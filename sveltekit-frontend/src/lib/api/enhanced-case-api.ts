@@ -112,7 +112,8 @@ export class EnhancedCaseAPI {
         formData: CaseCreationRequest
     ): Promise<APIResponse<WorkerTriggerResponse>> {
         try {
-            console.log('📡 Triggering worker processing for case: ', caseId);'/worker/autotag/trigger',
+            console.log('📡 Triggering worker processing for case: ', caseId);
+'/worker/autotag/trigger',
                 {
                     type: 'case_created',
                     caseId,
@@ -241,7 +242,7 @@ export class EnhancedCaseAPI {
     /**
      * Cluster similar cases using enhanced REST architecture
      */
-    async clusterSimilarCases(params, {
+    async clusterSimilarCases(params: {
         caseId?: string;
         algorithm?: 'kmeans' | 'som' | 'hierarchical';
         k?: number;

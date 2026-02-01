@@ -1,5 +1,5 @@
-<scriptlang="ts">
-    let message = "Hello from Phase 99 Test!";
+<script lang="ts">
+   let message = "Hello from Phase 99 Test!";
 </script>
 
 <h1>Phase 99 Test</h1>

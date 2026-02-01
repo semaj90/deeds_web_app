@@ -1,101 +1,135 @@
 <script lang="ts">
-	let tag = $state<any>(undefined);
 
+  // State definition using Runes
+  let tag = $state<any>(undefined);
 
- let evidence = [
- {
- id: 'EVD-2024-001',
- title: 'Financial Records Q3 2023',
- type: 'document',
- format: 'pdf',
- size: '2.4 MB',
- uploaded: new Date('2024-01-15', case: 'CASE-2024-001',
- tags: ['financial', 'quarterly', '2023'],
- aiAnalyzed: true, confidence: 94, status: 'processed'
- },
- {
- id: 'EVD-2024-002',
- title: 'Email Correspondence Chain',
- type: 'email',
- format: 'eml',
- size: '156 KB',
- uploaded: new Date('2024-01-16', case: 'CASE-2024-001',
- tags: ['communication', 'chain', 'evidence'],
- aiAnalyzed: true, confidence: 87, status: 'processed'
- },
- {
- id: 'EVD-2024-003',
- title: 'Contract Agreement - TechCorp',
- type: 'document',
- format: 'docx',
- size: '1.8 MB',
- uploaded: new Date('2024-01-17', case: 'CASE-2024-002',
- tags: ['contract', 'agreement', 'legal'],
- aiAnalyzed: false, confidence: 0, status: 'pending'
- },
- {
- id: 'EVD-2024-004',
- title: 'Security Camera Footage',
- type: 'video',
- format: 'mp4',
- size: '45.2 MB',
- uploaded: new Date('2024-01-18', case: 'CASE-2024-003',
- tags: ['video', 'security', 'footage'],
- aiAnalyzed: true, confidence: 76, status: 'processing'
- },
- {
- id: 'EVD-2024-005',
- title: 'Bank Transaction Records',
- type: 'spreadsheet',
- format: 'xlsx',
- size: '892 KB',
- uploaded: new Date('2024-01-19', case: 'CASE-2024-001',
- tags: ['banking', 'transactions', 'records'],
- aiAnalyzed: true, confidence: 91, status: 'processed'
- },
- {
- id: 'EVD-2024-006',
- title: 'Witness Statement - John Doe',
- type: 'document',
- format: 'pdf',
- size: '324 KB',
- uploaded: new Date('2024-01-20', case: 'CASE-2024-003',
- tags: ['witness', 'statement', 'testimony'],
- aiAnalyzed: false, confidence: 0, status: 'pending'
- }
- ],
+  interface EvidenceItem {
+    id: string;
+    title: string;
+    type: 'document' | 'email' | 'video' | 'spreadsheet' | 'audio';
+    format: string;
+    size: string;
+    uploaded: Date;
+    case: string;
+    tags: string[];
+    aiAnalyzed: boolean;
+    confidence: number;
+    status: 'processed' | 'pending' | 'processing' | 'failed';
+  }
 
- let selectedEvidence = $state(new Set<string>());
- let viewMode = $state('grid'); // 'grid' or 'list'
+  let evidence = $state<EvidenceItem[]>([
+    {
+      id: 'EVD-2024-001',
+      title: 'Financial Records Q3 2023',
+      type: 'document',
+      format: 'pdf',
+      size: '2.4 MB',
+      uploaded: new Date('2024-01-15'),
+      case: 'CASE-2024-001',
+      tags: ['financial', 'quarterly', '2023'],
+      aiAnalyzed: true,
+      confidence: 94,
+      status: 'processed'
+    },
+    {
+      id: 'EVD-2024-002',
+      title: 'Email Correspondence Chain',
+      type: 'email',
+      format: 'eml',
+      size: '156 KB',
+      uploaded: new Date('2024-01-16'),
+      case: 'CASE-2024-001',
+      tags: ['communication', 'chain', 'evidence'],
+      aiAnalyzed: true,
+      confidence: 87,
+      status: 'processed'
+    },
+    {
+      id: 'EVD-2024-003',
+      title: 'Contract Agreement - TechCorp',
+      type: 'document',
+      format: 'docx',
+      size: '1.8 MB',
+      uploaded: new Date('2024-01-17'),
+      case: 'CASE-2024-002',
+      tags: ['contract', 'agreement', 'legal'],
+      aiAnalyzed: false,
+      confidence: 0,
+      status: 'pending'
+    },
+    {
+      id: 'EVD-2024-004',
+      title: 'Security Camera Footage',
+      type: 'video',
+      format: 'mp4',
+      size: '45.2 MB',
+      uploaded: new Date('2024-01-18'),
+      case: 'CASE-2024-003',
+      tags: ['video', 'security', 'footage'],
+      aiAnalyzed: true,
+      confidence: 76,
+      status: 'processing'
+    },
+    {
+      id: 'EVD-2024-005',
+      title: 'Bank Transaction Records',
+      type: 'spreadsheet',
+      format: 'xlsx',
+      size: '892 KB',
+      uploaded: new Date('2024-01-19'),
+      case: 'CASE-2024-001',
+      tags: ['banking', 'transactions', 'records'],
+      aiAnalyzed: true,
+      confidence: 91,
+      status: 'processed'
+    },
+    {
+      id: 'EVD-2024-006',
+      title: 'Witness Statement - John Doe',
+      type: 'document',
+      format: 'pdf',
+      size: '324 KB',
+      uploaded: new Date('2024-01-20'),
+      case: 'CASE-2024-003',
+      tags: ['witness', 'statement', 'testimony'],
+      aiAnalyzed: false,
+      confidence: 0,
+      status: 'pending'
+    }
+  ]);
 
- function toggleSelection(evidenceId: string) {
- if (selectedEvidence.has(evidenceId)) {
- selectedEvidence.delete(evidenceId);
- } else {
- selectedEvidence.add(evidenceId);
- }
- selectedEvidence = selectedEvidence;
- }
+  let selectedEvidence = $state(new Set<string>());
+  let viewMode = $state('grid'); // 'grid' or 'list'
 
- function selectAll() {
- if (selectedEvidence.size === evidence.length) {
- selectedEvidence = new Set();
- } else {
- selectedEvidence = new Set(evidence.map(e => e.id));
- }
- }
+  function toggleSelection(evidenceId: string) {
+    const newSelection = new Set(selectedEvidence);
+    if (newSelection.has(evidenceId)) {
+      newSelection.delete(evidenceId);
+    } else {
+      newSelection.add(evidenceId);
+    }
+    selectedEvidence = newSelection;
+  }
 
- function getFileIcon(format: string): string {
- switch (format.toLowerCase()) {
- case 'pdf': return '📄';
- case 'docx': case 'doc': return '📝';
- case 'xlsx': case 'xls': return '📊';
- case 'mp4': case 'avi': case 'mov': return '🎥';
- case 'jpg': case 'png': case 'gif': return '🖼️';
- case 'eml': return '📧';
- default: return '📄';
- }
- }
+  function selectAll() {
+    if (selectedEvidence.size === evidence.length) {
+      selectedEvidence = new Set();
+    } else {
+      selectedEvidence = new Set(evidence.map(e => e.id));
+    }
+  }
+
+  function getFileIcon(format: string): string {
+    switch (format.toLowerCase()) {
+      case 'pdf': return '📄';
+      case 'docx': case 'doc': return '📝';
+      case 'xlsx': case 'xls': return '📊';
+      case 'mp4': case 'avi': case 'mov': return '🎥';
+      case 'jpg': case 'png': case 'gif': return '🖼️';
+      case 'eml': return '📧';
+      default: return '📄';
+    }
+  }
 
  function getStatusColor(status: string): string {
  switch (status) {

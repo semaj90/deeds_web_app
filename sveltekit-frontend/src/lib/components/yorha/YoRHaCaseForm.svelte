@@ -1,11 +1,10 @@
 <!-- Enhanced YoRHa Case Creation Form with Superforms + XState Integration -->
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { enhancedCaseAPI } from '$lib/api/enhanced-case-api';
-  import { createCaseCreationForm, FORM_STORAGE_KEYS, FormStatePersistence } from '$lib/forms/superforms-xstate-integration';
+  import { enhancedCaseAPI, type CaseCreationRequest } from '$lib/api/enhanced-case-api';
+  import { createCaseCreationForm, FORM_STORAGE_KEYS } from '$lib/forms/superforms-xstate-integration';
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
   import { get } from 'svelte/store';
-  import type { SuperForm } from 'sveltekit-superforms';
   import { z } from 'zod';
 
   // Enhanced Zod schema for case creation with legal AI context
@@ -33,7 +32,13 @@
   interface FormIntegrationType {
     state: { subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => string };
     context: { subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => unknown };
-    form: SuperForm<CaseCreationSchemaType, unknown>;
+    form: {
+      form: Readable<CaseCreationSchemaType>;
+      submitting: Readable<boolean>;
+      allErrors: Readable<string[]>;
+      errors: Readable<Record<string, string[]>>;
+      enhance: (el: HTMLFormElement) => { destroy: () => void };
+    };
   }
 
   let formIntegration = $state<FormIntegrationType | null>(null);
@@ -45,7 +50,7 @@
   let formState = $derived(formIntegration?.state.get?.() ?? 'idle');
   let formContext = $derived(formIntegration?.context.get?.() ?? {});
   let isSubmitting = $derived(formIntegration ? get(formIntegration.form.submitting) : false);
-  let isValid = $derived(formIntegration ? get(formIntegration.form.allErrors).length === 0 : true);
+  let isValid = $derived(formIntegration ? (get(formIntegration.form.allErrors) as string[]).length === 0 : true);
 
   // Progress calculation
   let progress = $derived(((currentStep + 1) / totalSteps) * 100);
@@ -56,7 +61,7 @@
   );
 
   let formErrors = $derived(
-    formIntegration ? get(formIntegration.form.errors) : {}
+    formIntegration ? (get(formIntegration.form.errors) as Record<string, string[]>) : {}
   );
 
   const STORAGE_KEY = FORM_STORAGE_KEYS?.CASE_CREATION ?? 'yorha:case_creation';
@@ -104,7 +109,7 @@
 
   async function handleEnhancedSubmit(data: Record<string, any>): Promise<any> {
     try {
-      const caseResponse = await enhancedCaseAPI.createCase(data as unknown);
+      const caseResponse = await enhancedCaseAPI.createCase(data as CaseCreationRequest);
       if (!caseResponse || !caseResponse.success) {
         throw new Error(caseResponse?.error ?? 'Failed to create case');
       }

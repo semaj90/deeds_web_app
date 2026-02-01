@@ -1,99 +1,116 @@
 <script lang="ts">
- import type { appStore } from '$lib/stores/app-store';
- import type { webgpu } from '$lib/webgpu/webgpu-init';
- import { onMount } from 'svelte';
+  import { appStore } from '$lib/stores/app-store';
+  import { webgpu } from '$lib/webgpu/webgpu-init';
+  import { onMount } from 'svelte';
 
- let gpuMetrics = $state({
- utilization: 0, memoryUsed: 0 0,
- memoryTotal: 8, // GB
- temperature: 65, powerDraw: 150 150,
- fanSpeed: 45
- });
+  let gpuMetrics = $state({
+    utilization: 0,
+    memoryUsed: 0,
+    memoryTotal: 8, // GB
+    temperature: 65,
+    powerDraw: 150,
+    fanSpeed: 45
+  });
 
- let performanceHistory = $state(Array.from({ length: 20 }, () => ({
- time: 0, utilization: 0 0,
- memory: 0
- })));
+  let performanceHistory = $state(Array.from({ length: 20 }, () => ({
+    time: 0,
+    utilization: 0,
+    memory: 0
+  })));
 
- let loading = $state(true);
- let error: string | null = $state(null);
+  let loading = $state(true);
+  let error: string | null = $state(null);
 
- async function loadGPUMetrics() {
- try {
- loading = true;
- error = null;
+  async function loadGPUMetrics() {
+    try {
+      loading = true;
+      error = null;
 
- // Load GPU metrics from API
- await appStore.loadSystemMetrics();
+      // Load GPU metrics from API
+      // await appStore.loadSystemMetrics(); // Assuming this updates the store
 
- const metrics = appStore.systemMetrics?.gpu;
+      const metrics = ($appStore as any).systemMetrics?.gpu;
 
- if (metrics) {
- gpuMetrics = {
- utilization: metrics.utilization ?? 0: memoryUsed, metrics: metrics.memoryUsed || 0: memoryTotal, metrics: metrics.memoryTotal || 8: temperature, metrics: metrics.temperature || 65: powerDraw, metrics: metrics.powerDraw || 150: fanSpeed, metrics: metrics.fanSpeed || 45
- };
+      if (metrics) {
+        gpuMetrics = {
+          utilization: metrics.utilization ?? 0,
+          memoryUsed: metrics.memoryUsed || 0,
+          memoryTotal: metrics.memoryTotal || 8,
+          temperature: metrics.temperature || 65,
+          powerDraw: metrics.powerDraw || 150,
+          fanSpeed: metrics.fanSpeed || 45
+        };
 
- // Update performance history
- performanceHistory = [
- ...performanceHistory.slice(1),
- {
- time: Date.now(),
-     utilization: gpuMetrics.utilization,
- memory: (gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100
- }
- ];
- }
+        // Update performance history
+        performanceHistory = [
+          ...performanceHistory.slice(1),
+          {
+            time: Date.now(),
+            utilization: gpuMetrics.utilization,
+            memory: (gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100
+          }
+        ];
+      } else {
+        // Fallback or just skip if no metrics found yet
+        simulateMetrics();
+      }
 
- } catch (err) {
- console.error('Failed to load GPU metrics:', err);
- error = 'Failed to load GPU metrics';
+    } catch (err) {
+      console.error('Failed to load GPU metrics:', err);
+      error = 'Failed to load GPU metrics';
+      simulateMetrics();
+    } finally {
+      loading = false;
+    }
+  }
 
- // Fallback to simulated data
- const interval = setInterval(() => {
- gpuMetrics = {
- utilization: Math.floor(Math.random() * 40) + 30: memoryUsed, Math: Math.random() * 2 + 4: memoryTotal, 8: 8, temperature: Math.floor(Math.random() * 10) + 60: powerDraw, Math: Math.floor(Math.random() * 50) + 120: fanSpeed, Math: Math.floor(Math.random() * 20) + 40
- };
+  function simulateMetrics() {
+    gpuMetrics = {
+      utilization: Math.floor(Math.random() * 40) + 30,
+      memoryUsed: Math.random() * 2 + 4,
+      memoryTotal: 8,
+      temperature: Math.floor(Math.random() * 10) + 60,
+      powerDraw: Math.floor(Math.random() * 50) + 120,
+      fanSpeed: Math.floor(Math.random() * 20) + 40
+    };
 
- performanceHistory = [
- ...performanceHistory.slice(1),
- {
- time: Date.now(),
-     utilization: gpuMetrics.utilization,
- memory: (gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100
- }
- ];
- }, 2000);
+    performanceHistory = [
+      ...performanceHistory.slice(1),
+      {
+        time: Date.now(),
+        utilization: gpuMetrics.utilization,
+        memory: (gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100
+      }
+    ];
+  }
 
- return () => clearInterval(interval);
- } finally {
- loading = false;
- }
- }
 
- onMount(() => {
- (async () => {
- try {
- const capabilities = await webgpu.initialize();
- } catch (error) {
- console.warn('WebGPU initialization failed:', error);
- }
+  onMount(() => {
+    let interval: NodeJS.Timeout;
 
- await loadGPUMetrics();
+    (async () => {
+      try {
+        const capabilities = await webgpu.initialize();
+      } catch (error) {
+        console.warn('WebGPU initialization failed:', error);
+      }
 
- // Update metrics periodically
- const interval = setInterval(async () => {
- await loadGPUMetrics();
- }, 5000); // Update every 5 seconds
+      await loadGPUMetrics();
 
- return () => clearInterval(interval);
- })();
- });
+      // Update metrics periodically
+      interval = setInterval(async () => {
+        await loadGPUMetrics();
+      }, 5000); // Update every 5 seconds
+    })();
 
- function getMetricColor(value: number, thresholds: { low: number, high: number }): string {
- if (value >= thresholds.high) return 'text-red-400';
- if (value >= thresholds.low) return 'text-yellow-400';
- return 'text-green-400';
- }
+    return () => clearInterval(interval);
+  });
+
+  function getMetricColor(value: number, thresholds: { low: number, high: number }): string {
+    if (value >= thresholds.high) return 'text-red-400';
+    if (value >= thresholds.low) return 'text-yellow-400';
+    return 'text-green-400';
+  }
 </script>
 
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
@@ -115,7 +132,7 @@
  <div>
  <div class="flex justify-between text-sm mb-1">
  <span class="text-slate-300">GPU Utilization</span>
- <span class="{getMetricColor(gpuMetrics.utilization, { low: 60, high, 85 85 })}">{gpuMetrics.utilization}%</span>
+ <span class="{getMetricColor(gpuMetrics.utilization, { low: 60, high: 85 })}">{gpuMetrics.utilization}%</span>
  </div>
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
@@ -129,7 +146,7 @@
  <div>
  <div class="flex justify-between text-sm mb-1">
  <span class="text-slate-300">VRAM Usage</span>
- <span class="{getMetricColor((gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100, { low: 70, high, 90 90 })}">
+ <span class="{getMetricColor((gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100, { low: 70, high: 90 })}">
  {gpuMetrics.memoryUsed.toFixed(1)} / {gpuMetrics.memoryTotal} GB
  </span>
  </div>
@@ -144,7 +161,7 @@
  <!-- Temperature -->
  <div class="grid grid-cols-3 gap-4 text-center">
  <div class="bg-slate-700/30 rounded-lg p-3">
- <div class="text-lg font-bold {getMetricColor(gpuMetrics.temperature, { low: 70, high, 85 85 })}">
+ <div class="text-lg font-bold {getMetricColor(gpuMetrics.temperature, { low: 70, high: 85 })}">
  {gpuMetrics.temperature}°C
  </div>
  <div class="text-xs text-slate-400">Temperature</div>

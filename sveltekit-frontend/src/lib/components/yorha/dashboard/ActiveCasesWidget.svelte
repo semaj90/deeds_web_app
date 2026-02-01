@@ -1,102 +1,105 @@
 <script lang="ts">
- import type { appStore } from '$lib/stores/app-store';
- import { onMount } from 'svelte';
+  import { appStore } from '$lib/stores/app-store';
+  import { onMount } from 'svelte';
 
- let activeCases: any[] = $state([]);
- let loading = $state(true);
- let error: string | null = $state(null);
+  let activeCases: any[] = $state([]);
+  let loading = $state(true);
+  let error: string | null = $state(null);
 
- async function loadActiveCases() {
- try {
- loading = true;
- error = null;
+  async function loadActiveCases() {
+    try {
+      loading = true;
+      error = null;
 
- // Load cases from API
- // await appStore.loadCases(); // Removed as loadCases does not exist on the store
+      // Filter for active cases and take first 5
+      // Accessing store reactively or directly depending on implementation
+      // Assuming naive access for now as the original code tried
+      const currentCases = ($appStore as any).cases || [];
 
- // Filter for active cases and take first 5
- activeCases = (($appStore as any).cases || [])
- .filter((caseItem: any) => caseItem.status === 'active' || caseItem.status === 'in_progress')
- .slice(0, 5)
- .map((caseItem: any) => ({
- id: caseItem.id || caseItem.caseId: title, caseItem: caseItem.title || caseItem.name || 'Untitled Case',
- status: caseItem.status || 'active',
- priority: caseItem.priority || 'medium',
- progress: caseItem.progress || Math.floor(Math.random() * 100, lastActivity: caseItem.updatedAt ? new Date(caseItem.updatedAt).toLocaleString() : 'Recently',
- evidenceCount: caseItem.evidenceCount || caseItem.documents?.length ?? 0
- }));
+      activeCases = currentCases
+        .filter((caseItem: any) => caseItem.status === 'active' || caseItem.status === 'in_progress')
+        .slice(0, 5)
+        .map((caseItem: any) => ({
+          id: caseItem.id || caseItem.caseId || 'UNKNOWN',
+          title: caseItem.title || caseItem.name || 'Untitled Case',
+          status: caseItem.status || 'active',
+          priority: caseItem.priority || 'medium',
+          progress: caseItem.progress || Math.floor(Math.random() * 100),
+          lastActivity: caseItem.updatedAt ? new Date(caseItem.updatedAt).toLocaleString() : 'Recently',
+          evidenceCount: caseItem.evidenceCount || caseItem.documents?.length ?? 0
+        }));
 
- } catch (err) {
- console.error('Failed to load active cases:', err);
- error = 'Failed to load cases';
+    } catch (err) {
+      console.error('Failed to load active cases:', err);
+      error = 'Failed to load cases';
 
- // Fallback to mock data if API fails
- activeCases = [
- {
- id: 'CASE-2024-001',
- title: 'Corporate Fraud Investigation',
- status: 'active',
- priority: 'high',
- progress: 75,
- lastActivity: '2 hours ago',
- evidenceCount: 1247
- },
- {
- id: 'CASE-2024-002',
- title: 'Intellectual Property Dispute',
- status: 'active',
- priority: 'medium',
- progress: 45,
- lastActivity: '1 day ago',
- evidenceCount: 892
- },
- {
- id: 'CASE-2024-003',
- title: 'Contract Breach Analysis',
- status: 'review',
- priority: 'low',
- progress: 90,
- lastActivity: '3 hours ago',
- evidenceCount: 567
- }
- ];
- } finally {
- loading = false;
- }
- }
+      // Fallback to mock data if API fails
+      activeCases = [
+        {
+          id: 'CASE-2024-001',
+          title: 'Corporate Fraud Investigation',
+          status: 'active',
+          priority: 'high',
+          progress: 75,
+          lastActivity: '2 hours ago',
+          evidenceCount: 1247
+        },
+        {
+          id: 'CASE-2024-002',
+          title: 'Intellectual Property Dispute',
+          status: 'active',
+          priority: 'medium',
+          progress: 45,
+          lastActivity: '1 day ago',
+          evidenceCount: 892
+        },
+        {
+          id: 'CASE-2024-003',
+          title: 'Contract Breach Analysis',
+          status: 'review',
+          priority: 'low',
+          progress: 90,
+          lastActivity: '3 hours ago',
+          evidenceCount: 567
+        }
+      ];
+    } finally {
+      loading = false;
+    }
+  }
 
- onMount(() => {
- loadActiveCases();
+  onMount(() => {
+    loadActiveCases();
 
- // Refresh cases periodically
- const interval = setInterval(() => {
- loadActiveCases();
- }, 60000); // Refresh every minute
+    // Refresh cases periodically
+    const interval = setInterval(() => {
+      loadActiveCases();
+    }, 60000); // Refresh every minute
 
- return () => clearInterval(interval);
- });
+    return () => clearInterval(interval);
+  });
 
- function getStatusColor(status: string): string {
- switch (status) {
- case 'active':
- case 'in_progress': return 'text-green-400';
- case 'review':
- case 'pending': return 'text-yellow-400';
- case 'closed':
- case 'completed': return 'text-slate-400';
- default: return 'text-slate-400';
- }
- }
+  function getStatusColor(status: string): string {
+    switch (status) {
+      case 'active':
+      case 'in_progress': return 'text-green-400';
+      case 'review':
+      case 'pending': return 'text-yellow-400';
+      case 'closed':
+      case 'completed': return 'text-slate-400';
+      default: return 'text-slate-400';
+    }
+  }
 
- function getPriorityColor(priority: string): string {
- switch (priority) {
- case 'high':
- case 'critical': return 'border-red-400';
- case 'medium': return 'border-yellow-400';
- case 'low': return 'border-green-400';
- default: return 'border-slate-400';
- }
- }
+  function getPriorityColor(priority: string): string {
+    switch (priority) {
+      case 'high':
+      case 'critical': return 'border-red-400';
+      case 'medium': return 'border-yellow-400';
+      case 'low': return 'border-green-400';
+      default: return 'border-slate-400';
+    }
+  }
 </script>
 
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">

@@ -11,10 +11,10 @@
   }
 
   // Props
-  const { systemData, legalSession, holographicMode = false } = $props<{ 
-    systemData?: SystemMetrics; 
-    legalSession?: any; 
-    holographicMode?: boolean; 
+  const { systemData, legalSession, holographicMode = false } = $props<{
+    systemData?: SystemMetrics;
+    legalSession?: any;
+    holographicMode?: boolean;
   }>();
 
   // Core system stores
@@ -65,7 +65,7 @@
     initializeHolographics();
     startSystemMonitoring();
     initWebGL();
-    
+
     return () => {
       if (animationId) cancelAnimationFrame(animationId);
     };
@@ -120,7 +120,7 @@
   function startRenderLoop() {
     const render = (timestamp: number) => {
       if (!glContext || !canvas3D) return;
-      
+
       glContext.viewport(0, 0, canvas3D.width, canvas3D.height);
       glContext.clearColor(0.02, 0.05, 0.1, 1.0);
       glContext.clear(glContext.COLOR_BUFFER_BIT | glContext.DEPTH_BUFFER_BIT);
@@ -132,7 +132,7 @@
   }
 
   function renderHolographics(timestamp: number) {
-    holographicData.update(currentData => 
+    holographicData.update(currentData =>
       currentData.map(item => ({
         ...item,
         rotation: {
@@ -146,7 +146,7 @@
 
   async function executeCommand(command: string): Promise<void> {
     if (isProcessingCommand) return;
-    
+
     isProcessingCommand = true;
     const cmdText = command;
     commandInput = '';
@@ -164,14 +164,14 @@
 
     try {
       const response: CommandResponse = await routeCommand(cmdText);
-      
+
       commandHistory.update(history => history.map(cmd => {
             if (cmd.id === result.id) {
-                return { 
-                    ...cmd, 
-                    status: 'SUCCESS', 
+                return {
+                    ...cmd,
+                    status: 'SUCCESS',
                     output: response.output || 'Command executed successfully.',
-                    data: response.data 
+                    data: response.data
                 };
             }
             return cmd;
@@ -213,28 +213,28 @@
   }
 
   async function executeAnalysisCommand(cmd: string): Promise<CommandResponse> {
-    return { 
-        output: `Analysis initiated: ${cmd.replace('analyze ', '')}`, 
-        data: { analysis_id: 'ANL-' + Date.now(), status: 'queued' } 
+    return {
+        output: `Analysis initiated: ${cmd.replace('analyze ', '')}`,
+        data: { analysis_id: 'ANL-' + Date.now(), status: 'queued' }
     };
   }
 
   async function executeSearchCommand(cmd: string): Promise<CommandResponse> {
     const query = cmd.replace('search ', '');
-    return { 
-        output: `Searching database for: "${query}"`, 
-        data: { query, results_count: Math.floor(Math.random() * 50) + 1 } 
+    return {
+        output: `Searching database for: "${query}"`,
+        data: { query, results_count: Math.floor(Math.random() * 50) + 1 }
     };
   }
 
   function executeSystemCommand(cmd: string): CommandResponse {
     if (cmd.includes('status')) {
-      return { 
-        output: 'All systems operational. YoRHa interface running at optimal parameters.', 
+      return {
+        output: 'All systems operational. YoRHa interface running at optimal parameters.',
         data: get(metrics)
       };
     } else if (cmd.includes('modules')) {
-      return { 
+      return {
         output: `${get(activeModules).length} modules active`,
         data: get(activeModules)
       };
@@ -243,16 +243,16 @@
   }
 
   async function executeNeuralCommand(): Promise<CommandResponse> {
-    return { 
-        output: 'Neural network processing initiated', 
+    return {
+        output: 'Neural network processing initiated',
         data: { neural_activity: get(metrics).neural_activity }
     };
   }
 
   function executeHelpCommand(): CommandResponse {
-    return { 
+    return {
         output: `Available commands: LEGAL <query>, ANALYZE <target>, SEARCH <terms>, SYSTEM STATUS, NEURAL SCAN`,
-        data: { commands: ['legal', 'analyze', 'search', 'system', 'neural'] } 
+        data: { commands: ['legal', 'analyze', 'search', 'system', 'neural'] }
     };
   }
 
@@ -284,7 +284,7 @@
 
 <!-- YoRHa Command Interface -->
 <div class="yorha-container min-h-screen bg-slate-900 text-cyan-400 p-4 relative overflow-hidden" class:glitch-effect={glitchActive}>
-  
+
   <!-- Scanline Overlay -->
   <div class="scanlines pointer-events-none absolute inset-0 z-20" style="opacity: {scanlineOpacity}"></div>
 
@@ -295,13 +295,13 @@
 
   <!-- Animated Data Streams -->
   {#each Array(12) as _, i}
-    <div class="data-stream absolute w-0.5 bg-gradient-to-b from-transparent via-cyan-500 to-transparent h-24 z-10" 
+    <div class="data-stream absolute w-0.5 bg-gradient-to-b from-transparent via-cyan-500 to-transparent h-24 z-10"
          style="left: {5 + i * 8}%; top: -100px; animation: dataFlow 3s linear infinite; animation-delay: {i * 0.3}s"></div>
   {/each}
 
   <!-- Main Interface Content -->
   <div class="relative z-30 flex flex-col h-full max-w-7xl mx-auto">
-    
+
     <!-- Header -->
     <header class="flex justify-between items-center mb-8 border-b border-cyan-500/30 pb-4">
       <div>
@@ -321,7 +321,7 @@
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1">
-      
+
       <!-- Left Column: Modules & Metrics -->
       <div class="lg:col-span-1 space-y-6">
         <!-- System Modules Grid -->
@@ -393,12 +393,12 @@
         <!-- Command Input -->
         <div class="p-4 bg-cyan-950/20 border-t border-cyan-500/30 flex items-center gap-3">
              <span class="text-cyan-400 font-bold animate-pulse">></span>
-             <input type="text" 
-                    bind:value={commandInput} 
+             <input type="text"
+                    bind:value={commandInput}
                     onkeydown={handleKeyPress}
                     disabled={isProcessingCommand}
                     class="flex-1 bg-transparent border-none outline-none text-cyan-100 font-mono placeholder-cyan-700 disabled:opacity-50"
-                    placeholder="Enter system command..." 
+                    placeholder="Enter system command..."
                     autocomplete="off" />
             {#if isProcessingCommand}
                  <span class="text-xs text-yellow-500 animate-pulse">PROCESSING...</span>
@@ -417,7 +417,7 @@
   .yorha-container {
       font-family: 'Share Tech Mono', monospace;
   }
-  
+
   .hologram-text {
       text-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
   }
