@@ -130,7 +130,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
-  class="bg-slate-950 border-2 border-slate-800 rounded-sm flex flex-col h-[600px] font-mono shadow-2xl overflow-hidden"
+  class="bg-slate-950 border-2 border-slate-800 rounded-sm flex flex-col h-fixed font-mono shadow-2xl overflow-hidden"
   onclick={() => inputRef?.focus()}
 >
   <!-- Header -->
@@ -141,11 +141,11 @@
         <div class="w-2.5 h-2.5 bg-slate-800 border border-slate-700"></div>
         <div class="w-2.5 h-2.5 bg-slate-800 border border-slate-700"></div>
       </div>
-      <span class="text-[10px] font-bold text-slate-500 tracking-widest uppercase">{title}</span>
+      <span class="text-xs-plus font-bold text-slate-500 tracking-widest uppercase">{title}</span>
     </div>
     <div class="flex items-center gap-2">
       <div class="h-1.5 w-1.5 rounded-full {isActive ? 'bg-cyan-500 animate-pulse' : 'bg-slate-600'}"></div>
-      <span class="text-[9px] text-slate-500">{isActive ? 'RELAY_ACTIVE' : 'RELAY_OFFLINE'}</span>
+      <span class="text-xxs text-slate-500">{isActive ? 'RELAY_ACTIVE' : 'RELAY_OFFLINE'}</span>
     </div>
   </div>
 
@@ -181,7 +181,7 @@
   </div>
 
   <!-- Footer -->
-  <div class="bg-slate-900/50 px-4 py-1 border-t border-slate-900 flex justify-between items-center text-[9px] text-slate-600">
+  <div class="bg-slate-900/50 px-4 py-1 border-t border-slate-900 flex justify-between items-center text-xxs text-slate-600">
     <span>SECURE CONNECTION</span>
     <span>ENCRYPTION: AES-256-YORHA</span>
   </div>
@@ -204,6 +204,11 @@
   .whitespace-pre-wrap { white-space: pre-wrap; }
   .leading-relaxed { line-height: 1.625; }
   .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+  .h-fixed { height: 600px; }
+  .text-xs-plus { font-size: 10px; }
+  .text-xxs { font-size: 9px; }
+
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -224,9 +229,9 @@
 
   /* Responsive Design */
   @media (max-width: 768px) {
-    .h-[600px] { height: 400px; }
-    .text-[10px] { font-size: 0.625rem; }
-    .text-[9px] { font-size: 0.5625rem; }
+    .h-fixed { height: 400px; }
+    .text-xs-plus { font-size: 0.625rem; }
+    .text-xxs { font-size: 0.5625rem; }
     .p-4 { padding: 0.5rem; }
     .px-4 { padding-left: 0.5rem; padding-right: 0.5rem; }
     .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }

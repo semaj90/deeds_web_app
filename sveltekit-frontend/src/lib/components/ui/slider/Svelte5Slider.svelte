@@ -1,13 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let id = $state<any>(undefined);
-	let label = $state<any>(undefined);
-	let name = $state<any>(undefined);
-	let step = $state<any>(undefined);
-	let disabled = $state<any>(undefined);
-	let min = $state<any>(undefined);
-	let max = $state<any>(undefined);
-
 /**
  * Svelte 5 Slider Component
  * Accessible range input with Svelte 5 runes
