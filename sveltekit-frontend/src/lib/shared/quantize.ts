@@ -1,5 +1,4 @@
 import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export function quantizeFloat32ToUint8(float32: Float32Array): QuantizedEmbedding {
     // Find min/max for scaling
@@ -25,6 +24,7 @@ export function quantizeFloat32ToUint8(float32: Float32Array): QuantizedEmbeddin
     }
 
     return {
+        uint8: quantized,
         data: quantized,
         scale,
         offset,
