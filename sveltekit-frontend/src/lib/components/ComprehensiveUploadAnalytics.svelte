@@ -463,7 +463,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 			<div class="results-list">
 				{#each uploadResults as result}
-					<div class="result-item" class:success={result.success}; class:error={!result.success}>
+					<div class="result-item"
+						class:success={result.success}
+						class:error={!result.success}
+					>
 						<div class="result-info">
 							<span class="result-filename">{result.fileName}</span>
 							{#if result.success && result.documentId}

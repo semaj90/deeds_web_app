@@ -1,4 +1,4 @@
-import type { AITask, AITaskType, WorkerStatus } from '$lib/types';
+import type { AITask, AITaskType } from '$lib/types';
 
 // --- TYPE GUARD UTILITIES ---
 // This file provides type guard functions for safely handling union types and
@@ -6,6 +6,7 @@ import type { AITask, AITaskType, WorkerStatus } from '$lib/types';
 
 // Define missing types locally
 export type ServiceStatus = 'operational' | 'degraded' | 'offline' | 'unknown';
+export type WorkerStatus = 'idle' | 'busy' | 'error' | 'offline';
 export type APIResponse<T = any> = { success: boolean; data?: T; error?: string; message?: string };
 export type WorkerMessage = { type: string; payload?: any };
 export type WorkerMessageType = string;

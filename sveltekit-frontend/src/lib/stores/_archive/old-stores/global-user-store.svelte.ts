@@ -5,8 +5,6 @@ import { browser } from '$app/environment';
 import type { ChatAnalytics, RecommendationResult, UserPattern, } from '$lib/server/services/user-recommendation-service';
 import crypto from 'crypto';
 import type { Session, User } from 'lucia';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // ===== CORE USER STATE =====
 export interface GlobalUserState {
@@ -154,8 +152,8 @@ let globalUserState = $state<GlobalUserState>(defaultState);
 
 // Reactive computations using Svelte 5 $derived
 const displayName = $derived(
-  globalUserState.profile?.name ?? globalUserState.profile?.firstName ||
-  globalUserState.profile?.email ?? 'Anonymous User'
+  globalUserState.profile?.name ?? (globalUserState.profile?.firstName ||
+  globalUserState.profile?.email) ?? 'Anonymous User'
 );
 
 const isOnline = $derived(globalUserState.syncStatus !== 'offline' && browser);
