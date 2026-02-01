@@ -29,23 +29,6 @@ export class UserAuthService {
                 return { user: null, success: false, error: 'User already exists' };
             }
 
-            const passwordHash = await bcrypt.hash(userData.password, 12);
-
-            // Create user
-            const result = await db.insert(users).values({
-                email: userData.email.toLowerCase(),
-                passwordHash,
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                role: userData.role ?? 'user',
-                jurisdiction: userData.jurisdiction,
-                practiceAreas: userData.practiceAreas,
-                isActive: true
-            } as any).returning();
-
-            const newUser = result[0];
-
-            return { user: newUser as unknown as User, success: true };
         } catch (error: any) {
             console.error('User registration error:', error);
             return { user: null, success: false, error: error.message };

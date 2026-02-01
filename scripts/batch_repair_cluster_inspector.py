@@ -1,4 +1,7 @@
-<script lang="ts">
+import os
+
+files_to_fix = {
+    "sveltekit-frontend/src/routes/couchdb-analytics/ClusterInspector.svelte": r"""<script lang="ts">
 	import { onMount } from 'svelte';
 
 	interface Props {
@@ -523,3 +526,29 @@
 		letter-spacing: 0.5px;
 	}
 </style>
+"""
+}
+
+def repair_files():
+    base_dir = r"c:\Users\james\Videos\deeds-web-app"
+
+    print(f"Starting repair of {len(files_to_fix)} files...")
+
+    for relative_path, clean_content in files_to_fix.items():
+        # Clean relative path to match OS
+        full_path = os.path.join(base_dir, relative_path.replace("/", os.sep))
+
+        try:
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+
+            with open(full_path, "w", encoding="utf-8") as f:
+                f.write(clean_content)
+
+            print(f"✅ Repaired: {relative_path}")
+
+        except Exception as e:
+            print(f"❌ Failed to repair {relative_path}: {e}")
+
+if __name__ == "__main__":
+    repair_files()
