@@ -83,17 +83,15 @@
  }
  }
 
- function getFilteredQuestions() {
- if (!session) return [];
+  function getFilteredQuestions() {
+    if (!session) return [];
 
- return session.questions.filter(q => {
- const typeMatch = selectedQuestionType === 'all' || q.type === selectedQuestionType,
- const priorityMatch = selectedPriority === 'all' || q.priority === selectedPriority,
- return typeMatch && priorityMatch;
- });
- }
-
- function getQuestionTypeIcon(type: string) {
+    return session.questions.filter(q => {
+      const typeMatch = selectedQuestionType === 'all' || q.type === selectedQuestionType;
+      const priorityMatch = selectedPriority === 'all' || q.priority === selectedPriority;
+      return typeMatch && priorityMatch;
+    });
+  } function getQuestionTypeIcon(type: string) {
  switch (type) {
  case 'general': return '❓';
  case 'timeline': return '⏰';

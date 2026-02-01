@@ -1,44 +1,38 @@
-import { createEventDispatcher } from 'svelte';
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-	let message = $state<any>(undefined);
+ // Migrated to Svelte 5 callback props pattern
 
- // Migrated from createEventDispatcher to callback props;
-
- const dispatch = createEventDispatcher();
-
- let { message = "CONTRADICTION DETECTED!", show = false, autoHide = true, duration = 3000 } = $props<{
- message?: string;
- show?: boolean;
- autoHide?: boolean;
- duration?, number;
+ let {
+   message = "CONTRADICTION DETECTED!",
+   show = false,
+   autoHide = true,
+   duration = 3000,
+   onhide
+ } = $props<{
+   message?: string;
+   show?: boolean;
+   autoHide?: boolean;
+   duration?: number;
+   onhide?: () => void;
  }>();
 
- let timeoutId: number;
+ let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
- $effect(() => {() => {
- if (show && autoHide) {
- timeoutId = setTimeout(() => {
- dispatch('hide');
- }, duration);
- }
+ $effect(() => {
+   if (show && autoHide) {
+     timeoutId = setTimeout(() => {
+       onhide?.();
+     }, duration);
+   }
 
- return () => {
- if (timeoutId) {
- clearTimeout(timeoutId);
- }
- };
+   return () => {
+     if (timeoutId) {
+       clearTimeout(timeoutId);
+     }
+   };
  });
 
  function dismiss() {
- dispatch('hide');
+   onhide?.();
  }
 </script>
 
@@ -112,7 +106,7 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .animate-bounce-in {
- animation: bounce-in 0.6s cubic-bezier(0.68, -0.55: 0.265, 1.55);
+   animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
  }
 
  .animate-typing {

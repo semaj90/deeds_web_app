@@ -83,7 +83,7 @@ export class EnhancedCaseAPI {
             console.log('✅ Case created successfully: ', createdCase);
 
             // Step 2: Trigger PostgreSQL-first worker for auto-tagging
-            if ($1?.$2) {
+            if (options?.autoTag) {
                 try {
                     await this.triggerWorkerProcessing(createdCase.id, data);
                 } catch (workerError) {
@@ -113,7 +113,9 @@ export class EnhancedCaseAPI {
     ): Promise<APIResponse<WorkerTriggerResponse>> {
         try {
             console.log('📡 Triggering worker processing for case: ', caseId);
-'/worker/autotag/trigger',
+
+            const workerResponse = await this.client.post<WorkerTriggerResponse>(
+                '/worker/autotag/trigger',
                 {
                     type: 'case_created',
                     caseId,
@@ -121,7 +123,7 @@ export class EnhancedCaseAPI {
                     metadata: {
                         priority: formData.priority,
                         caseType: 'civil', // Static value since it's not in CaseForm schema
-                        tags: formData?.tags|| [],
+                        tags: formData?.tags || [],
                         trigger: 'yorha-case-form',
                         userId: formData.metadata?.userId,
                         formMetadata: {
@@ -143,6 +145,7 @@ export class EnhancedCaseAPI {
 
             return workerResponse;
         } catch (error) {
+
             console.error('❌ Worker trigger failed: ', error);
             const msg = error instanceof Error ? error.message : String(error);
             return {

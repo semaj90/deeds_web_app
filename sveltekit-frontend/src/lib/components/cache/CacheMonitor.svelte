@@ -1,8 +1,14 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { cache } from '$lib/cache/cache-service.svelte';
 	import { CacheMonitoring } from '$lib/cache/cache-invalidation';
-	import type { CacheHealth } from '$lib/cache/cache-service.svelte';
+	import { cache } from '$lib/cache/cache-service.svelte';
+	import { onMount } from 'svelte';
+
+	type CacheHealth = {
+		isHealthy: boolean;
+		memoryReady: boolean;
+		persistentReady: boolean;
+		lastCheck: number;
+	};
 
 	let health = $state<CacheHealth>({
 		isHealthy: true,
@@ -13,7 +19,7 @@
 
 	let stats = $derived(cache.getStats());
 	let autoRefresh = $state(true);
-	let refreshInterval: number;
+	let refreshInterval: ReturnType<typeof setInterval> | undefined;
 
 	onMount(() => {
 		updateHealth();
@@ -43,7 +49,7 @@
 
 	async function clearCache() {
 		if (confirm('Clear all cache? This cannot be undone.')) {
-			await cache.clear();
+			await cache.clearAll();
 			await updateHealth();
 		}
 	}
@@ -102,11 +108,11 @@
 	<div class="stats-grid">
 		<div class="stat-card">
 			<div class="stat-label">Total Operations</div>
-			<div class="stat-value">{stats.total.toLocaleString()}</div>
+			<div class="stat-value">{stats.totalRequests.toLocaleString()}</div>
 		</div>
 		<div class="stat-card">
 			<div class="stat-label">Cache Hits</div>
-			<div class="stat-value text-success">{stats.hits.toLocaleString()}</div>
+			<div class="stat-value text-success">{stats.totalHits.toLocaleString()}</div>
 		</div>
 		<div class="stat-card">
 			<div class="stat-label">Cache Misses</div>
@@ -114,7 +120,7 @@
 		</div>
 		<div class="stat-card">
 			<div class="stat-label">Hit Rate</div>
-			<div class="stat-value">{stats.hitRate.toFixed(2)}%</div>
+			<div class="stat-value">{parseFloat(stats.hitRate).toFixed(2)}%</div>
 			<div class="progress-bar">
 				<div class="progress-fill" style="width: {stats.hitRate}%"></div>
 			</div>
@@ -128,7 +134,7 @@
 			<div class="storage-stats">
 				<div class="stat-row">
 					<span>Items:</span>
-					<strong>{stats.memoryItems.toLocaleString()}</strong>
+					<strong>{stats.memoryStats.collections.toLocaleString()}</strong>
 				</div>
 			</div>
 		</div>
@@ -137,7 +143,7 @@
 			<div class="storage-stats">
 				<div class="stat-row">
 					<span>Items:</span>
-					<strong>{stats.persistentItems.toLocaleString()}</strong>
+					<strong>{stats.persistentHits.toLocaleString()}</strong>
 				</div>
 			</div>
 		</div>

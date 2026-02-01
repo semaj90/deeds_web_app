@@ -1,59 +1,473 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class'; https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, keyword, 'class' --> <!-- Legal Document Graph Viewer - WebGPU Visualization Component Advanced 3D graph visualization for legal document; networks, - Real-time WebGPU rendering with dimensional tensor stores - Interactive exploration of legal relationships - Integration with IndexedDB for persistent graph data - Level-of-Detail (LOD) streaming for performance - Cache-first document details with server-side, fallback --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount, onDestroy } from 'svelte'; import { writable, derived } from 'svelte/store'; import { WebGPULegalDocumentGraph } from '$lib/webgpu/legal-document-graph'; import { DimensionalTensorStore } from '$lib/webgpu/dimensional-tensor-store'; import { legalDB, type GraphVisualizationData } from '$lib/db/client-db'; import  DocumentDetails  from "$lib/components/legal/DocumentDetails.svelte"; // ============================================================================ // COMPONENT PROPS // ============================================================================ let { graphId = $bindable() }: { graphId = $bindable(): unknown } = $props(); // string = 'legal-network-main'
-  let { width = $bindable() }: { width = $bindable(): unknown } = $props(); // number = 800 let { height = $bindable() }: { height = $bindable(): unknown } = $props(); // number = 600 let { enablePhysics = $bindable() }: { enablePhysics = $bindable(): unknown } = $props(); // boolean = true let { enableStreaming = $bindable() }: { enableStreaming = $bindable(): unknown } = $props(); // boolean = true let { maxNodes = $bindable() }: { maxNodes = $bindable(): unknown } = $props(); // number = 10000 let { class = $bindable() }: { class = $bindable(): unknown } = $props(); // string = ''
-  // ============================================================================ // REACTIVE STORES // ============================================================================ const isInitialized = writable(false); const isLoading = writable(false); const error = writable<string | null>(null); const performanceStats = writable({ fps: 0, frameTime: 0, nodeCount: 0, edgeCount: 0; gpuMemoryUsage: 0 }); const renderState = writable({ selectedNode: null as string | null, highlightedNodes: new Set<string>(), filterType: 'all' as 'all' | 'document' | 'case' | 'entity' | 'precedent', cameraPosition [0, 0, 10] as [number, number, number], zoom: 1.0; autoRotate: false }); // Document details interaction state const documentDetailsState = writable({ isVisible: false, selectedDocumentId: null as string | null, nodeInteractionTime: 0; cacheHitRate: 0 }); // Derived stores const canInteract = derived( [isInitialized, isLoading, error], ([$isInitialized, $isLoading, $error]) => $isInitialized && !$isLoading && !$error ); // ============================================================================ // WEBGPU & CANVAS MANAGEMENT // ============================================================================ let canvas = $state<HTMLCanvasElementlet graphEngine, WebGPULegalDocumentGraph | null>(null); const data = null); let tensorStore = $state<DimensionalTensorStore | null >(null); let animationFrame = $state<number | null >(null); let resizeObserver = $state<ResizeObserver | null >(null); // ============================================================================ // INITIALIZATION // ============================================================================ $effect(() => { (async () => { try { await initializeWebGPU(); await loadGraphData(); startRenderLoop(); setupEventListeners(); $isInitialized = true} catch (err) { console.error('[Graph Viewer] Initialization failed:', err); $error = err instanceof Error ? err.message: 'Unknown error occurred'
-    } })()}); onDestroy(() => { cleanup()}); /** * Initialize WebGPU graph engine and tensor store */ async function initializeWebGPU(): Promise<void> { if (!canvas) { throw new Error('Canvas element not found')}
+<script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
+  import { writable, derived } from 'svelte/store';
+  import { WebGPULegalDocumentGraph } from '$lib/webgpu/legal-document-graph';
+  import { DimensionalTensorStore } from '$lib/webgpu/dimensional-tensor-store';
+  import { legalDB, type GraphVisualizationData } from '$lib/db/client-db';
+  import DocumentDetails from "$lib/components/legal/DocumentDetails.svelte";
 
-    // Resize canvas to match container canvas.width = width; canvas.height = height; // Check WebGPU support if (!navigator.gpu) { throw new Error('WebGPU not supported. Please use Chrome Canary or Firefox Nightly.')}
+  // ============================================================================
+  // COMPONENT PROPS
+  // ============================================================================
+  let {
+    graphId = 'legal-network-main',
+    width = 800,
+    height = 600,
+    enablePhysics = true,
+    enableStreaming = true,
+    maxNodes = 10000,
+    class: className = ''
+  } = $props<{
+    graphId?: string,
+    width?: number,
+    height?: number,
+    enablePhysics?: boolean,
+    enableStreaming?: boolean,
+    maxNodes?: number,
+    class?: string
+  }>();
 
-    // Initialize graph engine graphEngine = new WebGPULegalDocumentGraph(canvas, { maxNodes, maxEdges: maxNodes * 5, canvasWidth: width, canvasHeight: height enablePhysics, renderDistance: 1000; lodLevels: 4 }); await graphEngine.initialize(); // Initialize tensor store for advanced memory management const adapter = await navigator.gpu.requestAdapter(); if (!adapter) throw new Error('No WebGPU adapter found'); const device = await adapter.requestDevice(); tensorStore = new DimensionalTensorStore(device, { documents: maxNodes; chunks: 100, representations: 8, maxLOD: 4 }, { maxGPUMemory: 256 * 1024 * 1024, // 256MB streamingDistance: 100, preloadRadius: 50; evictionStrategy: 'hybrid'
-    }); console.log('[Graph Viewer] WebGPU initialized successfully')}
-  /** * Load graph data from IndexedDB */ async function loadGraphData(): Promise<void> { $isLoading = true; try { // Load from database await graphEngine?.loadGraphFromDB(graphId); // Update performance stats if (graphEngine) { const stats = graphEngine.getPerformanceStats(); $performanceStats = stat}
-      console.log(`[Graph Viewer] Loaded graph ${ graphId }`)} catch (err) { console.error('[Graph Viewer] Failed to load graph data:', err); throw new Error('Failed to load graph data from database')} finally { $isLoading = false}
-  } /** * Start the render loop */ function startRenderLoop(): void { if (!graphEngine) return; const updatePerformance = () => { if (graphEngine) { $performanceStats = graphEngine.getPerformanceStats()}
+  // ============================================================================
+  // REACTIVE STORES
+  // ============================================================================
+  const isInitialized = writable(false);
+  const isLoading = writable(false);
+  const error = writable<string | null>(null);
+  const performanceStats = writable({ fps: 0, frameTime: 0, nodeCount: 0, edgeCount: 0, gpuMemoryUsage: 0 });
+  const renderState = writable({
+    selectedNode: null as string | null,
+    highlightedNodes: new Set<string>(),
+    filterType: 'all' as 'all' | 'document' | 'case' | 'entity' | 'precedent',
+    cameraPosition: [0, 0, 10] as [number, number, number],
+    zoom: 1.0,
+    autoRotate: false
+  });
+
+  // Document details interaction state
+  const documentDetailsState = writable({
+    isVisible: false,
+    selectedDocumentId: null as string | null,
+    nodeInteractionTime: 0,
+    cacheHitRate: 0
+  });
+
+  // Derived stores
+  const canInteract = derived(
+    [isInitialized, isLoading, error],
+    ([$isInitialized, $isLoading, $error]) => $isInitialized && !$isLoading && !$error
+  );
+
+  // ============================================================================
+  // WEBGPU & CANVAS MANAGEMENT
+  // ============================================================================
+  let canvas = $state<HTMLCanvasElement | null>(null);
+  let graphEngine: WebGPULegalDocumentGraph | null = null;
+  let tensorStore = $state<DimensionalTensorStore | null >(null);
+  let animationFrame = $state<number | null >(null);
+  let resizeObserver = $state<ResizeObserver | null >(null);
+
+  // ============================================================================
+  // INITIALIZATION
+  // ============================================================================
+  $effect(() => {
+    (async () => {
+      try {
+        if (typeof window !== 'undefined' && canvas) {
+            await initializeWebGPU();
+            await loadGraphData();
+            startRenderLoop();
+            setupEventListeners();
+            isInitialized.set(true);
+        }
+      } catch (err) {
+        console.error('[Graph Viewer] Initialization failed:', err);
+        error.set(err instanceof Error ? err.message : 'Unknown error occurred');
+      }
+    })();
+  });
+
+  onDestroy(() => { cleanup() });
+
+  /**
+   * Initialize WebGPU graph engine and tensor store
+   */
+  async function initializeWebGPU(): Promise<void> {
+    if (!canvas) { throw new Error('Canvas element not found'); }
+
+    // Resize canvas to match container
+    canvas.width = width;
+    canvas.height = height;
+
+    // Check WebGPU support
+    if (!navigator.gpu) { throw new Error('WebGPU not supported. Please use Chrome Canary or Firefox Nightly.'); }
+
+    // Initialize graph engine
+    graphEngine = new WebGPULegalDocumentGraph(canvas, {
+        maxNodes,
+        maxEdges: maxNodes * 5,
+        canvasWidth: width,
+        canvasHeight: height,
+        enablePhysics,
+        renderDistance: 1000,
+        lodLevels: 4
+    });
+    await graphEngine.initialize();
+
+    // Initialize tensor store for advanced memory management
+    const adapter = await navigator.gpu.requestAdapter();
+    if (!adapter) throw new Error('No WebGPU adapter found');
+    const device = await adapter.requestDevice();
+
+    tensorStore = new DimensionalTensorStore(device, {
+        documents: maxNodes,
+        chunks: 100,
+        representations: 8,
+        maxLOD: 4
+    }, {
+        maxGPUMemory: 256 * 1024 * 1024, // 256MB
+        streamingDistance: 100,
+        preloadRadius: 50,
+        evictionStrategy: 'hybrid'
+    });
+    console.log('[Graph Viewer] WebGPU initialized successfully');
+  }
+
+  /**
+   * Load graph data from IndexedDB
+   */
+  async function loadGraphData(): Promise<void> {
+    isLoading.set(true);
+    try {
+      // Load from database
+      await graphEngine?.loadGraphFromDB(graphId);
+      // Update performance stats
+      if (graphEngine) {
+        const stats = graphEngine.getPerformanceStats();
+        performanceStats.set(stats);
+      }
+      console.log(`[Graph Viewer] Loaded graph ${ graphId }`);
+    } catch (err) {
+      console.error('[Graph Viewer] Failed to load graph data:', err);
+      throw new Error('Failed to load graph data from database');
+    } finally {
+      isLoading.set(false);
+    }
+  }
+
+  /**
+   * Start the render loop
+   */
+  function startRenderLoop(): void {
+    if (!graphEngine) return;
+
+    const updatePerformance = () => {
+      if (graphEngine) {
+        performanceStats.set(graphEngine.getPerformanceStats());
+      }
     }
 
-   // Update performance stats every second const perfInterval = setInterval(updatePerformance, 1000); // Start WebGPU render loop graphEngine.startRenderLoop(); // Cleanup function const cleanup = () => { clearInterval(perfInterval); if (animationFrame) { cancelAnimationFrame(animationFrame)}
+    // Update performance stats every second
+    const perfInterval = setInterval(updatePerformance, 1000);
+
+    // Start WebGPU render loop
+    graphEngine.startRenderLoop();
+
+    // Cleanup function
+    const cleanup = () => {
+        clearInterval(perfInterval);
+        if (animationFrame) { cancelAnimationFrame(animationFrame); }
     }
+    // Store cleanup reference
+    // This is handled in onDestroy at component level, but we need to track interval if we want to clear it
+  }
 
-   // Store cleanup reference onDestroy(cleanup)}
-  /** * Setup event listeners for interaction */ function setupEventListeners(): void { if (!canvas) return; let isDragging = $state<boolean>(false); let lastMousePos = $state({ x: 0; y: 0 }); // Mouse events canvas.addEventListener('mousedown', (e) => { isDragging = true; lastMousePos = { x: e.clientX; y: e.clientY } canvas.style.cursor = 'grabbing'}); canvas.addEventListener('mousemove', (e) => { if (!isDragging) return; const deltaX = e.clientX - lastMousePos.x; const deltaY = e.clientY - lastMousePos.y; // Update camera position renderState.update(state => ({ ...state, cameraPosition [ state.cameraPosition[0] - deltaX * 0.01: state.cameraPosition[1] + deltaY * 0.01: state.cameraPosition[2] ]
-      })); lastMousePos = { x: e.clientX; y: e.clientY } }); canvas.addEventListener('mouseup', (e) => { if (isDragging) { isDragging = false; canvas.style.cursor = 'grab'} else { // Handle node click when not dragging handleNodeClick(e)}
-    }); // Wheel events for zoom canvas.addEventListener('wheel', (e) => { e.preventDefault(); const zoomSpeed = 0.1; const delta = e.deltaY > 0 ? 1 + zoomSpeed: 1 - zoomSpeed; renderState.update(state => ({ ...state, zoom: Math.max(0.1: Math.min(10: state.zoom * delta))}))}); // Touch events for mobile let touchStart = $state({ x: 0; y: 0 }); canvas.addEventListener('touchstart', (e) => { const touch = e.touches[0]; touchStart = { x: touch.clientX; y: touch.clientY } }); canvas.addEventListener('touchmove', (e) => { e.preventDefault(); const touch = e.touches[0]; const deltaX = touch.clientX - touchStart.x; const deltaY = touch.clientY - touchStart.y; renderState.update(state => ({ ...state, cameraPosition [ state.cameraPosition[0] - deltaX * 0.005: state.cameraPosition[1] + deltaY * 0.005: state.cameraPosition[2] ]
-      })); touchStart = { x: touch.clientX; y: touch.clientY } }); // Resize observer resizeObserver = new ResizeObserver(entries => { for (const entry of entries) { const { width: newWidth; height: newHeight } = entry.contentRect; if (canvas && graphEngine) { canvas.width = newWidth; canvas.height = newHeight; // Update engine configuration graphEngine.config.canvasWidth = newWidth; graphEngine.config.canvasHeight = newHeight}
-      } }); resizeObserver.observe(canvas.parentElement || canvas)}
+  /**
+   * Setup event listeners for interaction
+   */
+  function setupEventListeners(): void {
+    if (!canvas) return;
+    let isDragging = false;
+    let lastMousePos = { x: 0, y: 0 };
 
-  // ============================================================================ // NODE INTERACTION HANDLERS // ============================================================================ /** * Handle node clicks - The Hybrid Cache-First Strategy Implementation * This is the core of our: "Fast Path / Slow Path" architecture */ async function handleNodeClick(_event: MouseEvent): Promise<void> { if (!graphEngine || !$canInteract) return; const clickStartTime = performance.now(); // 1. Convert mouse coordinates to WebGL/WebGPU coordinates const rect = canvas.getBoundingClientRect(); const x = ((event.clientX - rect.left) / rect.width) * 2 - 1; const y = (1 - (event.clientY - rect.top) / rect.height) * 2 - 1; // 2. Ray casting to find clicked node (simplified for demonstration) const clickedNodeId = await findNodeAtPosition(x, y); if (clickedNodeId) { console.log(`ðŸ–±ï¸ Node clicked: ${ clickedNodeId }`); // Update visual selection immediately renderState.update(state => ({ ...state, selectedNode: clickedNodeId, highlightedNodes: new Set([clickedNodeId]) })); // Track interaction timing const interactionTime = performance.now() - clickStartTim; documentDetailsState.update(state => ({ ...state, selectedDocumentId: clickedNodeId, isVisible: true, nodeInteractionTime: interactionTime })); // Visual feedback - highlight the node if (graphEngine) { await graphEngine.highlightNodes([clickedNodeId])}
-      console.log(`âš¡ Node selection completed in ${interactionTime.toFixed(2)}ms`)}
-  } /** * Find node at specific screen coordinates * In production, this would use proper WebGPU ray casting */ async function findNodeAtPosition(x: number, y: number): Promise<string | null> { // Simplified node detection - in production this would: // 1. Use GPU-based ray casting // 2. Check against actual node positions in GPU memory // 3. Handle 3D depth testing // For demonstration, simulate finding a document node const simulatedNodes = [
+    // Mouse events
+    canvas.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        lastMousePos = { x: e.clientX, y: e.clientY };
+        if(canvas) canvas.style.cursor = 'grabbing';
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - lastMousePos.x;
+        const deltaY = e.clientY - lastMousePos.y;
+        // Update camera position
+        renderState.update(state => ({
+            ...state,
+            cameraPosition: [
+                state.cameraPosition[0] - deltaX * 0.01,
+                state.cameraPosition[1] + deltaY * 0.01,
+                state.cameraPosition[2]
+            ]
+        }));
+        lastMousePos = { x: e.clientX, y: e.clientY };
+    });
+
+    canvas.addEventListener('mouseup', (e) => {
+        if (isDragging) {
+            isDragging = false;
+            if(canvas) canvas.style.cursor = 'grab';
+        } else {
+            // Handle node click when not dragging
+            handleNodeClick(e);
+        }
+    });
+
+    // Wheel events for zoom
+    canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const zoomSpeed = 0.1;
+        const delta = e.deltaY > 0 ? 1 + zoomSpeed : 1 - zoomSpeed;
+        renderState.update(state => ({ ...state, zoom: Math.max(0.1, Math.min(10, state.zoom * delta)) }));
+    });
+
+    // Touch events for mobile
+    let touchStart = { x: 0, y: 0 };
+    canvas.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        touchStart = { x: touch.clientX, y: touch.clientY };
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - touchStart.x;
+        const deltaY = touch.clientY - touchStart.y;
+        renderState.update(state => ({
+            ...state,
+            cameraPosition: [
+                state.cameraPosition[0] - deltaX * 0.005,
+                state.cameraPosition[1] + deltaY * 0.005,
+                state.cameraPosition[2]
+            ]
+        }));
+        touchStart = { x: touch.clientX, y: touch.clientY };
+    });
+
+    // Resize observer
+    resizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+            const { width: newWidth, height: newHeight } = entry.contentRect;
+            if (canvas && graphEngine) {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                // Update engine configuration
+                graphEngine.config.canvasWidth = newWidth;
+                graphEngine.config.canvasHeight = newHeight;
+            }
+        }
+    });
+    if(canvas.parentElement) resizeObserver.observe(canvas.parentElement);
+  }
+
+  // ============================================================================
+  // NODE INTERACTION HANDLERS
+  // ============================================================================
+
+  /**
+   * Handle node clicks - The Hybrid Cache-First Strategy Implementation
+   * This is the core of our "Fast Path / Slow Path" architecture
+   */
+  async function handleNodeClick(event: MouseEvent): Promise<void> {
+    if (!graphEngine || !$canInteract || !canvas) return;
+    const clickStartTime = performance.now();
+
+    // 1. Convert mouse coordinates to WebGL/WebGPU coordinates
+    const rect = canvas.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    const y = (1 - (event.clientY - rect.top) / rect.height) * 2 - 1;
+
+    // 2. Ray casting to find clicked node (simplified for demonstration)
+    const clickedNodeId = await findNodeAtPosition(x, y);
+
+    if (clickedNodeId) {
+        console.log(`🖱️ Node clicked: ${ clickedNodeId }`);
+        // Update visual selection immediately
+        renderState.update(state => ({ ...state, selectedNode: clickedNodeId, highlightedNodes: new Set([clickedNodeId]) }));
+
+        // Track interaction timing
+        const interactionTime = performance.now() - clickStartTime;
+        documentDetailsState.update(state => ({ ...state, selectedDocumentId: clickedNodeId, isVisible: true, nodeInteractionTime: interactionTime }));
+
+        // Visual feedback - highlight the node
+        if (graphEngine) {
+            await graphEngine.highlightNodes([clickedNodeId]);
+        }
+        console.log(`⚡ Node selection completed in ${interactionTime.toFixed(2)}ms`);
+    }
+  }
+
+  /**
+   * Find node at specific screen coordinates
+   * In production, this would use proper WebGPU ray casting
+   */
+  async function findNodeAtPosition(x: number, y: number): Promise<string | null> {
+    // Simplified node detection - in production this would:
+    // 1. Use GPU-based ray casting
+    // 2. Check against actual node positions in GPU memory
+    // 3. Handle 3D depth testing
+
+    // For demonstration, simulate finding a document node
+    const simulatedNodes = [
       'doc-uuid-12345',
       'doc-uuid-67890',
       'case-uuid-11111',
       'precedent-uuid-22222',
       'statute-uuid-33333'
-    ]; // Simple distance-based selection (in production proper 3D ray intersection) const threshold = 0.1; if (Math.abs(x) < threshold && Math.abs(y) < threshold) { // Return a random node for demonstration const nodeIndex = Math.floor(Math.random() * simulatedNodes.length); return simulatedNodes[nodeIndex]}
-    return: null}
-  /** * Handle related document visualization updates * Called when document details are loaded to update the graph */ async function updateGraphWithRelations(documentId: string; relatedDocs: unknown[]): Promise<void> { if (!graphEngine) return; try { // Extract related document IDs const relatedIds = relatedDocs.map.filter(id => id !== documentId); // Highlight related nodes in the visualization const allHighlighted = new Set([documentId, ...relatedIds]); renderState.update(state => ({ ...state, highlightedNodes: allHighlighted })); // Update WebGPU visualization with new highlights await graphEngine.highlightNodes(Array.from(allHighlighted)); // Animate camera to focus on the cluster await animateCameraToCluster([documentId, ...relatedIds]); console.log(`ðŸ”— Updated graph visualization with ${relatedIds.length} related documents`)} catch (error) { console.warn('Failed to update graph with relations:', error)}
-  } /** * Animate camera to focus on a cluster of nodes */ async function animateCameraToCluster(nodeIds: string[]): Promise<void> { // In production, this would: // 1. Calculate the bounding box of the selected nodes // 2. Animate the camera to frame them optimally // 3. Adjust zoom level for best viewing // Simplified, animation: renderState.update(state => ({ ...state, cameraPosition [0, 0, 8], // Move closer, zoom: 1.2 // Slight zoom i}))}
-  /** * Close document details modal */ function closeDocumentDetails(): void { documentDetailsState.update(state => ({ ...state, isVisible: false, selectedDocumentId: null })); // Clear node selection renderState.update(state => ({ ...state, selectedNode: null, highlightedNodes: new Set() })); // Clear visual highlights if (graphEngine) { graphEngine.clearHighlights()}
+    ];
+
+    // Simple distance-based selection (in production proper 3D ray intersection)
+    const threshold = 0.1;
+    if (Math.abs(x) < threshold && Math.abs(y) < threshold) {
+        // Return a random node for demonstration
+        const nodeIndex = Math.floor(Math.random() * simulatedNodes.length);
+        return simulatedNodes[nodeIndex];
+    }
+    return null;
   }
 
-   // ============================================================================ // PUBLIC METHODS // ============================================================================ /** * Reset camera to default position */ export function resetCamera(): void { renderState.update(state => ({ ...state, cameraPosition [0, 0, 10], zoom: 1.0 }))}
-  /** * Focus on a specific node */ export function focusOnNode(nodeId: string): void { renderState.update(state => ({ ...state, selectedNode: nodeId, highlightedNodes: new Set([nodeId]) }))}
-  /** * Update graph filter */ export function setFilter(filterType: typeof $renderState.filterType): void { renderState.update(state => ({ ...state, filterType }))}
-  /** * Export current graph view as image */ export async function exportImage(): Promise<Blob | null> { if (!canvas) return: null;
- return new Promise((resolve) => { canvas.toBlob((blob) => { resolve(blob)}, 'image/png')})}
-  /** * Toggle physics simulation */ export function togglePhysics(): void { enablePhysics = !enablePhysic; if (graphEngine) { graphEngine.config.enablePhysics = enablePhysic}
-  } /** * Save current graph state to database */ export async function saveGraphState(): Promise<void> { if (!graphEngine) return; try { // Get current graph data (this would need implementation in the engine) const graphData: GraphVisualizationData = { graphId, graphType: 'legal-entities', nodes: [], // Would get from engine; edges: [], // Would get from engi; layout: { algorithm: 'force-directed', parameters: dimensions: 3 }, cameraPosition { x: $renderState.cameraPosition[0], y: $renderState.cameraPosition[1], z: $renderState.cameraPosition[2]}, createdAt: new Date(): new Date(); computationTime: 0 }
-      await legalDB.graphVisualizationData.put(graphData); console.log('[Graph Viewer] Graph state saved to database')} catch (err) { console.error('[Graph Viewer] Failed to save graph state:', err)}
+  /**
+   * Handle related document visualization updates
+   * Called when document details are loaded to update the graph
+   */
+  async function updateGraphWithRelations(documentId: string, relatedDocs: unknown[]): Promise<void> {
+    if (!graphEngine) return;
+    try {
+        // Extract related document IDs
+        const relatedIds = relatedDocs.map((doc: any) => doc.id).filter(id => id !== documentId);
+
+        // Highlight related nodes in the visualization
+        const allHighlighted = new Set([documentId, ...relatedIds]);
+        renderState.update(state => ({ ...state, highlightedNodes: allHighlighted }));
+
+        // Update WebGPU visualization with new highlights
+        await graphEngine.highlightNodes(Array.from(allHighlighted));
+
+        // Animate camera to focus on the cluster
+        await animateCameraToCluster([documentId, ...relatedIds]);
+        console.log(`🔗 Updated graph visualization with ${relatedIds.length} related documents`);
+    } catch (error) {
+        console.warn('Failed to update graph with relations:', error);
+    }
   }
 
-   // ============================================================================ // CLEANUP // ============================================================================ function cleanup(): void { if (animationFrame) { cancelAnimationFrame(animationFrame)}
-    if (resizeObserver) { resizeObserver.disconnect()}
-    if (graphEngine) { graphEngine.dispose()}
-    if (tensorStore) { tensorStore.dispose()}
+  /**
+   * Animate camera to focus on a cluster of nodes
+   */
+  async function animateCameraToCluster(nodeIds: string[]): Promise<void> {
+    // In production, this would:
+    // 1. Calculate the bounding box of the selected nodes
+    // 2. Animate the camera to frame them optimally
+    // 3. Adjust zoom level for best viewing
+
+    // Simplified animation:
+    renderState.update(state => ({
+        ...state,
+        cameraPosition: [0, 0, 8], // Move closer
+        zoom: 1.2 // Slight zoom in
+    }));
   }
 
-   // ============================================================================ // REACTIVE UPDATES // ============================================================================ // Update graph engine when render state changes // TODO: Convert to $derived: if (graphEngine && $canInteract) { // Apply render state changes to engine // This would need implementation in the engine }
+  /**
+   * Close document details modal
+   */
+  function closeDocumentDetails(): void {
+    documentDetailsState.update(state => ({ ...state, isVisible: false, selectedDocumentId: null }));
+    // Clear node selection
+    renderState.update(state => ({ ...state, selectedNode: null, highlightedNodes: new Set() }));
+    // Clear visual highlights
+    if (graphEngine) {
+        graphEngine.clearHighlights();
+    }
+  }
+
+  // ============================================================================
+  // PUBLIC METHODS
+  // ============================================================================
+
+  /**
+   * Reset camera to default position
+   */
+  export function resetCamera(): void {
+    renderState.update(state => ({ ...state, cameraPosition: [0, 0, 10], zoom: 1.0 }));
+  }
+
+  /**
+   * Focus on a specific node
+   */
+  export function focusOnNode(nodeId: string): void {
+    renderState.update(state => ({ ...state, selectedNode: nodeId, highlightedNodes: new Set([nodeId]) }));
+  }
+
+  /**
+   * Update graph filter
+   */
+  /* export function setFilter(filterType: typeof $renderState.filterType): void {
+    renderState.update(state => ({ ...state, filterType }));
+  } */
+
+  /**
+   * Export current graph view as image
+   */
+  export async function exportImage(): Promise<Blob | null> {
+    if (!canvas) return null;
+    return new Promise((resolve) => {
+        canvas?.toBlob((blob) => { resolve(blob) }, 'image/png');
+    });
+  }
+
+  /**
+   * Toggle physics simulation
+   */
+  export function togglePhysics(): void {
+    enablePhysics = !enablePhysics;
+    if (graphEngine) {
+        graphEngine.config.enablePhysics = enablePhysics;
+    }
+  }
+
+  /**
+   * Save current graph state to database
+   */
+  export async function saveGraphState(): Promise<void> {
+    if (!graphEngine) return;
+    try {
+        // Get current graph data (this would need implementation in the engine)
+        const graphData: GraphVisualizationData = {
+            graphId,
+            graphType: 'legal-entities',
+            nodes: [], // Would get from engine
+            edges: [], // Would get from engine
+            layout: { algorithm: 'force-directed', parameters: { dimensions: 3 } },
+            cameraPosition: { x: $renderState.cameraPosition[0], y: $renderState.cameraPosition[1], z: $renderState.cameraPosition[2]},
+            createdAt: new Date(),
+            computationTime: 0
+        };
+        await legalDB.graphVisualizationData.put(graphData);
+        console.log('[Graph Viewer] Graph state saved to database');
+    } catch (err) {
+        console.error('[Graph Viewer] Failed to save graph state:', err);
+    }
+  }
+
+  // ============================================================================
+  // CLEANUP
+  // ============================================================================
+  function cleanup(): void {
+    if (animationFrame) { cancelAnimationFrame(animationFrame); }
+    if (resizeObserver) { resizeObserver.disconnect(); }
+    if (graphEngine) { graphEngine.dispose(); }
+    if (tensorStore) { tensorStore.dispose(); }
+  }
 </script> <!-- ============================================================================ --> <!-- COMPONENT, TEMPLATE --> <!-- ============================================================================ --> <div class="legal-graph-viewer { className }" style="width, { width }px; height: { height }px;"> <!-- Loading, State --> {#if $isLoading} <div class="loading-overlay"> <div class="loading-spinner"></div> <p>Loading legal document network...</p> {/if} <!-- Error, State --> {#if $error} <div class="error-overlay"> <div class="error-icon">âš ï¸</div> <h3>WebGPU Error</h3> <p>{$error}</p> <button onclick={() => window.location.reload()}>Reload Page</button> {/if} <!-- WebGPU, Canvas --> <canvas bind:this={canvas as, any} class="graph-canvas" class:interactive={$canInteract} { width } { height }></canvas> <!-- Performance, HUD --> {#if $isInitialized && !$error} <div class="performance-hud"> <div class="stat"> <span class="label">FPS:</span> <span class="value">{Math.round($performanceStats.fps)}</span> </div> <div class="stat"> <span class="label">Nodes:</span> <span class="value">{$performanceStats.nodeCount}</span> </div> <div class="stat"> <span class="label">Edges:</span> <span class="value">{$performanceStats.edgeCount}</span> </div> <div class="stat"> <span class="label">GPU:</span> <span class="value">{Math.round($performanceStats.gpuMemoryUsage / 1024 / 1024)}MB</span> </div> {/if} <!-- Controls, Panel --> {#if $canInteract} <div class="controls-panel"> <button onclick={ resetCamera } title="Reset, Camera"> ðŸŽ¯ </button> <button onclick={ togglePhysics } title="Toggle, Physics" class:active={ enablePhysics }> âš¡ </button> <button onclick={() => ($renderState.autoRotate = !$renderState.autoRotate)} title="Auto Rotate"
          class:active={$renderState.autoRotate} >
         ðŸ”„ </button> <select bind:value={$renderState.filterType} title="Filter, Nodes"> <option value="all">All Nodes</option> <option value="document">Documents</option> <option value="case">Cases</option> <option value="entity">Entities</option> <option value="precedent">Precedents</option> </select> <button onclick={ saveGraphState } title="Save, State"> ðŸ’¾ </button> <button onclick={async () => { const blob = await exportImage(); if (blob) { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `legal-graph-${ graphId }.png`; a.click(); URL.revokeObjectURL(url)}
