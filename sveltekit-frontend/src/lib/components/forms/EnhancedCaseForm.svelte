@@ -2,8 +2,6 @@
 <script lang="ts">
   import { notifications } from '$lib/stores/unified';
   import type { Case } from '$lib/types/index';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     case_?: Case | undefined;
@@ -476,8 +474,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  input:focus;
-  select:focus;
+  input:focus,
+  select:focus,
   textarea:focus {
     outline: none;
     border-color: #3b82f6;

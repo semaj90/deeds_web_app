@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { CitationSaveRequest } from '$lib/types/citations';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	let {
 		caseId = undefined,
@@ -271,8 +270,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: var(--color-dark);
 	}
 
-	textarea:focus;
-	input:focus;
+	textarea:focus,
+	input:focus,
 	select:focus {
 		outline: none;
 		border-color: var(--color-burgundy);

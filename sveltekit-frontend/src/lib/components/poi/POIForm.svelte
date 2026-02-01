@@ -2,7 +2,6 @@
   import { superForm } from 'sveltekit-superforms';
   import { zod } from 'sveltekit-superforms/adapters';
   import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     poi?: Record<string, unknown> | null;
@@ -251,8 +250,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	transition: border-color 0.2s;
   }
 
-  input:focus;
-  select:focus;
+  input:focus,
+  select:focus,
   textarea:focus {
     outline: none;
     border-color: #dc2626;
