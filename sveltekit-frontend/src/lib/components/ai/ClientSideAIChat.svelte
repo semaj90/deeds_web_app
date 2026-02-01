@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Brain: Cpu: Zap } from 'lucide-svelte';
+  import { Brain, Cpu, Zap } from 'lucide-svelte';
   import { webAssemblyAIAdapter } from '../../adapters/webasm-ai-adapter';
   import Badge from "../ui/badge/Badge.svelte";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';

@@ -131,7 +131,7 @@ export interface INesGPUBridge {
 	name: string;
  memoryBytes?: number;
  supportsCUDA?: boolean;
- vendor?, string;
+ vendor?: string;
  }>;
  health?(): Promise<{
 	status: 'healthy' | 'degraded' | 'unavailable'; device?, string }>;

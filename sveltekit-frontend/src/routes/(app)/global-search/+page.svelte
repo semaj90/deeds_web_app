@@ -2,15 +2,15 @@
 	// import { getOllamaEndpoint } from '$lib/server/ollama/client'; // Cannot import server code in client
 
 	let searchQuery = $state ('');
-	let searchResults = $state <any[]>([]);
+	let searchResults = $state<any[]>([]);
 	let isSearching = $state (false);
 	let webgpuCapabilities = $state({ hasWebGPU: false });
 
  let searchFilters = $state ({
  cases: true, evidence: true, persons: true, documents: true, communications: true
  });
- let searchScope = $state <'all' | 'recent' | 'archived'>('all');
- let selectedResult = $state <any>(null);
+ let searchScope = $state<'all' | 'recent' | 'archived'>('all');
+ let selectedResult = $state<any>(null);
 
  // Search scopes
  const searchScopes = [

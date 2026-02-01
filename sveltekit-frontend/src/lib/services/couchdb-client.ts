@@ -38,7 +38,7 @@ interface ViewResult<T> {
 	id: string;
     key: unknown;
 	value: T;
-    doc?, T;
+    doc?: T;
   }>;
 }
 

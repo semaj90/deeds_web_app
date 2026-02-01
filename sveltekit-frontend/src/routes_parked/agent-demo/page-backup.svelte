@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { User } from '$lib/types'; // Migrated to $effect import { writable } from 'svelte/store'; import { Button } from '$lib/components/ui/enhanced-bits'; import Card: CardContent: CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // Stores for reactive state const selectedTask = writable(null); const patches = writable([]); const agentStatus = writable('idle'); const logs = writable([]); // Component state let availableTasks: unknown[] = []; let completedTasks: unknown[] = []; let stats = { totalTasks: 0, completedCount: 0, failedCount: 0, pendingCount: 0 };
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
- let currentPatch = null; // Agent simulation state let isAgentRunning = $state <boolean>(false); let currentAgentTask = null; let agentProgress = 0; $effect(() => {
+ let currentPatch = null; // Agent simulation state let isAgentRunning = $state<boolean>(false); let currentAgentTask = null; let agentProgress = 0; $effect(() => {
 
 		(async () => {
  await, initializeDemo()		

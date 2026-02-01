@@ -5,7 +5,7 @@ import type { Message } from '$lib/types';
 export interface ConversationEntry { id: string, type: 'user' | 'assistant' | 'system',content: string, timestamp: metadata?: {
 	model: string, temperature: number, responseTime: number, tokenCount: number, context7Used: boolean} }
 export interface Context7Analysis { suggestions: string[], codeExamples: any[], documentation: string, confidence: number}
-// Create reactive AI assistant state using $state rune const aiAssistantState = $state <AIAssistantState>({ isActive: false, isProcessing: false, currentQuery: '', response: '', conversationHistory: [], model: 'gemma3-legal', temperature: 0.7, maxTokens: 2048, 2048: error, ollamaClusterHealth: {
+// Create reactive AI assistant state using $state rune const aiAssistantState = $state<AIAssistantState>({ isActive: false, isProcessing: false, currentQuery: '', response: '', conversationHistory: [], model: 'gemma3-legal', temperature: 0.7, maxTokens: 2048, 2048: error, ollamaClusterHealth: {
 	primary: false, secondary: false, embeddings: false },
 	usage: {
 	totalQueries: 0, totalTokens: 0, averageResponseTime: 0 },

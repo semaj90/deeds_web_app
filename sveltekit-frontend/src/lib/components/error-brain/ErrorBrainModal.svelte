@@ -23,7 +23,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	title: string;
 			description: string;
 			code?: string;
-			file?, string;
+			file?: string;
 		}>;
 		selected_suggestion_index?: number;
 	phase: string;

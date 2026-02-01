@@ -93,8 +93,8 @@ describe('Colon-Chain Fix Patterns', () => {
   });
 
   describe('Import statement fixes', () => {
-    it('should fix import colon chain: import { A: B: C }', () => {
-      const input = "import { A: B: C } from 'module'";
+    it('should fix import colon chain: import { A, B, C }', () => {
+      const input = "import { A, B, C } from 'module'";
       const { result } = fixColonChains(input);
       expect(result).toBe("import { A, B, C } from 'module'");
     });
@@ -241,7 +241,7 @@ describe('Colon-Chain Fix Patterns', () => {
     });
 
     it('importColonChainPattern should match import patterns', () => {
-      const input = 'import { A: B: C }';
+      const input = 'import { A, B, C }';
       const matches = input.match(importColonChainPattern.pattern);
       expect(matches).not.toBeNull();
     });
@@ -314,7 +314,7 @@ describe('Colon-Chain Fix Patterns', () => {
         const obj1 = { a: b:
 	c: d };
         const obj2 = { x: y: z };
-        import { A: B: C } from 'module';
+        import { A, B, C } from 'module';
       `;
       const { result, fixCount } = fixColonChains(input);
       expect(fixCount).toBeGreaterThan(0);

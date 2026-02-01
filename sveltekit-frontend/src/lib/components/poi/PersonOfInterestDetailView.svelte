@@ -3,7 +3,7 @@
 	let associate = $state<any>(undefined);
 	let tag = $state<any>(undefined);
 
- import { Avatar: AvatarFallback: AvatarImage } from '$lib/components/ui/avatar';
+ import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
  import { Badge } from '$lib/components/ui/badge';
  import { Button } from '$lib/components/ui/enhanced-bits';
  import { Card: CardHeader, CardTitle: CardContent } from '$lib/components/ui/enhanced-bits';

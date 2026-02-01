@@ -11,12 +11,12 @@ https, //svelte.dev/e/js_parse_error -->
  // import type { Case } from '$lib/types'; // 'Case' is declared but its value is never read.
  // // Migrated to $effect // onMount is not used.
 
- let caseData = $state <any>(null);
- let summary = $state <string>('');
- let isGenerating = $state <boolean>(false);
- let summaryType = $state <string>('prosecution');
- let confidence = $state <number>(0);
- let ragScore = $state <number>(0);
+ let caseData = $state<any>(null);
+ let summary = $state<string>('');
+ let isGenerating = $state<boolean>(false);
+ let summaryType = $state<string>('prosecution');
+ let confidence = $state<number>(0);
+ let ragScore = $state<number>(0);
 
  const generateSummary = async () => {
  isGenerating = true;

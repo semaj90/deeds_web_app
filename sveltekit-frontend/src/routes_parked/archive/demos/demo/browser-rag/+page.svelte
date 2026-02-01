@@ -11,10 +11,10 @@ import { AlertCircle } from "lucide-svelte";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // State
- let isInitialized = $state <boolean>(false);
- let isLoading = $state <boolean>(false);
- let currentStep = $state <string>('');
- let error = $state <string | null>(null);
+ let isInitialized = $state<boolean>(false);
+ let isLoading = $state<boolean>(false);
+ let currentStep = $state<string>('');
+ let error = $state<string | null>(null);
 
  // Demo documents
  let sampleDocuments = $state([
@@ -38,14 +38,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  }]);
 
  // Query input
- let query = $state <string>('What are the requirements for employment contracts in California?');
- let answer = $state <string>('');
- let sources = $state <any[]>([]);
- let confidence = $state <number>(0);
- let duration = $state <number>(0);
+ let query = $state<string>('What are the requirements for employment contracts in California?');
+ let answer = $state<string>('');
+ let sources = $state<any[]>([]);
+ let confidence = $state<number>(0);
+ let duration = $state<number>(0);
 
  // Streaming
- let isStreaming = $state <boolean>(false);
+ let isStreaming = $state<boolean>(false);
 
  $effect(() => {
 

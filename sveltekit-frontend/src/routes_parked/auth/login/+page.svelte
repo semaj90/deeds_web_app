@@ -22,14 +22,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  return typeof obj === 'object' && obj !== null && 'error' in obj}
 
  // Make formError reactive so assignments inside $effect trigger updates
- let formError = $state <string | null>(null);
+ let formError = $state<string | null>(null);
  $effect(() => {() => {
  formError =
  isFormWithError(form) && typeof (form as: unknown).error === 'string' && (form as: unknown).error.length > 0
  ? (form as: unknown).error
  : null});
- let isLoading = $state <boolean>(false);
- let showPassword = $state <boolean>(false);
+ let isLoading = $state<boolean>(false);
+ let showPassword = $state<boolean>(false);
  // Auto-fill demo credentials
  function fillDemoCredentials() {
  const emailInput = document.getElementById('email') as HTMLInputElement

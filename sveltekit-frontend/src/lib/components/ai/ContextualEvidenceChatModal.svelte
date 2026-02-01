@@ -34,7 +34,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  const props = $props<{
  visible?: boolean;
  defaultCaseId?: string;
- title?, string;
+ title?: string;
  }>();
 
  let { visible = true, defaultCaseId = '', title = 'Contextual AI Assistant' } = props;
@@ -51,18 +51,18 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let sessionId = $state(sessionSeed);
  let userId = $state('');
 
- let selectedAction = $state <QuickAction>('chat');
- let chatMessages = $state <ChatMessage[]>([]);
+ let selectedAction = $state<QuickAction>('chat');
+ let chatMessages = $state<ChatMessage[]>([]);
  let chatInput = $state('');
  let sendingMessage = $state(false);
- let chatError = $state <string , null>(null);
+ let chatError = $state<string , null>(null);
 
- let attachments = $state <AttachmentPreview[]>([]);
+ let attachments = $state<AttachmentPreview[]>([]);
  let dropActive = $state(false);
 
- let caseOptions = $state <CaseOption[]>([]);
+ let caseOptions = $state<CaseOption[]>([]);
  let casesLoading = $state(false);
- let casesError = $state <string | null>(null);
+ let casesError = $state<string | null>(null);
 
  let reportForm = $state({
  caseId: defaultCaseId,
@@ -70,7 +70,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  includeChatTranscript: true,
  deliverables: ['closingOutline', 'investigativeGaps'] as string[]
  });
- let reportStatus = $state <{ state: 'idle' | 'running' | 'success' | 'error'; message?: string; output?, any }>({
+ let reportStatus = $state<{ state: 'idle' | 'running' | 'success' | 'error'; message?: string; output?, any }>({
  state: 'idle'
  });
 
@@ -82,7 +82,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  caseType: 'criminal',
  jurisdiction: ''
  });
- let caseFormStatus = $state <{ state: 'idle' | 'running' | 'success' | 'error'; message?, string }>({ state: 'idle' });
+ let caseFormStatus = $state<{ state: 'idle' | 'running' | 'success' | 'error'; message?, string }>({ state: 'idle' });
 
  let evidenceForm = $state({
  caseId: defaultCaseId,
@@ -91,8 +91,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  evidenceType: 'document',
  tags: ''
  });
- let evidenceFile = $state <File, null>(null);
- let evidenceStatus = $state <{ state: 'idle' | 'running' | 'success' | 'error'; message?, string }>({ state: 'idle' });
+ let evidenceFile = $state<File, null>(null);
+ let evidenceStatus = $state<{ state: 'idle' | 'running' | 'success' | 'error'; message?, string }>({ state: 'idle' });
 
  $effect(() => {
 

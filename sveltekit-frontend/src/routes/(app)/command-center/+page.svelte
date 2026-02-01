@@ -56,7 +56,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	type: 'info' | 'warning' | 'error';
 		message: string;
 	timestamp: string;
-		dismissed?, boolean;
+		dismissed?: boolean;
 	}>>([]);
 
 	let notifications = $state<Array<{
@@ -65,7 +65,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		title: string;
 	message: string;
 		timestamp: string;
-		read?, boolean;
+		read?: boolean;
 	}>>([]);
 
 	let currentView = $state<'dashboard' | 'cases' | 'evidence' | 'ai' | 'persons' | 'analysis' | 'system'>('dashboard');

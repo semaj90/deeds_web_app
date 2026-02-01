@@ -2,7 +2,7 @@
  let { children, title = '', value = undefined, subtitle = undefined } = $props<{
  title?: string;
  value?: string | number;
- subtitle?, string;
+ subtitle?: string;
  }>();
 </script>
 

@@ -136,7 +136,8 @@
           {/if}
           {#each columns as col}
             <th
-              class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-pointer hover: text-slate-300", style:width={col.width}
+              class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-300"
+              style:width={col.width}
               onclick={() => handleSort(col)}
             >
               <div class="flex items-center gap-1">

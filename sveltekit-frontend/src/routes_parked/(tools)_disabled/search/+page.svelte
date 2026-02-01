@@ -29,13 +29,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  };
 
  // Local UI state (avoid colliding with `reports` store name)
- let reportList = $state <Report[]>([]);
+ let reportList = $state<Report[]>([]);
  let loading = $state (true);
- let error = $state <string | null>(null);
+ let error = $state<string | null>(null);
  // Editor local state
  let title = $state ('');
  let content = $state ('');
- let hoverSaveTimeout = $state <ReturnType<typeof setTimeout> | null>(null);
+ let hoverSaveTimeout = $state<ReturnType<typeof setTimeout> | null>(null);
  let reportsUnsub: (() => void) | null = null;
  let unsubActive: (() => void) | null = null;
 

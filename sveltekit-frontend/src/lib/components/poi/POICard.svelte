@@ -31,7 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	url: string;
  thumbnailUrl: string;
  metadata?: any;
- ai?, any;
+ ai?: any;
  }>;
  notes?: string;
 	createdAt: string;

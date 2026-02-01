@@ -1,7 +1,7 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported // @ts-ignore - some components may not have perfect constructor typings import  ButtonBits  from "$lib/components/ui/bits-ui.svelte"; // Cast the imported component to a constructor so TypeScript/Svelte recognizes it as a component constructor const ButtonCtor = ButtonBits as unknown as new (...args: unknown[]) => import('svelte').SvelteComponent;
  import { citationsManager, type Citation, type CitationCollection } from '$lib/modules/citations-manager'; // Use Svelte, 5 runes $props() instead of export let type OnDispatch = (payload: {
 	citation: Citation; success?: boolean; error?: string }) => void;
-   let { citation, size = 'sm', variant = 'ghost', showText = true, ondispatch = undefined } = $props<{ citation: Citation; size?: 'sm' | 'md' | 'lg'; variant?: 'primary' | 'secondary' | 'ghost' | 'outline'; showText?, boolean; ondispatch?, OnDispatch}>(); // Optional callback prop for consumers; keep typed shape for consistent usage let isAuthenticated = $state(citationsManager.isAuthenticated());
+   let { citation, size = 'sm', variant = 'ghost', showText = true, ondispatch = undefined } = $props<{ citation: Citation; size?: 'sm' | 'md' | 'lg'; variant?: 'primary' | 'secondary' | 'ghost' | 'outline'; showText?: boolean; ondispatch?, OnDispatch}>(); // Optional callback prop for consumers; keep typed shape for consistent usage let isAuthenticated = $state(citationsManager.isAuthenticated());
    let isSaved = $state<boolean>(false);
    let isSaving = $state<boolean>(false);
    let collections = $state<CitationCollection[]>([]);

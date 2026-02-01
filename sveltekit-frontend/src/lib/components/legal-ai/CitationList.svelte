@@ -14,7 +14,7 @@
 
  let { caseId = null, limit = 20 } = $props<{
  caseId?: string | null;
- limit?, number;
+ limit?: number;
  }>();
 
 

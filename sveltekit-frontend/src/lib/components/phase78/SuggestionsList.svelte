@@ -14,7 +14,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let { suggestions = [], isLoading = false } = $props<{
  suggestions?: ErrorSuggestion[];
- isLoading?, boolean;
+ isLoading?: boolean;
  }>();
 
  let filterRisk = $state<string | null>(null);

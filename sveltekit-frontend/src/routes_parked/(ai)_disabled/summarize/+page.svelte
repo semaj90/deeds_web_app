@@ -14,12 +14,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  type FileMetadata = { id: string; name: string; size: number; uploadedAt?: string };
 
  // State (Svelte, 5 runes are auto-imported)
- let selectedFile = $state <FileMetadata, null>(null);
- let rawFile = $state <File, null>(null);
- let isUploading = $state <boolean>(false);
- let isSummarizing = $state <boolean>(false);
- let summary = $state <string>('');
- let summaryType = $state <'brief' | 'detailed' | 'bullet'>('detailed');
+ let selectedFile = $state<FileMetadata, null>(null);
+ let rawFile = $state<File, null>(null);
+ let isUploading = $state<boolean>(false);
+ let isSummarizing = $state<boolean>(false);
+ let summary = $state<string>('');
+ let summaryType = $state<'brief' | 'detailed' | 'bullet'>('detailed');
 
  const summaryTypes = [
  { value: 'brief', label: 'Brief Summary', description: 'Key points only' },

@@ -7,22 +7,22 @@
 -->
 <script lang="ts">
  // Component state
- let reportText = $state <string>('');
- let summary = $state <string>('');
- let isLoading = $state <boolean>(false);
- let errorMessage = $state <string>('');
- let processingSteps = $state <string[]>([]);
- let metadata = $state <any>(null);
+ let reportText = $state<string>('');
+ let summary = $state<string>('');
+ let isLoading = $state<boolean>(false);
+ let errorMessage = $state<string>('');
+ let processingSteps = $state<string[]>([]);
+ let metadata = $state<any>(null);
  // Summarization options
- let summaryLength = $state <'short' | 'medium' | 'long'>('medium');
- let includeKeyTerms = $state <boolean>(true);
- let includeLegalAnalysis = $state <boolean>(true);
+ let summaryLength = $state<'short' | 'medium' | 'long'>('medium');
+ let includeKeyTerms = $state<boolean>(true);
+ let includeLegalAnalysis = $state<boolean>(true);
  let temperature = $state (0.3);
  // UI state
- let activeTab = $state <'input' | 'summary' | 'analysis'>('input');
- let wordCount = $state <number>(0);
- let charCount = $state <number>(0);
- let estimatedProcessingTime = $state <number>(0);
+ let activeTab = $state<'input' | 'summary' | 'analysis'>('input');
+ let wordCount = $state<number>(0);
+ let charCount = $state<number>(0);
+ let estimatedProcessingTime = $state<number>(0);
  // Sample legal document for demonstration
  const sampleLegalDoc = `MEMORANDUM OF LAW
 TO: Senior Partner

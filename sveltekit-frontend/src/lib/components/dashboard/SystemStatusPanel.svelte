@@ -12,7 +12,7 @@
  gemma: 'unknown',
  storageCapacity: 0,
  } } = $props<{
- status?, SystemStatus;
+ status?: SystemStatus;
  }>();
 
  const getStatusColor = (s: string) => {

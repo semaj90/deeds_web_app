@@ -12,11 +12,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  deviceType: 'mobile' | 'tablet' | 'desktop' | 'unknown';
  }
 
- let sessions = $state <Session[]>([]);
- let loading = $state <boolean>(true);
- let revoking = $state <string | null>(null);
- let message = $state <string>('');
- let messageType = $state <'success' | 'error'>('success');
+ let sessions = $state<Session[]>([]);
+ let loading = $state<boolean>(true);
+ let revoking = $state<string | null>(null);
+ let message = $state<string>('');
+ let messageType = $state<'success' | 'error'>('success');
 
  async function loadSessions(): Promise<void> {
  try {

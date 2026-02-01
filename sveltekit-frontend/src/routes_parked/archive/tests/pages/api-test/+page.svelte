@@ -93,10 +93,10 @@
  },
  }];
 
- let testResults = $state <TestResult[]>([]);
- let isRunning = $state <boolean>(false);
- let autoRefresh = $state <boolean>(false);
- let filter = $state <'all' | 'success' | 'error'>('all');
+ let testResults = $state<TestResult[]>([]);
+ let isRunning = $state<boolean>(false);
+ let autoRefresh = $state<boolean>(false);
+ let filter = $state<'all' | 'success' | 'error'>('all');
  let refreshTimer: ReturnType<typeof setInterval> | null = null;
 
  const totalTests = $derived(() => testResults.length);

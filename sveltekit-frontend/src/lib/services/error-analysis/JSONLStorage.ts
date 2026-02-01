@@ -26,7 +26,7 @@ import type { error } from "console";
 import { boolean, bytes } from "drizzle-orm/gel-core";
 import type { line } from "drizzle-orm/pg-core";
 import type { T } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
-import { T: T: T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
+import { T, T, T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import type { string, record } from "fast-check";
 import type { stream } from "glob";
 import type { strategy } from "sharp";

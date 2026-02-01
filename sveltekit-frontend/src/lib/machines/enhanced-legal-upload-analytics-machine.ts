@@ -1,6 +1,5 @@
 import { assign, createActor, createMachine } from 'xstate';
 import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Enhanced Types for Legal AI Integration
 export interface UploadContext {
@@ -123,6 +122,14 @@ export interface UserAnalytics {
 	speed: number };
 		focusTime: number;
 	};
+	interactionPatterns: {
+		totalInteractions: number;
+		preferredFeatures: string[];
+	};
+	timeMetrics: {
+		averageUploadDuration: number;
+		totalTimeSpent: number;
+	};
 	contextualPreferences: {
 	preferredAIPromptStyle: 'concise' | 'detailed' | 'technical';
 		helpLevel: 'minimal' | 'moderate' | 'extensive';
@@ -148,6 +155,8 @@ export interface ClickPattern {
 export interface ContextualPrompt {
 	id: string;
 	content: string;
+	message?: string;
+	type?: 'info' | 'warning' | 'error' | 'success';
 	category: 'optimization' | 'guidance' | 'insight' | 'warning' | 'recommendation';
 	timing: 'before-upload' | 'during-upload' | 'after-upload';
 	confidence: number;
@@ -847,6 +856,109 @@ export function createUploadAnalyticsActor(initialContext: Partial<UploadContext
 	});
 }
 
+// Helper functions for components
+export function calculateUserEngagementScore(analytics: UserAnalytics): number {
+	const uploadScore = Math.min(analytics.uploadHistory.totalUploads / 100, 1) * 30;
+	const successScore = analytics.uploadHistory.successRate * 30;
+	const interactionScore = Math.min(analytics.interactionPatterns.totalInteractions / 500, 1) * 20;
+	const timeScore = Math.min(analytics.timeMetrics.totalTimeSpent / 36000, 1) * 20; // 10 hours max
 
+	return Math.round(uploadScore + successScore + interactionScore + timeScore);
+}
 
+export function generateUserInsights(analytics: UserAnalytics): string[] {
+	const insights: string[] = [];
 
+	if (analytics.uploadHistory.successRate < 0.7) {
+		insights.push('Consider reviewing file format requirements to improve upload success rate');
+	}
+
+	if (analytics.timeMetrics.averageUploadDuration > 30000) {
+		insights.push('Upload times are higher than average - check file sizes and network connection');
+	}
+
+	if (analytics.interactionPatterns.preferredFeatures.includes('quick-upload')) {
+		insights.push('Quick upload feature is frequently used - consider adding more shortcuts');
+	}
+
+	const hourOfDay = new Date().getHours();
+	if (hourOfDay >= 22 || hourOfDay < 6) {
+		insights.push('Working outside business hours - ensure adequate support coverage');
+	}
+
+	return insights;
+}
+
+export function getContextualPromptsByTiming(
+	context: UploadContext,
+	timing: 'before-upload' | 'during-upload' | 'after-upload' | 'on-error'
+): ContextualPrompt[] {
+	const prompts: ContextualPrompt[] = [];
+	const now = Date.now();
+
+	switch (timing) {
+		case 'before-upload':
+			if (context.files.length === 0) {
+				prompts.push({
+					id: 'empty-upload',
+					message: 'Select files to upload or drag and drop them here',
+					type: 'info',
+					priority: 1,
+					timestamp: now
+				});
+			}
+			if (context.legalContext?.urgency === 'critical') {
+				prompts.push({
+					id: 'urgent-case',
+					message: 'Critical case detected - uploads will be prioritized',
+					type: 'warning',
+					priority: 3,
+					timestamp: now
+				});
+			}
+			break;
+
+		case 'during-upload':
+			if (context.uploadProgress > 0 && context.uploadProgress < 100) {
+				prompts.push({
+					id: 'upload-progress',
+					message: `Upload in progress: ${Math.round(context.uploadProgress)}%`,
+					type: 'info',
+					priority: 2,
+					timestamp: now
+				});
+			}
+			break;
+
+		case 'after-upload':
+			if (context.uploadResults.length > 0) {
+				const successCount = context.uploadResults.filter(r => r.success).length;
+				prompts.push({
+					id: 'upload-complete',
+					message: `Successfully uploaded ${successCount} of ${context.files.length} files`,
+					type: successCount === context.files.length ? 'success' : 'warning',
+					priority: 2,
+					timestamp: now
+				});
+			}
+			break;
+
+		case 'on-error':
+			if (context.errors.length > 0) {
+				prompts.push({
+					id: 'upload-errors',
+					message: `${context.errors.length} error(s) occurred during upload`,
+					type: 'error',
+					priority: 3,
+					timestamp: now,
+					action: {
+						label: 'View Details',
+						callback: () => console.log('Errors:', context.errors)
+					}
+				});
+			}
+			break;
+	}
+
+	return prompts;
+}

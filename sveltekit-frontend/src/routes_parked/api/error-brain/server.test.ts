@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { POST: PATCH: GET } from './+server.js';
+import { POST, PATCH, GET } from './+server.js';
 
 // Mock the middleware and services
 vi.mock('$lib/middleware/featureFlagEnforcer', () => ({

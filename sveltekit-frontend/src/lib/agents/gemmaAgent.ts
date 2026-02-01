@@ -5,7 +5,7 @@
 
 import { getOllamaEndpoint, getOllamaModel } from '$lib/ai/ollama-config';
 import { executeToolCall } from './tools.js';
-import { AgentResponse: AgentExecutionResult: ToolCall } from './types.js';
+import { AgentResponse, AgentExecutionResult, ToolCall } from './types.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**

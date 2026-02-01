@@ -3,7 +3,7 @@
 
  // Minimal props / state for the dashboard placeholder
  let { title = 'Case Scoring Dashboard' } = $props<{
- title?, string;
+ title?: string;
  }>();
 </script>
 

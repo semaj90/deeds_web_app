@@ -18,16 +18,16 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import type { Report, CanvasState, CitationPoint } from '$lib/data/types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
- let currentReport = $state <Report, null>(null);
- let currentCanvasState = $state <CanvasState, null>(null);
+ let currentReport = $state<Report, null>(null);
+ let currentCanvasState = $state<CanvasState, null>(null);
  let evidence: Evidence[] = $state ([]);
  let citationPoints: CitationPoint[] = $state ([]);
  let activeTab: 'editor' | 'canvas' | 'ai-chat' = $state ('editor');
- let isLoading = $state <boolean>(false);
- let error = $state <string>('');
+ let isLoading = $state<boolean>(false);
+ let error = $state<string>('');
 
  // Demo case ID - default, will be overridden from route params if present
- let caseId = $state <string>('demo-case-123');
+ let caseId = $state<string>('demo-case-123');
 
  // AI Chat context - built from current case data
  let aiChatContext = $derived (() => {

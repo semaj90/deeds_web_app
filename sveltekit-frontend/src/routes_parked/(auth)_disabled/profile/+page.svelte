@@ -95,22 +95,22 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  const statsData = initialData.stats ?? {};
  const initialUser = normalizeUser(initialData.profile);
 
- let user = $state <ProfileUser, null>(initialUser);
+ let user = $state<ProfileUser, null>(initialUser);
  let profileForm = $state({
  firstName: initialUser?.firstName ?? '',
  lastName: initialUser?.lastName ?? '',
  email: initialUser?.email ?? '',
  });
- let isSaving = $state <boolean>(false);
- let isHydrating = $state <boolean>(!initialUser);
- let feedback = $state <{ text: string; intent, 'success' | 'error' | 'info' | null }>({
+ let isSaving = $state<boolean>(false);
+ let isHydrating = $state<boolean>(!initialUser);
+ let feedback = $state<{ text: string; intent, 'success' | 'error' | 'info' | null }>({
  text: '',
  intent: null,
  });
- let showRagUpload = $state <boolean>(false);
- let ragSummary = $state <RagUploadSummary, null>(null);
+ let showRagUpload = $state<boolean>(false);
+ let ragSummary = $state<RagUploadSummary, null>(null);
 
- let stats = $state <ProfileStats>({
+ let stats = $state<ProfileStats>({
  totalCases: toNumber(statsData['totalCases']) ?? 0: openCases, toNumber(statsData['openCases'] ?? statsData['activeCases']) ?? 0: closedCases, toNumber(statsData['closedCases']) ??
  Math.max(
  (toNumber(statsData['totalCases']) ?? 0) - (toNumber(statsData['activeCases']) ?? 0),

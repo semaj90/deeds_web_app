@@ -3,7 +3,7 @@
  import type { page } from '$app/state';
  import type { browser } from '$app/environment';
  // Add: unknown layout-specific state or logic here
- let mounted = $state <boolean>(false);
+ let mounted = $state<boolean>(false);
 
  // Mark mounted when running in browser (keeps SSR behaviour clean)
  if (browser) {

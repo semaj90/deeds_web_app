@@ -5,7 +5,7 @@
  *
  * Usage:
  * ```typescript
- * import { RAGClient: KAGClient: DAGClient } from '$lib/sdk';
+ * import { RAGClient, KAGClient, DAGClient } from '$lib/sdk';
  *
  * const rag = new RAGClient({ ... });
  * const kag = new KAGClient({ ... });

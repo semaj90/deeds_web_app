@@ -15,7 +15,7 @@
 
  let { caseId, showActions = true } = $props<{
  caseId: string;
- showActions?, boolean;
+ showActions?: boolean;
  }>();
 
 

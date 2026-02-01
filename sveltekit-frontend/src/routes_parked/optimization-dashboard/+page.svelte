@@ -21,7 +21,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  } as WorkerStats,
  recommendations: [] as string[]
  });
- let isMonitoring = $state <boolean>(false);
+ let isMonitoring = $state<boolean>(false);
  let lastUpdate = $state (new Date());
 
  // Real-time performance metrics
@@ -31,8 +31,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  processingTime: [] as PerfPoint[]
  });
   
- let testJobResult = $state <any>(null);
- let isSubmittingJob = $state <boolean>(false);
+ let testJobResult = $state<any>(null);
+ let isSubmittingJob = $state<boolean>(false);
 
  async function updateSystemMetrics(): Promise<any> {
  try {

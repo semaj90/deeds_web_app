@@ -13,7 +13,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  let { show = $bindable(false) }: {
 	show: boolean } = $props();
- let currentSuggestion = $state <AISuggestion | null>(null);
+ let currentSuggestion = $state<AISuggestion | null>(null);
 
  export function showModal(suggestion: AISuggestion) {
  currentSuggestion = suggestion;

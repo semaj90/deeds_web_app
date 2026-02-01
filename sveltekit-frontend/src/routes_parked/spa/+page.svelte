@@ -30,9 +30,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  };
 
  // reactive state for the data and flags
- let legalData = $state <typeof initialLegalData>(initialLegalData);
- let currentView = $state <'dashboard' | 'evidence' | 'documents' | 'chat' | 'cases'>('dashboard');
- let isLoading = $state <boolean>(true);
+ let legalData = $state<typeof initialLegalData>(initialLegalData);
+ let currentView = $state<'dashboard' | 'evidence' | 'documents' | 'chat' | 'cases'>('dashboard');
+ let isLoading = $state<boolean>(true);
 
  $effect (() => {
  (async () => {

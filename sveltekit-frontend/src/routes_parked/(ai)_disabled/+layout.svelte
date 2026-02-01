@@ -40,7 +40,7 @@ import type { Document } from '$lib/types';
  const consolePalette: ConsolePaletteName = 'cyberpunk';
 
  // Get current route (make reactive with Svelte, 5 runes)
- let currentPath = $state <string>('');
+ let currentPath = $state<string>('');
 
  // Use $effect for side-effects in runes mode.
  // Initialize palette and keep currentPath in sync using afterNavigate (SSR-safe).

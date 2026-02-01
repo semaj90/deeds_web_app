@@ -9,7 +9,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  thumbUrl: string;
  embedding?: number[] | null;
  frameIndex?: number;
- timestamp?, number;
+ timestamp?: number;
  }>;
  }>();
 

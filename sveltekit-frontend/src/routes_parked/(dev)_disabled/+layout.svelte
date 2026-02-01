@@ -16,7 +16,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  // Derive user and UI state for NavBar/Sidebar props
  const user = data?.user ?? null;
- let sidebarOpen = $state <boolean>(true); // Fix: Declare with $state for reactivity
+ let sidebarOpen = $state<boolean>(true); // Fix: Declare with $state for reactivity
  function toggleSidebar() {
  sidebarOpen = !sidebarOpen;
  }

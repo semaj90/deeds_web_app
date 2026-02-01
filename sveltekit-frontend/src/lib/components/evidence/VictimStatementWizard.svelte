@@ -44,11 +44,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  type WizardStep = 'basic-info' | 'incident-details' | 'impact-assessment' | 'evidence-links' | 'review';
 
- let currentStep = $state <WizardStep>('basic-info');
+ let currentStep = $state<WizardStep>('basic-info');
  let stepProgress = $state(0);
 
  // Form data
- let statement = $state <Statement>({
+ let statement = $state<Statement>({
  victimName: '',
  victimContact: '',
  incidentDate: '',

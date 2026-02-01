@@ -23,10 +23,10 @@ import { Settings } from "lucide-svelte";
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  // Editor state
- let editorValue = $state <string>('');
- let documentTitle = $state <string>('Untitled Document');
- let lastSaved = $state <Date, null>(null);
- let isModified = $state <boolean>(false);
+ let editorValue = $state<string>('');
+ let documentTitle = $state<string>('Untitled Document');
+ let lastSaved = $state<Date, null>(null);
+ let isModified = $state<boolean>(false);
 
  // Document metadata
  let documentStats = $derived(() => {

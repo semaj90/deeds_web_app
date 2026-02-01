@@ -105,7 +105,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         </div>
 
         <!-- Two Column Layout -->
-        <div class="grid grid-cols-1 lg, grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Left Column -->
             <div class="space-y-8">
                 <!-- Imports -->

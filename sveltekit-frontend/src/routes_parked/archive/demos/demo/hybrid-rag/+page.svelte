@@ -25,13 +25,13 @@ import { Database } from "lucide-svelte";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // State management using Svelte, 5 runes
- let query = $state <string>('');
- let documents = $state <any[]>([]);
- let results = $state <any[]>([]);
- let isProcessing = $state <boolean>(false);
- let processingStage = $state <string>('');
- let timing = $state <any>(null);
- let error = $state <string>('');
+ let query = $state<string>('');
+ let documents = $state<any[]>([]);
+ let results = $state<any[]>([]);
+ let isProcessing = $state<boolean>(false);
+ let processingStage = $state<string>('');
+ let timing = $state<any>(null);
+ let error = $state<string>('');
 
  // Sample documents for testing
  const sampleDocuments = $state([ {

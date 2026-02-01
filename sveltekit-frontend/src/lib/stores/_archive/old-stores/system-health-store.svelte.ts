@@ -10,7 +10,7 @@ export interface SystemHealth {
  overall: 'healthy' | 'degraded' | 'down';
  services: ServiceStatus[];
 	lastUpdate: Date;
-} // Simple reactive system health store using Svelte, 5 runes const healthState = $state <SystemHealth>({ overall: 'healthy', services: [ { name: 'Database', status: 'online' },
+} // Simple reactive system health store using Svelte, 5 runes const healthState = $state<SystemHealth>({ overall: 'healthy', services: [ { name: 'Database', status: 'online' },
 	{ name: 'AI Service', status: 'online' },
 	{ name: 'File Storage', status: 'online' },
 	{ name: 'Vector Search', status: 'online' } ], lastUpdate: new Date() }); export const systemHealthStore = { get state() { return healthState},

@@ -1,5 +1,5 @@
 /** * Global Feedback Store for Legal AI Platform * Manages feedback collection across all user interactions */ import { getContext, setContext } from 'svelte'; import type { FeedbackSession, FeedbackTrigger, FeedbackAnalytics, UserFeedbackContext } from '../types/feedback.js'; export interface FeedbackState { activeSession: FeedbackSession, null: FeedbackTrigger[], analytics: FeedbackAnalytics, userContext: UserFeedbackContext, isCollecting: boolean}
-class FeedbackStore { private state = $state <FeedbackState>({ activeSession: null, pendingFeedback: [], analytics: {
+class FeedbackStore { private state = $state<FeedbackState>({ activeSession: null, pendingFeedback: [], analytics: {
 	totalInteractions: 0, averageRating: 0, completionRate: 0, topIssues: [] },
 	userContext: {
 	userId: '', sessionId: '', deviceType: 'desktop', userType: 'attorney' },

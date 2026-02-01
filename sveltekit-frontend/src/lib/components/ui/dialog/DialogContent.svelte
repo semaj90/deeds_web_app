@@ -55,7 +55,7 @@ let contentRef = $state<HTMLDivElement | null>(null);
 				contentRef.focus();
 			}
 		}
-	
+
 });
 
 	// TODO: Add as cleanup in $effect: return () => {
@@ -83,8 +83,10 @@ let contentRef = $state<HTMLDivElement | null>(null);
 	<div
 		bind:this={contentRef}
 		class="{defaultClass} { className }"
-		transition: scale={{
-	duration: 150, start: 0.95 }}
+		transition:scale={{
+			duration: 150,
+			start: 0.95
+		}}
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
 		role="dialog"

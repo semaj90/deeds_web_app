@@ -22,8 +22,8 @@ https, //svelte.dev/e/js_parse_error -->
  let { data, children }: Props = $props ();
 
  // State management
- let sidebarOpen = $state <boolean>(true);
- let selectedTheme = $state <ConsolePaletteName>('legal');
+ let sidebarOpen = $state<boolean>(true);
+ let selectedTheme = $state<ConsolePaletteName>('legal');
 
  // Derived values
  let user = $derived (data?.user);

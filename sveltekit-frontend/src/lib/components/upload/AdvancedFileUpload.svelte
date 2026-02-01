@@ -54,7 +54,7 @@
     // Finalize chunked upload const finalizeResponse = await fetch(`${ uploadUrl }/finalize`, { method: "POST", headers: { "Content-Type": "application/json" },
 	body: JSON.stringify({
 	fileId: fileItem.id, filename: fileItem.name, totalChunks }) }); if (!finalizeResponse.ok) { throw new Error("Failed to finalize upload")}
-    const result = await finalizeResponse.json(); fileItem.url = (result as { url?: unknown; thumbnailUrl?: unknown }).url; fileItem.thumbnailUrl = (result as { url?, unknown; thumbnailUrl?, unknown }).thumbnailUrl}
+    const result = await finalizeResponse.json(); fileItem.url = (result as { url?: unknown; thumbnailUrl?: unknown }).url; fileItem.thumbnailUrl = (result as { url?: unknown; thumbnailUrl?, unknown }).thumbnailUrl}
   function updateTotalProgress() { if (files.length === 0) { totalProgress = 0; return}
     const totalProgressSum = files.reduce( (sum, file) => sum + file.progress, 0
     ); totalProgress = totalProgressSum / files.length}

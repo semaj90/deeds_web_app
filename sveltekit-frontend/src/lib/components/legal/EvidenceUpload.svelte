@@ -11,7 +11,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     'video/mp4',
     'audio/mpeg',
     'audio/wav'
-  ], enableGPUProcessing = true, enableAIAnalysis = true } = $props<{ maxFiles?: number; maxFileSize?: number; acceptedTypes?: string[]; enableGPUProcessing?, boolean; enableAIAnalysis?, boolean}>();
+  ], enableGPUProcessing = true, enableAIAnalysis = true } = $props<{ maxFiles?: number; maxFileSize?: number; acceptedTypes?: string[]; enableGPUProcessing?: boolean; enableAIAnalysis?, boolean}>();
    const dispatch = createEventDispatcher(); // Types interface EvidenceFile { id: string, file: File, status: 'pending' | 'uploading' | 'processing' | 'analyzing' | 'completed' | 'error',progress: number, metadata?: {
 	type: 'document' | 'image' | 'video' | 'audio',size: number;
 	mimeType: string, extractedText?: string; aiAnalysis?: string; confidence?: number; tags?: string[]; processingTime?: number}; error?: string; uploadUrl?: string}

@@ -33,19 +33,19 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  }
 
  // Reactive state (Svelte, 5 runes)
- let searchQuery = $state <string>('');
- let selectedOperation = $state <string>('');
- let selectedShaderType = $state <'webgpu' | 'webgl' | 'all'>('all');
- let selectedTags = $state <string[]>([]);
- let sortBy = $state <'relevance' | 'performance' | 'usage' | 'recent'>('relevance');
- let limit = $state <number>(20);
- let searchResults = $state <ShaderSearchResult[]>([]);
- let searchMetadata = $state <SearchResponse['metadata'] | null>(null);
- let isSearching = $state <boolean>(false);
- let stats = $state <ShaderStats, null>(null);
- let selectedShader = $state <ShaderSearchResult, null>(null);
- let availableTags = $state <string[]>([]);
- let availableOperations = $state <string[]>([]);
+ let searchQuery = $state<string>('');
+ let selectedOperation = $state<string>('');
+ let selectedShaderType = $state<'webgpu' | 'webgl' | 'all'>('all');
+ let selectedTags = $state<string[]>([]);
+ let sortBy = $state<'relevance' | 'performance' | 'usage' | 'recent'>('relevance');
+ let limit = $state<number>(20);
+ let searchResults = $state<ShaderSearchResult[]>([]);
+ let searchMetadata = $state<SearchResponse['metadata'] | null>(null);
+ let isSearching = $state<boolean>(false);
+ let stats = $state<ShaderStats, null>(null);
+ let selectedShader = $state<ShaderSearchResult, null>(null);
+ let availableTags = $state<string[]>([]);
+ let availableOperations = $state<string[]>([]);
 
  $effect (() => {
  (async () => {

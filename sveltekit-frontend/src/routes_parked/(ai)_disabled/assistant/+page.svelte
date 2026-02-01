@@ -5,10 +5,10 @@
  content: string; timestamp: Date;
  };
 
- let messages = $state <ChatMessage[]>([]);
- let currentMessage = $state <string>('');
- let isStreaming = $state <boolean>(false);
- let error = $state <string>('');
+ let messages = $state<ChatMessage[]>([]);
+ let currentMessage = $state<string>('');
+ let isStreaming = $state<boolean>(false);
+ let error = $state<string>('');
 
  // Send a message to backend AI; supports streaming SSE-like chunks or full JSON response
  async function sendMessage(): Promise<void> {

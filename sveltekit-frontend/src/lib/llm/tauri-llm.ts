@@ -8,7 +8,7 @@ invoke = tauriInvoke}catch (error: Error | unknown) {
 console.warn("Tauri not available - using fallback implementations");
 invoke = () => Promise.reject(new Error("Tauri not available")}
 }
-// Initialize on first use let tauriInitialized = $state <boolean>(false);
+// Initialize on first use let tauriInitialized = $state<boolean>(false);
 export async function getAvailableModels(): Promise<string[]> {
 if (!tauriInitialized) {
 await initializeTauri();

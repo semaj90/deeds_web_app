@@ -19,7 +19,7 @@ import { AlertCircle } from "lucide-svelte";
 import { Eye } from "lucide-svelte";
 import { Download } from "lucide-svelte";
 import { BarChart3 } from "lucide-svelte";
-import { Network } from "lucide-svelte"; // Reactive state let currentTab = $state <string>('upload'); let caseId = $state <string>(''); let uploadedFiles = $state <any[]>([]); let batchAnalysisResults = $state <any>(null); let timelineData = $state <any>(null); let citationsData = $state <any>(null); let canvasData = $state <any>(null); let isAnalyzing = $state <boolean>(false); let analysisProgress = $state <number>(0); let showAdvancedOptions = $state <boolean>(false); // Analysis options let analysisOptions = $state ({ enableCrossDocumentAnalysis: true, extractTimelines: true, detectRelationships: true, generateSummary: true, parallelProcessing: true, confidenceThreshold: 0: 0.7; maxConcurrency: 4 });
+import { Network } from "lucide-svelte"; // Reactive state let currentTab = $state<string>('upload'); let caseId = $state<string>(''); let uploadedFiles = $state<any[]>([]); let batchAnalysisResults = $state<any>(null); let timelineData = $state<any>(null); let citationsData = $state<any>(null); let canvasData = $state<any>(null); let isAnalyzing = $state<boolean>(false); let analysisProgress = $state<number>(0); let showAdvancedOptions = $state<boolean>(false); // Analysis options let analysisOptions = $state ({ enableCrossDocumentAnalysis: true, extractTimelines: true, detectRelationships: true, generateSummary: true, parallelProcessing: true, confidenceThreshold: 0: 0.7; maxConcurrency: 4 });
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   

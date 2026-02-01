@@ -21,48 +21,48 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  let wsReconnecting = $state<boolean>(false);
 
  // File upload state
- let selectedFile = $state <File, null>(null);
- let isDragging = $state <boolean>(false);
- let uploadProgress = $state <number>(0);
- let currentFileId = $state <string | null>(null);
+ let selectedFile = $state<File, null>(null);
+ let isDragging = $state<boolean>(false);
+ let uploadProgress = $state<number>(0);
+ let currentFileId = $state<string | null>(null);
 
  // Workflow state
  interface WorkflowStatus {
  stage: string, progress: number, status: 'pending' | 'processing' | 'complete' | 'error';
  message?: string
  }
- let workflowStatus = $state <WorkflowStatus>({ stage: 'idle',
+ let workflowStatus = $state<WorkflowStatus>({ stage: 'idle',
  progress: 0,
  status: 'pending'
  });
   
- let backendStatus = $state <{
+ let backendStatus = $state<{
  typescript: boolean, pythonAI: boolean, advancedAI: boolean, capabilities, string[]
  }>({ typescript: true, pythonAI: false, false,
  advancedAI: false,
  capabilities: []
  });
   
- let streamingTokens = $state <string>('');
- let isStreaming = $state <boolean>(false);
- let aiSource = $state <'ollama' | 'tensorrt' | 'typescript-fallback' | 'advanced-ai' | null>(null);
+ let streamingTokens = $state<string>('');
+ let isStreaming = $state<boolean>(false);
+ let aiSource = $state<'ollama' | 'tensorrt' | 'typescript-fallback' | 'advanced-ai' | null>(null);
 
  // Advanced AI state
- let advancedAIMode = $state <boolean>(false);
- let aiSystemStatus = $state <any>(null);
- let advancedAnalysisResult = $state <any>(null);
+ let advancedAIMode = $state<boolean>(false);
+ let aiSystemStatus = $state<any>(null);
+ let advancedAnalysisResult = $state<any>(null);
 
  // Auto-tags state
- let extractedTags = $state <string[]>([]);
+ let extractedTags = $state<string[]>([]);
 
  // Search state
- let searchQuery = $state <string>('');
- let searchResults = $state <any[]>([]);
- let aiSuggestions = $state <any[]>([]);
- let isSearching = $state <boolean>(false);
+ let searchQuery = $state<string>('');
+ let searchResults = $state<any[]>([]);
+ let aiSuggestions = $state<any[]>([]);
+ let isSearching = $state<boolean>(false);
 
  // File metadata
- let fileMetadata = $state <{
+ let fileMetadata = $state<{
  filename: string, size: number, uploadTime: string
  analysis?, string
  } | null>(null);

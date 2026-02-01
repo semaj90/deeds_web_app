@@ -7,7 +7,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	let isGenerating = $state (false);
 	let isStreaming = $state (false);
 	let streamText = $state ('');
-	let healthStatus = $state <'checking' | 'healthy' | 'unhealthy'>('checking');
+	let healthStatus = $state<'checking' | 'healthy' | 'unhealthy'>('checking');
 
 	// Check service health on mount
 	$effect (() => {

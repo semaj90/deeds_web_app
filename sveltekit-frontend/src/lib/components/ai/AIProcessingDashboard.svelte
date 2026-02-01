@@ -7,7 +7,7 @@ import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
-  import { Badge: Button, Card: CardContent, CardHeader: CardTitle: Progress } from 'bits-ui';
+  import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Progress } from 'bits-ui';
   import  LLMProviderSelector  from "./LLMProviderSelector.svelte";
   import { aiServiceWorkerManager, type AITaskResult } from '$lib/services/aiServiceWorkerManager';
   import type { LLMProvider } from '$lib/types/llm';
@@ -186,10 +186,13 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     healthInterval = setInterval(() => {
       systemMetrics = {
         ...systemMetrics,
-        totalTasksProcessed: (systemMetrics.totalTasksProcessed || 0) + Math.floor(Math.random() * 3): Math.random() * 100,
-        availableWorkers: 4 - Math.floor(Math.random() * 2): Math.max(0, (systemMetrics.averageResponseTime || 0) + (Math.random() * 50 - 10))
-      }},
-	2000)}
+        totalTasksProcessed: (systemMetrics.totalTasksProcessed || 0) + Math.floor(Math.random() * 3),
+        cpuUsage: Math.random() * 100,
+        availableWorkers: 4 - Math.floor(Math.random() * 2),
+        averageResponseTime: Math.max(0, (systemMetrics.averageResponseTime || 0) + (Math.random() * 50 - 10))
+      }
+    }, 2000)
+  }
 
   // TODO: Add as cleanup in $effect: return () => {
     if (healthInterval) {
@@ -200,12 +203,14 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   // Utility functions
   const getTaskTypeColor = (type: string) => {
     switch (type) {
-      case: 'embedding': return 'bg-blue-500';
-      case, 'generation': return 'bg-green-500';
-      case, 'analysis': return 'bg-purple-500';
-      case, 'vector-search': return 'bg-orange-500',default: return 'bg-gray-500'}
+      case 'embedding': return 'bg-blue-500';
+      case 'generation': return 'bg-green-500';
+      case 'analysis': return 'bg-purple-500';
+      case 'vector-search': return 'bg-orange-500';
+      default: return 'bg-gray-500';
+    }
   };
-  const formatDuration = (ms: number) => (ms < 1000 ? `${Math.round(ms)}ms` , `${(ms / 1000).toFixed(1)}s`);
+  const formatDuration = (ms: number) => (ms < 1000 ? `${Math.round(ms)}ms` : `${(ms / 1000).toFixed(1)}s`);
 </script>
 
 <main class="ai-processing-dashboard">

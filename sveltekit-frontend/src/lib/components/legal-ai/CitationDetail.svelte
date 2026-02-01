@@ -18,7 +18,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let { citation, showActions = true } = $props<{
  citation: Citation;
- showActions?, boolean;
+ showActions?: boolean;
  }>();
 
 

@@ -1,6 +1,6 @@
 <script lang="ts">
  import { Card } from '$lib/components/ui/enhanced-bits';
- import { CheckCircle: FileCode: Terminal } from 'lucide-svelte';
+ import { CheckCircle, FileCode, Terminal } from 'lucide-svelte';
  // Migrated to $effect
  import { fade, slide } from 'svelte/transition';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';

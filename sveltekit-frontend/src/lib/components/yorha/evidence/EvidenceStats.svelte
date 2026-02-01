@@ -25,8 +25,7 @@
       processingQueue = processingQueue.map(item => ({
         ...item,
         progress: Math.min(100, item.progress + Math.floor(Math.random() * 5))
-      
-});).filter(item => item.progress < 100);
+      })).filter(item => item.progress < 100);
 
       // Add new items occasionally
       if (Math.random() > 0.8 && processingQueue.length < 5) {
@@ -37,14 +36,13 @@
           eta: `${Math.floor(Math.random() * 5) + 1}m ${Math.floor(Math.random() * 60)}s`
         }];
       }
-    },
-	3000);
+    }, 3000);
 
     return () => clearInterval(interval);
   });
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
  <!-- Total Documents -->
  <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <div class="flex items-center justify-between">

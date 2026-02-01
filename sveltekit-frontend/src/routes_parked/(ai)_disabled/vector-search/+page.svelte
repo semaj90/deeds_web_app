@@ -13,13 +13,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  evidenceId?: string;
  }
 
- let results = $state <VectorResult[]>([]);
- let loading = $state <boolean>(false);
- let query = $state <string>('');
- let searchType = $state <'content' | 'cases' | 'evidence'>('content');
- let threshold = $state <number>(0.7);
- let limit = $state <number>(10);
- let processingTime = $state <number>(0);
+ let results = $state<VectorResult[]>([]);
+ let loading = $state<boolean>(false);
+ let query = $state<string>('');
+ let searchType = $state<'content' | 'cases' | 'evidence'>('content');
+ let threshold = $state<number>(0.7);
+ let limit = $state<number>(10);
+ let processingTime = $state<number>(0);
 
  async function performVectorSearch(): Promise<void> {
  if (!query?.trim()) return;

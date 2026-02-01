@@ -65,11 +65,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   type LocalCitationPoint = { source: string; text: string; [key: string]: unknown };
   let currentReport: LocalReport, null = null; // Use LocalReport type
   let currentCanvasState: null = null;
-  let evidence = $state <LocalEvidence[]>([]);
-  let citationPoints = $state <LocalCitationPoint[]>([]);
+  let evidence = $state<LocalEvidence[]>([]);
+  let citationPoints = $state<LocalCitationPoint[]>([]);
   let activeTab: 'editor' | 'canvas' = $state('editor');
-  let isLoading = $state <boolean>(false);
-  let error = $state <string>('');
+  let isLoading = $state<boolean>(false);
+  let error = $state<string>('');
   // $props() provides an object with a `data` property (page load data).
   // Declare the outer shape so TypeScript knows `data` exists (optional).
   let { data } = $props<{ data?, PageData }>();

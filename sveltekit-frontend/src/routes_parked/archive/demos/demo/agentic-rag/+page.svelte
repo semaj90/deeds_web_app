@@ -30,11 +30,11 @@ import { Upload } from "lucide-svelte";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // State using Svelte, 5 runes
- let query = $state <string>('');
- let messages = $state <any[]>([]);
- let isProcessing = $state <boolean>(false);
- let availableTools = $state <string[]>([]);
- let selectedDocument = $state <any>(null);
+ let query = $state<string>('');
+ let messages = $state<any[]>([]);
+ let isProcessing = $state<boolean>(false);
+ let availableTools = $state<string[]>([]);
+ let selectedDocument = $state<any>(null);
 
  // Sample queries
  const sampleQueries = [

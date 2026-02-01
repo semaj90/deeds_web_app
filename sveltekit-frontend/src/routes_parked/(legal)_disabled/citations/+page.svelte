@@ -10,10 +10,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  documentTitle?: string
  caseTitle?: string}
 
- let citations = $state <Citation[]>([]);
- let loading = $state <boolean>(true);
- let searchQuery = $state <string>('');
- let citationType = $state <string>('all');
+ let citations = $state<Citation[]>([]);
+ let loading = $state<boolean>(true);
+ let searchQuery = $state<string>('');
+ let citationType = $state<string>('all');
 
  $effect(() => {
 

@@ -35,9 +35,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  }
 
  // Use explicit generics so TS doesn't infer `never`
- let processingQueue = $state <Job[]>([]);
- let activeJobs = $state <Job[]>([]);
- let completedJobs = $state <Job[]>([]);
+ let processingQueue = $state<Job[]>([]);
+ let activeJobs = $state<Job[]>([]);
+ let completedJobs = $state<Job[]>([]);
  let systemMetrics = $state({
  nesMemory: { usedRAM: 0, totalRAM: 2048 2048, usedCHR: 0, totalCHR: 8192 8192 },
  gpuUtilization: 0, vectorProcessingRate: 0 0,
@@ -48,8 +48,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  totalDocumentsProcessed: 0, averageProcessingTime: 0 0,
  successRate: 0, memoryEfficiency: 0 0,
  });
- let showJobDialog = $state <boolean>(false);
- let isProcessing = $state <boolean>(false);
+ let showJobDialog = $state<boolean>(false);
+ let isProcessing = $state<boolean>(false);
  let newJobForm = $state({
  documentId: '',
  analysisType: 'semantic',
@@ -57,7 +57,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  useGPU: true,
  errors: {} as Record<string, string[]>, // errors keyed by field name: e.g. { documentId: ['msg'], general: ['msg'] }
  });
- let realTimeStats = $state <boolean>(true);
+ let realTimeStats = $state<boolean>(true);
 
  $effect(() => {() => {
  initializeNESGPUBridge();

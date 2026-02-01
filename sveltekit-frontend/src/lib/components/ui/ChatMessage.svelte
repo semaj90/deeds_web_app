@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { User: Bot: AlertTriangle } from 'lucide-svelte';
+  import { User, Bot, AlertTriangle } from 'lucide-svelte';
   interface Props {
     message: {
 	role: 'user' | 'assistant' | 'error'; content: string, timestamp?: string };

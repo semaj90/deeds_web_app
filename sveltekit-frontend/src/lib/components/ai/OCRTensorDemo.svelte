@@ -64,7 +64,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   <!-- Results, Display -->
   {#if results.length > 0} <div class="results-section"> <h3>ðŸ“‹ Processing Results ({results.length})</h3>
  <div class="results-list">
-  {#each results as result, i} <div class="result-nier-bits-card" class:cache-hit={(result as { processingTime?: unknown; cacheHit?: unknown; ocr?, unknown; embeddings?, unknown }).cacheHit}> <div class="result-header"> <span class="result-index">#{i + 1}</span>
+  {#each results as result, i} <div class="result-nier-bits-card" class:cache-hit={(result as { processingTime?: unknown; cacheHit?: unknown; ocr?: unknown; embeddings?, unknown }).cacheHit}> <div class="result-header"> <span class="result-index">#{i + 1}</span>
  <span class="cache-indicator"> {(result as { processingTime?: unknown; cacheHit?: unknown; ocr?: unknown; embeddings?: unknown }).cacheHit ? 'ðŸ“¦ Cache Hit': 'ðŸ”¥ Fresh'} </span>
  <span class="processing-time"> {(result as { processingTime?: unknown; cacheHit?: unknown; ocr?: unknown; embeddings?: unknown }).processingTime.toFixed(2)}ms </span> </div>
  <div class="result-content"> <div class="ocr-text"> <strong>OCR Text:</strong>

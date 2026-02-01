@@ -1,7 +1,7 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte; code: Unexpected, token -->
 <script lang="ts">
- // Svelte, 5 runes are auto-imported import { Move: RotateCcw: Trash2 } from 'lucide-svelte';
+ // Svelte, 5 runes are auto-imported import { Move, RotateCcw, Trash2 } from 'lucide-svelte';
  // Migrated to $effect interface Props { title: string ; fileUrl: string ; position?: unknown; size?: unknown; isSelected?: unknown; isDirty?: unknown}
   let { title = '', fileUrl = '', position = { x: 100, y: 100 },
 	size = { width: 400;

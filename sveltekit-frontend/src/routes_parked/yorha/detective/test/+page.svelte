@@ -1,8 +1,8 @@
 <script lang="ts">
  // Svelte 5 runes are auto-imported in runes mode
 
- let testResult = $state <string>('');
- let isLoading = $state <boolean>(false);
+ let testResult = $state<string>('');
+ let isLoading = $state<boolean>(false);
 
  // Example: Split logic for testCaseList into multiple lines for readability
  async function testCaseList(): Promise<any> {

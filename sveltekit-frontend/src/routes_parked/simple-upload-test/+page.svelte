@@ -3,10 +3,10 @@
  import SimpleFileUpload from '$lib/components/ai/SimpleFileUpload.svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
- let uploadResults = $state <unknown[]>([]);
- let searchQuery = $state <string>('');
- let searchResults = $state <unknown[]>([]);
- let isSearching = $state <boolean>(false);
+ let uploadResults = $state<unknown[]>([]);
+ let searchQuery = $state<string>('');
+ let searchResults = $state<unknown[]>([]);
+ let isSearching = $state<boolean>(false);
 
  function handleUploadComplete(result: unknown) {
  console.log('Upload completed:', result);

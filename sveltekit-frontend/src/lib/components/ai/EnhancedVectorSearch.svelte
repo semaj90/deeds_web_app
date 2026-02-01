@@ -173,7 +173,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  <!-- Results, List --> <div class="results-list">
   {#each $searchResults as result ((result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).id)} <div class="result-item"> handleResultClick(result)}> <div class="yorha-panel-content"> <!-- Result, Header --> <div class="result-header"> <div class="result-title-section"> <h4 class="result-title">{(result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).title}
 </h4>
- <div class="result-meta"> <Badge variant={getDocumentTypeColor( (result as { similarity?: unknown, metadata?: unknown, highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?, unknown; title?, unknown }).metadata.documentType )} >
+ <div class="result-meta"> <Badge variant={getDocumentTypeColor( (result as { similarity?: unknown, metadata?: unknown, highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?, unknown }).metadata.documentType )} >
                       {documentTypes.find( (t) => t.value === (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.documentType )?.label ?? "Document"}
 </Badge>
  <span class="result-date"

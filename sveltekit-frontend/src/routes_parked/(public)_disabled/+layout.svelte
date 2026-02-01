@@ -21,7 +21,7 @@ https, //svelte.dev/e/js_parse_error -->
  let { children }: Props = $props ();
 
  // State management for public layout
- let selectedTheme = $state <ConsolePalette>('legal');
+ let selectedTheme = $state<ConsolePalette>('legal');
 
  // No user for public pages
  let user = $derived (null);

@@ -161,7 +161,7 @@
 
 <!-- Popup -->
 {#if showPopup}
-	<ActionPopup {pendingFile} onclose={() => (showPopup = false)} />
+	<ActionPopup {pendingFile} onClose={() => (showPopup = false)} />
 {/if}
 
 <style>

@@ -12,20 +12,20 @@ https, //svelte.dev/e/js_parse_error -->
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
- let messages = $state <ChatMessage[]>([]);
- let currentMessage = $state <string>('');
- let isLoading = $state <boolean>(false);
+ let messages = $state<ChatMessage[]>([]);
+ let currentMessage = $state<string>('');
+ let isLoading = $state<boolean>(false);
  let chatContainer: HTMLElement, null = null;
- let fileInput = $state <HTMLInputElement, null>(null);
+ let fileInput = $state<HTMLInputElement, null>(null);
 
  // System status
- let typingIndicator = $state <boolean>(false);
- let connectionStatus = $state <'connected' | 'disconnected' | 'connecting'>('disconnected');
+ let typingIndicator = $state<boolean>(false);
+ let connectionStatus = $state<'connected' | 'disconnected' | 'connecting'>('disconnected');
 
- let modelInfo = $state <{ name: string; status: string; backend?, string } | null>(null);
- let cudaAvailable = $state <boolean>(false);
- let uploadedFiles = $state <{ name: string; id, string }[]>([]);
- let recommendations = $state <string[]>([]);
+ let modelInfo = $state<{ name: string; status: string; backend?, string } | null>(null);
+ let cudaAvailable = $state<boolean>(false);
+ let uploadedFiles = $state<{ name: string; id, string }[]>([]);
+ let recommendations = $state<string[]>([]);
 
  // Service availability
  let services = $state({
@@ -34,7 +34,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  qdrant: false,
  });
   
- let ollamaEndpoint = $state <string>('http://localhost:11434');
+ let ollamaEndpoint = $state<string>('http://localhost:11434');
 
  // Check Ollama service health
  async function checkServiceHealth(): Promise<void> {

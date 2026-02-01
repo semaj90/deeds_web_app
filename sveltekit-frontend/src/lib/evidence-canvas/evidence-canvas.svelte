@@ -31,13 +31,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  let webgpuSupported = $state(false);
  let gpuAccelerationEnabled = $state(false);
- let suggestions = $state <AISuggestion[]>([]);
- let selectedSuggestions = $state <AISuggestion[]>([]);
+ let suggestions = $state<AISuggestion[]>([]);
+ let selectedSuggestions = $state<AISuggestion[]>([]);
  let showSuggestions = $state(false);
 
  let showModal = $state(false);
 
- let selectedNodes = $state <EvidenceNode[]>([]);
+ let selectedNodes = $state<EvidenceNode[]>([]);
  let currentPhase = $state('initial');
 
  $effect(() => {

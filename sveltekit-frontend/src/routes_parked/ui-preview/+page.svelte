@@ -29,15 +29,15 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  truncateText, } from '$lib/utils/formatting';
 
  // Component state
- let showDialog = $state <boolean>(false);
- let selectedTab = $state <string>('buttons');
- let showSidebar = $state <boolean>(true);
- let mockSessionActive = $state <boolean>(false);
+ let showDialog = $state<boolean>(false);
+ let selectedTab = $state<string>('buttons');
+ let showSidebar = $state<boolean>(true);
+ let mockSessionActive = $state<boolean>(false);
 
  // Modal states
- let showModal = $state <boolean>(false);
- let modalVariant = $state <string>('gradient');
- let modalSize = $state <string>('md');
+ let showModal = $state<boolean>(false);
+ let modalVariant = $state<string>('gradient');
+ let modalSize = $state<string>('md');
 
  // Mock user data for session/user demo
  let mockUser = $state ({
@@ -167,7 +167,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  { title: 'Criminal Defense - Armed Robbery Case', status: 'closed', priority: 'critical' },
  { title: 'Family Law Custody Battle', status: 'open', priority: 'low' }];
 
- let focusReady = $state <boolean>(false);
+ let focusReady = $state<boolean>(false);
  $effect (() => {
  focusReady = true;
  });

@@ -61,20 +61,20 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  const RefreshCw = resolveIcon('RefreshCw');
 
  // State
- let searchQuery = $state <string>('');
- let viewMode = $state <'grid' , 'list'>('grid'); // Changed to 'grid' | 'list' and initial value to 'grid'
- let showFilters = $state <boolean>(false);
- let selectedThreatLevel = $state <string>('');
- let selectedStatus = $state <string>('');
- let selectedRelationship = $state <string>('');
- let sortBy = $state <'name' | 'updated' | 'created' | 'threat'>('updated');
- let sortOrder = $state <'asc' | 'desc'>('desc');
- let isLoading = $state <boolean>(false);
- let showAddModal = $state <boolean>(false);
- let error = $state <string | null>(null);
+ let searchQuery = $state<string>('');
+ let viewMode = $state<'grid' , 'list'>('grid'); // Changed to 'grid' | 'list' and initial value to 'grid'
+ let showFilters = $state<boolean>(false);
+ let selectedThreatLevel = $state<string>('');
+ let selectedStatus = $state<string>('');
+ let selectedRelationship = $state<string>('');
+ let sortBy = $state<'name' | 'updated' | 'created' | 'threat'>('updated');
+ let sortOrder = $state<'asc' | 'desc'>('desc');
+ let isLoading = $state<boolean>(false);
+ let showAddModal = $state<boolean>(false);
+ let error = $state<string | null>(null);
 
  // Mock data - replace with API calls (fixed: object literal syntax)
- let persons = $state <PersonOfInterest[]>([
+ let persons = $state<PersonOfInterest[]>([
  {
  id: '1',
  name: 'Marcus Chen',
@@ -156,7 +156,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  ]);
 
  // New person form state for the modal
- let newPerson = $state <Omit<PersonOfInterest, 'id' | 'caseIds' | 'createdAt' | 'updatedAt' | 'createdBy' | 'position'>>({
+ let newPerson = $state<Omit<PersonOfInterest, 'id' | 'caseIds' | 'createdAt' | 'updatedAt' | 'createdBy' | 'position'>>({
  name: '',
  aliases: [],
  relationship: 'person_of_interest',

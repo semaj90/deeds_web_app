@@ -6,7 +6,7 @@ import type { Button } from '$lib/components/ui/button';
  import UiButton as Button from "$lib/components/ui.svelte";
  // Migrated to $effect
  let caseId: string | null = null
- let readOnly = $state <boolean>(false);
+ let readOnly = $state<boolean>(false);
  $effect (() => {
  // Get case ID from URL params if provided
  caseId = $page .url.searchParams.get('caseId');

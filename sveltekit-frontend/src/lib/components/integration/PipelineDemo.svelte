@@ -117,7 +117,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="yorha-panel-content"> <div class="space-y-3">
   {#each Array.isArray(results.slice(0, 5)) ? results.slice(0, 5): [] as result} <div class="p-3 border"> <div class="flex justify-between items-start"> <div class="flex items-center"> <span class="font-semibold">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).type}
 </span>
- <span class={getStatusColor((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?, any; error?, any }).success)}> {(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).success ? 'âœ…': 'âŒ'}
+ <span class={getStatusColor((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?, any }).success)}> {(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).success ? 'âœ…': 'âŒ'}
 </span> </div>
  <div class="text-sm"> {formatTime((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.totalProcessingTime)}
 </div> </div>

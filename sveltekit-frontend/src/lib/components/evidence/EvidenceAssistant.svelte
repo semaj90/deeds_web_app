@@ -11,7 +11,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let { node, open = $bindable(false) } = $props<{
  node: EvidenceNode;
- open?, boolean;
+ open?: boolean;
  }>();
 
  let analysis = '';

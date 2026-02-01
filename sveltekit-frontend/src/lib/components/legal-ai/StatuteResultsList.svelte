@@ -15,7 +15,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let { statutes = [], error = null, isLoading = false } = $props<{
  statutes?: Statute[];
  error?: string | null;
- isLoading?, boolean;
+ isLoading?: boolean;
  }>();
 
  const dispatch = createEventDispatcher();

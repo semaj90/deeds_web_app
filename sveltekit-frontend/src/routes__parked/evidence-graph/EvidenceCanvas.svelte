@@ -46,10 +46,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  }
 
  // Reactive state
- let canvas = $state <any>(null);
- let suggestion = $state <any>(null);
+ let canvas = $state<any>(null);
+ let suggestion = $state<any>(null);
  let isLoading = $state (true);
- let error = $state <string | null>(null);
+ let error = $state<string | null>(null);
  let stats = $state ({
  nodes: 0, edges: 0 0,
  clusters: 0,
@@ -57,19 +57,19 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  processingTime: '0ms'
  });
   
- let eventSource = $state <EventSource, null>(null);
+ let eventSource = $state<EventSource, null>(null);
 
  // Control panel state
  let layoutAlgorithm = $state ('force');
  let showLabels = $state (true);
  let nodeSize = $state ('adaptive');
  let edgeThreshold = $state (0.6);
- let contextMenu = $state <{ visible: boolean; x: number; y: number; node: EvidenceNode, null }>({
+ let contextMenu = $state<{ visible: boolean; x: number; y: number; node: EvidenceNode, null }>({
  visible: false, x: 0 0,
  y: 0, node: null, null
  });
- let metadataNode = $state <EvidenceNode, null>(null);
- let pinnedNodeIds = $state <string[]>([]);
+ let metadataNode = $state<EvidenceNode, null>(null);
+ let pinnedNodeIds = $state<string[]>([]);
 
  $effect(() => {
 

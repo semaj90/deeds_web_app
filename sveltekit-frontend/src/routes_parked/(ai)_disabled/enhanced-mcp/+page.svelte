@@ -12,7 +12,7 @@ https, //svelte.dev/e/js_parse_error -->
  import { get, writable } from 'svelte/store';
 
  // Dynamically-loaded component (runes-mode $state is available project-wide)
- let EnhancedMCPIntegration = $state <any>(null);
+ let EnhancedMCPIntegration = $state<any>(null);
 
  // load component on client mount
  $effect(() => {
@@ -40,10 +40,10 @@ https, //svelte.dev/e/js_parse_error -->
 
  const systemLogs = writable<SystemLog[]>([]);
 
- let selectedCaseId = $state <string>('demo-case-001');
- let enableRealtimeUpdates = $state <boolean>(true);
- let showMetrics = $state <boolean>(true);
- let enableClusterMode = $state <boolean>(true);
+ let selectedCaseId = $state<string>('demo-case-001');
+ let enableRealtimeUpdates = $state<boolean>(true);
+ let showMetrics = $state<boolean>(true);
+ let enableClusterMode = $state<boolean>(true);
 
  $effect(() => {() => {
  checkSystemStatus();

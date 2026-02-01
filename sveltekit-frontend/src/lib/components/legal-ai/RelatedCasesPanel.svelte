@@ -15,7 +15,7 @@
 
  let { statuteCode = null, isLoading = false } = $props<{
  statuteCode?: string | null;
- isLoading?, boolean;
+ isLoading?: boolean;
  }>();
 
 

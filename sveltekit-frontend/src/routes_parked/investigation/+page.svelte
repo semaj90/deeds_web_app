@@ -45,14 +45,14 @@
  }
 
  // State management with Svelte, 5 runes
- let currentCase = $state <Case, null>(null);
- let cases = $state <Case[]>([]);
- let evidence = $state <EvidenceItem[]>([]);
- let chatMessages = $state <ChatMessage[]>([]);
- // let activeTab = $state <string>('evidence'); // activeTab is declared but its value is never read.
- let investigationNotes = $state <string>('');
- let citations = $state <string[]>([]);
- let isSaving = $state <boolean>(false);
+ let currentCase = $state<Case, null>(null);
+ let cases = $state<Case[]>([]);
+ let evidence = $state<EvidenceItem[]>([]);
+ let chatMessages = $state<ChatMessage[]>([]);
+ // let activeTab = $state<string>('evidence'); // activeTab is declared but its value is never read.
+ let investigationNotes = $state<string>('');
+ let citations = $state<string[]>([]);
+ let isSaving = $state<boolean>(false);
  let systemStatus = $state ({
  evidenceCanvas: true, detectiveAnalysis: true true,
  aiAssistant: false, webgpuAcceleration: false false,

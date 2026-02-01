@@ -13,15 +13,15 @@ https, //svelte.dev/e/js_parse_error -->
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Svelte, 5 runes for reactive state
- let log = $state <string>('');
+ let log = $state<string>('');
  let testResults = $state({
  webgpu: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null; as: string | null },
  webgl2: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null; as: string | null },
  webgl1: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null, as: string, string: string | null }; wasm: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null, as: string, string: string | null },
  recommendation: ''});
- let isTestingInProgress = $state <boolean>(false);
- let currentTest = $state <string>('');
- let progressPercent = $state <number>(0);
+ let isTestingInProgress = $state<boolean>(false);
+ let currentTest = $state<string>('');
+ let progressPercent = $state<number>(0);
  // Test configuration for Gemma3 270M simulation
  const matrixSize = 384; // Gemma3 270M embedding dimension
  const iterations = 50

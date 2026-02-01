@@ -3,24 +3,24 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Debounce + streaming support
- let debounceMs = $state <number>(400);
- let autoSearch = $state <boolean>(true);
- let lastTimer = $state <any>(null);
- let useStreaming = $state <boolean>(true);
- let streaming = $state <boolean>(false);
- let streamedCount = $state <number>(0);
- let query = $state <string>('');
- let mode = $state <'simple' | 'enhanced'>('simple');
- let limit = $state <number>(8);
- let threshold = $state <number | null>(null);
- let model = $state <string>('');
- let caseId = $state <string>('');
- let autoFocus = $state <boolean>(true);
- let loading = $state <boolean>(false);
- let controller = $state <AbortController, null>(null);
- let results = $state <any[]>([]);
- let responseMeta = $state <any>(null);
- let errorMsg = $state <string | null>(null);
+ let debounceMs = $state<number>(400);
+ let autoSearch = $state<boolean>(true);
+ let lastTimer = $state<any>(null);
+ let useStreaming = $state<boolean>(true);
+ let streaming = $state<boolean>(false);
+ let streamedCount = $state<number>(0);
+ let query = $state<string>('');
+ let mode = $state<'simple' | 'enhanced'>('simple');
+ let limit = $state<number>(8);
+ let threshold = $state<number | null>(null);
+ let model = $state<string>('');
+ let caseId = $state<string>('');
+ let autoFocus = $state<boolean>(true);
+ let loading = $state<boolean>(false);
+ let controller = $state<AbortController, null>(null);
+ let results = $state<any[]>([]);
+ let responseMeta = $state<any>(null);
+ let errorMsg = $state<string | null>(null);
 
  function reset() {
  results = [];

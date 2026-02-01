@@ -28,7 +28,7 @@ https://svelte.dev/e/expected_token -->
 	confidence: number;
 	text: string;
 	category: string;
-			implications?, string;
+			implications?: string;
 		}>;
 		clauses?: Array<{
 	name: string;

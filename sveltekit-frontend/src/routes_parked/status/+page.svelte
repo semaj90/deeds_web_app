@@ -5,10 +5,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  // System status state
- let systemHealth = $state <any>(null);
- let integrationTests = $state <any>({});
- let isLoading = $state <boolean>(true);
- let lastUpdated = $state <string>('');
+ let systemHealth = $state<any>(null);
+ let integrationTests = $state<any>({});
+ let isLoading = $state<boolean>(true);
+ let lastUpdated = $state<string>('');
 
  $effect (() => {
  if (!browser) return;

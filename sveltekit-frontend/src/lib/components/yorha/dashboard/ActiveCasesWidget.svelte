@@ -1,6 +1,5 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app-store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   let activeCases: any[] = $state([]);
@@ -27,7 +26,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           priority: caseItem.priority || 'medium',
           progress: caseItem.progress || Math.floor(Math.random() * 100),
           lastActivity: caseItem.updatedAt ? new Date(caseItem.updatedAt).toLocaleString() : 'Recently',
-          evidenceCount: caseItem.evidenceCount || caseItem.documents?.length ?? 0
+          evidenceCount: caseItem.evidenceCount || (caseItem.documents?.length ?? 0)
         }));
 
     } catch (err) {
@@ -80,7 +79,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	60000); // Refresh every minute
 
     return () => clearInterval(interval);
-  
+
 });
 
   function getStatusColor(status: string): string {

@@ -29,9 +29,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  [key: string]: unknown; // Allow other top-level properties
  }
 
- let searchResults = $state <VectorResult[]>([]); // Use VectorResult type
- let selectedDocument = $state <VectorResult, null>(null); // Use VectorResult type
- let isAnalyzing = $state <boolean>(false);
+ let searchResults = $state<VectorResult[]>([]); // Use VectorResult type
+ let selectedDocument = $state<VectorResult, null>(null); // Use VectorResult type
+ let isAnalyzing = $state<boolean>(false);
 
  const handleSearchResults = (results: VectorResult[]) => {
  // Use VectorResult type

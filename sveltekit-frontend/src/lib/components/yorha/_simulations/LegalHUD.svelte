@@ -1,6 +1,6 @@
 <script lang="ts">
  let { active = false } = $props<{
- active?, boolean;
+ active?: boolean;
  }>();
 </script>
 

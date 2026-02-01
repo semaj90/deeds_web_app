@@ -14,8 +14,7 @@ from 'svelte/store';
 import type {
 type Writable }
 from 'svelte/store';
-import {
-cacheFirstService: CaseSchema: EvidenceSchema }
+import { cacheFirstService, CaseSchema, EvidenceSchema }
 from './cache-first-architecture.js';
 // ===== ENHANCED CASE FORM SCHEMA ===== export const EnhancedCaseFormSchema = CaseSchema.extend({
 // Additional form-specific fields attachments: z.array(z.instanceof(File)).default([], legalCategory: z.enum(['civil', 'criminal', 'corporate', 'family', 'immigration']).optional( jurisdiction: z.string().min(1, 'Jurisdiction required', estimatedDuration: z.number().min(1).max(365).optional(budget: z.number().min(0).optional(, clientContact: z.object({

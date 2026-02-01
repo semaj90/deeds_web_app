@@ -44,7 +44,7 @@ export const importLongColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix simple value: value, value chains (likely corrupted imports)
- * Before: import { A: B: C } from
+ * Before: import { A, B, C } from
  * After:  import { A, B, C } from
  */
 export const importColonChainPattern: PatternMatcher = createPattern(

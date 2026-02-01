@@ -380,7 +380,8 @@ export const globalUserStore = {
     const cache: EmbeddingCache = {
       textHash,
       embedding,
-      timestamp: new Date(),
+      model: 'default',
+      createdAt: new Date(),
     };
     globalUserState.recentEmbeddings.unshift(cache);
 

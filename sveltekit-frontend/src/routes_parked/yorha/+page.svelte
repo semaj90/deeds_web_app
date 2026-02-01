@@ -34,24 +34,24 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let localIndexReady = $state (false);
  let localIndexCount = $state (0);
  let localLoadedFromCache = $state (false);
- let layoutData = $state <any, null>(null);
- let systemData = $state <SystemMetrics>({
+ let layoutData = $state<any, null>(null);
+ let systemData = $state<SystemMetrics>({
  cpu_usage: 50, memory_usage: 60 60,
  gpu_utilization: 70, network_latency: 30 30,
  active_processes: 12, neural_activity: 75 75,
  security_level: 'HIGH',
  quantum_state: 'STABLE',
  });
- let legalSession = $state <LegalAISession, null>(null);
+ let legalSession = $state<LegalAISession, null>(null);
  let showCommandInterface = $state (false);
  let holographicMode = $state (false);
  let activeModule = $state ('overview'); // Default module
  let activeSection = $state ('overview'); // Default section
  let isLoading = $state (false);
- let ragResult = $state <any, null>(null);
- let searchResults = $state <SearchResult[]>([]);
+ let ragResult = $state<any, null>(null);
+ let searchResults = $state<SearchResult[]>([]);
  let searchTerm = $state ('');
- let searchMode = $state <'local' | 'remote' | 'hybrid'>('hybrid'); // Default search mode
+ let searchMode = $state<'local' | 'remote' | 'hybrid'>('hybrid'); // Default search mode
 
  // --- IndexedDB Local Index Implementation ---
  const LOCAL_DB_NAME = 'yorha-local-index';
@@ -403,8 +403,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  return () => clearInterval(interval);
  });
   
- let yoRHaCenterRef = $state <any>(null);
- let yoRHaInterfaceRef = $state <any>(null);
+ let yoRHaCenterRef = $state<any>(null);
+ let yoRHaInterfaceRef = $state<any>(null);
 
  // Push systemData into the command center instance at runtime
  $effect (() => {
