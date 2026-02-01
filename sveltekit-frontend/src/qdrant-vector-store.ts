@@ -156,7 +156,7 @@ export class QdrantVectorStore {
 
     await this.client.upsert(COLLECTIONS.CONVERSATIONS, {
       wait: true,
-      points: [{, id: pointId, vector: embedding, payload }],
+      points: [{ id: pointId, vector: embedding, payload }],
     });
 
     return pointId;
