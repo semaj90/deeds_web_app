@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Component props
 	let {
@@ -757,7 +755,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		font-family: inherit;
 	}
 
-	textarea:focus;
+	textarea:focus,
 	select:focus {
 		outline: none;
 		border-color: #3498db;

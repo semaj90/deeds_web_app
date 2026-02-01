@@ -3,7 +3,6 @@
 	// Migrated to $effect
 	import SimilarCasesPanel from './SimilarCasesPanel.svelte';
 	import SummaryEditor from './SummaryEditor.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface CaseDetail {
 		id: string;
@@ -44,14 +43,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 		(async () => {
 			caseId = $page.params.id;
-			await loadCaseDetail();
-			await loadSummary();
-			isLoading = false;
-		
-});();
-	});
-
-	async function loadCaseDetail() {
+		await loadCaseDetail();
+		await loadSummary();
+		isLoading = false;
+	})();
+	});	async function loadCaseDetail() {
 		try {
 			const response = await fetch(`/api/cases/${caseId}`);
 			if (response.ok) {
@@ -461,7 +457,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem;
 	}
 
-	.btn-primary: hover, not(:disabled) {
+	.btn-primary:hover:not(:disabled) {
 		background-color: #1d4ed8;
 	}
 

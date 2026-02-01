@@ -38,6 +38,12 @@ const TYPE_FIXES = [
         pattern: /\[\{\s*,\s*/g,
         replacement: '[{ ',
         description: 'Fix [{, ... -> [{ ...'
+    },
+    {
+        name: 'array-from-leading-comma',
+        pattern: /Array\.from\(\{\s*,\s*/g,
+        replacement: 'Array.from({ ',
+        description: 'Fix Array.from({, ... -> Array.from({ ...'
     }
 ];
 
