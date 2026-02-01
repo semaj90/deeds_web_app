@@ -1,4 +1,4 @@
-<script>
+<scriptlang="ts">
  let message = 'RAG Interface is working!';
 </script>
 

@@ -1,4 +1,4 @@
-<script>
+<scriptlang="ts">
  import { redirect } from '@sveltejs/kit';
 
  // Redirect to the new command center in the (app) route group

@@ -1,4 +1,4 @@
-<script>
+<scriptlang="ts">
  // Simple test page to isolate the issue
  let message = 'Test RAG page is working!';
 </script>

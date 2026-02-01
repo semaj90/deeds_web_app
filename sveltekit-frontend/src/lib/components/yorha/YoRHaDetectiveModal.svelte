@@ -1,66 +1,90 @@
-<!-- YoRHa Detective: Modal, Component -->
+<!-- YoRHa Detective Modal Component -->
 <script lang="ts">
-  // Svelte, 5 runes are auto-imported
   import { onMount } from 'svelte';
   import type { Snippet } from 'svelte';
+
   let {
     showModal = false,
     title = '',
-    onClose = () => ,
+    onClose = () => {},
     children
+  }: {
+    showModal: boolean;
+    title: string;
+    onClose: () => void;
+    children?: Snippet;
   } = $props();
+
   // Handle escape key
-  function handleKeydown(_event: KeyboardEvent) {
+  function handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape' && showModal) {
-      onClose()}
+      onClose();
+    }
   }
 
   // Handle backdrop click
-  function handleBackdrop(_event: MouseEvent) {
+  function handleBackdrop(event: MouseEvent) {
     if (event.target === event.currentTarget) {
-      onClose()}
+      onClose();
+    }
   }
+
   $effect(() => {
-    const handleEscape = (e: CustomEvent<any>) => handleKeydown(e);
-    document.addEventListener('keydown', handleEscape);
+    if (showModal) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeydown);
+    } else {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeydown);
+    }
     return () => {
-      document.removeEventListener('keydown', handleEscape)}
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeydown);
+    }
   });
 </script>
+
 {#if showModal}
-  <!-- Modal, Backdrop -->
+  <!-- Modal Backdrop -->
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
-    class="modal-backdrop"
+    class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     onclick={handleBackdrop}
-    keydown={handleKeydown}
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title"
-    tabindex="-1"
   >
-    <!-- Modal, Panel -->
-    <div class="modal-panel">
+    <!-- Modal Panel -->
+    <div class="modal-panel bg-yorha-dark border border-yorha-accent-warm/30 rounded-lg shadow-xl w-full max-w-2xl mx-4 transform transition-all p-6 relative">
       <!-- Header -->
-      <div class="modal-header">
-        <h2 id="modal-title" class="modal-title">{title}</h2>
-        <button class="modal-close" onclick={onClose} aria-label="Close modal"> &time; </button>
+      <div class="modal-header flex items-center justify-between mb-4 pb-2 border-b border-yorha-accent-warm/20">
+        <h2 id="modal-title" class="modal-title text-xl font-bold text-yorha-light">{title}</h2>
+        <button class="modal-close text-yorha-muted hover:text-yorha-accent-warm transition-colors text-2xl leading-none"
+                onclick={onClose}
+                aria-label="Close modal">
+          &times;
+        </button>
       </div>
+
       <!-- Content -->
-      <div class="modal-content">
+      <div class="modal-content text-yorha-light">
         {#if children}
           {@render children()}
+        {:else}
+           <p class="text-yorha-muted text-center py-4">No content</p>
         {/if}
       </div>
     </div>
-  {/if}
+  </div>
+{/if}
+
 <style>
-  .modal-backdrop {
-    position: fixed
-d
-   ;top: 0; left: 0
-   ;right: 0; bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5); display: flex;
-    align-items: center;
+  /* Minimal custom styles, using Tailwind mostly */
+  .modal-panel {
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+  }
+</style>
     justify-content: center
    ; padding: 1rem;
     z-index: 1000; animation: fadeIn 0.2s ease-in-out}

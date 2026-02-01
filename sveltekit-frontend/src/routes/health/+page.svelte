@@ -1,4 +1,4 @@
-<script>
+<scriptlang="ts">
     let message = "Hello from Phase 99 Test!";
 </script>
 

@@ -1,4 +1,4 @@
-<script>
+<scriptlang="ts">
 
 let { title = 'YORHA COMMAND CENTER' } = $props();
 
