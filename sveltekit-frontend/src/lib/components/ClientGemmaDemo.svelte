@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { clientGemmaInference } from '$lib/ai/client-gemma-inference';
-	// Migrated to $effect
+	import { aiService } from '$lib/ai/ai-service';
+	// Migrated to $effect - Using stable aiService instead of client-gemma-inference
 
-	let isInitialized = $state(false);
+	let isInitialized = $state(true); // aiService is always available
 	let isInitializing = $state(false);
 	let initializationError = $state<string | null>(null);
 
@@ -15,21 +15,9 @@
 	dimensions: number } | null>(null);
 	let isGeneratingEmbedding = $state(false);
 
+	// No initialization needed for aiService
 	$effect(() => {
-
-		(async () => {
-			isInitializing = true;
-			try {
-				await clientGemmaInference.initialize();
-				isInitialized = true;
-				console.log('✅ Client Gemma Inference ready');
-			} catch (error) {
-				initializationError = error instanceof Error ? error.message : 'Unknown error';
-				console.error('❌ Failed to initialize:', error);
-			} finally {
-				isInitializing = false;
-			}
-		})();
+		console.log('✅ AI Service ready (using Ollama backend)');
 	});
 
 	async function generateText() {
@@ -38,7 +26,7 @@
 		isGenerating = true;
 		response = '';
 		try {
-			const result = await clientGemmaInference.generate(prompt, {
+			const result = await aiService.generateText(prompt, {
 				maxTokens: 200,
 				temperature: 0.7
 			});
@@ -56,8 +44,11 @@
 		isGeneratingEmbedding = true;
 		embeddingResult = null;
 		try {
-			const result = await clientGemmaInference.generateEmbedding(embeddingText);
-			embeddingResult = result;
+			const embedding = await aiService.generateEmbedding(embeddingText);
+			embeddingResult = {
+				embedding: embedding,
+				dimensions: embedding.length
+			};
 		} catch (error) {
 			console.error('Embedding generation failed:', error);
 		} finally {
