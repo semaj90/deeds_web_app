@@ -155,25 +155,23 @@
       >
         Clear Filters
       </button>
+
+      <button
+        class="px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded-lg transition-colors"
+        onclick={bulkAnalyze}
+      >
+        🤖 Bulk Analyze
+      </button>
+
+      <button
+        class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors"
+        onclick={bulkTag}
+      >
+        🏷️ Bulk Tag
+      </button>
     </div>
   </div>
 </div>
-
- <button
- class="px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded-lg transition-colors"
- onclick={bulkAnalyze}
- >
- 🤖 Bulk Analyze
- </button>
-
- <button
- class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors"
- onclick={bulkTag}
- >
- 🏷️ Bulk Tag
- </button>
- </div>
- </div>
 
  <!-- Active Filters Display -->
  {#if searchQuery || typeFilter !== 'all' || statusFilter !== 'all' || caseFilter !== 'all' || aiAnalyzedFilter !== 'all' || dateRange !== 'all'}

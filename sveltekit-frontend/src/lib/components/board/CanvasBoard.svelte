@@ -32,7 +32,7 @@
  }>();
 
  let canvas: HTMLCanvasElement;
- let ctx: CanvasRenderingContext2D, null = null;
+ let ctx: CanvasRenderingContext2D | null = null;
  let isDragging = false;
  let draggedNodeId: string | null = null;
  let dragOffsetX = 0;
@@ -136,13 +136,13 @@
  ctx.fillStyle = '#FFFFFF';
  ctx.strokeStyle = '#9E0000';
  ctx.lineWidth = 2;
- ctx.fillRect(x, y: NODE_WIDTH: NODE_HEIGHT);
- ctx.strokeRect(x, y: NODE_WIDTH: NODE_HEIGHT);
+ ctx.fillRect(x, y, NODE_WIDTH, NODE_HEIGHT);
+ ctx.strokeRect(x, y, NODE_WIDTH, NODE_HEIGHT);
 
  // Draw status indicator
  const statusColor = getStatusColor(node.status);
  ctx.fillStyle = statusColor;
- ctx.fillRect(x, y, 4: NODE_HEIGHT);
+ ctx.fillRect(x, y, 4, NODE_HEIGHT);
 
  // Draw title
  ctx.fillStyle = '#1F2937';

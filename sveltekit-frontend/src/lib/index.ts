@@ -32,7 +32,6 @@ export * from './utils/type-guards.js';
 export { default as localStorageFileFallback } from './services/localStorage-file-fallback.js';
 
 // ===== UTILITIES & TYPES =====
-export { cn, confidenceClass, legalCn, priorityClass } from './utils/cn.js';
 export {
     copyToClipboard, debounce, downloadFile, formatDate, formatFileSize, formatProcessingTime, generateId, getCaseStatusStyling, getConfidenceLevel, getEvidenceTypeStyling, getInitials, isBrowser, isValidEmail, storage,
     theme, throttle
@@ -106,6 +105,8 @@ export type {
     SearchCategory, SearchFilter,
     SearchOptions, SearchResult, SearchState
 } from './types/search.types.js';
+export * from './utils.js';
 
 // Default export for convenience
 export default { VERSION, BUILD_DATE, FRAMEWORK_INFO, FEATURES, DEV_TOOLS };
+

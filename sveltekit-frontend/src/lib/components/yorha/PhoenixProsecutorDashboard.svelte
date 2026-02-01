@@ -1,6 +1,6 @@
 <script lang="ts">
   import LegalHUD from '$lib/components/evidence-graph/LegalHUD.svelte';
-  import GraphView from '$lib/components/GraphView.svelte';
+  import { WebGPUEvidenceGraphVisualization } from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization';
   import { onDestroy, onMount } from 'svelte';
   import ContradictionReveal from './ContradictionReveal.svelte';
   import EvidenceComparisonOverlay from './evidence/EvidenceComparisonOverlay.svelte';
@@ -352,7 +352,7 @@
       <div class="bg-slate-900/50 rounded-lg p-4 h-full">
         <h2 class="text-lg font-bold mb-4 text-cyan-400">🔗 Evidence Relationship Graph</h2>
         <div class="h-[calc(100%-3rem)]">
-          <GraphView {caseId} {isProsecutorMode} />
+          <WebGPUEvidenceGraphVisualization nodes={[]} edges={[]} />
         </div>
       </div>
     </div>

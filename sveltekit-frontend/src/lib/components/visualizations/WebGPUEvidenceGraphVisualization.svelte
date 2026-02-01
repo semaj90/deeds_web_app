@@ -3,8 +3,8 @@
   import { WebGPUEvidenceGraph, type GraphEdge, type GraphNode } from '$lib/services/webgpu-evidence-graph';
 
   // Define interfaces for analysis props
-  interface Entity { type: 'person' | 'organization' | 'location' | 'object'; }
-  interface Correlation { correlationType: 'temporal' | 'causal' | 'semantic'; }
+  interface Entity { type: 'person' | 'organization' | 'location' | 'object' | 'date' | 'amount'; }
+  interface Correlation { correlationType: 'temporal' | 'causal' | 'semantic' | 'spatial' | 'entity'; }
   interface TimelineEvent { type: string; }
 
   let { nodes, edges, error = null, analysis } = $props<{

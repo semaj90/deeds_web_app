@@ -12,6 +12,7 @@ import {
     caseApi,
     evidenceApi,
     poiApi,
+    searchApi,
     systemApi,
 } from '$lib/services/api-client';
 import { writable } from 'svelte/store';
@@ -301,7 +302,7 @@ export const appActions = {
       if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
-          searchResults: response.data.items,
+          searchResults: response.data,
           searchQuery: query,
           error: null,
         }));
