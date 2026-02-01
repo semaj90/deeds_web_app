@@ -78,7 +78,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <input; bind:this={ fileInput } type="file"
         accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp" onchange={ handleFileSelect } class="sr-only"
         disabled={$isSubmitting} /> </div> </div>
- <!-- Form, Fields --> <form use, enhance | method="post" class="space-y-6"> <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Basic, Information --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Document Information</h3> </div>
+ <!-- Form, Fields --> <form use, enhance | method="post" class="space-y-6"> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Basic, Information --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Document Information</h3> </div>
  <div class="yorha-panel-content"> <div> <label for="title" class="block text-sm font-medium"> Title * </label>
  <Input id="title", bind:value={$formData.title} placeholder="Enter document, title"
               class={$errors.title ? "border-red-500", ""} disabled={$isSubmitting} />

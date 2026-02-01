@@ -52,7 +52,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   };
 </script>
 
-<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3 gap-6">
   {#if isLoading}
     {#each Array(3) as _}
       <div class="bg-white border-2 border-gray-300 p-6 rounded animate-pulse">

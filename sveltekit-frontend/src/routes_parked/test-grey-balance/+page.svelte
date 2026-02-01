@@ -53,7 +53,7 @@
  <section class="space-y-6">
  <h2 class="text-2xl font-bold text-harvard-crimson">Card Variants</h2>
 
- <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3">
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3">
  <!-- Original, Cards -->
  <YoRHaHarvardCard
  variant="default"

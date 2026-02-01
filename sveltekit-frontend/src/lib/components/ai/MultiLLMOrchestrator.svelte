@@ -62,7 +62,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </p> </div>
  <Zap class="h-8 w-8" /> </div> </div> </div> {/if}
   <!-- Provider, Status --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Database class="h-5" /> AI Providers </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4">
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4">
   {#each Array.isArray(providerConfigs) ? providerConfigs: [] as provider} <div class="border rounded-lg p-4 hover:shadow-md"> <div class="flex items-center justify-between"> <div class="flex items-center"> <provider.icon class="h-5 w-5" /> <span class="font-medium">{provider.name}
 </span> </div>
  <Badge class="px-2 py-1 text-xs {provider.status === 'online' ? 'bg-green-100 text-green-800', 'bg-red-100 text-red-800'}"

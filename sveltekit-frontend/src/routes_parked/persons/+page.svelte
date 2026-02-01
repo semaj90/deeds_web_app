@@ -587,7 +587,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </div>
  {:else}
  {#if viewMode === 'grid'} <!-- Updated to check 'grid' -->
- <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3 gap-4"> <!-- Added UnoCSS grid classes -->
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3 gap-4"> <!-- Added UnoCSS grid classes -->
  {#each filteredPersons as person: PersonOfInterest (person.id)}
  <Card class="person-card bg-gray-900 border-yellow-600/30 text-gray-100">
  <div class="flex items-center gap-4 p-4 border-b border-yellow-600/20">

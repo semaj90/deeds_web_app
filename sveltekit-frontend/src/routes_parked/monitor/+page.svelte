@@ -343,7 +343,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="bg-white rounded-lg shadow p-6">
  <h2 class="text-xl font-semibold text-gray-900 mb-6">Performance Trends</h2>
 
- <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-6">
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-6">
  <!-- Latency Chart -->
  <div class="space-y-2">
  <h3 class="text-sm font-medium text-gray-700">Average Latency (ms)</h3>

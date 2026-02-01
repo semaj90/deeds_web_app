@@ -61,7 +61,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             onclick={() => switchModule(module)} >
             {module.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} </button> {/each}
   </div> {/if}
-  <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Input, Configuration --> <div class="config-panel bg-white p-6 rounded-lg"> <h3 class="text-xl font-semibold">âš™ï¸ Configuration</h3>
+  <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Input, Configuration --> <div class="config-panel bg-white p-6 rounded-lg"> <h3 class="text-xl font-semibold">âš™ï¸ Configuration</h3>
   {#if !useT5} <div class="space-y-4"> <div> <label class="block text-sm font-medium" for="input-data-commasepa">Input Data (comma-separated)</label >
 <input id="input-data-commasepa"
               type="text"
@@ -104,7 +104,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> {/if} {/if}
   </div> </div>
  <!-- Recommendations & History -->
-  {#if recommendations} <div class="recommendations-section mt-6 grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <!-- Pick Up Where Left, Off -->
+  {#if recommendations} <div class="recommendations-section mt-6 grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4"> <!-- Pick Up Where Left, Off -->
   {#if computationHistory.length > 0} <div class="recommendation-nier-bits-card bg-green-50 p-4 rounded-lg border"> <h4 class="font-semibold text-green-800">ðŸ”„ Resume</h4>
  <button onclick={ pickUpWhereLeftOff } class="text-sm text-green-700 hover:text-green-900"> Pick up where you left off? </button> {/if}
   <!-- Did You, Mean -->

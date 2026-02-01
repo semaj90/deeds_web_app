@@ -12,7 +12,7 @@ import Button from './Button.svelte';
  <div class="relative">
  <input
  class="bg-sandDark text-black px-3 py-1.5 pr-8 rounded border border-black/40 text-xs font-mono w-64
- focus: outline-none, focus: ring-2, focus, ring-accent/50"
+ focus: outline-none, focus: ring-2, focus:ring-accent/50"
  placeholder="Search cases, evidence, persons..."
  type="search"
  />

@@ -240,7 +240,7 @@
  </CardTitle>
  </CardHeader>
  <CardContent>
- <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3 gap-4">
  {#if poi.physicalDescription.height}
  <div class="bg-slate-700 p-3 rounded-lg">
  <div class="text-xs text-slate-400 uppercase tracking-wide">Height</div>

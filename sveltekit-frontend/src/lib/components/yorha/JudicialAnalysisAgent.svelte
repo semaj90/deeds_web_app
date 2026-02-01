@@ -190,7 +190,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  <h2 class="text-xl font-bold text-cyan-400">Judge-Style Legal Reasoning Agent</h2>
  </div>
 
- <div class="grid grid-cols-1 lg, grid-cols-4 gap-6">
+ <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
  <!-- Input Section -->
  <div class="lg, col-span-1 space-y-6">
  <!-- Case Details -->

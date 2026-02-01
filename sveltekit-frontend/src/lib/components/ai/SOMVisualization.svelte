@@ -55,7 +55,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </script>
  <div class="som-visualization { className }"> <!-- Header --> <div class="header yorha-panel p-4"> <h2 class="text-xl font-bold text-yellow-400">Self-Organizing Map RAG Visualization</h2>
  <p class="text-gray-300">Dimensionality reduction and clustering for legal document embeddings</p> </div>
- <!-- Controls --> <div class="controls grid grid-cols-1 lg, grid-cols-3 gap-4"> <!-- SOM, Configuration --> <div class="config-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">SOM Configuration</h3>
+ <!-- Controls --> <div class="controls grid grid-cols-1 lg:grid-cols-3 gap-4"> <!-- SOM, Configuration --> <div class="config-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">SOM Configuration</h3>
  <div class="space-y-3"> <div> <label class="block text-sm text-gray-300">Map Size</label>
  <div class="flex"> <input bind:value={somConfig.mapWidth} onchange={ updateSOMConfig } type="number"
               min="5"

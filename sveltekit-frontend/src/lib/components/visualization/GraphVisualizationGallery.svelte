@@ -78,7 +78,7 @@
        </Button>
      </div>
   {:else}
-    <div class={viewMode === 'grid' ? 'grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
+    <div class={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
       {#each $visualizations as viz (viz.id)}
         <Card class="hover:border-primary/50 transition-colors cursor-pointer">
           <CardHeader>

@@ -197,7 +197,7 @@ await checkServiceHealth()})()});
       </Alert>
     {/if}
   </div>
-  <div class="grid grid-cols-1 lg, grid-cols-2">
+  <div class="grid grid-cols-1 lg:grid-cols-2">
     <!-- Input, Section -->
     <Card>
       <CardHeader>

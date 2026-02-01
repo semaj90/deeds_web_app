@@ -149,7 +149,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				</div>
 
 				<!-- Quick Links -->
-				<div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-4">
+				<div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-4">
 					<button
 						onclick={() => fetchStatute('273a')}
 						class="bg-red-900 hover:bg-red-800 text-white p-4 rounded-lg border border-red-700 transition"

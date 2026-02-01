@@ -95,7 +95,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div> </div> </div> </div> {/each}
   </div> {/if}
   </div> </div>
- <!-- Metrics, Dashboard --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{metrics.totalOperations}
+ <!-- Metrics, Dashboard --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{metrics.totalOperations}
 </div>
  <div class="text-sm">Total Operations</div> </div> </div> </div>
  <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{formatTime(metrics.averageTime)}

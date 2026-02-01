@@ -66,7 +66,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             /> </svg>
  <div class="ml-3"> <h3 class="text-sm font-medium">Error Loading Dashboard</h3>
  <p class="mt-1 text-sm">{ error }</p> </div> </div> </div> {:else} <!-- Overview, Tab -->
-  {#if selectedTab === 'overview'} <div class="space-y-6"> <!-- Statistics, Cards --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center"> <span class="text-blue-600">âš–ï¸</span> </div> </div>
+  {#if selectedTab === 'overview'} <div class="space-y-6"> <!-- Statistics, Cards --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4"> <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center"> <span class="text-blue-600">âš–ï¸</span> </div> </div>
  <div class="ml-5 w-0"> <dl> <dt class="text-sm font-medium text-gray-500">Total Cases</dt>
  <dd class="text-lg font-medium">{stats.totalCases}</dd> </dl> </div> </div> </div> </div>
  <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-green-100 rounded-md flex items-center"> <span class="text-green-600">ðŸ”</span> </div> </div>
@@ -78,7 +78,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-red-100 rounded-md flex items-center"> <span class="text-red-600">âš™ï¸</span> </div> </div>
  <div class="ml-5 w-0"> <dl> <dt class="text-sm font-medium text-gray-500">Pending Analysis</dt>
  <dd class="text-lg font-medium">{stats.pendingAnalysis}</dd> </dl> </div> </div> </div> </div> </div>
- <!-- Recent, Activity --> <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Recent, Cases --> <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Cases</h3>
+ <!-- Recent, Activity --> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Recent, Cases --> <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Cases</h3>
  <div class="flow-root"> <ul class="-my-5 divide-y">
   {#each Array.isArray(cases.slice(0, 5)) ? cases.slice(0, 5): [] as caseItem} <li class="py-4"> <div class="flex items-center"> <div class="flex-1"> <p class="text-sm font-medium text-gray-900"> {caseItem?.title ?? 'Untitled Case'} </p>
  <p class="text-sm text-gray-500 truncate">{caseItem?.description ?? 'No description'}</p> </div>
@@ -130,7 +130,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <td class="px-6 py-4 whitespace-nowrap text-sm"> <button class="text-blue-600">View</button> </td> </tr> {/each}
   </tbody> </table> </div> </div> </div>
  <!-- Evidence, Tab --> {:else if selectedTab === 'evidence'} <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium text-gray-900">Evidence Items</h3>
- <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
+ <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
   {#each Array.isArray(evidence) ? evidence: [] as item} <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md"> <div class="flex items-start"> <div class="flex-shrink-0"> <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center"> <span class="text-lg"> {item?.evidenceType === 'photo'
                             ? 'ðŸ“·': item?.evidenceType === 'document'
                               ? 'ðŸ“„': item?.evidenceType === 'video'

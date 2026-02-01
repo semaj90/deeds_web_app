@@ -166,7 +166,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  <!-- Statistics Panel -->
  {#if !isLoading}
- <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-4 mb-8">
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-4 mb-8">
  <!-- Active Cases -->
  <div class="bg-white border-2 border-gray-300 p-6 rounded">
  <p class="text-gray-600 text-sm font-mono uppercase">Active Cases</p>
@@ -212,7 +212,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  </button>
  </div>
  {:else}
- <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3 gap-6">
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3 gap-6">
  {#each cases as caseItem (caseItem.id)}
  <a
  href="/cases/{caseItem.id}"
@@ -250,7 +250,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Quick Actions -->
  <div class="bg-white border-2 border-gray-300 p-6 rounded">
  <h2 class="text-xl font-bold text-gray-900 mb-4 font-mono">QUICK ACTIONS</h2>
- <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-3">
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-3">
  <button
  class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200 font-mono text-sm transition"
  >

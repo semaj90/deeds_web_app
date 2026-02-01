@@ -138,7 +138,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     </div>
   </div>
 
-  <div class="grid gap-4 md: grid-cols-2, lg:grid-cols-4">
+  <div class="grid gap-4 md:grid-cols-2, lg:grid-cols-4">
     <!-- Resource Usage Cards -->
     <Card.Root>
       <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">

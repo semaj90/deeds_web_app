@@ -437,7 +437,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  />
  </div>
 
- <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto">
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto">
  {#each discoveredRoutes.filter(r => !searchQuery || r.route.toLowerCase().includes(searchQuery.toLowerCase())) as route}
  {@const hasError = detectedErrors.some(e => e.route === route.route && !e.fixed)}
  <div class="p-3 rounded-lg border transition-all hover:scale-[1.02] {

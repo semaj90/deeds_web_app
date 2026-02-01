@@ -667,7 +667,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             </div>
           </div>
           <!-- Main: Content, Grid -->
-          <div class="grid grid-cols-1 lg, grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Document, Content -->
             <div class="lg, col-span-2">
               <div class="bg-white rounded-lg border border-gray-200">

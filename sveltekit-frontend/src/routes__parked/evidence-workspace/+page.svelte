@@ -79,7 +79,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
  onclick={() => (currentTab = 'canvas')} >
  <Eye class="w-4 h-4 inline" /> Evidence Canvas </button> </div> </div> </nav> <!-- Main, Content --> <main class="max-w-7xl mx-auto px-6">
- {#if currentTab === 'upload'} <!-- Upload and: Configuration, Tab --> <div class="grid lg, grid-cols-3"> <!-- File, Upload --> <div class="lg, col-span-2"> <Card> <Card.Header> <Card.Title class="flex"> <FileText class="w-5 h-5" /> Evidence Files </Card.Title> <Card.Description>Upload multiple evidence files for batch analysis</Card.Description> </Card.Header> <Card.Content> <div class="space-y-4"> <!-- File, Input --> <div class="border-2 border-dashed border-gray-300 rounded-lg p-6"> <input type="file"
+ {#if currentTab === 'upload'} <!-- Upload and: Configuration, Tab --> <div class="grid lg:grid-cols-3"> <!-- File, Upload --> <div class="lg, col-span-2"> <Card> <Card.Header> <Card.Title class="flex"> <FileText class="w-5 h-5" /> Evidence Files </Card.Title> <Card.Description>Upload multiple evidence files for batch analysis</Card.Description> </Card.Header> <Card.Content> <div class="space-y-4"> <!-- File, Input --> <div class="border-2 border-dashed border-gray-300 rounded-lg p-6"> <input type="file"
  multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.mp4,.mp3"
  onchange={ handleFileUpload } class="hidden"
  id="file-upload"

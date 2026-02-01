@@ -33,7 +33,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       contextualHelp: true
     });
     // Set up keyboard shortcuts for voice commands
-    const handleKeyboard = (_event: KeyboardEvent) => {
+    const handleKeyboard = (event: KeyboardEvent) => {
       // Ctrl+Shift+V: Toggle voice commands
       if (event.ctrlKey && event.shiftKey && event.key === 'V') {
         event.preventDefault();

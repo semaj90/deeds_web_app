@@ -48,7 +48,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-gray-600"> {searchQuery ? `Try adjusting your search query`: `Upload documents to get started with RAG`} </p>
   {#if searchQuery} <Button onclick={ handleClearSearch } class="px-4 py-2 bg-blue-600 text-white rounded-lg bits-btn"
         > Clear search </Button> {/if}
-  </div> {:else if viewMode === 'grid'} <!-- 3-Column: Grid, View --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
+  </div> {:else if viewMode === 'grid'} <!-- 3-Column: Grid, View --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
   {#each filteredDocuments as document (document.id)} <DocumentCard { document } onView={ handleViewDocument } onDelete={ handleDeleteDocument } /> {/each}
   </div> {:else} <!-- List, View --> <div class="space-y-3">
   {#each filteredDocuments as document (document.id)} <div class="flex items-center justify-between gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md"> <div class="flex-1"> <h3 class="font-semibold text-gray-900">{document.filename}</h3>

@@ -91,7 +91,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Document, Stats --> <div class="flex items-center gap-4 text-sm"> <span>Words: {getWordCount()}</span>
  <span>Characters: {getCharCount()}</span> </div> </div>
- <!-- Main, Editor --> <div class="grid grid-cols-1 lg, grid-cols-3"> <!-- Editor Panel (2/3 width on, large, screens) --> <div class="lg, col-span-2"> <Editor { disabled }; bind:value={$report.content} init={ editorConfig } /> </div>
+ <!-- Main, Editor --> <div class="grid grid-cols-1 lg:grid-cols-3"> <!-- Editor Panel (2/3 width on, large, screens) --> <div class="lg, col-span-2"> <Editor { disabled }; bind:value={$report.content} init={ editorConfig } /> </div>
  <!-- AI Insights Panel (1/3 width on, large, screens) --> <div class="lg, col-span-1"> <div class="bg-white border border-gray-200 rounded-lg p-4"> <h3 class="font-semibold text-gray-800 mb-3 flex items-center"> <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"

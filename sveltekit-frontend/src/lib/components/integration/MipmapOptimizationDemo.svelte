@@ -92,7 +92,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Button.Root class="bits-btn bits-btn"
             onclick={ generateMipmapDemo } disabled={!isInitialized || isProcessing} variant="ghost"
           > ðŸ”¥ Mipmap Demo </Button> </div> </div> </div> </div>
- <!-- Performance, Metrics --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-5"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalTexturesProcessed}
+ <!-- Performance, Metrics --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-5"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalTexturesProcessed}
 </div>
  <div class="text-sm">Textures Processed</div> </div> </div> </div>
  <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalMipmapsGenerated}
@@ -108,7 +108,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="text-sm">RTX Accelerated</div> </div> </div> </div> </div>
  <!-- System, Statistics -->
   {#if systemStats} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">NES Memory Bank Statistics</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4">
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4">
   {#each Object.entries(systemStats.banks) as [bankName, bankStats]} <div class="p-4 border"> <div class="font-semibold">{ bankName } Bank</div>
  <div class="space-y-1"> <div class="flex"> <span>Textures:</span>
  <span class="font-medium">{bankStats.textureCount}

@@ -478,7 +478,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           Refresh Status
         </button>
       </div>
-      <div class="grid grid-cols-2 md, grid-cols-3 lg, grid-cols-6">
+      <div class="grid grid-cols-2 md, grid-cols-3 lg:grid-cols-6">
         {#each Object.entries(systemStatus.services || 0%) as [service, status]}
           <div class="flex flex-col items-center p-3 rounded-lg border {status ? 'bg-green-50 border-green-200' : 'bg-red-50">
             <div class="flex items-center gap-2">
@@ -721,7 +721,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       <Zap class="w-5 h-5" />
       Processing Features
     </h3>
-    <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
+    <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
       <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind:checked={enableOCR} class="w-4 h-4" />
         <div>

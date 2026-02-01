@@ -70,7 +70,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                   style="width: { uploadProgress }%"
                 ></div> </div> {/if}
   </div>
- <!-- Training, Metrics --> <div class="grid grid-cols-2 lg, grid-cols-4"> <div class="bg-gray-800/50 p-3 rounded border"> <p class="text-gray-400">Loss</p>
+ <!-- Training, Metrics --> <div class="grid grid-cols-2 lg:grid-cols-4"> <div class="bg-gray-800/50 p-3 rounded border"> <p class="text-gray-400">Loss</p>
  <p class="text-white">{currentJob.progress.loss.toFixed(4)}
 </p> </div>
  <div class="bg-gray-800/50 p-3 rounded border"> <p class="text-gray-400">Accuracy</p>
@@ -140,7 +140,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             /> <span class="text-gray-300">Enable User Analytics</span> </label> </div> {/if}
   <!-- User Analytics, Summary -->
   {#if analytics && config?.enableUserAnalytics} <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4" transition, fade={{ duration, 300 }}> <h5 class="text-blue-300 font-semibold">ðŸ“Š User Analytics</h5>
- <div class="grid grid-cols-2 lg, grid-cols-4 gap-4"> <div> <p class="text-gray-400">Interactions</p>
+ <div class="grid grid-cols-2 lg:grid-cols-4 gap-4"> <div> <p class="text-gray-400">Interactions</p>
  <p class="text-blue-300">{analytics.interactions.length}
 </p> </div>
  <div> <p class="text-gray-400">Accuracy Rate</p>

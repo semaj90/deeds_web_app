@@ -163,7 +163,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  </div>
  </div>
 
- <div class="grid grid-cols-1 lg, grid-cols-3 gap-6 flex-1 overflow-hidden">
+ <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
  <!-- Left Column, Tasks -->
  <div class="space-y-6 overflow-auto pr-2">
  <!-- Available Tasks -->

@@ -459,7 +459,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
     <Tabs.Content value="statistics">
       {#if cacheStats}
-        <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-4">
           <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
             <h4 class="text-sm text-gray-400 mb-2">Service Stats</h4>
             <div class="space-y-1">

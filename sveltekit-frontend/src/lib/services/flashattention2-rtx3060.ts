@@ -370,7 +370,7 @@ export class FlashAttention2RTX3060Service {
 		}
 
 		const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
-		
+
 		// Simulate Triton kernel fusion (tile-based computation)
 		const { tileSize, kernelOptimization, fusedKernels } = this.config.triton;
 		const numTiles = Math.ceil(embeddings.length / tileSize);

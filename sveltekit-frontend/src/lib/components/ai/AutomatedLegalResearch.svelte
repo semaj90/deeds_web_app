@@ -205,7 +205,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<select
 				id="jurisdiction"
 				bind:value={ jurisdiction }
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus, ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
 			>
 				<option value="federal">Federal</option>
 				<option value="state">State</option>
@@ -222,7 +222,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<select
 				id="caseType"
 				bind:value={caseType}
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus, ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
 			>
 				<option value="civil">Civil</option>
 				<option value="criminal">Criminal</option>
@@ -241,7 +241,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<select
 				id="depth"
 				bind:value={ depth }
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus, ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
 			>
 				<option value="brief">Brief Overview</option>
 				<option value="standard">Standard Analysis</option>
@@ -255,7 +255,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				<input
 					type="checkbox"
 					bind:checked={includePrecedents}
-					class="rounded border-gray-300 text-blue-600 focus, ring-blue-500"
+					class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 				/>
 				<span class="ml-2 text-sm text-gray-700">Include Precedents</span>
 			</label>
@@ -264,7 +264,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				<input
 					type="checkbox"
 					bind:checked={includeStatutes}
-					class="rounded border-gray-300 text-blue-600 focus, ring-blue-500"
+					class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 				/>
 				<span class="ml-2 text-sm text-gray-700">Include Statutes</span>
 			</label>
@@ -281,7 +281,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			bind:value={query}
 			placeholder="Enter your legal research question (e.g., 'What are the requirements for establishing undue influence in contract formation?')"
 			rows="3"
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus, ring-blue-500 resize-vertical"
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500 resize-vertical"
 		></textarea>
 	</div>
 
@@ -310,7 +310,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<button
 				type="button"
 				onclick={clearResearch}
-				class="px-4 py-2 bg-gray-600 text-white rounded-md hover: bg-gray-700, focus: outline-none, focus: ring-2, focus, ring-gray-500"
+				class="px-4 py-2 bg-gray-600 text-white rounded-md hover: bg-gray-700, focus: outline-none, focus: ring-2, focus:ring-gray-500"
 			>
 				Clear
 			</button>
@@ -318,7 +318,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<button
 				type="button"
 				onclick={ exportResearch }
-				class="px-4 py-2 bg-green-600 text-white rounded-md hover: bg-green-700, focus: outline-none, focus: ring-2, focus, ring-green-500"
+				class="px-4 py-2 bg-green-600 text-white rounded-md hover: bg-green-700, focus: outline-none, focus: ring-2, focus:ring-green-500"
 			>
 				Export
 			</button>

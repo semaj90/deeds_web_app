@@ -34,7 +34,7 @@
 
 <div class="bg-white border-2 border-gray-300 p-6 rounded">
 	<h2 class="text-xl font-bold text-gray-900 mb-4 font-mono">QUICK ACTIONS</h2>
-	<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-3">
+	<div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-3">
 		<button
 			onclick={handleTimelineAnalysis}
 			disabled={!caseId}

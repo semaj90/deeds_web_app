@@ -68,7 +68,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </span>
  <span class="text-sm nes-text">{$currentProgress}%</span> </div>
  <Progress value={$currentProgress} class="w-full" /> </div> {/if}
-  <!-- Main: Input, Form --> <div class="grid grid-cols-1 lg, grid-cols-2"> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Document Details</h3> </div>
+  <!-- Main: Input, Form --> <div class="grid grid-cols-1 lg:grid-cols-2"> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Document Details</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-2"> <Label for="title">Document Title</Label>
  <!-- replaced direct component with svelte, component using, typed, constructor --> <InputCtor id="title"
             bind:value={ documentTitle } placeholder="Enter document title..."

@@ -83,7 +83,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <!-- KPI Grid -->
- <div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-4">
  <!-- System Health -->
  <Card class="bg-slate-800/50 border-slate-700 p-4">
  <div class="flex items-center justify-between mb-2">
@@ -142,7 +142,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <!-- Main Content Grid -->
- <div class="grid grid-cols-1 lg, grid-cols-3 gap-6">
+ <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
  <!-- Live Event Log -->
  <div class="lg, col-span-2">
  <Card class="bg-slate-800/50 border-slate-700 h-96 flex flex-col">

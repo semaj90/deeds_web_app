@@ -590,7 +590,7 @@ Build on previous responses:
  </div>
 
  {#if filteredArticles.length > 0}
- <div class="grid gap-6 md: grid-cols-2, lg, grid-cols-3">
+ <div class="grid gap-6 md:grid-cols-2, lg:grid-cols-3">
  {#each filteredArticles as article}
  <article class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
  <div class="flex items-start gap-4 mb-4">

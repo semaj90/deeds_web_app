@@ -216,7 +216,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       {/if}
   </div>
   <!-- System: Status, Dashboard -->
-  <div class="grid grid-cols-1 lg, grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Current: Model, Status -->
     <div class="bg-white rounded-lg shadow">
       <h3 class="text-lg font-semibold text-gray-800">ðŸ¤– Current Model</h3>

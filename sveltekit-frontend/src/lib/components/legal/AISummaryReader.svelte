@@ -74,7 +74,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div> </div>
  <!-- Progress, Bar -->
   {#if isReading} <div class="bg-gray-200 rounded-full" in, fade> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: { progress }%"></div> {/if}
-  <!-- Section, Navigation --> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-3">
+  <!-- Section, Navigation --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
   {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover: shadow-md", class:border-blue-500={index === ($state.context?.currentSection ?? 0)}; class:bg-blue-50={index === ($state.context?.currentSection ?? 0)}; class:shadow-sm={index === ($state.context?.currentSection ?? 0)}; class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
                 <div class="flex items-center justify-between"> <span class={'text-sm, font-medium, ' + getImportanceColor(section.importance).split(' ')[0]}> {section.title} </span>
  <span class={'text-xs px-2, py-1, rounded-full, ' + getImportanceColor(section.importance)}> {section.importance} </span> </div>

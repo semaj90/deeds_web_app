@@ -142,7 +142,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                   ? '100%', '0%'}"
         ></div> </div> </div> </div>
   {#if $state.matches('idle') ?? $state.context.progressStage === 'selecting'} <!-- Item, Selection --> <div class="bg-white border border-gray-200 rounded-lg shadow-sm"> <h2 class="text-lg font-semibold text-gray-900">Select Items for Synthesis</h2>
- <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Documents --> <div> <h3 class="font-medium text-gray-900">Documents ({documents.length})</h3>
+ <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Documents --> <div> <h3 class="font-medium text-gray-900">Documents ({documents.length})</h3>
  <div class="space-y-3 max-h-96">
   {#each Array.isArray(documents) ? documents: [] as doc} <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer"> <input type="checkbox"
                   class="mt-1"
@@ -193,7 +193,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-gray-700">{area.details}</p> </div> {/each}
   </div> </div>
  <!-- Legal, Strategy --> <div class="bg-white border border-gray-200 rounded-lg"> <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center"> <span class="w-6">âš–ï¸</span> Legal Strategy </h2>
- <div class="grid grid-cols-1 lg, grid-cols-2"> <div> <h3 class="font-medium text-gray-900">Primary Charges</h3>
+ <div class="grid grid-cols-1 lg:grid-cols-2"> <div> <h3 class="font-medium text-gray-900">Primary Charges</h3>
  <ul class="space-y-2">
   {#each Array.isArray($state.context.synthesisResult.legalStrategy.primaryCharges) ? $state.context.synthesisResult.legalStrategy.primaryCharges: [] as charge} <li class="flex items-start"> <span class="w-4 h-4 text-green-600 mt-0.5">âœ…</span>
  <span class="text-gray-700">{ charge }</span> </li> {/each}

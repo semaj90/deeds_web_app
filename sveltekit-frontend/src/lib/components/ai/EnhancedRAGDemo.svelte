@@ -39,7 +39,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       onclick={() => (activeTab = 'query')} >
       RAG Query </button> </div>
  <!-- Analysis, Tab -->
-  {#if activeTab === 'analyze'} <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Input, Section --> <Card> <CardHeader> <CardTitle>Legal Document</CardTitle> </CardHeader>
+  {#if activeTab === 'analyze'} <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Input, Section --> <Card> <CardHeader> <CardTitle>Legal Document</CardTitle> </CardHeader>
  <CardContent> <textarea bind:value={ sampleLegalText } class="w-full h-64 p-3 border border-gray-300 rounded-md"
             placeholder="Paste your legal document here..."
           ></textarea>
@@ -85,7 +85,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="mt-2">No analysis results yet. Click: "Analyze Document" to get started.</p> {/if}
   </CardContent> </Card> {/if}
   <!-- Query, Tab -->
-  {#if activeTab === 'query'} <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Query: Input, Section --> <Card> <CardHeader> <CardTitle>RAG Query</CardTitle> </CardHeader>
+  {#if activeTab === 'query'} <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Query: Input, Section --> <Card> <CardHeader> <CardTitle>RAG Query</CardTitle> </CardHeader>
  <CardContent> <div class="space-y-4"> <div> <label class="block text-sm font-medium text-gray-700">Query</label>
  <textarea bind:value={ queryText } class="w-full h-20 p-3 border border-gray-300 rounded-md"
                 placeholder="Ask a question about the legal document..."

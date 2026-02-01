@@ -4,11 +4,11 @@
  * Designed to work seamlessly with .vscode/tasks.json
  */
 
-import type {
+import {
     comprehensiveOrchestrator,
     type ComprehensiveAgentRequest
 } from './comprehensive-agent-orchestration.js';
-import type {
+import {
     flashAttentionMulticoreBridge,
     type FlashAttentionMulticoreRequest,
     type FlashAttentionMulticoreResponse

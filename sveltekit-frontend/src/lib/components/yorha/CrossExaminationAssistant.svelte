@@ -156,7 +156,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <h2 class="text-xl font-bold text-purple-400">AI-Guided Cross-Examination Assistant</h2>
  </div>
 
- <div class="grid grid-cols-1 lg, grid-cols-3 gap-6">
+ <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
  <!-- Input Section -->
  <div class="lg, col-span-1 space-y-6">
  <!-- Witness Selection -->

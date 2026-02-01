@@ -227,7 +227,7 @@
 					{/if}
 				</div>
 			{:else}
-				<div class="grid gap-4 md: grid-cols-2, lg:grid-cols-3">
+				<div class="grid gap-4 md:grid-cols-2, lg:grid-cols-3">
 					{#each data.cases as caseItem (caseItem.id)}
 						<div
 							class="group relative rounded-lg border border-slate-700 bg-slate-900/50 p-5 transition-all hover: border-emerald-500/50, hover:bg-slate-900"

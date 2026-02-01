@@ -1,17 +1,15 @@
-import type {
+import {
     flashAttention2Service,
     type LegalContextAnalysis
 } from '$lib/services/flashattention2-rtx3060.js';
-import type {
-    comprehensiveOrchestrator,
-    type ComprehensiveAgentRequest
-} from './comprehensive-agent-orchestration.js';
-import type { getContext7MulticoreService } from './context7-multicore.js';
-
-/**
+import { getContext7MulticoreService } from '../services/context7-multicore.js'; /**
  * FlashAttention2 + Context7 Multicore Bridge Integration
  * Optimized for RTX 3060 Ti with legal AI processing
  */
+import {
+    comprehensiveOrchestrator,
+    type ComprehensiveAgentRequest
+} from './comprehensive-agent-orchestration.js';
 
 // Local types
 interface MulticoreSystemStatus {

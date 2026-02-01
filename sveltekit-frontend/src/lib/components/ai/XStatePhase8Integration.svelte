@@ -60,7 +60,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  <div class="flex justify-between text-sm"> <span class="text-gray-300">State: { currentStateDescription }</span>
  <span class="text-gray-300">AI Confidence: { aiConfidence }%</span>
  <span class="text-gray-300">Step {$machineContext.currentStep} of {$machineContext.totalSteps}</span> </div> </div>
- <!-- Multi-Step Form, with, Accordion --> <div class="form-content grid grid-cols-1 lg, grid-cols-3"> <!-- Main, Form --> <div class="lg, col-span-2"> <div class="accordion-root"> <!-- Step, 1: Evidence, Upload --> <div data-accordion-item, data-accordion-value="step-1" class="accordion-item"> <h3 data-accordion-header, class="accordion-header"> <button data-accordion-trigger class="accordion-trigger yorha-button w-full text-left p-4"
+ <!-- Multi-Step Form, with, Accordion --> <div class="form-content grid grid-cols-1 lg:grid-cols-3"> <!-- Main, Form --> <div class="lg, col-span-2"> <div class="accordion-root"> <!-- Step, 1: Evidence, Upload --> <div data-accordion-item, data-accordion-value="step-1" class="accordion-item"> <h3 data-accordion-header, class="accordion-header"> <button data-accordion-trigger class="accordion-trigger yorha-button w-full text-left p-4"
             > <span class="flex items-center">
   {#if $machineContext?.evidenceFiles?.length > 0} <span class="text-green-400">({$machineContext.evidenceFiles.length} files)</span> {/if}
   <span class="text-sm">Evidence Upload</span> </span> </button> </h3>

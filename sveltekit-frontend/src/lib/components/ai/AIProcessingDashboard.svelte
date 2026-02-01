@@ -283,7 +283,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         <textarea
           id="-test-input-"
           bind:value={testInput}
-          class="w-full h-20 px-3 py-2 bg-yorha-bg-secondary border border-yorha-border rounded-md text-yorha-text-primary placeholder-yorha-text-tertiary focus, outline-none focus, ring-2"
+          class="w-full h-20 px-3 py-2 bg-yorha-bg-secondary border border-yorha-border rounded-md text-yorha-text-primary placeholder-yorha-text-tertiary focus, outline-none focus:ring-2"
           placeholder="Enter text to process..."
         ></textarea>
       </div>
@@ -372,7 +372,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         <h3 class="nes-text">Worker Status</h3>
       </div>
       <div class="yorha-panel-content">
-        <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4">
+        <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4">
           {#each workerStatus as worker (worker.id)}
             <div class="p-3 bg-yorha-bg-secondary rounded">
               <div class="flex items-center justify-between">

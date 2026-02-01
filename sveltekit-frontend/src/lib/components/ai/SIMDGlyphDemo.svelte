@@ -79,7 +79,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="text-sm">Avg Time</div> </div> {/if}
   </div> </div>
  <!-- Results, Grid -->
-  {#if results.length > 0} <div class="grid grid-cols-1 lg, grid-cols-2">
+  {#if results.length > 0} <div class="grid grid-cols-1 lg:grid-cols-2">
   {#each results as result ((result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).id)} <div class="overflow-hidden"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary text-lg flex items-center"> <span class="truncate">{(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).prompt}
 </span>
  <span class={`px-2 py-1 rounded-full, text-xs ${getQualityTierColor((result as { success?: any, data?: any, metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?, any; processing_time?, any }).metadata.performance_tier)}`}> {(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).metadata.performance_tier.toUpperCase()}
