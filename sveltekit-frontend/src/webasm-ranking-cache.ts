@@ -232,7 +232,7 @@ class WebASMRankingCache {
             const wasmBytes = await wasmResponse.arrayBuffer();
             this.wasmModule = await WebAssembly.compile(wasmBytes);
             this.wasmInstance = await WebAssembly.instantiate(this.wasmModule, {
-                env: {, memory: new WebAssembly.Memory({ initial: 256, maximum: 1024 }),
+                env: { memory: new WebAssembly.Memory({ initial: 256, maximum: 1024 }),
                     __wbindgen_throw: (a: number, b: number): never => {
                         throw new Error(`WASM error: ${a}, ${b}`);
                     }

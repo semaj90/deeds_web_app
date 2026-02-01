@@ -3,7 +3,7 @@
  import type { PageData } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
- let { data }: {, data: PageData } = $props();
+ let { data }: { data: PageData } = $props();
 
  async function savePositions(items: any[]) {
  try {

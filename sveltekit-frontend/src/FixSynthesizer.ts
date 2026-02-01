@@ -163,7 +163,7 @@ export class FixSynthesizer {
   async validateFix(
     strategy: FixStrategy,
     error: ErrorReport
-  ): Promise<{, valid: boolean; errors: string[] }> {
+  ): Promise<{ valid: boolean; errors: string[] }> {
     const errors: string[] = [];
 
     for (const rule of strategy.validationRules) {

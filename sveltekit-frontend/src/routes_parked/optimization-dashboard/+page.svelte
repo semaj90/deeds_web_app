@@ -10,13 +10,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Reactive state using Svelte, 5 runes
  let systemStatus = $state ({
- neuralMemory: {, currentUsage: 0, efficiency: 0, predictions: [] as unknown[],
+ neuralMemory: { currentUsage: 0, efficiency: 0, predictions: [] as unknown[],
  lodLevel: 'medium' as const
  },
- mlCaching: {, hitRate: 0, evictionCount: 0, layersActive: [] as string[],
+ mlCaching: { hitRate: 0, evictionCount: 0, layersActive: [] as string[],
  compressionRatio: 0
  },
- workerSystem: {, totalJobs: 0, activeWorkers: 0, systemHealth: 'healthy' as const,
+ workerSystem: { totalJobs: 0, activeWorkers: 0, systemHealth: 'healthy' as const,
   queuedJobs: 0
  } as WorkerStats,
  recommendations: [] as string[]
@@ -85,11 +85,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({, type: 'SUMMARIZE_DOCUMENT',
- document: {, id: 'test-doc-001',
+ document: { id: 'test-doc-001',
  content: 'This is a test legal document for our specialized worker system. It demonstrates how the event-driven architecture with RabbitMQ can process documents efficiently using our legal AI models. The system uses neural memory management, ML-based caching, and adaptive resource management to optimize performance.',
- metadata: {, source: 'test' }
+ metadata: { source: 'test' }
  },
- options: {, maxLength: 100, style: 'brief' },
+ options: { maxLength: 100, style: 'brief' },
  priority: 'high'
  })
  });

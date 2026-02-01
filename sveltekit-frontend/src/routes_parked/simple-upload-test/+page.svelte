@@ -24,7 +24,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  });
  if (response.ok) {
  const json = await response.json();
- // normalize possible shapes: {, results: [...] } or [...] or single item
+ // normalize possible shapes: { results: [...] } or [...] or single item
  const results = Array.isArray(json?.results)
  ? json.results
  : Array.isArray(json)

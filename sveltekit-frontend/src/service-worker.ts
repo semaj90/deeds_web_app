@@ -278,7 +278,7 @@ async function cacheResponse(
 /**
  * Determine caching strategy based on request
  */
-function determineCacheStrategy(request: Request): {, useRedis: boolean;
+function determineCacheStrategy(request: Request): { useRedis: boolean;
  useSOM: boolean; ttl: number;
  priority: number;
 } {
@@ -411,21 +411,21 @@ function queueCommonCacheWarming(): void {{
  id: 'legal-templates',
  type: 'legal_document',
  priority: 10,
- payload: {, type: 'template_analysis' },
+ payload: { type: 'template_analysis' },
  retries: 0,
  },
  {
  id: 'common-vectors',
  type: 'vector_similarity',
  priority: 8,
- payload: {, precompute: 'common_embeddings' },
+ payload: { precompute: 'common_embeddings' },
  retries: 0,
  },
  {
  id: 'search-patterns',
  type: 'search_results',
  priority: 7,
- payload: {, warm: 'popular_queries' },
+ payload: { warm: 'popular_queries' },
  retries: 0,
  }];
  warmingQueue.push(...commonTasks);

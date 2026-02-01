@@ -13,20 +13,20 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		uploadedCount?: number;
 		processedCount?: number;
 		chatImages?: string[];
-		history?: Array<{, turnId: string;
+		history?: Array<{ turnId: string;
 			userMessage: string; assistantResponse: string;
 			timestamp, string;
 		}>;
 		error?: string;
 	}
 
-	let { form }: {, form: ActionData, null } = $props();
+	let { form }: { form: ActionData, null } = $props();
 
 	let message = $state('');
 	let caseId = $state('');
 	let uploadedFiles: File[] = $state([]);
 	let filePreviews: string[] = $state([]);
-	let messages: {, role: 'user' | 'assistant'; text: string; turnId?: string; timestamp?: string; keywords?: string[]; keyPhrases?: string[]; suggestions?: string[] }[] = $state([]);
+	let messages: { role: 'user' | 'assistant'; text: string; turnId?: string; timestamp?: string; keywords?: string[]; keyPhrases?: string[]; suggestions?: string[] }[] = $state([]);
 	let isSubmitting = $state(false);
 	let isLoadingHistory = $state(false);
 

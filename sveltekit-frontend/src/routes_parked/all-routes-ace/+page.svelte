@@ -37,11 +37,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // ACE Pipeline State
  let pipelineState = $state<Record<StageKey, { progress: number; status: StageStatus; results?, any }>>({
- webCrawl: {, progress: 0, status: 'idle' },
- vlmProcess: {, progress: 0, status: 'idle' },
- graphBuild: {, progress: 0, status: 'idle' },
- vectorIndex: {, progress: 0, status: 'idle' },
- llmAnalyze: {, progress: 0, status: 'idle' }
+ webCrawl: { progress: 0, status: 'idle' },
+ vlmProcess: { progress: 0, status: 'idle' },
+ graphBuild: { progress: 0, status: 'idle' },
+ vectorIndex: { progress: 0, status: 'idle' },
+ llmAnalyze: { progress: 0, status: 'idle' }
  });
 
  let isProcessing = $state(false);

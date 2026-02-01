@@ -26,7 +26,7 @@
  title: 'John Smith Testimony',
  content: 'Witness observed the contract signing on March 15, 2023',
  x: 100, y: 100, size: 25,
- metadata: {, date: '2023-03-15',
+ metadata: { date: '2023-03-15',
  credibility: 0.9,
  source: 'deposition'
  }
@@ -37,7 +37,7 @@
  title: 'Service Agreement Contract',
  content: 'Master service agreement between parties dated January 1, 2023',
  x: 300, y: 150, size: 25,
- metadata: {, date: '2023-01-01',
+ metadata: { date: '2023-01-01',
  type: 'contract',
  pages: 15
  }
@@ -48,7 +48,7 @@
  title: 'Email Correspondence',
  content: 'Email chain discussing contract terms and amendments',
  x: 200, y: 300, size: 20,
- metadata: {, date: '2023-02-10',
+ metadata: { date: '2023-02-10',
  sender: 'john.doe@company.com',
  recipients: ['jane.smith@lawfirm.com']
  }
@@ -59,7 +59,7 @@
  title: 'Financial Expert Report',
  content: 'Analysis of contract valuation and breach damages',
  x: 400, y: 250, size: 22,
- metadata: {, date: '2023-06-01',
+ metadata: { date: '2023-06-01',
  expert: 'Dr. Sarah Johnson',
  qualifications: 'CPA, MBA'
  }
@@ -70,7 +70,7 @@
  title: 'Signed Contract Copy',
  content: 'Physical copy of signed contract with wet signatures',
  x: 150, y: 400, size: 20,
- metadata: {, date: '2023-01-15',
+ metadata: { date: '2023-01-15',
  location: 'stored in evidence room',
  condition: 'good'
  }
@@ -84,7 +84,7 @@
  target: 'document_001',
  type: 'supports',
  weight: 0.9,
- metadata: {, relationship: 'observed signing',
+ metadata: { relationship: 'observed signing',
  strength: 'strong'
  }
  },
@@ -93,7 +93,7 @@
  target: 'document_001',
  type: 'references',
  weight: 0.7,
- metadata: {, relationship: 'discusses terms',
+ metadata: { relationship: 'discusses terms',
  strength: 'moderate'
  }
  },
@@ -102,7 +102,7 @@
  target: 'document_001',
  type: 'analyzes',
  weight: 0.95,
- metadata: {, relationship: 'valuation analysis',
+ metadata: { relationship: 'valuation analysis',
  strength: 'very strong'
  }
  },
@@ -111,7 +111,7 @@
  target: 'document_001',
  type: 'corroborates',
  weight: 0.85,
- metadata: {, relationship: 'physical evidence',
+ metadata: { relationship: 'physical evidence',
  strength: 'strong'
  }
  },
@@ -120,7 +120,7 @@
  target: 'email_001',
  type: 'communicated',
  weight: 0.6,
- metadata: {, relationship: 'email exchange',
+ metadata: { relationship: 'email exchange',
  strength: 'moderate'
  }
  }

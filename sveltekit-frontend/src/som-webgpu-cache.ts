@@ -241,7 +241,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 			this.device = await adapter.requestDevice({
 				requiredFeatures: ['shader-f16'] as GPUFeatureName[],
-				requiredLimits: {, maxStorageBufferBindingSize: adapter.limits.maxComputeWorkgroupStorageSize
+				requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxComputeWorkgroupStorageSize
 				}
 			});
 
@@ -468,7 +468,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 				confidence: 0.8,
 				tags: [primaryCategory, `cluster-${clusterId}`],
 				created_at: new Date().toISOString(),
-				metadata: {, clusterSize: clusterErrors.length,
+				metadata: { clusterSize: clusterErrors.length,
 					files: [...new Set(clusterErrors.map((e) => e.file))]
 				}
 			});

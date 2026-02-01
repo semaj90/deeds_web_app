@@ -15,7 +15,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  type CandidateContext = {
  context_id: string; source: string;
  score: number; snippet: string;
- range?: {, from_msg_id: number; to_msg_id: number };
+ range?: { from_msg_id: number; to_msg_id: number };
  timestamp?: string;
  };
 

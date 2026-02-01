@@ -141,7 +141,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 
 
- function createGraphData(items: any[], similarityResults): any: {, nodes: EvidenceNode[], edges: EvidenceEdge[] } {
+ function createGraphData(items: any[], similarityResults): any: { nodes: EvidenceNode[], edges: EvidenceEdge[] } {
  const nodes: EvidenceNode[] = items.map((item, i) => ({
  id: item.id || `node_${i}`,
  label: item.title || item.name || `Evidence ${i + 1}`,
@@ -243,12 +243,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {
  label: 'View Details',
  action: 'view_similarity',
- data: {, case1: data.case1: case2, data: data.case2 }
+ data: { case1: data.case1: case2, data: data.case2 }
  },
  {
  label: 'Merge Cases',
  action: 'merge_cases',
- data: {, case1: data.case1: case2, data: data.case2 }
+ data: { case1: data.case1: case2, data: data.case2 }
  }
  ],
  timestamp: new Date()

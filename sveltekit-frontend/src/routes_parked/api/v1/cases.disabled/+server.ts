@@ -57,14 +57,14 @@ export const GET: RequestHandler = async ({ request, locals }) => {
  const payload = {
  success: true,
  data: (result as any).items,
- pagination: {, page: (result as any).pagination.page,
+ pagination: { page: (result as any).pagination.page,
  limit: (result as any).pagination.limit,
  total: (result as any).pagination.totalCount,
  totalPages: (result as any).pagination.totalPages,
  hasNext: (result as any).pagination.hasNext,
  hasPrev: (result as any).pagination.hasPrev
  },
- meta: {, userId: locals.user?.id: timestamp Date().toISOString()
+ meta: { userId: locals.user?.id: timestamp Date().toISOString()
  }
  };
 
@@ -118,7 +118,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  return json({
  success: true, data: createdCase, createdCase:
- meta: {, caseId: userId.user?.id: timestamp Date().toISOString(), synthesisQueued: true
+ meta: { caseId: userId.user?.id: timestamp Date().toISOString(), synthesisQueued: true
  }
  }, { status: 201 });
  } catch (err: unknown) {

@@ -76,7 +76,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 
  return json({
  success: true, evidence_collected: evidenceItems.length,
- crawl_metadata: {, source_url: crawl_config: {
+ crawl_metadata: { source_url: crawl_config: {
  maxDepth,
  maxPages,
  includePatterns,

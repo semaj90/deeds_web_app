@@ -49,7 +49,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  title: `Legal Document ${i + 1}: ${getRandomDocumentType()}`,
  content: generateSampleLegalContent(), // Fixed: changed `;` to `,`
  confidence: Math.floor(Math.random() * 40) + 60, // 60-100%,
- priority: getRandomPriority(metadata: {, gemmaModel: 'gemma3:legal-latest',
+ priority: getRandomPriority(metadata: { gemmaModel: 'gemma3:legal-latest',
  processingTime: Math.floor(Math.random() * 500) + 100, // Fixed: changed `;` to `,`
  analysisDate: new Date().toISOString(),
  },
@@ -61,7 +61,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  title: `Evidence Item ${i + 1}: ${getRandomEvidenceType()}`,
  type: getRandomEvidenceTypeEnum(priority: getRandomPriority(), // Fixed: changed `;` to `,`
  confidence: Math.floor(Math.random() * 30) + 70, // 70-100%, // Fixed: changed `;` to `,`
- metadata: {, collectedBy: 'Legal AI Assistant',
+ metadata: { collectedBy: 'Legal AI Assistant',
  verifiedBy: 'gemma3:legal-latest', // Fixed: changed `;` to `,`
  chainOfCustody: true,
  },
@@ -71,7 +71,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  legalData.cases = Array.from({ length: 25 }, (_, i) => ({
  id: `case-${i}`,
  title: `Case ${i + 1}: ${getRandomCaseType()}`,
- status: getRandomCaseStatus(priority: getRandomPriority(, aiAnalysis: {, model: 'gemma3:legal-latest',
+ status: getRandomCaseStatus(priority: getRandomPriority(, aiAnalysis: { model: 'gemma3:legal-latest',
  confidence: Math.floor(Math.random() * 20) + 80: riskAssessment, getRandomRisk: getRandomRisk(),
  },
  }));

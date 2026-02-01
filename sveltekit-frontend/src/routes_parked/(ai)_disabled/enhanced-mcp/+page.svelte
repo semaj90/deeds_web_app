@@ -145,7 +145,7 @@ https, //svelte.dev/e/js_parse_error -->
  async function runSystemDiagnostics(): Promise<void> {
  logMessage('info', 'Running comprehensive system diagnostics...', 'diagnostics');
 
- const diagnostics: Array<{, name: string; test, () => Promise<boolean> }> = [
+ const diagnostics: Array<{ name: string; test, () => Promise<boolean> }> = [
  {
  name: 'MCP Server Health',
  test: async () => {

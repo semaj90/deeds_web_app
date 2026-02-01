@@ -91,7 +91,7 @@ const initialState: POIStoreState = {
     relationships: [],
     relationshipGraph: new Map(),
     clusters: [],
-    networkMetrics: {, centrality: new Map(),
+    networkMetrics: { centrality: new Map(),
         clustering: new Map(),
         density: 0
     },

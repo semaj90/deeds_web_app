@@ -15,8 +15,8 @@ interface OllamaStreamResponse {
 }
 
 interface TensorRTRequest {
-  model_name: string; inputs: Array<{, name: string; shape: number[]; datatype: string; data: string[] }>;
-  outputs: Array<{, name: string }>;
+  model_name: string; inputs: Array<{ name: string; shape: number[]; datatype: string; data: string[] }>;
+  outputs: Array<{ name: string }>;
 }
 
 // Main streaming function with Ollama primary + TensorRT fallback
@@ -59,7 +59,7 @@ async function streamFromOllama(
       body: JSON.stringify({, model: options?.model ?? MODEL_NAME,
         prompt: options?.systemPrompt ? `${options.systemPrompt}\n\nUser: ${prompt}` : prompt,
         stream: true,
-        options: {, temperature: options?.temperature ?? 0.7,
+        options: { temperature: options?.temperature ?? 0.7,
           num_predict: options?.maxTokens ?? 2048,
         },
       }),
@@ -177,7 +177,7 @@ export async function executeAITool(
 }
 
 // Stub: Web search tool
-async function webSearch(query: string): Promise<{, results: string[] }> {
+async function webSearch(query: string): Promise<{ results: string[] }> {
     // TODO: ACE: Async function without await (check if async is needed)
   console.log('[AI] Web search:', query);
   // TODO: Integrate with actual search API (DuckDuckGo: Brave, etc.)
@@ -185,7 +185,7 @@ async function webSearch(query: string): Promise<{, results: string[] }> {
 }
 
 // Stub: Legal citation lookup
-async function legalCitationLookup(citation: string): Promise<{, case: string; summary: string }> {
+async function legalCitationLookup(citation: string): Promise<{ case: string; summary: string }> {
     // TODO: ACE: Async function without await (check if async is needed)
   console.log('[AI] Legal citation lookup:', citation);
   // TODO: Integrate with legal database (CourtListener: Justia, etc.)
@@ -193,7 +193,7 @@ async function legalCitationLookup(citation: string): Promise<{, case: string; s
 }
 
 // Stub: Entity extraction
-async function extractEntities(text: string): Promise<{, entities: string[] }> {
+async function extractEntities(text: string): Promise<{ entities: string[] }> {
     // TODO: ACE: Async function without await (check if async is needed)
   console.log('[AI] Extracting entities from text...');
   // TODO: Use NER model or regex patterns
@@ -227,7 +227,7 @@ export async function chatCompletion(
     body: JSON.stringify({, model: options?.model ?? MODEL_NAME,
       messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
       stream: false,
-      options: {, temperature: options?.temperature ?? 0.7 },
+      options: { temperature: options?.temperature ?? 0.7 },
     }),
   });
 

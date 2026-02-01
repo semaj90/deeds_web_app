@@ -4,7 +4,7 @@ import type { RequestHandler } from './$types.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // POST /api/evidence/ai/magnetize - Calculate force-directed layout for magnetic mode
-export async function POST({ request }: {, request: Request }) {
+export async function POST({ request }: { request: Request }) {
  try {
  const { nodes, connections, caseId } = await request.json();
 

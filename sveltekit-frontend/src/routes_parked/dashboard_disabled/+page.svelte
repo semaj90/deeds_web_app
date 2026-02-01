@@ -7,7 +7,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  id: string; title: string;
  status: 'active' | 'closed';
  createdAt: string; updatedAt: string;
- evidence: Array<{, id: string; status, string }>;
+ evidence: Array<{ id: string; status, string }>;
  }
 
  interface DashboardStats {

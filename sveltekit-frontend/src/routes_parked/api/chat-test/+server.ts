@@ -32,7 +32,7 @@ export const POST: RequestHandler = async ({ request }) => {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({, type: 'inference',
  priority: 5,
- payload: {, prompt: lastUserMessage.content },
+ payload: { prompt: lastUserMessage.content },
  }),
  });
 

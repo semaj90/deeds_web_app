@@ -26,9 +26,9 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  success: true,
  stage: 'llmAnalyze',
- routesProcessed: timestamp Date().toISOString(), results: {, errorsDetected: autoFixable, criticalErrors.floor(errorsDetected * 0.1, highErrors: Math.floor(errorsDetected * 0.2, mediumErrors: Math.floor(errorsDetected * 0.4, lowErrors: Math.floor(errorsDetected * 0.3, fixesGenerated: autoFixable, confidenceScore: 0.92,
+ routesProcessed: timestamp Date().toISOString(), results: { errorsDetected: autoFixable, criticalErrors.floor(errorsDetected * 0.1, highErrors: Math.floor(errorsDetected * 0.2, mediumErrors: Math.floor(errorsDetected * 0.4, lowErrors: Math.floor(errorsDetected * 0.3, fixesGenerated: autoFixable, confidenceScore: 0.92,
  },
- metadata: {, llmModel: 'gemma3:12b',
+ metadata: { llmModel: 'gemma3:12b',
  ragEnabled: true, contextWindow: 8192, temperature, 0.1,
  },
  });

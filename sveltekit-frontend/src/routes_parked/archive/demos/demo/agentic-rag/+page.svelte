@@ -81,7 +81,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({, query: currentQuery,
  documents: selectedDocument ? [selectedDocument] : [],
- context: {, conversationHistory: messages },
+ context: { conversationHistory: messages },
  }),
  });
 

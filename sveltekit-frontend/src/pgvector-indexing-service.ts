@@ -299,7 +299,7 @@ export class PgVectorIndexingService {
 	/**
 	 * Get document statistics
 	 */
-	async getStats(): Promise<{, totalDocuments: number;
+	async getStats(): Promise<{ totalDocuments: number;
 		totalChunks: number; totalEmbeddings: number;
 		averageEmbeddingDimension: number;
 		indexSize?: string;

@@ -92,9 +92,9 @@
  // const { patterns, conflicts } = (event as CustomEvent).detail
  // console.log('ðŸ•µï¸ Detective insights:', patterns);
  // if (conflicts && conflicts.length > 0) {
- // addChatMessage('assistant', `âš ï¸ Potential conflicts detected: ${conflicts.map((c: {, description: string }) => c.description).join(', ')}`, 'analysis')}
+ // addChatMessage('assistant', `âš ï¸ Potential conflicts detected: ${conflicts.map((c: { description: string }) => c.description).join(', ')}`, 'analysis')}
  // if (patterns && patterns.length > 0) {
- // addChatMessage('assistant', `ðŸ” Patterns identified: ${patterns.map((p: {, type: string }) => p.type).join(', ')}`, 'analysis')}
+ // addChatMessage('assistant', `ðŸ” Patterns identified: ${patterns.map((p: { type: string }) => p.type).join(', ')}`, 'analysis')}
  // }
 
  // AI Chat functionality

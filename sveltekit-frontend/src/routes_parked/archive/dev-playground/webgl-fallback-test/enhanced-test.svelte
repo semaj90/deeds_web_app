@@ -15,9 +15,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Svelte, 5 runes for reactive state
  let log = $state <string>('');
  let testResults = $state({
- webgpu: {, supported: false, tested: false, performance: null, as: unknown, error: null; as: string | null },
- webgl2: {, supported: false, tested: false, performance: null, as: unknown, error: null; as: string | null },
- webgl1: {, supported: false, tested: false, performance: null, as: unknown, error: null, as: string | null }; wasm: {, supported: false, tested: false, performance: null, as: unknown, error: null, as: string | null },
+ webgpu: { supported: false, tested: false, performance: null, as: unknown, error: null; as: string | null },
+ webgl2: { supported: false, tested: false, performance: null, as: unknown, error: null; as: string | null },
+ webgl1: { supported: false, tested: false, performance: null, as: unknown, error: null, as: string | null }; wasm: { supported: false, tested: false, performance: null, as: unknown, error: null, as: string | null },
  recommendation: ''});
  let isTestingInProgress = $state <boolean>(false);
  let currentTest = $state <string>('');
@@ -25,7 +25,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Test configuration for Gemma3 270M simulation
  const matrixSize = 384; // Gemma3 270M embedding dimension
  const iterations = 50
- let testData: {, matrixA: Float32Array; matrixB: Float32Array } | null = null
+ let testData: { matrixA: Float32Array; matrixB: Float32Array } | null = null
  function append(msg: string) {
  log += `[${new Date().toLocaleTimeString()}] ${ msg }\n`}
  $effect(() => {() => {

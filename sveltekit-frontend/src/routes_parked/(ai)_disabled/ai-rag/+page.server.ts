@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  const fallback = {
  documents: [],
  recentQueries: [],
- stats: {, totalDocuments: 0, totalQueries: 0, avgResponseTime: 0,
+ stats: { totalDocuments: 0, totalQueries: 0, avgResponseTime: 0,
  },
  };
 
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  return {
  documents: [],
  recentQueries: [],
- stats: {, totalDocuments: 0, totalQueries: 0, avgResponseTime: 0,
+ stats: { totalDocuments: 0, totalQueries: 0, avgResponseTime: 0,
  },
  };
  } catch (error: unknown) {

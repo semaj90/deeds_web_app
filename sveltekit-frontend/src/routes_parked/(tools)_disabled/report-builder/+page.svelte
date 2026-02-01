@@ -54,7 +54,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     aiTags: string[]; aiSummary: string | null;
     summary: string | null;
     isAdmissible: boolean; confidentialityLevel: string;
-    canvasPosition: {, x: number; y: number } | null;
+    canvasPosition: { x: number; y: number } | null;
     uploadedBy: string; uploadedAt: Date;
     updatedAt: Date;
     [key: string]: unknown;
@@ -195,7 +195,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       error = 'Failed to save report';
     }
   }
-  async function handleCanvasSave(data: {, objects: unknown[] }): Promise<void> {
+  async function handleCanvasSave(data: { objects: unknown[] }): Promise<void> {
     try {
       const now = new Date().toISOString();
       let stateToSave: CanvasState;

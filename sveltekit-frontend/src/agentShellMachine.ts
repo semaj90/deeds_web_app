@@ -4,7 +4,7 @@
  * Phase 72 - Task 3
  */
 
-import { setup, assign } from 'xstate';
+import setup, { assign } from 'xstate';
 
 // Types
 export interface ShellContext {

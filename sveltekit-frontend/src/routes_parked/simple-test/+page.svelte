@@ -5,7 +5,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Keep this page small and valid while we repair corrupted portions elsewhere.
 let isSubmitting = false;
 let submitResult = '';
-let formData: {, caseNumber: string; title: string; description: string; priority: string } = {
+let formData: { caseNumber: string; title: string; description: string; priority: string } = {
  caseNumber: '',
  title: '',
  description: '',

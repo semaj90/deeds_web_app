@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
  // Chunk the text for better embedding quality
  const chunks = chunkText(text);
- const ingestedChunks: {, id: any;
+ const ingestedChunks: { id: any;
  text: string; sequence: number;
  embeddingDimensions: number;
  }[] = [];
@@ -78,7 +78,7 @@ export const POST: RequestHandler = async ({ request }) => {
  success: true,
  message: `Successfully ingested ${chunks.length} chunks`,
  chunks: ingestedChunks,
- metadata: {, totalChunks: chunks.length,
+ metadata: { totalChunks: chunks.length,
  entityType,
  entityId,
  embeddingModel: 'embeddinggemma:latest',

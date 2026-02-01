@@ -317,7 +317,7 @@ PARAMETER num_ctx 4096`;
 				throw new Error(`Embedding failed: ${response.statusText} - ${errorText}`);
 			}
 
-			const result: {, embedding: number[] } = await response.json();
+			const result: { embedding: number[] } = await response.json();
 			return result.embedding;
 		} catch (error) {
 			console.error('[OllamaLLM] Embedding failed:', error);
@@ -329,7 +329,7 @@ PARAMETER num_ctx 4096`;
 	 * Chat completion with conversation history
 	 */
 	async chat(
-		messages: Array<{, role: 'user' | 'assistant', content, string }>,
+		messages: Array<{ role: 'user' | 'assistant', content, string }>,
 		model?: string
 	): Promise<string | null> {
 		try {
@@ -391,7 +391,7 @@ PARAMETER num_ctx 4096`;
 				model: this.defaultModel,
 				prompt,
 				system: systemPrompt,
-				options: {, temperature: 0.3,
+				options: { temperature: 0.3,
 					top_p: 0.9,
 					num_predict: 2000
 				}

@@ -12,20 +12,20 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // === Client Cache Configuration ===
 export interface ClientCacheConfig {
-	indexedDB: {, dbName: string;
+	indexedDB: { dbName: string;
 		version: number; maxSizeMB: number;
 		autoCleanup: boolean;
 	};
-	lokiJS: {, enableMemoryCache: boolean;
+	lokiJS: { enableMemoryCache: boolean;
 		maxMemoryMB: number; persistInterval: number;
 	};
-	prefetch: {, enabled: boolean;
+	prefetch: { enabled: boolean;
 		maxConcurrentRequests: number; predictiveThreshold: number;
 	};
-	userHistory: {, trackingEnabled: boolean;
+	userHistory: { trackingEnabled: boolean;
 		maxEntriesPerUser: number; syncInterval: number;
 	};
-	ssr: {, hydrateFromCache: boolean;
+	ssr: { hydrateFromCache: boolean;
 		preloadCriticalData: boolean; serverCacheTimeout: number;
 	};
 }
@@ -33,7 +33,7 @@ export interface ClientCacheConfig {
 // === Cache Entry Types ===
 export interface ClientCacheEntry {
 	id: string; data: Record<string, unknown>;
-	metadata: {, timestamp: number;
+	metadata: { timestamp: number;
 		source: 'server' | 'client' | 'prefetch';
 		hitCount: number; lastAccessed: number;
 		size: number; compressed: boolean;
@@ -41,7 +41,7 @@ export interface ClientCacheEntry {
 	};
 	tags: string[];
 	embedding?: Float32Array;
-	userContext?: {, userId: string;
+	userContext?: { userId: string;
 		sessionId: string; preferences: unknown;
 	};
 }
@@ -62,16 +62,16 @@ export const cacheState = writable({
 });
 
 export const cacheMetrics = writable({
-	performance: {, serverLatency: 0,
+	performance: { serverLatency: 0,
 		clientLatency: 0,
 		indexedDBLatency: 0,
 		compressionRatio: 0
 	},
-	storage: {, indexedDBUsageMB: 0,
+	storage: { indexedDBUsageMB: 0,
 		lokiJSUsageMB: 0,
 		compressionSavingsMB: 0
 	},
-	predictions: {, prefetchAccuracy: 0,
+	predictions: { prefetchAccuracy: 0,
 		rlOptimizationGain: 0,
 		userBehaviorPrediction: 0
 	}
@@ -99,7 +99,7 @@ export class SvelteKitGPUCacheIntegration {
 	private userHistory = new Map<string, unknown[]>();
 	private prefetchQueue = new Set<string>();
 	private metrics = {
-		hits: {, server: 0, client: 0, indexeddb: 0, memory: 0 },
+		hits: { server: 0, client: 0, indexeddb: 0, memory: 0 },
 		misses: 0,
 		prefetchHits: 0,
 		latencies: [] as number[],
@@ -172,7 +172,7 @@ export class SvelteKitGPUCacheIntegration {
 					const clientEntry: ClientCacheEntry = {
 						id: key,
 						data: serverEntry as Record<string, unknown>,
-						metadata: {, timestamp: Date.now(),
+						metadata: { timestamp: Date.now(),
 							source: 'server',
 							hitCount: 1,
 							lastAccessed: Date.now(),
@@ -239,7 +239,7 @@ export class SvelteKitGPUCacheIntegration {
 			const clientEntry: ClientCacheEntry = {
 				id: key,
 				data: options.compression ? await this.compressData(data) : data,
-				metadata: {, timestamp: Date.now(),
+				metadata: { timestamp: Date.now(),
 					source: 'client',
 					hitCount: 0,
 					lastAccessed: Date.now(),
@@ -311,7 +311,7 @@ export class SvelteKitGPUCacheIntegration {
 				const clientEntry: ClientCacheEntry = {
 					id: key,
 					data: serverEntry as Record<string, unknown>,
-					metadata: {, timestamp: Date.now(),
+					metadata: { timestamp: Date.now(),
 						source: 'prefetch',
 						hitCount: 0,
 						lastAccessed: Date.now(),
@@ -487,24 +487,24 @@ export class SvelteKitGPUCacheIntegration {
 
 export function createDefaultClientCacheConfig(): ClientCacheConfig {
 	return {
-		indexedDB: {, dbName: 'SvelteKitGPUCache',
+		indexedDB: { dbName: 'SvelteKitGPUCache',
 			version: 1,
 			maxSizeMB: 50,
 			autoCleanup: true
 		},
-		lokiJS: {, enableMemoryCache: true,
+		lokiJS: { enableMemoryCache: true,
 			maxMemoryMB: 100,
 			persistInterval: 30000
 		},
-		prefetch: {, enabled: true,
+		prefetch: { enabled: true,
 			maxConcurrentRequests: 3,
 			predictiveThreshold: 0.7
 		},
-		userHistory: {, trackingEnabled: true,
+		userHistory: { trackingEnabled: true,
 			maxEntriesPerUser: 1000,
 			syncInterval: 60000
 		},
-		ssr: {, hydrateFromCache: true,
+		ssr: { hydrateFromCache: true,
 			preloadCriticalData: true,
 			serverCacheTimeout: 300000
 		}
@@ -515,7 +515,7 @@ export function createDefaultClientCacheConfig(): ClientCacheConfig {
 export const svelteKitGPUCache = new SvelteKitGPUCacheIntegration(createDefaultClientCacheConfig());
 
 // === Svelte Actions and Utilities ===
-export function cacheAction(_node: HTMLElement): {, destroy: () => void } {
+export function cacheAction(_node: HTMLElement): { destroy: () => void } {
 	return {
 		destroy() {
 			// Cleanup if needed

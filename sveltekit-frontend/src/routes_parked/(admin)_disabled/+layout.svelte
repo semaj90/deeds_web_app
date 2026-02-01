@@ -5,7 +5,7 @@
  import { Snippet } from 'svelte';
 
  interface Props {
- data: {, user: any;
+ data: { user: any;
  };
  children: Snippet;
  }

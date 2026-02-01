@@ -61,7 +61,7 @@ export interface GPUTaskResult {
 	recommendations?: string[];
 	riskScore?: number;
 	securityScore?: number;
-	legalVerification?: {, verified: boolean;
+	legalVerification?: { verified: boolean;
 		confidence: number;
 		details?: unknown;
 	};
@@ -70,7 +70,7 @@ export interface GPUTaskResult {
 export interface ClusterMetrics {
 	spawned: Record<string, number>;
 	deferredActive: number; deferredTotal: number;
-	lastAllocation: {, type: string;
+	lastAllocation: { type: string;
 		port: number; timestamp: string;
 	};
 	events: unknown[]; workers: unknown[];
@@ -159,7 +159,7 @@ class MCPGPUOrchestrator {
 				taskId: task.id,
 				success: true,
 				result: payload,
-				metrics: {, processingTime: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
+				metrics: { processingTime: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
 					gpuUtilization: await this.getGPUUtilization(),
 					memoryUsage: await this.getMemoryUsage(),
 					protocol,
@@ -180,7 +180,7 @@ class MCPGPUOrchestrator {
 				taskId: task.id,
 				success: false,
 				result: null,
-				metrics: {, processingTime: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
+				metrics: { processingTime: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
 					gpuUtilization: 0,
 					memoryUsage: 0,
 					protocol: 'failed',
@@ -373,7 +373,7 @@ class MCPGPUOrchestrator {
 
 			return {
 				success: true,
-				data: {, riskScore: compositeRiskScore,
+				data: { riskScore: compositeRiskScore,
 					securityScore: Math.round((1 - compositeRiskScore) * 100),
 					analysis: this.getNested<unknown>(response, ['data', 'analysis'], () => true) ?? undefined,
 					recommendations: [],
@@ -385,7 +385,7 @@ class MCPGPUOrchestrator {
 		} catch (error) {
 			return {
 				success: false,
-				data: {, riskScore: 0.5,
+				data: { riskScore: 0.5,
 					securityScore: 50,
 					analysis: 'Fallback security analysis',
 					error: error instanceof Error ? error.message : String(error)

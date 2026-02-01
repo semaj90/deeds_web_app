@@ -14,8 +14,8 @@ interface UploadRequest {
 
 interface UploadResponse {
  uploadId: string; minioUrl: string;
- doclingResult: {, fullText: string;
- blocks: Array<{, type: string;
+ doclingResult: { fullText: string;
+ blocks: Array<{ type: string;
  text: string; page: number;
  bbox?, [number, number, number, number];
  }>;

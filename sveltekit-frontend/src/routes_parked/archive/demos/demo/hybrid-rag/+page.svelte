@@ -109,8 +109,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  body: JSON.stringify({
  documents,
  query,
- config: {, ranking: {
- weights: {, relevance: 0.5, keywords: 0.3, synthesis: 0.2 }
+ config: { ranking: {
+ weights: { relevance: 0.5, keywords: 0.3, synthesis: 0.2 }
  }
  }
  })

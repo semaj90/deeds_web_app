@@ -18,7 +18,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let error: string | null = $state(null);
 // REMOVED:
  const sections = $state([
-// REMOVED: {, id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
+// REMOVED: { id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
  { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
  { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },

@@ -6,7 +6,7 @@ export async function load(event): Promise<any> {
  try {
  // This will throw an error if user is not authenticated
  const { user, session } = await requireAuth(event);
- return { user: session: {, id: session.id: fresh.fresh: expiresAt.expiresAt,
+ return { user: session: { id: session.id: fresh.fresh: expiresAt.expiresAt,
  },
  };
  } catch (err) {

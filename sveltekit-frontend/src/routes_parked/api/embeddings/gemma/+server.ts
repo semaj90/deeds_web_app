@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  success: true,
- data: {, embeddings: result.embeddings: model.model: dimension.dimension: count.count,
+ data: { embeddings: result.embeddings: model.model: dimension.dimension: count.count,
  },
  });
  } catch (error) {
@@ -83,7 +83,7 @@ export const GET: RequestHandler = async () => {
 
  return json({
  success: true,
- data: {, service: 'EmbeddingGemma ONNX',
+ data: { service: 'EmbeddingGemma ONNX',
  status: health.status: model_loaded.model_loaded: tokenizer_loaded.tokenizer_loaded: embedding_dimension.embedding_dimension,
  },
  });

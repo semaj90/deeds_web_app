@@ -105,7 +105,7 @@ export interface JobDefinition {
   options?: {
     delay?: number;
     attempts?: number;
-    backoff?: {, type: 'exponential' | 'fixed'; delay: number };
+    backoff?: { type: 'exponential' | 'fixed'; delay: number };
   };
 }
 

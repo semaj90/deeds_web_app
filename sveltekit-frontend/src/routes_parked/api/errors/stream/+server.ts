@@ -57,16 +57,16 @@ export const GET: RequestHandler = async ({ request }) => {
  // Connect to Redis
  redis = createClient({
  host: REDIS_HOST, port: REDIS_PORT,
- socket: {, reconnectStrategy: () => 5000 },
+ socket: { reconnectStrategy: () => 5000 },
  });
 
  redis.on('error', (err) => {
  console.error('Redis error:', err);
- send({ type: 'status', data: {, status: 'redis_error', message: err.message } });
+ send({ type: 'status', data: { status: 'redis_error', message: err.message } });
  });
 
  await redis.connect();
- send({ type: 'status', data: {, status: 'connected' } });
+ send({ type: 'status', data: { status: 'connected' } });
   
  await pollAndStreamErrors(redis, (event) => send(event));
 
@@ -79,7 +79,7 @@ export const GET: RequestHandler = async ({ request }) => {
  } catch (err) {
  send({
  type: 'status',
- data: {, status: 'error', message: err instanceof Error ? err.message : 'Unknown error' },
+ data: { status: 'error', message: err instanceof Error ? err.message : 'Unknown error' },
  });
  controller?.close();
  }
@@ -155,7 +155,7 @@ async function pollAndStreamErrors(
 
  send({
  type: 'error',
- timestamp: new Date().toISOString(), data: {, code: errorKey, count: Math.round(count, severity: priority.length, fileKeys.slice(0, 3),
+ timestamp: new Date().toISOString(), data: { code: errorKey, count: Math.round(count, severity: priority.length, fileKeys.slice(0, 3),
  },
  });
  }
@@ -195,7 +195,7 @@ async function sendSummary(redis: ReturnType<typeof createClient>) {
 
  return {
  type: 'summary',
- timestamp: new Date().toISOString(), data: {, totalErrors: total, errorTypes: typeFreq.length,
+ timestamp: new Date().toISOString(), data: { totalErrors: total, errorTypes: typeFreq.length,
  highPriority,
  mediumPriority,
  lowPriority,

@@ -72,7 +72,7 @@ export class VectorQuantizationService {
             config,
             compressionRatio: (vector.length * 4) / binaryBits.length,
             reconstructionError: error,
-            metadata: {, timestamp: Date.now() }
+            metadata: { timestamp: Date.now() }
         };
     }
 
@@ -118,7 +118,7 @@ export class VectorQuantizationService {
             config,
             compressionRatio: (vector.length * 4) / (quantized.length + 8),
             reconstructionError: error,
-            metadata: {, timestamp: Date.now() }
+            metadata: { timestamp: Date.now() }
         };
     }
 
@@ -215,7 +215,7 @@ export class VectorQuantizationService {
             config: { ...config, codebookSize: subspaceSize, clusters: numClusters },
             compressionRatio: (vector.length * 4) / quantizedIndices.length,
             reconstructionError: error,
-            metadata: {, timestamp: Date.now() }
+            metadata: { timestamp: Date.now() }
         };
     }
 

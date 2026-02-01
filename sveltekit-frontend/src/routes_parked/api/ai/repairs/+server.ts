@@ -32,7 +32,7 @@ export const GET: RequestHandler = async ({ url }) => {
  const minConfidence = parseFloat(url.searchParams.get('min_confidence') ?? '0.5');
 
  // Query Qdrant for repair suggestions
- const searchResult = await qdrant.scroll(COLLECTION_NAME, { limit: filter: {, must: [
+ const searchResult = await qdrant.scroll(COLLECTION_NAME, { limit: filter: { must: [
  {
  key: 'status',
  match: { value, status },
@@ -72,7 +72,7 @@ export const POST: RequestHandler = async ({ request }) => {
   
  await qdrant.setPayload(COLLECTION_NAME, {
  points: [id],
- payload: {, status: updated_at Date().toISOString(),
+ payload: { status: updated_at Date().toISOString(),
  ...(applied_diff && { applied_diff }),
  },
  });

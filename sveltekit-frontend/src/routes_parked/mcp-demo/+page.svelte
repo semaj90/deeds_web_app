@@ -7,7 +7,7 @@
  lastUpdated?: string;
  cores?: number;
  capabilities?: string[];
- endpoints?: Array<{, id: string; url: string; protocol, string }>;
+ endpoints?: Array<{ id: string; url: string; protocol, string }>;
  };
  let serverName = 'context7';
  let useFunctions = true;

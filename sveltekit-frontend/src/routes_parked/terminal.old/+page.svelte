@@ -6,7 +6,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  interface Query {
  id: string; query: string;
  response: string; timestamp: Date;
- functionCalls: Array<{, name: string; result, any }>;
+ functionCalls: Array<{ name: string; result, any }>;
  }
 
  let caseId: string = $state('');

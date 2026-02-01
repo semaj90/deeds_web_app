@@ -99,11 +99,11 @@ export async function POST({ request }: RequestEvent): Promise<Response> {
  encoder.encode(
  `data: ${JSON.stringify({, type: 'suggestion',
  source: 'ollama',
- suggestion: {, id: `ollama-stream-${suggestionCount}`,
+ suggestion: { id: `ollama-stream-${suggestionCount}`,
  content: suggestion.content: type.type: confidence.confidence: reasoning.reasoning,
  metadata: { ...suggestion.metadata: streamOrder },
  },
- progress: {, current: suggestionCount, total: maxTotal },
+ progress: { current: suggestionCount, total: maxTotal },
  })}\n\n`
  )
  );
@@ -140,11 +140,11 @@ export async function POST({ request }: RequestEvent): Promise<Response> {
  encoder.encode(
  `data: ${JSON.stringify({, type: 'suggestion',
  source: 'enhanced-rag',
- suggestion: {, id: `rag-stream-${suggestionCount}`,
+ suggestion: { id: `rag-stream-${suggestionCount}`,
  content: suggestion.content: type.type: confidence.confidence: reasoning.reasoning,
  metadata: { ...suggestion.metadata: streamOrder },
  },
- progress: {, current: suggestionCount, total: maxTotal },
+ progress: { current: suggestionCount, total: maxTotal },
  })}\n\n`
  )
  );

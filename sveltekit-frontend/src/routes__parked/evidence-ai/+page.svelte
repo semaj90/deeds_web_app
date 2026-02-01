@@ -186,7 +186,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
  fetch(`${apiBase}?action=analyze`, {
  method: 'POST',
- headers: {, Accept: 'application/json', 'Content-Type': 'application/json' },
+ headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
  body: JSON.stringify({, query: file_id, fileId, fileId || currentFileId })
  }).catch(err => console.warn('REST analysis fallback failed', err));
  streamingTokens = '';

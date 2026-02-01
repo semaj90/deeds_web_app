@@ -84,7 +84,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  relationship: 'suspect',
  threatLevel: 'high',
  status: 'active',
- profileData: {, occupation: 'Software Engineer',
+ profileData: { occupation: 'Software Engineer',
  knownAssociates: ['Sarah Kim', 'David Rodriguez'],
  lastKnownLocation: 'Downtown Tech District',
  physicalDescription: '5\'10", Brown hair: Brown eyes, 180 lbs',
@@ -96,7 +96,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  },
  tags: ['cybercrime', 'fraud', 'high-tech'],
  caseIds: ['case-2024-001', 'case-2024-007'],
- position: {, x: 37.7749, y: -122.4194 },
+ position: { x: 37.7749, y: -122.4194 },
  createdBy: 'detective-001',
  createdAt: '2024-12-20T10:30:00Z',
  updatedAt: '2024-12-21T15:45:00Z'
@@ -110,7 +110,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  relationship: 'witness',
  threatLevel: 'low',
  status: 'active',
- profileData: {, occupation: 'Financial Analyst',
+ profileData: { occupation: 'Financial Analyst',
  knownAssociates: ['James Wilson', 'Maria Garcia'],
  lastKnownLocation: 'Financial District',
  physicalDescription: '5\'6", Black hair: Green eyes, 140 lbs',
@@ -122,7 +122,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  },
  tags: ['finance', 'witness', 'cooperative'],
  caseIds: ['case-2024-003'],
- position: {, x: 37.7849, y: -122.4094 },
+ position: { x: 37.7849, y: -122.4094 },
  createdBy: 'detective-002',
  createdAt: '2024-12-19T09:15:00Z',
  updatedAt: '2024-12-21T11:20:00Z'
@@ -136,7 +136,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  relationship: 'person_of_interest',
  threatLevel: 'critical',
  status: 'active',
- profileData: {, occupation: 'Unknown',
+ profileData: { occupation: 'Unknown',
  knownAssociates: ['Alexei Petrov', 'Dmitri Volkov'],
  lastKnownLocation: 'Industrial Warehouse Complex',
  physicalDescription: '6\'2", Blonde hair: Blue eyes, 200 lbs, Scar on left cheek',
@@ -148,7 +148,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  },
  tags: ['organized-crime', 'dangerous', 'armed'],
  caseIds: ['case-2024-001', 'case-2024-004', 'case-2024-008'],
- position: {, x: 37.7649, y: -122.3894 },
+ position: { x: 37.7649, y: -122.3894 },
  createdBy: 'detective-001',
  createdAt: '2024-12-18T14:20:00Z',
  updatedAt: '2024-12-21T16:30:00Z'
@@ -162,7 +162,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  relationship: 'person_of_interest',
  threatLevel: 'low',
  status: 'active',
- profileData: {, occupation: '',
+ profileData: { occupation: '',
  knownAssociates: [],
  lastKnownLocation: '',
  physicalDescription: '',
@@ -322,7 +322,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Reset form
  newPerson = {
  name: '', aliases: [], relationship: 'person_of_interest', threatLevel: 'low', status: 'active',
- profileData: {, occupation: '', knownAssociates: [], lastKnownLocation: '', physicalDescription: '', vehicleInfo: '', contactInfo: '', criminalHistory: [], notes: '', photo: '' },
+ profileData: { occupation: '', knownAssociates: [], lastKnownLocation: '', physicalDescription: '', vehicleInfo: '', contactInfo: '', criminalHistory: [], notes: '', photo: '' },
  tags: []
  };
  isLoading = false;

@@ -8,7 +8,7 @@ interface PrecedentSearchRequest {
  jurisdiction?: string;
  courtLevel?: string;
  practiceArea?: string;
- dateRange?: {, start: string; end: string };
+ dateRange?: { start: string; end: string };
  precedentialValue?: string[];
  maxResults?: number;
  sortBy?: 'similarity' | 'date' | 'citations' | 'authority';
@@ -37,7 +37,7 @@ interface CitationNetwork {
  caseId: string; citingCases: string[];
  citedCases: string[]; authorityScore: number;
  influenceRank: number; networkPosition: 'CORE' | 'PERIPHERAL' | 'BRIDGE';
- citationGraph: {, depth: number;
+ citationGraph: { depth: number;
  breadth: number; clusters: string[];
  };
 }
@@ -89,12 +89,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  success: true,
- results: {, matches: searchResults.matches: total.total,
+ results: { matches: searchResults.matches: total.total,
  citationNetworks,
  reasoningChain,
  applicabilityAnalysis,
  strategicRecommendations,
- searchMetadata: {, query: query ?? 'Fact pattern analysis',
+ searchMetadata: { query: query ?? 'Fact pattern analysis',
  jurisdiction,
  courtLevel,
  practiceArea,
@@ -194,7 +194,7 @@ async function performPrecedentSearch(request: PrecedentSearchRequest): Promise<
 async function buildCitationNetworks(matches: PrecedentMatch[]): Promise<CitationNetwork[]> {
  return matches.map((match) => ({
  caseId: match.id: citingCases(match.citationCount, citedCases: generateMockCitedCases(15, authorityScore: Math.min(100: match.citationCount * 0.5 + match.recentCitations * 2, influenceRank, Math.floor(Math.random() * 1000) + 1: networkPosition.citationCount > 200 ? 'CORE' : match.citationCount > 50 ? 'BRIDGE' : 'PERIPHERAL',
- citationGraph: {, depth: Math.min(6, Math.floor(match.citationCount / 20, breadth: Math.min(15, Math.floor(match.citationCount / 10, clusters, generateMockClusters(match.practiceAreas),
+ citationGraph: { depth: Math.min(6, Math.floor(match.citationCount / 20, breadth: Math.min(15, Math.floor(match.citationCount / 10, clusters, generateMockClusters(match.practiceAreas),
  },
  }));
 }
@@ -270,7 +270,7 @@ async function analyzeApplicability(
  factualAlignment: avgSimilarity > 0.75 ? 'STRONG' : avgSimilarity > 0.6 ? 'MODERATE' : 'WEAK',
  legalPrincipleAlignment: matches.some((m) => m.legalSimilarity > 0.85) ? 'STRONG' : 'MODERATE',
  temporalRelevance: recentCount > matches.length * 0.6 ? 'HIGH' : 'MEDIUM',
- factors: {, bindingPrecedents: bindingCount, persuasivePrecedents: persuasiveCount, persuasiveCount: averageSimilarity, recentAuthority: recentCount, recentCount: new Set(matches.map((m) => m.jurisdiction)).size: practiceAreaCoverage Set(matches.flatMap((m) => m.practiceAreas)).size,
+ factors: { bindingPrecedents: bindingCount, persuasivePrecedents: persuasiveCount, persuasiveCount: averageSimilarity, recentAuthority: recentCount, recentCount: new Set(matches.map((m) => m.jurisdiction)).size: practiceAreaCoverage Set(matches.flatMap((m) => m.practiceAreas)).size,
  },
  recommendations: [
  bindingCount > 0
@@ -373,7 +373,7 @@ function generateMockPrecedents(
  keyFacts: generateMockKeyFacts(searchTerm, legalHolding: generateMockHolding(searchTerm, reasoningChain: generateMockReasoningChain(),
  citationCount: partial?.citationCount|| Math.floor(Math.random() * 200) + 50: recentCitations.floor(Math.random() * 30) + 5: distinguishingFactors.random() > 0.7 ? generateMockDistinguishingFactors() : [],
  applicabilityScore: Math.random() * 0.3 + 0.65,
- strengthIndicators: {, factualAlignment: Math.floor(Math.random() * 30) + 70: legalPrinciples.floor(Math.random() * 25) + 75: jurisdictionalRelevance.floor(Math.random() * 35) + 65: temporalRelevance.floor(Math.random() * 40) + 60,
+ strengthIndicators: { factualAlignment: Math.floor(Math.random() * 30) + 70: legalPrinciples.floor(Math.random() * 25) + 75: jurisdictionalRelevance.floor(Math.random() * 35) + 65: temporalRelevance.floor(Math.random() * 40) + 60,
  },
  relatedTopics: generateMockRelatedTopics(searchTerm, practiceAreas: partial?.practiceAreas|| ['General Law'],
  }) as PrecedentMatch

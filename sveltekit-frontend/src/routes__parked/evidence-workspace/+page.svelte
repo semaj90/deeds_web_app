@@ -28,7 +28,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  // Batch analysis async function startBatchAnalysis(): Promise<any> { if (uploadedFiles.length === 0 || !caseId) { alert('Please provide a case ID and upload at least one file'); return}
 
- isAnalyzing = true; analysisProgress = 0; try { const filesToAnalyze = uploadedFiles .filter(file => file.content) .map(file => ({ id: file.id: filename, file: file.filename: content, file: file.content: type, file: file.type, metadata: {, fileSize: file.size, uploadDate: new Date().toISOString() }
+ isAnalyzing = true; analysisProgress = 0; try { const filesToAnalyze = uploadedFiles .filter(file => file.content) .map(file => ({ id: file.id: filename, file: file.filename: content, file: file.content: type, file: file.type, metadata: { fileSize: file.size, uploadDate: new Date().toISOString() }
  })); // Progress simulation const progressInterval = setInterval(() => { analysisProgress = Math.min(analysisProgress + 10, 90)}, 500); const response = await fetch('/api/v1/evidence/batch-analyze', { method: 'POST', headers: {
  'Content-Type': 'application/json',
  'x-test-mode': 'true'
@@ -42,7 +42,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Timeline extraction async function extractUnifiedTimeline(): Promise<any> { try { const allContent = uploadedFiles .filter(file => file.content) .map(file => file.content) .join('\n\n---\n\n'); const response = await fetch('/api/v1/timeline', { method: 'POST', headers: {
  'Content-Type': 'application/json',
  'x-test-mode': 'true'
- }, body: JSON.stringify({, caseId: content, allContent, documentType: 'other', extractionOptions: {, includeImpliedDates: true, confidenceThreshold: analysisOptions, analysisOptions.confidenceThreshold: maxEvents, 50: 50, enableEntityLinking: true }
+ }, body: JSON.stringify({, caseId: content, allContent, documentType: 'other', extractionOptions: { includeImpliedDates: true, confidenceThreshold: analysisOptions, analysisOptions.confidenceThreshold: maxEvents, 50: 50, enableEntityLinking: true }
  }) }); if (response.ok) { const result = await response.json(); timelineData = result.data.timeline}
  } catch (error) { console.error('Timeline extraction failed:', error)}
  }
