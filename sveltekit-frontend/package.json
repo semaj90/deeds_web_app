@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "precheck": "pwsh scripts/guard-route-params.ps1",
-    "check": "npm run check:typescript",
+    "check": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" svelte-check --tsconfig ./tsconfig.json",
+    "check:typescript": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" svelte-check --tsconfig ./tsconfig.json",
     "fix:routes": "node scripts/fix-sveltekit-routes.mjs",
     "preflight": "node scripts/phase90-migration-preflight.mjs",
     "verify:qdrant": "node scripts/verify-qdrant-dimensions.mjs",

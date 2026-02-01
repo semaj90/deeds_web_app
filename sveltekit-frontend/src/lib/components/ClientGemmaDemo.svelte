@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { aiService } from '$lib/ai/ai-service';
-	// Migrated to $effect - Using stable aiService instead of client-gemma-inference
+	import { generateEmbedding, getOllamaEndpoint, getOllamaModel } from '$lib/ai/ollama-config';
+	// Migrated to $effect - Using Ollama functions directly
 
-	let isInitialized = $state(true); // aiService is always available
+	let isInitialized = $state(true); // Ollama functions are always available
 	let isInitializing = $state(false);
 	let initializationError = $state<string | null>(null);
 
@@ -15,9 +15,9 @@
 	dimensions: number } | null>(null);
 	let isGeneratingEmbedding = $state(false);
 
-	// No initialization needed for aiService
+	// No initialization needed
 	$effect(() => {
-		console.log('✅ AI Service ready (using Ollama backend)');
+		console.log('✅ Ollama service ready');
 	});
 
 	async function generateText() {
@@ -26,11 +26,29 @@
 		isGenerating = true;
 		response = '';
 		try {
-			const result = await aiService.generateText(prompt, {
-				maxTokens: 200,
-				temperature: 0.7
+			const ollamaUrl = getOllamaEndpoint();
+			const model = getOllamaModel();
+
+			const res = await fetch(`${ollamaUrl}/api/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model,
+					prompt,
+					stream: false,
+					options: {
+						temperature: 0.7,
+						num_predict: 200
+					}
+				})
 			});
-			response = result;
+
+			if (!res.ok) {
+				throw new Error(`HTTP ${res.status}`);
+			}
+
+			const data = await res.json();
+			response = data.response;
 		} catch (error) {
 			response = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
 		} finally {
@@ -38,13 +56,13 @@
 		}
 	}
 
-	async function generateEmbedding() {
+	async function generateEmbeddings() {
 		if (!isInitialized) return;
 
 		isGeneratingEmbedding = true;
 		embeddingResult = null;
 		try {
-			const embedding = await aiService.generateEmbedding(embeddingText);
+			const embedding = await generateEmbedding(embeddingText);
 			embeddingResult = {
 				embedding: embedding,
 				dimensions: embedding.length
@@ -99,17 +117,17 @@
 				placeholder="Enter text to embed..."
 				rows="2"
 				class="embedding-input"
-			></textarea>
+		></textarea>
 
-			<button onclick={generateEmbedding} disabled={isGeneratingEmbedding} class="embed-btn">
-				{#if isGeneratingEmbedding}
-					🔄 Generating...
-				{:else}
-					🎯 Generate Embedding
-				{/if}
-			</button>
+		<button onclick={generateEmbeddings} disabled={isGeneratingEmbedding} class="embed-btn">
+			{#if isGeneratingEmbedding}
+				🔄 Generating...
+			{:else}
+				🎯 Generate Embedding
+			{/if}
+		</button>
 
-			{#if embeddingResult}
+		{#if embeddingResult}
 				<div class="embedding-result">
 					<h4>Embedding Result:</h4>
 					<p><strong>Dimensions:</strong> {embeddingResult.dimensions}</p>
