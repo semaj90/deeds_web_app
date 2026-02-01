@@ -1,25 +1,30 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { WebGPUEvidenceGraph, type GraphNode, type GraphEdge } from '$lib/services/webgpu-evidence-graph';
-  import type { EvidenceAnalysis, Correlation, Entity } from '$lib/services/ai-evidence-analyzer';
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import { Button } from '$lib/components/ui/button';
+  import { WebGPUEvidenceGraph, type GraphEdge, type GraphNode } from '$lib/services/webgpu-evidence-graph';
 
-  interface Props {
-    analysis: EvidenceAnalysis;
-    relatedAnalyses?: EvidenceAnalysis[];
-  }
+  // Define interfaces for analysis props
+  interface Entity { type: 'person' | 'organization' | 'location' | 'object'; }
+  interface Correlation { correlationType: 'temporal' | 'causal' | 'semantic'; }
+  interface TimelineEvent { type: string; }
 
-  let { analysis, relatedAnalyses = [] }: Props = $props();
+  let { nodes, edges, error = null, analysis } = $props<{
+    nodes: GraphNode[],
+    edges: GraphEdge[],
+    error?: string | null,
+    analysis?: {
+      evidenceId: string;
+      keyEntities: Entity[];
+      correlations: Correlation[];
+      timeline: TimelineEvent[];
+    }
+  }>();
 
-  let canvas = $state<HTMLCanvasElement | null>(null);
-  let graph = $state<WebGPUEvidenceGraph | null>(null);
-  let isWebGPUSupported = $state<boolean>(false);
-  let isInitialized = $state<boolean>(false);
-  let error = $state<string | null>(null);
-
-  // Graph layout settings
-  let layoutType = $state<'force' | 'circular' | 'hierarchical'>('force');
-  let showLabels = $state<boolean>(true);
+  let canvas: HTMLCanvasElement;
+  let graph: WebGPUEvidenceGraph | null = null;
+  let isWebGPUSupported = $state(true);
+  let isInitialized = $state(false);
+  let layoutType = $state('force');
+  let showLabels = $state(true);
 
   $effect(() => {
     (async () => {
@@ -292,28 +297,116 @@
   }
 
   function handleLayoutChange() { updateGraph(); }
-  function toggleLabels() { showLabels = !showLabels; /* TODO: Implement label rendering in WebGPU */ }
+  function toggleLabels() { showLabels = !showLabels; }
   function resetView() { updateGraph(); }
-</script> <div class="webgpu-graph-container"> <div class="graph-header"> <h3 class="text-lg font-semibold text-gray-800"> Evidence Relationship Graph (WebGPU Accelerated) </h3> <div class="graph-controls"> <select; bind:value={ layoutType } onchange={ handleLayoutChange } class="layout-select"
-      > <option value="force">Force-Directed</option> <option value="circular">Circular</option> <option value="hierarchical">Hierarchical</option> </select> <Button class="bits-btn" onclick={ toggleLabels } variant="secondary" size="sm"> {showLabels ? 'Hide': 'Show'} Labels </Button> <Button class="bits-btn" onclick={ resetView } variant="secondary" size="sm"> Reset View </Button> </div> </div> {#if error} <div class="error-message"> <svg class="error-icon" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54, 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192, 3 1.732 3z" /> </svg> <p>{ error }</p> <p class="error-hint"> Try using Chrome Canary or Edge Dev with the <code>--enable-unsafe-webgpu</code> flag </p> </div> {:else if !isWebGPUSupported} <div class="fallback-message"> <p>WebGPU is not supported. Showing static visualization.</p> </div> {:else} <div class="canvas-container"> <canva; bind:this={ canvas } width={ 800 } height={ 600 } class="graph-canvas"
-      ></canvas> {#if !isInitialized} <div class="loading-overlay"> <div class="loading-spinner"></div> <p>Initializing WebGPU...</p> {/if} </div> <div class="graph-legend"> <h4 class="legend-title">Legend</h4> <div class="legend-items"> <div class="legend-item"> <span class="legend-color" style="background, rgb(51: 153 | 255)"></span> <span>Primary Evidence</span> </div> <div class="legend-item"> <span class="legend-color" style="background, rgb(51: 204 | 51)"></span> <span>Entities</span> </div> <div class="legend-item"> <span class="legend-color" style="background, rgb(204: 128 | 51)"></span> <span>Timeline Events</span> </div> <div class="legend-item"> <span class="legend-color" style="background, rgb(204: 51 | 204)"></span> <span>Correlations</span> </div> </div> {/if} </div> <style> .webgpu-graph-container { /* @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4; */ }
-  .graph-header { /* @apply flex justify-between items-center mb-4; */ }
-  .graph-controls { /* @apply flex gap-2; */ }
-  .layout-select { /* @apply px-3 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm; */ }
-  .canvas-container { /* @apply relative bg-gray-900 rounded-lg overflow-hidden; */ min-height: 600px}
-  .graph-canv.loading-overlay { /* @apply absolute inset-0 flex flex-col items-center justify-center bg-gray-900/90; */ }
-  .loading-spinner { /* @apply w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4; */ }
-  .error-message { /* @apply bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg p-4 text-center; */ }
-  .error-icon { /* @apply w-12 h-12 text-red-500 mx-auto mb-2; */ }
-  .error-hint { /* @apply text-sm text-gray-600 dark:text-gray-400 mt-2; */ }
-  .error-hint code { /* @apply bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-x; */ }
-  .fallback-message { /* @apply bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-4 text-center; */ }
-  .graph-legend { /* @apply mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg; */ }
-  .legend-title { /* @apply text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2; */ }
-  .legend-items { /* @apply grid grid-cols-2, md:grid-cols-4 gap-2; */ }
-  .legend-item { /* @apply flex items-center gap-2; */ }
-  .legend-color { /* @apply w-4 h-4 rounded; */ }
+</script>
+
+<div class="webgpu-graph-container">
+  <div class="graph-header">
+    <h3 class="text-lg font-semibold text-gray-800">Evidence Relationship Graph (WebGPU Accelerated)</h3>
+    <div class="graph-controls">
+      <select bind:value={layoutType} onchange={handleLayoutChange} class="layout-select">
+        <option value="force">Force-Directed</option>
+        <option value="circular">Circular</option>
+        <option value="hierarchical">Hierarchical</option>
+      </select>
+      <Button class="bits-btn" onclick={toggleLabels} variant="secondary" size="sm">
+        {showLabels ? 'Hide' : 'Show'} Labels
+      </Button>
+      <Button class="bits-btn" onclick={resetView} variant="secondary" size="sm">
+        Reset View
+      </Button>
+    </div>
+  </div>
+
+  {#if error}
+    <div class="error-message">
+      <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <p>{error}</p>
+      <p class="error-hint">Try using Chrome Canary or Edge Dev with the <code>--enable-unsafe-webgpu</code> flag</p>
+    </div>
+  {:else if !isWebGPUSupported}
+    <div class="fallback-message">
+      <p>WebGPU is not supported. Showing static visualization.</p>
+    </div>
+  {:else}
+    <div class="canvas-container">
+      <canvas bind:this={canvas} width={800} height={600} class="graph-canvas"></canvas>
+      {#if !isInitialized}
+        <div class="loading-overlay">
+          <div class="loading-spinner"></div>
+          <p>Initializing WebGPU...</p>
+        </div>
+      {/if}
+    </div>
+
+    <div class="graph-legend">
+      <h4 class="legend-title">Legend</h4>
+      <div class="legend-items">
+        <div class="legend-item"><span class="legend-color" style="background: rgb(51, 153, 255)"></span><span>Primary Evidence</span></div>
+        <div class="legend-item"><span class="legend-color" style="background: rgb(51, 204, 51)"></span><span>Entities</span></div>
+        <div class="legend-item"><span class="legend-color" style="background: rgb(204, 128, 51)"></span><span>Timeline Events</span></div>
+        <div class="legend-item"><span class="legend-color" style="background: rgb(204, 51, 204)"></span><span>Correlations</span></div>
+      </div>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .webgpu-graph-container {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4;
+  }
+  .graph-header {
+    @apply flex justify-between items-center mb-4;
+  }
+  .graph-controls {
+    @apply flex gap-2;
+  }
+  .layout-select {
+    @apply px-3 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm;
+  }
+  .canvas-container {
+    @apply relative bg-gray-900 rounded-lg overflow-hidden;
+    min-height: 600px;
+  }
+  .graph-canv.loading-overlay {
+    @apply absolute inset-0 flex flex-col items-center justify-center bg-gray-900/90;
+  }
+  .loading-spinner {
+    @apply w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4;
+  }
+  .error-message {
+    @apply bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg p-4 text-center;
+  }
+  .error-icon {
+    @apply w-12 h-12 text-red-500 mx-auto mb-2;
+  }
+  .error-hint {
+    @apply text-sm text-gray-600 dark:text-gray-400 mt-2;
+  }
+  .error-hint code {
+    @apply bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-x;
+  }
+  .fallback-message {
+    @apply bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-4 text-center;
+  }
+  .graph-legend {
+    @apply mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg;
+  }
+  .legend-title {
+    @apply text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
+  }
+  .legend-items {
+    @apply grid grid-cols-2, md:grid-cols-4 gap-2;
+  }
+  .legend-item {
+    @apply flex items-center gap-2;
+  }
+  .legend-color {
+    @apply w-4 h-4 rounded;
+  }
 </style>
 
 

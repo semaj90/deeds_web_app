@@ -158,7 +158,6 @@
     </div>
   </div>
 </div>
- </button>
 
  <button
  class="px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded-lg transition-colors"

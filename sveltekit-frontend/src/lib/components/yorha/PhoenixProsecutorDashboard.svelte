@@ -1,9 +1,9 @@
 <script lang="ts">
+  import LegalHUD from '$lib/components/evidence-graph/LegalHUD.svelte';
   import GraphView from '$lib/components/GraphView.svelte';
   import { onDestroy, onMount } from 'svelte';
   import ContradictionReveal from './ContradictionReveal.svelte';
   import EvidenceComparisonOverlay from './evidence/EvidenceComparisonOverlay.svelte';
-  import LegalHUD from './LegalHUD.svelte';
   import PhoenixEventMonitor from './PhoenixEventMonitor.svelte';
 
   interface Evidence {
@@ -473,7 +473,7 @@
   <LegalHUD {showHUD} />
 
   <!-- Event Monitor -->
-  <PhoenixEventMonitor {showEventMonitor} />
+  <PhoenixEventMonitor show={showEventMonitor} />
 </div>
 
 
