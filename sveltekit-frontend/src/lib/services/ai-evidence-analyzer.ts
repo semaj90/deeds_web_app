@@ -131,7 +131,7 @@ interface AIEvidenceAnalyzerOptions {
 
 export class AIEvidenceAnalyzer {
     private ollamaEndpoint: string;
-    private embeddingModel = 'nomic-embed-text:latest';
+    private embeddingModel = 'nomic-embed-text:latest'; // CPU-only fallback (768-dim, optimized for inference)
     private analysisModel = 'gemma3-legal:latest';
 
     private pgJsonStore?: PostgresJsonStore;
