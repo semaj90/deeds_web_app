@@ -1,8 +1,7 @@
 <!-- YoRHa Advanced Command Interface - Complete 3D System -->
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { writable, get } from 'svelte/store';
-  import type { SystemMetrics, CommandResult, YoRHaModule, HolographicData } from '$lib/types/yorha-interface';
+  import type { CommandResult, HolographicData, SystemMetrics, YoRHaModule } from '$lib/types/yorha-interface';
+  import { get, writable } from 'svelte/store';
 
   // Interface for command responses
   interface CommandResponse {
@@ -375,9 +374,10 @@
                         <span class="text-cyan-600">$</span>
                         <span class="text-cyan-200 font-bold">{result.command}</span>
                         <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded"
-                              class:text-green-400={result.status==='SUCCESS'}
-                              class:bg-green-900/20={result.status==='SUCCESS'}
-                              class:text-red-400={result.status==='ERROR'}
+                        class:text-green-400={result.status==='SUCCESS'}
+                        class:bg-green-900_20={result.status==='SUCCESS'}
+                        class:text-red-400={result.status==='ERROR'}
+                          >
                               class:bg-red-900/20={result.status==='ERROR'}
                               class:text-yellow-400={result.status==='PROCESSING'}
                               class:bg-yellow-900/20={result.status==='PROCESSING'}>

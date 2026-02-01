@@ -1,6 +1,5 @@
 <!-- YoRHa Detective Modal Component -->
 <script lang="ts">
-  import { onMount } from 'svelte';
   import type { Snippet } from 'svelte';
 
   let {
@@ -84,18 +83,7 @@
   .modal-panel {
       box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
   }
-</style>
-    justify-content: center
-   ; padding: 1rem;
-    z-index: 1000; animation: fadeIn 0.2s ease-in-out}
-  .modal-panel {
-    background-color: #F7F6F2
-   ;border: 1px solid #D1CFC7;
-    border-radius: 0, width: 100%; max-width: 32rem;
-    max-height: 90vh; overflow: hidden;
-    animation: slideIn 0.2s ease-in-out}
   .modal-header {
-    display: flex;
     justify-content: space-between;
     align-items: center; padding: 1.5rem;
     border-bottom: 1px solid #D1CFC7}

@@ -45,7 +45,47 @@ $effect(() => {
 3. **Revert Strategy**: Keep git checkpoints before mass repairs
 4. **Full Rewrites**: Files with >200 errors should be completely rewritten
 
+### bits-ui v2 → Svelte 5 Migration Guide (January 2026)
+
+**Key API Changes:**
+| bits-ui v0.x (Svelte 4) | bits-ui v1.x (Svelte 5) |
+|-------------------------|-------------------------|
+| `el` prop | `ref` prop |
+| `asChild` prop | `child` snippet |
+| `let:` directives | `children` or `child` snippet props |
+| `transition` props | Svelte transitions + `child` + `forceMount` |
+| `<slot>` | `{@render children()}` |
+
+**Component Patterns:**
+```svelte
+<!-- bits-ui v1.x with Svelte 5 -->
+<script lang="ts">
+  import { Button } from 'bits-ui';
+
+  // Svelte 5 runes
+  let count = $state(0);
+  let doubled = $derived(count * 2);
+</script>
+
+<Button.Root onclick={() => count++}>
+  Count: {count} (doubled: {doubled})
+</Button.Root>
+```
+
+**Migration Steps:**
+1. Update bits-ui: `npm install bits-ui@latest`
+2. Replace `el` → `ref` in all component usages
+3. Convert `asChild` to `child` snippets
+4. Replace `<slot>` with `{@render children()}`
+5. Use Svelte 5 event handlers: `onclick` not `on:click`
+
+**shadcn-svelte Replacement:**
+- bits-ui v1.x is now the foundation (not shadcn-svelte)
+- Use raw bits-ui components with custom styling
+- melt-ui is alternative headless option
+
 ---
+
 
 ## 🛡️ Phase 107.1 - Smart Validation Strategy (January 19, 2026)
 

@@ -33,7 +33,7 @@ export { default as localStorageFileFallback } from './services/localStorage-fil
 
 // ===== UTILITIES & TYPES =====
 export {
-    copyToClipboard, debounce, downloadFile, formatDate, formatFileSize, formatProcessingTime, generateId, getCaseStatusStyling, getConfidenceLevel, getEvidenceTypeStyling, getInitials, isBrowser, isValidEmail, storage,
+    cn, confidenceClass, copyToClipboard, debounce, downloadFile, formatDate, formatFileSize, formatProcessingTime, generateId, getCaseStatusStyling, getConfidenceLevel, getEvidenceTypeStyling, getInitials, isBrowser, isValidEmail, legalCn, priorityClass, storage,
     theme, throttle
 } from './utils/index.js';
 

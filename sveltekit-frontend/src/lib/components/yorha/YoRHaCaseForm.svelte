@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { enhancedCaseAPI, type CaseCreationRequest } from '$lib/api/enhanced-case-api';
   import { createCaseCreationForm, FORM_STORAGE_KEYS } from '$lib/forms/superforms-xstate-integration';
-  import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import type { Readable } from 'svelte/store';
   import { get } from 'svelte/store';
   import { z } from 'zod';
@@ -35,7 +35,12 @@
   type CaseCreationSchemaType = z.infer<typeof CaseCreationSchema>;
 
   // Optional callback prop
-  const { onDispatch } = $props<{ onDispatch?: (payload: Record<string, unknown>) => void }>();
+  const { onDispatch, onsuccess, onerror, onclose } = $props<{
+    onDispatch?: (payload: Record<string, unknown>) => void;
+    onsuccess?: (result: unknown) => void;
+    onerror?: (error: { message: string }) => void;
+    onclose?: () => void;
+  }>();
 
   // Minimal typing for the form integration
   type Subscriber<T = unknown> = (value: T) => void;
@@ -77,7 +82,7 @@
   const STORAGE_KEY = FORM_STORAGE_KEYS?.CASE_CREATION ?? 'yorha:case_creation';
   const formStatePersistence = new FormStatePersistence(STORAGE_KEY);
 
-  const dispatch = createEventDispatcher();
+
 
   onMount(() => {
     const savedData = formStatePersistence.load();
@@ -132,7 +137,7 @@
 
   function handleFormSuccess(result: unknown) {
     onDispatch?.({ caseItem: result });
-    dispatch('success', { result });
+    onsuccess?.(result);
     formStatePersistence.clear();
     const r = result as { id?: string };
     if (r.id) {
@@ -143,7 +148,7 @@
   function handleFormError(error: unknown) {
     const msg = error && typeof error === 'object' && 'message' in error ? String((error as any).message) : 'Case creation failed';
     onDispatch?.({ message: msg });
-    dispatch('error', { message: msg });
+    onerror?.({ message: msg });
   }
 
   function nextStep() {
@@ -155,7 +160,7 @@
   }
 
   function handleClose() {
-    dispatch('close');
+    onclose?.();
   }
 </script>
 

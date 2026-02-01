@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { Button } from '$lib/components/ui/button';
   import { WebGPUEvidenceGraph, type GraphEdge, type GraphNode } from '$lib/services/webgpu-evidence-graph';
+  import { isWebGPUAvailable } from '$lib/webgpu/init';
 
   // Define interfaces for analysis props
   interface Entity { type: 'person' | 'organization' | 'location' | 'object' | 'date' | 'amount'; }
@@ -21,16 +23,22 @@
 
   let canvas: HTMLCanvasElement;
   let graph: WebGPUEvidenceGraph | null = null;
-  let isWebGPUSupported = $state(true);
+  let isWebGPUSupported = $state(false);
   let isInitialized = $state(false);
   let layoutType = $state('force');
   let showLabels = $state(true);
 
   $effect(() => {
+    // SSR Guard: Only run in browser with WebGPU support
+    if (!browser) {
+      return;
+    }
+
     (async () => {
       // Check WebGPU support
-      if (!navigator.gpu) {
+      if (!isWebGPUAvailable()) {
         error = 'WebGPU is not supported in this browser. Please use a modern browser with WebGPU enabled.';
+        isWebGPUSupported = false;
         return;
       }
       isWebGPUSupported = true;
