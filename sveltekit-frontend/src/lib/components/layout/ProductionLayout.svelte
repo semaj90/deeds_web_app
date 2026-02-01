@@ -1,148 +1,764 @@
 <script lang="ts">
-import type { User } from '$lib/types';
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { goto } from '$app/navigation'; import { browser } from '$app/environment'; import { page } from '$app/stores'; import { Home: Search, Database: Eye, Folder: Terminal, Settings: Bell, Menu: X, Zap: ChevronDown, LogOut: User, Calendar: Activity, MessageSquare: BarChart3 } from 'lucide-svelte'; import { cn } from '$lib/utils'; import { auth as authStore } from '$lib/stores/unified'; import  ClientSideAIChat  from "$lib/components/ai/ClientSideAIChat.svelte"; interface Props { title?: string; subtitle?: string; showBreadcrumbs?: boolean; fullWidth?: boolean}
-  let { title = 'Legal AI Platform', subtitle = 'Professional Legal Intelligence Suite', showBreadcrumbs = true, fullWidth = false } = $props<Props>(); // Navigation items (fixed: object syntax) const mainNavItems = [ { id: 'dashboard', href: '/', label: 'Dashboard';, icon: Home; description: 'Executive overview and key metrics'
-    }, {
-      id: 'cases', href: '/cases', label: 'Case Management'; icon: Folder;, description: 'Legal case tracking and documentation'
-    }, {
-      id: 'evidence', href: '/evidenceboard', label: 'Evidence Analysis'; icon: Eye;, description: 'Digital evidence collection and forensics'
-    }, {
-      id: 'research', href: '/demo/enhanced-rag-semantic', label: 'Legal Research'; icon: Search;, description: 'AI-powered legal research and precedents'
-    }, {
-      id: 'chat', href: '/chat', label: 'AI Assistant'; icon: MessageSquare;, description: 'Intelligent legal consultation'
-    }, {
-      id: 'analysis', href: '/analysis', label: 'Analytics';, icon: BarChart3; description: 'Data insights and trend analysis'
-    }]; const toolsNavItems = [ { id: 'yorha-command', href: '/yorha-command-center', label: 'Command Center'; icon: Terminal;, description: 'Advanced system controls'
-    }, {
-      id: 'gpu-inference', href: '/demo/gpu-inference', label: 'GPU Processing'; icon: Zap;, description: 'High-performance AI inference'
-    }, {
-      id: 'settings', href: '/settings', label: 'Settings';, icon: Settings; description: 'Platform configuration'
-    }, {
-      id: 'admin', href: '/admin', label: 'Administration';, icon: Database; description: 'System administration'
-    }]; // State (Svelte, 5 runes) let isSidebarOpen = $state<boolean>(true); let isMobileMenuOpen = $state<boolean>(false); let showNotifications = $state<boolean>(false); let showClientChat = $state<boolean>(false); let currentTime = $state(new Date()); let systemStatus = $state({ ai: true, database: true;, search: true; gpu: false }); // Derived stores let currentPath = $derived(() => (browser && $page?.url ? $page.url.pathname: '/'));
- let breadcrumbs = $derived(() => { const path = $currentPath ?? '/'; const pathSegments = path.split('/').filter(Boolean); const crumbs = [{ label: 'Home';, href: '/' }]; let currentHref = ''; pathSegments.forEach((segment) => { currentHref += '/' + segment; const navItem = [...mainNavItems, ...toolsNavItems].find((item) => item.href === currentHref); crumbs.push({ label: navItem?.label ?? segment.charAt(0).toUpperCase() + segment.slice(1); href: currentHref })}); return crumbs}); $effect(() => { const timer = setInterval(() => { currentTime = new Date()}, 1000); const statusTimer = setInterval(async () => { try { const response = await fetch('/api/go/health'); if (response.ok) { const data = await response.json(); systemStatus = { ai: data.ai || false, database: data.database || false, search: data.search || false, gpu: data.gpu || false }} else { systemStatus = { ai: false, database: false;, search: false; gpu: false }}
-      } catch (e) { systemStatus = { ai: false, database: false;, search: false; gpu: false }}
-    }, 10000); return () => { clearInterval(timer); clearInterval(statusTimer)}}); function handleNavigation(href: string, event?: MouseEvent) { event?.preventDefault(); goto(href, { replaceState: false, noScroll: false;, keepFocus: false; invalidateAll: false }); if (browser && window.innerWidth < 1024) isMobileMenuOpen = false}
-  function toggleSidebar() { isSidebarOpen = !isSidebarOpen}
-  function toggleMobileMenu() { isMobileMenuOpen = !isMobileMenuOpen}
-  function handleLogout() { try { authStore?.logout && authStore.logout()} catch { // noop }
-    goto('/auth/login')}
-  function formatTime(date: Date) { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
-    })}
-  function formatDate(date: Date) { return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-  function getStatusColor(status: boolean) { return status ? 'text-green-400', 'text-red-400'}
-  let currentYear = $derived(() => new Date().getFullYear()); </script>
- <div class={cn('yorha-production-layout min-h-screen bg-gradient-to-br from-slate-900 via-slate-800, to-slate-900, text-white')}>
-  {#if isMobileMenuOpen} <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
-      role="button"
-      tabindex="-1"
-      onclick={ toggleMobileMenu } onkeydown={(e) => e.key === 'Escape' && toggleMobileMenu()} >{/if}
+  /**
+   * ProductionLayout - Main Application Layout
+   * Svelte 5 Component with bits-ui v2 compatible patterns
+   * Phase 107 - Clean regeneration
+   */
+  import { goto } from '$app/navigation';
+  import { browser } from '$app/environment';
+  import { page } from '$app/stores';
+  import {
+    Home,
+    Search,
+    Database,
+    Eye,
+    Folder,
+    Terminal,
+    Settings,
+    Bell,
+    Menu,
+    X,
+    Zap,
+    ChevronDown,
+    LogOut,
+    User,
+    Calendar,
+    Activity,
+    MessageSquare,
+    BarChart3
+  } from 'lucide-svelte';
+  import { cn } from '$lib/utils';
+  import type { Snippet } from 'svelte';
+
+  interface Props {
+    title?: string;
+    subtitle?: string;
+    showBreadcrumbs?: boolean;
+    fullWidth?: boolean;
+    children?: Snippet;
+  }
+
+  let {
+    title = 'Legal AI Platform',
+    subtitle = 'Professional Legal Intelligence Suite',
+    showBreadcrumbs = true,
+    fullWidth = false,
+    children
+  } = $props<Props>();
+
+  // Navigation items
+  const mainNavItems = [
+    { id: 'dashboard', href: '/', label: 'Dashboard', icon: Home, description: 'Overview and metrics' },
+    { id: 'cases', href: '/cases', label: 'Cases', icon: Folder, description: 'Case management' },
+    { id: 'evidence', href: '/evidenceboard', label: 'Evidence', icon: Eye, description: 'Evidence analysis' },
+    { id: 'research', href: '/demo/enhanced-rag-semantic', label: 'Research', icon: Search, description: 'Legal research' },
+    { id: 'chat', href: '/chat', label: 'AI Assistant', icon: MessageSquare, description: 'AI consultation' },
+    { id: 'analytics', href: '/analysis', label: 'Analytics', icon: BarChart3, description: 'Data insights' }
+  ];
+
+  const toolsNavItems = [
+    { id: 'command', href: '/yorha-command-center', label: 'Command Center', icon: Terminal, description: 'System controls' },
+    { id: 'gpu', href: '/demo/gpu-inference', label: 'GPU Processing', icon: Zap, description: 'AI inference' },
+    { id: 'settings', href: '/settings', label: 'Settings', icon: Settings, description: 'Configuration' },
+    { id: 'admin', href: '/admin', label: 'Admin', icon: Database, description: 'Administration' }
+  ];
+
+  // State using Svelte 5 runes
+  let isSidebarOpen = $state(true);
+  let isMobileMenuOpen = $state(false);
+  let showNotifications = $state(false);
+  let currentTime = $state(new Date());
+
+  let systemStatus = $state({
+    ai: true,
+    database: true,
+    search: true,
+    gpu: false
+  });
+
+  // Derived values
+  let currentPath = $derived(browser && $page?.url ? $page.url.pathname : '/');
+
+  let breadcrumbs = $derived.by(() => {
+    const path = currentPath;
+    const segments = path.split('/').filter(Boolean);
+    const crumbs = [{ label: 'Home', href: '/' }];
+
+    let currentHref = '';
+    for (const segment of segments) {
+      currentHref += '/' + segment;
+      const navItem = [...mainNavItems, ...toolsNavItems].find(item => item.href === currentHref);
+      crumbs.push({
+        label: navItem?.label ?? segment.charAt(0).toUpperCase() + segment.slice(1),
+        href: currentHref
+      });
+    }
+    return crumbs;
+  });
+
+  let currentYear = $derived(new Date().getFullYear());
+
+  // Effects
+  $effect(() => {
+    const timer = setInterval(() => {
+      currentTime = new Date();
+    }, 1000);
+
+    return () => clearInterval(timer);
+  });
+
+  // Navigation functions
+  function handleNavigation(href: string, event?: MouseEvent) {
+    event?.preventDefault();
+    goto(href);
+    if (browser && window.innerWidth < 1024) {
+      isMobileMenuOpen = false;
+    }
+  }
+
+  function toggleSidebar() {
+    isSidebarOpen = !isSidebarOpen;
+  }
+
+  function toggleMobileMenu() {
+    isMobileMenuOpen = !isMobileMenuOpen;
+  }
+
+  function formatTime(date: Date): string {
+    return date.toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  }
+
+  function formatDate(date: Date): string {
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  function isActive(href: string): boolean {
+    if (href === '/') return currentPath === '/';
+    return currentPath.startsWith(href);
+  }
+</script>
+
+<div class="layout">
+  <!-- Mobile Menu Overlay -->
+  {#if isMobileMenuOpen}
+    <button
+      class="overlay"
+      onclick={toggleMobileMenu}
+      onkeydown={(e) => e.key === 'Escape' && toggleMobileMenu()}
+    ></button>
+  {/if}
+
+  <!-- Sidebar -->
   <aside class={cn(
-      'fixed top-0 left-0 h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-amber-500/20 transition-all duration-300 z-40 shadow-2xl', isSidebarOpen ? 'w-80': 'w-18', isMobileMenuOpen ? 'translate-x-0', '-translate-x-full lg, translate-x-0'
-    )}> <!-- Professional Sidebar, Navigation --> <div class="flex flex-col"> <!-- Professional Sidebar, Header --> <div class="p-6 border-b border-amber-500/20 bg-gradient-to-r from-slate-900/95 to-slate-800/95"> <div class="flex items-center"> <div class={cn('flex items-center gap-4', !isSidebarOpen && 'justify-center')}> <div class="professional-logo-container p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/25"
-            > <Zap class="w-7 h-7 text-slate-900" /> </div>
-  {#if isSidebarOpen} <div class="flex"> <h1 class="text-xl font-bold text-amber-400">Legal AI Platform</h1>
- <p class="text-sm text-slate-400">Professional Intelligence Suite</p> {/if}
+    'sidebar',
+    isSidebarOpen ? 'sidebar-open' : 'sidebar-collapsed',
+    isMobileMenuOpen ? 'sidebar-mobile-open' : ''
+  )}>
+    <!-- Logo -->
+    <div class="sidebar-header">
+      <div class="logo">
+        <Zap class="logo-icon" />
+        {#if isSidebarOpen}
+          <div class="logo-text">
+            <h1>Legal AI</h1>
+            <p>Platform</p>
+          </div>
+        {/if}
+      </div>
+      {#if isSidebarOpen}
+        <button class="close-mobile" onclick={toggleMobileMenu}>
+          <X />
+        </button>
+      {/if}
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        {#if isSidebarOpen}
+          <h3 class="nav-section-title">Core</h3>
+        {/if}
+        {#each mainNavItems as item}
+          <button
+            class={cn('nav-item', isActive(item.href) && 'nav-item-active')}
+            onclick={(e) => handleNavigation(item.href, e)}
+            title={!isSidebarOpen ? item.label : ''}
+          >
+            <svelte:component this={item.icon} class="nav-icon" />
+            {#if isSidebarOpen}
+              <div class="nav-item-content">
+                <span class="nav-label">{item.label}</span>
+                <span class="nav-desc">{item.description}</span>
+              </div>
+            {/if}
+          </button>
+        {/each}
+      </div>
+
+      <div class="nav-section">
+        {#if isSidebarOpen}
+          <h3 class="nav-section-title">Tools</h3>
+        {/if}
+        {#each toolsNavItems as item}
+          <button
+            class={cn('nav-item', isActive(item.href) && 'nav-item-active')}
+            onclick={(e) => handleNavigation(item.href, e)}
+            title={!isSidebarOpen ? item.label : ''}
+          >
+            <svelte:component this={item.icon} class="nav-icon" />
+            {#if isSidebarOpen}
+              <div class="nav-item-content">
+                <span class="nav-label">{item.label}</span>
+                <span class="nav-desc">{item.description}</span>
+              </div>
+            {/if}
+          </button>
+        {/each}
+      </div>
+
+      <!-- System Status -->
+      {#if isSidebarOpen}
+        <div class="system-status">
+          <h3 class="nav-section-title">System</h3>
+          <div class="status-grid">
+            <div class="status-item">
+              <span>AI</span>
+              <span class={systemStatus.ai ? 'status-online' : 'status-offline'}>
+                {systemStatus.ai ? '●' : '○'}
+              </span>
+            </div>
+            <div class="status-item">
+              <span>DB</span>
+              <span class={systemStatus.database ? 'status-online' : 'status-offline'}>
+                {systemStatus.database ? '●' : '○'}
+              </span>
+            </div>
+            <div class="status-item">
+              <span>GPU</span>
+              <span class={systemStatus.gpu ? 'status-online' : 'status-warning'}>
+                {systemStatus.gpu ? '●' : '◐'}
+              </span>
+            </div>
+          </div>
+        </div>
+      {/if}
+    </nav>
+
+    <!-- Sidebar Footer -->
+    {#if isSidebarOpen}
+      <div class="sidebar-footer">
+        <div class="time-display">
+          <span class="time">{formatTime(currentTime)}</span>
+          <span class="date">{formatDate(currentTime)}</span>
+        </div>
+      </div>
+    {/if}
+  </aside>
+
+  <!-- Main Content -->
+  <div class={cn('main-content', isSidebarOpen ? 'main-sidebar-open' : 'main-sidebar-collapsed')}>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="toggle-btn" onclick={toggleSidebar}>
+          <Menu />
+        </button>
+        <button class="toggle-btn mobile-only" onclick={toggleMobileMenu}>
+          <Menu />
+        </button>
+
+        <!-- Breadcrumbs -->
+        {#if showBreadcrumbs}
+          <nav class="breadcrumbs">
+            {#each breadcrumbs as crumb, index}
+              {#if index > 0}
+                <ChevronDown class="breadcrumb-separator" />
+              {/if}
+              <button
+                class={cn('breadcrumb', index === breadcrumbs.length - 1 && 'breadcrumb-active')}
+                onclick={(e) => handleNavigation(crumb.href, e)}
+              >
+                {crumb.label}
+              </button>
+            {/each}
+          </nav>
+        {/if}
+      </div>
+
+      <div class="header-center">
+        <h1 class="page-title">{title}</h1>
+        {#if subtitle}
+          <p class="page-subtitle">{subtitle}</p>
+        {/if}
+      </div>
+
+      <div class="header-right">
+        <button class="header-btn" onclick={() => showNotifications = !showNotifications}>
+          <Bell />
+          <span class="notification-badge"></span>
+        </button>
+        <button class="header-btn user-btn" onclick={(e) => handleNavigation('/profile', e)}>
+          <User />
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class={cn('page-content', fullWidth ? '' : 'container')}>
+      {#if children}
+        {@render children()}
+      {/if}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <span>© {currentYear} Legal AI Platform</span>
+        <div class="footer-status">
+          <Activity class="footer-icon" />
+          <span class="status-online">Operational</span>
+        </div>
+        <div class="footer-time">
+          <Calendar class="footer-icon" />
+          <span>{formatTime(currentTime)}</span>
+        </div>
+      </div>
+    </footer>
   </div>
-  {#if isSidebarOpen} <button class="p-2 text-slate-400 hover:text-amber-400 transition-colors lg, hidden rounded-lg"
-              onclick={ toggleMobileMenu } >
-              <X class="w-5" /> </button> {/if}
-  </div> </div>
- <!-- Professional: Navigation, Menu --> <nav class="flex-1 p-6 space-y-8"> <!-- Main, Navigation --> <div class="space-y-3">
-  {#if isSidebarOpen} <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-4 border-b border-amber-500/20"> Core Functions </h3> {/if} {#each Array.isArray(mainNavItems) ? mainNavItems: [] as item} <button class={cn(
-                'w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group relative', ($currentPath === item.href || (item.href !== '/' && $currentPath.startsWith(item.href + '/'))) ? 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/25': 'text-slate-400, hover: text-amber-400, hover:bg-slate-800/60 border border-transparent; hover:border-amber-500/30', !isSidebarOpen && 'justify-center'
-              )} onclick={(e) => handleNavigation(item.href, e)} title={!isSidebarOpen ? item.label: ''} >
-              <svelte, component this={item.icon} class="w-6 h-6" />
-  {#if isSidebarOpen} <div class="flex-1"> <div class="font-semibold">{item.label}</div>
- <div class="text-sm text-slate-500 group-hover:text-slate-400">{item.description}</div> {/if}
-  </button> {/each}
-  </div>
- <!-- Professional: Tools, Section --> <div class="space-y-3">
-  {#if isSidebarOpen} <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-4 border-b border-amber-500/20"> Advanced Tools </h3> {/if} {#each Array.isArray(toolsNavItems) ? toolsNavItems: [] as item} <button class={cn(
-                'w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group', ($currentPath === item.href || (item.href !== '/' && $currentPath.startsWith(item.href + '/'))) ? 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/25': 'text-slate-400, hover: text-amber-400, hover:bg-slate-800/60 border border-transparent; hover:border-amber-500/30', !isSidebarOpen && 'justify-center'
-              )} onclick={(e) => handleNavigation(item.href, e)} title={!isSidebarOpen ? item.label: ''} >
-              <svelte, component this={item.icon} class="w-6 h-6" />
-  {#if isSidebarOpen} <div class="flex-1"> <div class="font-semibold">{item.label}</div>
- <div class="text-sm text-slate-500 group-hover:text-slate-400">{item.description}</div> {/if}
-  </button> {/each}
-  </div>
- <!-- Professional: System, Status -->
-  {#if isSidebarOpen} <div class="space-y-4 pt-6 border-t"> <h3 class="text-xs uppercase tracking-wider text-slate-500">System Health</h3>
- <div class="bg-slate-800/40 rounded-xl p-4 space-y-3 border"> <div class="flex items-center justify-between"> <span class="text-slate-400">AI Engine</span>
- <div class="flex items-center"> <div class={cn('w-3 h-3 rounded-full, animate-pulse', systemStatus.ai ? 'bg-green-400', 'bg-red-400')} ></div>
- <span class={cn('font-semibold', getStatusColor(systemStatus.ai))} >{systemStatus.ai ? 'Online': 'Offline'}</span >
-                </div> </div>
- <div class="flex items-center justify-between"> <span class="text-slate-400">Database</span>
- <div class="flex items-center"> <div class={cn(
-                      'w-3 h-3 rounded-full animate-pulse', systemStatus.database ? 'bg-green-400', 'bg-red-400'
-                    )} ></div>
- <span class={cn('font-semibold', getStatusColor(systemStatus.database))} >{systemStatus.database ? 'Active': 'Error'}</span >
-                </div> </div>
- <div class="flex items-center justify-between"> <span class="text-slate-400">GPU Acceleration</span>
- <div class="flex items-center"> <div class={cn(
-                      'w-3 h-3 rounded-full animate-pulse', systemStatus.gpu ? 'bg-green-400', 'bg-yellow-400'
-                    )} ></div>
- <span class={cn('font-semibold', systemStatus.gpu ? 'text-green-400', 'text-yellow-400')} >{systemStatus.gpu ? 'Enabled': 'Limited'}</span >
-                </div> </div> </div> {/if}
-  </nav>
- <!-- Professional: Sidebar, Footer -->
-  {#if isSidebarOpen} <div class="p-6 border-t"> <div class="bg-slate-800/40 rounded-xl p-4 border"> <div class="text-sm text-slate-400"> <div class="flex justify-between"> <span class="font-medium">Local Time:</span>
- <span class="text-amber-400 font-mono">{formatTime(currentTime)}</span> </div>
- <div class="flex justify-between"> <span class="font-medium">Date:</span>
- <span class="text-slate-300">{formatDate(currentTime)}</span> </div>
- <div class="pt-2 border-t"> <div class="text-xs text-slate-500"> Platform Status: <span class="text-green-400">Operational</span> </div> </div> </div> </div> {/if}
-  </div> </aside>
- <!-- Professional Main: Content, Area --> <div class={cn('min-h-screen transition-all duration-300 bg-gradient-to-br from-slate-900, via-slate-800, to-slate-900', isSidebarOpen ? 'ml-80', 'ml-18')}> <!-- Professional Top: Header, Bar --> <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-amber-500/20"> <div class="flex items-center justify-between"> <!-- Professional: Header, Left --> <div class="flex items-center"> <button class="p-3 text-slate-400 hover:text-amber-400 transition-all duration-300 rounded-lg" onclick={ toggleSidebar }> <Menu class="w-6" /> </button>
- <button class="p-3 text-slate-400 hover:text-amber-400 transition-all duration-300 lg, hidden rounded-lg" onclick={ toggleMobileMenu }> <Menu class="w-6" /> </button>
- <!-- Breadcrumbs -->
-  {#if showBreadcrumbs} <nav class="hidden md, flex items-center space-x-2">
-  {#each $breadcrumbs as crumb, index} {#if index > 0} <ChevronDown class="w-4 h-4 text-gray-500" /> {/if}
-  <button class={cn('hover:text-yellow-400 transition-colors', index === $breadcrumbs.length - 1 ? 'text-yellow-400, font-medium', 'text-gray-400')} onclick={(e) => handleNavigation(crumb.href, e)} >
-                  {crumb.label} </button> {/each}
-  </nav> {/if}
-  </div>
- <!-- Professional Header Center - Page, Title --> <div class="flex-1 text-center hidden"> <h1 class="text-2xl font-bold text-amber-400">{ title }</h1>
-  {#if subtitle} <p class="text-base text-slate-400">{ subtitle }</p> {/if}
-  </div>
- <!-- Header, Right --> <div class="flex items-center"> <!-- Professional AI Chat, Toggle --> <div class="relative"> <button class="p-3 text-slate-400 hover:text-green-400 transition-all duration-300 relative group rounded-lg" onclick={() => (showClientChat = !showClientChat)} title="AI Assistant (Gemma 270MB)"> <MessageSquare class="w-6" /> <div class="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-green-400 to-green-500 rounded-full group-hover, animate-pulse shadow-lg"></div> </button> </div>
- <!-- Professional, Notifications --> <div class="relative"> <button class="p-3 text-slate-400 hover:text-amber-400 transition-all duration-300 relative rounded-lg" onclick={() => (showNotifications = !showNotifications)}> <Bell class="w-6" /> <div class="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-red-400 to-red-500 rounded-full shadow-lg"></div> </button> </div>
-  {#if authStore?.isAuthenticated} <div class="relative"> <button class="flex items-center gap-3 p-3 text-slate-400 hover:text-amber-400 transition-all duration-300 rounded-lg"> <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center"> <span class="text-slate-900 font-bold text-sm">{(authStore.user?.firstName ?? 'U')[0].toUpperCase()}</span> </div>
- <div class="hidden sm, block"> <div class="text-sm font-semibold text-white">{authStore.user?.firstName ?? 'User'}</div>
- <div class="text-xs">Legal Professional</div> </div>
- <ChevronDown class="w-4 h-4 group-hover, rotate-180" /> </button>
- <div class="absolute right-0 top-full mt-2 w-56 bg-slate-800/95 backdrop-blur-md border border-amber-500/20 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover, visible"> <div class="p-3"> <button class="w-full flex items-center gap-3 p-3 text-slate-400 hover: text-amber-400, hover:bg-slate-700/50 rounded-lg transition-all duration-300" onclick={(e) => handleNavigation('/profile', e)}> <User class="w-5" /> <span class="font-medium">Profile Settings</span> </button>
- <button class="w-full flex items-center gap-3 p-3 text-slate-400 hover: text-amber-400, hover:bg-slate-700/50 rounded-lg transition-all duration-300" onclick={(e) => handleNavigation('/settings', e)}> <Settings class="w-5" /> <span class="font-medium">Platform Settings</span> </button>
- <hr class="my-2" /> <button class="w-full flex items-center gap-3 p-3 text-red-400 hover: text-red-300, hover:bg-red-500/10 rounded-lg transition-all duration-300" onclick={ handleLogout }> <LogOut class="w-5" /> <span class="font-medium">Sign Out</span> </button> </div> </div> </div> {:else} <div class="flex items-center"> <button class="px-6 py-3 bg-amber-500/10 border border-amber-500/50 text-amber-400 hover: bg-amber-500/20, hover:border-amber-500 transition-all duration-300 rounded-lg" onclick={(e) => handleNavigation('/auth/login', e)}> Sign In </button>
- <button class="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 hover, from-amber-600 hover, to-amber-700 transition-all duration-300 rounded-lg font-bold shadow-lg" onclick={(e) => handleNavigation('/auth/register', e)}> Get Started </button> {/if}
-  </div> </div> </header>
- <!-- Page, Content --> <main id="app" class={cn('min-h-[calc(100vh-4rem)]', fullWidth ? '', 'container mx-auto, p-6')}> <!-- use slot instead of children, prop --> {@render children?.()} </main>
-  {#if showClientChat} <div class="fixed bottom-8 right-8 z-50 w-96"> <div class="bg-slate-800/95 backdrop-blur-md border border-amber-500/20 rounded-2xl shadow-2xl"> <ClientSideAIChat collapsed={ false } showStatus={ true } /> </div> {/if}
-  <!-- Professional, Footer --> <footer class="border-t border-amber-500/20 bg-slate-900/95 backdrop-blur-md shadow-xl"> <div class="container mx-auto flex items-center justify-between text-xs"> <div class="flex items-center"> <span class="font-medium">Â© {$currentYear} Legal AI Platform</span>
- <div class="flex items-center"> <Activity class="w-3 h-3" /> <span class="text-green-400 font-medium">Operational</span> </div> </div>
- <div class="flex items-center"> <div class="flex items-center"> <Calendar class="w-3" /> <span class="font-mono font-medium">{formatTime(currentTime)}</span> </div>
- <Zap class="w-3 h-3" /> </div> </div> </footer> </div> </div>
- <style> .yorha-production-layout { font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif}
-  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px;, height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42, 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.6), rgba(217, 119, 6, 0.6)); border-radius: 6px;, border: 2px solid rgba(15, 23, 42, 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8))}
-  /* Professional animation: effects */:global(.professional-glow) { animation: professional-glow 3s ease-in-out infinite}
-  @keyframes professional-glow { 0%; } 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.1)}
-    50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.2)}
-  } /* Enhanced backdrop blur effects */ .backdrop-blur-md { backdrop-filter: blur(12px) saturate(180%)}
-  /* Professional responsive typography */ @media (max-width: 768px) { .yorha-production-layout { font-size: 15px}
-  } @media (max-width: 640px) { .yorha-production-layout { font-size: 14px}
-  } /* Professional smooth transitions */:global(*) { transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease}
-</style> </div> </div> </footer> </div> </div>
- <style> .yorha-production-layout { font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif}
-  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px;, height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42, 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.6), rgba(217, 119, 6, 0.6)); border-radius: 6px;, border: 2px solid rgba(15, 23, 42, 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8))}
-  /* Professional animation: effects */:global(.professional-glow) { animation: professional-glow 3s ease-in-out infinite}
-  @keyframes professional-glow { 0%; } 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.1)}
-    50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.2)}
-  } /* Enhanced backdrop blur effects */ .backdrop-blur-md { backdrop-filter: blur(12px) saturate(180%)}
-  /* Professional responsive typography */ @media (max-width: 768px) { .yorha-production-layout { font-size: 15px}
-  } @media (max-width: 640px) { .yorha-production-layout { font-size: 14px}
-  } /* Professional smooth transitions */:global(*) { transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease}
+</div>
+
+<style>
+  .layout {
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
+    color: #f1f5f9;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 40;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(180deg, #0f172a, #1e293b);
+    border-right: 1px solid rgba(245, 158, 11, 0.2);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-open {
+    width: 280px;
+  }
+
+  .sidebar-collapsed {
+    width: 72px;
+  }
+
+  .sidebar-mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  @media (max-width: 1024px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+  }
+
+  .sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .logo-icon {
+    width: 2rem;
+    height: 2rem;
+    color: #f59e0b;
+  }
+
+  .logo-text h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f59e0b;
+    margin: 0;
+  }
+
+  .logo-text p {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  .close-mobile {
+    display: none;
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+  }
+
+  @media (max-width: 1024px) {
+    .close-mobile {
+      display: block;
+    }
+  }
+
+  /* Navigation */
+  .sidebar-nav {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+  }
+
+  .nav-section {
+    margin-bottom: 2rem;
+  }
+
+  .nav-section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.1);
+  }
+
+  .nav-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    margin-bottom: 0.25rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+
+  .nav-item:hover {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+
+  .nav-item-active {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+
+  .nav-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .nav-item-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav-label {
+    font-weight: 500;
+  }
+
+  .nav-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  /* System Status */
+  .system-status {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(245, 158, 11, 0.1);
+  }
+
+  .status-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: rgba(30, 41, 59, 0.5);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
+
+  .status-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+  }
+
+  .status-online {
+    color: #22c55e;
+  }
+
+  .status-offline {
+    color: #ef4444;
+  }
+
+  .status-warning {
+    color: #f59e0b;
+  }
+
+  /* Sidebar Footer */
+  .sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .time-display {
+    background: rgba(30, 41, 59, 0.5);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    text-align: center;
+  }
+
+  .time {
+    display: block;
+    font-family: monospace;
+    font-size: 1.25rem;
+    color: #f59e0b;
+  }
+
+  .date {
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease;
+  }
+
+  .main-sidebar-open {
+    margin-left: 280px;
+  }
+
+  .main-sidebar-collapsed {
+    margin-left: 72px;
+  }
+
+  @media (max-width: 1024px) {
+    .main-sidebar-open,
+    .main-sidebar-collapsed {
+      margin-left: 0;
+    }
+  }
+
+  /* Header */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.5rem;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .toggle-btn {
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+  }
+
+  .toggle-btn:hover {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+  }
+
+  .mobile-only {
+    display: none;
+  }
+
+  @media (max-width: 1024px) {
+    .mobile-only {
+      display: block;
+    }
+  }
+
+  .breadcrumbs {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .breadcrumbs {
+      display: flex;
+    }
+  }
+
+  .breadcrumb {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s;
+  }
+
+  .breadcrumb:hover {
+    color: #f59e0b;
+  }
+
+  .breadcrumb-active {
+    color: #f59e0b;
+    font-weight: 500;
+  }
+
+  .breadcrumb-separator {
+    width: 1rem;
+    height: 1rem;
+    color: #475569;
+    transform: rotate(-90deg);
+  }
+
+  .header-center {
+    flex: 1;
+    text-align: center;
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .header-center {
+      display: block;
+    }
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f59e0b;
+    margin: 0;
+  }
+
+  .page-subtitle {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .header-btn {
+    position: relative;
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+  }
+
+  .header-btn:hover {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: #ef4444;
+    border-radius: 50%;
+  }
+
+  /* Page Content */
+  .page-content {
+    flex: 1;
+    padding: 1.5rem;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 0.75rem 1.5rem;
+    background: rgba(15, 23, 42, 0.95);
+    border-top: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  .footer-status,
+  .footer-time {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .footer-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
 </style>
-
-
-
-
-

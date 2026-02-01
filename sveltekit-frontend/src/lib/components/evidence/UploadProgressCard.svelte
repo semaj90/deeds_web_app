@@ -23,7 +23,7 @@
  failed: 'Processing failed'
  };
 
- const getStageIcon = (stage: ProcessingStage, null): string => {
+ const getStageIcon = (stage: ProcessingStage | null): string => {
  switch (stage) {
  case 'classification':
  return '📋';
