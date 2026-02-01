@@ -6,7 +6,8 @@
 	}
 
 	let {
-		value = $bindable('', class: className = '',
+		value = $bindable(''),
+		class: className = '',
 		type = 'text',
 		...restProps
 	}: Props = $props();

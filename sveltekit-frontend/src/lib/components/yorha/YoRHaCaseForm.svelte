@@ -4,8 +4,18 @@
   import { enhancedCaseAPI, type CaseCreationRequest } from '$lib/api/enhanced-case-api';
   import { createCaseCreationForm, FORM_STORAGE_KEYS } from '$lib/forms/superforms-xstate-integration';
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+  import type { Readable } from 'svelte/store';
   import { get } from 'svelte/store';
   import { z } from 'zod';
+
+  // Temporary polyfill for FormStatePersistence if missing
+  class FormStatePersistence {
+    private key: string;
+    constructor(key: string) { this.key = key; }
+    save(data: any) { if (typeof localStorage !== 'undefined') localStorage.setItem(this.key, JSON.stringify(data)); }
+    load() { if (typeof localStorage !== 'undefined') { const s = localStorage.getItem(this.key); return s ? JSON.parse(s) : null; } return null; }
+    clear() { if (typeof localStorage !== 'undefined') localStorage.removeItem(this.key); }
+  }
 
   // Enhanced Zod schema for case creation with legal AI context
   const CaseCreationSchema = z.object({
