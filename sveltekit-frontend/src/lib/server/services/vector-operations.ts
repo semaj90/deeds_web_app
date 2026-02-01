@@ -3,6 +3,7 @@ import { upsertVector, searchVector } from './qdrant-adapter.js';
 import { setEmbedding } from './redis-adapter.js';
 import { saveJsonbDocument } from './pg-jsonb.js';
 import { validateEmbedding, validatePositiveInt } from '../utils/service-error.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** see PRODUCTION TODO block above **/
 export async function storeDocumentWithEmbedding(

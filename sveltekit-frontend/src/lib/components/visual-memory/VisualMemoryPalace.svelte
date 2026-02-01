@@ -4,6 +4,8 @@
 	import yorhaMipmapShaders from '$lib/components/three/yorha-ui/webgpu/YoRHaMipmapShaders.svelte';
 	import { calculateDocumentPriority } from '$lib/config/legal-priorities';
 	import { componentTextureRegistry } from '$lib/registry/texture-component-registry';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	interface MemoryGlyph {

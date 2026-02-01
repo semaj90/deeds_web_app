@@ -4,6 +4,7 @@
  */
 
 import type { RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types
 export interface SSRResponse<T = unknown> {

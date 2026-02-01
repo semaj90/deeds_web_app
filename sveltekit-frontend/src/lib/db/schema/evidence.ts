@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { integer, json, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Enums
 export const evidenceTypeEnum = pgEnum('evidence_type', [

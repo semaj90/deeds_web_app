@@ -12,6 +12,7 @@ import type { AnswerGenerationRequest, AnswerGenerationResponse,
     KBSearchResponse, SourceValidationRequest, SourceValidationResponse } from '$lib/types/source-validation';
 
 import { SourceValidationError } from '$lib/types/source-validation';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const API_BASE_URL = import.meta.env?.VITE_API_URL ?? 'http://localhost:8000';
 const KB_API_PREFIX = '/api/kb';

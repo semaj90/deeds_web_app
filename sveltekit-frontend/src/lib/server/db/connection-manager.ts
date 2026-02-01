@@ -8,6 +8,7 @@ import pgClient, { poolShim } from '$lib/server/db-shim';
 import { getDatabaseConfig, validateDatabaseConfig } from '$lib/config/database.js';
 import * as schema from './schema-postgres.js';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Minimal pool/client types
 type LocalClientLike = {

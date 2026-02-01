@@ -8,6 +8,8 @@
  */
 
 import type { simdTextTilingEngine,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 $1;$2 } from '$lib/ai/simd-text-tiling-engine.js';
 
 export interface TextTileRenderConfig {

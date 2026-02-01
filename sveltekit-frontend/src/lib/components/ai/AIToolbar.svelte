@@ -10,6 +10,7 @@
   import Search from 'lucide-svelte/icons/search';
   import Sparkles from 'lucide-svelte/icons/sparkles';
   import Zap from 'lucide-svelte/icons/zap';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Exported props (use standard exports to avoid svelte-preprocess type errors)
   const { onAISearch } = $props<{ onAISearch, ((res: any) }>()

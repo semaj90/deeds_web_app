@@ -2,6 +2,8 @@
     import { enhance } from '$app/forms';
     import { page } from '$app/stores';
     import { ChatSession } from '$lib/models/ChatSession.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
     let { data } = $props(); // Load initial history from server load function
 

@@ -6,6 +6,7 @@
 import { DocumentLoader } from './document-loader.js';
 import { EmbeddingIndexer } from './embedding-indexer.js';
 import { processDocument, type ProcessedDocument } from './document-processor.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IngestionConfig {
 	localBasePath?: string;

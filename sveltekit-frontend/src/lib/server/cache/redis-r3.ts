@@ -1,5 +1,6 @@
 import type { EmbeddingResult, QuantizedEmbedding } from '$lib/shared/embedding-types';
 import { createClient } from 'redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 class RedisR3Cache {
 	private client: any;

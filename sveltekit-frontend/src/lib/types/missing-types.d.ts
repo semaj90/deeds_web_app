@@ -1,4 +1,5 @@
 import type { TextChunk } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // TypeScript declarations for missing types across the codebase // This file resolves many TS2304: "Cannot find name" errors // Engine/Graphics types
 declare class ShaderCache {
  static get(_key: string): unknown;

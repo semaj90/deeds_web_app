@@ -11,6 +11,7 @@ import { getGRPOPolicy } from '$lib/services/error-analysis/GRPOPolicy';
 import { getLearningPipeline } from '$lib/services/error-analysis/LearningPipeline';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {

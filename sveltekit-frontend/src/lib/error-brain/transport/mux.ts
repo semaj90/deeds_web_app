@@ -5,6 +5,7 @@
 
 import type { ErrorBrainEvent } from '../types.js';
 import type { ErrorBrainTransport } from './interface.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class MuxTransport implements ErrorBrainTransport {
  constructor(private transports: ErrorBrainTransport[]) {}

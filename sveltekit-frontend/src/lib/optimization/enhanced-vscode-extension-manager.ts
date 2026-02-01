@@ -1,4 +1,5 @@
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 EventEmitter }
 from 'events';
 // Import vscode only when available (safe require) vscode: unknown = null try {

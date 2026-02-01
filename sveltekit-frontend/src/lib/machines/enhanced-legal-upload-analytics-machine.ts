@@ -1,5 +1,6 @@
 import { assign, createActor, createMachine } from 'xstate';
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Enhanced Types for Legal AI Integration
 export interface UploadContext {

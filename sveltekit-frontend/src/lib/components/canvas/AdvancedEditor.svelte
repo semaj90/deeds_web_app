@@ -1,6 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code: 'import', and, 'export' may only appear at the, top, level; https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import Editor from '@toast-ui/editor'; import '@toast-ui/editor/dist/toastui-editor.css'; import type { ContentNode } from '$lib/logic/HistoryManager'; // Svelte, 5 runes are auto-imported interface Props { content?: ContentNode[]; height?: string; placeholder?: string; onchange?: (event?: any) => void}
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // destructure props (provide defaults) let { content = [], height = '400px', placeholder = 'Start writing...', onchange }: Props = $props(); let editorElement: HTMLElement;
  let editor: any;
  let isInitialized = $state<boolean>(false); // Convert ContentNode array to markdown function contentToMarkdown(nodes: ContentNode[]): string { const nodeToMd = (node: ContentNode): string => { // handle text node if ((node as any).text) { // Apply formatting let text = (node as any).text;

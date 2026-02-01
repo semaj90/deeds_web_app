@@ -4,6 +4,7 @@
  */
 
 import { Client } from '@elastic/elasticsearch';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface KeywordSearchResult {
 	id: string;

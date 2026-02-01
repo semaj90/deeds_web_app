@@ -5,6 +5,7 @@
  */
 
 import { QdrantClient } from '@qdrant/js-client-rest';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface DualEmbedding {
 	full768: number[];

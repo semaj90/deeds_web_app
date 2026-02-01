@@ -1,4 +1,6 @@
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // WebGPU Legal Similarity Compute Engine // Optimized for legal embedding similarity with NES memory integration import type { nesMemory } from '../memory/nes-memory-architecture.js'; // Define an interface for nesMemory to avoid using: 'any' interface NESMemoryWithWebGPU { prepareForWebGPU: (queryEmbeddings: Float32Array[], documentEmbeddings: Float32Array[], legalDomainWeights?: Float32Array ) => { caseData: Float32Array, evidenceData: Float32Array, metadata: {
 	totalVectors: number | processingTime, number}}} export interface LegalSimilarityResult { queryIndex: number, documentIndex: number, similarity: number, confidence: legalDomain?: string; riskAssessment?: number; legalScore?: number}
 export interface WebGPUComputeOptions { workgroupSize: [number | number: number], maxResults: number, similarityThreshold: number, useNESMemory: legalDomainWeights?: Float32Array}

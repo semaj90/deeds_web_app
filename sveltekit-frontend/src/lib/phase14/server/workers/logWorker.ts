@@ -7,6 +7,7 @@ getEmbedding }
 from '$lib/server/services/embeddingService';
 // You'll create this'
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 storeLogInVectorDB }
 from '$lib/server/services/vectorDBService';
 // You'll create this'

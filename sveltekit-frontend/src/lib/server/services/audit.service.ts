@@ -5,6 +5,7 @@
 
 import db from '$lib/server/db';
 import { auditLog } from '$lib/server/db/schema';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AuditLogEntry {
     userId: string;

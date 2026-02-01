@@ -1,4 +1,5 @@
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // @ts-nocheck - Complex experimental service with external dependencies
 /*
  * WebAssembly Legal Document Processor

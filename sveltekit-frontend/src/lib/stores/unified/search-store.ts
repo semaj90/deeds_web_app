@@ -1,5 +1,6 @@
 import type { SearchResult } from '$lib/types';
 import { derived, writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Types

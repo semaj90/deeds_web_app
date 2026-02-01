@@ -1,4 +1,5 @@
 import type { Document as BaseDocument } from '$lib/types';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 // XState Machine Types for Legal AI Platform
 
 // AI Assistant Events - Strongly Typed (XState v5 Compatible)

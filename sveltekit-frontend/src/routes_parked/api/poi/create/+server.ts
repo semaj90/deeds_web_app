@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types.js';
 import type { db } from '$lib/server/db/drizzle';
 import type { persons } from '$lib/server/db/schema-poi';
 import type { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
  try {

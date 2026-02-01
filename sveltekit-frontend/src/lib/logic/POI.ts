@@ -11,6 +11,7 @@ who: string;
 // Motivations, connections, reasons how: string;
 // Methods, capabilities, resources }
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 constructor }
 from 'function Object() {
 [native code] }';

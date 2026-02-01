@@ -5,6 +5,7 @@
 import Loki from 'lokijs';
 // import { cache } from '$lib/server/cache/redis.js'; // Unused?
 import type { IngestionJob } from '$lib/machines/ingestion-workflow-machine.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface JobRecord extends IngestionJob {
     // LokiJS metadata

@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Minimal Schema to avoid undefined error if not imported yet
 const schema = z.any();

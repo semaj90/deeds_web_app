@@ -13,6 +13,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { vector } from 'pgvector/drizzle-orm';
 import { cases, evidence, legalDocuments, users } from './schema-postgres.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Evidence Chain of Custody
 export const evidenceChainOfCustody = pgTable('evidence_chain_of_custody', {

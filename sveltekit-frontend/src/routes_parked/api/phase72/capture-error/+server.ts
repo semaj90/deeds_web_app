@@ -3,13 +3,14 @@ import { pool } from '$lib/server/db.ts';
 import { json } from '@sveltejs/kit';
 import crypto from 'node:crypto';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type CapturePayload = {
- route?: string;, file_path: string;
+ route?: string; file_path: string;
  line?: number;
  col?: number;
  code?: string;
- severity?: string;, message: string;
+ severity?: string; message: string;
  phase?: number;
  cycle?: number;
 };

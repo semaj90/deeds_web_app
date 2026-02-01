@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/private';
 import type { IOllamaEmbeddingService } from '$lib/types/external-services';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const API_URL = env?.OLLAMA_API_URL || env?.OLLAMA_ENDPOINT || 'http://localhost:11434';
 const MODEL = env?.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';

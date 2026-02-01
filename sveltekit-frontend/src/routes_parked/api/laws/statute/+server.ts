@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { enrichStatute } from '$lib/server/statute-enrichment';
 import { logStatuteView } from '$lib/server/timeline-logger';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
  const citation = url.searchParams.get('citation')?.trim();

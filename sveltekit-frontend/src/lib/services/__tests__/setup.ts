@@ -1,5 +1,6 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // src/lib/services/__tests__/setup.ts import type { beforeEach, vi } from 'vitest'; import type { LegalAIServiceMap } from '../types.js'; // Mock service implementations for unit testing export const mockServices: LegalAIServiceMap = { // Authentication services, validateCredentials: vi.fn().mockResolvedValue({
 	valid: true, id: 'test-123', userId: 'test-123', token: 'mock-auth-token', role: 'attorney' },
 	refreshAuthToken: vi.fn().mockResolvedValue({

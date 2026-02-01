@@ -6,6 +6,7 @@
 
 import crypto from 'crypto';
 import { redisService } from './redis-service.js';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface VectorCacheEntry {
 	results: unknown[];

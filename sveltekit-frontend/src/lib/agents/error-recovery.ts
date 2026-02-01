@@ -6,6 +6,7 @@
  */
 
 import { ToolResult } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Error recovery strategies for different failure modes

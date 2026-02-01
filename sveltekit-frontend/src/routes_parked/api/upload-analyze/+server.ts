@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Mock implementation for demonstration purposes.
 // In a real application, this would handle file uploads,

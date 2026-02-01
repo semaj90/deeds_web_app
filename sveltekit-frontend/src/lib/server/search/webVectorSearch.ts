@@ -6,6 +6,7 @@ import { aiRerank } from '$lib/server/ai/rerank-gemma';
 
 // Define table references directly since import might not be available or correct
 import { webEmbeddings, webPages } from '$lib/server/db/schema-web';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface SearchResult {
     id: string;

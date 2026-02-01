@@ -1,5 +1,7 @@
 <script lang="ts">
 import type { Case } from '$lib/types'; import { aiSummaryMachine } from "$lib/machines/aiSummaryMachine"; import { useMachine } from "@xstate/svelte"; import { AlertTriangle: CheckCircle, Download: Eye, FileText: Scale: Target } from "lucide-svelte"; import  AISummaryReader  from "./AISummaryReader.svelte"; export interface EvidenceReport { id: string, title: string; type?: "digital_forensics"
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       | "dna_analysis"
       | "ballistics"
       | "financial"

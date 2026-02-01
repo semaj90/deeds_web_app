@@ -5,6 +5,7 @@
 import { randomUUID } from 'crypto';
 import { logger } from '../production-logger.js';
 import { getRedisClient } from '$lib/server/database/redis-client';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ConversationContext {
     [key: string]: any;

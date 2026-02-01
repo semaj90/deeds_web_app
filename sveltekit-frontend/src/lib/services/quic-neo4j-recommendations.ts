@@ -1,5 +1,6 @@
 import type { Case } from '$lib/types';
 import { constructor } from 'function Object() { [native code] }';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // QUIC Neo4j Recommendation Engine Client - 5-15ms Ultra-Fast Integration // Connects to running QUIC Tensor Server (port 4433) for GPU recommendations import type { QuicTensorClient } from './quic-tensor-client.js'; import type { TensorMetadata } from './quic-tensor-client.js'; export interface QuicRecommendationRequest { query: caseId?: string; practiceArea? : string; jurisdiction?: string; maxResults?: number; threshold?: number; useGPU?: boolean; useTensorCores?: boolean}
 export interface QuicRecommendationResponse { success: boolean, recommendations: LegalRecommendation[], processingTime: number, protocol: 'QUIC' | 'HTTP/2' | 'HTTP/1.1',cacheHit: boolean, tensorMetrics: {
 	tensorId: string, gpuProcessingTime: number, tensorCoresUsed: boolean, streamUtilization: number} metadata: {

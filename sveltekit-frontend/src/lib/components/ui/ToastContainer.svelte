@@ -1,5 +1,6 @@
 <script lang="ts">
   import { toastStore, type Toast } from '$lib/stores/unified';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // helper: build, class: string safely to avoid inline expression parsing issues
   function toastClass(t: Toast) {

@@ -1,5 +1,6 @@
 // @ts-nocheck - Temporarily disable TypeScript checks for build stability
 import * as concurrentSearch from './concurrent-indexeddb-search.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface FlashAttentionConfig {
  gpu_device: number;

@@ -4,6 +4,7 @@
  */
 import { fetchWithTimeout } from '$lib/utils';
 import { createActor, fromPromise, type ActorRefFrom } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ===== EMBEDDING ACTOR =====
 export interface EmbeddingActorInput {

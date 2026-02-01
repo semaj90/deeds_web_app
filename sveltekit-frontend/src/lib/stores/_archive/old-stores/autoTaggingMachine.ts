@@ -1,4 +1,5 @@
 import type { assign, createMachine, fromPromise } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AutoTagContext {
  selectedNode: any;

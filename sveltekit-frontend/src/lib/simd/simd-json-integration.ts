@@ -1,6 +1,7 @@
 import type { Message } from '$lib/types';
 import type { User } from '$lib/types';
 import { dev } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** SIMD JSON Integration for WebAssembly Architecture */
 const USE_SIMDJSON = process.env.USE_SIMDJSON_NODE === '1' || dev;

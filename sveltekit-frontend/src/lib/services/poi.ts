@@ -4,6 +4,7 @@
  */
 
 import type { KnownAssociate, PersonOfInterest,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     POICreateRequest, POIListResponse,
     POISearchRequest, POISearchResult } from '$lib/types/poi';
 

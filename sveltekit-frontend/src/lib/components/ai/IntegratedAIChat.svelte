@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'; import { Button } from '$lib/components/ui/enhanced-bits'; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Separator  from "$lib/components/ui/separator/Separator.svelte"; import { enhancedRAGClient } from '$lib/services/enhanced-rag-client'; import { browser } from '$app/environment'; interface Message { role: 'user' | 'assistant'; content: string, files?: FileAttachment[]; metadata?: MessageMetadata,timestamp: number}
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface FileAttachment { name: string, size: number;
 	type: string, url?: string}
   interface MessageMetadata { confidence?: number; tokensPerSecond?: number; ragResults?: number; processingTime?: number; model?: string}

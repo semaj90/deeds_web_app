@@ -5,6 +5,7 @@ import type { Case } from '$lib/types';
 	learningRate: number, batchSize: number, epochs: number, warmupSteps: number, saveSteps: number}; datasetConfig: {
 	maxLength: number, promptTemplate: string, validationSplit: number}; outputDir: string, useReinforcementLearning: boolean, enableUserAnalytics: boolean}
 import type { Writable } from "stream";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export interface TrainingDataPoint { id: string, caseId: string, prompt: string, completion: string, metadata: {
 	documentType: 'case' | 'evidence' | 'brief' | 'statute',jurisdiction: string, practiceArea: string, complexity: number, userInteraction: {
 	timeSpent: number, corrections: number, confidence: number, feedback: string}}; createdAt: embedding?: Float32Array}

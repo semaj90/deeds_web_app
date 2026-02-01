@@ -1,6 +1,7 @@
 import { pipeline, env } from '@xenova/transformers';
 import type { config } from "process";
 import type { text } from "stream/consumers";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Configure transformers to use local models and avoid remote fetching
 env.localModelPath = '/models';

@@ -11,6 +11,7 @@ import type {
 listeners }
 from "process";
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 TransitionPrediction }
 from './hmm-transition-predictor.js';
 type RawClusterEvent = {

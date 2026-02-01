@@ -7,6 +7,7 @@ import { getRedisClient } from '$lib/server/cache/redis';
 import { db } from '$lib/server/db';
 import * as schema from '$lib/server/db/schema-postgres';
 import ollamaService from '$lib/server/services/ollama-service'; // Placeholder import
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface UserType {
 	id: string;

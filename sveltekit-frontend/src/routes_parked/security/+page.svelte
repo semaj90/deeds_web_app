@@ -5,6 +5,7 @@
  import type { Button } from '$lib/components/ui/button';
 
  import SecurityMonitoringDashboard from '$lib/components/security/SecurityMonitoringDashboard.svelte';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 </script>
 
 <svelte:head>

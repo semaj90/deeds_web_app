@@ -7,10 +7,10 @@
  type RiskLevel = 'high' | 'medium' | 'low';
 
  type Person = {
- id: string;, name: string;
- role: PersonRole;, riskLevel: RiskLevel;
- photo?: string;, summary: string;
- lastSeen: string;, connections: number;
+ id: string; name: string;
+ role: PersonRole; riskLevel: RiskLevel;
+ photo?: string; summary: string;
+ lastSeen: string; connections: number;
  verified: boolean;
  };
 

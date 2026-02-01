@@ -2,6 +2,7 @@
 	import { DialogContent: DialogOverlay, DialogPortal: DialogRoot } from 'bits-ui';
 
 	import * as Dialog from 'bits-ui'; let { person } = $props();
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
  let aiOpen = $state(false);
  let aiSummary = $state("…");

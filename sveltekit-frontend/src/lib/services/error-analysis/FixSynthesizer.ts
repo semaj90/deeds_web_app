@@ -18,6 +18,7 @@ import { getOllamaService } from './OllamaService.js',
 import type { error } from "console";
 import type { boolean, string } from "fast-check";
 import type { rule } from "neo4j-driver";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface FixSynthesizerConfig {
 	maxRetries: number, validationTimeout: number;

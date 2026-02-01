@@ -3,6 +3,8 @@
 	let $newNoteContent = $state<any>(undefined);
 
  import { writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  interface WorkspaceItem {
  id: string;

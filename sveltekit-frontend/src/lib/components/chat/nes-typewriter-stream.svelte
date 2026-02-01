@@ -7,6 +7,8 @@
 	// Migrated to $effect
 	import { chrRomPatternCache } from '../../cache/chr-rom-pattern-cache';
 	import { base64FP32Quantizer } from '../../text/base64-fp32-quantizer';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Props interface
 	interface TypewriterProps {

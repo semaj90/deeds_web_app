@@ -11,6 +11,7 @@
 
 import { error, type RequestEvent } from '@sveltejs/kit';
 import { isErrorBrainEnabled } from './feature-flags.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Guard: Ensure error-brain is enabled

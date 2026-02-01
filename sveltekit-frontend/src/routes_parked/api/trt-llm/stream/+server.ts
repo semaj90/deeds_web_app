@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import {  env  } from '$env /dynamic/private';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function POST({ request }) {
  try {

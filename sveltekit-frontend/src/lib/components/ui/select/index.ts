@@ -8,6 +8,7 @@ import SelectRoot from './SelectRoot.svelte';
 import SelectSeparator from './SelectSeparator.svelte';
 import SelectTrigger from './SelectTrigger.svelte';
 import SelectValue from './SelectValue.svelte';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 // Named exports
 export {

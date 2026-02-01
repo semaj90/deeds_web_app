@@ -4,6 +4,7 @@
     // Migrated to $effect
     import { fade, slide } from 'svelte/transition';
     import { createActor } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     const actor = createActor(documentUploadMachine).start();
 

@@ -16,6 +16,7 @@ import { gpuService } from "$lib/services/gpu-acceleration-service";
 import { rabbitmqService } from "$lib/services/rabbitmq-service";
 import VectorService from "$lib/services/vector-service";
 import { evidenceStore } from "$lib/stores/unified/evidence-store";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const vectorService = new VectorService();
 const EvidenceCardAny = EvidenceCard as any;

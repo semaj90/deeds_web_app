@@ -1,5 +1,6 @@
 import { SSE } from '$lib/server/sse';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ request, locals }) => {
     // 1. Initialize SSE helper

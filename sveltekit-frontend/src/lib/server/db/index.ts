@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 // @ts-ignore
 import postgres from 'postgres';
 import * as schema from './schema';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Use legal_ai_db as the default database
 const DEFAULT_DATABASE_URL = 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';

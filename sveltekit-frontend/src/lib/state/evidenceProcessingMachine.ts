@@ -4,6 +4,7 @@
  * Handles the complete lifecycle of evidence from upload to AI analysis
  */
 import { assign, fromPromise, setup } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types for the state machine
 export interface EvidenceProcessingContext {

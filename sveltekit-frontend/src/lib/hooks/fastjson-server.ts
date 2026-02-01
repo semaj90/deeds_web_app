@@ -8,6 +8,7 @@
 import type { Handle } from '@sveltejs/kit';
 import { fastjson } from '$lib/json/fastjson';
 import { json } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const fastjsonHook: Handle = async ({ event, resolve }) => {
  // Only intercept API routes

@@ -4,6 +4,7 @@ import { fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { evidenceUploadSchema } from '$lib/schemas/evidence';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
  const session = locals.session as any;

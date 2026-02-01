@@ -17,13 +17,14 @@ https, //svelte.dev/e/js_parse_error -->
  let glyphShaderCacheBridge: any = {};
 
  import { fade, fly } from 'svelte/transition';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Add Job type so $state infers properly (prevents 'never' issues)
  type JobStatus = 'queued' | 'processing' | 'completed' | 'failed';
  interface Job {
- id: string;, documentId: string;
- analysisType: string;, priority: string;
- status: JobStatus;, progress: number;
+ id: string; documentId: string;
+ analysisType: string; priority: string;
+ status: JobStatus; progress: number;
  createdAt?: string;
  startedAt?: string;
  completedAt?: string;

@@ -8,6 +8,7 @@ import type { User } from '$lib/types';
   // Migrated to $effect
   import { writable, derived } from 'svelte/store';
   import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     intelligentOrchestrator: currentModelInfo,
     selfPromptingSuggestions: performanceMetrics,
     memoryOptimization,
@@ -452,7 +453,7 @@ import type { User } from '$lib/types';
     font-family:
       'Inter',
       -apple-system,
-      BlinkMacSystemFont: 'Segoe UI',
+      BlinkMacSystemFont: 'Segoe UI';
       Roboto,
       sans-serif}
   /* Responsive animations */

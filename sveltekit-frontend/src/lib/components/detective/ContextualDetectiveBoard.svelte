@@ -6,6 +6,7 @@
   import HeadlessTypingListener from '$lib/components/HeadlessTypingListener.svelte';
   import type { TypingContext, TypingState } from '$lib/machines/userTypingStateMachine';
   import DetectiveWebSocketManager, { type CollaborativeUser } from '$lib/websocket/DetectiveWebSocketManager';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // Props interface

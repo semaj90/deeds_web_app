@@ -1,4 +1,5 @@
 import type { AITask, AITaskType, APIResponse, WorkerMessage, WorkerMessageType, WorkerStatus } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // --- TYPE GUARD UTILITIES ---
 // This file provides type guard functions for safely handling union types and

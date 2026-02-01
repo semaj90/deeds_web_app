@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET /api/system/services

@@ -7,6 +7,7 @@
 	// Migrated to $effect
 	import { cubicOut, elasticOut } from 'svelte/easing';
 	import { scale, slide } from 'svelte/transition';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface RecentCase {
 		id: string;

@@ -1,5 +1,6 @@
 import * as amqp from 'amqplib';
 import type { Connection, Channel, Options } from 'amqplib';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 let connection: Connection | null = null;
 let channel: Channel | null = null;

@@ -1,5 +1,6 @@
 import { execa } from 'execa';
 import type { ValidationResult, ValidationScope } from './validationTypes.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class ValidationService {
  constructor(private readonly cwd: string) {}

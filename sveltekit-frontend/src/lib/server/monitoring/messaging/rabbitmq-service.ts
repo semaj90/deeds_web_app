@@ -1,5 +1,7 @@
 /** * RabbitMQ Message Queue Service * Production-ready messaging system for async task processing */
 import amqp, { type Channel, type Connection } from 'amqplib';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // RabbitMQ configuration
 const RABBITMQ_CONFIG = {

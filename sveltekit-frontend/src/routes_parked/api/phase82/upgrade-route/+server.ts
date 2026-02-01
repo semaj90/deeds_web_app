@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { spawn } from 'node:child_process';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
  const { route } = (await request.json().catch(() => ({}))) as {
@@ -18,7 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const result = await new Promise<{
  code: number | null;
- stdout: string;, stderr: string;
+ stdout: string; stderr: string;
  }>((resolve) => {
  const child = spawn(cmd, args, {
  cwd: process.cwd(shell, process.platform === 'win32',

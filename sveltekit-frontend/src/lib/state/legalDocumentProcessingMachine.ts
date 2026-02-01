@@ -5,6 +5,7 @@
  * Powers: Legal document ingestion pipeline
  */
 import { assign, fromPromise, setup } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface LegalDocumentContext {
  documentId: string | null;

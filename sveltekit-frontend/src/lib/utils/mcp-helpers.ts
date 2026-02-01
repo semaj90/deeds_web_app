@@ -1,4 +1,6 @@
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /// <reference, types="vite/client" /> // Removed unused fs import to satisfy lint/tsc. // Define minimal interfaces for services we call so we avoid `any`.
 interface AutoGenService {
  executeLegalWorkflow?: (workflow: string, prompt: string, context?: unknown) => Promise<unknown>;

@@ -5,6 +5,8 @@
    * Supports PDFs, videos, images - auto-detected and analyzed
    */
   import type { AIMetadata, UploadedFile } from '$lib/stores/ui-store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     accept?: string;

@@ -5,6 +5,7 @@
 
 import { spawn } from 'child_process';
 import path from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const phase89Tools = {
 	/**

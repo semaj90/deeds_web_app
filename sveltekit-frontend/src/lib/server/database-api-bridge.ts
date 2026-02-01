@@ -1,6 +1,7 @@
 import type { Message } from '$lib/types';
 import type { Case } from '$lib/types';
 import { queryLegalDocumentsSSR, type SSRResponse } from './api-ssr-helpers.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Database API Bridge - Connects PostgreSQL schema with API endpoints

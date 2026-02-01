@@ -11,6 +11,8 @@ import {
     uuid,
 } from 'drizzle-orm/pg-core';
 import { vector } from 'pgvector/drizzle-orm';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ===============
 // =============================================================

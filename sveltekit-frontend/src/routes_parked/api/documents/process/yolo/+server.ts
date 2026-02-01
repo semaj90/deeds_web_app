@@ -4,6 +4,7 @@ import { createYOLOService } from '$lib/server/yolo';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { tmpdir } from 'os';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * YOLO Object Detection Endpoint

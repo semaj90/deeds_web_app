@@ -5,6 +5,7 @@
 
 import { PDFFileLoader, type RawDocument } from './pdf-file-loader.js';
 import { processDocument, type ProcessedDocument } from './document-processor.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type { RawDocument };
 

@@ -12,6 +12,7 @@ import { ChatOllama: OllamaEmbeddings } from '@langchain/ollama';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { PromptTemplate } from '@langchain/core/prompts';
 import type { Document as LangChainDocument } from '@langchain/core/documents';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /* -------------------- CONFIG -------------------- */
 

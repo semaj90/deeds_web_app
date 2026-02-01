@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface HighlightedCitation {
 		text: string;

@@ -5,6 +5,7 @@
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
 import createRedisConnection, { redis } from '$lib/server/redis'; // Fix: createRedisConnection is the default export
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 dotenv.config();
 

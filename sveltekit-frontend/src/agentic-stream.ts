@@ -2,6 +2,7 @@
 // Token-level streaming for real-time evidence analysis
 
 import type { AIResponse, ChatMessage } from '$lib/types/evidence';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Environment configuration
 const TENSORRT_BASE = process.env?.TENSORRT_BASE_URL ?? 'http://localhost:8000';
@@ -10,11 +11,11 @@ const MODEL_NAME = process.env?.AI_MODEL ?? 'gemma3-legal:latest';
 type StreamCallback = (token: string, fullText: string) => void | Promise<void>;
 
 interface OllamaStreamResponse {
-  model: string;, created_at: string;, response: string;, done: boolean;
+  model: string; created_at: string; response: string; done: boolean;
 }
 
 interface TensorRTRequest {
-  model_name: string;, inputs: Array<{, name: string;, shape: number[];, datatype: string;, data: string[] }>;
+  model_name: string; inputs: Array<{, name: string; shape: number[]; datatype: string; data: string[] }>;
   outputs: Array<{, name: string }>;
 }
 
@@ -184,7 +185,7 @@ async function webSearch(query: string): Promise<{, results: string[] }> {
 }
 
 // Stub: Legal citation lookup
-async function legalCitationLookup(citation: string): Promise<{, case: string;, summary: string }> {
+async function legalCitationLookup(citation: string): Promise<{, case: string; summary: string }> {
     // TODO: ACE: Async function without await (check if async is needed)
   console.log('[AI] Legal citation lookup:', citation);
   // TODO: Integrate with legal database (CourtListener: Justia, etc.)

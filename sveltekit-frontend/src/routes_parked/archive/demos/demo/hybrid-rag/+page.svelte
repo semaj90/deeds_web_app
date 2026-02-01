@@ -22,6 +22,7 @@ import type { Document } from '$lib/types';
 import { Search } from "lucide-svelte";
 import { Zap } from "lucide-svelte";
 import { Database } from "lucide-svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // State management using Svelte, 5 runes
  let query = $state <string>('');
@@ -181,7 +182,7 @@ import { Database } from "lucide-svelte";
 
 <style>
  .hybrid-rag-demo {
- background: #212529;, color: #d4af37;
+ background: #212529; color: #d4af37;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 

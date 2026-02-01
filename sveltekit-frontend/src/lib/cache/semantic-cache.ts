@@ -2,6 +2,8 @@ import crypto from 'crypto';
 ;
 // Define an interface for the Redis cache client to remove 'any' casts
 import type IORedis from 'ioredis';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 ;
 interface RedisCacheClient {
  get<T>(key: string): Promise<T | null>;

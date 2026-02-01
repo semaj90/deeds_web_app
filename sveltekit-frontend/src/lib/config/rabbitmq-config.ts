@@ -1,6 +1,7 @@
 import type { Message } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * RabbitMQ Configuration for Background Job Processing * Handles embedding generation and document processing queues */ export interface RabbitMQConfig { connection: {
 	protocol: 'amqp' | 'amqps',hostname: string, port: number, username: string, password: string, vhost: heartbeat?: number; connection_timeout?: number; channel_max?: number}; exchanges: {
 	name: string, type: 'direct' | 'topic' | 'fanout' | 'headers'; options?: { durable?: boolean; autoDelete?: boolean}}]; queues: {

@@ -1,5 +1,6 @@
 <!-- Legal AI Dashboard - Modern Svelte, 5 Component Comprehensive dashboard showing cases, evidence, reports, and real-time, processing --> <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { apiClient } from '$lib/services/enhanced-api-client'; import { toast } from 'svelte-sonner'; // State using Svelte, 5 runes let cases = $state<any[]>([]); let evidence = $state<any[]>([]); let reports = $state<any[]>([]); let personsOfInterest = $state<any[]>([]); let loading = $state<boolean>(true); let error = $state<string | null>(null); let selectedTab = $state<string>('overview'); let refreshInterval = $state<ReturnType<typeof setInterval> | null>(null); // Statistics let stats = $state({ totalCases: 0, totalEvidence: 0, totalReports: 0, totalPersons: 0, activeCases: 0, pendingAnalysis: 0, recentActivity: 0 }); // Real-time processing status let systemHealth = $state({ api: 'unknown', database: 'unknown', aiServices: 'unknown', jobQueue: 'unknown'
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }); // Tabs configuration const tabs = [ { id: 'overview', label: 'Overview', icon: 'ðŸ“Š' },
 	{ id: 'cases', label: 'Cases', icon: 'âš–ï¸' },
 	{ id: 'evidence', label: 'Evidence', icon: 'ðŸ”' },

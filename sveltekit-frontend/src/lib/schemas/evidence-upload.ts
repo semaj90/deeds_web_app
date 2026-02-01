@@ -3,6 +3,7 @@
  * Integrates with Superforms for type-safe file uploads
  */
 import { z } from 'zod';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Define EvidenceMetadata type locally since schema-unified-postgres doesn't exist
 export type EvidenceMetadata = {

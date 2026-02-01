@@ -8,6 +8,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { statuteChunks, statutes } from '../db/schema-postgres.js';
 import { generateEmbedding } from './embedding-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface StatuteSource {
  title: string;

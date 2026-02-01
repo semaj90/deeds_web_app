@@ -6,6 +6,7 @@
  */
 import { createClient, type RedisClientType } from 'redis';
 import type { IRedisCacheService, CacheSetOptions } from '$lib/types/external-services';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface RedisConfig {
   url?: string;

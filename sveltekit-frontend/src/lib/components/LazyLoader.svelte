@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { LazyComponentState } from '$lib/utils/intersection-observer.js';
 	import type { Snippet } from 'svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
 		preset?: string;

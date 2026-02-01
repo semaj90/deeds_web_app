@@ -8,6 +8,7 @@ import { createYOLOService } from '$lib/server/yolo';
 import { createONNXService } from '$lib/server/onnx';
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Multi-Engine Document Processing API
 export const POST: RequestHandler = async ({ request }) => {

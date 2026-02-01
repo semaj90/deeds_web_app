@@ -1,5 +1,6 @@
 import type { Document } from '$lib/types';
 import nodejsOrchestrator from "$lib/utils/fuse-import";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * Complete Service Router & Integration Layer * Routes all, 33 Go microservices with error handling and fallback */ // Removed unused import of `dev` which caused lint/parse confusion in some TS setups. // (import type { dev } from '$app/environment';) export interface ServiceEndpoint { name: string, port: number, string[], category: string, health: string, status: 'running' | 'stopped' | 'unknown'} // Replace `any` defaults and add small typed shapes used across the router export interface ServiceResponse<T = unknown> { success: data? , T; error? : string; service?: string; protocol?: string; latency?: number} // Small, lightweight payload/result types to avoid `any` export type RAGContext = Record<string, unknown>, export type UploadMetadata = Record<string, unknown>, export interface VectorSearchResult { documents: unknown[], total?, number}
 ;
 export interface GPUProcessResult { result?: unknown; details?: Record<string, unknown>}

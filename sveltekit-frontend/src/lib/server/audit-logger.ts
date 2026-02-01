@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { AuthenticatedUser } from './auth-guard.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AuditEntry {
 	timestamp: string;

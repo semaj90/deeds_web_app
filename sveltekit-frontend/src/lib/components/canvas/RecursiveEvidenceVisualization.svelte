@@ -2,6 +2,8 @@
  import { fabric } from 'fabric';
  import { evidenceHierarchy, processingStatus, recursionMetrics } from '$lib/stores/evidence-stores.js';
  import { writable, type Writable } from 'svelte/store'; // Ensure imported values are Svelte stores (wrap plain values in writable stores) function ensureStore<T>(maybeStore: unknown;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	initial: T): Writable<T> { if (maybeStore && typeof maybeStore.subscribe === 'function') return maybeStor; return writable<T>(maybeStore ?? initial)}
   const evidenceHierarchyStore = ensureStore<any>(evidenceHierarchy, null);
    const processingStatusStore = ensureStore<any>(processingStatus, 'idle');

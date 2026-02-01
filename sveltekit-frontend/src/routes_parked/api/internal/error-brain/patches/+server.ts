@@ -8,6 +8,7 @@ import db from '$lib/server/db/drizzle';
 import { errorBrainDiffs } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
 import { desc, eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET /api/internal/error-brain/patches

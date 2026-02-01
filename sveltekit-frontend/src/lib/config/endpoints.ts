@@ -1,5 +1,7 @@
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * Production Service Endpoints Configuration * * Centralized endpoint management for all services * Supports Docker, local dev, and production environments */ // Environment detection const IS_BROWSER = typeof window !== 'undefined'; const IS_DOCKER = process.env.DOCKER === 'true' || process.env.RUNNING_IN_DOCKER === 'true'; // Base URLs const getEnv = (key: string), string: string => { if (IS_BROWSER) { return (import.meta.env asnull)[`VITE_${ key }`] || (import.meta.env asnull)[key] || fallback} return process.env[key] || fallback}; /** * Service Endpoints */ export const ENDPOINTS = { // Database postgres: { $1: $2'DATABASE_URL', 'postgresql://legal_admin: 123456@localhost: 5432/legal_ai_db', host: IS_DOCKER ? 'postgres' : 'localhost', port: IS_DOCKER ? 5432 : 5434 },
 	// Cache & Search redis: {
 	url: getEnv('REDIS_URL', 'redis://localhost: 6379', host: IS_DOCKER ? 'redis' : 'localhost', port: 6379, password: getEnv('REDIS_PASSWORD', '') },

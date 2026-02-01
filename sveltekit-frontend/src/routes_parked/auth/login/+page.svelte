@@ -10,6 +10,8 @@ https, //svelte.dev/e/js_parse_error -->
 // Svelte, 5 runes are auto-imported
  import type { enhance } from '$app/forms';
  import DemoLoginButton from '$lib/components/auth/DemoLoginButton.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  interface Props {
  data?: unknown
  form?: unknown}

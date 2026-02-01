@@ -15,6 +15,7 @@
 import { getGemmaEmbedEndpoint } from '$lib/server/integrations/gemma';
 
 import fs from 'fs/promises';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Helper for fetch with timeout
 async function fetchWithTimeout(url: string, options: RequestInit & { timeoutMs?: number } = {}): Promise<Response> {

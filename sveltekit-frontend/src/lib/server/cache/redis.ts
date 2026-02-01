@@ -4,6 +4,7 @@
  */
 
 import { createClient } from 'redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379/0';
 

@@ -4,6 +4,7 @@
  import { aiService } from '$lib/services/aiService';
  import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
  import { Edit: Save, Sparkles: Tag, User as UserIcon: X } from "lucide-svelte"; // Simple POI interface for the component export interface POIData { id: string, name: string, posX: number, posY: number, relationship?: string;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	caseId: string, aliases?: string[]; profileImageUrl?: string; profileData?: {
 	who: string, what: string;
 	why: string; how: string}

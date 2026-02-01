@@ -1,5 +1,7 @@
 import type { LegalNote, NoteFilters } from '$lib/types/notes';
 import { derived, writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Stores
 export const legalNotes = writable<LegalNote[]>([]);

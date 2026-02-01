@@ -8,6 +8,7 @@ import {
 desc, eq, sql }
 from 'drizzle-orm';
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 randomUUID }
 from 'crypto';
 // Use InferModel or define types directly for better compatibility type NewChatSession = typeof chatSessions.$inferInsert ;

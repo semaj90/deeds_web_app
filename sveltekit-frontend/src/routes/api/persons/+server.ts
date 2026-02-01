@@ -2,6 +2,7 @@ import { db, personsOfInterest } from '$lib/server/db/client';
 import { error, json } from '@sveltejs/kit';
 import { and, desc, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET /api/persons

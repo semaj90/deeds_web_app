@@ -94,6 +94,7 @@ function astNodeToRouteNode(astNode: Record<string, unknown>): RouteNode {
 // ─────────────────────────────────────────────────────────
 
 import { getAllEnrichedRouteMetadata } from '$lib/db/queries/nes-command-center';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * 6.1: Query database for route metadata directly

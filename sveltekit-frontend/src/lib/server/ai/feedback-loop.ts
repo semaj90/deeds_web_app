@@ -1,4 +1,5 @@
 import logger from "../logger"
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // lib/server/ai/feedback-loop.ts // Machine learning feedback loop for continuous improvement of AI synthesis import type { logger } from './logger.js'; export interface FeedbackData { requestId: string, userId: string, rating: number; // 1-5 stars feedback?: string; improvedResponse?: string}
 export interface InteractionData { requestId: string, query: string, result: unknown, userId: string, timestamp: Date}

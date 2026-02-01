@@ -1,4 +1,6 @@
 import type { EmbeddingResult } from "./error-analysis/OllamaService";
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Enhanced Legal NLP Service using Transformers.js // Implements sentence transformers for YoRHa Legal AI Platform import {  pipeline, env, type Pipeline  } from '@xenova/transformers'; // Lightweight in-memory LRU + optional Redis cache + metrics hooks import type { Redis } from 'ioredis'; export interface CacheLayer { get(_key: string): Promise<EmbeddingResult | undefined> | EmbeddingResult | undefined; set(_key: string, value: Promise<void> | void, has? (_key : string): boolean | Promise<boolean>}
 class LRUCache implements CacheLayer { private max: number, private map = new Map<string, EmbeddingResult>(); constructor(max = 500) { this.max = max} get(k: any, string: any) { const v = this.map.get(k); if (!v) return; this.map.delete(k); this.map.set(k, v); return v} set(k: string): EmbeddingResult { if (this.map.has(k)) this.map.delete(k); this.map.set(k, v); if (this.map.size > this.max) { const first = this.map.keys().next().value; this.map.delete(first)}

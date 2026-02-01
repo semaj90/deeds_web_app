@@ -1,5 +1,6 @@
 import { env } from '$lib/env';
 import { Client } from 'minio';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Centralized MinIO client initialization
 let minioClient: Client | null = null;

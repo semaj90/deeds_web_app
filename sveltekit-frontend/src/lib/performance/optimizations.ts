@@ -2,6 +2,7 @@ import { getRedisConfig } from '$lib/config/redis-config';
 import { createRedisInstance } from '$lib/server/redis';
 import { sql } from 'drizzle-orm';
 import type { Redis } from 'ioredis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Mock db for TypeScript compatibility if actual db import is missing or causing issues
 // In a real scenario, you should import the actual singleton

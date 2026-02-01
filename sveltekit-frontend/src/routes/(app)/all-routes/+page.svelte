@@ -2,6 +2,7 @@
 	// @ts-nocheck
 	// Migrated to $effect
 	import type { PageData } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	// ─────────────────────────────────────
 	// Props & Data
@@ -195,7 +196,6 @@
 	 */
 	function handlePatchApply(routeId: string, patchId: string): void {
 		logInteraction(routeId, 'patch_apply', { patch_id: patchId });
-	}
 </script>
 
 <main class="command-center">

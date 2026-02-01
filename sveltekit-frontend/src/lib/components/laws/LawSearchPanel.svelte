@@ -10,6 +10,7 @@ https, //svelte.dev/e/block_unexpected_close -->
 	import { rerankLaws } from '$lib/api/laws/rerank';
 	import { searchLaws } from '$lib/api/laws/search';
 	import { createEventDispatcher } from 'svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	const dispatch = createEventDispatcher();
 

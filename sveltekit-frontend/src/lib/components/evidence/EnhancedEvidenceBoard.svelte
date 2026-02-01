@@ -1,6 +1,7 @@
 <!-- Enhanced Evidence Board with AI Integration + NES-Yorha Hybrid + N64 Gaming UI Connects to Ollama legal model: CUDA services, and MinIO storage Features: Retro gaming aesthetics, advanced AI analysis, real-time collaboration --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { goto } from '$app/navigation';
  import  FabricEvidenceCanvas  from "../canvas/FabricEvidenceCanvas.svelte"; // Types interface EvidenceItem { id: string;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	filename: string; type: 'document' | 'image' | 'video' | 'audio' | 'other'; uploadedAt: string;
 	status: 'uploading' | 'processing' | 'ready' | 'error'; size: number;
 	mimeType: string; aiAnalysis?: { summary?: string; confidence?: number; relevantLaws?: string[]; suggestedTags?: string[]; prosecutionScore?: number; legalRelevance?: string; keyFindings?: string[]; recommendations?: string[]; storage?: { bucket?: string; key?: string; url?: string}; unifiedInsights?: unknown}; position { x: number;

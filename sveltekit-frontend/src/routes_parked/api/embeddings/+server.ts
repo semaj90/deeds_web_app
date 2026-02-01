@@ -10,6 +10,7 @@ import {
  retrieveRAGContext,
 } from '$lib/server/services/embedding-service';
 import { getOllamaEndpoint } from '$lib/utils/ollama-config';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST /api/embeddings

@@ -1,4 +1,5 @@
 import { redis } from '$lib/server/redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class RedisService {
     private isConnected = false;

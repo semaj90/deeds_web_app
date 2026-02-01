@@ -13,6 +13,8 @@ import type { dev } from '$app/environment';
 import type { EnhancedUploadRequest, EnhancedUploadResponse, APIRequestContext, } from '$lib/types/api.js';
 import type { embeddingService } from '$lib/server/embedding-service.js';
 import crypto from 'crypto';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Upload Service Configuration
 const UPLOAD_SERVICE_CONFIG = {

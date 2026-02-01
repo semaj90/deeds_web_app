@@ -8,6 +8,7 @@ import type { isRedisHealthy, QueuedTask,
     queuedTasks, RedisOptimizationResult,
     redisOrchestratorClient } from '$lib/stores/unified';
 import { get } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type QueryContext = {
 	endpoint?: string;

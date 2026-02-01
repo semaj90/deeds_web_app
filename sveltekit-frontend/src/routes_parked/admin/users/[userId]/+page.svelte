@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { User } from, '$lib // TODO: Verify store subscription is correct for Svelte 5/types'; // Svelte, 5 runes are auto-imported import { enhance } from, '$app // TODO: Verify store subscription is correct for Svelte 5/forms'; import { page } from, '$app // TODO: Verify store subscription is correct for Svelte 5/state'; import type { PageData, ActionData } from, './$types // TODO: Verify store subscription is correct for Svelte 5'; import { goto } from, '$app // TODO: Verify store subscription is correct for Svelte 5/navigation'; let { data }: {data: PageData } = $props // TODO: Verify store subscription is correct for Svelte 5(); let showProfileModal = $state // TODO: Verify store subscription is correct for Svelte 5<boolean>(false); let showPasswordModal = $state // TODO: Verify store subscription is correct for Svelte 5<boolean>(false); let showSessionModal = $state // TODO: Verify store subscription is correct for Svelte 5<boolean>(false); let selectedSession = $state // TODO: Verify store subscription is correct for Svelte 5<any>(null); let formLoading = $state // TODO: Verify store subscription is correct for Svelte 5<boolean>(false); // Profile form let profileForm = $state // TODO: Verify store subscription is correct for Svelte 5({ firstName: (data as { user?: unknown, stats?: unknown, recentCases?: unknown; recentAIInteractions?: unknown; activeSessions?: unknown }).user.firstName || '', lastName: (data as { user?: unknown; stats?: unknown; recentCases?: unknown; recentAIInteractions?: unknown; activeSessions?: unknown }).user.lastName || ''
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  });
   
  }); function formatDate(dateStr: string | Date) { const date = typeof dateStr === 'string' ? new Date(dateStr): dateStr; return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -74,8 +75,8 @@ import type { User } from, '$lib // TODO: Verify store subscription is correct f
  onclick={ closeSessionModal } class="px-4 py-2 bg-gray-700 text-amber-300 border-2 border-amber-300 hover:bg-gray-600 transition-colors"
  > [CANCEL] </button> <button type="submit"
  disabled={ formLoading } class="px-4 py-2 bg-red-800 text-amber-300 border-2 border-red-500 hover:bg-red-700 transition-colors"
- > {formLoading ? '[REVOKING...]': '[REVOKE SESSION]'} </button> </div> </form> </div> </div> </div> {/if} <style> /* YoRHa cyberpunk aesthetic */:global(body) { background: #000;, color: #fbbf24}
- /* Custom scrollbar */ .overflow-y-auto::-webkit-scrollbar, .overflow-x-auto::-webkit-scrollbar { width: 8px;, height: 8px}
+ > {formLoading ? '[REVOKING...]': '[REVOKE SESSION]'} </button> </div> </form> </div> </div> </div> {/if} <style> /* YoRHa cyberpunk aesthetic */:global(body) { background: #000; color: #fbbf24}
+ /* Custom scrollbar */ .overflow-y-auto::-webkit-scrollbar, .overflow-x-auto::-webkit-scrollbar { width: 8px; height: 8px}
  .overflow-y-auto::-webkit-scrollbar-track, .overflow-x-auto::-webkit-scrollbar-track { background: #1f2937}
  .overflow-y-auto::-webkit-scrollbar-thumb, .overflow-x-auto::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 4px}
  .overflow-y-auto::-webkit-scrollbar-thumb:hover .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #f59e0b}

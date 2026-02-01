@@ -7,6 +7,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { citationManagementService } from '$lib/server/services/citation-management.service';
 import type { CitationSaveRequest } from '$lib/types/citations';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET /api/citations

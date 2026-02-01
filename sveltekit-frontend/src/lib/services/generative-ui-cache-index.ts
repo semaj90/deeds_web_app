@@ -3,6 +3,7 @@ import type Redis from 'ioredis';
 // Assuming these services exist or act as placeholders for the logic
 import { BitmapHMMSOMPredictor } from '$lib/ai/bitmap-hmm-som-predictor';
 import { QLoRAReinforcementLearningService } from '$lib/services/qlora-rl-training-service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Generative UI component metadata
 export interface UIComponentMetadata {

@@ -7,6 +7,7 @@ import db from '$lib/server/db/index';
 import { statutes, statuteChunks } from '$lib/server/db/schema-postgres';
 import { eq, inArray } from 'drizzle-orm';
 import type { PageServerLoad } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async () => {
  try {

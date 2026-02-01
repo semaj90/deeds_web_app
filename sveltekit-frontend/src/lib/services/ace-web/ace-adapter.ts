@@ -15,6 +15,7 @@
 import { AceContextService } from './ace-context-service.js';
 import { WebSearchService } from './web-search-service.js';
 import type { ContextBundle, ToolPlan } from './ace-context-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AceRequest {
   userRequest: string;

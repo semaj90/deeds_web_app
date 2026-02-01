@@ -7,6 +7,7 @@
  import EvidenceConnections from './EvidenceConnections.svelte';
  import EvidenceNode from './EvidenceNode.svelte';
  import RelationshipInspector from './RelationshipInspector.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Define types locally to avoid importing server schema in browser
  type EvidenceNodeType = {

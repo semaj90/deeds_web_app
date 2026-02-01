@@ -3,6 +3,7 @@
 import { error } from "console";
 import { string, boolean } from "fast-check";
 import nodejsOrchestrator from "./nodejs-orchestrator";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export interface EmbeddingResponse { success: embedding? , number[]; dimensions? : number; model?: string; processing_time?: number; cached?: boolean; error?: string; text_hash?: string}
 export interface VectorSearchRequest { query_embedding: number[], limit? , number; similarity_threshold? : number; document_types?: string[]; filters?: Record<string, unknown>}
 // REMOVED: export interface VectorSearchResult { id: string, similarity: number, content: string, metadata: Record<string, unknown>, document_type: string}

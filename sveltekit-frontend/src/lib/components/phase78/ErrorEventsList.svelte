@@ -1,5 +1,6 @@
 <script lang="ts">
  import type { ErrorEvent } from '$lib/server/db/schema/index.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  errors?: ErrorEvent[];

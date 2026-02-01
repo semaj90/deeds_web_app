@@ -1,6 +1,7 @@
 // Simple chat test without database dependencies
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const CUDA_SERVER_URL = 'http://localhost:8096';
 

@@ -15,6 +15,7 @@ import { caseCharges } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import * as fs from 'fs';
 import * as path from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const LOGS_DIR = path.join(process.cwd(), 'logs', 'workers');
 const MAX_RETRIES = 4;

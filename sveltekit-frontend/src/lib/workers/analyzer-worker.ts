@@ -9,6 +9,7 @@
  */
 
 import type { Ollama } from 'ollama/browser';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Worker state
 let ollama: Ollama | null = null;

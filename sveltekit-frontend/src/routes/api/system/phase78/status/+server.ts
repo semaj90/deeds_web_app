@@ -3,6 +3,7 @@ import { errorClusterTable, errorSuggestionsTable, routeMetadata } from '$lib/se
 import { error, json } from '@sveltejs/kit';
 import { desc, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Phase 78 System Status API

@@ -4,6 +4,7 @@
  */
 
 import type { SearchResult } from '/types';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Core AI Model Types
 export interface AIModel {

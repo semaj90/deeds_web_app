@@ -12,6 +12,7 @@
 import type { Experience, FixStrategy, ErrorReport, ErrorContext, ErrorGroup } from './types.js';
 import { getJSONLStorage } from './JSONLStorage.js';
 import { v4 as uuidv4 } from 'uuid';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ExperienceRecorderConfig {
 	jsonlDir: string;

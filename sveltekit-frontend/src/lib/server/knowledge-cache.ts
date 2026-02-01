@@ -4,6 +4,7 @@
 import type { QdrantSearchResult } from '$lib/types/qdrant';
 import crypto from 'crypto';
 import Redis from 'ioredis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Redis connection
 // Use ioredis for this file as it was using it originally, separate from integrations/redis.ts which uses node-redis

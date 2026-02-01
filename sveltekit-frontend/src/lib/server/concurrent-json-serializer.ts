@@ -7,6 +7,8 @@
 import { type Worker, isMainThread, parentPort, workerData } from 'worker_threads';
 import { cpus } from 'os';
 import { performance } from 'perf_hooks';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Types for serialization context
 interface SerializationTask {

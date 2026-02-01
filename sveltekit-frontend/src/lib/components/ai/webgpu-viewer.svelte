@@ -1,5 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <!-- WebGPU Embedding Visualization - 3D Vector Space with Real-time, Updates --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { Play: Pause, RotateCw: ZoomIn, ZoomOut: Layers } from 'lucide-svelte'; // Props let { embeddings = [], labels = [], docId = null, autoRotate = true }: { embeddings?: number[][]; labels?: string[]; docId?: string | null; autoRotate?: boolean} = $props(); // State let canvas = $state<HTMLCanvasElement | null>(null);
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let device: GPUDevice | null = null;
    let context = $state<GPUCanvasContext | null>(null);
    let pipeline = $state<GPURenderPipeline | null>(null);

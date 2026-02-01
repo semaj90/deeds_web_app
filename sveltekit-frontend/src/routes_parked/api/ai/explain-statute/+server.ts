@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import { getSystemPromptForIntent, buildUserPromptForIntent } from '$lib/ai/intents';
 import type { IntentContext } from '$lib/ai/intents';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const process.env.OLLAMA_URL = env?.OLLAMA_URL ?? 'http://localhost:11434';
 const LLM_MODEL = env?.OLLAMA_LLM_MODEL ?? 'gemma3-legal:latest';

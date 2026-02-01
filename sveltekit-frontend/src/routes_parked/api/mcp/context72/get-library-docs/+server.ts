@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 // Add a stricter metadata type to avoid 'any'
 type LibraryMetadata = {
@@ -11,7 +12,7 @@ type LibraryMetadata = {
  [key: string]: string | number | boolean | undefined;
 };string,
  {
- content: string;, metadata: LibraryMetadata;
+ content: string; metadata: LibraryMetadata;
  snippets?: Array<{, title: string; code: string; description?, string }>;
  }
 > = {

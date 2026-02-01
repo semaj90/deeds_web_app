@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import type { PageData } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let { data }: {
 	data: PageData } = $props();

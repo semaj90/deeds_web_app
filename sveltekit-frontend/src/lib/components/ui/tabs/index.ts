@@ -4,6 +4,7 @@ import TabsContent from './TabsContent.svelte';
 import TabsList from './TabsList.svelte';
 import TabsRoot from './TabsRoot.svelte';
 import TabsTrigger from './TabsTrigger.svelte';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 // Named exports
 export {

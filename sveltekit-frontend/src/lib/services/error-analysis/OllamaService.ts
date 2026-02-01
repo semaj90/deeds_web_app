@@ -22,6 +22,7 @@ import { stream } from "glob";
 import type { concurrency } from "sharp";
 import type { text } from "stream/consumers";
 import type { ErrorReport } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface OllamaConfig {
 	url: string;

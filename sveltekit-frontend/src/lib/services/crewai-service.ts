@@ -1,6 +1,7 @@
 import type { AIResponse, Case, Evidence } from '$lib/types';
 import crypto from 'crypto';
 import { process } from "node:process";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** * CrewAI Multi-Agent Service * Handles role-based agent crews for specialized legal workflows */
 

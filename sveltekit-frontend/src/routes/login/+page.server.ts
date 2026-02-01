@@ -1,6 +1,7 @@
 import { lucia, setSessionCookie } from '$lib/server/lucia';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {

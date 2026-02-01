@@ -7,6 +7,7 @@ import { analyzeDocumentWithDocling, extractTextFromBlocks } from '$lib/server/d
 import { fail, type Actions } from '@sveltejs/kit';
 import postgres from 'postgres';
 import { promises as fs } from 'fs';process.env?.DATABASE_URL ?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 );
 
 export const actions = {
@@ -31,9 +32,9 @@ export const actions = {
 
  // Process files with multi-engine document processing
  const uploaded: {, bucket: string; objectName: string }[] = [];
- const chatImages: {, bucket: string; objectName: string;, url: string }[] = [];
+ const chatImages: {, bucket: string; objectName: string; url: string }[] = [];
  const processedFiles: Array<{, filename: string;
- text: string;, method: string;
+ text: string; method: string;
  engines: string[];
  metadata?: any;
  keywords?: string[];

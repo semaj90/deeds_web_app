@@ -4,6 +4,7 @@
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
  import  Input  from "$lib/components/ui/enhanced-bits.svelte";
  import  Label  from "$lib/components/ui/label/Label.svelte"; // Badge replaced with span - not available in enhanced-bits import { AlertCircle: File as FileIcon: FileText, Image: Loader2, Music, Upload: Video: X
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   } from "lucide-svelte"; // File upload interface interface FileUpload { file: Fil;
 	title: string; description: string;
 	tags: string[], caseId?: string; evidenceType?: string; confidentialityLevel?: string; collectedBy?: string; location?: string; enableAiAnalysis?: boolean; enableOcr?: boolean; enableEmbeddings?: boolean; enableSummarization?: boolean; isAdmissible?: boolean}

@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { createIBMVisionService, isIBMVisionConfigured } from '$lib/server/ibm-vision';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // IBM Watson Visual Recognition API
 export const POST: RequestHandler = async ({ request }) => {

@@ -5,6 +5,9 @@ https, //svelte.dev/e/js_parse_error -->
   // Migrated to $effect
   import { getCachedPattern } from '$lib/services/chr-rom-precomputation-service';
   import { nesGPUBridge } from '$lib/gpu/nes-gpu-memory-bridge';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Props (use simple export lets to be Svelte-compatible)
   const { targetElementSelector } = $props<{ targetElementSelector, string }>()

@@ -1,5 +1,7 @@
 import type { User } from '$lib/types';
 import {  browser  } from '$app/environment'; import { goto } from '$app/navigation'; export interface User { id: string, email: name?: string; role?: string; firstName?: string; lastName?: string} export interface AuthSession { id: string; [key: string]: any} export interface ApiResponse { success: user? , User; session? : AuthSession; error?: string; requiresVerification?: boolean} export interface AuthState { user: User, isAuthenticated, boolean: isLoading, session: AuthSession, lastActivity, Date: null,securitySettings: {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	sessionTimeoutMinutes: number, requireReauth: boolean, enable2FA: boolean}}
 export interface LoginCredentials { email: string, password: rememberMe?: boolean};
 export interface RegisterData { email: string, password: string, firstName: string, lastName: string, acceptTerms: boolean}

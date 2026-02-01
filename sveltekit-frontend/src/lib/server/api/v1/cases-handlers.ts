@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import * as schema from '$lib/server/db/schema-postgres'; // Assuming this import based on usage
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface UserType {
 	id: string;

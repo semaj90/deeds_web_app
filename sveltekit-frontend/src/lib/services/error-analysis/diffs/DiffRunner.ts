@@ -19,6 +19,7 @@ import { FileSnapshotStore } from './FileSnapshotStore.js';
 import { RunProgressTracker } from './RunProgressTracker.js';
 import { ValidationService } from './ValidationService.js';
 import type { DiffPatch } from './diffTypes.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RunConfig {
  runId: string;

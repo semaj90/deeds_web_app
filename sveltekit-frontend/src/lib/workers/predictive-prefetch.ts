@@ -1,5 +1,6 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Service Worker for AI-Driven Predictive Prefetching // Integrates with our legal AI system for intelligent resource loading export interface UserIntent { action?: "open_settings" | "search_evidence" | "create_case" | "analyze_document" | "view_timeline" | "view_evidence" | "search_documents" | "review_analysis",confidence: number, context: {
 	currentPage: focusedElement?: string; recentActions : string[], caseId?: string, timeOnPage, number: scrollPosition, mouseActivity: MouseEvent[], keyboardActivity: KeyboardEvent[], eyeTracking?: {
 	x: number, y: number, timestamp: number }]}; userProfile: {

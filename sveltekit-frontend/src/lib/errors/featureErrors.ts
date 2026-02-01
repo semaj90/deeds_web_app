@@ -4,6 +4,7 @@
  */
 
 import { featureLogger } from '../services/featureLogger.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Feature error types

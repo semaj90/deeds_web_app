@@ -9,6 +9,7 @@ import { searchStatuteChunks } from './statute-ingestion-service.js';
 import { db } from '../db/index.js';
 import { statutes, statuteChunks } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface PrefetchContext {
     sectionId: string;

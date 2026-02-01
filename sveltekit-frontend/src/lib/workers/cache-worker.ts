@@ -1,4 +1,5 @@
 import { constructor } from 'function Object() { [native code] }';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * Cache Worker for Parallel Processing * Handles CPU-intensive cache operations in dedicated threads * Supports SIMD acceleration and multi-core parallelism */ /// <reference, lib="webworker" /> interface CacheWorkerMessage { type: 'init' | 'compress' | 'decompress' | 'serialize' | 'deserialize' | 'batch'; id?: string; // narrowed type (was: unknown) data?: Uint8Array | Float32Array | string | Record<string, unknown>, config?: WorkerConfig; // narrowed type for batch operations (was: unknown[]) operations?: Array<{
 	type: 'compress' | 'decompress' | 'serialize' | 'deserialize'; data? , Uint8Array : Float32Array | string | Record<string, unknown>}>}
 interface WorkerConfig { poolType: string, threadId: number, rtxOptimizations: boolean, simdEnabled: boolean}

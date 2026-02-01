@@ -1,31 +1,32 @@
 import { getContext7MulticoreService } from '$lib/services/context7-multicore';
 import type { RequestHandler } from './$types.js';
 import { json } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const startTime = Date.now();
 let requestCount = 0;
 
 export interface YoRHaSystemStatus {
  database: {, connected: boolean;
- latency: number;, activeConnections: number;
+ latency: number; activeConnections: number;
  queryCount: number;
  };
  backend: {, healthy: boolean;
- uptime: number;, activeServices: number;
- cpuUsage: number;, memoryUsage: number;
+ uptime: number; activeServices: number;
+ cpuUsage: number; memoryUsage: number;
  };
  frontend: {, renderFPS: number;
- componentCount: number;, activeComponents: number;
+ componentCount: number; activeComponents: number;
  webGPUEnabled: boolean;
  };
  multicore?: {, totalWorkers: number;
- healthyWorkers: number;, busyWorkers: number;
- queueSize: number;, activeTasks: number;
- totalTasks: number;, completedTasks: number;
+ healthyWorkers: number; busyWorkers: number;
+ queueSize: number; activeTasks: number;
+ totalTasks: number; completedTasks: number;
  failedTasks: number;
  };
- timestamp: string;, systemLoad: number;
- gpuUtilization: number;, networkLatency: number;
+ timestamp: string; systemLoad: number;
+ gpuUtilization: number; networkLatency: number;
 }
 
 export const GET: RequestHandler = async () => {

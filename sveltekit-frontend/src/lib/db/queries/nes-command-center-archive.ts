@@ -9,6 +9,7 @@
 
 import { eq, desc, and, sql, gte, lte } from 'drizzle-orm';
 import { getDb } from '../pool.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // Archive Query Helpers

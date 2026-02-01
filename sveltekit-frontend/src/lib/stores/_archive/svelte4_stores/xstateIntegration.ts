@@ -6,6 +6,7 @@
 import { derived, writable, type Readable } from 'svelte/store';
 import type { Actor, AnyStateMachine } from 'xstate';
 import { createActor } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type AnySnapshot = {
  value: any;

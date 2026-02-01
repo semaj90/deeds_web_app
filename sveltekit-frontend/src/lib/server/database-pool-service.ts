@@ -2,6 +2,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { redisService } from './redis-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface DatabasePoolConfig {
 	host: string;

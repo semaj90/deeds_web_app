@@ -4,9 +4,10 @@
  */
 
 import { browser } from '$app/environment';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 import { cache } from './cache-service.svelte';
 
-export interface OfflineFetchOptions {
+export interface OfflineFetchOptions extends Partial<CachingTypes.CacheStrategy> {
 	/** Cache key for storing/retrieving data */
 	cacheKey: string;
 	/** Time to live in milliseconds (default: 1 hour) */

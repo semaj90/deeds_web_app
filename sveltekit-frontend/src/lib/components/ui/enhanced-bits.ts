@@ -14,6 +14,7 @@ import Label from './label/LabelCompat.svelte';
 import Select from './select/Select.svelte';
 import Separator from './separator/Separator.svelte';
 import Textarea from './textarea/Textarea.svelte';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 // Named exports for new code
 export {

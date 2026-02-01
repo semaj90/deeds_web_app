@@ -5,6 +5,8 @@
 
 import type { Redis } from 'ioredis';
 import { getRedisClient } from './redis-helper.js';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RAGCacheEntry {
  query: string;

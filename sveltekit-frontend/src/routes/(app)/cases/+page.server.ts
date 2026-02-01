@@ -4,6 +4,7 @@ import { verifySSRDatabaseConnection } from '$lib/server/db/ssr-health-check';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, desc, eq, like } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * SSR Load Function - Server-side data fetching for cases

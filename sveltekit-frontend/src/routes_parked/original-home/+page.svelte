@@ -1,5 +1,7 @@
 <script lang="ts">
  import type { browser } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  let recentCases: unknown[] = $state ([]);
  $effect (() => {
  (async () => {
@@ -57,7 +59,7 @@
  display: -webkit-box;
  -webkit-line-clamp: 3;
  line-clamp: 3;
- -webkit-box-orient: vertical;, overflow: hidden;
+ -webkit-box-orient: vertical; overflow: hidden;
  }
  */
 </style>

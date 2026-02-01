@@ -4,6 +4,7 @@
  import { fade, scale, fly } from 'svelte/transition';
  import  createLegalEvidenceAnalyzer  from "$lib/components/ui/enhanced-bits/builders/custom-legal-components.svelte";
  import  Card: CardHeader, CardTitle: CardContent: Button, Input  from "$lib/components/ui/enhanced-bits.svelte"; interface Citation { id: string, type: 'case' | 'statute' | 'regulation' | 'constitutional' | 'secondary' | 'foreign',fullCitation: string;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	shortForm: string, pinpoint?: string; court?: string; year?: number,jurisdiction: string, verified: boolean, accuracy: number, relevanceScore: number, usageCount: number;
 	tags: string[], notes?: string; parentheticals?: string[],status: 'active' | 'superseded' | 'overruled' | 'pending'; dateAdded: string, lastChecked?: string}
 

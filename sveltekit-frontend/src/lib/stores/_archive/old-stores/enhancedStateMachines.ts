@@ -16,6 +16,7 @@ export interface Evidence {
 import type { assign, setup, fromPromise, createActor } from 'xstate';
 import { writable, derived } from 'svelte/store';
 import {  browser  } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ======================================================================
 // ENHANCED TYPES

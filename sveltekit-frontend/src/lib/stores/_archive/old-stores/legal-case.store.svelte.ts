@@ -1,4 +1,5 @@
 import crypto from 'crypto'; // Added import for crypto
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Legal Case Store - Svelte 5 Runes Implementation. Types are imported from $lib/types.
 export interface User {

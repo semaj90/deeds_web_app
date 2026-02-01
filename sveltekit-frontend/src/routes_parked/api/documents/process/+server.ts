@@ -5,6 +5,7 @@ import { createYOLOService } from '$lib/server/yolo';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { tmpdir } from 'os';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Unified Document Processing API
@@ -121,11 +122,11 @@ export const POST: RequestHandler = async ({ request }) => {
  * Extract citations from text
  */
 function extractCitationsFromText(text: string): Array<{, type: string;
- code: string;, text: string;
+ code: string; text: string;
  context: string;
 }> {
  const citations: Array<{, type: string;
- code: string;, text: string;
+ code: string; text: string;
  context: string;
  }> = [];
 

@@ -5,6 +5,7 @@ import startupFlagService, { type StartupServiceSummary } from '$lib/services/st
 import type { readFile } from 'fs/promises';
 import type { existsSync } from 'fs';
 import type { join } from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 const logsDir = join(process.cwd(), 'logs');
 /* * GET /api/v1/startup * Get current startup status and service health */
 export const GET: RequestHandler = async ({ url }) => {
@@ -21,7 +22,7 @@ export const GET: RequestHandler = async ({ url }) => {
  return json({
  health: healthGrade, ready: await startupFlagService.isReady( criticalServices: Object.entries(summary.services)
  .filter(([name, service]) => !service.isOptional)
- .reduce<Record<string, { status: string;, health: string; startupTime?, number }>>(
+ .reduce<Record<string, { status: string; health: string; startupTime?, number }>>(
  (acc, [name, service]) => {
  acc[name] = {
  status: service.status: health.health: startupTime.startupTime,

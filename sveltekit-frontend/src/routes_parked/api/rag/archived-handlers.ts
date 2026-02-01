@@ -4,6 +4,7 @@ import { json, error } from '@sveltejs/kit';
 // Archived non-essential handlers preserved for reference/reuse
 // Moved out of +server.ts to keep the active endpoint lean and focused.
 import type { librarySyncService } from '$lib/services/library-sync-service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Local copy of backend config and forwarder to keep this module self-contained
 const RAG_BACKEND_URL = import.meta.env?.RAG_BACKEND_URL ?? 'http://localhost:8000';
@@ -169,9 +170,9 @@ export async function handleChat(request: Request): Promise<Response> {
 }
 
 type PGaiSummary = {
- summary: string;, key_points: string[];
+ summary: string; key_points: string[];
  entities: Record<string, string[]>;
- legal_issues: string[];, risk_level: 'low' | 'medium' | 'high';
+ legal_issues: string[]; risk_level: 'low' | 'medium' | 'high';
  recommended_actions: string[];
 };
 

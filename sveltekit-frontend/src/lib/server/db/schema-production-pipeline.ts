@@ -8,6 +8,7 @@ import type {
 pgTable, integer, timestamp, boolean, uuid, varchar, bigint, real, index, uniqueIndex, primaryKey }
 from 'drizzle-orm/pg-core';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 sql }
 from 'drizzle-orm';
 // Enable pgvector extension export const enableVectorExtension = sql`CREATE EXTENSION IF NOT EXISTS vector`;

@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface VectorSearchOptions {
     limit?: number;

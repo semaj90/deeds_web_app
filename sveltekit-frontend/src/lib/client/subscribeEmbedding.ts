@@ -1,5 +1,6 @@
 import type { EmbeddingResult } from '$lib/shared/embedding-types';
 import { readable, type Readable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface EmbeddingStreamEvent {
   log?: string;

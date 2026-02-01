@@ -2,6 +2,7 @@
   // Svelte 5 runes are auto-imported
   import { browser } from '$app/environment';
   import { authStore } from '$lib/stores';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     children?: import('svelte').Snippet;

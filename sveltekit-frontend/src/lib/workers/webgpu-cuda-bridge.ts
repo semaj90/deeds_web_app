@@ -1,6 +1,8 @@
 // WebGPU to CUDA Service Worker Bridge
 // Enables GPU acceleration for AI processing tasks using WebGPU as a bridge to CUDA
 import { WebGPUBufferUtils, toFloat32Array,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 $1;$2} from '../utils/buffer-conversion.js';
 
 interface WebGPUCudaBridgeMessage {

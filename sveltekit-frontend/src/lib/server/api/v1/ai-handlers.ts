@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { EmbeddingService } from '$lib/server/embeddings';
 import type { OllamaService } from '$lib/server/ollama';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface UserType {
 	id: string;

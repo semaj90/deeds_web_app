@@ -1,4 +1,5 @@
 import { RedisClientType } from 'redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** Ollama endpoint helper shared across services */
 export function getOllamaEndpoint(): string {

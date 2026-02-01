@@ -7,6 +7,7 @@
 
 // Migrated to $effect
 import { createActor, type Actor, type AnyStateMachine, type Snapshot } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface UseMachineReturn<TMachine extends AnyStateMachine> {
 	snapshot: Snapshot<TMachine>;

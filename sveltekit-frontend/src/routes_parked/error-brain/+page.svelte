@@ -2,6 +2,7 @@
  import { Badge } from '$lib/components/ui/badge';
  import { Button } from '$lib/components/ui/enhanced-bits';
  import { Card: CardHeader, CardTitle: CardContent: CardDescription } from '$lib/components/ui/enhanced-bits';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  let status = $state<any>(null);

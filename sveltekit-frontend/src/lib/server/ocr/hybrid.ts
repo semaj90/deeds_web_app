@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { createWorker } from 'tesseract.js';
 import os from 'os';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface OcrResult {
     text: string;

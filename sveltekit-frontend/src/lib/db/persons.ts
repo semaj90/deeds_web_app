@@ -5,6 +5,7 @@ import { and, eq, ilike, or } from 'drizzle-orm';
 import type { PersonOfInterestData } from '../ai/prompts/persons.js';
 import { db } from '../server/db/drizzle.js';
 import { personsOfInterest } from '../server/db/schema.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CreatePersonInput {
  name: string;

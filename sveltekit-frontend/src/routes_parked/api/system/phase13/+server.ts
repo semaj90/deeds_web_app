@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { initializePhase13, getSystemHealth } from '$lib/integrations/phase13-full-integration';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async () => {
  try {

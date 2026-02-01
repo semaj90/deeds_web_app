@@ -5,6 +5,7 @@
   import YoRHaDetectiveForm from './YoRHaDetectiveForm.svelte';
   import YoRHaDetectiveModal from './YoRHaDetectiveModal.svelte';
   import YoRHaDetectiveNotification from './YoRHaDetectiveNotification.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Props interface
   interface Props {

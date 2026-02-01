@@ -1,4 +1,5 @@
 import {  env  } from '$env /dynamic/private';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export default {
  async getOptimalModel(): Promise<string> {

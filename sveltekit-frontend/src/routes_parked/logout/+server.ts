@@ -7,6 +7,7 @@
 
 import type { auth } from '$lib/server/auth';
 import { redirect } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST = async (event) => {
  const sessionId = event.cookies.get('auth_session');

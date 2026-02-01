@@ -4,6 +4,7 @@
 import { existsSync } from 'fs';
 import { Socket } from 'net';
 import { join } from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Add explicit types to avoid `any` type
 export type HealthStatus = 'healthy' | 'unhealthy' | 'error' | 'unknown';

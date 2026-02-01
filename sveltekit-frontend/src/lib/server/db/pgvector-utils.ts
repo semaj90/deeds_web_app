@@ -3,6 +3,7 @@
  * Provides proper vector similarity search and embedding operations
  */
 import { db } from './index.ts';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Safely escape a JS value as a SQL literal.

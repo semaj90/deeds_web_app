@@ -4,6 +4,7 @@
  */
 
 import type { EvidenceNode, SimilarityResult } from './case-similarity-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AISuggestion {
  id: string;

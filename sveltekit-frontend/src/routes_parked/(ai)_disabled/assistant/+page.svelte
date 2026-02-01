@@ -1,8 +1,8 @@
 <script lang="ts">
  // Runes-mode reactive state (Svelte 5)
  type ChatMessage = {
- id: string;, role: 'user' | 'assistant';
- content: string;, timestamp: Date;
+ id: string; role: 'user' | 'assistant';
+ content: string; timestamp: Date;
  };
 
  let messages = $state <ChatMessage[]>([]);
@@ -134,7 +134,6 @@
  function formatTime(date: Date | string | number): string {
  const d = new Date(date);
  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
- }
 </script>
 
 <!-- Changed, replace placeholder main with markup that uses the CSS classes defined below -->
@@ -225,7 +224,7 @@
 <style>
  /* ...existing CSS (unchanged) ... */
  .ai-assistant {
- max-width: 1200px;, margin: 0 auto;
+ max-width: 1200px; margin: 0 auto;
  padding: 0 1rem;
  }
 
@@ -235,7 +234,7 @@
  }
 
  .assistant-header h1 {
- font-size: 2.5rem;, color: var(--text-primary, #00ccff);
+ font-size: 2.5rem; color: var(--text-primary, #00ccff);
  margin-bottom: 0.5rem;
  text-shadow: 0 0 15px currentColor;
  }
@@ -248,8 +247,8 @@
 
  .error-banner {
  background: rgba(255, 0, 0, 0.1);
- color: #ff6666;, padding: 0.75rem;
- border-radius: 4px;, border: 1px solid #ff6666;
+ color: #ff6666; padding: 0.75rem;
+ border-radius: 4px; border: 1px solid #ff6666;
  margin-top: 1rem;
  }
 
@@ -275,7 +274,7 @@
  border: 1px solid rgba(0, 204, 255, 0.3);
  padding: 0.75rem;
  border-radius: 4px;
- font-size: 0.9rem;, transition: all 0.2s;
+ font-size: 0.9rem; transition: all 0.2s;
  }
 
  .quick-button:hover, not(disabled) {
@@ -285,7 +284,7 @@
  }
 
  .quick-button:disabled {
- opacity: 0.5;, cursor:not-allowed;
+ opacity: 0.5; cursor:not-allowed;
  }
 
  .chat-container {
@@ -299,13 +298,13 @@
 
  .messages-container {
  height: 400px;
- overflow-y: auto;, padding: 1rem 0;
+ overflow-y: auto; padding: 1rem 0;
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .message {
- display: flex;, gap: 0.75rem;
+ display: flex; gap: 0.75rem;
  align-items: flex-start;
  }
 
@@ -315,8 +314,8 @@
  }
 
  .message-icon {
- width: 32px;, height: 32px;
- border-radius: 50%;, display: flex;
+ width: 32px; height: 32px;
+ border-radius: 50%; display: flex;
  align-items: center;
  justify-content: center;
  font-size: 1.2rem;
@@ -343,7 +342,7 @@
  .message-text {
  background: rgba(0, 204, 255, 0.1);
  padding: 0.75rem;
- border-radius: 8px;, border: 1px solid rgba(0, 204, 255, 0.3);
+ border-radius: 8px; border: 1px solid rgba(0, 204, 255, 0.3);
  color: var(--text-primary, #ffffff);
  line-height: 1.4;
  white-space: pre-wrap;
@@ -355,7 +354,7 @@
  }
 
  .message-time {
- font-size: 0.7rem;, color: var(--text-secondary, #888888);
+ font-size: 0.7rem; color: var(--text-secondary, #888888);
  margin-top: 0.25rem;
  }
 
@@ -373,7 +372,7 @@
  }
  }
  .input-container {
- display: flex;, gap: 0.75rem;
+ display: flex; gap: 0.75rem;
  align-items: flex-end;
  margin-top: 1rem;
  padding-top: 1rem;
@@ -381,11 +380,11 @@
  }
 
  .message-input {
- flex: 1;, background: var(--surface-primary, #0a0a0a);
+ flex: 1; background: var(--surface-primary, #0a0a0a);
  border: 1px solid rgba(0, 204, 255, 0.3);
- border-radius: 4px;, padding: 0.75rem;
+ border-radius: 4px; padding: 0.75rem;
  color: var(--text-primary, #ffffff);
- font-family: inherit;, resize: vertical;
+ font-family: inherit; resize: vertical;
  min-height: 60px;
  }
 
@@ -402,9 +401,9 @@
  .send-button {
  background: var(--text-primary, #00ccff);
  color: var(--surface-secondary, #000000);
- border: none;, padding: 0.75rem 1.5rem;
+ border: none; padding: 0.75rem 1.5rem;
  border-radius: 4px;
- font-weight: bold;, transition: all 0.2s;
+ font-weight: bold; transition: all 0.2s;
  }
 
  .send-button:hover, not(disabled) {
@@ -413,7 +412,7 @@
  }
 
  .send-button:disabled {
- opacity: 0.5;, cursor:not-allowed;
+ opacity: 0.5; cursor:not-allowed;
  }
 
  .capabilities {
@@ -435,7 +434,7 @@
  .capability-card {
  background: var(--surface-secondary, #111111);
  border: 1px solid rgba(0, 204, 255, 0.3);
- text-align: center;, transition: all 0.3s ease;
+ text-align: center; transition: all 0.3s ease;
  }
 
  .capability-card:hover {

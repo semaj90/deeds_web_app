@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { DBCase } from '$lib/types/database';
   import type { YoRHaSystemMetrics } from '$lib/types/yorha-interface';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   interface ClusterHealth {

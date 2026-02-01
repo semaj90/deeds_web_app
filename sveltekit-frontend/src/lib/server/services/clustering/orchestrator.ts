@@ -6,6 +6,7 @@
 import { createActor } from 'xstate';
 import { clusteringMachineDef, type ClusteringContext, type ClusteringSnapshot } from './xstate-machine.js';
 import { redisClient } from '../persistence/redis-state.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface OrchestrationResult {
     jobId: string;

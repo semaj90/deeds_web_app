@@ -1,6 +1,8 @@
 import type { User } from '$lib/types';
 // Authentication Service - Production Implementation
 import { goto } from '$app/navigation';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface LoginCredentials {
  email: string;

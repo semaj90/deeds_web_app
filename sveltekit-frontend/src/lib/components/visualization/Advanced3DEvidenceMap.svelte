@@ -5,6 +5,8 @@
   import { Button } from "$lib/components/ui/button";
   import { Card } from "$lib/components/ui/card";
   import { Badge } from "$lib/components/ui/badge";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Mock types for Three.js interactions
   interface Props {

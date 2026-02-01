@@ -4,6 +4,8 @@ import { DbCaseOperations, DbEvidenceOperations } from '../db/enhanced-operation
 import { checkDatabaseHealth } from '../db/health-check.js';
 import type { User } from '../db/schema-postgres.js';
 import { cases, evidence } from '../db/schema-postgres.js';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type $Case = typeof cases.$inferSelect;
 type $Evidence = typeof evidence.$inferSelect;

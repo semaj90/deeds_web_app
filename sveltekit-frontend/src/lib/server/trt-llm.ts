@@ -1,4 +1,5 @@
 import type { parseFast } from './utils/json-fast.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function inferLLM(input: string) {
  const endpoint = process.env?.TRT_LLM_ENDPOINT ?? 'http://localhost:8000/api/infer';

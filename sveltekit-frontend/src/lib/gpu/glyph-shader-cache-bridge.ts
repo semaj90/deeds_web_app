@@ -1,4 +1,5 @@
 import shaderCache from './webgl-shader-cache.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Bridge for glyph shader generation and cached programs export function getGlyphProgram(gl: WebGL2RenderingContext, styleKey: string) {
 const vert = `#version, 300 es` in vec2 a_position;
 in vec2 a_uv;

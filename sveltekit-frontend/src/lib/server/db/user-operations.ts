@@ -4,6 +4,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { users, userSessions } from './schema/user-management.js';
 import { db } from './unified-client.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // USER AUTHENTICATION OPERATIONS

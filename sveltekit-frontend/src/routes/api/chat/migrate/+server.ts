@@ -8,6 +8,7 @@ import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { conversations, messages } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface ChatMessage {
 	id: string; conversationId: string;

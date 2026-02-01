@@ -26,20 +26,22 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import { Video } from "lucide-svelte";
  import { Sparkles } from "lucide-svelte";
  import { Brain } from "lucide-svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
  interface HelpArticle {
- id: string;, title: string;
- category: string;, content: string;
- tags: string[];, lastUpdated: string;
- helpful?: number;, description: string;
- duration: string;, popularity: number;
+ id: string; title: string;
+ category: string; content: string;
+ tags: string[]; lastUpdated: string;
+ helpful?: number; description: string;
+ duration: string; popularity: number;
  type: string;
  }
 
  interface SearchResult {
- id: string;, title: string;
- content: string;, score: number;
- category: string;, reasoning: string;
+ id: string; title: string;
+ content: string; score: number;
+ category: string; reasoning: string;
  }
 
  // Help state

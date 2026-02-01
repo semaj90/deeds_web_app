@@ -6,6 +6,7 @@
 
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { citationManagementService } from '$lib/server/services/citation-management.service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST /api/citations/collections/[collectionId]/items

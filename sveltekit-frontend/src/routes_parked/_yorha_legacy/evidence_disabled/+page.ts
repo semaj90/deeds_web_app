@@ -1,4 +1,5 @@
 import type { PageLoad } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageLoad = async ({ fetch }) => {
  // Load evidence for case (replace 'CASE-001' with actual case ID from route)

@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types'; const { caseId } = $props<{ caseId, string | undefined }>() const { enableRealtimeUpdates = true } = $props() const { showMetrics = true } = $props() const { enableClusterMode = true } = $props() // Migrated to $effect import { writable, derived } from 'svelte/store'; import { browser } from '$app/environment'; // Import browser environment check type Status = 'disconnected' | 'connecting' | 'connected' | 'error'; const mcpStatus = writable<Status>('disconnected'); const clusterMetrics = writable({ activeWorkers: 0, totalRequests: 0, successRate: 0, averageResponseTime: 0;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	cacheHitRate: 0 }); // Derived store for success rate percentage const successRatePercent = derived(clusterMetrics, $clusterMetrics => Math.round(($clusterMetrics.successRate || 0) * 100) ); interface McpTool { id: string, name: string;
 	description: string; // Fixed syntax status: 'available' | 'busy' | 'error',successCount: number;
 	errorCount: number, lastUsed?: Date}

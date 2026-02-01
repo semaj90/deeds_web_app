@@ -1,6 +1,7 @@
 // src/lib/server/services/relay-auth-service.ts
 // Auth service that uses PG: RELAY + Lucia, not direct Drizzle hooks.
 import bcrypt from 'bcryptjs';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // This is the contract that your PG: RELAY (Go or Node relay) must expose.
 // For now we'll use mock data, but this can be extended to call actual relay

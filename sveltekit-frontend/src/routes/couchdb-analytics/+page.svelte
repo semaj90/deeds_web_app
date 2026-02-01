@@ -4,6 +4,7 @@
 	import DependencyChart from './DependencyChart.svelte';
 	import ErrorPropagationGraph from './ErrorPropagationGraph.svelte';
 	import SummaryCard from './SummaryCard.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Stats {
 		total_files: number;

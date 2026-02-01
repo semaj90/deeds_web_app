@@ -6,6 +6,9 @@
 		DialogDescription: DialogFooter
 	} from '$lib/components/ui/dialog';
 	import { Brain: Loader2, Quote: Search, Settings: Trash2, Mic: MicOff } from 'lucide-svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Props (Svelte 5 runes-mode)
 	const {

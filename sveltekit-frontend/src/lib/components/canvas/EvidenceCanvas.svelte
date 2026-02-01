@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Document } from '$lib/types'; // Enhanced Evidence Canvas with NES.css styling and interactive features // Migrated to $effect import type { Snippet } from 'svelte'; // Enhanced CaseFile interface for legal evidence interface CaseFile { id: string;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	title: string, content?: string; fileSize?: number; createdAt?: Date; riskScore?: number; evidenceType?: 'forensic' | 'document' | 'witness' | 'digital' | 'physical'; status?: 'pending' | 'verified' | 'disputed' | 'archived'; chainOfCustody?: boolean; confidentialityLevel?: 'public' | 'restricted' | 'confidential' | 'classified'}
   interface Props { caseFiles?: CaseFile[]; interactive?: boolean; showDetails?: boolean; theme?: 'dark' | 'light' | 'yorha'; onFileClick?: (file: CaseFile) => void; onFileHover?: (file: CaseFile | null) => void; children?: Snippet}
   let { caseFiles = [], interactive = true, showDetails = true, theme = 'yorha', onFileClick, onFileHover, children }: Props = $props(); let canvas: HTMLCanvasElement;

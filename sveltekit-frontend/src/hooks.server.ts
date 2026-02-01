@@ -5,6 +5,7 @@
 
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Main request handler with Lucia v3 session validation

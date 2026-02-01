@@ -17,6 +17,7 @@
  */
 
 import { assign, fromPromise, setup } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type JobType =
 	| 'document_analysis'

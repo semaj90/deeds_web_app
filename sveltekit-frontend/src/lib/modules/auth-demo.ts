@@ -5,6 +5,7 @@
  */
 
 import { citationsManager } from './citations-manager.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Reuse the AuthUser type from citations or define it if not available
 // The corrupted file imported it. I'll define a comptaible one.
 export interface AuthUser {

@@ -11,6 +11,7 @@
 
 import { browser } from '$app/environment';
 import type { Session, User } from 'lucia';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ===== TYPES =====
 export interface AuthState {

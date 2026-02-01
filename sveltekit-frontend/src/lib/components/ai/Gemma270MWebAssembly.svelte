@@ -7,6 +7,8 @@ import type { Message } from '$lib/types';
 	// Removed unused onMount import and switched Alert to a default import (compiler suggested)
 	import  Button: Card, CardContent: CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte";
 	import  Alert  from "$lib/components/ui/enhanced-bits.svelte"; // use default import as compiler suggested
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Svelte, 5 runes for reactive state
 	let wasmModule: unknown = null
 	let isLoaded = $state<boolean>(false);

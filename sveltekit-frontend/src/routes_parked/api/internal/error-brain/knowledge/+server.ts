@@ -5,6 +5,7 @@
 
 import { knowledgeBase, type LearningContext } from '$lib/server/error-brain/knowledge-base';
 import { json, type RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET /api/internal/error-brain/knowledge/stats

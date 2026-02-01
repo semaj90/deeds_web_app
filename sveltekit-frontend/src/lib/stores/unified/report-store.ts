@@ -14,6 +14,8 @@
  * let reports = $derived($reportStore.reports);
  */
 import { writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /** * Types */
 export type ReportType =

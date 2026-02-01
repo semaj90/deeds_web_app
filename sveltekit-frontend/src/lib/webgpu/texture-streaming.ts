@@ -11,6 +11,8 @@
  */
 
 import { BufferDebugUtils, toArrayBuffer, type BufferLike } from '../utils/buffer-conversion.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Memory constraints (Nintendo NES inspired)
 const MEMORY_CONSTRAINTS = {

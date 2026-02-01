@@ -4,6 +4,7 @@
  */
 import { sql } from 'drizzle-orm';
 import { db } from './unified-client.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface DatabaseSetupResult {
     success: boolean;

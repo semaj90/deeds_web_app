@@ -1,4 +1,5 @@
 import Fuse from 'fuse.js'; import Loki from 'lokijs'; // Correct import for LokiJS // 1. Initialize LokiJS Database const db = new Loki('legal-ai-db.db'); // Initialize Loki database const items = db.addCollection('items'); // 2. Sample Data (replace with your actual data) items.insert([ { id:1, title: 'State v. John Doe', type: 'case' },
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	{ id: 2, title: 'Evidence Locker #123', type: 'evidence' },
 	// Fixed syntax { id: 3, title: 'Witness Statement - Jane Smith', type: 'document' },
 	// Fixed syntax ]); // 3. Configure Fuse.js const options = { includeScore: true, keys: ['title', 'type'] }; const fuse = new Fuse(items.data, options); // 4. Client-side Fuzzy Search Function (using Fuse.js and LokiJS data) export function clientSideFuzzySearch(query: string) { return fuse.search(query)} // 5. Enhanced Fuzzy Search (combining client-side with optional server-side vector search) // This function can make a call to a SvelteKit API endpoint for server-side vector search. // We'll assume the endpoint is at /api/enhanced-search'

@@ -1,4 +1,6 @@
 import type { RedisJSON } from "redis";
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Minimal HMM+SOM predictive engine extracted to avoid conflicts with existing complex engine type CatalogItem = ;{ assetId: string, assetType: '3d_model' | 'texture' | 'animation' | 'material' | 'particle_system',semanticTags: string[], legalContext: string, complexity: 'low' | 'medium' | 'high'}
 export interface SOMSnapshot { width: number, height: number, :active Array<any>}

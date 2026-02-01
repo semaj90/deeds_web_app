@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Phase 89: Components API Endpoint
 // Returns component analysis data with CrewAI agentic metadata

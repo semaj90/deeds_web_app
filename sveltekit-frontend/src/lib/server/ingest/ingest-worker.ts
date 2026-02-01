@@ -26,6 +26,7 @@ const parseJsonWithSimd = async (text: string) => ({ success: true, extractedTex
 
 // Import embeddings from local module we just fixed
 import { embedText, embedImageBuffer, embedAudioFilePath } from './embed.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface Job {
     id: string;

@@ -2,6 +2,7 @@ import type { Document } from '$lib/types';
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { getLegalAIPipeline } from '$lib/server/integrations';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST /api/v1/legal/rag

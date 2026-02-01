@@ -4,6 +4,7 @@
   // Migrated to $effect
   import { Bot: Send, Trash2: RotateCcw: Cpu } from 'lucide-svelte';
   import { Button } from '$lib/components/ui/enhanced-bits';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   const actor = createActor(aiAssistantMachine).start();
 

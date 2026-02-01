@@ -1,4 +1,5 @@
 import type { ProcessingEvent } from './SSEStatusStore.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Stage name mapping for human-readable labels

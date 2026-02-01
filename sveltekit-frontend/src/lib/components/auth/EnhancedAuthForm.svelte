@@ -1,6 +1,9 @@
 <script lang="ts"> import { Input } from '$lib/components/ui/input';
 import type { Message } from '$lib/types';
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms'; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Input  from "$lib/components/ui/enhanced-bits.svelte"; import  Label  from "$lib/components/ui/label/Label.svelte"; import  Alert  from "$lib/components/ui/alert/Alert.svelte"; import  Badge  from "$lib/components/ui/badge/Badge.svelte"; import  Progress  from "$lib/components/ui/progress/Progress.svelte"; import  Checkbox  from "$lib/components/ui/checkbox/Checkbox.svelte"; import { mcpGPUOrchestrator } from '$lib/services/mcp-gpu-orchestrator.js'; import { scale, fade } from 'svelte/transition'; import { quartOut } from 'svelte/easing'; import type { EnhancedAuthFormProps } from '$lib/types/component-props.js'; let { mode = $bindable('login'), open = $bindable(false), onOpenChange, onSuccess, allowGuestMode = false, loading = false, class: className = '', id,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     'data-testid': testId}: EnhancedAuthFormProps = $props(); // Enhanced Svelte, 5 reactive state let formData = $state({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', acceptTerms: false, rememberMe: false });
   let formState = $state({ loading: false, error: '', success: '', passwordStrength: 0, showPassword: false, showConfirmPassword: false, emailExists: false, verificationSent: false }); // Form element references for focus management let emailInput: HTMLInputElement = $state(undefined as any);
  let passwordInput: HTMLInputElement = $state(undefined as any);

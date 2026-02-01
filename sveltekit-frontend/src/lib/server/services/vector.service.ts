@@ -8,6 +8,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { documentEmbeddings } from '$lib/server/db/schema-postgres';
 import { createHash } from 'crypto';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Hash utility for caching
 function hashText(text: string): string {

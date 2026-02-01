@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/client';
 import { auditLog, cases, criminals, evidence } from '$lib/server/db/schema';
 import { count, desc, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = locals.user;

@@ -23,6 +23,7 @@ import { FileSearch } from "lucide-svelte";
 import { Sparkles } from "lucide-svelte";
 import { CheckCircle2 } from "lucide-svelte";
 import { AlertTriangle } from "lucide-svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import Card: CardContent: CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // ============================================================================ // Svelte, 5 State Management // ============================================================================ let uploadFile = $state <File, null>(null); let isUploading = $state <boolean>(false); let uploadProgress = $state <number>(0); // Form data let formData = $state ({ title: '', documentType: 'report', as: 'verdict' | 'sentence' | 'contract' | 'evidence' | 'brief' | 'motion' | 'report', jurisdiction: '', // Added colon caseNumber: '', enableComparison: true, // Added colon });
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   
  }
  function toastSuccess(message: string) { if (typeof _toast.success === 'function') { _toast.success(message)} else { _toast(message, { type: 'success' }, as: unknown)}

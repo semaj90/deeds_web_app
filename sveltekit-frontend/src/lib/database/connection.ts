@@ -2,6 +2,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres, { type ParameterOrJSON } from 'postgres';
 import * as schema from './schema.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Get DATABASE_URL from environment with fallback
 const DATABASE_URL = import.meta.env.VITE_DATABASE_URL || import.meta.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';

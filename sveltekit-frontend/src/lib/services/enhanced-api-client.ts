@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { goto } from '$app/navigation';
 import { browser } from '$app/environment';
 import { page } from "$app/stores";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Base API configuration
 const API_BASE_URL = '/api/v1';

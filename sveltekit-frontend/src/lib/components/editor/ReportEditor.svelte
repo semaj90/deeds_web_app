@@ -12,6 +12,9 @@
  import { legalAnalysisCache } from '$lib/services/legal-analysis-cache'; // lightweight Evidence type used in this component (prevents, "Cannot find name: 'Evidence'") type Evidence = { id: string;
 	title: string, description?: string; tags?: string[]; url?: string; file?: unknown}; // Create runtime aliases / fallbacks for external stores and actions import { writable } from 'svelte/store';
  import type { Writable } from 'svelte/store'; // helper: ensure we always have a Writable<T> (wrap readable stores if necessary) function ensureWritable<T>(maybeStore: unknown;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	fallback: T): Writable<T> { if (maybeStore && typeof maybeStore.subscribe === 'function' && typeof maybeStore.set === 'function' && typeof maybeStore.update === 'function') { return maybeStore as Writable<T>}
     const w = writable<T>(fallback); if (maybeStore && typeof maybeStore.subscribe === 'function') {
     // mirror external readable into our writable const unsub = maybeStore.subscribe((v: T) => w.set(v)); // best-effort cleanup if caller uses onDestroy (not required here) 

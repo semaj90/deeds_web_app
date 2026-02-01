@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { User } from 'lucia';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Client-side Auth State using Svelte 5 Runes

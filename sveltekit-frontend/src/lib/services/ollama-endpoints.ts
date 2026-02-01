@@ -5,6 +5,7 @@
 
 import { env } from '$env /dynamic/private';
 import type { dev } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Ollama endpoint configuration
 export const OLLAMA_ENDPOINTS = {

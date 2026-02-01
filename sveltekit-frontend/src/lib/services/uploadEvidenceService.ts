@@ -4,6 +4,8 @@
  */
 
 import type { ProcessingEvent } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface UploadInitiation {
   evidence_id: string;

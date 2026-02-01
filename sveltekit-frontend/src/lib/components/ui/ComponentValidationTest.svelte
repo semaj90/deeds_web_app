@@ -4,6 +4,7 @@ import type { Case } from '$lib/types';
   import  Dropdown  from "./Dropdown.svelte";
   import  Checkbox  from "./Checkbox.svelte";
   import  SearchBar  from "./SearchBar.svelte";
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   // Test data for dropdown
   const legalCaseTypes = [
     { value: 'contract', label: 'Contract Dispute' },

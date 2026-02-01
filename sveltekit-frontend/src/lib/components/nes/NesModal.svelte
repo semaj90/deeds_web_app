@@ -2,6 +2,7 @@
  // Migrated to $effect
 
  import type { Snippet } from 'svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  open: boolean;

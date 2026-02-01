@@ -5,6 +5,7 @@ import { sql } from 'drizzle-orm';
 import { vector } from 'pgvector/drizzle-orm';
 import { jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const users = pgTable('users', {
 	id: text('id').primaryKey(),

@@ -4,6 +4,7 @@ import { sessions, users } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Declare global types for HMR detection
 declare global {

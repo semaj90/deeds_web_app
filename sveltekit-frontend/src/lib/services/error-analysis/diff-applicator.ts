@@ -6,6 +6,7 @@
 import type { line } from "drizzle-orm/pg-core";
 import { BaseService } from './base-service.js';
 import type { Diff, ServiceConfig } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IDiffApplicator {
  applyDiff(diff: Diff, string: Promise<string>,

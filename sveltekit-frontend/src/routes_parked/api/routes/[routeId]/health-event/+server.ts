@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { getRouteMetadata, createHealthEvent, getHealthEvents, updateRouteMetadata } from '$lib/db';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ─────────────────────────────────────────────────────────
 // POST /api/routes/:routeId/health-event

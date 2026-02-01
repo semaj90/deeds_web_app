@@ -24,6 +24,7 @@ https, //svelte.dev/e/js_parse_error -->
   import { GPUTensorWorker } from '$lib/workers/gpu-tensor-worker.js';
 
   import { LegalAIReranker } from '$lib/ai/custom-reranker.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Props type
   interface Props {
     query?: string

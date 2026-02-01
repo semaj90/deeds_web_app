@@ -20,6 +20,8 @@
 	import Users from 'lucide-svelte/icons/users';
 	import X from 'lucide-svelte/icons/x';
 	import Zap from 'lucide-svelte/icons/zap';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	// Svelte 5 runes state

@@ -1,4 +1,5 @@
 import { env } from '$lib/env';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const LANGEXTRACT_API_URL = env?.LANGEXTRACT_API_URL ?? 'http://localhost:8000';
 

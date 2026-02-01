@@ -3,6 +3,8 @@
  * Enhanced accessibility features tailored for AI interactions and complex legal outputs
  */
 import { accessibilityService } from './accessibility-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface AIAccessibilityOptions {
     enableVoiceCommands?: boolean;

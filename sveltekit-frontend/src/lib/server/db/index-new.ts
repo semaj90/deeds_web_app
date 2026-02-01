@@ -2,6 +2,7 @@ import * as schema from '$lib/server/db/schema-postgres';
 import dotenv from 'dotenv';
 import { type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import pgClient, { poolShim, type PoolLike } from '$lib/server/db-shim';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Load environment-specific variables
 const envFile = `.env.${process.env?.NODE_ENV ?? 'development'}`;

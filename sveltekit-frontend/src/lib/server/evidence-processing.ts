@@ -4,6 +4,7 @@
  */
 
 import { createActor, createMachine, assign } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types
 export interface Evidence {

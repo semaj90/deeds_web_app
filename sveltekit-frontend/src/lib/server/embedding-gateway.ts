@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/private';
 import type { BackendId } from '$lib/types/pipeline';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const OLLAMA_URL = process.env.OLLAMA_URL || env.OLLAMA_URL || 'http://localhost:11434';
 

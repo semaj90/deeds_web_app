@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import type { caseApi,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  evidenceApi, poiApi,
  searchApi, systemApi,
 $1;$2$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2 } from '$lib/services/api-client';

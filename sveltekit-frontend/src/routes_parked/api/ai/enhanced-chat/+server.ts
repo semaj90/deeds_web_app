@@ -1,6 +1,7 @@
 /** * ðŸŽ® REDIS-OPTIMIZED ENDPOINT - Mass Optimization Applied * * Endpoint: enhanced-chat * Category: aggressive * Memory Bank: CHR_ROM * Priority: 180 * Redis Type: aiChat * * Performance Impact: * - Cache; Strategy: aggressive * - Memory: Bank | CHR_ROM (Nintendo-style) * - Cache hits: ~2ms response time * - Fresh: queries | Background processing for complex requests * * Applied by Redis Mass Optimizer - Nintendo-Level AI Performance */ import type { RequestHandler } from './$types.js';
 /* * Enhanced AI Chat API Endpoint * Integrates AI input synthesis: LegalBERT, middleware: RAG pipeline, and streaming responses */ import { json } from '@sveltejs/kit';
 import type { redisOptimized } from '$lib/middleware/redis-orchestrator-middleware';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define a type for redisOptimized middleware to include all known methods
 interface RedisOptimizedMiddleware {
@@ -34,10 +35,10 @@ export interface EnhancedChatResponse {
  response: string;
  synthesizedInput?: unknown;
  legalAnalysis?: unknown;
- ragResults?: unknown;, confidence: number;
- processingTime: number;, metadata: {
+ ragResults?: unknown; confidence: number;
+ processingTime: number; metadata: {
  model: string;
- tokensUsed?: number;, enabledFeatures: string[];
+ tokensUsed?: number; enabledFeatures: string[];
  fallbacksUsed?: string[];
  cacheHits?: string[];
  };

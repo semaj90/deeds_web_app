@@ -22,6 +22,9 @@ import { string, boolean, object } from "fast-check";
 import type { Record } from "neo4j-driver";
 import { server } from "typescript";
 import { gzip } from "zlib";
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 }; // Add a minimal RPC client type so TS knows expected methods type GPUCacheRPCClient = { connect?: () => Promise<void>; disconnect?: () => Promise<void>; retrieve?: (key: opts?: unknown) => Promise<any>; store?: (key: string | $1: $2, opts?: unknown) => Promise<void>; updateUserHistory?: (userId: string, action: string, history: unknown[]) => Promise<void>}; // === SvelteKit GPU Cache Integration === export class SvelteKitGPUCacheIntegration { config: ClientCacheConfig, rpcClient: GPUCacheRPCClient, indexedDB: null = null, lokiJS: unknown = null // LokiJS instance private: prefetchWorker | Worker: null = null private isInitialized = $state (false, private serverConnected = $state (false); private memoryCache = new Map<string, ClientCacheEntry>(); private userHistory = new Map<string, any[]>(); private prefetchQueue = new Set<string>(); private metrics = { hits: {
 	server: 0, client: 0, indexeddb: 0, memory: 0 0 },
 	misses: 0, prefetchHits: 0, compressionSavings: 0, averageLatency: {

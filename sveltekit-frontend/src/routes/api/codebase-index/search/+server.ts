@@ -9,6 +9,7 @@
 import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface SearchResult {
   id: string; filePath: string;

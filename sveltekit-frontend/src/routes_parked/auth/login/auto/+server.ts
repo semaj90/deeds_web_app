@@ -1,12 +1,13 @@
 import { lucia } from '$lib/server/auth';
 import { SimpleAuthService } from '$lib/server/auth-simple';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define the User interface for type safety
 interface User {
- id: string;, email: string;
+ id: string; email: string;
  first_name?: string;
- last_name?: string;, role: string;
+ last_name?: string; role: string;
 }
 
 /**

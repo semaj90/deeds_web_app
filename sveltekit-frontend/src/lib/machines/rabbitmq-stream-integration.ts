@@ -9,6 +9,7 @@
 
 import type { Channel, Connection, ConsumeMessage } from 'amqplib';
 import { assign, fromCallback, fromPromise, setup, type ActorRefFrom } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ===== Types =====
 

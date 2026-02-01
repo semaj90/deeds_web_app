@@ -31,6 +31,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { analyzeDocumentWithDocling } from '$lib/server/docling';
 import { extractKeywords } from '$lib/server/keyword-extractor';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
  try {

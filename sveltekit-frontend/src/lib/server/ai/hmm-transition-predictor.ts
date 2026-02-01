@@ -18,6 +18,7 @@ import {
 timestamp }
 from "drizzle-orm/gel-core";
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 Record }
 from "neo4j-driver";
 export interface TransitionObservation {

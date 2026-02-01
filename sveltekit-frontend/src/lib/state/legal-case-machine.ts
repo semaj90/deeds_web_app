@@ -11,6 +11,7 @@ type NewEvidence = InferInsert<typeof evidence>;
 import { aiSummarizationService } from '../services/ai-summarization-service.ts'; // Updated import path and extension
 import { vectorSearchService } from '../services/vector-search-service.ts'; // Updated import path and extension
 import { embedText } from '../server/ai/embedder.ts'; // Updated import path and extension
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // New interfaces for service return types
 interface ProcessEvidenceServiceResult {

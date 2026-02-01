@@ -7,6 +7,8 @@
  */
 
 import type { Transform } from 'stream';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * SIMD Parser Configuration

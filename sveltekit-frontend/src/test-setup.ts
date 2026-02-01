@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Generate valid UUIDs for tests (PostgreSQL requires proper UUID format)
 function generateValidUUID(): string {

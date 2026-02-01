@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { errorBrainAnalysisTable } from '$lib/server/db/schema/error_brain_analysis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request, params }) => {
  try {

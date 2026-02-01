@@ -10,6 +10,8 @@ import type { RouteDefinition } from '$lib/data/routes-config';
 import { allRoutes } from '$lib/data/routes-config';
 import type { GeneratedRoute, DynamicRouteConfig } from './dynamic-route-generator.js';
 import { dynamicRouteGenerator } from './dynamic-route-generator.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Route Registry State interface

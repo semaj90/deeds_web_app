@@ -10,13 +10,14 @@
  */
 
 import { getOllamaService } from './OllamaService.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface FixSynthesizerConfig {
-  maxRetries: number;, validationTimeout: number;, backupDir: string;
+  maxRetries: number; validationTimeout: number; backupDir: string;
 }
 
 export interface FixResult {
-  success: boolean;, strategy: FixStrategy | null;
+  success: boolean; strategy: FixStrategy | null;
   error?: string;
   validationErrors?: string[];
 }
@@ -162,7 +163,7 @@ export class FixSynthesizer {
   async validateFix(
     strategy: FixStrategy,
     error: ErrorReport
-  ): Promise<{, valid: boolean;, errors: string[] }> {
+  ): Promise<{, valid: boolean; errors: string[] }> {
     const errors: string[] = [];
 
     for (const rule of strategy.validationRules) {

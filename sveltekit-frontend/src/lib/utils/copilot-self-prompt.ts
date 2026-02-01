@@ -133,6 +133,7 @@ export interface AITask {
 
 // Import Redis client
 import { createClient, type RedisClientType } from 'redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Singleton Redis client for connection reuse
 let redisClient: null = null;

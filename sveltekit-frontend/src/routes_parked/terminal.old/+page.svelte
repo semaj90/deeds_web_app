@@ -1,10 +1,11 @@
 <script lang="ts">
  import TerminalWindow from '$lib/components/terminal/TerminalWindow.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  interface Query {
- id: string;, query: string;
- response: string;, timestamp: Date;
+ id: string; query: string;
+ response: string; timestamp: Date;
  functionCalls: Array<{, name: string; result, any }>;
  }
 

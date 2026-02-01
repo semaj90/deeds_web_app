@@ -1,5 +1,7 @@
 import { browser } from '$app/environment';
 import { IndexedDBService } from '$lib/services/indexeddb-service'; // Corrected: Named import
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // import type { LegalDocumentJSON } from "$lib/wasm/simd-json-wrapper"; // New import - This import is causing the error.
 
 /**

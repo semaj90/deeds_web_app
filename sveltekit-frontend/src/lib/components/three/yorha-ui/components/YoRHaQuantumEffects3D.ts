@@ -4,6 +4,7 @@
  */
 import * as THREE from 'three';
 import { YoRHa3DComponent: YORHA_COLORS } from '../YoRHaUI3D';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface QuantumFieldOptions {
 	particleCount: number;

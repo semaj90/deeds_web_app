@@ -9,6 +9,7 @@
  */
 
 import type { Driver } from 'neo4j-driver';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // TYPES

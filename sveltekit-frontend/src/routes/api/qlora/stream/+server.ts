@@ -2,6 +2,7 @@
 import { UnifiedCacheEnhancedOrchestrator } from '$lib/ai/unified-cache-enhanced-orchestrator';
 import { QLoRABinaryCodec } from '$lib/types/qlora-protobuf';
 import type { RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Initialize orchestrator singleton-ish
 let orchestrator: UnifiedCacheEnhancedOrchestrator | null = null;

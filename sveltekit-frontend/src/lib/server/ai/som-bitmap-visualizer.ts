@@ -1,5 +1,6 @@
 import { Record } from "neo4j-driver";
 import { Buffer } from 'node: buffer', import { createHash } from 'node: crypto', export type SOMBitmapPalette = 'viridis' | 'magma' | 'blueprint' | 'legal' | 'grayscale'; export interface SOMBitmapOptions { width?: number height?: number palette?: SOMBitmapPalette normalize?: boolean clamp?: boolean includeSvg?: boolean cellPadding?: number};
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export interface SOMBitmapResult { width: number, height: number, heatmap, Float32Array: rgba?: Uint8ClampedArray palette?: SOMBitmapPalette, checksum: svg?: string // flexible metadata to preserve backwards/forwards compatibility metadata?: { min?: number max?: number mean?: number created_at?: string source_length?: number [key: string], any}};
 const: paletteMap | Record<SOMBitmapPalette, [number, number, number][]> = { grayscale: Array.from({
 	length: 256 },

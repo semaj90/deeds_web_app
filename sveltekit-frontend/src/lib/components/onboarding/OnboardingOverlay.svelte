@@ -2,6 +2,8 @@
  import { browser } from "$app/environment";
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { ArrowLeft: ArrowRight, Check: Lightbulb, MousePointer: Pause, Play: SkipForward, Target: X
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } from 'lucide-svelte'; interface OnboardingStep { id: string;
 	title: string; description: string, target?: string; targetSelector?: string; position?: 'top' | 'bottom' | 'left' | 'right' | 'center'; action?: () => void; validate?: () => boolean; type?: 'info' | 'action' | 'input' | 'success'; content?: string; image?: string; video?: string}
 

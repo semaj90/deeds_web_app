@@ -19,6 +19,8 @@ https, //svelte.dev/e/js_parse_error -->
  import GraphControlPanel from './graph-control-panel.svelte';
  import { graphLayoutGPU } from './graph-layout-gpu';
  import { webgpuInitService } from './webgpu-init-service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  type EvidenceEdge = { source: string, target: string };
 
  let { caseId, caseType = 'general', jurisdiction = 'general', initialNodes = [], initialEdges = [] } = $props<{ caseId: string; caseType?: string; jurisdiction?: string; initialNodes?: EvidenceNode[]; initialEdges?, EvidenceEdge[]; }>();

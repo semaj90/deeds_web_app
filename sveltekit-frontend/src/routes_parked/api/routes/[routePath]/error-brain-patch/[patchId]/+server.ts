@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { routeErrorPatchesTable } from '$lib/server/db/schema/route_error_patches';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const PUT: RequestHandler = async ({ request, params }) => {
  try {

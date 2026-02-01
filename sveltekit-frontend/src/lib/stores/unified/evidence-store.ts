@@ -1,4 +1,5 @@
 import { derived, writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type EvidenceType = 'document' | 'image' | 'video' | 'audio' | 'email' | 'forensic' | 'physical' | 'digital' | 'testimony' | 'other';
 export type AnalysisStatus = 'pending' | 'processing' | 'complete' | 'error';

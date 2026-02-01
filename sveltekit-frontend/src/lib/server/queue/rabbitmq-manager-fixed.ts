@@ -1,6 +1,8 @@
 import amqp, { type Connection, type Channel, type ConsumeMessage } from 'amqplib';
 import { EventEmitter } from 'events';
 import { env } from '$lib/env'; // Use standard env
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Import types dynamically or use any to avoid circular deps for now
 // import type { OllamaEmbeddings } from '@langchain/community/embeddings/ollama';
@@ -20,7 +22,7 @@ export class RabbitMQManager extends EventEmitter {
     private lokiRedisCache: any = null;
     private enhancedRAGPipeline: any = null;
     private instantSearchEngine: any = null;
-    private db: any = null;
+    private db: DrizzleTypes.DatabaseConfig = null;
     private sql: any = null;
     private schema: any = null;
 

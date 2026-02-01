@@ -1,5 +1,6 @@
 import { streamEmbedding } from '$lib/server/vector/embedding-gemma';
 import { json, type RequestEvent } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function POST({ request }: RequestEvent) {
  try {

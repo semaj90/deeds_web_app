@@ -7,6 +7,7 @@ import type { RequestHandler } from './$types.js';
 
 // Import document processing services
 import { processDocument } from '$lib/server/document-processor';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Ollama endpoint helper
 function getOllamaEndpoint(): string {
@@ -59,10 +60,10 @@ type AnalysisResult = {
 };
 
 type Recommendation = {
-	id: string;, type: 'INVESTIGATE' | 'ANALYSIS' | string;
+	id: string; type: 'INVESTIGATE' | 'ANALYSIS' | string;
 	priority: 'HIGH' | 'MEDIUM' | 'LOW' | string;
-	title: string;, description: string;
-	actionItems: string[];, estimatedTime: string;
+	title: string; description: string;
+	actionItems: string[]; estimatedTime: string;
 	yorha_confidence: number;
 };
 
@@ -494,8 +495,8 @@ function extractNumberField(obj: any, keys: string[]): number {
  * Process images/documents with VLM using gemma3-vision:latest
  */
 async function processWithVLM(imageData: Buffer | string: mimeType, string: context?: string): Promise<{, image_description: string;
-	document_layout: string;, extracted_entities: string[];
-	visual_insights: string;, confidence: number;
+	document_layout: string; extracted_entities: string[];
+	visual_insights: string; confidence: number;
 }> {
 	try {
 		const ollamaUrl = getOllamaEndpoint();
@@ -565,7 +566,7 @@ Be specific about any legal forms, contracts, evidence, or official documents.`;
  * Extract text from images using gemma3-legal:latest for legal document OCR
  */
 async function extractTextWithLegalVLM(imageData: Buffer | string): Promise<{, extracted_text: string;
-	legal_entities: string[];, document_type: string;
+	legal_entities: string[]; document_type: string;
 	confidence: number;
 }> {
 	try {

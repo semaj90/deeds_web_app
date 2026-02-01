@@ -1,4 +1,5 @@
 import { vectorizeErrorsGPU } from './vectorizeErrors.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ErrorCluster {
     id: string;

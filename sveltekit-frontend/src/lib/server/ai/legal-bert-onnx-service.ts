@@ -8,6 +8,7 @@
 	name: string, type: string, shape: number[] } logits?: {
 	name: string, type: string, shape: number[] } }
 import { boolean } from "drizzle-orm/gel-core";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 } }
 interface LegalEntityExtractionResult { entities: Array<{
 	text: string, label: string, confidence: number, start: number, end, number }>; processingTime: number, modelUsed: string}

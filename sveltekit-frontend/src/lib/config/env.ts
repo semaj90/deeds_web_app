@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 import { default as clampMemoryMB, default as normalizePerformanceProfile } from '$lib/gpu/types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Raw environment (unvalidated)
 const RAW_ENV = {

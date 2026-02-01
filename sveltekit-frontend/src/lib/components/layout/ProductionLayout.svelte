@@ -29,6 +29,7 @@
   } from 'lucide-svelte';
   import { cn } from '$lib/utils';
   import type { Snippet } from 'svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     title?: string;

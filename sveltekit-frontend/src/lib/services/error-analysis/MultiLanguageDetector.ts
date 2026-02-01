@@ -14,6 +14,7 @@ import { promisify } from 'util';
 import type { ErrorReport } from './types.js';
 import type { duration } from "drizzle-orm/gel-core";
 import { line } from "drizzle-orm/pg-core";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const execAsync = promisify(exec);
 

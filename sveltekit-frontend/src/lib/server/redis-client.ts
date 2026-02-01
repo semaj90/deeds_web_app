@@ -5,6 +5,7 @@
 import { env } from '$env/dynamic/private';
 import type { RedisOptions } from 'ioredis';
 import Redis from 'ioredis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type RedisClientOptions = RedisOptions & {
 	url?: string;

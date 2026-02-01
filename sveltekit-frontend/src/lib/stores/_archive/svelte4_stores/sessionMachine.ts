@@ -1,6 +1,8 @@
 import type { createMachine, assign, fromPromise } from 'xstate';
 import type { User } from '$lib/types';
 import {  browser  } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Re-define Session interface for the machine's context
 export interface Session {

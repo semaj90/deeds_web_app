@@ -10,6 +10,7 @@
 
 import { and, eq, sql } from 'drizzle-orm';
 import { boolean, index, integer, pgTable, text, timestamp, uuid, vector } from 'drizzle-orm/pg-core';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Document Chunks - Phase 90 Hardened

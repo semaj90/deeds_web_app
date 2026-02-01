@@ -15,7 +15,6 @@
 
  function choose(src: string) {
  dispatch('select', { src });
- }
 </script>
 
 <div class="grid grid-cols-3 gap-2 overflow-auto h-full p-2 border border-black">

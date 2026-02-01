@@ -2,6 +2,7 @@
  * MCP Multi-Core Server Integration
  */
 import { logger } from '$lib/server/logger.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface MCPWorkerCore {
     id: string;

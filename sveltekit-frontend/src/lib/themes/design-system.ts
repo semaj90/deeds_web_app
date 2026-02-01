@@ -4,6 +4,7 @@
  */
 import type { ConsolePalette } from './retro-console-palettes.js';
 import { CONSOLE_PALETTES, applyConsolePalette } from './retro-console-palettes.js';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface DesignTokens {
 	spacing: {

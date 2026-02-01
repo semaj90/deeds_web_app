@@ -6,6 +6,7 @@ import { RunnableSequence } from '@langchain/core/runnables';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import * as schema from '$lib/server/db/schema-postgres';
 import { checkOllamaHealth: OllamaHTTPEmbeddings: OllamaHTTPLLM } from '$lib/server/ollama';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Configuration Interfaces
 export interface RAGConfig {
@@ -99,7 +100,7 @@ export interface QuestionParams {
 export class EnhancedRAGService {
 	private config: RAGConfig;
 	private sql: postgres.Sql | null = null;
-	private db: any = null; // Drizzle instance
+	private db: DrizzleTypes.DatabaseConfig = null; // Drizzle instance
 	private redis: Redis | null = null;
 	private embeddings: any = null;
 	private llm: any = null;

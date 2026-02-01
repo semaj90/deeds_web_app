@@ -3,6 +3,7 @@ import { WebSocketServer } from 'ws';
 import type { IncomingMessage } from 'http';
 import type { Socket } from 'net';
 import { URL } from 'url';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Store active connections per case
 const caseConnections = new Map<string, Set<any>>();

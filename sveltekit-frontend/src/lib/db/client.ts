@@ -3,6 +3,7 @@
 
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Environment variable picker - tries multiple common patterns
 function pickEnv(...names: string[]) {

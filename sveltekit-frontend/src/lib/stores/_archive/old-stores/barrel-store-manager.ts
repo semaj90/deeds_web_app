@@ -3,6 +3,8 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
 /** * TypeScript Barrel Store Pattern Implementation * Provides centralized, type-safe state management with performance optimizations */ import { writable, derived, readable } from 'svelte/store';
 import type { type Writable, type Readable } from 'svelte/store'; // SSR-safe storage utilities (adapted from ai-store.ts) const SSR_SAFE_STORAGE = { getItem: (key): string | null => { if (typeof window === 'undefined') return null; try { return localStorage.getItem(key)}catch { return null},
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	setItem: (key: string), string: void => { if (typeof window === 'undefined') return; try { localStorage.setItem(key, value)}catch { // Silently fail in SSR or if storage is unavailable } },
 	removeItem: (key: string): void => { if (typeof window === 'undefined') return; try { localStorage.removeItem(key)}catch { // Silently fail } }
 }; // Base interfaces for the barrel pattern export interface StoreMetadata { id: string, version: string, lastUpdated: number, dependencies: string[], cacheable: ttl?: number}

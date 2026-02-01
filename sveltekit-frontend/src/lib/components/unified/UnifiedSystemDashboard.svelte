@@ -14,6 +14,7 @@
   import Terminal from 'lucide-svelte/icons/terminal';
   import TriangleAlert from 'lucide-svelte/icons/triangle-alert';
   import Zap from 'lucide-svelte/icons/zap';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // System State with Svelte 5 Runes

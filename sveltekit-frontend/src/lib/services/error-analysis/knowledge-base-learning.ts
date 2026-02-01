@@ -10,6 +10,7 @@ import type { string } from "fast-check";
 import { Record } from "neo4j-driver";
 import { BaseService } from './base-service.js';
 import type { ServiceConfig, Diff, Error as ErrorType } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Stored fix in knowledge base

@@ -2,6 +2,7 @@
 import type { SearchResult } from '$lib/types';
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types'; import  Button: Card, CardContent: CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte"; // Migrated to $effect interface SearchResult { id: string, title: string, content: string, score: number, metadata: {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	document_type: string, jurisdiction: string;
 	date: string, legal_domain: string}; performance: {
 	gpu_accelerated: boolean, search_time_ms: number, gpu_utilization: number}}

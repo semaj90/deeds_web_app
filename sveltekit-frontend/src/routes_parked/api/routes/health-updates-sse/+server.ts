@@ -1,4 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Phase 10.2: SSE Fallback Endpoint

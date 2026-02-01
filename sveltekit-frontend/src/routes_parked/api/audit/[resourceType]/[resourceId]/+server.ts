@@ -8,6 +8,7 @@
 
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { getResourceHistory, type AuditResourceType } from '$lib/server/services/audit-service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const VALID_RESOURCE_TYPES: AuditResourceType[] = ['Evidence', 'Tag', 'EvidenceTag', 'RAGIndex'];
 

@@ -9,6 +9,7 @@
  */
 
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     AnswerRequest,
     AnswerWithCitations,
     ApprovedContext,

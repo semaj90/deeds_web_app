@@ -35,6 +35,7 @@ export {
 import DAGClient from './dag/index.js';
 import KAGClient from './kag/index.js';
 import RAGClient from './rag/index.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface UnifiedAIConfig {
 	rag: {
@@ -70,7 +71,7 @@ export class UnifiedAIClient {
 	 * Initialize all clients
 	 */
 	async initialize(deps: {
-	qdrant: any, neo4j: any, db: any }): Promise<void> {
+	qdrant: any, neo4j: any, db: DrizzleTypes.DatabaseConfig }): Promise<void> {
 		await Promise.all([
 			this.rag.initialize(deps.qdrant),
             this.kag.initialize(deps.neo4j),

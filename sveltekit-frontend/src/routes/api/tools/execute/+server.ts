@@ -9,6 +9,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { toolRegistry } from '$lib/server/tools/handlers/index.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {

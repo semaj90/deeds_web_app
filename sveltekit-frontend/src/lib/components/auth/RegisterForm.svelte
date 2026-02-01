@@ -16,6 +16,7 @@
   import { superForm } from 'sveltekit-superforms/client';
   import { createActor } from 'xstate';
   import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Enhanced registration schema for legal professionals
   const registerSchema = z

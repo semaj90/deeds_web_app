@@ -21,6 +21,7 @@ import {
     pgEnum
 } from 'drizzle-orm/pg-core';
 import { cases, users } from './schema-postgres.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // === ENUMS ===
 export const processingStatusEnum = pgEnum('processing_status', [

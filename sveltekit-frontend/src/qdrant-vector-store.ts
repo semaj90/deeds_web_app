@@ -10,6 +10,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import type { LegalEntity } from '$lib/types/sharedTypes';
 import * as crypto from 'crypto';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Reusing types from previous context where appropriate
 type QdrantCollectionsResponse = { collections?: Array<{, name: string }> };

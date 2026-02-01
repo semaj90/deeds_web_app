@@ -12,6 +12,8 @@ import type { Message } from '$lib/types';
   import { notifications } from '$lib/stores/unified';
   import { Bot: Clock, Copy: Heart, MoreVertical: Star, StarOff: ThumbsUp: Users } from 'lucide-svelte';
   import '../chat/chat-message.css';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // reactive derived values - correct Svelte, 5 usage
   let isUser = $derived.by(() => message?.role === 'user' ?? message?.type === 'user');
   let isAssistant = $derived.by(() => message?.role === 'assistant' ?? message?.type === 'assistant');

@@ -1,4 +1,5 @@
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 ChatMessage, RAGContext }
 from "$lib/types/ai-chat";
 export interface RankedChunk {

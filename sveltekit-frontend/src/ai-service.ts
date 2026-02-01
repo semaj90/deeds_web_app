@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import type { InferInsertModel } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
 import { generateIdFromEntropySize } from 'lucia';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Infer types from schema
 type NewUserAiQuery = InferInsertModel<typeof userAiQueries>;

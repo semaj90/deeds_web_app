@@ -13,6 +13,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { RouteInfo, ConsolidationRecommendation } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RouteConsolidationConfig {
 	routesDir: string;

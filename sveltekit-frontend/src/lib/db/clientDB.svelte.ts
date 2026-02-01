@@ -1,5 +1,7 @@
 import loki from 'lokijs';
 import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export class LocalLegalStore {
     private db: loki;

@@ -1,6 +1,8 @@
 /** * Universal Redis Orchestrator Middleware * Minimal implementation for SvelteKit API endpoints */
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type CacheStrategy = 'aggressive' | 'conservative' | 'minimal' | 'bypass';
 type MemoryBank = 'INTERNAL_RAM' | 'CHR_ROM' | 'PRG_ROM' | 'SAVE_RAM';

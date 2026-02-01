@@ -13,6 +13,7 @@ import { Tag } from "lucide-svelte";
 import { X } from "lucide-svelte";
 import { ZoomIn } from "lucide-svelte";
 import { ZoomOut } from "lucide-svelte";
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  let {
  open,

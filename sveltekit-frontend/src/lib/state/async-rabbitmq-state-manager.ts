@@ -5,6 +5,7 @@
  * Powers: Queue management for async workflows
  */
 import { assign, fromPromise, setup } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type JobStatus = 'queued' | 'dispatched' | 'running' | 'completed' | 'failed' | 'cancelled';
 

@@ -5,6 +5,7 @@
  */
 
 import Fuse from 'fuse.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CachedStatute {
     id: string;

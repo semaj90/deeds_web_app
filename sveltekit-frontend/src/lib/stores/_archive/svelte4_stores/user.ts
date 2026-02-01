@@ -1,5 +1,6 @@
 import { writable, derived } from 'svelte/store';
 import type { User } from 'lucia';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface UserSession {
  user: {

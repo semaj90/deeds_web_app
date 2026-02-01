@@ -30,6 +30,7 @@ import { T: T: T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import type { string, record } from "fast-check";
 import type { stream } from "glob";
 import type { strategy } from "sharp";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const gzip = promisify(zlib.gzip;
  const gunzip = promisify(zlib.gunzip);

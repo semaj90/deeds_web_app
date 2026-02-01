@@ -1,5 +1,6 @@
 import { as } from "$lib/server/db/utils";
 import type { Case } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // src/lib/services/__tests__/shared/integration-test-helpers.ts import type { productionServiceClient } from '../../../api/production-service-client.js'; // Shared integration test configuration and utilities export const TEST_CONFIG = { auth: {
 	email: 'test@legalai.com', password: 'testPassword123' },
 	timeouts: {

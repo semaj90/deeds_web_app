@@ -5,6 +5,7 @@
   import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
   import { Button } from '$lib/components/ui/enhanced-bits';
   import { AsyncStore, GenericStore } from '$lib/stores/generic.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // 1. Generic Store Example
   const counterStore = new GenericStore<number>(0);
@@ -24,7 +25,6 @@
 
       return { id: 1, name: 'Svelte 5 User' };
     });
-  }
 </script>
 
 <div class="space-y-8 p-4">

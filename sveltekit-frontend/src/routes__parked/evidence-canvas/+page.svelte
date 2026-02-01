@@ -29,10 +29,10 @@
 
 <style>
  .evidence-canvas-page {
- min-height: 100vh;, background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+ min-height: 100vh; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
  }
  .page-header {
- text-align: center;, padding: 2rem 1rem 1rem;
+ text-align: center; padding: 2rem 1rem 1rem;
  background: #fff;
  border-bottom: 1px solid #e5e5e5;
  margin-bottom: 0;
@@ -46,12 +46,12 @@
  font-weight: 600;
  }
  .page-header p {
- margin: 0;, color: #666;
+ margin: 0; color: #666;
  font-size: 1.1rem;
  }
  .main-content {
  padding: 2rem 1rem;
- max-width: 1200px;, margin: 0 auto;
+ max-width: 1200px; margin: 0 auto;
  }
  @media (max-width: 768px) {
  .page-header h1 {

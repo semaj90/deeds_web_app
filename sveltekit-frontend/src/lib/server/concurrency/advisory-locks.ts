@@ -1,6 +1,7 @@
 import type { User } from '$lib/types';
 import { sql } from '$lib/database/connection';
 import { randomUUID } from 'crypto';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * PostgreSQL Advisory Locks for Legal AI Platform

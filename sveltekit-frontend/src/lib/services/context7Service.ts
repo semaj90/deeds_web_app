@@ -1,4 +1,6 @@
 import { writable } from 'svelte/store';import nodejsOrchestrator from "./nodejs-orchestrator";
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 ; export interface Context7Tool { name: description?: string; schema?: Record<string, unknown>}
 export interface Context7Analysis { component: string, recommendations: string[], integration?: string; bestPractices?: string[]}
 // REMOVED: export interface VectorIntelligence { query: string | results: Array<Record<string, unknown>>, suggestions: string[]}

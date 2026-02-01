@@ -5,6 +5,7 @@
  */
 
 import { ingestStatuteWithChunks } from './statute-ingestion-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ScraperSource {
     name: string;

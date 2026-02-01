@@ -4,6 +4,7 @@
  */
 
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface OllamaChatOptions {
 	model: string;

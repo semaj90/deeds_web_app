@@ -3,7 +3,7 @@ import { json } from '@sveltejs/kit';
 import type { dimensionalCache } from '$lib/ai/dimensional-cache-engine';
 
 interface AttentionRequest {
- jobId: string;, text: string;
+ jobId: string; text: string;
  type: 'attention' | 'multi-head' | 'flash-attention' | 'kernel-splicing';
  useCache?: boolean;
  userId?: string;
@@ -17,9 +17,9 @@ interface AttentionRequest {
 }
 
 interface AttentionResponse {
- jobId: string;, status: 'success' | 'error';
- output: number[];, attention: number[];
- cached: boolean;, processTime: number;
+ jobId: string; status: 'success' | 'error';
+ output: number[]; attention: number[];
+ cached: boolean; processTime: number;
  gpu: string;
  memoryUsage?: string;
  confidence?: number;

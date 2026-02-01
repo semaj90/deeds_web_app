@@ -26,13 +26,13 @@ const SearchFormSchema: ZodSchema = z.object({
   
 
 interface SearchResult {
- id: string;, title: string;
- content: string;, similarity: number;
+ id: string; title: string;
+ content: string; similarity: number;
  metadata?: Record<string, unknown>;
 }
 interface SearchState {
- results: SearchResult[];, query: string;
- responseTime: number;, timestamp: string;
+ results: SearchResult[]; query: string;
+ responseTime: number; timestamp: string;
 }
 
 // ===== LOAD =====
@@ -58,7 +58,7 @@ export const actions: Actions = {
  method: 'POST',
  body: requestBody, // Pass the object directly
  })) as ServiceResponse<{
- results: SearchResult[];, responseTime: number;
+ results: SearchResult[]; responseTime: number;
  timestamp: string;
  }>;
 

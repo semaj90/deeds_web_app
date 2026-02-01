@@ -1,5 +1,6 @@
 import { jsonb, pgTable, text, timestamp, uuid, varchar, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * AI Chat Schema

@@ -1,6 +1,7 @@
 import { getContext, setContext } from 'svelte';
 import { writable, get, derived } from 'svelte/store';
 import type { Writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ContextualState {
 	userId?: string;

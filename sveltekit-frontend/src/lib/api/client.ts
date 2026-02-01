@@ -6,6 +6,7 @@ import {
  HealthAPI: StandardApiResponse, RequestOf,
 } from '../types/api-contracts.js';
 import { browser } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // API Client Configuration
 export interface ApiClientConfig {

@@ -6,6 +6,8 @@
 import type { LegalDocument } from '$lib/models/LegalDocument.svelte';
 import type { NESMemoryArchitecture } from '../memory/nes-memory-architecture';
 import type { WebGPUSOMCache } from '../webgpu/som-webgpu-cache';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Generic JSON value type
 type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };

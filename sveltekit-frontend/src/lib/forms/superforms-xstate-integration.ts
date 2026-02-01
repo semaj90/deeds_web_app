@@ -5,6 +5,7 @@ import { superForm, type SuperValidated } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createActor, type AnyActorRef } from 'xstate';
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Lightweight local types to reduce broad casting and improve readability
 type ValidationErrors = Record<string, string[]>;

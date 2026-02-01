@@ -14,6 +14,7 @@ import type { ErrorPattern, FixStrategy, ErrorRelationship } from './types.js';
 import { getJSONLStorage } from './JSONLStorage.js';
 import { getKAGTraverser } from './KAGTraverser.js';
 import type { ClusterResult } from './ErrorClustering.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface PatternStorageConfig {
 	jsonlDir: string, neo4jEnabled: boolean;

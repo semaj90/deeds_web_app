@@ -1,5 +1,7 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better error, handling --> <!-- import  ErrorBoundary  from "$lib/components/ErrorBoundary.svelte"; --> <!-- @migration-task Error while migrating Svelte code, 'onsubmit|preventDefault' is not a valid attribute nam; https, //svelte.dev/e/attribute_invalid_name --> <!-- @migration-task Error while migrating Svelte; code, 'onsubmit|preventDefault' is not a valid attribute name --> <script lang="ts">
 import type { Message } from '$lib/types'; import { debounce as _debounce } from '$lib/utils/debounce'; // Migrated to $effect import { fade, fly, scale } from 'svelte/transition'; import { quintOut, elasticOut } from 'svelte/easing'; // Types interface Message { id: string, role: 'user' | 'assistant' | 'system'; content: string;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	timestamp: Date, streaming?: boolean; error?: boolean}
 	interface ChatSettings { model: string, temperature: number;
 	maxTokens: number;

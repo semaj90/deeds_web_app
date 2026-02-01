@@ -5,6 +5,7 @@
 
 import type { webgpu } from './webgpu-init.js';
 import type { createForceLayoutPipeline,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  createSimilarityPipeline, createReductionPipeline,
  createHighlightPipeline, } from './webgpu-kernels.wgsl.js';
 

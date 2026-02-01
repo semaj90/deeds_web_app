@@ -3,6 +3,7 @@ import db from '$lib/server/db/client';
 import { routeHealth } from '$lib/server/db/schema';
 // @ts-ignore
 import routeGraph from '$lib/phase72/route-ast-graph.json';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async () => {
  try {

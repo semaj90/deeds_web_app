@@ -11,6 +11,7 @@
 	 * Features: Zoom, pan, node interaction, filtering
 	 */
 	import { browser } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	// Props

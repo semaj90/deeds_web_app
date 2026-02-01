@@ -1,4 +1,6 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export class QdrantManager {
     private client: QdrantClient;

@@ -2,6 +2,7 @@ import db from '$lib/server/db/drizzle';
 import { cases, evidence, sessions, users } from '$lib/server/db/schema';
 import { error, redirect } from '@sveltejs/kit';
 import { desc, eq, sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // TODO: Verify store subscription is correct for Svelte 5
 

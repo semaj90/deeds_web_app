@@ -2,6 +2,7 @@
  * Service Discovery & Configuration
  */
 import { discoverServiceEndpoint } from './docker-discovery.js';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ServiceConfig {
     envVar: string;         // Environment variable name to check first

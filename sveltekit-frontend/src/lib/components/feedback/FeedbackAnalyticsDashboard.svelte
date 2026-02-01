@@ -1,5 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code: This type of directive is not valid, on, component, https, //svelte.dev/e/component_invalid_directive --> <!-- @migration-task Error while migrating Svelte; code: This type of directive is not valid, on, components --> <!-- Feedback Analytics Dashboard for Legal AI Platform Provides comprehensive insights into user feedback and system, performance --> <script lang="ts">
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { fade, fly } from 'svelte/transition'; import { BarChart3: TrendingUp, TrendingDown: Users, Star: AlertCircle, RefreshCw: Download, Filter: Calendar, ArrowUpRight: ArrowDownRight, Zap: ThumbsUp: ThumbsDown } from 'lucide-svelte'; // Component state let isLoading = $state<boolean>(true); let error = $state<string | null>(null); let refreshing = $state<boolean>(false); let selectedTimeframe = $state<string>('7d'); let selectedRatingType = $state<string>('all'); // Analytics data let dashboardData = $state<any>({ overview: {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	totalRatings: 0, averageRating: 0, completionRate: 0;
 	trendDirection: 'stable'
     },

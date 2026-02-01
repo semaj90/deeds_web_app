@@ -5,6 +5,8 @@
   import ContradictionReveal from './ContradictionReveal.svelte';
   import EvidenceComparisonOverlay from './evidence/EvidenceComparisonOverlay.svelte';
   import PhoenixEventMonitor from './PhoenixEventMonitor.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Evidence {
     id: string;

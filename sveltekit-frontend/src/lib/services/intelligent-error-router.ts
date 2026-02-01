@@ -5,6 +5,7 @@
  */
 
 import type { ErrorCluster, GPUAnalysisResult, GPUErrorPattern } from './webgpu-cuda-bridge.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Error routing tier

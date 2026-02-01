@@ -4,6 +4,7 @@ import { processWithDocling } from '$lib/server/docling';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { tmpdir } from 'os';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Docling Document Processing Endpoint

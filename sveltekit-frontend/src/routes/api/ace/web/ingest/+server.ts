@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 import { inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // --- Singleton RabbitMQ Connection ---
 let amqpConnection: any = null;

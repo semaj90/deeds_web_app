@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import crypto from 'crypto';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   // Security check

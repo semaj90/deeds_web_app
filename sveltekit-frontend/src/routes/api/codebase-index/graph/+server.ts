@@ -9,6 +9,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface GraphNode {
   id: string; label: string;

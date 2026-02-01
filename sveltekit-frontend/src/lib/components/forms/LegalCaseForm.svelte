@@ -5,6 +5,7 @@
    * Phase 107 - Clean regeneration
    */
   import { Card } from '$lib/components/ui/enhanced-bits';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Form state using Svelte 5 runes
   let formData = $state({

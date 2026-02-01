@@ -1,6 +1,7 @@
 import { getOllamaEndpoint } from '$lib/server/endpoints.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async () => {
 	const ollamaUrl = getOllamaEndpoint();

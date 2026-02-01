@@ -6,6 +6,7 @@
 
 // Import the generated WASM bindings
 import wasmModule from '../../../static/wasm/vector-ops.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface VectorWasmModule {
  // Vector similarity functions

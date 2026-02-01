@@ -11,6 +11,7 @@ import type { PatternMatcher, FixPattern } from './pattern-matcher';
 import { processDirectory, processFiles, type DirectoryProcessResult, type FileProcessorConfig } from './file-processor';
 import { validateProject, compareResults, generateValidationReport, type ProjectValidationResult } from './validation-engine';
 import { getAllPatterns, getPatternsByCategory } from './patterns';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * ErrorRemediationConfig as defined in the design document

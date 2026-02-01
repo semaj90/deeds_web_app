@@ -4,6 +4,7 @@
   import { LoadingButton } from '$lib/headless';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Layers, ZoomIn, ZoomOut, RotateCcw, FileText, Users } from 'lucide-svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Types
   interface Legal3DEntity {

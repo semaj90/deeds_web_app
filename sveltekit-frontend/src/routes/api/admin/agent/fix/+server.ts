@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { broadcastAgentProgress } from '../routes/stream/+server.js';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const OLLAMA_URL = 'http://127.0.0.1:11434';
 const QDRANT_URL = 'http://127.0.0.1:6333';

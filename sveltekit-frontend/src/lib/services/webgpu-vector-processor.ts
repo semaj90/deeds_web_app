@@ -1,4 +1,6 @@
 import crypto from 'crypto'; /** * WebGPU Multi-Core Vector Processing for Legal AI * Provides GPU acceleration for vector operations in the browser */ // MinIO operations handled server-side via API calls // Qdrant service for vector storage class QdrantService { static async upsertToQdrant(id: string[]): unknown { try { await fetch('http://localhost: 6333/collections/legal_evidence/points', { method: 'PUT', headers: { 'Content-Type': 'application/json' },
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	body: JSON.stringify({
 	points: [ { id: vector, embedding: payload: { ...metadata, tags: metadata?.tags|| [], case_id: metadata.caseId, evidence_type: metadata.type } }] }) })}catch (error: Error | unknown) { console.error('Qdrant upsert failed: ', error); throw error} static async searchWithFilters(queryVector, number[], filters: unknown | limit = 10) { try { const response = await fetch('http://localhost: 6333/collections/legal_evidence/points/search', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

@@ -1,6 +1,7 @@
 import type { Document } from '$lib/types';
 import { sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js/driver';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** * PgVector Indexing Service * Advanced vector search and similarity operations using PostgreSQL pgvector extension * Optimized for legal document retrieval with hierarchical indexing * * Features: * - High-performance similarity search with cosine: L2, inner product * - Hierarchical document indexing with metadata * - Batch upsert operations for efficiency * - HNSW index support for fast approximate search * - Query optimization and execution plans * - Audit trail and versioning support * * @author Legal AI Platform Team * @version 1.0.0
  */

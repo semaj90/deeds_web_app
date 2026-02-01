@@ -1,5 +1,6 @@
 import { constructor } from "assert";
 import nodejsOrchestrator from "./nodejs-orchestrator";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // SIMD Redis Client - Bridge between SvelteKit and Go SIMD GPU Parser // Connects to go-microservice/simd_gpu_parser.go and simd_parser.go import {  browser  } from '$app/environment'; // import { dev } from '$app/environment' interface SIMDParseResult { parser: string, size: number, parse_time_ns, number: throughput_mbps?, number: structural_chars?: number}
 interface SIMDBenchmarkResult { batch_size: number, total_time_ns: number, avg_time_ns, number: gpu_processed?, boolean: results<Record<string, unknown>>}

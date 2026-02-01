@@ -14,6 +14,8 @@
  import { Search } from "lucide-svelte";
  import { Users } from "lucide-svelte";
  import { X } from "lucide-svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
  interface POI {
  id: string;

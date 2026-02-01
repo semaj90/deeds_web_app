@@ -1,6 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import type { ZodTypeAny } from 'zod';
 import { RedisCacheService } from '$lib/server/services/redis-cache'; // Use class import
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type RateOptions = {
     capacity?: number; // max tokens

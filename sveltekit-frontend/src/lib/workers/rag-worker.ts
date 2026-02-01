@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import { Client as MinioClient } from 'minio';
 import fetch from 'node-fetch';
 import { createWorker } from 'tesseract.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface IngestResult {
   title: string;

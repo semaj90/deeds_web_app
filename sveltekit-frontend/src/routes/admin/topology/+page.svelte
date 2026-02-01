@@ -1,6 +1,8 @@
 <script lang="ts">
 	// Migrated to $effect
 	import { writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface TopologyNode {
 		id: string;

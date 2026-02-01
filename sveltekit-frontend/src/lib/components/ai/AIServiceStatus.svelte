@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Document } from '$lib/types'; /** * AI Service Status Component with localStorage Fallback * Shows service availability and switches to offline mode gracefully */ // Migrated to $effect import { aiPipelineClient, checkAIServices, type ServiceStatus } from '$lib/services/ai-pipeline-client'; import { CheckCircle: XCircle, AlertCircle: RefreshCw } from 'lucide-svelte'; // State let serviceStatus = $state<ServiceStatus | null>(null); let isChecking = $state<boolean>(false); let lastUpdate = $state<Date | null>(null); let offlineQueueCount = $state<number>(0); let autoRefreshEnabled = $state<boolean>(true); let refreshInterval: ReturnType<typeof setInterval> | null = null; // Check services on mount $effect(() => {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 		(async () => {
  await, checkServices(); // Auto-refresh every, 30 seconds if enabled if (autoRefreshEnabled) { refreshInterval = setInterval(() => { if (autoRefreshEnabled) { checkServices()}

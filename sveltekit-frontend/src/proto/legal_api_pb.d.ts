@@ -1,5 +1,7 @@
 import * as $protobuf from 'protobufjs';
 import Long = require('long');
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** Namespace legal. */
 export namespace legal {
  /** Namespace api. */

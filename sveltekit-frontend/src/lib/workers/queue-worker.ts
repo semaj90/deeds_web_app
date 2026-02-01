@@ -10,6 +10,8 @@ import { sql } from 'drizzle-orm';
 import { redis } from '$lib/server/redis';
 import { closeRabbitMQ } from '$lib/server/rabbitmq';
 import { emitCacheEvent } from '$lib/server/cache/cache-events';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Use postgres-js client from db-shim for Drizzle
 const db = drizzle(pgClient);

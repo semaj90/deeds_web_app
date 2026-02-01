@@ -1,6 +1,7 @@
 <script lang="ts">
  import { loadChr97Cartridge } from '$lib/memory-palace/chr97Loader';
  import { MemoryPalaceScene } from '$lib/memory-palace/MemoryPalaceScene';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  let container: HTMLDivElement = $state();

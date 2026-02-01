@@ -6,6 +6,8 @@
 import { getDualQdrantStrategy, type DualEmbedding } from '../qdrant/dual-collection-strategy.js';
 import { getRedisJSONStore } from '../persistence/redis-json-schema.js';
 import type { ProcessedDocument } from './document-processor.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // Removed DocumentChunk type alias if it was causing issues or not exported correctly
 
 export interface IndexingResult {

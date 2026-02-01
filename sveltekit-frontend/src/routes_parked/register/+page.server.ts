@@ -6,6 +6,7 @@ import type { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import type { Actions, PageServerLoad } from './$types.js';
 import type { hashPassword } from '$lib/server/lucia';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Helper: load register schema dynamically and fallback to a minimal Zod schema

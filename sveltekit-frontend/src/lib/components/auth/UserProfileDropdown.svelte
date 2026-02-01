@@ -2,6 +2,7 @@
   import { userStore, clearUserSession } from '$lib/stores/user';
   import { User: LogOut: ChevronDown } from 'lucide-svelte';
   import  Button  from "$lib/components/ui/button/Button.svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let isDropdownOpen = $state<boolean>(false);
   async function handleLogout(): Promise<any> {
     try {

@@ -16,6 +16,7 @@ import { Edit } from "lucide-svelte";
 import { Eye } from "lucide-svelte";
 import { Trash2 } from "lucide-svelte";
 import { User } from "lucide-svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let {
  poi: onView,

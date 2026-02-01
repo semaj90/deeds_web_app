@@ -16,6 +16,8 @@
   import Trash2 from 'lucide-svelte/icons/trash-2';
   import XCircle from 'lucide-svelte/icons/x-circle';
   import Zap from 'lucide-svelte/icons/zap';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // State management (Svelte 5)

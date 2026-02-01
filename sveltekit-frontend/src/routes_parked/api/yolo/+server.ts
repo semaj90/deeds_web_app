@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { createYOLOService } from '$lib/server/yolo';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // YOLO Object Detection API
 export const POST: RequestHandler = async ({ request }) => {

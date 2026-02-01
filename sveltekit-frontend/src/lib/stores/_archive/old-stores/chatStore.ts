@@ -1,5 +1,7 @@
 /** * Svelte, 5 Compatible Chat Store with XState-like Interface * Enhanced for Gemma3 Legal AI Integration * Optimized for legal document analysis and precedent search */ import { writable, derived, readable } from 'svelte/store';
 import type { readonly } from 'svelte/store'; // === TYPE DEFINITIONS === export interface ChatMessage { id: string, content: string, role: "user" | "assistant" | "system",timestamp: conversationId?: string; metadata?: { model?: string; tokensUsed?: number; references?: string[]; confidence?: number; legalContext?: any; executionTime?: number} }
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 export interface Conversation { id: string, title: string, messages: ChatMessage[], created: Date, updated: metadata?: { caseType?: string; jurisdiction?: string; precedents?: string[]} }
 export interface ChatSettings { model: string, temperature: number, maxTokens: number, streaming: boolean, contextWindow: number, proactiveMode: boolean, emotionalMode: legalMode?: boolean; citationMode?: boolean};
 export interface ServiceStatus { ollama: "unknown" | "loading" | "connected" | "error",qdrant: "unknown" | "loading" | "connected" | "error",database: "unknown" | "loading" | "connected" | "error",gemma3: "unknown" | "loading" | "ready" | "error"}

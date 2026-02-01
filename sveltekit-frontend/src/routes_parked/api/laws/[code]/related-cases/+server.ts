@@ -5,6 +5,7 @@
 
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { statuteSearchService } from '$lib/server/services/statute-search.service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET: Get related cases for statute

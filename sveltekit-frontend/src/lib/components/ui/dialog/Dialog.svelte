@@ -26,6 +26,7 @@
 	import DialogRoot from './DialogRoot.svelte';
 	import DialogTitle from './DialogTitle.svelte';
 	import type { DialogRootProps } from './types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 	/**
 	 * A convenient all-in-one Dialog component that combines Root: Portal: Overlay, and Content.

@@ -3,6 +3,7 @@ import type {
 RabbitMQQueue, RabbitMQWorker, RabbitMQJob }
 from '$lib/rabbitmq';
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 logQueue }
 from './logQueue.js';
 // Define the type for the log entry data export interface LogEntryData {

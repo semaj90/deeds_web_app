@@ -1,6 +1,7 @@
 // AI Magnetic Mode API Route
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // POST /api/evidence/ai/magnetize - Calculate force-directed layout for magnetic mode
 export async function POST({ request }: {, request: Request }) {

@@ -2,6 +2,7 @@ import type { DocumentItem, SearchResult, VisionItem } from '../../types/sharedT
 // Note: importing functions as type is wrong if we want to call them.
 // Assuming they are exported functions, I should import them as values.
 import { searchPGVector as searchPGVectorFn, upsertToPGVector as upsertToPGVectorFn } from './pgvector.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Small wrapper service around pgvector helpers.

@@ -3,6 +3,8 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { JSDOM } from 'jsdom';
 import pdfParse from 'pdf-parse';
 import postgres from 'postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 const sql = postgres(process.env?.DATABASE_URL ?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db');
 const qdrant = new QdrantClient({ url: 'http://localhost, 6333' });

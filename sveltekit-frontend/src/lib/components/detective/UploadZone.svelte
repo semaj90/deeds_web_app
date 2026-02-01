@@ -2,6 +2,7 @@
 	import { evidenceStore } from '$lib/stores/unified/evidence-store';
 	import FileUp from 'lucide-svelte/icons/file-up';
 	import Loader2 from 'lucide-svelte/icons/loader-2';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	let {
 		caseId = 'case-001',

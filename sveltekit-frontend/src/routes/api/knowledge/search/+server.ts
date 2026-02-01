@@ -12,6 +12,7 @@ import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 import type { SearchRequest } from '$lib/services/knowledge-search/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {

@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { type RequestHandler } from '@sveltejs/kit';
 import type { contextualUnderstanding } from '$lib/server/ai/contextual-understanding-service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ url }) => {
  try {

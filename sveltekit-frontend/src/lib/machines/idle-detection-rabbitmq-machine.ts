@@ -1,4 +1,5 @@
 import type { User } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * XState Idle Detection Machine with RabbitMQ Self-Prompting Integration * Detects user idle states and triggers autonomous background processing */ import type { createMachine, assign, type ActorRefFrom } from 'xstate'; // Types for idle detection and self-prompting export interface IdleDetectionContext { userId?: string, sessionId, string: lastActivity, idleTimeout: number; // milliseconds: backgroundJobsEnabled | boolean; currentJob?, BackgroundJob: BackgroundJob[], neo4jConnected: boolean, minioConnected: boolean, rabbitmqConnected: boolean, selfPromptingHistory: SelfPrompt[], performanceMetrics: {
 	jobsCompleted: number, averageProcessingTime: number, successRate: number, lastJobTimestamp: number}}
 

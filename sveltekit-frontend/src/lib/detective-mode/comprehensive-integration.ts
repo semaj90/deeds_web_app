@@ -3,6 +3,7 @@
  * Unifies Enhanced RAG: WebGPU Acceleration, Real-time Communication, and Database Integration
  */
 import { writable, type Writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define types for missing dependencies
 export interface KeyValue {

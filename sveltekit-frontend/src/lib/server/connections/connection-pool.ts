@@ -18,6 +18,7 @@ import amqp, { type Channel, type Connection } from 'amqplib';
 import Redis from 'ioredis';
 import neo4j, { type Driver } from 'neo4j-driver';
 import { VECTOR_CONFIG } from '../config/vector-config.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // Redis Connection Pool

@@ -3,6 +3,7 @@ import db from '$lib/server/db';
 import { cases } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ params }) => {
  try {

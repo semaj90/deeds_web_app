@@ -1,5 +1,6 @@
 import { get } from 'svelte/store';
 import { constructor } from 'function Object() { [native code] }';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * Secure Storage Client with proper error handling and conditional removal * Follows security best practices for file operations */
 export interface UploadResponse {
  ok: boolean;

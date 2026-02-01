@@ -8,6 +8,7 @@ import { savedCitations } from '$lib/server/db/schema';
 import { redis } from '$lib/server/redis';
 import { auditService } from './audit.service.js';
 import { eq, like, and, or, desc, sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface Citation {
 	id: string;

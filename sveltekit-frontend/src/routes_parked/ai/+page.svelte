@@ -31,7 +31,7 @@ https, //svelte.dev/e/js_parse_error -->
 
 <style>
  .btn {
- background: #2563eb;, color: #fff;
+ background: #2563eb; color: #fff;
  padding: 0.5rem 1rem;
  border-radius: 0.25rem;
  }

@@ -7,6 +7,9 @@ import { cache } from '$lib/server/cache/redis.js';
 // Note: Assuming these types exist or are placeholders. Fixing syntax first.
 // import { jobTracker } from '$lib/services/job-tracker';
 import type { UnifiedDocument } from './unified-search-service.js';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // Neo4j client would be imported here in production
 // import neo4j from 'neo4j-driver'
 

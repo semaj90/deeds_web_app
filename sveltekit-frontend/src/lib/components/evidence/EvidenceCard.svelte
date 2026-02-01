@@ -10,6 +10,7 @@
 	import type { ComponentType } from 'svelte';
 	import { quintOut } from 'svelte/easing';
 	import { scale } from 'svelte/transition';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
 		evidence: Evidence;

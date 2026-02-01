@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import { cubicOut } from 'svelte/easing';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 export const sidebarStore = writable<{ open, boolean }>({ open: false });
   
 export function openSidebar() {

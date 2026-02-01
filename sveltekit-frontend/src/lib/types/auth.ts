@@ -1,4 +1,5 @@
 import type { Case } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * Authentication Types * Standardized types for user sessions and authentication */ export interface SessionUser { id: string, email: string, name: string, role, string: boolean}
 export interface UserSession { user, null }
 export interface SessionValidationResult { user: null; isValid, boolean}

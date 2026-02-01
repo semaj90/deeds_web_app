@@ -2,7 +2,7 @@
  // --- CHANGES START ---
  // Provide local types (make neural_activity required)
  type SearchResult = {
- id: string;, title: string;
+ id: string; title: string;
  type?: string;
  relevance?: number;
  status?: string;
@@ -14,11 +14,11 @@
  };
 
  type SystemMetrics = {
- cpu_usage: number;, memory_usage: number;
- gpu_utilization: number;, network_latency: number;
+ cpu_usage: number; memory_usage: number;
+ gpu_utilization: number; network_latency: number;
  active_processes: number;
  security_level?: string;
- quantum_state?: string;, neural_activity: number; // now required
+ quantum_state?: string; neural_activity: number; // now required
  };
 
  type CommandResult = { id?: string; command?: string; result?: any; ts?: number };
@@ -28,6 +28,7 @@
  import YoRHaCommandCenter from '$lib/components/yorha/YoRHaCommandCenter.svelte';
  import YoRHaCommandInterface from '$lib/components/yorha/YoRHaCommandInterface.svelte';
  import type { withAbort } from '$lib/yorha/constants';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // --- Reactive State Declarations (Svelte 5 Runes) ---
  let localIndexReady = $state (false);

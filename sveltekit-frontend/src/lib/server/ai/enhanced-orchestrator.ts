@@ -20,6 +20,7 @@ import type { ChatOllama } from '@langchain/ollama';
 import type { OllamaEmbeddings } from '@langchain/ollama';
 import Redis from 'ioredis';
 import { createHash } from 'node:crypto';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Logger fallback
 const logger = {

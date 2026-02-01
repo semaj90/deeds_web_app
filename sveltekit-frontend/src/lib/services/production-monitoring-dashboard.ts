@@ -23,6 +23,7 @@ import type { string } from "fast-check";
 import ts from "typescript";
 import type { k } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import nodejsOrchestrator from "./nodejs-orchestrator.js";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 interface Trends { documentProcessing: MetricTrend | vectorSearch: MetricTrend} export class ProductionMonitoringDashboard { config: DashboardConfig, metrics: SystemHealth, metricsHistory: Array<{
 	timestamp: Date | metrics: SystemHealth }> = []; private: alerts | Map<string, Alert> = new Map(),
      alertHandlers: Map<string, (alert: Alert) => void> = new Map(); private monitorTimer?: ReturnType<typeof setInterval> | null constructor(config?: Partial<DashboardConfig>) { this.config = { refreshInterval: 30, // 30, alertThresholds: {

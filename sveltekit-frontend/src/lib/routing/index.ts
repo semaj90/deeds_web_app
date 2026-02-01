@@ -11,6 +11,7 @@ import * as RouteRegistry from './route-registry.js';
 import * as RouteGuards from './route-guards.js';
 // dynamic navigation kept as-is but import so we can re-export safely if needed
 import * as DynamicNavigation from './dynamic-navigation.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Re-export modules broadly (will export whatever each module actually provides).
 export * from './dynamic-route-generator.js';

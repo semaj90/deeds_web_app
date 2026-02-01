@@ -1,6 +1,7 @@
 <script lang="ts">
  import { uploadEvidenceImage, uploadEvidenceVideo } from '$lib/vision/api';
  import { createEventDispatcher } from 'svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  const dispatch = createEventDispatcher<{
  updated: Array<{

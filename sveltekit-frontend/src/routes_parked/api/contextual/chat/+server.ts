@@ -5,6 +5,7 @@ import type { AttachmentMetadata } from '$lib/types/sharedTypes';
 import type { ingestContextualAttachment,
  resolveAttachmentReference, } from '$lib/server/storage/contextual-attachment-helper';
 import type { isLuciaAvailableForContextualUploads,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  requireLuciaForContextualUploads, } from '$lib/server/auth/contextual-upload-guard';
 
 interface ChatPayload {

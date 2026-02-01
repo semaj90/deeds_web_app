@@ -1,6 +1,8 @@
 import type { DocumentItem } from '$lib/types/sharedTypes'; // Use shared type instead of DocumentEmbedding
 import type { Driver } from 'neo4j-driver';
 import driverFactory, { auth } from 'neo4j-driver';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Type alias if DocumentEmbedding is used elsewhere
 type DocumentEmbedding = DocumentItem;

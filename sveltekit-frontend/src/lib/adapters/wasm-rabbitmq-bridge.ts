@@ -7,6 +7,7 @@
 import { RabbitMQServiceWorker } from '$lib/workers/rabbitmq-service-worker.js';
 import type { MessageHandler } from '$lib/server/messaging/rabbitmq-service';
 import { enhanceRabbitMQMessage } from '$lib/simd/simd-json-integration.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // WebAssembly module cache
 let wasmModule: WebAssembly.WebAssemblyInstantiatedSource | null = null;

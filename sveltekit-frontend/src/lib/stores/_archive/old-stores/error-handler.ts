@@ -2,6 +2,8 @@ import type { Message } from '$lib/types';
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * Enhanced Error Handler Store for Legal AI Platform * * Comprehensive error handling and monitoring system with legal-specific * error management, audit trails, and compliance reporting. * * Features: * - Legal document error tracking * - Compliance violation monitoring * - Chain of custody error management * - Attorney-client privilege error protection * - Evidence handling error tracking * - Court filing error management * - Case management error handling * - Performance and audit analytics * * @author Legal AI Platform Team * @version 2.1.0 * @lastModified 2025-01-20 */ import { writable, derived, get } from 'svelte/store'; import {  browser  } from '$app/environment'; import type { Writable, Readable } from 'svelte/store'; // ===== TYPE DEFINITIONS ===== export interface ErrorDetails { id: string; code?: string;
 	message: string; details?: string;
 	timestamp: Date; context?: Record<string, unknown>; // changed from: any stack?: string; retry?: () => Promise<void>; severity: ErrorSeverity;

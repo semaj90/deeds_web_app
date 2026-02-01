@@ -5,6 +5,9 @@
 import { gpuSummaryStore } from '$lib/stores/gpu-summary-store.svelte';
 import { metrics } from "@opentelemetry/api";
 import { webASMInferenceService } from './webasm-inference-service.js';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface VectorSearchPipelineConfig {
     embedding: {

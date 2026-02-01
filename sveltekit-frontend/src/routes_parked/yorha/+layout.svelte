@@ -20,13 +20,14 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import type { SvelteComponent } from 'svelte';
  // Migrated to $effect
  import '../../app.css';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Added: Top-level type import
 
  // Add a tiny local constructor type to represent Svelte components without using `import type`:
  type SvelteComponentConstructor = new (...args: any[]) => SvelteComponent; // Changed: Use imported SvelteComponent type
 
  type NavItem = {
- path: string;, label: string;
+ path: string; label: string;
  // Use the local constructor type so the parser doesn't see a top-level `import type` line
  icon?: SvelteComponentConstructor, null; description: string;
  };
@@ -290,7 +291,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  /* Rewritten plain CSS to replace Tailwind @apply usage and fix stray closing tags */
  :global(.yorha-layout) {
  min-height: 100vh;
- background-color: #000;, color: #f59e0b; /* amber-400 */;
+ background-color: #000; color: #f59e0b; /* amber-400 */;
  font-family: 'Courier New', monospace;
  background-image:
  radial-gradient(circle at 20% 50%, rgba(255, 191, 0, 0.03) 0%, transparent 50%),
@@ -299,32 +300,32 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  /* Header */
  :global(.yorha-header) {
- position: fixed;, top: 0;
- left: 0;, right: 0;
- height: 73px;, display: flex;
+ position: fixed; top: 0;
+ left: 0; right: 0;
+ height: 73px; display: flex;
  align-items: center;
  justify-content: space-between; /* fixed typo */;
  padding: 1rem 1.5rem;
- z-index: 40;, background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2));
+ z-index: 40; background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2));
  border-bottom: 1px solid rgba(245, 158, 11, 0.06);
  }
 
  /* Added: header content wrapper used in template */
  :global(.yorha-header-content) {
  display: flex;
- align-items: center;, gap: 1rem;
+ align-items: center; gap: 1rem;
  width: 100%;
  justify-content: space-between;
  }
 
  :global(.yorha-brand) {
  display: flex;
- align-items: center;, gap: 1rem;
+ align-items: center; gap: 1rem;
  }
 
  :global(.yorha-menu-toggle) {
- padding: 0.5rem;, color: #f59e0b;
- background: transparent;, border: 1px solid rgba(245, 158, 11, 0.3);
+ padding: 0.5rem; color: #f59e0b;
+ background: transparent; border: 1px solid rgba(245, 158, 11, 0.3);
  transition:
  color 0.15s ease,
  border-color 0.15s ease;
@@ -337,21 +338,21 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  :global(.yorha-brand-title) {
  font-size: 1.125rem;
  font-weight: 700;
- letter-spacing: 0.04em;, display: flex;
- align-items: center;, gap: 0.5rem;
+ letter-spacing: 0.04em; display: flex;
+ align-items: center; gap: 0.5rem;
  }
  :global(.yorha-brand-icon) {
  color: #f59e0b;
  font-size: 1.25rem;
  }
  :global(.yorha-status-bar) {
- display: flex;, gap: 1.5rem;
+ display: flex; gap: 1.5rem;
  align-items: center;
  }
  :global(.yorha-status-item) {
  display: flex;
- align-items: center;, gap: 0.5rem;
- font-size: 0.75rem;, color: #f59e0b;
+ align-items: center; gap: 0.5rem;
+ font-size: 0.75rem; color: #f59e0b;
  opacity: 0.6;
  }
 
@@ -366,17 +367,17 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  opacity: 1;
  }
  :global(.yorha-quick-actions) {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  align-items: center;
  }
  :global(.yorha-quick-btn) {
  padding: 0.375rem 0.75rem;
- background: #f59e0b;, color: #000;
+ background: #f59e0b; color: #000;
  font-size: 0.75rem;
  font-family: monospace;
- letter-spacing: 0.04em;, display: inline-flex;
- align-items: center;, gap: 0.5rem;
- border-radius: 3px;, cursor: pointer;
+ letter-spacing: 0.04em; display: inline-flex;
+ align-items: center; gap: 0.5rem;
+ border-radius: 3px; cursor: pointer;
  transition: background-color 0.15s ease;
  }
  :global(.yorha-quick-btn:hover) {
@@ -385,7 +386,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  /* Dot for status indicator */
  :global(.dot) {
- display: inline-block;, width: 8px;
+ display: inline-block; width: 8px;
  height: 8px;
  border-radius: 50%;
  background-color: #f43f5e; /* red-400 for disconnected */
@@ -399,19 +400,19 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  /* Sidebar */
  :global(.yorha-sidebar) {
- position: fixed;, top: 73px;
- left: 0;, bottom: 0;
+ position: fixed; top: 73px;
+ left: 0; bottom: 0;
  width: 20rem; /* w-80 */;
  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(255, 191, 0, 0.05) 100%);
  border-right: 1px solid rgba(245, 158, 11, 0.3);
- transform: translateX(-100%);, transition: transform 0.3s ease;
- z-index: 30;, overflow: auto;
+ transform: translateX(-100%); transition: transform 0.3s ease;
+ z-index: 30; overflow: auto;
  }
  :global(.yorha-sidebar-open) {
  transform: translateX(0);
  }
  :global(.yorha-nav) {
- height: 100%;, display: flex;
+ height: 100%; display: flex;
  flex-direction: column;
  }
  :global(.yorha-nav-header) {
@@ -423,16 +424,16 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  :global(.yorha-nav-header h2) {
  font-size: 1rem;
- font-weight: 700;, color: #f59e0b;
- letter-spacing: 0.04em;, margin: 0;
+ font-weight: 700; color: #f59e0b;
+ letter-spacing: 0.04em; margin: 0;
  }
  :global(.yorha-sidebar-close) {
- padding: 0.5rem;, color: #f59e0b;
- background: transparent;, border: none;
+ padding: 0.5rem; color: #f59e0b;
+ background: transparent; border: none;
  cursor: pointer;
  }
  :global(.yorha-nav-list) {
- flex: 1;, padding: 1rem 0;
+ flex: 1; padding: 1rem 0;
  margin: 0;
  list-style: none;
  }
@@ -440,12 +441,12 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  border-bottom: 1px solid rgba(245, 158, 11, 0.1);
  }
  :global(.yorha-nav-link) {
- width: 100%;, padding: 1rem;
- text-align: left;, display: flex;
- align-items: center;, gap: 1rem;
- background: transparent;, color: #f59e0b;
- text-decoration: none;, border: none;
- cursor: pointer;, transition:
+ width: 100%; padding: 1rem;
+ text-align: left; display: flex;
+ align-items: center; gap: 1rem;
+ background: transparent; color: #f59e0b;
+ text-decoration: none; border: none;
+ cursor: pointer; transition:
  background-color 0.15s ease,
  color 0.15s ease;
  }
@@ -459,7 +460,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  border-right: 2px solid #f59e0b;
  }
  :global(.yorha-nav-arrow) {
- opacity: 0.4;, transition: opacity 0.15s ease;
+ opacity: 0.4; transition: opacity 0.15s ease;
  }
  :global(.yorha-nav-link:hover .yorha-nav-arrow) {
  opacity: 1;
@@ -475,7 +476,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  :global(.yorha-nav-desc) {
  display: block;
- font-size: 0.75rem;, opacity: 0.6;
+ font-size: 0.75rem; opacity: 0.6;
  overflow: hidden;
  text-overflow: ellipsis;
  white-space: nowrap;
@@ -483,18 +484,18 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  /* Main content */
  :global(.yorha-main) {
- display: block;, flex: 1 1 auto;
+ display: block; flex: 1 1 auto;
  padding-top: 73px;
  padding-left: 2rem;
  padding-right: 2rem;
- padding-bottom: 2rem;, transition: all 0.3s ease;
+ padding-bottom: 2rem; transition: all 0.3s ease;
  }
 
  /* Added: overlay base style so overlay works at all sizes (not only inside media query) */
  :global(.yorha-overlay) {
- position: fixed;, inset: 0;
+ position: fixed; inset: 0;
  background: rgba(0, 0, 0, 0.45);
- z-index: 20;, display: block;
+ z-index: 20; display: block;
  }
 
  /* Responsive adjustments */

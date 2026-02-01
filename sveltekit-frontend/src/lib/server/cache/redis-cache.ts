@@ -10,6 +10,7 @@
 
 import crypto from 'crypto';
 import { redis } from './redis'; // Use local wrapper
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const SEARCH_CACHE_PREFIX = 'search:pgvector:';
 const EMBEDDING_CACHE_PREFIX = 'embedding:';

@@ -79,7 +79,6 @@
 
  function formatTime(date: Date): string {
  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
- }
 </script>
 
 <div class="case-chat-panel">

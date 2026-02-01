@@ -55,6 +55,7 @@ declare module '@tiptap/extension-table-header' {
 }
 declare module '@tiptap/extension-table' {
  import type { Node } from '@tiptap/core';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  export interface TableOptions {
  HTMLAttributes?: { [key: string]: string | number | boolean | undefined };
  resizable?: boolean;

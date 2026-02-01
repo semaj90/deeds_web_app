@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { User } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Removed rune imports ($props, $effect, $state) - they are provided by the Svelte compiler and must not be imported // Migrated to $effect import Editor from '@tinymce/tinymce-svelte'; import { report, reportActions, editorState } from '$lib/stores/unified'; import { lokiRedisCache } from '$lib/cache/loki-redis-integration'; import { browser } from '$app/environment'; interface Props { height?: any; disabled?: any; placeholder?: any}
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let { height = 500, disabled = false, placeholder = 'Begin writing your report...'
   }: Props = $props(); // Enhanced state management for AI-powered features let editorInstance: any;
  let isInitialized = $state<boolean>(false); let isProcessingSummary = $state<boolean>(false); let currentSummary = $state<string>(''); let lastProcessedText = $state<string>(''); let autoSaveStatus = $state<'saving' | 'saved' | 'error' | 'idle'>('idle'); let jobId = $state<string | null>(null); let pollingInterval: ReturnType<typeof setInterval> | null = null; // Debouncing variables let debounceTimer: ReturnType<typeof setTimeout> | null = null; const DEBOUNCE_DELAY = 500; // 500ms as recommended const MIN_TEXT_LENGTH = 100; // Minimum text length for AI processing // TinyMCE configuration const editorConfig = { height, menubar: true;

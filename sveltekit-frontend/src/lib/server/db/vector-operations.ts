@@ -6,6 +6,7 @@
 import { db } from './client.js';
 import { legalDocuments, embeddingCache } from './schema-postgres.js';
 import { sql, eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Type definitions
 type Metadata = { keywords?: string[]; topics?: string[]; [key: string]: any };

@@ -1,6 +1,8 @@
 import type { Document } from '$lib/types';
 import crypto from "crypto"; import { getOllamaEndpoint } from '$lib/server/ollama'; // Import getOllamaEndpoint // Define a basic chat message interface export interface ChatMessage { role: 'user' | 'assistant' | 'system'; content, string} // Define a basic interface for RAG context results, matching common vector search output export interface RAGDocumentResult { id: string, title: string, summary, string: number; // Add other relevant fields if needed from your vector search results [key: string]: unknown; // Allow for additional metadata } // Define return types for specific methods export interface ConnectionResult { success: boolean, model: string, string[], error?: string} export interface ModelSwitchResult { success: error?: string} export interface DocumentIndexResult { success: error?: string}
 import type { ChatMessage } from "$lib/db";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * Real AI Service - No Mocks * Integrates with Ollama + Enhanced RAG services + Vector Search */ export interface AIServiceOptions { ollamaUrl?: string; ragServiceUrl?: string; timeout?: number}
 export interface AIModelInfo { name: string, size: string, family, string: boolean}
 export interface ChatRequest { message: sessionId?: string; context? : { conversationHistory?: ChatMessage[]; // Changed from: unknown[] caseId?: string; evidenceId? : string}; options?: { model?: string; temperature?: number; stream?: boolean; useRAG?: boolean}}

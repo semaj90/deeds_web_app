@@ -7,6 +7,8 @@ import type { Readable } from 'svelte/store';
 import type { ActorRefFrom } from 'xstate';
 import { appMachine, appSelectors, type AppEvents } from './app-machine.js';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  legalCaseMachine: legalCaseSelectors,
  type LegalCaseEvents,
 } from './legal-case-machine.js';

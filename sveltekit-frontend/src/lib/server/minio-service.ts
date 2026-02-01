@@ -15,6 +15,7 @@ import {
 import { Upload } from '@aws-sdk/lib-storage';
 import { Buffer } from 'buffer';
 import type { Readable } from 'stream';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface MinIOConfig {
     endpoint: string;

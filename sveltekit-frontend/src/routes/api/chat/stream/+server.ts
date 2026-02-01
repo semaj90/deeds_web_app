@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/client';
 import { chatMessages, chatSessions } from '$lib/server/db/schema-postgres';
 import { desc, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Server-Sent Events endpoint for contextual chat streaming

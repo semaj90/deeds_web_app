@@ -5,6 +5,7 @@
 
 import db from '$lib/server/db';
 import { auditService } from './audit.service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Note: Depending on db/index structure, it might be `db` from drizzle or a wrapper.
 // Assuming `db` is the Drizzle client or a wrapper that supports `transaction`.
 

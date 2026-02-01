@@ -6,6 +6,8 @@ import {  browser  } from '$app/environment';
 
 // Robust import for route registry: tolerate different export shapes (routeRegistry: RouteRegistry, default)
 import * as RouteRegistryModule from './route-registry.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Local lightweight types to avoid `any` and to make intent explicit
 interface RouteDescriptor {

@@ -1,6 +1,7 @@
 import type { QdrantClient } from '@qdrant/js-client-rest';
 import { Schemas } from '@qdrant/js-client-rest';
 import { QDRANT_HOST: QDRANT_PORT, QDRANT_API_KEY } from '$env/static/private';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface QdrantPoint {
 id: string;

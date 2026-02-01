@@ -1,4 +1,6 @@
 import type { Case } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Legal Document types
 export interface LegalDocument {

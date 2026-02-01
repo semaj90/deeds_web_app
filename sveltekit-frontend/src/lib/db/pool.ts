@@ -11,6 +11,7 @@
 import { env } from '$env/dynamic/private';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Fallback for development if env is not loaded
 const connectionString = env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';

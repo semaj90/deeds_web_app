@@ -15,6 +15,7 @@
  */
 
 import type { FixStrategy, SimilarError } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RAGConfig {
 	qdrantUrl: string;

@@ -1,4 +1,5 @@
 import { createMachine, createActor, fromPromise } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export function createLLMStreamActor({
  url = '/api/ai/stream',

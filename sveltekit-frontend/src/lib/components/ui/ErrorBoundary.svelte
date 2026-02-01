@@ -7,6 +7,8 @@
   import { Button } from '$lib/components/ui/enhanced-bits';
   import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-svelte';
   import type { Snippet } from 'svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     fallback?: string;

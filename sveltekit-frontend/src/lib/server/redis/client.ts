@@ -1,4 +1,5 @@
 import { createClient } from 'redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 let redisClient: ReturnType<typeof createClient> | null = null;
 

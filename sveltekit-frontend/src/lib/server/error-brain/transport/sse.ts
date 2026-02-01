@@ -6,6 +6,7 @@
 
 import type { ErrorBrainEvent } from '../events.js';
 import type { ErrorBrainTransport } from './interface.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class SSETransport implements ErrorBrainTransport {
  name = 'sse';

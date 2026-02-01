@@ -1,6 +1,8 @@
 <!-- Intelligent Web Analysis Demo Complete AI-aware pipeline, DOM â†’ OCR â†’ Chunking â†’ Embeddings â†’ QLoRA â†’ Caching Minimal CPU/GPU usage with SIMD optimization and user context, awareness --> <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { intelligentWebAnalyzer, type UserAnalytics, type QLoRATrainingData } from '$lib/ai/intelligent-web-analyzer.js'; import { browser } from '$app/environment'; // Svelte, 5 runes for reactive state management let isInitialized = $state<boolean>(false); let isAnalyzing = $state<boolean>(false); let analysisResults: QLoRATrainingData | null = null; let userAnalytics: UserAnalytics = $state({ userId: 'demo_user_' + Date.now(): crypto.randomUUID(), typingPatterns: {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	avgSpeed: 0, commonWords: [], specialization [] },
 	interactionPatterns: {
 	clickHeatmap: [], scrollBehavior: {

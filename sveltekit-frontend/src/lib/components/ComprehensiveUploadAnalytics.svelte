@@ -10,6 +10,8 @@
 		type UserAnalytics
 	} from '$lib/machines/enhanced-legal-upload-analytics-machine.js';
 	import type { UploadResult } from '$lib/machines/enhanced-legal-upload-analytics-machine.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
 		caseId?: string;

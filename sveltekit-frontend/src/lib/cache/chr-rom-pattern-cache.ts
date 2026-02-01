@@ -1,5 +1,6 @@
 /** * CHR-ROM Pattern Cache Integration with Redis * Nintendo-inspired optimization for legal AI platform * Achieves 0.5-2ms response times for UI patterns */
 import Redis from 'ioredis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type LegalDocumentJSON = Record<string, unknown>;
 

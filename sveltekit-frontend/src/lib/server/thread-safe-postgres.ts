@@ -5,6 +5,7 @@
 
 import type { Pool, PoolClient } from 'pg';
 import { cognitiveCache } from '../services/cognitive-cache-integration.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // JSON types for JSONB operations
 type JsonPrimitive = string | number | boolean | null;

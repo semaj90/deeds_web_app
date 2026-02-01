@@ -1,12 +1,13 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const PHASE72_BACKEND_URL = process.env.PHASE72_BACKEND_URL ?? 'http://127.0.0.1:8000';
 
 interface SuggestFixRequest {
  route?: string;
  errors?: Array<{, code: string;
- message: string;, severity: string;
+ message: string; severity: string;
  file_path?: string;
  line?: number;
  }>;
@@ -14,7 +15,7 @@ interface SuggestFixRequest {
 }
 
 interface SuggestFixResponse {
- plan: string;, suggestions: string[];
+ plan: string; suggestions: string[];
  related_routes: string[];
 }
 

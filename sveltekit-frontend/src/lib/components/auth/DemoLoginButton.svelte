@@ -1,6 +1,7 @@
 <script lang="ts"> import type { User } from '$lib/types';
  import { goto } from '$app/navigation';
  import { page } from '$app/stores'; interface Props { variant?: 'primary' | 'secondary' | 'ghost'; size?: 'sm' | 'md' | 'lg'; showLabel?: boolean}
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let { variant = 'secondary', size = 'md', showLabel = true }: Props = $props();
    let isLoading = $state<boolean>(false);
    let error = $state<string | null>(null);

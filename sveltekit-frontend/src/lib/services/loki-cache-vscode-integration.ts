@@ -1,5 +1,8 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * Loki.js Caching Layer with VS Code Task Integration * High-performance in-memory database with VS Code automation */ import Loki from 'lokijs'; // avoid fragile generic Collection typing from lokijs in this file // we'll treat collections as `any` at runtime to keep TypeScript robust'
 // (lokijs Collection types are often non-generic in various versions) // import type { Collection } from 'lokijs'; export interface CacheableItem { id: string, type: 'document' | 'search' | 'embedding' | 'analysis' | 'task' | 'config',key: string, data: Record<string, unknown>, metadata: {
 	created: number, accessed: number, hits: number, size: ttl?: number; tags?: string[]}; expiry?: number}

@@ -33,35 +33,36 @@ https, //svelte.dev/e/js_parse_error -->
   
   import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte';
   import type { Report, CanvasState } from '$lib/data/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Avoid importing namespaces as types here — use lightweight local types to satisfy the component's needs.
   type LocalEvidence = {
-    id: string;, caseId: string;
+    id: string; caseId: string;
     criminalId: string | null;
-    title: string;, description: string;
-    evidenceType: string;, fileType: string | null;
+    title: string; description: string;
+    evidenceType: string; fileType: string | null;
     subType: string | null;
     fileUrl: string | null;
     fileName: string | null;
     fileSize: number | null;
     mimeType: string | null;
-    hash: string;, tags: string[];
-    chainOfCustody: unknown[];, collectedAt: Date, null; collectedBy: string | null;
+    hash: string; tags: string[];
+    chainOfCustody: unknown[]; collectedAt: Date, null; collectedBy: string | null;
     location: string | null;
     // Corrected type
     labAnalysis: Record<string, any>;
     aiAnalysis: Record<string, any>;
-    aiTags: string[];, aiSummary: string | null;
+    aiTags: string[]; aiSummary: string | null;
     summary: string | null;
-    isAdmissible: boolean;, confidentialityLevel: string;
+    isAdmissible: boolean; confidentialityLevel: string;
     canvasPosition: {, x: number; y: number } | null;
-    uploadedBy: string;, uploadedAt: Date;
+    uploadedBy: string; uploadedAt: Date;
     updatedAt: Date;
     [key: string]: unknown;
   };
   // Extend the imported Report type to include an optional 'id' property
   type LocalReport = Report & { id?: string };
 
-  type LocalCitationPoint = { source: string;, text: string; [key: string]: unknown };
+  type LocalCitationPoint = { source: string; text: string; [key: string]: unknown };
   let currentReport: LocalReport, null = null; // Use LocalReport type
   let currentCanvasState: null = null;
   let evidence = $state <LocalEvidence[]>([]);
@@ -375,7 +376,7 @@ https, //svelte.dev/e/js_parse_error -->
 <style>
   /* @unocss-include */
   .container {
-    max-width: 1200px;, margin: 0 auto;
+    max-width: 1200px; margin: 0 auto;
     padding: 20px;
     font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }

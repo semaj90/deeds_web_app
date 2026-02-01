@@ -1,4 +1,6 @@
 import type { TextChunk } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * SIMD-Optimized JSON Parser for Legal Documents

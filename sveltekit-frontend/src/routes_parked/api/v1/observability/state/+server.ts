@@ -8,6 +8,7 @@ import { json } from '@sveltejs/kit';
 import fs from 'fs';
 import path from 'path';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // GET /api/v1/observability/state - Get current observability state with enhanced persistence
 export const GET: RequestHandler = async () => {
  try {

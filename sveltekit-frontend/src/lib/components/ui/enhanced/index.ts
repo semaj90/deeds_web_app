@@ -1,5 +1,6 @@
 // Enhanced Svelte, 5 + UnoCSS Component Library // Optimized for legal AI application with NieR theming 
 import crypto from 'crypto';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 export {
 default, as Button }
 from './Button.svelte.js';

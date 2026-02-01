@@ -1,6 +1,7 @@
 <script lang="ts">let { messages = [] } = $props();
 
 	import CitationLink from './CitationLink.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	
 
@@ -27,7 +28,6 @@
 	function formatTime(timestamp: string): string {
 		const date = new Date(timestamp);
 		return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-	}
 </script>
 
 <div class="messages-list">

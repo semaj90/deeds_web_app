@@ -8,6 +8,8 @@
 import { embeddingGemma } from '$lib/server/ai/embeddinggemma-service';
 import { cache } from '$lib/server/cache/redis';
 import { qdrantClient } from '$lib/server/vector/qdrant';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /* -------------------------------------------------------------------------- */
 /* Config */

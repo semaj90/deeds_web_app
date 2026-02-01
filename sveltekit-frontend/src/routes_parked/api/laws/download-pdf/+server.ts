@@ -5,6 +5,7 @@
 
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET /api/laws/download-pdf

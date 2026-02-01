@@ -12,6 +12,8 @@
 	import X from 'lucide-svelte/icons/x';
 	import ZoomIn from 'lucide-svelte/icons/zoom-in';
 	import ZoomOut from 'lucide-svelte/icons/zoom-out';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Migrated from createEventDispatcher to callback props;
 
  let { photos = [], currentIndex = $bindable(0), open = $bindable(false), onclose } = $props<{

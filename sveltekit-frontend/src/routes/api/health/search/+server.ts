@@ -1,5 +1,6 @@
 import { env } from '$lib/env';
 import { json, type RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const GO_MICROSERVICE_URL = env?.GO_MICROSERVICE_URL ?? 'http://localhost:8080';
 

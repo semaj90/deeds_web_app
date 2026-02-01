@@ -7,6 +7,7 @@
  * Consumers read with XRANGE/XREAD to replay tokens for resume semantics.
  */
 import { redis } from '$lib/server/redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type TokenEntry = {
     id: string; // The stream ID (e.g. "169616...-0")

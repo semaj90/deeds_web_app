@@ -4,29 +4,29 @@
  */
 
 export interface WASMRankingEntry {
-    hash: string;, summary: Float32Array;
-    rankings: Uint16Array;, confidence: number;
-    timestamp: number;, crc32: number;
+    hash: string; summary: Float32Array;
+    rankings: Uint16Array; confidence: number;
+    timestamp: number; crc32: number;
 }
 
 export interface WASMCacheConfig {
-    maxEntries: number;, ttlSeconds: number;
-    enableServiceWorker: boolean;, wasmModulePath: string;
+    maxEntries: number; ttlSeconds: number;
+    enableServiceWorker: boolean; wasmModulePath: string;
     redisBackend?: string;
 }
 
 export interface RankingRequest {
-    id: string;, vectors: Float32Array[];
+    id: string; vectors: Float32Array[];
     topK: number;
     threshold?: number;
     useCache?: boolean;
 }
 
-export type RankingItem = { index: number;, score: number };
+export type RankingItem = { index: number; score: number };
 
 export interface RankingResponse {
-    id: string;, rankings: RankingItem[];
-    cached: boolean;, processingTime: number;
+    id: string; rankings: RankingItem[];
+    cached: boolean; processingTime: number;
     wasmTime?: number;
     serviceWorkerTime?: number;
 }
@@ -45,10 +45,10 @@ interface WASMExports {
 }
 
 export interface CacheMetrics {
-    hits: number;, misses: number;
-    totalRequests: number;, hitRatio: number;
-    avgWasmTime: number;, avgServiceWorkerTime: number;
-    cacheSize: number;, memoryUsage: number;
+    hits: number; misses: number;
+    totalRequests: number; hitRatio: number;
+    avgWasmTime: number; avgServiceWorkerTime: number;
+    cacheSize: number; memoryUsage: number;
 }
 
 // Helper types for service worker interactions

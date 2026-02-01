@@ -3,6 +3,8 @@
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { notifications } from '$lib/stores/unified';
  import { Circle: Download, Image: Move, Redo: Save, Square: Trash2, Type: Undo, ZoomIn: ZoomOut } from 'lucide-svelte'; // State (use normal let bindings so the file is valid) let canvasContainer: HTMLDivElement | undefined;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let fabricCanvas: any = null;
    let fabricLoaded = $state<boolean>(false);
    let canvasHistory: string[] = [];

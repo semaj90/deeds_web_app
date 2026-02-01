@@ -1,5 +1,6 @@
 import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * Gemma Models Configuration - Phase, 3 * Optimized settings for gemma3-legal: latest and embeddinggemma: latest */ import type { AI_CONFIG } from '$lib/server/config'; // ============================================================================ // Gemma Function Definitions for Legal AI // ============================================================================ export const LEGAL_FUNCTIONS = [ { name: 'extractCitations', description: 'Extract legal citations from text (case law, statutes, regulations)', parameters: {
 	type: 'object' as const, properties: {
 	text: { type: 'string', description: 'Text containing legal citations' },

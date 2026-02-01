@@ -2,6 +2,7 @@ import type { Document } from '$lib/types';
 /** * âš–ï¸  Neo4j Client for Legal Entity Graphs * -------------------------------------------------- * Adds or updates entities and relationships from * WASM / AI-parsed legal documents. */
 import neo4j, { Driver: Session } from 'neo4j-driver';
 import { env } from '$env/dynamic/private';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type LegalEntity = {
     name?: string;

@@ -9,11 +9,12 @@
  */
 
  import ContextConfirmModal from '$lib/components/ContextConfirmModal.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  type CandidateContext = {
- context_id: string;, source: string;
- score: number;, snippet: string;
+ context_id: string; source: string;
+ score: number; snippet: string;
  range?: {, from_msg_id: number; to_msg_id: number };
  timestamp?: string;
  };
@@ -190,7 +191,6 @@
  if (!timestamp) return '';
  const date = new Date(timestamp);
  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
- }
 </script>
 
 <div class="flex flex-col h-screen bg-base-900">

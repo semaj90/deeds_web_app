@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types.js';
 import { processWithDocling } from '$lib/server/docling';
 import { promises as fs } from 'fs';
 import path from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // IBM Docling Document Processing API
 export const POST: RequestHandler = async ({ request }) => {

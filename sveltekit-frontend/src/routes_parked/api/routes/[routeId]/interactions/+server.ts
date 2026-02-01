@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { getRouteMetadata, createInteractionLog, getInteractionLogs } from '$lib/db';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ─────────────────────────────────────────────────────────
 // POST /api/routes/:routeId/interactions

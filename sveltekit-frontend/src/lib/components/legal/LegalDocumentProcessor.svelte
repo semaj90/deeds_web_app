@@ -8,6 +8,8 @@ import type { Case } from '$lib/types';
   import { useMachine } from '@xstate/svelte';
   import { legalDocumentProcessingMachine, selectors } from '$lib/state/legalDocumentProcessingMachine';
   import type { LegalDocument } from '$lib/services/legalRAGEngine';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // Props
   let {
     document = $bindable(),

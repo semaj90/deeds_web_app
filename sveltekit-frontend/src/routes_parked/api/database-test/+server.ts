@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { db, testConnection, healthCheck } from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async () => {
  const results: { [key: string]: unknown } = {};

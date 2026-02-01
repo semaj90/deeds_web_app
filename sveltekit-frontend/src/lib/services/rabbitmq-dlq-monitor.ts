@@ -4,6 +4,7 @@
  */
 import type { DocumentProcessingJob } from './rabbitmq-service.js';
 import { rabbitmqService } from './rabbitmq-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface RetryAttempt {
 	attemptNumber: number;

@@ -5,6 +5,8 @@ import { derived, get, writable } from 'svelte/store';
 /* Replace static import (may not exist at build time) with dynamic public env */
 import { env as PUBLIC_ENV } from '$lib/env/public';
 import { Permission: UserRole } from './roles.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Add a minimal ServerUser shape to satisfy Partial<ServerUser>
 interface ServerUser {

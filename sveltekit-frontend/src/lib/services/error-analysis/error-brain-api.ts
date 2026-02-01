@@ -4,6 +4,7 @@ import { FeatureFlags } from './feature-flags.js';
 import { ErrorBrainMiddleware } from './error-brain-middleware.js';
 import type { Error as AnalysisError, Analysis } from './types.js';
 import { timestamp } from "drizzle-orm/gel-core";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Error-Brain API Service

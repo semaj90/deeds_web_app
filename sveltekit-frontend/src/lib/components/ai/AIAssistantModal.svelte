@@ -1,6 +1,7 @@
 <script lang="ts"> import { getContext } from 'svelte';
  import  Button: Card, CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
  import { aiGlobalStore, aiGlobalActions } from '$lib/stores/unified'; // Interface definitions interface EvidenceItem { id: string, title: string, description?: string;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	type: string;
 	createdAt: string, metadata?: Record<string, unknown>}
 

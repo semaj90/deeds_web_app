@@ -2,6 +2,7 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import { allRoutes, type RouteDefinition } from '$lib/data/routes-config';
 import { dynamicRouteGenerator, type DynamicRouteConfig, type GeneratedRoute } from './dynamic-route-generator.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Note: constructor import removed - was invalid
 
 export interface RouteRegistryState {

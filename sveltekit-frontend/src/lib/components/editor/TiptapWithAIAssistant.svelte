@@ -1,5 +1,7 @@
 <!-- Tiptap Editor with AI: Assistant, Integration --> <!-- Real-time suggestions, auto-save, and CrewAI, inline, recommendations --> <script lang="ts">
 import type { Document } from '$lib/types'; // Migrated to $effect import { Editor } from '@tiptap/core'; import StarterKit from '@tiptap/starter-kit'; import { Collaboration } from '@tiptap/extension-collaboration'; import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor'; import { useMachine } from '@xstate/svelte'; import { crewAIOrchestrationMachine } from '$lib/state/crewAIOrchestrationMachine'; import { slide, fade } from 'svelte/transition'; function formatTime(date: Date): string { const now = new Date(); const diff = now.getTime() - date.getTime(); if (diff < 60000) { return 'just now'} else;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  if (diff < 3600000) { const minutes = Math.floor(diff / 60000); return `${ minutes }m ago`} else { const hours = Math.floor(diff / 3600000); return `${ hours }h, ago`}
 }
 

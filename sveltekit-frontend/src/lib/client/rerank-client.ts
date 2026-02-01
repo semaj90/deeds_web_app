@@ -1,5 +1,7 @@
 import {  browser  } from '$app/environment';
 import Loki from 'lokijs'; // Import Loki.js
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Define a lightweight local type that captures the collection methods used here.
 type LokiCollection<T> = {

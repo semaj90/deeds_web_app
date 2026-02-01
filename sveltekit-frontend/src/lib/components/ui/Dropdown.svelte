@@ -3,6 +3,7 @@
   // Migrated to $effect
 
   import { fly } from 'svelte/transition';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // replaced prop/runtime handling with standard Svelte exports and dispatcher
   const { align } = $props<{ align, 'left' | 'right' }>()
   const { closeOnSelect } = $props<{ closeOnSelect, boolean }>()

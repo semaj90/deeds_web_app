@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * File Upload Schemas with Zod Validation

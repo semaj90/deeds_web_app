@@ -9,6 +9,8 @@
   import Wand2 from "lucide-svelte/icons/wand-2";
   // Migrated to $effect
   import { fly } from "svelte/transition";
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     disabled?: boolean;

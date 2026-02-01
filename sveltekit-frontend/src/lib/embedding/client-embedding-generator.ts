@@ -1,4 +1,6 @@
 import { getOllamaEndpoint } from '../services/get-ollama-endpoint';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // New: typed worker message shapes and memory stats
 type MemoryStats = {

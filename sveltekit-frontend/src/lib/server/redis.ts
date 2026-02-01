@@ -1,4 +1,5 @@
 import IORedis from 'ioredis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
 

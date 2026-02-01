@@ -25,6 +25,7 @@ import {
     varchar,
 } from 'drizzle-orm/pg-core';
 import { evidence } from './schema-postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // === ENUMS ===
 

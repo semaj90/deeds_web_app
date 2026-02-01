@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types.js';
 import { json } from '@sveltejs/kit';
 import type { LegalAISession, LegalContext, SecurityLevel } from '$lib/types/yorha-interface';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Legal AI Session Creation API
 // Creates and manages legal AI sessions with YoRHa interface integration

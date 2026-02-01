@@ -12,6 +12,7 @@ import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
 import { readFile } from 'fs/promises';
 import { promisify } from 'util';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const execAsync = promisify(exec);
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';

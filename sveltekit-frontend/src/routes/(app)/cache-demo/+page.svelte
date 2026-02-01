@@ -9,6 +9,7 @@
 	import Trash2 from 'lucide-svelte/icons/trash-2';
 	import Upload from 'lucide-svelte/icons/upload';
 	import Zap from 'lucide-svelte/icons/zap';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
 	const cache = useCache();
 

@@ -5,6 +5,8 @@
 
 import loki from 'lokijs';
 import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export type SyncStatus = 'synced' | 'syncing' | 'offline' | 'error';
 

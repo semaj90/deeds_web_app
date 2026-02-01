@@ -7,6 +7,7 @@ import crypto from 'crypto';
 
 import { createMachine, assign, fromPromise } from 'xstate';
 import type { Evidence } from '$lib/server/db/complete-introspected-schema';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Types for the custody workflow state machine
 export interface EvidenceCustodyContext {
   // Core evidence data

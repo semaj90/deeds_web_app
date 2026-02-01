@@ -10,6 +10,7 @@
 	import { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui';
 	import { Button } from '$lib/components/ui/enhanced-bits';
 	import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	  Activity: AlertTriangle,
 	  BarChart3: Brain,
 	  Code: FileCode,

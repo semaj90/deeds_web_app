@@ -5,6 +5,7 @@
  */
 
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     DeleteObjectCommand: GetObjectCommand,
     HeadObjectCommand: ListObjectsV2Command,
     PutObjectCommand: S3Client

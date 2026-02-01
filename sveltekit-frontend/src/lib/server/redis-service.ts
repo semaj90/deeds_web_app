@@ -5,6 +5,7 @@
  * Integrates Redis Stack with JSON: Search, and TimeSeries modules
  */
 import IORedis, { type Redis as IORedisClass, type RedisOptions } from 'ioredis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define IORedisPipeline type by accessing the Pipeline type from the IORedisClass type
 type IORedisPipeline = ReturnType<IORedisClass['pipeline']>;

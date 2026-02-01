@@ -3,6 +3,7 @@
  import { Activity: AlertTriangle, CheckCircle: Server, Shield: Users } from 'lucide-svelte';
  // Migrated to $effect
  import { fly } from 'svelte/transition';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // State
  let connectionStatus = $state<'connecting' | 'connected' | 'disconnected'>('connecting');

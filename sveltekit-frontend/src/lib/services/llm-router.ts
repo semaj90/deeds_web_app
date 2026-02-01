@@ -10,6 +10,7 @@ import { stream } from "glob";
 import type { url } from "inspector";
 import { Record } from "neo4j-driver";
 import type { config } from "process";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type LLMProvider = 'ollama' | 'gemini' | 'claude' | 'openai' | 'auto';
 

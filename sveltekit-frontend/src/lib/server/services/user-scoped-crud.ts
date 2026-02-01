@@ -6,6 +6,7 @@ import type { db } from '$lib/server/db';
 import type { cases, legalDocuments, evidence } from '$lib/server/db/schema';
 import { eq, and, desc, asc, count } from 'drizzle-orm';
 import type { createId } from '@paralleldrive/cuid2'; // Zod schemas for validation export const CreateCaseSchema = z.object({ title: z.string().min(1).max(255, description: z.string().optional(caseNumber: z.string().max(100).optional(, status: z.enum(['open', 'closed', 'pending', 'archived']).default('open', priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium', category: z.string().optional(metadata: z.record(z.any()).optional() }); export const UpdateCaseSchema = CreateCaseSchema.partial(); export type CreateCaseData = z.infer<typeof CreateCaseSchema>; export type UpdateCaseData = z.infer<typeof UpdateCaseSchema>; export interface ListOptions { page: number;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	limit: number; sortBy: 'title' | 'created_at' | 'updated_at' | 'status' | 'priority'; sortOrder: 'asc' | 'desc'; status?: string; priority?: string; } export interface ListResult<T> { items: T[];
 	pagination: { page: number;
 	limit: number; totalPages: number;

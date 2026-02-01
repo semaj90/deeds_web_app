@@ -76,6 +76,7 @@ import sys
 import json
 import numpy as np
 import onnxruntime as ort
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 from pathlib import Path
 
 def run_inference(input_file, output_file):

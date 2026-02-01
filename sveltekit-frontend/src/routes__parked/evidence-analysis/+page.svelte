@@ -12,6 +12,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import { Button } from '$lib/components/ui/enhanced-bits';
  import WebGPUEvidenceGraphVisualization from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization.svelte';
  import * as Card from 'bits-ui/components/card';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  let showWebGPUDemo = $state <boolean>(false);

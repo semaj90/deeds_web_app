@@ -1,5 +1,6 @@
 <script lang="ts">
  import * as d3 from 'd3';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  interface EvidenceNode {

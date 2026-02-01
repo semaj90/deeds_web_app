@@ -2,6 +2,8 @@
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import type { TabsContext, TabsListProps } from './types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props extends TabsListProps {
 		children?: Snippet;

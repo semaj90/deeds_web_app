@@ -1,5 +1,6 @@
 // Evidence Management Types for SvelteKit, 2 AI Platform // Optimized for PostgreSQL + PGVector + Qdrant + MinIO + Redis
 import type { ActorRef } from 'xstate';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Defines the structure for an evidence item used in the legal AI platform.

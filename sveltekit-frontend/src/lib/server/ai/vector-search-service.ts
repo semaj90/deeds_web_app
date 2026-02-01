@@ -1,5 +1,6 @@
 import Redis from 'ioredis';
 import type { Sql } from 'postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Type for postgres client
 type PostgresClient = Sql<Record<string, unknown>>;

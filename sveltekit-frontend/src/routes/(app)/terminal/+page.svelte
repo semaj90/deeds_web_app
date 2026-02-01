@@ -6,6 +6,7 @@
  import Send from 'lucide-svelte/icons/send';
  import Users from 'lucide-svelte/icons/users';
  import { tick } from 'svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  type ChatMessage = {
   id: string;
   role: 'user' | 'assistant';
@@ -221,7 +222,7 @@
   height: 100vh;
   font-family: 'JetBrains Mono', monospace;
   background-color: #0c0a09;
-  background-image: linear-gradient(rgba(12, 10, 9, 0.9), rgba(12, 10, 9, 0.9)),
+  background-image: linear-gradient(rgba(12, 10, 9, 0.9), rgba(12, 10, 9, 0.9));
         url('/grid-pattern.png');
  }
 

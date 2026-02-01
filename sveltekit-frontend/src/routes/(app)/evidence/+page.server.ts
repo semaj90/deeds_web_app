@@ -6,6 +6,7 @@ import { and, eq } from 'drizzle-orm';
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
 import type { Actions, PageServerLoad } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
 	// Phase 96: SSR Authentication Guard

@@ -127,6 +127,7 @@ import { createMachine, assign, fromPromise } from 'xstate';
 
 // Helper for Svelte code
 import { createActor } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const createRouteErrorAdvisorActor = () => createActor(routeErrorAdvisorMachine);
 

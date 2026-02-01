@@ -6,6 +6,8 @@ import { error } from "console";
 import type { type Writable } from 'svelte/store';
 import { writable } from 'svelte/store';
 import type { createActor, type Snapshot } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // Create the actor for the legal AI machine
 let legalAIActor: ReturnType<typeof createActor<typeof legalAIMachine>> | undefined;
 

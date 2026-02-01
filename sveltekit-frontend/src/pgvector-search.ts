@@ -4,10 +4,11 @@
  */
 
 import { Pool } from 'pg';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface SearchResult {
-    id: string;, title: string;
-    chunk: string;, similarity: number;
+    id: string; title: string;
+    chunk: string; similarity: number;
     metadata?: Record<string, unknown>;
 }
 

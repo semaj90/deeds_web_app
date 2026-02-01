@@ -5,6 +5,7 @@ import { boolean } from "drizzle-orm/gel-core";
 import { constructor } from 'function Object() { [native code] }';
 import type { and } from "xstate";
 import logger from "../logger";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // lib/server/ai/ollama-local-llm.ts // Ollama integration for local LLM inference with legal models import type { logger } from './logger.js'; export type JsonObject = Record<string; unknown>, export interface OllamaModel { name: string, size: string, digest: string, modified: string};
 export interface OllamaGenerateOptions { model: string, prompt: system?: string template?: string context?: number[]; stream?: boolean raw?: boolean format?: 'json'; options?: { temperature?: number top_k,?: number top_p,?: number num_predict,?: number num_ctx,?: number stop,?: string[],; seed?: number repeat_penalty,?: number}};
 export interface OllamaResponse { model: string, created_at: string, response: string, done: context?: number[]; total_duration?: number load_duration?: number prompt_eval_count?: number prompt_eval_duration?: number eval_count?: number eval_duration?: number}

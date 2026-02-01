@@ -2,6 +2,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
 import type { redisOptimized } from '$lib/middleware/redis-orchestrator-middleware';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type Analysis = {
  relevance: string;

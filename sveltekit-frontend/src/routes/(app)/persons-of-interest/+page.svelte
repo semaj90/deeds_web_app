@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { onMount } from "svelte";
  import { poiService } from '$lib/services/poi';
  import type { PersonOfInterest } from '$lib/types/poi';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  // Props
@@ -15,13 +17,10 @@
  let selectedPriority = $state<string>('');
 
  // Load POIs on mount
- $effect(() => {
-
- (async () => {
+ $effect(() => {	onMount(async () => {
  await loadPOIs();
  
-});();
- });
+});
 
  async function loadPOIs() {
  loading = true;
@@ -62,11 +61,10 @@
  const matchesSearch =
  poi.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
  poi.occupation?.toLowerCase().includes(searchQuery.toLowerCase());
- const matchesStatus = !selectedStatus ?? poi.status === selectedStatus;
+ const matchesStatus = !selectedStatus || poi.status === selectedStatus;
  const matchesPriority = !selectedPriority || poi.priority === selectedPriority;
  return matchesSearch && matchesStatus && matchesPriority;
  });
- }
 </script>
 
 <div class="poi-list-page">

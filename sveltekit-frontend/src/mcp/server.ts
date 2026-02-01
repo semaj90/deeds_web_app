@@ -4,6 +4,7 @@ import {
     CallToolRequestSchema, ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { mcpTools } from '../mcp/index.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const server = new Server(
   {

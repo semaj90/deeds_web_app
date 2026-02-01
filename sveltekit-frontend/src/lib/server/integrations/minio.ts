@@ -7,6 +7,7 @@
 
 import * as Minio from 'minio';
 import type { Readable } from 'stream';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define loose types for MinIO if missing
 type MinioClient = any;

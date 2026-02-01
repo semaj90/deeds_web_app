@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { enhancedRAGPipeline } from '$lib/services/enhanced-rag-pipeline';
 import { ragCacheKey, cacheGetJSON, cacheSetJSON } from '$lib/server/rag/cache';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const CACHE_TTL_SECONDS = 90;
 

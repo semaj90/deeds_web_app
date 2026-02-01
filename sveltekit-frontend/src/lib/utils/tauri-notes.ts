@@ -1,4 +1,5 @@
 import type { SavedNote } from "$lib/stores/saved-notes"; // Tauri-specific utilities for desktop app integration // Conditional imports to support both web and desktop environments let invoke: unknown;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let appDataDir: unknown;
  let join: unknown;
  let writeTextFile: unknown;

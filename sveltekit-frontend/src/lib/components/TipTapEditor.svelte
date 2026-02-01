@@ -1,6 +1,7 @@
 <script lang="ts">
 	import StarterKit from '@tiptap/starter-kit';
 	import { Editor, EditorContent } from 'svelte-tiptap';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
 		content?: string;

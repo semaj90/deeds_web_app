@@ -5,6 +5,7 @@
 
 import { logger } from '../logger.js';
 import { env } from '$env/dynamic/private';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface OllamaModel {
 	name: string;

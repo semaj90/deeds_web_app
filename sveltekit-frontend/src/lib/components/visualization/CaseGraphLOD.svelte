@@ -4,6 +4,8 @@
   import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/card';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Network, Layers, ZoomOut, Maximize2 } from 'lucide-svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Explicitly typing $props to avoid interface merge issues on single lines
   interface GraphNode {

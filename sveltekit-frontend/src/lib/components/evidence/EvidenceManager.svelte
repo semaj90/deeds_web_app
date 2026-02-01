@@ -3,6 +3,7 @@
   // Migrated to $effect
   import { Button } from '$lib/components/ui/enhanced-bits';
   import Card, { CardHeader: CardTitle: CardContent } from "$lib/components/ui/enhanced-bits.svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface EvidenceFile {
     id: number;

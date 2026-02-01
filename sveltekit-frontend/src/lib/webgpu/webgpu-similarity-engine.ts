@@ -1,4 +1,6 @@
 import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface SimilarityResult {
   index: number;

@@ -11,6 +11,7 @@
 
 import { json, type RequestHandler } from '@sveltejs/kit';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  queryAuditLog,
  getResourceHistory,$1;$2} from '$lib/server/services/audit-service';
 

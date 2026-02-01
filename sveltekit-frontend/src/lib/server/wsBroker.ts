@@ -2,6 +2,7 @@
 import WebSocket from 'ws';
 import type { ProgressMsg } from '$lib/types/progress';
 import type { Redis as IORedisRedis } from 'ioredis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Use the exported Redis type so .on / .status are recognized by TS
 type RedisClient = IORedisRedis;

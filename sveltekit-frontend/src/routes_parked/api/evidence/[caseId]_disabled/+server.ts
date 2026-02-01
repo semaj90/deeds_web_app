@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types.js';
 import { db } from '$lib/db';
 import { evidence, evidenceRelationships } from '$lib/db/schema/evidence';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // GET /api/evidence/[caseId] - Load all evidence for a case
 export const GET: RequestHandler = async ({ params }) => {

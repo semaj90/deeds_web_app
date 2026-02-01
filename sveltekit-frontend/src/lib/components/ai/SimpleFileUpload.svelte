@@ -12,6 +12,8 @@ import type { Document } from '$lib/types';
   // Use a namespace import and resolve the actual export at runtime.
   // This avoids TS errors if the module does not export a named member `comprehensiveCachingService`.
   import * as comprehensiveCachingModule from '$lib/services/comprehensive-caching-service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   const comprehensiveCachingService: {
 	set: (key: string, value: any, ttlSeconds?: number) => Promise<void>} = (comprehensiveCachingModule as any)?.comprehensiveCachingService
    ?? (comprehensiveCachingModule as any)?.default

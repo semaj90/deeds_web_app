@@ -7,6 +7,8 @@ import { cache } from '$lib/server/cache/redis.js';
 import type { EmbeddingResult } from '$lib/server/embedding-gateway.js';
 import { getEmbedding } from '$lib/server/embedding-gateway.js';
 import { assign, fromPromise, setup } from 'xstate';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface DocumentChunk {
 	id: string;

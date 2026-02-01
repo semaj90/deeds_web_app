@@ -5,6 +5,8 @@
  */
 import { browser } from '$app/environment';
 import { writable, type Writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface KeyboardShortcut {
     id: string;

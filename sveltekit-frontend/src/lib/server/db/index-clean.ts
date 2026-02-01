@@ -3,6 +3,7 @@ import { building } from '$app/environment';
 import * as schema from '$lib/server/db/schema-postgres';
 import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 let _db: PostgresJsDatabase<typeof schema> | null = null;
 let _client: ReturnType<typeof postgres> | null = null;

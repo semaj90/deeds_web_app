@@ -1,5 +1,6 @@
 // src/lib/server/orchestrators/nes-cache-orchestrator.ts
 import type { MultiDimArray } from '$lib/workers/gpu-tensor-worker';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 class NesCacheOrchestrator {
     private store = new Map<string, MultiDimArray>();

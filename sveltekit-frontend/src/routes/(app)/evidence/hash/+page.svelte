@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { onMount } from "svelte";
  import { goto } from '$app/navigation';
 	import { appStore, appActions } from '$lib/stores/app-store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  let selectedSection = $state('command-center');
@@ -181,9 +183,7 @@
 
  let intervalId: ReturnType<typeof setInterval>;
 
- $effect(() => {
-
- (async () => {
+ $effect(() => {	onMount(async () => {
  await loadData();
 
  // Refresh data periodically
@@ -192,8 +192,7 @@
  },
 	60000); // Refresh every minute
  
-});();
- });
+});
 
  // TODO: Add as cleanup in $effect: return () => {
  if (intervalId) {

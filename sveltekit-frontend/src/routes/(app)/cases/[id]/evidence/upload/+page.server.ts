@@ -3,6 +3,7 @@ import { cases } from '$lib/server/db/schema-postgres';
 import { error, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!locals.user) {

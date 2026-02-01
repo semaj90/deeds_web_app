@@ -1,4 +1,6 @@
 import type { ActorRefFrom } from "xstate";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Unified Health Monitoring and Job Orchestration Service // Coordinates CUDA: WebGPU, WASM LLM: Redis Streams, and PostgreSQL components import type { createMachine, assign, type ActorRefFrom } from 'xstate'; import type { fromPromise } from 'xstate/actors'; // Corrected import for fromPromise import type { VectorServiceMetrics, VectorHealthStatus, VectorProcessingError } from '$lib/types/vector-jobs'; import webgpuPolyfillInstance from '$lib/webgpu/webgpu-polyfill'; // Changed to default import import type { wasmLLMService } from '$lib/wasm/wasm-llm-service'; // New interface for alert thresholds export interface AlertThresholds { errorRate: number, latency: number, queueDepth: number} export interface HealthOrchestratorContext { services: {
 	redis: 'connected' | 'disconnected' | 'error',postgres: 'connected' | 'disconnected' | 'error',rabbitmq: 'connected' | 'disconnected' | 'error',cuda: 'available' | 'unavailable' | 'error',webgpu: 'available' | 'unavailable' | 'not_supported',wasmLLM: 'loaded' | 'unloaded' | 'error',vectorService: 'healthy' | 'degraded' | 'unhealthy'}; metrics: VectorServiceMetrics, healthStatus, VectorHealthStatus: null,jobQueue: {

@@ -11,6 +11,7 @@
 
 import type { RequestHandler } from '@sveltejs/kit';
 import { createClient } from 'redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const REDIS_HOST = process.env?.REDIS_HOST ?? '127.0.0.1';
 const REDIS_PORT = parseInt(process.env?.REDIS_PORT ?? '6379');
@@ -31,7 +32,7 @@ const ERROR_SEVERITY: Record<string, number> = {
 
 interface ErrorEvent {
  type: 'error' | 'status' | 'summary';
- timestamp: string;, data: Record<string, unknown>;
+ timestamp: string; data: Record<string, unknown>;
 }
 
 export const GET: RequestHandler = async ({ request }) => {

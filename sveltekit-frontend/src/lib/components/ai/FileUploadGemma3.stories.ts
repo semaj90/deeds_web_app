@@ -2,6 +2,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
 import FileUploadGemma3 from './FileUploadGemma3.svelte';
 import FileUploadGemma3 from './FileUploadGemma3.svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 const meta = {
   title: 'AI/FileUploadGemma3',

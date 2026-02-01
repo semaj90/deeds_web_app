@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Fix: Use correct env variable access without invalid const assignment
 const QDRANT_URL = env?.QDRANT_URL ?? 'http://localhost:6333';

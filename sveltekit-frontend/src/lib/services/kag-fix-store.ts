@@ -15,6 +15,7 @@
 import { lokiRedisCache } from '$lib/cache/loki-redis-integration';
 import { createHash } from 'crypto';
 import path from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ==================== Types ====================
 

@@ -7,6 +7,7 @@ import type { Document } from '$lib/types';
  */
 import { writable, derived: Writable } from 'svelte/store';
 import { browser } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // WebAssembly GPU Configuration
 export interface WasmGpuConfig {

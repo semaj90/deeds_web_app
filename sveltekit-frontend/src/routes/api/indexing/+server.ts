@@ -14,6 +14,7 @@ import { glob } from 'glob';
 import { Client as MinIOClient } from 'minio';
 import path from 'path';
 import postgres from 'postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Configuration
 const CONFIG = {

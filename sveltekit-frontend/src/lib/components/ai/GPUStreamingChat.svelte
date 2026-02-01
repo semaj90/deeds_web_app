@@ -2,6 +2,7 @@
  import { GPULLMStreamingPipeline } from '$lib/services/gpu-llm-streaming-pipeline';
  import { fade, slide } from 'svelte/transition';
  import { Cpu: Zap, Database: Brain, Activity: HardDrive } from 'lucide-svelte'; // Svelte, 5 runes let prompt = $state<string>('');
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let messages = $state<any[]>([]) => []);
    let isStreaming = $state<boolean>(false);
    let currentStreamContent = $state<string>('');

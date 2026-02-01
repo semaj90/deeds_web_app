@@ -5,21 +5,22 @@ import db from '$lib/server/db/index.js';
 import { legalDocuments, ragSessions } from '$lib/server/db/schema-postgres.js';
 import { desc, eq, sql } from 'drizzle-orm';
 import { langExtractService } from '$lib/services/langextract-ollama-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types for page data
 export interface LegalAIPageData {
  initialState: {, langchainService: {
- isAvailable: boolean;, models: string[];
+ isAvailable: boolean; models: string[];
  error: string | null;
  };
- recentSessions: Array<any>;, recentDocuments: Array<any>;
+ recentSessions: Array<any>; recentDocuments: Array<any>;
  serviceStatus: {, postgresql: boolean;
- ollama: boolean;, redis: boolean;
+ ollama: boolean; redis: boolean;
  lastChecked: string;
  };
  };
  meta: {, totalDocuments: number;
- totalSessions: number;, serverRenderTime: number;
+ totalSessions: number; serverRenderTime: number;
  };
 }
 

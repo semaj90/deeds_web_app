@@ -4,6 +4,7 @@ import { db } from '../db/index.js';
 import { cases } from '../db/schema.js';
 import type { QdrantApiWrapper } from './qdrant-api-wrapper.js';
 import { createQdrantWrapper } from './qdrant-api-wrapper.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface DocumentMetadata {
 	[key: string]: any;

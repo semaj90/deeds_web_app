@@ -50,6 +50,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
   let state = evidenceMachine.initialStat
   // Use zod adapter for superValidate
   import { zod } from 'sveltekit-superforms/adapters';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   $effect(() => {
     (async () => {
 form = await superValidate(zod(evidenceSchema), { initialValues: item

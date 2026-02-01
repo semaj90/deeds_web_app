@@ -1,5 +1,7 @@
 import type { EventEmitter } from 'events';
 import { EventEmitter as Events } from 'events';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define local types to avoid complex external dependencies for now
 type OllamaGenerateRequest = {

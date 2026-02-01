@@ -1,6 +1,7 @@
 import type { Document } from '$lib/types'; // Real-time Document Update Notifications // WebSocket-based notifications for document re-embedding and re-ranking progress import { writable } from 'svelte/store'; // TODO: Fix import - // Orphaned: import { // ============================================================================ // TYPES // ============================================================================ }
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface UpdateNotification { id: string, type: 'document_changed' | 'reembedding_started' | 'reembedding_complete' | 'reranking_complete' | 'error',documentId: string, timestamp: string, data: { title?: string; progress?: number; chunksProcessed?: number; totalChunks?: number; queriesReranked?: number; similarityImprovement?: number; error?: string; priority?: 'low' | 'medium' | 'high' | 'critical'} }
 // REMOVED: export interface NotificationState { connected: boolean, notifications: UpdateNotification[], activeUpdates: Map<string, UpdateNotification>, connectionStatus: 'connecting' | 'connected' | 'disconnected' | 'error'}

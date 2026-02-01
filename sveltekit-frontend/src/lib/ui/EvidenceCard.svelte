@@ -18,6 +18,8 @@ https, //svelte.dev/e/tag_invalid_name -->
  import Video from "lucide-svelte/icons/video";
  import Zap from "lucide-svelte/icons/zap";
  import Tooltip from './Tooltip.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
   evidence: Evidence;

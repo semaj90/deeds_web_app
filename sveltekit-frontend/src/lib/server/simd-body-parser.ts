@@ -4,6 +4,7 @@
  */
 
 import { dev } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Lightweight structural alias to avoid using SvelteKit's RequestEvent namespace/type directly
 // We only need the 'request' and 'url' properties in this module.

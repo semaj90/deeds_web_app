@@ -1,5 +1,6 @@
 // API Client utility for centralized API calls 
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 error }
 from '@sveltejs/kit';
 export interface ApiConfig {

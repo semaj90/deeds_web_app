@@ -22,9 +22,9 @@ https, //svelte.dev/e/js_parse_error -->
  <p>This placeholder replaces corrupted or missing markup for now.</p>
 </main>
 
-<style lang="css">
+<style>
  .demo-page {
- max-width: 1200px;, margin: 0 auto;
+ max-width: 1200px; margin: 0 auto;
  padding: 2rem;
  }
 
@@ -34,7 +34,7 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  h1 {
- margin: 0;, color: #1a1a1a;
+ margin: 0; color: #1a1a1a;
  font-size: 2.5rem;
  }
 
@@ -46,7 +46,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  .pipeline-diagram {
  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
- color: white;, padding: 2rem;
+ color: white; padding: 2rem;
  border-radius: 12px;
  margin-bottom: 2rem;
  }
@@ -60,7 +60,7 @@ https, //svelte.dev/e/js_parse_error -->
  .flow-steps {
  display: flex;
  align-items: center;
- justify-content: space-betweennn;, gap: 0.5rem;
+ justify-content: space-betweennn; gap: 0.5rem;
  overflow-x: auto;
  }
 
@@ -86,25 +86,25 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .stat-item {
- background: #f8f9fa;, padding: 1rem;
+ background: #f8f9fa; padding: 1rem;
  border-radius: 8px;
  text-align: center;
  }
 
  .stat-label {
- display: block;, color: #666;
+ display: block; color: #666;
  font-size: 0.875rem;
  margin-bottom: 0.25rem;
  }
 
  .stat-value {
- display: block;, color: #007bff;
+ display: block; color: #007bff;
  font-size: 1.25rem;
  font-weight: 700;
  }
 
  .integration-status {
- background: #e7f3ff;, padding: 2rem;
+ background: #e7f3ff; padding: 2rem;
  border-radius: 12px;
  margin-top: 2rem;
  }
@@ -123,8 +123,8 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .status-item {
- display: flex;, gap: 1rem;
- align-items: flex-start;, background: white;
+ display: flex; gap: 1rem;
+ align-items: flex-start; background: white;
  padding: 1.5rem;
  border-radius: 8px;
  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -135,12 +135,12 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .status-item strong {
- display: block;, color: #333;
+ display: block; color: #333;
  margin-bottom: 0.25rem;
  }
 
  .status-item p {
- margin: 0;, color: #666;
+ margin: 0; color: #666;
  font-size: 0.875rem;
  }
 
@@ -148,7 +148,7 @@ https, //svelte.dev/e/js_parse_error -->
  margin-top: 3rem;
  padding-top: 2rem;
  border-top: 2px solid #e9ecef;
- text-align: center;, color: #666;
+ text-align: center; color: #666;
  }
 
  footer p {

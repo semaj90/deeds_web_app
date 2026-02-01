@@ -1,6 +1,8 @@
 // Loki.js based local memory and sync service for enhanced performance
 
 import Loki from 'lokijs';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Browser environment check
 const browser = typeof window !== 'undefined';

@@ -5,6 +5,9 @@ import type { cacheActor, getCacheStats } from './xstate-cache-integration.js';
 import MultiTierCache from '$lib/ai/cache/multiTierCache.js';
 import type { getCache, setCache } from '$lib/server/utils/server-cache.js';
 import {  browser  } from '$app/environment';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface CacheResourceAllocation {
  cpuThreads: number;

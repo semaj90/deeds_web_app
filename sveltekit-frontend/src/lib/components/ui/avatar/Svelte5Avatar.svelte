@@ -6,6 +6,7 @@
  * Image/initials avatar with fallback and status indicator
  */
 import type { Snippet } from 'svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface Props {
 	src?: string;

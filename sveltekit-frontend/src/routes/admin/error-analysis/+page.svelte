@@ -3,6 +3,7 @@
 	import { Content as DialogContent, Description as DialogDescription, Overlay as DialogOverlay, Portal as DialogPortal, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
 	// Migrated to $effect
 	import type { PageData } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	// ═══════════════════════════════════════════════════════════════════════
 	// Phase 89: RAG+KAG Powered Error Analysis UI

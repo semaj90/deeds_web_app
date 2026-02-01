@@ -1,5 +1,6 @@
 import type { User } from '$lib/types';
 import type { db, pool } from './drizzle.js'; import type { users, cases, evidence } from './schema.ts'; import bcrypt from 'bcryptjs'; import { eq } from 'drizzle-orm'; // Sample embeddings (normally produced by an AI model) const sampleEmbeddings = { financial: Array.from({
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	length: 768 },
 	() => Math.random() * 0.1 + 0.1, legal: Array.from({
 	length: 768 },

@@ -10,6 +10,7 @@
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 	import Layers from 'lucide-svelte/icons/layers';
 	import Users from 'lucide-svelte/icons/users';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Cluster {
 		id: string;

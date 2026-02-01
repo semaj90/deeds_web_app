@@ -4,6 +4,8 @@ import { PromptTemplate } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
 import type { Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Mock advancedCache if not available (restoring logic from context)
 const advancedCache = {

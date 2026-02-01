@@ -18,6 +18,7 @@ import {
     SessionError,
 } from './errors.js';
 import { getLegalGatewayUrl } from './utils/endpoints.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // LUCIA v3 INITIALIZATION

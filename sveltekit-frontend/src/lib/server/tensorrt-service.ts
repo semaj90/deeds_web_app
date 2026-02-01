@@ -56,6 +56,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 try:
     import tensorrt_llm
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     from tensorrt_llm.runtime import ModelRunner
 
     def run_tensorrt_inference():

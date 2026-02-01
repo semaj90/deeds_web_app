@@ -8,6 +8,7 @@ import { text, jsonb } from 'drizzle-orm/pg-core';
 import { pgTable, uuid, timestamp, real, integer } from 'drizzle-orm/pg-core';
 import { vector } from 'pgvector/drizzle-orm';
 import { relations } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Test RAG Documents Table

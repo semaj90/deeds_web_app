@@ -2,6 +2,8 @@
 import { browser } from '$app/environment';
 import { ShaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
 import { Record } from "neo4j-driver";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Placeholder definitions to resolve compilation errors if gaming-constants.js is missing or incorrect
 // These should ideally be imported from a proper constants file.

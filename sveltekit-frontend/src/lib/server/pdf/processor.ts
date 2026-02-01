@@ -10,6 +10,7 @@ import { createWorker } from 'tesseract.js';
 import pdfParse from 'pdf-parse';
 import sharp from 'sharp';
 import { readFile } from 'fs/promises';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface PDFProcessingResult {
 	text: string;

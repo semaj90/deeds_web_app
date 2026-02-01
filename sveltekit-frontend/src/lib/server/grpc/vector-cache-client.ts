@@ -3,6 +3,7 @@ import { VectorCacheServiceClient } from '$lib/proto/vector_cache_grpc_pb';
 import { EmbedLookupRequest, EmbedStoreRequest } from '$lib/proto/vector_cache_pb';
 import type { ServiceError } from '@grpc/grpc-js';
 import { credentials } from '@grpc/grpc-js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // For GRPC_VECTORCACHE_URL
 const GRPC_VECTORCACHE_URL = env?.GRPC_VECTORCACHE_URL ?? "localhost:50051";

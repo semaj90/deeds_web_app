@@ -1,4 +1,5 @@
 import { assign, fromPromise, setup, type StateValue } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * XState Legal Form Machine (v5) - Case Creation Wizard

@@ -6,9 +6,9 @@
  type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
  interface ApiEndpoint {
- id: string;, name: string;
- description: string;, icon: any;
- method: HttpMethod;, url: string;
+ id: string; name: string;
+ description: string; icon: any;
+ method: HttpMethod; url: string;
  category: 'system' | 'ai' | 'data' | 'infrastructure' | 'messaging';
  timeoutMs?: number;
  headers?: Record<string, string>;
@@ -18,10 +18,10 @@
 
  type TestStatus = 'running' | 'success' | 'error';
  interface TestResult {
- id: string;, endpointId: string;
- name: string;, status: TestStatus;
+ id: string; endpointId: string;
+ name: string; status: TestStatus;
  statusCode: number | null;
- durationMs: number;, startedAt: Date;
+ durationMs: number; startedAt: Date;
  message: string;
  }
 

@@ -13,6 +13,7 @@ pgTable, uuid,
  real, vector, }
 from 'drizzle-orm/pg-core';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 sql }
 from 'drizzle-orm';
 // AI Responses with GRPO-thinking context and embeddings export const aiResponses = pgTable('ai_responses', {

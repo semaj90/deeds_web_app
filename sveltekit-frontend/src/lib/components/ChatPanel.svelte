@@ -105,7 +105,6 @@
 				}
 			}
 		});
-	}
 </script>
 
 <section class="flex flex-col h-full bg-noir text-beige font-ui">

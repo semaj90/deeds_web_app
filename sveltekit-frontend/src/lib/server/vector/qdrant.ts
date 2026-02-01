@@ -2,6 +2,7 @@ import { CONFIG } from '$lib/config/env.server';
 import type { DocumentItem, SearchResult } from '$lib/types/sharedTypes';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { logger } from '../production-logger.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const qdrantUrl = CONFIG?.QDRANT_URL || process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 

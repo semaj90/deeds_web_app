@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RAGService } from '$lib/server/rag';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const rag = new RAGService();
 

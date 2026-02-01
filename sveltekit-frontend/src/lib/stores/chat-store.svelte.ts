@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import type { ChatMessage, ChatSession, ConnectionStatus, MessageAnalysis, RAGContext, Recommendation } from '$lib/types/chat';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Re-export for UserActivity type
 export interface UserActivity {

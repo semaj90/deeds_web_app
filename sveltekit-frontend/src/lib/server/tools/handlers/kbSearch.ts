@@ -6,6 +6,7 @@
  */
 
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   toolRegistry: KBSearchRequestSchema,
 $1;$2$1;$2$1;$2} from '../registry.js';
 

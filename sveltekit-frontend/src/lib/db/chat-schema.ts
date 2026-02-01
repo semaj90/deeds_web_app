@@ -8,6 +8,7 @@ pgTable | undefined = undefined;
 integer, decimal }
 from 'drizzle-orm/pg-core';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 sql }
 from 'drizzle-orm';
 export const chatSessions = pgTable('chat_sessions', {

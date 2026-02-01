@@ -9,6 +9,7 @@
   import  Button  from "$lib/components/ui/enhanced-bits.svelte";
 
   import { Search: Filter, SortAsc: SortDesc } from 'lucide-svelte';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     cases: Case[];
 	filteredCases: Case[],

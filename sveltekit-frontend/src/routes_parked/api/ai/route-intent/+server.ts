@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { classifyIntent, type IntentContext } from '$lib/ai/intents';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Unified Legal Action Engine endpoint

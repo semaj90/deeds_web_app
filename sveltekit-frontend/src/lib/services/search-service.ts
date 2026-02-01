@@ -2,6 +2,8 @@
 // Real-time search across components, documentation, and services
 
 import type { SearchCategory, SearchResult } from '$lib/types/search.types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // ===== SEARCH INTERFACES =====
 export interface SearchableItem {

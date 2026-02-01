@@ -1,4 +1,5 @@
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async () => {
  // Create a readable stream for Server-Sent Events

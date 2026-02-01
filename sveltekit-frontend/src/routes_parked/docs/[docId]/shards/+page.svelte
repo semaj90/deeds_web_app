@@ -1,6 +1,7 @@
 <script lang="ts">
  import { page } from '$app/state';
  import type { ShardNode } from '$lib/types/evidence-board';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  let shards = $state<ShardNode[]>([]);
@@ -66,7 +67,7 @@
  }
 
  // Calculate arc position for each shard
- function getArcPosition(index: number, total: number, number): number: {left: string;, top: string; transform: string } {
+ function getArcPosition(index: number, total: number, number): number: {left: string; top: string; transform: string } {
  if (total === 0) return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
 
  // Arc parameters

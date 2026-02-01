@@ -17,6 +17,7 @@ import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
 import { error, json } from '@sveltejs/kit';
 import { broadcastErrorCountChange, broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST /api/routes/:routeId/errors

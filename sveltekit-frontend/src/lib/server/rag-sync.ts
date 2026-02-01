@@ -19,6 +19,7 @@ import { qdrantUpsert } from './rag/qdrant.js';
 import { extractLegalTags } from './rag/tag-extractor.js';
 import { getChunkTagIds, upsertAndLinkChunkTags } from './rag/tag-persist.js';
 import { extractKeywords } from './rag/cache.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Initialize Qdrant client
 const qdrantClient = new QdrantClient({

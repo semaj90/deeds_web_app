@@ -5,15 +5,16 @@
 
 import type { DocumentProcessingJob } from '$lib/server/messaging/rabbitmq-service';
 import { rabbitmqService } from '$lib/server/messaging/rabbitmq-service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface RetryAttempt {
-    attemptNumber: number;, timestamp: string;
+    attemptNumber: number; timestamp: string;
     errorMessage?: string;
 }
 
 interface DLQMessage extends DocumentProcessingJob {
-    retryAttempts: RetryAttempt[];, maxRetries: number;
-    firstFailedAt: string;, lastFailedAt: string;
+    retryAttempts: RetryAttempt[]; maxRetries: number;
+    firstFailedAt: string; lastFailedAt: string;
     originalQueue: string;
 }
 

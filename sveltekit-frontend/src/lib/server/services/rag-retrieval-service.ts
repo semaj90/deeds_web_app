@@ -18,6 +18,7 @@ import {
 import { eq, desc } from 'drizzle-orm';
 import { cosineSimilarity } from './embedding-service.js';
 import { searchStatuteChunks } from './statute-ingestion-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RAGSource {
 	type: 'statute' | 'evidence' | 'note' | 'message' | 'summary';

@@ -9,6 +9,7 @@ import { createHash } from 'crypto';
 import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from './schema-phase90-hardened.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type DB = PostgresJsDatabase<typeof schema>;
 

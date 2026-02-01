@@ -14,6 +14,7 @@ import { NESMemoryArchitecture } from '../../memory/nes-memory-architecture.js';
 import { WebGPUSOMCache } from '../../webgpu/som-webgpu-cache.js';
 import type { lokiRedisCache } from '$lib/cache/loki-redis-integration'; // Placeholder import, may need dynamic import or fix
 import type { RequestEvent } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // --- ADDED: missing type declarations to fix TS errors ---
 type GPUCache = {

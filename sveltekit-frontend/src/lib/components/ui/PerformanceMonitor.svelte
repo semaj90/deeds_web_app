@@ -5,6 +5,8 @@
 	import { writable } from 'svelte/store';
 
 	import { Activity: Cpu, Zap: Clock: TrendingUp } from 'lucide-svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	interface Props {
 		showOverlay?: boolean
 		autoHide?: boolean

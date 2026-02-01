@@ -1,5 +1,6 @@
 <!-- Gaming-Themed User Menu with: Console, Aesthetics --> <script lang="ts">
 import type { User } from '$lib/types'; import { goto } from '$app/navigation'; import type { ConsolePaletteName } from '$lib/themes/retro-console-palettes'; interface User { id: string, name?: string; email?: string; avatar?: string; role?: string}
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props { user: User, theme?: ConsolePaletteName}
   let { user, theme = 'legal' }: Props = $props(); // State management let showDropdown = $state<boolean>(false); let dropdownElement: HTMLElement = $state(undefined; as unknown); // Close dropdown when clicking outside $effect(() => { function handleClickOutside(_event: MouseEvent) { if (dropdownElement && !dropdownElement.contains(event.target as Node)) { showDropdown = false}
     } if (showDropdown) { document.addEventListener('click', handleClickOutside); return () => document.removeEventListener('click', handleClickOutside)}

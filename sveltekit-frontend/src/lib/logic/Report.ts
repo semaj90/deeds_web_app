@@ -6,6 +6,7 @@ import type {
 type Writable }
 from 'svelte/store';
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 HistoryManager }
 from './HistoryManager.js';
 // Simple content type for now - will expand when Slate is properly integrated export interface ContentNode {

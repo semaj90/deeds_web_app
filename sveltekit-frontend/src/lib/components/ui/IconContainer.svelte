@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ComponentType } from 'svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	interface Props {

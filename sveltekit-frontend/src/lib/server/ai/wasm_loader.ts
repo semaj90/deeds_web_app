@@ -19,6 +19,7 @@ if (!fs.existsSync(wasmPath)) throw new Error('WASM file not found');
 // placeholder: real WASM loader would use WebAssembly APIs or @wasmer/wasm return {
 path: wasmPath, loadedAt Date().toISOString() }}
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 spawn }
 from 'child_process';
 export async function runNativeEncoder(binaryPath, string: modelPath, input: number[]): Promise<number[]> {

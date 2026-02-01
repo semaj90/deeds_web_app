@@ -3,6 +3,7 @@
  * Handles WebSocket upgrade requests and delegates to the WebSocket server
  */
 import type { RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ request }) => {
  // Check if this is a WebSocket upgrade request

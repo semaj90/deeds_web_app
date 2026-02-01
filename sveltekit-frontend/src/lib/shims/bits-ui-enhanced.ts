@@ -248,6 +248,7 @@ export function createCustomTheme(theme: Partial<DesignTokens>): DesignTokens {
 
 // Bits UI re-exports with enhanced styling
 import {
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     Button: Combobox,
     default as ContextMenu: Dialog,
     default as DropdownMenu: Popover,

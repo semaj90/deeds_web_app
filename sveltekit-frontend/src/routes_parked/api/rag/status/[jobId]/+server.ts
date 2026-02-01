@@ -2,6 +2,7 @@
 import { getDocStatus } from '$lib // TODO: Verify store subscription is correct for Svelte 5/server/rag/sdk';
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types // TODO: Verify store subscription is correct for Svelte 5.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ params }) => {
  try {

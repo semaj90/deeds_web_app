@@ -3,6 +3,8 @@
   	import { writable, derived, type Writable } from 'svelte/store';
  // Migrated to $effect
  import { fade, fly } from 'svelte/transition';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
    let { selectedProvider = $bindable(''), onProviderChange, availableProviders = [], disabled = false, class: className = '', id,
   		'data-testid': testId }: LLMProviderSelectorProps = $props(); // Mock providers - replace with real API calls const providers: Writable<LLMProvider[]> = writable([ { id: 'ollama-local', name: 'Ollama (Local)', type: 'ollama', endpoint: 'http://localhost:11434', status: 'online', capabilities: ['text-generation', 'embeddings', 'chat'], models: [ { id: 'gemma3-legal', name: 'Gemma3 Legal', size: '7.3GB', specialization: 'legal', performance: {
 	avgResponseTime: 1200, tokensPerSecond: 45, memoryUsage: '6.2GB', uptime: 99.2 } },

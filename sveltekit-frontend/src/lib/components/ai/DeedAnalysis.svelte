@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import type { Document as LegalDocument } from '$lib/types/global'; // Types interface SimilarityResult extends LegalDocument { similarity: number}
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Props (Svelte, 5 runes) â€” add explicit types to avoid accidental runtime issues let { selectedDocument = $bindable(), searchQuery = $bindable() }: { selectedDocument?: LegalDocument; searchQuery?: string } = $props(); // State let similarDocuments = $state<SimilarityResult[]>([]); let isLoading = $state<boolean>(false); let error = $state<string | null>(null); async function performSemanticSearch(query: string | undefined): Promise<any> { const q = String(query ?? '').trim(); if (!q) { similarDocuments = []; return}
     isLoading = true; error = null; try { const response = await fetch('/api/semantic-search', { method: 'POST', headers: {

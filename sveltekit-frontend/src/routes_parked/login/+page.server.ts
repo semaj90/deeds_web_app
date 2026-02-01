@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms/server'
 import { zod } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Replace load to accept the full event and pass it to superValidate
 export const load: PageServerLoad = async (event) => {
@@ -58,7 +59,7 @@ export const actions: Actions = {
  }
  // Narrow the user shape for local usage
  const user = existingUser[0] as {
- id: string;, email: string;
+ id: string; email: string;
  hashed_password?: string | null;
  is_active?: boolean;
  };

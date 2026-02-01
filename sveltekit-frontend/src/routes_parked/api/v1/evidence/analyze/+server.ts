@@ -6,6 +6,7 @@ import {  env  } from '$env /dynamic/private';
 import getCudaEmbedding from '$lib/server/services/cuda-embedding-service';
 import getUserId from '$lib/server/utils/auth';
 import SimilarEvidenceSchema from '$lib/server/z-schemas/SimilarEvidenceSchema';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /*
  * POST /api/v1/evidence/similar

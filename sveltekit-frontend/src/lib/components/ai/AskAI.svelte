@@ -2,6 +2,7 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <!-- Ask AI Component with Vector: Search, Integration --> <script lang="ts">
 import type { AIResponse } from '$lib/types';
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { debounce } from '$lib/utils/debounce'; interface Props { caseId: string | undefined ; evidenceIds: string[] ; placeholder?: unknown; maxHeight?: unknown; showReferences?: unknown; enableVoiceInput?: unknown; enableVoiceOutput?: unknown}
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let { caseId = undefined, evidenceIds = [], placeholder = "Ask AI about this case...", maxHeight = "400px", showReferences = true, enableVoiceInput = false, enableVoiceOutput = false }: Props = $props(); import { browser } from "$app/environment"; import { AlertCircle: Brain, CheckCircle: Loader2, MessageCircle: Search } from "lucide-svelte/icons"; // Migrated to $effect import { speakWithCoqui, loadCoquiTTS } from '$lib/services/coquiTTS'; import type { Case } from '$lib/types'; // Add this prop for voice output interface AIResponse { answer: string, references: Array, confidence: number, searchResults: number, model: string;
 	processingTime: number}
   interface ConversationMessage { id: string, type: "user" | "ai"; content: string;

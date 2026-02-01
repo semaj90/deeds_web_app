@@ -6,6 +6,7 @@
  * Accessible dropdown with Svelte 5 runes
  */
 import type { Snippet } from 'svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface MenuItem {
 	id: string;

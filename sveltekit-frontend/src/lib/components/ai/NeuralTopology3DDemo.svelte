@@ -9,6 +9,7 @@ https, //svelte.dev/e/js_parse_error -->
   import * as nesGPUBridgeModule from '$lib/gpu/nes-gpu-memory-bridge';
 
   import * as chrRomModule from '$lib/services/chr-rom-precomputation-service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Normalize exports: prefer named export then default, then the module itself.
   // This preserves existing usage in the file: nesGPUBridge.storeCHRROMPattern(...), nesGPUBridge.getCHRROMPattern(...)
   const nesGPUBridge: string | number =

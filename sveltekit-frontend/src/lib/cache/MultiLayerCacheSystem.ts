@@ -6,13 +6,31 @@ import { browser } from '$app/environment';
 import Fuse from 'fuse.js';
 import type { Collection } from 'lokijs';
 import Loki from 'lokijs';
+import type {
+    CachingTypes,
+    LokiTypes,
+    IndexedDBTypes,
+    RedisTypes
+} from '$lib/types/enhanced-svelte5-types';
 
-interface CacheEntry<T = any> {
-    key: string, value: T, timestamp: number, ttl: number, priority: number, accessCount: number, sizeBytes: number;
+// Use enhanced types with proper structure
+interface CacheEntry<T = unknown> extends CachingTypes.CacheEntry<T> {
+    key: string;
+    value: T;
+    timestamp: number;
+    ttl: number;
+    layer: CachingTypes.CacheLayer;
+    priority: number;
+    accessCount: number;
+    sizeBytes: number;
 }
 
 interface CacheLayer {
-    name: string, maxSize: number, currentSize: number, hitRate: number, missRate: number;
+    name: string;
+    maxSize: number;
+    currentSize: number;
+    hitRate: number;
+    missRate: number;
 }
 
 export class MultiLayerCacheSystem {

@@ -3,6 +3,7 @@
  * Client-side GPU acceleration for legal AI operations
  */
 import type { SIMDGPUTilingEngine } from '$lib/evidence/simd-gpu-tiling-engine.js'; // Fix: Changed import to SIMDGPUTilingEngine
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface WebGPUTensorConfig {
  deviceType: 'discrete' | 'integrated' | 'auto';

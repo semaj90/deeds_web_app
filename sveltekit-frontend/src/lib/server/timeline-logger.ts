@@ -1,6 +1,7 @@
 import { db } from './db.js';
 import { userTimeline } from './db/schema-timeline.js';
 import { eq, desc } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface TimelineLogData {
     citation?: string;

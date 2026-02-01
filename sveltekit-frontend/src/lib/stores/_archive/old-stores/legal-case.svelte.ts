@@ -1,4 +1,5 @@
 import type { createActor } from 'xstate'; import type { legalCaseMachine } from '$lib/state/legal-case-machine'; import {  browser  } from '$app/environment'; // Create the XState actor for legal case management const legalCaseActor = browser ? createActor(legalCaseMachine).start() : null; const initialSnapshot = legalCaseActor?.getSnapshot(); // Svelte, 5 reactive store export const legalCaseStore = $state({ context: ((initialSnapshot && (initialSnapshot as any).context) as { [key: string], any }) || { cases: [], selectedCase: null, currentUser: null, loading: false, error: null, generatingEmbedding: false, searchingRelatedEvidence: false, relatedEvidence: [], lastEmbedding: null }
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 });
   
 // Actions that send events to the XState machine export const legalCaseActions = { loadCases: () => legalCaseActor?.send({ type : 'LOAD_CASES' },

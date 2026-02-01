@@ -1,4 +1,5 @@
 import type { ConversationTurn, HMMState, NextStepPrediction } from '$lib/types/sharedTypes';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export enum LegalConversationState {
  GREETING = 0,

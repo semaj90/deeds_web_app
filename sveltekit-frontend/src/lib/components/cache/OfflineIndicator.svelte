@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { WifiOff, Wifi } from 'lucide-svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	let isOnline = $state(browser && navigator.onLine);
 	let showOfflineBanner = $state(false);

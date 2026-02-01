@@ -7,6 +7,7 @@
  * Integrates with buffer-conversion.ts for complete buffer handling.
  */
 import type { type BufferLike, toFloat32Array, BufferTypeGuards } from './buffer-conversion.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 //
 // 1. Ensure input is always Float32Array

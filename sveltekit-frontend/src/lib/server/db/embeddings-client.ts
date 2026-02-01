@@ -3,6 +3,7 @@ import type { Pool } from 'pg';
 import { sql } from 'drizzle-orm';
 import type { NewEmbedding, Embedding, NewSearchQuery } from './schema-embeddings.js';
 import pg from 'pg';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Database connection pool
 const pool = new pg.Pool({

@@ -6,6 +6,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { getUser } from '$lib/server/auth/lucia';
 import { citationService } from '$lib/server/services/citation.service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET: Search citations

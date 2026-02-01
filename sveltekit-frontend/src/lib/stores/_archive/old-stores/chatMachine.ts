@@ -5,6 +5,7 @@ import crypto from 'crypto';
  * Enhanced with streaming, context injection, and model selection
  */
 import type { setup, assign, fromPromise } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Local chat types to satisfy references
 export interface ChatMessage {

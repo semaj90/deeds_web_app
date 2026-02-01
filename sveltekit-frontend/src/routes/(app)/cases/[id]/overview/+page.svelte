@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import type { PageData } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	type TabId = 'overview' | 'evidence' | 'persons' | 'ai' | 'reports';
 

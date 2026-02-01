@@ -9,6 +9,8 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import { getOllamaEndpoint } from ... '$lib/utils/ollama-endpoint';
  import type { ChatMessage } from '$lib/types/chat';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  let messages = $state <ChatMessage[]>([]);
  let currentMessage = $state <string>('');
@@ -20,7 +22,7 @@ https, //svelte.dev/e/js_parse_error -->
  let typingIndicator = $state <boolean>(false);
  let connectionStatus = $state <'connected' | 'disconnected' | 'connecting'>('disconnected');
 
- let modelInfo = $state <{ name: string;, status: string; backend?, string } | null>(null);
+ let modelInfo = $state <{ name: string; status: string; backend?, string } | null>(null);
  let cudaAvailable = $state <boolean>(false);
  let uploadedFiles = $state <{ name: string; id, string }[]>([]);
  let recommendations = $state <string[]>([]);
@@ -83,7 +85,7 @@ https, //svelte.dev/e/js_parse_error -->
  const notice = document.createElement('div');
  notice.innerText = '⚠️ Ollama service unavailable - using fallback mode';
  notice.style.cssText =
- 'position: fixed;, top: 20px; right: 20px;, background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+ 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
  document.body.appendChild(notice);
  setTimeout(() => notice.remove(), 3000);
  services = { ...services, ollama: false, false };
@@ -180,7 +182,7 @@ https, //svelte.dev/e/js_parse_error -->
  const notice = document.createElement('div');
  notice.innerText = '⚠️ Chat failed - using fallback response';
  notice.style.cssText =
- 'position: fixed;, top: 20px; right: 20px;, background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+ 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
  document.body.appendChild(notice);
  setTimeout(() => notice.remove(), 3000);
 
@@ -253,12 +255,12 @@ https, //svelte.dev/e/js_parse_error -->
  <header class="status-bar" role="status" aria-live="polite">
  <div>
  <strong>Legal AI Chat</strong>
- <div style="font-size: 0.85rem;, opacity: 0.8;">
+ <div style="font-size: 0.85rem; opacity: 0.8;">
  Model: {modelInfo?.name ?? '—'} · Status: {modelInfo?.status ?? connectionStatus}
  </div>
  </div>
  <div>
- <span style="font-size: 0.85rem;, opacity: 0.85;">Services: {JSON.stringify(services)}</span>
+ <span style="font-size: 0.85rem; opacity: 0.85;">Services: {JSON.stringify(services)}</span>
  </div>
  </header>
 
@@ -329,25 +331,25 @@ https, //svelte.dev/e/js_parse_error -->
  color: #ffffff;
  }
  .retro-chat-app {
- min-height: 100vh;, padding: 16px;
+ min-height: 100vh; padding: 16px;
  background: #212529;
- max-width: 1200px;, margin: 0 auto;
+ max-width: 1200px; margin: 0 auto;
  }
  .status-bar {
  display: flex;
  justify-content: space-between;
- align-items: center;, gap: 1rem;
+ align-items: center; gap: 1rem;
  margin-top: 1rem;
  }
  .chat-area {
  min-height: 400px;
  max-height: 500px;
- overflow-y: auto;, margin: 16px 0;
+ overflow-y: auto; margin: 16px 0;
  padding: 16px;
  }
  .welcome-screen {
- text-align: center;, background: #ffffff;
- color: #212529;, padding: 2rem;
+ text-align: center; background: #ffffff;
+ color: #212529; padding: 2rem;
  margin: 2rem 0;
  }
  .welcome-screen h2 {
@@ -359,7 +361,7 @@ https, //svelte.dev/e/js_parse_error -->
  font-weight: bold;
  }
  .welcome-screen button {
- display: block;, width: 100%;
+ display: block; width: 100%;
  margin: 0.75rem 0;
  font-size: 0.875rem;
  }
@@ -369,7 +371,7 @@ https, //svelte.dev/e/js_parse_error -->
  color: white !important;
  align-self: flex-end;
  max-width: 70%;
- margin-left: auto;, padding: 0.75rem;
+ margin-left: auto; padding: 0.75rem;
  border-radius: 8px;
  }
  .ai-message {
@@ -378,33 +380,33 @@ https, //svelte.dev/e/js_parse_error -->
  color: #212529 !important;
  align-self: flex-start;
  max-width: 70%;
- margin-right: auto;, padding: 0.75rem;
+ margin-right: auto; padding: 0.75rem;
  border-radius: 8px;
  }
  .timestamp {
  display: block;
- margin-top: 0.5rem;, opacity: 0.7;
+ margin-top: 0.5rem; opacity: 0.7;
  font-size: 0.75rem;
  }
  .input-section {
  margin: 16px 0;
- background: #ffffff;, color: #212529;
+ background: #ffffff; color: #212529;
  padding: 12px;
  border-radius: 6px;
  }
  .input-section label {
- font-weight: bold;, color: #212529;
- margin-bottom: 0.5rem;, display: block;
+ font-weight: bold; color: #212529;
+ margin-bottom: 0.5rem; display: block;
  }
  .button-row {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  margin-top: 1rem;
  flex-wrap: wrap;
  }
  .button-row button {
  flex: 1;
- min-width: 150px;, padding: 0.6rem 0.8rem;
- border-radius: 4px;, border: none;
+ min-width: 150px; padding: 0.6rem 0.8rem;
+ border-radius: 4px; border: none;
  cursor: pointer;
  }
  .footer-info {
@@ -415,14 +417,14 @@ https, //svelte.dev/e/js_parse_error -->
  margin: 0;
  }
  .footer-info li {
- color: #ffffff;, margin: 0.25rem 0;
+ color: #ffffff; margin: 0.25rem 0;
  }
  /* NES.css balloon positioning */
  .nes-balloon.from-right {
- float: right;, clear: both;
+ float: right; clear: both;
  }
  .nes-balloon.from-left {
- float: left;, clear: both;
+ float: left; clear: both;
  }
  /* Scrollbar styling for dark theme */
  .chat-area::-webkit-scrollbar {
@@ -454,7 +456,7 @@ https, //svelte.dev/e/js_parse_error -->
  min-width: auto;
  }
  .status-bar {
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
  }
  /* Animation for typing indicator */

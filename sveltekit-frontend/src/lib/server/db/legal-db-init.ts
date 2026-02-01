@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { db } from './drizzle.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Initialize legal search database schema

@@ -5,26 +5,28 @@
  */
 
 import Loki from 'lokijs';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // LokiJS types may not be available; use loose typing for collections
 type Collection<T> = ReturnType<Loki['addCollection']>;
 
 export interface NPMError {
-	message: string;, file: string;
-	line: number;, severity: 'low' | 'medium' | 'high' | 'critical';
-	category: string;, type: string;
+	message: string; file: string;
+	line: number; severity: 'low' | 'medium' | 'high' | 'critical';
+	category: string; type: string;
 	timestamp: string;
 	context?: string[];
 	dependencies?: string[];
 }
 
 export interface IntelligentTodo {
-	id: string;, priority: number;
-	category: string;, title: string;
-	description: string;, estimated_effort: number; // nanoseconds
-	dependencies: string[];, suggested_fixes: string[];
-	related_errors: NPMError[];, confidence: number;
-	tags: string[];, created_at: string;
+	id: string; priority: number;
+	category: string; title: string;
+	description: string; estimated_effort: number; // nanoseconds
+	dependencies: string[]; suggested_fixes: string[];
+	related_errors: NPMError[]; confidence: number;
+	tags: string[]; created_at: string;
 	metadata: Record<string, unknown>;
 }
 

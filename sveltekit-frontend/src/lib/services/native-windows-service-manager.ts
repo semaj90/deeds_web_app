@@ -1,6 +1,8 @@
 import flashAttentionProcessor from './flashattention-gpu-error-processor.js';
 import type { concurrentSearch } from './concurrent-indexeddb-search.js';
 import { error } from "console";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface WindowsService {
  name: string;

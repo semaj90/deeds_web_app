@@ -14,6 +14,7 @@ https, //svelte.dev/e/js_parse_error -->
  import { GrpcStatusAdapter } from '$lib/stores/dashboard/GrpcStatusAdapter';
  import type { ProcessingEvent } from '$lib/stores/dashboard/SSEStatusStore';
  import { connectionStatus, isConnected, sseStatusStore } from '$lib/stores/dashboard/SSEStatusStore';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  let connectionStatusText = 'Disconnected';
@@ -133,9 +134,9 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .courthouse-dashboard {
- background: var(--beige);, color: var(--noir);
+ background: var(--beige); color: var(--noir);
  font-family: var(--font-sans-body);
- min-height: 100vh;, padding: var(--space-lg);
+ min-height: 100vh; padding: var(--space-lg);
  }
 
  .dashboard-header {
@@ -153,7 +154,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  .connection-status {
  display: flex;
- align-items: center;, gap: var(--space-sm);
+ align-items: center; gap: var(--space-sm);
  padding: var(--space-sm) var(--space-md);
  background: rgba(26, 58, 82, 0.1);
  border: var(--border-width) solid var(--navy);
@@ -168,9 +169,9 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .status-indicator {
- display: inline-block;, width: 8px;
- height: 8px;, background: var(--navy);
- border-radius: 50%;, animation: pulse 2s ease-in-out infinite;
+ display: inline-block; width: 8px;
+ height: 8px; background: var(--navy);
+ border-radius: 50%; animation: pulse 2s ease-in-out infinite;
  }
 
  .connection-status.connected .status-indicator {
@@ -193,8 +194,8 @@ https, //svelte.dev/e/js_parse_error -->
 
  .dashboard-container {
  display: grid;
- grid-template-columns: 1fr;, gap: var(--space-lg);
- max-width: 1400px;, margin: 0 auto;
+ grid-template-columns: 1fr; gap: var(--space-lg);
+ max-width: 1400px; margin: 0 auto;
  }
 
  @media (min-width: 1024px) {
@@ -210,7 +211,7 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .dashboard-container > :nth-child(2) {
- grid-area: tray;, height: fit-content;
+ grid-area: tray; height: fit-content;
  }
 
  .dashboard-container > :nth-child(3) {
@@ -224,14 +225,14 @@ https, //svelte.dev/e/js_parse_error -->
  flex-direction: column;
  align-items: center;
  justify-content: center;
- min-height: 400px;, gap: var(--space-lg);
+ min-height: 400px; gap: var(--space-lg);
  }
 
  .loading-spinner {
- width: 40px;, height: 40px;
+ width: 40px; height: 40px;
  border: 3px solid var(--navy);
  border-top: 3px solid var(--bronze);
- border-radius: 50%;, animation: spin 1s linear infinite;
+ border-radius: 50%; animation: spin 1s linear infinite;
  }
 
  @keyframes spin {
@@ -244,18 +245,18 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .loading-state p {
- font-family: var(--font-serif-heading);, color: var(--noir);
+ font-family: var(--font-serif-heading); color: var(--noir);
  font-size: 1rem;
  }
 
  /* Error State */
  .error-state {
  display: flex;
- align-items: center;, gap: var(--space-lg);
- padding: var(--space-2xl);, background: rgba(139, 58, 58, 0.1);
+ align-items: center; gap: var(--space-lg);
+ padding: var(--space-2xl); background: rgba(139, 58, 58, 0.1);
  border: var(--border-width) solid var(--court-red);
  border-radius: var(--border-radius);
- max-width: 600px;, margin: var(--space-2xl) auto;
+ max-width: 600px; margin: var(--space-2xl) auto;
  }
 
  .error-icon {
@@ -268,23 +269,23 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .error-content h2 {
- font-family: var(--font-serif-heading);, color: var(--court-red);
+ font-family: var(--font-serif-heading); color: var(--court-red);
  margin: 0 0 var(--space-sm) 0;
  font-size: 1.25rem;
  }
 
  .error-content p {
- color: var(--noir);, margin: 0 0 var(--space-lg) 0;
+ color: var(--noir); margin: 0 0 var(--space-lg) 0;
  line-height: 1.6;
  }
 
  .retry-button {
- background: var(--bronze);, color: var(--noir);
+ background: var(--bronze); color: var(--noir);
  border: var(--border-width) solid var(--bronze);
  padding: var(--space-sm) var(--space-lg);
  border-radius: var(--border-radius);
  font-family: var(--font-sans-body);
- font-weight: 600;, cursor: pointer;
+ font-weight: 600; cursor: pointer;
  transition: all 0.2s ease;
  }
 
@@ -299,7 +300,7 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .dashboard-header {
- flex-direction: column;, gap: var(--space-md);
+ flex-direction: column; gap: var(--space-md);
  align-items: flex-start;
  margin-bottom: var(--space-lg);
  }
@@ -310,7 +311,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  .error-state {
  flex-direction: column;
- text-align: center;, padding: var(--space-lg);
+ text-align: center; padding: var(--space-lg);
  }
 
  .error-icon {

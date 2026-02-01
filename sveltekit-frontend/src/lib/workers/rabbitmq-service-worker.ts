@@ -2,6 +2,8 @@
 /** * RabbitMQ Service Worker - simplified, syntactically-correct version */
 import type { rabbitmqService } from '$lib/server/messaging/rabbitmq-service.js';
 import type { publishToQueue } from '$lib/server/rabbitmq.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // Removed problematic `import type ...` which caused parser errors in the build.
 // Added a local MessageHandler type so we don't rely on a type-only import.
 

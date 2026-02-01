@@ -1,5 +1,6 @@
 import { globalGPUManager } from './global-gpu-manager.js';
 import { VertexCacheManager } from './vertex-cache-manager.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const vertexCacheManager = new VertexCacheManager();
 

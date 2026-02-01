@@ -4,6 +4,7 @@
  */
 
 import type { RunProgress, RunStep } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * In-memory state store (later can be backed by Postgres)

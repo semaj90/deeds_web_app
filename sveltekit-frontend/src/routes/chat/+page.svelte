@@ -1,6 +1,8 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { ChatSession } from '$lib/models/ChatSession.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
     // Reactive Chat State Logic using the Barrel Store Pattern
     const room = new ChatSession('case-101');

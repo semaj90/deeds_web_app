@@ -1,4 +1,5 @@
 import type { Message } from '$lib/types'; // ranking-cache-worker.ts // Web Worker for WASM-accelerated ranking cache packing/unpacking & QUIC fetch // Message protocol // { type: 'init', wasmUrl?: string }
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // { type: 'pack', payload: RankingSet }
 // { type: 'unpack', blob: ArrayBuffer }
 // { type: 'fetch', key: endpoint?, string: format?: 'raw'|'json' }

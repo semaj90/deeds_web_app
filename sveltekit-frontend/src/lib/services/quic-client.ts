@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store';
 import type { type Writable } from 'svelte/store';import { metadata } from "./enhanced-rag-pagerank";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 ;
 
 // JSON-safe value types

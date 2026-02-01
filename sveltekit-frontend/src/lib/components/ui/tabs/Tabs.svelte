@@ -14,6 +14,7 @@
 	import TabsRoot from './TabsRoot.svelte';
 	import TabsTrigger from './TabsTrigger.svelte';
 	import type { TabsRootProps } from './types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 	/**
 	 * Convenient all-in-one Tabs component

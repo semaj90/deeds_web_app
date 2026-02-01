@@ -8,6 +8,7 @@ import { getUser } from '$lib/server/auth/lucia';
 import { jobQueueService } from '$lib/server/services/job-queue.service';
 import { auditLog } from '$lib/server/db/schema';
 import db from '$lib/server/db';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST: Enqueue summary generation job

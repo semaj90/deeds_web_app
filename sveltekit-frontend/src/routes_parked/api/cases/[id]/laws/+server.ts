@@ -8,6 +8,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { getUser } from '$lib/server/auth/lucia';
 import { caseLinkService } from '$lib/server/services/case-link.service';
 import { auditService } from '$lib/server/services/audit.service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET: Get case's linked statutes

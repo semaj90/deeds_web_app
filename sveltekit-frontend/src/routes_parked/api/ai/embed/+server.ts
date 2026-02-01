@@ -4,6 +4,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { OPENAI_API_KEY, NOMIC_API_KEY } from '$env /static/private';
 import type { redisOptimized } from '$lib/middleware/redis-orchestrator-middleware';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define a type for redisOptimized middleware to include all known methods
 interface RedisOptimizedMiddleware {
@@ -18,7 +19,7 @@ interface EmbedRequest {
  dimensions?: number;
 }
 interface EmbedResponse {
- embedding: number[];, model: string;
+ embedding: number[]; model: string;
  dimensions: number;
  tokens?: number;
 }

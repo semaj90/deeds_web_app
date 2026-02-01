@@ -1,4 +1,5 @@
 import type { Case } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * Enhanced WebSocket Real-time Dashboard Integration * Provides live updates for the Legal AI Dashboard with Svelte, 5 runes */ import {  browser  } from '$app/environment'; import type { getWebSocketClient } from '$lib/services/websocket-service'; // WebSocket client instance let wsClient: ReturnType<typeof getWebSocketClient> | null = null; // Reactive state using Svelte, 5 runes export const websocketStore = { // Connection state connected: $state(false, connecting: $state(false, error: $state <string | null>(null), // Live data dashboardData: $state({
 	cases: [], evidence: [], reports: [], stats: {
 	totalCases: 0, totalEvidence: 0, pendingAnalysis: 0, activeCases: 0 } }), // Real-time updates recentActivity: $state <any[]>([], processingJobs: $state <any[]>([], systemHealth: $state({

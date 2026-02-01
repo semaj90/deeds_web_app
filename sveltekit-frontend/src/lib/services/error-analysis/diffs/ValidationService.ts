@@ -16,6 +16,7 @@ import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import type { DiffApplier } from './DiffApplier.js';
 import type { DiffPatch } from './diffTypes.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const execAsync = promisify(exec);
 

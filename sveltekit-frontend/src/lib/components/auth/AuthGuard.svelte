@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores';
   import type { Snippet } from 'svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     children?: Snippet;

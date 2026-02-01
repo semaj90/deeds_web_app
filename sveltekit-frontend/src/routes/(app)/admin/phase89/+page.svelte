@@ -3,6 +3,8 @@
 
 	// Migrated to $effect
 	import type { PageData } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// TODO: Convert to $props - // TODO: Convert to $props - 
 

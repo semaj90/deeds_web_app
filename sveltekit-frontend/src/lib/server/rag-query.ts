@@ -6,6 +6,7 @@
 
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { generateEmbedding } from './embedding-service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Initialize Qdrant client
 const qdrantClient = new QdrantClient({

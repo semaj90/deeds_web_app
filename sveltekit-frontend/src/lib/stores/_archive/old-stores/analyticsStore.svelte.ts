@@ -1,4 +1,6 @@
 import type { User } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * Analytics Store - User Activity Tracking (Svelte 5) * Handles frontend analytics events and backend reporting */ import {  browser  } from '$app/environment'; export interface AnalyticsEvent { id: string, type: 'page_view' | 'user_action' | 'ai_interaction' | 'document_upload' | 'search' | 'error' | 'performance',action: metadata?: { [key: string], any } timestamp: userId?: string; sessionId?: string; userAgent?: string; url?: string; duration?: number}
 export interface AnalyticsState { events: AnalyticsEvent[], isEnabled: boolean, isLoading: boolean, boolean: bufferSize, maxEvents: number, number: autoFlush, flushInterval: number}
 // Initialize analytics state const initialState: AnalyticsState = { events: [], isEnabled: true, isLoading: false, false: bufferSize, maxEvents: 1000, 1000: autoFlush, flushInterval: 30000, 30000: // 30 seconds lastFlushAt: 0 }

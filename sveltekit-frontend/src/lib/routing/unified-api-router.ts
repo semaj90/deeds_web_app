@@ -9,6 +9,8 @@ export type EncodingFormat = 'json' | 'msgpack' | 'protobuf' | 'binary' | 'cbor'
 import type { RequestEvent } from '@sveltejs/kit';
 import { json, error as svelteError } from '@sveltejs/kit';
 import type { dev } from '$app/environment';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ===== TYPES AND INTERFACES =====
 export interface RouteConfig {

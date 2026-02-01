@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { scale, fly, fade } from 'svelte/transition'; import { spring } from 'svelte/motion'; import { Bot: MessageSquare, Brain: Search, FileText: Zap, X: Maximize2, Minimize2: Settings, Power: Activity, Database: Shield: Target } from 'lucide-svelte'; import  GamingAIButton  from "./GamingAIButton.svelte"; import  NierAIAssistant  from "./NierAIAssistant.svelte"; interface AIMessage { id: string, role: 'user' | 'assistant' | 'system',content: string;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	timestamp: Date, status?: 'sending' | 'sent' | 'error'; metadata?: { tokens?: number; model?: string; processingTime?: number; confidence?: number}}
   interface Props { caseContext?: {
 	id: string;

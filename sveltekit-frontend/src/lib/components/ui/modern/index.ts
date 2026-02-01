@@ -10,6 +10,7 @@ export { default as ModernDialog } from './ModernDialog.svelte';
 // Explicit prop interfaces (align with component internal Props declarations)
 
 import type { Snippet } from 'svelte';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 export interface ModernCardProps {
     title?: string;

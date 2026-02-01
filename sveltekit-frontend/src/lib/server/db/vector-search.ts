@@ -4,6 +4,7 @@ import { documentEmbeddings } from '$lib/server/db/vector-schema.js';
 import { eq, sql } from 'drizzle-orm';
 import crypto from "crypto";
 import { embedText } from '../embedding-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface VectorSearchOptions {
     threshold?: number;

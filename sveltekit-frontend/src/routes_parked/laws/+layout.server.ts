@@ -1,6 +1,7 @@
 import db from '$lib/server/db/drizzle';
 import { laws } from '$lib/server/db/schema/legal-index';
 import { sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function load() {
  try {

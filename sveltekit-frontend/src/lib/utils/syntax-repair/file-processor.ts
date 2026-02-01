@@ -10,6 +10,7 @@ import { join, extname, relative } from 'path';
 import { existsSync } from 'fs';
 import type {  PatternMatcher, FixResult, PatternMatchResult  } from './pattern-matcher';
 import { applyPatterns } from './pattern-matcher';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Configuration for file processing

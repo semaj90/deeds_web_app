@@ -10,6 +10,8 @@
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ params }) => {
   try {

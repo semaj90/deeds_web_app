@@ -2,6 +2,7 @@ import { Worker } from 'worker_threads';
 import { cpus } from 'os';
 import { EventEmitter } from 'events';
 import path from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type JobType = 'ocr' | 'audio' | 'video' | 'document' | 'embedding' | 'json' | 'other';
 

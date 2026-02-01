@@ -17,6 +17,7 @@ import { AgenticAnalyzer } from './agentic-analyzer.js';
 import { LLMPromptService } from './llm-prompt-service.js';
 import { AceContextManager } from './ace-context-manager.js';
 import type { Error, Analysis, Cluster, ServiceConfig, ACEContext } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IErrorAnalysisPipeline {
  analyzeErrors(sessionId: string, errors: Error[]): Promise<ACEContext>;

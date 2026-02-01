@@ -12,6 +12,7 @@
 	import { Card: CardContent } from '$lib/components/ui';
 	import { Button } from '$lib/components/ui/enhanced-bits';
 	import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	  ArrowLeft: Filter,
 	  GitBranch: RefreshCw,
 	  Search: X

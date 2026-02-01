@@ -3,6 +3,7 @@ import { db } from './drizzle';
 import { users } from './schema';
 import { eq } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 async function seed() {
     console.log('🌱 Seeding Dev User...');

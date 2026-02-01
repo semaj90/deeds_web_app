@@ -6,6 +6,7 @@ import { xstateIntegration } from '$lib/services/xstate-integration'; // Changed
 import { z } from 'zod';
 import redis from '$lib/server/redis-client'; // Changed to default imports
 import ensureRedisReady from '$lib/server/redis-client'; // Import ensureRedisReady as a default export
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const serverFileUploadSchema = fileUploadSchema.extend({
  file: z

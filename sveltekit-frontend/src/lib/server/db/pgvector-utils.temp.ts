@@ -4,6 +4,7 @@
  */
 
 import { db } from './index.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Type definitions
 type Row = Record<string, unknown>;

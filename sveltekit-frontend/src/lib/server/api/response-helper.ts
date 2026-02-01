@@ -4,6 +4,7 @@
  * Ensures proper HTTP status codes and consistent response format
  */
 import { json } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface APIResponse<T = unknown> {
  success: boolean;

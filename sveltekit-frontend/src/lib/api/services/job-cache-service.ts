@@ -1,5 +1,6 @@
 // Job Cache Service - Production Implementation for Legal AI Platform
 import { getAuthHeaders } from './auth-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface JobStatus {
  jobId: string;

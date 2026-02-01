@@ -8,6 +8,7 @@ import { users } from '$lib/server/db/schema';
 import { createUserSession, setSessionCookie, verifyPassword } from '$lib/server/lucia';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface LoginRequest {
 	email: string; password: string;

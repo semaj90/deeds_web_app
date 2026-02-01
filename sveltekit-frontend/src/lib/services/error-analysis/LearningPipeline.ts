@@ -16,6 +16,7 @@ import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getPatternStorage } from './PatternStorage.js';
 import { getErrorClustering } from './ErrorClustering.js';
 import type { PolicyState, Experience } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface LearningPipelineConfig {
 	updateIntervalMs: number;

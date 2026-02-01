@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/public';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // API Configuration
 export const API_CONFIG = {

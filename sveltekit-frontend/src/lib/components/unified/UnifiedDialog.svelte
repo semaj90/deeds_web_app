@@ -16,6 +16,7 @@ import type { User } from '$lib/types';
   // Migrated to $effect
   import { fade, scale } from 'svelte/transition';
   import { cubicInOut } from 'svelte/easing';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   interface DialogProps {
     open?: boolean

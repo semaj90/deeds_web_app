@@ -1,6 +1,7 @@
 <!-- Case Scoring Dashboard Integrates with /api/ai/case-scoring API using Enhanced-Bits UI components Uses Svelte, 5 runes and event handling, syntax --> <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect // Card components removed - using native HTML elements // Using native <button aria-label="Button"> elements for consistent event handling // Case scoring state let cases = $state<CaseScore[]>([]); let selectedCase = $state<CaseScore | null>(null); let isLoading = $state<boolean>(false); let errorMessage = $state<string>(''); let scoringInProgressIds = $state(new Set<string>()); let showScoreDetails = $state<boolean>(false); let useMockData = $state<boolean>(true); // Toggle for demo mode // Filters and sorting let scoreFilter = $state<'all' | 'high' | 'medium' | 'low'>('all'); let sortBy = $state<'score' | 'priority' | 'date'>('score'); let searchQuery = $state<string>(''); interface CaseScore { id: string, title: string;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	description: string; // Fixed: added colon score: number, priority: 'critical' | 'high' | 'medium' | 'low',confidence: number, dateCreated: string, lastUpdated: string, factors: ScoreFactor[], recommendations: string[];
 	riskLevel: 'low' | 'medium' | 'high' | 'critical'}
   interface ScoreFactor { category: string, weight: number, impact: number;

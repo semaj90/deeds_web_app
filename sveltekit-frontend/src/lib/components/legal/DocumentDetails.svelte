@@ -2,6 +2,7 @@
   import type { Document, Case } from '$lib/types';
   import { writable } from 'svelte/store';
   import { legalDB } from '$lib/db/client-db.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Svelte 5 props
   let {

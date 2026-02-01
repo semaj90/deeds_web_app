@@ -5,6 +5,8 @@
  */
 import { chrRomPatternCache } from '../cache/chr-rom-pattern-cache.js';
 import { base64FP32Quantizer } from '../text/base64-fp32-quantizer.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface GlyphTexture {
     char: string;

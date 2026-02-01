@@ -1,4 +1,6 @@
 import type { User } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * User Activity Detection Store for GPU Lifecycle Management * Tracks user interactions to trigger GPU memory optimization */ import { writable, derived, get } from 'svelte/store'; import {  browser  } from '$app/environment'; interface UserActivityMetrics { lastActivity: number, idleTimeMs: number, interactionCount: number, activityScore: number, isActive: boolean, sessionStartTime: number}
 interface ActivityEvent { type: string, timestamp: target?: string; data?: any}
 class UserActivityDetector { private activityStore = writable<UserActivityMetrics>({ lastActivity: Date.now(),

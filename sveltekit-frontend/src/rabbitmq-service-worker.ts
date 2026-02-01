@@ -4,6 +4,8 @@
 
 import { rabbitmqService } from '$lib/server/messaging/rabbitmq-service';
 import { publishToQueue } from '$lib/server/rabbitmq';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 type MessageHandler = (message: unknown, originalMessage?: unknown) => Promise<void> | void;
 

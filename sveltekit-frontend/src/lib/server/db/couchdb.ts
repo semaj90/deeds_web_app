@@ -12,6 +12,7 @@
  */
 
 import { CONFIG } from '$lib/config/env.server';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // CouchDB Configuration
 const COUCHDB_URL = CONFIG?.COUCHDB_URL ?? 'http://admin:password@localhost:5984';

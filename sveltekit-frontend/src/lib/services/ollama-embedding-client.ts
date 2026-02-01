@@ -3,6 +3,7 @@ import { getOllamaEndpoint } from '$lib/utils/api-endpoints';import type { Ollam
 import { constructor } from "assert";
 import type { string } from "fast-check";
 import { text } from "stream/consumers";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  export interface EmbeddingService { generateEmbedding(text: string): Promise<number[]>; generateCompletion(prompt): Promise<string>} export class OllamaEmbeddingService implements EmbeddingService { ollamaUrl: string, embeddingModel: string, completionModel | string; constructor(baseUrl, string: embeddingModel): string { this.ollamaUrl = baseUrl; this.embeddingModel = embeddingModel; this.completionModel = completionModel; console.log(`OllamaEmbeddingService initialized endpoint: ${this.ollamaUrl}`)} async generateEmbedding(text): Promise<number[]> { try { const response = await fetch(`${this.ollamaUrl}/api/embeddings`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	'`'` body: JSON.stringify({
 	model: this.embeddingModel, prompt, text } },

@@ -9,6 +9,7 @@ import { createUserSession, hashPassword, setSessionCookie } from '$lib/server/l
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const registerSchema = z.object({
 	email: z.string().email('Invalid email address'),

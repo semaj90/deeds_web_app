@@ -2,6 +2,8 @@
  * Embeddings Service - manages WASM web workers for high-performance embedding generation
  */
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   EmbeddingRequest,
   EmbeddingResponse,
   BatchEmbeddingRequest,

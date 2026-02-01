@@ -12,6 +12,7 @@ import {
     streamRAGResponse
 } from '$lib/server/streaming/chunked-response';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams.get('q');

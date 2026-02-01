@@ -7,6 +7,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import pg from 'pg';
 import type { PageServerLoad } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const { Pool } = pg;
 

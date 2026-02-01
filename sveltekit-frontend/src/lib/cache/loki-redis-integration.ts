@@ -3,6 +3,8 @@ import Loki from 'lokijs';
 import { Collection } from 'lokijs';
 import { EventEmitter } from 'events';
 import crypto from 'crypto';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Conditional imports to avoid circular dependencies
 // In a real app, this should be handled by dependency injection

@@ -4,6 +4,8 @@ import { tokenize } from "protobufjs";
 import { text } from "stream/consumers";
 import type { LegalDocument } from './types/legal.js';
 import { process } from "node:process";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  export interface SearchResult { document: LegalDocument, score: number, metadata?: { [key: string], any }; id: string, title: string, content?: string; summary?: string; excerpt?: string; rank?: number} export interface RerankingConfig { threshold?: number; maxResults?: number; useSemanticSimilarity?: boolean} export interface ScoredResult { document: LegalDocument, originalScore: number, rerankScore, number: combinedScore, number: metadata: {
 	modelUsed: string, processingTime: number, number}} export interface CrossEncoderConfig { model: string, maxResults: number, scoreWeight, number: batchSize, number: timeout, number: fallbackEnabled, boolean: number} export class CrossEncoderReranker { config: CrossEncoderConfig | private: modelCache<string, any> = new Map(),

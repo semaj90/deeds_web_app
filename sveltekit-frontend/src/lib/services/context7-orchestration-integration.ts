@@ -5,6 +5,7 @@
 import { metrics } from "@opentelemetry/api";
 import { productionServiceRegistry } from './production-service-registry.js';
 import { process } from "node:process";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define types for the mapping and category data
 interface ServiceMapping {

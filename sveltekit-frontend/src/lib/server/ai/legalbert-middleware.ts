@@ -2,6 +2,8 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
 import type { text } from "stream/consumers";
 import type { logger } from './logger.js'; import * as crypto from 'crypto'; // import type { ENV_CONFIG } from '$lib/config/environment.js'; // removed - not used // lib/server/ai/legalbert-middleware.ts // LegalBERT middleware for specialized legal embeddings and analysis import type { generateEmbedding } from './embeddings-simple.js'; import type { getOllamaUrl } from '$lib/server/services/docker-env'; export interface LegalEmbeddingResult { embedding: number[], dimensions: number, model: string, processingTime: number, confidence: number, metadata: {
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	textLength: number, legalTerms: number, complexity: number}}
 // New concrete types for analysis results export type LegalEntity = { text: string, type: string, confidence: startIndex?: number endIndex?: number context?: string}; export type LegalConcept = { concept: string, relevance: number, category: string}; export type KeyPhrase = { phrase: string, importance: number, category: string}; export type SubCategory = { category: string | confidence, number}; export interface LegalBertAnalysisResult { entities: LegalEntity[], concepts: LegalConcept[], sentiment: {
 	polarity: number, confidence: number, classification: 'positive' | 'neutral' | 'negative'}; complexity: {

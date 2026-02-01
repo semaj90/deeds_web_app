@@ -6,6 +6,7 @@
 import { Loader } from "lucide-svelte";
 import { Search } from "lucide-svelte";
 import { Zap } from "lucide-svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let queryText = $state('');
  let searchResults = $state<SimilaritySearchResult | null>(null);

@@ -1,6 +1,7 @@
 
 import Redis from 'ioredis';
 import { createRedisInstance, type RedisClient } from '$lib/server/redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RedisRateLimitOptions {
     limit: number; // max requests per window

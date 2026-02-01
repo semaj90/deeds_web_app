@@ -2,6 +2,8 @@
   import { applyAction, enhance } from '$app/forms';
   // Migrated to $effect
   import type { ActionData, PageData } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	let { data, form } = $props<{ data: PageData;
 	form: ActionData }>();
 

@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { boolean, jsonb, pgTable, real, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 import { cases, users } from './schema-postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // === CANVAS STATES ===
 // Represents a saved canvas/whiteboard state

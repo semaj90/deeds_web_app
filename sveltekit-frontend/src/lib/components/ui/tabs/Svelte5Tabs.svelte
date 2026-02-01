@@ -7,6 +7,8 @@
  */
 import type { Snippet } from 'svelte';
 import { setContext, getContext } from 'svelte';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface TabItem {
 	id: string;

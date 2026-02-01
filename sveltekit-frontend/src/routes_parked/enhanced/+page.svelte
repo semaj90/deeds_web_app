@@ -1,5 +1,7 @@
 <script lang="ts">
  import type { Case } from '$lib/types'; // Svelte 5 runes are auto-imported
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Debounce + streaming support
  let debounceMs = $state <number>(400);
  let autoSearch = $state <boolean>(true);
@@ -187,16 +189,16 @@
  background: var(--background, transparent);
  }
  .score-low {
- background: #fee2e2;, color: #991b1b;
+ background: #fee2e2; color: #991b1b;
  }
  .score-mid {
- background: #fef3c7;, color: #92400e;
+ background: #fef3c7; color: #92400e;
  }
  .score-high {
- background: #dcfce7;, color: #065f46;
+ background: #dcfce7; color: #065f46;
  }
  .score-top {
- background: #dbeafe;, color: #1e40af;
+ background: #dbeafe; color: #1e40af;
  }
 </style>
 

@@ -6,6 +6,7 @@ import { createEventDispatcher } from 'svelte';
  DialogDescription, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
  import type { Textarea } from '$lib/components/ui/textarea';
  import type { EvidenceNode } from '$lib/server/db/schema-postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated from createEventDispatcher to callback props;
 
  let { node, open = $bindable(false) } = $props<{

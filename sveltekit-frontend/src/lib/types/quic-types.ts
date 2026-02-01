@@ -1,4 +1,5 @@
 import type { SearchResult } from '$lib/types';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 // Type definitions for QUIC/HTTP3 integration // Supporting tensor processing, streaming, and real-time operations
 export interface TensorOperation {
  id: string;

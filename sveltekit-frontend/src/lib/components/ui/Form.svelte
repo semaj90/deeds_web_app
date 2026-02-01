@@ -1,6 +1,7 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { createFormStore, type FormOptions } from '$lib/stores/form';
  import { notifications } from '$lib/stores/unified'; interface Props { options?: FormOptions; class?: string; novalidate?: boolean; autocomplete?: "on" | "off"; submitText?: string; submitVariant?: "primary" | "secondary" | "outline" | "danger" | "success" | "warning" | "info" | "nier"; showSubmitButton?: boolean; submitFullWidth?: boolean; resetText?: string; showResetButton?: boolean; loading?: boolean; formApi?: any; // Add bindable formApi prop onsubmit?: (_event: {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	values: { [key: string]: any },
 	isValid: boolean }) => void; onreset?: () => void; onchange?: (_event: {
 	values: { [key: string]: any } }) => void}

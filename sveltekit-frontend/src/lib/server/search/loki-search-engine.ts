@@ -1,4 +1,5 @@
 import loki, { type Collection } from 'lokijs';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type LokiDoc = {
     id: string;

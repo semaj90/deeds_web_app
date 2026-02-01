@@ -5,40 +5,41 @@
  */
 
 import { Project, SyntaxKind, type Diagnostic, type Node, type SourceFile } from 'ts-morph';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ASTError {
-    id: string;, line: number;
-    column: number;, endLine: number;
-    endColumn: number;, message: string;
+    id: string; line: number;
+    column: number; endLine: number;
+    endColumn: number; message: string;
     severity: 'error' | 'warning' | 'info' | 'hint';
-    code: string;, source: 'typescript' | 'svelte' | 'eslint';
+    code: string; source: 'typescript' | 'svelte' | 'eslint';
     file: string;
     suggestion?: string;
 }
 
 export interface FunctionInfo {
-    name: string;, line: number;
+    name: string; line: number;
     parameters: {, name: string; type: string }[];
-    returnType: string;, isAsync: boolean;
+    returnType: string; isAsync: boolean;
     isExported: boolean;
 }
 
 export interface VariableInfo {
-    name: string;, line: number;
-    type: string;, isConst: boolean;
+    name: string; line: number;
+    type: string; isConst: boolean;
     isExported: boolean;
 }
 
 export interface TypeInfo {
-    name: string;, line: number;
+    name: string; line: number;
     kind: 'interface' | 'type' | 'class' | 'enum';
     isExported: boolean;
 }
 
 export interface ASTAnalysisResult {
-    errors: ASTError[];, functions: FunctionInfo[];
-    variables: VariableInfo[];, types: TypeInfo[];
-    imports: string[];, exports: string[];
+    errors: ASTError[]; functions: FunctionInfo[];
+    variables: VariableInfo[]; types: TypeInfo[];
+    imports: string[]; exports: string[];
     complexity: number;
 }
 

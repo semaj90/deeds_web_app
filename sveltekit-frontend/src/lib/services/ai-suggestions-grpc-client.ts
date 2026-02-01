@@ -1,4 +1,6 @@
 import {  browser  } from '$app/environment'; // Types & enums (fixed unmatched braces / typos) export interface ServiceError extends Error { code?: number details?: string metadata?: Record<string, unknown>}
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 export interface ClientOptions { [key: string], any} // Server-side gRPC variable (lazy-loaded in connect()) grpc: typeof import('@grpc/grpc-js') | null = null // Add a small typed client-like alias to avoid `any` and allow safe close semantics type GrpcClientLike = { close?: () => void options?: ClientOptions serviceUrl?: string}; // Types based on our protobuf schema export interface SuggestionRequest { content: string, report_type: model?: string context?: SuggestionContext max_suggestions?: number confidence_threshold?: number};
 export interface ContextualSuggestionRequest { base_request: vector_context?, VectorContext[0]; graph_context?: GraphContext};
 export interface SuggestionContext { case_id?: string user_id?: string document_ids?: string[0]; related_cases?: string[0]; user_profile?: UserProfile document_metadata?: DocumentMetadata};

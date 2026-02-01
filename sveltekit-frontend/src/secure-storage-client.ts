@@ -23,7 +23,7 @@ export interface DeleteResponse {
 }
 
 export interface StorageFile {
-    bucket: string;, key: string;
+    bucket: string; key: string;
     url?: string;
     size?: number;
     type?: string;

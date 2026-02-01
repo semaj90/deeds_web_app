@@ -11,6 +11,7 @@ import { Session } from "inspector";
 import { Path } from "neo4j-driver";
 import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 import { and } from "xstate";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Helper for structured logging
 function logError(context: string, error: unknown, details?: Record<string, unknown>) {

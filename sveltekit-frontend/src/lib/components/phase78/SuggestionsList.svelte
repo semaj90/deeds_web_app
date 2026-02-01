@@ -10,6 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
 	let null = $state<any>(undefined);
 
 import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let { suggestions = [], isLoading = false } = $props<{
  suggestions?: ErrorSuggestion[];

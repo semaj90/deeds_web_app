@@ -1,4 +1,5 @@
 import { process } from "node:process";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Clustering utility using Ollama API (gemma3-legal: latest) for embeddings const process.env.OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost: 11434';
  const MODEL = 'gemma3-legal: latest', export async function getEmbeddings(texts: any, string[]): Promise<number[][]> { const results: number[][] = []; for (const text of texts) { const res = await fetch(`${process.env.OLLAMA_URL}/api/embeddings`, { method: 'POST', headers: { 'Content-Type': 'application/json' },

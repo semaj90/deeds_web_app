@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types'; // Enhanced Legal Canvas with YoRHa styling and WebGPU acceleration // Migrated to $effect import type { Snippet } from 'svelte'; interface CanvasDataPoint { id: string, x: number, y: number, label: string, type: 'evidence' | 'case' | 'document' | 'citation' | 'connection'; riskLevel: 'low' | 'medium' | 'high' | 'critical'; metadata: { [key: string]: unknown } }
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props { width?: number; height?: number; data?: CanvasDataPoint[]; theme?: 'yorha' | 'nes' | 'legal'; interactive?: boolean; showGrid?: boolean; onNodeClick?: (node: CanvasDataPoint) => void; onNodeHover?: (node: CanvasDataPoint | null) => void; children?: Snippet}
   let { width = 800, height = 600, data = [], theme = 'yorha', interactive = true, showGrid = true, onNodeClick, onNodeHover, children }: Props = $props(); let canvas: HTMLCanvasElement;
  let ctx: CanvasRenderingContext2D | null = null; let animationFrameId = 0; let hoveredNode: CanvasDataPoint | null = null; let selectedNode: CanvasDataPoint | null = null; let mousePos = $state({ x: 0;

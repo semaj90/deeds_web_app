@@ -2,6 +2,7 @@ import { spawn } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const PYTHON_PATH = 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe';
 const SCRIPT_DIR = path.join(process.cwd(), 'scripts');

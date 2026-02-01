@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types.js';
 import db from '$lib/server/database';
 import * as schema from '$lib/server/db/schema-postgres';
 import { json, error } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Ollama embedding service (now using centralized API)
 async function generateEmbedding(text: string): Promise<number[]> {
@@ -45,7 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // Chunk the text for better embedding quality
  const chunks = chunkText(text);
  const ingestedChunks: {, id: any;
- text: string;, sequence: number;
+ text: string; sequence: number;
  embeddingDimensions: number;
  }[] = [];
  for (let i = 0; i < chunks.length; i++) {

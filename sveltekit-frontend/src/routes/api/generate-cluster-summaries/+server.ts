@@ -14,6 +14,7 @@ import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
 import { createClient } from 'redis';
 import { promisify } from 'util';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const execAsync = promisify(exec);
 const redis = createClient({ url: 'redis://127.0.0.1:6379' });

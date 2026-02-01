@@ -11,6 +11,7 @@ import { db } from '../server/db/unified-client.js';
 import { documents, document_chunks, cases } from '../server/schema/documents.js';
 import { eq, sql } from 'drizzle-orm';
 import { redis } from '../server/redis.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface EmbeddingJobPayload {
     entity_type: 'document' | 'case' | 'chunk';

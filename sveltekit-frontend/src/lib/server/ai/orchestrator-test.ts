@@ -1,6 +1,7 @@
 import type { error } from "console";
 import { timestamp } from "drizzle-orm/gel-core";
 import * as bridgeModule from './llm-orchestrator-bridge.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** Minimal local request type to avoid hard dependency on external named types. */
 type LLMBridgeRequest = {

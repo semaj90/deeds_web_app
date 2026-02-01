@@ -2,6 +2,7 @@
   import { cn } from "$lib";
   import * as Tooltip from "bits-ui";
   import { fade } from "svelte/transition";
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   let {
     children,

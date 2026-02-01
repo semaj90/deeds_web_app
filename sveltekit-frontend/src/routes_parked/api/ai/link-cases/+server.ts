@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { searchCases } from '$lib/client/search-client';
 import type { IntentContext } from '$lib/ai/intents';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Scenario B: Case-Law Linking Engine

@@ -3,16 +3,17 @@
  * Handles the complete lifecycle of evidence from upload to AI analysis
  */
 import { assign, fromPromise, setup } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types for the state machine
 export interface EvidenceProcessingContext {
-	evidenceId: string;, caseId: string;, userId: string;, filename: string;, content: string;, metadata: Record<string, unknown>;
+	evidenceId: string; caseId: string; userId: string; filename: string; content: string; metadata: Record<string, unknown>;
 
 	// Processing results
 	extractedText?: string;
 	chunks?: Array<{, text: string; embedding?: number[] }>;
 	embeddings?: number[][];
-	analysis?: {, summary: string;, entities: unknown[];, sentiment: string;, classification: string;
+	analysis?: {, summary: string; entities: unknown[]; sentiment: string; classification: string;
 		riskAssessment?: string;
 		recommendations?: string[];
 	};
@@ -23,30 +24,30 @@ export interface EvidenceProcessingContext {
 	analysisJobId?: string;
 
 	// Progress tracking
-	progress: number;, stage: string;
+	progress: number; stage: string;
 
 	// Error handling
-	error?: string;, retryCount: number;, maxRetries: number;
+	error?: string; retryCount: number; maxRetries: number;
 
 	// Performance metrics
-	startTime: number;, stageStartTime: number;, processingTimes: Record<string, number>;
+	startTime: number; stageStartTime: number; processingTimes: Record<string, number>;
 }
 
 export type EvidenceProcessingEvent =
 	| {
-			type: 'START_PROCESSING';, evidenceId: string;, caseId: string;, userId: string;, filename: string;, content: string;
+			type: 'START_PROCESSING'; evidenceId: string; caseId: string; userId: string; filename: string; content: string;
 			metadata?: Record<string, unknown>;
 	  }
 	| { type: 'RETRY' }
 	| { type: 'CANCEL' }
 	| { type: 'FORCE_COMPLETE' }
-	| { type: 'UPDATE_PROGRESS';, progress: number;, stage: string }
+	| { type: 'UPDATE_PROGRESS'; progress: number; stage: string }
 	| { type: 'PROCESSING_COMPLETE' }
-	| { type: 'PROCESSING_FAILED';, error: string }
+	| { type: 'PROCESSING_FAILED'; error: string }
 	| { type: 'EMBEDDING_COMPLETE' }
-	| { type: 'EMBEDDING_FAILED';, error: string }
+	| { type: 'EMBEDDING_FAILED'; error: string }
 	| { type: 'ANALYSIS_COMPLETE' }
-	| { type: 'ANALYSIS_FAILED';, error: string };
+	| { type: 'ANALYSIS_FAILED'; error: string };
 
 // Helper function for API calls
 async function callProcessingAPI(
@@ -76,7 +77,7 @@ export const evidenceProcessingMachine = setup({
 	types: {, context: {} as EvidenceProcessingContext,
 		events: {} as EvidenceProcessingEvent
 	},
-	actors: {, documentProcessing: fromPromise<{, jobId: string; extractedText?: string;, processingTime: number }, { input: EvidenceProcessingContext }>(
+	actors: {, documentProcessing: fromPromise<{, jobId: string; extractedText?: string; processingTime: number }, { input: EvidenceProcessingContext }>(
 			async ({ input }) => {
 				console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
@@ -96,11 +97,11 @@ export const evidenceProcessingMachine = setup({
 
 				return result as {
 					jobId: string;
-					extractedText?: string;, processingTime: number;
+					extractedText?: string; processingTime: number;
 				};
 			}
 		),
-		embeddingGeneration: fromPromise<{, chunks: Array<{, text: string;, embedding: number[] }> }, { input: EvidenceProcessingContext }>(
+		embeddingGeneration: fromPromise<{, chunks: Array<{, text: string; embedding: number[] }> }, { input: EvidenceProcessingContext }>(
 			async ({ input }) => {
 				console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
 
@@ -114,11 +115,11 @@ export const evidenceProcessingMachine = setup({
 				});
 
 				return result as {
-					chunks: Array<{, text: string;, embedding: number[] }>;
+					chunks: Array<{, text: string; embedding: number[] }>;
 				};
 			}
 		),
-		aiAnalysis: fromPromise<{, summary: string;, entities: unknown[];, sentiment: string;, classification: string;
+		aiAnalysis: fromPromise<{, summary: string; entities: unknown[]; sentiment: string; classification: string;
 			riskAssessment?: string;
 			recommendations?: string[];
 		}, { input: EvidenceProcessingContext }>(
@@ -132,7 +133,7 @@ export const evidenceProcessingMachine = setup({
 				});
 
 				return result as {
-					summary: string;, entities: unknown[];, sentiment: string;, classification: string;
+					summary: string; entities: unknown[]; sentiment: string; classification: string;
 					riskAssessment?: string;
 					recommendations?: string[];
 				};
@@ -364,7 +365,7 @@ export type EvidenceProcessingMachine = typeof evidenceProcessingMachine;
 
 // State helper type
 type MachineState = {
-	value: string;, context: EvidenceProcessingContext;
+	value: string; context: EvidenceProcessingContext;
 };
 
 // Export convenience functions

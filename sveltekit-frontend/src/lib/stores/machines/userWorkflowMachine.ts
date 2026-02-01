@@ -3,6 +3,7 @@
  * Manages user interaction workflows, case management, and collaborative processes
  */
 import { assign, createMachine, type ActorRefFrom } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Type definitions
 export interface User {

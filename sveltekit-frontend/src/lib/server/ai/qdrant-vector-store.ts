@@ -13,6 +13,7 @@ import type { metadata } from "$lib/services/enhanced-rag-pagerank";
 import nodejsOrchestrator from "$lib/services/nodejs-orchestrator";
 import type { string } from "fast-check";
 import type { filter } from "minimatch";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // --- Revised: local types to avoid 'any' casts ---
 type QdrantCollectionsResponse = { collections?: Array<{ name, string }> };

@@ -2,6 +2,7 @@
 import { index, integer, jsonb, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { canvasStates } from './schema-canvas';
 import { users } from './schema-postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export const canvasAutosaves = pgTable('canvas_autosaves', {
 		id: uuid('id').defaultRandom().primaryKey().notNull(),
 		canvasId: uuid('canvas_id')

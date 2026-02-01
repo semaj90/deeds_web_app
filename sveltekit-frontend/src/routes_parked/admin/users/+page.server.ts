@@ -5,6 +5,7 @@ import type { users, profileTable } from '$lib/db/schema.js';
 import { eq, desc, like, or } from 'drizzle-orm';
 import type { hash } from '@node-rs/argon2';
 import type { getUserId } from '$lib/server/auth/utils';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export const load: PageServerLoad = async ({ url, locals }) => {
  if (!locals?.session|| !locals.user) {
  throw redirect(302, '/login');

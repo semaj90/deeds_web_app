@@ -17,6 +17,7 @@
   import Root from "./SelectRoot.svelte";
   import Trigger from "./SelectTrigger.svelte";
   import Value from "./SelectValue.svelte";
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   interface SelectOption {
     value: string;

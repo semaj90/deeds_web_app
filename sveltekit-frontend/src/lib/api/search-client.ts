@@ -1,4 +1,5 @@
 import type { SearchResult } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type { SearchResult };
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { User } from '$lib/types'; // Migrated to $effect import { fade, fly } from 'svelte/transition'; import { quintOut, elasticOut } from 'svelte/easing'; import { advancedCache } from '$lib/services/advanced_cache_manager'; // Types interface UserActivity { timestamp: number;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	action: 'typing' | 'pause' | 'delete' | 'select'; content?: string; duration?: number; position?: number}
   interface ThinkingState { phase: 'analyzing' | 'processing' | 'generating' | 'complete'; progress: number, currentThought?: string}
 

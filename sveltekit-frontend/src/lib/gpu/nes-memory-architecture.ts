@@ -1,4 +1,5 @@
 import { globalGPUManager } from './global-gpu-manager.js'; /** * MemorySlot interface represents a slot in memory with an id, embedding, timestamp, * usage count, and optional metadata. */
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export interface MemorySlot {
  id: string;
 	embedding: Float32Array;

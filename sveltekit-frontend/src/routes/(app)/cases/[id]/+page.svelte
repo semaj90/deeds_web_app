@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from "svelte";
  import { goto } from '$app/navigation';
  import { page } from '$app/state';
  import CaseNotesEditor from '$lib/components/cases/CaseNotesEditor.svelte';
@@ -11,6 +12,9 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  // import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
  import { useCache, CacheStrategies } from '$lib/cache/cache-service.svelte';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  const cache = useCache();
@@ -46,14 +50,11 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
 
  const caseId = page.params.id;
 
- $effect(() => {
-
- (async () => {
+ $effect(() => {	onMount(async () => {
  await loadCase();
  await loadEvidence();
  
-});();
- });
+});
 
  const loadCase = async () => {
  try {

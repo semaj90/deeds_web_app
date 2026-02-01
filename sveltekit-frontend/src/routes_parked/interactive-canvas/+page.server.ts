@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'; // Changed from helpers import
 import type { PageServerLoad } from './$types.js';
 import { redirect } from '@sveltejs/kit';
 import db from '$lib/server/db/client.js'; // Changed from index.js
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
  if (!locals.user) {

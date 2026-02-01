@@ -1,5 +1,6 @@
 import type { MinIOService } from '$lib/server/minio';
 import { json } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function handleFileUpload(request: Request): MinIOService {
  try {

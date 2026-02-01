@@ -5,6 +5,7 @@
 // Assuming pool default export or similar from drizzle config or connection file
 // We'll use the one from './connections.ts' for better reliability if available, but matching existing import style
 import { appPool as pool } from './connections.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function validateDatabaseOnStartup(): Promise<boolean> {
 	let client;

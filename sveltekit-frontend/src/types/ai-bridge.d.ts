@@ -7,7 +7,7 @@ declare module '$lib/server/services/analytics-bridge' {
  export function fetchIntent(userId: string): Promise<any | null>;
 }
 export interface UserAnalyticsEvent {
- userId: string;, action: string;
+ userId: string; action: string;
  payload?: Record<string, unknown>;
  timestamp?: string;
 }

@@ -1,6 +1,8 @@
 <script lang="ts">
 	// Migrated to $effect
 	import { fade } from 'svelte/transition';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// State
 	let loading = $state(true);

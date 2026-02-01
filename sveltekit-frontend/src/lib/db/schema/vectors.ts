@@ -14,6 +14,7 @@ import type {
 pgTable, timestamp, uuid, integer, real, index, vector }
 from 'drizzle-orm/pg-core';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 sql }
 from 'drizzle-orm';
 // Using standard drizzle-orm pgvector support // Document vectors table for semantic search export const documentVectors = pgTable("document_vectors", {

@@ -8,6 +8,7 @@
  */
 
 import { setup, createActor, fromCallback } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RabbitMQContext {
   connected: boolean;

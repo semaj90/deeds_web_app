@@ -5,6 +5,7 @@
  import { fade, fly } from "svelte/transition";
  import { removeSavedNote, saveNoteForLater } from '$lib/stores/saved-notes';
  import  RichTextEditor  from "./RichTextEditor.svelte"; // Local state for mutable values that need to change let localMode = $state(mode);
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let localTitle = $state(title);
    let localContent = $state(content);
    let localMarkdown = $state(markdown);

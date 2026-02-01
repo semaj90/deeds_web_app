@@ -4,6 +4,7 @@
  * Implements advanced context management and query optimization
  */
 import { getPredictiveAssistance, searchUserChatHistory, storeChatWithVector, type ChatMessage } from '../services/chat-vector-storage.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ContextualTestResult {
 	testName: string;

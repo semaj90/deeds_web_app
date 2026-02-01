@@ -3,6 +3,8 @@
  * Manages batch processing, concurrent execution, and error recovery for legal documents
  */
 import type { createActor, setup } from 'xstate';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Types
 export interface DocumentInput {

@@ -3,6 +3,7 @@
 	// Migrated to $effect
 	import SimilarCasesPanel from './SimilarCasesPanel.svelte';
 	import SummaryEditor from './SummaryEditor.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface CaseDetail {
 		id: string;

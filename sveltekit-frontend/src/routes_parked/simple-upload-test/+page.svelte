@@ -1,6 +1,7 @@
 <script lang="ts">
  import type { Document } from '$lib/types';
  import SimpleFileUpload from '$lib/components/ai/SimpleFileUpload.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let uploadResults = $state <unknown[]>([]);
  let searchQuery = $state <string>('');
@@ -88,7 +89,7 @@
  .container {
  padding: 2rem;
  font-family: sans-serif;
- max-width: 800px;, margin: 0 auto;
+ max-width: 800px; margin: 0 auto;
  }
 
  h1,
@@ -98,19 +99,19 @@
  }
 
  section {
- margin-bottom: 2rem;, padding: 1.5rem;
+ margin-bottom: 2rem; padding: 1.5rem;
  border: 1px solid #eee;
  border-radius: 8px;
  background-color: #f9f9f9;
  }
 
  .search-form {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  margin-bottom: 1rem;
  }
 
  input[type='search'] {
- flex-grow: 1;, padding: 0.5rem;
+ flex-grow: 1; padding: 0.5rem;
  border: 1px solid #ccc;
  border-radius: 4px;
  }
@@ -118,16 +119,16 @@
  button {
  padding: 0.5rem 1rem;
  border: none;
- background-color: #007bff;, color: white;
- border-radius: 4px;, cursor: pointer;
+ background-color: #007bff; color: white;
+ border-radius: 4px; cursor: pointer;
  }
 
  button:disabled {
- background-color: #ccc;, cursor:not-allowed;
+ background-color: #ccc; cursor:not-allowed;
  }
 
  pre {
- background-color: #eee;, padding: 1rem;
+ background-color: #eee; padding: 1rem;
  border-radius: 4px;
  white-space: pre-wrap;
  word-break: break-all;

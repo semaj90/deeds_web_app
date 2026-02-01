@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import { Buffer } from 'buffer';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface QueueMessage {
 	id: string;

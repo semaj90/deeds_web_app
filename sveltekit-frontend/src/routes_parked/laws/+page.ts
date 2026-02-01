@@ -1,17 +1,18 @@
 import type { PageLoad } from './$types.js';
 import { error } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface QuickLink {
- id: string;, title: string;
- description: string;, jurisdiction: 'california' | 'federal';
- category: string;, url: string;
- fullTextUrl: string;, code: string;
+ id: string; title: string;
+ description: string; jurisdiction: 'california' | 'federal';
+ category: string; url: string;
+ fullTextUrl: string; code: string;
 }
 
 export interface LawSearchResult {
- id: string;, title: string;
- code: string;, section: string;
- summary: string;, url: string;
+ id: string; title: string;
+ code: string; section: string;
+ summary: string; url: string;
  score: number;
 }
 

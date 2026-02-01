@@ -2,6 +2,7 @@ import type { UserProfile } from '$lib/server/db/schema/user-management';
 import { db } from '$lib/server/db/unified-client'; // Unified client
 import { users, userProfiles } from '$lib/server/db/schema/user-management';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ContextOptions {
     jurisdictionHint?: boolean;

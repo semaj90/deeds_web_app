@@ -6,11 +6,12 @@
  */
 
 import * as Minio from 'minio';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface MinIOConfig {
     endPoint: string;
     port?: number;
-    useSSL?: boolean;, accessKey: string;
+    useSSL?: boolean; accessKey: string;
     secretKey: string;
     region?: string;
 }
@@ -27,12 +28,12 @@ export interface PresignedUrlOptions {
 }
 
 export interface FileInfo {
-    name: string;, size: number;
-    etag: string;, lastModified: Date;
+    name: string; size: number;
+    etag: string; lastModified: Date;
 }
 
 export interface FileMeta {
-    size: number;, etag: string;
+    size: number; etag: string;
     lastModified: Date;
     contentType?: string;
     metadata?: Record<string, string>;

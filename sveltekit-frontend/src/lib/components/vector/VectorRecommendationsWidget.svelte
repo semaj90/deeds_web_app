@@ -20,6 +20,7 @@ Compact AI recommendations component for sidebar/dashboard use
   } from 'lucide-svelte';
   import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
   import type { IntelligenceRecommendation } from '$lib/services/vector-intelligence-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     context?: string
     userRole?: 'prosecutor' | 'detective' | 'admin' | 'user';

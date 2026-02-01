@@ -5,6 +5,7 @@
  */
 
 import { productionServiceClient, type ServiceResponse } from '$lib/api/production-service-client';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface GPUTask {
 	id: string;
@@ -48,8 +49,8 @@ export interface GPUTaskConfig {
 }
 
 export interface GPUTaskResult {
-	taskId: string;, success: boolean;
-	result: unknown;, metrics: {
+	taskId: string; success: boolean;
+	result: unknown; metrics: {
 		processingTime: number;
 		gpuUtilization?: number;
 		memoryUsage?: number;
@@ -68,18 +69,18 @@ export interface GPUTaskResult {
 
 export interface ClusterMetrics {
 	spawned: Record<string, number>;
-	deferredActive: number;, deferredTotal: number;
+	deferredActive: number; deferredTotal: number;
 	lastAllocation: {, type: string;
-		port: number;, timestamp: string;
+		port: number; timestamp: string;
 	};
-	events: unknown[];, workers: unknown[];
+	events: unknown[]; workers: unknown[];
 	deferredQueue: unknown[];
 }
 
 export interface AutosolveContext {
-	errorCount: number;, errorTypes: string[];
-	clusterMetrics: ClusterMetrics;, threshold: number;
-	lastRun: string;, suggestedActions: string[];
+	errorCount: number; errorTypes: string[];
+	clusterMetrics: ClusterMetrics; threshold: number;
+	lastRun: string; suggestedActions: string[];
 }
 
 class MCPGPUOrchestrator {

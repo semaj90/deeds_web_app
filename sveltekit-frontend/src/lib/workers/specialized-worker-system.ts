@@ -1,4 +1,6 @@
 import { EventEmitter } from 'events';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Specialized Worker System - Event-Driven, "Hive Programming"

@@ -4,6 +4,7 @@
 import { db } from '../db/index.js';
 import { userAiQueries, ragMessages, ragSessions } from '../db/schema-postgres.js';
 import { eq, and, sql, count, desc } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // User behavior pattern interfaces
 export interface UserPattern {

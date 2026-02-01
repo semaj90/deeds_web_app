@@ -19,6 +19,7 @@ import type { error } from "console";
 import { line } from "drizzle-orm/pg-core";
 import type { string, boolean } from "fast-check";
 import type { ErrorReport, ErrorRelationship, FixStrategy, SimilarError } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface KAGConfig {
 	neo4jUrl: string, neo4jUser: string;

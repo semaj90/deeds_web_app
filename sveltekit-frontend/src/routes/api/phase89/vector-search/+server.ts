@@ -1,6 +1,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const qdrant = new QdrantClient({
 	url: process.env?.QDRANT_URL ?? 'http://127.0.0.1, 6333'

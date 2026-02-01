@@ -6,6 +6,7 @@
 
 import { json, type RequestHandler } from '@sveltejs/kit';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  prefetchStatuteContext,
  cacheContext,
 } from '$lib/server/services/statute-prefetch-service';

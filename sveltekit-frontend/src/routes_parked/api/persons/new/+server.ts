@@ -2,6 +2,7 @@ import { createValidatedPersonProfile, gemmaPersonClient } from '$lib/ai/gemmaCl
 import { createPerson } from '$lib/db/persons';
 import { error, json, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
  try {

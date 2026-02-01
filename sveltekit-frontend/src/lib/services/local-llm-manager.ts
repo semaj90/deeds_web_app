@@ -1,5 +1,7 @@
 import type { dev } from "$app/environment"
 import type { string, boolean } from "fast-check"
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  // Local LLM Configuration for Desktop and Web App Development // This file manages local model downloads, setup, and integration import type { dev } from '$app/environment'; // TODO: Fix import - // Orphaned: content { // Optional Tauri imports - fallback for web environments let, $1: $2, writeTextFile | any: readTextFile | $1: $2, join | any: appLocalDataDir, async function initializeTauriAPI(): Promise<any> { try { // Note: In Tauri v2, filesystem operations require plugins // For now, we'll use fallback implementations' throw new Error("Tauri v2 requires filesystem plugin")}catch { // Fallback implementations for web environment createDir = () => Promise.resolve(); writeTextFile = () => Promise.resolve(); readTextFile = () => Promise.resolve(""); exists = () => Promise.resolve(false); join = (...paths: string[]) => paths.join("/"); appLocalDataDir = () => Promise.resolve("./data")} }
 export interface LocalLLMConfig { models: {

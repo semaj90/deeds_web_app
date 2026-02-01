@@ -1,4 +1,5 @@
 import { createClient } from 'redis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type RedisClientOptions = Parameters<typeof createClient>[0];
 type RedisClient = ReturnType<typeof createClient>;

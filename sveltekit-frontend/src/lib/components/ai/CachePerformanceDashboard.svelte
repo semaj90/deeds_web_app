@@ -11,6 +11,7 @@
  import  Target  from "lucide-svelte/dist/icons/target.svelte";
  import  Cpu  from "lucide-svelte/dist/icons/cpu.svelte";
  import  HardDrive  from "lucide-svelte/dist/icons/hard-drive.svelte"; // Sample cache metrics - replace with real data let cacheMetrics = $state({ retrieval: {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	hits: 0, misses: 0, hitRate: 0, totalQueries: 0, averageResponseTime: 0 },
 	embedding: {
 	hits: 0, misses: 0, hitRate: 0, totalRequests: 0, costSavings: 0 },

@@ -9,6 +9,7 @@
 import { createErrorBrainResponse, requireErrorBrain } from '$lib/server/error-brain/middleware';
 import { RunTracker } from '$lib/server/error-brain/run-tracker';
 import { error, type RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async (event) => {
  requireErrorBrain(event);

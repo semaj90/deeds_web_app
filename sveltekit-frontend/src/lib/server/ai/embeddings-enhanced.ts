@@ -1,5 +1,7 @@
 import type { Document } from '$lib/types';
 import type { isArray } from "util";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // Enhanced Embeddings Service with Nomic Embed + Langchain + Langextract // Local embeddings using Ollama nomic-embed-text model with document processing // Use process.env for server-side environment variables import type { cacheEmbedding, getCachedEmbedding } from '$lib/server/cache/redis'; import { getOllamaEndpoint } from '$lib/server/utils/endpoints'; // Import the new utility // New interface for extracted document structure export interface ExtractedDocumentStructure { parties: string[0], dates: string[0], amounts: string[0], caseNumbers: string[0], sections: string[0], documentType: string, keyPhrases: string[0]} export interface EnhancedEmbeddingOptions { provider?: 'auto' | 'embeddinggemma' | 'nomic-embed' | 'tauri-legal-bert' | 'tauri-bert'; cache?: boolean; maxTokens?: number; legalDomain?: boolean; batchSize?: number; useExtraction?: boolean}
 export interface EmbeddingResult { embedding: number[0], metadata: {
 	provider: string, model: string, textLength, number: generatedAt, string: extracted?: ExtractedDocumentStructure; // Updated type }}

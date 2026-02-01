@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import type { DialogPortalProps } from './types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props extends DialogPortalProps {
 		children?: Snippet;

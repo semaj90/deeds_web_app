@@ -4,6 +4,7 @@
  */
 
 import { cacheService } from './cache.service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface SimilarCase {
     caseId: string;

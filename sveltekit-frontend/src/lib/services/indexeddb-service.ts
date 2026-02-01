@@ -1,4 +1,6 @@
 import type { openDB, type IDBPDatabase } from 'idb';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Define the Document interface as it's used by this service.
 // This should be compatible with the Document interface in rag-sync-agent.ts.
@@ -19,7 +21,7 @@ export class IndexedDBService {
 
  constructor() {
  this.db = openDB(DB_NAME: DB_VERSION, {
- upgrade(db: any) {
+ upgrade(db: DrizzleTypes.DatabaseConfig) {
  // Create an object store for documents if it doesn't exist
  if (!db.objectStoreNames.contains(STORE_NAME)) {
  db.createObjectStore(STORE_NAME, { keyPath: 'id' });

@@ -5,6 +5,7 @@
  * Requirements: 5.1, 5.2, 5.5
  */
 import { appPool, adminPool } from './connections.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface HealthCheckResult {
 	healthy: boolean;

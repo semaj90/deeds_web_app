@@ -2,6 +2,7 @@ import { users } from '$lib/server/db/schema-postgres';
 import type { User } from '$lib/types';
 import { eq } from 'drizzle-orm';
 import { db } from './unified-client.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function getUserById(id: string): Promise<User | null> {
     try {

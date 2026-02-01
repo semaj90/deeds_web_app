@@ -2,6 +2,8 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
 import { $derived } from 'svelte';
 import type { $state } from 'svelte'; // Import Svelte, 5 runes /** * Unified AI Assistant Global Store - SvelteKit, 2 + Svelte, 5 Runes * Replaces both ai-assistant.ts and ai-assistant.svelte.ts with proper Svelte, 5 implementation */ // Core types export interface AIMessage { id: string, role: 'user' | 'assistant' | 'system',content: string, timestamp: evidenceIds?: string[]; metadata?: { confidence?: number; source?: string; reasoning?: string; suggestions?: string[]; backend?: Backend; model?: string; tokenCount?: number; processingTime?: number; legalContext?: string}}
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 export interface CaseAIContext { caseId: title?: string; messages : AIMessage[], evidenceMap: Record<
  | string: {
 	id: string, title: string, annotations: string[], connections: string[], aiSummary?, string} >; currentSession: {

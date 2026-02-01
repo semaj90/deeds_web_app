@@ -1,6 +1,7 @@
 import type { db } from '$lib/server/db';
 import { sql } from '$lib/server/db';
 import { getEmbeddingViaGate } from '$lib/server/embedding-gateway';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // In-memory cache for embeddings to avoid regenerating
 const embeddingCache = new Map<string, number[]>();

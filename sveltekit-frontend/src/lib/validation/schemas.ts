@@ -14,6 +14,7 @@
  */
 
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // COMMON PRIMITIVES

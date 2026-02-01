@@ -2,6 +2,7 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
 // Case Service - Production Implementation for Legal AI Platform
 import { getAuthHeaders } from './auth-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface LegalCase {
  id: string;

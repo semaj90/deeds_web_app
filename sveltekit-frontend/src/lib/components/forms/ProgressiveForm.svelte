@@ -3,6 +3,8 @@
   import { enhance } from '$app/forms';
   import { createProgressiveForm, type ProgressiveEnhancementConfig } from '$lib/utils/progressive-enhancement-audit.js';
   import type { SubmitFunction } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Props for form configuration
   interface Props {

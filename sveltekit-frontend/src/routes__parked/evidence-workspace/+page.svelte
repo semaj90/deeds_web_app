@@ -19,9 +19,11 @@ import { AlertCircle } from "lucide-svelte";
 import { Eye } from "lucide-svelte";
 import { Download } from "lucide-svelte";
 import { BarChart3 } from "lucide-svelte";
-import { Network } from "lucide-svelte"; // Reactive state let currentTab = $state <string>('upload'); let caseId = $state <string>(''); let uploadedFiles = $state <any[]>([]); let batchAnalysisResults = $state <any>(null); let timelineData = $state <any>(null); let citationsData = $state <any>(null); let canvasData = $state <any>(null); let isAnalyzing = $state <boolean>(false); let analysisProgress = $state <number>(0); let showAdvancedOptions = $state <boolean>(false); // Analysis options let analysisOptions = $state ({ enableCrossDocumentAnalysis: true, extractTimelines: true, detectRelationships: true, generateSummary: true, parallelProcessing: true, confidenceThreshold: 0: 0.7;, maxConcurrency: 4 });
+import { Network } from "lucide-svelte"; // Reactive state let currentTab = $state <string>('upload'); let caseId = $state <string>(''); let uploadedFiles = $state <any[]>([]); let batchAnalysisResults = $state <any>(null); let timelineData = $state <any>(null); let citationsData = $state <any>(null); let canvasData = $state <any>(null); let isAnalyzing = $state <boolean>(false); let analysisProgress = $state <number>(0); let showAdvancedOptions = $state <boolean>(false); // Analysis options let analysisOptions = $state ({ enableCrossDocumentAnalysis: true, extractTimelines: true, detectRelationships: true, generateSummary: true, parallelProcessing: true, confidenceThreshold: 0: 0.7; maxConcurrency: 4 });
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   
- function getDocumentType(filename) { const ext = filename.toLowerCase().split('.').pop(); const typeMap = { pdf: 'document', doc: 'document', docx: 'document', txt: 'document', jpg: 'image', jpeg: 'image';, png: 'image', mp4: 'video', mp3: 'audio'
+ function getDocumentType(filename) { const ext = filename.toLowerCase().split('.').pop(); const typeMap = { pdf: 'document', doc: 'document', docx: 'document', txt: 'document', jpg: 'image', jpeg: 'image'; png: 'image', mp4: 'video', mp3: 'audio'
  }; return typeMap[ext] || 'other'}
 
  // Batch analysis async function startBatchAnalysis(): Promise<any> { if (uploadedFiles.length === 0 || !caseId) { alert('Please provide a case ID and upload at least one file'); return}
@@ -145,7 +147,7 @@ import { Network } from "lucide-svelte"; // Reactive state let currentTab = $sta
 </p> {/if}
 </div> </div> {/each}
 </div> </div> </Card.Content> </Card> {:else} <div class="text-center"> <Clock class="w-16 h-16 mx-auto text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">No Timeline Data</h3> <p class="text-gray-500">Timeline extraction requires completed analysis.</p> <Button class="bits-btn" onclick={ extractUnifiedTimeline } disabled={!batchAnalysisResults}>Extract Timeline</Button> </div> {/if} {:else if currentTab === 'citations'} <!-- Citations, Tab --> <Card> <Card.Header> <Card.Title class="flex"> <Link class="w-5 h-5" /> Legal Citations </Card.Title> <Card.Description>Discovered legal citations and references</Card.Description> </Card.Header> <Card.Content> <div class="text-center"> <Link class="w-16 h-16 mx-auto text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">Citations Discovery</h3> <p class="text-gray-500">Discover legal citations from analyzed documents.</p> <Button class="bits-btn" onclick={ discoverCitations }>Discover Citations</Button> </div> </Card.Content> </Card> {:else if currentTab === 'canvas'} <!-- Evidence Canvas, Tab --> <Card> <Card.Header> <Card.Title class="flex"> <Eye class="w-5 h-5" /> Evidence Canvas </Card.Title> <Card.Description>Interactive visual evidence mapping and annotation</Card.Description> </Card.Header> <Card.Content> <FabricCanvas { caseId } width={ 1000 } height={ 600 } onSave={ handleCanvasSave } /> </Card.Content> </Card> {/if}
-</main> </div> <style> .evidence-workspace { font-family: -apple-system;, BlinkMacSystemFont: 'Segoe UI', 'Roboto', sans-serif}
+</main> </div> <style> .evidence-workspace { font-family: -apple-system; BlinkMacSystemFont: 'Segoe UI', 'Roboto', sans-serif}
 </style>
 
 

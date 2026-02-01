@@ -4,6 +4,8 @@
  */
 
 import { cache } from './cache-service.svelte';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Standardized cache keys for the application

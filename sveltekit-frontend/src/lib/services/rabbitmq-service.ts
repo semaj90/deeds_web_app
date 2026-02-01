@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { env } from '$lib/env';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Dynamic import for amqplib to handle type issues
 let amqp: any;

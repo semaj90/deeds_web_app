@@ -7,6 +7,7 @@
 
 import type { MarkdownProcessingResult, MarkdownSection } from '$lib/gpu/markdown-processor';
 import { GPUMarkdownProcessor } from '$lib/gpu/markdown-processor';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface MarkdownPipelineConfig {
  enableGPU: boolean;

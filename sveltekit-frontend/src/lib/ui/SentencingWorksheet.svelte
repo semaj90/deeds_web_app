@@ -2,6 +2,7 @@
  import Button from './Button.svelte';
  import Panel from './Panel.svelte';
  import Tag from './Tag.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  type AggravatingFactor = {
  id: string;

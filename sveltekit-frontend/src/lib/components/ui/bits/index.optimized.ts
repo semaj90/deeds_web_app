@@ -78,6 +78,7 @@ import CardTitleComp from './CardTitle.svelte';
 import CardDescriptionComp from './CardDescription.svelte';
 import CardContentComp from './CardContent.svelte';
 import CardFooterComp from './CardFooter.svelte';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 export const CompoundComponents = {
     Card: {

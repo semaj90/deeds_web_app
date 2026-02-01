@@ -3,6 +3,7 @@
  import { PipelineVisualizer } from '$lib/services/pipeline-visualizer';
  import { Button } from '$lib/components/ui/enhanced-bits';
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; // Reactive state using Svelte, 5 runes let isProcessing = $state<boolean>(false);
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let results = $state<PipelineResult[]>([]);
    let systemHealth = $state<any>(null);
    let performanceReport = $state<any>(null);

@@ -1,4 +1,5 @@
 import type { dev } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Server-Side Authentication Utilities

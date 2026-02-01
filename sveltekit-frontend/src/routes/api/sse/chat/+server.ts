@@ -4,6 +4,7 @@ import { db } from '$lib/server/db';
 import { messages } from '$lib/server/db/schema';
 import { ollamaService } from '$lib/server/ai/ollama-service';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
     const { message, model, conversationId } = await request.json();

@@ -3,6 +3,7 @@
   import Activity from 'lucide-svelte/icons/activity';
   import BotIcon from 'lucide-svelte/icons/bot';
   import SendIcon from 'lucide-svelte/icons/send';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // Svelte 5 state management

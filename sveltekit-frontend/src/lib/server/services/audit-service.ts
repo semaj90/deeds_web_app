@@ -13,6 +13,7 @@ import {
 	type NewAuditLogEntry
 } from '$lib/server/db/schema-evidence-crud';
 import { eq, and, gte, lte, desc } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Create db connection
 const connectionString = process.env?.DATABASE_URL ?? 'postgresql://localhost:5432/legal_ai';

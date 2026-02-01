@@ -1,5 +1,6 @@
 import { allRoutes } from '$lib/data/routes-config';
 import { error } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Local (minimal) types to avoid hard coupling to external shape.

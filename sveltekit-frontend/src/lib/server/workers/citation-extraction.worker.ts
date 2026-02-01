@@ -7,6 +7,7 @@ import { Worker } from 'bullmq';
 import { redis } from '$lib/server/redis';
 import { citationService } from '$lib/server/services/citation.service';
 import { auditService } from '$lib/server/services/audit.service';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CitationExtractionJob {
   documentId: string;

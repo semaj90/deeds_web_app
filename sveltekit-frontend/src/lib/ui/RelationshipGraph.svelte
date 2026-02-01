@@ -8,6 +8,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
  import Button from './Button.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  type GraphNode = {
   id: string;

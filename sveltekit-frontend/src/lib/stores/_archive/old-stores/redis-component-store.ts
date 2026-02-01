@@ -4,6 +4,7 @@
  */
 import { writable } from 'svelte/store';
 import type { type Writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define a minimal interface for the Redis client methods used
 interface MinimalRedisClient {

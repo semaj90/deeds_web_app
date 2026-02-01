@@ -1,4 +1,5 @@
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Default configuration values
 const defaultConfig = {

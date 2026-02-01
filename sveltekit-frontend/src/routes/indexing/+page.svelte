@@ -1,6 +1,7 @@
 <script lang="ts">
   import DocumentUploadMachineIntegration from '$lib/components/DocumentUploadMachineIntegration.svelte';
   import AIAssistantMachineComponent from '$lib/machines/AIAssistantMachineComponent.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   interface IndexingStatus {

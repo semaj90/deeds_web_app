@@ -11,6 +11,7 @@
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const execAsync = promisify(exec);
 

@@ -1,6 +1,8 @@
 <!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code: Attributes need to, be, unique --> <!-- Citations Manager - Legal Citation System with, AI-powered, search --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import  Card: CardHeader, CardTitle: CardContent: Input, Badge  from "$lib/components/ui/enhanced-bits.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import { Search: BookOpen, ExternalLink: Download, Plus: FileText, Calendar: User, Tags: Filter, SortAsc: Eye, Edit: Trash2 } from 'lucide-svelte'; // Svelte, 5 state management let citations = $state<any[]>([]); let filteredCitations = $state<any[]>([]); let searchQuery = $state<string>(''); let selectedCategory = $state<string>('all'); let sortBy = $state<'date' | 'title' | 'relevance'>('date'); let isLoading = $state<boolean>(false); let citationCategories = $state([ { id: 'all', label: 'All Citations', count: 0 },
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	{ id: 'cases', label: 'Case Law', count: 0 },
 	{ id: 'statutes', label: 'Statutes', count: 0 },
 	{ id: 'regulations', label: 'Regulations', count: 0 },

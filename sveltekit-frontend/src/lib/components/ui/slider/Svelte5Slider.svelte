@@ -4,6 +4,7 @@
  * Accessible range input with Svelte 5 runes
  */
 import type { Snippet } from 'svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface Props {
 	value?: number;

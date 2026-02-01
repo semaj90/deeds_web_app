@@ -1,5 +1,6 @@
 <script lang="ts">
  import { appStore } from '$lib/stores/app-store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  let stats = $state({

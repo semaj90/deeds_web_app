@@ -14,6 +14,7 @@ import {
 import { error, json } from '@sveltejs/kit';
 import { broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST /api/routes/:routeId/health-event

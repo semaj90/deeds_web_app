@@ -5,6 +5,7 @@
 
 import { Buffer } from 'buffer';
 import { createHash } from 'crypto';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type SOMBitmapPalette = 'viridis' | 'magma' | 'blueprint' | 'legal' | 'grayscale';
 
@@ -19,10 +20,10 @@ export interface SOMBitmapOptions {
 }
 
 export interface SOMBitmapResult {
-    width: number;, height: number;
+    width: number; height: number;
     heatmap: Float32Array;
     rgba?: Uint8ClampedArray;
-    palette?: SOMBitmapPalette;, checksum: string;
+    palette?: SOMBitmapPalette; checksum: string;
     svg?: string;
     metadata?: {
         min?: number;

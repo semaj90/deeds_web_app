@@ -8,6 +8,7 @@
  */
 
 import { createPattern, type PatternMatcher } from '../pattern-matcher';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Pattern to fix simple function calls with colon-separated arguments

@@ -9,6 +9,7 @@
  */
 
 import { timestamp } from "drizzle-orm/gel-core";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 | 'idle'
  | 'generating'
  | 'applying'

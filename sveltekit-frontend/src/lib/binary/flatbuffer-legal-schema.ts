@@ -1,4 +1,6 @@
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 Document }
 from '$lib/types';
 /** * FlatBuffers Schema for Legal Documents * Ultra-fast binary serialization eliminating JSON bottlenecks * Designed for WebGPU texture streaming and NES memory banks */ // Legal Document Binary Schema export enum DocumentType {

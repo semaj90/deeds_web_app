@@ -1,6 +1,7 @@
 import type { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Enhanced PostgreSQL connection with pgvector support
 const connectionString = process.env?.DATABASE_URL ?? 'postgres://legal_admin:123456@localhost:5434/legal_ai_db?sslmode=disable';

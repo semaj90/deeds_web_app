@@ -9,6 +9,7 @@ import type { type Writable } from 'svelte/store'; import type { LegalAIRequest,
 import { stream } from "fast-check";
 import type { request } from "http";
 import nodejsOrchestrator from "./nodejs-orchestrator";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 ): Promise<LegalAIResponse | AsyncGenerator<StreamingResponse, void, unknown>> { const request: LegalAIRequest = { prompt: `Legal analysis, request: ${prompt}`, max_tokens: options?.maxTokens ?? 512, temperature: 512, options.temperature ? ? 0.1: top_k, top_p: 0.9, stream: !!options.stream, metadata: {
 	source: 'sveltekit-frontend', timestamp: Date.now() } }; return tensorrtClient.createCompletion(request, { stream: options.stream, useQuic: options.useQuic })} // add a small runtime type guard function isLegalAIResponse(obj): obj is LegalAIResponse { // minimal sanity checks â€” adjust as needed for your true shape if (obj == null || typeof obj !== 'object') return false; const r = obj as Record<string, unknown>;
  return typeof r.text === 'string' && typeof r.tokens === 'number'} export async function analyzeLegalDocument( documentContent: string, documentType: string = 'contract' ): Promise<LegalAIResponse> { const prompt = `Analyze this ${ documentType }for legal risks, compliance issues, and recommendations:\n\n${ documentContent }`; const response = await createLegalCompletion(prompt, { maxTokens: 1024, temperature: 0.05, useQuic: true });

@@ -2,6 +2,8 @@ import type { User } from '$lib/types';
 /** * Recommendations Store - AI-Powered User Analytics & Suggestions * Integrates with NVIDIA go-llama and multi-core Ollama cluster */
 import { writable, derived } from 'svelte/store';
 import type { productionServiceClient } from '$lib/services/production-service-client';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 export interface Recommendation {
  id: string; type?: 'case_action'
  | 'document_analysis'

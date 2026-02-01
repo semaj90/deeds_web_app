@@ -11,6 +11,8 @@
 	import FileJson from 'lucide-svelte/icons/file-json';
 	import FileSpreadsheet from 'lucide-svelte/icons/file-spreadsheet';
 	import Image from 'lucide-svelte/icons/image';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface GraphNode {
 		id: string;

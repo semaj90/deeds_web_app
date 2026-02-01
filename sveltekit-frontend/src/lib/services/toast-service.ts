@@ -1,5 +1,6 @@
 import { browser } from "$app/environment";
 import { writable } from "svelte/store";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Toast Service - Simple notification system // Provides user-friendly notifications for errors and success messages import { writable } from 'svelte/store'; import {  browser  } from '$app/environment'; export interface Toast { id: string, type: 'success' | 'error' | 'warning' | 'info',title: message?: string; duration?, number: timestamp}
 class ToastService { private toasts = writable<Toast[]>([]); private nextId = 1; constructor() { if (browser) { // Auto-cleanup old toasts every, 30 seconds setInterval(() => { this.cleanup()},

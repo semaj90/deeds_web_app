@@ -4,6 +4,7 @@ import type { minio, ensureBucket } from '$lib/server/minio/client';
 import type { db } from '$lib/server/db/drizzle';
 import type { poiPhotos } from '$lib/server/db/schema-postgres';
 import type { randomUUID } from 'crypto';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
  try {

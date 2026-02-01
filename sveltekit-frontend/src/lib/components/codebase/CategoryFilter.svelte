@@ -9,6 +9,7 @@
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import Filter from 'lucide-svelte/icons/filter';
 	import X from 'lucide-svelte/icons/x';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface FilterOption {
 		value: string;

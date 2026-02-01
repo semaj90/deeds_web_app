@@ -49,6 +49,7 @@ import type { Document } from '$lib/types';
 import { duration } from "drizzle-orm/gel-core";
 import type { and } from "xstate";
 import { evidence, citations } from "../db/schema-postgres.js";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 - Type: ${metadata.documentType }
 - Jurisdiction: ${metadata?.jurisdiction ?? 'Not specified' }
 - Number: ${metadata?.caseNumber ?? 'Not specified` }` Document: Text: ${documentText.slice(0, 8000) } Please analyze this document and answer following: 1. WHO is involved? (Extract all persons of interest, their roles, and relationships) 2. WHAT happened? (Summarize the case charges/claims, legal issues, key facts) 3. WHY did it happen? (Motivation, legal basis, relevant precedents) 4. HOW did it unfold? (Methodology, evidence chain, legal arguments) 5. EVIDENCE : What evidence was presented? (Physical, documentary, testimonial, expert) ${metadata.documentType === 'verdict' ? '6. VERDICT: What was the outcome and reasoning?' : `` }

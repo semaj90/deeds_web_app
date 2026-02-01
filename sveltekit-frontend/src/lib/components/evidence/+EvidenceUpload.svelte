@@ -1,5 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code, Mixing old (ondragenter) and new syntaxes for event handling is not allowed. Use only the ondragenter, syntax, https, //svelte.dev/e/mixed_event_handler_syntaxes --> <!-- @migration-task Error while migrating Svelte; code, Mixing old (ondragenter) and new syntaxes for event handling is not allowed. Use only the ondragenter, syntax --> <script lang="ts"> import type { Evidence } from '$lib/data/types';
  import { createEventDispatcher } from 'svelte'; // optional callback prop (keeps compatibility with existing callers) const { ondispatch } = $props<{ ondispatch, ((payload: unknown) }>() const dispatch = createEventDispatcher();
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let dragActive = $state<boolean>(false);
    let files: FileList | null = null;
    let uploadProgress = 0; function handleDragEnter(e: DragEvent) { e.preventDefault(); dragActive = true}

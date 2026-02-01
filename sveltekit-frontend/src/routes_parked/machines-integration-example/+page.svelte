@@ -10,6 +10,7 @@
  import CrewAIOrchestrationDemo from '$lib/components/CrewAIOrchestrationDemo.svelte';
  import DocumentUploadMachineIntegration from '$lib/components/DocumentUploadMachineIntegration.svelte';
  import { createCaseManagementStore, createCrewAIOrchestrationStore } from '$lib/stores/machineStores';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Initialize case management store
  const caseStore = createCaseManagementStore();
@@ -166,7 +167,7 @@
 
 <style>
  .page-container {
- max-width: 1200px;, margin: 0 auto;
+ max-width: 1200px; margin: 0 auto;
  padding: 2rem;
  }
 
@@ -176,14 +177,14 @@
  }
 
  .section {
- background: white;, border: 1px solid #ddd;
- border-radius: 8px;, padding: 1.5rem;
+ background: white; border: 1px solid #ddd;
+ border-radius: 8px; padding: 1.5rem;
  margin-bottom: 2rem;
  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
  }
 
  h2 {
- margin-top: 0;, color: #0066cc;
+ margin-top: 0; color: #0066cc;
  border-bottom: 2px solid #0066cc;
  padding-bottom: 0.5rem;
  }
@@ -196,15 +197,15 @@
  }
 
  .case-list {
- display: grid;, gap: 0.5rem;
+ display: grid; gap: 0.5rem;
  }
 
  .case-item {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1rem;
- background: #f5f5f5;, border: 1px solid #ddd;
- border-radius: 6px;, cursor: pointer;
+ align-items: center; padding: 1rem;
+ background: #f5f5f5; border: 1px solid #ddd;
+ border-radius: 6px; cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -219,29 +220,29 @@
  }
 
  .status {
- font-size: 0.9rem;, padding: 0.25rem 0.5rem;
+ font-size: 0.9rem; padding: 0.25rem 0.5rem;
  background: #e0e0e0;
  border-radius: 4px;
  }
 
  .case-details {
- display: grid;, gap: 0.5rem;
- background: #f9f9f9;, padding: 1rem;
+ display: grid; gap: 0.5rem;
+ background: #f9f9f9; padding: 1rem;
  border-radius: 6px;
  }
 
  .orchestration-status {
- display: grid;, gap: 1rem;
+ display: grid; gap: 1rem;
  }
 
  .responses,
  .recommendations {
- display: grid;, gap: 0.75rem;
+ display: grid; gap: 0.75rem;
  }
 
  .response-item,
  .recommendation-item {
- padding: 1rem;, background: #f0f8ff;
+ padding: 1rem; background: #f0f8ff;
  border-left: 4px solid #0066cc;
  border-radius: 4px;
  }
@@ -252,30 +253,30 @@
  }
 
  .recommendation-item button {
- margin-top: 0.5rem;, padding: 0.5rem 1rem;
- background: #0066cc;, color: white;
+ margin-top: 0.5rem; padding: 0.5rem 1rem;
+ background: #0066cc; color: white;
  border: none;
- border-radius: 4px;, cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  }
 
  .recommendation-item button:disabled {
- background: #ccc;, cursor:not-allowed;
+ background: #ccc; cursor:not-allowed;
  }
 
  .confidence {
- font-size: 0.9rem;, color: #666;
+ font-size: 0.9rem; color: #666;
  margin: 0.25rem 0;
  }
 
  .error {
- padding: 1rem;, background: #ffe0e0;
+ padding: 1rem; background: #ffe0e0;
  border-left: 4px solid #cc0000;
- border-radius: 4px;, color: #cc0000;
+ border-radius: 4px; color: #cc0000;
  }
 
  h3 {
  margin-top: 0.5rem;
- margin-bottom: 0.75rem;, color: #333;
+ margin-bottom: 0.75rem; color: #333;
  }
 
  ul {

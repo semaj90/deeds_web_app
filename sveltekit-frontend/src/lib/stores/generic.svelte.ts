@@ -1,4 +1,5 @@
 import type { AsyncState } from '../types/generics';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Generic Store Base Class (Svelte 5 Runes)

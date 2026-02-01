@@ -19,6 +19,7 @@
 	import TooltipRoot from './TooltipRoot.svelte';
 	import TooltipTrigger from './TooltipTrigger.svelte';
 	import type { TooltipContentProps, TooltipRootProps } from './types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 	/**
 	 * Convenient all-in-one Tooltip component

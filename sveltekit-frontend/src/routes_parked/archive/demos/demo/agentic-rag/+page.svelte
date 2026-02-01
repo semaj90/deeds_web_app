@@ -27,6 +27,7 @@ import { Tool } from "lucide-svelte";
 import { Database } from "lucide-svelte";
 import { Search } from "lucide-svelte";
 import { Upload } from "lucide-svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // State using Svelte, 5 runes
  let query = $state <string>('');
@@ -142,7 +143,7 @@ import { Upload } from "lucide-svelte";
 
 <style>
  .agentic-rag-demo {
- background: #212529;, color: #d4af37;
+ background: #212529; color: #d4af37;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 

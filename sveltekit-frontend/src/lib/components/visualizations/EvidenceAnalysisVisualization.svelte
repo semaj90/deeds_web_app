@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Correlation, EvidenceAnalysis, Finding } from '$lib/services/ai-evidence-analyzer';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Chart is dynamically imported in the browser to avoid TS/build errors / SSR issues
   let Chart: any = null;

@@ -1,4 +1,5 @@
 import type { Case } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Type definitions for Enhanced Vector Search Service // Legal AI Platform - Vector Similarity Search Types export interface VectorSearchResult { results: Array<{
 	id: string, content: string, metadata: { [key: string]: unknown } similarity: number, score, number}>; totalResults: number, queryTime: number, searchStrategy: string, indexUsed: string, threshold: number, embedding: {
 	dimensions: number, model: string, format: string} }

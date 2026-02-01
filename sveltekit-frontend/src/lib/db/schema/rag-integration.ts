@@ -17,6 +17,7 @@ import type {
 z }
 from 'zod';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 eq }
 from 'drizzle-orm';
 // Cases table for organizing documents export const cases = pgTable('cases', {

@@ -1,5 +1,7 @@
 <!-- Enhanced Claude Inline Suggestion Loop Real-time AI-powered editing with mini text box, suggestions --> <script lang="ts"> // Migrated to $effect
  import { interpret, type Snapshot, type Interpreter } from 'xstate'; // switched to interpret + Interpreter import { aiProcessingMachine } from '$lib/machines/ai-processing-machine'; // Adjusted path import { createAITask } from '$lib/utils/ai-task-helpers'; // Adjusted path import { enhancedRAGStore } from '$lib/stores/enhanced-rag-store'; // Adjusted path import { debounce } from 'lodash-es'; // Ensure lodash-es and @types/lodash-es are installed import { getOllamaApiUrl } from '$lib/utils/ollama-helpers'; // Import the new helper // Props using Svelte, 5 $props()  let {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     value = $bindable(''),
     placeholder = 'Start typing to get AI suggestions...',
     aiModel = 'gemma3-legal',

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { clientGemmaInference } from '$lib/ai/client-gemma-inference';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	let isInitialized = $state(false);

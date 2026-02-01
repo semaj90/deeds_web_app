@@ -1,6 +1,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import type { IQdrantVectorService } from '$lib/types/external-services';
 import { env } from '$env/dynamic/private';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const client = new QdrantClient({ url: env?.QDRANT_URL ?? 'http://localhost:6333' });
 const COLLECTION = env?.QDRANT_COLLECTION ?? 'legal-documents';

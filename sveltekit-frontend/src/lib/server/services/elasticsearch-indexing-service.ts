@@ -1,4 +1,5 @@
 import { env } from '$lib/env';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Correct environment variable access
 const ELASTICSEARCH_URL = env?.ELASTICSEARCH_URL ?? 'http://localhost:9200';

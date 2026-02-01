@@ -13,6 +13,7 @@
   import Trash2 from 'lucide-svelte/icons/trash-2';
   import Users from 'lucide-svelte/icons/users';
   import { scale } from 'svelte/transition';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface CaseData {
     id: string;

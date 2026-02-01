@@ -6,6 +6,8 @@ import { isPostgreSQL } from '../db/client';
 import { db } from '../db/index';
 import { redisService } from '../redis-service.js';
 import type { ollamaService } from '../services/OllamaService';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Import dependencies with fallbacks
 let qdrant: any = null;

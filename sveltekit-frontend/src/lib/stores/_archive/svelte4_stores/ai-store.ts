@@ -5,6 +5,7 @@
 
 import { writable, derived } from 'svelte/store';
 import type { LegalIntent } from '$lib/ai/intents';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AIMessage {
  id: string;

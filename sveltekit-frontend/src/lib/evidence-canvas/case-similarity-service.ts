@@ -4,6 +4,7 @@
  */
 
 import type { gpuGraphLayout } from './graph-layout-gpu.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface EvidenceNode {
  id: string;

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Progress as ProgressPrimitive } from 'bits-ui';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     value?: number
     max?: number

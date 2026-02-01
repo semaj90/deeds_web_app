@@ -16,6 +16,7 @@ import {
     systemApi,
 } from '$lib/services/api-client';
 import { writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Store Types
 export interface AppState {

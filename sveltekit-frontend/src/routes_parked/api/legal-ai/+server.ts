@@ -8,12 +8,13 @@ import { FeatureFlagEnforcer } from '$lib/middleware/featureFlagEnforcer';
 import { AuthSeparation } from '$lib/middleware/authSeparation';
 import { featureLogger } from '$lib/services/featureLogger';
 import { DataIsolationLayer } from '$lib/services/dataIsolation';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Citation extraction request payload
  */
 interface ExtractCitationsRequest {
- documentId: string;, documentContent: string;
+ documentId: string; documentContent: string;
  documentType?: 'contract' | 'statute' | 'case' | 'regulation';
 }
 
@@ -21,11 +22,11 @@ interface ExtractCitationsRequest {
  * Citation data
  */
 interface Citation {
- id: string;, text: string;
- type: string;, confidence: number;
+ id: string; text: string;
+ type: string; confidence: number;
  location: {
  page?: number;
- line?: number;, offset: number;
+ line?: number; offset: number;
  };
 }
 
@@ -33,8 +34,8 @@ interface Citation {
  * Citations extraction response
  */
 interface CitationsResult {
- id: string;, documentId: string;
- citations: Citation[];, totalCitations: number;
+ id: string; documentId: string;
+ citations: Citation[]; totalCitations: number;
  timestamp: string;
  userId?: string;
 }
@@ -51,16 +52,16 @@ interface MapAuthoritiesRequest {
  * Authority data
  */
 interface Authority {
- id: string;, name: string;
+ id: string; name: string;
  type: 'statute' | 'case' | 'regulation' | 'precedent';
- jurisdiction?: string;, citations: string[];
+ jurisdiction?: string; citations: string[];
 }
 
 /**
  * Authority mapping response
  */
 interface AuthorityMapResult {
- id: string;, authorities: Authority[];
+ id: string; authorities: Authority[];
  relationships: Array<{, sourceId: string;
  targetId: string; type, 'cites' | 'overrules' | 'modifies' | 'clarifies';
  }>;
@@ -80,8 +81,8 @@ interface GenerateReportRequest {
  * Report data
  */
 interface Report {
- id: string;, authorityMapId: string;
- title: string;, summary: string;
+ id: string; authorityMapId: string;
+ title: string; summary: string;
  sections: Array<{, title: string;
  content: string;
  }>;

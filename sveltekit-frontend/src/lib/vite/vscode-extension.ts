@@ -3,6 +3,7 @@
 
 import { existsSync, readFileSync, watchFile } from 'fs';
 import { resolve } from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface VSCodeCommand {
   command: string;

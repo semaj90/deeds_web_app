@@ -4,6 +4,7 @@
  */
 import { cache } from '$lib/cache/cache-service.svelte';
 import type { PageLoad } from './$types';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageLoad = async ({ data, fetch }) => {
 	const cacheKey = 'cases-list';

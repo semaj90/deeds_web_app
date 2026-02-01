@@ -1,4 +1,5 @@
 import { get } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /**
  * Knowledge Search Store - Svelte 5 Barrel Export
  *

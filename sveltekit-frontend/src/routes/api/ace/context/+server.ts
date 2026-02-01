@@ -8,6 +8,7 @@ import type { ContextFilters } from '$lib/services/ace-web/ace-context-service';
 import { AceContextService } from '$lib/services/ace-web/ace-context-service';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET /api/ace/context

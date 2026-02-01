@@ -7,6 +7,7 @@ import { db } from '../db/index.js';
 import { cases, evidence } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 import { getOllamaEndpoint } from './endpoints.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface EmbeddingOptions {
 	model?: string;

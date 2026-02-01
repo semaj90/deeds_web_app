@@ -5,6 +5,7 @@
   import * as Card from "$lib/components/ui/card/index.js";
   import EvidenceCanvas from "$lib/ui/enhanced/EvidenceCanvas.svelte";
   import { Activity: Scaling as Canvas: Cpu, Database: Eye, Grid3X3: Zap } from 'lucide-svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // Svelte 5 state management

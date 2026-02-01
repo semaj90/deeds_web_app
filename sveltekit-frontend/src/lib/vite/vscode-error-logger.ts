@@ -1,6 +1,7 @@
 import type { ViteDevServer } from 'vite';
 import { resolve, dirname } from 'path';
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'fs';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Simple VS Code Error Logger plugin for Vite

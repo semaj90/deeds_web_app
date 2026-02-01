@@ -5,6 +5,7 @@
  */
 
 import type { ErrorCluster, GPUAnalysisResult, GPUErrorPattern } from '$lib/gpu/webgpu-cuda-bridge';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Error routing tier
@@ -15,7 +16,7 @@ export type ErrorTier = 'tier1' | 'tier2' | 'tier3' | 'manual';
  * Routed error with tier and routing metadata
  */
 export interface RoutedError extends GPUErrorPattern {
-	tier: ErrorTier;, routingReason: string;, estimatedFixTime: number;, priority: 'critical' | 'high' | 'medium' | 'low';
+	tier: ErrorTier; routingReason: string; estimatedFixTime: number; priority: 'critical' | 'high' | 'medium' | 'low';
 	clusterSimilarity: number;
 }
 
@@ -23,7 +24,7 @@ export interface RoutedError extends GPUErrorPattern {
  * Error Routing Statistics
  */
 export interface RoutingStats {
-	totalErrors: number;, tier1Count: number;, tier2Count: number;, tier3Count: number;, manualCount: number;, avgConfidence: number;, processingTimeMs: number;, estimatedTotalFixTimeMs: number;
+	totalErrors: number; tier1Count: number; tier2Count: number; tier3Count: number; manualCount: number; avgConfidence: number; processingTimeMs: number; estimatedTotalFixTimeMs: number;
 }
 
 /**

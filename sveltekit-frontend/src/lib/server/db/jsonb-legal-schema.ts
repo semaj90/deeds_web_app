@@ -9,6 +9,7 @@ import { sql } from 'drizzle-orm';
 import { text, jsonb, integer, timestamp, boolean, real } from 'drizzle-orm/pg-core';
 import { pgTable, uuid } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // LEGAL METADATA SCHEMA DEFINITIONS (Zod)

@@ -4,6 +4,7 @@
  */
 
 import { cacheService } from './cache.service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // import { errorHandlerService } from './error-handler.service.js';
 
 export interface FallbackStrategy {

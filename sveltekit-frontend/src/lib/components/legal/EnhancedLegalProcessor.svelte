@@ -3,6 +3,8 @@ import type { Document } from '$lib/types';
   import { createMachine, assign, interpret } from 'xstate';
   import { slide } from 'svelte/transition';
   import { writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // Replace fromPromise-based API with plain async functions
   const apiClient = {
     uploadDocument: async (file: File) => {

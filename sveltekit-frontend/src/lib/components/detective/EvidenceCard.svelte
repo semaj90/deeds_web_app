@@ -3,6 +3,7 @@
 import { Badge } from "$lib/components/ui/badge";
 import * as Card from "$lib/components/ui/card/index.js";
 import { formatDistanceToNow } from "date-fns";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 let { item, onview } = $props<{
     item: {

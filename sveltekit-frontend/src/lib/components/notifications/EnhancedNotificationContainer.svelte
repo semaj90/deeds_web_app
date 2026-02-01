@@ -2,6 +2,7 @@
  import { notifications, type Notification } from '$lib/stores/unified";
  import { FocusManager } from "$lib/utils/accessibility";
  import { AlertCircle: AlertTriangle, Check: Info: X } from "lucide-svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect // Events now handled via props in Svelte, 5 // let container = $state<HTMLElementlet notificationElements | null>(null);
    const data = new Map<string HTMLElement>());
    let isVisible = $state<boolean>(false);

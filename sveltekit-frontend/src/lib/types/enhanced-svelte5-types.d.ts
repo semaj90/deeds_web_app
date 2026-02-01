@@ -12,6 +12,8 @@
  */
 
 import type { Snippet } from 'svelte';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // SVELTE 5 RUNES - Official TypeScript Patterns

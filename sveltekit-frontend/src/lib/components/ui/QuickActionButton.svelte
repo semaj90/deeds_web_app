@@ -2,6 +2,7 @@
   import { getOllamaGenerateEndpoint } from '$lib/utils/ollama';
 
   import { browser } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     label: string;
 	model: string;

@@ -3,6 +3,7 @@ import db from '$lib/server/db';
 import { errorBrainAnalysisTable } from '$lib/server/db/schema/error_brain_analysis';
 import { routeErrorPatchesTable } from '$lib/server/db/schema/route_error_patches';
 import { eq, desc } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ params, url }) => {
  try {

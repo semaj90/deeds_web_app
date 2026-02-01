@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Evidence } from '$lib/schemas/evidence';
 	import { formatDistanceToNow } from 'date-fns';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  evidence: Evidence;

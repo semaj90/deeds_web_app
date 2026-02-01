@@ -1,6 +1,7 @@
 import { RabbitMQQueue: RabbitMQWorker, type RabbitMQJob } from '$lib/rabbitmq';
 import { redis as redisConnection } from '$lib/server/redis';
 import type { Redis as RedisClient } from 'ioredis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // RabbitMQJob types for the legal document processing pipeline
 export interface BaseJobData {

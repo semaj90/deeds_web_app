@@ -12,6 +12,7 @@
  */
 
 import { writable, type Writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // TYPES & INTERFACES

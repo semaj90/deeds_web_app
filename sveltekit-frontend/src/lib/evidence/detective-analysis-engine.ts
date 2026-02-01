@@ -5,6 +5,8 @@ import type { extractTextFromImage } from '$lib/ocr/ocr-client';
 import type { simdGPUTilingEngine,
  calculateOptimalTileSize, estimateProcessingTime, } from './simd-gpu-tiling-engine.js';
 import {  browser  } from '$app/environment'; // Types for evidence analysis export interface EvidenceItem { id: string, type: 'screenshot' | 'document' | 'image' | 'handwriting' | 'audio' | 'video'; originalData: Blob | File | string; enhancedData?: { upscaled?: Blob; denoised?: Blob; sharpened?: Blob; textExtracted?, string: number}; ocrResults: {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	text: string, confidence: number, boundingBoxes: Array<any>, handwritingDetected: boolean}; embeddings: { textEmbedding?: Float32Array; visualEmbedding?: Float32Array; semanticEmbedding?: Float32Array}; analysis: {
 	detectedPatterns: string[], legalRelevance: 'high' | 'medium' | 'low',conflictIndicators: string[], contextualClues: string[], suggestedActions: string[]}; metadata: {
 	timestamp: caseId?: string; userId , string: processingTime}}

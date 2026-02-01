@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 import type { Pool } from 'pg'; // pg-native
 import type { Writable } from 'svelte/store';
 import { writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /* ============================================
  * Types & Interfaces (consolidated)

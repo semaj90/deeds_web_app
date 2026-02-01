@@ -7,6 +7,7 @@
   import Clock from "lucide-svelte/icons/clock";
   import FileText from "lucide-svelte/icons/file-text";
   import User from "lucide-svelte/icons/user";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface CaseData {
     id: string;

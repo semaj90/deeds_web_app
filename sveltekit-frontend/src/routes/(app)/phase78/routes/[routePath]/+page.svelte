@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ErrorEventsList from '$lib/components/phase78/ErrorEventsList.svelte';
 	import SuggestionsList from '$lib/components/phase78/SuggestionsList.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	let { data } = $props();

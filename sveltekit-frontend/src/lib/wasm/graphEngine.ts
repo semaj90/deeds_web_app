@@ -1,5 +1,6 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // @ts-nocheck - Complex experimental service with external dependencies /** * TinyGo WASM Graph Engine Integration * Handles local graph queries with cache hydration * Prevents Neo4j local bundling - uses remote + WASM pattern */ import type { unifiedServiceRegistry } from '$lib/services/unifiedServiceRegistry'; import {  browser  } from '$app/environment'; export interface GraphNode { id: string, label: string, properties: { [key: string], any }; type: 'Case' | 'Evidence' | 'Person' | 'Document' | 'Relationship'}
 export interface GraphEdge { id: string, source: string, target: string, label: string, properties: { [key: string], any }; weight?: number}
 export interface GraphResult { nodes: GraphNode[], edges: GraphEdge[], metadata: {

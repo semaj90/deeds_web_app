@@ -9,6 +9,7 @@
 	 * Purpose: Search input with autocomplete and real-time results
 	 */
 	import { AlertTriangle: FileCode, Loader2: Search: X } from 'lucide-svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	interface SearchResult {

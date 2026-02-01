@@ -2,6 +2,8 @@
 <!-- Interactive canvas for evidence visualization with YoRHa styling -->
 <script lang="ts">
   import type { EnhancedNeuralSpriteEngine } from '$lib/engines/neural-sprite-engine-enhanced';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Props
   interface Props {

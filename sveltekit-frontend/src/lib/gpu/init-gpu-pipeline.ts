@@ -1,4 +1,5 @@
 import shaderCache from './webgl-shader-cache.js';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 export interface GPUInitResult {
 gl?: WebGL2RenderingContext;
 adapter?: GPUAdapter;

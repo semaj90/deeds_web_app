@@ -18,6 +18,7 @@ import type {
 YORHA_COLORS }
 from './YoRHaUI3D.js';
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 EventEmitter }
 from 'events';
 export class YoRHaUIExample {

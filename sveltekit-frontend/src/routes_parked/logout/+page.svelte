@@ -1,6 +1,7 @@
 <script lang="ts">
  // Migrated to $effect
  import type { goto, invalidateAll } from '$app/navigation';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  $effect(() => {
 

@@ -1,5 +1,6 @@
 import { env as privateEnv } from '$env/dynamic/private';
 import type { EnhancedEnv } from './env-enhanced.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const nodeEnv = typeof process !== 'undefined' ? (process.env as Record<string, string | undefined>) : undefined;
 

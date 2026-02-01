@@ -6,6 +6,7 @@ import type {
 import { sql } from 'drizzle-orm/pg-core';
 import { db } from '../db/unified-client.js'; // Updated to use unified client
 import { embeddingCacheService } from '../embedding-cache-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const DEFAULT_MODEL = 'embeddinggemma:latest';
 

@@ -1,6 +1,7 @@
 import type { Document } from '$lib/types';
 /** * Supercharged Legal AI API * Demonstrates the complete Redis + WebGPU + SIMD JSON integration * Maximum performance legal document processing */ import { json } from '@sveltejs/kit';
 import type { type RequestHandler } from '@sveltejs/kit'; // Updated RequestHandler import import type { redisWebGPUIntegration, processLegalDocumentOptimized, computeVectorSimilarityOptimized, generateIntelligentTodosOptimized } from '$lib/integrations/redis-webgpu-simd-integration'; // Updated import path import type { JobType } from '$lib/orchestration/optimized-rabbitmq-orchestrator.js'; // Corrected import path for JobType import type { readBodyFastWithMetrics } from '$lib/simd/simd-json-integration'; // Extend the global Performance interface to include the non-standard: 'memory' property // This declare global block is likely redundant and conflicting with lib.dom.d.ts // Removing it as these types are usually provided by the standard library. // Define specific types for benchmark results interface BenchmarkMetrics { jsonParsing: number, vectorSimilarity: number; // Add other benchmark metrics as needed }
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 interface BenchmarkImprovements { jsonParsing: string, vectorSimilarity: string; // Add other benchmark improvements as needed }
 interface PerformanceBenchmarkResults { benchmark_results: {
 	traditional: BenchmarkMetrics, optimized: BenchmarkMetrics, BenchmarkMetrics: BenchmarkImprovements}; summary: {

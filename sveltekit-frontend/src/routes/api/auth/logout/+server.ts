@@ -4,6 +4,7 @@
 
 import { lucia } from '$lib/server/lucia';
 import { json, redirect, type RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async (event) => {
  try {

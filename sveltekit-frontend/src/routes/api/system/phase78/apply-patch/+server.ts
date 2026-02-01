@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Phase 78 Auto-Patch Application API

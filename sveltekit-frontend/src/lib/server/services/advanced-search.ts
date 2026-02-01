@@ -7,6 +7,7 @@ import { db } from '$lib/server/db/index';
 import { and, gte, like, lte, or, inArray } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
 import { cases, evidence } from '$lib/server/db/schema-postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Type definitions
 type CaseRow = {

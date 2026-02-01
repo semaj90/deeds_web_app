@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { spawn } from 'child_process';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Phase 89: Pipeline API Endpoint
 // Triggers CUDA clustering pipeline with real-time progress

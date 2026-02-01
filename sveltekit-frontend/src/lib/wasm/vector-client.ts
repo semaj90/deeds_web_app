@@ -3,6 +3,8 @@
  * Handles client-side WASM optimization with server-side CUDA fallback
  */
 import type { VectorSimilarityRequest } from '../types/vector-types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface WasmModule {
     memory: WebAssembly.Memory;

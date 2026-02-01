@@ -9,6 +9,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const QDRANT_URL = env?.QDRANT_URL ?? 'http://localhost:6333';
 const FASTAPI_URL = env?.FASTAPI_URL ?? 'http://localhost:8090';

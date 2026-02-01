@@ -5,6 +5,7 @@
  */
 import { env } from '$env/dynamic/private';
 import { ensureRedisReady, redis } from '$lib/server/redis-client';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type ActionType = string; // e.g., 'open:123', 'hover:123', 'search:term|indemnification'
 

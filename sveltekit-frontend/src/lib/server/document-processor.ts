@@ -6,6 +6,7 @@ import { isDoclingAvailable, processWithDocling } from '$lib/server/docling.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js'; // Assuming this exists or will be fixed
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface DocumentProcessingResult {
     text: string;

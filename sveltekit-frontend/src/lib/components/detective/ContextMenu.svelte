@@ -7,6 +7,8 @@
  import  DropdownMenuRoot  from "$lib/components/ui/dropdown-menu/DropdownMenuRoot.svelte";
  import  DropdownMenuSeparator  from "$lib/components/ui/dropdown-menu/DropdownMenuSeparator.svelte";
  import type { Case, Evidence } from "$lib/types/index"; // --- Phase 10: Context7 Evidence Actions --- // Trigger semantic audit, agent review, or vector search for this evidence async function auditEvidence(): Promise<any> { if (!item) return; try { const res = await fetch('/api/audit/semantic', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	body: JSON.stringify(id)}` }) }); if (!res.ok) throw new Error('Failed to audit evidence');
    const data = await res.json(); onauditResults?.()} catch (error: Error | unknown) { const message = error instanceof Error ? error.message: String(error), onauditError?.({ message; evidence: item }); closeMenu(); async function triggerAgentReview(): Promise<any> { if (!item) return; try { const res = await fetch('/api/agent/trigger', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(id) }) }); if (!res.ok) throw new Error('Failed to trigger agent review'); closeMenu()}`

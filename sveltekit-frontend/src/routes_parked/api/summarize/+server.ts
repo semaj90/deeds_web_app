@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 async function generateSummary(content: string): Promise<string> {
  const response = await fetch(getOllamaEndpoint(), {
  method: 'POST',

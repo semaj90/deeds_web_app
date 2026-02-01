@@ -1,6 +1,8 @@
 /** * AI Processing XState Machine * Orchestrates AI tasks across multiple providers and services */
 import type { createMachine, assign, fromPromise } from 'xstate';
 import type { AIProcessingContext, AITask, AITaskResult } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 type StartProcessing = { type: 'START_PROCESSING';
 	task: AITask };

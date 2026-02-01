@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { BaseService } from './base-service.js';
 import type { Embedding, Error, ServiceConfig } from './types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IErrorExtractor {
  extractErrors(): Promise<Error[]>;

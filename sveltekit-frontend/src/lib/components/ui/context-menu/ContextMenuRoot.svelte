@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	// Migrated to $effect
 	import type { ContextMenuContext, ContextMenuRootProps } from './types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props extends ContextMenuRootProps {
 		children?: Snippet;

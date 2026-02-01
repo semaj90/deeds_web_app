@@ -1,8 +1,9 @@
 import { browser } from '$app/environment';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 import type { PageLoad } from './$types.js';
 
 // Dynamically import cache service
-let cacheService: any = null;
+let cacheService: CachingTypes.UnifiedCache<unknown> | null = null;
 if (browser) {
     import('$lib/cache/cache-service.svelte').then(mod => {
         cacheService = mod.cache;

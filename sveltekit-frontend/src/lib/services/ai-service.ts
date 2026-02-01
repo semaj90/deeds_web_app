@@ -2,6 +2,7 @@ import OllamaService from '$lib/services/ollamaService.js';
 import crypto from 'crypto';
 import { sql } from 'drizzle-orm';
 import { generateIdFromEntropySize } from 'lucia';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type DbClient = {
   execute: (query: unknown) => Promise<unknown>;

@@ -2,6 +2,7 @@
 	// Migrated to $effect
 	import LawModal from './LawModal.svelte';
 	import LegalAutocomplete from './LegalAutocomplete.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface TimelineEvent {
 		id: string;

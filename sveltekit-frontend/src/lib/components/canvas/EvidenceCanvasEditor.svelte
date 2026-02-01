@@ -289,6 +289,9 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
  import  CardContent  from "$lib/components/ui/card/CardContent.svelte";
  import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte";
  import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	x: number, y: number, width: number, height: number }}
 
 interface CanvasState { id?: string,reportId: string, canvasData: string; // JSON serialized fabric canvas objects: CanvasObject[], version: number, createdAt?: Date; updatedAt?: Date}

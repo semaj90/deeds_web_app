@@ -2,6 +2,7 @@
  import { goto } from '$app/navigation';
  import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
  import type { appActions, appStore } from '$lib/stores/app-store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // REMOVED: // Migrated to $effect
 // REMOVED:
  // YoRHaModalComponent is being replaced by bits-ui Dialog

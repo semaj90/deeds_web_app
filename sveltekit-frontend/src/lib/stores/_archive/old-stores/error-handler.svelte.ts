@@ -3,6 +3,7 @@ import { User } from '$lib/types';
 import { Case } from '$lib/types';
 import { Document } from '$lib/types';
 import { browser } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ErrorDetails {
 id: string; code?: string;

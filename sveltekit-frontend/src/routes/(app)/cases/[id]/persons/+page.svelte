@@ -1,5 +1,6 @@
 <script lang="ts">
  import { page } from '$app/state';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let id = $derived(page.params.id);
  let persons = $state<any[]>([]);

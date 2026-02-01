@@ -1,5 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // Props from server load

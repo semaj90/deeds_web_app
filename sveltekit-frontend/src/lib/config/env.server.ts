@@ -1,5 +1,6 @@
 import { env } from '$lib/env';
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Determine if running in a Docker environment
 const isDocker = env.DOCKER_ENV === 'true';

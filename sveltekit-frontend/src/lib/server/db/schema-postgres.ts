@@ -19,6 +19,7 @@ import {
     varchar,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm/relations';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Note: vector type is handled via sql`` template in table definitions
 

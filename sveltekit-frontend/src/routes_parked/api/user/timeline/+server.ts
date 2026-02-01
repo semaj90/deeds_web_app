@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { getUserTimeline, formatTimelineEvent } from '$lib/server/timeline-logger';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
  if (!locals.user?.id) {

@@ -4,6 +4,7 @@
 
 import { writable, derived } from 'svelte/store';
 import type { UploadState, ProcessingEvent } from '../services/types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Initial state
 const initialState: UploadState = {

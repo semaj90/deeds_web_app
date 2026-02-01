@@ -1,6 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/components/ui/checkbox/Checkbox.svelte';
   import SelectBits from '$lib/components/ui/select/SelectBits.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   let selectedCase = $state('');
   let selectedPoi = $state('');

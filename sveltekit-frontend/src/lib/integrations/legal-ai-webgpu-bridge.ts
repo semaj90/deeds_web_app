@@ -1,5 +1,7 @@
 import type { LegalAIProfile } from '$lib/utils/typed-array-quantization.js';
 import { WebGPUBufferUploader } from '$lib/utils/webgpu-buffer-uploader.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Legal AI WebGPU Integration Bridge

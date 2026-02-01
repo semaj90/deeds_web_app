@@ -5,6 +5,8 @@ import type { string } from "fast-check";
 import { text } from "stream/consumers";
 import type { s } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js";
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 } }
 // Glyph generation request export interface GlyphRequest { evidence_id: number, prompt: string, style: 'detective' | 'corporate' | 'forensic' | 'legal',dimensions: [number, number], seed?: number conditioning_tensors?: string[]; // IDs of cached tensors to reuse neural_sprite_config?: {
 	enable_compression: boolean, predictive_frames: number, ui_layout_compression: target_compression_ratio?: number} }

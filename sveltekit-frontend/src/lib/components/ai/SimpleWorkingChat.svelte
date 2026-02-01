@@ -14,6 +14,7 @@
   import  Badge  from "$lib/components/ui/badge/Badge.svelte";
   import  Separator  from "$lib/components/ui/separator/Separator.svelte";
   import  ScrollArea  from "$lib/components/ui/scroll-area/ScrollArea.svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Svelte, 5 runes for state management
   let messages = $state<any[]>([]);
   let inputMessage = $state<string>('');
@@ -209,7 +210,7 @@
     animation: bounce 1s infinite}
   @keyframes bounce {
     0%; } 100% {
-      transform: translateY(-25%),
+      transform: translateY(-25%);
       animation-timing-function cubic-bezier(0.8, 0, 1, 1)}
     50% {
       transform: none

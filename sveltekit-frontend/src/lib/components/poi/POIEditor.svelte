@@ -8,6 +8,7 @@
   import Save from 'lucide-svelte/icons/save';
   import X from 'lucide-svelte/icons/x';
   import POIPhotoGrid from './POIPhotoGrid.svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface POI {
     name: string;

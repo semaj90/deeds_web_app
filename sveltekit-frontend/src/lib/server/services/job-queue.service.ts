@@ -7,6 +7,7 @@ import amqp, { type Connection, type Channel } from 'amqplib';
 import { db } from '$lib/server/db';
 import { processingJobs } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface JobPayload {
 	caseId: string;

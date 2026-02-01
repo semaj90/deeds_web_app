@@ -1,4 +1,5 @@
 import { topKSimilar } from './webgl-shader-cache.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface PalaceNode {
  id: string;

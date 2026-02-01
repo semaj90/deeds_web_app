@@ -8,6 +8,7 @@
  */
 
 import type { RequestHandler } from './$types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Store active SSE connections
 const connections = new Set<ReadableStreamDefaultController>();

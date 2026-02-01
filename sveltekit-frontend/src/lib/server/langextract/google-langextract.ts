@@ -1,5 +1,6 @@
 // This module uses Google's Gemma model, served locally via Ollama.
 import { OLLAMA_BASE_URL } from '$env/static/private';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Extract keywords from text using Ollama

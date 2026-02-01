@@ -1,311 +1,178 @@
 /**
  * Adaptive Index Orchestrator
- * Routes embedding and indexing operations based on system load and neural router predictions
+ * Manages dynamic indexing of legal documents based on usage patterns
+ * Phase 72 - Task 6
  */
 
-import { getOllamaEndpoint } from '$lib/utils/ollama-utils';
+import { EventEmitter } from 'events';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-// Configuration interface
-interface ExtendedConfig {
-  OLLAMA_URL: string;
-  TRITON_URL: string;
-  QDRANT_URL: string;
-  REDIS_URL: string;
-  REDIS_PASSWORD: string;
-  NEO4J_URL: string;
-  NEO4J_USER: string;
-  RABBITMQ_URL?: string;
-  MINIO_URL?: string;
-  MINIO_ACCESS_KEY?: string;
-  MINIO_SECRET_KEY?: string;
-  CADDY_URL?: string;
-  POSTGRES_URL?: string;
-  CACHE_EMBEDDING_TTL_SEC: number;
-  GPU_EMBEDDING_MODEL?: string;
-  QUIC_ENABLED?: boolean;
-  AUTO_STORE_PGVECTOR?: boolean;
-  ENABLE_EMBEDDING_REDIS?: boolean;
-  ENABLE_QDRANT_UPSERT?: boolean;
-  QDRANT_COLLECTION_NAME?: string;
+// Types
+export interface IndexConfig {
+  name: string;
+  type: 'vector' | 'keyword' | 'hybrid';
+  fields: string[];
+  dimensions?: number;
+  options?: Record<string, unknown>;
 }
 
-// Routing decision type
-export type RoutingDecision = 'gpu' | 'quic' | 'cache' | 'cpu';
-
-// Router input features
-interface RouterInputFeatures {
-  queryLatencyMs: number;
-  userFeedbackScore: number;
-  embeddingCostUsd: number;
-  gpuLoadPercent: number;
-  similarityScoreVariance: number;
-  cacheHitRate: number;
-  fileSizeKb: number;
-  docType: 'document' | 'evidence' | 'query';
-  vectorDensity: number;
-  ragConfidence: number;
-  textLength: number;
-  caseId: string;
-  currentVectorCount: number;
+export interface IndexStats {
+  documentCount: number;
+  sizeBytes: number;
+  lastUpdated: number;
+  queryCount: number;
+  avgLatencyMs: number;
 }
 
-// Router output logits
-interface RoutingLogits {
-  useGpu: number;
-  useCpu: number;
-  useQuic: number;
-  useRest: number;
-  cacheHit: number;
-  reindex: number;
-  useQdrantForStorage: number;
-  usePgVectorForStorage: number;
+export interface OrchestratorConfig {
+  maxIndices: number;
+  autoOptimize: boolean;
+  minUsageThreshold: number;
 }
 
-// Embedding orchestration payload
-interface EmbeddingOrchestrationPayload {
-  id: string;
-  caseId: string;
-  type: 'document' | 'evidence' | 'query';
-  text: string;
-  title: string;
-  metadata?: Record<string, unknown>;
-}
+export class AdaptiveIndexOrchestrator extends EventEmitter {
+  private indices: Map<string, IndexConfig> = new Map();
+  private stats: Map<string, IndexStats> = new Map();
+  private config: OrchestratorConfig;
 
-// Document upsert payload
-interface DocumentUpsertPayload {
-  id: string;
-  caseId: string;
-  type: 'document' | 'evidence' | 'query';
-  title: string;
-  content: string;
-  embedding: number[];
-  timestamp: string;
-  [key: string]: unknown;
-}
-
-export class AdaptiveIndexOrchestrator {
-  private ollamaUrl: string;
-  private qdrantUrl: string;
-
-  constructor() {
-    this.ollamaUrl = getOllamaEndpoint();
-    this.qdrantUrl = process.env?.QDRANT_URL ?? 'http://localhost:6333';
-  }
-
-  /**
-   * Decide routing based on context
-   */
-  async decideRouting(context: {
-    caseId: string;
-    fileSize: number;
-    textLength: number;
-  }): Promise<RoutingDecision> {
-    // Simple heuristic-based routing
-    if (context.fileSize > 1024 * 256) return 'gpu';
-    if (context.textLength > 10000) return 'gpu';
-    return 'cpu';
-  }
-
-  /**
-   * Record outcome for learning
-   */
-  async recordOutcome(taskId: string, success: boolean, latency: number): Promise<void> {
-    console.log(`Task ${taskId}: success=${success}, latency=${latency}ms`);
-  }
-
-  /**
-   * Predict routing using neural router
-   */
-  public async predictRouting(features: RouterInputFeatures): Promise<RoutingLogits> {
-    const start = performance.now();
-
-    // Default routing logits
-    const routingLogits: RoutingLogits = {
-      useGpu: 0.5,
-      useCpu: 0.5,
-      useQuic: 0.1,
-      useRest: 0.9,
-      cacheHit: 0.3,
-      reindex: 0.1,
-      useQdrantForStorage: 0.1,
-      usePgVectorForStorage: 0.9,
+  constructor(config?: Partial<OrchestratorConfig>) {
+    super();
+    this.config = {
+      maxIndices: config?.maxIndices ?? 10,
+      autoOptimize: config?.autoOptimize ?? true,
+      minUsageThreshold: config?.minUsageThreshold ?? 100,
     };
-
-    try {
-      // Construct prompt for Gemma 3
-      const prompt = `Given the following system metrics for case ${features.caseId}:
-- Latency: ${features.queryLatencyMs}ms
-- Feedback: ${features.userFeedbackScore}
-- Cost: ${features.embeddingCostUsd}
-- GPU Load: ${features.gpuLoadPercent}%
-- Variance: ${features.similarityScoreVariance}
-- Cache Rate: ${features.cacheHitRate}
-- Size: ${features.fileSizeKb}KB
-- Type: ${features.docType}
-- Density: ${features.vectorDensity}
-- Confidence: ${features.ragConfidence}
-- Length: ${features.textLength}
-- Vector Count: ${features.currentVectorCount}
-
-Predict optimal routing probabilities as JSON:
-{"useGpu": 0.X, "useCpu": 0.X, "useQuic": 0.X, "useRest": 0.X, "cacheHit": 0.X, "reindex": 0.X, "useQdrantForStorage": 0.X, "usePgVectorForStorage": 0.X}`;
-
-      const url = `${this.ollamaUrl}/api/generate`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gemma3',
-          prompt,
-          options: {
-            temperature: 0.1,
-            num_ctx: 4096,
-          },
-          stream: false,
-        }),
-      });
-
-      const data = await res.json();
-      const responseText = data?.response as string;
-
-      // Parse JSON from response
-      const jsonMatch = responseText?.match(/\{[^}]+\}/);
-      if (jsonMatch) {
-        try {
-          const parsedLogits = JSON.parse(jsonMatch[0]) as Partial<RoutingLogits>;
-          Object.assign(routingLogits, parsedLogits);
-          console.log('Gemma-derived logits:', routingLogits);
-        } catch (parseError) {
-          console.warn('Failed to parse Gemma routing logits:', parseError);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to get routing prediction from Ollama:', e);
-    }
-
-    console.log(`Routing prediction took ${performance.now() - start}ms`);
-    return routingLogits;
   }
 
   /**
-   * Upsert embedding to Qdrant
+   * Register a new index
    */
-  private async upsertToQdrant(
-    item: EmbeddingOrchestrationPayload,
-    embedding: number[]
-  ): Promise<void> {
-    const collectionName = process.env?.QDRANT_COLLECTION_NAME ?? 'legal_docs';
-    const qdrantUpsertUrl = `${this.qdrantUrl}/collections/${collectionName}/points?wait=true`;
+  async registerIndex(config: IndexConfig): Promise<void> {
+    if (this.indices.has(config.name)) {
+      throw new Error(`Index ${config.name} already exists`);
+    }
 
-    try {
-      const response = await fetch(qdrantUpsertUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          points: [
-            {
-              id: item.id,
-              vector: embedding,
-              payload: {
-                caseId: item.caseId,
-                type: item.type,
-                title: item.title ?? '',
-                content_preview: item.text.substring(0, 500),
-                timestamp: new Date().toISOString(),
-                ...item.metadata,
-              },
-            },
-          ],
-        }),
-      });
+    if (this.indices.size >= this.config.maxIndices) {
+      await this.evictLeastUsedIndex();
+    }
 
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(`Qdrant upsert failed, ${response.status} - ${errorBody}`);
-      }
+    this.indices.set(config.name, config);
+    this.stats.set(config.name, {
+      documentCount: 0,
+      sizeBytes: 0,
+      lastUpdated: Date.now(),
+      queryCount: 0,
+      avgLatencyMs: 0,
+    });
 
-      console.log(`Embedding for ${item.type}:${item.id} upserted to Qdrant collection '${collectionName}'.`);
-    } catch (e) {
-      console.error('Failed to upsert embedding to Qdrant:', e);
-      throw e;
+    this.emit('indexRegistered', config);
+  }
+
+  /**
+   * Update index statistics
+   */
+  updateStats(indexName: string, updates: Partial<IndexStats>): void {
+    const currentStats = this.stats.get(indexName);
+    if (!currentStats) return;
+
+    this.stats.set(indexName, { ...currentStats, ...updates });
+
+    if (this.config.autoOptimize) {
+      this.checkOptimizationNeeded(indexName);
     }
   }
 
   /**
-   * Orchestrate embedding generation
+   * Record a query against an index
    */
-  public async orchestrateEmbedding(
-    item: EmbeddingOrchestrationPayload
-  ): Promise<number[] | undefined> {
-    const start = performance.now();
-    let embedding: number[] | undefined;
-    let decisionSource = 'default';
+  recordQuery(indexName: string, latencyMs: number): void {
+    const stats = this.stats.get(indexName);
+    if (!stats) return;
 
-    // Collect features for router
-    const routerFeatures: RouterInputFeatures = {
-      queryLatencyMs: 100,
-      userFeedbackScore: 4,
-      embeddingCostUsd: 0.0001,
-      gpuLoadPercent: Math.random() * 100,
-      similarityScoreVariance: 0.1,
-      cacheHitRate: 0.5,
-      fileSizeKb: item.text.length / 1024,
-      docType: item.type,
-      vectorDensity: 0.7,
-      ragConfidence: 0.8,
-      textLength: item.text.length,
-      caseId: item.caseId,
-      currentVectorCount: Math.floor(Math.random() * 2_000_000),
-    };
+    const newQueryCount = stats.queryCount + 1;
+    // Moving average for latency
+    const newAvgLatency =
+      (stats.avgLatencyMs * stats.queryCount + latencyMs) / newQueryCount;
 
-    const routingDecision = await this.predictRouting(routerFeatures);
+    this.stats.set(indexName, {
+      ...stats,
+      queryCount: newQueryCount,
+      avgLatencyMs: newAvgLatency,
+      lastUpdated: Date.now(),
+    });
+  }
 
-    // Try Ollama REST API for embeddings
-    try {
-      const url = `${this.ollamaUrl}/api/embeddings`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'embeddinggemma:latest',
-          prompt: item.text,
-        }),
-      });
+  /**
+   * Check if an index needs optimization
+   */
+  private checkOptimizationNeeded(indexName: string): void {
+    const stats = this.stats.get(indexName);
+    if (!stats) return;
 
-      const data = await res.json();
-      if (data?.embedding && Array.isArray(data.embedding)) {
-        embedding = data.embedding as number[];
-        decisionSource = 'ollama-rest';
-        console.log(`Embedding for ${item.type}:${item.id} generated via Ollama.`);
-      } else {
-        console.error('Ollama embedding API returned no embedding:', data);
+    // Simple heuristic: if latency is high and usage is high
+    if (stats.avgLatencyMs > 200 && stats.queryCount > this.config.minUsageThreshold) {
+      this.emit('optimizeNeeded', indexName);
+    }
+  }
+
+  /**
+   * Evict the least used index to make space
+   */
+  private async evictLeastUsedIndex(): Promise<void> {
+    let leastUsedName: string | null = null;
+    let minScore = Infinity;
+
+    for (const [name, stats] of this.stats) {
+      // Score based on query count and recency (higher is better/more cached)
+      // Here we want lowest score for eviction
+      const timeFactor = (Date.now() - stats.lastUpdated) / (1000 * 60 * 60); // Hours since update
+      const score = stats.queryCount / (timeFactor + 1);
+
+      if (score < minScore) {
+        minScore = score;
+        leastUsedName = name;
       }
-    } catch (e) {
-      console.error('Ollama embedding failed:', e);
     }
 
-    // Store embedding if generated
-    if (embedding) {
-      // Store in Qdrant if configured
-      if (
-        routingDecision.useQdrantForStorage > 0.5 ||
-        process.env.ENABLE_QDRANT_UPSERT === 'true'
-      ) {
-        try {
-          await this.upsertToQdrant(item, embedding);
-        } catch (e) {
-          // Error already logged
-        }
-      }
-    } else {
-      console.error(`Failed to generate embedding for ${item.type}:${item.id}`);
+    if (leastUsedName) {
+      this.indices.delete(leastUsedName);
+      this.stats.delete(leastUsedName);
+      this.emit('indexEvicted', leastUsedName);
     }
+  }
 
-    console.log(
-      `Embedding orchestration took ${performance.now() - start}ms, source: ${decisionSource}`
-    );
-    return embedding;
+  /**
+   * Get all registered indices
+   */
+  getIndices(): IndexConfig[] {
+    return Array.from(this.indices.values());
+  }
+
+  /**
+   * Get stats for an index
+   */
+  getIndexStats(indexName: string): IndexStats | undefined {
+    return this.stats.get(indexName);
+  }
+
+  /**
+   * Clear all indices
+   */
+  clear(): void {
+    this.indices.clear();
+    this.stats.clear();
+    this.emit('cleared');
   }
 }
 
-export const adaptiveIndexOrchestrator = new AdaptiveIndexOrchestrator();
+/**
+ * Singleton instance
+ */
+let orchestratorInstance: AdaptiveIndexOrchestrator | null = null;
+
+export function getOrchestrator(): AdaptiveIndexOrchestrator {
+  if (!orchestratorInstance) {
+    orchestratorInstance = new AdaptiveIndexOrchestrator();
+  }
+  return orchestratorInstance;
+}

@@ -1,5 +1,7 @@
 // Lightweight embedding utilities with safe fallbacks and strict typing
 import { createHash } from 'crypto';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CacheInterface {
     getCachedEmbedding: (key: string) => Promise<number[] | null>;

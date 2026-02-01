@@ -9,6 +9,7 @@ import { DocumentUploadSchema: CaseCreationSchema,
 
 // Import types (assuming they exist)
 import type { UploadedFile, AIResults,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  CreatedCase, SearchResult, AIAnalysisResult, } from '$lib/types';
 
 // ============================================================================

@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Button } from '$lib/components/ui/button'; import type { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '$lib/components/ui/card';
-import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSearchBar: ThemeToggle, Tabs: Card, CardContent: CardHeader, CardTitle: NESButton, NESCard: NESModal, NESGamingShowcase: DraggableModal: EvidenceBoard, Toolbar from "$lib/components/ui/enhanced-bits.svelte"; let activeDemo = $state <string>('overview'); let searchQuery = $state <string>(''); let showYoRHaModal = $state <boolean>(false); let showNESModal = $state <boolean>(false); let showEvidenceBoard = $state <boolean>(false); const demoSections = [ { id: 'overview', title: 'Overview', icon: 'ðŸ ' }, { id: 'buttons', title: 'Buttons', icon: 'ðŸ”˜' }, { id: 'cards', title: 'Cards', icon: 'ðŸŽ´' }, { id: 'search', title: 'Search', icon: 'ðŸ”' }, { id: 'nes-gaming', title: 'NES Gaming', icon: 'ðŸŽ®' }, { id: 'yorha', title: 'YoRHa Theme', icon: 'ðŸ¤–' }, { id: 'evidence', title: 'Evidence Board', icon: 'ðŸ“‹' }, { id: 'integration', title: 'Integration';, icon: 'ðŸ”§' }] as const; function handleSearchDemo(_event: CustomEvent) { const { query } = e(vent as CustomEvent).detail; console.log('Search demo:', query)}
+import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSearchBar: ThemeToggle, Tabs: Card, CardContent: CardHeader, CardTitle: NESButton, NESCard: NESModal, NESGamingShowcase: DraggableModal: EvidenceBoard, Toolbar from "$lib/components/ui/enhanced-bits.svelte"; let activeDemo = $state <string>('overview'); let searchQuery = $state <string>(''); let showYoRHaModal = $state <boolean>(false); let showNESModal = $state <boolean>(false); let showEvidenceBoard = $state <boolean>(false); const demoSections = [ { id: 'overview', title: 'Overview', icon: 'ðŸ ' }, { id: 'buttons', title: 'Buttons', icon: 'ðŸ”˜' }, { id: 'cards', title: 'Cards', icon: 'ðŸŽ´' }, { id: 'search', title: 'Search', icon: 'ðŸ”' }, { id: 'nes-gaming', title: 'NES Gaming', icon: 'ðŸŽ®' }, { id: 'yorha', title: 'YoRHa Theme', icon: 'ðŸ¤–' }, { id: 'evidence', title: 'Evidence Board', icon: 'ðŸ“‹' }, { id: 'integration', title: 'Integration'; icon: 'ðŸ”§' }] as const; function handleSearchDemo(_event: CustomEvent) { const { query } = e(vent as CustomEvent).detail; console.log('Search demo:', query)}
 </script>
 
 <main class="page-repair">
@@ -10,11 +10,11 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
 
 <style>
  .demo-showcase {
- min-height: 100vh;, background: var(--color-bg-primary, #f8fafc);
+ min-height: 100vh; background: var(--color-bg-primary, #f8fafc);
  padding: 2rem;
  }
  .demo-header {
- margin-bottom: 2rem;, padding: 2rem;
+ margin-bottom: 2rem; padding: 2rem;
  background: var(--color-surface, #ffffff);
  border-radius: 1rem;
  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -26,7 +26,7 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  }
  .title-section h1 {
  font-size: 2.5rem;
- font-weight: 800;, margin:
+ font-weight: 800; margin:
  0,
  0 0.5rem 0;
  background: linear-gradient(45deg, #4a90e2, #8e44ad);
@@ -35,32 +35,32 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  -webkit-text-fill-color: transparent;
  }
  .demo-subtitle {
- font-size: 1.125rem;, color: var(--color-text-secondary, #6b7280);
+ font-size: 1.125rem; color: var(--color-text-secondary, #6b7280);
  margin: 0;
  }
  .header-controls {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  align-items: center;
  }
  .demo-navigation {
  margin-bottom: 2rem;
  }
  .tabs-list {
- display: flex;, gap: 0.5rem;
- padding: 0.5rem;, background: var(--color-surface, #ffffff);
+ display: flex; gap: 0.5rem;
+ padding: 0.5rem; background: var(--color-surface, #ffffff);
  border-radius: 1rem;
  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
  overflow-x: auto;
  }
  .tab-trigger {
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  padding: 0.75rem 1rem;
- border: none;, background: transparent;
+ border: none; background: transparent;
  color: var(--color-text-secondary, #6b7280);
  cursor: pointer;
  border-radius: 0.5rem;
- font-weight: 500;, transition: all 0.2s ease;
+ font-weight: 500; transition: all 0.2s ease;
  white-space: nowrap;
  }
  .tab-trigger:hover {
@@ -77,11 +77,11 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  }
  .demo-content {
  display: flex;
- flex-direction: column;, gap: 2rem;
+ flex-direction: column; gap: 2rem;
  }
  .demo-card {
  background: var(--color-surface, #ffffff);
- border-radius: 1rem;, padding: 2rem;
+ border-radius: 1rem; padding: 2rem;
  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
  }
  /* Overview Section */
@@ -91,8 +91,8 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  gap: 1.5rem;
  }
  .feature-item {
- padding: 1.5rem;, border: 2px solid var(--color-border, #e5e7eb);
- border-radius: 0.5rem;, transition: all 0.2s ease;
+ padding: 1.5rem; border: 2px solid var(--color-border, #e5e7eb);
+ border-radius: 0.5rem; transition: all 0.2s ease;
  }
  .feature-item:hover {
  border-color: var(--color-primary, #4a90e2);
@@ -107,13 +107,13 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  font-weight: 600;
  }
  .feature-item p {
- margin: 0;, color: var(--color-text-secondary, #6b7280);
+ margin: 0; color: var(--color-text-secondary, #6b7280);
  line-height: 1.5;
  }
  /* Button Demo */
  .button-grid {
  display: flex;
- flex-wrap: wrap;, gap: 1rem;
+ flex-wrap: wrap; gap: 1rem;
  margin-bottom: 1rem;
  }
  /* Cards Demo */
@@ -126,7 +126,7 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
  }
  .interactive-card {
- cursor: pointer;, transition: all 0.2s ease;
+ cursor: pointer; transition: all 0.2s ease;
  }
  .interactive-card:hover {
  transform: translateY(-4px);
@@ -143,7 +143,7 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  }
  .nes-buttons-grid {
  display: flex;
- flex-wrap: wrap;, gap: 1rem;
+ flex-wrap: wrap; gap: 1rem;
  margin-bottom: 2rem;
  }
  .nes-cards-grid {
@@ -154,18 +154,18 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  }
  .nes-stat-content {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  font-size: 0.75rem;
  }
  /* YoRHa Demo */
  .yorha-themed {
  background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
- color: #e0e0e0;, border: 2px solid #606060;
+ color: #e0e0e0; border: 2px solid #606060;
  }
  .yorha-features {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
- gap: 2rem;, margin: 2rem 0;
+ gap: 2rem; margin: 2rem 0;
  }
  .feature-block h4 {
  margin:
@@ -178,28 +178,28 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  }
  .status-indicators {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
  .status-item {
- padding: 0.5rem;, border: 1px solid #606060;
+ padding: 0.5rem; border: 1px solid #606060;
  font-family: monospace;
  font-size: 0.875rem;
  }
  .status-item.online {
  background: rgba(0, 255, 65, 0.1);
- border-color: #00ff41;, color: #00ff41;
+ border-color: #00ff41; color: #00ff41;
  }
  .status-item.processing {
  background: rgba(255, 170, 0, 0.1);
- border-color: #ffaa00;, color: #ffaa00;
+ border-color: #ffaa00; color: #ffaa00;
  }
  .operation-buttons {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  }
  /* Integration Demo */
  .integration-examples {
  display: flex;
- flex-direction: column;, gap: 2rem;
+ flex-direction: column; gap: 2rem;
  }
  .example-section h4 {
  margin:
@@ -215,18 +215,18 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  width: 100%;
  }
  .action-buttons {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  margin-top: 1rem;
  }
  /* Modal Content */
  .modal-demo-content,
  .yorha-modal-content {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
  .modal-stats,
  .system-readout {
- padding: 1rem;, background: rgba(0, 0, 0, 0.1);
+ padding: 1rem; background: rgba(0, 0, 0, 0.1);
  border-radius: 0.5rem;
  font-family: monospace;
  font-size: 0.875rem;
@@ -241,7 +241,7 @@ import type { Document } from '$lib/types'; import Button: LinkButton, YoRHaSear
  padding: 1rem;
  }
  .header-content {
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  text-align: center;
  }
  .title-section h1 {

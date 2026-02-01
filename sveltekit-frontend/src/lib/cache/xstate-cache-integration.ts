@@ -7,6 +7,7 @@ import { EventObject } from 'xstate';
 type DoneInvokeEvent<T> = EventObject & { output: T };
 
 import { headlessUICache } from './headless-ui-cache.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define a base context type for machines that use caching
 export interface BaseMachineContext {

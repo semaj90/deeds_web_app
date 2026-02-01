@@ -514,7 +514,7 @@
 });
 		window.addEventListener('keyup', onKeyUp);
 
-		// TODO: Add as cleanup in $effect: return () => {
+		return () => {
 			cancelAnimationFrame(raf);
 			canvasEl?.removeEventListener('wheel', onWheel);
 			ro?.disconnect();

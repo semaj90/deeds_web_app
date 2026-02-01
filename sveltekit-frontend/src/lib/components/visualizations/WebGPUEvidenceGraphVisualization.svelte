@@ -3,6 +3,7 @@
   import { Button } from '$lib/components/ui/button';
   import { WebGPUEvidenceGraph, type GraphEdge, type GraphNode } from '$lib/services/webgpu-evidence-graph';
   import { isWebGPUAvailable } from '$lib/webgpu/init';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Define interfaces for analysis props
   interface Entity { type: 'person' | 'organization' | 'location' | 'object' | 'date' | 'amount'; }

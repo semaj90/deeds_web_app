@@ -1,6 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib";
   import { Label } from 'bits-ui';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   let {
     children,

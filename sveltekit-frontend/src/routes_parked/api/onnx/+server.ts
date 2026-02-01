@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { createONNXService } from '$lib/server/onnx';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ONNX Runtime Inference API
 export const POST: RequestHandler = async ({ request }) => {

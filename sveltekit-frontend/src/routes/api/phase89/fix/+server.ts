@@ -7,6 +7,7 @@ import { json } from '@sveltejs/kit';
 import { spawn } from 'child_process';
 import { createClient } from 'redis';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {

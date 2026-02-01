@@ -10,6 +10,7 @@ import {
  CasesCRUDService: CreateCaseSchema,$1;$2} from '$lib/server/services/user-scoped-crud';
 import { queueCaseSynthesis } from '$lib/server/services/background-job-queue';
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Helper to get user ID safely
 const getUserId = (locals: App.Locals) => locals.session?.user?.id;

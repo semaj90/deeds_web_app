@@ -5,6 +5,7 @@
  */
 
 import type { vector } from "drizzle-orm/pg-core";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface QdrantSearchParams {
   vector: number[];

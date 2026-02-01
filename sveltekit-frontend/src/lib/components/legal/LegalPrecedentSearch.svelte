@@ -5,6 +5,7 @@ https, //svelte.dev/e/js_parse_error -->
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
   import { writable } from 'svelte/store';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface LegalPrecedent {
     id: string, caseTitle: string, citation: string, court: string, year: number, jurisdiction: string, summary: string, relevanceScore: number, legalPrinciples: string[],
     linkedCases: string[]}

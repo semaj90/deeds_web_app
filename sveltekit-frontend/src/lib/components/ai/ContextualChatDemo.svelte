@@ -12,6 +12,7 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
   // Migrated to $effect
   import type { ContextualState, NextStepPrediction,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     LegalEntity, ConversationTurn } from '$lib/types/sharedTypes';
   // Props
   interface Props {

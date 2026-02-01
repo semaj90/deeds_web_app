@@ -4,6 +4,7 @@
  */
 
 import postgres from 'postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Create a single connection instance
 const databaseUrl = process.env.DATABASE_URL ||

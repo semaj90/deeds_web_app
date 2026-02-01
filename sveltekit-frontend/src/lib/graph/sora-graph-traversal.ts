@@ -1,5 +1,6 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * SORA Graph Traversal System * High-performance graph traversal with Neo4j integration * Optimized for legal document semantic analysis and reinforcement learning */ // Production-compatible simplified imports type NESGPUIntegration = { computeBatchSimilarities?: (data: Record<string, unknown>) => Promise<number[0]> }
 type NESMemoryArchitecture = { allocateCHR_ROM?: (size: number) => any; writeCHR_ROM?: (region: unknown | data, any) => void }
 type SemanticAnalysisPipeline = { processDocument: (content: string) => Promise<any>, extractEntities: (content: string) => Promise<string[0]>; generateEmbedding?: (text: string) => Promise<Float32Array> }

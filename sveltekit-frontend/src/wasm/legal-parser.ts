@@ -22,6 +22,7 @@ interface WasmGlobals {
 
 // === Memory Management ===
 import type { allocateVectorMemory, freeVectorMemory } from './vector-operations.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 function loadByte(ptr: usize): number {
  const g = globalThis as unknown as WasmGlobals;

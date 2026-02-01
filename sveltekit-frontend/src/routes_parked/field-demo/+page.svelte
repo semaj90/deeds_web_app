@@ -3,6 +3,7 @@
  import Input from '$lib/components/ui/Input.svelte';
  import Select from '$lib/components/ui/Select.svelte';
  import Textarea from '$lib/components/ui/Textarea.svelte';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 </script>
 
 <div class="max-w-md mx-auto p-6 space-y-6">

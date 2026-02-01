@@ -7,6 +7,7 @@
   import { superForm } from 'sveltekit-superforms';
   import { zod } from 'sveltekit-superforms/adapters';
   import { registerSchema } from '$lib/schemas/auth';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     onsuccess?: () => void
     open?: boolean}

@@ -4,6 +4,7 @@
  */
 import { Argon2id } from 'oslo/password';
 import pkg from 'pg';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 const { Client } = pkg;
 // import { lucia } from './auth.js'; // Assuming auth.js exists for session creation, commenting out if not reliable
 

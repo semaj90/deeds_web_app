@@ -1,6 +1,7 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app-store';
   import { webgpu } from '$lib/webgpu/webgpu-init';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   let gpuMetrics = $state({

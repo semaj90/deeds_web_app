@@ -28,6 +28,7 @@ import type {
   ValidationStatus
 } from '$lib/types/rag-source-validation';
 import type { Component } from 'svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Type assertions for Svelte 5 component compatibility
 const SourceValidatorComponent = SourceValidator as unknown as Component;

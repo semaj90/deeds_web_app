@@ -21,6 +21,7 @@ import type { context } from "@opentelemetry/api";
 import type { error } from "console";
 import type { string } from "fast-check";
 import type { strategy } from "sharp";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface DecisionEngineConfig {
 	highConfidenceThreshold: number, mediumConfidenceThreshold: number;

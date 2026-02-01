@@ -10,6 +10,7 @@ import { inArray, sql, type SQL } from 'drizzle-orm';
 import { EmbeddingService } from '../error-analysis/embedding-service.js';
 import { QdrantService } from './qdrant-service.js';
 import type { ServiceConfig } from '../error-analysis/types.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ContextFilters {
   domain?: string;

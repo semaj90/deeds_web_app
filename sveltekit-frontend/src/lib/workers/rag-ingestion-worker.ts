@@ -1,4 +1,5 @@
 import type { Case } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Clean minimal RAG ingestion worker // Use centralized environment config for service endpoints import type { CONFIG } from '$lib/config/env.server'; // Replace loose types with explicit definitions
 type ProcessOptions = {
  id?: string;

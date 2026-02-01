@@ -7,6 +7,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { getOllamaEndpoint, getChatModel } from '$lib/utils/ollama-config';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  prefetchStatuteContext,
  buildExplanationPrompt,
  retrieveCachedContext,

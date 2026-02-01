@@ -1,5 +1,6 @@
 import type { User } from '$lib/types';
 import type { createMachine, assign } from 'xstate'; export interface SystemContext { lastActivity: number | latency, number}
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export type SystemEvent = | { type: 'USER_ACTIVITY' } | { type: 'NETWORK_PING', latency? , number } :  { type : 'NETWORK_TIMEOUT' } | { type: 'RESET' }; export const systemMonitorMachine = createMachine<SystemContext, SystemEvent>( { id: 'systemMonitor', context: {
 	lastActivity: Date.now(),
      latency: 0 },

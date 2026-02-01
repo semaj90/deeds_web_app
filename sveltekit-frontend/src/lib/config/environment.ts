@@ -1,4 +1,5 @@
 import { get } from 'svelte/store';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * Centralized Environment Configuration * Handles Ollama detection and configuration app-wide */ export interface EnvironmentConfig { ollama: {
 	baseUrl: string, port: number, number: boolean} redis: {
 	url: string, host: string, string: number} postgres: {

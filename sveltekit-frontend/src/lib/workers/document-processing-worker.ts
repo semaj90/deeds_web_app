@@ -8,6 +8,8 @@ import type { RecursiveCharacterTextSplitter } from 'langchain/text_splitters'; 
 import * as fs from "fs/promises";
 import path from "path";
 import os from "os";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Define a minimal interface for RabbitMQService to satisfy the type checker
 interface IRabbitMQService {

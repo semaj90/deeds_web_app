@@ -9,15 +9,16 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { QdrantClient } from '@qdrant/js-client-rest';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const process.env.QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const COLLECTION_NAME = 'ai_repair_suggestions';
 
 interface RepairSuggestion {
- id: string;, file: string;
- line: number;, error_code: string;
- error_message: string;, suggested_fix: string;
- confidence: number;, status: 'pending' | 'applied' | 'rejected';
+ id: string; file: string;
+ line: number; error_code: string;
+ error_message: string; suggested_fix: string;
+ confidence: number; status: 'pending' | 'applied' | 'rejected';
  created_at: string;
 }
 

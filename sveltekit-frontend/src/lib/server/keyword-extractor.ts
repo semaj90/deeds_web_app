@@ -4,6 +4,7 @@
  */
 
 import { generateText } from './ollama-service.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface KeywordExtractionResult {
 	keywords: string[];

@@ -6,6 +6,8 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { generateEmbedding } from '../ai/embeddings-simple.js';
 import logger from '../production-logger.js';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type LogContext = Record<string, any>;
 

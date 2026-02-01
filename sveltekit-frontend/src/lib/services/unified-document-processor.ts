@@ -7,6 +7,7 @@
 import type { TextChunk } from '$lib/types';
 import { EventEmitter } from 'events';
 import { Pool } from 'pg';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const pgPool = new Pool({
 	connectionString: process.env?.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost, 5432/deeds'

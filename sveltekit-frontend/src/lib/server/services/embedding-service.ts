@@ -2,6 +2,7 @@ import { env } from '$env/dynamic/private';
 import { db } from '../db/drizzle.js';
 import { caseChunks, lawSections } from '../db/schema/legal-index.js';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const OLLAMA_API_URL = env?.OLLAMA_API_URL ?? 'http://localhost:11434';
 const EMBEDDING_MODEL = env?.OLLAMA_EMBEDDING_MODEL ?? 'embeddinggemma:latest';

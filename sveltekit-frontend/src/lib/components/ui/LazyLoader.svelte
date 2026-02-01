@@ -1,6 +1,7 @@
 <script lang="ts">
   import { componentLoader } from '$lib/utils/dynamic-imports';
   import AILoadingIndicator from "./AILoadingIndicator.svelte";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     loader: () => Promise<any>;

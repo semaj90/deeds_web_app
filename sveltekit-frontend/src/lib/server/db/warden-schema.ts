@@ -6,6 +6,7 @@
 
 import { relations } from 'drizzle-orm';
 import {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     boolean,
     index,
     integer,

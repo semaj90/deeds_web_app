@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { YoRHa3DComponent: YORHA_COLORS, type YoRHaStyle } from '../YoRHaUI3D';
 import { resolveVariantStyle } from '../theme/yorha-theme-adapter';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface YoRHaModal3DOptions extends Omit<YoRHaStyle, 'variant'> {
 	title?: string;

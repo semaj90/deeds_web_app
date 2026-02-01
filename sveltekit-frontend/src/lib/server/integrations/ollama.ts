@@ -2,6 +2,7 @@
  * Ollama Integration - Production-ready Embedding & Chat Service
  */
 import type {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     ChatMessage, ChatOptions, ChatResult,
     EmbeddingOptions, IOllamaChatService,
     IOllamaEmbeddingService

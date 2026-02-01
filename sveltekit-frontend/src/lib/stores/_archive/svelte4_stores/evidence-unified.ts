@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import type { Evidence } from '../types/api.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type EvidenceState = {
  /* primary shape used by consumers */

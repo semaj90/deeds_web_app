@@ -12,6 +12,7 @@
 
 import { writable, derived, get } from 'svelte/store';
 import { getContext, setContext } from 'svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================
 // Types

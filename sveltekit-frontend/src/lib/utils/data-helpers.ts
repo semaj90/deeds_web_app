@@ -1,4 +1,7 @@
 import { browser } from '$app/environment';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Cache management for performance
 class DataCache<T = unknown> {

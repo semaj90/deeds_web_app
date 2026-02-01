@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { jsonb, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const pois = pgTable('persons_of_interest', {
     id: varchar('id').primaryKey(),

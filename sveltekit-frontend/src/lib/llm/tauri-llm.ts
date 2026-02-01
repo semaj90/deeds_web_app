@@ -1,5 +1,6 @@
 // Optional Tauri 
 import - fallback for web environments let invoke: unknown, async function initializeTauri(): Promise<any> {
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 try {
 const {
 invoke, tauriInvoke }= await import("@tauri-apps/api/core");

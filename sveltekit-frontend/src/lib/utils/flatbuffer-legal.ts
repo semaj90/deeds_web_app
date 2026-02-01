@@ -1,4 +1,6 @@
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // FlatBuffer utilities for legal document processing // Integrates with Go microservices for high-performance data exchange import type { Builder } from 'flatbuffers'; // Mock FlatBuffer types until we can generate from schemas // In production, these would be auto-generated from legal_data.fbs interface DocumentContent { id: string, title: string, content: Uint8Array, contentType: string, compressed: boolean, checksum: number}
 interface VectorEmbedding {
  documentId: string;

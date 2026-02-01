@@ -14,6 +14,7 @@
 import type { timestamp } from "drizzle-orm/gel-core";
 import { Redis } from 'ioredis';
 import { hash } from "node:crypto";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CacheConfig {
  redis: Redis;

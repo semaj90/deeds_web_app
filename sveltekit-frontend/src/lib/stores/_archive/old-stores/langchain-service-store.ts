@@ -5,6 +5,7 @@ import type { Document } from '$lib/types';
 import type { type Readable } from 'svelte/store';
 import type { langExtractService } from '$lib/services/langextract-ollama-service.js';
 import {  browser  } from '$app/environment'; // Simple state interfaces for UI consumption export interface LangChainState { isProcessing: boolean, isAvailable: boolean, error: string, null: string[]};
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export interface DocumentProcessingState {
  isProcessing: boolean;
 	progress: number;

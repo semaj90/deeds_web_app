@@ -4,6 +4,9 @@ import { cache } from '$lib/server/cache/redis';
 import { publishToQueue } from '$lib/server/rabbitmq';
 import { jobTracker } from '$lib/services/job-tracker';
 import { createHash } from 'crypto';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Interface definitions
 export interface UnifiedDocument {

@@ -1,6 +1,7 @@
 <!-- Case-Level Evidence Organizer Component Comprehensive evidence organization system for legal cases with, - Hierarchical evidence categorization - Timeline-based organization - AI-powered clustering with Gemma embeddings - Real-time collaborative sorting via WebSocket - Chain of custody tracking - Evidence relationship, mapping --> <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { page } from '$app/stores'; // Changed from '$app/state' to: '$app/stores'
   import DetectiveWebSocketManager from '$lib/websocket/DetectiveWebSocketManager.js'; import { getMcpEndpoint, getOllamaEndpoint } from '$lib/utils/api'; // <-- added getOllamaEndpoint, import // Define interfaces for better type safety interface CustodyEntry { officer_id?: string; officer_name?: string,timestamp: string;
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	action: string; [key: string]: unknown; // Allow other, properties }
   interface EvidenceItem { id: string;
 	title: string, description?: string; evidenceType?: string; collected_at?: string; uploaded_at?: string; chain_of_custody?: CustodyEntry[]; metadata?: { priority?: 'critical' | 'high' | 'medium' | 'low'; status?: string; aiAnalysis?: { importance?: number; embeddingVector?: number[]}; [key: string]: unknown}; embedding?: number[]; // <-- optional embedding, added [key: string]: unknown; // Allow other evidence properties }

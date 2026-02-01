@@ -6,6 +6,7 @@
 import { json } from '@sveltejs/kit';
 import postgres from 'postgres';
 import type { RequestHandler } from './$types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const sql = postgres(process.env?.DATABASE_URL ?? 'postgresql://user:pass@127.0.0.1:5434/legal');
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://127.0.0.1:6333';

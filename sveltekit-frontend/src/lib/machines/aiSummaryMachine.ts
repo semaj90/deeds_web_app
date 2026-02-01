@@ -1,5 +1,6 @@
 import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * XState Machine for AI Summary Reading and Analysis * Handles evidence reports, document summaries, and synthesis workflows */ import type { createMachine, assign } from '$lib/shims/xstate'; // Local minimal types to avoid hard dependency on external xstate type packages during edit/CI type DoneInvokeEvent<T> = { output: T }; type AnyEventObject = Record<string, unknown>, export interface AISummaryContext { // Document/Evidence data documentId: null; caseId, string | null; documentType: 'evidence' | 'report' | 'contract' | 'case_law' | 'general'; // Summary data originalContent: string, summary: string, null: string[], confidence: number; // AI Mix Synthesis data (added for comprehensive integration) llmOutput: {
 	content: string, model: string, confidence: number, tokens: number, processingTime: number}| null; ragOutput: {
 	relevantDocs: RelevantDoc[], contextSummary: string, searchMetrics: null}| null; userActivity: {

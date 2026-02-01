@@ -1,4 +1,9 @@
 <script lang="ts">
+	// Generated Runes
+	
+	let ButtonRoot = $state($state(undefined));
+
+
 	import type { FugitiveDexPerson } from './types';
 
 	interface Props {

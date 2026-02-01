@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db';
 import { documents } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function saveJsonbDocument(
     id: string,

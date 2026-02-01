@@ -14,6 +14,7 @@ import Fuse from 'fuse.js';
 import type { Redis } from 'ioredis';
 import Loki from 'lokijs';
 import { Client as MinioClient } from 'minio';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Environment configuration
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';

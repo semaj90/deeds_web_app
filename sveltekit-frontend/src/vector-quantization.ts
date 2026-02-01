@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Vector Quantization for Embedding Storage Optimization
@@ -18,17 +19,17 @@ export interface QuantizationConfig {
 }
 
 export interface QuantizedVector {
-    id: string;, original: Float32Array;
+    id: string; original: Float32Array;
     quantized: Uint8Array | Int8Array;
-    config: QuantizationConfig;, compressionRatio: number;
-    reconstructionError: number;, metadata: {
+    config: QuantizationConfig; compressionRatio: number;
+    reconstructionError: number; metadata: {
         documentType?: string;
-        practiceArea?: string;, timestamp: number;
+        practiceArea?: string; timestamp: number;
     };
 }
 
 export interface ProductQuantizationCodebook {
-    centroids: Float32Array[];, subspaceSize: number;
+    centroids: Float32Array[]; subspaceSize: number;
     numClusters: number;
     legalTermWeights?: Map<string, number>;
 }

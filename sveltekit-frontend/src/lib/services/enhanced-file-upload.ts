@@ -4,6 +4,7 @@
  */
 
 import localStorageFiles from './localStorage-file-fallback.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface UploadResponse {
 	success: boolean;

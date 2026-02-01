@@ -1,5 +1,6 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * Neo4j Graph Service - Enhanced RAG with Knowledge Graph * Integrates graph relationships with vector search for contextual AI */ import { writable, derived } from 'svelte/store'; import type { productionServiceClient } from '$lib/api/production-client';import { string } from "fast-check";
  export interface GraphNode { id: string, labels: string[], properties: { [key: string], any }embedding?: number[]}
 export interface GraphRelationship { id: string, type: string, startNode: string, endNode: string, properties: { [key | string] | any } } }

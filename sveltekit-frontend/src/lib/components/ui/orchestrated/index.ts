@@ -15,6 +15,7 @@ import { Button, Card } from '$lib/components/ui/enhanced-bits';
 import { Input } from '$lib/components/ui/input';
 // Select is imported from enhanced-bits or a compatible source
 import { Select } from '$lib/components/ui/enhanced-bits';
+import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 const EnhancedDialog = Dialog;
 const EnhancedSelect = Select;

@@ -1,5 +1,6 @@
 import type { requireAuth } from '$lib/server/auth';
 import { error } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function load(event): Promise<any> {
  try {

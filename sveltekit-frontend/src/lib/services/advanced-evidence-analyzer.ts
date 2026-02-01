@@ -12,6 +12,7 @@ import { performOCR } from '$lib/ocr/ocr-client';
 import { MinIOService } from '$lib/server/minio-service';
 import { Evidence } from "$lib/types";
 import { Buffer } from "node:buffer";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const EvidenceAnalysisSchema = z.object({
 	evidenceId: z.string(),

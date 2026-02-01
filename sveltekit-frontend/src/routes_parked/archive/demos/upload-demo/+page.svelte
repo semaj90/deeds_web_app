@@ -1,6 +1,7 @@
 <script lang="ts">
  import UploadProgress from '$lib/components/upload/UploadProgress.svelte';
  import type { submitWithProgress } from '$lib/api/submitWithProgress';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let last = '';
  let metadata = { title: 'My upload', tags: ['demo'] };

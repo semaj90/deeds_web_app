@@ -2,6 +2,7 @@
 import {
  contextualChat,$1;$2$1;$2} from '$lib/server/llm/contextual-chat';
 import type { RequestHandler } from '@sveltejs/kit';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const ORCHESTRATOR_URL = process.env.CONTEXT_ORCHESTRATOR_URL ?? '';
 

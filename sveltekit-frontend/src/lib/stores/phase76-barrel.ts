@@ -9,6 +9,7 @@
 import { LocalLegalStore } from '../db/clientDB.svelte';
 import { UserPreferences } from './preferences.svelte';
 import { TokenTracker } from './tokenUsage.svelte';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // 1. Instantiate Singletons (Global Services)
 export const tokenTracker = new TokenTracker();

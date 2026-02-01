@@ -18,6 +18,7 @@ import type { SavedCitation, CitationSearchRequest,
 
 import { AuditService } from './audit.service.js';
 import { sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class CitationManagementService {
 	private auditService: AuditService;

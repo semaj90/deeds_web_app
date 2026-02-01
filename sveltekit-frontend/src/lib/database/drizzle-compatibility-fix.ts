@@ -4,6 +4,7 @@
  */
 
 import type { Sql } from 'postgres';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Lightweight DB types to avoid `any`
 export type DBRow = Record<string, unknown>;

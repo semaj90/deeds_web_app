@@ -5,6 +5,7 @@ import type { cognitiveCache, getRedisClient } from '$lib/server/cache';
 import type { hmmStateMachine, LegalConversationState } from './hmm-state-machine.js';
 import { type } from "os";
 import { text } from "stream/consumers";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const CONTEXT_TTL_SECONDS = Number(process.env.CONTEXT_STATE_TTL ?? 3600;
  const MAX_HISTORY_LENGTH = Number(process.env.CONTEXT_MAX_HISTORY ?? 50;

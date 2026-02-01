@@ -3,6 +3,7 @@
 	// Migrated to $effect
 	import { scale } from 'svelte/transition';
 	import type { DialogContentProps } from './types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props extends DialogContentProps {
 		children?: Snippet;

@@ -1,6 +1,7 @@
 import { getRedisConfig, getRedisUrl: HEALTH_CHECK_CONFIG } from '$lib/config/redis-config';
 import type { RedisOptions } from 'ioredis';
 import Redis from 'ioredis';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Singleton Redis client
 let redisClient: Redis | null = null;

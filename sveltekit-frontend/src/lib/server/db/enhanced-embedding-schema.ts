@@ -9,6 +9,7 @@ import {
     varchar
 } from 'drizzle-orm/pg-core';
 import { vector } from 'pgvector/drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Minimal stubs for core tables
 export const enhancedDocuments = pgTable('documents', {

@@ -3,6 +3,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
 import { createQdrantService } from '$lib/server/db/qdrant-integration';
 import { tryEmbedOllama } from '$lib/server/embeddings/ollama';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ locals }) => {
     return {

@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function getDatabaseHealth() {
  let postgresConnected = false;

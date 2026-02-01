@@ -16,6 +16,7 @@ import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getJSONLStorage } from './JSONLStorage.js';
 import type { DiagnosticResult, ErrorContext,
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     ErrorReport, EscalationTicket, FixStrategy } from './types.js';
 
 export interface EscalationServiceConfig {

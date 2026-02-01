@@ -1,4 +1,6 @@
 import { createEventDispatcher } from 'svelte';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // Migrated to $effect
 // Migrated to $effect
 <!-- @migration-task Error while migrating Svelte code: Unexpected token

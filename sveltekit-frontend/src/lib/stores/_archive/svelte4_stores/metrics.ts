@@ -6,6 +6,7 @@
 import { writable, derived } from 'svelte/store';
 import { createActor } from 'xstate';
 import { createMetricsMachine } from '$lib/machines/metrics';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Create metrics actor

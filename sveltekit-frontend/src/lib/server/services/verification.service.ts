@@ -6,6 +6,7 @@
 import { db } from '$lib/server/db';
 import { sourceVerification, citationMetadata } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface SourceCheckResult {
     isVerified: boolean;

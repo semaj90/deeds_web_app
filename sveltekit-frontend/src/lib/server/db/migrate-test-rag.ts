@@ -6,6 +6,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const connectionString = process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 const migrationClient = postgres(connectionString, { max: 1 });

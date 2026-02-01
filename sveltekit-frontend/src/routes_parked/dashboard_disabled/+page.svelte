@@ -1,17 +1,18 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  interface Case {
- id: string;, title: string;
+ id: string; title: string;
  status: 'active' | 'closed';
- createdAt: string;, updatedAt: string;
+ createdAt: string; updatedAt: string;
  evidence: Array<{, id: string; status, string }>;
  }
 
  interface DashboardStats {
- activeCases: number;, pendingEvidence: number;
- approvedEvidence: number;, personsOfInterest: number;
+ activeCases: number; pendingEvidence: number;
+ approvedEvidence: number; personsOfInterest: number;
  }
 
  let cases: Case[] = $state([]);

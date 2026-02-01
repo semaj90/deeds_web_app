@@ -4,6 +4,7 @@
  */
 
 import type { ASTError } from './svelte-check-analyzer.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface Suggestion {
 	id: string;

@@ -8,6 +8,7 @@ import type { RequestHandler } from './$types.js';
 import { executeAgentWithTools, executeAgentWithContext } from '$lib/agents/gemmaAgent';
 import { executeToolCall } from '$lib/agents/tools';
 import { checkOllamaHealth } from '$lib/ai/ollama-config';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST handler for agent endpoints

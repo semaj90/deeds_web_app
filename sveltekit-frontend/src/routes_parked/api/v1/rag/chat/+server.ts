@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { OllamaService } from '$lib/server/ollama';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const ollama = new OllamaService();
 

@@ -3,6 +3,7 @@
  * Redis-based caching for embeddings and frequently accessed data
  */
 import { redisService } from './redis-service.js';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 // Using direct type access or any to bypass strict type checking during recovery
 const typedRedisService = redisService as any;
 

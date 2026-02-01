@@ -6,6 +6,7 @@ import { json, error, type RequestHandler } from '@sveltejs/kit';
 import makeHttpErrorPayload from '$lib // TODO: Verify store subscription is correct for Svelte 5/server/api/makeHttpError';
 import UserScopedCRUDService from '$lib // TODO: Verify store subscription is correct for Svelte 5/server/services/user-scoped-crud';
 import { z } from 'zod';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // UUID validation schema
 const UUIDSchema = z.string().uuid('Invalid case ID format');
