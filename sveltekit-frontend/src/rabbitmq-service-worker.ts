@@ -4,8 +4,6 @@
 
 import { rabbitmqService } from '$lib/server/messaging/rabbitmq-service';
 import { publishToQueue } from '$lib/server/rabbitmq';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 type MessageHandler = (message: unknown, originalMessage?: unknown) => Promise<void> | void;
 
@@ -40,13 +38,13 @@ type RabbitMQServiceLike = {
   close?: () => Promise<void> | void;
   stop?: () => Promise<void> | void;
   closeConnection?: () => Promise<void> | void;
-  consume?: (, queue: string,
+  consume?: (queue: string,
     cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
   ) => Promise<void> | void;
-  subscribe?: (, queue: string,
+  subscribe?: (queue: string,
     cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
   ) => Promise<void> | void;
-  createConsumer?: (, queue: string,
+  createConsumer?: (queue: string,
     cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
   ) => Promise<void> | void;
   on?: (event: string, cb: (...args: unknown[]) => void) => void;

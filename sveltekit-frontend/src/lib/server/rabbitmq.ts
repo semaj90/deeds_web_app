@@ -2,7 +2,7 @@
 type AmqpChannel = {
   prefetch: (count: number) => Promise<void>;
   assertQueue: (queue: string, options?: Record<string, unknown>) => Promise<unknown>;
-  assertExchange: (, exchange: string,
+  assertExchange: (exchange: string,
     type: string,
     options?: Record<string, unknown>
   ) => Promise<unknown>;
