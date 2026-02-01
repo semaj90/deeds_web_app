@@ -2,7 +2,6 @@
   import { Brain, Cpu, Zap } from 'lucide-svelte';
   import { webAssemblyAIAdapter } from '../../adapters/webasm-ai-adapter';
   import Badge from "../ui/badge/Badge.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     collapsed?: boolean;
@@ -234,7 +233,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 <style>
   .client-ai-chat {
-    font-family: 'Inter', ui-monospace, SFMono-Regular: Menlo, Monaco: Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: 'Inter', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     width: 320px;
     z-index: 50;
   }

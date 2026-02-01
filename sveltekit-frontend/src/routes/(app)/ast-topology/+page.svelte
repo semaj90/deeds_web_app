@@ -1,6 +1,5 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // Props from server load
@@ -184,21 +183,26 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     const node = nodes.find(n => n.id === nodeId);
     if (node) {
       node.status = status;
-      updateGraph();
+      // Graph update handled by reactivity
     }
   }
 
-  $effect(() => {
+  function updateGraph() {
+    // Force reactivity update
+    nodes = [...nodes];
+    edges = [...edges];
+  }
 
+  $effect(() => {
     connectSSE();
     // Fetch initial topology
     fetchTopology();
-  
-});
 
-  // TODO: Add as cleanup in $effect: return () => {
-    eventSource?.close();
-  }
+    // Cleanup on unmount
+    return () => {
+      eventSource?.close();
+    };
+  });
 
   async function fetchTopology() {
     try {

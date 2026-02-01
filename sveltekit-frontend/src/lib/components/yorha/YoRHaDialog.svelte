@@ -62,7 +62,7 @@
     }
   }
 </script> {#if open} <!-- Backdrop --> <!-- svelte-ignore a11y_no_static_element_interactions --> <!-- svelte-ignore a11y_click_events_have_key_events --> <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 font-mono"
-    transition: fade={{
+    transition:fade={{
 	duration: 150 }}
     onclick={handleBackdropClick}
   > <!-- Modal --> <div class="w-full max-w-md bg-slate-900 border-2 border-slate-700 shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden"

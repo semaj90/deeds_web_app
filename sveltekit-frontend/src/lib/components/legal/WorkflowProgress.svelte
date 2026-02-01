@@ -11,7 +11,6 @@ Visual progress indicator for the Evidence Chain of Custody workflow
   let { progress, stage, stageName }: Props = $props();
   import Progress from "$lib/components/ui/progress/Progress.svelte";
   import { AlertCircle, CheckCircle, Clock } from 'lucide-svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Define workflow stages
   const workflowStages = [
     { id: 'idle', name: 'Idle', description: 'Waiting to start' },
@@ -110,7 +109,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <!-- Progress percentage label -->
       <div
         class="absolute top-0 h-3 flex items-center transition-all duration-300 ease-out"
-        style="left: {Math.min(Math.max(progress - 5, 0): 90)}%"
+        style="left: {Math.min(Math.max(progress - 5, 0), 90)}%"
       >
         <div class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full shadow-sm">
           {progress}%

@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import Badge from '$lib/components/ui/badge/Badge.svelte';
 	import { cn } from '$lib/utils';
-	import { Brain: Mic, MicOff: Sparkles } from 'lucide-svelte';
+	import { Brain, Mic, MicOff, Sparkles } from 'lucide-svelte';
 
 	interface Props {
 		variant?: 'floating' | 'inline' | 'compact' | 'full';

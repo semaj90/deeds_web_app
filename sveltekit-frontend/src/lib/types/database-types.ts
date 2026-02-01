@@ -3,10 +3,25 @@
  * Phase 2A: Enhanced type safety for Drizzle ORM + PostgreSQL + RabbitMQ
  */
 
-import type * as schema from '$lib/server/db/schema-postgres';
-import type { Channel, ConfirmChannel, Connection } from 'amqplib';
+import {
+    casePriorityEnum,
+    cases,
+    caseStatusEnum,
+    chatMessages,
+    criminals,
+    evidence,
+    evidenceTypeEnum,
+    legalDocuments,
+    threatLevelEnum,
+    userRoleEnum,
+    users
+} from '$lib/server/db/schema-postgres';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { Redis } from 'ioredis';
+
+// Import amqplib types (use any as fallback if types not available)
+type AmqplibChannel = any; // amqplib types may not be available
+type AmqplibConnection = any;
 
 // ============================================================================
 // DATABASE TYPES
@@ -15,35 +30,35 @@ import type { Redis } from 'ioredis';
 /**
  * Drizzle database instance with full schema
  */
-export type LegalAIDatabase = PostgresJsDatabase<typeof schema>;
+export type LegalAIDatabase = PostgresJsDatabase<any>;
 
 /**
  * Inferred types from Drizzle schema
  */
-export type User = typeof schema.users.$inferSelect;
-export type NewUser = typeof schema.users.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
 
-export type Case = typeof schema.cases.$inferSelect;
-export type NewCase = typeof schema.cases.$inferInsert;
+export type Case = typeof cases.$inferSelect;
+export type NewCase = typeof cases.$inferInsert;
 
-export type Evidence = typeof schema.evidence.$inferSelect;
-export type NewEvidence = typeof schema.evidence.$inferInsert;
+export type Evidence = typeof evidence.$inferSelect;
+export type NewEvidence = typeof evidence.$inferInsert;
 
-export type Document = typeof schema.legalDocuments.$inferSelect;
-export type NewDocument = typeof schema.legalDocuments.$inferInsert;
+export type Document = typeof legalDocuments.$inferSelect;
+export type NewDocument = typeof legalDocuments.$inferInsert;
 
-export type Criminal = typeof schema.criminals.$inferSelect;
-export type NewCriminal = typeof schema.criminals.$inferInsert;
+export type Criminal = typeof criminals.$inferSelect;
+export type NewCriminal = typeof criminals.$inferInsert;
 
-export type ChatMessage = typeof schema.chatMessages.$inferSelect;
-export type NewChatMessage = typeof schema.chatMessages.$inferInsert;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type NewChatMessage = typeof chatMessages.$inferInsert;
 
 // Enums
-export type UserRole = typeof schema.userRoleEnum.enumValues[number];
-export type CaseStatus = typeof schema.caseStatusEnum.enumValues[number];
-export type CasePriority = typeof schema.casePriorityEnum.enumValues[number];
-export type EvidenceType = typeof schema.evidenceTypeEnum.enumValues[number];
-export type ThreatLevel = typeof schema.threatLevelEnum.enumValues[number];
+export type UserRole = typeof userRoleEnum.enumValues[number];
+export type CaseStatus = typeof caseStatusEnum.enumValues[number];
+export type CasePriority = typeof casePriorityEnum.enumValues[number];
+export type EvidenceType = typeof evidenceTypeEnum.enumValues[number];
+export type ThreatLevel = typeof threatLevelEnum.enumValues[number];
 
 // ============================================================================
 // RABBITMQ TYPES
@@ -53,9 +68,9 @@ export type ThreatLevel = typeof schema.threatLevelEnum.enumValues[number];
  * RabbitMQ connection wrapper
  */
 export interface RabbitMQConnection {
-	connection: Connection;
-	channel: Channel;
-	confirmChannel?: ConfirmChannel;
+	connection: AmqplibConnection;
+	channel: AmqplibChannel;
+	confirmChannel?: AmqplibChannel;
 	isConnected: boolean;
 }
 
@@ -307,11 +322,7 @@ export interface VectorSearchResult<T = unknown> {
 // EXPORT ALL SCHEMA TYPES
 // ============================================================================
 
-export type {
-    Channel,
-    ConfirmChannel, Connection, ConsumeMessage
-} from 'amqplib';
-
+// Note: amqplib types may not be available, using type aliases above
 export type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 export type { Redis } from 'ioredis';
 

@@ -2,7 +2,9 @@
 import type { SearchResult } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Updated to use bits-ui components import  Button  from "$lib/components/ui/bitsButton.svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import  Select  from "$lib/components/ui/MeltSelect.svelte"; // TODO: Replace with bits-ui equivalents when available // import { // Badge, // CardContent, // CardHeader, // CardTitle, // Checkbox, // DialogContent, // DialogHeader, // DialogTitle, // Input, // Progress, // SelectContent, // SelectItem, // SelectTrigger, // SelectValue, // Slider, // Tabs, // TabsContent, // TabsList, // TabsTrigger, // } from "bits-ui"
-  import { BarChart3: Brain, ChevronDown: ChevronUp, Clock: Download, Eye: Filter, Loader2: Search, Share2: Target, TrendingUp: Zap } from "lucide-svelte"; // Migrated to $effect import { derived, get, writable } from "svelte/store"; // Props let {
+  import { BarChart3, Brain, ChevronDown, ChevronUp, Clock, Download, Eye, Filter, Loader2, Search, Share2, Target, TrendingUp, Zap } from "lucide-svelte";
+  // Migrated to $effect
+  import { derived, get, writable } from "svelte/store"; // Props let {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     caseId = "",

@@ -22,7 +22,7 @@
 
 <div class="notification-group notification-group-top-right">
   {#each notifications as n (n.id)}
-    <div animate: flip={{
+    <div animate:flip={{
 	duration: 300 }} class="pointer-events-auto">
       <YoRHaNotification
         id={n.id}

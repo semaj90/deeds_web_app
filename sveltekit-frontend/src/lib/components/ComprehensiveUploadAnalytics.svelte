@@ -31,8 +31,9 @@
 	}: Props = $props();
 
 	// State
-	let uploadActor = $state<ReturnType<typeof createActor<typeof comprehensiveUploadAnalyticsMachine>> | null>(null);
+	let uploadActor = $state<any>(null);
 	let machineState = $state<any>(null); // Ideally strictly typed, but xstate types can be complex
+	let userAnalytics = $state<UserAnalytics | null>(null);
 	let fileInput = $state<HTMLInputElement | null>(null);
 	let dragOver = $state<boolean>(false);
 	let selectedFiles = $state<File[]>([]);
@@ -44,8 +45,8 @@
 	let duringUploadPrompts = $derived(context ? getContextualPromptsByTiming(context, 'during-upload') : []);
 	let afterUploadPrompts = $derived(context ? getContextualPromptsByTiming(context, 'after-upload') : []);
 
-	let currentUserInsights = $derived(context ? generateUserInsights(context) : null);
-	let engagementScore = $derived(context ? calculateUserEngagementScore(context) : 0);
+	let currentUserInsights = $derived(userAnalytics ? generateUserInsights(userAnalytics) : []);
+	let engagementScore = $derived(userAnalytics ? calculateUserEngagementScore(userAnalytics) : 0);
 
 	let uploadProgress = $derived(context?.uploadProgress ?? 0);
 	let isUploading = $derived(machineState?.matches('uploadPipeline') ?? false);
@@ -73,7 +74,7 @@
 	// });
 
 	function initializeUploadAnalytics() {
-		const userAnalytics: UserAnalytics = {
+		userAnalytics = {
 			userId: userId || 'anonymous',
 			sessionId: `session-${Date.now()}`,
 			behaviorPattern: 'intermediate',
@@ -320,7 +321,7 @@
 		<h2>Legal Document Upload & Analysis</h2>
 		{#if enableAnalytics && currentUserInsights}
 			<div class="user-insights-badge">
-				<span class="expertise-level">{currentUserInsights.behaviorPattern}</span>
+				<span class="expertise-level">{userAnalytics?.behaviorPattern || 'intermediate'}</span>
 				<span class="engagement-score">Engagement: {Math.round(engagementScore * 100)}%</span>
 			</div>
 		{/if}
@@ -536,17 +537,17 @@
 			<div class="analytics-content">
 				<div class="insight-card">
 					<h4>Behavior Pattern</h4>
-					<p class="behavior-pattern">{currentUserInsights.behaviorPattern}</p>
-					<p class="engagement-level">Engagement: {currentUserInsights.engagementLevel}</p>
+					<p class="behavior-pattern">{userAnalytics?.behaviorPattern || 'intermediate'}</p>
+					<p class="engagement-level">Engagement: {Math.round(engagementScore * 100)}%</p>
 				</div>
 				<div class="insight-card">
 					<h4>Efficiency</h4>
-					<p class="efficiency-score">{Math.round((currentUserInsights.uploadEfficiency || 0) * 100)}% Success Rate</p>
+					<p class="efficiency-score">{Math.round((userAnalytics?.uploadHistory.successRate || 0) * 100)}% Success Rate</p>
 				</div>
 				<div class="insight-card">
 					<h4>Recommendations</h4>
 					<ul class="recommendations-list">
-						{#each currentUserInsights.recommendations as recommendation}
+						{#each currentUserInsights as recommendation}
 							<li>{recommendation}</li>
 						{/each}
 					</ul>

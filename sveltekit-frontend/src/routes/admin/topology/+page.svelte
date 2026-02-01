@@ -1,8 +1,6 @@
 <script lang="ts">
 	// Migrated to $effect
 	import { writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface TopologyNode {
 		id: string;
@@ -30,7 +28,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	const loading = writable(true);
 	const searchQuery = writable('');
 
-	let canvas: HTMLCanvasElement;
+	let canvas = $state<HTMLCanvasElement | undefined>(undefined);
 	let ctx: CanvasRenderingContext2D;
 	let isDragging = false;
 	let dragNode: TopologyNode | null = null;
@@ -75,7 +73,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			    window.removeEventListener('resize', resizeCanvas);
             }
 		};
-	
+
 });
 
 	async function loadTopology() {
@@ -304,7 +302,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 					Object.assign(node, update);
 				}
 				return t;
-			
+
 });
 		});
 

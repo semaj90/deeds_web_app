@@ -61,7 +61,7 @@
       },
 	100);
     }
-  
+
 });
 
   // TODO: Add as cleanup in $effect: return () => {
@@ -72,7 +72,7 @@
 {#if visible}
   <div
     class="relative overflow-hidden bg-slate-900 border border-slate-700 p-4 min-w-[300px] shadow-2xl"
-    transition: fly={{
+    transition:fly={{
 	x: 100, duration: 400 }}
   >
     <div class="flex items-start gap-4">

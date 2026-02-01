@@ -16,7 +16,6 @@ import { gpuService } from "$lib/services/gpu-acceleration-service";
 import { rabbitmqService } from "$lib/services/rabbitmq-service";
 import VectorService from "$lib/services/vector-service";
 import { evidenceStore } from "$lib/stores/unified/evidence-store";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const vectorService = new VectorService();
 const EvidenceCardAny = EvidenceCard as any;
@@ -211,7 +210,7 @@ canvasEvidence = [...canvasEvidence, item];
 <p class="title bg-background">{column.title} ({column.items.length})</p>
 
 <div class="flex-1 overflow-y-auto p-2 space-y-4 custom-scrollbar"
-use: dndzone={{
+use:dndzone={{
 	items: column.items, flipDurationMs: 200 }}
 onfinalize={(e: any) => handleDndFinalize(e, column.id)}
 >

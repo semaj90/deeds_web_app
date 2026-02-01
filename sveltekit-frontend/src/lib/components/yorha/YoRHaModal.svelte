@@ -73,7 +73,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   class="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
   onclick={handleBackdropClick}
   onkeydown={handleKeydown}
-  transition: fade={{
+  transition:fade={{
 	duration: 200 }}
   role="dialog"
   aria-modal="true"

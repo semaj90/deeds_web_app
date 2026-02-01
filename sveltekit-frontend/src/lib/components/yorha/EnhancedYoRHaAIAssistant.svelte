@@ -189,7 +189,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 {#if isOpen}
   <div class="ai-assistant-overlay"
-    transition: fade={{
+    transition:fade={{
 	duration: 200 }}
     onclick={onClose}
     onkeydown={(e) => e.key === 'Escape' && onClose()}
