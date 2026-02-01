@@ -939,3 +939,4 @@ sveltekit-frontend/static/embeddinggemma_300m_onnx/special_tokens_map.json
 sveltekit-frontend/static/embeddinggemma_300m_onnx/tokenizer_config.json
 sveltekit-frontend/static/embeddinggemma_300m_onnx/tokenizer.json
 sveltekit-frontend/svelte-check-machine.ndjson
+langextract-go/
