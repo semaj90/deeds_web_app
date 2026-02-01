@@ -2,9 +2,8 @@ import type { User } from '$lib/types';
 import bcrypt from 'bcryptjs';
 import { and, eq, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import { users, userSessions } from './schema/user-management.js';
+import { users, sessions as userSessions } from './schema-postgres';
 import { db } from './unified-client.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // USER AUTHENTICATION OPERATIONS
@@ -30,6 +29,8 @@ export class UserAuthService {
                 return { user: null, success: false, error: 'User already exists' };
             }
 
+            // TODO: Implement user creation logic
+            return { user: null, success: false, error: 'Not implemented' };
         } catch (error: any) {
             console.error('User registration error:', error);
             return { user: null, success: false, error: error.message };
@@ -83,7 +84,7 @@ export class UserAuthService {
      */
     static async validateSession(sessionId: string): Promise<{ valid: boolean; user?: User }> {
         try {
-            const session = await db.query.userSessions.findFirst({
+            const session = await db.query.sessions.findFirst({
                 where: and(
                     eq(userSessions.sessionId, sessionId),
                     eq(userSessions.isActive, true),

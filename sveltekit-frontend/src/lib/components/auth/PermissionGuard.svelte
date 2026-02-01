@@ -22,14 +22,17 @@
       return false;
     }
 
-    // Check permissions
-    if (requireAll) {
-      return requiredPermissions.every((permission) => authStore.hasPermission(permission));
-    } else {
-      return requiredPermissions.some((permission) => authStore.hasPermission(permission));
+    // Check resource ownership if specified
+    if (resourceOwner && authStore.user.id !== resourceOwner && authStore.user.role !== 'admin') {
+      return false;
     }
-  });
-</script>
+
+    // Check case-specific permissions
+    if (caseId) {
+      if (requireAll) {
+        return requiredPermissions.every(permission => {
+          if (permission === 'read') return authStore.canAccessCase(caseId);
+          if (permission === 'write') return authStore.canEditCase(caseId);
           if (permission === 'delete') return authStore.canDeleteCase(caseId);
           return authStore.hasPermission(permission);
         });
@@ -42,12 +45,15 @@
         });
       }
     }
-    // Check resource ownership if specified
-    if (resourceOwner && authStore.user.id !== resourceOwner && authStore.user.role !== 'admin') {
-      return false;
-    }
+
     // Standard permission check
     if (requireAll) {
+      return requiredPermissions.every((permission) => authStore.hasPermission(permission));
+    } else {
+      return requiredPermissions.some((permission) => authStore.hasPermission(permission));
+    }
+  });
+</script>
       return requiredPermissions.every(permission => authStore.hasPermission(permission));
     } else {
       return requiredPermissions.some(permission => authStore.hasPermission(permission));

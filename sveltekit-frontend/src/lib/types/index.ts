@@ -1,4 +1,10 @@
 // src/lib/types/index.ts
+
+// Re-export database types
+export type {
+    Case, ChatMessage, Criminal, Document, Evidence, NewCase, NewChatMessage, NewCriminal, NewDocument, NewEvidence, NewUser, User
+} from './database-types';
+
 export interface CanvasState {
   id: string;
   fabricJSON?: any;

@@ -5,11 +5,10 @@
  */
 
 import { browser } from '$app/environment';
-import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 import { indexedDBCache } from './indexdb-cache.svelte';
 import { lokiCache } from './loki-cache.svelte';
 
-export interface CacheStrategy extends CachingTypes.CacheStrategy {
+export interface CacheStrategy {
 	/** Use in-memory cache (LokiJS) */
 	memory?: boolean;
 	/** Use persistent cache (IndexedDB) */

@@ -1,7 +1,7 @@
 <script lang="ts">
  import { Badge } from '$lib/components/ui/badge';
  import { Button } from '$lib/components/ui/enhanced-bits';
- import { Card: CardHeader, CardTitle: CardContent } from '$lib/components/ui/enhanced-bits';
+ import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/enhanced-bits';
 
  interface Props {
  id: number;
@@ -56,7 +56,7 @@
 
  <CardContent>
  <!-- Diff Display -->
- <div class="bg-slate-950 dark: bg-slate-900 rounded-md p-4 overflow-x-auto">
+ <div class="bg-slate-950 dark:bg-slate-900 rounded-md p-4 overflow-x-auto">
  <pre class="text-xs font-mono text-slate-200"><code>{diffText}</code></pre>
  </div>
 
@@ -70,12 +70,12 @@
  </div>
  <div class="flex gap-2">
  {#if !applied && onApply}
- <Button class="bits-btn" size="sm" onclick={() => onApply.id}>
+ <Button class="bits-btn" size="sm" onclick={() => onApply?.(id)}>
  Apply Patch
  </Button>
  {/if}
  {#if applied && onRollback}
- <Button class="bits-btn" size="sm" variant="destructive" onclick={() => onRollback.id}>
+ <Button class="bits-btn" size="sm" variant="destructive" onclick={() => onRollback?.(id)}>
  Rollback
  </Button>
  {/if}
@@ -83,6 +83,3 @@
  </div>
  </CardContent>
 </Card>
-
-
-
