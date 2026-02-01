@@ -115,29 +115,36 @@
 
   .nier-bits-yorha-panel-header h3 {
     margin: 0;
-    font-size: 1.25rem;, color: #333;
+    font-size: 1.25rem;
+    color: #333;
   }
 
   .nier-bits-card-body {
-    padding-top: 0.5rem;, display: block;
+    padding-top: 0.5rem;
+    display: block;
   }
 
   .form-label {
     font-weight: bold;
-    margin-bottom: 0.5rem;, display: block;
+    margin-bottom: 0.5rem;
+    display: block;
   }
 
   .form-control {
-    width: 100%;, padding: 0.75rem;
+    width: 100%;
+    padding: 0.75rem;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
   }
 
   .btn.nes-btn {
-    background-color: #007bff;, color: #fff;
-    border: none;, padding: 0.75rem 1.5rem;
-    border-radius: 4px;, cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
     font-size: 1rem;
   }
 

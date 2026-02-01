@@ -13,50 +13,68 @@
  */
 
 export interface WebGPUGraphConfig {
-  maxNodes: number;, maxEdges: number;
-  canvasWidth: number;, canvasHeight: number;
-  enablePhysics: boolean;, renderDistance: number;
+  maxNodes: number;
+  maxEdges: number;
+  canvasWidth: number;
+  canvasHeight: number;
+  enablePhysics: boolean;
+  renderDistance: number;
   lodLevels: number;
 }
 
 export interface GraphNode {
-  id: string;, position: [number, number, number];
+  id: string;
+  position: [number, number, number];
   velocity: [number, number, number];
   force: [number, number, number];
-  mass: number;, size: number;
+  mass: number;
+  size: number;
   color: [number, number, number, number];
   type: 'document' | 'case' | 'entity' | 'precedent';
-  metadata: {, title: string;
-    importance: number;, connections: number;
+  metadata: {
+    title: string;
+    importance: number;
+    connections: number;
     lastAccessed: number;
   };
 }
 
 export interface GraphEdge {
-  source: number;, target: number;
-  weight: number;, type: 'citation' | 'similarity' | 'reference' | 'temporal';
-  strength: number;, color: [number, number, number, number];
+  source: number;
+  target: number;
+  weight: number;
+  type: 'citation' | 'similarity' | 'reference' | 'temporal';
+  strength: number;
+  color: [number, number, number, number];
 }
 
 export interface TensorStore {
-  nodeBuffer: GPUBuffer;, edgeBuffer: GPUBuffer;
-  metadataBuffer: GPUBuffer;, positionTexture: GPUTexture;
-  colorTexture: GPUTexture;, adjacencyTexture: GPUTexture;
+  nodeBuffer: GPUBuffer;
+  edgeBuffer: GPUBuffer;
+  metadataBuffer: GPUBuffer;
+  positionTexture: GPUTexture;
+  colorTexture: GPUTexture;
+  adjacencyTexture: GPUTexture;
 }
 
 export interface GraphRenderState {
-  nodeCount: number;, edgeCount: number;
+  nodeCount: number;
+  edgeCount: number;
   cameraPosition: [number, number, number];
   cameraTarget: [number, number, number];
-  zoom: number;, selectedNode: string | null;
-  highlightedNodes: Set<string>;, filterType: 'all' | 'document' | 'case' | 'entity' | 'precedent';
+  zoom: number;
+  selectedNode: string | null;
+  highlightedNodes: Set<string>;
+  filterType: 'all' | 'document' | 'case' | 'entity' | 'precedent';
   timeRange: [number, number];
   autoRotate: boolean;
 }
 
 export type PerformanceStats = {
-  fps: number;, frameTime: number;
-  nodeCount: number;, edgeCount: number;
+  fps: number;
+  frameTime: number;
+  nodeCount: number;
+  edgeCount: number;
   gpuMemoryUsage: number;
   cacheHitRate?: number;
 };
@@ -134,7 +152,8 @@ export class WebGPULegalDocumentGraph {
 
     this.device = await adapter.requestDevice({
       requiredFeatures: [],
-      requiredLimits: {, maxStorageBufferBindingSize: 134217728,
+      requiredLimits: {
+        maxStorageBufferBindingSize: 134217728,
       },
     });
 
@@ -272,8 +291,12 @@ export class WebGPULegalDocumentGraph {
   }
   public startRenderLoop() { /* ... */ }
   public loadGraphFromDB(graphId: string) { /* ... */ }
-  public highlightNodes(nodes: string[]) { /* ... */ }
-  public clearHighlights() { /* ... */ }
+  public highlightNodes(nodes: string[]) {
+      nodes.forEach(id => this.renderState.highlightedNodes.add(id));
+  }
+  public clearHighlights() {
+      this.renderState.highlightedNodes.clear();
+  }
   public dispose() {
      this.stopRenderLoop();
      // Cleanup logic
@@ -281,9 +304,3 @@ export class WebGPULegalDocumentGraph {
   private stopRenderLoop() { /* ... */ }
   private estimateGPUMemory() { return 0; }
 }
-
-
-
-
-
-

@@ -46,15 +46,19 @@ export interface RedisCacheAdapter {
 /* ===== Domain types ===== */
 export interface ChainOfCustodyEntry {
     timestamp: string | Date;
-    handler: string;, action: string;
+    handler: string;
+    action: string;
     location: string;
-    notes?: string;, signature: string;
+    notes?: string;
+    signature: string;
 }
 
 export interface EvidenceItem {
-    id: string;, caseId: string;
+    id: string;
+    caseId: string;
     type: 'document' | 'image' | 'video' | 'audio' | 'digital' | 'physical';
-    title: string;, description: string;
+    title: string;
+    description: string;
     fileUrl?: string;
     metadata?: Record<string, unknown>;
     chainOfCustody: ChainOfCustodyEntry[];
@@ -66,44 +70,65 @@ export interface EvidenceItem {
 
 export interface Finding {
     type: 'pattern' | 'anomaly' | 'match' | 'contradiction' | 'gap';
-    description: string;, confidence: number;
+    description: string;
+    confidence: number;
     relevance: number;
     supportingData?: unknown[];
 }
 
 export interface Correlation {
-    relatedEvidenceId: string;, correlationType: 'temporal' | 'spatial' | 'causal' | 'semantic' | 'entity';
-    strength: number;, description: string;
+    relatedEvidenceId: string;
+    correlationType: 'temporal' | 'spatial' | 'causal' | 'semantic' | 'entity';
+    strength: number;
+    description: string;
     sharedEntities: string[];
 }
 
 export interface Entity {
     type: 'person' | 'organization' | 'location' | 'date' | 'amount' | 'object';
-    value: string;, confidence: number;
+    value: string;
+    confidence: number;
     mentions?: number;
     context?: string[];
 }
 
 export interface SentimentAnalysis {
-    overall: number;, emotions: { anger: number;, fear: number; joy: number;, sadness: number; surprise: number;, trust: number };
-    subjectivity: number;, formality: number;
+    overall: number;
+    emotions: {
+        anger: number;
+        fear: number;
+        joy: number;
+        sadness: number;
+        surprise: number;
+        trust: number;
+    };
+    subjectivity: number;
+    formality: number;
 }
 
 export interface TimelineEvent {
     timestamp: string | Date;
-    description: string;, type: 'action' | 'communication' | 'transaction' | 'movement' | 'state_change';
-    actors: string[];, keyEntities: Entity[];
+    description: string;
+    type: 'action' | 'communication' | 'transaction' | 'movement' | 'state_change';
+    actors: string[];
+    keyEntities: Entity[];
     sentiment: SentimentAnalysis;
     [key: string]: unknown;
 }
 
 export interface EvidenceAnalysis {
-    id: string;, evidenceId: string;
-    timestamp: Date;, aiModel: string;
-    findings: Finding[];, correlations: Correlation[];
-    riskScore: number;, confidence: number;
-    summary: string;, recommendations: string[];
-    keyEntities: Entity[];, sentiment: SentimentAnalysis;
+    id: string;
+    evidenceId: string;
+    timestamp: Date;
+    aiModel: string;
+    findings: Finding[];
+    correlations: Correlation[];
+    riskScore: number;
+    confidence: number;
+    summary: string;
+    recommendations: string[];
+    keyEntities: Entity[];
+    sentiment: SentimentAnalysis;
     timeline: TimelineEvent[];
     [key: string]: unknown;
 }
@@ -119,7 +144,7 @@ function getOllamaEndpoint(): string {
 }
 
 interface AIEvidenceAnalyzerOptions {
-    pgJsonStore?: PostgresJsonStore,
+    pgJsonStore?: PostgresJsonStore;
     qdrantAdapter?: QdrantClientAdapter;
     redisCacheAdapter?: RedisCacheAdapter;
     wasmCluster?: WasmClusteringService;
@@ -159,7 +184,7 @@ export class AIEvidenceAnalyzer {
             const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, model: this.analysisModel, prompt, stream: false, temperature: 0.0 })
+                body: JSON.stringify({ model: this.analysisModel, prompt, stream: false, temperature: 0.0 })
             });
 
             if (!res.ok) {
@@ -265,7 +290,7 @@ export class AIEvidenceAnalyzer {
     private async analyzeCorrelation(evidence1: EvidenceItem, evidence2: EvidenceItem | { id?: string; [k: string]: any }): Promise<Correlation> {
         const e2 = evidence2 as { id?: unknown };
         const evidence2Id = typeof e2.id === 'string' ? e2.id : String(Math.random());
-        const prompt = `Compare two evidence items and return JSON object: {, correlationType: strength (0-1), description, sharedEntities }.\n\nEvidence1: ${JSON.stringify(evidence1)}\nEvidence2: ${JSON.stringify(evidence2)}`;
+        const prompt = `Compare two evidence items and return JSON object: { correlationType, strength (0-1), description, sharedEntities }.\n\nEvidence1: ${JSON.stringify(evidence1)}\nEvidence2: ${JSON.stringify(evidence2)}`;
         const raw = await this.callOllamaGenerate(prompt);
         return await this.parseCorrelation(raw, evidence2Id);
     }
@@ -308,7 +333,7 @@ export class AIEvidenceAnalyzer {
     private async generateRecommendations(evidence: EvidenceItem, findings: Finding[], correlations: Correlation[], riskScore: number): Promise<string[]> {
         const evidenceCaption = evidence?.title ?? evidence?.description ?? 'evidence (no title)';
         const corrSummary = (correlations ?? []).map(c => `${c.correlationType}: ${c.description}`).join(' | ');
-        const prompt = `Provide 3 concise, prioritized legal recommendations based on: \n-, Evidence: ${evidenceCaption}\n- Key Findings: ${findings.map(f => f.description).join(', ')}\n- Correlations: ${corrSummary}\n- Overall Risk Score: ${riskScore.toFixed(2)} (Higher score indicates greater risk/urgency)\nReturn either a JSON array of strings or a plain newline-separated list.`;
+        const prompt = `Provide 3 concise, prioritized legal recommendations based on: \n- Evidence: ${evidenceCaption}\n- Key Findings: ${findings.map(f => f.description).join(', ')}\n- Correlations: ${corrSummary}\n- Overall Risk Score: ${riskScore.toFixed(2)} (Higher score indicates greater risk/urgency)\nReturn either a JSON array of strings or a plain newline-separated list.`;
         const raw = await this.callOllamaGenerate(prompt);
         return await this.parseRecommendations(raw);
     }
@@ -406,7 +431,7 @@ export class AIEvidenceAnalyzer {
     }
 
     private async parseSentiment(raw: string): Promise<SentimentAnalysis> {
-        const defaultSentiment: SentimentAnalysis = { overall: 0, emotions: {, anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 }, subjectivity: 0, formality: 0 };
+        const defaultSentiment: SentimentAnalysis = { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 }, subjectivity: 0, formality: 0 };
         return await this.parseJsonSafe<SentimentAnalysis>(raw, defaultSentiment);
     }
 
@@ -433,10 +458,3 @@ export class AIEvidenceAnalyzer {
         }
     }
 }
-
-
-
-
-
-
-

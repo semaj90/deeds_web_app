@@ -1,15 +1,20 @@
 export interface GraphNode {
-    id: string;, x: number;
-    y: number;, z: number;
+    id: string;
+    x: number;
+    y: number;
+    z: number;
     type: 'evidence' | 'entity' | 'event' | 'correlation' | 'person' | 'organization' | 'location' | 'object' | 'date' | 'amount';
-    label: string;, weight: number;
+    label: string;
+    weight: number;
     color: [number, number, number, number];
     connections: string[];
 }
 
 export interface GraphEdge {
-    source: string;, target: string;
-    weight: number;, type: 'temporal' | 'causal' | 'semantic' | 'entity' | 'spatial';
+    source: string;
+    target: string;
+    weight: number;
+    type: 'temporal' | 'causal' | 'semantic' | 'entity' | 'spatial';
     color: [number, number, number, number];
 }
 
@@ -113,7 +118,8 @@ export class WebGPUEvidenceGraph {
 
         this.pipeline = this.device.createRenderPipeline({
             layout: 'auto',
-            vertex: {, module: vertexModule,
+            vertex: {
+                module: vertexModule,
                 entryPoint: 'main',
                 buffers: [
                     {
@@ -126,13 +132,16 @@ export class WebGPUEvidenceGraph {
                     }
                 ]
             },
-            fragment: {, module: fragmentModule,
+            fragment: {
+                module: fragmentModule,
                 entryPoint: 'main',
                 targets: [{ format }]
             },
-            primitive: {, topology: 'point-list',
+            primitive: {
+                topology: 'point-list',
             },
-            depthStencil: {, depthWriteEnabled: true,
+            depthStencil: {
+                depthWriteEnabled: true,
                 depthCompare: 'less',
                 format: 'depth24plus',
             }
@@ -152,7 +161,8 @@ export class WebGPUEvidenceGraph {
             entries: [
                 {
                     binding: 0,
-                    resource: {, buffer: this.uniformBuffer,
+                    resource: {
+                        buffer: this.uniformBuffer,
                     },
                 },
             ],
@@ -194,7 +204,7 @@ export class WebGPUEvidenceGraph {
     }
 
     private updateEdgeBuffer(): void {
-       // Placeholder
+        // Placeholder
     }
 
     public startAnimation(): void {
@@ -236,12 +246,13 @@ export class WebGPUEvidenceGraph {
             colorAttachments: [
                 {
                     view: textureView,
-                    clearValue: {, r: 0.05, g: 0.05, b: 0.1, a: 1.0 },
+                    clearValue: { r: 0.05, g: 0.05, b: 0.1, a: 1.0 },
                     loadOp: 'clear',
                     storeOp: 'store',
                 },
             ],
-            depthStencilAttachment: {, view: depthTexture.createView(),
+            depthStencilAttachment: {
+                view: depthTexture.createView(),
                 depthClearValue: 1.0,
                 depthLoadOp: 'clear',
                 depthStoreOp: 'store',
@@ -334,9 +345,3 @@ export class WebGPUEvidenceGraph {
         this.context = null;
     }
 }
-
-
-
-
-
-
