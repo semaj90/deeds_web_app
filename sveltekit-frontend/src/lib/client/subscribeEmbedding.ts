@@ -1,11 +1,11 @@
 import type { EmbeddingResult } from '$lib/shared/embedding-types';
 import { readable, type Readable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface EmbeddingStreamEvent {
-  log?: string;
-  done?: boolean;
-  error?: string;
+	log?: string;
+	done?: boolean;
+	error?: string;
+	result?: EmbeddingResult;
 }
 
 export function subscribeEmbedding(docId: string, text: string): Readable<EmbeddingStreamEvent> {

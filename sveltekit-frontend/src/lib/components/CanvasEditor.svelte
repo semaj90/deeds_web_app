@@ -12,14 +12,15 @@
  let currentCanvasElements = $state(canvasState?.elements ?? []);
 
  function handleSave() {
- const updatedCanvasState: CanvasState = {
- id: canvasState?.id ?? crypto.randomUUID(),
- reportId,
- elements: currentCanvasElements,
- createdAt: canvasState?.createdAt ?? new Date(),
- updatedAt: new Date(),
- };
- save(updatedCanvasState);
+		const updatedCanvasState: CanvasState = {
+			id: canvasState?.id ?? crypto.randomUUID(),
+			caseId,
+			userId: '', // Will be set by server
+			stateData: currentCanvasElements,
+			createdAt: canvasState?.createdAt ?? new Date(),
+			updatedAt: new Date(),
+		};
+		save(updatedCanvasState);
  }
 </script>
 
