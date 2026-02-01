@@ -12,7 +12,8 @@
 	let { apiBase }: Props = $props();
 
 	interface DependencyNode {
-		import_path: string;, import_count: number;
+		import_path: string;
+		import_count: number;
 	}
 
 	let dependencies = $state<DependencyNode[]>([]);
@@ -23,7 +24,7 @@
 	async function loadDependencies() {
 		loading = true;
 		try {
-			const response = await fetch(`${apiBase}/dependencies? limit=${limit}`);
+			const response = await fetch(`${apiBase}/dependencies?limit=${limit}`);
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
 			const data = await response.json();
 			dependencies = data.most_imported_files ?? [];
@@ -190,28 +191,33 @@
 	}
 
 	.controls h3 {
-		margin: 0;, color: #1f2937;
+		margin: 0;
+		color: #1f2937;
 		font-size: 1.25rem;
 	}
 
 	.limit-control {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	.limit-control label {
-		font-size: 0.875rem;, color: #6b7280;
+		font-size: 0.875rem;
+		color: #6b7280;
 	}
 
 	.limit-control select {
 		padding: 0.5rem 0.75rem;
 		border: 2px solid #e5e7eb;
 		border-radius: 6px;
-		font-size: 0.875rem;, cursor: pointer;
+		font-size: 0.875rem;
+		cursor: pointer;
 	}
 
 	.loading, .empty-state {
-		text-align: center;, padding: 3rem;
+		text-align: center;
+		padding: 3rem;
 		color: #6b7280;
 	}
 
@@ -226,27 +232,29 @@
 	}
 
 	.stats-summary {
-		display: flex;, gap: 2rem;
-		padding: 1rem;, background: #f9fafb;
+		display: flex;
+		gap: 2rem;
+		padding: 1rem;
+		background: #f9fafb;
 		border-radius: 8px;
 	}
 
 	.stat {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column;
+		gap: 0.25rem;
 	}
 
 	.stat-label {
-		font-size: 0.75rem;, color: #6b7280;
+		font-size: 0.75rem;
+		color: #6b7280;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
 
 	.stat-value {
 		font-size: 1.25rem;
-		font-weight: bold;, color: #667eea;
+		font-weight: bold;
+		color: #667eea;
 	}
 </style>
-
-
-
