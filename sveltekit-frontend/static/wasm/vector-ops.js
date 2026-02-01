@@ -2,7 +2,7 @@ async function instantiate(module, imports = {}) {
   const adaptedImports = {
     env: Object.setPrototypeOf({
       abort(message, fileName, lineNumber, columnNumber) {
-        // ~lib/builtins/abort(~lib/string/String: null?, ~lib/string/String: null?, u32?, u32?) => void
+        // ~lib/builtins/abort(~lib/string/String | null?, ~lib/string/String | null?, u32?, u32?) => void
         message = __liftString(message >>> 0);
         fileName = __liftString(fileName >>> 0);
         lineNumber = lineNumber >>> 0;
@@ -22,9 +22,13 @@ async function instantiate(module, imports = {}) {
       return exports.allocateVectorMemory(length) >>> 0;
     },
     hybridCosineSimilarity(aPtr, bPtr, length, useServer) {
-      // src/wasm/vector-operations/hybridCosineSimilarity(usize, usize, i32, bool) => f32
+      // src/wasm/vector-operations/hybridCosineSimilarity(usize, usize, usize, bool) => f32
       useServer = useServer ? 1 : 0;
       return exports.hybridCosineSimilarity(aPtr, bPtr, length, useServer);
+    },
+    batchVectorChunking(vectorsPtr, numVectors, vectorLength, chunkSize, resultsPtr) {
+      // src/wasm/vector-operations/batchVectorChunking(usize, i32, i32, i32, usize) => usize
+      return exports.batchVectorChunking(vectorsPtr, numVectors, vectorLength, chunkSize, resultsPtr) >>> 0;
     },
     prepareTensorForCUDA(tensorPtr, dimensions, dimCount, outputPtr) {
       // src/wasm/vector-operations/prepareTensorForCUDA(usize, ~lib/array/Array<i32>, i32, usize) => void

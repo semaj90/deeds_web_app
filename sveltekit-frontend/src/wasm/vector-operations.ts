@@ -134,7 +134,7 @@ export function zScoreNormalize(vectorPtr: usize, length: i32): void {
  * Algorithm: 0=cosine, 1=euclidean, 2=dot, 3=manhattan
  */
 export function computeBatchSimilarity(
- queryPtr: usize, vectorsPtr: usize, usize: resultsPtr, vectorDim: i32, i32: vectorCount, algorithm: i32
+ queryPtr: usize, vectorsPtr: usize, resultsPtr: usize, vectorDim: i32, vectorCount: i32, algorithm: i32
 ): void {
  for (let i = 0; i < vectorCount; i++) {
  const vectorPtr = vectorsPtr + i * vectorDim * 4; // 4 bytes per f32
@@ -163,7 +163,7 @@ export function computeBatchSimilarity(
 /**
  * Batch normalize multiple vectors in place
  */
-export function batchNormalizeVectors(vectorsPtr: usize, numVectors: i32): void {
+export function batchNormalizeVectors(vectorsPtr: usize, numVectors: i32, vectorLength: i32): void {
  for (let v = 0; v < numVectors; v++) {
  const vectorOffset = v * vectorLength * 4;
  const currentVectorPtr = vectorsPtr + vectorOffset;
@@ -178,7 +178,7 @@ export function batchNormalizeVectors(vectorsPtr: usize, numVectors: i32): void 
  * Useful for quick similarity search on legal document text
  */
 export function hashEmbedding(
- textPtr: usize, textLen: i32, i32: embeddingPtr, embeddingDim: i32
+ textPtr: usize, textLen: i32, embeddingPtr: usize, embeddingDim: i32
 ): void {
  if (textLen <= 0 || embeddingDim <= 0) return;
  // Clear the embedding first
@@ -317,7 +317,7 @@ export function prepareVectorForServer(vectorPtr: usize, length: i32): void {
 /**
  * Process server response and store in WebAssembly memory
  */
-export function processServerResponse(responsePtr: usize, resultPtr: usize): void {
+export function processServerResponse(responsePtr: usize, resultPtr: usize, length: i32): void {
  // Copy server response data back into WebAssembly memory
  for (let i = 0; i < length; i++) {
  const value = load<f32>(responsePtr + (i << 2));
@@ -329,8 +329,8 @@ export function processServerResponse(responsePtr: usize, resultPtr: usize): voi
  * Hybrid processing: attempt local SIMD, fallback to server
  */
 export function hybridCosineSimilarity(
- aPtr: usize, bPtr: usize, usize: length, useServer: bool
-), f32 {
+ aPtr: usize, bPtr: usize, length: usize, useServer: bool
+): f32 {
  if (useServer || length > 10000) {
  // Use server for large vectors
  // Return sentinel value to indicate server processing needed
@@ -338,15 +338,15 @@ export function hybridCosineSimilarity(
  }
 
  // Use local SIMD optimization for smaller vectors
- return cosineSimilaritySIMD(aPtr, bPtr, length);
+ return cosineSimilaritySIMD(aPtr, bPtr, i32(length));
 }
 
 /**
  * Batch vector processing with chunking for server optimization
  */
 export function batchVectorChunking(
- vectorsPtr: usize, numVectors: i32, i32: vectorLength, chunkSize: i32, i32: usize
-): i32 {
+ vectorsPtr: usize, numVectors: i32, vectorLength: i32, chunkSize: i32, resultsPtr: usize
+): usize {
  if (chunkSize <= 0 || chunkSize > numVectors) {
  return 0; // Invalid chunk size
  }
@@ -399,7 +399,7 @@ export function prepareTensorForCUDA(
  * Optimized memory transfer for large embeddings
  */
 export function optimizedEmbeddingTransfer(
- embeddingPtr: usize, length: i32
+ embeddingPtr: usize, length: i32, compressionLevel: i32
 ): usize {
  if (compressionLevel == 0) {
  // No compression, direct transfer
@@ -500,9 +500,10 @@ export function getMemoryStats(): i32 {
 /**
  * Performance benchmark for routing decisions
  */
-export function benchmarkOperation(operation: i32, dataSize: i32) {
+export function benchmarkOperation(operation: i32, dataSize: i32): i32 {
  // Simple benchmark based on operation type
  let ops: i32 = 0;
+ const iterations: i32 = 1000;
  for (let i = 0; i < iterations; i++) {
  ops += dataSize * operation; // Simulate work
  }

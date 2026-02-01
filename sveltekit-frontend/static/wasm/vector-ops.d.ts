@@ -119,7 +119,7 @@ export declare function processServerResponse(responsePtr: number, resultPtr: nu
  * src/wasm/vector-operations/hybridCosineSimilarity
  * @param aPtr `usize`
  * @param bPtr `usize`
- * @param length `i32`
+ * @param length `usize`
  * @param useServer `bool`
  * @returns `f32`
  */
@@ -131,7 +131,7 @@ export declare function hybridCosineSimilarity(aPtr: number, bPtr: number, lengt
  * @param vectorLength `i32`
  * @param chunkSize `i32`
  * @param resultsPtr `usize`
- * @returns `i32`
+ * @returns `usize`
  */
 export declare function batchVectorChunking(vectorsPtr: number, numVectors: number, vectorLength: number, chunkSize: number, resultsPtr: number): number;
 /**
@@ -191,7 +191,6 @@ export declare function getMemoryStats(): number;
  * src/wasm/vector-operations/benchmarkOperation
  * @param operation `i32`
  * @param dataSize `i32`
- * @param iterations `i32`
  * @returns `i32`
  */
-export declare function benchmarkOperation(operation: number, dataSize: number, iterations: number): number;
+export declare function benchmarkOperation(operation: number, dataSize: number): number;
