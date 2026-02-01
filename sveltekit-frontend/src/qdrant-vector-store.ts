@@ -287,7 +287,7 @@ export class QdrantVectorStore {
     await this.ensureInitialized();
 
     const filter: QdrantFilter = entityType
-      ? { must: [{, key: 'entityType', match: { value: entityType } }] }
+      ? { must: [{ key: 'entityType', match: { value: entityType } }] }
       : undefined;
 
     const searchResult = (await this.client.search(COLLECTIONS.ENTITIES, {
@@ -386,7 +386,7 @@ export class QdrantVectorStore {
   async deleteConversationData(sessionId: string): Promise<void> {
     await this.ensureInitialized();
 
-    const filter = { must: [{, key: 'sessionId', match: { value: sessionId } }] };
+    const filter = { must: [{ key: 'sessionId', match: { value: sessionId } }] };
 
     await Promise.all([
       this.client.delete(COLLECTIONS.CONVERSATIONS, { filter }),

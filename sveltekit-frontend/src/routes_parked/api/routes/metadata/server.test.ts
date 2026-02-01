@@ -146,7 +146,7 @@ describe('GET /api/routes/metadata', () => {
  };{
  id: 'analysis1',
  routeId: '/cases/new',
- suggestions: [{, id: 's1', text: 'Fix type' }],
+ suggestions: [{ id: 's1', text: 'Fix type' }],
  selectedSuggestionIndex: 0,
  phase: 'done',
  createdAt: new Date( completedAt, new Date(),

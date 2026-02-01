@@ -527,7 +527,7 @@ Be specific about any legal forms, contracts, evidence, or official documents.`;
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({, model: 'gemma3-vision:latest',
-				messages: [{, role: 'user',
+				messages: [{ role: 'user',
 					content: prompt,
 					images: [imageBase64]
 				}],
@@ -593,7 +593,7 @@ Provide the extracted text and identify the document type.`;
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({, model: 'gemma3-legal:latest',
-				messages: [{, role: 'user',
+				messages: [{ role: 'user',
 					content: prompt,
 					images: [imageBase64]
 				}],
