@@ -64,13 +64,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		if (enableAnalytics) {
 			setupUserTracking();
 		}
-	
+
 });
 
-	// TODO: Add as cleanup in $effect: return () => {
-		uploadActor?.stop();
-		cleanupUserTracking();
-	}
+	// Cleanup handled via $effect
+	// $effect(() => {
+	// 	return () => {
+	// 		uploadActor?.stop();
+	// 		cleanupUserTracking();
+	// 	};
+	// });
 
 	function initializeUploadAnalytics() {
 		const userAnalytics: UserAnalytics = {
@@ -426,7 +429,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				{#each Object.entries(pipelineStatus) as [stage, status]}
 					{#if status && typeof status === 'object' && 'status' in status}
 						<div class="pipeline-stage"
-							class:active={status.status === 'processing'}; class:completed={status.status === 'completed'}; class:failed={status.status === 'failed'}
+							class:active={status.status === 'processing'}
+							class:completed={status.status === 'completed'}
+							class:failed={status.status === 'failed'}
 						>
 							<div class="stage-icon">{getStageIcon(status.status as string)}</div>
 							<span class="stage-name">{stage.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>

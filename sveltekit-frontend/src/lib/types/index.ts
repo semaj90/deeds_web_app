@@ -53,7 +53,7 @@ export interface Message {
 export type {
     AnalysisResult, AnalysisResultListResult, AnalysisResultQueryResult,
     // Batch operations
-    BatchQueryResult, Case, CaseListResult, CaseMetadata,
+    BatchQueryResult, CaseListResult, CaseMetadata,
     // Domain-specific query results
     CaseQueryResult, ChainOfCustodyRecord, ChatMessage, ChatMessageListResult, ChatMessageMetadata, ChatMessageQueryResult, CreateQueryResult, DBCase, DBEvidence,
     // Health checks

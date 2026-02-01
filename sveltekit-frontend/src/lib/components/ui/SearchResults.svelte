@@ -1,5 +1,5 @@
 <script lang="ts">
-	let query = $state<any>(undefined);
+
 
  /**
  * SearchResults Component
@@ -34,8 +34,8 @@
  }: Props = $props();
 
  function handleResultClick(result: SearchResult) {
- onResultClick.result;
- if (result.url) {
+  onResultClick?.(result);
+  if (result.url) {
  window.open(result.url, '_blank');
  }
  }

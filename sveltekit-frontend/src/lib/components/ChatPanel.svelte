@@ -151,7 +151,7 @@
 		/>
 
 		<button
-			class="px-3 py-2 border border-beige text-sm hover: bg-beige, hover:text-noir"
+			class="px-3 py-2 border border-beige text-sm hover:bg-beige hover:text-noir"
 			onclick={sendMessage}
 		>
 			<Send class="w-4 h-4" />

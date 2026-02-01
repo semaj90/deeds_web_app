@@ -1,12 +1,14 @@
-import type { AITask, AITaskType, APIResponse, WorkerMessage, WorkerMessageType, WorkerStatus } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { AITask, AITaskType, WorkerStatus } from '$lib/types';
 
 // --- TYPE GUARD UTILITIES ---
 // This file provides type guard functions for safely handling union types and
 // unknown values, addressing TypeScript errors related to type discrimination.
 
-// Define missing types locally if needed, but prefer importing from $lib/types
+// Define missing types locally
 export type ServiceStatus = 'operational' | 'degraded' | 'offline' | 'unknown';
+export type APIResponse<T = any> = { success: boolean; data?: T; error?: string; message?: string };
+export type WorkerMessage = { type: string; payload?: any };
+export type WorkerMessageType = string;
 
 export interface Evidence {
     id: string;

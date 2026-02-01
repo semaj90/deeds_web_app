@@ -14,3 +14,5 @@ export const detectEnvironment = () => {
   if (browser) return 'browser';
   return 'server';
 };
+
+export type BitsUI = any;

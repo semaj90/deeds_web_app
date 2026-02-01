@@ -347,23 +347,7 @@ export interface LocalModel {
  available: boolean;
 }
 
-// API Response types
-export interface ApiResponse {
- success: boolean;
- data?: any;
- error?: string;
- message?: string;
-}
 
-export interface CitationPoint {
- id: string;
-	caseId: string;
- source: string;
-	text: string;
- pageNumber?: number;
- documentId?: string;
- // Add other properties as needed
-}
 
 
 

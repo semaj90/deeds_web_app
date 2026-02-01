@@ -1,10 +1,4 @@
-<script lang="ts">
-	// Generated Runes
-	
-	let userDisplayName = $state($state(undefined));
 
-
-</script>
 // Global User Store with PostgreSQL Integration + Svelte 5 Runes
 // Predictive Analytics: Chat History, and Real-time Synchronization
 import { browser } from '$app/environment';
@@ -186,7 +180,7 @@ export const globalUserStore = {
  return globalUserState.isAuthenticated;
  },
 	get displayName() {
- return userDisplayName;
+ return displayName;
  },
 	get isOnline() {
  return isOnline;
