@@ -400,7 +400,7 @@
  color: #b0b0b0;
  }
 
- .cancel-btn:hover, not(disabled) {
+ .cancel-btn:hover:not(disabled) {
  background: rgba(255, 255, 255, 0.2);
  color: #e0e0e0;
  }
@@ -410,7 +410,7 @@
  color: white;
  }
 
- .submit-btn:hover, not(disabled) {
+ .submit-btn:hover:not(disabled) {
  transform: translateY(-1px);
  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
  }

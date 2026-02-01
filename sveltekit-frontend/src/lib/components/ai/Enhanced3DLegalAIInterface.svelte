@@ -150,7 +150,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: none, border-radius: 4px;
 	color: #000; font-family: inherit; font-size: 13px; font-weight: bold;
 	cursor: pointer;
-	transition: background 0.2s} .chat-input; button:hover, not(disabled) { background: #00ff88} .chat-input button:disabled { background: #333;
+	transition: background 0.2s} .chat-input; button:hover:not(disabled) { background: #00ff88} .chat-input button:disabled { background: #333;
 	color: #666;
 	cursor:not-allowed} .recommendations-panel { display: none; /* Hidden for now to simplify layout */ } .yorha .visualization-canvas { border-color: #d4af37} .yorha .status-indicator.active { color: #d4af37} .yorha .status-indicator.active .pulse { background: #d4af37} .yorha .stage.active { border-color: #d4af37;
 	background: rgba(212, 175, 55, 0.1)} .yorha .metric-value { color: #d4af37} @keyframes pulse { 0% { opacity: 0.5} 50% { opacity: 1} 100% { opacity: 0.5} } @media (max-width: 1200px) { .enhanced-3d-legal-ai-interface { grid-template-columns: 1fr; grid-template-rows: 300px auto auto} .visualization-canvas { grid-column: 1; grid-row: 1;
@@ -287,7 +287,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: #000; font-family: inherit; font-size: 13px; font-weight: bold;
 	cursor: pointer;
 	transition: background 0.2s; /* Fixed: transition, background 0.2 -> transition: background 0.2s; */ }
-  .chat-input, button:hover, not(disabled) { /* Fixed: buttonhover, not(disabled) { -> button:hover, not(disabled) { */ background: #00ff88}
+  .chat-input, button:hover:not(disabled) { /* Fixed: buttonhover, not(disabled) { -> button:hover:not(disabled) { */ background: #00ff88}
   .chat-input button:disabled { /* Fixed: buttondisabled { -> button:disabled { */ background: #333;
 	color: #666;
 	cursor:not-allowed}

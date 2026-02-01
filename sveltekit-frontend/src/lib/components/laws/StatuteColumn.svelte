@@ -193,7 +193,7 @@
     text-align: left;
   }
 
-  .btn: hover, not(:disabled) {
+  .btn:hover:not(:disabled) {
     background-color: #f5f5f5;
     border-color: #999;
   }
@@ -209,7 +209,7 @@
 	color: #333;
   }
 
-  .btn-primary: hover, not(:disabled) {
+  .btn-primary:hover:not(:disabled) {
     background-color: #f5e880;
     border-color: #e0d060;
   }

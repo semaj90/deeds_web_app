@@ -216,7 +216,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: white;
 	}
 
-	.generate-btn: hover, not(:disabled) {
+	.generate-btn:hover:not(:disabled) {
 		background: #1565c0;
 	}
 
@@ -225,7 +225,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: white;
 	}
 
-	.embed-btn: hover, not(:disabled) {
+	.embed-btn:hover:not(:disabled) {
 		background: #6a1b9a;
 	}
 

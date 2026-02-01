@@ -105,7 +105,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;transition: transform 0.12s ease}
 	.execute-button.disabled { opacity: 0.5;
 	cursor:not-allowed}
-	.execute-button:hover, not(disabled) { transform: translateY(-2px)}
+	.execute-button:hover:not(disabled) { transform: translateY(-2px)}
 	.results-list { margin-top: 12px;
 	display: grid;
 	gap: 10px}

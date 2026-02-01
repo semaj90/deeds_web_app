@@ -226,7 +226,7 @@
 	color: #f5f1e8;
   }
 
-  .btn-save: hover, not(:disabled) {
+  .btn-save:hover:not(:disabled) {
     background-color: #a0522d;
   }
 
@@ -235,7 +235,7 @@
 	color: #2c2c2c;
   }
 
-  .btn-cancel: hover, not(:disabled) {
+  .btn-cancel:hover:not(:disabled) {
     background-color: #d4a574;
   }
 

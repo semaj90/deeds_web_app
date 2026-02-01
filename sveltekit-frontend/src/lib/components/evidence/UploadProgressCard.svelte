@@ -296,7 +296,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: white;
  }
 
- .btn-retry:hover, not(disabled) {
+ .btn-retry:hover:not(disabled) {
  background: #dc2626;
  }
 

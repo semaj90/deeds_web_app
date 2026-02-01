@@ -164,7 +164,7 @@
  border-radius: 8px;
  font-weight: 600; cursor: pointer;
  }
- button:hover, not(disabled) {
+ button:hover:not(disabled) {
  background: #1d4ed8;
  }
 

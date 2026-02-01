@@ -481,7 +481,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: white;
  }
 
- .btn-primary:hover, not(disabled) {
+ .btn-primary:hover:not(disabled) {
  background: #0052a3;
  }
 

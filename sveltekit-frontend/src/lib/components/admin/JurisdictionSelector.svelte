@@ -116,7 +116,7 @@
 		padding-right: 2.5rem;
 	}
 
-	.jurisdiction-select:hover, not(disabled) {
+	.jurisdiction-select:hover:not(disabled) {
 		border-color: #9df;
 		box-shadow: 0 0 0 2px rgba(153, 221, 255, 0.1);
 	}

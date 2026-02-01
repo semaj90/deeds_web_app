@@ -234,7 +234,7 @@ border-radius: 4px;
 font-weight: 500;
 }
 
-button: hover, not(:disabled) {
+button:hover:not(:disabled) {
 background: #1976d2;
 }
 

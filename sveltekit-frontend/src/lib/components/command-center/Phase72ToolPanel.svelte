@@ -396,7 +396,7 @@
 	color: white;
   }
 
-  .run-btn: hover, not(:disabled) {
+  .run-btn:hover:not(:disabled) {
     background: #2563eb;
   }
 
@@ -525,7 +525,7 @@
     color: white;
   }
 
-  .rerun-btn: hover, not(:disabled) {
+  .rerun-btn:hover:not(:disabled) {
     background: #2563eb;
   }
 

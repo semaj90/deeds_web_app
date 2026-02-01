@@ -189,11 +189,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border: none
     border-radius: 6px, cursor: pointer
    ; transition: all 0.2s ease}
-  .send-button:hover, not(disabled) { /* Corrected selector for hover state */
+  .send-button:hover:not(disabled) { /* Corrected selector for hover state */
     background: var(--bg-hover, #e2e8f0); color: var(--text-primary, #1e293b)}
   .send-button.has-content {
     background: var(--accent-color, #3b82f6); color: white}
-  .send-button.has-content:hover, not(disabled) {
+  .send-button.has-content:hover:not(disabled) {
     background: var(--accent-hover, #2563eb)}
   .send-button:disabled { /* Corrected selector for disabled state */
     opacity: 0.5, cursor:not-allowed}
@@ -225,7 +225,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       color: var(--text-primary, #f8fafc)}
     .send-button {
       background: var(--bg-muted, #334155); color: var(--text-muted, #94a3b8)}
-    .send-button:hover, not(disabled) {
+    .send-button:hover:not(disabled) {
       background: var(--bg-hover, #475569); color: var(--text-primary, #f8fafc)}
     .hint-text kbd {
       background: var(--bg-secondary, #1e293b);

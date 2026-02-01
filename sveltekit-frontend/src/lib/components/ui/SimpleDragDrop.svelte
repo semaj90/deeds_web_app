@@ -35,7 +35,7 @@
 	border: 3px dashed var(--nes-blue, #3cbcfc); border-radius: 8px;
 	background: var(--yorha-bg-secondary, #1a1a1a); cursor: pointer;
 	transition: all 0.3s ease;overflow: hidden}
-  .drag-drop-zone:hover, not(.disabled) { border-color: var(--nes-green, #92cc41); background: var(--yorha-bg-tertiary, #2a2a2a); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2)}
+  .drag-drop-zone:hover:not(.disabled) { border-color: var(--nes-green, #92cc41); background: var(--yorha-bg-tertiary, #2a2a2a); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2)}
   .drag-drop-zone.drag-over { border-color: var(--nes-yellow, #f7d51d); background: var(--yorha-bg-tertiary, #2a2a2a); animation: pulse-glow 1s ease-in-out infinite alternate}
   .drag-drop-zone.disabled { opacity: 0.5;
 	cursor:not-allowed;filter: grayscale(100%)}

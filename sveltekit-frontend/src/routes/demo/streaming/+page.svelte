@@ -180,7 +180,7 @@
 		transition: background 0.2s;
 	}
 
-	button: hover, not(:disabled) {
+	button:hover:not(:disabled) {
 		background: #0052a3;
 	}
 

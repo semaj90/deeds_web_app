@@ -642,7 +642,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: white;
   }
 
-  .submit-button.primary: hover, not(:disabled) {
+  .submit-button.primary:hover:not(:disabled) {
     background: #2563eb;
   }
 
@@ -657,7 +657,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border: 1px solid #d1d5db;
   }
 
-  .reset-button.secondary: hover, not(:disabled) {
+  .reset-button.secondary:hover:not(:disabled) {
     background: #e5e7eb;
   }
 

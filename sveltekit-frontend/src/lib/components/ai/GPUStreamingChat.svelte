@@ -126,7 +126,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.25rem}
   .btn-send { background: #3b82f6;
 	color: white}
-  .btn-send:hover, not(disabled) { background: #2563eb}
+  .btn-send:hover:not(disabled) { background: #2563eb}
   .btn-send:disabled { opacity: 0.5;
 	cursor:not-allowed}
   .btn-stop { background: #ef4444;

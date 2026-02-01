@@ -241,7 +241,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		white-space: nowrap;
 	}
 
-	.search-btn:hover, not(disabled) {
+	.search-btn:hover:not(disabled) {
 		background: #6b0000;
 	}
 

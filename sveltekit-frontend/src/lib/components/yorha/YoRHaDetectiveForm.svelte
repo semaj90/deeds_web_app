@@ -242,7 +242,7 @@
     text-transform: uppercase;
   }
 
-  .submit-btn: hover, not(:disabled) {
+  .submit-btn:hover:not(:disabled) {
     background-color: #eae8e1;
 	transform: translateY(-1px);
   }
@@ -258,7 +258,7 @@
     border-color: rgba(16, 185, 129, 0.5);
   }
 
-  .submit-btn.yorha-btn-success: hover, not(:disabled) {
+  .submit-btn.yorha-btn-success:hover:not(:disabled) {
     background-color: rgba(16, 185, 129, 0.2);
   }
 

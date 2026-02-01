@@ -378,7 +378,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-color: #007bff;
  }
 
- .btn-primary:hover, not(disabled) {
+ .btn-primary:hover:not(disabled) {
  background: #0056b3;
  border-color: #0056b3;
  }

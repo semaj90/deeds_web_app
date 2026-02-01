@@ -37,7 +37,7 @@
 	color: white;
  }
 
- .unified-button--primary: hover, not(:disabled) {
+ .unified-button--primary:hover:not(:disabled) {
  background-color: #0056b3;
  }
 
@@ -46,7 +46,7 @@
 	color: white;
  }
 
- .unified-button--secondary: hover, not(:disabled) {
+ .unified-button--secondary:hover:not(:disabled) {
  background-color: #545b62;
  }
 
@@ -55,7 +55,7 @@
 	color: white;
  }
 
- .unified-button--danger: hover, not(:disabled) {
+ .unified-button--danger:hover:not(:disabled) {
  background-color: #c82333;
  }
 

@@ -378,7 +378,7 @@
 	color: white;
   }
 
-  .btn-primary: hover, not(:disabled) {
+  .btn-primary:hover:not(:disabled) {
     background: #0052a3;
   }
 
@@ -415,7 +415,7 @@
 	color: white;
   }
 
-  .btn-small.accept: hover, not(:disabled) {
+  .btn-small.accept:hover:not(:disabled) {
     background: #00aa55;
   }
 

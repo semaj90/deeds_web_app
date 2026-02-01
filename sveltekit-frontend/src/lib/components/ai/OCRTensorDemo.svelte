@@ -114,7 +114,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	cursor:not-allowed}
   .action-buttons buttonfirst-child { background: #3b82f6;
 	color: white}
-  .action-buttons buttonfirst-child:hover, not(disabled) { background: #2563eb}
+  .action-buttons buttonfirst-child:hover:not(disabled) { background: #2563eb}
   .metrics-grid, .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}
   .metric, .stat { display: flex; flex-direction: column;
 	gap: 0.25rem}

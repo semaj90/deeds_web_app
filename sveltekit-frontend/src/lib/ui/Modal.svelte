@@ -283,7 +283,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  flex-shrink: 0;
  }
 
- .close-btn: hover, not(:disabled) {
+ .close-btn:hover:not(:disabled) {
   background: #f8f9fa;
 	color: #495057;
  }
@@ -333,7 +333,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  border-color: #dee2e6;
  }
 
- .cancel-btn: hover, not(:disabled) {
+ .cancel-btn:hover:not(:disabled) {
   background: #f8f9fa;
 	color: #495057;
  }
@@ -343,7 +343,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: white;
  }
 
- .confirm-btn: hover, not(:disabled) {
+ .confirm-btn:hover:not(:disabled) {
   background: #0056b3;
  }
 

@@ -155,7 +155,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: none;
 	background: transparent; border-radius: 6px;
 	cursor: pointer;transition: background-color 0.2; border: 1px solid #d1d5db}
-  .action-btn:hover, not(disabled) { background: #f3f4f6}
+  .action-btn:hover:not(disabled) { background: #f3f4f6}
   .action-btn:disabled { opacity: 0.5;
 	cursor:not-allowed}
   .settings-panel { padding: 1rem, background: #f9fafb; border-bottom: 1px solid #e5e7eb}
@@ -247,7 +247,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .submit-btn { padding: 0.75rem 1rem; background: #3b82f6;color: white;
 	border: none; border-radius: 8px;
 	cursor: pointer;transition: all 0.2}
-  .submit-btn:hover, not(disabled) { background: #2563eb}
+  .submit-btn:hover:not(disabled) { background: #2563eb}
   .submit-btn:disabled { opacity: 0.5;
 	cursor:not-allowed}
   /* Modal styles */ .modal-overlay { position: fixed;

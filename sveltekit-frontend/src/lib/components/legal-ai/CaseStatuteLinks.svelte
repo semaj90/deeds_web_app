@@ -235,7 +235,7 @@
  transition: all 0.2s;
  }
 
- .refresh-btn:hover, not(disabled) {
+ .refresh-btn:hover:not(disabled) {
  background-color: #d4a574;
  }
 

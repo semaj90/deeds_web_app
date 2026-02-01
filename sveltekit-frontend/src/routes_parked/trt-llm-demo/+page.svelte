@@ -317,9 +317,9 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 		color: white;
 	}
 
-	.generate-btn:hover, not(disabled),
-	.stream-btn:hover, not(disabled),
-	.legal-btn:hover, not(disabled) {
+	.generate-btn:hover:not(disabled),
+	.stream-btn:hover:not(disabled),
+	.legal-btn:hover:not(disabled) {
 		filter: brightness(0.95);
 		box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 	}

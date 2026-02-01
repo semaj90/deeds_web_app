@@ -602,7 +602,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     color: white;
   }
 
-  .btn-primary: hover, not(:disabled) {
+  .btn-primary:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }
@@ -611,7 +611,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     background: #f0f0f0; color: #333;
   }
 
-  .btn-secondary: hover, not(:disabled) {
+  .btn-secondary:hover:not(:disabled) {
     background: #e0e0e0;
   }
 
@@ -620,7 +620,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     color: white;
   }
 
-  .btn-search: hover, not(:disabled) {
+  .btn-search:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }

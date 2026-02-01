@@ -590,7 +590,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     transition: background-color 0.2s;
   }
 
-  .submit-button: hover, not(:disabled) {
+  .submit-button:hover:not(:disabled) {
     background: var(--accent-primary-dark, #00b8e6);
   }
 

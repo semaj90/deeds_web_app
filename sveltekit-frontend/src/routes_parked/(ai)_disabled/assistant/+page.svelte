@@ -277,7 +277,7 @@
  font-size: 0.9rem; transition: all 0.2s;
  }
 
- .quick-button:hover, not(disabled) {
+ .quick-button:hover:not(disabled) {
  background: rgba(0, 204, 255, 0.2);
  border-color: var(--text-primary, #00ccff);
  transform: translateY(-1px);
@@ -406,7 +406,7 @@
  font-weight: bold; transition: all 0.2s;
  }
 
- .send-button:hover, not(disabled) {
+ .send-button:hover:not(disabled) {
  transform: scale(1.05);
  box-shadow: 0 0 15px rgba(0, 204, 255, 0.5);
  }

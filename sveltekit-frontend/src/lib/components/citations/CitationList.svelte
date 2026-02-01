@@ -287,7 +287,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	transition: all 150ms ease;
 	}
 
-	.btn-search: hover, not(:disabled) {
+	.btn-search:hover:not(:disabled) {
 		background: var(--color-dark-burgundy);
 	transform: translateY(-1px);
 	}
@@ -499,7 +499,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	transition: all 150ms ease;
 	}
 
-	.btn-load-more: hover, not(:disabled) {
+	.btn-load-more:hover:not(:disabled) {
 		background: var(--color-dark-tan);
 	transform: translateY(-1px);
 	}

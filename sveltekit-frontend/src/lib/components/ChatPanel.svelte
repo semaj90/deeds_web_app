@@ -100,14 +100,13 @@
 				// Get cached embeddings and compute similarity
 				const cached = await getCachedEmbedding(currentDocId);
 				if (cached && queryResult) {
-					const similarity = quantizedCosineSimilarity(queryResult.quantized, cached.quantized);
-					messages.push({ role: 'ai', text: `Similarity, score: ${(similarity * 100).toFixed(2)}%` });
-				}
+				const similarity = quantizedCosineSimilarity(queryResult.quantized, cached.quantized);
+				messages.push({ role: 'ai', text: `Similarity, score: ${(similarity * 100).toFixed(2)}%` });
 			}
-		});
-</script>
-
-<section class="flex flex-col h-full bg-noir text-beige font-ui">
+		}
+	});
+}
+</script><section class="flex flex-col h-full bg-noir text-beige font-ui">
 	<!-- Message List -->
 	<div class="flex-1 overflow-y-auto p-3 space-y-4 text-sm font-mono">
 		{#each messages as m}

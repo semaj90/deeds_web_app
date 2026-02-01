@@ -400,7 +400,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: white;
  }
 
- .btn-primary:hover, not(disabled) {
+ .btn-primary:hover:not(disabled) {
  background: #2563eb;
  }
 
@@ -409,7 +409,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: #111827;
  }
 
- .btn-secondary:hover, not(disabled) {
+ .btn-secondary:hover:not(disabled) {
  background: #d1d5db;
  }
 

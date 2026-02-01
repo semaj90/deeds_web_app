@@ -103,7 +103,7 @@
 	position: absolute; top: -4px;
 	left: -4px; right: -4px;
 	bottom: -4px;background: linear-gradient(45deg, #FFD700, #FFA500, #FF6B35); z-index: -1; border-radius: 0 }
-  .n64-drop-zone:hover, not(.uploading) { border-color: #FFA500;
+  .n64-drop-zone:hover:not(.uploading) { border-color: #FFA500;
 	transform: scale(1.02); box-shadow: inset 0 0 30px rgba(255, 165, 0, 0.2), 0, 0 30px rgba(255, 165, 0, 0.5)}
   .n64-drop-zone.drag-over { border-color: #FF6B35;
 	background: linear-gradient(135deg, #2e1a1a 0%, #3e1616 100%); transform: scale(1.05); box-shadow: inset 0 0 40px rgba(255, 107, 53, 0.3), 0, 0 40px rgba(255, 107, 53, 0.7)}

@@ -282,7 +282,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-size: 0.9rem; transition: background 0.2s;
 	}
 
-	.actions button:hover, not(disabled) {
+	.actions button:hover:not(disabled) {
 		background: #e8e8e8;
 	}
 
@@ -295,7 +295,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		border-color: #fcc; color: #c33;
 	}
 
-	.actions button.danger:hover, not(disabled) {
+	.actions button.danger:hover:not(disabled) {
 		background: #fdd;
 	}
 
@@ -360,7 +360,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		align-self: flex-end;
 	}
 
-	.message-input-area button:hover, not(disabled) {
+	.message-input-area button:hover:not(disabled) {
 		background: #6b2a2a;
 	}
 

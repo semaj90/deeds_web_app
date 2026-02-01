@@ -195,7 +195,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  text-transform: uppercase;
  letter-spacing: 0.5px;
  }
- .action-btn:hover, not(disabled) {
+ .action-btn:hover:not(disabled) {
  background: var(--nes-blue, #3cbcfc);
  border-color: var(--nes-blue, #3cbcfc);
  color: #000; transform: translateY(-1px);
@@ -209,7 +209,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  border-color: var(--nes-green, #92cc41);
  color: #000;
  }
- .save-btn:hover, not(disabled) { /* Corrected ':hover' */;
+ .save-btn:hover:not(disabled) { /* Corrected ':hover' */;
  background: #7fb82f;
  box-shadow: 0 4px 12px rgba(146, 204, 65, 0.3);
  }

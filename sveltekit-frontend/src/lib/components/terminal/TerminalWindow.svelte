@@ -228,7 +228,7 @@
 		transition: all 0.2s;
 	}
 
-	.send-button: hover, not(:disabled) {
+	.send-button:hover:not(:disabled) {
 		background-color: #00FF00;
 	color: black;
 	}

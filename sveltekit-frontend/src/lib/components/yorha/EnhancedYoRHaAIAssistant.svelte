@@ -494,7 +494,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;
     transition: all 0.2s ease;
   }
-  .search-btn: hover, not(:disabled) { background: transparent;
+  .search-btn:hover:not(:disabled) { background: transparent;
 	color: #ffd700; transform: translateY(-1px); }
   .search-btn:disabled { opacity: 0.5;
 	cursor: not-allowed; }

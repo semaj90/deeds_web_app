@@ -75,10 +75,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	cursor:not-allowed}
   .btn-primary { background: #3b82f6;
 	color: white}
-  .btn-primary:hover, not(disabled) { background: #2563eb}
+  .btn-primary:hover:not(disabled) { background: #2563eb}
   .btn-secondary { background: #f3f4f6;
 	color: #374151}
-  .btn-secondary:hover, not(disabled) { background: #e5e7eb}
+  .btn-secondary:hover:not(disabled) { background: #e5e7eb}
   .btn-small { padding: 6px 12px; font-size: 12px}
   .custom-document { margin: 20px 0}
   .document-input { width: 100%;

@@ -384,7 +384,7 @@
  white-space: nowrap;
  }
 
-	.send-button: hover, not(:disabled) {
+	.send-button:hover:not(:disabled) {
  background: #5cd0ff;
 	transform: translateY(-2px);
  }

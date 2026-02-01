@@ -356,7 +356,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 	color: #2c2c2c;
  }
 
- .btn-cancel:hover, not(disabled) {
+ .btn-cancel:hover:not(disabled) {
  background-color: #d4a574;
  }
 
@@ -365,7 +365,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 	color: #f5f1e8;
  }
 
- .btn-attach:hover, not(disabled) {
+ .btn-attach:hover:not(disabled) {
  background-color: #a0522d;
  }
 

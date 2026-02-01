@@ -374,7 +374,7 @@
  flex-shrink: 0;
  }
 
- .send-btn:hover, not(disabled) {
+ .send-btn:hover:not(disabled) {
  background-color: #a0522d;
  }
 

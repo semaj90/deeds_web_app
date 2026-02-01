@@ -289,7 +289,7 @@
     transition: background-color 0.2s;
   }
 
-  .btn-primary: hover, not(:disabled) {
+  .btn-primary:hover:not(:disabled) {
     background: #b91c1c;
   }
 

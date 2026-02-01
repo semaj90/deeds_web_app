@@ -632,7 +632,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: white;
   }
 
-  .input-actions button:first-child: hover, not(:disabled) {
+  .input-actions button:first-child:hover:not(:disabled) {
     background: #2563eb;
   }
 

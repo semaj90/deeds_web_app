@@ -375,7 +375,7 @@
     color: white;
   }
 
-  .start-btn: hover, not(:disabled) {
+  .start-btn:hover:not(:disabled) {
     background: #2563eb;
   }
 
@@ -396,7 +396,7 @@
     color: white;
   }
 
-  .stop-btn: hover, not(:disabled) {
+  .stop-btn:hover:not(:disabled) {
     background: #dc2626;
   }
 
