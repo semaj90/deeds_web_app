@@ -2,7 +2,6 @@
 	// @ts-nocheck
 	// Migrated to $effect
 	import type { PageData } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	// ─────────────────────────────────────
 	// Props & Data
@@ -53,7 +52,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			} catch (error) {
 				console.error('[SSE] Error parsing message:', error);
 			}
-		
+
 });
 
 		eventSource.addEventListener('error', (error) => {
@@ -61,14 +60,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		});
 
 		console.log('[SSE] EventSource connection established');
-	});
 
-	// TODO: Add as cleanup in $effect: return () => {
-		if (eventSource) {
-			eventSource.close();
-			console.log('[SSE] EventSource connection closed');
-		}
-	}
+		return () => {
+			if (eventSource) {
+				eventSource.close();
+				console.log('[SSE] EventSource connection closed');
+			}
+		};
+	});
 
 	/**
 	 * Update route health status in real-time
@@ -196,6 +195,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	 */
 	function handlePatchApply(routeId: string, patchId: string): void {
 		logInteraction(routeId, 'patch_apply', { patch_id: patchId });
+	}
 </script>
 
 <main class="command-center">

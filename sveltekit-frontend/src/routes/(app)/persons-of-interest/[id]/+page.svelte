@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { onMount } from "svelte";
 	import { poiService } from '$lib/services/poi';
 	import type { KnownAssociate, PersonOfInterest } from '$lib/types/poi';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+	import { onMount } from "svelte";
 	// Migrated to $effect
 
 	// Props
@@ -16,10 +15,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	let activeTab = $state<'details' | 'associates' | 'search'>('details');
 
 	// Load POI on mount
-	$effect(() => {	onMount(async () => {
-			await loadPOI();
-		
-});
+	onMount(async () => {
+		await loadPOI();
+	});
 
 	async function loadPOI() {
 		loading = true;

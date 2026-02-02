@@ -1,20 +1,17 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import CaseNotesEditor from '$lib/components/cases/CaseNotesEditor.svelte';
+	import ContextualChatModal from '$lib/components/cases/ContextualChatModal.svelte';
 	import { onMount } from "svelte";
- import { goto } from '$app/navigation';
- import { page } from '$app/state';
- import CaseNotesEditor from '$lib/components/cases/CaseNotesEditor.svelte';
- import ContextualChatModal from '$lib/components/cases/ContextualChatModal.svelte';
 // Evidence components temporarily disabled for core build
  // TODO: Re-enable after de-minification tool runs
 import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
 import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
 // import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
  // import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
+ import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
- import { useCache, CacheStrategies } from '$lib/cache/cache-service.svelte';
-import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  const cache = useCache();
@@ -50,11 +47,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  const caseId = page.params.id;
 
- $effect(() => {	onMount(async () => {
+ onMount(async () => {
  await loadCase();
  await loadEvidence();
- 
-});
+ });
 
  const loadCase = async () => {
  try {

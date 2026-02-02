@@ -1,9 +1,8 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
+	import { appActions, appStore } from '$lib/stores/app-store';
 	import { onMount } from "svelte";
- import { goto } from '$app/navigation';
- import { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
- import { appActions, appStore } from '$lib/stores/app-store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  // YoRHaModalComponent is being replaced by bits-ui Dialog
@@ -191,22 +190,20 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let intervalId: ReturnType<typeof setInterval>;
 
- $effect(() => {	onMount(async () => {
- await loadData();
+ onMount(() => {
+	loadData();
 
- // Refresh data periodically
- intervalId = setInterval(async () => {
- await loadData();
- },
-	60000); // Refresh every minute
- 
-});
+	// Refresh data periodically
+	intervalId = setInterval(async () => {
+		await loadData();
+	}, 60000); // Refresh every minute
 
- // TODO: Add as cleanup in $effect: return () => {
- if (intervalId) {
- clearInterval(intervalId);
- }
- }
+	return () => {
+		if (intervalId) {
+			clearInterval(intervalId);
+		}
+	};
+ });
 </script>
 
 <svelte:head>

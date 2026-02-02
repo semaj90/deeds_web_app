@@ -21,7 +21,6 @@
 
 import { afterEach, beforeEach, vi } from 'vitest';
 import {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     mockFetch,
     mockMinIO,
     mockOllama,

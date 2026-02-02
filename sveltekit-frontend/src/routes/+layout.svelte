@@ -34,13 +34,13 @@
             } catch (error) {
                 console.warn('CPU fallback initialization failed:', error);
             }
-        
-});();
     });
 
-    // TODO: Add as cleanup in $effect: return () => {
-        cleanupStores();
-    }
+    onMount(() => {
+        return () => {
+            cleanupStores();
+        };
+    });
 </script>
 
 <div class="app-shell" class:dark={userPrefs.theme === 'dark'}>

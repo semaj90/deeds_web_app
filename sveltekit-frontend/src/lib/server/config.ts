@@ -1,3 +1,5 @@
+import { env } from '$env/dynamic/private';
+
 /**
  * Application Configuration
  * Centralized configuration for all services
@@ -71,17 +73,17 @@ export const AI_CONFIG = {
 	},
 	// Fallback: OpenAI API
 	openai: {
-	enabled: process.env.OPENAI_ENABLED === 'true',
-		apiKey: process.env.OPENAI_API_KEY,
-		model: process.env.OPENAI_MODEL || 'gpt-4',
+		enabled: env.OPENAI_ENABLED === 'true',
+		apiKey: env.OPENAI_API_KEY,
+		model: env.OPENAI_MODEL || 'gpt-4',
 		timeout: 30000,
 		maxTokens: 2048
 	},
 	providerPriority: ['ollama', 'tensorrt', 'vllm', 'openai'] as const,
 	functionCalling: {
-	enabled: true,
+		enabled: true,
 		functions: {
-	legal: [
+			legal: [
 				'extractCitations',
 				'identifyLegalIssues',
 				'analyzeContracts',
@@ -334,5 +336,4 @@ export function getConfigSummary() {
 			failover: HEALTH_CONFIG.failover.enabled
 		}
 	};
-}
-
+}

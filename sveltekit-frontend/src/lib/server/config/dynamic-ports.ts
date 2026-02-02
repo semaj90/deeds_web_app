@@ -1,5 +1,4 @@
 import { createServer } from 'net';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ServicePort {
     name: string;
@@ -49,7 +48,7 @@ export class DynamicPortManager {
     async findAvailablePort(serviceName: string): Promise<number> {
         const service = this.services.get(serviceName);
         if (!service) {
-            throw new Error(Service  not found in port manager);
+            throw new Error(`Service ${serviceName} not found in port manager`);
         }
 
         const portsToTry = [service.basePort, ...service.portRange.filter(p => p !== service.basePort)];
@@ -58,12 +57,12 @@ export class DynamicPortManager {
             if (!this.usedPorts.has(port) && (await this.isPortAvailable(port))) {
                 this.usedPorts.add(port);
                 service.currentPort = port;
-                console.log(🔌 [] Allocated port: );
+                console.log(`🔌 [${serviceName}] Allocated port: ${port}`);
                 return port;
             }
         }
 
-        throw new Error(No available ports found for service  in range []);
+        throw new Error(`No available ports found for service ${serviceName} in range [${service.portRange.join(', ')}]`);
     }
 
     async isPortAvailable(port: number): Promise<boolean> {
