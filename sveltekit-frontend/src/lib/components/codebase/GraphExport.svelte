@@ -184,7 +184,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<FileJson class="h-4 w-4" />
 			<span>JSON</span>
 			{#if exportSuccess === 'JSON'}
-				<Check class="h-3 w-3 success-icon" />
+				<span class="success-icon"><Check class="h-3 w-3" /></span>
 			{/if}
 		</button>
 
@@ -196,7 +196,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<FileSpreadsheet class="h-4 w-4" />
 			<span>CSV</span>
 			{#if exportSuccess === 'CSV'}
-				<Check class="h-3 w-3 success-icon" />
+				<span class="success-icon"><Check class="h-3 w-3" /></span>
 			{/if}
 		</button>
 
@@ -209,7 +209,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<Image class="h-4 w-4" />
 			<span>SVG</span>
 			{#if exportSuccess === 'SVG'}
-				<Check class="h-3 w-3 success-icon" />
+				<span class="success-icon"><Check class="h-3 w-3" /></span>
 			{/if}
 		</button>
 
@@ -222,7 +222,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<Image class="h-4 w-4" />
 			<span>PNG</span>
 			{#if exportSuccess === 'PNG'}
-				<Check class="h-3 w-3 success-icon" />
+				<span class="success-icon"><Check class="h-3 w-3" /></span>
 			{/if}
 		</button>
 	</div>

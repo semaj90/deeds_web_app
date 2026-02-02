@@ -10,12 +10,12 @@ export const loadAIComponents = {
       import('$lib/components/detective/DetectiveBoard.svelte'),
       import('$lib/components/detective/EvidenceCard.svelte')
     ]);
-    return { 
+    return {
       DetectiveBoard: DetectiveBoard.default,
-      EvidenceCard: EvidenceCard.default 
+      EvidenceCard: EvidenceCard.default
     };
   },
-  
+
   async qloraMonitoring() {
     const { default: QLoRAMonitoringDashboard } = await import('$lib/components/ai/QLoRAMonitoringDashboard.svelte');
     return QLoRAMonitoringDashboard;
@@ -33,14 +33,16 @@ export const loadAIComponents = {
 
   // Upload components
   async uploads() {
-    const [MinIOUpload, N64Upload] = await Promise.all([
-      import('$lib/components/upload/OptimizedMinIOUpload.svelte'),
-      import('$lib/components/upload/N64MinIOUpload.svelte')
-    ]);
-    return { 
-      MinIOUpload: MinIOUpload.default,
-      N64Upload: N64Upload.default
-    };
+    // TODO: Fix OptimizedMinIOUpload and N64MinIOUpload components
+    // const [MinIOUpload, N64Upload] = await Promise.all([
+    //   import('$lib/components/upload/OptimizedMinIOUpload.svelte'),
+    //   import('$lib/components/upload/N64MinIOUpload.svelte')
+    // ]);
+    // return {
+    //   MinIOUpload: MinIOUpload.default,
+    //   N64Upload: N64Upload.default
+    // };
+    return {};
   },
 
   // WebGPU components
@@ -49,7 +51,7 @@ export const loadAIComponents = {
       import('$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte'),
       import('$lib/components/examples/NESTextureStreamingExample.svelte')
     ]);
-    return { 
+    return {
       WebGPULoader: WebGPULoader.default,
       TextureStreaming: TextureStreaming.default
     };
@@ -69,13 +71,13 @@ export const loadAIServices = {
   },
 
   async contextualIntelligence() {
-    const { contextualIntelligenceService } = await import('$lib/services/contextual-intelligence-service');
-    return contextualIntelligenceService;
+    const service = await import('$lib/services/contextual-intelligence-service');
+    return service;
   },
 
   async quantumCache() {
-    const { quantumRagCache } = await import('$lib/quantum/rag-cache');
-    return quantumRagCache;
+    const cache = await import('$lib/quantum/rag-cache');
+    return cache;
   },
 
   async simdGpuTiling() {
@@ -168,7 +170,7 @@ export const preloadStrategies = {
     ];
 
     // Preload after first user interaction
-    return Promise.all(commonComponents.map(({ key, loader }) => 
+    return Promise.all(commonComponents.map(({ key, loader }) =>
       componentLoader.preload(key, loader)
     ));
   },
@@ -190,9 +192,9 @@ export const preloadStrategies = {
     };
 
     const componentsToLoad = routeComponentMap[routeId] || [];
-    
+
     return Promise.all(
-      componentsToLoad.map(({ key, loader }) => 
+      componentsToLoad.map(({ key, loader }) =>
         componentLoader.preload(key, loader)
       )
     );
