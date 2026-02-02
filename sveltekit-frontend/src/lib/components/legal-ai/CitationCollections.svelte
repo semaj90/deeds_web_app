@@ -1,6 +1,3 @@
-<script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   interface Collection {
     id: string;
     name: string;
@@ -12,19 +9,19 @@
 
   interface Props {
     collections?: Collection[];
+    onselect?: (collection: Collection) => void;
+    ondeleted?: (id: string) => void;
   }
 
-  let { collections = [] }: Props = $props();
-
-  const dispatch = createEventDispatcher();
+  let { collections = [], onselect, ondeleted }: Props = $props();
 
   function selectCollection(collection: Collection) {
-    dispatch('select', collection);
+    onselect?.(collection);
   }
 
   function deleteCollection(collection: Collection) {
     if (!confirm(`Delete "${collection.name}"? This cannot be undone.`)) return;
-    dispatch('deleted', collection.id);
+    ondeleted?.(collection.id);
   }
 </script>
 

@@ -34,7 +34,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		return () => {
 			if (refreshInterval) clearInterval(refreshInterval);
 		};
-	
+
 });
 
 	async function updateHealth() {
@@ -126,7 +126,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			<div class="stat-label">Hit Rate</div>
 			<div class="stat-value">{parseFloat(stats.hitRate).toFixed(2)}%</div>
 			<div class="progress-bar">
-				<div class="progress-fill" style="width: {stats.hitRate}%"></div>
+				<div class="progress-fill" style="width: {parseFloat(stats.hitRate)}%"></div>
 			</div>
 		</div>
 	</div>

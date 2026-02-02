@@ -24,7 +24,7 @@
  {caseItem.title}
  </a>
  <span class="relevance-score">
- {(caseItem.relevanceScore * 100).toFixed(0)}%
+ {( (caseItem.relevanceScore || 0) * 100).toFixed(0)}%
  </span>
  </div>
 
