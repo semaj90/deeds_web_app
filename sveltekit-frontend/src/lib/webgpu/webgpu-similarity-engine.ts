@@ -40,7 +40,7 @@ export class WebGPUSimilarityEngine {
       throw new Error('WebGPU not supported');
     }
 
-    const adapter = await (navigator.gpu as GPU).requestAdapter();
+    const adapter = await (navigator.gpu as any).requestAdapter();
     if (!adapter) {
       throw new Error('No WebGPU adapter found');
     }
@@ -82,7 +82,7 @@ export class WebGPUSimilarityEngine {
     });
 
     this.pipeline = this.device.createComputePipeline({
-      layout: this.device.createPipelineLayout({ bindGroupLayouts: [this.bindGroupLayout] }),
+      layout: this.device.createPipelineLayout({ bindGroupLayouts: [this.bindGroupLayout!] }),
       compute: {
         module: shaderModule,
         entryPoint: 'computeSimilarity',
@@ -158,7 +158,7 @@ export class WebGPUSimilarityEngine {
     });
 
     const bindGroup = this.device.createBindGroup({
-      layout: this.bindGroupLayout,
+      layout: this.bindGroupLayout!,
       entries: [
         { binding: 0, resource: { buffer: queryBuffer } },
 	{ binding: 1, resource: { buffer: docsBuffer } },
@@ -290,7 +290,7 @@ export class WebGPUSimilarityEngine {
   static async isSupported(): Promise<boolean> {
     try {
       if (!navigator.gpu) return false;
-      const adapter = await (navigator.gpu as GPU).requestAdapter();
+      const adapter = await (navigator.gpu as any).requestAdapter();
       return adapter !== null;
     } catch {
       return false;
@@ -302,7 +302,7 @@ export class WebGPUSimilarityEngine {
    */
   static async getAdapterInfo(): Promise<GPUAdapterInfo | null> {
     try {
-      const adapter = await (navigator.gpu as GPU).requestAdapter();
+      const adapter = await (navigator.gpu as any).requestAdapter();
       return adapter?.info ?? null;
     } catch {
       return null;
