@@ -179,8 +179,31 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     }
   }
 
-  function toggleGPU() {
-    showGPUAnalysis = !showGPUAnalysis }
+  async function toggleGPUAnalysis(): Promise<void> {
+    if (!showGPUAnalysis && documentId) {
+      showGPUAnalysis = true;
+      await fetchAndCacheDocument(documentId, true);
+    } else {
+      showGPUAnalysis = false;
+      gpuAnalysis.set(null);
+    }
+  }
+
+  function formatBytes(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  function formatDuration(ms: number): string {
+    if (!ms) return '0ms';
+    if (ms < 1000) return `${ms.toFixed(2)}ms`;
+    return `${(ms / 1000).toFixed(2)}s`;
+  }
+  
+  import { get } from 'svelte/store';
 </script>
 
 <!-- ============================================================================ -->

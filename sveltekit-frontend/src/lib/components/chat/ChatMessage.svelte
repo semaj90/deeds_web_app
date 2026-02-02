@@ -1,6 +1,7 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported import type { ChatMessage } from '\/stores/chat.svelte';
  import DOMPurify from 'dompurify';
- import { Bot, User } from 'lucide-svelte';
+ import Bot from 'lucide-svelte/icons/bot';
+ import User from 'lucide-svelte/icons/user';
  import './chat-message.css'; interface Props { message: ChatMessage, showTimestamp?: boolean; showAvatar?: boolean}
   let { message, showTimestamp = true, showAvatar = true }: Props = $props();
    let sanitizedContent = $derived(() => DOMPurify.sanitize(message.content));

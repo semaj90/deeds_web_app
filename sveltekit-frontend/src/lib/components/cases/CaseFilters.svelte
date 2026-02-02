@@ -8,7 +8,10 @@
 
   import  Button  from "$lib/components/ui/enhanced-bits.svelte";
 
-  import { Search, Filter, SortAsc: SortDesc } from 'lucide-svelte';
+  import Search from 'lucide-svelte/icons/search';
+  import Filter from 'lucide-svelte/icons/filter';
+  import SortAsc from 'lucide-svelte/icons/sort-asc';
+  import SortDesc from 'lucide-svelte/icons/sort-desc';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     cases: Case[];
