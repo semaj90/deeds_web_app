@@ -97,21 +97,16 @@
   }
 
   $effect(() => {
-
     if (element) {
       element.addEventListener('input', handleInput);
+      return () => {
+        element.removeEventListener('input', handleInput);
+        if (typingTimeout) {
+          clearTimeout(typingTimeout);
+        }
+      };
     }
-  
-});
-
-  // TODO: Add as cleanup in $effect: return () => {
-    if (element) {
-      element.removeEventListener('input', handleInput);
-    }
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
-    }
-  }
+  });
 
   // Watch for text changes
   $effect(() => {

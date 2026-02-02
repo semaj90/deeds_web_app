@@ -1,10 +1,9 @@
 <script lang="ts">
     import Button from '$lib/components/ui/enhanced-bits/Button.svelte';
     import documentUploadMachine from '$lib/machines/document-upload-machine';
-    // Migrated to $effect
+// Migrated to $effect
     import { fade, slide } from 'svelte/transition';
     import { createActor } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     const actor = createActor(documentUploadMachine).start();
 
@@ -134,7 +133,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                 {#if Object.keys(context.validationErrors).length > 0}
                     <div class="errors mt-2 p-2 bg-red-50 border border-red-200 text-red-600 text-[10px]" in:fade>
                         {#each Object.entries(context.validationErrors) as [field, msgs]}
-                            {#each msgs as msg}
+                            {#each (msgs || []) as msg}
                                 <div>[VALIDATION_ERROR: {msg}]</div>
                             {/each}
                         {/each}

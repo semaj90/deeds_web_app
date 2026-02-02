@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Evidence } from '$lib/schemas/evidence';
 	import { formatDistanceToNow } from 'date-fns';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  evidence: Evidence;
@@ -33,7 +32,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  </div>
  <div class="actions">
  {#if onAskAI}
- <button class="btn-ask-ai" onclick={() => onAskAI.evidence}>
+ <button class="btn-ask-ai" onclick={() => onAskAI(evidence)}>
  Ask AI
  </button>
  {/if}
