@@ -57,7 +57,7 @@
 		onSearch(searchQuery);
 	}
 
-	function handleFilterChange(key: string, value): string {
+	function handleFilterChange(key: string, value): void {
 		filters[key] = value;
 		onFilterChange(filters);
 	}

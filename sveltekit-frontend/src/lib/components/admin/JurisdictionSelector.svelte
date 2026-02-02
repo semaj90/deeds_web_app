@@ -2,7 +2,7 @@
 
 	interface JurisdictionSelectorProps {
 		value: string;
-	onChange: (jurisdiction: string) => void;
+		onChange: (jurisdiction: string) => void;
 		disabled?: boolean;
 		required?: boolean;
 		showLabel?: boolean;

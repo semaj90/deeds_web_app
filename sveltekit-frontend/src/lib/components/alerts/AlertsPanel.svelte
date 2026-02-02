@@ -56,7 +56,7 @@
  clearTimeout(timer);
  }
  alertTimers.clear();
- }
+}
 </script>
 
 <div class="fixed bottom-4 right-4 z-50 w-80 space-y-3">
