@@ -2,18 +2,18 @@
 	let exifKey = $state<any>(undefined);
 	let aiTag = $state<any>(undefined);
 
- import Brain from "lucide-svelte";
-import Calendar from "lucide-svelte";
-import Camera from "lucide-svelte";
-import Download from "lucide-svelte";
-import Eye from "lucide-svelte";
-import MapPin from "lucide-svelte";
-import RotateCcw from "lucide-svelte";
-import Tag from "lucide-svelte";
-import X from "lucide-svelte";
-import ZoomIn from "lucide-svelte";
-import ZoomOut from "lucide-svelte";
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+	import Brain from 'lucide-svelte/icons/brain';
+	import Calendar from 'lucide-svelte/icons/calendar';
+	import Camera from 'lucide-svelte/icons/camera';
+	import Download from 'lucide-svelte/icons/download';
+	import Eye from 'lucide-svelte/icons/eye';
+	import MapPin from 'lucide-svelte/icons/map-pin';
+	import RotateCcw from 'lucide-svelte/icons/rotate-ccw';
+	import Tag from 'lucide-svelte/icons/tag';
+	import X from 'lucide-svelte/icons/x';
+	import ZoomIn from 'lucide-svelte/icons/zoom-in';
+	import ZoomOut from 'lucide-svelte/icons/zoom-out';
+	import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  let {
  open,

@@ -1,9 +1,9 @@
 <script lang="ts">
- import Button from '$lib/components/ui/button';
- import Camera from "lucide-svelte";
-import Upload from "lucide-svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+	import Button from '$lib/components/ui/button';
+	import Camera from 'lucide-svelte/icons/camera';
+	import Upload from 'lucide-svelte/icons/upload';
+	import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+	import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean;
 	onUpload: (data: any) => void; onError: (error: any) => void }>();
