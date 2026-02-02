@@ -5,7 +5,10 @@
    */
   // Migrated to $effect
   import { Button } from '$lib/components/ui/enhanced-bits';
-  import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-svelte';
+  import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
+  import Home from 'lucide-svelte/icons/home';
+  import Bug from 'lucide-svelte/icons/bug';
   import type { Snippet } from 'svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

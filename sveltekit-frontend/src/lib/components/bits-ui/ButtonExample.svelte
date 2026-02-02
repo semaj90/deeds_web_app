@@ -28,7 +28,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   }: Props = $props();
 
   // Derived class names based on variant and size
-  let buttonClasses = $derived(() => {
+  let buttonClasses = $derived.by(() => {
     const baseClasses = 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
 
     const variantClasses: Record<string, string> = {
@@ -65,7 +65,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   }
 </script>
 
-<Button class={buttonClasses()} {disabled} onclick={handleClick} type="button">
+<Button.Root class={buttonClasses} {disabled} onclick={handleClick} type="button">
   {#if isProcessing}
     <span class="i-lucide-loader-2 mr-2 h-4 w-4 animate-spin" aria-hidden="true"></span>
   {/if}

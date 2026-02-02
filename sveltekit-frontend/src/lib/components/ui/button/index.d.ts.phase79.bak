@@ -1,4 +1,0 @@
-// Type declarations for SimpleButton exports import type { SvelteComponentTyped } from 'svelte'; export type ButtonType = 'button' | 'submit' | 'reset'; export type ButtonVariant = 'primary' | 'secondary'; export interface ButtonProps { type?: ButtonType; variant?: ButtonVariant; disabled?: boolean; ariaLabel?: string | undefined}
-/** * Default export for index.ts (re-exports SimpleButton.svelte as Button) */ export default class Button extends SvelteComponentTyped<ButtonProps> { }
-/** * Also provide module declaration so direct imports of the .svelte file are typed: * import type { SimpleButton } from './SimpleButton.svelte'; */ declare module, './SimpleButton.svelte' { import type { SvelteComponentTyped } from 'svelte'; export interface SimpleButtonProps { type?: ButtonType; variant?: ButtonVariant; disabled?: boolean; ariaLabel?: string | undefined} export default class SimpleButton extends SvelteComponentTyped<SimpleButtonProps> { }
-} }
