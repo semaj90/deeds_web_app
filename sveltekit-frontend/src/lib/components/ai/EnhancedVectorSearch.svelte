@@ -2,7 +2,20 @@
 import type { SearchResult } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Updated to use bits-ui components import  Button  from "$lib/components/ui/bitsButton.svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import  Select  from "$lib/components/ui/MeltSelect.svelte"; // TODO: Replace with bits-ui equivalents when available // import { // Badge, // CardContent, // CardHeader, // CardTitle, // Checkbox, // DialogContent, // DialogHeader, // DialogTitle, // Input, // Progress, // SelectContent, // SelectItem, // SelectTrigger, // SelectValue, // Slider, // Tabs, // TabsContent, // TabsList, // TabsTrigger, // } from "bits-ui"
-  import { BarChart3, Brain, ChevronDown, ChevronUp, Clock, Download, Eye, Filter, Loader2, Search, Share2, Target, TrendingUp, Zap } from "lucide-svelte";
+  import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
+  import Brain from 'lucide-svelte/icons/brain';
+  import ChevronDown from 'lucide-svelte/icons/chevron-down';
+  import ChevronUp from 'lucide-svelte/icons/chevron-up';
+  import Clock from 'lucide-svelte/icons/clock';
+  import Download from 'lucide-svelte/icons/download';
+  import Eye from 'lucide-svelte/icons/eye';
+  import Filter from 'lucide-svelte/icons/filter';
+  import Loader2 from 'lucide-svelte/icons/loader-2';
+  import Search from 'lucide-svelte/icons/search';
+  import Share2 from 'lucide-svelte/icons/share-2';
+  import Target from 'lucide-svelte/icons/target';
+  import TrendingUp from 'lucide-svelte/icons/trending-up';
+  import Zap from 'lucide-svelte/icons/zap';
   // Migrated to $effect
   import { derived, get, writable } from "svelte/store"; // Props let {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';

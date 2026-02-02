@@ -3,11 +3,8 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
 <script lang="ts">
   // Migrated to $effect
-  import { getCachedPattern } from '$lib/services/chr-rom-precomputation-service';
   import { nesGPUBridge } from '$lib/gpu/nes-gpu-memory-bridge';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+  import { getCachedPattern } from '$lib/services/chr-rom-precomputation-service';
 
   // Props (use simple export lets to be Svelte-compatible)
   interface Props {
@@ -43,11 +40,6 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
     initializeZeroLatencySystem()
 });
-
-  // TODO: Add as cleanup in $effect
-  function cleanupSystem() {
-    // Cleanup logic here
-  }
 
   async function initializeZeroLatencySystem(): Promise<void> {
     try {
@@ -188,7 +180,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         <div class="loading-spinner" aria-hidden="true"></div>
         <div>Loadingâ€¦</div>
       </div>
-    `;`
+    `;
     document.body.appendChild(tooltip);
     positionTooltip(tooltip, target);
     requestAnimationFrame(() => tooltip.classList.add('visible'));
@@ -253,10 +245,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   async function cacheApiResult(elementId: string, html: string): Promise<any> {
     try {
       const chrRomPattern = {
-        renderableHTML: html;
+        renderableHTML: html,
 	type: 'summary_card',
-        priority: 3;
-	compressedData: new TextEncoder().encode(html): 2
+        priority: 3,
+	compressedData: new TextEncoder().encode(html),
+	timestamp: Date.now()
       };
       const storeFn = (nesGPUBridge as unknown).storeCHRROMPattern
       if (typeof storeFn === 'function') {
@@ -289,11 +282,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function escapeHtml(unsafe: string) {
     return unsafe
-      .replaceAll('&', '&amp,')
-      .replaceAll('<', '&lt,')
-      .replaceAll('>', '&gt,')
-      .replaceAll('"', '&quot,')"
-      .replaceAll("'", '&#039;');'
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
   }
   function updateStats(responseTime: number) {
     interactionStats.averageResponseTime = (

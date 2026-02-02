@@ -3,12 +3,10 @@
 	// Migrated to $effect
 
 	import Activity from 'lucide-svelte/icons/activity';
-	import Cpu from 'lucide-svelte/icons/cpu';
-	import Zap from 'lucide-svelte/icons/zap';
 	import Clock from 'lucide-svelte/icons/clock';
+	import Cpu from 'lucide-svelte/icons/cpu';
 	import TrendingUp from 'lucide-svelte/icons/trending-up';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+	import Zap from 'lucide-svelte/icons/zap';
 	interface Props {
 		showOverlay?: boolean
 		autoHide?: boolean
@@ -127,28 +125,27 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			if (e.ctrlKey && e.shiftKey && (e.key === 'P' || e.key === 'p')) {
 				e.preventDefault();
 				toggleVisibility();
-				autoHideTimer()}
+				autoHideTimer();
+			}
 		};
 		if (typeof window !== 'undefined') {
-    window.addEventListener('keydown', handleKeyDown)
-
-  }
-  return () => {
+			window.addEventListener('keydown', handleKeyDown);
+		}
+		return () => {
 			// teardown when effect re-runs or component destroyed
 			if (typeof window !== 'undefined') {
-				window.removeEventListener('keydown', handleKeyDown)}
+				window.removeEventListener('keydown', handleKeyDown);
+			}
 			if (intervalId) {
 				clearInterval(intervalId);
-				intervalId = undefined}
-		}});
-	// TODO: Add as cleanup in $effect: return () => {
-		if (intervalId) {
-			clearInterval(intervalId);
-			intervalId = undefined}
-		if (performanceObserver) {
-			performanceObserver.disconnect();
-			performanceObserver = null}
-	}
+				intervalId = undefined;
+			}
+			if (performanceObserver) {
+				performanceObserver.disconnect();
+				performanceObserver = null;
+			}
+		};
+	});
 	// Color coding for metrics
 	function getStatusColor(value: number, type: 'fps' | 'memory' | 'cpu' | 'gpu'): string {
 		switch (type) {
