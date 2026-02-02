@@ -1,5 +1,5 @@
 <script lang="ts">
- import type { Badge } from '$lib/components/ui/badge';
+ import { Badge } from '$lib/components/ui/badge';
  import { AlertCircle, AlertTriangle, CheckCircle, Shield } from "lucide-svelte";
 
  let { threatLevel, size = 'md', showIcon = true } = $props<{
