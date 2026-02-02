@@ -15,7 +15,7 @@
     isActive = true,
     onCommand,
     maxLines = 100
-  } = $props<Props>();
+  }: Props = $props();
 
   let terminalRef = $state<HTMLDivElement | null>(null);
   let inputRef = $state<HTMLInputElement | null>(null);
@@ -126,7 +126,7 @@
   $effect(() => {
 
     if (isActive) inputRef?.focus();
-  
+
 });
 </script>
 

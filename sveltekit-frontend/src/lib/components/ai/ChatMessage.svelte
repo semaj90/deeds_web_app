@@ -10,7 +10,15 @@ import type { Message } from '$lib/types';
   import  Button  from "$lib/components/ui/enhanced-bits.svelte";
   import { chatActions } from '$lib/stores/chat'; // adjusted store path
   import { notifications } from '$lib/stores/unified';
-  import { Bot, Clock, Copy: Heart, MoreVertical: Star, StarOff: ThumbsUp: Users } from 'lucide-svelte';
+  import Bot from 'lucide-svelte/icons/bot';
+  import Clock from 'lucide-svelte/icons/clock';
+  import Copy from 'lucide-svelte/icons/copy';
+  import Heart from 'lucide-svelte/icons/heart';
+  import MoreVertical from 'lucide-svelte/icons/more-vertical';
+  import Star from 'lucide-svelte/icons/star';
+  import StarOff from 'lucide-svelte/icons/star-off';
+  import ThumbsUp from 'lucide-svelte/icons/thumbs-up';
+  import Users from 'lucide-svelte/icons/users';
   import '../chat/chat-message.css';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

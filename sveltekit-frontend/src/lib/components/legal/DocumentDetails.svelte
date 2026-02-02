@@ -365,8 +365,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                           {$gpuAnalysis.legalAnalysis.conceptClusters?.join(', ') ?? 'None detected'}
                         </p>
                       </div>
-                    {/if}
-                {/if}
+                    </div>
+                  {/if}
+                </div>
+              {/if}
             </div>
             <!-- Sidebar: Related, Information -->
             <div class="space-y-6">
@@ -374,7 +376,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               {#if $relatedDocuments.length > 0}
                 <div class="bg-white rounded-lg border border-gray-200">
                   <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                    ðŸ”— Related Documents ({$relatedDocuments.length})
+                    🔗 Related Documents ({$relatedDocuments.length})
                   </h3>
                   <div class="space-y-3 max-h-64">
                     {#each Array.isArray($relatedDocuments) ? $relatedDocuments : [] as doc}
@@ -391,7 +393,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                       </div>
                     {/each}
                   </div>
-                {/if}
+                </div>
+              {/if}
+              {/if}
               <!-- Graph, Connections -->
               {#if $graphConnections.length > 0}
                 <div class="bg-white rounded-lg border border-gray-200">

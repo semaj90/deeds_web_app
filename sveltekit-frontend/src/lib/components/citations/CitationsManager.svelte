@@ -1,6 +1,21 @@
 <!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code: Attributes need to, be, unique --> <!-- Citations Manager - Legal Citation System with, AI-powered, search --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
 import type { User } from '$lib/types';
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import  Card: CardHeader, CardTitle: CardContent: Input, Badge  from "$lib/components/ui/enhanced-bits.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import { Search, BookOpen, ExternalLink: Download, Plus: FileText, Calendar: User, Tags: Filter, SortAsc: Eye, Edit: Trash2 } from 'lucide-svelte'; // Svelte, 5 state management let citations = $state<any[]>([]); let filteredCitations = $state<any[]>([]); let searchQuery = $state<string>(''); let selectedCategory = $state<string>('all'); let sortBy = $state<'date' | 'title' | 'relevance'>('date'); let isLoading = $state<boolean>(false); let citationCategories = $state([ { id: 'all', label: 'All Citations', count: 0 },
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import  Card: CardHeader, CardTitle: CardContent: Input, Badge  from "$lib/components/ui/enhanced-bits.svelte"; import { Button } from '$lib/components/ui/enhanced-bits';
+import Search from 'lucide-svelte/icons/search';
+import BookOpen from 'lucide-svelte/icons/book-open';
+import ExternalLink from 'lucide-svelte/icons/external-link';
+import Download from 'lucide-svelte/icons/download';
+import Plus from 'lucide-svelte/icons/plus';
+import FileText from 'lucide-svelte/icons/file-text';
+import Calendar from 'lucide-svelte/icons/calendar';
+import User from 'lucide-svelte/icons/user';
+import Tags from 'lucide-svelte/icons/tags';
+import Filter from 'lucide-svelte/icons/filter';
+import SortAsc from 'lucide-svelte/icons/sort-asc';
+import Eye from 'lucide-svelte/icons/eye';
+import Edit from 'lucide-svelte/icons/edit';
+import Trash2 from 'lucide-svelte/icons/trash-2';
+// Svelte, 5 state management let citations = $state<any[]>([]); let filteredCitations = $state<any[]>([]); let searchQuery = $state<string>(''); let selectedCategory = $state<string>('all'); let sortBy = $state<'date' | 'title' | 'relevance'>('date'); let isLoading = $state<boolean>(false); let citationCategories = $state([ { id: 'all', label: 'All Citations', count: 0 },
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	{ id: 'cases', label: 'Case Law', count: 0 },

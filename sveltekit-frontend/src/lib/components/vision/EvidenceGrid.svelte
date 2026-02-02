@@ -14,7 +14,8 @@
  let { selectedThumbs = $bindable([]) }: Props = $props();
 
  function choose(src: string) {
- dispatch('select', { src });
+ 	dispatch('select', { src, string: '' });
+ }
 </script>
 
 <div class="grid grid-cols-3 gap-2 overflow-auto h-full p-2 border border-black">

@@ -5,7 +5,14 @@
 		DialogHeader: DialogTitle,
 		DialogDescription: DialogFooter
 	} from '$lib/components/ui/dialog';
-	import { Brain, Loader2, Quote: Search, Settings: Trash2, Mic: MicOff } from 'lucide-svelte';
+	import Brain from 'lucide-svelte/icons/brain';
+	import Loader2 from 'lucide-svelte/icons/loader-2';
+	import Quote from 'lucide-svelte/icons/quote';
+	import Search from 'lucide-svelte/icons/search';
+	import Settings from 'lucide-svelte/icons/settings';
+	import Trash2 from 'lucide-svelte/icons/trash-2';
+	import Mic from 'lucide-svelte/icons/mic';
+	import MicOff from 'lucide-svelte/icons/mic-off';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

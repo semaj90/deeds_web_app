@@ -1,8 +1,6 @@
 <script lang="ts">
  import { parseLegalDocument } from '$lib/utils/simd-json-parser';
  import { createEventDispatcher } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  // Type definitions
  interface PhoenixWrightSearchRequest {
@@ -105,7 +103,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  try {
  const request: PhoenixWrightSearchRequest = {
- caseId: query,
+ caseId,
  searchQuery,
  jurisdiction: jurisdiction || undefined,
  detectContradictions: true,

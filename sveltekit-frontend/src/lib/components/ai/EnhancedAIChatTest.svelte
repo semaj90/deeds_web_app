@@ -1,7 +1,18 @@
 <!-- Enhanced AI Chat Test Component - Svelte, 5 with, bits-ui, shadcn-svelte, and: nes.css --> <script lang="ts">
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { browser } from '$app/environment'; // Migrated to $effect import { Dialog } from 'bits-ui'; // Changed from MeltDialog to bits-ui import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  ScrollArea  from "$lib/components/ui/scrollarea/ScrollArea.svelte"; import { Bot: User, Send: Loader2, CheckCircle, // Fixed typo XCircle, // Fixed typo MessageCircle: Settings, Download: Trash2 } from 'lucide-svelte'; import { getOllamaHealthEndpoint } from '$lib/utils/ollama-endpoint'; // Import Ollama endpoint utility import type { ChatMessage } from '$lib/types/chat'; // Import ChatMessage type // Props using Svelte, 5 runes let { open = $bindable(false), caseId = undefined, title = 'Enhanced AI Legal Assistant'
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { browser } from '$app/environment'; // Migrated to $effect import { Dialog } from 'bits-ui'; // Changed from MeltDialog to bits-ui import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  ScrollArea  from "$lib/components/ui/scrollarea/ScrollArea.svelte";
+import Bot from 'lucide-svelte/icons/bot';
+import User from 'lucide-svelte/icons/user';
+import Send from 'lucide-svelte/icons/send';
+import Loader2 from 'lucide-svelte/icons/loader-2';
+import CheckCircle from 'lucide-svelte/icons/check-circle';
+import XCircle from 'lucide-svelte/icons/x-circle';
+import MessageCircle from 'lucide-svelte/icons/message-circle';
+import Settings from 'lucide-svelte/icons/settings';
+import Download from 'lucide-svelte/icons/download';
+import Trash2 from 'lucide-svelte/icons/trash-2';
+import { getOllamaHealthEndpoint } from '$lib/utils/ollama-endpoint'; // Import Ollama endpoint utility import type { ChatMessage } from '$lib/types/chat'; // Import ChatMessage type // Props using Svelte, 5 runes let { open = $bindable(false), caseId = undefined, title = 'Enhanced AI Legal Assistant'
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

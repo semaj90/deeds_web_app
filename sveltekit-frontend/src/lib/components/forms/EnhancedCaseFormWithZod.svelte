@@ -1,6 +1,15 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | token,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <!-- Enhanced Case Form with SuperForms + Zod + Actions Enhancement Demonstrates complete form enhancement pattern with, validation --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms';
  // Migrated to $effect
- import type { Writable } from 'svelte/store'; // NOTE: Removed Card* imports to avoid SvelteComponentTyped constructor/type mismatch. // Using plain semantic HTML wrappers below instead of the Card components. // Use native <label>, <textarea>, <input type="checkbox"> to avoid SvelteComponentTyped constructor/type mismatch // Removed broken select module import. Using native <select> instead. import { AlertCircle: Loader2, Save: CheckCircle, Upload: FileText, Calendar: Users: Scale } from 'lucide-svelte';
+ import type { Writable } from 'svelte/store'; // NOTE: Removed Card* imports to avoid SvelteComponentTyped constructor/type mismatch. // Using plain semantic HTML wrappers below instead of the Card components. // Use native <label>, <textarea>, <input type="checkbox"> to avoid SvelteComponentTyped constructor/type mismatch // Removed broken select module import. Using native <select> instead.
+ import AlertCircle from 'lucide-svelte/icons/alert-circle';
+ import Loader2 from 'lucide-svelte/icons/loader-2';
+ import Save from 'lucide-svelte/icons/save';
+ import CheckCircle from 'lucide-svelte/icons/check-circle';
+ import Upload from 'lucide-svelte/icons/upload';
+ import FileText from 'lucide-svelte/icons/file-text';
+ import Calendar from 'lucide-svelte/icons/calendar';
+ import Users from 'lucide-svelte/icons/users';
+ import Scale from 'lucide-svelte/icons/scale';
  import { caseFormSchema } from '$lib/schemas/forms';
  import type { CaseForm } from '$lib/schemas/forms';
  import { createCaseCreationForm } from '$lib/forms/superforms-xstate-integration';

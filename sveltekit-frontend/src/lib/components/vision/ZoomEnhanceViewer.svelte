@@ -1,6 +1,4 @@
 <script lang="ts">
-	let zoomSrc = $state<any>(undefined);
-
  interface Props {
  zoomSrc?: string | null;
  }
