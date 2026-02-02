@@ -133,7 +133,7 @@
                 {#if Object.keys(context.validationErrors).length > 0}
                     <div class="errors mt-2 p-2 bg-red-50 border border-red-200 text-red-600 text-[10px]" in:fade>
                         {#each Object.entries(context.validationErrors) as [field, msgs]}
-                            {#each (msgs || []) as msg}
+                            {#each Array.isArray(msgs) ? msgs : [] as msg}
                                 <div>[VALIDATION_ERROR: {msg}]</div>
                             {/each}
                         {/each}

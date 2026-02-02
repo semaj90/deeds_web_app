@@ -3,7 +3,7 @@
 
 import { createActor, type StateMachine } from 'xstate';
 
-export function useMachine(machine: StateMachine<any, any, any, any, any, any, any>) {
+export function useMachine(machine: StateMachine<any, any>) {
   const actor = createActor(machine);
   actor.start();
 

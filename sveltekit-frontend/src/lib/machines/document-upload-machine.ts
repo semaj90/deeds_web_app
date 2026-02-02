@@ -1,4 +1,4 @@
-import { assign, createMachine, fromPromise } from 'xstate';
+import { assign, createMachine } from 'xstate';
 
 // Type definitions
 interface UploadedFile {
@@ -98,6 +98,88 @@ function extractAIResultsFromInvoke(
   return null;
 }
 
+// Service definitions for XState v5
+const validateFilesService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+  const errors: Record<string, string[]> = {};
+
+  if (input.files.length === 0) {
+    errors.files = ['Please select at least one file'];
+  }
+
+  const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
+  const maxSize = 10 * 1024 * 1024; // 10MB
+
+  for (const file of input.files) {
+    if (!allowedTypes.includes(file.type)) {
+      errors.files = errors.files || [];
+      errors.files.push(`${file.name}: File type not allowed`);
+    }
+    if (file.size > maxSize) {
+      errors.files = errors.files || [];
+      errors.files.push(`${file.name}: File too large (max 10MB)`);
+    }
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw { validationErrors: errors };
+  }
+
+  return input.files;
+});
+
+const uploadFilesService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+  const formData = new FormData();
+  input.files.forEach((file, index) => {
+    formData.append(`file_${index}`, file);
+  });
+
+  const response = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData?.error ?? `HTTP ${response.status}`);
+  }
+  return response.json();
+});
+
+const processFilesService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+  const processingResults: AIProcessingResult[] = [];
+
+  for (const file of input.uploadedFiles) {
+    const response = await fetch('/api/ai/process-document', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileId: file.id,
+        analysisType: 'full'
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Processing failed for ${file.name}`);
+    }
+    const result = (await response.json()) as AIProcessingResult;
+    processingResults.push(result);
+  }
+
+  const totalTextLength = processingResults.reduce(
+    (sum, r) => sum + (r.extractedText?.length ?? 0),
+    0
+  );
+
+  return {
+    processedFiles: processingResults,
+    summary: {
+      totalFiles: input.uploadedFiles.length,
+      successfulProcessing: processingResults.length,
+      extractedTextLength: totalTextLength,
+    },
+  };
+});
+
 export const documentUploadMachine = createMachine({
   types: {
 	context: {} as DocumentUploadContext,
@@ -130,32 +212,7 @@ export const documentUploadMachine = createMachine({
 	validating: {
 	invoke: {
         id: 'validateFiles',
-        src: fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
-          const errors: Record<string, string[]> = {};
-
-          if (input.files.length === 0) {
-            errors.files = ['Please select at least one file'];
-          }
-
-          const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
-          const maxSize = 10 * 1024 * 1024; // 10MB
-
-          for (const file of input.files) {
-            if (!allowedTypes.includes(file.type)) {
-              errors.files = errors.files || [];
-              errors.files.push(`${file.name}: File type not allowed`);
-            }
-            if (file.size > maxSize) {
-              errors.files = errors.files || [];
-              errors.files.push(`${file.name}: File too large (max 10MB)`);
-            }
-          }
-
-          if (Object.keys(errors).length > 0) {
-            throw { validationErrors: errors };
-          }
-          return input.files;
-        }),
+        src: validateFilesService,
         input: ({ context }) => context,
         onDone: {
 	target: 'validated',
@@ -191,23 +248,7 @@ export const documentUploadMachine = createMachine({
       }),
       invoke: {
 	id: 'uploadFiles',
-        src: fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
-          const formData = new FormData();
-          input.files.forEach((file, index) => {
-            formData.append(`file_${index}`, file);
-          });
-
-          const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData?.error ?? `HTTP ${response.status}`);
-          }
-          return response.json();
-        }),
+        src: uploadFilesService,
         input: ({ context }) => context,
         onDone: {
 	target: 'processing',
@@ -239,38 +280,7 @@ export const documentUploadMachine = createMachine({
 	entry: assign({ processingProgress: () => 0 }),
       invoke: {
 	id: 'processFiles',
-        src: fromPromise(
-          async ({ input }: { input: DocumentUploadContext }) => {
-            const processingResults: AIProcessingResult[] = [];
-
-            for (const file of input.uploadedFiles) {
-              const response = await fetch('/api/ai/process-document', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	fileId: file.id, analysisType: 'full' }),
-              });
-
-              if (!response.ok) {
-                throw new Error(`Processing failed for ${file.name}`);
-              }
-              const result = (await response.json()) as AIProcessingResult;
-              processingResults.push(result);
-            }
-
-            return {
-              processedFiles: processingResults,
-              summary: {
-	totalFiles: input.uploadedFiles.length,
-                successfulProcessing: processingResults.length,
-                extractedTextLength: processingResults.reduce(
-                  (acc, r) => acc + (r.extractedText?.length ?? 0),
-                  0
-                ),
-              },
-	};
-          }
-        ),
+        src: processFilesService,
         input: ({ context }) => context,
         onDone: {
 	target: 'completed',

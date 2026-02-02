@@ -1,8 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import * as Select from "bits-ui";
+  import { Select } from 'bits-ui';
   import type { Snippet } from "svelte";
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     children?: Snippet;
