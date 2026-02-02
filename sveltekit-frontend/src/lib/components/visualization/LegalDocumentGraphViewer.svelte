@@ -820,15 +820,46 @@
 		background: rgba(96, 165, 250, 0.3);
 		border-color: #60a5fa;
 	}
-  .node-info-panel { position: absolute;
-	bottom: 12px; left: 12px;
-	background: rgba(0, 0, 0, 0.8); color: white, padding: 12px; border-radius: 6px; min-width: 200px; max-width: 300px; z-index: 5 }
-  .node-info-panel h4 { margin: 0, 0 8px 0; color: #60a5fa; font-size: 14px}
-  .node-info-panel p { margin: 4px 0; font-size: 12px}
-  /* Responsive design */ @media (max-width: 768px) { .performance-hud { font-size: 10px}
-    .controls-panel { flex-direction: column; align-items: flex-end}
-    .controls-panel button, .controls-panel select { padding: 4px 8px; font-size: 12px}
-  } </style>
+	.node-info-panel {
+		position: absolute;
+		bottom: 12px;
+		left: 12px;
+		background: rgba(0, 0, 0, 0.8);
+		color: white;
+		padding: 12px;
+		border-radius: 6px;
+		min-width: 200px;
+		max-width: 300px;
+		z-index: 5;
+	}
+
+	.node-info-panel h4 {
+		margin: 0 0 8px 0;
+		color: #60a5fa;
+		font-size: 14px;
+	}
+
+	.node-info-panel p {
+		margin: 4px 0;
+		font-size: 12px;
+	}
+
+	/* Responsive design */
+	@media (max-width: 768px) {
+		.performance-hud {
+			font-size: 10px;
+		}
+		.controls-panel {
+			flex-direction: column;
+			align-items: flex-end;
+		}
+		.controls-panel button,
+		.controls-panel select {
+			padding: 4px 8px;
+			font-size: 12px;
+		}
+	}
+</style>
 
 
 

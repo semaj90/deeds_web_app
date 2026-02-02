@@ -54,12 +54,6 @@
     }
   });
 </script>
-      return requiredPermissions.every(permission => authStore.hasPermission(permission));
-    } else {
-      return requiredPermissions.some(permission => authStore.hasPermission(permission));
-    }
-  });
-</script>
 
 {#if hasAccess}
   {#if children}

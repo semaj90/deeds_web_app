@@ -3,7 +3,6 @@
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores';
   import type { Snippet } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     children?: Snippet;
@@ -30,7 +29,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Handle unauthorized access
   $effect(() => {
-    if (isAuthorized === false && typeof window !== 'undefined') {
+    if (isAuthorized() === false && typeof window !== 'undefined') {
       // Store redirect path
       const currentPath = window.location.pathname + window.location.search;
       authStore.setRedirect(currentPath);
@@ -40,16 +39,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   });
 </script>
 
-{#if isAuthorized === null && showLoading}
+{#if isAuthorized() === null && showLoading}
   <div class="auth-loading" role="status" aria-label="Loading, authentication">
     <div class="loading-spinner"></div>
     <span>Checking authentication...</span>
   </div>
-{:else if isAuthorized === true}
+{:else if isAuthorized() === true}
   {#if children}
     {@render children()}
   {/if}
-{:else if isAuthorized === false && fallback}
+{:else if isAuthorized() === false && fallback}
   {@render fallback()}
 {/if}
 

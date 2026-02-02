@@ -2,6 +2,12 @@
   import { AlertCircle, Brain, CheckCircle, Clock, Cpu, XCircle, Zap } from 'lucide-svelte';
   import { cubicOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
+Clock from 'lucide-svelte/icons/clock';
+  import Cpu from 'lucide-svelte/icons/cpu';
+  import XCircle from 'lucide-svelte/icons/x-circle';
+  import Zap from 'lucide-svelte/icons/zap';
+  import { cubicOut } from 'svelte/easing';
+  import { tweened } from 'svelte/motion';
 
   interface Props {
     isLoading?: boolean;
@@ -126,8 +132,8 @@
       <!-- Icon -->
       <div class="flex-shrink-0">
         {#if status === 'loading'}
+          {@const OperationIcon = getOperationIcon(operation)}
           <div class="relative">
-            {@const OperationIcon = getOperationIcon(operation)}
             <OperationIcon class="{iconSizes[size]} {getStatusColor(status)} animate-pulse" />
             {#if operation === 'ai' || operation === 'gpu'}
               <div class="absolute -inset-1 rounded-full border-2 border-current opacity-20 animate-spin border-r-transparent"></div>
