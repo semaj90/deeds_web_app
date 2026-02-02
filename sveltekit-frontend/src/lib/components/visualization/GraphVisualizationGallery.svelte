@@ -1,10 +1,12 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
   // Migrated to $effect
+  import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Button } from '$lib/components/ui/button';
   import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import Badge from "$lib/components/ui/badge/Badge.svelte";
-  import { Maximize2, RefreshCw, Save, Share2, Grid, List } from 'lucide-svelte';
+  import Grid from 'lucide-svelte/icons/grid';
+  import List from 'lucide-svelte/icons/list';
+  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
 
   // Types
   interface GraphVisualizationResult {

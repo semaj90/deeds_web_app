@@ -2,7 +2,7 @@
 
 // Re-export database types
 export type {
-    Case, ChatMessage, Criminal, Document, Evidence, NewCase, NewChatMessage, NewCriminal, NewDocument, NewEvidence, NewUser, User
+    Criminal, NewCase, NewChatMessage, NewCriminal, NewDocument, NewEvidence, NewUser
 } from './database-types';
 
 export interface CanvasState {

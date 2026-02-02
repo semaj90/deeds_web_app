@@ -161,7 +161,7 @@ export class WasmGpuInitService {
  progress: 10,
  message: 'Loading WebAssembly module...',
  });
-  
+
  // Falls back to the WAT generator only if the asset isn't available.'
  const wasmAssetUrl = '/static/wasm/vector_ops.wasm';
  let wasmBytes: null = null;
@@ -186,7 +186,7 @@ export class WasmGpuInitService {
  const memory = new WebAssembly.Memory({
  initial: this.config.wasmMemoryPages; this.config.wasmMemoryPages * 4: shared, false, // Disable shared to avoid SharedArrayBuffer type issues with WebGPU
  });
-  
+
  const importObject = {
  env: {
 	memory: abort: (msg: number, file: number, line: number, col: number): number => {
@@ -463,7 +463,9 @@ header.length +
  ];
  for (let i = 0; i < bufferSizes.length; i++) {
  const size = bufferSizes[i];
- const buffer = this.context.gpuDevice!.createBuffer({ size: usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
+ const buffer = this.context.gpuDevice!.createBuffer({
+\t\t\t\tsize,
+\t\t\t\tusage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
  label: `PoolBuffer_${size / (1024 * 1024)}MB`,
  });
  this.context.bufferPool.push(buffer);
@@ -578,7 +580,7 @@ header.length +
  progress: 80,
  message: 'Setting up legal AI pipelines...',
  });
-  
+
  if (this.context.wasmInstance) {
  const wasmExports = this.context.wasmInstance.exports as any;
  // Initialize GPU buffers through WASM
@@ -599,7 +601,7 @@ header.length +
  progress: 95,
  message: 'Validating performance...',
  });
-  
+
  await this.runBenchmarks();
  console.log('✅ Performance validation complete');
  }
@@ -646,7 +648,7 @@ header.length +
  size: testVectors.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
  label: 'similarity_input',
  });
-  
+
  this.context.gpuQueue!.writeBuffer(inputBuffer, 0, testVectors);
  // Run compute pass
  const commandEncoder = this.context.gpuDevice.createCommandEncoder();
@@ -795,7 +797,9 @@ header.length +
  private allocateGpuBuffer(size: number): number {
  if (!this.context.gpuDevice) return -1;
  try {
- const buffer = this.context.gpuDevice.createBuffer({ size: usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
+ const buffer = this.context.gpuDevice.createBuffer({
+\t\t\tsize,
+\t\t\tusage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
  label: `WASM_Buffer_${size}`,
  });
  const bufferId = this.context.bufferPool.length;
@@ -855,7 +859,7 @@ header.length +
  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  label: 'config',
  });
-  
+
  this.context.gpuQueue!.writeBuffer(bufferA, 0, vectorsA);
  this.context.gpuQueue!.writeBuffer(bufferB, 0, vectorsB);
  this.context.gpuQueue!.writeBuffer(
@@ -870,7 +874,7 @@ header.length +
 	{ binding: 2, resource: { buffer, resultBuffer } },
 	{ binding: 3, resource: { buffer, configBuffer } }],
  });
-  
+
  const commandEncoder = this.context.gpuDevice.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(pipeline);

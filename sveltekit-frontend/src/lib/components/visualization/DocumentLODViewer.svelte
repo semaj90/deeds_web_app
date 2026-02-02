@@ -1,16 +1,12 @@
 <script lang="ts">
   // Migrated to $effect
-  import { LoadingButton } from '$lib/headless';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Card, CardContent } from "$lib/components/ui/card";
+  import { LoadingButton } from '$lib/headless';
+  import FileText from 'lucide-svelte/icons/file-text';
+  import RotateCw from 'lucide-svelte/icons/rotate-cw';
   import ZoomIn from 'lucide-svelte/icons/zoom-in';
   import ZoomOut from 'lucide-svelte/icons/zoom-out';
-  import RotateCw from 'lucide-svelte/icons/rotate-cw';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import Layers from 'lucide-svelte/icons/layers';
-  import Download from 'lucide-svelte/icons/download';
-  import Eye from 'lucide-svelte/icons/eye';
-  import Navigation from 'lucide-svelte/icons/navigation';
 
   // Types
   interface DocumentPage {
@@ -49,7 +45,7 @@
       isLoading = false;
     },
 	1000);
-  
+
 });
 
   function handleZoom(delta: number) {
