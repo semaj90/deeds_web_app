@@ -1,11 +1,10 @@
 <script lang="ts">
-  import Card from '$lib/components/ui/Card/Card.svelte';
-  import CardContent from '$lib/components/ui/Card/CardContent.svelte';
-  import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
-  import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+  import Card from '$lib/components/ui/card/Card.svelte';
+  import CardContent from '$lib/components/ui/card/CardContent.svelte';
+  import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+  import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import { Button } from '$lib/components/ui/enhanced-bits';
   import { AsyncStore, GenericStore } from '$lib/stores/generic.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // 1. Generic Store Example
   const counterStore = new GenericStore<number>(0);
@@ -25,6 +24,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
       return { id: 1, name: 'Svelte 5 User' };
     });
+  }
 </script>
 
 <div class="space-y-8 p-4">

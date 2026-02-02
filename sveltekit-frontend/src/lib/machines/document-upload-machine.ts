@@ -1,4 +1,4 @@
-import { assign, createMachine } from 'xstate';
+import { assign, createMachine, fromPromise } from 'xstate';
 
 // Type definitions
 interface UploadedFile {
@@ -99,7 +99,8 @@ function extractAIResultsFromInvoke(
 }
 
 // Service definitions for XState v5
-const validateFilesService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+const validateFilesService = fromPromise<File[], DocumentUploadContext>(
+  async ({ input }: { input: DocumentUploadContext }) => {
   const errors: Record<string, string[]> = {};
 
   if (input.files.length === 0) {
@@ -125,9 +126,11 @@ const validateFilesService = fromPromise(async ({ input }: { input: DocumentUplo
   }
 
   return input.files;
-});
+  }
+);
 
-const uploadFilesService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+const uploadFilesService = fromPromise<any, DocumentUploadContext>(
+  async ({ input }: { input: DocumentUploadContext }) => {
   const formData = new FormData();
   input.files.forEach((file, index) => {
     formData.append(`file_${index}`, file);
@@ -143,9 +146,14 @@ const uploadFilesService = fromPromise(async ({ input }: { input: DocumentUpload
     throw new Error(errorData?.error ?? `HTTP ${response.status}`);
   }
   return response.json();
-});
+  }
+);
 
-const processFilesService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
+const processFilesService = fromPromise<
+  { processedFiles: AIProcessingResult[]; summary: { totalFiles: number; successfulProcessing: number; extractedTextLength: number } },
+  DocumentUploadContext
+>(
+  async ({ input }: { input: DocumentUploadContext }) => {
   const processingResults: AIProcessingResult[] = [];
 
   for (const file of input.uploadedFiles) {
@@ -178,7 +186,8 @@ const processFilesService = fromPromise(async ({ input }: { input: DocumentUploa
       extractedTextLength: totalTextLength,
     },
   };
-});
+  }
+);
 
 export const documentUploadMachine = createMachine({
   types: {

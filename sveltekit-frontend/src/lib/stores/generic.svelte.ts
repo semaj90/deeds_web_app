@@ -1,5 +1,4 @@
 import type { AsyncState } from '../types/generics';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Generic Store Base Class (Svelte 5 Runes)
@@ -71,7 +70,7 @@ export class AsyncStore<T> {
         this.state.lastUpdated = Date.now();
     }
 
-    setError(error, string | Error) {
+    setError(error: string | Error) {
         this.state.status = 'error';
         this.state.error = error instanceof Error ? error.message : String(error);
         this.state.lastUpdated = Date.now();

@@ -1,8 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import * as Select from "bits-ui";
+  import { Label } from "bits-ui";
   import type { Snippet } from "svelte";
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     children?: Snippet;
@@ -13,14 +12,14 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   let { children, class: className = "", ...rest }: Props = $props();
 </script>
 
-<Select.Label
+<Label.Root
   class={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
   {...rest}
 >
   {#if children}
     {@render children()}
   {/if}
-</Select.Label>
+</Label.Root>
 
 
 
