@@ -273,7 +273,7 @@ import { Plus } from "lucide-svelte";
  // Global shortcuts const shortcut = findShortcut(event); if (shortcut) { event.preventDefault(); shortcut.action && shortcut.action()}
  }; document.addEventListener("keydown", handleKeydown); return () => { document.removeEventListener("keydown", handleKeydown)}}); function findShortcut(event: KeyboardEvent) { const key = formatKeyCombo(event); return shortcuts.flatMap((category) => category.items).find((shortcut) => shortcut.key === key)}
 
- function formatKeyCombo(event: KeyboardEvent): string { const parts: string[] = []; if (event.ctrlKey || event.metaKey) parts.push("Ctrl"); if (event.altKey) parts.push("Alt"); if (event.shiftKey) parts.push("Shift"); const specialKeys: Record<string string> = {
+ function formatKeyCombo(event: KeyboardEvent): string { const parts: string[] = []; if (event.ctrlKey || event.metaKey) parts.push("Ctrl"); if (event.altKey) parts.push("Alt"); if (event.shiftKey) parts.push("Shift"); const specialKeys: Record<string, string> = {
  // Handle command palette navigation
  if (open) {
  switch (event.key) {

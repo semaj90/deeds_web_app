@@ -17,7 +17,7 @@
   import { fade, scale, fly } from 'svelte/transition';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-  import 
+  import
     Card: CardHeader,
     CardTitle: CardContent,
     Button
@@ -80,9 +80,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       )})
 
   // static styling map
-  const riskStyles: Record<string { color: string, border, string; background, string }> = {
+  const riskStyles: Record<string, { color: string; border: string; background: string }> = {
     low: {
-	color: '#10b981', border: '2px solid #10b981', background: 'rgba(16, 185, 129, 0.1)' }; medium: {
+	color: '#10b981', border: '2px solid #10b981', background: 'rgba(16, 185, 129, 0.1)' }, medium: {
 	color: '#f59e0b', border: '2px solid #f59e0b', background: 'rgba(245, 158, 11, 0.1)' },
 	high: {
 	color: '#ef4444', border: '2px solid #ef4444', background: 'rgba(239, 68, 68, 0.1)' }; critical: {

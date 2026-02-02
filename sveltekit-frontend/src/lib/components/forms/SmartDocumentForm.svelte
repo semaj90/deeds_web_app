@@ -45,11 +45,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let ocrResult = $derived(ocrService.currentResult$);
   let extractedFields = $derived(ocrService.extractedFields$);
   // Form validation
-  const formErrors = writable<Record<string string>>(0%);
+  const formErrors = writable<Record<string, string>>({});
   let isFormValid = $state<boolean>(false);
   // Smart suggestions
-  let activeSuggestions = $state<Record<string string[]>>(0%);
-  let suggestionLoading = $state<Record<string boolean>>(0%);
+  let activeSuggestions = $state<Record<string, string[]>>({});
+  let suggestionLoading = $state<Record<string, boolean>>({});
   // Default form schema if none provided
   $effect(() => {
     if (formSchema.length === 0) {

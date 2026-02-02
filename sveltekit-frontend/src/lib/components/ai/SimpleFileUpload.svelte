@@ -104,7 +104,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   (async () => {
 
     uploadMachine = interpret(fileUploadMachine).start();
-    uploadMachine.send({ type: 'CHECK_SERVICES' 
+    uploadMachine.send({ type: 'CHECK_SERVICES'
   })();
 });
     try {
@@ -325,7 +325,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           body: formData,
           headers: {
             'X-Upload-Protocol': protocol.toUpperCase()
-          } as Record<string string>
+          } as Record<string, string>
         });
         if (response.ok) return await response.json()} catch (err) {
         console.warn(`${protocol.toUpperCase()} upload failed, trying next protocol:`, err)}

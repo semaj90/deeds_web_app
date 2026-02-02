@@ -1,6 +1,4 @@
 <script lang="ts">
-	let onClose = $state<any>(undefined);
-
 	/**
 	 * Phase 72 Error Brain Modal
 	 * NES-styled real-time error viewer with AI suggestions
