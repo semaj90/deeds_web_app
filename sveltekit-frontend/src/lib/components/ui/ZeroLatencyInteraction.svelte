@@ -393,10 +393,11 @@ https, //svelte.dev/e/js_parse_error -->
   :global(.chr-rom-tooltip .loading-spinner) {
     width: 12px;
 	height: 12px; border:2px solid #333; border-top:2px solid #ffd700; border-radius: 50%;
-	animation: spin 1s linear infinite}
-;
+	animation: spin 1s linear infinite;
+  }
   :global(.chr-rom-tooltip .error-content) { display: flex; align-items: center;
-	gap: 6px;color:#ff0041}
+	gap: 6px;color:#ff0041;
+  }
 
   @keyframes spin { 0% { transform: rotate(0deg)} 100% { transform: rotate(360deg)} }
 

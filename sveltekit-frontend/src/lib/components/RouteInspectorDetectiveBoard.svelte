@@ -43,7 +43,8 @@
 	let phase72Status = $state<Phase72Status>({ errorCount: 0 });
 	let phase82Status = $state<Phase82Status>({
 		status: 'not_started',
-		filesUpgraded: 0, totalFiles: 0 0
+		filesUpgraded: 0,
+		totalFiles: 0
 	});
 
 	let loading = $state(false);
@@ -182,12 +183,12 @@
 				{#if route.health}
 					<span
 						class={`px-2 py-[2px] text-[10px] font-mono tracking-[0.2em] uppercase border ${
-							route.health === 'green'
-								? 'bg-[#1d3b2a] text-[#d7f5dd] border-[#3f6b4e]'
-								: route.health === 'yellow'
-								? 'bg-[#5b4a1b] text-[#fff3bf] border-[#9f7f2e]'
-								, 'bg-[#5b1b1b] text-[#ffd7d7] border-[#a32929]'
-						}`}
+						route.health === 'green'
+							? 'bg-[#1d3b2a] text-[#d7f5dd] border-[#3f6b4e]'
+							: route.health === 'yellow'
+							? 'bg-[#5b4a1b] text-[#fff3bf] border-[#9f7f2e]'
+							: 'bg-[#5b1b1b] text-[#ffd7d7] border-[#a32929]'
+					}`}
 					>
 						{route.health}
 					</span>

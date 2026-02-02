@@ -16,9 +16,8 @@
  } catch (e: any) {
  error = e.message;
  }
- 
-});();
- });
+ })();
+});
 </script>
 
 <div class="routes-list">

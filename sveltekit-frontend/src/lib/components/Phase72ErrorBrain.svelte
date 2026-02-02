@@ -13,7 +13,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	const { routePath = null, onClose = () => {} } = $props<{
 		routePath?: string | null;
-		onClose?, () => void;
+		onClose?: () => void;
 	}>();
 
 	interface Phase72Error {
@@ -147,14 +147,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	$effect(() => {
 
 		loadErrors();
-	
+
 });
 </script>
 
-<div class="phase72-modal" transitionfade={{ duration, 200 }}>
+<div class="phase72-modal" transition:fade={{ duration: 200 }}>
 	<div class="modal-backdrop" onclick={ onClose }></div>
 
-	<div class="modal-content nes-container is-dark" transitionfly={{ y: 50, duration, 300 300 }}>
+	<div class="modal-content nes-container is-dark" transition:fly={{ y: 50, duration: 300 }}>
 		<!-- Header -->
 		<div class="modal-header">
 			<h2 class="nes-text is-primary">

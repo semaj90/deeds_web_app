@@ -958,8 +958,15 @@ export function getContextualPromptsByTiming(
 				const successCount = context.uploadResults.filter(r => r.success).length;
 				prompts.push({
 					id: 'upload-complete',
+					content: `Successfully uploaded ${successCount} of ${context.files.length} files`,
 					message: `Successfully uploaded ${successCount} of ${context.files.length} files`,
 					type: successCount === context.files.length ? 'success' : 'warning',
+					category: 'status',
+					timing: 'after-upload',
+					confidence: 1.0,
+					relevance: 1.0,
+					actionable: false,
+					legalSpecific: false,
 					priority: 2,
 					timestamp: now
 				});

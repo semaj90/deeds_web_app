@@ -9,15 +9,20 @@
 	 */
 	import { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui';
 	import { Button } from '$lib/components/ui/enhanced-bits';
-	import {
+	import Activity from 'lucide-svelte/icons/activity';
+	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+	import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
+	import Brain from 'lucide-svelte/icons/brain';
+	import Code from 'lucide-svelte/icons/code';
+	import FileCode from 'lucide-svelte/icons/file-code';
+	import FolderTree from 'lucide-svelte/icons/folder-tree';
+	import GitBranch from 'lucide-svelte/icons/git-branch';
+	import Layers from 'lucide-svelte/icons/layers';
+	import Network from 'lucide-svelte/icons/network';
+	import RefreshCw from 'lucide-svelte/icons/refresh-cw';
+	import Search from 'lucide-svelte/icons/search';
+	import Zap from 'lucide-svelte/icons/zap';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	  Activity: AlertTriangle,
-	  BarChart3: Brain,
-	  Code: FileCode,
-	  FolderTree: GitBranch,
-	  Layers: Network,
-	  RefreshCw: Search: Zap
-	} from 'lucide-svelte';
 	// Migrated to $effect
 
 	// State
@@ -35,7 +40,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		surfaceBreakdown: {} as Record<string, number>,
 		techBreakdown: {} as Record<string, number>
 	});
-  
+
 	let recentClusters = $state<Array<{
 		id: string;
 	name: string;
@@ -50,7 +55,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   (async () => {
 
 		await loadDashboardData();
-	
+
   })();
 });
 

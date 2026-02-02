@@ -4,11 +4,14 @@
 	initialContext: string;
  }>();
 
- let messages = $state<{ sender: 'user' | 'ai'; text: string }[]>([
- {
- sender: 'ai',
- text: `Hello! I'm your AI Legal Assistant for Case ID: ${ caseId }. How can I help you today?`,
- }]);
+	let messages = $state<{ sender: 'user' | 'ai'; text: string }[]>([]);
+
+	$effect(() => {
+		messages = [{
+			sender: 'ai',
+			text: `Hello! I'm your AI Legal Assistant for Case ID: ${caseId}. How can I help you today?`
+		}];
+	});
  let currentInput = $state('');
  let isThinking = $state(false);
 
