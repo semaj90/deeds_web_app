@@ -213,8 +213,9 @@ export async function getCachedSearchResults(
  query: string, type: string,
  filters?: unknown
 ): Promise<unknown[] | null> {
-? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
- : 'none';
+ const filtersHash = filters
+   ? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
+   : 'none';
  const key = `search:${ type }:${Buffer.from(query).toString('base64')}:${filtersHash}`;
  return await cacheService.get<unknown[]>(key);
 }

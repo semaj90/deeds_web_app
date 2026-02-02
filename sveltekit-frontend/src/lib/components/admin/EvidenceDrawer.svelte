@@ -123,7 +123,7 @@
 		{:else if data}
 			<!-- Header -->
 			<div class="drawer-header">
-				<h2>{data.filename}</h2>
+				<h2>{data!.filename}</h2>
 				<button class="close-btn" onclick={onClose} disabled={ isSaving }>✕</button>
 			</div>
 
@@ -135,31 +135,31 @@
 					<div class="info-grid">
 						<div class="info-item">
 							<label>File ID</label>
-							<code>{data.id}</code>
+							<code>{data!.id}</code>
 						</div>
 						<div class="info-item">
 							<label>File Type</label>
-							<span>{data.file_type.toUpperCase()}</span>
+							<span>{data!.file_type.toUpperCase()}</span>
 						</div>
 						<div class="info-item">
 							<label>File Size</label>
-							<span>{formatFileSize(data.file_size)}</span>
+							<span>{formatFileSize(data!.file_size)}</span>
 						</div>
 						<div class="info-item">
 							<label>Chunks</label>
-							<span>{data.chunk_count}</span>
+							<span>{data!.chunk_count}</span>
 						</div>
 						<div class="info-item">
 							<label>Created</label>
-							<span>{formatDate(data.created_at)}</span>
+							<span>{formatDate(data!.created_at)}</span>
 						</div>
 						<div class="info-item">
 							<label>Updated</label>
-							<span>{formatDate(data.updated_at)}</span>
+							<span>{formatDate(data!.updated_at)}</span>
 						</div>
 						<div class="info-item">
 							<label>MinIO Path</label>
-							<code class="path">{data.minio_path}</code>
+							<code class="path">{data!.minio_path}</code>
 						</div>
 					</div>
 				</div>
