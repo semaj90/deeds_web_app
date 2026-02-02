@@ -1,9 +1,23 @@
-<script lang="ts"> // Migrated to $effect
- import { createEventDispatcher } from 'svelte';
- import { draggable } from '$lib/actions/draggable';
- import { aiService } from '$lib/services/aiService';
- import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
- import { Edit, Save, Sparkles, Tag, User as UserIcon, X } from "lucide-svelte"; // Simple POI interface for the component export interface POIData { id: string, name: string, posX: number, posY: number, relationship?: string;
+<script lang="ts">
+	// Migrated to $effect
+	import { createEventDispatcher } from 'svelte';
+	import { draggable } from '$lib/actions/draggable';
+	import { aiService } from '$lib/services/aiService';
+	import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
+	import Edit from 'lucide-svelte/icons/edit';
+	import Save from 'lucide-svelte/icons/save';
+	import Sparkles from 'lucide-svelte/icons/sparkles';
+	import Tag from 'lucide-svelte/icons/tag';
+	import UserIcon from 'lucide-svelte/icons/user';
+	import X from 'lucide-svelte/icons/x';
+
+	// Simple POI interface for the component
+	export interface POIData {
+		id: string;
+		name: string;
+		posX: number;
+		posY: number;
+		relationship?: string;
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	caseId: string, aliases?: string[]; profileImageUrl?: string; profileData?: {
 	who: string, what: string;

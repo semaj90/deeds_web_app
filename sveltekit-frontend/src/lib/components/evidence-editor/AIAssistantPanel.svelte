@@ -9,12 +9,12 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 	let tag = $state<any>(undefined);
 
- import Badge from "$lib/components/ui/Badge.svelte";
- import { Search } from "lucide-svelte";
-import { FileText } from "lucide-svelte";
-import { Users } from "lucide-svelte";
- import Fuse from 'fuse.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+	import Badge from '$lib/components/ui/Badge.svelte';
+	import Search from 'lucide-svelte/icons/search';
+	import FileText from 'lucide-svelte/icons/file-text';
+	import Users from 'lucide-svelte/icons/users';
+	import Fuse from 'fuse.js';
+	import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  selectedNode?: any;
@@ -32,9 +32,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let fuse = $state<Fuse<any> | null>(null); // explicitly type insight shapes to avoid `never` element inference type Connection = { entity?: string; description?: string; [k: string]: any }; type Similar = { name?: string; reason?: string; id?: string; [k: string]: any }; type Action = { title?: string; description?: string; [k: string]: any };
  let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: [];
 	suggestedActions: [] });
-  
+
  });
-  
+
  }); function clearSearch() { searchQuery = ''; searchResults = []}
  async function analyzeWithAI(): Promise<any> { if (!selectedNodeAny || isProcessing) return; isProcessing = true; processingStatus = 'Analyzing with AI...'; try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -66,13 +66,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  timeline: [],
  suggestedActions: []
  });
-  
+
  let selectedNodeAny = $state<any | null>(null);
 
  $effect(() => {
  selectedNodeAny = selectedNode as any;
  });
-  
+
  $effect(() => {
  if (evidenceList.length > 0) {
  fuse = new Fuse(evidenceList, {
@@ -81,7 +81,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  });
  }
  });
-  
+
  $effect(() => {
  if (fuse && searchQuery.trim()) {
  const results = fuse.search(searchQuery);
