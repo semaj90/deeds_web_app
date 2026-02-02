@@ -183,7 +183,7 @@
     font-weight: 600;
 	padding: 0.25rem 0.75rem;
     border-radius: 0.25rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
   }
 
   .status-indicator.connected {
@@ -330,7 +330,7 @@
   .bar-fill {
     height: 100%;
 	background: linear-gradient(90deg, #3b82f6, #dc2626);
-    transition: width 0.3s ease;
+    transition:width 0.3s ease;
   }
 
   .severity-label {

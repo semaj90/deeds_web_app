@@ -422,7 +422,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     background: #333, color: white, border: 1px solid #555
     cursor: pointer
     font-family: inherit
-    font-size: 0.875rem, transition: all 0.2s ease}
+    font-size: 0.875rem, transition:all 0.2s ease}
   .lod-button:hover {
     background: #444}
   .lod-button.active {
@@ -455,7 +455,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     overflow: hidden}
   .loading-progress {
     height: 100%;
-	background: #22c55e, transition: width 0.3s ease}
+	background: #22c55e, transition:width 0.3s ease}
   .texture-display {
     position: relative, display: flex
     align-items: center
@@ -508,7 +508,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .memory-usage {
     height: 100%;
 	background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
-    transition: width 0.3s ease}
+    transition:width 0.3s ease}
   /* NES-style scrollbar */
   .texture-viewer::-webkit-scrollbar {
     width: 16px}

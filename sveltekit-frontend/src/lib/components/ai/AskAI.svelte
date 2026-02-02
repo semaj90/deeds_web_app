@@ -486,7 +486,7 @@
 		border: none;
 		border-radius: 0.375rem;
 		cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.voice-btn {

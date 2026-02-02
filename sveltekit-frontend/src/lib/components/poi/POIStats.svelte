@@ -104,7 +104,7 @@
 	background: #1a1a2e;
  border: 1px solid #333;
  border-radius: 0.5rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .stat-card:hover {

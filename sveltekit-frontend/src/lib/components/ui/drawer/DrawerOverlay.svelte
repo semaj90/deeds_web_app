@@ -22,7 +22,7 @@
 
 {#if drawerContext?.open}
 	<div
-		transition: fade={{
+		transition:fade={{
 	duration: 150 }}
 		class="{defaultClass} { className }"
 		onclick={ handleClick }

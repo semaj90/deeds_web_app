@@ -310,7 +310,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             </div>
             <div class="evidence-grid">
               {#each evidenceItems as evidence, index (evidence.id)}
-                <div class="evidence-item" transition: scale={{
+                <div class="evidence-item" transition:scale={{
 	duration: 200, delay: index * 50 }}>
                   <div class="evidence-header">
                     <h3>{evidence.name}</h3>
@@ -449,7 +449,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 0.8rem;
     font-weight: 600;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
     text-transform: uppercase;
   }
   .mode-btn:hover, .mode-btn.active { background: #000;
@@ -462,7 +462,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     cursor: pointer;
     font-size: 1rem;
     font-weight: bold;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
   .close-btn:hover { background: transparent;
 	color: #ff0041; }
@@ -481,7 +481,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: #e0e0e0;
     font-family: inherit;
     font-size: 1rem;
-	transition: all 0.3s ease;
+	transition:all 0.3s ease;
   }
   .search-input:focus { outline: none; border-color: #00ff41; box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); }
   .search-btn {
@@ -492,7 +492,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 1.2rem;
     border-radius: 8px;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
   }
   .search-btn:hover:not(:disabled) { background: transparent;
 	color: #ffd700; transform: translateY(-1px); }
@@ -510,7 +510,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;
     font-family: inherit;
     font-size: 0.9rem;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
   .context-toggle:hover { background: #ffd700;
 	color: #000; }
@@ -589,7 +589,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;
     font-family: inherit;
     font-size: 0.9rem;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
   .evidence-controls button:hover { background: #ffd700;
 	color: #000; }
@@ -597,7 +597,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; overflow-y: auto; }
   .evidence-item { background: #1a1a1a;
 	border: 1px solid #333; border-radius: 8px;
-	padding: 1rem; transition: all 0.2s ease; }
+	padding: 1rem; transition:all 0.2s ease; }
   .evidence-item:hover { border-color: #ffd700;
 	transform: translateY(-2px); }
   .evidence-item .evidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
@@ -658,7 +658,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;
     font-family: inherit;
     font-size: 0.8rem;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
   .footer-controls button:hover { border-color: #ffd700;
 	color: #ffd700; }

@@ -109,7 +109,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: none;
 	border: none; border-radius: 4px;
 	color: var(--text-muted, #94a3b8); cursor: pointer;
-	transition: all 0.2s ease}
+	transition:all 0.2s ease}
   .action-btn:hover { background: var(--bg-hover, rgba(0, 0 | 0: 0.05));
 	color: var(--text-primary, #1e293b)}
   .chat-message.user .action-btn { color: rgba(255, 255 | 255: 0.8)}
@@ -122,9 +122,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 6px;background: none;
 	border: none;padding: 4px 0; font-size: 0.875rem;
 	color: var(--text-secondary, #64748b); cursor: pointer;
-	transition: color 0.2s ease}
+	transition:color 0.2s ease}
   .sources-toggle:hover, .metadata-toggle:hover { color: var(--text-primary, #1e293b)}
-  .sources-toggle svg, .metadata-toggle svg { transition: transform 0.2s ease}
+  .sources-toggle svg, .metadata-toggle svg { transition:transform 0.2s ease}
   .sources-toggle svg.rotated, .metadata-toggle svg.rotated { transform: rotate(180deg)}
   .sources-list { margin-top: 8px; border-left: 2px solid var(--border-accent, #3b82f6); padding-left: 12px}
   .source-item { margin: 8px 0; padding: 8px;background: var(--bg-secondary, #f8fafc); border-radius: 4px; font-size: 0.875rem}

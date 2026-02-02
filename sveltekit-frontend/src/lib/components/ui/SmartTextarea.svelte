@@ -167,7 +167,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 0.875rem;
     line-height: 1.5
    ;background: var(--pico-card-background-color, #ffffff); color: var(--pico-color, #111827);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease}
+    transition:border-color 0.15s ease, box-shadow 0.15s ease}
   .smart-textarea:focus { outline: none;
     border-color: var(--pico-primary, #3b82f6);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
@@ -187,7 +187,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     right: 0;
     font-size: 0.75rem
    ; color: var(--pico-muted-color, #6b7280); opacity: 0;
-	transition: opacity 0.15s ease}
+	transition:opacity 0.15s ease}
   .smart-textarea-container:hover::after {
     opacity: 1}
   .command-menu { background:var(--card-bg,#fff); box-shadow:0 8px 20px rgba(0, 0, 0, 0.12); border-radius:6px}

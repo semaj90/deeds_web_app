@@ -292,7 +292,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  font-size: 0.85rem;
  font-weight: 500;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .action-btn.attach {
@@ -447,7 +447,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-radius: 4px;
  font-weight: 500;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .btn-primary {
@@ -504,7 +504,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-radius: 4px;
  font-size: 0.8rem;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .edit-notes-btn:hover {

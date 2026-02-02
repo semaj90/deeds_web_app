@@ -12,8 +12,7 @@ userId?: string;
 enableWebGPU?: boolean;
 enableAttentionTracking?: boolean;
 showAnalysisPanel?: boolean;
-maxMessages?: number;
-};
+maxMessages?: number };
 
 let {
 caseId = '',
@@ -75,8 +74,7 @@ timestamp: new Date()
 };
 messages = [...messages, errorMessage];
 } finally {
-isLoading = false;
-}
+isLoading = false }
 }
 </script>
 
@@ -133,8 +131,7 @@ flex-direction: column;
 max-height: 600px;
 	border: 1px solid #e0e0e0;
 border-radius: 8px;
-	overflow: hidden;
-}
+	overflow: hidden }
 
 .chat-header {
 padding: 1rem;
@@ -142,21 +139,18 @@ padding: 1rem;
 border-bottom: 1px solid #e0e0e0;
 display: flex;
 align-items: center;
-	gap: 1rem;
-}
+	gap: 1rem }
 
 .chat-header h2 {
 margin: 0;
-font-size: 1.25rem;
-}
+font-size: 1.25rem }
 
 .badge {
 padding: 0.25rem 0.5rem;
 background: #4caf50;
 	color: white;
 border-radius: 4px;
-font-size: 0.75rem;
-}
+font-size: 0.75rem }
 
 .messages-container {
 flex: 1;
@@ -164,8 +158,7 @@ overflow-y: auto;
 	padding: 1rem;
 	display: flex;
 flex-direction: column;
-	gap: 1rem;
-}
+	gap: 1rem }
 
 .message {
 display: flex;
@@ -175,45 +168,37 @@ max-width: 80%;
 }
 
 .message.user {
-align-self: flex-end;
-}
+align-self: flex-end }
 
 .message.assistant {
-align-self: flex-start;
-}
+align-self: flex-start }
 
 .message-content {
 padding: 0.75rem;
 border-radius: 8px;
-white-space: pre-wrap;
-}
+white-space: pre-wrap }
 
 .message.user .message-content {
 background: #2196f3;
-	color: white;
-}
+	color: white }
 
 .message.assistant .message-content {
 background: #f5f5f5;
-	color: #333;
-}
+	color: #333 }
 
 .message.loading .message-content {
-animation: pulse 1.5s ease-in-out infinite;
-}
+animation: pulse 1.5s ease-in-out infinite }
 
 .message-timestamp {
 font-size: 0.75rem;
 	color: #999;
-	padding: 0 0.75rem;
-}
+	padding: 0 0.75rem }
 
 .input-container {
 padding: 1rem;
 border-top: 1px solid #e0e0e0;
 display: flex;
-	gap: 0.5rem;
-}
+	gap: 0.5rem }
 
 textarea {
 flex: 1;
@@ -221,8 +206,7 @@ flex: 1;
 	border: 1px solid #e0e0e0;
 border-radius: 4px;
 	resize: none;
-font-family: inherit;
-}
+font-family: inherit }
 
 button {
 padding: 0.75rem 1.5rem;
@@ -231,20 +215,17 @@ background: #2196f3;
 	border: none;
 border-radius: 4px;
 	cursor: pointer;
-font-weight: 500;
-}
+font-weight: 500 }
 
 button:hover:not(:disabled) {
-background: #1976d2;
-}
+background: #1976d2 }
 
 button:disabled {
 background: #ccc;
-	cursor: not-allowed;
-}
+	cursor: not-allowed }
 
 @keyframes pulse {
-0%, 100% { opacity: 1; }
-50% { opacity: 0.5; }
+0%, 100% { opacity: 1 }
+50% { opacity: 0.5 }
 }
 </style>

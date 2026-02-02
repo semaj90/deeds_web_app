@@ -38,7 +38,7 @@
 	cursor: pointer;
 		position: relative;
 	outline: none;
-		transition: all 0.2s ease-in-out;
+		transition:all 0.2s ease-in-out;
 	}
 
 	.checkbox-input:checked {

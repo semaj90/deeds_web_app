@@ -58,7 +58,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .user-greeting { font-size: 0.9rem; font-weight: 500}
   .nav-item { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem 1rem; text-decoration: none, color: inherit, border-radius: 4px;
-	transition: all 0.2s ease}
+	transition:all 0.2s ease}
   .nav-item:hover { background: rgba(0, 0, 0, 0.1)}
   .enhanced-layout[data-variant='yorha'] .nav-item:hover { background: rgba(255, 215, 0, 0.2); color: #ffd700}
   .nav-item.active { background: var(--nes-primary-color, #000); color: #fff}
@@ -70,14 +70,14 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .layout-body { flex: 1;
 	display: flex; position: relative}
   .layout-sidebar { width: 250px;
-	background: var(--nes-bg-color, #fff); border-right: 2px solid var(--nes-primary-color, #000); transform: translateX(-100%);transition: transform 0.3s ease; position: fixed;top: 0;
+	background: var(--nes-bg-color, #fff); border-right: 2px solid var(--nes-primary-color, #000); transform: translateX(-100%);transition:transform 0.3s ease; position: fixed;top: 0;
 	left: 0;height: 100vh; z-index: 90; padding-top: 5rem}
   .layout-sidebar.open { transform: translateX(0)}
   .sidebar-content { padding: 1rem, height: 100%; overflow-y: auto}
   .sidebar-actions { display: flex; flex-direction: column;
 	gap: 0.75rem; margin-top: 1rem}
   .layout-main { flex: 1;
-	padding: 2rem; transition: margin-left 0.3s ease}
+	padding: 2rem; transition:margin-left 0.3s ease}
   .main-content { max-width: 1200px;
 	margin: 0 auto;width: 100%}
   .full-width .main-content { max-width: none}

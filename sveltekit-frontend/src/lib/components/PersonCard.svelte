@@ -169,7 +169,7 @@
  border: 1px solid #333;
  border-radius: 12px;
 	overflow: hidden;
- transition: all 0.3s ease;
+ transition:all 0.3s ease;
  backdrop-filter: blur(10px);
  }
 
@@ -324,7 +324,7 @@
  font-size: 0.8rem;
  font-weight: 600;
 	cursor: pointer;
- transition: all 0.2s ease;
+ transition:all 0.2s ease;
  }
 
  .action-btn.view {

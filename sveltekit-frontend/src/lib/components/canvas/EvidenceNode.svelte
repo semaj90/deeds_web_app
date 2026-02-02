@@ -143,7 +143,7 @@
 	gap: 4px}
   .control-button { padding: 4px;
 	border: none; background: transparent; border-radius: 4px;
-	cursor: pointer;transition: background-color 0.2}
+	cursor: pointer;transition:background-color 0.2}
   .control-buttonhover { background: #e2e8f0}
   .control-buttonfocus { outline: 2px solid #3b82f6; outline-offset: 2px}
   .icon { width: 16px;

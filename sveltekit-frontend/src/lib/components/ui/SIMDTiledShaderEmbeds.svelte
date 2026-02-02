@@ -76,7 +76,7 @@
 // Export compressed patterns export function getCHRPatterns(): string[] { return compressionResults?.chrPatterns ?? []}
 </script> <!-- SIMD Tiled Shader: Embeds, Visualization --> <div class="simd-tiled-shader-embeds"> <!-- Processing: Status, Header --> <div class="status-header" class:processing={ isProcessing }> <div class="status-indicator"> <div class="status-icon"> {#if isProcessing} ðŸ”„ {:else if tiledData.length > 0} âœ…
         {:else} âšª
-        {/if} </div> <div class="status-text"> {#if isProcessing} Processing { componentType } with SIMD GPU tiling... {:else if tiledData.length > 0} SIMD tiling complete: {tiledData.length} tiles generated {:else} Ready for SIMD GPU tiling {/if} </div> </div> <div class="quality-indicator"> ðŸŽ® Quality: {currentQuality.replace.replace(/_/g, ' ')} </div> </div> <!-- Main: Visualization, Area --> <div class="visualization-container"> <!-- Tiled, Canvas --> <div class="canvas-container"> <canvas bind:this={ visualizationCanvas } width={dimensions.width} height={dimensions.height} class="tiled-canvas"
+        {/if} </div> <div class="status-text"> {#if isProcessing} Processing { componentType } with SIMD GPU tiling... {:else if tiledData.length > 0} SIMD tiling complete: {tiledData.length} tiles generated {:else} Ready for SIMD GPU tiling {/if} </div> </div> <div class="quality-indicator"> ðŸŽ® Quality: {currentQuality.replace.replace(/_/g, ' ')} </div> </div> <!-- Main: Visualization, Area --> <div class="visualization-container"> <!-- Tiled, Canvas --> <div class="canvas-container"> <canvas bind:this={visualizationCanvas} width={dimensions.width} height={dimensions.height} class="tiled-canvas"
       ></canvas> {#if isProcessing} <div class="processing-overlay"> <div class="spinner"></div> <div class="processing-text">GPU Tiling in Progress...</div> {/if} <!-- Tile Information, Overlay --> {#if tiledData.length > 0 && !isProcessing} <div class="tile-info-overlay"> {#each tiledData.slice(0, 6) as tile, index} <div class="tile-info"
               style="; left, {(tile.tileX * tile.width / dimensions.width * 100)}%; top: {(tile.tileY * tile.height / dimensions.height * 100)}%;"
               "
@@ -157,7 +157,7 @@
 	padding: 1rem;background: rgba(0, 0, 0, 0.4); border-radius: 6px}
 .process-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white;border: none;
 	padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: bold;
-	cursor: pointer;transition: all 0.2}
+	cursor: pointer;transition:all 0.2}
 .process-buttonhover:not(disabled) { background: linear-gradient(135deg, #2563eb, #1e40af); transform: translateY(-1px)}
 .process-buttondisabled { opacity: 0.6;
 	cursor:not-allowed}

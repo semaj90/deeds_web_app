@@ -21,8 +21,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
 		errorCount: number;
 	filePath: string;
-		cluster?: string;
-	}
+		cluster?: string }
 
 	interface GraphEdge {
 		source: string;
@@ -37,8 +36,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		onNodeClick?: (node: GraphNode) => void;
 		onNodeHover?: (node: GraphNode | null) => void;
 		width?: number;
-		height?: number;
-	}
+		height?: number }
 
 	let {
 		nodes = [],
@@ -87,8 +85,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			initializeGraph();
 		} catch (error) {
 			console.error('Failed to load D3:', error);
-			isLoading = false;
-		}
+			isLoading = false }
 	
   })();
 });
@@ -251,19 +248,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		function dragstarted(event: any, d: any) {
 			if (!event.active) simulation.alphaTarget(0.3).restart();
 			d.fx = d.x;
-			d.fy = d.y;
-		}
+			d.fy = d.y }
 
 		function dragged(event: any, d: any) {
 			d.fx = event.x;
-			d.fy = event.y;
-		}
+			d.fy = event.y }
 
 		function dragended(event: any, d: any) {
 			if (!event.active) simulation.alphaTarget(0);
 			d.fx = null;
-			d.fy = null;
-		}
+			d.fy = null }
 	}
 
 	// Re-initialize when data changes
@@ -351,8 +345,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		height: 100%;
 	background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px;
-	overflow: hidden;
-	}
+	overflow: hidden }
 
 	.graph-svg {
 		display: block;
@@ -378,8 +371,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border: 3px solid rgba(255, 255, 255, 0.1);
 		border-top-color: #00d4ff;
 		border-radius: 50%;
-	animation: spin 1s linear infinite;
-	}
+	animation: spin 1s linear infinite }
 
 	@keyframes spin {
 		to { transform: rotate(360deg); }
@@ -403,8 +395,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	display: flex;
 		flex-direction: column;
 	gap: 0.25rem;
-		z-index: 10;
-	}
+		z-index: 10 }
 
 	.zoom-controls button {
 		width: 32px;
@@ -418,8 +409,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	transition: all 0.2s ease;
-	}
+	transition:all 0.2s ease }
 
 	.zoom-controls button:hover {
 		background: rgba(0, 212, 255, 0.2);
@@ -434,8 +424,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px;
 	padding: 0.75rem;
-		z-index: 10;
-	}
+		z-index: 10 }
 
 	.legend-title {
 		font-size: 0.75rem;
@@ -443,15 +432,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: rgba(255, 255, 255, 0.7);
 		margin-bottom: 0.5rem;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
+		letter-spacing: 0.05em }
 
 	.legend-item {
 		display: flex;
 		align-items: center;
 	gap: 0.5rem;
-		margin-bottom: 0.25rem;
-	}
+		margin-bottom: 0.25rem }
 
 	.legend-dot {
 		width: 10px;
@@ -462,8 +449,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.legend-label {
 		font-size: 0.75rem;
 	color: rgba(255, 255, 255, 0.6);
-		text-transform: capitalize;
-	}
+		text-transform: capitalize }
 
 	.zoom-indicator {
 		position: absolute;
@@ -475,8 +461,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 0.25rem 0.5rem;
 		font-size: 0.75rem;
 	color: rgba(255, 255, 255, 0.6);
-		font-family: 'JetBrains Mono', monospace;
-	}
+		font-family: 'JetBrains Mono', monospace }
 
 	:global(.route-graph .node:hover, circle:first-child) {
 		filter: brightness(1.2);

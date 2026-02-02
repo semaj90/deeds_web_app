@@ -127,7 +127,7 @@
 	gap: 0.5rem;
  font-size: 0.85rem;
 	color: #444;
- transition: background-color 0.15s ease;
+ transition:background-color 0.15s ease;
  }
 
  .title-button:hover {
@@ -154,7 +154,7 @@
  .expand-icon {
  font-size: 0.7rem;
 	color: #999;
- transition: transform 0.15s ease;
+ transition:transform 0.15s ease;
  }
 
  .sections-list {
@@ -172,7 +172,7 @@
  text-decoration: none;
 	color: #555;
  font-size: 0.8rem;
-	transition: all 0.15s ease;
+	transition:all 0.15s ease;
  border-left: 3px solid transparent;
  }
 

@@ -85,7 +85,7 @@
  border: 1px solid #f0f0f0;
  border-radius: 4px;
 	padding: 1rem;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .case-card:hover {
@@ -168,7 +168,7 @@
  border-radius: 3px;
  text-align: center;
  font-size: 0.85rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .btn-view:hover {

@@ -167,7 +167,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .feature-indicators { display: flex;
 	gap: 0.5rem; flex-wrap}
   /* Custom nes.css enhancements for file upload */ .file-upload-area { cursor: pointer;
-	transition: all 0.3s ease; min-height: 200px, display: flex; align-items: center; justify-content: center; text-align: center}
+	transition:all 0.3s ease; min-height: 200px, display: flex; align-items: center; justify-content: center; text-align: center}
   .file-upload-area:hover { transform: translateY(-2px); box-shadow: 4px 4px 0px #000}
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem}
   /* NES.css checkbox styling */ .checkbox-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem}

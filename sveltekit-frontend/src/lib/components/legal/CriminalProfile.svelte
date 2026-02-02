@@ -400,7 +400,7 @@ import type { Case } from '$lib/types';
     {/if}
 </div>
 <style>
-  .criminal-profile { transition: all 0.2s ease}
+  .criminal-profile { transition:all 0.2s ease}
 </style>
           </p>
         </div>
@@ -421,7 +421,7 @@ import type { Case } from '$lib/types';
     {/if}
 </div>
 <style>
-  .criminal-profile { transition: all 0.2s ease}
+  .criminal-profile { transition:all 0.2s ease}
 </style>
 
 

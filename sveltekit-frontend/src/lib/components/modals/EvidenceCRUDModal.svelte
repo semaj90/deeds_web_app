@@ -78,7 +78,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     class:animate-fadeOut={ isClosing } onclick={(e) => { if (e.target === e.currentTarget) handleClose() }} onkeydown={ handleKeydown } role="dialog"
     aria-modal="true"
     tabindex="-1"
-  > <!-- Modal, Container --> <div bind:this={ modalElement } class="relative w-full max-w-4xl max-h-[90vh] m-4 overflow-hidden rounded-lg bg-background"
+  > <!-- Modal, Container --> <div bind:this={modalElement} class="relative w-full max-w-4xl max-h-[90vh] m-4 overflow-hidden rounded-lg bg-background"
       class:animate-scaleIn={!isClosing}; class:animate-scaleOut={ isClosing } >
   {#if isLoading} <!-- Loading, State --> <div class="flex items-center justify-center"> <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent"></div>
  <span class="ml-3">Loading evidence...</span> </div> {:else} <!-- Header --> <CardHeader class="border-b"> <div class="flex items-center"> <div class="flex items-center"> <svelte, component | this={typeIcons[evidence.type]} class="w-6" /> <CardTitle> {mode === 'create' ? 'Create Evidence': mode === 'edit' ? 'Edit Evidence': 'View Evidence'} </CardTitle> </div>

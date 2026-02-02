@@ -225,7 +225,7 @@
 		font-family: monospace;
 		font-size: 0.75rem;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.send-button:hover:not(:disabled) {

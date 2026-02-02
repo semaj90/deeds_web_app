@@ -82,7 +82,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   <div
     bind:this={modalElement}
     class="bg-slate-900 border-2 border-slate-700 shadow-2xl flex flex-col overflow-hidden relative {sizeClasses[size]} {type === 'system' ? 'border-cyan-500/50 shadow-[0_0_30px_rgba(34,211,238,0.1)]' : ''}"
-    transition: scale={{
+    transition:scale={{
 	duration: 300, easing: quintOut, start: 0.95 }}
     tabindex="-1"
   >
@@ -266,7 +266,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	display: flex;
     align-items: center;
     justify-content: center;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
     flex-shrink: 0;
   }
 
@@ -331,7 +331,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     text-transform: uppercase;
     letter-spacing: 1px;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
   }
 
   .modal-button:hover {

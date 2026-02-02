@@ -179,7 +179,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 		text-align: left;
 	}
 
@@ -248,7 +248,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.chevron {
 		color: rgba(255, 255, 255, 0.3);
 		flex-shrink: 0;
-	transition: transform 0.2s ease;
+	transition:transform 0.2s ease;
 	}
 
 	.cluster-card:hover .chevron {

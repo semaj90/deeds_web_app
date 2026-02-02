@@ -375,7 +375,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  padding: 0.5rem;
  border-radius: 4px;
 	background: #f3f4f6;
- transition: all 0.2s ease;
+ transition:all 0.2s ease;
  }
 
  .step-indicator.active {

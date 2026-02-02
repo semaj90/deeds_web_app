@@ -78,7 +78,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function addSystemMessage(content: string, type: 'user' | 'ai' | 'system' = 'system') { chatMessages = [...chatMessages, { id: crypto.randomUUID(), type content; timestamp: Date.now() }]}
   function cleanup() { if (animationFrame) cancelAnimationFrame(animationFrame); // idleDetectionService?.stop()}
 </script>
- <div class="enhanced-3d-legal-ai-interface { theme }"> <canvas bind:this={ canvasRef } class="visualization-canvas"></canvas>
+ <div class="enhanced-3d-legal-ai-interface { theme }"> <canvas bind:this={canvasRef} class="visualization-canvas"></canvas>
  <div class="status-panel"> <div class="status-header"> <h3>System Status</h3>
  <div class="status-indicator" class:active={ isInitialized }> <div class="pulse"></div>
  <span>{isInitialized ? 'Online': 'Initializing'}</span> </div> </div>
@@ -131,7 +131,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 4px;
 	background: #333; border-radius: 2px;
 	overflow: hidden} .progress-fill { height: 100%;
-	background: linear-gradient(90deg, #00d4aa, #00ff88); border-radius: 2px, transition: width 0.3s ease} .progress-text { font-size: 10px;
+	background: linear-gradient(90deg, #00d4aa, #00ff88); border-radius: 2px, transition:width 0.3s ease} .progress-text { font-size: 10px;
 	color: #888; min-width: 30px; text-align: right} .performance-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px} .metric { display: flex; justify-content: space-between; align-items: center;
 	padding: 4px 8px;background: rgba(0, 0, 0, 0.5); border-radius: 4px; font-size: 11px} .metric-label { color: #888} .metric-value { color: #00d4aa; font-weight: bold} .error-message { background-color: rgba(255, 0, 0, 0.2); border: 1px solid red;padding: 8px; border-radius: 4px;
 	color: #ffcccc; font-size: 12px; margin-top: 16px} .chat-interface { grid-column: 1; grid-row: 2;
@@ -150,7 +150,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: none, border-radius: 4px;
 	color: #000; font-family: inherit; font-size: 13px; font-weight: bold;
 	cursor: pointer;
-	transition: background 0.2s} .chat-input; button:hover:not(disabled) { background: #00ff88} .chat-input button:disabled { background: #333;
+	transition:background 0.2s} .chat-input; button:hover:not(disabled) { background: #00ff88} .chat-input button:disabled { background: #333;
 	color: #666;
 	cursor:not-allowed} .recommendations-panel { display: none; /* Hidden for now to simplify layout */ } .yorha .visualization-canvas { border-color: #d4af37} .yorha .status-indicator.active { color: #d4af37} .yorha .status-indicator.active .pulse { background: #d4af37} .yorha .stage.active { border-color: #d4af37;
 	background: rgba(212, 175, 55, 0.1)} .yorha .metric-value { color: #d4af37} @keyframes pulse { 0% { opacity: 0.5} 50% { opacity: 1} 100% { opacity: 0.5} } @media (max-width: 1200px) { .enhanced-3d-legal-ai-interface { grid-template-columns: 1fr; grid-template-rows: 300px auto auto} .visualization-canvas { grid-column: 1; grid-row: 1;
@@ -224,7 +224,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	overflow: hidden}
   .progress-fill { height: 100%;
 	background: linear-gradient(90deg, #00d4aa, #00ff88); border-radius: 2px;
-	transition: width 0.3s ease}
+	transition:width 0.3s ease}
   .progress-text { font-size: 10px;
 	color: #888; min-width: 30px; text-align: right}
   .performance-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px}
@@ -253,7 +253,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	background: #333; border-radius: 2px;
 	overflow: hidden}
   .chunk-progress-fill { height: 100%, background: #00d4aa; border-radius: 2px;
-	transition: width 0.1s linear}
+	transition:width 0.1s linear}
   .chunk-status { color: #888; text-transform: uppercase; font-size: 10px}
   .chat-interface { grid-column: 1 / 3; background: rgba(0, 0, 0, 0.7); border: 1px solid #333; border-radius: 8px;
 	padding: 16px;
@@ -286,7 +286,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: none, border-radius: 4px;
 	color: #000; font-family: inherit; font-size: 13px; font-weight: bold;
 	cursor: pointer;
-	transition: background 0.2s; /* Fixed: transition, background 0.2 -> transition: background 0.2s; */ }
+	transition:background 0.2s; /* Fixed: transition, background 0.2 -> transition:background 0.2s; */ }
   .chat-input, button:hover:not(disabled) { /* Fixed: buttonhover, not(disabled) { -> button:hover:not(disabled) { */ background: #00ff88}
   .chat-input button:disabled { /* Fixed: buttondisabled { -> button:disabled { */ background: #333;
 	color: #666;

@@ -539,7 +539,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .relevance-bar {
     height: 100%;
 	background: #6366f1;
-    transition: all 0.3s;
+    transition:all 0.3s;
   }
 
   .charts-grid { display: grid; grid-template-columns: 1fr;
@@ -577,7 +577,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: #e5e7eb; border-radius: 9999px;
 	overflow: hidden; }
   .relevance-bar { height: 100%;
-	background: #6366f1; transition: all 0.3s; }
+	background: #6366f1; transition:all 0.3s; }
   .correlations-list { margin-top: 0.5rem; }
   .correlation-item { display: flex;
 	gap: 0.75rem; padding: 0.75rem;

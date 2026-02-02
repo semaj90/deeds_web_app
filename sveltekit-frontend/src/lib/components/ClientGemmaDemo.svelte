@@ -210,7 +210,7 @@
 		font-size: 14px;
 		font-weight: 500;
 	cursor: pointer;
-		transition: background-color 0.2s;
+		transition:background-color 0.2s;
 	}
 
 	button:disabled {

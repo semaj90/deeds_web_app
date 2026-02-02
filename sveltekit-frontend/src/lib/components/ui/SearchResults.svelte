@@ -194,7 +194,7 @@
  border: 1px solid var(--yorha-border, #4a4a4a);
  border-radius: 4px;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .result-item:hover {

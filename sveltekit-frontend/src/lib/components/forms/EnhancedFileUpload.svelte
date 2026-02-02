@@ -73,7 +73,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }
   function removeTag(tag: string) { formState.tags = formState.tags.filter((t) => t !== tag)}
   $effect(() => { if (caseId) formState.caseId = caseId}); </script>
- <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"
+ <!-- Hidden, file, input --> <input bind:this={fileInput} type="file"
   { multiple } accept={acceptedTypes.join(",")} onchange={ handleFileSelect } class="hidden"
 /> <div class="w-full"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Upload class="h-5" /> {compact ? "Upload Files": "Evidence Upload"}
 </h3> </div>

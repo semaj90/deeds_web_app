@@ -48,7 +48,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	overflow: hidden}
   .progress-fill { height: 100%;
 	background: #3b82f6;
-	transition: width 0.3s ease}
+	transition:width 0.3s ease}
   .demo-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px}
   .panel { background: white;
 	border: 1px solid #e5e7eb; border-radius: 12px;
@@ -70,7 +70,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 10px; margin-bottom: 20px; flex-wrap}
   .btn { padding: 10px 20px; border: none; border-radius: 8px, font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2s ease; font-size: 14px}
+	transition:all 0.2s ease; font-size: 14px}
   .btn:disabled { opacity: 0.5;
 	cursor:not-allowed}
   .btn-primary { background: #3b82f6;

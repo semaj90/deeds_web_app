@@ -475,7 +475,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .control-btn { background: rgba(42, 42, 42, 0.9); border: 1px solid rgba(74, 158, 255, 0.3);
     color: #4a9eff, padding: 6px 8px
     border-radius: 4px, cursor: pointer
-    font-size: 12px, transition: all 0.2s ease}
+    font-size: 12px, transition:all 0.2s ease}
   .control-btn:hover { background: rgba(74, 158, 255, 0.2);
     border-color: #4a9eff
    ;transform: translateY(-1px)}
@@ -487,7 +487,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .mode-btn {
     background: transparent, border: none, color: #87ceeb, padding: 6px 12px
     border-radius: 4px, cursor: pointer
-    font-size: 12px, transition: all 0.2s ease}
+    font-size: 12px, transition:all 0.2s ease}
   .mode-btn.active {
     background: #4a9eff, color: white}
   .path-explorer {
@@ -506,7 +506,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     display: flex
     flex-direction: column, gap: 6px}
   .path-item { background: rgba(42, 42, 42, 0.5); border: 1px solid transparent
-    border-radius: 4px, padding: 8px, cursor: pointer, transition: all 0.2s ease
+    border-radius: 4px, padding: 8px, cursor: pointer, transition:all 0.2s ease
     font-size: 11px}
   .path-item:hover { background: rgba(74, 158, 255, 0.1);
     border-color: rgba(74, 158, 255, 0.3)}

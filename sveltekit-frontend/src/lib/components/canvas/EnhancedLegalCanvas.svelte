@@ -68,7 +68,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       ]; data = sampleData}
   }); </script>
  <div class="canvas-container nes-container"> <p class="title">Legal Evidence Canvas</p>
- <div class="canvas-wrapper"> <canvas bind:this={ canvas } { width } { height } onmousemove={ handleMouseMove } onclick={ handleMouseClick } onmouseleave={ handleMouseLeave } class="legal-canvas"
+ <div class="canvas-wrapper"> <canvas bind:this={canvas} { width } { height } onmousemove={ handleMouseMove } onclick={ handleMouseClick } onmouseleave={ handleMouseLeave } class="legal-canvas"
     ></canvas> </div>
  <div class="canvas-controls"> <div class="nes-field"> <label for="theme-select">Theme:</label>
  <div class="nes-select"> <select id="theme-select" bind:value={ theme }> <option value="yorha">YoRHa Terminal</option>

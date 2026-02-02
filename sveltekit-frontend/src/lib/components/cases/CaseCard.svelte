@@ -25,24 +25,20 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     updated?: Date | string;
     assignee?: {
 	name: string;
-      avatar?: string;
-    };
+      avatar?: string };
     stats: {
 	evidence: number;
       witnesses: number;
-	documents: number;
-    };
+	documents: number };
     tags?: string[];
-    progress?: number;
-  }
+    progress?: number }
 
   interface Props {
     caseItem: CaseData;
     onView?: (id: string) => void;
     onEdit?: (id: string) => void;
     onArchive?: (id: string) => void;
-    onDelete?: (id: string) => void;
-  }
+    onDelete?: (id: string) => void }
 
   let {
     caseItem: caseData,
@@ -257,11 +253,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 {#if open}
   <div
     class="absolute right-0 top-full mt-1 nier-panel p-2 min-w-[200px] z-50 shadow-lg"
-    transition: scale={{
+    transition:scale={{
 	duration: 200, start: 0.95 }}
   >
     <Button
-      onclick={() => { onView(caseData.id); open = false; }}
+      onclick={() => { onView(caseData.id); open = false }}
       variant="ghost"
       class="w-full justify-start"
       size="sm"
@@ -270,7 +266,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       View Details
     </Button>
     <Button
-      onclick={() => { onEdit(caseData.id); open = false; }}
+      onclick={() => { onEdit(caseData.id); open = false }}
       variant="ghost"
       class="w-full justify-start"
       size="sm"
@@ -280,7 +276,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     </Button>
     <div class="h-px bg-nier-light-gray dark:bg-nier-gray/30 my-1"></div>
     <Button
-      onclick={() => { onArchive(caseData.id); open = false; }}
+      onclick={() => { onArchive(caseData.id); open = false }}
       variant="ghost"
       class="w-full justify-start text-amber-600 hover:bg-amber-50"
       size="sm"
@@ -289,7 +285,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       Archive
     </Button>
     <Button
-      onclick={() => { onDelete(caseData.id); open = false; }}
+      onclick={() => { onDelete(caseData.id); open = false }}
       variant="ghost"
       class="w-full justify-start text-red-600 hover:bg-red-50"
       size="sm"
@@ -306,13 +302,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     -webkit-line-clamp: 1;
     line-clamp: 1;
     -webkit-box-orient: vertical;
-	overflow: hidden;
-  }
+	overflow: hidden }
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
-	overflow: hidden;
-  }
+	overflow: hidden }
 </style>

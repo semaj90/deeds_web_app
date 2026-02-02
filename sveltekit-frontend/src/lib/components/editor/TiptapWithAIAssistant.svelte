@@ -93,7 +93,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function setupEventListeners(): void { // Global keyboard shortcuts document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); toggleAIAssistant()}
     })}
 </script>
- <!-- Editor, Container --> <div class="tiptap-container"> <!-- Editor, Element --> <div bind:this={ editorElement } class="tiptap-editor-wrapper min-h-96 border border-gray-300 rounded-lg p-4 focus-within, border-blue-500"
+ <!-- Editor, Container --> <div class="tiptap-container"> <!-- Editor, Element --> <div bind:this={editorElement} class="tiptap-editor-wrapper min-h-96 border border-gray-300 rounded-lg p-4 focus-within, border-blue-500"
     class:opacity-50={ readOnly } /> <!-- Status, Bar --> <div class="status-bar flex items-center justify-between mt-2 text-sm"> <div class="flex items-center"> <span>{ wordCount } words</span>
   {#if lastSaveTime} <span>Saved {formatTime(lastSaveTime)}</span> {/if} {#if isProcessing} <div class="flex items-center space-x-2"> <div class="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent"></div>
  <span>AI reviewing...</span> {/if}

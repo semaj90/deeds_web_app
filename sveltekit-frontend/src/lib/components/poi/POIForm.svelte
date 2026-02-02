@@ -247,7 +247,7 @@
 	color: #ffffff;
     font-family: inherit;
     font-size: 0.875rem;
-	transition: border-color 0.2s;
+	transition:border-color 0.2s;
   }
 
   input:focus,
@@ -286,7 +286,7 @@
     border-radius: 0.375rem;
     font-weight: 600;
 	cursor: pointer;
-    transition: background-color 0.2s;
+    transition:background-color 0.2s;
   }
 
   .btn-primary:hover:not(:disabled) {

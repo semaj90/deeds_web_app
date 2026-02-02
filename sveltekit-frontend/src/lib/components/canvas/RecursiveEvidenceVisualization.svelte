@@ -13,7 +13,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { caseId, width = 1200, height = 800, enableInteraction = true, showMetrics = false }: Props = $props();
    let canvasElement: HTMLCanvasElement | null = null;
    let fabricCanvas: unknown = null;
-   let evidenceWorker: Worker | null = null; // Keep last fetched hierarchy in-memory for re-renders let lastHierarchy: unknown = null; // Visualization state (use: unknown for fabric types to avoid missing type exports) let hierarchyNodes = $state<Map<string any>>(new Map());
+   let evidenceWorker: Worker | null = null; // Keep last fetched hierarchy in-memory for re-renders let lastHierarchy: unknown = null; // Visualization state (use:unknown for fabric types to avoid missing type exports) let hierarchyNodes = $state<Map<string any>>(new Map());
    let connectionLines = $state<any[]>([]);
    let layoutMode = $state<'tree' | 'radial' | 'force'>('tree');
    let showChainIntegrity = $state<boolean>(true);
@@ -168,7 +168,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: white}
     .control-group button { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 4px;
 	background: white; cursor: pointer;
-	transition: all 0.2}
+	transition:all 0.2}
     .control-group buttonhover { background: #f3f4f6}
     .control-group button.active { background: #3b82f6, color: white; border-color: #3b82f6}
     .metrics-display { display: flex;

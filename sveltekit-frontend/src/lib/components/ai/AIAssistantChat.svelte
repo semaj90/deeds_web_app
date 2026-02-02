@@ -34,7 +34,7 @@
               stroke-width="2"
               d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             /> </svg> </Button> {/if}
-</div> </div> <!-- Chat, Messages --> <div bind:this={ chatContainer } class="flex-1 overflow-y-auto p-4 space-y-4"
+</div> </div> <!-- Chat, Messages --> <div bind:this={chatContainer} class="flex-1 overflow-y-auto p-4 space-y-4"
     style="height: calc({ height } - 200px);"
   >
  {#if conversationHistory().length === 0} <div class="text-center text-gray-500 dark:text-gray-400"> <div class="text-lg font-medium">Welcome to Legal AI Assistant</div> <p class="text-sm">Ask me about legal documents, case analysis, or get help with your legal research.</p>
@@ -59,7 +59,7 @@
 </div>
  {#if enableContext7} <div class="flex items-center gap-2"> <Switch bind:checked={ useContext7 } disabled={isProcessing()} /> <label class="text-sm font-medium text-gray-700"> Use Context7 Enhancement </label>
  {#if context7Analysis() && useContext7} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-          >, Confidence: {Math.round((context7Analysis()?.confidence ?? 0) * 100)}% </span> {/if} {/if} <div class="flex"> <Textarea bind:this={ messageInput },
+          >, Confidence: {Math.round((context7Analysis()?.confidence ?? 0) * 100)}% </span> {/if} {/if} <div class="flex"> <Textarea bind:this={messageInput},
 	bind:value={ currentMessage } onkeydown={ handleKeydown } placeholder="Ask about legal documents, cases, or research..."
         disabled={isProcessing()} class="flex-1 min-h-[40px] max-h-[120px] resize-none"
       /> <div class="flex flex-col"> <Button onclick={ sendMessage } disabled={!canSend()} class="px-4 bits-btn"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 24 24"> <path stroke-linecap="round"

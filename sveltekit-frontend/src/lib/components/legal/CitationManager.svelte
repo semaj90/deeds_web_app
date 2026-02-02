@@ -241,7 +241,7 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   .citation-list { display: flex; flex-direction: column;
 	gap: 1.5rem}
   .citation-item { background: rgba(255, 255, 255, 0.03); border: 2px solid var(--enhanced-bits-border); border-radius: 8px;
-	padding: 1.5rem; transition: all 300ms ease}
+	padding: 1.5rem; transition:all 300ms ease}
   .citation-item:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)}
   .citation-item.selected { border-color: var(--enhanced-bits-primary); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2)}
   .citation-header { display: flex; align-items: center;
@@ -291,7 +291,7 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
 	background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
   .metric-fill { height: 100%;
-	transition: width 300ms ease; border-radius: 4px}
+	transition:width 300ms ease; border-radius: 4px}
   .metric-value { font-size: 0.875rem; font-weight: bold;
 	color: var(--enhanced-bits-evidence)}
   .citation-dates { display: flex; flex-direction: column;

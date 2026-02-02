@@ -216,7 +216,7 @@
  border-radius: 4px;
  font-weight: 500;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  white-space: nowrap;
  }
 

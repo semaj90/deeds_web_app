@@ -244,7 +244,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: rgba(255, 255, 255, 0.5);
 		font-size: 0.75rem;
 	cursor: pointer;
-		transition: color 0.2s ease;
+		transition:color 0.2s ease;
 	}
 
 	.clear-all-btn:hover {
@@ -276,7 +276,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-size: 0.8rem;
 		font-weight: 500;
 	cursor: pointer;
-		transition: background 0.2s ease;
+		transition:background 0.2s ease;
 	}
 
 	.group-header:hover {
@@ -298,7 +298,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	:global(.chevron) {
 		color: rgba(255, 255, 255, 0.4);
-		transition: transform 0.2s ease;
+		transition:transform 0.2s ease;
 	}
 
 	:global(.chevron.expanded) {
@@ -323,7 +323,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: rgba(255, 255, 255, 0.7);
 		font-size: 0.8rem;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 		text-align: left;
 	}
 
@@ -365,7 +365,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: rgba(255, 255, 255, 0.4);
 		font-size: 0.7rem;
 	cursor: pointer;
-		transition: color 0.2s ease;
+		transition:color 0.2s ease;
 	}
 
 	.clear-group-btn:hover {
@@ -389,7 +389,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid;
 		font-size: 0.75rem;
 	cursor: pointer;
-		transition: opacity 0.2s ease;
+		transition:opacity 0.2s ease;
 	}
 
 	.active-tag:hover {

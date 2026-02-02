@@ -66,7 +66,7 @@
 	duration: 150 }}
     onclick={handleBackdropClick}
   > <!-- Modal --> <div class="w-full max-w-md bg-slate-900 border-2 border-slate-700 shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden"
-      transition: scale={{
+      transition:scale={{
 	duration: 200, start: 0.95 }}
       style:border-color={config.color}
     > <!-- Header --> <div class="bg-slate-950 px-4 py-2 border-b flex justify-between items-center" style:border-color={config.color}>

@@ -207,7 +207,7 @@
 		border-radius: 4px;
 	background: white;
 		cursor: pointer;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 		font-family: var(--yorha-font);
 	}
 
@@ -286,7 +286,7 @@
 		font-size: 0.875rem;
 		font-weight: bold;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 	}
 
 	.btn-cancel {

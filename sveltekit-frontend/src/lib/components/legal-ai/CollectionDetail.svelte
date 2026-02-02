@@ -199,7 +199,7 @@
  border-radius: 4px;
  font-weight: 500;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .btn-share,
@@ -293,7 +293,7 @@
 	cursor: pointer;
  color: #999;
 	padding: 0;
- transition: color 0.2s;
+ transition:color 0.2s;
  }
 
  .btn-remove:hover {

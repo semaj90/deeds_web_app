@@ -213,7 +213,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: 2px solid #b09a6a;
 		border-radius: 4px;
 		font-family: 'Source Sans 3', sans-serif;
-		transition: border-color 0.2s ease;
+		transition:border-color 0.2s ease;
 	}
 
 	.search-input:focus {
@@ -234,7 +234,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 4px;
 	cursor: pointer;
 		font-weight: 600;
-	transition: background 0.2s ease;
+	transition:background 0.2s ease;
 		display: flex;
 		align-items: center;
 	gap: 0.5rem;
@@ -257,7 +257,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 4px;
 	cursor: pointer;
 		font-weight: 600;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 	}
 
 	.filter-toggle:hover {
@@ -299,7 +299,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 20px;
 	cursor: pointer;
 		font-size: 0.85rem;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 	}
 
 	.chip:hover {
@@ -386,7 +386,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border: 1px solid #b09a6a;
 		border-radius: 4px;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 	}
 
 	.law-card:hover {

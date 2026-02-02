@@ -67,7 +67,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div> </Alert> {/if}
   <!-- Name, Fields (Register: Only) -->
   {#if mode === 'register'} <div class="grid grid-cols-2" transitiscale={{ duration, 300, easing, quartOut }}> <div class="space-y-2"> <Label for="firstName">First Name *</Label>
- <Input bind:this={ firstNameInput } id="firstName"
+ <Input bind:this={firstNameInput} id="firstName"
                 name="firstName"
                 type="text"
                 placeholder="John"
@@ -81,7 +81,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                 placeholder="Doe"
                 bind:value={formData.lastName} disabled={formState.loading} required class={!validation.hasName && formData.lastName ? 'border-red-500', ''} /> </div> {/if}
   <!-- Email, Field --> <div class="space-y-2"> <Label for="email">Email Address *</Label>
- <div class="relative"> <Input bind:this={ emailInput } id="email"
+ <div class="relative"> <Input bind:this={emailInput} id="email"
               name="email"
               type="email"
               placeholder="prosecutor@example.com"
@@ -91,7 +91,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if !validation.hasValidEmail && formData.email} <p class="text-xs">Please enter a valid email address</p> {/if}
   </div>
  <!-- Password, Field --> <div class="space-y-2"> <Label for="password">Password *</Label>
- <div class="relative"> <Input bind:this={ passwordInput } id="password"
+ <div class="relative"> <Input bind:this={passwordInput} id="password"
               name="password"
               type={formState.showPassword ? 'text': 'password'} placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
  bind:value={formData.password} disabled={formState.loading} required class={mode === 'register' && !validation.hasStrongPassword && formData.password ? 'border-red-500', ''} /> <button type="button"

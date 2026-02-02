@@ -348,7 +348,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     position: absolute;
 	cursor: pointer;
     user-select: none;
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	transition:transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .evidence-node:hover {

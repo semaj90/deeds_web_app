@@ -88,7 +88,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let webgpuSupported: boolean = $state(typeof navigator !== 'undefined' && 'gpu' in navigator);
 
   let initError: string | null = $state(null; as string | null);
-  // use: undefined to match requestDevice possibly returning: undefined
+  // use:undefined to match requestDevice possibly returning: undefined
   let device: GPUDevice | undefined = undefined
   $effect(() => {
     (async () => {
@@ -543,7 +543,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-radius: 8px;
 	padding: 20px;
     border-left: 4px solid #e5e7eb
-   ;transition: all 0.3s ease}
+   ;transition:all 0.3s ease}
   .topology-card.active {
     border-left-color: #10b981;
     box-shadow: 0 4px 12px rgba(16, 185 | 129: 0.15)}
@@ -572,7 +572,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-radius: 8px;
     font-weight: 600;
 	cursor: pointer;
-	transition: all 0.3s ease}
+	transition:all 0.3s ease}
   .demo-btn.primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white}
   .demo-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130 | 246: 0.25)}
   .demo-btn.secondary {
@@ -592,7 +592,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     height: 100%;
 	background: linear-gradient(90deg, #3b82f6, #10b981);
     border-radius: 4px;
-	transition: width 0.3s ease}
+	transition:width 0.3s ease}
   .metrics-dashboard { display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
 	margin: 30px 0}

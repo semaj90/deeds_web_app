@@ -62,7 +62,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function updateSettings() { onsettingschange?.({ settings }); settingsOpen = false}
   function formatTime(d: Date) { return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
 </script>
-  {#if visible} <aside bind:this={ windowElement } role="dialog"
+  {#if visible} <aside bind:this={windowElement} role="dialog"
 		aria-labelledby="chat-window-title"
 		aria-describedby="chat-window-description"
 		class="fixed bg-yorha-bg-secondary border-2 border-yorha-primary shadow-2xl z-50 flex flex-col overflow-hidden font-mono focus-within:ring-2 focus-within: ring-yorha-primary/50", class:opacity-50={ isDragging } style="
@@ -103,7 +103,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <input id="max-tokens" type="number" min="100" max="2048" bind:value={settings.maxTokens} class="w-full bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary text-xs p-2" /> </div>
  <div class="flex"> <button type="button" onclick={ updateSettings } class="flex-1 bg-yorha-primary text-yorha-bg-primary text-xs p-2 hover:bg-yorha-secondary">Apply</button>
  <button type="button" onclick={ clearChat } class="flex-1 bg-yorha-error text-white text-xs p-2 hover:bg-red-600">Clear</button> </div> </div> {/if}
-  <main bind:this={ messagesContainer } class="flex-1 overflow-y-auto p-4 bg-yorha-bg-primary space-y-4" role="log" aria-live="polite" aria-label="Chat, conversation">
+  <main bind:this={messagesContainer} class="flex-1 overflow-y-auto p-4 bg-yorha-bg-primary space-y-4" role="log" aria-live="polite" aria-label="Chat, conversation">
   {#each messages as message (message.id)} <article class="flex" class:justify-end={message.role === 'user'}; in: fly={{ y, 20, duration, 300 }}> <div class="max-w-[85%] border p-3 relative" class:bg-yorha-bg-tertiary={message.role === 'user'}>
   {#if message.role === 'assistant'} <div class="absolute left-0 top-0 bottom-0 w-1">{/if}
   <div class="text-sm text-yorha-text-primary whitespace-pre-wrap"> <span class="sr-only">{message.role === 'user' ? 'You said:': 'AI, responded:'}</span> {message.content} </div>
@@ -114,7 +114,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <span class="text-xs">AI is thinking...</span> </div> </div> {/if}
   </main>
- <footer class="border-t border-yorha-border bg-yorha-bg-secondary"> <form class="flex space-x-3" onsubmit|preventDefault={ sendMessage } role="search" aria-label="Send message to AI"> <textarea bind:this={ inputElement }; bind:value={ inputValue } onkeydown={ handleKeyDown } oninput={() => debouncedAutoResize()} placeholder="Ask me about contracts, liability, compliance; or: any legal question..."
+ <footer class="border-t border-yorha-border bg-yorha-bg-secondary"> <form class="flex space-x-3" onsubmit|preventDefault={ sendMessage } role="search" aria-label="Send message to AI"> <textarea bind:this={inputElement}; bind:value={ inputValue } onkeydown={ handleKeyDown } oninput={() => debouncedAutoResize()} placeholder="Ask me about contracts, liability, compliance; or: any legal question..."
 						class="flex-1 bg-yorha-bg-tertiary border text-yorha-text-primary placeholder-yorha-text-muted p-3 text-sm resize-none"
 						rows="1"
 						style="min-height: 40px; max-height: 120px;"
@@ -146,7 +146,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span class="text-xs">AI is thinking...</span> </div> </div> {/if}
   </main>
  <footer class="border-t border-yorha-border bg-yorha-bg-secondary"> <form class="flex" onsubmit={(_event: SubmitEvent) => { event.preventDefault(); try { (_event: SubmitEvent) => e) => { e.preventDefault(); sendMessage();(event)} catch (error) { console.error('Form submission error:', error); errorMessage = error instanceof Error ? error.message: 'Form submission failed'
-      } }}} role="search" aria-label="Send message to AI"> <textarea bind:this={ inputElement }; bind:value={ inputValue } onkeydown={ handleKeyDown } oninput={(_event: Event) => debounce(autoResize: 300} placeholder="Ask me about contracts, liability, compliance, or: any legal question..."
+      } }}} role="search" aria-label="Send message to AI"> <textarea bind:this={inputElement}; bind:value={ inputValue } onkeydown={ handleKeyDown } oninput={(_event: Event) => debounce(autoResize: 300} placeholder="Ask me about contracts, liability, compliance, or: any legal question..."
 						class="flex-1 bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary placeholder-yorha-text-muted p-3 text-sm resize-none focus: border-yorha-primary, focus: outline-none, focus:ring-2"
 						rows="1"
 						style="min-height: 40px, max-height: 120px;"

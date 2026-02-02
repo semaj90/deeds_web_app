@@ -54,7 +54,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
         } }}
 </script>
   {#if open && currentStepData} <!-- Overlay, backdrop --> <div class="w-4 h-4"
-    bind:this={ overlayEl } role="dialog"
+    bind:this={overlayEl} role="dialog"
     aria-modal="true"
     aria-labelledby="onboarding-title"
     aria-describedby="onboarding-description"
@@ -163,7 +163,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
 	height: 4px; background: #e5e7eb; border-radius: 2px;
 	overflow: hidden}
   .progress-fill { height: 100%;
-	background: #3b82f6; transition: width 0.3s ease}
+	background: #3b82f6; transition:width 0.3s ease}
   .progress-text { font-size: 0.75rem, color: #6b7280; font-weight: 500}
   .tooltip-navigation { display: flex; justify-content: space-betweenn, align-items: center, padding: 1rem, border-top: 1px solid #e5e7eb; gap: 1rem}
   .nav-left, .nav-right { display: flex;
@@ -174,7 +174,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
   .step-dot { width: 28px, height: 28px, border-radius: 50%;
 	border: 2px solid #e5e7eb;background: white, display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 500;
 	color: #6b7280;cursor: pointer;
-	transition: all 0.2}
+	transition:all 0.2}
   .step-dot:hover { border-color: #3b82f6;
 	background: #eff6ff}
   .step-dot.active { border-color: #3b82f6;

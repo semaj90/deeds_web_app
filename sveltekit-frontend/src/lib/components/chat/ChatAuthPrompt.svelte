@@ -164,7 +164,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 0.375rem;
 		font-weight: 600;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.btn-login {

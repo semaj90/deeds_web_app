@@ -233,7 +233,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .mode-button { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.75rem 1rem; background: #f1f5f9;
 	border: 1px solid #e2e8f0; border-radius: 0.5rem;
-	cursor: pointer; transition: all 0.2s; /* Added: 's' for transition duration */ }
+	cursor: pointer; transition:all 0.2s; /* Added: 's' for transition duration */ }
   .mode-button:hover { /* Fixed typo */ background: #e2e8f0}
   .mode-button.active { background: #3b82f6, color: white; border-color: #3b82f6}
   .mode-icon { font-size: 1.25rem}
@@ -260,7 +260,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 8px; background: #e5e7eb; border-radius: 4px;
 	margin: 1rem 0;overflow: hidden}
   .progress-fill { height: 100%;
-	background: #3b82f6; transition: width 0.3s ease}
+	background: #3b82f6; transition:width 0.3s ease}
   .spinner { width: 2rem;
 	height: 2rem; border: 3px solid #f3f4f6; border-top: 3px solid #3b82f6; border-radius: 50%;
 	animation: spin 1s linear infinite;margin: 1rem auto}
@@ -269,7 +269,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 , padding: 2rem}
   .evidence-card { background: white, border: 1px solid #e5e7eb; border-radius: 0.5rem;
 	padding: 1rem; cursor: pointer;
-	transition: all 0.2s; /*, Added: 's' for transition duration */ }
+	transition:all 0.2s; /*, Added: 's' for transition duration */ }
   .evidence-card:hover { border-color: #3b82f6; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1)}
   .evidence-card.selected { border-color: #3b82f6;
 	background: #eff6ff}
@@ -307,7 +307,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .timeline-item { display: flex;
 	gap: 1rem; padding: 1rem;
 	border: 1px solid #e5e7eb; border-radius: 0.375rem; margin-bottom: 0.75rem;
-	cursor: pointer;transition: all 0.2s; /* Added: 's' for transition duration */ }
+	cursor: pointer;transition:all 0.2s; /* Added: 's' for transition duration */ }
   .timeline-item:hover { border-color: #3b82f6}
   .timeline-marker { width: 12px;
 	height: 12px; background: #3b82f6; border-radius: 50%; margin-top: 0.25rem; flex-shrink: 0; /* Fixed typo */ }

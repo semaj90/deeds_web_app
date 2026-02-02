@@ -112,21 +112,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       onSuccess: handleFormSuccess,
       onError: handleFormError,
       onSubmit: handleEnhancedSubmit
-    
-}); as unknown as FormIntegrationType;
+    }) as unknown as FormIntegrationType;
 
     unsubscribe = formIntegration.state.subscribe((state: unknown) => {
        const s = String(state);
        onDispatch?.({ state: s, context: formIntegration?.context.get?.() });
     });
-  });
 
-  // TODO: Add as cleanup in $effect: return () => {
-    if (unsubscribe) unsubscribe();
-    if (formIntegration) {
-      formStatePersistence.save(get(formIntegration.form.form));
-    }
-  }
+    // Cleanup on effect destroy
+    return () => {
+      if (unsubscribe) unsubscribe();
+      if (formIntegration) {
+        formStatePersistence.save(get(formIntegration.form.form));
+      }
+    };
+  });
 
   async function handleEnhancedSubmit(data: Record<string, any>): Promise<any> {
     try {

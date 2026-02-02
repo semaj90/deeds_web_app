@@ -102,7 +102,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.query-input { flex: 1}
 	.execute-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: none; border-radius: 6px;
 	padding: 8px 14px;color: white; font-weight: 600;
-	cursor: pointer;transition: transform 0.12s ease}
+	cursor: pointer;transition:transform 0.12s ease}
 	.execute-button.disabled { opacity: 0.5;
 	cursor:not-allowed}
 	.execute-button:hover:not(disabled) { transform: translateY(-2px)}

@@ -172,7 +172,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <style> .simd-text-demo { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif}
   /* NES-style rendering for live components */:global(.rendered-component) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
-  /* Enhance tile visualizations */ .grid > div { transition: transform 0.2s ease-in-out}
+  /* Enhance tile visualizations */ .grid > div { transition:transform 0.2s ease-in-out}
   .grid > div:hover { transform: scale(1.05)}
   /* Processing animation: */ @keyframes processing-pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
   .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite}

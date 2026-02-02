@@ -270,7 +270,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       enhanceComponentAccessibility();
     }
   });
-</script> <div bind:this={ containerElement } class="bits-ui-accessibility-wrapper"
+</script> <div bind:this={containerElement} class="bits-ui-accessibility-wrapper"
   data-component={ component } data-route-type={currentRouteConfig?.routeType} >
   {#if children} {@render children()} {/if} {#if contextualHelp} <div id="contextual-help" class="sr-only"> { contextualHelp } {/if} </div> <style>
   .bits-ui-accessibility-wrapper {
@@ -311,7 +311,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     :global(.bits-ui-accessibility-wrapper *) {
-      transition: none !important;
+      transition:none !important;
       animation: none !important;
     }
   }

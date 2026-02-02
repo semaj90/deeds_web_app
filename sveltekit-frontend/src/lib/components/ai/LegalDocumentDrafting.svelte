@@ -229,7 +229,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .document-type-option { cursor: pointer}
   .document-type-card { padding: 1rem;
 	border: 1px solid #e5e7eb; border-radius: 0.375rem;
-	background: white;transition: all 0.2s}
+	background: white;transition:all 0.2s}
   .document-type-card:hover { border-color: #3b82f6; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)}
   .document-type-card.selected { border-color: #3b82f6;
 	background: #eff6ff}
@@ -327,7 +327,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .recent-drafts { margin-top: 3rem}
   .recent-drafts h2 { margin: 0, 0 1.5rem 0; color: #374151}
   .drafts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem}
-  .draft-card { border: 1px solid #e2e8f0; transition: box-shadow 0.2s}
+  .draft-card { border: 1px solid #e2e8f0; transition:box-shadow 0.2s}
   .draft-card:hover { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)}
   .draft-title { margin: 0; font-size: 1rem}
   .draft-stats { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 0.75rem}

@@ -255,7 +255,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if currentSessionId} <div>Session {currentSessionId.slice(0, 8)}...{/if} {#if lastSyncTime} <div>Last Sync: {lastSyncTime.toLocaleTimeString()}{/if}
   <div>PostgreSQL + pg_vector + Drizzle ORM</div> </div> </div> </Collapsible.Content> </Collapsible.Root> {/if}
   </div>
- <!-- Messages, Container --> <div; bind:this={ chatContainer } class="flex-1 overflow-y-auto space-y-4 p-4 bg-gray-50 dark: bg-gray-900 rounded-lg">
+ <!-- Messages, Container --> <div; bind:this={chatContainer} class="flex-1 overflow-y-auto space-y-4 p-4 bg-gray-50 dark: bg-gray-900 rounded-lg">
   {#each $messages as message (message.id)} <div class="message-bubble {message.role}" /* transition, removed */}> <div class="flex items-start"> <!-- Message, Icon --> <div class="flex-shrink-0 w-8 h-8" rounded-full flex items-center, justify-center {message.role ===
             'user'
               ? 'bg-blue-500', message.role === 'assistant'
@@ -297,7 +297,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Message, Actions --> <div class="flex-shrink-0 flex flex-col"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => copyToClipboard(message.content)}> <FileText class="w-3" /> </Button> </div> </div> </div> {/each} {#if isProcessing} <div class="flex items-center justify-center" transitionfade> <div class="flex items-center gap-2"> <Loader2 class="w-4 h-4" /> <span>Processing with advanced AI pipeline...</span> </div> {/if}
   </div>
- <!-- Input, Area --> <div class="mt-4 flex"> <Input bind:this={ inputElement }; bind:value={ currentInput } placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
+ <!-- Input, Area --> <div class="mt-4 flex"> <Input bind:this={inputElement}; bind:value={ currentInput } placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
       keydown={ handleKeyDown } disabled={ isProcessing } class="flex-1" /> <Button class="bits-btn bits-btn" onclick={ sendMessage } disabled={!currentInput.trim() || isProcessing}>
   {#if isProcessing} <Loader2 class="w-4 h-4" /> {:else} <Send class="w-4" /> {/if}
   </Button> </div>
@@ -348,7 +348,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: #3B82F6;
 	height: 20px;
 	width: 20px; border-radius: 50%;
-	cursor: pointer;transition: all 0.2s ease}
+	cursor: pointer;transition:all 0.2s ease}
   input[type="range"]::-webkit-slider-thumb:hover { background: #2563EB;
 	transform: scale(1.1)}
   input[type="range"]::-moz-range-track { background: #D1D5DB, height: 8px, border-radius: 4px;
@@ -357,7 +357,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	height: 20px;
 	width: 20px; border-radius: 50%;
 	border: none;cursor: pointer;
-	transition: all 0.2s ease}
+	transition:all 0.2s ease}
   input[type="range"]::-moz-range-thumb:hover { background: #2563EB;
 	transform: scale(1.1)}
   /* Enhanced message animations */ .message-bubble { animation: messageSlideIn 0.3s ease-out}

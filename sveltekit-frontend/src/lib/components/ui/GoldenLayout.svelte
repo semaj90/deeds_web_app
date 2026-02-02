@@ -147,7 +147,7 @@
     display: flex;
 	height: 100%;
     min-height: 0;
-	transition: all 0.3s ease;
+	transition:all 0.3s ease;
     gap: 0;
   }
 
@@ -157,7 +157,7 @@
 	overflow: hidden;
     background: var(--pico-card-background-color, #ffffff);
     border-radius: 0.5rem;
-	transition: all 0.3s ease;
+	transition:all 0.3s ease;
   }
 
   .sidebar {
@@ -166,7 +166,7 @@
     border: 1px solid var(--pico-border-color, #e2e8f0);
     border-radius: 0.5rem;
 	overflow: hidden;
-    transition: all 0.3s ease;
+    transition:all 0.3s ease;
     min-width: 0;
   }
 
@@ -198,7 +198,7 @@
 	cursor: pointer;
     font-size: 0.75rem;
     font-weight: bold;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
     z-index: 10;
   }
 

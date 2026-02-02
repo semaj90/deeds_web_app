@@ -188,7 +188,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	background: white;
 		cursor: pointer;
 		font-size: 0.875rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
 	}
 
 	.btn-secondary:hover {
@@ -301,7 +301,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.progress-fill {
 		height: 100%;
 	background: linear-gradient(90deg, #10b981, #3b82f6);
-		transition: width 0.3s;
+		transition:width 0.3s;
 	}
 
 	.storage-grid {

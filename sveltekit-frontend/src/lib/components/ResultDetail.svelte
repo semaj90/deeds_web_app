@@ -206,7 +206,7 @@
 		border-radius: 4px;
 	cursor: pointer;
 		font-size: 0.9rem;
-	transition: background 0.2s;
+	transition:background 0.2s;
 	}
 
 	.copy-btn:hover {
@@ -255,7 +255,7 @@
 		border-radius: 4px;
 	cursor: pointer;
 		font-size: 0.9rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
 	}
 
 	.action-btn:hover {

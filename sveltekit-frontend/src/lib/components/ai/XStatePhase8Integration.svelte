@@ -64,7 +64,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
             > <span class="flex items-center">
   {#if $machineContext?.evidenceFiles?.length > 0} <span class="text-green-400">({$machineContext.evidenceFiles.length} files)</span> {/if}
   <span class="text-sm">Evidence Upload</span> </span> </button> </h3>
- <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div class="file-upload-zone border-2 border-dashed border-gray-600 rounded-lg p-8"> <input bind:this={ fileInput } type="file"
+ <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div class="file-upload-zone border-2 border-dashed border-gray-600 rounded-lg p-8"> <input bind:this={fileInput} type="file"
                   multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                   onchange={ handleFileUpload } class="hidden"
                 /> <button onclick={() => fileInput?.click()} class="yorha-button px-6 py-3 bg-blue-600 text-white"> Select Evidence Files </button>
@@ -131,7 +131,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  <style> /* Converted Tailwind @apply rules to plain CSS to avoid: unknown at-rule errors */ .xstate-phase8-integration { max-width: 80rem; margin-left: auto, margin-right: auto;
 	padding: 1.5rem}
   .step-number { width: 1.5rem, height: 1.5rem, background-color: #fbbf24, color: #000, border-radius: 9999px, display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 700}
-  .progress-fill { transition: width 0.5s ease-in-out}
+  .progress-fill { transition:width 0.5s ease-in-out}
   .loading-spinner { width: 2rem;
 	height: 2rem;
 	border: 2px solid #fbbf24; border-top-color: transparent; border-radius: 50%;

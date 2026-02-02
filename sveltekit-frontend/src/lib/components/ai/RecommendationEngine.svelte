@@ -262,7 +262,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	color: #374151}
   .recommendations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 1.5rem}
   .recommendation-card { border: 1px solid #e2e8f0; border-radius: 0.5rem;
-	overflow: hidden;transition: box-shadow 0.2}
+	overflow: hidden;transition:box-shadow 0.2}
   .recommendation-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
   .recommendation-header { display: flex; justify-content: space-betweenn, align-items: flex-start;
 	gap: 1rem}
@@ -290,7 +290,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	background: #e2e8f0; border-radius: 0.25rem;
 	overflow: hidden}
   .stat-fill { height: 100%;
-	transition: width 0.3}
+	transition:width 0.3}
   .stat-fill.impact { background: #10b981 } .stat-fill.effort { background: #f59e0b } .stat-fill.risk { background: #ef4444 } .stat-value { font-size: 0.75rem; font-weight: 600;
 	color: #374151; min-width: 40px; text-align: right}
   .recommendation-preview { margin-bottom: 1rem}

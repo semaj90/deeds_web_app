@@ -58,9 +58,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         onclick={ clearAllCanvases } class="clear-btn bits-btn bits-btn"
       > ðŸ—‘ï¸ Clear </div> </div>
  <!-- Canvas, Container --> <div class="canvas-container" class:split-view={splitView && currentMode === 'both'}> <!-- Evidence, Canvas -->
-  {#if enableEvidenceCanvas && (currentMode === 'evidence' || currentMode === 'both')} <div class="evidence-canvas-section" class:full-width={!splitView || currentMode === 'evidence'}> <EvidenceCanvas bind:this={ evidenceCanvasRef } { caseId } enableDragDrop={ true } enableGPUProcessing={ true } enableCUDAAcceleration={ true } enableN64Style={ true } onfileUploaded={ handleEvidenceUploaded } onanalysisComplete={ handleAnalysisComplete } oncanvasUpdated={ syncCanvasBoards } /> {/if}
+  {#if enableEvidenceCanvas && (currentMode === 'evidence' || currentMode === 'both')} <div class="evidence-canvas-section" class:full-width={!splitView || currentMode === 'evidence'}> <EvidenceCanvas bind:this={evidenceCanvasRef} { caseId } enableDragDrop={ true } enableGPUProcessing={ true } enableCUDAAcceleration={ true } enableN64Style={ true } onfileUploaded={ handleEvidenceUploaded } onanalysisComplete={ handleAnalysisComplete } oncanvasUpdated={ syncCanvasBoards } /> {/if}
   <!-- YoRHa Canvas, Board -->
-  {#if enableYoRHaBoard && showYoRHaBoard} <div class="yorha-canvas-section" class:full-width={!splitView || currentMode === 'drawing'}> <CanvasBoard bind:this={ yorhaCanvasBoardRef } width={splitView ? 400, 800} height={splitView ?, 300, 600} enableDrawing={ true } showToolbar={ true } ondraw={ handleYoRHaDrawing } ondrawEnd={ syncCanvasBoards } onclear={ syncCanvasBoards } onneuralEngineReady={ handleNeuralEngineReady } /> {/if}
+  {#if enableYoRHaBoard && showYoRHaBoard} <div class="yorha-canvas-section" class:full-width={!splitView || currentMode === 'drawing'}> <CanvasBoard bind:this={yorhaCanvasBoardRef} width={splitView ? 400, 800} height={splitView ?, 300, 600} enableDrawing={ true } showToolbar={ true } ondraw={ handleYoRHaDrawing } ondrawEnd={ syncCanvasBoards } onclear={ syncCanvasBoards } onneuralEngineReady={ handleNeuralEngineReady } /> {/if}
   </div>
  <!-- Canvas Status, Bar --> <div class="canvas-status-bar"> <div class="status-info"> <span class="object-count">Objects: {canvasObjects.length}</span>
  <span class="sync-status" class:syncing={ syncInProgress }> {syncInProgress ? 'Syncing...': 'Synced'} </span>
@@ -80,7 +80,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .mode-btn, .sync-btn, .clear-btn { background: transparent;
 	border: 2px solid #00ff88;color: #00ff88;
 	padding: 0.5rem 1rem;cursor: pointer;
-	transition: all 0.3s ease; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold}
+	transition:all 0.3s ease; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold}
   .mode-btn:hover, .sync-btn:hover, .clear-btn:hover { background: rgba(0, 255, 136, 0.1); box-shadow: 0 0 10px rgba(0, 255, 136, 0.3)}
   .canvas-container { flex: 1;
 	display: flex;overflow: hidden}
@@ -98,7 +98,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .export-btn { background: transparent;
 	border: 1px solid #00ff88;color: #00ff88;
 	padding: 0.25rem 0.5rem;cursor: pointer; font-family: 'Courier New', monospace; font-size: 0.7rem;
-	transition: all 0.3s ease}
+	transition:all 0.3s ease}
   .export-btn:hover { background: rgba(0, 255, 136, 0.1)}
   @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.5} }
   /* Responsive design */ @media (max-width: 768px) { .canvas-mode-header { flex-direction: column;

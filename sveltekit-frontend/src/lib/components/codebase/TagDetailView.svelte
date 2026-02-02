@@ -324,7 +324,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		cursor: pointer;
 	padding: 0.25rem;
 		border-radius: 6px;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 	}
 
 	.close-btn:hover {
@@ -398,7 +398,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border: 1px solid rgba(168, 85, 247, 0.3);
 		border-radius: 8px;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 	}
 
 	.cluster-card:hover {
@@ -499,7 +499,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-size: 0.875rem;
 		font-weight: 500;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 	}
 
 	.action-btn.secondary {

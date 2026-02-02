@@ -87,7 +87,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	position: relative}
   .typewriter-text { white-space: pre-wrap; word-wrap: break-word}
   .typewriter-cursor { color: #00ff00; font-weight: bold;
-	transition: opacity 0.1s}
+	transition:opacity 0.1s}
   .typewriter-cursor.visible { opacity: 1}
   .typewriter-cursor.hidden { opacity: 0}
   .typewriter-cursor.blinking { animation: blink 1.06s infinite}
@@ -107,7 +107,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 0.25rem;background: rgba(0, 255, 0, 0.1); border-radius: 0.125rem;
 	overflow: hidden}
   .progress-bar { height: 100%;
-	background: linear-gradient(90deg, #00ff00, #00ff88); transition: width 0.3s ease}
+	background: linear-gradient(90deg, #00ff00, #00ff88); transition:width 0.3s ease}
   /* Activity Replay Styles */ .activity-replay-indicator { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem 1rem, background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 0.25rem; margin-bottom: 0.5rem; font-size: 0.875rem}
   .replay-icon { color: #ffa500; font-size: 1rem}

@@ -4,8 +4,7 @@
     onSelect?: (event: {
 	file: unknown;
 	action: string }) => void;
-    onClose?: () => void;
-  }
+    onClose?: () => void }
 
   let {
     pendingFile,
@@ -45,8 +44,7 @@
 
 <style>
   .animate-fade-in {
-    animation: fadeIn 0.3s ease-in-out;
-  }
+    animation: fadeIn 0.3s ease-in-out }
   @keyframes fadeIn {
     from { opacity: 0;
 	transform: translateY(20px); }

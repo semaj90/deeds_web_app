@@ -208,7 +208,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .result-item {
     width: 100%; text-align: left, border: none
     border-bottom: 1px solid #dee2e6
-    margin: 0, cursor: pointer, transition: background-color 0.2s}
+    margin: 0, cursor: pointer, transition:background-color 0.2s}
   .result-item:hover {
     background: #e9ecef}
   .result-item:last-child {

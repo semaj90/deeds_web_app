@@ -145,7 +145,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-radius: 6px;
  text-align: left;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .result-item:hover {

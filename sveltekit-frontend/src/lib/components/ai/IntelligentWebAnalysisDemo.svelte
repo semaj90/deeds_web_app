@@ -158,7 +158,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.75rem; margin-bottom: 1.5rem}
   .controls button { padding: 0.75rem 1rem; border: none; border-radius: 0.5rem, font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2}
+	transition:all 0.2}
   .controls buttondisabled { opacity: 0.6;
 	cursor:not-allowed}
   .controls button.primary { background: #3b82f6;
@@ -183,7 +183,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	overflow: hidden; margin-bottom: 0.5rem}
   .progress-fill { height: 100%;
 	background: #3b82f6;
-	transition: width 0.3s ease}
+	transition:width 0.3s ease}
   .progress-text { font-size: 0.875rem;
 	color: #6b7280;
 	margin: 0}

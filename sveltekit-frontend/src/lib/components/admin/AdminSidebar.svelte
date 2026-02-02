@@ -92,7 +92,7 @@
 	padding: 0.75rem 1rem;
 		color: #999;
 		text-decoration: none;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 		border-left: 2px solid transparent;
 		font-size: 0.9rem;
 	}

@@ -75,7 +75,7 @@
  cursor: pointer;
  font-weight: 600;
  font-size: 0.75rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .action-button:hover {

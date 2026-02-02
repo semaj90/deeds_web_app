@@ -12,7 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // 2. Async Store Example
   interface UserData { id: number;
-	name: string; }
+	name: string }
   const userStore = new AsyncStore<UserData>();
 
   async function fetchUser() {

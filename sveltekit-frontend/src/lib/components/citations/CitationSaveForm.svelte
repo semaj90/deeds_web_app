@@ -373,7 +373,7 @@
 		font-size: 14px;
 		font-weight: 600;
 	cursor: pointer;
-		transition: all 150ms ease;
+		transition:all 150ms ease;
 	}
 
 	.btn-primary {

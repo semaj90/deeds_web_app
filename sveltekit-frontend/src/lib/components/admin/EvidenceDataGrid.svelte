@@ -369,7 +369,7 @@
 
 	.datagrid tbody tr {
 		border-bottom: 1px solid #222;
-		transition: background 0.15s ease;
+		transition:background 0.15s ease;
 	}
 
 	.datagrid tbody tr.clickable:hover {
@@ -517,7 +517,7 @@
 	color: #ddd;
 	cursor: pointer;
 		font-size: 0.9rem;
-	transition: all 0.15s ease;
+	transition:all 0.15s ease;
 	}
 
 	.pagination-btn:hover:not(disabled) {
@@ -546,7 +546,7 @@
 	color: #ddd;
 	cursor: pointer;
 		font-size: 0.9rem;
-	transition: all 0.15s ease;
+	transition:all 0.15s ease;
 	}
 
 	.page-number:hover {

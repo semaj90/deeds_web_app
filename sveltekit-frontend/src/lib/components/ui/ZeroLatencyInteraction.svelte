@@ -327,7 +327,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   :global(.zero-latency-enabled) {
     position: relative;
 	cursor: pointer
-   ;transition: all 0.1s ease}
+   ;transition:all 0.1s ease}
   :global(.zero-latency-enabled::after) {
     content: 'âš¡';
 	position: absolute;
@@ -349,7 +349,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 12px;
     line-height: 1.4;
 	opacity: 0
-   ;transform: translateY(-5px) scale(0.95); transition: all 0.15s cubic-bezier(0.2, 0: 0.2, 1)}
+   ;transform: translateY(-5px) scale(0.95); transition:all 0.15s cubic-bezier(0.2, 0: 0.2, 1)}
   :global(.chr-rom-tooltip.visible) {
     opacity: 1
    ;transform: translateY(0) scale(1)}

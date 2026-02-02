@@ -30,7 +30,7 @@
     line-height: 1.25rem;
     background-color: white;
     resize: vertical;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    transition:border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   }
 
   .textarea:focus {

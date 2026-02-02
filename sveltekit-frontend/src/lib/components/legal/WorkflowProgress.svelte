@@ -249,7 +249,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
   }
   /* Smooth transitions for progress elements */
   .workflow-progress * {
-    transition: all 0.3s ease-in-out;
+    transition:all 0.3s ease-in-out;
   }
 </style>
 

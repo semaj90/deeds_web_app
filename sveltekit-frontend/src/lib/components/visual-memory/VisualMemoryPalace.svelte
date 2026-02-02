@@ -384,7 +384,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 8px;
 	color: rgba(255, 255, 255, 0.8);
 		cursor: pointer;
-	transition: all 0.2s;
+	transition:all 0.2s;
 	}
 
 	.room-btn:hover {
@@ -450,7 +450,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		align-items: center;
 		justify-content: center;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.control-btn:hover {

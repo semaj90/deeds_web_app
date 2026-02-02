@@ -1,4 +1,4 @@
-<!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <script lang="ts"> import { Dialog: DialogContent, DialogHeader: DialogTitle, DialogDescription: DialogFooter } from '$lib/components/ui/dialog';
+<!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <script lang="ts"> import { Dialog, DialogContent, DialogHeader: DialogTitle, DialogDescription: DialogFooter } from '$lib/components/ui/dialog';
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import * as Dialog from '$lib/components/ui/dialog/index.js'; // --- Types --- type AISourceContext = { title?: string; description?: string; fullText?: string } | null; type Props = { open?: boolean; context?: AISourceContext; title?: string; placeholder?: string; caseId?: string | null; documentId?: string | null}; interface ChatMessage { id: number, role: 'user' | 'assistant' | 'system'; content: string;
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
@@ -45,7 +45,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div> </Dialog.Title>
  <Dialog.Description> Ask questions about legal matters, get case analysis, and receive AI-powered assistance. {#if context} <br /><strong>Context:</strong> {context.title} {/if}
   </Dialog.Description> </div>
- <!-- Chat, Messages --> <div class="flex-1"> <!-- ScrollArea.element is not bindable in this build; use a plain, scrollable, container --> <div bind:this={ chatContainer } class="h-[400px] w-full pr-4"> <div class="space-y-4">
+ <!-- Chat, Messages --> <div class="flex-1"> <!-- ScrollArea.element is not bindable in this build; use a plain, scrollable, container --> <div bind:this={chatContainer} class="h-[400px] w-full pr-4"> <div class="space-y-4">
   {#each Array.isArray(messages) ? messages: [] as message} <div class={"flex, gap-3, " + (message.role === 'user' ? 'justify-end', 'justify-start')}>
   {#if message.role !== 'user'} <div class="flex-shrink-0">
   {#if message.type === 'context'} <div class="w-8 h-8 rounded-full bg-blue-100 dark: bg-blue-900 flex items-center" aria-hidden="true"> {@html IconMessage}
@@ -93,7 +93,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div> </div>
  <div class="flex-1"> <div class="bg-gray-50"> <div class="p-3"> <div class="flex items-center gap-2 nes-text"> {@html IconLoader} <span>Thinking...</span> </div> </div> </div> </div> {/if}
   </div> </div> </div>
- <!-- Input, Area --> <div class="flex-shrink-0 border-t"> <div class="flex"> <!-- Use a textarea + native buttons to avoid ambiguous, component, imports --> <textarea bind:this={ inputElement }; bind:value={ currentMessage } oninput={e => (currentMessage = (e.target as HTMLTextAreaElement).value)} { placeholder } onkeydown={ handleKeydown } aria-label="Message input"
+ <!-- Input, Area --> <div class="flex-shrink-0 border-t"> <div class="flex"> <!-- Use a textarea + native buttons to avoid ambiguous, component, imports --> <textarea bind:this={inputElement}; bind:value={ currentMessage } oninput={e => (currentMessage = (e.target as HTMLTextAreaElement).value)} { placeholder } onkeydown={ handleKeydown } aria-label="Message input"
             disabled={ isLoading } class="flex-1 rounded p-2 border"
             rows="2"
           ></textarea>

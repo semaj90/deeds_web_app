@@ -102,7 +102,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     cursor: pointer;
 	padding: 0.25rem;
     line-height: 1;
-	transition: color 0.2s ease}
+	transition:color 0.2s ease}
   .modal-close:hover {
     color: #3D3D3D}
   .modal-content { padding: 1.5rem;

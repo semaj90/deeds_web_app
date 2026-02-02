@@ -76,7 +76,7 @@
     border: 2px solid #e0d5c7;
     border-radius: 8px;
     overflow: hidden;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .collection-card:hover {
@@ -91,7 +91,7 @@
     border: none;
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition:background-color 0.2s;
   }
 
   .collection-card:hover .card-content {
@@ -146,7 +146,7 @@
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 4px;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .btn-delete:hover {

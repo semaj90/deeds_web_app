@@ -321,7 +321,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	width: 40px;
     height: 40px;
 	cursor: pointer;
-    transition: all 0.3s ease;
+    transition:all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -371,7 +371,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     color: #00ff88;
 	padding: 0.5rem;
     cursor: pointer;
-	transition: all 0.3s ease;
+	transition:all 0.3s ease;
     font-size: 1.2rem;
 	width: 40px;
     height: 40px;
@@ -403,7 +403,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	height: 30px;
     border: 2px solid #333;
     cursor: pointer;
-	transition: all 0.3s ease;
+	transition:all 0.3s ease;
   }
 
   .color-btn:hover {

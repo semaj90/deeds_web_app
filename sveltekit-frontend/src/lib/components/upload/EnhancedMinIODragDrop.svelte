@@ -48,7 +48,7 @@
   function handleClickToSelect() { if (disabled || uploading) return; fileInput?.click()}
   function handleFileSelect(_event: Event) { // removed unused target assignment if (!target.files) return; const selectedFiles = Array.from(target.files); processDroppedFiles(selectedFiles); // Clear the input so the same file can be selected again target.value = ''}
 </script> <!-- Enhanced drag-and-drop UI with Clang/LLVM performance, indicators --> <div class="enhanced-minio-upload relative"> <!-- Performance, Stats --> {#if enableCudaAcceleration && performanceStats.totalFiles > 0} <div class="performance-stats mb-4 p-3 bg-blue-50 border border-blue-200"> <div class="flex justify-between"> <span class="font-semibold">Performance (Clang/LLVM + CUDA):</span> <span>{performanceStats.cudaAccelerated}/{performanceStats.totalFiles} CUDA optimized</span> </div> <div class="flex justify-between text-xs"> <span>Avg Processing: {performanceStats.avgProcessingTime.toFixed(0)}ms</span> <span>Throughput: {performanceStats.throughputMBps.toFixed(1)} MB/s</span> </div> {/if} <!-- Hidden file, input --> <input type="file"
-    multiple accept={acceptedTypes.join(',')}; bind:this={ fileInput } onchange={ handleFileSelect } style="display: none;"
+    multiple accept={acceptedTypes.join(',')}; bind:this={fileInput} onchange={ handleFileSelect } style="display: none;"
   /> <!-- Drop, Zone --> <div class="drop-zone {dragOver ? 'drag-over': ''} {disabled ? 'disabled': ''} {uploading ? 'uploading': ''}" class:border-blue-400={ dragOver } class:bg-blue-50={ dragOver } class:border-gray-300={!dragOver},
 	class:bg-gray-50={!dragOver} ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
     aria-label="Drop zone"

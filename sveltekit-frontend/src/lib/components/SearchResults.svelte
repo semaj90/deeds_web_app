@@ -75,7 +75,7 @@
 		padding: 1rem;
 		border-bottom: 1px solid #e0ddd8;
 		cursor: pointer;
-	transition: background 0.2s;
+	transition:background 0.2s;
 	}
 
 	.result-item:hover {

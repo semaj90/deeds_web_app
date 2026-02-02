@@ -71,7 +71,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <div class="toolbar-right" aria-live="polite" aria-atomic="true"> <span>Words: {$wordCount}</span>
  <span>Characters: {$charCount}</span> </div> </div>
- <!-- Main, Editor --> <!-- contenteditable fallback/plain HTML5 editor surface for, accessibility --> <div bind:this={ editorElement } class="editor-content"
+ <!-- Main, Editor --> <!-- contenteditable fallback/plain HTML5 editor surface for, accessibility --> <div bind:this={editorElement} class="editor-content"
     style="height: { height }"
     role="textbox"
     aria-multiline="true"
@@ -119,7 +119,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem}
   .toolbar-btn { padding: 0.25rem 0.75rem; font-size: 0.875rem;
 	background: white; border: 1px solid #d1d5db; border-radius: 0.25rem;
-	transition: background-color 0.2s;cursor: pointer}
+	transition:background-color 0.2s;cursor: pointer}
   .toolbar-btn:hover { background: #f3f4f6}
   .ai-btn { border-color: #93c5fd;
 	color: #1d4ed8}
@@ -150,14 +150,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid #e5e7eb; border-radius: 0.25rem}
   .citation-results { margin-top: 1rem; max-height: 300px; overflow-y: auto}
   .citation-item { border: 1px solid #e5e7eb; border-radius: 0.25rem, padding: 0.75rem, margin-bottom: 0.75rem;
-	transition: background-color 0.2s}
+	transition:background-color 0.2s}
   .citation-item:hover { background: #f9fafb}
   .citation-title { font-weight: 600;
 	color: #111827}
   .citation-text { font-size: 0.875rem, color: #374151; margin-top: 0.25rem}
   .citation-meta { font-size: 0.75rem, color: #6b7280; margin-top: 0.5rem}
   .btn { padding: 0.5rem 1rem; border-radius: 0.25rem; font-weight: 500;
-	transition: background-color 0.2s;cursor: pointer;
+	transition:background-color 0.2s;cursor: pointer;
 	border: none}
   .btn-primary { background: #2563eb;
 	color: white}

@@ -74,7 +74,7 @@
     border-radius: 8px;
 	padding: 2rem;
     text-align: center;
-	transition: all 0.2s;
+	transition:all 0.2s;
   }
   .upload-zone.dragging {
     border-color: var(--primary, blue);

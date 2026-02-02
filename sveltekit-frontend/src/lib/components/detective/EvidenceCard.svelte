@@ -13,10 +13,8 @@ let { item, onview } = $props<{
         fileSize?: number;
 	createdAt: Date;
         tags: string[];
-        url?: string;
-    };
-    onview?: () => void;
-}>();
+        url?: string };
+    onview?: () => void }>();
 
 const typeIcon = $derived(() => {
     switch (item.evidenceType) {
@@ -69,6 +67,5 @@ function formatSize(bytes?: number) {
 
 <style>
     :global(.nes-container.is-rounded) {
-        padding: 0.5rem !important;
-    }
+        padding: 0.5rem !important }
 </style>

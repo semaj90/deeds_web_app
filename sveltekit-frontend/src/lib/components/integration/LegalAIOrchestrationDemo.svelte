@@ -72,8 +72,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  caseCreationForm.title = demoData.caseCreation.title;
  caseCreationForm.description = demoData.caseCreation.description;
  caseCreationForm.caseType = demoData.caseCreation.caseType;
- break;
- }
+ break }
  }
 
  // Execute selected workflow
@@ -93,8 +92,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  includeAI: true
  };
  result = await workflowOrchestrator.performLegalResearch(researchRequest);
- break;
- }
+ break }
  case 'document-processing': {
  const docRequest: DocumentProcessingWorkflowRequest = {
  documentId: documentProcessingForm.documentId || `doc_${Date.now()}`,
@@ -102,8 +100,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  documentType: documentProcessingForm.documentType
  };
  result = await workflowOrchestrator.processDocument(docRequest);
- break;
- }
+ break }
  case 'case-creation': {
  const caseRequest: CaseCreationWorkflowRequest = {
  title: caseCreationForm.title,
@@ -113,15 +110,12 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  clientId: caseCreationForm.clientId || 'demo_client'
  };
  result = await workflowOrchestrator.createCase(caseRequest);
- break;
+ break }
  }
- }
- workflowResult = result;
- } catch (error) {
+ workflowResult = result } catch (error) {
  errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
  } finally {
- isProcessing = false;
- }
+ isProcessing = false }
  }
 
 	// Format processing time
@@ -442,8 +436,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 
 <style>
  .animate-spin {
- animation: spin 1s linear infinite;
- }
+ animation: spin 1s linear infinite }
  @keyframes spin {
  from { transform: rotate(0deg); }
  to { transform: rotate(360deg); }

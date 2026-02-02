@@ -79,7 +79,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   <button type="button"
         onclick={ testConnections } class="ml-auto text-xs text-yellow-400 hover:text-yellow-300 transition-colors"
       > Refresh Status </button> {/if}
-  <!-- Messages, Container --> <div bind:this={ scrollContainer } class="yorha-panel-content flex-1 overflow-y-auto p-4 space-y-4"
+  <!-- Messages, Container --> <div bind:this={scrollContainer} class="yorha-panel-content flex-1 overflow-y-auto p-4 space-y-4"
     ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } >
   {#if messages.length === 0} <div class="flex items-center justify-center h-full"> <div class="text-center"> <p class="text-lg">No messages yet</p>
  <p class="text-sm">Start a conversation or drag & drop files to analyze</p> </div> {/if} {#each Array.isArray(messages) ? messages: [] as message} <div class="message-bubble {message.role === 'user' ? 'user-message', 'assistant-message'}"> <div class="message-header flex items-center justify-between"> <div class="flex items-center"> <Badge variant={message.role === 'user' ? 'info', 'success'} size="sm"> {message.role === 'user' ? 'You': 'AI Assistant'} </Badge>

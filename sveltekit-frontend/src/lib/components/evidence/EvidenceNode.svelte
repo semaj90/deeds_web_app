@@ -192,7 +192,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
  cursor: move;
  user-select: none;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
  z-index: 10;
  }
 

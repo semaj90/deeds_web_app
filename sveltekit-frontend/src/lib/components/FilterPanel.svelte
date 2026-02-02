@@ -186,7 +186,7 @@
 	color: #e0e0e0;
     font-size: 0.9rem;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
   }
 
   .filter-toggle:hover {
@@ -246,7 +246,7 @@
 	cursor: pointer;
     padding: 0.25rem;
     border-radius: 4px;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
 
   .close-btn:hover {
@@ -311,7 +311,7 @@
 	color: #b0b0b0;
     font-size: 0.8rem;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
   }
 
   .tag-btn:hover {
@@ -392,7 +392,7 @@
     border-radius: 6px;
     font-weight: 600;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
   }
 
   .reset-btn {

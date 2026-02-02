@@ -42,12 +42,10 @@
   };
 
   const toggleSidebar = () => {
-    sidebarOpen = !sidebarOpen;
-  };
+    sidebarOpen = !sidebarOpen };
 
   const toggleFullscreen = () => {
-    fullscreen = !fullscreen;
-  };
+    fullscreen = !fullscreen };
 
   const toggleLayout = () => {
     const layouts: ('single' | 'dual' | 'masonry')[] = ['single', 'dual', 'masonry'];
@@ -58,8 +56,7 @@
   const closeAllMenus = () => {
     fileMenuOpen = false;
     editMenuOpen = false;
-    viewMenuOpen = false;
-  };
+    viewMenuOpen = false };
 </script>
 
 <div class="report-toolbar container mx-auto">
@@ -69,7 +66,7 @@
     <div class="menu-dropdown">
       <button
         class="menu-trigger"
-        onclick={() => { closeAllMenus(); fileMenuOpen = !fileMenuOpen; }}
+        onclick={() => { closeAllMenus(); fileMenuOpen = !fileMenuOpen }}
       >
         File
       </button>
@@ -100,7 +97,7 @@
     <div class="menu-dropdown">
       <button
         class="menu-trigger"
-        onclick={() => { closeAllMenus(); editMenuOpen = !editMenuOpen; }}
+        onclick={() => { closeAllMenus(); editMenuOpen = !editMenuOpen }}
       >
         Edit
       </button>
@@ -127,7 +124,7 @@
     <div class="menu-dropdown">
       <button
         class="menu-trigger"
-        onclick={() => { closeAllMenus(); viewMenuOpen = !viewMenuOpen; }}
+        onclick={() => { closeAllMenus(); viewMenuOpen = !viewMenuOpen }}
       >
         View
       </button>
@@ -184,12 +181,12 @@
   <div class="status-info">
     <span class="word-count">{wordCount} words</span>
     {#if hasUnsavedChanges}
-      <span class="unsaved-indicator" transition: slide={{
+      <span class="unsaved-indicator" transition:slide={{
 	duration: 200 }}>
         Unsaved changes
       </span>
     {:else}
-      <span class="saved-indicator" transition: slide={{
+      <span class="saved-indicator" transition:slide={{
 	duration: 200 }}>
         Saved {lastSaved ? lastSaved.toLocaleTimeString() : 'never'}
       </span>
@@ -208,18 +205,15 @@
     min-height: 3rem;
 	position: sticky;
     top: 0;
-    z-index: 40;
-  }
+    z-index: 40 }
 
   .menu-bar {
     display: flex;
     align-items: center;
-	gap: 0.5rem;
-  }
+	gap: 0.5rem }
 
   .menu-dropdown {
-    position: relative;
-  }
+    position: relative }
 
   .menu-trigger {
     background: none;
@@ -229,12 +223,10 @@
     font-size: 0.875rem;
 	color: #374151;
     cursor: pointer;
-	transition: all 0.15s ease;
-  }
+	transition:all 0.15s ease }
 
   .menu-trigger:hover {
-    background: #f3f4f6;
-  }
+    background: #f3f4f6 }
 
   .dropdown-menu {
     position: absolute;
@@ -246,8 +238,7 @@
     border-radius: 0.5rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     padding: 0.5rem;
-    z-index: 50;
-  }
+    z-index: 50 }
 
   .dropdown-item {
     display: flex;
@@ -262,31 +253,26 @@
     font-size: 0.875rem;
 	color: #374151;
     cursor: pointer;
-	transition: background-color 0.15s ease;
-  }
+	transition:background-color 0.15s ease }
 
   .dropdown-item:hover {
-    background: #f3f4f6;
-  }
+    background: #f3f4f6 }
 
   .dropdown-separator {
     height: 1px;
 	background: #e2e8f0;
-    margin: 0.5rem 0;
-  }
+    margin: 0.5rem 0 }
 
   .shortcut {
     margin-left: auto;
     font-size: 0.75rem;
 	color: #6b7280;
-    opacity: 0.7;
-  }
+    opacity: 0.7 }
 
   .quick-actions {
     display: flex;
     align-items: center;
-	gap: 0.25rem;
-  }
+	gap: 0.25rem }
 
   .action-button {
     display: flex;
@@ -299,43 +285,35 @@
     border-radius: 0.25rem;
 	color: #6b7280;
     cursor: pointer;
-	transition: all 0.15s ease;
-  }
+	transition:all 0.15s ease }
 
   .action-button:hover {
     background: #f3f4f6;
-	color: #3b82f6;
-  }
+	color: #3b82f6 }
 
   .action-button.unsaved {
-    color: #ef4444;
-  }
+    color: #ef4444 }
 
   .separator {
     width: 1px;
 	height: 1.5rem;
     background: #e2e8f0;
-	margin: 0 0.5rem;
-  }
+	margin: 0 0.5rem }
 
   .status-info {
     display: flex;
     align-items: center;
 	gap: 1rem;
     font-size: 0.75rem;
-	color: #6b7280;
-  }
+	color: #6b7280 }
 
   .word-count {
-    font-weight: 500;
-  }
+    font-weight: 500 }
 
   .unsaved-indicator {
     color: #ef4444;
-    font-weight: 500;
-  }
+    font-weight: 500 }
 
   .saved-indicator {
-    color: #10b981;
-  }
+    color: #10b981 }
 </style>

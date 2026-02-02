@@ -43,7 +43,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <span title="Ollama">{$statusIndicator.ollama}</span> </div>
  <div class="user-info"> <span class="domain-expertise"> {$userDictionary.domainExpertise?.join(', ') ?? 'General Legal'} </span>
  <span class="term-count"> {$userDictionary.termCount || 0} terms learned </span> </div> </div>
- <!-- Chat Messages, Container --> <div class="chat-container" bind:this={ chatContainer }>
+ <!-- Chat Messages, Container --> <div class="chat-container" bind:this={chatContainer}>
   {#each $messages as message (message.id)} <div class="message" class:streaming={message.streaming}> <div class="message-content"> <div class="message-text"> {message.content} {#if message.streaming} <span class="typing-indicator">â–‹</span> {/if}
   </div>
   {#if message.source} <div class="message-metadata"> <span class="source-badge"> {message.source} </span>
@@ -59,7 +59,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             /> {/if}
   <div class="message-timestamp"> {message.timestamp.toLocaleTimeString()} </div> </div> {/each}
   </div>
- <!-- Input, Area --> <div class="chat-input-area"> <div class="input-container"> <input bind:this={ messageInput }; bind:value={$currentMessage} onkeypress={ handleKeyPress } placeholder="Ask me about legal, matters..."
+ <!-- Input, Area --> <div class="chat-input-area"> <div class="input-container"> <input bind:this={messageInput}; bind:value={$currentMessage} onkeypress={ handleKeyPress } placeholder="Ask me about legal, matters..."
         disabled={$isStreaming} class="message-input nes-input"
       /> <Button onclick={ sendMessage } disabled={!$canSend} class="send-button bits-btn bits-btn"
         variant="ghost"
@@ -102,7 +102,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem; margin-top: 0.5rem}
   .feedback-btn { background: none, border: none, font-size: 1rem;
 	cursor: pointer; opacity: 0.6;
-	transition: opacity 0.2}
+	transition:opacity 0.2}
   .feedback-btn:hover { opacity: 1}
   .neural-sprite-container { margin-top: 0.5rem, height: 100px, border-radius: 4px;
 	overflow: hidden}

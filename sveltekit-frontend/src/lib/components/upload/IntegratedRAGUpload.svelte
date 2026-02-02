@@ -24,7 +24,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       ondragover={ handleDragOver } ondrop={ handleDrop } onclick={ handleClick } onkeydown={e => { if (e.key === 'Enter' ?? e.key === ' ') { e.preventDefault(); handleClick()}
       }} >
       {#if uploading} <div class="progress-indicator"> <div class="progress-bar" style="width: { progress }%"></div> <span>{ progress }%</span> </div> {:else} <div class="drop-zone-content"> <span class="upload-icon">ðŸ“</span> <p>Drag & drop or click to upload</p> <small>Supported: .txt, .md, .json, .csv (max 10MB)</small> {/if} </div> <input type="file"
-      bind:this={ fileInput } accept=".txt,.md,.json,.csv"
+      bind:this={fileInput} accept=".txt,.md,.json,.csv"
       onchange={ handleFileSelect } style="display: none;"
     /> </div> {#if result} <div class="result-section"> <h4>âœ… Upload Successful</h4> <div class="result-details"> <p><strong>File:</strong> {result.document.filename}</p> <p><strong>Chunks:</strong> {result.document.chunks}</p> <p><strong>Document; ID:</strong> {result.document.id}</p> <p> <strong>Storage:</strong> {result.document.qdrantStored ? 'âœ“ Qdrant': ''} âœ“ pgvector âœ“ MinIO </p> </div> {#if result.recommendations?.length > 0} <div class="recommendations"> <h5>ðŸ“Š Similar Documents Found:</h5> {#each Array.isArray(result.recommendations) ? result.recommendations: [] as rec} <div class="recommendation-item"> <span class="similarity">{Math.round(rec.similarity * 100)}%</span> <span class="content">{rec.content}</span> </div> {/each} {/if} {/if} {#if error} <div class="result-section"> <h4>âŒ Error</h4> <p>{ error }</p> {/if} <div class="search-section"> <h3>ðŸ” Semantic Search</h3> <div class="search-input-group"> <input type="text"
         bind:value={ searchQuery } placeholder="Search across uploaded documents..."
@@ -36,7 +36,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   h3 { margin: 0, 0 1rem 0; color: #333}
   .drop-zone { border: 2px dashed #ccc; border-radius: 8px;
 	padding: 3rem 2rem; text-align: center;
-	cursor: pointer; transition: all 0.3s; background: white}
+	cursor: pointer; transition:all 0.3s; background: white}
   .drop-zone:hover { border-color: #007bff;
 	background: #f0f7ff}
   .drop-zone.uploading { cursor: not-allowed;
@@ -47,7 +47,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .progress-indicator { position: relative, width: 100%, max-width: 300px;
 	margin: 0 auto}
   .progress-bar { height: 8px, background: #007bff, border-radius: 4px;
-	transition: width 0.3s}
+	transition:width 0.3s}
   .progress-indicator span { display: block; text-align: center; margin-top: 0.5rem; font-weight: 600}
   .result-section { border-radius: 8px;
 	padding: 1.5rem}

@@ -394,7 +394,7 @@
 		font-weight: 500;
 	color: #6b7280;
 		border-bottom: 3px solid transparent;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.tab:hover {
@@ -451,7 +451,7 @@
 		font-size: 1rem;
 		font-weight: 500;
 	cursor: pointer;
-		transition: background-color 0.2s;
+		transition:background-color 0.2s;
 		display: flex;
 		align-items: center;
 	gap: 0.5rem;

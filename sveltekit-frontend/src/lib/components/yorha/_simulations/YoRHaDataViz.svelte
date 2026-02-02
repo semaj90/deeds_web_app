@@ -319,7 +319,7 @@
     position: relative;
 	width: 100%;
     max-width: 40px;
-	transition: all 0.3s ease;
+	transition:all 0.3s ease;
     transform-origin: bottom;
 	transform: scaleY(0);
   }
@@ -341,7 +341,7 @@
     font-weight: 600;
 	color: var(--yorha-text-primary, #e0e0e0);
     opacity: 0;
-	transition: opacity 0.2s;
+	transition:opacity 0.2s;
   }
 
   .bar:hover .bar-value {
@@ -418,7 +418,7 @@
     height: 100%;
 	position: relative;
     width: 0;
-	transition: width 0.3s ease;
+	transition:width 0.3s ease;
   }
 
   .progress-fill.animated {
@@ -451,7 +451,7 @@
     padding: 12px;
 	background: var(--yorha-bg-primary, #0a0a0a);
     border: 1px solid var(--yorha-text-muted, #808080);
-    transition: all 0.3s ease;
+    transition:all 0.3s ease;
     opacity: 0;
 	transform: translateX(-20px);
   }

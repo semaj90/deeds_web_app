@@ -243,7 +243,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 	cursor: pointer;
  color: #666;
 	padding: 0;
- transition: color 0.2s;
+ transition:color 0.2s;
  }
 
  .close-btn:hover {
@@ -312,7 +312,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  border-radius: 4px;
  font-family: 'Source Sans 3', sans-serif;
  font-size: 0.95rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .form-group select:focus,
@@ -347,7 +347,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  border-radius: 4px;
  font-weight: 600;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  font-size: 0.95rem;
  }
 

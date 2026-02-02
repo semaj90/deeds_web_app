@@ -153,7 +153,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 4px;
 		font-weight: 500;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.save-citation-btn:hover {
@@ -167,7 +167,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		border: none;
 		border-radius: 4px;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.cancel-btn:hover {
@@ -219,7 +219,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;
 		font-size: 1rem;
 	padding: 0;
-		transition: color 0.2s;
+		transition:color 0.2s;
 	}
 
 	.remove-btn:hover {

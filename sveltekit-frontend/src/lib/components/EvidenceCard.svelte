@@ -133,7 +133,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 16px;
  background: #fff;
  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
- transition: box-shadow 0.2s;
+ transition:box-shadow 0.2s;
  }
 
  .evidence-card:hover {
@@ -178,7 +178,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-radius: 4px;
  font-size: 12px;
 	cursor: pointer;
- transition: background 0.2s;
+ transition:background 0.2s;
  }
 
  .btn-ask-ai {

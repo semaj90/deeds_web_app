@@ -75,7 +75,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   role="region"
   aria-label="Enhanced evidence visualization system"
 > <p class="title">Evidence Management Canvas</p>
- <div class="canvas-wrapper"> <canvas bind:this={ canvas } width="800"
+ <div class="canvas-wrapper"> <canvas bind:this={canvas} width="800"
       height="600"
       onmousemove={ handleMouseMove } onclick={ handleMouseClick } onmouseleave={ handleMouseLeave } class="evidence-canvas"
     ></canvas> </div>

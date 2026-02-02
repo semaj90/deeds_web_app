@@ -367,7 +367,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     z-index: 50;
     display: flex;
     flex-direction: column;
-    transition: all 0.3s ease;
+    transition:all 0.3s ease;
   }
 
   .sidebar-open {
@@ -469,7 +469,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border-radius: 0.5rem;
     color: #94a3b8;
     cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
     text-align: left;
   }
 
@@ -568,7 +568,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     flex: 1;
     display: flex;
     flex-direction: column;
-    transition: margin-left 0.3s ease;
+    transition:margin-left 0.3s ease;
   }
 
   .main-sidebar-open {
@@ -613,7 +613,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     color: #94a3b8;
     cursor: pointer;
     border-radius: 0.5rem;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .toggle-btn:hover {
@@ -650,7 +650,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     cursor: pointer;
     padding: 0.25rem 0.5rem;
     border-radius: 0.25rem;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .breadcrumb:hover {
@@ -708,7 +708,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     color: #94a3b8;
     cursor: pointer;
     border-radius: 0.5rem;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .header-btn:hover {

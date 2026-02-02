@@ -258,7 +258,7 @@ interface SearchSuggestion { text: string;
   </div> </div> </div>
  <!-- Gaming-Themed: Evidence, Board --> <div class="nes-container is-rounded";
       class:retro-glow={gamingMode && particleEffects} >
-      <div bind:this={ dropZone } role="list"
+      <div bind:this={dropZone} role="list"
         class="evidence-drop-zone min-h-96 p-6 transition-all duration-300"
         class:n64-depth={ gamingMode }; class:yorha-glow={ dragActive } ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } ondrop={ handleDrop } >
   {#if dragActive} <div class="nes-container is-success p-8 text-center"> <div class="text-6xl">ðŸ“‚</div>
@@ -355,7 +355,7 @@ interface SearchSuggestion { text: string;
 	height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981); border-radius: 12px 12px 0 0}
 
   /* Gaming mode enhancements */
-  :global(.retro-glow) .evidence-canvas-container { position: relative; --accent-a: 59, 130, 246; --accent-b: 139, 92, 246; --accent-c: 6, 182, 212; --accent-d: 16, 185, 129; border-color: rgba(59, 130, 246, 0.9); box-shadow: 0 0 4px 2px rgba(59, 130, 246, 0.35), 0 0 18px 4px rgba(139, 92, 246, 0.3), 0 0 34px 6px rgba(6, 182, 212, 0.25), 0 0 52px 10px rgba(16, 185, 129, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 0 6px 2px rgba(139, 92, 246, 0.25); animation: canvasGlow 3.4s ease-in-out infinite alternate; transition: box-shadow 350ms ease, border-color 350ms ease, transform 400ms; will-change: box-shadow, transform}
+  :global(.retro-glow) .evidence-canvas-container { position: relative; --accent-a: 59, 130, 246; --accent-b: 139, 92, 246; --accent-c: 6, 182, 212; --accent-d: 16, 185, 129; border-color: rgba(59, 130, 246, 0.9); box-shadow: 0 0 4px 2px rgba(59, 130, 246, 0.35), 0 0 18px 4px rgba(139, 92, 246, 0.3), 0 0 34px 6px rgba(6, 182, 212, 0.25), 0 0 52px 10px rgba(16, 185, 129, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 0 6px 2px rgba(139, 92, 246, 0.25); animation: canvasGlow 3.4s ease-in-out infinite alternate; transition:box-shadow 350ms ease, border-color 350ms ease, transform 400ms; will-change: box-shadow, transform}
 
   :global(.retro-glow) .evidence-canvas-container: after, :global(.retro-glow) .evidence-canvas-container: before { content: ''; pointer-events: none;
 	position: absolute; inset: 0; border-radius: 10px}

@@ -123,7 +123,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px;
 	color: white;
 	cursor: pointer;
-	transition: all 0.2}
+	transition:all 0.2}
   .control-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05)}
   .info { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0 0.5rem; color: rgba(255, 255, 255, 0.8); font-size: 0.875rem}

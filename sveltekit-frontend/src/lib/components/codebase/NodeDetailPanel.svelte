@@ -208,7 +208,7 @@
     cursor: pointer;
 	padding: 0.25rem;
     border-radius: 4px;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
 
   .close-btn:hover {
@@ -249,7 +249,7 @@
     font-size: 0.8rem;
     font-family: 'JetBrains Mono', monospace;
     cursor: pointer;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
     text-align: left;
   }
 
@@ -275,7 +275,7 @@
 	color: #f87171;
     font-size: 0.875rem;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
   }
 
   .error-badge:hover {

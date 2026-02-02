@@ -14,8 +14,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     documentId?: string;
     isVisible?: boolean;
     onClose?: () => void;
-    relatedDocumentsLoaded?: (e: any) => void;
-  } = $props();
+    relatedDocumentsLoaded?: (e: any) => void } = $props();
 
   // Reactive state management
   const documentData = writable<any>(null);
@@ -71,8 +70,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
           if (cacheAge < cacheTimeout) {
             console.log('📦 Cache is fresh, using cached data');
-            return;
-          } else {
+            return } else {
             console.log('🔄 Cache is stale, fetching fresh data in background');
             // Continue to server fetch for fresh data
           }
@@ -182,8 +180,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }
 
   function toggleGPU() {
-    showGPUAnalysis = !showGPUAnalysis;
-  }
+    showGPUAnalysis = !showGPUAnalysis }
 </script>
 
 <!-- ============================================================================ -->
@@ -357,8 +354,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	display: flex;
     flex-direction: column;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
-  }
+    overflow: hidden }
 
   .modal-header {
     padding: 20px;
@@ -366,29 +362,25 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     display: flex;
     justify-content: space-between;
     align-items: center;
-	background: #f9fafb;
-  }
+	background: #f9fafb }
 
   .modal-header h2 {
     margin: 0;
     font-size: 1.25rem;
-	color: #111827;
-  }
+	color: #111827 }
 
   .close-btn {
     background: none;
 	border: none;
     font-size: 24px;
 	cursor: pointer;
-    color: #6b7280;
-  }
+    color: #6b7280 }
 
   .modal-body {
     flex: 1;
     overflow-y: auto;
 	padding: 0;
-    background: #f3f4f6;
-  }
+    background: #f3f4f6 }
 
   .metrics-banner {
     display: flex;
@@ -396,23 +388,19 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     padding: 12px 24px;
     background: #ffffff;
     border-bottom: 1px solid #e5e7eb;
-    font-size: 0.875rem;
-  }
+    font-size: 0.875rem }
 
   .metric {
     display: flex;
     align-items: center;
-	gap: 8px;
-  }
+	gap: 8px }
 
   .metric .label {
-    color: #6b7280;
-  }
+    color: #6b7280 }
 
   .metric .value {
     font-weight: 600;
-	color: #111827;
-  }
+	color: #111827 }
 
   .metric .tag {
     background: #e0e7ff;
@@ -420,21 +408,18 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.75rem;
-    text-transform: uppercase;
-  }
+    text-transform: uppercase }
 
   .details-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 24px;
-	padding: 24px;
-  }
+	padding: 24px }
 
   .main-content, .sidebar {
     display: flex;
     flex-direction: column;
-	gap: 24px;
-  }
+	gap: 24px }
 
   .content-preview, .gpu-analysis-section, .sidebar-section {
     background: #ffffff;
@@ -451,32 +436,27 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     font-weight: 600;
 	display: flex;
     align-items: center;
-	gap: 8px;
-  }
+	gap: 8px }
 
   .text-content {
     line-height: 1.6;
 	color: #4b5563;
-    white-space: pre-wrap;
-  }
+    white-space: pre-wrap }
 
   .related-list, .case-list {
     list-style: none;
 	padding: 0;
-    margin: 0;
-  }
+    margin: 0 }
 
   .related-item, .case-item {
     padding: 12px 0;
     border-bottom: 1px solid #f3f4f6;
     display: flex;
 	gap: 12px;
-    align-items: center;
-  }
+    align-items: center }
 
   .related-item:last-child, .case-item:last-child {
-    border-bottom: none;
-  }
+    border-bottom: none }
 
   .t-score {
     background: #ecfdf5;
@@ -484,16 +464,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 0.75rem;
-    font-weight: bold;
-  }
+    font-weight: bold }
 
   .t-title {
     font-size: 0.875rem;
 	color: #1f2937;
     white-space: nowrap;
 	overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    text-overflow: ellipsis }
 
   .primary-btn {
     width: 100%;
@@ -503,12 +481,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border: none;
     border-radius: 6px;
     font-weight: 500;
-	cursor: pointer;
-  }
+	cursor: pointer }
 
   .primary-btn:hover {
-    background: #1d4ed8;
-  }
+    background: #1d4ed8 }
 
   .loading-state, .error-state {
     display: flex;
@@ -517,8 +493,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     justify-content: center;
 	height: 100%;
     color: #6b7280;
-	gap: 16px;
-  }
+	gap: 16px }
 
   .spinner {
     width: 40px;
@@ -526,8 +501,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border: 3px solid #e5e7eb;
     border-top: 3px solid #3b82f6;
     border-radius: 50%;
-	animation: spin 1s linear infinite;
-  }
+	animation: spin 1s linear infinite }
 
   @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -537,8 +511,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   /* Responsive Design */
   @media (max-width: 768px) {
     .details-grid {
-      grid-template-columns: 1fr;
-    }
+      grid-template-columns: 1fr }
   }
 </style>
       await legalDB.documentCache.put(cacheEntry);

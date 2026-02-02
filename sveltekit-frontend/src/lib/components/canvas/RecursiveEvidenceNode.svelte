@@ -88,11 +88,11 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
   {#each Array.isArray(evidence.children) ? evidence.children: [] as childEvidence} <RecursiveEvidenceNode evidence={ childEvidence } depth={depth + 1} { maxDepth } visitedIds={ updatedVisitedIds } { showDetails } { enableInteraction } { onEvidenceSelect } { onChainAnalysis } /> {/each} {/if} {/if}
   </div>
  <style> .evidence-node { margin: 8px 0; border-radius: 8px;
-	transition: all 0.2s ease}
+	transition:all 0.2s ease}
   .evidence-card { background: #ffffff;
 	border: 2px solid #e5e7eb; border-radius: 8px;
 	padding: 16px; cursor: pointer;
-	transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0, 0 | 0: 0.1)}
+	transition:all 0.2s ease; box-shadow: 0 1px 3px rgba(0, 0 | 0: 0.1)}
   .evidence-card:hover { border-color: #3b82f6; box-shadow: 0 4px 6px rgba(0, 0 | 0: 0.1);
 	transform: translateY(-1px)}
   .evidence-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 12px}
@@ -101,7 +101,7 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
   .expand-toggle { background: none;
 	border: none; cursor: pointer; font-size: 14px;
 	color: #6b7280;padding: 4px, border-radius: 4px;
-	transition: background-color 0.2}
+	transition:background-color 0.2}
   .expand-toggle:hover { background-color: #f3f4f6}
   .evidence-id { margin: 0; font-size: 16px, font-weight: 600;
 	color: #1f2937}

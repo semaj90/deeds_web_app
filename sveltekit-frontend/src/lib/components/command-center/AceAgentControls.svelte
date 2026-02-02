@@ -294,7 +294,7 @@
     font-weight: 600;
 	background: var(--surface-3);
     color: var(--text-2);
-	transition: all 0.3s;
+	transition:all 0.3s;
   }
 
   .status-indicator.running {
@@ -366,7 +366,7 @@
     font-size: 0.875rem;
     font-weight: 600;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .start-btn {
@@ -448,7 +448,7 @@
   .progress-fill {
     height: 100%;
 	background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-    transition: width 0.3s ease;
+    transition:width 0.3s ease;
   }
 
   .logs-panel {

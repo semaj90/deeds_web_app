@@ -9,8 +9,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		onUploadComplete = (result: any) => {}
 	} = $props<{
 		caseId?: string;
-		onUploadComplete?: (result: any) => void;
-	}>();
+		onUploadComplete?: (result: any) => void }>();
 
 	let isUploading = $state(false);
 	let uploadProgress = $state(0);
@@ -37,15 +36,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			console.error('Upload failed:', error);
 		} finally {
 			isUploading = false;
-			uploadProgress = 100;
-		}
+			uploadProgress = 100 }
 	}
 </script>
 
 <div
 	class="nes-container is-rounded p-4 flex flex-col items-center justify-center border-dashed border-2 min-h-[150px] transition-colors"
 	class:bg-blue-900={dropzoneActive}
-	ondragover={(e) => { e.preventDefault(); dropzoneActive = true; }}
+	ondragover={(e) => { e.preventDefault(); dropzoneActive = true }}
 	ondragleave={() => dropzoneActive = false}
 	ondrop={async (e) => {
 		e.preventDefault();
@@ -70,7 +68,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-	.hidden { display: none; }
+	.hidden { display: none }
 </style>
 
 

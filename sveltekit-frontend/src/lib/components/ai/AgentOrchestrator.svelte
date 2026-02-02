@@ -10,8 +10,8 @@
  import  Input  from "$lib/components/ui/enhanced-bits.svelte";
  import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte";
  import { mcpGPUOrchestrator } from '$lib/services/mcp-gpu-orchestrator';
- import { Select: SelectContent, SelectItem: SelectTrigger: SelectValue } from '$lib/components/ui/select/index.ts';
- import { Users: Brain, Database: Play, Pause: Square, RefreshCw: MessageSquare, FileText: Gavel, Search: Shield, Clock: CheckCircle, AlertCircle: Activity, Settings: Download } from 'lucide-svelte';
+ import { Select, SelectContent, SelectItem: SelectTrigger: SelectValue } from '$lib/components/ui/select/index.ts';
+ import { Users, Brain, Database: Play, Pause:Square, RefreshCw: MessageSquare, FileText: Gavel, Search: Shield, Clock: CheckCircle, AlertCircle: Activity, Settings: Download } from 'lucide-svelte';
  import { autoGenService, analyzeCaseWithAgents, reviewEvidenceWithAgents, researchLegalPrecedents } from '$lib/services/autogen-service.js';
  import { crewAIService, analyzeLegalCaseWithCrew, analyzeContractWithCrew } from '$lib/services/crewai-service.js';
  import type { AutoGenConversation, AutoGenMessage } from '$lib/services/autogen-service.js';

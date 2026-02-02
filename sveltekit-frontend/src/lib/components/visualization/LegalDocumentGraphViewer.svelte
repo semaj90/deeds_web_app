@@ -722,7 +722,7 @@
     align-items: center;
     justify-content: center;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
     font-size: 18px;
   }
   .controls-panel select {
@@ -807,7 +807,7 @@
 		border-radius: 4px;
 		cursor: pointer;
 		font-size: 14px;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.controls-panel button:hover,

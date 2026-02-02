@@ -2,7 +2,7 @@
  import { browser } from '$app/environment';
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { notifications } from '$lib/stores/unified';
- import { Circle: Download, Image: Move, Redo: Save, Square: Trash2, Type: Undo, ZoomIn: ZoomOut } from 'lucide-svelte'; // State (use normal let bindings so the file is valid) let canvasContainer: HTMLDivElement | undefined;
+ import { Circle, Download, Image: Move, Redo: Save, Square: Trash2, Type: Undo, ZoomIn: ZoomOut } from 'lucide-svelte'; // State (use normal let bindings so the file is valid) let canvasContainer: HTMLDivElement | undefined;
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let fabricCanvas: any = null;
@@ -117,7 +117,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if !readonly} <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => deleteSelected()}> <Trash2 /> </Button>
  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => saveCanvas()}> <Save /> Save </Button> {/if}
   <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => exportCanvas()}> <Download /> Export </Button> </div> </div>
- <!-- Canvas, Container --> <div> <div bind:this={ canvasContainer } class="canvas-placeholder"></div>
+ <!-- Canvas, Container --> <div> <div bind:this={canvasContainer} class="canvas-placeholder"></div>
   {#if !fabricLoaded} <div> <p>Loading canvas...</p> {/if}
   </div>
  <!-- Instructions -->

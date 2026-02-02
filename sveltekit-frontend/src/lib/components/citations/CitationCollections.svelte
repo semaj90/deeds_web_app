@@ -225,7 +225,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;
  font-size: 13px;
  font-weight: 600;
-	transition: all 150ms ease;
+	transition:all 150ms ease;
  }
 
  .btn-create:hover:not(disabled) {
@@ -285,7 +285,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border: 2px solid transparent;
  border-radius: 4px;
 	cursor: pointer;
- transition: all 150ms ease;
+ transition:all 150ms ease;
  }
 
  .color-option:hover {
@@ -311,7 +311,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  font-size: 13px;
  font-weight: 600;
 	cursor: pointer;
- transition: all 150ms ease;
+ transition:all 150ms ease;
  }
 
  .btn-primary {
@@ -372,7 +372,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-radius: 4px;
 	padding: 10px 12px;
  cursor: pointer;
-	transition: all 150ms ease;
+	transition:all 150ms ease;
  text-align: left;
  }
 
@@ -416,7 +416,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  font-size: 14px;
 	padding: 4px;
  opacity: 0.6;
-	transition: opacity 150ms ease;
+	transition:opacity 150ms ease;
  }
 
  .btn-delete:hover {

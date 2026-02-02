@@ -118,7 +118,7 @@
     border-radius: 4px;
     font-size: 1rem;
     font-family: 'Source Sans 3', sans-serif;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .search-input:focus {
@@ -140,7 +140,7 @@
     border-radius: 4px;
     font-weight: 600;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .search-btn:hover:not(:disabled) {
@@ -192,7 +192,7 @@
     border-radius: 4px;
     font-size: 0.85rem;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .clear-btn:hover:not(:disabled) {

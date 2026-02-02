@@ -266,7 +266,7 @@
 		height: 30px;
 		font-weight: 700;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 	}
 
 	.route-modal__close:hover {
@@ -409,7 +409,7 @@
 		background: transparent;
 		font-size: 11px;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 		color: var(--yorha-ink, #111);
 	}
 
@@ -468,7 +468,7 @@
 		font-size: 12px;
 		font-family: var(--yorha-font, 'JetBrains Mono', monospace);
 		cursor: pointer;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 	}
 
 	.yorha-btn.primary {

@@ -305,7 +305,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   .results-list { display: flex; flex-direction: column;
 	gap: 0.75rem}
   .result-item { cursor: pointer;
-	transition: box-shadow 0.2}
+	transition:box-shadow 0.2}
   .result-item:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)}
   .result-content { display: flex; flex-direction: column;
 	gap: 0.75rem}

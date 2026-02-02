@@ -270,7 +270,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-radius: 4px;
     font-weight: 600;
 	cursor: pointer;
-	transition: all 0.2s;
+	transition:all 0.2s;
   }
 
   button:hover:not(:disabled) {

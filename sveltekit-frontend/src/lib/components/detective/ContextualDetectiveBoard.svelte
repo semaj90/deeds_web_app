@@ -587,7 +587,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     font-weight: 500;
 	color: #64748b;
     background: #f1f5f9;
-	transition: all 0.2s;
+	transition:all 0.2s;
   }
 
   .typing-indicator.active {
@@ -624,7 +624,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-radius: 0.375rem;
     font-weight: 500;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .input-actions button:first-child {
@@ -677,7 +677,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-radius: 1rem;
     font-size: 0.875rem;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .prompt-button:hover {

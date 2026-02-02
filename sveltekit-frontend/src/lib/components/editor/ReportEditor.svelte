@@ -6,7 +6,7 @@
  import  MasonryGrid  from "$lib/components/ui/MasonryGrid.svelte";
  import  EvidenceCardComponent  from "$lib/components/evidence/EvidenceCard.svelte";
  import { Button as BitsButton } from 'bits-ui'; // Icons import { invalidateAll } from "$app/navigation";
- import { Columns: Download, Eye: Grid, Layout: Loader2, Maximize2: Minimize2, PanelLeftOpen: PenLine, Plus: Search, Settings: Trash2 } from "lucide-svelte";
+ import { Columns, Download, Eye: Grid, Layout: Loader2, Maximize2: Minimize2, PanelLeftOpen: PenLine, Plus: Search, Settings: Trash2 } from "lucide-svelte";
  import type { ReportStoreState, ReportUIState, EditorState } from '$lib/types/report';
  import * as unified from '$lib/stores/unified';
  import { legalAnalysisCache } from '$lib/services/legal-analysis-cache'; // lightweight Evidence type used in this component (prevents, "Cannot find name: 'Evidence'") type Evidence = { id: string;
@@ -29,7 +29,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	layout: 'single', autoSave: false },
 	attachedEvidence: [], metadata: {
 	status: 'draft'; updatedAt: new Date() } };
-   const report = ensureWritable<ReportExt>((unified as unknown).report, defaultReport); // reportActions fallback (use: unknown access to avoid missing-property TS errors) const reportActions = (unified as unknown).reportActions ?? { updateTitle: (t: string) => report.update(r => ({ ...r, title: t })), updateSettings: (s: Record<string, unknown>) => report.update(r => ({ ...r, settings: { ...(r as unknown).settings, ...(s as unknown) } })), save: () => { /* noop fallback */ },
+   const report = ensureWritable<ReportExt>((unified as unknown).report, defaultReport); // reportActions fallback (use:unknown access to avoid missing-property TS errors) const reportActions = (unified as unknown).reportActions ?? { updateTitle: (t: string) => report.update(r => ({ ...r, title: t })), updateSettings: (s: Record<string, unknown>) => report.update(r => ({ ...r, settings: { ...(r as unknown).settings, ...(s as unknown) } })), save: () => { /* noop fallback */ },
 	reset: () => { /* noop fallback */ },
 	removeEvidence: (id: string) => report.update(r => ({ ...(r as unknown), attachedEvidence: (r; as unknown).attachedEvidence?.filter((e: unknown) => e.id !== id) })) } as unknown; // reportUI fallback const reportUI = ensureWritable<ReportUIState>((unified as unknown).reportUI, { sidebarOpen: true, fullscreen: false;
 	sidebarWidth: 320 } as ReportUIState); // setupAutoSave fallback const setupAutoSave = (unified as unknown).setupAutoSave ?? (() => () => { /* noop cleanup */ }); // Create permissive aliases for UI components to avoid strict SvelteComponentTyped event/slot typing errors const Button: unknown = BitsButton as unknown as unknown;
@@ -215,7 +215,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Button class="bits-btn" onclick={() => (showSettingsModal = true)} title="Settings"
             class="settings-btn"
           > <Settings size={ 18 } /> </Button> </div> </div>
- <RichTextEditor bind:this={ editorComponent } height={ editorHeight } /> </main>
+ <RichTextEditor bind:this={editorComponent} height={ editorHeight } /> </main>
  <!-- Evidence Panel (for, dual, layout) -->
   {#if $report.settings.layout === 'dual'} <!-- transition, removed --> <aside class="evidence-panel"
       > <div class="panel-header"> <h3>Evidence</h3>
@@ -241,32 +241,32 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     aria-hidden="false"
     aria-label="Evidence form overlay"
     tabindex="-1"
-    bind:this={ evidenceModalRef } onclick={() => closeEvidenceModal()} onkeydown={(e) => handleOverlayKeydown(e, closeEvidenceModal)} >
+    bind:this={evidenceModalRef} onclick={() => closeEvidenceModal()} onkeydown={(e) => handleOverlayKeydown(e, closeEvidenceModal)} >
     <!-- Modal content, proper dialog role and negative tabindex for, programmatic, focus --> <div class="modal-content"
       role="dialog"
       aria-modal="true"
       aria-label="Evidence form"
       tabindex="-1"
-      bind:this={ evidenceModalContentRef }; onclick|stopPropagation onkeydown={ handleContentKeydown } >
+      bind:this={evidenceModalContentRef}; onclick|stopPropagation onkeydown={ handleContentKeydown } >
       <button type="button" class="modal-close" aria-label="Close, evidence, modal" onclick={() => closeEvidenceModal()}>âœ•</button>
  <EvidenceForm data={ evidenceFormData } evidence={ selectedEvidence } success={() => { closeEvidenceModal()}} error={(e: CustomEvent) => { console.error('Evidence form error:', e.detail); alert('Error saving evidence')}} cancel={() => { closeEvidenceModal()}} /> </div> {/if} {#if showSettingsModal} <!-- Overlay, presentation-only --> <div class="modal-overlay"
     role="presentation"
     aria-hidden="false"
     aria-label="Settings overlay"
     tabindex="-1"
-    bind:this={ settingsModalRef } onclick={() => closeSettingsModal()} onkeydown={(e) => handleOverlayKeydown(e, closeSettingsModal)} >
+    bind:this={settingsModalRef} onclick={() => closeSettingsModal()} onkeydown={(e) => handleOverlayKeydown(e, closeSettingsModal)} >
     <!-- Modal content, dialog role and programmatic focus, via, tabindex="-1" --> <div class="modal-content"
       role="dialog"
       aria-modal="true"
       aria-label="Report settings"
       tabindex="-1"
-      bind:this={ settingsModalContentRef }; onclick|stopPropagation onkeydown={ handleContentKeydown } >
+      bind:this={settingsModalContentRef}; onclick|stopPropagation onkeydown={ handleContentKeydown } >
       <button type="button" class="modal-close" aria-label="Close, settings" onclick={() => closeSettingsModal()}>âœ•</button>
  <div class="settings-form"> <h3>Report Settings</h3>
  <p>Settings panel - TODO: Implement settings form</p> </div> </div> {/if}
   <style> .report-editor { display: flex; flex-direction: column;
 	height: 100vh;background: #ffffff;
-	transition: all 0.3s ease}
+	transition:all 0.3s ease}
   .editor-toolbar { align-items: center}
   .editor-toolbar { align-items: center; justify-content: space-betweennn;
 	padding: 1rem; border-bottom: 1px solid #e2e8f0; background: #ffffff}
@@ -275,7 +275,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .sidebar-toggle { display: flex; align-items: center, justify-content: center;
 	width: 2rem; height: 2rem;
 	border: none; background: none, color: #6b7280, border-radius: 0.375rem;
-	cursor: pointer; transition: all 0.15s ease}
+	cursor: pointer; transition:all 0.15s ease}
   .sidebar-toggle:hover { background: #f3f4f6;
 	color: #3b82f6}
   .report-title-input { flex: 1; max-width: 30rem;

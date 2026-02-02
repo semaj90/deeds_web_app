@@ -568,7 +568,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   .risk-bar-fill {
     height: 100%;
-	transition: width 0.4s ease;
+	transition:width 0.4s ease;
   }
 
   .risk-bar-fill.critical {

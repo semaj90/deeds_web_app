@@ -122,7 +122,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: white; font-size: 0.875rem}
   .action-button { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500, font-size: 0.875rem;
-	transition: all 0.2}
+	transition:all 0.2}
   .refresh-button { background: #3b82f6;
 	color: white;border: none}
   .refresh-buttonhover:not(disabled) { background: #2563eb}
@@ -166,7 +166,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	height: 4px; background: #e5e7eb; border-radius: 2px;
 	overflow: hidden}
   .progress-fill { height: 100%;
-	background: linear-gradient(90deg, #10b981 0%, #059669 100%); transition: width 0.3s ease}
+	background: linear-gradient(90deg, #10b981 0%, #059669 100%); transition:width 0.3s ease}
   .section-title { display: flex; align-items: center;
 	gap: 0.5rem; font-size: 1.5rem, font-weight: bold;
 	color: #1f2937; margin-bottom: 1.5rem}
@@ -198,7 +198,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	height: 4px; background: #e5e7eb; border-radius: 2px;
 	overflow: hidden}
   .bar-fill { height: 100%;
-	transition: width 0.3s ease}
+	transition:width 0.3s ease}
   .bar-fill.rating-5 { background: #10b981 } .bar-fill.rating-4 { background: #84cc16 } .bar-fill.rating-3 { background: #eab308 } .bar-fill.rating-2 { background: #f97316 } .bar-fill.rating-1 { background: #ef4444 } .rating-percentage { width: 2.5rem; text-align: right;
 	color: #6b7280}
   .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem}

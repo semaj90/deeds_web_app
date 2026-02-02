@@ -93,7 +93,7 @@
  border-radius: 25px;
 	color: #e0e0e0;
  font-size: 0.9rem;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
  }
 
  .search-input:focus {
@@ -117,7 +117,7 @@
 	cursor: pointer;
  padding: 0.25rem;
  border-radius: 50%;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
  display: flex;
  align-items: center;
  justify-content: center;

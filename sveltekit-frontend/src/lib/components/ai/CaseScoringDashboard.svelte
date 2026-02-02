@@ -223,7 +223,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; min-width: 140px}
   .cases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem}
   .case-score-card { border: 1px solid #e2e8f0; border-radius: 0.5rem;
-	overflow: hidden;transition: box-shadow 0.2s}
+	overflow: hidden;transition:box-shadow 0.2s}
   .case-score-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
   .case-header { display: flex; justify-content: space-between; /* Fixed: space-betweennn -> space-between */ align-items: flex-start;
 	gap: 1rem}
@@ -300,7 +300,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .factor-bar { flex: 1; /* Fixed: comma -> semicolon */ height: 0.5rem, background: #e2e8f0, border-radius: 0.25rem;
 	overflow: hidden}
   .factor-fill { height: 100%;
-	background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition: width 0.3s}
+	background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s}
   .factor-percentage { font-size: 0.75rem; font-weight: 600;
 	color: #374151}
   .factor-description { font-size: 0.75rem;

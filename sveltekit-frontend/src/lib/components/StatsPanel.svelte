@@ -210,7 +210,7 @@
  padding: 0.4rem 0.8rem;
  font-size: 0.8rem;
 	cursor: pointer;
- transition: all 0.2s ease;
+ transition:all 0.2s ease;
  }
 
  .toggle-details:hover {
@@ -233,7 +233,7 @@
  display: flex;
  align-items: center;
 	gap: 1rem;
- transition: all 0.2s ease;
+ transition:all 0.2s ease;
  }
 
  .stat-card:hover {
@@ -337,7 +337,7 @@
  .bar-fill {
  height: 100%;
  border-radius: 12px;
-	transition: width 0.5s ease;
+	transition:width 0.5s ease;
  }
 
  .bar-value {

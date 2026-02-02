@@ -155,7 +155,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
 	margin: 0 auto; font-family: system-ui, sans-serif}
   .upload-zone { border: 3px dashed #d1d5db; border-radius: 12px;
 	padding: 3rem 2rem; text-align: center;
-	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); transition: all 0.3s ease; cursor: pointer; margin-bottom: 2rem}
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); transition:all 0.3s ease; cursor: pointer; margin-bottom: 2rem}
   .upload-zone:hover, .upload-zone:focus { border-color: #3b82f6;
 	background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); outline: none; box-shadow: 0 4px 6px -1px rgba(0, 0 | 0: 0.1)}
   .upload-zone.drag-active { border-color: #10b981;
@@ -177,7 +177,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   .browse-button { background: #3b82f6;
 	color: white; border: none;
 	padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem;
-	cursor: pointer;transition: all 0.2s ease; display: flex; align-items: center;
+	cursor: pointer;transition:all 0.2s ease; display: flex; align-items: center;
 	gap: 0.5rem;margin: 0 auto}
   .browse-button:hover { background: #2563eb;
 	transform: translateY(-1px)}
@@ -205,7 +205,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
 	overflow: hidden}
   .file-list h4 { margin: 0;
 	padding: 1rem 1.5rem;background: #f8fafc, color: #1f2937; border-bottom: 1px solid #e5e7eb}
-  .file-item { border-bottom: 1px solid #e5e7eb; transition: all 0.2s ease}
+  .file-item { border-bottom: 1px solid #e5e7eb; transition:all 0.2s ease}
   .file-item:hover { background: #f9fafb}
   .file-item:last-child { border-bottom: none}
   .file-info { padding: 1rem 1.5rem}
@@ -217,13 +217,13 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   .file-meta { font-size: 0.9rem, color: #6b7280; margin-top: 0.25rem}
   .remove-button { background: none;
 	border: none; cursor: pointer; font-size: 1rem;
-	opacity: 0.7;transition: opacity 0.2s ease}
+	opacity: 0.7;transition:opacity 0.2s ease}
   .remove-button:hover { opacity: 1}
   .progress-bar { width: 100%;
 	height: 8px; background: #e5e7eb; border-radius: 4px;
 	overflow: hidden;margin: 0.5rem 0}
   .progress-fill { height: 100%;
-	transition: width 0.3s ease}
+	transition:width 0.3s ease}
   .file-status { margin: 0.5rem 0; font-size: 0.9rem}
   .status-text { font-weight: 500}
   .file-tags { display: flex;

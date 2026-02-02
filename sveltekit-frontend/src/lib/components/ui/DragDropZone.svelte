@@ -36,7 +36,7 @@
   tabindex="0"
   aria-label="Drop zone or click to upload files"
   onclick={ openFileDialog } onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && openFileDialog()} >
-  <input bind:this={ fileInput } type="file"
+  <input bind:this={fileInput} type="file"
     { accept } { multiple } { disabled } onchange={ handleFileSelect } class="file-input-hidden"
   /> <div class="upload-content"> <div class="upload-icon-container">
   {#if isDragOver} <div class="upload-icon"> <Upload class="w-16" /> </div> {:else} <div class="upload-icon"> <Upload class="w-16" /> {/if}
@@ -51,7 +51,7 @@
   </div>
  <style> .file-input-hidden { display: none}
   .drag-drop-zone { border: 2px dashed var(--border-color, #cbd5e0); border-radius: 12px, padding: 2rem, text-align: center;
-	cursor: pointer; transition: all 0.3s ease; background: var(--bg-primary, #ffffff)}
+	cursor: pointer; transition:all 0.3s ease; background: var(--bg-primary, #ffffff)}
   .drag-drop-zone:hover:not(.disabled) { border-color: var(--accent-primary, #3b82f6); background: var(--bg-secondary, #f7fafc)}
   .drag-drop-zone.drag-over { border-color: var(--accent-primary, #3b82f6); background: var(--accent-primary-10, rgba(59, 130, 246, 0.1)); transform: scale(1.02)}
   .drag-drop-zone.disabled { opacity: 0.6;

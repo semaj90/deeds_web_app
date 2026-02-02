@@ -84,7 +84,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             <Download class="h-4" /> </Button>
  <Button class="nes-btn bits-btn" variant="ghost" size="sm" onclick={ clearMessages } disabled={messages.length <= 1}> <Trash2 class="h-4" /> </Button>
  <Dialog.Close> <Button class="nes-btn bits-btn" variant="ghost" size="sm">âœ•</Button> </Dialog.Close> </div> </div>
- <!-- Messages --> <ScrollArea class="flex-1 p-4 nes-container"> <!-- Added, nes-container --> <div bind:this={ messagesContainer } class="space-y-4">
+ <!-- Messages --> <ScrollArea class="flex-1 p-4 nes-container"> <!-- Added, nes-container --> <div bind:this={messagesContainer} class="space-y-4">
   {#each messages as message (message.id)} <div class="flex">
   {#if message.role === 'assistant'} <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center nes-container is-dark"> <!-- Adjusted, styling --> <Bot class="h-4 w-4 nes-text" /> <!-- Adjusted, color --> {/if}
   <div class="max-w-[80%] p-3" {message.role === 'user'
@@ -107,7 +107,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div> {/each}
   </div> </ScrollArea>
  <!-- Input --> <div class="p-4 border-t nes-container"> <!-- Changed, to, nes-container --> <div class="flex"> <div class="nes-field is-inline"> <!-- Added, nes-field --> <input type="text"
-              bind:this={ inputElement }; bind:value={ currentMessage } placeholder={isConnected ? 'Ask your legal question...', 'Connecting to AI service...'} disabled={!isConnected ?? isLoading} class="nes-input" <!-- Changed to, nes-input --> onkeydown={ handleKeydown } <!-- Changed to, onkeydown --> /> </div>
+              bind:this={inputElement}; bind:value={ currentMessage } placeholder={isConnected ? 'Ask your legal question...', 'Connecting to AI service...'} disabled={!isConnected ?? isLoading} class="nes-input" <!-- Changed to, nes-input --> onkeydown={ handleKeydown } <!-- Changed to, onkeydown --> /> </div>
  <Button onclick={ sendMessage } disabled={!currentMessage.trim() || !isConnected || isLoading} class="nes-btn is-primary bits-btn" <!-- Changed to nes-btn, is-primary --> >
   {#if isLoading} <Loader2 class="h-4 w-4" /> {:else} <Send class="h-4" /> {/if}
   </Button> </div>

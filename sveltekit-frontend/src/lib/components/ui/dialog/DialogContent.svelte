@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	// Migrated to $effect
+	import { getContext } from 'svelte';
+// Migrated to $effect
 	import { scale } from 'svelte/transition';
 	import type { DialogContentProps } from './types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props extends DialogContentProps {
 		children?: Snippet;
@@ -41,7 +41,6 @@ let contentRef = $state<HTMLDivElement | null>(null);
 	}
 
 	$effect(() => {
-
 		if (dialogContext?.open) {
 			previousActiveElement = document.activeElement;
 
@@ -56,17 +55,17 @@ let contentRef = $state<HTMLDivElement | null>(null);
 			}
 		}
 
-});
+		// Cleanup on effect destroy
+		return () => {
+			// Restore scroll
+			document.body.style.overflow = '';
 
-	// TODO: Add as cleanup in $effect: return () => {
-		// Restore scroll
-		document.body.style.overflow = '';
-
-		// Restore focus
-		if (previousActiveElement instanceof HTMLElement) {
-			previousActiveElement.focus();
-		}
-	}
+			// Restore focus
+			if (previousActiveElement instanceof HTMLElement) {
+				previousActiveElement.focus();
+			}
+		};
+	});
 
 	const defaultClass = `
 		fixed left-1/2 top-1/2 z-50
@@ -74,7 +73,7 @@ let contentRef = $state<HTMLDivElement | null>(null);
 		-translate-x-1/2 -translate-y-1/2
 		gap-4 border border-slate-700 bg-slate-900
 		p-6 shadow-lg duration-200
-		sm: rounded-lg, md:w-full
+		sm:rounded-lg md:w-full
 	`.replace(/\s+/g, ' ').trim();
 </script>
 

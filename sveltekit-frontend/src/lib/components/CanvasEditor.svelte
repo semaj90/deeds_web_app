@@ -8,13 +8,13 @@
 	save: (canvasState: CanvasState) => Promise<void>;
  }>();
 
- // Placeholder for canvas content
- let currentCanvasElements = $state(canvasState?.elements ?? []);
+ // Reactive derived value from props
+ let currentCanvasElements = $derived(canvasState?.elements ?? []);
 
  function handleSave() {
 		const updatedCanvasState: CanvasState = {
 			id: canvasState?.id ?? crypto.randomUUID(),
-			caseId,
+			caseId: reportId, // Use reportId from props
 			userId: '', // Will be set by server
 			stateData: currentCanvasElements,
 			createdAt: canvasState?.createdAt ?? new Date(),

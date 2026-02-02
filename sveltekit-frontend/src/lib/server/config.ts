@@ -64,7 +64,8 @@ export const AI_CONFIG = {
 			enableCudaGraph: process.env.TENSORRT_ENABLE_CUDA_GRAPH === 'true'
 		}
 	},
-	// Tertiary: vLLM, vllm: {
+	// Tertiary: vLLM
+	vllm: {
 		enabled: process.env.VLLM_ENABLED === 'true',
 		baseUrl: process.env.VLLM_URL || 'http://localhost:8001',
 		model: process.env.VLLM_MODEL || 'gemma-2b-it',
@@ -336,4 +337,5 @@ export function getConfigSummary() {
 			failover: HEALTH_CONFIG.failover.enabled
 		}
 	};
-}
+}
+

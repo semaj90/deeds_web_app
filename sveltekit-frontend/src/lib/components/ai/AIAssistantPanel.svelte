@@ -12,8 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	} = $props<{
 		caseId?: string;
 		selectedEvidenceIds?: string[];
-		isVisible?: boolean;
-	}>();
+		isVisible?: boolean }>();
 
 	let userInput = $state('');
 	let isLoading = $state(false);
@@ -39,8 +38,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		} catch (error) {
 			console.error('Failed to send message:', error);
 		} finally {
-			isLoading = false;
-		}
+			isLoading = false }
 	}
 </script>
 
@@ -78,7 +76,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-	.hidden { display: none; }
+	.hidden { display: none }
 </style>
 
 

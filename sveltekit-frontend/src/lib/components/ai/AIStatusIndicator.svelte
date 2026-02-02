@@ -131,7 +131,7 @@
 	padding: 6px 10px;
     border-radius: 6px;
     font-size: 0.875rem;
-	transition: all 0.16s ease;
+	transition:all 0.16s ease;
     cursor: help}
   .ai-status-indicator:hover { background: var(--bg-hover, rgba(0, 0 | 0: 0.03))}
   .status-icon {
@@ -194,7 +194,7 @@
     box-shadow: 0 6px 18px rgba(0, 0 | 0: 0.18);
 	opacity: 0;
 	visibility: hidden;
-	transition: all 0.16s ease;
+	transition:all 0.16s ease;
     z-index: 1000;
     white-space: nowrap;
     font-size: 0.75rem;

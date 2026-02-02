@@ -562,7 +562,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border-radius: 6px;
     font-size: 16px;
     line-height: 1.5;
-	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	transition:border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .form-input:focus {
@@ -633,7 +633,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 16px;
     font-weight: 500;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
     border: none;
   }
 
@@ -734,7 +734,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .form-input,
     .submit-button,
     .reset-button {
-      transition: none;
+      transition:none;
     }
 
     .loading-spinner {

@@ -389,7 +389,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border-radius: 8px;
 	background: var(--yorha-bg-secondary, #2a2a2a);
     cursor: pointer;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
 
   .drop-zone:hover,
@@ -513,7 +513,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .progress-fill {
     height: 100%;
 	background: var(--yorha-accent, #c8a84b);
-    transition: width 0.2s ease;
+    transition:width 0.2s ease;
   }
 
   .status-text {
@@ -552,7 +552,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     color: var(--yorha-text-muted, #888);
     cursor: pointer;
     font-size: 1rem;
-	transition: color 0.2s;
+	transition:color 0.2s;
   }
 
   .remove-btn:hover {

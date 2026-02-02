@@ -151,7 +151,7 @@
 		line-height: inherit;
 	cursor: pointer;
 		text-decoration: underline;
-	transition: all 0.2s;
+	transition:all 0.2s;
 	}
 
 	.citation-link.statute {

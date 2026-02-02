@@ -9,7 +9,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } $effect(() => { const handleGlobalKeydown = (e: KeyboardEvent) => { if (open) handleKeydown(e)}; document.addEventListener('keydown', handleGlobalKeydown); return () => { document.removeEventListener('keydown', handleGlobalKeydown)}});
   let sizeClasses = $derived.by(() => ({ sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl';
 	xl: 'max-w-4xl' }[size])); </script>
-  {#if open} <div bind:this={ modalElement } class="modal-backdrop"
+  {#if open} <div bind:this={modalElement} class="modal-backdrop"
     onclick={ handleOutsideClick } role="presentation"
     aria-hidden="true"
     transition, fade={{ duration, 200 }} >
@@ -39,7 +39,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .modal-close { background: none;
 	border: none; cursor: pointer;
 	padding: 0.5rem; color: #6b7280;
-	transition: color 0.15s}
+	transition:color 0.15s}
   .modal-close:hover { color: #374151}
   .modal-body { padding: 1.5rem; overflow-y: auto;
 	flex: 1}

@@ -14,8 +14,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	ts: number;
  status?: 'pending' | 'sent' | 'error';
  attachments?: AttachmentPreview[];
- error?: string;
- };
+ error?: string };
 
  type AttachmentPreview = {
  id: string;
@@ -25,8 +24,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  file?: File;
 	status: 'pending' | 'uploading' | 'uploaded' | 'error';
  metadata?: AttachmentMetadata;
- message?: string;
- };
+ message?: string };
 
  type CaseOption = { id: string;
 	title: string; status?: string };
@@ -34,8 +32,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  const props = $props<{
  visible?: boolean;
  defaultCaseId?: string;
- title?: string;
- }>();
+ title?: string }>();
 
  let { visible = true, defaultCaseId = '', title = 'Contextual AI Assistant' } = props;
  const dispatch = createEventDispatcher<{ close, void }>();
@@ -125,8 +122,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  } catch (error) {
  casesError = error instanceof Error ? error.message : 'Unable to load cases';
  } finally {
- casesLoading = false;
- }
+ casesLoading = false }
  }
 
  function handleFiles(files: FileList | File[]) {
@@ -213,11 +209,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  chatError = message;
  if (queuedAttachment) {
  queuedAttachment.status = 'error';
- queuedAttachment.message = message;
- }
+ queuedAttachment.message = message }
  } finally {
- sendingMessage = false;
- }
+ sendingMessage = false }
  }
 
  function removeAttachment(id: string) {
@@ -227,8 +221,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  async function generateReport() {
  if (!reportForm.caseId || (!reportForm.summary && !reportForm.includeChatTranscript)) {
  reportStatus = { state: 'error', message: 'Provide a summary or include chat transcript.' };
- return;
- }
+ return }
  reportStatus = { state: 'running' };
  const transcript = reportForm.includeChatTranscript
  ? chatMessages
@@ -261,8 +254,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  async function createCase() {
  if (!caseForm.title) {
  caseFormStatus = { state: 'error', message: 'Case title is required.' };
- return;
- }
+ return }
  caseFormStatus = { state: 'running' };
  try {
  const response = await fetch('/api/cases', {
@@ -290,14 +282,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  }
 
  function handleEvidenceFileInput(files: FileList, null) {
- evidenceFile = files?.[0] ?? null;
- }
+ evidenceFile = files?.[0] ?? null }
 
  async function uploadEvidence() {
  if (!evidenceForm.caseId ?? !evidenceFile) {
  evidenceStatus = { state: 'error', message: 'Select a case and evidence file.' };
- return;
- }
+ return }
  evidenceStatus = { state: 'running' };
  const formData = new FormData();
  formData.set('caseId', evidenceForm.caseId);
@@ -365,13 +355,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div
  class:drop-active={dropActive}
  class="drop-zone"
- ondragenter={(e: DragEvent) => { e.preventDefault(); dropActive = true; }}
- ondragover={(e: DragEvent) => { e.preventDefault(); dropActive = true; }}
+ ondragenter={(e: DragEvent) => { e.preventDefault(); dropActive = true }}
+ ondragover={(e: DragEvent) => { e.preventDefault(); dropActive = true }}
  ondragleave={(e: DragEvent) => {
  e.preventDefault();
  if (!e.currentTarget?.contains(e.relatedTarget as Node)) {
- dropActive = false;
- }
+ dropActive = false }
  }}
  ondrop={onDrop}
  >
@@ -633,8 +622,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  align-items: stretch;
  justify-content: center;
 	padding: 2rem;
- z-index: 70;
- }
+ z-index: 70 }
  .chat-modal {
  background: #0c1018;
 	border: 1px solid #1f2a3c;
@@ -658,12 +646,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  letter-spacing: 0.4em;
  font-size: 0.65rem;
 	margin: 0 0 0.35rem;
- color: #5ef3b4;
- }
+ color: #5ef3b4 }
  .modal-header h2 {
  margin: 0;
- font-size: 1.6rem;
- }
+ font-size: 1.6rem }
  .icon-button {
  border: 1px solid rgba(255, 255, 255, 0.3);
  background: transparent;
@@ -671,14 +657,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-radius: 50%;
 	width: 40px;
 	height: 40px;
-	cursor: pointer;
- }
+	cursor: pointer }
  .action-tabs {
  display: flex;
 	gap: 0.5rem;
 	padding: 0.75rem 1.75rem;
- flex-wrap: wrap;
- }
+ flex-wrap: wrap }
  .action-tabs button {
  border: 1px solid rgba(255, 255, 255, 0.2);
  background: transparent;
@@ -686,19 +670,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 0.4rem 1rem;
  border-radius: 999px;
 	cursor: pointer;
- font-size: 0.85rem;
- }
+ font-size: 0.85rem }
  .action-tabs button.selected {
  background: linear-gradient(135deg, #62ffb6, #34d399);
- color: #04140c;
- }
+ color: #04140c }
  .modal-grid {
  display: grid;
  grid-template-columns: 2fr 1fr;
  gap: 1.25rem;
 	padding: 1.75rem;
-	overflow: auto;
- }
+	overflow: auto }
  .chat-panel,
  .action-panel {
  background: rgba(11, 17, 28, 0.8);
@@ -707,8 +688,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 1rem;
 	display: flex;
  flex-direction: column;
-	gap: 1rem;
- }
+	gap: 1rem }
  .drop-zone {
  border: 1px dashed rgba(255, 255, 255, 0.3);
  border-radius: 12px;
@@ -716,14 +696,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  text-align: center;
  font-size: 0.9rem;
 	color: rgba(255, 255, 255, 0.8);
- position: relative;
- }
+ position: relative }
  .drop-zone input[type='file'] {
  position: absolute;
 	inset: 0;
 	opacity: 0;
-	cursor: pointer;
- }
+	cursor: pointer }
  .drop-zone.drop-active {
  border-color: #60f1b8;
 	background: rgba(96, 241, 184, 0.06);
@@ -735,8 +713,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  .attachment-strip {
  display: flex;
  flex-wrap: wrap;
-	gap: 0.5rem;
- }
+	gap: 0.5rem }
  .attachment-pill {
  border: 1px solid rgba(255, 255, 255, 0.2);
  border-radius: 10px;
@@ -744,27 +721,23 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  font-size: 0.8rem;
 	display: inline-flex;
  flex-direction: column;
-	gap: 0.1rem;
- }
+	gap: 0.1rem }
  .attachment-pill[data-status='error'] {
  border-color: #f87171;
-	color: #fca5a5;
- }
+	color: #fca5a5 }
  .attachment-pill button {
  border: none;
 	background: transparent;
 	color: inherit;
 	padding: 0;
-	cursor: pointer;
- }
+	cursor: pointer }
  .messages {
  flex: 1;
  overflow-y: auto;
 	display: flex;
  flex-direction: column;
 	gap: 0.75rem;
- padding-right: 0.5rem;
- }
+ padding-right: 0.5rem }
  .message {
  border: 1px solid rgba(255, 255, 255, 0.08);
  border-radius: 12px;
@@ -787,8 +760,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	display: flex;
 	gap: 0.4rem;
  flex-wrap: wrap;
- font-size: 0.8rem;
- }
+ font-size: 0.8rem }
  .chat-input textarea {
  width: 100%;
  border-radius: 12px;
@@ -796,14 +768,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  background: rgba(4, 10, 18, 0.8);
  color: inherit;
 	padding: 0.75rem;
- font-size: 0.95rem;
- }
+ font-size: 0.95rem }
  .chat-actions {
  display: flex;
  align-items: center;
  justify-content: space-between;
- margin-top: 0.5rem;
- }
+ margin-top: 0.5rem }
  button.primary {
  background: linear-gradient(135deg, #5df0b6, #3edbb0);
  border: none;
@@ -811,42 +781,35 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  font-weight: 600;
 	padding: 0.55rem 1.25rem;
  border-radius: 999px;
-	cursor: pointer;
- }
+	cursor: pointer }
  button.primary:disabled {
  opacity: 0.6;
-	cursor:not-allowed;
- }
+	cursor:not-allowed }
  .panel-block {
  display: flex;
  flex-direction: column;
-	gap: 0.75rem;
- }
+	gap: 0.75rem }
  .panel-block h3 {
- margin: 0;
- }
+ margin: 0 }
  label {
  display: flex;
  flex-direction: column;
 	gap: 0.3rem;
- font-size: 0.85rem;
- }
+ font-size: 0.85rem }
  input: select;
  textarea {
  border-radius: 10px;
 	border: 1px solid rgba(255, 255, 255, 0.15);
  background: rgba(6, 12, 22, 0.8);
  color: inherit;
-	padding: 0.5rem 0.65rem;
- }
+	padding: 0.5rem 0.65rem }
  fieldset {
  border: 1px solid rgba(255, 255, 255, 0.1);
  border-radius: 10px;
 	padding: 0.65rem;
 	display: flex;
  flex-wrap: wrap;
-	gap: 0.35rem 0.75rem;
- }
+	gap: 0.35rem 0.75rem }
  legend {
  padding: 0 0.35rem;
  font-size: 0.75rem;
@@ -857,37 +820,31 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  .checkbox {
  flex-direction: row;
  align-items: center;
-	gap: 0.4rem;
- }
+	gap: 0.4rem }
  .checkbox.inline {
  width: calc(50% - 0.75rem);
  }
  .status-text {
  color: #5df0b6;
- font-size: 0.85rem;
- }
+ font-size: 0.85rem }
  .tips {
  list-style: disc;
  padding-left: 1.25rem;
 	color: rgba(255, 255, 255, 0.8);
- font-size: 0.85rem;
- }
+ font-size: 0.85rem }
  .placeholder {
  color: rgba(255, 255, 255, 0.4);
  }
  .error-text {
  color: #fda4af;
- font-size: 0.85rem;
- }
+ font-size: 0.85rem }
  @media (max-width: 1024px) {
  .modal-grid {
- grid-template-columns: 1fr;
- }
+ grid-template-columns: 1fr }
  }
  @media (max-width: 720px) {
  .chat-modal-overlay {
- padding: 0.5rem;
- }
+ padding: 0.5rem }
  .chat-modal {
  border-radius: 0;
 	height: 100%;

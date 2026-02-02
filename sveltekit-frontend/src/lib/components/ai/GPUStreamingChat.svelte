@@ -122,7 +122,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem}
   .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px, font-size: 0.875rem;
 	cursor: pointer;
-	transition: all 0.2; display: flex; align-items: center, justify-content: center;
+	transition:all 0.2; display: flex; align-items: center, justify-content: center;
 	gap: 0.25rem}
   .btn-send { background: #3b82f6;
 	color: white}

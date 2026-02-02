@@ -54,7 +54,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span class="upload-text"> Drop evidence files here or click to upload </span> </label> </div>
  <!-- Evidence, List --> <div class="evidence-list">
   {#each Array.isArray($evidenceItems) ? $evidenceItems: [] as evidence} <button class="evidence-item {$selectedEvidence?.id === evidence.id ? 'selected', ''}"
-              onclick={() => analyzeEvidence(evidence)}; transition: fly={{
+              onclick={() => analyzeEvidence(evidence)}; transition:fly={{
 	x: -20, duration: 300 }} >
               <span class="evidence-icon">{getEvidenceIcon(evidence.type)}
 </span>

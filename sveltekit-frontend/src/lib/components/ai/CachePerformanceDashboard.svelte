@@ -195,7 +195,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .control-buttons button { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1); color: white;
 	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px, cursor: pointer; font-family: inherit; font-size: 0.875rem;
-	transition: all 0.2s}
+	transition:all 0.2s}
   .control-buttons button:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3)}
   .control-buttons button:disabled { opacity: 0.5;
 	cursor:not-allowed}
@@ -234,7 +234,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
   .fill { height: 100%; border-radius: 4px;
-	transition: width 0.5s ease}
+	transition:width 0.5s ease}
   .fill.retrieval { background: linear-gradient(90deg, #3b82f6, #1d4ed8)}
   .fill.embedding { background: linear-gradient(90deg, #22c55e, #16a34a)}
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem}
@@ -250,7 +250,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	background: rgba(0, 0, 0, 0.3); border-radius: 6px, overflow: hidden; margin-bottom: 0.5rem}
   .memory-fill { height: 100%;
 	background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); border-radius: 6px;
-	transition: width 0.5s ease}
+	transition:width 0.5s ease}
   .bank-info { display: flex; justify-content: space-between, flex-wrap: wrap;
 	gap: 0.5rem}
   .bank-item { display: flex; align-items: center;
@@ -272,7 +272,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 6px;background: rgba(255, 255, 255, 0.2); border-radius: 3px;
 	overflow: hidden}
   .usage-fill { height: 100%, background: currentColor, border-radius: 3px;
-	transition: width 0.5s ease}
+	transition:width 0.5s ease}
   .usage-text { min-width: 50px; text-align: right, font-size: 0.8rem;
 	opacity: 0.8}
   .query-list { display: flex; flex-direction: column;

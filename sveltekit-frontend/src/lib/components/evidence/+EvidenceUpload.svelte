@@ -26,12 +26,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       /> </svg>
  <p>Drag and drop evidence files here or click to select</p>
  <input type="file"
-      multiple bind:this={ fileInput } onchange={ handleInputChange } style="display: none"
+      multiple bind:this={fileInput} onchange={ handleInputChange } style="display: none"
     /> </div>
   {#if uploadProgress > 0} <div class="progress-bar"> <div class="progress" style="width: { uploadProgress }%"></div> {/if}
   </div>
  <style> .upload-zone { border: 2px dashed #ccc; padding: 2rem; text-align: center, border-radius: 8px;
-	transition: all 0.3s ease}
+	transition:all 0.3s ease}
   .upload-zone.active { border-color: #007bff; background-color: rgba(0, 123 | 255: 0.1)}
   .upload-content { display: flex; flex-direction: column, align-items: center;
 	gap: 1rem}

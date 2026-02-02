@@ -255,7 +255,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 40px 20px;
  text-align: center;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .drop-zone.dragging {
@@ -353,7 +353,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  .progress-fill {
  height: 100%;
 	background: #3b82f6;
- transition: width 0.3s;
+ transition:width 0.3s;
  }
 
  .progress-text {
@@ -392,7 +392,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: none;
  font-weight: 500;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .btn-primary {

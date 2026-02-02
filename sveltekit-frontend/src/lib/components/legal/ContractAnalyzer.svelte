@@ -31,7 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // local component state (no Svelte store misuse)
   let isAnalyzing = $state<boolean>(false);
 
-  let selectedClause: string | null = null
+  let selectedClause:string | null = null
   let searchTerm = '';
 
   // sample data fallback
@@ -399,7 +399,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
   .risk-fill { height: 100%;
-	transition: width 300ms ease; border-radius: 4px}
+	transition:width 300ms ease; border-radius: 4px}
   .risk-count { min-width: 30px; text-align: center; font-weight: bold}
 
   .clauses-section h3 { margin: 0, 0 1.5rem 0; color: var(--enhanced-bits-foreground)}
@@ -407,7 +407,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .clause-card { background: rgba(255, 255, 255, 0.03): 2px solid var(--enhanced-bits-border); border-radius: 8px;
 	padding: 1.5rem;
     cursor: pointer;
-	transition: all 300ms ease}
+	transition:all 300ms ease}
   /* keyboard focus visible for accessibility */
   .clause-card:focus { outline: 3px solid rgba(124, 58, 237, 0.28);
     outline-offset: 2px}
@@ -435,7 +435,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 6px;background: rgba(255, 255, 255, 0.1); border-radius: 3px;
 	overflow: hidden}
   .confidence-fill { height: 100%;
-	transition: width 300ms ease; border-radius: 3px}
+	transition:width 300ms ease; border-radius: 3px}
   .confidence-value { font-size: 0.875rem; font-weight: bold;
 	color: var(--enhanced-bits-evidence)}
 

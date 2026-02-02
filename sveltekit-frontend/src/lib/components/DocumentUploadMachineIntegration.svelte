@@ -14,9 +14,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     $effect(() => {
 
         const sub = actor.subscribe((s) => {
-            snapshot = s;
-        
-});
+            snapshot = s });
         return () => {
             sub.unsubscribe();
             actor.stop();
@@ -46,12 +44,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     function handleDragOver(e: DragEvent) {
         e.preventDefault();
-        dragOver = true;
-    }
+        dragOver = true }
 
     function handleDragLeave() {
-        dragOver = false;
-    }
+        dragOver = false }
 
     function handleKeyDown(e: KeyboardEvent) {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -94,8 +90,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             class:drag-over={dragOver}
             ondragover={(e: DragEvent) => {
                 e.preventDefault();
-                dragOver = true;
-            }}
+                dragOver = true }}
             ondragleave={() => (dragOver = false)}
             ondrop={handleDrop}
             onclick={() => fileInput?.click()}
@@ -240,8 +235,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 <style>
     .drop-zone.drag-over {
         background-color: rgba(0, 0, 0, 0.05);
-        border-color: black;
-    }
+        border-color: black }
 
     .progress-fill {
         background-image: linear-gradient(
@@ -255,12 +249,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             transparent
         );
         background-size: 20px 20px;
-        animation: progress-stripes 1s linear infinite;
-    }
+        animation: progress-stripes 1s linear infinite }
 
     @keyframes progress-stripes {
-        from { background-position: 0 0; }
-        to { background-position: 20px 0; }
+        from { background-position: 0 0 }
+        to { background-position: 20px 0 }
     }
 </style>
 

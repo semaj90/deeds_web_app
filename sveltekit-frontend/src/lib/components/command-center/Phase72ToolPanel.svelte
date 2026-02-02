@@ -260,7 +260,7 @@
 	cursor: pointer;
     font-size: 1rem;
 	color: var(--text-2);
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .close-btn:hover {
@@ -288,7 +288,7 @@
 	background: var(--surface-2);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-	transition: all 0.2s;
+	transition:all 0.2s;
   }
 
   .tool-card:hover {
@@ -388,7 +388,7 @@
     font-size: 0.875rem;
     font-weight: 600;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .run-btn {

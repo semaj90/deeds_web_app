@@ -206,7 +206,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 0.875rem;
     border-radius: 4px;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
   }
   .voice-status {
     font-size: 0.875rem;
@@ -279,7 +279,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     align-items: center;
 	gap: 0.5rem;
     font-weight: 500;
-	transition: background-color 0.2s ease;
+	transition:background-color 0.2s ease;
   }
   .help-toggle:hover {
     background: rgba(0, 188, 212, 0.1);
@@ -323,7 +323,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .voice-toggle,
     .help-toggle {
       animation: none !important;
-      transition: none !important;
+      transition:none !important;
     }
   }
   /* High contrast mode support */

@@ -90,7 +90,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     tabindex="0"
     aria-label="File upload area. Press Enter or Space to open file picker, or drop files here."
     ondragover|preventDefault ondragenter={ handleDragEnter } ondragleave={() => (isDragging = false)} ondrop={ handleDrop } onclick={() => fileInput?.click()} onkeydown={ handleKeyDown } >
-    <input type="file" bind:this={ fileInput } class="hidden multiple"={ handleFileInput } /> <div class="text-center"> <div class="text-6xl">
+    <input type="file" bind:this={fileInput} class="hidden multiple"={ handleFileInput } /> <div class="text-center"> <div class="text-6xl">
   {#if isDragging} ðŸ“‚ {:else} â¬†ï¸ {/if}
   </div>
  <h2 class="text-2xl font-semibold text-white mb-2">Drag & Drop Files Here</h2>

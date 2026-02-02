@@ -114,7 +114,7 @@
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			transition: scale={{
+			transition:scale={{
 	duration: 150, start: 0.95 }}
 			class="{contentClass} {sizeClass()} { className }"
 			onclick={ handleContentClick }

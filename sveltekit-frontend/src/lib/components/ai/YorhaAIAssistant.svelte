@@ -40,7 +40,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="text-sm text-muted-foreground flex items-center">
   {#if isConnecting} <Loader2 class="h-4 w-4" /> Connecting... {:else if isConnected} <Wifi class="h-4 w-4" /> Connected {:else} <WifiOff class="h-4 w-4" /> Disconnected {/if}
   </div> </HeaderAny>
- <Separator /> <ScrollArea class="flex-1" viewportClass="p-4"> <div class="space-y-4" bind:this={ chatContainer }>
+ <Separator /> <ScrollArea class="flex-1" viewportClass="p-4"> <div class="space-y-4" bind:this={chatContainer}>
   {#each chatSession.messages as message (message.id)} {#if message.role === 'system'} <div class="text-center text-xs">{message.content}</div> {:else} <!-- Fix, compute classes instead of embedding JS inside a, plain, string --> <div class={message.role === 'user' ? 'flex items-start gap-3 justify-end', 'flex, items-start, gap-3'}>
   {#if message.role === 'assistant'} <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary"
                 > <Bot class="h-5" /> </div> {/if}

@@ -13,21 +13,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  isPinned: boolean;
 	createdBy: string | null; // Changed from number to string for UUID
  createdAt: string;
-	updatedAt: string;
- }
+	updatedAt: string }
 
  interface EvidenceRef {
  id: string;
 	evidenceId: string;
  title: string;
 	evidenceType: string;
- fileName?: string;
- }
+ fileName?: string }
 
  interface Props {
  caseId: string;
- onClose?: () => void;
- }
+ onClose?: () => void }
 
  let { caseId, onClose }: Props = $props();
 
@@ -38,8 +35,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  createdAt?: string;
  updatedAt?: string;
  pinned?: boolean;
- score?: number;
- };
+ score?: number };
 
  let searchQuery = $state("");
  let searching = $state(false);
@@ -54,8 +50,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			searchHits = [];
 			searchError = null;
 			searching = false;
-			return;
-		}
+			return }
 
 		searching = true;
 		searchError = null;
@@ -80,8 +75,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			searchError = e?.message ?? "Search error";
 			searchHits = [];
 		} finally {
-			searching = false;
-		}
+			searching = false }
 	}
 
 	function onSearchInput(e: Event) {
@@ -97,8 +91,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			searchQuery = "";
 			searchHits = [];
 			searchError = null;
-			return;
-		}
+			return }
 
 		try {
 			const res = await fetch(`/api/cases/${caseId}/notes/${hit.id}`);
@@ -113,8 +106,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		} finally {
 			searchQuery = "";
 			searchHits = [];
-			searchError = null;
-		}
+			searchError = null }
 	}
 
 	let notes = $state<CaseNote[]>([]);
@@ -191,8 +183,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to load notes';
 		} finally {
-			isLoading = false;
-		}
+			isLoading = false }
 	}
 
 	function selectNote(note: CaseNote) {
@@ -213,14 +204,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		selectedNote = null;
 		noteTitle = '';
 		noteContent = '';
-		isNewNote = true;
-	}
+		isNewNote = true }
 
 	async function saveNote() {
 		if (!noteContent.trim()) {
 			error = 'Note content cannot be empty';
-			return;
-		}
+			return }
 
 		isSaving = true;
 		error = null;
@@ -245,8 +234,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 				// Update baselines after successful save
 				lastSavedTitle = data.note.title || '';
-				lastSavedContent = data.note.content;
-			} else if (selectedNote) {
+				lastSavedContent = data.note.content } else if (selectedNote) {
 				// Update existing note
 				const response = await fetch(`/api/cases/${caseId}/notes/${selectedNote.id}`, {
 					method: 'PATCH',
@@ -264,13 +252,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 				// Update baselines after successful save
 				lastSavedTitle = data.note.title || '';
-				lastSavedContent = data.note.content;
-			}
+				lastSavedContent = data.note.content }
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to save note';
 		} finally {
-			isSaving = false;
-		}
+			isSaving = false }
 	}
 
 	async function deleteNote(noteId: string) {
@@ -287,8 +273,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				selectedNote = null;
 				noteTitle = '';
 				noteContent = '';
-				isNewNote = false;
-			}
+				isNewNote = false }
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to delete note';
 		}
@@ -323,8 +308,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			console.error('Failed to load evidence refs:', err);
 			evidenceRefs = [];
 		} finally {
-			isLoadingRefs = false;
-		}
+			isLoadingRefs = false }
 	}
 
 	async function removeEvidenceRef(noteId: string, evidenceId: string) {
@@ -344,8 +328,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	async function exportAIMemo() {
  if (notes.length === 0) {
  error = 'No notes to export';
- return;
- }
+ return }
 
  isExportingMemo = true;
  error = null;
@@ -366,10 +349,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <head>
  <title>AI Legal Memo</title>
  <style>
- body { font-family: Arial, sans-serif, margin: 40px, line-height: 1.6; }
- h1 { color: #333; }
+ body { font-family: Arial, sans-serif, margin: 40px, line-height: 1.6 }
+ h1 { color: #333 }
  pre { white-space: pre-wrap;
-	background: #f5f5f5; padding: 20px; border-radius: 5px; }
+	background: #f5f5f5; padding: 20px; border-radius: 5px }
  </style>
  </head>
  <body>
@@ -386,15 +369,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to export AI memo';
  } finally {
- isExportingMemo = false;
- }
+ isExportingMemo = false }
  }
 
  async function exportPDF() {
  if (notes.length === 0) {
  error = 'No notes to export';
- return;
- }
+ return }
 
  isExportingPDF = true;
  error = null;
@@ -418,8 +399,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to export PDF';
  } finally {
- isExportingPDF = false;
- }
+ isExportingPDF = false }
  }
 
  function formatDate(dateStr: string): string {
@@ -480,7 +460,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {#if searchMode}
  <button
  class="rounded-lg border border-slate-700 px-3 py-2 text-sm"
- onclick={() => { searchQuery = ""; searchHits = []; searchError = null; }}
+ onclick={() => { searchQuery = ""; searchHits = []; searchError = null }}
  >
  Clear
  </button>
@@ -679,8 +659,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  color: var(--yorha-text-primary, #e0e0e0);
  border: 1px solid var(--yorha-border, #606060);
  border-radius: 8px;
-	overflow: hidden;
- }
+	overflow: hidden }
 
  .notes-header {
  display: flex;
@@ -694,13 +673,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  .notes-header h2 {
  margin: 0;
  font-size: 1.25rem;
- font-weight: 600;
- }
+ font-weight: 600 }
 
  .header-actions {
  display: flex;
-	gap: 0.5rem;
- }
+	gap: 0.5rem }
 
  .btn-new {
  padding: 0.5rem 1rem;
@@ -709,8 +686,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: none;
  border-radius: 4px;
 	cursor: pointer;
- font-weight: 500;
- }
+ font-weight: 500 }
 
  .btn-export {
  padding: 0.5rem 0.75rem;
@@ -721,8 +697,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;
  font-size: 0.85rem;
  font-weight: 500;
-	transition: all 0.2s;
- }
+	transition:all 0.2s }
 
 .btn-export:hover:not(:disabled) {
  background: var(--yorha-accent, #3cbcfc);
@@ -732,8 +707,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  .btn-export:disabled {
  opacity: 0.5;
-	cursor:not-allowed;
- }
+	cursor:not-allowed }
 
  .btn-close {
  padding: 0.5rem;
@@ -741,21 +715,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  color: var(--yorha-text-secondary, #a0a0a0);
  border: 1px solid var(--yorha-border, #606060);
  border-radius: 4px;
-	cursor: pointer;
- }
+	cursor: pointer }
 
 .error-banner {
  padding: 0.75rem 1rem;
  background: rgba(239, 68, 68, 0.2);
  color: #ef4444;
- border-bottom: 1px solid #ef4444;
- }
+ border-bottom: 1px solid #ef4444 }
 
  .notes-content {
  display: flex;
 	flex: 1;
- overflow: hidden;
- }
+ overflow: hidden }
 
  .notes-list {
  width: 280px;
@@ -763,16 +734,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  overflow-y: auto;
 	background: var(--yorha-bg-secondary, #1a1a1a);
  display: flex;
- flex-direction: column;
- }
+ flex-direction: column }
 
 :global(.search-container) {
  position: relative;
 	padding: 0.75rem;
  border-bottom: 1px solid var(--yorha-border, #606060);
  background: var(--yorha-bg-secondary, #1a1a1a);
- flex-shrink: 0;
- }
+ flex-shrink: 0 }
 
 :global(.search-input) {
  width: 100%;
@@ -781,8 +750,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  border: 1px solid var(--yorha-border, #606060);
  border-radius: 4px;
 	color: inherit;
- font-size: 0.85rem;
- }
+ font-size: 0.85rem }
 
 :global(.search-input:focus) {
  outline: none;
@@ -812,12 +780,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  border-bottom: 1px solid var(--yorha-border, #606060);
  font-size: 0.8rem;
 	color: var(--yorha-text-secondary, #a0a0a0);
- flex-shrink: 0;
- }
+ flex-shrink: 0 }
 
 :global(.results-count) {
- font-weight: 500;
- }
+ font-weight: 500 }
 
 :global(.clear-search) {
  padding: 0.25rem 0.5rem;
@@ -826,8 +792,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  border-radius: 3px;
 	cursor: pointer;
  color: var(--yorha-text-secondary, #a0a0a0);
- font-size: 0.75rem;
- }
+ font-size: 0.75rem }
 
 :global(.clear-search:hover) {
  background: rgba(60, 188, 252, 0.1);
@@ -838,8 +803,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  padding: 2rem 1rem;
  text-align: center;
 	color: var(--yorha-text-secondary, #a0a0a0);
- font-size: 0.85rem;
- }
+ font-size: 0.85rem }
 
  .loading, .empty-state, .no-selection {
  padding: 2rem;
@@ -854,8 +818,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  color: #000;
 	border: none;
  border-radius: 4px;
-	cursor: pointer;
- }
+	cursor: pointer }
 
  .note-item {
  display: block;
@@ -867,8 +830,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  border-bottom: 1px solid var(--yorha-border, #606060);
  cursor: pointer;
 	color: inherit;
- transition: background 0.2s;
- }
+ transition:background 0.2s }
 
 .note-item:hover {
  background: rgba(60, 188, 252, 0.1);
@@ -887,16 +849,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  display: flex;
  justify-content: space-between;
  align-items: center;
- margin-bottom: 0.5rem;
- }
+ margin-bottom: 0.5rem }
 
  .note-title {
  font-weight: 600;
  font-size: 0.9rem;
 	overflow: hidden;
  text-overflow: ellipsis;
- white-space: nowrap;
- }
+ white-space: nowrap }
 
  .pin-btn {
  padding: 0.25rem;
@@ -904,12 +864,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  border: none;
 	cursor: pointer;
  opacity: 0.5;
-	transition: opacity 0.2s;
- }
+	transition:opacity 0.2s }
 
  .pin-btn:hover, .pin-btn.active {
- opacity: 1;
- }
+ opacity: 1 }
 
  .note-preview {
  margin: 0;
@@ -921,8 +879,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	display: -webkit-box;
  -webkit-line-clamp: 2;
  line-clamp: 2;
- -webkit-box-orient: vertical;
- }
+ -webkit-box-orient: vertical }
 
  .note-date {
  display: block;
@@ -939,15 +896,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  color: #000;
  font-size: 0.65rem;
  font-weight: 600;
- border-radius: 2px;
- }
+ border-radius: 2px }
 
  .editor-panel {
  flex: 1;
 	display: flex;
  flex-direction: column;
-	overflow: hidden;
- }
+	overflow: hidden }
 
  .editor-header {
  display: flex;
@@ -955,8 +910,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  align-items: center;
 	padding: 1rem;
  border-bottom: 1px solid var(--yorha-border, #606060);
- gap: 1rem;
- }
+ gap: 1rem }
 
  .title-input {
  flex: 1;
@@ -965,8 +919,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  border: 1px solid var(--yorha-border, #606060);
  border-radius: 4px;
 	color: inherit;
- font-size: 1rem;
- }
+ font-size: 1rem }
 
  .title-input:focus {
  outline: none;
@@ -975,8 +928,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  .editor-actions {
  display: flex;
-	gap: 0.5rem;
- }
+	gap: 0.5rem }
 
  .btn-save {
  padding: 0.5rem 1rem;
@@ -985,21 +937,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: none;
  border-radius: 4px;
 	cursor: pointer;
- font-weight: 500;
- }
+ font-weight: 500 }
 
  .btn-save:disabled {
  opacity: 0.5;
-	cursor:not-allowed;
- }
+	cursor:not-allowed }
 
  .btn-delete {
  padding: 0.5rem;
 	background: transparent;
  border: 1px solid #ef4444;
  border-radius: 4px;
-	cursor: pointer;
- }
+	cursor: pointer }
 
 .btn-delete:hover {
  background: rgba(239, 68, 68, 0.2);
@@ -1008,8 +957,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  .editor-body {
  flex: 1;
 	padding: 1rem;
- overflow: auto;
- }
+ overflow: auto }
 
  .editor-footer {
  padding: 0.5rem 1rem;
@@ -1036,8 +984,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  padding: 1rem;
  text-align: center;
 	color: var(--yorha-text-secondary, #a0a0a0);
- font-size: 0.85rem;
- }
+ font-size: 0.85rem }
 
  .no-refs small {
  display: block;
@@ -1047,8 +994,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  .refs-list {
  max-height: 200px;
- overflow-y: auto;
- }
+ overflow-y: auto }
 
 .ref-item {
  display: flex;
@@ -1067,8 +1013,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  flex: 1;
 	display: flex;
  flex-direction: column;
-	gap: 0.25rem;
- }
+	gap: 0.25rem }
 
  .ref-title {
  font-weight: 500;
@@ -1080,14 +1025,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  font-size: 0.75rem;
 	color: var(--yorha-accent, #3cbcfc);
  text-transform: uppercase;
- font-weight: 600;
- }
+ font-weight: 600 }
 
  .ref-file {
  font-size: 0.75rem;
 	color: var(--yorha-text-secondary, #a0a0a0);
- font-style: italic;
- }
+ font-style: italic }
 
  .ref-remove {
  padding: 0.25rem;
@@ -1097,8 +1040,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;
  color: #ef4444;
  font-size: 0.8rem;
-	transition: all 0.2s;
- }
+	transition:all 0.2s }
 
 .ref-remove:hover {
  background: rgba(239, 68, 68, 0.2);

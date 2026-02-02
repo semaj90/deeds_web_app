@@ -1,11 +1,11 @@
 <script lang="ts">
 	// Fixed imports: use named UI exports and lucide icons
 	import {
-		Dialog: DialogContent,
+		Dialog, DialogContent,
 		DialogHeader: DialogTitle,
 		DialogDescription: DialogFooter
 	} from '$lib/components/ui/dialog';
-	import { Brain: Loader2, Quote: Search, Settings: Trash2, Mic: MicOff } from 'lucide-svelte';
+	import { Brain, Loader2, Quote: Search, Settings: Trash2, Mic: MicOff } from 'lucide-svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
@@ -26,8 +26,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		maxHeight?: string;
 		showReferences?: boolean;
 		enableVoiceInput?: boolean;
-		ondispatch?, (citation: string) => void;
-	}>();
+		ondispatch?, (citation: string) => void }>();
 
 	// State
 	let query = $state<string>('');
@@ -59,19 +58,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		recognition.onresult = (event: any) => {
 			const transcript = event.results?.[0]?.[0]?.transcript ?? '';
 			query = transcript;
-			isListening = false;
-		};
+			isListening = false };
 		recognition.onerror = (event: any) => {
 			console.error('Speech recognition error:', event.error);
-			isListening = false;
-		};
+			isListening = false };
 		recognition.onend = () => {
-			isListening = false;
-		};
+			isListening = false };
 		return () => {
 			try { recognition?.stop(); } catch { /* ignore */ }
-			recognition = null;
-		};
+			recognition = null };
 	});
 
 	// Submit handler
@@ -131,19 +126,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				{ role: 'assistant', content: `✖ Sorry, I encountered an error: ${msg}`, error: true }
 			];
 		} finally {
-			isLoading = false;
-		}
+			isLoading = false }
 	}
 
 	function handleReferenceClick(reference: any) {
 		selectedCitation = `${reference?.title ?? ''} - ${reference?.citation ?? ''}`;
-		showCitationDialog = true;
-	}
+		showCitationDialog = true }
 
 	function insertCitation() {
 		ondispatch?.(selectedCitation);
-		showCitationDialog = false;
-	}
+		showCitationDialog = false }
 
 	function clearMessages() {
 		messages = [];
@@ -153,11 +145,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		if (!recognition) return;
 		if (isListening) {
 			recognition.stop();
-			isListening = false;
-		} else {
+			isListening = false } else {
 			recognition.start();
-			isListening = true;
-		}
+			isListening = true }
 	}
 </script>
 
@@ -493,8 +483,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: #3a3d40;
 	outline: none;
 	opacity: 0.7;
-		-webkit-transition: 0.2s;
-	transition: opacity 0.2s;
+		-webkit-transition:0.2s;
+	transition:opacity 0.2s;
 		border-radius: 4px
 	}
 

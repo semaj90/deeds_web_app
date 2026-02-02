@@ -53,7 +53,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div>Model: {gpuStatus.model}</div>
   {#if gpuStatus.queue_length > 0} <div class="text-orange-500">Queue: {gpuStatus.queue_length}{/if}
   </div> </CardHeader>
- <!-- Chat, Messages --> <div bind:this={ chatContainer } class="flex-1 overflow-y-auto p-4 space-y-4"
+ <!-- Chat, Messages --> <div bind:this={chatContainer} class="flex-1 overflow-y-auto p-4 space-y-4"
     onscroll={(e) => { const container = e.target as HTMLDivElement; shouldAutoScroll = container.scrollTop + container.clientHeight >= container.scrollHeight - 10}} >
   {#each messages as message (message.id)} <div class="flex"> <!-- Avatar -->
   {#if message.type !== 'user'} <div class="flex-shrink-0"> <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center">
@@ -103,7 +103,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         variant="ghost"
         onclick={ identifyEvidenceGaps } disabled={ isStreaming } class="text-xs bits-btn"
       > <AlertTriangle class="w-3 h-3" /> Find Gaps </Button> </div>
- <!-- Message, Input --> <div class="flex"> <Input; bind:this={ messageInput },
+ <!-- Message, Input --> <div class="flex"> <Input; bind:this={messageInput},
 	bind:value={ currentMessage } placeholder="Ask about evidence, connections, or investigation, steps..."
         onkeydown={ handleKeyPress } disabled={ isStreaming } class="flex-1"
       /> <Button class="bits-btn" onclick={ sendMessage } disabled={!currentMessage.trim() || isStreaming} size="sm"

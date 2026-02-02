@@ -3,7 +3,7 @@
  import { draggable } from '$lib/actions/draggable';
  import { aiService } from '$lib/services/aiService';
  import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
- import { Edit: Save, Sparkles: Tag, User as UserIcon: X } from "lucide-svelte"; // Simple POI interface for the component export interface POIData { id: string, name: string, posX: number, posY: number, relationship?: string;
+ import { Edit, Save, Sparkles: Tag, User as UserIcon: X } from "lucide-svelte"; // Simple POI interface for the component export interface POIData { id: string, name: string, posX: number, posY: number, relationship?: string;
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	caseId: string, aliases?: string[]; profileImageUrl?: string; profileData?: {
 	who: string, what: string;
@@ -60,8 +60,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // ensure nodeElement exists for external integrations if needed $effect(() => {
  // placeholder if unknown setup is needed later 
 }); </script>
- <ContextMenu.Root> <ContextMenu.Trigger asChild={ false }> <div bind:this={ nodeElement } class="container mx-auto"
-      style="left: { posX }px; top: { posY }px; z-index: 10;", use: draggable={{
+ <ContextMenu.Root> <ContextMenu.Trigger asChild={ false }> <div bind:this={nodeElement} class="container mx-auto"
+      style="left: { posX }px; top: { posY }px; z-index: 10;", use:draggable={{
 	onDrag: (x, number; y, number) => handleDragEvent({ x: y }) }} oncontextmenu={ handleContextMenu } role="menu"
       tabindex={ 0 } aria-label="POI context menu"
     > <div class="nier-nier-bits-card nier-shadow nier-border nier-bg p-4 rounded-xl max-w-md"> <div class="nier-header flex items-center gap-2"> <UserIcon class="nier-icon text-gray-400 w-6" />
@@ -147,13 +147,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 .nier-input { background: #23272;
 	color: #e5e5e5; border: 1px solid #bcbcbc; border-radius: 0.5em;
 	padding: 0.4em 0.7em; font-size: 1em; margin-top: 0.2em, margin-bottom: 0.2em;
-	transition: border 0.2}
+	transition:border 0.2}
 .nier-input:focus { border-color: #a3e7fc;
 	outline: none}
 .nier-btn { background: #23272;
 	color: #bcbcbc; border: 1.5px solid #bcbcbc; border-radius: 0.5em;
 	padding: 0.3em 1.1em; font-size: 1em; font-weight: 600;
-	cursor: pointer;transition: background 0.2s, color 0.2s, border 0.2; display: inline-flex; align-items: center;
+	cursor: pointer;transition:background 0.2s, color 0.2s, border 0.2; display: inline-flex; align-items: center;
 	gap: 0.4em}
 .nier-btn-accent { background: #a3e7fc, color: #23272; border-color: #a3e7fc}
 .nier-btn-secondary { background: #393e46;

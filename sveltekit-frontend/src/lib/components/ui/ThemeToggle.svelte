@@ -76,7 +76,7 @@
     border-radius: 3px;
     color: var(--yorha-text-muted, #888);
     cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
     font-size: 0.85rem;
   }
 

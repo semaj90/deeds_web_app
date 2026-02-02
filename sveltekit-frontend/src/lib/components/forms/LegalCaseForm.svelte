@@ -442,7 +442,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #f59e0b, #d97706);
-    transition: width 0.3s ease;
+    transition:width 0.3s ease;
   }
 
   .progress-text {
@@ -466,7 +466,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     color: #94a3b8;
     cursor: pointer;
     border-radius: 0.25rem;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .tab-btn:hover {
@@ -515,7 +515,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     background: #1e293b;
     color: #f1f5f9;
     font-size: 0.875rem;
-    transition: border-color 0.2s;
+    transition:border-color 0.2s;
   }
 
   .form-field input:focus,
@@ -603,7 +603,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-radius: 0.5rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
     border: none;
   }
 

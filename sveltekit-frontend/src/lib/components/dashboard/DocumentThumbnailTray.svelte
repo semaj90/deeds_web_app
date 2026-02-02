@@ -118,7 +118,7 @@
 		font-size: 0.75rem;
 		font-weight: 600;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 		position: relative;
 		flex-shrink: 0;
 	}
@@ -242,7 +242,7 @@
 	cursor: pointer;
 		font-size: 1.5rem;
 		line-height: 1;
-	transition: color 0.2s ease;
+	transition:color 0.2s ease;
 	}
 
 	.error-modal-close:hover {
@@ -284,7 +284,7 @@
 		font-size: 0.875rem;
 		font-weight: 600;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 		border: var(--border-width) solid transparent;
 	}
 

@@ -72,7 +72,7 @@
     stroke-width: 1;
     stroke-dasharray: 4, 4;
     opacity: 0.5;
-	transition: all 0.2s;
+	transition:all 0.2s;
   }
 
   .connection-line.precedent {

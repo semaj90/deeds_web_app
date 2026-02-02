@@ -134,7 +134,7 @@
  border-radius: var(--border-radius);
 	padding: var(--space-lg);
  box-shadow: var(--shadow-subtle);
-	transition: all 0.3s ease;
+	transition:all 0.3s ease;
  }
 
  .progress-card:hover {
@@ -185,7 +185,7 @@
  .progress-bar-fill {
  background: linear-gradient(90deg, var(--bronze), var(--gold-accent));
  height: 100%;
-	transition: width 0.3s ease;
+	transition:width 0.3s ease;
  border-radius: 2px;
  }
 

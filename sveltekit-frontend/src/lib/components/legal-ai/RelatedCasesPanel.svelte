@@ -166,7 +166,7 @@
  font-size: 1.2rem;
 	cursor: pointer;
  padding: 0;
-	transition: transform 0.2s;
+	transition:transform 0.2s;
  }
 
  .refresh-btn:hover:not(disabled) {
@@ -222,7 +222,7 @@
  border-radius: 6px;
  text-align: left;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .case-card:hover {

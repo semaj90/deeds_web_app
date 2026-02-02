@@ -339,7 +339,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  border: 1px solid #e0e0e0;
  border-radius: 6px;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  margin-bottom: 0.75rem;
  }
 
@@ -473,7 +473,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	cursor: pointer;
  font-size: 0.875rem;
  font-weight: 500;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .btn-primary {

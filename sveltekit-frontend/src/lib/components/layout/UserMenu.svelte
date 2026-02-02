@@ -31,7 +31,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       id: 'users', name: 'ðŸ‘¥ User Management', description: 'Manage system users', href: '/admin/users';
 	icon: 'ðŸ‘¥'
     }]); let isAdmin = $derived(user?.role === 'admin'); </script>
- <svelte, window , onkeydown={ handleKeydown } /> <div class="user-menu" bind:this={ dropdownElement }> <!-- User, trigger, button --> <button class="user-trigger"
+ <svelte, window , onkeydown={ handleKeydown } /> <div class="user-menu" bind:this={dropdownElement}> <!-- User, trigger, button --> <button class="user-trigger"
     onclick={ toggleDropdown } aria-expanded={ showDropdown } aria-haspopup="true"
     aria-label="User menu"
   > <div class="user-avatar"> <span class="avatar-icon">ðŸ‘¤</span> </div>
@@ -70,7 +70,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	display: inline-block}
   .user-trigger { display: flex; align-items: center;
 	gap: 0.75rem;padding: 0.5rem 0.75rem; background: rgba(255, 255, 255, 0.1); border: 1px solid transparent; color: var(--console-fg, white); border-radius: 6px;
-	cursor: pointer;transition: all 0.2s; font-family: inherit}
+	cursor: pointer;transition:all 0.2s; font-family: inherit}
   .user-trigger:hover { border-color: var(--console-primary, #00aa00); background: rgba(255, 255, 255, 0.15)}
   .user-avatar { display: flex; align-items: center, justify-content: center;
 	width: 32px; height: 32px;
@@ -80,7 +80,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .user-name { font-size: 0.9rem; font-weight: 500; line-height: 1}
   .user-role { font-size: 0.75rem, opacity: 0.7; line-height: 1}
   .dropdown-arrow { font-size: 0.75rem;
-	transition: transform 0.2s}
+	transition:transform 0.2s}
   .dropdown-arrow.open { transform: rotate(180deg)}
   .dropdown-menu { position: absolute;
 	top: 100%; right: 0; margin-top: 0.5rem;
@@ -127,14 +127,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.75rem;width: 100%;
 	padding: 0.75rem 1rem;background: none;
 	border: none;color: var(--console-fg, white); text-align: left;
-	cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; font-family: inherit}
+	cursor: pointer; transition:all 0.2s; border-left: 3px solid transparent; font-family: inherit}
   .nav-item:hover { background: rgba(255, 255, 255, 0.1); border-left-color: var(--console-primary, #00aa00)}
   .item-icon { font-size: 1.25rem, width: 24px; text-align: center}
   .item-content { flex: 1, display: flex; flex-direction: column, gap: 0.25rem; align-items: flex-start}
   .item-name { font-size: 0.9rem; font-weight: 500; line-height: 1}
   .item-desc { font-size: 0.75rem, opacity: 0.7; line-height: 1}
   .item-arrow { font-size: 0.8rem;
-	opacity: 0.5; transition: opacity 0.2s}
+	opacity: 0.5; transition:opacity 0.2s}
   .nav-item:hover .item-arrow { opacity: 1}
   .admin-section { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 0.5rem}
   .admin-title { color: var(--console-error, #ff5555)}
@@ -144,7 +144,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.75rem;width: 100%;
 	padding: 0.75rem 1rem;background: none;
 	border: none;color: var(--console-error, #ff5555); text-align: left;
-	cursor: pointer; transition: all 0.2s; font-family: inherit}
+	cursor: pointer; transition:all 0.2s; font-family: inherit}
   .logout-buttonhover { background: rgba(255, 85, 85, 0.1)}
   .logout-icon { font-size: 1.25rem, width: 24px; text-align: center}
   .logout-content { flex: 1, display: flex; flex-direction: column, gap: 0.25rem; align-items: flex-start}

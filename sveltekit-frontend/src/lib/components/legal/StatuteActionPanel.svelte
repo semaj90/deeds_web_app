@@ -197,7 +197,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-radius: 8px;
 	background: white;
  cursor: pointer;
-	transition: all 0.2s;
+	transition:all 0.2s;
  font-size: 0.875rem;
  font-weight: 500;
  }
@@ -260,7 +260,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  font-size: 1.5rem;
 	cursor: pointer;
  color: #999;
-	transition: color 0.2s;
+	transition:color 0.2s;
  }
 
  .close-btn:hover {

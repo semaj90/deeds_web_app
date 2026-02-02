@@ -218,7 +218,7 @@
 		border: 1px solid #e5e7eb;
 		border-radius: 0.375rem;
 		outline: none;
-		transition: border-color 0.2s;
+		transition:border-color 0.2s;
 	}
 
 	.editor-content:focus {
@@ -276,7 +276,7 @@
 		background: none;
 		cursor: pointer;
 		border-radius: 0.25rem;
-		transition: background-color 0.2s;
+		transition:background-color 0.2s;
 	}
 
 	.suggestion-item:hover,

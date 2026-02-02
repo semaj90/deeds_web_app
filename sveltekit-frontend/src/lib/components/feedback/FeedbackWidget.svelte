@@ -47,7 +47,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: #333; font-size: 18px; font-weight: 600}
   .close-button { background: none, border: none, font-size: 24px;
 	color: #999; cursor: pointer, padding: 4px, border-radius: 4px;
-	transition: color 0.2s, background-color 0.2}
+	transition:color 0.2s, background-color 0.2}
   .close-buttonhover { color: #666; background-color: #f5f5f5}
   .feedback-content { display: flex; flex-direction: column;
 	gap: 20px}
@@ -57,7 +57,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 4px}
   .star { background: none, border: none, font-size: 32px;
 	color: #ddd; cursor: pointer;
-	transition: color 0.2s, transform 0.1; padding: 4px; border-radius: 4px}
+	transition:color 0.2s, transform 0.1; padding: 4px; border-radius: 4px}
   .star:hover { color: #ffc107;
 	transform: scale(1.1)}
   .star.active { color: #ffc107}
@@ -66,13 +66,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .feedback-textarea-label { color: #555; font-size: 14px; font-weight: 500}
   .feedback-textarea { border: 2px solid #e1e1e1; border-radius: 8px;
 	padding: 12px; font-size: 14px; font-family: inherit;
-	resize: vertical;transition: border-color 0.2}
+	resize: vertical;transition:border-color 0.2}
   .feedback-textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1)}
   .feedback-actions { display: flex; justify-content: flex-end}
   .submit-button { background: #4f46e5;
 	color: white; border: none;
 	padding: 12px 24px; border-radius: 8px; font-size: 14px, font-weight: 600;
-	cursor: pointer;transition: background-color 0.2s, transform 0.1}
+	cursor: pointer;transition:background-color 0.2s, transform 0.1}
   .submit-buttonhover:not(disabled) { background: #4338ca;
 	transform: translateY(-1px)}
   .submit-buttondisabled { background: #9ca3af;

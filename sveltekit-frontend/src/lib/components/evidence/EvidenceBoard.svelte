@@ -25,8 +25,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	uploadedAt: string;
  updatedAt: string;
 	x: number;
- y: number;
- };
+ y: number };
 
  type EvidenceConnection = {
  id: string;
@@ -40,8 +39,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  isVisible: boolean;
  createdBy?: number;
 	createdAt: string;
- updatedAt: string;
- };
+ updatedAt: string };
  type BoardMode = 'grid' | 'free' | 'magnetic';
 
  let { caseId, initialNodes = [], initialConnections = [] }: {
@@ -124,8 +122,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  y: node.y + force.dy,
  };
  }
- return node;
- }));
+ return node }));
  } catch (error) {
  console.error('Failed to apply magnetic forces:', error);
  }
@@ -145,12 +142,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  newSelection.clear();
  newSelection.add(nodeId);
  }
- return newSelection;
- });
+ return newSelection });
 
  if (!multiSelect) {
- selectedEvidenceForInspector = nodeId;
- }
+ selectedEvidenceForInspector = nodeId }
  }
 
  // Node movement
@@ -158,8 +153,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  if (boardMode === 'grid') {
  const snapped = snapToGrid(newX, newY);
  newX = snapped.x;
- newY = snapped.y;
- }
+ newY = snapped.y }
 
  nodes.update(current =>
  current.map(node =>
@@ -297,8 +291,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  deleteSelectedNodes();
  break;
  default:
- break;
- }
+ break }
  }
 
  let canvasElement: HTMLDivElement;
@@ -402,8 +395,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  display: flex;
  flex-direction: column;
 	height: 100vh;
- background: #f8f9fa;
- }
+ background: #f8f9fa }
 
  .board-toolbar {
  display: flex;
@@ -412,18 +404,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 1rem;
  background: white;
  border-bottom: 1px solid #e9ecef;
- gap: 1rem;
- }
+ gap: 1rem }
 
  .mode-selector {
- min-width: 150px;
- }
+ min-width: 150px }
 
  .actions {
  display: flex;
 	gap: 0.5rem;
- align-items: center;
- }
+ align-items: center }
 
  .relationship-selector {
  display: flex;
@@ -432,15 +421,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  background: #f0f9ff;
 	padding: 0.5rem;
  border-radius: 0.375rem;
-	border: 1px solid #0ea5e9;
- }
+	border: 1px solid #0ea5e9 }
 
  .relationship-label {
  font-size: 0.875rem;
  font-weight: 500;
 	color: #0c4a6e;
- white-space: nowrap;
- }
+ white-space: nowrap }
 
  .relationship-select {
  padding: 0.25rem 0.5rem;
@@ -448,27 +435,23 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-radius: 0.25rem;
 	background: white;
  font-size: 0.875rem;
- min-width: 140px;
- }
+ min-width: 140px }
 
  .board-main-content {
  flex: 1;
-	display: flex;
- }
+	display: flex }
 
  .board-canvas {
  flex: 1;
 	position: relative;
  overflow: hidden;
-	background: white;
- }
+	background: white }
 
  .board-canvas.grid-mode {
  background-image:
  linear-gradient(rgba(0,0,0,.1) 1px, transparent 1px),
  linear-gradient(90deg, rgba(0,0,0,.1) 1px, transparent 1px);
- background-size: 50px 50px;
- }
+ background-size: 50px 50px }
 
  .board-canvas.magnetic-mode {
  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);

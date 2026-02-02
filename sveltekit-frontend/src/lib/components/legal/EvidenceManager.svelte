@@ -188,7 +188,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .evidence-list { display: flex; flex-direction: column;
 	gap: 1.5rem}
   .evidence-item { background: rgba(255, 255, 255, 0.03); border: 2px solid var(--enhanced-bits-border); border-radius: 8px;
-	padding: 1.5rem; transition: all 300ms ease}
+	padding: 1.5rem; transition:all 300ms ease}
   .evidence-item:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)}
   .evidence-item.selected { border-color: var(--enhanced-bits-primary); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2)}
   .evidence-header { display: flex; align-items: center;
@@ -232,7 +232,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
   .relevance-fill { height: 100%;
-	transition: width 300ms ease; border-radius: 4px}
+	transition:width 300ms ease; border-radius: 4px}
   .relevance-value { font-size: 0.875rem; font-weight: bold;
 	color: var(--enhanced-bits-evidence)}
   .evidence-actions { display: flex; flex-wrap: wrap;

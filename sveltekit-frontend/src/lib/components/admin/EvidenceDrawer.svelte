@@ -309,7 +309,7 @@
 	background: rgba(0, 0, 0, 0.5);
 		opacity: 0;
 		pointer-events: none;
-	transition: opacity 0.3s ease;
+	transition:opacity 0.3s ease;
 		z-index: 1000;
 	}
 
@@ -329,7 +329,7 @@
 		display: flex;
 		flex-direction: column;
 	transform: translateX(100%);
-	transition: transform 0.3s ease;
+	transition:transform 0.3s ease;
 		z-index: 1001;
 		box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
 	}
@@ -371,7 +371,7 @@
 	display: flex;
 		align-items: center;
 		justify-content: center;
-	transition: color 0.2s ease;
+	transition:color 0.2s ease;
 		margin-left: 1rem;
 	}
 
@@ -497,7 +497,7 @@
 	color: #ddd;
 		font-size: 0.9rem;
 		font-family: inherit;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 	}
 
 	.form-input:focus,
@@ -561,7 +561,7 @@
 		font-size: 0.9rem;
 		font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 		white-space: nowrap;
 	}
 

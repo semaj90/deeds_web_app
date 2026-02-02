@@ -20,9 +20,9 @@
     aria-modal="true"
     aria-labelledby="modal-title"
     onclick={ handleClose } keydown={ handleKeydown } tabindex="-1"
-    ; bind:this={ modalElement } >
+    ; bind:this={modalElement} >
     <!-- FF-Style: Modal, Container --> <div class="relative" {sizeClasses[size]} bg-gradient-to-br {typeColors[type]} border-2 border-amber-400/80 shadow-2xl, overflow-hidden {cornerClasses[cornerStyle]}"
-      transitiscale={{ duration: 400, easing: quintOut, start: 0.8 }}; bind:this={ contentElement } >
+      transitiscale={{ duration: 400, easing: quintOut, start: 0.8 }}; bind:this={contentElement} >
       <!-- FF-Style: Corner, Decorations -->
   {#if showBorder} <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2"></div>
  <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2"></div>

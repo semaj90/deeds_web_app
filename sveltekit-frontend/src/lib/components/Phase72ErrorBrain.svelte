@@ -415,7 +415,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		background: rgba(255, 255, 255, 0.05);
 		border: 2px solid #444;
 		cursor: pointer;
-	transition: all 0.2s;
+	transition:all 0.2s;
 	}
 
 	.error-item:hover {

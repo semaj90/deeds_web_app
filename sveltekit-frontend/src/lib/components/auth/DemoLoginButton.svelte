@@ -26,7 +26,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem;
 	padding: 0.5rem 1rem; border: 2px solid transparent; border-radius: 6px;
 	background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); font-weight: 600;
-	cursor: pointer;transition: all 0.2s; font-size: 0.9rem; white-space: nowrap; font-family: 'Press Start 2P', 'Courier New', monospace; letter-spacing: 0.5px}
+	cursor: pointer;transition:all 0.2s; font-size: 0.9rem; white-space: nowrap; font-family: 'Press Start 2P', 'Courier New', monospace; letter-spacing: 0.5px}
   .demo-btn:hover:not(disabled) { transform: scale(1.05); box-shadow: 0 0 10px var(--console-primary, rgba(0, 170, 0, 0.5))}
   .demo-btn:disabled { opacity: 0.6;
 	cursor:not-allowed}

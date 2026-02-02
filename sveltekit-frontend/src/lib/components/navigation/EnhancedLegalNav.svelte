@@ -126,7 +126,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	</div>
 
 	<!-- Recent Cases Bar -->
-	<div class="recent-cases-bar" transition: slide={{
+	<div class="recent-cases-bar" transition:slide={{
 	duration: 300, easing: cubicOut }}>
 		<div class="cases-container">
 			<span class="cases-label">📊 Recent:</span>
@@ -142,7 +142,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 						<a
 							href="/cases/{caseItem.id}"
 							class="case-pill"
-							transition: scale|local={{
+							transition:scale|local={{
 	duration: 200, delay: i * 50, easing: elasticOut }}
 							style="--priority-color: hsl({240 - caseItem.priority},
 	70%: 50%)"
@@ -172,7 +172,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		background: rgba(0, 0, 0, var(--nav-translucency));
 		border-bottom: 2px solid var(--nes-primary);
 		transform: translateY(calc(var(--scroll-offset) * -0.02px));
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
 	.nav-main {
@@ -199,7 +199,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		text-decoration: none;
 	padding: 0.5rem 1rem;
 		border: 2px solid transparent;
-		transition: all 0.2s;
+		transition:all 0.2s;
 		position: relative;
 	}
 
@@ -267,7 +267,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: var(--nes-white);
 		text-decoration: none;
 		white-space: nowrap;
-	transition: all 0.2s;
+	transition:all 0.2s;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 	}
 

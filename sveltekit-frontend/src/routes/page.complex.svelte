@@ -113,6 +113,7 @@
  console.log('Triggering Ollama AI analysis (gemma3-legal: latest, embeddinggemma): latest, latest');
  // In a production environment, this would involve an actual API call
  // to your Ollama backend endpoint.
+ }
 </script>
 
 <svelte:head><title>YoRHa Legal AI Detective Interface</title></svelte:head>

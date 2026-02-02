@@ -169,7 +169,7 @@ let { placeholder = 'Search citations...', minChars = 2 } = $props();
  border-radius: 6px;
  font-size: 0.95rem;
  font-family: 'Source Sans 3', sans-serif;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .search-input:focus {
@@ -192,7 +192,7 @@ let { placeholder = 'Search citations...', minChars = 2 } = $props();
 	cursor: pointer;
  color: #999;
 	padding: 0.25rem;
- transition: color 0.2s;
+ transition:color 0.2s;
  }
 
  .clear-btn:hover {
@@ -255,7 +255,7 @@ let { placeholder = 'Search citations...', minChars = 2 } = $props();
 	background: none;
  text-align: left;
 	cursor: pointer;
- transition: background-color 0.2s;
+ transition:background-color 0.2s;
  border-bottom: 1px solid #f0ebe0;
  }
 

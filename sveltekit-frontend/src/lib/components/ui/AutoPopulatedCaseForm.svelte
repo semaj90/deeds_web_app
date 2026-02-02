@@ -22,7 +22,7 @@
 		editable = true
 	}: Props = $props();
 
-	let localForm = $state<AutoPopulatedForm>({ ...form });
+	let localForm = $derived<AutoPopulatedForm>({ ...form });
 
 	$effect(() => {
 		localForm = { ...form };
@@ -73,10 +73,12 @@
 		localForm.source = 'ai';
 	}
 
-	function handleFieldChange(field: keyof AutoPopulatedForm, value: any): void {
+	function handleFieldChange(field: string, value: any): void {
 		(localForm as any)[field] = value;
 		localForm.source = 'mixed';
-		onFieldChange?.(field, value);
+		if (typeof field === 'string') {
+			onFieldChange?.(field, value);
+		}
 	}
 
 	function handleSubmit() {
@@ -426,7 +428,7 @@
 		border-radius: 4px;
 	color: var(--yorha-text, #d4d4d4);
 		font-size: 0.9rem;
-	transition: border-color 0.2s;
+	transition:border-color 0.2s;
 	}
 
 	.form-input:focus,
@@ -465,7 +467,7 @@
 	color: var(--yorha-accent, #c8a84b);
 		font-size: 0.75rem;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.add-btn:hover {
@@ -495,7 +497,7 @@
 		border-radius: 4px;
 	color: var(--yorha-error, #ef4444);
 		cursor: pointer;
-	transition: all 0.2s;
+	transition:all 0.2s;
 	}
 
 	.remove-btn:hover {
@@ -524,7 +526,7 @@
 		font-size: 0.9rem;
 		font-weight: 500;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.btn-primary {

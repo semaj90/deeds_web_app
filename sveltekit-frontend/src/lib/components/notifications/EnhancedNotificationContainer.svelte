@@ -43,7 +43,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    const enterFrom = isTop ? "-translate-y-2": "translate-y-2"; return { enter: `transition-all duration-300 ease-out transform ${ enterFrom } opacity-0`, enterActive: "transform translate-y-0 opacity-100"; exit: `transition-all duration-200 ease-in transform ${ enterFrom } opacity-0` }
   }
 </script>
- <div class={getContainerClasses()} bind:this={ container } role="region"
+ <div class={getContainerClasses()} bind:this={container} role="region"
   aria-label="Notifications"
   aria-live="polite"
   aria-atomic="false"
@@ -135,7 +135,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     to { opacity: 0;
 	transform: translateY(-1rem) scale(0.95)}} .notification-item { animation:notification-enter 0.3s ease-out}
   /* Reduce motion for accessibility */ @media (prefers-reduced-motion: reduce) { .notification-item { animation: none}
-    .transition-all { transition: none !important}} /* High contrast mode support */ @media (prefers-contrast: high) { .notification-item { border-width: 2px}} /* Focus indicators */ .notification-item:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px}
+    .transition-all { transition:none !important}} /* High contrast mode support */ @media (prefers-contrast: high) { .notification-item { border-width: 2px}} /* Focus indicators */ .notification-item:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px}
   /* Screen reader only content */ .sr-only { position: absolute;
 	width: 1px; height: 1px;
 	padding: 0; margin: -1px;

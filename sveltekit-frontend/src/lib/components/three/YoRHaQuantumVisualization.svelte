@@ -81,7 +81,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <button class="quantum-btn"
           onclick={ captureQuantumState } >
           ðŸ“¸ Capture </button> </div> </div> </div>
- <div class="visualization-content"> <div; bind:this={ container } class="three-container"
+ <div class="visualization-content"> <div; bind:this={container} class="three-container"
       style="width, { width }px; height: { height }px;"
     ></div>
   {#if !isInitialized} <div class="loading-overlay"> <div class="loading-spinner"></div>
@@ -126,7 +126,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem}
   .quantum-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff;
 	padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;
-	cursor: pointer;transition: all 0.3s ease}
+	cursor: pointer;transition:all 0.3s ease}
   .quantum-btn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4)}
   .quantum-btn.active { background: rgba(0, 255, 65, 0.3); border-color: #00ff41;
 	color: #00ff41}
@@ -155,7 +155,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
   .metric-fill { height: 100%;
-	transition: width 0.3s ease; border-radius: 4px}
+	transition:width 0.3s ease; border-radius: 4px}
   .metric-fill.quantum { background: linear-gradient(90deg, #00bfff, #1e90ff) } .metric-fill.entanglement { background: linear-gradient(90deg, #ff1493, #ff69b4) } .metric-fill.collapsed { background: linear-gradient(90deg, #ff4500, #ffa500) } .metric-fill.awareness { background: linear-gradient(90deg, #9370db, #ba55d3) } .metric-fill.activity { background: linear-gradient(90deg, #32cd32, #7fff00) } .metric-fill.stability { background: linear-gradient(90deg, #228b22, #90ee90) } .metric-fill.glitch { background: linear-gradient(90deg, #dc143c, #ff6347) } .metric-fill.temporal { background: linear-gradient(90deg, #ffd700, #ffff00) } .status { font-weight: bold;
 	padding: 0.1rem 0.3rem; border-radius: 2px; font-size: 0.7rem}
   .status.active { background: rgba(0, 255, 65, 0.2); color: #00ff41}

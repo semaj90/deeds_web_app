@@ -200,7 +200,7 @@
 	cursor: pointer;
  padding: 0.25rem 0.5rem;
  border-radius: 4px;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .header-btn:hover {
@@ -370,7 +370,7 @@
  border-radius: 4px;
  font-size: 1rem;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  flex-shrink: 0;
  }
 

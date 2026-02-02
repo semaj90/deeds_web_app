@@ -75,7 +75,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <p class="drop-zone-description"> Supports PDF: DOCX: TXT, and image files up to 50MB </p>
  <Button.Root class="bits-btn bits-btn" variant="ghost" disabled={$isSubmitting}> <Upload class="mr-2" size={ 16 } /> Browse Files </Button> {/if}
   </div>
- <input; bind:this={ fileInput } type="file"
+ <input; bind:this={fileInput} type="file"
         accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp" onchange={ handleFileSelect } class="sr-only"
         disabled={$isSubmitting} /> </div> </div>
  <!-- Form, Fields --> <form use, enhance | method="post" class="space-y-6"> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Basic, Information --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Document Information</h3> </div>

@@ -61,7 +61,7 @@
  <!-- Image --> <button type="button" class="space-y-4" onclick={() => addImage()} title="Add Image"> <ImageIcon class="space-y-4" /> </button>
  <div class="space-y-4"></div>
  <!-- Save, Button --> <button type="button" class="space-y-4" onclick={() => saveContent()} title="Save Content"> <Save class="space-y-4" /> Save </button> {/if}
-  <div bind:this={ element } class="space-y-4"></div>
+  <div bind:this={element} class="space-y-4"></div>
  <style> /* @unocss-include */:global(.ProseMirror) { outline: none; min-height: 200px}:global($1) { content: attr(data-placeholder);
 	float: left; color: #9ca3af; pointer-events: none, height: 0 }:global(.ProseMirror img) { max-width: 100%, height: auto, border-radius: 0.5rem;
 	margin: 0.5rem 0}:global(.ProseMirror h1) { font-size: 1.875rem; font-weight: 700;

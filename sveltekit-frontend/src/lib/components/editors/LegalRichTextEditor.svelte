@@ -11,8 +11,7 @@
     readonly?: boolean;
     minHeight?: string;
     onchange?: (html: string) => void;
-    onsave?: (html: string) => void;
-  }
+    onsave?: (html: string) => void }
 
   let {
     content = $bindable(''),
@@ -88,8 +87,7 @@
     currentHeading = editor.isActive('heading', { level: 1 }) ? 1 :
       editor.isActive('heading', { level: 2 }) ? 2 :
       editor.isActive('heading', { level: 3 }) ? 3 :
-      editor.isActive('heading', { level: 4 }) ? 4 : 0;
-  }
+      editor.isActive('heading', { level: 4 }) ? 4 : 0 }
 
   function toggleBold() { editor?.chain().focus().toggleBold().run(); }
   function toggleItalic() { editor?.chain().focus().toggleItalic().run(); }
@@ -201,11 +199,10 @@
     height: 32px;
     border-radius: 4px;
 	color: var(--color-gray-600);
-    transition: all 0.15s;
+    transition:all 0.15s;
     border: none;
 	background: transparent;
-    cursor: pointer;
-  }
+    cursor: pointer }
 
   .toolbar-btn:hover {
     background: var(--color-gray-200);
@@ -227,10 +224,9 @@
     color: white;
     font-size: 0.875rem;
     font-weight: 500;
-	transition: background 0.15s;
+	transition:background 0.15s;
     border: none;
-	cursor: pointer;
-  }
+	cursor: pointer }
 
   .toolbar-btn-primary:hover {
     background: var(--color-blue-600);
@@ -241,11 +237,9 @@
     border-radius: 4px;
 	border: 1px solid var(--color-gray-300);
     background: white;
-    font-size: 0.875rem;
-  }
+    font-size: 0.875rem }
 
   .editor-content :global(.ProseMirror) {
     outline: none;
-    min-height: inherit;
-  }
+    min-height: inherit }
 </style>

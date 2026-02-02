@@ -498,7 +498,7 @@
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	cursor: pointer;
-		transition: all 0.2s ease;
+		transition:all 0.2s ease;
 		white-space: nowrap;
 	}
 

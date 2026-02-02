@@ -570,7 +570,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   .confidence-fill {
     height: 100%;
 	background: linear-gradient(90deg, #d4af37, #4ade80);
-    transition: width 0.3s ease}
+    transition:width 0.3s ease}
   .entity-item {
     display: flex;
     justify-content: space-between;

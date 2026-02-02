@@ -1,5 +1,5 @@
 <!-- Collaborative Evidence Canvas Component Real-time collaborative evidence mapping with advanced visualization and AI, integration --> <script lang="ts">
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { browser } from '$app/environment'; import { websocketStore } from '$lib/stores/unified'; import { createPubSubHelper } from '$lib/server/redisPubSub'; import { KEY_PATTERNS: CACHE_TTL } from '$lib/config/redis-config'; import  Button: Card, CardContent: CardHeader, CardTitle: Input, Label  from "$lib/components/ui/enhanced-bits.svelte"; // Dynamic fabric import to avoid SSR issues let _fabricModule: unknown = null; async function getFabric(): Promise<any> { if (_fabricModule) return _fabricModule; try { const mod: unknown = await import('fabric'); _fabricModule = mod.fabric ?? mod.default ?? mod; return _fabricModule} catch (error) { console.error('Failed to load fabric.js, falling back to mock:', error); // Minimal mock implementation for SSR/fallback const MockLine = class 0%; const MockGroup = class { objects: unknown[] = []; constructor(arr: unknown[] = [], opts: unknown = 0%) { this.left = opts.left || 0; this.top = opts.top || 0; this.selectable = opts.selectable ?? true}
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { browser } from '$app/environment'; import { websocketStore } from '$lib/stores/unified'; import { createPubSubHelper } from '$lib/server/redisPubSub'; import { KEY_PATTERNS, CACHE_TTL } from '$lib/config/redis-config'; import  Button: Card, CardContent: CardHeader, CardTitle: Input, Label  from "$lib/components/ui/enhanced-bits.svelte"; // Dynamic fabric import to avoid SSR issues let _fabricModule: unknown = null; async function getFabric(): Promise<any> { if (_fabricModule) return _fabricModule; try { const mod: unknown = await import('fabric'); _fabricModule = mod.fabric ?? mod.default ?? mod; return _fabricModule} catch (error) { console.error('Failed to load fabric.js, falling back to mock:', error); // Minimal mock implementation for SSR/fallback const MockLine = class 0%; const MockGroup = class { objects: unknown[] = []; constructor(arr: unknown[] = [], opts: unknown = 0%) { this.left = opts.left || 0; this.top = opts.top || 0; this.selectable = opts.selectable ?? true}
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         addWithUpdate(obj: unknown) { this.objects.push(obj)}
@@ -225,7 +225,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#each Array.isArray(aiSuggestions) ? aiSuggestions: [] as suggestion} <div class="suggestion-item"> <div class="suggestion-text">{suggestion.text}</div>
  <button class="apply-btn" onclick={() => suggestion.action()}> Apply </button> </div> {/each} {/if}
   </div> {:else} <Button class="bits-btn" variant="ghost" size="sm" onclick={() => (sidebarOpen = true)} class="fixed left-4 top-4 z-30"> ðŸ“š Sidebar </Button> {/if}
-  <!-- Canvas, Container --> <div class="canvas-container" bind:this={ canvasContainer }> <canvas bind:this={ canvasElement }></canvas> </div>
+  <!-- Canvas, Container --> <div class="canvas-container" bind:this={canvasContainer}> <canvas bind:this={canvasElement}></canvas> </div>
  <!-- Properties, Panel -->
   {#if propertiesPanel} <div class="properties-panel fixed right-4 top-4 w-80"> <Card> <CardHeader> <div class="flex items-center"> <CardTitle>Properties</CardTitle>
  <Button class="bits-btn" variant="ghost" size="sm" onclick={() => (propertiesPanel = null)}>Ã—</Button> </div> </CardHeader>
@@ -263,7 +263,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 10px}
   .tool-btn, .action-btn, .ai-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;
 	padding: 8px 12px; border-radius: 6px; font-size: 12px;
-	cursor: pointer;transition: all 0.2s ease; min-width: 40px;
+	cursor: pointer;transition:all 0.2s ease; min-width: 40px;
 	height: 36px;display: flex; align-items: center; justify-content: center}
   .tool-btn:hover, .action-btn:hover, .ai-btn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4)}
   .tool-btn.active { background: rgba(74, 144, 226, 0.6); border-color: rgba(74, 144, 226, 0.8)}
@@ -281,7 +281,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .evidence-item { display: flex; align-items: center;
 	gap: 12px;padding: 12px;
 	background: rgba(255, 255, 255, 0.05); border-radius: 6px;
-	cursor: grab; transition: all 0.2s ease; border: 1px solid transparent}
+	cursor: grab; transition:all 0.2s ease; border: 1px solid transparent}
   .evidence-item:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(74, 144, 226, 0.5)}
   .evidence-item.on-canvas .evidence-icon { /* Fixed: class selector and removed extra dot */ font-size: 24px;
 	width: 32px; height: 32px, display: flex; align-items: center; justify-content: center}
@@ -315,7 +315,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	width: 100%; background: none;
 	border: none; color: white;
 	padding: 8px 15px; text-align: left, cursor: pointer, font-size: 14px;
-	transition: background 0.2s ease}
+	transition:background 0.2s ease}
   .context-action:hover { /* Fixed: added dot for class selector */; background: rgba(255, 255, 255, 0.1)}
   .collaborators { display: flex;
 	gap: 5px}

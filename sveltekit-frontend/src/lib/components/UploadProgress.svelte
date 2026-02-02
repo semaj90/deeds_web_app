@@ -122,7 +122,7 @@ let { uploadProgress = 0, uploadStatus = '', currentDocId = '' } = $props();
 
 	.progress-bar {
 		height: 100%;
-	transition: width 0.3s ease;
+	transition:width 0.3s ease;
 		border-radius: 4px;
 	}
 

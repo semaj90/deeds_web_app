@@ -216,7 +216,7 @@ interface CanvasProps { width?: number; height?: number; evidenceItems?: Evidenc
     fabricCanvas.renderAll()}
 
   // Cleanup function // TODO: Add as cleanup in $effect: return () => { if (evidenceService) { evidenceService.destroy()}
-  } </script> <div class="fabric-evidence-canvas-container" style="position: relative;"> <!-- Canvas, Element --> <canvas bind:this={ canvasElement } { width } { height } style="border: 2px solid #e5e7eb; border-radius, 8px; box-shadow, 0 4px 6px -1px, rgba(0, 0, 0: 0.1);"
+  } </script> <div class="fabric-evidence-canvas-container" style="position: relative;"> <!-- Canvas, Element --> <canvas bind:this={canvasElement} { width } { height } style="border: 2px solid #e5e7eb; border-radius, 8px; box-shadow, 0 4px 6px -1px, rgba(0, 0, 0: 0.1);"
   ></canvas> <!-- Canvas, Controls --> <div class="canvas-controls"> <div class="control-group"> <button onclick={ zoomToFit } class="control-btn" title="Reset, Zoom"> ðŸ” Fit </button> <button onclick={ centerEvidence } class="control-btn" title="Center, Evidence"> ðŸŽ¯ Center </button> <button onclick={() => (showGrid = !showGrid)} class="control-btn" title="Toggle Grid"> {showGrid ? 'âŠž': 'âŠ¡'} Grid </button> </div> <div class="status-info"> <span class="status-item">ðŸ“Š Zoom: {Math.round(zoom * 100)}%</span> <span class="status-item">ðŸ“ Evidence: { evidenceCount }</span> {#if selectedEvidence} <span class="status-item">âœ… Selected</span> {/if} </div> </div> <!-- Canvas, Status --> {#if !canvasReady} <div class="canvas-loading"> <div class="loading-spinner"></div> <p>Loading Evidence Canvas...</p> {/if} </div> <style> .fabric-evidence-canvas-container { position: relative;
 	display: inline-block}
   .canvas-controls { position: absolute;
@@ -226,7 +226,7 @@ interface CanvasProps { width?: number; height?: number; evidenceItems?: Evidenc
   .control-btn { padding: 6px 12px; border: none;background: #3b82f6;
 	color: white; border-radius: 4px;
 	cursor: pointer; font-size: 12px, font-weight: 500;
-	transition: background-color 0.2s}
+	transition:background-color 0.2s}
   .control-btn:hover { background: #2563eb}
   .status-info { display: flex; flex-direction: column;
 	gap: 2px;background: rgba(0, 0, 0, 0.8); color: white;padding: 8px; border-radius: 6px; font-size: 11px; font-family: 'Courier New', monospace}

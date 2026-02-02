@@ -69,7 +69,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </script>
  <!-- NES-styled toolbar with controls, and, status --> <div class="nes-container with-title is-centered"> <p class="title">Evidence Analysis Toolkit</p>
  <!-- File: Upload, Section --> <div class="upload-section"> <label class="nes-btn"> <Upload size={ 16 } /> Upload Evidence <input type="file"
-        bind:this={ fileInput } onchange={ handleFileUpload } multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
+        bind:this={fileInput} onchange={ handleFileUpload } multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
         style="display: none;"
       /> </label>
  <button type="button"
@@ -100,7 +100,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Status, Messages -->
   {#if error} <div class="nes-container is-rounded"> <p><AlertCircle size={ 16 } /> { error }</p> {/if}
   </div>
- <div class="evidence-canvas-wrapper"> <canvas bind:this={ canvasEl } width="800" height="600"></canvas> </div>
+ <div class="evidence-canvas-wrapper"> <canvas bind:this={canvasEl} width="800" height="600"></canvas> </div>
  <!-- Evidence List, Display -->
   {#if evidenceList.length > 0} <div class="nes-container with-title"> <p class="title">Evidence Items ({evidenceList.length})</p>
  <div class="evidence-grid">

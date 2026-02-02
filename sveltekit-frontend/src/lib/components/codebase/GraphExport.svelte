@@ -20,21 +20,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		type: string;
 	errorCount: number;
 		filePath: string;
-		cluster?: string;
-	}
+		cluster?: string }
 
 	interface GraphEdge {
 		source: string;
 	target: string;
-		type: string;
-	}
+		type: string }
 
 	interface Props {
 		nodes?: GraphNode[];
 		edges?: GraphEdge[];
 		svgElement?: SVGSVGElement | null;
-		filename?: string;
-	}
+		filename?: string }
 
 	let {
 		nodes = [],
@@ -50,8 +47,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	function showSuccess(format: string) {
 		exportSuccess = format;
 		setTimeout(() => {
-			exportSuccess = null;
-		},
+			exportSuccess = null },
 	2000);
 	}
 
@@ -71,8 +67,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			downloadBlob(blob, `${ filename }.json`);
 			showSuccess('JSON');
 		} finally {
-			isExporting = false;
-		}
+			isExporting = false }
 	}
 
 	async function exportCSV() {
@@ -97,15 +92,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			downloadBlob(blob, `${ filename }.csv`);
 			showSuccess('CSV');
 		} finally {
-			isExporting = false;
-		}
+			isExporting = false }
 	}
 
 	async function exportSVG() {
 		if (!svgElement) {
 			console.warn('No SVG element provided');
-			return;
-		}
+			return }
 
 		isExporting = true;
 		try {
@@ -114,15 +107,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			downloadBlob(svgBlob, `${ filename }.svg`);
 			showSuccess('SVG');
 		} finally {
-			isExporting = false;
-		}
+			isExporting = false }
 	}
 
 	async function exportPNG() {
 		if (!svgElement) {
 			console.warn('No SVG element provided');
-			return;
-		}
+			return }
 
 		isExporting = true;
 		try {
@@ -148,8 +139,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 							downloadBlob(blob, `${filename}.png`);
 							showSuccess('PNG');
 						}
-						isExporting = false;
-					},
+						isExporting = false },
 	'image/png');
 				}
 
@@ -162,11 +152,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				URL.revokeObjectURL(url);
 			};
 
-			img.src = url;
-		} catch (error) {
+			img.src = url } catch (error) {
 			console.error('PNG export failed:', error);
-			isExporting = false;
-		}
+			isExporting = false }
 	}
 
 	function downloadBlob(blob: Blob, filename: string) {
@@ -244,8 +232,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	.graph-export {
 		display: flex;
 		flex-direction: column;
-	gap: 0.5rem;
-	}
+	gap: 0.5rem }
 
 	.export-header {
 		display: flex;
@@ -255,13 +242,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-weight: 500;
 	color: rgba(255, 255, 255, 0.5);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
+		letter-spacing: 0.05em }
 
 	.export-options {
 		display: flex;
-	gap: 0.5rem;
-	}
+	gap: 0.5rem }
 
 	.export-btn {
 		display: flex;
@@ -274,8 +259,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: rgba(255, 255, 255, 0.8);
 		font-size: 0.8rem;
 	cursor: pointer;
-		transition: all 0.2s ease;
-	}
+		transition:all 0.2s ease }
 
 	.export-btn:hover:not(:disabled) {
 		background: rgba(255, 255, 255, 0.1);
@@ -284,13 +268,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	.export-btn:disabled {
 		opacity: 0.5;
-	cursor: not-allowed;
-	}
+	cursor: not-allowed }
 
 	.success-icon {
 		color: #4ade80;
-	animation: pop 0.3s ease;
-	}
+	animation: pop 0.3s ease }
 
 	@keyframes pop {
 		0% { transform: scale(0); }

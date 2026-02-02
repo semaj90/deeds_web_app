@@ -205,7 +205,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   .history-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
   .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem}
   .history-item { cursor: pointer;
-	transition: transform 0.2s ease}
+	transition:transform 0.2s ease}
   .history-item:hover { transform: translateY(-2px)}
   .history-thumbnail { width: 100%, height: 120px; object-fit: cover; border-radius: 4px}
   .history-info { margin-top: 0.5rem}

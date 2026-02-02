@@ -1,6 +1,5 @@
 <script lang="ts">
   import { toastStore, type Toast } from '$lib/stores/unified';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // helper: build, class: string safely to avoid inline expression parsing issues
   function toastClass(t: Toast) {
@@ -41,9 +40,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	width: 100%; pointer-events: none}
   .toast-item {
     pointer-events: auto;
-	animation: slideInRight: 0.3s ease-out;
+	animation: slideInRight 0.3s ease-out;
     padding: 16px;
-    min-width: 200px}
+    min-width: 200px;
+  }
   .toast-item.is-success {
     border-color: #92cc41 !important;
     background: #f8fff8 !important;

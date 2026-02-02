@@ -276,7 +276,7 @@
     cursor: pointer;
 	padding: 0.25rem;
     border-radius: 6px;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
 
   .close-btn:hover:not(:disabled) {
@@ -330,7 +330,7 @@
     border-radius: 8px;
 	color: white;
     font-size: 0.9rem;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
 
   .name-input::placeholder {
@@ -435,7 +435,7 @@
     font-size: 0.875rem;
     font-weight: 500;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
   }
 
   .btn.secondary {

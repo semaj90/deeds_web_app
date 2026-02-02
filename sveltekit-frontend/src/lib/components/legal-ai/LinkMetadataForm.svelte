@@ -186,7 +186,7 @@
     border-radius: 4px;
     font-family: 'Source Sans 3', sans-serif;
     font-size: 0.95rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
   }
 
   .form-group select:focus,
@@ -218,7 +218,7 @@
     border-radius: 4px;
     font-weight: 500;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .btn-save {
@@ -278,7 +278,7 @@
     border-radius: 4px;
     font-size: 0.9rem;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .btn-edit:hover {

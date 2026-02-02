@@ -40,7 +40,7 @@
 </script>
 
 <div
-	transition: fly={{
+	transition:fly={{
 	x: 100, duration, 200 }}
 	class="{baseClass} {variantClass()} { className }"
 	role="alert"

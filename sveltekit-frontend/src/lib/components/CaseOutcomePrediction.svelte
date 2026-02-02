@@ -22,15 +22,13 @@
 		onPredictionComplete?: (event: {
 	prediction: any }) => void;
 		onPredictionError?: (event: {
-	error: string }) => void;
-	}>();
+	error: string }) => void }>();
 
 	// Define a type for the prediction outcome part that is stored in history
 	interface OutcomePredictionSummary {
 		success_probability: number;
 	most_likely_outcome: string;
-		confidence_level: string;
-	}
+		confidence_level: string }
 
 	// Define a type for an item in the analysis history
 	interface AnalysisHistoryItem {
@@ -38,8 +36,7 @@
 	caseFacts: string;
 		caseType: string;
 	prediction: OutcomePredictionSummary;
-		id: number;
-	}
+		id: number }
 
 	// Local state
 	let isLoading = $state(false);
@@ -49,14 +46,26 @@
 	let analysisHistory = writable<AnalysisHistoryItem[]>([]);
 	let exportFormat = writable('json');
 
-	// Form data
+	// Form data - initialize reactively
 	let formData = writable({
-		caseFacts,
-		caseType,
-		jurisdiction,
-		partyType,
-		historicalData: historicalData.join('\n'),
-		similarCases: similarCases.join('\n')
+		caseFacts: '',
+		caseType: 'civil',
+		jurisdiction: 'general',
+		partyType: 'plaintiff',
+		historicalData: '',
+		similarCases: ''
+	});
+
+	// Update formData when props change
+	$effect(() => {
+		formData.set({
+			caseFacts,
+			caseType,
+			jurisdiction,
+			partyType,
+			historicalData: historicalData.join('\n'),
+			similarCases: similarCases.join('\n')
+		});
 	});
 
 	const caseTypes = [
@@ -143,17 +152,14 @@
 		} catch (err: unknown) { // Explicitly type err as unknown
 			let errorMessage = 'An unknown error occurred.';
 			if (err instanceof Error) {
-				errorMessage = err.message;
-			} else if (typeof err === 'string') {
-				errorMessage = err;
-			}
+				errorMessage = err.message } else if (typeof err === 'string') {
+				errorMessage = err }
 			error = errorMessage;
 			if (onPredictionError) {
 				onPredictionError({ error: errorMessage });
 			}
 		} finally {
-			isLoading = false;
-		}
+			isLoading = false }
 	}
 
 	// Export prediction results
@@ -281,8 +287,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	// Clear results
 	function clearResults() {
 		prediction = null;
-		error = null;
-	}
+		error = null }
 
 	// Load from history
 	function loadFromHistory(historyItem: AnalysisHistoryItem) {
@@ -661,45 +666,38 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		max-width: 1200px;
 	margin: 0 auto;
 		padding: 2rem;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	}
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif }
 
 	.header {
 		text-align: center;
-		margin-bottom: 2rem;
-	}
+		margin-bottom: 2rem }
 
 	.header h2 {
 		color: #2c3e50;
 		margin-bottom: 0.5rem;
-		font-size: 2rem;
-	}
+		font-size: 2rem }
 
 	.description {
 		color: #7f8c8d;
 		font-size: 1.1rem;
-		line-height: 1.5;
-	}
+		line-height: 1.5 }
 
 	.prediction-form {
 		background: white;
 		border-radius: 12px;
 	padding: 2rem;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-		margin-bottom: 2rem;
-	}
+		margin-bottom: 2rem }
 
 	.form-section {
-		margin-bottom: 2rem;
-	}
+		margin-bottom: 2rem }
 
 	.form-section h3 {
 		color: #2c3e50;
 		margin-bottom: 1.5rem;
 		font-size: 1.3rem;
 		border-bottom: 2px solid #ecf0f1;
-		padding-bottom: 0.5rem;
-	}
+		padding-bottom: 0.5rem }
 
 	.section-header {
 		display: flex;
@@ -711,38 +709,32 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		background: transparent;
 	border: none;
 		padding: 0;
-		text-align: left;
-	}
+		text-align: left }
 
 	.toggle-icon {
 		font-size: 1.2rem;
 	color: #7f8c8d;
-		transition: transform 0.2s;
-	}
+		transition:transform 0.2s }
 
 	.form-group {
-		margin-bottom: 1.5rem;
-	}
+		margin-bottom: 1.5rem }
 
 	.form-group label {
 		display: block;
 		margin-bottom: 0.5rem;
 		font-weight: 600;
-	color: #2c3e50;
-	}
+	color: #2c3e50 }
 
 	.help-text {
 		font-size: 0.9rem;
 	color: #7f8c8d;
 		font-weight: normal;
-		margin-left: 0.5rem;
-	}
+		margin-left: 0.5rem }
 
 	.form-row {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 1rem;
-	}
+		gap: 1rem }
 
 	textarea,
 	select {
@@ -751,9 +743,8 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		border: 2px solid #ecf0f1;
 		border-radius: 8px;
 		font-size: 1rem;
-	transition: border-color 0.2s;
-		font-family: inherit;
-	}
+	transition:border-color 0.2s;
+		font-family: inherit }
 
 	textarea:focus,
 	select:focus {
@@ -764,15 +755,13 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	textarea {
 		resize: vertical;
-		min-height: 100px;
-	}
+		min-height: 100px }
 
 	.form-actions {
 		display: flex;
 	gap: 1rem;
 		justify-content: center;
-		margin-top: 2rem;
-	}
+		margin-top: 2rem }
 
 	.primary-button, .secondary-button {
 		padding: 0.75rem 2rem;
@@ -781,16 +770,14 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		font-size: 1rem;
 		font-weight: 600;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 		display: flex;
 		align-items: center;
-	gap: 0.5rem;
-	}
+	gap: 0.5rem }
 
 	.primary-button {
 		background: linear-gradient(135deg, #3498db, #2980b9);
-		color: white;
-	}
+		color: white }
 
 	.primary-button:hover:not(:disabled) {
 		transform: translateY(-2px);
@@ -799,21 +786,17 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.primary-button:disabled {
 		opacity: 0.6;
-	cursor: not-allowed;
-	}
+	cursor: not-allowed }
 
 	.secondary-button {
 		background: #ecf0f1;
-	color: #2c3e50;
-	}
+	color: #2c3e50 }
 
 	.secondary-button:hover {
-		background: #d5dbdb;
-	}
+		background: #d5dbdb }
 
 	.spinner {
-		animation: spin 1s linear infinite;
-	}
+		animation: spin 1s linear infinite }
 
 	@keyframes spin {
 		from { transform: rotate(0deg); }
@@ -825,13 +808,11 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	border: 1px solid #fcc;
 		border-radius: 8px;
 	padding: 1rem;
-		margin-bottom: 2rem;
-	}
+		margin-bottom: 2rem }
 
 	.error-message h4 {
 		color: #c0392b;
-		margin-bottom: 0.5rem;
-	}
+		margin-bottom: 0.5rem }
 
 	.prediction-results {
 		background: white;
@@ -846,25 +827,21 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		align-items: center;
 		margin-bottom: 2rem;
 		border-bottom: 2px solid #ecf0f1;
-		padding-bottom: 1rem;
-	}
+		padding-bottom: 1rem }
 
 	.results-header h3 {
 		color: #2c3e50;
-	margin: 0;
-	}
+	margin: 0 }
 
 	.export-controls {
 		display: flex;
 	gap: 1rem;
-		align-items: center;
-	}
+		align-items: center }
 
 	.export-controls select {
 		padding: 0.5rem;
 		border-radius: 4px;
-	border: 1px solid #bdc3c7;
-	}
+	border: 1px solid #bdc3c7 }
 
 	.export-button {
 		padding: 0.5rem 1rem;
@@ -873,86 +850,72 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		border: none;
 		border-radius: 4px;
 	cursor: pointer;
-		font-size: 0.9rem;
-	}
+		font-size: 0.9rem }
 
 	.export-button:hover {
-		background: #229954;
-	}
+		background: #229954 }
 
 	.results-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 		gap: 2rem;
-		margin-bottom: 2rem;
-	}
+		margin-bottom: 2rem }
 
 	.result-card {
 		background: #f8f9fa;
 		border-radius: 8px;
 	padding: 1.5rem;
-		border-left: 4px solid #3498db;
-	}
+		border-left: 4px solid #3498db }
 
 	.result-card h4 {
 		color: #2c3e50;
 		margin-bottom: 1rem;
-		font-size: 1.2rem;
-	}
+		font-size: 1.2rem }
 
 	.strength-indicator {
-		margin-bottom: 1rem;
-	}
+		margin-bottom: 1rem }
 
 	.strength-bar {
 		height: 8px;
 	background: #ecf0f1;
 		border-radius: 4px;
 		margin-bottom: 0.5rem;
-	overflow: hidden;
-	}
+	overflow: hidden }
 
 	.strength-fill {
 		height: 100%;
-	transition: width 0.3s ease;
-	}
+	transition:width 0.3s ease }
 
-	.strength-fill.weak { background: #e74c3c; }
-	.strength-fill.moderate { background: #f39c12; }
-	.strength-fill.strong { background: #27ae60; }
+	.strength-fill.weak { background: #e74c3c }
+	.strength-fill.moderate { background: #f39c12 }
+	.strength-fill.strong { background: #27ae60 }
 
 	.strength-text {
 		font-weight: 600;
-		font-size: 0.9rem;
-	}
+		font-size: 0.9rem }
 
 	.assessment-details p.legal-merits {
 		font-style: italic;
 	color: #7f8c8d;
-		margin-bottom: 1rem;
-	}
+		margin-bottom: 1rem }
 
 	.strengths, .weaknesses {
-		margin-bottom: 1rem;
-	}
+		margin-bottom: 1rem }
 
-	.strengths h5 { color: #27ae60; }
-	.weaknesses h5 { color: #e74c3c; }
+	.strengths h5 { color: #27ae60 }
+	.weaknesses h5 { color: #e74c3c }
 
 	.strengths ul, .weaknesses ul {
 		margin: 0.5rem 0;
-		padding-left: 1.5rem;
-	}
+		padding-left: 1.5rem }
 
 	.strengths li, .weaknesses li {
-		margin-bottom: 0.25rem;
-	}
+		margin-bottom: 0.25rem }
 
 	.success-probability {
 		display: flex;
 		justify-content: center;
-		margin-bottom: 1rem;
-	}
+		margin-bottom: 1rem }
 
 	.probability-circle {
 		width: 120px;
@@ -963,8 +926,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-	position: relative;
-	}
+	position: relative }
 
 	.probability-circle::before {
 		content: '';
@@ -972,147 +934,123 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		height: 80px;
 	background: white;
 		border-radius: 50%;
-	position: absolute;
-	}
+	position: absolute }
 
 	.probability-number {
 		font-size: 1.5rem;
 		font-weight: bold;
 	color: #2c3e50;
-		z-index: 1;
-	}
+		z-index: 1 }
 
 	.probability-label {
 		font-size: 0.8rem;
 	color: #7f8c8d;
 		z-index: 1;
-		margin-top: 0.25rem;
-	}
+		margin-top: 0.25rem }
 
 	.outcome-details {
-		text-align: center;
-	}
+		text-align: center }
 
 	.outcome-details p {
-		margin: 0.5rem 0;
-	}
+		margin: 0.5rem 0 }
 
 	.alternative-outcomes {
-		margin-top: 1rem;
-	}
+		margin-top: 1rem }
 
 	.alternative-outcome {
 		padding: 0.75rem;
 	background: white;
 		border-radius: 4px;
 		margin-bottom: 0.5rem;
-		border-left: 3px solid #bdc3c7;
-	}
+		border-left: 3px solid #bdc3c7 }
 
 	.outcome-text {
 		font-weight: 600;
-	color: #2c3e50;
-	}
+	color: #2c3e50 }
 
 	.outcome-probability {
 		color: #7f8c8d;
-		margin-left: 0.5rem;
-	}
+		margin-left: 0.5rem }
 
 	.outcome-conditions {
 		margin: 0.25rem 0 0 0;
 		font-size: 0.9rem;
-	color: #7f8c8d;
-	}
+	color: #7f8c8d }
 
 	.legal-analysis h5, .strategy h5, .timeline-costs h5 {
 		color: #2c3e50;
 		margin-bottom: 0.5rem;
-		font-size: 1rem;
-	}
+		font-size: 1rem }
 
 	.legal-analysis ul, .strategy ul, .timeline-costs ul {
 		margin: 0.5rem 0;
-		padding-left: 1.5rem;
-	}
+		padding-left: 1.5rem }
 
 	.legal-analysis li, .strategy li, .timeline-costs li {
 		margin-bottom: 0.25rem;
-		line-height: 1.4;
-	}
+		line-height: 1.4 }
 
 	.strategy-section {
-		margin-bottom: 1.5rem;
-	}
+		margin-bottom: 1.5rem }
 
 	.strategy-section p {
 		line-height: 1.5;
-	color: #34495e;
-	}
+	color: #34495e }
 
 	.cost-range {
 		font-size: 1.1rem;
 		font-weight: 600;
 	color: #2c3e50;
-		margin-bottom: 1rem;
-	}
+		margin-bottom: 1rem }
 
 	.contingency-factors h6 {
 		color: #e74c3c;
 		margin-bottom: 0.5rem;
 		font-size: 0.9rem;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
+		letter-spacing: 0.5px }
 
 	.disclaimer {
 		background: #fff3cd;
 	border: 1px solid #ffeaa7;
 		border-radius: 8px;
 	padding: 1rem;
-		margin-top: 2rem;
-	}
+		margin-top: 2rem }
 
 	.disclaimer p {
 		margin: 0.5rem 0;
-		color: #856404;
-	}
+		color: #856404 }
 
 	.metadata {
 		font-size: 0.9rem;
 	color: #6c757d;
-		font-style: italic;
-	}
+		font-style: italic }
 
 	.analysis-history {
 		background: white;
 		border-radius: 12px;
 	padding: 2rem;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-		margin-top: 2rem;
-	}
+		margin-top: 2rem }
 
 	.analysis-history h3 {
 		color: #2c3e50;
-		margin-bottom: 1rem;
-	}
+		margin-bottom: 1rem }
 
 	.history-list {
 		display: flex;
 		flex-direction: column;
-	gap: 1rem;
-	}
+	gap: 1rem }
 
 	.history-item {
 		padding: 1rem;
 	background: #f8f9fa;
 		border-radius: 8px;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 		border: 1px solid #ecf0f1;
 		width: 100%;
-		text-align: left;
-	}
+		text-align: left }
 
 	.history-item:hover {
 		background: #e9ecef;
@@ -1125,15 +1063,13 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 0.5rem;
-	}
+		margin-bottom: 0.5rem }
 
 	.history-case {
 		font-weight: 600;
 	color: #2c3e50;
 		flex: 1;
-		margin-right: 1rem;
-	}
+		margin-right: 1rem }
 
 	.history-type {
 		background: #3498db;
@@ -1141,48 +1077,39 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-size: 0.8rem;
-		text-transform: uppercase;
-	}
+		text-transform: uppercase }
 
 	.history-date {
 		color: #7f8c8d;
-		font-size: 0.9rem;
-	}
+		font-size: 0.9rem }
 
 	.history-prediction {
 		color: #34495e;
-		font-size: 0.9rem;
-	}
+		font-size: 0.9rem }
 
 	@media (max-width: 768px) {
 		.case-outcome-prediction {
-			padding: 1rem;
-		}
+			padding: 1rem }
 
 		.results-grid {
 			grid-template-columns: 1fr;
-	gap: 1rem;
-		}
+	gap: 1rem }
 
 		.results-header {
 			flex-direction: column;
 	gap: 1rem;
-			align-items: stretch;
-		}
+			align-items: stretch }
 
 		.form-row {
-			grid-template-columns: 1fr;
-		}
+			grid-template-columns: 1fr }
 
 		.form-actions {
-			flex-direction: column;
-		}
+			flex-direction: column }
 
 		.history-header {
 			flex-direction: column;
 			align-items: flex-start;
-	gap: 0.5rem;
-		}
+	gap: 0.5rem }
 	}
 </style>
 

@@ -231,7 +231,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 <div class="error-brain-modal" transition:fade={{ duration, 200 }}>
 	<div class="modal-backdrop" onclick={onClose}></div>
 
-	<div class="modal-content nes-container is-dark" transition: fly={{
+	<div class="modal-content nes-container is-dark" transition:fly={{
 	y: 50, duration, 300 300 }}>
 		<!-- Header -->
 		<div class="modal-header">
@@ -313,7 +313,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 			<!-- Analysis Details -->
 			{#if selectedAnalysis}
-				<div class="analysis-details" transition: fly={{
+				<div class="analysis-details" transition:fly={{
 	x: 20, duration, 200 200 }}>
 					<h3 class="nes-text is-primary">Analysis Details</h3>
 
@@ -410,7 +410,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 					<!-- Verification Form -->
 					{#if showVerification}
-						<div class="verification-form nes-container is-rounded" transition: fly={{
+						<div class="verification-form nes-container is-rounded" transition:fly={{
 	y: 20, duration, 200 200 }}>
 							<h4 class="nes-text">Patch Verification</h4>
 
@@ -522,7 +522,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border: 2px solid #444;
 		border-radius: 4px;
 		font-size: 0.9rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
 	}
 
 	.phase-badge.active {
@@ -557,7 +557,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		background: rgba(255, 255, 255, 0.05);
 		border: 2px solid #444;
 		cursor: pointer;
-	transition: all 0.2s;
+	transition:all 0.2s;
 	}
 
 	.analysis-item:hover {

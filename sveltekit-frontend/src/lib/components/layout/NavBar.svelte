@@ -237,7 +237,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border: none;
 	cursor: pointer;
     border-radius: 4px;
-	transition: background 0.2s;
+	transition:background 0.2s;
   }
 
   .sidebar-toggle:hover {
@@ -258,7 +258,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     width: 100%;
 	background: var(--console-fg, white);
     margin: 2px 0;
-    transition: 0.3s;
+    transition:0.3s;
     transform-origin: center;
   }
 
@@ -286,7 +286,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     font-weight: bold;
 	cursor: pointer;
     border-radius: 6px;
-	transition: all 0.2s;
+	transition:all 0.2s;
   }
 
   .logo-btn:hover {
@@ -312,7 +312,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     color: var(--console-fg, white);
     text-decoration: none;
     border-radius: 6px;
-	transition: all 0.2s;
+	transition:all 0.2s;
     font-weight: 500;
   }
 
@@ -356,7 +356,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     color: var(--console-fg, white);
     border-radius: 6px;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
     font-size: 0.9rem;
   }
 
@@ -366,7 +366,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   .dropdown-arrow {
     font-size: 0.8rem;
-	transition: transform 0.2s;
+	transition:transform 0.2s;
   }
 
   .dropdown-arrow.open {
@@ -396,7 +396,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: none;
     color: var(--console-fg, white);
     cursor: pointer;
-	transition: background 0.2s;
+	transition:background 0.2s;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
@@ -457,7 +457,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     color: var(--console-fg, white);
     border-radius: 9999px;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
     list-style: none;
   }
 
@@ -555,7 +555,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     color: var(--console-fg, white);
     border-radius: 6px;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .user-btn:hover {
@@ -572,7 +572,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: white;
     border-radius: 6px;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
     font-size: 0.9rem;
   }
 
@@ -593,7 +593,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     background: none;
     border-radius: 6px;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
     font-weight: 500;
   }
 

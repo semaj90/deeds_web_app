@@ -169,7 +169,7 @@ function handleBackdropClick(event: MouseEvent) {
 	cursor: pointer;
 		font-size: 1.25rem;
 	color: #6b7280;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.close-button:hover {

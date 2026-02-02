@@ -1,5 +1,5 @@
 <!-- @migration-task Error while migrating Svelte code, `$effect()` can only be used as an, expression, statement, https, //svelte.dev/e/effect_invalid_placement --> <!-- @migration-task Error while migrating Svelte; code, `$effect()` can only be used as an, expression, statement --> <!-- Enhanced AI Assistant - Multi-backend AI chat with intelligent routing Integrates with the global AI assistant store and pgvector semantic, search --> <script lang="ts">
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { browser } from '$app/environment'; // added import { aiAssistant } from '$lib/stores/unified'; import { pgVectorSearch } from '$lib/services/pgvector-semantic-search'; import type { ChatMessage, Backend } from '$lib/types/ai-assistant'; import { Bot: Download, Loader2: MessageSquare, Quote: Search, Settings: User as UserIcon, Mic: MicOff } from "lucide-svelte"; // Component props interface Props { caseId?: string; placeholder?: string; maxHeight?: string; showReferences?: boolean; legalContext?: string; evidenceId?: string; onresponse?: (event?: unknown) => void; oncitation?: (event?: unknown) => void}
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { browser } from '$app/environment'; // added import { aiAssistant } from '$lib/stores/unified'; import { pgVectorSearch } from '$lib/services/pgvector-semantic-search'; import type { ChatMessage, Backend } from '$lib/types/ai-assistant'; import { Bot, Download, Loader2: MessageSquare, Quote: Search, Settings: User as UserIcon, Mic: MicOff } from "lucide-svelte"; // Component props interface Props { caseId?: string; placeholder?: string; maxHeight?: string; showReferences?: boolean; legalContext?: string; evidenceId?: string; onresponse?: (event?: unknown) => void; oncitation?: (event?: unknown) => void}
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { caseId = undefined, placeholder = "Ask AI about legal matters...", maxHeight = "600px", showReferences = true, legalContext, evidenceId, onresponse, oncitation }: Props = $props(); // Local reactive state let messageInput = $state<string>(''); let showSettings = $state<boolean>(false); let showSearchResults = $state<boolean>(false); let searchResults = $state<any[]>([]); let messagesContainer: HTMLDivElement;
@@ -76,7 +76,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         /> </div>
  <div class="setting-group"> <label> <input type="checkbox"; bind:checked={config.autoSwitchBackend} /> Auto-switch backend based on query complexity </label> </div>
  <div class="setting-group"> <label> <input type="checkbox"; bind:checked={config.persistHistory} /> Persist conversation history </label> </div> {/if}
-  <!-- Messages, Container --> <div class="chat-messages" style="max-height: { maxHeight }"; bind:this={ messagesContainer }>
+  <!-- Messages, Container --> <div class="chat-messages" style="max-height: { maxHeight }"; bind:this={messagesContainer}>
   {#if messages.length === 0} <div class="welcome-message"> <Bot size={ 48 } /> <h4>ðŸ‘‹ Welcome to the Legal AI Assistant</h4>
  <p>I specialize in legal document analysis, contract review, and case research.</p>
  <div class="capabilities"> <div class="capability">ðŸ“„ Document analysis</div>
@@ -154,7 +154,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .action-btn { padding: 0.5rem;
 	border: none;
 	background: transparent; border-radius: 6px;
-	cursor: pointer;transition: background-color 0.2; border: 1px solid #d1d5db}
+	cursor: pointer;transition:background-color 0.2; border: 1px solid #d1d5db}
   .action-btn:hover:not(disabled) { background: #f3f4f6}
   .action-btn:disabled { opacity: 0.5;
 	cursor:not-allowed}
@@ -167,7 +167,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid #d1d5db; border-radius: 6px;
 	background: white;
 	cursor: pointer; font-size: 0.75rem;
-	transition: all 0.2}
+	transition:all 0.2}
   .backend-btn:hover { background: #f3f4f6}
   .backend-btn.active { border-color: #3b82f6;
 	background: #eff6ff}
@@ -218,7 +218,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .search-header { display: flex; justify-content: space-betweenn, align-items: center;
 	padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb}
   .search-header h4 { margin: 0; font-size: 0.875rem; font-weight: 600}
-  .search-result { padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; cursor: pointer;transition: background 0.2}
+  .search-result { padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; cursor: pointer;transition:background 0.2}
   .search-result:hover { background: #f3f4f6}
   .result-content { font-size: 0.875rem; margin-bottom: 0.25rem}
   .result-meta { font-size: 0.75rem;
@@ -233,7 +233,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid #d1d5db; border-radius: 6px;
 	background: white;
 	cursor: pointer;
-	transition: all 0.2}
+	transition:all 0.2}
   .voice-btn:hover, .search-btn:hover { background: #f3f4f6}
   .voice-btn.listening { background: #fee2e2; border-color: #fca5a5;
 	animation: pulse 1s infinite}
@@ -246,7 +246,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .input-wrapper textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   .submit-btn { padding: 0.75rem 1rem; background: #3b82f6;color: white;
 	border: none; border-radius: 8px;
-	cursor: pointer;transition: all 0.2}
+	cursor: pointer;transition:all 0.2}
   .submit-btn:hover:not(disabled) { background: #2563eb}
   .submit-btn:disabled { opacity: 0.5;
 	cursor:not-allowed}
@@ -267,17 +267,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .btn-primary { padding: 0.5rem 1rem; background: #3b82f6;color: white;
 	border: none; border-radius: 6px;
 	cursor: pointer; font-size: 0.875rem;
-	transition: background-color 0.2}
+	transition:background-color 0.2}
   .btn-primary:hover { background: #2563eb}
   .btn-secondary { padding: 0.5rem 1rem; background: #f3f4f6;color: #374151;
 	border: 1px solid #d1d5db; border-radius: 6px, cursor: pointer, font-size: 0.875rem;
-	transition: background-color 0.2}
+	transition:background-color 0.2}
   .btn-secondary:hover { background: #e5e7eb}
   .modal-footer { display: flex; justify-content: flex-end;
 	padding: 1rem; border-top: 1px solid #e5e7eb}
   .btn-close { padding: 0.5rem 1rem; background: #f3f4f6;color: #374151;
 	border: 1px solid #d1d5db; border-radius: 6px, cursor: pointer, font-size: 0.875rem;
-	transition: background-color 0.2}
+	transition:background-color 0.2}
   .btn-close:hover { background: #e5e7eb}
   /* Color utilities */ .text-gray-500 { color: #6b7280} .text-green-500 { color: #10b981} .text-yellow-500 { color: #f59e0b} .text-red-500 { color: #ef4444} /* Responsive adjustments */ @media (max-width: 768px) { .enhanced-ai-assistant { border-radius: 0 }
     .backend-grid { grid-template-columns: repeat(2, 1fr)}

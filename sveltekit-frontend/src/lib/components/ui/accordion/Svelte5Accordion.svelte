@@ -38,7 +38,7 @@ let {
 // Provide context
 setContext('accordion', {
 	get value() { return value; },
-	type: collapsible,
+	type: 'single' as const,
 	toggle: (id: string) => {
 		if (type === 'single') {
 			if (value === id && collapsible) {

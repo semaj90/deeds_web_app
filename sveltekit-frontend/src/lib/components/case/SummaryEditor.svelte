@@ -234,7 +234,7 @@
  border-radius: 4px;
 	cursor: pointer;
  font-size: 0.9rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .btn-save {
@@ -327,7 +327,7 @@
  border-radius: 4px;
  font-size: 0.85rem;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .back-btn:hover {

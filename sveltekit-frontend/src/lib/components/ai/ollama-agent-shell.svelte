@@ -51,7 +51,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {#if $state.matches("processing")} <span class="text-sm nes-text is-disabled"
               >Processing...</span >
           {/if}
-</div> <Dialog.Close class="p-1 hover:bg-muted"> <X class="h-4" /> </Dialog.Close> </div> <divbind:this={ terminalElement } class="flex-1 overflow-y-auto p-4"
+</div> <Dialog.Close class="p-1 hover:bg-muted"> <X class="h-4" /> </Dialog.Close> </div> <divbind:this={terminalElement} class="flex-1 overflow-y-auto p-4"
       >
  {#each messages as message, i} <div class="flex items-start gap-3">
  {#if message.role === "assistant"} <div class="p-2 bg-primary bg-opacity-10 rounded-full"> <Bot class="h-4" /> </div> {:else if message.role === "user"} <div class="p-2 bg-muted rounded-full"> <User class="h-4" /> </div> {:else} <div class="p-2 bg-accent rounded-full"> <Terminal class="h-4" /> {/if} <div class="flex-1"> <div class="flex items-center gap-2"> <span class="text-xs nes-text"> {message.timestamp.toLocaleTimeString()}
@@ -62,7 +62,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             >
  {#if copiedIndex === i} <Check class="h-4 w-4" /> {:else} <Copy class="h-4" /> {/if}
 </button> </div> {/each}
-</div> <div class="border-t"> <div class="flex items-end"> <textarea bind:this={ inputElement },
+</div> <div class="border-t"> <div class="flex items-end"> <textarea bind:this={inputElement},
 	bind:value={ input } keydown={ handleKeyDown } placeholder="Type a message or /help for, commands..."
             class="flex-1 min-h-[60px] max-h-[120px] p-3 bg-muted rounded-lg resize-none focus: outline-none, focus:ring-2"
             disabled={ isLoading } /> <button onclick={ handleSubmit } disabled={isLoading || !input.trim()} class={cn(

@@ -203,7 +203,7 @@
 		border: 1px solid var(--border-color);
 		border-radius: 4px;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.refresh-btn:hover {
@@ -238,7 +238,7 @@
 	gap: 0.5rem;
 		padding: 0.25rem;
 		border-radius: 4px;
-	transition: background 0.15s;
+	transition:background 0.15s;
 	}
 
 	.route-header:hover {
@@ -275,7 +275,7 @@
 	cursor: pointer;
 		text-align: left;
 	color: var(--text-1);
-		transition: background 0.15s;
+		transition:background 0.15s;
 	}
 
 	.route-link:hover {

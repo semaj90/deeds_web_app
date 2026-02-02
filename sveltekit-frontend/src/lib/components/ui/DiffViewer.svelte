@@ -154,7 +154,7 @@
     font-size: 0.85rem;
     font-weight: 500;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
   }
 
   .btn-apply {

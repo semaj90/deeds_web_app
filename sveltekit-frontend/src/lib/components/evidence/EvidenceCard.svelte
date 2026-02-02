@@ -118,7 +118,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	class:shadow-2xl={isHovered}
 	onmouseenter={handleMouseEnter}
 	onmouseleave={handleMouseLeave}
-	transition: scale={{
+	transition:scale={{
 	duration: 200, easing: quintOut }}
 >
 	<!-- Header -->

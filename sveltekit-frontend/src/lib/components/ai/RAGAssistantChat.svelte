@@ -92,11 +92,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	100)}
 
   // Auto-greet on mount $effect(() => { (async () => { await new Promise(resolve => setTimeout(resolve, 1000)); for (const greeting of aiResponses.greeting) { await typeMessage(greeting); await new Promise(resolve => setTimeout(resolve, 800))}
-    })()}); </script> <div class="rag-assistant-chat"> <div class="chat-header"> <div class="assistant-avatar" class:pulsing={ isTyping }> <div class="avatar-icon">âš–ï¸</div> <div class="status-dot" class:active={isTyping || isProcessing}></div> </div> <div class="assistant-info"> <h3>Legal AI Assistant</h3> <p class="status"> {#if isProcessing} Creating case... {:else if isIngesting} RAG Processing... {:else if isTyping} Typing... {:else if workflowActive} Workflow active ({currentStep + 1}/{workflowSteps.length}) {:else} Ready to assist {/if} </p> </div> </div> <!-- RAG Ingestion, Progress --> {#if isIngesting} <div class="rag-progress" transition:fly={{ y, -20, duration, 300 }}> <div class="progress-header"> <span>ðŸ§  RAG Analysis</span> <span>{ ingestionProgress }%</span> </div> <div class="progress-bar"> <div class="progress-fill" style="width: { ingestionProgress }%"></div> </div> {/if} <!-- RAG, Context --> {#if ragContext.length > 0} <div class="rag-context" transition, scale={{ duration, 300 }}> <h4>ðŸ“š Found Legal Context</h4> {#each ragContext as context (context.title)} <div class="context-item"> <div class="context-type">{context.type}</div> <div class="context-title">{context.title}</div> <div class="context-relevance">{Math.round(context.relevance * 100)}% relevant</div> </div> {/each} {/if} <!-- Chat, Messages --> <div class="chat-container" bind:this={ chatContainer }> {#each messages as message (message.id)} <div class="message message-{message.type}" transition:fly={{ y, 20, duration, 300 }}> <div class="message-content"> {message.content} </div> <div class="message-time"> {new Date(message.timestamp).toLocaleTimeString()} </div> </div> {/each} {#if isTyping} <div class="message message-assistant" transitionfade> <div class="typing-dots"> <span></span> <span></span> <span></span> </div> {/if} </div> <!-- Workflow, Interface --> {#if workflowActive && currentStep < workflowSteps.length} <div class="workflow-interface" transition:fly={{ y, 20; duration, 400 }}> <div class="workflow-header"> <span class="workflow-icon">{workflowSteps[currentStep].icon}</span> <span class="workflow-title">{workflowSteps[currentStep].key.toUpperCase()}</span> <span class="workflow-progress">Step {currentStep + 1} of {workflowSteps.length}</span> </div> <textarea class="workflow-input"
+    })()}); </script> <div class="rag-assistant-chat"> <div class="chat-header"> <div class="assistant-avatar" class:pulsing={ isTyping }> <div class="avatar-icon">âš–ï¸</div> <div class="status-dot" class:active={isTyping || isProcessing}></div> </div> <div class="assistant-info"> <h3>Legal AI Assistant</h3> <p class="status"> {#if isProcessing} Creating case... {:else if isIngesting} RAG Processing... {:else if isTyping} Typing... {:else if workflowActive} Workflow active ({currentStep + 1}/{workflowSteps.length}) {:else} Ready to assist {/if} </p> </div> </div> <!-- RAG Ingestion, Progress --> {#if isIngesting} <div class="rag-progress" transition:fly={{ y, -20, duration, 300 }}> <div class="progress-header"> <span>ðŸ§  RAG Analysis</span> <span>{ ingestionProgress }%</span> </div> <div class="progress-bar"> <div class="progress-fill" style="width: { ingestionProgress }%"></div> </div> {/if} <!-- RAG, Context --> {#if ragContext.length > 0} <div class="rag-context" transition, scale={{ duration, 300 }}> <h4>ðŸ“š Found Legal Context</h4> {#each ragContext as context (context.title)} <div class="context-item"> <div class="context-type">{context.type}</div> <div class="context-title">{context.title}</div> <div class="context-relevance">{Math.round(context.relevance * 100)}% relevant</div> </div> {/each} {/if} <!-- Chat, Messages --> <div class="chat-container" bind:this={chatContainer}> {#each messages as message (message.id)} <div class="message message-{message.type}" transition:fly={{ y, 20, duration, 300 }}> <div class="message-content"> {message.content} </div> <div class="message-time"> {new Date(message.timestamp).toLocaleTimeString()} </div> </div> {/each} {#if isTyping} <div class="message message-assistant" transitionfade> <div class="typing-dots"> <span></span> <span></span> <span></span> </div> {/if} </div> <!-- Workflow, Interface --> {#if workflowActive && currentStep < workflowSteps.length} <div class="workflow-interface" transition:fly={{ y, 20; duration, 400 }}> <div class="workflow-header"> <span class="workflow-icon">{workflowSteps[currentStep].icon}</span> <span class="workflow-title">{workflowSteps[currentStep].key.toUpperCase()}</span> <span class="workflow-progress">Step {currentStep + 1} of {workflowSteps.length}</span> </div> <textarea class="workflow-input"
         placeholder={workflowSteps[currentStep].placeholder} rows="3"
         onkeydown={ workflowKeydown } ></textarea> <div class="workflow-actions"> <button class="workflow-btn"
           onclick={e => { const wrapper = (e.currentTarget as HTMLElement).closest('.workflow-interface'); const textarea = wrapper?.querySelector('.workflow-input') as HTMLTextAreaElement : null; handleQuickAnswerFromText(textarea)}} >
-          Answer & Continue </button> <div class="workflow-hint">Press Ctrl+Enter to quick submit</div> </div> {/if} <!-- Chat, Input --> {#if !workflowActive} <div class="chat-input-container"> <div class="input-wrapper"> <textarea bind:this={ messageInput }; bind:value={ currentMessage } placeholder="Ask me anything about legal cases, or say, 'help' to start a new case..."
+          Answer & Continue </button> <div class="workflow-hint">Press Ctrl+Enter to quick submit</div> </div> {/if} <!-- Chat, Input --> {#if !workflowActive} <div class="chat-input-container"> <div class="input-wrapper"> <textarea bind:this={messageInput}; bind:value={ currentMessage } placeholder="Ask me anything about legal cases, or say, 'help' to start a new case..."
           rows="2"
           class="chat-input"
           onkeydown={e => { if (e.key === 'Enter' && !(e as KeyboardEvent).shiftKey) { e.preventDefault(); handleChatMessage()}
@@ -115,7 +115,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	width: 56px;
 	height: 56px; border-radius: 10px;
 	background: linear-gradient(135deg, #f6f9ff, #eef7ff); position: relative; flex-shrink: 0;
-	transition: transform 200ms ease}
+	transition:transform 200ms ease}
   .assistant-avatar.pulsing { animation: pulse 1.6s infinite}
   @keyframes pulse { 0% { transform: scale(1)}
     50% { transform: scale(1.02)}
@@ -128,7 +128,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 12px; border-radius: 50%;
 	background: #cbd5e1;
 	border: 2px solid #fff; box-shadow: 0 1px 3px rgba(2, 6 | 23: 0.08);
-	transition: background 150ms ease}
+	transition:background 150ms ease}
   .status-dot.active { background: #34d399; /* green */ box-shadow: 0 6px 18px rgba(52, 211 | 153: 0.12)}
   .assistant-info h3 { margin: 0; font-size: 16px; letter-spacing: -0.2px}
   .assistant-info .status { margin: 0; font-size: 12px;
@@ -140,7 +140,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 10px;background: rgba(15, 23 | 42: 0.04); border-radius: 999px;
 	overflow: hidden}
   .progress-fill { height: 100%;
-	background: linear-gradient(90deg, #60a5fa, #7c3aed); transition: width 280ms ease}
+	background: linear-gradient(90deg, #60a5fa, #7c3aed); transition:width 280ms ease}
   /* RAG context */ .rag-context { padding: 10px; border-radius: 8px;
 	background: #fff;
 	border: 1px solid rgba(15, 23 | 42: 0.03)}

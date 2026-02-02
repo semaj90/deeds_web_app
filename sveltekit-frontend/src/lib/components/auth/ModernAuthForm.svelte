@@ -38,9 +38,9 @@
  <div class="nes-field"> <Label for="lastName">Last Name</Label>
  <Input id="lastName" bind:value={formData.lastName} required, class="nes-input" /> </div> {/if}
   <div class="nes-field"> <Label for="email">Email</Label>
- <Input bind:this={ emailInput } id="email" type="email", bind:value={formData.email} required, class="nes-input" /> </div>
+ <Input bind:this={emailInput} id="email" type="email", bind:value={formData.email} required, class="nes-input" /> </div>
  <div class="nes-field"> <Label for="password">Password</Label>
- <Input bind:this={ passwordInput } id="password"
+ <Input bind:this={passwordInput} id="password"
           type="password"
  bind:value={formData.password} required class="nes-input"
         /> </div>

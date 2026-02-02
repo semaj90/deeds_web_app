@@ -76,7 +76,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } $effect(() => {
  const preventDefaults = (e: Event) => { e.preventDefault(); e.stopPropagation()}; ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.addEventListener(eventName, preventDefaults, false)
 }); return () => { ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.removeEventListener(eventName, preventDefaults, false)})}}); </script>
- <!-- Main: Upload, Interface --> <div class="enhanced-document-uploader { className }"> <!-- Drop, Zone --> <div bind:this={ dropZone } class="drop-zone"
+ <!-- Main: Upload, Interface --> <div class="enhanced-document-uploader { className }"> <!-- Drop, Zone --> <div bind:this={dropZone} class="drop-zone"
 ; class:dragging={$isDragging} ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
     aria-label="Drop zone"
     tabindex="0"
@@ -86,7 +86,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="drop-zone-description">Drag and drop files here, or click to select files.</p>
  <p class="drop-zone-specs"> Accepted: { acceptedTypes } â€¢ Max; file: {formatFileSize(maxFileSize)} â€¢ Up to { maxFiles } files </p>
  <!-- Hidden real file input to, support, click / keyboard --> <input type="file"
-        bind:this={ fileInput } multiple accept={ acceptedTypes } onchange={ handleFileSelect } aria-hidden="true"
+        bind:this={fileInput} multiple accept={ acceptedTypes } onchange={ handleFileSelect } aria-hidden="true"
         class="sr-only"
       /> </div> </div>
  <!-- File, List -->
@@ -156,7 +156,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </Dialog.Content> </Dialog> </div>
  <style> .enhanced-document-uploader { width: 100%}
   .drop-zone { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem, text-align: center;
-	cursor: pointer;transition: border-color 0.2s, background 0.2s; background: #f9fafb}
+	cursor: pointer;transition:border-color 0.2s, background 0.2s; background: #f9fafb}
   .drop-zone.dragging { border-color: #2563eb;
 	background: rgba(37, 99, 235, 0.05)}
   .drop-zone-content { margin-top: 0.5rem; margin-bottom: 0.5rem}
@@ -168,7 +168,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .drop-zone-specs { font-size: 0.75rem;
 	color: #6b7280}
   .file-list { margin-top: 0.75rem; margin-bottom: 0.75rem}
-  .file-item { transition: box-shadow 0.2s}
+  .file-item { transition:box-shadow 0.2s}
   .file-item:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08)}
   .file-info { display: flex; align-items: center;
 	gap: 1rem}

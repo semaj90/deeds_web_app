@@ -435,7 +435,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-radius: 4px
    ;background: var(--background, #ffffff); cursor: pointer
     font-size: 0.875rem
-    font-weight: 500, transition: all 0.2s}
+    font-weight: 500, transition:all 0.2s}
 ; buttonhover:not(disabled) {
     background: var(--muted, #f9fafb)}
   buttondisabled {
@@ -508,7 +508,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .prediction-fill {
     height: 100%;
 	background: var(--primary, #3b82f6);
-    transition: width 0.3s ease}
+    transition:width 0.3s ease}
   .entities-list {
     display: flex
     flex-direction: column, gap: 0.5rem}

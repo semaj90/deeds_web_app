@@ -145,7 +145,7 @@
  border-radius: 4px;
  font-size: 0.9rem;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .back-btn:hover {

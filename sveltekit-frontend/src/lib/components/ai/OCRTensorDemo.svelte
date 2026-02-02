@@ -29,7 +29,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if processing} Processing... {:else if initialized} Ready {:else} Initializing... {/if}
   </div> </div>
  <div class="demo-content"> <!-- File: Upload, Section --> <div class="upload-section"> <h3>ðŸ“ Upload Image</h3>
- <input; bind:this={ fileInput } type="file"
+ <input; bind:this={fileInput} type="file"
         accept="image/*"
         onchange={ handleFileSelect } disabled={!initialized || processing} />
   {#if uploadedFile} <div class="file-info"> <strong>{uploadedFile.name}</strong>
@@ -109,7 +109,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 1rem; flex-wrap}
   .action-buttons button { padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem, font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2}
+	transition:all 0.2}
   .action-buttons buttondisabled { opacity: 0.6;
 	cursor:not-allowed}
   .action-buttons buttonfirst-child { background: #3b82f6;

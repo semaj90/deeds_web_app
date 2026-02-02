@@ -134,7 +134,7 @@
 	<Portal>
 		<div
 			class="modal-overlay"
-			transition: fade={{
+			transition:fade={{
 	duration: 200 }}
 			onclick={closeModal}
 			onkeydown={handleKeydown}
@@ -147,7 +147,7 @@
 				class:glass-effect={glassEffect}
 				onclick={(e) => e.stopPropagation()}
 				onkeydown={(e) => e.stopPropagation()}
-				transition: scale={{
+				transition:scale={{
 	duration: 300, easing: backOut }}
 				role="dialog"
 				aria-modal="true"
@@ -349,7 +349,7 @@
 		align-items: center;
 		justify-content: center;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 		z-index: 2;
 	}
 
@@ -367,7 +367,7 @@
 	color: #fff;
 		font-weight: 500;
 	cursor: pointer;
-		transition: all 0.3s;
+		transition:all 0.3s;
 	}
 
 	.close-button:hover {

@@ -96,7 +96,7 @@
 		border-radius: 3px;
 	cursor: pointer;
 		font-size: 0.85rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
 	}
 
 	.btn-retry {

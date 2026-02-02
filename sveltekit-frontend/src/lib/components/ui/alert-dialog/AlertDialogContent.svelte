@@ -59,7 +59,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	<div
 		bind:this={contentRef}
 		class="{defaultClass} { className }"
-		transition: scale={{
+		transition:scale={{
 	duration: 150, start: 0.95 }}
 		onkeydown={ handleKeydown }
 		role="alertdialog"

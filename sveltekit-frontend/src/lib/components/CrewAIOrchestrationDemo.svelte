@@ -370,7 +370,7 @@
     border-radius: 4px;
 	cursor: pointer;
     font-size: 0.95rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
   }
 
   .btn-primary {

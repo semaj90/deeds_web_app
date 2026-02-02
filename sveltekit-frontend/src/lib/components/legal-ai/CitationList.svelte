@@ -241,7 +241,7 @@
 	border: none;
  font-size: 1.2rem;
 	cursor: pointer;
- transition: transform 0.2s;
+ transition:transform 0.2s;
  }
 
  .refresh-btn:hover:not(disabled) {
@@ -299,7 +299,7 @@
 	border: 2px solid #e0d5c7;
  border-radius: 6px;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .citation-card:hover {
@@ -383,7 +383,7 @@
  font-size: 1rem;
 	cursor: pointer;
  opacity: 0.6;
-	transition: opacity 0.2s;
+	transition:opacity 0.2s;
  }
 
  .delete-btn:hover {

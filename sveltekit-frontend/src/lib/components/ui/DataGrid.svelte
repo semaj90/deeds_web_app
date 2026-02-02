@@ -67,14 +67,14 @@
 	height: 1rem;color: rgb(156, 163 175)}
   .search-input { width: 100%;
 	padding: 0.5rem 0.75rem 0.5rem 2.5rem;border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, background-color: white;
-	transition: border-color 0.15s}
+	transition:border-color 0.15s}
   .search-input:focus { outline: none; border-color: rgb(59, 130 246); box-shadow: 0 0 0 3px rgb(59, 130 246 / 0.1)}
   .filter-actions { display: flex;
 	gap: 0.5rem}
   .filter-button { display: inline-flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem 1rem; background-color: white;
 	border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, font-weight: 500;
-	color: rgb(55, 65 81); transition: all 0.15s}
+	color: rgb(55, 65 81); transition:all 0.15s}
   .filter-buttonhover { background-color: rgb(249, 250 251); border-color: rgb(156, 163 175)}
   .table-container { overflow: auto; max-height: 70vh}
   .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem}
@@ -87,14 +87,14 @@
 	width: 100%; padding: 0.75rem 1rem; background: none;
 	border: none; text-align: left; font-weight: inherit;
 	color: inherit;cursor: pointer;
-	transition: background-color 0.15s}
+	transition:background-color 0.15s}
   .header-buttonhover:not(disabled) { background-color: rgb(243, 244 246)}
   .header-buttondisabled { cursor: default}
   .header-text { font-weight: 600;
 	color: rgb(55, 65 81)}
   .sort-icons { display: flex; align-items: center; margin-left: 0.5rem}
   .table-body { background-color: white}
-  .data-row { border-bottom: 1px solid rgb(243, 244 246); transition: background-color 0.15}
+  .data-row { border-bottom: 1px solid rgb(243, 244 246); transition:background-color 0.15}
   .data-row:hover { background-color: rgb(249, 250 251)}
   .row-selected { background-color: rgb(239, 246 255)}
   .row-selected:hover { background-color: rgb(219, 234 254)}

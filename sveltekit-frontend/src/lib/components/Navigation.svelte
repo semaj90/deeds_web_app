@@ -183,7 +183,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  border: none;
 	cursor: pointer;
  border-radius: 0.375rem;
-	transition: background-color 0.2s;
+	transition:background-color 0.2s;
  }
 
  .mobile-menu-btn:hover {
@@ -194,7 +194,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  width: 20px;
 	height: 2px;
  background: var(--text-primary, #111827);
- transition: all 0.3s;
+ transition:all 0.3s;
  }
 
  .desktop-nav {
@@ -219,7 +219,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  text-decoration: none;
 	color: var(--text-secondary, #6b7280);
  border-radius: 0.375rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
  font-weight: 500;
  }
 
@@ -283,7 +283,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  color: var(--text-secondary, #6b7280);
  padding: 0.25rem;
  border-radius: 0.25rem;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .close-btn:hover {
@@ -308,7 +308,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  padding: 1rem 1.5rem;
  text-decoration: none;
 	color: var(--text-secondary, #6b7280);
- transition: all 0.2s;
+ transition:all 0.2s;
  font-weight: 500;
  }
 

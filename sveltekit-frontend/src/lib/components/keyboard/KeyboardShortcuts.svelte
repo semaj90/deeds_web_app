@@ -35,7 +35,7 @@ import { Plus } from "lucide-svelte";
  }
 
  .command-item {
- transition: none;
+ transition:none;
  }
  interface CommandItem {
  interface CommandItem {
@@ -694,7 +694,7 @@ import { Plus } from "lucide-svelte";
  aria-modal="true"
  aria-labelledby="command-palette-title"
  onclick={(e) => { if (e.target === e.currentTarget) open = false}} onkeydown={(e) => (e.key === "Escape" ? (open = false): null)} >
- <div class="command-palette"> <div class="command-palette-header"> <h2 id="command-palette-title" class="sr-only">Command Palette</h2> <div class="search-container"> <Command class="search-icon" /> <input bind:this={ commandInput }; bind:value={ searchQuery } type="text"
+ <div class="command-palette"> <div class="command-palette-header"> <h2 id="command-palette-title" class="sr-only">Command Palette</h2> <div class="search-container"> <Command class="search-icon" /> <input bind:this={commandInput}; bind:value={ searchQuery } type="text"
  onclick={(e) => {
  if (e.target === e.currentTarget) open = false;
  }}
@@ -887,7 +887,7 @@ import { Plus } from "lucide-svelte";
 	padding: 0.5rem 0; margin: 0}
 
  .command-item { display: flex; align-items: center;
-	gap: 0.75rem;padding: 0.75rem 1rem; cursor: pointer;transition: background-color 0.1s ease}
+	gap: 0.75rem;padding: 0.75rem 1rem; cursor: pointer;transition:background-color 0.1s ease}
 
  .command-item:hover, .command-item.selected { background: #f3f4f6} /* Removed unused .command-icon selector */ .command-content { flex: 1; min-width: 0} .command-title { font-weight: 500, color: #111827; margin-bottom: 0.125rem}
 
@@ -918,7 +918,7 @@ import { Plus } from "lucide-svelte";
  /* High contrast mode */ @media (prefers-contrast: high) { .command-palette { border: 2px solid #000} .command-item.selected { background: #000;
 	color: #fff} }
 
- /* Reduced motion */ @media (prefers-reduced-motion: reduce) { .command-palette-overlay, .command-palette { animation: none} .command-item { transition: none} }
+ /* Reduced motion */ @media (prefers-reduced-motion: reduce) { .command-palette-overlay, .command-palette { animation: none} .command-item { transition:none} }
  </style>
 
 <script lang="ts">

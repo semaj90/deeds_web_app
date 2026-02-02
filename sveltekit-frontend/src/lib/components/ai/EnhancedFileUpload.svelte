@@ -105,7 +105,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid #e5e7eb; text-align: center}
   .upload-area { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem, text-align: center;
 	cursor: pointer;
-	transition: border-color 0.2s}
+	transition:border-color 0.2s}
   .upload-area:hover { border-color: #60a5fa}
   .upload-label { display: flex; flex-direction: column; align-items: center; justify-content: center;
 	cursor: pointer}
@@ -114,7 +114,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	background: #f9fafb}
   .search-section { border-top: 1px solid #e5e7eb; padding-top: 1.5rem}
   .result-item { cursor: pointer;
-	transition: background-color 0.15s}
+	transition:background-color 0.15s}
   .result-item:hover { background: #f9fafb}
   /* spinner animation (tailwind-like used above relies on this) */ @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
   .animate-spin { animation: spin 1s linear infinite} .hidden { display: none}

@@ -74,7 +74,7 @@
 	.attr-fill {
 		height: 100%;
 	background: linear-gradient(90deg, #10b981, #34d399);
-		transition: width 0.3s ease;
+		transition:width 0.3s ease;
 	}
 	.attribute-row {
 		display: flex;

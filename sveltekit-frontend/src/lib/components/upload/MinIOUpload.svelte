@@ -430,7 +430,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: var(--bg-primary, #0f0f1a);
     color: var(--text-primary, #fff);
     font-family: inherit;
-	transition: border-color 0.2s;
+	transition:border-color 0.2s;
   }
 
   .form-input:focus,
@@ -451,7 +451,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	padding: 2rem;
     text-align: center;
 	cursor: pointer;
-    transition: all 0.2s;
+    transition:all 0.2s;
     background: var(--bg-primary, #0f0f1a);
   }
 
@@ -564,7 +564,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .progress-fill {
     height: 100%;
 	background: var(--accent-primary, #00d4ff);
-    transition: width 0.3s ease;
+    transition:width 0.3s ease;
   }
 
   .progress-text {
@@ -587,7 +587,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border-radius: 6px;
     font-weight: 600;
 	cursor: pointer;
-    transition: background-color 0.2s;
+    transition:background-color 0.2s;
   }
 
   .submit-button:hover:not(:disabled) {

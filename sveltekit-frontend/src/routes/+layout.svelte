@@ -1,6 +1,7 @@
 <script lang="ts">
     import { appState, cleanupStores, initializeStores, tokenTracker, userPrefs } from '$lib/stores';
     import type { Snippet } from 'svelte';
+    import { onMount } from 'svelte';
     // Migrated to $effect
 
     let { children }: { children: Snippet } = $props();
@@ -34,6 +35,7 @@
             } catch (error) {
                 console.warn('CPU fallback initialization failed:', error);
             }
+        })();
     });
 
     onMount(() => {

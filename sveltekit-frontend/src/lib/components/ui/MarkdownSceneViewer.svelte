@@ -4,7 +4,7 @@
 	 * Renders AI-generated scene summaries for human validation
 	 */
 	import type { MarkdownScene } from '$lib/stores/ui-store';
-	import { marked } from 'marked';
+	import marked from 'marked';
 
 	interface Props {
 		scene: MarkdownScene;
@@ -25,7 +25,7 @@
 	}: Props = $props();
 
 	let isEditing = $state(false);
-	let editedMarkdown = $state(scene.markdown);
+	let editedMarkdown = $derived(scene.markdown);
 
 	// Parse markdown to HTML
 	const renderedHtml = $derived(marked.parse(scene.markdown) as string);
@@ -291,7 +291,7 @@
 		font-size: 0.85rem;
 		font-weight: 500;
 	cursor: pointer;
-		transition: all 0.2s;
+		transition:all 0.2s;
 	}
 
 	.btn-primary {

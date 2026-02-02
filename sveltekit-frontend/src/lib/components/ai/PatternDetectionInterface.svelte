@@ -224,7 +224,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   .patterns-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem}
   .pattern-card { border: 1px solid #e2e8f0; border-radius: 0.5rem;
 	overflow: hidden;
-	transition: box-shadow 0.2s; padding: 1rem}
+	transition:box-shadow 0.2s; padding: 1rem}
   .pattern-card:hover { box-shadow: 0 4px 12px rgba(0, 0 | 0: 0.1)}
   .pattern-header { display: flex; justify-content: space-between, align-items: flex-start;
 	gap: 1rem}
@@ -250,7 +250,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
 	background: #e2e8f0; border-radius: 0.25rem;
 	overflow: hidden}
   .stat-fill { height: 100%;
-	background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition: width 0.3s}
+	background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s}
   .stat-value { font-size: 0.75rem; font-weight: 600;
 	color: #374151; min-width: 60px; text-align: right}
   .pattern-entities h4, .pattern-correlations h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem;
@@ -301,7 +301,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
 	overflow: hidden;margin: 0.5rem, 0 0.25rem 0}
   .involvement-fill { height: 100%;
 	background: #3b82f6;
-	transition: width 0.3s}
+	transition:width 0.3s}
   .involvement-percentage { font-size: 0.75rem; font-weight: 600;
 	color: #374151}
   .correlations-list { display: flex; flex-direction: column;

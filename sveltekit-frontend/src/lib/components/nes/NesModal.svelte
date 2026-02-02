@@ -146,7 +146,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  cursor: pointer;
  font-size: 1rem;
  line-height: 1;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .nes-modal-close-btn:hover {

@@ -33,7 +33,7 @@
   role="button"
   aria-label={ ariaLabel } tabindex="0"
   onclick={() => !disabled && inputEl.click()}; ondrop: preventDefault={ onDrop } ondragover|preventDefault={ onDragOver } >
-  <input; bind:this={ inputEl } type="file"
+  <input; bind:this={inputEl} type="file"
 	{ accept } { multiple } onchange={ onInputChange } style="display: none;"
 	aria-hidden="true"
   /> <div> <strong>Drag & drop files here</strong> </div>

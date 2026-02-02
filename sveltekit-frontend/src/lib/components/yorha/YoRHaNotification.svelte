@@ -48,7 +48,6 @@
   }
 
   $effect(() => {
-
     if (duration > 0) {
       const startTime = Date.now();
       interval = setInterval(() => {
@@ -58,15 +57,14 @@
           clearInterval(interval);
           close();
         }
-      },
-	100);
+      }, 100);
     }
 
-});
-
-  // TODO: Add as cleanup in $effect: return () => {
-    if (interval) clearInterval(interval);
-  }
+    // Cleanup on effect destroy
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  });
 </script>
 
 {#if visible}

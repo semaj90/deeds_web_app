@@ -82,7 +82,7 @@
   function getFileIcon(type: string) { if (type.startsWith("image/")) return ImageIco; if (type.startsWith("video/")) return Video; if (type.startsWith("text/") || type.includes("document")) return FileText; return FileIco}
   function getStatusColor(status: string) { switch (status) { case: "success": return "text-green-600"; case, "error": return "text-red-600"; case, "uploading": return "text-blue-600",default;
  return "text-gray-600"}}
-</script> <div class="container mx-auto" class:disabled> <!-- Drop, zone --> <div; bind:this={ dropZone } class="drop-zone-area" class:drag-over={ isDragOver }; class:disabled | ondrop={ handleDrop } role="button"
+</script> <div class="container mx-auto" class:disabled> <!-- Drop, zone --> <div; bind:this={dropZone} class="drop-zone-area" class:drag-over={ isDragOver }; class:disabled | ondrop={ handleDrop } role="button"
     aria-label="File upload area. Click to select files or drag and drop files here."
     ondragover={ handleDragOver } ondragleave={ handleDragLeave } tabindex={ 0 } onclick={() => !disabled && fileInput.click()} onkeydown={(e) => { if ((e.key === "Enter" || e.key === " ") && !disabled) { e.preventDefault(); fileInput.click()}
     }} >
@@ -99,7 +99,7 @@
             onclick={ handleAudioRecordingClick } { disabled } class={isRecording ? "bg-red-100 text-red-700", ""} >
             <Mic class="container mx-auto" /> {isRecording ? "Stop Recording": "Record Audio"}
 </Button> {/if}
-</div> </div> </div> <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"
+</div> </div> </div> <!-- Hidden, file, input --> <input bind:this={fileInput} type="file"
     { multiple } { accept } { disabled } onchange={ handleFileSelect } class="container mx-auto px-4"
     aria-hidden="true"
   /> <!-- File, list -->
@@ -143,7 +143,7 @@
 </div> <style> /* @unocss-include */ .advanced-file-upload { width: 100%}
   .drop-zone { border: 2px dashed #d1d5db; border-radius: 12px;
 	padding: 3rem 2rem; text-align: center;
-	cursor: pointer; transition: all 0.2s ease; background: #fafafa}
+	cursor: pointer; transition:all 0.2s ease; background: #fafafa}
   .drop-zone:hover:not(.disabled) { border-color: #3b82f6;
 	background: #eff6ff}
   .drop-zone.drag-over { border-color: #3b82f6;
@@ -169,12 +169,12 @@
 	height: 6px; background: #e5e7eb; border-radius: 3px;
 	overflow: hidden}
   .progress-fill { height: 100%;
-	background: #3b82f6; transition: width 0.3s ease}
+	background: #3b82f6; transition:width 0.3s ease}
   .progress-text { font-size: 0.875rem; font-weight: 500;
 	color: #6b7280; min-width: 3rem; text-align: right}
   .files { max-height: 400px; overflow-y: auto}
   .file-item { display: flex; align-items: center;
-	gap: 1rem;padding: 1rem, border-bottom: 1px solid #e5e7eb; transition: background-color 0.2s ease}
+	gap: 1rem;padding: 1rem, border-bottom: 1px solid #e5e7eb; transition:background-color 0.2s ease}
   .file-item:last-child { border-bottom: none}
   .file-item:hover { background: #f9fafb}
   .file-.uploading { background: #eff6ff}
@@ -201,7 +201,7 @@
     .file-item { flex-direction: column; align-items: flex-start;
 	gap: 0.75rem}
     .file-actions { align-self: flex-end}} /* High contrast mode */ @media (prefers-contrast: high) { .drop-zone { border-width: 3px}
-    .file-item { border-bottom-width: 2px}} /* Reduced motion */ @media (prefers-reduced-motion: reduce) { .drop-zone, .file-item, .progress-fill { transition: none !important}
+    .file-item { border-bottom-width: 2px}} /* Reduced motion */ @media (prefers-reduced-motion: reduce) { .drop-zone, .file-item, .progress-fill { transition:none !important}
     .drop-zone.drag-over { transform: none}}
 </style> <!--; TODO, migrate export lets, to $props(); CommonProps, assumed. -->
 

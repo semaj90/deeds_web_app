@@ -232,7 +232,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		text-align: center;
 	color: rgba(255, 255, 255, 0.7);
 		font-size: 0.875rem;
-	transition: opacity 0.3s ease;
+	transition:opacity 0.3s ease;
 		z-index: 101;
 		pointer-events: none;
 	}

@@ -39,7 +39,7 @@
             {#if isAnalyzing} <div class="animate-spin w-4 h-4 mr-1 border border-current border-t-transparent"></div> {:else} <Search class="w-4 h-4" /> {/if} Analyze All </Button> <Button class="bits-btn" size="sm"
             variant="ghost"
             onclick={ exportCanvasData } >
-            <Download class="w-4 h-4" /> Export </Button> </div> </div> </CardHeader> <CardContent class="pt-0"> <div class="flex items-center gap-4 text-sm"> <span>{evidenceList.length} evidence items</span> <span>{connections.length} connections</span> <span>{selectedNodes.length} selected</span> </div> </CardContent> </Card> <!-- Canvas --> <Card.Root class="relative"> <div; bind:this={ canvasElement } class="relative bg-slate-50 dark:bg-slate-900"
+            <Download class="w-4 h-4" /> Export </Button> </div> </div> </CardHeader> <CardContent class="pt-0"> <div class="flex items-center gap-4 text-sm"> <span>{evidenceList.length} evidence items</span> <span>{connections.length} connections</span> <span>{selectedNodes.length} selected</span> </div> </CardContent> </Card> <!-- Canvas --> <Card.Root class="relative"> <div; bind:this={canvasElement} class="relative bg-slate-50 dark:bg-slate-900"
       style="width, {canvasSize.width}px; height: {canvasSize.height}px;"
       ondrop={ handleCanvasDrop } ondragover={(e) => e.preventDefault()} role="region"
       aria-label="Evidence canvas"

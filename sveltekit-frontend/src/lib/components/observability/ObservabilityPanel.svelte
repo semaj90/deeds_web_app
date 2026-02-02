@@ -290,7 +290,7 @@ await loadState();
     border-radius: 2px, overflow: hidden}
   .progress-bar {
     height: 100%;
-	background: currentColor, transition: width 0.3s ease}
+	background: currentColor, transition:width 0.3s ease}
   .details-section { background: var(--bg-primary, #000); padding: 1rem
     border-radius: 6px
     margin-bottom: 1rem}

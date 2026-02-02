@@ -74,7 +74,7 @@
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
-	transition: color 0.2s;
+	transition:color 0.2s;
 	}
 
 	.dismiss-btn:hover {

@@ -2,7 +2,7 @@
 
   // Expose cancel helper function cancelAll() { manager.cancelAll()} $effect(() => {
  // no-op: placeholder for future session restore 
-}); </script> <div class="n64-upload"> <input bind:this={ fileInput } type="file" { accept } { multiple } style="display: none" onchange={ handleFileSelect } /> <button onclick={() => fileInput?.click()} class="n64-select">Select files</button> <button onclick={ cancelAll } class="n64-cancel">Cancel all</button> <div class="files"> {#each Array.isArray(manager.fileStates) ? manager.fileStates: [] as s} <div class="file-row"> <div class="file-name">{s.file.name}</div> <div class="file-status">{s.status}</div> <div class="file-progress">{s.progress}%</div> </div> {/each} </div> </div> <style> .n64-upload { padding: 8px} .n64-select, .n64-cancel { padding: 6px 10px; border-radius: 6px} .files { margin-top: 12px} .file-row { display: flex;
+}); </script> <div class="n64-upload"> <input bind:this={fileInput} type="file" { accept } { multiple } style="display: none" onchange={ handleFileSelect } /> <button onclick={() => fileInput?.click()} class="n64-select">Select files</button> <button onclick={ cancelAll } class="n64-cancel">Cancel all</button> <div class="files"> {#each Array.isArray(manager.fileStates) ? manager.fileStates: [] as s} <div class="file-row"> <div class="file-name">{s.file.name}</div> <div class="file-status">{s.status}</div> <div class="file-progress">{s.progress}%</div> </div> {/each} </div> </div> <style> .n64-upload { padding: 8px} .n64-select, .n64-cancel { padding: 6px 10px; border-radius: 6px} .files { margin-top: 12px} .file-row { display: flex;
 	gap:12px, align-items: center, padding:6px 0} .file-name { flex:1 } </style>; dismissible: false;
 	actions: [{ label: 'Cancel', action () => { controller.abort(); fs.status = 'canceled'},
 	style: 'danger'
@@ -46,7 +46,7 @@
       telemetry.emit(fs.status === 'canceled' ? 'upload_canceled': 'upload_error', { file: file.name, error: fs.error, attempt: fs.attempt})} finally { fs.controller = null; serializeSession(); function getEvidenceType(file: File): string { if (file.type.startsWith('image/')) return 'IMAGE'; if (file.type === 'application/pdf') return 'PDF'; if (file.type.startsWith('text/')) return 'TEXT'; if (file.type.startsWith('video/')) return 'VIDEO'; if (file.type.startsWith('audio/')) return 'AUDIO'; return 'DOCUMENT'}
   function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
   function openFileDialog() { if (!disabled && !uploading && fileInput) fileInput.click()}
-  $effect(() => { (async () => { restoreSession(); try { const res = await fetch('/api/v1/minio/health'); if (res.ok) { const data = await res.json(); minioHealthy = !!data?.ok} else minioHealthy = false} catch { minioHealthy = false } })()}); $effect(() => { fileStates.map(f => [f.status: f.progress: f.attempts, f.nextRetryAt: f.placeholder]); uploading; queueMicrotask(serializeSession)}); </script> <!-- N64 Gaming Style MinIO: Upload, Zone --> <div class="n64-upload-container" class:retro> <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"
+  $effect(() => { (async () => { restoreSession(); try { const res = await fetch('/api/v1/minio/health'); if (res.ok) { const data = await res.json(); minioHealthy = !!data?.ok} else minioHealthy = false} catch { minioHealthy = false } })()}); $effect(() => { fileStates.map(f => [f.status: f.progress: f.attempts, f.nextRetryAt: f.placeholder]); uploading; queueMicrotask(serializeSession)}); </script> <!-- N64 Gaming Style MinIO: Upload, Zone --> <div class="n64-upload-container" class:retro> <!-- Hidden, file, input --> <input bind:this={fileInput} type="file"
     { accept } { multiple } disabled={disabled || uploading} onchange={ handleFileSelect } style="display: none"
   /> <!-- Evolution: Loader, Overlay --> {#if showEvolutionLoader} <div class="evolution-overlay"> <N64EvolutionLoader stage={ evolutionStage } autoEvolution={ false } ragIntegration={ enableGPUProcessing } yorhaMode={ retro } /> {/if} <!-- N64-style, drop, zone --> <div class="n64-drop-zone"
     class:drag-over={ dragOver } class:has-files={files.length > 0} class:uploading={ uploading } class:theme-{ evolutionStage } role="button"
@@ -96,7 +96,7 @@
 	animation: fadeIn 0.3s ease}
   @keyframes fadeIn { from { opacity: 0} to { opacity: 1} }
   .n64-drop-zone { border: 4px solid #FFD700; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem; text-align: center;
-	cursor: pointer;transition: all 0.3s ease; min-height: 220px;
+	cursor: pointer;transition:all 0.3s ease; min-height: 220px;
 	display: flex; align-items: center; justify-content: center;
 	position: relative; box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.1), 0, 0 20px rgba(255, 215, 0, 0.3)}
   .n64-drop-zone::before { content: '';
@@ -129,7 +129,7 @@
   .n64-file-item { display: flex; align-items: center;
 	gap: 1rem;padding: 1rem;
 	background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%); border: 2px solid #FFD700; text-align: left;
-	transition: all 0.3s ease;position: relative; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.1), 0, 0 10px rgba(0, 0, 0, 0.5)}
+	transition:all 0.3s ease;position: relative; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.1), 0, 0 10px rgba(0, 0, 0, 0.5)}
   .n64-file-item::before { content: '';
 	position: absolute; top: 4px;
 	left: 4px; right: 4px;
@@ -156,7 +156,7 @@
   .n64-action-btn { padding: 0.5rem;
 	background: #FFD700; color: #000;
 	border: 2px solid #FFA500;cursor: pointer; font-family: 'Courier New', monospace; font-weight: bold; font-size: 0.8rem;
-	transition: all 0.2s ease; box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px, 0 rgba(0, 0, 0, 0.3)}
+	transition:all 0.2s ease; box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px, 0 rgba(0, 0, 0, 0.3)}
   .n64-action-btn:hover { background: #FFA500;
 	transform: translateY(-1px)}
   .n64-action-btn.cancel { background: #FF3030; border-color: #CC0000;
@@ -191,7 +191,7 @@
 	display: flex; align-items: center; justify-content: center;
 	gap: 0.75rem;padding: 1rem 1.5rem; background: #FFD700;color: #000;
 	border: 3px solid #FFA500; font-family: 'Courier New', monospace; font-weight: bold;
-	cursor: pointer;transition: all 0.3s ease; font-size: 0.9rem; letter-spacing: 0.5px; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px, 0 rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.5)}
+	cursor: pointer;transition:all 0.3s ease; font-size: 0.9rem; letter-spacing: 0.5px; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px, 0 rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.5)}
   .n64-upload-buttonhover:not(disabled) { background: #FFA500;
 	transform: translateY(-2px); box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px, 0 rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.7)}
   .n64-upload-buttondisabled { opacity: 0.6;
@@ -199,7 +199,7 @@
   .n64-clear-button { padding: 1rem;
 	background: #666666; color: #FFF;
 	border: 2px solid #444444; font-family: 'Courier New', monospace; font-weight: bold;
-	cursor: pointer;transition: all 0.2s ease; font-size: 0.8rem; letter-spacing: 0.5px; box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2), inset -1px -1px, 0 rgba(0, 0, 0, 0.3)}
+	cursor: pointer;transition:all 0.2s ease; font-size: 0.8rem; letter-spacing: 0.5px; box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2), inset -1px -1px, 0 rgba(0, 0, 0, 0.3)}
   .n64-clear-buttonhover { background: #777777;
 	transform: translateY(-1px)}
   .n64-clear-button.cancel { background: #FF3030; border-color: #CC0000}

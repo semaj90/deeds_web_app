@@ -43,7 +43,7 @@
 	gap: 0.5rem; max-height: 200px; overflow-y: auto}
   .collection-item { display: flex; justify-content: space-betweennn, align-items: center;
 	padding: 0.5rem;background: rgba(15, 15, 35, 0.5); border: 1px solid rgba(74, 144, 226, 0.3); border-radius: 4px;
-	cursor: pointer; transition: all 0.3s ease; text-align: left}
+	cursor: pointer; transition:all 0.3s ease; text-align: left}
   .collection-item:hover { background: rgba(74, 144, 226, 0.2); border-color: var(--n64-primary)}
   .collection-name { color: var(--nier-text-primary); font-size: 0.75rem; font-weight: bold}
   .collection-count { color: var(--nier-text-secondary); font-size: 0.625rem}

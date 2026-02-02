@@ -64,7 +64,7 @@ let openContextMenuId = $state<string | null>(null);
 
 // Effects
 $effect(() => {
-const unsubscribe = evidenceStore.subscribe(v => { evidenceStoreState = v; });
+const unsubscribe = evidenceStore.subscribe(v => { evidenceStoreState = v });
 return () => unsubscribe();
 });
 
@@ -84,8 +84,7 @@ systemStatus.rabbitMQ.health = "connected";
 try {
 const gpuStatus = await gpuService.getStatus();
 systemStatus.gpu.available = !!gpuStatus?.webgpuSupported;
-systemStatus.gpu.utilization = gpuStatus?.accelerationActive ? 75 : 0;
-} catch (e) { console.warn("GPU failed", e); }
+systemStatus.gpu.utilization = gpuStatus?.accelerationActive ? 75 : 0 } catch (e) { console.warn("GPU failed", e); }
 }
 
 // Handlers
@@ -138,7 +137,7 @@ findModal.query = item?.title ?? "";
 findModal.results = [];
 }
 
-function closeFindModal() { findModal.show = false; }
+function closeFindModal() { findModal.show = false }
 
 async function runFindSearch() {
 findModal.loading = true;
@@ -158,7 +157,7 @@ const vectorResults = await resp.json();
 findModal.results = [...findModal.results, ...(vectorResults || [])];
 }
 } catch (e) { findModal.error = "Search failed"; }
-finally { findModal.loading = false; }
+finally { findModal.loading = false }
 }
 
 function handleCanvasDrop(e: DragEvent) {
@@ -231,14 +230,14 @@ onclick={() => handleEvidenceSelect(item.id)}
 <EvidenceCardAny {item} onview={() => handleViewEvidence(item)} />
 </div>
 <button class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 nes-btn is-small p-1"
-onclick={(e) => { e.stopPropagation(); openContextMenuId = openContextMenuId === item.id ? null : item.id; }}
+onclick={(e) => { e.stopPropagation(); openContextMenuId = openContextMenuId === item.id ? null : item.id }}
 >⋮</button>
 
 {#if openContextMenuId === item.id}
 <div class="absolute right-0 top-10 z-50 bg-background border-2 border-primary p-2 shadow-xl text-xs flex flex-col gap-2 min-w-[150px]">
-<button class="text-left hover:text-primary" onclick={() => { handleViewEvidence(item); openContextMenuId = null; }}>VIEW DETAILS</button>
-<button class="text-left hover:text-primary" onclick={() => { openFindModal(item); openContextMenuId = null; }}>FIND RELATED</button>
-<button class="text-left text-error" onclick={() => { openContextMenuId = null; }}>DELETE</button>
+<button class="text-left hover:text-primary" onclick={() => { handleViewEvidence(item); openContextMenuId = null }}>VIEW DETAILS</button>
+<button class="text-left hover:text-primary" onclick={() => { openFindModal(item); openContextMenuId = null }}>FIND RELATED</button>
+<button class="text-left text-error" onclick={() => { openContextMenuId = null }}>DELETE</button>
 </div>
 {/if}
 </div>
@@ -326,9 +325,8 @@ onclick={() => { handleViewEvidence(result); closeFindModal(); }}
 background-image:
 linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
 linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
-background-size: 40px 40px;
-}
-.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+background-size: 40px 40px }
+.custom-scrollbar::-webkit-scrollbar { width: 4px }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: currentColor;
-	opacity: 0.2; }
+	opacity: 0.2 }
 </style>

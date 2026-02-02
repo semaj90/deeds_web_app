@@ -28,8 +28,7 @@
 		relationships?: ErrorRelationship[];
 		width?: number;
 		height?: number;
-		onNodeClick?: (node: any) => void;
-	} = $props();
+		onNodeClick?: (node: any) => void } = $props();
 
 	// State
 	let container: HTMLDivElement;
@@ -82,8 +81,7 @@
 			});
 		}
 
-		return nodeList;
-	}
+		return nodeList }
 
 	function buildLinks(
 		relationships: ErrorRelationship[],
@@ -191,30 +189,26 @@
 		position: relative;
 	background: #1a1a2e;
 		border-radius: 8px;
-	overflow: hidden;
-	}
+	overflow: hidden }
 
 	.controls {
 		display: flex;
 	gap: 1rem;
 		padding: 0.5rem;
 	background: rgba(0, 0, 0, 0.3);
-		align-items: center;
-	}
+		align-items: center }
 
 	.filter-select {
 		background: #2d2d44;
 	color: #fff;
 		border: 1px solid #4a4a6a;
 		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-	}
+		border-radius: 4px }
 
 	.zoom-controls {
 		display: flex;
 		align-items: center;
-	gap: 0.5rem;
-	}
+	gap: 0.5rem }
 
 	.zoom-controls button {
 		background: #4f46e5;
@@ -223,35 +217,30 @@
 	width: 24px;
 		height: 24px;
 		border-radius: 4px;
-	cursor: pointer;
-	}
+	cursor: pointer }
 
 	.stats {
 		margin-left: auto;
 	color: #9ca3af;
 		font-size: 0.875rem;
 	display: flex;
-		gap: 1rem;
-	}
+		gap: 1rem }
 
 	svg {
 		display: block;
-	transition: transform 0.2s;
-	}
+	transition:transform 0.2s }
 
 	.link {
 		stroke: #4a4a6a;
-		stroke-opacity: 0.6;
-	}
+		stroke-opacity: 0.6 }
 
-	.link-causes { stroke: #ef4444; }
-	.link-fixed_by { stroke: #10b981; }
-	.link-similar_to { stroke: #6366f1; }
-	.link-related_to { stroke: #8b5cf6; }
+	.link-causes { stroke: #ef4444 }
+	.link-fixed_by { stroke: #10b981 }
+	.link-similar_to { stroke: #6366f1 }
+	.link-related_to { stroke: #8b5cf6 }
 
 	.node {
-		cursor: pointer;
-	}
+		cursor: pointer }
 
 	.node:hover circle {
 		filter: brightness(1.2);
@@ -260,8 +249,7 @@
 	.node-label {
 		font-size: 10px;
 	fill: #9ca3af;
-		pointer-events: none;
-	}
+		pointer-events: none }
 
 	.node-details {
 		position: absolute;
@@ -271,18 +259,15 @@
 		padding: 1rem;
 		border-radius: 8px;
 	color: #fff;
-		max-width: 300px;
-	}
+		max-width: 300px }
 
 	.node-details h4 {
 		margin: 0 0 0.5rem;
-		color: #a5b4fc;
-	}
+		color: #a5b4fc }
 
 	.node-details p {
 		margin: 0.25rem 0;
-		font-size: 0.875rem;
-	}
+		font-size: 0.875rem }
 
 	.node-details button {
 		margin-top: 0.5rem;
@@ -291,8 +276,7 @@
 	border: none;
 		padding: 0.25rem 0.75rem;
 		border-radius: 4px;
-	cursor: pointer;
-	}
+	cursor: pointer }
 </style>
 
 

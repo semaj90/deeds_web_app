@@ -233,7 +233,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
  <!-- Canvas, Container --> <div class="canvas-container">
   {#if error} <div class="error-message"> L { error } {/if} {#if isLoading} <div class="loading-overlay"> <div class="spinner"></div>
  <p>Loading canvas...</p> {/if}
-  <canvas bind:this={ canvasElement }></canvas> </div>
+  <canvas bind:this={canvasElement}></canvas> </div>
  <!-- Evidence, Panel -->
   {#if evidence.length > 0} <div class="evidence-panel"> <h3>Evidence Library ({evidence.length})</h3>
  <div class="evidence-grid">
@@ -519,7 +519,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
  <!-- Canvas, Container --> <div class="canvas-container">
   {#if error} <div class="error-message"> L { error } {/if} {#if isLoading} <div class="loading-overlay"> <div class="spinner"></div>
  <p>Loading canvas...</p> {/if}
-  <canvas bind:this={ canvasElement }></canvas> </div>
+  <canvas bind:this={canvasElement}></canvas> </div>
  <!-- Evidence, Panel -->
   {#if evidence.length > 0} <div class="evidence-panel"> <h3>Evidence Library ({evidence.length})</h3>
  <div class="evidence-grid">

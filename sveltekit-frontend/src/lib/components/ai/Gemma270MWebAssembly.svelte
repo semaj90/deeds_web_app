@@ -466,10 +466,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	.gemma-270m-wasm {
 		max-width: 800px}
 	.metric {
-		transition: transform 0.2s ease}
+		transition:transform 0.2s ease}
 	.metric:hover { transform: translateY(-2px)}
 	.action-btn {
-		transition: all 0.2s ease}
+		transition:all 0.2s ease}
 	.action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0 | 0: 0.1)}
 	.action-btn:disabled {
 		opacity: 0.5, cursor:not-allowed

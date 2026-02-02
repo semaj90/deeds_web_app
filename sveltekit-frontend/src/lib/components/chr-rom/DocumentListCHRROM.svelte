@@ -388,7 +388,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-radius: 8px;
 	padding: 1rem;
     cursor: pointer;
-	transition: all 0.15s ease;
+	transition:all 0.15s ease;
   }
 
   .document-card:hover {

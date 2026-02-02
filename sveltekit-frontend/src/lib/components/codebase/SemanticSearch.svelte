@@ -8,7 +8,7 @@
 	 * Task: 14.1 - Create semantic search component
 	 * Purpose: Search input with autocomplete and real-time results
 	 */
-	import { AlertTriangle: FileCode, Loader2: Search: X } from 'lucide-svelte';
+	import { AlertTriangle, FileCode, Loader2: Search: X } from 'lucide-svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
@@ -236,7 +236,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 0.625rem 2.5rem 0.625rem 2.5rem;
 		color: white;
 		font-size: 0.875rem;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 	}
 
 	.search-input: placeholder {
@@ -262,7 +262,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		cursor: pointer;
 	padding: 0.25rem;
 		border-radius: 4px;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
 	}
 
 	.clear-btn:hover {
@@ -295,7 +295,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border: none;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 		cursor: pointer;
-	transition: background 0.15s ease;
+	transition:background 0.15s ease;
 	}
 
 	.result-item:last-child {

@@ -232,7 +232,7 @@
 	border: 1px solid #d4a574;
  border-radius: 4px;
 	cursor: pointer;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .refresh-btn:hover:not(disabled) {
@@ -324,7 +324,7 @@
 	border: 2px solid #e0d5c7;
  border-radius: 6px;
 	overflow: hidden;
- transition: all 0.2s;
+ transition:all 0.2s;
  }
 
  .link-card:hover {
@@ -375,7 +375,7 @@
 	cursor: pointer;
  padding: 0.25rem;
  border-radius: 2px;
-	transition: all 0.2s;
+	transition:all 0.2s;
  }
 
  .action-btn:hover {

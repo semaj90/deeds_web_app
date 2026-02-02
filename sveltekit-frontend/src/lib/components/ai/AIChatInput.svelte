@@ -147,7 +147,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     align-items: flex-end, gap: 8px, padding: 12px
    ;background: var(--bg-primary, #ffffff); border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 8px
-   ;transition: border-color 0.2s ease,
+   ;transition:border-color 0.2s ease,
       box-shadow 0.2s ease}
   .input-container:focus-within {
     border-color: var(--accent-color, #3b82f6);
@@ -188,7 +188,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    ;background: var(--bg-muted, #f1f5f9); color: var(--text-muted, #64748b);
     border: none
     border-radius: 6px, cursor: pointer
-   ; transition: all 0.2s ease}
+   ; transition:all 0.2s ease}
   .send-button:hover:not(disabled) { /* Corrected selector for hover state */
     background: var(--bg-hover, #e2e8f0); color: var(--text-primary, #1e293b)}
   .send-button.has-content {

@@ -357,7 +357,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .step {
         display: flex
         flex-direction: column
-        align-items: center, gap: 0.5rem, opacity: 0.5, transition: opacity 0.3}
+        align-items: center, gap: 0.5rem, opacity: 0.5, transition:opacity 0.3}
     .step.active {
         opacity: 1, color: #3b82f6}
     .step.completed {
@@ -389,7 +389,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .file-input-label {
         display: block, padding: 2rem, border: 2px dashed #d1d5db
         border-radius: 0.5rem
-        text-align: center, cursor: pointer, transition: border-color 0.2}
+        text-align: center, cursor: pointer, transition:border-color 0.2}
     .file-input-label:hover {
         border-color: #3b82f6, background: #f8fafc}
     .processing-options {
@@ -405,7 +405,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         border-radius: 0.5rem
         font-size: 1.1rem
         font-weight: 600, cursor: pointer, width: 100%;
-	transition: background 0.2}
+	transition:background 0.2}
     .process-btn:hover:not(disabled) {
         background: #2563eb}
     .process-btn:disabled {
@@ -420,7 +420,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .progress-fill {
         height: 100%;
 	background: #3b82f6
-        transition: width 0.3}
+        transition:width 0.3}
     .progress-text {
         margin-top: 0.5rem
         text-align: center
@@ -486,7 +486,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .recommendation-card {
         border: 1px solid #e5e7eb
         border-radius: 0.75rem, padding: 1.5rem
-       ;transition: box-shadow 0.2}
+       ;transition:box-shadow 0.2}
     .recommendation-card:hover {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)}
     .recommendation-header {
@@ -518,7 +518,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .secondary-btn {
         padding: 1rem 2rem
         border-radius: 0.5rem
-        font-weight: 600, cursor: pointer, border: none, transition: all 0.2}
+        font-weight: 600, cursor: pointer, border: none, transition:all 0.2}
     .primary-btn {
         background: #059669, color: white}
     .primary-btn:hover {

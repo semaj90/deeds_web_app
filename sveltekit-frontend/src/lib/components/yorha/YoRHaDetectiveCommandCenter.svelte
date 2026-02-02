@@ -510,7 +510,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     font-weight: bold;
 	color: var(--yorha-dark);
     cursor: pointer;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
     border-radius: 0;
   }
 
@@ -565,7 +565,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     background: none;
 	color: var(--yorha-dark);
     cursor: pointer;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
     border-radius: 0;
   }
 
@@ -602,7 +602,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid var(--yorha-sand-dark);
     border-radius: 0;
 	padding: 1rem;
-    transition: all 0.3s ease;
+    transition:all 0.3s ease;
   }
 
   .metric-card:hover {
@@ -655,7 +655,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-radius: 0;
 	padding: 1rem;
     background-color: white;
-	transition: all 0.2s ease;
+	transition:all 0.2s ease;
   }
 
   .case-item:hover {
@@ -731,7 +731,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .health-fill {
     height: 100%;
     border-radius: 0;
-	transition: all 0.3s ease;
+	transition:all 0.3s ease;
   }
 
   .health-fill.normal {
@@ -887,7 +887,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: var(--yorha-dark);
     font-weight: bold;
 	cursor: pointer;
-    transition: all 0.2s ease;
+    transition:all 0.2s ease;
   }
 
   .yorha-btn:hover {

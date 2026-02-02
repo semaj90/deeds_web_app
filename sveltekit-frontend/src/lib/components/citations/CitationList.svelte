@@ -284,7 +284,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 4px;
 	cursor: pointer;
 		font-size: 16px;
-	transition: all 150ms ease;
+	transition:all 150ms ease;
 	}
 
 	.btn-search:hover:not(:disabled) {
@@ -332,7 +332,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		display: flex;
 		flex-direction: column;
 	gap: 12px;
-		transition: all 150ms ease;
+		transition:all 150ms ease;
 	}
 
 	.citation-card:hover {
@@ -394,7 +394,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-size: 16px;
 	padding: 4px;
 		opacity: 0.6;
-	transition: opacity 150ms ease;
+	transition:opacity 150ms ease;
 	}
 
 	.btn-delete:hover {
@@ -475,7 +475,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.relevance-fill {
 		height: 100%;
 	background: var(--color-burgundy);
-		transition: width 300ms ease;
+		transition:width 300ms ease;
 	}
 
 	.relevance-value {
@@ -496,7 +496,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 4px;
 	cursor: pointer;
 		font-weight: 600;
-	transition: all 150ms ease;
+	transition:all 150ms ease;
 	}
 
 	.btn-load-more:hover:not(:disabled) {
