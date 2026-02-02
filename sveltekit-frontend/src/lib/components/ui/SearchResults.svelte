@@ -75,7 +75,13 @@
 
  <div class="results-list">
  {#each results as result (result.id)}
- <div class="result-item" onclick={() => handleResultClick(result)}>
+ <div
+	class="result-item"
+	role="button"
+	tabindex="0"
+	onclick={() => handleResultClick(result)}
+	onkeydown={(e) => e.key === 'Enter' && handleResultClick(result)}
+ >
  <div class="result-header">
  <div class="result-source">
  {#if result.favicon}

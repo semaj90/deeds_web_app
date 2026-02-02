@@ -1,0 +1,21 @@
+  /**
+   * Initialize the component
+   */
+  $effect(() => {
+    (async () => {
+      // Load initial evidence if caseId provided
+      if (caseId && evidenceList.length === 0) {
+        await loadCaseEvidence();
+      }
+
+      // Initialize WebSocket collaboration
+      await initializeCollaboration();
+      console.log('[ContextualDetectiveBoard] Initialized for case:', caseId);
+    })();
+
+    return () => {
+      if (wsManager) {
+        wsManager.disconnect();
+      }
+    };
+  });

@@ -1,41 +1,44 @@
 <script lang="ts">
- // Migrated to $effect
+	// Migrated to $effect
 
- interface Citation {
- id: string;
-	statute_code: string;
- statute_title?: string;
- jurisdiction?: string;
- severity?: string;
-	source_type: 'manual' | 'auto_extracted';
- notes?: string;
-	created_at: string;
- }
+	interface Citation {
+		id: string;
+		statute_code: string;
+		statute_title?: string;
+		jurisdiction?: string;
+		severity?: string;
+		source_type: 'manual' | 'auto_extracted';
+		notes?: string;
+		created_at: string;
+	}
 
- let { caseId = null, limit = 20 } = $props<{
- caseId?: string | null;
- limit?: number;
- }>();
+	let {
+		caseId = null,
+		limit = 20,
+		onview = () => {},
+		onedit = () => {},
+		ondeleted = () => {}
+	} = $props<{
+		caseId?: string | null;
+		limit?: number;
+		onview?: (citation: Citation) => void;
+		onedit?: (citation: Citation) => void;
+		ondeleted?: () => void;
+	}>();
 
 
- let citations: Citation[] = $state([]);
- let isLoading = $state(true);
- let error: string | null = $state(null);
- let selectedCitation: Citation | null = $state(null);
+	let citations: Citation[] = $state([]);
+	let isLoading = $state(true);
+	let error: string | null = $state(null);
+	let selectedCitation: Citation | null = $state(null);
 
- $effect(() => {
+	$effect(() => {
+		loadCitations();
+	});
 
- (async () => {
- await loadCitations();
- 
-});();
- });
-
- async function loadCitations() {
- isLoading = true;
- error = null;
-
- try {
+	async function loadCitations() {
+		isLoading = true;
+		error = null; try {
  const params = new URLSearchParams({
  limit: limit.toString(),
  });

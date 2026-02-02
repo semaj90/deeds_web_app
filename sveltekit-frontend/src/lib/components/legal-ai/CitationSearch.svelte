@@ -1,79 +1,85 @@
 <script lang="ts">
-	let placeholder = $state<any>(undefined);
-let { placeholder = 'Search citations...', minChars = 2 } = $props();
+	import { debounce } from '$lib/utils/debounce';
 
- import { debounce } from '$lib/utils/debounce';
- import { createEventDispatcher } from 'svelte';
+	// Svelte 5 props
+	let {
+		placeholder = 'Search citations...',
+		minChars = 2,
+		onselect = () => {},
+		onupdated = () => {}
+	} = $props<{
+		placeholder?: string;
+		minChars?: number;
+		onselect?: (citation: Citation) => void;
+		onupdated?: () => void;
+	}>();
 
- interface Citation {
- id: string;
-	statute_code: string;
- statute_title?: string;
- jurisdiction?: string;
- severity?: string;
- year?: number;
-	source_type: 'manual' | 'auto_extracted';
- notes?: string;
-	created_at: string;
- }
+	interface Citation {
+		id: string;
+		statute_code: string;
+		statute_title?: string;
+		jurisdiction?: string;
+		severity?: string;
+		year?: number;
+		source_type: 'manual' | 'auto_extracted';
+		notes?: string;
+		created_at: string;
+	}
 
+	let searchQuery = $state('');
+	let results: Citation[] = $state([]);
+	let isSearching = $state(false);
+	let error: string | null = $state(null);
+	let showResults = $state(false);
 
+	const performSearch = debounce((query: string) => {
+		if (query.length < minChars) {
+			results = [];
+			showResults = false;
+			return;
+		}
 
+		isSearching = true;
+		error = null;
 
- const dispatch = createEventDispatcher();
+		(async () => {
+			try {
+				const params = new URLSearchParams();
+				params.set('q', query);
 
- let searchQuery = '';
- let results: Citation[] = [];
- let isSearching = false;
- let error: string | null = null;
- let showResults = false;
+				const response = await fetch(`/api/citations/search?${params}`);
+				if (response.ok) {
+					const data = await response.json();
+					if (data.success) {
+						results = data.citations;
+						showResults = true;
+					} else {
+						error = data.error ?? 'Search failed';
+					}
+				} else {
+					error = 'Search failed';
+				}
+			} catch (err) {
+				error = err instanceof Error ? err.message : 'An error occurred';
+			} finally {
+				isSearching = false;
+			}
+		})();
+	}, 300);
 
- const performSearch = debounce(async (query: string) => {
- if (query.length < minChars) {
- results = [];
- showResults = false;
- return;
- }
+	function handleInput(e: Event) {
+		const target = e.target as HTMLInputElement;
+		searchQuery = target.value;
+		performSearch(searchQuery);
+	}
 
- isSearching = true;
- error = null;
-
- try {
- const params = new URLSearchParams();
- params.set('q', query);
-
- const response = await fetch(`/api/citations/search? ${params}`);
- if (response.ok) {
- const data = await response.json();
- if (data.success) {
- results = data.citations;
- showResults = true;
- } else {
- error = data.error ?? 'Search failed';
- }
- } else {
- error = 'Search failed';
- }
- } catch (err) {
- error = err instanceof Error ? err.message : 'An error occurred';
- } finally {
- isSearching = false;
- }
- },
-	300);
-
- function handleInput(e: Event) {
- const target = e.target as HTMLInputElement;
- searchQuery = target.value;
- performSearch(searchQuery);
- }
-
- function selectCitation(citation: Citation) {
- dispatch('select', citation);
- searchQuery = '';
- results = [];
- showResults = false;
- }
+	function selectCitation(citation: Citation) {
+		onselect(citation);
+		onupdated();
+		searchQuery = '';
+		results = [];
+		showResults = false;
+	}
 
  function clearSearch() {
  searchQuery = '';
@@ -90,7 +96,7 @@ let { placeholder = 'Search citations...', minChars = 2 } = $props();
  }
 </script>
 
-<svelte, window onclick={ handleClickOutside } />
+<svelte:window onclick={handleClickOutside} />
 
 <div class="citation-search">
  <div class="search-input-wrapper">

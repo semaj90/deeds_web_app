@@ -1,10 +1,9 @@
 <script lang="ts">
   // Migrated to $effect
   import { browser } from '$app/environment';
-  import { LoadingButton } from '$lib/headless';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
-  import { Layers, ZoomIn, ZoomOut, RotateCcw, FileText, Users } from 'lucide-svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+  import { LoadingButton } from '$lib/headless';
+  import { Layers, RotateCcw, ZoomIn, ZoomOut } from 'lucide-svelte';
 
   // Types
   interface Legal3DEntity {
@@ -54,19 +53,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   };
 
   $effect(() => {
-
     if (!browser) return;
     initScene();
     animate();
-  
-});
 
-  // TODO: Add as cleanup in $effect: return () => {
-    // Cleanup WebGL/WebGPU context
-    if (browser) {
-      // disposer logic here
-    }
-  }
+    return () => {
+        // Cleanup WebGL/WebGPU context
+        if (browser) {
+          // disposer logic here
+        }
+    };
+  });
 
   function initScene() {
     isWebGPUActive = enableWebGPU && !!navigator.gpu;

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app-store';
   import { webgpu } from '$lib/webgpu/webgpu-init';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   let gpuMetrics = $state({
@@ -88,10 +87,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 
   $effect(() => {
-
     let interval: NodeJS.Timeout;
 
-    (async () => {
+    const init = async () => {
       try {
         const capabilities = await webgpu.initialize();
       } catch (error) {
@@ -103,12 +101,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       // Update metrics periodically
       interval = setInterval(async () => {
         await loadGPUMetrics();
-      },
-	5000); // Update every 5 seconds
-    
-});();
+      }, 5000); // Update every 5 seconds
+    };
 
-    return () => clearInterval(interval);
+    init();
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   });
 
   function getMetricColor(value: number, thresholds: {

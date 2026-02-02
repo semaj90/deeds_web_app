@@ -5,8 +5,7 @@
 	import AlertCircle from 'lucide-svelte/icons/alert-circle';
 	import Save from 'lucide-svelte/icons/save';
 	import Trash2 from 'lucide-svelte/icons/trash-2';
-import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+	import { onMount } from 'svelte';
 	// Migrated to $effect
 
 	const cache = useCache();

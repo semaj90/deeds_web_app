@@ -55,7 +55,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	let d3Module: any = null;
 	let isLoading = $state(true);
 	let transform = $state({ x: 0, y: 0, k: 1 });
-  
+
 	const nodeColors: Record<string, string> = {
 		route: '#a855f7',      // Purple
 		component: '#3b82f6',  // Blue
@@ -74,27 +74,30 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	$effect(() => {
-  (async () => {
+		let currentSimulation: any = null;
 
-		if (!browser) return;
+		const init = async () => {
+			if (!browser) return;
 
-		try {
-			// Dynamic import D3
-			d3Module = await import('d3');
-			isLoading = false;
-			initializeGraph();
-		} catch (error) {
-			console.error('Failed to load D3:', error);
-			isLoading = false }
-	
-  })();
-});
+			try {
+				// Dynamic import D3
+				d3Module = await import('d3');
+				isLoading = false;
+				initializeGraph();
+			} catch (error) {
+				console.error('Failed to load D3:', error);
+				isLoading = false;
+			}
+		};
 
-	// TODO: Add as cleanup in $effect: return () => {
-		if (simulation) {
-			simulation.stop();
-		}
-	}
+		init();
+
+		return () => {
+			if (simulation) {
+				simulation.stop();
+			}
+		};
+	});
 
 	function initializeGraph() {
 		if (!d3Module || !svg || nodes.length === 0) return;
@@ -233,7 +236,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			onNodeHover(null);
 			link.attr('stroke', 'rgba(255,255,255, 0.2)');
 		});
-  
+
 		simulation.on('tick', () => {
 			link
 				.attr('x1', (d: any) => d.source.x)
@@ -244,7 +247,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			node.attr('transform', (d: any) => `translate(${d.x},
 	${d.y})`);
 		});
-  
+
 		function dragstarted(event: any, d: any) {
 			if (!event.active) simulation.alphaTarget(0.3).restart();
 			d.fx = d.x;
@@ -266,7 +269,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			initializeGraph();
 		}
 	});
-  
+
 	function zoomIn() {
 		if (!d3Module || !svg) return;
 		d3Module.select(svg).transition().call(

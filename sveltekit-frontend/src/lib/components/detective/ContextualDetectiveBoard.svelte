@@ -6,7 +6,6 @@
   import HeadlessTypingListener from '$lib/components/HeadlessTypingListener.svelte';
   import type { TypingContext, TypingState } from '$lib/machines/userTypingStateMachine';
   import DetectiveWebSocketManager, { type CollaborativeUser } from '$lib/websocket/DetectiveWebSocketManager';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // Props interface
@@ -82,16 +81,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       await initializeCollaboration();
       console.log('[ContextualDetectiveBoard] Initialized for case:', caseId);
     })();
-  });
 
-  /**
-   * Cleanup on destroy
-   */
-  // TODO: Add as cleanup in $effect: return () => {
-    if (wsManager) {
-      wsManager.disconnect();
-    }
-  }
+    return () => {
+      if (wsManager) {
+        wsManager.disconnect();
+      }
+    };
+  });
 
   /**
    * Load case evidence from API

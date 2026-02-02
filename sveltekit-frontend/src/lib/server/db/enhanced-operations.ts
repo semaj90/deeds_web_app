@@ -1,4 +1,3 @@
-import type { Case } from '$lib/types';
 
 // Enhanced database operations for cases and evidence
 export const DbCaseOperations = {
@@ -55,6 +54,45 @@ export const DbCaseOperations = {
 			id,
 			...updates
 		};
+	},
+	getWithRelations: async (id: string) => {
+		// Stub: Return mock case with relations
+		return {
+			id,
+			caseNumber: `MOCK-${id}`,
+			title: 'Mock Case',
+			evidence: [],
+			witnesses: [],
+			documents: [],
+			createdBy: 'mock-user-id',
+			leadProsecutor: 'mock-prosecutor-id'
+		};
 	}
 };
+
+// Evidence operations stub for SSR compatibility
+export const DbEvidenceOperations = {
+	search: async (params: {
+		query?: string;
+		caseId?: string;
+		type?: string[];
+		limit?: number;
+		offset?: number;
+	}) => {
+		// Stub: Return mock evidence
+		return {
+			evidence: [],
+			total: 0
+		};
+	}
+};
+
+// Health check stub for SSR
+export async function checkDatabaseHealth() {
+	return {
+		healthy: true,
+		connected: true,
+		latency: 0
+	};
+}
 

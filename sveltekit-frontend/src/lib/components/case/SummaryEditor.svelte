@@ -1,8 +1,15 @@
 <script lang="ts">
- import type { CaseSummary } from '$lib/types/case-summary';
- import CitationDetail from '../legal-ai/CitationDetail.svelte';
- import CitationList from '../legal-ai/CitationList.svelte';
- import CitationSearch from '../legal-ai/CitationSearch.svelte';
+	import type { CaseSummary } from '$lib/types/case-summary';
+	import CitationDetail from '../legal-ai/CitationDetail.svelte';
+	import CitationList from '../legal-ai/CitationList.svelte';
+	import CitationSearch from '../legal-ai/CitationSearch.svelte';
+
+	interface Citation {
+		id: string;
+		statute_code: string;
+		statute_title?: string;
+		jurisdiction?: string;
+	}
 
  let { summary, caseId = null } = $props<{
  summary: CaseSummary;
@@ -10,7 +17,7 @@
  }>();
 
  let isEditing = $state(false);
- let editedText = $state(summary.text);
+	let editedText = $derived(summary.text);
  let showCitationPanel = $state(false);
  let selectedCitation = $state<any>(null);
  let showCitationSearch = $state(false);
@@ -50,9 +57,9 @@
  <ul class="citations">
  {#each summary.citations as citation}
  <li>
- <a href="#" class="citation-link">
+	<button type="button" class="citation-link">
  {citation.code} ({citation.jurisdiction})
- </a>
+ </button>
  <span class="citation-title">{citation.title}</span>
  </li>
  {/each}
@@ -88,22 +95,22 @@
  </div>
  {:else}
  <div class="citation-list-view">
- <div class="search-section">
- <h4>Search Citations</h4>
- <CitationSearch
- onselect={(e) => (selectedCitation = e.detail)}
- />
- </div>
+\t\t\t\t<div class="search-section">
+\t\t\t\t\t<h4>Search Citations</h4>
+\t\t\t\t\t<CitationSearch
+\t\t\t\t\t\tonselect={(citation) => (selectedCitation = citation)}
+\t\t\t\t\t\tonupdated={() => {}}
+\t\t\t\t\t/>
+\t\t\t\t</div>
 
- <div class="list-section">
- <CitationList
- {caseId}
- limit={10}
- showFilters={true}
- onview={(e) => (selectedCitation = e.detail)}
- onedit={(e) => (selectedCitation = e.detail)}
- ondeleted={() => {}}
- />
+\t\t\t\t<div class="list-section">
+\t\t\t\t\t<CitationList
+\t\t\t\t\t\tcaseId={caseId}
+\t\t\t\t\t\tlimit={10}
+\t\t\t\t\t\tonview={(citation) => (selectedCitation = citation)}
+\t\t\t\t\t\tonedit={(citation) => (selectedCitation = citation)}
+\t\t\t\t\t\tondeleted={() => {}}
+\t\t\t\t\t/>
  </div>
  </div>
  {/if}

@@ -141,17 +141,15 @@
   }
 
   $effect(() => {
-
     fetchStatus();
     statusInterval = setInterval(fetchStatus, 5000);
-  
-});
 
-  // TODO: Add as cleanup in $effect: return () => {
-    if (statusInterval) {
-      clearInterval(statusInterval);
-    }
-  }
+    return () => {
+      if (statusInterval) {
+        clearInterval(statusInterval);
+      }
+    };
+  });
 </script>
 
 <div class="ace-controls">

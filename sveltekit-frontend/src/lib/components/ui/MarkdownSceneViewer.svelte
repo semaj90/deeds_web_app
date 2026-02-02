@@ -3,8 +3,19 @@
 	 * MarkdownSceneViewer Component
 	 * Renders AI-generated scene summaries for human validation
 	 */
-	import type { MarkdownScene } from '$lib/stores/ui-store';
 	import marked from 'marked';
+
+	// Define type locally since not exported from ui-store
+	interface MarkdownScene {
+		markdown: string;
+		id?: string;
+		title?: string;
+		confidence?: number;
+		sourceFiles?: string[];
+		validatedBy?: string;
+		validatedAt?: Date;
+		[key: string]: unknown;
+	}
 
 	interface Props {
 		scene: MarkdownScene;
@@ -28,7 +39,7 @@
 	let editedMarkdown = $derived(scene.markdown);
 
 	// Parse markdown to HTML
-	const renderedHtml = $derived(marked.parse(scene.markdown) as string);
+	const renderedHtml = $derived(typeof marked === 'function' ? marked(scene.markdown) : String(scene.markdown));
 
 	function handleValidate() {
 		onValidate?.(scene.id);

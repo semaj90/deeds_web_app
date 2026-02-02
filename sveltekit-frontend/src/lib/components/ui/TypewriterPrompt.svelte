@@ -4,7 +4,14 @@
  * Displays AI prompts with typewriter effect
  * "What about Case #123..."
  */
- import type { TypewriterPrompt } from '$lib/stores/ui-store';
+
+ // Define type locally since not exported from ui-store
+ interface TypewriterPrompt {
+   text: string;
+   speed?: number;
+   cursor?: string;
+   [key: string]: unknown;
+ }
 
  interface Props {
  prompt?: TypewriterPrompt;

@@ -7,8 +7,6 @@
 	// Migrated to $effect
 	import { chrRomPatternCache } from '../../cache/chr-rom-pattern-cache';
 	import { base64FP32Quantizer } from '../../text/base64-fp32-quantizer';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Props interface
 	interface TypewriterProps {
@@ -62,6 +60,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Animation frame ID
 	let animationFrame: number;
 	let typewriterInterval: ReturnType<typeof setInterval> | undefined;
+    let cursorBlinkInterval: ReturnType<typeof setInterval> | undefined;
 
 	// Component references
 	let containerElement: HTMLDivElement;
@@ -69,16 +68,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	let cursorElement: HTMLSpanElement;
 
 	$effect(() => {
-
 		initializeTextureSystem();
 		initializeAudioSystem();
 		startTypewriterEffect();
-	
-});
 
-	// TODO: Add as cleanup in $effect: return () => {
-		cleanup();
-	}
+		return () => {
+			cleanup();
+		};
+	});
 
 	function initializeTextureSystem(): void {
 		if (!cacheTextures) return;
@@ -322,24 +319,23 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	function startCursorBlink(): void {
-		const blinkInterval = setInterval(() => {
+        if (cursorBlinkInterval) clearInterval(cursorBlinkInterval);
+		cursorBlinkInterval = setInterval(() => {
 			if (!isTyping) {
 				cursor = !cursor;
 			} else {
 				cursor = true;
 			}
-		},
-	500);
-
-		// TODO: Add as cleanup in $effect: return () => {
-			clearInterval(blinkInterval);
-		}
+		}, 500);
 	}
 
 	function cleanup(): void {
 		if (typewriterInterval) {
 			clearInterval(typewriterInterval);
 		}
+        if (cursorBlinkInterval) {
+            clearInterval(cursorBlinkInterval);
+        }
 		if (animationFrame) {
 			cancelAnimationFrame(animationFrame);
 		}

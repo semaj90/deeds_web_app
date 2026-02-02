@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { superForm } from 'sveltekit-superforms';
   import { zod } from 'sveltekit-superforms/adapters';
+  import { superForm } from 'sveltekit-superforms/client';
   import { z } from 'zod';
 
   interface Props {
@@ -24,7 +24,10 @@
     physicalDescription: z.string().optional()
   });
 
-  const { form, errors, enhance, submitting } = superForm(poi || {},
+  // Use a function to get current poi value
+  const getInitialData = () => poi || {};
+
+  const { form, errors, enhance, submitting } = superForm(getInitialData(),
 	{
     validators: zod(poiSchema),
     onSubmit: async ({ formData }) => {
@@ -259,8 +262,7 @@
   }
 
   input.error,
-  select.error,
-  textarea.error {
+  select.error {
     border-color: #ef4444;
   }
 

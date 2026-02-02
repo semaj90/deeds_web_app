@@ -160,7 +160,7 @@
 			</div>
 			<div class="case-info">
 				<div class="info-item">
-					<label>Charges:</label>
+					<h4 class="detail-label">Charges:</h4>
 					<div class="charges">
 						{#each caseDetail.charges as charge}
 							<span class="charge-badge">{charge}</span>
@@ -168,11 +168,11 @@
 					</div>
 				</div>
 				<div class="info-item">
-					<label>Prosecutor:</label>
+					<h4 class="detail-label">Prosecutor:</h4>
 					<span>{caseDetail.prosecutor}</span>
 				</div>
 				<div class="info-item">
-					<label>Filed:</label>
+					<h4 class="detail-label">Filed:</h4>
 					<span>{new Date(caseDetail.filedDate).toLocaleDateString()}</span>
 				</div>
 			</div>

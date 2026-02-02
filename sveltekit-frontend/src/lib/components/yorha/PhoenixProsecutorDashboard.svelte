@@ -1,12 +1,10 @@
 <script lang="ts">
   import LegalHUD from '$lib/components/evidence-graph/LegalHUD.svelte';
   import { WebGPUEvidenceGraphVisualization } from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization';
-  // Migrated to $effect
+// Migrated to $effect
   import ContradictionReveal from './ContradictionReveal.svelte';
   import EvidenceComparisonOverlay from './evidence/EvidenceComparisonOverlay.svelte';
   import PhoenixEventMonitor from './PhoenixEventMonitor.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Evidence {
     id: string;
@@ -69,16 +67,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   );
 
   $effect(() => {
-
     investigationActive = true;
     connectEventStream();
     refreshRecommendations();
-  
-});
 
-  // TODO: Add as cleanup in $effect: return () => {
-    disconnectEventStream();
-  }
+    return () => {
+      disconnectEventStream();
+    };
+  });
 
   function handleEvidenceSelect(evidence: Evidence) {
     if (selectedEvidence.length < 2) {

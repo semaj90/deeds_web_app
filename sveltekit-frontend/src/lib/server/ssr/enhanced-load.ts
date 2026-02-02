@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
-import type { User } from '$lib/types';
+import type { User } from '$lib/types/database-types';
 import { CommonErrors } from '../api/response.js';
-import { DbCaseOperations } from '../db/enhanced-operations.js';
+import { DbCaseOperations, DbEvidenceOperations, checkDatabaseHealth } from '../db/enhanced-operations.js';
 import { cases, evidence } from '../db/schema-postgres.js';
 
 type $Case = typeof cases.$inferSelect;

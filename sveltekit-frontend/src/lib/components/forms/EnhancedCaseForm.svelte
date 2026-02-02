@@ -39,26 +39,46 @@
 	metadata: Record<string, unknown>;
   }
 
-  // Form data matching the database schema
+  // Form data matching the database schema - initialize with defaults
   let formData = $state<FormData>({
-    title: case_?.title ?? '',
-    description: case_?.description ?? '',
-    caseNumber: case_?.caseNumber ?? '',
-    name: case_?.name ?? '',
-    incidentDate: case_?.incidentDate
+    title: '',
+    description: '',
+    caseNumber: '',
+    name: '',
+    incidentDate: '',
+    location: '',
+    priority: 'medium',
+    status: 'open',
+    category: '',
+    dangerScore: 0,
+    estimatedValue: '',
+    jurisdiction: '',
+    leadProsecutor: '',
+    assignedTeam: [],
+    tags: [],
+    metadata: {}
+  });
+
+  // Sync props to formData reactively
+  $effect(() => {
+    formData.title = case_?.title ?? '';
+    formData.description = case_?.description ?? '';
+    formData.caseNumber = case_?.caseNumber ?? '';
+    formData.name = case_?.name ?? '';
+    formData.incidentDate = case_?.incidentDate
       ? new Date(case_.incidentDate as string | Date).toISOString().split('T')[0]
-      : '',
-    location: case_?.location ?? '',
-    priority: case_?.priority ?? 'medium',
-    status: case_?.status ?? 'open',
-    category: case_?.category ?? '',
-    dangerScore: case_?.dangerScore ?? 0,
-    estimatedValue: case_?.estimatedValue?.toString() ?? '',
-    jurisdiction: case_?.jurisdiction ?? '',
-    leadProsecutor: case_?.leadProsecutor ?? (user?.id ?? ''),
-    assignedTeam: case_?.assignedTeam ?? [],
-    tags: case_?.tags ?? [],
-    metadata: case_?.metadata ?? {}
+      : '';
+    formData.location = case_?.location ?? '';
+    formData.priority = case_?.priority ?? 'medium';
+    formData.status = case_?.status ?? 'open';
+    formData.category = case_?.category ?? '';
+    formData.dangerScore = case_?.dangerScore ?? 0;
+    formData.estimatedValue = case_?.estimatedValue?.toString() ?? '';
+    formData.jurisdiction = case_?.jurisdiction ?? '';
+    formData.leadProsecutor = case_?.leadProsecutor ?? (user?.id ?? '');
+    formData.assignedTeam = case_?.assignedTeam ?? [];
+    formData.tags = case_?.tags ?? [];
+    formData.metadata = case_?.metadata ?? {};
   });
 
   let loading = $state(false);
@@ -84,7 +104,7 @@
   // Handle form submission
   async function handleSubmit(): Promise<void> {
     if (!validateForm()) {
-      (notifications as { add: (n: unknown) => void }).add({
+      notifications.addNotification({
         type: 'error',
         title: 'Validation Error',
         message: 'Please fix the form errors before submitting.'
@@ -107,7 +127,7 @@
         dangerScore: Number(formData.dangerScore),
         estimatedValue: formData.estimatedValue ? Number(formData.estimatedValue) : null,
         jurisdiction: (formData.jurisdiction || '').trim(),
-        leadProsecutor: formData.leadProsecutor || user?.id ?? '',
+        leadProsecutor: formData.leadProsecutor || (user?.id ?? ''),
         assignedTeam: formData.assignedTeam,
         tags: formData.tags,
         metadata: {
@@ -140,7 +160,7 @@
         throw new Error(savedCase?.error ?? 'Failed to save case');
       }
 
-      (notifications as { add: (n: unknown) => void }).add({
+      notifications.addNotification({
         type: 'success',
         title: case_ ? 'Case Updated' : 'Case Created',
         message: `Case "${savedCase.title}" has been ${case_ ? 'updated' : 'created'} successfully.`
@@ -153,7 +173,7 @@
       }
     } catch (err) {
       console.error('Error saving case:', err);
-      (notifications as { add: (n: unknown) => void }).add({
+      notifications.addNotification({
         type: 'error',
         title: 'Save Error',
         message: err instanceof Error ? err.message : 'Failed to save case. Please try again.'

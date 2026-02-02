@@ -1,5 +1,30 @@
 <script lang="ts">
-	import type { AIMetadata, AutoPopulatedForm } from '$lib/stores/ui-store';
+	// Define types locally since they're not exported from ui-store
+	interface AIEntity {
+		type: string;
+		value: string;
+		context?: string;
+	}
+
+	interface AIMetadata {
+		confidence: number;
+		source: string;
+		entities?: AIEntity[];
+		[key: string]: unknown;
+	}
+
+	interface AutoPopulatedForm {
+		confidence: number;
+		source: 'ocr' | 'ai' | 'manual' | 'mixed';
+		defendant?: string;
+		plaintiff?: string;
+		location?: string;
+		date?: string;
+		charges?: string[];
+		witnesses?: string[];
+		summary?: string;
+		[key: string]: unknown;
+	}
 
 	interface Props {
 		form?: AutoPopulatedForm;
@@ -13,7 +38,7 @@
 	let {
 		form = {
 			confidence: 0,
-			source: 'manual'
+			source: 'manual' as const
 		},
 	metadata,
 		onSubmit,
@@ -22,10 +47,17 @@
 		editable = true
 	}: Props = $props();
 
-	let localForm = $derived<AutoPopulatedForm>({ ...form });
+	// Use $state for mutable form data, sync with $effect
+	let localForm = $state<AutoPopulatedForm>({
+		confidence: 0,
+		source: 'manual',
+		charges: [],
+		witnesses: []
+	});
 
+	// Sync form prop to localForm
 	$effect(() => {
-		localForm = { ...form };
+		localForm = { ...form, charges: form.charges || [], witnesses: form.witnesses || [] };
 	});
 
 	$effect(() => {
@@ -35,7 +67,7 @@
 	});
 
 	function populateFromMetadata(meta: AIMetadata) {
-		if (!meta.entities) return;
+		if (!meta.entities || !Array.isArray(meta.entities)) return;
 
 		for (const entity of meta.entities) {
 			switch (entity.type) {
@@ -162,10 +194,10 @@
 			</label>
 			<input
 				type="text"
-				id="caseNumber"
-				class="form-input"
-				value={localForm.caseNumber || ''}
-				oninput={(e) => handleFieldChange('caseNumber', e.currentTarget.value)}
+			id="caseNumber"
+			class="form-input"
+			value={localForm.caseNumber || ''}
+			oninput={(e) => handleFieldChange('caseNumber', (e.currentTarget as HTMLInputElement).value)}
 				disabled={!editable}
 				placeholder="e.g., 2025-CR-001234"
 			/>
@@ -175,10 +207,10 @@
 			<label class="form-label" for="caseName">Case Name</label>
 			<input
 				type="text"
-				id="caseName"
-				class="form-input"
-				value={localForm.caseName || ''}
-				oninput={(e) => handleFieldChange('caseName', e.currentTarget.value)}
+			id="caseName"
+			class="form-input"
+			value={localForm.caseName || ''}
+			oninput={(e) => handleFieldChange('caseName', (e.currentTarget as HTMLInputElement).value)}
 				disabled={!editable}
 				placeholder="e.g., State v. Doe"
 			/>
@@ -193,10 +225,10 @@
 			</label>
 			<input
 				type="text"
-				id="defendant"
-				class="form-input"
-				value={localForm.defendant || ''}
-				oninput={(e) => handleFieldChange('defendant', e.currentTarget.value)}
+			id="defendant"
+			class="form-input"
+			value={localForm.defendant || ''}
+			oninput={(e) => handleFieldChange('defendant', (e.currentTarget as HTMLInputElement).value)}
 				disabled={!editable}
 				placeholder="Defendant name"
 			/>
@@ -206,10 +238,10 @@
 			<label class="form-label" for="plaintiff">Plaintiff</label>
 			<input
 				type="text"
-				id="plaintiff"
-				class="form-input"
-				value={localForm.plaintiff || ''}
-				oninput={(e) => handleFieldChange('plaintiff', e.currentTarget.value)}
+			id="plaintiff"
+			class="form-input"
+			value={localForm.plaintiff || ''}
+			oninput={(e) => handleFieldChange('plaintiff', (e.currentTarget as HTMLInputElement).value)}
 				disabled={!editable}
 				placeholder="Plaintiff name"
 			/>
@@ -224,10 +256,10 @@
 			</label>
 			<input
 				type="text"
-				id="location"
-				class="form-input"
-				value={localForm.location || ''}
-				oninput={(e) => handleFieldChange('location', e.currentTarget.value)}
+			id="location"
+			class="form-input"
+			value={localForm.location || ''}
+			oninput={(e) => handleFieldChange('location', (e.currentTarget as HTMLInputElement).value)}
 				disabled={!editable}
 				placeholder="Incident location"
 			/>
@@ -245,7 +277,7 @@
 				id="date"
 				class="form-input"
 				value={localForm.date || ''}
-				oninput={(e) => handleFieldChange('date', e.currentTarget.value)}
+				oninput={(e) => handleFieldChange('date', (e.currentTarget as HTMLInputElement).value)}
 				disabled={!editable}
 			/>
 		</div>
@@ -253,7 +285,7 @@
 
 	<div class="form-section">
 		<div class="section-header">
-			<label class="form-label">Charges</label>
+			<h3 class="form-label">Charges</h3>
 			{#if editable}
 				<button type="button" class="add-btn" onclick={addCharge}>+ Add Charge</button>
 			{/if}
@@ -266,7 +298,7 @@
 							type="text"
 							class="form-input"
 							value={charge}
-							oninput={(e) => updateCharge(index, e.currentTarget.value)}
+							oninput={(e) => updateCharge(index, (e.currentTarget as HTMLInputElement).value)}
 							disabled={!editable}
 							placeholder="Enter charge"
 						/>
@@ -285,7 +317,7 @@
 
 	<div class="form-section">
 		<div class="section-header">
-			<label class="form-label">Witnesses</label>
+			<h3 class="form-label">Witnesses</h3>
 			{#if editable}
 				<button type="button" class="add-btn" onclick={addWitness}>+ Add Witness</button>
 			{/if}
@@ -298,7 +330,7 @@
 							type="text"
 							class="form-input"
 							value={witness}
-							oninput={(e) => updateWitness(index, e.currentTarget.value)}
+							oninput={(e) => updateWitness(index, (e.currentTarget as HTMLInputElement).value)}
 							disabled={!editable}
 							placeholder="Witness name"
 						/>
@@ -321,7 +353,7 @@
 			id="summary"
 			class="form-textarea"
 			value={localForm.summary || ''}
-			oninput={(e) => handleFieldChange('summary', e.currentTarget.value)}
+			oninput={(e) => handleFieldChange('summary', (e.currentTarget as HTMLTextAreaElement).value)}
 			disabled={!editable}
 			rows="4"
 			placeholder="Brief case summary..."

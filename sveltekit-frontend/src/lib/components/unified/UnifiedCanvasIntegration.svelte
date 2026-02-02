@@ -38,11 +38,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   $effect(() => {
     initializeUnifiedSystems();
     startPerformanceMonitoring();
-  });
 
-  // TODO: Add as cleanup in $effect: return () => {
-    if (performanceInterval) clearInterval(performanceInterval);
-  }
+    return () => {
+      if (performanceInterval) clearInterval(performanceInterval);
+    };
+  });
 
   async function initializeUnifiedSystems(): Promise<void> {
     console.log('🚀 Initializing Unified Canvas Integration for caseId:', caseId);

@@ -166,13 +166,18 @@
 	function exportResults() {
 		if (!prediction) return;
 
-		const data = {
-			export_timestamp: new Date().toISOString(),
-			case_data: $formData,
-			prediction_results: prediction
-		};
-
-		let content, filename, mimeType;
+	const data = {
+		export_timestamp: new Date().toISOString(),
+		case_data: {
+			caseFacts: $formData.caseFacts,
+			caseType: $formData.caseType,
+			jurisdiction: $formData.jurisdiction,
+			partyType: $formData.partyType,
+			historicalData: $formData.historicalData.split('\n').filter((line: string) => line.trim()),
+			similarCases: $formData.similarCases.split('\n').filter((line: string) => line.trim())
+		},
+		prediction_results: prediction
+	};		let content, filename, mimeType;
 
 		if ($exportFormat=== 'json') {
 			content = JSON.stringify(data, null, 2);

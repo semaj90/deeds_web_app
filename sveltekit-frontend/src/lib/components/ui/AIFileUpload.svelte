@@ -4,9 +4,38 @@
    * Drag-and-drop with auto-detection and AI analysis
    * Supports PDFs, videos, images - auto-detected and analyzed
    */
-  import type { AIMetadata, UploadedFile } from '$lib/stores/ui-store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+
+  // Define types locally since not exported from ui-store
+  interface AIEntity {
+    type: string;
+    value: string;
+    confidence: number;
+    context?: string;
+  }
+
+  interface AIMetadata {
+    confidence: number;
+    source: string;
+    entities?: AIEntity[];
+    ocrText?: string;
+    timeline?: unknown[];
+    scenes?: unknown[];
+    analyzedAt?: Date;
+    processingTimeMs?: number;
+    [key: string]: unknown;
+  }
+
+  interface UploadedFile {
+    id: string;
+    name: string;
+    size: number;
+    type: string;
+    url?: string;
+    status?: string;
+    progress?: number;
+    metadata?: AIMetadata;
+    [key: string]: unknown;
+  }
 
   interface Props {
     accept?: string;
@@ -166,6 +195,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function generateMockMetadata(file: UploadedFile): AIMetadata {
     const baseMetadata: AIMetadata = {
       confidence: 0.85 + Math.random() * 0.1,
+      source: 'mock',
       analyzedAt: new Date(),
       processingTimeMs: Math.floor(Math.random() * 2000) + 500,
       entities: [

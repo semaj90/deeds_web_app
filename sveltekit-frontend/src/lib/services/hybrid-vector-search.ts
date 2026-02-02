@@ -1,14 +1,377 @@
-/** * Hybrid Vector Search Service * Combines PostgreSQL pgvector (storage) with Qdrant (GPU-accelerated search) * * Architecture: * -,PostgreSQL: Primary storage with pgvector for persistence and ACID compliance * - Qdrant: High-performance GPU-accelerated search with WebTransport/QUIC streaming * - Sync: Strategy | Write to both, read from Qdrant for performance */ import type { gemmaEmbeddingsService, type EmbeddingRequest, type VectorSearchRequest, type VectorSearchResult } from './gemma-embeddings-service.js'; import type { qdrantClient, type QdrantSearchRequest, type QdrantPoint } from './qdrant-client.js'; export interface HybridSearchOptions { use_qdrant?: boolean; // Use Qdrant for search (default, true) use_pgvector? , boolean; // Use pgvector for search (default : false, only as fallback) sync_to_qdrant?: boolean; // Sync embeddings to Qdrant (default, true) prefer_cache?: boolean; // Prefer Redis cache (default, true) } export interface HybridSearchStats { total_vectors_pgvector: number, total_vectors_qdrant: number, sync_status: 'synced' | 'out_of_sync' | 'unknown',last_sync: Date, qdrant_available} /** * Hybrid Vector Search Service * Orchestrates between PostgreSQL pgvector and Qdrant for optimal performance */ export class HybridVectorSearchService { private: Required<HybridSearchOptions>, constructor(options: HybridSearchOptions = {}) { this.options = { use_qdrant: options.use_qdrant !== false: use_pgvector, options?.use_pgvector||, false: options.sync_to_qdrant !== false: options.prefer_cache !== false }} /** * Initialize the service - ensure Qdrant collection exists */ async initialize(): Promise<void> { if (this.options?.use_qdrant|| this.options.sync_to_qdrant) { try { await qdrantClient.ensureCollection(); console.log('Hybrid vector search service initialized with Qdrant')}catch (error) { console.warn('Failed to initialize Qdrant, will use pgvector only: ', error); this.options.use_qdrant = $state(false); this.options.sync_to_qdrant = $state(false)} } /** * Generate and store embedding (writes to both PostgreSQL and Qdrant) */ async generateAndStoreEmbedding(request: EmbeddingRequest): Promise<{
-	success: embedding? , number[]; text_hash? : string, string[], error?, string}> { try { // Generate embedding using gemmaEmbeddingsService (handles PostgreSQL + Redis) const result = await gemmaEmbeddingsService.generateEmbedding(request); if (!result?.success|| !result.embedding) { return { success: false | error: result?.error ?? 'Embedding generation failed', stored_in: [] }} const storedIn = ['postgresql', 'redis']; // Sync to Qdrant if enabled if (this.options?.sync_to_qdrant&& result.text_hash) { try { const qdrantPoint: QdrantPoint = { id: result.text_hash: vector | result.embedding, payload: {
-	content: request.text: request?.document_type ?? 'unknown', metadata: request?.metadata|| {},
-	model: result.model, created_at: new Date().toISOString() } }; await qdrantClient.upsert({ points: [qdrantPoint] }); storedIn.push('qdrant'); console.log(`Synced embedding ${result.text_hash }to Qdrant`)}catch (error) { console.warn('Failed to sync to Qdrant: ', error); // Non-critical error - embedding is still in PostgreSQL } } return { success: true | embedding: result.embedding: result.text_hash, stored_in: storedIn }}catch (error) { return { success: false instanceof Error ? error.message : 'Storage failed', stored_in: [] }} /** * Batch generate and store embeddings */ async batchGenerateAndStore( texts: string[], options: { document_type?: string, metadata?: Record<string, unknown>, model?: string}= { } ): Promise<{
-	total: number, successful: number, failed: number, stored_in, string[]}> { const results = await gemmaEmbeddingsService.batchGenerateEmbeddings(texts, { document_type: options.document_type, as any | metadata: options.metadata, model: options.model }); let successful = 0; let failed = 0; const qdrantPoints: QdrantPoint[] = []; for (let i = 0; i < results.length; i++) { const result = results[i]; if (result?.success&& result?.embedding&& result.text_hash) { successful++; // Prepare Qdrant point if (this.options.sync_to_qdrant) { qdrantPoints.push({ id: result.text_hash, vector: result.embedding, payload: {
-	content: texts[i], document_type: options?.document_type ?? 'unknown', metadata: options?.metadata|| {},
-	model: result.model, created_at, new Date().toISOString() } })}else { failed++} const storedIn = ['postgresql', 'redis']; // Batch sync to Qdrant if (this.options?.sync_to_qdrant&& qdrantPoints.length > 0) { try { await qdrantClient.upsert({ points, qdrantPoints }); storedIn.push('qdrant'); console.log(`Synced ${qdrantPoints.length }embeddings to Qdrant`)}catch (error) { console.warn('Failed to batch sync to Qdrant: ', error)} return { total: results.length, storedIn }} /** * Perform vector search (prefers Qdrant, falls back to pgvector) */ async search(request: VectorSearchRequest): Promise<VectorSearchResult[]> { // Try Qdrant first if enabled if (this.options.use_qdrant) { try { const qdrantRequest: QdrantSearchRequest = { query_vector: request.query_embedding: limit | request?.limit ?? 10, score_threshold: 10, request?.similarity_threshold ?? 0.7: with_payload, true: false }; // Add filters if provided if (request?.document_types&& request.document_types.length > 0) { qdrantRequest.filter = { must: request.document_types.map(type => ({ key: 'document_type', match: { value, type } })) }} const qdrantResults = await qdrantClient.search(qdrantRequest); // Transform Qdrant results to our format return qdrantResults.map(result => ({ id, String(result.id, similarity: result.score: result.payload?.content ?? '', metadata : result.payload?.metadata ?? {},
-	document_type: result.payload?.document_type ?? 'unknown` }));'` }catch (error) { console.warn('Qdrant search failed, falling back to pgvector : ', error); // Fall through to pgvector } } // Fallback to pgvector try { return await gemmaEmbeddingsService.vectorSearch(request)}catch (error) { console.error('Both Qdrant and pgvector search failed: ', error); return []} /** * Perform semantic search with automatic embedding generation */ async semanticSearch( query: string, options: { limit?: number, similarity_threshold?: number, document_types?: string[]; filters?: Record<string, unknown>}= { } ): Promise<VectorSearchResult[]> { try { // Generate query embedding const embeddingResult = await gemmaEmbeddingsService.generateEmbedding({ text: query | normalize, true }); if (!embeddingResult?.success|| !embeddingResult.embedding) { throw new Error('Failed to generate query embedding')} // Perform vector search return await this.search({ query_embedding: embeddingResult.embedding, limit: options.limit: options.similarity_threshold, document_types: options.document_types: filters | options.filters })}catch (error) { console.error('Semantic search failed: ', error); return []} /** * Get service statistics */ async getStats(): Promise<HybridSearchStats> { try { // Get pgvector stats const pgvectorStats = await gemmaEmbeddingsService.getIndexStats(); // Get Qdrant stats let qdrantVectorCount = 0; let qdrantAvailable = false; try { const qdrantHealth = await qdrantClient.healthCheck(); qdrantAvailable = qdrantHealth; if (qdrantAvailable) { const qdrantInfo = await qdrantClient.getCollectionInfo(); qdrantVectorCount = qdrantInfo.vectors_count}catch (error) { console.warn('Failed to get Qdrant stats: ', error)} // Determine sync status let syncStatus: 'synced' | 'out_of_sync' | 'unknown' = 'unknown'; if (qdrantAvailable) { const diff = Math.abs(pgvectorStats.total_vectors - qdrantVectorCount); syncStatus = diff < 10 ? 'synced' : 'out_of_sync'} return { total_vectors_pgvector: pgvectorStats.total_vectors, qdrantVectorCount: sync_status, syncStatus: last_sync, // Would need to track this separately qdrant_available: qdrantAvailable, pgvector_available: true }}catch (error) { console.error('Failed to get hybrid search stats: ', error); return { total_vectors_pgvector: 0, total_vectors_qdrant: 0, sync_status: 'unknown', last_sync: null, qdrant_available: false, pgvector_available: false }} /** * Health check */ async healthCheck(): Promise<{
-	healthy: boolean, services: {
-	qdrant: boolean, pgvector: boolean, redis, boolean}}> { const qdrantHealthy = await qdrantClient.healthCheck(); // pgvector health is checked through gemmaEmbeddingsService return { healthy, qdrantHealthy || true, // Healthy if at least pgvector works services: {
-	qdrant: qdrantHealthy, pgvector: true, // Assume healthy if we got here redis: true, // Assume healthy if we got here } }} } // Export singleton instance export const hybridVectorSearch = new HybridVectorSearchService({ use_qdrant: true | use_pgvector, false, // Use as fallback only sync_to_qdrant: true, prefer_cache: true true }); export default hybridVectorSearch
+/**
+ * Hybrid Vector Search Service
+ * Combines PostgreSQL pgvector (storage) with Qdrant (GPU-accelerated search)
+ *
+ * Architecture:
+ * - PostgreSQL: Primary storage with pgvector for persistence and ACID compliance
+ * - Qdrant: High-performance GPU-accelerated search with WebTransport/QUIC streaming
+ * - Sync Strategy: Write to both, read from Qdrant for performance
+ */
+
+import { gemmaEmbeddingsService, type EmbeddingRequest, type VectorSearchRequest, type VectorSearchResult } from './gemma-embeddings-service';
+import { qdrantClient, type QdrantPoint, type QdrantSearchRequest } from './qdrant-client';
+
+export interface HybridSearchOptions {
+    use_qdrant?: boolean;       // Use Qdrant for search (default: true)
+    use_pgvector?: boolean;     // Use pgvector for search (default: false, only as fallback)
+    sync_to_qdrant?: boolean;   // Sync embeddings to Qdrant (default: true)
+    prefer_cache?: boolean;     // Prefer Redis cache (default: true)
+}
+
+export interface HybridSearchStats {
+    total_vectors_pgvector: number;
+    total_vectors_qdrant: number;
+    sync_status: 'synced' | 'out_of_sync' | 'unknown';
+    last_sync: Date | null;
+    qdrant_available: boolean;
+    pgvector_available: boolean;
+}
+
+/**
+ * Hybrid Vector Search Service
+ * Orchestrates between PostgreSQL pgvector and Qdrant for optimal performance
+ */
+export class HybridVectorSearchService {
+    private options: Required<HybridSearchOptions>;
+
+    constructor(options: HybridSearchOptions = {}) {
+        this.options = {
+            use_qdrant: options.use_qdrant !== false,
+            use_pgvector: options.use_pgvector || false,
+            sync_to_qdrant: options.sync_to_qdrant !== false,
+            prefer_cache: options.prefer_cache !== false
+        };
+    }
+
+    /**
+     * Initialize the service - ensure Qdrant collection exists
+     */
+    async initialize(): Promise<void> {
+        if (this.options.use_qdrant || this.options.sync_to_qdrant) {
+            try {
+                await qdrantClient.ensureCollection();
+                console.log('✅ Hybrid vector search service initialized with Qdrant');
+            } catch (error) {
+                console.warn('⚠️ Failed to initialize Qdrant, will use pgvector only:', error);
+                this.options.use_qdrant = false;
+                this.options.sync_to_qdrant = false;
+            }
+        }
+    }
+
+    /**
+     * Generate and store embedding (writes to both PostgreSQL and Qdrant)
+     */
+    async generateAndStoreEmbedding(request: EmbeddingRequest): Promise<{
+        success: boolean;
+        embedding?: number[];
+        text_hash?: string;
+        stored_in: string[];
+        error?: string;
+    }> {
+        try {
+            // Generate embedding using gemmaEmbeddingsService (handles PostgreSQL + Redis)
+            const result = await gemmaEmbeddingsService.generateEmbedding(request);
+
+            if (!result.success || !result.embedding) {
+                return {
+                    success: false,
+                    error: result.error ?? 'Embedding generation failed',
+                    stored_in: []
+                };
+            }
+
+            const storedIn = ['postgresql'];
+            if (result.cached) storedIn.push('redis');
+
+            // Sync to Qdrant if enabled
+            if (this.options.sync_to_qdrant && result.text_hash) {
+                try {
+                    const qdrantPoint: QdrantPoint = {
+                        id: result.text_hash,
+                        vector: result.embedding,
+                        payload: {
+                            content: request.text,
+                            document_type: request.document_type || 'unknown',
+                            metadata: request.metadata || {},
+                            model: result.model || 'unknown',
+                            created_at: new Date().toISOString()
+                        }
+                    };
+
+                    await qdrantClient.upsert({ points: [qdrantPoint] });
+                    storedIn.push('qdrant');
+                } catch (error) {
+                    console.warn('⚠️ Failed to sync to Qdrant:', error);
+                    // Non-critical error - embedding is still in PostgreSQL
+                }
+            }
+
+            return {
+                success: true,
+                embedding: result.embedding,
+                text_hash: result.text_hash,
+                stored_in: storedIn
+            };
+
+        } catch (error: any) {
+            return {
+                success: false,
+                error: error.message || 'Storage failed',
+                stored_in: []
+            };
+        }
+    }
+
+    /**
+     * Batch generate and store embeddings
+     */
+    async batchGenerateAndStore(
+        texts: string[],
+        options: { document_type?: string, metadata?: Record<string, unknown>, model?: string } = {}
+    ): Promise<{
+        total: number;
+        successful: number;
+        failed: number;
+        stored_in: string[];
+    }> {
+        const results = await gemmaEmbeddingsService.batchGenerateEmbeddings(texts, {
+            document_type: options.document_type,
+            metadata: options.metadata,
+            model: options.model
+        });
+
+        let successful = 0;
+        let failed = 0;
+        const qdrantPoints: QdrantPoint[] = [];
+
+        for (let i = 0; i < results.length; i++) {
+            const result = results[i];
+            if (result.success && result.embedding && result.text_hash) {
+                successful++;
+
+                // Prepare Qdrant point
+                if (this.options.sync_to_qdrant) {
+                    qdrantPoints.push({
+                        id: result.text_hash,
+                        vector: result.embedding,
+                        payload: {
+                            content: texts[i],
+                            document_type: options.document_type || 'unknown',
+                            metadata: options.metadata || {},
+                            model: result.model || 'unknown',
+                            created_at: new Date().toISOString()
+                        }
+                    });
+                }
+            } else {
+                failed++;
+            }
+        }
+
+        const storedIn = ['postgresql', 'redis'];
+
+        // Batch sync to Qdrant
+        if (this.options.sync_to_qdrant && qdrantPoints.length > 0) {
+            try {
+                await qdrantClient.upsert({ points: qdrantPoints });
+                storedIn.push('qdrant');
+                console.log(`✅ Synced ${qdrantPoints.length} embeddings to Qdrant`);
+            } catch (error) {
+                console.warn('⚠️ Failed to batch sync to Qdrant:', error);
+            }
+        }
+
+        return {
+            total: results.length,
+            successful,
+            failed,
+            stored_in: storedIn
+        };
+    }
+
+    /**
+     * Perform vector search (prefers Qdrant, falls back to pgvector)
+     */
+    async search(request: VectorSearchRequest): Promise<VectorSearchResult[]> {
+        // Try Qdrant first if enabled
+        if (this.options.use_qdrant) {
+            try {
+                // Ensure query_embedding is present
+                if (!request.query_embedding) {
+                    const embeddingResult = await gemmaEmbeddingsService.generateEmbedding({
+                        text: request.query_text!, // Assume text is present if embedding isn't
+                        normalize: true
+                    });
+                     if (!embeddingResult.success || !embeddingResult.embedding) {
+                        throw new Error("Failed to generate embedding for query");
+                    }
+                    request.query_embedding = embeddingResult.embedding;
+                }
+
+
+                const qdrantRequest: QdrantSearchRequest = {
+                    query_vector: request.query_embedding,
+                    limit: request.limit ?? 10,
+                    score_threshold: request.similarity_threshold ?? 0.7,
+                    with_payload: true
+                };
+
+                // Add filters if provided
+                if (request.document_types && request.document_types.length > 0) {
+                    qdrantRequest.filter = {
+                        must: request.document_types.map(type => ({
+                            key: 'document_type',
+                            match: { value: type }
+                        }))
+                    };
+                }
+
+                const qdrantResults = await qdrantClient.search(qdrantRequest);
+
+                // Transform Qdrant results to our format
+                return qdrantResults.map(result => ({
+                    id: String(result.id),
+                    similarity: result.score,
+                    content: (result.payload?.content as string) || '',
+                    metadata: (result.payload?.metadata as Record<string, unknown>) || {},
+                    document_type: (result.payload?.document_type as string) || 'unknown'
+                }));
+
+            } catch (error) {
+                console.warn('⚠️ Qdrant search failed, falling back to pgvector:', error);
+                // Fall through to pgvector
+            }
+        }
+
+        // Fallback to pgvector
+        try {
+            return await gemmaEmbeddingsService.vectorSearch(request);
+        } catch (error) {
+            console.error('❌ Both Qdrant and pgvector search failed:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Perform semantic search with automatic embedding generation
+     */
+    async semanticSearch(
+        query: string,
+        options: {
+            limit?: number;
+            similarity_threshold?: number;
+            document_types?: string[];
+            filters?: Record<string, unknown>;
+        } = {}
+    ): Promise<VectorSearchResult[]> {
+        return this.search({
+            query_text: query,
+            limit: options.limit,
+            similarity_threshold: options.similarity_threshold,
+            document_types: options.document_types,
+            filters: options.filters
+        });
+    }
+
+    /**
+     * Get service statistics
+     */
+    async getStats(): Promise<HybridSearchStats> {
+        try {
+            // Get pgvector stats
+            const pgvectorStats = await gemmaEmbeddingsService.getIndexStats();
+
+            // Get Qdrant stats
+            let qdrantVectorCount = 0;
+            let qdrantAvailable = false;
+
+            try {
+                const qdrantHealth = await qdrantClient.healthCheck();
+                qdrantAvailable = qdrantHealth;
+
+                if (qdrantAvailable) {
+                    const qdrantInfo = await qdrantClient.getCollectionInfo();
+                    qdrantVectorCount = qdrantInfo.vectors_count;
+                }
+            } catch (error) {
+                console.warn('Failed to get Qdrant stats:', error);
+            }
+
+            // Determine sync status
+            let syncStatus: 'synced' | 'out_of_sync' | 'unknown' = 'unknown';
+            if (qdrantAvailable) {
+                const diff = Math.abs(pgvectorStats.total_vectors - qdrantVectorCount);
+                syncStatus = diff < 10 ? 'synced' : 'out_of_sync';
+            }
+
+            return {
+                total_vectors_pgvector: pgvectorStats.total_vectors,
+                total_vectors_qdrant: qdrantVectorCount,
+                sync_status: syncStatus,
+                last_sync: null, // Would need to track this separately
+                qdrant_available: qdrantAvailable,
+                pgvector_available: true
+            };
+
+        } catch (error) {
+            console.error('Failed to get hybrid search stats:', error);
+            return {
+                total_vectors_pgvector: 0,
+                total_vectors_qdrant: 0,
+                sync_status: 'unknown',
+                last_sync: null,
+                qdrant_available: false,
+                pgvector_available: false
+            };
+        }
+    }
+
+    /**
+     * Health check
+     */
+    async healthCheck(): Promise<{
+        healthy: boolean;
+        services: {
+            qdrant: boolean;
+            pgvector: boolean;
+            redis: boolean;
+        };
+    }> {
+        let qdrantHealthy = false;
+        try {
+             qdrantHealthy = await qdrantClient.healthCheck();
+        } catch {}
+
+        // pgvector health is checked through gemmaEmbeddingsService implied by basic connectivity
+        // For a deeper check we could call getIndexStats and catch errors
+        let pgvectorHealthy = true;
+        try {
+            await gemmaEmbeddingsService.getIndexStats();
+        } catch {
+            pgvectorHealthy = false;
+        }
+
+        return {
+            healthy: qdrantHealthy || pgvectorHealthy, // Healthy if at least one works
+            services: {
+                qdrant: qdrantHealthy,
+                pgvector: pgvectorHealthy,
+                redis: true // redis is largely managed by outside services, assuming ok for now or swallowed
+            }
+        };
+    }
+}
+
+// Export singleton instance
+export const hybridVectorSearch = new HybridVectorSearchService({
+    use_qdrant: true,
+    use_pgvector: false, // Use as fallback only
+    sync_to_qdrant: true,
+    prefer_cache: true
+});
+
+export default hybridVectorSearch;
 
 
 

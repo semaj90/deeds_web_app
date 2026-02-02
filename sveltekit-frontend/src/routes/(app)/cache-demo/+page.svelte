@@ -9,7 +9,6 @@
 	import Trash2 from 'lucide-svelte/icons/trash-2';
 	import Upload from 'lucide-svelte/icons/upload';
 	import Zap from 'lucide-svelte/icons/zap';
-import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 
 	const cache = useCache();
 
@@ -183,7 +182,7 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 		<CardContent class="space-y-4">
 			<div class="grid grid-cols-2 gap-4">
 				<div>
-					<label class="text-sm font-medium">Key</label>
+					<label class="text-sm font-medium" for="cache-key">Key</label>
 					<input
 						type="text"
 						bind:value={testKey}
@@ -192,7 +191,7 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 					/>
 				</div>
 				<div>
-					<label class="text-sm font-medium">Value</label>
+					<label class="text-sm font-medium" for="cache-value">Value</label>
 					<input
 						type="text"
 						bind:value={testValue}

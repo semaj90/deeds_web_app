@@ -1,19 +1,7 @@
 <script lang="ts">
-	// Generated Runes
-	
-	let $progressTween = $state($state(undefined));
-
-
-	// Generated Runes
-	
-	let $progressTween = $state($state(undefined));
-
-
   import { AlertCircle, Brain, CheckCircle, Clock, Cpu, XCircle, Zap } from 'lucide-svelte';
-  // Migrated to $effect
   import { cubicOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     isLoading?: boolean;
@@ -122,14 +110,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         intervalId = null;
       }
     }
-  });
 
-  // TODO: Add as cleanup in $effect: return () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-    }
-  }
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+  });
 </script>
 
 {#if isLoading || status !== 'loading'}

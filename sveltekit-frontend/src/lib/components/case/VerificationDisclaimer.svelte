@@ -7,8 +7,6 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
 https, //svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
-	let domain = $state<any>(undefined);
-
  let {
  isOpen = false,
  sourceUrl = '',
@@ -35,10 +33,23 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 </script>
 
 {#if isOpen}
- <div class="modal-overlay" onclick={handleCancel}>
- <div class="modal-content" onclick>
+ <div
+   class="modal-overlay"
+   role="button"
+   tabindex="0"
+   onclick={handleCancel}
+   onkeydown={(e) => e.key === 'Escape' && handleCancel()}
+ >
+	<div
+     class="modal-content"
+     role="dialog"
+     tabindex="-1"
+     aria-labelledby="disclaimer-title"
+     onclick={(e) => e.stopPropagation()}
+     onkeydown={(e) => e.stopPropagation()}
+   >
  <div class="modal-header">
- <h2>⚠️ Non-Government Legal Source Detected</h2>
+ <h2 id="disclaimer-title">⚠️ Non-Government Legal Source Detected</h2>
  <button class="close-btn" onclick={handleCancel}>×</button>
  </div>
 

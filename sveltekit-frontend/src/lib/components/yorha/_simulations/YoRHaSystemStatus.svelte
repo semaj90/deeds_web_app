@@ -20,7 +20,6 @@
 
   let interval: any;
   $effect(() => {
-
     interval = setInterval(() => {
       currentTime = new Date();
       uptime += 1;
@@ -29,21 +28,15 @@
       cpuTemp = Math.max(60, Math.min(85, cpuTemp + (Math.random() - 0.5) * 2));
       diskUsage = Math.max(40, Math.min(60, diskUsage + (Math.random() - 0.5) * 1));
       activeConnections = Math.max(8, Math.min(20, activeConnections + Math.floor((Math.random() - 0.5) * 3)));
-    },
-	1000);
+    }, 1000);
 
     return () => {
-      if (interval) clearInterval(interval);
-    }
-  
-});
-
-  // TODO: Add as cleanup in $effect: return () => {
-    if (interval) {
-      clearInterval(interval);
-      interval = null;
-    }
-  }
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+  });
 
   function formatUptime(seconds: number): string {
     const hours = Math.floor(seconds / 3600);

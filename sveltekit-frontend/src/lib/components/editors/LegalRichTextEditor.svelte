@@ -23,7 +23,7 @@
   }: Props = $props();
 
   let editorElement: HTMLDivElement;
-  let editor: any = null;
+  let editor = $state<any>(null);
   let isBold = $state(false);
   let isItalic = $state(false);
   let isUnderline = $state(false);
@@ -32,6 +32,17 @@
   let isOrderedList = $state(false);
   let isBlockquote = $state(false);
   let currentHeading = $state(0);
+
+  $effect(() => {
+    initEditor();
+
+    return () => {
+      if (editor) {
+        editor.destroy();
+        editor = null;
+      }
+    };
+  });
 
   async function initEditor() {
     try {
@@ -87,7 +98,8 @@
     currentHeading = editor.isActive('heading', { level: 1 }) ? 1 :
       editor.isActive('heading', { level: 2 }) ? 2 :
       editor.isActive('heading', { level: 3 }) ? 3 :
-      editor.isActive('heading', { level: 4 }) ? 4 : 0 }
+      editor.isActive('heading', { level: 4 }) ? 4 : 0;
+  }
 
   function toggleBold() { editor?.chain().focus().toggleBold().run(); }
   function toggleItalic() { editor?.chain().focus().toggleItalic().run(); }
@@ -118,16 +130,6 @@
     const target = e.target as HTMLTextAreaElement;
     content = target.value;
     onchange?.(content);
-  }
-
-  $effect(() => {
-
-    initEditor();
-  
-});
-
-  // TODO: Add as cleanup in $effect: return () => {
-    editor?.destroy();
   }
 </script>
 

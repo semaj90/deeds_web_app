@@ -19,7 +19,9 @@ import {
     varchar,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm/relations';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
+// Re-export chatMessages from schema-chat for broader availability
+export { chatMessages, type ChatMessage, type NewChatMessage } from './schema-chat';
 
 // Note: vector type is handled via sql`` template in table definitions
 

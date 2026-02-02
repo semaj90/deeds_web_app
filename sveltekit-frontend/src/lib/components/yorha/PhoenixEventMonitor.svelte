@@ -22,16 +22,13 @@
   let isConnected = $state(false);
 
   $effect(() => {
-
     if (show) {
       connectToEvents();
     }
-  
-});
-
-  // TODO: Add as cleanup in $effect: return () => {
-    disconnectFromEvents();
-  }
+    return () => {
+      disconnectFromEvents();
+    };
+  });
 
   function connectToEvents() {
     try {

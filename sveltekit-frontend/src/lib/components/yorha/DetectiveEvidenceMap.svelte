@@ -1,6 +1,5 @@
 <script lang="ts">
  import * as d3 from 'd3';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  interface EvidenceNode {
@@ -74,22 +73,22 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  };
 
  $effect(() => {
+   const init = async () => {
+     if (show && !data) {
+       await loadData();
+     } else if (data) {
+       initializeVisualization();
+     }
+   };
 
- (async () => {
- if (show && !data) {
- await loadData();
- } else if (data) {
- initializeVisualization();
- }
- 
-});();
+   init();
+
+   return () => {
+     if (simulation) {
+       simulation.stop();
+     }
+   };
  });
-
- // TODO: Add as cleanup in $effect: return () => {
- if (simulation) {
- simulation.stop();
- }
- }
 
  async function loadData() {
  try {

@@ -1,34 +1,36 @@
 <script lang="ts">
- import { createEventDispatcher } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
- interface Citation {
- id: string;
-	statute_code: string;
- statute_title?: string;
- jurisdiction?: string;
- severity?: string;
- year?: number;
-	source_type: 'manual' | 'auto_extracted';
- highlighted_text?: string;
- notes?: string;
-	created_at: string;
- updated_at: string;
- }
+	interface Citation {
+		id: string;
+		statute_code: string;
+		statute_title?: string;
+		jurisdiction?: string;
+		severity?: string;
+		year?: number;
+		source_type: 'manual' | 'auto_extracted';
+		highlighted_text?: string;
+		notes?: string;
+		created_at: string;
+		updated_at: string;
+	}
 
- let { citation, showActions = true } = $props<{
- citation: Citation;
- showActions?: boolean;
- }>();
+	let {
+		citation,
+		showActions = true,
+		onupdated = () => {},
+		ondelete = () => {},
+		onattachtocase = () => {}
+	} = $props<{
+		citation: Citation;
+		showActions?: boolean;
+		onupdated?: () => void;
+		ondelete?: () => void;
+		onattachtocase?: (citation: Citation) => void;
+	}>();
 
-
- const dispatch = createEventDispatcher();
-
- let isEditing = false;
- let editedNotes = citation.notes || '';
- let isSaving = false;
-
- function startEdit() {
+	let isEditing = $state(false);
+	let editedNotes = $state(citation.notes || '');
+	let isSaving = $state(false); function startEdit() {
  isEditing = true;
  editedNotes = citation.notes || '';
  }
@@ -70,17 +72,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  }
  }
 
- function attachToCase() {
- dispatch('attach-to-case', citation);
- }
-
- function deleteCitation() {
- if (confirm('Are you sure you want to delete this citation?')) {
- dispatch('delete', citation);
- }
- }
-
- function getSourceTypeIcon(sourceType: string) {
+	function attachToCase() {
+		onattachtocase(citation);
+	} function deleteCitation() {
+		if (confirm('Are you sure you want to delete this citation?')) {
+			ondelete();
+		}
+	} function getSourceTypeIcon(sourceType: string) {
  return sourceType === 'manual' ? '✏️' : '🤖';
  }
 
@@ -379,19 +377,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: white;
  }
 
- .meta-badge.jurisdiction {
- background-color: #8b4513;
- }
+	.meta-badge.jurisdiction {
+		background-color: #8b4513;
+	}
 
- .meta-badge.severity {
- /* Color set dynamically */
- }
-
- .meta-badge.year {
- background-color: #666;
- }
-
- .meta-value {
+	.meta-badge.year {
+		background-color: #666;
+	} .meta-value {
  font-size: 0.85rem;
 	color: #333;
  }

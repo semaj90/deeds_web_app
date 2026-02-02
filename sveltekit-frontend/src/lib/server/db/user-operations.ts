@@ -1,4 +1,4 @@
-import type { User } from '$lib/types';
+import type { User } from '$lib/types/database-types';
 import bcrypt from 'bcryptjs';
 import { and, eq, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
@@ -84,19 +84,27 @@ export class UserAuthService {
      */
     static async validateSession(sessionId: string): Promise<{ valid: boolean; user?: User }> {
         try {
-            const session = await db.query.sessions.findFirst({
-                where: and(
+            // Query sessions directly since db.query.sessions typing is incomplete
+            const sessionResults = await db.select().from(userSessions)
+                .where(and(
                     eq(userSessions.sessionId, sessionId),
                     eq(userSessions.isActive, true),
                     sql`${userSessions.expiresAt} > NOW()`
-                ),
-                with: { user: true
-                }
-            } as any);
+                ))
+                .limit(1);
 
+            const session = sessionResults[0];
             if (!session) return { valid: false };
 
-            return { valid: true, user: (session as any).user as unknown as User };
+            // Fetch user separately
+            const userResults = await db.select().from(users)
+                .where(eq(users.id, session.userId as string))
+                .limit(1);
+            const user = userResults[0];
+
+            if (!user) return { valid: false };
+
+            return { valid: true, user: user as unknown as User };
         } catch {
             return { valid: false };
         }

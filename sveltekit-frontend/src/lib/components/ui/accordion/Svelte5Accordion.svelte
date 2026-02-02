@@ -32,7 +32,8 @@ let {
 	collapsible = true,
 	variant = 'default',
 	class: className = '',
-	onchange: children
+	onchange,
+	children
 }: Props = $props();
 
 // Provide context
@@ -75,9 +76,7 @@ let variantClasses = $derived({
 	{#each items as item}
 		{@render AccordionItemComponent({ item, variant })}
 	{/each}
-	{#if children}
-		{@render children()}
-	{/if}
+	{@render children?.()}
 </div>
 
 {#snippet AccordionItemComponent({ item, variant }: {
