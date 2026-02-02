@@ -44,8 +44,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     initializeZeroLatencySystem()
 });
 
-  // TODO: Add as cleanup in $effect: return () => {
-    cleanupSystem()}
+  // TODO: Add as cleanup in $effect
+  function cleanupSystem() {
+    // Cleanup logic here
+  }
+
   async function initializeZeroLatencySystem(): Promise<void> {
     try {
       if (isInitialized) return
@@ -145,7 +148,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       showLoadingTooltip(target);
       const apiResponse = await fetch(`${fallbackApiEndpoint}/${encodeURIComponent(elementId)}`);
       if (!apiResponse.ok) throw new Error('API error: ' + apiResponse.status);
-'
+
       const data = await apiResponse.json();
       const responseTime = performance.now() - startTime
       const html = generateTooltipHTML(data);

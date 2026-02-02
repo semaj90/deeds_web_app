@@ -93,7 +93,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 					for (const entry of entries) {
 						if (entry.entryType === 'measure' || entry.entryType === 'navigation') {
 							// lightweight processing for now
-							// console.debug('Performance entry:', entry)}
+							// console.debug('Performance entry:', entry)
+						}
 					}
 				});
 				performanceObserver.observe({

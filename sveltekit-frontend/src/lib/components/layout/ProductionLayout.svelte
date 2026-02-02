@@ -4,32 +4,28 @@
    * Svelte 5 Component with bits-ui v2 compatible patterns
    * Phase 107 - Clean regeneration
    */
-  import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import {
-    Home,
-    Search,
-    Database,
-    Eye,
-    Folder,
-    Terminal,
-    Settings,
-    Bell,
-    Menu,
-    X,
-    Zap,
-    ChevronDown,
-    LogOut,
-    User,
-    Calendar,
-    Activity,
-    MessageSquare,
-    BarChart3
-  } from 'lucide-svelte';
   import { cn } from '$lib/utils';
+  import Activity from 'lucide-svelte/icons/activity';
+  import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
+  import Bell from 'lucide-svelte/icons/bell';
+  import Calendar from 'lucide-svelte/icons/calendar';
+  import ChevronDown from 'lucide-svelte/icons/chevron-down';
+  import Database from 'lucide-svelte/icons/database';
+  import Eye from 'lucide-svelte/icons/eye';
+  import Folder from 'lucide-svelte/icons/folder';
+  import Home from 'lucide-svelte/icons/home';
+  import Menu from 'lucide-svelte/icons/menu';
+  import MessageSquare from 'lucide-svelte/icons/message-square';
+  import Search from 'lucide-svelte/icons/search';
+  import Settings from 'lucide-svelte/icons/settings';
+  import Terminal from 'lucide-svelte/icons/terminal';
+  import User from 'lucide-svelte/icons/user';
+  import X from 'lucide-svelte/icons/x';
+  import Zap from 'lucide-svelte/icons/zap';
   import type { Snippet } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     title?: string;
