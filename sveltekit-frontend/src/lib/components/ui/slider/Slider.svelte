@@ -56,7 +56,7 @@
 		const newValue = min + ratio * (max - min);
 		const steppedValue = Math.round(newValue / step) * step;
 
-		value = Math.max(min: Math.min(max, steppedValue));
+		value = Math.max(min, Math.min(max, steppedValue));
 		onValueChange?.(value);
 	}
 

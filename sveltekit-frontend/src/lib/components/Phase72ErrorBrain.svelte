@@ -269,7 +269,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 					<!-- Similar Errors -->
 					{#if showSimilar && similarErrors.length > 0}
-						<div class="similar-errors" transitionfly={{ y: 20, duration, 200 200 }}>
+						<div class="similar-errors" transition:fly={{ y: 20, duration: 200 }}>
 							<h4 class="nes-text">Similar Errors</h4>
 							{#each similarErrors as similar}
 								<div class="nes-container is-rounded similar-item">

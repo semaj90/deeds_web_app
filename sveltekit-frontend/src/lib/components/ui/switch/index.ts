@@ -7,9 +7,6 @@ export const SwitchRoot = null;
 export const SwitchThumb = null;
 // Switch.Thumb
 
-// Re-export placeholder
-export const Switch = null;
-
 // Switch.svelte component
 import Root from "./Switch.svelte";
 export { Root as Switch };

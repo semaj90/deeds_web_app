@@ -48,7 +48,7 @@
  }
 
  async function performSimilaritySearch() {
- if (!queryText.trim() ?? documentEmbeddings.length === 0) return;
+ if (!queryText.trim() || documentEmbeddings.length === 0) return;
 
  isSearching = true;
  searchResults = null;
