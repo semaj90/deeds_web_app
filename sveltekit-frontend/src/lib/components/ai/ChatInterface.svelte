@@ -13,7 +13,9 @@ import type { Case } from '$lib/types';
     notifications
   } from '$lib/stores/unified';
   import type { ApiResponse, ChatRequest, ChatResponse } from '$lib/types/api';
-  import { Bot, Loader2, Send } from 'lucide-svelte';
+  import Bot from 'lucide-svelte/icons/bot';
+  import Loader2 from 'lucide-svelte/icons/loader-2';
+  import Send from 'lucide-svelte/icons/send';
   // Migrated to $effect
   import  ChatMessage  from "./ChatMessage.svelte";
   import  ProactivePrompt  from "./ProactivePrompt.svelte";

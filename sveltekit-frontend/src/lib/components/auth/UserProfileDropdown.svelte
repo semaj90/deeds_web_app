@@ -1,6 +1,8 @@
 <script lang="ts">
   import { userStore, clearUserSession } from '$lib/stores/user';
-  import { User, LogOut, ChevronDown } from 'lucide-svelte';
+  import User from 'lucide-svelte/icons/user';
+  import LogOut from 'lucide-svelte/icons/log-out';
+  import ChevronDown from 'lucide-svelte/icons/chevron-down';
   import  Button  from "$lib/components/ui/button/Button.svelte";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let isDropdownOpen = $state<boolean>(false);
@@ -9,7 +11,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       await fetch('/api/auth/logout', { method: 'POST' });
       clearUserSession();
       window.location.href = '/'} catch (error) {
-      console.error('Logout error:', error);'
+      console.error('Logout error:', error);
+'
     }
   }
   function toggleDropdown() {

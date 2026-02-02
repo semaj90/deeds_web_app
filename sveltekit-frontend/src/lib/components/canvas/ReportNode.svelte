@@ -8,8 +8,8 @@
   // UI Components
   import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
   // Icons
-  import { Link, Sparkles } from 'lucide-svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+  import Link from 'lucide-svelte/icons/link';
+  import Sparkles from 'lucide-svelte/icons/sparkles';
   let nodeElement: HTMLDivElement | null = null
   let isDragging = $state<boolean>(false);
   let dragStartX = $state<number>(0);

@@ -202,394 +202,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     if (ms < 1000) return `${ms.toFixed(2)}ms`;
     return `${(ms / 1000).toFixed(2)}s`;
   }
-  
+
   import { get } from 'svelte/store';
 </script>
 
-<!-- ============================================================================ -->
-<!-- TEMPLATE -->
-<!-- ============================================================================ -->
-
-{#if isVisible}
-  <div class="modal-backdrop" onclick={onClose} role="button" tabindex="0" onkeydown={e => e.key === 'Escape' && onClose()}>
-    <div class="modal-content" onclick={(e) => e.stopPropagation()} role="document" tabindex="0" onkeydown={e => e.key === 'Escape' && onClose()}>
-      <div class="modal-header">
-        <h2>
-          {#if $documentData?.title}
-            {$documentData.title}
-          {:else}
-            Document Details
-          {/if}
-        </h2>
-        <button class="close-btn" onclick={onClose}>&times;</button>
-      </div>
-
-      <div class="modal-body">
-        {#if $isLoading}
-          <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Loading document analysis...</p>
-            {#if $loadingSource === 'cache'}
-              <small>Checking local cache...</small>
-            {:else if $loadingSource === 'server'}
-              <small>Fetching from Legal AI Server...</small>
-            {/if}
-          </div>
-        {:else if $errorMessage}
-          <div class="error-state">
-            <p class="error-icon">⚠️</p>
-            <p>{$errorMessage}</p>
-            <button onclick={() => loadDocumentDetails(documentId, true)}>Retry Fetch</button>
-          </div>
-        {:else if $documentData}
-          <!-- Performance Metrics Banner -->
-          <div class="metrics-banner">
-            <div class="metric">
-              <span class="label">Load Time:</span>
-              <span class="value">
-                {#if cacheHitTime > 0}
-                  ⚡ {cacheHitTime.toFixed(1)}ms (Cache)
-                {:else}
-                  🌐 {serverFetchTime.toFixed(0)}ms (Server)
-                {/if}
-              </span>
-            </div>
-            {#if $processingMetrics}
-              <div class="metric">
-                <span class="label">AI Processing:</span>
-                <span class="value">{$processingMetrics.total_server_time}</span>
-              </div>
-            {/if}
-            <div class="metric">
-              <span class="label">Type:</span>
-              <span class="value tag">{$documentData.documentType}</span>
-            </div>
-          </div>
-
-          <div class="details-grid">
-            <!-- Left Column: Content & Analysis -->
-            <div class="main-content">
-              {#if $documentData.content}
-                <div class="content-preview">
-                  <h3>Document Excerpt</h3>
-                  <p class="text-content">
-                    {$documentData.content.substring(0, 500)}
-                    {$documentData.content.length > 500 ? '...' : ''}
-                  </p>
-                </div>
-              {/if}
-
-              {#if $gpuAnalysis}
-                <div class="gpu-analysis-section">
-                  <div class="section-header">
-                    <h3>🧠 GPU Semantic Analysis</h3>
-                    <button class="toggle-btn" onclick={toggleGPU}>
-                      {showGPUAnalysis ? 'Hide' : 'Show Details'}
-                    </button>
-                  </div>
-
-                  {#if showGPUAnalysis}
-                    <div class="analysis-content">
-                      <div class="tensor-viz">
-                        <!-- Placeholder for tensor visualization -->
-                        <div class="tensor-placeholder">Tensor Embedding Visualized</div>
-                      </div>
-                      <div class="insights">
-                        {#each $gpuAnalysis.insights || [] as insight}
-                          <div class="insight-item">
-                            <span class="confidence {(insight.confidence > 0.8) ? 'high' : 'medium'}">
-                              {(insight.confidence * 100).toFixed(0)}%
-                            </span>
-                            <p>{insight.text}</p>
-                          </div>
-                        {/each}
-                      </div>
-                    </div>
-                  {/if}
-                </div>
-              {/if}
-            </div>
-
-            <!-- Right Column: Relations & Graph -->
-            <div class="sidebar">
-              {#if $relatedDocuments.length > 0}
-                <div class="sidebar-section">
-                  <h3>🔗 Related Documents</h3>
-                  <ul class="related-list">
-                    {#each $relatedDocuments as doc}
-                      <li class="related-item">
-                        <span class="t-score">{(doc.similarity * 100).toFixed(0)}%</span>
-                        <span class="t-title">{doc.title || doc.id}</span>
-                      </li>
-                    {/each}
-                  </ul>
-                </div>
-              {/if}
-
-              {#if $caseAssociations.length > 0}
-                <div class="sidebar-section">
-                  <h3>⚖️ Cited Cases</h3>
-                  <ul class="case-list">
-                    {#each $caseAssociations as kase}
-                      <li class="case-item">
-                        <a href="/cases/{kase.id}" onclick|preventDefault>{kase.name}</a>
-                      </li>
-                    {/each}
-                  </ul>
-                </div>
-              {/if}
-
-              <div class="actions">
-                 <button class="primary-btn">Full Analysis Report</button>
-              </div>
-            </div>
-          </div>
-        {/if}
-      </div>
-    </div>
-  </div>
-{/if}
-
-<!-- ============================================================================ -->
-<!-- STYLES -->
-<!-- ============================================================================ -->
-<style>
-  .modal-backdrop {
-    position: fixed;
-	top: 0;
-    left: 0;
-	width: 100%;
-    height: 100%;
-	background: rgba(0, 0, 0, 0.75);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(4px);
-  }
-
-  .modal-content {
-    background: #ffffff;
-	width: 90%;
-    max-width: 900px;
-	height: 85vh;
-    border-radius: 12px;
-	display: flex;
-    flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    overflow: hidden }
-
-  .modal-header {
-    padding: 20px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-	background: #f9fafb }
-
-  .modal-header h2 {
-    margin: 0;
-    font-size: 1.25rem;
-	color: #111827 }
-
-  .close-btn {
-    background: none;
-	border: none;
-    font-size: 24px;
-	cursor: pointer;
-    color: #6b7280 }
-
-  .modal-body {
-    flex: 1;
-    overflow-y: auto;
-	padding: 0;
-    background: #f3f4f6 }
-
-  .metrics-banner {
-    display: flex;
-	gap: 20px;
-    padding: 12px 24px;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    font-size: 0.875rem }
-
-  .metric {
-    display: flex;
-    align-items: center;
-	gap: 8px }
-
-  .metric .label {
-    color: #6b7280 }
-
-  .metric .value {
-    font-weight: 600;
-	color: #111827 }
-
-  .metric .tag {
-    background: #e0e7ff;
-	color: #4338ca;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    text-transform: uppercase }
-
-  .details-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 24px;
-	padding: 24px }
-
-  .main-content, .sidebar {
-    display: flex;
-    flex-direction: column;
-	gap: 24px }
-
-  .content-preview, .gpu-analysis-section, .sidebar-section {
-    background: #ffffff;
-	padding: 20px;
-    border-radius: 8px;
-	border: 1px solid #e5e7eb;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  }
-
-  h3 {
-    margin: 0 0 16px 0;
-    font-size: 1rem;
-	color: #374151;
-    font-weight: 600;
-	display: flex;
-    align-items: center;
-	gap: 8px }
-
-  .text-content {
-    line-height: 1.6;
-	color: #4b5563;
-    white-space: pre-wrap }
-
-  .related-list, .case-list {
-    list-style: none;
-	padding: 0;
-    margin: 0 }
-
-  .related-item, .case-item {
-    padding: 12px 0;
-    border-bottom: 1px solid #f3f4f6;
-    display: flex;
-	gap: 12px;
-    align-items: center }
-
-  .related-item:last-child, .case-item:last-child {
-    border-bottom: none }
-
-  .t-score {
-    background: #ecfdf5;
-	color: #059669;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: bold }
-
-  .t-title {
-    font-size: 0.875rem;
-	color: #1f2937;
-    white-space: nowrap;
-	overflow: hidden;
-    text-overflow: ellipsis }
-
-  .primary-btn {
-    width: 100%;
-	padding: 10px;
-    background: #2563eb;
-	color: white;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-	cursor: pointer }
-
-  .primary-btn:hover {
-    background: #1d4ed8 }
-
-  .loading-state, .error-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-	height: 100%;
-    color: #6b7280;
-	gap: 16px }
-
-  .spinner {
-    width: 40px;
-	height: 40px;
-    border: 3px solid #e5e7eb;
-    border-top: 3px solid #3b82f6;
-    border-radius: 50%;
-	animation: spin 1s linear infinite }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .details-grid {
-      grid-template-columns: 1fr }
-  }
-</style>
-      await legalDB.documentCache.put(cacheEntry);
-      console.log('ðŸ’¾ Document cached successfully in IndexedDB')} catch (cacheError) {
-      console.warn('âš ï¸ Failed to cache document:', cacheError)}
-
-    // Update UI with server data
-    displayDocumentDetails(data);
-    loadingSource.set(null);
-    isLoading.set(false)}
-
-  // Display document details (unified function for cache and server data)
-  function displayDocumentDetails(data: Record<string, unknown>) {
-    const obj = data as unknown
-    const doc = obj.document ?? obj
-    const metadata = obj.metadata ?? obj
-    documentData.set({ id: doc.id ?? doc.documentId ?? null,
-      title: doc.title ?? '',
-      content: doc.content ?? '',
-      document_type: doc.document_type ?? doc.documentType ?? 'unknown',
-      file_path: doc.file_path ?? null,
-      created_at: doc.created_at ?? null,
-      updated_at: doc.updated_at ?? null
-    });
-    relatedDocuments.set(obj.related_documents ?? metadata.related_documents ?? []);
-    graphConnections.set(obj.graph_connections ?? metadata.graph_connections ?? []);
-    caseAssociations.set(obj.case_associations ?? metadata.case_associations ?? []);
-    gpuAnalysis.set(obj.gpu_analysis ?? metadata.gpu_analysis ?? null);
-    processingMetrics.set(obj.enhanced_metadata ?? metadata.enhanced_metadata ?? null)}
-
-  // Reactive updates when documentId or visibility changes
-  // CHANGED: use Svelte, 5 rune $effect instead of legacy $:
-  $effect(() => {
-    if (documentId && isVisible) {
-      loadDocumentDetails(documentId)}
-  });
-  // GPU Analysis toggle
-  async function toggleGPUAnalysis(): Promise<any> {
-    if (!showGPUAnalysis && documentId) {
-      showGPUAnalysis = true
-      await fetchAndCacheDocument(documentId, true)} else {
-      showGPUAnalysis = false
-      gpuAnalysis.set(null)}
-  }
-  function formatBytes(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
-  function formatDuration(ms: number): string {
-    if (!ms) return '0ms';
-    if (ms < 1000) return `${ms.toFixed(2)}ms`;
-    return `${(ms / 1000).toFixed(2)}s`}
-</script>
 <!-- Document: Details, Modal -->
 {#if isVisible}
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -600,18 +216,18 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           <h2 class="text-2xl">Document Analysis</h2>
           <p class="text-blue-100">
             {#if $loadingSource === 'cache'}
-              ðŸ“¦ Loading from cache... ({formatDuration(cacheHitTime)})
+              📦 Loading from cache... ({formatDuration(cacheHitTime)})
             {:else if $loadingSource === 'server'}
-              ðŸŒ Fetching from server...
+              🌐 Fetching from server...
             {:else if $documentData}
-              ðŸ“„ {$documentData.title || `Document ${documentId}`}
+              📄 {$documentData.title || `Document ${documentId}`}
             {:else}
               Document ID: {documentId}
             {/if}
           </p>
         </div>
         <button onclick={onClose} class="text-white hover:text-blue-200 text-2xl" aria-label="Close">
-          Ã—
+          &times;
         </button>
       </div>
       <!-- Loading, State -->
@@ -631,7 +247,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <!-- Error, State -->
       {#if $errorMessage}
         <div class="p-8">
-          <div class="text-red-600 text-xl">âŒ Error</div>
+          <div class="text-red-600 text-xl">❌ Error</div>
           <p class="text-red-700">{$errorMessage}</p>
           <button
             onclick={() => loadDocumentDetails(documentId, true)}
@@ -644,7 +260,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       {#if $documentData && !$isLoading}
         <div class="overflow-y-auto">
           <!-- Performance: Metrics, Bar -->
-          <div class="bg-gray-100 px-6 py-3 border-b grid grid-cols-2 md, grid-cols-4 gap-4">
+          <div class="bg-gray-100 px-6 py-3 border-b grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <span class="font-semibold">Cache Hit:</span>
               {cacheHitTime ? formatDuration(cacheHitTime) : 'No cache'}
@@ -665,7 +281,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           <!-- Main: Content, Grid -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Document, Content -->
-            <div class="lg, col-span-2">
+            <div class="lg:col-span-2">
               <div class="bg-white rounded-lg border border-gray-200">
                 <div class="flex justify-between items-start">
                   <h3 class="text-xl font-semibold">Document Content</h3>
@@ -674,16 +290,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                       onclick={() => loadDocumentDetails(documentId, true)}
                       class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded"
                     >
-                      ðŸ”„ Refresh
+                      🔄 Refresh
                     </button>
                     <button
                       onclick={toggleGPUAnalysis}
-                      class="text-sm" {showGPUAnalysis
-                        ? 'bg-purple-100 text-purple-700'
-                        , 'bg-gray-100'},
-	hover:bg-purple-200 px-3 py-1 rounded"
+                      class="text-sm {showGPUAnalysis ? 'bg-purple-100 text-purple-700' : 'bg-gray-100'} hover:bg-purple-200 px-3 py-1 rounded"
                     >
-                      {showGPUAnalysis ? 'ðŸ§  GPU Active' : 'âš¡ GPU Analysis'}
+                      {showGPUAnalysis ? '🧠 GPU Active' : '⚡ GPU Analysis'}
                     </button>
                   </div>
                 </div>
@@ -715,7 +328,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               {#if $gpuAnalysis}
                 <div class="bg-purple-50 rounded-lg border border-purple-200 p-6">
                   <h3 class="text-xl font-semibold text-purple-800 mb-4 flex items-center">
-                    ðŸ§  GPU Analysis (FlashAttention2 RTX, 3060 Ti)
+                    🧠 GPU Analysis (FlashAttention2 RTX 3060 Ti)
                   </h3>
                   <div class="grid grid-cols-2">
                     <div>
