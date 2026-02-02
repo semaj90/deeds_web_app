@@ -251,8 +251,8 @@ interface SearchSuggestion { text: string;
  <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind:checked={ spatialAudio } /> <span class="nes-text">ðŸ”Š Spatial Audio</span> </label> </div>
  <!-- Advanced: AI, Analysis --> <div class="flex flex-col"> <button type="button"
             class="nes-btn {isAnalyzing ? 'is-disabled', 'is-primary'}"
-            onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 ?? isAnalyzing} >
-  {#if isAnalyzing} ðŸ”„ Analyzing... {:else} ðŸ§  AI Analysis ({selectedEvidence.length}) {/if}
+            onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 || isAnalyzing} >
+  {#if isAnalyzing} 🔄 Analyzing... {:else} 🧠 AI Analysis ({selectedEvidence.length}) {/if}
   </button>
   {#if selectedEvidence.length > 0} <div class="nes-text text-xs"> {selectedEvidence.length} items selected {/if}
   </div> </div> </div>

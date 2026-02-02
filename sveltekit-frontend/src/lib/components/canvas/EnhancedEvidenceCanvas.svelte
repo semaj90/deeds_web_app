@@ -39,12 +39,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }); // TODO: Add as cleanup in $effect: return () => { if (fabricCanvas && typeof fabricCanvas.dispose === 'function') { fabricCanvas.dispose()}
   }
   async function addEvidenceToCanvas(item: any): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
-   const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (item?.type === 'image' && item?.thumbnailUrl) { // fabric.Image.fromURL is callback-based fabric.Image.fromURL( item.thumbnailUrl, (img: any) => { img.set({ left: item.x ?? 100, top: item.y ?? 100, selectable: !readonly;
+   const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (item?.type === 'image' && item?.thumbnailUrl) { // fabric.Image.fromURL is callback-based fabric.Image.fromURL( item.thumbnailUrl, (img: any) => { img.set({ left: item.x ?? 100, top: item.y ?? 100, selectable: !readonly,
 	evented: !readonly }); // optional scaling if width/height provided if (item.width && img.width) { img.scaleX = item.width / img.width}
             if (item.height && img.height) { img.scaleY = item.height / img.height}
             img.set('evidenceId', item.id ?? null); img.set('evidenceType', item.type); fabricCanvas.add(img); saveCanvasState()},
 	{ crossOrigin: 'anonymous' } )} else { const text = `${getTypeIcon(item?.type)} ${item?.title ?? ''}`;
-   const textbox = new fabric.Textbox(text, { left: item.x ?? 100, top: item.y ?? 100, width: item.width ?? 200, fontSize: 14, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: '#ffffff', padding: 8, selectable: !readonly;
+   const textbox = new fabric.Textbox(text, { left: item.x ?? 100, top: item.y ?? 100, width: item.width ?? 200, fontSize: 14, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: '#ffffff', padding: 8, selectable: !readonly,
 	evented: !readonly }); textbox.set('evidenceId', item.id ?? null); textbox.set('evidenceType', item?.type ?? 'document'); fabricCanvas.add(textbox); saveCanvasState()}
     } catch (error) { console.error('Error adding evidence to canvas:', error)}
   }
@@ -114,7 +114,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   <!-- History --> <div class="space-y-4"> <Button class="bits-btn bits-btn"
           variant="ghost"
           size="sm"
-          onclick={() => undo()} disabled={readonly ?? historyIndex <= 0} >
+          onclick={() => undo()} disabled={readonly || historyIndex <= 0} >
           <Undo /> </Button>
  <Button class="bits-btn bits-btn"
           variant="ghost"

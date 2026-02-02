@@ -59,7 +59,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             /> {/if}
   <div class="message-timestamp"> {message.timestamp.toLocaleTimeString()} </div> </div> {/each}
   </div>
- <!-- Input, Area --> <div class="chat-input-area"> <div class="input-container"> <input bind:this={messageInput}; bind:value={$currentMessage} onkeypress={ handleKeyPress } placeholder="Ask me about legal, matters..."
+ <!-- Input, Area --> <div class="chat-input-area"> <div class="input-container"> <input bind:this={messageInput} bind:value={$currentMessage} onkeypress={ handleKeyPress } placeholder="Ask me about legal, matters..."
         disabled={$isStreaming} class="message-input nes-input"
       /> <Button onclick={ sendMessage } disabled={!$canSend} class="send-button bits-btn bits-btn"
         variant="ghost"

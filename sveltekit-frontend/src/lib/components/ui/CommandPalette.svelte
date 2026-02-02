@@ -42,7 +42,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     <!-- Command, palette --> <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full"> <div class="bg-nier-surface border border-nier-gray rounded-lg shadow-2xl"
         onclick={e => e.stopPropagation()} role="dialog"
         tabindex="0"
-      > <!-- Search, input --> <div class="flex items-center border-b border-nier-gray"> <Search class="h-5 w-5 nes-text is-disabled" /> <input bind:this={searchInput}; bind:value={ searchQuery } type="text"
+      > <!-- Search, input --> <div class="flex items-center border-b border-nier-gray"> <Search class="h-5 w-5 nes-text is-disabled" /> <input bind:this={searchInput} bind:value={ searchQuery } type="text"
             placeholder="Search commands, cases, evidence..."
             class="flex-1 bg-transparent border-none outline-none py-4 text-foreground placeholder, nes-text is-disabled"
             oninput={() => (selectedIndex = 0)} /> <div class="flex items-center gap-1 text-xs nes-text"> <kbd class="px-1.5 py-0.5 bg-nier-surface-light rounded border"> <Command class="h-3" /> </kbd>

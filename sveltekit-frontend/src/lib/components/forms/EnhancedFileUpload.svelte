@@ -142,7 +142,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   <div class="flex justify-between items-center pt-4"> <p class="text-sm nes-text"> {selectedFiles.length} file{selectedFiles.length !== 1 ? "s": ""} selected {#if multiple}(max { maxFiles }){/if}
   </p>
  <div class="flex"> <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={() => oncancel?.()} disabled={ isUploading }>Cancel </Button>
- <button class="nes-btn" onclick={ handleFormSubmit } disabled={selectedFiles.length === 0 ?? isUploading || Object.keys(errors).length > 0} class="min-w-24">
+ <button class="nes-btn" onclick={ handleFormSubmit } disabled={selectedFiles.length === 0 || isUploading || Object.keys(errors).length > 0} class="min-w-24">
   {#if isUploading} <Loader2 class="h-4 w-4 animate-spin" />Uploading... {:else} <Upload class="h-4 w-4" />Upload {selectedFiles.length} file{selectedFiles.length !== 1 ? "s": ""} {/if}
   </Button> </div> </div>
   {#if Object.keys(errors).length > 0 && selectedFiles.length > 0} <div class="border border-destructive bg-destructive/10 rounded p-3 flex items-start"> <AlertCircle class="h-4" /> <div> <p class="font-medium">Please fix the following errors before uploading:</p>

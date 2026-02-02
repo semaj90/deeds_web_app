@@ -87,12 +87,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <div class="chat-input-wrapper" class:multiline={isMultiline}>
   <div class="input-container">
     <textarea
-      bind:this={textarea}; bind:value
+      bind:this={textarea}
+      bind:value
       {placeholder}
       {disabled}
       maxlength={maxLength}
       class="chat-input"
-      class: disabled, class:near-limit={isNearLimit}; class:at-limit={isAtLimit}
+      class: disabled, class:near-limit={isNearLimit}
+; class:at-limit={isAtLimit}
       {rows}
       oninput={debouncedHandleInput}
       onkeydown={handleKeydown}

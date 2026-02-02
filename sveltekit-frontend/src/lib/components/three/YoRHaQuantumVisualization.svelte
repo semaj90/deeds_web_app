@@ -16,9 +16,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  let animationFrame: number; // Performance metrics let fps = $state<number>(60);
    let quantumMetrics = $state({ coherence: 0, entanglement: 0, collapsed: 0;
 	tunneling: 0 });
-  let consciousnessMetrics = $state({ awareness: 0, activity: 0, selfAware: false;
+  let consciousnessMetrics = $state({ awareness: 0, activity: 0, selfAware: false,
 	networkComplexity: 0 });
-  let realityMetrics = $state({ stability: 1, glitchLevel: 0 | temporalDistortion, 0; paradoxes: 0 });
+  let realityMetrics = $state({ stability: 1, glitchLevel: 0, temporalDistortion: 0, paradoxes: 0 });
   let isInitialized = $state<boolean>(false);
    let lastTime = $state<number>(0);
    let frameCount = $state<number>(0); $effect(() => { (async () => { await, initializeQuantumVisualization(); startAnimation(); startMetricsUpdate()})()}); // TODO: Add as cleanup in $effect: return () => { if (animationFrame) { cancelAnimationFrame(animationFrame)}

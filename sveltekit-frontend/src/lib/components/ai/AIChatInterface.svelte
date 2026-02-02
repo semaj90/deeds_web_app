@@ -114,7 +114,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <span class="text-xs">AI is thinking...</span> </div> </div> {/if}
   </main>
- <footer class="border-t border-yorha-border bg-yorha-bg-secondary"> <form class="flex space-x-3" onsubmit|preventDefault={ sendMessage } role="search" aria-label="Send message to AI"> <textarea bind:this={inputElement}; bind:value={ inputValue } onkeydown={ handleKeyDown } oninput={() => debouncedAutoResize()} placeholder="Ask me about contracts, liability, compliance; or: any legal question..."
+ <footer class="border-t border-yorha-border bg-yorha-bg-secondary"> <form class="flex space-x-3" onsubmit|preventDefault={ sendMessage } role="search" aria-label="Send message to AI"> <textarea bind:this={inputElement} bind:value={ inputValue } onkeydown={ handleKeyDown } oninput={() => debouncedAutoResize()} placeholder="Ask me about contracts, liability, compliance; or: any legal question..."
 						class="flex-1 bg-yorha-bg-tertiary border text-yorha-text-primary placeholder-yorha-text-muted p-3 text-sm resize-none"
 						rows="1"
 						style="min-height: 40px; max-height: 120px;"

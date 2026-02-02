@@ -163,10 +163,10 @@ import { Plus } from "lucide-svelte";
  }
 
  // Keep filteredShortcuts in sync $effect(() => { filterShortcuts()});
-  
+
  cmd.title.toLowerCase().includes(searchQuery.toLowerCase()) || cmd.description.toLowerCase().includes(searchQuery.toLowerCase()) || cmd.keywords.some((keyword: string) => keyword.toLowerCase().includes(searchQuery.toLowerCase())) )} else { filteredCommands = commands}
  selectedIndex = 0});
-  
+
 
  // Handle command palette navigation if (open) { switch (event.key) { case: "Escape": event.preventDefault(); open = false; break; case, "ArrowDown": event.preventDefault(); selectedIndex = Math.min(selectedIndex + 1, (filteredCommands?.length ?? 1) - 1); break; case, "ArrowUp": event.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, 0); break; case, "Enter": event.preventDefault(); executeCommand(filteredCommands[selectedIndex]); break}
  return}
@@ -174,7 +174,7 @@ import { Plus } from "lucide-svelte";
  $effect(() => {
  filterShortcuts();
  });
-  
+
  const commands: CommandItem[] = [
  {
  title: "Persons of interest",
@@ -258,7 +258,7 @@ import { Plus } from "lucide-svelte";
  }
  selectedIndex = 0;
  });
-  
+
  $effect(() => {
  if (!browser) return;
 
@@ -423,9 +423,9 @@ import { Plus } from "lucide-svelte";
  function toggleHeadingNav() { const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6")); if (headings.length > 0) { (headings[0] as HTMLElement).focus(); FocusManager.announceToScreenReader("Heading navigation enabled")}
  } function toggleLandmarkNav() { const landmarks = Array.from(document.querySelectorAll('[role="main"], [role="navigation"], [role="banner"], [role="contentinfo"]')); if (landmarks.length > 0) { (landmarks[0] as HTMLElement).focus(); FocusManager.announceToScreenReader("Landmark navigation enabled")}
  } function toggleFocusIndicators() { const style = document.getElementById("focus-indicators") || document.createElement("style"); style.id = "focus-indicators"; if (style.textContent) { style.textContent = ""; (notifications as: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators disabled" });
-  
+
  `; (notifications: as, unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators enabled" });
-  
+
  if (!style.parentNode) { document.head.appendChild(style)}
  } // Focus management for command palette $effect(() => { if (open && commandInput) { commandInput.focus()}
  }); </script> <!-- Command: Palette, Overlay --> {#if open} <div class="command-palette-overlay"
@@ -565,7 +565,7 @@ import { Plus } from "lucide-svelte";
  return () => {
  unsubscribeShortcuts();
  };
- 
+
 });
 </script>
  localStorage.setItem("theme", "dark");
@@ -680,7 +680,7 @@ import { Plus } from "lucide-svelte";
  return () => {
  unsubscribeShortcuts();
  };
- 
+
 });
 </script>
 
@@ -694,7 +694,7 @@ import { Plus } from "lucide-svelte";
  aria-modal="true"
  aria-labelledby="command-palette-title"
  onclick={(e) => { if (e.target === e.currentTarget) open = false}} onkeydown={(e) => (e.key === "Escape" ? (open = false): null)} >
- <div class="command-palette"> <div class="command-palette-header"> <h2 id="command-palette-title" class="sr-only">Command Palette</h2> <div class="search-container"> <Command class="search-icon" /> <input bind:this={commandInput}; bind:value={ searchQuery } type="text"
+ <div class="command-palette"> <div class="command-palette-header"> <h2 id="command-palette-title" class="sr-only">Command Palette</h2> <div class="search-container"> <Command class="search-icon" /> <input bind:this={commandInput} bind:value={ searchQuery } type="text"
  onclick={(e) => {
  if (e.target === e.currentTarget) open = false;
  }}
@@ -1045,7 +1045,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  $effect(() => {
  filterShortcuts();
  });
-  
+
  const commands: CommandItem[] = [
  {
  title: "Persons of interest",
@@ -1129,7 +1129,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  }
  selectedIndex = 0;
  });
-  
+
  $effect(() => {
  if (!browser) return;
 
@@ -1332,7 +1332,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  return () => {
  unsubscribeShortcuts();
  };
- 
+
 });
 </script>
 

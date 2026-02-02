@@ -149,7 +149,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Textarea id="orchestrator-input"; bind:value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
           rows={ 4 } class="w-full"
         /> </div>
- <div class="flex"> <Button class="bits-btn" onclick={(_event: MouseEvent) => executeWorkflow} disabled={isProcessing ?? !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"
+ <div class="flex"> <Button class="bits-btn" onclick={(_event: MouseEvent) => executeWorkflow} disabled={isProcessing || !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"
         >
   {#if isProcessing} <Pause class="h-4 w-4" /> Processing... {:else} <Play class="h-4 w-4" /> Execute Workflow {/if}
   </Button>

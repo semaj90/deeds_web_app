@@ -7,7 +7,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	id: string, name: string, type: string, uploadedAt, string; status, 'uploading' | 'uploaded' | 'failed'}> = []; // Canvas options let options = $state({ analyze_layout: true, extract_entities: true, generate_summary: true, confidence_level: 0.8, context_window: 4096 }); $effect(() => {
 
 		(async () => {
- // initialize fabric try { const mod = await import('fabric'); // support both ESM default/namespace shapes Fabric = (mod as unknown).fabric ?? mod; fabricCanvas = new Fabric.Canvas(canvasEl as HTMLCanvasElement, { backgroundColor: '#ffffff', selection: true, // fixed missing colon preserveObjectStacking: true 		
+ // initialize fabric try { const mod = await import('fabric'); // support both ESM default/namespace shapes Fabric = (mod as unknown).fabric ?? mod; fabricCanvas = new Fabric.Canvas(canvasEl as HTMLCanvasElement, { backgroundColor: '#ffffff', selection: true, // fixed missing colon preserveObjectStacking: true
 });();
 	})} catch (err: unknown) { // normalize: unknown to Error before logging/using const e = err instanceof Error ?; err: new Error(String(err)); console.warn('Fabric failed to load:', e)}'
 
@@ -73,7 +73,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         style="display: none;"
       /> </label>
  <button type="button"
-      class={'nes-btn, ' + (analysisStatus === 'idle' ? 'is-primary', analysisStatus === 'complete' ? 'is-success', 'is-warning')} onclick={ handleAnalysis } disabled={analysisStatus === 'analyzing' ?? analysisStatus === 'pending'} >
+      class={'nes-btn ' + (analysisStatus === 'idle' ? 'is-primary' : analysisStatus === 'complete' ? 'is-success' : 'is-warning')} onclick={ handleAnalysis } disabled={analysisStatus === 'analyzing' || analysisStatus === 'pending'} >
   {#if analysisStatus === 'analyzing'} <Loader size={ 16 } /> Analyzing Evidence... {:else if analysisStatus === 'complete'} <CheckCircle size={ 16 } /> Analysis Complete {:else if analysisStatus === 'error'} <AlertCircle size={ 16 } /> Retry Analysis {:else} <FileText size={ 16 } /> Analyze Evidence {/if}
   </button>
  <button type="button" class="nes-btn" onclick={ saveCanvas }> <Save size={ 16 } /> Save Canvas </button> </div>

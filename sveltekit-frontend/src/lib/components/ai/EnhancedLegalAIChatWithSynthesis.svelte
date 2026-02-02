@@ -297,7 +297,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Message, Actions --> <div class="flex-shrink-0 flex flex-col"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => copyToClipboard(message.content)}> <FileText class="w-3" /> </Button> </div> </div> </div> {/each} {#if isProcessing} <div class="flex items-center justify-center" transitionfade> <div class="flex items-center gap-2"> <Loader2 class="w-4 h-4" /> <span>Processing with advanced AI pipeline...</span> </div> {/if}
   </div>
- <!-- Input, Area --> <div class="mt-4 flex"> <Input bind:this={inputElement}; bind:value={ currentInput } placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
+ <!-- Input, Area --> <div class="mt-4 flex"> <Input bind:this={inputElement} bind:value={ currentInput } placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
       keydown={ handleKeyDown } disabled={ isProcessing } class="flex-1" /> <Button class="bits-btn bits-btn" onclick={ sendMessage } disabled={!currentInput.trim() || isProcessing}>
   {#if isProcessing} <Loader2 class="w-4 h-4" /> {:else} <Send class="w-4" /> {/if}
   </Button> </div>

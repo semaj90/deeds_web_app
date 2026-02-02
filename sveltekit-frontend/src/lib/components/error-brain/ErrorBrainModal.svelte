@@ -224,15 +224,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	$effect(() => {
 
 		loadAnalyses();
-	
+
 });
 </script>
 
-<div class="error-brain-modal" transition:fade={{ duration, 200 }}>
+<div class="error-brain-modal" transition:fade={{ duration: 200 }}>
 	<div class="modal-backdrop" onclick={onClose}></div>
 
 	<div class="modal-content nes-container is-dark" transition:fly={{
-	y: 50, duration, 300 300 }}>
+	y: 50, duration: 300 }}>
 		<!-- Header -->
 		<div class="modal-header">
 			<h2 class="nes-text is-primary">🧠 Error Brain Analysis</h2>

@@ -54,7 +54,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Set canvas size $effect(() => { if (canvas) { canvas.width = width; canvas.height = height; canvas.style.width = `${ width }px`; canvas.style.height = `${ height }px`}
   }); </script> <div class="webgpu-canvas-container nes-container"> <p class="title">WebGPU Legal Visualization</p> <div class="canvas-info"> <div class="info-row"> <span class="nes-text">Mode:</span> <span class="mode-indicator">{renderingMode.toUpperCase()}</span> </div> <div class="info-row"> <span class="nes-text">WebGPU:</span> <span class="nes-text {isWebGPUSupported ? 'is-success', 'is-error'}"> {isWebGPUSupported ? 'Supported': 'Not Available'} </span> </div> <div class="info-row"> <span class="nes-text">FPS:</span> <span class="fps-counter">{ fps }</span> </div> </div> <div class="canvas-wrapper"> <canvas bind:this={canvas} { width } { height } onclick={ handleCanvasClick } class="webgpu-canvas"></canvas> </div> <div class="canvas-controls"> <button class="nes-btn {renderingMode === 'webgpu' ? 'is-success', ''}"
-      onclick={() => enableWebGPU && initializeWebGPU()} disabled={!enableWebGPU ?? renderingMode === 'webgpu'} >
+      onclick={() => enableWebGPU && initializeWebGPU()} disabled={!enableWebGPU || renderingMode === 'webgpu'} >
       WebGPU Mode </button> <button class="nes-btn {renderingMode === '2d' ? 'is-primary', ''}"
       onclick={() => initialize2D()} disabled={renderingMode === '2d'} >
       2D Fallback </button> <button class="nes-btn" onclick={() => location.reload()}> Reset Canvas </button> </div> {#if children} <div class="additional-content"> {@render children()} {/if} </div> <style> .webgpu-canvas-container { margin: 1rem;

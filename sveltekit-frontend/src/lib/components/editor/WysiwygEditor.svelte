@@ -89,7 +89,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             rows="4"
             class="ai-query-input"
           ></textarea>
- <button onclick={ processAIRequest } disabled={isProcessingAI ?? !aiQuery.trim()} class="btn btn-primary">
+ <button onclick={ processAIRequest } disabled={isProcessingAI || !aiQuery.trim()} class="btn btn-primary">
   {#if isProcessingAI} Processing... {:else} Ask AI {/if}
   </button>
   {#if aiResults} <div class="ai-results"> <strong>AI Response:</strong>

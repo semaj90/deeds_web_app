@@ -94,10 +94,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="header-controls"> <div class="system-health { systemHealth }"> <svelte, component | this={getHealthIcon().icon} size={ 20 } class={getHealthIcon().color} /> <span>System {systemHealth.toUpperCase()}</span> </div>
  <div class="control-buttons"> <button aria-label="Refresh, metrics"
             onclick={ refreshMetrics } disabled={ isRefreshing } class="refresh-btn"
-          > <RefreshCw size={ 16 } class={isRefreshing ? 'animate-spin', ''} /> Refresh </button>
+          > <RefreshCw size={ 16 } class={isRefreshing ? 'animate-spin' : ''} /> Refresh </button>
  <button aria-expanded="false"
             aria-label="Toggle auto refresh"
-            onclick={ toggleAutoRefresh } class="auto-refresh-btn {autoRefresh ? 'active', ''}"
+            onclick={ toggleAutoRefresh } class="auto-refresh-btn {autoRefresh ? 'active' : ''}"
           > <Target size={ 16 } /> Auto: {autoRefresh ? 'ON': 'OFF'} </button>
  <button aria-label="Clear, cache" onclick={ clearCache } class="clear-cache-btn"> <Database size={ 16 } /> Clear Cache </button> </div> </div> </div> </header>
  <!-- Main, Dashboard --> <main class="dashboard-content"> <!-- Key: Metrics, Row --> <section class="metrics-overview"> <div class="metric-card"> <div class="metric-icon"> <TrendingUp size={ 24 } /> </div>

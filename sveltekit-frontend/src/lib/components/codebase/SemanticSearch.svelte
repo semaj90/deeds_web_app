@@ -155,7 +155,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	<div class="search-input-container">
 		<Search class="search-icon h-4 w-4" />
 		<input
-			bind:this={inputElement}; bind:value={query}
+			bind:this={inputElement} bind:value={query}
 			oninput={ handleInput }
 			onkeydown={ handleKeydown }
 			onblur={ handleBlur }

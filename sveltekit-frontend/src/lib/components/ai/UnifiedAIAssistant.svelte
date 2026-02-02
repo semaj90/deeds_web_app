@@ -17,7 +17,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gpuUtilization: 0 });
   let assistantConfig = $state({ model: 'gemma3-legal', temperature: 0.7, maxTokens: 1000, streamResponse: true, useGPUAcceleration: true, // Fixed syntax error: added colon; preferredBackend: 'auto', // 'vllm' | 'ollama' | 'webasm' | 'auto'
     legalContext: true });
-  let voiceRecording = $state({ isRecording: false, mediaRecorder: null as MediaRecorder | null; audioChunks: [] as Blob[] });
+  let voiceRecording = $state({ isRecording: false, mediaRecorder: null as MediaRecorder | null, audioChunks: [] as Blob[] });
   let webgpuBridge: Worker | null = null; // Component props let { caseId = '', evidenceContext = [] as any[], readonly = false } = $props(); // Initialize AI systems $effect(() => { (async () => { console.log('ðŸ¤– Initializing Unified AI Assistant'); await initializeBackends(); await loadConversationHistory(); setupWebGPUWorker(); // Add welcome message addSystemMessage('Legal AI Assistant initialized. How can I help you analyze your case today?')})()});
   async function initializeBackends(): Promise<void> { console.log('ðŸ”Œ Checking backend availability...'); // Check vLLM try { const vllmResponse = await fetch(`${aiBackends.vllm.endpoint}/v1/models`, { method: 'GET', signal: AbortSignal.timeout(5000) }); aiBackends.vllm.available = vllmResponse.ok; aiBackends.vllm.status = vllmResponse.ok ? 'healthy': 'error'} catch { aiBackends.vllm.available = false; aiBackends.vllm.status = 'unavailable'}
 

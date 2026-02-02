@@ -63,7 +63,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <Button class="bits-btn" onclick={() => exportSelected('json')} variant="outline">ðŸ”§ Export JSON</Button> {/if}
   </div> </CardTitle> </CardHeader>
  <CardContent> <!-- Upload, Section -->
-  {#if showUpload} <div class="upload-section" transition:fly={{ y, -20; duration, 300 }}> <div class="upload-area"> <input type="file"
+  {#if showUpload} <div class="upload-section" transition:fly={{ y: -20, duration: 300 }}> <div class="upload-area"> <input type="file"
               multiple accept=".pdf,.doc,.docx,.txt,.email,.csv,.xlsx,.mp3,.mp4,.wav"
               onchange={ handleFileUpload } class="file-input"
             /> <div class="upload-instructions"> <span class="upload-icon">ðŸ“Ž</span>

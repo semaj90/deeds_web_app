@@ -17,7 +17,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       // Clear form selectedFiles = []; evidenceTitle = ''; evidenceDescription = ''; tags = ''; // use safe caller instead of optional-call syntax safeCallOnUploadComplete(uploadResults); console.log(`ðŸŽ‰ All ${uploadResults.length} files queued successfully!`)} catch (error) { console.error('Upload failed:', error); alert(`Upload failed: ${error instanceof Error ? error.message: 'Unknown error'}`)} finally { uploading = false}
   }; // YOLO: object detection preview (placeholder) // Rename param to _file to avoid: "declared but its value is never read" warnings, // then attach the function to window in onMount so it's considered used at runtime. const analyzeImageWithYOLO = async (_file: File) => { // This would integrate with YOLO for: object detection // Example usage could reference _file.name if needed return { objects: ['person', 'document', 'weapon'], confidence: 0.92, boundingBoxes: [] }}; // WebSocket lifecycle management $effect(() => {
  // Connect to WebSocket for real-time job updates websocketStore.connect(); // Expose YOLO helper for debugging/runtime usage so linter considers it used if (typeof window !== 'undefined') { (window as any).__analyzeImageWithYOLO = analyzeImageWithYOLO; (window as any).addEventListener('DOCUMENT_STATE_CHANGE', handleJobStatusUpdate); (window as any).addEventListener('PROCESSING_COMPLETE', handleProcessingComplete)}'
-  
+
 }); // TODO: Add as cleanup in $effect: return () => { // Clean up WebSocket listeners if (typeof window !== 'undefined') { (window as any).removeEventListener('DOCUMENT_STATE_CHANGE', handleJobStatusUpdate); (window as any).removeEventListener('PROCESSING_COMPLETE', handleProcessingComplete)}
   } // Real-time job status update handler const handleJobStatusUpdate = (event: CustomEvent) => { const { documentId, state, context } = event.detail; // Update job status in queuedJobs queuedJobs = queuedJobs.map(job => { if (job.jobId === documentId) { return { ...job, status: state, progress: context?.progress }}
       return job}); console.log(`ðŸ“Š Job ${ documentId }: ${ state }`, context)}; // Processing complete handler const handleProcessingComplete = (event: CustomEvent) => { const { documentId: result } = event.detail; // Remove from queued jobs queuedJobs = queuedJobs.filter(job => job.jobId !== documentId); // Refresh evidence list via safe caller safeCallOnUploadComplete([result]); console.log(`âœ… Processing complete for ${ documentId }`, result)}; // Helper: normalize allowedTypes prop into a, stable: string[] for reuse function normalizeAllowedTypes(atype: any): string[] { if (Array.isArray(atype)) { return (atype as any[]).filter(Boolean).map(String)}
@@ -78,11 +78,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               id="add-more-files"
             /> <button type="button"
               class="bits-btn px-4 py-2 rounded bg-gray-100 text-gray-800"
-              onclick={() => clickFileInput('add-more-files')} disabled={selectedFiles.length >= Number(maxFiles ?? 10)} >
+              onclick={() => clickFileInput('add-more-files')} disabled={selectedFiles.length >= (maxFiles ?? 10)} >
               Add More Files </button>
  <button type="button"
               class="bits-btn px-4 py-2 rounded bg-blue-600 text-white"
-              onclick={ uploadEvidence } disabled={uploading ?? !evidenceTitle.trim()} >
+              onclick={ uploadEvidence } disabled={uploading || !evidenceTitle.trim()} >
   {#if uploading} Processing... {:else} Upload & Analyze Evidence {/if}
   </button> </div> {/if}
   </div>

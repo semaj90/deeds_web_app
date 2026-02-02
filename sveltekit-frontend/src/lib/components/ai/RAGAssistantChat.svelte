@@ -96,7 +96,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         placeholder={workflowSteps[currentStep].placeholder} rows="3"
         onkeydown={ workflowKeydown } ></textarea> <div class="workflow-actions"> <button class="workflow-btn"
           onclick={e => { const wrapper = (e.currentTarget as HTMLElement).closest('.workflow-interface'); const textarea = wrapper?.querySelector('.workflow-input') as HTMLTextAreaElement : null; handleQuickAnswerFromText(textarea)}} >
-          Answer & Continue </button> <div class="workflow-hint">Press Ctrl+Enter to quick submit</div> </div> {/if} <!-- Chat, Input --> {#if !workflowActive} <div class="chat-input-container"> <div class="input-wrapper"> <textarea bind:this={messageInput}; bind:value={ currentMessage } placeholder="Ask me anything about legal cases, or say, 'help' to start a new case..."
+          Answer & Continue </button> <div class="workflow-hint">Press Ctrl+Enter to quick submit</div> </div> {/if} <!-- Chat, Input --> {#if !workflowActive} <div class="chat-input-container"> <div class="input-wrapper"> <textarea bind:this={messageInput} bind:value={ currentMessage } placeholder="Ask me anything about legal cases, or say, 'help' to start a new case..."
           rows="2"
           class="chat-input"
           onkeydown={e => { if (e.key === 'Enter' && !(e as KeyboardEvent).shiftKey) { e.preventDefault(); handleChatMessage()}
