@@ -1,4 +1,7 @@
-<script lang="ts"> import { Upload, Camera, X } from 'lucide-svelte';
+<script lang="ts">
+import Upload from 'lucide-svelte/icons/upload';
+import Camera from 'lucide-svelte/icons/camera';
+import X from 'lucide-svelte/icons/x';
  import { Button } from '$lib/components/ui/enhanced-bits'; interface Props { poiId: string, poiName?: string; currentImage?: string; onUploadComplete?: (data: {
 	imageUrl: string; [key: string]: any }) => void}
   let { poiId, poiName = 'Person of Interest', currentImage, onUploadComplete }: Props = $props();

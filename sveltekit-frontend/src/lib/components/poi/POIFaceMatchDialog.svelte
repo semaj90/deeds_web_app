@@ -10,12 +10,10 @@
  import DialogDescription from '$lib/components/ui/dialog/DialogDescription.svelte';
  import DialogHeader from '$lib/components/ui/dialog/DialogHeader.svelte';
  import DialogTitle from '$lib/components/ui/dialog/DialogTitle.svelte';
- import Percent from "lucide-svelte";
- import Search from "lucide-svelte";
- import Users from "lucide-svelte";
- import X from "lucide-svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+ import Percent from 'lucide-svelte/icons/percent';
+ import Search from 'lucide-svelte/icons/search';
+ import Users from 'lucide-svelte/icons/users';
+ import X from 'lucide-svelte/icons/x';
 
  interface POI {
  id: string;

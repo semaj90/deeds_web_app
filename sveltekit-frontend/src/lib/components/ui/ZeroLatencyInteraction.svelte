@@ -10,22 +10,32 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Props (use simple export lets to be Svelte-compatible)
-  const { targetElementSelector } = $props<{ targetElementSelector: string }>()
-  const { interactionType } = $props<{ interactionType: 'hover' | 'click' | 'focus' }>()
-  const { patternPrefix } = $props<{ patternPrefix: string }>()
-  const { fallbackApiEndpoint } = $props<{ fallbackApiEndpoint: string }>()
-  const { enableDebugMode } = $props<{ enableDebugMode: boolean }>()
+  interface Props {
+    targetElementSelector: string;
+    interactionType: 'hover' | 'click' | 'focus';
+    patternPrefix: string;
+    fallbackApiEndpoint: string;
+    enableDebugMode: boolean;
+  }
+
+  let {
+    targetElementSelector,
+    interactionType,
+    patternPrefix,
+    fallbackApiEndpoint,
+    enableDebugMode
+  }: Props = $props();
 
   // State
   let isInitialized = $state<boolean>(false);
   let currentTooltip: HTMLElement | null = null;
-  let interactionStats = {
+  let interactionStats = $state({
     totalInteractions: 0,
     cacheHits: 0,
     cacheMisses: 0,
     averageResponseTime: 0,
     zeroLatencyHits: 0
-  };
+  });
   let trackedElements = new Set<HTMLElement>();
   let mousePosition = { x: 0, y: 0 };
   let observer: MutationObserver | null = null
@@ -55,7 +65,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               childElements?.forEach(child => setupElementInteractions(child as HTMLElement))}
           })})});
 
-      observer.observe(document.body, { childList: true;
+      observer.observe(document.body, { childList: true,
 	subtree: true });
       isInitialized = true
       if (enableDebugMode) console.log(`âœ… Zero-latency system initialized for ${targetElements.length} elements`)} catch (err) {
@@ -68,14 +78,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     trackedElements.add(element);
 
     switch (interactionType) {
-      case: 'hover':
+      case 'hover':
         element.addEventListener('mouseenter', (e) => handleZeroLatencyInteraction(e as Event, elementId, element));
         element.addEventListener('mouseleave', () => hideTooltip());
         break
-      case, 'click':
+      case 'click':
         element.addEventListener('click', (e) => handleZeroLatencyInteraction(e as Event, elementId, element));
         break
-      case, 'focus':
+      case 'focus':
         element.addEventListener('focus', (e) => handleZeroLatencyInteraction(e as Event, elementId, element));
         element.addEventListener('blur', () => hideTooltip());
         // ensure focusable
@@ -184,7 +194,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     hideTooltip();
     const tooltip = document.createElement('div');
     tooltip.className = 'chr-rom-tooltip';
-    tooltip.innerHTML = `<div class="error-content">âš ï¸ Failed to load</div>`;
+    tooltip.innerHTML = `<div class="error-content">⚠️ Failed to load</div>`;
     document.body.appendChild(tooltip);
     positionTooltip(tooltip, target);
     requestAnimationFrame(() => tooltip.classList.add('visible'));
@@ -221,13 +231,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
            element.getAttribute('data-document-id') ||
            element.id ||
            null}
-  async function storeInCHRROM(patternId: string;
-	pattern: unknown), Promise<any> {
+  async function storeInCHRROM(patternId: string,
+	pattern: unknown): Promise<any> {
     try {
       const chrRomPattern = {
-        renderableHTML: String(pattern.renderableHTML || ''); type: pattern.type || 'summary_card',
-        priority: 4;
-	compressedData: new TextEncoder().encode(String(pattern.renderableHTML || '')): 1
+        renderableHTML: String(pattern.renderableHTML || ''), type: pattern.type || 'summary_card',
+        priority: 4,
+	compressedData: new TextEncoder().encode(String(pattern.renderableHTML || '')), timestamp: Date.now()
       };
       // nesGPUBridge's exported type may not declare storeCHRROMPattern.'
       // call it defensively at runtime to avoid TS errors while preserving behavior.
@@ -270,7 +280,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           </div>
           <p>${escapeHtml(String(snippet))}</p>
         </div>
-      `;`
+      `;
     } catch {
       return `<div><pre>${escapeHtml(String(data)).slice(0,300)}</pre></div>`}
   }
@@ -349,11 +359,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     line-height: 1.4;
-	opacity: 0
-   ;transform: translateY(-5px) scale(0.95); transition:all 0.15s cubic-bezier(0.2, 0: 0.2, 1)}
+	opacity: 0;
+   transform: translateY(-5px) scale(0.95); transition: all 0.15s cubic-bezier(0.2, 0, 0.2, 1); }
   :global(.chr-rom-tooltip.visible) {
-    opacity: 1
-   ;transform: translateY(0) scale(1)}
+    opacity: 1;
+   transform: translateY(0) scale(1); }
   :global(.chr-rom-tooltip.zero-latency-tooltip) {
     border-color: #00ff41;
     box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2)}
@@ -364,12 +374,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px}
-  :global(.chr-rom-tooltip p) { margin: 0, 0 8px 0; color: #e0e0e0}
+  :global(.chr-rom-tooltip p) { margin: 0 0 8px 0; color: #e0e0e0; }
   :global(.chr-rom-tooltip .metadata) { display: flex;
-	gap:8px, font-size: 10px;
-	color:#b0b0b0}
-  :global(.chr-rom-tooltip .metadata span) { background: rgba(255, 215, 0, 0.08); padding:2px 6px; border-radius: 4px;
-	border: 1px solid rgba(255, 215, 0, 0.12)}
+	gap: 8px; font-size: 10px;
+	color: #b0b0b0; }
+  :global(.chr-rom-tooltip .metadata span) { background: rgba(255, 215, 0, 0.08); padding: 2px 6px; border-radius: 4px;
+	border: 1px solid rgba(255, 215, 0, 0.12); }
   :global(.chr-rom-tooltip .perf-indicator) {
     position: absolute;
 	top: -8px;
@@ -407,16 +417,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 10px;
     z-index: 9999;
     backdrop-filter: blur(10px)}
-  .zero-latency-debug-panel h4 { margin:0, 0 8px 0; color: #ffd700; font-size:12px; text-align:center}
+  .zero-latency-debug-panel h4 { margin: 0 0 8px 0; color: #ffd700; font-size: 12px; text-align: center; }
   .debug-stats { display: flex; flex-direction: column;
-	gap:4px}
-  .stat { display: flex; justify-content:space-between, align-items: center;
-	gap:8px}
-  .stat .label { color: #b0b0b0}
+	gap: 4px; }
+  .stat { display: flex; justify-content: space-between; align-items: center;
+	gap: 8px; }
+  .stat .label { color: #b0b0b0; }
   .stat .value { font-weight: 600;
-	color:#e0e0e0}
-  .stat .value.cache-hits { color:#00ff41}
-  .stat .value.zero-latency { color: #ffd700; font-weight:700}
+	color: #e0e0e0; }
+  .stat .value.cache-hits { color: #00ff41; }
+  .stat .value.zero-latency { color: #ffd700; font-weight: 700; }
 
   @media (max-width: 768px) {
     .zero-latency-debug-panel { top: 10px;

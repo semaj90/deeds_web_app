@@ -2,8 +2,6 @@
 	// Svelte, 5 runes are auto-imported
 	// Migrated to $effect
 
-	import { writable } from 'svelte/store';
-
 	import Activity from 'lucide-svelte/icons/activity';
 	import Cpu from 'lucide-svelte/icons/cpu';
 	import Zap from 'lucide-svelte/icons/zap';
@@ -18,7 +16,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	let { showOverlay = false, autoHide = true, updateInterval = 1000 }: Props = $props();
 	interface PerformanceMetrics {
 		fps: number, memoryUsage: number, cpuUsage: number, gpuUsage: number, webGPUActive: boolean, activeOperations: number, responseTime: number, timestamp: number}
-	const metrics = writable<PerformanceMetrics>({ fps: 0,
+	let metrics = $state<PerformanceMetrics>({ fps: 0,
 		memoryUsage: 0,
 		cpuUsage: 0,
 		gpuUsage: 0,
@@ -65,7 +63,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		} catch {
 			// ignore; not available in all environments
 		}
-		metrics.set({
+		metrics = {
 			fps: isNaN(fps) ? 60 : Math.min(Math.max(fps, 0), 120),
 			memoryUsage,
 			cpuUsage: Math.round((Math.random() * 20 + 10) * 10) / 10, // simulated
@@ -74,7 +72,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			activeOperations: getActiveOperationsCount(),
 			responseTime,
 			timestamp: now
-		});
+		};
 	}
 
 	function getActiveOperationsCount(): number {
@@ -100,7 +98,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				});
 				performanceObserver.observe({
 					entryTypes: ['measure', 'navigation', 'resource']
-				})} catch (error) {
+				});
+			} catch (error) {
 				// PerformanceObserver may not be available in all contexts
 				console.warn('PerformanceObserver not supported:', error);
 				performanceObserver = null}
@@ -190,7 +189,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       </div>
 
       <!-- Metrics -->
-  {#if $metrics}
+  {#if metrics}
         <div class="space-y-1">
           <!-- FPS -->
           <div class="flex items-center">
@@ -199,8 +198,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               FPS:
             </span>
 
-            <span class={getStatusColor($metrics.fps, 'fps') + ' font-semibold'}>
-              {$metrics.fps}
+            <span class={getStatusColor(metrics.fps, 'fps') + ' font-semibold'}>
+              {metrics.fps}
             </span>
           </div>
 
@@ -211,8 +210,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               Memory:
             </span>
 
-            <span class={getStatusColor($metrics.memoryUsage, 'memory') + ' font-semibold'}>
-              {$metrics.memoryUsage}%
+            <span class={getStatusColor(metrics.memoryUsage, 'memory') + ' font-semibold'}>
+              {metrics.memoryUsage}%
             </span>
           </div>
 
@@ -220,8 +219,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           <div class="flex items-center">
             <span>CPU:</span>
 
-            <span class={getStatusColor($metrics.cpuUsage, 'cpu') + ' font-semibold'}>
-              {$metrics.cpuUsage.toFixed(1)}%
+            <span class={getStatusColor(metrics.cpuUsage, 'cpu') + ' font-semibold'}>
+              {metrics.cpuUsage.toFixed(1)}%
             </span>
           </div>
 
@@ -232,8 +231,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               GPU:
             </span>
 
-            <span class={getStatusColor($metrics.gpuUsage, 'gpu') + ' font-semibold'}>
-              {$metrics.webGPUActive ? $metrics.gpuUsage.toFixed(1) + '%' : 'N/A'}
+            <span class={getStatusColor(metrics.gpuUsage, 'gpu') + ' font-semibold'}>
+              {metrics.webGPUActive ? metrics.gpuUsage.toFixed(1) + '%' : 'N/A'}
             </span>
           </div>
 
@@ -242,7 +241,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             <span>AI Ops:</span>
 
             <span class="text-blue-400">
-              {$metrics.activeOperations}
+              {metrics.activeOperations}
             </span>
           </div>
 
@@ -254,7 +253,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             </span>
 
             <span class="text-purple-400">
-              {$metrics.responseTime}ms
+              {metrics.responseTime}ms
             </span>
           </div>
 
@@ -262,8 +261,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           <div class="flex items-center justify-between pt-1 border-t">
             <span>WebGPU:</span>
 
-            <span class={( $metrics.webGPUActive ? 'text-green-400' : 'text-red-400') + ' font-semibold'}>
-              {$metrics.webGPUActive ? 'Active' : 'Inactive'}
+            <span class={( metrics.webGPUActive ? 'text-green-400' : 'text-red-400') + ' font-semibold'}>
+              {metrics.webGPUActive ? 'Active' : 'Inactive'}
             </span>
           </div>
         </div>

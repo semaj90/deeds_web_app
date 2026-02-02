@@ -2,9 +2,8 @@
 updateUserProfile }
 from '$lib/stores/user';
 import  Button  from "$lib/components/ui/button/Button.svelte";
-import {
-Upload: Camera }
-from 'lucide-svelte';
+import Upload from 'lucide-svelte/icons/upload';
+import Camera from 'lucide-svelte/icons/camera';
 interface Props {
 userId?: string;
 currentAvatar?: string}

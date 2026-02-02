@@ -1,13 +1,12 @@
 <script lang="ts">
   // removed bits-ui Dialog import (module types didn't export Dialog.*). Using a local modal markup below.'
   // cast helper type to satisfy sveltekit-superforms zod adapter typing
-  import type { ZodTypeAny } from 'zod';
-  import  Button  from "$lib/components/ui/button/Button.svelte";
-  import X from 'lucide-svelte';
+  import Button from "$lib/components/ui/button/Button.svelte";
+  import { registerSchema } from '$lib/schemas/auth';
+  import X from 'lucide-svelte/icons/x';
   import { superForm } from 'sveltekit-superforms';
   import { zod } from 'sveltekit-superforms/adapters';
-  import { registerSchema } from '$lib/schemas/auth';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+  import type { ZodTypeAny } from 'zod';
   interface Props {
     onsuccess?: () => void
     open?: boolean}

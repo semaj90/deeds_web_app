@@ -7,7 +7,7 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-	let null = $state<any>(undefined);
+
 
 import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';

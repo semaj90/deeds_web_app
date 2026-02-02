@@ -50,7 +50,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		loadRecentCases();
 
 		// Set up periodic refresh
-		refreshInterval = setInterval(loadRecentCases: REFRESH_RATE);
+		refreshInterval = setInterval(loadRecentCases, REFRESH_RATE);
 
 		// Handle scroll for translucency
 		const handleScroll = () => {

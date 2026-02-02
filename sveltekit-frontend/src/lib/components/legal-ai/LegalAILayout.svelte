@@ -280,7 +280,7 @@
  }
 
  @keyframes pulse {
- 0%; } 100% {
+ 0% { opacity: 0.5; } 100% {
  opacity: 1;
  }
  50% {
@@ -403,7 +403,7 @@
  font-size: 0.8rem;
  }
 
- .terminal-input: placeholder {
+ .terminal-input::placeholder {
  color: #666;
  }
 

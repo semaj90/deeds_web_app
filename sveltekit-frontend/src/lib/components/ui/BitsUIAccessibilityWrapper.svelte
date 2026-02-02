@@ -272,7 +272,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   });
 </script> <div bind:this={containerElement} class="bits-ui-accessibility-wrapper"
   data-component={ component } data-route-type={currentRouteConfig?.routeType} >
-  {#if children} {@render children()} {/if} {#if contextualHelp} <div id="contextual-help" class="sr-only"> { contextualHelp } {/if} </div> <style>
+  {#if children} {@render children()} {/if} {#if contextualHelp} <div id="contextual-help" class="sr-only"> { contextualHelp } </div> {/if} </div> <style>
   .bits-ui-accessibility-wrapper {
     position: relative;
   }
