@@ -16,7 +16,7 @@
 
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
  <!-- Active Cases -->
  <div class="bg-white border-2 border-gray-300 p-6 rounded hover:border-[#9E0000] transition">
  <p class="text-gray-600 text-sm font-mono uppercase">Active Cases</p>

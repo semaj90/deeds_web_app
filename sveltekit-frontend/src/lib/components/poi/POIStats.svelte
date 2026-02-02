@@ -4,7 +4,7 @@
  // Migrated to $effect
 
  // Props
- let { caseId = null } = $props();
+ let { caseId = null }: { caseId?: string | null } = $props();
 
  // State
  let stats = $state({
@@ -17,11 +17,7 @@
  let error = $state<string | null>(null);
 
  $effect(() => {
-
- (async () => {
- await loadStats();
- 
-});();
+  loadStats();
  });
 
  async function loadStats() {

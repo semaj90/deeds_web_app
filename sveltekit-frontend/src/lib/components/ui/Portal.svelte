@@ -2,7 +2,6 @@
 <script lang="ts">
   // Migrated to $effect
   import type { Snippet } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     children?: Snippet}
   let { children }: Props = $props();
@@ -16,16 +15,20 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     if (!target) {
       target = document.createElement('div');
       target.id = 'portal-target';
-      document.body.appendChild(target)}
+      document.body.appendChild(target);
+    }
     // Only append if portal exists (bind:this guarantees this in onMount)
     if (portal && target) {
-      target.appendChild(portal)}
-  
-});
-  // TODO: Add as cleanup in $effect: return () => {
-    if (portal && portal.parentNode) {
-      portal.parentNode.removeChild(portal)}
-  }
+      target.appendChild(portal);
+    }
+
+    // Cleanup function
+    return () => {
+      if (portal && portal.parentNode) {
+        portal.parentNode.removeChild(portal);
+      }
+    };
+  });
 </script>
 
 <div bind:this={portal} style="display: contents;">

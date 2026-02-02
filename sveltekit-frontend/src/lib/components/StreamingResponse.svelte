@@ -1,5 +1,8 @@
 <script lang="ts">
-	let { response = '' } = $props();
+	interface Props {
+		response?: string;
+	}
+	let { response = '' }: Props = $props();
 
 	function getDisplayText(): string {
 		return response;

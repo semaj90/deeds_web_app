@@ -19,7 +19,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		lastCheck: Date.now()
 	});
 
-	let stats = $derived(cache.getStats());
+	let stats = $derived(cache.getStats() as any);
 	let autoRefresh = $state(true);
 	let refreshInterval: ReturnType<typeof setInterval> | undefined;
 
