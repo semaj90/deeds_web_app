@@ -1,5 +1,5 @@
 <script lang="ts">
-import Badge from "$lib/components/ui/Badge.svelte";
+import Badge from "$lib/components/ui/badge.svelte";
 import { vectorIntelligenceService, type VectorSearchResult } from '$lib/services/vector-intelligence-service.js';
 import { Calendar, FileText, Loader2, MapPin, Scale, Search, Users, X } from 'lucide-svelte';
 

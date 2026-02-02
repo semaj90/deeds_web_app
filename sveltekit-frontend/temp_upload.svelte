@@ -235,7 +235,7 @@ function formatFileSize(bytes: number): string {
             Only visible to you and case administrators
           </span>
         </Label>
-        <Switch id="isPrivate" name="isPrivate" bind:checked={$form.isPrivate} onCheckedChange={(v) => $form.isPrivate = v} />
+        <Switch id="isPrivate" name="isPrivate" bind:checked={$form.isPrivate} />
       </div>
     </div>
 

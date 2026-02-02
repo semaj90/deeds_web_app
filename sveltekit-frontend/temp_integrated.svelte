@@ -1,7 +1,7 @@
 <script lang="ts">
 import Alert from "$lib/components/ui/alert/Alert.svelte";
 import AlertDescription from "$lib/components/ui/alert/AlertDescription.svelte";
-import Badge from "$lib/components/ui/Badge.svelte";
+import Badge from "$lib/components/ui/badge.svelte";
 import Button from '$lib/components/ui/enhanced-bits.svelte';
 import Input from "$lib/components/ui/input/Input.svelte";
 import Progress from "$lib/components/ui/progress/Progress.svelte";

@@ -12,6 +12,17 @@ const config = {
   // Use svelte-preprocess for safe defaults (TypeScript, PostCSS, scss, etc.)
   preprocess: vitePreprocess(),
 
+  // Configure Vite to handle node_modules differently (legacy mode for lucide-svelte)
+  vitePlugin: {
+    inspector: false,
+    dynamicCompileOptions({ filename }) {
+      // Disable runes for node_modules components that use $$props
+      if (filename.includes('node_modules')) {
+        return { runes: false };
+      }
+    }
+  },
+
   kit: {
     // Ensure we explicitly use the Node adapter (not adapter-auto)
     adapter: nodeAdapter({ out: 'build', precompress: true }),

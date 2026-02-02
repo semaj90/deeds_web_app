@@ -35,7 +35,7 @@ async function sampleCollection(name: string, limit: number = 10): Promise<Array
     const response = await fetch(`${QDRANT_URL}/collections/${ name }/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit: with_payload, true, with_vector: false })
+      body: JSON.stringify({ limit, with_payload: true, with_vector: false })
     });
     if (!response.ok) return [];
     const data = await response.json() as { result: { points: Array<{ id: string; payload: Record<string, unknown> }> } };

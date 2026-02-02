@@ -96,23 +96,29 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
 
 function extractFileMetadata(content: string, filePath: string): any {
   const lines = content.split('\n');
-.filter(l => l.match(/^import\s+/))
+  const imports = lines
+    .filter(l => l.match(/^import\s+/))
     .slice(0, 10)
     .map(l => l.trim());
-.filter(l => l.match(/^export\s+/))
+  const exports = lines
+    .filter(l => l.match(/^export\s+/))
     .slice(0, 10)
     .map(l => l.trim());
 
   const typeCount = (content.match(/\b(type|interface)\s+/g) || []).length;
   const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;
-? 'svelte'
+
+  const language = filePath.endsWith('.svelte')
+    ? 'svelte'
     : filePath.endsWith('.ts')
       ? 'typescript'
       : 'javascript';
 
   return {
-    language: imports,
-    exports: typeCount,
+    language,
+    imports,
+    exports,
+    typeCount,
     functionCount
   };
 }
