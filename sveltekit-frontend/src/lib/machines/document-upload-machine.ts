@@ -1,5 +1,4 @@
 import { assign, createMachine, fromPromise } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Type definitions
 interface UploadedFile {
@@ -131,8 +130,7 @@ export const documentUploadMachine = createMachine({
 	validating: {
 	invoke: {
         id: 'validateFiles',
-        src: fromPromise<File[]>(async (params) => {
-          const { input } = params as { input: DocumentUploadContext };
+        src: fromPromise<File[], { input: DocumentUploadContext }>(async ({ input }) => {
           const errors: Record<string, string[]> = {};
 
           if (input.files.length === 0) {

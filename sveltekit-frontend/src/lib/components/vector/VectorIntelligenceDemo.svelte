@@ -108,7 +108,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  searchResults = [];
  try {
  const results = await vectorIntelligenceService.semanticSearch({
- query: searchQuery, threshold: 0 0.7, limit: 10: 10, includeMetadata: true,
+ query: searchQuery, threshold: 0.7, limit: 10, includeMetadata: true,
  contextFilter: {
 	evidenceType: selectedCaseType }
  });
@@ -240,7 +240,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  </h4> <p class="text-xs nes-text is-disabled">{example.description}
  </p> <p class="text-xs bg-muted p-2">{example.content.substring(0, 60)}...</p> </div> {/each}
  </div> </div> </div> </div> <!-- Tab, Navigation --> <div class="flex items-center justify-center space-x-1 bg-muted p-1 rounded-lg w-fit"> <ButtonRoot class="bits-btn flex items-center gap-2 bits-btn"
- variant={activeTab === 'search' ? 'default', 'ghost'} size="sm"
+ variant={activeTab === 'search' ? 'default' : 'ghost'} size="sm"
  onclick={() => activeTab = 'search'}
  > <Search class="h-4" /> Search </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2 bits-btn"
  variant={activeTab === 'recommendations' ? 'default', 'ghost'} size="sm"

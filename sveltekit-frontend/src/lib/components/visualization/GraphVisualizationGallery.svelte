@@ -3,7 +3,10 @@
   // Migrated to $effect
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Button } from '$lib/components/ui/button';
-  import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+  import Card from '$lib/components/ui/card/Card.svelte';
+  import CardContent from '$lib/components/ui/card/CardContent.svelte';
+  import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+  import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import Grid from 'lucide-svelte/icons/grid';
   import List from 'lucide-svelte/icons/list';
   import RefreshCw from 'lucide-svelte/icons/refresh-cw';

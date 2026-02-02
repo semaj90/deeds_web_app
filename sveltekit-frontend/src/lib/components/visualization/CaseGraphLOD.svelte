@@ -2,7 +2,10 @@
   import { browser } from '$app/environment';
   // Migrated to $effect
   import Badge from "$lib/components/ui/badge/Badge.svelte";
-  import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+  import Card from '$lib/components/ui/card/Card.svelte';
+  import CardContent from '$lib/components/ui/card/CardContent.svelte';
+  import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+  import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import Network from 'lucide-svelte/icons/network';
   // Explicitly typing $props to avoid interface merge issues on single lines
   interface GraphNode {

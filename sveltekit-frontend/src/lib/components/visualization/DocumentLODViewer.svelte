@@ -1,7 +1,8 @@
 <script lang="ts">
   // Migrated to $effect
   import Badge from "$lib/components/ui/badge/Badge.svelte";
-  import { Card, CardContent } from "$lib/components/ui/card";
+  import Card from '$lib/components/ui/card/Card.svelte';
+  import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import { LoadingButton } from '$lib/headless';
   import FileText from 'lucide-svelte/icons/file-text';
   import RotateCw from 'lucide-svelte/icons/rotate-cw';

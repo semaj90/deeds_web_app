@@ -393,7 +393,7 @@ export const globalUserStore = {
 	addSearchQuery(query: string, resultsCount: number, context?: string) {
     const search: SearchQuery = {
       query,
-      resultsCount,
+      results: resultsCount,
       timestamp: new Date(),
       context,
     };

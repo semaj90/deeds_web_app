@@ -37,7 +37,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     autoRefresh = false,
     refreshInterval = 30,
     compact = false,
-    onRecommendationClick = () => 0%
+    onRecommendationClick = () => {}
   }: Props = $props();
   let recommendations = $state<IntelligenceRecommendation[]>([]);
   let isLoading = $state<boolean>(false);
@@ -238,6 +238,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                 <span>Time: {rec.estimatedImpact.timeToComplete}min</span>
                 <span>â€¢</span>
                 <span>Success: {rec.estimatedImpact.successProbability}%</span>
+              </div>
               {/if}
           </button>
         {/each}

@@ -970,14 +970,17 @@ export function getContextualPromptsByTiming(
 			if (context.errors.length > 0) {
 				prompts.push({
 					id: 'upload-errors',
+					content: `${context.errors.length} error(s) occurred during upload`,
 					message: `${context.errors.length} error(s) occurred during upload`,
 					type: 'error',
+					category: 'warning',
+					timing: 'after-upload',
+					confidence: 1.0,
+					relevance: 1.0,
+					actionable: true,
+					legalSpecific: false,
 					priority: 3,
-					timestamp: now,
-					action: {
-						label: 'View Details',
-						callback: () => console.log('Errors:', context.errors)
-					}
+					timestamp: now
 				});
 			}
 			break;

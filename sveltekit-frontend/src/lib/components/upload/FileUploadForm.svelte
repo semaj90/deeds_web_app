@@ -10,9 +10,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "$
 import Switch from "$lib/components/ui/switch/Switch.svelte";
 import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
 import { fileUploadSchema } from '$lib/schemas/upload';
-import { Binary, CheckCircle, FileText, Film, HardDrive, Image, Music, Upload } from 'lucide-svelte';
-import { superForm } from 'sveltekit-superforms';
+import Binary from 'lucide-svelte/icons/binary';
+import CheckCircle from 'lucide-svelte/icons/check-circle';
+import FileText from 'lucide-svelte/icons/file-text';
+import Film from 'lucide-svelte/icons/film';
+import HardDrive from 'lucide-svelte/icons/hard-drive';
+import Image from 'lucide-svelte/icons/image';
+import Music from 'lucide-svelte/icons/music';
+import Upload from 'lucide-svelte/icons/upload';
 import { zodClient } from 'sveltekit-superforms/adapters';
+import { superForm } from 'sveltekit-superforms/client';
 
 interface Props {
   data: { form: any };
