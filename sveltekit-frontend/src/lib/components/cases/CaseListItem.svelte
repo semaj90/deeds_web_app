@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Badge from "$lib/components/ui/badge.svelte";
+  import Badge from "$lib/components/ui/Badge.svelte";
   import { formatDistanceToNow } from "date-fns";
   import Archive from "lucide-svelte/icons/archive";
   import Calendar from "lucide-svelte/icons/calendar";
@@ -182,3 +182,4 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     </div>
   </div>
 </div>
+

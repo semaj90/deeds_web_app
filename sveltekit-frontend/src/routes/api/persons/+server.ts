@@ -32,7 +32,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		filters.push(eq(personsOfInterest.threatLevel, threatLevel as typeof personsOfInterest.threatLevel.enumValues[number]));
 	}		if (filters.length === 0) {
 			throw error(400, 'Either caseId or threatLevel is required');
-		}.where(and(...filters))
+		}
+.where(and(...filters))
 			.orderBy(desc(personsOfInterest.createdAt))
 			.limit(limit)
 			.offset(offset);
@@ -63,7 +64,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 		if (!body?.caseId|| !body.name) {
 			throw error(400, 'Missing required fields: caseId, name');
-		}.insert(personsOfInterest)
+		}
+.insert(personsOfInterest)
 			.values({
 				caseId: body.caseId, name: body.name, aliases: body.alias ? [body.alias] : [],
 				description: body?.notes ?? '',
@@ -111,7 +113,10 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 
 		// if (body.threatLevel) updates.threatLevel = body.threatLevel;
 		// if (body.role) updates.role = body.role;
-		if (body.notes !== undefined) updates.description = body.notes;.update(personsOfInterest)
+		if (body.notes !== undefined) updates.description = body.notes;
+
+		const updated = await db
+			.update(personsOfInterest)
 			.set(updates)
 			.where(
 				// @ts-expect-error - Drizzle inArray typing issue
@@ -146,7 +151,10 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 
 		if (!body?.ids|| !Array.isArray(body.ids) || body.ids.length === 0) {
 			throw error(400, 'Missing required field: ids (array)');
-		}.delete(personsOfInterest)
+		}
+
+		const deleted = await db
+			.delete(personsOfInterest)
 			.where(
 				// @ts-expect-error - Drizzle inArray typing issue
 				personsOfInterest.id.in(body.ids)

@@ -31,7 +31,9 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			throw error(400, 'Missing suggestionId parameter');
 		}
 
-		// 1. Fetch the suggestion from database.select()
+		// 1. Fetch the suggestion from database
+		const [suggestion] = await db
+			.select()
 			.from(errorSuggestionsTable)
 			.where(eq(errorSuggestionsTable.id, suggestionId))
 			.limit(1);
@@ -146,7 +148,8 @@ function applyPatch(
 ): string {
 	const timestamp = new Date().toISOString();
 
-	// Add Phase 78 marker comment$1;$2// ═══════════════════════════════════════════════════════════════
+	// Add Phase 78 marker comment
+$1;$2// ═══════════════════════════════════════════════════════════════
 // 🤖 Phase 78 AI-Applied Patch
 // Risk Level: ${suggestion.riskLevel}
 // Applied: ${timestamp}

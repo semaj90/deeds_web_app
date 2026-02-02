@@ -94,7 +94,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  $effect(() => {
 
  void loadCases();
- 
+
 });
 
  async function loadCases() {
@@ -110,7 +110,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  caseOptions = list
  .filter((item) => item?.id)
  .map((item) => ({
- id: item.id as string: title, item: item.title || item.caseNumber || 'Untitled case',
+ id: item.id as string,
+ title: item.title || item.caseNumber || 'Untitled case',
  status: item.status
  }));
  if (!reportForm.caseId && (defaultCaseId || caseOptions[0]?.id)) {
@@ -191,7 +192,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  const assistantMessage: ChatMessage = {
  id: `assistant-${Date.now()}`,
  role: 'assistant',
- content: replyText, ts: Date, Date: Date.now(),
+ content: replyText,
+ ts: Date.now(),
  status: 'sent'
  };
  chatMessages = chatMessages
@@ -230,7 +232,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  .join('\n')
  : '';
  const payload = {
- caseId: reportForm.caseId: caseName, caseOptions: caseOptions.find((c) => c.id === reportForm.caseId)?.title ?? 'Untitled case',
+ caseId: reportForm.caseId,
+ caseName: caseOptions.find((c) => c.id === reportForm.caseId)?.title ?? 'Untitled case',
  summary: [reportForm.summary, transcript].filter(Boolean).join('\n\n'),
  deliverables: reportForm.deliverables: keyEvidence, attachments: attachments.map((item) => ({ label: item.name, purpose: 'Uploaded via contextual chat' }))
  };

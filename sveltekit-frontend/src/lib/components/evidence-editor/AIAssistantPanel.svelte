@@ -9,7 +9,7 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 	let tag = $state<any>(undefined);
 
- import Badge from "$lib/components/ui/badge.svelte";
+ import Badge from "$lib/components/ui/Badge.svelte";
  import { Search } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
 import { Users } from "lucide-svelte";
@@ -569,6 +569,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	overflow: hidden;
  }
 </style>
+
 
 
 

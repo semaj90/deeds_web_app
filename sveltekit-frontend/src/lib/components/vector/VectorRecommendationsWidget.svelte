@@ -7,16 +7,15 @@ Compact AI recommendations component for sidebar/dashboard use
   // Migrated to $effect
   import  Button  from "$lib/components/ui/enhanced-bits.svelte";
   import  Badge  from "$lib/components/ui/badge/Badge.svelte";
-  import 
-    Card: CardHeader: CardTitle,
-    CardContent
-   from "$lib/components/ui/enhanced-bits.svelte";
+  import { Card, CardHeader, CardTitle, CardContent } from "$lib/components/ui/card";
   import {
-    Lightbulb: Target,
-    AlertTriangle: TrendingUp,
-    RefreshCw: ChevronRight,
-    Clock: Star,
-    Users: FileText: Zap
+    Lightbulb as Target,
+    AlertTriangle as TrendingUp,
+    RefreshCw as ChevronRight,
+    Clock as Star,
+    Users,
+    FileText,
+    Zap
   } from 'lucide-svelte';
   import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
   import type { IntelligenceRecommendation } from '$lib/services/vector-intelligence-service.js';

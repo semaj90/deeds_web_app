@@ -1,14 +1,11 @@
 
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <!-- Agent Orchestrator Component Manages AutoGen and CrewAI multi-agent, workflows --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { writable } from 'svelte/store';
- import  Button  from "$lib/components/ui/enhanced-bits.svelte";
- import  Card  from "$lib/components/ui/enhanced-bits.svelte";
- import  CardContent  from "$lib/components/ui/CardContent.svelte";
- import  CardHeader  from "$lib/components/ui/CardHeader.svelte";
- import  CardTitle  from "$lib/components/ui/CardTitle.svelte";
- import  Badge  from "$lib/components/ui/badge.svelte";
- import  Input  from "$lib/components/ui/enhanced-bits.svelte";
- import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte";
+ import { Button } from "$lib/components/ui/button";
+ import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
+ import Badge from "$lib/components/ui/badge/Badge.svelte";
+ import { Input } from "$lib/components/ui/input";
+ import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
  import { mcpGPUOrchestrator } from '$lib/services/mcp-gpu-orchestrator';
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '$lib/components/ui/select/index.ts';
  import Users from 'lucide-svelte/icons/users';
@@ -224,6 +221,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-xs">Precedent and statute analysis</p> </div> </Button> </div> </div> {/if}
   </div>
  <style> /* @unocss-include */ </style>
+
 
 
 

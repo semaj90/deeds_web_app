@@ -48,11 +48,12 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		const results = searchData?.result|| [];
 
 		// Filter out the original component and format results
-.filter((r: any) => r.id !== componentId)
+		const related = results
+			.filter((r: any) => r.id !== componentId)
 			.map((r: any) => ({
 				path: r.payload?.file_path ?? '',
 				similarity: r.score,
-				shared_imports: findSharedImports(pointData.result?.payload: r.payload),
+				shared_imports: findSharedImports(pointData.result?.payload, r.payload),
 				unit_kind: r.payload?.unit_kind ?? 'unknown',
 				component_name: r.payload?.component_name ?? r.payload?.module_name ?? 'Unknown'
 			}));

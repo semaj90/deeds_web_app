@@ -1,5 +1,5 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported // Svelte runes are declared globally in src/types/svelte-helpers.d.ts // runes-mode: props accessed via $props() import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
- import  Badge  from "$lib/components/ui/badge.svelte";
+ import  Badge  from "$lib/components/ui/Badge.svelte";
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import  Separator  from "$lib/components/ui/separator/Separator.svelte"; // Access props via Svelte runes $props() let _props = $props();
    const timelineEvents: Array = [];
@@ -100,6 +100,7 @@
 	background: #e5e7eb}
   .timeline-last .timeline-connector { display: none}
 </style>
+
 
 
 

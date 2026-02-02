@@ -23,7 +23,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	try {
 		// 1. Get route health statistics
-.select({
+		const [healthStats] = await db
+			.select({
 				total: sql<number>`COUNT(*)::int`,
 				healthy: sql<number>`COUNT(*) FILTER (WHERE status = 'healthy')::int`,
 				degraded: sql<number>`COUNT(*) FILTER (WHERE status = 'degraded')::int`,
@@ -34,7 +35,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.execute();
 
 		// 2. Get critical routes (top 10 by priority)
-.select({
+		const criticalRoutes = await db
+			.select({
 				id: routeMetadata.id,
 				path: routeMetadata.path,
 				kind: routeMetadata.kind,
@@ -48,7 +50,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.limit(10);
 
 		// 3. Get AI suggestions with their associated routes
-.select({
+		const suggestions = await db
+			.select({
 				id: errorSuggestionsTable.id,
 				routePath: errorSuggestionsTable.routePath,
 				summary: errorSuggestionsTable.summary,
@@ -63,7 +66,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.limit(20);
 
 		// 4. Get suggestion quality statistics
-.select({
+		const [qualityStats] = await db
+			.select({
 				total: sql<number>`COUNT(*)::int`,
 				complete: sql<number>`COUNT(*) FILTER (WHERE LENGTH(patch) >= 100 AND patch NOT LIKE '%See error messages%')::int`,
 				incomplete: sql<number>`COUNT(*) FILTER (WHERE LENGTH(patch) < 100)::int`,

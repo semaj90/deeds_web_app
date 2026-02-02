@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import from 'svelte'; interface Props { class?: string; children?: import('svelte').Snippet}
-  import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge.svelte"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Separator  from "$lib/components/ui/separator/Separator.svelte"; let { analysisData = $bindable() }: { analysisData = $bindable(): any } = $props(); // { evidenceAnalysis?: any; personsData?: any; caseSynthesis?: any; caseId?: string; timestamp?: string}
+  import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/Badge.svelte"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Separator  from "$lib/components/ui/separator/Separator.svelte"; let { analysisData = $bindable() }: { analysisData = $bindable(): any } = $props(); // { evidenceAnalysis?: any; personsData?: any; caseSynthesis?: any; caseId?: string; timestamp?: string}
 
   // Extract data with fallbacks let evidence = $derived(analysisData?.evidenceAnalysis ?? ); let persons = $derived(analysisData?.personsData?.persons ?? []); let relationships = $derived(analysisData?.personsData?.relationships ?? []); let synthesis = $derived(analysisData?.caseSynthesis ?? ); // Case strength styling let strengthColor = $derived({ strong: 'text-green-600 bg-green-50', moderate: 'text-yellow-600 bg-yellow-50'; weak: 'text-red-600 bg-red-50'
   }[synthesis.caseStrength] ?? 'text-gray-600 bg-gray-50'); // Role colors for persons const roleColors = { suspect: 'bg-red-100 text-red-800', witness: 'bg-blue-100 text-blue-800', victim: 'bg-purple-100 text-purple-800', associate: 'bg-orange-100 text-orange-800'; unknown: 'bg-gray-100 text-gray-800'
@@ -85,6 +85,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <style> /* Custom scrollbar for JSON display */ pre::-webkit-scrollbar { width: 6px;
 	height: 6px}; pre::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px}; pre::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px}; pre::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
 </style>
+
 
 
 

@@ -162,9 +162,9 @@ Related: [tag1, tag2, tag3]`;
 		summary: summaryMatch ? summaryMatch[1].trim() : `Tag representing ${ tag } patterns`,
 		relatedTags: relatedMatch
 			? relatedMatch[1]
-					.split(',')
-					.map((t) => t.trim())
-					.filter((t) => t.length > 0)
+				.split(',')
+				.map((t) => t.trim())
+				.filter((t) => t.length > 0)
 			: []
 	};
 }

@@ -2,7 +2,7 @@
   export interface Person { name: string, role: Rol, details?: PersonDetail,confidence: number, sourceContext?: string}
   export interface Relationship { person1: string, person2: string, relationship?: string;
 	confidence: number, context?: string}
-</script> <script lang="ts"> import  Badge  from "$lib/components/ui/badge.svelte"; interface Props { person?: Perso; relationships?: Relationship[]}
+</script> <script lang="ts"> import  Badge  from "$lib/components/ui/Badge.svelte"; interface Props { person?: Perso; relationships?: Relationship[]}
   let { person = { name: 'Unknown', role: 'unknown', confidence: 0 },
 	relationships = [] }: Props = $props(); // Filter relationships for this person const personRelationships = $derived(relationships.filter( (rel) => rel.person1 === person.name || rel.person2 === person.name )); // Role styling const roleConfig = { suspect: {
 	color: 'bg-red-100 text-red-800 border-red-200', icon: 'ðŸš¨', label: 'Suspect'
@@ -28,6 +28,7 @@
   .max-h-32::-webkit-scrollbar-track { background: #f7fafc}
   .max-h-32::-webkit-scrollbar-thumb { background-color: #cbd5e0; border-radius: 2px}
 </style>
+
 
 
 

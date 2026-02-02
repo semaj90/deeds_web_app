@@ -12,7 +12,6 @@ import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
 import { readFile } from 'fs/promises';
 import { promisify } from 'util';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const execAsync = promisify(exec);
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
@@ -103,10 +102,10 @@ async function extractComments(filePath: string): Promise<string[]> {
 			{ timeout: 5000 }
 		);
 
-		return stdout
-			.split('\n')
-			.filter((line) => line.trim().length > 0)
-			.map((line) => line.trim());
+	const lines = stdout.split('\n');
+	return lines
+		.filter((line) => line.trim().length > 0)
+		.map((line) => line.trim());
 	} catch {
 		return [];
 	}

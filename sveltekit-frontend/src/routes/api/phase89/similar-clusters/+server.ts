@@ -1,7 +1,5 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const qdrant = new QdrantClient({
 	url: process.env?.QDRANT_URL ?? 'http://127.0.0.1:6333'
@@ -27,7 +25,9 @@ export const POST: RequestHandler = async ({ request }) => {
 			limit: limit + 1, // +1 to exclude the query cluster itself
 			with_payload: true,
 			with_vector: false
-		} as any);.filter((result) => result.payload?.cluster_id !== cluster_id)
+		} as any);
+		const similar = searchResults
+			.filter((result) => result.payload?.cluster_id !== cluster_id)
 			.slice(0, limit)
 			.map((result) => ({
 				cluster_id: result.payload?.cluster_id,

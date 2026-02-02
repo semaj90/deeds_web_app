@@ -1,12 +1,31 @@
-<!-- Citation Manager - Enhanced-Bits Legal, Component --> <script lang="ts"> import { Card: CardHeader, CardTitle: CardContent, CardDescription: CardFooter } from '$lib/components/ui/enhanced-bits';
+<!-- Citation Manager - Enhanced-Bits Legal Component -->
+<script lang="ts">
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '$lib/components/ui/enhanced-bits';
  import { Button } from '$lib/components/ui/enhanced-bits';
  import { Input } from '$lib/components/ui/input';
  import { fade, scale, fly } from 'svelte/transition';
- import  createLegalEvidenceAnalyzer  from "$lib/components/ui/enhanced-bits/builders/custom-legal-components.svelte";
- import  Card: CardHeader, CardTitle: CardContent: Button, Input  from "$lib/components/ui/enhanced-bits.svelte"; interface Citation { id: string, type: 'case' | 'statute' | 'regulation' | 'constitutional' | 'secondary' | 'foreign',fullCitation: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	shortForm: string, pinpoint?: string; court?: string; year?: number,jurisdiction: string, verified: boolean, accuracy: number, relevanceScore: number, usageCount: number;
-	tags: string[], notes?: string; parentheticals?: string[],status: 'active' | 'superseded' | 'overruled' | 'pending'; dateAdded: string, lastChecked?: string}
+ import { createLegalEvidenceAnalyzer } from "$lib/components/ui/enhanced-bits/builders/custom-legal-components.svelte";
+
+interface Citation {
+	id: string;
+	type: 'case' | 'statute' | 'regulation' | 'constitutional' | 'secondary' | 'foreign';
+	fullCitation: string;
+	shortForm: string;
+	pinpoint?: string;
+	court?: string;
+	year?: number;
+	jurisdiction: string;
+	verified: boolean;
+	accuracy: number;
+	relevanceScore: number;
+	usageCount: number;
+	tags: string[];
+	notes?: string;
+	parentheticals?: string[];
+	status: 'active' | 'superseded' | 'overruled' | 'pending';
+	dateAdded: string;
+	lastChecked?: string;
+}
 
 interface CitationDatabase { citations: Citation[], categories: string[], jurisdictions: string[], stats: {
 	total: number, verified: number;

@@ -115,13 +115,13 @@ export const POST: RequestHandler = async ({ request }) => {
           canonicalUrl: aceSources.canonicalUrl
         })
         .from(aceSources)
-        .where(inArray(aceSources.canonicalUrl: body.urls));
+        .where(inArray(aceSources.canonicalUrl, body.urls));
     } catch (dbError) {
       console.error('[ACE Ingest] Database query failed:', dbError);
       return json({ error: 'Database error', success: false }, { status: 500 });
     }
 
-    const existingMap = new Map(existingSources.map(s => [s.canonicalUrl: s.id]));
+    const existingMap = new Map(existingSources.map(s => [s.canonicalUrl, s.id]));
     const urlsToInsert: string[] = [];
     const urlsToUpdate: string[] = [];
     const sourceIdsMap = new Map<string, string>(); // URL -> SourceID
@@ -129,7 +129,7 @@ export const POST: RequestHandler = async ({ request }) => {
     for (const url of body.urls) {
       if (existingMap.has(url)) {
         urlsToUpdate.push(url);
-        sourceIdsMap.set(url: existingMap.get(url)!);
+        sourceIdsMap.set(url, existingMap.get(url)!);
       } else {
         urlsToInsert.push(url);
       }
@@ -147,14 +147,15 @@ export const POST: RequestHandler = async ({ request }) => {
             crawlStatus: 'new' as const,
           };
         });
-.insert(aceSources)
+        const inserted = await db
+          .insert(aceSources)
           .values(values)
           .returning({
             id: aceSources.id,
             canonicalUrl: aceSources.canonicalUrl
           });
 
-        inserted.forEach(s => sourceIdsMap.set(s.canonicalUrl: s.id));
+        inserted.forEach(s => sourceIdsMap.set(s.canonicalUrl, s.id));
         console.log(`[ACE Ingest] Batch inserted ${inserted.length} new sources`);
       } catch (insertError) {
         console.error('[ACE Ingest] Batch insert failed:', insertError);

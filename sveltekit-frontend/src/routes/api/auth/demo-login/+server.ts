@@ -2,8 +2,6 @@ import { auth as lucia } from '$lib/server/auth/lucia';
 import { db, users } from '$lib/server/db/client';
 import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST /api/auth/demo-login
@@ -26,27 +24,32 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const { email = 'demo@legal.ai.dev', role = 'prosecutor' } = body;
 
 	// Get or create demo user
-.select()
+	let user = await db
+		.select()
 		.from(users)
 		.where(eq(users.email, email))
 		.then((rows) => rows[0]);
 
 	if (!user) {
 		// Create demo user if it doesn't exist
-.insert(users)
-			.values({ email: firstName, email.split('@')[0],
+		const [newUser] = await db
+			.insert(users)
+			.values({
+				email,
+				firstName: email.split('@')[0],
 				lastName: 'Demo',
 				isActive: true,
 				passwordHash: 'demo-mode-no-password',
 				createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
 			})
 			.returning();
 		user = newUser;
 	} else if (user.role !== role) {
 		// Update role if different
-.update(users)
-			.set({ role, role as any, updatedAt, new Date().toISOString() })
+		const [updated] = await db
+			.update(users)
+			.set({ role: role as any, updatedAt: new Date().toISOString() })
 			.where(eq(users.id, user.id))
 			.returning();
 		user = updated;

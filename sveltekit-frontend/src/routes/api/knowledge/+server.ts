@@ -257,9 +257,13 @@ export const PATCH: RequestHandler = async ({ request }) => {
       limit: max_context_chunks,
       score_threshold: 0.6
     });
-.map(r => `[${r.payload?.document_name}] ${r.payload?.content}`)
+
+    const contextText = (searchResults as any[])
+      .map(r => `[${r.payload?.document_name}] ${r.payload?.content}`)
       .join('\n\n');
-? (searchResults as any[]).reduce((sum, r) => sum + r.score, 0) / (searchResults as any[]).length
+
+    const avgScore = (searchResults as any[]).length > 0
+      ? (searchResults as any[]).reduce((sum, r) => sum + r.score, 0) / (searchResults as any[]).length
       : 0;
 
     // 2. Build augmented prompt

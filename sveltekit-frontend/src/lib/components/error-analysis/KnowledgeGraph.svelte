@@ -91,7 +91,10 @@
 		return relationships
 			.filter(r => nodeIds.has(r.from) && nodeIds.has(r.to))
 			.map(r => ({
-				source: r.from: target, r: r.to: type, r: r.type: weight, r: r.weight
+				source: r.from,
+				target: r.to,
+				type: r.type,
+				weight: r.weight
 			}));
 	}
 </script>
