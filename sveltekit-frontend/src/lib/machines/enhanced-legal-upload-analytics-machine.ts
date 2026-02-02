@@ -903,8 +903,15 @@ export function getContextualPromptsByTiming(
 			if (context.files.length === 0) {
 				prompts.push({
 					id: 'empty-upload',
+					content: 'Select files to upload or drag and drop them here',
 					message: 'Select files to upload or drag and drop them here',
 					type: 'info',
+					category: 'guidance',
+					timing: 'before-upload',
+					confidence: 1.0,
+					relevance: 1.0,
+					actionable: true,
+					legalSpecific: false,
 					priority: 1,
 					timestamp: now
 				});
@@ -912,8 +919,15 @@ export function getContextualPromptsByTiming(
 			if (context.legalContext?.urgency === 'critical') {
 				prompts.push({
 					id: 'urgent-case',
+					content: 'Critical case detected - uploads will be prioritized',
 					message: 'Critical case detected - uploads will be prioritized',
 					type: 'warning',
+					category: 'warning',
+					timing: 'before-upload',
+					confidence: 0.9,
+					relevance: 1.0,
+					actionable: true,
+					legalSpecific: true,
 					priority: 3,
 					timestamp: now
 				});
@@ -924,8 +938,15 @@ export function getContextualPromptsByTiming(
 			if (context.uploadProgress > 0 && context.uploadProgress < 100) {
 				prompts.push({
 					id: 'upload-progress',
+					content: `Upload in progress: ${Math.round(context.uploadProgress)}%`,
 					message: `Upload in progress: ${Math.round(context.uploadProgress)}%`,
 					type: 'info',
+					category: 'guidance',
+					timing: 'during-upload',
+					confidence: 1.0,
+					relevance: 0.8,
+					actionable: false,
+					legalSpecific: false,
 					priority: 2,
 					timestamp: now
 				});

@@ -61,13 +61,13 @@ export type {
     // Batch operations
     BatchQueryResult, CaseListResult, CaseMetadata,
     // Domain-specific query results
-    CaseQueryResult, ChainOfCustodyRecord, ChatMessage, ChatMessageListResult, ChatMessageMetadata, ChatMessageQueryResult, CreateQueryResult, DBCase, DBEvidence,
+    CaseQueryResult, ChainOfCustodyRecord, ChatMessageListResult, ChatMessageMetadata, ChatMessageQueryResult, CreateQueryResult, DBCase, DBEvidence,
     // Health checks
-    DatabaseHealthResponse, DeleteQueryResult, Document, DocumentListResult, DocumentQueryResult, Evidence, EvidenceAnalysis, EvidenceListResult, EvidenceMetadata, EvidenceQueryResult, HealthCheck, ListQueryResult, PaginationInfo,
+    DatabaseHealthResponse, DeleteQueryResult, DocumentListResult, DocumentQueryResult, EvidenceAnalysis, EvidenceListResult, EvidenceMetadata, EvidenceQueryResult, HealthCheck, ListQueryResult, PaginationInfo,
     // Query response types
     QueryResult, Transaction, UpdateQueryResult,
     // Core entity types
-    User, UserListResult, UserQueryResult, VectorSearchQueryResult,
+    UserListResult, UserQueryResult, VectorSearchQueryResult,
     // Vector search types
     VectorSearchResult
 } from './database.js';
