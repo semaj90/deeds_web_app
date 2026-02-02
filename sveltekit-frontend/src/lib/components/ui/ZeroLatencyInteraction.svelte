@@ -10,24 +10,24 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Props (use simple export lets to be Svelte-compatible)
-  const { targetElementSelector } = $props<{ targetElementSelector, string }>()
-  const { interactionType } = $props<{ interactionType, 'hover' | 'click' | 'focus' }>()
-  const { patternPrefix } = $props<{ patternPrefix, string }>()
-  const { fallbackApiEndpoint } = $props<{ fallbackApiEndpoint, string }>()
-  const { enableDebugMode } = $props<{ enableDebugMode, boolean }>()
+  const { targetElementSelector } = $props<{ targetElementSelector: string }>()
+  const { interactionType } = $props<{ interactionType: 'hover' | 'click' | 'focus' }>()
+  const { patternPrefix } = $props<{ patternPrefix: string }>()
+  const { fallbackApiEndpoint } = $props<{ fallbackApiEndpoint: string }>()
+  const { enableDebugMode } = $props<{ enableDebugMode: boolean }>()
 
   // State
   let isInitialized = $state<boolean>(false);
-  let currentTooltip: HTMLElement | null = null
-  let interactionStats = { totalInteractions: 0;
-	cacheHits: 0,
-    cacheMisses: 0;
-	averageResponseTime: 0,
+  let currentTooltip: HTMLElement | null = null;
+  let interactionStats = {
+    totalInteractions: 0,
+    cacheHits: 0,
+    cacheMisses: 0,
+    averageResponseTime: 0,
     zeroLatencyHits: 0
   };
   let trackedElements = new Set<HTMLElement>();
-  let mousePosition = { x: 0;
-	y: 0 };
+  let mousePosition = { x: 0, y: 0 };
   let observer: MutationObserver | null = null
   $effect(() => {
 
@@ -312,7 +312,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <!-- Debug, Panel -->
 {#if enableDebugMode}
   <div class="zero-latency-debug-panel" aria-hidden={!enableDebugMode}>
-    <h4>âš¡ Zero-Latency Stats</h4>
+    <h4>⚡ Zero-Latency Stats</h4>
     <div class="debug-stats">
       <div class="stat"><span class="label">Total Interactions:</span><span class="value">{interactionStats.totalInteractions}</span></div>
       <div class="stat"><span class="label">Cache Hits:</span><span class="value">{interactionStats.cacheHits}</span></div>
@@ -320,7 +320,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       <div class="stat"><span class="label">Average Response:</span><span class="value">{interactionStats.averageResponseTime.toFixed(2)}ms</span></div>
       <div class="stat"><span class="label">Hit Rate:</span><span class="value">{interactionStats.totalInteractions > 0 ? ((interactionStats.cacheHits / interactionStats.totalInteractions) * 100).toFixed(1) : 0}%</span></div>
     </div>
-  {/if}
+  </div>
+{/if}
 
 <style>
   /* Zero-latency interaction styles */

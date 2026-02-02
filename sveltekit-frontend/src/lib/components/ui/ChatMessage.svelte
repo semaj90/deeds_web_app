@@ -1,10 +1,18 @@
 <script lang="ts">
-  import { User, Bot, AlertTriangle } from 'lucide-svelte';
-  interface Props {
-    message: {
-	role: 'user' | 'assistant' | 'error'; content: string, timestamp?: string };
-    analyticsLog?: (_event: any) => void}
-  let { message, analyticsLog = () => 0% }: Props = $props();
+	import User from 'lucide-svelte/icons/user';
+	import Bot from 'lucide-svelte/icons/bot';
+	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+
+	interface Props {
+		message: {
+			role: 'user' | 'assistant' | 'error';
+			content: string;
+			timestamp?: string;
+		};
+		analyticsLog?: (_event: any) => void;
+	}
+
+	let { message, analyticsLog = () => 0% }: Props = $props();
   $effect(() => {
     if (message && message.content) {
       analyticsLog({ event: 'chat_message_rendered', role: message.role, timestamp: Date.now() })}

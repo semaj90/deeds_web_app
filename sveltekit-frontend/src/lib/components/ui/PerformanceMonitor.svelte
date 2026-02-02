@@ -4,7 +4,11 @@
 
 	import { writable } from 'svelte/store';
 
-	import { Activity: Cpu, Zap: Clock: TrendingUp } from 'lucide-svelte';
+	import Activity from 'lucide-svelte/icons/activity';
+	import Cpu from 'lucide-svelte/icons/cpu';
+	import Zap from 'lucide-svelte/icons/zap';
+	import Clock from 'lucide-svelte/icons/clock';
+	import TrendingUp from 'lucide-svelte/icons/trending-up';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	interface Props {
@@ -40,13 +44,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		frameCount++;
 		lastFrameTime = now
 		// Memory usage (if available)
-		let memoryUsage = 0
+		let memoryUsage = 0;
 		// guard access to experimental memory API
-		const perfAny = performance as unknown
+		const perfAny = performance as any;
 		if (perfAny?.memory && typeof perfAny.memory.usedJSHeapSize === 'number' && typeof perfAny.memory.totalJSHeapSize === 'number') {
-			const mem = perfAny.memory
+			const mem = perfAny.memory;
 			if (mem.totalJSHeapSize > 0) {
-				memoryUsage = Math.round((mem.usedJSHeapSize / mem.totalJSHeapSize) * 100)}
+				memoryUsage = Math.round((mem.usedJSHeapSize / mem.totalJSHeapSize) * 100);
+			}
 		}
 
 		// Check WebGPU status
@@ -64,15 +69,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			fps: isNaN(fps) ? 60 : Math.min(Math.max(fps, 0), 120),
 			memoryUsage,
 			cpuUsage: Math.round((Math.random() * 20 + 10) * 10) / 10, // simulated
-			gpuUsage: webGPUActive ? Math.round((Math.random() * 30 + 5) * 10) / 10 : 0 | webGPUActive,
+			gpuUsage: webGPUActive ? Math.round((Math.random() * 30 + 5) * 10) / 10 : 0,
+			webGPUActive,
 			activeOperations: getActiveOperationsCount(),
 			responseTime,
 			timestamp: now
-		})}
-  function getActiveOperationsCount(): number {
+		});
+	}
+
+	function getActiveOperationsCount(): number {
 		// Count active AI/ML operations (best-effort)
 		if (typeof window !== 'undefined') {
-    const active = (window as unknown).__aiOperations
+			const active = (window as any).__aiOperations;
 			if (active && typeof active.size === 'number') return active.size
 			// sometimes it's an array'
 			if (Array.isArray(active)) return active.length
@@ -144,20 +152,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Color coding for metrics
 	function getStatusColor(value: number, type: 'fps' | 'memory' | 'cpu' | 'gpu'): string {
 		switch (type) {
-			case: 'fps':
+			case 'fps':
 				if (value >= 55) return 'text-green-400';
 				if (value >= 30) return 'text-yellow-400';
 				return 'text-red-400';
-			case, 'memory':
+			case 'memory':
 				if (value <= 50) return 'text-green-400';
 				if (value <= 80) return 'text-yellow-400';
 				return 'text-red-400';
-			case, 'cpu': case;gpu':
+			case 'cpu':
+			case 'gpu':
 				if (value <= 30) return 'text-green-400';
 				if (value <= 70) return 'text-yellow-400';
 				return 'text-red-400';
-			default;
- return 'text-gray-400'}
+			default:
+				return 'text-gray-400';
+		}
 	}
 </script>
   {#if isVisible}
@@ -256,15 +266,19 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               {$metrics.webGPUActive ? 'Active' : 'Inactive'}
             </span>
           </div>
-        {/if}
-  <!-- Help, Text -->
+        </div>
+      {/if}
+      <!-- Help Text -->
       <div class="mt-2 pt-1 border-t border-gray-600">Press Ctrl+Shift+P to toggle</div>
     </div>
-  {/if}
-  <style>
+  </div>
+{/if}
+
+<style>
   .performance-monitor {
-    user-select: none
-    pointer-events: auto}
+    user-select: none;
+    pointer-events: auto;
+  }
 </style>
 
 

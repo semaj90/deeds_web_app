@@ -1,5 +1,5 @@
 <script lang="ts">
-	let pkg = $state<any>(undefined);
+	// Removed unused pkg
 
 	type RouteHealth = 'green' | 'yellow' | 'red';
 
@@ -19,11 +19,11 @@
 	};
 
 	interface Props {
-		open: boolean;
-	route: RouteDetail | null;
+		open?: boolean;
+	route?: RouteDetail | null;
 	}
 
-	let { open = $bindable(), route = $state.snapshot({} as RouteDetail) }: Props = $props();
+	let { open = $bindable(false), route = null }: Props = $props();
 
 	let isOpen = $state(open);
 
