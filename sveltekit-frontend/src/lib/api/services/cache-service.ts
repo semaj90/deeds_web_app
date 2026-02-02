@@ -203,8 +203,8 @@ export async function setCachedEmbedding(
 ): Promise<void> {
  const key = `embedding:${ model }:${Buffer.from(text).toString('base64')}`;
  await cacheService.set(key, embedding, {
- ttlMs, 24 * 60 * 60 * 1000, // 24 hours for embeddings
- compress, true, // Always compress embeddings (large arrays)
+   ttlMs: 24 * 60 * 60 * 1000, // 24 hours for embeddings
+   compress: true, // Always compress embeddings (large arrays)
  });
 }
 

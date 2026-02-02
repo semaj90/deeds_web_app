@@ -1,6 +1,4 @@
 <script lang="ts">
-	let error = $state<any>(undefined);
-
  // Svelte 5 runes mode
  type Snippet<T = any> = (args: T) => any;
 

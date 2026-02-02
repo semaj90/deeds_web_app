@@ -3,7 +3,12 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
- let { webgpuCapabilities = null, cpuCapabilities = null } = $props();
+ interface SystemProps {
+ 	webgpuCapabilities?: { hasWebGPU: boolean } | null;
+ 	cpuCapabilities?: { hasWebGL: boolean; maxThreads?: number } | null;
+ }
+
+ let { webgpuCapabilities = null, cpuCapabilities = null }: SystemProps = $props();
 
  let systemHealth = $state({
  overall: 85,
@@ -66,7 +71,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	30000); // Update every 30 seconds
 
  return () => clearInterval(interval);
- 
+
 });
 
  function getHealthColor(score: number): string {

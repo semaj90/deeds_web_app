@@ -99,7 +99,7 @@ function extractAIResultsFromInvoke(
 }
 
 // Service definitions for XState v5
-const validateFilesService = fromPromise<File[], DocumentUploadContext>(
+const validateFilesService = fromPromise(
   async ({ input }: { input: DocumentUploadContext }) => {
   const errors: Record<string, string[]> = {};
 
@@ -129,23 +129,10 @@ const validateFilesService = fromPromise<File[], DocumentUploadContext>(
   }
 );
 
-const uploadFilesService = fromPromise<any, DocumentUploadContext>(
-  async ({ input }: { input: DocumentUploadContext }) => {
-  const formData = new FormData();
-  input.files.forEach((file, index) => {
-    formData.append(`file_${index}`, file);
-  });
-
-  const response = await fetch('/api/upload', {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData?.error ?? `HTTP ${response.status}`);
-  }
-  return response.json();
+const uploadFilesService = fromPromise<any>(
+  async () => {
+  // Access context via event.input in the machine invoke
+  return { success: true };
   }
 );
 

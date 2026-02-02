@@ -408,7 +408,24 @@ export class AIAccessibilityPatterns {
             (accessibilityService as any).announce('AI operation stopped.');
         }
     }
+
+    public updateOptions(options: Partial<AIAccessibilityOptions>) {
+        this.options = { ...this.options, ...options } as Required<AIAccessibilityOptions>;
+        if (options.enableVoiceCommands) {
+            this.initializeVoiceCommands();
+        }
+    }
+
+    public startVoiceCommands() {
+        this.voiceRecognition?.start?.();
+    }
+
+    public stopVoiceCommands() {
+        this.voiceRecognition?.stop?.();
+    }
 }
+
+export const aiAccessibilityPatterns = new AIAccessibilityPatterns();
 
 
 
