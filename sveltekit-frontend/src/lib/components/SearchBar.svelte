@@ -4,7 +4,7 @@
  let { placeholder = 'Search...', value = '' } = $props();
 
  const dispatch = createEventDispatcher<{
- search, string;
+ search: string;
  }>();
 
  let searchTimeout: number;
@@ -37,9 +37,11 @@
 
  // Cleanup timeout on destroy
  // Migrated to $effect
- // TODO: Add as cleanup in $effect: return () => {
+ $effect(() => {
+ return () => {
  clearTimeout(searchTimeout);
- }
+ };
+ });
 </script>
 
 <div class="search-bar">
@@ -103,7 +105,7 @@
  background: rgba(255, 255, 255, 0.08);
  }
 
- .search-input: placeholder {
+ .search-input::placeholder {
  color: #888;
  }
 

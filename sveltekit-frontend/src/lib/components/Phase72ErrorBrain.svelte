@@ -18,11 +18,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Phase72Error {
 		id: string;
-	error_hash: string;
+		error_hash: string;
 		error_code: string;
-	file_path: string;
+		file_path: string;
 		line_num: number;
-	column_num: number;
+		column_num: number;
 		occurrence_count: number;
 	message: string;
 		severity: string;
@@ -237,7 +237,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 			<!-- Error Details & AI Suggestions -->
 			{#if selectedError}
-				<div class="error-details" transitionfly={{ x: 20, duration, 200 200 }}>
+				<div class="error-details" transition:fly={{ x: 20, duration: 200 }}>
 					<h3 class="nes-text is-primary">Error Details</h3>
 
 					<div class="detail-section nes-container is-dark">

@@ -11,11 +11,11 @@ https, //svelte.dev/e/js_parse_error -->
  import type { Badge } from '$lib/components/ui/badge';
  import type { Button } from '$lib/components/ui/button';
  import type { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
- import { Camera } from "lucide-svelte";
-import { Edit } from "lucide-svelte";
-import { Eye } from "lucide-svelte";
-import { Trash2 } from "lucide-svelte";
-import { User } from "lucide-svelte";
+ import Camera from 'lucide-svelte/icons/camera';
+ import Edit from 'lucide-svelte/icons/edit';
+ import Eye from 'lucide-svelte/icons/eye';
+ import Trash2 from 'lucide-svelte/icons/trash-2';
+ import User from 'lucide-svelte/icons/user';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let {
