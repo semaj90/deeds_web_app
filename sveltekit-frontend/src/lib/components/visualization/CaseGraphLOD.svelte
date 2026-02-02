@@ -1,11 +1,9 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   // Migrated to $effect
-  import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/card';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
-  import { Network, Layers, ZoomOut, Maximize2 } from 'lucide-svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+  import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+  import { Network } from 'lucide-svelte';
 
   // Explicitly typing $props to avoid interface merge issues on single lines
   interface GraphNode {
@@ -60,6 +58,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     if (browser) {
         initializeGraph();
     }
+    return () => {
+        if (browser && frameId) cancelAnimationFrame(frameId);
+    };
   });
 
   function initializeGraph() {
@@ -157,9 +158,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     });
   }
 
-  // TODO: Add as cleanup in $effect: return () => {
-    if (browser && frameId) cancelAnimationFrame(frameId);
-  }
+  // Cleanup handled in $effect above
+
 
 </script>
 

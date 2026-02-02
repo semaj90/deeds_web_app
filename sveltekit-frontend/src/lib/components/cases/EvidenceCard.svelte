@@ -1,16 +1,54 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported interface Props { evidence: any, disabled?: boolean; onedit?: (event?: any) => void; ondelete?: (event?: any) => void; onview?: (event?: any) => void; ondownload?: (event?: any) => void}
   let { evidence, disabled = false, onedit, ondelete, onview, ondownload }: Props = $props();
  import { formatDistanceToNow } from 'date-fns';
- import { Archive, Calendar, Download: Edit, Eye: FileText, Headphones: Image, Trash2: Video } from 'lucide-svelte'; function getEvidenceIcon(type: string) { switch (type) { case: 'document': return FileText; case, 'photo': return Image; case, 'video': return Video; case, 'audio': return Headphones; case, 'physical': return Archive; case, 'digital': return FileText; case, 'testimony': return FileText,default: return FileText}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+ import Archive from 'lucide-svelte/icons/archive';
+ import Calendar from 'lucide-svelte/icons/calendar';
+ import Download from 'lucide-svelte/icons/download';
+ import Edit from 'lucide-svelte/icons/edit';
+ import Eye from 'lucide-svelte/icons/eye';
+ import FileText from 'lucide-svelte/icons/file-text';
+ import Headphones from 'lucide-svelte/icons/headphones';
+ import Image from 'lucide-svelte/icons/image';
+ import Trash2 from 'lucide-svelte/icons/trash-2';
+ import Video from 'lucide-svelte/icons/video';
+
+ function getEvidenceIcon(type: string) {
+   switch (type) {
+     case 'document': return FileText;
+     case 'photo': return Image;
+     case 'video': return Video;
+     case 'audio': return Headphones;
+     case 'physical': return Archive;
+     case 'digital': return FileText;
+     case 'testimony': return FileText;
+     default: return FileText;
+   }
   }
-  function getTypeColor(type: string) { switch (type) { case: 'document': return 'bg-blue-100 text-blue-800'; case, 'photo': return 'bg-purple-100 text-purple-800'; case, 'video': return 'bg-red-100 text-red-800'; case, 'audio': return 'bg-green-100 text-green-800'; case, 'physical': return 'bg-yellow-100 text-yellow-800'; case, 'digital': return 'bg-indigo-100 text-indigo-800'; case, 'testimony': return 'bg-orange-100 text-orange-800',default: return 'bg-gray-100 text-gray-800'}
-  } let evidenceIcon = $derived(getEvidenceIcon(evidence.evidenceType || evidence.type));
-   let formattedDate = $derived( formatDistanceToNow(new Date(evidence.createdAt || evidence.dateCollected || Date.now()), { addSuffix: true }) ); function handleEdit() { if (!disabled) { onedit?.()}
+
+  function getTypeColor(type: string) {
+    switch (type) {
+      case 'document': return 'bg-blue-100 text-blue-800';
+      case 'photo': return 'bg-purple-100 text-purple-800';
+      case 'video': return 'bg-red-100 text-red-800';
+      case 'audio': return 'bg-green-100 text-green-800';
+      case 'physical': return 'bg-yellow-100 text-yellow-800';
+      case 'digital': return 'bg-indigo-100 text-indigo-800';
+      case 'testimony': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   }
-  function handleDelete() { if (!disabled) { ondelete?.()}
+
+  let evidenceIcon = $derived(getEvidenceIcon(evidence.evidenceType || evidence.type));
+  let formattedDate = $derived( formatDistanceToNow(new Date(evidence.createdAt || evidence.dateCollected || Date.now()), { addSuffix: true }) );
+
+  function handleEdit() {
+    if (!disabled) { onedit?.(); }
   }
-  function handleView() { if (!disabled) { onview?.()}
+  function handleDelete() {
+    if (!disabled) { ondelete?.(); }
+  }
+  function handleView() {
+    if (!disabled) { onview?.(); }
   }
   function handleDownload() { if (!disabled) { ondownload?.()}
   } </script>

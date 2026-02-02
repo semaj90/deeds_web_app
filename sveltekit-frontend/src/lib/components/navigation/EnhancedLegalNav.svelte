@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { getRecentCases } from '$lib/api/recommendation-engine';
 	import { calculateDocumentPriority } from '$lib/config/legal-priorities';
-	import { componentTextureRegistry } from '$lib/registry/texture-component-registry';
+	import { textureRegistry as componentTextureRegistry } from '$lib/registry/texture-component-registry';
 	// Migrated to $effect
 	import { cubicOut, elasticOut } from 'svelte/easing';
 	import { scale, slide } from 'svelte/transition';
@@ -42,7 +42,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				updateFrequency: 'periodic',
 				priority: 180,
 				estimatedUsage: NAV_MEMORY_BUDGET
-			
+
 });
 		})();
 

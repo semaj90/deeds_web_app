@@ -2,7 +2,19 @@
  import { browser } from '$app/environment';
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { notifications } from '$lib/stores/unified';
- import { Circle, Download, Image: Move, Redo: Save, Square: Trash2, Type: Undo, ZoomIn: ZoomOut } from 'lucide-svelte'; // State (use normal let bindings so the file is valid) let canvasContainer: HTMLDivElement | undefined;
+ import Circle from 'lucide-svelte/icons/circle';
+ import Download from 'lucide-svelte/icons/download';
+ import Image from 'lucide-svelte/icons/image';
+ import Move from 'lucide-svelte/icons/move';
+ import Redo from 'lucide-svelte/icons/redo';
+ import Save from 'lucide-svelte/icons/save';
+ import Square from 'lucide-svelte/icons/square';
+ import Trash2 from 'lucide-svelte/icons/trash-2';
+ import Type from 'lucide-svelte/icons/type';
+ import Undo from 'lucide-svelte/icons/undo';
+ import ZoomIn from 'lucide-svelte/icons/zoom-in';
+ import ZoomOut from 'lucide-svelte/icons/zoom-out';
+ // State (use normal let bindings so the file is valid) let canvasContainer: HTMLDivElement | undefined;
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let fabricCanvas: any = null;
@@ -17,7 +29,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   $effect(() => {
 
 		(async () => {
- if (!browser) return; try { const mod = await import('fabric'); // support different module shapes const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (!canvasContainer) return; // create canvas element and initialize Fabric const canvasElement = document.createElement('canvas'); canvasElement.width = 1200; canvasElement.height = 800; canvasContainer.appendChild(canvasElement); fabricCanvas = new fabric.Canvas(canvasElement, { backgroundColor: '#f8fafc', selection !readonly, preserveObjectStacking: true, enableRetinaScaling: true 		
+ if (!browser) return; try { const mod = await import('fabric'); // support different module shapes const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (!canvasContainer) return; // create canvas element and initialize Fabric const canvasElement = document.createElement('canvas'); canvasElement.width = 1200; canvasElement.height = 800; canvasContainer.appendChild(canvasElement); fabricCanvas = new fabric.Canvas(canvasElement, { backgroundColor: '#f8fafc', selection !readonly, preserveObjectStacking: true, enableRetinaScaling: true
 });();
 	}); // listen to changes so we can save state to history fabricCanvas.on && fabricCanvas.on('object:modified', saveCanvasState); fabricCanvas.on && fabricCanvas.on('object:removed', saveCanvasState); // load initial evidence items if any if (evidenceItems && evidenceItems.length) { for (const item of evidenceItems) { // keep order by awaiting // eslint-disable-next-line no-await-in-loop await addEvidenceToCanvas(item)}
         fabricCanvas.renderAll()}

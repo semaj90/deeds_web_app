@@ -1,12 +1,9 @@
 <script lang="ts">
   // Migrated to $effect
   import { browser } from '$app/environment';
-  import * as THREE from 'three';
-  import { Button } from "$lib/components/ui/button";
-  import { Card } from "$lib/components/ui/card";
   import { Badge } from "$lib/components/ui/badge";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+  import { Button } from "$lib/components/ui/button";
+  import * as THREE from 'three';
 
   // Mock types for Three.js interactions
   interface Props {
@@ -35,6 +32,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         init();
         isMounted = true;
     }
+    return () => {
+         if (browser) {
+             window.removeEventListener('resize', onWindowResize);
+             if (frameId) cancelAnimationFrame(frameId);
+             if (renderer) renderer.dispose();
+         }
+    };
   });
 
   function init() {
@@ -98,13 +102,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
      }
   }
 
-  // TODO: Add as cleanup in $effect: return () => {
-     if (browser) {
-         window.removeEventListener('resize', onWindowResize);
-         if (frameId) cancelAnimationFrame(frameId);
-         if (renderer) renderer.dispose();
-     }
-  }
+  // Cleanup handled in $effect above
+
 
 </script>
 

@@ -2,10 +2,8 @@
   // Migrated to $effect
   import { browser } from '$app/environment';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
-  import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "$lib/components/ui/card";
   import { Button } from "$lib/components/ui/button";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "$lib/components/ui/card";
 
   // --- Types ---
 
@@ -255,6 +253,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   function formatDate(d: Date) {
     return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
 </script>
 
 <Card class="w-full h-full bg-slate-950 border-slate-800 flex flex-col">

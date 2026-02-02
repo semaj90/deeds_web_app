@@ -60,6 +60,7 @@
       month: 'short',
       day: '2-digit'
     });
+  }
 </script>
 
 <!-- System Status Bar -->
