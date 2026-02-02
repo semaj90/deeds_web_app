@@ -3,9 +3,7 @@
   // Migrated to $effect
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-  import { Network } from 'lucide-svelte';
-
-  // Explicitly typing $props to avoid interface merge issues on single lines
+  import Network from 'lucide-svelte/icons/network';  // Explicitly typing $props to avoid interface merge issues on single lines
   interface GraphNode {
     id: string;
 	label: string;

@@ -1,7 +1,14 @@
 <script lang="ts">
 import Badge from "$lib/components/ui/Badge.svelte";
 import { vectorIntelligenceService, type VectorSearchResult } from '$lib/services/vector-intelligence-service.js';
-import { Calendar, FileText, Loader2, MapPin, Scale, Search, Users, X } from 'lucide-svelte';
+import Calendar from 'lucide-svelte/icons/calendar';
+import FileText from 'lucide-svelte/icons/file-text';
+import Loader2 from 'lucide-svelte/icons/loader-2';
+import MapPin from 'lucide-svelte/icons/map-pin';
+import Scale from 'lucide-svelte/icons/scale';
+import Search from 'lucide-svelte/icons/search';
+import Users from 'lucide-svelte/icons/users';
+import X from 'lucide-svelte/icons/x';
 
 interface Props {
   placeholder?: string;

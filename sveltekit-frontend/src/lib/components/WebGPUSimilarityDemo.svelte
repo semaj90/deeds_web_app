@@ -2,10 +2,10 @@
  import { getCachedEmbedding, subscribeEmbedding } from '$lib/client/subscribeEmbedding';
  import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
  import { webgpuSimilarityService, type SimilaritySearchResult } from '$lib/webgpu/webgpu-similarity-service';
- import { Cpu } from "lucide-svelte";
-import { Loader } from "lucide-svelte";
-import { Search } from "lucide-svelte";
-import { Zap } from "lucide-svelte";
+ import Cpu from "lucide-svelte";
+import Loader from "lucide-svelte";
+import Search from "lucide-svelte";
+import Zap from "lucide-svelte";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let queryText = $state('');

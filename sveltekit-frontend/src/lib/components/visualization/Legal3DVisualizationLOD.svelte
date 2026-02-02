@@ -3,7 +3,10 @@
   import { browser } from '$app/environment';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { LoadingButton } from '$lib/headless';
-  import { Layers, RotateCcw, ZoomIn, ZoomOut } from 'lucide-svelte';
+  import Layers from 'lucide-svelte/icons/layers';
+  import RotateCcw from 'lucide-svelte/icons/rotate-ccw';
+  import ZoomIn from 'lucide-svelte/icons/zoom-in';
+  import ZoomOut from 'lucide-svelte/icons/zoom-out';
 
   // Types
   interface Legal3DEntity {

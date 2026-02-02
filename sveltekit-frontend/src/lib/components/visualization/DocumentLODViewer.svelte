@@ -3,7 +3,14 @@
   import { LoadingButton } from '$lib/headless';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Card, CardContent } from "$lib/components/ui/card";
-  import { ZoomIn, ZoomOut, RotateCw, FileText, Layers, Download, Eye, Navigation } from 'lucide-svelte';
+  import ZoomIn from 'lucide-svelte/icons/zoom-in';
+  import ZoomOut from 'lucide-svelte/icons/zoom-out';
+  import RotateCw from 'lucide-svelte/icons/rotate-cw';
+  import FileText from 'lucide-svelte/icons/file-text';
+  import Layers from 'lucide-svelte/icons/layers';
+  import Download from 'lucide-svelte/icons/download';
+  import Eye from 'lucide-svelte/icons/eye';
+  import Navigation from 'lucide-svelte/icons/navigation';
 
   // Types
   interface DocumentPage {

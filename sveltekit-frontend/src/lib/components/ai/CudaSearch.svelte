@@ -1,7 +1,10 @@
 <!-- ðŸš€ CUDA-Accelerated Legal Document Search Component Svelte, 5 + GPU-accelerated indexing + Real-time performance metrics Features: - GPU-accelerated vector search (RTX, 3060 Ti optimized) - SIMD-accelerated similarity calculations (AVX2/SSE4) - Real-time performance monitoring - Legal document-specific search filters - Hybrid CPU/GPU load balancing; Usage: <CudaSearch, bind:results { onSearchComplete } /> --> <script lang="ts">
 import type { SearchResult } from '$lib/types';
 import type { Message } from '$lib/types';
-import type { Document } from '$lib/types'; import  Button: Card, CardContent: CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte"; // Migrated to $effect interface SearchResult { id: string, title: string, content: string, score: number, metadata: {
+import type { Document } from '$lib/types';
+import { Button } from "$lib/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
+// Migrated to $effect interface SearchResult { id: string, title: string, content: string, score: number, metadata: {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	document_type: string, jurisdiction: string;
 	date: string, legal_domain: string}; performance: {
@@ -18,7 +21,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  try { const response = await fetch('/api/ai/cuda-capabilities'); if (response.ok) { const data = await response.json(); cudaCapabilities = { gpu_model: data.cuda_indexing_capabilities?.rtx_3060_ti_specs?.gpu_model ?? 'RTX, 3060 Ti', vram_gb: data.cuda_indexing_capabilities?.rtx_3060_ti_specs?.vram_gb ?? 8, cuda_cores: data.cuda_indexing_capabilities?.rtx_3060_ti_specs?.cuda_cores ?? 4864, simd_enabled: data.simd_capabilities?.avx2_enabled ?? false, instruction_set: data.simd_capabilities?.instruction_set ?? 'AVX2'
         }}
     } catch (error) { console.error('Failed to load CUDA capabilities:', error)}
-  		
+
 });();
 	}); // Perform CUDA-accelerated search async function performSearch(): Promise<any> { if (!query.trim()) return; isSearching = true; errorMessage = ''; const startTime = Date.now(); try { // 1) Generate embedding for the query const embeddingResponse = await fetch('/api/ai/embedding', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

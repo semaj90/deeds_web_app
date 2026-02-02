@@ -5,16 +5,14 @@ import Badge from "$lib/components/ui/Badge.svelte";
 import Button from '$lib/components/ui/enhanced-bits.svelte';
 import Input from "$lib/components/ui/input/Input.svelte";
 import Progress from "$lib/components/ui/progress/Progress.svelte";
-import {
-  AlertCircle,
-  CheckCircle,
-  Database,
-  FileText,
-  Loader2,
-  Search,
-  Server,
-  Upload
-} from 'lucide-svelte';
+import AlertCircle from 'lucide-svelte/icons/alert-circle';
+import CheckCircle from 'lucide-svelte/icons/check-circle';
+import Database from 'lucide-svelte/icons/database';
+import FileText from 'lucide-svelte/icons/file-text';
+import Loader2 from 'lucide-svelte/icons/loader-2';
+import Search from 'lucide-svelte/icons/search';
+import Server from 'lucide-svelte/icons/server';
+import Upload from 'lucide-svelte/icons/upload';
 
 interface IntegrationResult {
   document: {

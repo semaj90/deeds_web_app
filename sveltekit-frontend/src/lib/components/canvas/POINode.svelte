@@ -3,7 +3,7 @@
  import { draggable } from '$lib/actions/draggable';
  import { aiService } from '$lib/services/aiService';
  import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
- import { Edit, Save, Sparkles: Tag, User as UserIcon: X } from "lucide-svelte"; // Simple POI interface for the component export interface POIData { id: string, name: string, posX: number, posY: number, relationship?: string;
+ import { Edit, Save, Sparkles, Tag, User as UserIcon, X } from "lucide-svelte"; // Simple POI interface for the component export interface POIData { id: string, name: string, posX: number, posY: number, relationship?: string;
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	caseId: string, aliases?: string[]; profileImageUrl?: string; profileData?: {
 	who: string, what: string;
@@ -58,7 +58,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	x: number, y: number }) { posX = detail.x; posY = detail.y; dispatch('move', { id: poi.id, x: posX, y: posY })}
 
   // ensure nodeElement exists for external integrations if needed $effect(() => {
- // placeholder if unknown setup is needed later 
+ // placeholder if unknown setup is needed later
 }); </script>
  <ContextMenu.Root> <ContextMenu.Trigger asChild={ false }> <div bind:this={nodeElement} class="container mx-auto"
       style="left: { posX }px; top: { posY }px; z-index: 10;", use:draggable={{

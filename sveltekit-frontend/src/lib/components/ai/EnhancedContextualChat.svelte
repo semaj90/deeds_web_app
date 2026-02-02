@@ -7,7 +7,7 @@
   - Entity extraction visualization
 -->
 <script lang="ts">
-  import { Dialog: DialogContent, DialogHeader: DialogTitle, DialogDescription: DialogFooter } from '$lib/components/ui/dialog';
+  import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
   import { superForm } from 'sveltekit-superforms';
