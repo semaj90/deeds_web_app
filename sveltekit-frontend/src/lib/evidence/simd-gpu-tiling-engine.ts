@@ -10,7 +10,6 @@
  * - RTX 3060 Ti tensor core optimization
  */
 
-import { simdRedisClient } from '$lib/services/simd-redis-client.js';
 // Removed: import { webgpuTextureStreaming } from '$lib/services/webgpu-texture-streaming.js';
 // Removed: import type { textureStreamer } from '$lib/webgpu/texture-streaming.js';
 // Removed: import type { embeddingCache } from '$lib/server/embedding-cache-middleware.js';
@@ -116,7 +115,7 @@ export class SIMDGPUTilingEngine {
       return;
     }
 
-    const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
+    const adapter = await (navigator.gpu as GPU).requestAdapter({ powerPreference: 'high-performance' });
     if (!adapter) {
       throw new Error('Failed to get WebGPU adapter');
     }
@@ -128,10 +127,10 @@ export class SIMDGPUTilingEngine {
         maxComputeWorkgroupSizeY: GPU_TILING_CONFIG.compute.workgroupSize.y
       }
     });
-    
+
     // Create compute pipeline
     await this.createComputePipeline();
-    
+
     this.isInitialized = true;
     console.log('✅ SIMD GPU Tiling Engine initialized with RTX 3060 Ti optimizations');
   }
@@ -193,19 +192,19 @@ export class SIMDGPUTilingEngine {
     if (!this.isInitialized) await this.initialize();
 
     const startTime = performance.now();
-    
+
     // Step 1: SIMD Parsing of metadata (pre-processing)
     const simdStart = performance.now();
-    const metadata = { 
-        id: evidenceId, 
-        dimensions: { width, height }, 
-        processing: { 
-            enableCompression: options.enableCompression, 
-            priority: options.priority, 
+    const metadata = {
+        id: evidenceId,
+        dimensions: { width, height },
+        processing: {
+            enableCompression: options.enableCompression,
+            priority: options.priority,
             generateEmbeddings: options.generateEmbeddings
-        } 
+        }
     };
-    
+
     //const simdResult = await simdRedisClient.parseJSON(metadata);
     const simdResult = { throughput_mbps: 0 }; // Mock
     const simdTime = performance.now() - simdStart;
@@ -230,14 +229,14 @@ export class SIMDGPUTilingEngine {
     }
 
     const totalTime = performance.now() - startTime;
-    
+
     // Calculate metrics
     const totalDataMB = imageData.byteLength / 1024 / 1024;
     const throughputMBps = totalDataMB / (totalTime / 1000);
     const parallelEfficiency = (simdTime + gpuTime) / totalTime;
-    
+
     this.updateMetrics(tiles.length, simdTime, gpuTime, throughputMBps);
-    
+
     console.log(`✅ Evidence processing complete: ${tiles.length} tiles in ${totalTime.toFixed(2)}ms`);
 
     return {
@@ -269,7 +268,7 @@ export class SIMDGPUTilingEngine {
     const tilesX = Math.ceil(width / tileSize);
     const tilesY = Math.ceil(height / tileSize);
     const totalTiles = tilesX * tilesY;
-    
+
     console.log(`🔧 GPU tiling: ${totalTiles} tiles (${tilesX}x${tilesY})`);
 
     // Create GPU buffers
@@ -278,8 +277,8 @@ export class SIMDGPUTilingEngine {
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
         label: 'Evidence-Input-Buffer'
     });
-    
-    this.device.queue.writeBuffer(inputBuffer, 0, imageData);
+
+    this.device.queue.writeBuffer(inputBuffer, 0, imageData as GPUAllowSharedBufferSource);
 
     // Simplified for now - return empty or mock tiles
     const tiles: TiledEvidenceChunk[] = [];
@@ -303,7 +302,7 @@ export class SIMDGPUTilingEngine {
 
     return tiles;
   }
-  
+
   private async performCPUTiling(
     imageData: Float32Array,
     width: number,
@@ -348,14 +347,14 @@ export class SIMDGPUTilingEngine {
   private async cacheTileResults(evidenceId: string, tiles: TiledEvidenceChunk[]): Promise<void> {
       // Mock caching
   }
-  
+
   private updateMetrics(tilesCount: number, simdTime: number, gpuTime: number, throughput: number): void {
       this.metrics.tilesProcessed += tilesCount;
       this.metrics.totalSIMDTime += simdTime;
       this.metrics.totalGPUTime += gpuTime;
       this.metrics.averageThroughput = (this.metrics.averageThroughput + throughput) / 2;
   }
-  
+
   private getMemoryUsage(): Record<string, number> {
       return {
           vram: 0,
@@ -391,7 +390,7 @@ export function estimateProcessingTime(
 } {
   const pixelCount = imageWidth * imageHeight;
   const complexity = pixelCount / (1920 * 1080); // Relative to 1080p
-  
+
   return {
     estimatedSIMDTime: complexity * 50, // ~50ms per 1080p equivalent for SIMD
     estimatedGPUTime: complexity * 20,  // ~20ms per 1080p equivalent for GPU

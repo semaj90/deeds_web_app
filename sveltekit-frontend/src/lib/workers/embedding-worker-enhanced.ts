@@ -1,8 +1,8 @@
 import { cacheService } from '$lib/api/services/cache-service';
 import { redis } from '$lib/server/redis';
 import type { Redis } from 'ioredis';
-// Assuming globalLoki exists based on imports, but if not we might need to mock or remove it.
-import { globalLoki } from '$lib/stores/global-loki-store';
+// globalLoki removed - not exported from global-loki-store
+// import { globalLoki } from '$lib/stores/global-loki-store';
 
 /**
  * Enhanced Embedding Worker with XState Job Lifecycle Integration
@@ -61,10 +61,7 @@ export class EnhancedEmbeddingWorker {
             this.redis = cacheService.getClient() || redis;
 
             if (this.redis) {
-                // Initialize global Loki store with Redis if available
-                if (globalLoki) {
-                    await globalLoki.initRedis(this.redis);
-                }
+                // globalLoki removed - not exported
                 console.log('✅ Enhanced embedding worker initialized with Redis integration');
             } else {
                 console.warn('⚠️ Enhanced embedding worker running without Redis (fallback mode)');
@@ -149,14 +146,14 @@ if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'test' && import.
     process.on('SIGINT', async () => {
         console.log('Received SIGINT, shutting down embedding worker...');
         await enhancedEmbeddingWorker.stop();
-        if (globalLoki) await globalLoki.shutdown();
+        // globalLoki removed - not exported
         process.exit(0);
     });
 
     process.on('SIGTERM', async () => {
         console.log('Received SIGTERM, shutting down embedding worker...');
         await enhancedEmbeddingWorker.stop();
-        if (globalLoki) await globalLoki.shutdown();
+        // globalLoki removed - not exported
         process.exit(0);
     });
 }

@@ -1,6 +1,5 @@
-import { gzipSync, gunzipSync } from 'zlib';
 import { Redis } from 'ioredis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { gunzipSync, gzipSync } from 'zlib';
 
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour in ms
 
@@ -28,7 +27,6 @@ export class CacheService {
       this.redisClient = new Redis({
         host: 'localhost',
         port: 6379,
-        retryDelayOnFailover: 100,
         maxRetriesPerRequest: 3,
         lazyConnect: true,
       });
@@ -225,12 +223,13 @@ export async function cacheSearchResults(
  results: any[],
  filters?: unknown
 ): Promise<void> {
-? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
- : 'none';
+ const filtersHash = filters
+   ? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
+   : 'none';
  const key = `search:${ type }:${Buffer.from(query).toString('base64')}:${filtersHash}`;
  await cacheService.set(key, results, {
- ttlMs, 30 * 60 * 1000, // 30 minutes for search results
- compress, true,
+   ttlMs: 30 * 60 * 1000, // 30 minutes for search results
+   compress: true,
  });
 }
 
