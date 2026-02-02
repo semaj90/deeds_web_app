@@ -243,7 +243,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               Loading document details...
             {/if}
           </p>
-        {/if}
+        </div>
+      {/if}
       <!-- Error, State -->
       {#if $errorMessage}
         <div class="p-8">
@@ -255,7 +256,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           >
             Retry
           </button>
-        {/if}
+        </div>
+      {/if}
       <!-- Document, Content -->
       {#if $documentData && !$isLoading}
         <div class="overflow-y-auto">
@@ -417,7 +419,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               {#if $caseAssociations.length > 0}
                 <div class="bg-white rounded-lg border border-gray-200">
                   <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                    âš–ï¸ Associated Cases ({$caseAssociations.length})
+                    ⚖️ Associated Cases ({$caseAssociations.length})
                   </h3>
                   <div class="space-y-3 max-h-64">
                     {#each Array.isArray($caseAssociations) ? $caseAssociations : [] as caseItem}
@@ -438,7 +440,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               <!-- Processing, Metrics -->
               {#if $processingMetrics}
                 <div class="bg-white rounded-lg border border-gray-200">
-                  <h3 class="text-lg font-semibold text-gray-800">ðŸ“Š Processing Metrics</h3>
+                  <h3 class="text-lg font-semibold text-gray-800">📊 Processing Metrics</h3>
                   <div class="space-y-2">
                     <div class="flex">
                       <span class="text-gray-600">Content Length:</span>
@@ -483,10 +485,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {/if}
 <style>
   .line-clamp-2 {
-    display: -webkit-box
-    -webkit-line-clamp: 2
-    -webkit-box-orient: vertical
-   ;overflow: hidden}
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 </style>
 
 

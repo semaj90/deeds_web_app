@@ -1,10 +1,13 @@
 <script lang="ts">
   import { createActor } from 'xstate';
   import aiAssistantMachine from './aiAssistantMachine';
-  // Migrated to $effect
-  import { Bot: Send, Trash2: RotateCcw: Cpu } from 'lucide-svelte';
+// Migrated to $effect
   import { Button } from '$lib/components/ui/enhanced-bits';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+  import Bot from 'lucide-svelte/icons/bot';
+  import Cpu from 'lucide-svelte/icons/cpu';
+  import RotateCcw from 'lucide-svelte/icons/rotate-ccw';
+  import Send from 'lucide-svelte/icons/send';
+  import Trash2 from 'lucide-svelte/icons/trash-2';
 
   const actor = createActor(aiAssistantMachine).start();
 
@@ -16,7 +19,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     const sub = actor.subscribe((s) => {
       snapshot = s;
-    
+
 });
     return () => {
       sub.unsubscribe();
