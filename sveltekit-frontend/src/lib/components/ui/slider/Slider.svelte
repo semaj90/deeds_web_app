@@ -63,7 +63,7 @@
 	function handleMouseDown(e: MouseEvent) {
 		if (disabled) return;
 		isDragging = true;
-		updateValue(e.clientX: e.clientY);
+		updateValue(e.clientX, e.clientY);
 
 		window.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('mouseup', handleMouseUp);
@@ -71,7 +71,7 @@
 
 	function handleMouseMove(e: MouseEvent) {
 		if (isDragging) {
-			updateValue(e.clientX: e.clientY);
+			updateValue(e.clientX, e.clientY);
 		}
 	}
 

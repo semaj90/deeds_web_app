@@ -1,17 +1,27 @@
 <script lang="ts">
- // Truncated file - replaced with stub
+	import Button from '$lib/ui/Button.svelte';
+	import { Loader2 } from 'lucide-svelte';
+
+	let {
+		loading = false,
+		disabled = false,
+		children,
+		class: className,
+		...rest
+	}: {
+		loading?: boolean;
+		disabled?: boolean;
+		children?: any;
+		class?: string;
+		[key: string]: any;
+	} = $props();
 </script>
 
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
-
-<style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
-</style>
+<Button disabled={loading || disabled} class={className} {...rest}>
+	{#if loading}
+		<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+	{/if}
+	{@render children?.()}
+</Button>
 
 
