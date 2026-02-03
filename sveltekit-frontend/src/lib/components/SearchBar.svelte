@@ -7,7 +7,7 @@
  search: string;
  }>();
 
- let searchTimeout: number;
+ let searchTimeout: any;
  let inputElement: HTMLInputElement;
 
  function handleInput() {
