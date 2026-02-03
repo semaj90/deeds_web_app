@@ -73,11 +73,11 @@
  }
  }
 
- // Apply selected suggestion as a patch
- async function applySelectedSuggestion() {
- if (!routePath ?? !selectedSuggestionId) return;
+	// Apply selected suggestion as a patch
+	async function applySelectedSuggestion() {
+		if (!routePath || !selectedSuggestionId) return;
 
- applying = true;
+		applying = true;
  try {
  const res = await fetch('/api/phase78/route-health', {
  method: 'POST',

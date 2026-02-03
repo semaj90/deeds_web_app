@@ -1,4 +1,3 @@
-import type { User } from '$lib/types/database-types';
 import bcrypt from 'bcryptjs';
 import { and, eq, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
