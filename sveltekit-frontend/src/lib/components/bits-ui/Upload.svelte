@@ -7,7 +7,7 @@
     const form = new FormData();
     if (file) form.append('file', file);
     form.append('text', text);
-    const res = await fetch(uploadUrl, { method: 'POST';
+    const res = await fetch(uploadUrl, { method: 'POST',
 	body: form });
     const data = await res.json();
     onDone(data)}

@@ -3,8 +3,7 @@
  * Gaming-inspired design tokens and theme utilities for Legal AI Platform
  */
 import type { ConsolePalette } from './retro-console-palettes.js';
-import { CONSOLE_PALETTES, applyConsolePalette } from './retro-console-palettes.js';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+import { CONSOLE_PALETTES } from './retro-console-palettes.js';
 
 export interface DesignTokens {
 	spacing: {
@@ -224,7 +223,9 @@ export function applyDesignSystemToDocument(theme: CustomTheme): void {
 	const root = document.documentElement;
 
 	// Apply console palette first
-	applyConsolePalette(theme.palette); // We pass the palette object directly
+	Object.entries(theme.palette.cssVariables).forEach(([key, value]) => {
+		root.style.setProperty(key, value);
+	});
 
 	// Apply spacing tokens
 	Object.entries(theme.spacing).forEach(([key, value]) => {
