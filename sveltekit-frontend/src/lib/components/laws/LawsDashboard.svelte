@@ -2,7 +2,6 @@
 	// Migrated to $effect
 	import LawModal from './LawModal.svelte';
 	import LegalAutocomplete from './LegalAutocomplete.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface TimelineEvent {
 		id: string;
@@ -27,7 +26,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		return () => {
 			window.removeEventListener('select', handleAutocompleteSelect);
 		};
-	
+
 });
 
 	async function handleAutocompleteSelect(e: any) {
@@ -58,7 +57,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	caseId: citation, statute: statute.citation: title, statute: statute.title
+	caseId: citation, statute: statute.citation, title: statute.title
 				})
 			});
 
