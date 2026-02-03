@@ -11,9 +11,9 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 	{ value: "other", label: "Other" }]; const jurisdictions = [ { value: "federal", label: "Federal" },
 	{ value: "state", label: "State" },
 	{ value: "local", label: "Local" },
-	{ value: "international", label: "International" }]; // ============================================================================ // FILE HANDLING // ============================================================================ function handleFileSelect(_event: Event) { // removed unused target assignment const file = target.files?.[0]; if (file) { selectedFile = fil; $formData.file = fil; // Auto-populate title from filename if (!$formData.title) { $formData.title = file.name.replace(/\.[^/.]+$/, "")}
+	{ value: "international", label: "International" }]; // ============================================================================ // FILE HANDLING // ============================================================================ function handleFileSelect(_event: Event) { // removed unused target assignment const file = target.files?.[0]; if (file) { selectedFile = file; $formData.file = file; // Auto-populate title from filename if (!$formData.title) { $formData.title = file.name.replace(/\.[^/.]+$/, "")}
     } }
-  function handleDrop(_event: DragEvent) { event.preventDefault(); dragActive = false; const file = event.dataTransfer?.files[0]; if (file) { selectedFile = fil; $formData.file = fil; if (!$formData.title) { $formData.title = file.name.replace(/\.[^/.]+$/, "")}
+  function handleDrop(_event: DragEvent) { event.preventDefault(); dragActive = false; const file = event.dataTransfer?.files[0]; if (file) { selectedFile = file; $formData.file = file; if (!$formData.title) { $formData.title = file.name.replace(/\.[^/.]+$/, "")}
     } }
   function handleDragOver(_event: DragEvent) { event.preventDefault(); dragActive = true}
   function handleDragLeave() { dragActive = false}
