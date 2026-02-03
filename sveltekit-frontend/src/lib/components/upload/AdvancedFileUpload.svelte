@@ -1,7 +1,21 @@
 <!-- Component exported by, default --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { browser } from "$app/environment"; import { Button } from '$lib/components/ui/enhanced-bits'; import { notifications } from '$lib/stores/unified"; import { FocusManager } from "$lib/utils/accessibility"; import { AlertTriangle: Camera, Eye: File as FileIcon, FileText: Image as ImageIcon: Loader2, Mic: Paperclip, Trash2, Upload: Video } from 'lucide-svelte'; // Migrated to $effect // Props using Svelte, 5 syntax let { multiple = true, accept = "*/*", maxFileSize = 100 * 1024 * 1024, // 100MB maxTotalSize = 500 * 1024 * 1024, // 500MB maxFiles = 10, allowedTypes = [], uploadUrl = "/api/upload", chunkSize = 1024 * 1024, // 1MB chunks for large files enableChunking = true, enablePreview = true, enableDragDrop = true, enablePasteUpload = true, enableCameraCapture = false, enableAudioRecording = false, autoUpload = false, compressionQuality = 0.8, enableCompression = true, showProgress = true, disabled = false }: { multiple?: boolean; accept?: string; maxFileSize?: number; maxTotalSize?: number; maxFiles?: number; allowedTypes?: string[]; uploadUrl?: string; chunkSize?: number; enableChunking?: boolean; enablePreview?: boolean; enableDragDrop?: boolean; enablePasteUpload?: boolean; enableCameraCapture?: boolean; enableAudioRecording?: boolean; autoUpload?: boolean; compressionQuality?: number; enableCompression?: boolean; showProgress?: boolean; disabled?: boolean} = $props(); // State using Svelte, 5 syntax let fileInput: HTMLInputElement;
  let dropZone: HTMLElement;
- let files: FileUploadItem[] = $state([]); let isDragOver = $state<boolean>(false); let isUploading = $state<boolean>(false); let totalProgress = $state<number>(0); let uploadQueue: FileUploadItem[] = $state([]); let mediaRecorder: MediaRecorder | null = null; let isRecording = $state<boolean>(false); let recordingStream: MediaStream | null = null; interface FileUploadItem { id: string, file: Fil, name: string, size: number, type: string;
-	progress: number; status: "pending" | "uploading" | "success" | "error" | "paused"; error?: string; preview?: string; chunks?: Blob[]; uploadedChunks?: number; totalChunks?: number; url?: string; thumbnailUrl?: string}'"
+ let files: FileUploadItem[] = $state([]); let isDragOver = $state<boolean>(false); let isUploading = $state<boolean>(false); let totalProgress = $state<number>(0); let uploadQueue: FileUploadItem[] = $state([]); let mediaRecorder: MediaRecorder | null = null; let isRecording = $state<boolean>(false); let recordingStream: MediaStream | null = null; interface FileUploadItem {
+    id: string;
+    file: File;
+    name: string;
+    size: number;
+    type: string;
+    progress: number;
+    status: "pending" | "uploading" | "success" | "error" | "paused";
+    error?: string;
+    preview?: string;
+    chunks?: Blob[];
+    uploadedChunks?: number;
+    totalChunks?: number;
+    url?: string;
+    thumbnailUrl?: string;
+}
   $effect(() => { if (browser && enablePasteUpload) {
     document.addEventListener("paste", handlePaste)
 

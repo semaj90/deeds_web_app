@@ -5,7 +5,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { data, caseId = '', onUploadComplete, onUploadError, preserveExistingFlow = true // Default to preserve existing enhanced flow }: Props = $props(); // Enhanced form leveraging Superforms' built-in validation const { form, errors, enhance, submitting, message, delayed } = superForm((data as { form?: unknown, som_cluster?: unknown }).form, { validators: zod(fileUploadSchema), dataType: 'form', // Use FormData for file uploads multipleSubmits: 'prevent', clearOnSubmit: 'errors-and-message', invalidateAll: false;
-	onSubmit: ({ formData: cancel }) => { // Superforms handles validation automatically if (!selectedFile) { cancel(); return}'
+    onSubmit: ({ cancel }) => {
+        // Superforms handles validation automatically
+        if (!selectedFile) {
+            cancel();
+            return;
+        }
       // Add enhanced processing metadata to form if (preserveExistingFlow && (ocrResults || legalAnalysis || semanticEmbeddings)) { formData.set('enhancedAnalysis', JSON.stringify({ ocr: ocrResults, legal: legalAnalysis, semantic: semanticEmbeddings;
 	preserveFlow: true }))}
     },
@@ -13,7 +18,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         onUploadComplete?.(uploadResult)} else if ((result as { type?: unknown; data?: unknown; error?: unknown }).type === 'failure') { onUploadError?.((result as { type?: unknown; data?: unknown; error?: unknown }).data?.message ?? 'Upload validation failed')} else if ((result as { type?: unknown; data?: unknown; error?: unknown }).type === 'error') { onUploadError?.((result as { type?: unknown; data?: unknown; error?: unknown }).error?.message ?? 'Upload failed')}
     },
 	onError: ({ result }) => { onUploadError?.((result as { type?: unknown; data?: unknown; error?: unknown }).error?.message ?? 'Unexpected error occurred')}
-  }); // State management let selectedFile: File | null = null; let filePreview: string | null = null; let dragOver = $state<boolean>(false); let processingStage = $state<string>(''); let ocrResults = $state<any>(null); let legalAnalysis = $state<any>(null); let semanticEmbeddings = $state<any>(null); let showAdvancedOptions = $state<boolean>(false); let showProcessingDetails = $state<boolean>(false); // XState evidence processing actor for the existing flow let evidenceActor = $state<ReturnType<typeof createActor> | null>(null); // Enhanced file selection with Superforms integration async function handleFileSelect(file: File): Promise<any> { selectedFile = file; // Clear previous results and errors ocrResults = null; legalAnalysis = null; semanticEmbeddings = null; processingStage = ''; // Use Superforms' validation by updating the form $form.file = file as unknown; // Auto-populate case ID if provided as prop if (caseId && !$form.caseId) { $form.caseId = caseId}'
+  }); // State management let selectedFile: File | null = null; let filePreview: string | null = null; let dragOver = $state<boolean>(false); let processingStage = $state<string>(''); let ocrResults = $state<any>(null); let legalAnalysis = $state<any>(null); let semanticEmbeddings = $state<any>(null); let showAdvancedOptions = $state<boolean>(false); let showProcessingDetails = $state<boolean>(false); // XState evidence processing actor for the existing flow let evidenceActor = $state<ReturnType<typeof createActor> | null>(null); // Enhanced file selection with Superforms integration async function handleFileSelect(file: File): Promise<any> { selectedFile = file; // Clear previous results and errors ocrResults = null; legalAnalysis = null; semanticEmbeddings = null; processingStage = ''; // Use Superforms' validation by updating the form $form.file = file as unknown; // Auto-populate case ID if provided as prop        if (caseId && !$form.caseId) {
+            $form.caseId = caseId;
+        }
     // Client-side validation using Zod schema (Superforms will handle this automatically) try { fileUploadSchema.parse({ file, caseId: $form.caseId })} catch (validationError) { // Superforms will show these errors automatically return}
 
     // Generate preview for images if (file.type.startsWith('image/')) { filePreview = URL.createObjectURL(file)} else { filePreview = null}

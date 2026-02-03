@@ -16,7 +16,6 @@
   import { superForm } from 'sveltekit-superforms/client';
   import { createActor } from 'xstate';
   import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Enhanced registration schema for legal professionals
   const registerSchema = z
@@ -367,7 +366,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               <div class="h-2 flex-1 bg-gray-200 rounded">
                 <div
                   class="h-full rounded transition-all duration-300 {passwordStrength.color.replace('text-', 'bg-')}"
-                  style="width: {Math.min(100: (passwordStrength.score / 8) * 100)}%"
+                  style="width: {Math.min(100, (passwordStrength.score / 8) * 100)}%"
                 ></div>
               </div>
               <span class="text-sm {passwordStrength.color}">{passwordStrength.feedback}</span>

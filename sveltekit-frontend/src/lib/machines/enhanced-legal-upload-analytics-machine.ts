@@ -961,7 +961,7 @@ export function getContextualPromptsByTiming(
 					content: `Successfully uploaded ${successCount} of ${context.files.length} files`,
 					message: `Successfully uploaded ${successCount} of ${context.files.length} files`,
 					type: successCount === context.files.length ? 'success' : 'warning',
-					category: 'status',
+					category: 'insight',
 					timing: 'after-upload',
 					confidence: 1.0,
 					relevance: 1.0,

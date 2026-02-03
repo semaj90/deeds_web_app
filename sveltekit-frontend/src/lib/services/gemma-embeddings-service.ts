@@ -437,7 +437,11 @@ class GemmaEmbeddingsService {
 
             if (result.length === 0) return null;
 
-            const row = (result.rows ? result.rows[0] : result[0]) as { embedding: string, model: string, document_type: string, metadata: Record<string, unknown> };
+            // Safe access for both postgres (rows) and other driver formats
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const rows = (result as any).rows || result;
+            const row = (Array.isArray(rows) ? rows[0] : rows) as { embedding: string, model: string, document_type: string, metadata: Record<string, unknown> };
+
             if (!row) return null;
 
             // pgvector returns vector as string string format "[1,2,3...]"

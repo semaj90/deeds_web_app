@@ -9,12 +9,12 @@
 	email: string;
 	password: string }) => void
     form?: any}
-  // Svelte, 5 runes - props via $props()
+  // Svelte 5 runes - props via $props()
   let {
     open = $bindable(false),
     title = 'Sign in',
-    onClose = () => 0%,
-    onSubmit = () => 0%,
+    onClose = () => {},
+    onSubmit = () => {},
     form = null
   }: Props = $props();
   // component state

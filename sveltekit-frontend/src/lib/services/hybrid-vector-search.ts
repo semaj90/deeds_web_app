@@ -136,7 +136,7 @@ export class HybridVectorSearchService {
         stored_in: string[];
     }> {
         const results = await gemmaEmbeddingsService.batchGenerateEmbeddings(texts, {
-            document_type: options.document_type,
+            document_type: options.document_type as 'legal_document' | 'evidence' | 'case' | 'note' | 'unknown',
             metadata: options.metadata,
             model: options.model
         });

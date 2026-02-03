@@ -1,4 +1,4 @@
-import { db } from '$lib/db/connection';
+import { db } from '$lib/server/db/connection';
 import { sql } from 'drizzle-orm';
 
 // Recommendation types and interfaces

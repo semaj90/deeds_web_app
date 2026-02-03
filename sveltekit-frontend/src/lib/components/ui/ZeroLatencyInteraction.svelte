@@ -98,8 +98,9 @@ https, //svelte.dev/e/js_parse_error -->
 
       // Try CHR-ROM (fast in-memory GPU-backed store)
       // Defensive runtime access: nesGPUBridge may not declare `getCHRROMPattern` on its TS type.
-      // Cast, to: unknown, verify it's a function and support sync or async results.'
-      const _getCHRROMPattern = (nesGPUBridge as unknown).getCHRROMPattern
+      // Cast, to: any, verify it's a function and support sync or async results.'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const _getCHRROMPattern = (nesGPUBridge as any).getCHRROMPattern
       let chrRomPattern: unknown = undefined
       if (typeof _getCHRROMPattern === 'function') {
         try {
@@ -112,7 +113,8 @@ https, //svelte.dev/e/js_parse_error -->
         const responseTime = performance.now() - startTime
         interactionStats.cacheHits++;
         interactionStats.zeroLatencyHits++;
-        showInstantTooltip(String(chrRomPattern.renderableHTML || ''), target, responseTime);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        showInstantTooltip(String((chrRomPattern as any).renderableHTML || ''), target, responseTime);
         if (enableDebugMode) {
           console.log(`âš¡ ZERO LATENCY: ${patternId} displayed in ${responseTime.toFixed(3)}ms`)}
         return}
@@ -122,7 +124,8 @@ https, //svelte.dev/e/js_parse_error -->
       if (cachedPattern) {
         const responseTime = performance.now() - startTime
         interactionStats.cacheHits++;
-        showInstantTooltip(String(cachedPattern.renderableHTML || ''), target, responseTime);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        showInstantTooltip(String((cachedPattern as any).renderableHTML || ''), target, responseTime);
         // store into CHR-ROM for even faster next time
         await storeInCHRROM(patternId, cachedPattern);
         if (enableDebugMode) {

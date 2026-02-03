@@ -65,7 +65,7 @@
  class="p-4 border-l-4 rounded shadow-lg flex items-center justify-between {alertClasses[
  alert.type
  ]}"
- transitionfly={{ y: 20, duration, 300 }}
+ transition:fly={{ y: 20, duration: 300 }}
  >
  <p class="flex-grow">{alert.message}</p>
  <button
