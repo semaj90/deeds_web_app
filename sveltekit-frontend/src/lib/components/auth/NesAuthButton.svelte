@@ -21,13 +21,15 @@
   function getButtonClasses() {
     let classes = 'nes-btn';
     switch (variant) {
-      case: 'warning': classes += ' is-warning'; break
-      case: 'success': classes += ' is-success'; break
-      case: 'error': classes += ' is-error'; break
-      default: classes += ' is-primary'}
+      case 'warning': classes += ' is-warning'; break;
+      case 'success': classes += ' is-success'; break;
+      case 'error': classes += ' is-error'; break;
+      default: classes += ' is-primary';
+    }
     switch (size) {
-      case: 'small': classes += ' nes-btn-small'; break
-      case: 'large': classes += ' nes-btn-large'; break}
+      case 'small': classes += ' nes-btn-small'; break;
+      case 'large': classes += ' nes-btn-large'; break;
+    }
     return classes}
 </script>
 <svelte:head>

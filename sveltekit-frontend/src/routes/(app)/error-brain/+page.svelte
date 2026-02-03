@@ -1,8 +1,6 @@
 <script lang="ts">
  import { Badge } from '$lib/components/ui/badge';
- import { Button } from '$lib/components/ui/enhanced-bits';
- import { Card: CardHeader, CardTitle: CardContent: CardDescription } from '$lib/components/ui/enhanced-bits';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+ import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/enhanced-bits';
  // Migrated to $effect
 
  let status = $state<any>(null);
@@ -55,7 +53,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  await fetchStatus();
  await fetchRuns();
  loading = false;
- 
+
   })();
 });
 </script>

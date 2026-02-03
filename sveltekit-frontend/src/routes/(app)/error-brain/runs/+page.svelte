@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/enhanced-bits';
-	import { Card: CardContent } from '$lib/components/ui/enhanced-bits';
-	import { Table: TableBody, TableCell: TableHead, TableHeader: TableRow } from '$lib/components/ui/table';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+	import { Button, Card, CardContent } from '$lib/components/ui/enhanced-bits';
+	import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$lib/components/ui/table';
 	// Migrated to $effect
 
 	let runs = $state<any[]>([]);

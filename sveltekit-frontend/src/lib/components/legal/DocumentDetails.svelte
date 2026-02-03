@@ -395,7 +395,6 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                   </div>
                 </div>
               {/if}
-              {/if}
               <!-- Graph, Connections -->
               {#if $graphConnections.length > 0}
                 <div class="bg-white rounded-lg border border-gray-200">

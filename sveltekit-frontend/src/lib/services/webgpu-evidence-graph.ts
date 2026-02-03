@@ -83,11 +83,11 @@ export class WebGPUEvidenceGraph {
     async initialize(canvas: HTMLCanvasElement): Promise<void> {
         this.canvas = canvas;
 
-        if (!navigator.gpu) {
+        if (!(navigator as any).gpu) {
             throw new Error('WebGPU not supported on this browser');
         }
 
-        const adapter = await navigator.gpu.requestAdapter();
+        const adapter = await (navigator as any).gpu.requestAdapter();
         if (!adapter) {
             throw new Error('Failed to get GPU adapter');
         }
@@ -99,7 +99,7 @@ export class WebGPUEvidenceGraph {
             throw new Error('Failed to get WebGPU context');
         }
 
-        const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+        const presentationFormat = (navigator as any).gpu.getPreferredCanvasFormat();
         this.context.configure({
             device: this.device,
             format: presentationFormat,

@@ -5,7 +5,7 @@
     (unified as any).auth ??
     (unified as any).authStore ??
     (unified as any).default ??
-    (unified as any),
+    (unified as any);
 
   import { goto } from '$app/navigation';
   import * as Button from '$lib/components/ui/button';

@@ -28,7 +28,7 @@
 
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D | null = null;
-	let autoencoder: NeuralSpriteAutoencoder;
+		let autoencoder: any;
 	let rooms = $state<MemoryPalaceRoom[]>([]);
 	let selectedRoom = $state<MemoryPalaceRoom | null>(null);
 	let glyphCache = new Map<string, ImageData>();
@@ -123,8 +123,8 @@
 		const latent = autoencoder.encode(pixelArray);
 
 		const priority = calculateDocumentPriority({
-			type: 'document',
-			urgency: 'normal',
+			type: 'evidence',
+			urgency: 'medium',
 			lastAccessed: new Date()
 		});
 

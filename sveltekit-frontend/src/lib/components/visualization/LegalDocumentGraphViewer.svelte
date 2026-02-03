@@ -114,7 +114,7 @@
     await graphEngine.initialize();
 
     // Initialize tensor store for advanced memory management
-    const adapter = await navigator.gpu.requestAdapter();
+    const adapter = await (navigator as any).gpu.requestAdapter();
     if (!adapter) throw new Error('No WebGPU adapter found');
     const device = await adapter.requestDevice();
 
