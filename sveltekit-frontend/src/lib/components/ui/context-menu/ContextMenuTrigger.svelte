@@ -17,7 +17,7 @@
 	function handleContextMenu(event: MouseEvent) {
 		event.preventDefault();
 		event.stopPropagation();
-		menuContext?.setPosition(event.clientX: event.clientY);
+		menuContext?.setPosition(event.clientX, event.clientY);
 		menuContext?.setOpen(true);
 	}
 </script>

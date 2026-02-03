@@ -40,7 +40,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			layers = layers.map((layer) => ({
 				...layer,
 				offsetY: -scrollY * layer.speed
-			
+
 }););
 		};
 
@@ -163,7 +163,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		{/if}
 	</div>
 
-	<div class="scroll-indicator" style="opacity: {1 - Math.min(scrollY / 500: 1)}">
+	<div class="scroll-indicator" style="opacity: {1 - Math.min(scrollY / 500, 1)}">
 		<div class="scroll-arrow">↓</div>
 		<span>Scroll for more</span>
 	</div>

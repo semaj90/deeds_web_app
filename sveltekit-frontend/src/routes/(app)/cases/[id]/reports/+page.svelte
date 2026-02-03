@@ -1,5 +1,7 @@
 <script lang="ts">
 
+	import TiptapWithAIAssistant from '$lib/components/editor/TiptapWithAIAssistant.svelte';
+
 	const { data } = $props();
 	const caseData = $derived(data?.caseData);
 	const reports = $derived(data?.reports);
@@ -189,49 +191,58 @@
 		</div>
 	{/if}
 
+
+
 	{#if showEditor}
 		<!-- Editor Modal -->
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
 			<div
-				class="w-full max-w-5xl h-[90vh] border border-amber-400/40 rounded-3xl
-                  bg-slate-950/95 shadow-2xl shadow-amber-500/20 flex flex-col"
+				class="w-full max-w-6xl h-[90vh] border border-amber-400/40 rounded-3xl
+                  bg-slate-950/95 shadow-2xl shadow-amber-500/20 p-6 space-y-4 flex flex-col"
 			>
-				<header class="flex items-center justify-between gap-2 p-4 border-b border-slate-800">
-					<div>
+				<header class="flex items-center justify-between gap-4">
+					<div class="flex-1">
 						<div class="text-[10px] uppercase tracking-[0.35em] text-amber-300">
-							{selectedReport ? 'Edit Report' : 'New Draft'}
+							{selectedReport ? 'Edit Report' : 'New Report'}
 						</div>
 						<input
 							type="text"
-							class="text-sm font-semibold text-slate-50 bg-transparent border-none outline-none"
+							class="text-lg font-semibold text-slate-50 bg-transparent border-0 border-b border-slate-700
+                         focus:border-amber-400/60 outline-none w-full"
 							value={selectedReport?.title || 'Untitled Report'}
+							oninput={(e) => {
+								if (selectedReport) {
+									selectedReport.title = e.currentTarget.value;
+								}
+							}}
 							placeholder="Report Title"
 						/>
 					</div>
 					<div class="flex gap-2">
 						<button
-							class="text-xs px-3 py-1 rounded-full border border-amber-400/80
-                       bg-amber-400/10 hover:bg-amber-400/20 disabled:opacity-50"
-							onclick={saveReport}
-							disabled={isSaving || !selectedReport?.id}
-						>
-							{isSaving ? 'Saving...' : 'Save'}
-						</button>
-						<button
-							class="text-xs px-2 py-1 rounded-full border border-slate-700
-                       hover:bg-slate-800/80"
+							class="text-xs px-3 py-1 rounded-full border border-slate-600
+                         hover:bg-slate-800/80"
 							onclick={closeEditor}
 						>
-							Close
+							Cancel
+						</button>
+						<button
+							class="text-xs px-3 py-1 rounded-full border border-amber-400/80
+                         bg-amber-400/10 hover:bg-amber-400/20"
+							onclick={saveReport}
+							disabled={isSaving}
+						>
+							{isSaving ? 'Saving...' : 'Save'}
 						</button>
 					</div>
 				</header>
 
-				<div class="flex-1 overflow-auto p-4">
-					<TipTapEditor
+				<div class="flex-1 overflow-auto">
+					<TiptapWithAIAssistant
 						bind:this={editorRef}
 						initialContent={editorContent}
-						onUpdate={(html, json) => {
+						placeholder="Start writing your report..."
+						onUpdate={(html) => {
 							editorContent = html;
 						}}
 					/>

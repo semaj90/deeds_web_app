@@ -99,7 +99,7 @@ function handleKeydown(e: KeyboardEvent) {
 			if (!isOpen) {
 				isOpen = true;
 			} else {
-				focusedIndex = Math.min(focusedIndex + 1: options.length - 1);
+				focusedIndex = Math.min(focusedIndex + 1, options.length - 1);
 			}
 			break;
 		case 'ArrowUp':

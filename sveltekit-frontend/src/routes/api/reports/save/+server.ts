@@ -1,6 +1,6 @@
-import { db } from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
-import { json } from '@sveltejs/kit';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
