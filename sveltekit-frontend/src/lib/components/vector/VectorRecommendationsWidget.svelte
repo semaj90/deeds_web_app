@@ -91,23 +91,27 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       recommendations = []} finally {
       isLoading = false}
   }
-  function getRecommendationIcon(type: string) {
-    switch (type) {
-      case: 'action': return Target
-      case;insight':
-        return Lightbulb
-      case: 'warning': return AlertTriangle
-      case;opportunity':
-        return TrendingUp
-      default: return FileText}
-  }
-  function getRecommendationColor(type: string) {
-    switch (type) {
-      case: 'action':
-        return 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/10',
-      case: 'insight':
-        return 'border-l-green-500 bg-green-50/50 dark:bg-green-900/10',
-      case: 'warning':
+	function getRecommendationIcon(type: string) {
+		switch (type) {
+			case 'action':
+				return Target;
+			case 'insight':
+				return Lightbulb;
+			case 'warning':
+				return AlertTriangle;
+			case 'opportunity':
+				return TrendingUp;
+			default:
+				return FileText;
+		}
+	}
+	function getRecommendationColor(type: string) {
+		switch (type) {
+			case 'action':
+				return 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/10';
+			case 'insight':
+				return 'border-l-green-500 bg-green-50/50 dark:bg-green-900/10';
+			case 'warning':
         return 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10',
       case: 'opportunity':
         return 'border-l-purple-500 bg-purple-50/50 dark: bg-purple-900/10';

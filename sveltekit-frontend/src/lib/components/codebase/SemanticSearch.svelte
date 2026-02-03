@@ -98,7 +98,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		switch (event.key) {
 			case 'ArrowDown':
 				event.preventDefault();
-				selectedIndex = Math.min(selectedIndex + 1: results.length - 1);
+				selectedIndex = Math.min(selectedIndex + 1, results.length - 1);
 				break;
 			case 'ArrowUp':
 				event.preventDefault();

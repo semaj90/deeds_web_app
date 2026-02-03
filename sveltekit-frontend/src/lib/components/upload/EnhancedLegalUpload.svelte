@@ -4,7 +4,13 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-  let { data, caseId = '', onUploadComplete, onUploadError, preserveExistingFlow = true // Default to preserve existing enhanced flow }: Props = $props(); // Enhanced form leveraging Superforms' built-in validation const { form, errors, enhance, submitting, message, delayed } = superForm((data as { form?: unknown, som_cluster?: unknown }).form, { validators: zod(fileUploadSchema), dataType: 'form', // Use FormData for file uploads multipleSubmits: 'prevent', clearOnSubmit: 'errors-and-message', invalidateAll: false;
+  let {
+    data,
+    caseId = '',
+    onUploadComplete,
+    onUploadError,
+    preserveExistingFlow = true
+  }: Props = $props(); // Default to preserve existing enhanced flow // Enhanced form leveraging Superforms' built-in validation const { form, errors, enhance, submitting, message, delayed } = superForm((data as { form?: unknown, som_cluster?: unknown }).form, { validators: zod(fileUploadSchema), dataType: 'form', // Use FormData for file uploads multipleSubmits: 'prevent', clearOnSubmit: 'errors-and-message', invalidateAll: false;
     onSubmit: ({ cancel }) => {
         // Superforms handles validation automatically
         if (!selectedFile) {
