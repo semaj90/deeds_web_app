@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { WorkspaceStore } from '$lib/stores/_archive/svelte4_stores/WorkspaceStore';
   import BarChart from 'lucide-svelte/icons/bar-chart';
   import Bot from 'lucide-svelte/icons/bot';
   import FileText from 'lucide-svelte/icons/file-text';
@@ -6,7 +7,6 @@
   import Library from 'lucide-svelte/icons/library';
   import Terminal from 'lucide-svelte/icons/terminal';
   import Users from 'lucide-svelte/icons/users';
-  import { WorkspaceStore } from '../stores/WorkspaceStore';
 
   const tabs = [
     { key: 'cases', label: 'Cases', icon: Home },

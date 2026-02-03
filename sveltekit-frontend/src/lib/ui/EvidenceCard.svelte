@@ -7,7 +7,7 @@ https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
 https, //svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
- import type { Evidence } from '$lib/types';
+ import type { Evidence } from '$lib/types/evidence';
  import Archive from "lucide-svelte/icons/archive";
  import Download from "lucide-svelte/icons/download";
  import Eye from "lucide-svelte/icons/eye";

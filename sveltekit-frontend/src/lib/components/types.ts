@@ -115,3 +115,30 @@ export interface RAGResult {
     score: number;
     metadata?: Record<string, unknown>;
 }
+
+// Fugitive Dex Person Interface (for PersonProfile and PersonStatsPanel components)
+export interface FugitiveDexPerson {
+	id: string;
+	name: string;
+	alias: string;
+	role: string;
+	status: string;
+	priority: string;
+	height: string;
+	age: number | string;
+	hair: string;
+	eyes: string;
+	modusOperandi: string;
+	lastSeen: string;
+	dangerLevel: number;
+	photo: string;
+	knownAssociates: string[];
+	knownHabits: string[];
+	attributes: {
+		stealth: number;
+		intelligence: number;
+		strength: number;
+		speed: number;
+		dangerousness: number;
+	};
+}
