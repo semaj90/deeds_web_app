@@ -281,12 +281,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 						</div>
 					{/if}
 
-					<!-- AI Suggestion -->
-					{#if aiSuggestion}
-						<div class="ai-suggestion nes-container is-rounded" transitionfly={{ y: 20, duration, 200 200 }}>
-							<h4 class="nes-text is-success">🤖 AI Suggestion</h4>
-							<div class="suggestion-content">
-								{@html aiSuggestion.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}
+				<!-- AI Suggestion -->
+				{#if aiSuggestion}
+					<div class="ai-suggestion nes-container is-rounded" transition:fly={{ y: 20, duration: 200 }}>
+						<h4 class="nes-text is-success">🤖 AI Suggestion</h4>
+						<div class="suggestion-content">
+							{@html aiSuggestion.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}
 							</div>
 						</div>
 					{/if}

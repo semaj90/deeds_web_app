@@ -19,15 +19,54 @@ interface Props {
 	loading?: boolean;
 	formApi?: any;
 	onsubmit?: (_event: {
-	values: { [key: string]: any },
-	isValid: boolean }) => void; onreset?: () => void; onchange?: (_event: {
-	values: { [key: string]: any } }) => void}
-  let { children, options = 0%, submitText = "Submit", submitVariant = "primary", showSubmitButton = true, submitFullWidth = false, resetText = "Reset", showResetButton = false, loading = false, formApi = $bindable(), // Make formApi bindable onsubmit, onreset, onchange, ...restProps }: Props = $props(); // Create form store const form = createFormStore({ ...options, onSubmit: async (values: Record<string, any>) => { onsubmit?.({ values, isValid: true }) if ((options as any).onSubmit) await (options as any).onSubmit(values) }
-  }) // Subscribe to form values for change events using $effect $effect(() => { if ($form.isDirty) { onchange?.({ values: $form.values })}
-  });
-  async function handleSubmit(_event: SubmitEvent): Promise<any> { _event.preventDefault();
-   const isValid = await form.submit(); if (!isValid) { notifications.error(
-        "Form validation failed",
+		values: { [key: string]: any },
+		isValid: boolean
+	}) => void;
+	onreset?: () => void;
+	onchange?: (_event: {
+		values: { [key: string]: any }
+	}) => void;
+}
+
+let {
+	children,
+	options = {},
+	submitText = "Submit",
+	submitVariant = "primary",
+	showSubmitButton = true,
+	submitFullWidth = false,
+	resetText = "Reset",
+	showResetButton = false,
+	loading = false,
+	formApi = $bindable(),
+	onsubmit,
+	onreset,
+	onchange,
+	...restProps
+}: Props = $props();
+
+// Create form store
+const form = createFormStore({
+	...options,
+	onSubmit: async (values: Record<string, any>) => {
+		onsubmit?.({ values, isValid: true });
+		if ((options as any).onSubmit) await (options as any).onSubmit(values);
+	}
+});
+
+// Subscribe to form values for change events using $effect
+$effect(() => {
+	if ($form.isDirty) {
+		onchange?.({ values: $form.values });
+	}
+});
+
+async function handleSubmit(_event: SubmitEvent): Promise<any> {
+	_event.preventDefault();
+	const isValid = await form.submit();
+	if (!isValid) {
+		notifications.error(
+			"Form validation failed",
         "Please correct the errors and try again."
       )}}
   function handleReset() { form.reset(); onreset?.()}

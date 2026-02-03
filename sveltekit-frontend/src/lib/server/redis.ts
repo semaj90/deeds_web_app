@@ -19,6 +19,10 @@ export const redis = new IORedis(REDIS_URL, {
 redis.on('connect', () => console.log('📡 Redis connected'));
 redis.on('error', (err: Error) => console.warn('⚠️ Redis error:', err.message));
 
+export function createRedisInstance(options: IORedis.RedisOptions) {
+	return new IORedis(options);
+}
+
 export function createRedisConnection() {
 	return new IORedis(REDIS_URL, {
 		maxRetriesPerRequest: 1,

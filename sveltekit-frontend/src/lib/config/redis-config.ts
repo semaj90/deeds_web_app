@@ -25,7 +25,6 @@ export const REDIS_BASE_CONFIG: RedisOptions = {
     family: 4,
     // Performance optimization - reduced retries to prevent flooding
     maxRetriesPerRequest: 1,
-    retryDelayOnFailover: 100,
     enableReadyCheck: true,
     // Connection pooling for high concurrency
     maxLoadingTimeout: 5000

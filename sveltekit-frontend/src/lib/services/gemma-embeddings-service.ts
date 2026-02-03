@@ -5,7 +5,7 @@
 import { env } from '$env/dynamic/private';
 import { createServiceConfig } from '$lib/config/redis-config';
 import { db } from '$lib/server/db/connection';
-import createRedisInstance from '$lib/server/redis';
+import { createRedisInstance } from '$lib/server/redis';
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
 import { createHash } from 'crypto';
 import { sql } from 'drizzle-orm';
@@ -433,7 +433,7 @@ class GemmaEmbeddingsService {
                 FROM embeddings
                 WHERE text_hash = ${textHash}
                 LIMIT 1
-            `);
+            `) as any;
 
             if (result.length === 0) return null;
 
