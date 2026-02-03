@@ -7,7 +7,6 @@
 
 	// Migrated to $effect
 	import { fade, fly } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	const { routePath = null, onClose = () => {} } = $props<{
 		routePath?: string | null;
@@ -37,9 +36,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	let errors: Phase72Error[] = [];
-	let stats: StatsSummary, null = null;
+	let stats: StatsSummary | null = null;
 	let loading = true;
-	let selectedError: Phase72Error, null = null;
+	let selectedError: Phase72Error | null = null;
 	let similarErrors: any[] = [];
 	let aiSuggestion = '';
 	let streamingFix = false;

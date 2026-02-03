@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/ui/button';
+	import Button from '$lib/components/ui/button/Button.svelte';
 	import Camera from 'lucide-svelte/icons/camera';
 	import Upload from 'lucide-svelte/icons/upload';
 
