@@ -212,7 +212,7 @@
 							value={selectedReport?.title || 'Untitled Report'}
 							oninput={(e) => {
 								if (selectedReport) {
-									selectedReport.title = e.currentTarget.value;
+									selectedReport.title = (e.currentTarget as HTMLInputElement).value;
 								}
 							}}
 							placeholder="Report Title"

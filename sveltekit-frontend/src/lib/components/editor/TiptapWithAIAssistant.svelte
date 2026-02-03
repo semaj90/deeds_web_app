@@ -55,35 +55,33 @@ ordered: editor?.isActive('orderedList') ?? false,
 });
 
 $effect(() => {
-if (!element) return;
+	if (!element) return;
 
-editor = new Editor({
-element,
-editable: !readOnly,
-extensions: [
-StarterKit,
-Placeholder.configure({ placeholder })
-],
-content: initialContent,
-onUpdate: ({ editor }) => {
-const text = editor.getText();
-wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+	editor = new Editor({
+		element,
+		editable: !readOnly,
+		extensions: [
+			StarterKit,
+			Placeholder.configure({ placeholder })
+		],
+		content: initialContent,
+		onUpdate: ({ editor }) => {
+			const text = editor.getText();
+			wordCount = text.trim().split(/\s+/).filter(Boolean).length;
 
-				// Debounced autosave
-				if (onAutoSave) {
-					// In a real app, debounce this
-					onAutoSave(editor.getHTML());
-				}
-				if (onUpdate) {
-					onUpdate(editor.getHTML());
-				}
+			// Debounced autosave
+			if (onAutoSave) {
+				onAutoSave(editor.getHTML());
 			}
-}
-});
+			if (onUpdate) {
+				onUpdate(editor.getHTML());
+			}
+		}
+	});
 
-return () => {
-editor?.destroy();
-};
+	return () => {
+		editor?.destroy();
+	};
 });
 
 async function handleSave() {
