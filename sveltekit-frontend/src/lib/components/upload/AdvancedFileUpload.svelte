@@ -1,15 +1,21 @@
 <script lang="ts">
-import * as Lucide from 'lucide-svelte';
+import AlertCircle from 'lucide-svelte/icons/alert-circle';
+import Camera from 'lucide-svelte/icons/camera';
+import FileIcon from 'lucide-svelte/icons/file';
+import ImageIcon from 'lucide-svelte/icons/image';
+import Loader2 from 'lucide-svelte/icons/loader-2';
+import Upload from 'lucide-svelte/icons/upload';
+import X from 'lucide-svelte/icons/x';
 import { onDestroy } from 'svelte';
 import { fly, slide } from 'svelte/transition';
-const {
-    Upload, X, File: FileIcon, Image: ImageIcon,
-    Mic, Camera, CheckCircle, AlertCircle, Loader2,
-    Trash2, Play, Pause, Square
-} = Lucide;
 
 import Button from '$lib/components/ui/button/Button.svelte';
-import { Card } from '$lib/components/ui/card';
+import Card from '$lib/components/ui/card/Card.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardDescription from '$lib/components/ui/card/CardDescription.svelte';
+import CardFooter from '$lib/components/ui/card/CardFooter.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 import { Progress } from '$lib/components/ui/progress';
 import { ScrollArea } from '$lib/components/ui/scroll-area';
 

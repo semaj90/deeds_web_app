@@ -2,30 +2,36 @@
 import { Editor } from '@tiptap/core';
 import Placeholder from '@tiptap/extension-placeholder';
 import StarterKit from '@tiptap/starter-kit';
-import * as Lucide from 'lucide-svelte';
+import Bold from 'lucide-svelte/icons/bold';
+import Check from 'lucide-svelte/icons/check';
+import Heading1 from 'lucide-svelte/icons/heading-1';
+import Heading2 from 'lucide-svelte/icons/heading-2';
+import Italic from 'lucide-svelte/icons/italic';
+import List from 'lucide-svelte/icons/list';
+import ListOrdered from 'lucide-svelte/icons/list-ordered';
+import Loader2 from 'lucide-svelte/icons/loader-2';
+import Save from 'lucide-svelte/icons/save';
+import Wand2 from 'lucide-svelte/icons/wand-2';
 import { slide } from 'svelte/transition';
-const {
-    Bold, Italic, List, ListOrdered,
-    Heading1, Heading2, Wand2, Save,
-    Loader2, Check, X, FileText
-} = Lucide;
 
 import Button from '$lib/components/ui/button/Button.svelte';
 
 interface Props {
-initialContent?: string;
-placeholder?: string;
-readOnly?: boolean;
-onSave?: (content: string) => Promise<void>;
-onAutoSave?: (content: string) => void;
+	initialContent?: string;
+	placeholder?: string;
+	readOnly?: boolean;
+	onSave?: (content: string) => Promise<void>;
+	onAutoSave?: (content: string) => void;
+	onUpdate?: (content: string) => void;
 }
 
 let {
-initialContent = '',
-placeholder = 'Write something amazing...',
-readOnly = false,
-onSave,
-onAutoSave
+	initialContent = '',
+	placeholder = 'Write something amazing...',
+	readOnly = false,
+	onSave,
+	onAutoSave,
+	onUpdate
 }: Props = $props();
 
 // State
@@ -63,11 +69,15 @@ onUpdate: ({ editor }) => {
 const text = editor.getText();
 wordCount = text.trim().split(/\s+/).filter(Boolean).length;
 
-// Debounced autosave
-if (onAutoSave) {
-// In a real app, debounce this
-onAutoSave(editor.getHTML());
-}
+				// Debounced autosave
+				if (onAutoSave) {
+					// In a real app, debounce this
+					onAutoSave(editor.getHTML());
+				}
+				if (onUpdate) {
+					onUpdate(editor.getHTML());
+				}
+			}
 }
 });
 

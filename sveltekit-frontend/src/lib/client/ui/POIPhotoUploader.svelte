@@ -2,8 +2,6 @@
 	import Button from '$lib/components/ui/button';
 	import Camera from 'lucide-svelte/icons/camera';
 	import Upload from 'lucide-svelte/icons/upload';
-	import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean;
 	onUpload: (data: any) => void; onError: (error: any) => void }>();
@@ -80,15 +78,22 @@
 <div class="w-full">
  <!-- Drop Zone -->
  <div
- class="relative border-2 border-dashed rounded-lg p-8 text-center transition-colors"
- class:border-gray-300={!dragging && !disabled}; class:border-blue-500={dragging && !disabled}; class:border-gray-200={ disabled }; class:bg-gray-50={dragging && !disabled}; class:bg-gray-100={ disabled }
- role="button"
- tabindex="0"
- aria-label="Drop zone for POI photos"
- ondragover={(e) => { e.preventDefault(); if (!disabled && !uploading) dragging = true }}
- ondragleave={() => dragging = false}
- ondrop={handleDrop}
- >
+    class="relative border-2 border-dashed rounded-lg p-8 text-center transition-colors"
+    class:border-gray-300={!dragging && !disabled}
+    class:border-blue-500={dragging && !disabled}
+    class:border-gray-200={disabled}
+    class:bg-gray-50={dragging && !disabled}
+    class:bg-gray-100={disabled}
+    role="button"
+    tabindex="0"
+    aria-label="Drop zone for POI photos"
+    ondragover={(e) => {
+      e.preventDefault();
+      if (!disabled && !uploading) dragging = true;
+    }}
+    ondragleave={() => (dragging = false)}
+    ondrop={handleDrop}
+  >
  {#if uploading}
  <div class="flex flex-col items-center gap-4">
  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
