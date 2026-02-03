@@ -91,18 +91,29 @@ const file = input.files?.[0];
       {message}
     </div>
   {/if}
-<div class="flex items-center"> <!-- Avatar, Display --> <div class="relative"> <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full flex items-center justify-center"> {#if preview}
-<img src={
-preview }
-alt="Avatar preview" class="w-full h-full" /> {:else}
-<div class="text-white">ðŸ‘¤{/if}
-</div> <button onclick={
-triggerUpload }
-disabled={
-uploading }
-class="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled, opacity-50"
+  <div class="flex items-center">
+    <div class="relative">
+      <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full flex items-center justify-center">
+        {#if preview}
+          <img src={preview} alt="Avatar preview" class="w-full h-full" />
+        {:else}
+          <div class="text-white">👤</div>
+        {/if}
+      </div>
+      <button
+        onclick={triggerUpload}
+        disabled={uploading}
+        class="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50"
         title="Change avatar"
-      > <Camera class="w-4" /> </button> </div> <!-- Upload, Info --> <div class="flex-1"> <p class="text-sm text-gray-600"> Upload a profile picture (JPEG or PNG, max 2MB) </p> <Button onclick={
+      >
+        <Camera class="w-4" />
+      </button>
+    </div>
+    <div class="flex-1">
+      <p class="text-sm text-gray-600">
+        Upload a profile picture (JPEG or PNG, max 2MB)
+      </p>
+      <Button onclick={triggerUpload}
 triggerUpload }
 disabled={
 uploading }

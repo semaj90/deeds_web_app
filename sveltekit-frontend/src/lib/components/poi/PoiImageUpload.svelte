@@ -15,10 +15,25 @@ import X from 'lucide-svelte/icons/x';
     // Validate file size (5MB max for POI images) if (file.size > 5 * 1024 * 1024) { message = 'File is too large. Maximum 5MB allowed.'; messageType = 'error'; return}
 
     // Show preview const reader = new FileReader(); reader.onload = (e) => { preview = e.target?.result as string}; reader.readAsDataURL(file); // Upload file await uploadImage(file)}
-  async function uploadImage(file: File): Promise<any> { try { uploading = true; message = '';
-   const formData = new FormData(); formData.append('file', file); formData.append('poiId', poiId);
-   const response = await fetch('/api/poi/image', { method: 'POST', body: formData });
-   const data = await response.json(); if (response.ok) { message = `Image uploaded successfully for ${ poiName }`; messageType = 'success'; // Reset input if (fileInput) fileInput.value = ''; // Emit event or callback could be added here for parent component onUploadComplete?.(data)} else { message = data.error?.message ?? 'Upload failed'; messageType = 'error'; preview = currentImage || ''}
+  async function uploadImage(file: File): Promise<any> {
+    try {
+      uploading = true;
+      message = '';
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('poiId', poiId);
+      const response = await fetch('/api/poi/image', { method: 'POST', body: formData });
+      const data = await response.json();
+      if (response.ok) {
+        message = `Image uploaded successfully for ${poiName}`;
+        messageType = 'success';
+        if (fileInput) fileInput.value = '';
+        onUploadComplete?.(data);
+      } else {
+        message = data.error?.message ?? 'Upload failed';
+        messageType = 'error';
+        preview = currentImage || '';
+      }
     } catch (error) {
       message = 'Failed to upload image';
       messageType = 'error';
