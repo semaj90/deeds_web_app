@@ -13,7 +13,7 @@ export const uploadSchema = z.object({
     file: z
         .instanceof(File, { message: 'Please upload a file.' })
         .refine((file) => file.size <= MAX_FILE_SIZE, {
-            message: \File size must be less than or equal to \MB.\,
+            message: 'File size must be less than or equal to 10MB.',
         })
         .refine((file) => ALLOWED_FILE_TYPES.includes(file.type), {
             message: 'Invalid file type. Only JPEG, PNG, WEBP, GIF, and PDF are allowed.',

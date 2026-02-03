@@ -11,7 +11,6 @@
 	 * Features: Zoom, pan, node interaction, filtering
 	 */
 	import { browser } from '$app/environment';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	// Props
@@ -273,21 +272,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	function zoomIn() {
 		if (!d3Module || !svg) return;
 		d3Module.select(svg).transition().call(
-			d3Module.zoom().scaleBy: 1.3
+			d3Module.zoom().scaleBy, 1.3
 		);
 	}
 
 	function zoomOut() {
 		if (!d3Module || !svg) return;
 		d3Module.select(svg).transition().call(
-			d3Module.zoom().scaleBy: 0.7
+			d3Module.zoom().scaleBy, 0.7
 		);
 	}
 
 	function resetZoom() {
 		if (!d3Module || !svg) return;
 		d3Module.select(svg).transition().call(
-			d3Module.zoom().transform: d3Module.zoomIdentity
+			d3Module.zoom().transform, d3Module.zoomIdentity
 		);
 	}
 </script>

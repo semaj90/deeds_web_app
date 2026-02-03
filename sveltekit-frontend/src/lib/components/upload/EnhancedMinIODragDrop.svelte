@@ -4,15 +4,14 @@ import { CONFIG } from '$lib/config/production-config';
 import { cn } from '$lib/utils';
 import AlertCircle from 'lucide-svelte/icons/alert-circle';
 import Check from 'lucide-svelte/icons/check';
-import File from 'lucide-svelte/icons/file';
 import Upload from 'lucide-svelte/icons/upload';
 import X from 'lucide-svelte/icons/x';
 import Zap from 'lucide-svelte/icons/zap';
 
 interface UploadFile {
-id: string;
-file: File;
-progress: number;
+	id: string;
+	file: File;
+	progress: number;
 status: 'pending' | 'uploading' | 'completed' | 'error';
 minioPath?: string;
 cudaProcessed?: boolean;
@@ -220,7 +219,7 @@ Max file size: {Math.round(maxFileSize / 1024 / 1024)}MB
 {#each files as file (file.id)}
 <div class="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border">
 <div class="p-2 bg-background rounded border">
-<File class="h-4 w-4" />
+							<FileIcon class="h-4 w-4" />
 </div>
 
 <div class="flex-1 min-w-0">
