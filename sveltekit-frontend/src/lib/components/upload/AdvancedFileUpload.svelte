@@ -1,19 +1,17 @@
 <script lang="ts">
-import { onMount, onDestroy } from 'svelte';
-import { fade, fly, slide } from 'svelte/transition';
-import { quintOut } from 'svelte/easing';
-import { 
-Upload, X, File as FileIcon, Image as ImageIcon, 
-Mic, Camera, CheckCircle, AlertCircle, Loader2,
-Trash2, Play, Pause, Square
-} from 'lucide-svelte';
+import * as Lucide from 'lucide-svelte';
+import { onDestroy } from 'svelte';
+import { fly, slide } from 'svelte/transition';
+const {
+    Upload, X, File: FileIcon, Image: ImageIcon,
+    Mic, Camera, CheckCircle, AlertCircle, Loader2,
+    Trash2, Play, Pause, Square
+} = Lucide;
 
 import Button from '$lib/components/ui/button/Button.svelte';
-import * as Card from '$lib/components/ui/card';
+import { Card } from '$lib/components/ui/card';
 import { Progress } from '$lib/components/ui/progress';
-import { Badge } from '$lib/components/ui/badge';
 import { ScrollArea } from '$lib/components/ui/scroll-area';
-import { Label } from '$lib/components/ui/label';
 
 // Props interface
 interface Props {
@@ -24,12 +22,12 @@ onUpload?: (files: File[]) => Promise<void>;
 class?: string;
 }
 
-let { 
-acceptedTypes = ['*'], 
+let {
+acceptedTypes = ['*'],
 maxSize = 10 * 1024 * 1024, // 10MB
 multiple = true,
 onUpload,
-class: className = '' 
+class: className = ''
 }: Props = $props();
 
 // State
@@ -210,21 +208,21 @@ if (audioUrl) URL.revokeObjectURL(audioUrl);
 </script>
 
 <div class={`w-full max-w-3xl mx-auto ${className}`}>
-<Card.Root>
-<Card.Header>
-<Card.Title class="flex items-center justify-between">
+<Card>
+<CardHeader>
+<CardTitle class="flex items-center justify-between">
 <span>Upload Documents</span>
 <div class="flex gap-2">
-<Button 
-variant={activeTab === 'drop' ? 'default' : 'outline'} 
+<Button
+variant={activeTab === 'drop' ? 'default' : 'outline'}
 size="sm"
 onclick={() => { stopMedia(); activeTab = 'drop'; }}
 >
 <FileIcon class="w-4 h-4 mr-2" />
 Files
 </Button>
-<Button 
-variant={activeTab === 'camera' ? 'default' : 'outline'} 
+<Button
+variant={activeTab === 'camera' ? 'default' : 'outline'}
 size="sm"
 onclick={() => startCamera()}
 >
@@ -232,13 +230,13 @@ onclick={() => startCamera()}
 Camera
 </Button>
 </div>
-</Card.Title>
-<Card.Description>
+</CardTitle>
+<CardDescription>
 Drag and drop files here, or use your camera/microphone.
-</Card.Description>
-</Card.Header>
+</CardDescription>
+</CardHeader>
 
-<Card.Content>
+<CardContent>
 {#if activeTab === 'drop'}
 <div
 role="region"
@@ -261,10 +259,10 @@ ondrop={handleDrop}
 <p class="text-sm font-medium">
 <span class="text-primary cursor-pointer hover:underline">
 Click to upload
-<input 
-type="file" 
-class="sr-only" 
-multiple={multiple} 
+<input
+type="file"
+class="sr-only"
+multiple={multiple}
 accept={acceptedTypes.join(',')}
 onchange={handleFileInput}
 />
@@ -311,7 +309,7 @@ Capture
 <ScrollArea class="h-[200px] w-full rounded-md border p-4">
 <div class="space-y-3">
 {#each files as file, i (file.name + i)}
-<div 
+<div
 class="flex items-center gap-3 p-3 bg-muted/30 rounded-lg group hover:bg-muted/50 transition-colors"
 in:fly={{ y: 20, duration: 300, delay: i * 50 }}
 out:slide
@@ -331,8 +329,8 @@ out:slide
 </p>
 </div>
 
-<Button 
-variant="ghost" 
+<Button
+variant="ghost"
 size="icon"
 class="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 text-muted-foreground hover:text-destructive"
 onclick={() => removeFile(i)}
@@ -355,18 +353,18 @@ onclick={() => removeFile(i)}
 {/if}
 </div>
 {/if}
-</Card.Content>
+</CardContent>
 
-<Card.Footer class="justify-end gap-3 border-t bg-muted/5 p-6 mt-4">
-<Button 
-variant="outline" 
-disabled={files.length === 0 || isUploading} 
+<CardFooter class="justify-end gap-3 border-t bg-muted/5 p-6 mt-4">
+<Button
+variant="outline"
+disabled={files.length === 0 || isUploading}
 onclick={() => { files = []; error = null; }}
 >
 Clear All
 </Button>
-<Button 
-disabled={files.length === 0 || isUploading} 
+<Button
+disabled={files.length === 0 || isUploading}
 onclick={handleUpload}
 class="min-w-[100px]"
 >
@@ -378,6 +376,6 @@ Uploading
 Upload Files
 {/if}
 </Button>
-</Card.Footer>
-</Card.Root>
+</CardFooter>
+</Card>
 </div>

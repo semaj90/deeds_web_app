@@ -1,17 +1,16 @@
 <script lang="ts">
-import { onMount, onDestroy } from 'svelte';
 import { Editor } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import { fade, slide } from 'svelte/transition';
-import { 
-Bold, Italic, List, ListOrdered, 
-Heading1, Heading2, Wand2, Save,
-Loader2, Check, X, FileText
-} from 'lucide-svelte';
+import StarterKit from '@tiptap/starter-kit';
+import * as Lucide from 'lucide-svelte';
+import { slide } from 'svelte/transition';
+const {
+    Bold, Italic, List, ListOrdered,
+    Heading1, Heading2, Wand2, Save,
+    Loader2, Check, X, FileText
+} = Lucide;
 
 import Button from '$lib/components/ui/button/Button.svelte';
-import { Badge } from '$lib/components/ui/badge';
 
 interface Props {
 initialContent?: string;
@@ -21,8 +20,8 @@ onSave?: (content: string) => Promise<void>;
 onAutoSave?: (content: string) => void;
 }
 
-let { 
-initialContent = '', 
+let {
+initialContent = '',
 placeholder = 'Write something amazing...',
 readOnly = false,
 onSave,
@@ -117,7 +116,7 @@ return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 <!-- Toolbar -->
 {#if !readOnly}
 <div class="border-b bg-muted/40 p-2 flex items-center gap-1 flex-wrap">
-<Button variant="ghost" size="icon" 
+<Button variant="ghost" size="icon"
 class={isActive.bold ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleBold().run()}
 >
@@ -162,7 +161,7 @@ onclick={() => editor?.chain().focus().toggleOrderedList().run()}
 
 <div class="flex-1"></div>
 
-<Button variant="outline" size="sm" 
+<Button variant="outline" size="sm"
 class="gap-2 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/10"
 onclick={() => showAiMenu = !showAiMenu}
 >
@@ -170,7 +169,7 @@ onclick={() => showAiMenu = !showAiMenu}
 AI Assistant
 </Button>
 
-<Button variant="default" size="sm" 
+<Button variant="default" size="sm"
 class="gap-2 min-w-[100px]"
 onclick={handleSave}
 disabled={isSaving}
@@ -190,8 +189,8 @@ Save
 {#if showAiMenu}
 <div class="bg-indigo-950/30 border-b border-indigo-500/20 p-3" transition:slide>
 <div class="flex gap-2">
-<input 
-type="text" 
+<input
+type="text"
 class="flex-1 bg-background border rounded-md px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
 placeholder="Ask AI to draft a section, summarize, or improved phrasing..."
 bind:value={aiPrompt}

@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/client';
 import { cases, evidence, personsOfInterest, reports } from '$lib/server/db/schema';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {

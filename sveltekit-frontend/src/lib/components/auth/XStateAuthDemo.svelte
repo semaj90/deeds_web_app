@@ -5,7 +5,7 @@ import Shield from 'lucide-svelte/icons/shield';
 import CheckCircle from 'lucide-svelte/icons/check-circle';
 import AlertCircle from 'lucide-svelte/icons/alert-circle';
 import Loader2 from 'lucide-svelte/icons/loader-2';
-import User from 'lucide-svelte/icons/user';
+import UserIcon from 'lucide-svelte/icons/user';
 import MessageCircle from 'lucide-svelte/icons/message-circle';
 import Settings from 'lucide-svelte/icons/settings';
 import LogOut from 'lucide-svelte/icons/log-out';

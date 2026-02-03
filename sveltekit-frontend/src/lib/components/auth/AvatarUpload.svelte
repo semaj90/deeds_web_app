@@ -1,9 +1,9 @@
-<script lang="ts"> import {
-updateUserProfile }
-from '$lib/stores/user';
-import  Button  from "$lib/components/ui/button/Button.svelte";
-import Upload from 'lucide-svelte/icons/upload';
+<script lang="ts"> import Button from "$lib/components/ui/button/Button.svelte";
+import {
+  updateUserProfile
+} from '$lib/stores/user';
 import Camera from 'lucide-svelte/icons/camera';
+import Upload from 'lucide-svelte/icons/upload';
 interface Props {
 userId?: string;
 currentAvatar?: string}
@@ -17,54 +17,80 @@ let preview = $state(currentAvatar || '');
 async function handleFileSelect(event: Event): Promise<any> {
 const input = event.target as HTMLInputElement;
 const file = input.files?.[0];
-if (!file) return;
-// Validate file type if (!['image/jpeg', 'image/png'].includes(file.type)) {
-message = 'Only JPEG and PNG files are allowed';
-messageType = 'error';
-return}
-    // Validate file size (2MB max) if (file.size > 2 * 1024 * 1024) {
-message = 'File is too large. Maximum 2MB allowed.';
-messageType = 'error';
-return}
-    // Show preview const reader = new FileReader();
-reader.onload = (e) => {
-preview = e.target?.result as string};
-reader.readAsDataURL(file);
-// Upload file await uploadAvatar(file)}
-  async function uploadAvatar(file: File): Promise<any> {
-try {
-uploading = true;
-message = '';
-const formData = new FormData();
-formData.append('file', file);
-const response = await fetch('/api/auth/profile/avatar', {
-method: 'POST', body: formData });
-const data = await response.json();
-if (response.ok) {
-message = 'Avatar uploaded successfully!';
-messageType = 'success';
-updateUserProfile({
-avatarUrl: data.avatarUrl });
-// Reset input if (fileInput) fileInput.value = ''}
-else {
-message = data.error?.message ?? 'Upload failed';
-messageType = 'error';
-preview = currentAvatar || ''}
+    if (!file) return;
+
+    // Validate file type
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      message = 'Only JPEG and PNG files are allowed';
+      messageType = 'error';
+      return;
     }
-catch (error) {
-message = 'Failed to upload avatar';
-messageType = 'error';
-preview = currentAvatar || ''}
-finally {
-uploading = false}
+
+    // Validate file size (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+      message = 'File is too large. Maximum 2MB allowed.';
+      messageType = 'error';
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      preview = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+
+    // Upload file
+    await uploadAvatar(file);
   }
-function triggerUpload() {
-fileInput?.click()}
-</script> <div class="space-y-4"> <h3 class="text-lg font-semibold">Profile Picture</h3> {#if message}
-<div class="p-3 rounded text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700', 'bg-red-50 border border-red-200"
-    > {
-message }
-{/if}
+
+  async function uploadAvatar(file: File): Promise<any> {
+    try {
+      uploading = true;
+      message = '';
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch('/api/auth/profile/avatar', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      if (response.ok) {
+        message = 'Avatar uploaded successfully!';
+        messageType = 'success';
+        updateUserProfile({ avatarUrl: data.avatarUrl });
+        // Reset input
+        if (fileInput) fileInput.value = '';
+      } else {
+        message = data.error?.message ?? 'Upload failed';
+        messageType = 'error';
+        preview = currentAvatar || '';
+      }
+    } catch (error) {
+      message = 'Failed to upload avatar';
+      messageType = 'error';
+      preview = currentAvatar || '';
+    } finally {
+      uploading = false;
+    }
+  }
+
+  function triggerUpload() {
+    fileInput?.click();
+  }
+</script>
+
+<div class="space-y-4">
+  <h3 class="text-lg font-semibold">Profile Picture</h3>
+  {#if message}
+    <div
+      class="p-3 rounded text-sm {messageType === 'success'
+        ? 'bg-green-50 border border-green-200 text-green-700'
+        : 'bg-red-50 border border-red-200 text-red-700'}"
+    >
+      {message}
+    </div>
+  {/if}
 <div class="flex items-center"> <!-- Avatar, Display --> <div class="relative"> <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full flex items-center justify-center"> {#if preview}
 <img src={
 preview }

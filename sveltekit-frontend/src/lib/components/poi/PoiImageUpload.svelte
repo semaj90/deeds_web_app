@@ -19,14 +19,34 @@ import X from 'lucide-svelte/icons/x';
    const formData = new FormData(); formData.append('file', file); formData.append('poiId', poiId);
    const response = await fetch('/api/poi/image', { method: 'POST', body: formData });
    const data = await response.json(); if (response.ok) { message = `Image uploaded successfully for ${ poiName }`; messageType = 'success'; // Reset input if (fileInput) fileInput.value = ''; // Emit event or callback could be added here for parent component onUploadComplete?.(data)} else { message = data.error?.message ?? 'Upload failed'; messageType = 'error'; preview = currentImage || ''}
-    } catch (error) { message = 'Failed to upload image'; messageType = 'error'; preview = currentImage || ''} finally { uploading = false}
+    } catch (error) {
+      message = 'Failed to upload image';
+      messageType = 'error';
+      preview = currentImage || '';
+    } finally {
+      uploading = false;
+    }
   }
-  function triggerUpload() { fileInput?.click()}
-  function clearPreview() { preview = ''; if (fileInput) fileInput.value = ''}
+  function triggerUpload() {
+    fileInput?.click();
+  }
+  function clearPreview() {
+    preview = '';
+    if (fileInput) fileInput.value = '';
+  }
 </script>
- <div class="space-y-4"> <h3 class="text-lg font-semibold">Photo</h3>
-  {#if message} <div class="p-3 rounded text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700', 'bg-red-50 border border-red-200"
-    > { message } {/if}
+
+<div class="space-y-4">
+  <h3 class="text-lg font-semibold">Photo</h3>
+  {#if message}
+    <div
+      class="p-3 rounded text-sm {messageType === 'success'
+        ? 'bg-green-50 border border-green-200 text-green-700'
+        : 'bg-red-50 border border-red-200 text-red-700'}"
+    >
+      {message}
+    </div>
+  {/if}
   <div class="flex items-center"> <!-- Image, Display --> <div class="relative"> <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-lg flex items-center justify-center overflow-hidden border-2">
   {#if preview} <img src={ preview } alt="{ poiName } preview" class="w-full h-full" /> {:else} <div class="text-white">ðŸ‘¤{/if}
   </div>
