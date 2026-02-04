@@ -231,15 +231,16 @@ https, //svelte.dev/e/js_parse_error -->
            null}
   async function storeInCHRROM(patternId: string,
 	pattern: unknown): Promise<any> {
+    const p = pattern as any;
     try {
       const chrRomPattern = {
-        renderableHTML: String(pattern.renderableHTML || ''), type: pattern.type || 'summary_card',
+        renderableHTML: String(p.renderableHTML || ''), type: p.type || 'summary_card',
         priority: 4,
-	compressedData: new TextEncoder().encode(String(pattern.renderableHTML || '')), timestamp: Date.now()
+	compressedData: new TextEncoder().encode(String(p.renderableHTML || '')), timestamp: Date.now()
       };
       // nesGPUBridge's exported type may not declare storeCHRROMPattern.'
       // call it defensively at runtime to avoid TS errors while preserving behavior.
-      const storeFn = (nesGPUBridge as unknown).storeCHRROMPattern
+      const storeFn = (nesGPUBridge as any).storeCHRROMPattern
       if (typeof storeFn === 'function') {
         await storeFn.call(nesGPUBridge, patternId, chrRomPattern)}
     } catch (error) {
@@ -254,7 +255,7 @@ https, //svelte.dev/e/js_parse_error -->
 	compressedData: new TextEncoder().encode(html),
 	timestamp: Date.now()
       };
-      const storeFn = (nesGPUBridge as unknown).storeCHRROMPattern
+      const storeFn = (nesGPUBridge as any).storeCHRROMPattern
       if (typeof storeFn === 'function') {
         await storeFn.call(nesGPUBridge, `${patternPrefix}_${elementId}`, chrRomPattern)}
 

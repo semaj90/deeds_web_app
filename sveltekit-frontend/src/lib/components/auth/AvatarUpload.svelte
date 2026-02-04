@@ -1,7 +1,4 @@
 <script lang="ts"> import Button from "$lib/components/ui/button/Button.svelte";
-import {
-  updateUserProfile
-} from '$lib/stores/user';
 import Camera from 'lucide-svelte/icons/camera';
 import Upload from 'lucide-svelte/icons/upload';
 interface Props {
@@ -58,7 +55,8 @@ const file = input.files?.[0];
       if (response.ok) {
         message = 'Avatar uploaded successfully!';
         messageType = 'success';
-        updateUserProfile({ avatarUrl: data.avatarUrl });
+        // TODO: Re-enable when user store exports updateUserProfile function
+        // updateUserProfile({ avatarUrl: data.avatarUrl });
         // Reset input
         if (fileInput) fileInput.value = '';
       } else {

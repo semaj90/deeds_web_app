@@ -3,7 +3,6 @@
 import Button from "$lib/components/ui/enhanced-bits.svelte";
 import { createFormStore, type FormOptions } from '$lib/stores/form';
 import { notifications } from '$lib/stores/unified';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface Props {
 	options?: FormOptions;
@@ -71,14 +70,88 @@ async function handleSubmit(_event: SubmitEvent): Promise<any> {
       )}}
   function handleReset() { form.reset(); onreset?.()}
 
-  // Update formApi when form changes using $effect $effect(() => { if (formApi !== undefined) { formApi = { setField: form.setField, touchField: form.touchField, validate: form.validate, submit: form.submit, reset: form.reset, addField: form.addField, removeField: form.removeField, values: form.values, errors: form.errors }
-    } }); </script> <form onsubmit={ handleSubmit } onreset={ handleReset } class={`space-y-6 ${restProps?.class ?? ''}`} novalidate={restProps?.novalidate} autocomplete={restProps?.autocomplete} {...restProps} >
-  <!-- Form, content --> {@render children?.({ form, formApi, values: $form.values, errors: $form.errors, isValid: $form.isValid, isDirty: $form.isDirty })} <!-- Form, actions --> {#if showSubmitButton || showResetButton} <div class="flex gap-3"> {#if showResetButton} <Button type="reset"
-          variant="secondary"
-          disabled={!$form.isDirty || $form.isSubmitting || loading} class={submitFullWidth ? "w-full", ""} >
-          { resetText } </Button> {/if} {#if showSubmitButton} <Button type="submit"
-          variant={ submitVariant } disabled={!$form.isValid} loading={$form.isSubmitting} class={submitFullWidth ? "w-full", ""} >
-          { submitText } </Button> {/if} {/if} <!-- Form, status --> {#if $form.submitCount > 0 && Object.keys($form.errors).length > 0} <div class="mt-4 p-4 bg-red-50 dark: bg-red-900/20 border border-red-200 dark: border-red-700"> <div class="flex items-start"> <div class="text-red-600 dark: text-red-400">âš </div> <div class="flex-1"> <h3 class="text-sm font-medium text-red-800 dark: text-red-200"> Please correct the following errors: </h3> <ul class="text-sm text-red-700 dark: text-red-300"> {#each Object.entries($form.errors) as [field, error]} <li class="list-disc">{ error }</li> {/each} </ul> </div> </div> {/if} </form>
+	// Update formApi when form changes using $effect
+	$effect(() => {
+		if (formApi !== undefined) {
+			formApi = {
+				setField: form.setField,
+				touchField: form.touchField,
+				validate: form.validate,
+				submit: form.submit,
+				reset: form.reset,
+				addField: form.addField,
+				removeField: form.removeField,
+				values: form.values,
+				errors: form.errors
+			}
+		}
+	});
+</script>
+
+<form
+	onsubmit={handleSubmit}
+	onreset={handleReset}
+	class={`space-y-6 ${restProps?.class ?? ''}`}
+	novalidate={restProps.novalidate}
+	autocomplete={restProps.autocomplete}
+	{...restProps}
+>
+	<!-- Form content -->
+	{@render children?.({
+		form,
+		formApi,
+		values: $form.values,
+		errors: $form.errors,
+		isValid: $form.isValid,
+		isDirty: $form.isDirty
+	})}
+
+	<!-- Form actions -->
+	{#if showSubmitButton || showResetButton}
+		<div class="flex gap-3">
+			{#if showResetButton}
+				<Button
+					type="reset"
+					variant="secondary"
+					disabled={!$form.isDirty || $form.isSubmitting || loading}
+					class={submitFullWidth ? "w-full" : ""}
+				>
+					{resetText}
+				</Button>
+			{/if}
+			{#if showSubmitButton}
+				<Button
+					type="submit"
+					variant={submitVariant}
+					disabled={!$form.isValid}
+					loading={$form.isSubmitting}
+					class={submitFullWidth ? "w-full" : ""}
+				>
+					{submitText}
+				</Button>
+			{/if}
+		</div>
+	{/if}
+
+	<!-- Form status -->
+	{#if $form.submitCount > 0 && Object.keys($form.errors).length > 0}
+		<div class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md">
+			<div class="flex items-start">
+				<div class="text-red-600 dark:text-red-400 mr-2">⚠️</div>
+				<div class="flex-1">
+					<h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+						Please correct the following errors:
+					</h3>
+					<ul class="text-sm text-red-700 dark:text-red-300 ml-4 list-disc">
+						{#each Object.entries($form.errors) as [field, error]}
+							<li>{error}</li>
+						{/each}
+					</ul>
+				</div>
+			</div>
+		</div>
+	{/if}
+</form>
 
 
 
