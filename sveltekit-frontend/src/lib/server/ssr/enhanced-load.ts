@@ -57,7 +57,7 @@ export const createEnhancedLayoutLoad = () => {
 
         try {
             // Check user session
-            let user = locals.user as User | null;
+            let user = locals.user as any | null;
             const session = locals.session;
 
             // --- START DEV_BYPASS_AUTH LOGIC ---
@@ -70,7 +70,7 @@ export const createEnhancedLayoutLoad = () => {
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     role: 'admin'
-                } as User;
+                } as any;
                 console.warn('DEV_BYPASS_AUTH is active. Using mock user for layout load.');
             }
             // --- END DEV_BYPASS_AUTH LOGIC ---
@@ -194,7 +194,7 @@ export const createEnhancedCasePageLoad = () => {
 
         try {
             // Ensure user is authenticated
-            const user = locals.user as User;
+            const user = locals.user as any;
             if (!user) {
                 throw CommonErrors.Unauthorized('Authentication required');
             }
@@ -255,7 +255,7 @@ export const createEnhancedCasePageLoad = () => {
 };
 
 // Helper function to create hydration context
-function createHydrationContext(url: URL, request: Request, user: User | null) {
+function createHydrationContext(url: URL, request: Request, user: any | null) {
     return {
         timestamp: new Date().toISOString(),
         route: url.pathname,

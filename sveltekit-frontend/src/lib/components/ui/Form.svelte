@@ -1,7 +1,7 @@
 <script lang="ts">
 // Svelte 5 runes are auto-imported
 import Button from "$lib/components/ui/enhanced-bits.svelte";
-import { createFormStore, type FormOptions } from '$lib/stores/form';
+import { createFormStore, type FormOptions } from '$lib/stores/form.svelte';
 import { notifications } from '$lib/stores/unified';
 
 interface Props {
@@ -25,6 +25,7 @@ interface Props {
 	onchange?: (_event: {
 		values: { [key: string]: any }
 	}) => void;
+	children?: any;
 }
 
 let {
