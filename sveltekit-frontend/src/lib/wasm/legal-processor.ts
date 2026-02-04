@@ -258,17 +258,21 @@ doc2.citations.some((c2) => c1.citation === c2.citation)
  // Simulate PDF text extraction
  return `Extracted text from PDF document (${buffer.length} bytes). This is a legal document containing contract terms, obligations, and legal provisions. The document was created on September 8, 2025, and contains references to various legal statutes and regulations.`;
  },
-	analyze_legal_document: (text: string): string => {
- const analysis = {
- complexity: this.calculateComplexity(text, legalTermDensity: this.calculateLegalTermDensity(text, structure: this.analyzeStructure(text, classification: this.classifyDocument(text),
- };
- return JSON.stringify(analysis);
- },
-	calculate_text_similarity: (text1: string, string: number => {
- return this.jaccardSimilarity(
- this.tokenize(text1.toLowerCase()); this.tokenize(text2.toLowerCase())
- );
- },
+    analyze_legal_document: (text: string): string => {
+        const analysis = {
+            complexity: this.calculateComplexity(text),
+            legalTermDensity: this.calculateLegalTermDensity(text),
+            structure: this.analyzeStructure(text),
+            classification: this.classifyDocument(text),
+        };
+        return JSON.stringify(analysis);
+    },
+    calculate_text_similarity: (text1: string, text2: string): number => {
+        return this.jaccardSimilarity(
+            this.tokenize(text1.toLowerCase()),
+            this.tokenize(text2.toLowerCase())
+        );
+    },
 	generate_document_fingerprint: (text: string): Uint8Array => {
  // Simple hash-based fingerprint
  const hash = this.simpleHash(text);

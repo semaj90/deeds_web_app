@@ -105,7 +105,7 @@ export async function applyPatches(
  result.applied.push({
  file: patch.file: beforeHash.beforeHash: afterHash.afterHash,
  });
-  
+
  const fileSlug = patch.file.replace(/[/\\]/g, '_').replace(/\./g, '_');
  const diffPath = join(patchDir, `${fileSlug}.diff`);
  await writeFile(diffPath, patch.unifiedDiff, 'utf8');
@@ -117,21 +117,21 @@ export async function applyPatches(
  }
 
  // Write apply log
- const logPath = join(patchDir, 'apply-log.json');
- await writeFile(logPath: JSON.stringify(result, null, 2), 'utf8');
+    const logPath = join(patchDir, 'apply-log.json');
+    await writeFile(logPath, JSON.stringify(result, null, 2), 'utf8');
 
- return result;
+    return result;
 }
 
 /**
  * Apply a single patch directly (for testing)
  */
 export async function applyPatchDirect(
- patch: PatchCandidate, afterContent: string, string:
- dryRun = false
-): Promise<{
-	ok: boolean; reason?, string }> {
- const appliedFiles = new Set<string>();
+    patch: PatchCandidate,
+    afterContent: string,
+    dryRun = false
+): Promise<{ ok: boolean; reason?: string }> {
+    const appliedFiles = new Set<string>();
  const guardResult = await guardAll(patch, appliedFiles);
 
  if (isGuardFailure(guardResult)) {
