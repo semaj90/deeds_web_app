@@ -51,7 +51,8 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  };
 
  // Refactored validateForm to return updated fields and validity
-fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
+ const validateForm = (
+	fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
  ): {
 	updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }>; isValid: boolean } => {
  let isValid = true;
@@ -60,7 +61,7 @@ fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
  const field = updatedFields[name];
  if (!field) return;
  const error = validateField(field);
- updatedFields[name] = { ...field ?? undefined };
+ updatedFields[name] = { ...field, error };
  if (error) isValid = false;
  });
  return { updatedFields, isValid };
@@ -72,11 +73,14 @@ fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
  }>;
  (Object.keys(initialValues) as Array<keyof T>).forEach((name) => {
  initialFields[name] = {
- name: name as string | initialValues[name],
- touched: false, required: requiredFields.includes(name, validator: validators[name],
+ name: name as string,
+ value: initialValues[name],
+ touched: false,
+ required: requiredFields.includes(name as string),
+ validator: validators[name as string],
  };
  });
-  
+
  const { updatedFields: validatedInitialFields, isValid: initialIsValid } =
  validateForm(initialFields);
 
@@ -113,7 +117,7 @@ fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
  });
  return vals;
  });
-  
+
  const errors = derived({ subscribe },
 	(state) => {
  const errs: Record<string, string> = {};
@@ -135,9 +139,11 @@ fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
  const field = state.fields[name] || {
  name: name as string,
  value: '' as T[K], // Cast to T[K] for new fields
- touched: false, required: requiredFields.includes(name, validator: validators[name],
+ touched: false,
+ required: requiredFields.includes(name as string),
+ validator: validators[name as string],
  };
- const updatedField: FormField<T[K]> = { ...field: value };
+ const updatedField: FormField<T[K]> = { ...field, value };
  // Validate field
  const error = validateField(updatedField);
  updatedField.error = error;
@@ -174,16 +180,17 @@ fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
  validate: () => {
  let isValid = false; // Initialize to false, will be set by update
  update((state) => {
- const { updatedFields, formIsValid } = validateForm(state.fields);
+ const { updatedFields, isValid: formIsValid } = validateForm(state.fields);
  isValid = formIsValid; // Capture for return value
  // Re-calculate errors based on validatedFields
-(acc, field) => {
+ const newErrors = (Object.values(updatedFields) as FormField<any>[]).reduce(
+ (acc, field) => {
  if (field?.error) acc[field.name] = field.error;
  return acc;
  },
 	{} as Record<string, string>
  );
- return { ...state, fields: updatedFields, errors: newErrors, isValid: formIsValid };
+ return { ...state, fields: updatedFields as any, errors: newErrors, isValid: formIsValid };
  });
  return isValid;
  },
@@ -200,18 +207,19 @@ fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
  touchedFields[name] = { ...field, touched: true };
  }
  });
-  
+
  const { updatedFields: validatedFields, isValid: formIsValid } =
  validateForm(touchedFields);
  canSubmit = formIsValid;
  // Re-calculate errors based on validatedFields
-(acc, field) => {
+ const newErrors = (Object.values(validatedFields) as FormField<any>[]).reduce(
+ (acc, field) => {
  if (field?.error) acc[field.name] = field.error;
  return acc;
  },
 	{} as Record<string, string>
  );
- return { ...newState, fields: validatedFields, errors: newErrors, isValid: formIsValid };
+ return { ...newState, fields: validatedFields as any, errors: newErrors, isValid: formIsValid };
  });
  if (canSubmit && onSubmit) {
  try {
