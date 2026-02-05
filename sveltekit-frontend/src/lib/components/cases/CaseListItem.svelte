@@ -7,7 +7,6 @@
   import Clock from "lucide-svelte/icons/clock";
   import FileText from "lucide-svelte/icons/file-text";
   import User from "lucide-svelte/icons/user";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface CaseData {
     id: string;
@@ -126,12 +125,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     <!-- Status and Priority Badges -->
     <div class="flex gap-2 flex-wrap">
-      <Badge variant="ghost">
+      <Badge variant="outline">
         <span class="px-2 py-1 rounded text-xs {getStatusColor(caseData.status)}">
           {caseData.status.replace('_', ' ')}
         </span>
       </Badge>
-      <Badge variant="ghost">
+      <Badge variant="outline">
         <span class="px-2 py-1 rounded text-xs {getPriorityColor(caseData.priority)}">
           {caseData.priority}
         </span>

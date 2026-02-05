@@ -13,7 +13,6 @@
   import Trash2 from 'lucide-svelte/icons/trash-2';
   import Users from 'lucide-svelte/icons/users';
   import { scale } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface CaseData {
     id: string;
@@ -115,7 +114,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       </div>
 
       <div class="flex items-center gap-2">
-        <Badge variant="ghost" class={currentStatus.class}>
+        <Badge variant="outline" class={currentStatus.class}>
           {#if currentStatus.icon}
             {@const StatusIcon = currentStatus.icon}
             <StatusIcon class="w-3 h-3 mr-1" />
