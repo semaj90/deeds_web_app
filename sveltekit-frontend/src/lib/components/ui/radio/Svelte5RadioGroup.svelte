@@ -1,12 +1,8 @@
 <script lang="ts">
-	let required = $state<any>(undefined);
-	let name = $state<any>(undefined);
-
 /**
  * Svelte 5 RadioGroup Component
  * Accessible radio button group with Svelte 5 runes
  */
-import type { Snippet } from 'svelte';
 
 interface RadioOption {
 	value: string;

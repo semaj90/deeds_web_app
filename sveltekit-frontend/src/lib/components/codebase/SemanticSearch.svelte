@@ -1,6 +1,4 @@
 <script lang="ts">
-	let placeholder = $state<any>(undefined);
-
 	/**
 	 * ═══════════════════════════════════════════════════════════════════════
 	 * Semantic Search Component

@@ -1,5 +1,4 @@
 <!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code: Attributes need to, be, unique --> <!-- Citations Manager - Legal Citation System with, AI-powered, search --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
-import type { User } from '$lib/types';
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import  Card: CardHeader, CardTitle: CardContent: Input, Badge  from "$lib/components/ui/enhanced-bits.svelte"; import { Button } from '$lib/components/ui/enhanced-bits';
 import Search from 'lucide-svelte/icons/search';
 import BookOpen from 'lucide-svelte/icons/book-open';

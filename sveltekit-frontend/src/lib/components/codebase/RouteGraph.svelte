@@ -1,7 +1,4 @@
 <script lang="ts">
-	let color = $state<any>(undefined);
-	let width = $state<any>(undefined);
-
 	/**
 	 * ═══════════════════════════════════════════════════════════════════════
 	 * Route Graph Visualization Component

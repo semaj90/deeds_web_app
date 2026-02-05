@@ -1,6 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-
 /**
  * Svelte 5 Tabs Component
  * Native HTML with Svelte 5 runes and accessible tabpanel
@@ -42,7 +40,7 @@ $effect(() => {
 		value = tabs[0].id;
 	}
 });
-  
+
 setContext('tabs', {
 	get activeTab() { return value; },
 	setActiveTab: (id: string) => {
@@ -50,7 +48,7 @@ setContext('tabs', {
 		onchange?.(id);
 	}
 });
-  
+
 let orientationClasses = $derived(
 	orientation === 'vertical'
 		? 'flex-col'
