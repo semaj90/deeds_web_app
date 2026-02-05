@@ -1,9 +1,7 @@
 <script lang="ts">
-  import type { User } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // RoleGuard component - Role-based access control - Svelte, 5 compatible
-  import { auth } from '$lib/stores/unified';
-  interface Props {
+    interface Props {
     children?: import('svelte').Snippet;
 	roles: string | string[];
     fallback?: import('svelte').Snippet;
@@ -22,12 +20,13 @@
     if (userRole === 'admin') {
       return true;
     }
+    const rolesArray = allowedRoles();
     if (requireAll) {
       // User must have all specified roles (not typical for single role systems)
-      return allowedRoles.every(role => userRole === role);
+      return rolesArray.every(role => userRole === role);
     } else {
       // User must have at least one of the specified roles
-      return allowedRoles.includes(userRole);
+      return rolesArray.includes(userRole);
     }
   });
 </script>
