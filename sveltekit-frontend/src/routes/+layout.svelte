@@ -64,7 +64,9 @@
             {#if appState.globalError}
                 <div class="error-toast">{appState.globalError}</div>
             {/if}
-            <div class="header-title">YoRHa Legal AI</div>
+            <div class="header-title">
+                <a href="/" class="home-link">YoRHa Legal AI</a>
+            </div>
         </header>
 
         <div class="content">
@@ -90,6 +92,7 @@
     progress { width: 100%; }
     button { padding: 0.5rem 1rem; cursor: pointer; }
     .error-toast { background: #ff4444; color: white; padding: 0.5rem; border-radius: 4px; }
+    .home-link { text-decoration: none; color: inherit; font-weight: bold; }
 </style>
 
 

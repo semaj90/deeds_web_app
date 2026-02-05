@@ -4,7 +4,7 @@
  * Ensures redundancy and optimized access patterns
  */
 
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { sql } from 'drizzle-orm';
 

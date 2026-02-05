@@ -712,3 +712,28 @@ npx svelte-check --threshold error 2>&1 | Select-String "found \d+ error"
 **Next:** Apply CSS fixes to 1-2 files, verify, then scale
 **Maintained by:** Claude (Anthropic) + Antigravity (Google Deepmind)
 **Last Updated:** 2026-01-11 10:52 PST
+
+## Status Update (2026-02-04)
+- **Restoration:** 99 corrupted files identified. Priority: Restore before cleanup.
+- **Git:** Service consolidation (AI, POI, Evidence) secured in commit f5233e9.
+
+## 🚨 Emergency Restoration Phase (2026-02-04)
+
+**Objective:** Restore 99 corrupted files from `src.backup.20260104_111218`.
+
+### Status (Live)
+- **Restored:**
+  - `src/lib/server/ai/rag-pipeline.ts`
+  - `src/lib/services/gpu-cache-rpc-client.ts`
+  - `src/lib/services/llm-router.ts`
+  - `src/routes/api/embed/+server.ts`
+- **Verified:**
+  - `src/lib/server/embeddings/ollama.ts` (Intact)
+- **Pending:**
+  - `sveltekit-gpu-cache-integration.ts` (Under analysis)
+  - Remaining 95 corrupted files.
+
+### Critical Notes
+- Directory consolidation (`src/lib/features`) was preserved via Git commit prior to restoration.
+- Backups are restoring to legacy paths; duplicates must be managed.
+

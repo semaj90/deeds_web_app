@@ -601,3 +601,8 @@ npx svelte-check --threshold error
   "errorPatt
 
 ---
+
+## Status Update (2026-02-04)
+- **Restoration:** 99 corrupted files identified for restoration. See GEMINI.md for full plan.
+- **Consolidation:** Services moved to src/lib/features.
+
