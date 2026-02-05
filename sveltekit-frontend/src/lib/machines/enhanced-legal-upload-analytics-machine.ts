@@ -829,7 +829,9 @@ actions: assign({
   },
 },
 },
-,
+},
+},
+_debug_depth: true,
 { // start options
   // wire named services to the existing helper functions by forwarding the machine context
  services: {

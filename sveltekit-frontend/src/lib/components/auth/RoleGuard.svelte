@@ -15,7 +15,7 @@
     if (!authStore.isAuthenticated || !authStore.user) {
       return false;
     }
-    const userRole = authStore.user.rol;
+    const userRole = authStore.user.role;
     // Admin always has access
     if (userRole === 'admin') {
       return true;
