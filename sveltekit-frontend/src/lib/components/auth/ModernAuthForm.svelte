@@ -1,7 +1,8 @@
-<script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits';
- import  Alert  from "$lib/components/ui/alert/Alert.svelte";
- import  Label  from "$lib/components/ui/Label.svelte";
- import  Input  from "$lib/components/ui/Input.svelte"; interface Props { mode?: 'login' | 'register'; open?: boolean; onOpenChange?: (open: boolean) => void; onSuccess?: (user: any) => void}
+<script lang="ts"> import Alert from "$lib/components/ui/alert/Alert.svelte";
+import { Button } from '$lib/components/ui/enhanced-bits';
+import Input from "$lib/components/ui/Input.svelte";
+import Label from "$lib/components/ui/Label.svelte";
+ interface Props { mode?: 'login' | 'register'; open?: boolean; onOpenChange?: (open: boolean) => void; onSuccess?: (user: any) => void}
   let { mode = $bindable('login'), open = $bindable(false), onOpenChange, onSuccess }: Props = $props();
    let formData = $state({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '' });
   let loading = $state<boolean>(false);
@@ -36,7 +37,7 @@
   {#if success} <Alert variant="default" class="nes-text">{ success }</Alert> {/if} {#if error} <Alert variant="destructive" class="nes-text">{ error }</Alert> {/if} {#if mode === 'register'} <div class="grid grid-cols-2"> <div class="nes-field"> <Label for="firstName">First Name</Label>
  <Input id="firstName" bind:value={formData.firstName} required, class="nes-input" /> </div>
  <div class="nes-field"> <Label for="lastName">Last Name</Label>
- <Input id="lastName" bind:value={formData.lastName} required, class="nes-input" /> </div> {/if}
+ <Input id="lastName" bind:value={formData.lastName} required, class="nes-input" /> </div> </div>{/if}
   <div class="nes-field"> <Label for="email">Email</Label>
  <Input bind:this={emailInput} id="email" type="email", bind:value={formData.email} required, class="nes-input" /> </div>
  <div class="nes-field"> <Label for="password">Password</Label>

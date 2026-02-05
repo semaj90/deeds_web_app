@@ -65,8 +65,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="nes-text is-disabled">Register as a legal professional to access the AI-powered legal system</p> </div>
  <!-- Error, Message -->
   {#if errorMessage} <div class="bg-destructive/15 border border-destructive text-destructive-foreground px-4 py-3 rounded mb-4 flex items-center"`
-      > <AlertCircle class="h-4" /> <span>{ errorMessage }
-</span> {/if}
+      > <AlertCircle class="h-4" /> <span>{ errorMessage }</span></div> {/if}
   <!-- Success, Message -->
   {#if successMessage} <div class="bg-green-500/15 border border-green-500 text-green-700 px-4 py-3 rounded mb-4 flex items-center"
       > <Shield class="h-4" /> <span>{ successMessage }

@@ -1,4 +1,4 @@
-import { createMachine, assign, createActor } from 'xstate';
+import { assign, createActor, createMachine } from 'xstate';
 // import type { AnyActorLogic } from 'xstate';
 import { z } from 'zod'; // Enhanced Types for Legal AI Integration
 export interface UploadContext {
@@ -831,7 +831,6 @@ actions: assign({
 },
 },
 },
-_debug_depth: true,
 { // start options
   // wire named services to the existing helper functions by forwarding the machine context
  services: {

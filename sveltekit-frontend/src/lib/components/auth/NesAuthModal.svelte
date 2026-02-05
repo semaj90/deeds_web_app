@@ -49,7 +49,7 @@
     <form class="relative z-10 w-full max-w-md rounded bg-neutral-900 p-6" onsubmit={submit}>
       <div class="mb-3 text-lg">{title}</div>
       {#if error}
-        <div class="mb-3 text-sm">{error}{/if}
+        <div class="mb-3 text-sm">{error}</div>{/if}
       <div class="space-y-3">
         <label class="block">Email
           <input

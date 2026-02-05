@@ -88,19 +88,10 @@
 	interactionMetrics: {
 	typingSpeed: 0,
 				clickPatterns: [],
-				scrollBehavior: {
-	depth: 0, speed: 0 },
-	focusTime: 0
+				scrollBehavior: { depth: 0, speed: 0 },
+				focusTime: 0
 			},
-			interactionPatterns: {
-				totalInteractions: 0,
-				preferredFeatures: []
-			},
-			timeMetrics: {
-				averageUploadDuration: 0,
-				totalTimeSpent: 0
-			},
-	contextualPreferences: {
+			contextualPreferences: {
 	preferredAIPromptStyle: 'detailed',
 				helpLevel: 'moderate',
 				autoSuggestions: enableAIPrompts,
@@ -542,9 +533,11 @@
 				<div class="insight-card">
 					<h4>Recommendations</h4>
 					<ul class="recommendations-list">
-						{#each currentUserInsights as recommendation}
-							<li>{recommendation}</li>
-						{/each}
+						{#if currentUserInsights?.recommendations}
+							{#each currentUserInsights.recommendations as recommendation}
+								<li>{recommendation}</li>
+							{/each}
+						{/if}
 					</ul>
 				</div>
 			</div>
