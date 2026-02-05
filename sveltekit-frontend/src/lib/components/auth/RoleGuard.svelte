@@ -1,6 +1,8 @@
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
   // RoleGuard component - Role-based access control - Svelte, 5 compatible
+  import { authStore } from '$lib/stores.svelte';
+
     interface Props {
     children?: import('svelte').Snippet;
 	roles: string | string[];

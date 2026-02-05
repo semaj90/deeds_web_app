@@ -4,7 +4,7 @@
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
-  import { Progress } from '$lib/components/ui/progress/index.js';
+  import * as Progress from '$lib/components/ui/progress/index.js';
   import * as Tabs from '$lib/components/ui/tabs/index.js';
   import Activity from 'lucide-svelte/icons/activity';
   import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
@@ -16,8 +16,6 @@
   import Trash2 from 'lucide-svelte/icons/trash-2';
   import XCircle from 'lucide-svelte/icons/x-circle';
   import Zap from 'lucide-svelte/icons/zap';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // State management (Svelte 5)
@@ -303,7 +301,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     refreshStats();
     const interval = setInterval(refreshStats, 10000);
     return () => clearInterval(interval);
-  
+
 });
 </script>
 
