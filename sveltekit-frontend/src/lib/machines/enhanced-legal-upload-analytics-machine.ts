@@ -1,5 +1,5 @@
 import { createMachine, assign, createActor } from 'xstate';
-import type { AnyActorLogic } from 'xstate';
+// import type { AnyActorLogic } from 'xstate';
 import { z } from 'zod'; // Enhanced Types for Legal AI Integration
 export interface UploadContext {
  files: File[]; uploadProgress: number;
@@ -325,7 +325,8 @@ export async function performAIAnalysisService({
 					source: 'legal_upload',
 					acquisition_date: new Date().toISOString(),
 					authenticity_verified: true,
-					chain_of_custody_status: 'verified'
+					chain_of_custody_status: 'verified',
+					chain_of_custody: []
 				}
 			} as UploadResult;
 		});
@@ -817,7 +818,7 @@ actions: assign({
     },
   },
 },
-},
+},,
 {
   // wire named services to the existing helper functions by forwarding the machine context
  // wire named services to the existing helper functions by forwarding the machine context

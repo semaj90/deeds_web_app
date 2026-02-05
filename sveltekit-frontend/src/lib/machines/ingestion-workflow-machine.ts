@@ -1,5 +1,5 @@
 /** * XState v5 Ingestion Workflow Machine * Orchestrates document processing: upload â†’ chunk â†’ embed â†’ store â†’ cache * Integrates with RabbitMQ, LokiJS, and Drizzle ORM */
-import type { type setup, type assign, type createActor, type fromPromise, createMachine } from 'xstate'; // Removed sendTo
+import { setup, assign, createActor, fromPromise, createMachine } from 'xstate'; // Removed sendTo
 import type { getEmbedding, type EmbeddingResult } from '$lib/server/embedding-gateway.js'; // Changed getEmbeddingViaGate to getEmbedding, added type import
 import type { cache } from '$lib/server/cache/redis.js';
 import type { metadata } from "$lib/services/enhanced-rag-pagerank";
@@ -386,7 +386,7 @@ export function startIngestionWorkflow(options?: { concurrency?: number; batchSi
 
 // Utility functions
 export function createIngestionJob(
- documentId: string, chunks: string, 
+ documentId: string, chunks: string,
  metadata: Partial<IngestionJob['metadata']>
 ): IngestionJob {
  return {
