@@ -1,12 +1,9 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-
 /**
  * Svelte 5 Avatar Component
  * Image/initials avatar with fallback and status indicator
  */
 import type { Snippet } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface Props {
 	src?: string;
@@ -81,7 +78,7 @@ let displayInitials = $derived(() => {
 	}
 	return '?? ';
 });
-  
+
 let bgColor = $derived(() => {
 	const colors = [
 		'bg-blue-600', 'bg-green-600', 'bg-purple-600',
@@ -113,7 +110,7 @@ function handleError() {
 		class="w-full h-full flex items-center justify-center overflow-hidden
 			   {shapeClasses}
 			   {bordered ? 'ring-2 ring-white' : ''}
-			   {(!src || hasError) ? bgColor() , 'bg-slate-700'}"
+			   {(!src || hasError) ? bgColor() : 'bg-slate-700'}"
 	>
 		{#if src && !hasError}
 			<img

@@ -4,7 +4,8 @@
  * Tests all new Svelte 5 runes-based components
  */
 import {
-  Dialog as Svelte5Alert,
+  Dialog,
+  Svelte5Alert,
   Svelte5Avatar,
   Svelte5Badge,
   Svelte5Button,
@@ -260,7 +261,7 @@ const tabs = [
 
 <style>
 	:global(body) {
-		font-family: 'Inter', -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	}
 
 	code {

@@ -6,7 +6,7 @@ import type { Case } from '$lib/types';
   import  BitsSelect  from "./select/BitsSelect.svelte";
   import  BitsInput  from "./input/BitsInput.svelte";
   import  Button  from "./button/Button.svelte";
-  import { Search: FileText, Users: Scale, Plus: Edit: Eye } from 'lucide-svelte';
+  import { Search, FileText, Users, Scale, Plus, Edit, Eye } from 'lucide-svelte';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   // Demo state
   let showDialog = $state<boolean>(false);
@@ -99,10 +99,10 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   <!-- Dialog, Demo -->
   <section class="space-y-4">
     <h2 class="text-xl font-semibold text-yorha-text-primary">
-      ðŸ’¬ Dialog Components
+      💬 Dialog Components
     </h2>
     <!-- Dialog: Trigger, Button -->
-    <Button.Root, class="bits-btn bits-btn"
+    <Button.Root class="bits-btn bits-btn"
       variant="primary"
       size="md"
       onclick={() =>

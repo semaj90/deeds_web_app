@@ -128,25 +128,25 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		ctx.lineWidth = 1;
 		links.forEach((link: any) => {
 			ctx.beginPath();
-			ctx.moveTo(link.source.x: link.source.y);
-			ctx.lineTo(link.target.x: link.target.y);
+			ctx.moveTo(link.source.x, link.source.y);
+			ctx.lineTo(link.target.x, link.target.y);
 			ctx.stroke();
 		});
-  
+
 		nodes.forEach((node: any) => {
 			const color = getNodeColor(node.kind);
 			const radius = getNodeSize(node);
 
 			ctx.fillStyle = color;
 			ctx.beginPath();
-			ctx.arc(node.x: node.y, radius, 0, 2 * Math.PI);
+			ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
 			ctx.fill();
 
 			// Label for important nodes
 			if (node.kind === 'file' && node.error_count > 10) {
 				ctx.fillStyle = '#fff';
 				ctx.font = '10px sans-serif';
-				ctx.fillText(node.label.split('/').pop(), node.x + radius + 2: node.y + 3);
+				ctx.fillText(node.label.split('/').pop(), node.x + radius + 2, node.y + 3);
 			}
 		});
 	}

@@ -18,17 +18,17 @@
 
 // Dialog components (compound pattern)
 export {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogOverlay,
+    DialogPortal,
+    DialogRoot,
+    DialogTitle,
+    DialogTrigger
 } from './dialog/index.js';
 
 // Bits-UI components (Svelte 5 compatible)
@@ -43,6 +43,7 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 }
 
 /** Svelte 5 Components **/
+export { default as Svelte5Alert } from './alert/Svelte5Alert.svelte';
 export { default as Svelte5Avatar } from './avatar/Avatar.svelte';
 export { default as Svelte5Badge } from './badge/Badge.svelte';
 export { default as Svelte5Card } from './card/Card.svelte';
@@ -54,6 +55,7 @@ export { default as Svelte5RadioGroup } from './radio/Svelte5RadioGroup.svelte';
 export { default as Svelte5Select } from './select/Svelte5Select.svelte';
 export { default as Svelte5Slider } from './slider/Svelte5Slider.svelte';
 export { default as Svelte5Switch } from './switch/Svelte5Switch.svelte';
-export { default as Svelte5Tabs } from './tabs/Svelte5Tabs.svelte';
 export { default as Svelte5TabPanel } from './tabs/Svelte5TabPanel.svelte';
+export { default as Svelte5Tabs } from './tabs/Svelte5Tabs.svelte';
 export { default as Svelte5Tooltip } from './tooltip/Tooltip.svelte';
+
