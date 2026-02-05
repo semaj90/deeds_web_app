@@ -63,8 +63,8 @@ interface DocumentStructure {
 	sections: number;
  headers: number;
 }
-import WebGPUGemmaClient from '$lib/webgpu/webgpu-gemma-client.js'; // Ensure correct path/file extension
 import { getComputeShaders, type LegalComputeShaders } from '$lib/webgpu/legal-compute-shaders.js';
+import WebGPUGemmaClient from '$lib/webgpu/webgpu-gemma-client.js'; // Ensure correct path/file extension
 
 // WebAssembly Legal Processor Class
 export class WasmLegalProcessor {
@@ -239,22 +239,6 @@ export class WasmLegalProcessor {
         }
 
         return vector;
-    }
-                // Note: In a real implementation, we'd chunk the document.
-                const emb1 = await this.gemmaClient.embed(text1.slice(0, 1024));
-                const emb2 = await this.gemmaClient.embed(text2.slice(0, 1024));
-
-                // Use the optimized WebGPU Similarity Service to compare them
-                // We wrap them in specific structures if the service requires QuantizedEmbedding,
-                // but for raw cosine similarity we can often compute directly.
-                // Here we'll use a direct cosine similarity helper since we have raw float arrays.
-                return this.cosineSimilarity(emb1, emb2);
-            } catch (e) {
-                console.warn('WebGPU similarity calculation failed, falling back to Jaccard', e);
-            }
-        }
-
-        return this.wasmModule!.calculate_text_similarity(text1, text2);
     }
 
     private cosineSimilarity(vecA: Float32Array | number[], vecB: Float32Array | number[]): number {

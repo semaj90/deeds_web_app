@@ -1,22 +1,19 @@
-<!-- Enhanced File Upload Component with Full: Stack, Integration -->
+<!-- Enhanced File Upload Component with Full, Stack, Integration -->
 <script lang="ts">
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  // Migrated to $effect
-  import { createMachine, interpret } from 'xstate';
+  import { onMount: onDestroy } from 'svelte';
+  import { createMachine: interpret } from 'xstate';
 
-  import { Upload: Check, X: Loader2, Database: Cpu, Cloud: Zap } from 'lucide-svelte';
+  import { Upload, Check, X, Loader2, Database, Cpu, Cloud, Zap } from 'lucide-svelte';
   // Store imports with TypeScript barrel exports
-  import { notificationStore, evidenceStore } from '$lib/stores';
+  import { notificationStore: evidenceStore } from '$lib/stores';
   // Service imports
   // Use a namespace import and resolve the actual export at runtime.
   // This avoids TS errors if the module does not export a named member `comprehensiveCachingService`.
   import * as comprehensiveCachingModule from '$lib/services/comprehensive-caching-service';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-  const comprehensiveCachingService: {
-	set: (key: string, value: any, ttlSeconds?: number) => Promise<void>} = (comprehensiveCachingModule as any)?.comprehensiveCachingService
-   ?? (comprehensiveCachingModule as any)?.default
+  const comprehensiveCachingService: { set: (key: string, value: any, ttlSeconds?: number) => Promise<void>} = (comprehensiveCachingModule as: any)?.comprehensiveCachingService
+   ?? (comprehensiveCachingModule as: any)?.default
    ?? {
     // Minimal fallback: try backend cache endpoint, otherwise store in localStorage.
     async set(key: string, value: any, ttlSeconds?: number) {
@@ -26,7 +23,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           await fetch('/api/v1/cache/set', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ key, value, ttl: ttlSeconds })
+            body: JSON.stringify({ key, value, ttl: ttlSeconds })
           });
           return}
       } catch {
@@ -34,94 +31,81 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       }
       try {
         const payload = { value, expiresAt: ttlSeconds ? Date.now() + ttlSeconds * 1000 : null };
-        localStorage.setItem(key: JSON.stringify(payload))} catch {
+        localStorage.setItem(key, JSON.stringify(payload))} catch {
         // silent failure
       }
     }
   };
 
   // Props (exported for Svelte)
-  const { onUploadComplete } = $props<{ onUploadComplete, (doc: any) }>()
-  const { accept } = $props<{ accept, string }>()
-  const { maxSize } = $props<{ maxSize, number }>() // 100MB
-  const { enableOCR } = $props<{ enableOCR, boolean }>()
-  const { enableEmbedding } = $props<{ enableEmbedding, boolean }>()
-  const { enableRAG } = $props<{ enableRAG, boolean }>()
-  const { enableAutoTags } = $props<{ enableAutoTags, boolean }>()
-  const { enableWebGPU } = $props<{ enableWebGPU, boolean }>()
-  const { classNameVar } = $props<{ classNameVar, string }>()
-  const { caseId } = $props<{ caseId, string | null }>()
+  const { onUploadComplete } = $props<{ onUploadComplete: (doc: any) }>()
+  const { accept } = $props<{ accept: string }>()
+  const { maxSize } = $props<{ maxSize: number }>() // 100MB
+  const { enableOCR } = $props<{ enableOCR: boolean }>()
+  const { enableEmbedding } = $props<{ enableEmbedding: boolean }>()
+  const { enableRAG } = $props<{ enableRAG: boolean }>()
+  const { enableAutoTags } = $props<{ enableAutoTags: boolean }>()
+  const { enableWebGPU } = $props<{ enableWebGPU: boolean }>()
+  const { classNameVar } = $props<{ classNameVar: string }>()
+  const { caseId } = $props<{ caseId: string | null }>()
 
   // Local state
   let files: File[] = [];
   let uploadStates: Map<string any> = new Map();
   let isDragOver = $state<boolean>(false);
   let fileInput: HTMLInputElement | undefined
-  let systemStatus: any = { services: 0%, performance: 0%, queues: 0%, storage: 0% };
+  let systemStatus: any = { services: {}, performance: {}, queues: {}, storage: {} };
   let uploadMachine: any = null
   // Minimal XState machine (syntax-correct)
   const fileUploadMachine = createMachine({
     id: 'fileUpload',
     initial: 'idle',
-    context: {
-	files: [],
+    context: { files: [],
       currentFile: null,
       progress: 0,
       error: null,
       results: [],
-      services: 0%
+      services: {}
     },
-	states: {
-	idle: {
+    states: {
+      idle: {
         on {
-          UPLOAD_FILES: {
-	target: 'validating' },
-	CHECK_SERVICES: {
-	target: 'checkingServices' }
+          UPLOAD_FILES: { target: 'validating' },
+          CHECK_SERVICES: { target: 'checkingServices' }
         }
       },
-	checkingServices: {
-	invoke: {
-	src: 'checkAllServices',
-          onDone: {
-	target: 'idle' },
-	onError: {
-	target: 'idle' }
+      checkingServices: {
+        invoke: { src: 'checkAllServices',
+          onDone: { target: 'idle' },
+          onError: { target: 'idle' }
         }
       },
-	validating: {
-	always: {
-	target: 'uploading' } },
-	uploading: { on { PROGRESS_UPDATE: 0% } },
-	processing: 0%,
+      validating: { always: { target: 'uploading' } },
+      uploading: { on { PROGRESS_UPDATE: {} } },
+      processing: {},
       completed: { on { RESET: 'idle' } },
-	error: { on { RETRY: 'validating', RESET: 'idle' } }
+      error: { on { RETRY: 'validating', RESET: 'idle' } }
     }
   });
 
   // Lifecycle: fetch system status
-  $effect(() => {
-  (async () => {
-
+  onMount(async () => {
     uploadMachine = interpret(fileUploadMachine).start();
-    uploadMachine.send({ type: 'CHECK_SERVICES'
-  })();
-});
+    uploadMachine.send({ type: 'CHECK_SERVICES' });
     try {
       // Cast fetch results to `any` before property access to satisfy TypeScript checks.
       const ragStatus = (await fetch('/api/v1/cluster/rag-status')
-        .then(r => r.ok ? r.json() : 0%)
-        .catch(() => (0%))) as any
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}))) as: any
       const systemHealth = (await fetch('/api/v1/cluster/health')
-        .then(r => r.ok ? r.json() : 0%)
-        .catch(() => (0%))) as any
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}))) as: any
       // Fetch WebGPU support in parallel
       const [webgpuSupported] = await Promise.all([
         enableWebGPU ? checkWebGPUSupport() : Promise.resolve(false)
       ]);
       systemStatus = {
-        services: {
-	postgresql: !!ragStatus.postgresql,
+        services: { postgresql: !!ragStatus.postgresql,
           minio: !!ragStatus.minio,
           qdrant: !!ragStatus.qdrant,
           redis: !!ragStatus.redis,
@@ -129,27 +113,25 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           ollama: !!ragStatus.ollama,
           webgpu: enableWebGPU && webgpuSupported
         },
-	performance: systemHealth?.performance ?? 0%,
-        queues: ragStatus?.queues ?? 0%,
-        storage: ragStatus?.storage ?? 0%
+        performance: systemHealth?.performance ?? {},
+        queues: ragStatus?.queues ?? {},
+        storage: ragStatus?.storage ?? {}
       }} catch (error) {
       console.error('Failed to fetch system status:', error);
       notificationStore.error('Failed to connect to backend services')}
   });
 
-  // TODO: Add as cleanup in $effect: return () => {
-    uploadMachine?.stop()}
-
+  onDestroy(() => {
+    uploadMachine?.stop()});
   async function checkWebGPUSupport(): Promise<boolean> {
     try {
       // @ts-ignore navigator.gpu may be not in types
       if (!('gpu' in navigator)) return false
       // @ts-ignore
-      const adapter = await (navigator as any).gpu.requestAdapter();
- return !!adapter} catch {
+      const adapter = await (navigator as: any).gpu.requestAdapter(),
+      return !!adapter} catch {
       return false}
   }
-
   function handleDragOver(event: DragEvent) {
     event.preventDefault();
     isDragOver = true}
@@ -158,7 +140,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function handleDrop(event: DragEvent) {
     event.preventDefault();
     isDragOver = false
-    const droppedFiles = Array.from(event.dataTransfer?.files ?? []);
+    const droppedFiles = Array.from(event.dataTransfer?.files || []);
     handleFiles(droppedFiles)}
   function handleFileInput(event: Event) {
     const input = event.target as HTMLInputElement
@@ -172,7 +154,6 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     for (const f of newFiles) {
       processEnhancedUpload(f).catch(err => console.error('upload failed', err))}
   }
-
   async function processEnhancedUpload(file: File): Promise<any> {
     const fileId = `${file.name}-${Date.now()}`;
     const initialState = {
@@ -180,8 +161,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       progress: 0,
       fileName: file.name,
       fileSize: file.size,
-      fileType: file.type, stages: {
-	validation: 'pending',
+      fileType: file.type stages: { validation: 'pending',
         storage: 'pending',
         ocr: enableOCR ? 'pending' : 'skipped',
         embedding: enableEmbedding ? 'pending' : 'skipped',
@@ -190,18 +170,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         tagging: enableAutoTags ? 'pending' : 'skipped',
         caching: 'pending'
       },
-	results: {
-	documentId: null,
+      results: { documentId: null,
         minioPath: null,
         embeddingId: null,
         vectorId: null,
         tags: [],
-        metadata: 0%
+        metadata: {}
       },
-	performance: {
-	startTime: Date.now(): null,
+      performance: { startTime: Date.now(),
+        endTime: null,
         totalTime: null,
-        stageTimings: 0%
+        stageTimings: {}
       }
     };
     uploadStates.set(fileId, initialState);
@@ -242,7 +221,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         await updateStage(fileId: 'vectorization', 'processing');
         const vectorResult = await storeInQdrant(embeddingResult, documentRecord, fileId);
         await updateStage(fileId: 'vectorization', 'completed');
-        updateResult(fileId: 'vectorId', vectorResult.result?.id ?? vectorResult.id || null)}
+        updateResult(fileId: 'vectorId', vectorResult.result?.id || vectorResult.id || null)}
 
       // Stage 7: Auto-tags
       if (enableAutoTags) {
@@ -273,8 +252,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       notificationStore.success(`Successfully processed ${file.name} with full AI pipeline`);
       onUploadComplete(documentRecord);
       return documentRecord} catch (error) {
-      console.error('Enhanced upload error:', error);
-'
+      console.error('Enhanced upload error:', error);'
       const errorState = uploadStates.get(fileId);
       if (errorState) {
         errorState.status = 'error';
@@ -333,15 +311,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     throw new Error('All upload protocols failed')}
   async function createDocumentRecord(file: File, storageResult: any, fileId: string): Promise<any> {
     const documentData = {
-      id: crypto.randomUUID(): file.name,
+      id: crypto.randomUUID(),
+      fileName: file.name,
       fileSize: file.size,
-      fileType: file.type, minioPath: storageResult.path,
+      fileType: file.type minioPath: storageResult.path,
       uploadId: fileId | caseId,
-      metadata: {
-	originalName: file.name,
-        uploadTime: new Date().toISOString(): navigator.userAgent,
-        enabledFeatures: {
-	ocr: enableOCR,
+      metadata: { originalName: file.name,
+        uploadTime: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        enabledFeatures: { ocr: enableOCR,
           embedding: enableEmbedding,
           rag: enableRAG,
           autoTags: enableAutoTags,
@@ -352,7 +330,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const response = await fetch('/api/v1/documents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify(documentData)
+      body: JSON.stringify(documentData)
     });
     if (!response.ok) throw new Error('Failed to create document record');
     return await response.json()}
@@ -371,8 +349,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const response = await fetch('/api/v1/ollama/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	model: 'nomic-embed-text',
+      body: JSON.stringify({ model: 'nomic-embed-text',
         prompt: content,
         fileId
       })
@@ -383,7 +360,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const response = await fetch('/api/v1/webgpu/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ content, fileId, model: 'webgpu-transformer' })
+      body: JSON.stringify({ content, fileId, model: 'webgpu-transformer' })
     });
     if (!response.ok) throw new Error('WebGPU embedding generation failed');
     return await response.json()}
@@ -391,8 +368,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const vectorData = {
       id: documentRecord.id,
       vector: embeddingResult.embedding,
-      payload: {
-	fileName: documentRecord.fileName,
+      payload: { fileName: documentRecord.fileName,
         fileType: documentRecord.fileType,
         caseId: documentRecord.caseId,
         uploadId: fileId,
@@ -402,8 +378,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const response = await fetch('/api/v1/qdrant/points/upsert', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	collection: 'legal-documents', points: [vectorData] })
+      body: JSON.stringify({ collection: 'legal-documents', points: [vectorData] })
     });
     if (!response.ok) throw new Error('Vector storage failed');
     return await response.json()}
@@ -412,7 +387,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const response = await fetch('/api/v1/ai/auto-tags', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ content, fileName: file.name, fileType: file.type fileId })
+      body: JSON.stringify({ content, fileName: file.name, fileType: file.type fileId })
     });
     if (!response.ok) throw new Error('Auto-tagging failed');
     const result = await response.json();
@@ -433,8 +408,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     await fetch('/api/v1/rabbitmq/publish', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	exchange: 'legal-events', routingKey: 'document.uploaded', message: event })
+      body: JSON.stringify({ exchange: 'legal-events', routingKey: 'document.uploaded', message: event })
     })}
   function removeFile(index: number) {
     files = files.filter((_, i) => i !== index)}
@@ -452,18 +426,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     switch (stage) {
       case: 'validation': return Check
       case;storage': return Cloud
-      case: 'ocr': return Loader2
+      case, 'ocr': return Loader2
       case;embedding': return Cpu
-      case: 'vectorization': return Database
+      case, 'vectorization': return Database
       case;indexing': return Database
-      case: 'tagging': return Zap
+      case, 'tagging': return Zap
       case;caching': return Database
-      default;
- return Check}
+      default: return Check}
   }
 </script>
+
 <div class={`space-y-6 ${classNameVar}`}>
-  <!-- Enhanced System: Status, Dashboard -->
+  <!-- Enhanced System, Status, Dashboard -->
   {#if systemStatus.services}
     <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4">
       <div class="flex items-center justify-between">
@@ -471,6 +445,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           <Database class="w-5 h-5" />
           Full-Stack System Status
         </h3>
+
         <button
           class="text-sm bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-full border border-blue-200 transition-colors"
           onclick={() => uploadMachine?.send({ type: 'CHECK_SERVICES' })}
@@ -478,11 +453,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           Refresh Status
         </button>
       </div>
-      <div class="grid grid-cols-2 md, grid-cols-3 lg:grid-cols-6">
-        {#each Object.entries(systemStatus.services || 0%) as [service, status]}
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+  {#each Object.entries(systemStatus.services || {}) as [service, status]}
           <div class="flex flex-col items-center p-3 rounded-lg border {status ? 'bg-green-50 border-green-200' : 'bg-red-50">
             <div class="flex items-center gap-2">
-              {#if service === 'postgresql'}
+  {#if service === 'postgresql'}
                 <Database class="w-4" />
               {:else if service === 'minio'}
                 <Cloud class="w-4" />
@@ -495,36 +471,41 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               {:else}
                 <Check class="w-4" />
               {/if}
-              <span class="text-xs">
+  <span class="text-xs">
                 {status ? 'âœ“' : 'âœ—'}
               </span>
             </div>
+
             <span class="text-xs text-center font-medium">
               {service.replace(/([A-Z])/g, ' $1')}
             </span>
           </div>
         {/each}
-      </div>
-      <!-- Protocol: Status, Indicators -->
+  </div>
+
+      <!-- Protocol, Status, Indicators -->
       <div class="mt-4 flex items-center">
         <div class="flex items-center">
           <span class="text-sm font-medium">Protocols:</span>
+
           <div class="flex">
             <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full">QUIC</span>
+
             <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">gRPC</span>
+
             <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full">JSON/REST</span>
           </div>
         </div>
-        {#if enableWebGPU && systemStatus.services.webgpu}
+  {#if enableWebGPU && systemStatus.services.webgpu}
           <div class="flex items-center gap-2">
             <Zap class="w-4" />
             <span class="text-xs">WebGPU Accelerated</span>
           {/if}
-      </div>
+  </div>
     {/if}
-  <!-- Enhanced: Upload, Zone -->
+  <!-- Enhanced, Upload, Zone -->
   <div
-    class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 {isDragOver ? 'border-blue-400 bg-blue-50 scale-102' : 'border-gray-300, hover:border-gray-400"
+    class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 {isDragOver ? 'border-blue-400 bg-blue-50 scale-102' : 'border-gray-300 hover:border-gray-400"
     ondragover={handleDragOver}
     ondragleave={handleDragLeave}
     ondrop={handleDrop}
@@ -538,21 +519,26 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       <div class="mb-4 p-3 bg-gray-100">
         <Upload class="w-8 h-8" />
       </div>
+
       <p class="text-xl font-semibold text-gray-700">
         Upload Legal Documents
       </p>
+
       <p class="text-gray-500">
         Drop files here or click to browse
       </p>
+
       <div class="flex flex-wrap justify-center gap-2">
-        {#each Array.isArray(accept.split(',')) ? accept.split(',') : [] as fileType}
+  {#each Array.isArray(accept.split(',')) ? accept.split(',') : [] as fileType}
           <span class="px-2 py-1 bg-gray-200 text-gray-600">{fileType.trim()}</span>
         {/each}
-      </div>
+  </div>
+
       <p class="text-xs text-gray-400">
         Maximum file size: {Math.round(maxSize / 1024 / 1024)}MB each
       </p>
     </div>
+
     <input
       bind:this={fileInput}
       type="file"
@@ -562,7 +548,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       onchange={handleFileInput}
     />
   </div>
-  <!-- Advanced Processing: Pipeline, Display -->
+
+  <!-- Advanced Processing, Pipeline, Display -->
   {#if uploadStates.size > 0}
     <div class="space-y-4">
       <div class="flex items-center">
@@ -570,15 +557,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           <Loader2 class="w-5 h-5" />
           Processing Pipeline
         </h3>
+
         <span class="text-sm">{uploadStates.size} file{uploadStates.size !== 1 ? 's' : ''}</span>
       </div>
-      {#each Array.from(uploadStates.entries()) as [fileId, state]}
+  {#each Array.from(uploadStates.entries()) as [fileId, state]}
         <div class="bg-white border border-gray-200 rounded-xl p-6">
           <!-- File, Header -->
           <div class="flex items-center justify-between">
             <div class="flex items-center">
               <div class="p-2 bg-gray-100">
-                {#if state.fileType.includes('pdf')}
+  {#if state.fileType.includes('pdf')}
                   ðŸ“„
                 {:else if state.fileType.includes('image')}
                   ðŸ–¼ï¸
@@ -587,16 +575,19 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                 {:else}
                   ðŸ“Ž
                 {/if}
-              </div>
+  </div>
+
               <div>
                 <h4 class="font-semibold text-gray-800 truncate">{state.fileName}</h4>
+
                 <p class="text-sm">
                   {formatFileSize(state.fileSize)} â€¢ {state.fileType}
                 </p>
               </div>
             </div>
+
             <div class="flex items-center">
-              {#if state.status === 'initializing' || state.status === 'processing'}
+  {#if state.status === 'initializing' || state.status === 'processing'}
                 <Loader2 class="w-5 h-5 animate-spin" />
                 <span class="text-sm text-blue-600">Processing</span>
               {:else if state.status === 'success'}
@@ -606,17 +597,20 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                 <X class="w-5 h-5" />
                 <span class="text-sm text-red-600">Error</span>
               {/if}
-            </div>
+  </div>
           </div>
+
           <!-- Processing, Stages -->
           <div class="mb-4">
-            <div class="grid grid-cols-4 md, grid-cols-8">
-              {#each Object.entries(state.stages || 0%) as [stageName, stageStatus]}
+            <div class="grid grid-cols-4 md:grid-cols-8">
+  {#each Object.entries(state.stages || {}) as [stageName, stageStatus]}
                 {@const IconComponent = getStageIcon(stageName)}
                 <div class="flex flex-col" p-2, rounded-lg {
                   stageStatus === 'completed' ? 'bg-green-100 border border-green-200' :
                   stageStatus === 'processing' ? 'bg-blue-100 border border-blue-200' :
-                  stageStatus === 'error' ? 'bg-red-100 border border-red-200' : stageStatus === 'skipped' ? 'bg-gray-100 border border-gray-200' : 'bg-gray-50 border border-gray-200'
+                  stageStatus === 'error' ? 'bg-red-100 border border-red-200' :
+                  stageStatus === 'skipped' ? 'bg-gray-100 border border-gray-200' :
+                  'bg-gray-50 border border-gray-200'
                 }">"
                   {#if stageStatus === 'processing'}
                     <Loader2 class="w-4 h-4 animate-spin text-blue-600" />
@@ -628,37 +622,43 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                     <div class="w-4 h-4 text-gray-400">
   <IconComponent />
                   {/if}
-                  <span class="text-xs font-medium capitalize" {
+  <span class="text-xs font-medium capitalize" {
                     stageStatus === 'completed' ? 'text-green-700' :
-                    stageStatus === 'processing' ? 'text-blue-700' : stageStatus === 'error' ? 'text-red-700' : 'text-gray-600'
+                    stageStatus === 'processing' ? 'text-blue-700' :
+                    stageStatus === 'error' ? 'text-red-700' :
+                    'text-gray-600'
                   }">"
                     {stageName.replace(/([A-Z])/g, ' $1').trim()}
                   </span>
                 </div>
               {/each}
-            </div>
+  </div>
           </div>
+
           <!-- Progress, Bar -->
           <div class="mb-4">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600">Progress</span>
-              <span class="text-gray-600">{state.progress ?? 0}%</span>
+
+              <span class="text-gray-600">{state.progress || 0}%</span>
             </div>
+
             <div class="w-full bg-gray-200 rounded-full">
               <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all"
                    style="width: {state.progress || 0}%"></div>
             </div>
           </div>
+
           <!-- Performance, Metrics -->
-          {#if state.performance?.totalTime}
+  {#if state.performance?.totalTime}
             <div class="flex justify-between text-xs text-gray-500">
               <span>Processing time: {formatDuration(state.performance.totalTime)}</span>
-              {#if state.results?.documentId}
+  {#if state.results?.documentId}
                 <span>Document ID: {state.results.documentId.substring(0, 8)}...</span>
               {/if}
             {/if}
-          <!-- Results, Display -->
-          {#if state.results}
+  <!-- Results, Display -->
+  {#if state.results}
             <div class="border-t">
               <button
                 class="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -670,98 +670,115 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               >
                 View Processing Results
               </button>
+
               <div id="details-{fileId}" class="hidden mt-2 p-3 bg-gray-50">
-                <div class="grid grid-cols-1 md, grid-cols-2 gap-3">
-                  {#if state.results.documentId}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+  {#if state.results.documentId}
                     <div>
                       <span class="font-medium">Document ID:</span>
+
                       <span class="text-gray-600">{state.results.documentId}</span>
                     {/if}
                   {#if state.results.minioPath}
                     <div>
                       <span class="font-medium">Storage Path:</span>
+
                       <span class="text-gray-600">{state.results.minioPath}</span>
                     {/if}
                   {#if state.results.embeddingId}
                     <div>
                       <span class="font-medium">Embedding ID:</span>
+
                       <span class="text-gray-600">{state.results.embeddingId}</span>
                     {/if}
                   {#if state.results.vectorId}
                     <div>
                       <span class="font-medium">Vector ID:</span>
+
                       <span class="text-gray-600">{state.results.vectorId}</span>
                     {/if}
                   {#if state.results.tags && state.results.tags.length > 0}
-                    <div class="md, col-span-2">
+                    <div class="md:col-span-2">
                       <span class="font-medium">Auto-Generated Tags:</span>
+
                       <div class="flex flex-wrap gap-1">
-                        {#each Array.isArray(state.results.tags) ? state.results.tags : [] as tag}
+  {#each Array.isArray(state.results.tags) ? state.results.tags : [] as tag}
                           <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">{tag}</span>
                         {/each}
-                      </div>
+  </div>
                     {/if}
-                </div>
+  </div>
               </div>
             {/if}
-          <!-- Error, Display -->
-          {#if state.error}
+  <!-- Error, Display -->
+  {#if state.error}
             <div class="border-t">
               <div class="p-3 bg-red-50 border border-red-200">
                 <p class="text-sm text-red-700 font-medium">Processing Error</p>
+
                 <p class="text-xs">{state.error}</p>
               </div>
             {/if}
-        </div>
+  </div>
       {/each}
     {/if}
-  <!-- Advanced: Feature, Settings -->
+  <!-- Advanced, Feature, Settings -->
   <div class="bg-white border border-gray-200 rounded-xl">
     <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
       <Zap class="w-5 h-5" />
       Processing Features
     </h3>
-    <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind:checked={enableOCR} class="w-4 h-4" />
         <div>
           <span class="font-medium">OCR Processing</span>
+
           <p class="text-xs">Extract text from images and PDFs</p>
         </div>
       </label>
+
       <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind:checked={enableEmbedding} class="w-4 h-4" />
         <div>
           <span class="font-medium">Vector Embeddings</span>
+
           <p class="text-xs">Generate semantic embeddings with Ollama</p>
         </div>
       </label>
+
       <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind:checked={enableRAG} class="w-4 h-4" />
         <div>
           <span class="font-medium">RAG Integration</span>
+
           <p class="text-xs">Enhanced retrieval-augmented generation</p>
         </div>
       </label>
+
       <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind:checked={enableAutoTags} class="w-4 h-4" />
         <div>
           <span class="font-medium">Auto-Tagging</span>
+
           <p class="text-xs">AI-powered automatic tag generation</p>
         </div>
       </label>
+
       <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
         <input type="checkbox" bind:checked={enableWebGPU} class="w-4 h-4" />
         <div>
           <span class="font-medium">WebGPU Acceleration</span>
+
           <p class="text-xs">Hardware-accelerated processing</p>
         </div>
       </label>
     </div>
   </div>
 </div>
-<!-- Removed, unused <style> block that targeted `pre` to fix Svelte unused CSS selector warning -->
-<!-- SimpleFileUpload component - Svelte, 5, compatible -->
 
+<!-- Removed, unused <style> block that targeted `pre` to fix Svelte unused CSS selector warning -->
+<!-- SimpleFileUpload component - Svelte: 5, compatible -->
 
 

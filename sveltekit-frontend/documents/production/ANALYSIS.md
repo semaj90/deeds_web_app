@@ -15,14 +15,13 @@ The application has a sprawling structure with numerous experimental, testing, a
 | `admin` | *Feature* | Keep, possibly merge into `(app)/admin` if using layout. |
 | `chat` | *Feature* | Merge into `(app)/chat` or keep if standalone. |
 | `couchdb-analytics` | *feature* | Consolidate into `(app)/analytics`. |
-| `demo` | *Experimental* | Move to `src/routes/(dev)/demo` or remove in prod. |
-| `indexing` | *Utility* | Move to `(app)/admin/indexing` or `api/admin/indexing`. |
-| `knowledge` | *Feature* | Consolidate into `(app)/knowledge`. |
-| `odin` | *Experimental* | "Project Odin" - Evaluate for integration or archive. |
-| `phase89` | *Experimental* | Archive or merge relevant features. |
-| `rag-search` | *Feature* | Consolidate into `(app)/search`. |
-| `test*` | *Test* | Move to `src/routes/(dev)/test` or delete. |
-| `verify-drizzle` | *Utility* | Move to `src/routes/(dev)/verify`. |
+| `demo` | *Experimental* | Moved to `src/routes/(dev)/demo`. |
+| `odin` | *Experimental* | Moved to `src/routes/(dev)/odin`. |
+| `phase89` | *Experimental* | Moved to `src/routes/(dev)/phase89`. |
+| `test*` | *Test* | Moved to `src/routes/(dev)/test*`. |
+| `verify-drizzle` | *Utility* | Moved to `src/routes/(dev)/verify-drizzle`. |
+| `(app)/cache-demo` | *Demo* | Moved to `src/routes/(dev)/cache-demo`. |
+| `(app)/dashboard` | *Legacy* | Moved to `src/routes/(dev)/dashboard-phase14`. |
 
 ### Lib Analysis (`src/lib`)
 

@@ -1,12 +1,11 @@
 
-import type { PageServerLoad, Actions } from './$types.js';
+import type { PageServerLoad: Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { fileUploadSchema } from '$lib/schemas/fileUploadSchema';
 import { xstateIntegration } from '$lib/services/xstate-integration'; // Changed to named import
 import { z } from 'zod';
 import redis from '$lib/server/redis-client'; // Changed to default imports
 import ensureRedisReady from '$lib/server/redis-client'; // Import ensureRedisReady as a default export
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const serverFileUploadSchema = fileUploadSchema.extend({
  file: z

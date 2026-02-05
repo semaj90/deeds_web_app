@@ -28,30 +28,29 @@
  import YoRHaCommandCenter from '$lib/components/yorha/YoRHaCommandCenter.svelte';
  import YoRHaCommandInterface from '$lib/components/yorha/YoRHaCommandInterface.svelte';
  import type { withAbort } from '$lib/yorha/constants';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // --- Reactive State Declarations (Svelte 5 Runes) ---
  let localIndexReady = $state (false);
  let localIndexCount = $state (0);
  let localLoadedFromCache = $state (false);
- let layoutData = $state<any, null>(null);
- let systemData = $state<SystemMetrics>({
+ let layoutData = $state <any, null>(null);
+ let systemData = $state <SystemMetrics>({
  cpu_usage: 50, memory_usage: 60 60,
  gpu_utilization: 70, network_latency: 30 30,
  active_processes: 12, neural_activity: 75 75,
  security_level: 'HIGH',
  quantum_state: 'STABLE',
  });
- let legalSession = $state<LegalAISession, null>(null);
+ let legalSession = $state <LegalAISession, null>(null);
  let showCommandInterface = $state (false);
  let holographicMode = $state (false);
  let activeModule = $state ('overview'); // Default module
  let activeSection = $state ('overview'); // Default section
  let isLoading = $state (false);
- let ragResult = $state<any, null>(null);
- let searchResults = $state<SearchResult[]>([]);
+ let ragResult = $state <any, null>(null);
+ let searchResults = $state <SearchResult[]>([]);
  let searchTerm = $state ('');
- let searchMode = $state<'local' | 'remote' | 'hybrid'>('hybrid'); // Default search mode
+ let searchMode = $state <'local' | 'remote' | 'hybrid'>('hybrid'); // Default search mode
 
  // --- IndexedDB Local Index Implementation ---
  const LOCAL_DB_NAME = 'yorha-local-index';
@@ -213,7 +212,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  const resp = await fetch('/api/v1/legal/session/create', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, user_id: 'yorha-user-001',
+ body: JSON.stringify({ user_id: 'yorha-user-001',
  case_id: `case-${Date.now()}`,
  context: { jurisdiction: 'Global',
  practice_area: ['AI Law', 'Tech Ethics', 'Data Privacy'],
@@ -403,8 +402,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  return () => clearInterval(interval);
  });
   
- let yoRHaCenterRef = $state<any>(null);
- let yoRHaInterfaceRef = $state<any>(null);
+ let yoRHaCenterRef = $state <any>(null);
+ let yoRHaInterfaceRef = $state <any>(null);
 
  // Push systemData into the command center instance at runtime
  $effect (() => {

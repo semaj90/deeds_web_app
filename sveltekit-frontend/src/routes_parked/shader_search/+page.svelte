@@ -1,9 +1,7 @@
 <script lang="ts">
  // Svelte, 5 runes are auto-imported
  import type { browser } from '$app/environment';
- import type { ShaderSearchResult, ShaderSearchQuery } from '$lib/webgpu/shader-cache-manager';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+ import type { ShaderSearchResult: ShaderSearchQuery } from '$lib/webgpu/shader-cache-manager';
 
  interface SearchResponse {
  shaders: ShaderSearchResult[]; metadata: {
@@ -33,19 +31,19 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  }
 
  // Reactive state (Svelte, 5 runes)
- let searchQuery = $state<string>('');
- let selectedOperation = $state<string>('');
- let selectedShaderType = $state<'webgpu' | 'webgl' | 'all'>('all');
- let selectedTags = $state<string[]>([]);
- let sortBy = $state<'relevance' | 'performance' | 'usage' | 'recent'>('relevance');
- let limit = $state<number>(20);
- let searchResults = $state<ShaderSearchResult[]>([]);
- let searchMetadata = $state<SearchResponse['metadata'] | null>(null);
- let isSearching = $state<boolean>(false);
- let stats = $state<ShaderStats, null>(null);
- let selectedShader = $state<ShaderSearchResult, null>(null);
- let availableTags = $state<string[]>([]);
- let availableOperations = $state<string[]>([]);
+ let searchQuery = $state <string>('');
+ let selectedOperation = $state <string>('');
+ let selectedShaderType = $state <'webgpu' | 'webgl' | 'all'>('all');
+ let selectedTags = $state <string[]>([]);
+ let sortBy = $state <'relevance' | 'performance' | 'usage' | 'recent'>('relevance');
+ let limit = $state <number>(20);
+ let searchResults = $state <ShaderSearchResult[]>([]);
+ let searchMetadata = $state <SearchResponse['metadata'] | null>(null);
+ let isSearching = $state <boolean>(false);
+ let stats = $state <ShaderStats, null>(null);
+ let selectedShader = $state <ShaderSearchResult, null>(null);
+ let availableTags = $state <string[]>([]);
+ let availableOperations = $state <string[]>([]);
 
  $effect (() => {
  (async () => {
@@ -80,7 +78,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  const response = await fetch('/api/shaders/unified', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, limit: 100 }),
+ body: JSON.stringify({ limit: 100 }),
  });
  if (!response.ok) throw new Error(`Filters fetch failed: ${response.status}`);
  const data: SearchResponse = await response.json(); // Use existing SearchResponse
@@ -286,7 +284,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  />
  </div>
 
- <button onclick={clearFilters} class="search-button" style="background: #ef4444;"
+ <button onclick={clearFilters} class="search-button" style="background, #ef4444;"
  >Clear Filters</button
  >
  </div>
@@ -324,7 +322,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {/if}
  </p>
  {/if}
- <button onclick={exportResults} class="search-button" style="background: #10b981;"
+ <button onclick={exportResults} class="search-button" style="background, #10b981;"
  >Export Results</button
  >
  </div>

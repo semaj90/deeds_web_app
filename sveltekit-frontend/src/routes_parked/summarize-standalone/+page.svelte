@@ -7,22 +7,22 @@
 -->
 <script lang="ts">
  // Component state
- let reportText = $state<string>('');
- let summary = $state<string>('');
- let isLoading = $state<boolean>(false);
- let errorMessage = $state<string>('');
- let processingSteps = $state<string[]>([]);
- let metadata = $state<any>(null);
+ let reportText = $state <string>('');
+ let summary = $state <string>('');
+ let isLoading = $state <boolean>(false);
+ let errorMessage = $state <string>('');
+ let processingSteps = $state <string[]>([]);
+ let metadata = $state <any>(null);
  // Summarization options
- let summaryLength = $state<'short' | 'medium' | 'long'>('medium');
- let includeKeyTerms = $state<boolean>(true);
- let includeLegalAnalysis = $state<boolean>(true);
+ let summaryLength = $state <'short' | 'medium' | 'long'>('medium');
+ let includeKeyTerms = $state <boolean>(true);
+ let includeLegalAnalysis = $state <boolean>(true);
  let temperature = $state (0.3);
  // UI state
- let activeTab = $state<'input' | 'summary' | 'analysis'>('input');
- let wordCount = $state<number>(0);
- let charCount = $state<number>(0);
- let estimatedProcessingTime = $state<number>(0);
+ let activeTab = $state <'input' | 'summary' | 'analysis'>('input');
+ let wordCount = $state <number>(0);
+ let charCount = $state <number>(0);
+ let estimatedProcessingTime = $state <number>(0);
  // Sample legal document for demonstration
  const sampleLegalDoc = `MEMORANDUM OF LAW
 TO: Senior Partner
@@ -120,7 +120,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  const response = await fetch('/api/summarize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, text: reportText,
+ body: JSON.stringify({ text: reportText,
  options: {
  summaryLength,
  includeKeyTerms,
@@ -196,13 +196,13 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  </header>
  <div class="tab-navigation">
  <button
- class="tab {activeTab === 'input' ? 'active' : ''}"
+ class="tab {activeTab === 'input' ? 'active' , ''}"
  onclick={() => (activeTab = 'input')}
  >
  📄 Document Input
  </button>
  <button
- class="tab {activeTab === 'summary' ? 'active' : ''}"
+ class="tab {activeTab === 'summary' ? 'active' , ''}"
  onclick={() => (activeTab = 'summary')}
  disabled={!summary && !isLoading}
  >
@@ -212,7 +212,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  {/if}
  </button>
  <button
- class="tab {activeTab === 'analysis' ? 'active' : ''}"
+ class="tab {activeTab === 'analysis' ? 'active' , ''}"
  onclick={() => (activeTab = 'analysis')}
  disabled={!metadata?.legalRiskAnalysis}
  >
@@ -299,7 +299,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <h3>🧠 AI Processing in Progress</h3>
  <div class="processing-steps">
  {#each processingSteps as step, i}
- <div class="step {i === processingSteps.length - 1 ? 'current' : 'completed'}">
+ <div class="step {i === processingSteps.length - 1 ? 'current' , 'completed'}">
  { step }
  </div>
  {/each}
@@ -398,7 +398,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  .summarization-container {
  max-width: 1200px; margin: 0 auto;
  padding: 2rem;
- font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
  .page-header {
  text-align: center;
@@ -442,7 +442,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  align-items: center;
  justify-content: center; gap: 0.5rem;
  }
- .tab:hover:not(disabled) {
+ .tab:hover, not(disabled) {
  background: rgba(59, 130, 246, 0.1);
  }
  .tab.active {
@@ -533,14 +533,14 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  .btn-primary {
  background: #3b82f6; color: white;
  }
- .btn-primary:hover:not(disabled) {
+ .btn-primary:hover, not(disabled) {
  background: #2563eb;
  }
  .btn-outline {
  background: transparent; border: 1px solid #d1d5db;
  color: #374151;
  }
- .btn-outline:hover:not(disabled) {
+ .btn-outline:hover, not(disabled) {
  background: #f9fafb;
  }
  .btn-large {

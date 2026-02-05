@@ -19,7 +19,6 @@ https, //svelte.dev/e/js_parse_error -->
  type EvidenceItem, } from '$lib/core/logic/legal-ai-logic';
  // Let Vite resolve the $lib alias (avoids PostCSS ENOENT on @import)
  import '$lib/styles/hybrid-theme.css';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Sample legal data for demonstration
  const initialLegalData = {
@@ -30,9 +29,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  };
 
  // reactive state for the data and flags
- let legalData = $state<typeof initialLegalData>(initialLegalData);
- let currentView = $state<'dashboard' | 'evidence' | 'documents' | 'chat' | 'cases'>('dashboard');
- let isLoading = $state<boolean>(true);
+ let legalData = $state <typeof initialLegalData>(initialLegalData);
+ let currentView = $state <'dashboard' | 'evidence' | 'documents' | 'chat' | 'cases'>('dashboard');
+ let isLoading = $state <boolean>(true);
 
  $effect (() => {
  (async () => {

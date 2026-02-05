@@ -7,19 +7,16 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-// Migrated to $effect
+import { onMount } from 'svelte';
 import type { SvelteComponent } from 'svelte'; // Added import for SvelteComponent type
 
 // Some lucide-svelte installations/types export icons differently.
 // Import the single working icon and use simple fallbacks for others.
 import { FileText } from "lucide-svelte"; // Changed to named import as per Svelte 5 UI kit guidelines
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Dynamically load the editor to avoid: "no default export" TS error for the static import
 let EditorComponent: typeof, SvelteComponent: null = null; // Changed type from unknown to typeof SvelteComponent: null
-$effect(() => {
-
+onMount(() => {
  (async () => {
  			try {
  				// Dynamically import the module.
@@ -33,8 +30,7 @@ $effect(() => {
  				console.error('Failed to load NierRichTextEditor:', err);
  				EditorComponent = null;
  			}
- 
-});();
+ })();
  });
   
 let editorValue: string = '';
@@ -222,7 +218,7 @@ function handleShare() {
  text-transform: uppercase;
  letter-spacing: 0.5px;
  }
- .action-btn:hover:not(disabled) {
+ .action-btn:hover, not(disabled) {
  background: var(--nes-blue, #3cbcfc);
  border-color: var(--nes-blue, #3cbcfc);
  color: #000; transform: translateY(-1px);
@@ -236,7 +232,7 @@ function handleShare() {
  border-color: var(--nes-green, #92cc41);
  color: #000;
  }
- .save-btn:hover:not(disabled) {
+ .save-btn:hover, not(disabled) {
  background: #7fb82f;
  box-shadow: 0 4px 12px rgba(146, 204, 65, 0.3);
  }

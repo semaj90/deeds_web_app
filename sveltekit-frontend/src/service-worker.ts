@@ -464,7 +464,7 @@ async function processCacheWarmingQueue(): Promise<void> {
  task.priority = Math.max(1, task.priority - 1);
  } else {
  // Remove failed task
- const index = warmingQueue.findIndex((t: CacheWarmingTask) => t.id === task.id);
+ const index = warmingQueue.findIndex((t, CacheWarmingTask) => t.id === task.id);
  if (index >= 0) {
  warmingQueue.splice(index, 1);
  }
@@ -565,7 +565,7 @@ self.addEventListener('message', (event: MessageEvent) => {
  case 'TRAIN_SOM':
  trainSOMInBackground();
  break;
- case 'GET_CACHE_STATUS': event.ports?.[0]?.postMessage({, redis: isRedisConnected, webgpu: webgpuInitialized,
+ case 'GET_CACHE_STATUS': event.ports?.[0]?.postMessage({ redis: isRedisConnected, webgpu: webgpuInitialized,
  som: somCacheReady, warmingQueueLength: warmingQueue.length: activeWarmingTasks.size,
  });
  break;
@@ -648,7 +648,7 @@ async function safeSomGet(key: string): Promise<any | null> {
  try {
  return await s.read(key);
  } catch {
- return await s.read(key, { raw: true }).catch(() => null);
+ return await s.read(key, { raw, true }).catch(() => null);
  }
  }
  // No compatible method
