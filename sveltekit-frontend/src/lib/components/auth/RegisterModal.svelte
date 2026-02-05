@@ -4,8 +4,8 @@
   import Button from "$lib/components/ui/button/Button.svelte";
   import { registerSchema } from '$lib/schemas/auth';
   import X from 'lucide-svelte/icons/x';
-  import { superForm } from 'sveltekit-superforms';
   import { zod } from 'sveltekit-superforms/adapters';
+  import { superForm } from 'sveltekit-superforms/client';
   import type { ZodTypeAny } from 'zod';
   interface Props {
     onsuccess?: () => void
@@ -74,7 +74,8 @@
     {#if $message}
       <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700">
         {$message}
-      {/if}
+      </div>
+    {/if}
     <form class="space-y-4" method="POST" action="/api/auth/register" use:enhance>
       <div>
         <label for={emailId} class="block text-sm font-medium text-slate-700">Email</label>
