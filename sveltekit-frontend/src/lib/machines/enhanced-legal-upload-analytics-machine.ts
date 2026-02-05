@@ -337,6 +337,7 @@ export async function performAIAnalysisService({
 		// Fallback for demo/offline
 		return input.files.map((file) => ({
 			fileName: file.name,
+			success: false,
 			documentId: `local-${Date.now()}-${Math.random()}`,
 			aiInsights: {
 				summary: 'Analysis unavailable (offline mode)',
@@ -344,7 +345,11 @@ export async function performAIAnalysisService({
 			},
 			metadata: {
 				source: 'local_fallback',
-				acquisition_date: new Date().toISOString()
+				acquisition_date: new Date().toISOString(),
+				fileId: 'fallback-id',
+				hash: '000',
+				authenticity_verified: false,
+				chain_of_custody: []
 			}
 		}));
 	}
@@ -818,8 +823,14 @@ actions: assign({
     },
   },
 },
-},,
-{
+},
+},
+      },
+    },
+  },
+},
+},
+{ // start options
   // wire named services to the existing helper functions by forwarding the machine context
  // wire named services to the existing helper functions by forwarding the machine context
  services: {
@@ -828,7 +839,7 @@ actions: assign({
  // avoid `any` by typing the optional invocation event and use a safe fallback for timing
  generateContextualPrompts: ({ context, event }) =>
  generateContextualPromptsService({
- input: { context: event?.timing ?? 'before-upload' },
+ input: { context, timing: event?.timing ?? 'before-upload' },
  }),
  performAIAnalysis: ({ context }) =>
  performAIAnalysisService({ input: { files: context.files, context } }),
