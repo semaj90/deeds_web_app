@@ -6,13 +6,14 @@
  * Phase: Agentic RAG Source Validation (Task 1.4)
  */
 
-import type { AnswerGenerationRequest, AnswerGenerationResponse,
+import type {
+    AnswerGenerationRequest, AnswerGenerationResponse,
     HealthCheckResponse, KAGUpdateRequest,
     KAGUpdateResponse, KBSearchRequest,
-    KBSearchResponse, SourceValidationRequest, SourceValidationResponse } from '$lib/types/source-validation';
+    KBSearchResponse, SourceValidationRequest, SourceValidationResponse
+} from '$lib/types/source-validation';
 
 import { SourceValidationError } from '$lib/types/source-validation';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const API_BASE_URL = import.meta.env?.VITE_API_URL ?? 'http://localhost:8000';
 const KB_API_PREFIX = '/api/kb';
@@ -38,7 +39,7 @@ async function fetchJSON<T>(
 			const errorData = await response.json().catch(() => ({}));
 			throw new SourceValidationError(
 				errorData.detail ?? `HTTP ${response.status}: ${response.statusText}`,
-				response.status:
+				response.status,
 				errorData.detail
 			);
 		}
@@ -49,7 +50,7 @@ async function fetchJSON<T>(
 			throw error;
 		}
 		throw new SourceValidationError(
-			error instanceof Error ? error.message , 'Unknown error occurred'
+			error instanceof Error ? error.message : 'Unknown error occurred'
 		);
 	}
 }
@@ -198,7 +199,8 @@ function extractEntities(text: string): string[] {
 	const entities = new Set<string>();
 
 	// Patterns for technical terms
-/\$state/g,
+	const patterns = [
+		/\$state/g,
 		/\$derived/g,
 		/\$effect/g,
 		/\$props/g,
@@ -232,15 +234,12 @@ function extractEntities(text: string): string[] {
 
 function extractRelationships(
 	text: string
-): Array<{
-	from: string; to: string;
-	type: string }> {
-	const relationships: Array<{
-	from: string; to: string;
-	type: string }> = [];
+): Array<{ from: string; to: string; type: string }> {
+	const relationships: Array<{ from: string; to: string; type: string }> = [];
 
 	// Pattern: "X uses Y", "X depends on Y", "X references Y"
-{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },
+	const patterns = [
+		{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },
 	{ regex: /(\w+)\s+depends?\s+on\s+(\w+)/gi, type: 'DEPENDS_ON' },
 	{ regex: /(\w+)\s+references?\s+(\w+)/gi, type: 'REFERENCES' },
 	{ regex: /(\w+)\s+extends?\s+(\w+)/gi, type: 'EXTENDS' },
