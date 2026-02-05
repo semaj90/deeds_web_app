@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { poiService } from '$lib/services/poi';
+	import { poiService } from '$lib/features/poi/services/poi';
 	import type { KnownAssociate, PersonOfInterest } from '$lib/types/poi';
 	import { onMount } from "svelte";
 	// Migrated to $effect

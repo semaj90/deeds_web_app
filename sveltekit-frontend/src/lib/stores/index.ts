@@ -4,7 +4,7 @@
  */
 
 export { appState } from './appState.svelte.js';
-export { authStore } from './auth-store.svelte.js';
+export { authStore } from './auth-store.svelte';
 export { userPrefs } from './preferences.svelte.js';
 export { tokenTracker } from './tokenUsage.svelte.js';
 // export { userStore } from './user.svelte.js';

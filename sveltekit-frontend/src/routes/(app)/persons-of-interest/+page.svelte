@@ -15,9 +15,11 @@
  let selectedStatus = $state<string>('');
  let selectedPriority = $state<string>('');
 
- // Load POIs on mount
+ // Load POIs on mount if caseId exists
  onMount(async () => {
-  await loadPOIs();
+  if (data.caseId) {
+    await loadPOIs();
+  }
  });
 
  async function loadPOIs() {
@@ -106,12 +108,17 @@
  </div>
 
  {#if loading}
- <div class="loading">Loading POIs...</div>
- {:else if filteredPOIs().length === 0}
- <div class="empty-state">
- <p>No persons of interest found</p>
- <a href="/persons-of-interest/create" class="btn-primary">Create First POI</a>
- </div>
+  <div class="loading">Loading POIs...</div>
+  {:else if !data.caseId}
+  <div class="empty-state">
+  <p>Please select a case to view Persons of Interest</p>
+  <a href="/cases" class="btn-primary">View Cases</a>
+  </div>
+  {:else if filteredPOIs().length === 0}
+  <div class="empty-state">
+  <p>No persons of interest found</p>
+  <a href="/persons-of-interest/create?caseId={data.caseId}" class="btn-primary">Create First POI</a>
+  </div>
  {:else}
  <div class="poi-grid">
  {#each filteredPOIs() as poi (poi.id)}

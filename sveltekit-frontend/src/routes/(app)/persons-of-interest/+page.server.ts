@@ -6,7 +6,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   const caseId = url.searchParams.get('caseId') || (locals as any).caseId;
 
   if (!caseId) {
-    throw new Error('Case ID is required');
+    // Return null instead of throwing to allow UI to handle empty state
+    return {
+      caseId: null
+    };
   }
 
   return {
