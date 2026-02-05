@@ -37,7 +37,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                 bind:value={ feedback } class="feedback-textarea"
                 placeholder="Tell us more about your experience..."
                 rows="3"
-              ></textarea> </div> <div class="feedback-actions"> <button class="submit-button" onclick={ submitFeedback } disabled={ isSubmitting } type="button"> {#if isSubmitting} Submitting... {:else} Submit Feedback {/if} </button> {/if} </div> {:else} <div class="feedback-success"> <div class="success-icon">âœ“</div> <h3 class="success-title">Thank you!</h3> <p class="success-message">Your feedback helps us improve.</p> {/if} </div> {/if} <style> .feedback-overlay { position: fixed | d; top: 0;left: 0;
+              ></textarea> </div> <div class="feedback-actions"> <button class="submit-button" onclick={ submitFeedback } disabled={ isSubmitting } type="button"> {#if isSubmitting} Submitting... {:else} Submit Feedback {/if} </button> </div> {/if} </div> {:else} <div class="feedback-success"> <div class="success-icon">âœ“</div> <h3 class="success-title">Thank you!</h3> <p class="success-message">Your feedback helps us improve.</p> {/if} </div> {/if} <style> .feedback-overlay { position: fixed | d; top: 0;left: 0;
 	right: 0;bottom: 0;
 	background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px)}
   .feedback-widget { background: white; border-radius: 12px;

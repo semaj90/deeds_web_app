@@ -78,7 +78,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-sm"> {editMode ? 'Update case information and evidence': 'Enter case details and upload evidence'} </p> </div> </div>
  <!-- Progress, indicator -->
   {#if progress > 0} <div class="flex items-center"> <div class="w-20 bg-gray-200 rounded-full"> <div class="bg-primary h-2 rounded-full transition-all" style="width: { progress }%"></div> </div>
- <span class="text-sm nes-text">{Math.round(progress)}%</span> {/if}
+ <span class="text-sm nes-text">{Math.round(progress)}%</span></div> {/if}
   </div> </header>
  <section class="px-6"> <!-- Auto-save, status -->
   {#if enableAutoSave && (lastSaved || isAutoSaving)} <div class="mb-4 p-3 bg-muted rounded-md flex items-center"> <div class="flex items-center">
@@ -86,7 +86,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Real-time validation, status -->
   {#if enableRealTimeValidation} <div class="flex items-center">
-  {#if validationStatus === 'validating'} <Loader2 class="h-4 w-4 animate-spin" /> <span class="text-sm">Validating...</span> {:else if validationStatus === 'valid'} <CheckCircle class="h-4 w-4" /> <span class="text-sm">Valid</span> {:else if validationStatus === 'invalid'} <AlertCircle class="h-4 w-4" /> <span class="text-sm">Issues found</span> {/if} {/if} {/if}
+  {#if validationStatus === 'validating'} <Loader2 class="h-4 w-4 animate-spin" /> <span class="text-sm">Validating...</span> {:else if validationStatus === 'valid'} <CheckCircle class="h-4 w-4" /> <span class="text-sm">Valid</span> {:else if validationStatus === 'invalid'} <AlertCircle class="h-4 w-4" /> <span class="text-sm">Issues found</span> {/if} </div> {/if} {/if}
   <form method="POST"
         action={ submitAction } use, createEnhancedSubmit enctype="multipart/form-data"
         class="space-y-6"

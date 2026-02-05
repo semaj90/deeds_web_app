@@ -243,13 +243,13 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  variant={activeTab === 'search' ? 'default' : 'ghost'} size="sm"
  onclick={() => activeTab = 'search'}
  > <Search class="h-4" /> Search </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2 bits-btn"
- variant={activeTab === 'recommendations' ? 'default', 'ghost'} size="sm"
+ variant={activeTab === 'recommendations' ? 'default' : 'ghost'} size="sm"
  onclick={() => activeTab = 'recommendations'}
  > <Lightbulb class="h-4" /> Recommendations </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2 bits-btn"
- variant={activeTab === 'analysis' ? 'default', 'ghost'} size="sm"
+ variant={activeTab === 'analysis' ? 'default' : 'ghost'} size="sm"
  onclick={() => activeTab = 'analysis'}
  > <BarChart3 class="h-4" /> Analysis </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2 bits-btn"
- variant={activeTab === 'health' ? 'default', 'ghost'} size="sm"
+ variant={activeTab === 'health' ? 'default' : 'ghost'} size="sm"
  onclick={() => activeTab = 'health'}
  > <Activity class="h-4" /> Health </ButtonRoot> </div> <!-- Processing, Indicator -->
  {#if isProcessing} <div class="bits-nier-bits-card"> <div class="yorha-panel-content" variant="default" legal={ true }> <div class="flex items-center justify-center space-x-3"> <div class="animate-spin h-6 w-6 border border-primary border-t-transparent"></div> <span class="nes-text">{ processingStage }

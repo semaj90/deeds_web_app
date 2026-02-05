@@ -76,7 +76,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 							data-enhanced-bits="true"
 							data-operation="add-citation"
 						> <Plus class="w-4 h-4" aria-hidden="true" role="img" aria-label="Plus, icon" /> Add Citation </Button>
- <div id="add-citation-help" class="sr-only"> Create a new legal citation with complete source information {/if}
+ <div id="add-citation-help" class="sr-only"> Create a new legal citation with complete source information </div> {/if}
   <Button class="enhanced-bits-btn nes-citation-control n64-enhanced lod-optimized bits-btn"
 						variant="ghost"
 						size="sm"

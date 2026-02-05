@@ -126,7 +126,7 @@
 			type: 'evidence',
 			urgency: 'medium',
 			lastAccessed: new Date()
-		});
+		} as any);
 
 		const position = calculateSpatialPosition(latent, priority);
 

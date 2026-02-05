@@ -136,7 +136,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="metric"> <span class="metric-value">{organizationMetrics.aiAnalyzed}</span>
  <span class="metric-label">AI Analyzed</span> </div>
  <div class="metric"> <span class="metric-value">{organizationMetrics.chainOfCustodyComplete}</span>
- <span class="metric-label">Chain Complete</span> </div> {/if}
+ <span class="metric-label">Chain Complete</span> </div></div> {/if}
   <!-- Search and, filters --> <div class="filters-panel"> <div class="search-box"> <input type="text" placeholder="Search, evidence..." bind:value={ searchQuery } class="search-input" /> </div>
  <div class="filter-controls"> <select bind:value={filterCriteria.evidenceType}> <option value="all">All Types</option>
  <option value="physical_evidence">Physical Evidence</option>

@@ -51,7 +51,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
    // Load citations on mount and when dependencies change $effect(() => { loadCitations()}); $effect(() => { if (caseId) { loadCitations()}
   }); </script>
-  {#if showEditor} <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"> <div class="bg-white rounded-lg max-w-4xl w-full"> <CitationEditor { caseId } citation={ selectedCitation } mode={ editMode } onsave={ handleCitationSave } ondelete={ handleCitationDelete } oncancel={ closeEditor } /> </div> {/if}
+  {#if showEditor} <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"> <div class="bg-white rounded-lg max-w-4xl w-full"> <CitationEditor { caseId } citation={ selectedCitation } mode={ editMode } onsave={ handleCitationSave } ondelete={ handleCitationDelete } oncancel={ closeEditor } /> </div></div> {/if}
   <div class="citations-list"> <!-- Header --> <div class="flex justify-between"> <div> <h2 class="text-xl font-semibold">Citations</h2>
  <p class="text-sm text-gray-600"> Manage legal citations and references for this case </p> </div>
   {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus: outline-none, focus:ring-2"
@@ -108,7 +108,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                 </blockquote> {/if}
   <!-- Tags -->
   {#if citation.tags && citation.tags.length > 0} <div class="flex flex-wrap gap-1">
-  {#each Array.isArray(citation.tags) ? citation.tags: [] as tag} <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100"> { tag } </span> {/each} {/if}
+  {#each Array.isArray(citation.tags) ? citation.tags: [] as tag} <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100"> { tag } </span> {/each} </div> {/if}
   <!-- Links -->
   {#if citation.url || citation.doi} <div class="flex space-x-4">
   {#if citation.url} <a href={citation.url} target="_blank"

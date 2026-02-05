@@ -76,13 +76,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     role="textbox"
     aria-multiline="true"
     contenteditable={!readonly} data-placeholder={ placeholder } >
-  {#if !content} <div class="editor-placeholder" aria-hidden="true">{ placeholder }{/if}
+  {#if !content} <div class="editor-placeholder" aria-hidden="true">{ placeholder }</div>{/if}
   </div> </div>
  <!-- AI Assistant Modal (replaces: Dialog.Root, usage) -->
   {#if $aiOpen} <div class="fixed inset-0"> <div class="fixed inset-0" onclick={() => aiOpen.set(false)} /> <div class="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-600px -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white" role="dialog" aria-modal="true" aria-labelledby="ai-title"> <h2 id="ai-title" class="pb-4 text-xl">AI Legal Assistant</h2>
  <div class="pt-4">
   {#if selectedText} <div class="selected-text"> <strong>Selected text:</strong>
- <p>"{ selectedText }"</p> {/if}
+ <p>"{ selectedText }"</p> </div> {/if}
   <div class="space-y-4"> <label for="ai-query">What would you like help with? </label>
  <textarea id="ai-query"
             bind:value={ aiQuery } placeholder="E.g., 'Analyze this clause', 'Suggest improvements', 'Find relevant precedents'..."

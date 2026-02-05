@@ -28,7 +28,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <input type="file"
       multiple bind:this={fileInput} onchange={ handleInputChange } style="display: none"
     /> </div>
-  {#if uploadProgress > 0} <div class="progress-bar"> <div class="progress" style="width: { uploadProgress }%"></div> {/if}
+  {#if uploadProgress > 0} <div class="progress-bar"> <div class="progress" style="width: { uploadProgress }%"></div></div> {/if}
   </div>
  <style> .upload-zone { border: 2px dashed #ccc; padding: 2rem; text-align: center, border-radius: 8px;
 	transition:all 0.3s ease}

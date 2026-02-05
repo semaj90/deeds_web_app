@@ -28,7 +28,7 @@ import type { Document } from '$lib/types';
     <input type="hidden" name="id" value={$form.id} />
   {/if}
   {#if serverData?.form?.message}
-    <div class="space-y-4">{serverData.form.message}{/if}
+    <div class="space-y-4">{serverData.form.message}</div>{/if}
   <div>
     <!-- replaced Label component with, native, label -->
     <label for="title" class="block text-sm font-medium">Title</label>

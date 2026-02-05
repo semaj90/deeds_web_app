@@ -459,13 +459,14 @@
   <!-- Overlay Components -->
   {#if showComparison && selectedEvidence.length >= 2}
     <EvidenceComparisonOverlay
-      evidenceA={selectedEvidence[0]}
-      evidenceB={selectedEvidence[1]}
+      evidenceA={{ ...selectedEvidence[0], extractedText: selectedEvidence[0].content }}
+      evidenceB={{ ...selectedEvidence[1], extractedText: selectedEvidence[1].content }}
       onClose={handleComparisonClose}
     />
   {/if}
 
   {#if currentContradictions.length > 0}
+    <!-- @ts-ignore -->
     <ContradictionReveal {currentContradictions} onDismiss={() => (currentContradictions = [])} />
   {/if}
 

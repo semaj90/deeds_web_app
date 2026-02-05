@@ -5,21 +5,18 @@ Compact AI recommendations component for sidebar/dashboard use
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
-  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
-  import  Badge  from "$lib/components/ui/badge/Badge.svelte";
-  import { Card, CardHeader, CardTitle, CardContent } from "$lib/components/ui/card";
+  import Badge from "$lib/components/ui/badge/Badge.svelte";
+  import Button from "$lib/components/ui/enhanced-bits.svelte";
+  import type { IntelligenceRecommendation } from '$lib/services/vector-intelligence-service.js';
+  import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
   import {
+    RefreshCw as ChevronRight,
+    FileText,
+    Clock as Star,
     Lightbulb as Target,
     AlertTriangle as TrendingUp,
-    RefreshCw as ChevronRight,
-    Clock as Star,
-    Users,
-    FileText,
     Zap
   } from 'lucide-svelte';
-  import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
-  import type { IntelligenceRecommendation } from '$lib/services/vector-intelligence-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     context?: string
     userRole?: 'prosecutor' | 'detective' | 'admin' | 'user';

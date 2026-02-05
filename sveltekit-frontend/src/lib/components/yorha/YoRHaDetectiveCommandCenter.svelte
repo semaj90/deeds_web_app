@@ -1,15 +1,13 @@
 <!-- YoRHa Detective Command Center Component -->
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import type { User } from '$lib/types/legal-document';
   import YoRHaDetectiveForm from './YoRHaDetectiveForm.svelte';
   import YoRHaDetectiveModal from './YoRHaDetectiveModal.svelte';
   import YoRHaDetectiveNotification from './YoRHaDetectiveNotification.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Props interface
   interface Props {
-    currentUser?: User;
+    currentUser?: any;
     systemData?: {
 	activeCases: number;
       evidenceItems: number;
@@ -382,7 +380,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     onClose={closeNewCaseModal}
   >
     <YoRHaDetectiveForm
-      fields={newCaseFormFields}
+      fields={newCaseFormFields as any}
       onsubmit={handleNewCaseSubmit}
       submitText="SAVE TO DATABASE"
       submitClass="yorha-btn-success"

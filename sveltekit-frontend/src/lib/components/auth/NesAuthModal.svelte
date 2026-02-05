@@ -78,6 +78,7 @@
         </button>
       </div>
     </form>
+  </div>
   {/if}
 <style>
   /* Minimal modal styles; keep project-wide theming elsewhere */

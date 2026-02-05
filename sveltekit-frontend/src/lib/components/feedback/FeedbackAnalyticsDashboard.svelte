@@ -59,7 +59,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <button onclick={ exportData } class="action-button"> <Download class="w-4" /> Export Data </button> </div> </div> </header>
   {#if error} <div class="error-banner" transitionfade> <AlertCircle class="w-5" /> <div> <h3 class="font-semibold">Error Loading Analytics</h3>
  <p>{ error }</p> </div>
- <button onclick={() => loadDashboardData()} class="retry-button"> <RefreshCw class="w-4" /> Retry </button> {/if} {#if isLoading} <div class="loading-state"> <div class="loading-spinner"></div>
+ <button onclick={() => loadDashboardData()} class="retry-button"> <RefreshCw class="w-4" /> Retry </button> </div> {/if} {#if isLoading} <div class="loading-state"> <div class="loading-spinner"></div>
  <p>Loading analytics data...</p> </div> {:else} <main class="dashboard-main"> <!-- Overview, Cards --> <section class="overview-section" /* transition, removed */}> <div class="overview-cards"> <!-- Total, Ratings --> <div class="metric-nier-bits-card"> <div class="metric-header"> <Users class="metric-icon" /> <span class="metric-label">Total Ratings</span> </div>
  <div class="metric-value"> {dashboardData.overview?.totalRatings?.toLocaleString() ?? 0} </div>
  <div class="metric-trend {getTrendColor(dashboardData.overview?.trendDirection)}"> <svelte, component this={getTrendIcon(dashboardData.overview?.trendDirection)} class="w-4" /> <span>vs last period</span> </div> </div>

@@ -52,7 +52,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               > ðŸ‘ </button>
  <button class="feedback-btn"
                 onclick={() => provideFeedback(message.id, -1)} title="Poor response"
-              > ðŸ‘Ž </button> {/if}
+              > ðŸ‘Ž </button></div> {/if}
   </div>
  <!-- Neural: Sprite, Visualization -->
   {#if message.neuralSprite} <div class="neural-sprite-container"> <NeuralSpriteRenderer spriteData={message.neuralSprite} size="small"

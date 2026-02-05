@@ -207,6 +207,7 @@ https, //svelte.dev/e/js_parse_error -->
  />
  {#if searchQuery} <!-- native button instead of custom: Button, component --> <button class="bits-btn px-3 py-2 rounded text-sm bg-transparent hover:bg-gray-100" onclick={ clearSearch } disabled={ isProcessing }> Clear </button> {/if}
  </div>
+ </div>
  {/if}
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
