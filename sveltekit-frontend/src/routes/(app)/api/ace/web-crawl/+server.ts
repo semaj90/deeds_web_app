@@ -374,4 +374,9 @@ async function processDAG(jobId: string, text: string, vector: number[]) {
 	// Build causal reasoning graph
 	// Use for legal precedent analysis
 	await publishToRabbitMQ('dag.process', {
-		jo
+		jobId,
+		text,
+		vector,
+		reasoningType: 'legal_precedent'
+	});
+}
