@@ -20,7 +20,9 @@ async function ensureConnection() {
 
 	const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
 
+	// @ts-ignore - amqp typing issue
 	connection = await amqp.connect(rabbitmqUrl);
+	// @ts-ignore - amqp typing issue
 	channel = await connection.createChannel();
 
 	// Declare exchanges

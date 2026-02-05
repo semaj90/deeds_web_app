@@ -27,30 +27,32 @@
       return false;
     }
 
+    const perms = requiredPermissions();
+
     // Check case-specific permissions
     if (caseId) {
       if (requireAll) {
-        return requiredPermissions.every(permission => {
-          if (permission === 'read') return authStore.canAccessCase(caseId);
-          if (permission === 'write') return authStore.canEditCase(caseId);
-          if (permission === 'delete') return authStore.canDeleteCase(caseId);
-          return authStore.hasPermission(permission);
+        return perms.every(permission => {
+          if (permission === 'read') return authStore.canAccessCase?.(caseId) ?? false;
+          if (permission === 'write') return authStore.canEditCase?.(caseId) ?? false;
+          if (permission === 'delete') return authStore.canDeleteCase?.(caseId) ?? false;
+          return authStore.hasPermission?.(permission) ?? false;
         });
       } else {
-        return requiredPermissions.some(permission => {
-          if (permission === 'read') return authStore.canAccessCase(caseId);
-          if (permission === 'write') return authStore.canEditCase(caseId);
-          if (permission === 'delete') return authStore.canDeleteCase(caseId);
-          return authStore.hasPermission(permission);
+        return perms.some(permission => {
+          if (permission === 'read') return authStore.canAccessCase?.(caseId) ?? false;
+          if (permission === 'write') return authStore.canEditCase?.(caseId) ?? false;
+          if (permission === 'delete') return authStore.canDeleteCase?.(caseId) ?? false;
+          return authStore.hasPermission?.(permission) ?? false;
         });
       }
     }
 
     // Standard permission check
     if (requireAll) {
-      return requiredPermissions.every((permission) => authStore.hasPermission(permission));
+      return perms.every((permission) => authStore.hasPermission?.(permission) ?? false);
     } else {
-      return requiredPermissions.some((permission) => authStore.hasPermission(permission));
+      return perms.some((permission) => authStore.hasPermission?.(permission) ?? false);
     }
   });
 </script>
