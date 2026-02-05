@@ -1,6 +1,28 @@
-# YoRHa Legal AI - Copilot Context (Updated 2026-01-19)
+# YoRHa Legal AI - Copilot Context (Updated 2026-02-04)
 
-## 🎯 Project Status Overview
+## 🎯 Project Status Overview (Current Session)
+
+### 🚨 Critical Restoration Phase (Feb 4, 3-5pm Session Recovery)
+- **Status:** Directory Consolidation Complete (Moved `src/lib/machines` -> `src/lib/features`).
+- **Git State:** Restored and Committed ("Refactor: Consolidate lib...").
+- **Primary Goal:** Restore 99 corrupted files listed in `backup-analysis.md`.
+- **Secondary Goal:** Review 51 manual-flagged files.
+- **Modernization:** Svelte 5 runes, bits-ui, uno.css updates pending for restored files.
+
+### Backup Analysis Summary
+- **Total Backups:** 618 files analysed.
+- **Corrupted Candidates:** 99 files (Current < Backup or corrupted content).
+- **Safe to Delete:** 468 files (Identical/Older).
+- **Manual Review:** 51 files.
+
+### Architecture Update: Feature-Based Structure
+- **New Location:** `src/lib/features/`
+- **Modules Moved:**
+  - `ai` -> `features/ai`
+  - `evidence` -> `features/evidence`
+  - `machines` -> `features/workflows`
+  - `memory` -> `features/memory`
+  - `search` -> `features/search`
 
 ### Error Reduction Progress (Phase 107)
 - **Current Errors:** 51,397 (down from 51,680 on 2026-01-13)

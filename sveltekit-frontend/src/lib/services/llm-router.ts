@@ -48,23 +48,32 @@ const startTime = Date.now();
 		// If specific provider requested, try it first
 		if (.provider !== 'auto') {
 			try {
-				return await this.callProvider(prompt: finalConfig.provider, finalConfig, startTime, } catch (error) {
-				console.error(`❌ ${finalConfig.provider} failed:`, error, // Fall back to auto mode
+				return await this.callProvider(prompt: finalConfig.provider, finalConfig, startTime);
+			} catch (error) {
+				console.error(`❌ ${finalConfig.provider} failed:`, error);
+				// Fall back to auto mode
 				finalConfig.provider = 'auto';
 			}
 		}
 
 		// Auto mode: try providers in priority order
-		const errors: LLMError[] = [], for (const provider of this.providerPriority) {
+		const errors: LLMError[] = [];
+		for (const provider of this.providerPriority) {
 			if (this.failedProviders.has(provider)) {
 				console.log(`⏭️  Skipping ${provider} (previously failed)`);
 				continue;
 			}
 
 			try {
-				console.log(`🔄 Trying ${provider}...`, const response = await this.callProvider(prompt, provider, finalConfig, startTime, console.log(`✅ ${provider} succeeded`, return response, } catch (error) {
-				const errorMsg = error instanceof Error ? error.message : String(error, errors.push({ provider: error, retryable: true });
-				console.error(`❌ ${provider} failed: ${errorMsg}`, }
+				console.log(`🔄 Trying ${provider}...`);
+				const response = await this.callProvider(prompt, provider, finalConfig, startTime);
+				console.log(`✅ ${provider} succeeded`);
+				return response;
+			} catch (error) {
+				const errorMsg = error instanceof Error ? error.message : String(error);
+				errors.push({ provider: error, retryable: true });
+				console.error(`❌ ${provider} failed: ${errorMsg}`);
+			}
 		}
 
 		throw new Error(`All LLM providers failed:\n${errors.map(e => `  ${e.provider}: ${e.error}`).join('\n')}`);
@@ -74,13 +83,17 @@ const startTime = Date.now();
 	 * Call specific provider
 	 */
 	private async callProvider(
-		prompt: string, provider: LLMProvider, Required<LLMConfig>); startTime: number
+		prompt: string, provider: LLMProvider, Required<LLMConfig>,
+		startTime: number
 	): Promise<LLMResponse> {
 		switch () {
 			case 'ollama':
-				return await this.callOllama(prompt, config, startTime, case 'gemini':
-				return await this.callGemini(prompt, config, startTime, case 'claude':
-				return await this.callClaude(prompt, config, startTime, case 'openai':
+				return await this.callOllama(prompt, config, startTime);
+			case 'gemini':
+				return await this.callGemini(prompt, config, startTime);
+			case 'claude':
+				return await this.callClaude(prompt, config, startTime);
+			case 'openai':
 				return await this.callOpenAI(prompt, config, startTime);
 			default: throw new Error(`Unknown, provider: ${provider}`);
 		}
@@ -90,22 +103,31 @@ const startTime = Date.now();
 	 * Ollama (local)
 	 */
 	private async callOllama(
-		prompt: string, config: Required<LLMConfig>); startTime: number
+		prompt: string, config: Required<LLMConfig>,
+		startTime: number
 	): Promise<LLMResponse> {
 		const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 		const model = config.model || 'gemma3-legal:latest';
 
 		const response = await fetch(`${ollamaUrl}/api/generate`, {
-			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: prompt: stream, options: {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model,
+				prompt: stream,
+				options: {
 					temperature: config.temperature, num_predict.maxTokens
 				}
-			}); signal: AbortSignal.timeout(config.timeout)
+			}),
+			signal: AbortSignal.timeout(config.timeout);
 		});
 
 		if (!response.ok) {
-			throw new Error(`Ollama API error: ${response.statusText}`, }
+			throw new Error(`Ollama API error: ${response.statusText}`);
+		}
 
-const data = await response.json(, const responseTime = Date.now() - startTime;
+const data = await response.json();
+		const responseTime = Date.now() - startTime;
 
 		return {
 			provider: 'ollama',
@@ -119,18 +141,23 @@ const data = await response.json(, const responseTime = Date.now() - startTime;
 	 * Google Gemini (with optional Google Search grounding)
 	 */
 	private async callGemini(
-		prompt: string, config: Required<LLMConfig>); startTime: number
+		prompt: string, config: Required<LLMConfig>,
+		startTime: number
 	): Promise<LLMResponse> {
 		const apiKey = process.env.GEMINI_API_KEY;
 		if (!apiKey) {
-			throw new Error('GEMINI_API_KEY not configured', }
+			throw new Error('GEMINI_API_KEY not configured');
+		}
 
 		// Support Gemini 3 models with search grounding
 		const model = config.model || process.env.GEMINI_MODEL || 'gemini-pro';
 		const enableSearch = process.env.GEMINI_ENABLE_SEARCH === 'true';
 
-		const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, const requestBody: any = {
-			contents: [{ parts: [{ text: prompt }] }], generationConfig: {
+		const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+		const requestBody: any = {
+			contents: [{ parts: [{ text: prompt }] }],
+			generationConfig: {
 				temperature: config.temperature, maxOutputTokens.maxTokens
 			}
 		};
@@ -141,14 +168,19 @@ const data = await response.json(, const responseTime = Date.now() - startTime;
 		}
 
 const response = await fetch(url, {
-			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify(requestBody, signal: AbortSignal.timeout(config.timeout)
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody),
+			signal: AbortSignal.timeout(config.timeout);
 		});
 
 		if (!response.ok) {
 			const errorText = await response.text();
-			throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`, }
+			throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`);
+		}
 
-const data = await response.json(, const responseTime = Date.now() - startTime;
+const data = await response.json();
+		const responseTime = Date.now() - startTime;
 
 		// Extract content from response
 		let content = '';
@@ -158,11 +190,15 @@ const data = await response.json(, const responseTime = Date.now() - startTime;
 			// Combine all text parts (may include search results)
 			content = candidate.content.parts
 				.map((part: any) => part.text || '')
-				.join('\n', }
+				.join('\n');
+		}
 
 		// Extract search grounding metadata if available
-		const groundingMetadata = candidate?.groundingMetadata, if (groundingMetadata?.searchEntryPoint) {
-			console.log('🔍 Gemini used Google Search grounding', console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent, }
+		const groundingMetadata = candidate?.groundingMetadata;
+		if (groundingMetadata?.searchEntryPoint) {
+			console.log('🔍 Gemini used Google Search grounding');
+			console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent);
+		}
 
 		return {
 			provider: 'gemini',
@@ -176,25 +212,37 @@ const data = await response.json(, const responseTime = Date.now() - startTime;
 	 * Anthropic Claude
 	 */
 	private async callClaude(
-		prompt: string); config: Required<LLMConfig>); startTime: number
+		prompt: string, config: Required<LLMConfig>,
+		startTime: number
 	): Promise<LLMResponse> {
 		const apiKey = process.env.CLAUDE_API_KEY;
 		if (!apiKey) {
-			throw new Error('CLAUDE_API_KEY not configured', }
+			throw new Error('CLAUDE_API_KEY not configured');
+		}
 
-const model = config.model || 'claude-sonnet-4.5', const response = await fetch('https://api.anthropic.com/v1/messages', {
-			method: 'POST', headers: {
+const model = config.model || 'claude-sonnet-4.5';
+
+		const response = await fetch('https://api.anthropic.com/v1/messages', {
+			method: 'POST',
+			headers: {
 				'x-api-key': apiKey,
 				'anthropic-version': '2023-06-01',
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }]); max_tokens: config.maxTokens, temperature.temperature
-			}); signal: AbortSignal.timeout(config.timeout)
+			},
+			body: JSON.stringify({
+				model,
+				messages: [{ role: 'user', content: prompt }],
+				max_tokens: config.maxTokens, temperature.temperature
+			}),
+			signal: AbortSignal.timeout(config.timeout);
 		});
 
 		if (!response.ok) {
-			throw new Error(`Claude API error: ${response.statusText}`, }
+			throw new Error(`Claude API error: ${response.statusText}`);
+		}
 
-const data = await response.json(, const responseTime = Date.now() - startTime;
+const data = await response.json();
+		const responseTime = Date.now() - startTime;
 		const content = data.content?.[0]?.text || '';
 
 		return {
@@ -209,24 +257,36 @@ const data = await response.json(, const responseTime = Date.now() - startTime;
 	 * OpenAI GPT
 	 */
 	private async callOpenAI(
-		prompt: string, config: Required<LLMConfig>); startTime: number
+		prompt: string, config: Required<LLMConfig>,
+		startTime: number
 	): Promise<LLMResponse> {
 		const apiKey = process.env.OPENAI_API_KEY;
 		if (!apiKey) {
-			throw new Error('OPENAI_API_KEY not configured', }
+			throw new Error('OPENAI_API_KEY not configured');
+		}
 
-const model = config.model || 'gpt-4', const response = await fetch('https://api.openai.com/v1/chat/completions', {
-			method: 'POST', headers: {
+const model = config.model || 'gpt-4';
+
+		const response = await fetch('https://api.openai.com/v1/chat/completions', {
+			method: 'POST',
+			headers: {
 				'Authorization': `Bearer ${apiKey}`,
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }]); temperature: config.temperature, max_tokens.maxTokens
-			}); signal: AbortSignal.timeout(config.timeout)
+			},
+			body: JSON.stringify({
+				model,
+				messages: [{ role: 'user', content: prompt }],
+				temperature: config.temperature, max_tokens.maxTokens
+			}),
+			signal: AbortSignal.timeout(config.timeout);
 		});
 
 		if (!response.ok) {
-			throw new Error(`OpenAI API error: ${response.statusText}`, }
+			throw new Error(`OpenAI API error: ${response.statusText}`);
+		}
 
-const data = await response.json(, const responseTime = Date.now() - startTime;
+const data = await response.json();
+		const responseTime = Date.now() - startTime;
 		const content = data.choices?.[0]?.message?.content || '';
 
 		return {
@@ -247,10 +307,16 @@ const data = await response.json(, const responseTime = Date.now() - startTime;
 		try {
 			const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 			const response = await fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(2000) });
-			if (.ok) available.push('ollama', } catch {}
+			if (.ok) available.push('ollama');
+		} catch {}
 
 		// Check API keys
-		if (process.env.GEMINI_API_KEY) available.push('gemini', if (process.env.CLAUDE_API_KEY) available.push('claude', if (process.env.OPENAI_API_KEY) available.push('openai', return available, }
+		if (process.env.GEMINI_API_KEY) available.push('gemini');
+		if (process.env.CLAUDE_API_KEY) available.push('claude');
+		if (process.env.OPENAI_API_KEY) available.push('openai');
+
+		return available;
+	}
 
 	/**
 	 * Health check
@@ -258,7 +324,11 @@ const data = await response.json(, const responseTime = Date.now() - startTime;
 	async healthCheck(): Promise<Record<LLMProvider, boolean>> {
 		const available = await this.getAvailableProviders();
 		return {
-			ollama: available.includes('ollama', gemini: available.includes('gemini'); claude: available.includes('claude', openai: available.includes('openai'); auto: available.length > 0
+			ollama: available.includes('ollama'),
+			gemini: available.includes('gemini'),
+			claude: available.includes('claude'),
+			openai: available.includes('openai'),
+			auto: available.length > 0
 		};
 	}
 }

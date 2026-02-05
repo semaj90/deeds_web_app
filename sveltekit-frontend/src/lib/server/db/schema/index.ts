@@ -2,12 +2,12 @@
 export * from '../schema-prosecutor.js';
 
 // Core Application Tables
+export * from './cases.js';
+export * from './citations.js';
+export * from './evidence.js';
 export * from './legal-cases.js';
 export * from './persons.js';
-export * from './evidence.js';
-export * from './cases.js';
 export * from './reports.js';
-export * from './citations.js';
 
 // AI & Chat
 export * from './ai_chat.js';
@@ -27,6 +27,9 @@ export * from './error_brain_analysis.js';
 
 // Phase 27 (Error Brain Diffs) tables
 export * from './errorBrainDiffs.js';
+
+// ACE Pipeline tables
+export * from './ace-web-crawl.js';
 
 
 
