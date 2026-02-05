@@ -64,6 +64,7 @@ interface DocumentStructure {
  headers: number;
 }
 import WebGPUGemmaClient from '$lib/webgpu/webgpu-gemma-client.js'; // Ensure correct path/file extension
+import { getComputeShaders, type LegalComputeShaders } from '$lib/webgpu/legal-compute-shaders.js';
 
 // WebAssembly Legal Processor Class
 export class WasmLegalProcessor {
@@ -73,6 +74,7 @@ export class WasmLegalProcessor {
 
     // AI/GPU Clients
     private gemmaClient: WebGPUGemmaClient | null = null;
+    private computeShaders: LegalComputeShaders | null = null;
     private useWebGPU = false;
 
     constructor() {
@@ -91,8 +93,13 @@ export class WasmLegalProcessor {
                 try {
                      this.gemmaClient = new WebGPUGemmaClient();
                      await this.gemmaClient.initialize();
+
+                     // Initialize compute shaders for text processing
+                     this.computeShaders = await getComputeShaders();
+
                      this.useWebGPU = this.gemmaClient.isWebGPUAvailable;
                      console.log(`✅ WebGPU Acceleration Enabled: ${this.useWebGPU}`);
+                     console.log(`✅ WebGPU Compute Shaders Ready: ${!!this.computeShaders}`);
                 } catch (e) {
                     console.warn('⚠️ WebGPU initialization failed, falling back to CPU/WASM', e);
                     this.useWebGPU = false;
@@ -135,13 +142,23 @@ export class WasmLegalProcessor {
             const sensitiveInfo = JSON.parse(sensitiveJson) as SensitiveInfo[];
             // 6. Generate document fingerprint (WebGPU accelerated if available)
             let fingerprint: string;
-            if (this.useWebGPU && this.gemmaClient) {
-                 // Use embedding as a semantic fingerprint
-                 const embedding = await this.gemmaClient.embed(extractedText.slice(0, 512)); // First 512 tokens as signature
-                 fingerprint = this.bufferToHex(new Uint8Array(embedding.buffer));
+            if (this.useWebGPU && this.computeShaders) {
+                try {
+                    // Use WebGPU compute shader for fast fingerprinting
+                    const fingerprintBuffer = await this.computeShaders.generateDocumentFingerprint(extractedText);
+                    fingerprint = this.bufferToHex(fingerprintBuffer);
+                } catch (error) {
+                    console.warn('WebGPU fingerprint failed, using WASM fallback:', error);
+                    const fingerprintBuffer = await this.wasmModule!.generate_document_fingerprint(extractedText);
+                    fingerprint = this.bufferToHex(fingerprintBuffer);
+                }
+            } else if (this.useWebGPU && this.gemmaClient) {
+                // Use embedding as a semantic fingerprint
+                const embedding = await this.gemmaClient.embed(extractedText.slice(0, 512));
+                fingerprint = this.bufferToHex(new Uint8Array(embedding.buffer));
             } else {
-                 const fingerprintBuffer = this.wasmModule!.generate_document_fingerprint(extractedText);
-                 fingerprint = this.bufferToHex(fingerprintBuffer);
+                const fingerprintBuffer = await this.wasmModule!.generate_document_fingerprint(extractedText);
+                fingerprint = this.bufferToHex(fingerprintBuffer);
             }
 
             // 7. Calculate readability score
@@ -164,13 +181,65 @@ export class WasmLegalProcessor {
     }
 
     // Calculate similarity between two documents
-    // Upgraded to use WebGPU Vector Similarity if available
+    // Upgraded to use WebGPU compute shaders for maximum performance
     async calculateSimilarity(text1: string, text2: string): Promise<number> {
         await this.ensureInitialized();
 
+        // Priority 1: WebGPU compute shaders (fastest)
+        if (this.computeShaders) {
+            try {
+                const vec1 = this.textToVector(text1);
+                const vec2 = this.textToVector(text2);
+                return await this.computeShaders.calculateTextSimilarity(vec1, vec2);
+            } catch (e) {
+                console.warn('WebGPU compute shader failed, trying embeddings:', e);
+            }
+        }
+
+        // Priority 2: WebGPU embeddings (slower but more accurate)
         if (this.useWebGPU && this.gemmaClient) {
             try {
-                // Generate embeddings for both texts (truncate to fit model context)
+                const emb1 = await this.gemmaClient.embed(text1.slice(0, 1024));
+                const emb2 = await this.gemmaClient.embed(text2.slice(0, 1024));
+                return this.cosineSimilarity(emb1, emb2);
+            } catch (e) {
+                console.warn('WebGPU embedding similarity failed, falling back to WASM:', e);
+            }
+        }
+
+        // Priority 3: WASM fallback
+        return await this.wasmModule!.calculate_text_similarity(text1, text2);
+    }
+
+    /**
+     * Convert text to frequency-based vector for similarity computation
+     */
+    private textToVector(text: string, dimensions: number = 256): Float32Array {
+        const vector = new Float32Array(dimensions);
+        const normalized = text.toLowerCase();
+
+        // Simple character frequency encoding
+        for (let i = 0; i < normalized.length; i++) {
+            const charCode = normalized.charCodeAt(i);
+            const bucket = charCode % dimensions;
+            vector[bucket] += 1.0;
+        }
+
+        // Normalize to unit vector
+        let magnitude = 0;
+        for (let i = 0; i < dimensions; i++) {
+            magnitude += vector[i] * vector[i];
+        }
+        magnitude = Math.sqrt(magnitude);
+
+        if (magnitude > 0) {
+            for (let i = 0; i < dimensions; i++) {
+                vector[i] /= magnitude;
+            }
+        }
+
+        return vector;
+    }
                 // Note: In a real implementation, we'd chunk the document.
                 const emb1 = await this.gemmaClient.embed(text1.slice(0, 1024));
                 const emb2 = await this.gemmaClient.embed(text2.slice(0, 1024));
@@ -341,14 +410,34 @@ export class WasmLegalProcessor {
                 };
                 return JSON.stringify(analysis);
             },
-            calculate_text_similarity: (text1: string, text2: string): number => {
+            calculate_text_similarity: async (text1: string, text2: string): Promise<number> => {
+                // Try WebGPU acceleration first
+                if (this.computeShaders) {
+                    try {
+                        // Convert text to embeddings (simple char frequency vectors for demo)
+                        const vec1 = this.textToVector(text1);
+                        const vec2 = this.textToVector(text2);
+                        return await this.computeShaders.calculateTextSimilarity(vec1, vec2);
+                    } catch (error) {
+                        console.warn('WebGPU similarity failed, using CPU fallback:', error);
+                    }
+                }
+                // CPU fallback: Jaccard similarity
                 return this.jaccardSimilarity(
                     this.tokenize(text1.toLowerCase()),
                     this.tokenize(text2.toLowerCase())
                 );
             },
-            generate_document_fingerprint: (text: string): Uint8Array => {
-                // Simple hash-based fingerprint
+            generate_document_fingerprint: async (text: string): Promise<Uint8Array> => {
+                // Try WebGPU acceleration first
+                if (this.computeShaders) {
+                    try {
+                        return await this.computeShaders.generateDocumentFingerprint(text);
+                    } catch (error) {
+                        console.warn('WebGPU fingerprint failed, using CPU fallback:', error);
+                    }
+                }
+                // CPU fallback: Simple hash-based fingerprint
                 const hash = this.simpleHash(text);
                 const buffer = new Uint8Array(32);
                 for (let i = 0; i < 32; i++) {
