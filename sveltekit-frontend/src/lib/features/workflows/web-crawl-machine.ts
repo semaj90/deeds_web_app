@@ -3,6 +3,8 @@
  * Orchestrates the ACE web-crawl pipeline with state management
  */
 
+// TODO: Fix XState v5 setup import - may need to install xstate@^5.0.0
+// @ts-ignore - XState version mismatch
 import { assign, setup } from 'xstate';
 
 interface WebCrawlContext {

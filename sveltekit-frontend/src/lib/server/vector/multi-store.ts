@@ -26,7 +26,7 @@ export async function storeInQdrant(params: {
 
 	// Ensure collection exists
 	const collections = await qdrant.getCollections();
-	const exists = collections.collections.some(c => c.name === collectionName);
+	const exists = collections.collections?.some((c: any) => c.name === collectionName) ?? false;
 
 	if (!exists) {
 		await qdrant.createCollection(collectionName, {
@@ -45,7 +45,7 @@ export async function storeInQdrant(params: {
 				id,
 				vector,
 				payload
-			} as PointStruct
+			}
 		]
 	});
 
@@ -139,7 +139,8 @@ export async function queryMultiStore(params: {
 		collections.qdrant ?
 			qdrant.search(collections.qdrant, {
 				vector,
-				limit: topK
+				limit: topK,
+				with_payload: true
 			}) :
 			Promise.resolve(null),
 
