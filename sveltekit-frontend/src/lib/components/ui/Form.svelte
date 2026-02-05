@@ -47,37 +47,51 @@ let {
 }: Props = $props();
 
 // Mock form store until createFormStore is fixed
+// Reactive state values (must be declared at top level)
+let values = $state<Record<string, any>>({});
+let errors = $state<Record<string, string>>({});
+let isValid = $state(true);
+let isDirty = $state(false);
+let isSubmitting = $state(false);
+let submitCount = $state(0);
+
+// Form object with methods and reactive getters
 const form = {
-	values: $state<Record<string, any>>({}),
-	errors: $state<Record<string, string>>({}),
-	isValid: $state(true),
-	isDirty: $state(false),
-	isSubmitting: $state(false),
-	submitCount: $state(0),
+	get values() { return values; },
+	set values(v) { values = v; },
+	get errors() { return errors; },
+	set errors(e) { errors = e; },
+	get isValid() { return isValid; },
+	set isValid(v) { isValid = v; },
+	get isDirty() { return isDirty; },
+	set isDirty(d) { isDirty = d; },
+	get isSubmitting() { return isSubmitting; },
+	set isSubmitting(s) { isSubmitting = s; },
+	get submitCount() { return submitCount; },
+	set submitCount(c) { submitCount = c; },
 
 	setField: (_field: string, _value: any) => {},
 	touchField: (_field: string) => {},
 	validate: async () => true,
 	submit: async () => {
-		form.isSubmitting = true;
-		form.submitCount++;
+		isSubmitting = true;
+		submitCount++;
 		try {
-			await onsubmit?.({ values: form.values, isValid: form.isValid });
-			if ((options as any).onSubmit) await (options as any).onSubmit(form.values);
+			await onsubmit?.({ values, isValid });
+			if ((options as any).onSubmit) await (options as any).onSubmit(values);
 			return true;
 		} finally {
-			form.isSubmitting = false;
+			isSubmitting = false;
 		}
 	},
 	reset: () => {
-		form.values = {};
-		form.errors = {};
-		form.isDirty = false;
+		values = {};
+		errors = {};
+		isDirty = false;
 	},
 	addField: (_field: string) => {},
 	removeField: (_field: string) => {}
 };
-
 // Subscribe to form values for change events using $effect
 $effect(() => {
 	if (form.isDirty) {
