@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { fade } from 'svelte/transition';
+
 	// Migrated to $effect
 
 	// State
@@ -215,12 +217,12 @@
 	</header>
 
 	{#if loading}
-		<div class="loading" transition, fade>
+		<div class="loading" transition:fade>
 			<div class="spinner"></div>
 			<p>Loading error graph...</p>
 		</div>
 	{:else if error}
-		<div class="error-message" transition, fade>
+		<div class="error-message" transition:fade>
 			<h2>❌ Error</h2>
 			<p>{error}</p>
 		</div>
@@ -305,7 +307,7 @@
 			<aside class="right-panel">
 				<h2>📝 Node Details</h2>
 				{#if selectedNode}
-					<div class="node-details" transition, fade>
+					<div class="node-details" transition:fade>
 						<h3>{selectedNode.label}</h3>
 						<dl>
 							<dt>Kind</dt>

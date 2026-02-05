@@ -47,7 +47,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#each $messages as message (message.id)} <div class="message" class:streaming={message.streaming}> <div class="message-content"> <div class="message-text"> {message.content} {#if message.streaming} <span class="typing-indicator">â–‹</span> {/if}
   </div>
   {#if message.source} <div class="message-metadata"> <span class="source-badge"> {message.source} </span>
-  {#if message.instant} <span class="instant-badge">âš¡</span> {/if} {#if message.similarity} <span class="similarity-badge"> {Math.round(message.similarity * 100)}% </span> {/if} {/if} {#if message.role === 'assistant' && !message.streaming} <div class="feedback-buttons"> <button class="feedback-btn positive"
+  {#if message.instant} <span class="instant-badge">âš¡</span> {/if} {#if message.similarity} <span class="similarity-badge"> {Math.round(message.similarity * 100)}% </span> {/if}</div> {/if} {#if message.role === 'assistant' && !message.streaming} <div class="feedback-buttons"> <button class="feedback-btn positive"
                 onclick={() => provideFeedback(message.id, 1)} title="Good response"
               > ðŸ‘ </button>
  <button class="feedback-btn"

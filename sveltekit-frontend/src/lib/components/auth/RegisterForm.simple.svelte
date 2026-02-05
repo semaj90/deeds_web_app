@@ -69,7 +69,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   <!-- Success, Message -->
   {#if successMessage} <div class="bg-green-500/15 border border-green-500 text-green-700 px-4 py-3 rounded mb-4 flex items-center"
       > <Shield class="h-4" /> <span>{ successMessage }
-</span> {/if}
+</span></div> {/if}
   <form method="POST"
       action="?/register"
       use, enhance={({ formData, cancel }) => { if (!validateForm()) { cancel(); return}
