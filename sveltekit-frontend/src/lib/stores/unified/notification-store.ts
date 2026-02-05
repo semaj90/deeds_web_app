@@ -306,6 +306,8 @@ export const activeAlerts = derived(
 export const showToast = (message: string, type: NotificationType = 'info', duration: ToastDuration = 3000) =>
     notificationStore.showToast(message, type, duration);
 
+export const removeAlert = (id: string) => notificationStore.removeAlert(id);
+
 
 
 
