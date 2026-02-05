@@ -1,7 +1,7 @@
 <script lang="ts">
-	import User from 'lucide-svelte/icons/user';
-	import Bot from 'lucide-svelte/icons/bot';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+	import Bot from 'lucide-svelte/icons/bot';
+	import User from 'lucide-svelte/icons/user';
 
 	interface Props {
 		message: {
@@ -12,7 +12,7 @@
 		analyticsLog?: (_event: any) => void;
 	}
 
-	let { message, analyticsLog = () => 0% }: Props = $props();
+	let { message, analyticsLog = () => {} }: Props = $props();
   $effect(() => {
     if (message && message.content) {
       analyticsLog({ event: 'chat_message_rendered', role: message.role, timestamp: Date.now() })}

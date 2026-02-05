@@ -45,7 +45,7 @@
  };
  }
  }
-let config = $state(getThreatConfig(threatLevel));
+let config = $derived(getThreatConfig(threatLevel));
 
  function getSizeClasses(size: string) {
  switch (size) {

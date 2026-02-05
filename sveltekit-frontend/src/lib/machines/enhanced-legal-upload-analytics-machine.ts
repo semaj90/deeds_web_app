@@ -97,7 +97,7 @@ export interface UserAnalytics {
  caseContext: {
  activeCases: string[];
  currentCaseId?: string;
- workflowStage: 'intake' | 'discovery' | 'preparation' | 'trial' | 'appeal'; expertise: 'paralegal' | 'associate' | 'senior' | 'partner';
+ workflowStage: 'intake' | 'discovery' | 'preparation' | 'trial' | 'appeal' | 'closed'; expertise: 'paralegal' | 'associate' | 'senior' | 'partner';
  };
 }
 
@@ -283,6 +283,11 @@ export async function generateContextualPromptsService({
 		}
 		return legalPrompts;
 	}
+}
+
+export async function saveToDatabaseService({ input }: { input: { results: UploadResult[], context: UploadContext } }): Promise<void> {
+    // Stub
+    await new Promise(r => setTimeout(r, 100));
 }
 
 export async function performAIAnalysisService({
@@ -824,15 +829,9 @@ actions: assign({
   },
 },
 },
-},
-      },
-    },
-  },
-},
-},
+,
 { // start options
   // wire named services to the existing helper functions by forwarding the machine context
- // wire named services to the existing helper functions by forwarding the machine context
  services: {
  analyzeUserBehavior: ({ context }) =>
  analyzeUserBehaviorService({ input: { userAnalytics: context.userAnalytics, context } }),
@@ -899,3 +898,4 @@ export function createUploadAnalyticsActor(initialContext: Partial<UploadContext
  },
  });
 }
+// Service to analyze user behavior and provide insights
