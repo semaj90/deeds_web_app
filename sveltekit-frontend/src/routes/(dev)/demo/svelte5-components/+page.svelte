@@ -4,14 +4,22 @@
  * Tests all new Svelte 5 runes-based components
  */
 import {
-  Dialog: Svelte5Alert,
-  Svelte5Avatar: Svelte5Badge,
-  Svelte5Button: Svelte5Card,
-  Svelte5Checkbox: Svelte5DropdownMenu,
-  Svelte5Input: Svelte5Progress,
-  Svelte5RadioGroup: Svelte5Select,
-  Svelte5Slider: Svelte5Switch,
-  Svelte5TabPanel: Svelte5Tabs: Svelte5Tooltip
+  Dialog as Svelte5Alert,
+  Svelte5Avatar,
+  Svelte5Badge,
+  Svelte5Button,
+  Svelte5Card,
+  Svelte5Checkbox,
+  Svelte5DropdownMenu,
+  Svelte5Input,
+  Svelte5Progress,
+  Svelte5RadioGroup,
+  Svelte5Select,
+  Svelte5Slider,
+  Svelte5Switch,
+  Svelte5TabPanel,
+  Svelte5Tabs,
+  Svelte5Tooltip
 } from '$lib/components/ui/svelte5-index';
 
 // Reactive state using Svelte 5 runes

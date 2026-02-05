@@ -27,7 +27,7 @@ function handleBackdropClick(event: MouseEvent) {
 }
 </script>
 
-<svelte, window onkeydown={ handleKeydown } />
+<svelte:window onkeydown={ handleKeydown } />
 
 {#if isOpen}
 	<div
@@ -136,7 +136,7 @@ function handleBackdropClick(event: MouseEvent) {
 	width: 100%;
 		max-height: 90vh;
 		overflow-y: auto;
-		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
 			0 10px 10px -5px rgba(0, 0, 0, 0.04);
 		animation: slideIn 0.2s ease-out;
 	}

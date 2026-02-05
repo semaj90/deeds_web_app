@@ -1,8 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let id = $state<any>(undefined);
-	let required = $state<any>(undefined);
-
 /**
  * Svelte 5 Checkbox Component
  * Native HTML with Svelte 5 runes and accessible checkbox
@@ -87,7 +83,7 @@ function handleChange(e: Event) {
 			{ value }
 			{ disabled }
 			{required}
-			bind: checked, bind:indeterminate
+			bind:checked bind:indeterminate
 			class="peer appearance-none {sizeClasses} {variantClasses} cursor-pointer disabled, cursor-not-allowed"
 			onchange={ handleChange }
 		/>

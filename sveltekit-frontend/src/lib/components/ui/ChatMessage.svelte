@@ -36,7 +36,7 @@
   <div class="flex-1">
     <div class="text-sm">{message.content}</div>
     {#if message.timestamp}
-      <div class="text-xs text-gray-400">{message.timestamp}{/if}
+      <div class="text-xs text-gray-400">{message.timestamp}</div>{/if}
   </div>
 </div>
 ;
