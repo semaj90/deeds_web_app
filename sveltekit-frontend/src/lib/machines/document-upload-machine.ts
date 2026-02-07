@@ -1,6 +1,6 @@
 // Document Upload State Machine - XState v5 compatible
 // Manages file upload workflow with progress tracking and AI processing
-import { assign, createMachine, fromPromise } from 'xstate';
+import { createMachine, assign, fromPromise } from 'xstate';
 
 // New small, permissive types for uploaded files and AI results
 type UploadedFile = {
@@ -98,10 +98,82 @@ function extractAIResultsFromInvoke(evt: unknown): { processedFiles: AIProcessin
     return null;
 }
 
-const createMachineCompat = createMachine as unknown as (config: Parameters<typeof createMachine>[0]) => ReturnType<typeof createMachine>;
+const validateFiles = fromPromise((async ({ input }: { input: DocumentUploadContext }) => {
+    const errors: Record<string, string[]> = {};
+    if (input.files.length === 0) {
+        errors.files = ['Please select at least one file'];
+    }
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
+    const maxSize = 10 * 1024 * 1024;
+    for (const file of input.files) {
+        if (!allowedTypes.includes(file.type)) {
+            errors.files = errors.files || [];
+            errors.files.push(`${file.name}: File type not allowed`);
+        }
+        if (file.size > maxSize) {
+            errors.files = errors.files || [];
+            errors.files.push(`${file.name}: File too large (max 10MB)`);
+        }
+    }
 
-export const documentUploadMachine = createMachineCompat({
+    if (Object.keys(errors).length > 0) {
+        // eslint-disable-next-line no-throw-literal
+        throw { validationErrors: errors };
+    }
+    return input.files;
+}) as any);
+
+const uploadFiles = fromPromise((async ({ input }: { input: DocumentUploadContext }) => {
+    const formData = new FormData();
+    input.files.forEach((file, index) => {
+        formData.append(`file_${index}`, file);
+    });
+
+    try {
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+        return response.json();
+    } catch (error: any) {
+        throw new Error(error.message || 'Unknown upload error');
+    }
+}) as any);
+
+const processFiles = fromPromise((async ({ input }: { input: DocumentUploadContext }) => {
+    const processingResults: AIProcessingResult[] = [];
+    for (const file of input.uploadedFiles) {
+        const response = await fetch('/api/ai/process-document', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileId: file.id, analysisType: 'full' })
+        });
+        if (!response.ok) {
+            throw new Error(`Processing failed for ${file.name}`);
+        }
+        const result = (await response.json()) as AIProcessingResult;
+        processingResults.push(result);
+    }
+    return {
+        processedFiles: processingResults,
+        summary: {
+            totalFiles: input.uploadedFiles.length,
+            successfulProcessing: processingResults.length,
+            extractedTextLength: processingResults.reduce((acc, r) => acc + (r.extractedText?.length || 0), 0)
+        }
+    };
+}) as any);
+
+export const documentUploadMachine = createMachine({
     id: 'documentUpload',
+    types: {
+        context: {} as DocumentUploadContext,
+        events: {} as DocUploadEvent
+    },
     initial: 'idle',
     context: {
         files: [],
@@ -112,6 +184,11 @@ export const documentUploadMachine = createMachineCompat({
         aiResults: null,
         error: null,
         retryCount: 0
+    },
+    actors: {
+        validateFiles,
+        uploadFiles,
+        processFiles
     },
     states: {
         idle: {
@@ -128,29 +205,7 @@ export const documentUploadMachine = createMachineCompat({
         validating: {
             invoke: {
                 id: 'validateFiles',
-                src: fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
-                    const errors: Record<string, string[]> = {};
-                    if (input.files.length === 0) {
-                        errors.files = ['Please select at least one file'];
-                    }
-                    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
-                    const maxSize = 10 * 1024 * 1024;
-                    for (const file of input.files) {
-                        if (!allowedTypes.includes(file.type)) {
-                            errors.files = errors.files || [];
-                            errors.files.push(`${file.name}: File type not allowed`);
-                        }
-                        if (file.size > maxSize) {
-                            errors.files = errors.files || [];
-                            errors.files.push(`${file.name}: File too large (max 10MB)`);
-                        }
-                    }
-                    if (Object.keys(errors).length > 0) {
-                        // eslint-disable-next-line no-throw-literal
-                        throw { validationErrors: errors };
-                    }
-                    return input.files;
-                }),
+                src: 'validateFiles',
                 input: ({ context }) => context,
                 onDone: {
                     target: 'validated',
@@ -186,30 +241,7 @@ export const documentUploadMachine = createMachineCompat({
             }),
             invoke: {
                 id: 'uploadFiles',
-                src: fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
-                    const formData = new FormData();
-                    input.files.forEach((file, index) => {
-                        formData.append(`file_${index}`, file);
-                    });
-                    const progressInterval = setInterval(() => {
-                        // Progress simulation
-                    }, 100);
-                    try {
-                        const response = await fetch('/api/upload', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        clearInterval(progressInterval);
-                        if (!response.ok) {
-                            const errorData = await response.json().catch(() => ({}));
-                            throw new Error(errorData.error || `HTTP ${response.status}`);
-                        }
-                        return response.json();
-                    } catch (error: any) {
-                        clearInterval(progressInterval);
-                        throw new Error(error.message || 'Unknown upload error');
-                    }
-                }),
+                src: 'uploadFiles',
                 input: ({ context }) => context,
                 onDone: {
                     target: 'processing',
@@ -240,29 +272,7 @@ export const documentUploadMachine = createMachineCompat({
             entry: assign({ processingProgress: 0 }),
             invoke: {
                 id: 'processFiles',
-                src: fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
-                    const processingResults: AIProcessingResult[] = [];
-                    for (const file of input.uploadedFiles) {
-                        const response = await fetch('/api/ai/process-document', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ fileId: file.id, analysisType: 'full' })
-                        });
-                        if (!response.ok) {
-                            throw new Error(`Processing failed for ${file.name}`);
-                        }
-                        const result = (await response.json()) as AIProcessingResult;
-                        processingResults.push(result);
-                    }
-                    return {
-                        processedFiles: processingResults,
-                        summary: {
-                            totalFiles: input.uploadedFiles.length,
-                            successfulProcessing: processingResults.length,
-                            extractedTextLength: processingResults.reduce((acc, r) => acc + (r.extractedText?.length || 0), 0)
-                        }
-                    };
-                }),
+                src: 'processFiles',
                 input: ({ context }) => context,
                 onDone: {
                     target: 'completed',
@@ -322,6 +332,3 @@ export const documentUploadMachine = createMachineCompat({
 });
 
 export default documentUploadMachine;
-
-
-

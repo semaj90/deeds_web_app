@@ -1,9 +1,6 @@
 # Legal AI Platform - Technical Documentation
-
 ## Architecture Overview
-
 ### Tech Stack
-
 **Client-Side:**
 - **ONNX Runtime Web** - EmbeddingGemma 300M model for browser-side embeddings
 - **WebGPU** - GPU-accelerated compute shaders for text processing

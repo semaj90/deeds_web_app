@@ -1,6 +1,5 @@
 import { browser } from '$app/environment';
 import type { ChatMessage, ChatSession, ConnectionStatus, MessageAnalysis, RAGContext, Recommendation } from '$lib/types/chat';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Re-export for UserActivity type
 export interface UserActivity {
@@ -50,8 +49,7 @@ export class ChatStore {
     processingMetrics = $state({ responseTime: 0, tokenCount: 0, confidenceScore: 0, somCluster: -1, embeddingTime: 0, searchTime: 0, generationTime: 0 });
 
     lastError = $state<string | null>(null);
-    errorHistory = $state<Array<{ timestamp: Date;
-	error: string; context?: unknown }>>([]);
+    errorHistory = $state<Array<{ timestamp: Date; error: string; context?: unknown }>>([]);
 
     // User interaction
     userAttention = $state<AttentionData>({ messageId: '', attentionWeights: [], focusPoints: [] });
@@ -122,8 +120,7 @@ export class ChatStore {
             const response = await fetch('/api/chat/session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	user_id: userId, case_id: caseId })
+                body: JSON.stringify({ user_id: userId, case_id: caseId })
             });
             if (!response.ok) { throw new Error('Failed to create session'); }
             const session: ChatSession = await response.json();
@@ -139,7 +136,7 @@ export class ChatStore {
 
     async loadSession(sessionId: string): Promise<void> {
         try {
-             const response = await fetch(`/api/chat/session/${ sessionId }`);
+             const response = await fetch(`/api/chat/session/${sessionId}`);
             if (!response.ok) { throw new Error('Session not found'); }
             const session: ChatSession = await response.json();
             this.session = session;
@@ -168,10 +165,10 @@ export class ChatStore {
 
     async loadHistory(sessionId: string): Promise<void> {
         try {
-            const response = await fetch(`/api/chat/history/${ sessionId }`);
+            const response = await fetch(`/api/chat/history/${sessionId}`);
             if (!response.ok) { throw new Error('Failed to load history'); }
             const history = await response.json();
-            this.messages = history?.messages|| [];
+            this.messages = history?.messages || [];
         } catch (error: any) {
             this.addError('Failed to load chat history', { sessionId, error });
         }
@@ -202,9 +199,12 @@ export class ChatStore {
             // Create final AI message
             const session = this.session;
             const aiMessage: ChatMessage = {
-                id: messageId, session_id: session?.id ?? '',
+                id: messageId,
+                session_id: session?.id ?? '',
                 role: 'assistant',
-                content: response, timestamp: new Date().toISOString(), token_count: Math.ceil(response.length / 4) // Rough estimate
+                content: response,
+                timestamp: new Date().toISOString(),
+                token_count: Math.ceil(response.length / 4) // Rough estimate
             };
             this.addMessage(aiMessage);
         }
@@ -218,13 +218,15 @@ export class ChatStore {
         this.currentAnalysis = analysis;
         // Update processing metrics
         this.processingMetrics = {
-            ...this.processingMetrics, confidenceScore: analysis.confidence, somCluster: typeof analysis.som_cluster === 'string' ? parseInt(analysis.som_cluster) : -1
+            ...this.processingMetrics,
+            confidenceScore: analysis.confidence,
+            somCluster: typeof analysis.som_cluster === 'string' ? parseInt(analysis.som_cluster) : -1
         };
     }
 
     setRAGContext(context: RAGContext): void {
         this.ragContext = context;
-        this.recommendations = context?.recommendations|| [];
+        this.recommendations = context?.recommendations || [];
         this.didYouMean = Array.isArray(context.did_you_mean) ? context.did_you_mean : [];
     }
 
@@ -232,7 +234,8 @@ export class ChatStore {
         const activity: UserActivity = {
             userId: sessionId,
             lastSeen: new Date(),
-            status: 'online'
+            status: 'online',
+            sessionId
         };
         const updated = [...this.userActivities, activity];
         // Keep only last 100 activities
@@ -240,7 +243,8 @@ export class ChatStore {
 
         // Update attention data
         this.userAttention = {
-            ...this.userAttention, lastActivity: Date.now(),
+            ...this.userAttention,
+            lastActivity: Date.now(),
             interactionCount: (this.userAttention?.interactionCount ?? 0) + 1
         };
     }
@@ -294,8 +298,7 @@ export class ChatStore {
         const messages = this.messages;
         const analysis = this.currentAnalysis;
         const context = this.ragContext;
-        return JSON.stringify({ session, messages, analysis, context, exportedAt: new Date().toISOString() },
-	null, 2);
+        return JSON.stringify({ session, messages, analysis, context, exportedAt: new Date().toISOString() }, null, 2);
     }
 
     reset(): void {
@@ -316,7 +319,3 @@ export class ChatStore {
 }
 
 export const chatStore = new ChatStore();
-
-
-
-

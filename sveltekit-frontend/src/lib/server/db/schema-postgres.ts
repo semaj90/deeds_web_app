@@ -2153,3 +2153,8 @@ export const auditLog = pgTable('audit_log', {
 
 
 
+
+export type NewUserAiQuery = typeof userAiQueries.$inferInsert;
+export type NewAutoTag = typeof autoTags.$inferInsert;
+export type NewDocumentChunk = typeof documentChunks.$inferInsert;
+

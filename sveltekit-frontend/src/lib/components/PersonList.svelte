@@ -9,11 +9,11 @@
 		onSelect: (person: FugitiveDexPerson) => void;
 	}
 
-	let { persons, selectedPerson, searchQuery, onSelect }: Props = $props();
+	let { persons, selectedPerson, searchQuery = $bindable(), onSelect }: Props = $props();
 
 	// Filter states
-	let statusFilter = 'ALL';
-	let priorityFilter = 'ALL';
+	let statusFilter = $state('ALL');
+	let priorityFilter = $state('ALL');
 
 	const statusOptions = ['ALL', 'WANTED', 'MONITORING', 'COOPERATIVE'];
 	const priorityOptions = ['ALL', 'HIGH', 'MEDIUM', 'LOW'];
@@ -55,6 +55,7 @@
 					<div class="text-left">
 						<p class="text-white font-bold text-sm">{person.name}</p>
 						<p class="text-xs opacity-60">{person.alias}</p>
+					</div>
 				</Button.Root>
 			{/each}
 		</div>
@@ -63,8 +64,8 @@
 		<div class="filter-section">
 			<h4 class="text-amber-300 text-sm mb-2">FILTERS</h4>
 			<div class="filter-group">
-				<label class="text-xs opacity-70 block mb-1">STATUS</label>
-				<div class="flex gap-1 flex-wrap">
+				<label id="status-filter-label" class="text-xs opacity-70 block mb-1">STATUS</label>
+				<div class="flex gap-1 flex-wrap" role="group" aria-labelledby="status-filter-label">
 					{#each statusOptions as status}
 						<Button.Root
 							class="nes-btn text-xs {statusFilter === status ? 'is-primary' : ''}"
@@ -76,8 +77,8 @@
 				</div>
 			</div>
 			<div class="filter-group mt-3">
-				<label class="text-xs opacity-70 block mb-1">PRIORITY</label>
-				<div class="flex gap-1 flex-wrap">
+				<label id="priority-filter-label" class="text-xs opacity-70 block mb-1">PRIORITY</label>
+				<div class="flex gap-1 flex-wrap" role="group" aria-labelledby="priority-filter-label">
 					{#each priorityOptions as priority}
 						<Button.Root
 							class="nes-btn text-xs {priorityFilter === priority ? 'is-primary' : ''}"

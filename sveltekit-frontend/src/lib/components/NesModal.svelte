@@ -39,7 +39,13 @@
 		tabindex="-1"
 		transition:fade
 	>
-		<div class="modal-container" onclick={stopPropagation} role="document">
+	<div
+		class="modal-container"
+		onclick={stopPropagation}
+		onkeydown={(e) => e.stopPropagation()}
+		role="document"
+		tabindex="-1"
+	>
 			<div class="modal-header">
 				{#if header}
 					{@render header()}

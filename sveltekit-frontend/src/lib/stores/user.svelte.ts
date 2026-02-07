@@ -64,7 +64,7 @@ class UserStore {
   /**
    * Update user profile data
    */
-  updateUserProfile(updates, Partial<UserSession['user']>) {
+  updateUserProfile(updates: Partial<UserSession['user']>) {
     if (!this.user) return;
 
     this.user = {

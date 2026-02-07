@@ -35,14 +35,14 @@
 	total_occurrences: number;
 	}
 
-	let errors: Phase72Error[] = [];
-	let stats: StatsSummary | null = null;
-	let loading = true;
-	let selectedError: Phase72Error | null = null;
-	let similarErrors: any[] = [];
-	let aiSuggestion = '';
-	let streamingFix = false;
-	let showSimilar = false;
+	let errors = $state<Phase72Error[]>([]);
+	let stats = $state<StatsSummary | null>(null);
+	let loading = $state(true);
+	let selectedError = $state<Phase72Error | null>(null);
+	let similarErrors = $state<any[]>([]);
+	let aiSuggestion = $state('');
+	let streamingFix = $state(false);
+	let showSimilar = $state(false);
 
 	async function loadErrors() {
 		loading = true;
@@ -149,7 +149,7 @@
 </script>
 
 <div class="phase72-modal" transition:fade={{ duration: 200 }}>
-	<div class="modal-backdrop" onclick={ onClose }></div>
+	<div class="modal-backdrop" role="button" tabindex="0" onclick={onClose} onkeydown={(e) => e.key === 'Escape' && onClose()}></div>
 
 	<div class="modal-content nes-container is-dark" transition:fly={{ y: 50, duration: 300 }}>
 		<!-- Header -->

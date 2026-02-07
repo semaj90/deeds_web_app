@@ -52,6 +52,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			await uploadFiles(Array.from(e.dataTransfer.files));
 		}
 	}}
+	onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { (document.querySelector('input[type=file]') as HTMLInputElement)?.click() } }}
 >
 	{#if isUploading}
 		<Loader2 class="animate-spin mb-2" size={32} />

@@ -38,7 +38,7 @@
       "source.organizeImports": "explicit"
     }
   },
-  "cmake.sourceDirectory": "${workspaceFolder}",
+  "cmake.sourceDirectory": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/build/_deps/nlohmann_json-src",
   "cmake.configureSettings": {
     "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
     "VCPKG_TARGET_TRIPLET": "x64-windows"
@@ -114,5 +114,8 @@
   "diffEditor.experimental.useVersionedHover": true,
   "editor.codeActions.triggerOnFocusChange": true,
   "github.copilot.chat.languageContext.inline.typescript.enabled": true,
-  "github.copilot.chat.languageContext.typescript.enabled": true
+  "github.copilot.chat.languageContext.typescript.enabled": true,
+  "github.copilot.chat.languageContext.fix.typescript.enabled": true,
+  "github.copilot.chat.languageContext.typescript.items": "fill",
+  "github.copilot.nextEditSuggestions.enabled": true
 }

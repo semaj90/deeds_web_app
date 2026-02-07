@@ -1,5 +1,4 @@
 import { browser } from '$app/environment';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AuthUser {
 	id: string;
@@ -9,10 +8,12 @@ export interface AuthUser {
 	role: string;
 	avatarUrl: string | null;
 }
+
 export interface Session {
 	id: string;
 	expiresAt: string;
 }
+
 export interface UserSession {
 	user: AuthUser;
 	session: Session;
@@ -34,7 +35,7 @@ class AuthStore {
 	userDisplayName = $derived.by(() => {
 		if (!this.session?.user) return null;
 		const { firstName, lastName, email } = this.session.user;
-		return firstName && lastName ? `${ firstName } ${ lastName }` : email;
+		return firstName && lastName ? `${firstName} ${lastName}` : email;
 	});
 
 	constructor() {
@@ -83,7 +84,7 @@ class AuthStore {
 			const response = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ email, password }),
+				body: JSON.stringify({ email, password }),
 				credentials: 'include'
 			});
 
@@ -138,8 +139,8 @@ class AuthStore {
 	 * Register new user
 	 */
 	async register(data: {
-	email: string,
-		password: string,
+		email: string;
+		password: string;
 		firstName?: string;
 		lastName?: string;
 	}): Promise<boolean> {
@@ -150,7 +151,7 @@ class AuthStore {
 			const response = await fetch('/api/auth/register', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify(data),
+				body: JSON.stringify(data),
 				credentials: 'include'
 			});
 
@@ -188,13 +189,15 @@ class AuthStore {
 			const response = await fetch('/api/auth/profile', {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify(updates),
+				body: JSON.stringify(updates),
 				credentials: 'include'
 			});
 
 			if (response.ok) {
 				const updatedUser: AuthUser = await response.json();
-				this.session = { ...this.session, user: updatedUser };
+				if (this.session) {
+                    this.session = { ...this.session, user: updatedUser };
+                }
 				return true;
 			} else {
 				const errorData = await response.json().catch(() => ({ message: 'Update failed' }));
@@ -240,7 +243,7 @@ class AuthStore {
 	hasPermission(permission: string): boolean {
 		if (!this.user) return false;
 		// Check user role-based permissions
-		const adminPermissions = ['read', 'write', 'delete', 'admin'];
+		// const adminPermissions = ['read', 'write', 'delete', 'admin'];
 		if (this.user.role === 'admin') return true;
 		// Add role-based permission mapping as needed
 		return false;
@@ -251,9 +254,6 @@ class AuthStore {
 			localStorage.setItem('auth.redirect', path);
 		}
 	}
-};
+}
+
 export const authStore = new AuthStore();
-
-
-
-

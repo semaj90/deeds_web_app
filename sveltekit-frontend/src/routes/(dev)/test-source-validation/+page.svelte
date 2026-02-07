@@ -28,7 +28,7 @@ let citations = $state<CitationMetadata[]>([]);
 
 // Step 3: Knowledge Graph
 let entities = $state<string[]>([]);
-let relationships = $state<Array<{ from: string; to: string; type, string }>>([]);
+let relationships = $state<Array<{ from: string; to: string; type: string }>>([]);
 let kagUpdateStatus = $state<string | null>(null);
 
 // ============================================================================
@@ -111,7 +111,7 @@ function extractEntities(text: string): string[] {
 			matches.forEach((match) => entities.add(match));
 		}
 	});
-  
+
 	const capitalizedWords = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g);
 	if (capitalizedWords) {
 		capitalizedWords.forEach((word) => {
@@ -124,8 +124,8 @@ function extractEntities(text: string): string[] {
 
 function extractRelationships(
 	text: string
-): Array<{ from: string; to: string; type, string }> {
-	const relationships: Array<{ from: string; to: string; type, string }> = [];
+): Array<{ from: string; to: string; type: string }> {
+	const relationships: Array<{ from: string; to: string; type: string }> = [];
 
 	const patterns = [
 		{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },

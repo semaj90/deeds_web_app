@@ -8,7 +8,7 @@ import { Badge } from "$lib/components/ui/badge/index.js";
 import { Button } from "$lib/components/ui/button/index.js";
 import * as Card from "$lib/components/ui/card/index.js";
 // App stores & Services
-import { analyzeEvidence, findEvidenceConnections } from "$lib/ai/ai-service";
+import { aiService } from "$lib/features/ai/services/ai-service";
 import AIAssistantPanel from "$lib/components/ai/AIAssistantPanel.svelte";
 import EvidenceCard from "$lib/components/detective/EvidenceCard.svelte";
 import UploadZone from "$lib/components/detective/UploadZone.svelte";
@@ -40,22 +40,26 @@ let aiHighlightedEvidence = $state<string[]>([]);
 let canvasContainer = $state<HTMLDivElement | undefined>();
 
 let columns = $state([
-{ id: "new", title: "New Evidence", items: [] },
-	{ id: "processing", title: "Processing", items: [] },
-	{ id: "verified", title: "Verified", items: [] }
+  { id: "new", title: "New Evidence", items: [] },
+  { id: "processing", title: "Processing", items: [] },
+  { id: "verified", title: "Verified", items: [] }
 ]);
 
 let canvasEvidence = $state<any[]>([]);
 let activeUsers = $state<any[]>([]);
 let systemStatus = $state({
-rabbitMQ: {
-	connected: false, health: "unknown" },
-	postgreSQL: {
-	connected: false, vectorCount: 0 },
-	gpu: {
-	available: false, utilization: 0, model: "RTX 3060 Ti" },
-	processingStats: {
-	totalFiles: 0, processed: 0, queued: 0 }
+  rabbitMQ: {
+    connected: false, health: "unknown"
+  },
+  postgreSQL: {
+    connected: false, vectorCount: 0
+  },
+  gpu: {
+    available: false, utilization: 0, model: "RTX 3060 Ti"
+  },
+  processingStats: {
+    totalFiles: 0, processed: 0, queued: 0
+  }
 });
 
 let findModal = $state({ show: false, query: "", results: [] as any[], loading: false, error: "" });
@@ -64,71 +68,79 @@ let openContextMenuId = $state<string | null>(null);
 
 // Effects
 $effect(() => {
-const unsubscribe = evidenceStore.subscribe(v => { evidenceStoreState = v });
-return () => unsubscribe();
+  const unsubscribe = evidenceStore.subscribe(v => { evidenceStoreState = v });
+  return () => unsubscribe();
 });
 
 $effect(() => {
-void (async () => {
-await initializeEnhancedSystems();
-})();
+  void (async () => {
+    await initializeEnhancedSystems();
+  })();
 });
 
 async function initializeEnhancedSystems() {
-try {
-await rabbitmqService.initialize();
-systemStatus.rabbitMQ.connected = true;
-systemStatus.rabbitMQ.health = "connected";
-} catch (e) { console.warn("RabbitMQ failed", e); }
+  try {
+    await rabbitmqService.initialize();
+    systemStatus.rabbitMQ.connected = true;
+    systemStatus.rabbitMQ.health = "connected";
+  } catch (e) {
+    console.warn("RabbitMQ failed", e);
+  }
 
-try {
-const gpuStatus = await gpuService.getStatus();
-systemStatus.gpu.available = !!gpuStatus?.webgpuSupported;
-systemStatus.gpu.utilization = gpuStatus?.accelerationActive ? 75 : 0 } catch (e) { console.warn("GPU failed", e); }
+  try {
+    const gpuStatus = await gpuService.getStatus();
+    systemStatus.gpu.available = !!gpuStatus?.webgpuSupported;
+    systemStatus.gpu.utilization = gpuStatus?.accelerationActive ? 75 : 0
+  } catch (e) {
+    console.warn("GPU failed", e);
+  }
 }
 
 // Handlers
 function handleFileUpload(result: any, columnId: string) {
-const newEvidence = {
-id: result?.id ?? `evidence-${Date.now()}-${Math.random()}`,
-title: result?.originalName ?? result?.fileName ?? "Untitled",
-fileName: result?.fileName,
-fileSize: result?.fileSize,
-evidenceType: result?.metadata?.evidenceType ?? "document",
-createdAt: new Date(result?.metadata?.uploadedAt ?? Date.now()),
-tags: [],
-x: 100 + Math.random() * 200,
-y: 100 + Math.random() * 200,
-url: result?.url
-};
-columns = columns.map(col => col.id === columnId ? { ...col, items: [...col.items, newEvidence] } : col);
+  const newEvidence = {
+    id: result?.id ?? `evidence-${Date.now()}-${Math.random()}`,
+    title: result?.originalName ?? result?.fileName ?? "Untitled",
+    fileName: result?.fileName,
+    fileSize: result?.fileSize,
+    evidenceType: result?.metadata?.evidenceType ?? "document",
+    createdAt: new Date(result?.metadata?.uploadedAt ?? Date.now()),
+    tags: [],
+    x: 100 + Math.random() * 200,
+    y: 100 + Math.random() * 200,
+    url: result?.url
+  };
+  columns = columns.map(col => col.id === columnId ? { ...col, items: [...col.items, newEvidence] } : col);
 }
 
-function handleDndFinalize(e: CustomEvent<{
-	items: any[] }>, columnId: string) {
-const { items } = e.detail;
-columns = columns.map(col => col.id === columnId ? { ...col, items } : col);
+function handleDndFinalize(e: CustomEvent<{ items: any[] }>, columnId: string) {
+  const { items } = e.detail;
+  columns = columns.map(col => col.id === columnId ? { ...col, items } : col);
 }
 
 function handleEvidenceSelect(id: string) {
-selectedEvidenceIds = selectedEvidenceIds.includes(id)
-? selectedEvidenceIds.filter(i => i !== id)
-: [...selectedEvidenceIds, id];
+  selectedEvidenceIds = selectedEvidenceIds.includes(id)
+    ? selectedEvidenceIds.filter(i => i !== id)
+    : [...selectedEvidenceIds, id];
 }
 
 function handleViewEvidence(item: any) {
-window.open(`/evidence/${item.id}`, "_blank");
+  window.open(`/evidence/${item.id}`, "_blank");
 }
 
 async function analyzeSelectedEvidence() {
-if (selectedEvidenceIds.length === 0) return;
-try {
-if (selectedEvidenceIds.length === 1) {
-await analyzeEvidence(caseId, selectedEvidenceIds[0]);
-} else {
-await findEvidenceConnections(caseId, selectedEvidenceIds);
-}
-} catch (e) { console.error("Analyze failed", e); }
+  if (selectedEvidenceIds.length === 0) return;
+  try {
+    if (selectedEvidenceIds.length === 1) {
+      // Assuming 'document' as default type if not available
+      await aiService.analyzeEvidence(selectedEvidenceIds[0], "document");
+    } else {
+      // await findEvidenceConnections(caseId, selectedEvidenceIds);
+      console.warn("findEvidenceConnections not implemented yet");
+    }
+  } catch (e) {
+    console.error("Analyze failed", e);
+  }
 }
 
 function openFindModal(item: any) {

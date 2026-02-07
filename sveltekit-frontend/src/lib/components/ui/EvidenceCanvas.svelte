@@ -102,11 +102,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#each evidenceItems as item (item.id)}
     <article
       class="card nes-container is-dark hover:shadow-lg cursor-pointer"
-      role="button"
-      tabindex="0"
-      aria-label={item.title ?? 'Evidence item'}
       onclick={() => handleItemClick(item)}
       onkeydown={(e) => (['Enter',' '].includes(e.key) && handleItemClick(item))}
+      tabindex="0"
+      role="button"
+      aria-label={item.title ?? 'Evidence item'}
     >
       {#if item.thumbnail}
         <img src={item.thumbnail} alt={item.title ?? 'Evidence'} class="rounded-md w-full aspect-video object-cover mb-2" />

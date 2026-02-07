@@ -2,17 +2,21 @@
 	/**
 	 * Knowledge Graph Visualization Component
 	 * Phase 72 - Task 16.1: Visual Knowledge Graph UI
-	 *
-	 * Features:
-	 * - Interactive graph visualization using D3.js force-directed layout
-	 * - Display error nodes, fix strategy nodes, and relationships
-	 * - Color coding by cluster/error type
-	 * - Zoom, pan, and filter capabilities
 	 */
 
 	import type { ErrorPattern, ErrorRelationship, FixStrategy } from '$lib/services/error-analysis/types';
+    import { onMount } from 'svelte';
 
 	// Props
+    interface Props {
+        patterns?: ErrorPattern[];
+        strategies?: FixStrategy[];
+        relationships?: ErrorRelationship[];
+        width?: number;
+        height?: number;
+        onNodeClick?: (node: any) => void;
+    }
+
 	let {
 		patterns = [],
 		strategies = [],
@@ -20,21 +24,14 @@
 		width = 800,
 		height = 600,
 		onNodeClick = (node: any) => {}
-	}: {
-		patterns?: ErrorPattern[];
-		strategies?: FixStrategy[];
-		relationships?: ErrorRelationship[];
-		width?: number;
-		height?: number;
-		onNodeClick?: (node: any) => void } = $props();
+	}: Props = $props();
 
 	// State
-	let container: HTMLDivElement;
-	let svg: SVGSVGElement;
-	let simulation: any = null;
-	let selectedNode: any = $state(null);
-	let filterType: string = $state('all');
-	let zoomLevel: number = $state(1);
+	let container = $state<HTMLDivElement>();
+	let svg = $state<SVGSVGElement>();
+	let selectedNode = $state<any>(null);
+	let filterType = $state<string>('all');
+	let zoomLevel = $state<number>(1);
 
 	// Node colors by type
 	const nodeColors: Record<string, string> = {
@@ -46,16 +43,30 @@
 		runtime: '#8b5cf6' // purple
 	};
 
+    // Helper for circular type safety
+    interface GraphNode {
+        id: string;
+        type: string;
+        label: string;
+        errorType?: string;
+        occurrences?: number;
+        successRate?: number;
+        confidence?: number;
+        x?: number;
+        y?: number;
+        [key: string]: any;
+    }
+
 	// Derived nodes and links
-	let nodes = $derived(buildNodes(patterns, strategies, filterType));
-	let links = $derived(buildLinks(relationships, nodes));
+	const nodes = $derived(buildNodes(patterns, strategies, filterType));
+	const links = $derived(buildLinks(relationships, nodes));
 
 	function buildNodes(
 		patterns: ErrorPattern[],
 		strategies: FixStrategy[],
 		filter: string
-	) {
-		const nodeList: any[] = [];
+	): GraphNode[] {
+		const nodeList: GraphNode[] = [];
 
 		// Add pattern nodes
 		for (const p of patterns) {
@@ -64,7 +75,10 @@
 				id: p.id,
 				type: 'pattern',
 				label: p.pattern.slice(0, 30) + '...',
-				errorType: p.errorType: occurrences, p: p.occurrences: successRate, p: p.successRate: data, p
+				errorType: p.errorType,
+                occurrences: p.occurrences,
+                successRate: p.successRate,
+                data: p
 			});
 		}
 
@@ -75,26 +89,38 @@
 				id: s.id,
 				type: 'strategy',
 				label: s.description.slice(0, 30) + '...',
-				successRate: s.successRate: confidence, s: s.confidence: data, s
+				successRate: s.successRate,
+                confidence: s.confidence,
+                data: s
 			});
 		}
 
-		return nodeList }
+		return nodeList;
+	}
 
 	function buildLinks(
 		relationships: ErrorRelationship[],
-		nodes: any[]
+		nodes: GraphNode[]
 	) {
 		const nodeIds = new Set(nodes.map(n => n.id));
 		return relationships
 			.filter(r => nodeIds.has(r.from) && nodeIds.has(r.to))
 			.map(r => ({
-				source: r.from,
-				target: r.to,
+				source: nodes.find(n => n.id === r.from) || { x: 0, y: 0 },
+				target: nodes.find(n => n.id === r.to) || { x: 0, y: 0 },
 				type: r.type,
 				weight: r.weight
 			}));
 	}
+
+    // Zoom controls
+    function zoomIn() {
+        zoomLevel = Math.min(zoomLevel + 0.2, 3);
+    }
+
+    function zoomOut() {
+        zoomLevel = Math.max(zoomLevel - 0.2, 0.5);
+    }
 </script>
 
 <div class="knowledge-graph" bind:this={container}>
@@ -109,9 +135,9 @@
 		</select>
 
 		<div class="zoom-controls">
-			<button onclick={() => zoomLevel = Math.min(zoomLevel + 0.2, 3)}>+</button>
+			<button onclick={zoomIn}>+</button>
 			<span>{Math.round(zoomLevel * 100)}%</span>
-			<button onclick={() => zoomLevel = Math.max(zoomLevel - 0.2: 0.5)}>-</button>
+			<button onclick={zoomOut}>-</button>
 		</div>
 
 		<div class="stats">
@@ -122,9 +148,9 @@
 
 	<svg
 		bind:this={svg}
-		{ width }
-		{ height }
-		viewBox={`0 0 ${ width } ${height}`}
+		{width}
+		{height}
+		viewBox={`0 0 ${width} ${height}`}
 		style="transform: scale({zoomLevel})"
 	>
 		<!-- Links -->
@@ -136,7 +162,7 @@
 					y1={link.source.y || height / 2}
 					x2={link.target.x || width / 2}
 					y2={link.target.y || height / 2}
-					stroke-width={Math.max(1: link.weight * 3)}
+					stroke-width={Math.max(1, link.weight * 3)}
 				/>
 			{/each}
 		</g>
@@ -144,17 +170,20 @@
 		<!-- Nodes -->
 		<g class="nodes">
 			{#each nodes as node}
+                <!-- Svelte 5 requires events on elements or components -->
 				<g
 					class="node"
-					transform="translate({node.x || width / 2},
-	{node.y || height / 2})"
+					transform="translate({node.x || width / 2}, {node.y || height / 2})"
 					onclick={() => {
 						selectedNode = node;
 						onNodeClick(node);
 					}}
+                    role="button"
+                    tabindex="0"
+                    onkeydown={(e) => e.key === 'Enter' && onNodeClick(node)}
 				>
 					<circle
-						r={node.type === 'pattern' ? 8 + node.occurrences * 0.5 : 6}
+						r={node.type === 'pattern' ? 8 + (node.occurrences || 0) * 0.5 : 6}
 						fill={nodeColors[node.errorType || node.type] || '#6b7280'}
 						stroke={selectedNode?.id === node.id ? '#fff' : 'none'}
 						stroke-width="2"
@@ -188,52 +217,65 @@
 <style>
 	.knowledge-graph {
 		position: relative;
-	background: #1a1a2e;
+		background: #1a1a2e;
 		border-radius: 8px;
-	overflow: hidden }
+		overflow: hidden;
+    }
 
 	.controls {
 		display: flex;
-	gap: 1rem;
+		gap: 1rem;
 		padding: 0.5rem;
-	background: rgba(0, 0, 0, 0.3);
-		align-items: center }
+		background: rgba(0, 0, 0, 0.3);
+		align-items: center;
+    }
 
 	.filter-select {
 		background: #2d2d44;
-	color: #fff;
+		color: #fff;
 		border: 1px solid #4a4a6a;
 		padding: 0.25rem 0.5rem;
-		border-radius: 4px }
+		border-radius: 4px;
+    }
 
 	.zoom-controls {
 		display: flex;
 		align-items: center;
-	gap: 0.5rem }
+		gap: 0.5rem;
+    }
 
 	.zoom-controls button {
 		background: #4f46e5;
-	color: white;
+		color: white;
 		border: none;
-	width: 24px;
+		width: 24px;
 		height: 24px;
 		border-radius: 4px;
-	cursor: pointer }
+		cursor: pointer;
+    }
 
 	.stats {
 		margin-left: auto;
-	color: #9ca3af;
+		color: #9ca3af;
 		font-size: 0.875rem;
-	display: flex;
-		gap: 1rem }
+		display: flex;
+		gap: 1rem;
+    }
 
 	svg {
 		display: block;
-	transition:transform 0.2s }
+		transition: transform 0.2s;
+        cursor: grab;
+    }
+
+    svg:active {
+        cursor: grabbing;
+    }
 
 	.link {
 		stroke: #4a4a6a;
-		stroke-opacity: 0.6 }
+		stroke-opacity: 0.6;
+    }
 
 	.link-causes { stroke: #ef4444 }
 	.link-fixed_by { stroke: #10b981 }
@@ -241,7 +283,8 @@
 	.link-related_to { stroke: #8b5cf6 }
 
 	.node {
-		cursor: pointer }
+		cursor: pointer;
+    }
 
 	.node:hover circle {
 		filter: brightness(1.2);
@@ -249,36 +292,39 @@
 
 	.node-label {
 		font-size: 10px;
-	fill: #9ca3af;
-		pointer-events: none }
+		fill: #9ca3af;
+		pointer-events: none;
+    }
 
 	.node-details {
 		position: absolute;
-	bottom: 1rem;
+		bottom: 1rem;
 		right: 1rem;
-	background: #2d2d44;
+		background: #2d2d44;
 		padding: 1rem;
 		border-radius: 8px;
-	color: #fff;
-		max-width: 300px }
+		color: #fff;
+		max-width: 300px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
 
 	.node-details h4 {
 		margin: 0 0 0.5rem;
-		color: #a5b4fc }
+		color: #a5b4fc;
+    }
 
 	.node-details p {
 		margin: 0.25rem 0;
-		font-size: 0.875rem }
+		font-size: 0.875rem;
+    }
 
 	.node-details button {
 		margin-top: 0.5rem;
-	background: #4f46e5;
+		background: #4f46e5;
 		color: white;
-	border: none;
+		border: none;
 		padding: 0.25rem 0.75rem;
 		border-radius: 4px;
-	cursor: pointer }
+		cursor: pointer;
+    }
 </style>
-
-
-

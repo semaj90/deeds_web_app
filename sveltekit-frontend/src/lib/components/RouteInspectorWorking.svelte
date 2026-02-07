@@ -165,8 +165,20 @@
 </script>
 
 {#if open && route}
-	<div class="route-modal-overlay" onclick={() => (open = false)}>
-		<div class="route-modal" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="route-modal-overlay"
+		onclick={() => (open = false)}
+		onkeydown={(e) => e.key === 'Escape' && (open = false)}
+		role="button"
+		tabindex="0"
+	>
+		<div
+			class="route-modal"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="document"
+			tabindex="-1"
+		>
 			<header class="route-modal__header">
 				<div class="route-modal__title">
 					<span class="route-icon">🎮</span>

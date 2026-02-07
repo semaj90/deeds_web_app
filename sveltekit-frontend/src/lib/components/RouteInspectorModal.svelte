@@ -76,8 +76,20 @@
 </script>
 
 {#if isOpen && route}
-	<div class="route-modal-backdrop" onclick={close}>
-		<div class="route-modal" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="route-modal-backdrop"
+		onclick={close}
+		onkeydown={(e) => e.key === 'Escape' && close()}
+		role="button"
+		tabindex="0"
+	>
+		<div
+			class="route-modal"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="document"
+			tabindex="-1"
+		>
 			<header class="route-modal__header">
 				<div class="route-modal__title-block">
 					<span class="route-modal__kind-chip">

@@ -14,10 +14,10 @@
     return Array.isArray(roles) ? roles : [roles];
   });
   let hasAccess = $derived(() => {
-    if (!authStore.isAuthenticated || !authStore.user) {
+    if (!authStore.isAuthenticated || !authStore.session?.user) {
       return false;
     }
-    const userRole = authStore.user.role;
+    const userRole = authStore.session.user.role;
     // Admin always has access
     if (userRole === 'admin') {
       return true;
