@@ -156,7 +156,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if isGeneratingClusters} <h3>Generating AI Clusters with Gemma Embeddings...</h3>
  <div class="progress-bar"> <div class="progress-fill" style="width: { clusteringProgress }%"></div> </div>
  <p>Progress: { clusteringProgress }%</p> {:else} <h3>Reorganizing Evidence...</h3>
- <div class="spinner">{/if}
+ <div class="spinner"></div>{/if}
   </div> {/if}
   <!-- Organization, display --> <main class="organization-display">
   {#if organizationStructure?.type === 'category'} <!-- Category, organization --> <div class="category-organization">

@@ -86,7 +86,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Real-time validation, status -->
   {#if enableRealTimeValidation} <div class="flex items-center">
-  {#if validationStatus === 'validating'} <Loader2 class="h-4 w-4 animate-spin" /> <span class="text-sm">Validating...</span> {:else if validationStatus === 'valid'} <CheckCircle class="h-4 w-4" /> <span class="text-sm">Valid</span> {:else if validationStatus === 'invalid'} <AlertCircle class="h-4 w-4" /> <span class="text-sm">Issues found</span> {/if} </div> {/if} {/if}
+  {#if validationStatus === 'validating'} <Loader2 class="h-4 w-4 animate-spin" /> <span class="text-sm">Validating...</span> {:else if validationStatus === 'valid'} <CheckCircle class="h-4 w-4" /> <span class="text-sm">Valid</span> {:else if validationStatus === 'invalid'} <AlertCircle class="h-4 w-4" /> <span class="text-sm">Issues found</span> {/if} </div> {/if}</div> {/if}
   <form method="POST"
         action={ submitAction } use, createEnhancedSubmit enctype="multipart/form-data"
         class="space-y-6"

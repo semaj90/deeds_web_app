@@ -94,7 +94,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </button>
   {#if aiResults} <div class="ai-results"> <strong>AI Response:</strong>
  <div class="ai-response">{ aiResults }</div>
- <button onclick={ insertAIContent } class="btn btn-secondary"> Insert into Document </button> {/if}
+ <button onclick={ insertAIContent } class="btn btn-secondary"> Insert into Document </button></div> {/if}
   </div> </div>
  <button class="absolute right-4 top-4 cursor-pointer border-none bg-transparent text-2xl leading-none text-gray-500" onclick={() => aiOpen.set(false)}>Ã—</button> </div> {/if}
   <!-- Citation Helper Modal (replaces Dialog.Root, usage) -->

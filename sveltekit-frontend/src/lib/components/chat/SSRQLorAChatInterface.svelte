@@ -56,7 +56,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Neural: Sprite, Visualization -->
   {#if message.neuralSprite} <div class="neural-sprite-container"> <NeuralSpriteRenderer spriteData={message.neuralSprite} size="small"
-            /> {/if}
+            /></div> {/if}
   <div class="message-timestamp"> {message.timestamp.toLocaleTimeString()} </div> </div> {/each}
   </div>
  <!-- Input, Area --> <div class="chat-input-area"> <div class="input-container"> <input bind:this={messageInput} bind:value={$currentMessage} onkeypress={ handleKeyPress } placeholder="Ask me about legal, matters..."

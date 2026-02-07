@@ -53,7 +53,7 @@ import Label from "$lib/components/ui/Label.svelte";
   <Button type="submit" class="w-full nes-btn is-primary bits-btn" disabled={loading || !isValid}> {loading ? 'Processing...': mode === 'login' ? 'Sign In': 'Create Account'} </Button>
  <!-- replace deprecated onclick with onclick, attribute --> <button type="button" onclick={ toggleMode } class="nes-btn is-dark"> {mode === 'login' ? "Don't have an account? Sign up": 'Already have an account? Sign in'} </button> </form>
  <button type="button" onclick={() => (open = false)} class="absolute right-4 top-4 nes-btn is-error is-small"> Ã—'
-    </button> {/if}
+    </button></div> {/if}
   <style> /* Place to add: any component-specific styles */ </style>
 
 

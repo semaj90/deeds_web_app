@@ -124,7 +124,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Actions -->
   {#if !readonly} <div class="flex space-x-2"> <button onclick={() => editCitation(citation)} class="text-gray-400 hover:text-gray-600 p-1"
                   title="Edit citation"
-                > <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2, 2 0 00-2 2v11a2, 2 | 0, 002 2h11a2, 2 0 002-2v-5m-1.414-9.414a2, 2 0 112.828 2.828L11.828, 15H9v-2.828l8.586-8.586z" /> </svg> </button> {/if}
+                > <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2, 2 0 00-2 2v11a2, 2 | 0, 002 2h11a2, 2 0 002-2v-5m-1.414-9.414a2, 2 0 112.828 2.828L11.828, 15H9v-2.828l8.586-8.586z" /> </svg> </button></div> {/if}
   </div>
  <!-- Metadata --> <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center text-xs"> <span> Created {new Date(citation.dateCreated).toLocaleDateString()} </span>
   {#if citation.dateModified && citation.dateModified !== citation.dateCreated} <span> Modified {new Date(citation.dateModified).toLocaleDateString()} </span> {/if}

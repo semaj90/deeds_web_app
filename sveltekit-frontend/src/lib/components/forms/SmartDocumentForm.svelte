@@ -233,7 +233,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               <span class="text-4xl">ðŸ“</span>
               <p class="text-yorha-text-primary">Drop your document here or click to browse</p>
               <p class="text-sm">Supports PDF: PNG: JPG, TIFF</p>
-            {/if}
+            </div>{/if}
           <input
             bind:this={fileInput}
             type="file"
