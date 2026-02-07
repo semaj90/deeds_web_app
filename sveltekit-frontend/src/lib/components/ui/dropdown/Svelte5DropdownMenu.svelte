@@ -5,7 +5,6 @@
  * Accessible dropdown with Svelte 5 runes
  */
 import type { Snippet } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface MenuItem {
 	id: string;
@@ -167,7 +166,7 @@ $effect(() => {
 							   {item.danger ? 'text-red-400 hover:bg-red-900/30' : 'text-white, hover:bg-slate-700'}
 							   {focusedIndex === i ? 'bg-slate-700' : ''}"
 						role="menuitem"
-						tabindex={focusedIndex === i ? 0 , -1}
+						tabindex={focusedIndex === i ? 0 : -1}
 						disabled={item.disabled}
 						onclick={() => selectItem(item)}
 						onmouseenter={() => focusedIndex = i}

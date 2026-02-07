@@ -40,7 +40,7 @@
 
 <div
 	role="menuitem"
-	tabindex={disabled ? -1 , 0}
+	tabindex={disabled ? -1 : 0}
 	data-disabled={disabled || undefined}
 	onclick={ handleClick }
 	onkeydown={ handleKeydown }

@@ -152,7 +152,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           uploadProgress = `${file.name} uploaded successfully`;
         }
       } catch (err) {
-        error = `Failed to upload ${file.name}: ${err instanceof Error ? err.message , 'Unknown error'}`;
+        error = `Failed to upload ${file.name}: ${err instanceof Error ? err.message : 'Unknown error'}`;
         console.error(err);
       }
     }

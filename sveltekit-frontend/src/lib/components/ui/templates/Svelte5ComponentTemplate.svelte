@@ -100,7 +100,7 @@ $effect(() => {
 		console.log('Component unmounted, cleanup here');
 	};
 });
-  
+
 function handleClick(event: MouseEvent) {
 	if (disabled) return;
 	onclick?.(event);
@@ -126,7 +126,7 @@ function handleKeydown(event: KeyboardEvent) {
 	class="component-wrapper border rounded-lg transition-all duration-200
 		   {variantClasses} {sizeClasses} {stateClasses} {className}"
 	role="button"
-	tabindex={disabled ? -1 , 0}
+	tabindex={disabled ? -1 : 0}
 	aria-disabled={ disabled }
 	onmouseenter={() => isHovered = true}
 	onmouseleave={() => isHovered = false}

@@ -113,7 +113,7 @@ function handleKeydown(e: KeyboardEvent) {
 				   rounded-full
 				   transform transition-transform duration-200 ease-in-out
 				   {thumbVariants}
-				   {checked ? dimensions.translate , 'translate-x-0.5'}"
+			   {checked ? dimensions.translate : 'translate-x-0.5'}"
 			aria-hidden="true"
 		></span>
 	</button>

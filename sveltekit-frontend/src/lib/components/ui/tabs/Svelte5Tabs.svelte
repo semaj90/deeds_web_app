@@ -4,9 +4,7 @@
  * Native HTML with Svelte 5 runes and accessible tabpanel
  */
 import type { Snippet } from 'svelte';
-import { setContext, getContext } from 'svelte';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+import { setContext } from 'svelte';
 
 interface TabItem {
 	id: string;
@@ -147,7 +145,7 @@ function handleKeydown(e: KeyboardEvent, index: number) {
 				role="tab"
 				aria-selected={value === tab.id}
 				aria-controls="panel-{tab.id}"
-				tabindex={value === tab.id ? 0 , -1}
+				tabindex={value === tab.id ? 0 : -1}
 				disabled={tab.disabled}
 				onclick={() => handleTabClick(tab)}
 				onkeydown={(e) => handleKeydown(e, i)}
