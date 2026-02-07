@@ -1,6 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let label = $state<any>(undefined);
 
 /**
  * Svelte 5 Progress Component

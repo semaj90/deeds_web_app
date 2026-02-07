@@ -1,8 +1,4 @@
 <script lang="ts">
-	let onClose = $state<any>(undefined);
-	let imp = $state<any>(undefined);
-	let exp = $state<any>(undefined);
-	let fn = $state<any>(undefined);
 
 	/**
 	 * ═══════════════════════════════════════════════════════════════════════
@@ -20,7 +16,6 @@
 	import Layers from 'lucide-svelte/icons/layers';
 	import Tag from 'lucide-svelte/icons/tag';
 	import X from 'lucide-svelte/icons/x';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface EnhancedTag {
 		id: string;

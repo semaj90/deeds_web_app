@@ -1,5 +1,5 @@
 <script lang="ts">
-	let isGenerating = $state<any>(undefined);
+
 
  // Migrated to $effect
 
@@ -26,7 +26,7 @@
  if (metadata?.extractedText) {
  extractedText = metadata.extractedText as string;
  }
- 
+
 });();
  });
 

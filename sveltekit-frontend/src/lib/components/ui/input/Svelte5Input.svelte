@@ -1,19 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let id = $state<any>(undefined);
-	let label = $state<any>(undefined);
-	let type = $state<any>(undefined);
-	let name = $state<any>(undefined);
-	let disabled = $state<any>(undefined);
-	let readonly = $state<any>(undefined);
-	let required = $state<any>(undefined);
-	let autocomplete = $state<any>(undefined);
-	let min = $state<any>(undefined);
-	let max = $state<any>(undefined);
-	let step = $state<any>(undefined);
-	let pattern = $state<any>(undefined);
-	let maxlength = $state<any>(undefined);
-	let minlength = $state<any>(undefined);
 
 /**
  * Svelte 5 Input Component

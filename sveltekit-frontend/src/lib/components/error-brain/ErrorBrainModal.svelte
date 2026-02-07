@@ -1,5 +1,4 @@
 <script lang="ts">
-	let onClose = $state<any>(undefined);
 
 	/**
 	 * Phase 9: Error Brain Modal

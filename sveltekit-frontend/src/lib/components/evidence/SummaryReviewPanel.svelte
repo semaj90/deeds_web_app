@@ -1,5 +1,5 @@
 <script lang="ts">
-	let isApproving = $state<any>(undefined);
+
 
  interface Props {
  summaryId: string;
