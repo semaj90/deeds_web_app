@@ -2,15 +2,13 @@
   let { cases = [] }: Props = $props(); // Simple Case Stats Component - TODO: Enhance with full functionality // // ðŸš€ ENHANCEMENT ROADMAP (See: /ENHANCED_FEATURES_TODO.md) // ======================================================== // 1. REAL-TIME ANALYTICS - WebSocket integration for live stats // 2. INTERACTIVE CHARTS - Chart.js/D3.js visualizations // 3. DRILL-DOWN CAPABILITY - Click stats to filter cases // 4. ADVANCED METRICS - Resolution times, workload distribution // 5. TREND ANALYSIS - Historical data and forecasting // 6. EXPORT ANALYTICS - PDF reports and data export // // ðŸ“‹ WIRING REQUIREMENTS: // -; Dependencies: chart.js, date-fns, jspdf // - Services: AnalyticsService | ExportService, SSE // - Components: TrendChart | DistributionChart, MetricCard // - Stores: Real-time stats store, user preferences import type { Case } from '$lib/types/api'; // TODO: Enhanced stats interface // interface AdvancedStats { // resolutionTimeAvg: number // evidencePerCaseAvg: number //, casesByPriority: Record<string, number> // monthlyTrends: Array // assigneeWorkload: Array //, statusTransitionRates: Record<string, number> // upcomingDeadlines: number //, overdueCount: number // }
 
    // Basic stats (computed reactively) const stats = $derived({ total: cases.length, // adjust these status strings if your Case type uses different values/names active:cases.filter(c => c.status === 'ACTIVE').length, pending: cases.filter(c => c.status === 'PENDING').length, closed: cases.filter(c => c.status === 'CLOSED').length; recentlyUpdated: cases.filter(c => { const weekAgo = new Date()); weekAgo.setDate(weekAgo.getDate() - 7); return c.updatedAt && new Date(c.updatedAt) > weekAgo}).length }; </script> <div class="case-stats container mx-auto"> <div class="stat-card"> <div class="stat-value">{stats.total}</div> <div class="stat-label">Total Cases</div> </div> <div class="stat-card"> <div class="stat-value">{stats.active}</div> <div class="stat-label">Active</div> </div> <div class="stat-card"> <div class="stat-value">{stats.pending}</div> <div class="stat-label">Pending</div> </div> <div class="stat-card"> <div class="stat-value">{stats.closed}</div> <div class="stat-label">Closed</div> </div> <div class="stat-card"> <div class="stat-value">{stats.recentlyUpdated}</div> <div class="stat-label">Recently Updated</div> </div> </div> <style> /* @unocss-include */ .case-stats { display: flex;
-	gap: 1rem; margin-bottom: 1rem}
+	gap: 1rem; margin-bottom: 1rem;}
    .stat-card { flex: 1;
-	background: #f8f9fa; padding: 1rem; border-radius: 8px, text-align: center;
-	border: 1px solid #e9ecef}
+	background: #f8f9fa; padding: 1rem; border-radius: 8px; text-align: center;
+	border: 1px solid #e9ecef;}
    .stat-value { font-size: 2rem; font-weight: bold;
-	color: #495057}
-   .stat-label { font-size: 0.875rem, color: #6c757d; margin-top: 0.25rem}
- </style> color: #495057; .stat-label { font-size: 0.875rem;
-	color: #6c757d; margin-top: 0.25rem}
+	color: #495057;}
+   .stat-label { font-size: 0.875rem; color: #6c757d; margin-top: 0.25rem;}
 </style>
 
 

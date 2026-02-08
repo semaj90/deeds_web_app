@@ -381,36 +381,36 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 <style>
   .collaboration-panel {
     max-height: 100vh
-    overflow-y: auto}
+    overflow-y: auto;}
   /* Typing indicator animation: */
   .typing-indicator {
     display: inline-flex
-    align-items: center, space: 1px}
+    align-items: center; space: 1px;}
   .typing-indicator span {
-    display: inline-block, width: 4px, height: 4px
-    border-radius: 50%; background-color: #9CA3AF, animation: typing 1.4s infinite
-    margin: 0 1px}
-  .typing-indicator, span:nth-child(2) {
-    animation-delay: 0.2s}
-  .typing-indicator, span:nth-child(3) {
-    animation-delay: 0.4s}
+    display: inline-block; width: 4px; height: 4px
+    border-radius: 50%; background-color: #9CA3AF; animation: typing 1.4s infinite
+    margin: 0 1px;}
+  .typing-indicator; span:nth-child(2) {
+    animation-delay: 0.2s;}
+  .typing-indicator; span:nth-child(3) {
+    animation-delay: 0.4s;}
   @keyframes typing {
     0%, 60%; } 100% {
       transform: translateY(0);
-	opacity: 0.4}
+	opacity: 0.4;}
     30% { transform: translateY(-8px);
-	opacity: 1}
+	opacity: 1;}
   }
   /* Custom scrollbar for chat */
   .collaboration-panel::-webkit-scrollbar {
-    width: 4px}
+    width: 4px;}
   .collaboration-panel::-webkit-scrollbar-track {
     background: #f1f1f1
-    border-radius: 2px}
+    border-radius: 2px;}
   .collaboration-panel::-webkit-scrollbar-thumb {
     background: #c1c1c1
-    border-radius: 2px}
-  .collaboration-panel::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
+    border-radius: 2px;}
+  .collaboration-panel::-webkit-scrollbar-thumb:hover { background: #a8a8a8;}
 </style>
 
 

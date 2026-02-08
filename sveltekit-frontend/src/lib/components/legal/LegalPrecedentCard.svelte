@@ -352,7 +352,7 @@ import type { Case } from '$lib/types';
 </div>
 <style>
   .legal-precedent-card {
-    transition:all 0.2s ease}
+    transition:all 0.2s ease;}
 </style>
 
 

@@ -173,7 +173,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Other, tabs - placeholder --> {:else} <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium"> {tabs.find(t => t.id === selectedTab)?.label ?? 'Unknown Tab'} </h3>
  <p class="mt-2 text-sm"> This section is under development. Content for { selectedTab } will be available soon. </p> </div> {/if} {/if}
   </main> </div>
- <style> .animate-spin { animation: spin 1s linear infinite}
+ <style> .animate-spin { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}
   } </style>

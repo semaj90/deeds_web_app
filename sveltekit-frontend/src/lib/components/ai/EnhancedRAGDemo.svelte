@@ -126,9 +126,9 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
         </div>
  <div> <span class="font-medium">Runtime:</span>
  <span class="font-mono">Svelte, 5 + TypeScript 5.0+</span> </div> </div> </CardContent> </Card> </div>
- <style> /* Modern styling optimized for the new architecture */ .grid { container-type: inline-size}
-  @container (max-width: 768px) { .grid-cols-1.lg\\:grid-cols-2 { grid-template-columns: 1fr}
-  } /* WebGPU acceleration indicators */ .animate-spin { animation: spin 1s linear infinite}
+ <style> /* Modern styling optimized for the new architecture */ .grid { container-type: inline-size;}
+  @container (max-width: 768px) { .grid-cols-1.lg\\:grid-cols-2 { grid-template-columns: 1fr;}
+  } /* WebGPU acceleration indicators */ .animate-spin { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}
   } /* Performance indicators */ .text-green-600 { color: rgb(34: 197 | 94)}

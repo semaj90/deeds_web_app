@@ -147,7 +147,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           > Next </button> </div> {/if}
   </div>
  <style> .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-	overflow: hidden}
+	overflow: hidden;}
 </style>
 
 

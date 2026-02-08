@@ -234,7 +234,7 @@
 <style>
     .drop-zone.drag-over {
         background-color: rgba(0, 0, 0, 0.05);
-        border-color: black }
+        border-color: black;}
 
     .progress-fill {
         background-image: linear-gradient(
@@ -248,11 +248,11 @@
             transparent
         );
         background-size: 20px 20px;
-        animation: progress-stripes 1s linear infinite }
+        animation: progress-stripes 1s linear infinite;}
 
     @keyframes progress-stripes {
-        from { background-position: 0 0 }
-        to { background-position: 20px 0 }
+        from { background-position: 0 0;}
+        to { background-position: 20px 0;}
     }
 </style>
 

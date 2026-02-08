@@ -83,7 +83,7 @@
 </div> <div class="text-sm"> <strong>Total Tokens:</strong> {aiUsage().totalTokens.toLocaleString()}
 </div> </div> <div class="flex justify-end"> <Button class="bits-btn" variant="ghost" onclick={() => (showExportDialog = false)} class="bits-btn">Cancel</Button> <Button class="bits-btn bits-btn"
             onclick={() => { exportConversation(); showExportDialog = false}} >
-            Export JSON </Button> </div> </CardContent> </Card> {/if} <style>:global(.animate-spin) { animation: spin 1s linear infinite}
+            Export JSON </Button> </div> </CardContent> </Card> {/if} <style>:global(.animate-spin) { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}
   }

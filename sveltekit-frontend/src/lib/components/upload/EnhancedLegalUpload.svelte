@@ -173,53 +173,53 @@ event: 'legal_analysis_complete', documentId: uploadResult.documentId, analysis:
 	{semanticEmbeddings .data.som_cluster.y}] </p> {:else} <p class="nes-text">âœ… Vector embeddings generated successfully</p> {/if}
 </div> </div> {/if} {#if !ocrResults && !legalAnalysis && !semanticEmbeddings} <div class="nes-container is-rounded"> <p class="nes-text">No processing data available yet. Upload a document to see detailed analysis.</p> {/if}
 </div> </div> </Dialog.Content> </Dialog.Portal> </Dialog> <style> /* bits-ui + nes.css integration styles */ .enhanced-legal-upload { max-width: 900px;
-	margin: 2rem auto; font-family: 'Press Start 2P', monospace}
-  .upload-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem, flex-wrap: wrap;
-	gap: 1rem}
-  .feature-indicators { display: flex; gap: 0.5rem; flex-wrap}
-  /* Custom nes.css enhancements for file upload */ .file-upload-area { cursor: pointer; transition:all 0.3s ease; min-height: 200px, display: flex; align-items: center; justify-content: center; text-align: center}
-  .file-upload-area:hover { transform: translateY(-2px); box-shadow: 4px 4px 0px #000}
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem}
-  /* NES.css checkbox styling */ .checkbox-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem}
+	margin: 2rem auto; font-family: 'Press Start 2P', monospace;}
+  .upload-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;
+	gap: 1rem;}
+  .feature-indicators { display: flex; gap: 0.5rem; flex-wrap;}
+  /* Custom nes.css enhancements for file upload */ .file-upload-area { cursor: pointer; transition:all 0.3s ease; min-height: 200px; display: flex; align-items: center; justify-content: center; text-align: center;}
+  .file-upload-area:hover { transform: translateY(-2px); box-shadow: 4px 4px 0px #000;}
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;}
+  /* NES.css checkbox styling */ .checkbox-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;}
   /* File preview with retro styling */ .file-preview { display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .file-info { display: flex; align-items: flex-start;
-	gap: 1rem; flex-wrap}
-  .image-preview { width: 100px, height: 100px; object-fit: cover; image-rendering: pixelated;
-	border: 4px solid #000}
+	gap: 1rem; flex-wrap;}
+  .image-preview { width: 100px; height: 100px; object-fit: cover; image-rendering: pixelated;
+	border: 4px solid #000;}
   .file-icon { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2rem;
-	border: 4px solid #000;background: #fff}
-  .file-details { flex: 1; min-width: 200px}
-  .file-name { font-size: 0.75rem; margin-bottom: 0.5rem; word-break: break-all}
+	border: 4px solid #000;background: #fff;}
+  .file-details { flex: 1; min-width: 200px;}
+  .file-name { font-size: 0.75rem; margin-bottom: 0.5rem; word-break: break-all;}
   .file-size { font-size: 0.6rem; margin-bottom: 0.5rem;
-	opacity: 0.8}
-  .remove-file { font-size: 0.6rem}
+	opacity: 0.8;}
+  .remove-file { font-size: 0.6rem;}
   /* Processing status with retro styling */ .processing-indicator { display: flex; align-items: center;
-	gap: 0.5rem; font-size: 0.75rem}
+	gap: 0.5rem; font-size: 0.75rem;}
   /* Submit button styling */ .submit-button { width: 100%; font-size: 0.75rem;
-	padding: 1rem; margin-top: 1rem}
-  .form-actions { margin-top: 2rem}
-  .enhanced-status { margin-top: 1rem; font-size: 0.6rem}
-  /* Upload prompt styling */ .upload-prompt { display: flex; flex-direction: column, align-items: center;
-	gap: 1rem; padding: 2rem}
+	padding: 1rem; margin-top: 1rem;}
+  .form-actions { margin-top: 2rem;}
+  .enhanced-status { margin-top: 1rem; font-size: 0.6rem;}
+  /* Upload prompt styling */ .upload-prompt { display: flex; flex-direction: column; align-items: center;
+	gap: 1rem; padding: 2rem;}
   .upload-icon { font-size: 3rem;
-	opacity: 0.7}
-  .upload-text { text-align: center; font-size: 0.75rem}
-  .upload-hint { font-size: 0.6rem; margin-top: 0.5rem}
-  /* Dialog styling */ .dialog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 4px solid #000}
-  .dialog-content { max-height: 60vh; overflow-y: auto}
-  .analysis-details { margin-top: 1rem}
-  .concept-list { margin-top: 1rem}
+	opacity: 0.7;}
+  .upload-text { text-align: center; font-size: 0.75rem;}
+  .upload-hint { font-size: 0.6rem; margin-top: 0.5rem;}
+  /* Dialog styling */ .dialog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 4px solid #000;}
+  .dialog-content { max-height: 60vh; overflow-y: auto;}
+  .analysis-details { margin-top: 1rem;}
+  .concept-list { margin-top: 1rem;}
   .semantic-visualization { text-align: center;
-	padding: 1rem}
+	padding: 1rem;}
   /* Retro animations */ @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}
   } .spinner { width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
-	animation: spin 1s linear infinite;display: inline-block}
-  /* Responsive design */ @media (max-width: 768px) { .enhanced-legal-upload { margin: 1rem; max-width: none}
-    .form-row { grid-template-columns: 1fr}
-    .upload-header { flex-direction: column; text-align: center}
-    .file-info { flex-direction: column; text-align: center}
+	animation: spin 1s linear infinite;display: inline-block;}
+  /* Responsive design */ @media (max-width: 768px) { .enhanced-legal-upload { margin: 1rem; max-width: none;}
+    .form-row { grid-template-columns: 1fr;}
+    .upload-header { flex-direction: column; text-align: center;}
+    .file-info { flex-direction: column; text-align: center;}
   }
 </style>
 

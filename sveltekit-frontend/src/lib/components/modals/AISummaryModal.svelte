@@ -108,10 +108,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <style>
   /* @unocss-include */
   .prose {
-    max-width: none}
+    max-width: none;}
   /* minimal header/footer styles so layout remains consistent */
-  .dialog-header { margin-bottom: 0.75rem}
-  .dialog-footer { margin-top: 1rem}
+  .dialog-header { margin-bottom: 0.75rem;}
+  .dialog-footer { margin-top: 1rem;}
 </style>
 
 

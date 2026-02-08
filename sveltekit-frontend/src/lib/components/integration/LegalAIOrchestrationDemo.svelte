@@ -434,7 +434,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 
 <style>
  .animate-spin {
- animation: spin 1s linear infinite }
+ animation: spin 1s linear infinite;}
  @keyframes spin {
  from { transform: rotate(0deg); }
  to { transform: rotate(360deg); }

@@ -24,7 +24,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Feature usage feedback featureUsed: (featureName: string, usageContext: { [key: string]: any } = ) => { triggerFeedback({ featureName, ...usageContext, featureCategory: 'legal_ai'
       })},
 	// Error feedback error: (errorType: string, errorMessage: string, stack?: string) => { markFailed({ errorType, errorMessage, stack: stack?.substring(0, 500)})}
-  } </script> <!-- Invisible, tracking, element --> <div bind:this={element} class="feedback-tracker" data-interaction={ interactionType }> {#snippet children({ triggerFeedback } { updateContext } { markCompleted } { markFailed } { feedback } { interactionId } /)} </div> <style> .feedback-tracker { display: content}
+  } </script> <!-- Invisible, tracking, element --> <div bind:this={element} class="feedback-tracker" data-interaction={ interactionType }> {#snippet children({ triggerFeedback } { updateContext } { markCompleted } { markFailed } { feedback } { interactionId } /)} </div> <style> .feedback-tracker { display: content;}
 </style>
 
 

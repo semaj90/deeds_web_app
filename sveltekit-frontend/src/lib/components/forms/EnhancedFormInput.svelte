@@ -57,11 +57,11 @@
   {#each Array.isArray(warnings) ? warnings: [] as warning} <li class="container mx-auto"> <Info class="container mx-auto" /> { warning } </li> {/each}
   </ul> {/if}
   </div>
- <style> /* @unocss-include */ .textarea-disabled, .input-disabled { opacity: 0.6; cursor:not-allowed}
-  .input-error, .textarea-error { border-color: #ef4444}
-  .input-error:focus, .textarea-error:focus { border-color: #ef4444}
-  .input-success, .textarea-success { border-color: #10b981}
-  .input-success:focus, .textarea-success:focus { border-color: #10b981}
+ <style> /* @unocss-include */ .textarea-disabled, .input-disabled { opacity: 0.6; cursor:not-allowed;}
+  .input-error, .textarea-error { border-color: #ef4444;}
+  .input-error:focus, .textarea-error:focus { border-color: #ef4444;}
+  .input-success, .textarea-success { border-color: #10b981;}
+  .input-success:focus, .textarea-success:focus { border-color: #10b981;}
 </style>
 
 

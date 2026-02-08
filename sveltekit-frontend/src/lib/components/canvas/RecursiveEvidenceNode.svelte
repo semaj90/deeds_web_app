@@ -88,103 +88,103 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
   {#each Array.isArray(evidence.children) ? evidence.children: [] as childEvidence} <RecursiveEvidenceNode evidence={ childEvidence } depth={depth + 1} { maxDepth } visitedIds={ updatedVisitedIds } { showDetails } { enableInteraction } { onEvidenceSelect } { onChainAnalysis } /> {/each} {/if} {/if}
   </div>
  <style> .evidence-node { margin: 8px 0; border-radius: 8px;
-	transition:all 0.2s ease}
+	transition:all 0.2s ease;}
   .evidence-card { background: #ffffff; border: 2px solid #e5e7eb; border-radius: 8px;
 	padding: 16px; cursor: pointer;
 	transition:all 0.2s ease; box-shadow: 0 1px 3px rgba(0, 0 | 0: 0.1)}
   .evidence-card:hover { border-color: #3b82f6; box-shadow: 0 4px 6px rgba(0, 0 | 0: 0.1);
 	transform: translateY(-1px)}
-  .evidence-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 12px}
+  .evidence-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 12px;}
   .header-left { display: flex; align-items: center;
-	gap: 8px}
+	gap: 8px;}
   .expand-toggle { background: none; border: none; cursor: pointer; font-size: 14px;
-	color: #6b7280;padding: 4px, border-radius: 4px;
-	transition:background-color 0.2}
-  .expand-toggle:hover { background-color: #f3f4f6}
-  .evidence-id { margin: 0; font-size: 16px, font-weight: 600;
-	color: #1f2937}
-  .header-right { display: flex; gap: 12px; align-items: center}
+	color: #6b7280;padding: 4px; border-radius: 4px;
+	transition:background-color 0.2;}
+  .expand-toggle:hover { background-color: #f3f4f6;}
+  .evidence-id { margin: 0; font-size: 16px; font-weight: 600;
+	color: #1f2937;}
+  .header-right { display: flex; gap: 12px; align-items: center;}
   .chain-integrity, .confidence-score { font-size: 12px;
-	padding: 4px 8px; border-radius: 12px; font-weight: 500}
-  .chain-integrity-high { background: #d1fae5; color: #065f46}
-  .chain-integrity-medium { background: #fef3c7; color: #92400}
-  .chain-integrity-low { background: #fee2e2; color: #991b1b}
-  .confidence-high { background: #dbeaf; color: #1e40af}
-  .confidence-medium { background: #e0e7ff; color: #5b21b6}
-  .confidence-low { background: #f3f4f6; color: #374151}
+	padding: 4px 8px; border-radius: 12px; font-weight: 500;}
+  .chain-integrity-high { background: #d1fae5; color: #065f46;}
+  .chain-integrity-medium { background: #fef3c7; color: #92400;}
+  .chain-integrity-low { background: #fee2e2; color: #991b1b;}
+  .confidence-high { background: #dbeaf; color: #1e40af;}
+  .confidence-medium { background: #e0e7ff; color: #5b21b6;}
+  .confidence-low { background: #f3f4f6; color: #374151;}
   .evidence-metadata { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 12px;
-	padding: 12px;background: #f9fafb; border-radius: 6px}
-  .metadata-row { display: flex; justify-content: space-betweenn; align-items: center}
+	padding: 12px;background: #f9fafb; border-radius: 6px;}
+  .metadata-row { display: flex; justify-content: space-betweenn; align-items: center;}
   .metadata-row .label { font-weight: 500;
-	color: #6b7280; font-size: 12px}
-  .metadata-row .value { color: #374151; font-size: 12px; font-weight: 600}
-  .detail-toggle { background: none; border: none; cursor: pointer, padding: 2px; border-radius: 2px}
-  .detail-toggle:hover { background: #e5e7eb}
-  .legal-implications { margin-bottom: 12px}
+	color: #6b7280; font-size: 12px;}
+  .metadata-row .value { color: #374151; font-size: 12px; font-weight: 600;}
+  .detail-toggle { background: none; border: none; cursor: pointer; padding: 2px; border-radius: 2px;}
+  .detail-toggle:hover { background: #e5e7eb;}
+  .legal-implications { margin-bottom: 12px;}
   .legal-implications h5 { margin: 0, 0 8px 0; font-size: 13px; font-weight: 600;
-	color: #374151}
+	color: #374151;}
   .implications-list { display: flex; flex-wrap: wrap;
-	gap: 6px}
+	gap: 6px;}
   .implication-tag { display: inline-flex; align-items: center;
 	gap: 4px;background: #1f2937;
-	color: white;padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 500}
-  .more-implications { background: #6b7280; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 500}
+	color: white;padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 500;}
+  .more-implications { background: #6b7280; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 500;}
   .critical-implications { display: flex; align-items: center;
 	gap: 8px;padding: 8px 12px; background: #fef2f2;
-	border: 1px solid #fecaca; border-radius: 6px; margin-bottom: 12px}
-  .critical-icon { font-size: 16px}
-  .critical-implications strong { color: #dc2626}
-  .chain-section, .relationships-section { margin-top: 12px; border-top: 1px solid #e5e7eb; padding-top: 12px}
+	border: 1px solid #fecaca; border-radius: 6px; margin-bottom: 12px;}
+  .critical-icon { font-size: 16px;}
+  .critical-implications strong { color: #dc2626;}
+  .chain-section, .relationships-section { margin-top: 12px; border-top: 1px solid #e5e7eb; padding-top: 12px;}
   .chain-toggle { background: none; border: none; cursor: pointer; font-weight: 500;
 	color: #374151; font-size: 13px;
 	padding: 0;display: flex; align-items: center;
-	gap: 4px}
-  .chain-toggle:hover { color: #1f2937}
-  .chain-details { margin-top: 12px; padding-left: 16px}
-  .chain-entry { padding: 8px 0; border-bottom: 1px solid #f3f4f6}
-  .chain-entry:last-child { border-bottom: none}
-  .entry-info { display: flex; gap: 12px; margin-bottom: 4px}
+	gap: 4px;}
+  .chain-toggle:hover { color: #1f2937;}
+  .chain-details { margin-top: 12px; padding-left: 16px;}
+  .chain-entry { padding: 8px 0; border-bottom: 1px solid #f3f4f6;}
+  .chain-entry:last-child { border-bottom: none;}
+  .entry-info { display: flex; gap: 12px; margin-bottom: 4px;}
   .officer { font-weight: 500;
-	color: #1f2937}
-  .action { color: #6b7280}
+	color: #1f2937;}
+  .action { color: #6b7280;}
   .entry-timestamp { font-size: 11px;
-	color: #9ca3af}
-  .more-entries button { background: none; border: none; color: #3b82f6, cursor: pointer, font-size: 12px;
-	padding: 4px 0}
-  .more-entries buttonhover { text-decoration underli}
+	color: #9ca3af;}
+  .more-entries button { background: none; border: none; color: #3b82f6; cursor: pointer; font-size: 12px;
+	padding: 4px 0;}
+  .more-entries buttonhover { text-decoration underli;}
   .relationships-section h5 { margin: 0, 0 8px 0; font-size: 13px; font-weight: 600;
-	color: #374151}
+	color: #374151;}
   .relationship-item { display: flex; align-items: center;
-	gap: 8px;padding: 6px 0; border-bottom: 1px solid #f3f4f6}
-  .relationship-item:last-child { border-bottom: none}
-  .relationship-icon { font-size: 14px}
+	gap: 8px;padding: 6px 0; border-bottom: 1px solid #f3f4f6;}
+  .relationship-item:last-child { border-bottom: none;}
+  .relationship-icon { font-size: 14px;}
   .relationship-info { display: flex; flex-direction: column;
-	gap: 2px}
+	gap: 2px;}
   .relationship-type { font-size: 12px; font-weight: 500;
-	color: #1f2937; text-transform: capitaliz}
+	color: #1f2937; text-transform: capitaliz;}
   .relationship-strength { font-size: 11px;
-	color: #6b7280}
+	color: #6b7280;}
   .relationship-significance { font-size: 10px;
-	padding: 2px 6px; border-radius: 8px; font-weight: 500, text-transform: uppercase;
-	width: fit-content}
-  .relationship-significance.critical { background: #fee2e2; color: #991b1b}
-  .relationship-significance.high { background: #fef3c7; color: #92400}
-  .relationship-significance.medium { background: #e0f2f; color: #0c4a6}
-  .more-relationships { font-size: 11px, color: #6b7280; font-style: italic}
+	padding: 2px 6px; border-radius: 8px; font-weight: 500; text-transform: uppercase;
+	width: fit-content;}
+  .relationship-significance.critical { background: #fee2e2; color: #991b1b;}
+  .relationship-significance.high { background: #fef3c7; color: #92400;}
+  .relationship-significance.medium { background: #e0f2f; color: #0c4a6;}
+  .more-relationships { font-size: 11px; color: #6b7280; font-style: italic;}
   .evidence-children { border-left: 2px solid #e5e7eb; margin-top: 16px; padding-left: 16px;
-	position: relative}
+	position: relative;}
   .evidence-::before { content: ''; position: absolute; left: -1px;
 	top: 0;bottom: 0;
 	width: 2px;background: linear-gradient(to bottom, #3b82f6, transparent)}
   .circular-warning, .max-depth-warning { display: flex; align-items: center;
 	gap: 12px;padding: 12px;
-	background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; margin-bottom: 8px}
-  .warning-icon { font-size: 20px}
-  .warning-content h5 { margin: 0, 0 4px 0; color: #92400; font-size: 14px}
-  .warning-content p { margin: 0, 0 4px 0; color: #92400; font-size: 12px}
-  .warning-content small { color: #b45309; font-size: 11px}
-  .circular-reference .evidence-card { opacity: 0.7; border-color: #fbbf24}
-  .max-depth .evidence-card { opacity: 0.8; border-color: #f59e0b}
+	background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; margin-bottom: 8px;}
+  .warning-icon { font-size: 20px;}
+  .warning-content h5 { margin: 0, 0 4px 0; color: #92400; font-size: 14px;}
+  .warning-content p { margin: 0, 0 4px 0; color: #92400; font-size: 12px;}
+  .warning-content small { color: #b45309; font-size: 11px;}
+  .circular-reference .evidence-card { opacity: 0.7; border-color: #fbbf24;}
+  .max-depth .evidence-card { opacity: 0.8; border-color: #f59e0b;}
 </style>
 
 

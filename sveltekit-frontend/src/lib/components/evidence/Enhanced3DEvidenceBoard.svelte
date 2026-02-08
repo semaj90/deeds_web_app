@@ -162,46 +162,45 @@ z: 500 }); rotation.set({ x: 0, y: 0 })}
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type, 'application/json' });
    const url = URL.createObjectURL(blob);
    const a = document.createElement('a'); a.href = url; a.download = 'evidence-board-export.json'; a.click(); URL.revokeObjectURL(url)}
-</script> <div class="evidence-board-container"> <!-- 3D, Canvas --> <canvas bind:this={canvas} width={ 1200 } height={ 800 } class="evidence-canvas"></canvas> <!-- Control, Panel --> <div class="control-panel"> <div class="panel-section"> <h3>Evidence Board</h3> <div class="stats"> <div class="stat"> <span>Nodes:</span> <span class="value">{nodes.length}</span> </div> <div class="stat"> <span>Connections:</span> <span class="value">{connections.length}</span> </div> </div> </div> <div class="panel-section"> <h4>Controls</h4> <button class="control-btn" onclick={ resetCamera }>Reset View</button> <button class="control-btn" onclick={ toggleView }>Toggle View</button> <button class="control-btn" onclick={ exportBoard }>Export</button> </div> </div> </div> <!-- Node: Details, Modal --> <DiamondModal bind:open={ showNodeDetails } title="Evidence, Details" size="large"> {#if selectedNode} <div class="node-details"> <div class="detail-header"> <h2>{selectedNode.title}</h2> <span class="node-type">{selectedNode.type}</span> </div> <div class="detail-stats"> <div class="stat-item"> <span>Confidence:</span> <div class="confidence-bar"> <div class="confidence-fill" style="width: {selectedNode.confidence * 100}%"></div> </div> <span>{Math.round(selectedNode.confidence * 100)}%</span> </div> <div class="stat-item"> <span>Priority:</span> <span class="priority-value">{selectedNode.priority}/255</span> </div> </div> <div class="detail-metadata"> <h4>Metadata</h4> <pre>{JSON.stringify(selectedNode.metadata, null, 2)}</pre> </div> <div class="detail-connections"> <h4>Connections ({selectedNode.connections.length})</h4> {#each Array.isArray(selectedNode.connections) ? selectedNode.connections: [] as connectionId} {@const connectedNode = nodes.find(n => n.id === connectionId)} {#if connectedNode} <div class="connection-item"> <span class="connection-icon">ðŸ”—</span> <span>{connectedNode.title}</span> <span class="connection-type">({connectedNode.type})</span></div> {/if} {/each} </div> {/if} </DiamondModal> <style> .evidence-board-container { position: relative; /* Fixed syntax */ width: 100%, height: 800px, border-radius: 8px;
+</script> <div class="evidence-board-container"> <!-- 3D, Canvas --> <canvas bind:this={canvas} width={ 1200 } height={ 800 } class="evidence-canvas"></canvas> <!-- Control, Panel --> <div class="control-panel"> <div class="panel-section"> <h3>Evidence Board</h3> <div class="stats"> <div class="stat"> <span>Nodes:</span> <span class="value">{nodes.length}</span> </div> <div class="stat"> <span>Connections:</span> <span class="value">{connections.length}</span> </div> </div> </div> <div class="panel-section"> <h4>Controls</h4> <button class="control-btn" onclick={ resetCamera }>Reset View</button> <button class="control-btn" onclick={ toggleView }>Toggle View</button> <button class="control-btn" onclick={ exportBoard }>Export</button> </div> </div> </div> <!-- Node: Details, Modal --> <DiamondModal bind:open={ showNodeDetails } title="Evidence, Details" size="large"> {#if selectedNode} <div class="node-details"> <div class="detail-header"> <h2>{selectedNode.title}</h2> <span class="node-type">{selectedNode.type}</span> </div> <div class="detail-stats"> <div class="stat-item"> <span>Confidence:</span> <div class="confidence-bar"> <div class="confidence-fill" style="width: {selectedNode.confidence * 100}%"></div> </div> <span>{Math.round(selectedNode.confidence * 100)}%</span> </div> <div class="stat-item"> <span>Priority:</span> <span class="priority-value">{selectedNode.priority}/255</span> </div> </div> <div class="detail-metadata"> <h4>Metadata</h4> <pre>{JSON.stringify(selectedNode.metadata, null, 2)}</pre> </div> <div class="detail-connections"> <h4>Connections ({selectedNode.connections.length})</h4> {#each Array.isArray(selectedNode.connections) ? selectedNode.connections: [] as connectionId} {@const connectedNode = nodes.find(n => n.id === connectionId)} {#if connectedNode} <div class="connection-item"> <span class="connection-icon">ðŸ”—</span> <span>{connectedNode.title}</span> <span class="connection-type">({connectedNode.type})</span></div> {/if} {/each} </div> {/if} </DiamondModal> <style> .evidence-board-container { position: relative; /* Fixed syntax */ width: 100%; height: 800px; border-radius: 8px;
 	overflow: hidden;background: linear-gradient(135deg, #0a0a1f, #1a0a2f)}
-  .evidence-canvas { width: 100%; height: 100%; cursor: grab; image-rendering: optimizeSpeed}
-  .evidence-canvas:active { cursor: grabbing}
+  .evidence-canvas { width: 100%; height: 100%; cursor: grab; image-rendering: optimizeSpeed;}
+  .evidence-canvas:active { cursor: grabbing;}
   .control-panel { position: absolute; /* Fixed syntax */ top: 1rem;
 	right: 1rem;background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px;
 	padding: 1rem; min-width: 200px; backdrop-filter: blur(8px)}
-  .panel-section { margin-bottom: 1rem}
-  .panel-section h3, .panel-section h4 { margin: 0, 0 0.5rem 0; color: rgba(255, 255, 255, 0.9); font-size: 0.9rem}
+  .panel-section { margin-bottom: 1rem;}
+  .panel-section h3, .panel-section h4 { margin: 0, 0 0.5rem 0; color: rgba(255, 255, 255, 0.9); font-size: 0.9rem;}
   .stats { display: flex; flex-direction: column;
-	gap: 0.25rem}
+	gap: 0.25rem;}
   .stat { display: flex; justify-content: space-between; /* Fixed typo */ font-size: 0.8rem;
 	color: rgba(255, 255, 255, 0.7)}
-  .value { color: #8a2be2; font-weight: bold}
+  .value { color: #8a2be2; font-weight: bold;}
   .control-btn { display: block; width: 100%; margin: 0.25rem 0; padding: 0.5rem;background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.5); border-radius: 4px;
 	color: #fff; font-size: 0.8rem;
 	cursor: pointer; transition:all 0.2s ease; /* Fixed syntax */ }
   .control-btn:hover { background: rgba(138, 43, 226, 0.4); transform: translateY(-1px)}
   .node-details { color: rgba(255, 255, 255, 0.9)}
   .detail-header { display: flex; align-items: center;
-	gap: 1rem; margin-bottom: 1.5rem}
-  .detail-header h2 { margin: 0; flex: 1}
-  .node-type { background: rgba(138, 43, 226, 0.3); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; text-transform: uppercase}
-  .detail-stats { margin-bottom: 1.5rem}
+	gap: 1rem; margin-bottom: 1.5rem;}
+  .detail-header h2 { margin: 0; flex: 1;}
+  .node-type { background: rgba(138, 43, 226, 0.3); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; text-transform: uppercase;}
+  .detail-stats { margin-bottom: 1.5rem;}
   .stat-item { display: flex; align-items: center;
-	gap: 1rem;margin: 0.75rem 0}
+	gap: 1rem;margin: 0.75rem 0;}
   .confidence-bar { flex: 1; /* Fixed syntax */ height: 8px;
 	background: rgba(255, 255, 255, 0.1); border-radius: 4px;
-	overflow: hidden}
-  .confidence-fill { height: 100%; background: linear-gradient(90deg, #8a2be2, #4b0082); transition:width 0.3s ease}
-  .priority-value { color: #8a2be2; font-weight: bold; font-family: 'Courier New', monospace}
-  .detail-metadata { margin-bottom: 1.5rem}
-  .detail-metadata pre { background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 4px; font-size: 0.8rem; overflow-x: auto}
+	overflow: hidden;}
+  .confidence-fill { height: 100%; background: linear-gradient(90deg, #8a2be2, #4b0082); transition:width 0.3s ease;}
+  .priority-value { color: #8a2be2; font-weight: bold; font-family: 'Courier New', monospace;}
+  .detail-metadata { margin-bottom: 1.5rem;}
+  .detail-metadata pre { background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 4px; font-size: 0.8rem; overflow-x: auto;}
   .connection-item { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem;
 	border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px;
-	margin: 0.5rem 0}
-  .connection-icon { color: #8a2be2}
-  .connection-type { color: rgba(255, 255, 255, 0.6); font-size: 0.8rem}
-</style> .connection-type { color: rgba(255, 255, 255, 0.6); font-size: 0.8rem}
+	margin: 0.5rem 0;}
+  .connection-icon { color: #8a2be2;}
+  .connection-type { color: rgba(255, 255, 255, 0.6); font-size: 0.8rem;}
 </style>
 
 

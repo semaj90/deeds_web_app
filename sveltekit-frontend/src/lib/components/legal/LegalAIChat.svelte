@@ -111,8 +111,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> </CardContent> </Card> {/if}
   </div>
  <style> .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-	overflow: hidden}
-  .prose { line-height: 1.6}
+	overflow: hidden;}
+  .prose { line-height: 1.6;}
 </style>
 
 

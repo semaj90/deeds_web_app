@@ -34,9 +34,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 </main>
 
 <style>
-/* Custom scrollbar for query results */ .overflow-y-auto::-webkit-scrollbar { width: 6px}"
+/* Custom scrollbar for query results */ .overflow-y-auto::-webkit-scrollbar { width: 6px;}"
  .overflow-y-auto::-webkit-scrollbar-track { background: var(--nier-bg-tertiary)}
- .overflow-y-auto::-webkit-scrollbar-thumb { background: var(--nier-accent-warm); border-radius: 3px}
+ .overflow-y-auto::-webkit-scrollbar-thumb { background: var(--nier-accent-warm); border-radius: 3px;}
  .overflow-y-auto::-webkit-scrollbar-thumb:hover { background: var(--nier-accent-cool)}
 </style>
 

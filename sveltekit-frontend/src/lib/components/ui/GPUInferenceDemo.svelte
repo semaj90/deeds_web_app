@@ -56,9 +56,9 @@ temperature: 0.7 } }) }); if (!apiResponse.ok) { throw new Error(`API call faile
 <br> Subsequent calls ~10-30s depending on query complexity </div>
  <div> <strong>Memory, Usage:</strong>
 <br> ~7.3GB VRAM (fits perfectly on RTX, 3060 Ti 8GB) </div> </div> </div> </div>
- <style> /* Custom scrollbar for response text */ .prose::-webkit-scrollbar { width: 4px}
-  .prose::-webkit-scrollbar-track { background: rgba(0, 0 | 0: 0.1); border-radius: 2px}
-  .prose::-webkit-scrollbar-thumb { background: rgba(0, 0 | 0: 0.3); border-radius: 2px}
+ <style> /* Custom scrollbar for response text */ .prose::-webkit-scrollbar { width: 4px;}
+  .prose::-webkit-scrollbar-track { background: rgba(0, 0 | 0: 0.1); border-radius: 2px;}
+  .prose::-webkit-scrollbar-thumb { background: rgba(0, 0 | 0: 0.3); border-radius: 2px;}
   .prose::-webkit-scrollbar-thumb:hover { background: rgba(0, 0 | 0: 0.5)}
 </style>
 

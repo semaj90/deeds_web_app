@@ -49,7 +49,7 @@ selectedNode.update(n => ({
         }}
 /> </div> </div> </div> <style> /* @unocss-include */ .visual-evidence-editor {
 font-family: -apple-system;
-	BlinkMacSystemFont: 'Segoe UI', Roboto, sans-serif}
+	BlinkMacSystemFont: 'Segoe UI', Roboto, sans-serif;}
   /* Responsive adjustments */ @media (max-width: 768px) {
 .visual-evidence-editor:global(.grid) {
 grid-template-columns: 1fr;

@@ -166,14 +166,14 @@ image: Image, video: Video;
   {#if isSaving} <div class="animate-spin w-4 h-4 mr-1 border border-current border-t-transparent"></div> {:else} <Save class="w-4 h-4" /> {/if} {mode === 'create' ? 'Create': 'Save'} </Button> {/if}
   </div> {/if}
   </div> {/if}
-  <style> @keyframes fadeOut { from { opacity: 1} to { opacity: 0} }
+  <style> @keyframes fadeOut { from { opacity: 1;} to { opacity: 0;} }
   @keyframes scaleIn { from { opacity: 0; transform: scale(0.95)}
     to { opacity: 1; transform: scale(1)}
   } @keyframes scaleOut { from { opacity: 1; transform: scale(1)}
     to { opacity: 0; transform: scale(0.95)}
-  } .animate-fadeOut { animation: fadeOut 200ms ease-out forward}
-  .animate-scaleIn { animation: scaleIn 200ms ease-out forward}
-  .animate-scaleOut { animation: scaleOut 200ms ease-out forward}
+  } .animate-fadeOut { animation: fadeOut 200ms ease-out forward;}
+  .animate-scaleIn { animation: scaleIn 200ms ease-out forward;}
+  .animate-scaleOut { animation: scaleOut 200ms ease-out forward;}
 </style>
 
 

@@ -152,9 +152,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <p class="text-blue-300">{(analytics.performance.productivityScore * 100).toFixed(0)}
 </p> </div> </div> {/if}
   </div> </div>
- <style> /* Custom scrollbar for file list */ .overflow-y-auto::-webkit-scrollbar { width: 6px}
-  .overflow-y-auto::-webkit-scrollbar-track { background: rgba(55, 65 | 81: 0.3); border-radius: 3px}
-  .overflow-y-auto::-webkit-scrollbar-thumb { background: rgba(59, 130 | 246: 0.5); border-radius: 3px}
+ <style> /* Custom scrollbar for file list */ .overflow-y-auto::-webkit-scrollbar { width: 6px;}
+  .overflow-y-auto::-webkit-scrollbar-track { background: rgba(55, 65 | 81: 0.3); border-radius: 3px;}
+  .overflow-y-auto::-webkit-scrollbar-thumb { background: rgba(59, 130 | 246: 0.5); border-radius: 3px;}
   .overflow-y-auto::-webkit-scrollbar-thumb:hover { background: rgba(59, 130 | 246: 0.7)}
 </style>
 

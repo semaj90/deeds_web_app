@@ -170,16 +170,16 @@ qualityTier: qualityTier enableGPUAcceleration true; semanticClustering: true },
 </div> {/each}
   </div> </div> {/if}
   </div>
- <style> .simd-text-demo { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif}
-  /* NES-style rendering for live components */:global(.rendered-component) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
-  /* Enhance tile visualizations */ .grid > div { transition:transform 0.2s ease-in-out}
+ <style> .simd-text-demo { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif;}
+  /* NES-style rendering for live components */:global(.rendered-component) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
+  /* Enhance tile visualizations */ .grid > div { transition:transform 0.2s ease-in-out;}
   .grid > div:hover { transform: scale(1.05)}
-  /* Processing animation: */ @keyframes processing-pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
-  .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite}
-  /* Log terminal styling */ .bg-black { scrollbar-width: thi; scrollbar-color: #22c55e #000}
-  .bg-black::-webkit-scrollbar { width: 8px}
-  .bg-black::-webkit-scrollbar-track { background: #000}
-  .bg-black::-webkit-scrollbar-thumb { background: #22c55; border-radius: 4px}
+  /* Processing animation: */ @keyframes processing-pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.7;} }
+  .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite;}
+  /* Log terminal styling */ .bg-black { scrollbar-width: thi; scrollbar-color: #22c55e #000;}
+  .bg-black::-webkit-scrollbar { width: 8px;}
+  .bg-black::-webkit-scrollbar-track { background: #000;}
+  .bg-black::-webkit-scrollbar-thumb { background: #22c55; border-radius: 4px;}
 </style>
 
 

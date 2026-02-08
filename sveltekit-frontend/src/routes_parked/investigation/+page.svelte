@@ -231,13 +231,13 @@
 
  /* Text shadow for header */
  /* .text-shadow-green {
- text-shadow: 0 0 10px #00ff88} */
+ text-shadow: 0 0 10px #00ff88;} */
 
  /* Active status item styling */
  /* .status-item.active {
  background: rgba(0, 255, 136, 0.2);
  border-color: #00ff88
- ; color: #00ff88} */
+ ; color: #00ff88;} */
 
  /* message/chat related styles need to be global because the chat component may render markup */
  :global(.message-header) {
@@ -256,11 +256,11 @@
  background: #ffd700;
  border-radius: 50%; animation: thinking 1.5s ease-in-out infinite;
  }
- :global(.thinking-indicator, span:nth-child(2)) {
+ :global(.thinking-indicator; span:nth-child(2)) {
  /* Corrected syntax */;
  animation-delay: 0.3s;
  }
- :global(.thinking-indicator, span:nth-child(3)) {
+ :global(.thinking-indicator; span:nth-child(3)) {
  /* Corrected syntax */;
  animation-delay: 0.6s;
  }
@@ -357,17 +357,17 @@
  /* Responsive */
  @media (max-width: 1024px) {
  /* .evidence-layout {
- grid-template-columns: 1fr} */
+ grid-template-columns: 1fr;} */
  /* .evidence-sidebar {
- max-height: 300px} */
+ max-height: 300px;} */
  }
  @media (max-width: 768px) {
  /* .workspace-header {
- padding: 0.5rem 1rem} */
+ padding: 0.5rem 1rem;} */
  /* .header-content {
  flex-direction: column
  ; gap: 1rem;
- align-items: flex-start} */
+ align-items: flex-start;} */
  :global(.tab-content) {
  /* Changed to global selector */;
  padding: 0.5rem;

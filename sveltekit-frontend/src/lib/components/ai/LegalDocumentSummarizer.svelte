@@ -466,7 +466,7 @@ await checkServiceHealth()})()});
 </div>
 <style>
   .legal-summarizer {
-    font-family: system-ui, -apple-system, sans-serif}
+    font-family: system-ui, -apple-system, sans-serif;}
 </style>
 
 

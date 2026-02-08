@@ -42,7 +42,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 	transform: translateY(-10px)}
     to { opacity: 1;
 	transform: translateY(0)}
-  } .animate-slideIn { animation: slideIn 0.3s ease-out}
+  } .animate-slideIn { animation: slideIn 0.3s ease-out;}
   /* Remove native button chrome for the full-screen backdrop while keeping utility classes' background */ .backdrop-btn { appearance: none; -webkit-appearance: none;
 	border: none;padding: 0;
 	margin: 0; display: block;

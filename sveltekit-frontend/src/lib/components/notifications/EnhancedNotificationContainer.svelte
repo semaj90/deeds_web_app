@@ -127,20 +127,20 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <option value="bottom-left">Bottom Left</option>
  <option value="top-center">Top Center</option>
  <option value="bottom-center">Bottom Center</option> </select> </div> </div> {/if}
-  <style> /* @unocss-include */ .notification-item { transform-origin: center}
+  <style> /* @unocss-include */ .notification-item { transform-origin: center;}
   /* Animations for notification entrance/exit */ @keyframes notification-enter { from { opacity: 0;
 	transform: translateY(-1rem) scale(0.95)}
-    to { opacity: 1, transform: translateY(0) scale(1)}} @keyframes notification-exit { from { opacity: 1;
+    to { opacity: 1; transform: translateY(0) scale(1)}} @keyframes notification-exit { from { opacity: 1;
 	transform: translateY(0) scale(1)}
     to { opacity: 0;
-	transform: translateY(-1rem) scale(0.95)}} .notification-item { animation:notification-enter 0.3s ease-out}
-  /* Reduce motion for accessibility */ @media (prefers-reduced-motion: reduce) { .notification-item { animation: none}
-    .transition-all { transition:none !important}} /* High contrast mode support */ @media (prefers-contrast: high) { .notification-item { border-width: 2px}} /* Focus indicators */ .notification-item:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px}
+	transform: translateY(-1rem) scale(0.95)}} .notification-item { animation:notification-enter 0.3s ease-out;}
+  /* Reduce motion for accessibility */ @media (prefers-reduced-motion: reduce) { .notification-item { animation: none;}
+    .transition-all { transition:none !important;}} /* High contrast mode support */ @media (prefers-contrast: high) { .notification-item { border-width: 2px;}} /* Focus indicators */ .notification-item:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px;}
   /* Screen reader only content */ .sr-only { position: absolute;
 	width: 1px; height: 1px;
 	padding: 0; margin: -1px;
 	overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap;
-	border: 0 }
+	border: 0;}
 </style>
 
 

@@ -87,22 +87,22 @@
       {#if isProcessing} ðŸ”„ Processing... {:else} ðŸš€ Process with SIMD GPU Tiling {/if} </button> <div class="settings"> <label> <input type="checkbox" bind:checked={ enableSIMDAcceleration } /> SIMD Acceleration </label> <label> <input type="checkbox" bind:checked={ generateShaders } /> Generate Shaders </label> <label> <input type="checkbox" bind:checked={ enablePredictiveLoading } /> Predictive Loading </label> </div> </div> </div> <style> .simd-tiled-shader-embeds { display: flex; flex-direction: column;
 	gap: 1rem;padding: 1rem;
 	background: linear-gradient(135deg, #1e293b, #334155); border-radius: 8px;
-	color: white}
+	color: white;}
 .status-header { display: flex; justify-content: space-between align-items: center;
-	padding: 0.75rem;background: rgba(0, 0, 0, 0.3); border-radius: 6px; border-left: 4px solid #3b82f6}
+	padding: 0.75rem;background: rgba(0, 0, 0, 0.3); border-radius: 6px; border-left: 4px solid #3b82f6;}
 .status-header.processing { border-left-color: #f59e0b;
-	animation: pulse 2s infinite}
+	animation: pulse 2s infinite;}
 .status-indicator { display: flex; align-items: center;
-	gap: 0.5rem}
-.status-icon { font-size: 1.2rem}
-.status-text { font-weight: 500}
+	gap: 0.5rem;}
+.status-icon { font-size: 1.2rem;}
+.status-text { font-weight: 500;}
 .quality-indicator { font-size: 0.9rem;
 	background: rgba(212, 175, 55, 0.2); padding: 0.25rem 0.75rem; border-radius: 4px;
-	border: 1px solid #d4af37}
-.visualization-container { display: grid; grid-template-columns: 1fr 300px; gap: 1rem; min-height: 400px}
+	border: 1px solid #d4af37;}
+.visualization-container { display: grid; grid-template-columns: 1fr 300px; gap: 1rem; min-height: 400px;}
 .canvas-container { position: relative;
 	background: rgba(0, 0, 0, 0.5); border-radius: 6px;
-	overflow: hidden}
+	overflow: hidden;}
 .tiled-canv.processing-overlay { position: absolute;
 	top: 0;left: 0;
 	right: 0;bottom: 0;
@@ -110,72 +110,72 @@
 	background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px)}
 .spinner { width: 40px;
 	height: 40px;border: 4px solid rgba(255, 255, 255, 0.2); border-top: 4px solid #3b82f6; border-radius: 50%;
-	animation: spin 1s linear infinite; margin-bottom: 1rem}
+	animation: spin 1s linear infinite; margin-bottom: 1rem;}
 .processing-text { font-weight: 500; text-shadow: 0, 0 10px rgba(59, 130, 246, 0.5)}
 .tile-info-overlay { position: absolute;
 	top: 0;left: 0;
-	right: 0;bottom: 0; pointer-events: none}
+	right: 0;bottom: 0; pointer-events: none;}
 .tile-info { position: absolute;
 	transform: translate(-50%, -50%)}
 .tile-confidence { background: rgba(0, 255, 0, 0.8); padding: 0.15rem 0.3rem; border-radius: 3px; font-size: 0.7rem font-weight: bold;
-	color: black}
+	color: black;}
 .adaptive-rendering-container { background: rgba(0, 0, 0, 0.3); border-radius: 6px;
-	padding: 1rem}
-.metrics-dashboard { background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 6px}
-.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem}
+	padding: 1rem;}
+.metrics-dashboard { background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 6px;}
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem;}
 .metric-card { text-align: center;
-	padding: 0.75rem;background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px}
+	padding: 0.75rem;background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px;}
 .metric-value { font-size: 1.5rem; font-weight: bold;
-	color: #60a5fa}
-.metric-label { font-size: 0.8rem opacity: 0.8; margin-top: 0.25rem}
-.memory-usage { margin-top: 1rem}
+	color: #60a5fa;}
+.metric-label { font-size: 0.8rem opacity: 0.8; margin-top: 0.25rem;}
+.memory-usage { margin-top: 1rem;}
 .memory-bar { display: flex;
 	height: 20px;background: rgba(0, 0, 0, 0.5); border-radius: 10px;
-	overflow: hidden}
+	overflow: hidden;}
 .memory-section { display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8)}
-.memory-section.gpu { background: #dc2626 } .memory-section.system { background: #059669 } .memory-section.cache { background: #7c3aed } .shader-preview, .chr-patterns { background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 6px}
-.shader-preview h3, .chr-patterns h3 { margin: 0, 0 1rem 0; color: #e2e8f0}
-.shader-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem}
+.memory-section.gpu { background: #dc2626;} .memory-section.system { background: #059669;} .memory-section.cache { background: #7c3aed;} .shader-preview, .chr-patterns { background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 6px;}
+.shader-preview h3, .chr-patterns h3 { margin: 0, 0 1rem 0; color: #e2e8f0;}
+.shader-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;}
 .shader-card { background: rgba(0, 0, 0, 0.6); padding: 0.75rem; border-radius: 4px;
 	border: 1px solid rgba(148, 163, 184, 0.3)}
 .shader-title { font-size: 0.8rem; font-weight: bold margin-bottom: 0.5rem;
-	color: #fbbf24}
-.shader-code { margin-bottom: 0.5rem}
+	color: #fbbf24;}
+.shader-code { margin-bottom: 0.5rem;}
 .shader-code pre { margin: 0; font-size: 0.7rem; line-height: 1.2; white-space: pre-wrap;
-	color: #94a3b8}
+	color: #94a3b8;}
 .copy-shader { background: #374151;
 	border: 1px solid #6b7280;color: white;
 	padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.7rem;
-	cursor: pointer}
-.copy-shader:hover { background: #4b5563}
+	cursor: pointer;}
+.copy-shader:hover { background: #4b5563;}
 .pattern-stats { display: flex;
-	gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem}
-.compression-ratio { color: #10b981; font-weight: bold}
-.pattern-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.5rem}
-.pattern-preview { background: white padding: 0.25rem border-radius: 3px display: flex; justify-content: center; align-items: center}
+	gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;}
+.compression-ratio { color: #10b981; font-weight: bold;}
+.pattern-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.5rem;}
+.pattern-preview { background: white padding: 0.25rem border-radius: 3px display: flex; justify-content: center; align-items: center;}
 .control-panel { display: flex; justify-content: space-between align-items: center;
-	padding: 1rem;background: rgba(0, 0, 0, 0.4); border-radius: 6px}
+	padding: 1rem;background: rgba(0, 0, 0, 0.4); border-radius: 6px;}
 .process-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white;border: none;
 	padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: bold;
-	cursor: pointer;transition:all 0.2}
+	cursor: pointer;transition:all 0.2;}
 .process-buttonhover:not(disabled) { background: linear-gradient(135deg, #2563eb, #1e40af); transform: translateY(-1px)}
 .process-buttondisabled { opacity: 0.6;
-	cursor:not-allowed}
+	cursor:not-allowed;}
 .settings { display: flex;
-	gap: 1rem}
+	gap: 1rem;}
 .settings label { display: flex; align-items: center;
 	gap: 0.5rem; font-size: 0.9rem;
-	cursor: pointer}
-.settings input[type="checkbox"] { accent-color: #3b82f6}
+	cursor: pointer;}
+.settings input[type="checkbox"] { accent-color: #3b82f6;}
 @keyframes spin { to { transform: rotate(360deg) } }
-@keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
-@media (max-width: 768px) { .visualization-container { grid-template-columns: 1fr}
+@keyframes pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.7;} }
+@media (max-width: 768px) { .visualization-container { grid-template-columns: 1fr;}
   .metrics-grid { grid-template-columns: repeat(2, 1fr)}
-  .shader-grid { grid-template-columns: 1fr}
+  .shader-grid { grid-template-columns: 1fr;}
   .pattern-grid { grid-template-columns: repeat(4, 1fr)}
   .control-panel { flex-direction: column;
-	gap: 1rem}
-  .settings { flex-wrap}
+	gap: 1rem;}
+  .settings { flex-wrap;}
 } </style>
 
 

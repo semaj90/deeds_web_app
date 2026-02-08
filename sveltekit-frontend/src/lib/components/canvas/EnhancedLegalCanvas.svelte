@@ -81,31 +81,31 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <style> .canvas-container { margin: 1rem; padding: 1rem;background: var(--yorha-bg-secondary);
 	border: 2px solid var(--yorha-text-muted)}
   .canvas-wrapper { position: relative; display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary)}
-  .legal-canvas { display: block, background: transparent; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
+  .legal-canvas { display: block; background: transparent; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
   .canvas-controls { margin-top: 1rem;
-	display: flex; gap: 1rem; align-items: center; flex-wrap}
-  .nes-field { margin: 0}
+	display: flex; gap: 1rem; align-items: center; flex-wrap;}
+  .nes-field { margin: 0;}
   .nes-field label { font-family: 'Press Start 2P', monospace; font-size: 10px;
-	color: var(--yorha-text-accent); margin-right: 0.5rem}
+	color: var(--yorha-text-accent); margin-right: 0.5rem;}
   .node-details { margin-top: 1rem;
 	padding: 1rem;background: var(--yorha-bg-tertiary);
 	border: 2px solid var(--yorha-accent)}
-  .node-details h4 { margin: 0, 0 0.5rem 0; color: var(--yorha-text-accent); font-family: 'Press Start 2P', monospace; font-size: 12px}
+  .node-details h4 { margin: 0, 0 0.5rem 0; color: var(--yorha-text-accent); font-family: 'Press Start 2P', monospace; font-size: 12px;}
   .node-details p { margin: 0.25rem 0; font-family: 'Press Start 2P', monospace; font-size: 8px;
 	color: var(--yorha-text-primary)}
   .metadata { font-family: 'JetBrains Mono', monospace; font-size: 8px;
 	background: var(--yorha-bg-primary);padding: 0.5rem;
-	border: 1px solid var(--yorha-text-muted);color: var(--yorha-text-secondary); overflow-x: auto}
-  details { margin-top: 0.5rem}
+	border: 1px solid var(--yorha-text-muted);color: var(--yorha-text-secondary); overflow-x: auto;}
+  details { margin-top: 0.5rem;}
   summary { font-family: 'Press Start 2P', monospace; font-size: 8px;
 	color: var(--yorha-secondary);cursor: pointer;
 	padding: 0.25rem;border: 1px solid var(--yorha-text-muted); background: var(--yorha-bg-secondary)}; summary:hover { background: var(--yorha-bg-tertiary); border-color: var(--yorha-secondary)}
-/* Animation for canvas updates */ 0% .canvas-wrapper { animation: subtleGlow 3s ease-in-out infinite alternate}
+/* Animation for canvas updates */ 0% .canvas-wrapper { animation: subtleGlow 3s ease-in-out infinite alternate;}
   @keyframes subtleGlow { from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.2)}
     to { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4)}
-  } /* Responsive design */ @media (max-width: 768px) { .canvas-controls { flex-direction: column; align-items: flex-start}
+  } /* Responsive design */ @media (max-width: 768px) { .canvas-controls { flex-direction: column; align-items: flex-start;}
     .legal-canvas { max-width: 100%;
-	height: auto}
+	height: auto;}
   } </style>
 
 

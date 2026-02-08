@@ -268,16 +268,13 @@
 		color: var(--color-dark);
 	}
 
-	textarea:focus,
-	input:focus,
-	select:focus {
+	textarea:focus; input:focus; select:focus {
 		outline: none;
 		border-color: var(--color-burgundy);
 		box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
 	}
 
-	textarea:disabled,
-	input:disabled { opacity: 0.6; cursor: not-allowed;
+	textarea:disabled; input:disabled { opacity: 0.6; cursor: not-allowed;
 	}
 	select:disabled { background: var(--color-light-gray); cursor: not-allowed;
 	}

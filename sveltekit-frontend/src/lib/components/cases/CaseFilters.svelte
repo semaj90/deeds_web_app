@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Case } from '$lib/types';
   import { Input } from "$lib/components/ui/input";
-  import * as Select from '$lib/components/ui/select';
+  import * as Select from 'bits-ui/components/select';
   import { Button } from "$lib/components/ui/button";
   import Search from 'lucide-svelte';
   import Filter from 'lucide-svelte';

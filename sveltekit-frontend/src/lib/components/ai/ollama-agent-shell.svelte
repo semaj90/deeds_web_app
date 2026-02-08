@@ -70,7 +70,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               "bg-primary text-primary-foreground hover:bg-primary, hover:bg-opacity-90",
               "disabled, opacity-50, disabled, cursor-not-allowed"
             )} >
-            <Send class="h-4" /> </button> </div> </div> </Dialog.Content> </Dialog.Portal> </Dialog> <style> pre { font-family: "Cascadia Code", "SF Mono", Consolas, monospace}
+            <Send class="h-4" /> </button> </div> </div> </Dialog.Content> </Dialog.Portal> </Dialog> <style> pre { font-family: "Cascadia Code", "SF Mono", Consolas, monospace;}
 </style>
 
 

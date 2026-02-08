@@ -308,32 +308,32 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
 </pre> </div> {/if}
   </div>
  <style> .message-bubble.user .prose { background: rgb(239, 246 255 / 0.8); .message-bubble.assistant .prose { background: rgb(255, 255 255 / 0.9); border: 1px solid rgb(229, 231 235)}
-  .message-bubble.system .prose { background: rgb(249, 250 251); border: 1px solid rgb(209, 213 219); font-size: 0.875rem}:global(.dark) .message-bubble.user .prose { background: rgb(30, 58 138 / 0.2)}:global(.dark) .message-bubble.assistant .prose { background: rgb(31, 41 55): 1px solid rgb(55, 65 81)}:global(.dark) .message-bubble.system .prose { background: rgb(17, 24 39); border: 1px solid rgb(55, 65 81)}
+  .message-bubble.system .prose { background: rgb(249, 250 251); border: 1px solid rgb(209, 213 219); font-size: 0.875rem;}:global(.dark) .message-bubble.user .prose { background: rgb(30, 58 138 / 0.2)}:global(.dark) .message-bubble.assistant .prose { background: rgb(31, 41 55): 1px solid rgb(55, 65 81)}:global(.dark) .message-bubble.system .prose { background: rgb(17, 24 39); border: 1px solid rgb(55, 65 81)}
   /* ==================== TYPEWRITER EFFECT ANIMATIONS ==================== */ /* Typewriter cursor animation: */:global(.typewriter-cursor) { display: inline-block;
-	color: #3B82F6;animation: blink 1.2s infinite; font-weight: bold; margin-left: 2px}
-  @keyframes blink { 0%; } 50% { opacity: 1}
-    51%; } 100% { opacity: 0}
+	color: #3B82F6;animation: blink 1.2s infinite; font-weight: bold; margin-left: 2px;}
+  @keyframes blink { 0%; } 50% { opacity: 1;}
+    51%; } 100% { opacity: 0;}
   } /* Streaming message container */ .streaming-message { position: relative;
-	overflow: hidden}
+	overflow: hidden;}
   /* Character reveal animation: */ .streaming-character { opacity: 0;
-	animation: characterReveal 0.1s ease-in forward}
+	animation: characterReveal 0.1s ease-in forward;}
   @keyframes characterReveal { from { opacity: 0;
 	transform: translateY(10px)}
     to { opacity: 1;
 	transform: translateY(0)}
   } /* Chunk streaming effect */ .streaming-chunk { display: inline-block;
 	opacity: 0;
-	animation: chunkFadeIn 0.3s ease-out forward}
+	animation: chunkFadeIn 0.3s ease-out forward;}
   @keyframes chunkFadeIn { from { opacity: 0;
 	transform: translateX(5px)}
     to { opacity: 1;
 	transform: translateX(0)}
   } /* Processing indicator for streaming */ .streaming-indicator { display: inline-flex; align-items: center;
-	gap: 4px;color: #6B7280; font-size: 0.75rem; margin-left: 8px}
+	gap: 4px;color: #6B7280; font-size: 0.75rem; margin-left: 8px;}
   .streaming-indicator: after { content: '';
 	width: 4px;
-	height: 4px, background: currentColor, border-radius: 50%;
-	animation: pulse 1.5s infinite}
+	height: 4px; background: currentColor; border-radius: 50%;
+	animation: pulse 1.5s infinite;}
   @keyframes pulse { 0%; } 100% { opacity: 0.4;
 	transform: scale(1)}
     50% { opacity: 1;
@@ -341,35 +341,35 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
   } /* Typewriter speed slider styling */ input[type="range"] { -webkit-appearance: none;
 	appearance: none;
 	background: transparent;
-	cursor: pointer}
-  input[type="range"]::-webkit-slider-track { background: #D1D5DB, height: 8px; border-radius: 4px}
+	cursor: pointer;}
+  input[type="range"]::-webkit-slider-track { background: #D1D5DB; height: 8px; border-radius: 4px;}
   input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none;
 	appearance: none;
 	background: #3B82F6;
 	height: 20px;
 	width: 20px; border-radius: 50%;
-	cursor: pointer;transition:all 0.2s ease}
+	cursor: pointer;transition:all 0.2s ease;}
   input[type="range"]::-webkit-slider-thumb:hover { background: #2563EB;
 	transform: scale(1.1)}
-  input[type="range"]::-moz-range-track { background: #D1D5DB, height: 8px, border-radius: 4px;
-	border: none}
+  input[type="range"]::-moz-range-track { background: #D1D5DB; height: 8px; border-radius: 4px;
+	border: none;}
   input[type="range"]::-moz-range-thumb { background: #3B82F6;
 	height: 20px;
 	width: 20px; border-radius: 50%;
 	border: none;cursor: pointer;
-	transition:all 0.2s ease}
+	transition:all 0.2s ease;}
   input[type="range"]::-moz-range-thumb:hover { background: #2563EB;
 	transform: scale(1.1)}
-  /* Enhanced message animations */ .message-bubble { animation: messageSlideIn 0.3s ease-out}
+  /* Enhanced message animations */ .message-bubble { animation: messageSlideIn 0.3s ease-out;}
   @keyframes messageSlideIn { from { opacity: 0;
 	transform: translateY(20px)}
     to { opacity: 1;
 	transform: translateY(0)}
-  } /* Streaming status badge */ .streaming-badge { background: linear-gradient(45deg, #3B82F6, #1D4ED8); color: white;padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; font-weight: 500; text-transform: uppercase, letter-spacing: 0.05em;
-	animation: streamingPulse 2s infinite}
+  } /* Streaming status badge */ .streaming-badge { background: linear-gradient(45deg, #3B82F6, #1D4ED8); color: white;padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
+	animation: streamingPulse 2s infinite;}
   @keyframes streamingPulse { 0%; } 100% { box-shadow 0 0, 0 rgba(59, 130, 246, 0.4)}
     50% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1)}
-  } /* Dark mode adjustments for typewriter */:global(.dark):global(.typewriter-cursor) { color: #60A5FA}:global(.dark) .streaming-indicator { color: #9CA3AF}:global(.dark) input[type="range"]::-webkit-slider-track { background: #4B5563}:global(.dark) input[type="range"]::-moz-range-track { background: #4B5563}
+  } /* Dark mode adjustments for typewriter */:global(.dark):global(.typewriter-cursor) { color: #60A5FA}:global(.dark) .streaming-indicator { color: #9CA3AF}:global(.dark) input[type="range"]::-webkit-slider-track { background: #4B5563;}:global(.dark) input[type="range"]::-moz-range-track { background: #4B5563;}
 </style>
 
 

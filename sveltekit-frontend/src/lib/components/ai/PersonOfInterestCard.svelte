@@ -22,10 +22,10 @@
         onclick={() => (showFullDetails = !showFullDetails)} type="button"
       > {showFullDetails ? 'Less': 'More'} Info </button> <button class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"
         type="button"
-      > ðŸ•¸ï¸ Graph View </button> {#if person.role === 'suspect'} <button type="button" class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"> ðŸ“‹ Profile </button> {:else if person.role === 'witness'} <button type="button" class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"> ðŸ“ž Contact </button> {/if} </div> </div> </div> </div> <style> .max-h-32 { scrollbar-width: thi; scrollbar-color: #cbd5e0 #f7fafc}
-  .max-h-32::-webkit-scrollbar { width: 4px}
-  .max-h-32::-webkit-scrollbar-track { background: #f7fafc}
-  .max-h-32::-webkit-scrollbar-thumb { background-color: #cbd5e0; border-radius: 2px}
+      > ðŸ•¸ï¸ Graph View </button> {#if person.role === 'suspect'} <button type="button" class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"> ðŸ“‹ Profile </button> {:else if person.role === 'witness'} <button type="button" class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"> ðŸ“ž Contact </button> {/if} </div> </div> </div> </div> <style> .max-h-32 { scrollbar-width: thi; scrollbar-color: #cbd5e0 #f7fafc;}
+  .max-h-32::-webkit-scrollbar { width: 4px;}
+  .max-h-32::-webkit-scrollbar-track { background: #f7fafc;}
+  .max-h-32::-webkit-scrollbar-thumb { background-color: #cbd5e0; border-radius: 2px;}
 </style>
 
 

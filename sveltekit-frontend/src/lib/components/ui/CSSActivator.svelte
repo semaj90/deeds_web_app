@@ -234,7 +234,7 @@
     opacity: 0 !important
     width: 1px !important
     height: 1px !important
-   ;overflow: hidden !important}
+   ;overflow: hidden !important;}
 </style>
 
 

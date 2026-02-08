@@ -338,7 +338,7 @@
 		height: 100%;
 	background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px;
-	overflow: hidden }
+	overflow: hidden;}
 
 	.graph-svg { display: block; width: 100%;
 		height: 100%;
@@ -358,7 +358,7 @@
 		border: 3px solid rgba(255, 255, 255, 0.1);
 		border-top-color: #00d4ff;
 		border-radius: 50%;
-	animation: spin 1s linear infinite }
+	animation: spin 1s linear infinite;}
 
 	@keyframes spin {
 		to { transform: rotate(360deg); }
@@ -378,7 +378,7 @@
 	display: flex;
 		flex-direction: column;
 	gap: 0.25rem;
-		z-index: 10 }
+		z-index: 10;}
 
 	.zoom-controls button { width: 32px; height: 32px;
 		background: rgba(0, 0, 0, 0.6);
@@ -390,7 +390,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	transition:all 0.2s ease }
+	transition:all 0.2s ease;}
 
 	.zoom-controls button:hover {
 		background: rgba(0, 212, 255, 0.2);
@@ -403,7 +403,7 @@
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px;
 	padding: 0.75rem;
-		z-index: 10 }
+		z-index: 10;}
 
 	.legend-title {
 		font-size: 0.75rem;
@@ -411,13 +411,13 @@
 	color: rgba(255, 255, 255, 0.7);
 		margin-bottom: 0.5rem;
 		text-transform: uppercase;
-		letter-spacing: 0.05em }
+		letter-spacing: 0.05em;}
 
 	.legend-item {
 		display: flex;
 		align-items: center;
 	gap: 0.5rem;
-		margin-bottom: 0.25rem }
+		margin-bottom: 0.25rem;}
 
 	.legend-dot { width: 10px; height: 10px;
 		border-radius: 50%;
@@ -426,7 +426,7 @@
 	.legend-label {
 		font-size: 0.75rem;
 	color: rgba(255, 255, 255, 0.6);
-		text-transform: capitalize }
+		text-transform: capitalize;}
 
 	.zoom-indicator { position: absolute; bottom: 1rem;
 		right: 1rem;
@@ -436,9 +436,9 @@
 	padding: 0.25rem 0.5rem;
 		font-size: 0.75rem;
 	color: rgba(255, 255, 255, 0.6);
-		font-family: 'JetBrains Mono', monospace }
+		font-family: 'JetBrains Mono', monospace;}
 
-	:global(.route-graph .node:hover, circle:first-child) {
+	:global(.route-graph .node:hover; circle:first-child) {
 		filter: brightness(1.2);
 	}
 </style>

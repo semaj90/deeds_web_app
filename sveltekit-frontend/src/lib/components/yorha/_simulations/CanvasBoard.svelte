@@ -448,25 +448,25 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem;
   }
   .size-slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px;
-	background: #00ff88; cursor: pointer; border-radius: 0 }
+	background: #00ff88; cursor: pointer; border-radius: 0;}
   .size-display { font-weight: bold;
-	color: #00ff88; text-shadow: 0 0 5px #00ff88 }
+	color: #00ff88; text-shadow: 0 0 5px #00ff88;}
   .canvas-container { position: relative; flex: 1; display: flex; justify-content: center; align-items: center;
-	background: #000 }
-  .yorha-canvas { border: 2px solid #333; cursor: crosshair }
+	background: #000;}
+  .yorha-canvas { border: 2px solid #333; cursor: crosshair;}
   .yorha-canvas:hover { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3) }
   .yorha-canvas.drawing { box-shadow: 0 0 30px rgba(0, 255, 136, 0.5)}
   .canvas-overlay { position: absolute; top: 1rem; right: 1rem;
-	background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff88; padding: 0.5rem; pointer-events: none}
+	background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff88; padding: 0.5rem; pointer-events: none;}
   .canvas-info { display: flex; flex-direction: column;
-	gap: 0.25rem}
-  .info-item { font-size: 0.8rem; font-family: 'Courier New', monospace; color: #00ff88}
+	gap: 0.25rem;}
+  .info-item { font-size: 0.8rem; font-family: 'Courier New', monospace; color: #00ff88;}
   /* Responsive design */ @media (max-width: 768px) { .canvas-toolbar { flex-direction: column;
-	gap: 1rem}
-    .tool-section, .color-section, .size-section { flex-direction: row; align-items: center}
-    .color-palette { max-width: 200px}
+	gap: 1rem;}
+    .tool-section, .color-section, .size-section { flex-direction: row; align-items: center;}
+    .color-palette { max-width: 200px;}
   } /* YoRHa-style animations */ @keyframes yorha-glow { 0% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.3) } 50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.6) } 100% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.3) } }
-  .yorha-canvas-board:hover { animation: yorha-glow 2s ease-in-out infinite}
+  .yorha-canvas-board:hover { animation: yorha-glow 2s ease-in-out infinite;}
 </style>
 
 

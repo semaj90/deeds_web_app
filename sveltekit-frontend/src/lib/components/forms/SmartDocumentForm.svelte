@@ -440,7 +440,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <style>
   .smart-document-form {
     background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-    min-height: 100vh}
+    min-height: 100vh;}
 </style>
 
 

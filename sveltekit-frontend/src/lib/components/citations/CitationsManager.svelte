@@ -242,9 +242,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 							data-enhanced-bits="true"
 						> Close </Button> </div> </div> </div> </div> {/if}
   <style> /* Custom scrollbar for modal content */ .overflow-y-auto { scrollbar-width: thi; scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted))}
-	.overflow-y-auto::-webkit-scrollbar { width: 6px}
+	.overflow-y-auto::-webkit-scrollbar { width: 6px;}
 	.overflow-y-auto::-webkit-scrollbar-track { background: hsl(var(--muted))}
-	.overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px}
+	.overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px;}
 </style>
 
 

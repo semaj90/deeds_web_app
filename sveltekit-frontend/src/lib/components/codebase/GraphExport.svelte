@@ -230,7 +230,7 @@
 	.graph-export {
 		display: flex;
 		flex-direction: column;
-	gap: 0.5rem }
+	gap: 0.5rem;}
 
 	.export-header {
 		display: flex;
@@ -240,11 +240,11 @@
 		font-weight: 500;
 	color: rgba(255, 255, 255, 0.5);
 		text-transform: uppercase;
-		letter-spacing: 0.05em }
+		letter-spacing: 0.05em;}
 
 	.export-options {
 		display: flex;
-	gap: 0.5rem }
+	gap: 0.5rem;}
 
 	.export-btn {
 		display: flex;
@@ -257,7 +257,7 @@
 	color: rgba(255, 255, 255, 0.8);
 		font-size: 0.8rem;
 	cursor: pointer;
-		transition:all 0.2s ease }
+		transition:all 0.2s ease;}
 
 	.export-btn:hover:not(:disabled) {
 		background: rgba(255, 255, 255, 0.1);
@@ -266,11 +266,11 @@
 
 	.export-btn:disabled {
 		opacity: 0.5;
-	cursor: not-allowed }
+	cursor: not-allowed;}
 
 	.success-icon {
 		color: #4ade80;
-	animation: pop 0.3s ease }
+	animation: pop 0.3s ease;}
 
 	@keyframes pop {
 		0% { transform: scale(0); }

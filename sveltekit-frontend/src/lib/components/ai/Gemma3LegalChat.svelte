@@ -147,8 +147,8 @@ prompt: augmentedPrompt, maxTokens: context.maxTokens, temperature: context.temp
  <N64ProgressBar value={$performanceMetrics.gpuUtilization * 100} max={ 100 } size="sm"
                   theme="classic"
                   animated={$performanceMetrics.gpuUtilization > 0} showPercentage={ false } sparkle={$performanceMetrics.gpuUtilization > 0.9} /> </div> </div> </div> </div> </div> </TabsContent> </Tabs> </div>
- <style> .gemma3-legal-chat { min-height: 600px}
-  .prose { max-width: none}
+ <style> .gemma3-legal-chat { min-height: 600px;}
+  .prose { max-width: none;}
   .prose pre { background-color: var(--card);
 	border: 1px solid var(--border); border-radius: var(--radius)}
 </style>

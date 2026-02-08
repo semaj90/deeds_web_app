@@ -120,22 +120,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <div class="text-xs nes-text">Enter to send â€¢ Shift+Enter for new line</div>
  <!-- Adjusted, styling --> </div> </div> </Dialog.Content> </Dialog.Portal> </Dialog>
- <style> /* Custom styles for enhanced appearance */:global(.chat-message-content) { line-height: 1.6}:global(.chat-message-content p) { margin-bottom: 0.5rem}:global(.chat-message-content, p:last-child) { margin-bottom: 0; /* Fixed comma */ }:global(.chat-message-content ul, .chat-message-content ol) { margin: 0.5rem 0; padding-left: 1.5rem}:global(.chat-message-content code) { background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; font-size: 0.875em}:global(.chat-message-content blockquote) { border-left: 4px solid currentColor; padding-left: 1rem;
-	margin: 0.5rem 0;opacity: 0.8}
+ <style> /* Custom styles for enhanced appearance */:global(.chat-message-content) { line-height: 1.6;}:global(.chat-message-content p) { margin-bottom: 0.5rem;}:global(.chat-message-content; p:last-child) { margin-bottom: 0; /* Fixed comma */ }:global(.chat-message-content ul, .chat-message-content ol) { margin: 0.5rem 0; padding-left: 1.5rem;}:global(.chat-message-content code) { background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-family: 'Courier New', monospace; font-size: 0.875em;}:global(.chat-message-content blockquote) { border-left: 4px solid currentColor; padding-left: 1rem;
+	margin: 0.5rem 0;opacity: 0.8;}
 /* Additional NES.css specific overrides/adjustments */ .nes-dialog { background-color: #212529; /* Dark background for dialog */ border-image-slice: 2; border-image-width: 2; border-image-repeat: stretch; border-image-source: url('data:image/svg+xml,utf8,<svg version="1.1" width="8" height="8" xmlns="http, //www.w3.org/2000/svg"><path fill="%23d4af37" d="M0 2h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm-4-2h2v2h-2v-2zm4, 0h2v2h-2v-2zm-2-2h2v2h-2v-2zm0, 4h2v2h-2v-2z"/></svg>'); padding: 0; /* Remove default padding to control internal spacing */ }
   .nes-dialog.is-dark { border-image-source: url('data:image/svg+xml,utf8,<svg version="1.1" width="8" height="8" xmlns="http, //www.w3.org/2000/svg"><path fill="%23d4af37" d="M0 2h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm-4-2h2v2h-2v-2zm4, 0h2v2h-2v-2zm-2-2h2v2h-2v-2zm0, 4h2v2h-2v-2z"/></svg>')}
   .nes-container.is-dark { background-color: #1a1d20 !important; /* Darker background for containers */ }
   .nes-text.is-primary { color: #d4af37 !important; /* Gold color for primary text */ }
   .nes-text.is-disabled { color: #888 !important; /* Gray for disabled text */ }
-  .nes-btn.is-primary { background-color: #d4af37 !important; color: #1a1d20 !important}
-  .nes-btn.is-primary:hover { background-color: #e0c26e !important}
-  .nes-btn.is-small { padding: 0.5rem 0.75rem; font-size: 0.75rem}
+  .nes-btn.is-primary { background-color: #d4af37 !important; color: #1a1d20 !important;}
+  .nes-btn.is-primary:hover { background-color: #e0c26e !important;}
+  .nes-btn.is-small { padding: 0.5rem 0.75rem; font-size: 0.75rem;}
   .nes-input { background-color: #2a2d30;
 	color: #eee;
-	border: 2px solid #d4af37}
-  .nes-input:focus { outline: none; box-shadow: 0 0 0 2px #d4af37}
-  .nes-field.is-inline { display: flex; align-items: center}
-  .nes-field.is-inline .nes-input { flex-grow: 1}
+	border: 2px solid #d4af37;}
+  .nes-input:focus { outline: none; box-shadow: 0 0 0 2px #d4af37;}
+  .nes-field.is-inline { display: flex; align-items: center;}
+  .nes-field.is-inline .nes-input { flex-grow: 1;}
 </style>
 
 

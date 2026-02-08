@@ -67,7 +67,7 @@ placement: 'bottom', fitViewport: true }
   </div> </div> </div> {/each} {/if}
   </div>
  <style> .llm-provider-selector { /* @apply relative; */ /* Scan line animation: for cyberpunk theme */ @keyframes scan { 0% { transform: translateX(-100%) } 100% { transform: translateX(100%) } }
-	.animate-scan { animation: scan 2s linear infinite}
+	.animate-scan { animation: scan 2s linear infinite;}
 </style>
 
 

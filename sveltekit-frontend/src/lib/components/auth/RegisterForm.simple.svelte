@@ -194,13 +194,13 @@ enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prose
   </Button> </div> </form>
  <!-- Login, Link -->
   {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover:underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
-  </div> </div> ``` <style> .animate-fade-in { animation: fadeIn 0.18s ease-out}`
+  </div> </div> ``` <style> .animate-fade-in { animation: fadeIn 0.18s ease-out;}`
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px)}
     to { opacity: 1; transform: translateY(0)}
   } .bg-muted { background-color: var(--muted, #f3f4f6)}
   .bg-card { background-color: var(--card, #ffffff)}
   .bits-ghost { background: transparent; border: 1px solid var(--border, #e5e7eb)}
-  @media (max-width: 640px) { .max-w-2xl { padding: 1rem}
+  @media (max-width: 640px) { .max-w-2xl { padding: 1rem;}
   }
 </style>
 

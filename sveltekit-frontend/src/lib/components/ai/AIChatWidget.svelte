@@ -111,7 +111,7 @@ message: messageToSend, context: contextText ? [contextText]: undefined | caseId
  <li>"How does this relate to other laws?"</li>
  <li>"What are common defenses or exceptions?"</li> </ul> {/if}
   </div> </div> </Dialog.Content> </Dialog>
- <style>:global(.prose p) { font-size: 0.875rem; line-height: 1.6; margin-bottom: 0.5rem}
+ <style>:global(.prose p) { font-size: 0.875rem; line-height: 1.6; margin-bottom: 0.5rem;}
 </style>
 
 

@@ -121,7 +121,7 @@ narrative: narrative.trim(),
  <head>
  <title>Police Report - ${generatedReport.id}</title>
  <style>
- body { font-family: 'Times New Roman', serif, margin: 40px, line-height: 1.6; }
+ body { font-family: 'Times New Roman', serif; margin: 40px; line-height: 1.6; }
  h1 { color: #1f2937; border-bottom: 2px solid #1f2937; padding-bottom: 10px; }
  h2 { color: #374151; margin-top: 30px; }
  .metadata { background: #f3f4f6; padding: 15px; border-radius: 5px;

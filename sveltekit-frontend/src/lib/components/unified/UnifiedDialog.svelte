@@ -277,7 +277,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     image-rendering: -moz-crisp-edge
     image-rendering: -webkit-crisp-edge
     image-rendering: pixelated
-    image-rendering: crisp-edge}
+    image-rendering: crisp-edge;}
   /* WebGPU canvas optimization */
   canvas {
     will-change: transform

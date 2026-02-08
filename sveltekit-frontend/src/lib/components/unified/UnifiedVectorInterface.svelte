@@ -434,9 +434,7 @@
 		outline: none;
 	}
 
-	input:focus,
-	textarea:focus,
-	select:focus {
+	input:focus; textarea:focus; select:focus {
 		box-shadow: inset 0 0 0 1px theme('colors.green.400');
 	}
 

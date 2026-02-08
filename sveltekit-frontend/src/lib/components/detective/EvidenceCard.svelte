@@ -67,5 +67,5 @@ function formatSize(bytes?: number) {
 
 <style>
     :global(.nes-container.is-rounded) {
-        padding: 0.5rem !important }
+        padding: 0.5rem !important;}
 </style>

@@ -156,48 +156,48 @@ documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extrac
  <svelte, component | this={ ButtonComponent } class="bits-btn" onclick={ saveMetadataFromDialog }> Save </svelte:component> </div> {/if}
   </Dialog.Content> </Dialog> </div>
  <style> .enhanced-document-uploader { width: 100%}
-  .drop-zone { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem, text-align: center;
-	cursor: pointer;transition:border-color 0.2s, background 0.2s; background: #f9fafb}
+  .drop-zone { border: 2px dashed #d1d5db; border-radius: 0.5rem; padding: 2rem; text-align: center;
+	cursor: pointer;transition:border-color 0.2s, background 0.2s; background: #f9fafb;}
   .drop-zone.dragging { border-color: #2563eb;
 	background: rgba(37, 99, 235, 0.05)}
-  .drop-zone-content { margin-top: 0.5rem; margin-bottom: 0.5rem}
-  .drop-zone-icon { display: block; margin-left: auto, margin-right: auto;
-	color: #6b7280}
-  .drop-zone-title { font-size: 1.125rem; font-weight: 600}
+  .drop-zone-content { margin-top: 0.5rem; margin-bottom: 0.5rem;}
+  .drop-zone-icon { display: block; margin-left: auto; margin-right: auto;
+	color: #6b7280;}
+  .drop-zone-title { font-size: 1.125rem; font-weight: 600;}
   .drop-zone-description { font-size: 0.875rem;
-	color: #6b7280}
+	color: #6b7280;}
   .drop-zone-specs { font-size: 0.75rem;
-	color: #6b7280}
-  .file-list { margin-top: 0.75rem; margin-bottom: 0.75rem}
-  .file-item { transition:box-shadow 0.2s}
+	color: #6b7280;}
+  .file-list { margin-top: 0.75rem; margin-bottom: 0.75rem;}
+  .file-item { transition:box-shadow 0.2s;}
   .file-item:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08)}
   .file-info { display: flex; align-items: center;
-	gap: 1rem}
+	gap: 1rem;}
   .file-preview { flex-shrink: 0;
 	width: 3rem;
 	height: 3rem; border-radius: 0.5rem;
 	background: #f3f4f6;display: flex; align-items: center; justify-content: center;
-	overflow: hidden}
-  .preview-image { width: 100%, height: 100%; object-fit: cover}
-  .file-details { flex: 1, 1 0%; min-width: 0 }
+	overflow: hidden;}
+  .preview-image { width: 100%; height: 100%; object-fit: cover;}
+  .file-details { flex: 1, 1 0%; min-width: 0;}
   .file-name { font-weight: 500; white-space: nowrap;
-	overflow: hidden; text-overflow: ellipsis}
+	overflow: hidden; text-overflow: ellipsis;}
   .file-meta { font-size: 0.875rem;
-	color: #6b7280}
-  .file-progress { margin-top: 0.5rem}
+	color: #6b7280;}
+  .file-progress { margin-top: 0.5rem;}
   .error-message { font-size: 0.875rem;
 	color: #dc2626;
-	display: flex; align-items: center; margin-top: 0.5rem}
-  .file-actions { display: flex; flex-direction: column, align-items: flex-end;
-	gap: 0.5rem}
-  .action-buttons { display: flex; gap: 0.5rem}
-  .upload-actions { display: flex; align-items: center; justify-content: center}
-  .metadata-form { padding: 0.25rem}
+	display: flex; align-items: center; margin-top: 0.5rem;}
+  .file-actions { display: flex; flex-direction: column; align-items: flex-end;
+	gap: 0.5rem;}
+  .action-buttons { display: flex; gap: 0.5rem;}
+  .upload-actions { display: flex; align-items: center; justify-content: center;}
+  .metadata-form { padding: 0.25rem;}
   .checkbox-group { margin-top: 0.5rem; margin-bottom: 0.5rem;
 	display: flex; flex-direction: column;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   .dialog-actions { display: flex; justify-content: flex-end;
-	gap: 0.5rem; margin-top: 1.5rem}
+	gap: 0.5rem; margin-top: 1.5rem;}
 </style>
 
 

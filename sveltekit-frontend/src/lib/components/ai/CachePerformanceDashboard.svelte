@@ -162,134 +162,134 @@ bankSwitches: 0 });
  <span class="value {cacheMetrics.performance.errorRate > 2 ? 'text-red-500': 'text-green-500'}"> {cacheMetrics.performance.errorRate.toFixed(2)}% </span> </div>
  <div class="perf-item"> <span>Cached Items:</span>
  <span class="value">{cacheMetrics.memory.totalCachedItems.toLocaleString()}</span> </div> </div> </div> </div> </main> </div>
- <style> .cache-dashboard { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); color: #ffffff; font-family: 'JetBrains Mono', monospace; min-height: 100vh}
-  .dashboard-header { background: rgba(0, 0, 0, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem 2rem}
+ <style> .cache-dashboard { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); color: #ffffff; font-family: 'JetBrains Mono', monospace; min-height: 100vh;}
+  .dashboard-header { background: rgba(0, 0, 0, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem 2rem;}
   .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
 	gap: 1rem; max-width: 1400px;
-	margin: 0 auto}
+	margin: 0 auto;}
   .title-section h1 { margin: 0, 0 0.25rem 0; font-size: 1.75rem;
-	background: linear-gradient(45deg, #22c55e, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text}
-  .title-section p { margin: 0, opacity: 0.7; font-size: 0.9rem}
+	background: linear-gradient(45deg, #22c55e, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;}
+  .title-section p { margin: 0; opacity: 0.7; font-size: 0.9rem;}
   .header-controls { display: flex; align-items: center;
-	gap: 1rem; flex-wrap}
+	gap: 1rem; flex-wrap;}
   .system-health { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; font-weight: 500}
+	gap: 0.5rem;padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; font-weight: 500;}
   .system-health.healthy { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3)}
   .system-health.warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3)}
   .system-health.critical { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3)}
-  .control-buttons { display: flex; gap: 0.5rem}
+  .control-buttons { display: flex; gap: 0.5rem;}
   .control-buttons button { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1); color: white;
-	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px, cursor: pointer; font-family: inherit; font-size: 0.875rem;
-	transition:all 0.2s}
+	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.875rem;
+	transition:all 0.2s;}
   .control-buttons button:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3)}
-  .control-buttons button:disabled { opacity: 0.5; cursor:not-allowed}
-  .auto-refresh-btn.active { background: rgba(34, 197, 94, 0.2); border-color: #22c55e}
-  .clear-cache-btn { background: rgba(239, 68, 68, 0.2) !important; border-color: #ef4444 !important}
+  .control-buttons button:disabled { opacity: 0.5; cursor:not-allowed;}
+  .auto-refresh-btn.active { background: rgba(34, 197, 94, 0.2); border-color: #22c55e;}
+  .clear-cache-btn { background: rgba(239, 68, 68, 0.2) !important; border-color: #ef4444 !important;}
   .dashboard-content { padding: 2rem; max-width: 1400px;
-	margin: 0 auto}
-  .metrics-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem}
+	margin: 0 auto;}
+  .metrics-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;}
   .metric-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
 	padding: 1.5rem;
 	display: flex; align-items: center;
-	gap: 1rem}
-  .metric-card.primary { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border-color: #3b82f6}
-  .metric-icon { color: #3b82f6; opacity: 0.8}
-  .metric-content h3 { margin: 0, 0 0.5rem 0; font-size: 0.875rem, opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em}
+	gap: 1rem;}
+  .metric-card.primary { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border-color: #3b82f6;}
+  .metric-icon { color: #3b82f6; opacity: 0.8;}
+  .metric-content h3 { margin: 0, 0 0.5rem 0; font-size: 0.875rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em;}
   .metric-value { font-size: 1.75rem; font-weight: bold;
 	color: #ffffff;display: flex; align-items: baseline;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   .grade { font-size: 1rem;
-	opacity: 0.7}
-  .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem}
+	opacity: 0.7;}
+  .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;}
   .dashboard-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
-	padding: 1.5rem}
+	padding: 1.5rem;}
   .dashboard-card h2 { margin: 0, 0 1rem 0; font-size: 1.1rem;
-	color: #f59e0b; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem}
-  .dashboard-card.nintendo { background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05)); border-color: #22c55e}
-  .dashboard-card.nintendo h2 { color: #22c55e}
+	color: #f59e0b; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem;}
+  .dashboard-card.nintendo { background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05)); border-color: #22c55e;}
+  .dashboard-card.nintendo h2 { color: #22c55e;}
   .cache-stats { display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .stat-row { display: flex; align-items: center;
-	gap: 1rem}
-  .stat-bar { flex: 1, display: flex; align-items: center;
-	gap: 0.5rem}
+	gap: 1rem;}
+  .stat-bar { flex: 1; display: flex; align-items: center;
+	gap: 0.5rem;}
   .bar { flex: 1; height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
-	overflow: hidden}
+	overflow: hidden;}
   .fill { height: 100%; border-radius: 4px;
-	transition:width 0.5s ease}
+	transition:width 0.5s ease;}
   .fill.retrieval { background: linear-gradient(90deg, #3b82f6, #1d4ed8)}
   .fill.embedding { background: linear-gradient(90deg, #22c55e, #16a34a)}
-  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem}
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;}
   .stat-item { display: flex; flex-direction: column;
-	gap: 0.25rem}
+	gap: 0.25rem;}
   .stat-item .label { font-size: 0.8rem;
-	opacity: 0.7}
-  .stat-item .value { font-weight: bold; font-size: 0.9rem}
+	opacity: 0.7;}
+  .stat-item .value { font-weight: bold; font-size: 0.9rem;}
   .nintendo-stats { display: flex; flex-direction: column;
-	gap: 1rem}
-  .memory-overview { text-align: center}
-  .memory-bar { height: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 6px, overflow: hidden; margin-bottom: 0.5rem}
+	gap: 1rem;}
+  .memory-overview { text-align: center;}
+  .memory-bar { height: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 6px; overflow: hidden; margin-bottom: 0.5rem;}
   .memory-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); border-radius: 6px;
-	transition:width 0.5s ease}
-  .bank-info { display: flex; justify-content: space-between, flex-wrap: wrap;
-	gap: 0.5rem}
+	transition:width 0.5s ease;}
+  .bank-info { display: flex; justify-content: space-between; flex-wrap: wrap;
+	gap: 0.5rem;}
   .bank-item { display: flex; align-items: center;
-	gap: 0.25rem; font-size: 0.85rem}
-  .nintendo-events { display: flex; justify-content: space-between, font-size: 0.8rem;
-	opacity: 0.7}
+	gap: 0.25rem; font-size: 0.85rem;}
+  .nintendo-events { display: flex; justify-content: space-between; font-size: 0.8rem;
+	opacity: 0.7;}
   .memory-hierarchy { display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .memory-layer { display: flex; align-items: center;
-	gap: 1rem;padding: 0.75rem; border-radius: 6px}
+	gap: 1rem;padding: 0.75rem; border-radius: 6px;}
   .memory-layer.l1 { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3)}
   .memory-layer.l2 { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3)}
   .memory-layer.l3 { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3)}
-  .layer-info { min-width: 120px}
-  .layer-info h4 { margin: 0, 0 0.25rem 0; font-size: 0.8rem; font-weight: bold}
+  .layer-info { min-width: 120px;}
+  .layer-info h4 { margin: 0, 0 0.25rem 0; font-size: 0.8rem; font-weight: bold;}
   .layer-info span { font-size: 0.7rem;
-	opacity: 0.7}
+	opacity: 0.7;}
   .usage-bar { flex: 1; height: 6px;background: rgba(255, 255, 255, 0.2); border-radius: 3px;
-	overflow: hidden}
-  .usage-fill { height: 100%, background: currentColor, border-radius: 3px;
-	transition:width 0.5s ease}
-  .usage-text { min-width: 50px; text-align: right, font-size: 0.8rem;
-	opacity: 0.8}
+	overflow: hidden;}
+  .usage-fill { height: 100%; background: currentColor; border-radius: 3px;
+	transition:width 0.5s ease;}
+  .usage-text { min-width: 50px; text-align: right; font-size: 0.8rem;
+	opacity: 0.8;}
   .query-list { display: flex; flex-direction: column;
-	gap: 0.75rem; max-height: 300px; overflow-y: auto}
+	gap: 0.75rem; max-height: 300px; overflow-y: auto;}
   .query-item { padding: 0.75rem; border-radius: 6px;
 	border: 1px solid rgba(255, 255, 255, 0.1)}
   .query-item.cached { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3)}
   .query-item.uncached { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3)}
-  .query-text { font-size: 0.9rem; margin-bottom: 0.5rem}
-  .query-meta { display: flex; justify-content: space-between, font-size: 0.8rem;
-	opacity: 0.8}
-  .cache-status.hit { color: #22c55e}
-  .cache-status.miss { color: #ef4444}
+  .query-text { font-size: 0.9rem; margin-bottom: 0.5rem;}
+  .query-meta { display: flex; justify-content: space-between; font-size: 0.8rem;
+	opacity: 0.8;}
+  .cache-status.hit { color: #22c55e;}
+  .cache-status.miss { color: #ef4444;}
   .performance-metrics { display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .perf-item { display: flex; justify-content: space-between;
 	padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05)}
-  .perf-item:last-child { border-bottom: none}
-  .perf-item .value { font-weight: bold}
-  /* Responsive design */ @media (max-width: 768px) { .dashboard-header { padding: 1rem}
-    .header-content { flex-direction: column; align-items: stretch}
-    .header-controls { justify-content: center}
-    .control-buttons { flex-wrap: wrap; justify-content: center}
-    .dashboard-content { padding: 1rem}
-    .metrics-overview { grid-template-columns: 1fr}
-    .dashboard-grid { grid-template-columns: 1fr}
-    .stat-grid { grid-template-columns: 1fr}
-    .bank-info { flex-direction: column}
-  } /* Animation classes */ .animate-spin { animation: spin 1s linear infinite}
+  .perf-item:last-child { border-bottom: none;}
+  .perf-item .value { font-weight: bold;}
+  /* Responsive design */ @media (max-width: 768px) { .dashboard-header { padding: 1rem;}
+    .header-content { flex-direction: column; align-items: stretch;}
+    .header-controls { justify-content: center;}
+    .control-buttons { flex-wrap: wrap; justify-content: center;}
+    .dashboard-content { padding: 1rem;}
+    .metrics-overview { grid-template-columns: 1fr;}
+    .dashboard-grid { grid-template-columns: 1fr;}
+    .stat-grid { grid-template-columns: 1fr;}
+    .bank-info { flex-direction: column;}
+  } /* Animation classes */ .animate-spin { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}
-  } /* Text color utilities */ .text-green-500 { color: #22c55e}
-  .text-yellow-500 { color: #eab308}
-  .text-orange-500 { color: #f97316}
-  .text-red-500 { color: #ef4444}
-  .text-gray-500 { color: #6b7280}
-</style>; color: #6b7280; </style>
+  } /* Text color utilities */ .text-green-500 { color: #22c55e;}
+  .text-yellow-500 { color: #eab308;}
+  .text-orange-500 { color: #f97316;}
+  .text-red-500 { color: #ef4444;}
+  .text-gray-500 { color: #6b7280;}
+</style>
 
 
 

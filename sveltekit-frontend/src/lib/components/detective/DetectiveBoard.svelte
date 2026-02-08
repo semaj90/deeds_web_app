@@ -335,7 +335,7 @@ onclick={() => { handleViewEvidence(result); closeFindModal(); }}
 background-image:
 linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
 linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
-background-size: 40px 40px }
-.custom-scrollbar::-webkit-scrollbar { width: 4px }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: currentColor; opacity: 0.2 }
+background-size: 40px 40px;}
+.custom-scrollbar::-webkit-scrollbar { width: 4px;}
+.custom-scrollbar::-webkit-scrollbar-thumb { background: currentColor; opacity: 0.2;}
 </style>

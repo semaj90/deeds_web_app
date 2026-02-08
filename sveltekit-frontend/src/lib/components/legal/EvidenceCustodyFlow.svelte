@@ -91,8 +91,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             class="flex-1"
           > Cancel </Button> </div> </div> {/if}
   </div>
- <style> .evidence-custody-flow { min-height: 100vh}
-  /* Custom animations for state transitions */ .workflow-transition { animation: fadeInUp 0.3s ease-out}
+ <style> .evidence-custody-flow { min-height: 100vh;}
+  /* Custom animations for state transitions */ .workflow-transition { animation: fadeInUp 0.3s ease-out;}
   @keyframes fadeInUp { from { opacity: 0;
 	transform: translateY(20px)}
     to { opacity: 1;

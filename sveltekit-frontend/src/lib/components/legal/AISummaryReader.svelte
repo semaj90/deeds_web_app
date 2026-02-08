@@ -145,12 +145,12 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
  <h4 class="text-lg font-medium text-gray-900">No Document Loaded</h4>
  <p class="text-gray-600">Load a document or provide content to generate an AI summary.</p> {/if}
   </div> </div> </div>
- <style> .ai-summary-reader { width: 100%; max-width: 72rem; margin-left: auto; margin-right: auto}
-  .ai-summary-reader.compact { max-width: 32rem}
+ <style> .ai-summary-reader { width: 100%; max-width: 72rem; margin-left: auto; margin-right: auto;}
+  .ai-summary-reader.compact { max-width: 32rem;}
   .line-clamp-2 { display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-	overflow: hidden}
-  .prose p { margin-bottom: 1rem}
-  .prose, p:last-child { margin-bottom: 0}
+	overflow: hidden;}
+  .prose p { margin-bottom: 1rem;}
+  .prose; p:last-child { margin-bottom: 0;}
 </style>
 
 

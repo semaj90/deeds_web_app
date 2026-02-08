@@ -207,7 +207,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 {/if}
 <style>
   .animate-bounce {
-    animation: bounce 1s infinite}
+    animation: bounce 1s infinite;}
   @keyframes bounce {
     0%; } 100% {
       transform: translateY(-25%);

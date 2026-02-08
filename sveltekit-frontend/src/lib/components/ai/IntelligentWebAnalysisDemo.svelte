@@ -132,107 +132,107 @@ ocrEnabled: true, cacheEnabled: true, qloraTraining: true, minChunkSize: 1000, m
   {#each Array.isArray(logs) ? logs: [] as log} <div class="log-entry">{ log }</div> {/each}
   </div> </div> </div> </div>
  <style> .intelligent-analysis-demo { max-width: 1400px;
-	margin: 0 auto;padding: 2rem; font-family: 'Inter', sans-serif}
-  .demo-header { text-align: center; margin-bottom: 2rem}
-  .demo-header h2 { color: #1f2937; margin-bottom: 0.5rem}
-  .demo-header p { color: #6b7280; margin-bottom: 1.5rem}
+	margin: 0 auto;padding: 2rem; font-family: 'Inter', sans-serif;}
+  .demo-header { text-align: center; margin-bottom: 2rem;}
+  .demo-header h2 { color: #1f2937; margin-bottom: 0.5rem;}
+  .demo-header p { color: #6b7280; margin-bottom: 1.5rem;}
   .status-bar { display: inline-flex; align-items: center;
 	gap: 0.5rem;padding: 0.75rem 1.5rem; border-radius: 2rem;
 	background: #f3f4f6;
-	color: #6b7280; font-weight: 500}
+	color: #6b7280; font-weight: 500;}
   .status-bar.initialized { background: #d1fae5;
-	color: #065f46}
+	color: #065f46;}
   .status-bar.analyzing { background: #fef3c7;
 	color: #92400;
-	animation: pulse 2s infinite}
-  .status-dot { width: 10px, height: 10px, border-radius: 50%;
-	background: #9ca3af}
-  .initialized .status-dot { background: #10b981}
-  .analyzing .status-dot { background: #f59e0b}
-  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem}
+	animation: pulse 2s infinite;}
+  .status-dot { width: 10px; height: 10px; border-radius: 50%;
+	background: #9ca3af;}
+  .initialized .status-dot { background: #10b981;}
+  .analyzing .status-dot { background: #f59e0b;}
+  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;}
   .panel { background: white; border-radius: 1rem;
 	padding: 1.5rem;border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .panel h3 { margin-bottom: 1rem;
-	color: #1f2937}
+	color: #1f2937;}
   .controls { display: flex; flex-direction: column;
-	gap: 0.75rem; margin-bottom: 1.5rem}
-  .controls button { padding: 0.75rem 1rem; border: none; border-radius: 0.5rem, font-weight: 500;
+	gap: 0.75rem; margin-bottom: 1.5rem;}
+  .controls button { padding: 0.75rem 1rem; border: none; border-radius: 0.5rem; font-weight: 500;
 	cursor: pointer;
-	transition:all 0.2}
+	transition:all 0.2;}
   .controls buttondisabled { opacity: 0.6;
-	cursor:not-allowed}
+	cursor:not-allowed;}
   .controls button.primary { background: #3b82f6;
-	color: white}
-  .controls button.primary:hover:not(disabled) { background: #2563eb}
+	color: white;}
+  .controls button.primary:hover:not(disabled) { background: #2563eb;}
   .controls button.export { background: #10b981;
-	color: white}
+	color: white;}
   .controls buttonnot(.primary):not(.export) { background: #f3f4f6;
-	color: #374151}
-  .controls buttonnot(.primary):not(.export):hover:not(disabled) { background: #e5e7eb}
-  .settings { border-top: 1px solid #e5e7eb; padding-top: 1rem}
+	color: #374151;}
+  .controls buttonnot(.primary):not(.export):hover:not(disabled) { background: #e5e7eb;}
+  .settings { border-top: 1px solid #e5e7eb; padding-top: 1rem;}
   .settings h4 { margin-bottom: 0.75rem;
-	color: #374151; font-size: 0.875rem; font-weight: 600}
+	color: #374151; font-size: 0.875rem; font-weight: 600;}
   .settings label { display: flex; align-items: center;
 	gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.875rem;
 	color: #6b7280;
-	cursor: pointer}
-  .progress-section { margin-bottom: 1.5rem}
+	cursor: pointer;}
+  .progress-section { margin-bottom: 1.5rem;}
   .progress-bar { width: 100%;
 	height: 8px;
 	background: #e5e7eb; border-radius: 4px;
-	overflow: hidden; margin-bottom: 0.5rem}
+	overflow: hidden; margin-bottom: 0.5rem;}
   .progress-fill { height: 100%;
 	background: #3b82f6;
-	transition:width 0.3s ease}
+	transition:width 0.3s ease;}
   .progress-text { font-size: 0.875rem;
 	color: #6b7280;
-	margin: 0}
-  .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1rem}
+	margin: 0;}
+  .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1rem;}
   .metric { display: flex; flex-direction: column;
 	gap: 0.25rem; text-align: center;
-	padding: 0.75rem;background: #f9fafb; border-radius: 0.5rem}
-  .metric-label { font-size: 0.75rem, color: #6b7280; text-transform: uppercase; font-weight: 500}
+	padding: 0.75rem;background: #f9fafb; border-radius: 0.5rem;}
+  .metric-label { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; font-weight: 500;}
   .metric-value { font-size: 1.25rem; font-weight: 600;
-	color: #1f2937}
-  .efficiency-metrics { border-top: 1px solid #e5e7eb; padding-top: 1rem, display: flex; flex-direction: column;
-	gap: 0.5rem}
-  .efficiency-metric { display: flex; justify-content: space-betweenn, font-size: 0.875rem;
-	color: #6b7280}
-  .analytics-section { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6}
-  .analytics-sectionlast-child { border-bottom: none}
+	color: #1f2937;}
+  .efficiency-metrics { border-top: 1px solid #e5e7eb; padding-top: 1rem; display: flex; flex-direction: column;
+	gap: 0.5rem;}
+  .efficiency-metric { display: flex; justify-content: space-betweenn; font-size: 0.875rem;
+	color: #6b7280;}
+  .analytics-section { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6;}
+  .analytics-sectionlast-child { border-bottom: none;}
   .analytics-section h4 { margin-bottom: 0.5rem;
-	color: #374151; font-size: 0.875rem; font-weight: 600}
+	color: #374151; font-size: 0.875rem; font-weight: 600;}
   .interaction-stats, .typing-stats { display: flex; flex-wrap: wrap;
 	gap: 0.75rem; font-size: 0.875rem;
-	color: #6b7280}
+	color: #6b7280;}
   .case-context p { margin: 0.25rem 0; font-size: 0.875rem;
-	color: #6b7280}
+	color: #6b7280;}
   .results-summary { margin-bottom: 1.5rem;
 	padding: 1rem;
-	background: #f0fdf4; border-radius: 0.5rem}
-  .chunks-preview { margin-top: 1rem}
+	background: #f0fdf4; border-radius: 0.5rem;}
+  .chunks-preview { margin-top: 1rem;}
   .chunk-preview { margin-bottom: 1rem;
 	padding: 0.75rem;
 	border: 1px solid #e5e7eb; border-radius: 0.5rem;
-	background: #fafafa}
-  .chunk-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 0.5rem; font-size: 0.875rem}
+	background: #fafafa;}
+  .chunk-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 0.5rem; font-size: 0.875rem;}
   .chunk-index { font-weight: 600;
-	color: #1f2937}
+	color: #1f2937;}
   .chunk-type { color: #6b7280;
 	background: #f3f4f6;
-	padding: 0.25rem 0.5rem; border-radius: 0.25rem}
-  .chunk-weight { color: #7c3aed; font-weight: 500}
+	padding: 0.25rem 0.5rem; border-radius: 0.25rem;}
+  .chunk-weight { color: #7c3aed; font-weight: 500;}
   .chunk-content { font-size: 0.875rem;
 	color: #374151;
-	margin: 0; line-height: 1.4}
+	margin: 0; line-height: 1.4;}
   .logs-container { max-height: 300px; overflow-y: auto;
 	background: #1f2937; border-radius: 0.5rem;
-	padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem}
-  .log-entry { color: #f3f4f6; margin-bottom: 0.25rem; line-height: 1.3}
-  @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
+	padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem;}
+  .log-entry { color: #f3f4f6; margin-bottom: 0.25rem; line-height: 1.3;}
+  @keyframes pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.7;} }
   @media (max-width: 1200px) { .demo-grid { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr))}
-  } @media (max-width: 768px) { .demo-grid { grid-template-columns: 1fr}
-    .metrics-grid { grid-template-columns: 1fr}
+  } @media (max-width: 768px) { .demo-grid { grid-template-columns: 1fr;}
+    .metrics-grid { grid-template-columns: 1fr;}
   } </style>
 
 

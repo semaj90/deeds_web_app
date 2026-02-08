@@ -139,75 +139,75 @@ Content-Type: application/json {
  :global(body) {
  font-family: 'Press Start 2P', cursive;
  background-color: #212529; color: #f8f9fa;
- line-height: 1.6}
+ line-height: 1.6;}
  .container {
  max-width: 1200px; margin: 0 auto;
- padding: 20px}
+ padding: 20px;}
  .hero {
  text-align: center;
  margin-bottom: 40px;
- background-color: #0f4c75}
+ background-color: #0f4c75;}
  .hero h1 {
- margin-bottom: 20px; color: #92cc41}
+ margin-bottom: 20px; color: #92cc41;}
  .search-section {
- margin-bottom: 40px}
+ margin-bottom: 40px;}
  .features {
  margin-bottom: 40px;
- background-color: #2d3436}
+ background-color: #2d3436;}
  .feature-grid { display: grid;
  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
  gap: 20px;
- margin-top: 20px}
+ margin-top: 20px;}
  .feature-item {
- background-color: #1a1a1a}
+ background-color: #1a1a1a;}
  .feature-item h3 {
- margin-bottom: 15px}
+ margin-bottom: 15px;}
  .api-info {
  margin-bottom: 40px;
- background-color: #2d3436}
+ background-color: #2d3436;}
  .api-details h3 { margin: 20px, 0 10px 0;
- color: #92cc41}
+ color: #92cc41;}
  .code-block {
  margin: 15px 0;
- background-color: #000}
+ background-color: #000;}
  .code-block pre {
  margin: 0; color: #00ff00;
  font-size: 10px;
  line-height: 1.4;
- overflow-x: auto}
+ overflow-x: auto;}
  .system-status {
- background-color: #2d3436}
+ background-color: #2d3436;}
  .status-grid { display: grid;
  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
  gap: 15px;
- margin-top: 20px}
+ margin-top: 20px;}
  .status-item {
  background-color: #1a1a1a;
- text-align: center; padding: 15px}
+ text-align: center; padding: 15px;}
  .status-item a {
- text-decoration none}
- .status-item: a, hover:hover {
- text-decoration underline}
+ text-decoration none;}
+ .status-item: a; hover:hover {
+ text-decoration underline;}
  /* Responsive design */
  @media (max-width: 768px) {
  .container {
- padding: 10px}
+ padding: 10px;}
  .feature-grid {
- grid-template-columns: 1fr}
+ grid-template-columns: 1fr;}
  .status-grid {
- grid-template-columns: 1fr}
+ grid-template-columns: 1fr;}
  .code-block pre {
- font-size: 8px}
+ font-size: 8px;}
  }
  /* NES.css enhancements */
  :global(.nes-container.with-title > .title) {
  background-color: inherit
- ; padding: 0 20px}
+ ; padding: 0 20px;}
  :global(.nes-list.is-disc) {
  list-style-type: disc;
- margin-left: 20px}
+ margin-left: 20px;}
  :global(.nes-list.is-disc li) {
- margin-bottom: 5px}
+ margin-bottom: 5px;}
 </style>
 
 

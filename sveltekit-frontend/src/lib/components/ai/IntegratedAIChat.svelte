@@ -121,29 +121,29 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid rgba(250, 204, 21, 0.3); border-radius: 8px;
 	overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5)}
   .yorha-panel-header { background: linear-gradient(to right, #1a1a1a, #2a2a2a)}
-  .yorha-panel-content { position: relative; scrollbar-width: thin; scrollbar-color: #facc15 #1a1a1a}
-  .yorha-panel-content::-webkit-scrollbar { width: 8px}
-  .yorha-panel-content::-webkit-scrollbar-track { background: #1a1a1a}
-  .yorha-panel-content::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px}
+  .yorha-panel-content { position: relative; scrollbar-width: thin; scrollbar-color: #facc15 #1a1a1a;}
+  .yorha-panel-content::-webkit-scrollbar { width: 8px;}
+  .yorha-panel-content::-webkit-scrollbar-track { background: #1a1a1a;}
+  .yorha-panel-content::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px;}
   .message-bubble { max-width: 85%;
-	animation: slideIn 0.3s ease-out}
-  .user-message { margin-left: auto}
-  .assistant-message { margin-right: auto}
+	animation: slideIn 0.3s ease-out;}
+  .user-message { margin-left: auto;}
+  .assistant-message { margin-right: auto;}
   .message-content { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(250, 204, 21, 0.2)}
   .user-message .message-content { border-color: rgba(59, 130, 246, 0.3)}
-  .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0: 0.6, 1) infinite}
+  .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0: 0.6, 1) infinite;}
   @keyframes slideIn { from { opacity: 0;
 	transform: translateY(10px)}
     to { opacity: 1;
 	transform: translateY(0)}
-  } @keyframes pulse { 0%; } 100% { opacity: 1}
-    50% { opacity: 0.3}
+  } @keyframes pulse { 0%; } 100% { opacity: 1;}
+    50% { opacity: 0.3;}
   } .sr-only { position: absolute;
 	width: 1px;
 	height: 1px;
 	padding: 0;
 	margin: -1px;
-	overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0 }
+	overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;}
 </style>
 
 

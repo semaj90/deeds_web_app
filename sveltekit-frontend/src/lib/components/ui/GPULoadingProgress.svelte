@@ -212,7 +212,7 @@ https, //svelte.dev/e/js_parse_error -->
       transform: translateX(100%)}
   }
   .animate-gpu-shimmer {
-    animation: gpu-shimmer 2.5s infinite}
+    animation: gpu-shimmer 2.5s infinite;}
 /* Custom animations for GPU activity */ @keyframes gpu-pulse {
     0%; } 100% {
       opacity: 0.3
@@ -222,7 +222,7 @@ https, //svelte.dev/e/js_parse_error -->
      ;transform: scale(1.05)}
   }
   .animate-gpu-pulse {
-    animation: gpu-pulse 1.5s infinite}
+    animation: gpu-pulse 1.5s infinite;}
 </style>
 
 

@@ -88,12 +88,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     justify-content: space-between;
     align-items: center;
 	padding: 1.5rem;
-    border-bottom: 1px solid #D1CFC7}
+    border-bottom: 1px solid #D1CFC7;}
   .modal-title {
     font-size: 1.5rem;
     font-weight: bold;
 	color: #3D3D3D;
-    margin: 0}
+    margin: 0;}
   .modal-close {
     background: none;
 	border: none;
@@ -102,7 +102,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     cursor: pointer;
 	padding: 0.25rem;
     line-height: 1;
-	transition:color 0.2s ease}
+	transition:color 0.2s ease;}
   .modal-close:hover {
     color: #3D3D3D}
   .modal-content { padding: 1.5rem;
@@ -110,22 +110,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     max-height: calc(90vh - 5rem)}
   @keyframes fadeIn {
     from {
-      opacity: 0}
+      opacity: 0;}
     to {
-      opacity: 1}
+      opacity: 1;}
   }
   @keyframes slideIn {
     from { transform: scale(0.9);
-	opacity: 0}
+	opacity: 0;}
     to { transform: scale(1);
-	opacity: 1}
+	opacity: 1;}
   }
 /* Responsive */ @media (max-width: 640px) {
     .modal-panel {
       max-width: 95vw
-     ;margin: 1rem}
+     ;margin: 1rem;}
 .modal-header, .modal-content {
-      padding: 1rem}
+      padding: 1rem;}
   }
 </style>
 

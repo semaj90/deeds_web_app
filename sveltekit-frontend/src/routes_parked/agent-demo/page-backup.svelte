@@ -33,20 +33,20 @@ import type { User } from '$lib/types'; import { onMount } from 'svelte'; import
                   ? 'text-red-600': log.type === 'success'
                     ? 'text-green-600': log.type === 'warning'
                       ? 'text-yellow-600': 'text-gray-700'}"
-              > {log.message} </span> </div> {/each} {#if $logs.length === 0} <div class="text-center text-gray-500"> <p>No activity yet.</p> </div> {/if} </div> </CardContent> </Card> </div> </div> <style> .agent-demo-container { font-family: 'Segoe UI', system-ui, sans-serif}
+              > {log.message} </span> </div> {/each} {#if $logs.length === 0} <div class="text-center text-gray-500"> <p>No activity yet.</p> </div> {/if} </div> </CardContent> </Card> </div> </div> <style> .agent-demo-container { font-family: 'Segoe UI', system-ui, sans-serif;}
 
-  .task-card:hover { border-color: #3b82f6}
+  .task-card:hover { border-color: #3b82f6;}
 
-  .patch-card { border: 1px solid #e5e7eb}
+  .patch-card { border: 1px solid #e5e7eb;}
 
-  .diff-preview { font-size: 11px; line-height: 1.4}
+  .diff-preview { font-size: 11px; line-height: 1.4;}
 
-  .log-container { font-family: 'JetBrains Mono', 'Consolas', monospace}
+  .log-container { font-family: 'JetBrains Mono', 'Consolas', monospace;}
 
-  .progress-bar { animation: pulse 2s infinite}
+  .progress-bar { animation: pulse 2s infinite;}
 
-  @keyframes pulse { 0%, 100% { opacity: 1}
-    50% { opacity: 0.8}
+  @keyframes pulse { 0%, 100% { opacity: 1;}
+    50% { opacity: 0.8;}
   } </style>
 
 

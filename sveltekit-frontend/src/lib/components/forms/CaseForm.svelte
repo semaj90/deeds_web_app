@@ -96,8 +96,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   <!-- Loading, Indicator -->
   {#if $delayed} <div>Processing your request...{/if}
   </form> </div>
- <style> /* @unocss-include */ /* Custom validation styles */ .legal-input:invalid { border-color: #ef4444}
-	.legal-input:valid { border-color: #10b981}
+ <style> /* @unocss-include */ /* Custom validation styles */ .legal-input:invalid { border-color: #ef4444;}
+	.legal-input:valid { border-color: #10b981;}
 </style>
 
 

@@ -388,7 +388,7 @@ caseId: fromEvidenceId,
  display: flex;
  flex-direction: column;
 	height: 100vh;
- background: #f8f9fa }
+ background: #f8f9fa;}
 
  .board-toolbar {
  display: flex;
@@ -397,13 +397,13 @@ caseId: fromEvidenceId,
 	padding: 1rem;
  background: white;
  border-bottom: 1px solid #e9ecef;
- gap: 1rem }
+ gap: 1rem;}
 
  .mode-selector {
- min-width: 150px }
+ min-width: 150px;}
 
  .actions { display: flex; gap: 0.5rem;
- align-items: center }
+ align-items: center;}
 
  .relationship-selector {
  display: flex;
@@ -412,13 +412,13 @@ caseId: fromEvidenceId,
  background: #f0f9ff;
 	padding: 0.5rem;
  border-radius: 0.375rem;
-	border: 1px solid #0ea5e9 }
+	border: 1px solid #0ea5e9;}
 
  .relationship-label {
  font-size: 0.875rem;
  font-weight: 500;
 	color: #0c4a6e;
- white-space: nowrap }
+ white-space: nowrap;}
 
  .relationship-select {
  padding: 0.25rem 0.5rem;
@@ -426,19 +426,19 @@ caseId: fromEvidenceId,
  border-radius: 0.25rem;
 	background: white;
  font-size: 0.875rem;
- min-width: 140px }
+ min-width: 140px;}
 
- .board-main-content { flex: 1; display: flex }
+ .board-main-content { flex: 1; display: flex;}
 
  .board-canvas { flex: 1; position: relative;
  overflow: hidden;
-	background: white }
+	background: white;}
 
  .board-canvas.grid-mode {
  background-image:
  linear-gradient(rgba(0,0,0,.1) 1px, transparent 1px),
  linear-gradient(90deg, rgba(0,0,0,.1) 1px, transparent 1px);
- background-size: 50px 50px }
+ background-size: 50px 50px;}
 
  .board-canvas.magnetic-mode {
  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);

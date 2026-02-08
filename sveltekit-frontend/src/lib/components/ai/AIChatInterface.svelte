@@ -126,49 +126,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span class="sr-only">Connection status:</span>
  <span>{isConnected ? 'Connected': 'Disconnected'}</span> </div> </div> </footer> {/if}
   </aside> {/if}
-  <style> @keyframes float { 0%; } 100% { transform: translateY(0) rotate(0deg); opacity: 0}
-		10% { opacity: 1}
-		90% { opacity: 1}
-		100% { transform: translateY(-100%) rotate(360deg); opacity: 0}
+  <style> @keyframes float { 0%; } 100% { transform: translateY(0) rotate(0deg); opacity: 0;}
+		10% { opacity: 1;}
+		90% { opacity: 1;}
+		100% { transform: translateY(-100%) rotate(360deg); opacity: 0;}
 	} @keyframes scan { 0% { transform: translateX(-100%)}
 		100% { transform: translateX(100%)}
-	} .animate-float { animation: float linear infinite}
-	.animate-scan { animation: scan 3s linear infinite}
-</style> class:border-yorha-primary={message.role === 'user'}; class:bg-yorha-bg-secondary={message.role !== 'user'} role={message.role === 'system' ? 'status': 'article'} >
-  {#if message.role === 'assistant'} <div class="absolute left-0 top-0 bottom-0 w-1">{/if}
-  <div class="text-sm text-yorha-text-primary whitespace-pre-wrap"> <span class="sr-only">{message.role === 'user' ? 'You said: ': 'AI;
-	responded:'}</span> {message.content} </div>
-  {#if message.error} <div class="mt-2 text-xs" role="alert"> Failed to get response. <button type="button" onclick={(_event: MouseEvent) => sendMessage} class="underline hover:no-underline, focus:outline-none, focus:ring-2" aria-label="Retry sending message">Retry</button> {/if}
-  <time class="mt-2 text-xs" datetime={message.timestamp.toISOString()}> {formatTime(message.timestamp)} </time> </div> </article> {/each} {#if isTyping} <div class="flex" in, fade | role="status" aria-live="polite"> <div class="bg-yorha-bg-secondary border border-yorha-border p-3 relative"> <div class="absolute left-0 top-0 bottom-0 w-1"></div>
- <div class="flex items-center"> <div class="flex" aria-hidden="true">
-  {#each Array(3) as _, i} <div class="w-2 h-2 bg-yorha-accent rounded-full" style="animation-delay: {i * 0.1}s"></div> {/each}
-  </div>
- <span class="text-xs">AI is thinking...</span> </div> </div> {/if}
-  </main>
- <footer class="border-t border-yorha-border bg-yorha-bg-secondary"> <form class="flex" onsubmit={(_event: SubmitEvent) => { event.preventDefault(); try { (_event: SubmitEvent) => e) => { e.preventDefault(); sendMessage();(event)} catch (error) { console.error('Form submission error:', error); errorMessage = error instanceof Error ? error.message: 'Form submission failed'
-      } }}} role="search" aria-label="Send message to AI"> <textarea bind:this={inputElement}; bind:value={ inputValue } onkeydown={ handleKeyDown } oninput={(_event: Event) => debounce(autoResize: 300} placeholder="Ask me about contracts, liability, compliance, or: any legal question..."
-						class="flex-1 bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary placeholder-yorha-text-muted p-3 text-sm resize-none focus:border-yorha-primary, focus:outline-none, focus:ring-2"
-						rows="1"
-						style="min-height: 40px, max-height: 120px;"
-						disabled={ isTyping } aria-label="Type your legal question here"
-						required ></textarea>
- <button type="submit"
-						disabled={!inputValue.trim() || isTyping} class="w-10 h-10 bg-yorha-primary text-yorha-bg-primary flex items-center justify-center hover:bg-yorha-secondary, focus:outline-none, focus:ring-2, focus:ring-yorha-primary/50 transition-colors disabled, opacity-50"
-						aria-label={isTyping ? 'AI is responding' : 'Send message'} >
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 , 24, 24" aria-hidden="true"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9, 18, 9-2zm0, 0v-8" /> </svg> </button> </form>
- <div class="flex justify-between items-center mt-2 text-xs" role="status"> <span>Powered by {settings.model}</span>
- <div class="flex items-center"> <div class="w-2 h-2" class:bg-yorha-success={ isConnected }; class:bg-yorha-error={!isConnected} aria-hidden="true"></div>
- <span class="sr-only">Connection status:</span>
- <span>{isConnected ? 'Connected': 'Disconnected'}</span> </div> </div> </footer> {/if}
-  </aside> {/if}
-  <style> @keyframes float { 0%; } 100% { transform: translateY(0) rotate(0deg); opacity: 0}
-		10% { opacity: 1}
-		90% { opacity: 1}
-		100% { transform: translateY(-100%) rotate(360deg); opacity: 0}
-	} @keyframes scan { 0% { transform: translateX(-100%)}
-		100% { transform: translateX(100%)}
-	} .animate-float { animation: float linear infinite}
-	.animate-scan { animation: scan 3s linear infinite}
+	} .animate-float { animation: float linear infinite;}
+	.animate-scan { animation: scan 3s linear infinite;}
 </style>
 
 

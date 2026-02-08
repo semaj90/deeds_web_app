@@ -45,9 +45,9 @@ in fade={{ duration: 200 }}
 more operations {/if}
 {/if}
 <style> /* Ensure notifications don't interfere with other UI elements */ .pointer-events-none {
-pointer-events: none}'
+pointer-events: none;}'
   .pointer-events-auto {
-pointer-events: auto}
+pointer-events: auto;}
 </style>
 
 

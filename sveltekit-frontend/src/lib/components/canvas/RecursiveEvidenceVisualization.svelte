@@ -158,42 +158,42 @@ height: cardHeight, fill: getEvidenceCardColor(node), stroke: '#e5e7eb', strokeW
    const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1;
 	multiplier: 2 }); // Download the visualization const link = document.createElement('a'); link.download = `evidence-hierarchy-${ caseId }-${Date.now()}.png`; link.href = dataURL; link.click()}
 </script> <!-- Canvas container with, controls --> <div class="recursive-evidence-visualization"> <!-- Canvas, controls --> <div class="visualization-controls"> <div class="control-group"> <label>Layout Mode:</label> <select bind:value={ layoutMode } onchange={() => switchLayoutMode(layoutMode)}> <option value="tree">Tree Layout</option> <option value="radial">Radial Layout</option> <option value="force">Force-Directed</option> </select> </div> <div class="control-group"> <button onclick={ toggleChainIntegrity } class:active={ showChainIntegrity }> Chain Integrity </button> <button onclick={ toggleLegalImplications } class:active={ showLegalImplications }> Legal Implications </button> </div> <div class="control-group"> <button onclick={() => fitHierarchyToCanvas()}> Fit to Canvas </button> <button onclick={ exportHierarchyVisualization }> Export PNG </button> </div> {#if showMetrics} <div class="metrics-display"> <span>Zoom: {Math.round(zoom * 100)}%</span> <span>Nodes: {visualizationMetrics.nodesRendered}</span> <span>Connections: {visualizationMetrics.connectionsDrawn}</span> <span>Render: {Math.round(visualizationMetrics.renderTime)}ms</span> {/if} </div> <!-- Processing status (use the ensured, store) --> {#if $processingStatusStore === 'processing'} <div class="processing-overlay"> <div class="processing-content"> <div class="spinner"></div> <h3>Processing Evidence Hierarchy</h3> <p>Analyzing evidence relationships and chain of custody...</p> {#if $recursionMetricsStore.totalNodesProcessed > 0} <p>Processed {$recursionMetricsStore.totalNodesProcessed} evidence items</p> {/if} </div> {/if} {/if} {#if $processingStatusStore === 'processing'} <div class="processing-overlay"> <div class="processing-content"> <div class="spinner"></div> <h3>Processing Evidence Hierarchy</h3> <p>Analyzing evidence relationships and chain of custody...</p> {#if $recursionMetricsStore.totalNodesProcessed > 0} <p>Processed {$recursionMetricsStore.totalNodesProcessed} evidence items</p> {/if} </div> {/if} <div class="hierarchy-summary"> <h4>Evidence Hierarchy Analysis Complete</h4> <div class="summary-stats"> <div class="stat"> <span class="label">Total Evidence Items:</span> <span class="value">{$recursionMetrics.totalNodesProcessed}</span> </div> <div class="stat"> <span class="label">Maximum Depth Reached:</span> <span class="value">{$recursionMetrics.maxDepthReached}</span> </div> <div class="stat"> {#if $evidenceHierarchyStore && $processingStatusStore === 'completed'} <div class="hierarchy-summary"> <h4>Evidence Hierarchy Analysis Complete</h4> <div class="summary-stats"> <div class="stat"> <span class="label">Total Evidence Items:</span> <span class="value">{$recursionMetricsStore.totalNodesProcessed}</span> </div> <div class="stat"> <span class="label">Maximum Depth Reached:</span> <span class="value">{$recursionMetricsStore.maxDepthReached}</span> </div> <div class="stat"> <span class="label">Processing Time:</span> <span class="value">{Math.round($recursionMetricsStore.totalProcessingTime)}ms</span> </div> <div class="stat"> <span class="label">Analysis Timestamp:</span> <span class="value">{new Date($recursionMetricsStore.analysisTimestamp).toLocaleString()}</span> </div> </div> {/if} <style> .visualization-controls { display: flex;
-	gap: 1rem; padding: 1rem, background: white; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; align-items: center}
+	gap: 1rem; padding: 1rem; background: white; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; align-items: center;}
     .control-group { display: flex;
-	gap: 0.5rem; align-items: center}
+	gap: 0.5rem; align-items: center;}
     .control-group label { font-weight: 500;
-	color: #374151}
+	color: #374151;}
     .control-group select { padding: 0.5rem;
 	border: 1px solid #d1d5db; border-radius: 4px;
-	background: white}
+	background: white;}
     .control-group button { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 4px;
 	background: white; cursor: pointer;
-	transition:all 0.2}
-    .control-group buttonhover { background: #f3f4f6}
-    .control-group button.active { background: #3b82f6, color: white; border-color: #3b82f6}
+	transition:all 0.2;}
+    .control-group buttonhover { background: #f3f4f6;}
+    .control-group button.active { background: #3b82f6; color: white; border-color: #3b82f6;}
     .metrics-display { display: flex;
-	gap: 1rem, font-size: 0.875rem, color: #6b7280; margin-left: auto}
+	gap: 1rem; font-size: 0.875rem; color: #6b7280; margin-left: auto;}
   .processing-overlay { position: absolute;
 	top: 0;left: 0;
 	right: 0;bottom: 0;
-	background: rgba(255, 255, 255, 0.9); display: flex; align-items: center; justify-content: center; z-index: 10 }
+	background: rgba(255, 255, 255, 0.9); display: flex; align-items: center; justify-content: center; z-index: 10;}
   .processing-content { text-align: center;
-	padding: 2rem}
+	padding: 2rem;}
   .spinner { width: 40px;
 	height: 40px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%;
-	animation: spin 1s linear infinite;margin: 0 auto 1rem}
+	animation: spin 1s linear infinite;margin: 0 auto 1rem;}
   @keyframes spin { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
   .canvas-container { flex: 1;
-	position: relative; overflow: hidden}
-  .evidence-hierarchy-canv.evidence-hierarchy-canvas:active { cursor: grabbing}
-  .hierarchy-summary { background: white; border-top: 1px solid #e5e7eb; padding: 1rem}
-  .hierarchy-summary h4 { margin: 0, 0 1rem 0; color: #059669; font-weight: 600}
-  .summary-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}
+	position: relative; overflow: hidden;}
+  .evidence-hierarchy-canv.evidence-hierarchy-canvas:active { cursor: grabbing;}
+  .hierarchy-summary { background: white; border-top: 1px solid #e5e7eb; padding: 1rem;}
+  .hierarchy-summary h4 { margin: 0, 0 1rem 0; color: #059669; font-weight: 600;}
+  .summary-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;}
   .stat { display: flex; justify-content: space-betweenn;
-	padding: 0.5rem;background: #f9fafb; border-radius: 4px}
+	padding: 0.5rem;background: #f9fafb; border-radius: 4px;}
   .stat .label { font-weight: 500;
-	color: #374151}
-  .stat .value { color: #059669; font-weight: 600}
+	color: #374151;}
+  .stat .value { color: #059669; font-weight: 600;}
 </style>
 
 

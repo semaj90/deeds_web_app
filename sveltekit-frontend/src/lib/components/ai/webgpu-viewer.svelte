@@ -108,15 +108,15 @@ storeOp: 'store'
   .control-btn { padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px;
 	color: white;
 	cursor: pointer;
-	transition:all 0.2}
+	transition:all 0.2;}
   .control-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05)}
   .info { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0 0.5rem; color: rgba(255, 255, 255, 0.8); font-size: 0.875rem}
+	gap: 0.5rem;padding: 0 0.5rem; color: rgba(255, 255, 255, 0.8); font-size: 0.875rem;}
   canvas { display: block; width: 100%;
 	height: 600px;
-	cursor: grab}; canvas:active { cursor: grabbing}
+	cursor: grab;}; canvas:active { cursor: grabbing;}
   .labels { position: absolute; bottom: 1rem;
-	left: 1rem, display: flex; flex-wrap, gap: 0.5rem; max-width: 300px; font-size: 0.75rem; z-index: 10 }
+	left: 1rem; display: flex; flex-wrap; gap: 0.5rem; max-width: 300px; font-size: 0.75rem; z-index: 10;}
   .label { padding: 0.25rem 0.5rem; background: rgba(0, 0, 0, 0.5); border-radius: 4px; backdrop-filter: blur(10px)}
 </style>
 

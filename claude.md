@@ -109,6 +109,161 @@ import * as Dialog from "bits-ui/components/dialog";
 - [Svelte 5 Migration Guide](https://svelte.dev/docs/svelte/v5-migration-guide)
 - [shadcn-svelte Svelte 5 Guide](https://www.shadcn-svelte.com/docs/migration/svelte-5)
 
+---
+
+## 🎨 UnoCSS + CSS Best Practices (Phases 66-72)
+
+### 📦 UnoCSS Configuration
+
+**Installed Version:** `unocss@66.5.11` with Svelte scoped mode
+
+**Config Location:** [unocss.config.ts](sveltekit-frontend/unocss.config.ts)
+
+#### Presets Enabled
+```typescript
+import { defineConfig, presetUno, presetAttributify, presetIcons } from 'unocss'
+
+export default defineConfig({
+  presets: [
+    presetUno(),           // Tailwind-compatible utilities
+    presetAttributify(),   // Attribute mode: <div text="sm blue-500">
+    presetIcons({          // Iconify integration
+      collections: {
+        heroicons: () => import('@iconify-json/heroicons/icons.json')
+      }
+    })
+  ]
+})
+```
+
+#### Custom Theme & Shortcuts
+**Legal AI Color Palette:**
+```typescript
+theme: {
+  colors: {
+    sand: '#d4c7a3',          // Primary background
+    sandDark: '#b9aa86',       // Darker variant
+    panel: '#24211b',          // Dark panels
+    panelSoft: '#2f2a22',      // Soft panels
+    accent: '#4ade80',         // Success/primary
+    accentSoft: '#a3e635',     // Lighter accent
+    danger: '#ef4444',         // Error states
+    warning: '#facc15',        // Warning states
+    info: '#38bdf8'            // Info states
+  }
+}
+```
+
+**Shortcuts (Reusable Patterns):**
+```typescript
+shortcuts: {
+  // Layout
+  'app-bg': 'bg-sand text-black font-ui',
+  'panel': 'bg-panel text-sand rounded-lg border border-black/40 shadow-[0_0_0_2px_#000]',
+
+  // Buttons
+  'btn-base': 'inline-flex items-center justify-center rounded border px-3 py-2 ' +
+              'text-xs uppercase tracking-[0.18em] font-mono ' +
+              'shadow-[0_2px_0_0_#000] active:translate-y-0.5',
+  'btn-primary': 'btn-base bg-accent text-black hover:bg-accentSoft',
+
+  // Tags
+  'tag': 'inline-flex items-center gap-1 rounded px-2 py-0.5 ' +
+         'text-[10px] uppercase tracking-[0.16em] font-mono'
+}
+```
+
+#### Svelte-Scoped Mode (Performance Optimization)
+For large codebases, use `@unocss/svelte-scoped` to place component-specific styles directly in `<style>` blocks instead of global CSS:
+
+```javascript
+// vite.config.ts
+import { sveltekit } from '@sveltejs/kit/vite';
+import UnoCSS from '@unocss/svelte-scoped/vite';
+
+export default {
+  plugins: [
+    UnoCSS({ /* config */ }),
+    sveltekit()
+  ]
+};
+```
+
+**Benefits:**
+- Reduces global CSS bundle size
+- Improves hot module replacement (HMR) performance
+- Component styles co-located with markup
+
+**Documentation:**
+- [UnoCSS Official Guide](https://unocss.dev/guide/)
+- [Setting Up UnoCSS with SvelteKit](https://frontavo.com/blog/setting-up-unocss-with-sveltekit)
+- [UnoCSS Svelte Scoped Mode](https://unocss.dev/integrations/svelte-scoped)
+
+---
+
+### 🐛 CSS Corruption Patterns Discovered (Feb 2026)
+
+During error reduction work (Phases 66-72), several systematic CSS corruption patterns were identified and fixed:
+
+#### Pattern 1: Comma Instead of Semicolon
+**Corruption:** CSS properties separated by commas instead of semicolons
+```css
+/* ❌ WRONG - comma separating properties */
+.stat-card {
+  border-radius: 8px, text-align: center;
+  font-size: 0.875rem, color: #6c757d;
+}
+
+/* ✅ CORRECT - semicolon separating properties */
+.stat-card {
+  border-radius: 8px; text-align: center;
+  font-size: 0.875rem; color: #6c757d;
+}
+```
+
+**Fix Applied:** [fix-css-comma-corruption.mjs](sveltekit-frontend/scripts/fix-css-comma-corruption.mjs)
+- **Files Fixed:** 218 files
+- **Instances:** 4,702 comma→semicolon replacements
+- **Impact:** Resolved CSS parsing errors in style blocks
+
+#### Pattern 2: Missing Semicolons Before Closing Braces
+```css
+/* ❌ WRONG - missing semicolon */
+.stat-card {
+  border: 1px solid #e9ecef}
+
+/* ✅ CORRECT */
+.stat-card {
+  border: 1px solid #e9ecef;}
+```
+
+#### Pattern 3: Duplicate Style Blocks
+**Cause:** File corruption or merge conflicts created duplicate `<style>` tags with conflicting CSS rules.
+
+**Detection:** Look for multiple `</style>` tags in a single component.
+
+**Fix:** Manually consolidate to single style block.
+
+---
+
+### 🔧 CSS Fixing Scripts
+
+All CSS corruption fixers are located in [sveltekit-frontend/scripts/](sveltekit-frontend/scripts/):
+
+| Script | Purpose | Pattern Fixed |
+|--------|---------|---------------|
+| `fix-css-comma-corruption.mjs` | Replace commas with semicolons in CSS properties | `,` → `;` |
+| `fix-attribute-trailing-comma.mjs` | Remove trailing commas from Svelte attributes | `required,` → `required` |
+| `fix-zero-percent-targeted-apply.mjs` | Fix `?? 0%` → `?? {}` corruption | TypeScript object corruption |
+
+**Usage:**
+```bash
+cd sveltekit-frontend
+node scripts/fix-css-comma-corruption.mjs
+```
+
+---
+
 ### 🗄️ Legal AI Database Architecture
 
 #### Multi-Tier Caching Strategy

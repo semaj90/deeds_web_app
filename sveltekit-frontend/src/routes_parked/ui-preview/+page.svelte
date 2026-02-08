@@ -506,7 +506,7 @@
  display: grid; gap: 1rem;
  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
  }
- /* Removed unused CSS selector: h1 { font-family: 'Press Start 2P', monospace; font-size: 1.1rem} */
+ /* Removed unused CSS selector: h1 { font-family: 'Press Start 2P', monospace; font-size: 1.1rem;} */
  h2.section {
  margin: 0 0 0.75rem;
  font-size: 0.9rem;
@@ -637,8 +637,8 @@
  .sidebar-info {
  color: inherit;
  }
- /* Removed unused CSS selector: .feature-list { list-style: none; padding: 0; margin: 0.5rem 0} */
- /* Removed unused CSS selector: .feature-list li { margin: 0.25rem 0; padding: 0.25rem 0} */
+ /* Removed unused CSS selector: .feature-list { list-style: none; padding: 0; margin: 0.5rem 0;} */
+ /* Removed unused CSS selector: .feature-list li { margin: 0.25rem 0; padding: 0.25rem 0;} */
  .integration-notes {
  margin-top: 1rem;
  }
@@ -665,7 +665,7 @@
  justify-content: center;
  z-index: 100; border: none;
  padding: 0; cursor: pointer;
- } /* Added border: none, padding: 0, cursor: pointer */
+ } /* Added border: none; padding: 0; cursor: pointer */
  .modal-content {
  background: white; padding: 2rem;
  border-radius: 8px;

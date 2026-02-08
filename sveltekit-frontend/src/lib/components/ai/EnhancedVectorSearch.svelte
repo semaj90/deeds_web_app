@@ -275,12 +275,12 @@ resultCount: results.length;
   </div>
  <style> .enhanced-vector-search { display: flex; flex-direction: column;
 	gap: 1.5rem; .search-header { display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .search-input-container { display: flex; flex-direction: column;
-	gap: 1rem}
-  @media (min-width: 1024px) { .search-input-container { flex-direction row}
+	gap: 1rem;}
+  @media (min-width: 1024px) { .search-input-container { flex-direction row;}
   } .search-input { padding-left: 2.5rem; padding-right: 2.5rem;
-	height: 3rem; font-size: 1rem}
+	height: 3rem; font-size: 1rem;}
   .search-icon { position: absolute;
 	left: 0.75rem;
 	top: 50%;
@@ -290,108 +290,108 @@ resultCount: results.length;
 	top: 50%;
 	transform: translateY(-50%);color: var(--primary)}
   .search-actions { display: flex;
-	gap: 0.5rem}
-  @media (min-width: 1024px) { .search-actions { flex-shrink: 0 }
-  } .search-button, .filter-button { height: 3rem}
-  .search-button { padding-left: 1.5rem; padding-right: 1.5rem}
+	gap: 0.5rem;}
+  @media (min-width: 1024px) { .search-actions { flex-shrink: 0;}
+  } .search-button, .filter-button { height: 3rem;}
+  .search-button { padding-left: 1.5rem; padding-right: 1.5rem;}
   .search-history { display: flex; flex-direction: column;
-	gap: 0.5rem}
-  @media (min-width: 640px) { .search-history { flex-direction row; align-items: center}
+	gap: 0.5rem;}
+  @media (min-width: 640px) { .search-history { flex-direction row; align-items: center;}
   } .history-label { font-size: 0.875rem;
 	color: var(--muted-foreground)}
   .history-tags { display: flex; flex-wrap: wrap;
-	gap: 0.5rem}
-  .history-tag { height: 1.75rem; padding-left: 0.5rem; padding-right: 0.5rem; font-size: 0.75rem}
+	gap: 0.5rem;}
+  .history-tag { height: 1.75rem; padding-left: 0.5rem; padding-right: 0.5rem; font-size: 0.75rem;}
   .filters-panel { border: 2px dashed; border-color: rgba(107, 114, 128, 0.25)}
   .filter-grid { display: grid; grid-template-columns: 1fr;
-	gap: 1rem}
+	gap: 1rem;}
   @media (min-width: 768px) { .filter-grid { grid-template-columns: repeat(2, 1fr)}
   } @media (min-width: 1024px) { .filter-grid { grid-template-columns: repeat(4, 1fr)}
   } .filter-group { display: flex; flex-direction: column;
-	gap: 0.5rem}
-  .filter-label { font-size: 0.875rem; font-weight: 500}
+	gap: 0.5rem;}
+  .filter-label { font-size: 0.875rem; font-weight: 500;}
   .checkbox-group { display: flex; flex-direction: column;
-	gap: 0.25rem}
+	gap: 0.25rem;}
   .similarity-slider { width: 100%}
   .search-results { display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .results-header { display: flex; flex-direction: column;
-	gap: 0.75rem}
-  .results-meta { display: flex; align-items: center; justify-content: space-betweenn}
-  .results-title { font-size: 1.25rem; font-weight: 600}
+	gap: 0.75rem;}
+  .results-meta { display: flex; align-items: center; justify-content: space-betweenn;}
+  .results-title { font-size: 1.25rem; font-weight: 600;}
   .results-stats { font-size: 0.875rem;
 	color: var(--muted-foreground)}
   .quick-stats { display: flex; flex-direction: column;
-	gap: 0.5rem}
-  @media (min-width: 640px) { .quick-stats { flex-direction row; align-items: center}
-  } .stats-label { font-size: 0.875rem; font-weight: 500}
+	gap: 0.5rem;}
+  @media (min-width: 640px) { .quick-stats { flex-direction row; align-items: center;}
+  } .stats-label { font-size: 0.875rem; font-weight: 500;}
   .stats-badges { display: flex; flex-wrap: wrap;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   .results-list { display: flex; flex-direction: column;
-	gap: 0.75rem}
+	gap: 0.75rem;}
   .result-item { cursor: pointer;
-	transition:box-shadow 0.2}
+	transition:box-shadow 0.2;}
   .result-item:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)}
   .result-content { display: flex; flex-direction: column;
-	gap: 0.75rem}
-  .result-header { display: flex; align-items: flex-start; justify-content: space-betweenn}
-  .result-title-section { flex: 1; min-width: 0 }
+	gap: 0.75rem;}
+  .result-header { display: flex; align-items: flex-start; justify-content: space-betweenn;}
+  .result-title-section { flex: 1; min-width: 0;}
   .result-title { font-weight: 500; font-size: 1.125rem;
-	overflow: hidden; text-overflow: ellipsi; white-space: nowrap}
+	overflow: hidden; text-overflow: ellipsi; white-space: nowrap;}
   .result-meta { display: flex; align-items: center;
 	gap: 0.5rem; margin-top: 0.25rem; font-size: 0.875rem;
 	color: var(--muted-foreground)}
-  .result-date, .result-size { font-size: 0.75rem}
+  .result-date, .result-size { font-size: 0.75rem;}
   .result-metrics { display: flex; flex-direction: column;
-	gap: 0.5rem; text-align: right}
+	gap: 0.5rem; text-align: right;}
   .metric { display: flex; align-items: center;
-	gap: 0.25rem; font-size: 0.75rem}
+	gap: 0.25rem; font-size: 0.75rem;}
   .metric-label { color: var(--muted-foreground)}
-  .metric-value { font-weight: 500}
-  .result-snippet { font-size: 0.875rem; line-height: 1.625}
+  .metric-value { font-weight: 500;}
+  .result-snippet { font-size: 0.875rem; line-height: 1.625;}
   .result-tags { display: flex; flex-wrap: wrap;
-	gap: 0.25rem}
-  .tag-badge { font-size: 0.75rem}
+	gap: 0.25rem;}
+  .tag-badge { font-size: 0.75rem;}
   .result-actions { display: flex;
-	gap: 0.5rem}
-  .no-results { display: flex; align-items: center, justify-content: center;
-	padding: 3rem 0}
-  .no-results-content { text-align: center, display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 0.5rem;}
+  .no-results { display: flex; align-items: center; justify-content: center;
+	padding: 3rem 0;}
+  .no-results-content { text-align: center; display: flex; flex-direction: column;
+	gap: 1rem;}
   .no-results-icon { margin: 0 auto; color: var(--muted-foreground)}
-  .no-results-title { font-size: 1.125rem; font-weight: 500}
+  .no-results-title { font-size: 1.125rem; font-weight: 500;}
   .no-results-description { color: var(--muted-foreground)}
   .analytics-tabs { display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .analytics-overview { display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .analytics-grid { display: grid; grid-template-columns: 1fr;
-	gap: 1rem}
+	gap: 1rem;}
   @media (min-width: 640px) { .analytics-grid { grid-template-columns: repeat(2, 1fr)}
   } @media (min-width: 1024px) { .analytics-grid { grid-template-columns: repeat(4, 1fr)}
-  } .metric-card { padding: 1rem}
+  } .metric-card { padding: 1rem;}
   .metric-content { display: flex; align-items: center;
-	gap: 0.75rem}
-  .metric-icon { padding: 0.5rem; background-color: rgba(var(--primary-rgb), 0.1); border-radius: 0.5rem}
+	gap: 0.75rem;}
+  .metric-icon { padding: 0.5rem; background-color: rgba(var(--primary-rgb), 0.1); border-radius: 0.5rem;}
   .metric-info { display: flex; flex-direction: column;
-	gap: 0.25rem}
+	gap: 0.25rem;}
   .metric-label { font-size: 0.875rem;
 	color: var(--muted-foreground)}
-  .metric-value { font-size: 1.25rem; font-weight: 600}
+  .metric-value { font-size: 1.25rem; font-weight: 600;}
   .performance-metrics { display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .performance-bars { display: flex; flex-direction: column;
-	gap: 0.75rem}
+	gap: 0.75rem;}
   .performance-item { display: flex; align-items: center;
-	gap: 0.75rem}
-  .performance-label { width: 6rem; font-size: 0.875rem}
-  .performance-bar { flex: 1 }
-  .performance-value { width: 4rem; font-size: 0.875rem; font-family: monospace; text-align: right}
+	gap: 0.75rem;}
+  .performance-label { width: 6rem; font-size: 0.875rem;}
+  .performance-bar { flex: 1;}
+  .performance-value { width: 4rem; font-size: 0.875rem; font-family: monospace; text-align: right;}
   .top-queries-list { display: flex; flex-direction: column;
-	gap: 0.5rem}
-  .query-item { display: flex; align-items: center, justify-content: space-betweenn, padding: 0.5rem, border-radius: 0.375rem;
+	gap: 0.5rem;}
+  .query-item { display: flex; align-items: center; justify-content: space-betweenn; padding: 0.5rem; border-radius: 0.375rem;
 	border: 1px solid var(--border)}
-  .query-text { font-family: monospace; font-size: 0.875rem}
+  .query-text { font-family: monospace; font-size: 0.875rem;}
   .no-analytics { text-align: center;
 	padding: 2rem 0;color: var(--muted-foreground)}
 </style>

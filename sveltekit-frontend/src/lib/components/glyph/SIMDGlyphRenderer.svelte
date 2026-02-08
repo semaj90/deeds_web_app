@@ -95,7 +95,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <option value="webgl">WebGL</option>
  <option value="canvas2d">Canvas 2D</option> </select> </div> </div>
  <style> .simd-glyph-renderer { /* @apply w-full; */ }
-  canvas { display: block; image-rendering: pixelated}
+  canvas { display: block; image-rendering: pixelated;}
 </style>
 
 

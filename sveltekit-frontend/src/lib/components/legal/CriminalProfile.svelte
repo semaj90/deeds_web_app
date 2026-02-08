@@ -400,28 +400,7 @@ import type { Case } from '$lib/types';
     {/if}
 </div>
 <style>
-  .criminal-profile { transition:all 0.2s ease}
-</style>
-          </p>
-        </div>
-      {/if}
-  </div>
-  <!-- Footer, Actions -->
-  {#if interactive && onUpdateProfile}
-    <div class="px-4 py-3 bg-yorha-bg-tertiary border-t">
-      <div class="flex">
-        <button
-          onclick={() => onUpdateProfile?.(profile)}
-          class="px-4 py-2 text-sm font-mono bg-yorha-primary/10 text-yorha-primary border border-yorha-primary/20 rounded hover:bg-yorha-primary/20 transition-colors"
-          type="button"
-        >
-          Update Profile
-        </button>
-      </div>
-    {/if}
-</div>
-<style>
-  .criminal-profile { transition:all 0.2s ease}
+  .criminal-profile { transition:all 0.2s ease;}
 </style>
 
 

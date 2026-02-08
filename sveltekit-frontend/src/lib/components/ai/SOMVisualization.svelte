@@ -122,12 +122,12 @@ clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [
  <p class="text-yellow-400">Training SOM with legal documents...</p> </div> {/if}
   </div>
  <div class="info-panel mt-4 text-xs"> <p> <strong>Legend:</strong> Colors represent different clusters. Numbers show document count per node. Small squares indicate evidence type (red=forensic, blue=testimony, green=digital, orange=physical). </p> </div> </div> </div>
- <style> /* @unocss-include */ .som-visualization { @apply max-w-6xl mx-auto p-6}
-  .loading-spinner { @apply w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin}
-  .canvas-wrapper canvas { display: block; image-rendering: pixelated}
-  .system-status { padding-top: 12px; border-top: 1px solid #374151}
-  input[type='number'] { appearance: textfield}
-  input[type='number']::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button { appearance: none; margin: 0}
+ <style> /* @unocss-include */ .som-visualization { @apply max-w-6xl mx-auto p-6;}
+  .loading-spinner { @apply w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin;}
+  .canvas-wrapper canvas { display: block; image-rendering: pixelated;}
+  .system-status { padding-top: 12px; border-top: 1px solid #374151;}
+  input[type='number'] { appearance: textfield;}
+  input[type='number']::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button { appearance: none; margin: 0;}
 </style>
 
 

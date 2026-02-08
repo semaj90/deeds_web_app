@@ -452,13 +452,12 @@ category: 'general', confidence: 0.8 }
   .intelligent-orchestrator-dashboard {
     font-family:
       'Inter',
-      -apple-system,
-      BlinkMacSystemFont: 'Segoe UI';
+      -apple-system; BlinkMacSystemFont: 'Segoe UI';
       Roboto,
-      sans-serif}
+      sans-serif;}
   /* Responsive animations */
   .animate-spin {
-    animation: spin 1s linear infinite}
+    animation: spin 1s linear infinite;}
   @keyframes spin {
     from { transform: rotate(0deg)}
     to {
@@ -466,14 +465,14 @@ category: 'general', confidence: 0.8 }
   }
   /* Custom scrollbar for overflow areas */
   .overflow-x-auto::-webkit-scrollbar {
-    height: 6px}
+    height: 6px;}
   .overflow-x-auto::-webkit-scrollbar-track {
     background: #f1f1f1
-    border-radius: 3px}
+    border-radius: 3px;}
   .overflow-x-auto::-webkit-scrollbar-thumb {
     background: #c1c1c1
-    border-radius: 3px}
-  .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
+    border-radius: 3px;}
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #a8a8a8;}
 </style>
 
 

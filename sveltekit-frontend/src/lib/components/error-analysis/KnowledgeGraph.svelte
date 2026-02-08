@@ -265,10 +265,10 @@
 		stroke-opacity: 0.6;
     }
 
-	.link-causes { stroke: #ef4444 }
-	.link-fixed_by { stroke: #10b981 }
-	.link-similar_to { stroke: #6366f1 }
-	.link-related_to { stroke: #8b5cf6 }
+	.link-causes { stroke: #ef4444;}
+	.link-fixed_by { stroke: #10b981;}
+	.link-similar_to { stroke: #6366f1;}
+	.link-related_to { stroke: #8b5cf6;}
 
 	.node {
 		cursor: pointer;

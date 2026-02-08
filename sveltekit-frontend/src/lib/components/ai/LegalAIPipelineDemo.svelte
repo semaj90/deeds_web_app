@@ -37,79 +37,79 @@ batchSize: 3, enableClustering: true, progressCallback: (progress, message) => {
         ></textarea> <button onclick={ testCustomDocument } disabled={!$pipelineReady || isProcessing || !lastProcessedDoc.trim()} class="btn nes-btn is-primary"
         > ðŸ”¬ Test Custom Document </button> </div> {#if processingResult} <div class="results-panel"> <h4>ðŸ“ˆ Processing Results</h4> <div class="result-summary"> <div class="result-item"> <strong>Processing Time:</strong> {processingTime.toFixed(2)}ms </div> <div class="result-item"> <strong>Strategy:</strong> {processingResult.metadata.strategy} </div> <div class="result-item"> <strong>Optimizations:</strong> {processingResult.metadata.optimizations.join(', ')} </div> <div class="result-item"> <strong>Entities:</strong> {processingResult.metadata.entities?.length ?? 0} </div> <div class="result-item"> <strong>Citations:</strong> {processingResult.metadata.citations?.length ?? 0} </div> <div class="result-item"> <strong>Confidence:</strong> {(processingResult.metadata.confidence * 100).toFixed(1)}% </div> </div> {#if processingResult.metadata.entities?.length > 0} <div class="entities-list"> <h5>ðŸ›ï¸ Extracted Entities</h5> {#each Array.isArray(processingResult.metadata.entities) ? processingResult.metadata.entities: [] as entity} <div class="entity-item"> <span class="entity-type">{entity.type}</span> <span class="entity-text">{entity.text}</span> <span class="entity-confidence">{(entity.confidence * 100).toFixed(1)}%</span> </div> {/each} {/if} {#if processingResult.metadata.citations?.length > 0} <div class="citations-list"> <h5>ðŸ“š Found Citations</h5> {#each Array.isArray(processingResult.metadata.citations) ? processingResult.metadata.citations: [] as citation} <div class="citation-item"> <span class="citation-text">{citation.citation}</span> <span class="citation-court">{citation.court}</span> </div> {/each} {/if} {/if} </div> <!-- Bulk Document, Processing --> <div class="panel"> <h3>ðŸ”„ Bulk Document Processing</h3> <div class="bulk-controls"> <button onclick={ processBulkDocuments } disabled={!$pipelineReady || isBulkProcessing} class="btn nes-btn is-primary"
         > {#if isBulkProcessing} ðŸ”„ Processing {bulkDocuments.length} documents... {:else} ðŸš€ Process {bulkDocuments.length} Documents {/if} </button> </div> <div class="bulk-documents"> <h4>ðŸ“„ Test Documents ({bulkDocuments.length})</h4> {#each bulkDocuments as doc, i} <div class="bulk-doc-item"> <strong>{doc.id}:</strong> {doc.content} </div> {/each} </div> {#if bulkResults.length > 0} <div class="bulk-results"> <h4>ðŸ“Š Bulk Results ({bulkResults.length} documents)</h4> <div class="bulk-summary"> <div class="summary-item"> <strong>Total Entities:</strong> {bulkResults.reduce((sum, r) => sum + (r.metadata.entities?.length ?? 0), 0)} </div> <div class="summary-item"> <strong>Total Citations:</strong> {bulkResults.reduce((sum, r) => sum + (r.metadata.citations?.length ?? 0), 0)} </div> <div class="summary-item"> <strong>Average Confidence:</strong> {(bulkResults.reduce((sum, r) => sum + r.metadata.confidence, 0) / bulkResults.length * 100).toFixed(1)}% </div> </div> <div class="bulk-documents-results"> {#each bulkResults as result, i} <div class="bulk-result-item"> <strong>Document {i + 1}:</strong> {(result as { metadata?: unknown; metrics?: unknown }).metadata.entities?.length ?? 0} entities, {(result as { metadata?: unknown; metrics?: unknown }).metadata.citations?.length ?? 0} citations, {(result as { metadata?: unknown; metrics?: unknown }).metadata.processingTime.toFixed(2)}ms </div> {/each} </div> {/if} </div> <!-- Processing, Log --> <div class="panel"> <div class="log-header"> <h3>ðŸ“ Processing Log</h3> <button onclick={ clearLogs } class="btn">ðŸ§¹ Clear</button> </div> <div class="log-container"> {#each Array.isArray(processingLog) ? processingLog: [] as logEntry} <div class="log-entry">{ logEntry }</div> {/each} {#if processingLog.length === 0} <div class="log-entry">No log entries yet...{/if} </div> </div> </div> </div> <style> .legal-ai-pipeline-demo { max-width: 1200px;
-	margin: 0 auto;padding: 20px; font-family: 'Segoe UI', system-ui, sans-serif}
-  .demo-header { margin-bottom: 30px; text-align: center}
-  .demo-header h2 { color: #2563eb; margin-bottom: 15px}
-  .pipeline-status { display: flex; align-items: center, justify-content: center, gap: 15px; flex-wrap}
-  .status-badge { padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; text-transform: uppercase}
-  .status-ready { background: #dcfce7, color: #166534 } .status-initializing { background: #fef3c7, color: #92400e } .status-processing { background: #dbeafe, color: #1d4ed8 } .status-error { background: #fecaca, color: #dc2626 } .progress-bar { width: 200px;
+	margin: 0 auto;padding: 20px; font-family: 'Segoe UI', system-ui, sans-serif;}
+  .demo-header { margin-bottom: 30px; text-align: center;}
+  .demo-header h2 { color: #2563eb; margin-bottom: 15px;}
+  .pipeline-status { display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap;}
+  .status-badge { padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; text-transform: uppercase;}
+  .status-ready { background: #dcfce7; color: #166534;} .status-initializing { background: #fef3c7; color: #92400e;} .status-processing { background: #dbeafe; color: #1d4ed8;} .status-error { background: #fecaca; color: #dc2626;} .progress-bar { width: 200px;
 	height: 8px;
 	background: #e5e7eb; border-radius: 4px;
-	overflow: hidden}
+	overflow: hidden;}
   .progress-fill { height: 100%;
 	background: #3b82f6;
-	transition:width 0.3s ease}
-  .demo-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px}
+	transition:width 0.3s ease;}
+  .demo-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px;}
   .panel { background: white;
 	border: 1px solid #e5e7eb; border-radius: 12px;
 	padding: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
-  .panel h3 { margin: 0, 0 15px 0; color: #1f2937; font-size: 18px}
-  .capabilities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px}
+  .panel h3 { margin: 0, 0 15px 0; color: #1f2937; font-size: 18px;}
+  .capabilities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;}
   .capability { display: flex; align-items: center;
-	gap: 8px;padding: 8px, border-radius: 6px;
-	background: #f9fafb}
-  .capability.enabled { background: #ecfdf5}
-  .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px}
+	gap: 8px;padding: 8px; border-radius: 6px;
+	background: #f9fafb;}
+  .capability.enabled { background: #ecfdf5;}
+  .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;}
   .metric { display: flex; flex-direction: column;
-	gap: 4px}
-  .metric-label { font-size: 12px, color: #6b7280; font-weight: 500}
+	gap: 4px;}
+  .metric-label { font-size: 12px; color: #6b7280; font-weight: 500;}
   .metric-value { font-size: 18px; font-weight: 700;
-	color: #1f2937}
-  .processing-panel, .bulk-panel { grid-column: 1 / -1}
+	color: #1f2937;}
+  .processing-panel, .bulk-panel { grid-column: 1 / -1;}
   .processing-controls, .bulk-controls { display: flex;
-	gap: 10px; margin-bottom: 20px; flex-wrap}
-  .btn { padding: 10px 20px; border: none; border-radius: 8px, font-weight: 500;
+	gap: 10px; margin-bottom: 20px; flex-wrap;}
+  .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500;
 	cursor: pointer;
-	transition:all 0.2s ease; font-size: 14px}
+	transition:all 0.2s ease; font-size: 14px;}
   .btn:disabled { opacity: 0.5;
-	cursor:not-allowed}
+	cursor:not-allowed;}
   .btn-primary { background: #3b82f6;
-	color: white}
-  .btn-primary:hover:not(disabled) { background: #2563eb}
+	color: white;}
+  .btn-primary:hover:not(disabled) { background: #2563eb;}
   .btn-secondary { background: #f3f4f6;
-	color: #374151}
-  .btn-secondary:hover:not(disabled) { background: #e5e7eb}
-  .btn-small { padding: 6px 12px; font-size: 12px}
-  .custom-document { margin: 20px 0}
+	color: #374151;}
+  .btn-secondary:hover:not(disabled) { background: #e5e7eb;}
+  .btn-small { padding: 6px 12px; font-size: 12px;}
+  .custom-document { margin: 20px 0;}
   .document-input { width: 100%;
 	padding: 12px;border: 1px solid #d1d5db; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px;
-	resize: vertical;margin: 10px 0}
+	resize: vertical;margin: 10px 0;}
   .results-panel, .bulk-results { margin-top: 20px;
-	padding: 15px;background: #f8fafc; border-radius: 8px}
-  .result-summary, .bulk-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px}
+	padding: 15px;background: #f8fafc; border-radius: 8px;}
+  .result-summary, .bulk-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px;}
   .result-item, .summary-item { padding: 8px;
-	background: white; border-radius: 4px; font-size: 14px}
-  .entities-list, .citations-list { margin-top: 15px}
-  .entities-list h5, .citations-list h5 { margin: 0, 0 10px 0; color: #374151}
+	background: white; border-radius: 4px; font-size: 14px;}
+  .entities-list, .citations-list { margin-top: 15px;}
+  .entities-list h5, .citations-list h5 { margin: 0, 0 10px 0; color: #374151;}
   .entity-item, .citation-item { display: flex;
 	gap: 10px;
-	padding: 6px, background: white; border-radius: 4px; margin-bottom: 4px; font-size: 13px}
+	padding: 6px; background: white; border-radius: 4px; margin-bottom: 4px; font-size: 13px;}
   .entity-type { background: #dbeaf;
-	color: #1d4ed8;padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 500}
-  .entity-confidence, .citation-court { color: #6b7280; font-size: 11px}
-  .bulk-documents { margin: 15px 0}
-  .bulk-doc-item, .bulk-result-item { padding: 8px, background: #f9fafb; border-radius: 4px; margin-bottom: 6px; font-size: 14px}
-  .log-panel { grid-column: 1 / -1; max-height: 400px}
-  .log-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 15px}
+	color: #1d4ed8;padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 500;}
+  .entity-confidence, .citation-court { color: #6b7280; font-size: 11px;}
+  .bulk-documents { margin: 15px 0;}
+  .bulk-doc-item, .bulk-result-item { padding: 8px; background: #f9fafb; border-radius: 4px; margin-bottom: 6px; font-size: 14px;}
+  .log-panel { grid-column: 1 / -1; max-height: 400px;}
+  .log-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 15px;}
   .log-container { height: 300px; overflow-y: auto;
 	border: 1px solid #e5e7eb; border-radius: 6px;
-	padding: 10px;background: #1f2937; font-family: 'Courier New', monospace}
-  .log-entry { color: #d1d5db; font-size: 12px, line-height: 1.4;
-	padding: 2px 0}
-  .log-empty { color: #6b7280; font-style: italic}
-  @media (max-width: 768px) { .demo-content { grid-template-columns: 1fr}
-    .capabilities-grid, .metrics-grid { grid-template-columns: 1fr}
-    .processing-controls, .bulk-controls { flex-direction: column}
+	padding: 10px;background: #1f2937; font-family: 'Courier New', monospace;}
+  .log-entry { color: #d1d5db; font-size: 12px; line-height: 1.4;
+	padding: 2px 0;}
+  .log-empty { color: #6b7280; font-style: italic;}
+  @media (max-width: 768px) { .demo-content { grid-template-columns: 1fr;}
+    .capabilities-grid, .metrics-grid { grid-template-columns: 1fr;}
+    .processing-controls, .bulk-controls { flex-direction: column;}
   } </style>
 
 

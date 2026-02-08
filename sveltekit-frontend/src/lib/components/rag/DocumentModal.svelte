@@ -24,7 +24,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                   ></div> </div> <span class="text-sm font-medium">{Math.round(document.metadata.confidence * 100)}%</span> </div> {/if} </div> </div> <!-- Summary --> <div> <p class="text-xs font-semibold text-gray-500 uppercase">Summary</p> <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 p-4"> {document.summary ?? 'No summary available'} </p> </div> <!-- Metadata --> {#if document.metadata?.language} <div class="border-t"> <p class="text-xs font-semibold text-gray-500 uppercase">Language</p> <p class="text-sm">{document.metadata.language}</p> {/if} </div> <!-- Footer / Actions --> <div class="flex gap-3 bg-gray-50 px-6 py-4"> <Button onclick={ downloadDocument } disabled={downloading ?? deleting} class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 bits-btn"
       > <Download class="w-4" /> {downloading ? 'Downloading...': 'Download'} </Button> <Button onclick={ deleteDocument } disabled={deleting || downloading} class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 bits-btn"
       > <Trash2 class="w-4" /> {deleting ? 'Deleting...': 'Delete'} </Button> <Button onclick={ closeModal } disabled={deleting || downloading} class="flex-1 px-4 py-2 bg-gray-300 text-gray-900 rounded-lg hover:bg-gray-400 bits-btn"
-      > Close </Button> </div> {/if} <style>:global(body) { overflow: hidden}
+      > Close </Button> </div> {/if} <style>:global(body) { overflow: hidden;}
 </style>
 
 

@@ -7,11 +7,11 @@ https://svelte.dev/e/style_duplicate -->
 <!-- @migration-task Error while migrating Svelte code: A component can have a single top-level `<style>` element
 https://svelte.dev/e/style_duplicate -->
 <script lang="ts">
- import type { goto } from '$app/navigation';
- import type { superForm } from 'sveltekit-superforms';
- import type { zod } from 'sveltekit-superforms/adapters';
- import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+ import type { goto;} from '$app/navigation';
+ import type { superForm;} from 'sveltekit-superforms';
+ import type { zod;} from 'sveltekit-superforms/adapters';
+ import { z;} from 'zod';
+import type { DrizzleTypes;} from '$lib/types/enhanced-svelte5-types';
 
  // Define the base Zod schema for client validation
  const baseRegisterSchema = z.object({
@@ -24,15 +24,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  path: ['terms']
  });
   
- let { form, errors, enhance, message } = superForm({
+ let { form, errors, enhance, message;} = superForm({
  email: '';
  password: '';
  confirmPassword: '';
- terms: false
- }, {
+ terms: false;}, {
  validators: zod(baseRegisterSchema as z.ZodObject<any>, resetForm: true;
- taintedMessage: null
- });
+ taintedMessage: null;});
   
  let passwordStrength = $derived (() => {
  const password = $form .password || '';
@@ -91,12 +89,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <p class="register-subtitle">Join the Legal AI Platform to get started</p>
  </div>
 
- {#if $message }
+ {#if $message;}
  <div class="error-message">
  <span>⚠</span>
- <span>{$message }</span>
+ <span>{$message;}</span>
  </div>
- {/if}
+ {/if;}
 
  <form method="POST" use, enhance class="register-form">
  <div class="form-field">
@@ -105,15 +103,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  id="email"
  name="email"
  type="email"
- bind:value={$form .email}
+ bind:value={$form .email;}
  placeholder="Enter your email address"
- aria-invalid={$errors .email ? 'true' : undefined}
+ aria-invalid={$errors .email ? 'true' : undefined;}
  class="form-input"
  required
  />
- {#if $errors .email}
- <span class="field-error">{$errors .email}</span>
- {/if}
+ {#if $errors .email;}
+ <span class="field-error">{$errors .email;}</span>
+ {/if;}
  </div>
 
  <div class="form-field">
@@ -122,13 +120,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  id="password"
  name="password"
  type="password"
- bind:value={$form .password}
+ bind:value={$form .password;}
  placeholder="Create a strong password"
- aria-invalid={$errors .password ? 'true' : undefined}
+ aria-invalid={$errors .password ? 'true' : undefined;}
  class="form-input"
  required
  />
- {#if $form .password}
+ {#if $form .password;}
  <div class="password-strength">
  <div class="strength-bar">
  <div
@@ -140,10 +138,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  {getPasswordStrengthText(passwordStrength)}
  </span>
  </div>
- {/if}
- {#if $errors .password}
- <span class="field-error">{$errors .password}</span>
- {/if}
+ {/if;}
+ {#if $errors .password;}
+ <span class="field-error">{$errors .password;}</span>
+ {/if;}
  <div class="password-requirements">
  <small>Password must be at least 8 characters with uppercase, lowercase, number, and special character</small>
  </div>
@@ -155,15 +153,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  id="confirmPassword"
  name="confirmPassword"
  type="password"
- bind:value={$form .confirmPassword}
+ bind:value={$form .confirmPassword;}
  placeholder="Confirm your password"
- aria-invalid={$errors .confirmPassword ? 'true' : undefined}
+ aria-invalid={$errors .confirmPassword ? 'true' : undefined;}
  class="form-input"
  required
  />
- {#if $errors .confirmPassword}
- <span class="field-error">{$errors .confirmPassword}</span>
- {/if}
+ {#if $errors .confirmPassword;}
+ <span class="field-error">{$errors .confirmPassword;}</span>
+ {/if;}
  </div>
 
  <div class="form-field checkbox-field">
@@ -172,7 +170,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  id="terms"
  name="terms"
  type="checkbox"
- bind:checked={$form .terms}
+ bind:checked={$form .terms;}
  class="form-checkbox"
  required
  />
@@ -181,9 +179,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>
  </label>
  </div>
- {#if $errors .terms}
- <span class="field-error">{$errors .terms}</span>
- {/if}
+ {#if $errors .terms;}
+ <span class="field-error">{$errors .terms;}</span>
+ {/if;}
  </div>
 
  <div class="form-actions">
@@ -196,7 +194,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="register-footer">
  <p>
  Already have an account?
- <button onclick={handleLoginLink} class="link-btn">
+ <button onclick={handleLoginLink;} class="link-btn">
  Sign in here
  </button>
  </p>

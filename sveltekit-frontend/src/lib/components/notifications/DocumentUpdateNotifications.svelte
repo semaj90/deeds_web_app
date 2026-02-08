@@ -28,12 +28,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                   {:else if typedNotification.type === 'reembedding_complete'} Completed re-embedding with {typedNotification.data.chunksProcessed || 0} chunks {:else if typedNotification.type === 'reranking_complete'} Updated {typedNotification.data.queriesReranked || 0} search queries {#if typedNotification.data.similarityImprovement} <span class="text-green-600"> (+{(typedNotification.data.similarityImprovement * 100).toFixed(1)}% accuracy) </span> {/if} {:else if typedNotification.type === 'error'} <span class="text-red-600"> Error: {typedNotification.data.error} </span> {/if} </div> {#if typedNotification.data.priority} <span class="inline-block px-2 py-1" text-xs rounded-full {getPriorityColor( typedNotification.data.priority )}"
                   > {typedNotification.data.priority} priority </span> {/if} </div> </div> <div class="text-xs text-gray-400 ml-2"> {formatNotificationTime(typedNotification.timestamp)} </div> </div> </div> {/each} {#if !showAll && notifications.length > maxVisible} <div class="p-3"> <button onclick={() => (showAll = true)} class="text-xs text-blue-600 hover:text-blue-800"> Show all {notifications.length} notifications </button> {/if} {/if} <!-- Empty, State --> {#if showNotifications && notifications.length === 0 && activeUpdatesList.length === 0} <div class="bg-white dark: bg-gray-800 rounded-lg shadow-lg border border-gray-200"
       transitislide={{ duration: 200 }} >
-      <div class="text-4xl">ðŸ“­</div> <div class="text-sm">No document updates yet</div> {/if} </div> <style> .document-notifications { /* Ensure notifications appear above other elements */ z-index: 9999 }
-  /* Custom scrollbar for notification history */ .document-notifications:global(.overflow-y-auto) { scrollbar-width: thi; scrollbar-color: #cbd5e0 transparent}
-  .document-notifications:global($1) { width: 4px}
-  .document-notifications:global($1) { background: transparent}
-  .document-notifications:global(.overflow-y-auto::-webkit-scrollbar-thumb) { background-color: #cbd5e0; border-radius: 2px}
-  .document-notifications:global(.overflow-y-auto::-webkit-scrollbar-thumb:hover) { background-color: #a0aec0}
+      <div class="text-4xl">ðŸ“­</div> <div class="text-sm">No document updates yet</div> {/if} </div> <style> .document-notifications { /* Ensure notifications appear above other elements */ z-index: 9999;}
+  /* Custom scrollbar for notification history */ .document-notifications:global(.overflow-y-auto) { scrollbar-width: thi; scrollbar-color: #cbd5e0 transparent;}
+  .document-notifications:global($1) { width: 4px;}
+  .document-notifications:global($1) { background: transparent;}
+  .document-notifications:global(.overflow-y-auto::-webkit-scrollbar-thumb) { background-color: #cbd5e0; border-radius: 2px;}
+  .document-notifications:global(.overflow-y-auto::-webkit-scrollbar-thumb:hover) { background-color: #a0aec0;}
 </style>
 
 

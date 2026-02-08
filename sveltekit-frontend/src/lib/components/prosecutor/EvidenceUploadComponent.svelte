@@ -140,7 +140,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <li>â€¢ Qdrant storage with payload filters</li>
   {#if enableWebGPU} <li>â€¢ WebGPU acceleration for vector operations</li> {/if}
   </ul> </div> </div>
- <style> .drag-active { border-color: #3b82f6; background-color: #eff6ff}
+ <style> .drag-active { border-color: #3b82f6; background-color: #eff6ff;}
 </style>
 
 

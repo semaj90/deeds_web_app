@@ -108,32 +108,32 @@ model: required })
 <style>
   .ai-setup-banner {
     border: 1px solid #f5c2c7
-    background: #fff5f5, color: #842029, padding: 12px
-    border-radius: 8px}
-  .title { font-weight: 600; margin-bottom: 6px}
-  .msg { margin-bottom: 8px}
+    background: #fff5f5; color: #842029; padding: 12px
+    border-radius: 8px;}
+  .title { font-weight: 600; margin-bottom: 6px;}
+  .msg { margin-bottom: 8px;}
   .grid { display: grid
-    grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px}
+    grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;}
   .item { display: flex; align-items: center;
-	gap: 6px}
-  .label { color: #495057}
+	gap: 6px;}
+  .label { color: #495057;}
   .ok {
-    color: #0f5132, background: #d1e7dd, padding: 2px 6px
+    color: #0f5132; background: #d1e7dd; padding: 2px 6px
     border-radius: 9999px
-    font-size: 12px}
+    font-size: 12px;}
   .bad {
-    color: #842029, background: #f8d7da, padding: 2px 6px
+    color: #842029; background: #f8d7da; padding: 2px 6px
     border-radius: 9999px
-    font-size: 12px}
+    font-size: 12px;}
   .pull {
-    margin-left: 8px, padding: 4px 10px
+    margin-left: 8px; padding: 4px 10px
     border: 1px solid #0d6efd
-    color: #0d6efd, background: #eef5ff
+    color: #0d6efd; background: #eef5ff
     border-radius: 6px
-    font-size: 12px, cursor: pointer}
-  .pull:hover { background: #dceaff}
+    font-size: 12px; cursor: pointer;}
+  .pull:hover { background: #dceaff;}
   @media (max-width: 600px) {
-    .grid { grid-template-columns: 1fr}
+    .grid { grid-template-columns: 1fr;}
   }
 </style>
 

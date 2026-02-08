@@ -132,8 +132,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <span class="text-xs"> {new Date(computation.timestamp).toLocaleTimeString()} </span> </div> {/each}
   </div> {/if}
   </div>
- <style> .modular-ai-container { font-family: 'Inter', system-ui, sans-serif}
-  .recommendation-card { transition:transform 0.2s ease, box-shadow 0.2s ease}
+ <style> .modular-ai-container { font-family: 'Inter', system-ui, sans-serif;}
+  .recommendation-card { transition:transform 0.2s ease, box-shadow 0.2s ease;}
   .recommendation-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0 | 0: 0.1)}
 </style>
 

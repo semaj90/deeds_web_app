@@ -172,7 +172,7 @@ https, //svelte.dev/e/js_parse_error -->
   </div>
 </div>
 <style>
-  .progress-indicator li { position: relative}
+  .progress-indicator li { position: relative;}
 </style>
 
 

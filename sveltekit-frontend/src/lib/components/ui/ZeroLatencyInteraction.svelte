@@ -334,14 +334,14 @@ https, //svelte.dev/e/js_parse_error -->
 <style>
   /* Zero-latency interaction styles */
   :global(.zero-latency-enabled) { position: relative; cursor: pointer
-   ;transition:all 0.1s ease}
+   ;transition:all 0.1s ease;}
   :global(.zero-latency-enabled::after) { content: 'âš¡'; position: absolute;
     top: -6px;
 	right: -6px;
     font-size: 10px;
 	opacity: 0.85
    ;color: #ffd700;
-    pointer-events: none}
+    pointer-events: none;}
 
   /* CHR-ROM Tooltip Styles */
   :global(.chr-rom-tooltip) {
@@ -365,7 +365,7 @@ https, //svelte.dev/e/js_parse_error -->
     font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px}
+    letter-spacing: 1px;}
   :global(.chr-rom-tooltip p) { margin: 0 0 8px 0; color: #e0e0e0; }
   :global(.chr-rom-tooltip .metadata) { display: flex; gap: 8px; font-size: 10px;
 	color: #b0b0b0; }
@@ -382,7 +382,7 @@ https, //svelte.dev/e/js_parse_error -->
    ;border: 1px solid #000;
     box-shadow: 0 2px 8px rgba(0, 255, 65, 0.4)}
   :global(.chr-rom-tooltip .loading-content) { display: flex; align-items: center;
-	gap:8px}
+	gap:8px;}
   :global(.chr-rom-tooltip .loading-spinner) { width: 12px; height: 12px; border:2px solid #333; border-top:2px solid #ffd700; border-radius: 50%;
 	animation: spin 1s linear infinite;
   }
@@ -415,8 +415,8 @@ https, //svelte.dev/e/js_parse_error -->
   .stat .value.zero-latency { color: #ffd700; font-weight: 700; }
 
   @media (max-width: 768px) {
-    .zero-latency-debug-panel { top: 10px; right: 10px;left: 10px; font-size:9px}
-    :global(.chr-rom-tooltip) { max-width: 250px; font-size:11px}
+    .zero-latency-debug-panel { top: 10px; right: 10px;left: 10px; font-size:9px;}
+    :global(.chr-rom-tooltip) { max-width: 250px; font-size:11px;}
   }
 </style>
 

@@ -76,7 +76,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-	.hidden { display: none }
+	.hidden { display: none;}
 </style>
 
 

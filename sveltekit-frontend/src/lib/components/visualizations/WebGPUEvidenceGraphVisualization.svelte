@@ -406,7 +406,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     @apply text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
   }
   .legend-items {
-    @apply grid grid-cols-2, md:grid-cols-4 gap-2;
+    @apply grid grid-cols-2; md:grid-cols-4 gap-2;
   }
   .legend-item {
     @apply flex items-center gap-2;
