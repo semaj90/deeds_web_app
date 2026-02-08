@@ -1,5 +1,5 @@
 <script lang="ts">
-  import * as Dialog from "bits-ui/components/dialog";
+  import { Dialog } from "bits-ui";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

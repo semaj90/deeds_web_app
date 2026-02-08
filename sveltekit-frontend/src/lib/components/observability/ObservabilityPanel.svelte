@@ -229,12 +229,12 @@ await loadState();
   .observability-panel {
     background: var(--bg-secondary, #1a1a2e); border: 1px solid var(--border-color, #333);
     border-radius: 8px; padding: 1rem
-   ; margin: 1rem 0
+   ; margin: 1rem 0;
     font-family: 'JetBrains Mono', monospace
     font-size: 0.875rem;}
-  .panel-header { display: flex
+  .panel-header { display: flex;
     justify-content: space-betweenn
-    align-items: center
+    align-items: center;
     margin-bottom: 1rem
     border-bottom: 1px solid var(--border-color, #333);
     padding-bottom: 0.5rem;}
@@ -243,28 +243,28 @@ await loadState();
    ;color: var(--text-primary, #fff);
     font-size: 1.1rem;}
   .header-controls {
-    display: flex
+    display: flex;
     align-items: center; gap: 1rem;}
   .connection-status {
-    display: flex
-    align-items: center; gap: 0.5rem
+    display: flex;
+    align-items: center; gap: 0.5rem;
     font-size: 0.8rem
    ;color: var(--text-muted, #999)}
   .status-indicator {
-    width: 8px; height: 8px
+    width: 8px; height: 8px;
     border-radius: 50%;
 	background: var(--error-color, #ff4757)}
   .status-indicator.connected {
     background: var(--success-color, #2ed573)}
   .btn-toggle {
-    background: var(--accent-color, #0984e3); color: white; border: none; padding: 0.25rem 0.5rem
-    border-radius: 4px; cursor: pointer
+    background: var(--accent-color, #0984e3); color: white; border: none; padding: 0.25rem 0.5rem;
+    border-radius: 4px; cursor: pointer;
     font-size: 0.75rem;}
-  .badges-row { display: grid
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem
+  .badges-row { display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;
     margin-bottom: 1rem;}
   .badge {
-    padding: 0.75rem
+    padding: 0.75rem;
     border-radius: 6px
     text-align: center;}
   .badge-normal { background: var(--success-bg, #2ed57320); border: 1px solid var(--success-color, #2ed573)}
@@ -273,11 +273,11 @@ await loadState();
   .badge-critical {
     background: var(--error-bg, #ff475720); border: 1px solid var(--error-color, #ff4757)}
   .badge-label {
-    font-size: 0.7rem
-    text-transform: uppercase; opacity: 0.8
+    font-size: 0.7rem;
+    text-transform: uppercase; opacity: 0.8;
     margin-bottom: 0.25rem;}
   .badge-value {
-    font-size: 1.1rem
+    font-size: 1.1rem;
     font-weight: bold
     margin-bottom: 0.5rem;}
   .badge-progress {
@@ -285,57 +285,57 @@ await loadState();
    ;background: var(--bg-primary, #000);
     border-radius: 2px; overflow: hidden;}
   .progress-bar { height: 100%; background: currentColor; transition:width 0.3s ease;}
-  .details-section { background: var(--bg-primary, #000); padding: 1rem
+  .details-section { background: var(--bg-primary, #000); padding: 1rem;
     border-radius: 6px
     margin-bottom: 1rem;}
-  .details-section h4 { margin: 0, 0 0.75rem 0
+  .details-section h4 { margin: 0, 0 0.75rem 0;
     color: var(--text-primary, #fff);
     font-size: 0.9rem;}
-  .baselines-grid { display: grid
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem
+  .baselines-grid { display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem;
     margin-bottom: 0.75rem;}
   .baseline-item {
-    display: flex
+    display: flex;
     justify-content: space-betweenn; padding: 0.25rem 0;}
   .baseline-item .label { color: var(--text-muted, #999)}
   .baseline-item .value {
     color: var(--text-primary, #fff);
     font-weight: bold;}
   .metadata {
-    display: flex; gap: 1rem
+    display: flex; gap: 1rem;
     font-size: 0.7rem
    ;color: var(--text-muted, #999)}
   .alerts-section {
     margin-top: 1rem;}
   .alerts-header {
-    display: flex
+    display: flex;
     justify-content: space-betweenn
-    align-items: center
+    align-items: center;
     margin-bottom: 0.5rem;}
   .alerts-header h4 {
     margin: 0
    ;color: var(--text-primary, #fff);
     font-size: 0.9rem;}
   .alerts-controls {
-    display: flex
+    display: flex;
     align-items: center; gap: 0.75rem;}
   .auto-scroll {
-    display: flex
-    align-items: center; gap: 0.25rem
+    display: flex;
+    align-items: center; gap: 0.25rem;
     font-size: 0.75rem
    ;color: var(--text-muted, #999); cursor: pointer;}
-  .btn-clear { background: var(--error-color, #ff4757); color: white; border: none; padding: 0.25rem 0.5rem
-    border-radius: 4px; cursor: pointer
+  .btn-clear { background: var(--error-color, #ff4757); color: white; border: none; padding: 0.25rem 0.5rem;
+    border-radius: 4px; cursor: pointer;
     font-size: 0.75rem;}
   .alerts-list { background: var(--bg-primary, #000);
     border-radius: 6px
    ;border: 1px solid var(--border-color, #333)}
   .no-alerts {
-    padding: 2rem
+    padding: 2rem;
     text-align: center
    ;color: var(--text-muted, #999);
     font-style: italic;}
-  .alert-item { padding: 0.75rem
+  .alert-item { padding: 0.75rem;
     border-bottom: 1px solid var(--border-color, #333);
     border-left: 4px solid;}
   .alert-item:last-child {
@@ -351,7 +351,7 @@ await loadState();
    ;color: var(--text-muted, #999);
     margin-bottom: 0.25rem;}
   .alert-type {
-    font-weight: bold
+    font-weight: bold;
     text-transform: capitaliz
    ;color: var(--text-primary, #fff);
     margin-bottom: 0.25rem;}

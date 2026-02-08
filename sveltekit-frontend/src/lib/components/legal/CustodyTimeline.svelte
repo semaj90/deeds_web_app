@@ -191,16 +191,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 <style>
   .custody-timeline {
-    max-height: 600px
+    max-height: 600px;
     overflow-y: auto
     scroll-behavior: smooth;}
   .custody-timeline::-webkit-scrollbar {
     width: 6px;}
   .custody-timeline::-webkit-scrollbar-track {
-    background: #f1f1f1
+    background: #f1f1f1;
     border-radius: 3px;}
   .custody-timeline::-webkit-scrollbar-thumb {
-    background: #c1c1c1
+    background: #c1c1c1;
     border-radius: 3px;}
   .custody-timeline::-webkit-scrollbar-thumb:hover { background: #a8a8a8;}
 </style>

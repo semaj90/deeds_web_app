@@ -325,20 +325,20 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <style>
     .legal-ai-workflow {
         max-width: 1200px; margin: 0 auto
-       ;padding: 2rem
+       ;padding: 2rem;
         font-family: -apple-system;
 	BlinkMacSystemFont: 'Segoe UI', Roboto, sans-serif;}
     .workflow-header {
-        text-align: center
+        text-align: center;
         margin-bottom: 2rem;}
     .workflow-header h2 {
-        color: #1a365d
+        color: #1a365d;
         margin-bottom: 0.5rem;}
     .services-status {
-        display: flex
+        display: flex;
         align-items: center
-        justify-content: center; gap: 1rem
-        margin-top: 1rem; padding: 0.75rem; background: #f7fafc
+        justify-content: center; gap: 1rem;
+        margin-top: 1rem; padding: 0.75rem; background: #f7fafc;
         border-radius: 0.5rem
         font-size: 0.875rem;}
     .status-indicator {
@@ -348,14 +348,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .status-indicator.offline {
         color: #dc2626;}
     .refresh-btn {
-        background: none; border: none; cursor: pointer
+        background: none; border: none; cursor: pointer;
         font-size: 1rem;}
     .step-indicator {
-        display: flex
-        justify-content: center; margin: 2rem 0
+        display: flex;
+        justify-content: center; margin: 2rem 0;
         gap: 2rem;}
     .step {
-        display: flex
+        display: flex;
         flex-direction: column
         align-items: center; gap: 0.5rem; opacity: 0.5; transition:opacity 0.3;}
     .step.active {
@@ -363,23 +363,23 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .step.completed {
         opacity: 1; color: #059669;}
     .step-number {
-        display: flex
+        display: flex;
         align-items: center
-        justify-content: center; width: 2rem; height: 2rem
+        justify-content: center; width: 2rem; height: 2rem;
         border-radius: 50%;
-	background: currentColor; color: white
+	background: currentColor; color: white;
         font-weight: bold
         font-size: 0.875rem;}
     .error-message {
-        display: flex
-        align-items: center; gap: 1rem; padding: 1rem; background: #fef2f2; border: 1px solid #fecaca
+        display: flex;
+        align-items: center; gap: 1rem; padding: 1rem; background: #fef2f2; border: 1px solid #fecaca;
         border-radius: 0.5rem; color: #dc2626; margin: 1rem 0;}
     .retry-btn {
-        background: #dc2626; color: white; border: none; padding: 0.5rem 1rem
+        background: #dc2626; color: white; border: none; padding: 0.5rem 1rem;
         border-radius: 0.25rem; cursor: pointer;}
     .upload-section {
         background: white
-       ;padding: 2rem
+       ;padding: 2rem;
         border-radius: 1rem
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
     .file-input-wrapper {
@@ -387,7 +387,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .file-input {
         display: none;}
     .file-input-label {
-        display: block; padding: 2rem; border: 2px dashed #d1d5db
+        display: block; padding: 2rem; border: 2px dashed #d1d5db;
         border-radius: 0.5rem
         text-align: center; cursor: pointer; transition:border-color 0.2;}
     .file-input-label:hover {
@@ -397,13 +397,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .processing-options h3 {
         margin-bottom: 1rem; color: #374151;}
     .option {
-        display: flex
-        align-items: center; gap: 0.5rem
+        display: flex;
+        align-items: center; gap: 0.5rem;
         margin-bottom: 0.5rem; cursor: pointer;}
     .process-btn {
-        background: #3b82f6; color: white; border: none; padding: 1rem 2rem
+        background: #3b82f6; color: white; border: none; padding: 1rem 2rem;
         border-radius: 0.5rem
-        font-size: 1.1rem
+        font-size: 1.1rem;
         font-weight: 600; cursor: pointer; width: 100%;
 	transition:background 0.2;}
     .process-btn:hover:not(disabled) {
@@ -414,32 +414,32 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         margin: 2rem 0;}
     .progress-bar {
         width: 100%;
-	height: 0.5rem
+	height: 0.5rem;
         background: #e5e7eb
         border-radius: 0.25rem; overflow: hidden;}
     .progress-fill {
         height: 100%;
-	background: #3b82f6
+	background: #3b82f6;
         transition:width 0.3;}
     .progress-text {
-        margin-top: 0.5rem
+        margin-top: 0.5rem;
         text-align: center
        ;color: #6b7280;}
     .results-section,
     .recommendations-section {
         background: white
-       ;padding: 2rem
+       ;padding: 2rem;
         border-radius: 1rem
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin: 2rem 0;}
     .result-summary,
     .recommendations-summary {
-        display: grid
+        display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem
        ; margin: 1rem 0;}
     .metric,
     .detail {
-        display: flex
-        justify-content: space-betweenn; padding: 0.75rem; background: #f8fafc
+        display: flex;
+        justify-content: space-betweenn; padding: 0.75rem; background: #f8fafc;
         border-radius: 0.5rem;}
     .label {
         font-weight: 500; color: #6b7280;}
@@ -449,22 +449,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .entity-tags,
     .concept-tags,
     .recommendation-concepts {
-        display: flex
+        display: flex;
         flex-wrap: wrap
-       ;gap: 0.5rem
+       ;gap: 0.5rem;
         margin-top: 0.5rem;}
     .entity-tag,
     .concept-tag {
-        background: #dbeaf; color: #1e40af; padding: 0.25rem 0.75rem
+        background: #dbeaf; color: #1e40af; padding: 0.25rem 0.75rem;
         border-radius: 1rem
-        font-size: 0.875rem
+        font-size: 0.875rem;
         font-weight: 500;}
     .concept-tag.small {
         font-size: 0.75rem; padding: 0.125rem 0.5rem;}
     .risk-level {
-        padding: 0.75rem
+        padding: 0.75rem;
         border-radius: 0.5rem
-        font-weight: 600
+        font-weight: 600;
         margin-bottom: 0.5rem;}
     .risk-level.low {
         background: #d1fae5; color: #065f46;}
@@ -473,50 +473,50 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .risk-level.high {
         background: #fecaca; color: #991b1b;}
     .similar-case {
-        padding: 1rem; border: 1px solid #e5e7eb
+        padding: 1rem; border: 1px solid #e5e7eb;
         border-radius: 0.5rem
         margin-bottom: 0.5rem;}
     .case-title {
-        font-weight: 600; color: #111827
+        font-weight: 600; color: #111827;
         margin-bottom: 0.25rem;}
     .case-details {
         font-size: 0.875rem; color: #6b7280;}
     .recommendations-list {
         display: grid; gap: 1rem;}
     .recommendation-card {
-        border: 1px solid #e5e7eb
+        border: 1px solid #e5e7eb;
         border-radius: 0.75rem; padding: 1.5rem
        ;transition:box-shadow 0.2;}
     .recommendation-card:hover {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)}
     .recommendation-header {
-        display: flex
+        display: flex;
         justify-content: space-betweenn
-        align-items: flex-start
+        align-items: flex-start;
         margin-bottom: 0.75rem;}
     .recommendation-title {
         color: #111827; margin: 0;}
     .recommendation-type {
-        background: #f3f4f6; color: #374151; padding: 0.25rem 0.75rem
+        background: #f3f4f6; color: #374151; padding: 0.25rem 0.75rem;
         border-radius: 1rem
-        font-size: 0.75rem
+        font-size: 0.75rem;
         font-weight: 500
         text-transform: uppercase;}
     .recommendation-description {
-        color: #6b7280
+        color: #6b7280;
         margin-bottom: 1rem
         line-height: 1.6;}
-    .recommendation-details { display: grid
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem
+    .recommendation-details { display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem;
         margin-bottom: 1rem;}
     .action-buttons {
-        display: flex
+        display: flex;
         justify-content: center
-       ;gap: 1rem
+       ;gap: 1rem;
         margin-top: 2rem;}
     .primary-btn,
     .secondary-btn {
-        padding: 1rem 2rem
+        padding: 1rem 2rem;
         border-radius: 0.5rem
         font-weight: 600; cursor: pointer; border: none; transition:all 0.2;}
     .primary-btn {

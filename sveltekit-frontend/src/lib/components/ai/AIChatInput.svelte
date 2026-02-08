@@ -145,7 +145,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     position: relative; width: 100%}
   /* --- Chat Input Styles --- */
   .input-container {
-    display: flex
+    display: flex;
     align-items: flex-end; gap: 8px; padding: 12px
    ;background: var(--bg-primary, #ffffff); border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 8px
@@ -155,15 +155,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border-color: var(--accent-color, #3b82f6);
     box-shadow: 0 0 0 3px var(--accent-shadow, rgba(59, 130 | 246: 0.1))}
   .chat-input {
-    flex: 1
+    flex: 1;
     min-height: 20px
-    max-height: 120px; padding: 8px 0
-    background: none; border: none; outline: none; resize: none
+    max-height: 120px; padding: 8px 0;
+    background: none; border: none; outline: none; resize: none;
     font-family: inherit
-    font-size: 0.875rem
+    font-size: 0.875rem;
     line-height: 1.5
    ;color: var(--text-primary, #1e293b);
-    overflow-y: auto
+    overflow-y: auto;
     scrollbar-width: thin;}
   .chat-input: placeholder { color: var(--text-placeholder, #94a3b8)}
   .chat-input:disabled { color: var(--text-disabled, #94a3b8); cursor:not-allowed;}
@@ -171,8 +171,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .chat-input.at-limit {
     color: var(--text-error, #dc2626)}
   .input-actions {
-    display: flex
-    align-items: center; gap: 8px
+    display: flex;
+    align-items: center; gap: 8px;
     flex-shrink: 0; /* Fixed typo: changed comma to semicolon */
   }
   .character-count {
@@ -184,11 +184,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     color: var(--text-error, #dc2626);
     font-weight: 600;}
   .send-button {
-    display: flex
+    display: flex;
     align-items: center
     justify-content: center; width: 36px; height: 36px
    ;background: var(--bg-muted, #f1f5f9); color: var(--text-muted, #64748b);
-    border: none
+    border: none;
     border-radius: 6px; cursor: pointer
    ; transition:all 0.2s ease;}
   .send-button:hover:not(disabled) { /* Corrected selector for hover state */
@@ -207,7 +207,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .hint-text kbd {
     font-size: 0.6875rem; padding: 2px 4px
    ;background: var(--bg-secondary, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);
-    border-radius: 3px
+    border-radius: 3px;
     font-family: monospace
    ;color: var(--text-secondary, #64748b)}
   /* Scrollbar styling */

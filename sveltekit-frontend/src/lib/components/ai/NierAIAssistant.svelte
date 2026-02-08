@@ -43,7 +43,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
   .nier-ai-assistant {
     background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
     border: 1px solid #00ff00;
-    box-shadow:
+    box-shadow: ;
       0: 0 20px rgba(0, 255, 0, 0.3);
   }
   .messages {

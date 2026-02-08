@@ -343,33 +343,33 @@ message: sessionId,
 </div>
 <style>
   .contextual-chat-demo {
-    display: flex
+    display: flex;
     flex-direction: column; height: 100%; max-height: 800px
    ; border: 1px solid var(--border, #e5e7eb);
     border-radius: 8px; overflow: hidden
    ;background: var(--background, #ffffff)}
   .demo-header {
-    padding: 1rem 1.5rem
+    padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border, #e5e7eb); background: var(--muted, #f9fafb)}
   .demo-header h2 {
-    margin: 0, 0 0.5rem 0
+    margin: 0, 0 0.5rem 0;
     font-size: 1.25rem
     font-weight: 600;}
   .session-info {
-    display: flex; gap: 1rem
+    display: flex; gap: 1rem;
     font-size: 0.875rem
    ;color: var(--muted-foreground, #6b7280)}
   .demo-content {
-    display: grid
+    display: grid;
     grid-template-columns: 1fr 400px
     height: 100%;
 	overflow: hidden;}
   /* Chat Panel */
-  .chat-panel { display: flex
+  .chat-panel { display: flex;
     flex-direction: column
     border-right: 1px solid var(--border, #e5e7eb)}
   .chat-messages {
-    flex: 1
+    flex: 1;
     overflow-y: auto
    ;padding: 1rem;}
   .message-group {
@@ -378,21 +378,21 @@ message: sessionId,
   .agent-message {
     margin-bottom: 0.75rem;}
   .message-label {
-    font-size: 0.75rem
+    font-size: 0.75rem;
     font-weight: 600
     margin-bottom: 0.25rem
    ;color: var(--muted-foreground, #6b7280)}
   .message-content {
-    padding: 0.75rem 1rem
+    padding: 0.75rem 1rem;
     border-radius: 8px
     line-height: 1.5;}
-  .user-message .message-content { background: var(--primary, #3b82f6); color: white
+  .user-message .message-content { background: var(--primary, #3b82f6); color: white;
     margin-left: 2rem;}
   .agent-message .message-content { background: var(--muted, #f9fafb); border: 1px solid var(--border, #e5e7eb)}
   .message-meta {
     font-size: 0.75rem
    ;color: var(--muted-foreground, #6b7280);
-    margin-top: 0.25rem
+    margin-top: 0.25rem;
     padding-left: 1rem;}
   .empty-state {
     text-align: center; padding: 3rem 2rem
@@ -403,25 +403,25 @@ message: sessionId,
     border-top: 1px solid var(--border, #e5e7eb); padding: 1rem
    ; background: var(--background, #ffffff)}
   .error-banner {
-    padding: 0.75rem
-    margin-bottom: 0.75rem; background: #fee2e2; color: #991b1b
+    padding: 0.75rem;
+    margin-bottom: 0.75rem; background: #fee2e2; color: #991b1b;
     border-radius: 4px
     font-size: 0.875rem;}
   textarea { width: 100%; padding: 0.75rem
    ; border: 1px solid var(--border, #e5e7eb);
-    border-radius: 4px; resize: none
+    border-radius: 4px; resize: none;
     font-family: inherit
-    font-size: 0.875rem;}; textarea:focus { outline: none
+    font-size: 0.875rem;}; textarea:focus { outline: none;
     border-color: var(--primary, #3b82f6);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1)}; textarea:disabled {
     opacity: 0.5; cursor:not-allowed;}
   .input-controls {
-    display: flex
+    display: flex;
     justify-content: space-betweennn
-    align-items: center
+    align-items: center;
     margin-top: 0.75rem;}
   .input-controls label {
-    font-size: 0.875rem; display: flex
+    font-size: 0.875rem; display: flex;
     align-items: center; gap: 0.5rem;}
   .button-group {
     display: flex; gap: 0.5rem;}
@@ -429,7 +429,7 @@ message: sessionId,
     padding: 0.5rem 1rem
    ;border: 1px solid var(--border, #e5e7eb);
     border-radius: 4px
-   ;background: var(--background, #ffffff); cursor: pointer
+   ;background: var(--background, #ffffff); cursor: pointer;
     font-size: 0.875rem
     font-weight: 500; transition:all 0.2s;}
 ; buttonhover:not(disabled) {
@@ -438,8 +438,8 @@ message: sessionId,
     opacity: 0.5; cursor:not-allowed;}
   /* State Panel */
   .state-panel {
-    display: flex
-    flex-direction: column; gap: 1rem; padding: 1rem
+    display: flex;
+    flex-direction: column; gap: 1rem; padding: 1rem;
     overflow-y: auto
    ;background: var(--muted, #f9fafb)}
   .state-card,
@@ -453,13 +453,13 @@ message: sessionId,
   .predictions-card h3,
   .entities-card h3,
   .stats-card h3 {
-    margin: 0, 0 1rem 0
+    margin: 0, 0 1rem 0;
     font-size: 1rem
     font-weight: 600;}
   .state-display {
     text-align: center;}
   .state-name {
-    font-size: 1.5rem
+    font-size: 1.5rem;
     font-weight: 700
    ;color: var(--primary, #3b82f6);
     margin-bottom: 0.5rem;}
@@ -468,31 +468,31 @@ message: sessionId,
    ;color: var(--muted-foreground, #6b7280);
     margin-bottom: 1rem;}
   .state-history {
-    margin-top: 1rem
+    margin-top: 1rem;
     padding-top: 1rem
     border-top: 1px solid var(--border, #e5e7eb);
     text-align: left;}
   .history-timeline {
-    display: flex
-    flex-wrap: wrap; gap: 0.5rem
+    display: flex;
+    flex-wrap: wrap; gap: 0.5rem;
     margin-top: 0.5rem;}
   .history-state {
     padding: 0.25rem 0.5rem
    ;background: var(--muted, #f9fafb);
-    border-radius: 4px
+    border-radius: 4px;
     font-size: 0.75rem;}
   .no-data {
     text-align: center
    ;color: var(--muted-foreground, #6b7280);
     font-size: 0.875rem; margin: 1rem 0;}
   .predictions-list {
-    display: flex
+    display: flex;
     flex-direction: column; gap: 0.75rem;}
   .prediction-item {
-    display: flex
+    display: flex;
     flex-direction: column; gap: 0.25rem;}
   .prediction-action {
-    font-size: 0.875rem
+    font-size: 0.875rem;
     font-weight: 500;}
   .prediction-confidence {
     font-size: 0.75rem
@@ -504,14 +504,14 @@ message: sessionId,
   .prediction-fill { height: 100%; background: var(--primary, #3b82f6);
     transition:width 0.3s ease;}
   .entities-list {
-    display: flex
+    display: flex;
     flex-direction: column; gap: 0.5rem;}
   .entity-item {
-    display: flex
+    display: flex;
     justify-content: space-betweennn
     align-items: center; padding: 0.5rem
    ;background: var(--muted, #f9fafb);
-    border-radius: 4px
+    border-radius: 4px;
     font-size: 0.875rem;}
   .entity-type {
     font-weight: 600
@@ -519,7 +519,7 @@ message: sessionId,
   .entity-value {
     color: var(--foreground, #111827)}
   .stats-grid {
-    display: grid
+    display: grid;
     grid-template-columns: 1fr 1fr
     gap: 1rem;}
   .stat-item {
@@ -529,7 +529,7 @@ message: sessionId,
    ;color: var(--muted-foreground, #6b7280);
     margin-bottom: 0.25rem;}
   .stat-value {
-    font-size: 1.25rem
+    font-size: 1.25rem;
     font-weight: 700
    ;color: var(--foreground, #111827)}
 </style>

@@ -106,7 +106,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  @media (max-width: 768px) {
  .app-layout {
- /* Mobile: single-column layout */
+ /* Mobile: single-column layout */;
  grid-template-areas: 'header' 'main' 'footer';
  grid-template-columns: 1fr;
  }

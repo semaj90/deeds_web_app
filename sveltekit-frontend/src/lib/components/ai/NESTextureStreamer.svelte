@@ -376,26 +376,26 @@ activeBankId: 0
 <style>
   .nes-texture-streamer {
     background: #0f0f0f
-   ;color: #ffffff
+   ;color: #ffffff;
     font-family: 'Perfect DOS VGA 437', 'JetBrains Mono', monospace
-    border: 2px solid #333
+    border: 2px solid #333;
     border-radius: 4px; overflow: hidden;}
   .controls-header {
-    display: flex
+    display: flex;
     justify-content: space-betweennn
-    align-items: center; padding: 1rem; background: #1a1a1a
+    align-items: center; padding: 1rem; background: #1a1a1a;
     border-bottom: 1px solid #333
     flex-wrap: wrap; gap: 1rem;}
   .document-info {
-    display: flex
+    display: flex;
     align-items: center; gap: 0.5rem;}
-  .document-info h3 { margin: 0
+  .document-info h3 { margin: 0;
     font-size: 1rem;}
   .mode-badge,
   .importance-badge {
-    padding: 0.25rem 0.5rem
+    padding: 0.25rem 0.5rem;
     border-radius: 4px
-    font-size: 0.75rem
+    font-size: 0.75rem;
     font-weight: bold;}
   .mode-badge.active {
     background: #22c55e;}
@@ -416,24 +416,24 @@ activeBankId: 0
   .lod-controls {
     display: flex; gap: 0.25rem;}
   .lod-button {
-    padding: 0.5rem 0.75rem
-    background: #333; color: white; border: 1px solid #555
+    padding: 0.5rem 0.75rem;
+    background: #333; color: white; border: 1px solid #555;
     cursor: pointer
-    font-family: inherit
+    font-family: inherit;
     font-size: 0.875rem; transition:all 0.2s ease;}
   .lod-button:hover {
     background: #444;}
   .lod-button.active {
-    background: #22c55e
+    background: #22c55e;
     border-color: #22c55e;}
   .lod-button:disabled {
     opacity: 0.5; cursor:not-allowed;}
   .zoom-controls {
-    display: flex
+    display: flex;
     align-items: center; gap: 0.5rem;}
   .zoom-controls button {
-    padding: 0.25rem 0.5rem
-    background: #333; color: white; border: 1px solid #555
+    padding: 0.25rem 0.5rem;
+    background: #333; color: white; border: 1px solid #555;
     cursor: pointer
     font-family: inherit;}
   .texture-viewer {
@@ -441,62 +441,62 @@ activeBankId: 0
    ;background: repeating-conic-gradient(#2a2a2a 0% 25%, transparent 0% 50%) 50% / 20px 20px;}
   .streaming-overlay {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0
-   ;background: rgba(0, 0, 0, 0.8); display: flex
+   ;background: rgba(0, 0, 0, 0.8); display: flex;
     align-items: center
-    justify-content: center
+    justify-content: center;
     z-index: 10;}
   .nes-loading {
     text-align: center; color: #22c55e;}
   .loading-bar {
-    width: 200px; height: 8px; background: #333; border: 1px solid #555
+    width: 200px; height: 8px; background: #333; border: 1px solid #555;
     margin: 1rem 0
     overflow: hidden;}
   .loading-progress { height: 100%; background: #22c55e; transition:width 0.3s ease;}
   .texture-display {
-    position: relative; display: flex
+    position: relative; display: flex;
     align-items: center
     justify-content: center; height: 100%}
   .texture-image {
     max-width: 100%; max-height: 100%; image-rendering: pixelated; border: 2px solid #555;}
   .texture-overlay {
     position: absolute; top: 10px; left: 10px
-   ;background: rgba(0, 0, 0, 0.7); padding: 0.5rem
+   ;background: rgba(0, 0, 0, 0.7); padding: 0.5rem;
     border-radius: 4px;}
   .lod-indicator {
     font-size: 0.875rem; color: #22c55e;}
   .no-texture {
-    display: flex
+    display: flex;
     flex-direction: column
-    align-items: center
+    align-items: center;
     justify-content: center; height: 100%;
 	color: #666;}
   .nes-icon {
-    font-size: 3rem
+    font-size: 3rem;
     margin-bottom: 1rem;}
   .no-texture button {
-    padding: 0.75rem 1.5rem
-    background: #3b82f6; color: white; border: none
-    border-radius: 4px; cursor: pointer
+    padding: 0.75rem 1.5rem;
+    background: #3b82f6; color: white; border: none;
+    border-radius: 4px; cursor: pointer;
     font-family: inherit
     margin-top: 1rem;}
   .debug-panel {
-    background: #111
+    background: #111;
     border-top: 1px solid #333
     padding: 1rem;}
-  .debug-panel h4 { margin: 0, 0 1rem 0
+  .debug-panel h4 { margin: 0, 0 1rem 0;
     color: #22c55e;}
-  .debug-stats { display: grid
+  .debug-stats { display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;}
   .stat-group {
-    background: #1a1a1a; padding: 0.75rem
+    background: #1a1a1a; padding: 0.75rem;
     border-radius: 4px; border: 1px solid #333;}
-  .stat-group h5 { margin: 0, 0 0.5rem 0
+  .stat-group h5 { margin: 0, 0 0.5rem 0;
     color: #f59e0b
     font-size: 0.875rem;}
   .stat-group p {
-    margin: 0.25rem 0
+    margin: 0.25rem 0;
     font-size: 0.75rem; color: #ccc;}
-  .memory-bar { width: 100%; height: 8px; background: #333; border: 1px solid #555
+  .memory-bar { width: 100%; height: 8px; background: #333; border: 1px solid #555;
     margin: 0.5rem 0
     overflow: hidden;}
   .memory-usage { height: 100%; background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
@@ -511,7 +511,7 @@ activeBankId: 0
   .texture-viewer::-webkit-scrollbar-thumb:hover { background: #666;}
   @media (max-width: 768px) {
     .controls-header {
-      flex-direction: column
+      flex-direction: column;
       align-items: stretch;}
     .lod-controls,
     .zoom-controls {

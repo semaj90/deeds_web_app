@@ -401,10 +401,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   :global(.message-content; p:last-child) {
     margin-bottom: 0;}
   :global(.message-content ul, .message-content ol) {
-    margin: 0.5rem 0
+    margin: 0.5rem 0;
     padding-left: 1.5rem;}
   :global(.message-content code) {
-    background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem
+    background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem;
     border-radius: 0.25rem
     font-family: "Courier New", monospace;}
   :global(.message-content h1, .message-content h2, .message-content h3) {

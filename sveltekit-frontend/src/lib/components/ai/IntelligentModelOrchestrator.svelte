@@ -467,10 +467,10 @@ category: 'general', confidence: 0.8 }
   .overflow-x-auto::-webkit-scrollbar {
     height: 6px;}
   .overflow-x-auto::-webkit-scrollbar-track {
-    background: #f1f1f1
+    background: #f1f1f1;
     border-radius: 3px;}
   .overflow-x-auto::-webkit-scrollbar-thumb {
-    background: #c1c1c1
+    background: #c1c1c1;
     border-radius: 3px;}
   .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #a8a8a8;}
 </style>

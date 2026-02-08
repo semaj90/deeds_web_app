@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import * as Select from 'bits-ui/components/select';
+  import { Select } from "bits-ui";
 
   interface Props {
     placeholder?: string;

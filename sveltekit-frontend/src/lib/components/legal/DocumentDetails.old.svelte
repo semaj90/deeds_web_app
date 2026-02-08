@@ -847,7 +847,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {/if}
 <style>
   .line-clamp-2 {
-    display: -webkit-box
+    display: -webkit-box;
     -webkit-line-clamp: 2
     -webkit-box-orient: vertical
    ;overflow: hidden;}

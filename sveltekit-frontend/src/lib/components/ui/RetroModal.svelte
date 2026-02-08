@@ -85,7 +85,7 @@
   .retro-modal-overlay {
     background: rgba(0, 0, 0, 0.5)}
   .modal-content {
-    max-height: 400px
+    max-height: 400px;
     overflow-y: auto;}
   .modal-content :global(.nes-field) {
     margin-bottom: 1rem;}

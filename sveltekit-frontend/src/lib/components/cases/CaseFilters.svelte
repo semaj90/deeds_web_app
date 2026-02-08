@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { Case } from '$lib/types';
   import { Input } from "$lib/components/ui/input";
-  import * as Select from 'bits-ui/components/select';
+  import { Select } from "bits-ui";
   import { Button } from "$lib/components/ui/button";
-  import Search from 'lucide-svelte';
-  import Filter from 'lucide-svelte';
-  import SortAsc from 'lucide-svelte';
-  import SortDesc from 'lucide-svelte';
+  import Search from 'lucide-svelte/icons/search';
+  import Filter from 'lucide-svelte/icons/filter';
+  import SortAsc from 'lucide-svelte/icons/sort-asc';
+  import SortDesc from 'lucide-svelte/icons/sort-desc';
 
   interface Props {
     cases?: Case[];

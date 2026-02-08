@@ -13,7 +13,7 @@
 <style>
   /* @unocss-include */
   .ai-button-portal {
-    position: fixed
+    position: fixed;
     z-index: 1000
     pointer-events: auto;}
   [data-position='bottom-right'] {

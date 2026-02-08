@@ -274,9 +274,9 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 <style>
   .image-rendering-pixelated {
-    image-rendering: -moz-crisp-edge
+    image-rendering: -moz-crisp-edge;
     image-rendering: -webkit-crisp-edge
-    image-rendering: pixelated
+    image-rendering: pixelated;
     image-rendering: crisp-edge;}
   /* WebGPU canvas optimization */
   canvas {

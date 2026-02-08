@@ -10,7 +10,7 @@
 </script>
 
 <script lang="ts">
-  import * as Select from "bits-ui/components/select";
+  import { Select } from "bits-ui";
   import type { Snippet } from "svelte";
   import Content from "./SelectContent.svelte";
   import Item from "./SelectItem.svelte";
