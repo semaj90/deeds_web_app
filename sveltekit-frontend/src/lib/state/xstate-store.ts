@@ -24,7 +24,7 @@ interface ErrorPayload {
 // Minimal window shape for Redux DevTools availability check
 interface DevtoolsWindow extends Window {
  __REDUX_DEVTOOLS_EXTENSION__?: {
-	connect: (opts?: { name?: string; [key: string]: any }) => {
+	connect: (opts?: { name?: string, [key: string]: any }) => {
  send: (action: any, state?: unknown) => void;
  init: (state: unknown) => void;
  };

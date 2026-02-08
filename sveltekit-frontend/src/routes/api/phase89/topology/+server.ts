@@ -68,8 +68,8 @@ SELECT
       }
     }
 
-    return json({ topology: { nodes: edges,
-        summary: { totalFiles: nodes.length,
+    return json({ topology: {, nodes: edges,
+        summary: {, totalFiles: nodes.length,
           totalErrors: nodes.reduce((sum, n) => sum + n.errorCount, 0),
           totalEmbedded: nodes.reduce((sum, n) => sum + n.embeddedCount, 0)
         }

@@ -118,12 +118,12 @@ export const userWorkflowMachine = createMachine({
     }
   },
 	states: {
-	idle: {
-      on: {
-	LOGIN: {
-          target: 'authenticated',
+, idle: {
+     , on: {
+, LOGIN: {
+         , target: 'authenticated',
           actions: assign({
-	user: ({ event }) => event.user,
+, user: ({ event }) => event.user,
             userId: ({ event }) => event.user.id
           })
         }

@@ -20,7 +20,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		showCompare?: boolean;
 		autoCompare?: boolean;
 		oncompare?: (evidence: Evidence) => void;
-		oncompared?: (data: { evidence: Evidence;, result: unknown }) => void;
+		oncompared?: (data: {, evidence: Evidence,, result: unknown }) => void;
 	}
 
 	let {

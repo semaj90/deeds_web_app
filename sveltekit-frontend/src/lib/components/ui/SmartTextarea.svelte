@@ -13,7 +13,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     className?: string; // renamed from `class`
     triggerChar?: string
     // onCommandSelect was unused â€” removed
-    onInput?: (data: { value: string;, target:HTMLTextAreaElement }) => void
+    onInput?: (data: {, value: string,, target:HTMLTextAreaElement }) => void
     onKeydown?: (e: KeyboardEvent) => void
     onCommandInsert?: (data: {
 , text: string }) => void

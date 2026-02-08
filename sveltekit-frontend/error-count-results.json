@@ -1,22 +1,22 @@
 {
   "summary": {
     "totalFiles": 878,
-    "filesWithErrors": 241,
-    "cleanFiles": 637,
-    "totalErrors": 2938
+    "filesWithErrors": 246,
+    "cleanFiles": 632,
+    "totalErrors": 2951
   },
   "errorsByCategory": {
     "src/lib/components/ui": {
-      "files": 93,
-      "errors": 236
+      "files": 94,
+      "errors": 238
     },
     "src/lib/components/ai": {
       "files": 76,
-      "errors": 2477
+      "errors": 2479
     },
     "src/lib/components/evidence": {
-      "files": 12,
-      "errors": 82
+      "files": 15,
+      "errors": 87
     },
     "src/lib/components/cases": {
       "files": 4,
@@ -27,8 +27,8 @@
       "errors": 32
     },
     "src/routes/api": {
-      "files": 40,
-      "errors": 96
+      "files": 41,
+      "errors": 100
     }
   },
   "errorsByPattern": {
@@ -38,9 +38,9 @@
     "classSpacing": 345,
     "implicitAny": 2247,
     "corruptedArrows": 192,
+    "phantomComma": 17,
     "cssSpacing": 8,
-    "exportLet": 1,
-    "phantomComma": 4
+    "exportLet": 1
   },
   "topFiles": [
     {
@@ -168,11 +168,12 @@
     {
       "file": "src\\lib\\components\\ai\\Gemma3LegalChat.svelte",
       "errors": {
+        "phantomComma": 1,
         "classSpacing": 2,
         "implicitAny": 12,
         "corruptedArrows": 2
       },
-      "errorCount": 16,
+      "errorCount": 17,
       "hasErrors": true
     },
     {
@@ -230,5 +231,5 @@
       "hasErrors": true
     }
   ],
-  "timestamp": "2026-02-08T19:51:16.916Z"
+  "timestamp": "2026-02-08T19:55:48.171Z"
 }

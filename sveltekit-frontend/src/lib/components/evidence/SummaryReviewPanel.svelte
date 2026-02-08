@@ -6,9 +6,9 @@
 	citations: Array<{ text: string; caseId?, string }>;
  keywords: string[];
 	confidence: number;
- onApprove: (data: { holding: string;, reasoning: string;
-	citations: Array<{ text: string; caseId?, string }>;
- keywords: string[];
+ onApprove: (data: {, holding: string;, reasoning: string;
+, citations: Array<{, text: string; caseId?, string }>;
+ keywords: string[],
  }) => void;
  onReject: () => void;
  isApproving?: boolean;

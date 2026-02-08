@@ -207,12 +207,12 @@ export const evidenceProcessingMachine = createMachine({
  },
 	states: {
 	idle: {
- on: {
-	UPLOAD_FILE: {
- target: 'uploading',
+, on: {
+, UPLOAD_FILE: {
+, target: 'uploading',
  actions: assign({
-	file: ({ event }: {
-	event: any }) => event.file,
+, file: ({ event }: {
+, event: any }) => event.file,
  evidenceId: ({ event }: {
 	event: any }) => event.evidenceId,
  uploadProgress: 0,
@@ -242,7 +242,7 @@ export const evidenceProcessingMachine = createMachine({
  actions: assign({
 	uploadProgress: 100,
  streamingUpdates: ({ context }: {
-	context: EvidenceProcessingContext }) => [
+, context: EvidenceProcessingContext }) => [
  ...context.streamingUpdates,
  {
  step: 'upload',
@@ -291,7 +291,7 @@ export const evidenceProcessingMachine = createMachine({
 	target: 'generatingGlyph',
  actions: assign({
 	analysisResults: ({ event }: {
-	event: any }) => event.output,
+, event: any }) => event.output,
  streamingUpdates: ({ context }: {
 	context: EvidenceProcessingContext }) => [
  ...context.streamingUpdates,
@@ -450,7 +450,7 @@ export const evidenceProcessingMachine = createMachine({
 	target: 'storingInMinIO',
  actions: assign({
 	portableArtifact: ({ event }: {
-	event: any }) => ({
+, event: any }) => ({
  enhancedPngUrl: event.output.enhancedPngUrl,
  metadata: event.output.metadata,
  compressionRatio: event.output.metadata.neural_sprite_data?.compression_ratio,
@@ -511,7 +511,7 @@ export const evidenceProcessingMachine = createMachine({
 	target: 'completed',
  actions: assign({
 	minioStorage: ({ event }: {
-	event: any }) => event.output,
+, event: any }) => event.output,
  processingTimeMs: ({ context }: {
 	context: EvidenceProcessingContext }) => Date.now() - context.processingTimeMs,
  streamingUpdates: ({ context }: {
@@ -552,7 +552,7 @@ export const evidenceProcessingMachine = createMachine({
 	type: 'final',
  entry: assign({
 	processingTimeMs: ({ context }: {
-	context: EvidenceProcessingContext }) => Date.now() - context.processingTimeMs,
+, context: EvidenceProcessingContext }) => Date.now() - context.processingTimeMs,
  }),
  on: {
 	RESET: 'idle',

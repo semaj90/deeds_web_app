@@ -42,7 +42,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
       // Connect to NATS for real-time updates if (natsMessaging) { natsConnection = await natsMessaging.connect(); subscribeToUpdates()}
 
-      // Initialize RAG machine ragMachine = createActor(chatMachine, { services: { generateEmbeddings: async (context) => { if (gemma3Bridge) { return await gemma3Bridge.generateEmbeddings(context.currentQuery)}
+      // Initialize RAG machine ragMachine = createActor(chatMachine, { services: {, generateEmbeddings: async (context) => { if (gemma3Bridge) { return await gemma3Bridge.generateEmbeddings(context.currentQuery)}
 
             // Fallback to server-side embedding return await fetch('/api/embeddings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

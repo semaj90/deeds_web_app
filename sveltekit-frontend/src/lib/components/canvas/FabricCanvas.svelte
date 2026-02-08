@@ -5,7 +5,7 @@
 		readOnly: boolean;
 		gridEnabled: boolean;
 		snapToGrid: boolean;
-		onSave: (data: { objects: unknown[] }) => Promise<void>;
+		onSave: (data: {, objects: unknown[] }) => Promise<void>;
 	}>();
 
 	// Placeholder for the actual Fabric.js canvas implementation.

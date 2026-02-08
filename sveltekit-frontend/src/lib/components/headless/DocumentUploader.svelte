@@ -45,7 +45,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     onUploadComplete?: (event: {
 , file: MinIOFile }) => void;
     onUploadError?: (event: {
-, error: string; file?: File }) => void;
+, error: string, file?: File }) => void;
     onAllUploadsComplete?: (event: {
 , files: MinIOFile[] }) => void;
     children?: Snippet<[SlotProps]>;

@@ -15,7 +15,7 @@
  import { createCaseCreationForm } from '$lib/forms/superforms-xstate-integration';
  import type { SuperValidated } from 'sveltekit-superforms'; // Svelte, 5 Props Interface interface Props { data?: any; // SuperValidated<CaseForm> submitAction?: string; editMode?: boolean; enableAutoSave?: boolean; enableRealTimeValidation?: boolean; onsubmit?: (_event: {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types',
 , data: CaseForm }) => void; onsuccess?: (_event: {
 , caseItem: any }) => void; onerror?: (_event: {
 , message: string }) => void; ondraft?: (_event: {

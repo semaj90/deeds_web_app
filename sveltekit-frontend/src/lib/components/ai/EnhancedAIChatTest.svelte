@@ -32,7 +32,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     // Add messages and clear input messages = [...messages, userMessage, loadingMessage]; const messageContent = currentMessage; // Fixed typo currentMessage = ''; isLoading = true; // Scroll to bottom await tick(); scrollToBottom(); try { const response = await fetch('/api/contextual/chat', { // Changed from /api/chat to /api/contextual/chat method: 'POST', headers: {
           'Content-Type': 'application/json'
         },
-	body: JSON.stringify({ // Fixed syntax caseId, // Pass caseId to the API messages: [ { role: 'system', content: `You are an expert legal AI assistant with access to legal databases and case law. You are running locally on an RTX, 3060 Ti GPU using the Gemma3-legal-enhanced model. Provide accurate, helpful legal information while noting that you provide general information only and not legal advice.${caseId ? ` Context: Case ID ${ caseId }`: ''}` },
+	body: JSON.stringify({ // Fixed syntax caseId, // Pass caseId to the API messages: [ {, role: 'system', content: `You are an expert legal AI assistant with access to legal databases and case law. You are running locally on an RTX, 3060 Ti GPU using the Gemma3-legal-enhanced model. Provide accurate, helpful legal information while noting that you provide general information only and not legal advice.${caseId ? ` Context: Case ID ${ caseId }`: ''}` },
 	...messages .filter((m) => !m.loading && !m.error) .map((m) => ({ role: m.role;, content: m.content })), { role: 'user';, content: messageContent, // Fixed syntax }]
         }) }); if (!response.ok) { throw new Error(`HTTP ${response.status}: ${response.statusText}`)}
 

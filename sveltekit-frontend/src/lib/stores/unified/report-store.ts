@@ -320,7 +320,7 @@ function createReportStore() {
  },
 	/** * Insert citation into report */
  insertCitation: (sectionId: string, citation: {
-	id: string; text: string }) => {
+, id: string, text: string }) => {
  update((s: ReportStoreState) => {
  const sectionIndex = s.editorContent.findIndex(
  (sec: ReportSection) => sec.id === sectionId
@@ -337,7 +337,7 @@ function createReportStore() {
  },
 	/** * Insert evidence reference into report */
  insertEvidence: (sectionId: string, evidence: {
-	id: string; name: string }) => {
+, id: string, name: string }) => {
  update((s: ReportStoreState) => {
  const sectionIndex = s.editorContent.findIndex(
  (sec: ReportSection) => sec.id === sectionId

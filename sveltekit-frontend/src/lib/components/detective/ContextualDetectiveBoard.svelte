@@ -129,14 +129,14 @@
       });
 
       // Handle real-time updates
-      wsManager.onMessage('connection_map_update', (data: { action?: string; connectionMap?: unknown }) => {
+      wsManager.onMessage('connection_map_update', (data: { action?: string, connectionMap?: unknown }) => {
         if (data.action === 'generated') {
           connectionMap = data.connectionMap as typeof connectionMap;
           console.log('[Collaboration] Connection map updated by remote user');
         }
       });
 
-      wsManager.onMessage('evidence_analysis', (data: { action?: string; evidenceId?: string; analysis?: unknown }) => {
+      wsManager.onMessage('evidence_analysis', (data: { action?: string; evidenceId?: string, analysis?: unknown }) => {
         if (data.action === 'completed') {
           // Update evidence list with remote analysis
           evidenceList = evidenceList.map((item: unknown) => {
