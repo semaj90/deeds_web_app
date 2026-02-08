@@ -1,7 +1,7 @@
 <script lang="ts">
   interface Props {
     pendingFile?: File | { name: string; [key: string]: unknown };
-    onSelect?: (event: { file: unknown,, action: string }) => void;
+    onSelect?: (event: { file: unknown, action: string }) => void;
     onClose?: () => void }
 
   let {

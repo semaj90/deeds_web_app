@@ -25,7 +25,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  isSelected?: boolean;
  isPendingLinkSource?: boolean;
  linkMode?: boolean;
-	onSelect: (data: { nodeId: string,, multiSelect: boolean }) => void;
+	onSelect: (data: { nodeId: string, multiSelect: boolean }) => void;
  onMove: (data: { nodeId: string; x: number,
 y: number }) => void;
  onLink?: (data: {

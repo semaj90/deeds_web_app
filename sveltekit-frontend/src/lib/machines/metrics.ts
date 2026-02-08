@@ -28,7 +28,7 @@ export const createMetricsMachine = () =>
  id: 'metrics',
  initial: 'idle',
  context: {
- metrics: null, error: null,, retryCount, maxRetries: 3
+ metrics: null, error: null, retryCount, maxRetries: 3
  },
  states: {
  idle: {
@@ -36,7 +36,7 @@ export const createMetricsMachine = () =>
  FETCH: 'updating',
  RESET: {
  actions: assign({
- metrics: null, error: null,, retryCount,
+ metrics: null, error: null, retryCount,
  }),
  },
  },
@@ -74,7 +74,7 @@ export const createMetricsMachine = () =>
  RESET: {
  target: 'idle',
  actions: assign({
- metrics: null, error: null,, retryCount,
+ metrics: null, error: null, retryCount,
  }),
  },
  },
@@ -84,7 +84,7 @@ export const createMetricsMachine = () =>
  RESET: {
  target: 'idle',
  actions: assign({
- metrics: null, error: null,, retryCount,
+ metrics: null, error: null, retryCount,
  }),
  },
  },

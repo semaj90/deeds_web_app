@@ -8,7 +8,7 @@ import * as Switch from "bits-ui/components/switch";
   let {
     onSearch
   }: {
-    onSearch?: (params: { query: string; threshold: number,, semantic: boolean }) => void
+    onSearch?: (params: { query: string; threshold: number, semantic: boolean }) => void
   } = $props();
 
   // State

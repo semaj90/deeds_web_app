@@ -118,7 +118,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  fallbacks: new Map(),
  },
  context7Integration || {
- svelteComplete: null, drizzleOrmDocs: null,, xStateDocs, null: new Map(),
+ svelteComplete: null, drizzleOrmDocs: null, xStateDocs, null: new Map(),
  }
  );
  result.generatedFiles = Object.keys(generatedStores);

@@ -5,7 +5,7 @@
     open?: boolean
     title?: string
     onClose?: () => void
-    onSubmit?: (payload: { email: string,, password: string }) => void
+    onSubmit?: (payload: { email: string, password: string }) => void
     form?: any}
   // Svelte 5 runes - props via $props()
   let {
