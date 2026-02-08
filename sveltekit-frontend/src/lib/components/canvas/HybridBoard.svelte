@@ -51,7 +51,7 @@
 
 	// ===== State (Svelte 5 runes) =====
 	const getInitialViewport = (): BoardViewport =>
-		initialSnapshot?.viewport ? { ...initialSnapshot.viewport } : { pan: {, x: 0, y: 0 },
+		initialSnapshot?.viewport ? { ...initialSnapshot.viewport } : { pan: { x: 0, y: 0 },
 	zoom: 1 };
 
 	const getInitialNodes = (): BoardNode[] =>

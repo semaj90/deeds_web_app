@@ -14,7 +14,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
    // Format confidence as percentage function formatConfidence(confidence: number): string { return Math.round(confidence * 100) + '%'}
 
-  // Format execution time function formatExecutionTime(ms: number): string { if (ms < 1000) return `${ ms }ms`; return `${(ms / 1000).toFixed(1)}s`}
+  // Format execution time function formatExecutionTime(ms: number): string { if (ms < 1000) return `${ms}ms`; return `${(ms / 1000).toFixed(1)}s`}
 </script>
  <div class="chat-message {message.role}" role="article" aria-label="{message.role} message"> <div class="message-header"> <div class="message-role">
   {#if message.role === 'user'} <svg width="20"

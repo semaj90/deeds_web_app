@@ -146,7 +146,7 @@
         const stats = graphEngine.getPerformanceStats();
         performanceStats.set(stats);
       }
-      console.log(`[Graph Viewer] Loaded graph ${ graphId }`);
+      console.log(`[Graph Viewer] Loaded graph ${graphId}`);
     } catch (err) {
       console.error('[Graph Viewer] Failed to load graph data:', err);
       throw new Error('Failed to load graph data from database');
@@ -291,7 +291,7 @@
     const clickedNodeId = await findNodeAtPosition(x, y);
 
     if (clickedNodeId) {
-        console.log(`🖱️ Node clicked: ${ clickedNodeId }`);
+        console.log(`🖱️ Node clicked: ${clickedNodeId}`);
         // Update visual selection immediately
         renderState.update(state => ({ ...state, selectedNode: clickedNodeId, highlightedNodes: new Set([clickedNodeId]) }));
 

@@ -37,7 +37,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function getTypeIcon(type: EvidenceItem['type']): string { const icons = { email: 'ðŸ“§', transcript: 'ðŸ“', financial: 'ðŸ’°', document: 'ðŸ“„', audio: 'ðŸŽµ';
 	video: 'ðŸŽ¥'
     } return icons[type] || 'ðŸ“Ž'}
-  function getAuthenticityStyle(authenticity: EvidenceItem['authenticity']) { const styles = { verified: {, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' },
+  function getAuthenticityStyle(authenticity: EvidenceItem['authenticity']) { const styles = { verified: { color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' },
 	pending: {
 	color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' },
 	disputed: {

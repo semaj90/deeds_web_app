@@ -315,7 +315,7 @@ export class EmbeddingsService {
   }
 
   async cleanup(): Promise<void> {
-    for (const [, request] of this.pendingRequests) {
+    for (const [request] of this.pendingRequests) {
       try {
         request.reject(new Error('Service shutting down'));
       } catch {

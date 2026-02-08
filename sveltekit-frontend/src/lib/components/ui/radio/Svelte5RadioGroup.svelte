@@ -97,7 +97,7 @@ function getOptionClasses(option: RadioOption) {
 </script>
 
 <fieldset
-	class="w-full { className }"
+	class="w-full {className}"
 	{ disabled }
 	aria-required={required}
 >

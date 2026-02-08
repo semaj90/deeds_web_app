@@ -17,7 +17,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   async function initializeMCPConnection(): Promise<void> { mcpStatus.set('connecting'); try { // Assuming /mcp/health is proxied by SvelteKit backend const response = await fetch('/mcp/health'); if (response.ok) { mcpStatus.set('connected'); mcpTools.set( availableMCPTools.map(tool => ({ ...tool, status: 'available', successCount: 0, errorCount: 0 }) as McpTool) )} else { throw new Error('MCP health check failed')}
     } catch (err) { console.warn('MCP connection failed (non-blocking):', err); mcpStatus.set('disconnected')}
   }
-  function setupWebSocketConnection() { if (!browser) return; // Only run in browser try { const protocol = window.location.protocol === 'https:' ? 'wss:': 'ws:'; // Assuming /mcp/ws is proxied by SvelteKit backend wsConnection = new WebSocket(`${ protocol }
+  function setupWebSocketConnection() { if (!browser) return; // Only run in browser try { const protocol = window.location.protocol === 'https:' ? 'wss:': 'ws:'; // Assuming /mcp/ws is proxied by SvelteKit backend wsConnection = new WebSocket(`${protocol}
 
   //${window.location.host}/mcp/ws`); wsConnection.addEventListener('open', () => { // no-op }); wsConnection.addEventListener('message', ev => { try { const data = JSON.parse(ev.data); handleRealtimeUpdate(data)} catch (e) { console.warn('Invalid WS message', e)}
       }); wsConnection.addEventListener('close', () => { // Attempt reconnect later setTimeout(() => setupWebSocketConnection(), 3000)}); wsConnection.addEventListener('error', (event) => { console.error('WebSocket error:', event); mcpStatus.set('error')})} catch (e) { console.warn('WebSocket setup failed (non-fatal)', e); mcpStatus.set('error')}

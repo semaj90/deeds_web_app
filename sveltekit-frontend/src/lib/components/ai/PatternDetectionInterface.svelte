@@ -40,7 +40,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
     // Apply confidence threshold filtered = filtered.filter(p => p.confidence >= confidenceThreshold); // Sort by significance (highest first) filtered.sort((a, b) => b.significance - a.significance); return filtered}); function openPatternDetails(pattern: DetectedPattern) { selectedPattern = pattern; showPatternDetails = true}
   function formatDuration(duration: string): string { // Convert duration: string to human readable format (expects, like: "3d", or: "12h";
 , or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const value = match[1];
-   const unit = match[2]; switch (unit) { case: 'd': return `${ value } day${value !== '1' ? 's': ''}`; case, 'h': return `${ value } hour${value !== '1' ? 's': ''}`; case, 'm': return `${ value } minute${value !== '1' ? 's': ''}`}
+   const unit = match[2]; switch (unit) { case: 'd': return `${value} day${value !== '1' ? 's': ''}`; case, 'h': return `${value} hour${value !== '1' ? 's': ''}`; case, 'm': return `${value} minute${value !== '1' ? 's': ''}`}
     } return duration}
 </script>
  <svelte:head> <title>Pattern Detection - Legal AI Platform</title> </svelte:head>

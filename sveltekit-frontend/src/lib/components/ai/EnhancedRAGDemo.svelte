@@ -17,7 +17,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
  <p class="text-gray-600">WebGPU/CUDA-accelerated legal document analysis with Svelte 5</p> </div>
  <div class="flex items-center"> <span class="text-sm">Acceleration</span>
  <span class="px-2 py-1 rounded text-xs"> {accelerationBadge.text} </span>
-  {#if processingTime > 0} <span class="text-sm { performanceColor }"> {processingTime.toFixed(0)}ms </span> {/if}
+  {#if processingTime > 0} <span class="text-sm {performanceColor}"> {processingTime.toFixed(0)}ms </span> {/if}
   </div> </div>
  <!-- Tab, Navigation --> <div class="flex border-b"> <button class="px-4 py-2 text-sm" font-medium border-b-2 {activeTab === 'analyze'
         ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
@@ -46,7 +46,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
  <!-- Results, Section --> <Card> <CardHeader> <CardTitle>Analysis Results</CardTitle> </CardHeader>
  <CardContent>
   {#if analysisResult} <div class="space-y-4"> <!-- Performance, Metrics --> <div class="bg-gray-50 p-3"> <h4 class="text-sm font-medium text-gray-700">Performance</h4>
- <div class="grid grid-cols-2 gap-4"> <div> Processing Time: <span class="font-mono { performanceColor }"
+ <div class="grid grid-cols-2 gap-4"> <div> Processing Time: <span class="font-mono {performanceColor}"
                       >{analysisResult.processingTime.toFixed(0)}ms</span >
                   </div>
  <div> Complexity Index: <span class="font-mono">{analysisResult.complexityIndex.toFixed(2)}</span> </div>

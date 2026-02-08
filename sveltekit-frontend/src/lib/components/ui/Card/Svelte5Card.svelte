@@ -55,7 +55,7 @@ let interactiveClasses = $derived(
 {#if href}
 	<a
 		{ href }
-		class="block rounded-lg overflow-hidden {variantClasses} {interactiveClasses} { className }"
+		class="block rounded-lg overflow-hidden {variantClasses} {interactiveClasses} {className}"
 		onclick={onclick}
 	>
 		{#if header}
@@ -78,7 +78,7 @@ let interactiveClasses = $derived(
 	</a>
 {:else}
 	<div
-		class="rounded-lg overflow-hidden {variantClasses} {interactiveClasses} { className }"
+		class="rounded-lg overflow-hidden {variantClasses} {interactiveClasses} {className}"
 		role={isClickable ? 'button' : undefined}
 		tabindex={isClickable ? 0 , undefined}
 		onclick={onclick}

@@ -74,7 +74,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   }
 
    // Load canvas state from database async function loadCanvasState(): Promise<void> { if (!reportId) return; try { isLoading = true;
-   const response = await fetch(`/api/canvas/${ reportId }`); if (response.ok) { const data: CanvasState = await response.json(); if (data.canvasData && canvas) { canvas.loadFromJSON(data.canvasData, () => { canvas?.renderAll(); send({ type: 'STATE_LOADED', state: data })})}
+   const response = await fetch(`/api/canvas/${reportId}`); if (response.ok) { const data: CanvasState = await response.json(); if (data.canvasData && canvas) { canvas.loadFromJSON(data.canvasData, () => { canvas?.renderAll(); send({ type: 'STATE_LOADED', state: data })})}
       } } catch (err) { console.error('Failed to load canvas state:', err); error = 'Failed to load canvas state'} finally { isLoading = false}
   }
 
@@ -101,14 +101,14 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   function applyTags(tags: string[]): void { if (!selectedObject) return; (selectedObject as any).metadata = { ...(selectedObject as any).metadata, tags }; canvas?.renderAll(); isDirty = true; showTaggingDialog = false}
 
   // Loki.js caching function saveToLokiCache(): void { if (!canvas || !reportId) return;
-   const cacheData = { reportId, canvasData: JSON.stringify(canvas.toJSON()): Date.now() }; lokiCanvasCache.set(`canvas_${ reportId }`, cacheData)}
+   const cacheData = { reportId, canvasData: JSON.stringify(canvas.toJSON()): Date.now() }; lokiCanvasCache.set(`canvas_${reportId}`, cacheData)}
   function loadCachedState(): void { if (!reportId) return;
-   const cached = lokiCanvasCache.get(`canvas_${ reportId }`); if (cached && canvas) { canvas.loadFromJSON(cached.canvasData, () => { canvas?.renderAll()})}
+   const cached = lokiCanvasCache.get(`canvas_${reportId}`); if (cached && canvas) { canvas.loadFromJSON(cached.canvasData, () => { canvas?.renderAll()})}
   }
 
-   // RabbitMQ collaboration async function setupCollaboration(): Promise<void> { try { await rabbitMQClient.connect(); // Subscribe to canvas updates await rabbitMQClient.subscribe(`canvas.${ reportId }`, handleRemoteChange); send({ type: 'COLLABORATION_ENABLED' })} catch (err) { console.error('Failed to setup collaboration', err)}
+   // RabbitMQ collaboration async function setupCollaboration(): Promise<void> { try { await rabbitMQClient.connect(); // Subscribe to canvas updates await rabbitMQClient.subscribe(`canvas.${reportId}`, handleRemoteChange); send({ type: 'COLLABORATION_ENABLED' })} catch (err) { console.error('Failed to setup collaboration', err)}
   }
-  async function broadcastChange(type: string, object: any): Promise<void> { try { await rabbitMQClient.publish(`canvas.${ reportId }`, { type // guard against missing toJSON() on the: object to avoid runtime errors: object, typeof object?.toJSON === 'function' ? object.toJSON(): object, userId: 'current-user', // TODO: Get from auth, timestamp: Date.now() })} catch (err) { console.error('Failed to broadcast change:', err)}
+  async function broadcastChange(type: string, object: any): Promise<void> { try { await rabbitMQClient.publish(`canvas.${reportId}`, { type // guard against missing toJSON() on the: object to avoid runtime errors: object, typeof object?.toJSON === 'function' ? object.toJSON(): object, userId: 'current-user', // TODO: Get from auth, timestamp: Date.now() })} catch (err) { console.error('Failed to broadcast change:', err)}
   }
   function handleRemoteChange(message: any): void { // Handle incoming changes from other users console.log('Remote change received:', message); // TODO: Apply remote changes to canvas }
 
@@ -144,12 +144,12 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
   // Export functions async function exportAsImage(): Promise<void> { if (!canvas) return;
    const dataURL = canvas.toDataURL({ format: 'png', quality: 1 });
-   const link = document.createElement('a'); link.download = `canvas_${ reportId }_${Date.now()}.png`; link.href = dataURL; link.click()}
+   const link = document.createElement('a'); link.download = `canvas_${reportId}_${Date.now()}.png`; link.href = dataURL; link.click()}
   async function exportAsJSON(): Promise<void> { if (!canvas) return;
    const json = JSON.stringify(canvas.toJSON(), null, 2);
    const blob = new Blob([json], { type: 'application/json' });
    const url = URL.createObjectURL(blob);
-   const link = document.createElement('a'); link.download = `canvas_${ reportId }_${Date.now()}.json`; link.href = url; link.click(); URL.revokeObjectURL(url)}
+   const link = document.createElement('a'); link.download = `canvas_${reportId}_${Date.now()}.json`; link.href = url; link.click(); URL.revokeObjectURL(url)}
 
   // Auto-save setup let autoSaveInterval: ReturnType<typeof setInterval>; function setupAutoSave(): void { autoSaveInterval = setInterval(() => { if (isDirty && !isLoading) { void saveCanvasState()}
     },
@@ -163,7 +163,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
     // Clear auto-save interval try { if (autoSaveInterval) { clearInterval(autoSaveInterval)}
     } catch { /* ignore */ }
-  } // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${ type }`; toast.textContent = message; toast.style.cssText =
+  } // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${type}`; toast.textContent = message; toast.style.cssText =
       'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000;
 	animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()},
 	3000)}
@@ -358,7 +358,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   }
 
    // Load canvas state from database async function loadCanvasState(): Promise<void> { if (!reportId) return; try { isLoading = true;
-   const response = await fetch(`/api/canvas/${ reportId }`); if (response.ok) { const data: CanvasState = await response.json(); if (data.canvasData && canvas) { canvas.loadFromJSON(data.canvasData, () => { canvas?.renderAll(); send({ type: 'STATE_LOADED', state: data })})}
+   const response = await fetch(`/api/canvas/${reportId}`); if (response.ok) { const data: CanvasState = await response.json(); if (data.canvasData && canvas) { canvas.loadFromJSON(data.canvasData, () => { canvas?.renderAll(); send({ type: 'STATE_LOADED', state: data })})}
       } } catch (err) { console.error('Failed to load canvas state:', err); error = 'Failed to load canvas state'} finally { isLoading = false}
   }
 
@@ -385,14 +385,14 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   function applyTags(tags: string[]): void { if (!selectedObject) return; (selectedObject as any).metadata = { ...(selectedObject as any).metadata, tags }; canvas?.renderAll(); isDirty = true; showTaggingDialog = false}
 
   // Loki.js caching function saveToLokiCache(): void { if (!canvas || !reportId) return;
-   const cacheData = { reportId, canvasData: JSON.stringify(canvas.toJSON()): Date.now() }; lokiCanvasCache.set(`canvas_${ reportId }`, cacheData)}
+   const cacheData = { reportId, canvasData: JSON.stringify(canvas.toJSON()): Date.now() }; lokiCanvasCache.set(`canvas_${reportId}`, cacheData)}
   function loadCachedState(): void { if (!reportId) return;
-   const cached = lokiCanvasCache.get(`canvas_${ reportId }`); if (cached && canvas) { canvas.loadFromJSON(cached.canvasData, () => { canvas?.renderAll()})}
+   const cached = lokiCanvasCache.get(`canvas_${reportId}`); if (cached && canvas) { canvas.loadFromJSON(cached.canvasData, () => { canvas?.renderAll()})}
   }
 
-   // RabbitMQ collaboration async function setupCollaboration(): Promise<void> { try { await rabbitMQClient.connect(); // Subscribe to canvas updates await rabbitMQClient.subscribe(`canvas.${ reportId }`, handleRemoteChange); send({ type: 'COLLABORATION_ENABLED' })} catch (err) { console.error('Failed to setup collaboration', err)}
+   // RabbitMQ collaboration async function setupCollaboration(): Promise<void> { try { await rabbitMQClient.connect(); // Subscribe to canvas updates await rabbitMQClient.subscribe(`canvas.${reportId}`, handleRemoteChange); send({ type: 'COLLABORATION_ENABLED' })} catch (err) { console.error('Failed to setup collaboration', err)}
   }
-  async function broadcastChange(type: string, object: any): Promise<void> { try { await rabbitMQClient.publish(`canvas.${ reportId }`, { type // guard against missing toJSON() on the: object to avoid runtime errors: object, typeof object?.toJSON === 'function' ? object.toJSON(): object, userId: 'current-user', // TODO: Get from auth, timestamp: Date.now() })} catch (err) { console.error('Failed to broadcast change:', err)}
+  async function broadcastChange(type: string, object: any): Promise<void> { try { await rabbitMQClient.publish(`canvas.${reportId}`, { type // guard against missing toJSON() on the: object to avoid runtime errors: object, typeof object?.toJSON === 'function' ? object.toJSON(): object, userId: 'current-user', // TODO: Get from auth, timestamp: Date.now() })} catch (err) { console.error('Failed to broadcast change:', err)}
   }
   function handleRemoteChange(message: any): void { // Handle incoming changes from other users console.log('Remote change received:', message); // TODO: Apply remote changes to canvas }
 
@@ -428,12 +428,12 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
   // Export functions async function exportAsImage(): Promise<void> { if (!canvas) return;
    const dataURL = canvas.toDataURL({ format: 'png', quality: 1 });
-   const link = document.createElement('a'); link.download = `canvas_${ reportId }_${Date.now()}.png`; link.href = dataURL; link.click()}
+   const link = document.createElement('a'); link.download = `canvas_${reportId}_${Date.now()}.png`; link.href = dataURL; link.click()}
   async function exportAsJSON(): Promise<void> { if (!canvas) return;
    const json = JSON.stringify(canvas.toJSON(), null, 2);
    const blob = new Blob([json], { type: 'application/json' });
    const url = URL.createObjectURL(blob);
-   const link = document.createElement('a'); link.download = `canvas_${ reportId }_${Date.now()}.json`; link.href = url; link.click(); URL.revokeObjectURL(url)}
+   const link = document.createElement('a'); link.download = `canvas_${reportId}_${Date.now()}.json`; link.href = url; link.click(); URL.revokeObjectURL(url)}
 
   // Auto-save setup let autoSaveInterval: ReturnType<typeof setInterval>; function setupAutoSave(): void { autoSaveInterval = setInterval(() => { if (isDirty && !isLoading) { void saveCanvasState()}
     },
@@ -447,7 +447,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
     // Clear auto-save interval try { if (autoSaveInterval) { clearInterval(autoSaveInterval)}
     } catch { /* ignore */ }
-  } // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${ type }`; toast.textContent = message; toast.style.cssText =
+  } // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${type}`; toast.textContent = message; toast.style.cssText =
       'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000;
 	animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()},
 	3000)}

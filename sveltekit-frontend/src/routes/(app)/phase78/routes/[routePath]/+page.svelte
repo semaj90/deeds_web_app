@@ -123,21 +123,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="flex">
  <button
  onclick={() => (tab = 'errors')}
- class={`flex-1 py-4 px-6 font-semibold border-b-2 transition text-center ${
- tab === 'errors'
+ class={`flex-1 py-4 px-6 font-semibold border-b-2 transition text-center ${tab === 'errors'
  ? 'border-blue-600 text-blue-600 bg-blue-50'
- : 'border-transparent text-gray-600 hover:text-gray-900'
- }`}
+ : 'border-transparent text-gray-600 hover:text-gray-900'}`}
  >
  🔴 Errors ({errors.length})
  </button>
  <button
  onclick={() => (tab = 'suggestions')}
- class={`flex-1 py-4 px-6 font-semibold border-b-2 transition text-center ${
- tab === 'suggestions'
+ class={`flex-1 py-4 px-6 font-semibold border-b-2 transition text-center ${tab === 'suggestions'
  ? 'border-blue-600 text-blue-600 bg-blue-50'
- : 'border-transparent text-gray-600 hover:text-gray-900'
- }`}
+ : 'border-transparent text-gray-600 hover:text-gray-900'}`}
  >
  💡 Suggestions ({suggestions.length})
  </button>

@@ -10,7 +10,7 @@ export type UploadResult = {
     message?: string;
 };
 
-export type FileState = { file: File;, status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error' | 'canceled';
+export type FileState = { file: File; status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error' | 'canceled';
     progress: number; // 0-100
     attempts: number;
 	error: string | null;

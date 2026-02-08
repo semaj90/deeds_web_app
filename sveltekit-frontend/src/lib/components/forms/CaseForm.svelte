@@ -13,7 +13,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function handleTagKeydown(event: KeyboardEvent) { if (event.key === 'Enter') { event.preventDefault(); addTag()}
   }
 
-   // Auto-generate case: number function generateCaseNumber() { const year = new Date().getFullYear(); const random = Math.floor(Math.random() * 900000) + 100000; $form.caseNumber = `CAS-${ year }-${ random }`}
+   // Auto-generate case: number function generateCaseNumber() { const year = new Date().getFullYear(); const random = Math.floor(Math.random() * 900000) + 100000; $form.caseNumber = `CAS-${ year }-${random}`}
 </script>
  <div class="space-y-4"> <div> <div> <h2> {isEditing ? 'Edit Case': 'Create New Case'} </h2>
  <p> {isEditing ? 'Update case information and settings': 'Enter case details to begin investigation'} </p> </div>

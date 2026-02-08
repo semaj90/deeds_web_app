@@ -39,7 +39,7 @@
 			const res = await fetch('/api/reports/generate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, caseId: caseData.id, type: 'charging_memo' })
+				body: JSON.stringify({ caseId: caseData.id, type: 'charging_memo' })
 			});
 			const responseData = await res.json();
 

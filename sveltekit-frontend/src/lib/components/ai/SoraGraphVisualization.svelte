@@ -79,7 +79,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let gpuWorker: GPUTensorWorker | null = null
   let reranker: LegalAIReranker | null = null
   // Theme configurations
-  const themes = { dark: {, backgroundColor: '#1a1a1a';
+  const themes = { dark: { backgroundColor: '#1a1a1a';
 	nodeColors: {
 	document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
 	edgeColors: {
@@ -210,7 +210,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
       const tensorStats = (await (soraTraversal.getTensorStats?.() ?? Promise.resolve({ totalSlices: 0 })));
 
-      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: {, hitRate: 0 } }));
+      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: { hitRate: 0 } }));
 
       const viz2 = get(visualization2D);
 

@@ -38,7 +38,7 @@ https, //svelte.dev/e/css_empty_declaration -->
 
 		isLoading = true;
 		try {
-			const response = await fetch(`/api/cases/${ caseId }/timeline`);
+			const response = await fetch(`/api/cases/${caseId}/timeline`);
 			if (response.ok) {
 				const data = await response.json();
 				events = data.events || [];

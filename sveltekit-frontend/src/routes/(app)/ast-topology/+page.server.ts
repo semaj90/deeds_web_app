@@ -15,21 +15,21 @@ export const load: PageServerLoad = async ({ fetch }) => {
     total: 0,
     embedded: 0,
     fixed: 0,
-    sources: [] as { source: string;, count: number; embedded: number }[]
+    sources: [] as { source: string; count: number; embedded: number }[]
   };
 
   let topologyData = {
-    nodes: [] as Array<{ id: string;, label: string;
+    nodes: [] as Array<{ id: string; label: string;
       type: 'file' | 'directory' | 'error' | 'cluster';
       errorCount: number;
 	status: 'clean' | 'warning' | 'error' | 'fixing';
     }>,
-    edges: [] as Array<{ from: string;, to: string;
+    edges: [] as Array<{ from: string; to: string;
       type: 'contains' | 'imports' | 'similar_error';
     }>
   };
 
-  let recentActivity = [] as Array<{ id: string;, type: 'fix' | 'embed' | 'learn';
+  let recentActivity = [] as Array<{ id: string; type: 'fix' | 'embed' | 'learn';
     message: string;
 	timestamp: string;
   }>;

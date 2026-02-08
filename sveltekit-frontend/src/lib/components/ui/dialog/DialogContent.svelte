@@ -80,7 +80,7 @@ let contentRef = $state<HTMLDivElement | null>(null);
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		bind:this={contentRef}
-		class="{defaultClass} { className }"
+		class="{defaultClass} {className}"
 		transition:scale={{
 			duration: 150,
 			start: 0.95

@@ -46,7 +46,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			const response = await fetch('/api/phase89/agentic-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({, cluster_id: clusterId, enable_tools: true })
+	body: JSON.stringify({ cluster_id: clusterId, enable_tools: true })
 			});
 
 			if (!response.body) throw new Error('No response body');

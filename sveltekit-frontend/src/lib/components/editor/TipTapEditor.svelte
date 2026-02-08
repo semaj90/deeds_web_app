@@ -27,7 +27,7 @@
 		const editorInstance = new Editor({
 			element: editorElement,
 			extensions: [
-				StarterKit.configure({, heading: {, levels: [1, 2, 3]
+				StarterKit.configure({ heading: { levels: [1, 2, 3]
 					}
 				}),
 				Placeholder.configure({

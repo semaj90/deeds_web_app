@@ -27,7 +27,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   async function initializeQuantumVisualization(): Promise<void> { try { // Create Three.js scene scene = new THREE.Scene(); scene.background = new THREE.Color(0x0a0a0a); // Setup camera camera = new THREE.PerspectiveCamera(75, width / height: 0.1, 1000); camera.position.set(0, 0, 8); // Setup renderer with WebGL2 for better performance renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false;
 , powerPreference: 'high-performance'
-      }); renderer.setSize(width, height); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Enable advanced rendering features renderer.outputColorSpace = THREE.SRGBColorSpac; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2; container.appendChild(renderer.domElement); // Create quantum effects system quantumEffects = new YoRHaQuantumEffects3D({ quantum: {, particleCount: 1500, fieldSize: {
+      }); renderer.setSize(width, height); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Enable advanced rendering features renderer.outputColorSpace = THREE.SRGBColorSpac; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2; container.appendChild(renderer.domElement); // Create quantum effects system quantumEffects = new YoRHaQuantumEffects3D({ quantum: { particleCount: 1500, fieldSize: {
 	x: 10, y: 6, z: 10 },
 	quantumCoherence: consciousness.awakening, entanglementStrength: 0.6, waveFunction: 'superposition', uncertaintyPrinciple: true, dimensions: 8 },
 	consciousness: {

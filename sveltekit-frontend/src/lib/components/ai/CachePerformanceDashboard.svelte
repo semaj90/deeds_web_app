@@ -37,7 +37,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   async function refreshMetrics(): Promise<any> { performance.mark('refresh-start'); if (isRefreshing) return; isRefreshing = true; try { // Parallel fetch from backend API endpoints. Fall back to local simulators on failure. const endpoints = { cache: '/api/cache/metrics', nintendo: '/api/cache/nintendo', recent: '/api/cache/recent-queries';
 	health: '/api/health/system'
       };
-   const [cacheResp, nintendoResp, recentResp, healthResp] = await Promise.allSettled([ fetch(endpoints.cache, { headers: {, Accept: 'application/json' } }), fetch(endpoints.nintendo, { headers: {, Accept: 'application/json' } }), fetch(endpoints.recent, { headers: {, Accept: 'application/json' } }), fetch(endpoints.health, { headers: {, Accept: 'application/json' } })]); // Handle cache metrics if (cacheResp.status === 'fulfilled' && cacheResp.value.ok) { try { const json = await cacheResp.value.json(); cacheMetrics = json} catch (e) { console.warn('Invalid JSON from cache metrics endpoint, using simulator.', e); await updateCacheMetrics()}
+   const [cacheResp, nintendoResp, recentResp, healthResp] = await Promise.allSettled([ fetch(endpoints.cache, { headers: { Accept: 'application/json' } }), fetch(endpoints.nintendo, { headers: { Accept: 'application/json' } }), fetch(endpoints.recent, { headers: { Accept: 'application/json' } }), fetch(endpoints.health, { headers: { Accept: 'application/json' } })]); // Handle cache metrics if (cacheResp.status === 'fulfilled' && cacheResp.value.ok) { try { const json = await cacheResp.value.json(); cacheMetrics = json} catch (e) { console.warn('Invalid JSON from cache metrics endpoint, using simulator.', e); await updateCacheMetrics()}
       } else { console.warn('Cache metrics endpoint failed, using simulator.', cacheResp); await updateCacheMetrics()}
 
       // Handle Nintendo stats if (nintendoResp.status === 'fulfilled' && nintendoResp.value.ok) { try { const json = await nintendoResp.value.json(); nintendoStats = json} catch (e) { console.warn('Invalid JSON from nintendo endpoint, using simulator.', e); await updateNintendoStats()}
@@ -50,7 +50,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       } else { console.warn('Health endpoint failed, re-evaluating locally.', healthResp); await checkSystemHealth()}
     } catch (error) { console.error('Failed to refresh metrics:', error); systemHealth = 'error'} finally { isRefreshing = false; performance.mark('refresh-end'); try { performance.measure('refreshMetrics', 'refresh-start', 'refresh-end')} catch (e) { // performance.measure may throw in some environments; ignore }
     } }
-  async function updateCacheMetrics(): Promise<any> { performance.mark('function-start'); // Simulate API call to get cache metrics await new Promise(resolve => setTimeout(resolve, 200)); cacheMetrics = { retrieval: {, hits: Math.floor(Math.random() * 1000) + 500, misses: Math.floor(Math.random() * 300) + 100, hitRate: 70 + Math.random() * 25, totalQueries: Math.floor(Math.random() * 1500) + 800, averageResponseTime: 45 + Math.random() * 30 },
+  async function updateCacheMetrics(): Promise<any> { performance.mark('function-start'); // Simulate API call to get cache metrics await new Promise(resolve => setTimeout(resolve, 200)); cacheMetrics = { retrieval: { hits: Math.floor(Math.random() * 1000) + 500, misses: Math.floor(Math.random() * 300) + 100, hitRate: 70 + Math.random() * 25, totalQueries: Math.floor(Math.random() * 1500) + 800, averageResponseTime: 45 + Math.random() * 30 },
 	embedding: {
 	hits: Math.floor(Math.random() * 2000) + 800, misses: Math.floor(Math.random() * 200) + 50, hitRate: 85 + Math.random() * 10, totalRequests: Math.floor(Math.random() * 2500) + 1000, costSavings: (Math.random() * 50 + 25).toFixed(2) },
 	memory: {
@@ -78,7 +78,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   } </script>
  <div class="cache-dashboard"> <!-- Header --> <header class="dashboard-header"> <div class="header-content"> <div class="title-section"> <h1>âš¡ Legal AI Cache Performance</h1>
  <p>Nintendo-style memory management with intelligent caching</p> </div>
- <div class="header-controls"> <div class="system-health { systemHealth }"> <svelte, component | this={getHealthIcon().icon} size={ 20 } class={getHealthIcon().color} /> <span>System {systemHealth.toUpperCase()}</span> </div>
+ <div class="header-controls"> <div class="system-health {systemHealth}"> <svelte, component | this={getHealthIcon().icon} size={ 20 } class={getHealthIcon().color} /> <span>System {systemHealth.toUpperCase()}</span> </div>
  <div class="control-buttons"> <button aria-label="Refresh, metrics"
             onclick={ refreshMetrics } disabled={ isRefreshing } class="refresh-btn"
           > <RefreshCw size={ 16 } class={isRefreshing ? 'animate-spin' : ''} /> Refresh </button>

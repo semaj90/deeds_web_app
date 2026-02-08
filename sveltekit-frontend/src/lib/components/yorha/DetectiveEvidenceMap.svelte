@@ -45,7 +45,7 @@
  let filterMode = $state<'all' | 'evidence' | 'contradictions' | 'timeline'>('all');
 
  // Phoenix Wright color scheme
- const colors = { evidence: {, approved: '#10b981',
+ const colors = { evidence: { approved: '#10b981',
  reviewing: '#f59e0b',
  rejected: '#ef4444',
  new: '#3b82f6'

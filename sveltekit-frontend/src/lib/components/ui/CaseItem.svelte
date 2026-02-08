@@ -3,7 +3,7 @@
   import Card from "./Card/Card.svelte";
   import { cn } from "$lib";
 
-  interface Props { caseItem: {, id: string;
+  interface Props { caseItem: { id: string;
       title: string;
       description?: string;
 	priority: string;

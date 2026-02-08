@@ -361,11 +361,9 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  {#each evidence as item (item.id)}
  <button
  onclick={() => (selectedEvidence = item)}
- class={`w-full text-left p-4 rounded-lg border-2 transition ${
- selectedEvidence?.id === item.id
+ class={`w-full text-left p-4 rounded-lg border-2 transition ${selectedEvidence?.id === item.id
  ? 'border-blue-500 bg-blue-50'
-  : 'border-gray-200, hover:border-gray-300'
- }`}
+  : 'border-gray-200, hover:border-gray-300'}`}
  >
  <div class="flex items-start justify-between">
  <div>
@@ -375,13 +373,11 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  </p>
  </div>
  <span
- class={`px-3 py-1 rounded-full text-xs font-medium ${
- item.status === 'pending'
+ class={`px-3 py-1 rounded-full text-xs font-medium ${item.status === 'pending'
  ? 'bg-yellow-100 text-yellow-800'
  : item.status === 'approved'
  ? 'bg-green-100 text-green-800'
- : 'bg-red-100 text-red-800'
- }`}
+ : 'bg-red-100 text-red-800'}`}
  >
  {item.status}
  </span>

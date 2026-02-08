@@ -228,7 +228,7 @@ Key Strengths:
 ${pred.case_assessment.key_strengths.map(s => `- ${s}`).join('\n')}
 
 Key Weaknesses:
-${pred.case_assessment.key_weaknesses.map(w => `- ${ w }`).join('\n')}
+${pred.case_assessment.key_weaknesses.map(w => `- ${w}`).join('\n')}
 
 OUTCOME PREDICTION
 ==================
@@ -250,7 +250,7 @@ Critical Issues:
 ${pred.legal_analysis.critical_issues.map(i => `- ${i}`).join('\n')}
 
 Key Legal Questions:
-${pred.legal_analysis.key_legal_questions.map(q => `- ${ q }`).join('\n')}
+${pred.legal_analysis.key_legal_questions.map(q => `- ${q}`).join('\n')}
 
 STRATEGIC CONSIDERATIONS
 ========================

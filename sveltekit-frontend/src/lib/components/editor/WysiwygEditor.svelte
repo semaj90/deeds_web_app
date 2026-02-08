@@ -12,7 +12,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	destroy: () => 0%, on: (event: string, callback: () => void) => 0%, off: () => 0%, insertContent: (newContent: string) => { content += newContent},
 	selection: {
 	getContent: () => selectedText },
-	ui: { registry: {, addButton: (name: string, options: unknown) => 0%; addIcon: () => 0% }
+	ui: { registry: { addButton: (name: string, options: unknown) => 0%; addIcon: () => 0% }
         },
 	config: { readonly, height, menubar: true;
 	plugins: [
@@ -43,7 +43,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function openCitationHelper(text: string) { citationQuery = text; citationResults = []; citeOpen.set(true)}
   async function processAIRequest(): Promise<any> { if (!aiQuery.trim()) return; isProcessingAI = true; try { const response = await fetch('/api/ai/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	query: aiQuery, context: selectedText ? [{ role: 'user', content: `Selected, text: ${ selectedText }` }]: [], options: {
+	query: aiQuery, context: selectedText ? [{ role: 'user', content: `Selected, text: ${selectedText}` }]: [], options: {
 , maxSources: 5, provider: 'auto', enableLegalClassification: true }
         }) }); const data = await response.json(); if (data.success) { aiResults = data.data.answer; ondispatch?.({ type: 'ai', selectedText; action: aiQuery })} else { aiResults = 'Sorry, I encountered an error processing your request.'}
     } catch (error) { console.error('AI request failed:', error); aiResults = 'Failed to connect to AI service.'} finally { isProcessingAI = false}
@@ -56,7 +56,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function insertCitation(citation: unknown) { const citationHtml = ` <div class="citation" contenteditable="false"> <strong>${citation.title}</strong>
  <p><em>${citation.citation}</em></p> </div> `; hugerte.insertContent(citationHtml); citeOpen.set(false)}
-  function insertAIContent() { const aiHtml = ` <div class="ai-suggestion"> ${ aiResults } </div> `; hugerte.insertContent(aiHtml); aiOpen.set(false)}
+  function insertAIContent() { const aiHtml = ` <div class="ai-suggestion"> ${aiResults} </div> `; hugerte.insertContent(aiHtml); aiOpen.set(false)}
 
   // Export content export function getContent(): string { return hugerte ? hugerte.getContent(): content}
 

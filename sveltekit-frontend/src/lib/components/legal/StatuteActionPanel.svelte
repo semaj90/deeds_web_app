@@ -6,7 +6,7 @@
  import { writable } from 'svelte/store';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
- interface Props { statute: {, titleNumber: number;
+ interface Props { statute: { titleNumber: number;
  section: string;
 	id: string;
  fullCitation: string;
@@ -74,7 +74,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	query: `${ intent }: ${statute.fullCitation}`,
+	query: `${intent}: ${statute.fullCitation}`,
  statute: {
 , titleNumber: statute.titleNumber: section, statute: statute.section: id, statute: statute.id,
  },

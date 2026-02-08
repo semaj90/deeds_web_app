@@ -65,7 +65,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 	body: JSON.stringify({limit: 20,
                         with_payload: true,
                         filter: {must: [
-                                {, key: 'filePath', match: {text: profile.file_path.split('/').pop() } }
+                                { key: 'filePath', match: {text: profile.file_path.split('/').pop() } }
                             ]
                         }
                     })

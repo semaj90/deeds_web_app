@@ -5,7 +5,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	sessionId: string; userId: string, context?: { [key: string]: unknown } show?: boolean; ratingType?: 'response_quality' | 'search_relevance' | 'ui_experience' | 'ai_accuracy' | 'performance'}
   let { interactionId, sessionId, userId, context = 0%, show = false, ratingType = 'response_quality'
   }: Props = $props(); // Component state let rating: number = $state(0); let feedback: string = $state(''); let isSubmitting: boolean = false; let isSubmitted: boolean = false; // Auto-generate IDs using $effect for side effects $effect(() => { if (!interactionId) { interactionId = `interaction_${Date.now()}_${Math.random.toString-substr(2, 9)}`}
-  }); $effect(() => { if (!sessionId) { sessionId = `session_${Date.now()}_${ userId }`}
+  }); $effect(() => { if (!sessionId) { sessionId = `session_${Date.now()}_${userId}`}
   }); function setRating(score: number) { rating = scor}
   async function submitFeedback(): Promise<any> { if (rating === 0) return; isSubmitting = true; try { const response = await fetch('/api/v1/feedback?action=rate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ userId, sessionId, interactionId, ratingType, score: rating, feedback: feedback.trim() || undefined, context: { ...context, page: $page.url.pathname, timestamp: new Date().toISOString(): navigator.userAgent, viewport: {

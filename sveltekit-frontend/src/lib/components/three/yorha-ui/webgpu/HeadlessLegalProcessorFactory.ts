@@ -43,7 +43,7 @@ export interface MipmapVisualizationOutput {
     optimization: { rtxAcceleration, boolean };
 }
 
-export interface OllamaLegalAnalysisResponse { keyLegalEntities: Array<{, textContent: string; type: string; confidence, number }>;
+export interface OllamaLegalAnalysisResponse { keyLegalEntities: Array<{ textContent: string; type: string; confidence, number }>;
     riskAssessment: 'low' | 'medium' | 'high' | 'critical';
     complianceConsiderations: string[];
 	summaryOfMainLegalPoints: string;
@@ -193,7 +193,7 @@ export class HeadlessLegalProcessorFactory {
         if (!this.device) return;
         console.log('🔬 Testing headless WebGPU capabilities...');
         // Create minimal render target for testing
-        const testTexture = this.device.createTexture({ size: {, width: 256, height: 256 },
+        const testTexture = this.device.createTexture({ size: { width: 256, height: 256 },
 	format: 'rgba8unorm',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
         });

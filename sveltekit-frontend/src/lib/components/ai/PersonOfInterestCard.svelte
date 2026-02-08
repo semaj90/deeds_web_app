@@ -4,7 +4,7 @@
 	confidence: number, context?: string}
 </script> <script lang="ts"> import  Badge  from "$lib/components/ui/Badge.svelte"; interface Props { person?: Perso; relationships?: Relationship[]}
   let { person = { name: 'Unknown', role: 'unknown', confidence: 0 },
-	relationships = [] }: Props = $props(); // Filter relationships for this person const personRelationships = $derived(relationships.filter( (rel) => rel.person1 === person.name || rel.person2 === person.name )); // Role styling const roleConfig = { suspect: {, color: 'bg-red-100 text-red-800 border-red-200', icon: 'ðŸš¨', label: 'Suspect'
+	relationships = [] }: Props = $props(); // Filter relationships for this person const personRelationships = $derived(relationships.filter( (rel) => rel.person1 === person.name || rel.person2 === person.name )); // Role styling const roleConfig = { suspect: { color: 'bg-red-100 text-red-800 border-red-200', icon: 'ðŸš¨', label: 'Suspect'
     },
 	witness: {
 	color: 'bg-blue-100 text-blue-800 border-blue-200', icon: 'ðŸ‘ï¸', label: 'Witness'

@@ -243,7 +243,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		}}
   async function simulateExtraction(params: Record<string, string>): Promise<any> {
 		await new Promise((resolve) => setTimeout(resolve, 120));
-		return { entities: [{, type: 'person', value: 'Client Entity', confidence: 0.9 }],
+		return { entities: [{ type: 'person', value: 'Client Entity', confidence: 0.9 }],
 			relationships: []
 		}}
   function simulateMemoryAllocate(_size: number) {

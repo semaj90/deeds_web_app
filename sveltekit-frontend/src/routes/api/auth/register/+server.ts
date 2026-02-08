@@ -75,7 +75,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			success: true,
 			userId: newUser.id,
 			sessionId: session.sessionId,
-			user: {, id: newUser.id,
+			user: { id: newUser.id,
 				email: newUser.email,
 				firstName: newUser.firstName,
 				lastName: newUser.lastName,

@@ -21,7 +21,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let {
  poi: onView,
  onEdit: onDelete
- } = $props<{ poi: {, id: string;
+ } = $props<{ poi: { id: string;
  name: string;
  alias?: string;
 	threatLevel: string;

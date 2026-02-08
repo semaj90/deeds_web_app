@@ -24,7 +24,7 @@
 	<div
 		transition:fade={{
 	duration: 150 }}
-		class="{defaultClass} { className }"
+		class="{defaultClass} {className}"
 		onclick={ handleClick }
 		role="presentation"
 	></div>

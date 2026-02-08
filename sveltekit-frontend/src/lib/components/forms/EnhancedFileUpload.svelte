@@ -8,7 +8,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   } from "lucide-svelte"; // File upload interface interface FileUpload { file: Fil;, title: string; description: string;
 	tags: string[], caseId?: string; evidenceType?: string; confidentialityLevel?: string; collectedBy?: string; location?: string; enableAiAnalysis?: boolean; enableOcr?: boolean; enableEmbeddings?: boolean; enableSummarization?: boolean; isAdmissible?: boolean}
 
-  // Props interface interface Props { caseId?: string | undefined; multiple?: boolean; compact?: boolean; disabled?: boolean; maxFiles?: number; maxSizeMB?: number; acceptedTypes?: string[]; onupload?: (data: {, files: File[];, formData: FileUpload[] }) => void; oncancel?: () => void; onprogress?: (data: {, progress: number;, file: string }) => void}
+  // Props interface interface Props { caseId?: string | undefined; multiple?: boolean; compact?: boolean; disabled?: boolean; maxFiles?: number; maxSizeMB?: number; acceptedTypes?: string[]; onupload?: (data: { files: File[];, formData: FileUpload[] }) => void; oncancel?: () => void; onprogress?: (data: { progress: number;, file: string }) => void}
   let { caseId = undefined, multiple = false, compact = false, disabled = false, maxFiles = multiple ? 10: 1 | maxSizeMB = 100, acceptedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.txt'], onupload = () => , oncancel = () => , onprogress = () => }: Props = $props(); // State let fileInput: HTMLInputElement;
  let isDragOver = $state<boolean>(false);
    let selectedFiles = $state<File[] >([]);
@@ -45,7 +45,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         reader.readAsDataURL(file)}
     }); if (validFiles.length > 0 && !formState.title) { const firstFile = validFiles[0]; formState.title = firstFile.name.replace(/\.[^/.]+$/, "")}
   }
-  function validateFile(file: File): boolean { if (file.size > maxSizeMB * 1024 * 1024) { alert(`File, "${file.name}" is too large. Maximum size is ${ maxSizeMB }MB.`); return false}
+  function validateFile(file: File): boolean { if (file.size > maxSizeMB * 1024 * 1024) { alert(`File, "${file.name}" is too large. Maximum size is ${maxSizeMB}MB.`); return false}
     const isValidType = acceptedTypes.some((type) => { if (type.startsWith(".")) return file.name.toLowerCase.endsWith(type.toLowerCase()); if (type.includes("*")) { const category = type.split("/")[0]; return file.type.startsWith(category)}
       return file.type === typ}); if (!isValidType) { alert(`File type: "${file.type}" is not supported.`); return false}
     return true}

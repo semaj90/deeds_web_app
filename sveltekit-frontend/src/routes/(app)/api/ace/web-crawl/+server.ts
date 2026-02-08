@@ -27,11 +27,11 @@ import type { RequestHandler } from './$types';
 /**
  * Web Crawl State Machine Context
  */
-interface WebCrawlContext { jobId: string;, urls: string[];
+interface WebCrawlContext { jobId: string; urls: string[];
 	userId?: string;
 	sessionId?: string;
 	status: 'pending' | 'processing' | 'completed' | 'failed';
-	results: { screenshotsCaptured: number;, htmlExtracted: number;
+	results: { screenshotsCaptured: number; htmlExtracted: number;
 		vectorsGenerated: number;
 		cudaProcessed: boolean;
 	};
@@ -82,7 +82,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		// Initialize XState machine for workflow orchestration
-		const crawlActor = createActor(webCrawlMachine, { input: {, jobId: job.id,
+		const crawlActor = createActor(webCrawlMachine, { input: { jobId: job.id,
 				urls,
 				userId,
 				sessionId: crypto.randomUUID(),
@@ -143,7 +143,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					storeInFAISS({
 						indexName: 'ace_crawl_gpu',
 						vector: embeddings.vector,
-						metadata: {, jobId: job.id, url },
+						metadata: { jobId: job.id, url },
 						useCUDA: enableGPU
 					}),
 

@@ -46,7 +46,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Minimal typing for the form integration
   type Subscriber<T = unknown> = (value: T) => void;
-  interface FormIntegrationType { state: {, subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => string };
+  interface FormIntegrationType { state: { subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => string };
     context: {
 	subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => unknown };
     form: { form: Readable<CaseCreationSchemaType>;, submitting: Readable<boolean>;

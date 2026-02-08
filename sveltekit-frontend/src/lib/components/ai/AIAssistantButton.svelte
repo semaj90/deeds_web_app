@@ -85,7 +85,7 @@
 		aiStatus = isListening ? 'listening' : 'connected';
 	}
 
-	const statusConfig = { idle: {, color: 'bg-gray-400', pulse: false },
+	const statusConfig = { idle: { color: 'bg-gray-400', pulse: false },
 	processing: {
 	color: 'bg-blue-500', pulse: true },
 	listening: {

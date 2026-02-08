@@ -124,7 +124,7 @@ async function streamOllamaResponse(
 		body: JSON.stringify({ model: MODEL,
 			prompt,
 			stream: true,
-			options: {, temperature: 0.3,
+			options: { temperature: 0.3,
 				num_predict: 2048
 			}
 		})

@@ -44,7 +44,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		}
 	});
 
-	const dispatch = createEventDispatcher<{ generated: {, plan: CaseTheoryPlan } }>();
+	const dispatch = createEventDispatcher<{ generated: { plan: CaseTheoryPlan } }>();
 
 	let isSubmitting = $state(false);
 	let plan = $state<CaseTheoryPlan | null>(null);
@@ -88,7 +88,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	function selectedDeliverables(): string[] {
 		return Object.entries(form.deliverables)
-			.filter(([, enabled]) => enabled)
+			.filter(([enabled]) => enabled)
 			.map(([key]) => key);
 	}
 

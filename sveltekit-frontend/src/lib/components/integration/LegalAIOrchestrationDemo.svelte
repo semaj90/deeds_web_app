@@ -32,7 +32,7 @@ Shows complete workflow from user input to AI-powered results -->
 	const systemHealthy = $derived($isSystemHealthy);
 
  // Demo data for quick testing
- const demoData = { legalResearch: {, query: 'breach of contract damages in commercial agreements',
+ const demoData = { legalResearch: { query: 'breach of contract damages in commercial agreements',
  jurisdiction: 'federal',
  userRole: 'attorney'
  },

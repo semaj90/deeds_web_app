@@ -67,7 +67,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 		try {
 			const response = await fetch(
-				`/api/routes/${ routePath }/error-brain-analysis`,
+				`/api/routes/${routePath}/error-brain-analysis`,
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -105,7 +105,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 		try {
 			const response = await fetch(
-				`/api/routes/${ routePath }/error-brain-patch`,
+				`/api/routes/${routePath}/error-brain-patch`,
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -143,7 +143,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 		try {
 			const response = await fetch(
-				`/api/routes/${ routePath }/error-brain-patch/${patchId}`,
+				`/api/routes/${routePath}/error-brain-patch/${patchId}`,
 				{
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
@@ -177,7 +177,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 		try {
 			const response = await fetch(
-				`/api/routes/${ routePath }/error-brain-analyses? limit=20&offset=0`
+				`/api/routes/${routePath}/error-brain-analyses? limit=20&offset=0`
 			);
 
 			if (!response.ok) throw new Error('Failed to load analyses');

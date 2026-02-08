@@ -72,9 +72,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: {, display: false
+        plugins: { legend: { display: false
           },
-	tooltip: { callbacks: {, label: (context: any) => `${context.label}: ${context.parsed.toFixed(1)}%`
+	tooltip: { callbacks: { label: (context: any) => `${context.label}: ${context.parsed.toFixed(1)}%`
             }
           }
         }
@@ -110,12 +110,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        scales: { y: {, beginAtZero: true,
+        scales: { y: { beginAtZero: true,
             ticks: {
 	precision: 0 }
           }
         },
-	plugins: { legend: {, display: false }
+	plugins: { legend: { display: false }
         }
       }
     });
@@ -147,7 +147,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        scales: { y: {, beginAtZero: true,
+        scales: { y: { beginAtZero: true,
             max: 100,
             title: {
 	display: true,
@@ -155,7 +155,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             }
           }
         },
-	plugins: { tooltip: {, callbacks: {
+	plugins: { tooltip: { callbacks: {
 	afterLabel: (context: any) => {
                 const event = sortedEvents[context.dataIndex];
                 return `${event.type}: ${event.description}`;
@@ -191,7 +191,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        scales: { r: {, beginAtZero: true,
+        scales: { r: { beginAtZero: true,
             max: 100,
             ticks: {
 	stepSize: 20 }
@@ -228,9 +228,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        scales: { r: {, beginAtZero: true, max: 100 }
+        scales: { r: { beginAtZero: true, max: 100 }
         },
-	plugins: { legend: {, position: 'right' }
+	plugins: { legend: { position: 'right' }
         }
       }
     });

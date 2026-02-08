@@ -18,7 +18,7 @@ interface QdrantPoint { id: number;, payload: FileProfile;
 	vector?: number[];
 }
 
-interface QdrantScrollResponse { result: {, points: QdrantPoint[];
+interface QdrantScrollResponse { result: { points: QdrantPoint[];
 		next_page_offset?: number;
 	};
 	status: string;
@@ -42,7 +42,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			must.push({ key: 'risk', match: { value, risk } });
 		}
 		if (surface) {
-			must.push({ key: 'surface', match: {, any: [surface] } });
+			must.push({ key: 'surface', match: { any: [surface] } });
 		}
 
 		// Scroll through Qdrant collection
@@ -113,7 +113,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		console.error('Codebase index API error:', error);
 		return json({
 			files: [],
-			stats: {, totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
+			stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
 			error: error instanceof Error ? error.message : 'Unknown error'
 		}, { status: 200 });
 	}
@@ -132,7 +132,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const embedResponse = await fetch('http://localhost:11434/api/embeddings', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: query
 			})
 		});
@@ -148,7 +148,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const searchResponse = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, vector: limit,
+			body: JSON.stringify({ vector: limit,
 				with_payload: true
 			})
 		});

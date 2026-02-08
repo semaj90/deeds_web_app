@@ -59,7 +59,7 @@
       editor = new Editor({
         element: editorElement,
         extensions: [
-          StarterKit.configure({, heading: {, levels: [1, 2, 3, 4] }
+          StarterKit.configure({ heading: { levels: [1, 2, 3, 4] }
           }),
           Placeholder.configure({ placeholder }),
           Underline

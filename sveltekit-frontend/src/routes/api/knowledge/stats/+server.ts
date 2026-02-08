@@ -23,12 +23,12 @@ export const GET: RequestHandler = async () => {
       success: true,
       stats: { totalDocuments: stats.totalDocuments,
         indexedVectors: stats.indexedVectors,
-        collections: { qdrant: {, points: stats.collections.qdrant.points,
+        collections: { qdrant: { points: stats.collections.qdrant.points,
             status: stats.collections.qdrant.status
           },
           postgres: { rows: stats.collections.postgres.rows
           },
-          minio: {, objects: stats.collections.minio.objects,
+          minio: { objects: stats.collections.minio.objects,
             size: stats.collections.minio.size
           }
         },

@@ -1,9 +1,9 @@
 /**
  * Headless evidence canvas component using Svelte 5 runes
  */
-export interface EvidenceItem { id: string;, type: 'photo' | 'document' | 'physical' | 'digital';
+export interface EvidenceItem { id: string; type: 'photo' | 'document' | 'physical' | 'digital';
     name: string;
-	position: { x: number;, y: number };
+	position: { x: number; y: number };
     rotation: number;
 	scale: number;
     textureId?: string;
@@ -11,7 +11,7 @@ export interface EvidenceItem { id: string;, type: 'photo' | 'document' | 'physi
     connections: string[];
 }
 
-export interface CanvasState { zoom: number;, pan: { x: number;, y: number };
+export interface CanvasState { zoom: number; pan: { x: number; y: number };
     selectedItems: string[];
 	mode: 'view' | 'edit' | 'present';
     showConnections: boolean;

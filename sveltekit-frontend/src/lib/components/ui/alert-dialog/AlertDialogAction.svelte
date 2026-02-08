@@ -39,7 +39,7 @@
 <button
 	type="button"
 	onclick={ handleClick }
-	class="{baseClass} {variantClass} { className }"
+	class="{baseClass} {variantClass} {className}"
 >
 	{#if children}
 		{@render children()}

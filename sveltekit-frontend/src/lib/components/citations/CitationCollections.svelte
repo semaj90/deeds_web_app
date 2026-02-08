@@ -77,7 +77,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  if (!confirm('Are you sure you want to delete this collection?')) return;
 
  try {
- const response = await fetch(`/api/citations/collections/${ collectionId }`, {
+ const response = await fetch(`/api/citations/collections/${collectionId}`, {
  method: 'DELETE'
  });
 

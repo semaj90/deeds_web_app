@@ -103,14 +103,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     } isProcessing = false; lastUpdate = 'Execution cancelled'}
   function clearResults() { conversationMessages = []; executionResults = []; activeConversation = null; activeExecution = null; executionProgress = 0; lastUpdate = ''}
   function formatDuration(ms: number): string { const seconds = Math.floor(ms / 1000);
-   const minutes = Math.floor(seconds / 60); if (minutes > 0) { return `${ minutes }m ${seconds % 60}s`}
-    return `${ seconds }s`}
+   const minutes = Math.floor(seconds / 60); if (minutes > 0) { return `${minutes}m ${seconds % 60}s`}
+    return `${seconds}s`}
   function downloadResults() { const results = selectedProvider === 'autogen'
       ? conversationMessages: executionResult;
  const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json'
     });
    const url = URL.createObjectURL(blob);
-   const a = document.createElement('a'); a.href = url; a.download = `${ selectedWorkflow }_${ selectedProvider }_results.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
+   const a = document.createElement('a'); a.href = url; a.download = `${ selectedWorkflow }_${selectedProvider}_results.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
   function getWorkflowIcon(workflowId: string) { return workflows.find(w => w.id === workflowId)?.icon ?? Activity}
   function getServiceStatusColor(status: boolean) { return status ? 'text-green-500': 'text-red-500'}
 </script>

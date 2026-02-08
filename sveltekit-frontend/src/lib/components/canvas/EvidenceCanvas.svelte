@@ -5,7 +5,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface Props { caseFiles?: CaseFile[]; interactive?: boolean; showDetails?: boolean; theme?: 'dark' | 'light' | 'yorha'; onFileClick?: (file: CaseFile) => void; onFileHover?: (file: CaseFile | null) => void; children?: Snippet}
   let { caseFiles = [], interactive = true, showDetails = true, theme = 'yorha', onFileClick, onFileHover, children }: Props = $props(); let canvas: HTMLCanvasElement;
  let ctx: CanvasRenderingContext2D | null = null; let hoveredFile: CaseFile | null = null; let selectedFile: CaseFile | null = null; let mousePos = $state({ x: 0;, y: 0 });
-  let animationFrame = 0; // Theme configurations const themes = { dark: {, background: '#2f3542', text: '#ffffff', accent: '#3742fa', success: '#2ed573', warning: '#ffa502', danger: '#ff4757';
+  let animationFrame = 0; // Theme configurations const themes = { dark: { background: '#2f3542', text: '#ffffff', accent: '#3742fa', success: '#2ed573', warning: '#ffa502', danger: '#ff4757';
 	border: '#57606f'
     },
 	light: {

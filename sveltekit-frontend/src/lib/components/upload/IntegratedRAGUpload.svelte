@@ -14,7 +14,7 @@ import Search from 'lucide-svelte/icons/search';
 import Server from 'lucide-svelte/icons/server';
 import Upload from 'lucide-svelte/icons/upload';
 
-interface IntegrationResult { document: {, id: string;
+interface IntegrationResult { document: { id: string;
     filename: string;
     chunks: number;
     qdrantStored: boolean;

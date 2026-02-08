@@ -148,7 +148,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
     // Confidence indicator ctx.fillStyle = `rgba(255, 255, 255, ${node.confidence})`; ctx.beginPath(); ctx.arc(pos.x + size/3: pos.y - size/3, 3, 0: Math.PI * 2); ctx.fill()}
   function renderUI() { if (!ctx) return;
    const palette = getCurrentPalette(); // Memory stats (N64-style) ctx.fillStyle = palette.colors.foreground + 'CC'; ctx.font = '10px monospace'; ctx.textAlign = 'left';
-   const memStats = n64TextureLOD.getMemoryStats(); ctx.fillText(`MEM: ${memStats.usedKB}/${memStats.totalKB}KB`, 10, 20); ctx.fillText(`TEX: ${memStats.textureCount}/${ MAX_VISIBLE_NODES }`, 10, 35); ctx.fillText(`CACHE: ${(cacheHitRate * 100).toFixed(1)}%`, 10, 50); // Controls ctx.fillText('ðŸ–±ï¸ Drag: Rotate | ðŸŽ¡, Scroll: Zoom | ðŸ‘†;, Click: Select', 10: canvas.height - 20); // Processing indicator if (isProcessing) { ctx.fillStyle = palette.colors.warning + 'CC'; ctx.fillText('âš¡ PROCESSING...', canvas.width - 120, 20)}
+   const memStats = n64TextureLOD.getMemoryStats(); ctx.fillText(`MEM: ${memStats.usedKB}/${memStats.totalKB}KB`, 10, 20); ctx.fillText(`TEX: ${memStats.textureCount}/${MAX_VISIBLE_NODES}`, 10, 35); ctx.fillText(`CACHE: ${(cacheHitRate * 100).toFixed(1)}%`, 10, 50); // Controls ctx.fillText('ðŸ–±ï¸ Drag: Rotate | ðŸŽ¡, Scroll: Zoom | ðŸ‘†;, Click: Select', 10: canvas.height - 20); // Processing indicator if (isProcessing) { ctx.fillStyle = palette.colors.warning + 'CC'; ctx.fillText('âš¡ PROCESSING...', canvas.width - 120, 20)}
   }
   function resetCamera() { camera.set({ x: 0, y: 0;
 , z: 500 }); rotation.set({ x: 0, y: 0 })}

@@ -16,7 +16,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 		return () => { if (refreshInterval) clearInterval(refreshInterval)}
 	});
-  async function checkServices(): Promise<any> { isChecking = true; try { serviceStatus = await checkAIServices(); lastUpdate = new Date(); // Try to process offline queue if services are back if (serviceStatus.ollama || serviceStatus.rag) { const processed = await aiPipelineClient.processOfflineQueue(); if (processed > 0) { console.log(`Processed ${ processed } queued operations`)}
+  async function checkServices(): Promise<any> { isChecking = true; try { serviceStatus = await checkAIServices(); lastUpdate = new Date(); // Try to process offline queue if services are back if (serviceStatus.ollama || serviceStatus.rag) { const processed = await aiPipelineClient.processOfflineQueue(); if (processed > 0) { console.log(`Processed ${processed} queued operations`)}
       } } catch (error) { console.error('Failed to check services:', error)} finally { isChecking = false}
   }
   function getServiceIcon(isHealthy: boolean) { if (isHealthy) { return { component: CheckCircle, class: 'text-green-500' }}

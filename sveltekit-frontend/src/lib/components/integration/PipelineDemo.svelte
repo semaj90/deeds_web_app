@@ -10,7 +10,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let searchQuery = $state<string>('');
    let searchResults = $state<any>(null);
    let selectedPipeline = $state<PipelineType>('optimized');
-   let cacheKey = $state<string>('demo_legal_documents'); // Performance metrics let metrics = $state({ totalOperations: 0, averageTime: 0, successRate: 0, lastUpdate: new Date() }); // Pipeline execution with XState management async function executePipeline(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log(`ðŸš€ Starting ${ selectedPipeline } pipeline execution`);
+   let cacheKey = $state<string>('demo_legal_documents'); // Performance metrics let metrics = $state({ totalOperations: 0, averageTime: 0, successRate: 0, lastUpdate: new Date() }); // Pipeline execution with XState management async function executePipeline(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log(`ðŸš€ Starting ${selectedPipeline} pipeline execution`);
    const result = await pipelineManager.executePipeline(cacheKey, { type: selectedPipeline
 , enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); results = [result, ...results.slice(0, 9)]; // Keep last, 10 results updateMetrics()} catch (error) { console.error('Pipeline execution failed:', error)} finally { isProcessing = false}
   }
@@ -29,7 +29,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    const batchResults = await pipelineManager.batchProcess(batchRequests); results = [...batchResults, ...results.slice(0, 7)]; updateMetrics()} catch (error) { console.error('Batch processing failed:', error)} finally { isProcessing = false}
   }
 
-   // Search across all pipelines async function searchPipelines(): Promise<any> { if (!searchQuery.trim()) return; try { console.log(`ðŸ” Searching all pipelines for: "${ searchQuery }"`);
+   // Search across all pipelines async function searchPipelines(): Promise<any> { if (!searchQuery.trim()) return; try { console.log(`ðŸ” Searching all pipelines for: "${searchQuery}"`);
    const results = await pipelineManager.searchAllPipelines(searchQuery, 10); searchResults = result} catch (error) { console.error('Search failed:', error)}
   }
 

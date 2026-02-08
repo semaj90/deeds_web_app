@@ -113,21 +113,17 @@
 		<div class="flex gap-4 mb-6 border-b border-gray-700">
 			<button
 				onclick={() => (activeTab = 'search')}
-				class={`px-4 py-3 font-semibold transition ${
-					activeTab === 'search'
+				class={`px-4 py-3 font-semibold transition ${activeTab === 'search'
 						? 'text-blue-400 border-b-2 border-blue-400'
-						: 'text-gray-400, hover:text-gray-300'
-				}`}
+						: 'text-gray-400, hover:text-gray-300'}`}
 			>
 				🔍 Search
 			</button>
 			<button
 				onclick={() => (activeTab = 'timeline')}
-				class={`px-4 py-3 font-semibold transition ${
-					activeTab === 'timeline'
+				class={`px-4 py-3 font-semibold transition ${activeTab === 'timeline'
 						? 'text-blue-400 border-b-2 border-blue-400'
-						: 'text-gray-400, hover:text-gray-300'
-				}`}
+						: 'text-gray-400, hover:text-gray-300'}`}
 			>
 				🕒 Timeline ({timelineEvents.length})
 			</button>

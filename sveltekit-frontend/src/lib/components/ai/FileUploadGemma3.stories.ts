@@ -8,7 +8,7 @@ const meta = {
   title: 'AI/FileUploadGemma3',
   component: FileUploadGemma3,
   tags: ['autodocs'],
-  argTypes: { maxSize: {, control: 'number',
+  argTypes: { maxSize: { control: 'number',
       description: 'Maximum file size in bytes',
       defaultValue: 10485760
     },
@@ -23,7 +23,7 @@ const meta = {
       defaultValue: true
     }
   },
-	parameters: { docs: {, description: {
+	parameters: { docs: { description: {
 	component: 'AI-powered file upload component with real-time processing and vector embeddings'
       }
     }
@@ -34,7 +34,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Default file upload interface
-export const Default:Story = { args: {, maxSize: 10485760, // 10MB
+export const Default:Story = { args: { maxSize: 10485760, // 10MB
     accept: [
       'application/pdf',
       'application/msword',
@@ -47,7 +47,7 @@ export const Default:Story = { args: {, maxSize: 10485760, // 10MB
 };
 
 // Large file support
-export const LargeFileSupport: Story = { args: {, maxSize: 104857600, // 100MB
+export const LargeFileSupport: Story = { args: { maxSize: 104857600, // 100MB
     accept: [
       'application/pdf',
       'application/msword',
@@ -59,7 +59,7 @@ export const LargeFileSupport: Story = { args: {, maxSize: 104857600, // 100MB
     ],
     aiEnabled: true
   },
-	parameters: { docs: {, description: {
+	parameters: { docs: { description: {
 	story: 'File upload with large file support (100MB) and multimedia types'
       }
     }
@@ -67,11 +67,11 @@ export const LargeFileSupport: Story = { args: {, maxSize: 104857600, // 100MB
 };
 
 // AI processing disabled
-export const NoAI: Story = { args: {, maxSize: 5242880, // 5MB
+export const NoAI: Story = { args: { maxSize: 5242880, // 5MB
     accept: ['text/plain', 'text/csv'],
     aiEnabled: false
   },
-	parameters: { docs: {, description: {
+	parameters: { docs: { description: {
 	story: 'Simple file upload without AI processing - faster for basic use cases'
       }
     }
@@ -79,7 +79,7 @@ export const NoAI: Story = { args: {, maxSize: 5242880, // 5MB
 };
 
 // Legal document specific
-export const LegalDocs: Story = { args: {, maxSize: 52428800, // 50MB
+export const LegalDocs: Story = { args: { maxSize: 52428800, // 50MB
     accept: [
       'application/pdf',
       'application/msword',
@@ -89,7 +89,7 @@ export const LegalDocs: Story = { args: {, maxSize: 52428800, // 50MB
     ],
     aiEnabled: true
   },
-	parameters: { docs: {, description: {
+	parameters: { docs: { description: {
 	story: 'Optimized for legal document formats with enhanced AI analysis'
       }
     }
@@ -97,7 +97,7 @@ export const LegalDocs: Story = { args: {, maxSize: 52428800, // 50MB
 };
 
 // Multimedia
-export const Multimedia: Story = { args: {, maxSize: 209715200, // 200MB
+export const Multimedia: Story = { args: { maxSize: 209715200, // 200MB
     accept: [
       'image/jpeg',
       'image/png',
@@ -110,7 +110,7 @@ export const Multimedia: Story = { args: {, maxSize: 209715200, // 200MB
     ],
     aiEnabled: true
   },
-	parameters: { docs: {, description: {
+	parameters: { docs: { description: {
 	story: 'Media upload with OCR and audio transcription capabilities'
       }
     }
@@ -118,11 +118,11 @@ export const Multimedia: Story = { args: {, maxSize: 209715200, // 200MB
 };
 
 // Minimal configuration
-export const Minimal: Story = { args: {, maxSize: 1048576, // 1MB
+export const Minimal: Story = { args: { maxSize: 1048576, // 1MB
     accept: ['text/plain'],
     aiEnabled: false
   },
-	parameters: { docs: {, description: {
+	parameters: { docs: { description: {
 	story: 'Minimal upload component for simple text files only'
       }
     }

@@ -73,7 +73,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   async function processWithWebASM(context: string): Promise<any> { // WebASM LLaMA.cpp processing (placeholder implementation) // In a real implementation, this would load and run a WebAssembly version of LLaMA.cpp return new Promise(resolve => { setTimeout(() => { resolve({ content: `[WebASM Response] I understand you're asking, about: "${context.slice(-100)}...". This is a placeholder response from the WebAssembly LLaMA.cpp implementation.`, backend: 'WebASM LLaMA.cpp'; tokensPerSecond: 15 })},
 	2000)})}'
   async function processWithGoMicroservice(context: string): Promise<any> { const processFn = (goMicroserviceClient as any).processChat ?? (goMicroserviceClient as any).process;
- if (!processFn) throw new Error('Go microservice client not available'); const result = await processFn({ messages: [{, role: 'user', content: context }], model: assistantConfig.model, temperature: assistantConfig.temperature;
+ if (!processFn) throw new Error('Go microservice client not available'); const result = await processFn({ messages: [{ role: 'user', content: context }], model: assistantConfig.model, temperature: assistantConfig.temperature;
 , stream: false }); if (!result?.success) {
     throw new Error(result?.error ?? 'Go microservice error')
 

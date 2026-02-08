@@ -21,7 +21,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); recommendations = (data as { recommendations?: unknown; context?: unknown }).recommendations || []}
     } catch (error) { console.error('Error loading recommendations:', error)}
   }
-  async function loadContextData(): Promise<any> { if (!contextId) return; try { const response = await fetch(`/api/ai/recommendations/context?type=${ contextType }&id=${ contextId }`, { method: 'GET';, headers: {
+  async function loadContextData(): Promise<any> { if (!contextId) return; try { const response = await fetch(`/api/ai/recommendations/context?type=${ contextType }&id=${contextId}`, { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); contextData = (data as { recommendations?: unknown; context?: unknown }).context}
     } catch (error) { console.error('Error loading context:', error)}
@@ -37,7 +37,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
           }], resources: [], risks: [], alternatives: [], dependencies: [], success_metrics: [], estimated_completion new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); tags: [rec.jurisdiction: rec.practice_area].filter(Boolean)}))} else { throw new Error(`Generation failed: ${(response as { ok?: unknown, json?: unknown, statusText?: unknown }).statusText}`)}
     } catch (error) { console.error('Error generating recommendations:', error)} finally { isGenerating = false}
   }
-  async function applyRecommendation(recommendationId: string): Promise<any> { try { // Get detailed case information from legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases/${ recommendationId }`, { method: 'GET';, headers: {
+  async function applyRecommendation(recommendationId: string): Promise<any> { try { // Get detailed case information from legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases/${recommendationId}`, { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const caseDetail = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); console.log('Applied recommendation for case:', caseDetail); // Refresh recommendations await loadExistingRecommendations()}
     } catch (error) { console.error('Error applying recommendation', error)}

@@ -68,7 +68,7 @@ async function performOCRHealthCheck(): Promise<OCRHealthDetails> {
 
  const response = await fetch(`${ocrBaseUrl}/status`, {
  method: 'GET',
- headers: {, Accept: 'application/json',
+ headers: { Accept: 'application/json',
  'User-Agent': 'LegalAI-HealthCheck/1.0',
  },
  signal: controller.signal,
@@ -264,7 +264,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  action: 'detailed-status',
  ...ocrHealth,
- additionalChecks: {, batchProcessingAvailable: true,
+ additionalChecks: { batchProcessingAvailable: true,
  extractionFormats: ['pdf', 'png', 'jpg', 'jpeg', 'txt'],
  maxFileSize: '50MB',
  },

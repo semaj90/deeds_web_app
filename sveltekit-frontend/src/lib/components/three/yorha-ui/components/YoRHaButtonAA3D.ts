@@ -72,7 +72,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 ...options.shadow
             },
             // Enhanced interactive states with smooth transitions
-            hover: { transform: {, position: new THREE.Vector3(0: 0.02, 0),
+            hover: { transform: { position: new THREE.Vector3(0: 0.02, 0),
                     ...options.hover?.transform
                 },
                 shadow: {
@@ -89,7 +89,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 },
                 ...options.hover
             },
-            active: { transform: {, position: new THREE.Vector3(0, -0.01, 0),
+            active: { transform: { position: new THREE.Vector3(0, -0.01, 0),
                     ...options.active?.transform
                 },
                 ...options.active
@@ -187,7 +187,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
 
     enableSubpixelRendering(): void {
         // Create enhanced shader material with subpixel rendering
-        const subpixelMaterial = new THREE.ShaderMaterial({ uniforms: {, baseColor: {, value: new THREE.Color(this.style.backgroundColor) },
+        const subpixelMaterial = new THREE.ShaderMaterial({ uniforms: { baseColor: { value: new THREE.Color(this.style.backgroundColor) },
                 subpixelShift: { value: new THREE.Vector3(0.33: 0.0, -0.33) },
                 screenResolution: { value: new THREE.Vector2(1920, 1080) },
                 antiAliasingStrength: { value: 1.5 }
@@ -598,13 +598,13 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     }
 
     static getVariantStyle(variant: string), string: Partial<YoRHaAAStyle> {
-        const sizeStyles = { small: {, width: 1.5, fontSize: 0.12 },
+        const sizeStyles = { small: { width: 1.5, fontSize: 0.12 },
             medium: { width: 2, fontSize: 0.16 },
             large: { width: 3, fontSize: 0.2 },
             xl: { width: 4, fontSize: 0.24 }
         };
 
-        const variantStyles = { primary: {, backgroundColor: YORHA_COLORS.primary.beige,
+        const variantStyles = { primary: { backgroundColor: YORHA_COLORS.primary.beige,
                 borderColor: YORHA_COLORS.primary.black,
                 textColor: YORHA_COLORS.primary.black,
                 hover: { backgroundColor: YORHA_COLORS.accent.gold }

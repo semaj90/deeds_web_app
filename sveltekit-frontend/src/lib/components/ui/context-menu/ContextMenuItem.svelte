@@ -44,7 +44,7 @@
 	data-disabled={disabled || undefined}
 	onclick={ handleClick }
 	onkeydown={ handleKeydown }
-	class="{defaultClass} { className }"
+	class="{defaultClass} {className}"
 >
 	{#if children}
 		{@render children()}

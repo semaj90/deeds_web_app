@@ -44,7 +44,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({, tool: 'system:health', args: {} })
+	body: JSON.stringify({ tool: 'system:health', args: {} })
 			});
 			const data = await res.json();
 			systemHealth = data.result?.services ?? {};
@@ -65,7 +65,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({, tool: selectedTool, args })
+	body: JSON.stringify({ tool: selectedTool, args })
 			});
 			const data = await res.json();
 			result = data;

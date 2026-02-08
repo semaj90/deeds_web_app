@@ -15,7 +15,7 @@
         const res = await fetch(searchUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, queryText: query })
+            body: JSON.stringify({ queryText: query })
         });
         const data = await res.json();
         results = data.results ?? [];

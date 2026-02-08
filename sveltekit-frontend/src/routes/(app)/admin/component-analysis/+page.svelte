@@ -98,7 +98,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Get related files for selected component
 	async function getRelatedFiles(componentId: string): Promise<RelatedFile[]> {
 		try {
-			const res = await fetch(`/api/phase89/related/${ componentId }`);
+			const res = await fetch(`/api/phase89/related/${componentId}`);
 			if (res.ok) {
 				const data = await res.json();
 				return data.related || [];

@@ -52,7 +52,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function exportSOMData(): void { if (!somRAG) return; const exportData = somRAG.exportRapidJSON(); const blob = new Blob([exportData], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `som-data-${Date.now()}.json`; link.click(); URL.revokeObjectURL(url)}
 </script>
- <div class="som-visualization { className }"> <!-- Header --> <div class="header yorha-panel p-4"> <h2 class="text-xl font-bold text-yellow-400">Self-Organizing Map RAG Visualization</h2>
+ <div class="som-visualization {className}"> <!-- Header --> <div class="header yorha-panel p-4"> <h2 class="text-xl font-bold text-yellow-400">Self-Organizing Map RAG Visualization</h2>
  <p class="text-gray-300">Dimensionality reduction and clustering for legal document embeddings</p> </div>
  <!-- Controls --> <div class="controls grid grid-cols-1 lg:grid-cols-3 gap-4"> <!-- SOM, Configuration --> <div class="config-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">SOM Configuration</h3>
  <div class="space-y-3"> <div> <label class="block text-sm text-gray-300">Map Size</label>

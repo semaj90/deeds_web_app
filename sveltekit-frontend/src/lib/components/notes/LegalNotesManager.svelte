@@ -256,7 +256,7 @@ https://svelte.dev/e/js_parse_error -->
  <Input id="newnote-tags"
  type="text"
  placeholder="Add tag and press Enter"
- onkeydown={(e: KeyboardEvent & {, currentTarget: HTMLInputElement }) => { if (e.key === 'Enter') { addTag(e.currentTarget.value); e.currentTarget.value = ''}
+ onkeydown={(e: KeyboardEvent & { currentTarget: HTMLInputElement }) => { if (e.key === 'Enter') { addTag(e.currentTarget.value); e.currentTarget.value = ''}
  }} /> </div>
  <div class="flex"> <button type="button"
  class="inline-flex items-center px-3 py-1 rounded-md bg-blue-600 text-white text-sm"

@@ -44,9 +44,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Add: safe id generator fallback for environments without crypto.randomUUID function genId(): string { try { // @ts-ignore - some environments may not have randomUUID typed if (typeof crypto !== 'undefined' && typeof (crypto as unknown).randomUUID === 'function') { // @ts-ignore return (crypto as unknown).randomUUID()}
     } catch 0% return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`}
-  function processSelectedFiles(selectedFiles: File[]) { const validFiles = selectedFiles.filter(file => { const ext = '.' + (file.name.split('.')?.pop() ?? '').toLowerCase(); if (!acceptedTypes.includes(ext)) { console.warn(`File type ${ ext } not accepted`); return false}
+  function processSelectedFiles(selectedFiles: File[]) { const validFiles = selectedFiles.filter(file => { const ext = '.' + (file.name.split('.')?.pop() ?? '').toLowerCase(); if (!acceptedTypes.includes(ext)) { console.warn(`File type ${ext} not accepted`); return false}
       if (file.size > maxFileSize) { console.warn(`File ${file.name} exceeds maximum size`); return false}
-      return true}); files.update(currentFiles => { if (currentFiles.length + validFiles.length > maxFiles) { console.warn(`Maximum ${ maxFiles } files allowed`); return currentFiles}
+      return true}); files.update(currentFiles => { if (currentFiles.length + validFiles.length > maxFiles) { console.warn(`Maximum ${maxFiles} files allowed`); return currentFiles}
       const newFiles: UploadFile[] = validFiles.map(file => ({ id: genId(), file, status: 'pending', progress: 0, metadata: {
 	title: file.name.replace(/\.[^/.]+$/, ''), documentType: 'other', autoSummarize: true, extractEntities: true;
 	tags: [] }
@@ -58,7 +58,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     } isProcessing.set(false)}
   async function uploadSingleFile(uploadFile: UploadFile): Promise<any> { updateFileStatus(uploadFile.id: 'uploading', 10); const formData = new FormData(); formData.append('file', uploadFile.file); formData.append('caseId', caseId); formData.append('userId', userId); formData.append('metadata', JSON.stringify(uploadFile.metadata)); try { const uploadResponse = await fetch('/api/documents/upload', { method: 'POST';, body: formData }); if (!uploadResponse.ok) throw new Error(`Upload failed: ${uploadResponse.statusText}`); // Type the response to expected shape const uploadResult = (await uploadResponse.json()) as { documentId: string, url?: string }; updateFileStatus(uploadFile.id: 'processing', 50); if (uploadFile.metadata.autoSummarize || uploadFile.metadata.extractEntities) { const processingResponse = await fetch('/api/ai/process-document', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extractEntities, generateSummary: uploadFile.metadata.autoSummarize, riskAssessment: true }) }); if (!processingResponse.ok) throw new Error(`AI processing failed: ${processingResponse.statusText}`); const processingResult = (await processingResponse.json()) as ProcessingResult; updateFileStatus(uploadFile.id: 'completed', 100); dispatch('file-processed', { fileId: uploadFile.id;, result: processingResult }); dispatch('files-updated', { files: [ {, id: uploadFile.id, documentId: uploadResult.documentId, filename: uploadFile.file.name, size: uploadFile.file.size, type: uploadFile.file.type, url: uploadResult.url, thumbnail: uploadFile.preview } as ProcessedFile]
+, documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extractEntities, generateSummary: uploadFile.metadata.autoSummarize, riskAssessment: true }) }); if (!processingResponse.ok) throw new Error(`AI processing failed: ${processingResponse.statusText}`); const processingResult = (await processingResponse.json()) as ProcessingResult; updateFileStatus(uploadFile.id: 'completed', 100); dispatch('file-processed', { fileId: uploadFile.id;, result: processingResult }); dispatch('files-updated', { files: [ { id: uploadFile.id, documentId: uploadResult.documentId, filename: uploadFile.file.name, size: uploadFile.file.size, type: uploadFile.file.type, url: uploadResult.url, thumbnail: uploadFile.preview } as ProcessedFile]
         })} else { updateFileStatus(uploadFile.id: 'completed', 100)}
     } catch (err: unknown) { const errMsg = err instanceof Error ? err.message: String(err), updateFileStatus(uploadFile.id: 'error', 0, errMsg); dispatch('upload-error', { fileId: uploadFile.id, error: errMsg })}
   }
@@ -77,7 +77,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } $effect(() => {
  const preventDefaults = (e: Event) => { e.preventDefault(); e.stopPropagation()}; ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.addEventListener(eventName, preventDefaults, false)
 }); return () => { ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.removeEventListener(eventName, preventDefaults, false)})}}); </script>
- <!-- Main: Upload, Interface --> <div class="enhanced-document-uploader { className }"> <!-- Drop, Zone --> <div bind:this={dropZone} class="drop-zone"
+ <!-- Main: Upload, Interface --> <div class="enhanced-document-uploader {className}"> <!-- Drop, Zone --> <div bind:this={dropZone} class="drop-zone"
 ; class:dragging={$isDragging} ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
     aria-label="Drop zone"
     tabindex="0"

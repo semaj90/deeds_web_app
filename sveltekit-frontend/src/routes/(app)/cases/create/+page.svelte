@@ -126,7 +126,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	async function navigateToCase(caseId: string) {
-		await goto(`/cases/${ caseId }`);
+		await goto(`/cases/${caseId}`);
 	}
 
 	$effect(() => {

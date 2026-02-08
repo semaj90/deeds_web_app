@@ -69,7 +69,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
 , name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
 	neuralSpriteConfig: neuralSpriteConfig.enable_compression ?, neuralSpriteConfig: undefined }) }); if (!response.body) { throw new Error('No response stream available')}
 
-      // Connect to SSE stream eventSource = new EventSource(`${ endpoint }? evidenceId=${encodeURIComponent(evidenceId)}`); eventSource.onmessage = (event) => { try { const data = JSON.parse(event.data); if (data.type === 'connection_established') { console.log('ðŸ”— Streaming connection established for', evidenceId); return}
+      // Connect to SSE stream eventSource = new EventSource(`${endpoint}? evidenceId=${encodeURIComponent(evidenceId)}`); eventSource.onmessage = (event) => { try { const data = JSON.parse(event.data); if (data.type === 'connection_established') { console.log('ðŸ”— Streaming connection established for', evidenceId); return}
 
           // Streaming progress update if (data.type === 'streaming_update' && data.payload) { currentState.context.streamingUpdates = [ ...(currentState.context.streamingUpdates ?? []), data.payload ]}
 
@@ -84,7 +84,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
   }
   function disconnectStream() { if (eventSource) { eventSource.close(); eventSource = null}
   }
-  async function cancelProcessing(): Promise<any> { try { await fetch(`${ endpoint }?evidenceId=${encodeURIComponent(evidenceId)}`, { method: 'DELETE'
+  async function cancelProcessing(): Promise<any> { try { await fetch(`${endpoint}?evidenceId=${encodeURIComponent(evidenceId)}`, { method: 'DELETE'
       }); actor.send({ type: 'CANCEL_PROCESSING' }); disconnectStream()} catch (error) { console.error('Failed to cancel processing:', error)}
   }
   async function retryProcessing(): Promise<any> { actor.send({ type: 'RETRY_CURRENT_STEP' }); if (selectedFile) { setTimeout(() => startProcessing(), 500)}

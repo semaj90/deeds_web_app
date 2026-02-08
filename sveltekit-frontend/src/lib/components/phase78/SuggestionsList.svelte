@@ -45,7 +45,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  async function applySuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${ id }/apply`, {
+ const response = await fetch(`/api/phase78/suggestions/${id}/apply`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -63,7 +63,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  async function dismissSuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${ id }`, {
+ const response = await fetch(`/api/phase78/suggestions/${id}`, {
  method: 'DELETE',
  });
 

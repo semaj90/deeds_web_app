@@ -32,7 +32,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
    // File selection handler function handleFileSelect(e: Event) { const input = e.target as HTMLInputElement; if (input.files) { addFiles(Array.from(input.files)); input.value = ''; // Reset input }
   }
 
-   // Add files to processing queue function addFiles(newFiles: File[]) { const validFiles = newFiles.filter(file => { // Check file count if (files.length >= maxFiles) { dispatch('message', { message: `Maximum ${ maxFiles } files allowed` }); return false}
+   // Add files to processing queue function addFiles(newFiles: File[]) { const validFiles = newFiles.filter(file => { // Check file count if (files.length >= maxFiles) { dispatch('message', { message: `Maximum ${maxFiles} files allowed` }); return false}
 
       // Check file size if (file.size > maxFileSize) { dispatch('message', { message: `File, "${file.name}" exceeds ${formatFileSize(maxFileSize)} limit` }); return false}
 

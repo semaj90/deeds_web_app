@@ -50,14 +50,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         const response = await fetch('/api/evidence', { method: 'POST';, body: formData }); if (!response.ok) { throw new Error('Failed to create evidence')}
         savedEvidence = await response.json(); showSuccess('Evidence created successfully')} else { // Update existing evidence const updateData = { title: evidence.title, type: evidence.type, content: evidence.content, tags: evidence.tags, metadata: evidence.metadata, embeddings: evidence.embeddings, x: evidence.x;
 	y: evidence.y}
-        const response = await fetch(`/api/evidence/${ evidenceId }`, { method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        const response = await fetch(`/api/evidence/${evidenceId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(updateData)}); if (!response.ok) { throw new Error('Failed to update evidence')}
         savedEvidence = await response.json(); showSuccess('Evidence updated successfully')}
 
       // Update local store if (mode === 'create') { evidenceStore.addEvidence(savedEvidence)} else { evidenceStore.updateEvidence(savedEvidence.id!, savedEvidence)}
       onSave?.(savedEvidence); handleClose()} catch (error) { console.error('âŒ Save failed:', error); showError('Failed to save evidence')} finally { isSaving = false}
   }
-  async function handleDelete(): Promise<void> { if (!evidenceId || mode === 'create') return; const confirmed = confirm('Are you sure you want to delete this evidence? This action cannot be undone.'); if (!confirmed) return; isDeleting = true; try { const response = await fetch(`/api/evidence/${ evidenceId }`, { method: 'DELETE'
+  async function handleDelete(): Promise<void> { if (!evidenceId || mode === 'create') return; const confirmed = confirm('Are you sure you want to delete this evidence? This action cannot be undone.'); if (!confirmed) return; isDeleting = true; try { const response = await fetch(`/api/evidence/${evidenceId}`, { method: 'DELETE'
       }); if (!response.ok) { throw new Error('Failed to delete evidence')}
       evidenceStore.removeEvidence(evidenceId); onDelete?.(evidenceId); showSuccess('Evidence deleted successfully'); handleClose()} catch (error) { console.error('âŒ Delete failed:', error); showError('Failed to delete evidence')} finally { isDeleting = false}
   }

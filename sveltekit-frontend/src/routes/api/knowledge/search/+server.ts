@@ -82,7 +82,7 @@ export const POST: RequestHandler = async ({ request }) => {
       success: true,
       query: body.query,
       results,
-      metadata: {, queryTime: totalResults, results.length,
+      metadata: { queryTime: totalResults, results.length,
         synthesized: body?.synthesize|| false,
         llmProvider: body?.llmProvider ?? 'ollama'
       }

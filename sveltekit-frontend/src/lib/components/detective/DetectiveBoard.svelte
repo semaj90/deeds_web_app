@@ -47,7 +47,7 @@ let columns = $state([
 
 let canvasEvidence = $state<any[]>([]);
 let activeUsers = $state<any[]>([]);
-let systemStatus = $state({ rabbitMQ: {, connected: false, health: "unknown"
+let systemStatus = $state({ rabbitMQ: { connected: false, health: "unknown"
   },
   postgreSQL: {
     connected: false, vectorCount: 0
@@ -111,7 +111,7 @@ function handleFileUpload(result: any, columnId: string) {
   columns = columns.map(col => col.id === columnId ? { ...col, items: [...col.items, newEvidence] } : col);
 }
 
-function handleDndFinalize(e: CustomEvent<{, items: any[] }>, columnId: string) {
+function handleDndFinalize(e: CustomEvent<{ items: any[] }>, columnId: string) {
   const { items } = e.detail;
   columns = columns.map(col => col.id === columnId ? { ...col, items } : col);
 }

@@ -12,10 +12,10 @@
 		rows?: number;
 		className?: string;
 		id?: string;
-		oninput?: (e: Event & {, currentTarget: HTMLTextAreaElement }) => void;
+		oninput?: (e: Event & { currentTarget: HTMLTextAreaElement }) => void;
 	} = $props();
 
-	function handleInput(e: Event & {, currentTarget: HTMLTextAreaElement }) {
+	function handleInput(e: Event & { currentTarget: HTMLTextAreaElement }) {
 		value = e.currentTarget.value;
 		oninput?.(e);
 	}

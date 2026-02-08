@@ -146,13 +146,13 @@
 			<div class="header-subtitle">YoRHa <span class="dimmed">Detective Interface / 8/13.10</span></div>
 		</div>
  <div class="header-right">
- <button class="{buttonVariants({ variant: 'outline', size: 'sm' })} header-btn">
+ <button class="{buttonVariants({variant: 'outline', size: 'sm'})} header-btn">
  <span class="icon">🔔</span> HELP <span class="badge">0</span>
  </button>
- <button class="{buttonVariants({ variant: 'outline', size: 'sm' })} header-btn">
+ <button class="{buttonVariants({variant: 'outline', size: 'sm'})} header-btn">
  <span class="icon">⚙️</span> OPTIONS
  </button>
- <a href="/cases/new" class="{buttonVariants({ variant: 'default', size: 'sm' })} header-btn new-case-btn">
+ <a href="/cases/new" class="{buttonVariants({variant: 'default', size: 'sm'})} header-btn new-case-btn">
  <span class="icon">➕</span> NEW CASE
  </a>
  </div>

@@ -30,7 +30,7 @@ let {
 }: Props = $props();
 
 // Size dimensions
-let dimensions = $derived({ sm: {, track: 'w-8 h-4',
+let dimensions = $derived({ sm: { track: 'w-8 h-4',
 		thumb: 'w-3 h-3',
 		translate: 'translate-x-4'
 	},

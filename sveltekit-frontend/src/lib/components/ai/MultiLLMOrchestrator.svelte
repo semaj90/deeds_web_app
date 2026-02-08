@@ -22,7 +22,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function handleTaskError(taskId: string, error: Error) { activeTasks.delete(taskId); taskErrors.set(taskId, error); // Trigger reactivity activeTasks = new Map(activeTasks); taskErrors = new Map(taskErrors)}
   function handleStatusUpdate(status: WorkerStatus) { workerStatus = statu}
   async function submitTestTask(providerId: string): Promise<any> { const testTask: AITask = { taskId: crypto.randomUUID(), type: 'generate', providerId, model: providerConfigs.find(p => p.id === providerId)?.models[0] ?? 'default', prompt: 'Hello! Please respond with a brief test message to verify the connection.', timestamp: Date.now(), priority: 'medium', temperature: 0.1, maxTokens: 50 }
-    try { activeTasks.set(testTask.taskId, testTask); activeTasks = new Map(activeTasks); await aiWorkerManager.submitTask(testTask); console.log(`Test task submitted to ${ providerId }`)} catch (error) { console.error(`Failed to submit test task to ${ providerId }:`, error); activeTasks.delete(testTask.taskId); taskErrors.set(testTask.taskId, error as Error)}
+    try { activeTasks.set(testTask.taskId, testTask); activeTasks = new Map(activeTasks); await aiWorkerManager.submitTask(testTask); console.log(`Test task submitted to ${providerId}`)} catch (error) { console.error(`Failed to submit test task to ${providerId}:`, error); activeTasks.delete(testTask.taskId); taskErrors.set(testTask.taskId, error as Error)}
   }
   async function cancelTask(taskId: string): Promise<any> { try { await aiWorkerManager.cancelTask(taskId); activeTasks.delete(taskId); activeTasks = new Map(activeTasks)} catch (error) { console.error('Failed to cancel task:', error)}
   }
@@ -30,7 +30,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function getProviderIcon(providerId: string) { return providerConfigs.find(p => p.id === providerId)?.icon ?? Glob}
   function getStatusColor(status: string) { switch (status) { case: 'online': return 'text-green-500'; case, 'offline': return 'text-red-500'; case, 'unknown': return 'text-gray-400',default:return 'text-gray-400'}
   }
-  function formatDuration(ms: number): string { if (ms < 1000) return `${ ms }ms`; if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`; return `${(ms / 60000).toFixed(1)}m`}
+  function formatDuration(ms: number): string { if (ms < 1000) return `${ms}ms`; if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`; return `${(ms / 60000).toFixed(1)}m`}
 </script>
  <div class="w-full"> <!-- Header --> <div class="flex items-center"> <div> <h2 class="text-2xl font-bold text-gray-900"> Multi-LLM Orchestrator </h2>
  <p class="text-gray-600"> Manage and monitor multiple AI processing workers </p> </div>

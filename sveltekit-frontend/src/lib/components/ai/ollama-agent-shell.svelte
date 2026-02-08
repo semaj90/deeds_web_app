@@ -8,7 +8,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // State let messages: Message[] = $state([]); let input = $state<string>(""); let isLoading = $state<boolean>(false); let copiedIndex = $state<number | null>(null); let terminalElement = $state<HTMLDivElement; let inputElement = $state<HTMLTextAreaElement// WebSocket for real-time, updates let ws, WebSocket | null>(null); const data = null); $effect(() => { // Initialize with system message messages.push({ role: "system", content: `ðŸš€ Ollama Agent Shell v1.0 Connected, to: nomic-embed-text, gemma:3b, GPU: ${navigator.gpu ? "Enabled": "Disabled"} Type /help for commands`, timestamp: new Date(), status: "complete"
     })); // Connect WebSocket if docId provided if (docId) { connectWebSocket()}
     // Process initial prompt if (initialPrompt) { input = initialPrompt; handleSubmit()}
-  }); // TODO: Add as cleanup in $effect: return () => { ws?.close()} function connectWebSocket() { if (!docId) return; ws = new WebSocket(`ws://localhost:8080/ws?docId=${ docId }`) ws.onmessage = (event) => { const data = JSON.parse(event.data); if (data.type === "status_update") { messages.push({ role: "system", content: data.message, timestamp: new Date(), status: "complete"
+  }); // TODO: Add as cleanup in $effect: return () => { ws?.close()} function connectWebSocket() { if (!docId) return; ws = new WebSocket(`ws://localhost:8080/ws?docId=${docId}`) ws.onmessage = (event) => { const data = JSON.parse(event.data); if (data.type === "status_update") { messages.push({ role: "system", content: data.message, timestamp: new Date(), status: "complete"
         })}
     } ws.onerror = () => { messages.push({ role: "system", content: "âš ï¸ WebSocket disconnected", timestamp: new Date(), status: "error"
       })}
@@ -25,7 +25,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       messages[messages.length - 1].status = "streaming"; const reader = response.body.getReader(); const decoder = new TextDecoder(); let content = $state<string>(""); while (true) { const { done: value } = await reader.read(); if (done) break; const chunk = decoder.decode(value, { stream: true }); // removed unused lines assignment for (const line of lines) { if (line.trim()) { try { const data = JSON.parse(line); if (data.response) { content += data.respon; messages[messages.length - 1].content = content}
             } catch (e) { // Skip invalid JSON }
           } }
-      } messages[messages.length - 1].status = "complete"} catch (error) { messages[messages.length - 1].content = `âŒ Error: ${ error }`; messages[messages.length - 1].status = "error"} finally { isLoading = false; scrollToBottom()}
+      } messages[messages.length - 1].status = "complete"} catch (error) { messages[messages.length - 1].content = `âŒ Error: ${error}`; messages[messages.length - 1].status = "error"} finally { isLoading = false; scrollToBottom()}
   } function handleCommand(cmd: string) { const command = cmd.slice.toLowerCase(); switch (command) { case: "help": messages.push({
 	role: "system", content: `Commands: /help - Show this help /clear - Clear chat /embed - Show embeddings /gpu - GPU status /export - Export chat`, timestamp: new Date(), status: "complete"
         }); break; case, "clear": messages = [ { role: "system", content: "ðŸ§¹ Cleared", timestamp: new Date(), status: "complete"
@@ -33,7 +33,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 , .join(", ")}...]`, timestamp: new Date(), status: "complete"
           })}
         break; case, "gpu": checkGPUStatus(); break; case, "export": exportChat(); break; default:messages.push({
-	role: "system", content: `Unknown, command: ${ cmd }`, timestamp: new Date(), status: "error"
+	role: "system", content: `Unknown, command: ${cmd}`, timestamp: new Date(), status: "error"
         })}
   } async function checkGPUStatus(): Promise<any> { if (navigator.gpu) { const adapter = await navigator.gpu.requestAdapter(); messages.push({ role: "system", content: `ðŸŽ®, GPU: ${adapter?.name ?? "Available"}`, timestamp: new Date(), status: "complete"
       })} else { messages.push({ role: "system", content: "âŒ WebGPU not available", timestamp: new Date(), status: "error"

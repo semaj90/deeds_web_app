@@ -15,7 +15,7 @@
 	z: number };
   }
 
-  interface Camera3D { position: {, x: number, y: number;
+  interface Camera3D { position: { x: number, y: number;
 	z: number };
     target: {
 	x: number, y: number;
@@ -40,7 +40,7 @@
   let isWebGPUActive = $state(false);
 
   // Constants
-  const LOD_CONFIG = { 0: {, description: 'Full Mesh Detail (High Poly)', distance: 0 },
+  const LOD_CONFIG = { 0: { description: 'Full Mesh Detail (High Poly)', distance: 0 },
 	1: {
 	description: 'Balanced (Mid Poly)', distance: 15 },
 	2: {

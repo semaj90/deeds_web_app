@@ -42,7 +42,7 @@
 <div
 	transition:fly={{
 	x: 100, duration, 200 }}
-	class="{baseClass} {variantClass()} { className }"
+	class="{baseClass} {variantClass()} {className}"
 	role="alert"
 >
 	<div class="flex-1">

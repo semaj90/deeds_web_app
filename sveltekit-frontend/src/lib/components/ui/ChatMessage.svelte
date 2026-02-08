@@ -3,7 +3,7 @@
 	import Bot from 'lucide-svelte/icons/bot';
 	import User from 'lucide-svelte/icons/user';
 
-	interface Props { message: {, role: 'user' | 'assistant' | 'error';
+	interface Props { message: { role: 'user' | 'assistant' | 'error';
 			content: string;
 			timestamp?: string;
 		};

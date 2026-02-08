@@ -169,7 +169,7 @@
   /**
    * Handle typing state changes from the headless listener
    */
-  function handleTypingStateChange(event: CustomEvent<{, state: TypingState;, context: TypingContext }>) {
+  function handleTypingStateChange(event: CustomEvent<{ state: TypingState;, context: TypingContext }>) {
     currentTypingState = event.detail.state;
     typingContext = event.detail.context;
 
@@ -187,7 +187,7 @@
   /**
    * Handle contextual prompts from typing behavior
    */
-  function handleContextualPrompt(event: CustomEvent<{, prompts: string[];, context: TypingContext }>) {
+  function handleContextualPrompt(event: CustomEvent<{ prompts: string[];, context: TypingContext }>) {
     contextualPrompts = [...event.detail.prompts];
 
     // Add detective-specific contextual prompts
@@ -205,8 +205,7 @@
   /**
    * Handle analytics updates from typing behavior
    */
-  function handleAnalyticsUpdate(event: CustomEvent<{
-, analytics: unknown }>) {
+  function handleAnalyticsUpdate(event: CustomEvent<{ analytics: unknown }>) {
     if (enableAnalytics) {
       console.log('[ContextualDetectiveBoard] Analytics update:', event.detail.analytics);
     }

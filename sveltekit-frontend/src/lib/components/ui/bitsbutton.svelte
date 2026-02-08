@@ -11,7 +11,7 @@
   // Define buttonVariants
   const buttonVariants = cva(
     'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none nes-focus disabled:opacity-50 disabled:pointer-events-none cursor-pointer',
-    { variants: {, variant: {
+    { variants: { variant: {
           default: 'btn-nes-primary',
           destructive: 'btn-nes-danger',
           outline: 'border-2 border-gray-400 bg-transparent hover:bg-gray-100 dark: hover, bg-gray-800',

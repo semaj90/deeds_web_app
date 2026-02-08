@@ -87,7 +87,7 @@
             body: JSON.stringify({
                 question: query,
                 context: { content, documentType, caseId },
-                options: {, includeReferences: true }
+                options: { includeReferences: true }
             })
         });
 

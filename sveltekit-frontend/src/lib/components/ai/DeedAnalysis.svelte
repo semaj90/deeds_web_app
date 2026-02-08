@@ -30,7 +30,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> </div>
  <div class="mb-4"> <h3 class="font-bold mb-2">Content Preview</h3>
  <div class="bg-gray-50 p-3 rounded border max-h-40"> <p class="text-sm text-gray-700"> {String(selectedDocument?.content ?? '').slice(0, 500)}{(selectedDocument?.content?.length ?? 0) > 500 ? '...': ''} </p> </div> </div> {/if}
-  <!-- Search, Results --> <div class="bg-white rounded-lg shadow-md p-6"> <h2 class="text-xl font-bold mb-4"> ðŸŽ¯ Similar Documents {searchQuery ? `for, "${ searchQuery }"`: ''} </h2>
+  <!-- Search, Results --> <div class="bg-white rounded-lg shadow-md p-6"> <h2 class="text-xl font-bold mb-4"> ðŸŽ¯ Similar Documents {searchQuery ? `for, "${searchQuery}"`: ''} </h2>
   {#if error} <div class="bg-red-50 border border-red-200 rounded-md p-4"> <div class="flex"> <div class="flex-shrink-0"> <span class="text-red-400">âŒ</span> </div>
  <div class="ml-3"> <h3 class="text-sm font-medium">Search Error</h3>
  <p class="text-sm text-red-700">{ error }</p> </div> </div> {/if} {#if isLoading} <div class="flex items-center justify-center"> <div class="flex items-center"> <div class="animate-spin rounded-full h-6 w-6 border-b-2"></div>

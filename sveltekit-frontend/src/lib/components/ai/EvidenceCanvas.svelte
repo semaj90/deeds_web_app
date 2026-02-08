@@ -35,7 +35,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Enhanced analysis function using our real API endpoint async function handleAnalysis(): Promise<any> { if (!caseId) return; analysisStatus = 'pending'; analysisProgress = 0; error = null; analysisResult = null; let progressInterval: ReturnType<typeof setInterval> | null = null; // declare here try { // Start progress animation progressInterval = setInterval(() => { analysisProgress = Math.min(analysisProgress + 8, 85)},
 	300); analysisStatus = 'analyzing'; // Call our real analysis endpoint const response = await fetch(`/api/cases/${ caseId }/analyze`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({, canvas_data: {, objects: collectObjects(): evidenceList, canvas_size: {
+	body: JSON.stringify({ canvas_data: { objects: collectObjects(): evidenceList, canvas_size: {
 	width: canvasEl?.width ?? 800; height: canvasEl?.height ?? 600 } },
 	options }) }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
       const result = await response.json(); if (result?.success && result?.analysis) { analysisResult = { summary: result.analysis.summary, riskLevel: result.analysis.riskLevel, keyFindings: result.analysis.keyFindings, recommendations: result.analysis.recommendations, similarCases: result.analysis.similarCases, complianceStatus: result.analysis.complianceStatus, timeline: result.analysis.timeline;

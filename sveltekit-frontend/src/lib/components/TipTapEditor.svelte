@@ -28,7 +28,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				const html = ed.getHTML();
 				onChange?.(html);
 			},
-	editorProps: { attributes: {, class: 'prose prose-invert w-full focus:outline-none bg-neutral-950/90 text-neutral-100 p-4'
+	editorProps: { attributes: { class: 'prose prose-invert w-full focus:outline-none bg-neutral-950/90 text-neutral-100 p-4'
 				}
 			}
 		});

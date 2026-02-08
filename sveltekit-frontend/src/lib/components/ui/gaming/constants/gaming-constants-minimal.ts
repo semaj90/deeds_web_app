@@ -92,7 +92,7 @@ export const GAMING_ERA_SPECS = {
 };
 
 // N64 Texture Presets
-export const N64_TEXTURE_PRESETS = { lowPoly: {, textureQuality: 'low' as const,
+export const N64_TEXTURE_PRESETS = { lowPoly: { textureQuality: 'low' as const,
     enableBilinearFiltering: false,
     enableTrilinearFiltering: false,
     anisotropicLevel: 1 as const,

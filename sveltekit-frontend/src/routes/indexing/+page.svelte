@@ -4,7 +4,7 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
-  interface IndexingStatus { success: boolean;, collections: { codebase: {, points_count: number };
+  interface IndexingStatus { success: boolean;, collections: { codebase: { points_count: number };
       errors: { points_count: number };
     };
     timestamp: string;
@@ -53,7 +53,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       const response = await fetch('/api/indexing/codebase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, rootPath: indexPath })
+        body: JSON.stringify({ rootPath: indexPath })
       });
 
       const result = await response.json();
@@ -106,7 +106,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       const response = await fetch(`/api/indexing/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, query: searchQuery, limit: 5 })
+        body: JSON.stringify({ query: searchQuery, limit: 5 })
       });
 
       const result = await response.json();

@@ -53,7 +53,7 @@
 		const res = await fetch('/api/phase89/graph/expand', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, seed_uris: [nodeUri],
+			body: JSON.stringify({ seed_uris: [nodeUri],
 				depth: expandDepth
 			})
 		});

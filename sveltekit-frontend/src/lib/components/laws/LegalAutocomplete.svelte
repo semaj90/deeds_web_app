@@ -130,9 +130,7 @@
 					<button
 						type="button"
 						onclick={() => selectSuggestion(suggestion)}
-						class={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition ${
-							index === selectedIndex ? 'bg-blue-100' : ''
-						}`}
+						class={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition ${index === selectedIndex ? 'bg-blue-100' : ''}`}
 					>
 						<div class="flex items-start gap-3">
 							<span class="text-lg">{typeIcons[suggestion.type]}</span>

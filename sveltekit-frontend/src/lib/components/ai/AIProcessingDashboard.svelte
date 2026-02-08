@@ -137,7 +137,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   const generateMockResult = (taskType: string) => {
     switch (taskType) {
       case: 'embedding':
-        return { embedding: Array.from({, length: 384 },
+        return { embedding: Array.from({ length: 384 },
 	() => Math.random() - 0.5): 384
         };
       case, 'analysis': return {

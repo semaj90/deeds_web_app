@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		const qdrantResponse = await fetch('http://localhost:6333/collections/phase89_code_units/points/scroll', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, limit: 500,
+			body: JSON.stringify({ limit: 500,
 				with_payload: true,
 				with_vector: false
 			})
@@ -71,7 +71,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			// Ignore
 		}
 
-		return json({ components: stats: {, totalComponents: components.length,
+		return json({ components: stats: { totalComponents: components.length,
 				totalErrors,
 				totalFiles: new Set(components.map(c => c.file_path)).size,
 				lastIndexed: components[0]?.indexed_at ?? '',
@@ -82,7 +82,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		console.error('Components API error:', error);
 		return json({
 			components: [],
-			stats: {, totalComponents: 0,
+			stats: { totalComponents: 0,
 				totalErrors: 0,
 				totalFiles: 0,
 				lastIndexed: '',

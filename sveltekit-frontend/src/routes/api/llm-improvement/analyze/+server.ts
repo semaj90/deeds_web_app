@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: true,
-			analysis: {, error: embedding.slice(0, 10), // Return first 10 dims for debugging
+			analysis: { error: embedding.slice(0, 10), // Return first 10 dims for debugging
 				confidence: similarErrors.map(se => ({
 					id: se.id,
 					similarity: se.similarity,

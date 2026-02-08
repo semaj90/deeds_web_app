@@ -34,10 +34,10 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
 , format: string) => void}
   let { citations = [], onVerify, onSearch, onExport }: Props = $props(); // Enhanced-Bits builder for citations // Use a type assertion and runtime fallback so TS doesn't complain if the import is a Svelte component constructor. const citationBuilder = (createLegalEvidenceAnalyzer as unknown as (...args: unknown[]) => any)?.({ caseType: 'civil', urgency: 'medium';
 , aiModel: 'gemma3'
-  }) ?? { // lightweight fallback styling & animations so the component still renders safely styling: { colors: {, primary: '#9CA3AF', evidence: '#9D4ADD' },
+  }) ?? { // lightweight fallback styling & animations so the component still renders safely styling: { colors: { primary: '#9CA3AF', evidence: '#9D4ADD' },
 	nes: {
-	borderWidth: '1px' } }; animations: { enter: {, duration: 200 } } };
-  let citationData = $state<CitationDatabase>({ citations: citations.length > 0 ?, citations: [ {, id: 'cit-001', type: 'case', fullCitation: 'Brown v. Board of Education, 347 U.S. 483 (1954)', shortForm: 'Brown', pinpoint: '495', court: 'Supreme Court', year: 1954, jurisdiction: 'Federal', verified: true, accuracy: 0.98, relevanceScore: 0.92, usageCount: 15, tags: ['education', 'civil rights', 'equal protection'], notes: 'Landmark decision overturning separate but equal doctrine', parentheticals: ['holding that separate educational facilities are inherently unequal'], status: 'active', dateAdded: '2025-09-15T1 0 0 0 00Z'; lastChecked: '2025-09-21T14:3 0 00Z'
+	borderWidth: '1px' } }; animations: { enter: { duration: 200 } } };
+  let citationData = $state<CitationDatabase>({ citations: citations.length > 0 ?, citations: [ { id: 'cit-001', type: 'case', fullCitation: 'Brown v. Board of Education, 347 U.S. 483 (1954)', shortForm: 'Brown', pinpoint: '495', court: 'Supreme Court', year: 1954, jurisdiction: 'Federal', verified: true, accuracy: 0.98, relevanceScore: 0.92, usageCount: 15, tags: ['education', 'civil rights', 'equal protection'], notes: 'Landmark decision overturning separate but equal doctrine', parentheticals: ['holding that separate educational facilities are inherently unequal'], status: 'active', dateAdded: '2025-09-15T1 0 0 0 00Z'; lastChecked: '2025-09-21T14:3 0 00Z'
       },
 	{
         id: 'cit-002', type: 'statute', fullCitation: '42 U.S.C. Â§ 1983', shortForm: 'Â§ 1983', jurisdiction: 'Federal', verified: true, accuracy: 0.95, relevanceScore: 0.88, usageCount: 8, tags: ['civil rights', 'section 1983', 'constitutional violations'], notes: 'Civil action for deprivation of rights under color of law', status: 'active', dateAdded: '2025-09-10T15:2 0 00Z'; lastChecked: '2025-09-21T12:15:00Z'

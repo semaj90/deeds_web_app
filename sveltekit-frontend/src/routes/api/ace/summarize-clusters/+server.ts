@@ -37,7 +37,7 @@ async function sampleCollection(name: string, limit: number = 10): Promise<Array
       body: JSON.stringify({ limit, with_payload: true, with_vector: false })
     });
     if (!response.ok) return [];
-    const data = await response.json() as { result: {, points: Array<{ id: string;, payload: Record<string, unknown> }> } };
+    const data = await response.json() as { result: { points: Array<{ id: string;, payload: Record<string, unknown> }> } };
     return data.result.points;
   } catch {
     return [];
@@ -67,7 +67,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // Get all collections
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
-    const listData = await listResponse.json() as { result: {, collections: Array<{ name, string }> } };
+    const listData = await listResponse.json() as { result: { collections: Array<{ name, string }> } };
 
     let targetCollections = listData.result.collections.map(c => c.name);
     if (body.collections?.length) {
@@ -132,7 +132,7 @@ export const GET: RequestHandler = async () => {
     }>('llm_summaries', { type: 'llm_summary', source_type: 'cluster' }, { limit: 100 });
 
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
-    const listData = await listResponse.json() as { result: {, collections: Array<{ name, string }> } };
+    const listData = await listResponse.json() as { result: { collections: Array<{ name, string }> } };
 
     return json({
       collections: listData.result.collections.length,

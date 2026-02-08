@@ -58,7 +58,7 @@
 
       // In a real implementation, we would fetch('/api/ingest', { method: 'POST', body: formData })
     } catch (err) {
-      processingLog = [...processingLog, `> ERROR: ${ err }`];
+      processingLog = [...processingLog, `> ERROR: ${err}`];
       processingStatus = 'idle';
     }
   }

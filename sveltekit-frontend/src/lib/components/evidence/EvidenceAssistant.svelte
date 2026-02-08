@@ -18,7 +18,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let isAnalyzing = false;
  let suggestions: string[] = [];
 
- const dispatch = createEventDispatcher<{ update: {, nodeId: string; updates: Partial<EvidenceNode> };
+ const dispatch = createEventDispatcher<{ update: { nodeId: string; updates: Partial<EvidenceNode> };
  close: void;
  }>();
 

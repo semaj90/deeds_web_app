@@ -36,7 +36,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		indexedFiles: 0,
 		totalErrors: 0,
 		errorClusters: 0,
-		topErrorCodes: [] as Array<{, code: string; count, number }>,
+		topErrorCodes: [] as Array<{ code: string; count, number }>,
 		surfaceBreakdown: {} as Record<string, number>,
 		techBreakdown: {} as Record<string, number>
 	});

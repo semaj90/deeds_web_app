@@ -55,7 +55,7 @@
 
   // --- Derived ---
 
-  const lodConfig = { 0: {, precision: 'hour', maxEvents: 1000, label: 'Ultra (Hours)' },
+  const lodConfig = { 0: { precision: 'hour', maxEvents: 1000, label: 'Ultra (Hours)' },
 	1: {
 	precision: 'day', maxEvents: 500, label: 'High (Days)' },
 	2: {

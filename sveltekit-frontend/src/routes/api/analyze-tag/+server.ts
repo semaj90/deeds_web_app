@@ -31,7 +31,7 @@ export async function POST({ request }: RequestEvent) {
 		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: analysis.summary
 			})
 		});
@@ -147,7 +147,7 @@ Related: [tag1, tag2, tag3]`;
 				}
 			],
 			stream: false,
-			options: {, temperature: 0.3, num_predict: 200 }
+			options: { temperature: 0.3, num_predict: 200 }
 		})
 	});
 

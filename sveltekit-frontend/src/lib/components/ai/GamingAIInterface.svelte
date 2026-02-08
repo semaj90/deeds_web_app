@@ -17,7 +17,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	model: data?.model ?? 'gemma3-legal'; confidence: Math.floor(Math.random() * 20) + 80, // Simulate confidence if absent processingTime: typeof data?.processingTime === 'number' ? data.processingTime: Math.floor(Math.random() * 1000) + 500 }
       }; messages = [...messages, aiMessage]; // Update user message status messages = messages.map(msg => (msg.id === userMessage.id ? { ...msg, status: 'sent' }: msg))} catch (error) { console.error('AI Chat Error:', error); // Add error message const errorMessage: AIMessage = { id: crypto.randomUUID(), role: 'system', content: `ERROR: AI system unavailable - ${error instanceof Error ? error.message: 'Unknown error'}`, timestamp: new Date(); metadata: {
 	confidence: 0 } }; messages = [...messages, errorMessage]; // Update user message status messages = messages.map(msg => (msg.id === userMessage.id ? { ...msg, status: 'error' }: msg))} finally { isTyping = false; aiMode = 'idle'; inputValue = ''}
-  } // Gaming Interface Themes const themes = { yorha: {, primary: 'text-gray-100', secondary: 'text-blue-300', accent: 'text-green-400', danger: 'text-red-400', bg: 'bg-gray-900', panel: 'bg-gray-800/90';
+  } // Gaming Interface Themes const themes = { yorha: { primary: 'text-gray-100', secondary: 'text-blue-300', accent: 'text-green-400', danger: 'text-red-400', bg: 'bg-gray-900', panel: 'bg-gray-800/90';
 	border: 'border-gray-600/50'
     },
 	cyberpunk: {

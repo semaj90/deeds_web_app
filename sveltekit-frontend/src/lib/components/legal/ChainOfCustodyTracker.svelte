@@ -26,7 +26,7 @@
 	label: 'Damaged', class: 'bg-red-500/20 text-red-400' } }; function formatDateTime(date: Date): string { return date.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     })}
 
-  function getTimeSince(date: Date): string { const now = new Date(); const diffTime = now.getTime() - date.getTime(); const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); const diffHours = Math.floor(diffTime / (1000 * 60 * 60)); if (diffDays > 0) { return `${ diffDays } day${diffDays !== 1 ? 's': ''} ago`} else if (diffHours > 0) { return `${ diffHours } hour${diffHours !== 1 ? 's': ''} ago`} else { return 'Less than an hour ago'}
+  function getTimeSince(date: Date): string { const now = new Date(); const diffTime = now.getTime() - date.getTime(); const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); const diffHours = Math.floor(diffTime / (1000 * 60 * 60)); if (diffDays > 0) { return `${diffDays} day${diffDays !== 1 ? 's': ''} ago`} else if (diffHours > 0) { return `${diffHours} hour${diffHours !== 1 ? 's': ''} ago`} else { return 'Less than an hour ago'}
   } </script> <div class={cn('chain-of-custody, w-full, space-y-4', className)}> <!-- Evidence, Header --> <div class={cn(
       'bg-yorha-bg-secondary border rounded-lg p-4', evidence?.compromised ? 'border-red-500/30 bg-red-500/5', 'border-yorha-border'
     )} >

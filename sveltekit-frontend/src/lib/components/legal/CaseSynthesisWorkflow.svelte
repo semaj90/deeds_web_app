@@ -17,16 +17,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	name: string, score: number, details: string}[]}
   interface LegalStrategy { primaryCharges: string[], supportingEvidence: string[], potentialDefenses: string[], prosecutionApproach: string
 ,keyArguments: string[]}
-  interface RiskAnalysis { challengePoints: {, issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
+  interface RiskAnalysis { challengePoints: { issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
   interface Recommendation { priority: 'immediate' | 'high' | 'medium' | 'low',category: 'evidence' | 'legal' | 'procedural' | 'strategic',action: string; // Added colon rationale: string, timeline, string}
   const synthesisMachine = createMachine<SynthesisContext>({ id: 'synthesis', initial: 'idle', context: { caseId, documents, evidenceReports, selectedItems: [], synthesisMode: 'thematic', synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma loading: false },
-	states: { idle: {, on: { // Added colon SELECT_ITEMS: {, actions: assign({, selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
+	states: { idle: { on: { // Added colon SELECT_ITEMS: { actions: assign({ selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
             }) },
 	START_SYNTHESIS: {
 	target: 'synthesizing', actions: assign({
 	loading: true, progressStage: 'synthesizing' }) }
         } },
-	synthesizing: { invoke: {, src: 'performSynthesis', onDone: {
+	synthesizing: { invoke: { src: 'performSynthesis', onDone: {
 	target: 'complete', actions: assign({
 	synthesisResult: ({ event }) => event.data, loading: false, // Added comma progressStage: 'complete'
             }) },
@@ -48,7 +48,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
         } }
     } },
-	{ services: {, performSynthesis: async (context: SynthesisContext) => { // Mock comprehensive synthesis return new Promise<CaseSynthesis>((resolve) => { setTimeout(() => { resolve({ executiveSummary: "Comprehensive analysis of the case evidence reveals a strong foundation for prosecution with multiple corroborating sources. The digital forensics evidence provides clear proof of unauthorized access, supported by witness testimony and financial records showing systematic fraud over an 18-month period.", timeline: [ { date: "2023-01-15", event: "First unauthorized access detected in system logs", sources: ["Digital Forensics Report #001", "Server Log Analysis"], significance: "high"
+	{ services: { performSynthesis: async (context: SynthesisContext) => { // Mock comprehensive synthesis return new Promise<CaseSynthesis>((resolve) => { setTimeout(() => { resolve({ executiveSummary: "Comprehensive analysis of the case evidence reveals a strong foundation for prosecution with multiple corroborating sources. The digital forensics evidence provides clear proof of unauthorized access, supported by witness testimony and financial records showing systematic fraud over an 18-month period.", timeline: [ { date: "2023-01-15", event: "First unauthorized access detected in system logs", sources: ["Digital Forensics Report #001", "Server Log Analysis"], significance: "high"
                 },
 	{
                   date: "2023-03-22", event: "Large data transfer to external IP address", sources: ["Network Traffic Analysis", "Digital Forensics Report #002"], significance: "critical"
@@ -118,7 +118,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function getScoreColor(score: number): string { if (score >= 0.8) return 'text-green-600'; if (score >= 0.6) return 'text-yellow-600'; return 'text-red-600'}
   function getPriorityColor(priority: string): string { switch (priority) { case: 'immediate': return 'bg-red-100 text-red-800 border-red-200'; case, 'high': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'; case, 'low': return 'bg-gray-100 text-gray-800 border-gray-200',default:return 'bg-gray-100 text-gray-800 border-gray-200'}
   }
-  function exportSynthesis() { const s = $state.context?.synthesisResult; if (!s) return; const synthesis = s as CaseSynthesis; const content = `# Case Synthesis Report - ${ caseId } ## Executive Summary ${synthesis.executiveSummary} ## Strength Assessment - Overall: ${Math.round(synthesis.strengthAssessment.overall * 100)}% - Evidence Quality: ${Math.round(synthesis.strengthAssessment.evidenceQuality * 100)}% - Legal Basis: ${Math.round(synthesis.strengthAssessment.legalBasis * 100)}% ## Legal Strategy ### Primary Charges ${synthesis.legalStrategy.primaryCharges.map(charge => charge).join('\n')} ### Prosecution Approach ${synthesis.legalStrategy.prosecutionApproach} ## Recommendations ${synthesis.recommendations.map(rec => `### ${rec.priority.toUpperCase()} - ${rec.action}\n${rec.rationale}\n`).join('\n')} ## Next Steps ${synthesis.nextSteps.map(step => step).join('\n')} `; const blob = new Blob([content], { type: 'text/markdown' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `case-synthesis-${ caseId }-${new Date().toISOString().split('T')[0]}.md`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
+  function exportSynthesis() { const s = $state.context?.synthesisResult; if (!s) return; const synthesis = s as CaseSynthesis; const content = `# Case Synthesis Report - ${caseId} ## Executive Summary ${synthesis.executiveSummary} ## Strength Assessment - Overall: ${Math.round(synthesis.strengthAssessment.overall * 100)}% - Evidence Quality: ${Math.round(synthesis.strengthAssessment.evidenceQuality * 100)}% - Legal Basis: ${Math.round(synthesis.strengthAssessment.legalBasis * 100)}% ## Legal Strategy ### Primary Charges ${synthesis.legalStrategy.primaryCharges.map(charge => charge).join('\n')} ### Prosecution Approach ${synthesis.legalStrategy.prosecutionApproach} ## Recommendations ${synthesis.recommendations.map(rec => `### ${rec.priority.toUpperCase()} - ${rec.action}\n${rec.rationale}\n`).join('\n')} ## Next Steps ${synthesis.nextSteps.map(step => step).join('\n')} `; const blob = new Blob([content], { type: 'text/markdown' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `case-synthesis-${caseId}-${new Date().toISOString().split('T')[0]}.md`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
 </script>
  <div class="case-synthesis-workflow max-w-7xl mx-auto"> <!-- Header --> <div class="bg-white border border-gray-200 rounded-lg shadow-sm"> <div class="flex items-center"> <div> <h1 class="text-2xl font-bold text-gray-900">Case Synthesis Workflow</h1>
  <p class="text-gray-600">Case ID: { caseId } â€¢ Comprehensive analysis and strategic planning</p> </div>

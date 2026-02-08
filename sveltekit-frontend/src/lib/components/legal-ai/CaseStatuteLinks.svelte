@@ -46,7 +46,7 @@
  const params = new URLSearchParams();
  if (selectedLinkType) params.set('link_type', selectedLinkType);
 
- const response = await fetch(`/api/cases/${ caseId }/laws? ${params}`);
+ const response = await fetch(`/api/cases/${caseId}/laws? ${params}`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
@@ -71,7 +71,7 @@
  }
 
  try {
- const response = await fetch(`/api/cases/${ caseId }/laws/${ statuteCode }`, {
+ const response = await fetch(`/api/cases/${ caseId }/laws/${statuteCode}`, {
  method: 'DELETE',
  });
 

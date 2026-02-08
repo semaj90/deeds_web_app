@@ -113,7 +113,7 @@
 				uploadResults: [],
 				errors: [],
 				contextualPrompts: [],
-				pipeline: { fileValidation: {, status: 'pending' },
+				pipeline: { fileValidation: { status: 'pending' },
 	fileUpload: {
 	status: 'pending' },
 	aiAnalysis: {

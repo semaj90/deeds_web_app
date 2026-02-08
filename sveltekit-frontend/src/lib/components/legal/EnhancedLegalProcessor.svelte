@@ -40,14 +40,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       analysisResults: null as any,
       errorMessage: null as string | null
     },
-	states: { idle: {, on: { FILE_SELECTED: {, target: 'readyToUpload',
+	states: { idle: { on: { FILE_SELECTED: { target: 'readyToUpload',
             actions: assign({
 , file: ({ event }: any) => event.file
             })
           }
         }
       },
-	readyToUpload: { on: {, UPLOAD: 'uploading',
+	readyToUpload: { on: { UPLOAD: 'uploading',
           CANCEL: {
 	target: 'idle',
             actions: assign({
@@ -55,7 +55,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	uploading: { invoke: {, src: async ({ context }: any) => {
+	uploading: { invoke: { src: async ({ context }: any) => {
             // return a promise
             return apiClient.uploadDocument(context.file!)},
 	onDone: {
@@ -72,7 +72,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	processing: { invoke: {, src: async ({ context }: any) => {
+	processing: { invoke: { src: async ({ context }: any) => {
             return apiClient.processDocument(context.documentId!)},
 	onDone: {
 	target: 'analyzing',
@@ -88,7 +88,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	analyzing: { invoke: {, src: async ({ context }: any) => {
+	analyzing: { invoke: { src: async ({ context }: any) => {
             return apiClient.analyzeDocument(context.documentId!)},
 	onDone: {
 	target: 'complete',
@@ -104,7 +104,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	complete: { on: {, RESET: {
+	complete: { on: { RESET: {
 	target: 'idle',
             actions: assign({
 	file: null,
@@ -116,7 +116,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	error: { on: {, RESET: {
+	error: { on: { RESET: {
 	target: 'idle',
             actions: assign({
 	file: null,

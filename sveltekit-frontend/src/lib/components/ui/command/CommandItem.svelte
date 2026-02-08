@@ -66,7 +66,7 @@
 	tabindex={disabled ? -1 : 0}
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
-		class="{defaultClass} { className }"
+		class="{defaultClass} {className}"
 	>
 		{#if children}
 			{@render children()}

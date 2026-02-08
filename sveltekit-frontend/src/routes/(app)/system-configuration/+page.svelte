@@ -4,7 +4,7 @@
  let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security'>('general');
 
  // Configuration settings
- let config = $state({ general: {, theme: 'yorha',
+ let config = $state({ general: { theme: 'yorha',
    language: 'en',
    timezone: 'UTC',
    autoSave: true,
@@ -47,7 +47,7 @@
   uptime: '0d 0h 0m',
   memory: { used: 0, total: 0, percentage: 0 },
 	disk: { used: 0, total: 0, percentage: 0 },
-	cpu: {, usage: 0, cores: 0 }
+	cpu: { usage: 0, cores: 0 }
  });
 
  let webgpuCapabilities = $state({ hasWebGPU: false });

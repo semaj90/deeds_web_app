@@ -1,30 +1,30 @@
 {
   "summary": {
     "totalFiles": 878,
-    "filesWithErrors": 299,
-    "cleanFiles": 579,
-    "totalErrors": 3254
+    "filesWithErrors": 241,
+    "cleanFiles": 637,
+    "totalErrors": 2938
   },
   "errorsByCategory": {
     "src/lib/components/ui": {
-      "files": 134,
-      "errors": 400
+      "files": 93,
+      "errors": 236
     },
     "src/lib/components/ai": {
-      "files": 83,
-      "errors": 2590
+      "files": 76,
+      "errors": 2477
     },
     "src/lib/components/evidence": {
-      "files": 14,
-      "errors": 88
+      "files": 12,
+      "errors": 82
     },
     "src/lib/components/cases": {
-      "files": 5,
-      "errors": 18
+      "files": 4,
+      "errors": 15
     },
     "src/routes/(app)": {
-      "files": 23,
-      "errors": 62
+      "files": 16,
+      "errors": 32
     },
     "src/routes/api": {
       "files": 40,
@@ -32,16 +32,15 @@
     }
   },
   "errorsByPattern": {
-    "missingComma": 120,
-    "cssSpacing": 257,
-    "classSpacing": 386,
+    "missingComma": 102,
     "barrelImport": 22,
     "namedBitsImport": 17,
+    "classSpacing": 345,
     "implicitAny": 2247,
     "corruptedArrows": 192,
-    "malformedFunctions": 9,
+    "cssSpacing": 8,
     "exportLet": 1,
-    "phantomComma": 3
+    "phantomComma": 4
   },
   "topFiles": [
     {
@@ -81,16 +80,6 @@
         "implicitAny": 14
       },
       "errorCount": 40,
-      "hasErrors": true
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AIChatInterface.svelte",
-      "errors": {
-        "cssSpacing": 19,
-        "classSpacing": 11,
-        "corruptedArrows": 2
-      },
-      "errorCount": 32,
       "hasErrors": true
     },
     {
@@ -139,14 +128,6 @@
       "hasErrors": true
     },
     {
-      "file": "src\\lib\\components\\ai\\AutomatedLegalResearch.svelte",
-      "errors": {
-        "cssSpacing": 22
-      },
-      "errorCount": 22,
-      "hasErrors": true
-    },
-    {
       "file": "src\\lib\\components\\evidence\\EvidenceProcessingWorkflow.svelte",
       "errors": {
         "classSpacing": 14,
@@ -166,29 +147,20 @@
       "hasErrors": true
     },
     {
-      "file": "src\\lib\\components\\ai\\EnhancedDocumentUploader.svelte",
-      "errors": {
-        "classSpacing": 14,
-        "corruptedArrows": 4
-      },
-      "errorCount": 18,
-      "hasErrors": true
-    },
-    {
-      "file": "src\\lib\\components\\ai\\PatternRecognition.svelte",
-      "errors": {
-        "cssSpacing": 17,
-        "corruptedArrows": 1
-      },
-      "errorCount": 18,
-      "hasErrors": true
-    },
-    {
       "file": "src\\lib\\components\\ui\\SIMDTiledShaderEmbeds.svelte",
       "errors": {
         "missingComma": 11,
         "classSpacing": 4,
         "corruptedArrows": 2
+      },
+      "errorCount": 17,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedDocumentUploader.svelte",
+      "errors": {
+        "classSpacing": 13,
+        "corruptedArrows": 4
       },
       "errorCount": 17,
       "hasErrors": true
@@ -204,25 +176,10 @@
       "hasErrors": true
     },
     {
-      "file": "src\\lib\\components\\ai\\LLMSelector.svelte",
+      "file": "src\\lib\\components\\ai\\AIChatInterface.svelte",
       "errors": {
-        "cssSpacing": 9,
-        "classSpacing": 2,
-        "barrelImport": 1,
-        "implicitAny": 1,
+        "classSpacing": 11,
         "corruptedArrows": 2
-      },
-      "errorCount": 15,
-      "hasErrors": true
-    },
-    {
-      "file": "src\\lib\\components\\ai\\LLMProviderSelector.svelte",
-      "errors": {
-        "cssSpacing": 6,
-        "classSpacing": 2,
-        "barrelImport": 1,
-        "namedBitsImport": 1,
-        "corruptedArrows": 3
       },
       "errorCount": 13,
       "hasErrors": true
@@ -235,7 +192,43 @@
       },
       "errorCount": 13,
       "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SIMDAIAssistantDemo.svelte",
+      "errors": {
+        "classSpacing": 8,
+        "implicitAny": 5
+      },
+      "errorCount": 13,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedAIAssistant.svelte",
+      "errors": {
+        "classSpacing": 11,
+        "corruptedArrows": 1
+      },
+      "errorCount": 12,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SimpleFileUpload.svelte",
+      "errors": {
+        "implicitAny": 12
+      },
+      "errorCount": 12,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SOMVisualization.svelte",
+      "errors": {
+        "classSpacing": 5,
+        "implicitAny": 3,
+        "corruptedArrows": 3
+      },
+      "errorCount": 11,
+      "hasErrors": true
     }
   ],
-  "timestamp": "2026-02-08T19:32:04.921Z"
+  "timestamp": "2026-02-08T19:51:16.916Z"
 }

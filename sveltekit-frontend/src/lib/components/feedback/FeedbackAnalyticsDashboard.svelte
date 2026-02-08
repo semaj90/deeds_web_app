@@ -28,7 +28,7 @@ let selectedTimeframe = $state<string>('7d');
 let selectedRatingType = $state<string>('all');
 
 // Analytics data
-let dashboardData = $state<any>({ overview: {, totalRatings: 0,
+let dashboardData = $state<any>({ overview: { totalRatings: 0,
     averageRating: 0,
     completionRate: 0,
     trendDirection: 'stable'

@@ -45,7 +45,7 @@ export class Complex {
 	add(other: Complex): Complex { return new Complex(this.real + other.real, this.imaginary + other.imaginary); }
 }
 
-interface QuantumParticle { position: {, x: number; y: number;
+interface QuantumParticle { position: { x: number; y: number;
 	z: number };
 	waveFunction: Complex;
 	entangled: boolean;
@@ -56,7 +56,7 @@ interface QuantumParticle { position: {, x: number; y: number;
 	phase: number;
 }
 
-interface ConsciousnessNode { position: {, x: number; y: number;
+interface ConsciousnessNode { position: { x: number; y: number;
 	z: number };
 	activation: number;
 	connections: number[];
@@ -166,7 +166,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 		const sizes = new Float32Array(this.quantumOptions.particleCount);
 
 		for (let i = 0; i < this.quantumOptions.particleCount; i++) {
-			const particle: QuantumParticle = { position: {, x: (Math.random() - 0.5) * this.quantumOptions.fieldSize.x,
+			const particle: QuantumParticle = { position: { x: (Math.random() - 0.5) * this.quantumOptions.fieldSize.x,
 					y: (Math.random() - 0.5) * this.quantumOptions.fieldSize.y,
 					z: (Math.random() - 0.5) * this.quantumOptions.fieldSize.z
 				},
@@ -202,7 +202,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 		geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 		geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
-		const material = new THREE.ShaderMaterial({ uniforms: {, time: { value: 0 },
+		const material = new THREE.ShaderMaterial({ uniforms: { time: { value: 0 },
 	quantumCoherence: {
 , value: this.quantumOptions.quantumCoherence }
 			},
@@ -222,7 +222,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 		const nodeCount = this.consciousnessOptions.neuralNetworkComplexity * 10;
 
 		for (let i = 0; i < nodeCount; i++) {
-			const node: ConsciousnessNode = { position: {, x: (Math.random() - 0.5) * this.quantumOptions.fieldSize.x * 0.8,
+			const node: ConsciousnessNode = { position: { x: (Math.random() - 0.5) * this.quantumOptions.fieldSize.x * 0.8,
 					y: (Math.random() - 0.5) * this.quantumOptions.fieldSize.y * 0.8,
 					z: (Math.random() - 0.5) * this.quantumOptions.fieldSize.z * 0.8
 				},
@@ -262,7 +262,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 
 		for (let i = 0; i < streamCount; i++) {
 			const streamGeometry = new THREE.PlaneGeometry(0.1, 4);
-			const streamMaterial = new THREE.ShaderMaterial({ uniforms: {, time: { value: 0 },
+			const streamMaterial = new THREE.ShaderMaterial({ uniforms: { time: { value: 0 },
 	glitchIntensity: {
 , value: this.realityOptions.matrixGlitchIntensity }
 				},

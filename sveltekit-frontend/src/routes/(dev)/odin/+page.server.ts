@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   // 2. Fetch Data (Direct DB or via Service)
   // We fetch high-priority errors to display on the dashboard
-  const stats: Array<{ error_code: string;, message: string; count: number }> = [];
+  const stats: Array<{ error_code: string; message: string; count: number }> = [];
 
   // Mock user for consistent UI if auth is bypassed
   const user = locals?.user || {

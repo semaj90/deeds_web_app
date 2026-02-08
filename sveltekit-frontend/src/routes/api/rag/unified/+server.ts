@@ -105,7 +105,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         const embedResp = await fetch(`${OLLAMA_URL}/api/embeddings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, model: 'embeddinggemma:latest',
+            body: JSON.stringify({ model: 'embeddinggemma:latest',
                 prompt: query
             })
         });

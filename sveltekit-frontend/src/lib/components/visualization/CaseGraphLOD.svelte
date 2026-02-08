@@ -42,7 +42,7 @@
   let isSimulating = $state(true);
   let frameId: number;
 
-  const lodConfig = { 0: {, maxNodes: 500, label: 'High' },
+  const lodConfig = { 0: { maxNodes: 500, label: 'High' },
 	1: {
 	maxNodes: 200, label: 'Medium' },
 	2: {

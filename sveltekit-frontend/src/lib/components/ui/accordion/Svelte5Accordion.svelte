@@ -72,7 +72,7 @@ let variantClasses = $derived({
 }[variant]);
 </script>
 
-<div class="w-full {variantClasses} { className }" data-accordion>
+<div class="w-full {variantClasses} {className}" data-accordion>
 	{#each items as item}
 		{@render AccordionItemComponent({ item, variant })}
 	{/each}

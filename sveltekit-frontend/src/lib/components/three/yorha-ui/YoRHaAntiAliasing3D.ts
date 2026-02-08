@@ -79,7 +79,7 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
         const baseColor = new THREE.Color(this.style?.backgroundColor|| YORHA_COLORS.primary.beige);
         const edgeColor = new THREE.Color(this.style?.borderColor|| YORHA_COLORS.primary.black);
 
-        this.enhancedMaterial = new THREE.ShaderMaterial({ uniforms: {, baseColor: { value: baseColor },
+        this.enhancedMaterial = new THREE.ShaderMaterial({ uniforms: { baseColor: { value: baseColor },
 	edgeColor: {
 	value: edgeColor },
 	edgeWidth: {

@@ -38,7 +38,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	module: fragmentShader, entryPoint: 'main';
 	targets: [ { format: presentationFormat }]
       },
-	primitive: {, topology: 'triangle-list';, cullMode: 'back'
+	primitive: { topology: 'triangle-list';, cullMode: 'back'
       } }); // Create buffers updateEmbeddings(embeddings); // Create uniform buffer uniformBuffer = device.createBuffer({ size: 64 + 8, // mat4x4 + 2 float, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })}
   function updateEmbeddings(newEmbeddings: number[][]) { if (!device || newEmbeddings.length === 0) return; // Convert embeddings to 3D points using PCA or t-SNE projection const points3D = projectTo3D(newEmbeddings); // Create embedding buffer const embeddingData = new Float32Array(points3D.flat()); if (embedBuffer) { try { embedBuffer.destroy()} catch (e) { /* ignore */ }
       embedBuffer = null}
@@ -69,7 +69,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const uniformArray = new Float32Array(uniformData); uniformArray.set(createTransformMatrix(), 0); uniformArray[16] = performance.now() / 1000; // time uniformArray[17] = zoom; // zoom device.queue.writeBuffer(uniformBuffer, 0, uniformData); renderPass.setPipeline(pipeline); renderPass.setBindGroup(0, bindGroup); renderPass.draw(embeddings.length * 6); // 6 vertices per point (quad) renderPass.end(); device.queue.submit([commandEncoder.finish()])}
   function animate() { if (isPlaying) { rotation.y += 0.01; render(); animationFrame = requestAnimationFrame(animate)}
   }
-  function connectWebSocket() { if (!docId) return; ws = new WebSocket(`ws://localhost:8080/ws?docId=${ docId }`); ws.onmessage = (event: MessageEvent) => { const data = JSON.parse(event.data as string);
+  function connectWebSocket() { if (!docId) return; ws = new WebSocket(`ws://localhost:8080/ws?docId=${docId}`); ws.onmessage = (event: MessageEvent) => { const data = JSON.parse(event.data as string);
  if (data.type === 'embeddings_update' && data.embeddings) { updateEmbeddings(data.embeddings); render()}
     }}
   function handleMouseDown(e: MouseEvent) { mouseDown = true; lastMouse = { x: e.clientX;, y: e.clientY }}

@@ -68,7 +68,7 @@
          // Create event object directly if callback is provided
          // Note: CustomEvent constructor might not be needed if we just call the function with data
          // But signature says CustomEvent, so we respect it.
-         onstateChange(new CustomEvent('stateChange', { detail: {, state: newState, context }
+         onstateChange(new CustomEvent('stateChange', { detail: { state: newState, context }
          }));
       }
     }

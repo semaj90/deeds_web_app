@@ -18,7 +18,7 @@ interface ErrorCard { id: string;, name: string;
 interface QdrantPoint { id: number;, payload: ErrorCard;
 }
 
-interface QdrantScrollResponse { result: {, points: QdrantPoint[];
+interface QdrantScrollResponse { result: { points: QdrantPoint[];
         next_page_offset: string | null;
     };
 }

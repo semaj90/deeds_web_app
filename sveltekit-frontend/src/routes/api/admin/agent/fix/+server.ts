@@ -25,7 +25,7 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 		const embedResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: errorContext
 			})
 		});
@@ -51,7 +51,7 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 						},
 						{
 							key: 'type',
-							match: {, value: 'fix' }
+							match: { value: 'fix' }
 						}
 					]
 				}
@@ -133,7 +133,7 @@ Return fixes in JSON format:
 			body: JSON.stringify({ model: 'gemma3-legal:latest',
 				prompt,
 				stream: false,
-				options: {, temperature: 0.3,
+				options: { temperature: 0.3,
 					top_p: 0.9,
 					num_predict: 2048
 				}

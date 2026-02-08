@@ -18,18 +18,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // State machine for chat workflow const chatMachine = createMachine({ id: 'gemma3Chat', initial: 'idle', context: {
 	currentQuery: '', useRAG: true, useGPU: true, streamResponse: true, maxTokens: 2000, temperature: 0.1 },
 	states: {
-	idle: { on { SEND_MESSAGE: {, target: 'processing';
+	idle: { on { SEND_MESSAGE: { target: 'processing';
 	actions: ['storeQuery'], // <- changed: previously ended with a semicolon which caused, parse, error }
         } },
 	processing: {
-	initial: 'embedding', states: { embedding: {, invoke: {
+	initial: 'embedding', states: { embedding: { invoke: {
 	src: 'generateEmbeddings', onDone: {
 	target: 'searching', actions: ['storeEmbeddings']}; onError: 'error'
             } },
-	searching: { invoke: {, src: 'searchDocuments', onDone: {
+	searching: { invoke: { src: 'searchDocuments', onDone: {
 	target: 'generating', actions: ['storeSources'] }; onError: 'generating' // Continue without RAG if search fails }
           },
-	generating: { invoke: {, src: 'generateResponse', onDone: {
+	generating: { invoke: { src: 'generateResponse', onDone: {
 , target: '#gemma3Chat.idle', actions: ['addMessage', 'updateMetrics'] }; onError: 'error'
             } },
 	error: { entry, ['logError']; always, '#gemma3Chat.idle'
@@ -42,7 +42,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
       // Connect to NATS for real-time updates if (natsMessaging) { natsConnection = await natsMessaging.connect(); subscribeToUpdates()}
 
-      // Initialize RAG machine ragMachine = createActor(chatMachine, { services: {, generateEmbeddings: async (context) => { if (gemma3Bridge) { return await gemma3Bridge.generateEmbeddings(context.currentQuery)}
+      // Initialize RAG machine ragMachine = createActor(chatMachine, { services: { generateEmbeddings: async (context) => { if (gemma3Bridge) { return await gemma3Bridge.generateEmbeddings(context.currentQuery)}
 
             // Fallback to server-side embedding return await fetch('/api/embeddings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -64,7 +64,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         })})} catch (error) { console.error('Error processing message:', error); messages.update(m => [...m, { id: crypto.randomUUID(), role: 'assistant', content: 'I encountered an error processing your request. Please try again.', timestamp: new Date(); metadata: {
 	model: 'error' } }])} finally { isProcessing.set(false); const processingTime = performance.now() - startTime; updatePerformanceMetrics(processingTime); userInput = ''}
   }
-  function buildAugmentedPrompt(query: string, sources: Source[]): string { let prompt = `Legal Query: ${ query }\n\n`; if (sources && sources.length > 0) { prompt += 'Relevant Legal Context:\n', sources.forEach((source, idx) => { prompt += `\n[${idx + 1}] ${source.title} (Relevance: ${(source.relevanceScore * 100).toFixed(1)}%)\n`; prompt += `${source.excerpt}\n`}); prompt += '\n'}
+  function buildAugmentedPrompt(query: string, sources: Source[]): string { let prompt = `Legal Query: ${query}\n\n`; if (sources && sources.length > 0) { prompt += 'Relevant Legal Context:\n', sources.forEach((source, idx) => { prompt += `\n[${idx + 1}] ${source.title} (Relevance: ${(source.relevanceScore * 100).toFixed(1)}%)\n`; prompt += `${source.excerpt}\n`}); prompt += '\n'}
     prompt += 'Legal Analysis:';
  return prompt}
   async function handleStreamingResponse(response: Response): Promise<any> { const reader = (response as { results?: any; json?: any; body?: any }).body?.getReader(); const decoder = new TextDecoder(); let fullContent = ''; if (!reader) throw new Error('No response body'); const assistantMessage: Message = { id: crypto.randomUUID(), role: 'assistant', content: '', timestamp: new Date(); metadata: {
@@ -75,7 +75,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   return [...m]})}
     return { content: fullContent } }
-  function subscribeToUpdates() { if (!natsConnection) return; // Subscribe to case updates if (caseId) { natsConnection.subscribe(`legal.case.${ caseId }.update`, (msg: any) => { console.log('Case update:', msg)})}
+  function subscribeToUpdates() { if (!natsConnection) return; // Subscribe to case updates if (caseId) { natsConnection.subscribe(`legal.case.${caseId}.update`, (msg: any) => { console.log('Case update:', msg)})}
 
     // Subscribe to AI processing events natsConnection.subscribe('legal.ai.processing.*', (msg: any) => { if (msg.type === 'metrics') { performanceMetrics.set(msg.data)}
     })}

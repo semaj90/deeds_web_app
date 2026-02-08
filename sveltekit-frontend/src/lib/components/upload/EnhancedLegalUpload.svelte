@@ -56,7 +56,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 , includeConcepts: true includeClassification true }) }); if (legalResponse.ok) { legalAnalysis = await legalResponse.json(); processingStage = `Legal analysis complete: ${legalAnalysis.concepts?.length ?? 0} concepts identified`}
       }
 
-   // Step, 3: Enhanced RAG Integration (your semantic architecture) if (legalAnalysis) { processingStage = 'Generating semantic embeddings...'; const ragResponse = await fetch('/api/semantic-analysis', { method: 'POST', body: new URLSearchParams({, text: ocrResults?.text ?? await file.text()}) }); if (ragResponse.ok) { semanticEmbeddings = await ragResponse.json(); processingStage = `Semantic analysis complete: ${semanticEmbeddings.data?.som_cluster ? `Clustered to region [${semanticEmbeddings.data.som_cluster.x},
+   // Step, 3: Enhanced RAG Integration (your semantic architecture) if (legalAnalysis) { processingStage = 'Generating semantic embeddings...'; const ragResponse = await fetch('/api/semantic-analysis', { method: 'POST', body: new URLSearchParams({ text: ocrResults?.text ?? await file.text()}) }); if (ragResponse.ok) { semanticEmbeddings = await ragResponse.json(); processingStage = `Semantic analysis complete: ${semanticEmbeddings.data?.som_cluster ? `Clustered to region [${semanticEmbeddings.data.som_cluster.x},
 	${semanticEmbeddings.data.som_cluster.y}]`:`
             'Vector embeddings generated'}`}`
       } processingStage = 'Preliminary analysis complete'} catch (error) { console.error('Preliminary analysis failed:', error); processingStage = 'Analysis failed - will proceed with basic upload'}

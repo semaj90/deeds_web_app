@@ -45,7 +45,7 @@
 
   let open = $state(false);
 
-  const statusConfig = { active: {, label: 'Active', class: 'bg-green-100 text-green-800', icon: CheckCircle },
+  const statusConfig = { active: { label: 'Active', class: 'bg-green-100 text-green-800', icon: CheckCircle },
 	pending: {
 	label: 'Pending', class: 'bg-yellow-100 text-yellow-800', icon: Clock },
 	closed: {
@@ -54,7 +54,7 @@
 	label: 'Archived', class: 'bg-gray-100 text-gray-800', icon: Archive }
   };
 
-  const priorityConfig = { critical: {, icon: '🔴', color: 'text-red-500' },
+  const priorityConfig = { critical: { icon: '🔴', color: 'text-red-500' },
 	high: {
 	icon: '🟠', color: 'text-orange-500' },
 	medium: {
