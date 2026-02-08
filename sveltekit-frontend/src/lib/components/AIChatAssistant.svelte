@@ -1,6 +1,5 @@
 <script lang="ts">
- let { caseId, initialContext } = $props<{ caseId: string initialContext: string;
- }>();
+ let { caseId, initialContext } = $props<{ caseId: string; initialContext: string }>();
 
 	let messages = $state<{ sender: 'user' | 'ai'; text: string }[]>([]);
 
@@ -110,9 +109,11 @@
  font-weight: bold;
  margin-right: 5px;
  }
- .chat-input { display: flex padding: 10px 15px;
- border-top: 1px solid #eee;
- gap: 10px;
+ .chat-input {
+	display: flex;
+	padding: 10px 15px;
+	border-top: 1px solid #eee;
+	gap: 10px;
  }
  .chat-input textarea {
  flex-grow: 1;
@@ -132,8 +133,8 @@
 	cursor: pointer;
  }
  .chat-input button:disabled {
- background-color: #ccc;
-	cursor:not-allowed;
+	background-color: #ccc;
+	cursor: not-allowed;
  }
 </style>
 
