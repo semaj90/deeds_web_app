@@ -4,7 +4,13 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import EvidenceCanvas from "$lib/ui/enhanced/EvidenceCanvas.svelte";
-  import { Activity, Box, Cpu, Database, Eye, Grid3X3, Zap } from 'lucide-svelte';
+  import Activity from 'lucide-svelte/icons/activity';
+  import Box from 'lucide-svelte/icons/box';
+  import Cpu from 'lucide-svelte/icons/cpu';
+  import Database from 'lucide-svelte/icons/database';
+  import Eye from 'lucide-svelte/icons/eye';
+  import Grid3X3 from 'lucide-svelte/icons/grid-3x3';
+  import Zap from 'lucide-svelte/icons/zap';
   // Migrated to $effect
 
   // Svelte 5 state management

@@ -91,14 +91,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       window.addEventListener('error', handleError);
       window.addEventListener('unhandledrejection', handleError);
     }
-  });
 
-  // TODO: Add as cleanup in $effect: return () => {
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleError);
-    }
-  }
+    // TODO: Add cleanup: return () => { window.removeEventListener('error', handleError); window.removeEventListener('unhandledrejection', handleError); };
+  });
 </script>
 
 {#if error}

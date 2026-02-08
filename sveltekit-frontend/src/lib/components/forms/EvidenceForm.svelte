@@ -6,10 +6,10 @@ import type { Document } from '$lib/types';
     data = null
   }: Props = $props();
   import { invalidateAll } from "$app/navigation";
-  import { superForm } from "sveltekit-superforms";
+  import { superForm } from "sveltekit-superforms/client";
   // cast server data to: unknown to avoid: 'unknown' access errors
   const serverData = data as unknown
-  const initialValues = evidence || serverData?.form ?? {};
+  const initialValues = evidence || (serverData?.form ?? {});
   const { form, enhance, errors, submitting } = superForm(
     initialValues, {
       onUpdated: async ({ form }) => {
@@ -23,7 +23,7 @@ import type { Document } from '$lib/types';
     form.update((f: unknown) => ({ ...(f ?? {}), [key]: value }))}
 </script>
 
-<form method="POST" use:enhance | class="space-y-4">
+<form method="POST" use:enhance class="space-y-4">
   {#if evidence}
     <input type="hidden" name="id" value={$form.id} />
   {/if}
@@ -139,14 +139,21 @@ import type { Document } from '$lib/types';
   form {
     max-width: 500px; margin: 0 auto;}
   .select-trigger {
-    display: inline-flex
-    align-items: center; padding: 0.5rem 1rem
-    border: 1px solid #ccc
-    border-radius: 6px; background: #f9fafb; cursor: pointer
-    font-size: 1rem
-    min-width: 160px; transition:box-shadow 0.2s;}
-  .select-trigger:focus { outline: none
-    box-shadow: 0 0 0 2px #6366f1;}
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #f9fafb;
+    cursor: pointer;
+    font-size: 1rem;
+    min-width: 160px;
+    transition: box-shadow 0.2s;
+  }
+  .select-trigger:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #6366f1;
+  }
   /* Removed .select-menu rules (unused) to fix Svelte unused CSS warnings */
 </style>
 

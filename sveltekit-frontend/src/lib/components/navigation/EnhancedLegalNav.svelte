@@ -57,12 +57,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		};
 		window.addEventListener('scroll', handleScroll);
 
-		return () => window.removeEventListener('scroll', handleScroll);
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+			if (refreshInterval) clearInterval(refreshInterval);
+		};
 	});
-
-	// TODO: Add as cleanup in $effect: return () => {
-		if (refreshInterval) clearInterval(refreshInterval);
-	}
 
 	async function loadRecentCases() {
 		try {

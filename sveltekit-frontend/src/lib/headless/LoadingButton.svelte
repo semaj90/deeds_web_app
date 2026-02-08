@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/ui/Button.svelte';
-	import { Loader2 } from 'lucide-svelte';
+	import Loader2 from 'lucide-svelte/icons/loader-2';
 
 	let {
 		loading = false,
