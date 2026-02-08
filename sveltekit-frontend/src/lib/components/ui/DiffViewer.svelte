@@ -28,7 +28,7 @@
     class: className = ''
   }: Props = $props();
 
-  function computeDiff(orig: string mod: string): DiffLine[] {
+  function computeDiff(orig: string, mod: string): DiffLine[] {
     const origLines = orig.split('\n');
     const modLines = mod.split('\n');
     const diff: DiffLine[] = [];
@@ -36,14 +36,14 @@
     let i = 0, j = 0;
     while (i < origLines.length || j < modLines.length) {
       if (i < origLines.length && j < modLines.length && origLines[i] === modLines[j]) {
-        diff.push({ type: 'context' content: origLines[i], lineNumber: i + 1 });
+        diff.push({ type: 'context', content: origLines[i], lineNumber: i + 1 });
         i++;
         j++;
       } else if (i < origLines.length && (j >= modLines.length || origLines[i] !== modLines[j])) {
-        diff.push({ type: 'remove' content: origLines[i], lineNumber: i + 1 });
+        diff.push({ type: 'remove', content: origLines[i], lineNumber: i + 1 });
         i++;
       } else if (j < modLines.length) {
-        diff.push({ type: 'add' content: modLines[j], lineNumber: j + 1 });
+        diff.push({ type: 'add', content: modLines[j], lineNumber: j + 1 });
         j++;
       }
     }

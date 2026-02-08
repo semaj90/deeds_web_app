@@ -20,7 +20,7 @@
 	interface Props {
 		scene: MarkdownScene;
 		onValidate?: (sceneId: string) => void;
-		onEdit?: (sceneId: string markdown: string) => void;
+		onEdit?: (sceneId: string, markdown: string) => void;
 		onReject?: (sceneId: string) => void;
 		class?: string;
 		editable?: boolean;

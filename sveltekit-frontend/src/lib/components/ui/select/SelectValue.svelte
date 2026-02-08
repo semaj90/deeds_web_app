@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import { Select } from 'bits-ui';
+  import * as Select from 'bits-ui/components/select';
 
   interface Props {
     placeholder?: string;
@@ -8,7 +8,7 @@
     [key: string]: any;
   }
 
-  let { placeholder = "Select..." class: className = "", ...rest }: Props = $props();
+  let { placeholder = "Select...", class: className = "", ...rest }: Props = $props();
 </script>
 
 <Select.Value
