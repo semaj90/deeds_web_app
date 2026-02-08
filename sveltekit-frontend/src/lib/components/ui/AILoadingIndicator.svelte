@@ -37,7 +37,7 @@
     variant = 'inline'
   }: Props = $props();
 
-  const progressTween = tweened(0, { duration: 300 easing: cubicOut });
+  const progressTween = tweened(0, { duration: 300, easing: cubicOut });
   let startTime = Date.now();
   let elapsedTime = $state<number>(0);
   let intervalId: ReturnType<typeof setInterval> | null = null;

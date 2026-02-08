@@ -34,8 +34,8 @@ https, //svelte.dev/e/js_parse_error -->
     zeroLatencyHits: 0
   });
   let trackedElements = new Set<HTMLElement>();
-  let mousePosition = { x: 0 y: 0 };
-  let observer: MutationObserver | null = null
+  let mousePosition = { x: 0, y: 0 };
+  let observer: MutationObserver | null = null;
   $effect(() => {
 
     initializeZeroLatencySystem()

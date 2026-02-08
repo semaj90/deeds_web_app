@@ -145,7 +145,7 @@
 		};
 	});
 
-	function getStatusColor(value: number type: 'fps' | 'memory' | 'cpu' | 'gpu'): string {
+	function getStatusColor(value: number, type: 'fps' | 'memory' | 'cpu' | 'gpu'): string {
 		switch (type) {
 			case 'fps':
 				if (value >= 55) return 'text-green-400';
