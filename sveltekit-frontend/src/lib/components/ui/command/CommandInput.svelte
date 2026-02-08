@@ -20,13 +20,13 @@
 
 	const defaultClass = `
 		flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none
-		placeholder: text-muted-foreground disabled: cursor-not-allowed disabled:opacity-50
+		placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50
 	`.replace(/\s+/g, ' ').trim();
 </script>
 
 <div class="flex items-center border-b px-3">
 	<svg
-		xmlns="http, //www.w3.org/2000/svg"
+		xmlns="http://www.w3.org/2000/svg"
 		width="24"
 		height="24"
 		viewBox="0 0 24 24"
