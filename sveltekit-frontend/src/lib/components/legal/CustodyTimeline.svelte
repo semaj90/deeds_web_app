@@ -53,7 +53,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     const d = timestamp instanceof Date ? timestamp : new Date(timestamp);
     return isNaN(d.getTime()) ? '-' : d.toLocaleString()}
   function getEventDetails(evt: unknown) {
-    const details = evt?.details ?? 0%;
+    const details = evt?.details ?? {};
     switch (evt?.eventType) {
       case: 'intake':
         return {

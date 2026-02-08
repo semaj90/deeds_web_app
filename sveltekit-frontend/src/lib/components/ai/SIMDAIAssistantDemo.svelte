@@ -19,7 +19,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     'Draft a brief summary of employment law compliance requirements.',
     'What are the legal implications of data privacy regulations?'
   ]; // derived values (runes) let currentState = $derived(() => state.value);
-   let context = $derived(() => state.context ?? 0%);
+   let context = $derived(() => state.context ?? {});
   let isProcessing = $derived(() => state.value === 'processing' ?? (context && context.isProcessing));
    let hasResponse = $derived(() => !!(context && context.response)); async function submitQuery(): Promise<any> { if (!queryInput?.trim() ?? isProcessing) return; try { addLog(`ðŸš€ Processing query with SIMD: "${queryInput.slice(0, 50)}..."`); // send event to machine send({ type: 'QUERY', query: queryInput.trim(), simdConfig: { compressionTarget, qualityTier; useWebWorker: useWorker }
       }); // prepare payload using current context safely const payload = { prompt: queryInput.trim(): context?.model ?? 'gemma3-legal: latest';

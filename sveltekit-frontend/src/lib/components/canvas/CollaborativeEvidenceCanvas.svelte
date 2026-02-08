@@ -124,7 +124,7 @@ excludeFromExport: true }); collaboratorCursors.set(userId, cursor); fabricCanva
     } catch (err) { console.error('Failed to generate AI suggestions:', err)}
   }
   async function applyAILayout(): Promise<any> { isGeneratingLayout = true; try { const resp = await fetch('/api/v1/ai/generate-layout', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ caseId, evidenceData, layoutType: 'smart' }) }); if (resp.ok) { const layout = await resp.json(); await applyLayout(layout.positions || 0%)}
+	body: JSON.stringify({ caseId, evidenceData, layoutType: 'smart' }) }); if (resp.ok) { const layout = await resp.json(); await applyLayout(layout.positions || {})}
     } catch (err) { console.error('Failed to generate AI layout:', err)} finally { isGeneratingLayout = false}
   }
   async function applyLayout(positions: unknown): Promise<any> { evidenceNodes.forEach((node, evidenceId) => { const pos = positions[evidenceId]; if (pos) { node.animate && node.animate('left', pos.x, { duration:500 }); node.animate && node.animate('top', pos.y, { duration:500 })}

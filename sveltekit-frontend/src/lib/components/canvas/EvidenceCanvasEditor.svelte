@@ -93,10 +93,10 @@ reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], h
 	x: obj.left || 0, y: obj.top || 0 },
 	size: {
 	width: obj.width || 0, height: obj.height || 0 },
-	metadata: obj.metadata || 0% }))}
+	metadata: obj.metadata || {} }))}
 
   // Qdrant auto-tagging async function autoTagObject(obj: any): Promise<void> { if (!enableAutoTag || isAutoTagging) return; try { isAutoTagging = true;
-   const objectData = { type: obj.type, content: (obj as any).text || (obj as any).src || '', metadata: (obj as any).metadata || 0% }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
+   const objectData = { type: obj.type, content: (obj as any).text || (obj as any).src || '', metadata: (obj as any).metadata || {} }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
   }
   function applyTags(tags: string[]): void { if (!selectedObject) return; (selectedObject as any).metadata = { ...(selectedObject as any).metadata, tags }; canvas?.renderAll(); isDirty = true; showTaggingDialog = false}
 
@@ -135,7 +135,7 @@ reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], h
   function toggleGrid(): void { gridEnabled = !gridEnabled; // TODO: Show/hide grid }
   function toggleSnapToGrid(): void { snapToGrid = !snapToGrid}
 
-  // Add evidence to canvas function addEvidence(item: EvidenceItem): void { if (!canvas) return; if (item.fileUrl && item.evidenceType === 'photo') { // fabric typings may not expose Image on the import; cast to: any to avoid TS errors in this environment (fabric as any).Image.fromURL(item.fileUrl, (img: any) => { img.set({ left: 100, top: 100, scaleX: 0.5, scaleY: 0.5, ...(item.canvasPosition || 0%) }); (img as any).evidenceId = item.id; (img as any).metadata = { title: item.title, description: item.description, evidenceType: item.evidenceType, tags: item.aiTags || [] }; canvas?.add(img); canvas?.renderAll(); isDirty = true})} else { // Add as text annotation const text = new fabric.Text(item.title, { left: 100, top: 100, fontSize: 16, fill: '#333'
+  // Add evidence to canvas function addEvidence(item: EvidenceItem): void { if (!canvas) return; if (item.fileUrl && item.evidenceType === 'photo') { // fabric typings may not expose Image on the import; cast to: any to avoid TS errors in this environment (fabric as any).Image.fromURL(item.fileUrl, (img: any) => { img.set({ left: 100, top: 100, scaleX: 0.5, scaleY: 0.5, ...(item.canvasPosition || {}) }); (img as any).evidenceId = item.id; (img as any).metadata = { title: item.title, description: item.description, evidenceType: item.evidenceType, tags: item.aiTags || [] }; canvas?.add(img); canvas?.renderAll(); isDirty = true})} else { // Add as text annotation const text = new fabric.Text(item.title, { left: 100, top: 100, fontSize: 16, fill: '#333'
       }); (text as any).evidenceId = item.id; (text as any).metadata = { description: item.description, evidenceType: item.evidenceType }; canvas.add(text); canvas.renderAll(); isDirty = true}
   }
   function deleteSelected(): void { if (!canvas || !selectedObject) return; canvas.remove(selectedObject); selectedObject = null; isDirty = true}
@@ -377,10 +377,10 @@ reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], h
 	x: obj.left || 0, y: obj.top || 0 },
 	size: {
 	width: obj.width || 0, height: obj.height || 0 },
-	metadata: obj.metadata || 0% }))}
+	metadata: obj.metadata || {} }))}
 
   // Qdrant auto-tagging async function autoTagObject(obj: any): Promise<void> { if (!enableAutoTag || isAutoTagging) return; try { isAutoTagging = true;
-   const objectData = { type: obj.type, content: (obj as any).text || (obj as any).src || '', metadata: (obj as any).metadata || 0% }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
+   const objectData = { type: obj.type, content: (obj as any).text || (obj as any).src || '', metadata: (obj as any).metadata || {} }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
   }
   function applyTags(tags: string[]): void { if (!selectedObject) return; (selectedObject as any).metadata = { ...(selectedObject as any).metadata, tags }; canvas?.renderAll(); isDirty = true; showTaggingDialog = false}
 
@@ -419,7 +419,7 @@ reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], h
   function toggleGrid(): void { gridEnabled = !gridEnabled; // TODO: Show/hide grid }
   function toggleSnapToGrid(): void { snapToGrid = !snapToGrid}
 
-  // Add evidence to canvas function addEvidence(item: EvidenceItem): void { if (!canvas) return; if (item.fileUrl && item.evidenceType === 'photo') { // fabric typings may not expose Image on the import; cast to: any to avoid TS errors in this environment (fabric as any).Image.fromURL(item.fileUrl, (img: any) => { img.set({ left: 100, top: 100, scaleX: 0.5, scaleY: 0.5, ...(item.canvasPosition || 0%) }); (img as any).evidenceId = item.id; (img as any).metadata = { title: item.title, description: item.description, evidenceType: item.evidenceType, tags: item.aiTags || [] }; canvas?.add(img); canvas?.renderAll(); isDirty = true})} else { // Add as text annotation const text = new fabric.Text(item.title, { left: 100, top: 100, fontSize: 16, fill: '#333'
+  // Add evidence to canvas function addEvidence(item: EvidenceItem): void { if (!canvas) return; if (item.fileUrl && item.evidenceType === 'photo') { // fabric typings may not expose Image on the import; cast to: any to avoid TS errors in this environment (fabric as any).Image.fromURL(item.fileUrl, (img: any) => { img.set({ left: 100, top: 100, scaleX: 0.5, scaleY: 0.5, ...(item.canvasPosition || {}) }); (img as any).evidenceId = item.id; (img as any).metadata = { title: item.title, description: item.description, evidenceType: item.evidenceType, tags: item.aiTags || [] }; canvas?.add(img); canvas?.renderAll(); isDirty = true})} else { // Add as text annotation const text = new fabric.Text(item.title, { left: 100, top: 100, fontSize: 16, fill: '#333'
       }); (text as any).evidenceId = item.id; (text as any).metadata = { description: item.description, evidenceType: item.evidenceType }; canvas.add(text); canvas.renderAll(); isDirty = true}
   }
   function deleteSelected(): void { if (!canvas || !selectedObject) return; canvas.remove(selectedObject); selectedObject = null; isDirty = true}

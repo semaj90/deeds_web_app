@@ -62,7 +62,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
    const processingTime = Date.now() - startTime; processingStats.completed = processingStats.completed + 1; processingStats.averageTime = (processingStats.averageTime * (processingStats.completed - 1) + processingTime) / processingStats.completed; files = [...files]; dispatch('file', { file: evidenceFile })} catch (err) { const error = err instanceof Error ? err: new Error(String(err)); evidenceFile.status = 'error'; evidenceFile.error = error.message; files = [...files]; processingStats.failed = processingStats.failed + 1; dispatch('error', { message: `Failed to, process: "${evidenceFile.file.name}": ${evidenceFile.error}`, file: evidenceFile })}
   }
 
-   // Upload file to server async function uploadFile(evidenceFile: EvidenceFile): Promise<any> { const formData = new FormData(); formData.append('file', evidenceFile.file); formData.append('metadata', JSON.stringify(evidenceFile.metadata ?? 0%));
+   // Upload file to server async function uploadFile(evidenceFile: EvidenceFile): Promise<any> { const formData = new FormData(); formData.append('file', evidenceFile.file); formData.append('metadata', JSON.stringify(evidenceFile.metadata ?? {}));
    const response = await fetch('/api/evidence/upload', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`Upload failed: ${response.statusText}`)}
     return await response.json()}
 

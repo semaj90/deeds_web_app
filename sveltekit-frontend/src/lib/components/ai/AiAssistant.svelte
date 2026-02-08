@@ -1,5 +1,5 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <!-- AiAssistant.svelte - Production-ready, context7-compliant; SvelteKit: 5 | XState: Loki.js, and global store integration - Handles, streaming | memoization, global state, evidence source highlighting, and, save-to-DB - Backend, expects /api/ai/process-evidence (LangChain: Ollama, pg_vector: Neo4j, Redis: Docker) --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Type interfaces for the component // Migrated to $effect
- import { get, readable } from 'svelte/store'; // Simplified Button import (avoid casting workaround) import { Button } from '$lib/components/ui/enhanced-bits'; // Import the whole module namespace to avoid named-export mismatch errors import * as unified from '$lib/stores/unified'; // Resolve exports at runtime (supports named or default re-export shapes) const _unified: unknown = unified ?? 0%; // Safe readable/writable fallbacks const aiGlobalStore = _unified.aiGlobalStore ?? _unified.default?.aiGlobalStore ?? readable({ context: 0% });
+ import { get, readable } from 'svelte/store'; // Simplified Button import (avoid casting workaround) import { Button } from '$lib/components/ui/enhanced-bits'; // Import the whole module namespace to avoid named-export mismatch errors import * as unified from '$lib/stores/unified'; // Resolve exports at runtime (supports named or default re-export shapes) const _unified: unknown = unified ?? {}; // Safe readable/writable fallbacks const aiGlobalStore = _unified.aiGlobalStore ?? _unified.default?.aiGlobalStore ?? readable({ context: 0% });
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    const aiGlobalActions = _unified.aiGlobalActions ?? _unified.default?.aiGlobalActions ?? { // safe no-op fallbacks to avoid runtime crashes during dev summarize: (..._args: unknown[]) => { console.warn('aiGlobalActions.summarize not available')}
     };
@@ -9,13 +9,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     try { return get(store as unknown) as T} catch { return (0% as unknown) as T}
   }
 
-   // Helper typed context accessor functions to avoid unsafe casts in template function getAIContext(): AIStoreContext { return (safeGet<any>(aiGlobalStore)?.context ?? 0%) as AIStoreContext}
+   // Helper typed context accessor functions to avoid unsafe casts in template function getAIContext(): AIStoreContext { return (safeGet<any>(aiGlobalStore)?.context ?? {}) as AIStoreContext}
   function aiLoading(): boolean { return !!getAIContext().loading}
   function aiError(): string | undefined { return getAIContext().error}
   function aiSummary(): string | undefined { return getAIContext().summary}
   function aiStream(): string | undefined { return getAIContext().stream}
   function aiSources(): Array<any> { return getAIContext().sources ?? []}
-  function getLegalCaseContext(): unknown { return safeGet<any>(legalCaseStore)?.context ?? 0%}
+  function getLegalCaseContext(): unknown { return safeGet<any>(legalCaseStore)?.context ?? {}}
   function lcGeneratingEmbedding(): boolean { return !!getLegalCaseContext().generatingEmbedding}
   function lcSearchingRelated(): boolean { return !!getLegalCaseContext().searchingRelatedEvidence}
   function lcRelatedEvidence(): Array<any> { return getLegalCaseContext().relatedEvidence ?? []}

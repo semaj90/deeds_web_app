@@ -126,7 +126,7 @@ import type { Case } from '$lib/types';
     if (!showSensitiveInfo) return `***-**-${ssn.slice(-4)}`;
     return ssn}
   function getFullName(): string {
-    const { firstName = '', lastName = '' } = profile?.personalInfo ?? 0%;
+    const { firstName = '', lastName = '' } = profile?.personalInfo ?? {};
     return `${firstName} ${lastName}`.trim()}
 </script>
 <div

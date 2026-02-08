@@ -93,14 +93,14 @@ evidenceId: 'health-check', filename: 'test.txt', content: 'health check', type:
 key: keyCandidate, bucket: currentBucket }) }); if (signedResp.ok) { const signedJson = await signedResp.json();
    const uploadUrl = signedJson.url;
    const namespacedKey = signedJson.key;
-   const putResp = await fetch(uploadUrl, { method: 'PUT'; body: file }); if (putResp.ok) { // update item safely evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), storage: {
+   const putResp = await fetch(uploadUrl, { method: 'PUT'; body: file }); if (putResp.ok) { // update item safely evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || {}), storage: {
 	bucket: signedJson.bucket || currentBucket, key: namespacedKey;
 	url: signedJson.url }
                         } }: item ); toastMessage = `Uploaded ${file.name} â†’ ${signedJson.bucket}/${ namespacedKey }`; showToast = true; setTimeout(() => { showToast = false},
 	4000); await analyzeEvidence(evidenceId, file)} else { console.error('Direct PUT failed:', await putResp.text()); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'error' }: item )}
             } else { // fallback to server upload console.warn('Signed URL request failed, falling back to server upload');
    const uploadResp = await fetch('/api/v1/storage/upload', { method: 'POST', credentials: 'include';
-body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), storage: {
+body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || {}), storage: {
 	bucket: uploadJson.bucket, key: uploadJson.key;
 	url: uploadJson.url } }
                       }: item ); await analyzeEvidence(evidenceId, file)} else { evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'error' }: item )}
@@ -112,7 +112,7 @@ body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json
 
   // AI analysis of evidence async function analyzeEvidence(evidenceId: string, file: File): Promise<any> { try { let content = ''; if (file.type.startsWith('text/')) { content = await file.text()} else if (file.type === 'application/pdf') { content = `PDF document: ${file.name}`}
       const response = await fetch('/api/v1/evidence/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ evidenceId, filename: file.name, content: content.substring(0, 2000); type: detectFileType(file.type) }) }); if (response.ok) { const analysisResult = await response.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'ready', aiAnalysis: analysisResult.data?.analysis ?? analysisResult.data || 0% }: item )} else { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, status: 'error' }: item))}
+	body: JSON.stringify({ evidenceId, filename: file.name, content: content.substring(0, 2000); type: detectFileType(file.type) }) }); if (response.ok) { const analysisResult = await response.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'ready', aiAnalysis: analysisResult.data?.analysis ?? analysisResult.data || {} }: item )} else { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, status: 'error' }: item))}
     } catch (error) { console.error('AI analysis failed:', error); evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, status: 'error' }: item))}
     filterEvidence()}
 
@@ -146,7 +146,7 @@ body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json
     }; return icons[status]}
   function getScoreColor(score: number): string { if (score >= 0.8) return 'text-green-600 bg-green-100'; if (score >= 0.6) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
 
-  // Real-time updates (simulate with timer) function startRealTimeUpdates() { setInterval(() => { evidenceItems = evidenceItems.map(item => { if (item.status === 'processing' && Math.random() > 0.8) { return { ...item, status: 'ready', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), summary: `AI analysis complete for ${(item as unknown).filename}`, confidence: Math.random() * 0.4 + 0.6, relevantLaws: ['Sample Law 1', 'Sample Law 2'], suggestedTags: ['evidence', 'legal'], prosecutionScore: Math.random() * 0.5 + 0.5, legalRelevance: 'High - Contains relevant legal information', keyFindings: ['Key finding 1', 'Key finding 2']; recommendations: ['Recommendation 1', 'Recommendation 2'] }
+  // Real-time updates (simulate with timer) function startRealTimeUpdates() { setInterval(() => { evidenceItems = evidenceItems.map(item => { if (item.status === 'processing' && Math.random() > 0.8) { return { ...item, status: 'ready', aiAnalysis: { ...((item as unknown).aiAnalysis || {}), summary: `AI analysis complete for ${(item as unknown).filename}`, confidence: Math.random() * 0.4 + 0.6, relevantLaws: ['Sample Law 1', 'Sample Law 2'], suggestedTags: ['evidence', 'legal'], prosecutionScore: Math.random() * 0.5 + 0.5, legalRelevance: 'High - Contains relevant legal information', keyFindings: ['Key finding 1', 'Key finding 2']; recommendations: ['Recommendation 1', 'Recommendation 2'] }
           } as EvidenceItem}
         return item})},
 	5000)}
@@ -163,7 +163,7 @@ caseType: 'commercial', urgency: 'medium'
           } }) }); if (response.ok) { const analysis = await response.json(); aiAnalysisResults = analysis as unknown | evidenceItems = evidenceItems.map(item => { const id = item.id,
    const correlations = ((analysis as unknown).correlationAnalysis?.correlations ?? []).filter( (c: unknown) => c.evidenceA === id || c.evidenceB === id );
    const vectorGroup = ((analysis as unknown).vectorAnalysis?.similarityGroups ?? []).find( (g: unknown) => Array.isArray(g.evidenceIds) && g.evidenceIds.includes(id) );
-   const recs = ((analysis as unknown).unifiedInsights?.recommendations ?? []).filter((r: unknown) => String(r.action || '') .toLowerCase() .includes(((item as unknown).filename || '').toLowerCase()) ); return { ...item, aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), unifiedInsights: { correlations, vectorGroup, strategicImportance: (analysis as unknown).strategyAnalysis?.primaryStrategy; recommendations: recs }
+   const recs = ((analysis as unknown).unifiedInsights?.recommendations ?? []).filter((r: unknown) => String(r.action || '') .toLowerCase() .includes(((item as unknown).filename || '').toLowerCase()) ); return { ...item, aiAnalysis: { ...((item as unknown).aiAnalysis || {}), unifiedInsights: { correlations, vectorGroup, strategicImportance: (analysis as unknown).strategyAnalysis?.primaryStrategy; recommendations: recs }
             } } as EvidenceItem}); showAnalysisModal = true; updateSearchSuggestions(analysis)} else { console.error('Advanced analysis failed'); alert('Advanced analysis failed. Please try again.')}
     } catch (error) { console.error('Advanced analysis error:', error); alert('Analysis error occurred. Please check your connection and try again.')} finally { isAnalyzing = false}
   }

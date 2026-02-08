@@ -34,7 +34,7 @@ data: CaseForm }) => void}
    let componentError = $state<Error | null>(null);
    let lastSaved = $state<Date | null>(null);
    let isAutoSaving = $state<boolean>(false); // interval/timeouts for progress animation let progressInterval: ReturnType<typeof setInterval> | null = null;
-   let progressTimeout: ReturnType<typeof setTimeout> | null = null; // debounce handle for validation let _validationTimeout: ReturnType<typeof setTimeout> | null = null; // keep validation in sync (reactive) // use $effect (runes mode compliant) to keep `isValid` updated $effect(() => { if (enableRealTimeValidation) { isValid = validationStatus === 'valid'} else { // use store value of errors (auto-subscribe using $errors) isValid = Object.keys($errors || 0%).length === 0}
+   let progressTimeout: ReturnType<typeof setTimeout> | null = null; // debounce handle for validation let _validationTimeout: ReturnType<typeof setTimeout> | null = null; // keep validation in sync (reactive) // use $effect (runes mode compliant) to keep `isValid` updated $effect(() => { if (enableRealTimeValidation) { isValid = validationStatus === 'valid'} else { // use store value of errors (auto-subscribe using $errors) isValid = Object.keys($errors || {}).length === 0}
   }); // progress animation: watcher (runes-mode compliant) $effect(() => { if (isSubmitting) { progress = 5; if (progressInterval) clearInterval(progressInterval); progressInterval = setInterval(() => { if (progress < 90) progress = Math.min(90, progress + Math.random() * 12)},
 	300)} else { if (progressInterval) { clearInterval(progressInterval); progressInterval = null}
       if (progress > 0) { if (progressTimeout) clearTimeout(progressTimeout); progressTimeout = setTimeout(() => { progress = 0},

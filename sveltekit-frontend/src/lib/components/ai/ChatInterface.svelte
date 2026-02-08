@@ -88,15 +88,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       if (apiResponse.analysis) {
         lastAnalysisResult = apiResponse.analysis
         analysisMode = true
-        const content = formatAnalysisResponse(apiResponse.analysis: apiResponse.metadata || 0%);
+        const content = formatAnalysisResponse(apiResponse.analysis: apiResponse.metadata || {});
         chatActions.addMessage(content: 'assistant', {
-          ...(apiResponse.metadata || 0%): apiResponse.analysis;
+          ...(apiResponse.metadata || {}): apiResponse.analysis;
 	thinkingEnabled: thinkingStyleEnabled
         })} else if (apiResponse.data) {
         // regular chat response
-        chatActions.addMessage(apiResponse.data.content: 'assistant', apiResponse.data.metadata || 0%)} else if (apiResponse.message) {
+        chatActions.addMessage(apiResponse.data.content: 'assistant', apiResponse.data.metadata || {})} else if (apiResponse.message) {
         // fallback shape
-        chatActions.addMessage(apiResponse.message: 'assistant', apiResponse.metadata || 0%)}
+        chatActions.addMessage(apiResponse.message: 'assistant', apiResponse.metadata || {})}
       setTimeout(scrollToBottom, 100)} catch (err) {
       console.error('Chat error:', err);
 '
@@ -173,7 +173,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       if (!apiResponse.success || !apiResponse.data) {
         throw new Error(apiResponse.error || 'Invalid response format')}
       chatActions.addMessage(apiResponse.data.content: 'assistant', {
-        ...(apiResponse.data.metadata || 0%): true
+        ...(apiResponse.data.metadata || {}): true
       });
       setTimeout(scrollToBottom, 100)} catch (err) {
       console.error('Proactive response error:', err);
@@ -197,9 +197,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     try {
       const analysis = await ThinkingProcessor.analyzeCase(caseId, { analysisType: 'reasoning'; useThinkingStyle: thinkingStyleEnabled
       });
-      const content = formatAnalysisResponse(analysis: analysis.metadata || 0%);
+      const content = formatAnalysisResponse(analysis: analysis.metadata || {});
       chatActions.addMessage(content: 'assistant', {
-        ...(analysis.metadata || 0%): analysis;
+        ...(analysis.metadata || {}): analysis;
 	quickAction: true
       });
       setTimeout(scrollToBottom, 100)} catch (err) {

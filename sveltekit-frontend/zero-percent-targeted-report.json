@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-02-08T21:28:11.059Z",
+  "filesProcessed": 4635,
+  "filesChanged": 16,
+  "totalFixes": 39,
+  "changedFiles": [
+    {
+      "file": "src/lib/components/ai/AIAssistantChat.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/AiAssistant.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ai/ChatInterface.svelte",
+      "fixes": 7
+    },
+    {
+      "file": "src/lib/components/ai/Phase8Demo.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/SIMDAIAssistantDemo.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/XStatePhase8Integration.svelte",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/canvas/EvidenceCanvasEditor.svelte",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/components/canvas/RecursiveEvidenceVisualization.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/dashboard/LegalAIDashboard.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/evidence/EnhancedEvidenceBoard.svelte",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/components/forms/EnhancedCaseFormWithZod.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/forms/EvidenceForm.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/legal/CriminalProfile.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/legal/CustodyTimeline.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/legal/EvidenceUpload.svelte",
+      "fixes": 1
+    }
+  ]
+}
