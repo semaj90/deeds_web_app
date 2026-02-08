@@ -6,8 +6,8 @@
 
   // UI Components
   import * as Dialog from "$lib/components/ui/dialog";
-  import { Button } from "$lib/components/ui/button";
-  import { Input } from "$lib/components/ui/input";
+  import Button from "$lib/components/ui/button";
+  import Input from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import * as Alert from "$lib/components/ui/alert";
   import { Checkbox } from "$lib/components/ui/checkbox";
@@ -64,9 +64,7 @@
     verificationSent: false
   });
 
-  let emailInput = $state<HTMLInputElement>();
-  let passwordInput = $state<HTMLInputElement>();
-  let firstNameInput = $state<HTMLInputElement>();
+  // Removed unused ref variables - not needed in Svelte 5
 
   // Validation
   let validation = $derived.by(() => {
@@ -139,11 +137,6 @@
   });
 
   // Focus management
-  $effect(() => {
-      if (open && emailInput) {
-          setTimeout(() => emailInput?.focus(), 100);
-      }
-  });
 
   async function getClientIP(): Promise<string> {
       try {
@@ -269,7 +262,7 @@
         <div class="grid grid-cols-2 gap-4">
           <div class="grid gap-2">
             <Label for="firstName">First name</Label>
-            <Input id="firstName" bind:value={formData.firstName} bind:ref={firstNameInput} required />
+            <Input id="firstName" bind:value={formData.firstName} required />
           </div>
           <div class="grid gap-2">
             <Label for="lastName">Last name</Label>
@@ -280,7 +273,7 @@
 
       <div class="grid gap-2">
         <Label for="email">Email</Label>
-        <Input id="email" type="email" bind:value={formData.email} bind:ref={emailInput} placeholder="name@example.com" required />
+        <Input id="email" type="email" bind:value={formData.email} placeholder="name@example.com" required />
         {#if formState.emailExists && mode === 'register'}
             <p class="text-xs text-red-500">Email already registered</p>
         {/if}
@@ -289,7 +282,7 @@
       <div class="grid gap-2">
         <Label for="password">Password</Label>
         <div class="relative">
-             <Input id="password" type={formState.showPassword ? 'text' : 'password'} bind:value={formData.password} bind:ref={passwordInput} required />
+             <Input id="password" type={formState.showPassword ? 'text' : 'password'} bind:value={formData.password} required />
              <button type="button" class="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700" onclick={() => formState.showPassword = !formState.showPassword}>
                  {#if formState.showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
              </button>
@@ -315,14 +308,14 @@
         </div>
 
         <div class="flex items-center space-x-2">
-            <Checkbox id="terms" bind:checked={formData.acceptTerms} />
+            <Checkbox id="terms" name="terms" class="" bind:checked={formData.acceptTerms} />
             <Label for="terms" class="text-sm font-normal">I agree to the terms and service</Label>
         </div>
       {/if}
 
       {#if mode === 'login'}
         <div class="flex items-center space-x-2">
-            <Checkbox id="remember" bind:checked={formData.rememberMe} />
+            <Checkbox id="remember" name="remember" class="" bind:checked={formData.rememberMe} />
             <Label for="remember" class="text-sm font-normal">Remember me</Label>
         </div>
       {/if}

@@ -1,15 +1,13 @@
-// Switch Component Barrel Export
-// Note: Switch may not be available in bits-ui v2, using fallback approach
+// Switch Component - Svelte 5 Native Implementation
+// bits-ui v2 does not include Switch component, using native implementation
 
-// Fallback implementation for missing Switch export
-export const SwitchRoot = null;
-// Switch.Root
-export const SwitchThumb = null;
-// Switch.Thumb
+import Switch from "./Svelte5Switch.svelte";
 
-// Switch.svelte component
-import Root from "./Switch.svelte";
-export { Root as Switch };
+// Default export
+export { Switch };
+
+// Also export as default for default import syntax
+export { Switch as default };
 
 // Switch-specific common props interface (local, not exported)
 interface SwitchCommonProps {

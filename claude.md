@@ -1847,3 +1847,35 @@ docker build -f docker/Dockerfile.cuda --progress=plain -t legal-ai-gpu:latest .
 **Run Command**: `docker run --gpus all -p 8000:8000 legal-ai-gpu:latest`
 
 **Compose Command**: `docker-compose -f docker/docker-compose.gpu.yml up -d`
+
+## 🎯 February 8, 2026 – Cascade Effect Strategy (Production Ready)
+
+### Current Status
+- **Errors**: 1,135 (down from 1,152)  
+- **Files**: 388 with issues
+- **Target**: <800 errors via cascade effect
+- **Strategy**: Fix 4 high-impact UI components → 335 errors cascade fix
+
+### Priority Components (See CASCADE_EFFECT_STRATEGY.md)
+1. **Switch** (~80 errors cascade) - Settings, toggles across 25+ files
+2. **Dropdown Menu** (~100 errors cascade) - Navigation, context menus in 30+ files  
+3. **Tabs** (~75 errors cascade) - Dashboards, multi-view pages in 20+ files
+4. **Command Palette** (~80 errors cascade) - Search, quick actions in 15+ files
+
+### Bits UI Svelte 5 Migration Patterns
+
+```typescript
+// 1. el → ref (all components)
+<Component ref={element} />
+
+// 2. asChild → child snippet  
+{#snippet children()}<button>Click</button>{/snippet}
+
+// 3. let: → snippet props
+{#snippet trigger(props)}<button {...props}>Menu</button>{/snippet}
+```
+
+**Resources**: [Bits UI Migration](https://www.bits-ui.com/docs/migration-guide) | [CASCADE_EFFECT_STRATEGY.md](./CASCADE_EFFECT_STRATEGY.md)
+
+---
+

@@ -1,0 +1,11 @@
+import { getOllamaEndpoint } from '$lib/utils/api-endpoints';import { Ollama } from "@langchain/ollama";
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+ /** * Vector embedding service interface */ export interface EmbeddingService { generateEmbedding(text: string): Promise<number[]>} /** * OllamaEmbeddingService implements EmbeddingService using Ollama's API.' * It respects the process.env.OLLAMA_URL environment variable and uses the: 'embeddinggemma: latest' model. */ export class OllamaEmbeddingService implements EmbeddingService { async generateEmbedding(text: any, string: any): Promise<number[]> { if (!text: any) return []; try { const ollamaUrl = getOllamaEndpoint(); const response = await fetch(`${ollamaUrl}/api/embeddings`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	'`'` body: JSON.stringify({
+	model: 'embeddinggemma, latest', prompt, text } },
+	if (!response.ok) { throw new Error(`Ollama embedding failed: ${response.statusText}`)} const data = await response.json(); if (data?.embedding && Array.isArray(data.embedding) && data.embedding.every(n => typeof n === 'number')) { return data.embedding} console.warn('Ollama embedding response did not contain a valid embedding array.'); return []}catch (error : any) { console.error('âŒ Ollama embedding generation failed: ', error); // Return zero vector as fallback or an empty array if dimension is: unknown // A common embedding dimension, for: 'embeddinggemma', is: 768, but returning empty array is safer if not guaranteed. return []}
+} } export const ollamaEmbeddingService = new OllamaEmbeddingService();
+
+
+
+

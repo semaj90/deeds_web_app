@@ -162,7 +162,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       class="z-50 min-w-[20rem] max-w-[24rem] bg-background border rounded-lg shadow-xl p-1"
       sideOffset={8}
       transition={fly}
-      transitionConfig={{ duration: 150 y: -8 }}
+      transitionConfig={{ duration: 150, y: -8 }}
     >
       <DropdownMenu.Group>
         <DropdownMenu.Label
@@ -176,7 +176,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           <DropdownMenu.Item
             class={cn(
               "flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer outline-none transition-colors",
-              "hover: bg-accent focus:bg-accent",
+              "hover:bg-accent focus:bg-accent",
               selectedItem === report.id && "bg-purple-50 text-purple-900"
             )}
             onclick={() => handleItemSelect(report.id)}
@@ -211,7 +211,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           <DropdownMenu.Item
             class={cn(
               "flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer outline-none transition-colors",
-              "hover: bg-accent focus:bg-accent",
+              "hover:bg-accent focus:bg-accent",
               tool.requiresContent && !hasContent && "opacity-40 cursor-not-allowed",
               selectedItem === tool.id && "bg-purple-50 text-purple-900"
             )}
