@@ -40,7 +40,7 @@ file: null as File | null,
       analysisResults: null as any,
       errorMessage: null as string | null
     },
-	states: {, idle: {, on: {, FILE_SELECTED: {, target: 'readyToUpload',
+	states: { idle: { on: { FILE_SELECTED: { target: 'readyToUpload',
             actions: assign({
 file: ({ event }: any) => event.file
             })

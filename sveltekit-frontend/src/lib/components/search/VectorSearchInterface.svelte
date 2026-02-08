@@ -1,13 +1,14 @@
 
 <script lang="ts">
-  import { Slider, Switch, Button } from "bits-ui";
+  import * as Slider from "bits-ui/components/slider";
+import * as Switch from "bits-ui/components/switch";
   import { Search, SlidersHorizontal, Zap } from "lucide-svelte";
 
   // Props
   let {
     onSearch
   }: {
-    onSearch?: (params: {, query: string; threshold: number,, semantic: boolean }) => void
+    onSearch?: (params: { query: string; threshold: number,, semantic: boolean }) => void
   } = $props();
 
   // State

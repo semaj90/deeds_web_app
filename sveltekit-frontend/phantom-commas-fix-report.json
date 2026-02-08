@@ -1,139 +1,27 @@
 {
-  "timestamp": "2026-02-08T19:51:01.531Z",
+  "timestamp": "2026-02-08T20:32:41.940Z",
   "filesProcessed": 2184,
-  "filesWithIssues": 256,
-  "totalChanges": 653,
+  "filesWithIssues": 45,
+  "totalChanges": 89,
   "changedFiles": [
     {
-      "file": "src\\lib\\components\\ui\\Button.stories.ts",
-      "changes": 25
-    },
-    {
-      "file": "src\\lib\\components\\ui\\enhanced\\Button.stories.ts",
-      "changes": 25
-    },
-    {
-      "file": "src\\lib\\components\\ui\\enhanced\\Card.stories.ts",
-      "changes": 19
-    },
-    {
-      "file": "src\\lib\\components\\LegalCaseManager.stories.ts",
-      "changes": 17
-    },
-    {
-      "file": "src\\lib\\components\\visualizations\\EvidenceAnalysisVisualization.svelte",
-      "changes": 14
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\YoRHaCommandCenter.stories.ts",
-      "changes": 14
-    },
-    {
-      "file": "src\\lib\\components\\ai\\FileUploadGemma3.stories.ts",
-      "changes": 13
-    },
-    {
-      "file": "src\\lib\\services\\goMicroservice.ts",
-      "changes": 13
-    },
-    {
-      "file": "src\\routes\\api\\indexing\\+server.ts",
-      "changes": 12
-    },
-    {
-      "file": "src\\lib\\components\\legal-ai\\__tests__\\CaseStatuteLinks.test.ts",
-      "changes": 11
-    },
-    {
-      "file": "src\\lib\\components\\legal-ai\\__tests__\\LinkMetadataForm.test.ts",
-      "changes": 11
-    },
-    {
-      "file": "src\\lib\\components\\AIChat.stories.ts",
+      "file": "src\\lib\\state\\evidence-processing-machine.ts",
       "changes": 10
     },
     {
-      "file": "src\\lib\\services\\go-microservice-client.ts",
-      "changes": 10
-    },
-    {
-      "file": "src\\lib\\components\\legal\\EnhancedLegalProcessor.svelte",
-      "changes": 9
-    },
-    {
-      "file": "src\\lib\\components\\ai\\Gemma3LegalChat.svelte",
+      "file": "src\\lib\\services\\rag-ingestion-pipeline.ts",
       "changes": 8
     },
     {
-      "file": "src\\lib\\components\\three\\yorha-ui\\components\\YoRHaQuantumEffects3D.ts",
-      "changes": 8
-    },
-    {
-      "file": "src\\lib\\components\\detective\\ContextualDetectiveBoard.svelte",
-      "changes": 7
+      "file": "src\\lib\\stores\\machines\\userWorkflowMachine.ts",
+      "changes": 5
     },
     {
       "file": "src\\lib\\components\\legal\\CaseSynthesisWorkflow.svelte",
-      "changes": 7
-    },
-    {
-      "file": "src\\lib\\components\\headless\\DocumentUploader.svelte",
-      "changes": 6
-    },
-    {
-      "file": "src\\lib\\components\\legal-ai\\__tests__\\CitationDetail.test.ts",
-      "changes": 6
-    },
-    {
-      "file": "src\\lib\\components\\three\\yorha-ui\\components\\YoRHaButtonAA3D.ts",
-      "changes": 6
-    },
-    {
-      "file": "src\\lib\\components\\ui\\bits\\custom-design-integration.ts",
-      "changes": 6
-    },
-    {
-      "file": "src\\lib\\components\\ai\\CachePerformanceDashboard.svelte",
-      "changes": 5
-    },
-    {
-      "file": "src\\lib\\components\\three\\yorha-ui\\webgpu\\HeadlessLegalProcessorFactory.ts",
-      "changes": 5
-    },
-    {
-      "file": "src\\routes\\(app)\\api\\ace\\web-crawl\\+server.ts",
-      "changes": 5
-    },
-    {
-      "file": "src\\routes\\api\\codebase\\apply-patch\\+server.ts",
-      "changes": 5
-    },
-    {
-      "file": "src\\routes\\api\\codebase-index\\+server.ts",
-      "changes": 5
-    },
-    {
-      "file": "src\\lib\\services\\gpu-rag-service.ts",
-      "changes": 5
-    },
-    {
-      "file": "src\\lib\\components\\canvas\\CollaborativeEvidenceCanvas.svelte",
       "changes": 4
     },
     {
-      "file": "src\\lib\\components\\detective\\DetectiveBoard.svelte",
-      "changes": 4
-    },
-    {
-      "file": "src\\lib\\components\\evidence\\EnhancedEvidenceBoard.svelte",
-      "changes": 4
-    },
-    {
-      "file": "src\\lib\\components\\evidence\\EvidenceBoard.svelte",
-      "changes": 4
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\CaseTheoryConstructor.svelte",
+      "file": "src\\lib\\components\\legal\\EnhancedLegalProcessor.svelte",
       "changes": 4
     },
     {
@@ -141,67 +29,11 @@
       "changes": 4
     },
     {
+      "file": "src\\routes\\(app)\\api\\ace\\web-crawl\\+server.ts",
+      "changes": 3
+    },
+    {
       "file": "src\\routes\\(app)\\command-center\\codebase\\errors\\+page.server.ts",
-      "changes": 4
-    },
-    {
-      "file": "src\\routes\\api\\ace\\summarize-clusters\\+server.ts",
-      "changes": 4
-    },
-    {
-      "file": "src\\routes\\api\\admin\\knowledge\\+server.ts",
-      "changes": 4
-    },
-    {
-      "file": "src\\routes\\api\\phase89\\topology\\+server.ts",
-      "changes": 4
-    },
-    {
-      "file": "src\\lib\\components\\ai\\DocumentUploadSimulator.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\ai\\UnifiedAIAssistant.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\cache\\CacheDemo.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\editor\\WysiwygEditor.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\error-brain\\ErrorBrainModal.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\forms\\EnhancedCaseFormWithZod.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\legal\\CitationManager.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\RAGSearchComponent.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\RouteInspectorDetectiveBoard.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\upload\\EnhancedLegalUpload.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\routes\\(app)\\phase78\\monitor\\+page.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\routes\\(app)\\system-configuration\\+page.svelte",
       "changes": 3
     },
     {
@@ -209,103 +41,7 @@
       "changes": 3
     },
     {
-      "file": "src\\routes\\api\\admin\\agent\\fix\\+server.ts",
-      "changes": 3
-    },
-    {
-      "file": "src\\routes\\api\\analyze-tag\\+server.ts",
-      "changes": 3
-    },
-    {
-      "file": "src\\routes\\api\\evidence\\realtime\\+server.ts",
-      "changes": 3
-    },
-    {
-      "file": "src\\routes\\api\\phase89\\components\\+server.ts",
-      "changes": 3
-    },
-    {
-      "file": "src\\routes\\api\\phase89\\stream\\+server.ts",
-      "changes": 3
-    },
-    {
-      "file": "src\\routes\\api\\qlora\\stream\\+server.ts",
-      "changes": 3
-    },
-    {
-      "file": "src\\routes\\api\\routes\\events\\+server.ts",
-      "changes": 3
-    },
-    {
-      "file": "src\\routes\\indexing\\+page.svelte",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\services\\gpu-som-embeddings.ts",
-      "changes": 3
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AIProcessingDashboard.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ai\\EnhancedDocumentUploader.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ai\\EvidenceCanvas.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ai\\LLMSelector.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ai\\SoraGraphVisualization.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\canvas\\EvidenceCanvasEditor.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\canvas\\FabricCanvas.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\CaseOutcomePrediction.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\cases\\CaseCard.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ComprehensiveUploadAnalytics.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ContextConfirmModal.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\editor\\TipTapEditor.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\editors\\LegalRichTextEditor.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\evidence\\Enhanced3DEvidenceBoard.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\evidence\\EvidenceAssistant.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\evidence\\EvidenceFilesManager.svelte",
+      "file": "src\\lib\\components\\board\\CanvasBoard.svelte",
       "changes": 2
     },
     {
@@ -313,7 +49,7 @@
       "changes": 2
     },
     {
-      "file": "src\\lib\\components\\feedback\\FeedbackAnalyticsDashboard.svelte",
+      "file": "src\\lib\\components\\evidence\\SummaryReviewPanel.svelte",
       "changes": 2
     },
     {
@@ -321,131 +57,7 @@
       "changes": 2
     },
     {
-      "file": "src\\lib\\components\\glyph\\SIMDGlyphRenderer.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\legal\\CaseTimeline.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\legal\\LegalPrecedentCard.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\legal\\StatuteActionPanel.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\modals\\EvidenceAnalysisModal.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\modals\\EvidenceModal.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\RouteInspectorWorking.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\three\\yorha-ui\\YoRHaAntiAliasing3D.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\three\\YoRHaQuantumVisualization.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\TipTapEditor.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ui\\alert\\alert-variants.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ui\\badge\\Badge.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ui\\bitsbutton.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ui\\button-variants.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ui\\core\\Textarea.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ui\\enhanced\\button-variants.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ui\\Form.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ui\\SmartTextarea.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\ui\\switch\\Svelte5Switch.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\upload\\IntegratedRAGUpload.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\upload\\upload-core.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\vision\\PhoenixWrightSearch.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\visualization\\Legal3DVisualizationLOD.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\PoliceReportGenerator.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\YoRHaCaseForm.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\(app)\\agentic-errors\\+page.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\(app)\\cases\\[id]\\reports\\+page.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\(app)\\command-center\\codebase\\clusters\\[id]\\+page.server.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\(dev)\\test-user-store\\+page.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\acp\\+page.svelte",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\api\\analyze-file\\+server.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\api\\codebase-index\\reindex\\+server.ts",
+      "file": "src\\routes\\api\\admin\\knowledge\\+server.ts",
       "changes": 2
     },
     {
@@ -453,51 +65,15 @@
       "changes": 2
     },
     {
-      "file": "src\\routes\\api\\health\\ocr\\+server.ts",
+      "file": "src\\routes\\api\\indexing\\+server.ts",
       "changes": 2
     },
     {
-      "file": "src\\routes\\api\\health\\ollama\\+server.ts",
+      "file": "src\\routes\\api\\phase89\\topology\\+server.ts",
       "changes": 2
     },
     {
-      "file": "src\\routes\\api\\kb\\validate\\+server.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\api\\knowledge\\stats\\+server.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\api\\knowledge\\stream\\+server.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\api\\llm-improvement\\fix\\+server.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\api\\llm-improvement\\learn\\+server.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\api\\rag\\unified\\+server.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\routes\\api\\routes\\[routeId]\\interactions\\+server.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\services\\anonymous-session-manager.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\services\\comprehensive-missing-imports-orchestrator.ts",
-      "changes": 2
-    },
-    {
-      "file": "src\\lib\\services\\legal-ai-client.ts",
+      "file": "src\\lib\\stores\\unified\\report-store.ts",
       "changes": 2
     },
     {
@@ -505,123 +81,11 @@
       "changes": 1
     },
     {
-      "file": "src\\lib\\components\\admin\\TagSelector.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\agentic\\AgentChat.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AiAssistant.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AIAssistantButton.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AIAssistantModal.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AIChatWidget.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AiSetupBanner.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AISummaryButton.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AskAI.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\AuditResults.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\ContextualChatDemo.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\DeedAnalysis.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\EnhancedAIChat.svelte",
-      "changes": 1
-    },
-    {
       "file": "src\\lib\\components\\ai\\EnhancedAIChatTest.svelte",
       "changes": 1
     },
     {
-      "file": "src\\lib\\components\\ai\\EnhancedMCPIntegration.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\GamingAIInterface.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\Gemma270MWebAssembly.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\IngestAIAssistant.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\IntelligentModelOrchestrator.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\LegalDocumentDrafting.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\LLMProviderSelector.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\PatternRecognition.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\PersonOfInterestCard.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\ThinkingStyleToggle.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\VectorIntelligenceDemo.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\webgpu-viewer.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ai\\WWWHAnalyzer.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\AIAssistant.svelte.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\auth\\DemoLoginButton.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\auth\\EnhancedAuthForm.svelte",
+      "file": "src\\lib\\components\\ai\\Gemma3LegalChat.svelte",
       "changes": 1
     },
     {
@@ -629,75 +93,7 @@
       "changes": 1
     },
     {
-      "file": "src\\lib\\components\\auth\\RegisterForm.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\bits-ui\\Search.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\board\\CanvasBoard.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\canvas\\EnhancedLegalCanvas.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\canvas\\EvidenceCanvas.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\canvas\\HybridBoard.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\canvas\\POINode.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\canvas\\WebGPUCanvas.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\cases\\ContextualChatModal.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\citations\\CitationCollections.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\citations\\CitationsSaveButton.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ClientGemmaDemo.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\command-center\\AceAgentControls.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\command-center\\AllRoutesExplorer.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\command-center\\Phase72ToolPanel.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\CrewAIOrchestrationDemo.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\editor\\LegalDocumentEditor.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\evidence\\DraggableEvidenceNode.svelte",
+      "file": "src\\lib\\components\\canvas\\FabricCanvas.svelte",
       "changes": 1
     },
     {
@@ -705,203 +101,19 @@
       "changes": 1
     },
     {
-      "file": "src\\lib\\components\\evidence\\EvidenceProcessingWorkflow.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\evidence\\SimpleEvidenceBoard.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\evidence\\SummaryReviewPanel.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\headless\\evidence-canvas.svelte.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\HeadlessTypingListener.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\integration\\LegalAIOrchestrationDemo.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\laws\\LawsDashboard.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\laws\\StatuteColumn.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\legal\\AISummaryReader.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\legal\\EvidenceManager.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\legal\\EvidenceUpload.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\legal\\LegalDocumentProcessor.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\legal-ai\\AttachToCaseModal.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\legal-ai\\CitationDetail.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\legal-ai\\CitationLibraryPage.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\legal-ai\\LinkMetadataForm.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\navigation\\EnhancedLegalNav.svelte",
-      "changes": 1
-    },
-    {
       "file": "src\\lib\\components\\notes\\LegalNotesManager.svelte",
       "changes": 1
     },
     {
-      "file": "src\\lib\\components\\Phase72ErrorBrain.svelte",
+      "file": "src\\lib\\components\\search\\VectorSearchInterface.svelte",
       "changes": 1
     },
     {
-      "file": "src\\lib\\components\\phase78\\ErrorModal.svelte",
+      "file": "src\\lib\\components\\ui\\core\\Textarea.svelte",
       "changes": 1
     },
     {
-      "file": "src\\lib\\components\\phase78\\SuggestionsList.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\poi\\POICard.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\RouteInspectorModal.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\SearchBox.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\source-validation\\ProvenanceGraph.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\three\\yorha-ui\\components\\YoRHaPanel3D.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\three\\yorha-ui\\YoRHaUI3D.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ui\\bits\\index.enhanced.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ui\\bits\\index.optimized.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ui\\CaseItem.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ui\\ChatMessage.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ui\\DataGrid.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ui\\gaming\\constants\\gaming-constants-minimal.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\ui\\GPUInferenceDemo.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\unified\\UnifiedCanvasIntegration.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\upload\\FileUploadForm.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\upload\\MinIOUpload.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\vector\\VectorRecommendationsWidget.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\vision\\EvidenceUpload.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\visualization\\CaseGraphLOD.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\visualization\\EvidenceTimelineLOD.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\CrossExaminationAssistant.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\dashboard\\GPUMetrics.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\DetectiveEvidenceMap.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\EnhancedYoRHaAIAssistant.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\JudicialAnalysisAgent.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\YoRHaAIChat.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\YoRHaDialog.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\YoRHaNotification.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\components\\yorha\\_simulations\\YoRHaCommandInterface.svelte",
+      "file": "src\\lib\\components\\ui\\SmartTextarea.svelte",
       "changes": 1
     },
     {
@@ -913,15 +125,11 @@
       "changes": 1
     },
     {
+      "file": "src\\routes\\(app)\\cases\\[id]\\reports\\+page.svelte",
+      "changes": 1
+    },
+    {
       "file": "src\\routes\\(app)\\command-center\\+page.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\(app)\\command-center\\codebase\\+page.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\(app)\\command-center\\codebase\\components\\[id]\\+page.server.ts",
       "changes": 1
     },
     {
@@ -929,27 +137,11 @@
       "changes": 1
     },
     {
-      "file": "src\\routes\\(app)\\global-search\\+page.svelte",
-      "changes": 1
-    },
-    {
       "file": "src\\routes\\(app)\\persons-of-interest\\create\\+page.server.ts",
       "changes": 1
     },
     {
-      "file": "src\\routes\\(app)\\phase78\\monitor\\+page.server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\(dev)\\phase89\\error-map\\+page.svelte",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\.well-known\\appspecific\\com.chrome.devtools.json\\+server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\admin\\error-analysis\\+page.svelte",
+      "file": "src\\routes\\(app)\\system-configuration\\+page.svelte",
       "changes": 1
     },
     {
@@ -957,59 +149,27 @@
       "changes": 1
     },
     {
-      "file": "src\\routes\\api\\acp\\execute\\+server.ts",
+      "file": "src\\routes\\api\\ace\\summarize-clusters\\+server.ts",
       "changes": 1
     },
     {
-      "file": "src\\routes\\api\\auth\\login\\+server.ts",
+      "file": "src\\routes\\api\\analyze-tag\\+server.ts",
       "changes": 1
     },
     {
-      "file": "src\\routes\\api\\auth\\logout\\+server.ts",
+      "file": "src\\routes\\api\\codebase\\apply-patch\\+server.ts",
       "changes": 1
     },
     {
-      "file": "src\\routes\\api\\auth\\register\\+server.ts",
+      "file": "src\\routes\\api\\kb\\validate\\+server.ts",
       "changes": 1
     },
     {
-      "file": "src\\routes\\api\\auth\\session\\+server.ts",
+      "file": "src\\routes\\api\\knowledge\\stream\\+server.ts",
       "changes": 1
     },
     {
-      "file": "src\\routes\\api\\cases\\+server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\api\\chat\\stream\\+server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\api\\health\\search\\+server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\api\\knowledge\\search\\+server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\api\\llm-improvement\\analyze\\+server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\api\\phase89\\vector-search\\+server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\api\\phase90\\+server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\api\\phase90\\health\\+server.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\routes\\api\\reports\\+server.ts",
+      "file": "src\\routes\\api\\rag\\unified\\+server.ts",
       "changes": 1
     },
     {
@@ -1021,11 +181,7 @@
       "changes": 1
     },
     {
-      "file": "src\\lib\\services\\embeddings-service.ts",
-      "changes": 1
-    },
-    {
-      "file": "src\\lib\\services\\gpu-acceleration-service.ts",
+      "file": "src\\lib\\stores\\unified\\evidence-store.ts",
       "changes": 1
     }
   ]

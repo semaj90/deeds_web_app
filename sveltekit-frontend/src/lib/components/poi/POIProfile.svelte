@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { DialogContent, DialogOverlay, DialogPortal, DialogRoot } from 'bits-ui';
+	import * as DialogContent from "bits-ui/components/dialog";
+import * as DialogOverlay from "bits-ui/components/dialog";
+import * as DialogPortal from "bits-ui/components/dialog";
+import * as DialogRoot from "bits-ui/components/dialog";
 
 
  let aiOpen = $state(false);

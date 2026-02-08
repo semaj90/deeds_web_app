@@ -27,7 +27,7 @@
     zoomLevel?: number;
     panX?: number;
     panY?: number;
-    onUpdatePosition?: (event: {, id: string; position: {, x: number,, y: number } }) => void;
+    onUpdatePosition?: (event: { id: string; position: { x: number,, y: number } }) => void;
   }>();
 
   let canvas: HTMLCanvasElement;

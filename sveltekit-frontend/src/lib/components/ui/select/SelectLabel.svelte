@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import { Label } from "bits-ui";
+  import * as Label from "bits-ui/components/label";
   import type { Snippet } from "svelte";
 
   interface Props {

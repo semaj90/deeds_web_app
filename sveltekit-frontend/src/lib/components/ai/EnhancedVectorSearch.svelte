@@ -1,7 +1,19 @@
 <!-- @migration-task Error while migrating Svelte code: Attributes need to, be, unique, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code: Attributes need to, be, unique --> <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke; https, //svelte.dev/e/js_parse_error --> <!-- Enhanced Vector Search Interface with Ranking: Analytics, and, Real-time, Results --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
 import type { SearchResult } from '$lib/types';
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Updated to use bits-ui components import  Button  from "$lib/components/ui/bitsButton.svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import  Select  from "$lib/components/ui/MeltSelect.svelte"; // TODO: Replace with bits-ui equivalents when available // import { // Badge, // CardContent, // CardHeader, // CardTitle, // Checkbox, // DialogContent, // DialogHeader, // DialogTitle, // Input, // Progress, // SelectContent, // SelectItem, // SelectTrigger, // SelectValue, // Slider, // Tabs, // TabsContent, // TabsList, // TabsTrigger, // } from "bits-ui"
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Updated to use bits-ui components import  Button  from "$lib/components/ui/bitsButton.svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import  Select  from "$lib/components/ui/MeltSelect.svelte"; // TODO: Replace with bits-ui equivalents when available // import * as // Checkbox from "bits-ui/components/checkbox";
+import * as // DialogContent from "bits-ui/components/dialog";
+import * as // DialogHeader from "bits-ui/components/dialog";
+import * as // DialogTitle from "bits-ui/components/dialog";
+import * as // SelectContent from "bits-ui/components/select";
+import * as // SelectItem from "bits-ui/components/select";
+import * as // SelectTrigger from "bits-ui/components/select";
+import * as // SelectValue from "bits-ui/components/select";
+import * as // Slider from "bits-ui/components/slider";
+import * as // Tabs from "bits-ui/components/tabs";
+import * as // TabsContent from "bits-ui/components/tabs";
+import * as // TabsList from "bits-ui/components/tabs";
+import * as // TabsTrigger from "bits-ui/components/tabs"
   import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
   import Brain from 'lucide-svelte/icons/brain';
   import ChevronDown from 'lucide-svelte/icons/chevron-down';

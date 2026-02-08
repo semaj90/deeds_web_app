@@ -1,7 +1,7 @@
 <!-- Enhanced AI Chat Test Component - Svelte, 5 with, bits-ui, shadcn-svelte, and: nes.css --> <script lang="ts">
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { browser } from '$app/environment'; // Migrated to $effect import { Dialog } from 'bits-ui'; // Changed from MeltDialog to bits-ui import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  ScrollArea  from "$lib/components/ui/scrollarea/ScrollArea.svelte";
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { browser } from '$app/environment'; // Migrated to $effect import * as Dialog from "bits-ui/components/dialog"; // Changed from MeltDialog to bits-ui import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  ScrollArea  from "$lib/components/ui/scrollarea/ScrollArea.svelte";
 import Bot from 'lucide-svelte/icons/bot';
 import User from 'lucide-svelte/icons/user';
 import Send from 'lucide-svelte/icons/send';
@@ -32,7 +32,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     // Add messages and clear input messages = [...messages, userMessage, loadingMessage]; const messageContent = currentMessage; // Fixed typo currentMessage = ''; isLoading = true; // Scroll to bottom await tick(); scrollToBottom(); try { const response = await fetch('/api/contextual/chat', { // Changed from /api/chat to /api/contextual/chat method: 'POST', headers: {
           'Content-Type': 'application/json'
         },
-	body: JSON.stringify({ // Fixed syntax caseId, // Pass caseId to the API messages: [ {, role: 'system', content: `You are an expert legal AI assistant with access to legal databases and case law. You are running locally on an RTX, 3060 Ti GPU using the Gemma3-legal-enhanced model. Provide accurate, helpful legal information while noting that you provide general information only and not legal advice.${caseId ? ` Context: Case ID ${ caseId }`: ''}` },
+	body: JSON.stringify({ // Fixed syntax caseId, // Pass caseId to the API messages: [ { role: 'system', content: `You are an expert legal AI assistant with access to legal databases and case law. You are running locally on an RTX, 3060 Ti GPU using the Gemma3-legal-enhanced model. Provide accurate, helpful legal information while noting that you provide general information only and not legal advice.${caseId ? ` Context: Case ID ${ caseId }`: ''}` },
 	...messages .filter((m) => !m.loading && !m.error) .map((m) => ({ role: m.role; content: m.content })), { role: 'user'; content: messageContent, // Fixed syntax }]
         }) }); if (!response.ok) { throw new Error(`HTTP ${response.status}: ${response.statusText}`)}
 

@@ -20,7 +20,7 @@ keyArguments: string[]}
   interface RiskAnalysis { challengePoints: { issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
   interface Recommendation { priority: 'immediate' | 'high' | 'medium' | 'low',category: 'evidence' | 'legal' | 'procedural' | 'strategic',action: string; // Added colon rationale: string, timeline, string}
   const synthesisMachine = createMachine<SynthesisContext>({ id: 'synthesis', initial: 'idle', context: { caseId, documents, evidenceReports, selectedItems: [], synthesisMode: 'thematic', synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma loading: false },
-	states: {, idle: {, on: { // Added colon, SELECT_ITEMS: {, actions: assign({, selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
+	states: { idle: { on: { // Added colon, SELECT_ITEMS: { actions: assign({ selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
             }) },
 	START_SYNTHESIS: {
 	target: 'synthesizing', actions: assign({

@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         let members: Array<Record<string, unknown>> = [];
         if (membersResponse.ok) {
             const membersData = await membersResponse.json();
-            members = membersData.result.points.map((p: {, payload: Record<string, unknown> }) => p.payload);
+            members = membersData.result.points.map((p: { payload: Record<string, unknown> }) => p.payload);
         }
 
         // Generate safe patches based on error type
