@@ -60,7 +60,7 @@ export interface WasmClusteringService {
 }
 
 export interface NESGPUBridge {
-    computeSimilarity(a: Float32Array, b: Float32Array): Promise<number>;
+    computeSimilarity(a: Float32Array; b: Float32Array): Promise<number>;
     allocateBuffer(size: number): GPUBuffer | { size: number };
 }
 

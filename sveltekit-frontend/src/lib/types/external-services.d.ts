@@ -83,7 +83,7 @@ export interface IRedisCacheService {
 }
 export interface IQdrantVectorService {
  upsertVector(
- id: string, vector: Float32Array | number[],
+ id: string; vector: Float32Array | number[],
  metadata?: Record<string, unknown>
  ): Promise<void>;
  upsertBatch(

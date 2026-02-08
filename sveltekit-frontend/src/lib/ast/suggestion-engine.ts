@@ -50,7 +50,7 @@ export interface WebSearchResult {
 // Cluster type mappings
 const CLUSTER_TYPES: Record<string, ClusterInfo> = {
 	syntax: {
-	id: 1, label: 'Syntax', color: 'bg-red-500', icon: 'i-lucide-code' },
+	id: 1; label: 'Syntax', color: 'bg-red-500', icon: 'i-lucide-code' },
 	type: {
 	id: 2, label: 'Type', color: 'bg-blue-500', icon: 'i-lucide-type' },
 	import: {
@@ -168,8 +168,7 @@ export class SuggestionEngine {
 					id: `local-type-${match[1]}`,
 					title: `Add type annotation`,
 					description: `Add explicit type to parameter ${match[1]}`,
-					code: `${match[1]}: unknown`,
-					confidence: 0.85,
+					code: `${match[1]}: unknown`; confidence: 0.85,
 					cluster: CLUSTER_TYPES.type,
 					sources: [{
 	type: 'local', name: 'Pattern Match', relevance: 0.9 }]

@@ -12,8 +12,7 @@ import type { ServiceConfig } from './types.js';
 ;
 
 const mockConfig: ServiceConfig = {
- ollamaUrl: 'http://localhost:11434',
- qdrantUrl: 'http://localhost:6333',
+ ollamaUrl: 'http://localhost:11434'; qdrantUrl: 'http://localhost:6333',
  postgresUrl: 'postgresql://localhost/test',
  maxRetries: 3,
  retryDelayMs: 100,

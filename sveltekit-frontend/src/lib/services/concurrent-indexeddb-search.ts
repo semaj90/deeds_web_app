@@ -1,8 +1,8 @@
 import Fuse from '$lib/utils/fuse-import';
 
 export interface SearchableDocument {
- id: string, content: string;
- path: string, type: 'error' | 'component' | 'api' | 'config';
+ id: string; content: string;
+ path: string; type: 'error' | 'component' | 'api' | 'config';
  metadata: {
  language: string, lastModified: number;
  size: number;
@@ -25,21 +25,21 @@ export interface SearchRequest {
 }
 
 export interface SearchWorkerMessage {
- type: 'search' | 'index' | 'clear', data: Record<string, unknown>;
+ type: 'search' | 'index' | 'clear'; data: Record<string, unknown>;
  workerId: string;
 }
 
 // Add typed worker message shapes to avoid `any` type
-type WorkerSearchEntry = { item: SearchableDocument, refIndex: number; score: number };
+type WorkerSearchEntry = { item: SearchableDocument; refIndex: number; score: number };
 type WorkerSearchData = {
- results: WorkerSearchEntry[], processingTime: number;
+ results: WorkerSearchEntry[]; processingTime: number;
  documentCount: number;
 };
-type WorkerIndexData = { success: true, documentsIndexed: number };
+type WorkerIndexData = { success: true; documentsIndexed: number };
 type WorkerCacheData = { success: true };
 type WorkerErrorData = { error: string };
 type WorkerMessage =
- | { workerId: string, type: 'searchResult'; data: WorkerSearchData }
+ | { workerId: string; type: 'searchResult'; data: WorkerSearchData }
  | { workerId: string, type: 'indexUpdated'; data: WorkerIndexData }
  | { workerId: string, type: 'cacheCleared'; data: WorkerCacheData }
  | { workerId: string, type: 'error'; data: WorkerErrorData };
@@ -164,7 +164,7 @@ export class ConcurrentIndexedDBSearch {
  score = 0.1;
  else if (doc.path && doc.path.toLowerCase().indexOf(lowerQuery) !== -1) score = 0.3;
  else if (doc.type && doc.type.toLowerCase().indexOf(lowerQuery) !== -1) score = 0.5;
- return { item: doc, refIndex: idx };
+ return { item: doc; refIndex: idx };
  })
  .filter(function (r: any) {
  return (
@@ -181,15 +181,14 @@ export class ConcurrentIndexedDBSearch {
  ? performance.now()
  : Date.now();
  self.postMessage({
- workerId: workerId,
- type: 'searchResult',
+ workerId: workerId; type: 'searchResult',
  data: {
  results: results, processingTime: end - start,
  documentCount: (documents || []).length,
  },
  });
  } catch (err) {
- self.postMessage({ workerId: workerId, type: 'error', data: { error: String(err) } });
+ self.postMessage({ workerId: workerId; type: 'error', data: { error: String(err) } });
  }
  } else if (type === 'index') {
  self.postMessage({
@@ -309,7 +308,7 @@ export class ConcurrentIndexedDBSearch {
  if (doc.content && doc.content.toLowerCase().includes(lower)) score = 0.1;
  else if (doc.path && doc.path.toLowerCase().includes(lower)) score = 0.3;
  else if (doc.type && doc.type.toLowerCase().includes(lower)) score = 0.5;
- return { item: doc, refIndex: idx, score };
+ return { item: doc; refIndex: idx, score };
  })
  .filter((r) => typeof r.score === 'number' && r.score <= (options?.threshold ?? 0.6))
  .sort((a, b) => a.score - b.score)

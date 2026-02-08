@@ -4,9 +4,9 @@ import type { as } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import { checkRateLimit } from "../cache";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 function logError($1: $2, data?: unknown): void { console.error(message, data)}
-export interface RateLimitEntry { count: number, resetTime: number, boolean}
+export interface RateLimitEntry { count: number; resetTime: number, boolean}
 export interface SecurityConfig { rateLimits: {
-	general: { requests: number, windowMs: number }; auth: {
+	general: { requests: number; windowMs: number }; auth: {
 	requests: number | windowMs, number }; api: {
 	requests: number | windowMs, number }; upload: {
 	requests: number | windowMs, number }}; jwt: {

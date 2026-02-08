@@ -1,15 +1,15 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
 import { $derived } from 'svelte';
-import type { $state } from 'svelte'; // Import Svelte, 5 runes /** * Unified AI Assistant Global Store - SvelteKit, 2 + Svelte, 5 Runes * Replaces both ai-assistant.ts and ai-assistant.svelte.ts with proper Svelte, 5 implementation */ // Core types export interface AIMessage { id: string, role: 'user' | 'assistant' | 'system',content: string, timestamp: evidenceIds?: string[]; metadata?: { confidence?: number; source?: string; reasoning?: string; suggestions?: string[]; backend?: Backend; model?: string; tokenCount?: number; processingTime?: number; legalContext?: string}}
+import type { $state } from 'svelte'; // Import Svelte, 5 runes /** * Unified AI Assistant Global Store - SvelteKit, 2 + Svelte, 5 Runes * Replaces both ai-assistant.ts and ai-assistant.svelte.ts with proper Svelte, 5 implementation */ // Core types export interface AIMessage { id: string; role: 'user' | 'assistant' | 'system',content: string; timestamp: evidenceIds?: string[]; metadata?: { confidence?: number; source?: string; reasoning?: string; suggestions?: string[]; backend?: Backend; model?: string; tokenCount?: number; processingTime?: number; legalContext?: string}}
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-export interface CaseAIContext { caseId: title?: string; messages : AIMessage[], evidenceMap: Record<
+export interface CaseAIContext { caseId: title?: string; messages : AIMessage[]; evidenceMap: Record<
  | string: {
 	id: string, title: string, annotations: string[], connections: string[], aiSummary?, string} >; currentSession: {
 	isActive: boolean, lastActivity: activeEvidenceId?: string}; insights: Array<{
 	id: string, type: 'pattern' | 'connection' | 'anomaly' | 'recommendation',description: string, confidence: number, evidenceIds: string[], timestamp, number}>}
-// REMOVED: export type Backend = 'vllm' | 'ollama' | 'webasm' | 'go-micro'; export interface AssistantConfig { temperature: number, maxTokens: number, model: string, systemPrompt: string, autoSwitchBackend: boolean, persistHistory: boolean, enableAcceleration: boolean}
+// REMOVED: export type Backend = 'vllm' | 'ollama' | 'webasm' | 'go-micro'; export interface AssistantConfig { temperature: number; maxTokens: number, model: string; systemPrompt: string, autoSwitchBackend: boolean, persistHistory: boolean, enableAcceleration: boolean}
 // Global AI Assistant Store using Svelte, 5 Runes class AIAssistantGlobalStore { // Core state (now using Svelte, 5 runes for reactivity) cases = $state<Record<string, CaseAIContext>>({}); currentCaseId = $state<string | undefined>(undefined); isLoading = $state<boolean>(false); error = $state<string | undefined>(undefined); // Multi-backend support currentBackend = $state<Backend>('ollama'); availableBackends = $state<Backend[]>(['vllm', 'ollama', 'webasm', 'go-micro']); backendHealth = $state<Record<Backend, number>>({ vllm: 0.8, ollama: 0.9, webasm: 0.7, 'go-micro': 0.6 });
   
      metadata: {

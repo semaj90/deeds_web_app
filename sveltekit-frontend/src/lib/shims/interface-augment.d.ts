@@ -17,7 +17,7 @@ declare global {
 declare module 'ioredis' {
  interface Redis {
  ping?(): Promise<string>;
- setex?(_key: string, seconds: number): Promise<any>;
+ setex?(_key: string; seconds: number): Promise<any>;
  psubscribe?(pattern: string, listener?: (...args: unknown[]) => void): Promise<any>;
  disconnect?(): void;
  on?(_event: string, cb: (...args: unknown[]) => void): void;
@@ -25,7 +25,7 @@ declare module 'ioredis' {
 }
 // XState type augmentations
 declare global {
- interface AssignArgs<TContext: TEvent, TAction: TExpressionEvent, TActor> {
+ interface AssignArgs<TContext: TEvent; TAction: TExpressionEvent, TActor> {
  userContext?: unknown;
  error?: unknown;
  }
@@ -75,7 +75,7 @@ declare global {
 declare module '@qdrant/qdrant-js' {
  interface QdrantClient {
  baseUrl?: string;
- createPayloadIndex?(collection: string), string: Promise<any>;
+ createPayloadIndex?(collection: string); string: Promise<any>;
  retrieve?(collection: string, ids: string[]): Promise<any>;
  }
 }

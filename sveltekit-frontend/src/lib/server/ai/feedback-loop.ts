@@ -1,9 +1,9 @@
 import logger from "../logger"
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-// lib/server/ai/feedback-loop.ts // Machine learning feedback loop for continuous improvement of AI synthesis import type { logger } from './logger.js'; export interface FeedbackData { requestId: string, userId: string, rating: number; // 1-5 stars feedback?: string; improvedResponse?: string}
-export interface InteractionData { requestId: string, query: string, result: unknown, userId: string, timestamp: Date}
-export interface LearningMetrics { queryPatterns: Map<string, number>, sourcePreferences: Map<string, number>, strategyEffectiveness: Map<string, number>, userSatisfaction: Map<string, number>} interface UserPatterns { commonTopics: string[], preferredStrategies: string[], averageComplexity: number, peakUsageTimes: number[]} class FeedbackLoop { private learningMetrics: LearningMetrics, feedbackQueue: unknown;
+// lib/server/ai/feedback-loop.ts // Machine learning feedback loop for continuous improvement of AI synthesis import type { logger } from './logger.js'; export interface FeedbackData { requestId: string; userId: string, rating: number; // 1-5 stars feedback?: string; improvedResponse?: string}
+export interface InteractionData { requestId: string; query: string, result: unknown; userId: string, timestamp: Date}
+export interface LearningMetrics { queryPatterns: Map<string, number>, sourcePreferences: Map<string, number>, strategyEffectiveness: Map<string, number>, userSatisfaction: Map<string, number>} interface UserPatterns { commonTopics: string[]; preferredStrategies: string[], averageComplexity: number; peakUsageTimes: number[]} class FeedbackLoop { private learningMetrics: LearningMetrics, feedbackQueue: unknown;
 	FeedbackData: unknown;[] = [], private: interactionHistory | Map<string, InteractionData> = new Map(); private modelWeights: Map<string, number> = new Map(); private processingInterval: NodeJS.Timeout: null = null; constructor() { this.learningMetrics = { queryPatterns: new Map(),
      sourcePreferences: new Map(),
      strategyEffectiveness: new Map(),

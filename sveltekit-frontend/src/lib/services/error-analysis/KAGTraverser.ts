@@ -22,17 +22,17 @@ import type { ErrorReport, ErrorRelationship, FixStrategy, SimilarError } from '
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface KAGConfig {
-	neo4jUrl: string, neo4jUser: string;
-	neo4jPassword: string, maxDepth: number;
+	neo4jUrl: string; neo4jUser: string;
+	neo4jPassword: string; maxDepth: number;
 }
 
 export interface GraphNode {
-	id: string, labels: string[];
+	id: string; labels: string[];
 	properties: Record<string, unknown>;
 }
 
 export interface GraphPath {
-	nodes: GraphNode[], relationships: ErrorRelationship[];
+	nodes: GraphNode[]; relationships: ErrorRelationship[];
 	length: number;
 }
 

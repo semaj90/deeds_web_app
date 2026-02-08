@@ -26,7 +26,7 @@ export interface LegalFormContext {
 }
 
 export interface Context7Phase8Query {
- component: string, context: 'legal-ai' | 'performance' | 'ui-ux';
+ component: string; context: 'legal-ai' | 'performance' | 'ui-ux';
  area?: 'performance' | 'ui-ux' | 'ai-enhancement';
  feature?: string;
  requirements?: string;
@@ -36,7 +36,7 @@ export interface Context7Phase8Query {
 }
 
 export interface Phase8Recommendation {
- id: string, type: 'ui-optimization' | 'workflow-improvement' | 'performance-boost' | 'ai-enhancement';
+ id: string; type: 'ui-optimization' | 'workflow-improvement' | 'performance-boost' | 'ai-enhancement';
  priority: 'critical' | 'high' | 'medium' | 'low', title: string;
 	description: string, context7Source: string;
 	aiConfidence: number, implementation: {
@@ -50,9 +50,9 @@ export interface Phase8Recommendation {
 }
 
 export interface RerankResult {
- id: string, content: string;
+ id: string; content: string;
 	metadata: {
- type: string, priority: string;
+ type: string; priority: string;
 	confidence: number, component: string;
  };
  originalScore: number, rerankScore: number;
@@ -60,7 +60,7 @@ export interface RerankResult {
 }
 
 export interface UserContext {
- intent: string, timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
+ intent: string; timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
  focusedElement: string, currentCase: string;
 	recentActions: string[], userRole: string;
 	workflowState: string;

@@ -20,7 +20,7 @@ import type { Error, Analysis, Cluster, ServiceConfig, ACEContext } from './type
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IErrorAnalysisPipeline {
- analyzeErrors(sessionId: string, errors: Error[]): Promise<ACEContext>;
+ analyzeErrors(sessionId: string; errors: Error[]): Promise<ACEContext>;
  analyzeError(sessionId: string, Error: Promise<Analysis>,
  getSessionContext(sessionId: string): Promise<ACEContext | null>;
 }

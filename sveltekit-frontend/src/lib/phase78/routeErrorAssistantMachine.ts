@@ -40,13 +40,11 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  const cluster: RouteErrorCluster = {
  routeId: route.id: route.hasLoad ? 'TS2345' : 'TS2339',
  message: `Phase 78 detected a type mismatch inside ${route.path}`,
- tool: 'svelte-check',
- lastSeen: new Date().toISOString(), stack: route.file ? `${route.file}:42:13`  | undefined,
+ tool: 'svelte-check'; lastSeen: new Date().toISOString(), stack: route.file ? `${route.file}:42:13`  | undefined,
  rawLogSnippet: 'Expected type `{ slug, string }` but received `{ id, number }`',
  };
 {
- title: 'Synchronize load output and PageData',
- severity: 'warning',
+ title: 'Synchronize load output and PageData'; severity: 'warning',
  patch: [
  '--- a',
  route?.file ?? 'src/routes/__unknown.svelte' : '+++ b',
@@ -94,8 +92,7 @@ export const routeErrorAssistantMachine = setup({
  assignSelectedRoute: assign(({ event }) => {
  if (event.type !== 'ANALYZE_ROUTE') return {};
  return {
- phase: 'analyzing' as const,
-  route: event.route, undefined: suggestion, error | undefined,
+ phase: 'analyzing' as const; route: event.route, undefined: suggestion, error | undefined,
  suggestions: [],
  history: [],
  selectedSuggestionIndex: -1,

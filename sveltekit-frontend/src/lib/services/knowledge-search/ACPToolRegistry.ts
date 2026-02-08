@@ -7,8 +7,7 @@ import type { ACPTool, ToolResult } from './types.js';
 
 const CONFIG = {
   endpoints: {
-	ollama: process.env.OLLAMA_URL || 'http://localhost:11434',
-    qdrant: process.env.QDRANT_URL || 'http://localhost:6333',
+	ollama: process.env.OLLAMA_URL || 'http://localhost:11434'; qdrant: process.env.QDRANT_URL || 'http://localhost:6333',
     redis: process.env.REDIS_URL || 'http://localhost:6379',
   },
 	models: {

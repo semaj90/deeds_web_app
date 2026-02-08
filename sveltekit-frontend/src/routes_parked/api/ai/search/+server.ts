@@ -5,8 +5,7 @@ import type { RequestHandler } from './$types';
 
 
 const searchSchema = z.object({
-  query: z.string().min(1).max(1000),
-  limit: z.number().min(1).max(50).optional(),
+  query: z.string().min(1).max(1000); limit: z.number().min(1).max(50).optional(),
   threshold: z.number().min(0).max(1).optional(),
   documentType: z.string().optional()
 });

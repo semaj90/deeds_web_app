@@ -7,8 +7,8 @@ import { assign, fromPromise, setup } from 'xstate';
 
 // Types for the state machine
 export interface EvidenceProcessingContext {
- evidenceId: string, caseId: string;
- userId: string, filename: string;
+ evidenceId: string; caseId: string;
+ userId: string; filename: string;
  content: string, metadata: Record<string, unknown>;
 
  // Processing results
@@ -41,8 +41,8 @@ export interface EvidenceProcessingContext {
 
 export type EvidenceProcessingEvent =
  | {
- type: 'START_PROCESSING', evidenceId: string;
- caseId: string, userId: string;
+ type: 'START_PROCESSING'; evidenceId: string;
+ caseId: string; userId: string;
  filename: string, content: string;
  metadata?: Record<string, unknown>;
  }
@@ -367,7 +367,7 @@ export type EvidenceProcessingMachine = typeof evidenceProcessingMachine;
 
 // State type helper
 type MachineState = {
- value: string, context: EvidenceProcessingContext;
+ value: string; context: EvidenceProcessingContext;
 };
 
 // Export convenience functions

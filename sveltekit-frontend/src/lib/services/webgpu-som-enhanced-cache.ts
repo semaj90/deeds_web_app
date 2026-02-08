@@ -1,4 +1,4 @@
-// Stub WebGPU SOM Enhanced Cache to unblock build // Provides minimal API: initialize(), processEnhanced() interface ProcessEnhancedOptions { documents: unknown[], operation: userId?: string; batchSize?: number}
+// Stub WebGPU SOM Enhanced Cache to unblock build // Provides minimal API: initialize(), processEnhanced() interface ProcessEnhancedOptions { documents: unknown[]; operation: userId?: string; batchSize?: number}
 class WebGPUSOMEnhancedCacheStub {
  private initialized = false;
  async initialize(): Promise<void> {

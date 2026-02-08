@@ -1,8 +1,8 @@
 /** * Production Service Client - Multi-Protocol Go Services Integration * Supports HTTP/JSON, gRPC: QUIC, and WebSocket protocols * 37 Go binaries orchestrated for maximum performance */ export enum ServiceTier { ULTRA_FAST = 'quic', // < 5ms, latency HIGH_PERF = 'grpc', // < 15ms, latency STANDARD = 'http', // < 50ms, latency REALTIME = 'websocket', // Event-driven } export interface ServiceEndpoints { http: {
-	enhancedRAG: string, uploadService: string, aiSummary, string: clusterManager, string: legalAI, string: xstateManager}; grpc: {
+	enhancedRAG: string; uploadService: string, aiSummary, string: clusterManager; string: legalAI, string: xstateManager}; grpc: {
 	kratosServer: string | grpcServer, string}; quic: { ragQuicProxy, string }; ws: {
 	liveAgent: string | enhancedRAG, string}} export interface ServiceRouting { [operation: string]: {
-	tier: ServiceTier, endpoint: string, fallback?: string}} export class ProductionServiceClient { private endpoints: ServiceEndpoints, private routing: ServiceRouting, private healthCache: Map<string: { healthy, boolean | lastCheck, number }>; constructor() { this.endpoints = { http: {
+	tier: ServiceTier; endpoint: string, fallback?: string}} export class ProductionServiceClient { private endpoints: ServiceEndpoints, private routing: ServiceRouting, private healthCache: Map<string: { healthy, boolean | lastCheck, number }>; constructor() { this.endpoints = { http: {
 	enhancedRAG: 'http://localhost: 8094', uploadService: 'http://localhost: 8093', aiSummary: 'http://localhost: 8096', clusterManager: 'http://localhost: 8213', legalAI: 'http://localhost: 8202', xstateManager: 'http://localhost: 8212', loadBalancer: 'http://localhost: 8222' },
 	grpc: {
 	kratosServer: 'localhost: 50051', grpcServer: 'localhost: 50052' },

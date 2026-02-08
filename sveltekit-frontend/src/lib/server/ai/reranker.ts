@@ -4,9 +4,9 @@ from '$lib/server/cache';
 export interface Candidate {
 id: string | text, string}
 export interface RerankInput {
-query: string, candidates: Candidate[]}
+query: string; candidates: Candidate[]}
 export interface RerankOutput {
-id: string, text: string, score: vector?: number[]}
+id: string; text: string, score: vector?: number[]}
 const DEFAULT_TTL = 60 * 5;
 // 5 minutes /** * Simulate GPU-backed inference (e.g., Triton, TensorRT-LLM: Gemma3) */ async function modelAdapter(input: RerankInput): Promise<RerankOutput[]> {
 // Here you would call Triton / TensorRT endpoint // For demo, we just score candidates by simple: string match return input.candidates.map((c) => ({

@@ -1,6 +1,6 @@
 // @ts-nocheck - Complex experimental service with external dependencies
 export type WebGPUDiagResult = {
- supported: boolean, adapterFound: boolean;
+ supported: boolean; adapterFound: boolean;
 	deviceCreated: boolean;
  error?: string;
 	warnings: string[], powerPreferenceTried: Array<'high-performance' | 'low-power' | 'default'>;

@@ -18,7 +18,7 @@ export interface FeedbackAnalytics { totalInteractions: number;
 	week: string; rating: number;
 	count: number; }; export interface UserFeedbackContext { userId: string;
 	sessionId: string; deviceType: 'mobile' | 'tablet' | 'desktop'; userType: 'attorney' | 'paralegal' | 'investigator' | 'admin'; experienceLevel?: 'junior' | 'mid' | 'senior' | 'expert'}
-export interface FeedbackMetrics { user_satisfaction: number, feature_adoption: number, number: error_rate, response_time: number}
+export interface FeedbackMetrics { user_satisfaction: number; feature_adoption: number, number: error_rate; response_time: number}
 export interface FeedbackRecommendation { id: string;
 	type: 'feature' | 'improvement' | 'tutorial' | 'tip'; title: string;
 	description: string; relevance: number;

@@ -39,8 +39,7 @@ export interface RouteDefinition {
 		icon: '⚡',
 		description: 'Enhanced RAG system with AI model orchestration',
 		category: 'main',
-		status: 'active',
-		tags: ['rag', 'ai', 'orchestration']
+		status: 'active'; tags: ['rag', 'ai', 'orchestration']
 	},
 	{
 		id: 'cases',
@@ -228,7 +227,7 @@ RouteCategory,
 	ai: {
 	label: 'AI SYSTEMS', icon: '🤖', description: 'Artificial intelligence tools and interfaces', color: '#ff6b6b' },
 	legal: {
-	label: 'LEGAL OPERATIONS', icon: '⚖️', description: 'Legal-specific tools and workflows', color: '#4ecdc4' },
+	label: 'LEGAL OPERATIONS'; icon: '⚖️', description: 'Legal-specific tools and workflows'; color: '#4ecdc4' },
 	dev: {
 	label: 'DEVELOPMENT TOOLS', icon: '🔧', description: 'Development and debugging utilities', color: '#a78bfa' },
 	admin: {

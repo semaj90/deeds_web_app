@@ -1,10 +1,10 @@
 import type { Message } from '$lib/types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-/** * Chat Machine - XState v5 Compatible * Handles chat conversation state with streaming support */ import type { createMachine, assign, fromPromise, createActor, type StateFrom } from 'xstate'; // Message types export interface ChatMessage { role: 'user' | 'assistant' | 'system',content: timestamp?: string; id?: string}
+/** * Chat Machine - XState v5 Compatible * Handles chat conversation state with streaming support */ import type { createMachine, assign, fromPromise, createActor, type StateFrom } from 'xstate'; // Message types export interface ChatMessage { role: 'user' | 'assistant' | 'system'; content: timestamp?: string; id?: string}
 
-export interface ChatSettings { model: string, temperature: number, maxTokens: systemPrompt?: string}
-// Machine Context export interface ChatContext { messages: ChatMessage[], error, string | null, status: 'idle' | 'loading' | 'error',settings: currentResponse?: string}
-// Machine Events type ChatEvent = | { type: 'SUBMIT', message, string } | { type: 'RESET' } | { type: 'UPDATE_SETTINGS', settings: Partial<ChatSettings> } | { type: 'STREAM_CHUNK', chunk, string } | { type: 'STREAM_DONE' } | { type: 'RETRY' }; // Stream chat service const streamChatService = fromPromise( async ({ input }: {
+export interface ChatSettings { model: string; temperature: number, maxTokens: systemPrompt?: string}
+// Machine Context export interface ChatContext { messages: ChatMessage[], error, string | null, status: 'idle' | 'loading' | 'error'; settings: currentResponse?: string}
+// Machine Events type ChatEvent = | { type: 'SUBMIT', message, string } | { type: 'RESET' } | { type: 'UPDATE_SETTINGS'; settings: Partial<ChatSettings> } | { type: 'STREAM_CHUNK', chunk, string } | { type: 'STREAM_DONE' } | { type: 'RETRY' }; // Stream chat service const streamChatService = fromPromise( async ({ input }: {
 	input: { messages: ChatMessage[], settings: ChatSettings } }) => { const { messages, settings }= input; const response = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	messages: settings?.model ?? 'unknown', temperature : settings.temperature, max_tokens: settings.maxTokens, stream: true }) }); if (!response.ok) { throw new Error(`Chat request failed: ${response.statusText}`)} return response}

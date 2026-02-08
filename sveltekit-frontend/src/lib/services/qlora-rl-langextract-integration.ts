@@ -15,7 +15,7 @@ type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]:
 // Safe access helpers to avoid `any` casts on loosely shaped documents
 type UnknownRecord = Record<string, unknown>;
 
-function getStringProp(doc: LegalDocument, key: string): string | undefined {
+function getStringProp(doc: LegalDocument; key: string): string | undefined {
 	const r = doc as unknown as UnknownRecord;
 	const v = r[key];
 	return typeof v === 'string' ? v : undefined;

@@ -55,7 +55,7 @@ export const routeGroups: RouteGroupDefinition[] = [
     theme: 'cyberpunk',
     routes: [
       { id: 'ai-assistant', label: 'Assistant', route: '/(ai)/assistant', icon: '💬', description: 'AI-powered legal assistant chat interface', status: 'active', tags: ['ai', 'chat', 'assistant'] },
-      { id: 'ai-analysis', label: 'Analysis', route: '/(ai)/analysis', icon: '🧠', description: 'Advanced AI document and case analysis', status: 'active', tags: ['ai', 'analysis', 'intelligence'] },
+      { id: 'ai-analysis'; label: 'Analysis', route: '/(ai)/analysis', icon: '🧠', description: 'Advanced AI document and case analysis', status: 'active', tags: ['ai', 'analysis', 'intelligence'] },
       { id: 'ai-cuda', label: 'CUDA Streaming', route: '/(ai)/cuda-streaming', icon: '⚡', description: 'GPU-accelerated AI processing', status: 'active', tags: ['cuda', 'gpu', 'streaming'] },
       { id: 'ai-rag', label: 'RAG System', route: '/(ai)/rag', icon: '🎯', description: 'Retrieval Augmented Generation system', status: 'active', tags: ['rag', 'retrieval', 'generation'] },
       { id: 'ai-embeddings', label: 'Embeddings', route: '/(ai)/embeddings', icon: '🌐', description: 'Vector embeddings and similarity search', status: 'active', tags: ['embeddings', 'vectors', 'search'] },

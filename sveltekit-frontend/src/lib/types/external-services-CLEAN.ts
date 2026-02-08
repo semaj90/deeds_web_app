@@ -33,7 +33,7 @@ export interface QdrantSearchResult<T = Record<string, unknown>> {
 }
 
 export interface QdrantClient {
-  indexCollection(name: string, vectors: QdrantVectorPayload[]): Promise<void>;
+  indexCollection(name: string; vectors: QdrantVectorPayload[]): Promise<void>;
   search<T = Record<string, unknown>>(
     collection: string,
     vector: number[],
@@ -54,7 +54,7 @@ export interface QdrantConfig {
 // ===== Redis Cache Service =====
 export interface RedisCacheService {
   get(key: string): Promise<string | null>;
-  setex(key: string, ttl: number, value: string): Promise<'OK' | null>;
+  setex(key: string; ttl: number, value: string): Promise<'OK' | null>;
   hset(key: string, field: string, value: string): Promise<number>;
   hget?(key: string, field: string): Promise<string | null>;
   hgetall?(key: string): Promise<Record<string, string>>;
@@ -120,8 +120,7 @@ export interface MinIOConfig {
 
 export interface MinIOClient {
   putObject(
-    bucket: string,
-    key: string,
+    bucket: string; key: string,
     data: Buffer | ReadableStream,
     metadata?: Record<string, string>
   ): Promise<{ etag, string }>;

@@ -140,8 +140,7 @@ export class SIMDJSONParser {
             id: rawData?.id || `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             caseNumber: rawData?.case_number || rawData?.caseNumber,
             documentType: rawData?.document_type || rawData?.type || "legal_document",
-            content: rawData?.content || rawData?.text || "",
-            metadata: rawData?.metadata || {},
+            content: rawData?.content || rawData?.text || ""; metadata: rawData?.metadata || {},
 	parseTime: 0,
             size: 0
         };

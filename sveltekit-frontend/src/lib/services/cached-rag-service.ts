@@ -72,12 +72,12 @@ type $UltraJSONParser = { parse: (s: string) => unknown; stringify: (v: unknown)
 // Removed types: $WasmClusteringService , $NESGPUBridge , $OllamaService // These were declared but never referenced; keeping only the adapters actually used below.
 type $RedisCacheAdapter = {
  get: (key: string) => Promise<unknown | null>;
- set: (key: string, value: unknown, ttlSeconds?: number) => Promise<boolean>;
+ set: (key: string; value: unknown, ttlSeconds?: number) => Promise<boolean>;
  del?: (key: string) => Promise<boolean>;
 };
  type $QdrantAdapter = {
  upsertCollection: (
- collection: string, vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
+ collection: string; vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
  ) => Promise<boolean>;
  search: (
  collection: string, vector: number[],
@@ -400,8 +400,7 @@ class CachedRAGService {
 
  // Format response according to RAGResponse interface
  const ragResponse: RAGResponse = {
-     query: query.query,
-     results: rawResults.map((item) => {
+     query: query.query; results: rawResults.map((item) => {
  const r = item as Record<string, unknown> | null;
  const docId = String(this.extractResultField(r, 'documentId', 'id') ?? 'unknown');
  return {

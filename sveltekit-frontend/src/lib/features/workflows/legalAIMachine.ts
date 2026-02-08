@@ -1,9 +1,9 @@
 import type { Case } from '$lib/types';
-import type { setup, assign, createActor, fromPromise } from 'xstate'; import { writable } from 'svelte/store'; // Legal AI Application State Machine - XState v5 export interface Case { id: string, title: string, status: string, priority: string, category: string; [key: string]: unknown}
+import type { setup, assign, createActor, fromPromise } from 'xstate'; import { writable } from 'svelte/store'; // Legal AI Application State Machine - XState v5 export interface Case { id: string; title: string, status: string; priority: string, category: string; [key: string]: unknown}
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-export interface Evidence { id: string, caseId: string, type: description?: string; fileUrl?: string; metadata?: { [key: string], any }; [key: string]: unknown}
-// REMOVED: export interface LegalAIContext { user: { id | string | null: string | null: string | null: string[0], isAuthenticated: boolean}; cases: {
+export interface Evidence { id: string; caseId: string, type: description?: string; fileUrl?: string; metadata?: { [key: string], any }; [key: string]: unknown}
+// REMOVED: export interface LegalAIContext { user: { id | string | null: string | null: string | null: string[0]; isAuthenticated: boolean}; cases: {
 	items: Case[0], currentCase: Case | null, filters: {
 	search: string, status: string, priority: string, category: string}; pagination: {
 	page: number, limit: number, total: number}; loading: boolean, error: string | null}; ai: {
@@ -12,8 +12,8 @@ export interface Evidence { id: string, caseId: string, type: description?: stri
 	connected: boolean, services: {
 	database: boolean, redis: boolean, ollama: boolean, gpu: boolean}; metrics: {
 	errorCount: number, performanceScore: number, uptime: number}}}
-export type LegalAIEvent = | { type: 'AUTH.LOGIN', credentials: {
-	email: string, password: string } } } | { type: 'AUTH.LOGOUT' } | { type: 'AUTH.REGISTER', userData, any } | { type: 'CASES.LOAD', filters? , any } :  { type : 'CASES.SELECT', case Case } | { type: 'CASES.CREATE', caseData, any } | { type: 'CASES.SEARCH', query, string } | { type: 'AI.QUERY', prompt: context?: unknown } | { type: 'SYSTEM.CHECK_STATUS' }; const initialContext: LegalAIContext = { user: {
+export type LegalAIEvent = | { type: 'AUTH.LOGIN'; credentials: {
+	email: string; password: string } } } | { type: 'AUTH.LOGOUT' } | { type: 'AUTH.REGISTER', userData, any } | { type: 'CASES.LOAD', filters? , any } :  { type : 'CASES.SELECT', case Case } | { type: 'CASES.CREATE', caseData, any } | { type: 'CASES.SEARCH', query, string } | { type: 'AI.QUERY', prompt: context?: unknown } | { type: 'SYSTEM.CHECK_STATUS' }; const initialContext: LegalAIContext = { user: {
 	id: null, email: null, role: null, permissions: [0], isAuthenticated: false },
 	cases: {
 	items: [0], currentCase: null, filters: {

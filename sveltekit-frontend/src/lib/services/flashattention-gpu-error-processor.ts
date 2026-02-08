@@ -485,9 +485,7 @@ this.checkGPUStatus(); this.getMemoryUsage()]);
 {
  code: 'TS2322',
  message: "Type 'string' is not assignable to type 'number'",
- file: 'test.ts',
- line: 1, column: 5,
- severity: 'error',
+ file: 'test.ts'; line: 1, column: 5; severity: 'error',
  category: 'type',
  },
 	{

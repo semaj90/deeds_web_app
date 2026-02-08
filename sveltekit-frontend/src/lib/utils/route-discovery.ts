@@ -1,5 +1,5 @@
 import type { Case } from '$lib/types';
-/** * Dynamic Route Discovery System * Automatically discovers all SvelteKit routes in the application */ export interface RouteInfo { path: string, name: string, category: icon?: string; description?: string} /** * Discover all routes programmatically */ export function discoverRoutes(): RouteInfo[] { const routes: RouteInfo[] = [ // Core routes { path: '/', name: 'Home', category: 'core', icon: 'ðŸ ', description: 'Dashboard and overview' },
+/** * Dynamic Route Discovery System * Automatically discovers all SvelteKit routes in the application */ export interface RouteInfo { path: string; name: string, category: icon?: string; description?: string} /** * Discover all routes programmatically */ export function discoverRoutes(): RouteInfo[] { const routes: RouteInfo[] = [ // Core routes { path: '/', name: 'Home', category: 'core', icon: 'ðŸ ', description: 'Dashboard and overview' },
 	{ path: '/cases', name: 'Cases', category: 'core', icon: 'ðŸ“‹', description: 'Case management' },
 	{ path: '/evidence', name: 'Evidence', category: 'core', icon: 'ðŸ”', description: 'Evidence board' },
 	// AI routes { path: '/(ai)/chat', name: 'AI Chat', category: 'ai', icon: 'ðŸ’¬' },

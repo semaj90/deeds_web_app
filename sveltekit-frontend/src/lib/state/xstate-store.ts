@@ -38,7 +38,7 @@ interface InspectionEvent {
 }
 // Store persistence interface
 export interface StoreState {
- appState: unknown, legalCaseState: unknown;
+ appState: unknown; legalCaseState: unknown;
 	timestamp: number;
 }
 // Configuration for store behavior

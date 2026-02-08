@@ -10,7 +10,7 @@ export interface OllamaEndpoint {
 export interface OllamaConfig {
 	baseUrl: string;
 	models: {
-		legal: string; // gemma3-legal: latest, embedding: string; // embeddinggemma: latest, fastFix: string; // gemma2:2b
+		legal: string; // gemma3-legal: latest; embedding: string; // embeddinggemma: latest, fastFix: string; // gemma2:2b
 	};
 	timeout: number;
 }

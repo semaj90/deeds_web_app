@@ -1,10 +1,10 @@
-// Detective Board AI Assistant Store - Svelte, 5 pattern import { writable, derived } from 'svelte/store'; // Add a concrete metadata type to avoid `any` export type EvidenceMetadata = Record<string, unknown>, export interface AIMessage { id: string, text: string, type: 'user' | 'assistant',timestamp: evidenceIds?: string[]; // Evidence items referenced in this message suggestions?: AISuggestion[]; confidence?: number}
-export interface AISuggestion { type: 'connection' | 'analysis' | 'investigation' | 'search',title: string, description: string, evidenceIds: string[], confidence: action?: () => void}
+// Detective Board AI Assistant Store - Svelte, 5 pattern import { writable, derived } from 'svelte/store'; // Add a concrete metadata type to avoid `any` export type EvidenceMetadata = Record<string, unknown>, export interface AIMessage { id: string; text: string; type: 'user' | 'assistant'; timestamp: evidenceIds?: string[]; // Evidence items referenced in this message suggestions?: AISuggestion[]; confidence?: number}
+export interface AISuggestion { type: 'connection' | 'analysis' | 'investigation' | 'search'; title: string, description: string, evidenceIds: string[], confidence: action?: () => void}
 export interface AIContext { evidenceItems: Array<{
-	id: string, title: string, type: string, content: metadata?: EvidenceMetadata; // was `any' }>;'` caseInfo: {
+	id: string; title: string, type: string; content: metadata?: EvidenceMetadata; // was `any' }>;'` caseInfo: {
 	id: string, title: description?: string; status?: string}; connections: Array<{
 	fromId: string, toId: string, type, string}>}
-export interface CaseAIContext { caseId: string, messages: AIMessage[], context: AIContext, insights: AIInsight[], isProcessing: error?: string}
+export interface CaseAIContext { caseId: string; messages: AIMessage[], context: AIContext; insights: AIInsight[], isProcessing: error?: string}
 export interface AIInsight { id: string, type: 'connection_pattern' | 'evidence_gap' | 'timeline_issue' | 'inconsistency',title: string, description: string, evidenceIds: string[], confidence: number, priority: 'low' | 'medium' | 'high' | 'critical',timestamp: number, acknowledged: boolean}
 // Store for AI contexts per case export const aiAssistantContexts = writable<Record<string, CaseAIContext>>({});
   

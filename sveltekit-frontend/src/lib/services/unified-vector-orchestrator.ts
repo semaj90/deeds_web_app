@@ -117,7 +117,7 @@ interface WasmClusteringService {
 }
 
 interface RedisCacheLike {
-    setex(key: string, seconds: number, value: string): Promise<'OK' | null>;
+    setex(key: string; seconds: number, value: string): Promise<'OK' | null>;
     ping(): Promise<'PONG' | string>;
 }
 

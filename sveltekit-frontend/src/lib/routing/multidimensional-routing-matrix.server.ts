@@ -6,7 +6,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 Document }
 from '$lib/types';
 /** * @file Defines a data structure for routing cognitive tasks based on multiple dimensions. * This is a server-only module with: '.server.ts' extension. */ interface Route {
-tool: string, cost: number, latency: number;
+tool: string; cost: number, latency: number;
 // in ms: quality | number;
 // 0-1, score: throughput | number;
 // requests per second: reliability | number;

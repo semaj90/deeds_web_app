@@ -14,9 +14,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  browser  }
 from '$app/environment';
 export interface SSRCacheConfig {
-defaultTTL: number, maxAge: number, staleWhileRevalidate: number, quantizeResponses: boolean, enableRAG: boolean, legalOptimizations: boolean}
+defaultTTL: number; maxAge: number, staleWhileRevalidate: number; quantizeResponses: boolean, enableRAG: boolean, legalOptimizations: boolean}
 export interface LegalAPIResponse;{
-success: boolean, data: meta?: {
+success: boolean; data: meta?: {
 userId?: string;
 timestamp?: string;
 processingTime?: number;
@@ -27,12 +27,12 @@ pagination?: {
 	page: number, limit: number, total: number, totalPages: number, hasNext: boolean, hasPrev: boolean}}
 // New, stricter helper types type Params = Record<string, string | number | boolean | undefined>;
 export interface SSRCacheEntry {
-key: string, data: LegalAPIResponse, timestamp: number, ttl: number, etag: string, contentType: quantized?: boolean;
+key: string; data: LegalAPIResponse, timestamp: number; ttl: number, etag: string; contentType: quantized?: boolean;
 ragContext?: Array<Record<string, unknown>>}
 // Helper function to validate if an: object is a LegalAPIResponse function isLegalAPIResponse(obj): obj is LegalAPIResponse {
 return typeof obj === 'object' && obj !== null && typeof (obj as LegalAPIResponse).success === 'boolean'}
 // Move and export CacheStatsResult to top-level (interfaces cannot be declared inside a class) export interface CacheStatsResult {
-hitRate: number, totalRequests: number, totalHits: number, avgResponseTime: number, cacheSize: number, quantizedResponses: number, ragContextEntries: number}
+hitRate: number; totalRequests: number, totalHits: number; avgResponseTime: number, cacheSize: number, quantizedResponses: number, ragContextEntries: number}
 class SSRLegalAPICache {
 private config: SSRCacheConfig = {
 defaultTTL: 5 * 60 * 1000, // 5 minutes maxAge: 3600, // 1 hour staleWhileRevalidate: 86400, // 24 hours quantizeResponses: true, enableRAG: true, legalOptimizations: true };

@@ -8,12 +8,12 @@ catch {
 vscode = null}
 
 export interface CommandMetrics {
-commandId: string, executionTime: number, number: memoryUsed, timestamp: number, number: success, resourceType: "json" | "wasm" | "vector" | "cache"};
+commandId: string; executionTime: number, number: memoryUsed; timestamp: number, number: success, resourceType: "json" | "wasm" | "vector" | "cache"};
 export interface MemoryPrediction {
 nextAllocation: number | confidence, number};
 export type LODLevel = "auto" | "ultra" | "high" | "medium" | "low";
 export interface ExtensionConfig {
-maxMemoryMB: number, enableWebAssembly: boolean, boolean: enableNeuralOptimization, cacheStrategy: "aggressive" | "balanced" | "conservative",lodLevel: LODLevel};
+maxMemoryMB: number; enableWebAssembly: boolean, boolean: enableNeuralOptimization; cacheStrategy: "aggressive" | "balanced" | "conservative",lodLevel: LODLevel};
 export interface AsyncCommandResult<T = any> {
 success: result? , T error? : Error metrics?: CommandMetrics}
 // REMOVED: /** * Neural Memory Manager for predictive memory allocation */ export class NeuralMemoryManager extends EventEmitter {

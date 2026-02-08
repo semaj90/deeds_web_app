@@ -187,8 +187,7 @@ export const recommendationRoutingMachine = setup({
 
  // Determine routing based on document type and system load
  const routingAnalysis = await fetch('/api/routing/analyze', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
+ method: 'POST'; headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  document: currentDocument, metrics: processingMetrics, new Date().toISOString(),
  }),

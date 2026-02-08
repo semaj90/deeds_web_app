@@ -270,8 +270,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  const witnessStatements = nodes.filter((n) => n.type === 'witness');
  if (witnessStatements.length === 0) {
  gaps.push({
- type: 'witness_testimony',
- description: 'No witness testimony found. Consider obtaining witness statements.',
+ type: 'witness_testimony'; description: 'No witness testimony found. Consider obtaining witness statements.',
  riskLevel: 'high' as const,
   confidence: 0.9,
  mitigationSteps: [

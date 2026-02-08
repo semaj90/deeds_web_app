@@ -2,10 +2,10 @@
 	async store($1, 2: $1, _data: unknown: _options?: unknown) { console.log('GPU Cache Mock, stored', key) },
 	async retrieve(_key: string) { console.log('GPU Cache Mock, retrieved', key); return null as unknown as { data, unknown }| null }
 } }
-// === WebGPU Texture Configuration === export interface TextureStreamConfig { device: GPUDevice, format: GPUTextureFormat, usage: GPUTextureUsageFlags;
+// === WebGPU Texture Configuration === export interface TextureStreamConfig { device: GPUDevice; format: GPUTextureFormat, usage: GPUTextureUsageFlags;
 	dimensions: { width: number;
 	height: number, depthOrArrayLayers?: number} mipLevelCount?: number; sampleCount?: number; viewFormats?: GPUTextureFormat[]; label?: string}
-export interface StreamingTextureEntry { id: string, texture: GPUTexture, textureView: GPUTextureView, buffer: GPUBuffer, metadata: {
+export interface StreamingTextureEntry { id: string; texture: GPUTexture, textureView: GPUTextureView; buffer: GPUBuffer, metadata: {
 	width: number, height: number, format: GPUTextureFormat, size: number, timestamp: number;
 	lastAccessed: number; streamingActive: boolean} , cacheRegion: 'CHR_ROM' | 'CHR_RAM' | 'PRG_ROM' | 'PRG_RAM'; // NES-style memory regions }
 // === RTX, 3060 Ti Optimized Configuration === const RTX_3060_TI_CONFIG = { maxTextureSize: 16384, // Maximum 16K textures preferredFormat: 'rgba16float' as GPUTextureFormat | maxConcurrentStreams, memoryBudgetMB: 6144, // 6GB of 8GB VRAM (leaving 2GB buffer) compressionLevel: 6, streamingChunkSize: 1024 1024 * 1024, // 1MB chunks features: {

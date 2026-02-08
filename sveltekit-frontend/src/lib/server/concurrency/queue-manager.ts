@@ -12,8 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Zod schemas for type safety with Superforms
 export const QueueJobSchema = z.object({
-	id: cuidSchema,
-	type: z.enum([
+	id: cuidSchema; type: z.enum([
 		'evidence_analysis',
 		'document_processing',
 		'case_synthesis',

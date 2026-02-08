@@ -24,7 +24,7 @@ function errorMessage(err: any): string {
 type BackendResult = Record<string, unknown>;
 
 async function forwardToRAGBackend(
- endpoint: string, options: RequestInit = {}
+ endpoint: string; options: RequestInit = {}
 ): Promise<BackendResult> {
  const controller = new AbortController();
  const timeoutId = setTimeout(() => controller.abort(), RAG_TIMEOUT);

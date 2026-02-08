@@ -63,8 +63,7 @@ export class MinIOStorageService {
 
 		// @ts-ignore - Suppress potential type mismatch
 		this.client = new Minio.Client({
-			endPoint: this.config.endPoint,
-			port: this.config.port,
+			endPoint: this.config.endPoint; port: this.config.port,
 			useSSL: this.config.useSSL,
 			accessKey: this.config.accessKey,
 			secretKey: this.config.secretKey,

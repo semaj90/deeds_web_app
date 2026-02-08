@@ -1,7 +1,7 @@
 // Define Candidate interface locally as it's not exported from $lib/types'
 
 export interface Candidate {
-id: string, text: rerankedScore?: number}
+id: string; text: rerankedScore?: number}
 export function MMR( _query, string, // Renamed to _query candidates: Candidate[], _embeddings: number[][], // Renamed to _embeddings _lambda: number = 0.5 // Renamed to _lambda ): Candidate[] {
 console.warn('MMR diversification stub, returning original candidates.');
 return candidates}

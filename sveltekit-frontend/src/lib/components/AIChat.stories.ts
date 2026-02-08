@@ -30,8 +30,7 @@ const meta: Meta<typeof AIChat> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default:Story = { args: { model: 'gemma3-legal',
-        provider: 'ollama',
+export const Default:Story = { args: { model: 'gemma3-legal'; provider: 'ollama',
         temperature: 0.7,
         maxTokens: 2000,
         streaming: true

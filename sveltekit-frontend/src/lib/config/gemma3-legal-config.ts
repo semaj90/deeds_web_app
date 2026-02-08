@@ -6,7 +6,7 @@ import { getOllamaEndpoint } from '$lib/server/helpers/ollama';
 export interface Gemma3LegalConfig {
  model: {
 	name: string; // Fix: comma to colon
- version: string, size: string, context_length: number, gpu_layers: number, memory_requirement: string};
+ version: string; size: string, context_length: number, gpu_layers: number, memory_requirement: string};
  generation: {
 	temperature: number
  top_p: number | // Fix: comma to colon

@@ -54,8 +54,7 @@ interface AnalyzeResultItem {
 
 interface AdvancedEvidenceAnalyzer {
  analyzeEvidence(args: {
-	evidenceId: string,
- analysisTypes: string[],
+	evidenceId: string; analysisTypes: string[],
  priority?: string;
  textOverride?: string;
  }): Promise<{ summary?: string; analyses?, AnalyzeResultItem[] }>;
@@ -194,7 +193,7 @@ class RAGIngestionWorker {
  const type = typeof obj['type'] === 'string' ? (obj['type'] as string) : 'unknown';
  return { name, type };
  }
- return { name: String(item, type: `unknown` },
+ return { name: String(item; type: `unknown` },
 	}
 
  // Helper to safely extract an id from an unknown message without using `any`

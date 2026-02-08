@@ -64,7 +64,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: `Unknown operation type: ${ type }` }, { status: 400 });
  }
 
- return json({ ok: true, message: 'Operation logged' });
+ return json({ ok: true; message: 'Operation logged' });
  } catch (err) {
  return json(
  { error: `Failed to log operation: ${err instanceof Error ? err.message : String(err)}` },

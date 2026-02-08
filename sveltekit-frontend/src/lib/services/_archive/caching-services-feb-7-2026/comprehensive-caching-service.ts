@@ -6,7 +6,7 @@ import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval';
 // Simple Redis interface
 interface RedisLike {
     get(key: string): Promise<string | null>;
-    setex(key: string, ttlSeconds: number, value: string): Promise<unknown>;
+    setex(key: string; ttlSeconds: number, value: string): Promise<unknown>;
     del(key: string): Promise<unknown>;
 }
 

@@ -5,7 +5,7 @@ deterministic?: boolean;
 // deterministic mode is useful for repeatable tests }
 
 export interface EmbeddingResult {
-vector: Float32Array, model: string}
+vector: Float32Array; model: string}
 
 export class EmbeddingAdapter {
 private readonly dimensions: number, private readonly deterministic: boolean, private readonly model: string, constructor(model = 'mock-embedding-model', opts: EmbeddingAdapterOptions = {}) {

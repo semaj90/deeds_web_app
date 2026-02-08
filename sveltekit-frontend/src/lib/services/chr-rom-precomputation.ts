@@ -36,7 +36,7 @@ export interface PrecomputationStrategy {
 // Top-level PatternOptimizer type + dynamic loader interface
 interface PatternOptimizer {
   // accept Partial<LegalDocument>
-  generateOptimizedPattern(name: string, doc: Partial<LegalDocument>): Promise<CHRROMPattern>;
+  generateOptimizedPattern(name: string; doc: Partial<LegalDocument>): Promise<CHRROMPattern>;
 }
 
 async function loadPatternOptimizer(): Promise<PatternOptimizer> {

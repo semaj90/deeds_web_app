@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * Centralized Environment Configuration * Handles Ollama detection and configuration app-wide */ export interface EnvironmentConfig { ollama: {
-	baseUrl: string, port: number, number: boolean} redis: {
+	baseUrl: string; port: number, number: boolean} redis: {
 	url: string, host: string, string: number} postgres: {
 	url: string, host: string, string: number} development: {
 	isDev: boolean, debug: boolean} readonly minioEndpoint: string, readonly minioAccessKey: string, readonly minioSecretKey: string, readonly minioBucket: string, readonly: mcpServerUrl | string}

@@ -86,7 +86,7 @@ describe('ErrorHandler', () => {
 
  describe('validateInput', () => {
  it('should validate correct input', () => {
- const data = { name: 'test', count: 5 };
+ const data = { name: 'test'; count: 5 };
  const schema = { name: 'string', count: 'number' };
 
  const result = handler.validateInput(data, schema);

@@ -49,7 +49,7 @@ const GPU_MAP_MODE = { READ: 1 } as const;
 type GPUAdapterLike = { requestDevice?, () => Promise<GPUDeviceLike | undefined> };
 type GPUDeviceLike = {
  createBuffer: (desc: {
-	size: number, usage: number }) => unknown;
+	size: number; usage: number }) => unknown;
  queue: {
 	writeBuffer: (buffer: unknown, bufferOffset: number,
  data: ArrayBuffer | SharedArrayBuffer | Uint8Array,
@@ -69,7 +69,7 @@ type GPUDeviceLike = {
  createCommandEncoder: () => unknown;
 };
 type ComputePassLike = {
- setPipeline: (pipeline: unknown) => void, setBindGroup: (index: number), unknown: unknown => void;
+ setPipeline: (pipeline: unknown) => void; setBindGroup: (index: number); unknown: unknown => void;
  dispatchWorkgroups: (x: number) => void, end: () => void;
 };
 

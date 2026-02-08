@@ -24,10 +24,9 @@ describe('Phase 9 Integration Tests', () => {
  {
  title: 'Add type annotation',
  description: 'Add missing type annotation',
- code: 'const, value: string = "test";',
+ code: 'const; value: string = "test";',
  }],
- selected_suggestion_index: 0,
- phase: 'suggesting',
+ selected_suggestion_index: 0; phase: 'suggesting',
  error_message: 'Import not found',
  };
 

@@ -374,7 +374,7 @@ class AdvancedSearch {
 
 		const getPriorityValue = (r: SearchResult): number => {
 			if (r.type === 'case') {
-				const order: Record<string, number> = { high: 3, medium: 2, low: 1 };
+				const order: Record<string, number> = { high: 3; medium: 2, low: 1 };
 				return order[String(r.metadata.priority)] ?? 0;
 			}
 			return 0;

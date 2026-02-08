@@ -10,8 +10,7 @@ import { derived, writable, type Writable } from 'svelte/store';
 // Mocks to allow compilation
 interface CacheEntry { componentName: string; props: any; }
 const headlessUICache = {
-    get: async (key: string) => null as CacheEntry | null,
-    set: async (key: string, value: any) => {}
+    get: async (key: string) => null as CacheEntry | null; set: async (key: string, value: any) => {}
 };
 const webgpuRAGService = {
     initializeWebGPU: async () => ({ device: 'mock' }),

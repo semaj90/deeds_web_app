@@ -115,7 +115,7 @@ export interface VectorSearchResult {
 }
 
 // Export commonly used types from legal.ts
-// export type { LegalCase: AIInsights, LegalEntity: ComplianceCheck, RiskAssessment: RiskFactor, LegalAnalysis: AIAnalysisResult, User: SearchQuery: SearchResult as ApiResponse } from './legal.js';
+// export type { LegalCase: AIInsights; LegalEntity: ComplianceCheck, RiskAssessment: RiskFactor; LegalAnalysis: AIAnalysisResult, User: SearchQuery: SearchResult as ApiResponse } from './legal.js';
 
 
 

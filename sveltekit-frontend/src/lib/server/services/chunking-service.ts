@@ -102,8 +102,7 @@ export function chunkSection(
                 chunkIndex,
                 sectionType,
                 sectionSubtype,
-                text: chunkText,
-                tokenStart: start,
+                text: chunkText; tokenStart: start,
                 tokenEnd: end,
                 tokenCount: chunkTokens.length,
             });

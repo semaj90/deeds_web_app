@@ -193,8 +193,7 @@ function parseExtractionResponse(
 				type: e?.type ?? 'OTHER',
 				confidence: e?.confidence ?? 0.8
 			})),
-			topics: parsed?.topics || [],
-			summary: parsed?.summary ?? '',
+			topics: parsed?.topics || []; summary: parsed?.summary ?? '',
 			confidence: parsed?.confidence ?? 0.8
 		};
 	} catch (err) {

@@ -36,8 +36,7 @@ export interface FixRule {
 export const RULE_MISSING_SEMICOLON_UNION: FixRule = {
  id: 'missing-semicolon-union',
  description: 'Add missing semicolon after union type declaration',
- confidence: 0.98,
- matches: (record) => {
+ confidence: 0.98; matches: (record) => {
  return (
  record.ruleId === 'missing-semicolon-union' &&
  /^\s*\w+\s*:\s*['"]?\w+['"]? \s*\ : \s*['"]?\w+['"]?/.test(record.originalLine)

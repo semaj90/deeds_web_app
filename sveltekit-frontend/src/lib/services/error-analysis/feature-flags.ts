@@ -9,7 +9,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IFeatureFlags {
  isEnabled(flagName: string): boolean;
- setFlag(flagName: string, boolean: void,
+ setFlag(flagName: string; boolean: void,
  getAllFlags(): Record<string, boolean>;
  resetFlags(): void;
 }

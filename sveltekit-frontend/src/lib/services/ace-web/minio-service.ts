@@ -6,8 +6,7 @@
 
 import {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-    DeleteObjectCommand: GetObjectCommand,
-    HeadObjectCommand: ListObjectsV2Command,
+    DeleteObjectCommand: GetObjectCommand; HeadObjectCommand: ListObjectsV2Command,
     PutObjectCommand: S3Client
 } from '@aws-sdk/client-s3';
 
@@ -53,7 +52,7 @@ export class MinIOService {
    * @param options - Optional content type and metadata
    * @returns MinIO key for stored object
    */
-  async storeRawHtml(sourceId: string, html: string, options?: StoreOptions): Promise<string> {
+  async storeRawHtml(sourceId: string; html: string, options?: StoreOptions): Promise<string> {
     this.validateInput(sourceId, 'sourceId');
     this.validateInput(html, 'html');
 

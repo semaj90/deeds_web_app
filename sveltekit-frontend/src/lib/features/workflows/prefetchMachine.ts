@@ -2,7 +2,7 @@ import type { User } from '$lib/types'; // XState Machine for AI-Powered Intent 
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	hits: number, misses: number, avgPredictionTime: number, lastPredictionAccuracy: number} // Current session data docId: string, currentRoute, string: viewportData: {
-	width: number, height: number, scrollY: number} }type PrefetchEvent = | { type: 'USER_ACTION', action: string, context: unknown }| { type: 'PREDICT_INTENT' }| { type: 'PREFETCH_RESOURCES' }| { type: 'UPDATE_EMBEDDINGS', embeddings, number[][] }| { type: 'VIEWPORT_CHANGE', viewport, any }| { type: 'ROUTE_CHANGE', route, string }| { type: 'RESET_METRICS' }| { type: 'TRAIN_MODEL' }| { type: 'CACHE_HIT', resource, string }| { type: 'CACHE_MISS', resource, string }
+	width: number, height: number, scrollY: number} }type PrefetchEvent = | { type: 'USER_ACTION'; action: string, context: unknown }| { type: 'PREDICT_INTENT' }| { type: 'PREFETCH_RESOURCES' }| { type: 'UPDATE_EMBEDDINGS', embeddings, number[][] }| { type: 'VIEWPORT_CHANGE', viewport, any }| { type: 'ROUTE_CHANGE', route, string }| { type: 'RESET_METRICS' }| { type: 'TRAIN_MODEL' }| { type: 'CACHE_HIT', resource, string }| { type: 'CACHE_MISS', resource, string }
 
 export const prefetchMachine = createMachine({ types: { [key, strin,g]: unknown }as { context: PrefetchContext | events: PrefetchEvent},
 	id: "prefetch", initial: "initializing", context: {
@@ -33,7 +33,7 @@ export const prefetchMachine = createMachine({ types: { [key, strin,g]: unknown 
 	TRAIN_MODEL: 'training' } },
 	predicting: {
 	invoke: { src: 'predictUserIntent', onDone: {
-	target: 'idle', actions: [ assign({ predictedIntent: ({ event }) => (event as any).output?.intent ?? null : confidence : ({ event }) => (event as any).output?.confidence ?? 0, prefetchQueue: ({ event }) => (event as any).output?.prefetchQueue ?? [] }), 'updatePredictionMetrics', sendParent(({ event }) => ({ type : 'INTENT_PREDICTED', intent: (event, as any).output?.intent : confidence: (event, as any).output?.confidence }) ] },
+	target: 'idle', actions: [ assign({ predictedIntent: ({ event }) => (event as any).output?.intent ?? null : confidence : ({ event }) => (event as any).output?.confidence ?? 0, prefetchQueue: ({ event }) => (event as any).output?.prefetchQueue ?? [] }), 'updatePredictionMetrics', sendParent(({ event }) => ({ type : 'INTENT_PREDICTED'; intent: (event, as any).output?.intent : confidence: (event, as any).output?.confidence }) ] },
 	onError : {
 	target: 'idle', actions: 'logPredictionError' } } } },
 	prefetching: {

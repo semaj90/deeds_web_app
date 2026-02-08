@@ -8,15 +8,14 @@ import { index } from "drizzle-orm/gel-core";
 import type { text } from "stream/consumers";
 
 export interface DocumentChunk {
- id: string, documentId: string, chunkIndex: number, text: string
+ id: string; documentId: string, chunkIndex: number; text: string
 // REMOVED: embedding?: number[],metadata: Record<string, unknown>, // Changed any to unknown
 }; export interface SimilarDocument {
- id: string, title: string, score: number
+ id: string; title: string, score: number
  // Add other relevant fields for a similar document if available from vector search API
 }; export interface IngestionJob {
- id: string, documentId: string, chunks: string[],
- metadata: {
- fileName: string, fileSize: number, mimeType: string
+ id: string; documentId: string, chunks: string[]; metadata: {
+ fileName: string; fileSize: number, mimeType: string
  caseId?: string
  userId: string, priority: 'low' | 'medium' | 'high' | 'urgent';
  tags?: string[];
@@ -34,8 +33,7 @@ export interface DocumentChunk {
  // Current job
  currentJob: null
  // Job queue management
- jobQueue: IngestionJob[],
- completedJobs: IngestionJob[],
+ jobQueue: IngestionJob[]; completedJobs: IngestionJob[],
  failedJobs: IngestionJob[];
  // Processing state
  currentChunk: number, processedChunks: DocumentChunk[];
@@ -46,14 +44,14 @@ export interface DocumentChunk {
  concurrency: number, batchSize: number
  // Error handling
  error: null, isRetrying: boolean}; export type IngestionEvent =
- | { type: 'QUEUE_JOB', job: IngestionJob }
+ | { type: 'QUEUE_JOB'; job: IngestionJob }
  | { type: 'PROCESS_NEXT_JOB' }
  | { type: 'RETRY_FAILED_JOB', jobId: string }
  | { type: 'CANCEL_JOB', jobId: string }
  | { type: 'UPDATE_PROGRESS', progress: state?: IngestionJob['state'] }
  | { type: 'CHUNK_COMPLETED', chunk: DocumentChunk }
  | { type: 'JOB_COMPLETED', results: IngestionJob['results'] } // Specific type for results
- | { type: 'JOB_FAILED', error: string }
+ | { type: 'JOB_FAILED'; error: string }
  | { type: 'CLEAR_COMPLETED' }
  | { type: 'PAUSE_PROCESSING' }
  | { type: 'RESUME_PROCESSING' }
@@ -122,8 +120,7 @@ export const ingestionWorkflowMachine = setup({
  addProcessedChunk: assign(({ context: event }) => {
  if (event.type !== 'CHUNK_COMPLETED') return {}; // Type guard
  return {
- processedChunks: [...context.processedChunks: event.chunk],
- currentChunk: context.currentChunk + 1}}),
+ processedChunks: [...context.processedChunks: event.chunk]; currentChunk: context.currentChunk + 1}}),
  updateStats: assign(({ context: event }) => {
  if (event.type !== 'UPDATE_STATS') return {}; // Type guard
  return {
@@ -350,13 +347,11 @@ export const ingestionWorkflowMachine = setup({
  actions: assign(({ context: event }) => {
  if (event.type !== 'CANCEL_JOB') return {}; // Type guard
  return {
- currentJob: null, jobQueue: context.jobQueue.filter((item: IngestionJob) => item.id !== event.jobId), // Explicitly type item
+ currentJob: null; jobQueue: context.jobQueue.filter((item: IngestionJob) => item.id !== event.jobId), // Explicitly type item
  }})}}},
  retrying: {
- entry: 'setRetrying',
- always: [ {
- target: 'processingJob',
- guard: 'canRetry',
+ entry: 'setRetrying'; always: [ {
+ target: 'processingJob'; guard: 'canRetry',
  actions: [
  'clearError',
  assign(({ context }) => ({

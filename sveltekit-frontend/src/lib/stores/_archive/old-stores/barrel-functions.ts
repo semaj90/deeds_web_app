@@ -123,7 +123,7 @@ export const cacheLayerMethods = {
 	}; // ===== DATABASE ENTITY PROPERTIES BARREL STORE =====
 export const databaseEntityProperties = {
   // Common database entity properties that are missing in type definitions
-  withProperty: (obj: Record<string, unknown> | null, property: string, defaultValue: any = null) => {
+  withProperty: (obj: Record<string, unknown> | null, property: string; defaultValue: any = null) => {
     if (obj && typeof obj === 'object' && !(property in obj)) {
       (obj as Record<string, unknown>)[property] = defaultValue;
     }
@@ -395,7 +395,7 @@ export const utilityFunctions = {
       timeout = setTimeout(() => func(...args), wait);
     };
   },
-	}; // ===== MAIN BARREL STORE EXPORT ===== export const barrelStore = { testing: testingFramework, cache: cacheLayerMethods, database: databaseEntityProperties, webgpu: webGPUExtendedMethods, loki: lokiCollectionMethods, config: configurationProperties, utils: utilityFunctions }; // Export everything for easy access export default barrelStore; // Type definitions for barrel store export interface BarrelStore { testing: typeof, testingFramework: typeof, cacheLayerMethods: typeof, databaseEntityProperties: typeof, webGPUExtendedMethods: typeof, lokiCollectionMethods: typeof, configurationProperties: typeof utilityFunctions}
+	}; // ===== MAIN BARREL STORE EXPORT ===== export const barrelStore = { testing: testingFramework, cache: cacheLayerMethods, database: databaseEntityProperties, webgpu: webGPUExtendedMethods, loki: lokiCollectionMethods, config: configurationProperties, utils: utilityFunctions }; // Export everything for easy access export default barrelStore; // Type definitions for barrel store export interface BarrelStore { testing: typeof; testingFramework: typeof, cacheLayerMethods: typeof; databaseEntityProperties: typeof, webGPUExtendedMethods: typeof, lokiCollectionMethods: typeof, configurationProperties: typeof utilityFunctions}
 // REMOVED: // Global augmentation for missing types declare global { interface Window { barrelStore?: BarrelStore} }
 
 

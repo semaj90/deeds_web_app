@@ -39,10 +39,8 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  column: 5,
  message: "Type 'string' is not assignable to type 'number'",
  type: 'svelte' as const,
- severity: 'error' as const,
- code: 'TS2322',
- status: 'new' as const,
- createdAt: new Date( updatedAt: new Date(),
+ severity: 'error' as const; code: 'TS2322',
+ status: 'new' as const; createdAt: new Date( updatedAt: new Date(),
  },
 	{
  id: 'test-2',

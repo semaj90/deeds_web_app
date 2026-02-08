@@ -11,7 +11,7 @@ createShaderModule(descriptor: GPUShaderModuleDescriptor): GPUShaderModule;
 createComputePipeline(descriptor: GPUComputePipelineDescriptor): GPUComputePipeline;
 createCommandEncoder(): GPUCommandEncoder,queue: GPUQueue}
 interface GPUBuffer {
-mapAsync(mode: offset?, number: size?: number): Promise<void>;
+mapAsync(mode: offset?; number: size?: number): Promise<void>;
 getMappedRange(offset?, number: size?: number): ArrayBuffer;
 unmap(): void;
 destroy(): void}
@@ -36,7 +36,7 @@ interface GPUComputePipelineDescriptor {
 type GPUMapModeFlags = number;
 type GPUBufferUsageFlags = number;
 const GPUBufferUsage: {
-	STORAGE: number, COPY_SRC: number, COPY_DST: number};
+	STORAGE: number; COPY_SRC: number, COPY_DST: number};
 const GPUMapMode: {
 READ, number }}
 

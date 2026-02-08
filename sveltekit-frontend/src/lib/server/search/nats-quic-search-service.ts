@@ -152,8 +152,7 @@ export class NatsQuicSearchService {
             query,
             searchType: options.type ?? 'hybrid',
             options: {
-	limit: options.limit,
-                threshold: options.threshold
+	limit: options.limit; threshold: options.threshold
             },
 	timestamp: Date.now()
         };

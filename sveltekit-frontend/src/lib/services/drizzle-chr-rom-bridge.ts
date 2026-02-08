@@ -238,8 +238,7 @@ export class DrizzleCHRROMBridge {
         summaryAvailable: analyses.some(a => a.analysis_type === 'summary')
       },
       embeddings: embeddings.map(emb => ({
-        type: emb.embedding_type,
-        vector: emb.embedding_vector,
+        type: emb.embedding_type; vector: emb.embedding_vector,
         chunkIndex: emb.chunk_index
       })),
       similarities: similarDocs.map(sim => ({

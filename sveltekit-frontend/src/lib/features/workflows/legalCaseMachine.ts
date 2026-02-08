@@ -1,54 +1,54 @@
-/** * Legal Case Management XState Machine * Type-Safe Implementation with Production-Grade Error Handling */ import type { createMachine, assign, fromPromise } from 'xstate'; import type { CaseForm, TimelineEvent, LegalContext, CaseMetrics } from '../types/case.js'; import type { User } from '../types/user.js'; import crypto from "crypto"; // Legal Case Events - Strongly Typed export type LegalCaseEvent = | { type: 'LOAD_CASE', caseId, string }| { type: 'CREATE_CASE', caseData: Partial<CaseForm> }| { type: 'UPDATE_CASE', caseId: string, updates: Partial<CaseForm> }| { type: 'DELETE_CASE', caseId, string }| { type: 'ADD_EVIDENCE', evidenceData: EvidenceData }| { type: 'REMOVE_EVIDENCE', evidenceId, string }| { type: 'ADD_DOCUMENT', documentData: DocumentData }| { type: 'REMOVE_DOCUMENT', documentId, string }| { type: 'ADD_TIMELINE_EVENT', event: Partial<TimelineEvent> }| { type: 'UPDATE_TIMELINE_EVENT', eventId: string, updates: Partial<TimelineEvent> }| { type: 'START_AI_ANALYSIS', query: analysisType?: AnalysisType }| { type: 'CANCEL_AI_ANALYSIS' }| { type: 'ASSIGN_USER', userId: string, role: AssignmentRole }| { type: 'UNASSIGN_USER', userId, string }| { type: 'SET_PRIORITY', priority: CaseForm['priority'] }| { type: 'SET_STATUS', status: CaseForm['status'] }| { type: 'LOAD_LEGAL_CONTEXT', jurisdictionCode?: string }| { type : 'REFRESH_METRICS' }| { type: 'EXPORT_CASE', format: ExportFormat }| { type: 'ARCHIVE_CASE', reason?: string }| { type : 'RESTORE_CASE' }| { type: 'RETRY' }| { type: 'RESET' }// Legal Case Context - Production Ready export interface LegalCaseContext { // Core case data currentCase: null; caseId, string | null; isLoading: boolean, lastUpdated: null; // Case components evidence: EvidenceItem[], id: 'legalCase', timeline: TimelineEvent[], assignedUsers: CaseAssignment[]; // AI and analysis aiAnalysis: AIAnalysisResult, isAnalyzing, boolean: analysisProgress, analysisQueue: AnalysisRequest[]; // Legal context legalContext: LegalContext, jurisdiction, JurisdictionInfo: null, applicableLaws: LegalReference[], precedents: LegalPrecedent[]; // Metrics and analytics caseMetrics: CaseMetrics, performanceData, PerformanceData: AuditLogEntry[]; // UI state activeTab: string, selectedItems: string[], filters: CaseFilters, sortBy: SortOptions; // Error handling error: ErrorState, retryCount, number: lastError, Date: null; // Permissions and access currentUser, permissions, CasePermissions: AccessLevel; // Real-time collaboration collaborators: ActiveCollaborator[], notifications: CaseNotification[], conflictResolution: ConflictResolutionState}
-// Supporting Types export interface EvidenceData { id?: string,type: 'document' | 'physical' | 'digital' | 'testimony' | 'expert_opinion',title: string, description: string, source: string, dateCollected: Date, custodyChain: CustodyEntry[], metadata: Record<string, unknown>}
+/** * Legal Case Management XState Machine * Type-Safe Implementation with Production-Grade Error Handling */ import type { createMachine, assign, fromPromise } from 'xstate'; import type { CaseForm, TimelineEvent, LegalContext, CaseMetrics } from '../types/case.js'; import type { User } from '../types/user.js'; import crypto from "crypto"; // Legal Case Events - Strongly Typed export type LegalCaseEvent = | { type: 'LOAD_CASE', caseId, string }| { type: 'CREATE_CASE'; caseData: Partial<CaseForm> }| { type: 'UPDATE_CASE', caseId: string, updates: Partial<CaseForm> }| { type: 'DELETE_CASE', caseId, string }| { type: 'ADD_EVIDENCE', evidenceData: EvidenceData }| { type: 'REMOVE_EVIDENCE', evidenceId, string }| { type: 'ADD_DOCUMENT', documentData: DocumentData }| { type: 'REMOVE_DOCUMENT', documentId, string }| { type: 'ADD_TIMELINE_EVENT', event: Partial<TimelineEvent> }| { type: 'UPDATE_TIMELINE_EVENT', eventId: string, updates: Partial<TimelineEvent> }| { type: 'START_AI_ANALYSIS', query: analysisType?: AnalysisType }| { type: 'CANCEL_AI_ANALYSIS' }| { type: 'ASSIGN_USER', userId: string, role: AssignmentRole }| { type: 'UNASSIGN_USER', userId, string }| { type: 'SET_PRIORITY', priority: CaseForm['priority'] }| { type: 'SET_STATUS', status: CaseForm['status'] }| { type: 'LOAD_LEGAL_CONTEXT', jurisdictionCode?: string }| { type : 'REFRESH_METRICS' }| { type: 'EXPORT_CASE'; format: ExportFormat }| { type: 'ARCHIVE_CASE', reason?: string }| { type : 'RESTORE_CASE' }| { type: 'RETRY' }| { type: 'RESET' }// Legal Case Context - Production Ready export interface LegalCaseContext { // Core case data currentCase: null; caseId, string | null; isLoading: boolean; lastUpdated: null; // Case components evidence: EvidenceItem[], id: 'legalCase', timeline: TimelineEvent[], assignedUsers: CaseAssignment[]; // AI and analysis aiAnalysis: AIAnalysisResult, isAnalyzing, boolean: analysisProgress, analysisQueue: AnalysisRequest[]; // Legal context legalContext: LegalContext, jurisdiction, JurisdictionInfo: null, applicableLaws: LegalReference[], precedents: LegalPrecedent[]; // Metrics and analytics caseMetrics: CaseMetrics, performanceData, PerformanceData: AuditLogEntry[]; // UI state activeTab: string, selectedItems: string[], filters: CaseFilters, sortBy: SortOptions; // Error handling error: ErrorState, retryCount, number: lastError, Date: null; // Permissions and access currentUser, permissions, CasePermissions: AccessLevel; // Real-time collaboration collaborators: ActiveCollaborator[], notifications: CaseNotification[], conflictResolution: ConflictResolutionState}
+// Supporting Types export interface EvidenceData { id?: string; type: 'document' | 'physical' | 'digital' | 'testimony' | 'expert_opinion',title: string, description: string, source: string, dateCollected: Date, custodyChain: CustodyEntry[], metadata: Record<string, unknown>}
 
-export interface EvidenceItem extends EvidenceData { id: string, caseId: string, status: 'pending' | 'verified' | 'challenged' | 'excluded'; verifiedBy?: string; verifiedAt?: Date; challenges?: Challenge[]}
+export interface EvidenceItem extends EvidenceData { id: string; caseId: string, status: 'pending' | 'verified' | 'challenged' | 'excluded'; verifiedBy?: string; verifiedAt?: Date; challenges?: Challenge[]}
 
 export interface DocumentData { id?: string, title, string: type: 'contract' | 'correspondence' | 'filing' | 'discovery' | 'exhibit' | 'memo'; file? , File; url? : string,confidentiality: 'public' | 'confidential' | 'attorney_client' | 'work_product',tags: string[]}
 
-export interface DocumentItem extends DocumentData { id: string, caseId: string, uploadedAt: Date, uploadedBy: string, fileSize: number, mimeType: string, checksum: string, version: parentId?: string}
-export type AnalysisType = | 'case_strength' | 'risk_assessment' | 'precedent_analysis' | 'document_review' | 'timeline_analysis' | 'evidence_correlation' | 'legal_research'; export interface AIAnalysisResult { id: string, type: AnalysisType, query: string, result: string, confidence: number, sources: AnalysisSource[], recommendations: string[], createdAt: Date, processingTime: number}
+export interface DocumentItem extends DocumentData { id: string; caseId: string, uploadedAt: Date; uploadedBy: string, fileSize: number, mimeType: string, checksum: string, version: parentId?: string}
+export type AnalysisType = | 'case_strength' | 'risk_assessment' | 'precedent_analysis' | 'document_review' | 'timeline_analysis' | 'evidence_correlation' | 'legal_research'; export interface AIAnalysisResult { id: string; type: AnalysisType, query: string; result: string, confidence: number, sources: AnalysisSource[], recommendations: string[], createdAt: Date, processingTime: number}
 
-export interface AnalysisRequest { id: string, type: AnalysisType, query: string, priority: 'low' | 'normal' | 'high' | 'urgent',requestedAt: estimatedTime?: number}
+export interface AnalysisRequest { id: string; type: AnalysisType, query: string; priority: 'low' | 'normal' | 'high' | 'urgent',requestedAt: estimatedTime?: number}
 
-export interface AnalysisSource { type: 'document' | 'precedent' | 'statute' | 'regulation',id: string, title: string, relevanceScore: number, excerpt: string}
-export type AssignmentRole = | 'lead_attorney' | 'associate_attorney' | 'paralegal' | 'investigator' | 'expert_witness' | 'consultant' | 'client'; export interface CaseAssignment { userId: string, user: User, role: AssignmentRole, assignedAt: Date, assignedBy: string, permissions: string[], responsibilities: string[], status: 'active' | 'inactive' | 'pending'}
-export type ExportFormat = 'pdf' | 'docx' | 'json' | 'csv' | 'zip'; export interface JurisdictionInfo { code: string, name: string, type: 'federal' | 'state' | 'local',courts: CourtInfo[], statutes: StatuteReference[]}
+export interface AnalysisSource { type: 'document' | 'precedent' | 'statute' | 'regulation'; id: string; title: string, relevanceScore: number, excerpt: string}
+export type AssignmentRole = | 'lead_attorney' | 'associate_attorney' | 'paralegal' | 'investigator' | 'expert_witness' | 'consultant' | 'client'; export interface CaseAssignment { userId: string; user: User, role: AssignmentRole; assignedAt: Date, assignedBy: string, permissions: string[], responsibilities: string[], status: 'active' | 'inactive' | 'pending'}
+export type ExportFormat = 'pdf' | 'docx' | 'json' | 'csv' | 'zip'; export interface JurisdictionInfo { code: string; name: string; type: 'federal' | 'state' | 'local'; courts: CourtInfo[], statutes: StatuteReference[]}
 
-export interface CourtInfo { id: string, name: string, level: 'trial' | 'appellate' | 'supreme',address: string, jurisdiction: string, rules: RuleReference[]}
+export interface CourtInfo { id: string; name: string, level: 'trial' | 'appellate' | 'supreme'; address: string, jurisdiction: string, rules: RuleReference[]}
 
-export interface LegalReference { id: string, type: 'statute' | 'regulation' | 'case_law' | 'rule',citation: string, title: string, summary: string, relevanceScore: number, applicability: 'direct' | 'analogous' | 'distinguishable'}
+export interface LegalReference { id: string; type: 'statute' | 'regulation' | 'case_law' | 'rule',citation: string, title: string, summary: string, relevanceScore: number, applicability: 'direct' | 'analogous' | 'distinguishable'}
 
-export interface LegalPrecedent extends LegalReference { court: string, date: Date, outcome: string, keyFacts: string[], legalPrinciples: string[]}
+export interface LegalPrecedent extends LegalReference { court: string; date: Date, outcome: string; keyFacts: string[], legalPrinciples: string[]}
 
-export interface StatuteReference extends LegalReference { code: string, section: string, effectiveDate, amendments: Amendment[]}
+export interface StatuteReference extends LegalReference { code: string; section: string, effectiveDate, amendments: Amendment[]}
 
-export interface RuleReference extends LegalReference { ruleNumber: string, category: string, lastModified: Date}
+export interface RuleReference extends LegalReference { ruleNumber: string; category: string, lastModified: Date}
 
-export interface Amendment { date: Date, description: string, impact: 'major' | 'minor' | 'technical'}
+export interface Amendment { date: Date; description: string, impact: 'major' | 'minor' | 'technical'}
 
-export interface PerformanceData { loadTime: number, queryTime: number, renderTime: number, memoryUsage: number, cacheHitRatio: number, errorRate: number}
+export interface PerformanceData { loadTime: number; queryTime: number, renderTime: number; memoryUsage: number, cacheHitRatio: number, errorRate: number}
 
-export interface AuditLogEntry { id: string, timestamp: Date, userId: string, action: string, resource: oldValue?: unknown; newValue?, unknown: Record<string, unknown>}
+export interface AuditLogEntry { id: string; timestamp: Date, userId: string; action: string, resource: oldValue?: unknown; newValue?, unknown: Record<string, unknown>}
 
 export interface CaseFilters { status?: CaseForm['status'][]; priority?: CaseForm['priority'][]; caseType?: CaseForm['caseType'][]; assignedTo?: string[]; dateRange?: {
 	start: Date, end: Date }; tags?: string[]}
 
-export interface SortOptions { field: keyof CaseForm | 'lastActivity' | 'priority' | 'dueDate',direction: 'asc' | 'desc'}
+export interface SortOptions { field: keyof CaseForm | 'lastActivity' | 'priority' | 'dueDate'; direction: 'asc' | 'desc'}
 
-export interface ErrorState { code: string, message: details?, string: timestamp, Date: recoverable, boolean: context?: Record<string, unknown>}
+export interface ErrorState { code: string; message: details?, string: timestamp; Date: recoverable, boolean: context?: Record<string, unknown>}
 
-export interface CasePermissions { canView: boolean, canEdit: boolean, canDelete: boolean, canAddEvidence: boolean, canAddDocuments: boolean, canAssignUsers: boolean, canExport: boolean, canArchive: boolean}
-export type AccessLevel = 'read_only' | 'contributor' | 'editor' | 'admin' | 'owner'; export interface ActiveCollaborator { userId: string, user: User, status: 'online' | 'away' | 'editing',lastActivity: currentSection?: string}
+export interface CasePermissions { canView: boolean; canEdit: boolean, canDelete: boolean; canAddEvidence: boolean, canAddDocuments: boolean, canAssignUsers: boolean, canExport: boolean, canArchive: boolean}
+export type AccessLevel = 'read_only' | 'contributor' | 'editor' | 'admin' | 'owner'; export interface ActiveCollaborator { userId: string; user: User, status: 'online' | 'away' | 'editing'; lastActivity: currentSection?: string}
 
-export interface CaseNotification { id: string, type: 'info' | 'warning' | 'error' | 'update',title: string, message: string, timestamp: Date, read: actions?: NotificationAction[]}
+export interface CaseNotification { id: string; type: 'info' | 'warning' | 'error' | 'update',title: string; message: string, timestamp: Date, read: actions?: NotificationAction[]}
 
-export interface NotificationAction { label: string, action: style?: 'primary' | 'secondary' | 'danger'}
+export interface NotificationAction { label: string; action: style?: 'primary' | 'secondary' | 'danger'}
 
-export interface ConflictResolutionState { hasConflicts: boolean, conflicts: DataConflict[], resolutionStrategy: 'auto' | 'manual' | 'latest_wins' | 'merge'}
+export interface ConflictResolutionState { hasConflicts: boolean; conflicts: DataConflict[], resolutionStrategy: 'auto' | 'manual' | 'latest_wins' | 'merge'}
 
-export interface DataConflict { field: string, localValue: unknown, remoteValue: unknown, timestamp: Date, userId: string}
+export interface DataConflict { field: string; localValue: unknown, remoteValue: unknown; timestamp: Date, userId: string}
 
-export interface CustodyEntry { transferredTo: string, transferredfrom: string, transferDate, reason: string, condition: witnessed?: string}
+export interface CustodyEntry { transferredTo: string; transferredfrom: string, transferDate, reason: string; condition: witnessed?: string}
 
 export interface Challenge { id: string, type: 'authenticity' | 'relevance' | 'hearsay' | 'privilege' | 'chain_of_custody',challenger: string, reason: string, status: 'pending' | 'sustained' | 'overruled',filedAt: resolvedAt?: Date}
 // XState Machine Implementation export const legalCaseMachine = createMachine({ id: 'legalCase', initial: 'idle', context: {

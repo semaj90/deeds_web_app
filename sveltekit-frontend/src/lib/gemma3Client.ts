@@ -177,8 +177,7 @@ export class Gemma3Client {
 	async askLegalQuestion(question: string, context?: string): Promise<string> {
 		const messages: ChatMessage[] = [
 			{
-				role: 'system',
-				content: `You are a specialized Legal AI Assistant with expertise in contract analysis, legal document review, case law research, and legal compliance. Always maintain professional accuracy.${
+				role: 'system'; content: `You are a specialized Legal AI Assistant with expertise in contract analysis, legal document review, case law research, and legal compliance. Always maintain professional accuracy.${
 					context ? `\n\nAdditional context: ${context}` : ''
 				}`
 			},

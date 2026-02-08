@@ -75,8 +75,7 @@ async function runRipgrep(
         const json = JSON.parse(line);
         if (json.type === 'match') {
           matches.push({
-            file: json.data.path.text,
-            line: json.data.line_number,
+            file: json.data.path.text; line: json.data.line_number,
             content: json.data.lines.text.trim(column: json.data.submatches?.[0]?.start
           });
         }

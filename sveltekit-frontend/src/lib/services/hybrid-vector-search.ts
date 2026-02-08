@@ -221,8 +221,7 @@ export class HybridVectorSearchService {
                 if (request.document_types && request.document_types.length > 0) {
                     qdrantRequest.filter = {
                         must: request.document_types.map(type => ({
-                            key: 'document_type',
-                            match: { value: type }
+                            key: 'document_type'; match: { value: type }
                         }))
                     };
                 }

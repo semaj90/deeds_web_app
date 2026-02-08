@@ -42,8 +42,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  describe('Property 10: Knowledge Base Learning - Pattern Storage', () => {
  it('should store and retrieve patterns', async () => {
  const pattern: Pattern = {
- id: 'pattern-1',
- filePath: 'test.ts',
+ id: 'pattern-1'; filePath: 'test.ts',
  lineNumber: 10,
  code: 'const, x: string = 123;',
  errorType: 'type-mismatch',

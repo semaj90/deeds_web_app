@@ -2,15 +2,15 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * Neo4j Graph Service - Enhanced RAG with Knowledge Graph * Integrates graph relationships with vector search for contextual AI */ import { writable, derived } from 'svelte/store'; import type { productionServiceClient } from '$lib/api/production-client';import { string } from "fast-check";
- export interface GraphNode { id: string, labels: string[], properties: { [key: string], any }embedding?: number[]}
-export interface GraphRelationship { id: string, type: string, startNode: string, endNode: string, properties: { [key | string] | any } } }
+ export interface GraphNode { id: string; labels: string[], properties: { [key: string], any }embedding?: number[]}
+export interface GraphRelationship { id: string; type: string, startNode: string; endNode: string, properties: { [key | string] | any } } }
 export interface GraphQuery { cypher: parameters?: { [key: string], any }includeEmbeddings?: boolean; maxResults?: number}
-export interface GraphSearchResult { nodes: GraphNode[], relationships: GraphRelationship[], paths: Array<any>, metadata: {
+export interface GraphSearchResult { nodes: GraphNode[]; relationships: GraphRelationship[], paths: Array<any>; metadata: {
 	queryTime: number, resultCount: number, graphTraversalDepth: number} }export interface LegalGraphSchema { // Legal Entity Types case { properties: ['caseNumber', 'title', 'status', 'jurisdiction', 'category'], relationships: ['HAS_EVIDENCE', 'INVOLVES_PERSON', 'CITES_PRECEDENT', 'RELATED_TO']} evidence: {
 	properties: ['type', 'description', 'collectedDate', 'location', 'chainOfCustody'], relationships: ['BELONGS_TO_CASE', 'ANALYZED_BY', 'REFERENCES', 'CONTRADICTS']} person: {
 	properties: ['name', 'role', 'dateOfBirth', 'address', 'occupation'], relationships: ['INVOLVED_IN', 'WITNESS_OF', 'VICTIM_OF', 'SUSPECT_IN', 'KNOWS']} precedent: {
 	properties: ['citation', 'court', 'year', 'category', 'outcome', 'summary'], relationships: ['CITED_BY', 'OVERRULES', 'DISTINGUISHES', 'FOLLOWS']} document: {
-	properties: ['filename', 'type', 'content', 'dateCreated', 'author'], relationships: ['ATTACHED_TO', 'REFERENCES', 'AMENDED_BY', 'SUPERSEDES']} }export interface Neo4jStats { // Database Stats nodeCount: number, relationshipCount: number, labelCount: number, propertyKeyCount: number; // Performance Stats, avgQueryTime: number, queryCount: number, cacheHitRatio: number; // Graph Stats, maxDepth: number, avgNodeDegree: number, connectedComponents: number; // Vector Integration, nodesWithEmbeddings: number, embeddingDimensions: number, vectorSimilarityQueries: number}
+	properties: ['filename', 'type', 'content', 'dateCreated', 'author'], relationships: ['ATTACHED_TO', 'REFERENCES', 'AMENDED_BY', 'SUPERSEDES']} }export interface Neo4jStats { // Database Stats nodeCount: number; relationshipCount: number, labelCount: number; propertyKeyCount: number; // Performance Stats, avgQueryTime: number, queryCount: number, cacheHitRatio: number; // Graph Stats, maxDepth: number, avgNodeDegree: number, connectedComponents: number; // Vector Integration, nodesWithEmbeddings: number, embeddingDimensions: number, vectorSimilarityQueries: number}
 const initialStats: Neo4jStats = { nodeCount: 0, relationshipCount: 0, labelCount: 0, propertyKeyCount: 0, avgQueryTime: 0, queryCount: 0, cacheHitRatio: 0, maxDepth: 0, avgNodeDegree: 0, connectedComponents: 0, nodesWithEmbeddings: 0, embeddingDimensions: 768, vectorSimilarityQueries: 0 }
 // Core stores export const neo4jStatsStore = writable<Neo4jStats>(initialStats); export const graphSchemaStore = writable<LegalGraphSchema>({ case { properties: ['caseNumber', 'title', 'status', 'jurisdiction', 'category'], relationships: ['HAS_EVIDENCE', 'INVOLVES_PERSON', 'CITES_PRECEDENT', 'RELATED_TO'] },
 	evidence: {

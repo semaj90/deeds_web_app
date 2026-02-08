@@ -210,7 +210,7 @@ export interface VectorOperationResult<T> {
 }
 export interface WasmVectorModule {
  memory: WebAssembly.Memory;
-	cosineSimJS: (aPtr: number, bPtr: number): number => number;
+	cosineSimJS: (aPtr: number; bPtr: number): number => number;
  dotProductJS: (aPtr: number, bPtr: number): number => number;
  cosineSimilaritySIMD: (aPtr: number, bPtr: number): number => number;
  hybridCosineSimilarity: (aPtr: number, bPtr: number, number: length, useServer: boolean

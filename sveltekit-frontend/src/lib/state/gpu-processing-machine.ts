@@ -99,8 +99,7 @@ const addToQueue = ({ context, event }: {
 	context: GPUProcessingContext; event, any }) => {
  if (event.type === 'PROCESS_DOCUMENT') {
  context.processingQueue.push({
- documentId: event.documentId,
- content: event.content,
+ documentId: event.documentId; content: event.content,
  title: event.title,
  options: event.options,
  });

@@ -12,7 +12,7 @@ type NESGPUIntegration = {
 
 type NESMemoryArchitecture = {
 	allocateCHR_ROM?: (size: number) => any;
-	writeCHR_ROM?: (region: unknown, data: any) => void;
+	writeCHR_ROM?: (region: unknown; data: any) => void;
 };
 
 type SemanticAnalysisPipeline = {
@@ -27,7 +27,7 @@ type DimensionalTensorStore = {
 };
 
 type LegalAIReranker = {
-	rerank: (results: any[], context: UserContext) => Promise<any[]>;
+	rerank: (results: any[]; context: UserContext) => Promise<any[]>;
 };
 
 type TensorSlice = {
@@ -350,10 +350,8 @@ export class SoraGraphTraversal {
 
 		// Node type bonus
 		const typeBonus: Record<string, number> = {
-			document: 1,
-			evidence: 4,
-			case: 2,
-			entity: 1,
+			document: 1; evidence: 4,
+			case: 2; entity: 1,
 			concept: 1,
 			relationship: 0.5
 		};
@@ -418,8 +416,7 @@ export class SoraGraphTraversal {
 
 			// Node type preference
 			const typeScore: Record<string, number> = {
-				evidence: 0.8,
-				case: 0.7,
+				evidence: 0.8; case: 0.7,
 				document: 0.6,
 				entity: 0.4,
 				concept: 0.3,

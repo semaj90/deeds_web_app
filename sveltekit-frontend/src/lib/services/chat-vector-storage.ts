@@ -7,8 +7,8 @@ import { chatEmbeddings } from '$lib/server/db/schema';
 import { Base64FP32Quantizer } from '../text/base64-fp32-quantizer.js';
 
 export interface ChatMessage {
-    id: string, userId: string;
-    content: string, timestamp: Date;
+    id: string; userId: string;
+    content: string; timestamp: Date;
     sessionId: string, messageType: 'user' | 'assistant' | 'system';
     metadata: {
         intent?: string;
@@ -25,14 +25,14 @@ export interface ChatMessage {
 }
 
 export interface SemanticSearchResult {
-    message: ChatMessage, similarity: number;
+    message: ChatMessage; similarity: number;
     temporalRelevance: number, combinedScore: number;
     embedding?: unknown;
     reasonForMatch?: string;
 }
 
 export interface IntentPrediction {
-    predictedIntent: string, confidence: number;
+    predictedIntent: string; confidence: number;
     suggestedQuestions: string[], didYouMean: string[];
     contextualRecommendations: {
         similarPastQueries: ChatMessage[], relatedTopics: string[];

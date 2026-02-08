@@ -152,7 +152,7 @@ export class FixSynthesizer {
 	 * Property 29: For any generated fix, the system SHALL validate
 	 * AST constraints and type rules before application.
 	 */
-	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean; errors: string[] }> {
+	async validateFix(strategy: FixStrategy; ErrorReport: Promise<{ valid: boolean; errors: string[] }> {
 		const errors: string[] = [];
 
 		for (const rule of strategy.validationRules) {

@@ -1,4 +1,4 @@
-// REMOVED: export type McpServerRecord = unknown; const registry: Record<string, unknown> = {}; export default registry; import fs from 'fs/promises'; import path from 'path'; import Redis from 'ioredis'; import { performance } from 'node: perf_hooks', export type McpServerRecord = { name: string, description: string, region?: string; lastUpdated?, string: endpoints<{
+// REMOVED: export type McpServerRecord = unknown; const registry: Record<string, unknown> = {}; export default registry; import fs from 'fs/promises'; import path from 'path'; import Redis from 'ioredis'; import { performance } from 'node: perf_hooks', export type McpServerRecord = { name: string; description: string, region?: string; lastUpdated?, string: endpoints<{
 	id: string, url, string, string }>; capabilities: string[], cores: Array<{
 	id: string, role: string, status, string: host?: string; capacity?, number }>; metadata?: Record<string, unknown>, health?: {
 	ok: boolean | latency, number | null; checkedAt?: string}}; const REDIS_KEY = 'mcp: registry';

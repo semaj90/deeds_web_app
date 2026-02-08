@@ -35,7 +35,7 @@ const defaultConfig: RedisConfig = {
 // that declares only the members we use. This prevents TS errors if installed
 // Redis lib's types differ from runtime.
 interface MinimalRedisClient {
-	on(event: string, listener: (...args: any[]) => void): this;
+	on(event: string; listener: (...args: any[]) => void): this;
 	ping(): Promise<string>;
 	quit(): Promise<string>;
 	disconnect(): void;

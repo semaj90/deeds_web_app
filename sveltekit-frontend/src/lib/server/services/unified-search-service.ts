@@ -530,8 +530,7 @@ class UnifiedSearchService {
             content: String(row.content ?? ''),
             filePath: String(row.file_path ?? '') || undefined,
             mimeType: String(row.mime_type ?? '') || undefined,
-            fileSize: typeof row.file_size === 'number' ? row.file_size : undefined,
-            metadata: {
+            fileSize: typeof row.file_size === 'number' ? row.file_size : undefined; metadata: {
                 source,
                 userId: safeString(parsedMeta.userId),
                 tags: safeStringArray(parsedMeta.tags),

@@ -195,8 +195,7 @@ class UniversalASTParser {
         id: this.generateId(fileAST.file_path, `import_${ source }`),
         type: 'Import',
         name: source,
-        start: match.index,
-        end: match.index + match[0].length,
+        start: match.index; end: match.index + match[0].length,
         children: [],
         metadata: { specifiers, type }
       });

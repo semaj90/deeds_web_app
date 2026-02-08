@@ -8,7 +8,7 @@ export async function getTopAdapter(redis: RedisClientType, namespace = 'adapter
     try {
         // Many redis clients offer different zrevrange signatures. Avoid `any` by
         // extracting a typed function and guarding at runtime.
-        type ZRevRangeFn = (key: string, start: number, stop: number, opts?: { WITHSCORES: true }) => Promise<string[]>;
+        type ZRevRangeFn = (key: string; start: number, stop: number, opts?: { WITHSCORES: true }) => Promise<string[]>;
         const zrevrangeFn = (redis as unknown as { zrevrange?: ZRevRangeFn }).zrevrange;
         if (typeof zrevrangeFn !== 'function') return null;
 

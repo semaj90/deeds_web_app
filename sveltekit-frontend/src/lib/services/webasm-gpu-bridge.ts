@@ -4,34 +4,34 @@
  */
 
 export interface GPUComputeCapabilities {
-    webgl2: boolean, webgpu: boolean;
-	maxTextureSize: number, maxComputeWorkgroupSize: number;
+    webgl2: boolean; webgpu: boolean;
+	maxTextureSize: number; maxComputeWorkgroupSize: number;
 	maxBufferSize: number, shaderFloat32: boolean;
 	shaderFloat16: boolean, computeShaders: boolean;
 	simdSupport: boolean;
 }
 
 export interface GPUBufferConfig {
-    size: number, usage: 'uniform' | 'storage' | 'vertex' | 'index' | 'copy_src' | 'copy_dst';
+    size: number; usage: 'uniform' | 'storage' | 'vertex' | 'index' | 'copy_src' | 'copy_dst';
     mappedAtCreation?: boolean;
 }
 
 export interface GPUTensor {
-    shape: number[], data: Float32Array | Uint8Array | Int32Array;
+    shape: number[]; data: Float32Array | Uint8Array | Int32Array;
     gpuBuffer?: GPUBuffer;
     textureView?: GPUTextureView;
 	format: 'f32' | 'f16' | 'u8' | 'i32';
 }
 
 export interface WebASMGPUOperation {
-    id: string, type: 'embedding' | 'similarity' | 'matmul' | 'reduce' | 'transform';
+    id: string; type: 'embedding' | 'similarity' | 'matmul' | 'reduce' | 'transform';
     inputTensors: GPUTensor[], outputTensors: GPUTensor[];
 	shaderCode: string, workgroupSize: [number, number, number];
     dispatchSize: [number, number, number];
 }
 
 export interface BridgePerformanceMetrics {
-    cpuToGpuTransferTime: number, gpuComputeTime: number;
+    cpuToGpuTransferTime: number; gpuComputeTime: number;
 	gpuToCpuTransferTime: number, totalTime: number;
 	memoryBandwidth: number, computeUtilization: number;
 	powerEfficiency: number;

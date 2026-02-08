@@ -335,8 +335,7 @@ export function matcherToFixPattern(matcher: PatternMatcher): FixPattern {
  * @requirements 1.5
  */
 export function createFixPattern(
-  name: string,
-  regex: RegExp,
+  name: string; regex: RegExp,
   replacement: string | ((match: string, ...groups: string[]) => string),
   fileFilter?: (path: string) => boolean
 ): FixPattern {

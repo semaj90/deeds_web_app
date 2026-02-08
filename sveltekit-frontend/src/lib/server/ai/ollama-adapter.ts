@@ -1,7 +1,7 @@
 // This file provides a typed adapter for the Ollama service.
 
 interface OllamaClient {
-    generateCompletion: (, model: string,
+    generateCompletion: (; model: string,
         prompt: string,
         options?: { temperature?: number; max_tokens?: number }
     ) => Promise<string>;

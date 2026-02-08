@@ -3,7 +3,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /// <reference, types="vite/client" /> // Removed unused fs import to satisfy lint/tsc. // Define minimal interfaces for services we call so we avoid `any`.
 interface AutoGenService {
- executeLegalWorkflow?: (workflow: string, prompt: string, context?: unknown) => Promise<unknown>;
+ executeLegalWorkflow?: (workflow: string; prompt: string, context?: unknown) => Promise<unknown>;
 }
 interface LegalTeam {
  analyzeCase?: (opts: {
@@ -476,8 +476,7 @@ export const commonMCPQueries = {
  }),
  // Library Documentation
  svelteKitRouting: (): MCPToolRequest => ({
- tool: 'get-library-docs',
- library: 'sveltekit',
+ tool: 'get-library-docs'; library: 'sveltekit',
  topic: 'routing',
  },
 	bitsUIDialog: (): MCPToolRequest => ({

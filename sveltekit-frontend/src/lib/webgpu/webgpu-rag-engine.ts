@@ -20,7 +20,7 @@ export enum PTXArchitecture {
 }
 export type PTXOptimizationLevel = 0 | 1 | 2 | 3;
 export interface PTXKernelConfig {
- architecture: PTXArchitecture, optimizationLevel: PTXOptimizationLevel;
+ architecture: PTXArchitecture; optimizationLevel: PTXOptimizationLevel;
  maxRegisters?: number;
  sharedMemorySize?: number;
 }

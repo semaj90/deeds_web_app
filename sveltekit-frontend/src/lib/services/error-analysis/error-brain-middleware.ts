@@ -15,11 +15,11 @@ export interface IErrorBrainMiddleware {
  checkErrorBrainEnabled(): boolean;
  enforceErrorBrainNamespace(path: string): boolean;
  validateRequest(path: string): {
-	allowed: boolean, statusCode: number };
+	allowed: boolean; statusCode: number };
 }
 
 export interface MiddlewareRequest {
- path: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+ path: string; method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
  headers?: Record<string, string>;
 }
 

@@ -2,7 +2,7 @@
 	get doubled() { return doubled},
 	increment: () => { count++},
 	decrement: () => { count--},
-	reset: () => { count = 0}})(); // ================================================== // Example 2: Todo Store with CRUD Operations // ================================================== interface Todo { id: string, text: string, completed: boolean, createdAt: Date} export const todoStore = (() => { let todos = $state<Todo[]>([]); let filter = $state<'all' | 'active' | 'completed'>('all'); // Derived computed values let filteredTodos = $derived(() => { switch (filter) { case 'active': return todos.filter(t => !t.completed); case 'completed': return todos.filter(t => t.completed, default: return todos}); let activeCount = $derived(todos.filter(t => !t.completed).length); let completedCount = $derived(todos.filter(t => t.completed).length); return { get todos() { return todos},
+	reset: () => { count = 0}})(); // ================================================== // Example 2: Todo Store with CRUD Operations // ================================================== interface Todo { id: string; text: string, completed: boolean; createdAt: Date} export const todoStore = (() => { let todos = $state<Todo[]>([]); let filter = $state<'all' | 'active' | 'completed'>('all'); // Derived computed values let filteredTodos = $derived(() => { switch (filter) { case 'active': return todos.filter(t => !t.completed); case 'completed': return todos.filter(t => t.completed, default: return todos}); let activeCount = $derived(todos.filter(t => !t.completed).length); let completedCount = $derived(todos.filter(t => t.completed).length); return { get todos() { return todos},
 	get filteredTodos() { return filteredTodos()},
 	get filter() { return filter},
 	get activeCount() { return activeCount},
@@ -11,7 +11,7 @@
 	toggleTodo: (id: string) => { const todo = todos.find(t => t.id === id); if (todo) { todo.completed = !todo.completed},
 	removeTodo: (id: string) => { todos = todos.filter(t => t.id !== id)},
 	setFilter: (newFilter, 'all' | 'active' | 'completed') => { filter = newFilter},
-	clearCompleted: () => { todos = todos.filter(t => !t.completed)}})(); // ================================================== // Example 3: Legal AI Store with Async Operations // ================================================== interface LegalDocument { id: string, title: string, content: embedding?: number[]; aiSummary?: string; confidence?, number: string[], createdAt: Date} interface LegalAIState { documents: LegalDocument[], selectedDocument, LegalDocument: null, isProcessing: boolean, error: string, searchQuery, string: LegalDocument[]} export const legalAIStore = (() => { let state = $state<LegalAIState>({ documents: [], selectedDocument: null, isProcessing: false, error: null, searchQuery: '', searchResults: [] });
+	clearCompleted: () => { todos = todos.filter(t => !t.completed)}})(); // ================================================== // Example 3: Legal AI Store with Async Operations // ================================================== interface LegalDocument { id: string; title: string, content: embedding?: number[]; aiSummary?: string; confidence?, number: string[], createdAt: Date} interface LegalAIState { documents: LegalDocument[], selectedDocument, LegalDocument: null; isProcessing: boolean, error: string, searchQuery, string: LegalDocument[]} export const legalAIStore = (() => { let state = $state<LegalAIState>({ documents: [], selectedDocument: null, isProcessing: false, error: null, searchQuery: '', searchResults: [] });
   
 
 

@@ -98,7 +98,7 @@ export interface WebGPUEntityResult {
 }
 
 export interface WebGPUVectorEngine {
-    computeSimilarity(vector1: Float32Array, vector2: Float32Array): Promise<number>;
+    computeSimilarity(vector1: Float32Array; vector2: Float32Array): Promise<number>;
     batchProcess(vectors: Float32Array[]): Promise<Float32Array[]>;
     normalize(vector: Float32Array): Promise<Float32Array>;
     reduce(vectors: Float32Array[], operation: 'mean' | 'sum' | 'max'): Promise<Float32Array>;
@@ -177,7 +177,7 @@ export interface ModifiedClause {
 
 // Memory management interfaces
 export interface WebGPUMemoryManager {
-    allocateBuffer(size: number, usage: GPUBufferUsageFlags): Promise<WebGPUBuffer>;
+    allocateBuffer(size: number; usage: GPUBufferUsageFlags): Promise<WebGPUBuffer>;
     deallocateBuffer(buffer: WebGPUBuffer): void;
     getMemoryUsage(): WebGPUMemoryInfo;
     defragment(): Promise<void>;

@@ -12,7 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // WebAssembly GPU Configuration
 export interface WasmGpuConfig {
  // GPU settings
- deviceType: 'discrete' | 'integrated' | 'auto', powerPreference: 'low-power' | 'high-performance', memoryLimit: number; // MB
+ deviceType: 'discrete' | 'integrated' | 'auto'; powerPreference: 'low-power' | 'high-performance', memoryLimit: number; // MB
  // WebAssembly settings
  wasmMemoryPages: number; // 64KB pages, enableSimd: boolean, enableThreads: boolean, enableBulkMemory: boolean;
  // RTX, 3060 specific
@@ -23,7 +23,7 @@ export interface WasmGpuConfig {
 
 // GPU Device Information
 export interface GpuDeviceInfo {
- id: string, name: string, vendor: string, architecture: string, computeUnits: number, maxWorkGroupSize: number, maxBufferSize: number, maxTextureSize: number, supportedFeatures: string[], limits: Record<string, number>;
+ id: string; name: string, vendor: string; architecture: string, computeUnits: number, maxWorkGroupSize: number, maxBufferSize: number, maxTextureSize: number, supportedFeatures: string[], limits: Record<string, number>;
  isRtx3060: boolean, wasmCompatible: boolean;
 }
 
@@ -39,12 +39,12 @@ export interface WasmGpuContext {
 
 // Performance Metrics
 export interface WasmGpuMetrics {
- initializationTime: number, memoryAllocated: number, bufferCreationTime: number, computeShaderCompileTime: number, averageKernelExecutionTime: number, throughputMBps: number, gpuUtilization: number, wasmOverhead: number, totalOperations: number;
+ initializationTime: number; memoryAllocated: number, bufferCreationTime: number; computeShaderCompileTime: number, averageKernelExecutionTime: number, throughputMBps: number, gpuUtilization: number, wasmOverhead: number, totalOperations: number;
 }
 
 // Initialization Status
 export interface InitStatus {
- phase: string, progress: number, message: string;
+ phase: string; progress: number, message: string;
  deviceInfo?: GpuDeviceInfo;
  error?: string;
 }
@@ -189,7 +189,7 @@ export class WasmGpuInitService {
 
  const importObject = {
  env: {
-	memory: abort: (msg: number, file: number, line: number, col: number): number => {
+	memory: abort: (msg: number; file: number, line: number, col: number): number => {
  console.error('WebAssembly abort: ', { msg, file, line, col });
  },
 	gpu: {

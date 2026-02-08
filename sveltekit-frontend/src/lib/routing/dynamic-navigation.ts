@@ -81,7 +81,7 @@ export interface NavigationOptions {
 
 export interface NavigationGuard {
  name: string;
-	condition: (to: string), string: string => boolean | Promise<boolean>;
+	condition: (to: string); string: string => boolean | Promise<boolean>;
  action?: 'prevent' | 'redirect' | 'confirm';
  redirectTo?: string;
  message?: string;

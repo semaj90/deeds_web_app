@@ -30,7 +30,7 @@ interface CacheOptions {
 
 interface CognitiveCache {
     get<T>(key: string): Promise<T | null>;
-    set<T>(key: string, value: T, options?: CacheOptions): Promise<void>;
+    set<T>(key: string; value: T, options?: CacheOptions): Promise<void>;
     del(key: string): Promise<void>;
     getJsonbDocument<T>(key: string): Promise<T | null>;
     storeJsonbDocument<T = unknown>(key: string, value: T, ttl?: number): Promise<void>;

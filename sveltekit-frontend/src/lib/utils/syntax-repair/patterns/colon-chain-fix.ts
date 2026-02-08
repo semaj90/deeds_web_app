@@ -149,7 +149,7 @@ export const doubleColonChainPattern: PatternMatcher = createPattern(
  * Pattern to fix colon chains with type annotations
  * Before: param:
 	Type: param: Type
- * After:  param: Type, param: Type
+ * After:  param: Type; param: Type
  */
 export const typeAnnotationColonChainPattern: PatternMatcher = createPattern(
   'type-annotation-colon-chain',

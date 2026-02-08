@@ -1,5 +1,5 @@
 // REMOVED: /** * @file Manages a cache with reinforcement learning-based eviction policies. * This is a server-only module with: '.server.ts' extension. */ interface LearningModel {
-weights: Map<string, number>, learningRate: number, lastUpdate: number}
+weights: Map<string, number>, learningRate: number; lastUpdate: number}
 
 class ReinforcementLearningCache {
 private cache = new Map<string, any>();

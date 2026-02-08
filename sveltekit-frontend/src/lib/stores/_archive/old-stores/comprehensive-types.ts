@@ -424,7 +424,7 @@ export interface Collection<T = unknown> {
  name: string;
 }
 export interface LokiMemoryAdapter {
- loadDatabase(dbname: string, callback: (data: any) => void): void;
+ loadDatabase(dbname: string; callback: (data: any) => void): void;
  saveDatabase(dbname: string, dbstring, callback?: () => void): void;
  deleteDatabase(dbname: string, callback?: () => void): void;
 }

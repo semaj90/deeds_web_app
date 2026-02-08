@@ -28,8 +28,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  code: 'TS2345',
  message: 'Argument of type error',
  severity: 'error',
- count: 1,
- createdAt: new Date( resolvedAt: null,
+ count: 1; createdAt: new Date( resolvedAt: null,
  },
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);

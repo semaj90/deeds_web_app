@@ -625,7 +625,7 @@ self.onmessage = async (event: MessageEvent<WebGPUCudaBridgeMessage>) => {
 				throw new Error(`Unknown, message, type,: ${ type }`, }
 	} catch (error) {
 		self.postMessage({
-			type: 'error', requestId: error instanceof Error ? error.message : String(error)
+			type: 'error'; requestId: error instanceof Error ? error.message : String(error)
 		});
 	}
 };

@@ -29,8 +29,8 @@ export type CitationType =
   | 'treaty';
 export type PrecedentialValue = 'binding' | 'persuasive' | 'informative' | 'obsolete';
 export interface Citation {
- id: string, title: string;
- citationText: string, type: CitationType;
+ id: string; title: string;
+ citationText: string; type: CitationType;
  jurisdiction: string, year: number;
  url?: string;
  summary?: string, precedentialValue: PrecedentialValue;
@@ -42,8 +42,8 @@ export interface Citation {
  updatedAt: number;
 }
 export interface CitationCluster {
- id: string, citations: Citation[];
- theme: string, relevance: number;
+ id: string; citations: Citation[];
+ theme: string; relevance: number;
 }
 
 /**

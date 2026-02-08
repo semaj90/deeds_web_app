@@ -12,7 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Minimal pool/client types
 type LocalClientLike = {
-	query: (, textOrConfig: string | { text: string; values?: any[] },
+	query: (; textOrConfig: string | { text: string; values?: any[] },
 	params?: any[]
 	) => Promise<{ rows?: Record<string, unknown>[] }>;
 	release?: () => void;

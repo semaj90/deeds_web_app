@@ -5,7 +5,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** Minimal local request type to avoid hard dependency on external named types. */
 type LLMBridgeRequest = {
- id: string, type: string;
+ id: string; type: string;
 	content: string;
  context?: Record<string, unknown>;
  options?: Record<string, unknown>;
@@ -72,7 +72,7 @@ mod['llmOrchestratorBridge'],
 const llmOrchestratorBridge = resolveBridge();
 
 type TestResult = {
- test: string, success: boolean;
+ test: string; success: boolean;
  details?: Record<string, unknown>;
  error?: string;
 };

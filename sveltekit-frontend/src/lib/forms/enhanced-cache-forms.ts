@@ -32,7 +32,7 @@ type?: 'success' | 'error' | string;
 data?: T;
 error?: unknown};
 // Add a specific type for chain of custody entries to avoid `any` type ChainOfCustodyEntry = {
-timestamp: Date, handler: string, action: notes?: string};
+timestamp: Date; handler: string, action: notes?: string};
 export class CacheFirstFormManager {
 // narrow the cache type private formCache = new Map<string, FormCacheData>();
 // use browser timer: number to avoid NodeJS vs DOM timer type conflicts private autosaveTimers = new Map<string, number>();

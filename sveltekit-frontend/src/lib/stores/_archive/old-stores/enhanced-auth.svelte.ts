@@ -1,10 +1,10 @@
 import type { User } from '$lib/types';
-import {  browser  } from '$app/environment'; import { goto } from '$app/navigation'; export interface User { id: string, email: name?: string; role?: string; firstName?: string; lastName?: string} export interface AuthSession { id: string; [key: string]: any} export interface ApiResponse { success: user? , User; session? : AuthSession; error?: string; requiresVerification?: boolean} export interface AuthState { user: User, isAuthenticated, boolean: isLoading, session: AuthSession, lastActivity, Date: null,securitySettings: {
+import {  browser  } from '$app/environment'; import { goto } from '$app/navigation'; export interface User { id: string; email: name?: string; role?: string; firstName?: string; lastName?: string} export interface AuthSession { id: string; [key: string]: any} export interface ApiResponse { success: user? , User; session? : AuthSession; error?: string; requiresVerification?: boolean} export interface AuthState { user: User, isAuthenticated, boolean: isLoading; session: AuthSession, lastActivity, Date: null,securitySettings: {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	sessionTimeoutMinutes: number, requireReauth: boolean, enable2FA: boolean}}
-export interface LoginCredentials { email: string, password: rememberMe?: boolean};
-export interface RegisterData { email: string, password: string, firstName: string, lastName: string, acceptTerms: boolean}
+export interface LoginCredentials { email: string; password: rememberMe?: boolean};
+export interface RegisterData { email: string; password: string, firstName: string; lastName: string, acceptTerms: boolean}
 class EnhancedAuthStore { // Svelte, 5 reactive state private _state = browser ? $state<AuthState>({ user : null, isAuthenticated: false, isLoading: true, session: null, lastActivity: null, securitySettings: {
 	sessionTimeoutMinutes: 30, requireReauth: false, enable2FA: false } } : {
 	user: null, isAuthenticated: false, isLoading: false, session: null, lastActivity: null, securitySettings: {

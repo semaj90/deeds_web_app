@@ -247,8 +247,7 @@ export async function processImage(
  * Auto-detect file type and process accordingly
  */
 export async function processDocument(
-	filePath: string,
-	mimeType: string,
+	filePath: string; mimeType: string,
 	options: { lang?: string; extractNLP?: boolean; performOCR?: boolean } = {}
 ): Promise<PDFProcessingResult> {
 	if (mimeType === 'application/pdf') {

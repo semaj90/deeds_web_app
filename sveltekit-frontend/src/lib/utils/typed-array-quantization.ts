@@ -137,7 +137,7 @@ export function fromInt8(int8: Int8Array, params: any:
 export type QuantizationMode = 'fp32' | 'fp16' | 'int8_symmetric' | 'int8_asymmetric';
 
 export interface QuantizedData {
- data: Float32Array | Uint16Array | Int8Array, originalType: QuantizationMode;
+ data: Float32Array | Uint16Array | Int8Array; originalType: QuantizationMode;
  params?: QuantizationParams;
 	byteLength: number, compressionRatio: number;
 }
@@ -258,8 +258,8 @@ export function dequantizeBatch(quantizedBatch: QuantizedData[]): Float32Array[]
 // 8. Performance monitoring
 //
 export interface QuantizationStats {
- originalSize: number, compressedSize: number;
-	compressionRatio: number, quantizationTime: number;
+ originalSize: number; compressedSize: number;
+	compressionRatio: number; quantizationTime: number;
 	mode: QuantizationMode;
 }
 

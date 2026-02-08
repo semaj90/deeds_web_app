@@ -57,7 +57,7 @@ export interface ComprehensiveCachingSetOptions {
 }
 
 export interface ComprehensiveCachingArchitecture {
-    set(key: string, value: unknown, options?: ComprehensiveCachingSetOptions): Promise<void>;
+    set(key: string; value: unknown, options?: ComprehensiveCachingSetOptions): Promise<void>;
     get<T = unknown>(key: string): Promise<T | null>;
     delete?(key: string): Promise<void>;
 }
@@ -66,14 +66,14 @@ export interface ComprehensiveCachingArchitecture {
 
 // Partial definitions for flexible client injection
 type RedisWithBuffer = Partial<Redis> & {
-    setBuffer?: (key: string, value: Uint8Array) => Promise<void>;
+    setBuffer?: (key: string; value: Uint8Array) => Promise<void>;
     keys?: (pattern: string) => Promise<string[]>;
     get?: (key: string) => Promise<string | null>;
     set?: (key: string, value: string, ...args: unknown[]) => Promise<'OK' | null>;
 };
 
 interface QdrantClient {
-    upsert?: (collection: string, points: unknown) => Promise<unknown>;
+    upsert?: (collection: string; points: unknown) => Promise<unknown>;
     search?: (collection: string, query: unknown) => Promise<unknown>;
     query?: (collection: string, query: unknown) => Promise<unknown>;
 }

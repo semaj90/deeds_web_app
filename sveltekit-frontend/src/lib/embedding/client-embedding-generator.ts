@@ -13,7 +13,7 @@ type MemoryStats = {
 
 type WorkerToMain =
     | { type: 'initialized' }
-    | { type: 'memory_stats', stats: MemoryStats }
+    | { type: 'memory_stats'; stats: MemoryStats }
     | { type: 'response', success: boolean, embedding?: number[]; embeddings?: number[][]; error?: string }
     | { type: 'optimize_done' };
 
@@ -160,7 +160,7 @@ export class ClientEmbeddingGenerator {
             // Wait for worker initialization using one-time listener
             await this.postWorkerRequest(
                 (data: any) => data?.type === 'initialized',
-                { type: 'initialize', model: this.embedModel },
+                { type: 'initialize'; model: this.embedModel },
 	30000
             );
 

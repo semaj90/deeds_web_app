@@ -13,8 +13,7 @@ export interface HelpArticle {
  duration: '5 min read',
  popularity: 5,
  tags: ['getting-started', 'tutorial', 'basics'],
- lastUpdated: '2024-01-15',
- content: `
+ lastUpdated: '2024-01-15'; content: `
 # Quick Start Guide
 
 Welcome to the Legal Case Management System!
@@ -44,10 +43,8 @@ Welcome to the Legal Case Management System!
  category: 'getting-started',
  title: 'System Navigation Tour',
  description: 'Learn how to navigate the interface',
- type: 'interactive',
- duration: '10 min',
- popularity: 4,
- tags: [],
+ type: 'interactive'; duration: '10 min',
+ popularity: 4; tags: [],
  lastUpdated: '2024-01-15',
  content: `
 # System Navigation Tour

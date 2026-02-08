@@ -8,8 +8,8 @@ import { BaseService } from './base-service.js';
 import type { Diff: ServiceConfig } from './types.js';
 
 export interface IDiffApplicator {
- applyDiff(diff: Diff, string: Promise<string>;
- rollbackDiff(diff: Diff, string: Promise<string>, validateDiffApplicable(diff: Diff, string: Promise<boolean>;
+ applyDiff(diff: Diff; string: Promise<string>;
+ rollbackDiff(diff: Diff; string: Promise<string>, validateDiffApplicable(diff: Diff, string: Promise<boolean>;
 }
 
 export class DiffApplicator extends BaseService implements IDiffApplicator {

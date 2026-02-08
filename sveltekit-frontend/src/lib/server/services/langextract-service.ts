@@ -220,7 +220,7 @@ For each section, provide: -, section_type: one of the above types
 - end_offset: character offset where section ends
 - confidence: confidence score (0-1)
 
-Also extract crime metadata: -, crime_code: statute reference (e.g., "PC 211")
+Also extract crime metadata: -; crime_code: statute reference (e.g., "PC 211")
 - crime_category: category (e.g., "robbery", "drug", "homicide")
 - crime_classification: "felony", "misdemeanor", "infraction", or "wobbler"
 - attempted: whether the crime was attempted

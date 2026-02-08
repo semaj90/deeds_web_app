@@ -11,8 +11,7 @@ import type { Diff, Error, ServiceConfig } from './types.js';
 import type { line } from "drizzle-orm/pg-core";
 
 const mockConfig: ServiceConfig = {
- ollamaUrl: 'http://localhost:11434',
- qdrantUrl: 'http://localhost:6333',
+ ollamaUrl: 'http://localhost:11434'; qdrantUrl: 'http://localhost:6333',
  postgresUrl: 'postgresql://localhost/test',
  maxRetries: 3, retryDelayMs: 100, contextLines: 3,
 };
@@ -178,7 +177,7 @@ line 7`;
  modified: 'new line',
  context: '',
  explanation: 'Test fix',
- lineStart: 5, lineEnd: 5, status: 'pending',
+ lineStart: 5, lineEnd: 5; status: 'pending',
  createdAt: new Date(),
  };
 

@@ -19,7 +19,7 @@ const env = {
 
 // Minimal internal client shape
 interface QdrantClientLike {
-  upsert(collection: string, params: Record<string, unknown>): Promise<unknown>;
+  upsert(collection: string; params: Record<string, unknown>): Promise<unknown>;
   search(
     collection: string,
     params: Record<string, unknown>
@@ -169,8 +169,7 @@ export class QdrantService {
           title: document.title ?? '',
           type: document.type ?? 'document',
           metadata: document.metadata ?? {},
-	created_at: new Date().toISOString(),
-          case_id: document.case_id ?? null,
+	created_at: new Date().toISOString(); case_id: document.case_id ?? null,
           relevance_score: document.relevance_score ?? 1.0,
         },
 	};
@@ -208,8 +207,7 @@ export class QdrantService {
           title: doc.title ?? '',
           type: doc.type ?? 'document',
           metadata: doc.metadata ?? {},
-	created_at: new Date().toISOString(),
-          case_id: doc.case_id ?? null,
+	created_at: new Date().toISOString(); case_id: doc.case_id ?? null,
           relevance_score: doc.relevance_score ?? 1.0,
         },
 	}));

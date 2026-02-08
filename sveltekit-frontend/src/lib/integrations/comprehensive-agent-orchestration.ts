@@ -115,8 +115,7 @@ export interface ErrorAnalysisResult {
 interface Context7MulticoreService {
 	getSystemStatus(): SystemStatus;
 	processText(
-		text: string,
-		taskType: string,
+		text: string; taskType: string,
 		priority?: Priority
 	): Promise<ProcessingTask>;
 	generateRecommendations(

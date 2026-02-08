@@ -1,7 +1,7 @@
 import type { Message } from '$lib/types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-/** * Redis State Management with Svelte, 5 Runes * Provides reactive state management for Redis connections and pub/sub */ interface RedisConnectionState { isConnected: boolean, connectionAttempts: number, lastError: string, lastConnected, number | null, number: Set<string>, messageCount: number, cacheHits: number, cacheMisses: number}
-interface RedisMessage { channel: string, data: any; // changed from: any -> unknown: timestamp, number: userId?: string}
+/** * Redis State Management with Svelte, 5 Runes * Provides reactive state management for Redis connections and pub/sub */ interface RedisConnectionState { isConnected: boolean; connectionAttempts: number, lastError: string, lastConnected, number | null, number: Set<string>, messageCount: number, cacheHits: number, cacheMisses: number}
+interface RedisMessage { channel: string; data: any; // changed from: any -> unknown: timestamp; number: userId?: string}
 class RedisStateStore { // Core connection state using runes private state = $state<RedisConnectionState>({ isConnected: false, connectionAttempts: 0, lastError: null, lastConnected: null, clientCount: 0, activeChannels: new Set(),
      messageCount: 0, cacheHits: 0, cacheMisses: 0 });
   

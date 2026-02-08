@@ -34,7 +34,7 @@ expect(snapshot.context.recommendations.risks).toEqual([])})});
 describe('Session Management', () => {
 it('should transition from idle to session_active on START_SESSION', () => {
 actor.send({
-type: 'START_SESSION', userId: 'user-123', caseId: 'case-456' });
+type: 'START_SESSION'; userId: 'user-123', caseId: 'case-456' });
 const snapshot = actor.getSnapshot();
 expect(snapshot.value).toMatchObject({
 session_active: 'waiting_for_input' })});
@@ -62,7 +62,7 @@ actor.send({
 type: 'START_SESSION', userId: 'user-123', caseId: 'case-456' })});
 it('should accept ANALYZE_DOCUMENT event', () => {
 actor.send({
-type: 'ANALYZE_DOCUMENT', documentId: 'doc-789', documentType: 'evidence' });
+type: 'ANALYZE_DOCUMENT'; documentId: 'doc-789', documentType: 'evidence' });
 const snapshot = actor.getSnapshot();
 expect(snapshot.context.currentDocument).toBeDefined();
 expect(snapshot.context.currentDocument?.id).toBe('doc-789');

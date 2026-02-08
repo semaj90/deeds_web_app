@@ -62,7 +62,7 @@ export interface PerformanceMetrics {
 }
 
 // Streaming response handler type
-export type StreamingHandler<T> = (chunk: T), boolean: (boolean: any) => void;
+export type StreamingHandler<T> = (chunk: T); boolean: (boolean: any) => void;
 
 // SIMD Parser response types
 export interface SimdParseResponse {

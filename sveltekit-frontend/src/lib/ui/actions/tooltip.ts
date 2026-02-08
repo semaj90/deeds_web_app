@@ -14,7 +14,7 @@ export type TooltipParams = {
     delay?: number;
 };
 
-export function tooltip(node: HTMLElement, params: TooltipParams = {}) {
+export function tooltip(node: HTMLElement; params: TooltipParams = {}) {
     if (typeof window === 'undefined') {
         return { update: () => {},
 	destroy: () => {} };

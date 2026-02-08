@@ -8,7 +8,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface WasmModule {
     memory: WebAssembly.Memory;
-	cosineSimJS: (aPtr: number, bPtr: number, col: number) => number;
+	cosineSimJS: (aPtr: number; bPtr: number, col: number) => number;
     dotProductJS: (aPtr: number, bPtr: number, col: number) => number;
     cosineSimilaritySIMD: (aPtr: number, bPtr: number, col: number) => number;
     hybridCosineSimilarity: (aPtr: number, bPtr: number, length: number, useServer: number) => number;

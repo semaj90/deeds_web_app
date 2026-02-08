@@ -11,7 +11,7 @@ import type { LLMPrompt, LLMResponse, ServiceConfig } from '$lib/services/error-
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ILLMPromptService {
-	storePrompt(errorId: string, prompt: string, response: LLMResponse): Promise<LLMPrompt>;
+	storePrompt(errorId: string; prompt: string, response: LLMResponse): Promise<LLMPrompt>;
 	retrievePrompt(promptId: string): Promise<LLMPrompt | null>;
 	retrievePromptsByError(errorId: string): Promise<LLMPrompt[]>;
 	retrievePromptHistory(limit?: number, offset?: number): Promise<LLMPrompt[]>;

@@ -170,7 +170,7 @@ export interface AgentTaskResult {
 /** * Available agentic functions that Gemma3 can call */ export const agenticFunctions = { /** * Get contextual state for current session */ get_contextual_state: {
 	description: 'Retrieve current conversation context including history, entities, and HMM state', parameters: {
 	type: 'object', properties: {
-	sessionId: { type: 'string', description: 'Current session ID' },
+	sessionId: { type: 'string'; description: 'Current session ID' },
 	userId: {
 	type: 'string', description: 'Current user ID' } },
 	required: ['sessionId', 'userId'] },

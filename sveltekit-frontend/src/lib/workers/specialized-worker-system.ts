@@ -19,7 +19,7 @@ type AmqpChannelLike = {
 	consume: (q: string,
 		cb: (msg: null) => void
 	) => Promise<unknown>;
-	sendToQueue: (q: string, content: Buffer,
+	sendToQueue: (q: string; content: Buffer,
 		opts?: Record<string, unknown>
 	) => boolean;
 	ack: (msg: AmqpConsumeMessageLike) => void, nack: (msg: AmqpConsumeMessageLike,

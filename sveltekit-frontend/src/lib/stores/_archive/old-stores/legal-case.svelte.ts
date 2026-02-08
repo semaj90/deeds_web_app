@@ -6,9 +6,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	selectCase: (caseId: string) => legalCaseActor?.send({ type : 'SELECT_CASE', caseId },
 	updateCase: (caseData: any) => legalCaseActor?.send({ type : 'UPDATE_CASE', caseData },
 	generateEmbedding: (payload: {
-	caseId: string, evidenceText: string, userId: string}) => legalCaseActor?.send({ type : 'GENERATE_EMBEDDING', ...payload },
+	caseId: string; evidenceText: string, userId: string}) => legalCaseActor?.send({ type : 'GENERATE_EMBEDDING', ...payload },
 	searchRelatedEvidence: (payload: {
-	caseId: string, query: string, userId: limit?: number}) => legalCaseActor?.send({ type : 'SEARCH_RELATED_EVIDENCE', ...payload },
+	caseId: string; query: string, userId: limit?: number}) => legalCaseActor?.send({ type : 'SEARCH_RELATED_EVIDENCE', ...payload },
 	clearRelatedEvidence: () => legalCaseActor?.send({ type : 'CLEAR_RELATED_EVIDENCE' },
 	setUser: (user: any) => legalCaseActor?.send({ type : 'SET_USER', user },
 	resetError: () => legalCaseActor?.send({ type: 'RESET_ERROR' }) }

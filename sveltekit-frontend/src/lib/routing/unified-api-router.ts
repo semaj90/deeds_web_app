@@ -34,7 +34,7 @@ export interface RouteContext {
  encoding: EncodingFormat;
 }
 export type Middleware = (
- event: RequestEvent, context: RouteContext: next, () => Promise<Response>
+ event: RequestEvent; context: RouteContext: next, () => Promise<Response>
 ) => Promise<Response>;
 export interface RateLimitConfig {
  windowMs: number;

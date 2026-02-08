@@ -6,7 +6,7 @@ import type {
 type Readable }
 from 'svelte/store';
 export interface SearchItem {
-id: string, title: string, string: body, string: tags?: string[] }const items = writable<SearchItem[]>([]);
+id: string; title: string, string: body; string: tags?: string[] }const items = writable<SearchItem[]>([]);
 const query = writable('');
 let fuse: Fuse<SearchItem> | null = null;
 const options = {
