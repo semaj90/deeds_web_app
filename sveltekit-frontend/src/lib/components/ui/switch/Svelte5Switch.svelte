@@ -25,17 +25,27 @@ let {
 	class: className = '',
 	variant = 'default',
 	size = 'md',
-	onchange: children
+	onchange,
+	children
 }: Props = $props();
 
 // Size dimensions
 let dimensions = $derived({
 	sm: {
-	track: 'w-8 h-4' thumb: 'w-3 h-3' translate: 'translate-x-4' },
+		track: 'w-8 h-4',
+		thumb: 'w-3 h-3',
+		translate: 'translate-x-4'
+	},
 	md: {
-	track: 'w-11 h-6' thumb: 'w-5 h-5' translate: 'translate-x-5' },
+		track: 'w-11 h-6',
+		thumb: 'w-5 h-5',
+		translate: 'translate-x-5'
+	},
 	lg: {
-	track: 'w-14 h-7' thumb: 'w-6 h-6' translate: 'translate-x-7' }
+		track: 'w-14 h-7',
+		thumb: 'w-6 h-6',
+		translate: 'translate-x-7'
+	}
 }[size]);
 
 let labelSizeClasses = $derived({
@@ -46,10 +56,10 @@ let labelSizeClasses = $derived({
 
 // Variant classes
 let trackVariants = $derived({
-	default:checked
+	default: checked
 		? 'bg-blue-600'
 		: 'bg-slate-600',
-	nes:checked
+	nes: checked
 		? 'bg-green-500 border-4 border-white'
 		: 'bg-red-500 border-4 border-white'
 }[variant]);
@@ -102,7 +112,8 @@ function handleKeydown(e: KeyboardEvent) {
 		class="relative inline-flex shrink-0 {dimensions.track}
 			   rounded-full cursor-pointer
 			   transition-colors duration-200 ease-in-out
-			   focus: outline-none focus: ring-2 focus: ring-blue-500 focus: ring-offset-2 focus: ring-offset-slate-900, disabled, cursor-not-allowed
+			   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900
+			   disabled:cursor-not-allowed
 			   {trackVariants}"
 		onclick={() => !disabled && (checked = !checked, onchange?.(checked))}
 		onkeydown={handleKeydown}
