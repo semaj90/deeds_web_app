@@ -48,8 +48,8 @@
 </script>
 
 <div
-	class="tabs-root { className }"
-	data-orientation={ orientation }
+	class="tabs-root {className}"
+	data-orientation={orientation}
 	role="tablist"
 	aria-orientation={orientation}
 >
