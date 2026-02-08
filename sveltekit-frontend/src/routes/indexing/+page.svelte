@@ -337,7 +337,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               bind:value={searchQuery}
               placeholder={searchType === 'codebase'
                 ? 'e.g., "import statement for stores"'
-                , 'e.g., "cannot find module"'}
+                'e.g., "cannot find module"'}
               onkeydown={(e) => e.key === 'Enter' && search()}
               disabled={searching}
             />

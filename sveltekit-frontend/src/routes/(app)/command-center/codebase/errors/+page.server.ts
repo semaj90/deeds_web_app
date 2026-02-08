@@ -39,11 +39,11 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
         }
         if (surface) {
             must.push({ key: 'surface', match: {
-, any: surface.split(',') } });
+any: surface.split(',') } });
         }
         if (tech) {
             must.push({ key: 'tech', match: {
-, any: tech.split(',') } });
+any: tech.split(',') } });
         }
         if (clusterId) {
             must.push({ key: 'clusterId', match: { value, clusterId } });
@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, limit: with_payload, true,
+limit: with_payload, true,
                 filter
             })
         });

@@ -34,7 +34,7 @@
    precision: 'fp16'
   },
 	security: {
-  , encryption: 'AES256',
+  encryption: 'AES256',
    sessionTimeout: 3600,
    twoFactor: false,
    auditLogging: true,

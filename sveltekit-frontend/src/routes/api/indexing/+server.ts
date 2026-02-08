@@ -217,7 +217,7 @@ parseInt(
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ points: [
                   {
-                   , id: pointId,
+                   id: pointId,
                     vector: Array.from(embedding),
                     payload: { file_path: relativePath,
                       file_hash: fileHash,
@@ -322,7 +322,7 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ points: [
                 {
-                 , id: pointId,
+                 id: pointId,
                   vector: Array.from(embedding),
                   payload: { error_code: file_path,
                     message: error_count,

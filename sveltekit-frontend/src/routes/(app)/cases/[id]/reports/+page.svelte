@@ -64,7 +64,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-				, reportId: selectedReport.id,
+				reportId: selectedReport.id,
 					title: selectedReport.title || 'Untitled Report',
 					contentHtml: editorRef?.getHTML?.(),
 					contentJson: editorRef?.getJSON?.()

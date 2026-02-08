@@ -27,7 +27,7 @@ import type { Case } from '$lib/types';
       reportsUnsub = reportsStore.subscribe((r: any) => {
         reportList = (r ?? []).map((it: any) => ({
           id: String(it?.id ?? ''), // ensure id is: string
-         , title: it?.title ?? '',
+         title: it?.title ?? '',
           summary: it?.summary ?? '',
           reportType: it?.reportType ?? 'general',
           createdAt: it?.createdAt ?? new Date().toISOString(),

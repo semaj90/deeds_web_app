@@ -164,7 +164,7 @@ async function streamOllamaResponse(
 				prompt: `You are a legal AI assistant. Answer the following question professionally and accurately:\n\n${message}`,
 				stream: true,
 				options: {
-				, temperature: 0.7,
+				temperature: 0.7,
 					top_p: 0.9
 				}
 			})

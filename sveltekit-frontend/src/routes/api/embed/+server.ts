@@ -37,7 +37,7 @@ async function getOpenAIEmbedding(
  'Content-Type': 'application/json',
  },
  body: JSON.stringify({
-, model: 'text-embedding-3-small',
+model: 'text-embedding-3-small',
  input: text,
  encoding_format: 'float',
  ...(dimensions && { dimensions }), // Conditionally add dimensions
@@ -64,7 +64,7 @@ async function getNomicEmbedding(text: string): Promise<{ embedding: number[] }>
  'Content-Type': 'application/json',
  },
  body: JSON.stringify({
-, model: 'nomic-embed-text-v1.5',
+model: 'nomic-embed-text-v1.5',
  texts: [text],
  task_type: 'search_document',
  dimensionality_reduction: 768, // Reduce from to 768 for better performance

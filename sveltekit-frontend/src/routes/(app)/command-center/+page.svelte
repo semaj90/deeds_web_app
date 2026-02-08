@@ -35,7 +35,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		ragIndexSize: 0,
 		ocrAccuracy: 0,
 		trends: {
-, totalCases: 5.2,
+totalCases: 5.2,
 			activeCases: -2.1,
 			evidenceProcessed: 12.8,
 			aiQueries: 8.5

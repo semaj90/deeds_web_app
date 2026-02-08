@@ -515,7 +515,7 @@ export const documentUploadMachine: any = setup({
       entry: ({ context }) => {
         console.error(
           `Document upload failed after ${context.retryCount} retries: ${context.error}`
-        , },
+        },
     },
 
     cancelled: {

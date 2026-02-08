@@ -93,7 +93,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, model: 'embeddinggemma:latest', input: searchQuery })
+model: 'embeddinggemma:latest', input: searchQuery })
 			});
 
 			if (!embedRes.ok) throw new Error('Embedding failed');
@@ -137,7 +137,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, limit: 50, with_payload: true })
+limit: 50, with_payload: true })
 			});
 
 			if (!res.ok) return;
@@ -184,7 +184,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, action: 'cluster', chunkSize: 500 })
+action: 'cluster', chunkSize: 500 })
 			});
 
 			if (res.ok) {
@@ -220,7 +220,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, cluster_id: cluster.cluster_id,
+cluster_id: cluster.cluster_id,
 					strategy: cluster.fix_strategy,
 					ace_context: true
 				})

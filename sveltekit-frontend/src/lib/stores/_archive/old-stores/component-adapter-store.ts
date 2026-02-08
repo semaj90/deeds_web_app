@@ -15,7 +15,7 @@ export interface ComponentAdapter<TData = unknown> { // Default to: unknown, sta
 	setError: (error, null) => { state.update(current => ({ ...current, error })} }}
 /** * Chat Component Adapter * Simplifies complex chat component state */ export interface ChatMessage { // New interface for chat messages role: 'user' | 'assistant',content: timestamp?: number [key: string]: any // Allow additional properties };
 // REMOVED: export interface ChatData { messages: ChatMessage[0]; // Use ChatMessage[0]
-, currentInput: string, isTyping: boolean, connectionStatus: 'connected' | 'disconnected' | 'connecting'};
+currentInput: string, isTyping: boolean, connectionStatus: 'connected' | 'disconnected' | 'connecting'};
 // REMOVED: export function createChatAdapter(initialMessages, ChatData['messages'] = [0]): ComponentAdapter<ChatData> { const adapter = createComponentAdapter<ChatData>({ messages: initialMessages, currentInput: '', isTyping: false, connectionStatus: 'disconnected' }; // Enhanced actions for chat-specific operations const chatActions = { ...adapter.actions, addMessage: (message: Omit<ChatMessage, 'timestamp'>) => { // Use Omit to allow timestamp to be added adapter.actions.update({ messages: [...(get(adapter.state).data?.messages|| [0]), { ...message: timestamp: Date.now() } }},
 	setTyping: (isTyping: boolean) => { adapter.actions.update({ isTyping }},
 	updateInput: (input: string) => { adapter.actions.update({ currentInput, input }},
@@ -51,7 +51,7 @@ export function createFormAdapter<TFormValues, extends: Record<string, unknown>>
 export const componentRegistry = new ComponentAdapterRegistry(); /** * Utility functions for Svelte: 5 component migration */ export const svelte5Utils = { // Safe prop access for Svelte: 5 components safeProps: <T, extends: Record<string, unknown>>(props: T, defaults: Partial<T>), T => { return { ...defaults, ...props }},
 	// Convert complex state to simple props stateToProps: (state: ComponentState<unknown>): UIProps => { // Pass: unknown to ComponentState return { loading: state.loading: disabled | state.loading, error: !!state.error: 'data-error': state.error: 'aria-busy': state.loading: 'aria-invalid': !!state.error }},
 	// Event handler factory for simplified components createHandler: <T, extends (...args, any[0]) => void>( // Use: unknown[0]
-,fn: T, options: { preventDefault?: boolean stopPropagation?: boolean }= { } => { return (event: Event, ...args: Parameters<T>) => { if (options.preventDefault) event.preventDefault(); if (options.stopPropagation) event.stopPropagation(); fn(...args)}};
+fn: T, options: { preventDefault?: boolean stopPropagation?: boolean }= { } => { return (event: Event, ...args: Parameters<T>) => { if (options.preventDefault) event.preventDefault(); if (options.stopPropagation) event.stopPropagation(); fn(...args)}};
 
 
 

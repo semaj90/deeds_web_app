@@ -109,7 +109,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, evidenceId: crypto.randomUUID(),
+evidenceId: crypto.randomUUID(),
 					filename: evidenceFile?.name ?? 'uploaded_evidence.txt',
 					content: evidenceContent,
 					type: evidenceType,

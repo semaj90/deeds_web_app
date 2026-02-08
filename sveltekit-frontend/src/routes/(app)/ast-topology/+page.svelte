@@ -234,7 +234,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, file: nodeId })
+file: nodeId })
       });
 
       if (res.ok) {

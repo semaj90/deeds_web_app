@@ -138,7 +138,7 @@ export const GET: RequestHandler = async () => {
       collections: listData.result.collections.length,
       summaries: docs.length,
       data: docs.map(d => ({
-       , collection: d.source_id,
+       collection: d.source_id,
         summary: d.summary_text,
         tags: d.tags,
         created_at: d.created_at

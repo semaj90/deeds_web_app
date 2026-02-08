@@ -108,7 +108,7 @@ export const POST: RequestHandler = async ({ request }) => {
       validated_sources: selectedSources.length,
       validation_id: validationRecord._id,
       approved_context: selectedSources.map(s => ({
-       , chunk_id: s.chunk_id,
+       chunk_id: s.chunk_id,
         content: s.content
       }))
     });

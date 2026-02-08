@@ -83,7 +83,7 @@ export const GET: RequestHandler = async () => {
 				fixedToday: 0, // TODO: Query from error_fix_history
 				inProgress: 0,
 				confidence: 0, // TODO: Query from learned_fix_patterns
-			, errorChange: 0,
+			errorChange: 0,
 				uniqueFiles
 			}
 		});

@@ -72,7 +72,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				userId,
 				eventType: 'web_crawl_initiated',
 				metadata: {
-				, jobId: job.id,
+				jobId: job.id,
 					urlCount: urls.length,
 					ragMode,
 					timestamp: new Date().toISOString()
@@ -131,7 +131,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						id: vectorId,
 						vector: embeddings.vector,
 						payload: {
-						, jobId: job.id,
+						jobId: job.id,
 							url,
 							extractedText: crawlResult.extractedText,
 							screenshot: crawlResult.screenshotUrl,
@@ -152,7 +152,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						table: 'web_crawl_vectors',
 						vector: embeddings.vector,
 						metadata: {
-						, jobId: job.id,
+						jobId: job.id,
 							url,
 							content: crawlResult.extractedText
 						}

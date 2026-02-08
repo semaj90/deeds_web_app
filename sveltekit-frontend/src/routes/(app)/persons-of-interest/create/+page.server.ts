@@ -42,7 +42,7 @@ export const actions: Actions = {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, case_id: caseId,
+case_id: caseId,
 					...form.data
 				})
 			});

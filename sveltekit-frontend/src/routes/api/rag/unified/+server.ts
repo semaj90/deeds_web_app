@@ -151,7 +151,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
             collection,
             resultCount: results.length,
             results: results.map(r => ({
-               , id: r.id,
+               id: r.id,
                 score: r.score,
                 payload: r.payload
             }))

@@ -226,7 +226,7 @@ export class AceContextService {
 
     console.log(
       `[AceContextService] Tool plan: ${actions.length} actions, shouldProceed=${shouldProceed}`
-    , return { actions: shouldProceed,
+    return { actions: shouldProceed,
     }, }
 
   /**

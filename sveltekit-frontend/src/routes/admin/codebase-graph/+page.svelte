@@ -103,7 +103,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-				, query: searchQuery,
+				query: searchQuery,
 					limit: 10,
 					threshold: 0.7
 				})
@@ -123,7 +123,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-				, cluster_id: cluster.cluster_id,
+				cluster_id: cluster.cluster_id,
 					embedding: cluster.embedding,
 					limit: 5
 				})
@@ -150,7 +150,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 					pattern: cluster.pattern,
 					file_paths: cluster.file_paths,
 					context: {
-					, summary: cluster.summary,
+					summary: cluster.summary,
 						tags: cluster.tags,
 						similar_clusters: similarClusters.map((c) => c.pattern)
 					}

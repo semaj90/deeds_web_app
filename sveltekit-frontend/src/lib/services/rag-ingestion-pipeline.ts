@@ -238,17 +238,17 @@ export const ragIngestionMachine = setup({
     id: 'ragIngestion',
     initial: 'idle',
     context: {
-       , progress: 0,
+       progress: 0,
         stage: 'idle'
     } as IngestionContext,
     states: {
-       , idle: {
-           , on: {
-               , START_INGESTION: 'uploading'
+       idle: {
+           on: {
+               START_INGESTION: 'uploading'
             }
         },
         uploading: {
-           , entry: assign(({ event }) => ({
+           entry: assign(({ event }) => ({
                 progress: 10,
                 stage: 'Uploading document...',
                 initialFile: event.file,

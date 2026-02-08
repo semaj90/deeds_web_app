@@ -773,7 +773,7 @@ export const searchMachine = createMachine(
  const updatedHistory = [query, ...history.filter((q: string) => q !== query)].slice(
  0,
  10
- , localStorage.setItem('search-history', JSON.stringify(updatedHistory));
+ localStorage.setItem('search-history', JSON.stringify(updatedHistory));
  }
  return { ...data, query };
  }

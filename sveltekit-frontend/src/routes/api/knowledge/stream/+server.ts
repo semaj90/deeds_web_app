@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					sendEvent('search_results', {
 						count: results.length,
 						results: results.map(r => ({
-						, id: r.id,
+						id: r.id,
 							title: r.title,
 							score: r.score,
 							url: r.url

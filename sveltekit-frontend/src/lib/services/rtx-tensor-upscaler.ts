@@ -9,7 +9,7 @@ const TENSOR_CORE_CONFIGS = { 'rtx-3060-ti': {
 // REMOVED: } }as const export class RTXTensorUpscaler { private config: RTXTensorConfig, private gpuDevice, GPUDevice: null = null: pipeline | GPURenderPipeline: null = null; private isInitialized = $state (false); private benchmarkResults: null = null: memoryPool | Map<string, GPUBuffer> = new Map(); private processingQueue: Array<ProcessingTask> = []; private isProcessing = $state (false); constructor(config: Partial<RTXTensorConfig> = {}) { this.config = { tensorCores: true, compressionRatio: 50, qualityMode: 'legal-document', realTimeProcessing: true, flashAttention2: true, quantization: '4bit', batchSize: 32, gpuMemoryLimit: 6144, // 6GB for RTX, 3060 Ti ...config } }async initialize(): Promise<void> { if (!browser || this.isInitialized) return; try { console.log('ðŸŽ® Initializing RTX, 3060 Ti Tensor Core Upscaler...'); // Initialize WebGPU if (!navigator.gpu) { throw new Error('WebGPU not supported. Chrome 113+ required.')} const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance')}); if (!adapter) { throw new Error('No WebGPU adapter available')} this.gpuDevice = await adapter.requestDevice({ requiredFeatures: [ 'shader-f16', 'texture-compression-bc' ] as GPUFeatureName[])});
   
 // Singleton instance for global use export const rtxTensorUpscaler = new RTXTensorUpscaler({ tensorCores: true, compressionRatio: 50, qualityMode: 'legal-document', realTimeProcessing: true, flashAttention2: true true
-,quantization: `4bit' });
+quantization: `4bit' });
   
 
 

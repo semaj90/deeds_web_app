@@ -29,14 +29,14 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  if (errorLine < 0 || errorLine >= lines.length) {
  throw new Error(
  `Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
- , }
+ }
 
  // Verify the original line matches before applying
  const currentLine = lines[errorLine];
  if (currentLine !== diff.original) {
  throw new Error(
  `Original line mismatch at line ${diff.lineStart}. Expected "${diff.original}", got "${currentLine}"`
- , }
+ }
 
  // Apply the modification
  const modifiedLines = [...lines];
@@ -61,14 +61,14 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  if (errorLine < 0 || errorLine >= lines.length) {
  throw new Error(
  `Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
- , }
+ }
 
  // Verify the modified line matches before rolling back
  const currentLine = lines[errorLine];
  if (currentLine !== diff.modified) {
  throw new Error(
  `Modified line mismatch at line ${diff.lineStart}. Expected "${diff.modified}", got "${currentLine}"`
- , }
+ }
 
  // Restore the original
  const restoredLines = [...lines];

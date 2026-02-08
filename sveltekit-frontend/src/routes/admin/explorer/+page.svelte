@@ -106,7 +106,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-                   , file_path: route.path,
+                   file_path: route.path,
 					error_count: route.errors
 				})
 			});
