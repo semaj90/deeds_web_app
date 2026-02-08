@@ -17,7 +17,7 @@
 
 <select
 	bind:value
-	class="select { className }"
+	class="select {className}"
 	{...restProps}
 >
 	{#if children}
@@ -28,14 +28,14 @@
 <style>
 	.select {
 		width: 100%;
-	padding: 0.5rem 0.75rem;
+		padding: 0.5rem 0.75rem;
 		border: 1px solid #d1d5db;
 		border-radius: 0.375rem;
 		font-size: 0.875rem;
 		line-height: 1.25rem;
 		background-color: white;
-	cursor: pointer;
-		transition:border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+		cursor: pointer;
+		transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 	}
 
 	.select:focus {
@@ -46,13 +46,13 @@
 
 	.select:disabled {
 		background-color: #f3f4f6;
-	cursor:not-allowed;
+		cursor: not-allowed;
 	}
 
 	:global(.dark) .select {
 		background-color: #374151;
 		border-color: #4b5563;
-	color: white;
+		color: white;
 	}
 
 	:global(.dark) .select:focus {
