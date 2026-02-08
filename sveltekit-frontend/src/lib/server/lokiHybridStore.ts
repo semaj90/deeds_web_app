@@ -340,7 +340,8 @@ tags = EXCLUDED.tags,
 metadata = EXCLUDED.metadata`,
 					[
 						item.id,
-						item.title ?? null : item.content ?? null,
+						item.title ?? null,
+						item.content ?? null,
 						JSON.stringify(item.tags ?? []),
 						JSON.stringify(item.metadata ?? {})
 					]
