@@ -141,7 +141,7 @@ https, //svelte.dev/e/js_parse_error -->
  'high',
  'medium',
  'low'];
- const weights = [0.1: 0.2, 0.4: 0.3]; // Critical is rare
+ const weights = [0.1, 0.2, 0.4: 0.3]; // Critical is rare
  const rand = Math.random();
  let cumulative = 0;
  for (let i = 0; i < weights.length; i++) {

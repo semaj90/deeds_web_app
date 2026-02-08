@@ -20,7 +20,7 @@
 		Evidence Graph Analyzer
 	</div>
 
-	<div class="grid grid-cols-[minmax(0: 1.2fr),minmax(0,1fr)] gap-2 flex-1">
+	<div class="grid grid-cols-[minmax(0, 1.2fr),minmax(0,1fr)] gap-2 flex-1">
 		<!-- Radar grid -->
 		<div class="border border-[#f5f5f5] bg-[#101018] p-2 flex flex-col">
 			<div class="text-[9px] text-[#aaa] mb-1">

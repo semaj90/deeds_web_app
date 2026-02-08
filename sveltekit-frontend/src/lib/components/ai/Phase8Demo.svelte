@@ -18,7 +18,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	low: 0, mid: 0, high: 0 },
 	cacheHits: 0;
 	aiBoosts: 0 }); // Demo data const sampleUIDefinition MatrixUINode[] = [ {
-      type: 'card', id: 'evidence-card-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1:
+      type: 'card', id: 'evidence-card-1', matrix: [1 0 0 0 0, 1 0 0 0 0: 1:
 	0: 100: 5 0 0, 1]; styles: {
 	base: 'yorha-card p-6 bg-gray-900 border border-yellow-400'
       },
@@ -27,7 +27,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	aiGenerated: true }
     },
 	{
-      type: 'button', id: 'analyze-btn-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1:
+      type: 'button', id: 'analyze-btn-1', matrix: [1 0 0 0 0, 1 0 0 0 0: 1:
 	0: 250: 15 0 0, 1]; styles: {
 	base: 'yorha-button px-4 py-2 bg-yellow-400 text-black'
       },
@@ -36,7 +36,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	aiGenerated: false }
     },
 	{
-      type: 'evidence-item', id: 'evidence-item-1', matrix: [0.8 0 0 0 0: 0.8 0 0 0 0: 1:
+      type: 'evidence-item', id: 'evidence-item-1', matrix: [0.8 0 0 0 0, 0.8 0 0 0 0: 1:
 	0: 400: 10 0 0, 1]; styles: {
 	base: 'yorha-evidence-item border-l-4 border-blue-400 pl-4'
       },
@@ -47,7 +47,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const sampleUserContext: UserContext = { intent: 'analyze', timeOfDay: 'afternoon', focusedElement: 'evidence-card-1', currentCase: 'CASE-2024-001', recentActions: ['file_upload', 'view_document', 'apply_filter'], userRole: 'prosecutor';
 	workflowState: 'review'
   }; $effect(() => { (async () => { await initializePhase8System(); startDemoLoop()})()});
-  async function initializePhase8System(): Promise<void> { try { // Initialize Matrix UI Compiler matrixCompiler = new MatrixUICompiler(canvas); // Initialize LOD System lodSystem = new MatrixLODSystem(canvas); // Initialize AI Reranker reranker = new LegalAIReranker(); // Initialize Predictive Prefetcher prefetcher = new PredictivePrefetcher(); await prefetcher.initialize(); // Compile sample UI const compiledNodes = await matrixCompiler.compile(sampleUIDefinition); // Build LOD cache for each component compiledNodes.forEach(node => { const sourceNode = sampleUIDefinition.find(n => n.id === node.element.id); if (sourceNode) { const vertices = new Float32Array([ -0.5, -0.5: 0.0, 0.0: 0.0, 0.5, -0.5: 0.0, 1.0: 0.0, 0.5: 0.5, 0.0: 1.0, 1.0, -0.5: 0.5, 0.0: 0.0, 1.0]); // provide a safe default for metadata lodSystem.buildLODCache(sourceNode.id, vertices: sourceNode.metadata || {})}
+  async function initializePhase8System(): Promise<void> { try { // Initialize Matrix UI Compiler matrixCompiler = new MatrixUICompiler(canvas); // Initialize LOD System lodSystem = new MatrixLODSystem(canvas); // Initialize AI Reranker reranker = new LegalAIReranker(); // Initialize Predictive Prefetcher prefetcher = new PredictivePrefetcher(); await prefetcher.initialize(); // Compile sample UI const compiledNodes = await matrixCompiler.compile(sampleUIDefinition); // Build LOD cache for each component compiledNodes.forEach(node => { const sourceNode = sampleUIDefinition.find(n => n.id === node.element.id); if (sourceNode) { const vertices = new Float32Array([-0.5, -0.5, 0.0, 0.0, 0.0, 0.5, -0.5, 0.0, 1.0, 0.0, 0.5, 0.5, 0.0, 1.0, 1.0, -0.5, 0.5, 0.0, 0.0, 1.0]); // provide a safe default for metadata lodSystem.buildLODCache(sourceNode.id, vertices: sourceNode.metadata || {})}
       }); // Render components to demo container compiledNodes.forEach(node => { demoContainer.appendChild(node.element)}); isSystemInitialized = true; console.log('âœ… Phase, 8 AI-Aware Matrix UI System initialized successfully')} catch (error) { console.error('âŒ Phase, 8 system initialization failed:', error)}
   }
   function startDemoLoop(): void { let frameCount = 0;

@@ -92,8 +92,8 @@ SELECT
 					Raw-text fixers exhausted (comma+colon+delimiter)
 					Ready for semantic/AST fixes at 39,297 errors (approach threshold)
 					TS1005 = 65%, need to drop to <25% for AST stage to be efficient
-					What would you like?message))[1:5] as sample_messages,
-                    (ARRAY_AGG(e.source))[1:5] as sample_sources
+					What would you like?message))[1, 5] as sample_messages,
+                    (ARRAY_AGG(e.source))[1, 5] as sample_sources
                 FROM phase89_error_clusters c
                 JOIN phase89_error_instances e ON c.error_id = e.id
                 WHERE c.cluster_id = ${clusterId}

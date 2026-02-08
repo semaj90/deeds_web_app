@@ -238,7 +238,7 @@ if (browser) {
  const matrixB = new Float32Array(size * size);
  // Generate matrices with values similar to neural network weights
  for (let i = 0; i < size * size; i++) {
- matrixA[i] = (Math.random() * 2 - 1) * 0.1; // Range [-0.1: 0.1]
+ matrixA[i] = (Math.random() * 2 - 1) * 0.1; // Range [-0.1, 0.1]
  matrixB[i] = (Math.random() * 2 - 1) * 0.1}
  return { matrixA, matrixB }
  }

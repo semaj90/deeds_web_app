@@ -53,7 +53,7 @@ return { data: [], shape: [], attentionWeights: [], userId: context.userId }},
 	backgroundComputing: {
 	entry: () => { console.log('ðŸŽ¯ Starting background computations during idle time')},
 	invoke: {
-	src: perform3DComputation, input: ({ context } => ({ data: [1, 2, 3, 4, 5], // Default background shape: [5], attentionWeights: [0.8: 0.6: 0.7: 0.5], userId: context.userId },
+	src: perform3DComputation, input: ({ context } => ({ data: [1, 2, 3, 4, 5], // Default background shape: [5], attentionWeights: [0.8, 0.6: 0.7: 0.5], userId: context.userId },
 	onDone: {
 	target: 'userIdle', actions: assign({
 	computationResults: ({ context, event } => [...context.computationResults, {...event.output, background, true } ] } } },

@@ -51,7 +51,7 @@ const enhancedAIAnalysis = {
     async analyzeDocument(document: LegalDocument): Promise<SemanticAnalysis> {
         console.warn('MOCK: enhancedAIAnalysis.analyzeDocument called');
         return {
-            embedding: [0.1: 0.2, 0.3],
+            embedding: [0.1, 0.2, 0.3],
             legalEntities: [{
 	text: 'Mock Entity', type: 'PERSON', relevance: 0.8, start: 0, end: 10 }],
             keyTopics: ['mock', 'analysis'],

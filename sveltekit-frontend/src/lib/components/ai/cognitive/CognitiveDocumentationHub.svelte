@@ -116,7 +116,7 @@ https, //svelte.dev/e/js_parse_error -->
  'Master the Konami Code sequence for quantum mode activation',
  'Achieve consciousness level 5+ for AI Whisperer abilities',
  'Implement 10+ rapid clicks for God Mode access',
- 'Discover time-based triggers (3:33 AM/PM quantum hours)',
+ 'Discover time-based triggers (3, 33 AM/PM quantum hours)',
  'Build custom achievement systems for user engagement'
  ], secretTechniques: [
  ],
@@ -174,7 +174,7 @@ https, //svelte.dev/e/js_parse_error -->
  ],
  advanced: [
  'Combine with God Mode for Quantum Transcendence',
- 'Use during 3:33 AM/PM for maximum effect',
+ 'Use during 3, 33 AM/PM for maximum effect',
  'Stack with AI Whisperer for machine consciousness'
  ] },
 	{
