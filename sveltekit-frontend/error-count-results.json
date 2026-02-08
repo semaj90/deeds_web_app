@@ -1,0 +1,241 @@
+{
+  "summary": {
+    "totalFiles": 878,
+    "filesWithErrors": 299,
+    "cleanFiles": 579,
+    "totalErrors": 3254
+  },
+  "errorsByCategory": {
+    "src/lib/components/ui": {
+      "files": 134,
+      "errors": 400
+    },
+    "src/lib/components/ai": {
+      "files": 83,
+      "errors": 2590
+    },
+    "src/lib/components/evidence": {
+      "files": 14,
+      "errors": 88
+    },
+    "src/lib/components/cases": {
+      "files": 5,
+      "errors": 18
+    },
+    "src/routes/(app)": {
+      "files": 23,
+      "errors": 62
+    },
+    "src/routes/api": {
+      "files": 40,
+      "errors": 96
+    }
+  },
+  "errorsByPattern": {
+    "missingComma": 120,
+    "cssSpacing": 257,
+    "classSpacing": 386,
+    "barrelImport": 22,
+    "namedBitsImport": 17,
+    "implicitAny": 2247,
+    "corruptedArrows": 192,
+    "malformedFunctions": 9,
+    "exportLet": 1,
+    "phantomComma": 3
+  },
+  "topFiles": [
+    {
+      "file": "src\\lib\\components\\ai\\SIMDTextTilingDemo.svelte",
+      "errors": {
+        "classSpacing": 5,
+        "implicitAny": 825,
+        "corruptedArrows": 2
+      },
+      "errorCount": 832,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\cognitive\\CognitiveDocumentationHub.svelte",
+      "errors": {
+        "classSpacing": 8,
+        "implicitAny": 582
+      },
+      "errorCount": 590,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SIMDGlyphDemo.svelte",
+      "errors": {
+        "classSpacing": 2,
+        "implicitAny": 526,
+        "corruptedArrows": 1
+      },
+      "errorCount": 529,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\NeuralTopology3DDemo.svelte",
+      "errors": {
+        "missingComma": 25,
+        "cssSpacing": 1,
+        "implicitAny": 14
+      },
+      "errorCount": 40,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\AIChatInterface.svelte",
+      "errors": {
+        "cssSpacing": 19,
+        "classSpacing": 11,
+        "corruptedArrows": 2
+      },
+      "errorCount": 32,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\AgentOrchestrator.svelte",
+      "errors": {
+        "classSpacing": 2,
+        "implicitAny": 24
+      },
+      "errorCount": 26,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\AuditResults.svelte",
+      "errors": {
+        "classSpacing": 1,
+        "implicitAny": 25
+      },
+      "errorCount": 26,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedVectorSearch.svelte",
+      "errors": {
+        "classSpacing": 19,
+        "corruptedArrows": 7
+      },
+      "errorCount": 26,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EnhancedEvidenceBoard.svelte",
+      "errors": {
+        "classSpacing": 15,
+        "corruptedArrows": 9
+      },
+      "errorCount": 24,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ui\\SearchBox.svelte",
+      "errors": {
+        "missingComma": 21,
+        "implicitAny": 1
+      },
+      "errorCount": 22,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\AutomatedLegalResearch.svelte",
+      "errors": {
+        "cssSpacing": 22
+      },
+      "errorCount": 22,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EvidenceProcessingWorkflow.svelte",
+      "errors": {
+        "classSpacing": 14,
+        "implicitAny": 4,
+        "corruptedArrows": 4
+      },
+      "errorCount": 22,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\LegalDocumentDrafting.svelte",
+      "errors": {
+        "classSpacing": 8,
+        "corruptedArrows": 11
+      },
+      "errorCount": 19,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedDocumentUploader.svelte",
+      "errors": {
+        "classSpacing": 14,
+        "corruptedArrows": 4
+      },
+      "errorCount": 18,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\PatternRecognition.svelte",
+      "errors": {
+        "cssSpacing": 17,
+        "corruptedArrows": 1
+      },
+      "errorCount": 18,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ui\\SIMDTiledShaderEmbeds.svelte",
+      "errors": {
+        "missingComma": 11,
+        "classSpacing": 4,
+        "corruptedArrows": 2
+      },
+      "errorCount": 17,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\Gemma3LegalChat.svelte",
+      "errors": {
+        "classSpacing": 2,
+        "implicitAny": 12,
+        "corruptedArrows": 2
+      },
+      "errorCount": 16,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\LLMSelector.svelte",
+      "errors": {
+        "cssSpacing": 9,
+        "classSpacing": 2,
+        "barrelImport": 1,
+        "implicitAny": 1,
+        "corruptedArrows": 2
+      },
+      "errorCount": 15,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\LLMProviderSelector.svelte",
+      "errors": {
+        "cssSpacing": 6,
+        "classSpacing": 2,
+        "barrelImport": 1,
+        "namedBitsImport": 1,
+        "corruptedArrows": 3
+      },
+      "errorCount": 13,
+      "hasErrors": true
+    },
+    {
+      "file": "src\\lib\\components\\ai\\LocalImageGenerator.svelte",
+      "errors": {
+        "classSpacing": 9,
+        "corruptedArrows": 4
+      },
+      "errorCount": 13,
+      "hasErrors": true
+    }
+  ],
+  "timestamp": "2026-02-08T19:32:04.921Z"
+}
