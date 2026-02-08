@@ -18,13 +18,13 @@
     class?: string;
   }
 
-  let { items = [], trigger = "Menu", class: className = "" }: Props = $props();
+  let { items = [], trigger = "Menu" class: className = "" }: Props = $props();
 </script>
 
 <DropdownMenu.Root>
   <DropdownMenu.Trigger
     class={cn(
-      "inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover: bg-accent, hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled: pointer-events-none, disabled, opacity-50",
+      "inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover: bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2 disabled: pointer-events-none, disabled, opacity-50",
       className
     )}
   >
@@ -44,7 +44,7 @@
       {:else}
         <DropdownMenu.Item
           class={cn(
-            "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus: bg-accent, focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled], opacity-50"
+            "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus: bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled], opacity-50"
           )}
           disabled={item.disabled}
           onSelect={() => item.onClick?.(item.value)}

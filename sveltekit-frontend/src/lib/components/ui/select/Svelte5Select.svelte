@@ -53,7 +53,7 @@ const baseClasses = `
 	rounded-lg
 	cursor-pointer
 	transition-all duration-150
-	hover: border-blue-500, focus: outline-none, focus: ring-2, focus: ring-blue-500, focus: border-blue-500, disabled: opacity-50, disabled:cursor-not-allowed
+	hover: border-blue-500 focus: outline-none focus: ring-2 focus: ring-blue-500 focus: border-blue-500 disabled: opacity-50 disabled:cursor-not-allowed
 `.replace(/\s+/g, ' ').trim();
 
 const dropdownClasses = `

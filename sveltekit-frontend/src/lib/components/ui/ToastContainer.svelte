@@ -1,7 +1,7 @@
 <script lang="ts">
   import { toastStore, type Toast } from '$lib/stores/unified';
 
-  // helper: build, class: string safely to avoid inline expression parsing issues
+  // helper: build class: string safely to avoid inline expression parsing issues
   function toastClass(t: Toast) {
     return [
       'toast-item',

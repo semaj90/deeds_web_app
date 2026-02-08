@@ -148,7 +148,7 @@
 				onclick={(e) => e.stopPropagation()}
 				onkeydown={(e) => e.stopPropagation()}
 				transition:scale={{
-	duration: 300, easing: backOut }}
+	duration: 300 easing: backOut }}
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="modal-title"

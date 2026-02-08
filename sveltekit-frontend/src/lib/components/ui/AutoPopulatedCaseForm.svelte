@@ -30,7 +30,7 @@
 		form?: AutoPopulatedForm;
 		metadata?: AIMetadata;
 		onSubmit?: (form: AutoPopulatedForm) => void;
-		onFieldChange?: (field: string, value: any) => void;
+		onFieldChange?: (field: string value: any) => void;
 		class?: string;
 		editable?: boolean;
 	}
@@ -57,7 +57,7 @@
 
 	// Sync form prop to localForm
 	$effect(() => {
-		localForm = { ...form, charges: form.charges || [], witnesses: form.witnesses || [] };
+		localForm = { ...form charges: form.charges || [] witnesses: form.witnesses || [] };
 	});
 
 	$effect(() => {
@@ -105,7 +105,7 @@
 		localForm.source = 'ai';
 	}
 
-	function handleFieldChange(field: string, value: any): void {
+	function handleFieldChange(field: string value: any): void {
 		(localForm as any)[field] = value;
 		localForm.source = 'mixed';
 		if (typeof field === 'string') {
@@ -130,7 +130,7 @@
 		}
 	}
 
-	function updateCharge(index: number, value: string) {
+	function updateCharge(index: number value: string) {
 		if (localForm.charges) {
 			localForm.charges = localForm.charges.map((c, i) => (i === index ? value : c));
 		}
@@ -149,7 +149,7 @@
 		}
 	}
 
-	function updateWitness(index: number, value: string) {
+	function updateWitness(index: number value: string) {
 		if (localForm.witnesses) {
 			localForm.witnesses = localForm.witnesses.map((w, i) => (i === index ? value : w));
 		}

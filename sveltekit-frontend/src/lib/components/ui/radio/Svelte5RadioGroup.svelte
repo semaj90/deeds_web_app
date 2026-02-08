@@ -76,7 +76,7 @@ function getOptionClasses(option: RadioOption) {
 			transition-all duration-150
 			${isSelected
 				? 'border-blue-500 bg-blue-900/20'
-				: 'border-slate-600, hover:border-slate-500'}
+				: 'border-slate-600 hover:border-slate-500'}
 			${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
 		`;
 	}
@@ -86,7 +86,7 @@ function getOptionClasses(option: RadioOption) {
 			flex items-center gap-3 p-2
 			border-2 border-white cursor-pointer
 			font-["Press_Start_2P",monospace] text-sm
-			${isSelected ? 'bg-blue-600' : 'bg-slate-900, hover:bg-slate-800'}
+			${isSelected ? 'bg-blue-600' : 'bg-slate-900 hover:bg-slate-800'}
 			${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
 		`;
 	}

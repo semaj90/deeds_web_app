@@ -26,7 +26,7 @@
 		onValueChange?.(v);
 	}
 
-	function registerItem(itemValue: string, text: string) {
+	function registerItem(itemValue: string text: string) {
 		items.set(itemValue, text);
 		items = new Map(items);
 	}
@@ -36,7 +36,7 @@
 		items = new Map(items);
 	}
 
-	function isItemVisible(itemValue: string, text: string): boolean {
+	function isItemVisible(itemValue: string text: string): boolean {
 		if (!searchValue.trim()) return true;
 		const search = searchValue.toLowerCase();
 		return (

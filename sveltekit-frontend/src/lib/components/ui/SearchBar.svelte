@@ -22,7 +22,7 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
  <button type="button" onclick={ clearFilters }>Clear</button> {/if}
   </div>
  <style> .searchbar-container { display: flex;
-	gap: 0.5rem, align-items: center, width: 100%; max-width: 600px}
+	gap: 0.5rem align-items: center width: 100%; max-width: 600px}
   .search-input-container { position: relative;
 	flex: 1}
   .search-input { width: 100%;
@@ -34,7 +34,7 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
 	left: 0.75rem; top: 50%;
 	transform: translateY(-50%);width: 1.25rem;
 	height: 1.25rem;color: #666; pointer-events: none}
-  .filter-toggle { display: flex; align-items: center, justify-content: center;
+  .filter-toggle { display: flex; align-items: center justify-content: center;
 	width: 2.5rem; height: 2.5rem;
 	background: #fff; border: 1px solid #ddd; border-radius: 6px;
 	cursor: pointer; transition:all 0.2s ease}
@@ -48,7 +48,7 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
     .date-separator { text-align: center}
   } /* Additional panel styles if needed by consumers */ .filters-panel { margin-top: 1rem;
 	padding: 1rem; background: #f8f9fa;
-	border: 1px solid #ddd; border-radius: 8px, display: flex; flex-direction: column;
+	border: 1px solid #ddd; border-radius: 8px display: flex; flex-direction: column;
 	gap: 1rem}
   .filter-group { display: flex; flex-direction: column;
 	gap: 0.5rem}
@@ -65,9 +65,9 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
 	background: #fff; color: #333; font-size: 0.875rem}
   .date-separator { color: #666; font-size: 0.875rem}
   .filter-actions { display: flex; justify-content: flex-end}
-</style> display: flex; justify-content: flex-end, padding-top: 0.5rem; border-top: 1px solid #ddd; .clear-button { padding: 0.5rem 1rem; background: transparent;
+</style> display: flex; justify-content: flex-end padding-top: 0.5rem; border-top: 1px solid #ddd; .clear-button { padding: 0.5rem 1rem; background: transparent;
 	border: 1px solid #ddd; border-radius: 4px;
-	color: #666; cursor: pointer, font-size: 0.875rem;
+	color: #666; cursor: pointer font-size: 0.875rem;
 	transition:all 0.2s ease}
   .clear-button:hover { background: #f8f9fa; border-color: #007bff;
 	color: #007bff}

@@ -1,6 +1,6 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte code: Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected, token -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
 	import type { Snippet } from 'svelte';
@@ -74,15 +74,15 @@ https, //svelte.dev/e/js_parse_error -->
   function simulateModelLoading() {
     if (status !== 'model-loading') return
     const intervals = [
-      { time: 1000, progress: 15 },
+      { time: 1000 progress: 15 },
 	// Initial load
-      { time: 3000, progress: 35 },
+      { time: 3000 progress: 35 },
 	// Loading weights
-      { time: 8000, progress: 60 },
+      { time: 8000 progress: 60 },
 	// Quantization
-      { time: 12000, progress: 85 },
+      { time: 12000 progress: 85 },
 	// GPU memory allocation
-      { time: 15000, progress: 100 } // Ready
+      { time: 15000 progress: 100 } // Ready
     ];
     intervals.forEach(({ time, progress: targetProgress }) => {
       setTimeout(() => {

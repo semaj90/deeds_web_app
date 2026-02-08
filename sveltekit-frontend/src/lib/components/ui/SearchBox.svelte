@@ -150,30 +150,30 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div>
 <style>
   .search-container {
-    position: relative, width: 100%; max-width: 600px
+    position: relative width: 100%; max-width: 600px
    ; margin: 0 auto
     font-family: 'Press Start 2P', monospace}
   .search-field {
     margin-bottom: 0}
   .search-label {
     display: flex
-    align-items: center, gap: 8px
+    align-items: center gap: 8px
     margin-bottom: 8px
-    font-size: 12px, color: #212529}
+    font-size: 12px color: #212529}
   .search-input-wrapper {
-    position: relative, display: flex
+    position: relative display: flex
     align-items: center}
   .search-input { flex: 1
     padding-right: 80px
     font-family: 'Press Start 2P', monospace
     font-size: 10px}
   .clear-btn {
-    position: absolute, right: 40px, top: 50%;
-	transform: translateY(-50%);width: 32px, height: 32px, padding: 0
+    position: absolute right: 40px top: 50%;
+	transform: translateY(-50%);width: 32px height: 32px padding: 0
     font-size: 16px
-    line-height: 1, border: 2px solid #dc3545}
+    line-height: 1 border: 2px solid #dc3545}
   .loading-indicator {
-    position: absolute, right: 8px, top: 50%;
+    position: absolute right: 8px top: 50%;
 	transform: translateY(-50%);animation: bounce 1s infinite}
   @keyframes bounce {
     0%, 20%, 50%, 80%; } 100% {
@@ -184,8 +184,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       transform: translateY(-55%)}
   }
   .results-container {
-    position: absolute, top: 100%;
-	left: 0, right: 0
+    position: absolute top: 100%;
+	left: 0 right: 0
     z-index: 1000
    ;background: white
     margin-top: 8px
@@ -194,21 +194,21 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .loading-message,
   .no-results {
     display: flex
-    align-items: center, gap: 8px, padding: 16px
+    align-items: center gap: 8px padding: 16px
     justify-content: center
-    font-size: 10px, color: #6c757d}
+    font-size: 10px color: #6c757d}
   .results-header {
     display: flex
-    align-items: center, gap: 8px, padding: 8px 16px
+    align-items: center gap: 8px padding: 8px 16px
     border-bottom: 2px solid #dee2e6
-    font-size: 10px, color: #495057, background: #f8f9fa}
+    font-size: 10px color: #495057 background: #f8f9fa}
   .results-list {
     max-height: 300px
     overflow-y: auto}
   .result-item {
-    width: 100%; text-align: left, border: none
+    width: 100%; text-align: left border: none
     border-bottom: 1px solid #dee2e6
-    margin: 0, cursor: pointer, transition:background-color 0.2s}
+    margin: 0 cursor: pointer transition:background-color 0.2s}
   .result-item:hover {
     background: #e9ecef}
   .result-item:last-child {
@@ -217,10 +217,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     padding: 12px}
   .result-title {
     font-size: 10px
-    font-weight: bold, color: #212529
+    font-weight: bold color: #212529
     margin-bottom: 4px}
   .result-snippet {
-    font-size: 8px, color: #6c757d
+    font-size: 8px color: #6c757d
     line-height: 1.4
     margin-bottom: 8px}
   .result-metadata {
@@ -229,12 +229,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     margin-bottom: 4px}
   .case-tag,
   .type-tag {
-    font-size: 8px, padding: 2px 6px
-    border-radius: 2px, background: #e9ecef, color: #495057}
+    font-size: 8px padding: 2px 6px
+    border-radius: 2px background: #e9ecef color: #495057}
   .case-tag {
-    background: #d1ecf1, color: #0c5460}
+    background: #d1ecf1 color: #0c5460}
   .type-tag {
-    background: #d4edda, color: #155724}
+    background: #d4edda color: #155724}
   .similarity-score {
     font-size: 8px
    ;color: #007bff
@@ -246,7 +246,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .search-input {
       font-size: 8px}
     .results-container {
-      position: fixed, top: auto, left: 16px
+      position: fixed top: auto left: 16px
      ;right: 16px
       max-height: 50vh}
   }

@@ -14,13 +14,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	}: Props = $props();
 
 	let open = $state(false);
-	let position = $state({ x: 0, y: 0 });
+	let position = $state({ x: 0 y: 0 });
 
 	function setOpen(value: boolean) {
 		open = value;
 	}
 
-	function setPosition(x: number, y: number) {
+	function setPosition(x: number y: number) {
 		position = { x, y };
 	}
 

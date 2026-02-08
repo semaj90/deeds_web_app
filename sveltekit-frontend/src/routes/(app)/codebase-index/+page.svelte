@@ -148,7 +148,7 @@
 				<label class="text-sm text-slate-400">Role:</label>
 				<select
 					bind:value={selectedRole}
-					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus: border-cyan-500, focus:outline-none"
+					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus:border-cyan-500 focus:outline-none"
 				>
 					<option value="all">All Roles</option>
 					<option value="route">Routes</option>
@@ -162,7 +162,7 @@
 				<label class="text-sm text-slate-400">Risk:</label>
 				<select
 					bind:value={selectedRisk}
-					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus: border-cyan-500, focus:outline-none"
+					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus:border-cyan-500 focus:outline-none"
 				>
 					<option value="all">All Risk Levels</option>
 					<option value="high">High Risk</option>

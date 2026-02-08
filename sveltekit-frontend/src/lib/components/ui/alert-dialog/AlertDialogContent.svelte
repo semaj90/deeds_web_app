@@ -60,7 +60,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		bind:this={contentRef}
 		class="{defaultClass} { className }"
 		transition:scale={{
-	duration: 150, start: 0.95 }}
+	duration: 150 start: 0.95 }}
 		onkeydown={ handleKeydown }
 		role="alertdialog"
 		aria-modal="true"

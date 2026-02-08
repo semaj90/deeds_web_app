@@ -15,7 +15,7 @@
 	let { message, analyticsLog = () => {} }: Props = $props();
   $effect(() => {
     if (message && message.content) {
-      analyticsLog({ event: 'chat_message_rendered', role: message.role, timestamp: Date.now() })}
+      analyticsLog({ event: 'chat_message_rendered' role: message.role timestamp: Date.now() })}
   });
 </script>
 <div

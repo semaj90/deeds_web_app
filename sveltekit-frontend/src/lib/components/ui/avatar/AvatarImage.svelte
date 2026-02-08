@@ -6,7 +6,7 @@
  [key: string]: any;
  }
 
- let { src = '', alt = '', class: className = '', ...rest }: Props = $props();
+ let { src = '', alt = '' class: className = '', ...rest }: Props = $props();
 </script>
 
 <img

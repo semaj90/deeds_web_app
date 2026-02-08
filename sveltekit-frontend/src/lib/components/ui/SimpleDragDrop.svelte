@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <!-- Simple HTML5 Drag and Drop Component Modern Svelte, 5 implementation with gaming, aesthetics --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import Upload from 'lucide-svelte/icons/upload';
+<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <!-- Simple HTML5 Drag and Drop Component Modern Svelte, 5 implementation with gaming, aesthetics --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import Upload from 'lucide-svelte/icons/upload';
 import File from 'lucide-svelte/icons/file';
 import X from 'lucide-svelte/icons/x';
 interface Props { accept?: string; multiple?: boolean; maxSize?: number; disabled?: boolean; onFilesSelected?: (files: File[]) => void; onError?: (error: string) => void}
@@ -59,11 +59,11 @@ interface Props { accept?: string; multiple?: boolean; maxSize?: number; disable
 	color: var(--yorha-text-primary, #e0e0e0); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px}
   .upload-description { color: var(--yorha-text-muted, #b0b0b0); margin-bottom: 16px; font-size: 14px}
   .upload-specs { display: flex;
-	gap: 12px, font-size: 12px;
+	gap: 12px font-size: 12px;
 	color: var(--yorha-text-muted, #808080)}
   .spec { background: var(--yorha-bg-tertiary, #2a2a2a); padding: 4px 8px; border-radius: 4px;
 	border: 1px solid var(--yorha-border, #606060)}
-  /* Processing State */ .processing-state { display: flex; flex-direction: column, align-items: center;
+  /* Processing State */ .processing-state { display: flex; flex-direction: column align-items: center;
 	gap: 16px}
   .loading-spinner { width: 40px;
 	height: 40px;border: 4px solid rgba(60, 188, 252, 0.3); border-top: 4px solid var(--nes-blue, #3cbcfc); border-radius: 50%;
@@ -79,14 +79,14 @@ interface Props { accept?: string; multiple?: boolean; maxSize?: number; disable
 	transition:all 0.2s ease}
   .file-item:hover { background: var(--yorha-bg-primary, #0a0a0a); transform: translateX(4px)}
   .file-icon { color: var(--nes-green, #92cc41); flex-shrink: 0 }
-  .file-info { flex: 1, display: flex; flex-direction: column;
+  .file-info { flex: 1 display: flex; flex-direction: column;
 	gap: 2px}
   .file-name { font-size: 14px;
 	color: var(--yorha-text-primary, #e0e0e0); font-weight: 500}
   .file-size { font-size: 12px;
 	color: var(--yorha-text-muted, #b0b0b0)}
   .remove-file { background: none;
-	border: none;color: var(--nes-red, #f83800); cursor: pointer;padding: 4px, border-radius: 4px;
+	border: none;color: var(--nes-red, #f83800); cursor: pointer;padding: 4px border-radius: 4px;
 	transition:all 0.2s ease}
   .remove-file:hover { background: rgba(248, 56, 0, 0.1); transform: scale(1.1)}
   /* Animations */ @keyframes pulse-glow { from { box-shadow: 0 0 20px rgba(247, 209, 29, 0.3)}

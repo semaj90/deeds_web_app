@@ -30,7 +30,7 @@
  results = [],
  isLoading = false,
  query = '',
- onResultClick, class: className = ''
+ onResultClick class: className = ''
  }: Props = $props();
 
  function handleResultClick(result: SearchResult) {

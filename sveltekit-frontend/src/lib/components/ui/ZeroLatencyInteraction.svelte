@@ -1,6 +1,6 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte code: Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected, token -->
 <script lang="ts">
   // Migrated to $effect
   import { nesGPUBridge } from '$lib/gpu/nes-gpu-memory-bridge';
@@ -34,7 +34,7 @@ https, //svelte.dev/e/js_parse_error -->
     zeroLatencyHits: 0
   });
   let trackedElements = new Set<HTMLElement>();
-  let mousePosition = { x: 0, y: 0 };
+  let mousePosition = { x: 0 y: 0 };
   let observer: MutationObserver | null = null
   $effect(() => {
 
@@ -89,7 +89,7 @@ https, //svelte.dev/e/js_parse_error -->
 
     element.classList.add('zero-latency-enabled');
     element.setAttribute('data-chr-rom-ready', 'true')}
-  async function handleZeroLatencyInteraction(_event: Event, elementId: string, target: HTMLElement): Promise<any> {
+  async function handleZeroLatencyInteraction(_event: Event, elementId: string target: HTMLElement): Promise<any> {
     const startTime = performance.now();
     interactionStats.totalInteractions++;
 
@@ -98,7 +98,7 @@ https, //svelte.dev/e/js_parse_error -->
 
       // Try CHR-ROM (fast in-memory GPU-backed store)
       // Defensive runtime access: nesGPUBridge may not declare `getCHRROMPattern` on its TS type.
-      // Cast, to: any, verify it's a function and support sync or async results.'
+      // Cast to: any, verify it's a function and support sync or async results.'
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const _getCHRROMPattern = (nesGPUBridge as any).getCHRROMPattern
       let chrRomPattern: unknown = undefined
@@ -137,7 +137,7 @@ https, //svelte.dev/e/js_parse_error -->
       console.warn('Zero-latency interaction failed:', error);
       await handleCacheMiss(elementId, target, startTime)}
   }
-  async function handleCacheMiss(elementId: string, target: HTMLElement, startTime: number): Promise<any> {
+  async function handleCacheMiss(elementId: string target: HTMLElement, startTime: number): Promise<any> {
     interactionStats.cacheMisses++;
     try {
       showLoadingTooltip(target);
@@ -156,7 +156,7 @@ https, //svelte.dev/e/js_parse_error -->
       console.error('API fallback failed:', error);
       showErrorTooltip(target)}
   }
-  function showInstantTooltip(html: string, target: HTMLElement, responseTime: number) {
+  function showInstantTooltip(html: string target: HTMLElement, responseTime: number) {
     hideTooltip();
     const tooltip = document.createElement('div');
     tooltip.className = 'chr-rom-tooltip zero-latency-tooltip';
@@ -203,7 +203,7 @@ https, //svelte.dev/e/js_parse_error -->
     const toRemove = currentTooltip
     currentTooltip = null
     setTimeout(() => toRemove.remove(), 200)}
-  function positionTooltip(tooltip: HTMLElement, target: HTMLElement) {
+  function positionTooltip(tooltip: HTMLElement target: HTMLElement) {
     // ensure tooltip is measurable
     tooltip.style.position = 'absolute';
     tooltip.style.left = '0px';
@@ -234,9 +234,9 @@ https, //svelte.dev/e/js_parse_error -->
     const p = pattern as any;
     try {
       const chrRomPattern = {
-        renderableHTML: String(p.renderableHTML || ''), type: p.type || 'summary_card',
+        renderableHTML: String(p.renderableHTML || '') type: p.type || 'summary_card',
         priority: 4,
-	compressedData: new TextEncoder().encode(String(p.renderableHTML || '')), timestamp: Date.now()
+	compressedData: new TextEncoder().encode(String(p.renderableHTML || '')) timestamp: Date.now()
       };
       // nesGPUBridge's exported type may not declare storeCHRROMPattern.'
       // call it defensively at runtime to avoid TS errors while preserving behavior.
@@ -246,7 +246,7 @@ https, //svelte.dev/e/js_parse_error -->
     } catch (error) {
       console.warn('Failed to store pattern in CHR-ROM:', error)}
   }
-  async function cacheApiResult(elementId: string, html: string): Promise<any> {
+  async function cacheApiResult(elementId: string html: string): Promise<any> {
     try {
       const chrRomPattern = {
         renderableHTML: html,

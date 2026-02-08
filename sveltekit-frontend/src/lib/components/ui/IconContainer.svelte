@@ -9,7 +9,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 	}
 
-	let { icon: Icon, class: className = '', size = 'md' }: Props = $props();
+	let { icon: Icon class: className = '', size = 'md' }: Props = $props();
 
 	const sizeClasses: Record<string, string> = {
 		xs: 'h-3 w-3',

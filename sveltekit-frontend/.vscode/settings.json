@@ -66,11 +66,15 @@
   ],
   "typescript.inlayHints.variableTypes.enabled": true,
   // ========================================
-  // GITHUB COPILOT AUTO-FIX SETTINGS
+  // GITHUB COPILOT ENHANCED SETTINGS
   // ========================================
   "github.copilot.editor.enableAutoCompletions": true,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": true,
+  "github.copilot.chat.history.maxSize": 100,
+  "github.copilot.chat.followUps": "always",
+  "github.copilot.referencesUsed": "panelWithReferences",
+  "github.copilot.chat.scopeSelection": true,
   "editor.acceptSuggestionOnCommitCharacters": true,
   "editor.inlineSuggest.enabled": true,
   "files.autoSave": "afterDelay",

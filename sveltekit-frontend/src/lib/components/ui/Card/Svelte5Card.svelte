@@ -47,7 +47,7 @@ let paddingClasses = $derived({
 
 let interactiveClasses = $derived(
 	isClickable
-		? 'cursor-pointer transition-all duration-200 hover: border-blue-500, hover: shadow-lg, active:scale-[0.98]'
+		? 'cursor-pointer transition-all duration-200 hover: border-blue-500 hover: shadow-lg active:scale-[0.98]'
 		: ''
 );
 </script>

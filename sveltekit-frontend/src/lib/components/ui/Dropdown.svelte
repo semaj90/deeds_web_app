@@ -65,7 +65,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       onclick|stopPropagation
       onkeydown={(e) => {
         if (e.key === 'Escape') close()}}
-      style={`position: absolute, top: 100%; z-index: 60, ${menuPosition}`}
+      style={`position: absolute top: 100%; z-index: 60, ${menuPosition}`}
       transition:fly={{
 	y: -6; duration: 140 }}
     >

@@ -20,10 +20,10 @@
   }: Props = $props();
 
   const themes: Array<{ id: Theme; label: string; icon: string }> = [
-    { id: 'light', label: 'Light', icon: '☀️' },
-    { id: 'dark', label: 'Dark', icon: '🌙' },
-    { id: 'yorha', label: 'YoRHa', icon: '🤖' },
-    { id: 'nier', label: 'Nier', icon: '⚔️' }
+    { id: 'light' label: 'Light' icon: '☀️' },
+    { id: 'dark' label: 'Dark' icon: '🌙' },
+    { id: 'yorha' label: 'YoRHa' icon: '🤖' },
+    { id: 'nier' label: 'Nier' icon: '⚔️' }
   ];
 
   function handleThemeChange(theme: Theme) {

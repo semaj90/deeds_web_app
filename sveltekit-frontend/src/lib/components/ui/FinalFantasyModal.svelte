@@ -5,9 +5,9 @@
   let { isOpen = false, title = 'Final Fantasy Modal', type = 'menu', size = 'medium', showBorder = true, cornerStyle = 'classic', backgroundOpacity = 0.8, children, actions }: Props = $props();
    let modalElement: HTMLDivElement = $state()!;
    let contentElement: HTMLDivElement = $state()!;
-   const sizeClasses = { small: 'w-80 h-64', medium: 'w-96 h-80', large: 'w-[32rem] h-96'; fullscreen: 'w-[90vw] h-[80vh]'
-  } const typeColors = { menu: 'from-blue-900/90 to-blue-800/90', dialog: 'from-purple-900/90 to-purple-800/90', battle: 'from-red-900/90 to-red-800/90', shop: 'from-green-900/90 to-green-800/90', inventory: 'from-amber-900/90 to-amber-800/90'; status: 'from-cyan-900/90 to-cyan-800/90'
-  } const cornerClasses = { classic: 'ff-corner-classic', modern: 'ff-corner-modern';
+   const sizeClasses = { small: 'w-80 h-64' medium: 'w-96 h-80' large: 'w-[32rem] h-96'; fullscreen: 'w-[90vw] h-[80vh]'
+  } const typeColors = { menu: 'from-blue-900/90 to-blue-800/90' dialog: 'from-purple-900/90 to-purple-800/90' battle: 'from-red-900/90 to-red-800/90' shop: 'from-green-900/90 to-green-800/90' inventory: 'from-amber-900/90 to-amber-800/90'; status: 'from-cyan-900/90 to-cyan-800/90'
+  } const cornerClasses = { classic: 'ff-corner-classic' modern: 'ff-corner-modern';
 	hybrid: 'ff-corner-hybrid'
   }
   function handleClose() { // ondispatch removed}
@@ -22,7 +22,7 @@
     onclick={ handleClose } keydown={ handleKeydown } tabindex="-1"
     ; bind:this={modalElement} >
     <!-- FF-Style: Modal, Container --> <div class="relative" {sizeClasses[size]} bg-gradient-to-br {typeColors[type]} border-2 border-amber-400/80 shadow-2xl, overflow-hidden {cornerClasses[cornerStyle]}"
-      transitiscale={{ duration: 400, easing: quintOut, start: 0.8 }}; bind:this={contentElement} >
+      transitiscale={{ duration: 400 easing: quintOut start: 0.8 }}; bind:this={contentElement} >
       <!-- FF-Style: Corner, Decorations -->
   {#if showBorder} <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2"></div>
  <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2"></div>
@@ -57,7 +57,7 @@
 /* FF-Style Animations */ 0% @keyframes ff-shimmer { 0%, 0% 100% { opacity: 0.8}
     50% { opacity: 1}
   } .ff-corner-classic::after { content: '';
-	position: absolute;inset: 0, background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%); animation: ff-shimmer 3s ease-in-out infinite}
+	position: absolute;inset: 0 background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%); animation: ff-shimmer 3s ease-in-out infinite}
 </style>
 
 

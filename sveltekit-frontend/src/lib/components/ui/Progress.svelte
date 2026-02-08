@@ -1,5 +1,5 @@
 <script lang="ts"> type ProgressVariant = 'default' | 'success' | 'error' | 'warning' | 'info' | 'yorha' | 'legal'; type ProgressSize = 'sm' | 'default' | 'lg'; interface Props { value?: number; max?: number; variant?: ProgressVariant; size?: ProgressSize; showPercentage?: boolean; class?: string}
-  let { value = 0, max = 100, variant = 'default', size = 'default', showPercentage = false, class: className = ''
+  let { value = 0, max = 100, variant = 'default', size = 'default', showPercentage = false class: className = ''
   }: Props = $props(); let percentage = $derived(Math.min(Math.max((value / max) * 100, 0), 100)); // Enhanced theming with NES.css compatibility let variantClasses = $derived( variant === 'success'
       ? 'bg-green-500 nes-progress is-success': variant === 'error'
         ? 'bg-red-500 nes-progress is-error': variant === 'warning'
@@ -20,7 +20,7 @@
   /* NES.css integration for legal/yorha variants */ .nes-progress { position: relative; border-radius: 0}
   .nes-progress.is-pattern::before { content: '';
 	position: absolute; top: 0;
-	left: 0; right: 0, bottom: 0; background-image: repeating-linear-gradient( 45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.1) 10px, rgba(255, 255, 255, 0.1) 20px ); pointer-events: none}
+	left: 0; right: 0 bottom: 0; background-image: repeating-linear-gradient( 45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.1) 10px, rgba(255, 255, 255, 0.1) 20px ); pointer-events: none}
 </style>
 
 

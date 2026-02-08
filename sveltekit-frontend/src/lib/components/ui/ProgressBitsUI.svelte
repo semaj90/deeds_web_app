@@ -7,7 +7,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     variant?: 'default' | 'success' | 'error' | 'warning' | 'yorha' | 'legal';
     class?: string
     showPercentage?: boolean}
-  let { value = 0, max = 100, variant = 'default', class: className = '', showPercentage = false }: Props = $props();
+  let { value = 0, max = 100, variant = 'default' class: className = '', showPercentage = false }: Props = $props();
   // reactive percentage using Svelte, 5 runes
   let percentage = $derived(Math.min(Math.max((value / (max || 1)) * 100, 0), 100));
   

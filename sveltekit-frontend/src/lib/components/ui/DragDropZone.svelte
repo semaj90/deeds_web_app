@@ -4,10 +4,10 @@
  let isDragOver = $state<boolean>(false);
    let errors = $state<string[]>([]);
    const allowedTypes = {
-    'image/*': { icon Image, label: 'Images' },
-	'application/pdf': { icon FileText, label: 'PDF Documents' },
-	'text/*': { icon FileText, label: 'Text Files' },
-	'*/*': { icon Upload, label: 'Any File' } }; function handleDragOver(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = true; dragActive = true; onFileHover?.(true)}
+    'image/*': { icon Image label: 'Images' },
+	'application/pdf': { icon FileText label: 'PDF Documents' },
+	'text/*': { icon FileText label: 'Text Files' },
+	'*/*': { icon Upload label: 'Any File' } }; function handleDragOver(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = true; dragActive = true; onFileHover?.(true)}
   function handleDragLeave(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = false; dragActive = false; onFileHover?.(false)}
   function handleDrop(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = false; dragActive = false; onFileHover?.(false);
    const files = Array.from(e.dataTransfer?.files ?? []); processFiles(files)}
@@ -50,13 +50,13 @@
   {#each Array.isArray(errors) ? errors: [] as error} <div class="error-item"> <AlertCircle class="w-4" /> { error } </div> {/each} {/if}
   </div>
  <style> .file-input-hidden { display: none}
-  .drag-drop-zone { border: 2px dashed var(--border-color, #cbd5e0); border-radius: 12px, padding: 2rem, text-align: center;
+  .drag-drop-zone { border: 2px dashed var(--border-color, #cbd5e0); border-radius: 12px padding: 2rem text-align: center;
 	cursor: pointer; transition:all 0.3s ease; background: var(--bg-primary, #ffffff)}
   .drag-drop-zone:hover:not(.disabled) { border-color: var(--accent-primary, #3b82f6); background: var(--bg-secondary, #f7fafc)}
   .drag-drop-zone.drag-over { border-color: var(--accent-primary, #3b82f6); background: var(--accent-primary-10, rgba(59, 130, 246, 0.1)); transform: scale(1.02)}
   .drag-drop-zone.disabled { opacity: 0.6;
 	cursor:not-allowed}
-  .upload-content { display: flex; flex-direction: column, align-items: center;
+  .upload-content { display: flex; flex-direction: column align-items: center;
 	gap: 1.5rem}
   .upload-icon-container { color: var(--text-secondary, #718096)}
   .upload-icon { display: flex; align-items: center; justify-content: center}

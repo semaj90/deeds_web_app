@@ -80,7 +80,7 @@
 
     // Problems panel configuration
     "problems.autoReveal": true,
-    "problems.defaultViewMode": "list",
+    "problems.defaultViewMode": "table",
     "problems.showCurrentInStatus": true,
 
     // Terminal configuration
@@ -88,13 +88,13 @@
     "powershell.cwd": "Main Project",
     "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
     "powershell.developer.editorServicesWaitForDebugger": true,
-    "chat.agent.thinking.collapsedTools": "all",
+    "chat.agent.thinking.collapsedTools": "off",
     "editor.inlineSuggest.edits.showCollapsed": false,
     "editor.inlineSuggest.showToolbar": "onHover",
     "notebook.diff.experimental.toggleInline": false,
     "inlineChat.enableV2": true,
     "inlineChat.lineEmptyHint": true,
-    "github.copilot.chat.completionsFetcher": "",
+    "github.copilot.chat.completionsFetcher": "node-fetch",
     "github.copilot.chat.languageContext.inline.typescript.enabled": true,
     "github.copilot.chat.editor.temporalContext.enabled": true,
     "github.copilot.chat.languageContext.typescript.enabled": true,
@@ -105,6 +105,21 @@
     "editor.codeActions.triggerOnFocusChange": true,
     "terminal.integrated.enableImages": true,
     "editor.inlineSuggest.suppressInSnippetMode": false,
+    "geminicodeassist.updateChannel": "Default",
+    "geminicodeassist.inlineSuggestions.suggestionSpeed": "Slow",
+    "geminicodeassist.inlineSuggestions.enableAuto": false,
+    "chat.detectParticipant.enabled": false,
+    "terminal.integrated.customGlyphs": true,
+    "github.copilot.chat.agent.autoFix": true,
+    "github.copilot.chat.anthropic.contextEditing.enabled": true,
+    "github.copilot.chat.anthropic.tools.websearch.enabled": true,
+    "github.copilot.chat.anthropic.tools.websearch.maxUses": 7,
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.copilotMemory.enabled": true,
+    "github.copilot.chat.nesFetcher": "node-fetch",
+    "github.copilot.chat.switchAgent.enabled": true,
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "github.copilot.chat.languageContext.typescript.includeDocumentation": true,
   },
 
   "extensions": {
@@ -118,8 +133,7 @@
       "ms-vscode.vscode-eslint",
       "esbenp.prettier-vscode",
       "octref.vetur",
-      "bradlc.vscode-tailwindcss",
-      "undefined_publisher.mcp-context7-assistant"
+      "bradlc.vscode-tailwindcss"
     ]
   },
 
@@ -158,7 +172,9 @@
         "options": {
           "cwd": "${workspaceFolder}/sveltekit-frontend"
         },
-        "problemMatcher": ["$tsc", "$svelte-check"]
+        "problemMatcher": [
+          "$tsc"
+        ]
       },
       {
         "label": "Fix TypeScript Errors",

@@ -37,7 +37,7 @@
     variant = 'inline'
   }: Props = $props();
 
-  const progressTween = tweened(0, { duration: 300, easing: cubicOut });
+  const progressTween = tweened(0, { duration: 300 easing: cubicOut });
   let startTime = Date.now();
   let elapsedTime = $state<number>(0);
   let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -184,7 +184,7 @@
 
         {#if operation && status === 'loading'}
           <div class="mt-2">
-            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium {operation === 'ai' ? 'bg-blue-100 text-blue-800 dark: bg-blue-900, dark:text-blue-200' : operation === 'gpu' ? 'bg-purple-100 text-purple-800 dark: bg-purple-900, dark:text-purple-200' : operation === 'cpu' ? 'bg-orange-100 text-orange-800 dark: bg-orange-900, dark:text-orange-200' : 'bg-green-100 text-green-800 dark: bg-green-900, dark:text-green-200'}">
+            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium {operation === 'ai' ? 'bg-blue-100 text-blue-800 dark: bg-blue-900 dark:text-blue-200' : operation === 'gpu' ? 'bg-purple-100 text-purple-800 dark: bg-purple-900 dark:text-purple-200' : operation === 'cpu' ? 'bg-orange-100 text-orange-800 dark: bg-orange-900 dark:text-orange-200' : 'bg-green-100 text-green-800 dark: bg-green-900 dark:text-green-200'}">
               {operation.toUpperCase()} Processing
             </span>
           </div>

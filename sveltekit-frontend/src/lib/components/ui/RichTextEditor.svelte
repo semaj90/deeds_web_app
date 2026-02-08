@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported interface Props { content?: unknown; placeholder?: unknown; editable?: unknown; showToolbar?: unknown; autoSave?: unknown; autoSaveDelay?: unknown}
+<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported interface Props { content?: unknown; placeholder?: unknown; editable?: unknown; showToolbar?: unknown; autoSave?: unknown; autoSaveDelay?: unknown}
   let { content = "", placeholder = "Start writing your note...", editable = true, showToolbar = true, autoSave = false, autoSaveDelay = 2000 }: Props = $props();
  import { Editor } from "@tiptap/core";
  import Image from "@tiptap/extension-image";
@@ -38,7 +38,7 @@
    const json = editor.getJSON();
    const markdown = htmlToMarkdown(html); ondispatch?.({ html, markdown, json })}
 
-  // Public methods export function getContent() { if (!editor ?? !isReady) return { html: "", markdown: "";
+  // Public methods export function getContent() { if (!editor ?? !isReady) return { html: "" markdown: "";
 	json: null } const html = editor.getHTML();
    const json = editor.getJSON();
    const markdown = htmlToMarkdown(html); return { html, markdown, json } }
@@ -63,7 +63,7 @@
  <!-- Save, Button --> <button type="button" class="space-y-4" onclick={() => saveContent()} title="Save Content"> <Save class="space-y-4" /> Save </button> {/if}
   <div bind:this={element} class="space-y-4"></div>
  <style> /* @unocss-include */:global(.ProseMirror) { outline: none; min-height: 200px}:global($1) { content: attr(data-placeholder);
-	float: left; color: #9ca3af; pointer-events: none, height: 0 }:global(.ProseMirror img) { max-width: 100%, height: auto, border-radius: 0.5rem;
+	float: left; color: #9ca3af; pointer-events: none height: 0 }:global(.ProseMirror img) { max-width: 100% height: auto border-radius: 0.5rem;
 	margin: 0.5rem 0}:global(.ProseMirror h1) { font-size: 1.875rem; font-weight: 700;
 	margin: 1rem, 0 0.5rem 0; line-height: 1.2}:global(.ProseMirror h2) { font-size: 1.5rem; font-weight: 600;
 	margin: 1rem, 0 0.5rem 0; line-height: 1.3}:global(.ProseMirror h3) { font-size: 1.25rem; font-weight: 600;

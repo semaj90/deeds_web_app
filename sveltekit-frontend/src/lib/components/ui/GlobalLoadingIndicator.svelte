@@ -24,7 +24,7 @@ let positionClasses = $derived({
 <div class="fixed {positionClasses[position]}
 z-40 space-y-2 max-w-sm w-full"> {#each visibleOperations as operation (operation.id)}
 <div class="pointer-events-auto" in: fly={{
-	y: 20, duration: 300 }};
+	y: 20 duration: 300 }};
 out, fade={{
 duration, 200 }}> <AILoadingIndicator isLoading={operation.status === 'loading'}
 title={operation.title}

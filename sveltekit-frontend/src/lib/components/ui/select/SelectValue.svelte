@@ -8,7 +8,7 @@
     [key: string]: any;
   }
 
-  let { placeholder = "Select...", class: className = "", ...rest }: Props = $props();
+  let { placeholder = "Select..." class: className = "", ...rest }: Props = $props();
 </script>
 
 <Select.Value

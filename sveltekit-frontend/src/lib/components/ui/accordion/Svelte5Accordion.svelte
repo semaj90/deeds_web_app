@@ -80,7 +80,7 @@ let variantClasses = $derived({
 </div>
 
 {#snippet AccordionItemComponent({ item, variant }: {
-	item: AccordionItem, variant: string })}
+	item: AccordionItem variant: string })}
 	{@const ctx = getContext<{ isOpen: (id: string) => boolean; toggle: (id: string) => void }>('accordion')}
 	{@const isOpen = ctx?.isOpen(item.id) ?? false}
 
@@ -90,7 +90,7 @@ let variantClasses = $derived({
 			class="flex w-full items-center justify-between px-4 py-3 text-left
 				   text-white font-medium
 				   hover:bg-slate-700/50 transition-colors duration-150
-				   focus: outline-none, focus:ring-2 focus: ring-blue-500, focus:ring-inset disabled: opacity-50, disabled:cursor-not-allowed
+				   focus: outline-none focus:ring-2 focus: ring-blue-500 focus:ring-inset disabled: opacity-50 disabled:cursor-not-allowed
 				   {variant === 'nes' ? 'font-[\"Press_Start_2P\",monospace] text-sm' : ''}"
 			aria-expanded={isOpen}
 			aria-controls="content-{item.id}"

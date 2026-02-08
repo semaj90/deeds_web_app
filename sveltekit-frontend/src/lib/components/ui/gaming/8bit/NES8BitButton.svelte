@@ -27,15 +27,15 @@
 
  const variantColors = {
  primary: {
-	bg: '#e4a672', shadow: '#b07a4a', text: '#2d1b0e' },
+	bg: '#e4a672' shadow: '#b07a4a' text: '#2d1b0e' },
 	secondary: {
-	bg: '#6b7280', shadow: '#4b5563', text: '#ffffff' },
+	bg: '#6b7280' shadow: '#4b5563' text: '#ffffff' },
 	info: {
-	bg: '#60a5fa', shadow: '#3b82f6', text: '#1e3a5f' },
+	bg: '#60a5fa' shadow: '#3b82f6' text: '#1e3a5f' },
 	warning: {
-	bg: '#fbbf24', shadow: '#d97706', text: '#451a03' },
+	bg: '#fbbf24' shadow: '#d97706' text: '#451a03' },
 	danger: {
-	bg: '#f87171', shadow: '#dc2626', text: '#450a0a' }
+	bg: '#f87171' shadow: '#dc2626' text: '#450a0a' }
  };
 
  const sizeStyles = {
@@ -65,7 +65,7 @@
  relative font-bold uppercase tracking-wider
  {sizeStyles[size]}
  transition-transform duration-75
- disabled: opacity-50, disabled:cursor-not-allowed
+ disabled: opacity-50 disabled:cursor-not-allowed
  { className }
  "
  style="
@@ -75,7 +75,7 @@
  box-shadow: {isPressed ? 'none' : `4px 4px 0 ${colors.shadow}`};
  transform: {isPressed ? 'translate(2px, 2px)' : 'translate(0, 0)'};
  image-rendering: pixelated;
- font-family: 'Press Start 2P', monospace: system-ui;
+ font-family: 'Press Start 2P' monospace: system-ui;
  "
 >
  <!-- Pixel highlight -->

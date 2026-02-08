@@ -16,17 +16,17 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   let searchQuery = $state<string>('');
   // Sample data for legal app
   const caseTypes = [
-    { value: 'criminal', label: 'Criminal Law' },
-	{ value: 'civil', label: 'Civil Litigation' },
-	{ value: 'corporate', label: 'Corporate Law' },
-	{ value: 'family', label: 'Family Law' },
-	{ value: 'intellectual', label: 'Intellectual Property' },
-	{ value: 'employment', label: 'Employment Law' }
+    { value: 'criminal' label: 'Criminal Law' },
+	{ value: 'civil' label: 'Civil Litigation' },
+	{ value: 'corporate' label: 'Corporate Law' },
+	{ value: 'family' label: 'Family Law' },
+	{ value: 'intellectual' label: 'Intellectual Property' },
+	{ value: 'employment' label: 'Employment Law' }
   ];
   const sampleCases = [
-    { id: '1', name: 'Smith vs. Johnson', type: 'Civil Litigation', status: 'Active' },
-	{ id: '2', name: 'Corporate Merger - TechCorp', type: 'Corporate Law', status: 'Pending' },
-	{ id: '3', name: 'Patent Dispute - Innovation Inc', type: 'Intellectual Property', status: 'Active' }
+    { id: '1' name: 'Smith vs. Johnson' type: 'Civil Litigation' status: 'Active' },
+	{ id: '2' name: 'Corporate Merger - TechCorp' type: 'Corporate Law' status: 'Pending' },
+	{ id: '3' name: 'Patent Dispute - Innovation Inc' type: 'Intellectual Property' status: 'Active' }
   ];
   function handleCreateCase() {
     console.log('Creating caseItem:', { caseName, clientName, selectedCaseType });

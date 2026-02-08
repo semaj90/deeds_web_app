@@ -61,7 +61,7 @@
   let files = $state<UploadedFile[]>([]);
   let inputRef: HTMLInputElement;
 
-  const fileTypeIcons: Record<UploadedFile['type'], string> = {
+  const fileTypeIcons: Record<string, string> = {
     pdf: '📄',
     video: '🎬',
     image: '🖼️',
@@ -70,7 +70,7 @@
     unknown: '📁'
   };
 
-  function detectFileType(file: File): UploadedFile['type'] {
+  function detectFileType(file: File): string {
     const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
     const mimeType = file.type.toLowerCase();
 
@@ -218,7 +218,7 @@
       return {
         ...baseMetadata,
         scenes: [{
-	description: 'Indoor scene with multiple subjects',
+          description: 'Indoor scene with multiple subjects',
           objects: ['desk', 'computer', 'documents'],
           actions: ['sitting', 'reading'],
           confidence: 0.87
@@ -252,7 +252,7 @@
     files = files.map(f => f.id === fileId ? { ...f, progress } : f);
   }
 
-  function updateFileStatus(fileId: string, status: UploadedFile['status']) {
+  function updateFileStatus(fileId: string, status: string) {
     files = files.map(f => f.id === fileId ? { ...f, status } : f);
   }
 

@@ -1,8 +1,8 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class'; https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { marked } from "marked";
+<!-- @migration-task Error while migrating Svelte code: Unexpected; keyword, 'class'; https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte code: Unexpected; keyword, 'class' --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { marked } from "marked";
  // Migrated to $effect interface Props { markdown?: string; class?: string; unsafe?: boolean; // Allow raw HTML in markdown baseUrl?: string; breaks?: boolean; // Convert \n to <br> }
   let { markdown = "", class = "", unsafe = false, baseUrl = "", breaks = true }: Props = $props();
    let renderedHtml = $state<string >("");
-   let isClient = $state<boolean>(false); // Configure marked options const markedOptions = { breaks, gfm: true, // GitHub Flavored Markdown headerIds: false, mangle: false, sanitize: !unsafe, smartLists: true;
+   let isClient = $state<boolean>(false); // Configure marked options const markedOptions = { breaks, gfm: true, // GitHub Flavored Markdown headerIds: false mangle: false sanitize: !unsafe, smartLists: true;
 	smartypants: true baseUrl }
   $effect(() => { isClient = true; renderMarkdown()});
   async function renderMarkdown(): Promise<any> { if (!markdown) { renderedHtml = ""; return}
@@ -30,11 +30,11 @@
   /* Lists */:global(.prose ul, .prose ol) { margin-top: 0; margin-bottom: 1rem; padding-left: 1.5rem}:global(.prose li) { margin: 0.25rem 0}:global(.prose li > p) { margin: 0}
   /* Code */:global(.prose code) { color: #db2777; background-color: #f3f4f6;
 	padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-size: 0.875em}:global(.dark .prose code) { color: #f472b6; background-color: #1f2937}:global(.prose pre) { background-color: #f3f4f6; border-radius: 0.5rem;
-	padding: 1rem; overflow-x: auto, margin: 1rem 0}:global(.dark .prose pre) { background-color: #1f2937}:global(.prose pre code) { background-color: transparent;
+	padding: 1rem; overflow-x: auto margin: 1rem 0}:global(.dark .prose pre) { background-color: #1f2937}:global(.prose pre code) { background-color: transparent;
 	padding: 0;color: inherit}
-  /* Tables */:global(.prose table) { width: 100%; border-collapse: collap, margin: 1rem 0}:global(.prose th, .prose td) { border: 1px solid #d1d5db; padding: 0.5rem; text-align: left}:global(.dark .prose th, .dark .prose td) { border-color: #4b5563}:global(.prose th) { background-color: #f3f4f6; font-weight: 600}:global(.dark .prose th) { background-color: #1f2937}
+  /* Tables */:global(.prose table) { width: 100%; border-collapse: collap margin: 1rem 0}:global(.prose th, .prose td) { border: 1px solid #d1d5db; padding: 0.5rem; text-align: left}:global(.dark .prose th, .dark .prose td) { border-color: #4b5563}:global(.prose th) { background-color: #f3f4f6; font-weight: 600}:global(.dark .prose th) { background-color: #1f2937}
   /* Blockquotes */:global(.prose blockquote) { border-left: 4px solid #3b82f6; padding-left: 1rem;
-	margin: 1rem 0; font-style: italic, color: #4b5563}:global(.dark .prose blockquote) { border-left-color: #60a5fa;
+	margin: 1rem 0; font-style: italic color: #4b5563}:global(.dark .prose blockquote) { border-left-color: #60a5fa;
 	color: #9ca3af}
   /* Links */:global(.prose a) { color: #2563eb, text-decoration underli}:global($1) { color: #1d4ed8}:global(.dark .prose a) { color: #60a5fa}:global($1) { color: #93c5fd}
   /* Images */:global(.prose img) { border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)}

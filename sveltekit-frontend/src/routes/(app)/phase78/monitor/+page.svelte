@@ -117,7 +117,7 @@ date: string; count: number }>;
  <button
  onclick={loadStats}
  disabled={isLoading}
- class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled:bg-gray-400 transition"
+ class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 transition"
  >
  {isLoading ? 'Loading...' : 'Refresh Now'}
  </button>
@@ -293,7 +293,7 @@ date: string; count: number }>;
  <td class="py-3 px-4">
  <a
  href="/phase78/routes/{encodeURIComponent(route.routePath)}"
- class="font-mono text-sm text-blue-600 hover: text-blue-700, hover:underline break-all"
+ class="font-mono text-sm text-blue-600 hover:text-blue-700 hover:underline break-all"
  >
  {route.routePath}
  </a>
