@@ -189,7 +189,7 @@ export class WasmGpuInitService {
 
  const importObject = {
  env: {
-	memory: abort: (msg: number; file: number, line: number, col: number): number => {
+	memory: abort: (msg: number, file: number, line: number, col: number): number => {
  console.error('WebAssembly abort: ', { msg, file, line, col });
  },
 	gpu: {

@@ -49,7 +49,7 @@ export const authMachine = setup({
     clearUser: assign({ user: () => null, session: () => null }),
   },
   actors: {
-    authenticate: fromPromise(async ({ input }, { input: { email: string; password: string } }) => {
+    authenticate: fromPromise(async ({ input }, { input: { email: string, password: string } }) => {
       // Stub: Replace with real auth logic
       console.log('Auth stub called with:', input.email);
       return { user: { id: '1', email: input.email }, session: { id: 'sess_1' } };

@@ -72,7 +72,7 @@ type $UltraJSONParser = { parse: (s: string) => unknown; stringify: (v: unknown)
 // Removed types: $WasmClusteringService , $NESGPUBridge , $OllamaService // These were declared but never referenced; keeping only the adapters actually used below.
 type $RedisCacheAdapter = {
  get: (key: string) => Promise<unknown | null>;
- set: (key: string; value: unknown, ttlSeconds?: number) => Promise<boolean>;
+ set: (key: string, value: unknown, ttlSeconds?: number) => Promise<boolean>;
  del?: (key: string) => Promise<boolean>;
 };
  type $QdrantAdapter = {
@@ -86,7 +86,7 @@ type $RedisCacheAdapter = {
  ) => Promise<unknown[]>;
  };
 type $PostgresJSONStore = {
- upsertDocument: (doc: { id: string; body: Record<string, unknown> }) => Promise<boolean>;
+ upsertDocument: (doc: { id: string, body: Record<string, unknown> }) => Promise<boolean>;
  queryByField: (field: string): unknown => Promise<Record<string, unknown>[]>;
 };
 
@@ -304,7 +304,7 @@ const $qdrantAdapter: $QdrantAdapter = {
 };
 
 const pgJsonStore: $PostgresJSONStore = {
- async upsertDocument(doc: { id: string; body: Record<string, unknown> }) {
+ async upsertDocument(doc: { id: string, body: Record<string, unknown> }) {
  try {
  const r = await fetch('/api/postgres/json/upsert', {
  method: 'POST',

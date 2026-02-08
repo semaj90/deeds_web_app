@@ -15,7 +15,7 @@ type QdrantSearchResult<T = Record<string, unknown>> = {
 };
 
 type QdrantClient = {
-    indexCollection: (name: string; vectors: QdrantVectorPayload[]) => Promise<void>;
+    indexCollection: (name: string, vectors: QdrantVectorPayload[]) => Promise<void>;
     search: <T = Record<string, unknown>>(
         collection: string,
         vector: number[],

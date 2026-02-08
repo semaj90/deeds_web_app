@@ -4,7 +4,7 @@ class SimpleCacheManager {
     private cache = new Map<string, { data: unknown;
 	expires: number }>();
 
-    async set(key: string; data: Record<string, unknown>, options: {
+    async set(key: string, data: Record<string, unknown>, options: {
 	ttl: number } = { ttl: 24 * 3600 * 1000 }): Promise<void> {
         this.cache.set(key, { data, expires: Date.now() + options.ttl });
     }

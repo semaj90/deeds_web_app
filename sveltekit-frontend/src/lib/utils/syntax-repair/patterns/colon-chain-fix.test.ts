@@ -291,7 +291,7 @@ describe('Colon-Chain Fix Patterns', () => {
       const { result } = fixColonChains(input);
       // Note: The general pattern fixes to comma, which is also valid TypeScript
       // The interface-specific pattern would use semicolons but has lower priority
-      expect(result).toBe('interface Props { name: String; age: Number }');
+      expect(result).toBe('interface Props { name: String, age: Number }');
     });
 
     it('should fix corrupted type definition', () => {
@@ -300,7 +300,7 @@ describe('Colon-Chain Fix Patterns', () => {
       const { result } = fixColonChains(input);
       // Note: The general pattern fixes to comma, which is also valid TypeScript
       // The type-specific pattern would use semicolons but has lower priority
-      expect(result).toBe('type Config = { host: String; port: Number }');
+      expect(result).toBe('type Config = { host: String, port: Number }');
     });
 
     it('should fix corrupted object destructuring', () => {
@@ -336,7 +336,7 @@ describe('Colon-Chain Fix Patterns', () => {
     });
 
     it('should not break valid type annotations', () => {
-      const input = 'function foo(a: string; b: number): void {}';
+      const input = 'function foo(a: string, b: number): void {}';
       const { result } = fixColonChains(input);
       expect(result).toBe(input);
     });

@@ -182,7 +182,7 @@ export const legalFormMachine = setup({
  }); on: {
  UPDATE_CASE_DETAILS: {
  actions: assign({
- caseTitle: ({ event }) => (event.type === 'UPDATE_CASE_DETAILS' ? event.title : ''; caseDescription: ({ event }) =>
+ caseTitle: ({ event }) => (event.type === 'UPDATE_CASE_DETAILS' ? event.title : '', caseDescription: ({ event }) =>
  event.type === 'UPDATE_CASE_DETAILS' ? event.description : ''; confidence: ({ context: event }) => {
  if (event.type === 'UPDATE_CASE_DETAILS') {
  const hasDetail = event.description.length > 50;

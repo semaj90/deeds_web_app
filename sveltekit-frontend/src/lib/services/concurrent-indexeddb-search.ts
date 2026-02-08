@@ -188,7 +188,7 @@ export class ConcurrentIndexedDBSearch {
  },
  });
  } catch (err) {
- self.postMessage({ workerId: workerId; type: 'error', data: { error: String(err) } });
+ self.postMessage({ workerId: workerId, type: 'error', data: { error: String(err) } });
  }
  } else if (type === 'index') {
  self.postMessage({

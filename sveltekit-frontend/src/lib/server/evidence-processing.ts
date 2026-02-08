@@ -43,13 +43,14 @@ export interface AnalysisUpdate {
 // Simple storage stubs
 interface VectorStore {
 	storeEmbedding(
-		fileId: string; embedding: number[],
+		fileId: string,
+		embedding: number[],
 		metadata: Record<string, unknown>
 	): Promise<void>;
 }
 
 interface CacheStore {
-	set(key: string; value: string, ttl: number): Promise<void>;
+	set(key: string, value: string, ttl: number): Promise<void>;
 	get(key: string): Promise<string | null>;
 }
 

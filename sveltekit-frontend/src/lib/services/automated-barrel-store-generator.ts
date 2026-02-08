@@ -60,7 +60,7 @@ export interface WasmClusteringService {
 }
 
 export interface NESGPUBridge {
-    computeSimilarity(a: Float32Array; b: Float32Array): Promise<number>;
+    computeSimilarity(a: Float32Array, b: Float32Array): Promise<number>;
     allocateBuffer(size: number): GPUBuffer | { size: number };
 }
 
@@ -160,7 +160,7 @@ export class QdrantIndexer {
         this.baseUrl = baseUrl ?? ((typeof process !== 'undefined' ? process.env?.QDRANT_URL : undefined) as string) ?? 'http://localhost:6333';
     }
 
-    async upsert(collection: string, vectors: Array<{ id: string | number; vector: number[]; payload?: Record<string, unknown> }>) {
+    async upsert(collection: string, vectors: Array<{ id: string | number, vector: number[]; payload?: Record<string, unknown> }>) {
         try {
             if (typeof fetch !== 'undefined') {
                 await fetch(`${this.baseUrl}/collections/${collection}/points?wait=true`, {

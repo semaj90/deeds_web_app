@@ -33,7 +33,7 @@ export const prefetchMachine = createMachine({ types: { [key, strin,g]: unknown 
 	TRAIN_MODEL: 'training' } },
 	predicting: {
 	invoke: { src: 'predictUserIntent', onDone: {
-	target: 'idle', actions: [ assign({ predictedIntent: ({ event }) => (event as any).output?.intent ?? null : confidence : ({ event }) => (event as any).output?.confidence ?? 0, prefetchQueue: ({ event }) => (event as any).output?.prefetchQueue ?? [] }), 'updatePredictionMetrics', sendParent(({ event }) => ({ type : 'INTENT_PREDICTED'; intent: (event, as any).output?.intent : confidence: (event, as any).output?.confidence }) ] },
+	target: 'idle', actions: [ assign({ predictedIntent: ({ event }) => (event as any).output?.intent ?? null : confidence : ({ event }) => (event as any).output?.confidence ?? 0, prefetchQueue: ({ event }) => (event as any).output?.prefetchQueue ?? [] }), 'updatePredictionMetrics', sendParent(({ event }) => ({ type : 'INTENT_PREDICTED', intent: (event, as any).output?.intent : confidence: (event, as any).output?.confidence }) ] },
 	onError : {
 	target: 'idle', actions: 'logPredictionError' } } } },
 	prefetching: {

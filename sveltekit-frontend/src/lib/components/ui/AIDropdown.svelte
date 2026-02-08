@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import * as DropdownMenu from "bits-ui/components/dropdown-menu";
+  import { DropdownMenu } from "bits-ui";
   import Brain from "lucide-svelte/icons/brain";
   import ChevronDown from "lucide-svelte/icons/chevron-down";
   import FileText from "lucide-svelte/icons/file-text";

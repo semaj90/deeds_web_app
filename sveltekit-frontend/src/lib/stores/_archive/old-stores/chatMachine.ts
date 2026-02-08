@@ -303,7 +303,7 @@ event.type === 'NEW_CONVERSATION'
 	STREAM_ERROR: {
 	target: 'error',
  actions: assign({
-	error: ({ event }) => (event.type === 'STREAM_ERROR' ? event.error : null; stream: () => null,
+	error: ({ event }) => (event.type === 'STREAM_ERROR' ? event.error : null, stream: () => null,
  }),
  },
 	},

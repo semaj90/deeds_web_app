@@ -251,7 +251,7 @@ obj?.title ?? '',
 		return this.evidenceCollection.find({ type });
 	}
 
-	public getEvidenceByDateRange(startDate: string; endDate: string): LokiEvidence[] {
+	public getEvidenceByDateRange(startDate: string, endDate: string): LokiEvidence[] {
 		if (!this.evidenceCollection) return [];
 		return this.evidenceCollection.where((obj: LokiEvidence) => {
 			const createdAt = new Date(obj.timeline?.createdAt ?? 0);

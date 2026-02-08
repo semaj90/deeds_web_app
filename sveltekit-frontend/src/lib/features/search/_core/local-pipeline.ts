@@ -36,7 +36,7 @@ class TinyTTLCache<V> {
 
 interface RedisClient {
     get: (key: string) => MaybePromise<string | null>;
-    setex?: (key: string; seconds: number, value: string) => MaybePromise<string | number | void>;
+    setex?: (key: string, seconds: number, value: string) => MaybePromise<string | number | void>;
     set?: (key: string, value: string) => MaybePromise<string | number | void>;
     expire?: (key: string, seconds: number) => MaybePromise<string | number | void>;
 }

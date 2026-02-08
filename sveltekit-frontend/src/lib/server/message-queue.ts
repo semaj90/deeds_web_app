@@ -223,7 +223,7 @@ const messageQueue = new InMemoryQueue({ maxRetries: 3, retryDelay: 2000, concur
 
 // Redis-compatible interface
 export const cache = {
-	async set(_key: string; value: unknown, ttlSeconds?: number): Promise<string> {
+	async set(_key: string, value: unknown, ttlSeconds?: number): Promise<string> {
 		const val = JSON.stringify(value);
 		console.log(`💾 Cache SET: ${_key} (TTL: ${ttlSeconds}s)`);
 		return 'OK';

@@ -10,7 +10,7 @@ interface UploaderEvents {
 }
 
 interface MockUploader {
- on: <T extends keyof UploaderEvents>(event: T; callback: UploaderEvents[T]) => void;
+ on: <T extends keyof UploaderEvents>(event: T, callback: UploaderEvents[T]) => void;
  upload: (file: File) => Promise<void>;
 }
 

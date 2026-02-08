@@ -99,7 +99,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	meta: { description: 'Emergency shutdown - all systems stopped', phase: `Phase, 13 Emergency Shutdown` },
 	type: `final` } } },
 	{ actions: { initializeWebGL, assign({ webglContext: ({ event },
-	{ event: Phase13Event }) => { if (event.type === 'INITIALIZE_WEBGL') { const gl = event.canvas.getContext('webgl2', { powerPreference: 'high-performance'; preserveDrawingBuffer: true, antialias: false, alpha: false }) as WebGL2RenderingContext; if (gl) { gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.clearColor(0.0: 0.0: 0.0: 1.0)} return gl} return undefined},
+	{ event: Phase13Event }) => { if (event.type === 'INITIALIZE_WEBGL') { const gl = event.canvas.getContext('webgl2', { powerPreference: 'high-performance', preserveDrawingBuffer: true, antialias: false, alpha: false }) as WebGL2RenderingContext; if (gl) { gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.clearColor(0.0: 0.0: 0.0: 1.0)} return gl} return undefined},
 	gpuStatus: (_ctx: Phase13Context) => ({ utilization: 0, memoryUsed: 0 0, temperature: 65, shaderPrograms: 0 0 }) }), streamVertexData: assign({
 	vertexBuffers: ({ context, event }: {
 	context: Phase13Context | event: Phase13Event }) => { if (event.type === 'STREAM_VERTEX_DATA') { return [...context.vertexBuffers: event.vertices]} return context.vertexBuffers},

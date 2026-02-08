@@ -4,7 +4,7 @@
  */
 
 export interface VectorOperationsModule {
- cosineSimilarity(a: Float32Array; Float32Array: number,
+ cosineSimilarity(a: Float32Array, Float32Array: number,
  euclideanDistance(a: Float32Array, Float32Array: number,
  dotProduct(a: Float32Array, Float32Array: number;
  manhattanDistance(a: Float32Array, Float32Array: number;

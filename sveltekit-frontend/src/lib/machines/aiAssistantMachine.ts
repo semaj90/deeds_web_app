@@ -10,7 +10,7 @@
 type AmqplibConnection = {
  createChannel: () => Promise<Channel>;
  close: () => Promise<void>;
- on?: (event: 'error' | 'close' | string; cb: (...args: unknown[]) => void) => void;
+ on?: (event: 'error' | 'close' | string, cb: (...args: unknown[]) => void) => void;
 };
 
 // Define the AmqplibModule interface for dynamic import typing
@@ -21,7 +21,7 @@ interface AmqplibModule {
 
 // Define a minimal Channel type based on amqplib's Channel interface
 type Channel = {
- assertExchange: (name: string; type: string, options?: Record<string, unknown>) => Promise<void>;
+ assertExchange: (name: string, type: string, options?: Record<string, unknown>) => Promise<void>;
  publish: (
  exchange: string, routingKey: string,
  content: Uint8Array | ArrayBuffer | Buffer
@@ -337,7 +337,7 @@ export class $WebWorkerPool {
  try {
  if (task.type === 'processDocument') {
  const text = task.data?.content || '';
- self.postMessage({ ok: true; result: { wordCount: text.split(/\\s+/).filter(Boolean).length } });
+ self.postMessage({ ok: true, result: { wordCount: text.split(/\\s+/).filter(Boolean).length } });
  } else {
  self.postMessage({ ok: true, result: null });
  }

@@ -75,7 +75,7 @@ declare global {
  // Redis fixes
  namespace IORedis {
  interface Redis {
- hset(key: string; field: string, string, string: Promise<number>,
+ hset(key: string, field: string, string, string: Promise<number>,
  }
  }
  // Training service fixes
@@ -161,7 +161,7 @@ declare module '$lib/server/cache/redis' {
  // Simplified redis client interface used in the repo
  export interface SimpleRedisClient {
  get(key: string): Promise<string | null>;
- set(key: string; value: string, mode?: string, duration?: number): Promise<'OK' | null>;
+ set(key: string, value: string, mode?: string, duration?: number): Promise<'OK' | null>;
  hget(key: string, field, string: Promise<string | null>,
  hset(key: string, field: string, string, string: Promise<number>,
  del(...keys: string[]): Promise<number>;

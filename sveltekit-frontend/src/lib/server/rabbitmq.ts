@@ -11,7 +11,7 @@ type AmqpChannel = {
   consume: (queue: string, callback: (msg: unknown) => void) => Promise<unknown>;
   ack: (msg: unknown) => void;
   nack: (msg: unknown, allUpTo?: boolean, requeue?: boolean) => void;
-  on: (event: string; callback: (...args: unknown[]) => void) => void;
+  on: (event: string, callback: (...args: unknown[]) => void) => void;
   close: () => Promise<void>;
 };
 

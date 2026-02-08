@@ -1,940 +1,372 @@
 {
-  "timestamp": "2026-02-08T23:28:25.634Z",
+  "timestamp": "2026-02-08T23:31:27.049Z",
   "dryRun": false,
   "filesProcessed": 3102,
-  "filesWithMatches": 788,
-  "totalFixes": 3887,
+  "filesWithMatches": 539,
+  "totalFixes": 1873,
   "fixedFiles": [
     {
-      "file": "src/lib/types/llm.ts",
-      "fixes": 57
-    },
-    {
-      "file": "src/lib/types/orchestration.ts",
-      "fixes": 50
-    },
-    {
-      "file": "src/lib/services/auto-attach-queue-manager.ts",
-      "fixes": 46
-    },
-    {
-      "file": "src/lib/features/workflows/legalCaseMachine.ts",
-      "fixes": 45
-    },
-    {
       "file": "src/lib/machines/legalCaseMachine.ts",
-      "fixes": 45
-    },
-    {
-      "file": "src/lib/types/gpu-cache-integration.ts",
-      "fixes": 39
-    },
-    {
-      "file": "src/lib/middleware/tfjs-synthesizer.ts",
-      "fixes": 34
-    },
-    {
-      "file": "src/lib/types/ai-workflows.ts",
       "fixes": 32
     },
     {
-      "file": "src/lib/services/types/service-types.ts",
+      "file": "src/lib/types/llm.ts",
       "fixes": 31
     },
     {
-      "file": "src/lib/types/ai-worker.ts",
-      "fixes": 29
+      "file": "src/lib/features/workflows/legalCaseMachine.ts",
+      "fixes": 30
     },
     {
-      "file": "src/lib/optimization/optimization-test-suite.ts",
-      "fixes": 28
+      "file": "src/lib/types/orchestration.ts",
+      "fixes": 30
     },
     {
-      "file": "src/lib/services/context-aware-ai-memory-types.ts",
-      "fixes": 27
-    },
-    {
-      "file": "src/lib/types/gpu-services.ts",
-      "fixes": 27
-    },
-    {
-      "file": "src/lib/types/state.ts",
-      "fixes": 27
-    },
-    {
-      "file": "src/lib/types/upload.ts",
-      "fixes": 27
-    },
-    {
-      "file": "src/lib/services/precedent-analysis-engine.ts",
-      "fixes": 25
-    },
-    {
-      "file": "src/lib/types/case.ts",
-      "fixes": 23
-    },
-    {
-      "file": "src/lib/types/rust-bridge.ts",
+      "file": "src/lib/services/auto-attach-queue-manager.ts",
       "fixes": 22
     },
     {
-      "file": "src/lib/services/production-monitoring-dashboard.ts",
+      "file": "src/lib/types/ai-workflows.ts",
+      "fixes": 22
+    },
+    {
+      "file": "src/lib/middleware/tfjs-synthesizer.ts",
       "fixes": 21
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/types.ts",
+      "file": "src/lib/services/types/service-types.ts",
       "fixes": 21
     },
     {
-      "file": "src/lib/types/common.ts",
-      "fixes": 21
-    },
-    {
-      "file": "src/lib/types/wasm-types.ts",
-      "fixes": 21
-    },
-    {
-      "file": "src/lib/stores/machines/types.ts",
+      "file": "src/lib/types/gpu-cache-integration.ts",
       "fixes": 20
     },
     {
-      "file": "src/lib/types/svelte5-patterns.d.ts",
+      "file": "src/lib/services/context-aware-ai-memory-types.ts",
       "fixes": 19
     },
     {
-      "file": "src/lib/services/production-pipeline-integration.ts",
-      "fixes": 18
-    },
-    {
-      "file": "src/lib/services/user-analytics-rl-integration.ts",
-      "fixes": 18
-    },
-    {
-      "file": "src/lib/caching/multi-dimensional-image-cache.ts",
+      "file": "src/lib/optimization/optimization-test-suite.ts",
       "fixes": 17
     },
     {
-      "file": "src/lib/features/workflows/predictive-typing-machine.ts",
+      "file": "src/lib/types/ai-worker.ts",
       "fixes": 17
     },
     {
-      "file": "src/lib/services/alert-center.ts",
+      "file": "src/lib/types/state.ts",
       "fixes": 17
     },
     {
-      "file": "src/lib/services/cuda-vector-integration.ts",
-      "fixes": 17
-    },
-    {
-      "file": "src/lib/services/system-integration.ts",
-      "fixes": 17
-    },
-    {
-      "file": "src/lib/services/_archive/caching-services-feb-7-2026/comprehensive-caching-architecture.ts",
+      "file": "src/lib/types/upload.ts",
       "fixes": 16
     },
     {
-      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/llamacpp-ollama-integration.ts",
-      "fixes": 16
+      "file": "src/lib/types/case.ts",
+      "fixes": 14
     },
     {
-      "file": "src/lib/services/gguf-runtime.ts",
-      "fixes": 16
+      "file": "src/lib/types/gpu-services.ts",
+      "fixes": 14
     },
     {
-      "file": "src/lib/services/llamacpp-ollama-integration.ts",
-      "fixes": 16
+      "file": "src/lib/types/rust-bridge.ts",
+      "fixes": 14
     },
     {
-      "file": "src/lib/services/yorha-detective-service.ts",
-      "fixes": 16
+      "file": "src/lib/types/wasm-types.ts",
+      "fixes": 14
     },
     {
       "file": "src/lib/types/canvas.ts",
-      "fixes": 16
-    },
-    {
-      "file": "src/lib/types/webgpu-extensions.d.ts",
-      "fixes": 16
-    },
-    {
-      "file": "src/lib/machines/predictive-typing-machine.ts",
-      "fixes": 15
-    },
-    {
-      "file": "src/lib/server/ai/embeddings-enhanced.ts",
-      "fixes": 15
-    },
-    {
-      "file": "src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts",
-      "fixes": 15
-    },
-    {
-      "file": "src/lib/services/legal-rag-embedding-orchestrator.ts",
-      "fixes": 15
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/legal-reports.ts",
-      "fixes": 15
-    },
-    {
-      "file": "src/lib/optimization/neural-memory-manager.ts",
-      "fixes": 14
-    },
-    {
-      "file": "src/lib/server/ai/legalbert-middleware.ts",
-      "fixes": 14
-    },
-    {
-      "file": "src/lib/services/autogen-gguf-orchestra.ts",
-      "fixes": 14
-    },
-    {
-      "file": "src/lib/services/redis-orchestrator.ts",
-      "fixes": 14
-    },
-    {
-      "file": "src/lib/services/unified-legal-simd-pgvector.ts",
-      "fixes": 14
-    },
-    {
-      "file": "src/lib/services/unsloth-finetuning.ts",
-      "fixes": 14
-    },
-    {
-      "file": "src/lib/types/component-props.ts",
-      "fixes": 14
-    },
-    {
-      "file": "src/lib/types/component-types.ts",
-      "fixes": 14
-    },
-    {
-      "file": "src/lib/components/ui/gaming/types/gaming-types.ts",
       "fixes": 13
     },
     {
-      "file": "src/lib/machines/index.ts",
-      "fixes": 13
+      "file": "src/lib/services/gguf-runtime.ts",
+      "fixes": 12
     },
     {
-      "file": "src/lib/machines/ingestion-workflow-machine.ts",
-      "fixes": 13
+      "file": "src/lib/services/user-analytics-rl-integration.ts",
+      "fixes": 12
     },
     {
-      "file": "src/lib/services/context7-flashattention-integration.ts",
-      "fixes": 13
+      "file": "src/lib/services/cuda-vector-integration.ts",
+      "fixes": 11
     },
     {
-      "file": "src/lib/services/grpc-quic-vector-proxy.ts",
-      "fixes": 13
+      "file": "src/lib/services/production-monitoring-dashboard.ts",
+      "fixes": 11
     },
     {
       "file": "src/lib/services/qlora-training-service.ts",
-      "fixes": 13
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/evidence-store.ts",
-      "fixes": 13
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/evidence.ts",
-      "fixes": 13
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/userDataStore.svelte.ts",
-      "fixes": 13
-    },
-    {
-      "file": "src/lib/orchestration/autoencoder-context-switcher.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/services/ai-error-fixer.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/services/clientSideGemma270m.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/services/optimized-qdrant-service.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/services/performance/TextureStreamingEvaluator.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/services/quic-neo4j-recommendations.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/services/simd-json-acceleration.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/services/unified-wasm-gpu-orchestrator.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/shims/missing-types-shim.d.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/state/phase13StateMachine.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/types.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/types/legal-ai.ts",
-      "fixes": 12
-    },
-    {
-      "file": "src/lib/client/ocr-tensor-processor.ts",
       "fixes": 11
     },
     {
-      "file": "src/lib/server/ai/legal-document-analyzer.ts",
+      "file": "src/lib/stores/_archive/old-stores/legal-reports.ts",
       "fixes": 11
     },
     {
-      "file": "src/lib/server/unified/legal-ai-service.ts",
+      "file": "src/lib/stores/_archive/old-stores/types.ts",
       "fixes": 11
     },
     {
-      "file": "src/lib/services/concurrent-indexeddb-search.ts",
+      "file": "src/lib/types/component-types.ts",
       "fixes": 11
     },
     {
-      "file": "src/lib/services/enhanced-nats-messaging.ts",
-      "fixes": 11
-    },
-    {
-      "file": "src/lib/services/nes-gpu-bridge_corrected.ts",
-      "fixes": 11
-    },
-    {
-      "file": "src/lib/services/unified-legal-cache-orchestrator.ts",
-      "fixes": 11
-    },
-    {
-      "file": "src/lib/services/vector-suggestions-service.ts",
-      "fixes": 11
-    },
-    {
-      "file": "src/lib/types/metrics.ts",
-      "fixes": 11
-    },
-    {
-      "file": "src/lib/components/three/yorha-ui/webgpu/YoRHaWebGPUMath.ts",
+      "file": "src/lib/caching/multi-dimensional-image-cache.ts",
       "fixes": 10
     },
     {
-      "file": "src/lib/db/dexie-integration.ts",
+      "file": "src/lib/server/ai/legalbert-middleware.ts",
       "fixes": 10
     },
     {
-      "file": "src/lib/features/workflows/ssr-qlora-chat-machine.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/optimization/copilot-index-optimizer.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/orchestration/master-cognitive-hub.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/server/ai/mcp-context7-embedding-integration.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/services/ai-suggestions-grpc-client.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/services/caseService.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/services/cognitive-cache-integration.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/services/enhanced-embedding-service.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/services/enhanced-recommendation-integration.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/services/nomic-embedding-service.ts",
+      "file": "src/lib/services/yorha-detective-service.ts",
       "fixes": 10
     },
     {
       "file": "src/lib/services/performanceMonitor.ts",
-      "fixes": 10
+      "fixes": 9
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/chatStore.svelte.ts",
-      "fixes": 10
+      "file": "src/lib/services/quic-neo4j-recommendations.ts",
+      "fixes": 9
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/xstate-service-adapter.svelte.ts",
-      "fixes": 10
+      "file": "src/lib/services/redis-orchestrator.ts",
+      "fixes": 9
     },
     {
-      "file": "src/lib/types/auth.ts",
-      "fixes": 10
+      "file": "src/lib/services/system-integration.ts",
+      "fixes": 9
+    },
+    {
+      "file": "src/lib/services/unsloth-finetuning.ts",
+      "fixes": 9
+    },
+    {
+      "file": "src/lib/stores/machines/types.ts",
+      "fixes": 9
     },
     {
       "file": "src/lib/types/ingest.ts",
-      "fixes": 10
-    },
-    {
-      "file": "src/lib/db/schema-example-legal.ts",
       "fixes": 9
     },
     {
-      "file": "src/lib/features/workflows/aiSummaryMachine.ts",
+      "file": "src/lib/types/webgpu-extensions.d.ts",
       "fixes": 9
     },
     {
-      "file": "src/lib/integrations/full-system-orchestrator.ts",
-      "fixes": 9
+      "file": "src/lib/components/ui/gaming/types/gaming-types.ts",
+      "fixes": 8
     },
     {
-      "file": "src/lib/machines/aiSummaryMachine.ts",
-      "fixes": 9
+      "file": "src/lib/machines/predictive-typing-machine.ts",
+      "fixes": 8
     },
     {
-      "file": "src/lib/machines/ssr-qlora-chat-machine.ts",
-      "fixes": 9
+      "file": "src/lib/server/ai/enhanced-ai-synthesis-orchestrator.ts",
+      "fixes": 8
     },
     {
-      "file": "src/lib/monitoring/legal-performance-metrics.ts",
-      "fixes": 9
+      "file": "src/lib/server/unified/legal-ai-service.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/services/_archive/caching-services-feb-7-2026/comprehensive-caching-architecture.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/services/alert-center.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/services/context7-flashattention-integration.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/services/enhanced-embedding-service.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/services/grpc-quic-vector-proxy.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/services/unified-legal-cache-orchestrator.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/services/unified-legal-simd-pgvector.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/shims/missing-types-shim.d.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/userDataStore.svelte.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/types/auth.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/types/common.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/types/svelte5-patterns.d.ts",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/features/workflows/predictive-typing-machine.ts",
+      "fixes": 7
+    },
+    {
+      "file": "src/lib/optimization/neural-memory-manager.ts",
+      "fixes": 7
     },
     {
       "file": "src/lib/optimization/simd-json-index-processor.ts",
-      "fixes": 9
+      "fixes": 7
     },
     {
-      "file": "src/lib/server/ai/legal-bert-onnx-service.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/ai-pipeline.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/aiAutoTagging.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/case-memory-engine.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/crud-client.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/minio-gpu-cache-integration.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/minio-upload-service.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/q-lora-training.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/qlora-rl-training-service.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/quic-gateway-client.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/recommendation-orchestrator.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/unified-legal-orchestration-service.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/services/vector-pipeline-service.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/chatStore.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/enhancedLokiStore.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/legal-poi.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/types/webassembly-types.d.ts",
-      "fixes": 9
-    },
-    {
-      "file": "src/lib/ast/svelte-check-analyzer.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/cache/parallel-cache-orchestrator-corrupted.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/cache/ssr-legal-api-cache.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/features/workflows/ai-analysis-machine.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/features/workflows/case-workflow-machine.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/features/workflows/graph-cache-machine.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/machines/graph-cache-machine.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/orchestration/qlora-ollama-orchestrator.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/server/ai/ai-service-orchestrator.ts",
-      "fixes": 8
+      "file": "src/lib/orchestration/master-cognitive-hub.ts",
+      "fixes": 7
     },
     {
       "file": "src/lib/services/context7-phase13-integration.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/services/go-binary-integration.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/services/legalRAGEngine.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/services/master-service-coordinator.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/services/real-ai-service.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/services/types/quic-types.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/services/user-chat-recommendation-engine.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/ai-chat-store.svelte.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/ai-store.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/detectiveBoard.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/types/predictor.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/utils/flatbuffer-legal.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/utils/mcp-graph-reader.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/utils/todo-autogen.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/routes_parked/api/predictor/$types.d.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/routes_parked/system-dashboard/+page.server.ts",
-      "fixes": 8
-    },
-    {
-      "file": "src/lib/evidence-canvas/graph-layout-gpu.ts",
       "fixes": 7
     },
     {
-      "file": "src/lib/machines/ai-analysis-machine.ts",
+      "file": "src/lib/services/legal-rag-embedding-orchestrator.ts",
       "fixes": 7
     },
     {
-      "file": "src/lib/machines/case-workflow-machine.ts",
+      "file": "src/lib/services/performance/TextureStreamingEvaluator.ts",
       "fixes": 7
     },
     {
-      "file": "src/lib/machines/idle-detection-rabbitmq-machine.ts",
+      "file": "src/lib/services/production-pipeline-integration.ts",
       "fixes": 7
     },
     {
-      "file": "src/lib/optimization/index.ts",
+      "file": "src/lib/services/unified-wasm-gpu-orchestrator.ts",
       "fixes": 7
     },
     {
-      "file": "src/lib/schemas/vector.ts",
+      "file": "src/lib/stores/_archive/old-stores/chatStore.svelte.ts",
       "fixes": 7
     },
     {
-      "file": "src/lib/server/ai/ai-provider-router.ts",
+      "file": "src/lib/stores/_archive/old-stores/enhancedLokiStore.ts",
       "fixes": 7
     },
     {
-      "file": "src/lib/server/ai/monitoring-service.ts",
+      "file": "src/lib/stores/_archive/old-stores/evidence.ts",
       "fixes": 7
     },
     {
-      "file": "src/lib/server/ai/ollama-local-llm.ts",
+      "file": "src/lib/types/component-props.ts",
       "fixes": 7
     },
     {
-      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/ollama-gemma3-service.ts",
-      "fixes": 7
+      "file": "src/lib/ast/svelte-check-analyzer.ts",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/monitoring/legal-performance-metrics.ts",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/optimization/copilot-index-optimizer.ts",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/orchestration/autoencoder-context-switcher.ts",
+      "fixes": 6
     },
     {
       "file": "src/lib/services/_archive/ollama-services-feb-7-2026/ollamaClusterService.ts",
-      "fixes": 7
+      "fixes": 6
     },
     {
-      "file": "src/lib/services/agentic-rag-orchestrator.ts",
-      "fixes": 7
+      "file": "src/lib/services/ai-suggestions-grpc-client.ts",
+      "fixes": 6
     },
     {
-      "file": "src/lib/services/ai-worker-manager.ts",
-      "fixes": 7
+      "file": "src/lib/services/minio-upload-service.ts",
+      "fixes": 6
     },
     {
-      "file": "src/lib/services/cache-warmer.ts",
-      "fixes": 7
+      "file": "src/lib/services/nes-gpu-bridge_corrected.ts",
+      "fixes": 6
     },
     {
-      "file": "src/lib/services/error-resolution-engine.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/services/go-tensor-service-client.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/services/neo4jGraphService.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/services/ollama-gemma3-service.ts",
-      "fixes": 7
+      "file": "src/lib/services/nomic-embedding-service.ts",
+      "fixes": 6
     },
     {
       "file": "src/lib/services/ollamaClusterService.ts",
-      "fixes": 7
+      "fixes": 6
     },
     {
-      "file": "src/lib/services/performance-optimization-service.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/services/sveltekit-gpu-cache-integration.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/services/unified-legal-orchestrator.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/services/unified-service-orchestrator.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/services/vector-embedding-service.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/services/webgpu-som-error-fixer.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/shims/redis-shim.ts",
-      "fixes": 7
+      "file": "src/lib/services/q-lora-training.ts",
+      "fixes": 6
     },
     {
       "file": "src/lib/stores/_archive/old-stores/ai-agent.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/types/vector.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/wasm/gpu-wasm-init.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/webgpu/webgpu-ai-engine.ts",
-      "fixes": 7
-    },
-    {
-      "file": "src/lib/composables/legal-data-runes.svelte.ts",
       "fixes": 6
     },
     {
-      "file": "src/lib/db/vector-operations.ts",
+      "file": "src/lib/stores/_archive/old-stores/chatStore.ts",
       "fixes": 6
     },
     {
-      "file": "src/lib/features/workflows/idle-detection-rabbitmq-machine.ts",
+      "file": "src/lib/stores/_archive/old-stores/evidence-store.ts",
       "fixes": 6
     },
     {
-      "file": "src/lib/features/workflows/legalAIMachine.ts",
+      "file": "src/lib/stores/_archive/old-stores/legal-poi.ts",
       "fixes": 6
     },
     {
-      "file": "src/lib/integrations/supercharged-legal-ai-server.ts",
+      "file": "src/lib/stores/_archive/old-stores/xstate-service-adapter.svelte.ts",
       "fixes": 6
     },
     {
-      "file": "src/lib/machines/legalAIMachine.ts",
+      "file": "src/lib/types/predictor.ts",
       "fixes": 6
     },
     {
-      "file": "src/lib/middleware/binary-encoding.ts",
+      "file": "src/lib/utils/todo-autogen.ts",
       "fixes": 6
+    },
+    {
+      "file": "src/lib/cache/parallel-cache-orchestrator-corrupted.ts",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/components/three/yorha-ui/webgpu/YoRHaWebGPUMath.ts",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/machines/idle-detection-rabbitmq-machine.ts",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/machines/ingestion-workflow-machine.ts",
+      "fixes": 5
     },
     {
       "file": "src/lib/optimization/advanced-memory-optimizer.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/server/ai/agentic.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/server/ai/enhanced-legal-search.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/langchain-ollama-llama-integration.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/advanced-bit-encoder.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/advanced-simd-pipeline.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/aiServiceWorkerManager.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/comprehensive-integration.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/concurrency-orchestrator.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/cross-encoder-reranker.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/enhancedContext7Service.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/enhancedRAG.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/enterprise-vector-search.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/error-analysis/JSONLStorage.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/error-pattern-rag.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/grpc-ai-orchestrator.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/hierarchical-cache-index.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/index.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/langchain-config-service.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/langchain-ollama-llama-integration.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/live-agent-orchestrator.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/neo4j-3d-recommendation-engine.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/nodejs-cluster-architecture.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/parallel-error-analyzer.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/pipeline-metrics.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/qdrant-vector-service.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/tensorrt-quic-client.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/webasm-gpu-bridge.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/webasm-inference-rag.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/webgpu-ai-service.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/services/webtransport-service.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/ai.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/aiAssistant.svelte.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/component-adapter-store.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/wasm/ultra-json-parser.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/webgpu/gpu-ranking-matrices.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/webgpu/text-tile-renderer.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/workers/predictive-prefetch.ts",
-      "fixes": 6
-    },
-    {
-      "file": "src/lib/db/schema-jsonb.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/features/ai/services/gemma-embedding-service.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/features/ai/services/providers/ollama/local-llm.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/features/ai/services/providers/ollama/streaming.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/features/workflows/canvasSystem.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/features/workflows/rag-machine.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/graph/sora-graph-traversal.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/machines/ai-computation-machine.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/machines/rag-machine.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/optimization/redis-som-cache.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/server/ai/feedback-loop.ts",
+      "file": "src/lib/server/ai/embeddings-enhanced.ts",
       "fixes": 5
     },
     {
@@ -942,243 +374,155 @@
       "fixes": 5
     },
     {
-      "file": "src/lib/server/ai/llm-orchestrator-bridge.ts",
+      "file": "src/lib/services/advanced-bit-encoder.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/server/ai/streaming-service.ts",
+      "file": "src/lib/services/agentic-rag-orchestrator.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/services/chat-memory-service.ts",
+      "file": "src/lib/services/ai-error-fixer.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/services/documentUpdateLoop.ts",
+      "file": "src/lib/services/aiAutoTagging.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/services/minio-webgpu-evidence-service.ts",
+      "file": "src/lib/services/enhanced-nats-messaging.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/services/multi-embedding-vector-service.ts",
+      "file": "src/lib/services/enhancedRAG.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/services/multiLayerCache.ts",
+      "file": "src/lib/services/enterprise-vector-search.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/services/pagerank-similarity-retrieval.ts",
+      "file": "src/lib/services/error-resolution-engine.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/services/reinforcement-learning-cache-optimizer.ts",
+      "file": "src/lib/services/go-binary-integration.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/services/unified-health-orchestrator.ts",
+      "file": "src/lib/services/index.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/services/unified-inference-integration.ts",
+      "file": "src/lib/services/legalRAGEngine.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/state/evidenceProcessingMachine.ts",
+      "file": "src/lib/services/neo4jGraphService.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/ai-assistant.svelte.ts",
+      "file": "src/lib/services/quic-gateway-client.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/enhanced-auth.svelte.ts",
+      "file": "src/lib/services/recommendation-orchestrator.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/evidence-unified-fixed.ts",
+      "file": "src/lib/services/vector-suggestions-service.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/legal-case.store.svelte.ts",
+      "file": "src/lib/stores/_archive/old-stores/ai-chat-store.svelte.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/legal-platform-integration.ts",
+      "file": "src/lib/stores/_archive/old-stores/detectiveBoard.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/ui.ts",
+      "file": "src/lib/types/legal-ai.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/vector-search.ts",
+      "file": "src/lib/types/metrics.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/types/lokijs-enhanced.d.ts",
+      "file": "src/routes_parked/api/predictor/$types.d.ts",
       "fixes": 5
     },
     {
-      "file": "src/lib/types/qdrant.d.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/types/shared.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/types/vector-search.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/utils/context7-phase8-integration.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/utils/syntax-repair/patterns/import-type-fix.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/wasm/qlora-wasm-loader.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/webgpu/N64TextureLODSystem.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/workers/embeddings-worker.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/workers/ranking-cache-worker.ts",
-      "fixes": 5
-    },
-    {
-      "file": "src/lib/components/three/yorha-ui/webgpu/YoRHaMipmapShaders.ts",
+      "file": "src/lib/cache/ssr-legal-api-cache.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/components/three/yorha-ui/webgpu/YoRHaOptimizedTextureManager.ts",
+      "file": "src/lib/db/schema-example-legal.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/evidence/detective-analysis-engine.ts",
+      "file": "src/lib/db/schema-jsonb.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/features/evidence/services/evidence-chain-integration.ts",
+      "file": "src/lib/features/workflows/aiSummaryMachine.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/features/workflows/ai-computation-machine.ts",
+      "file": "src/lib/features/workflows/ssr-qlora-chat-machine.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/features/workflows/chatMachine.ts",
+      "file": "src/lib/integrations/full-system-orchestrator.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/features/workflows/sessionMachine.ts",
+      "file": "src/lib/machines/aiSummaryMachine.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/integrations/revolutionary-multicore-bridge.ts",
+      "file": "src/lib/schemas/vector.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/machines/aiAssistantMachine.ts",
+      "file": "src/lib/server/ai/ai-provider-router.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/machines/canvasSystem.ts",
+      "file": "src/lib/server/ai/feedback-loop.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/machines/enhanced-legal-case-machine.ts",
+      "file": "src/lib/server/ai/legal-bert-onnx-service.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/machines/sessionMachine.ts",
+      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/langchain-ollama-llama-integration.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/optimization/context7-mcp-integration.ts",
+      "file": "src/lib/services/advanced-simd-pipeline.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/optimization/enhanced-vscode-extension-manager.ts",
+      "file": "src/lib/services/ai-pipeline.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/rag/query-helpers.ts",
+      "file": "src/lib/services/case-memory-engine.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/routing/index.ts",
+      "file": "src/lib/services/caseService.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/server/cache/index-cache.ts",
+      "file": "src/lib/services/clientSideGemma270m.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/server/services/background-job-queue.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/server/ssr/enhanced-load.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/comprehensive-ollama-summarizer.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/ollama-cuda-service.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/advanced-patch-streaming.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/agent-stubs.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/ai-evidence-analyzer.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/aiSummarizationService.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/bitmap-hmm-som.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/cached-vector-search.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/chat-vector-storage.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/comprehensive-database-orchestrator.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/comprehensive-ollama-summarizer.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/context7-mcp-integration.ts",
+      "file": "src/lib/services/comprehensive-integration.ts",
       "fixes": 4
     },
     {
@@ -1186,39 +530,23 @@
       "fixes": 4
     },
     {
-      "file": "src/lib/services/cuda-tensor-service.ts",
+      "file": "src/lib/services/crud-client.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/diff-patch-applicator.ts",
+      "file": "src/lib/services/enhanced-recommendation-integration.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/enhanced-ai-analysis.ts",
+      "file": "src/lib/services/hierarchical-cache-index.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/error-analysis/DecisionEngine.ts",
+      "file": "src/lib/services/langchain-config-service.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/error-analysis/KAGTraverser.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/inlineSuggestionService.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/legal-precedent-discovery.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/logging-aggregation-service.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/loki-cache-vscode-integration.ts",
+      "file": "src/lib/services/langchain-ollama-llama-integration.ts",
       "fixes": 4
     },
     {
@@ -1226,43 +554,19 @@
       "fixes": 4
     },
     {
-      "file": "src/lib/services/nvidiaLlamaService.ts",
+      "file": "src/lib/services/performance-optimization-service.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/ollama-cuda-service.ts",
+      "file": "src/lib/services/pipeline-metrics.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/pgvector-search-wrapper.ts",
+      "file": "src/lib/services/precedent-analysis-engine.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/predictive-analytics-service.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/predictive-hmm-som.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/quic-tensor-client.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/rag-pipeline-integrator.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/realtime-communication.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/rtx-tensor-upscaler.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/services/service-orchestrator.ts",
+      "file": "src/lib/services/qdrant-vector-service.ts",
       "fixes": 4
     },
     {
@@ -1270,67 +574,27 @@
       "fixes": 4
     },
     {
-      "file": "src/lib/services/som-clustering.ts",
+      "file": "src/lib/services/simd-json-acceleration.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/vector-search-index.ts",
+      "file": "src/lib/services/vector-pipeline-service.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/vector-search.ts",
+      "file": "src/lib/services/webasm-inference-rag.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/vertex-buffer-image-analyzer.ts",
+      "file": "src/lib/state/phase13StateMachine.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/webgpu-accelerator.ts",
+      "file": "src/lib/stores/_archive/old-stores/ai-store.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/services/webgpu-wasm-service.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/state/legal-case-machine.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/auth.svelte.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/barrel-store-manager.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/citations.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/enhanced-saved-notes.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/evidence-unified.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/legal-citations.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/loading-store.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/multiStepFormMachine.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/pipelineMachine.ts",
+      "file": "src/lib/stores/_archive/old-stores/ai.ts",
       "fixes": 4
     },
     {
@@ -1338,87 +602,67 @@
       "fixes": 4
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/saved-notes.ts",
+      "file": "src/lib/utils/flatbuffer-legal.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/upload-machine.ts",
+      "file": "src/lib/wasm/gpu-wasm-init.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/stores/_archive/svelte4_stores/example-barrel-pattern.ts",
+      "file": "src/lib/webgpu/N64TextureLODSystem.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/stores/unified/citation-store.ts",
+      "file": "src/lib/workers/predictive-prefetch.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/types/ai-chat.d.ts",
+      "file": "src/routes_parked/system-dashboard/+page.server.ts",
       "fixes": 4
     },
     {
-      "file": "src/lib/types/user.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/utils/observability-client.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/utils/ux-pattern-validator.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/wasm/simd-json-wrapper.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/webgpu/legal-similarity-compute.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/routes_parked/api/v1/detective/patterns/+server.ts",
-      "fixes": 4
-    },
-    {
-      "file": "src/lib/ast/index.ts",
+      "file": "src/lib/components/three/yorha-ui/webgpu/YoRHaOptimizedTextureManager.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/client/ai/webgpu-reranker-worker.ts",
+      "file": "src/lib/composables/legal-data-runes.svelte.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/components/ui/gaming/effects/gradient-utils.ts",
+      "file": "src/lib/db/dexie-integration.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/data/routes-config.ts",
+      "file": "src/lib/features/ai/services/providers/ollama/local-llm.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/features/ai/services/ai-service-orchestrator.ts",
+      "file": "src/lib/features/evidence/services/evidence-chain-integration.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/features/ai/services/types/ai-provider.ts",
+      "file": "src/lib/features/workflows/canvasSystem.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/features/evidence/services/evidence-processing-service.ts",
+      "file": "src/lib/features/workflows/case-workflow-machine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/features/workflows/ai-processing-machine.ts",
+      "file": "src/lib/features/workflows/graph-cache-machine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/features/workflows/search-machine.ts",
+      "file": "src/lib/features/workflows/idle-detection-rabbitmq-machine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/integrations/enhanced-rabbitmq-cuda-bridge.ts",
+      "file": "src/lib/features/workflows/legalAIMachine.ts",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/features/workflows/rag-machine.ts",
       "fixes": 3
     },
     {
@@ -1426,39 +670,59 @@
       "fixes": 3
     },
     {
-      "file": "src/lib/integrations/rabbitmq-tensor-integration.ts",
+      "file": "src/lib/machines/canvasSystem.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/machines/ai-processing-machine.ts",
+      "file": "src/lib/machines/case-workflow-machine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/machines/chatMachine.ts",
+      "file": "src/lib/machines/enhanced-legal-case-machine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/mcp/cases.mcp.ts",
+      "file": "src/lib/machines/graph-cache-machine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/optimization/json-wasm-optimizer.ts",
+      "file": "src/lib/machines/legalAIMachine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/phase78/routeErrorAssistantMachine.ts",
+      "file": "src/lib/machines/rag-machine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/polyfills/sveltekit2-universal-polyfill.ts",
+      "file": "src/lib/machines/ssr-qlora-chat-machine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/ai/agentic-stream.ts",
+      "file": "src/lib/middleware/binary-encoding.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/ai/cluster-service.ts",
+      "file": "src/lib/optimization/context7-mcp-integration.ts",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/optimization/enhanced-vscode-extension-manager.ts",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/optimization/redis-som-cache.ts",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/orchestration/qlora-ollama-orchestrator.ts",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/rag/query-helpers.ts",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/server/ai/ai-service-orchestrator.ts",
       "fixes": 3
     },
     {
@@ -1466,175 +730,163 @@
       "fixes": 3
     },
     {
-      "file": "src/lib/server/ai/config.ts",
+      "file": "src/lib/server/ai/llm-orchestrator-bridge.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/database-api-bridge.ts",
+      "file": "src/lib/server/ai/ollama-local-llm.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/lokiHybridStore.ts",
+      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/llamacpp-ollama-integration.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/monitoring/logger.ts",
+      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/ollama-cuda-service.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/services/QdrantService.ts",
+      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/ollama-gemma3-service.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/services/ai-analytics-service.ts",
+      "file": "src/lib/services/ai-worker-manager.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/services/redis-cache.ts",
+      "file": "src/lib/services/autogen-gguf-orchestra.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/services/vector-service.ts",
+      "file": "src/lib/services/cached-vector-search.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/server/vector/vectorService.ts",
+      "file": "src/lib/services/concurrency-orchestrator.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/_archive/caching-services-feb-7-2026/enhanced-caching-optimizer.ts",
+      "file": "src/lib/services/diff-patch-applicator.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/ollama-suggestions-service.ts",
+      "file": "src/lib/services/documentUpdateLoop.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/api-orchestrator.ts",
+      "file": "src/lib/services/grpc-ai-orchestrator.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/autogen-service.ts",
+      "file": "src/lib/services/inlineSuggestionService.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/cache-orchestrator.ts",
+      "file": "src/lib/services/legal-precedent-discovery.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/cached-enhanced-rag-integration.ts",
+      "file": "src/lib/services/live-agent-orchestrator.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/cached-rag-service.ts",
+      "file": "src/lib/services/llamacpp-ollama-integration.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/canonical-result-cache.ts",
+      "file": "src/lib/services/logging-aggregation-service.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/chat-worker-client.ts",
+      "file": "src/lib/services/loki-cache-vscode-integration.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/chr-rom-mipmap-integration.ts",
+      "file": "src/lib/services/minio-webgpu-evidence-service.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/chr-rom-pattern-optimizer.ts",
+      "file": "src/lib/services/multiLayerCache.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/context7Service.ts",
+      "file": "src/lib/services/nvidiaLlamaService.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/end-to-end-pipeline.ts",
+      "file": "src/lib/services/ollama-cuda-service.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/enhanced-rag-pipeline.ts",
+      "file": "src/lib/services/ollama-gemma3-service.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/enhancedRAGPipeline.ts",
+      "file": "src/lib/services/optimized-qdrant-service.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/error-analysis/PatternStorage.ts",
+      "file": "src/lib/services/pagerank-similarity-retrieval.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/error-handler.ts",
+      "file": "src/lib/services/parallel-error-analyzer.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/knowledge-search/RedisCacheService.ts",
+      "file": "src/lib/services/realtime-communication.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/mmr-summary-generator.ts",
+      "file": "src/lib/services/reinforcement-learning-cache-optimizer.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/multi-library-startup.ts",
+      "file": "src/lib/services/service-orchestrator.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/nats-messaging-service.ts",
+      "file": "src/lib/services/tensorrt-quic-client.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/ollama-config-service.ts",
+      "file": "src/lib/services/unified-health-orchestrator.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/ollama-suggestions-service.ts",
+      "file": "src/lib/services/unified-inference-integration.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/pattern-analyzer.ts",
+      "file": "src/lib/services/unified-legal-orchestrator.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/productionServiceClient.ts",
+      "file": "src/lib/services/vector-embedding-service.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/real-vector-search-service.ts",
+      "file": "src/lib/services/vector-search-index.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/selfPromptingSystem.ts",
+      "file": "src/lib/services/vertex-buffer-image-analyzer.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/tauri-llm.ts",
+      "file": "src/lib/services/webgpu-som-error-fixer.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/types/vector-search.ts",
+      "file": "src/lib/services/webgpu-wasm-service.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/uploadService.ts",
+      "file": "src/lib/stores/_archive/old-stores/ai-assistant.svelte.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/services/vectorRankingService.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/services/webgpu-texture-streaming.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/shims/interface-augment.d.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/simd/vector-simd.ts",
+      "file": "src/lib/stores/_archive/old-stores/aiAssistant.svelte.ts",
       "fixes": 3
     },
     {
@@ -1642,15 +894,7 @@
       "fixes": 3
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/barrel-functions.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/component-metadata-cache.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/stores/_archive/old-stores/enhanced-upload-machine.ts",
+      "file": "src/lib/stores/_archive/old-stores/enhanced-saved-notes.ts",
       "fixes": 3
     },
     {
@@ -1662,83 +906,51 @@
       "fixes": 3
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/evidence-workflow.svelte.ts",
+      "file": "src/lib/stores/_archive/old-stores/evidence-unified-fixed.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/global-loki-store.ts",
+      "file": "src/lib/stores/_archive/old-stores/evidence-unified.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/redis-state.svelte.ts",
+      "file": "src/lib/stores/_archive/old-stores/legal-case.store.svelte.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/report.svelte.ts",
+      "file": "src/lib/stores/_archive/old-stores/saved-notes.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/userActivityStore.ts",
+      "file": "src/lib/stores/_archive/old-stores/ui.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/types/external-services-CLEAN.ts",
+      "file": "src/lib/stores/_archive/old-stores/upload-machine.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/types/external-services.ts",
+      "file": "src/lib/stores/_archive/old-stores/vector-search.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/types/globals.d.ts",
+      "file": "src/lib/types/lokijs-enhanced.d.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/types/ollama.d.ts",
+      "file": "src/lib/types/shared.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/types/route-analytics.ts",
+      "file": "src/lib/types/user.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/utils/database-sync.ts",
+      "file": "src/lib/types/webassembly-types.d.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/utils/errorHandler.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/utils/formatters.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/utils/pdf-packet-generator.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/utils/syntax-repair/patterns/colon-chain-fix.test.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/utils/timing-metrics.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/utils/typed-array-quantization.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/utils/webgl-shader-cache.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/utils/webgpu-buffer-uploader.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/wasm/clustering-wasm.ts",
+      "file": "src/lib/utils/observability-client.ts",
       "fixes": 3
     },
     {
@@ -1746,51 +958,15 @@
       "fixes": 3
     },
     {
-      "file": "src/lib/webgpu/evidence-graph-visualizer.ts",
+      "file": "src/lib/wasm/ultra-json-parser.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/webgpu/graph-texture-layout.ts",
+      "file": "src/lib/webgpu/gpu-ranking-matrices.ts",
       "fixes": 3
     },
     {
-      "file": "src/lib/workers/ai-service-worker.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/workers/comprehensive-worker.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/workers/gpu-compute-worker.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/lib/yorha/localSearch.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/routes_parked/api/brain/graph/+server.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/routes_parked/api/v1/evidence/strategy/strategy-engine.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/routes_parked/api/v1/evidence/vector/similarity-engine.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/routes_parked/help/articles.data.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/routes_parked/saved-citations/+page.server.ts",
-      "fixes": 3
-    },
-    {
-      "file": "src/types/integrations.d.ts",
+      "file": "src/lib/workers/ranking-cache-worker.ts",
       "fixes": 3
     },
     {
@@ -1802,31 +978,15 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/components/error-brain/ErrorBrainModal.test.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/components/legal-ai/__tests__/LinkMetadataForm.test.ts",
-      "fixes": 2
-    },
-    {
       "file": "src/lib/components/legal/index.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/components/three/yorha-ui/NESYoRHaHybrid3D.ts",
+      "file": "src/lib/components/three/yorha-ui/webgpu/YoRHaMipmapShaders.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/components/three/yorha-ui/webgpu/HeadlessLegalProcessorFactory.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/components/three/yorha-ui/webgpu/webgpu-types.d.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/components/ui/gaming/n64/index.ts",
+      "file": "src/lib/components/ui/gaming/effects/gradient-utils.ts",
       "fixes": 2
     },
     {
@@ -1834,43 +994,47 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/config/rabbitmq-config.ts",
+      "file": "src/lib/data/routes-config.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/embedding/client-embedding-generator.ts",
+      "file": "src/lib/db/vector-operations.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/features/search/_core/fuse-rag-search.ts",
+      "file": "src/lib/evidence/detective-analysis-engine.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/features/search/_core/fuseStore.ts",
+      "file": "src/lib/features/ai/services/gemma-embedding-service.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/features/workflows/agentShellMachine.mcp.ts",
+      "file": "src/lib/features/evidence/services/evidence-processing-service.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/features/workflows/agentShellMachine.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/features/workflows/aiAssistantMachine.stories.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/features/workflows/legal-case-machine-factory.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/features/workflows/prefetchMachine.ts",
+      "file": "src/lib/features/workflows/ai-processing-machine.ts",
       "fixes": 2
     },
     {
       "file": "src/lib/features/workflows/recommendation-routing-machine.test.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/features/workflows/sessionMachine.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/graph/sora-graph-traversal.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/integrations/revolutionary-multicore-bridge.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/integrations/supercharged-legal-ai-server.ts",
       "fixes": 2
     },
     {
@@ -1882,31 +1046,7 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/machines/agentShellMachine.mcp.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/machines/agentShellMachine.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/machines/aiAssistantMachine.d.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/machines/aiAssistantMachine.stories.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/machines/case-creation-machine.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/machines/legal-case-machine-factory.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/machines/prefetchMachine.ts",
+      "file": "src/lib/machines/ai-processing-machine.ts",
       "fixes": 2
     },
     {
@@ -1914,23 +1054,27 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/machines/search-machine.ts",
+      "file": "src/lib/machines/sessionMachine.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/machines/vector-pipeline-machine.ts",
+      "file": "src/lib/mcp/cases.mcp.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/orchestration/complete-legal-ai-orchestrator.ts",
+      "file": "src/lib/phase78/routeErrorAssistantMachine.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/rag/som-intent.ts",
+      "file": "src/lib/polyfills/sveltekit2-universal-polyfill.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/schemas/evidence.ts",
+      "file": "src/lib/server/ai/cluster-service.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/server/ai/enhanced-legal-search.ts",
       "fixes": 2
     },
     {
@@ -1938,15 +1082,7 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/server/ai/hmm-transition-predictor.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/server/ai/orchestrator-test.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/server/ai/reranker.ts",
+      "file": "src/lib/server/ai/legal-document-analyzer.ts",
       "fixes": 2
     },
     {
@@ -1954,43 +1090,35 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/server/index.ts",
+      "file": "src/lib/server/monitoring/logger.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/server/monitoring/security.ts",
+      "file": "src/lib/server/services/background-job-queue.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/server/redisPubSub.ts",
+      "file": "src/lib/server/services/vector-service.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/server/services/minio.ts",
+      "file": "src/lib/services/agent-stubs.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/__tests__/shared/unified-test-utilities.ts",
+      "file": "src/lib/services/ai-evidence-analyzer.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/ollama-legal-ai.ts",
+      "file": "src/lib/services/aiServiceWorkerManager.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/ace-web/minio-service.ts",
+      "file": "src/lib/services/aiSummarizationService.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/ai-analysis.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/ai-assistant-input-synthesizer.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/aiSummarizationService.d.ts",
+      "file": "src/lib/services/api-orchestrator.ts",
       "fixes": 2
     },
     {
@@ -1998,11 +1126,23 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/services/complete-service-router.ts",
+      "file": "src/lib/services/cache-orchestrator.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/context7-missing-imports-fetcher.ts",
+      "file": "src/lib/services/cached-enhanced-rag-integration.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/services/chat-memory-service.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/services/comprehensive-database-orchestrator.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/services/concurrent-indexeddb-search.ts",
       "fixes": 2
     },
     {
@@ -2018,27 +1158,7 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/services/error-analysis/ace-context-manager.test.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/error-analysis/diff-applicator.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/error-analysis/diff-generator.test.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/error-analysis/error-brain-middleware.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/error-analysis/error-extractor.unit.test.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/error-analysis/index.ts",
+      "file": "src/lib/services/error-handler.ts",
       "fixes": 2
     },
     {
@@ -2050,35 +1170,15 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/services/hybrid-rag-simd-bridge.ts",
+      "file": "src/lib/services/mmr-summary-generator.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/indexeddb.ts",
+      "file": "src/lib/services/neo4j-3d-recommendation-engine.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/latency-logger.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/local-llm-manager.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/neo4j-recommendation-engine.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/nintendo-memory-manager.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/ocr-integration-service.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/ollama-legal-ai.ts",
+      "file": "src/lib/services/ollama-config-service.ts",
       "fixes": 2
     },
     {
@@ -2086,27 +1186,15 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/services/png-embed-extractor.ts",
+      "file": "src/lib/services/predictive-hmm-som.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/postgresql-vector-service.ts",
+      "file": "src/lib/services/rag-pipeline-integrator.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/q-lora-trainer.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/qlora-reinforcement-learning-trainer.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/queue-service.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/services/redis-gpu-chat-optimization.ts",
+      "file": "src/lib/services/real-vector-search-service.ts",
       "fixes": 2
     },
     {
@@ -2114,7 +1202,15 @@
       "fixes": 2
     },
     {
+      "file": "src/lib/services/rtx-tensor-upscaler.ts",
+      "fixes": 2
+    },
+    {
       "file": "src/lib/services/security.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/services/selfPromptingSystem.ts",
       "fixes": 2
     },
     {
@@ -2122,39 +1218,47 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/services/startup-flag-service.ts",
+      "file": "src/lib/services/som-clustering.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/test-caching-integration.ts",
+      "file": "src/lib/services/sveltekit-gpu-cache-integration.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/toast-service.ts",
+      "file": "src/lib/services/tauri-llm.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/unified-ocr-service.ts",
+      "file": "src/lib/services/types/quic-types.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/upload-telemetry-service.ts",
+      "file": "src/lib/services/unified-legal-orchestration-service.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/web-fetch-missing-implementations.ts",
+      "file": "src/lib/services/unified-service-orchestrator.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/services/websocket-service.ts",
+      "file": "src/lib/services/user-chat-recommendation-engine.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/state/legalFormMachine.ts",
+      "file": "src/lib/services/webgpu-ai-service.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/ai-assistant-unified.svelte.ts",
+      "file": "src/lib/services/webgpu-texture-streaming.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/services/webtransport-service.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/shims/redis-shim.ts",
       "fixes": 2
     },
     {
@@ -2162,7 +1266,7 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/canvas.ts",
+      "file": "src/lib/stores/_archive/old-stores/barrel-store-manager.ts",
       "fixes": 2
     },
     {
@@ -2170,23 +1274,43 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/evidence-cache-service.ts",
+      "file": "src/lib/stores/_archive/old-stores/citations.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/feedback-store.svelte.ts",
+      "file": "src/lib/stores/_archive/old-stores/component-adapter-store.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/langchain-service-store.ts",
+      "file": "src/lib/stores/_archive/old-stores/component-metadata-cache.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/legal-case.svelte.ts",
+      "file": "src/lib/stores/_archive/old-stores/enhanced-auth.svelte.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/notifications.ts",
+      "file": "src/lib/stores/_archive/old-stores/enhanced-upload-machine.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/legal-citations.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/legal-platform-integration.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/multiStepFormMachine.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/pipelineMachine.ts",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/stores/_archive/svelte4_stores/example-barrel-pattern.ts",
       "fixes": 2
     },
     {
@@ -2194,31 +1318,31 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/types/advanced-patches.d.ts",
+      "file": "src/lib/types/ai-chat.d.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/types/ai.d.ts",
+      "file": "src/lib/types/external-services-CLEAN.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/types/comprehensive-shims.d.ts",
+      "file": "src/lib/types/external-services.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/types/evidence-board.ts",
+      "file": "src/lib/types/globals.d.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/types/feedback.ts",
+      "file": "src/lib/types/ollama.d.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/types/legal-types.ts",
+      "file": "src/lib/types/route-analytics.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/types/webgpu.d.ts",
+      "file": "src/lib/types/vector-search.ts",
       "fixes": 2
     },
     {
@@ -2226,11 +1350,11 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/utils/fast-json.ts",
+      "file": "src/lib/utils/database-sync.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/utils/mcp-helpers.ts",
+      "file": "src/lib/utils/mcp-graph-reader.ts",
       "fixes": 2
     },
     {
@@ -2238,72 +1362,44 @@
       "fixes": 2
     },
     {
-      "file": "src/lib/utils/validation.ts",
+      "file": "src/lib/utils/ux-pattern-validator.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/wasm/wasm-llm-service.ts",
+      "file": "src/lib/wasm/qlora-wasm-loader.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/webgpu/shader-cache-manager.ts",
+      "file": "src/lib/wasm/simd-json-wrapper.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/workers/cache-worker.ts",
+      "file": "src/lib/webgpu/evidence-graph-visualizer.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/workers/job-state.ts",
+      "file": "src/lib/webgpu/legal-similarity-compute.ts",
       "fixes": 2
     },
     {
-      "file": "src/lib/workers/rag-ingestion-worker.ts",
+      "file": "src/lib/workers/comprehensive-worker.ts",
       "fixes": 2
     },
     {
-      "file": "src/routes_parked/(legal)_disabled/legal-cases/+page.server.ts",
+      "file": "src/routes_parked/api/v1/evidence/strategy/strategy-engine.ts",
       "fixes": 2
     },
     {
-      "file": "src/routes_parked/api/routes/[routePath]/error-brain-integration.test.ts",
+      "file": "src/routes_parked/api/v1/evidence/vector/similarity-engine.ts",
       "fixes": 2
     },
     {
-      "file": "src/routes_parked/api/v1/citations/verify/+server.ts",
+      "file": "src/routes_parked/help/articles.data.ts",
       "fixes": 2
     },
     {
-      "file": "src/routes_parked/api/v1/detective/insights/+server.ts",
+      "file": "src/routes_parked/saved-citations/+page.server.ts",
       "fixes": 2
-    },
-    {
-      "file": "src/routes_parked/archive/tests/pages/api-test/+page.server.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/types/gpu.d.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/types/webgpu-shims.d.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/types/webgpu.d.ts",
-      "fixes": 2
-    },
-    {
-      "file": "src/lib/__tests__/unified-schema.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/agents/rag-sync-agent.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/agents/tools.ts",
-      "fixes": 1
     },
     {
       "file": "src/lib/ast/ast-processor.ts",
@@ -2314,31 +1410,7 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/cache/parallel-cache-orchestrator.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/cache/semantic-cache.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/caching/advanced-cache-manager.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/caching/reinforcement-learning-cache.server.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/caching/reinforcement-learning-cache.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/components/AIChat.stories.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/components/LegalCaseManager.stories.ts",
+      "file": "src/lib/components/error-brain/ErrorBrainModal.test.ts",
       "fixes": 1
     },
     {
@@ -2346,19 +1418,15 @@
       "fixes": 1
     },
     {
+      "file": "src/lib/components/legal-ai/__tests__/LinkMetadataForm.test.ts",
+      "fixes": 1
+    },
+    {
       "file": "src/lib/components/search/types.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/components/ui/Button.stories.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/components/ui/enhanced/Button.stories.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/components/ui/enhanced/Card.stories.ts",
+      "file": "src/lib/components/three/yorha-ui/webgpu/webgpu-types.d.ts",
       "fixes": 1
     },
     {
@@ -2366,11 +1434,11 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/components/ui/select/index.d.ts",
+      "file": "src/lib/components/ui/gaming/n64/index.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/components/yorha/YoRHaCommandCenter.stories.ts",
+      "file": "src/lib/components/ui/select/index.d.ts",
       "fixes": 1
     },
     {
@@ -2382,7 +1450,7 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/config/ollama.ts",
+      "file": "src/lib/config/rabbitmq-config.ts",
       "fixes": 1
     },
     {
@@ -2390,35 +1458,43 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/embedding/embedding-adapter.ts",
+      "file": "src/lib/features/ai/services/ai-service-orchestrator.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/error-brain/analyze/propose.ts",
+      "file": "src/lib/features/ai/services/providers/ollama/streaming.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/evidence-canvas/ai-suggestions-service.ts",
+      "file": "src/lib/features/ai/services/types/ai-provider.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/features/search/_core/local-pipeline.ts",
+      "file": "src/lib/features/search/_core/fuse-rag-search.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/features/workflows/aiAssistantMachine.minimal.ts",
+      "file": "src/lib/features/search/_core/fuseStore.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/features/workflows/recommendation-routing-machine.fixed.ts",
+      "file": "src/lib/features/workflows/ai-computation-machine.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/features/workflows/recommendation-routing-machine.ts",
+      "file": "src/lib/features/workflows/chatMachine.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/features/workflows/web-crawl-machine.ts",
+      "file": "src/lib/features/workflows/legal-case-machine-factory.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/features/workflows/prefetchMachine.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/features/workflows/search-machine.ts",
       "fixes": 1
     },
     {
@@ -2430,19 +1506,19 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/gpu/visual-memory-palace-integration.ts",
+      "file": "src/lib/integrations/enhanced-rabbitmq-cuda-bridge.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/integrations/comprehensive-agent-orchestration.ts",
+      "file": "src/lib/integrations/rabbitmq-tensor-integration.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/integrations/flashattention-multicore-bridge.ts",
+      "file": "src/lib/machines/ai-analysis-machine.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/machines/aiAssistantMachine.minimal.ts",
+      "file": "src/lib/machines/ai-computation-machine.ts",
       "fixes": 1
     },
     {
@@ -2450,35 +1526,35 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/machines/recommendation-routing-machine.ts",
+      "file": "src/lib/machines/case-creation-machine.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/machines/vectorJobMachine.ts",
+      "file": "src/lib/machines/chatMachine.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/moogle/stage6-production-orchestrator.ts",
+      "file": "src/lib/machines/index.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/optimization/simd-json-parser.ts",
+      "file": "src/lib/machines/legal-case-machine-factory.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/orchestration/index.ts",
+      "file": "src/lib/machines/prefetchMachine.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/parsers/simd-json-parser.ts",
+      "file": "src/lib/machines/search-machine.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/phase14/server/queues/logWorker.ts",
+      "file": "src/lib/machines/vector-pipeline-machine.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/routing/dynamic-navigation.ts",
+      "file": "src/lib/optimization/index.ts",
       "fixes": 1
     },
     {
@@ -2486,11 +1562,7 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/routing/unified-api-router.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/schemas/fileUploadSchema.ts",
+      "file": "src/lib/schemas/evidence.ts",
       "fixes": 1
     },
     {
@@ -2498,19 +1570,19 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/server/adapters/qdrant-adapter.ts",
+      "file": "src/lib/server/ai/agentic-stream.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/server/ai/ai-utils.ts",
+      "file": "src/lib/server/ai/agentic.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/server/ai/cache.ts",
+      "file": "src/lib/server/ai/hmm-transition-predictor.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/server/ai/embedding.ts",
+      "file": "src/lib/server/ai/monitoring-service.ts",
       "fixes": 1
     },
     {
@@ -2518,27 +1590,15 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/server/ai/som-bitmap-visualizer.ts",
+      "file": "src/lib/server/ai/reranker.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/server/cache/redis-client.ts",
+      "file": "src/lib/server/ai/streaming-service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/server/concurrency/queue-manager.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/server/database/redis-client.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/server/db/connection-manager.ts",
+      "file": "src/lib/server/database-api-bridge.ts",
       "fixes": 1
     },
     {
@@ -2550,19 +1610,7 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/server/db/query-utils.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/server/db/schema-canvas-autosaves.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/server/db/schemas/cases-schema.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/server/embedding/knn-helper.ts",
+      "file": "src/lib/server/index.ts",
       "fixes": 1
     },
     {
@@ -2574,23 +1622,7 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/server/keyword-extractor.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/server/message-queue.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/server/messaging/rabbitmq-service.ts",
-      "fixes": 1
-    },
-    {
       "file": "src/lib/server/orchestrator/gemma-agent.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/server/pdf/processor.ts",
       "fixes": 1
     },
     {
@@ -2602,10 +1634,6 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/server/search/nats-quic-search-service.ts",
-      "fixes": 1
-    },
-    {
       "file": "src/lib/server/services/adaptive-index-orchestrator.ts",
       "fixes": 1
     },
@@ -2614,11 +1642,11 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/server/services/chunking-service.ts",
+      "file": "src/lib/server/services/ai-analytics-service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/server/services/langextract-service.ts",
+      "file": "src/lib/server/services/chunking-service.ts",
       "fixes": 1
     },
     {
@@ -2626,7 +1654,11 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/server/services/unified-search-service.ts",
+      "file": "src/lib/server/services/minio.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/server/services/redis-cache.ts",
       "fixes": 1
     },
     {
@@ -2638,39 +1670,31 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/server/types.ts",
-      "fixes": 1
-    },
-    {
       "file": "src/lib/server/utils/server-cache.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/server/websocket/socket-server.ts",
+      "file": "src/lib/services/__tests__/shared/unified-test-utilities.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/server/workflows/index.ts",
+      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/comprehensive-ollama-summarizer.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/N64LODManager.ts",
+      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/ollama-legal-ai.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/__tests__/shared/integration-test-helpers.ts",
+      "file": "src/lib/services/advanced-patch-streaming.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/_archive/caching-services-feb-7-2026/comprehensive-caching-service.ts",
+      "file": "src/lib/services/ai-analysis.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/_archive/ollama-services-feb-7-2026/ollama-suggestions-service.fixed.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/services/aiPipeline.ts",
+      "file": "src/lib/services/ai-assistant-input-synthesizer.ts",
       "fixes": 1
     },
     {
@@ -2678,19 +1702,35 @@
       "fixes": 1
     },
     {
+      "file": "src/lib/services/aiSummarizationService.d.ts",
+      "fixes": 1
+    },
+    {
       "file": "src/lib/services/ast-parser.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/automated-barrel-store-generator.ts",
+      "file": "src/lib/services/autogen-service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/chr-rom-precomputation.ts",
+      "file": "src/lib/services/cache-warmer.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/complete-gpu-error-pipeline.ts",
+      "file": "src/lib/services/canonical-result-cache.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/chr-rom-mipmap-integration.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/chr-rom-pattern-optimizer.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/complete-service-router.ts",
       "fixes": 1
     },
     {
@@ -2698,79 +1738,55 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/services/context-aware-ai-memory.ts",
+      "file": "src/lib/services/comprehensive-ollama-summarizer.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/drizzle-chr-rom-bridge.ts",
+      "file": "src/lib/services/context7-mcp-integration.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/enhanced-auth-service.ts",
+      "file": "src/lib/services/context7-missing-imports-fetcher.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/enhanced-sentence-splitter.ts",
+      "file": "src/lib/services/context7Service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/CacheService.ts",
+      "file": "src/lib/services/cuda-tensor-service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/FixSynthesizer.ts",
+      "file": "src/lib/services/end-to-end-pipeline.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/agentic-analyzer.ts",
+      "file": "src/lib/services/enhancedContext7Service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/context-formatter.ts",
+      "file": "src/lib/services/enhancedRAGPipeline.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/diff-applicator.test.ts",
+      "file": "src/lib/services/error-analysis/ace-context-manager.test.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/diff-generator.ts",
+      "file": "src/lib/services/error-analysis/diff-generator.test.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/diff-storage.test.ts",
+      "file": "src/lib/services/error-analysis/error-brain-middleware.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/diffs/DiffApplier.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/services/error-analysis/error-analysis-pipeline.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/services/error-analysis/error-brain-middleware.test.ts",
+      "file": "src/lib/services/error-analysis/error-extractor.unit.test.ts",
       "fixes": 1
     },
     {
       "file": "src/lib/services/error-analysis/error-handler.test.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/services/error-analysis/feature-flags.test.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/services/error-analysis/feature-flags.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/services/error-analysis/knowledge-base-learning.test.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/services/error-analysis/knowledge-base-learning.ts",
       "fixes": 1
     },
     {
@@ -2782,35 +1798,51 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/llm-prompt-service.ts",
+      "file": "src/lib/services/go-tensor-service-client.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/error-analysis/validation-service.ts",
+      "file": "src/lib/services/indexeddb.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/fuse-lazy-search-indexeddb.ts",
+      "file": "src/lib/services/latency-logger.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/hybrid-vector-search.ts",
+      "file": "src/lib/services/master-service-coordinator.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/knowledge-search/ACPToolRegistry.ts",
+      "file": "src/lib/services/multi-embedding-vector-service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/mcp-registry.ts",
+      "file": "src/lib/services/multi-library-startup.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/nlp-metrics.ts",
+      "file": "src/lib/services/neo4j-recommendation-engine.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/ollama-suggestions-service.fixed.ts",
+      "file": "src/lib/services/nintendo-memory-manager.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/nodejs-cluster-architecture.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/ocr-integration-service.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/ollama-legal-ai.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/pattern-analyzer.ts",
       "fixes": 1
     },
     {
@@ -2818,15 +1850,27 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/services/production-service-registry.ts",
+      "file": "src/lib/services/png-embed-extractor.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/qlora-rl-langextract-integration.ts",
+      "file": "src/lib/services/postgresql-vector-service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/quic-client.ts",
+      "file": "src/lib/services/predictive-analytics-service.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/q-lora-trainer.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/qlora-reinforcement-learning-trainer.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/qlora-rl-training-service.ts",
       "fixes": 1
     },
     {
@@ -2834,11 +1878,7 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/services/redis-compression-cache.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/services/revolutionary-ai-integration.ts",
+      "file": "src/lib/services/real-ai-service.ts",
       "fixes": 1
     },
     {
@@ -2854,7 +1894,7 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/services/simd-text-processor.worker.ts",
+      "file": "src/lib/services/startup-flag-service.ts",
       "fixes": 1
     },
     {
@@ -2862,7 +1902,11 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/services/types/legal.ts",
+      "file": "src/lib/services/test-caching-integration.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/toast-service.ts",
       "fixes": 1
     },
     {
@@ -2874,7 +1918,11 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/services/unsynced-uploads.ts",
+      "file": "src/lib/services/vector-search.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/services/vectorRankingService.ts",
       "fixes": 1
     },
     {
@@ -2882,31 +1930,19 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/services/webasm-evidence-pipeline.ts",
+      "file": "src/lib/services/webgpu-accelerator.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/services/webgpu-som-enhanced-cache.ts",
+      "file": "src/lib/services/websocket-service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/shims/pg-compat.ts",
+      "file": "src/lib/simd/vector-simd.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/shims/xstate.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/state/gpu-processing-machine.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/state/routeHealthMachine.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/state/xstate-store.ts",
+      "file": "src/lib/stores/_archive/old-stores/ai-assistant-unified.svelte.ts",
       "fixes": 1
     },
     {
@@ -2914,27 +1950,51 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/avatarStore.ts",
+      "file": "src/lib/stores/_archive/old-stores/barrel-functions.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/chatMachine.ts",
+      "file": "src/lib/stores/_archive/old-stores/evidence-cache-service.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/comprehensive-types.ts",
+      "file": "src/lib/stores/_archive/old-stores/evidence-workflow.svelte.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/dialogs.ts",
+      "file": "src/lib/stores/_archive/old-stores/feedback-store.svelte.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/notification.ts",
+      "file": "src/lib/stores/_archive/old-stores/global-loki-store.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/stores/_archive/old-stores/sessionManager.svelte.ts",
+      "file": "src/lib/stores/_archive/old-stores/langchain-service-store.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/legal-case.svelte.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/loading-store.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/notifications.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/redis-state.svelte.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/report.svelte.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/stores/_archive/old-stores/userActivityStore.ts",
       "fixes": 1
     },
     {
@@ -2942,7 +2002,11 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/stores/machines/goMicroserviceMachine.ts",
+      "file": "src/lib/types/advanced-patches.d.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/types/ai.d.ts",
       "fixes": 1
     },
     {
@@ -2950,19 +2014,11 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/types/dashboard.ts",
-      "fixes": 1
-    },
-    {
       "file": "src/lib/types/enhanced-svelte5-types.d.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/types/external-services.d.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/types/global.d.ts",
+      "file": "src/lib/types/feedback.ts",
       "fixes": 1
     },
     {
@@ -2970,23 +2026,19 @@
       "fixes": 1
     },
     {
+      "file": "src/lib/types/legal-types.ts",
+      "fixes": 1
+    },
+    {
       "file": "src/lib/types/missing-types.d.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/types/service-worker.d.ts",
+      "file": "src/lib/types/qdrant.d.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/types/vector-types.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/ui/actions/tooltip.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/ui/useChrrom.ts",
+      "file": "src/lib/types/vector.ts",
       "fixes": 1
     },
     {
@@ -3006,15 +2058,11 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/utils/error-client.ts",
+      "file": "src/lib/utils/errorHandler.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/utils/evidence.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/utils/file-uploader.ts",
+      "file": "src/lib/utils/formatters.ts",
       "fixes": 1
     },
     {
@@ -3026,23 +2074,7 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/utils/loki-evidence.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/utils/rate-limit.ts",
-      "fixes": 1
-    },
-    {
       "file": "src/lib/utils/route-discovery.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/utils/routes.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/utils/simd-markdown-parser.ts",
       "fixes": 1
     },
     {
@@ -3054,23 +2086,15 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/utils/syntax-repair/patterns/colon-chain-fix.ts",
+      "file": "src/lib/utils/timing-metrics.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/utils/syntax-repair/patterns/function-call-fix.ts",
+      "file": "src/lib/utils/validation.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/utils/transitions.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/wasm/autoencoder-wasm.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/lib/wasm/bindings.ts",
+      "file": "src/lib/wasm/clustering-wasm.ts",
       "fixes": 1
     },
     {
@@ -3078,7 +2102,7 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/wasm/vector-wasm-wrapper.ts",
+      "file": "src/lib/wasm/wasm-llm-service.ts",
       "fixes": 1
     },
     {
@@ -3086,15 +2110,27 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/webgpu/diag.ts",
+      "file": "src/lib/webgpu/graph-texture-layout.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/webgpu/init.ts",
+      "file": "src/lib/webgpu/shader-cache-manager.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/webgpu/webgpu-rag-engine.ts",
+      "file": "src/lib/workers/ai-service-worker.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/workers/cache-worker.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/workers/embeddings-worker.ts",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/workers/gpu-compute-worker.ts",
       "fixes": 1
     },
     {
@@ -3106,55 +2142,23 @@
       "fixes": 1
     },
     {
-      "file": "src/lib/workers/webgpu-cuda-bridge.ts",
+      "file": "src/lib/yorha/localSearch.ts",
       "fixes": 1
     },
     {
-      "file": "src/lib/yorha/hybridSearchManager.ts",
+      "file": "src/routes_parked/(legal)_disabled/legal-cases/+page.server.ts",
       "fixes": 1
     },
     {
-      "file": "src/routes/(app)/admin/codebase-viewer/+page.server.ts",
+      "file": "src/routes_parked/api/v1/detective/patterns/+server.ts",
       "fixes": 1
     },
     {
-      "file": "src/routes_parked/api/ai/search/+server.ts",
+      "file": "src/types/integrations.d.ts",
       "fixes": 1
     },
     {
-      "file": "src/routes_parked/api/error-brain/+server.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/routes_parked/api/rag/archived-handlers.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/routes_parked/api/route-operations/log/+server.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/routes_parked/api/routes/[routeId]/errors/server.test.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/routes_parked/api/routes/health-updates-sse/+server.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/routes_parked/api/security/validate/progress/+server.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/routes_parked/api/vector/analyze/+server.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/types/pgvector-drizzle.d.ts",
-      "fixes": 1
-    },
-    {
-      "file": "src/wasm/legal-parser.ts",
+      "file": "src/types/webgpu.d.ts",
       "fixes": 1
     }
   ]

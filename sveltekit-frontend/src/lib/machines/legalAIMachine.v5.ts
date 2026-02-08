@@ -316,7 +316,7 @@ export const legalAIMachine = createMachine(
          };
       }),
 
-      authenticateUser: fromPromise(async ({ input }: { input: { credentials: { email: string; password: string } } }): Promise<AuthResponse> => {
+      authenticateUser: fromPromise(async ({ input }: { input: { credentials: { email: string, password: string } } }): Promise<AuthResponse> => {
            // Simplified mock
            await new Promise(resolve => setTimeout(resolve, 500));
            return {

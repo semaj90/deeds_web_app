@@ -19,7 +19,7 @@ const env = {
 
 // Minimal internal client shape
 interface QdrantClientLike {
-  upsert(collection: string; params: Record<string, unknown>): Promise<unknown>;
+  upsert(collection: string, params: Record<string, unknown>): Promise<unknown>;
   search(
     collection: string,
     params: Record<string, unknown>

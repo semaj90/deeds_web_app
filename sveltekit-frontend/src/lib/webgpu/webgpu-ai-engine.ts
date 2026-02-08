@@ -70,7 +70,7 @@ export interface T5InferenceResult {
 }
 export interface CustomAILibrary {
  DimensionalProcessor: {
- process(data: Float32Array; shape: number[]): Promise<DimensionalArrayProcessingResult>;
+ process(data: Float32Array, shape: number[]): Promise<DimensionalArrayProcessingResult>;
  };
  AttentionKernel: {
  splice(

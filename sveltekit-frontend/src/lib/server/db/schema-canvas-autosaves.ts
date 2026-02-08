@@ -18,7 +18,8 @@ export const canvasAutosaves = pgTable('canvas_autosaves', {
         // But preventing syntax errors is priority.
 	    // embedding:  uuid('embedding').defaultRandom(),
         // commenting out embedding to prevent runtime type mismatch if not properly typed.
-		version: integer('version').default(1).notNull(); createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+		version: integer('version').default(1).notNull(),
+		createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 	},
 	(table) => ([
  index('canvas_autosaves_canvas_id_idx').on(table.canvasId),

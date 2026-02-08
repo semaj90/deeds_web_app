@@ -69,7 +69,7 @@ export class HiddenMarkovModel {
 
 // Tensor Acceleration Types
 export interface TensorAccelerator {
-  acceleratedSimilarity(a: Float32Array; b: Float32Array): number;
+  acceleratedSimilarity(a: Float32Array, b: Float32Array): number;
   batchProcess(vectors: Float32Array[]): Promise<Float32Array[]>;
 }
 
@@ -88,7 +88,7 @@ export interface WASMMemory {
 export interface WASMMath {
   sqrt(x: number): number;
   abs(x: number): number;
-  max(a: number; b: number): number;
+  max(a: number, b: number): number;
   min(a: number, b: number): number;
 }
 

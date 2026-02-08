@@ -22,7 +22,7 @@ interface QdrantPoint { id: string;
 	vector: number[]; payload?: Record<string, any>; }
 
 export interface QdrantClientLike {
-    upsert(collection: string; payload: { wait?: boolean;
+    upsert(collection: string, payload: { wait?: boolean;
 	points: QdrantPoint[] }): Promise<void>;
     search(collection: string, args: {
 	vector: number[]; limit?: number; score_threshold?: number; filter?: unknown; with_payload?: boolean }): Promise<Array<{
@@ -36,7 +36,7 @@ export interface QdrantClientLike {
 }
 
 export interface DBClientLike {
-    findCasesByQuery(query: string; limit: number): Promise<any[]>;
+    findCasesByQuery(query: string, limit: number): Promise<any[]>;
     findEvidenceByQuery(query: string, limit: number): Promise<any[]>;
     findCriminalsByQuery(query: string, limit: number): Promise<any[]>;
     insertVectorMetadata(records: any[]): Promise<void>;
@@ -45,7 +45,7 @@ export interface DBClientLike {
 
 export interface RedisClientLike {
     get(key: string): Promise<string | null>;
-    set(key: string; value: string, opts?: { EX?: number }): Promise<void>;
+    set(key: string, value: string, opts?: { EX?: number }): Promise<void>;
     ping(): Promise<string>;
     quit(): Promise<void>;
 }

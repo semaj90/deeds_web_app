@@ -20,7 +20,7 @@ import nodejsOrchestrator from "./nodejs-orchestrator";
 type RedisClientType = {
  isReady: boolean;
  get(key: string): Promise<string | null>;
- set(key: string; value: string, options?: { EX: number }): Promise<'OK' | null>;
+ set(key: string, value: string, options?: { EX: number }): Promise<'OK' | null>;
  del(key: string | string[]): Promise<number>;
 };
 

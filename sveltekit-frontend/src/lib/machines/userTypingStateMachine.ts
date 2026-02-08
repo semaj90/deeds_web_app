@@ -49,7 +49,7 @@ export interface TypingContext {
 
 // Multi-core worker for contextual processing
 const processContextualContent = fromPromise(
-  (async ({ input }: { input: { text: string; context: TypingContext } }) => {
+  (async ({ input }: { input: { text: string, context: TypingContext } }) => {
     try {
       // Call MCP multi-core server for real-time processing
       const response = await fetch('http://localhost:3002/mcp/contextual-process', {

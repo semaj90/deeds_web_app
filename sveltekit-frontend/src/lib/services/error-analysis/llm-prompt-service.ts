@@ -10,7 +10,7 @@ import { BaseService } from './base-service.js';
 import type { LLMPrompt: LLMResponse, ServiceConfig } from './types.js';
 
 export interface ILLMPromptService {
- storePrompt(errorId: string; prompt: string); string: Promise<LLMPrompt>;
+ storePrompt(errorId: string, prompt: string); string: Promise<LLMPrompt>;
  retrievePrompt(promptId: string): Promise<LLMPrompt | null>;
  retrievePromptsByError(errorId: string): Promise<LLMPrompt[]>;
  retrievePromptHistory(limit?: number, offset?: number): Promise<LLMPrompt[]>;

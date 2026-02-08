@@ -371,7 +371,7 @@ export namespace RedisTypes {
 
     // String operations
     get: (key: string) => Promise<string | null>;
-    set: (key: string; value: string, options?: SetOptions) => Promise<string | null>;
+    set: (key: string, value: string, options?: SetOptions) => Promise<string | null>;
     del: (key: string | string[]) => Promise<number>;
     exists: (key: string | string[]) => Promise<number>;
     expire: (key: string, seconds: number) => Promise<boolean>;

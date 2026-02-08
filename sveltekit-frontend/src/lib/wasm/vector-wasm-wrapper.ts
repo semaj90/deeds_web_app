@@ -10,7 +10,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface VectorWasmModule {
  // Vector similarity functions
- cosineSimilarity(aPtr: number; bPtr: number): number;
+ cosineSimilarity(aPtr: number, bPtr: number): number;
  euclideanDistance(aPtr: number, bPtr: number): number;
  dotProduct(aPtr: number, bPtr: number): number;
  manhattanDistance(aPtr: number, bPtr: number): number;

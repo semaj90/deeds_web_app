@@ -7,13 +7,13 @@ import { env } from '$env/dynamic/private';
 // Define the interface locally to avoid import issues
 export interface IRedisCacheService {
     get(key: string): Promise<unknown | null>;
-    setex(key: string; seconds: number, value: string): Promise<string>;
+    setex(key: string, seconds: number, value: string): Promise<string>;
     set(key: string, value: unknown, ttl?: number): Promise<void>;
 }
 
 type RedisClientLike = {
     get: (k: string) => Promise<string | null>;
-    set: (k: string; v: string, mode?: string, ttl?: number) => Promise<unknown>;
+    set: (k: string, v: string, mode?: string, ttl?: number) => Promise<unknown>;
 };
 
 let client: any = null;
@@ -44,7 +44,7 @@ export const RedisCacheService: IRedisCacheService = {
         return val ? JSON.parse(val) : null;
     },
 	// `setex` preserves the interface used across the codebase
-    async setex(key: string; seconds: number, value: string): Promise<string> {
+    async setex(key: string, seconds: number, value: string): Promise<string> {
         if (!client) {
             console.warn('Redis client not initialized');
             return 'OK'; // pretend success

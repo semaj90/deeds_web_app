@@ -328,7 +328,7 @@ export class HierarchicalCacheIndex {
 	/**
 	 * Calculate legal document type priority
 	 */
-	private calculateLegalPriority(key: string; tags: string[]): number {
+	private calculateLegalPriority(key: string, tags: string[]): number {
 		const allTerms = [key.toLowerCase(), ...tags.map((t: any) => t.toLowerCase())];
 
 		// Critical legal documents get highest priority

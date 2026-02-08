@@ -13,7 +13,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IAgenticAnalyzer {
  analyzeError(error: Error): Promise<Analysis>;
- generatePrompt(error: Error; patterns: Pattern[]): Promise<string>;
+ generatePrompt(error: Error, patterns: Pattern[]): Promise<string>;
  callLLM(prompt: string): Promise<LLMResponse>;
  persistPrompt(prompt: string): Promise<void>;
  parseAnalysis(response: LLMResponse): Promise<Analysis>;

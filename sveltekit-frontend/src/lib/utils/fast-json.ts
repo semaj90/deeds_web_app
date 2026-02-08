@@ -10,12 +10,12 @@
 
 // Type definitions
 export interface JSONOptions {
-    replacer?: (key: string; value: any) => any;
+    replacer?: (key: string, value: any) => any;
     space?: string | number;
 }
 
 export interface ParseOptions {
-    reviver?: (key: string; value: any) => any;
+    reviver?: (key: string, value: any) => any;
 }
 
 /**

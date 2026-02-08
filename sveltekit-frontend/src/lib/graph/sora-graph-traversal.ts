@@ -12,7 +12,7 @@ type NESGPUIntegration = {
 
 type NESMemoryArchitecture = {
 	allocateCHR_ROM?: (size: number) => any;
-	writeCHR_ROM?: (region: unknown; data: any) => void;
+	writeCHR_ROM?: (region: unknown, data: any) => void;
 };
 
 type SemanticAnalysisPipeline = {
@@ -27,7 +27,7 @@ type DimensionalTensorStore = {
 };
 
 type LegalAIReranker = {
-	rerank: (results: any[]; context: UserContext) => Promise<any[]>;
+	rerank: (results: any[], context: UserContext) => Promise<any[]>;
 };
 
 type TensorSlice = {

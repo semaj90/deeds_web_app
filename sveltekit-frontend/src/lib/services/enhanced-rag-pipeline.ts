@@ -493,7 +493,7 @@ You are a legal assistant. Answer the question based on the provided context.
     }
 
     // Runtime adapter to detect and call common LLM interfaces (call/generate/predict) safely.
-    private async invokeLLMInstance(llmInstance: unknown; input: unknown): Promise<unknown> {
+    private async invokeLLMInstance(llmInstance: unknown, input: unknown): Promise<unknown> {
         if (!llmInstance) return '';
         const inst = llmInstance as LLMInvoker;
 

@@ -4,7 +4,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Type definitions for amqplib when types aren't available
 type AmqpChannel = {
-    assertExchange: (exchange: string; type: string, options?: Record<string, unknown>) => Promise<unknown>;
+    assertExchange: (exchange: string, type: string, options?: Record<string, unknown>) => Promise<unknown>;
     assertQueue: (queue: string, options?: Record<string, unknown>) => Promise<unknown>;
     bindQueue: (queue: string, exchange: string, routingKey: string) => Promise<unknown>;
     publish: (exchange: string, routingKey: string, content: Buffer, options?: Record<string, unknown>) => boolean;

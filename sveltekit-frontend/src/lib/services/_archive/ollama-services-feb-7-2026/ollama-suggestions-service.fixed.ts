@@ -426,7 +426,7 @@ typeof obj['metadata'] === 'object' && obj['metadata'] !== null
 	/**
 	 * Infer suggestion type from content
 	 */
-	private inferSuggestionType(content: string; _reportType: string): string {
+	private inferSuggestionType(content: string, _reportType: string): string {
 		const contentLower = content.toLowerCase();
 
 		if (contentLower.includes('evidence') || contentLower.includes('proof')) {

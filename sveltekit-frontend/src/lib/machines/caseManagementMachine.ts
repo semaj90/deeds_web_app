@@ -58,7 +58,7 @@ type CaseManagementEvent =
 
 // Machine Services (MCP Tool Calls) - XState v5 pattern
 const caseManagementServices = {
- loadCase: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
+ loadCase: async ({ input }: { input: { context: CaseManagementContext, event: any } }) => {
  const { context, event } = input;
  const caseId = event.caseId ?? context.selectedCaseId;
  if (!caseId) throw new Error('No case ID provided');
@@ -75,7 +75,7 @@ const caseManagementServices = {
  }
  return await response.json();
  },
- createCase: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
+ createCase: async ({ input }: { input: { context: CaseManagementContext, event: any } }) => {
  const { context, event } = input;
  const response = await fetch('/api/v1/mcp/call', {
  method: 'POST',
@@ -92,7 +92,7 @@ const caseManagementServices = {
  }
  return await response.json();
  },
- updateCase: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
+ updateCase: async ({ input }: { input: { context: CaseManagementContext, event: any } }) => {
  const { context, event } = input;
  const response = await fetch('/api/v1/mcp/call', {
  method: 'POST',
@@ -107,7 +107,7 @@ const caseManagementServices = {
  }
  return await response.json();
  },
- addEvidence: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
+ addEvidence: async ({ input }: { input: { context: CaseManagementContext, event: any } }) => {
  const { context, event } = input;
  const response = await fetch('/api/v1/mcp/call', {
  method: 'POST',
@@ -122,7 +122,7 @@ const caseManagementServices = {
  }
  return await response.json();
  },
- searchCases: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
+ searchCases: async ({ input }: { input: { context: CaseManagementContext, event: any } }) => {
  const { context, event } = input;
  const response = await fetch('/api/v1/mcp/call', {
  method: 'POST',
@@ -139,7 +139,7 @@ const caseManagementServices = {
  }
  return await response.json();
  },
- loadUserCases: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
+ loadUserCases: async ({ input }: { input: { context: CaseManagementContext, event: any } }) => {
  const { context, event } = input;
  const response = await fetch('/api/v1/mcp/call', {
  method: 'POST',

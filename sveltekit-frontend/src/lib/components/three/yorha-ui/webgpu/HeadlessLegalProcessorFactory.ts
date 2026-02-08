@@ -50,7 +50,7 @@ export interface OllamaLegalAnalysisResponse { keyLegalEntities: Array<{ textCon
 }
 
 interface OllamaServiceType {
-    generateCompletion(prompt: string; options: {
+    generateCompletion(prompt: string, options: {
 model: string; stream: boolean }): Promise<OllamaLegalAnalysisResponse>;
 }
 

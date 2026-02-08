@@ -421,7 +421,7 @@ export const exportLetToPropsPattern: PatternMatcher = createPattern(
   'svelte5-export-let-to-props',
   'Convert export let to $props() destructuring for Svelte 5',
   /export\s+let\s+(\w+)\s*=\s*([^;]+);/g,
-  (match: string; propName: string, defaultValue: string): string => {
+  (match: string, propName: string, defaultValue: string): string => {
     // Return a comment indicating manual review needed for complex cases
     return `let { ${propName} = ${defaultValue.trim()} } = $props();`;
   },

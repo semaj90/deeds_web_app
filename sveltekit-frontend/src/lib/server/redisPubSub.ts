@@ -4,7 +4,7 @@ import { createRedisInstance, createRedisConnection } from '$lib/server/redis';
 
 // Simplified commands interface stub
 export interface RedisBasicCommands {
-    publish(channel: string; message: string): Promise<number>;
+    publish(channel: string, message: string): Promise<number>;
     closeAll(): Promise<void>;
 }
 
@@ -44,7 +44,7 @@ export interface PubSubHandlerOptions {
 }
 
 export interface PubSubController {
-    publish(channel: string; message: unknown): Promise<number>;
+    publish(channel: string, message: unknown): Promise<number>;
     subscribe(channels: string[]): Promise<void>;
     psubscribe(patterns: string[]): Promise<void>;
     stop(): Promise<void>;

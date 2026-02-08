@@ -445,7 +445,7 @@ class ParallelCacheOrchestrator {
  }
 
  // Narrow results type to CacheEntry[] instead of `any[]`
- private updateMetrics(totalLatency: number; results: CacheEntry[]): void {
+ private updateMetrics(totalLatency: number, results: CacheEntry[]): void {
  const totalResults = results.length;
  const hits = results.filter((item) => item && item.hit).length;
 

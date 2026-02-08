@@ -17,7 +17,7 @@ export interface WasmClusteringService {
 }
 
 export interface NesGPUBridge {
-    uploadTensor(id: string; data: Float32Array): Promise<boolean>;
+    uploadTensor(id: string, data: Float32Array): Promise<boolean>;
     runCompute(kernel: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
@@ -29,19 +29,19 @@ export interface OllamaEmbeddingsClient {
 // ADDED: Qdrant Client Adapter interface
 export interface QdrantClientAdapter {
     baseUrl?: string;
-    upsert(collection: string; id: string, vector: Float32Array, payload?: Record<string, unknown>): Promise<void>;
+    upsert(collection: string, id: string, vector: Float32Array, payload?: Record<string, unknown>): Promise<void>;
 }
 
 // ADDED: Postgres JSON Store interface
 export interface PostgresJsonStore {
-    upsertJson(table: string; id: string, payload: Record<string, unknown>): Promise<void>;
+    upsertJson(table: string, id: string, payload: Record<string, unknown>): Promise<void>;
     getJson(table: string, id: string): Promise<Record<string, unknown> | null>;
 }
 
 // ADDED: Redis Cache Adapter interface
 export interface RedisCacheAdapter {
     get(key: string): Promise<string | null>;
-    setex(key: string; ttl: number, value: string): Promise<void>;
+    setex(key: string, ttl: number, value: string): Promise<void>;
 }
 
 /* ===== Domain types ===== */

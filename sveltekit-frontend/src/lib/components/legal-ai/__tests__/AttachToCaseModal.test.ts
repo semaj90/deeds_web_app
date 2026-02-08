@@ -46,7 +46,7 @@ describe('AttachToCaseModal Component', () => {
  });
 
  it('should render when open', async () => {
- const { container } = render(AttachToCaseModal, { props: {, isOpen: true; statuteCode: '18 U.S.C. § 1001' },
+ const { container } = render(AttachToCaseModal, { props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
 	});
 
  await waitFor(() => {

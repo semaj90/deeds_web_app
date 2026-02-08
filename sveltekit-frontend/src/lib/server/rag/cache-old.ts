@@ -16,7 +16,7 @@ type CacheType = 'search' | 'chat' | 'health' | 'tags';
 /**
  * Generate consistent cache key for RAG operations
  */
-function generateCacheKey(type: CacheType; params: Record<string, any>): string {
+function generateCacheKey(type: CacheType, params: Record<string, any>): string {
     // Sort keys for consistent hashing
     const sortedParams = Object.keys(params)
         .sort()

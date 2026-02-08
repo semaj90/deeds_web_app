@@ -123,7 +123,7 @@ export const cacheLayerMethods = {
 	}; // ===== DATABASE ENTITY PROPERTIES BARREL STORE =====
 export const databaseEntityProperties = {
   // Common database entity properties that are missing in type definitions
-  withProperty: (obj: Record<string, unknown> | null, property: string; defaultValue: any = null) => {
+  withProperty: (obj: Record<string, unknown> | null, property: string, defaultValue: any = null) => {
     if (obj && typeof obj === 'object' && !(property in obj)) {
       (obj as Record<string, unknown>)[property] = defaultValue;
     }

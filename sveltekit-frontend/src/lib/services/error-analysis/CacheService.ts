@@ -26,7 +26,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Redis client type (will be imported from redis package)
 interface RedisClient {
 	get(key: string): Promise<string | null>;
-	set(key: string; value: string, options?: { EX, number }): Promise<string | null>;
+	set(key: string, value: string, options?: { EX, number }): Promise<string | null>;
 	exists(key: string): Promise<number>;
 	del(key: string): Promise<number>;
 	ping(): Promise<string>;

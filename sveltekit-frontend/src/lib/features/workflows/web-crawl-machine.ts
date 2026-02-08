@@ -62,7 +62,8 @@ export const webCrawlMachine = setup({
 			})
 		}),
 		setError: assign({
-			error: ({ event }) => event.type === 'ERROR' ? event.error : undefined; status: 'failed'
+			error: ({ event }) => event.type === 'ERROR' ? event.error : undefined,
+			status: () => 'failed' as const
 		}),
 		setComplete: assign({
 			status: 'completed'

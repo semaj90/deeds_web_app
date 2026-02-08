@@ -10,7 +10,7 @@ import type { Diff, Error, ServiceConfig } from './types.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IDiffGenerator {
- generateDiff(error: Error; fix: string): Promise<Diff>;
+ generateDiff(error: Error, fix: string): Promise<Diff>;
  addContext(diff: Diff, contextLines?: number): Promise<Diff>;
  formatDiff(diff: Diff): Promise<string>;
  splitLargeDiff(diff: Diff, maxLines?: number): Promise<Diff[]>;

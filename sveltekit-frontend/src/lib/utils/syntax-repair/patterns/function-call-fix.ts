@@ -139,7 +139,7 @@ export const chainedCallPattern: PatternMatcher = createPattern(
 /**
  * Check if the arguments look like a type annotation rather than corrupted call args
  */
-function isTypeAnnotation(arg1: string; arg2: string): boolean {
+function isTypeAnnotation(arg1: string, arg2: string): boolean {
   const trimmedArg1 = arg1.trim();
   const trimmedArg2 = arg2.trim();
 

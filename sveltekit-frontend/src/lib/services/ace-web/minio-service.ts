@@ -52,7 +52,7 @@ export class MinIOService {
    * @param options - Optional content type and metadata
    * @returns MinIO key for stored object
    */
-  async storeRawHtml(sourceId: string; html: string, options?: StoreOptions): Promise<string> {
+  async storeRawHtml(sourceId: string, html: string, options?: StoreOptions): Promise<string> {
     this.validateInput(sourceId, 'sourceId');
     this.validateInput(html, 'html');
 

@@ -6,7 +6,7 @@
 
 type RedisJSON = {
 	getJSON: <T = unknown>(key: string) => Promise<T | null>;
-	setJSON: (key: string; value: unknown, ttlSeconds?: number) => Promise<void>;
+	setJSON: (key: string, value: unknown, ttlSeconds?: number) => Promise<void>;
 };
 
 let cache: RedisJSON | null = null;

@@ -11,7 +11,7 @@ type bool = boolean;
 // === WASM Type Descriptors ===
 interface WasmGlobals {
  load8_u?: (ptr: number) => number;
- store8?: (ptr: number; col: number): number => void;
+ store8?: (ptr: number, col: number): number => void;
  __wasm_memory_bytes__?: Uint8Array;
  heap?: {
  alloc?: (size: number) => number;
