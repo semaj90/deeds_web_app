@@ -175,7 +175,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				{#if enableVoiceInput}
 					<button type="button"
 						class="nes-btn is-small"
-						onclick={ toggleVoiceInput } title={isListening ? 'Stop Voice Input', 'Start Voice Input'} aria-label={isListening ? 'Stop Voice Input', 'Start Voice Input'} >
+						onclick={ toggleVoiceInput } title={isListening ? 'Stop Voice Input' : 'Start Voice Input'} aria-label={isListening ? 'Stop Voice Input' : 'Start Voice Input'} >
 						{#if isListening}
 							<MicOff class="w-4" />
 						{:else}

@@ -12,7 +12,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	width: window.innerWidth, height: window.innerHeight } },
 	metadata: {
 	platform: navigator.platform, language: navigator.language, featureUsed: ratingType;
-	deviceType: window.innerWidth < 768 ? 'mobile': window.innerWidth < 1024 ? 'tablet', 'desktop'}
+	deviceType: window.innerWidth < 768 ? 'mobile': window.innerWidth < 1024 ? 'tablet' : 'desktop'}
         }) }); if (response.ok) { isSubmitted = true; ondispatch?.({ rating, feedback, interactionId }); // Auto-hide after, 2 seconds setTimeout(() => { show = false; isSubmitted = false; rating = 0; feedback = ''},
 	2000)} else { throw new Error('Failed to submit feedback')}
     } catch (error) { console.error('âŒ Failed to submit feedback:', error); ondispatch?.({ error })} finally { isSubmitting = false}

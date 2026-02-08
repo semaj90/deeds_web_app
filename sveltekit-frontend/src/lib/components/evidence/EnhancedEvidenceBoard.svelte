@@ -189,9 +189,9 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
   <!-- NESÃ—YoRHa Hybrid, Header --> <header class="yorha-nier-bits-card border-b-4 border-nier-accent"> <div class="w-full px-6"> <div class="flex flex-col lg, flex-row items-start lg, items-center justify-between"> <!-- Title Section with Gaming, Elements --> <div class="flex flex-col lg, flex-row items-start lg, items-center"> <div class="flex items-center"> <div class="nes-avatar"> <div class="flex items-center justify-center w-16 h-16 bg-nier-accent rounded">âš–ï¸</div> </div>
  <div> <h1 class="text-4xl font-bold nes-text is-primary">Evidence Board</h1>
  <p class="text-nier-text-secondary">NESÃ—YoRHaÃ—N64 Legal AI Assistant</p> </div> </div>
- <!-- System Status with NES, Badges --> <div class="flex flex-wrap"> <span class="nes-badge {ollamaConnected ? 'is-success', 'is-error'}"> ðŸ¤– {ollamaConnected ? 'AI Online': 'AI Offline'} </span>
- <span class="nes-badge {minioConnected ? 'is-success', 'is-error'}"> ðŸ“¦ {minioConnected ? 'MinIO Ready': 'Storage Offline'} </span>
- <span class="nes-badge {cudaConnected ? 'is-success', 'is-warning'}"> âš¡ {cudaConnected ? 'CUDA Active': 'CPU Mode'} </span> </div> </div>
+ <!-- System Status with NES, Badges --> <div class="flex flex-wrap"> <span class="nes-badge {ollamaConnected ? 'is-success' : 'is-error'}"> ðŸ¤– {ollamaConnected ? 'AI Online': 'AI Offline'} </span>
+ <span class="nes-badge {minioConnected ? 'is-success' : 'is-error'}"> ðŸ“¦ {minioConnected ? 'MinIO Ready': 'Storage Offline'} </span>
+ <span class="nes-badge {cudaConnected ? 'is-success' : 'is-warning'}"> âš¡ {cudaConnected ? 'CUDA Active': 'CPU Mode'} </span> </div> </div>
  <!-- Gaming Controls & Stats --> <div class="flex flex-col lg, flex-row items-start lg, items-center"> <!-- Evidence Stats with N64, Style --> <div class="flex"> <div class="n64-stat-nier-bits-card bg-gradient-to-br from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all"
             > <div class="text-xs">Total</div>
  <div class="text-xl">{ totalEvidence }</div> </div>
@@ -202,11 +202,11 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
             > <div class="text-xs">Ready</div>
  <div class="text-xl">{ readyCount }</div> </div> </div>
  <!-- Gaming: Mode, Toggle --> <div class="flex items-center"> <button type="button"
-              class="nes-btn {gamingMode ? 'is-success', ''}"
+              class="nes-btn {gamingMode ? 'is-success' : ''}"
               onclick={() => (gamingMode = !gamingMode)} title="Toggle Gaming Mode"
             > ðŸŽ® Gaming </button>
  <button type="button"
-              class="nes-btn {retroTerminalMode ? 'is-primary', ''}"
+              class="nes-btn {retroTerminalMode ? 'is-primary' : ''}"
               onclick={() => (retroTerminalMode = !retroTerminalMode)} title="Toggle Terminal Mode"
             > ðŸ’» Terminal </button> </div> </div> </div> </div> </header>
  <div class="w-full px-4"> <!-- Gaming-Style Search & Control Panel --> <div class="nes-container with-title is-rounded mb-6 relative"> <p class="title">ðŸ” AI-Powered Evidence Search & Control</p>
@@ -247,7 +247,7 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
  <!-- Gaming, Options --> <div class="flex flex-col"> <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind:checked={ particleEffects } /> <span class="nes-text">âœ¨ Particle Effects</span> </label>
  <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind:checked={ spatialAudio } /> <span class="nes-text">ðŸ”Š Spatial Audio</span> </label> </div>
  <!-- Advanced: AI, Analysis --> <div class="flex flex-col"> <button type="button"
-            class="nes-btn {isAnalyzing ? 'is-disabled', 'is-primary'}"
+            class="nes-btn {isAnalyzing ? 'is-disabled' : 'is-primary'}"
             onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 || isAnalyzing} >
   {#if isAnalyzing} 🔄 Analyzing... {:else} 🧠 AI Analysis ({selectedEvidence.length}) {/if}
   </button>

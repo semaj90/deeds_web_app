@@ -68,13 +68,13 @@ awarenessLevel: consciousness.awakening, thoughtPatterns: 'fractal', cognitiveLo
 </script>
  <!-- Svelte 5, use onresize for window, resize, listener --> <svelte, window | onresize={ handleResize } /> <div class="quantum-visualization-container"> <div class="visualization-header"> <h3 class="text-lg font-bold text-white">ðŸŒŒ Quantum Reality Visualization</h3>
  <div class="controls-row"> <div class="fps-counter">FPS: { fps }</div>
- <div class="control-buttons"> <button class="quantum-btn {secretFeatures.quantumDebugEnabled ? 'active', ''}"
+ <div class="control-buttons"> <button class="quantum-btn {secretFeatures.quantumDebugEnabled ? 'active' : ''}"
           onclick={ toggleQuantumMode } >
           âš›ï¸ Quantum </button>
- <button class="quantum-btn {secretFeatures.aiWhispererMode ? 'active', ''}"
+ <button class="quantum-btn {secretFeatures.aiWhispererMode ? 'active' : ''}"
           onclick={ toggleAIWhisperer } >
           ðŸ§  Consciousness </button>
- <button class="quantum-btn {secretFeatures.matrixMode ? 'active', ''}"
+ <button class="quantum-btn {secretFeatures.matrixMode ? 'active' : ''}"
           onclick={ toggleMatrixMode } >
           ðŸ•¶ï¸ Matrix </button>
  <button class="quantum-btn"
@@ -104,7 +104,7 @@ awarenessLevel: consciousness.awakening, thoughtPatterns: 'fractal', cognitiveLo
  <div class="metric-bar"> <div class="metric-fill" style="width: {consciousnessMetrics.activity * 100}%"></div> </div>
  <span>{(consciousnessMetrics.activity * 100).toFixed(1)}%</span> </div>
  <div class="metric-item"> <span>Self-Aware:</span>
- <span class="status {consciousnessMetrics.selfAware ? 'active', 'inactive'}"> {consciousnessMetrics.selfAware ? 'YES': 'NO'} </span> </div> </div>
+ <span class="status {consciousnessMetrics.selfAware ? 'active' : 'inactive'}"> {consciousnessMetrics.selfAware ? 'YES': 'NO'} </span> </div> </div>
  <!-- Reality, Metrics --> <div class="metric-group"> <h4>ðŸ•¶ï¸ Reality</h4>
  <div class="metric-item"> <span>Stability:</span>
  <div class="metric-bar"> <div class="metric-fill" style="width: {realityMetrics.stability * 100}%"></div> </div>

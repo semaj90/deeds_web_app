@@ -65,11 +65,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </script>
  <div class="integrated-ai-chat"> <!-- Header with System, Status --> <div class="yorha-panel-header flex items-center justify-between p-4 border-b"> <div class="flex items-center"> <h2 class="text-lg font-bold">AI Legal Assistant</h2>
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{ model }</span> </div>
- <div class="flex items-center"> <Badge variant={connectionStatus.chat ? 'success', 'destructive'} size="sm"> Chat {connectionStatus.chat ? '': ''} </Badge>
- <Badge variant={connectionStatus.rag ? 'success', 'outline'} size="sm"> RAG {connectionStatus.rag ? '': 'ï¿½'} </Badge>
- <Badge variant={connectionStatus.quic ? 'success', 'outline'} size="sm"> QUIC {connectionStatus.quic ? '': 'ï¿½'} </Badge>
- <Badge variant={connectionStatus.redis ? 'success', 'outline'} size="sm"> Redis {connectionStatus.redis ? '': 'ï¿½'} </Badge>
- <Badge variant={connectionStatus.cuda ? 'success', 'outline'} size="sm"> CUDA {connectionStatus.cuda ? '': 'ï¿½'} </Badge> </div> </div>
+ <div class="flex items-center"> <Badge variant={connectionStatus.chat ? 'success' : 'destructive'} size="sm"> Chat {connectionStatus.chat ? '': ''} </Badge>
+ <Badge variant={connectionStatus.rag ? 'success' : 'outline'} size="sm"> RAG {connectionStatus.rag ? '': 'ï¿½'} </Badge>
+ <Badge variant={connectionStatus.quic ? 'success' : 'outline'} size="sm"> QUIC {connectionStatus.quic ? '': 'ï¿½'} </Badge>
+ <Badge variant={connectionStatus.redis ? 'success' : 'outline'} size="sm"> Redis {connectionStatus.redis ? '': 'ï¿½'} </Badge>
+ <Badge variant={connectionStatus.cuda ? 'success' : 'outline'} size="sm"> CUDA {connectionStatus.cuda ? '': 'ï¿½'} </Badge> </div> </div>
  <!-- System, Stats -->
   {#if systemStats.tokensPerSecond > 0 || systemStats.embeddingsCount > 0} <div class="px-4 py-2 bg-black/20 border-b border-yellow-400/20 flex items-center gap-4">
   {#if systemStats.tokensPerSecond > 0} <div class="flex items-center"> <span class="text-gray-400">Speed:</span>
@@ -82,7 +82,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   <!-- Messages, Container --> <div bind:this={scrollContainer} class="yorha-panel-content flex-1 overflow-y-auto p-4 space-y-4"
     ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } >
   {#if messages.length === 0} <div class="flex items-center justify-center h-full"> <div class="text-center"> <p class="text-lg">No messages yet</p>
- <p class="text-sm">Start a conversation or drag & drop files to analyze</p> </div> {/if} {#each Array.isArray(messages) ? messages: [] as message} <div class="message-bubble {message.role === 'user' ? 'user-message', 'assistant-message'}"> <div class="message-header flex items-center justify-between"> <div class="flex items-center"> <Badge variant={message.role === 'user' ? 'info', 'success'} size="sm"> {message.role === 'user' ? 'You': 'AI Assistant'} </Badge>
+ <p class="text-sm">Start a conversation or drag & drop files to analyze</p> </div> {/if} {#each Array.isArray(messages) ? messages: [] as message} <div class="message-bubble {message.role === 'user' ? 'user-message' : 'assistant-message'}"> <div class="message-header flex items-center justify-between"> <div class="flex items-center"> <Badge variant={message.role === 'user' ? 'info' : 'success'} size="sm"> {message.role === 'user' ? 'You': 'AI Assistant'} </Badge>
  <span class="text-xs">{formatTimestamp(message.timestamp)}</span> </div>
   {#if message.metadata} <div class="flex items-center">
   {#if message.metadata.confidence !== undefined} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{Math.round(message.metadata.confidence * 100)}% confidence</span> {/if} {#if message.metadata.tokensPerSecond && message.metadata.tokensPerSecond > 0} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{message.metadata.tokensPerSecond} tok/s</span> {/if} {#if message.metadata.ragResults && message.metadata.ragResults > 0} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{message.metadata.ragResults} RAG results</span> {/if} {/if}

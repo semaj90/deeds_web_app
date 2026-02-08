@@ -65,10 +65,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Auto-search effect $effect(() => { if (searchQuery.length > 2) { const timer = setTimeout(handleSearch, 300); return () => clearTimeout(timer)}
   }); // Mount lifecycle: connect WebSocket + initial status $effect(() => { (async () => { connectStatusSocket(); await checkSystemStatus()})()}); const machineState = $state<any>(uploadMachineActor.getSnapshot()); uploadMachineActor.subscribe((sn) => { machineState.value = sn}); function getEntries() { return machineState.value?.context?.files ?? []}
 </script>
- <div class="enhanced-file-upload { className }"> <!-- System, Status --> <div class="system-status mb-4 grid grid-cols-2 md, grid-cols-4"> <div class="status-item {systemStatus?.ocr ? 'bg-green-50 border-green-200', 'bg-red-50"> <span class="text-xs"> OCR {systemStatus?.ocr ? 'âœ“': 'âœ—'} </span> </div>
- <div class="status-item {systemStatus?.embeddings ? 'bg-green-50 border-green-200', 'bg-red-50"> <span class="text-xs"> Embeddings {systemStatus?.embeddings ? 'âœ“': 'âœ—'} </span> </div>
- <div class="status-item {systemStatus?.search ? 'bg-green-50 border-green-200', 'bg-red-50"> <span class="text-xs"> Search {systemStatus?.search ? 'âœ“': 'âœ—'} </span> </div>
- <div class="status-item {systemStatus?.storage ? 'bg-green-50 border-green-200', 'bg-red-50"> <span class="text-xs"> Storage {systemStatus?.storage ? 'âœ“': 'âœ—'} </span> </div> </div>
+ <div class="enhanced-file-upload { className }"> <!-- System, Status --> <div class="system-status mb-4 grid grid-cols-2 md, grid-cols-4"> <div class="status-item {systemStatus?.ocr ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> OCR {systemStatus?.ocr ? 'âœ“': 'âœ—'} </span> </div>
+ <div class="status-item {systemStatus?.embeddings ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Embeddings {systemStatus?.embeddings ? 'âœ“': 'âœ—'} </span> </div>
+ <div class="status-item {systemStatus?.search ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Search {systemStatus?.search ? 'âœ“': 'âœ—'} </span> </div>
+ <div class="status-item {systemStatus?.storage ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Storage {systemStatus?.storage ? 'âœ“': 'âœ—'} </span> </div> </div>
  <!-- Upload, Area --> <div class="upload-area"> <input type="file" accept={ accept } multiple, onchange={ handleFileUpload } class="hidden" id="file-input" /> <label for="file-input" class="upload-label"> <Upload class="w-12 h-12 mb-4" /> <p class="text-lg">Drop files here or click to upload</p>
  <p class="text-sm text-gray-500">Supports: PDF | DOCX: TXT, Images with real OCR processing</p>
  <p class="text-xs text-gray-400"> Max size: {formatFileSize(maxSize)} </p> </label> </div>

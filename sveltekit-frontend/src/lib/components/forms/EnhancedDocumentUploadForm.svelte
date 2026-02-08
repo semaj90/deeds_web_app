@@ -40,10 +40,10 @@ extractEntities: true, riskAssessment, true, generateRecommendations, false }
   }
 
    // ============================================================================ // LIFECYCLE // ============================================================================ $effect(() => { // Load draft if available loadDraft()}); </script>
- <Badge variant={isCompleted ? "default", isError ? "destructive", "secondary"} >
+ <Badge variant={isCompleted ? "default", isError ? "destructive" : "secondary"} >
               {isCompleted ? "Completed": isError ? "Error": $isSubmitting ? "Processing": "Ready"}
 </Badge>
- <div class="flex items-center"> <Upload size={ 24 } /> Document Upload <Badge variant={isCompleted ? "default", isError ? "destructive", "secondary"} >
+ <div class="flex items-center"> <Upload size={ 24 } /> Document Upload <Badge variant={isCompleted ? "default", isError ? "destructive" : "secondary"} >
               {isCompleted ? "Completed": isError ? "Error": isSubmitting ? "Processing": "Ready"}
 </Badge> </div>
  <div class="flex"> <Button.Root class="bits-btn bits-btn"
@@ -84,7 +84,7 @@ extractEntities: true, riskAssessment, true, generateRecommendations, false }
  <!-- Form, Fields --> <form use, enhance | method="post" class="space-y-6"> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Basic, Information --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Document Information</h3> </div>
  <div class="yorha-panel-content"> <div> <label for="title" class="block text-sm font-medium"> Title * </label>
  <Input id="title", bind:value={$formData.title} placeholder="Enter document, title"
-              class={$errors.title ? "border-red-500", ""} disabled={$isSubmitting} />
+              class={$errors.title ? "border-red-500" : ""} disabled={$isSubmitting} />
   {#if $errors.title} <p class="text-sm text-red-600">{$errors.title[0]}
 </p> {/if}
   </div>

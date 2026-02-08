@@ -134,7 +134,7 @@ primaryCharges: [
             ? '25%': $state.context.progressStage === 'analyzing'
               ? '50%': $state.context.progressStage === 'synthesizing'
                 ? '75%', $state.context.progressStage === 'complete'
-                  ? '100%', '0%'}"
+                  ? '100%' : '0%'}"
         ></div> </div> </div> </div>
   {#if $state.matches('idle') ?? $state.context.progressStage === 'selecting'} <!-- Item, Selection --> <div class="bg-white border border-gray-200 rounded-lg shadow-sm"> <h2 class="text-lg font-semibold text-gray-900">Select Items for Synthesis</h2>
  <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Documents --> <div> <h3 class="font-medium text-gray-900">Documents ({documents.length})</h3>

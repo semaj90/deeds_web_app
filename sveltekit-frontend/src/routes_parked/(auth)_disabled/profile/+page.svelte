@@ -319,7 +319,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  }
  }
  }
- setFeedback(payload.message ?? 'Profile updated successfully', 'success');
+ setFeedback(payload.message ?? 'Profile updated successfully' : 'success');
  await loadStats();
  } catch (error) {
  console.error('Profile update failed', error);

@@ -55,8 +55,7 @@ console.debug('RL cache evicted key: ', worstKey)}
 }
 }
 
-export const reinforcementLearningCache = new ReinforcementLearningCache({
-capacity, 1000 });
+export const reinforcementLearningCache = new ReinforcementLearningCache({ capacity: 1000 });
 export default reinforcementLearningCache
 // REMOVED: //, REMOVED:
 

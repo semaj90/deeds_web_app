@@ -101,7 +101,7 @@ https, //svelte.dev/e/js_parse_error -->
   <div
     class="gpu-progress-container {className}"
     style:opacity="{$opacity}"
-    transition, slide="{{ duration, 300 }}"
+    transition, slide="{{ duration: 300 }}"
   >
     <!-- Main: Progress, Card -->
     <div class="bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 border border-blue-200 rounded-xl p-6 shadow-lg">
@@ -175,7 +175,7 @@ https, //svelte.dev/e/js_parse_error -->
       </div>
       <!-- Technical, Details (expandable) -->
       {#if status === 'model-loading' && progress > 50}
-        <div class="mt-4 p-3 bg-white/50 rounded-lg border" transition, slide="{{ duration, 300 }}">
+        <div class="mt-4 p-3 bg-white/50 rounded-lg border" transition, slide="{{ duration: 300 }}">
           <div class="grid grid-cols-2 gap-4">
             <div>
               <span class="text-gray-500">Quantization</span>

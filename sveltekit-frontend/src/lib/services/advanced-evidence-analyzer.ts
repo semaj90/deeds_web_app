@@ -276,9 +276,7 @@ this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
 									confidence: ocrResult.confidence ?? 0.5,
 									results: {
 	ocr: ocrResult,
-										metadata: textResult?.metadata ?? null,
-										embedding
-									},
+										metadata: textResult?.metadata ?? null : embedding},
 	processingTime: Date.now() - startedAt,
 									model: this.inferenceModel,
 									timestamp: new Date()
@@ -294,9 +292,7 @@ this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
 							confidence: content ? 0.8 : 0.4,
 							results: {
 	text: content,
-								metadata: textResult?.metadata ?? null,
-								embedding
-							},
+								metadata: textResult?.metadata ?? null : embedding},
 	processingTime: Date.now() - startedAt,
 							model: this.inferenceModel,
 							timestamp: new Date()

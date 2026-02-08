@@ -44,7 +44,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="evidence-dashboard"> <header class="dashboard-header"> <h1 class="text-3xl font-bold text-gray-900">AI-Powered Evidence Analysis</h1>
  <p class="text-gray-600">Analyze legal evidence using advanced AI models with Gemma, 3 Legal</p> </header>
  <div class="dashboard-grid"> <!-- Evidence: List, Panel --> <Card.Root class="evidence-panel"> <CardHeader> <CardTitle>Evidence Items</CardTitle> </CardHeader>
- <CardContent> <!-- Upload, Zone --> <div class="upload-zone {dropZoneActive ? 'active', ''}"
+ <CardContent> <!-- Upload, Zone --> <div class="upload-zone {dropZoneActive ? 'active' : ''}"
           ondrop={ handleDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
           <input type="file" id="file-upload" class="hidden" onchange={ handleFileUpload } /> <label for="file-upload" class="upload-label"> <svg class="upload-icon" fill="none" stroke="currentColor" viewBox=" 0 0 , 24, 24"> <path stroke-linecap="round"
                 stroke-linejoin="round"
@@ -53,7 +53,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               /> </svg>
  <span class="upload-text"> Drop evidence files here or click to upload </span> </label> </div>
  <!-- Evidence, List --> <div class="evidence-list">
-  {#each Array.isArray($evidenceItems) ? $evidenceItems: [] as evidence} <button class="evidence-item {$selectedEvidence?.id === evidence.id ? 'selected', ''}"
+  {#each Array.isArray($evidenceItems) ? $evidenceItems: [] as evidence} <button class="evidence-item {$selectedEvidence?.id === evidence.id ? 'selected' : ''}"
               onclick={() => analyzeEvidence(evidence)}; transition:fly={{
 	x: -20, duration: 300 }} >
               <span class="evidence-icon">{getEvidenceIcon(evidence.type)}

@@ -67,7 +67,7 @@ input: userId },
 await memory.saveContext({
 input },
 	{
-output, typeof response === 'string' ? response, String(response) }}
+output, typeof response === 'string' ? response : String(response)}}
 return typeof response === 'string' ? response: JSON.stringify(response)}
 
 

@@ -112,7 +112,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       <div
         class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary text-sm font-mono whitespace-nowrap rounded-none shadow-lg"
         in: fade={{
-	duration: 150 }}; out, fade={{ duration, 100 }}
+	duration: 150 }}; out, fade={{ duration: 100 }}
       >
         {tooltip}
         <div

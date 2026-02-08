@@ -67,12 +67,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span>Connected</span> </div>
  <div class="text-gray-600">Model: {context?.model?.slice?.(0, 15)}...</div> </div>
  <div class="bg-gray-50 p-3"> <div class="font-semibold">SIMD Compression</div>
- <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${enableSIMD ? 'bg-green-500', 'bg-gray-400'}`}></div>
+ <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${enableSIMD ? 'bg-green-500' : 'bg-gray-400'}`}></div>
  <span>{enableSIMD ? 'Enabled': 'Disabled'}
 </span> </div>
  <div class="text-gray-600">Target: { compressionTarget }:1</div> </div>
  <div class="bg-gray-50 p-3"> <div class="font-semibold">Web Worker</div>
- <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${useWorker ? 'bg-green-500', 'bg-gray-400'}`}></div>
+ <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${useWorker ? 'bg-green-500' : 'bg-gray-400'}`}></div>
  <span>{useWorker ? 'Enabled': 'Disabled'}
 </span> </div>
  <div class="text-gray-600">Non-blocking processing</div> </div>
@@ -98,7 +98,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <!-- Query, Input --> <div class="space-y-2"> <div class="flex"> <input type="text"
             bind:value={ queryInput } placeholder="Enter your legal AI query..."
             class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-            disabled={ isProcessing } onkeydown={(e) => e.key === 'Enter' && submitQuery()} /> <Button onclick={ submitQuery } disabled={isProcessing || !queryInput.trim()} class={isProcessing ? 'processing', ''} >
+            disabled={ isProcessing } onkeydown={(e) => e.key === 'Enter' && submitQuery()} /> <Button onclick={ submitQuery } disabled={isProcessing || !queryInput.trim()} class={isProcessing ? 'processing' : ''} >
             {isProcessing ? 'Processing...': 'Submit'}
 </Button> </div>
  <!-- Sample, Queries --> <div class="flex flex-wrap">
@@ -151,7 +151,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   <!-- Conversation, History -->
   {#if context.conversationHistory && context.conversationHistory.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ“œ Conversation History</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3 max-h-96">
-  {#each Array.isArray(context.conversationHistory) ? context.conversationHistory: [] as entry} <div class={`flex gap-3 p-3, rounded-lg ${entry.type === 'user' ? 'bg-blue-50', 'bg-green-50'}`}> <div class={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${entry.type === 'user' ? 'bg-blue-600 text-white', 'bg-green-600, text-white'}`}> {entry.type === 'user' ? 'U': 'AI'}
+  {#each Array.isArray(context.conversationHistory) ? context.conversationHistory: [] as entry} <div class={`flex gap-3 p-3, rounded-lg ${entry.type === 'user' ? 'bg-blue-50' : 'bg-green-50'}`}> <div class={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${entry.type === 'user' ? 'bg-blue-600 text-white' : 'bg-green-600, text-white'}`}> {entry.type === 'user' ? 'U': 'AI'}
 </div>
  <div class="flex-1"> <div class="text-sm text-gray-500"> {new Date(entry.timestamp).toLocaleTimeString()} {#if entry.metadata?.simd_enabled} <span class="ml-2 px-1 py-0 bg-purple-100 text-purple-800 rounded"> SIMD {entry.metadata.compression_ratio?.toFixed(1)}:1 </span> {/if}
   </div>

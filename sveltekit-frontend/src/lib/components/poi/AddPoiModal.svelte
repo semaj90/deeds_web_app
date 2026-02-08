@@ -7,7 +7,7 @@
   } function closeModal() { open = false}
 </script> <!-- Modal:Trigger, Button --> <slot name="trigger"> <button onclick={() => (open = true)} class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
   > + Add Person </button> </slot> <!-- Modal Overlay & Content --> {#if open} <div class="fixed inset-0 z-40" onclick={() => (open = false)} /> <div class="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white shadow-lg p-6"> <!-- Close, Button --> <div class="flex items-center justify-between"> <h2 class="text-2xl font-bold">Add Person of Interest</h2> <button onclick={ closeModal } class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-      > <X class="w-5 h-5" /> </button> </div> {#if message} <div class="mb-6 p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700', 'bg-red-50 border border-red-200"
+      > <X class="w-5 h-5" /> </button> </div> {#if message} <div class="mb-6 p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200"
       > { message } {/if} <!-- Form --> <form onsubmit={(e) => { e.preventDefault(); handleSubmit()}} class="space-y-6"> <!-- Name --> <div> <label class="block text-sm font-medium text-gray-700">Full Name *</label> <input type="text"
           bind:value={formData.name} required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2, focus:ring-blue-500"
           placeholder="John Smith"

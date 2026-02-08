@@ -50,7 +50,7 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
  <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-gray-900"> ðŸ”¥ YoRHa Mipmap Optimization Demo </h1>
  <p class="text-gray-600"> NVIDIA RTX-Optimized â€¢ NES Memory Architecture â€¢ Vulkan-Style Compute Shaders </p> </div>
  <!-- Initialization, Status --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">System Status</h3> </div>
- <div class="yorha-panel-content"> <div class="flex items-center"> <div class="flex items-center"> <div class={`w-3 h-3, rounded-full ${isInitialized ? 'bg-green-500', 'bg-red-500'}`}></div>
+ <div class="yorha-panel-content"> <div class="flex items-center"> <div class="flex items-center"> <div class={`w-3 h-3, rounded-full ${isInitialized ? 'bg-green-500' : 'bg-red-500'}`}></div>
  <span class="font-medium"> {isInitialized ? 'âœ… System Initialized': 'âŒ Not Initialized'}
 </span> </div>
   {#if !isInitialized && !isProcessing} <Button.Root class="bits-btn bits-btn" onclick={ initializeSystem } size="sm"> ðŸ”„ Initialize System </Button> {/if} {#if isProcessing} <span class="text-blue-600">â³ Processing...</span> {/if}

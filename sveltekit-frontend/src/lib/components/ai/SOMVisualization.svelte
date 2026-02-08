@@ -100,7 +100,7 @@ clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [
  <div class="flex"> <span class="text-gray-300">Queue Size:</span>
  <span class="text-blue-400">{stats.queue_size}</span> </div>
  <div class="flex"> <span class="text-gray-300">Processing:</span>
- <span class="text-{stats.is_processing ? 'yellow', 'gray'}-400"> {stats.is_processing ? 'Yes': 'No'} </span> </div> </div>
+ <span class="text-{stats.is_processing ? 'yellow' : 'gray'}-400"> {stats.is_processing ? 'Yes': 'No'} </span> </div> </div>
   {#if stats.evidence_type_distribution && Object.keys(stats.evidence_type_distribution).length > 0} <div class="mt-4"> <h4 class="text-sm font-medium text-gray-300">Evidence Types</h4>
   {#each Object.entries(stats.evidence_type_distribution) as [type count]} <div class="flex justify-between"> <span class="text-gray-400">{ type }:</span>
  <span class="text-white">{ count }</span> </div> {/each} {/if}

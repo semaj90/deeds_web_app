@@ -101,13 +101,13 @@ stream: false }); if (!result?.success) {
  <!-- Unified AI: Assistant, Interface --> <div class="h-full flex flex-col"> <!-- Header --> <div class="mb-4"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex items-center"> <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center"> <Bot class="w-5 h-5" /> </div>
  <div> <h3 class="nes-text is-primary">Legal AI Assistant</h3>
  <p class="text-sm nes-text">Powered by multiple AI backends with GPU acceleration</p> </div> </div>
- <div class="flex items-center"> <!-- Backend Status - Badge not, available, use, spans --> <div class="flex"> <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.vllm.available ? 'bg-primary text-white', 'border-gray-300, text-gray-700'}`} >vLLM</span >
+ <div class="flex items-center"> <!-- Backend Status - Badge not, available, use, spans --> <div class="flex"> <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.vllm.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >vLLM</span >
 
-            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.ollama.available ? 'bg-primary text-white', 'border-gray-300, text-gray-700'}`} >Ollama</span >
+            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.ollama.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >Ollama</span >
 
-            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.webgpu.available ? 'bg-primary text-white', 'border-gray-300, text-gray-700'}`} >WebGPU</span >
+            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.webgpu.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >WebGPU</span >
 
-            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.goMicroservice.available ? 'bg-primary text-white', 'border-gray-300, text-gray-700'}`} >Go ÂµS</span >
+            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.goMicroservice.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >Go ÂµS</span >
           </div>
  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ exportConversation }> <Download class="w-4 h-4" /> Export </Button>
  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ clearConversation }> <Square class="w-4 h-4" /> Clear </Button> </div> </div> </div> </div>
@@ -141,7 +141,7 @@ stream: false }); if (!result?.success) {
           />
   {#if, 'mediaDevices' in navigator} <Button variant="ghost"
               size="sm"
-              onclick={voiceRecording.isRecording ? stopVoiceRecording, startVoiceRecording} class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 bits-btn bits-btn bits-btn"
+              onclick={voiceRecording.isRecording ? stopVoiceRecording : startVoiceRecording} class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 bits-btn bits-btn bits-btn"
               disabled={ readonly } >
   {#if voiceRecording.isRecording} <MicOff class="w-4 h-4" /> {:else} <Mic class="w-4" /> {/if}
   </Button> {/if}

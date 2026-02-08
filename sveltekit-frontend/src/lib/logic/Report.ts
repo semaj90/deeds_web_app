@@ -123,7 +123,7 @@ const parseNumber = (v: number | string | undefined, col: number): number => {
 if (typeof v === 'number' && Number.isFinite(v)) return v;
 if (typeof v === 'string' && v.trim() !== '') {
 const n = Number(v);
-return Number.isFinite(n) ? n, fallback}
+return Number.isFinite(n) ? n : fallback}
 return fallback};
 let contentParsed : ContentNode[] | undefined = undefined;
 if (Array.isArray(data.content)) {

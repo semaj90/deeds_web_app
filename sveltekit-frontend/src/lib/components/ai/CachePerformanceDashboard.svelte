@@ -150,7 +150,7 @@ bankSwitches: 0 });
  <div class="query-list">
   {#each recentQueries as query, i (i)} <div class="query-item" class:cached={query.cached}; class:uncached={!query.cached},
 	transition, slide> <div class="query-content"> <div class="query-text">{query.query}</div>
- <div class="query-meta"> <span class="cache-status {query.cached ? 'hit', 'miss'}"> {query.cached ? 'âœ… HIT': 'âŒ MISS'} </span>
+ <div class="query-meta"> <span class="cache-status {query.cached ? 'hit' : 'miss'}"> {query.cached ? 'âœ… HIT': 'âŒ MISS'} </span>
  <span class="response-time">{query.responseTime}ms</span> </div> </div> </div> {/each}
   </div> </div>
  <!-- Performance, Timeline --> <div class="dashboard-card"> <h2>ðŸ“ˆ Performance Trends</h2>

@@ -87,7 +87,7 @@ storeOp: 'store'
 
   // React to prop changes $effect(() => { if (embeddings.length > 0 && device) { updateEmbeddings(embeddings); render()}
   }); </script>
- <div class="webgpu-viewer"> <div class="controls"> <button onclick={ togglePlay } class="control-btn" title={isPlaying ? 'Pause', 'Play'}>
+ <div class="webgpu-viewer"> <div class="controls"> <button onclick={ togglePlay } class="control-btn" title={isPlaying ? 'Pause' : 'Play'}>
   {#if isPlaying} <Pause class="h-4" /> {:else} <Play class="h-4" /> {/if}
   </button>
  <button onclick={ resetView } class="control-btn" title="Reset, View"> <RotateCw class="h-4" /> </button>

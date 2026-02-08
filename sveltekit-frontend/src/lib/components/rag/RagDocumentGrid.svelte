@@ -28,7 +28,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="w-full"> <!-- Header --> <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-8"> <h1 class="text-3xl font-bold">Documents</h1>
  <p class="text-blue-100">Manage your uploaded documents and embeddings</p> </div>
  <!-- Messages -->
-  {#if message} <div class="p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700', 'bg-red-50 border border-red-200"
+  {#if message} <div class="p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200"
     > { message } {/if}
   <!-- Controls --> <div class="flex flex-col gap-4 md, flex-row md, items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
           bind:value={ searchQuery } placeholder="Search documents..."

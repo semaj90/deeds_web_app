@@ -27,7 +27,7 @@ let {
    let isSaving = $state<boolean>(false);
    let collections = $state<CitationCollection[]>([]);
    let showCollectionSelector = $state<boolean>(false); // Check if citation is already saved $effect(() => { if (isAuthenticated) { const savedCitations = citationsManager.getSavedCitations(); isSaved = savedCitations.some(c => c.id === citation.id); collections = citationsManager.getCollections()}
-  }); // Listen for authentication changes citationsManager.onAuthChange(user => { isAuthenticated = user?.isAuthenticated ?? false, if (isAuthenticated) { const savedCitations = citationsManager.getSavedCitations(); isSaved = savedCitations.some(c => c.id === citation.id); collections = citationsManager.getCollections()} else { isSaved = false; collections = []}
+  }); // Listen for authentication changes citationsManager.onAuthChange(user => { isAuthenticated = user?.isAuthenticated ?? false : if (isAuthenticated) { const savedCitations = citationsManager.getSavedCitations(); isSaved = savedCitations.some(c => c.id === citation.id); collections = citationsManager.getCollections()} else { isSaved = false; collections = []}
   });
   async function handleSave(): Promise<void> { if (!isAuthenticated) { ondispatch?.({ citation, error: 'Please sign in to save citations'
       }); return}
@@ -43,7 +43,7 @@ let {
   async function handleSaveToCollection(collectionId: string): Promise<void> { if (!isAuthenticated) return; try { // First save the citation if not already saved if (!isSaved) { await citationsManager.saveCitation(citation, collectionId); isSaved = true} else { // Just add to collection await citationsManager.addCitationToCollection(collectionId: citation.id)}
       showCollectionSelector = false; ondispatch?.({ citation, success: true })} catch (error) { ondispatch?.({ citation; error: error instanceof Error ? error.message: 'Failed to save to collection'
       })}
-  } </script> {#if !isAuthenticated} <ButtonCtor { variant } { size } class="citation-save-btn disabled bits-btn" disabled={ true } title="Sign in to, save, citations"> ðŸ”’ {showText ? 'Sign in to Save': ''} </ButtonCtor> {:else} <div class="citation-save-container"> <ButtonCtor { variant } { size } class={`citation-save-btn ${isSaved ? 'saved': ''}`} onclick={isSaved ? handleRemove, handleSave} disabled={ isSaving } title={isSaved ? 'Remove from saved citations', 'Save, citation'} >
+  } </script> {#if !isAuthenticated} <ButtonCtor { variant } { size } class="citation-save-btn disabled bits-btn" disabled={ true } title="Sign in to, save, citations"> ðŸ”’ {showText ? 'Sign in to Save': ''} </ButtonCtor> {:else} <div class="citation-save-container"> <ButtonCtor { variant } { size } class={`citation-save-btn ${isSaved ? 'saved': ''}`} onclick={isSaved ? handleRemove : handleSave} disabled={ isSaving } title={isSaved ? 'Remove from saved citations' : 'Save, citation'} >
       {#if isSaving} â³ {showText ? 'Saving...': ''} {:else if isSaved} â­ {showText ? 'Saved': ''} {:else} ðŸ’¾ {showText ? 'Save': ''} {/if} </ButtonCtor> <ButtonCtor variant="ghost"
       { size } class="collection-selector-btn bits-btn"
       onclick={() => (showCollectionSelector = !showCollectionSelector)} title="Save to collection"

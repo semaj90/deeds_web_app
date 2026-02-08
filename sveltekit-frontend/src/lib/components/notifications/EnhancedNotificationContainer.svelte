@@ -82,7 +82,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#each (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).actions as action} <Button.Root class="bits-btn bits-btn"
                           size="sm"
                           variant={action.variant === "primary"
-                            ? "default", "ghost"} onclick={() => handleNotificationAction(notification, action)} class="container mx-auto px-4"
+                            ? "default" : "ghost"} onclick={() => handleNotificationAction(notification, action)} class="container mx-auto px-4"
                         > {action.label}
 </Button> {/each} {/if}
   </div>

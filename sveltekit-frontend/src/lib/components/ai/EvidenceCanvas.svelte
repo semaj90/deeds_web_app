@@ -75,7 +75,7 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
  <!-- Progress, Bar -->
   {#if analysisStatus === 'pending' || analysisStatus === 'analyzing'} <div class="progress-section"> <label for="analysis-progress" class="nes-text">Analysis Progress:</label>
  <progress id="analysis-progress"
-        class={'nes-progress, ' + (analysisStatus === 'analyzing' ? 'is-primary', 'is-warning')} value={ analysisProgress } max="100"
+        class={'nes-progress, ' + (analysisStatus === 'analyzing' ? 'is-primary' : 'is-warning')} value={ analysisProgress } max="100"
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow={Math.round(analysisProgress)} ></progress>
@@ -111,7 +111,7 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
  <p class="analysis-text">{analysisResult.summary}</p>
   {#if analysisResult.riskLevel} <div class="risk-indicator"> <span class={'nes-badge, ' + (analysisResult.riskLevel === 'high' || analysisResult.riskLevel === 'critical'
                 ? 'is-error', analysisResult.riskLevel === 'medium'
-                  ? 'is-warning', 'is-success')} >
+                  ? 'is-warning' : 'is-success')} >
             Risk Level: {analysisResult.riskLevel.toUpperCase()} </span> {/if}
   </div>
  <!-- Key, Findings -->
@@ -137,13 +137,13 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
   {#each Array.isArray(analysisResult.timeline) ? analysisResult.timeline: [] as event} <div class={'nes-container is-rounded, timeline-item, ' + event.importance}> <div class="timeline-header"> <span class="timeline-date">{new Date(event.date).toLocaleDateString()}</span>
  <span class={'nes-badge, ' + (event.importance === 'high'
                       ? 'is-error', event.importance === 'medium'
-                        ? 'is-warning', 'is-success')} >
+                        ? 'is-warning' : 'is-success')} >
                   {event.importance} </span> </div>
  <p class="timeline-event">{event.event}</p> </div> {/each}
   </div> {/if}
   <!-- Compliance, Status -->
   {#if analysisResult.complianceStatus} <div class="nes-container is-rounded"> <h4 class="nes-text">Compliance Status</h4>
- <div class="compliance-status"> <span class={'nes-badge, ' + (analysisResult.complianceStatus.toLowerCase().includes('compliant') ? 'is-success', analysisResult.complianceStatus.toLowerCase().includes('violation') ? 'is-error', 'is-warning')} >
+ <div class="compliance-status"> <span class={'nes-badge, ' + (analysisResult.complianceStatus.toLowerCase().includes('compliant') ? 'is-success', analysisResult.complianceStatus.toLowerCase().includes('violation') ? 'is-error' : 'is-warning')} >
             {analysisResult.complianceStatus} </span> </div> {/if}
   <!-- Processing, Metadata --> <div class="nes-container is-rounded"> <h4 class="nes-text">Analysis Metadata</h4>
  <div class="metadata-grid">

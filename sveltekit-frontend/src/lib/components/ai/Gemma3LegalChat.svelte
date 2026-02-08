@@ -91,7 +91,7 @@ prompt: augmentedPrompt, maxTokens: context.maxTokens, temperature: context.temp
  <TabsTrigger value="documents">Documents</TabsTrigger>
  <TabsTrigger value="metrics">Performance</TabsTrigger> </TabsList>
  <!-- Chat, Tab --> <TabsContent value="chat" class="flex-1 flex"> <ScrollArea class="flex-1"> <div class="space-y-4">
-  {#each Array.isArray($messages) ? $messages: [] as message} <div class="flex {message.role === 'user' ? 'justify-end', 'justify-start'}"> <div class="max-w-[80%] {message.role === 'user' ? 'bg-primary/10', ''} nes-container"> <div class="yorha-panel-content"> <div class="text-sm nes-text is-disabled"> {message.role === 'user' ? 'You': 'Gemma3 Legal AI'} Â· {message.timestamp.toLocaleTimeString()} </div>
+  {#each Array.isArray($messages) ? $messages: [] as message} <div class="flex {message.role === 'user' ? 'justify-end' : 'justify-start'}"> <div class="max-w-[80%] {message.role === 'user' ? 'bg-primary/10' : ''} nes-container"> <div class="yorha-panel-content"> <div class="text-sm nes-text is-disabled"> {message.role === 'user' ? 'You': 'Gemma3 Legal AI'} Â· {message.timestamp.toLocaleTimeString()} </div>
  <div class="prose prose-sm"> {@html message.content} </div>
   {#if message.metadata?.sources && message.metadata.sources.length > 0} <div class="mt-3 pt-3"> <div class="text-xs nes-text is-disabled">Sources:</div>
  <div class="space-y-1">
@@ -131,7 +131,7 @@ prompt: augmentedPrompt, maxTokens: context.maxTokens, temperature: context.temp
  <div> <div class="flex justify-between text-sm"> <span class="nes-text">Response Time</span>
  <span class="font-medium"> {$performanceMetrics.latency.toFixed(0)}ms </span> </div>
  <N64ProgressBar value={Math.max(0, 5000 - $performanceMetrics.latency)} max={ 5000 } size="sm"
-                  theme={$performanceMetrics.latency < 1000 ? 'green': $performanceMetrics.latency < 3000 ? 'gold', 'red'} animated={ true } showPercentage={ false } /> </div> </div> </div> </div>
+                  theme={$performanceMetrics.latency < 1000 ? 'green': $performanceMetrics.latency < 3000 ? 'gold' : 'red'} animated={ true } showPercentage={ false } /> </div> </div> </div> </div>
  <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary text-sm flex items-center"> <Zap class="h-4" /> GPU Status - RTX, 3060 Ti </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-4"> <div> <div class="flex justify-between text-sm"> <span class="nes-text">GPU Layers</span>
  <span class="font-medium">{$gpuStatus.layers}/35</span> </div>
@@ -141,7 +141,7 @@ prompt: augmentedPrompt, maxTokens: context.maxTokens, temperature: context.temp
  <div> <div class="flex justify-between text-sm"> <span class="nes-text">VRAM Usage</span>
  <span class="font-medium"> {($gpuStatus.memory / 1024).toFixed(1)}GB / 8.0GB </span> </div>
  <N64ProgressBar value={$gpuStatus.memory / 1024} max={ 8 } size="sm"
-                  theme={$gpuStatus.memory / 1024 < 6 ? 'green': $gpuStatus.memory / 1024 < 7 ? 'gold', 'red'} animated={ true } showPercentage={ false } /> </div>
+                  theme={$gpuStatus.memory / 1024 < 6 ? 'green': $gpuStatus.memory / 1024 < 7 ? 'gold' : 'red'} animated={ true } showPercentage={ false } /> </div>
  <div> <div class="flex justify-between text-sm"> <span class="nes-text">GPU Utilization</span>
  <span class="font-medium"> {($performanceMetrics.gpuUtilization * 100).toFixed(0)}% </span> </div>
  <N64ProgressBar value={$performanceMetrics.gpuUtilization * 100} max={ 100 } size="sm"

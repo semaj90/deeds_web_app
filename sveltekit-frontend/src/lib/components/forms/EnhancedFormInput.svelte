@@ -33,7 +33,7 @@
         class:input-error={ showErrorState }; class:input-success={ showSuccessState }; class:input-disabled={ disabled }; class:pr-12={type === "password" && showPasswordToggle} oninput={ handleInput } onchange={ handleChange } onfocus={ handleFocus } onblur={ handleBlur } aria-describedby={`${ name }-help ${name}-error`} aria-invalid={ showErrorState } /> <!-- Password Toggle, Button -->
   {#if type === "password" && showPasswordToggle} <button type="button"
           class="container mx-auto px-4"
-          onclick={ togglePasswordVisibility } aria-label={showPassword ? "Hide password", "Show password"} tabindex={-1} >
+          onclick={ togglePasswordVisibility } aria-label={showPassword ? "Hide password" : "Show password"} tabindex={-1} >
   {#if showPassword} <EyeOff class="container mx-auto" /> {:else} <Eye class="container mx-auto" /> {/if}
   </button> {/if}
   <!-- Validation, Icons -->

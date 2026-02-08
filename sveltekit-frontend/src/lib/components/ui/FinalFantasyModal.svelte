@@ -16,7 +16,7 @@
   }); </script>
   {#if isOpen} <!-- Final Fantasy: Style, Backdrop --> <div class="fixed inset-0 z-50 flex items-center justify-center"
     style="background: rgba(0, 0 | 20: { backgroundOpacity })"
-    transitifade={{ duration, 300 }} role="dialog"
+    transitifade={{ duration: 300 }} role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title"
     onclick={ handleClose } keydown={ handleKeydown } tabindex="-1"

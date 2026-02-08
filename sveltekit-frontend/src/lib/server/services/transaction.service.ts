@@ -205,8 +205,7 @@ export async function handleConstraintViolation(
         if (context.userId) {
             await auditService.logDatabaseOperation(
                 context.userId,
-                context.operationName ?? 'constraint_violation',
-                'constraint_violation',
+                context.operationName ?? 'constraint_violation' : 'constraint_violation',
                 {
                     error: error.message,
                     affectedData: context.affectedData,

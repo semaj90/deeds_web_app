@@ -53,7 +53,7 @@ export const GET: RequestHandler = async ({ url }) => {
             error: 'Invalid limit parameter',
             message: 'limit must be a positive integer',
           },
-          { status, 400 }
+          { status: 400 }
         );
       }
       if (parsedLimit > 50) {

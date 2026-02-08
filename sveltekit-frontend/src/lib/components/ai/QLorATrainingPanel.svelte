@@ -19,7 +19,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   async function resumeTraining(): Promise<any> { await qloraTrainingService.resumeTraining()}
   async function stopTraining(): Promise<any> { await qloraTrainingService.stopTraining()}
 </script>
- <div class="w-full max-w-4xl mx-auto bg-gradient-to-br from-gray-900 to-gray-800 border-cyan-500/20"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary text-2xl font-bold text-cyan-400 flex items-center"> <span class="text-3xl">ðŸ§ </span> QLorA Training System <Badge class="ml-auto" variant={trainingEnabled ? "default", "secondary"}> {trainingEnabled ? 'ENABLED': 'DISABLED'}
+ <div class="w-full max-w-4xl mx-auto bg-gradient-to-br from-gray-900 to-gray-800 border-cyan-500/20"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary text-2xl font-bold text-cyan-400 flex items-center"> <span class="text-3xl">ðŸ§ </span> QLorA Training System <Badge class="ml-auto" variant={trainingEnabled ? "default" : "secondary"}> {trainingEnabled ? 'ENABLED': 'DISABLED'}
 </Badge> </h3> </div>
  <div class="yorha-panel-content"> <!-- Main: Training, Toggle --> <div class="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border"> <div class="space-y-1"> <h3 class="text-lg font-semibold">Enable QLorA Training</h3>
  <p class="text-gray-400"> Train legal AI models on .case files with Low-Rank Adaptation </p> </div>
@@ -55,7 +55,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             {currentJob?.status === 'running' ? 'Training in Progress...': 'Start Training'}
 </button> {/if} {/if}
   <!-- Training, Progress -->
-  {#if currentJob} <div class="space-y-4" transition, fade={{ duration, 300 }}> <div class="flex items-center"> <h4 class="text-lg font-semibold">Training Progress</h4>
+  {#if currentJob} <div class="space-y-4" transition, fade={{ duration: 300 }}> <div class="flex items-center"> <h4 class="text-lg font-semibold">Training Progress</h4>
  <Badge class={getStatusColor(currentJob.status) + ' text-white'}> {currentJob.status.toUpperCase()}
 </Badge> </div>
  <!-- Progress, Bars --> <div class="space-y-3"> <div> <div class="flex justify-between text-sm text-gray-400"> <span>Epoch {currentJob.progress.currentEpoch}/{currentJob.progress.totalEpochs}
@@ -139,7 +139,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               checked={config?.enableUserAnalytics ?? false} onchange={(e) => qloraTrainingService.updateConfig({ enableUserAnalytics: e.target.checked })} class="w-4 h-4 text-cyan-600 bg-gray-700 border-gray-600 rounded focus:ring-cyan-500"
             /> <span class="text-gray-300">Enable User Analytics</span> </label> </div> {/if}
   <!-- User Analytics, Summary -->
-  {#if analytics && config?.enableUserAnalytics} <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4" transition, fade={{ duration, 300 }}> <h5 class="text-blue-300 font-semibold">ðŸ“Š User Analytics</h5>
+  {#if analytics && config?.enableUserAnalytics} <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4" transition, fade={{ duration: 300 }}> <h5 class="text-blue-300 font-semibold">ðŸ“Š User Analytics</h5>
  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4"> <div> <p class="text-gray-400">Interactions</p>
  <p class="text-blue-300">{analytics.interactions.length}
 </p> </div>

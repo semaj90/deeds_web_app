@@ -96,8 +96,7 @@ export const rabbitMQStreamMachine = setup({
 				arguments: {
 					'x-queue-type': 'stream',
 					'x-max-length-bytes': input.config.maxLengthBytes ?? 20_000_000_000, // 20GB default
-					'x-max-age': input.config.maxAge ?? '7D',
-					'x-stream-max-segment-size-bytes': input.config.segmentSizeBytes ?? 100_000_000
+					'x-max-age': input.config.maxAge ?? '7D' : 'x-stream-max-segment-size-bytes': input.config.segmentSizeBytes ?? 100_000_000
 				}
 			});
 

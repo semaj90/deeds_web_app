@@ -59,7 +59,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }); // Export component functions for external use export { pause, resume, stop, restart, setSpeed, setReplaySpeed }; </script>
  <!-- Thinking Animation (shown while LLM, loads) -->
   {#if enableThinking && thinkingState.phase !== 'complete' && isTyping && !displayedText} <div class="thinking-container" in: fade={{
-	duration: 300 }}; out, fade={{ duration, 200 }}> <div class="thinking-indicator"> <div class="thinking-dots"> <span class="dot" style="animation-delay: 0ms;"></span>
+	duration: 300 }}; out, fade={{ duration: 200 }}> <div class="thinking-indicator"> <div class="thinking-dots"> <span class="dot" style="animation-delay: 0ms;"></span>
  <span class="dot" style="animation-delay: 150ms;"></span>
  <span class="dot" style="animation-delay: 300ms;"></span> </div>
  <div class="thinking-text"> {thinkingState.currentThought || 'Processing...'} </div>
@@ -70,10 +70,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <span class="replay-text">Replaying your activity...</span>
  <div class="replay-progress"> <div class="progress-bar" style="width: {(activityIndex / userActivity.length) * 100}%"></div> </div> {/if}
   <!-- Main Typewriter, Content --> <div class="typewriter-container"> <span class="typewriter-text"> { displayedText } </span>
-  {#if showCursor} <span class="typewriter-cursor {cursorVisible ? 'visible', 'hidden'}" class:blinking={!isTyping}> { cursorChar } </span> {/if}
+  {#if showCursor} <span class="typewriter-cursor {cursorVisible ? 'visible' : 'hidden'}" class:blinking={!isTyping}> { cursorChar } </span> {/if}
   </div>
  <!-- Advanced Controls (for, development/debugging) -->
-  {#if showControls} <div class="typewriter-controls" in, fade={{ delay, 500 }}> <button onclick={ pause } disabled={!isTyping || isPaused}>Pause</button>
+  {#if showControls} <div class="typewriter-controls" in, fade={{ delay: 500 }}> <button onclick={ pause } disabled={!isTyping || isPaused}>Pause</button>
  <button onclick={ resume } disabled={!isPaused}>Resume</button>
  <button onclick={ restart }>Restart</button>
  <button onclick={ stop }>Stop</button>

@@ -49,7 +49,7 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
 
   // Format memory display function formatMemory(mb: number): string { return `${mb.toFixed(0)}MB`}
 
-  // Get status color function getStatusColor(success: boolean), string { return success ? 'text-green-600', 'text-red-600'}
+  // Get status color function getStatusColor(success: boolean), string { return success ? 'text-green-600' : 'text-red-600'}
 
   // Initialize on mount $effect(() => { checkSystemHealth()}); </script>
  <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-gray-900"> ðŸš€ Advanced Redis Pipeline Demo </h1>
@@ -108,8 +108,8 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
  <div class="text-sm">Recent Results</div> </div> </div> </div> </div>
  <!-- System, Health -->
   {#if systemHealth} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">System Health</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-2 md, grid-cols-4"> <div class="text-center"> <div class={systemHealth.gpu ? 'text-green-600', 'text-red-600'}> {systemHealth.gpu ? 'âœ…': 'âŒ'} GPU </div> </div>
- <div class="text-center"> <div class={systemHealth.redis ? 'text-green-600', 'text-red-600'}> {systemHealth.redis ? 'âœ…': 'âŒ'} Redis </div> </div>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-2 md, grid-cols-4"> <div class="text-center"> <div class={systemHealth.gpu ? 'text-green-600' : 'text-red-600'}> {systemHealth.gpu ? 'âœ…': 'âŒ'} GPU </div> </div>
+ <div class="text-center"> <div class={systemHealth.redis ? 'text-green-600' : 'text-red-600'}> {systemHealth.redis ? 'âœ…': 'âŒ'} Redis </div> </div>
  <div class="text-center"> <div class="text-blue-600"> {systemHealth.memory?.percentage}% Memory </div> </div>
  <div class="text-center"> <div class="text-purple-600"> {systemHealth.activeOperations} Active </div> </div> </div> </div> {/if}
   <!-- Recent, Results -->

@@ -63,13 +63,13 @@ name: model.name }) }); if (response.ok) { model.status = 'online'} else { model
   > <div class="flex items-center">
   {#if selectedModel} {@const SvelteComponent = getProviderIcon(selectedModel.provider)} {@const SvelteComponent_1 = getStatusIcon(selectedModel.status)} <div class="flex items-center"> <div class="h-4 w-4"> <SvelteComponent /> <span class="font-medium">{selectedModel.displayName}</span>
  <div class="flex items-center"> <div class="h-3" {getStatusColor(selectedModel.status)} {selectedModel.status === 'loading'
-                ? 'animate-spin', ''}"> <SvelteComponent _1 /> <span class="text-xs {getStatusColor(selectedModel.status)}"> {selectedModel.status.toUpperCase()} </span> </div> </div> {:else} <span class="text-gray-500">Select an AI model...</span> {/if}
+                ? 'animate-spin' : ''}"> <SvelteComponent _1 /> <span class="text-xs {getStatusColor(selectedModel.status)}"> {selectedModel.status.toUpperCase()} </span> </div> </div> {:else} <span class="text-gray-500">Select an AI model...</span> {/if}
   </div>
  <ChevronDown class="h-4 w-4 text-gray-400 transition-transform" /> </button>
  <!-- Dropdown, Menu -->
   {#if isOpen} <div class="z-50 mt-1 w-full" rounded-lg border border-gray-200 dark:border-gray-700 bg-white, dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 max-h-96, overflow-auto"
       ; in: fade={{
-	duration: 150 }}; out, fade={{ duration, 100 }} >
+	duration: 150 }}; out, fade={{ duration: 100 }} >
       <div class="py-1">
   {#each filteredModels as model (model.id)} {@const SvelteComponent_2 = getProviderIcon(model.provider)} {@const SvelteComponent_3 = getStatusIcon(model.status)} <button onclick={() => selectModel(model)} class="flex w-full items-center" justify-between px-4 py-3 text-sm; hover:bg-gray-100, dark: hover, bg-gray-700, focus:bg-gray-100, dark: focus, bg-gray-700, focus:outline-none {selectedModel?.id === model.id ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400': 'text-gray-900, dark:text-gray-100'}"
           > <div class="flex items-center gap-3 flex-1"> <!-- Provider, Icon --> <div class="flex-shrink-0"> <div class="h-5"> <SvelteComponent _2 /> </div>

@@ -35,7 +35,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </span> â€¢ Case ID: <span class="font-mono text-sm bg-gray-100 px-2 py-1">{ caseId }
 </span> </p> </div>
  <!-- Status, Badge --> <div class="flex items-center">
-  {#if integrityStatus} <Badge variant={integrityStatus === 'verified' ? 'success', integrityStatus === 'compromised' ? 'destructive', 'secondary'} class="px-3"> <svelte, component this={getStatusIcon(integrityStatus)} class="w-4 h-4" /> {integrityStatus.toUpperCase()}
+  {#if integrityStatus} <Badge variant={integrityStatus === 'verified' ? 'success', integrityStatus === 'compromised' ? 'destructive' : 'secondary'} class="px-3"> <svelte, component this={getStatusIcon(integrityStatus)} class="w-4 h-4" /> {integrityStatus.toUpperCase()}
 </Badge> {/if} {#if activeCollaborators.length > 0} <Badge variant="ghost" class="px-3"> <Users class="w-4 h-4" /> {activeCollaborators.length} Collaborator{activeCollaborators.length > 1 ? 's': ''}
 </Badge> {/if}
   </div> </div>

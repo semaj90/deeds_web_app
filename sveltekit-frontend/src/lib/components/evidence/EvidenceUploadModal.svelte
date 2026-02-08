@@ -112,7 +112,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </script>
 
 {#if isOpen}
- <div class="modal-overlay" transitionfade={{ duration, 200 }} onclick={handleCancel}>
+ <div class="modal-overlay" transitionfade={{ duration: 200 }} onclick={handleCancel}>
  <div class="modal-content" onclick={(e) => e.stopPropagation()}>
  <div class="modal-header">
  <h2>Upload Evidence</h2>

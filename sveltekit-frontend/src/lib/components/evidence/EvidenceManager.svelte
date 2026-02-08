@@ -287,7 +287,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </Button> </div> </div> </div>
  <!-- Upload, Section -->
   {#if showUpload} <div class="mb-6"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ“ Upload Evidence</h3> </div>
- <div class="yorha-panel-content"> <div class="upload-area {dragActive ? 'drag-active', ''}"
+ <div class="yorha-panel-content"> <div class="upload-area {dragActive ? 'drag-active' : ''}"
           ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } role="region" aria-label="Drop zone" ondrop={ handleDrop } >
           <input bind:this={fileInput} type="file"
             multiple class="hidden"

@@ -239,7 +239,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  {#each sections as section (section.id)}
  <button
  class="rounded-lg border border-slate-700 bg-black/60 p-4 transition-all hover:border-amber-400
- {selectedSection === section.id ? 'border-amber-400' , ''}"
+ {selectedSection === section.id ? 'border-amber-400' : ''}"
  onclick={() => setSelectedSection(section.id)}
  aria-pressed={selectedSection === section.id}
  >

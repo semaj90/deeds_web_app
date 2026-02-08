@@ -105,7 +105,7 @@
 {#if open}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		transition:fade={{ duration, 150 }}
+		transition:fade={{ duration: 150 }}
 		class={overlayClass}
 		onclick={ handleOverlayClick }
 		onkeydown={ handleOverlayKeydown }

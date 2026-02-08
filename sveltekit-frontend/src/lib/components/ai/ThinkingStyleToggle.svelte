@@ -22,7 +22,7 @@ alternatives: false });
  <div class="thinking-style-control"> <!-- Main: Toggle, Button --> <div class="toggle-container"
     onmouseenter={() => (showTooltip = true)} onmouseleave={() => (showTooltip = false)} role="button"
     tabindex="0"
-  > <Button variant={enabled ? 'crimson': 'nier'} size={size === 'sm' ? 'sm', size === 'lg' ? 'lg', 'default'} disabled={loading ?? (!premium && !enabled)} onclick={ handleToggle } class={cn(
+  > <Button variant={enabled ? 'crimson': 'nier'} size={size === 'sm' ? 'sm', size === 'lg' ? 'lg' : 'default'} disabled={loading ?? (!premium && !enabled)} onclick={ handleToggle } class={cn(
         'thinking-toggle-btn transition-all duration-300', enabled && 'animate-crimson-glow', loading && 'animate-nier-pulse'
       )} >
       <div class="icon-container">
@@ -42,7 +42,7 @@ alternatives: false });
   <!-- Info Button for non-premium, users -->
   {#if !premium} <Button variant="ghost" size="sm" onclick={ handleUpgrade } class="upgrade-btn ml-2 bits-btn bits-btn"> <Info size={ 14 } class="text-harvard-gold" /> </Button> {/if}
   <!-- Tooltip -->
-  {#if showTooltip} <div class="tooltip" transitifade={{ duration, 200 }}>
+  {#if showTooltip} <div class="tooltip" transitifade={{ duration: 200 }}>
   {#if !premium} <div class="tooltip-content"> <Crown class="h-4 w-4" /> <div> <strong>Premium Feature</strong>
  <p>Thinking Style requires Premium access for advanced AI reasoning</p> </div> </div> {:else if enabled} <div class="tooltip-content"> <Brain class="h-4 w-4" /> <div> <strong>Thinking Style Active</strong>
  <p>AI shows step-by-step reasoning process</p>
@@ -57,7 +57,7 @@ alternatives: false });
  <span class="feature">â€¢ Basic analysis</span> </div> </div> {/if} {/if}
   </div>
  <!-- Configuration, Panel -->
-  {#if showConfig && premium} <div class="config-panel nier-border-glow" transitislide={{ duration, 300 }}> <div class="config-header"> <h4 class="text-foreground">Thinking Style Configuration</h4>
+  {#if showConfig && premium} <div class="config-panel nier-border-glow" transitislide={{ duration: 300 }}> <div class="config-header"> <h4 class="text-foreground">Thinking Style Configuration</h4>
  <p class="nes-text is-disabled">Customize AI reasoning parameters</p> </div>
  <div class="config-content"> <!-- Reasoning, Depth --> <div class="setting-group"> <label for="thinking-depth" class="setting-label"> Reasoning Depth </label>
  <select id="thinking-depth" bind:value={ thinkingDepth } class="setting-select"> <option value="basic">Basic (3-5 steps)</option>
@@ -71,7 +71,7 @@ alternatives: false });
  <div class="config-actions"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => (showConfig = false)}>Cancel</Button>
  <Button.Root class="bits-btn bits-btn" variant="crimson" size="sm">Save Configuration</Button> </div> {/if}
   <!-- Premium Upgrade, Banner -->
-  {#if !premium} <div class="premium-banner" transitislide={{ duration, 300 }}> <div class="premium-content"> <Crown class="h-5 w-5" /> <div class="premium-text"> <strong>Unlock Advanced AI Reasoning</strong>
+  {#if !premium} <div class="premium-banner" transitislide={{ duration: 300 }}> <div class="premium-content"> <Crown class="h-5 w-5" /> <div class="premium-text"> <strong>Unlock Advanced AI Reasoning</strong>
  <p>Get step-by-step legal analysis with transparent thinking process</p> </div>
  <Button.Root class="bits-btn bits-btn" variant="gold" size="sm" onclick={ handleUpgrade }>Upgrade Now</Button> </div> {/if}
   </div>

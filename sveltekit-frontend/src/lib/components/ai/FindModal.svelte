@@ -78,7 +78,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } </script>
   {#if isOpen} <!-- Overlay --> <div class="nier-overlay fixed inset-0 bg-black/80 backdrop-blur-sm"
     in: fade={{
-	duration: 200 }}; out, fade={{ duration, 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
+	duration: 200 }}; out, fade={{ duration: 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
     in: fly={{
 	y: -20, duration: 300, easing: quintInOut }}; out: fly={{ y, -10; duration, 200 }} data-testid="find-modal"
   > <div class="nier-container bg-gray-900 border-2 border-yellow-400 shadow-2xl"> <!-- Animated: Border, Effect --> <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-transparent to-yellow-400 opacity-20 animate-pulse"></div>
@@ -181,7 +181,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="flex-1"> <h4 class="text-white font-mono font-bold text-sm mb-1 group-hover:text-yellow-400"> -                        {suggestion.suggestion} +                        {suggestion.suggestion} </h4>
  <p class="text-gray-400 text-xs mb-2"> -                        {suggestion.implementation} +                        {suggestion.implementation} </p>
  <div class="flex items-center"> <span class="nier-type-badge bg-gray-900 border border-gray-700 px-2 py-1"> -                          {suggestion.type?.toUpperCase()} +                          {String(suggestion.type ?? '').toUpperCase()} </span>
- <span class={ suggestion.priority === 'high' ? 'text-red-400 text-xs font-mono', suggestion.priority === 'medium' ? 'text-yellow-400 text-xs font-mono', 'text-green-400 text-xs, font-mono' }> { (suggestion.priority ?? '').toUpperCase() } </span> </div> </div> </div> </div> {/each}
+ <span class={ suggestion.priority === 'high' ? 'text-red-400 text-xs font-mono', suggestion.priority === 'medium' ? 'text-yellow-400 text-xs font-mono' : 'text-green-400 text-xs, font-mono' }> { (suggestion.priority ?? '').toUpperCase() } </span> </div> </div> </div> </div> {/each}
   </div> {/if}
   <!-- Footer --> <div class="nier-footer border-t border-yellow-400/30 p-4 flex justify-between items-center text-xs text-gray-500 font-mono"> <div class="flex items-center"> <span>POWERED BY AI + CONTEXT7 MCP</span>
   {#if mcpContext} <span class="text-green-400">â€¢ MCP ACTIVE</span> {/if}

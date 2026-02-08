@@ -180,22 +180,22 @@ evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout((
   function addNoteAt(x: number, y: number) { console.log('addNoteAt', x, y)}
   function paste() { console.log('paste')}
 </script>
- <div class="canvas-workspace" class:sidebar-open={ sidebarOpen }> <!-- Toolbar --> <div class="toolbar"> <div class="tool-group flex"> <Button class="bits-btn" variant={selectedTool === 'select' ? 'default', 'ghost'} onclick={() => { selectedTool = 'select'; updateToolMode()}} title="Select (1)"
+ <div class="canvas-workspace" class:sidebar-open={ sidebarOpen }> <!-- Toolbar --> <div class="toolbar"> <div class="tool-group flex"> <Button class="bits-btn" variant={selectedTool === 'select' ? 'default' : 'ghost'} onclick={() => { selectedTool = 'select'; updateToolMode()}} title="Select (1)"
         size="sm"
       > â†–ï¸ Select </Button>
- <Button class="bits-btn" variant={selectedTool === 'evidence' ? 'default', 'ghost'} onclick={() => (selectedTool = 'evidence')} title="Add Evidence (2)"
+ <Button class="bits-btn" variant={selectedTool === 'evidence' ? 'default' : 'ghost'} onclick={() => (selectedTool = 'evidence')} title="Add Evidence (2)"
         size="sm"
       > ðŸ“„ Evidence </Button>
- <Button class="bits-btn" variant={selectedTool === 'connection' ? 'default', 'ghost'} onclick={() => (selectedTool = 'connection')} title="Connect Evidence (3)"
+ <Button class="bits-btn" variant={selectedTool === 'connection' ? 'default' : 'ghost'} onclick={() => (selectedTool = 'connection')} title="Connect Evidence (3)"
         size="sm"
       > ðŸ”— Connect </Button>
- <Button class="bits-btn" variant={selectedTool === 'note' ? 'default', 'ghost'} onclick={() => (selectedTool = 'note')} title="Add Note (4)"
+ <Button class="bits-btn" variant={selectedTool === 'note' ? 'default' : 'ghost'} onclick={() => (selectedTool = 'note')} title="Add Note (4)"
         size="sm"
       > ðŸ“ Note </Button>
- <Button class="bits-btn" variant={selectedTool === 'highlight' ? 'default', 'ghost'} onclick={() => (selectedTool = 'highlight')} title="Highlight (5)"
+ <Button class="bits-btn" variant={selectedTool === 'highlight' ? 'default' : 'ghost'} onclick={() => (selectedTool = 'highlight')} title="Highlight (5)"
         size="sm"
       > ðŸ–ï¸ Highlight </Button>
- <Button class="bits-btn" variant={selectedTool === 'draw' ? 'default', 'ghost'} onclick={() => { selectedTool = 'draw'; updateToolMode()}} title="Draw (6)"
+ <Button class="bits-btn" variant={selectedTool === 'draw' ? 'default' : 'ghost'} onclick={() => { selectedTool = 'draw'; updateToolMode()}} title="Draw (6)"
         size="sm"
       > âœï¸ Draw </Button> </div>
  <div class="action-group flex"> <Button class="bits-btn" variant="ghost" onclick={ undo } disabled={undoStack.length === 0} size="sm">âª Undo</Button>
@@ -212,7 +212,7 @@ evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout((
   {#if sidebarOpen} <div class="sidebar"> <div class="sidebar-header"> <h3>Evidence Library</h3>
  <button class="close-btn" onclick={() => (sidebarOpen = false)}>Ã—</button> </div>
  <div class="evidence-list">
-  {#each Array.isArray(evidenceData) ? evidenceData: [] as evidence} <div class="evidence-item {evidenceNodes.has(evidence.id) ? 'on-canvas', ''}"
+  {#each Array.isArray(evidenceData) ? evidenceData: [] as evidence} <div class="evidence-item {evidenceNodes.has(evidence.id) ? 'on-canvas' : ''}"
             draggable="true"
             ondragstart={e => e.dataTransfer?.setData('evidence', JSON.stringify(evidence))} >
             <div class="evidence-icon">{getEvidenceIcon(evidence.type)}</div>

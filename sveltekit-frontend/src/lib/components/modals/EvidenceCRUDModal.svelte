@@ -86,7 +86,7 @@ image: Image, video: Video;
             > <X class="w-4" /> </Button> </div> </CardHeader>
  <CardContent class="p-6 overflow-y-auto"> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Left: Column: Basic, Info --> <div class="space-y-4"> <!-- Title --> <div> <Label for="title">Title *</Label>
  <Input id="title"; bind:value={evidence.title} placeholder="Enter evidence, title"
-                  class={errors.title ? 'border-red-500', ''} disabled={mode === 'view'} />
+                  class={errors.title ? 'border-red-500' : ''} disabled={mode === 'view'} />
   {#if errors.title} <p class="text-sm text-red-500">{errors.title}</p> {/if}
   </div>
  <!-- Type --> <div> <Label for="type">Type *</Label>

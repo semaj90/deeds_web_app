@@ -279,8 +279,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {#each messages as msg (msg.id)}
  <div
  class={msg.role === 'user'
- ? 'user-message nes-balloon from-right'
- , 'ai-message nes-balloon from-left'}
+ ? 'user-message nes-balloon from-right' : 'ai-message nes-balloon from-left'}
  >
  <div>{@html msg.content}</div>
  <span class="timestamp">{formatTime(msg.timestamp)}</span>

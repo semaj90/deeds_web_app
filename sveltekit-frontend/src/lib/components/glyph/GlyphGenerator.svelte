@@ -37,7 +37,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     } catch (err) { console.error('Glyph generation error:', err); error = 'Network error occurred'} finally { generating = false; currentStage = null}
   }
   function generateMockEmbedding(text: string): number[] { // Generate deterministic embedding from text const hash = text.split('').reduce((a, b) => { // Fixed syntax a = ((a << 5) - a) + b.charCodeAt(0); return a & a},
-	0); return Array.from({ length, 768 },
+	0); return Array.from({ length: 768 },
 	(_, i) => { const seed = hash + i; return (Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000)) * 2 - 1})}
   async function generateWithGRPMOContext(grpmoResult: any): Promise<any> { // Enhanced generation request with GRPMO context const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

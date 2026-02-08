@@ -198,9 +198,7 @@ class UnifiedSearchService {
                     documentId,
                     document.title,
                     document.content,
-                    document.filePath ?? null,
-                    document.mimeType ?? null,
-                    document.fileSize ?? 0,
+                    document.filePath ?? null : document.mimeType ?? null : document.fileSize ?? 0,
                     JSON.stringify(unifiedDoc.metadata || {})
                 ]
             );

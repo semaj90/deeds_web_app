@@ -62,7 +62,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if showSettings} <div class="settings-panel"> <h4>AI Assistant Settings</h4>
  <div class="setting-group"> <span class="label">Backend Selection</span>
  <div class="backend-grid">
-  {#each Array.isArray(aiAssistant.availableBackends) ? aiAssistant.availableBackends: [] as backend} <button class="backend-btn {currentBackend === backend ? 'active', ''}"
+  {#each Array.isArray(aiAssistant.availableBackends) ? aiAssistant.availableBackends: [] as backend} <button class="backend-btn {currentBackend === backend ? 'active' : ''}"
               class:unavailable={backendLatency[backend] === 0} onclick={() => selectBackend(backend)} >
               { backend } <span class="latency {getBackendStatusColor(backend)}"> {backendLatency[backend]}ms </span> </button> {/each}
   </div> </div>
@@ -108,8 +108,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="result-meta"> Similarity: {Math.round(((result, as unknown).similarity ?? 0) * 100)}% :  {formatTime((result as { timestamp?: number }).timestamp ?? Date.now())} </div> </div> {/each} {#if searchResults.length === 0} <div class="no-results">No related conversations found.{/if}
   </div> {/if}
   <!-- Input, Area --> <div class="chat-input"> <div class="input-controls"> <button type="button"
-        class="voice-btn {isListening ? 'listening', ''}"
-        onclick={ toggleVoiceInput } disabled={!recognition} title={recognition ? 'Voice input', 'Voice input not supported'} >
+        class="voice-btn {isListening ? 'listening' : ''}"
+        onclick={ toggleVoiceInput } disabled={!recognition} title={recognition ? 'Voice input' : 'Voice input not supported'} >
   {#if isListening} <MicOff size={ 16 } /> {:else} <Mic size={ 16 } /> {/if}
   </button>
  <button type="button"

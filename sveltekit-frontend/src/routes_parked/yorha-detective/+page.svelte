@@ -30,7 +30,7 @@
 </script>
 
 {#if isBooting}
- <div class="boot-screen" transition:fade={{ duration, 500 }}>
+ <div class="boot-screen" transition:fade={{ duration: 500 }}>
  <div class="boot-logo">
  <span class="logo-symbol">Y</span>
  <span class="logo-main">oRHa</span>

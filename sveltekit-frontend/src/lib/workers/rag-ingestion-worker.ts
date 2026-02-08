@@ -539,7 +539,7 @@ typeof CONFIG !== 'undefined' && CONFIG?.OLLAMA_URL
  }
 
  return embedsList.map((arr) => {
- return new Float32Array(arr.length ? arr , new Array(384).fill(0.1));
+ return new Float32Array(arr.length ? arr : new Array(384).fill(0.1));
  });
  } catch (e: unknown) {
  console.warn('batch fail', e);

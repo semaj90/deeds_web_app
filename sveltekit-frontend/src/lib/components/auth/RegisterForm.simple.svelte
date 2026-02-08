@@ -126,7 +126,7 @@ enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prose
  <!-- Password, Fields --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Password --> <div> <Label>Password</Label>
  <div class="relative"> <Input id="password"
               name="password"
-              type={showPassword ? 'text', 'password'} placeholder="Enter secure password";
+              type={showPassword ? 'text' : 'password'} placeholder="Enter secure password";
               bind:value={formData.password} disabled={ isLoading } required class="mt-1 pr-10"
             /> <button type="button"
               class="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -142,7 +142,7 @@ enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prose
  <!-- Confirm, Password --> <div> <Label>Confirm Password</Label>
  <div class="relative"> <Input id="confirmPassword"
               name="confirmPassword"
-              type={showConfirmPassword ? 'text', 'password'} placeholder="Confirm your password";
+              type={showConfirmPassword ? 'text' : 'password'} placeholder="Confirm your password";
               bind:value={formData.confirmPassword} disabled={ isLoading } required class="mt-1 pr-10"
             /> <button type="button"
               class="absolute inset-y-0 right-0 pr-3 flex items-center"

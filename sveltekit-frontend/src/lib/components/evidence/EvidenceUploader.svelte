@@ -29,7 +29,7 @@
 	border: none; color: #c00;
 	cursor: pointer;padding: 0.25rem 0.5rem}
 </style>
- <div class="uploader {disabled ? 'disabled', ''}"
+ <div class="uploader {disabled ? 'disabled' : ''}"
   role="button"
   aria-label={ ariaLabel } tabindex="0"
   onclick={() => !disabled && inputEl.click()}; ondrop: preventDefault={ onDrop } ondragover|preventDefault={ onDragOver } >

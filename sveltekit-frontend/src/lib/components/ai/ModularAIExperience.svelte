@@ -57,7 +57,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Module, Selector -->
   {#if enableModularSwitching} <div class="module-switcher mb-6 p-4 bg-gray-50"> <h3 class="text-lg font-semibold">ðŸ”„ Modular Components</h3>
  <div class="flex flex-wrap">
-  {#each Array.isArray(['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']) ? ['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']: [] as module} <button class="px-4 py-2 rounded-lg" border transition-colors {currentModule === module ? 'bg-blue-600 text-white border-blue-600', 'bg-white text-gray-700 border-gray-300, hover:bg-gray-50'}"
+  {#each Array.isArray(['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']) ? ['dimensional-arrays', 't5-transformer', 'kernel-attention', 'webgpu-compute']: [] as module} <button class="px-4 py-2 rounded-lg" border transition-colors {currentModule === module ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300, hover:bg-gray-50'}"
             onclick={() => switchModule(module)} >
             {module.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} </button> {/each}
   </div> {/if}

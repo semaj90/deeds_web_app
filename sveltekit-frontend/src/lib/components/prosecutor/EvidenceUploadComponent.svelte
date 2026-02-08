@@ -112,7 +112,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-sm">Stored in MinIO â€¢ Embedded in Qdrant â€¢ AI Analyzed</p>
   {#if result.aiAnalysis} <div class="mt-2"> <p class="text-xs"> <strong>AI Summary:</strong> {result.aiAnalysis.summary ? result.aiAnalysis.summary.substring(0, 100) + '...': 'No summary'} </p>
   {#if result.aiAnalysis.prosecutionRelevance} <!-- Use a simple span instead of Badge to avoid Svelte component constructor typing, issues --> <span class={'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium, ' + (result.aiAnalysis.prosecutionRelevance === 'high'
-                            ? 'bg-red-100 text-red-800', 'bg-gray-100 text-gray-800')} >
+                            ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')} >
                         {result.aiAnalysis.prosecutionRelevance} relevance </span> {/if} {/if}
   </div>
  <div class="flex flex-col items-end"> <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200"> {result.embedding ?? 'Vector stored'} </span>

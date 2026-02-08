@@ -41,7 +41,7 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
  <p>Evidence analysis stopped at depth { maxDepth }</p>
  <small>Evidence ID: {evidence.evidenceId}</small> </div> </div> {:else} <!-- Normal, evidence, node --> <div class="evidence-card" onclick={ handleEvidenceClick }> <!-- Header with, expand/collapse, control --> <div class="evidence-header"> <div class="header-left">
   {#if shouldRenderChildren} <button class="expand-toggle"
-              onclick={ toggleExpanded } aria-label={isExpanded ? 'Collapse children', 'Expand children'} >
+              onclick={ toggleExpanded } aria-label={isExpanded ? 'Collapse children' : 'Expand children'} >
               {isExpanded ? 'â–¼': 'â–¶'} </button> {/if}
   <h4 class="evidence-id"> {evidence.evidenceId.substring(0, 12)}... </h4> </div>
  <div class="header-right"> <span class="chain-integrity {getChainIntegrityClass(chainIntegrity)}"

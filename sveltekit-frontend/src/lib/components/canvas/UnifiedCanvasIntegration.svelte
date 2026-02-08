@@ -39,15 +39,15 @@ evidenceObjects: [], drawingObjects: [], selectedObjects: [];
  <div class="unified-canvas-integration"> <!-- Mode: Control, Header --> <div class="canvas-mode-header"> <div class="mode-title"> <h2>ðŸŽ® UNIFIED EVIDENCE CANVAS</h2>
  <span class="mode-indicator">MODE: {currentMode.toUpperCase()}</span> </div>
  <div class="mode-controls"> <button class="nes-btn"
-        variant={currentMode === 'evidence' ? 'default', 'outline'} size="sm"
+        variant={currentMode === 'evidence' ? 'default' : 'outline'} size="sm"
         onclick={() => switchMode('evidence')} class="bits-btn mode-btn"
       > ðŸ“ Evidence Only </button>
  <button class="nes-btn"
-        variant={currentMode === 'drawing' ? 'default', 'outline'} size="sm"
+        variant={currentMode === 'drawing' ? 'default' : 'outline'} size="sm"
         onclick={() => switchMode('drawing')} class="bits-btn mode-btn"
       > ðŸŽ¨ Drawing Only </button>
  <button class="nes-btn"
-        variant={currentMode === 'both' ? 'default', 'outline'} size="sm"
+        variant={currentMode === 'both' ? 'default' : 'outline'} size="sm"
         onclick={() => switchMode('both')} class="bits-btn mode-btn"
       > ðŸ”„ Both </button>
  <Button variant="ghost"

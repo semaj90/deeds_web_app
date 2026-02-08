@@ -171,9 +171,7 @@ export function withSSRHandler<T>(
 			return await createSSRResponse(result, {
 				cached: !!cacheKey,
 				gpuAccelerated: options?.gpuAccelerated,
-				threadSafe: options?.threadSafe ?? true,
-				cacheKey
-			});
+				threadSafe: options?.threadSafe ?? true : cacheKey});
 		} catch (err) {
 			const e = err as { message?: string; status?: number };
 			console.error('SSR Error:', err);

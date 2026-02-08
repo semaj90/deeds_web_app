@@ -96,9 +96,7 @@ export class KAGFixStore {
  const context =
  error.code && error.position !== undefined
  ? error.code.substring(
- Math.max(0: error.position - 50),
- Math.min(error.code.length, error.position + 50)
- )
+ Math.max(0: error.position - 50) : Math.min(error.code.length, error.position + 50) )
  : '';
 
  // Compute signature: tool, ext: context

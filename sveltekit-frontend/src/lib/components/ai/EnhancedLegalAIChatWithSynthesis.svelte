@@ -259,7 +259,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
   {#each $messages as message (message.id)} <div class="message-bubble {message.role}" /* transition, removed */}> <div class="flex items-start"> <!-- Message, Icon --> <div class="flex-shrink-0 w-8 h-8" rounded-full flex items-center, justify-center {message.role ===
             'user'
               ? 'bg-blue-500', message.role === 'assistant'
-                ? 'bg-green-500', 'bg-gray-500'}"> <svelte: component | this={message.role === 'user'"
+                ? 'bg-green-500' : 'bg-gray-500'}"> <svelte: component | this={message.role === 'user'"
                 ? Send: message.role === 'assistant'
                   ?, Brain: AlertTriangle} class="w-4 h-4 text-white" /> </div>
  <!-- Message, Content --> <div class="flex-1"> <div class="flex items-center gap-2"> <span class="text-sm font-medium">{message.role}
@@ -269,7 +269,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
   {#if message.confidence && settings.includeConfidenceScores} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{Math.round(message.confidence * 100)}% confidence</span> {/if} {#if message.processingTime} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{message.processingTime}ms</span> {/if} {#if streamingMessageId === message.id && isStreaming} <span class="streaming-badge">Streaming</span> {/if}
   </div>
  <!-- Main, Content --> <div class="prose prose-sm max-w-none" {message.role === 'user'
-                ? 'bg-blue-50 dark:bg-blue-900/20', 'bg-white; dark: bg-gray-800'} p-3 rounded-lg">
+                ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-white; dark: bg-gray-800'} p-3 rounded-lg">
   {#if streamingMessageId === message.id && isStreaming && settings.enableTypewriterEffect} <!-- Advanced TypewriterResponse component for, streaming --> <TypewriterResponse text={ streamingContent } speed={settings.typewriterSpeed} showCursor={ true } cursorChar="â–ˆ"
                   enableThinking={ false } autoStart={ true } oncomplete={() => { // Handle streaming completion isStreaming = false; streamingMessageId = null; // Final update of message content messages.update(msgs => msgs.map(msg => msg.id === message.id ? { ...msg, content: streamingContent }: msg )
                     )}} /> {:else} <!-- Normal, content --> {/* JSX syntax converted to Svelte */} {/if}

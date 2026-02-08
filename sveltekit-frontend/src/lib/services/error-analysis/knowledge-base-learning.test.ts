@@ -500,7 +500,7 @@ describe('KnowledgeBaseLearning', () => {
  }
  }
  ),
- { numRuns, 100 }
+ { numRuns: 100 }
  );
  });
 

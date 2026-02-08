@@ -43,7 +43,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="stat-item"> <Activity class="icon" /> <span>Usage: {memoryUsagePercent.toFixed(1)}%</span> </div>
  <div class="stat-item"> <Zap class="icon" /> <span>GPU: Active</span> </div> </div>
  <!-- Chat, Messages --> <div class="chat-container"> <div class="messages-wrapper">
-  {#each visibleMessages as message, i (i)} <div class="message {message.role}" transition, slide={{ duration, 300 }}> <div class="message-role">
+  {#each visibleMessages as message, i (i)} <div class="message {message.role}" transition, slide={{ duration: 300 }}> <div class="message-role">
   {#if message.role === 'user'} <span class="role-icon">ðŸ‘¤</span> {:else if message.role === 'assistant'} <Brain class="role-icon" /> {:else} <span class="role-icon">âš™ï¸</span> {/if}
   <span class="role-text">{message.role}</span> </div>
  <div class="message-content">

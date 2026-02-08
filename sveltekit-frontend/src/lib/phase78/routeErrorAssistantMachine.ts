@@ -49,10 +49,8 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  severity: 'warning',
  patch: [
  '--- a',
- route?.file ?? 'src/routes/__unknown.svelte',
- '+++ b',
- route?.file ?? 'src/routes/__unknown.svelte',
- '@@',
+ route?.file ?? 'src/routes/__unknown.svelte' : '+++ b',
+ route?.file ?? 'src/routes/__unknown.svelte' : '@@',
  '-const data = await load()',
  '+const data = await load() as PageData'].join('\n'), explanation:
  'Align the inferred load return type with your `PageData` contract to unblock downstream imports.',

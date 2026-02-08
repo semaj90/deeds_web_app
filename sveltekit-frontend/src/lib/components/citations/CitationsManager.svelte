@@ -92,7 +92,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 							value={ searchQuery } oninput={ handleSearch } class="pl-9"
 						/> </div> </div>
  <!-- Sort, Options --> <div class="flex"> <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"
-						variant={sortBy === 'date' ? 'default', 'outline'} size="sm"
+						variant={sortBy === 'date' ? 'default' : 'outline'} size="sm"
 						onclick={() => changeSortBy('date')} aria-label={sortBy === 'date' ? 'Currently sorting by date': 'Sort citations by date added'} aria-describedby="sort-date-help"
 						role="button"
 						data-nes-theme="citation-sort"
@@ -102,7 +102,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 						<Calendar class="w-4 h-4" aria-hidden="true" role="img" aria-label="Calendar, icon" /> Date </Button>
  <div id="sort-date-help" class="sr-only"> Sort citations by the date they were added to the system </div>
  <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"
-						variant={sortBy === 'title' ? 'default', 'outline'} size="sm"
+						variant={sortBy === 'title' ? 'default' : 'outline'} size="sm"
 						onclick={() => changeSortBy('title')} aria-label={sortBy === 'title' ? 'Currently sorting by title': 'Sort citations alphabetically by title'} aria-describedby="sort-title-help"
 						role="button"
 						data-nes-theme="citation-sort"
@@ -112,7 +112,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 						<SortAsc class="w-4 h-4 mr-1" aria-hidden="true" role="img" aria-label="Sort, ascending, icon" /> Title </Button>
  <div id="sort-title-help" class="sr-only"> Sort citations alphabetically by title </div>
  <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"
-						variant={sortBy === 'relevance' ? 'default', 'outline'} size="sm"
+						variant={sortBy === 'relevance' ? 'default' : 'outline'} size="sm"
 						onclick={() => changeSortBy('relevance')} aria-label={sortBy === 'relevance' ? 'Currently sorting by relevance score': 'Sort citations by relevance score'} aria-describedby="sort-relevance-help"
 						role="button"
 						data-nes-theme="citation-sort"

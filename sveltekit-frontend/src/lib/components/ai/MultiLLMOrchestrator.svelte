@@ -65,7 +65,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4">
   {#each Array.isArray(providerConfigs) ? providerConfigs: [] as provider} <div class="border rounded-lg p-4 hover:shadow-md"> <div class="flex items-center justify-between"> <div class="flex items-center"> <provider.icon class="h-5 w-5" /> <span class="font-medium">{provider.name}
 </span> </div>
- <Badge class="px-2 py-1 text-xs {provider.status === 'online' ? 'bg-green-100 text-green-800', 'bg-red-100 text-red-800'}"
+ <Badge class="px-2 py-1 text-xs {provider.status === 'online' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
               > {provider.status}
 </Badge> </div>
  <div class="space-y-2"> <p class="text-xs">{provider.endpoint}

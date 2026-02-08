@@ -53,13 +53,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Connection Status, Ring -->
   {#if isConnected} <div class="absolute inset-0 rounded-full border-2"></div> {:else} <div class="absolute inset-0 rounded-full border-2 border-red-400/50">{/if}
   <!-- Main Icon, Container --> <div class="relative flex items-center justify-center w-12">
-  {#if isExpanded} <ChevronUp class="w-6 h-6 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110" ; in, scale={{ duration, 200 }} /> {:else} <div class="relative"> <Bot class="w-7 h-7 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110" ; in, scale={{ duration, 200 }} /> <!-- AI Activity, Indicator -->
+  {#if isExpanded} <ChevronUp class="w-6 h-6 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110" ; in, scale={{ duration: 200 }} /> {:else} <div class="relative"> <Bot class="w-7 h-7 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110" ; in, scale={{ duration: 200 }} /> <!-- AI Activity, Indicator -->
   {#if aiMode === 'thinking' || aiMode === 'active'} <div class="absolute -top-1 -right-1 w-3 h-3 bg-current">{/if}
-  <!-- Power Status, Indicator --> <div class="absolute" -bottom-1 -right-1 w-3 h-3, rounded-full {isConnected ? 'bg-green-400', 'bg-red-400'} {isConnected ? 'animate-pulse', 'animate-ping'}"></div> {/if}
+  <!-- Power Status, Indicator --> <div class="absolute" -bottom-1 -right-1 w-3 h-3, rounded-full {isConnected ? 'bg-green-400' : 'bg-red-400'} {isConnected ? 'animate-pulse' : 'animate-ping'}"></div> {/if}
   </div>
  <!-- Gaming-style scanline, effect --> <div class="absolute inset-0 rounded-full overflow-hidden"> <div class="absolute inset-0 bg-gradient-to-t" from-transparent via-white/5, to-transparent -translate-y-full group-hover:translate-y-full transition-transform duration-1000"></div> </div>
  <!-- Tooltip -->
-  {#if isHovered && !isExpanded} <div class="absolute right-full mr-4" top-1/2 -translate-y-1/2 px-3 py-2 bg-gray-900/95 backdrop-blur-md border border-gray-600/50 rounded-lg text-sm text-gray-300 whitespace-nowrap"; in, fade={{ duration, 200 }} role="tooltip"
+  {#if isHovered && !isExpanded} <div class="absolute right-full mr-4" top-1/2 -translate-y-1/2 px-3 py-2 bg-gray-900/95 backdrop-blur-md border border-gray-600/50 rounded-lg text-sm text-gray-300 whitespace-nowrap"; in, fade={{ duration: 200 }} role="tooltip"
         > {isConnected ? 'AI Assistant Ready': 'AI Disconnected'} <!-- Tooltip, arrow --> <div class="absolute" top-1/2 -translate-y-1/2 left-full w-0, h-0 border-l-4 border-l-gray-900/95 border-y-4, border-y-transparent"></div> {/if}
   </button> {/if}
   <style> /* @unocss-include */ /* Custom gaming-style animations */ @keyframes scanner { 0%; } 100% { transform: translateY(-100%) } 50% { transform: translateY(100%) } }"

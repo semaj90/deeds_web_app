@@ -39,11 +39,11 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
 	}); // Add this typed constructor alias so TypeScript treats Input as a component constructor const InputCtor = Input as unknown as ComponentType; </script>
  <!-- Component HTML following your: UI, patterns --> <div class="w-full max-w-4xl mx-auto p-6"> <!-- Header with, system, status --> <div class="flex items-center"> <div class="flex items-center"> <div class="w-3 h-3" {$systemHealth === 'healthy'
           ? 'bg-green-500', $systemHealth === 'degraded'
-            ? 'bg-yellow-500', 'bg-red-500'}"
+            ? 'bg-yellow-500' : 'bg-red-500'}"
       ></div>
  <h1 class="text-2xl">AI-Powered Document Ingest</h1>
  <span class="px-2 py-1 rounded" text-xs, font-medium {$systemHealth === 'healthy'
-          ? 'bg-green-200 text-green-800', 'bg-yellow-200 text-yellow-800'}"
+          ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}"
       > {$systemHealth}
 </span> </div>
  <div class="flex items-center"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
@@ -74,7 +74,7 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
  <!-- replaced direct component with svelte, component using, typed, constructor --> <InputCtor id="case-id" bind:value={ caseId } placeholder="CASE-2024-001" disabled={$isProcessing} /> </div>
  <div class="space-y-2"> <Label>Document Type</Label>
  <div class="grid grid-cols-2">
-  {#each Array.isArray(documentTypes) ? documentTypes: [] as type} <button class="nes-btn bits-btn justify-start" {selectedDocumentType === type.value ? 'is-primary', ''}"
+  {#each Array.isArray(documentTypes) ? documentTypes: [] as type} <button class="nes-btn bits-btn justify-start" {selectedDocumentType === type.value ? 'is-primary' : ''}"
                 onclick={() => (selectedDocumentType = type.value)} disabled={$isProcessing} >
                 <span class="mr-2">{type.icon}
 </span> {type.label}
@@ -141,8 +141,8 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
   <!-- AI Chat Integration (if active, conversation, exists) -->
   {#if $currentConversation.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">AI Analysis</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-4 max-h-60">
-  {#each Array.isArray($currentConversation.slice(-2)) ? $currentConversation.slice(-2): [] as message} <div class="flex {message.role === 'user' ? 'justify-end', 'justify-start'}"> <div class="max-w-[80%] p-3" {message.role === 'user'
-                  ? 'bg-primary text-primary-foreground', 'bg-muted'}"
+  {#each Array.isArray($currentConversation.slice(-2)) ? $currentConversation.slice(-2): [] as message} <div class="flex {message.role === 'user' ? 'justify-end' : 'justify-start'}"> <div class="max-w-[80%] p-3" {message.role === 'user'
+                  ? 'bg-primary text-primary-foreground' : 'bg-muted'}"
               > <div class="text-sm"> {message.content}
 </div>
   {#if message.sources?.length > 0} <div class="text-xs opacity-75"> Sources: {message.sources.length} documents {/if}

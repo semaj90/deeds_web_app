@@ -97,15 +97,15 @@ multiplier: 2 });
   }
 </script>
  <div class="space-y-4"> <!-- Toolbar --> <div class="space-y-4"> <div class="space-y-4"> <!-- Tool, Selection --> <div class="space-y-4"> <Button class="bits-btn bits-btn"
-          variant={selectedTool === 'select' ? 'primary', 'outline'} size="sm"
+          variant={selectedTool === 'select' ? 'primary' : 'outline'} size="sm"
           onclick={() => selectTool('select')} disabled={ readonly } >
           <Move /> </Button>
  <Button class="bits-btn bits-btn"
-          variant={selectedTool === 'draw' ? 'primary', 'outline'} size="sm"
+          variant={selectedTool === 'draw' ? 'primary' : 'outline'} size="sm"
           onclick={() => selectTool('draw')} disabled={ readonly } >
           âœï¸ </Button>
  <Button class="bits-btn bits-btn"
-          variant={selectedTool === 'text' ? 'primary', 'outline'} size="sm"
+          variant={selectedTool === 'text' ? 'primary' : 'outline'} size="sm"
           onclick={() => selectTool('text')} disabled={ readonly } >
           <Type /> </Button> </div>
  <!-- Shapes -->

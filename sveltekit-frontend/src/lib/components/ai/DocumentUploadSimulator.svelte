@@ -99,7 +99,7 @@ text: shortText }) }); if (res.ok) { const json = await res.json(); if (Array.is
  <!-- Processing, Queue -->
   {#each uploads as upload (upload.id)} <div class="upload-item bg-gray-800 rounded-lg p-6 mb-4 border"> <div class="flex items-center justify-between"> <div class="flex items-center"> <div class="text-2xl"> {upload.type === 'application/pdf' ? 'ðŸ“„': 'ðŸ“'} </div>
  <div> <h3 class="font-semibold">{upload.filename}</h3>
- <p class="text-sm"> {(upload.size / 1024).toFixed(1)} KB â€¢ {upload.size < MAX_LOCAL_STORAGE_SIZE ? 'Local, Storage', 'PostgreSQL, Only'} </p> </div> </div>
+ <p class="text-sm"> {(upload.size / 1024).toFixed(1)} KB â€¢ {upload.size < MAX_LOCAL_STORAGE_SIZE ? 'Local, Storage' : 'PostgreSQL, Only'} </p> </div> </div>
  <button type="button"
           class="text-gray-400 hover:text-red-400 transition-colors"
           onclick={() => removeUpload(upload.id)} aria-label="Remove upload"
