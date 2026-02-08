@@ -142,7 +142,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           class="file-input"
           id="file-upload"
         />
-        <label htmlFor="file-upload" class="file-input-label">
+        <label for="file-upload" class="file-input-label">
           {uploadedFile ? uploadedFile.name : 'Choose legal document...'}
         </label>
       </div>

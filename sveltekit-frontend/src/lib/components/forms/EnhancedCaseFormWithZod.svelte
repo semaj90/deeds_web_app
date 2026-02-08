@@ -90,14 +90,14 @@ data: CaseForm }) => void}
   <form method="POST"
         action={ submitAction } use, createEnhancedSubmit enctype="multipart/form-data"
         class="space-y-6"
-      > <!-- Basic, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Case, Number --> <div class="space-y-2"> <label htmlFor="caseNumber" class="flex items-center"> <FileText class="h-4" /> <span>Case Number *</span> </label>
+      > <!-- Basic, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Case, Number --> <div class="space-y-2"> <label for="caseNumber" class="flex items-center"> <FileText class="h-4" /> <span>Case Number *</span> </label>
  <input id="caseNumber"
               name="caseNumber"
               placeholder="ABC-2024-123456"
               value={$form?.caseNumber ?? ''} oninput={e => setFormField('caseNumber', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.caseNumber ? 'true': undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.caseNumber ? 'border-destructive': ''}`} />
   {#if $errors?.caseNumber} <p class="text-sm text-destructive flex items-center"> <AlertCircle class="h-3" /> <span>{$errors.caseNumber[0]}</span> </p> {/if}
   </div>
- <!-- Priority --> <div class="space-y-2"> <label htmlFor="priority" class="flex items-center"> <AlertCircle class="h-4" /> <span>Priority Level *</span> </label>
+ <!-- Priority --> <div class="space-y-2"> <label for="priority" class="flex items-center"> <AlertCircle class="h-4" /> <span>Priority Level *</span> </label>
  <select id="priority"
               name="priority"
               value={$form?.priority ?? ''} onchange={e => setFormField('priority', (e.target as HTMLSelectElement).value as any)} class={$errors?.priority ? 'border-destructive': ''} >
@@ -106,14 +106,14 @@ data: CaseForm }) => void}
   </select>
   {#if $errors?.priority} <p class="text-sm">{$errors.priority[0]}</p> {/if}
   </div> </div>
- <!-- Title --> <div class="space-y-2"> <label htmlFor="title">Case Title *</label>
+ <!-- Title --> <div class="space-y-2"> <label for="title">Case Title *</label>
  <input id="title"
             name="title"
             placeholder="Enter a descriptive case title"
             value={$form?.title ?? ''} oninput={e => setFormField('title', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.title ? 'true': undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.title ? 'border-destructive': ''}`} />
   {#if $errors?.title} <p class="text-sm">{$errors.title[0]}</p> {/if}
   </div>
- <!-- Description --> <div class="space-y-2"> <label htmlFor="description">Description</label>
+ <!-- Description --> <div class="space-y-2"> <label for="description">Description</label>
  <textarea id="description"
             name="description"
             placeholder="Provide detailed case description (optional)"
@@ -125,21 +125,21 @@ data: CaseForm }) => void}
             onclick={() => (showAdvanced = !showAdvanced)} class="mb-4 inline-flex items-center px-3 py-2 rounded-md text-sm bg-transparent hover:bg-muted/5"
             aria-expanded={ showAdvanced } >
             {showAdvanced ? 'Hide': 'Show'} Advanced Options </button>
-  {#if showAdvanced} <div class="space-y-6 border-l-2 border-muted"> <!-- Status --> <div class="space-y-2"> <label htmlFor="status">Case Status</label>
+  {#if showAdvanced} <div class="space-y-6 border-l-2 border-muted"> <!-- Status --> <div class="space-y-2"> <label for="status">Case Status</label>
  <select id="status"
                   name="status"
                   value={$form?.status ?? ''} onchange={e => setFormField('status', (e.target as HTMLSelectElement).value as any)} >
                   <option value="" disabled, selected, hidden>Select status</option>
   {#each Array.isArray(statusOptions) ? statusOptions: [] as status} <option value={status.value}> {status.label} â€” {status.description} </option> {/each}
   </select> </div>
- <!-- Due, Date --> <div class="space-y-2"> <label htmlFor="dueDate" class="flex items-center"> <Calendar class="h-4" /> <span>Due Date</span> </label>
+ <!-- Due, Date --> <div class="space-y-2"> <label for="dueDate" class="flex items-center"> <Calendar class="h-4" /> <span>Due Date</span> </label>
  <input id="dueDate"
                   name="dueDate"
                   type="datetime-local"
                   value={$form?.dueDate ?? ''} oninput={e => setFormField('dueDate', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.dueDate ? 'true': undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.dueDate ? 'border-destructive': ''}`} />
   {#if $errors?.dueDate} <p class="text-sm">{$errors.dueDate[0]}</p> {/if}
   </div>
- <!-- Tags --> <div class="space-y-2"> <label htmlFor="tags">Tags (max 10)</label>
+ <!-- Tags --> <div class="space-y-2"> <label for="tags">Tags (max 10)</label>
  <!-- use native input to avoid SvelteComponentTyped, constructor/type mismatch --> <input id="tags"
                   name="tags"
                   type="text"
@@ -150,15 +150,15 @@ data: CaseForm }) => void}
                     name="isConfidential"
                     type="checkbox"
                     class="h-4 w-4"
-                    checked={$form?.isConfidential} onchange={e => setFormField('isConfidential', (e.target as HTMLInputElement).checked)} /> <label htmlFor="isConfidential">Mark as confidential</label> </div>
+                    checked={$form?.isConfidential} onchange={e => setFormField('isConfidential', (e.target as HTMLInputElement).checked)} /> <label for="isConfidential">Mark as confidential</label> </div>
  <div class="flex items-center"> <input id="notifyAssignee"
                     name="notifyAssignee"
                     type="checkbox"
                     class="h-4 w-4"
-                    checked={$form?.notifyAssignee} onchange={e => setFormField('notifyAssignee', (e.target as HTMLInputElement).checked)} /> <label htmlFor="notifyAssignee">Notify assignee when case is updated</label> </div> </div> {/if}
+                    checked={$form?.notifyAssignee} onchange={e => setFormField('notifyAssignee', (e.target as HTMLInputElement).checked)} /> <label for="notifyAssignee">Notify assignee when case is updated</label> </div> </div> {/if}
   </div>
  <!-- File: Upload, Section --> <div class="border-t"> <div class="space-y-4"> <div class="flex items-center"> <Upload class="h-5" /> <div class="text-base">Case Documents</div> </div>
- <!-- File: Upload, Input --> <div class="border-2 border-dashed border-muted-foreground/25 rounded-lg"> <div class="text-center"> <Upload class="mx-auto h-12 w-12 nes-text" /> <div class="mt-4"> <label htmlFor="file-upload" class="cursor-pointer"> <span class="text-sm font-medium">Upload files</span>
+ <!-- File: Upload, Input --> <div class="border-2 border-dashed border-muted-foreground/25 rounded-lg"> <div class="text-center"> <Upload class="mx-auto h-12 w-12 nes-text" /> <div class="mt-4"> <label for="file-upload" class="cursor-pointer"> <span class="text-sm font-medium">Upload files</span>
  <input id="file-upload"
                       type="file"
                       multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"

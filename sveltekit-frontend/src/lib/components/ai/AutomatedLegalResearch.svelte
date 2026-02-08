@@ -199,7 +199,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	<!-- Research Configuration -->
 	<div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-6">
 		<div>
-			<label htmlFor="jurisdiction" class="block text-sm font-medium text-gray-700 mb-2">
+			<label for="jurisdiction" class="block text-sm font-medium text-gray-700 mb-2">
 				Jurisdiction
 			</label>
 			<select
@@ -216,7 +216,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		</div>
 
 		<div>
-			<label htmlFor="caseType" class="block text-sm font-medium text-gray-700 mb-2">
+			<label for="caseType" class="block text-sm font-medium text-gray-700 mb-2">
 				Case Type
 			</label>
 			<select
@@ -235,7 +235,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		</div>
 
 		<div>
-			<label htmlFor="depth" class="block text-sm font-medium text-gray-700 mb-2">
+			<label for="depth" class="block text-sm font-medium text-gray-700 mb-2">
 				Research Depth
 			</label>
 			<select
@@ -273,7 +273,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	<!-- Research Query Input -->
 	<div class="mb-4">
-		<label htmlFor="query" class="block text-sm font-medium text-gray-700 mb-2">
+		<label for="query" class="block text-sm font-medium text-gray-700 mb-2">
 			Research Query
 		</label>
 		<textarea

@@ -146,7 +146,7 @@
 					bind:checked={autoSaveEnabled}
 					class="w-4 h-4"
 				/>
-				<label htmlFor="autosave" class="text-sm">
+				<label for="autosave" class="text-sm">
 					Enable auto-save (saves to browser cache every 1 second)
 				</label>
 			</div>
@@ -154,7 +154,7 @@
 			<!-- Form Fields -->
 			<div class="space-y-4">
 				<div>
-					<label htmlFor="title" class="block text-sm font-medium mb-1">
+					<label for="title" class="block text-sm font-medium mb-1">
 						Case Title *
 					</label>
 					<input
@@ -168,7 +168,7 @@
 				</div>
 
 				<div>
-					<label htmlFor="description" class="block text-sm font-medium mb-1">
+					<label for="description" class="block text-sm font-medium mb-1">
 						Description *
 					</label>
 					<textarea
@@ -183,7 +183,7 @@
 
 				<div class="grid grid-cols-2 gap-4">
 					<div>
-						<label htmlFor="priority" class="block text-sm font-medium mb-1">
+						<label for="priority" class="block text-sm font-medium mb-1">
 							Priority
 						</label>
 						<select
@@ -199,7 +199,7 @@
 					</div>
 
 					<div>
-						<label htmlFor="caseType" class="block text-sm font-medium mb-1">
+						<label for="caseType" class="block text-sm font-medium mb-1">
 							Case Type
 						</label>
 						<input
@@ -213,7 +213,7 @@
 				</div>
 
 				<div>
-					<label htmlFor="assignedTo" class="block text-sm font-medium mb-1">
+					<label for="assignedTo" class="block text-sm font-medium mb-1">
 						Assigned To
 					</label>
 					<input

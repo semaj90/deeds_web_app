@@ -182,7 +182,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="step-content">
  <h3>Basic Information</h3>
  <div class="form-group">
- <label htmlFor="victimName">Victim Name:</label>
+ <label for="victimName">Victim Name:</label>
  <Input
  id="victimName"
  value={statement.victimName}
@@ -190,7 +190,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  placeholder="Full name of the victim"
  />
  <div class="form-group">
- <label htmlFor="victimContact">Contact Information:</label>
+ <label for="victimContact">Contact Information:</label>
  <Input
  id="victimContact"
  value={statement.victimContact}
@@ -204,7 +204,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  {#if currentStep === 'incident-details'}
  <div class="form-group">
- <label htmlFor="incidentDate">Date of Incident:</label>
+ <label for="incidentDate">Date of Incident:</label>
  <Input
  id="incidentDate"
  type="date"
@@ -212,7 +212,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  oninput={(e) => statement.incidentDate = e.target.value}
  />
  <div class="form-group">
- <label htmlFor="incidentLocation">Location:</label>
+ <label for="incidentLocation">Location:</label>
  <Input
  id="incidentLocation"
  value={statement.incidentLocation}
@@ -220,7 +220,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  placeholder="Where did the incident occur?"
  />
  <div class="form-group">
- <label htmlFor="incidentDescription">Description:</label>
+ <label for="incidentDescription">Description:</label>
  <Textarea
  value={statement.incidentDescription}
  oninput={(e) => statement.incidentDescription = e.target.value}
@@ -252,7 +252,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  {/if}
  </div>
  <div class="form-group">
- <label htmlFor="emotionalImpact">Emotional Impact:</label>
+ <label for="emotionalImpact">Emotional Impact:</label>
  <Textarea
  value={statement.emotionalImpact}
  oninput={(e) => statement.emotionalImpact = e.target.value}
@@ -260,7 +260,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  rows={ 4 }
  />
  <div class="form-group">
- <label htmlFor="physicalImpact">Physical Impact:</label>
+ <label for="physicalImpact">Physical Impact:</label>
  <Textarea
  value={statement.physicalImpact}
  oninput={(e) => statement.physicalImpact = e.target.value}
@@ -268,7 +268,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  rows={4}
  />
  <div class="form-group">
- <label htmlFor="financialImpact">Financial Impact:</label>
+ <label for="financialImpact">Financial Impact:</label>
  <Textarea
  value={statement.financialImpact}
  oninput={(e) => statement.financialImpact = e.target.value}
@@ -276,7 +276,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  rows={4}
  />
  </div>lass="form-group">
- <label htmlFor="financialImpact">Financial Impact:</label>
+ <label for="financialImpact">Financial Impact:</label>
  <textarea
  bind:value={statement.financialImpact}
  placeholder="Any financial losses or costs incurred?"

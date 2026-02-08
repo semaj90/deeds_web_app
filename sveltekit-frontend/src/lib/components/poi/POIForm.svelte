@@ -62,7 +62,7 @@
 
 <form method="POST" use:enhance class="poi-form">
   <div class="form-group">
-    <label htmlFor="name">Name *</label>
+    <label for="name">Name *</label>
     <input
       id="name"
       type="text"
@@ -77,7 +77,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="dateOfBirth">Date of Birth</label>
+    <label for="dateOfBirth">Date of Birth</label>
     <input
       id="dateOfBirth"
       type="date"
@@ -87,7 +87,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="email">Email</label>
+    <label for="email">Email</label>
     <input
       id="email"
       type="email"
@@ -102,7 +102,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="phone">Phone</label>
+    <label for="phone">Phone</label>
     <input
       id="phone"
       type="tel"
@@ -113,7 +113,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="address">Address</label>
+    <label for="address">Address</label>
     <textarea
       id="address"
       name="address"
@@ -124,7 +124,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="status">Status *</label>
+    <label for="status">Status *</label>
     <select
       id="status"
       name="status"
@@ -142,7 +142,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="priority">Priority *</label>
+    <label for="priority">Priority *</label>
     <select
       id="priority"
       name="priority"
@@ -160,7 +160,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="threatLevel">Threat Level *</label>
+    <label for="threatLevel">Threat Level *</label>
     <select
       id="threatLevel"
       name="threatLevel"
@@ -178,7 +178,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="occupation">Occupation</label>
+    <label for="occupation">Occupation</label>
     <input
       id="occupation"
       type="text"
@@ -189,7 +189,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="lastKnownLocation">Last Known Location</label>
+    <label for="lastKnownLocation">Last Known Location</label>
     <input
       id="lastKnownLocation"
       type="text"
@@ -200,7 +200,7 @@
   </div>
 
   <div class="form-group">
-    <label htmlFor="physicalDescription">Physical Description</label>
+    <label for="physicalDescription">Physical Description</label>
     <textarea
       id="physicalDescription"
       name="physicalDescription"

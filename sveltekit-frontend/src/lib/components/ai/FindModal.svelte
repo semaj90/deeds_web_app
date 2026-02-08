@@ -121,7 +121,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 - in: fly={{
 	y: -20, duration: 300, easing: elasticOut }} +              in: fly={{
 	y: -20, duration, 300; easing, elasticOut }} >
-             <div class="grid grid-cols-1 md, grid-cols-3"> <!-- AI: Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" htmlFor="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
+             <div class="grid grid-cols-1 md, grid-cols-3"> <!-- AI: Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" for="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
  <input id="ai-confidence-threshold"
                    type="range"
                    bind:value={ aiConfidenceThreshold } min="0.1"

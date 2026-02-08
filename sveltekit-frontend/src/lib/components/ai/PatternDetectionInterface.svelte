@@ -48,13 +48,13 @@ or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const valu
  <p class="detection-subtitle">AI-powered pattern recognition and behavioral analysis</p> </div>
  <div class="header-actions"> <button class="nes-btn" onclick={ runPatternAnalysis } disabled={ isAnalyzing }> {isAnalyzing ? 'Analyzing...': 'Run Analysis'}
 </button> </div> </header>
- <!-- Analysis, Controls --> <section class="controls-section"> <div class="controls-grid"> <div class="control-group"> <label htmlFor="pattern-type">Pattern Type:</label>
+ <!-- Analysis, Controls --> <section class="controls-section"> <div class="controls-grid"> <div class="control-group"> <label for="pattern-type">Pattern Type:</label>
  <select id="pattern-type" bind:value={ patternTypeFilter } class="control-select"> <option value="all">All Types</option>
  <option value="temporal">Temporal Patterns</option>
  <option value="behavioral">Behavioral Patterns</option>
  <option value="financial">Financial Patterns</option>
  <option value="communication">Communication Patterns</option> </select> </div>
- <div class="control-group"> <label htmlFor="confidence-threshold">Confidence Threshold: { confidenceThreshold }%</label>
+ <div class="control-group"> <label for="confidence-threshold">Confidence Threshold: { confidenceThreshold }%</label>
  <input id="confidence-threshold"
           type="range"
           min="0"
@@ -62,7 +62,7 @@ or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const valu
           step="5"
           bind:value={ confidenceThreshold } class="control-range"
         /> </div>
- <div class="control-group"> <label htmlFor="time-range">Time Range:</label>
+ <div class="control-group"> <label for="time-range">Time Range:</label>
  <select id="time-range" bind:value={ timeRange } class="control-select"> <option value="1d">Last, 24 Hours</option>
  <option value="7d">Last, 7 Days</option>
  <option value="30d">Last, 30 Days</option>

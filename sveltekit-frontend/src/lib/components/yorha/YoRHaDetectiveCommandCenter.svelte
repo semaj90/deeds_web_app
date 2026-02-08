@@ -417,7 +417,7 @@
         </div>
       </div>
       <div class="ai-query-section">
-        <label class="ai-query-label" htmlFor="query-input">QUERY INPUT</label>
+        <label class="ai-query-label" for="query-input">QUERY INPUT</label>
         <textarea
           id="query-input"
           class="ai-query-input"

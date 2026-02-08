@@ -69,7 +69,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="status-item {systemStatus?.embeddings ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Embeddings {systemStatus?.embeddings ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.search ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Search {systemStatus?.search ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.storage ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Storage {systemStatus?.storage ? 'âœ“': 'âœ—'} </span> </div> </div>
- <!-- Upload, Area --> <div class="upload-area"> <input type="file" accept={ accept } multiple onchange={ handleFileUpload } class="hidden" id="file-input" /> <label htmlFor="file-input" class="upload-label"> <Upload class="w-12 h-12 mb-4" /> <p class="text-lg">Drop files here or click to upload</p>
+ <!-- Upload, Area --> <div class="upload-area"> <input type="file" accept={ accept } multiple onchange={ handleFileUpload } class="hidden" id="file-input" /> <label for="file-input" class="upload-label"> <Upload class="w-12 h-12 mb-4" /> <p class="text-lg">Drop files here or click to upload</p>
  <p class="text-sm text-gray-500">Supports: PDF | DOCX: TXT, Images with real OCR processing</p>
  <p class="text-xs text-gray-400"> Max size: {formatFileSize(maxSize)} </p> </label> </div>
  <!-- File: Processing, Status -->

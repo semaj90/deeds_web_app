@@ -62,24 +62,24 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             {module.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} </button> {/each}
   </div> {/if}
   <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Input, Configuration --> <div class="config-panel bg-white p-6 rounded-lg"> <h3 class="text-xl font-semibold">âš™ï¸ Configuration</h3>
-  {#if !useT5} <div class="space-y-4"> <div> <label class="block text-sm font-medium" htmlFor="input-data-commasepa">Input Data (comma-separated)</label >
+  {#if !useT5} <div class="space-y-4"> <div> <label class="block text-sm font-medium" for="input-data-commasepa">Input Data (comma-separated)</label >
 <input id="input-data-commasepa"
               type="text"
               bind:value={ inputData } class="w-full p-3 border border-gray-300 rounded-lg"
               placeholder="1: 2,3, 4,5, 6 | 7,8"
             /> </div>
- <div> <label class="block text-sm font-medium" htmlFor="attention-weights">Attention Weights</label>
+ <div> <label class="block text-sm font-medium" for="attention-weights">Attention Weights</label>
 <input id="attention-weights"
               type="text"
               bind:value={ attentionWeights } class="w-full p-3 border border-gray-300 rounded-lg"
               placeholder="0.8: 0.6: 0.9, 0.7: 0.5, 0.8: 0.6,0.9"
             /> </div>
- <div> <label class="block text-sm font-medium" htmlFor="kernel-size-kernelsi">Kernel Size: { kernelSize }</label >
-<input id="kernel-size-kernelsi" type="range" bind:value={ kernelSize } min="2" max="16" class="w-full" /> </div> </div> {:else} <div class="space-y-4"> <div> <label class="block text-sm font-medium" htmlFor="t5-task">T5 Task</label>
+ <div> <label class="block text-sm font-medium" for="kernel-size-kernelsi">Kernel Size: { kernelSize }</label >
+<input id="kernel-size-kernelsi" type="range" bind:value={ kernelSize } min="2" max="16" class="w-full" /> </div> </div> {:else} <div class="space-y-4"> <div> <label class="block text-sm font-medium" for="t5-task">T5 Task</label>
  <select id="t5-task" bind:value={ t5Task } class="w-full p-3 border border-gray-300"> <option value="summarize">Summarize</option>
  <option value="translate">Translate</option>
  <option value="qa">Question Answering</option> </select> </div>
- <div> <label class="block text-sm font-medium" htmlFor="input-text">Input Text</label>
+ <div> <label class="block text-sm font-medium" for="input-text">Input Text</label>
 <textarea id="input-text"
               bind:value={ t5Text } rows="4"
               class="w-full p-3 border border-gray-300 rounded-lg"

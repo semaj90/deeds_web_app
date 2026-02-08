@@ -235,7 +235,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         <p>Scan TypeScript/Svelte files and index them in Qdrant for semantic search</p>
 
         <div class="form-group">
-          <label htmlFor="path">Root Path:</label>
+          <label for="path">Root Path:</label>
           <input
             id="path"
             type="text"

@@ -88,7 +88,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  <div class="search-options">
  <div class="option-group">
- <label htmlFor="search-type-select">Type</label>
+ <label for="search-type-select">Type</label>
  <select
  id="search-type-select"
  class="search-type-select"
@@ -101,7 +101,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="option-group">
- <label htmlFor="limit-input">Limit</label>
+ <label for="limit-input">Limit</label>
  <input
  id="limit-input"
  class="limit-input"
@@ -114,7 +114,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="option-group">
- <label htmlFor="threshold-slider">
+ <label for="threshold-slider">
  Threshold <span class="threshold-value">{threshold.toFixed(2)}</span>
  </label>
  <input

@@ -37,11 +37,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  action="?/updateProfile"
  ; use enhance={() => { formLoading = true; return ({ result }) => { formLoading = false; if ( (result as { type?: unknown; status?: unknown }).type === 'success' || (result as { type?: unknown; status?: unknown }).status === 200 ) { showProfileModal = false}
  }}} >
- <div class="space-y-4"> <div> <label htmlFor="firstName" class="block text-sm font-bold">FIRST NAME</label> <input id="firstName"
+ <div class="space-y-4"> <div> <label for="firstName" class="block text-sm font-bold">FIRST NAME</label> <input id="firstName"
  name="firstName"
  type="text"
  bind:value={profileForm.firstName} required class="w-full px-3 py-2 bg-black border-2 border-amber-300 text-amber-300 focus:outline-none"
- /> </div> <div> <label htmlFor="lastName" class="block text-sm font-bold">LAST NAME</label> <input id="lastName"
+ /> </div> <div> <label for="lastName" class="block text-sm font-bold">LAST NAME</label> <input id="lastName"
  name="lastName"
  type="text"
  ; bind:value={profileForm.lastName} required class="w-full px-3 py-2 bg-black border-2 border-amber-300 text-amber-300 focus:outline-none"
@@ -53,12 +53,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  action="?/resetPassword"
  ; use enhance={() => { if (!validatePasswordForm()) return false; formLoading = true; return ({ result }) => { formLoading = false; if ( (result as { type?: unknown; status?: unknown }).type === 'success' || (result as { type?: unknown; status?: unknown }).status === 200 ) { showPasswordModal = false; passwordForm.newPassword = ''; passwordForm.confirmPassword = ''}
  }}} >
- <div class="space-y-4"> <div> <label htmlFor="newPassword" class="block text-sm font-bold">NEW PASSWORD</label> <input id="newPassword"
+ <div class="space-y-4"> <div> <label for="newPassword" class="block text-sm font-bold">NEW PASSWORD</label> <input id="newPassword"
  name="newPassword"
  type="password"
  bind:value={passwordForm.newPassword} required minlength="8"
  class="w-full px-3 py-2 bg-black border-2 border-amber-300 text-amber-300 focus:outline-none"
- /> </div> <div> <label htmlFor="confirmPassword" class="block text-sm font-bold">CONFIRM PASSWORD</label> <input id="confirmPassword"
+ /> </div> <div> <label for="confirmPassword" class="block text-sm font-bold">CONFIRM PASSWORD</label> <input id="confirmPassword"
  name="confirmPassword"
  type="password"
  ; bind:value={passwordForm.confirmPassword} required minlength="8"

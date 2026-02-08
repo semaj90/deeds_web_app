@@ -319,7 +319,7 @@
 				{/if}
 
 				<div>
-					<label htmlFor="title" class="block text-sm font-medium mb-2">
+					<label for="title" class="block text-sm font-medium mb-2">
 						Case Title <span class="text-red-500">*</span>
 					</label>
 					<input
@@ -333,7 +333,7 @@
 				</div>
 
 				<div>
-					<label htmlFor="description" class="block text-sm font-medium mb-2">
+					<label for="description" class="block text-sm font-medium mb-2">
 						Description <span class="text-red-500">*</span>
 					</label>
 				<textarea
@@ -348,7 +348,7 @@
 
 				<div class="grid grid-cols-2 gap-4">
 					<div>
-						<label htmlFor="priority" class="block text-sm font-medium mb-2">Priority</label>
+						<label for="priority" class="block text-sm font-medium mb-2">Priority</label>
 					<select
 						id="priority"
 						name="priority"
@@ -363,7 +363,7 @@
 					</div>
 
 					<div>
-						<label htmlFor="caseNumber" class="block text-sm font-medium mb-2">Case Number</label>
+						<label for="caseNumber" class="block text-sm font-medium mb-2">Case Number</label>
 					<input
 						type="text"
 						id="caseNumber"
@@ -376,7 +376,7 @@
 
 				<div class="grid grid-cols-2 gap-4">
 					<div>
-						<label htmlFor="practiceArea" class="block text-sm font-medium mb-2">Practice Area</label>
+						<label for="practiceArea" class="block text-sm font-medium mb-2">Practice Area</label>
 					<input
 						type="text"
 						id="practiceArea"
@@ -387,7 +387,7 @@
 					</div>
 
 					<div>
-						<label htmlFor="jurisdiction" class="block text-sm font-medium mb-2">Jurisdiction</label>
+						<label for="jurisdiction" class="block text-sm font-medium mb-2">Jurisdiction</label>
 					<input
 						type="text"
 						id="jurisdiction"

@@ -310,7 +310,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 				<h3>Case Information</h3>
 
 				<div class="form-group">
-					<label htmlFor="caseFacts">
+					<label for="caseFacts">
 						Case Facts & Circumstances *
 						<span class="help-text">Describe the key facts, evidence, and circumstances of the case</span>
 					</label>
@@ -326,7 +326,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 				<div class="form-row">
 					<div class="form-group">
-						<label htmlFor="caseType">Case Type</label>
+						<label for="caseType">Case Type</label>
 						<select id="caseType" name="caseType" bind:value={$formData.caseType}>
 							{#each caseTypes as type (type.value)}
 								<option value={type.value}>{type.label}</option>
@@ -335,7 +335,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 					</div>
 
 					<div class="form-group">
-						<label htmlFor="jurisdiction">Jurisdiction</label>
+						<label for="jurisdiction">Jurisdiction</label>
 						<select id="jurisdiction" name="jurisdiction" bind:value={$formData.jurisdiction}>
 							{#each jurisdictions as juris (juris.value)}
 								<option value={juris.value}>{juris.label}</option>
@@ -344,7 +344,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 					</div>
 
 					<div class="form-group">
-						<label htmlFor="partyType">Your Role</label>
+						<label for="partyType">Your Role</label>
 						<select id="partyType" name="partyType" bind:value={$formData.partyType}>
 							{#each partyTypes as party (party.value)}
 								<option value={party.value}>{party.label}</option>
@@ -363,7 +363,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 				{#if $showAdvanced}
 					<div class="advanced-options">
 						<div class="form-group">
-							<label htmlFor="historicalData">
+							<label for="historicalData">
 								Historical Case Data
 								<span class="help-text">Optional:Add relevant historical case outcomes or settlement data</span>
 							</label>
@@ -377,7 +377,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 						</div>
 
 						<div class="form-group">
-							<label htmlFor="similarCases">
+							<label for="similarCases">
 								Similar Cases
 								<span class="help-text">Optional:Reference similar cases for comparative analysis</span>
 							</label>

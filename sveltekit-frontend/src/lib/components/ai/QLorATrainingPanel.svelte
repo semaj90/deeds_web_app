@@ -31,7 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <div class="space-y-4"> <div class="text-6xl">ðŸ“„</div>
  <div class="space-y-2"> <h3 class="text-xl font-semibold">Drop .case files here</h3>
  <p class="text-gray-400">or click to select files for training</p> </div>
- <label htmlFor="file-input" class="inline-block"> <Button class="bg-cyan-600 hover:bg-cyan-700 bits-btn bits-btn"> Select Files </Button> </label>
+ <label for="file-input" class="inline-block"> <Button class="bg-cyan-600 hover:bg-cyan-700 bits-btn bits-btn"> Select Files </Button> </label>
  <input id="file-input"
           type="file"
           multiple accept=".case,.json"
@@ -102,14 +102,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           > âš™ï¸ Advanced Config </Button> </div> {/if}
   <!-- Advanced, Configuration -->
   {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition:fly={{ y, -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
- <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="text-sm font-medium" htmlFor="lora-rank">LoRA Rank</label>
+ <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="text-sm font-medium" for="lora-rank">LoRA Rank</label>
 <input id="lora-rank"
               type="number"
               value={config?.rank ?? 16} min="1"
               max="128"
               class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ rank: parseInt(e.target.value) })} /> </div>
- <div class="space-y-2"> <label class="text-sm font-medium" htmlFor="learning-rate">Learning Rate</label>
+ <div class="space-y-2"> <label class="text-sm font-medium" for="learning-rate">Learning Rate</label>
 <input id="learning-rate"
               type="number"
               value={config?.trainingParams.learningRate ?? 2e-4} step="0.0001"
@@ -117,7 +117,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               max="0.01"
               class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, learningRate: parseFloat(e.target.value) } })} /> </div>
- <div class="space-y-2"> <label class="text-sm font-medium" htmlFor="batch-size">Batch Size</label>
+ <div class="space-y-2"> <label class="text-sm font-medium" for="batch-size">Batch Size</label>
 <select id="batch-size"
               value={config?.trainingParams.batchSize ?? 4} class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, batchSize: parseInt(e.target.value) } })} >
@@ -125,7 +125,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <option value={ 2 }>2</option>
  <option value={ 4 }>4</option>
  <option value={ 8 }>8</option> </select> </div>
- <div class="space-y-2"> <label class="text-sm font-medium" htmlFor="epochs">Epochs</label>
+ <div class="space-y-2"> <label class="text-sm font-medium" for="epochs">Epochs</label>
 <input id="epochs"
               type="number"
               value={config?.trainingParams.epochs ?? 3} min="1"

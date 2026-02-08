@@ -246,7 +246,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		class="chat-input-form"
 	>
 		<div class="input-row">
-			<label htmlFor="message" class="sr-only">Your message</label>
+			<label for="message" class="sr-only">Your message</label>
 			<textarea
 				id="message"
 				name="message"
@@ -265,7 +265,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 		<div class="meta-row">
 			<div class="input-group">
-				<label htmlFor="caseId">Case ID (optional)</label>
+				<label for="caseId">Case ID (optional)</label>
 				<input
 					id="caseId"
 					name="caseId"
@@ -278,7 +278,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			</div>
 
 			<div class="input-group">
-				<label htmlFor="files">Attach Evidence</label>
+				<label for="files">Attach Evidence</label>
 				<input
 					id="files"
 					name="files"

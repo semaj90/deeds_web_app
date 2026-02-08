@@ -145,7 +145,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	<div class="controls">
 		<h3>📊 Most Imported Modules</h3>
 		<div class="limit-control">
-			<label htmlFor="limit">Show top:</label>
+			<label for="limit">Show top:</label>
 			<select id="limit" bind:value={limit} onchange={() => loadDependencies()}>
 				<option value={ 10 }>10</option>
 				<option value={20}>20</option>

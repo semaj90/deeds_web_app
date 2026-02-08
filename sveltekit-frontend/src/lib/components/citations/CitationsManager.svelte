@@ -179,7 +179,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Input bind:value={newCitation.authors} placeholder="Author names, or, court" /> </div> </div>
  <div class="grid grid-cols-3"> <div> <label class="block text-sm font-medium">Year</label>
  <Input type="number" bind:value={newCitation.year} /> </div>
- <div> <label class="block text-sm font-medium" htmlFor="category">Category</label>
+ <div> <label class="block text-sm font-medium" for="category">Category</label>
  <select id="category" bind:value={newCitation.category} class="w-full p-2 border"> <option value="cases">Case Law</option>
  <option value="statutes">Statutes</option>
  <option value="regulations">Regulations</option>
@@ -191,7 +191,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Input bind:value={newCitation.source} placeholder="Journal, reporter, publisher" /> </div>
  <div> <label class="block text-sm font-medium">URL</label>
  <Input bind:value={newCitation.url} placeholder="https, //..." /> </div>
- <div> <label class="block text-sm font-medium" htmlFor="notes">Notes</label>
+ <div> <label class="block text-sm font-medium" for="notes">Notes</label>
 <textarea id="notes"
 						bind:value={newCitation.notes} placeholder="Brief description or notes about this citation"
 						class="w-full p-2 border rounded min-h-[80px]"

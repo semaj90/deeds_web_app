@@ -224,7 +224,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <div class="input-panel">
  <div class="input-controls">
  <div class="file-upload">
- <label htmlFor="file-input" class="btn"> 📄 Upload Document </label>
+ <label for="file-input" class="btn"> 📄 Upload Document </label>
  <input
  id="file-input"
  type="file"
@@ -235,7 +235,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  </div>
  <div class="options-grid">
  <div class="option-group">
- <label htmlFor="summary-length">Summary Length:</label>
+ <label for="summary-length">Summary Length:</label>
  <select id="summary-length" bind:value={summaryLength}>
  <option value="short">Short (150 tokens)</option>
  <option value="medium">Medium (300 tokens)</option>
@@ -243,7 +243,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  </select>
  </div>
  <div class="option-group">
- <label htmlFor="temperature">Analysis Creativity:</label>
+ <label for="temperature">Analysis Creativity:</label>
  <input
  id="temperature"
  type="range"

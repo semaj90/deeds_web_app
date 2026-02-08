@@ -168,7 +168,7 @@
 		<!-- Tool Browser -->
 		<aside class="tool-browser">
 			<div class="category-filter">
-				<label htmlFor="category">Category:</label>
+				<label for="category">Category:</label>
 				<select id="category" bind:value={selectedCategory}>
 					<option value="all">All Categories</option>
 					{#each categories as cat}
@@ -204,7 +204,7 @@
 					</p>
 
 					<div class="args-section">
-						<label htmlFor="args">Arguments (JSON):</label>
+						<label for="args">Arguments (JSON):</label>
 						<textarea
 							id="args"
 							bind:value={toolArgs}

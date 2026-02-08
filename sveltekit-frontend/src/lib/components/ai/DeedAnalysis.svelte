@@ -14,7 +14,7 @@ query: q, limit: 5, threshold: 0.3 }) }); if (!response.ok) { const text = await
 
    // Reactive search when query changes // simple reactive trigger (debounce could be added later) $effect(() => { // safe-trim check if (searchQuery && String(searchQuery).trim().length) { performSemanticSearch(searchQuery)} else { // clear results when query becomes empty/undefined similarDocuments = []; error = null}
   }); </script>
- <!-- Search, Input --> <div class="mb-6"> <label htmlFor="search-query" class="block text-sm font-medium"> ðŸ” Semantic Search Legal Documents </label>
+ <!-- Search, Input --> <div class="mb-6"> <label for="search-query" class="block text-sm font-medium"> ðŸ” Semantic Search Legal Documents </label>
  <div class="flex"> <input id="search-query"
       type="text"
       bind:value={ searchQuery } placeholder="Enter search query (e.g., 'property deed transfer', 'contract liability'...)"

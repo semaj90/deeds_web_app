@@ -89,7 +89,7 @@
 <div class="citation-save-form">
 	<form onsubmit={handleSubmit}>
 		<div class="form-group">
-			<label htmlFor="citation-text">Citation Text *</label>
+			<label for="citation-text">Citation Text *</label>
 			<textarea
 				id="citation-text"
 				bind:value={formData.citationText}
@@ -101,7 +101,7 @@
 		</div>
 
 		<div class="form-group">
-			<label htmlFor="source-type">Source Type *</label>
+			<label for="source-type">Source Type *</label>
 			<select id="source-type" bind:value={formData.sourceType} disabled={isLoading}>
 				{#each sourceTypes as type}
 					<option value={type.value}>{type.label}</option>
@@ -110,7 +110,7 @@
 		</div>
 
 		<div class="form-group">
-			<label htmlFor="tags">Tags</label>
+			<label for="tags">Tags</label>
 			<div class="tag-input-group">
 				<input
 					id="tags"
@@ -160,7 +160,7 @@
 		{#if showAdvanced}
 			<div class="advanced-options">
 				<div class="form-group">
-					<label htmlFor="statute-code">Statute Code</label>
+					<label for="statute-code">Statute Code</label>
 					<input
 						id="statute-code"
 						type="text"
@@ -171,7 +171,7 @@
 				</div>
 
 				<div class="form-group">
-					<label htmlFor="statute-title">Statute Title</label>
+					<label for="statute-title">Statute Title</label>
 					<input
 						id="statute-title"
 						type="text"
@@ -182,7 +182,7 @@
 				</div>
 
 				<div class="form-group">
-					<label htmlFor="context-text">Context Text</label>
+					<label for="context-text">Context Text</label>
 					<textarea
 						id="context-text"
 						bind:value={formData.contextText}
@@ -193,7 +193,7 @@
 				</div>
 
 				<div class="form-group">
-					<label htmlFor="notes">Notes</label>
+					<label for="notes">Notes</label>
 					<textarea
 						id="notes"
 						bind:value={formData.notes}
@@ -204,7 +204,7 @@
 				</div>
 
 				<div class="form-group">
-					<label htmlFor="relevance">Relevance Score (0-1)</label>
+					<label for="relevance">Relevance Score (0-1)</label>
 					<input
 						id="relevance"
 						type="number"

@@ -30,7 +30,7 @@
 
 <div class="jurisdiction-selector">
 	{#if showLabel}
-		<label htmlFor="jurisdiction">
+		<label for="jurisdiction">
 			<span class="label-text">
 				⚖️ Jurisdiction
 				{#if required}

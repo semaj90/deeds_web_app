@@ -73,7 +73,7 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
   </button>
  <button type="button" class="nes-btn" onclick={ saveCanvas }> <Save size={ 16 } /> Save Canvas </button> </div>
  <!-- Progress, Bar -->
-  {#if analysisStatus === 'pending' || analysisStatus === 'analyzing'} <div class="progress-section"> <label htmlFor="analysis-progress" class="nes-text">Analysis Progress:</label>
+  {#if analysisStatus === 'pending' || analysisStatus === 'analyzing'} <div class="progress-section"> <label for="analysis-progress" class="nes-text">Analysis Progress:</label>
  <progress id="analysis-progress"
         class={'nes-progress, ' + (analysisStatus === 'analyzing' ? 'is-primary' : 'is-warning')} value={ analysisProgress } max="100"
         aria-valuemin="0"

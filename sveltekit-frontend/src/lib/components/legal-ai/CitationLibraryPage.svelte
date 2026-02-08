@@ -119,7 +119,7 @@ name: newCollectionName,
 		<div class="create-form">
 			<h3>Create New Collection</h3>
 			<div class="form-group">
-				<label htmlFor="name">Collection Name *</label>
+				<label for="name">Collection Name *</label>
 				<input
 					id="name"
 					type="text"
@@ -130,7 +130,7 @@ name: newCollectionName,
 			</div>
 
 			<div class="form-group">
-				<label htmlFor="description">Description</label>
+				<label for="description">Description</label>
 				<textarea
 					id="description"
 					bind:value={newCollectionDescription}

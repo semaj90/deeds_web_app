@@ -84,7 +84,7 @@ link_type: editedLinkType,
   {#if localIsEditing}
     <div class="form-content">
       <div class="form-group">
-        <label htmlFor="link-type">Link Type</label>
+        <label for="link-type">Link Type</label>
         <select id="link-type" bind:value={editedLinkType} disabled={isSaving}>
           {#each linkTypes as type}
             <option value={type}>{type}</option>
@@ -93,7 +93,7 @@ link_type: editedLinkType,
       </div>
 
       <div class="form-group">
-        <label htmlFor="notes">Notes</label>
+        <label for="notes">Notes</label>
         <textarea
           id="notes"
           bind:value={editedNotes}

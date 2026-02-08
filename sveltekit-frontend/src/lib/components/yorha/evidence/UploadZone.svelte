@@ -132,7 +132,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  />
 
  <label
- htmlFor="file-input"
+ for="file-input"
  class="inline-flex items-center px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 rounded-lg cursor-pointer transition-colors"
  >
  <span class="mr-2">📎</span>

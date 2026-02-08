@@ -66,7 +66,7 @@ clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [
               max="50"
               class="w-20 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
               disabled={ isTraining } /> </div> </div>
- <div> <label class="block text-sm text-gray-300" htmlFor="learning-rate">Learning Rate</label>
+ <div> <label class="block text-sm text-gray-300" for="learning-rate">Learning Rate</label>
 <input id="learning-rate"
             bind:value={somConfig.learningRate} type="number"
             step="0.01"
@@ -74,14 +74,14 @@ clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [
             max="1.0"
             class="w-full px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
             disabled={ isTraining } /> </div>
- <div> <label class="block text-sm text-gray-300" htmlFor="clusters">Clusters</label>
+ <div> <label class="block text-sm text-gray-300" for="clusters">Clusters</label>
 <input id="clusters"
             bind:value={somConfig.clusterCount} onchange={ updateSOMConfig } type="number"
             min="2"
             max="16"
             class="w-full px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
             disabled={ isTraining } /> </div>
- <div> <label class="block text-sm text-gray-300" htmlFor="epochs">Epochs</label>
+ <div> <label class="block text-sm text-gray-300" for="epochs">Epochs</label>
 <input id="epochs"
             bind:value={somConfig.maxEpochs} type="number"
             min="100"

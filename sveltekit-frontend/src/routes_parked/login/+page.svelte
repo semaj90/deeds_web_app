@@ -54,7 +54,7 @@
  <form onsubmit={handleSubmit} class="space-y-4">
  <!-- Email -->
  <div>
- <label htmlFor="email" class="block text-sm font-medium text-gray-700 mb-1">
+ <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
  Email Address
  </label>
  <input
@@ -69,7 +69,7 @@
 
  <!-- Password -->
  <div>
- <label htmlFor="password" class="block text-sm font-medium text-gray-700 mb-1">
+ <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
  Password
  </label>
  <input

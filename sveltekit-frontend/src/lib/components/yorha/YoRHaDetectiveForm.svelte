@@ -76,7 +76,7 @@
   <div class="form-fields">
     {#each fields as field}
       <div class="form-field">
-        <label htmlFor={field.name} class="form-label">
+        <label for={field.name} class="form-label">
           {field.label}
           {#if field.required}<span class="required">*</span>{/if}
         </label>

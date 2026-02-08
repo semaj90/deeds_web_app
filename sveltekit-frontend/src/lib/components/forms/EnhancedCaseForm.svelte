@@ -222,7 +222,7 @@
     <section class="form-section">
       <h3>Basic Information</h3>
       <div class="field-group">
-        <label htmlFor="title" class="required">Case Title</label>
+        <label for="title" class="required">Case Title</label>
         <input
           id="title"
           type="text"
@@ -236,7 +236,7 @@
         {/if}
       </div>
       <div class="field-group">
-        <label htmlFor="caseNumber" class="required">Case Number</label>
+        <label for="caseNumber" class="required">Case Number</label>
         <input
           id="caseNumber"
           type="text"
@@ -250,7 +250,7 @@
         {/if}
       </div>
       <div class="field-group">
-        <label htmlFor="name">Case Name (Optional)</label>
+        <label for="name">Case Name (Optional)</label>
         <input
           id="name"
           type="text"
@@ -259,7 +259,7 @@
         />
       </div>
       <div class="field-group">
-        <label htmlFor="description">Description</label>
+        <label for="description">Description</label>
         <textarea
           id="description"
           bind:value={formData.description}
@@ -274,7 +274,7 @@
       <h3>Case Details</h3>
       <div class="field-row">
         <div class="field-group">
-          <label htmlFor="priority">Priority</label>
+          <label for="priority">Priority</label>
           <select id="priority" bind:value={formData.priority}>
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -283,7 +283,7 @@
           </select>
         </div>
         <div class="field-group">
-          <label htmlFor="status">Status</label>
+          <label for="status">Status</label>
           <select id="status" bind:value={formData.status}>
             <option value="open">Open</option>
             <option value="active">Active</option>
@@ -294,7 +294,7 @@
         </div>
       </div>
       <div class="field-group">
-        <label htmlFor="category">Category</label>
+        <label for="category">Category</label>
         <input
           id="category"
           type="text"
@@ -304,7 +304,7 @@
       </div>
       <div class="field-row">
         <div class="field-group">
-          <label htmlFor="dangerScore">Danger Score (0-10)</label>
+          <label for="dangerScore">Danger Score (0-10)</label>
           <input
             id="dangerScore"
             type="number"
@@ -318,7 +318,7 @@
           {/if}
         </div>
         <div class="field-group">
-          <label htmlFor="estimatedValue">Estimated Value ($)</label>
+          <label for="estimatedValue">Estimated Value ($)</label>
           <input
             id="estimatedValue"
             type="number"
@@ -338,7 +338,7 @@
     <section class="form-section">
       <h3>Location & Timeline</h3>
       <div class="field-group">
-        <label htmlFor="incidentDate">Incident Date</label>
+        <label for="incidentDate">Incident Date</label>
         <input
           id="incidentDate"
           type="date"
@@ -346,7 +346,7 @@
         />
       </div>
       <div class="field-group">
-        <label htmlFor="location">Location</label>
+        <label for="location">Location</label>
         <input
           id="location"
           type="text"
@@ -355,7 +355,7 @@
         />
       </div>
       <div class="field-group">
-        <label htmlFor="jurisdiction">Jurisdiction</label>
+        <label for="jurisdiction">Jurisdiction</label>
         <input
           id="jurisdiction"
           type="text"
@@ -370,7 +370,7 @@
       <h3>Team & Tags</h3>
       <!-- Assigned Team -->
       <div class="field-group">
-        <label htmlFor="new-member">Assigned Team</label>
+        <label for="new-member">Assigned Team</label>
         <div class="tag-input">
           <input
             id="new-member"
@@ -393,7 +393,7 @@
       </div>
       <!-- Tags -->
       <div class="field-group">
-        <label htmlFor="new-tag">Tags</label>
+        <label for="new-tag">Tags</label>
         <div class="tag-input">
           <input
             id="new-tag"

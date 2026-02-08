@@ -99,7 +99,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported /**
     <h2>âš™ï¸ Integration Controls</h2>
     <div class="controls-grid">
       <div class="control-group">
-        <label htmlFor="case-selector">Select Case ID:</label>
+        <label for="case-selector">Select Case ID:</label>
         <select id="case-selector" bind:value={selectedCaseId}>
           <option value="demo-case-001">Demo Case 001</option> <option value="demo-case-002">Demo Case 002</option>
           <option value="complex-case-003">Complex Case 003</option>

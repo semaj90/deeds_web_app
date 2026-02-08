@@ -103,7 +103,7 @@ function handleChange(e: Event) {
 	{#if label || showValue}
 		<div class="flex justify-between items-center mb-2">
 			{#if label}
-				<label htmlFor={id} class="text-sm font-medium text-slate-300">
+				<label for={id} class="text-sm font-medium text-slate-300">
 					{label}
 				</label>
 			{/if}

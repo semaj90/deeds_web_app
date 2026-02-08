@@ -267,7 +267,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 			<div class="settings-content space-y-4 nes-container">
 				<div class="setting-group">
-					<label htmlFor="model-select" class="nes-text">Model:</label>
+					<label for="model-select" class="nes-text">Model:</label>
 					<div class="nes-select">
 						<select id="model-select" bind:value={ selectedModel }>
 							<option value="gemma3-legal, latest">Gemma, 3 Legal (Ollama)</option>
@@ -279,15 +279,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 					</div>
 				</div>
 				<div class="setting-group">
-					<label htmlFor="temperature-range" class="nes-text">Temperature: { temperature }</label>
+					<label for="temperature-range" class="nes-text">Temperature: { temperature }</label>
 					<input id="temperature-range" type="range" min="0" max="1" step="0.1" bind:value={ temperature } class="nes-range" />
 				</div>
 				<div class="setting-group">
-					<label htmlFor="threshold-range" class="nes-text">Search Threshold: { searchThreshold }</label>
+					<label for="threshold-range" class="nes-text">Search Threshold: { searchThreshold }</label>
 					<input id="threshold-range" type="range" min="0" max="1" step="0.1" bind:value={ searchThreshold } class="nes-range" />
 				</div>
 				<div class="setting-group">
-					<label htmlFor="max-results" class="nes-text">Max Results:</label>
+					<label for="max-results" class="nes-text">Max Results:</label>
 					<input id="max-results" type="number" min="1" max="20" bind:value={ maxResults } class="nes-input" />
 				</div>
 				<div class="setting-group">

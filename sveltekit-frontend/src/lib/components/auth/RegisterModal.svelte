@@ -78,7 +78,7 @@
     {/if}
     <form class="space-y-4" method="POST" action="/api/auth/register" use:enhance>
       <div>
-        <label htmlFor={emailId} class="block text-sm font-medium text-slate-700">Email</label>
+        <label for={emailId} class="block text-sm font-medium text-slate-700">Email</label>
         <input
           type="email"
           name="email"
@@ -91,7 +91,7 @@
         {/if}
       </div>
       <div>
-        <label htmlFor={passwordId} class="block text-sm font-medium text-slate-700">Password</label>
+        <label for={passwordId} class="block text-sm font-medium text-slate-700">Password</label>
         <input
           type="password"
           name="password"
@@ -104,7 +104,7 @@
         {/if}
       </div>
       <div>
-        <label htmlFor={confirmPasswordId} class="block text-sm font-medium text-slate-700">Confirm Password</label>
+        <label for={confirmPasswordId} class="block text-sm font-medium text-slate-700">Confirm Password</label>
         <input
           type="password"
           name="confirmPassword"
@@ -124,7 +124,7 @@
           bind:checked={$form.termsAccepted}
           class="mt-1 w-4 h-4 border-slate-300 rounded focus:ring-2"
         />
-        <label htmlFor={termsId} class="text-sm">
+        <label for={termsId} class="text-sm">
           I agree to the <a href="/terms" class="text-blue-600">Terms of Service</a> and
           <a href="/privacy" class="text-blue-600">Privacy Policy</a>
         </label>

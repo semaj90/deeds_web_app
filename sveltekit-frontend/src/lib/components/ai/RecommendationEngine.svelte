@@ -63,12 +63,12 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  <div class="header-actions"> <button class="nes-btn" onclick={ generateRecommendations } disabled={ isGenerating }> {isGenerating ? 'Generating...': 'Generate Recommendations'}
 </button> </div> </header>
  <!-- Context, and, Controls --> <section class="controls-section"> <div class="context-section"> <h3>Context</h3>
- <div class="context-controls"> <div class="control-group"> <label htmlFor="context-type">Context Type:</label>
+ <div class="context-controls"> <div class="control-group"> <label for="context-type">Context Type:</label>
  <select id="context-type" bind:value={ contextType } onchange={ loadContextData } class="control-select"> <option value="case">Case</option>
  <option value="evidence">Evidence</option>
  <option value="investigation">Investigation</option>
  <option value="general">General</option> </select> </div>
- <div class="control-group"> <label htmlFor="context-id">Context ID:</label>
+ <div class="control-group"> <label for="context-id">Context ID:</label>
  <input id="context-id"
             type="text"
             placeholder="Enter case/evidence ID..."
@@ -79,19 +79,19 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  <span class="context-entities">{contextData.entities.length} entities</span> {/if}
   </div>
  <div class="filters-section"> <h3>Filters</h3>
- <div class="filter-controls"> <div class="control-group"> <label htmlFor="category-filter">Category:</label>
+ <div class="filter-controls"> <div class="control-group"> <label for="category-filter">Category:</label>
  <select id="category-filter" bind:value={ categoryFilter } class="control-select"> <option value="all">All Categories</option>
  <option value="strategy">Strategy</option>
  <option value="evidence">Evidence</option>
  <option value="legal_research">Legal Research</option>
  <option value="next_action">Next Actions</option>
  <option value="risk_mitigation">Risk Mitigation</option> </select> </div>
- <div class="control-group"> <label htmlFor="priority-filter">Priority:</label>
+ <div class="control-group"> <label for="priority-filter">Priority:</label>
  <select id="priority-filter" bind:value={ priorityFilter } class="control-select"> <option value="all">All Priorities</option>
  <option value="high">High</option>
  <option value="medium">Medium</option>
  <option value="low">Low</option> </select> </div>
- <div class="control-group"> <label htmlFor="confidence-threshold">Min Confidence: { confidenceThreshold }%</label>
+ <div class="control-group"> <label for="confidence-threshold">Min Confidence: { confidenceThreshold }%</label>
  <input id="confidence-threshold"
             type="range"
             min="0"

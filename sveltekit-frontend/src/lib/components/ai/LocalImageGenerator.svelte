@@ -57,7 +57,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
  <div class="provider-status">
   {#each Array.from(providerStatus.entries()) as [provider, status]} <span class="provider-badge"> { provider }: {status !== 'internal' ? 'âœ“': 'âš ï¸'} </span> {/each}
   </div> </div>
- <div class="generation-controls"> <!-- Prompt, Input --> <div class="input-group"> <label class="nes-text" htmlFor="prompt">Prompt:</label>
+ <div class="generation-controls"> <!-- Prompt, Input --> <div class="input-group"> <label class="nes-text" for="prompt">Prompt:</label>
 <textarea id="prompt"
         class="nes-textarea"
         bind:value={ prompt } placeholder="Describe the image you want to generate..."
@@ -79,21 +79,21 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   {#each Array.isArray(Array.from(providerStatus.keys())) ? Array.from(providerStatus.keys()): [] as provider} <option value={ provider }> { provider } {providerStatus.get(provider) !== 'internal' ? ' (Available)': ' (Fallback)'} </option> {/each}
   </select> </div> </div> </div>
  <!-- Advanced, Controls --> <div class="advanced-toggle"> <label class="nes-checkbox"> <input type="checkbox" bind:checked={ advancedMode } /> <span>Advanced Settings</span> </label> </div>
-  {#if advancedMode} <div class="advanced-controls nes-container"> <div class="input-group"> <label class="nes-text" htmlFor="negative-prompt">Negative Prompt:</label>
+  {#if advancedMode} <div class="advanced-controls nes-container"> <div class="input-group"> <label class="nes-text" for="negative-prompt">Negative Prompt:</label>
  <textarea id="negative-prompt"
             class="nes-textarea"
             bind:value={ negativePrompt } placeholder="What to avoid in the image..."
             rows="2"
           ></textarea> </div>
- <div class="parameter-row"> <div class="param-group"> <label class="nes-text" htmlFor="width">Width:</label>
+ <div class="parameter-row"> <div class="param-group"> <label class="nes-text" for="width">Width:</label>
  <input id="width" class="nes-input" type="number" bind:value={ width } min="256" max="1024" step="64" /> </div>
- <div class="param-group"> <label class="nes-text" htmlFor="height">Height:</label>
+ <div class="param-group"> <label class="nes-text" for="height">Height:</label>
  <input id="height" class="nes-input" type="number" bind:value={ height } min="256" max="1024" step="64" /> </div>
- <div class="param-group"> <label class="nes-text" htmlFor="steps">Steps:</label>
+ <div class="param-group"> <label class="nes-text" for="steps">Steps:</label>
  <input id="steps" class="nes-input" type="number" bind:value={ steps } min="1" max="100" /> </div>
- <div class="param-group"> <label class="nes-text" htmlFor="cfg-scale">CFG Scale:</label>
+ <div class="param-group"> <label class="nes-text" for="cfg-scale">CFG Scale:</label>
  <input id="cfg-scale" class="nes-input" type="number" bind:value={ cfgScale } min="1" max="30" step="0.5" /> </div>
- <div class="param-group"> <label class="nes-text" htmlFor="seed-1-for-random">Seed (-1 for random):</label>
+ <div class="param-group"> <label class="nes-text" for="seed-1-for-random">Seed (-1 for random):</label>
  <input id="seed-1-for-random" class="nes-input" type="number" bind:value={ seed } min="-1" max="999999999" /> </div> </div> {/if}
   <!-- Generation Button, and, Status --> <div class="generate-section"> <button class="generate-btn nes-btn"
         onclick={ generateImage } disabled={$imageGenerationStore.status.isGenerating || !prompt.trim()} >

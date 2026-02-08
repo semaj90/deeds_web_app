@@ -99,7 +99,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
 
  <form onsubmit|preventDefault={handleSubmit} class="space-y-4">
  <div>
- <label htmlFor="documentUrl" class="block text-sm font-medium text-gray-700 mb-2">
+ <label for="documentUrl" class="block text-sm font-medium text-gray-700 mb-2">
  Document URL
  </label>
  <input

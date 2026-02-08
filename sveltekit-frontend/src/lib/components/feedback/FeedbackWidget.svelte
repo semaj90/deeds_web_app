@@ -33,7 +33,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                   onclick={() => setRating(star)} aria-label="Rate { star } stars"
                   type="button"
                 > â˜…
-                </button> {/each} </div> </div> {#if rating > 0} <div class="feedback-section"> <label htmlFor="feedback-text" class="feedback-textarea-label"> Additional feedback (optional): </label> <textarea id="feedback-text"
+                </button> {/each} </div> </div> {#if rating > 0} <div class="feedback-section"> <label for="feedback-text" class="feedback-textarea-label"> Additional feedback (optional): </label> <textarea id="feedback-text"
                 bind:value={ feedback } class="feedback-textarea"
                 placeholder="Tell us more about your experience..."
                 rows="3"

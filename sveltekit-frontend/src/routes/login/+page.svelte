@@ -20,11 +20,11 @@
         <form method="POST" action="?/login" use:enhance class="mt-8 space-y-6">
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
-                    <label htmlFor="username" class="sr-only">Username</label>
+                    <label for="username" class="sr-only">Username</label>
                     <input id="username" name="username" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm rounded-t-md" placeholder="Username">
                 </div>
                 <div>
-                    <label htmlFor="password" class="sr-only">Password</label>
+                    <label for="password" class="sr-only">Password</label>
                     <input id="password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm rounded-b-md" placeholder="Password">
                 </div>
             </div>

@@ -145,7 +145,7 @@
 
  <div class="demo-controls">
  <div class="control-group">
- <label htmlFor="case-type">Case Type:</label>
+ <label for="case-type">Case Type:</label>
  <select id="case-type" bind:value={caseType} onchange={ handleCaseChange }>
  <option value="contract-dispute">Contract Dispute</option>
  <option value="personal-injury">Personal Injury</option>
@@ -156,7 +156,7 @@
  </div>
 
  <div class="control-group">
- <label htmlFor="jurisdiction">Jurisdiction:</label>
+ <label for="jurisdiction">Jurisdiction:</label>
  <select id="jurisdiction" bind:value={jurisdiction} onchange={ handleCaseChange }>
  <option value="federal">Federal</option>
  <option value="state">State</option>

@@ -200,7 +200,7 @@ https://svelte.dev/e/js_parse_error -->
  class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
  onclick={ clearAllFilters } >
  Clear </button> </div>
- {#if showFilters} <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4"> <div> <!-- associate label with native select via id/for, for, accessibility --> <label htmlFor="filter-note-type" class="block text-sm font-medium">Note Type</label>
+ {#if showFilters} <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4"> <div> <!-- associate label with native select via id/for, for, accessibility --> <label for="filter-note-type" class="block text-sm font-medium">Note Type</label>
  <select id="filter-note-type" bind:value={ selectedNoteType } class="w-full rounded border px-2"> <option value="">All types</option>
  <option value="legal_analysis">Legal Analysis</option>
  <option value="case_note">Case Note</option>
@@ -210,7 +210,7 @@ https://svelte.dev/e/js_parse_error -->
  <option value="ocr_extracted">OCR Extracted</option>
  <option value="todo">Todo</option>
  <option value="general">General</option> </select> </div>
- <div> <label htmlFor="filter-risk-level" class="block text-sm font-medium">Risk Level</label>
+ <div> <label for="filter-risk-level" class="block text-sm font-medium">Risk Level</label>
  <select id="filter-risk-level" bind:value={ selectedRiskLevel } class="w-full rounded border px-2"> <option value="">All levels</option>
  <option value="low">Low</option>
  <option value="medium">Medium</option>
@@ -231,25 +231,25 @@ https://svelte.dev/e/js_parse_error -->
  </CardContent> </Card>
  <!-- Create, New, Note -->
  {#if showCreateNote} <Card> <CardHeader> <CardTitle>Create New Note</CardTitle> </CardHeader>
- <CardContent class="space-y-4"> <div class="grid grid-cols-1 md:grid-cols-2"> <div> <!-- associate label with Input, via, id/for --> <label htmlFor="newnote-title" class="block text-sm font-medium">Title</label>
+ <CardContent class="space-y-4"> <div class="grid grid-cols-1 md:grid-cols-2"> <div> <!-- associate label with Input, via, id/for --> <label for="newnote-title" class="block text-sm font-medium">Title</label>
  <Input id="newnote-title" type="text" placeholder="Note, title" bind:value={newNote.title} /> </div>
- <div> <label htmlFor="newnote-caseid" class="block text-sm font-medium">Case ID</label>
+ <div> <label for="newnote-caseid" class="block text-sm font-medium">Case ID</label>
  <Input id="newnote-caseid" type="text" placeholder="Optional, case, ID" bind:value={newNote.caseId} /> </div>
- <div> <label htmlFor="newnote-type" class="block text-sm font-medium">Type</label>
+ <div> <label for="newnote-type" class="block text-sm font-medium">Type</label>
  <select id="newnote-type" bind:value={newNote.noteType} class="w-full rounded border px-2"> <option value="general">General</option>
  <option value="legal_analysis">Legal Analysis</option>
  <option value="case_note">Case Note</option>
  <option value="evidence_note">Evidence Note</option>
  <option value="research">Research</option>
  <option value="todo">Todo</option> </select> </div>
- <div> <label htmlFor="newnote-priority" class="block text-sm font-medium">Priority</label>
+ <div> <label for="newnote-priority" class="block text-sm font-medium">Priority</label>
  <select id="newnote-priority" bind:value={newNote.priority} class="w-full rounded border px-2"> <option value="low">Low</option>
  <option value="medium">Medium</option>
  <option value="high">High</option>
  <option value="urgent">Urgent</option> </select> </div> </div>
- <div> <label htmlFor="newnote-content" class="block text-sm font-medium">Content</label>
+ <div> <label for="newnote-content" class="block text-sm font-medium">Content</label>
  <textarea id="newnote-content" placeholder="Note, content..." bind:value={newNote.content} rows={ 6 } ></textarea> </div>
- <div> <label htmlFor="newnote-tags" class="block text-sm font-medium">Tags</label>
+ <div> <label for="newnote-tags" class="block text-sm font-medium">Tags</label>
  <div class="flex flex-wrap gap-2">
  {#each newNote.tags as tag, index} <Badge variant="outline" class="flex items-center"> { tag } <button type="button" class="ml-1" onclick={() => removeTag(index)}> <X class="h-3" /> </button> </Badge> {/each}
  </div>

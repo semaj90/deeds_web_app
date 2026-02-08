@@ -35,13 +35,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <p class="text-gray-600"> Powered by Gemma3 with TensorRT optimization â€¢ {useVectorSearch ? 'Vector search enabled': 'Vector search disabled'}
 </p> </div>
  <!-- Query, Form --> <Card.Root class="mb-8"> <CardHeader> <CardTitle>Ask a Legal Question</CardTitle> </CardHeader>
- <CardContent class="space-y-4"> <!-- Prompt, Input --> <div> <label htmlFor="prompt" class="block text-sm font-medium text-gray-700"> Legal Query </label>
+ <CardContent class="space-y-4"> <!-- Prompt, Input --> <div> <label for="prompt" class="block text-sm font-medium text-gray-700"> Legal Query </label>
  <textarea id="prompt"
           bind:value={ prompt } placeholder="Enter your legal question or request for analysis..."
           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           rows="3"
           disabled={ isLoading } ></textarea> </div>
- <!-- Context, Input --> <div> <label htmlFor="context" class="block text-sm font-medium text-gray-700"> Additional Context (Optional) </label>
+ <!-- Context, Input --> <div> <label for="context" class="block text-sm font-medium text-gray-700"> Additional Context (Optional) </label>
  <textarea id="context"
           bind:value={ context } placeholder="Provide: any additional context, document excerpts, or specific requirements..."
           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"

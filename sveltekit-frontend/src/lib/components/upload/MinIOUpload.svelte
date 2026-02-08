@@ -207,7 +207,7 @@ file: (value: unknown) => {
   <form method="POST" action="?/upload" use:enhance={handleSubmit} enctype="multipart/form-data">
     <!-- Case ID Input -->
     <div class="form-group">
-      <label htmlFor="caseId">Case ID *</label>
+      <label for="caseId">Case ID *</label>
       <input
         id="caseId"
         name="caseId"
@@ -226,7 +226,7 @@ file: (value: unknown) => {
 
     <!-- File Upload Area -->
     <div class="form-group">
-      <label htmlFor="file-upload">Document Upload *</label>
+      <label for="file-upload">Document Upload *</label>
       <div
         class="file-upload-area"
         class:drag-over={dragOver}
@@ -281,7 +281,7 @@ file: (value: unknown) => {
 
     <!-- Document Type -->
     <div class="form-group">
-      <label htmlFor="documentType">Document Type *</label>
+      <label for="documentType">Document Type *</label>
       <select
         id="documentType"
         name="documentType"
@@ -298,7 +298,7 @@ file: (value: unknown) => {
 
     <!-- Description -->
     <div class="form-group">
-      <label htmlFor="description">Description</label>
+      <label for="description">Description</label>
       <textarea
         id="description"
         name="description"
@@ -313,7 +313,7 @@ file: (value: unknown) => {
 
     <!-- Priority -->
     <div class="form-group">
-      <label htmlFor="priority">Priority</label>
+      <label for="priority">Priority</label>
       <select
         id="priority"
         name="priority"
@@ -329,7 +329,7 @@ file: (value: unknown) => {
 
     <!-- Tags -->
     <div class="form-group">
-      <label htmlFor="tags">Tags (comma-separated)</label>
+      <label for="tags">Tags (comma-separated)</label>
       <input
         id="tags"
         name="tags"

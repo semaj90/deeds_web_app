@@ -66,7 +66,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               class:unavailable={backendLatency[backend] === 0} onclick={() => selectBackend(backend)} >
               { backend } <span class="latency {getBackendStatusColor(backend)}"> {backendLatency[backend]}ms </span> </button> {/each}
   </div> </div>
- <div class="setting-group"> <label htmlFor="temperature-configte">Temperature: {config.temperature}</label>
+ <div class="setting-group"> <label for="temperature-configte">Temperature: {config.temperature}</label>
 <input id="temperature-configte"
           type="range"
           min="0"

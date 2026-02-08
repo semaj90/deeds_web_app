@@ -280,7 +280,7 @@ userId: 'demo-user',
     <div class="yorha-panel-content">
       <!-- Test, Input -->
       <div>
-        <label class="block text-sm font-medium text-yorha-text-primary" htmlFor="-test-input-">
+        <label class="block text-sm font-medium text-yorha-text-primary" for="-test-input-">
           Test Input
         </label>
         <textarea

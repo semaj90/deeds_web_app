@@ -77,7 +77,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       height="600"
       onmousemove={ handleMouseMove } onclick={ handleMouseClick } onmouseleave={ handleMouseLeave } class="evidence-canvas"
     ></canvas> </div>
- <div class="controls-panel"> <div class="nes-field"> <label htmlFor="theme-select">Theme:</label>
+ <div class="controls-panel"> <div class="nes-field"> <label for="theme-select">Theme:</label>
  <div class="nes-select"> <select id="theme-select" bind:value={ theme }> <option value="yorha">YoRHa Terminal</option>
  <option value="dark">Dark Mode</option>
  <option value="light">Light Mode</option> </select> </div> </div>

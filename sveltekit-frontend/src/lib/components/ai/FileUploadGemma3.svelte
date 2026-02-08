@@ -55,7 +55,7 @@
     style="display: none;"
     id="file-upload"
   />
-  <label htmlFor="file-upload" class="cursor-pointer">
+  <label for="file-upload" class="cursor-pointer">
     {#if files && files.length > 0}
       <p>{files.length} file(s) selected</p>
     {:else}

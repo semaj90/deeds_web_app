@@ -113,7 +113,7 @@
 
  <div class="filters">
  <div class="filter-group">
- <label htmlFor="link-type-filter">Link Type:</label>
+ <label for="link-type-filter">Link Type:</label>
  <select id="link-type-filter" bind:value={selectedLinkType} onchange={ loadLinks }>
  <option value="">All</option>
  {#each Object.keys(stats.byLinkType) as linkType}

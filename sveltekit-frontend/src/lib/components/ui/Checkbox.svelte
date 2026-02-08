@@ -16,7 +16,7 @@
 <div class="checkbox-container">
 	<input type="checkbox" id={checkboxId} bind:checked class="checkbox-input" />
 	{#if label}
-		<label htmlFor={checkboxId} class="checkbox-label">{label}</label>
+		<label for={checkboxId} class="checkbox-label">{label}</label>
 	{/if}
 </div>
 

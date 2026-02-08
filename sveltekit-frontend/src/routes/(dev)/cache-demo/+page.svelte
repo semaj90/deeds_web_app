@@ -182,7 +182,7 @@
 		<CardContent class="space-y-4">
 			<div class="grid grid-cols-2 gap-4">
 				<div>
-					<label class="text-sm font-medium" htmlFor="cache-key">Key</label>
+					<label class="text-sm font-medium" for="cache-key">Key</label>
 					<input
 						type="text"
 						bind:value={testKey}
@@ -191,7 +191,7 @@
 					/>
 				</div>
 				<div>
-					<label class="text-sm font-medium" htmlFor="cache-value">Value</label>
+					<label class="text-sm font-medium" for="cache-value">Value</label>
 					<input
 						type="text"
 						bind:value={testValue}

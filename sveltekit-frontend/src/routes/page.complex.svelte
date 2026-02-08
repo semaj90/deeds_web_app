@@ -415,7 +415,7 @@
  }}
  >
  <div>
- <label htmlFor="case-title" class="mb-2 block text-sm font-medium">Title</label>
+ <label for="case-title" class="mb-2 block text-sm font-medium">Title</label>
  <input
  id="case-title"
  type="text"
@@ -425,7 +425,7 @@
  />
  </div>
  <div>
- <label htmlFor="case-description" class="mb-2 block text-sm font-medium">Description</label>
+ <label for="case-description" class="mb-2 block text-sm font-medium">Description</label>
  <textarea
  id="case-description"
  bind:value={newCaseData.description}
@@ -435,7 +435,7 @@
  ></textarea>
  </div>
  <div>
- <label htmlFor="case-priority" class="mb-2 block text-sm font-medium">Priority</label>
+ <label for="case-priority" class="mb-2 block text-sm font-medium">Priority</label>
  <select
  id="case-priority"
  bind:value={newCaseData.priority}

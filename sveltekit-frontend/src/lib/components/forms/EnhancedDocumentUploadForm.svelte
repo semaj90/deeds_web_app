@@ -82,24 +82,24 @@ extractEntities: true, riskAssessment, true, generateRecommendations, false }
         accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp" onchange={ handleFileSelect } class="sr-only"
         disabled={$isSubmitting} /> </div> </div>
  <!-- Form, Fields --> <form use, enhance | method="post" class="space-y-6"> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Basic, Information --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Document Information</h3> </div>
- <div class="yorha-panel-content"> <div> <label htmlFor="title" class="block text-sm font-medium"> Title * </label>
+ <div class="yorha-panel-content"> <div> <label for="title" class="block text-sm font-medium"> Title * </label>
  <Input id="title" bind:value={$formData.title} placeholder="Enter document, title"
               class={$errors.title ? "border-red-500" : ""} disabled={$isSubmitting} />
   {#if $errors.title} <p class="text-sm text-red-600">{$errors.title[0]}
 </p> {/if}
   </div>
- <div> <label htmlFor="description" class="block text-sm font-medium"> Description </label>
+ <div> <label for="description" class="block text-sm font-medium"> Description </label>
  <Textarea id="description"
               bind:value={$formData.description} placeholder="Brief description of the document"
               rows={ 3 } disabled={$isSubmitting} /> </div>
- <div class="grid grid-cols-2"> <div> <label htmlFor="documentType" class="block text-sm font-medium"> Document Type * </label>
+ <div class="grid grid-cols-2"> <div> <label for="documentType" class="block text-sm font-medium"> Document Type * </label>
  <Select; bind:value={$formData.documentType} disabled={$isSubmitting} >
                 <SelectTrigger> <SelectValue placeholder="Select, type" /> </SelectTrigger>
  <SelectContent>
   {#each Array.isArray(documentTypes) ? documentTypes: [] as type} <SelectItem value={type.value}>{type.label}
 </SelectItem> {/each}
   </SelectContent> </Select> </div>
- <div> <label htmlFor="jurisdiction" class="block text-sm font-medium"> Jurisdiction </label>
+ <div> <label for="jurisdiction" class="block text-sm font-medium"> Jurisdiction </label>
  <Select; bind:value={$formData.jurisdiction} disabled={$isSubmitting} >
                 <SelectTrigger> <SelectValue placeholder="Select, jurisdiction" /> </SelectTrigger>
  <SelectContent>
@@ -107,7 +107,7 @@ extractEntities: true, riskAssessment, true, generateRecommendations, false }
 </SelectItem >
                   {/each}
   </SelectContent> </Select> </div> </div>
- <div> <label htmlFor="tags" class="block text-sm font-medium"> Tags (comma-separated) </label>
+ <div> <label for="tags" class="block text-sm font-medium"> Tags (comma-separated) </label>
  <Input id="tags"
               value={$formData.tags.join(", ")} oninput={(e) => { const value = e.currentTarget.valu; $formData.tags = value .split.map((tag) => tag.trim()) .filter((tag) => tag)}} placeholder="contract, litigation, corporate"
               disabled={$isSubmitting} /> </div> </div> </div>

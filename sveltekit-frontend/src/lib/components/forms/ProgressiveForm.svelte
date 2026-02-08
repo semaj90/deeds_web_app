@@ -273,7 +273,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
     <div class="form-row">
       <div class="form-group">
-        <label htmlFor={fieldIds.firstName} class="form-label">First Name</label>
+        <label for={fieldIds.firstName} class="form-label">First Name</label>
         <input
           id={fieldIds.firstName}
           type="text"
@@ -295,7 +295,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       </div>
 
       <div class="form-group">
-        <label htmlFor={fieldIds.lastName} class="form-label">Last Name</label>
+        <label for={fieldIds.lastName} class="form-label">Last Name</label>
         <input
           id={fieldIds.lastName}
           type="text"
@@ -323,7 +323,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     <legend>Account Information</legend>
 
     <div class="form-group">
-      <label htmlFor={fieldIds.email} class="form-label">Email Address</label>
+      <label for={fieldIds.email} class="form-label">Email Address</label>
       <input
         id={fieldIds.email}
         type="email"
@@ -346,7 +346,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     </div>
 
     <div class="form-group">
-      <label htmlFor={fieldIds.password} class="form-label">Password</label>
+      <label for={fieldIds.password} class="form-label">Password</label>
       <input
         id={fieldIds.password}
         type="password"
@@ -371,7 +371,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     </div>
 
     <div class="form-group">
-      <label htmlFor={fieldIds.confirmPassword} class="form-label">Confirm Password</label>
+      <label for={fieldIds.confirmPassword} class="form-label">Confirm Password</label>
       <input
         id={fieldIds.confirmPassword}
         type="password"
@@ -409,7 +409,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         aria-describedby={hasError('terms') ? progressiveForm.generateErrorId(fieldIds.terms) : undefined}
         required
       />
-      <label htmlFor={fieldIds.terms} class="checkbox-label">
+      <label for={fieldIds.terms} class="checkbox-label">
         I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and
         <a href="/privacy" target="_blank">Privacy Policy</a>
       </label>

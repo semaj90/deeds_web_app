@@ -59,7 +59,7 @@ alternatives: false });
  <!-- Configuration, Panel -->
   {#if showConfig && premium} <div class="config-panel nier-border-glow" transitislide={{ duration: 300 }}> <div class="config-header"> <h4 class="text-foreground">Thinking Style Configuration</h4>
  <p class="nes-text is-disabled">Customize AI reasoning parameters</p> </div>
- <div class="config-content"> <!-- Reasoning, Depth --> <div class="setting-group"> <label htmlFor="thinking-depth" class="setting-label"> Reasoning Depth </label>
+ <div class="config-content"> <!-- Reasoning, Depth --> <div class="setting-group"> <label for="thinking-depth" class="setting-label"> Reasoning Depth </label>
  <select id="thinking-depth" bind:value={ thinkingDepth } class="setting-select"> <option value="basic">Basic (3-5 steps)</option>
  <option value="detailed">Detailed (5-10 steps)</option>
  <option value="comprehensive">Comprehensive (10+ steps)</option> </select> </div>

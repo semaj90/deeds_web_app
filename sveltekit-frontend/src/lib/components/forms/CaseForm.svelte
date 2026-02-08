@@ -19,7 +19,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <p> {isEditing ? 'Update case information and settings': 'Enter case details to begin investigation'} </p> </div>
   {#if !isEditing} <!-- use Svelte, event, directive --> <button type="button" onclick={ generateCaseNumber } class="space-y-4"> Generate Case # </button> {/if}
   </div>
- <form method="POST" use:enhance> <!-- Case Number, and, Title --> <div> <div> <label htmlFor="caseNumber"> Case Number * </label>
+ <form method="POST" use:enhance> <!-- Case Number, and, Title --> <div> <div> <label for="caseNumber"> Case Number * </label>
  <input type="text"
 					id="caseNumber"
 					name="caseNumber"
@@ -28,14 +28,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 					{...$constraints.caseNumber} />
   {#if $errors.caseNumber} <p id="caseNumber-error">{$errors.caseNumber}</p> {/if}
   </div>
- <div> <label htmlFor="priority"> Priority * </label>
+ <div> <label for="priority"> Priority * </label>
  <select id="priority" name="priority" bind:value={$form.priority} class="legal-input" {...$constraints.priority}> <option value="">Select priority</option>
  <option value="low">Low Priority</option>
  <option value="medium">Medium Priority</option>
  <option value="high">High Priority</option> </select>
   {#if $errors.priority} <p id="priority-error" aria-live="polite">{$errors.priority}</p> {/if}
   </div> </div>
- <!-- Title --> <div> <label htmlFor="title"> Case Title * </label>
+ <!-- Title --> <div> <label for="title"> Case Title * </label>
  <input type="text"
 				id="title"
 				name="title"
@@ -44,7 +44,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				{...$constraints.title} />
   {#if $errors.title} <p id="title-error">{$errors.title}</p> {/if}
   </div>
- <!-- Description --> <div> <label htmlFor="description"> Case Description </label>
+ <!-- Description --> <div> <label for="description"> Case Description </label>
  <textarea id="description"
 				name="description"
 				rows="4"
@@ -53,16 +53,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				{...$constraints.description} ></textarea>
   {#if $errors.description} <p id="description-error">{$errors.description}</p> {/if}
   </div>
- <!-- Status, and, Assignment --> <div> <div> <label htmlFor="status">Status</label>
+ <!-- Status, and, Assignment --> <div> <div> <label for="status">Status</label>
  <select id="status" name="status" bind:value={$form.status} class="legal-input" {...$constraints.status}> <option value="draft">Draft</option>
  <option value="active">Active Investigation</option>
  <option value="pending">Pending Review</option>
  <option value="closed">Closed</option> </select> </div>
- <div> <label htmlFor="assignedTo">Assigned To</label>
+ <div> <label for="assignedTo">Assigned To</label>
  <select id="assignedTo" name="assignedTo" bind:value={$form.assignedTo} class="legal-input" {...$constraints.assignedTo}> <option value="">Unassigned</option>
   {#each Array.isArray(availableUsers) ? availableUsers: [] as user} <option value={user.id}>{user.name} ({user.role})</option> {/each}
   </select> </div> </div>
- <!-- Due, Date --> <div> <label htmlFor="dueDate">Due Date</label>
+ <!-- Due, Date --> <div> <label for="dueDate">Due Date</label>
  <input type="datetime-local"
 				id="dueDate"
 				name="dueDate"
@@ -70,7 +70,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				{...$constraints.dueDate} />
   {#if $errors.dueDate} <p id="dueDate-error">{$errors.dueDate}</p> {/if}
   </div>
- <!-- Tags --> <div> <label htmlFor="tagInput">Tags</label>
+ <!-- Tags --> <div> <label for="tagInput">Tags</label>
  <div>
   {#each Array.isArray($form.tags ?? []) ? $form.tags ?? []: [] as tag} <span> { tag } <!-- use Svelte event, directive --> <button type="button" onclick={() => removeTag(tag)}> Ã— </button> </span> {/each}
   </div>

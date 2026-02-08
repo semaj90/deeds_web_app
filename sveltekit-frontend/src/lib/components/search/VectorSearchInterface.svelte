@@ -103,7 +103,7 @@ import * as Switch from "bits-ui/components/switch";
 
       <!-- Semantic Mode Toggle -->
       <div class="flex items-center justify-between sm:justify-end gap-4">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer" htmlFor="semantic-mode">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer" for="semantic-mode">
           Deep Semantic Search
         </label>
         <Switch.Root

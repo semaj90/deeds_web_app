@@ -23,7 +23,7 @@
 
    // Reactive validation $effect(() => { if (value !== undefined) { validateField()}
   }); </script>
- <div class="container mx-auto"> <!-- Label --> <label htmlFor={ name } class="container mx-auto"> <span class="container mx-auto"> { label } {#if required} <span class="container mx-auto" aria-label="required">*</span> {/if}
+ <div class="container mx-auto"> <!-- Label --> <label for={ name } class="container mx-auto"> <span class="container mx-auto"> { label } {#if required} <span class="container mx-auto" aria-label="required">*</span> {/if}
   </span>
   {#if helpText} <span class="container mx-auto" data-tip={ helpText }> <Info class="container mx-auto" /> </span> {/if}
   </label>

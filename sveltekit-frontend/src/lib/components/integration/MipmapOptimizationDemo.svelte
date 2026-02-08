@@ -56,13 +56,13 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
   {#if !isInitialized && !isProcessing} <Button.Root class="bits-btn bits-btn" onclick={ initializeSystem } size="sm"> ðŸ”„ Initialize System </Button> {/if} {#if isProcessing} <span class="text-blue-600">â³ Processing...</span> {/if}
   </div> </div> </div>
  <!-- Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Mipmap Configuration</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" htmlFor="max-mip-levels">Max Mip Levels</label>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" for="max-mip-levels">Max Mip Levels</label>
 <input id="max-mip-levels"
             type="number" ,bind:value={mipmapConfig.maxMipLevels} min="1"
             max="16"
             class="w-full p-2 border rounded-md"
             disabled={ isProcessing } /> </div>
- <div> <label class="block text-sm font-medium" htmlFor="filter-mode">Filter Mode</label>
+ <div> <label class="block text-sm font-medium" for="filter-mode">Filter Mode</label>
 <select id="filter-mode"
             bind:value={mipmapConfig.filterMode} class="w-full p-2 border rounded-md"
             disabled={ isProcessing } >
@@ -71,9 +71,9 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
  <option value="cubic">Cubic (Gaussian)</option> </select> </div>
  <div class="space-y-3"> <div class="flex items-center"> <input type="checkbox"
               bind:checked={mipmapConfig.rtxOptimized} id="rtx"
-              disabled={ isProcessing } /> <label htmlFor="rtx" class="text-sm">RTX Optimization</label> </div>
+              disabled={ isProcessing } /> <label for="rtx" class="text-sm">RTX Optimization</label> </div>
  <div class="flex items-center"> <input type="checkbox"; bind:checked={mipmapConfig.enableStreaming} id="streaming"
-              disabled={ isProcessing } /> <label htmlFor="streaming" class="text-sm">Enable Streaming</label> </div> </div> </div> </div> </div>
+              disabled={ isProcessing } /> <label for="streaming" class="text-sm">Enable Streaming</label> </div> </div> </div> </div> </div>
  <!-- Legal, Documents --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Legal Document Processing</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-4"> <!-- Document, List --> <div class="grid">
   {#each legalDocuments as document, index} <div class="flex items-center justify-between p-3 border"> <div class="flex-1"> <div class="font-medium">{document.title}

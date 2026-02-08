@@ -127,7 +127,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  <!-- use the summaryTypes so it is not unused and allow user to pick summary type -->
  <div class="summary-type">
- <label htmlFor="summaryType">Summary style:</label>
+ <label for="summaryType">Summary style:</label>
  <select id="summaryType" bind:value={summaryType}>
  {#each summaryTypes as st}
  <option value={st.value}>{st.label}</option>

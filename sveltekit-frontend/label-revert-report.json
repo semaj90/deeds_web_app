@@ -1,0 +1,668 @@
+{
+  "timestamp": "2026-02-08T21:05:02.007Z",
+  "filesProcessed": 1534,
+  "filesChanged": 165,
+  "totalReverts": 549,
+  "changedFiles": [
+    {
+      "file": "src/lib/components/CaseOutcomePrediction.svelte",
+      "reverts": 6
+    },
+    {
+      "file": "src/lib/components/ClientGemmaInference.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ContextConfirmModal.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/FilterPanel.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/PersonForm.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/admin/EvidenceDrawer.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/admin/JurisdictionSelector.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/AIChatInterface.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/ai/AIProcessingDashboard.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/AgentOrchestrator.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/AutomatedLegalResearch.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/ai/CaseScoringDashboard.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/ai/DeedAnalysis.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedAIAssistant.simple.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedAIAssistant.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedFileUpload.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedRAGDemo.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/EvidenceCanvas.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/FileUploadGemma3.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/FindModal.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/LegalDocumentDrafting.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/ai/LocalImageGenerator.svelte",
+      "reverts": 7
+    },
+    {
+      "file": "src/lib/components/ai/ModularAIExperience.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/lib/components/ai/PatternDetectionInterface.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/ai/PatternRecognition.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/ai/QLorATrainingPanel.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/lib/components/ai/RecommendationEngine.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/lib/components/ai/SIMDAIAssistantDemo.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/ai/SIMDGlyphDemo.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/ai/SIMDTextTilingDemo.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/ai/SOMVisualization.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/ai/SmartSearchInterface.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/ThinkingStyleToggle.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ai/XStatePhase8Integration.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/auth/AuthForm.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/auth/RegisterForm.svelte",
+      "reverts": 9
+    },
+    {
+      "file": "src/lib/components/auth/RegisterModal.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/cache/CacheDemo.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/canvas/EnhancedLegalCanvas.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/canvas/EvidenceCanvas.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/canvas/POINode.svelte",
+      "reverts": 9
+    },
+    {
+      "file": "src/lib/components/citations/CitationCollections.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/citations/CitationSaveForm.svelte",
+      "reverts": 8
+    },
+    {
+      "file": "src/lib/components/citations/CitationsList.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/citations/CitationsManager.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/codebase/TagRenameDialog.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/command-center/AceAgentControls.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/dashboard/EvidenceAnalysisDashboard.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/editor/WysiwygEditor.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/evidence/EnhancedEvidenceBoard.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/evidence/EvidenceBoard.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/evidence/EvidenceProcessingWorkflow.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/evidence/VictimStatementWizard.svelte",
+      "reverts": 9
+    },
+    {
+      "file": "src/lib/components/feedback/FeedbackWidget.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/forms/CaseForm.svelte",
+      "reverts": 8
+    },
+    {
+      "file": "src/lib/components/forms/EnhancedCaseForm.svelte",
+      "reverts": 14
+    },
+    {
+      "file": "src/lib/components/forms/EnhancedCaseFormWithZod.svelte",
+      "reverts": 10
+    },
+    {
+      "file": "src/lib/components/forms/EnhancedDocumentUploadForm.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/lib/components/forms/EnhancedFormInput.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/forms/EvidenceForm.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/lib/components/forms/LegalCaseForm.svelte",
+      "reverts": 11
+    },
+    {
+      "file": "src/lib/components/forms/ProgressiveForm.svelte",
+      "reverts": 6
+    },
+    {
+      "file": "src/lib/components/glyph/GlyphConfigPanel.svelte",
+      "reverts": 9
+    },
+    {
+      "file": "src/lib/components/glyph/GlyphGenerator.svelte",
+      "reverts": 7
+    },
+    {
+      "file": "src/lib/components/integration/LegalAIOrchestrationDemo.svelte",
+      "reverts": 9
+    },
+    {
+      "file": "src/lib/components/integration/MipmapOptimizationDemo.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/integration/PipelineDemo.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/legal-ai/AttachToCaseModal.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/legal-ai/CaseStatuteLinks.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/legal-ai/CitationLibraryPage.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/legal-ai/CitationSaveModal.svelte",
+      "reverts": 7
+    },
+    {
+      "file": "src/lib/components/legal-ai/LinkMetadataForm.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/legal-ai/StatuteSearchBar.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/legal/LegalAIChat.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/legal/LegalAIWorkflow.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/legal/LegalAnalysisDialog.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/legal/LegalPrecedentSearch.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/lib/components/notes/LegalNotesManager.svelte",
+      "reverts": 8
+    },
+    {
+      "file": "src/lib/components/notifications/EnhancedNotificationContainer.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/lib/components/poi/POIForm.svelte",
+      "reverts": 11
+    },
+    {
+      "file": "src/lib/components/prosecutor/EvidenceUploadComponent.svelte",
+      "reverts": 7
+    },
+    {
+      "file": "src/lib/components/search/VectorSearchInterface.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ui/AutoPopulatedCaseForm.svelte",
+      "reverts": 7
+    },
+    {
+      "file": "src/lib/components/ui/CaseForm.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/lib/components/ui/Checkbox.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ui/Field.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ui/GPUInferenceDemo.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ui/Label.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ui/NESElementsShowcase.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/ui/SearchBox.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ui/input/Svelte5Input.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ui/label/LabelCompat.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/ui/slider/Svelte5Slider.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/unified/UnifiedVectorInterface.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/lib/components/upload/+FileUploadSection.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/upload/EnhancedLegalUpload.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/lib/components/upload/MinIOUpload.svelte",
+      "reverts": 6
+    },
+    {
+      "file": "src/lib/components/vector/VectorIntelligenceDemo.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/components/yorha/PoliceReportGenerator.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/yorha/YoRHaCaseForm.svelte",
+      "reverts": 9
+    },
+    {
+      "file": "src/lib/components/yorha/YoRHaDetectiveCommandCenter.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/yorha/YoRHaDetectiveForm.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/yorha/YoRHaForm.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/components/yorha/evidence/UploadZone.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/lib/evidence-canvas/graph-control-panel.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/lib/ui/Field.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes/(app)/cases/+page.svelte",
+      "reverts": 6
+    },
+    {
+      "file": "src/routes/(app)/cases/create-cached/+page.svelte",
+      "reverts": 6
+    },
+    {
+      "file": "src/routes/(app)/cases/create/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes/(app)/cases/new/+page.svelte",
+      "reverts": 8
+    },
+    {
+      "file": "src/routes/(app)/evidence/hash/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes/(app)/evidence/realtime/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes/(app)/system-configuration/+page.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/routes/(dev)/cache-demo/+page.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/routes/(dev)/odin/+page.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes/acp/+page.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/routes/couchdb-analytics/DependencyChart.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes/indexing/+page.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes/login/+page.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/routes/page.complex.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes__parked/evidence-workspace/+page.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes_parked/(ai)_disabled/chat/+page.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes_parked/(ai)_disabled/enhanced-mcp/+page.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes_parked/(ai)_disabled/orchestrator/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/(ai)_disabled/summarize/+page.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes_parked/(ai)_disabled/vector-search/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/(demo)_disabled/showcase/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/(legal)_disabled/legal-cases/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/(legal)_disabled/legal-cases/[id]/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/_archive-terminal/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/admin/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/admin/redis/detailed/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/admin/users/[userId]/+page.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/routes_parked/ai-test/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/archive/demos/vite-error-demo/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/archive/dev-playground/dynamic-routing-test/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/archive/dev-playground/webgl-fallback-test/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/archive/tests/pages/test/test/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/archive/tests/pages/upload-test/+page.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes_parked/auth/logout/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/auth/register/+page.svelte",
+      "reverts": 12
+    },
+    {
+      "file": "src/routes_parked/auth/test/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/authenticated-crud-test/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/brain/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/cuda-streaming/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/export/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/gallery/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/import/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/legal-report-compare/+page.svelte",
+      "reverts": 5
+    },
+    {
+      "file": "src/routes_parked/login/+page.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/routes_parked/mcp/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/memory-dashboard/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/nier-showcase/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/perf/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/phase72-demo/+page.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/routes_parked/rag-demo/+page.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes_parked/register/+page.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/routes_parked/routes/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/search.bak/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/settings/+page.svelte",
+      "reverts": 2
+    },
+    {
+      "file": "src/routes_parked/shader_search/+page.svelte",
+      "reverts": 4
+    },
+    {
+      "file": "src/routes_parked/simple/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/summarize-standalone/+page.svelte",
+      "reverts": 3
+    },
+    {
+      "file": "src/routes_parked/upload-test/+page.svelte",
+      "reverts": 1
+    },
+    {
+      "file": "src/routes_parked/yorha/detective/+page.svelte",
+      "reverts": 3
+    }
+  ]
+}

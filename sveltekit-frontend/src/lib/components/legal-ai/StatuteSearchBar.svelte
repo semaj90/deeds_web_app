@@ -60,7 +60,7 @@
 
   <div class="filters">
     <div class="filter-group">
-      <label htmlFor="jurisdiction">Jurisdiction</label>
+      <label for="jurisdiction">Jurisdiction</label>
       <select id="jurisdiction" bind:value={jurisdiction} disabled={isLoading}>
         <option value="">All</option>
         {#each jurisdictions as j}
@@ -70,7 +70,7 @@
     </div>
 
     <div class="filter-group">
-      <label htmlFor="severity">Severity</label>
+      <label for="severity">Severity</label>
       <select id="severity" bind:value={severity} disabled={isLoading}>
         <option value="">All</option>
         {#each severities as s}
@@ -80,7 +80,7 @@
     </div>
 
     <div class="filter-group">
-      <label htmlFor="category">Category</label>
+      <label for="category">Category</label>
       <select id="category" bind:value={category} disabled={isLoading}>
         <option value="">All</option>
         {#each categories as c}

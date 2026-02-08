@@ -106,23 +106,23 @@ documentId: currentDocument.id }) }); if ((response as { ok?: unknown; json?: un
  <span>Updated {new Date(selectedTemplateObj.lastUpdated).toLocaleDateString()}</span> </div> {/if}
   </section> {/if}
   <!-- Document, Configuration --> <section class="sidebar-section"> <h3>Configuration</h3>
- <div class="config-form"> <div class="form-group"> <label htmlFor="doc-title">Document Title:</label>
+ <div class="config-form"> <div class="form-group"> <label for="doc-title">Document Title:</label>
  <input id="doc-title"
                 type="text"
  bind:value={ documentTitle } placeholder="Enter document title..."
                 class="form-input"
               /> </div>
- <div class="form-group"> <label htmlFor="case-context">Case Context (Optional):</label>
+ <div class="form-group"> <label for="case-context">Case Context (Optional):</label>
  <textarea id="case-context"
                 bind:value={ caseContext } placeholder="Provide relevant case details..."
                 rows="3"
                 class="form-textarea"
               ></textarea> </div>
- <div class="form-group"> <label htmlFor="drafting-mode">Drafting Mode:</label>
+ <div class="form-group"> <label for="drafting-mode">Drafting Mode:</label>
  <select id="drafting-mode" bind:value={ draftingMode } class="form-select"> <option value="guided">Guided (Step-by-step)</option>
  <option value="template">Template-based</option>
  <option value="freeform">Freeform</option> </select> </div>
- <div class="form-group"> <label htmlFor="ai-assistance">AI Assistance Level:</label>
+ <div class="form-group"> <label for="ai-assistance">AI Assistance Level:</label>
  <select id="ai-assistance" bind:value={ aiAssistanceLevel } class="form-select"> <option value="minimal">Minimal</option>
  <option value="moderate">Moderate</option>
  <option value="extensive">Extensive</option> </select> </div> </div> </section> {:else} <!-- Document, Information --> <section class="sidebar-section"> <h3>Document Info</h3>

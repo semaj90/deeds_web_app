@@ -27,7 +27,7 @@
 </script>
 
 <div class="space-y-1.5">
- <label htmlFor={autoId} class="block text-sm font-medium">
+ <label for={autoId} class="block text-sm font-medium">
  {label}{#if required} <span aria-hidden="true">*</span>{/if}
  </label>
 

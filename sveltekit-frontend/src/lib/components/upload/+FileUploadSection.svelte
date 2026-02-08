@@ -73,15 +73,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div>
   <div class="nier-bits-card-body">
     <div class="mb-3">
-      <label htmlFor="caseSelect" class="form-label">Select Case:</label>
+      <label for="caseSelect" class="form-label">Select Case:</label>
       <SelectBits id="caseSelect" bind:selected={selectedCase} options={caseOptions} />
     </div>
     <div class="mb-3">
-      <label htmlFor="poiSelect" class="form-label">Select POI (Optional):</label>
+      <label for="poiSelect" class="form-label">Select POI (Optional):</label>
       <SelectBits id="poiSelect" bind:selected={selectedPoi} options={poiOptions} />
     </div>
     <div class="mb-3">
-      <label htmlFor="fileInput" class="form-label">Upload File:</label>
+      <label for="fileInput" class="form-label">Upload File:</label>
       <input type="file" id="fileInput" class="form-control" onchange={handleFileChange} />
     </div>
     <div class="mb-3">

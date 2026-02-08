@@ -162,7 +162,7 @@ narrative: narrative.trim(),
  <div class="space-y-6">
  <!-- Narrative Input -->
  <div>
- <label htmlFor="narrative-input" class="block text-sm font-medium text-slate-300 mb-2">
+ <label for="narrative-input" class="block text-sm font-medium text-slate-300 mb-2">
  Victim/Reporting Party Narrative
  </label>
  <textarea
