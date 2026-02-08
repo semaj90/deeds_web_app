@@ -1,5 +1,5 @@
 <script lang="ts">
-  import * as Select from "bits-ui/components/select";
+  import { Select } from "bits-ui";
   import type { Snippet } from "svelte";
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
