@@ -142,9 +142,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		}
 	}
 
-	// TODO: Add as cleanup in $effect: return () => {
-		clearTimeout(debounceTimer);
-	}
+	// TODO: Add as cleanup in $effect: return () => clearTimeout(debounceTimer);
 </script>
 
 <div class="semantic-search">

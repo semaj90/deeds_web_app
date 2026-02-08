@@ -6,7 +6,7 @@ import { Input } from '$lib/components/ui/input';
 import Label from "$lib/components/ui/label/Label.svelte";
 import FileUpload from "$lib/components/ui/modular/FileUpload.svelte";
 import type { UploadFile } from '$lib/components/ui/modular/types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "$lib/components/ui/select";
+import * as Select from 'bits-ui/components/select';
 import Switch from "$lib/components/ui/switch";
 import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
 import { fileUploadSchema } from '$lib/schemas/upload';

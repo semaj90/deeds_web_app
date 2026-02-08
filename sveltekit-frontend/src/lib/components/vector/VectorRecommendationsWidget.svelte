@@ -9,14 +9,12 @@ Compact AI recommendations component for sidebar/dashboard use
   import Button from "$lib/components/ui/enhanced-bits.svelte";
   import type { IntelligenceRecommendation } from '$lib/services/vector-intelligence-service.js';
   import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
-  import {
-    RefreshCw as ChevronRight,
-    FileText,
-    Clock as Star,
-    Lightbulb as Target,
-    AlertTriangle as TrendingUp,
-    Zap
-  } from 'lucide-svelte';
+  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
+  import FileText from 'lucide-svelte/icons/file-text';
+  import Clock from 'lucide-svelte/icons/clock';
+  import Lightbulb from 'lucide-svelte/icons/lightbulb';
+  import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+  import Zap from 'lucide-svelte/icons/zap';
   interface Props {
     context?: string
     userRole?: 'prosecutor' | 'detective' | 'admin' | 'user';

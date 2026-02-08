@@ -1,9 +1,24 @@
 <script lang="ts">
-	import * as DialogContent from "bits-ui/components/dialog";
-import * as DialogOverlay from "bits-ui/components/dialog";
-import * as DialogPortal from "bits-ui/components/dialog";
-import * as DialogRoot from "bits-ui/components/dialog";
+	import * as Dialog from "bits-ui/components/dialog";
 
+	interface PersonOfInterest {
+		name: string;
+		face: string;
+		alias?: string;
+		status: string;
+		riskLevel: string;
+		age: number;
+		height: number;
+		hair: string;
+		modusOperandi: string;
+		knownAssociates: string[];
+	}
+
+	interface Props {
+		person: PersonOfInterest;
+	}
+
+	let { person } = $props<Props>();
 
  let aiOpen = $state(false);
  let aiSummary = $state("…");
@@ -64,15 +79,17 @@ import * as DialogRoot from "bits-ui/components/dialog";
  AI ANALYSIS
  </button>
 
- <DialogRoot bind:open={aiOpen}>
- <DialogPortal>
- <DialogOverlay />
- <DialogContent class="nes-container bg-gray-900 text-white w-[500px] rounded-xl">
- <h2 class="text-xl mb-4">AI Legal Risk Summary</h2>
- <p>{aiSummary}</p>
- </DialogContent>
- </DialogPortal>
- </DialogRoot>
+ <Dialog.Root bind:open={aiOpen}>
+ <Dialog.Portal>
+ <Dialog.Overlay />
+ <Dialog.Content class="nes-container bg-gray-900 text-white w-[500px] rounded-xl">
+ <Dialog.Title class="text-xl mb-4">AI Legal Risk Summary</Dialog.Title>
+ <Dialog.Description>
+   <p>{aiSummary}</p>
+ </Dialog.Description>
+ </Dialog.Content>
+ </Dialog.Portal>
+ </Dialog.Root>
 </div>
 
 

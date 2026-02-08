@@ -8,11 +8,11 @@ https://svelte.dev/e/tag_invalid_name -->
 https://svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
 	// Migrated from createEventDispatcher to callback props;
-	import { Brain } from "lucide-svelte";
-import { TriangleAlert } from "lucide-svelte";
-import { CircleCheck } from "lucide-svelte";
-import { Lightbulb } from "lucide-svelte";
-import { Target } from "lucide-svelte";;
+	import Brain from "lucide-svelte/icons/brain";
+	import TriangleAlert from "lucide-svelte/icons/triangle-alert";
+	import CircleCheck from "lucide-svelte/icons/circle-check";
+	import Lightbulb from "lucide-svelte/icons/lightbulb";
+	import Target from "lucide-svelte/icons/target";
 	import type { Recommendation } from '$lib/types/recommendation'; // Import the interface
 
 	let { evidenceId, caseId = undefined, recommendations = [], isLoading = false, error = null } = $props<{
