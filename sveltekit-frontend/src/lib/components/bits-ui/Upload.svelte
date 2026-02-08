@@ -1,7 +1,5 @@
 <script lang="ts">
-  interface Props {
-    uploadUrl: string;
-    onDone: (res: unknown) => void;
+  interface Props { uploadUrl: string;, onDone: (res: unknown) => void;
   }
 
   let { uploadUrl, onDone }: Props = $props();
@@ -46,9 +44,7 @@
 </div>
 
 <style>
-  .bits-upload {
-    display: flex;
-    gap: 0.5rem;
+  .bits-upload { display: flex;, gap: 0.5rem;
     flex-direction: column;
   }
   .btn {
@@ -60,9 +56,7 @@
     display: inline-block;
     text-align: center;
   }
-  .btn.primary {
-    background: #2563eb;
-    color: white;
+  .btn.primary { background: #2563eb;, color: white;
     border: none;
   }
   textarea {

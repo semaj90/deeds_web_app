@@ -3,9 +3,7 @@
 	// Migrated to $effect
 	import { spring } from 'svelte/motion';
 
-	interface ParallaxLayer {
-		id: string;
-		depth: number;
+	interface ParallaxLayer { id: string;, depth: number;
 		speed: number;
 		image?: string;
 		pattern?: 'dots' | 'grid' | 'circuit' | 'hexagon';
@@ -71,7 +69,7 @@
 		});
 	}
 
-	function smoothScrollTo(target: HTMLElement) {
+	function smoothScrollTo(target:HTMLElement) {
 		const targetPosition = target.offsetTop;
 		const startPosition = window.pageYOffset;
 		const distance = targetPosition - startPosition;
@@ -121,8 +119,7 @@
 					repeating-linear-gradient(150deg, transparent, transparent 10px, ${accentColors[3]}15 10px, ${accentColors[3]}15 20px),
 					repeating-linear-gradient(270deg, transparent, transparent 10px, ${accentColors[3]}15 10px, ${accentColors[3]}15 20px)
 				`;
-			default:
-				return 'none';
+			default:return 'none';
 		}
 	}
 
@@ -134,8 +131,7 @@
 				return '50px 50px';
 			case 'circuit':
 				return '100px 100px';
-			default:
-				return '60px 60px';
+			default:return '60px 60px';
 		}
 	}
 </script>
@@ -177,9 +173,7 @@
 		background: var(--console-gradient-main, linear-gradient(180deg, #0a0a1f, #1a0a2f));
 	}
 
-	.parallax-layer {
-		position: fixed;
-		top: 0;
+	.parallax-layer { position: fixed;, top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
@@ -189,18 +183,14 @@
 		backface-visibility: hidden;
 	}
 
-	.gradient-overlay {
-		position: fixed;
-		left: 0;
+	.gradient-overlay { position: fixed;, left: 0;
 		right: 0;
 		height: 200px;
 		pointer-events: none;
 		z-index: 10;
 	}
 
-	.gradient-overlay.top {
-		top: 0;
-		background: linear-gradient(
+	.gradient-overlay.top { top: 0;, background: linear-gradient(
 			180deg,
 			rgba(10, 10, 31, 1) 0%,
 			rgba(10, 10, 31, 0.8) 30%,
@@ -208,9 +198,7 @@
 		);
 	}
 
-	.gradient-overlay.bottom {
-		bottom: 0;
-		background: linear-gradient(
+	.gradient-overlay.bottom { bottom: 0;, background: linear-gradient(
 			0deg,
 			rgba(26, 10, 47, 1) 0%,
 			rgba(26, 10, 47, 0.8) 30%,
@@ -224,9 +212,7 @@
 		min-height: 100vh;
 	}
 
-	.scroll-indicator {
-		position: fixed;
-		bottom: 2rem;
+	.scroll-indicator { position: fixed;, bottom: 2rem;
 		left: 50%;
 		transform: translateX(-50%);
 		text-align: center;

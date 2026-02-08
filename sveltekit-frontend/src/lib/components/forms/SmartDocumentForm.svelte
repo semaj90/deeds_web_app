@@ -54,13 +54,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   $effect(() => {
     if (formSchema.length === 0) {
       populatedFields = [
-        { name: 'case_number', type: 'case_number', label: 'Case Number', required: false },
-	{ name: 'document_date', type: 'date', label: 'Document Date', required: true },
-	{ name: 'jurisdiction', type: 'text_block', label: 'Jurisdiction', required: false },
-	{ name: 'contact_email', type: 'email', label: 'Contact Email', required: true },
-	{ name: 'contact_phone', type: 'phone', label: 'Contact Phone', required: false },
-	{ name: 'description', type: 'text_block', label: 'Description', required: true },
-	{ name: 'notes', type: 'text_block', label: 'Additional Notes', required: false }
+        { name: 'case_number', type: 'case_number', label: 'Case Number', required:false },
+	{ name: 'document_date', type: 'date', label: 'Document Date', required:true },
+	{ name: 'jurisdiction', type: 'text_block', label: 'Jurisdiction', required:false },
+	{ name: 'contact_email', type: 'email', label: 'Contact Email', required:true },
+	{ name: 'contact_phone', type: 'phone', label: 'Contact Phone', required:false },
+	{ name: 'description', type: 'text_block', label: 'Description', required:true },
+	{ name: 'notes', type: 'text_block', label: 'Additional Notes', required:false }
       ]}
   });
   // Handle file upload
@@ -153,7 +153,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       case: 'date': return 'ðŸ“…';
       case: 'address': return 'ðŸ“';
       case: 'case_number': return 'ðŸ“‹';
-      case: 'monetary_amount': return 'ðŸ’°',default: return 'ðŸ“'}
+      case: 'monetary_amount': return 'ðŸ’°',default:return 'ðŸ“'}
   };
   // Get confidence color
   const getConfidenceColor = (confidence?: number) => {
@@ -211,7 +211,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         </div>
         <!-- File: Drop, Zone -->
         <div
-          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover: border-yorha-primary, hover: bg-yorha-bg-secondary/50", class:border-yorha-primary={uploadedFile}
+          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover:border-yorha-primary, hover:bg-yorha-bg-secondary/50", class:border-yorha-primary={uploadedFile}
           ondrop={handleDrop}
           role="button"
           aria-label="Drop zone"

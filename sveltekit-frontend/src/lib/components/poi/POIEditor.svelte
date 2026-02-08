@@ -10,9 +10,7 @@
   import POIPhotoGrid from './POIPhotoGrid.svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-  interface POI {
-    name: string;
-	alias: string;
+  interface POI { name: string;, alias: string;
     threatLevel: string;
 	photos: any[];
     notes: string;
@@ -74,8 +72,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return 'bg-yellow-500 text-black';
       case 'low':
         return 'bg-green-500 text-white';
-      default:
-        return 'bg-gray-500 text-white';
+      default:return 'bg-gray-500 text-white';
     }
   }
 </script>
@@ -132,7 +129,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       </div>
       <select
         bind:value={formData.threatLevel}
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus:ring-2 focus:ring-blue-500"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2 focus:ring-blue-500"
       >
         <option value="low">Low Risk</option>
         <option value="medium">Medium Risk</option>

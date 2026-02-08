@@ -21,15 +21,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let {
  poi: onView,
  onEdit: onDelete
- } = $props<{
- poi: {
-	id: string;
+ } = $props<{ poi: {, id: string;
  name: string;
  alias?: string;
 	threatLevel: string;
- photos?: Array<{
-	url: string;
- thumbnailUrl: string;
+ photos?: Array<{ url: string;, thumbnailUrl: string;
  metadata?: any;
  ai?: any;
  }>;
@@ -47,7 +43,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  case 'high': return 'bg-orange-500 text-white';
  case 'medium': return 'bg-yellow-500 text-black';
  case 'low': return 'bg-green-500 text-white';
- default: return 'bg-gray-500 text-white';
+ default:return 'bg-gray-500 text-white';
  }
  }
 
@@ -62,7 +58,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  case 'high': return 'bg-orange-500 text-white';
  case 'medium': return 'bg-yellow-500 text-black';
  case 'low': return 'bg-green-500 text-white';
- default: return 'bg-gray-500 text-white';
+ default:return 'bg-gray-500 text-white';
  }
  }
 

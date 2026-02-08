@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					sendEvent('search_results', {
 						count: results.length,
 						results: results.map(r => ({
-							id: r.id,
+						, id: r.id,
 							title: r.title,
 							score: r.score,
 							url: r.url
@@ -124,7 +124,7 @@ async function streamOllamaResponse(
 		body: JSON.stringify({ model: MODEL,
 			prompt,
 			stream: true,
-			options: { temperature: 0.3,
+			options: {, temperature: 0.3,
 				num_predict: 2048
 			}
 		})

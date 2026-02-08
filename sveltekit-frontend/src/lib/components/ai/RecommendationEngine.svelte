@@ -11,20 +11,17 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	mitigation: string}
   interface Alternative { title: string, description: string, pros: string[], cons: string[];
 	confidence: number}
-  interface SuccessMetric { name: string;
-	target: string, measurement_method: string}
+  interface SuccessMetric { name: string;, target:string, measurement_method: string}
   interface ContextData { type: string, id: string;
 	metadata: { [key: string]: unknown }; entities: string[], current_status: string;
 	constraints: string[]}
   $effect(() => { loadExistingRecommendations(); loadContextData()});
-  async function loadExistingRecommendations(): Promise<any> { try { // Use new integrated legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases`, { method: 'GET';
-	headers: {
+  async function loadExistingRecommendations(): Promise<any> { try { // Use new integrated legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases`, { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); recommendations = (data as { recommendations?: unknown; context?: unknown }).recommendations || []}
     } catch (error) { console.error('Error loading recommendations:', error)}
   }
-  async function loadContextData(): Promise<any> { if (!contextId) return; try { const response = await fetch(`/api/ai/recommendations/context?type=${ contextType }&id=${ contextId }`, { method: 'GET';
-	headers: {
+  async function loadContextData(): Promise<any> { if (!contextId) return; try { const response = await fetch(`/api/ai/recommendations/context?type=${ contextType }&id=${ contextId }`, { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); contextData = (data as { recommendations?: unknown; context?: unknown }).context}
     } catch (error) { console.error('Error loading context:', error)}
@@ -40,19 +37,18 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
           }], resources: [], risks: [], alternatives: [], dependencies: [], success_metrics: [], estimated_completion new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); tags: [rec.jurisdiction: rec.practice_area].filter(Boolean)}))} else { throw new Error(`Generation failed: ${(response as { ok?: unknown, json?: unknown, statusText?: unknown }).statusText}`)}
     } catch (error) { console.error('Error generating recommendations:', error)} finally { isGenerating = false}
   }
-  async function applyRecommendation(recommendationId: string): Promise<any> { try { // Get detailed case information from legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases/${ recommendationId }`, { method: 'GET';
-	headers: {
+  async function applyRecommendation(recommendationId: string): Promise<any> { try { // Get detailed case information from legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases/${ recommendationId }`, { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const caseDetail = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); console.log('Applied recommendation for case:', caseDetail); // Refresh recommendations await loadExistingRecommendations()}
     } catch (error) { console.error('Error applying recommendation', error)}
   }
-  function getCategoryIcon(category: string): string { switch (category) { case: 'strategy': return 'ðŸŽ¯'; case, 'evidence': return 'ðŸ”'; case, 'legal_research': return 'ðŸ“š'; case, 'next_action': return 'âš¡'; case, 'risk_mitigation': return 'ðŸ›¡ï¸',default: return 'ðŸ’¡'}
+  function getCategoryIcon(category: string): string { switch (category) { case: 'strategy': return 'ðŸŽ¯'; case, 'evidence': return 'ðŸ”'; case, 'legal_research': return 'ðŸ“š'; case, 'next_action': return 'âš¡'; case, 'risk_mitigation': return 'ðŸ›¡ï¸',default:return 'ðŸ’¡'}
   }
-  function getCategoryColor(category: string): string { switch (category) { case: 'strategy': return 'bg-purple-100 text-purple-800 border-purple-200'; case, 'evidence': return 'bg-blue-100 text-blue-800 border-blue-200'; case, 'legal_research': return 'bg-green-100 text-green-800 border-green-200'; case, 'next_action': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'risk_mitigation': return 'bg-red-100 text-red-800 border-red-200',default: return 'bg-gray-100 text-gray-800 border-gray-200'}
+  function getCategoryColor(category: string): string { switch (category) { case: 'strategy': return 'bg-purple-100 text-purple-800 border-purple-200'; case, 'evidence': return 'bg-blue-100 text-blue-800 border-blue-200'; case, 'legal_research': return 'bg-green-100 text-green-800 border-green-200'; case, 'next_action': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'risk_mitigation': return 'bg-red-100 text-red-800 border-red-200',default:return 'bg-gray-100 text-gray-800 border-gray-200'}
   }
-  function getPriorityColor(priority: string): string { switch (priority) { case: 'high': return 'text-red-600'; case, 'medium': return 'text-yellow-600'; case, 'low': return 'text-green-600',default: return 'text-gray-600'}
+  function getPriorityColor(priority: string): string { switch (priority) { case: 'high': return 'text-red-600'; case, 'medium': return 'text-yellow-600'; case, 'low': return 'text-green-600',default:return 'text-gray-600'}
   }
-  function getTimeframeColor(timeframe: string): string { switch (timeframe) { case: 'immediate': return 'bg-red-50 text-red-700 border-red-200'; case, 'short_term': return 'bg-orange-50 text-orange-700 border-orange-200'; case, 'medium_term': return 'bg-yellow-50 text-yellow-700 border-yellow-200'; case, 'long_term': return 'bg-green-50 text-green-700 border-green-200',default: return 'bg-gray-50 text-gray-700 border-gray-200'}
+  function getTimeframeColor(timeframe: string): string { switch (timeframe) { case: 'immediate': return 'bg-red-50 text-red-700 border-red-200'; case, 'short_term': return 'bg-orange-50 text-orange-700 border-orange-200'; case, 'medium_term': return 'bg-yellow-50 text-yellow-700 border-yellow-200'; case, 'long_term': return 'bg-green-50 text-green-700 border-green-200',default:return 'bg-gray-50 text-gray-700 border-gray-200'}
   } let filteredRecommendations = $derived(() => { let filtered = recommendation; // Apply category filter if (categoryFilter !== 'all') { filtered = filtered.filter(rec => rec.category === categoryFilter)}
 
     // Apply priority filter if (priorityFilter !== 'all') { filtered = filtered.filter(rec => rec.priority === priorityFilter)}
@@ -237,8 +233,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   .engine-header { display: flex; justify-content: space-betweenn; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0}
   .engine-title { font-size: 2rem; font-weight: 700;
 	color: #1e293b;margin: 0}
-  .engine-subtitle { color: #64748b;
-	margin: 0.5rem, 0 0 0}
+  .engine-subtitle { color: #64748b;, margin: 0.5rem, 0 0 0}
   .controls-section { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;
 	padding: 1.5rem;background: #f8fafc; border-radius: 0.5rem}
   .context-section h3, .filters-section h3 { margin: 0, 0 1rem 0; color: #374151; font-size: 1.125rem}
@@ -248,11 +243,9 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem}
   .control-group label { font-size: 0.875rem; font-weight: 500;
 	color: #374151}
-  .control-select, .control-input { padding: 0.5rem;
-	border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
+  .control-select, .control-input { padding: 0.5rem;, border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
   .control-range { width: 100%}
-  .context-preview { display: flex;
-	gap: 1rem, margin-top: 1rem;
+  .context-preview { display: flex;, gap: 1rem, margin-top: 1rem;
 	padding: 0.75rem;
 	background: white; border-radius: 0.375rem;
 	border: 1px solid #e5e7eb}
@@ -270,8 +263,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.75rem;flex: 1 }
   .recommendation-icon { font-size: 1.5rem; margin-top: 0.25rem}
   .recommendation-title { margin: 0, 0 0.5rem 0}
-  .recommendation-badges { display: flex;
-	gap: 0.5rem; flex-wrap}
+  .recommendation-badges { display: flex;, gap: 0.5rem; flex-wrap}
   .category-badge, .timeframe-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem, font-weight: 600;
 	border: 1px solid; text-transform: capitaliz}
   .recommendation-metrics { display: flex; flex-direction: column, align-items: flex-end;
@@ -285,12 +277,10 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   .stat { display: flex; align-items: center;
 	gap: 0.75rem}
   .stat-label { font-size: 0.75rem, color: #64748b; min-width: 60px}
-  .stat-bar { flex: 1;
-	height: 0.5rem;
+  .stat-bar { flex: 1;, height: 0.5rem;
 	background: #e2e8f0; border-radius: 0.25rem;
 	overflow: hidden}
-  .stat-fill { height: 100%;
-	transition:width 0.3}
+  .stat-fill { height: 100%;, transition:width 0.3}
   .stat-fill.impact { background: #10b981 } .stat-fill.effort { background: #f59e0b } .stat-fill.risk { background: #ef4444 } .stat-value { font-size: 0.75rem; font-weight: 600;
 	color: #374151; min-width: 40px; text-align: right}
   .recommendation-preview { margin-bottom: 1rem}
@@ -303,8 +293,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	padding: 0.5rem 0; font-size: 0.75rem;
 	color: #64748b;
 	position: relative; padding-left: 1.5rem}
-  .step-item: before { content: counter(step-counter);
-	position: absolute;left: 0;
+  .step-item: before { content: counter(step-counter);, position: absolute;left: 0;
 	top: 0.5rem;
 	width: 1rem;
 	height: 1rem;
@@ -322,13 +311,11 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   .tag { padding: 0.125rem 0.375rem; background: #f1f5f9; border-radius: 0.25rem, font-size: 0.625rem;
 	color: #475569}
   .tag-more { padding: 0.125rem 0.375rem; background: #f8fafc; border-radius: 0.25rem, font-size: 0.625rem, color: #9ca3af; font-style: italic}
-  .card-actions { display: flex;
-	gap: 0.5rem; justify-content: flex-end}
+  .card-actions { display: flex;, gap: 0.5rem; justify-content: flex-end}
   .loading-state, .empty-state { grid-column: 1 / -1; text-align: center;
 	padding: 3rem;
 	color: #64748b}
-  .loading-spinner { width: 2rem;
-	height: 2rem;
+  .loading-spinner { width: 2rem;, height: 2rem;
 	border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%;
 	animation: spin 1s linear infinite;margin: 0 auto 1rem}
   .loading-detail { font-size: 0.875rem; margin-top: 0.5rem}
@@ -355,8 +342,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   .step-details p { margin: 0.5rem 0; font-size: 0.875rem;
 	color: #64748b}
   .resources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem}
-  .resource-card { padding: 1rem;
-	border: 1px solid #e5e7eb; border-radius: 0.375rem;
+  .resource-card { padding: 1rem;, border: 1px solid #e5e7eb; border-radius: 0.375rem;
 	background: #fafafa}
   .resource-card h4 { margin: 0, 0 0.5rem 0; color: #374151}
   .resource-type .resource-description { margin: 0.25rem 0; font-size: 0.75rem;
@@ -366,8 +352,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	color: #374151}
   .risks-list { display: flex; flex-direction: column;
 	gap: 1rem}
-  .risk-item { padding: 1rem;
-	border: 1px solid #fecaca; border-radius: 0.375rem;
+  .risk-item { padding: 1rem;, border: 1px solid #fecaca; border-radius: 0.375rem;
 	background: #fef2f2}
   .risk-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 0.5rem}
   .risk-description { font-weight: 500;
@@ -378,8 +363,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	color: #64748b}
   .alternatives-list { display: flex; flex-direction: column;
 	gap: 1.5rem}
-  .alternative-item { padding: 1rem;
-	border: 1px solid #e5e7eb; border-radius: 0.375rem;
+  .alternative-item { padding: 1rem;, border: 1px solid #e5e7eb; border-radius: 0.375rem;
 	background: #fafafa}
   .alternative-item h4 { margin: 0, 0 0.5rem 0; color: #374151}
   .alternative-item > p { margin: 0, 0 1rem 0; color: #64748b}
@@ -389,14 +373,12 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   .pros ul, .cons ul { margin: 0; padding-left: 1rem}
   .pros li, .cons li { font-size: 0.75rem, color: #64748b; margin-bottom: 0.25rem}
   .metrics-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem}
-  .metric-item { padding: 1rem;
-	border: 1px solid #dbeaf; border-radius: 0.375rem;
+  .metric-item { padding: 1rem;, border: 1px solid #dbeaf; border-radius: 0.375rem;
 	background: #eff6ff}
   .metric-item h4 { margin: 0, 0 0.5rem 0; color: #374151}
   .metric-item p { margin: 0.25rem 0; font-size: 0.75rem;
 	color: #64748b}
-  .dialog-actions { display: flex;
-	gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
+  .dialog-actions { display: flex;, gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
   @media (max-width: 768px) { .engine-header { flex-direction: column;
 	gap: 1rem}
     .controls-section { grid-template-columns: 1fr}

@@ -55,7 +55,7 @@ let variantClasses = $derived({
 }[variant]);
 
 let barClasses = $derived({
-	default: colorClasses,
+	default:colorClasses,
 	nes: `${colorClasses} border-r-2 border-white`,
 	gradient: 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500'
 }[variant]);

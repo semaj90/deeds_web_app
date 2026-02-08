@@ -2,19 +2,13 @@
 	// Migrated to $effect
 
 	// Type definitions
-	interface Vec2 {
-		x: number;
-	y: number;
+	interface Vec2 { x: number;, y: number;
 	}
 
-	interface BoardViewport {
-		pan: Vec2;
-	zoom: number;
+	interface BoardViewport { pan: Vec2;, zoom: number;
 	}
 
-	interface BoardNode {
-		id: string;
-	kind: 'note' | 'evidence' | 'document';
+	interface BoardNode { id: string;, kind: 'note' | 'evidence' | 'document';
 		x: number;
 	y: number;
 		w: number;
@@ -25,17 +19,13 @@
 		locked?: boolean;
 	}
 
-	interface BoardEdge {
-		id: string;
-	fromId: string;
+	interface BoardEdge { id: string;, fromId: string;
 		toId: string;
 	style: 'solid' | 'dashed';
 		label?: string;
 	}
 
-	interface BoardSnapshot {
-		version: number;
-	viewport: BoardViewport;
+	interface BoardSnapshot { version: number;, viewport: BoardViewport;
 		nodes: BoardNode[];
 	edges: BoardEdge[];
 		updatedAt?: string;
@@ -61,8 +51,7 @@
 
 	// ===== State (Svelte 5 runes) =====
 	const getInitialViewport = (): BoardViewport =>
-		initialSnapshot?.viewport ? { ...initialSnapshot.viewport } : {
-	pan: { x: 0, y: 0 },
+		initialSnapshot?.viewport ? { ...initialSnapshot.viewport } : { pan: {, x: 0, y: 0 },
 	zoom: 1 };
 
 	const getInitialNodes = (): BoardNode[] =>
@@ -120,8 +109,7 @@
 	let dragNodesStart = $state<Map<string, Vec2>>(new Map());
 
 	// Text editing overlay
-	let editing = $state<{ id: string;
-	value: string; mode: 'title' | 'body' } | null>(null);
+	let editing = $state<{ id: string;, value: string; mode: 'title' | 'body' } | null>(null);
 
 	// Canvas internals
 	let ctx = $state<CanvasRenderingContext2D | null>(null);
@@ -305,8 +293,7 @@
 		if (!readonly) setDirty(true);
 	});
 
-	function selectedBounds(): {
-	x: number; y: number;
+	function selectedBounds(): { x: number;, y: number;
 	w: number; h: number } | null {
 		const ids = [...selected];
 		if (ids.length === 0) return null;

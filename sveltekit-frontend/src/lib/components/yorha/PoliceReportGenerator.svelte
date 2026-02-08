@@ -1,9 +1,7 @@
 <script lang="ts">
   // Migrated from createEventDispatcher to callback props;
 
- interface Evidence {
- id: string;
-	title: string;
+ interface Evidence { id: string;, title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -15,11 +13,8 @@
 	generatedAt: string;
  type: string;
 	content: string;
- sections: Array<{
-	title: string; content: string }>;
- metadata: {
-	narrativeProvided: boolean;
- evidenceCount: number;
+ sections: Array<{ title: string;, content: string }>;
+ metadata: { narrativeProvided: boolean;, evidenceCount: number;
 	model: string;
  };
  }
@@ -28,7 +23,7 @@
   caseId?: string | null;
   initialEvidence?: Evidence[];
   onReportGenerated?: (data: {
-	report: PoliceReport }) => void;
+, report: PoliceReport }) => void;
  }
 
  let {
@@ -65,7 +60,7 @@
  'Content-Type': 'application/json'
  },
 	body: JSON.stringify({
-	narrative: narrative.trim(),
+, narrative: narrative.trim(),
    evidence: selectedEvidence,
    caseId
  })
@@ -129,8 +124,7 @@
  body { font-family: 'Times New Roman', serif, margin: 40px, line-height: 1.6; }
  h1 { color: #1f2937; border-bottom: 2px solid #1f2937; padding-bottom: 10px; }
  h2 { color: #374151; margin-top: 30px; }
- .metadata { background: #f3f4f6;
-	padding: 15px; border-radius: 5px;
+ .metadata { background: #f3f4f6;, padding: 15px; border-radius: 5px;
 	margin: 20px 0; }
  .section { margin: 20px 0; }
  </style>
@@ -138,7 +132,7 @@
  <body>
  <h1>POLICE REPORT</h1>
  <div class="metadata">
- <p><strong>Report ID:</strong> ${generatedReport.id}</p>
+ <p><strong>Report, ID:</strong> ${generatedReport.id}</p>
  <p><strong>Generated:</strong> ${new Date(generatedReport.generatedAt).toLocaleString()}</p>
  <p><strong>Case ID:</strong> ${generatedReport.caseId || 'N/A'}</p>
  </div>
@@ -175,7 +169,7 @@
  id="narrative-input"
  bind:value={narrative}
  placeholder="Describe what happened... (e.g., 'I was walking home when I noticed someone following me...')"
- class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus: outline-none, focus:ring-2 focus:ring-blue-500 resize-none"
+ class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none, focus:ring-2 focus:ring-blue-500 resize-none"
  ></textarea>
  </div>
 
@@ -215,7 +209,7 @@
  <button
  onclick={generateReport}
  disabled={isGenerating || (!narrative.trim() && selectedEvidence.length === 0)}
- class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover: from-blue-500, hover: to-blue-600, disabled: from-slate-600, disabled, to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+ class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500, hover:to-blue-600, disabled:from-slate-600, disabled, to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
  >
  {#if isGenerating}
  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

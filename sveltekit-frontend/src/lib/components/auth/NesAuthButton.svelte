@@ -24,7 +24,7 @@
       case 'warning': classes += ' is-warning'; break;
       case 'success': classes += ' is-success'; break;
       case 'error': classes += ' is-error'; break;
-      default: classes += ' is-primary';
+      default:classes += ' is-primary';
     }
     switch (size) {
       case 'small': classes += ' nes-btn-small'; break;

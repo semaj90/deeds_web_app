@@ -140,8 +140,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				case: 'extract':
 					result = await extractClientSide(text);
 					break
-				default:
-					throw new Error(`Unknown operation ${operation}`)}
+				default:throw new Error(`Unknown operation ${operation}`)}
 			const inferenceTime = performance.now() - startTime
 			performanceMetrics.inferenceTime = inferenceTime
 			performanceMetrics.tokensPerSecond = calculateTokensPerSecond(text, inferenceTime);
@@ -244,9 +243,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		}}
   async function simulateExtraction(params: Record<string, string>): Promise<any> {
 		await new Promise((resolve) => setTimeout(resolve, 120));
-		return {
-			entities: [{
-	type: 'person', value: 'Client Entity', confidence: 0.9 }],
+		return { entities: [{, type: 'person', value: 'Client Entity', confidence: 0.9 }],
 			relationships: []
 		}}
   function simulateMemoryAllocate(_size: number) {

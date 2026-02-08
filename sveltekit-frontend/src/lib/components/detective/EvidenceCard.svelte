@@ -23,7 +23,7 @@ const typeIcon = $derived(() => {
         case 'audio': return '🎵';
         case 'document': return '📝';
         case 'email': return '📧';
-        default: return '📁';
+        default:return '📁';
     }
 });
 

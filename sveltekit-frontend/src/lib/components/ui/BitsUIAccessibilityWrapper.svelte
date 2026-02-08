@@ -149,8 +149,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       case 'tabs':
         enhanceTabs(element);
         break;
-      default:
-        enhanceGeneric(element);
+      default:enhanceGeneric(element);
     }
   }
 

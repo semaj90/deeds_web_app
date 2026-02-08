@@ -1,9 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  interface Filters {
-    status: string;
-	priority: string;
+  interface Filters { status: string;, priority: string;
     tags: string[];
   }
 
@@ -200,18 +198,14 @@
 	color: #00d4ff;
   }
 
-  .filter-count {
-    background: #00d4ff;
-	color: #000;
+  .filter-count { background: #00d4ff;, color: #000;
     padding: 0.1rem 0.4rem;
     border-radius: 10px;
     font-size: 0.7rem;
     font-weight: 600;
   }
 
-  .filter-dropdown {
-    position: absolute;
-	top: 100%;
+  .filter-dropdown { position: absolute;, top: 100%;
     right: 0;
 	width: 320px;
     background: rgba(26, 26, 46, 0.95);
@@ -238,9 +232,7 @@
 	color: #e0e0e0;
   }
 
-  .close-btn {
-    background: none;
-	border: none;
+  .close-btn { background: none;, border: none;
     color: #888;
     font-size: 1.2rem;
 	cursor: pointer;
@@ -276,9 +268,7 @@
     font-size: 0.9rem;
   }
 
-  .filter-select {
-    width: 100%;
-	padding: 0.5rem;
+  .filter-select { width: 100%;, padding: 0.5rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #333;
     border-radius: 6px;
@@ -325,9 +315,7 @@
 	color: #00d4ff;
   }
 
-  .selected-tags {
-    padding: 0.75rem;
-	background: rgba(0, 212, 255, 0.05);
+  .selected-tags { padding: 0.75rem;, background: rgba(0, 212, 255, 0.05);
     border: 1px solid rgba(0, 212, 255, 0.2);
     border-radius: 8px;
   }
@@ -357,9 +345,7 @@
     font-size: 0.75rem;
   }
 
-  .remove-tag {
-    background: none;
-	border: none;
+  .remove-tag { background: none;, border: none;
     color: #00d4ff;
     font-size: 0.8rem;
 	cursor: pointer;
@@ -416,9 +402,7 @@
   }
 
   @media (max-width: 768px) {
-    .filter-dropdown {
-      width: 280px;
-	right: -20px;
+    .filter-dropdown { width: 280px;, right: -20px;
     }
 
     .filter-content {

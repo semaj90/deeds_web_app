@@ -74,7 +74,7 @@ let variantClasses = $derived({
 	default: `
 		bg-slate-800 text-white
 		border-2 border-slate-600
-		hover: border-slate-500 focus: border-blue-500 focus: ring-2 focus: ring-blue-500/20 placeholder:text-slate-400
+		hover:border-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400
 	`,
 	nes: `
 		bg-slate-900 text-white
@@ -85,13 +85,13 @@ let variantClasses = $derived({
 	ghost: `
 		bg-transparent text-white
 		border-b-2 border-slate-600
-		hover: border-slate-500 focus: border-blue-500 placeholder:text-slate-400
+		hover:border-slate-500 focus:border-blue-500, placeholder:text-slate-400
 		rounded-none
 	`
 }[variant].replace(/\s+/g, ' ').trim());
 
 let errorClasses = $derived(
-	error ? 'border-red-500 focus: border-red-500 focus:ring-red-500/20' : ''
+	error ? 'border-red-500 focus:border-red-500, focus:ring-red-500/20' : ''
 );
 
 function handleInput(e: Event) {
@@ -152,7 +152,7 @@ function handleBlur() {
 			bind:value
 			class="w-full rounded-lg outline-none transition-all duration-150
 				   {sizeClasses} {variantClasses} {errorClasses}
-				   disabled: opacity-50 disabled:cursor-not-allowed
+				   disabled:opacity-50 disabled:cursor-not-allowed
 				   {prefix ? 'pl-10' : ''}
 				   {suffix ? 'pr-10' : ''}"
 			oninput={ handleInput }

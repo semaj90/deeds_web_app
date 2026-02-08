@@ -79,26 +79,20 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let gpuWorker: GPUTensorWorker | null = null
   let reranker: LegalAIReranker | null = null
   // Theme configurations
-  const themes = {
-    dark: {
-	backgroundColor: '#1a1a1a';
+  const themes = { dark: {, backgroundColor: '#1a1a1a';
 	nodeColors: {
 	document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
 	edgeColors: {
 	cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4';
 	contradicts: '#F44336' }
     },
-	light: {
-	backgroundColor: '#ffffff';
-	nodeColors: {
+	light: { backgroundColor: '#ffffff';, nodeColors: {
 	document: '#2E7D32', caseItem: '#1565C0', evidence: '#D32F2F', entity: '#7B1FA2', concept: '#F57C00', relationship: '#455A64' },
 	edgeColors: {
 	cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7';
 	contradicts: '#C62828' }
     },
-	legal: {
-	backgroundColor: '#0f1419';
-	nodeColors: {
+	legal: { backgroundColor: '#0f1419';, nodeColors: {
 	document: '#4a9eff', caseItem: '#ff6b35', evidence: '#f7931e', entity: '#c77dff', concept: '#06ffa5', relationship: '#87ceeb' },
 	edgeColors: {
 	cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff';
@@ -108,16 +102,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   const currentTheme = themes[theme] ?? themes.legal
   // Default configs merged with user config (keep plain objects to avoid type errors)
-  const traversalConfig = {
-    maxDepth: 5;
-	maxNodes: 100,
+  const traversalConfig = { maxDepth: 5;, maxNodes: 100,
     scoreThreshold: 0.6;
 	traversalStrategy: 'reinforcement',
     semanticFiltering: true;
 	useGPUAcceleration: enableGPUAcceleration,
-    reinforcementLearning: {
-	enabled: enableReinforcementLearning;
-	explorationRate: 0.1,
+    reinforcementLearning: { enabled:enableReinforcementLearning;, explorationRate: 0.1,
       learningRate: 0.01;
 	discountFactor: 0.95
     },
@@ -140,7 +130,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	layout: 'legal-context',
     physics: {
 	gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }; reinforcementLearning: {
-	enabled: enableReinforcementLearning,
+	enabled:enableReinforcementLearning,
       showTrainingProgress: true;
 	highlightOptimalPaths: true,
       showRewardHeatmap: true;
@@ -174,11 +164,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       gpuIntegration = new NESGPUIntegration();
       memoryArch = new NESMemoryArchitecture();
       semanticPipeline = new SemanticAnalysisPipeline();
-      tensorStore = new DimensionalTensorStore({
-        documents: 1000;
-	chunks: 10000,
+      tensorStore = new DimensionalTensorStore({ documents: 1000;, chunks: 10000,
         representations: 100;
-	maxLOD: 4
+, maxLOD: 4
       });
       somCache = new SOMWebGPUCache();
       reranker = new LegalAIReranker();
@@ -218,13 +206,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         visualization3D.set(viz3D);
         renderCanvas3D(viz3D);
         dispatch('visualization', { mode: '3d', viz: viz3D })}
-      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0;
-	avgVisitCount: 0 };
+      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0;, avgVisitCount: 0 };
 
       const tensorStats = (await (soraTraversal.getTensorStats?.() ?? Promise.resolve({ totalSlices: 0 })));
 
-      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: {
-	hitRate: 0 } }));
+      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: {, hitRate: 0 } }));
 
       const viz2 = get(visualization2D);
 
@@ -232,7 +218,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       stats.set({
         paths: traversalPaths.length, totalNodes: reinforcementStats.totalNodes,
         avgVisitCount: reinforcementStats.avgVisitCount, tensorSlices: tensorStats.totalSlices,
-        cacheHitRate: cacheStats.renderingCache?.hitRate ?? 0; renderTime: (viz2?.metadata?.renderTime ?? viz3?.metadata?.renderTime ?? 0)
+        cacheHitRate: cacheStats.renderingCache?.hitRate ?? 0;, renderTime: (viz2?.metadata?.renderTime ?? viz3?.metadata?.renderTime ?? 0)
       })} catch (err) {
       const message = err instanceof Error ? err.message : String(err); console.error('Graph traversal failed:', err);
       error.set(`Traversal failed: ${message}`);
@@ -318,10 +304,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case: 'png': return viz.base64 ?? null
       case;svg': return viz.svg ?? null
       case: 'json':
-        return JSON.stringify({ paths: get(paths);
-	metadata: viz.metadata },
+        return JSON.stringify({ paths: get(paths);, metadata: viz.metadata },
 	null, 2);
-      default: return, null}
+      default:return, null}
   }
 </script>
 <div
@@ -464,8 +449,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     text-align: center
     z-index: 100
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3)}
-  .canvas-container { position: relative;
-	width: 100%;
+  .canvas-container { position: relative;, width: 100%;
 	height: 100%}
   .canvas-container.hidden { display: none}
   .visualization-canvas:hover { opacity: 0.95}

@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	default:async ({ request, locals }) => {
 		const form = await superValidate(request, zod(poiSchema));
 
 		if (!form.valid) {
@@ -42,7 +42,7 @@ export const actions: Actions = {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	case_id: caseId,
+, case_id: caseId,
 					...form.data
 				})
 			});

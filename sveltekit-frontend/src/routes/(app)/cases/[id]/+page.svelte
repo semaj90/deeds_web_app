@@ -16,9 +16,7 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
 
  const cache = useCache();
 
- interface Evidence {
- id: string;
-	fileName: string;
+ interface Evidence { id: string;, fileName: string;
  documentType: string;
 	inferenceConfidence: number;
  status: 'pending' | 'approved' | 'rejected';
@@ -26,9 +24,7 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  metadata?: Record<string, unknown>;
  }
 
- interface Case {
- id: string;
-	title: string;
+ interface Case { id: string;, title: string;
  createdAt: string;
  }
 

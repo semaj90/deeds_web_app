@@ -1,8 +1,6 @@
 <script lang="ts">
 
-	interface Citation {
-		id: string;
-		statute_code: string;
+	interface Citation { id: string;, statute_code: string;
 		statute_title?: string;
 		jurisdiction?: string;
 		severity?: string;
@@ -48,7 +46,7 @@
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	notes: editedNotes }),
+, notes: editedNotes }),
  });
 
  if (response.ok) {
@@ -94,8 +92,7 @@
  return '#ffd700';
  case 'infraction':
  return '#44ff44';
- default:
- return '#999';
+ default:return '#999';
  }
  }
 </script>
@@ -277,9 +274,7 @@
 	color: #666;
  }
 
- .header-actions {
- display: flex;
-	gap: 0.5rem;
+ .header-actions { display: flex;, gap: 0.5rem;
  flex-wrap: wrap;
  }
 
@@ -320,9 +315,7 @@
  background-color: #ff5252;
  }
 
- .detail-content {
- padding: 1.5rem;
-	display: flex;
+ .detail-content { padding: 1.5rem;, display: flex;
  flex-direction: column;
 	gap: 1.5rem;
  }
@@ -407,9 +400,7 @@
 	gap: 0.75rem;
  }
 
- .notes-editor textarea {
- padding: 0.75rem;
-	border: 1px solid #d4a574;
+ .notes-editor textarea { padding: 0.75rem;, border: 1px solid #d4a574;
  border-radius: 4px;
  font-family: 'Source Sans 3', sans-serif;
  font-size: 0.95rem;
@@ -427,9 +418,7 @@
 	color: #999;
  }
 
- .editor-actions {
- display: flex;
-	gap: 0.5rem;
+ .editor-actions { display: flex;, gap: 0.5rem;
  }
 
  .btn-primary,
@@ -451,9 +440,7 @@
  background-color: #a0522d;
  }
 
- .btn-primary:disabled {
- opacity: 0.6;
-	cursor:not-allowed;
+ .btn-primary:disabled { opacity: 0.6;, cursor:not-allowed;
  }
 
  .btn-secondary {
@@ -465,9 +452,7 @@
  background-color: #d4a574;
  }
 
- .btn-secondary:disabled {
- opacity: 0.6;
-	cursor:not-allowed;
+ .btn-secondary:disabled { opacity: 0.6;, cursor:not-allowed;
  }
 
  .notes-display {
@@ -509,9 +494,7 @@
 	gap: 0.5rem;
  }
 
- .timestamp-item {
- display: flex;
-	gap: 1rem;
+ .timestamp-item { display: flex;, gap: 1rem;
  font-size: 0.85rem;
  }
 

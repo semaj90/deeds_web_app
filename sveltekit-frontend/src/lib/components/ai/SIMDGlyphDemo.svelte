@@ -43,7 +43,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const k = 1024;
    const sizes = ['B', 'KB', 'MB'];
    const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
-  function getQualityTierColor(tier) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800'; case, 'snes': return 'bg-blue-100 text-blue-800'; case, 'n64': return 'bg-purple-100 text-purple-800',default: return 'bg-gray-100 text-gray-800'}
+  function getQualityTierColor(tier) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800'; case, 'snes': return 'bg-blue-100 text-blue-800'; case, 'n64': return 'bg-purple-100 text-purple-800',default:return 'bg-gray-100 text-gray-800'}
   }
   function getCompressionColor(ratio) { if (ratio > 40) return 'text-green-600 font-bold'; if (ratio > 20) return 'text-blue-600 font-semibold'; if (ratio > 10) return 'text-orange-600'; return 'text-red-600'}
   $effect(() => { console.log('ðŸŽ¨ SIMD Glyph Demo component mounted')}); </script>

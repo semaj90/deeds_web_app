@@ -2,9 +2,7 @@
  import { uploadEvidenceImage, uploadEvidenceVideo } from '$lib/vision/api';
  import { createEventDispatcher } from 'svelte';
 
- const dispatch = createEventDispatcher<{
- updated: Array<{
-	embeddingId: string;
+ const dispatch = createEventDispatcher<{ updated: Array<{, embeddingId: string;
  thumbUrl: string;
  embedding?: number[] | null;
  frameIndex?: number;

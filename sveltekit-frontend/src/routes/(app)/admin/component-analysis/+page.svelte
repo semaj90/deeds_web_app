@@ -184,7 +184,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			switch (sortBy) {
 				case 'errors': return b.error_count - a.error_count;
 				case 'modified': return new Date(b.last_modified).getTime() - new Date(a.last_modified).getTime();
-				default: return a.component_name.localeCompare(b.component_name);
+				default:return a.component_name.localeCompare(b.component_name);
 			}
 		});
 	});

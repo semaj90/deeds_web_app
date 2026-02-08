@@ -48,9 +48,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	evented: !readonly }); textbox.set('evidenceId', item.id ?? null); textbox.set('evidenceType', item?.type ?? 'document'); fabricCanvas.add(textbox); saveCanvasState()}
     } catch (error) { console.error('Error adding evidence to canvas:', error)}
   }
-  function getTypeIcon(type: string | undefined): string { switch (type) { case: 'image': return 'ðŸ–¼ï¸'; case, 'document': return 'ðŸ“„'; case, 'video': return 'ðŸŽ¥'; case, 'audio': return 'ðŸŽµ',default: return 'ðŸ“Ž'}
+  function getTypeIcon(type: string | undefined): string { switch (type) { case: 'image': return 'ðŸ–¼ï¸'; case, 'document': return 'ðŸ“„'; case, 'video': return 'ðŸŽ¥'; case, 'audio': return 'ðŸŽµ',default:return 'ðŸ“Ž'}
   }
-  function selectTool(tool: string) { selectedTool = tool; if (!fabricCanvas) return; switch (tool) { case: 'select': fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true; break; case, 'draw': fabricCanvas.isDrawingMode = true; fabricCanvas.selection = false; break; case, 'text': fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true; addTextBox(); break; default: fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true}
+  function selectTool(tool: string) { selectedTool = tool; if (!fabricCanvas) return; switch (tool) { case: 'select': fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true; break; case, 'draw': fabricCanvas.isDrawingMode = true; fabricCanvas.selection = false; break; case, 'text': fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true; addTextBox(); break; default:fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true}
   }
   async function addShape(shape: 'rectangle' | 'circle'): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
    const fabric = (mod as any).fabric ?? (mod as any).default ?? mod;
@@ -83,12 +83,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const positions = (fabricCanvas.getObjects ? fabricCanvas.getObjects(): []) .filter((obj: any) => obj.evidenceId) .map((obj: any) => ({ evidenceId: obj.evidenceId, x: obj.left, y: obj.top, width: (obj.width ?? (obj.getScaledWidth ? obj.getScaledWidth(): 0)) * (obj.scaleX ?? 1); height: (obj.height ?? (obj.getScaledHeight ? obj.getScaledHeight(): 0)) * (obj.scaleY ?? 1) }));
    const response = await fetch('/api/canvas/save', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ caseId, canvasData, positions }) }); if (!response.ok) throw new Error('Failed to save canvas'); notifications.add({ type: 'success', title: 'Canvas Saved', message: 'Evidence board saved successfully.'
-      })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed'; message: 'Failed to save evidence board.'
+      })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed';, message: 'Failed to save evidence board.'
       }); console.error('Save error:', error)}
 '
   }
   async function exportCanvas(): Promise<any> { if (!fabricCanvas) return; try { const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.9;
-	multiplier: 2 });
+, multiplier: 2 });
    const link = document.createElement('a'); link.download = `evidence-board-${caseId ?? 'canvas'}-${Date.now()}.png`; link.href = dataURL; link.click(); notifications.add({ type: 'success', title: 'Export Complete', message: 'Evidence board exported successfully.'
       })} catch (error) { console.error('Export error:', error); notifications.add({ type: 'error', title: 'Export Failed', message: 'Failed to export evidence board.'
       })}
@@ -136,8 +136,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if fabricLoaded && evidenceItems.length === 0} <div> <Image /> <p>Evidence Board</p>
  <p>Add evidence items to start building your case visualization</p> {/if}
   </div>
- <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%;
-	height: auto;display: block}
+ <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%;, height: auto;display: block}
 </style>
 
 

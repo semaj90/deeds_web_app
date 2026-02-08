@@ -64,7 +64,7 @@ export interface DropdownMenuCheckboxItemProps extends DropdownMenuItemProps {
 	/** Whether the item is checked */
 	checked?: boolean;
 	/** Callback when checked state changes */
-	onCheckedChange?: (checked: boolean) => void;
+	onCheckedChange?: (checked:boolean) => void;
 }
 
 export interface DropdownMenuContext {

@@ -5,9 +5,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	icon: string}
   interface DocumentTemplate { id: string, name: string, documentTypeId: string, description: string, content: string, variables: TemplateVariable[];
 	lastUpdated: string, usage_count: number}
-  interface TemplateVariable { name: string, type: 'text' | 'date' | 'number' | 'select' | 'boolean',required: boolean;
+  interface TemplateVariable { name: string, type: 'text' | 'date' | 'number' | 'select' | 'boolean',required:boolean;
 	description: string, options?: string[]; default_value?: unknown}
-  interface DocumentField { name: string, type: 'text' | 'textarea' | 'date' | 'select' | 'number',required: boolean;
+  interface DocumentField { name: string, type: 'text' | 'textarea' | 'date' | 'select' | 'number',required:boolean;
 	label: string, placeholder?: string; options?: string[]}
   interface DocumentDraft { id: string, title: string, type: string, content: string, metadata: { caseId?: string,createdAt: string, lastModified: string, version: number, wordCount: number;
 	completionScore: number}; aiSuggestions: AISuggestion[], status: 'draft' | 'review' | 'finalized'; collaborators: string[]}
@@ -15,24 +15,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	confidence: number;
 	applied: boolean}
   $effect(() => { loadDocumentTypes(); loadTemplates(); loadDraftHistory()});
-  async function loadDocumentTypes(): Promise<any> { try { const response = await fetch('/api/ai/document-drafting/types', { method: 'GET';
-	headers: {
+  async function loadDocumentTypes(): Promise<any> { try { const response = await fetch('/api/ai/document-drafting/types', { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); documentTypes = (
             data as { documentTypes?: unknown; templates?: unknown; history?: unknown; version?: unknown; completionScore?: unknown; lastModified?: unknown; wordCount?: unknown; createdAt?: unknown}
           ).documentTypes || []}
     } catch (error) { console.error('Error loading document types:', error)}
   }
-  async function loadTemplates(): Promise<any> { try { const response = await fetch('/api/ai/document-drafting/templates', { method: 'GET';
-	headers: {
+  async function loadTemplates(): Promise<any> { try { const response = await fetch('/api/ai/document-drafting/templates', { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); templates = (
             data as { documentTypes?: unknown; templates?: unknown; history?: unknown; version?: unknown; completionScore?: unknown; lastModified?: unknown; wordCount?: unknown; createdAt?: unknown}
           ).templates || []}
     } catch (error) { console.error('Error loading templates:', error)}
   }
-  async function loadDraftHistory(): Promise<any> { try { const response = await fetch('/api/ai/document-drafting/history', { method: 'GET';
-	headers: {
+  async function loadDraftHistory(): Promise<any> { try { const response = await fetch('/api/ai/document-drafting/history', { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); draftHistory = (
             data as { documentTypes?: unknown; templates?: unknown; history?: unknown; version?: unknown; completionScore?: unknown; lastModified?: unknown; wordCount?: unknown; createdAt?: unknown}
@@ -67,17 +64,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           'Content-Type': 'application/json'
         },
 	body: JSON.stringify({
-	documentId: currentDocument.id }) }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); documentContent = (result as { document?: unknown; content?: unknown; suggestions?: unknown }).content; // Mark suggestion as applied if (currentDocument) { const suggestionIndex = currentDocument.aiSuggestions.findIndex(s => s.id === suggestion.id); if (suggestionIndex !== -1) { currentDocument.aiSuggestions[suggestionIndex].applied = true}
+, documentId: currentDocument.id }) }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); documentContent = (result as { document?: unknown; content?: unknown; suggestions?: unknown }).content; // Mark suggestion as applied if (currentDocument) { const suggestionIndex = currentDocument.aiSuggestions.findIndex(s => s.id === suggestion.id); if (suggestionIndex !== -1) { currentDocument.aiSuggestions[suggestionIndex].applied = true}
         } }
     } catch (error) { console.error('Error applying suggestion', error)}
   }
-  function getDocumentTypeIcon(category: string): string { switch (category) { case: 'litigation': return 'âš–ï¸'; case, 'contract': return 'ðŸ“„'; case, 'compliance': return 'âœ…'; case, 'discovery': return 'ðŸ”'; case, 'pleading': return 'ðŸ“',default: return 'ðŸ“‹'}
+  function getDocumentTypeIcon(category: string): string { switch (category) { case: 'litigation': return 'âš–ï¸'; case, 'contract': return 'ðŸ“„'; case, 'compliance': return 'âœ…'; case, 'discovery': return 'ðŸ”'; case, 'pleading': return 'ðŸ“',default:return 'ðŸ“‹'}
   }
-  function getCategoryColor(category: string): string { switch (category) { case: 'litigation': return 'bg-red-100 text-red-800 border-red-200'; case, 'contract': return 'bg-blue-100 text-blue-800 border-blue-200'; case, 'compliance': return 'bg-green-100 text-green-800 border-green-200'; case, 'discovery': return 'bg-purple-100 text-purple-800 border-purple-200'; case, 'pleading': return 'bg-orange-100 text-orange-800 border-orange-200',default: return 'bg-gray-100 text-gray-800 border-gray-200'}
+  function getCategoryColor(category: string): string { switch (category) { case: 'litigation': return 'bg-red-100 text-red-800 border-red-200'; case, 'contract': return 'bg-blue-100 text-blue-800 border-blue-200'; case, 'compliance': return 'bg-green-100 text-green-800 border-green-200'; case, 'discovery': return 'bg-purple-100 text-purple-800 border-purple-200'; case, 'pleading': return 'bg-orange-100 text-orange-800 border-orange-200',default:return 'bg-gray-100 text-gray-800 border-gray-200'}
   }
-  function getComplexityColor(complexity: string): string { switch (complexity) { case: 'basic': return 'text-green-600'; case, 'intermediate': return 'text-yellow-600'; case, 'advanced': return 'text-red-600',default: return 'text-gray-600'}
+  function getComplexityColor(complexity: string): string { switch (complexity) { case: 'basic': return 'text-green-600'; case, 'intermediate': return 'text-yellow-600'; case, 'advanced': return 'text-red-600',default:return 'text-gray-600'}
   }
-  function getSuggestionTypeIcon(type: string): string { switch (type) { case: 'content': return 'âœï¸'; case, 'structure': return 'ðŸ—ï¸'; case, 'legal_point': return 'âš–ï¸'; case, 'citation': return 'ðŸ“–'; case, 'language': return 'ðŸ”¤',default: return 'ðŸ’¡'}
+  function getSuggestionTypeIcon(type: string): string { switch (type) { case: 'content': return 'âœï¸'; case, 'structure': return 'ðŸ—ï¸'; case, 'legal_point': return 'âš–ï¸'; case, 'citation': return 'ðŸ“–'; case, 'language': return 'ðŸ”¤',default:return 'ðŸ’¡'}
   } let filteredTemplates = $derived(() => { if (!selectedDocumentType) return []; return templates.filter(template => template.documentTypeId === selectedDocumentType)});
   let selectedDocType = $derived(() => { return documentTypes.find(type => type.id === selectedDocumentType)}); // New: derived, object for the currently selected template (avoid in-template {@const}) let selectedTemplateObj = $derived(() => templates.find(t => t.id === selectedTemplate) || null); let wordCount = $derived(() => { return documentContent ? documentContent.split(/\s+/).filter(Boolean).length: 0});
   let pendingSuggestions = $derived(() => { if (!currentDocument) return []; return currentDocument.aiSuggestions.filter(s => !s.applied)}); </script>
@@ -216,8 +213,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .drafting-header { display: flex; justify-content: space-betweennn; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0}
   .drafting-title { font-size: 2rem; font-weight: 700;
 	color: #1e293b;margin: 0}
-  .drafting-subtitle { color: #64748b;
-	margin: 0.5rem, 0 0 0}
+  .drafting-subtitle { color: #64748b;, margin: 0.5rem, 0 0 0}
   .drafting-layout { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; min-height: 600px}
   .drafting-sidebar { background: #f8fafc; border-radius: 0.5rem;
 	padding: 1.5rem;height: fit-content; max-height: 80vh; overflow-y: auto}
@@ -227,8 +223,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .document-types-list { display: flex; flex-direction: column;
 	gap: 0.75rem}
   .document-type-option { cursor: pointer}
-  .document-type-card { padding: 1rem;
-	border: 1px solid #e5e7eb; border-radius: 0.375rem;
+  .document-type-card { padding: 1rem;, border: 1px solid #e5e7eb; border-radius: 0.375rem;
 	background: white;transition:all 0.2s}
   .document-type-card:hover { border-color: #3b82f6; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)}
   .document-type-card.selected { border-color: #3b82f6;
@@ -243,8 +238,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .type-metadata { display: flex; justify-content: space-betweennn; align-items: center; font-size: 0.75rem}
   .complexity { font-weight: 600; text-transform: uppercase}
   .estimated-time { color: #6b7280}
-  .template-select { width: 100%;
-	padding: 0.5rem;
+  .template-select { width: 100%;, padding: 0.5rem;
 	border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; margin-bottom: 0.75rem}
   .template-preview { padding: 0.75rem, background: white, border-radius: 0.375rem;
 	border: 1px solid #e5e7eb}
@@ -258,8 +252,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem}
   .form-group label { font-size: 0.75rem; font-weight: 500;
 	color: #374151}
-  .form-input, .form-textarea, .form-select { padding: 0.5rem;
-	border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
+  .form-input, .form-textarea, .form-select { padding: 0.5rem;, border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
   .form-textarea { resize: vertical; min-height: 60px}
   .document-info h4 { margin: 0, 0 0.75rem 0; color: #374151}
   .info-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 0.75rem}
@@ -282,8 +275,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: #6b7280}
   .suggestion-text { margin: 0, 0 0.5rem 0; font-size: 0.75rem, color: #374151; line-height: 1.4}
   .suggestion-reasoning { margin: 0, 0 0.75rem 0; font-size: 0.625rem, color: #64748b; font-style: italic}
-  .suggestion-actions { display: flex;
-	gap: 0.5rem}
+  .suggestion-actions { display: flex;, gap: 0.5rem}
   .quick-actions { display: flex; flex-direction: column;
 	gap: 0.5rem}
   .drafting-main { background: white; border-radius: 0.5rem;
@@ -301,8 +293,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 70vh}
   .editor-toolbar { display: flex; justify-content: space-betweennn, align-items: center;
 	padding: 1rem 1.5rem; border-bottom: 1px solid #e2e8f0; background: #f8fafc}
-  .title-input { border: none;
-	background: transparent; font-size: 1.25rem; font-weight: 600;
+  .title-input { border: none;, background: transparent; font-size: 1.25rem; font-weight: 600;
 	color: #374151;padding: 0.5rem, border-radius: 0.375rem;
 	width: 400px}
   .title-input:focus { outline: 1px solid #3b82f6; background: white}
@@ -310,19 +301,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 1rem}
   .word-count { font-size: 0.875rem;
 	color: #6b7280}
-  .editor-content { flex: 1;
-	padding: 1.5rem}
-  .document-textarea { width: 100%;
-	height: 100%;
+  .editor-content { flex: 1;, padding: 1.5rem}
+  .document-textarea { width: 100%;, height: 100%;
 	border: none;
 	resize: none; font-family: 'Georgia', serif; font-size: 1rem; line-height: 1.6;
 	color: #374151;background: transparent}
   .document-textarea:focus { outline: none}
   .editor-footer { padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0; background: #f8fafc}
-  .ai-prompt-section { display: flex;
-	gap: 0.75rem; align-items: center}
-  .ai-prompt-input { flex: 1;
-	padding: 0.5rem;
+  .ai-prompt-section { display: flex;, gap: 0.75rem; align-items: center}
+  .ai-prompt-input { flex: 1;, padding: 0.5rem;
 	border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
   .recent-drafts { margin-top: 3rem}
   .recent-drafts h2 { margin: 0, 0 1.5rem 0; color: #374151}
@@ -332,32 +319,25 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .draft-title { margin: 0; font-size: 1rem}
   .draft-stats { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 0.75rem}
   .draft-status { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.625rem; font-weight: 600; text-transform: uppercase}
-  .status-draft { background: #fef3c7;
-	color: #92400c}
-  .status-review { background: #dbeafe;
-	color: #1e40af}
-  .status-finalized { background: #d1fae5;
-	color: #166534}
+  .status-draft { background: #fef3c7;, color: #92400c}
+  .status-review { background: #dbeafe;, color: #1e40af}
+  .status-finalized { background: #d1fae5;, color: #166534}
   .draft-date { font-size: 0.75rem;
 	color: #6b7280}
   .draft-preview { font-size: 0.75rem, color: #64748b; line-height: 1.4}
-  .draft-actions { display: flex;
-	gap: 0.5rem; justify-content: flex-end}
+  .draft-actions { display: flex;, gap: 0.5rem; justify-content: flex-end}
   /* Dialog Styles */ .document-preview-dialog { max-width: 800px; max-height: 90vh; overflow-y: auto}
   .preview-content { padding: 1.5rem, background: white, border-radius: 0.375rem;
 	border: 1px solid #e5e7eb}
   .preview-header { margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb}
   .preview-header h1 { margin: 0, 0 0.5rem 0; color: #374151; font-size: 1.5rem}
-  .preview-metadata { display: flex;
-	gap: 1rem, font-size: 0.75rem;
+  .preview-metadata { display: flex;, gap: 1rem, font-size: 0.75rem;
 	color: #6b7280}
   .preview-body { font-family: 'Georgia', serif; font-size: 1rem; line-height: 1.6;
 	color: #374151}
   .preview-body p { margin: 0, 0 1rem 0}
-  .dialog-actions { display: flex;
-	gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
-  /* Modal overlay used in place of external Dialog component */ .modal-overlay { position: fixed;
-	inset: 0;background: rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; z-index: 60;
+  .dialog-actions { display: flex;, gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
+  /* Modal overlay used in place of external Dialog component */ .modal-overlay { position: fixed;, inset: 0;background: rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; z-index: 60;
 	padding: 1rem}
   .modal-content { max-width: 800px;
 	width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); border-radius: 0.5rem}

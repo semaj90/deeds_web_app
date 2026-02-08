@@ -37,7 +37,7 @@
             onclick={ handleClose } aria-label="Close modal"
           > Ã—
           </button> {/if}
-  <!-- Modal: Content, Area --> <div class="flex-1 p-6 overflow-y-auto"> {@render children?.()} </div>
+  <!-- Modal:Content, Area --> <div class="flex-1 p-6 overflow-y-auto"> {@render children?.()} </div>
  <!-- FF-Style Action Bar (if actions, snippet, provided) -->
   {#if actions} <div class="px-6 py-4 bg-gradient-to-r" from-slate-800/90 to-slate-700/90 border-t, border-amber-400/30"
         > <div class="flex justify-end"> {@render actions()} </div> {/if}

@@ -19,12 +19,12 @@ interface Props {
 	loading?: boolean;
 	formApi?: any;
 	onsubmit?: (_event: {
-		values: { [key: string]: any },
+	, values: { [key: string]: any },
 		isValid: boolean
 	}) => void;
 	onreset?: () => void;
 	onchange?: (_event: {
-		values: { [key: string]: any }
+	, values: { [key: string]: any }
 	}) => void;
 	children?: any;
 }

@@ -80,9 +80,7 @@ import CardContentComp from './CardContent.svelte';
 import CardFooterComp from './CardFooter.svelte';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
-export const CompoundComponents = {
-    Card: {
-	Root: CardRoot,
+export const CompoundComponents = { Card: {, Root:CardRoot,
         Header: CardHeaderComp,
         Title: CardTitleComp,
         Description: CardDescriptionComp,

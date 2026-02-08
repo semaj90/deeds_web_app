@@ -8,9 +8,7 @@
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import Network from 'lucide-svelte/icons/network';
   // Explicitly typing $props to avoid interface merge issues on single lines
-  interface GraphNode {
-    id: string;
-	label: string;
+  interface GraphNode { id: string;, label: string;
     type: string;
     x?: number;
     y?: number;
@@ -18,16 +16,13 @@
     importance: number;
   }
 
-  interface GraphEdge {
-    source: string;
-	target: string;
+  interface GraphEdge { source: string;, target:string;
     value: number;
   }
 
   interface Props {
     caseId: string;
-    graphData?: {
-	nodes: GraphNode[]; edges: GraphEdge[] };
+    graphData?: { nodes: GraphNode[];, edges: GraphEdge[] };
     enableWebGPU?: boolean;
     maxNodes?: number;
   }
@@ -47,9 +42,7 @@
   let isSimulating = $state(true);
   let frameId: number;
 
-  const lodConfig = {
-    0: {
-	maxNodes: 500, label: 'High' },
+  const lodConfig = { 0: {, maxNodes: 500, label: 'High' },
 	1: {
 	maxNodes: 200, label: 'Medium' },
 	2: {

@@ -68,7 +68,7 @@ function getTabClasses(tab: TabItem) {
 	const base = 'px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500';
 
 	const variants = {
-		default: isActive
+		default:isActive
 			? 'bg-blue-600 text-white rounded-md'
 			: 'text-slate-400 hover:text-white hover:bg-slate-700 rounded-md',
 		pills: isActive

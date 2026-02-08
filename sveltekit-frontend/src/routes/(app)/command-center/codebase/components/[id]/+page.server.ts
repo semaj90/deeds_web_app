@@ -1,9 +1,7 @@
 import type { PageServerLoad } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface FileProfile {
-    file_path: string;
-	role: string;
+interface FileProfile { file_path: string;, role: string;
     surface: string[];
 	dependencies: string[];
     exports: string[];
@@ -18,9 +16,7 @@ interface FileProfile {
 	generated_at: string;
 }
 
-interface QdrantPoint {
-    id: number;
-	payload: FileProfile;
+interface QdrantPoint { id: number;, payload: FileProfile;
 }
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
@@ -69,7 +65,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 	body: JSON.stringify({limit: 20,
                         with_payload: true,
                         filter: {must: [
-                                { key: 'filePath', match: {text: profile.file_path.split('/').pop() } }
+                                {, key: 'filePath', match: {text: profile.file_path.split('/').pop() } }
                             ]
                         }
                     })

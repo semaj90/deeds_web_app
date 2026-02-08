@@ -30,8 +30,7 @@
 	width: 32px;height: 32px; border-radius: 50%; flex-shrink: 0 }
   .assistant .avatar { background-color: var(--muted, #f1f5f9); color: var(--muted-foreground, #64748b)}
   .user .avatar { background-color: var(--primary, #3b82f6); color: var(--primary-foreground, white)}
-  .avatar-icon { width: 16px;
-	height: 16px}
+  .avatar-icon { width: 16px;, height: 16px}
   .message-content { flex: 1; min-width: 0 }
   .message-header { display: flex; align-items: center; justify-content: space-betweenn; margin-bottom: 0.25rem}
   .sender-name { font-size: 0.75rem; font-weight: 600;

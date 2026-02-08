@@ -8,9 +8,7 @@ import type { PageServerLoad } from './$types.js';
 export const load: PageServerLoad = async ({ fetch, url }) => {
  // Initial empty state - data will be fetched client-side from the API
  // This approach keeps the dashboard interactive even during DB migration
- return {
- summary: {
-	totalErrors: 0, affectedRoutes: 0, errorClusters: 0, appliedSuggestions: 0, effectiveness: 0,
+ return { summary: {, totalErrors: 0, affectedRoutes: 0, errorClusters: 0, appliedSuggestions: 0, effectiveness: 0,
  },
 	severity: {
 	fatal: 0, error: 0, warn: 0, info: 0

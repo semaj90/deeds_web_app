@@ -64,7 +64,7 @@
       case 'gpu': return Zap;
       case 'cpu': return Cpu;
       case 'upload': return CheckCircle;
-      default: return Brain;
+      default:return Brain;
     }
   }
 
@@ -73,7 +73,7 @@
       case 'success': return CheckCircle;
       case 'error': return XCircle;
       case 'warning': return AlertCircle;
-      default: return getOperationIcon(operation);
+      default:return getOperationIcon(operation);
     }
   }
 
@@ -88,9 +88,9 @@
           case 'gpu': return 'text-purple-400';
           case 'cpu': return 'text-orange-400';
           case 'upload': return 'text-green-400';
-          default: return 'text-blue-400';
+          default:return 'text-blue-400';
         }
-      default: return 'text-gray-400';
+      default:return 'text-gray-400';
     }
   }
 
@@ -201,9 +201,7 @@
     border-radius: 0.5rem;
   }
 
-  .ai-loading-component.overlay {
-    position: fixed;
-	inset: 0;
+  .ai-loading-component.overlay { position: fixed;, inset: 0;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
     z-index: 50;

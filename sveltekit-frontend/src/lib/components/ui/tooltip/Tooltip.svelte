@@ -22,7 +22,7 @@
 
 	/**
 	 * Convenient all-in-one Tooltip component
-	 * For more control, use the individual sub-components (Tooltip.Root: Tooltip.Content, etc.)
+	 * For more control, use the individual sub-components (Tooltip.Root:Tooltip.Content, etc.)
 	 */
 	interface Props extends TooltipRootProps, Pick<TooltipContentProps, 'side' | 'align' | 'sideOffset'> {
 		children?: Snippet;

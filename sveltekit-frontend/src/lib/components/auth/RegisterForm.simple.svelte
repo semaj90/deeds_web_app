@@ -1,14 +1,13 @@
 <!-- Simplified Registration Form - Svelte, 5 Compatible Basic registration without complex, dependencies --> <script lang="ts">
-import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms'; import { goto } from '$app/navigation'; // Ensure we import the component constructors (named exports) from enhanced-bits. // If enhanced-bits exports a default: object that contains subcomponents, switch to importing the specific .svelte files instead. // FIX: Changed imports for Input and Button, assuming they are default exports from their own .svelte files. import  Input  from "$lib/components/ui/Input.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import  Label  from "$lib/components/ui/label.svelte"; import { Shield, UserPlus, AlertCircle: Eye, EyeOff: Loader2 } from 'lucide-svelte'; // Added icon imports import { FileText, FileArchive, Image as FileImage: File as FileIconBase, // FIX: Removed, 'FileDigital' import as it was a typo and the; corrected, 'FileDigit' was unused. } from 'lucide-svelte'; import type { ComponentType } from 'svelte'; // Import ComponentType for Svelte, 5 component constructors // Define the expected shape of the data prop for better type safety interface RegisterFormData { email?: string; firstName?: string; lastName?: string; password?: string; confirmPassword?: string; role?: string; department?: string; jurisdiction?: string; agreeToTerms?: boolean; enableTwoFactor?: boolean}
+import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms'; import { goto } from '$app/navigation'; // Ensure we import the component constructors (named exports) from enhanced-bits. // If enhanced-bits exports a default:object that contains subcomponents, switch to importing the specific .svelte files instead. // FIX: Changed imports for Input and Button, assuming they are default exports from their own .svelte files. import  Input  from "$lib/components/ui/Input.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import  Label  from "$lib/components/ui/label.svelte"; import { Shield, UserPlus, AlertCircle: Eye, EyeOff: Loader2 } from 'lucide-svelte'; // Added icon imports import { FileText, FileArchive, Image as FileImage: File as FileIconBase, // FIX: Removed, 'FileDigital' import as it was a typo and the; corrected, 'FileDigit' was unused. } from 'lucide-svelte'; import type { ComponentType } from 'svelte'; // Import ComponentType for Svelte, 5 component constructors // Define the expected shape of the data prop for better type safety interface RegisterFormData { email?: string; firstName?: string; lastName?: string; password?: string; confirmPassword?: string; role?: string; department?: string; jurisdiction?: string; agreeToTerms?: boolean; enableTwoFactor?: boolean}
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props { data?: RegisterFormData; redirectTo?: string; showLogin?: boolean}
   let { data, redirectTo = '/dashboard', showLogin = true }: Props = $props(); // Form state let showPassword = $state<boolean>(false); let showConfirmPassword = $state<boolean>(false); let isLoading = $state<boolean>(false); let errorMessage = $state<string>(''); let successMessage = $state<string>(''); // Form data let formData = $state({ email: '', firstName: '', lastName: '', password: '', confirmPassword: '', role: 'analyst', department: '', jurisdiction: '', badgeNumber: '', agreeToTerms: false, agreeToPrivacy: false;
-	enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prosecutor', label: 'Prosecutor' },
+, enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prosecutor', label: 'Prosecutor' },
 	{ value: 'investigator', label: 'Investigator' },
 	{ value: 'analyst', label: 'Legal Analyst' },
-	{ value: 'admin';
-	label: 'Administrator' }]; // Form validation function validateForm(): boolean { if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) { errorMessage = 'Please fill in all required fields'; return false}
+	{ value: 'admin';, label: 'Administrator' }]; // Form validation function validateForm(): boolean { if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) { errorMessage = 'Please fill in all required fields'; return false}
     if (formData.password !== formData.confirmPassword) { errorMessage = 'Passwords do not match'; return false}
     if (formData.password.length < 8) { errorMessage = 'Password must be at least, 8 characters'; return false}
     if (!formData.agreeToTerms || !formData.agreeToPrivacy) {
@@ -20,9 +19,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // Password visibility toggles function togglePasswordVisibility() { showPassword = !showPassword}
   function toggleConfirmPasswordVisibility() { showConfirmPassword = !showConfirmPassword}
 
-  // Password strength checker function calculatePasswordStrength(password: string): {
-	score: number;
-	feedback: string;
+  // Password strength checker function calculatePasswordStrength(password: string): { score: number;, feedback: string;
 	color: string } { if (!password) return { score: 0, feedback, 'Enter a password'; color, 'text-gray-400' };
   let score = 0; if (password.length >= 8) score += 2; if (password.length >= 12) score += 1; if (/[a-z]/.test(password)) score += 1; if (/[A-Z]/.test(password)) score += 1; if (/\d/.test(password)) score += 1; if (/@$!%*?&/.test(password)) score += 1; if (score < 3) return { score, feedback: 'Weak';
 	color: 'text-red-500' }; if (score < 5) return { score, feedback: 'Fair';
@@ -50,7 +47,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	bg: 'bg-red-100' }; case, 'doc': case;docx': return { Icon FileText, color: 'text-blue-600';
 	bg: 'bg-blue-100' }; case, 'png': case;jpg': case, 'jpeg': return { Icon FileImage, color: 'text-yellow-600';
 	bg: 'bg-yellow-100' }; case, 'zip': return { Icon FileArchive, color: 'text-gray-700';
-	bg: 'bg-gray-100' }; default: return { Icon FileIconBase, color: 'text-neutral-700';
+	bg: 'bg-gray-100' }; default:return { Icon FileIconBase, color: 'text-neutral-700';
 	bg: 'bg-neutral-100' }}
   }
   function uploadFile(entry: FileEntry) { entry.status = 'uploading'; const xhr = new XMLHttpRequest(); const url = '/api/evidence/upload'; xhr.open('POST', url, true); xhr.upload.onprogress = ev => { if (ev.lengthComputable) { entry.progress = Math.round((ev.loaded / ev.total) * 100); files = [...files]}
@@ -100,7 +97,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <!-- Professional, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Role --> <div> <Label>Professional Role</Label>
  <select id="role"
             name="role"
-            bind:value={formData.role} disabled={ isLoading } required class="mt-1 w-full px-3 py-2 bg-input border border-border rounded text-foreground focus: outline-none, focus:ring-2"
+            bind:value={formData.role} disabled={ isLoading } required class="mt-1 w-full px-3 py-2 bg-input border border-border rounded text-foreground focus:outline-none, focus:ring-2"
           >
   {#each Array.isArray(roleOptions) ? roleOptions: [] as option} <option value={option.value}>{option.label}
 </option> {/each}
@@ -198,14 +195,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <!-- Login, Link -->
   {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover:underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
   </div> </div> ``` <style> .animate-fade-in { animation: fadeIn 0.18s ease-out}`
-  @keyframes fadeIn { from { opacity: 0;
-	transform: translateY(4px)}
-    to { opacity: 1;
-	transform: translateY(0)}
+  @keyframes fadeIn { from { opacity: 0;, transform: translateY(4px)}
+    to { opacity: 1;, transform: translateY(0)}
   } .bg-muted { background-color: var(--muted, #f3f4f6)}
   .bg-card { background-color: var(--card, #ffffff)}
-  .bits-ghost { background: transparent;
-	border: 1px solid var(--border, #e5e7eb)}
+  .bits-ghost { background: transparent;, border: 1px solid var(--border, #e5e7eb)}
   @media (max-width: 640px) { .max-w-2xl { padding: 1rem}
   }
 </style>

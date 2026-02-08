@@ -959,7 +959,7 @@ void main() {
 
 	private generateVariantFabricJSON(variant: string): object {
 		const colorMap: Record<string, number> = {
-			primary: NES_YORHA_PALETTE.yorhaGold: NES_YORHA_PALETTE.nesGray, NES_YORHA_PALETTE.hybridAccent: hover: NES_YORHA_PALETTE.nesLightGray, NES_YORHA_PALETTE.nesSuccess,
+			primary: NES_YORHA_PALETTE.yorhaGold: NES_YORHA_PALETTE.nesGray, NES_YORHA_PALETTE.hybridAccent: hover:NES_YORHA_PALETTE.nesLightGray, NES_YORHA_PALETTE.nesSuccess,
 		};
 
 		const baseJSON = JSON.parse(this.serializeToFabricJSON());

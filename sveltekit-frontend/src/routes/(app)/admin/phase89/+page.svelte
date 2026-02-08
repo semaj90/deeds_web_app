@@ -55,18 +55,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Real-time SSE
 	let eventSource: EventSource | null = null;
 
-	interface SearchResult {
-		id: string;
-	score: number;
+	interface SearchResult { id: string;, score: number;
 		text: string;
 	source: string;
 		tags: string[];
 		cluster_id?: number;
 	}
 
-	interface Cluster {
-		cluster_id: number;
-	error_count: number;
+	interface Cluster { cluster_id: number;, error_count: number;
 		first_seen: string;
 	last_seen: string;
 		sample_message: string;
@@ -77,16 +73,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		tags?: string[];
 	}
 
-	interface GraphNode {
-		id: string;
-	label: string;
+	interface GraphNode { id: string;, label: string;
 		type: 'component' | 'module' | 'route' | 'error';
 		errorCount: number;
 	}
 
-	interface GraphEdge {
-		from: string;
-	to: string;
+	interface GraphEdge { from: string;, to: string;
 		type: 'imports' | 'uses' | 'depends';
 	}
 
@@ -101,7 +93,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: 'embeddinggemma:latest', input: searchQuery })
+, model: 'embeddinggemma:latest', input: searchQuery })
 			});
 
 			if (!embedRes.ok) throw new Error('Embedding failed');
@@ -145,7 +137,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	limit: 50, with_payload: true })
+, limit: 50, with_payload: true })
 			});
 
 			if (!res.ok) return;
@@ -192,7 +184,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	action: 'cluster', chunkSize: 500 })
+, action: 'cluster', chunkSize: 500 })
 			});
 
 			if (res.ok) {
@@ -228,7 +220,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	cluster_id: cluster.cluster_id,
+, cluster_id: cluster.cluster_id,
 					strategy: cluster.fix_strategy,
 					ace_context: true
 				})
@@ -510,9 +502,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-size: 0.875rem;
 	}
 
-	.tabs {
-		display: flex;
-	gap: 0.5rem;
+	.tabs { display: flex;, gap: 0.5rem;
 		margin-bottom: 1.5rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		padding-bottom: 0.5rem;
@@ -528,14 +518,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		transition: all 0.2s;
 	}
 
-	.tab:hover {
-		color: #fff;
-	background: rgba(255, 255, 255, 0.05);
+	.tab:hover { color: #fff;, background: rgba(255, 255, 255, 0.05);
 	}
 
-	.tab.active {
-		color: #00d4ff;
-	background: rgba(0, 212, 255, 0.1);
+	.tab.active { color: #00d4ff;, background: rgba(0, 212, 255, 0.1);
 		border-bottom: 2px solid #00d4ff;
 	}
 
@@ -548,15 +534,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	/* Search Section */
-	.search-box {
-		display: flex;
-	gap: 1rem;
+	.search-box { display: flex;, gap: 1rem;
 		margin-bottom: 1.5rem;
 	}
 
-	.search-input {
-		flex: 1;
-	padding: 1rem 1.5rem;
+	.search-input { flex: 1;, padding: 1rem 1.5rem;
 		background: rgba(0, 0, 0, 0.3);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
@@ -726,9 +708,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		margin: 0;
 	}
 
-	.fix-btn {
-		width: 100%;
-	padding: 1rem;
+	.fix-btn { width: 100%;, padding: 1rem;
 		background: linear-gradient(135deg, #10b981, #00d4ff);
 		border: none;
 		border-radius: 8px;
@@ -744,9 +724,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		gap: 1.5rem;
 	}
 
-	.graph-stats {
-		display: flex;
-	gap: 1rem;
+	.graph-stats { display: flex;, gap: 1rem;
 		grid-column: 1 / -1;
 	}
 
@@ -803,9 +781,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	margin: 0 0 1rem 0;
 	}
 
-	.node-item {
-		display: flex;
-	gap: 0.5rem;
+	.node-item { display: flex;, gap: 0.5rem;
 		align-items: center;
 	padding: 0.5rem 0;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -833,9 +809,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	/* Pipeline Section */
-	.pipeline-controls {
-		display: flex;
-	gap: 1rem;
+	.pipeline-controls { display: flex;, gap: 1rem;
 		margin-bottom: 1.5rem;
 	}
 
@@ -858,24 +832,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		cursor: pointer;
 	}
 
-	.progress-bar {
-		height: 24px;
-	background: rgba(255, 255, 255, 0.1);
+	.progress-bar { height: 24px;, background: rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
 	overflow: hidden;
 		position: relative;
 		margin-bottom: 1.5rem;
 	}
 
-	.progress-fill {
-		height: 100%;
-	background: linear-gradient(90deg, #7c3aed, #00d4ff);
+	.progress-fill { height: 100%;, background: linear-gradient(90deg, #7c3aed, #00d4ff);
 		transition: width 0.3s;
 	}
 
-	.progress-text {
-		position: absolute;
-	top: 50%;
+	.progress-text { position: absolute;, top: 50%;
 		left: 50%;
 	transform: translate(-50%, -50%);
 		font-size: 0.75rem;

@@ -1,21 +1,15 @@
 <script lang="ts">
 	// Define types locally since they're not exported from ui-store
-	interface AIEntity {
-		type: string;
-		value: string;
+	interface AIEntity { type: string;, value: string;
 		context?: string;
 	}
 
-	interface AIMetadata {
-		confidence: number;
-		source: string;
+	interface AIMetadata { confidence: number;, source: string;
 		entities?: AIEntity[];
 		[key: string]: unknown;
 	}
 
-	interface AutoPopulatedForm {
-		confidence: number;
-		source: 'ocr' | 'ai' | 'manual' | 'mixed';
+	interface AutoPopulatedForm { confidence: number;, source: 'ocr' | 'ai' | 'manual' | 'mixed';
 		defendant?: string;
 		plaintiff?: string;
 		location?: string;
@@ -412,9 +406,7 @@
 		color: var(--yorha-bg, #1a1a1a);
 	}
 
-	.source-badge[data-source='ocr'] {
-		background: #60a5fa;
-	color: var(--yorha-bg, #1a1a1a);
+	.source-badge[data-source='ocr'] { background: #60a5fa;, color: var(--yorha-bg, #1a1a1a);
 	}
 
 	.confidence-indicator {
@@ -470,9 +462,7 @@
 	}
 
 	.form-input:disabled,
-	.form-textarea:disabled {
-		opacity: 0.6;
-	cursor: not-allowed;
+	.form-textarea:disabled { opacity: 0.6;, cursor: not-allowed;
 	}
 
 	.form-textarea {
@@ -513,9 +503,7 @@
 	gap: 0.5rem;
 	}
 
-	.list-item {
-		display: flex;
-	gap: 0.5rem;
+	.list-item { display: flex;, gap: 0.5rem;
 	}
 
 	.list-item .form-input {
@@ -544,9 +532,7 @@
 	margin: 0;
 	}
 
-	.form-actions {
-		display: flex;
-	gap: 0.75rem;
+	.form-actions { display: flex;, gap: 0.75rem;
 		padding-top: 1rem;
 		border-top: 1px solid var(--yorha-border, #4a4a4a);
 	}

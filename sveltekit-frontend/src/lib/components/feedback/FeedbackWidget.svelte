@@ -43,8 +43,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .feedback-widget { background: white; border-radius: 12px;
 	padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); max-width: 400px, width: 90%; max-height: 80vh; overflow-y: auto}
   .feedback-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 20px}
-  .feedback-title { margin: 0;
-	color: #333; font-size: 18px; font-weight: 600}
+  .feedback-title { margin: 0;, color: #333; font-size: 18px; font-weight: 600}
   .close-button { background: none, border: none, font-size: 24px;
 	color: #999; cursor: pointer, padding: 4px, border-radius: 4px;
 	transition:color 0.2s, background-color 0.2}
@@ -58,8 +57,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .star { background: none, border: none, font-size: 32px;
 	color: #ddd; cursor: pointer;
 	transition:color 0.2s, transform 0.1; padding: 4px; border-radius: 4px}
-  .star:hover { color: #ffc107;
-	transform: scale(1.1)}
+  .star:hover { color: #ffc107;, transform: scale(1.1)}
   .star.active { color: #ffc107}
   .feedback-section { display: flex; flex-direction: column;
 	gap: 8px}
@@ -69,20 +67,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	resize: vertical;transition:border-color 0.2}
   .feedback-textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1)}
   .feedback-actions { display: flex; justify-content: flex-end}
-  .submit-button { background: #4f46e5;
-	color: white; border: none;
+  .submit-button { background: #4f46e5;, color: white; border: none;
 	padding: 12px 24px; border-radius: 8px; font-size: 14px, font-weight: 600;
 	cursor: pointer;transition:background-color 0.2s, transform 0.1}
-  .submit-buttonhover:not(disabled) { background: #4338ca;
-	transform: translateY(-1px)}
-  .submit-buttondisabled { background: #9ca3af;
-	cursor:not-allowed; transform: none}
+  .submit-buttonhover:not(disabled) { background: #4338ca;, transform: translateY(-1px)}
+  .submit-buttondisabled { background: #9ca3af;, cursor:not-allowed; transform: none}
   .feedback-success { text-align: center;
 	padding: 20px 0}
   .success-icon { font-size: 48px, color: #10b981; margin-bottom: 12px}
   .success-title { margin: 0, 0 8px 0; color: #333; font-size: 18px; font-weight: 600}
-  .success-message { margin: 0;
-	color: #666; font-size: 14px}
+  .success-message { margin: 0;, color: #666; font-size: 14px}
   /* Mobile responsiveness */ @media (max-width: 480px) { .feedback-widget { padding: 20px, margin: 20px, max-width: none;
 	width: calc(100% - 40px)}
     .star { font-size: 28px}

@@ -80,7 +80,7 @@ export interface SelectValueProps {
 export interface SelectContext {
 	readonly open: boolean;
 	readonly value: string;
-	readonly disabled: boolean;
+	readonly disabled:boolean;
 	setValue: (value: string) => void;
 	setOpen: (open: boolean) => void;
 	toggle: () => void;

@@ -41,9 +41,7 @@
 	const visibleText = $derived(displayText.slice(0, currentIndex));
 
 	// Texture cache for alphabet characters
-	interface AlphabetTexture {
-		char: string;
-	texture: ImageData | null;
+	interface AlphabetTexture { char: string;, texture: ImageData | null;
 		quantizedData: Float32Array;
 	nesPattern: Uint8Array;
 		cached: boolean;
@@ -390,22 +388,16 @@
 	position: relative;
 	}
 
-	.nes-classic {
-		color: #ffffff;
-	background: #000000;
+	.nes-classic { color: #ffffff;, background: #000000;
 		border-color: #ffffff;
 	}
 
-	.nes-modern {
-		color: #00ff00;
-	background: #001100;
+	.nes-modern { color: #00ff00;, background: #001100;
 		border-color: #00ff00;
 		text-shadow: 0 0 2px #00ff00;
 	}
 
-	.nes-legal {
-		color: #ffd700;
-	background: #1a1a2e;
+	.nes-legal { color: #ffd700;, background: #1a1a2e;
 		border-color: #ffd700;
 		text-shadow: 0 0 1px #ffd700;
 	}
@@ -436,9 +428,7 @@
 		}
 	}
 
-	.nes-typewriter-cursor {
-		display: inline-block;
-	opacity: 0;
+	.nes-typewriter-cursor { display: inline-block;, opacity: 0;
 		margin-left: 1px;
 		font-weight: bold;
 	color: currentColor;
@@ -497,9 +487,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.nes-typewriter-cursor {
-			animation: none;
-	opacity: 1;
+		.nes-typewriter-cursor { animation: none;, opacity: 1;
 		}
 
 		.nes-typewriter-text:global(.nes-text-emphasis) {

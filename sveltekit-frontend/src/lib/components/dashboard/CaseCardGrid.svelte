@@ -31,8 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return 'border-l-4 border-l-[#9E0000]';
       case 'closed':
         return 'border-l-4 border-l-gray-400';
-      default:
-        return 'border-l-4 border-l-gray-300';
+      default:return 'border-l-4 border-l-gray-300';
     }
   };
 
@@ -42,8 +41,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return 'bg-[#9E0000] text-white';
       case 'closed':
         return 'bg-gray-400 text-white';
-      default:
-        return 'bg-gray-300 text-gray-900';
+      default:return 'bg-gray-300 text-gray-900';
     }
   };
 

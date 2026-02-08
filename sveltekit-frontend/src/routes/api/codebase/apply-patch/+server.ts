@@ -7,12 +7,10 @@ interface ApplyPatchRequest {
     dryRun?: boolean;
 }
 
-interface PatchResult {
-    success: boolean; clusterId: string;
+interface PatchResult { success: boolean;, clusterId: string;
     filesPatched: number; errorsFixed: number;
     message: string;
-    patches?: Array<{ filePath: string;
-        line: number; before: string;
+    patches?: Array<{ filePath: string;, line: number; before: string;
         after: string;
     }>;
 }
@@ -32,7 +30,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ limit: 1,
                 with_payload: true,
-                filter: { must: [{ key: 'cluster_id', match: { value, clusterId } }]
+                filter: {, must: [{, key: 'cluster_id', match: { value, clusterId } }]
                 }
             })
         });
@@ -45,7 +43,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         const cluster = clusterData.result?.points[0]?.payload;
 
         if (!cluster) {
-            return json({ error: `Cluster not found: ${ clusterId }` }, { status: 404 });
+            return json({ error: `Cluster not, found: ${ clusterId }` }, { status: 404 });
         }
 
         // Fetch member errors
@@ -54,7 +52,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ limit: 100,
                 with_payload: true,
-                filter: { must: [{ key: 'clusterId', match: { value, clusterId } }]
+                filter: {, must: [{, key: 'clusterId', match: { value, clusterId } }]
                 }
             })
         });
@@ -62,7 +60,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         let members: Array<Record<string, unknown>> = [];
         if (membersResponse.ok) {
             const membersData = await membersResponse.json();
-            members = membersData.result.points.map((p: { payload: Record<string, unknown> }) => p.payload);
+            members = membersData.result.points.map((p: {, payload: Record<string, unknown> }) => p.payload);
         }
 
         // Generate safe patches based on error type
@@ -89,7 +87,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
                     patches.push({
                         filePath: member.filePath as string,
                         line: 1,
-                        before: `// Missing import for: ${match[1]}`,
+                        before: `// Missing import, for: ${match[1]}`,
                         after: `import { ${match[1]} } from '$lib/types'; // Auto-suggested`
                     });
                 }

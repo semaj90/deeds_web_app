@@ -170,8 +170,7 @@
  return 'border-orange-500/60 bg-orange-500/20 text-orange-100';
  case 'low':
  return 'border-blue-500/60 bg-blue-500/20 text-blue-100';
- default:
- return 'border-slate-500/60 bg-slate-500/20 text-slate-100';
+ default:return 'border-slate-500/60 bg-slate-500/20 text-slate-100';
  }
  }
 
@@ -411,7 +410,7 @@
  </form>
  <button
  type="button"
- class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-slate-400 focus: ring-offset-2, focus:ring-offset-slate-900"
+ class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100, focus:outline-none focus:ring-2, focus:ring-slate-400 focus:ring-offset-2, focus:ring-offset-slate-900"
  onclick={ cancelNewCase }
  aria-label="Close"
  >

@@ -38,28 +38,28 @@
 		<button
 			onclick={handleTimelineAnalysis}
 			disabled={!caseId}
-			class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover: bg-gray-200, disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm transition"
+			class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200, disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm transition"
 		>
 			TIMELINE ANALYSIS
 		</button>
 		<button
 			onclick={handleEvidenceSummary}
 			disabled={!caseId}
-			class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover: bg-gray-200, disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm transition"
+			class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200, disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm transition"
 		>
 			EVIDENCE SUMMARY
 		</button>
 		<button
 			onclick={handleSuspectConnections}
 			disabled={!caseId}
-			class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover: bg-gray-200, disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm transition"
+			class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200, disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm transition"
 		>
 			SUSPECT CONNECTIONS
 		</button>
 		<button
 			onclick={handleGenerateReport}
 			disabled={!caseId}
-			class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover: bg-gray-200, disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm transition"
+			class="px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded hover:bg-gray-200, disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm transition"
 		>
 			GENERATE REPORT
 		</button>

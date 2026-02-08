@@ -2,15 +2,14 @@
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { createSOMRAGSystem, type SOMConfig } from '$lib/ai/som-rag-system'; import { createEnhancedIngestionPipeline, type IngestionStats } from '$lib/ai/enhanced-ingestion-pipeline'; interface Props { class?: string; width?: number; height?: number}
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-  interface SOMNode { position { x: number;
-	y: number }; cluster: number, confidence: number, documents: number;
+  interface SOMNode { position { x: number;, y: number }; cluster: number, confidence: number, documents: number;
 	evidenceType: string}
   let { class: className = '', width = 800, height = 600 }: Props = $props(); // SOM system components let somRAG: any;
  let ingestionPipeline: any;
  let canvas: HTMLCanvasElement;
  let ctx: CanvasRenderingContext2D; // Visualization state let isInitialized = $state<boolean>(false); let isTraining = $state<boolean>(false); let visualizationData = $state<SOMNode[]>([]); let stats = $state<IngestionStats & { queue_size: number, is_processing, boolean, som_visualization, any[] }>({ total_processed: 0, successful: 0;
-	failed: 0, avg_processing_time: 0, cluster_distribution 0%, evidence_type_distribution 0%, queue_size: 0, is_processing: false, som_visualization [] }); // Configuration let somConfig: SOMConfig = $state({ mapWidth: 20, mapHeight: 20, dimensions: 384, learningRate: 0.1, neighborhoodRadius: 3, maxEpochs: 500;
-	clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [ { id: 'doc-1', content: 'Forensic DNA analysis shows conclusive match with suspect blood sample found at crime scene.'; metadata: {
+, failed: 0, avg_processing_time: 0, cluster_distribution 0%, evidence_type_distribution 0%, queue_size: 0, is_processing: false, som_visualization [] }); // Configuration let somConfig: SOMConfig = $state({ mapWidth: 20, mapHeight: 20, dimensions: 384, learningRate: 0.1, neighborhoodRadius: 3, maxEpochs: 500;
+, clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [ { id: 'doc-1', content: 'Forensic DNA analysis shows conclusive match with suspect blood sample found at crime scene.'; metadata: {
 	filename: 'forensic-dna-report.pdf', evidence_type: 'forensic' as const legal_category: 'physical-evidence', upload_timestamp: Date.now() - 86400000, file_size: 1024, mime_type: 'application/pdf'
       } },
 	{
@@ -128,8 +127,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .canvas-wrapper canvas { display: block; image-rendering: pixelated}
   .system-status { padding-top: 12px; border-top: 1px solid #374151}
   input[type='number'] { appearance: textfield}
-  input[type='number']::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button { appearance: none;
-	margin: 0}
+  input[type='number']::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button { appearance: none;, margin: 0}
 </style>
 
 

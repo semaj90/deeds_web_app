@@ -47,9 +47,9 @@
   async function initEditor() {
     try {
       const [{ Editor },
-	{ default: StarterKit },
-	{ default: Placeholder },
-	{ default: Underline }] = await Promise.all([
+	{ default:StarterKit },
+	{ default:Placeholder },
+	{ default:Underline }] = await Promise.all([
         import('@tiptap/core'),
         import('@tiptap/starter-kit'),
         import('@tiptap/extension-placeholder'),
@@ -59,9 +59,7 @@
       editor = new Editor({
         element: editorElement,
         extensions: [
-          StarterKit.configure({
-            heading: {
-	levels: [1, 2, 3, 4] }
+          StarterKit.configure({, heading: {, levels: [1, 2, 3, 4] }
           }),
           Placeholder.configure({ placeholder }),
           Underline
@@ -206,14 +204,10 @@
 	background: transparent;
     cursor: pointer }
 
-  .toolbar-btn:hover {
-    background: var(--color-gray-200);
-	color: var(--color-gray-900);
+  .toolbar-btn:hover { background: var(--color-gray-200);, color: var(--color-gray-900);
   }
 
-  .toolbar-btn.active {
-    background: var(--color-blue-100);
-	color: var(--color-blue-600);
+  .toolbar-btn.active { background: var(--color-blue-100);, color: var(--color-blue-600);
   }
 
   .toolbar-btn-primary {

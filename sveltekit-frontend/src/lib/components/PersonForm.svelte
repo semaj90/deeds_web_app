@@ -2,9 +2,7 @@
  // Reset form when component mounts
  // Migrated to $effect
 
- interface PersonFormData {
- name: string;
-	alias: string;
+ interface PersonFormData { name: string;, alias: string;
  description: string;
 	caseId: string }
 
@@ -127,7 +125,7 @@
  <div class="form-group">
  <label for="caseId" class="form-label">
  Associated Case ID
- <span class="label-hint">Optional: Link to an existing case</span>
+ <span class="label-hint">Optional:Link to an existing case</span>
  </label>
  <input
  id="caseId"
@@ -186,9 +184,7 @@
 </div>
 
 <style>
- .person-form-overlay {
- position: fixed;
-	top: 0;
+ .person-form-overlay { position: fixed;, top: 0;
  left: 0;
 	right: 0;
  bottom: 0;
@@ -233,9 +229,7 @@
  margin: 0.25rem 0 0 0;
  grid-column: 1 / -1 }
 
- .close-btn {
- background: none;
-	border: none;
+ .close-btn { background: none;, border: none;
  color: #888;
  font-size: 1.5rem;
 	cursor: pointer;
@@ -303,9 +297,7 @@
  font-weight: 400;
  margin-top: 0.25rem }
 
- .form-input, .form-textarea {
- width: 100%;
-	padding: 0.75rem;
+ .form-input, .form-textarea { width: 100%;, padding: 0.75rem;
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
  border-radius: 8px;
@@ -385,14 +377,10 @@
  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
  }
 
- .submit-btn:disabled {
- opacity: 0.5;
-	cursor:not-allowed;
+ .submit-btn:disabled { opacity: 0.5;, cursor:not-allowed;
  transform: none }
 
- .spinner {
- width: 16px;
-	height: 16px;
+ .spinner { width: 16px;, height: 16px;
  border: 2px solid rgba(255, 255, 255, 0.3);
  border-top: 2px solid white;
  border-radius: 50%;

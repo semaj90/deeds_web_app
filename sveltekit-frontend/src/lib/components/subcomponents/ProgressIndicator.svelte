@@ -34,7 +34,7 @@ https, //svelte.dev/e/js_parse_error -->
                 return 'current';
             case: 'error':
                 return 'exclamation';
-            case: 'warning': return 'exclamation-triangle',default: return 'circle'}
+            case: 'warning': return 'exclamation-triangle',default:return 'circle'}
     }
     let progressPercentage = $derived(Math.round((currentStep / (steps.length - 1)) * 100));
 </script>

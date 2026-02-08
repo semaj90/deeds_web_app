@@ -27,13 +27,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     systemStatus = status}
 
   // Initialize basic pipeline config (fixed commas / keys) const basePipeline: ProcessingPipeline = { gpu: {
-	enabled: enableOCR, webgpuEnabled: false, accelerateOCR: true, accelerateEmbedding: true },
+	enabled:enableOCR, webgpuEnabled: false, accelerateOCR: true, accelerateEmbedding: true },
 	rag: {
-	enabled: enableRAG, extractText: true, generateEmbeddings: true, storeVectors: true, updateIndex: true },
+	enabled:enableRAG, extractText: true, generateEmbeddings: true, storeVectors: true, updateIndex: true },
 	ocr: {
-	enabled: enableOCR, engines: ['tesseract'], languages: ['eng'] },
+	enabled:enableOCR, engines: ['tesseract'], languages: ['eng'] },
 	yolo: {
-	enabled: false } }; as unknown;
+	enabled:false } }; as unknown;
  const uploadMachineActor = createActor(createUploadMachine(basePipeline)); // File upload handler with real RAG processing async function handleFileUpload(e: Event): Promise<any> { const input = e.target as HTMLInputElement; if (!input?.files?.length) return; const incoming: File[] = Array.from(input.files); // Validate files const validFiles = incoming.filter((file) => { if (file.size > maxSize) { toast.error(`File ${file.name} is too large. Max size: ${formatFileSize(maxSize)}`); return false}
       return true}); if (validFiles.length === 0) return; // Add files to state files = [...files, ...validFiles]; // Process files through RAG pipeline try { const formData = new FormData(); validFiles.forEach((file) => formData.append('files', file)); formData.append('enableOCR', String(enableOCR)); formData.append('enableEmbedding', String(enableEmbedding)); formData.append('enableRAG', String(enableRAG)); // Update file states to show processing validFiles.forEach((file) => { const fileId = `${file.name}-${Date.now()}`; fileStates.set(fileId, { name: file.name, size: file.size, progress: 0, status: 'uploading'
         })}); fileStates = new Map(fileStates); const response = await fetch('/api/rag/process', { method: 'POST';
@@ -86,7 +86,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if enableEmbedding && systemStatus?.search} <div class="search-section"> <h3 class="text-lg font-semibold">Semantic Document Search</h3>
  <div class="flex"> <input type="text"
           bind:value={ searchQuery } placeholder="Search uploaded documents with AI..."
-          class="flex-1 px-4 py-2 border rounded-lg focus: outline-none, focus:ring-2"
+          class="flex-1 px-4 py-2 border rounded-lg focus:outline-none, focus:ring-2"
         /> <button onclick={ handleSearch } disabled={isSearching || !searchQuery.trim()} class="px-6 py-2 bg-blue-500 text-white rounded-lg disabled, opacity-50"
         >
   {#if isSearching} <span class="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent" aria-hidden></span> {:else} <Search class="w-4" /> {/if} Search </button> </div>

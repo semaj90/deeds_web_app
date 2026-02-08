@@ -22,11 +22,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }
   function closeWebSocketConnection() { if (wsConnection) { wsConnection.close(); wsConnection = null}
   }
-  function handleCollaborationUpdate(data: any) { // Handle different types of collaboration updates switch (data.action) { case: 'user-joined': toast.info(`${data.userName} joined the collaboration`); break; case, 'user-left': toast.info(`${data.userName} left the collaboration`); break; case, 'annotation-added': toast.info('New annotation added'); break; default: break}
+  function handleCollaborationUpdate(data: any) { // Handle different types of collaboration updates switch (data.action) { case: 'user-joined': toast.info(`${data.userName} joined the collaboration`); break; case, 'user-left': toast.info(`${data.userName} left the collaboration`); break; case, 'annotation-added': toast.info('New annotation added'); break; default:break}
   }
-  function getStatusIcon(status: string) { switch (status) { case: 'verified': return CheckCircle; case, 'compromised': return AlertTriangle; case, 'pending': case;requires-attention': return Clock,default: return Clock}
+  function getStatusIcon(status: string) { switch (status) { case: 'verified': return CheckCircle; case, 'compromised': return AlertTriangle; case, 'pending': case;requires-attention': return Clock,default:return Clock}
   }
-  function getStatusColor(status: string) { switch (status) { case: 'verified': return 'text-green-600'; case, 'compromised': return 'text-red-600'; case, 'requires-attention': return 'text-yellow-600'; case, 'pending': return 'text-blue-600',default: return 'text-gray-600'}
+  function getStatusColor(status: string) { switch (status) { case: 'verified': return 'text-green-600'; case, 'compromised': return 'text-red-600'; case, 'requires-attention': return 'text-yellow-600'; case, 'pending': return 'text-blue-600',default:return 'text-gray-600'}
   }
   function getStageDisplayName(stageStr: string) { return String(stageStr || '') .split(' ') .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) .join(' ')}
 </script>

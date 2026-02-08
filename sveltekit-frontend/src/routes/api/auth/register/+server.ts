@@ -18,8 +18,7 @@ const registerSchema = z.object({
 	lastName: z.string().min(1, 'Last name is required')
 });
 
-interface RegisterRequest {
-	email: string; password: string;
+interface RegisterRequest { email: string;, password: string;
 	firstName: string; lastName: string;
 }
 
@@ -76,7 +75,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			success: true,
 			userId: newUser.id,
 			sessionId: session.sessionId,
-			user: { id: newUser.id,
+			user: {, id: newUser.id,
 				email: newUser.email,
 				firstName: newUser.firstName,
 				lastName: newUser.lastName,

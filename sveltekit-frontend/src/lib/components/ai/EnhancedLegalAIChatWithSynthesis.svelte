@@ -176,7 +176,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function formatTimestamp(timestamp: number): string { return new Date(timestamp).toLocaleTimeString()}
   function getConfidenceColor(confidence: number): string { if (confidence >= 0.8) return 'text-green-600'; if (confidence >= 0.6) return 'text-yellow-600'; return 'text-red-600'}
-  function getStatusIcon(status: string) { switch (status) { case: 'active': return CheckCircl; case, 'inactive': return AlertTriangl,default: return Loader2}
+  function getStatusIcon(status: string) { switch (status) { case: 'active': return CheckCircl; case, 'inactive': return AlertTriangl,default:return Loader2}
   }
   function copyToClipboard(text: string) { navigator.clipboard.writeText(text)}
 

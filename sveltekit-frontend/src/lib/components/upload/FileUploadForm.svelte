@@ -21,8 +21,7 @@ import Upload from 'lucide-svelte/icons/upload';
 import { zodClient } from 'sveltekit-superforms/adapters';
 import { superForm } from 'sveltekit-superforms/client';
 
-interface Props {
-  data: { form: any };
+interface Props { data: {, form: any };
   caseId?: string;
 }
 

@@ -32,8 +32,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   let isPressed = $state(false);
   let isHovered = $state(false);
 
-  const variantClassMap: Record<string, string> = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white border-blue-800',
+  const variantClassMap: Record<string, string> = { primary: 'bg-blue-600, hover:bg-blue-700 text-white border-blue-800',
     secondary: 'bg-gray-600 hover:bg-gray-700 text-white border-gray-800',
     success: 'bg-green-600 hover:bg-green-700 text-white border-green-800',
     warning: 'bg-yellow-500 hover:bg-yellow-600 text-black border-yellow-700',
@@ -68,7 +67,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
       'font-medium rounded-md',
       'border-2 border-b-4',
       'transition-all duration-150 ease-in-out',
-      'focus: outline-none focus:ring-2 focus: ring-offset-2 focus:ring-blue-500',
+      'focus:outline-none focus:ring-2 focus:ring-offset-2, focus:ring-blue-500',
       variantClasses,
       sizeClasses,
       stateClasses,
@@ -122,9 +121,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 </Button.Root>
 
 <style>
-  :global(.nes-btn) {
-    position: relative;
-	display: inline-block;
+  :global(.nes-btn) { position: relative;, display: inline-block;
     padding: 6px 8px;
     margin: 4px;
     text-align: center;

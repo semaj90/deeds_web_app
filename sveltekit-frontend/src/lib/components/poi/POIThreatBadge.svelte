@@ -37,8 +37,7 @@
  icon: CheckCircle,
  label: 'LOW'
  };
- default:
- return {
+ default:return {
  color: 'bg-gray-500 text-white border-gray-600',
  icon: Shield,
  label: 'UNKNOWN'
@@ -51,7 +50,7 @@ let config = $derived(getThreatConfig(threatLevel));
  switch (size) {
  case 'sm': return 'text-xs px-2 py-1';
  case 'lg': return 'text-sm px-4 py-2';
- default: return 'text-xs px-3 py-1';
+ default:return 'text-xs px-3 py-1';
  }
  }
 </script>

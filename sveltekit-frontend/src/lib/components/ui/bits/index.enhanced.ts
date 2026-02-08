@@ -122,9 +122,7 @@ export const EnhancedBitsFonts = {
  * YoRHa Harvard Gaming Color System
  * Academic prestige meets technological aesthetic
  */
-export const EnhancedBitsColors = {
-    background: {
-	primary: '#0d0d0d',   // Deep space black
+export const EnhancedBitsColors = { background: {, primary: '#0d0d0d',   // Deep space black
         secondary: '#1a0f0f', // Harvard crimson shadow
         tertiary: '#2a1515',  // Warm dark crimson
     },

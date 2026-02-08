@@ -2,9 +2,7 @@
   import VectorCard from "./VectorCard.svelte";
 
   // Combine props into single $props call
-  interface Props {
-    searchUrl: string;
-    onSelect: (item: any) => void;
+  interface Props { searchUrl: string;, onSelect: (item: any) => void;
   }
 
   let { searchUrl, onSelect }: Props = $props();
@@ -17,7 +15,7 @@
         const res = await fetch(searchUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ queryText: query })
+            body: JSON.stringify({, queryText: query })
         });
         const data = await res.json();
         results = data.results ?? [];
@@ -42,18 +40,12 @@
 </div>
 
 <style>
-  .bits-search {
-    display: block;
-    width: 100%;
+  .bits-search { display: block;, width: 100%;
   }
-  .search-bar {
-    display: flex;
-    gap: 0.5rem;
+  .search-bar { display: flex;, gap: 0.5rem;
     margin-bottom: 1rem;
   }
-  input {
-    flex: 1;
-    padding: 0.5rem;
+  input { flex: 1;, padding: 0.5rem;
     border: 1px solid #e5e7eb;
     border-radius: 0.375rem;
   }

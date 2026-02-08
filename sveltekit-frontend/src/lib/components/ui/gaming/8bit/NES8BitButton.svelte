@@ -65,7 +65,7 @@
  relative font-bold uppercase tracking-wider
  {sizeStyles[size]}
  transition-transform duration-75
- disabled: opacity-50 disabled:cursor-not-allowed
+ disabled:opacity-50 disabled:cursor-not-allowed
  { className }
  "
  style="

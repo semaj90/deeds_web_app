@@ -4,7 +4,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 export const GET: RequestHandler = async () => {
 	const config = {
 		// PostgreSQL Configuration
-		postgres: { host: env?.PGHOST ?? '127.0.0.1',
+		postgres: { host:env?.PGHOST ?? '127.0.0.1',
 			port: parseInt(env?.PGPORT ?? '5434'),
 			database: env?.PGDATABASE ?? 'legal',
 			ssl: env.PGSSL === 'true'

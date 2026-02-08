@@ -184,7 +184,7 @@
                 {#if snapshot.matches('uploading')}
                     <div>> UPLOADING_DOCUMENT_PACKETS...</div>
                     <div>> PACKET_COUNT: {context.files.length}</div>
-                    <div>> TARGET: PostgreSQL17 + MinIO + Qdrant</div>
+                    <div>> TARGET:PostgreSQL17 + MinIO + Qdrant</div>
                 {:else}
                     <div>> CONNECTION_ESTABLISHED.</div>
                     <div>> ANALYZING_DOCUMENT_TOPOLOGY...</div>

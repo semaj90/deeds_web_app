@@ -28,16 +28,12 @@
 	} = $props();
 
 	// AI suggestion types
-	interface AISuggestion {
-		id: string;
-		type: 'completion' | 'grammar' | 'semantic' | 'legal_term';
+	interface AISuggestion { id: string;, type: 'completion' | 'grammar' | 'semantic' | 'legal_term';
 		text: string;
 		replacement?: string;
 		confidence: number;
 		reasoning: string;
-		range?: {
-			start: number;
-			end: number;
+		range?: { start: number;, end: number;
 		};
 	}
 
@@ -89,11 +85,9 @@
 	}, suggestionDelay);
 
 	// Generate AI suggestions using multiple techniques
-	async function generateAISuggestions(context: {
-		text: string;
-		contextBefore: string;
+	async function generateAISuggestions(context: { text: string;, contextBefore: string;
 		contextAfter: string;
-		cursorPosition: number;
+	, cursorPosition: number;
 	}): Promise<AISuggestion[]> {
 		const suggestions: AISuggestion[] = [];
 
@@ -207,9 +201,7 @@
 </div>
 
 <style>
-	.enhanced-inline-editor {
-		position: relative;
-		width: 100%;
+	.enhanced-inline-editor { position: relative;, width: 100%;
 	}
 
 	.editor-content {
@@ -225,14 +217,10 @@
 		border-color: #3b82f6;
 	}
 
-	.editor-content:empty:before {
-		content: attr(placeholder);
-		color: #9ca3af;
+	.editor-content:empty:before { content: attr(placeholder);, color: #9ca3af;
 	}
 
-	.processing-indicator {
-		position: absolute;
-		bottom: 0.5rem;
+	.processing-indicator { position: absolute;, bottom: 0.5rem;
 		right: 0.5rem;
 		display: flex;
 		align-items: center;
@@ -241,9 +229,7 @@
 		color: #6b7280;
 	}
 
-	.spinner {
-		width: 1rem;
-		height: 1rem;
+	.spinner { width: 1rem;, height: 1rem;
 		border: 2px solid #e5e7eb;
 		border-top-color: #3b82f6;
 		border-radius: 50%;
@@ -256,9 +242,7 @@
 		}
 	}
 
-	.suggestion-popup {
-		position: fixed;
-		background: white;
+	.suggestion-popup { position: fixed;, background: white;
 		border: 1px solid #e5e7eb;
 		border-radius: 0.375rem;
 		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -267,9 +251,7 @@
 		max-width: 300px;
 	}
 
-	.suggestion-item {
-		display: block;
-		width: 100%;
+	.suggestion-item { display: block;, width: 100%;
 		padding: 0.5rem;
 		text-align: left;
 		border: none;

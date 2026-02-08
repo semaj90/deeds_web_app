@@ -50,8 +50,7 @@
 				return '#ff9800';
 			case 'error':
 				return '#f44336';
-			default:
-				return '#999';
+			default:return '#999';
 		}
 	}
 
@@ -63,8 +62,7 @@
 				return '#ff9800';
 			case 'low':
 				return '#4caf50';
-			default:
-				return '#999';
+			default:return '#999';
 		}
 	}
 </script>

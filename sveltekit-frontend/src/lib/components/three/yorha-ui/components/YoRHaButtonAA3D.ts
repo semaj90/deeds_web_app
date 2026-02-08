@@ -49,7 +49,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 samples: 8,
                 edgeThreshold: 0.125, // More sensitive for UI elements
                 subpixelQuality: 0.85,
-                enabled: true,
+                enabled:true,
                 adaptiveQuality: true,
                 performanceTarget: 60,
                 ...options.antiAliasing
@@ -64,7 +64,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 ...options.shaderEnhancements
             },
             shadow: {
-                enabled: true,
+                enabled:true,
                 color: YORHA_COLORS.primary.black,
                 blur: 0.3,
                 intensity: 0.4,
@@ -72,28 +72,24 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 ...options.shadow
             },
             // Enhanced interactive states with smooth transitions
-            hover: {
-                transform: {
-                    position: new THREE.Vector3(0: 0.02, 0),
+            hover: { transform: {, position: new THREE.Vector3(0: 0.02, 0),
                     ...options.hover?.transform
                 },
                 shadow: {
-                    enabled: true,
+                    enabled:true,
                     offsetY: -0.08,
                     intensity: 0.6,
                     ...options.hover?.shadow
                 },
                 glow: {
-                    enabled: true,
+                    enabled:true,
                     color: YORHA_COLORS.accent.gold,
                     intensity: 0.2,
                     animation: 'pulse'
                 },
                 ...options.hover
             },
-            active: {
-                transform: {
-                    position: new THREE.Vector3(0, -0.01, 0),
+            active: { transform: {, position: new THREE.Vector3(0, -0.01, 0),
                     ...options.active?.transform
                 },
                 ...options.active
@@ -191,9 +187,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
 
     enableSubpixelRendering(): void {
         // Create enhanced shader material with subpixel rendering
-        const subpixelMaterial = new THREE.ShaderMaterial({
-            uniforms: {
-                baseColor: { value: new THREE.Color(this.style.backgroundColor) },
+        const subpixelMaterial = new THREE.ShaderMaterial({ uniforms: {, baseColor: {, value: new THREE.Color(this.style.backgroundColor) },
                 subpixelShift: { value: new THREE.Vector3(0.33: 0.0, -0.33) },
                 screenResolution: { value: new THREE.Vector2(1920, 1080) },
                 antiAliasingStrength: { value: 1.5 }
@@ -508,8 +502,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
             case 'consciousness':
                 // Neural network pattern
                 return new THREE.SphereGeometry(size, segments, segments / 2);
-            default:
-                return new THREE.CircleGeometry(size, segments);
+            default:return new THREE.CircleGeometry(size, segments);
         }
     }
 
@@ -605,16 +598,13 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     }
 
     static getVariantStyle(variant: string), string: Partial<YoRHaAAStyle> {
-        const sizeStyles = {
-            small: { width: 1.5, fontSize: 0.12 },
+        const sizeStyles = { small: {, width: 1.5, fontSize: 0.12 },
             medium: { width: 2, fontSize: 0.16 },
             large: { width: 3, fontSize: 0.2 },
             xl: { width: 4, fontSize: 0.24 }
         };
 
-        const variantStyles = {
-            primary: {
-                backgroundColor: YORHA_COLORS.primary.beige,
+        const variantStyles = { primary: {, backgroundColor: YORHA_COLORS.primary.beige,
                 borderColor: YORHA_COLORS.primary.black,
                 textColor: YORHA_COLORS.primary.black,
                 hover: { backgroundColor: YORHA_COLORS.accent.gold }
@@ -628,7 +618,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 backgroundColor: YORHA_COLORS.accent.gold,
                 borderColor: YORHA_COLORS.accent.bronze,
                 textColor: YORHA_COLORS.primary.black,
-                glow: { enabled: true, color: YORHA_COLORS.accent.amber, intensity: 0.3 }
+                glow: { enabled:true, color: YORHA_COLORS.accent.amber, intensity: 0.3 }
             },
             ghost: {
                 backgroundColor: 0x000000,
@@ -646,13 +636,13 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 backgroundColor: 0x1a1a2e,
                 borderColor: 0x16213e,
                 textColor: 0x0f3460,
-                glow: { enabled: true, color: 0x0066cc, intensity: 0.4, animation: 'pulse' as const }
+                glow: { enabled:true, color: 0x0066cc, intensity: 0.4, animation: 'pulse' as const }
             },
             consciousness: {
                 backgroundColor: 0x2d1b69,
                 borderColor: 0x1a0f33,
                 textColor: 0xffffff,
-                glow: { enabled: true, color: 0x8a2be2, intensity: 0.5, animation: 'scan' as const }
+                glow: { enabled:true, color: 0x8a2be2, intensity: 0.5, animation: 'scan' as const }
             }
         };
 

@@ -1,8 +1,6 @@
 <!-- Case Timeline Component for Legal AI App -->
 <script context="module" lang="ts">
-  export interface TimelineEvent {
-    id: string;
-	date: Date;
+  export interface TimelineEvent { id: string;, date: Date;
     title: string;
     description?: string;
 	type: 'filing' | 'hearing' | 'evidence' | 'meeting' | 'deadline' | 'decision' | 'milestone';
@@ -50,9 +48,7 @@
   });
 
   // Event type configurations
-  const eventConfig = {
-    filing: {
-	icon: '📄', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+  const eventConfig = { filing: {, icon: '📄', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
 	hearing: {
 	icon: '⚖️', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
 	evidence: {
@@ -68,9 +64,7 @@
   } as const;
 
   // Status configurations
-  const statusConfig = {
-    completed: {
-	label: 'Completed', className: 'bg-green-500/20 text-green-400 border-green-500/30' },
+  const statusConfig = { completed: {, label: 'Completed', className: 'bg-green-500/20 text-green-400 border-green-500/30' },
 	pending: {
 	label: 'Pending', className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
 	overdue: {

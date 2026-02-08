@@ -26,7 +26,7 @@ export const GET: RequestHandler = async ({ request }) => {
     async start(controller) {
       // Send initial connection message
       controller.enqueue(
-        encoder.encode(`data: ${JSON.stringify({ type: 'connected', timestamp: Date.now() })}\n\n`)
+        encoder.encode(`data: ${JSON.stringify({, type: 'connected', timestamp: Date.now() })}\n\n`)
       );
 
       // Send periodic stats updates
@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: 'stats',
-                data: { embeddingCache: embKeys.length,
+                data: {, embeddingCache: embKeys.length,
                   fixSuggestions: fixKeys.length,
                   timestamp: Date.now()
                 }
@@ -48,7 +48,7 @@ export const GET: RequestHandler = async ({ request }) => {
           } else {
             // Just send a heartbeat
             controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ type: 'heartbeat', timestamp: Date.now() })}\n\n`)
+              encoder.encode(`data: ${JSON.stringify({, type: 'heartbeat', timestamp: Date.now() })}\n\n`)
             );
           }
         } catch (e) {

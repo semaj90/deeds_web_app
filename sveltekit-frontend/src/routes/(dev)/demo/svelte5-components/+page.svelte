@@ -52,7 +52,7 @@ const selectOptions = [
 const radioOptions = [
 	{ value: 'option1', label: 'Standard Review', description: 'Basic document analysis' },
 	{ value: 'option2', label: 'Deep Analysis', description: 'AI-powered comprehensive review' },
-	{ value: 'option3', label: 'Expert Review', description: 'Human expert verification', disabled: true }
+	{ value: 'option3', label: 'Expert Review', description: 'Human expert verification', disabled:true }
 ];
 
 const menuItems = [

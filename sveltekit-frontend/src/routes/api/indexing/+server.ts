@@ -17,8 +17,7 @@ import postgres from 'postgres';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Configuration
-const CONFIG = {
-  qdrant: { url: process.env?.QDRANT_URL ?? 'http://localhost:6333',
+const CONFIG = { qdrant: {, url: process.env?.QDRANT_URL ?? 'http://localhost:6333',
     collectionCode: 'phase79_codebase',
     collectionErrors: 'phase79_error_analysis'
   },
@@ -56,7 +55,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${CONFIG.ollama.url}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: CONFIG.ollama.embeddingModel,
+      body: JSON.stringify({, model: CONFIG.ollama.embeddingModel,
         prompt: text.substring(0, 8000)
       })
     });
@@ -82,8 +81,7 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
     const createResponse = await fetch(`${CONFIG.qdrant.url}/collections/${collectionName}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vectors: {
-          size: 768,
+      body: JSON.stringify({, vectors: {, size: 768,
           distance: 'Cosine'
         }
       })
@@ -219,7 +217,7 @@ parseInt(
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ points: [
                   {
-                    id: pointId,
+                   , id: pointId,
                     vector: Array.from(embedding),
                     payload: { file_path: relativePath,
                       file_hash: fileHash,
@@ -324,7 +322,7 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ points: [
                 {
-                  id: pointId,
+                 , id: pointId,
                   vector: Array.from(embedding),
                   payload: { error_code: file_path,
                     message: error_count,
@@ -391,7 +389,7 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
       const searchResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vector: Array.from(embedding),
+        body: JSON.stringify({, vector: Array.from(embedding),
           limit,
           with_payload: true
         })
@@ -440,7 +438,7 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
       const searchResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vector: Array.from(embedding),
+        body: JSON.stringify({, vector: Array.from(embedding),
           limit,
           with_payload: true
         })
@@ -495,11 +493,10 @@ export const GET: RequestHandler = async ({ url }) => {
 
     return json({
       success: true,
-      collections: { codebase: {
-          points_count: codebaseCollection?.points_count ?? 0,
+      collections: { codebase: {, points_count: codebaseCollection?.points_count ?? 0,
           vectors_size: codebaseCollection?.config?.params?.vectors?.size ?? 768
         },
-        errors: { points_count: errorsCollection?.points_count ?? 0,
+        errors: {, points_count: errorsCollection?.points_count ?? 0,
           vectors_size: errorsCollection?.config?.params?.vectors?.size ?? 768
         }
       },
@@ -509,8 +506,8 @@ export const GET: RequestHandler = async ({ url }) => {
     return json(
       {
         success: false, error: err.message,
-        collections: { codebase: { points_count: 0 },
-          errors: { points_count: 0 }
+        collections: { codebase: {, points_count: 0 },
+          errors: {, points_count: 0 }
         }
       },
       { status: 500 }

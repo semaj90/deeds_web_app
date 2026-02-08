@@ -131,9 +131,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     display: block;
   }
 
-  .form-control {
-    width: 100%;
-    padding: 0.75rem;
+  .form-control { width: 100%;, padding: 0.75rem;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;

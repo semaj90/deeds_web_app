@@ -21,9 +21,7 @@ const EnhancedDialog = Dialog;
 const EnhancedSelect = Select;
 
 // Legal AI specific components
-export interface LegalEvidenceItem {
-    id: string;
-	title: string;
+export interface LegalEvidenceItem { id: string;, title: string;
     type: "document" | "image" | "video" | "audio" | "transcript";
     priority: "critical" | "high" | "medium" | "low";
     confidence?: number;
@@ -32,16 +30,14 @@ export interface LegalEvidenceItem {
 	updatedAt: Date;
 }
 
-export interface AIAnalysisResult {
-    confidence: number;
-	entities: Array<any>;
+export interface AIAnalysisResult { confidence: number;, entities: Array<any>;
     themes: Array<any>;
 	summary: string;
 }
 
 // Orchestrated Dialog - combines headless functionality with enhanced styling
 export const OrchestratedDialog = Object.assign(HeadlessDialog, {
-    Root: HeadlessDialog,
+    Root:HeadlessDialog,
     Content: HeadlessDialog, // Placeholder, usually HeadlessDialogContent
     Enhanced: EnhancedDialog,
     // Legal AI specific dialog variants

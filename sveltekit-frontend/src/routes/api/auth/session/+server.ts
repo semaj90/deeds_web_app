@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 				expiresAt: session.expiresAt,
 				fresh: session.fresh
 			},
-			user: { id: user.id,
+			user: {, id: user.id,
 				email: user.email,
 				firstName: user.firstName,
 				lastName: user.lastName,

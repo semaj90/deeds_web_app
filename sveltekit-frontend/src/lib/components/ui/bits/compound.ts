@@ -1,4 +1,4 @@
-// Enhanced Bits Compound Component Exports // For legacy compatibility with compound syntax (Button.Root: Card.Root, etc.) 
+// Enhanced Bits Compound Component Exports // For legacy compatibility with compound syntax (Button.Root:Card.Root, etc.) 
 import type {
 CompoundButton, Dialog as CompoundDialog, Card as CompoundCard, Select as CompoundSelect }
 from './index.js';

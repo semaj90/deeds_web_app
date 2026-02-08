@@ -14,9 +14,7 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
-	interface SearchResult {
-		id: string;
-	filePath: string;
+	interface SearchResult { id: string;, filePath: string;
 		label: string;
 	type: string;
 		score: number;
@@ -211,28 +209,20 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-	.semantic-search {
-		position: relative;
-	width: 100%;
+	.semantic-search { position: relative;, width: 100%;
 		max-width: 400px;
 	}
 
-	.search-input-container {
-		position: relative;
-	display: flex;
+	.search-input-container { position: relative;, display: flex;
 		align-items: center;
 	}
 
-	.search-icon {
-		position: absolute;
-	left: 0.75rem;
+	.search-icon { position: absolute;, left: 0.75rem;
 		color: rgba(255, 255, 255, 0.5);
 		pointer-events: none;
 	}
 
-	.search-input {
-		width: 100%;
-	background: rgba(255, 255, 255, 0.05);
+	.search-input { width: 100%;, background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px;
 	padding: 0.625rem 2.5rem 0.625rem 2.5rem;
@@ -252,29 +242,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	.loading-icon,
-	.clear-btn {
-		position: absolute;
-	right: 0.75rem;
+	.clear-btn { position: absolute;, right: 0.75rem;
 		color: rgba(255, 255, 255, 0.5);
 	}
 
-	.clear-btn {
-		background: transparent;
-	border: none;
+	.clear-btn { background: transparent;, border: none;
 		cursor: pointer;
 	padding: 0.25rem;
 		border-radius: 4px;
 	transition:all 0.2s ease;
 	}
 
-	.clear-btn:hover {
-		color: white;
-	background: rgba(255, 255, 255, 0.1);
+	.clear-btn:hover { color: white;, background: rgba(255, 255, 255, 0.1);
 	}
 
-	.search-results {
-		position: absolute;
-	top: calc(100% + 0.5rem);
+	.search-results { position: absolute;, top: calc(100% + 0.5rem);
 		left: 0;
 	right: 0;
 		background: rgba(0, 0, 0, 0.95);

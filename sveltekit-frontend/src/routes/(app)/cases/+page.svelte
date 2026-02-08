@@ -50,7 +50,7 @@
 			case 'high': return 'border-yellow-600 bg-yellow-500/20 text-yellow-100';
 			case 'medium': return 'border-blue-600 bg-blue-500/20 text-blue-100';
 			case 'low': return 'border-green-600 bg-green-500/20 text-green-100';
-			default: return 'border-slate-600 bg-slate-500/20 text-slate-100';
+			default:return 'border-slate-600 bg-slate-500/20 text-slate-100';
 		}
 	}
 
@@ -61,7 +61,7 @@
 			case 'pending_review': return 'border-yellow-500 bg-yellow-500/20 text-yellow-100';
 			case 'closed': return 'border-slate-500 bg-slate-500/20 text-slate-100';
 			case 'archived': return 'border-slate-700 bg-slate-700/20 text-slate-300';
-			default: return 'border-slate-500 bg-slate-500/20 text-slate-100';
+			default:return 'border-slate-500 bg-slate-500/20 text-slate-100';
 		}
 	}
 

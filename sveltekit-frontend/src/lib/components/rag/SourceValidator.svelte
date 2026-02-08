@@ -25,7 +25,7 @@ let {
 	onValidate,
 	onCancel
 }: SourceValidatorProps & {
-	chunks?: Array<{ chunk_id: string; confidence: ConfidenceLevel; source_title: string; score: number; text?: string; snippet?: string; source_type?: string; page_num?: number; has_table?: boolean; has_image?: boolean; related_entities: string[]; source_url?: string }>;
+	chunks?: Array<{ chunk_id: string;, confidence: ConfidenceLevel; source_title: string; score: number; text?: string; snippet?: string; source_type?: string; page_num?: number; has_table?: boolean; has_image?: boolean; related_entities: string[]; source_url?: string }>;
 	isLoading?: boolean;
 	onValidate?: (selectedIds: string[]) => void;
 	onCancel?: () => void;
@@ -86,7 +86,7 @@ function handleValidate() {
 }
 
 // Confidence badge styling
-function getConfidenceBadge(confidence: ConfidenceLevel): { class: string; label: string } {
+function getConfidenceBadge(confidence: ConfidenceLevel): { class: string;, label: string } {
   switch (confidence) {
     case 'high':
       return { class: 'badge-success', label: 'High' };
@@ -94,8 +94,7 @@ function getConfidenceBadge(confidence: ConfidenceLevel): { class: string; label
       return { class: 'badge-warning', label: 'Medium' };
     case 'low':
       return { class: 'badge-error', label: 'Low' };
-    default:
-      return { class: 'badge-ghost', label: 'Marginal' };
+    default:return { class: 'badge-ghost', label: 'Marginal' };
   }
 }
 

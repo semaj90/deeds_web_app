@@ -58,8 +58,7 @@
         return "bg-blue-100 text-blue-800";
       case "archived":
         return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      default:return "bg-gray-100 text-gray-800";
     }
   }
 
@@ -73,8 +72,7 @@
         return "bg-orange-100 text-orange-800";
       case "urgent":
         return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      default:return "bg-gray-100 text-gray-800";
     }
   }
 
@@ -88,8 +86,7 @@
         return Archive;
       case "archived":
         return Archive;
-      default:
-        return FileText;
+      default:return FileText;
     }
   }
 
@@ -100,7 +97,7 @@
 </script>
 
 <div
-  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover: shadow-md", class:bg-blue-50={isActive}
+  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md", class:bg-blue-50={isActive}
   class:border-blue-300={isActive}
   class:opacity-50={disabled}
   class:cursor-not-allowed={disabled}

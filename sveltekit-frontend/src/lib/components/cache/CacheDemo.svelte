@@ -96,7 +96,7 @@
 	key: cacheKey,
           value: cacheValue,
           options: {
-	ttl: parseInt(selectedTTL) * 1000,
+, ttl: parseInt(selectedTTL) * 1000,
             priority: selectedPriority,
             tags: tags.length > 0 ? tags : undefined
           }
@@ -213,7 +213,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	operations: testData })
+, operations: testData })
       });
       const result = await response.json();
       const duration = Date.now() - startTime;
@@ -253,7 +253,7 @@
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	key: testKey, value: 'test_data', options: {
-	ttl: 60000 } })
+, ttl: 60000 } })
       });
 
       // Test cache hit

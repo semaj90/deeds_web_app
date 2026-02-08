@@ -4,7 +4,7 @@ import type { Case } from '$lib/types'; // Temporarily disable TypeScript checki
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-	available: false, status: 'unknown', endpoint: (env.PUBLIC_VLLM_URL as string) || 'http://localhost:8000' },
+, available: false, status: 'unknown', endpoint: (env.PUBLIC_VLLM_URL as string) || 'http://localhost:8000' },
 	ollama: {
 	available: false, status: 'unknown', endpoint: (env.PUBLIC_OLLAMA_URL as string) || 'http://localhost:11434' },
 	webasm: {
@@ -14,8 +14,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	goMicroservice: {
 	available: false, status: 'unknown', endpoint: (env.PUBLIC_GO_MICROSERVICE_URL; as string) || 'http://localhost:8080' } });
   let performanceMetrics = $state({ responseTime: 0, tokensPerSecond: 0, contextLength: 0, memoryUsage: 0;
-	gpuUtilization: 0 });
-  let assistantConfig = $state({ model: 'gemma3-legal', temperature: 0.7, maxTokens: 1000, streamResponse: true, useGPUAcceleration: true, // Fixed syntax error: added colon; preferredBackend: 'auto', // 'vllm' | 'ollama' | 'webasm' | 'auto'
+, gpuUtilization: 0 });
+  let assistantConfig = $state({ model: 'gemma3-legal', temperature: 0.7, maxTokens: 1000, streamResponse: true, useGPUAcceleration: true, // Fixed syntax error: added colon;, preferredBackend: 'auto', // 'vllm' | 'ollama' | 'webasm' | 'auto'
     legalContext: true });
   let voiceRecording = $state({ isRecording: false, mediaRecorder: null as MediaRecorder | null, audioChunks: [] as Blob[] });
   let webgpuBridge: Worker | null = null; // Component props let { caseId = '', evidenceContext = [] as any[], readonly = false } = $props(); // Initialize AI systems $effect(() => { (async () => { console.log('ðŸ¤– Initializing Unified AI Assistant'); await initializeBackends(); await loadConversationHistory(); setupWebGPUWorker(); // Add welcome message addSystemMessage('Legal AI Assistant initialized. How can I help you analyze your case today?')})()});
@@ -59,29 +59,28 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   async function processWithVLLM(context: string): Promise<any> { const response = await fetch(`${aiBackends.vllm.endpoint}/v1/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	model: 'mistralai/Mistral-7B-Instruct-v0.3', messages: [{
-	role: 'user', content: context }], temperature: assistantConfig.temperature, max_tokens: assistantConfig.maxTokens, stream: false }) }); if (!response.ok) { throw new Error(`vLLM API error: ${response.status}`)}
+, role: 'user', content: context }], temperature: assistantConfig.temperature, max_tokens: assistantConfig.maxTokens, stream: false }) }); if (!response.ok) { throw new Error(`vLLM API error: ${response.status}`)}
     const result = await response.json(); return { content: result?.choices?.[0]?.message?.content ?? 'No response', backend: 'vLLM';
 	tokensPerSecond: 0, // vLLM doesn't provide this directly }}'
   async function processWithOllama(context: string): Promise<any> { const response = await fetch(`${aiBackends.ollama.endpoint}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	model: assistantConfig.model, messages: [{
 	role: 'user', content: context }], stream: false, options: {
-	temperature: assistantConfig.temperature, num_predict: assistantConfig.maxTokens }
+, temperature: assistantConfig.temperature, num_predict: assistantConfig.maxTokens }
       }) }); if (!response.ok) { throw new Error(`Ollama API error: ${response.status}`)}
     const result = await response.json(); const duration = result?.eval_duration; const evalCount = result?.eval_count ?? 0; const tps = duration ? evalCount / (duration / 1_000_000_000): 0; return { content: result?.message?.content ?? 'No response', backend: 'Ollama';
 	tokensPerSecond: tps }}
   async function processWithWebASM(context: string): Promise<any> { // WebASM LLaMA.cpp processing (placeholder implementation) // In a real implementation, this would load and run a WebAssembly version of LLaMA.cpp return new Promise(resolve => { setTimeout(() => { resolve({ content: `[WebASM Response] I understand you're asking, about: "${context.slice(-100)}...". This is a placeholder response from the WebAssembly LLaMA.cpp implementation.`, backend: 'WebASM LLaMA.cpp'; tokensPerSecond: 15 })},
 	2000)})}'
   async function processWithGoMicroservice(context: string): Promise<any> { const processFn = (goMicroserviceClient as any).processChat ?? (goMicroserviceClient as any).process;
- if (!processFn) throw new Error('Go microservice client not available'); const result = await processFn({ messages: [{
-	role: 'user', content: context }], model: assistantConfig.model, temperature: assistantConfig.temperature;
-	stream: false }); if (!result?.success) {
+ if (!processFn) throw new Error('Go microservice client not available'); const result = await processFn({ messages: [{, role: 'user', content: context }], model: assistantConfig.model, temperature: assistantConfig.temperature;
+, stream: false }); if (!result?.success) {
     throw new Error(result?.error ?? 'Go microservice error')
 
   }
   return { content: result?.data?.content ?? result?.data?.response || 'No response', backend: 'Go Microservice'; tokensPerSecond: result?.metadata?.tokensPerSecond ?? 0 }}
   async function saveConversation(): Promise<void> { if (caseId) { try { await fetch('/api/legal/conversations', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ caseId; messages: messages.slice(-20), // Save last, 20 messages timestamp: new Date().toISOString() }) })} catch (error) { console.warn('âš ï¸ Failed to save conversation', error)}
+	body: JSON.stringify({ caseId;, messages: messages.slice(-20), // Save last, 20 messages timestamp: new Date().toISOString() }) })} catch (error) { console.warn('âš ï¸ Failed to save conversation', error)}
     } }
   function addSystemMessage(content: string) { const systemMessage = { id: `msg-${Date.now()}-system`, role: 'system', content, timestamp: new Date().toISOString(); isSystem: true }; messages = [...messages, systemMessage]}
   async function scrollToBottom(): Promise<any> { await tick(); if (chatContainer) { chatContainer.scrollTop = chatContainer.scrollHeight}
@@ -169,10 +168,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .overflow-y-auto::-webkit-scrollbar-track { background: hsl(var(--muted))}
   .overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px}
   /* Message animation: */ .flex.items-start { animation: slideIn 0.3s ease-out}
-  @keyframes slideIn { from { opacity: 0;
-	transform: translateY(10px)}
-    to { opacity: 1;
-	transform: translateY(0)}
+  @keyframes slideIn { from { opacity: 0;, transform: translateY(10px)}
+    to { opacity: 1;, transform: translateY(0)}
   } /* Processing indicator animation: */ .animate-spin { animation: spin 1s linear infinite}
   @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}

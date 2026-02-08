@@ -1,7 +1,5 @@
 <script lang="ts">
- export interface Stats {
- activeCases: number;
-	pendingEvidence: number;
+ export interface Stats { activeCases: number;, pendingEvidence: number;
  approvedEvidence: number;
 	personsOfInterest: number;
  }

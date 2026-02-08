@@ -10,26 +10,21 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Define types locally to avoid importing server schema in browser
- type EvidenceNodeType = {
- id: string;
-	caseId: string;
+ type EvidenceNodeType = { id: string;, caseId: string;
  title: string;
  description?: string;
 	evidenceType: string;
  fileType?: string;
  fileName?: string;
  fileUrl?: string;
-	canvasPosition: { x: number;
-	y: number };
+	canvasPosition: { x: number;, y: number };
  uploadedBy?: number;
 	uploadedAt: string;
  updatedAt: string;
 	x: number;
  y: number };
 
- type EvidenceConnection = {
- id: string;
-	caseId: string;
+ type EvidenceConnection = { id: string;, caseId: string;
  fromEvidenceId: string;
 	toEvidenceId: string;
  connectionType: string;
@@ -87,8 +82,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Grid snapping
  const GRID_SIZE = 50;
- function snapToGrid(x: number, y: number): {
-	x: number; y: number } {
+ function snapToGrid(x: number, y: number): { x: number;, y: number } {
  return {
  x: Math.round(x / GRID_SIZE) * GRID_SIZE,
  y: Math.round(y / GRID_SIZE) * GRID_SIZE,
@@ -105,7 +99,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	nodes: currentNodes, connections: currentConnections,
+, nodes: currentNodes, connections: currentConnections,
  caseId,
  }),
  });
@@ -166,7 +160,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	x: newX, y: newY }),
+, x: newX, y: newY }),
  });
  }
 
@@ -179,7 +173,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	fromNodeId: selected[0],
+, fromNodeId: selected[0],
  toNodeId: selected[1],
  caseId,
  strength: 0.5, // Default strength
@@ -202,7 +196,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	caseId: fromEvidenceId,
+, caseId: fromEvidenceId,
  toEvidenceId: relationshipType,
  strength: 'medium',
  label: relationshipType.replace('_', ' ')
@@ -290,8 +284,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  case 'delete':
  deleteSelectedNodes();
  break;
- default:
- break }
+ default:break }
  }
 
  let canvasElement: HTMLDivElement;
@@ -409,9 +402,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  .mode-selector {
  min-width: 150px }
 
- .actions {
- display: flex;
-	gap: 0.5rem;
+ .actions { display: flex;, gap: 0.5rem;
  align-items: center }
 
  .relationship-selector {
@@ -437,13 +428,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  font-size: 0.875rem;
  min-width: 140px }
 
- .board-main-content {
- flex: 1;
-	display: flex }
+ .board-main-content { flex: 1;, display: flex }
 
- .board-canvas {
- flex: 1;
-	position: relative;
+ .board-canvas { flex: 1;, position: relative;
  overflow: hidden;
 	background: white }
 

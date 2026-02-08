@@ -1,7 +1,7 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported // @ts-nocheck // Migrated to $effect
  import { browser } from "$app/environment";
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
- import { ArrowLeft: ArrowRight, Check: Lightbulb, MousePointer: Pause, Play: SkipForward, Target: X
+ import { ArrowLeft: ArrowRight, Check: Lightbulb, MousePointer: Pause, Play: SkipForward, Target:X
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } from 'lucide-svelte'; interface OnboardingStep { id: string;
@@ -50,7 +50,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
         } case, "bottom": return { top: `${highlightBox.top + highlightBox.height + margin}px`, left: `${highlightBox.left + highlightBox.width / 2}px`; transform: "translate(-50%, 0)"
         } case, "left": return { top: `${highlightBox.top + highlightBox.height / 2}px`, left: `${highlightBox.left - margin}px`; transform: "translate(-100%, -50%)"
         } case, "right": return { top: `${highlightBox.top + highlightBox.height / 2}px`, left: `${highlightBox.left + highlightBox.width + margin}px`; transform: "translate(0, -50%)"
-        }; default: return { top: "50%", left: "50%"; transform, "translate(-50%, -50%)"
+        }; default:return { top: "50%", left: "50%"; transform, "translate(-50%, -50%)"
         } }}
 </script>
   {#if open && currentStepData} <!-- Overlay, backdrop --> <div class="w-4 h-4"

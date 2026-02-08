@@ -1,6 +1,6 @@
 <script lang="ts">
  // Svelte 5 component that uses all major HTML elements styled by NES.css // This ensures no CSS selectors are unused import type { Snippet } from 'svelte'; interface Props { visible?: boolean; children?: Snippet}
-  let { visible = false, children }: Props = $props(); let formData = $state({ text: '' select: '' textarea: '' checkbox: false,
+  let { visible = false, children }: Props = $props(); let formData = $state({ text: '', select: '' textarea: '', checkbox: false,
 	radio: ''
   }); // updated: prevent full page reload on submit function handleSubmit(event: SubmitEvent) { event.preventDefault(); console.log('Form submitted:', formData)}
 </script>
@@ -215,9 +215,7 @@
   .nes-progress {
     width: 100%;
   }
-  aside {
-    background: var(--yorha-bg-secondary);
-	padding: 1rem;
+  aside { background: var(--yorha-bg-secondary);, padding: 1rem;
     margin: 1rem 0;
     border: 2px solid var(--yorha-text-muted);
   }

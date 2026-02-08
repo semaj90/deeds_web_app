@@ -58,7 +58,7 @@
 			case 'lg': return 'max-w-lg';
 			case 'xl': return 'max-w-xl';
 			case 'full': return 'max-w-full mx-4';
-			default: return 'max-w-md';
+			default:return 'max-w-md';
 		}
 	});
 
@@ -85,7 +85,7 @@
 
 	const closeButtonClass = `
 		absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background
-		transition-opacity hover: opacity-100 focus: outline-none focus: ring-2 focus: ring-ring focus:ring-offset-2
+		transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
 	`.replace(/\s+/g, ' ').trim();
 
 	const footerClass = `

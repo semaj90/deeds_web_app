@@ -14,9 +14,7 @@
   import Users from 'lucide-svelte/icons/users';
   import { scale } from 'svelte/transition';
 
-  interface CaseData {
-    id: string;
-	title: string;
+  interface CaseData { id: string;, title: string;
     description?: string;
 	status: 'active' | 'pending' | 'closed' | 'archived';
     priority: 'critical' | 'high' | 'medium' | 'low';
@@ -25,9 +23,7 @@
     assignee?: {
 	name: string;
       avatar?: string };
-    stats: {
-	evidence: number;
-      witnesses: number;
+    stats: { evidence: number;, witnesses: number;
 	documents: number };
     tags?: string[];
     progress?: number }
@@ -49,9 +45,7 @@
 
   let open = $state(false);
 
-  const statusConfig = {
-    active: {
-	label: 'Active', class: 'bg-green-100 text-green-800', icon: CheckCircle },
+  const statusConfig = { active: {, label: 'Active', class: 'bg-green-100 text-green-800', icon: CheckCircle },
 	pending: {
 	label: 'Pending', class: 'bg-yellow-100 text-yellow-800', icon: Clock },
 	closed: {
@@ -60,9 +54,7 @@
 	label: 'Archived', class: 'bg-gray-100 text-gray-800', icon: Archive }
   };
 
-  const priorityConfig = {
-    critical: {
-	icon: '🔴', color: 'text-red-500' },
+  const priorityConfig = { critical: {, icon: '🔴', color: 'text-red-500' },
 	high: {
 	icon: '🟠', color: 'text-orange-500' },
 	medium: {
@@ -103,7 +95,7 @@
             {currentPriority.icon}
           </span>
         </div>
-        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover: text-harvard-crimson, dark:group-hover:text-digital-green">
+        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover:text-harvard-crimson, dark:group-hover:text-digital-green">
           {caseData.title}
         </h3>
         {#if caseData.description}

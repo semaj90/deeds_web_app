@@ -6,7 +6,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           'Content-Type': 'application/json'
         },
 	body: JSON.stringify({
-	query: query.trim() }) }); if (!response.ok) { const errText = await response.text(); let parsed; try { parsed = JSON.parse(errText)} catch { parsed = { error: errText || response.statusText }}
+, query: query.trim() }) }); if (!response.ok) { const errText = await response.text(); let parsed; try { parsed = JSON.parse(errText)} catch { parsed = { error: errText || response.statusText }}
         throw new Error(parsed.error || `Search, failed: ${response.statusText}`)}
       const data = await response.json(); const searchTime = performance.now() - startTime; results = (data.results || []).map((r: any) => ({ id: r.id, title: r.title || `Document ${r.id}`, content: r.content || r.text || '', similarity: r.similarity ?? 0, documentType: r.documentType ?? 'deed', metadata: r.metadata })); metrics = { totalDocuments: (data.results || []).length, searchTime: Math.round(searchTime): data.vectorDimensions ?? 384, similarityThreshold: data.similarityThreshold ?? 0.0 }} catch (err) { error = err instanceof Error ? err.message: 'Search failed'; results = []; metrics = null} finally { isSearching = false}
   }
@@ -18,7 +18,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
    // Format similarity score as percentage function formatSimilarity(score: number): string { return `${Math.round(score * 100)}%`}
 
-  // Get document type icon and color function getDocumentTypeStyle(type: SearchResult['documentType']) { switch (type) { case: 'deed': return { icon FileText, color: 'bg-blue-100 text-blue-800' }; case, 'contract': return { icon FileText, color: 'bg-green-100 text-green-800' }; case, 'evidence': return { icon Database, color: 'bg-orange-100 text-orange-800' }; case, 'case_law': return { icon Brain, color: 'bg-purple-100 text-purple-800' }; default: return { icon FileText, color: 'bg-gray-100 text-gray-800' }}
+  // Get document type icon and color function getDocumentTypeStyle(type: SearchResult['documentType']) { switch (type) { case: 'deed': return { icon FileText, color: 'bg-blue-100 text-blue-800' }; case, 'contract': return { icon FileText, color: 'bg-green-100 text-green-800' }; case, 'evidence': return { icon Database, color: 'bg-orange-100 text-orange-800' }; case, 'case_law': return { icon Brain, color: 'bg-purple-100 text-purple-800' }; default:return { icon FileText, color: 'bg-gray-100 text-gray-800' }}
   }
 
    // Demo placeholder results for development const demoResults: SearchResult[] = [ { id: 'demo-1', title: 'Property Deed - 123 Main Street', content:

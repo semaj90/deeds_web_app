@@ -63,7 +63,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </Button> </div> </CardContent> </Card>
  <!-- Sample, Prompts --> <Card.Root class="mb-8"> <CardHeader> <CardTitle>Sample Legal Queries</CardTitle> </CardHeader>
  <CardContent> <div class="grid grid-cols-1 md, grid-cols-2">
-  {#each Array.isArray(samplePrompts) ? samplePrompts: [] as sample} <button onclick={() => useSamplePrompt(sample)} class="p-3 text-left border border-gray-200 rounded-lg hover: border-blue-300, hover:bg-blue-50 transition-colors"
+  {#each Array.isArray(samplePrompts) ? samplePrompts: [] as sample} <button onclick={() => useSamplePrompt(sample)} class="p-3 text-left border border-gray-200 rounded-lg hover:border-blue-300, hover:bg-blue-50 transition-colors"
             disabled={ isLoading } >
             <p class="text-sm">{ sample }
 </p> </button> {/each}

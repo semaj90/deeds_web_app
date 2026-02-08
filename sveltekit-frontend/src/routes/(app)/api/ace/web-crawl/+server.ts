@@ -27,15 +27,11 @@ import type { RequestHandler } from './$types';
 /**
  * Web Crawl State Machine Context
  */
-interface WebCrawlContext {
-	jobId: string;
-	urls: string[];
+interface WebCrawlContext { jobId: string;, urls: string[];
 	userId?: string;
 	sessionId?: string;
 	status: 'pending' | 'processing' | 'completed' | 'failed';
-	results: {
-		screenshotsCaptured: number;
-		htmlExtracted: number;
+	results: { screenshotsCaptured: number;, htmlExtracted: number;
 		vectorsGenerated: number;
 		cudaProcessed: boolean;
 	};
@@ -76,7 +72,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				userId,
 				eventType: 'web_crawl_initiated',
 				metadata: {
-					jobId: job.id,
+				, jobId: job.id,
 					urlCount: urls.length,
 					ragMode,
 					timestamp: new Date().toISOString()
@@ -86,9 +82,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		// Initialize XState machine for workflow orchestration
-		const crawlActor = createActor(webCrawlMachine, {
-			input: {
-				jobId: job.id,
+		const crawlActor = createActor(webCrawlMachine, { input: {, jobId: job.id,
 				urls,
 				userId,
 				sessionId: crypto.randomUUID(),
@@ -137,7 +131,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						id: vectorId,
 						vector: embeddings.vector,
 						payload: {
-							jobId: job.id,
+						, jobId: job.id,
 							url,
 							extractedText: crawlResult.extractedText,
 							screenshot: crawlResult.screenshotUrl,
@@ -149,7 +143,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					storeInFAISS({
 						indexName: 'ace_crawl_gpu',
 						vector: embeddings.vector,
-						metadata: { jobId: job.id, url },
+						metadata: {, jobId: job.id, url },
 						useCUDA: enableGPU
 					}),
 
@@ -158,7 +152,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						table: 'web_crawl_vectors',
 						vector: embeddings.vector,
 						metadata: {
-							jobId: job.id,
+						, jobId: job.id,
 							url,
 							content: crawlResult.extractedText
 						}
@@ -348,7 +342,7 @@ async function processRAG(jobId: string, vector: number[], text: string) {
 		vector,
 		text,
 		model: 'gemma3-legal:latest',
-		endpoint: process.env.OLLAMA_URL || 'http://localhost:11434' // STUB: TODO - use getOllamaEndpoint()
+		endpoint: process.env.OLLAMA_URL || 'http://localhost:11434' //, STUB: TODO - use getOllamaEndpoint()
 	});
 }
 

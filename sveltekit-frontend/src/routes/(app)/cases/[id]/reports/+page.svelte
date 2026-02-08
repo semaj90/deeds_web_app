@@ -39,7 +39,7 @@
 			const res = await fetch('/api/reports/generate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ caseId: caseData.id, type: 'charging_memo' })
+				body: JSON.stringify({, caseId: caseData.id, type: 'charging_memo' })
 			});
 			const responseData = await res.json();
 
@@ -64,7 +64,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					reportId: selectedReport.id,
+				, reportId: selectedReport.id,
 					title: selectedReport.title || 'Untitled Report',
 					contentHtml: editorRef?.getHTML?.(),
 					contentJson: editorRef?.getJSON?.()
@@ -117,7 +117,7 @@
 				<button
 					type="button"
 					class="w-full text-left px-3 py-2 rounded-xl border border-slate-800/60
-                 hover: border-amber-400/60, hover:bg-slate-800/60 transition-colors
+                 hover:border-amber-400/60, hover:bg-slate-800/60 transition-colors
                  flex items-center justify-between gap-3 text-sm"
 					onclick={() => openResume(report)}
 				>

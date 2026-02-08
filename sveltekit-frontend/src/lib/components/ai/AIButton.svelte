@@ -54,11 +54,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // Variant configurations
   const variantClasses = {
     primary:
-      'bg-gradient-to-br from-yorha-primary to-yorha-secondary hover: from-yorha-secondary, hover:to-yorha-primary border-yorha-primary',
+      'bg-gradient-to-br from-yorha-primary to-yorha-secondary hover:from-yorha-secondary, hover:to-yorha-primary border-yorha-primary',
     secondary:
-      'bg-gradient-to-br from-yorha-bg-secondary to-yorha-bg-tertiary hover: from-yorha-bg-tertiary, hover:to-yorha-bg-secondary border-yorha-border',
+      'bg-gradient-to-br from-yorha-bg-secondary to-yorha-bg-tertiary hover:from-yorha-bg-tertiary, hover:to-yorha-bg-secondary border-yorha-border',
     accent:
-      'bg-gradient-to-br from-yorha-accent to-blue-400 hover: from-blue-400, hover:to-yorha-accent border-yorha-accent',
+      'bg-gradient-to-br from-yorha-accent to-blue-400 hover:from-blue-400, hover:to-yorha-accent border-yorha-accent',
   } as const;
 
   // Handle button click
@@ -133,10 +133,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				shadow-lg
 				transition-all duration-300 ease-in-out
 				transform-gpu;
-				focus: outline-none, focus: ring-2, focus: ring-yorha-primary, focus: ring-offset-2, focus: ring-offset-yorha-bg-primary;
+				focus:outline-none, focus:ring-2, focus:ring-yorha-primary, focus:ring-offset-2, focus:ring-offset-yorha-bg-primary;
 	active:scale-95
 				group
-				{disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110, hover: shadow-xl, hover:shadow-yorha-primary/20'}
+				{disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110, hover:shadow-xl, hover:shadow-yorha-primary/20'}
 				{loading ? 'animate-pulse' : ''}
 			"
       {disabled}

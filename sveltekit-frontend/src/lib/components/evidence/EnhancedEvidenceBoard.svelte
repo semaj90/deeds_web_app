@@ -4,11 +4,9 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	filename: string; type: 'document' | 'image' | 'video' | 'audio' | 'other'; uploadedAt: string;
 	status: 'uploading' | 'processing' | 'ready' | 'error'; size: number;
-	mimeType: string; aiAnalysis?: { summary?: string; confidence?: number; relevantLaws?: string[]; suggestedTags?: string[]; prosecutionScore?: number; legalRelevance?: string; keyFindings?: string[]; recommendations?: string[]; storage?: { bucket?: string; key?: string; url?: string}; unifiedInsights?: unknown}; position { x: number;
-	y: number }; previewUrl?: string}
+	mimeType: string; aiAnalysis?: { summary?: string; confidence?: number; relevantLaws?: string[]; suggestedTags?: string[]; prosecutionScore?: number; legalRelevance?: string; keyFindings?: string[]; recommendations?: string[]; storage?: { bucket?: string; key?: string; url?: string}; unifiedInsights?: unknown}; position { x: number;, y: number }; previewUrl?: string}
 
-interface SearchSuggestion { text: string;
-	type: 'case' | 'law' | 'evidence' | 'precedent'; confidence: number;
+interface SearchSuggestion { text: string;, type: 'case' | 'law' | 'evidence' | 'precedent'; confidence: number;
 	source: string; reasoning?: string}
 
   // State management using Svelte, 5 runes let evidenceItems = $state<EvidenceItem[]>([]);
@@ -42,7 +40,7 @@ interface SearchSuggestion { text: string;
       } catch (e) { // ignore console.warn('startup error', e)}
     })()}); // Service health checks async function checkServiceStatus(): Promise<any> { try { // Check Ollama connection (send a small health payload) const ollamaResponse = await fetch('/api/v1/evidence/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	evidenceId: 'health-check', filename: 'test.txt', content: 'health check', type: 'document'
+, evidenceId: 'health-check', filename: 'test.txt', content: 'health check', type: 'document'
         }) }); ollamaConnected = ollamaResponse.status !== 500; // Check MinIO connection try { const minioResponse = await fetch('/api/v1/storage/health'); minioConnected = minioResponse.ok} catch (error) { console.warn('MinIO health check failed:', error); minioConnected = false}
       console.log('Service status - Ollama:', ollamaConnected ? 'âœ…': 'âŒ'); console.log('Service status - MinIO:', minioConnected ? 'âœ…': 'âŒ')} catch (error) { console.warn('Service health check failed:', error); ollamaConnected = false}
   }
@@ -92,18 +90,17 @@ interface SearchSuggestion { text: string;
    const formData = new FormData(); formData.append('file', file); formData.append('position', JSON.stringify(newEvidence.position)); formData.append('bucket', currentBucket); formData.append('useMinIO', uploadToMinIO.toString()); if (uploadToMinIO) { try { const keyCandidate = `${(window as unknown).__CURRENT_USER_ID__ || 'anon'}/${file.name}`;
    const signedResp = await fetch('/api/v1/storage/signed-url', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	key: keyCandidate, bucket: currentBucket }) }); if (signedResp.ok) { const signedJson = await signedResp.json();
+, key: keyCandidate, bucket: currentBucket }) }); if (signedResp.ok) { const signedJson = await signedResp.json();
    const uploadUrl = signedJson.url;
    const namespacedKey = signedJson.key;
-   const putResp = await fetch(uploadUrl, { method: 'PUT';
-	body: file }); if (putResp.ok) { // update item safely evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), storage: {
+   const putResp = await fetch(uploadUrl, { method: 'PUT';, body: file }); if (putResp.ok) { // update item safely evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), storage: {
 	bucket: signedJson.bucket || currentBucket, key: namespacedKey;
 	url: signedJson.url }
                         } }: item ); toastMessage = `Uploaded ${file.name} â†’ ${signedJson.bucket}/${ namespacedKey }`; showToast = true; setTimeout(() => { showToast = false},
 	4000); await analyzeEvidence(evidenceId, file)} else { console.error('Direct PUT failed:', await putResp.text()); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'error' }: item )}
             } else { // fallback to server upload console.warn('Signed URL request failed, falling back to server upload');
    const uploadResp = await fetch('/api/v1/storage/upload', { method: 'POST', credentials: 'include';
-	body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), storage: {
+, body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), storage: {
 	bucket: uploadJson.bucket, key: uploadJson.key;
 	url: uploadJson.url } }
                       }: item ); await analyzeEvidence(evidenceId, file)} else { evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'error' }: item )}
@@ -162,7 +159,7 @@ interface SearchSuggestion { text: string;
 	parameters: {
 	similarityThreshold: 0.7, strategyType: 'comprehensive', correlationConfidence: 0.6, includeVisualization true },
 	context: {
-	caseType: 'commercial', urgency: 'medium'
+, caseType: 'commercial', urgency: 'medium'
           } }) }); if (response.ok) { const analysis = await response.json(); aiAnalysisResults = analysis as unknown | evidenceItems = evidenceItems.map(item => { const id = item.id,
    const correlations = ((analysis as unknown).correlationAnalysis?.correlations ?? []).filter( (c: unknown) => c.evidenceA === id || c.evidenceB === id );
    const vectorGroup = ((analysis as unknown).vectorAnalysis?.similarityGroups ?? []).find( (g: unknown) => Array.isArray(g.evidenceIds) && g.evidenceIds.includes(id) );
@@ -183,7 +180,7 @@ interface SearchSuggestion { text: string;
   function handleEvidenceSelect(evidenceId: string | null) { if (evidenceId) { if (!selectedEvidence.includes(evidenceId)) { selectedEvidence = [...selectedEvidence, evidenceId]}
     } }
   function handleCanvasDropZone(data: {
-	x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 0) { uploadFiles(data.files, { x: data.x, y: data.y })} else { console.log('Canvas drop zone clicked at:', data)}
+, x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 0) { uploadFiles(data.files, { x: data.x, y: data.y })} else { console.log('Canvas drop zone clicked at:', data)}
   } </script>
  <svelte:head> <title>ðŸŽ® Evidence Board - NESÃ—YoRHaÃ—N64 Legal AI</title>
  <link href="https, //unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" /> </svelte:head>
@@ -343,14 +340,12 @@ interface SearchSuggestion { text: string;
   <style>
   .animate-spin { animation: spin 1s linear infinite}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
-  .evidence-thumb { width: 40px;
-	height: 40px; object-fit: cover;
+  .evidence-thumb { width: 40px;, height: 40px; object-fit: cover;
 	display: block}
   .evidence-canvas-container { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px;
 	padding: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.1); border: 2px solid rgba(59, 130, 246, 0.2); position: relative;
 	overflow: hidden}
-  .evidence-canvas-container: before { content: '';
-	position: absolute; top: 0;
+  .evidence-canvas-container: before { content: '';, position: absolute; top: 0;
 	left: 0; right: 0;
 	height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981); border-radius: 12px 12px 0 0}
 
@@ -377,10 +372,7 @@ interface SearchSuggestion { text: string;
   @media (prefers-reduced-motion: reduce) {
     :global(.retro-glow) .evidence-canvas-container, :global(.retro-glow) .evidence-canvas-container: before, :global(.retro-glow) .evidence-canvas-container: after { animation: none !important}
   }
-  @keyframes scanDrift { 0% { transform: translateY(0);
-	opacity: 0.55} 50% { transform: translateY(-6px);
-	opacity: 0.42} 100% { transform: translateY(0);
-	opacity: 0.55} }
+  @keyframes scanDrift { 0% { transform: translateY(0);, opacity: 0.55} 50% { transform: translateY(-6px);, opacity: 0.42} 100% { transform: translateY(0);, opacity: 0.55} }
   @keyframes hueShift { 0% { filter: brightness(1.05) saturate(1.15) hue-rotate(0deg)} 50% { filter: brightness(1.1) saturate(1.25) hue-rotate(25deg)} 100% { filter: brightness(1.05) saturate(1.15) hue-rotate(0deg)} }
   @keyframes pulseRing { 0% { outline-offset: 0 } 100% { outline-offset: 4px} }
   @keyframes canvasGlow { 0% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.2)} 100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), 0 0 60px rgba(139, 92, 246, 0.3)} }

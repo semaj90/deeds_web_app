@@ -51,7 +51,7 @@
 			case 'high': return 'bg-red-500/20 text-red-400 border-red-500/50';
 			case 'med': return 'bg-orange-500/20 text-orange-400 border-orange-500/50';
 			case 'low': return 'bg-green-500/20 text-green-400 border-green-500/50';
-			default: return 'bg-slate-500/20 text-slate-400 border-slate-500/50';
+			default:return 'bg-slate-500/20 text-slate-400 border-slate-500/50';
 		}
 	}
 
@@ -63,7 +63,7 @@
 			case 'utility': return '🔧';
 			case 'schema': return '📋';
 			case 'worker': return '👷';
-			default: return '📁';
+			default:return '📁';
 		}
 	}
 
@@ -104,7 +104,7 @@
 							type="text"
 							placeholder="Search components, modules, dependencies..."
 							bind:value={searchQuery}
-							class="w-80 rounded-lg border border-white/20 bg-white/10 px-4 py-2 pl-10 text-sm placeholder-white/60 backdrop-blur focus: border-white/40, focus:outline-none"
+							class="w-80 rounded-lg border border-white/20 bg-white/10 px-4 py-2 pl-10 text-sm placeholder-white/60 backdrop-blur focus:border-white/40, focus:outline-none"
 						/>
 						<svg class="absolute left-3 top-2.5 h-4 w-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -191,7 +191,7 @@
 		<!-- File Cards Grid -->
 		<div class="grid gap-4">
 			{#each filteredFiles() as file (file.id)}
-				<div class="group rounded-xl border border-slate-700/50 bg-slate-800/30 p-5 backdrop-blur transition-all hover: border-cyan-500/50, hover:bg-slate-800/50">
+				<div class="group rounded-xl border border-slate-700/50 bg-slate-800/30 p-5 backdrop-blur transition-all hover:border-cyan-500/50, hover:bg-slate-800/50">
 					<div class="flex items-start gap-4">
 						<!-- Icon -->
 						<div class="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-2xl">

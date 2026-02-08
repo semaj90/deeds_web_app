@@ -56,7 +56,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       type: 'START_PROCESSING',
       document,
       options: {
-	extractEntities: true
+, extractEntities: true
 ,
         generateSummary: true, assessRisk: true, generateEmbedding: true, storeInQdrant: true, useContext7: true, useSemanticSearch: false
       }
@@ -268,7 +268,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     {#if !isProcessing && !isCompleted && document}
       <button
         onclick={startProcessing}
-        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover: bg-blue-700, focus: outline-none, focus: ring-2, focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700, focus:outline-none, focus:ring-2, focus:ring-blue-500 focus:ring-offset-2 transition-colors"
       >
         Start Processing
       </button>
@@ -276,7 +276,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     {#if isProcessing}
       <button
         onclick={cancelProcessing}
-        class="px-4 py-2 bg-red-600 text-white rounded-lg hover: bg-red-700, focus: outline-none, focus: ring-2, focus:ring-red-500 focus:ring-offset-2 transition-colors"
+        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700, focus:outline-none, focus:ring-2, focus:ring-red-500 focus:ring-offset-2 transition-colors"
       >
         Cancel
       </button>
@@ -284,7 +284,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     {#if isFailed && $context.retryCount < $context.maxRetries}
       <button
         onclick={retryProcessing}
-        class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover: bg-yellow-700, focus: outline-none, focus:ring-2 focus:ring-yellow-500"
+        class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700, focus:outline-none, focus:ring-2 focus:ring-yellow-500"
       >
         Retry ({$context.retryCount}/{$context.maxRetries})
       </button>
@@ -296,7 +296,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           send({ type: 'CANCEL' });
           // You might want to emit an event or call a callback here
         }}
-        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover: bg-gray-700, focus: outline-none, focus: ring-2, focus:ring-gray-500"
+        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700, focus:outline-none, focus:ring-2, focus:ring-gray-500"
       >
         Process Another Document
       </button>

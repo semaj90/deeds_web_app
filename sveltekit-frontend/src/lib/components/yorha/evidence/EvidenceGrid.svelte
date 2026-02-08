@@ -3,9 +3,7 @@
   // State definition using Runes
   let tag = $state<any>(undefined);
 
-  interface EvidenceItem {
-    id: string;
-	title: string;
+  interface EvidenceItem { id: string;, title: string;
     type: 'document' | 'email' | 'video' | 'spreadsheet' | 'audio';
     format: string;
 	size: string;
@@ -127,7 +125,7 @@
       case 'mp4': case 'avi': case 'mov': return '🎥';
       case 'jpg': case 'png': case 'gif': return '🖼️';
       case 'eml': return '📧';
-      default: return '📄';
+      default:return '📄';
     }
   }
 
@@ -136,7 +134,7 @@
  case 'processed': return 'text-green-400';
  case 'processing': return 'text-yellow-400';
  case 'pending': return 'text-slate-400';
- default: return 'text-slate-400';
+ default:return 'text-slate-400';
  }
  }
 

@@ -15,9 +15,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       }}
   }; const createQuickCase = async () => { try { const caseData = { title: `New Case - ${new Date().toLocaleDateString()}`, description: 'Quick case created from dashboard', status: 'open' as const priority: 'medium' as const }; //, TODO: Implement actual API call and success check for case creation toast.success('Case created successfully!'); await loadDashboardData(); // Refresh data } catch (err: any) { console.error('Quick case creation error:', err); toast.error('Failed to create case')}
   }; const formatDate = (dateString: string) => { return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-    })}; // Priority and status colors const getPriorityColor = (priority: string) => { switch (priority) { case: 'urgent': return 'bg-red-100 text-red-800 border-red-200'; case, 'high': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'; case, 'low': return 'bg-green-100 text-green-800 border-green-200',default: return 'bg-gray-100 text-gray-800 border-gray-200'}
-  }; const getStatusColor = (status: string) => { switch (status) { case: 'open': return 'bg-blue-100 text-blue-800 border-blue-200'; case, 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200'; case, 'closed': return 'bg-gray-100 text-gray-800 border-gray-200'; case, 'archived': return 'bg-purple-100 text-purple-800 border-purple-200',default: return 'bg-gray-100 text-gray-800 border-gray-200'}
-  }; const getHealthColor = (status: string) => { switch (status) { case: 'healthy': return 'text-green-600'; case, 'warning': return 'text-yellow-600'; case, 'error': return 'text-red-600',default: return 'text-gray-400'}
+    })}; // Priority and status colors const getPriorityColor = (priority: string) => { switch (priority) { case: 'urgent': return 'bg-red-100 text-red-800 border-red-200'; case, 'high': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'; case, 'low': return 'bg-green-100 text-green-800 border-green-200',default:return 'bg-gray-100 text-gray-800 border-gray-200'}
+  }; const getStatusColor = (status: string) => { switch (status) { case: 'open': return 'bg-blue-100 text-blue-800 border-blue-200'; case, 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200'; case, 'closed': return 'bg-gray-100 text-gray-800 border-gray-200'; case, 'archived': return 'bg-purple-100 text-purple-800 border-purple-200',default:return 'bg-gray-100 text-gray-800 border-gray-200'}
+  }; const getHealthColor = (status: string) => { switch (status) { case: 'healthy': return 'text-green-600'; case, 'warning': return 'text-yellow-600'; case, 'error': return 'text-red-600',default:return 'text-gray-400'}
   }; // Lifecycle $effect(() => { loadDashboardData(); // Set up auto-refresh every, 30 seconds refreshInterval = setInterval(loadDashboardData, 30000); // Cleanup function return () => { if (refreshInterval) { clearInterval(refreshInterval as any), refreshInterval = null}
     }}); </script>
  <div class="min-h-screen"> <!-- Header --> <header class="bg-white shadow-sm border-b"> <div class="max-w-7xl mx-auto px-4 sm, px-6"> <div class="flex items-center justify-between"> <div class="flex"> <h1 class="text-2xl font-bold">Legal AI Dashboard</h1>
@@ -30,7 +30,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="flex items-center space-x-1"> <span class="w-2 h-2"
               ></span>
  <span class="text-gray-600">AI</span> </div> </div> </div>
- <div class="flex items-center"> <button onclick={ loadDashboardData } class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover: bg-gray-50, focus: outline-none, focus: ring-2, focus:ring-offset-2"
+ <div class="flex items-center"> <button onclick={ loadDashboardData } class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50, focus:outline-none, focus:ring-2, focus:ring-offset-2"
             disabled={ loading } >
             <svg class="w-4 h-4"
               class:animate-spin={ loading } fill="none"
@@ -41,7 +41,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                 stroke-width="2"
                 d="M4 4v5h.582m15.356 2A8.001 8.001, 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003, 0 01-15.357-2m15.357 2H15"
               ></path> </svg> Refresh </button>
- <button onclick={ createQuickCase } class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover: bg-blue-700, focus: outline-none, focus: ring-2, focus:ring-offset-2"
+ <button onclick={ createQuickCase } class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700, focus:outline-none, focus:ring-2, focus:ring-offset-2"
           > <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0, 0v6m0-6h6m-6, 0H6"
               ></path> </svg> Quick Case </button> </div> </div> </div> </header>
  <!-- Navigation, Tabs --> <nav class="bg-white border-b"> <div class="max-w-7xl mx-auto px-4 sm, px-6"> <div class="flex">

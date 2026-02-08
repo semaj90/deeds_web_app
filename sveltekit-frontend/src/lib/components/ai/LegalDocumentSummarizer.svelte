@@ -16,7 +16,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface SummarizationRequest {
     document_id: string, title: string, content: string, document_type: 'contract' | 'judgment' | 'brief' | 'statute',summary_type: 'executive' | 'detailed' | 'bullet_points' | 'legal_analysis',
-    max_length: number, focus: string[],
+    max_length: number, focus:string[],
     metadata: { [key: string]: any }
   }
   interface SummarizationResponse {

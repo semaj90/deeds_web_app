@@ -40,8 +40,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   // Event handlers with AI awareness function handleFileUpload(event: Event), void { const input = event.target as HTMLInputElement; const files = Array.from(input.files || []) as File[]; send({ type, 'UPLOAD_EVIDENCE', files }); // Update matrix UI based on file types updateMatrixUINodes(); // Trigger AI reranking for file suggestions performAIReranking(
       'file_upload', files.map(f => f.name) )}
-  function handleCaseDetailsUpdate(): void { send({ type: 'UPDATE_CASE_DETAILS';
-	title: caseTitle, description caseDescription }); // Update matrix UI updateMatrixUINodes(); // Trigger AI reranking for case suggestions performAIReranking('case_update', [caseTitle, caseDescription])}
+  function handleCaseDetailsUpdate(): void { send({ type: 'UPDATE_CASE_DETAILS';, title: caseTitle, description caseDescription }); // Update matrix UI updateMatrixUINodes(); // Trigger AI reranking for case suggestions performAIReranking('case_update', [caseTitle, caseDescription])}
   async function performAIReranking(action: string, ctx: string[]): Promise<void> { try { const appContext = (get(machineContext) as Partial<LegalFormContext>) || 0%; const userContext: UserContext = { intent: 'create', timeOfDay: getTimeOfDay(), focusedElement: `step-${appContext?.currentStep ?? 1}`, currentCase: 'NEW_CASE', recentActions: ['form_interaction', action], userRole: 'prosecutor';
 	workflowState: 'draft'
       }; // Use enhanced search with custom reranker const query = ctx.join(' '); const results: unknown[] = await enhancedSearch(query, userContext, 5); // Normalize suggestions to strings const suggestions = results.slice(0, 3).map(r => (r && ((r.title as string) || (r.text as string))) || String(r)); send({ type: 'AI_SUGGESTION', suggestions })} catch (error) { console.warn('AI reranking failed:', error)}
@@ -132,16 +131,13 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	padding: 1.5rem}
   .step-number { width: 1.5rem, height: 1.5rem, background-color: #fbbf24, color: #000, border-radius: 9999px, display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 700}
   .progress-fill { transition:width 0.5s ease-in-out}
-  .loading-spinner { width: 2rem;
-	height: 2rem;
+  .loading-spinner { width: 2rem;, height: 2rem;
 	border: 2px solid #fbbf24; border-top-color: transparent; border-radius: 50%;
 	animation: spin 1s linear infinite}
   .accordion-trigger[data-accordion-trigger] { background-color: rgba(255, 255, 255, 0.03)}
   .accordion-content { animation: slideDown 0.3s ease-out}
-  @keyframes slideDown { from { height: 0;
-	opacity: 0}
-    to { height: auto;
-	opacity: 1}
+  @keyframes slideDown { from { height: 0;, opacity: 0}
+    to { height: auto;, opacity: 1}
   } @keyframes spin { to { transform: rotate(360deg)}
   } .suggestion-item { border-left: 3px solid rgb(59, 130 246)}
   .recommendation-item { border-left: 3px solid rgb(251, 191 36)}

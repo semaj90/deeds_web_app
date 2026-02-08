@@ -52,9 +52,7 @@
   let loadingDocument = $state<boolean>(false);
   let documentLoadError = $state<string>("");
 
-  interface Citation {
-    id: string;
-    text: string;
+  interface Citation { id: string;, text: string;
     source: string;
     type: string;
   }
@@ -69,9 +67,7 @@
   let saveError = $state<string>("");
   let hasUnsavedChanges = $state<boolean>(false);
 
-  interface DocumentData {
-    id: string;
-    title: string;
+  interface DocumentData { id: string;, title: string;
     content: string;
     type: "brief" | "contract" | "motion" | "evidence";
     caseId?: string;
@@ -91,7 +87,7 @@
             body: JSON.stringify({
                 question: query,
                 context: { content, documentType, caseId },
-                options: { includeReferences: true }
+                options: {, includeReferences: true }
             })
         });
 
@@ -204,7 +200,7 @@
         case "contract": return BookOpen;
         case "motion": return Scale;
         case "evidence": return Search;
-        default: return FileText;
+        default:return FileText;
     }
   }
 

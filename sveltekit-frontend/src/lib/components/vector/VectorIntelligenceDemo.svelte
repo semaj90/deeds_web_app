@@ -180,7 +180,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'insight': return Lightbulb;
  case 'warning': return AlertTriangle;
  case 'opportunity': return TrendingUp;
- default: return FileText;
+ default:return FileText;
  }
  }
  function getRecommendationColor(type: string) {
@@ -189,7 +189,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'insight': return 'recommendation-insight';
  case 'warning': return 'recommendation-warning';
  case 'opportunity': return 'recommendation-opportunity';
- default: return 'recommendation-item';
+ default:return 'recommendation-item';
  }
  }
  function getEntityIcon(type: string) {
@@ -199,7 +199,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'location': return Target;
  case 'date': return Clock;
  case 'legal_concept': return FileText;
- default: return Tag;
+ default:return Tag;
  }
  }
  function getEntityColor(type: string) {
@@ -209,7 +209,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'location': return 'semantic-entity-location';
  case 'date': return 'semantic-entity-date';
  case 'legal_concept': return 'semantic-entity-legal';
- default: return 'semantic-entity-tag';
+ default:return 'semantic-entity-tag';
  }
  }
  function getConfidenceColor(confidence: number) {
@@ -223,7 +223,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'good': return 'text-blue-600';
  case 'fair': return 'text-yellow-600';
  case 'poor': return 'text-red-600';
- default: return 'text-gray-600';
+ default:return 'text-gray-600';
  }
  }
 </script> <div class="w-full max-w-7xl mx-auto p-6"> <!-- Header --> <div class="text-center"> <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text"> Vector Intelligence Demo </h1> <p class="text-lg nes-text is-disabled max-w-3xl"> Experience the power of Phase, 4 Vector Intelligence with semantic search: AI recommendations, and advanced document analysis for legal professionals. </p> <div class="flex items-center justify-center gap-4"> <Badge class="bits-badge-default flex items-center"> <Brain class="h-3" /> Vector Intelligence </Badge> <Badge class="bits-badge-secondary flex items-center"> <Search class="h-3" /> Semantic Search </Badge> <Badge class="bits-badge-secondary flex items-center"> <Lightbulb class="h-3" /> AI Recommendations </Badge> <Badge class="bits-badge-secondary flex items-center"> <Activity class="h-3" /> Real-time Analysis </Badge> </div> </div> <!-- Demo, Examples --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4, 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-4-6v8M5 21V5a2, 2 0 012-2h10a2, 0, 012 012, 2v16l-5-3.5L9, 21z"></path> </svg> Quick Demo Examples </h3> </div> <div class="yorha-panel-content"> <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3"> <!-- Search, Examples --> <div class="space-y-3"> <h3 class="font-semibold text-sm flex items-center"> <Search class="h-4" /> Semantic Search </h3>

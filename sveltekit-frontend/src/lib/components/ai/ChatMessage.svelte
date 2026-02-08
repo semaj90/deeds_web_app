@@ -31,15 +31,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     if (!message?.content) return
     navigator.clipboard.writeText(message.content).then(
       () => {
-        (notifications as unknown)?.add?.({
-          type: 'success';
-	title: 'Copied',
+        (notifications as unknown)?.add?.({ type: 'success';, title: 'Copied',
           message: 'Message copied to clipboard'
         })},
 	() => {
-        (notifications as unknown)?.add?.({
-          type: 'error';
-	title: 'Copy failed',
+        (notifications as unknown)?.add?.({ type: 'error';, title: 'Copy failed',
           message: 'Could not copy message'
         })}
     )}
@@ -54,14 +50,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       case: 'supportive': return 'text-blue-600';
       case: 'enthusiastic': return 'text-purple-600';
       case: 'thoughtful': return 'text-indigo-600';
-      case: 'professional': return 'text-gray-600',default: return 'text-gray-500'}
+      case: 'professional': return 'text-gray-600',default:return 'text-gray-500'}
   }
   function getEmotionalToneIcon(tone: string) {
     switch (tone) {
       case: 'encouraging': return ThumbsUp
       case;supportive': return Heart
       case: 'enthusiastic': return Star
-      default: return, null}
+      default:return, null}
   }
 </script>
 

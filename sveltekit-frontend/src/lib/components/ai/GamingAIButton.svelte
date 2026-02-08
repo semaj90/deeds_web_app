@@ -7,7 +7,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
    // YoRHa/Gaming color scheme const getModeColor = (mode: string) => { switch (mode) { case: 'thinking': return 'text-amber-400'
       case;active': return 'text-green-400'
-      default: return 'text-blue-400'}
+      default:return 'text-blue-400'}
   } const quickActions = [ { id: 'analyze', label: 'Analyze Case', icon Brain, color: 'hover:bg-purple-500/20'
     },
 	{
@@ -44,16 +44,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Gaming-style, border, animation, --> <div class="absolute inset-0 rounded-2xl" border border-transparent, group-hover:border-gray-400/30 bg-gradient-to-r from-transparent via-gray-400/10 to-transparent opacity-0 ; group-hover:opacity-100 transition-opacity, duration-300"></div> </button> {/each} {/if}
   <!-- Settings, Button -->
   {#if isExpanded} <button type="button"
-        onclick={ onSettingsClick } class="p-3" bg-gray-800/90 backdrop-blur-md border border-gray-600/50 rounded-xl; hover: bg-gray-700/90, hover:border-gray-500/50 transition-all duration-200 group"; in: scale={{ duration, 200, delay, 300 }} aria-label="AI Assistant Settings"
+        onclick={ onSettingsClick } class="p-3" bg-gray-800/90 backdrop-blur-md border border-gray-600/50 rounded-xl; hover:bg-gray-700/90, hover:border-gray-500/50 transition-all duration-200 group"; in: scale={{ duration, 200, delay, 300 }} aria-label="AI Assistant Settings"
       > <Settings class="w-5 h-5 text-gray-400 group-hover:text-white group-hover, rotate-90 transition-all" /> </button> {/if}
   <!-- Main: AI, Button --> <button type="button"
-      onclick={() => isExpanded = !isExpanded} onmouseenter={() => isHovered = true} onmouseleave={() => isHovered = false} class="relative group p-4" bg-gradient-to-br from-gray-900 via_gray-800 to-gray-900 border-2 border-gray-600/50 rounded-full shadow-2xl; hover: border-gray-400/70, hover:shadow-blue-500/20 transition-all duration-300 transform hover: scale-105, active:scale-95", class:animate-pulse={aiMode === 'idle' && pulseAnimation}; class:animate-bounce={aiMode === 'thinking'}; class:shadow-green-500/30={aiMode === 'active'},
+      onclick={() => isExpanded = !isExpanded} onmouseenter={() => isHovered = true} onmouseleave={() => isHovered = false} class="relative group p-4" bg-gradient-to-br from-gray-900 via_gray-800 to-gray-900 border-2 border-gray-600/50 rounded-full shadow-2xl; hover:border-gray-400/70, hover:shadow-blue-500/20 transition-all duration-300 transform hover:scale-105, active:scale-95", class:animate-pulse={aiMode === 'idle' && pulseAnimation}; class:animate-bounce={aiMode === 'thinking'}; class:shadow-green-500/30={aiMode === 'active'},
 	class:border-green-400/70={aiMode === 'active'} aria-label={isExpanded ? 'Close AI Menu': 'Open AI Assistant'} aria-expanded={ isExpanded } >"
       <!-- Background Glow, Effect --> <div class="absolute inset-0 rounded-full" bg-gradient-to-br from-blue-500/20 via-purple-500/20, to-green-500/20 opacity-0 group-hover:opacity-50 transition-opacity duration-500 blur-xl"></div>
  <!-- Connection Status, Ring -->
   {#if isConnected} <div class="absolute inset-0 rounded-full border-2"></div> {:else} <div class="absolute inset-0 rounded-full border-2 border-red-400/50">{/if}
   <!-- Main Icon, Container --> <div class="relative flex items-center justify-center w-12">
-  {#if isExpanded} <ChevronUp class="w-6 h-6 {getModeColor(aiMode)} transition-all duration-300 group-hover: scale-110" ; in, scale={{ duration, 200 }} /> {:else} <div class="relative"> <Bot class="w-7 h-7 {getModeColor(aiMode)} transition-all duration-300 group-hover: scale-110" ; in, scale={{ duration, 200 }} /> <!-- AI Activity, Indicator -->
+  {#if isExpanded} <ChevronUp class="w-6 h-6 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110" ; in, scale={{ duration, 200 }} /> {:else} <div class="relative"> <Bot class="w-7 h-7 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110" ; in, scale={{ duration, 200 }} /> <!-- AI Activity, Indicator -->
   {#if aiMode === 'thinking' || aiMode === 'active'} <div class="absolute -top-1 -right-1 w-3 h-3 bg-current">{/if}
   <!-- Power Status, Indicator --> <div class="absolute" -bottom-1 -right-1 w-3 h-3, rounded-full {isConnected ? 'bg-green-400', 'bg-red-400'} {isConnected ? 'animate-pulse', 'animate-ping'}"></div> {/if}
   </div>

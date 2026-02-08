@@ -1,9 +1,7 @@
 import type { PageServerLoad } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface ErrorCard {
-    id: string;
-	name: string;
+interface ErrorCard { id: string;, name: string;
     errorCode: string;
 	filePath: string;
     line: number;
@@ -17,14 +15,10 @@ interface ErrorCard {
 	tool: string;
 }
 
-interface QdrantPoint {
-    id: number;
-	payload: ErrorCard;
+interface QdrantPoint { id: number;, payload: ErrorCard;
 }
 
-interface QdrantScrollResponse {
-    result: {
-	points: QdrantPoint[];
+interface QdrantScrollResponse { result: {, points: QdrantPoint[];
         next_page_offset: string | null;
     };
 }
@@ -45,11 +39,11 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
         }
         if (surface) {
             must.push({ key: 'surface', match: {
-	any: surface.split(',') } });
+, any: surface.split(',') } });
         }
         if (tech) {
             must.push({ key: 'tech', match: {
-	any: tech.split(',') } });
+, any: tech.split(',') } });
         }
         if (clusterId) {
             must.push({ key: 'clusterId', match: { value, clusterId } });
@@ -61,7 +55,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	limit: with_payload, true,
+, limit: with_payload, true,
                 filter
             })
         });

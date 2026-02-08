@@ -45,9 +45,7 @@ import type { Case } from '$lib/types';
   }: LegalPrecedentCardProps = $props();
   let expanded = $state<boolean>(false);
   // Precedent type configurations (use className to avoid JS reserved word)
-  const precedentTypeConfig = {
-    binding: {
-	label: 'Binding Precedent',
+  const precedentTypeConfig = { binding: {, label: 'Binding Precedent',
       className: 'bg-green-500/20 text-green-400 border-green-500/30',
       priority: 1
     },
@@ -63,9 +61,7 @@ import type { Case } from '$lib/types';
     }
   };
   // Jurisdiction configurations
-  const jurisdictionConfig = {
-    federal: {
-	label: 'Federal', icon: Scale, color: 'text-blue-400' },
+  const jurisdictionConfig = { federal: {, label: 'Federal', icon: Scale, color: 'text-blue-400' },
 	state: {
 	label: 'State', icon: MapPin, color: 'text-green-400' },
 	local: {

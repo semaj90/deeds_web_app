@@ -15,9 +15,7 @@
   let { open = $bindable(false) }: Props = $props();
 
   // Define the command item type
-  interface CommandItem {
-    id: string;
-    title: string;
+  interface CommandItem { id: string;, title: string;
     description: string;
     icon: unknown;
     category: string;
@@ -310,9 +308,7 @@
     box-shadow: 0 0 30px rgba(165, 28, 48, 0.3);
   }
 
-  .nier-border-glow::before {
-    content: '';
-    position: absolute;
+  .nier-border-glow::before { content: '';, position: absolute;
     inset: -1px;
     padding: 1px;
     background: linear-gradient(45deg, var(--color-accent-crimson), transparent, var(--color-accent-gold));

@@ -13,11 +13,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     className?: string; // renamed from `class`
     triggerChar?: string
     // onCommandSelect was unused â€” removed
-    onInput?: (data: {
-	value: string; target: HTMLTextAreaElement }) => void
+    onInput?: (data: {, value: string;, target:HTMLTextAreaElement }) => void
     onKeydown?: (e: KeyboardEvent) => void
     onCommandInsert?: (data: {
-	text: string }) => void
+, text: string }) => void
     onBlur?: (e: FocusEvent) => void
     onFocus?: (e: FocusEvent) => void}
 
@@ -40,8 +39,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let textarea = $state<HTMLTextAreaElement | null>(null);
   let commandMenu = $state<any>(null);
   let showCommandMenu = $state<boolean>(false);
-  let commandMenuPosition = $state({ x: 0;
-	y: 0 });
+  let commandMenuPosition = $state({ x: 0;, y: 0 });
   let lastCursorPosition = $state<number>(0);
   function handleInput(e: Event) {
     const target = e.target as HTMLTextAreaElement
@@ -171,9 +169,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .smart-textarea:focus { outline: none;
     border-color: var(--pico-primary, #3b82f6);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
-  .smart-textarea:disabled {
-    opacity: 0.6;
-	cursor:not-allowed
+  .smart-textarea:disabled { opacity: 0.6;, cursor:not-allowed
    ;background: var(--pico-card-sectioning-background-color, #f8fafc)}
   .smart-textarea[readonly] {
     background: var(--pico-card-sectioning-background-color, #f8fafc)}

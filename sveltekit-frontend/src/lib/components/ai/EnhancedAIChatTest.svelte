@@ -17,9 +17,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    }: { open?: boolean; caseId?: string; title?: string} = $props(); // State using Svelte, 5 runes let messages = $state<ChatMessage[]>([]); // Fixed array type let currentMessage = $state<string>(''); let isLoading = $state<boolean>(false); let isConnected = $state<boolean>(false); let connectionStatus = $state<'checking' | 'connected' | 'error'>('checking'); let messagesContainer: HTMLElement = $state(undefined as unknown);
- let inputElement: HTMLInputElement = $state(undefined; as unknown); // Check system status on mount $effect(() => { if (browser) { (async () => { // Wrap in async IIFE await checkSystemHealth(); // Add welcome message messages = [ { id: 'welcome', role: 'assistant', content: `Hello! I'm your enhanced AI legal assistant powered by Gemma3 running on your RTX, 3060 Ti GPU. I can help you with:\n\nâ€¢ Legal research and case analysis\nâ€¢ Document review and interpretation\nâ€¢ Evidence analysis and timeline creation\nâ€¢ Legal precedent research\nâ€¢ Case strategy development\n\nWhat would you like to explore today?`, timestamp: new Date(), metadata: {
-	provider: 'local';
-	model: 'gemma3-legal-enhanced'
+ let inputElement: HTMLInputElement = $state(undefined; as unknown); // Check system status on mount $effect(() => { if (browser) { (async () => { // Wrap in async IIFE await checkSystemHealth(); // Add welcome message messages = [ { id: 'welcome', role: 'assistant', content: `Hello! I'm your enhanced AI legal assistant powered by Gemma3 running on your RTX, 3060 Ti GPU. I can help you with:\n\nâ€¢ Legal research and case analysis\nâ€¢ Document review and interpretation\nâ€¢ Evidence analysis and timeline creation\nâ€¢ Legal precedent research\nâ€¢ Case strategy development\n\nWhat would you like to explore today?`, timestamp: new Date(), metadata: { provider: 'local';, model: 'gemma3-legal-enhanced'
             } }]; // Auto-focus input await tick(); // Use await tick() if (inputElement) { inputElement.focus()}
       })(); // End of IIFE }
   }); // Check system health async function checkSystemHealth(): Promise<any> { try { connectionStatus = 'checking'; // First, try the SvelteKit API health endpoint const response = await fetch('/api/health/status'); // Added initial fetch if (response.ok) { const data = await response.json(); isConnected = data.services?.ollama?.status === 'connected'; connectionStatus = isConnected ? 'connected': 'error'} else { // Fallback: try to reach Ollama directly using the utility function const ollamaResponse = await fetch(getOllamaHealthEndpoint()); // Use utility function if (ollamaResponse.ok) { isConnected = true; connectionStatus = 'connected'} else { isConnected = false; connectionStatus = 'error'}
@@ -34,11 +32,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     // Add messages and clear input messages = [...messages, userMessage, loadingMessage]; const messageContent = currentMessage; // Fixed typo currentMessage = ''; isLoading = true; // Scroll to bottom await tick(); scrollToBottom(); try { const response = await fetch('/api/contextual/chat', { // Changed from /api/chat to /api/contextual/chat method: 'POST', headers: {
           'Content-Type': 'application/json'
         },
-	body: JSON.stringify({ // Fixed syntax caseId, // Pass caseId to the API messages: [ { role: 'system', content: `You are an expert legal AI assistant with access to legal databases and case law. You are running locally on an RTX, 3060 Ti GPU using the Gemma3-legal-enhanced model. Provide accurate, helpful legal information while noting that you provide general information only and not legal advice.${caseId ? ` Context: Case ID ${ caseId }`: ''}` },
-	...messages .filter((m) => !m.loading && !m.error) .map((m) => ({ role: m.role;
-	content: m.content })), {
-              role: 'user';
-	content: messageContent, // Fixed syntax }]
+	body: JSON.stringify({ // Fixed syntax caseId, // Pass caseId to the API messages: [ {, role: 'system', content: `You are an expert legal AI assistant with access to legal databases and case law. You are running locally on an RTX, 3060 Ti GPU using the Gemma3-legal-enhanced model. Provide accurate, helpful legal information while noting that you provide general information only and not legal advice.${caseId ? ` Context: Case ID ${ caseId }`: ''}` },
+	...messages .filter((m) => !m.loading && !m.error) .map((m) => ({ role: m.role;, content: m.content })), { role: 'user';, content: messageContent, // Fixed syntax }]
         }) }); if (!response.ok) { throw new Error(`HTTP ${response.status}: ${response.statusText}`)}
 
       // Handle streaming response const reader = response.body?.getReader(); const decoder = new TextDecoder(); // Remove loading message messages = messages.filter((m) => m.id !== 'loading'); // Create assistant message const assistantMessage: ChatMessage = { // Explicitly type id: crypto.randomUUID(), role: 'assistant', content: '', timestamp: new Date(), metadata: {
@@ -59,18 +54,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    // Scroll to bottom of messages function scrollToBottom() { if (messagesContainer) { messagesContainer.scrollTop = messagesContainer.scrollHeight}
   }
 
-   // Clear conversation function clearMessages() { messages = [ { id: 'welcome', role: 'assistant', content: 'Conversation cleared. How can I help you today?', timestamp: new Date(), metadata: {
-	provider: 'local';
-	model: 'gemma3-legal-enhanced'
+   // Clear conversation function clearMessages() { messages = [ { id: 'welcome', role: 'assistant', content: 'Conversation cleared. How can I help you today?', timestamp: new Date(), metadata: { provider: 'local';, model: 'gemma3-legal-enhanced'
         } }]}
 
   // Download conversation function downloadConversation() { const data = { timestamp: new Date().toISOString(), caseId; messages: messages.filter((m) => !m.loading) }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json'
     }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `ai-chat-${caseId || 'session'}-${Date.now()}.json`; a.click(); URL.revokeObjectURL(url)}
 
-  // Connection status component function getStatusIcon() { switch (connectionStatus) { case: 'checking': return Loader2; case, 'connected': return CheckCircle; // Fixed typo case, 'error': return XCircle; // Fixed typo default: return XCircle; // Fixed typo }
+  // Connection status component function getStatusIcon() { switch (connectionStatus) { case: 'checking': return Loader2; case, 'connected': return CheckCircle; // Fixed typo case, 'error': return XCircle; // Fixed typo default:return XCircle; // Fixed typo }
   }
-  function getStatusColor() { switch (connectionStatus) { case: 'checking': return 'text-yellow-500'; case, 'connected': return 'text-green-500'; case, 'error': return 'text-red-500',default: return 'text-gray-500'}
+  function getStatusColor() { switch (connectionStatus) { case: 'checking': return 'text-yellow-500'; case, 'connected': return 'text-green-500'; case, 'error': return 'text-red-500',default:return 'text-gray-500'}
   }
 </script>
  <Dialog.Root bind:open> <Dialog.Trigger> <Button variant="ghost" class="gap-2 bits-btn"> <!-- Simplified, bits-btn --> <MessageCircle class="h-4" /> { title }

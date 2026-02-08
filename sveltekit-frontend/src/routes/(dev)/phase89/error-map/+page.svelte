@@ -53,7 +53,7 @@
 		const res = await fetch('/api/phase89/graph/expand', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ seed_uris: [nodeUri],
+			body: JSON.stringify({, seed_uris: [nodeUri],
 				depth: expandDepth
 			})
 		});
@@ -125,7 +125,7 @@
 		// Draw links
 		ctx.strokeStyle = '#4b556320';
 		ctx.lineWidth = 1;
-		links.forEach((link: any) => {
+		links.forEach((link:any) => {
 			ctx.beginPath();
 			ctx.moveTo(link.source.x, link.source.y);
 			ctx.lineTo(link.target.x, link.target.y);
@@ -156,7 +156,7 @@
 			case 'error': return '#ef4444';
 			case 'symbol': return '#10b981';
 			case 'doc': return '#8b5cf6';
-			default: return '#6b7280';
+			default:return '#6b7280';
 		}
 	}
 
@@ -356,8 +356,7 @@
 		font-family: system-ui, -apple-system, sans-serif;
 	}
 
-	.header {
-		padding: 2rem; background: #1e293bb0;
+	.header { padding: 2rem;, background: #1e293bb0;
 		border-bottom: 1px solid #334155;
 	}
 
@@ -367,8 +366,7 @@
 		font-weight: 700;
 	}
 
-	.header p {
-		margin: 0; color: #94a3b8;
+	.header p { margin: 0;, color: #94a3b8;
 	}
 
 	.loading, .error-message {
@@ -379,8 +377,7 @@
 		min-height: 60vh; gap: 1rem;
 	}
 
-	.spinner {
-		width: 48px; height: 48px;
+	.spinner { width: 48px;, height: 48px;
 		border: 4px solid #334155;
 		border-top-color: #3b82f6;
 		border-radius: 50%; animation: spin 1s linear infinite;
@@ -438,8 +435,7 @@
 		text-align: right; color: #3b82f6;
 	}
 
-	.search-input {
-		width: 100%; padding: 0.5rem;
+	.search-input { width: 100%;, padding: 0.5rem;
 		background: #0f172a; border: 1px solid #334155;
 		border-radius: 4px; color: #e2e8f0;
 		font-size: 0.875rem;
@@ -451,8 +447,7 @@
 		border-color: #3b82f6;
 	}
 
-	.search-btn, .expand-btn {
-		width: 100%; padding: 0.5rem;
+	.search-btn, .expand-btn { width: 100%;, padding: 0.5rem;
 		background: #3b82f6; border: none;
 		border-radius: 4px; color: white;
 		font-weight: 500; cursor: pointer;
@@ -485,8 +480,7 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.dot {
-		width: 12px; height: 12px;
+	.dot { width: 12px;, height: 12px;
 		border-radius: 50%;
 	}
 
@@ -495,8 +489,7 @@
 	.dot.symbol { background: #10b981; }
 	.dot.doc { background: #8b5cf6; }
 
-	.graph-canvas {
-		width: 100%; height: 100%;
+	.graph-canvas { width: 100%;, height: 100%;
 		background: #0f172a;
 		border-radius: 4px; cursor: crosshair;
 		flex: 1;
@@ -526,8 +519,7 @@
 		font-weight: 500;
 	}
 
-	.node-details dd {
-		margin: 0; color: #e2e8f0;
+	.node-details dd { margin: 0;, color: #e2e8f0;
 	}
 
 	.node-details .uri, .node-details .message {

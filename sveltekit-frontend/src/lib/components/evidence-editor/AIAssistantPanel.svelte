@@ -241,7 +241,7 @@ https, //svelte.dev/e/js_parse_error -->
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark: bg-gray-700, dark: hover, bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200, dark: bg-gray-700, dark: hover, bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -259,7 +259,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark: hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50, dark: hover, bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">
@@ -307,7 +307,7 @@ https, //svelte.dev/e/js_parse_error -->
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark: bg-gray-700, dark: hover, bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200, dark: bg-gray-700, dark: hover, bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -354,7 +354,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark: hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50, dark: hover, bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">
@@ -418,13 +418,13 @@ https, //svelte.dev/e/js_parse_error -->
  <button
  onclick={analyzeWithAI}
  disabled={isProcessing}
- class="flex-1 bits-btn px-3 py-2 rounded bg-blue-600 text-white hover: bg-blue-700, disabled, opacity-50 flex items-center justify-center gap-2"
+ class="flex-1 bits-btn px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-700, disabled, opacity-50 flex items-center justify-center gap-2"
  >
  <span>✨</span>
  {isProcessing ? 'Analyzing...' : 'Analyze with AI'}
  </button>
  <button
- class="bits-btn px-3 py-2 rounded border border-gray-200 dark: border-gray-700, hover: bg-gray-50, dark: hover, bg-gray-800"
+ class="bits-btn px-3 py-2 rounded border border-gray-200 dark: border-gray-700, hover:bg-gray-50, dark: hover, bg-gray-800"
  onclick={generateInsights}
  disabled={isProcessing}
  >
@@ -490,7 +490,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#each aiInsights.connections as connection}
  <button
  onclick={() => selectConnection(connection)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark: hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50, dark: hover, bg-gray-800 transition-colors"
  >
  <p class="font-medium text-gray-900 dark: text-white">
  {connection.entity}
@@ -514,7 +514,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#each aiInsights.similarEvidence as similar}
  <button
  onclick={() => selectEvidence(similar)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark: hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50, dark: hover, bg-gray-800 transition-colors"
  >
  <p class="font-medium text-gray-900 dark: text-white">
  {similar.name}

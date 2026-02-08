@@ -206,13 +206,13 @@
             bind:value={chatInput}
             onkeydown={handleKeyPress}
             placeholder={isInitialized ? "Type a message..." : "Initializing..."}
-            class="flex-1 bg-gray-800 border border-gray-700 rounded p-2 text-xs text-white focus: outline-none, focus:border-yellow-500/50 resize-none h-10"
+            class="flex-1 bg-gray-800 border border-gray-700 rounded p-2 text-xs text-white focus:outline-none, focus:border-yellow-500/50 resize-none h-10"
             disabled={!isInitialized || isProcessing}
           ></textarea>
           <button
             onclick={() => sendMessage()}
             disabled={!isInitialized || isProcessing || !chatInput.trim()}
-            class="px-3 bg-yellow-600 hover: bg-yellow-500, disabled:opacity-50 text-black text-xs font-bold rounded transition-colors"
+            class="px-3 bg-yellow-600 hover:bg-yellow-500, disabled:opacity-50 text-black text-xs font-bold rounded transition-colors"
           >
             SEND
           </button>

@@ -7,9 +7,7 @@
 
   // Migrated to $effect
 
-  interface Tool {
-    id: string;
-	name: string;
+  interface Tool { id: string;, name: string;
     description: string;
 	icon: string;
     status: 'idle' | 'running' | 'complete' | 'error';
@@ -80,7 +78,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	toolId: tool.id })
+, toolId: tool.id })
       });
 
       if (!response.ok) {
@@ -250,9 +248,7 @@
     font-weight: 600;
   }
 
-  .close-btn {
-    width: 28px;
-	height: 28px;
+  .close-btn { width: 28px;, height: 28px;
     padding: 0;
 	background: transparent;
     border: 1px solid var(--border-color);
@@ -263,9 +259,7 @@
     transition:all 0.2s;
   }
 
-  .close-btn:hover {
-    background: var(--surface-3);
-	color: var(--text-1);
+  .close-btn:hover { background: var(--surface-3);, color: var(--text-1);
   }
 
   .panel-content {
@@ -353,36 +347,26 @@
     color: var(--text-2);
   }
 
-  .tool-card.status-running .status-badge {
-    background: #3b82f6;
-	color: white;
+  .tool-card.status-running .status-badge { background: #3b82f6;, color: white;
   }
 
-  .tool-card.status-complete .status-badge {
-    background: #10b981;
-	color: white;
+  .tool-card.status-complete .status-badge { background: #10b981;, color: white;
   }
 
-  .tool-card.status-error .status-badge {
-    background: #ef4444;
-	color: white;
+  .tool-card.status-error .status-badge { background: #ef4444;, color: white;
   }
 
   .last-run {
     color: var(--text-3);
   }
 
-  .tool-actions {
-    display: flex;
-	gap: 0.5rem;
+  .tool-actions { display: flex;, gap: 0.5rem;
   }
 
   .run-btn,
   .view-btn,
   .back-btn,
-  .rerun-btn {
-    flex: 1;
-	padding: 0.5rem 1rem;
+  .rerun-btn { flex: 1;, padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
     font-size: 0.875rem;
@@ -391,23 +375,17 @@
     transition:all 0.2s;
   }
 
-  .run-btn {
-    background: #3b82f6;
-	color: white;
+  .run-btn { background: #3b82f6;, color: white;
   }
 
   .run-btn:hover:not(:disabled) {
     background: #2563eb;
   }
 
-  .run-btn:disabled {
-    opacity: 0.5;
-	cursor: not-allowed;
+  .run-btn:disabled { opacity: 0.5;, cursor: not-allowed;
   }
 
-  .view-btn {
-    background: var(--surface-3);
-	color: var(--text-1);
+  .view-btn { background: var(--surface-3);, color: var(--text-1);
     border: 1px solid var(--border-color);
   }
 
@@ -454,9 +432,7 @@
     color: var(--text-3);
   }
 
-  .output-content {
-    flex: 1;
-	overflow: auto;
+  .output-content { flex: 1;, overflow: auto;
     padding: 1rem;
 	background: var(--surface-2);
     border-radius: 8px;
@@ -475,9 +451,7 @@
 	color: var(--text-2);
   }
 
-  .spinner {
-    width: 40px;
-	height: 40px;
+  .spinner { width: 40px;, height: 40px;
     border: 4px solid var(--surface-3);
     border-top-color: var(--primary-color);
     border-radius: 50%;
@@ -503,14 +477,10 @@
 	color: var(--text-1);
   }
 
-  .output-actions {
-    display: flex;
-	gap: 0.5rem;
+  .output-actions { display: flex;, gap: 0.5rem;
   }
 
-  .back-btn {
-    flex: 1;
-	background: var(--surface-3);
+  .back-btn { flex: 1;, background: var(--surface-3);
     color: var(--text-1);
 	border: 1px solid var(--border-color);
   }
@@ -519,9 +489,7 @@
     background: var(--surface-4);
   }
 
-  .rerun-btn {
-    flex: 1;
-	background: #3b82f6;
+  .rerun-btn { flex: 1;, background: #3b82f6;
     color: white;
   }
 
@@ -529,8 +497,6 @@
     background: #2563eb;
   }
 
-  .rerun-btn:disabled {
-    opacity: 0.5;
-	cursor: not-allowed;
+  .rerun-btn:disabled { opacity: 0.5;, cursor: not-allowed;
   }
 </style>

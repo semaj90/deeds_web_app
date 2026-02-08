@@ -119,7 +119,7 @@
       const response = await fetch('/api/auth/check-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email })
+        body: JSON.stringify({, email: formData.email })
       });
       const result = await response.json();
       formState.emailExists = result.exists;

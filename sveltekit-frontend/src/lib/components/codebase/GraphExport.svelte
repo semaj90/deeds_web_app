@@ -22,7 +22,7 @@
 
 	interface GraphEdge {
 		source: string;
-	target: string;
+	target:string;
 		type: string }
 
 	interface Props {

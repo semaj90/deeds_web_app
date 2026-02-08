@@ -8,9 +8,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  // Migrated from createEventDispatcher to callback props;
 
- interface Evidence {
- id: string;
-	title: string;
+ interface Evidence { id: string;, title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -20,9 +18,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  id: string;
  caseId?: string;
 	generatedAt: string;
- admissibility: Array<{
-	evidence: string;
- ruling: 'admissible' | 'inadmissible' | 'conditional';
+ admissibility: Array<{ evidence: string;, ruling: 'admissible' | 'inadmissible' | 'conditional';
  reasoning: string;
 	legalBasis: string;
  }>;
@@ -35,9 +31,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	overall: number; // 0-100
  prosecution: number;
 	defense: number;
- keyFactors: Array<{
-	factor: string;
- impact: 'positive' | 'negative' | 'neutral';
+ keyFactors: Array<{ factor: string;, impact: 'positive' | 'negative' | 'neutral';
  weight: number;
  }>;
  };
@@ -76,7 +70,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  'Content-Type': 'application/json'
  },
 	body: JSON.stringify({
-	caseId: evidence,
+, caseId: evidence,
  charges: jurisdiction
  })
  });
@@ -102,7 +96,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  case 'admissible': return 'text-green-400 bg-green-900/20';
  case 'inadmissible': return 'text-red-400 bg-red-900/20';
  case 'conditional': return 'text-yellow-400 bg-yellow-900/20';
- default: return 'text-slate-400 bg-slate-900/20';
+ default:return 'text-slate-400 bg-slate-900/20';
  }
  }
 
@@ -112,7 +106,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  case 'moderate': return 'text-yellow-400';
  case 'weak': return 'text-orange-400';
  case 'none': return 'text-red-400';
- default: return 'text-slate-400';
+ default:return 'text-slate-400';
  }
  }
 
@@ -128,7 +122,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  case 'positive': return '✅';
  case 'negative': return '❌';
  case 'neutral': return '➖';
- default: return '❓';
+ default:return '❓';
  }
  }
 
@@ -200,7 +194,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  </label>
  <select
  bind:value={ jurisdiction }
- class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus: outline-none, focus: ring-2, focus:ring-cyan-500"
+ class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none, focus:ring-2, focus:ring-cyan-500"
  >
  <option value="federal">Federal</option>
  <option value="state">State</option>
@@ -254,7 +248,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  <button
  onclick={performAnalysis}
  disabled={isAnalyzing || evidence.length === 0}
- class="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover: from-cyan-500, hover: to-cyan-600, disabled: from-slate-600, disabled, to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+ class="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500, hover:to-cyan-600, disabled:from-slate-600, disabled, to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
  >
  {#if isAnalyzing}
  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -273,7 +267,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  {#each ['overview', 'admissibility', 'probable-cause', 'case-strength', 'recommendations'] as tab}
  <button
  onclick={() => activeTab = tab}
- class="flex-1 px-4 py-2 rounded text-sm font-medium transition-colors {activeTab === tab ? 'bg-cyan-600 text-white' : 'text-slate-400, hover: text-white, hover:bg-slate-700'}"
+ class="flex-1 px-4 py-2 rounded text-sm font-medium transition-colors {activeTab === tab ? 'bg-cyan-600 text-white' : 'text-slate-400, hover:text-white, hover:bg-slate-700'}"
  >
  {tab.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
  </button>

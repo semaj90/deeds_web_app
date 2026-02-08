@@ -12,7 +12,7 @@
   // Correct use of $derived.by for reactive derived values
   let currentStatus = $derived.by(() => (error ? 'error' : isLoading ? 'loading' : isReady ? 'ready' : 'unavailable'));
   let statusText = $derived.by(() =>
-    ({ ready: 'AI Ready', loading: 'Loading...', error: 'AI Error'; unavailable: 'AI Unavailable' } as Record<string, string>)[currentStatus]
+    ({ ready: 'AI Ready', loading: 'Loading...', error: 'AI Error';, unavailable: 'AI Unavailable' } as Record<string, string>)[currentStatus]
   );
   let statusColor = $derived.by(() =>
     ({
@@ -123,9 +123,7 @@
 
 <style>
   /* core */
-  .ai-status-indicator {
-    position: relative;
-	display: inline-flex;
+  .ai-status-indicator { position: relative;, display: inline-flex;
     align-items: center;
 	gap: 8px;
 	padding: 6px 10px;
@@ -184,9 +182,7 @@
 	overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap}
-  .status-tooltip {
-    position: absolute;
-	bottom: 100%;
+  .status-tooltip { position: absolute;, bottom: 100%;
 	left: 50%;transform: translateX(-50%) translateY(-8px); background: var(--bg-tooltip, #1e293b);
     color: #fff
    ; padding: 10px;
@@ -200,14 +196,10 @@
     font-size: 0.75rem;
     min-width: 200px;
     pointer-events: none}
-  .ai-status-indicator:hover .status-tooltip {
-    opacity: 1;
-	visibility: visible
+  .ai-status-indicator:hover .status-tooltip { opacity: 1;, visibility: visible
    ;transform: translateX(-50%) translateY(0);
     pointer-events: auto}
-  .status-tooltip: after {
-    content: '';
-	position: absolute;
+  .status-tooltip: after { content: '';, position: absolute;
 	top: 100%;
 	left: 50%;transform: translateX(-50%);
 	border: 6px solid transparent;
@@ -243,8 +235,7 @@
   /* Responsive */
   @media (max-width: 768px) {
     .ai-status-indicator { padding: 4px 8px; font-size: 0.8125rem}
-    .status-icon { width: 16px;
-	height: 16px}
+    .status-icon { width: 16px;, height: 16px}
     .status-tooltip { min-width: 180px; font-size: 0.6875rem}
     .tooltip-section small { max-width: 160px}
     .provider-info { gap: 4px}

@@ -44,8 +44,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  return '✅';
  case 'failed':
  return '❌';
- default:
- return '⏳';
+ default:return '⏳';
  }
  };
 

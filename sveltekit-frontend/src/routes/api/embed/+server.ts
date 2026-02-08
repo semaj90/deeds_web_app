@@ -17,9 +17,7 @@ interface EmbedRequest {
  model?: 'openai' | 'nomic' | 'mock';
  dimensions?: number;
 }
-interface EmbedResponse {
- embedding: number[];
- model: string;
+interface EmbedResponse { embedding: number[];, model: string;
  dimensions: number;
  tokens?: number;
 }
@@ -28,7 +26,7 @@ interface EmbedResponse {
 async function getOpenAIEmbedding(
  text: string,
  dimensions?: number
-): Promise<{ embedding: number[]; tokens: number }> {
+): Promise<{ embedding: number[];, tokens: number }> {
  if (!OPENAI_API_KEY) {
  throw new Error('OpenAI API key not configured');
  }
@@ -39,7 +37,7 @@ async function getOpenAIEmbedding(
  'Content-Type': 'application/json',
  },
  body: JSON.stringify({
- model: 'text-embedding-3-small',
+, model: 'text-embedding-3-small',
  input: text,
  encoding_format: 'float',
  ...(dimensions && { dimensions }), // Conditionally add dimensions
@@ -66,7 +64,7 @@ async function getNomicEmbedding(text: string): Promise<{ embedding: number[] }>
  'Content-Type': 'application/json',
  },
  body: JSON.stringify({
- model: 'nomic-embed-text-v1.5',
+, model: 'nomic-embed-text-v1.5',
  texts: [text],
  task_type: 'search_document',
  dimensionality_reduction: 768, // Reduce from to 768 for better performance
@@ -126,14 +124,13 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  };
  break;
  }
- default:
- return json(
- { error: `Unsupported model: ${model}. Use 'openai', 'nomic', or 'mock'` },
+ default:return json(
+ { error: `Unsupported, model: ${model}. Use 'openai', 'nomic', or 'mock'` },
  { status: 400 }
  );
  }
 
- // Optional: Apply dimensionality reduction if requested (only if not already handled by API)
+ // Optional:Apply dimensionality reduction if requested (only if not already handled by API)
  // For OpenAI, dimensions can be specified in the request. For Nomic, it's fixed or reduced to 768.
  // This block might be redundant or need adjustment based on actual API behavior.
  if (dimensions && dimensions < result.embedding.length) {

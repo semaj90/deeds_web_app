@@ -14,9 +14,7 @@
 
 	let { showOverlay = false, autoHide = true, updateInterval = 1000 }: Props = $props();
 
-	interface PerformanceMetrics {
-		fps: number;
-		memoryUsage: number;
+	interface PerformanceMetrics { fps: number;, memoryUsage: number;
 		cpuUsage: number;
 		gpuUsage: number;
 		webGPUActive: boolean;
@@ -160,8 +158,7 @@
 				if (value <= 30) return 'text-green-400';
 				if (value <= 70) return 'text-yellow-400';
 				return 'text-red-400';
-			default:
-				return 'text-gray-400';
+			default:return 'text-gray-400';
 		}
 	}
 </script>

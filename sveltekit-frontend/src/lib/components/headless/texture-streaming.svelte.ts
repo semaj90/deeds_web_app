@@ -6,17 +6,13 @@
 // Define explicit types if not available from import to avoid errors
 // (The pipeline types are imported, but just in case of environment issues)
 
-export interface TextureStreamingConfig {
-    enableGPU: boolean;
-	maxChunkSize: number;
+export interface TextureStreamingConfig { enableGPU: boolean;, maxChunkSize: number;
     cacheSize: number;
 	adaptiveQuality: boolean;
     compressionEnabled: boolean;
 }
 
-export interface StreamingStats {
-    chunksLoaded: number;
-	cacheHits: number;
+export interface StreamingStats { chunksLoaded: number;, cacheHits: number;
     renderTime: number;
 	qualityLevel: number;
     hasWebGL: boolean;

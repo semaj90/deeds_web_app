@@ -74,8 +74,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           return 'You must accept the terms and conditions';
         }
         return null;
-      default:
-        return null;
+      default:return null;
     }
   }
 

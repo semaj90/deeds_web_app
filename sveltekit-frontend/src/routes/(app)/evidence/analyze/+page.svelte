@@ -8,9 +8,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Define missing types
-	type SearchResult = {
-		status: string;
-	sessionId: string;
+	type SearchResult = { status: string;, sessionId: string;
 		analysisResults: {
 			summary?: string;
 			confidence?: number;
@@ -24,19 +22,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			model?: string;
 			processedAt?: string;
 			documentType?: string;
-			personsOfInterest?: {
-	name: string; role: string;
+			personsOfInterest?: { name: string;, role: string;
 	confidence: number }[];
-			timeline?: {
-	event: string; date: string;
+			timeline?: { event: string;, date: string;
 	importance: string }[];
 			legalImplications?: string;
 			confidenceScore?: number;
 			nextSteps?: string[];
 		};
-		metadata?: {
-	source: string;
-			processingTime: string;
+		metadata?: { source: string;, processingTime: string;
 	model: string;
 		};
 	};
@@ -115,7 +109,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	evidenceId: crypto.randomUUID(),
+, evidenceId: crypto.randomUUID(),
 					filename: evidenceFile?.name ?? 'uploaded_evidence.txt',
 					content: evidenceContent,
 					type: evidenceType,
@@ -231,7 +225,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				</div>
 				<div>
 					<Label htmlFor="evidenceType">Evidence Type</Label>
-					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
+					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700], focus:outline-none">
 						<option value="" disabled>Select type</option>
 						{#each evidenceTypes as type}
 							<option value={type.value}>{type.label}</option>
@@ -249,7 +243,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="priority">Priority</Label>
-				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
+				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700], focus:outline-none">
 					<option value="" disabled>Select priority</option>
 					{#each priorityOptions as option}
 						<option value={option.value}>{option.label}</option>
@@ -258,7 +252,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			</div>
 		</CardContent>
 		<CardFooter>
-			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover: bg-[#ffed4a], disabled: opacity-50, disabled, cursor-not-allowed bits-btn">
+			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover:bg-[#ffed4a], disabled:opacity-50, disabled, cursor-not-allowed bits-btn">
 				{analyzing ? 'Analyzing...' : 'Start Analysis'}
 			</Button>
 			<Button onclick={ resetForm } variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover:bg-[#e5c51b] bits-btn">Reset</Button>

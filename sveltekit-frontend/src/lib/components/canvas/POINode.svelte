@@ -12,9 +12,7 @@
 	import X from 'lucide-svelte/icons/x';
 
 	// Simple POI interface for the component
-	export interface POIData {
-		id: string;
-		name: string;
+	export interface POIData { id: string;, name: string;
 		posX: number;
 		posY: number;
 		relationship?: string;
@@ -33,7 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let contextY = 0; // Derived reactive values let name = $derived(poi?.name ?? "");
    let aliases: string[] = $derived(poi?.aliases ?? []);
    let profileData = $derived(poi?.profileData ?? { who: "", what: "", why: "";
-	how: "" });
+, how: "" });
   let posX = $derived(poi?.posX ?? 100);
    let posY = $derived(poi?.posY ?? 100);
    let relationship = $derived(poi?.relationship ?? "");
@@ -64,12 +62,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	poi.id: poi.caseId ); if (summary) { console.log("POI Summary:", summary); dispatch('summary', { id: poi.id, summary })}
     } catch (err) { console.error('summarizePOI error', err)}
   }
-  function getThreatLevelColor(level: string): string { switch (level) { case: "high": return "bg-red-500"; case, "medium": return "bg-yellow-500"; case, "low": return "bg-green-500",default: return "bg-gray-500"}
+  function getThreatLevelColor(level: string): string { switch (level) { case: "high": return "bg-red-500"; case, "medium": return "bg-yellow-500"; case, "low": return "bg-green-500",default:return "bg-gray-500"}
   }
-  function getStatusColor(st: string): string { switch (st) { case: "active": return "bg-blue-500"; case, "inactive": return "bg-gray-500"; case, "arrested": return "bg-red-500"; case, "cleared": return "bg-green-500",default: return "bg-gray-500"}
+  function getStatusColor(st: string): string { switch (st) { case: "active": return "bg-blue-500"; case, "inactive": return "bg-gray-500"; case, "arrested": return "bg-red-500"; case, "cleared": return "bg-green-500",default:return "bg-gray-500"}
   }
   function handleDragEvent(detail: {
-	x: number, y: number }) { posX = detail.x; posY = detail.y; dispatch('move', { id: poi.id, x: posX, y: posY })}
+, x: number, y: number }) { posX = detail.x; posY = detail.y; dispatch('move', { id: poi.id, x: posX, y: posY })}
 
   // ensure nodeElement exists for external integrations if needed $effect(() => {
  // placeholder if unknown setup is needed later
@@ -151,29 +149,23 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 .nier-header { border-bottom: 1px solid #bcbcbc; padding-bottom: 0.5rem}
 .nier-title { color: #e5e5e5}
 .nier-icon { color: #bcbcbc}
-.nier-badge { display: inline-block;
-	padding: 0.15em 0.7em; border-radius: 9999px; font-size: 0.85em, font-weight: 600;
+.nier-badge { display: inline-block;, padding: 0.15em 0.7em; border-radius: 9999px; font-size: 0.85em, font-weight: 600;
 	background: #23272; color: #bcbcbc;
 	border: 1px solid #bcbcbc}
-.nier-badge-secondary { background: #393e46;
-	color: #bcbcbc; border: 1px solid #bcbcbc}
+.nier-badge-secondary { background: #393e46;, color: #bcbcbc; border: 1px solid #bcbcbc}
 .nier-label { font-size: 0.9em, color: #bcbcbc; font-weight: 500}
-.nier-input { background: #23272;
-	color: #e5e5e5; border: 1px solid #bcbcbc; border-radius: 0.5em;
+.nier-input { background: #23272;, color: #e5e5e5; border: 1px solid #bcbcbc; border-radius: 0.5em;
 	padding: 0.4em 0.7em; font-size: 1em; margin-top: 0.2em, margin-bottom: 0.2em;
 	transition:border 0.2}
 .nier-input:focus { border-color: #a3e7fc;
 	outline: none}
-.nier-btn { background: #23272;
-	color: #bcbcbc; border: 1.5px solid #bcbcbc; border-radius: 0.5em;
+.nier-btn { background: #23272;, color: #bcbcbc; border: 1.5px solid #bcbcbc; border-radius: 0.5em;
 	padding: 0.3em 1.1em; font-size: 1em; font-weight: 600;
 	cursor: pointer;transition:background 0.2s, color 0.2s, border 0.2; display: inline-flex; align-items: center;
 	gap: 0.4em}
 .nier-btn-accent { background: #a3e7fc, color: #23272; border-color: #a3e7fc}
-.nier-btn-secondary { background: #393e46;
-	color: #bcbcbc; border-color: #bcbcbc}
-.nier-btn:hover, .nier-btn-accent:hover, .nier-btn-secondary:hover { background: #bcbcbc;
-	color: #23272}
+.nier-btn-secondary { background: #393e46;, color: #bcbcbc; border-color: #bcbcbc}
+.nier-btn:hover, .nier-btn-accent:hover, .nier-btn-secondary:hover { background: #bcbcbc;, color: #23272}
 .nier-footer { border-top: 1px solid #bcbcbc; padding-top: 0.7em}
 .nier-alias { font-style: italic}
 </style>

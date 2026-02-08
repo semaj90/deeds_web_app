@@ -48,10 +48,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function toggleSIMD() { enableSIMD = !enableSIMD; send({ type: 'UPDATE_CONFIG';
 	config: {
 	simdEnabled: enableSIMD } }); addLog(`ðŸ”§ SIMD ${enableSIMD ? 'enabled': 'disabled'}`)}
-  function getStateColor(s: string) { switch (s) { case: 'idle': return 'bg-green-500'; case, 'processing': return 'bg-yellow-500'; case, 'streaming': return 'bg-blue-500'; case, 'error': return 'bg-red-500',default: return 'bg-gray-500'}
+  function getStateColor(s: string) { switch (s) { case: 'idle': return 'bg-green-500'; case, 'processing': return 'bg-yellow-500'; case, 'streaming': return 'bg-blue-500'; case, 'error': return 'bg-red-500',default:return 'bg-gray-500'}
   }
   function getCompressionColor(ratio: number) { if (ratio > 100) return 'text-purple-600 font-bold'; if (ratio > 50) return 'text-green-600 font-bold'; if (ratio > 25) return 'text-blue-600 font-semibold'; return 'text-orange-600'}
-  function getQualityBadgeColor(tier: string) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; case, 'snes': return 'bg-blue-100 text-blue-800 border-blue-300'; case, 'n64': return 'bg-purple-100 text-purple-800 border-purple-300',default: return 'bg-gray-100 text-gray-800 border-gray-300'}
+  function getQualityBadgeColor(tier: string) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; case, 'snes': return 'bg-blue-100 text-blue-800 border-blue-300'; case, 'n64': return 'bg-purple-100 text-purple-800 border-purple-300',default:return 'bg-gray-100 text-gray-800 border-gray-300'}
   } $effect(() => { addLog('ðŸ§¬ SIMD AI Assistant initialized with XState machine'); addLog(`ðŸ’¡ SIMD: ${enableSIMD ? 'enabled': 'disabled'},
 	WebWorker: ${useWorker ? 'enabled': 'disabled'}`)}); </script>
  <div class="simd-ai-assistant max-w-6xl mx-auto p-6"> <!-- Enhanced Status Header with: SIMD, Info --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> ðŸ§¬ SIMD AI Assistant <span class="text-sm font-normal">XState + Ollama + 7-bit Compression</span> </span>

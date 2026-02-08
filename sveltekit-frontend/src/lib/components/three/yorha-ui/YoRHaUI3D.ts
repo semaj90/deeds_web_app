@@ -8,9 +8,7 @@ import * as THREE from 'three';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // YoRHa Color Scheme (NieR: Automata inspired)
-export const YORHA_COLORS = {
-	primary: {
-	black: 0x0a0a0a,
+export const YORHA_COLORS = { primary: {, black: 0x0a0a0a,
 		white: 0xfaf6ed,
 		beige: 0xd4c5a9,
 		grey: 0x8b8680
@@ -83,7 +81,7 @@ export interface YoRHaMargin {
 }
 
 export interface YoRHaShadow {
-	enabled: boolean;
+	enabled:boolean;
 	color?: number;
 	blur?: number;
 	intensity?: number;
@@ -93,7 +91,7 @@ export interface YoRHaShadow {
 }
 
 export interface YoRHaGlow {
-	enabled: boolean;
+	enabled:boolean;
 	color?: number;
 	intensity?: number;
 	size?: number;

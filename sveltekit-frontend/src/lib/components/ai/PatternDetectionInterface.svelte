@@ -18,8 +18,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
 	insights: string[];
 	recommendations: string[]}
   $effect(() => { loadExistingPatterns()});
-  async function loadExistingPatterns(): Promise<any> { try { const response = await fetch('/api/ai/pattern-detection', { method: 'GET';
-	headers: {
+  async function loadExistingPatterns(): Promise<any> { try { const response = await fetch('/api/ai/pattern-detection', { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if (response.ok) { const data = await response.json(); patterns = data.patterns || []}
     } catch (error) { console.error('Error loading patterns:', error)}
@@ -31,16 +30,16 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
 	body: JSON.stringify(analysisRequest) }); if (response.ok) { const result = await response.json(); analysisResults = result.analysis ?? null; patterns = result.patterns ?? []} else { throw new Error(`Analysis failed: ${response.statusText}`)}
     } catch (error) { console.error('Error running pattern analysis:', error)} finally { isAnalyzing = false}
   }
-  function getPatternTypeIcon(type: string): string { switch (type) { case: 'temporal': return 'â°'; case, 'behavioral': return 'ðŸ‘¤'; case, 'financial': return 'ðŸ’°'; case, 'communication': return 'ðŸ“ž'; case, 'location': return 'ðŸ“',default: return 'ðŸ”'}
+  function getPatternTypeIcon(type: string): string { switch (type) { case: 'temporal': return 'â°'; case, 'behavioral': return 'ðŸ‘¤'; case, 'financial': return 'ðŸ’°'; case, 'communication': return 'ðŸ“ž'; case, 'location': return 'ðŸ“',default:return 'ðŸ”'}
   }
-  function getPatternTypeColor(type: string): string { switch (type) { case: 'temporal': return 'bg-blue-100 text-blue-800 border-blue-200'; case, 'behavioral': return 'bg-purple-100 text-purple-800 border-purple-200'; case, 'financial': return 'bg-green-100 text-green-800 border-green-200'; case, 'communication': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'location': return 'bg-indigo-100 text-indigo-800 border-indigo-200',default: return 'bg-gray-100 text-gray-800 border-gray-200'}
+  function getPatternTypeColor(type: string): string { switch (type) { case: 'temporal': return 'bg-blue-100 text-blue-800 border-blue-200'; case, 'behavioral': return 'bg-purple-100 text-purple-800 border-purple-200'; case, 'financial': return 'bg-green-100 text-green-800 border-green-200'; case, 'communication': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'location': return 'bg-indigo-100 text-indigo-800 border-indigo-200',default:return 'bg-gray-100 text-gray-800 border-gray-200'}
   }
-  function getRiskLevelColor(risk: string): string { switch (risk) { case: 'critical': return 'text-red-600'; case, 'high': return 'text-orange-600'; case, 'medium': return 'text-yellow-600'; case, 'low': return 'text-green-600',default: return 'text-gray-600'}
+  function getRiskLevelColor(risk: string): string { switch (risk) { case: 'critical': return 'text-red-600'; case, 'high': return 'text-orange-600'; case, 'medium': return 'text-yellow-600'; case, 'low': return 'text-green-600',default:return 'text-gray-600'}
   } let filteredPatterns = $derived(() => { let filtered = patterns.slice(); // Apply type filter if (patternTypeFilter !== 'all') { filtered = filtered.filter(p => p.type === patternTypeFilter)}
 
     // Apply confidence threshold filtered = filtered.filter(p => p.confidence >= confidenceThreshold); // Sort by significance (highest first) filtered.sort((a, b) => b.significance - a.significance); return filtered}); function openPatternDetails(pattern: DetectedPattern) { selectedPattern = pattern; showPatternDetails = true}
   function formatDuration(duration: string): string { // Convert duration: string to human readable format (expects, like: "3d", or: "12h";
-	or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const value = match[1];
+, or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const value = match[1];
    const unit = match[2]; switch (unit) { case: 'd': return `${ value } day${value !== '1' ? 's': ''}`; case, 'h': return `${ value } hour${value !== '1' ? 's': ''}`; case, 'm': return `${ value } minute${value !== '1' ? 's': ''}`}
     } return duration}
 </script>
@@ -188,8 +187,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   .detection-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0}
   .detection-title { font-size: 2rem; font-weight: 700;
 	color: #1e293b;margin: 0}
-  .detection-subtitle { color: #64748b;
-	margin: 0.5rem, 0 0 0}
+  .detection-subtitle { color: #64748b;, margin: 0.5rem, 0 0 0}
   .controls-section { margin-bottom: 2rem;
 	padding: 1.5rem;
 	background: #f8fafc; border-radius: 0.5rem}
@@ -198,11 +196,9 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
 	gap: 0.5rem}
   .control-group label { font-size: 0.875rem; font-weight: 500;
 	color: #374151}
-  .control-select { padding: 0.5rem;
-	border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
+  .control-select { padding: 0.5rem;, border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
   .control-range { width: 100%}
-  .checkbox-group { display: flex;
-	gap: 1rem; flex-wrap}
+  .checkbox-group { display: flex;, gap: 1rem; flex-wrap}
   .checkbox-label { display: flex; align-items: center;
 	gap: 0.5rem; font-size: 0.875rem;
 	cursor: pointer}
@@ -245,12 +241,10 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   .stat { display: flex; align-items: center;
 	gap: 0.75rem}
   .stat-label { font-size: 0.75rem, color: #64748b; min-width: 80px}
-  .stat-bar { flex: 1;
-	height: 0.5rem;
+  .stat-bar { flex: 1;, height: 0.5rem;
 	background: #e2e8f0; border-radius: 0.25rem;
 	overflow: hidden}
-  .stat-fill { height: 100%;
-	background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s}
+  .stat-fill { height: 100%;, background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s}
   .stat-value { font-size: 0.75rem; font-weight: 600;
 	color: #374151; min-width: 60px; text-align: right}
   .pattern-entities h4, .pattern-correlations h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem;
@@ -263,13 +257,11 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   .entity-more { padding: 0.25rem 0.5rem; background: #f3f4f6; border-radius: 0.25rem, font-size: 0.75rem, color: #6b7280; font-style: italic}
   .correlations-preview { font-size: 0.75rem;
 	color: #64748b}
-  .card-actions { display: flex;
-	gap: 0.5rem; justify-content: flex-end}
+  .card-actions { display: flex;, gap: 0.5rem; justify-content: flex-end}
   .loading-state, .empty-state { grid-column: 1 / -1; text-align: center;
 	padding: 3rem;
 	color: #64748b}
-  .loading-spinner { width: 2rem;
-	height: 2rem;
+  .loading-spinner { width: 2rem;, height: 2rem;
 	border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%;
 	animation: spin 1s linear infinite;margin: 0 auto 1rem}
   .loading-detail { font-size: 0.875rem; margin-top: 0.5rem}
@@ -289,25 +281,21 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   .timeframe-info p { margin: 0.25rem 0; font-size: 0.875rem;
 	color: #64748b}
   .entities-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}
-  .entity-card { padding: 1rem;
-	border: 1px solid #e5e7eb; border-radius: 0.375rem;
+  .entity-card { padding: 1rem;, border: 1px solid #e5e7eb; border-radius: 0.375rem;
 	background: #fafafa}
   .entity-card h4 { margin: 0, 0 0.5rem 0; color: #374151}
   .entity-type .entity-role { margin: 0.25rem 0; font-size: 0.75rem;
 	color: #6b7280}
-  .involvement-meter { width: 100%;
-	height: 0.5rem;
+  .involvement-meter { width: 100%;, height: 0.5rem;
 	background: #e5e7eb; border-radius: 0.25rem;
 	overflow: hidden;margin: 0.5rem, 0 0.25rem 0}
-  .involvement-fill { height: 100%;
-	background: #3b82f6;
+  .involvement-fill { height: 100%;, background: #3b82f6;
 	transition:width 0.3s}
   .involvement-percentage { font-size: 0.75rem; font-weight: 600;
 	color: #374151}
   .correlations-list { display: flex; flex-direction: column;
 	gap: 1rem}
-  .correlation-item { padding: 1rem;
-	border: 1px solid #e5e7eb; border-radius: 0.375rem;
+  .correlation-item { padding: 1rem;, border: 1px solid #e5e7eb; border-radius: 0.375rem;
 	background: #fafafa}
   .correlation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem}
   .correlation-type { font-size: 0.75rem; font-weight: 600;
@@ -325,8 +313,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   .evidence-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem}
   .evidence-item { padding: 0.5rem, background: #f3f4f6; border-radius: 0.25rem; font-size: 0.75rem;
 	color: #6b7280; font-family: monospace}
-  .dialog-actions { display: flex;
-	gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
+  .dialog-actions { display: flex;, gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
   @media (max-width: 768px) { .detection-header { flex-direction: column;
 	gap: 1rem}
     .controls-grid { grid-template-columns: 1fr}

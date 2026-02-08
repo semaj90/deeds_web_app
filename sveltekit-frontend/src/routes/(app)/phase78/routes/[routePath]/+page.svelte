@@ -33,7 +33,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			case 'healthy': return 'text-green-600';
 			case 'flaky': return 'text-yellow-600';
 			case 'broken': return 'text-red-600';
-			default: return 'text-gray-400';
+			default:return 'text-gray-400';
 		}
 	}
 
@@ -42,7 +42,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			case 'healthy': return '✅';
 			case 'flaky': return '⚠️';
 			case 'broken': return '❌';
-			default: return '❓';
+			default:return '❓';
 		}
 	}
 

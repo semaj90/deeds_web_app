@@ -242,9 +242,7 @@
 
   input,
   select,
-  textarea {
-    padding: 0.75rem;
-	background: #1a1a2e;
+  textarea { padding: 0.75rem;, background: #1a1a2e;
     border: 1px solid #333;
     border-radius: 0.375rem;
 	color: #ffffff;
@@ -295,8 +293,6 @@
     background: #b91c1c;
   }
 
-  .btn-primary:disabled {
-    opacity: 0.5;
-	cursor: not-allowed;
+  .btn-primary:disabled { opacity: 0.5;, cursor: not-allowed;
   }
 </style>

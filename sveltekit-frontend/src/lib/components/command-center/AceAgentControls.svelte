@@ -7,9 +7,7 @@
 
   // Migrated to $effect
 
-  interface AgentStatus {
-    running: boolean;
-	taskId: string | null;
+  interface AgentStatus { running: boolean;, taskId: string | null;
     task: string | null;
     iteration: number;
 	totalIterations: number;
@@ -75,7 +73,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	task: taskInput,
+, task: taskInput,
           iterations: iterationsInput,
           provider: providerInput
         })
@@ -295,9 +293,7 @@
 	transition:all 0.3s;
   }
 
-  .status-indicator.running {
-    background: #10b981;
-	color: white;
+  .status-indicator.running { background: #10b981;, color: white;
     animation: pulse 2s infinite;
   }
 
@@ -338,9 +334,7 @@
 
   .form-group textarea,
   .form-group input,
-  .form-group select {
-    width: 100%;
-	padding: 0.5rem;
+  .form-group select { width: 100%;, padding: 0.5rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
 	background: var(--surface-2);
@@ -367,9 +361,7 @@
     transition:all 0.2s;
   }
 
-  .start-btn {
-    width: 100%;
-	background: #3b82f6;
+  .start-btn { width: 100%;, background: #3b82f6;
     color: white;
   }
 
@@ -377,20 +369,14 @@
     background: #2563eb;
   }
 
-  .start-btn:disabled {
-    opacity: 0.5;
-	cursor: not-allowed;
+  .start-btn:disabled { opacity: 0.5;, cursor: not-allowed;
   }
 
-  .action-buttons {
-    display: flex;
-	gap: 0.5rem;
+  .action-buttons { display: flex;, gap: 0.5rem;
     margin-top: 1rem;
   }
 
-  .stop-btn {
-    flex: 2;
-	background: #ef4444;
+  .stop-btn { flex: 2;, background: #ef4444;
     color: white;
   }
 
@@ -398,9 +384,7 @@
     background: #dc2626;
   }
 
-  .clear-btn {
-    flex: 1;
-	background: var(--surface-3);
+  .clear-btn { flex: 1;, background: var(--surface-3);
     color: var(--text-1);
 	border: 1px solid var(--border-color);
   }
@@ -434,24 +418,18 @@
 	color: var(--text-1);
   }
 
-  .progress-bar {
-    width: 100%;
-	height: 8px;
+  .progress-bar { width: 100%;, height: 8px;
     background: var(--surface-3);
     border-radius: 4px;
 	overflow: hidden;
     margin-bottom: 1rem;
   }
 
-  .progress-fill {
-    height: 100%;
-	background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  .progress-fill { height: 100%;, background: linear-gradient(90deg, #3b82f6, #8b5cf6);
     transition:width 0.3s ease;
   }
 
-  .logs-panel {
-    flex: 1;
-	display: flex;
+  .logs-panel { flex: 1;, display: flex;
     flex-direction: column;
 	overflow: hidden;
   }
@@ -490,9 +468,7 @@
 	color: var(--text-2);
   }
 
-  .log-entry {
-    display: flex;
-	gap: 0.5rem;
+  .log-entry { display: flex;, gap: 0.5rem;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     margin-bottom: 0.125rem;
@@ -507,9 +483,7 @@
 	color: var(--text-3);
   }
 
-  .log-text {
-    flex: 1;
-	color: var(--text-1);
+  .log-text { flex: 1;, color: var(--text-1);
     word-break: break-all;
   }
 </style>

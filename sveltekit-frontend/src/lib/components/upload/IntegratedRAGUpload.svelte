@@ -14,23 +14,17 @@ import Search from 'lucide-svelte/icons/search';
 import Server from 'lucide-svelte/icons/server';
 import Upload from 'lucide-svelte/icons/upload';
 
-interface IntegrationResult {
-  document: {
-    id: string;
+interface IntegrationResult { document: {, id: string;
     filename: string;
     chunks: number;
     qdrantStored: boolean;
   };
-  recommendations: Array<{
-    similarity: number;
-    content: string;
+  recommendations: Array<{ similarity: number;, content: string;
     source?: string;
   }>;
 }
 
-interface SearchResult {
-  content: string;
-  similarity: number;
+interface SearchResult { content: string;, similarity: number;
   source?: string;
   id?: string;
 }
@@ -113,7 +107,7 @@ async function searchDocuments() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        query: searchQuery,
+       , query: searchQuery,
         limit: 5
       })
     });

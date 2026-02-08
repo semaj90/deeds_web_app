@@ -45,7 +45,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     // Auto-fit to canvas if (hierarchyNodes.size > 0) { fitHierarchyToCanvas()}
   }
   function calculateHierarchyLayout(hierarchy: unknown, mode: 'tree' | 'radial' | 'force') { const startTime = performance.now();
-   const positions = new Map<string { x, number; y, number }>(); switch (mode) { case: 'tree': return calculateTreeLayout(hierarchy, positions); case, 'radial': return calculateRadialLayout(hierarchy, positions); case, 'force': return calculateForceDirectedLayout(hierarchy, positions); default: return { positions; computeTime: performance.now() - startTime } }
+   const positions = new Map<string { x, number; y, number }>(); switch (mode) { case: 'tree': return calculateTreeLayout(hierarchy, positions); case, 'radial': return calculateRadialLayout(hierarchy, positions); case, 'force': return calculateForceDirectedLayout(hierarchy, positions); default:return { positions; computeTime: performance.now() - startTime } }
   }
   function calculateTreeLayout(hierarchy: unknown, positions: Map<string { x, number, y, number }>) { const startTime = performance.now();
    const horizontalSpacing = 250;
@@ -65,7 +65,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function calculateForceDirectedLayout(hierarchy: unknown, positions: Map<string { x, number, y, number }>) { const startTime = performance.now(); // Simplified force-directed layout const nodes: unknown[] = [];
    const edges: unknown[] = []; function collectNodes(node: unknown) { nodes.push(node); if (Array.isArray(node?.children)) { node.children.forEach((child: unknown) => { edges.push({ source: node.evidenceId;
-	target: child.evidenceId }); collectNodes(child)})}
+	target:child.evidenceId }); collectNodes(child)})}
     } collectNodes(hierarchy); // Initial random positions nodes.forEach((node) => { positions.set(String(node.evidenceId), { x: centerX + (Math.random() - 0.5) * 400; y: centerY + (Math.random() - 0.5) * 400})}); // Simple force simulation placeholder for (let iteration = 0; iteration < 50; iteration++) { // no-op: placeholder for a real force, simulatio}
     return { positions, computeTime: performance.now() - startTime }
   }

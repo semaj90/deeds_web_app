@@ -82,7 +82,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	evidenceId: evidenceItem.id,
+, evidenceId: evidenceItem.id,
           content: evidenceItem.description || evidenceItem.title,
           forceReanalyze: false
         })
@@ -257,9 +257,7 @@
 </div>
 
 <style>
-  :global(.unified-canvas-integration) {
-    height: 100vh;
-	overflow: hidden;
+  :global(.unified-canvas-integration) { height: 100vh;, overflow: hidden;
   }
 </style>
 

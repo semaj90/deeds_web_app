@@ -432,7 +432,7 @@ import type { Document } from '$lib/types';
       case;indexing': return Database
       case, 'tagging': return Zap
       case;caching': return Database
-      default: return Check}
+      default:return Check}
   }
 </script>
 

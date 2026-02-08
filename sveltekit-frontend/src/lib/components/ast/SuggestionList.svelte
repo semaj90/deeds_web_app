@@ -34,7 +34,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  case 'web': return 'i-lucide-globe';
  case 'ai': return 'i-lucide-sparkles';
  case 'local': return 'i-lucide-code';
- default: return 'i-lucide-circle';
+ default:return 'i-lucide-circle';
  }
  }
 </script>
@@ -108,7 +108,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  {#if onDismiss}
  <button
  type="button"
- class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 dark: text-gray-400, hover: text-gray-800, dark: hover, text-gray-200 border border-gray-300 dark: border-gray-600 rounded transition-colors"
+ class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 dark: text-gray-400, hover:text-gray-800, dark: hover, text-gray-200 border border-gray-300 dark: border-gray-600 rounded transition-colors"
  onclick={() => onDismiss.suggestion}
  >
  <span class="i-lucide-x"></span>

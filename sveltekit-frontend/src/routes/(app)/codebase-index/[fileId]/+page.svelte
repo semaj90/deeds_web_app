@@ -23,7 +23,7 @@
 			case 'refactor': return '✏️';
 			case 'bugfix': return '🐛';
 			case 'optimization': return '⚡';
-			default: return '🔧';
+			default:return '🔧';
 		}
 	}
 
@@ -32,7 +32,7 @@
 			case 'high': return 'text-red-400';
 			case 'med': return 'text-orange-400';
 			case 'low': return 'text-green-400';
-			default: return 'text-slate-400';
+			default:return 'text-slate-400';
 		}
 	}
 </script>
@@ -61,7 +61,7 @@
 					<input
 						type="text"
 						placeholder="Search components, modules, dependencies..."
-						class="w-80 rounded-lg border border-white/20 bg-white/10 px-4 py-2 pl-10 text-sm placeholder-white/60 backdrop-blur focus: border-white/40, focus:outline-none"
+						class="w-80 rounded-lg border border-white/20 bg-white/10 px-4 py-2 pl-10 text-sm placeholder-white/60 backdrop-blur focus:border-white/40, focus:outline-none"
 					/>
 					<svg class="absolute left-3 top-2.5 h-4 w-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>

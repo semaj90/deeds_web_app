@@ -23,21 +23,15 @@ https://svelte.dev/e/expected_token -->
 			key_concerns?: string[];
 			recommendations?: string[];
 		};
-		patterns?: Array<{
-	type: string;
-	confidence: number;
+		patterns?: Array<{ type: string;, confidence: number;
 	text: string;
 	category: string;
 			implications?: string;
 		}>;
-		clauses?: Array<{
-	name: string;
-	risk_level: 'high' | 'medium' | 'low';
+		clauses?: Array<{ name: string;, risk_level: 'high' | 'medium' | 'low';
 			text: string; analysis, string;
 		}>;
-		metadata?: {
-	document_type: string;
-	analysis_timestamp: string;
+		metadata?: { document_type: string;, analysis_timestamp: string;
 	model_used: string;
 		};
 	}
@@ -75,7 +69,7 @@ https://svelte.dev/e/expected_token -->
 					'Content-Type': 'application/json'
 				},
 	body: JSON.stringify({
-	content: documentType,
+, content: documentType,
 					patterns
 				})
 			});
@@ -134,7 +128,7 @@ https://svelte.dev/e/expected_token -->
 		<select
 			id="documentType"
 			bind:value={ documentType }
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
 		>
 			<option value="contract">Contract</option>
 			<option value="agreement">Agreement</option>
@@ -157,7 +151,7 @@ https://svelte.dev/e/expected_token -->
 				id="customPatternInput"
 				type="text"
 				placeholder="Add specific pattern (e.g., indemnification, force majeure)"
-				class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+				class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
 				onkeydown={(e) => { // Changed back to onkeydown
 					if (e.key === 'Enter') {
 						e.preventDefault();
@@ -175,7 +169,7 @@ https://svelte.dev/e/expected_token -->
 						input.value = '';
 					}
 				}}
-				class="px-4 py-2 bg-blue-600 text-white rounded-md hover: bg-blue-700, focus: outline-none, focus: ring-2, focus:ring-blue-500"
+				class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700, focus:outline-none, focus:ring-2, focus:ring-blue-500"
 			>
 				Add
 			</button>
@@ -209,7 +203,7 @@ https://svelte.dev/e/expected_token -->
 			bind:value={content}
 			placeholder="Paste or type the legal document content here..."
 			rows="8"
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500 resize-vertical"
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500 resize-vertical"
 		></textarea>
 	</div>
 
@@ -219,7 +213,7 @@ https://svelte.dev/e/expected_token -->
 			type="button"
 			onclick={analyzePatterns} // Changed back to onclick
 			disabled={isAnalyzing || !content.trim()}
-			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover: bg-blue-700, focus: outline-none, focus: ring-2, focus: ring-blue-500, disabled: opacity-50, disabled, cursor-not-allowed"
+			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700, focus:outline-none, focus:ring-2, focus:ring-blue-500, disabled:opacity-50, disabled, cursor-not-allowed"
 		>
 			{#if isAnalyzing}
 				<span class="flex items-center justify-center">
@@ -238,7 +232,7 @@ https://svelte.dev/e/expected_token -->
 			<button
 				type="button"
 				onclick={ clearAnalysis } // Changed back to onclick
-				class="px-4 py-2 bg-gray-600 text-white rounded-md hover: bg-gray-700, focus: outline-none, focus: ring-2, focus:ring-gray-500"
+				class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700, focus:outline-none, focus:ring-2, focus:ring-gray-500"
 			>
 				Clear
 			</button>

@@ -11,16 +11,12 @@
 
   // --- Types ---
 
-  export interface EvidenceItem {
-    id: string;
-	type: 'document' | 'image' | 'video' | 'audio' | 'other';
+  export interface EvidenceItem { id: string;, type: 'document' | 'image' | 'video' | 'audio' | 'other';
     filename: string;
     thumbnailUrl?: string;
   }
 
-  export interface TimelineEvent {
-    id: string;
-	timestamp: Date;
+  export interface TimelineEvent { id: string;, timestamp: Date;
     type: 'document' | 'meeting' | 'filing' | 'communication' | 'incident' | 'media';
     title: string;
 	description: string;
@@ -33,8 +29,7 @@
     caseId: string;
     timelineData?: TimelineEvent[];
     enableWebGPU?: boolean;
-    initialTimeRange?: {
-	start: Date; end: Date };
+    initialTimeRange?: { start: Date;, end: Date };
     onEventClick?: (event: TimelineEvent) => void;
   }
 
@@ -60,9 +55,7 @@
 
   // --- Derived ---
 
-  const lodConfig = {
-    0: {
-	precision: 'hour', maxEvents: 1000, label: 'Ultra (Hours)' },
+  const lodConfig = { 0: {, precision: 'hour', maxEvents: 1000, label: 'Ultra (Hours)' },
 	1: {
 	precision: 'day', maxEvents: 500, label: 'High (Days)' },
 	2: {
@@ -251,7 +244,7 @@
       case 'meeting': return '#3b82f6';
       case 'document': return '#10b981';
       case 'incident': return '#f59e0b';
-      default: return '#6b7280';
+      default:return '#6b7280';
     }
   }
 
@@ -330,9 +323,7 @@
 </Card>
 
 <style>
-  canvas {
-    display: block;
-	width: 100%;
+  canvas { display: block;, width: 100%;
     height: 100%;
   }
 </style>

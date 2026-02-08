@@ -4,22 +4,18 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
-  interface IndexingStatus {
-    success: boolean; collections: {
-      codebase: { points_count: number };
+  interface IndexingStatus { success: boolean;, collections: { codebase: {, points_count: number };
       errors: { points_count: number };
     };
     timestamp: string;
   }
 
-  interface SearchResult {
-    file: string; chunk: number;
+  interface SearchResult { file: string;, chunk: number;
     similarity: string; language: string;
     content: string;
   }
 
-  interface ErrorResult {
-    code: string; file: string;
+  interface ErrorResult { code: string;, file: string;
     count: number; similarity: string;
     message: string;
   }
@@ -57,7 +53,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       const response = await fetch('/api/indexing/codebase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rootPath: indexPath })
+        body: JSON.stringify({, rootPath: indexPath })
       });
 
       const result = await response.json();
@@ -110,7 +106,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       const response = await fetch(`/api/indexing/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: searchQuery, limit: 5 })
+        body: JSON.stringify({, query: searchQuery, limit: 5 })
       });
 
       const result = await response.json();
@@ -433,12 +429,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     background-clip: text;
   }
 
-  header p {
-    color: #666; margin: 0;
+  header p { color: #666;, margin: 0;
   }
 
-  .tabs {
-    display: flex; gap: 12px;
+  .tabs { display: flex;, gap: 12px;
     margin-bottom: 24px;
     border-bottom: 2px solid #eee;
   }
@@ -467,11 +461,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0; transform: translateY(10px);
+    from { opacity: 0;, transform: translateY(10px);
     }
-    to {
-      opacity: 1; transform: translateY(0);
+    to { opacity: 1;, transform: translateY(0);
     }
   }
 
@@ -483,8 +475,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     margin-bottom: 32px;
   }
 
-  .status-card {
-    display: flex; gap: 16px;
+  .status-card { display: flex;, gap: 16px;
     padding: 20px; background: white;
     border: 1px solid #eee;
     border-radius: 8px; transition: all 0.3s ease;
@@ -527,8 +518,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }
 
   /* Info Box */
-  .info-box {
-    padding: 16px; background: #f5f7ff;
+  .info-box { padding: 16px;, background: #f5f7ff;
     border-left: 4px solid #667eea;
     border-radius: 4px;
     margin-bottom: 24px;
@@ -607,8 +597,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }
 
-  .btn-secondary {
-    background: #f0f0f0; color: #333;
+  .btn-secondary { background: #f0f0f0;, color: #333;
   }
 
   .btn-secondary:hover:not(:disabled) {
@@ -625,8 +614,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }
 
-  button:disabled {
-    opacity: 0.6; cursor:not-allowed;
+  button:disabled { opacity: 0.6;, cursor:not-allowed;
   }
 
   /* Results */
@@ -645,8 +633,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     flex-direction: column; gap: 12px;
   }
 
-  .result-item {
-    display: flex; gap: 12px;
+  .result-item { display: flex;, gap: 12px;
     padding: 12px; background: white;
     border: 1px solid #eee;
     border-radius: 6px;
@@ -674,8 +661,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     font-size: 12px; color: #999;
   }
 
-  .result-card {
-    padding: 16px; background: white;
+  .result-card { padding: 16px;, background: white;
     border: 1px solid #eee;
     border-radius: 6px;
   }
@@ -684,30 +670,25 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     border-left: 4px solid #ff6b6b;
   }
 
-  .result-header {
-    display: flex; gap: 8px;
+  .result-header { display: flex;, gap: 8px;
     margin-bottom: 12px;
   }
 
   .file-badge,
   .error-code,
-  .similarity-badge {
-    display: inline-block; padding: 4px 8px;
+  .similarity-badge { display: inline-block;, padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
   }
 
-  .file-badge {
-    background: #e8f0ff; color: #667eea;
+  .file-badge { background: #e8f0ff;, color: #667eea;
   }
 
-  .error-code {
-    background: #ffe8e8; color: #ff6b6b;
+  .error-code { background: #ffe8e8;, color: #ff6b6b;
   }
 
-  .similarity-badge {
-    background: #e8ffe8; color: #51cf66;
+  .similarity-badge { background: #e8ffe8;, color: #51cf66;
     margin-left: auto;
   }
 
@@ -739,8 +720,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     margin-bottom: 24px;
   }
 
-  .search-type {
-    display: flex; gap: 16px;
+  .search-type { display: flex;, gap: 16px;
     margin-bottom: 16px;
   }
 
@@ -755,12 +735,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     cursor: pointer;
   }
 
-  .search-box {
-    display: flex; gap: 8px;
+  .search-box { display: flex;, gap: 8px;
   }
 
-  .search-box input {
-    flex: 1; padding: 10px 16px;
+  .search-box input { flex: 1;, padding: 10px 16px;
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 14px;
@@ -797,8 +775,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     margin-top: 24px;
   }
 
-  .integration-card {
-    background: #fff; border: 1px solid #eee;
+  .integration-card { background: #fff;, border: 1px solid #eee;
     border-radius: 8px; padding: 16px;
   }
 

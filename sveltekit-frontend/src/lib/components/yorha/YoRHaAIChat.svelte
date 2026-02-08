@@ -120,7 +120,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	message: trimmed, history: messages })
+, message: trimmed, history: messages })
       }).catch(() => null);
 
       if (ragResponse && ragResponse.ok) {
@@ -175,7 +175,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case 'help': response = 'Available commands: /help, /status, /clear'; break;
       case 'status': response = `System Status: ${isConnected ? 'Online' : 'Offline'}`; break;
       case 'clear': messages = messages.slice(0,1); response = 'Chat cleared.'; break;
-      default: response = `Unknown command: ${cmd}`;
+      default:response = `Unknown command: ${cmd}`;
     }
 
     messages = [...messages, {
@@ -246,7 +246,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         bind:value={messageInput}
         onkeydown={handleKeydown}
         placeholder="ENTER_COMMAND_OR_QUERY..."
-        class="flex-1 bg-black border border-zinc-800 p-3 text-sm focus: outline-none, focus:border-cyan-500 resize-none"
+        class="flex-1 bg-black border border-zinc-800 p-3 text-sm focus:outline-none, focus:border-cyan-500 resize-none"
         rows="2"
       ></textarea>
       <Button variant="outline" class="h-auto px-6 border-zinc-800 bg-black hover:bg-zinc-900" onclick={sendMessage}>

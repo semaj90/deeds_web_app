@@ -5,8 +5,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { caseId = '', userId = '', documentId = '' }: Props = $props(); // Stores const messages = writable<Message[]>([]); const isProcessing = writable(false); const currentModel = writable('gemma3-legal'); const gpuStatus = writable<GPUStatus>({ available: false, layers: 0;
-	memory: 0 }); const performanceMetrics = writable<PerformanceMetrics>({ tokensPerSecond: 0, latency: 0;
-	cacheHitRate: 0 | gpuUtilization, 0, // fixed trailing semicolon -> comma }); // Gemma3 Bridge Instance let gemma3Bridge = $state<Gemma3WASMBridge | null >(null); let natsConnection = $state<any >(null); let ragMachine = $state<any >(null); // Types interface Message { id: string, role: 'user' | 'assistant' | 'system',content: string;
+, memory: 0 }); const performanceMetrics = writable<PerformanceMetrics>({ tokensPerSecond: 0, latency: 0;
+, cacheHitRate: 0 | gpuUtilization, 0, // fixed trailing semicolon -> comma }); // Gemma3 Bridge Instance let gemma3Bridge = $state<Gemma3WASMBridge | null >(null); let natsConnection = $state<any >(null); let ragMachine = $state<any >(null); // Types interface Message { id: string, role: 'user' | 'assistant' | 'system',content: string;
 	timestamp: Date, metadata?: { model?: string; processingTime?: number; sources?: Source[]; confidence?: number; entities?: string[]; citations?: string[]}
   } interface Source { id: string, title: string, relevanceScore: number;
 	excerpt: string}
@@ -18,26 +18,19 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // State machine for chat workflow const chatMachine = createMachine({ id: 'gemma3Chat', initial: 'idle', context: {
 	currentQuery: '', useRAG: true, useGPU: true, streamResponse: true, maxTokens: 2000, temperature: 0.1 },
 	states: {
-	idle: { on { SEND_MESSAGE: {
-	target: 'processing';
+	idle: { on { SEND_MESSAGE: {, target: 'processing';
 	actions: ['storeQuery'], // <- changed: previously ended with a semicolon which caused, parse, error }
         } },
 	processing: {
-	initial: 'embedding', states: {
-	embedding: {
-	invoke: {
+	initial: 'embedding', states: { embedding: {, invoke: {
 	src: 'generateEmbeddings', onDone: {
 	target: 'searching', actions: ['storeEmbeddings']}; onError: 'error'
             } },
-	searching: {
-	invoke: {
-	src: 'searchDocuments', onDone: {
+	searching: { invoke: {, src: 'searchDocuments', onDone: {
 	target: 'generating', actions: ['storeSources'] }; onError: 'generating' // Continue without RAG if search fails }
           },
-	generating: {
-	invoke: {
-	src: 'generateResponse', onDone: {
-	target: '#gemma3Chat.idle', actions: ['addMessage', 'updateMetrics'] }; onError: 'error'
+	generating: { invoke: {, src: 'generateResponse', onDone: {
+, target: '#gemma3Chat.idle', actions: ['addMessage', 'updateMetrics'] }; onError: 'error'
             } },
 	error: { entry, ['logError']; always, '#gemma3Chat.idle'
           } }
@@ -49,29 +42,25 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
       // Connect to NATS for real-time updates if (natsMessaging) { natsConnection = await natsMessaging.connect(); subscribeToUpdates()}
 
-      // Initialize RAG machine ragMachine = createActor(chatMachine, { services: {
-	generateEmbeddings: async (context) => { if (gemma3Bridge) { return await gemma3Bridge.generateEmbeddings(context.currentQuery)}
+      // Initialize RAG machine ragMachine = createActor(chatMachine, { services: {, generateEmbeddings: async (context) => { if (gemma3Bridge) { return await gemma3Bridge.generateEmbeddings(context.currentQuery)}
 
             // Fallback to server-side embedding return await fetch('/api/embeddings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	text: context.currentQuery }) }).then(r => r.json())},
+, text: context.currentQuery }) }).then(r => r.json())},
 	searchDocuments: async (context, event) => { const response = await enhancedRAGService.search({ query: context.currentQuery, embedding: event.data, caseId, limit: 10;
-	threshold: 0.7 }); return (response as { results?: any; json?: any; body?: any }).result},
+, threshold: 0.7 }); return (response as { results?: any; json?: any; body?: any }).result},
 	generateResponse: async (context, event) => { const sources = event.data || []; const augmentedPrompt = buildAugmentedPrompt(context.currentQuery, sources); if (gemma3Bridge && context.useGPU) { // Use local WebAssembly model const result = await gemma3Bridge.processLegalText(augmentedPrompt, { maxLength: context.maxTokens, temperature: context.temperature;
-	stream: context.streamResponse }); return { content: (result as { text?: any; processingTime?: any; analysis?: any }).text, metadata: {
-	model: 'gemma3-legal-wasm';
-	processingTime: (result as { text?: any; processingTime?: any; analysis?: any }).processingTime, sources, ...result.analysis }
+, stream: context.streamResponse }); return { content: (result as { text?: any; processingTime?: any; analysis?: any }).text, metadata: { model: 'gemma3-legal-wasm';, processingTime: (result as { text?: any; processingTime?: any; analysis?: any }).processingTime, sources, ...result.analysis }
               } } else { // Fallback to server API const response = await fetch('/api/ai/gemma3-chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	prompt: augmentedPrompt, maxTokens: context.maxTokens, temperature: context.temperature, stream: context.streamResponse }) }); if (context.streamResponse) { return handleStreamingResponse(response)} else { return await (response as { results?: any; json?: any; body?: any }).json()}
+, prompt: augmentedPrompt, maxTokens: context.maxTokens, temperature: context.temperature, stream: context.streamResponse }) }); if (context.streamResponse) { return handleStreamingResponse(response)} else { return await (response as { results?: any; json?: any; body?: any }).json()}
             } }
         } }); ragMachine.start(); // Add welcome message messages.update(m => [...m, { id: crypto.randomUUID(), role: 'system', content: 'Gemma3 Legal AI Assistant initialized. GPU acceleration enabled with, 35 layers loaded. How can I help you with your legal analysis today?'; timestamp: new Date() }])} catch (error) { console.error('Failed to initialize Gemma3:', error); messages.update(m => [...m, { id: crypto.randomUUID(), role: 'system', content: 'Running in CPU mode. GPU acceleration unavailable.'; timestamp: new Date() }])}
   }); // Cleanup on destroy // TODO: Add as cleanup in $effect: return () => { if (gemma3Bridge) { gemma3Bridge.dispose()}
     if (natsConnection) { natsConnection.close()}
     if (ragMachine) { ragMachine.stop()}
   } // Message handling let userInput = $state<string>(''); async function sendMessage(): Promise<any> { if (!userInput.trim() || get(isProcessing)) return; const userMessage: Message = { id: crypto.randomUUID(), role: 'user', content: userInput;
-	timestamp: new Date() }; messages.update(m => [...m, userMessage]); isProcessing.set(true); const startTime = performance.now(); try { // Use state machine for processing ragMachine.send({ type: 'SEND_MESSAGE';
-	query: userInput }); // Wait for completion await new Promise((resolve) => { const unsubscribe = ragMachine.subscribe((state) => { if (state.matches('idle')) { unsubscribe(); resolve(state.context)}
+	timestamp: new Date() }; messages.update(m => [...m, userMessage]); isProcessing.set(true); const startTime = performance.now(); try { // Use state machine for processing ragMachine.send({ type: 'SEND_MESSAGE';, query: userInput }); // Wait for completion await new Promise((resolve) => { const unsubscribe = ragMachine.subscribe((state) => { if (state.matches('idle')) { unsubscribe(); resolve(state.context)}
         })})} catch (error) { console.error('Error processing message:', error); messages.update(m => [...m, { id: crypto.randomUUID(), role: 'assistant', content: 'I encountered an error processing your request. Please try again.', timestamp: new Date(); metadata: {
 	model: 'error' } }])} finally { isProcessing.set(false); const processingTime = performance.now() - startTime; updatePerformanceMetrics(processingTime); userInput = ''}
   }

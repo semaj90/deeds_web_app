@@ -200,7 +200,7 @@ import type { Case } from '$lib/types';
         </div>
       </div>
     </div>
-    <!-- Active: Warrants, Alert -->
+    <!-- Active:Warrants, Alert -->
     {#if activeWarrants.length > 0}
       <div class="mt-3 p-3 bg-red-500/10 border border-red-500/20">
         <div class="flex items-center gap-2 text-red-400 font-medium text-sm font-mono">

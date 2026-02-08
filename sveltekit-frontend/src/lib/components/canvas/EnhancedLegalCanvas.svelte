@@ -3,10 +3,8 @@ import type { Case } from '$lib/types'; // Enhanced Legal Canvas with YoRHa styl
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props { width?: number; height?: number; data?: CanvasDataPoint[]; theme?: 'yorha' | 'nes' | 'legal'; interactive?: boolean; showGrid?: boolean; onNodeClick?: (node: CanvasDataPoint) => void; onNodeHover?: (node: CanvasDataPoint | null) => void; children?: Snippet}
   let { width = 800, height = 600, data = [], theme = 'yorha', interactive = true, showGrid = true, onNodeClick, onNodeHover, children }: Props = $props(); let canvas: HTMLCanvasElement;
- let ctx: CanvasRenderingContext2D | null = null; let animationFrameId = 0; let hoveredNode: CanvasDataPoint | null = null; let selectedNode: CanvasDataPoint | null = null; let mousePos = $state({ x: 0;
-	y: 0 });
-  let isWebGPUSupported = $state<boolean>(false); // Theme configurations const themes = { yorha: {
-	background: '#0a0a0a', grid: 'rgba(255, 215, 0, 0.1)', text: '#e0e0e0', accent: '#ffd700', evidence: '#00ff41', case: '#00ccff', document: '#ff6b35', citation: '#d63384', connection: '#6f42c1', riskLow: '#28a745', riskMedium: '#ffc107', riskHigh: '#fd7e14';
+ let ctx: CanvasRenderingContext2D | null = null; let animationFrameId = 0; let hoveredNode: CanvasDataPoint | null = null; let selectedNode: CanvasDataPoint | null = null; let mousePos = $state({ x: 0;, y: 0 });
+  let isWebGPUSupported = $state<boolean>(false); // Theme configurations const themes = { yorha: {, background: '#0a0a0a', grid: 'rgba(255, 215, 0, 0.1)', text: '#e0e0e0', accent: '#ffd700', evidence: '#00ff41', case: '#00ccff', document: '#ff6b35', citation: '#d63384', connection: '#6f42c1', riskLow: '#28a745', riskMedium: '#ffc107', riskHigh: '#fd7e14';
 	riskCritical: '#dc3545'
     },
 	nes: {
@@ -54,17 +52,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function handleMouseLeave() { hoveredNode = null; onNodeHover?.(null); if (canvas) { canvas.style.cursor = 'default'}
   }
 
-   // Generate sample data if none provided $effect(() => { if (data.length === 0) { // Generate sample legal data points const sampleData: CanvasDataPoint[] = [ { id: 'case-001', x: 100, y: 100, label: 'Case 001', type: 'case', riskLevel: 'high', metadata: {
-	priority: 'urgent'; connections: ['evidence-001', 'document-001'] } },
+   // Generate sample data if none provided $effect(() => { if (data.length === 0) { // Generate sample legal data points const sampleData: CanvasDataPoint[] = [ { id: 'case-001', x: 100, y: 100, label: 'Case 001', type: 'case', riskLevel: 'high', metadata: { priority: 'urgent';, connections: ['evidence-001', 'document-001'] } },
 	{
-          id: 'evidence-001', x: 200, y: 150, label: 'Evidence A', type: 'evidence', riskLevel: 'critical', metadata: {
-	type: 'forensic'; connections: ['case-001'] } },
+          id: 'evidence-001', x: 200, y: 150, label: 'Evidence A', type: 'evidence', riskLevel: 'critical', metadata: { type: 'forensic';, connections: ['case-001'] } },
 	{
-          id: 'document-001', x: 300, y: 120, label: 'Contract X', type: 'document', riskLevel: 'medium', metadata: {
-	category: 'legal'; connections: ['case-001', 'citation-001'] } },
+          id: 'document-001', x: 300, y: 120, label: 'Contract X', type: 'document', riskLevel: 'medium', metadata: { category: 'legal';, connections: ['case-001', 'citation-001'] } },
 	{
-          id: 'citation-001', x: 400, y: 200, label: 'Precedent Y', type: 'citation', riskLevel: 'low', metadata: {
-	court: 'supreme'; connections: ['document-001'] } }
+          id: 'citation-001', x: 400, y: 200, label: 'Precedent Y', type: 'citation', riskLevel: 'low', metadata: { court: 'supreme';, connections: ['document-001'] } }
       ]; data = sampleData}
   }); </script>
  <div class="canvas-container nes-container"> <p class="title">Legal Evidence Canvas</p>
@@ -84,11 +78,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if selectedNode.metadata} <details> <summary>Metadata</summary>
  <pre class="metadata">{JSON.stringify(selectedNode.metadata, null, 2)}</pre> </details> {/if} {/if} {#if children} {@render children()} {/if}
   </div>
- <style> .canvas-container { margin: 1rem;
-	padding: 1rem;background: var(--yorha-bg-secondary);
+ <style> .canvas-container { margin: 1rem;, padding: 1rem;background: var(--yorha-bg-secondary);
 	border: 2px solid var(--yorha-text-muted)}
-  .canvas-wrapper { position: relative;
-	display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary)}
+  .canvas-wrapper { position: relative;, display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary)}
   .legal-canvas { display: block, background: transparent; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
   .canvas-controls { margin-top: 1rem;
 	display: flex; gap: 1rem; align-items: center; flex-wrap}

@@ -13,7 +13,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
-    const body = await request.json() as { tool: string; args: unknown };
+    const body = await request.json() as { tool: string;, args: unknown };
 
     if (!body?.tool|| typeof body.tool !== 'string') {
       return json({

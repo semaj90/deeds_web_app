@@ -16,10 +16,10 @@
  import type { SuperValidated } from 'sveltekit-superforms'; // Svelte, 5 Props Interface interface Props { data?: any; // SuperValidated<CaseForm> submitAction?: string; editMode?: boolean; enableAutoSave?: boolean; enableRealTimeValidation?: boolean; onsubmit?: (_event: {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-	data: CaseForm }) => void; onsuccess?: (_event: {
-	caseItem: any }) => void; onerror?: (_event: {
-	message: string }) => void; ondraft?: (_event: {
-	data: CaseForm }) => void}
+, data: CaseForm }) => void; onsuccess?: (_event: {
+, caseItem: any }) => void; onerror?: (_event: {
+, message: string }) => void; ondraft?: (_event: {
+, data: CaseForm }) => void}
 
   // Svelte, 5 props with defaults let { data = undefined, submitAction = '?/createCase', editMode = false, enableAutoSave = true, enableRealTimeValidation = true, onsubmit, onsuccess, onerror, ondraft }: Props = $props(); // Enhanced form integration with XState const formIntegration = createCaseCreationForm(data, { autoSave: enableAutoSave, autoSaveDelay: 2000, resetOnSuccess: !editMode, onSubmit: async formData => { if (onsubmit) onsubmit({ data: formData as CaseForm })},
 	onSuccess: result => { if (onsuccess) onsuccess({ caseItem: result })},

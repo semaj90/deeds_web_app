@@ -47,8 +47,7 @@ export const GET: RequestHandler = async ({ url }) => {
                         memoryBudget: 512,
                         qualityLevel: 'production'
                     },
-                    context: { userSession: {
-                            userId: 'sse_user',
+                    context: { userSession: {, userId: 'sse_user',
                             sessionId: 'sse_session',
                             preferences: {}
                         },
@@ -98,8 +97,7 @@ export const GET: RequestHandler = async ({ url }) => {
                 // Mapping result (unknown type in original) to likely structure
                 const resultAny = result as any;
 
-                const qloraResponse: any = {
-                    prediction: { type: resultAny.prediction?.type ?? 'legal_document',
+                const qloraResponse: any = { prediction: {, type: resultAny.prediction?.type ?? 'legal_document',
                         confidence: resultAny?.accuracy ?? 85,
                         // Provide empty vectors if missing
                         vectors: resultAny.prediction?.vectors ?? [],
@@ -163,7 +161,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
                 sendEvent('end', {
                     message: 'QLoRA processing complete',
-                    metadata: { accuracy: qloraResponse.prediction.accuracy,
+                    metadata: {, accuracy: qloraResponse.prediction.accuracy,
                         processingTime
                     }
                 });

@@ -267,8 +267,8 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 							}
 						})
 						.onConflictDoUpdate({
-							target: chatMessages.id,
-							set: { content: fullResponse, updatedAt: new Date() }
+							target:chatMessages.id,
+							set: {, content: fullResponse, updatedAt: new Date() }
 						});
 				}
 			} else if (chunk.type === 'done') {

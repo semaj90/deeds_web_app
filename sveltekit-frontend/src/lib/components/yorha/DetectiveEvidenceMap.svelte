@@ -2,9 +2,7 @@
  import * as d3 from 'd3';
  // Migrated to $effect
 
- interface EvidenceNode {
- id: string;
-	title: string;
+ interface EvidenceNode { id: string;, title: string;
  type: string;
 	color: string;
  size: number;
@@ -13,21 +11,15 @@
  contradictions?: number;
  }
 
- interface GraphLink {
- source: string;
-	target: string;
+ interface GraphLink { source: string;, target:string;
  score: number;
 	type: string;
  }
 
- interface DetectiveMapData {
- evidence: EvidenceNode[];
-	links: GraphLink[];
- contradictions: Array<{
-	sourceId: string; targetId: string;
+ interface DetectiveMapData { evidence: EvidenceNode[];, links: GraphLink[];
+ contradictions: Array<{ sourceId: string;, targetId: string;
 	type: string }>;
- timeline: Array<{
-	evidenceId: string; timestamp: string;
+ timeline: Array<{ evidenceId: string;, timestamp: string;
 	description: string }>;
  }
 
@@ -53,9 +45,7 @@
  let filterMode = $state<'all' | 'evidence' | 'contradictions' | 'timeline'>('all');
 
  // Phoenix Wright color scheme
- const colors = {
- evidence: {
-	approved: '#10b981',
+ const colors = { evidence: {, approved: '#10b981',
  reviewing: '#f59e0b',
  rejected: '#ef4444',
  new: '#3b82f6'
@@ -308,7 +298,7 @@
  // Add contradiction links
  data.contradictions.forEach(contradiction => {
  links.push({
- source: contradiction.sourceId, target: contradiction.targetId, score: 1, type: 'contradicts'
+ source: contradiction.sourceId, target:contradiction.targetId, score: 1, type: 'contradicts'
  });
  });
 
@@ -318,7 +308,7 @@
  const next = data.timeline[i + 1];
 
  links.push({
- source: current.evidenceId, target: next.evidenceId, score: 0.8,
+ source: current.evidenceId, target:next.evidenceId, score: 0.8,
  type: 'timeline'
  });
  }
@@ -327,35 +317,35 @@
  return links;
  }
 
- function getLinkDistance(link: any): number {
+ function getLinkDistance(link:any): number {
  switch (link.type) {
  case 'contradicts': return 100;
  case 'timeline': return 150;
- default: return 120;
+ default:return 120;
  }
  }
 
- function getLinkStrength(link: any): number {
+ function getLinkStrength(link:any): number {
  switch (link.type) {
  case 'contradicts': return 0.8;
  case 'timeline': return 0.6;
- default: return 0.3;
+ default:return 0.3;
  }
  }
 
- function getLinkColor(link: any): string {
+ function getLinkColor(link:any): string {
  switch (link.type) {
  case 'contradicts': return colors.links.contradicts;
  case 'timeline': return 'url(#timeline-gradient)';
- default: return colors.links.similar;
+ default:return colors.links.similar;
  }
  }
 
- function getLinkWidth(link: any): number {
+ function getLinkWidth(link:any): number {
  switch (link.type) {
  case 'contradicts': return 3;
  case 'timeline': return 2;
- default: return 1;
+ default:return 1;
  }
  }
 
@@ -526,13 +516,9 @@
  }
 
  @keyframes contradiction-glow {
- 0%, 100% {
- r: 0;
-	opacity: 0;
+ 0%, 100% { r: 0;, opacity: 0;
  }
- 50% {
- r: 30;
-	opacity: 0.3;
+ 50% { r: 30;, opacity: 0.3;
  }
  }
 </style>

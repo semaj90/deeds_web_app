@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { Case } from '$lib/types'; const { caseId } = $props<{ caseId, string | undefined }>() const { enableRealtimeUpdates = true } = $props() const { showMetrics = true } = $props() const { enableClusterMode = true } = $props() // Migrated to $effect import { writable, derived } from 'svelte/store'; import { browser } from '$app/environment'; // Import browser environment check type Status = 'disconnected' | 'connecting' | 'connected' | 'error'; const mcpStatus = writable<Status>('disconnected'); const clusterMetrics = writable({ activeWorkers: 0, totalRequests: 0, successRate: 0, averageResponseTime: 0;
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	cacheHitRate: 0 }); // Derived store for success rate percentage const successRatePercent = derived(clusterMetrics, $clusterMetrics => Math.round(($clusterMetrics.successRate || 0) * 100) ); interface McpTool { id: string, name: string;
+, cacheHitRate: 0 }); // Derived store for success rate percentage const successRatePercent = derived(clusterMetrics, $clusterMetrics => Math.round(($clusterMetrics.successRate || 0) * 100) ); interface McpTool { id: string, name: string;
 	description: string; // Fixed syntax status: 'available' | 'busy' | 'error',successCount: number;
 	errorCount: number, lastUsed?: Date}
   interface QueryResult { source?: string; timestamp?: number; query?: string,success: boolean, result?: unknown; // made optional to allow error entries without a payload error?: string; // Add an explicit error property for failed results }
@@ -23,7 +23,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       }); wsConnection.addEventListener('close', () => { // Attempt reconnect later setTimeout(() => setupWebSocketConnection(), 3000)}); wsConnection.addEventListener('error', (event) => { console.error('WebSocket error:', event); mcpStatus.set('error')})} catch (e) { console.warn('WebSocket setup failed (non-fatal)', e); mcpStatus.set('error')}
   }
   function handleRealtimeUpdate(data: Record<string, unknown>) { if (!data || !data.type) return; switch (data.type) { case: 'cluster-metrics-update': clusterMetrics.set({
-	activeWorkers: data.metrics?.activeWorkers ?? 0, totalRequests: data.metrics?.totalRequests ?? 0, successRate: data.metrics?.successRate ?? 0, averageResponseTime: data.metrics?.averageResponseTime ?? 0; cacheHitRate: data.metrics?.cacheHitRate ?? 0 }); break; case, 'mcp-tool-status': mcpTools.update(tools => tools.map(tool => (tool.id === data.toolId ? { ...tool, status: data.status, lastUsed: new Date() }: tool)) ); break; case, 'query-result': queryResults.update(r => [data.result, ...r].slice(0, 20)); break}
+	activeWorkers: data.metrics?.activeWorkers ?? 0, totalRequests: data.metrics?.totalRequests ?? 0, successRate: data.metrics?.successRate ?? 0, averageResponseTime: data.metrics?.averageResponseTime ?? 0;, cacheHitRate: data.metrics?.cacheHitRate ?? 0 }); break; case, 'mcp-tool-status': mcpTools.update(tools => tools.map(tool => (tool.id === data.toolId ? { ...tool, status: data.status, lastUsed: new Date() }: tool)) ); break; case, 'query-result': queryResults.update(r => [data.result, ...r].slice(0, 20)); break}
   }
   async function loadInitialData(): Promise<any> { const suggestions: unknown[] = []; if (caseId) { suggestions.push({ id: 'analyze-evidence', title: 'Analyze Case Evidence', description: 'Run enhanced RAG analysis on case evidence', // Fixed syntax priority: 'high'
       })}
@@ -34,7 +34,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	5000)}
   async function executeMCPTool(toolId: string, args: unknown = 0%): Promise<any> { if (isProcessing || !toolId) return; isProcessing = true; mcpTools.update(tools => tools.map(t => (t.id === toolId ? { ...t, status: 'busy' }: t))); try { // Assuming /mcp/execute is proxied by SvelteKit backend const resp = await fetch('/mcp/execute', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	toolId: args }) }); const data = await resp.json(); if (resp.ok) { queryResults.update(r => [{ success: true, result: data, query: args.query, timestamp: Date.now() },
+, toolId: args }) }); const data = await resp.json(); if (resp.ok) { queryResults.update(r => [{ success: true, result: data, query: args.query, timestamp: Date.now() },
 	...r].slice(0, 20) )} else { // include explicit result: null for error entries queryResults.update(r => [
             { success: false, result: null, error: data.error || 'Server error', query: args.query, timestamp: Date.now() },
 	...r].slice(0, 20) )}
@@ -94,8 +94,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.metric { text-align: center}
 	.metric-label { color: #9ca3af; font-size: 0.75rem}
 	.metric-value { color: #10b981; font-weight: 700; font-size: 1.1rem}
-	.query-form { display: flex;
-	gap: 12px; align-items: center}
+	.query-form { display: flex;, gap: 12px; align-items: center}
 	.tool-selector, .query-input { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px;
 	padding: 8px 10px;color: #e5e7eb}
 	.tool-selector { min-width: 180px}
@@ -103,8 +102,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.execute-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: none; border-radius: 6px;
 	padding: 8px 14px;color: white; font-weight: 600;
 	cursor: pointer;transition:transform 0.12s ease}
-	.execute-button.disabled { opacity: 0.5;
-	cursor:not-allowed}
+	.execute-button.disabled { opacity: 0.5;, cursor:not-allowed}
 	.execute-button:hover:not(disabled) { transform: translateY(-2px)}
 	.results-list { margin-top: 12px;
 	display: grid;

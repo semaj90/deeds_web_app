@@ -102,7 +102,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             userContext: {
 	sessionId: 'demo' },
 	intent: {
-	category: 'general', confidence: 0.8 }
+, category: 'general', confidence: 0.8 }
           }
         })}
     } catch (error) {
@@ -147,7 +147,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case: 'expansion': return 'ðŸ“‹';
       case: 'alternative': return 'ðŸ”„';
       case: 'follow-up': return 'âž¡ï¸';
-      case: 'correction': return 'âœï¸',default: return 'ðŸ’¡'}
+      case: 'correction': return 'âœï¸',default:return 'ðŸ’¡'}
   }
 </script>
 <div class="intelligent-orchestrator-dashboard min-h-screen bg-gray-50">
@@ -166,7 +166,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         bind:value={queryInput}
         onkeydown={e => e.key === 'Enter' && processQuery()}
         placeholder="Ask me anything... (the system will intelligently select the best model)"
-        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500"
+        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2, focus:ring-blue-500"
         disabled={isProcessing}
       />
       <button

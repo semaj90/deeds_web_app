@@ -113,7 +113,7 @@
  onkeydown={(e) => e.key === 'Enter' && performSimilaritySearch()}
  />
  <button
- class="px-4 py-3 border border-beige hover: bg-beige, hover:text-noir rounded flex items-center gap-2"
+ class="px-4 py-3 border border-beige hover:bg-beige, hover:text-noir rounded flex items-center gap-2"
  onclick={ performSimilaritySearch }
  disabled={isSearching || documentEmbeddings.length === 0}
  >

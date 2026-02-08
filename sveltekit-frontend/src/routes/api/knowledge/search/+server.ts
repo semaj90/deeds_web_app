@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ request }) => {
       const validProviders = ['ollama', 'gemini', 'claude'];
       if (!validProviders.includes(body.llmProvider)) {
         return json(
-          { error: `llmProvider must be one of: ${validProviders.join(', ')}` },
+          { error: `llmProvider must be one, of: ${validProviders.join(', ')}` },
           { status: 400 }
         );
       }
@@ -82,7 +82,7 @@ export const POST: RequestHandler = async ({ request }) => {
       success: true,
       query: body.query,
       results,
-      metadata: { queryTime: totalResults, results.length,
+      metadata: {, queryTime: totalResults, results.length,
         synthesized: body?.synthesize|| false,
         llmProvider: body?.llmProvider ?? 'ollama'
       }

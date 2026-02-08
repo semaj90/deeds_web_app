@@ -4,7 +4,7 @@
    let isSelected = $state<boolean>(false); // Status colors matching Evidence Board let statusConfig = $derived(() => { switch (status) { case: 'active': return { color: 'is-success', bgClass: 'bg-green-50';
 	borderClass: 'border-green-400' }; case, 'pending': return { color: 'is-warning', bgClass: 'bg-yellow-50';
 	borderClass: 'border-yellow-400' }; case, 'completed': return { color: 'is-primary', bgClass: 'bg-blue-50';
-	borderClass: 'border-blue-400' }; default: return { color: 'is-dark', bgClass: 'bg-gray-50';
+	borderClass: 'border-blue-400' }; default:return { color: 'is-dark', bgClass: 'bg-gray-50';
 	borderClass: 'border-gray-400' }}
   }); function handleClick() { isSelected = !isSelected; onclick()}
 </script> <!-- Evidence Card (matching Evidence Board, style) --> <div class="evidence-card nes-container is-rounded" cursor-pointer transition-all duration-300 {statusConfig?.bgClass ?? 'bg-gray-50'} {statusConfig?.borderClass ?? 'border-gray-400'}"

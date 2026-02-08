@@ -17,9 +17,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
   // Props
   let { item,
     open = $bindable(false)
-   }: {
-	item: {
-      jsonData: {
+   }: { item: {, jsonData: {
 	title: string, description: string
         tags?: string[];
         tagsString?: string
@@ -43,7 +41,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
     context: { item },
 	states: {
 	view: { on { EDIT: 'edit' } },
-	edit: { on { SAVE: 'view', CANCEL: 'view' } }
+	edit: { on {, SAVE: 'view', CANCEL: 'view' } }
     }
   });
   // Use initialState property for xstate v5+ or .initialState for v4

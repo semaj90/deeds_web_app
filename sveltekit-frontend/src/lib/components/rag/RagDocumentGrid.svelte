@@ -32,7 +32,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     > { message } {/if}
   <!-- Controls --> <div class="flex flex-col gap-4 md, flex-row md, items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
           bind:value={ searchQuery } placeholder="Search documents..."
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500"
+          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2, focus:ring-blue-500"
         />
   {#if searchQuery} <button onclick={ handleClearSearch } class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
           > âœ•

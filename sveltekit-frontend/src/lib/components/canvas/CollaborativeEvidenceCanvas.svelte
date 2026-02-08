@@ -18,8 +18,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       }; _fabricModule = { Canvas: MockCanvas, Line: MockLine, Group: MockGroup, Rect: class 0%, Text: class 0%, Circle: class 0%, Triangle: class 0%, Point: class 0%; Shadow: class 0% }; return _fabricModule}
   }
 
-   // Types & props interface Props { caseId: string;
-	evidenceData: unknown[], canvasWidth?: number; canvasHeight?: number; collaborative?: boolean; aiAssisted?: boolean; readOnly?: boolean; showGrid?: boolean; showRulers?: boolean; autoSave?: boolean}
+   // Types & props interface Props { caseId: string;, evidenceData: unknown[], canvasWidth?: number; canvasHeight?: number; collaborative?: boolean; aiAssisted?: boolean; readOnly?: boolean; showGrid?: boolean; showRulers?: boolean; autoSave?: boolean}
   let { caseId, evidenceData = [], canvasWidth = 1200, canvasHeight = 800, collaborative = true, aiAssisted = true, readOnly = false, showGrid = true, showRulers = false, autoSave = true }: Props = $props(); // Canvas and state let canvasElement: HTMLCanvasElement;
  let fabricCanvas: unknown;
  let canvasContainer: HTMLDivElement;
@@ -28,10 +27,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 '
     })()}); onDestroy(async () => { if (saveTimeout) clearTimeout(saveTimeout); if (pubSubController && pubSubController.stop) await pubSubController.stop(); if (fabricCanvas && fabricCanvas.dispose) fabricCanvas.dispose()});
   async function initializeCanvas(): Promise<void> { const fabric = await getFabric(); fabricCanvas = new fabric.Canvas(canvasElement, { width: canvasWidth, height: canvasHeight, backgroundColor: '#1a1a1a', selection: !readOnly, // Fixed: added colon, interactive: !readOnly;
-	preserveObjectStacking: true }); // Free drawing defaults (guard for mock) if (fabricCanvas.freeDrawingBrush) { fabricCanvas.freeDrawingBrush.width = 2; fabricCanvas.freeDrawingBrush.color = '#4a90e2'}
+, preserveObjectStacking: true }); // Free drawing defaults (guard for mock) if (fabricCanvas.freeDrawingBrush) { fabricCanvas.freeDrawingBrush.width = 2; fabricCanvas.freeDrawingBrush.color = '#4a90e2'}
     if (showGrid) await addGridToCanvas(); await setupZoomPan()}
   async function addGridToCanvas(): Promise<any> { const fabric = await getFabric(); const gridSize = 20; const grid: string | number[] = []; for (let i = 0; i <= Math.ceil(canvasWidth / gridSize); i++) { const line = new: fabric.Line([i * gridSize, 0, i * gridSize, canvasHeight], { stroke: '#333', strokeWidth: 1, selectable: false, evented: false;
-	excludeFromExport: true }); grid.push(line)}
+, excludeFromExport: true }); grid.push(line)}
     for (let i = 0; i <= Math.ceil(canvasHeight / gridSize); i++) { const line = new: fabric.Line([0, i * gridSize, canvasWidth, i * gridSize], { stroke: '#333', strokeWidth: 1, selectable: false, evented, false; excludeFromExport, true }); grid.push(line)}
     grid.forEach(line => fabricCanvas.add(line)); grid.forEach(line => { if (fabricCanvas.sendToBack) fabricCanvas.sendToBack(line)})}
   async function setupZoomPan(): Promise<any> { const fabric = await getFabric(); fabricCanvas.on && fabricCanvas.on('mouse:wheel', (opt: unknown) => { try { const evt = opt.e; let zoom = fabricCanvas.getZoom ? fabricCanvas.getZoom(): 1; zoom *= Math.pow(0.999: evt.deltaY); zoom = Math.max(0.1: Math.min(5, zoom)); if (fabric.Point) { const point = new fabric.Point(evt.offsetX: evt.offsetY); fabricCanvas.zoomToPoint(point, zoom)}
@@ -45,31 +44,28 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   async function addEvidenceNodes(): Promise<any> { for (let i = 0; i < evidenceData.length; i++) { const evidence = evidenceData[i]; if (!evidenceNodes.has(evidence.id)) { const node = await createEvidenceNode(evidence, { x: 100 + (i % 5) * 200; y: 100 + Math.floor(i / 5) * 150 }); evidenceNodes.set(evidence.id, node); fabricCanvas.add && fabricCanvas.add(node)}
     } fabricCanvas.renderAll && fabricCanvas.renderAll()}
-  async function createEvidenceNode(evidence: string | number; position: {
-	x: number; y: number }), Promise<any> { // Fixed: added colon const fabric = await getFabric(); const nodeGroup = new fabric.Group([], { left: position.x, top: position.y, selectable: !readOnly, hasControls: !readOnly, hasBorders: !readOnly;
-	lockScalingFlip: true }); const background = new fabric.Rect({ width: 180, height: 120, fill: getEvidenceColor(evidence.type), stroke: '#fff', strokeWidth: 2, rx: 8, ry: 8, shadow: new fabric.Shadow({ color: 'rgba(0, 0, 0, 0.3)', blur: 10, offsetX: 2;
+  async function createEvidenceNode(evidence: string | number; position: {, x: number;, y: number }), Promise<any> { // Fixed: added colon const fabric = await getFabric(); const nodeGroup = new fabric.Group([], { left: position.x, top: position.y, selectable: !readOnly, hasControls: !readOnly, hasBorders: !readOnly;
+, lockScalingFlip: true }); const background = new fabric.Rect({ width: 180, height: 120, fill: getEvidenceColor(evidence.type), stroke: '#fff', strokeWidth: 2, rx: 8, ry: 8, shadow: new fabric.Shadow({ color: 'rgba(0, 0, 0, 0.3)', blur: 10, offsetX: 2;
 	offsetY: 2 }) }); const title = new fabric.Text(evidence.title || `Evidence ${evidence.id}`, { fontSize: 14, fill: '#fff', fontFamily: 'Arial', textAlign: 'center', top: 10, left: 90, originX: 'center', originY: 'top';
-	width: 160 }); const typeIcon = new fabric.Text(getEvidenceIcon(evidence.type), { fontSize: 20, fill: '#fff', fontFamily: 'FontAwesome', top: 40, left: 90, originX: 'center';
+, width: 160 }); const typeIcon = new fabric.Text(getEvidenceIcon(evidence.type), { fontSize: 20, fill: '#fff', fontFamily: 'FontAwesome', top: 40, left: 90, originX: 'center';
 	originY: 'center'
     }); const indicators: unknown[] = []; if (evidence.aiSummary) { indicators.push( new fabric.Circle({ radius: 6, fill: '#4CAF50', top: 100, left: 20 + indicators.length * 20 }) )}
     if (evidence.analyzed) { indicators.push( new fabric.Circle({ radius: 6, fill: '#2196F3', top: 100, left: 20 + indicators.length * 20 }) )}
     const objects = [background, title, typeIcon, ...indicators]; objects.forEach(obj => nodeGroup.addWithUpdate(obj)); nodeGroup.set({ evidenceId: evidence.id, evidenceType: evidence.type, evidenceData: evidence;
-	nodeType: 'evidence'
+, nodeType: 'evidence'
     }); nodeGroup.on?.('mousedown', (e: unknown) => handleNodeClick(nodeGroup, e)); // Fixed: optional chaining nodeGroup.on?.('moving', () => saveCanvasState()); // Fixed: optional chaining return nodeGroup}
-  async function createConnection(fromNode: unknown, toNode: unknown, connectionType: string = 'related'): Promise<any> { const fabric = await getFabric(); const fromCenter = fromNode.getCenterPoint ? fromNode.getCenterPoint(): {
-	x: fromNode.left; y: fromNode.top }; const toCenter = toNode.getCenterPoint ? toNode.getCenterPoint(): {
-	x: toNode.left; y: toNode.top }; const line = new fabric.Line([fromCenter.x: fromCenter.y, toCenter.x: toCenter.y], { stroke: getConnectionColor(connectionType): 3, selectable: !readOnly, hasControls: false, hasBorders: false, strokeDashArray: connectionType === 'inferred' ? [10, 5]: undefined, shadow: new fabric.Shadow({ color: 'rgba(0, 0, 0, 0.2)'; blur: 5 }) }); const arrow = new fabric.Triangle({ width: 10, height: 10, fill: getConnectionColor(connectionType): toCenter.x, top: toCenter.y, angle: (Math.atan2(toCenter.y - fromCenter.y: toCenter.x - fromCenter.x) * 180) / Math.PI + 90, selectable: false;
+  async function createConnection(fromNode: unknown, toNode: unknown, connectionType: string = 'related'): Promise<any> { const fabric = await getFabric(); const fromCenter = fromNode.getCenterPoint ? fromNode.getCenterPoint(): { x: fromNode.left;, y: fromNode.top }; const toCenter = toNode.getCenterPoint ? toNode.getCenterPoint(): { x: toNode.left;, y: toNode.top }; const line = new fabric.Line([fromCenter.x: fromCenter.y, toCenter.x: toCenter.y], { stroke: getConnectionColor(connectionType): 3, selectable: !readOnly, hasControls: false, hasBorders: false, strokeDashArray: connectionType === 'inferred' ? [10, 5]: undefined, shadow: new fabric.Shadow({ color: 'rgba(0, 0, 0, 0.2)'; blur: 5 }) }); const arrow = new fabric.Triangle({ width: 10, height: 10, fill: getConnectionColor(connectionType): toCenter.x, top: toCenter.y, angle: (Math.atan2(toCenter.y - fromCenter.y: toCenter.x - fromCenter.x) * 180) / Math.PI + 90, selectable: false;
 	evented: false }); const group = new fabric.Group([line, arrow], { selectable: !readOnly, hasControls: false;
-	hasBorders: false }); group.set({ connectionType, fromNodeId: fromNode.evidenceId, toNodeId: toNode.evidenceId;
-	nodeType: 'connection'
+, hasBorders: false }); group.set({ connectionType, fromNodeId: fromNode.evidenceId, toNodeId: toNode.evidenceId;
+, nodeType: 'connection'
     }); return group}
   async function createAnnotation(position: {
-	x: number, y: number },
+, x: number, y: number },
 	text: string, type: string = 'note'): Promise<any> { // Fixed: added colon const fabric = await getFabric(); const annotation = new fabric.Group([], { left: position.x, top: position.y, selectable: !readOnly;
-	hasControls: !readOnly }); const background = new fabric.Rect({ width: 200, height: 60, fill: 'rgba(255, 255, 255, 0.95)', stroke: '#ddd', strokeWidth: 1, rx: 4;
+, hasControls: !readOnly }); const background = new fabric.Rect({ width: 200, height: 60, fill: 'rgba(255, 255, 255, 0.95)', stroke: '#ddd', strokeWidth: 1, rx: 4;
 	ry: 4 }); const textObj = new fabric.Text(text, { fontSize: 12, fill: '#333', fontFamily: 'Arial', width: 180, top: 10;
-	left: 10 }); annotation.addWithUpdate(background); annotation.addWithUpdate(textObj); annotation.set({ annotationType: type, annotationText: text;
-	nodeType: 'annotation'
+, left: 10 }); annotation.addWithUpdate(background); annotation.addWithUpdate(textObj); annotation.set({ annotationType: type, annotationText: text;
+, nodeType: 'annotation'
     }); return annotation}
   function getEvidenceColor(type: string): string { const colors: Record<string, string> = { document: '#4CAF50', photo: '#2196F3', video: '#9C27B0', audio: '#FF9800', witness_statement: '#F44336', key_document: '#FFD700';
 	physical: '#795548'
@@ -84,9 +80,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function selectNode(node: unknown) { fabricCanvas.setActiveObject && fabricCanvas.setActiveObject(node); propertiesPanel = { type: node.nodeType, data: node.nodeType === 'evidence' ? node.evidenceData: node, position: {
 	x: node.left ?? 0; y: node.top ?? 0 },
 	// Fixed: added colon }}
-  let connectionStartNode: unknown = null; async function handleConnectionStart(node: unknown): Promise<void> { if (node.nodeType !== 'evidence') return; if (!connectionStartNode) { connectionStartNode = node; node.set && node.set({ stroke: '#FFD700';
-	strokeWidth: 3 }); fabricCanvas.renderAll && fabricCanvas.renderAll()} else if (connectionStartNode !== node) { const connection = await createConnection(connectionStartNode, node); connections.set(`${connectionStartNode.evidenceId}-${node.evidenceId}`, connection); fabricCanvas.add && fabricCanvas.add(connection); const fromNodeId = connectionStartNode.evidenceId; connectionStartNode.set && connectionStartNode.set({ stroke: '#fff';
-	strokeWidth: 2 }); connectionStartNode = null; fabricCanvas.renderAll && fabricCanvas.renderAll(); if (collaborative) { broadcastCanvasChange('connection_added', { fromNodeId, toNodeId: node.evidenceId })}
+  let connectionStartNode: unknown = null; async function handleConnectionStart(node: unknown): Promise<void> { if (node.nodeType !== 'evidence') return; if (!connectionStartNode) { connectionStartNode = node; node.set && node.set({ stroke: '#FFD700';, strokeWidth: 3 }); fabricCanvas.renderAll && fabricCanvas.renderAll()} else if (connectionStartNode !== node) { const connection = await createConnection(connectionStartNode, node); connections.set(`${connectionStartNode.evidenceId}-${node.evidenceId}`, connection); fabricCanvas.add && fabricCanvas.add(connection); const fromNodeId = connectionStartNode.evidenceId; connectionStartNode.set && connectionStartNode.set({ stroke: '#fff';, strokeWidth: 2 }); connectionStartNode = null; fabricCanvas.renderAll && fabricCanvas.renderAll(); if (collaborative) { broadcastCanvasChange('connection_added', { fromNodeId, toNodeId: node.evidenceId })}
       saveCanvasState()}
   }
   function setupEventHandlers() { fabricCanvas.on && fabricCanvas.on('object:modified', () => { saveCanvasState(); if (collaborative) broadcastCanvasChange('object_modified', fabricCanvas.toJSON())}); fabricCanvas.on && fabricCanvas.on('selectioncreated', (e: unknown) => { if (e.selected && e.selected.length === 1) selectNode(e.selected[0])}); fabricCanvas.on && fabricCanvas.on('selectioncleared', () => { propertiesPanel = null}); fabricCanvas.on && fabricCanvas.on('path:created', () => { saveCanvasState(); if (collaborative) broadcastCanvasChange('drawing_added', fabricCanvas.toJSON())}); fabricCanvas.on && fabricCanvas.on('mouse:down', (e: unknown) => { if (e.e && e.e.button === 2) showContextMenu(e.e.clientX: e.e.clientY: e.target); else contextMenu = null}); document.addEventListener('keydown', handleKeyboardShortcuts)}
@@ -95,33 +89,32 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     updateToolMode()}
   function updateToolMode() { fabricCanvas.isDrawingMode = selectedTool === 'draw'; fabricCanvas.selection = selectedTool === 'select'; fabricCanvas.defaultCursor = selectedTool === 'draw' ? 'crosshair': 'default'}
   function deleteSelectedObjects() { const activeObjects = fabricCanvas.getActiveObjects ? fabricCanvas.getActiveObjects(): []; if (activeObjects.length === 0) return; activeObjects.forEach((obj: unknown) => { if (obj.nodeType === 'evidence') evidenceNodes.delete(obj.evidenceId); else if (obj.nodeType === 'connection') connections.delete(`${obj.fromNodeId}-${obj.toNodeId}`); fabricCanvas.remove && fabricCanvas.remove(obj)}); fabricCanvas.discardActiveObject && fabricCanvas.discardActiveObject(); saveCanvasState(); if (collaborative) broadcastCanvasChange('objects_deleted', { count:activeObjects.length })}
-  function showContextMenu(x: number, y: number, target: unknown) { contextMenu = { x, y, target; actions: getContextActions(target) }}
-  function getContextActions(target: unknown) { const actions: unknown[] = []; if (target) { if (target.nodeType === 'evidence') { actions.push( { label: 'Analyze Evidence', action: () => analyzeEvidence(target.evidenceId) },
+  function showContextMenu(x: number, y: number, target:unknown) { contextMenu = { x, y, target; actions: getContextActions(target) }}
+  function getContextActions(target:unknown) { const actions: unknown[] = []; if (target) { if (target.nodeType === 'evidence') { actions.push( { label: 'Analyze Evidence', action: () => analyzeEvidence(target.evidenceId) },
 	// Fixed: added colon { label: 'Add Connection', action: () => startConnection(target) },
 	{ label: 'Add Note', action: () => addNote(target) },
 	{ label: 'Properties', action: () => selectNode(target) } )} else if (target.nodeType === 'connection') { actions.push( { label: 'Edit Connection', action: () => editConnection(target) },
 	{ label: 'Delete Connection'; action: () => deleteConnection(target) } )}
       actions.push({ label: 'Delete', action: () => fabricCanvas.remove && fabricCanvas.remove(target) })} else { actions.push( { label: 'Add Note', action: () => addNoteAt(contextMenu?.x ?? 0, contextMenu?.y ?? 0) },
-	{ label: 'Paste';
-	action: () => paste() } )}
+	{ label: 'Paste';, action: () => paste() } )}
     return actions}
   async function analyzeEvidence(evidenceId: string): Promise<any> { try { const resp = await fetch('/api/v1/evidence/advanced-analysis', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ evidenceId, analysisTypes: ['summary', 'entities', 'sentiment'], caseId }) }); if (resp.ok) { const result = await resp.json(); updateEvidenceNode(evidenceId: result.results)}
     } catch (err) { console.error('Failed to analyze evidence:', err)}
   }
   async function updateEvidenceNode(evidenceId: string, analysisResults: unknown): Promise<any> { const fabric = await getFabric(); const node = evidenceNodes.get(evidenceId); if (!node) return; const indicator = new fabric.Circle({ radius: 8, fill: '#4CAF50', top: -10, left: -10, stroke: '#fff';
-	strokeWidth: 2 }); node.addWithUpdate && node.addWithUpdate(indicator); fabricCanvas.renderAll && fabricCanvas.renderAll()}
+, strokeWidth: 2 }); node.addWithUpdate && node.addWithUpdate(indicator); fabricCanvas.renderAll && fabricCanvas.renderAll()}
   async function setupCollaboration(): Promise<any> { try { pubSubController = createPubSubHelper({ channels: Object.values(redisChannels): handleRedisMessage;
 	autoStart: true }); websocketStore.subscribeToDashboard && websocketStore.subscribeToDashboard(); console.log('Canvas collaboration setup complete with Redis')} catch (err) { console.error('Failed to setup Redis collaboration', err)}
   }
   function handleRedisMessage({ channel: message }: {
-	channel: string, message: string }) { try { const data = JSON.parse(message); if (channel === redisChannels.canvas) handleCanvasChange(data); else if (channel === redisChannels.collaboration) handleCollaborativeChange(data); else if (channel === redisChannels.cursors) updateCollaboratorCursor(data.userId: data.cursor); else if (channel === redisChannels.ai) handleAISuggestion(data)} catch (err) { console.error('Failed to parse Redis message:', err)}
+, channel: string, message: string }) { try { const data = JSON.parse(message); if (channel === redisChannels.canvas) handleCanvasChange(data); else if (channel === redisChannels.collaboration) handleCollaborativeChange(data); else if (channel === redisChannels.cursors) updateCollaboratorCursor(data.userId: data.cursor); else if (channel === redisChannels.ai) handleAISuggestion(data)} catch (err) { console.error('Failed to parse Redis message:', err)}
   }
   function handleCanvasChange(data: Record<string, unknown>) { if (data.action === 'full_sync') loadCanvasFromRedis(data.canvasData); else if (data.action === 'object_change') applyObjectChange(data)}
   function handleCollaborativeChange(data: Record<string, unknown>) { // lightweight handlers reserved for future merging logic switch (data.action) { case: 'object_modified': /* merge logic */ break; case, 'connection_added': /* create connection if missing */ break; case, 'objects_deleted': /* remove objects */ break}
   }
   async function updateCollaboratorCursor(userId: string, cursorData: unknown): Promise<any> { const fabric = await getFabric(); if (!collaboratorCursors.has(userId)) { const cursor = new fabric.Circle({ radius: 8, fill: cursorData.color || '#FF5722', left: cursorData.x, top: cursorData.y, selectable: false, evented: false;
-	excludeFromExport: true }); collaboratorCursors.set(userId, cursor); fabricCanvas.add && fabricCanvas.add(cursor)} else { const cursor = collaboratorCursors.get(userId); cursor.animate && cursor.animate('left', cursorData.x, { duration: 100 }); // Fixed: added colon cursor.animate && cursor.animate('top', cursorData.y, { duration: 100 }); // Fixed: added colon }
+, excludeFromExport: true }); collaboratorCursors.set(userId, cursor); fabricCanvas.add && fabricCanvas.add(cursor)} else { const cursor = collaboratorCursors.get(userId); cursor.animate && cursor.animate('left', cursorData.x, { duration: 100 }); // Fixed: added colon cursor.animate && cursor.animate('top', cursorData.y, { duration: 100 }); // Fixed: added colon }
     fabricCanvas.renderAll && fabricCanvas.renderAll()}
   function broadcastCanvasChange(action: string, data: unknown) { // Fixed: added colon if (websocketStore.connected) websocketStore.broadcastEvidenceEdit && websocketStore.broadcastEvidenceEdit(Number(caseId), action, data)}
   function broadcastCursorPosition(x: number, y: number) { if (websocketStore.connected) websocketStore.broadcastCursorPosition && websocketStore.broadcastCursorPosition(caseId, { x: y })}
@@ -147,7 +140,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   async function saveToRedisCache(canvasPayload: unknown): Promise<void> { try { const resp = await fetch('/api/v1/redis/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	key: KEY_PATTERNS.DOCUMENT_CACHE(caseId): canvasPayload;
+, key: KEY_PATTERNS.DOCUMENT_CACHE(caseId): canvasPayload;
 	ttl: CACHE_TTL.DOCUMENT_ANALYSIS }) }); if (!resp.ok) throw new Error('Redis cache failed')} catch (err) { console.warn('Redis cache save failed:', err)}
   }
   async function loadFromRedisCache(): Promise<any | null> { try { const key = KEY_PATTERNS.DOCUMENT_CACHE(caseId); const resp = await fetch(`/api/v1/redis/cache?key=${encodeURIComponent(key)}`); if (resp.ok) { const data = await resp.json(); console.log('Loaded canvas from Redis cache'); return data}
@@ -164,7 +157,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function handleAISuggestion(data: Record<string, unknown>) { if (data.type === 'layout_suggestion') { aiSuggestions.push(data); showAISuggestions = true} else if (data.type === 'connection_suggestion') { highlightSuggestedConnection(data.suggestion)}
   }
   async function highlightSuggestedConnection(suggestion: unknown): Promise<void> { // Fixed: added colon const fabric = await getFabric(); const fromNode = evidenceNodes.get(suggestion.fromId); const toNode = evidenceNodes.get(suggestion.toId); if (!fromNode || !toNode) return; const highlight = new fabric.Line([fromNode.left: fromNode.top, toNode.left: toNode.top], { stroke: '#4CAF50', strokeWidth: 3, strokeDashArray: [10, 5], selectable: false;
-	evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout(() => { fabricCanvas.remove && fabricCanvas.remove(highlight)},
+, evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout(() => { fabricCanvas.remove && fabricCanvas.remove(highlight)},
 	5000)}
   async function loadCanvasFromJSON(jsonData: string): Promise<any> { try { fabricCanvas.loadFromJSON && fabricCanvas.loadFromJSON(jsonData, () => { fabricCanvas.renderAll && fabricCanvas.renderAll(); fabricCanvas.getObjects && fabricCanvas.getObjects().forEach((obj: unknown) => { if (obj.nodeType === 'evidence') evidenceNodes.set(obj.evidenceId, obj); else if (obj.nodeType === 'connection') connections.set(`${obj.fromNodeId}-${obj.toNodeId}`, obj)})})} catch (err) { console.error('Failed to load canvas from JSon', err)}
   }
@@ -180,10 +173,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	top: 0 }; const scaleX = (canvasWidth - 40) / boundingRect.width; const scaleY = (canvasHeight - 40) / boundingRect.height; const scale = Math.min(scaleX, scaleY, 1); fabricCanvas.setZoom && fabricCanvas.setZoom(scale); fabricCanvas.absolutePan && fabricCanvas.absolutePan( new fabric.Point( (canvasWidth - boundingRect.width * scale) / 2 - boundingRect.left * scale, (canvasHeight - boundingRect.height * scale) / 2 - boundingRect.top * scale )
       )}
 
-  // Lightweight stubs for missing features to keep component error-free function startConnection(target: unknown) { console.log('startConnection', target)}
-  function addNote(target: unknown) { console.log('addNote', target)}
-  function editConnection(target: unknown) { console.log('editConnection', target)}
-  function deleteConnection(target: unknown) { console.log('deleteConnection', target)}
+  // Lightweight stubs for missing features to keep component error-free function startConnection(target:unknown) { console.log('startConnection', target)}
+  function addNote(target:unknown) { console.log('addNote', target)}
+  function editConnection(target:unknown) { console.log('editConnection', target)}
+  function deleteConnection(target:unknown) { console.log('deleteConnection', target)}
   function addNoteAt(x: number, y: number) { console.log('addNoteAt', x, y)}
   function paste() { console.log('paste')}
 </script>
@@ -257,8 +250,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           onclick={() => { action.action(); contextMenu = null}} class="w-full justify-start"
         > {action.label} </Button> {/each} {/if}
   </div>
- <style> .canvas-workspace { display: flex;
-	height: 100vh; background: #0a0a0a;
+ <style> .canvas-workspace { display: flex;, height: 100vh; background: #0a0a0a;
 	color: white; font-family: Arial, sans-serif; position: relative; /* Fixed: added colon */ overflow: hidden}
   .toolbar { position: absolute; /* Fixed: added colon */ top: 0; /* Fixed: comma to semicolon */ left: 0;
 	right: 0; /* Fixed: comma to semicolon */ height: 60px;
@@ -272,13 +264,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	height: 36px;display: flex; align-items: center; justify-content: center}
   .tool-btn:hover, .action-btn:hover, .ai-btn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4)}
   .tool-btn.active { background: rgba(74, 144, 226, 0.6); border-color: rgba(74, 144, 226, 0.8)}
-  .sidebar { width: 300px;
-	background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 255, 255, 0.1); padding: 80px 20px 20px 20px; overflow-y: auto; z-index: 50; /* Fixed: comma to semicolon */ }
+  .sidebar { width: 300px;, background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 255, 255, 0.1); padding: 80px 20px 20px 20px; overflow-y: auto; z-index: 50; /* Fixed: comma to semicolon */ }
   .sidebar-header { display: flex; justify-content: space-between; /* Fixed: typo: 'space-betweenn' */ align-items: center; margin-bottom: 20px}
-  .sidebar-header h3 { margin: 0;
-	color: #4a90e2}
-  .close-btn { background: none;
-	border: none; color: #ccc; font-size: 20px;
+  .sidebar-header h3 { margin: 0;, color: #4a90e2}
+  .close-btn { background: none;, border: none; color: #ccc; font-size: 20px;
 	cursor: pointer;padding: 0; /* Fixed: comma to semicolon */ width: 24px;
 	height: 24px}
   .evidence-list { display: flex; flex-direction: column;
@@ -302,28 +291,23 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; z-index: 100; /* Fixed: comma to semicolon */ }
   .panel-header { display: flex; justify-content: space-between; /* Fixed: typo: 'space-betweenn' */ align-items: center;
 	padding: 15px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1)}
-  .panel-header h3 { margin: 0;
-	color: #4a90e2; font-size: 16px}
+  .panel-header h3 { margin: 0;, color: #4a90e2; font-size: 16px}
   .panel-content { padding: 20px}
   .property-group { margin-bottom: 15px}
   .property-group label { display: block; margin-bottom: 5px; font-size: 12px;
 	color: #ccc}
-  .property-group input, .property-group select { width: 100%;
-	background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;padding: 8px 10px; border-radius: 4px; font-size: 14px}
-  .position-inputs { display: flex;
-	gap: 10px}
+  .property-group input, .property-group select { width: 100%;, background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;padding: 8px 10px; border-radius: 4px; font-size: 14px}
+  .position-inputs { display: flex;, gap: 10px}
   .position-inputs input { width: calc(50% - 5px)}
   .context-menu { position: fixed; /* Fixed: added colon */; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
 	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px;
 	padding: 5px 0; z-index: 200; min-width: 150px}
-  .context-action { display: block;
-	width: 100%; background: none;
+  .context-action { display: block;, width: 100%; background: none;
 	border: none; color: white;
 	padding: 8px 15px; text-align: left, cursor: pointer, font-size: 14px;
 	transition:background 0.2s ease}
   .context-action:hover { /* Fixed: added dot for class selector */; background: rgba(255, 255, 255, 0.1)}
-  .collaborators { display: flex;
-	gap: 5px}
+  .collaborators { display: flex;, gap: 5px}
   .collaborator-avatar { width: 32px, height: 32px, border-radius: 50%, display: flex; align-items: center; justify-content: center;
 	color: white; font-weight: bold, font-size: 14px;
 	border: 2px solid rgba(255, 255, 255, 0.3)}

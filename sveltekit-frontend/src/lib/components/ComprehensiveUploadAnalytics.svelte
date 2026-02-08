@@ -113,8 +113,7 @@
 				uploadResults: [],
 				errors: [],
 				contextualPrompts: [],
-				pipeline: {
-	fileValidation: { status: 'pending' },
+				pipeline: { fileValidation: {, status: 'pending' },
 	fileUpload: {
 	status: 'pending' },
 	aiAnalysis: {
@@ -124,7 +123,7 @@
 	vectorEmbedding: {
 	status: 'pending' },
 	dbStorage: {
-	status: 'pending' },
+, status: 'pending' },
 	},
 	evidenceMetadata: [],
 				aiAnalysisResults: []
@@ -558,25 +557,17 @@
 		align-items: center;
 		margin-bottom: 2rem }
 
-	.upload-header h2 {
-		margin: 0;
-	color: #2563eb }
+	.upload-header h2 { margin: 0;, color: #2563eb }
 
-	.user-insights-badge {
-		display: flex;
-	gap: 1rem;
+	.user-insights-badge { display: flex;, gap: 1rem;
 		font-size: 0.875rem }
 
-	.expertise-level {
-		background: #dbeafe;
-	color: #2563eb;
+	.expertise-level { background: #dbeafe;, color: #2563eb;
 		padding: 0.25rem 0.75rem;
 		border-radius: 1rem;
 		text-transform: capitalize }
 
-	.engagement-score {
-		background: #dcfce7;
-	color: #16a34a;
+	.engagement-score { background: #dcfce7;, color: #16a34a;
 		padding: 0.25rem 0.75rem;
 		border-radius: 1rem }
 
@@ -592,9 +583,7 @@
 
 	.ai-prompts h3 { margin: 0 0 1rem 0; color: #374151 }
 
-	.ai-prompt {
-		background: white;
-	padding: 1rem;
+	.ai-prompt { background: white;, padding: 1rem;
 		border-radius: 0.5rem;
 		margin-bottom: 1rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -604,8 +593,7 @@
 
 	.prompt-content { margin: 0 0 1rem 0; line-height: 1.5 }
 
-	.prompt-actions { display: flex;
-	gap: 0.5rem; margin-bottom: 0.5rem }
+	.prompt-actions { display: flex;, gap: 0.5rem; margin-bottom: 0.5rem }
 	.prompt-confidence { font-size: 0.75rem;
 	color: #6b7280 }
 
@@ -649,27 +637,20 @@
 	.status-success { color: #16a34a; font-weight: 500 }
 	.status-error { color: #dc2626; font-weight: 500 }
 
-	.file-actions { display: flex;
-	gap: 1rem; margin-top: 1rem; justify-content: center }
+	.file-actions { display: flex;, gap: 1rem; margin-top: 1rem; justify-content: center }
 
-	.upload-progress {
-		background: #f9fafb;
-	padding: 1.5rem;
+	.upload-progress { background: #f9fafb;, padding: 1.5rem;
 		border-radius: 0.75rem;
 		margin-bottom: 2rem }
 
 	.progress-header { display: flex; justify-content: space-between; margin-bottom: 1rem }
-	.progress-bar {
-		height: 0.5rem;
-	background: #e5e7eb;
+	.progress-bar { height: 0.5rem;, background: #e5e7eb;
 		border-radius: 0.25rem;
 	overflow: hidden;
 		margin-bottom: 1rem }
-	.progress-fill { height: 100%;
-	background: linear-gradient(90deg, #3b82f6, #10b981); transition:width 0.3s ease }
+	.progress-fill { height: 100%;, background: linear-gradient(90deg, #3b82f6, #10b981); transition:width 0.3s ease }
 
-	.pipeline-status { display: flex;
-	gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap }
+	.pipeline-status { display: flex;, gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap }
 	.pipeline-stage {
 		display: flex;
 		align-items: center;
@@ -685,17 +666,13 @@
 	.pipeline-stage.failed { border-color: #ef4444;
 	background: #fef2f2 }
 
-	.upload-results { background: #f0fdf4;
-	padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem }
-	.results-summary { display: flex;
-	gap: 2rem; margin-bottom: 1.5rem; justify-content: center }
+	.upload-results { background: #f0fdf4;, padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem }
+	.results-summary { display: flex;, gap: 2rem; margin-bottom: 1.5rem; justify-content: center }
 	.summary-stat { text-align: center }
 	.stat-value { display: block; font-size: 2rem; font-weight: bold;
 	color: #10b981 }
 
-	.result-item {
-		background: white;
-	padding: 1rem;
+	.result-item { background: white;, padding: 1rem;
 		border-radius: 0.5rem;
 		margin-bottom: 1rem;
 		border-left: 4px solid #e5e7eb }
@@ -704,55 +681,42 @@
 
 	.ai-insights { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb }
 	.insights-summary { margin-bottom: 1rem; line-height: 1.5 }
-	.tag { display: inline-block;
-	background: #e5e7eb; color: #374151;
+	.tag { display: inline-block;, background: #e5e7eb; color: #374151;
 	padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; margin-right: 0.5rem; margin-bottom: 0.25rem }
 
 	.analytics-dashboard { margin-top: 2rem;
 	border: 1px solid #e5e7eb; border-radius: 0.5rem }
-	.analytics-dashboard summary { padding: 1rem;
-	cursor: pointer; font-weight: 500 }
+	.analytics-dashboard summary { padding: 1rem;, cursor: pointer; font-weight: 500 }
 	.analytics-content { padding: 1rem; border-top: 1px solid #e5e7eb; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem }
-	.insight-card { background: #f9fafb;
-	padding: 1rem; border-radius: 0.5rem }
+	.insight-card { background: #f9fafb;, padding: 1rem; border-radius: 0.5rem }
 	.insight-card h4 { margin: 0 0 0.5rem 0; color: #374151 }
 
 	/* Buttons */
-	.btn-accept { background: #10b981;
-	color: white; border: none;
+	.btn-accept { background: #10b981;, color: white; border: none;
 	padding: 0.5rem 1rem; border-radius: 0.25rem;
 	cursor: pointer }
-	.btn-dismiss { background: #ef4444;
-	color: white; border: none;
+	.btn-dismiss { background: #ef4444;, color: white; border: none;
 	padding: 0.5rem 1rem; border-radius: 0.25rem;
 	cursor: pointer }
-	.btn-select-files { background: #3b82f6;
-	color: white; border: none;
+	.btn-select-files { background: #3b82f6;, color: white; border: none;
 	padding: 1rem 2rem; border-radius: 0.5rem;
 	cursor: pointer; font-size: 1rem }
-	.btn-cancel { background: #ef4444;
-	color: white; border: none;
+	.btn-cancel { background: #ef4444;, color: white; border: none;
 	padding: 0.5rem 1rem; border-radius: 0.25rem;
 	cursor: pointer }
-	.btn-retry { background: #f59e0b;
-	color: white; border: none;
+	.btn-retry { background: #f59e0b;, color: white; border: none;
 	padding: 0.75rem 1.5rem; border-radius: 0.5rem;
 	cursor: pointer }
-	.btn-reset { background: #6b7280;
-	color: white; border: none;
+	.btn-reset { background: #6b7280;, color: white; border: none;
 	padding: 0.75rem 1.5rem; border-radius: 0.5rem;
 	cursor: pointer }
 
-	.error-section { background: #fef2f2;
-	border: 1px solid #fecaca; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem }
+	.error-section { background: #fef2f2;, border: 1px solid #fecaca; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem }
 	.error-section h3 { margin: 0 0 1rem 0; color: #dc2626 }
-	.error-item { background: white;
-	padding: 1rem; margin-bottom: 0.5rem; border-left: 4px solid #ef4444 }
-	.error-actions { display: flex;
-	gap: 1rem; margin-top: 1rem }
+	.error-item { background: white;, padding: 1rem; margin-bottom: 0.5rem; border-left: 4px solid #ef4444 }
+	.error-actions { display: flex;, gap: 1rem; margin-top: 1rem }
 
-	.final-actions { display: flex;
-	gap: 1rem; justify-content: center; margin-top: 2rem }
+	.final-actions { display: flex;, gap: 1rem; justify-content: center; margin-top: 2rem }
 
 	@media (max-width: 640px) {
 		.upload-header { flex-direction: column;

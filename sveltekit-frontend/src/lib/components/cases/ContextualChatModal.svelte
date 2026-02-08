@@ -11,9 +11,7 @@
  interface Message {
  role: 'user' | 'assistant';
  content: string;
- citations?: Array<{
-	type: string;
-	id: string;
+ citations?: Array<{ type: string;, id: string;
 	text: string;
  }>;
  }
@@ -60,7 +58,7 @@
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	message: userMessage,
+, message: userMessage,
 				caseId,
 				messages: messages.map((m) => ({
 					role: m.role,
@@ -219,13 +217,9 @@
  }
 
  @keyframes slideIn {
- from {
- opacity: 0;
-	transform: translateY(10px);
+ from { opacity: 0;, transform: translateY(10px);
  }
- to {
- opacity: 1;
-	transform: translateY(0);
+ to { opacity: 1;, transform: translateY(0);
  }
  }
 
@@ -268,17 +262,13 @@
  color: #ef4444;
  }
 
- .message-content.loading {
- display: flex;
-	gap: 0.25rem;
+ .message-content.loading { display: flex;, gap: 0.25rem;
  align-items: center;
  justify-content: center;
 	padding: 0.5rem 1rem;
  }
 
- .dot {
- width: 6px;
-	height: 6px;
+ .dot { width: 6px;, height: 6px;
  border-radius: 50%;
 	background: var(--yorha-accent, #3cbcfc);
  animation: bounce 1.4s infinite;
@@ -293,17 +283,11 @@
  }
 
 	@keyframes bounce {
-	0%, 80% {
-		opacity: 0.3;
-	transform: translateY(0);
+	0%, 80% { opacity: 0.3;, transform: translateY(0);
 	}
-	40% {
-		opacity: 1;
-	transform: translateY(-8px);
+	40% { opacity: 1;, transform: translateY(-8px);
 	}
-	100% {
-		opacity: 0.3;
-	transform: translateY(0);
+	100% { opacity: 0.3;, transform: translateY(0);
 	}
 	}
 
@@ -339,18 +323,14 @@
 	color: var(--yorha-accent, #3cbcfc);
  }
 
- .input-area {
- display: flex;
-	gap: 0.5rem;
+ .input-area { display: flex;, gap: 0.5rem;
  padding: 1rem;
  border-top: 1px solid var(--yorha-border, #606060);
  background: var(--yorha-bg-secondary, #1a1a1a);
  flex-shrink: 0;
  }
 
- .input-field {
- flex: 1;
-	padding: 0.75rem;
+ .input-field { flex: 1;, padding: 0.75rem;
  background: var(--yorha-bg-primary, #0a0a0a);
  border: 1px solid var(--yorha-border, #606060);
  border-radius: 4px;
@@ -367,9 +347,7 @@
  border-color: var(--yorha-accent, #3cbcfc);
  }
 
- .input-field:disabled {
- opacity: 0.5;
-	cursor:not-allowed;
+ .input-field:disabled { opacity: 0.5;, cursor:not-allowed;
  }
 
  .send-button {
@@ -384,14 +362,10 @@
  white-space: nowrap;
  }
 
-	.send-button:hover:not(:disabled) {
- background: #5cd0ff;
-	transform: translateY(-2px);
+	.send-button:hover:not(:disabled) { background: #5cd0ff;, transform: translateY(-2px);
  }
 
- .send-button:disabled {
- opacity: 0.5;
-	cursor:not-allowed;
+ .send-button:disabled { opacity: 0.5;, cursor:not-allowed;
  }
 
  /* Scrollbar styling */

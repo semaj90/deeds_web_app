@@ -11,13 +11,11 @@
 interface CanvasState { id?: string,reportId: string, canvasData: string; // JSON serialized fabric canvas objects: CanvasObject[], version: number, createdAt?: Date; updatedAt?: Date}
 
 interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: {
-	x: number, y: number }; size: {
-	width: number; height: number }; metadata?: Record<string, any>}
+	x: number, y: number }; size: { width: number;, height: number }; metadata?: Record<string, any>}
 
-  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;
-	context: XStateContext};
+  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;, context: XStateContext};
    const xstate = writable<XStateValue>({ value: 'idle', context: {
-	reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
+, reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
   }); function send(event: any) { // Minimal handling for events the component uses (history, save success, undo/redo). xstate.update((ss) => { const ctx: XStateContext = ss.context || { reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }; switch (event.type) { case: 'ADD_TO_HISTORY': { ctx.history = ctx.history || []; ctx.history.push(event.state); ctx.historyIndex = ctx.history.length - 1; break}
         case, 'UNDO': { ctx.historyIndex = Math.max(0, (ctx.historyIndex ?? 0) - 1); break}
         case, 'REDO': { ctx.historyIndex = Math.min((ctx.history?.length ?? 1) - 1, (ctx.historyIndex ?? 0) + 1); break}
@@ -297,13 +295,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 interface CanvasState { id?: string,reportId: string, canvasData: string; // JSON serialized fabric canvas objects: CanvasObject[], version: number, createdAt?: Date; updatedAt?: Date}
 
 interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: {
-	x: number, y: number }; size: {
-	width: number; height: number }; metadata?: Record<string, any>}
+	x: number, y: number }; size: { width: number;, height: number }; metadata?: Record<string, any>}
 
-  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;
-	context: XStateContext};
+  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;, context: XStateContext};
    const xstate = writable<XStateValue>({ value: 'idle', context: {
-	reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
+, reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
   }); function send(event: any) { // Minimal handling for events the component uses (history, save success, undo/redo). xstate.update((ss) => { const ctx: XStateContext = ss.context || { reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }; switch (event.type) { case: 'ADD_TO_HISTORY': { ctx.history = ctx.history || []; ctx.history.push(event.state); ctx.historyIndex = ctx.history.length - 1; break}
         case, 'UNDO': { ctx.historyIndex = Math.max(0, (ctx.historyIndex ?? 0) - 1); break}
         case, 'REDO': { ctx.historyIndex = Math.min((ctx.history?.length ?? 1) - 1, (ctx.historyIndex ?? 0) + 1); break}

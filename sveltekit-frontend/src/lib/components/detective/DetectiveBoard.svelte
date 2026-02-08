@@ -47,9 +47,7 @@ let columns = $state([
 
 let canvasEvidence = $state<any[]>([]);
 let activeUsers = $state<any[]>([]);
-let systemStatus = $state({
-  rabbitMQ: {
-    connected: false, health: "unknown"
+let systemStatus = $state({ rabbitMQ: {, connected: false, health: "unknown"
   },
   postgreSQL: {
     connected: false, vectorCount: 0
@@ -58,7 +56,7 @@ let systemStatus = $state({
     available: false, utilization: 0, model: "RTX 3060 Ti"
   },
   processingStats: {
-    totalFiles: 0, processed: 0, queued: 0
+   , totalFiles: 0, processed: 0, queued: 0
   }
 });
 
@@ -113,7 +111,7 @@ function handleFileUpload(result: any, columnId: string) {
   columns = columns.map(col => col.id === columnId ? { ...col, items: [...col.items, newEvidence] } : col);
 }
 
-function handleDndFinalize(e: CustomEvent<{ items: any[] }>, columnId: string) {
+function handleDndFinalize(e: CustomEvent<{, items: any[] }>, columnId: string) {
   const { items } = e.detail;
   columns = columns.map(col => col.id === columnId ? { ...col, items } : col);
 }
@@ -162,7 +160,7 @@ const resp = await fetch("/api/vector-search", {
 method: "POST",
 headers: { "Content-Type": "application/json" },
 	body: JSON.stringify({
-	query: findModal.query })
+, query: findModal.query })
 });
 if (resp.ok) {
 const vectorResults = await resp.json();
@@ -339,6 +337,5 @@ linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
 linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
 background-size: 40px 40px }
 .custom-scrollbar::-webkit-scrollbar { width: 4px }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: currentColor;
-	opacity: 0.2 }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: currentColor;, opacity: 0.2 }
 </style>

@@ -17,7 +17,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // relax strict typing for our local UI components (prevents TS errors about: unknown props/events)
   declare module: '$lib/components/ui/dialog' {
-    export const Root: any
+    export const Root:any
     export const Content: any
     export const Title: any
     export const Description: any}

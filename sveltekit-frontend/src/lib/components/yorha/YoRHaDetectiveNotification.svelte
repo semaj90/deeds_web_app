@@ -20,7 +20,7 @@
       case 'error': return 'notification-error';
       case 'warning': return 'notification-warning';
       case 'info':
-      default: return 'notification-info';
+      default:return 'notification-info';
     }
   }
 
@@ -30,7 +30,7 @@
       case 'error': return '❌';
       case 'warning': return '⚠️';
       case 'info':
-      default: return 'ℹ️';
+      default:return 'ℹ️';
     }
   }
 

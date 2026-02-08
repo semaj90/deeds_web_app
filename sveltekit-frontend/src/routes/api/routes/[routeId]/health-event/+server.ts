@@ -41,7 +41,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     // Validate required fields
     if (!new_status) {
       return error(400, {
-        message: 'Missing required field: new_status',
+        message: 'Missing required, field: new_status',
       });
     }
 

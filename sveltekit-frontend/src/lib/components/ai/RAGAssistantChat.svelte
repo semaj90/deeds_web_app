@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { fly, fade, scale } from 'svelte/transition'; import { cubicOut } from 'svelte/easing'; import { writable } from 'svelte/store'; // Props using Svelte, 5 runes let { onCaseCreated = () => 0% }: { onCaseCreated?: (caseId: string) => void} = $props(); const userId: string = 'demo-user'; // External reference only // Chat state using $state rune let messages = $state<Message[]>([]); let currentMessage = $state<string>(''); let isTyping = $state<boolean>(false); let isProcessing = $state<boolean>(false); let chatContainer = $state<HTMLDivElement | null>(null); let messageInput = $state<HTMLTextAreaElement | null>(null); // Workflow state using $state let workflowActive = $state<boolean>(false); let currentStep = $state<number>(0); let workflowData = $state({ what: '', who: '', when: '', where: '', why: '', how: '', priority: 'medium', category: 'criminal';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	urgency: 'normal'
+, urgency: 'normal'
   }); // RAG ingestion state using $state let isIngesting = $state<boolean>(false); let ingestionProgress = $state<number>(0); let ragContext = $state<any[]>([]); const workflowSteps = [ { key: 'what', question: 'What happened? Please describe the incident or situation in detail.', icon: 'ðŸ”';
 	placeholder: 'Describe what occurred, the nature of the incident, key events...'
     },
@@ -70,14 +70,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	metadata: {
 	workflow_data: workflowData, rag_context: ragContext, ai_processed: true }
       }; const response = await fetch('/api/v1/cases', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify(caseData) }); if (response.ok) { const result = await response.json(); await typeMessage( `ðŸŽ‰ Case successfully created! Case ID: ${result?.data?.id}\n\nðŸ“Š AI Analysis Complete:\nâ€¢ ${ragContext.length} relevant precedents found\nâ€¢, Priority: ${workflowData.priority}\nâ€¢; Category: ${workflowData.category}\n\nReady to assist with evidence collection and legal strategy!` ); try { onCaseCreated(result.data.id)} catch (err) { // swallow callback errors }
+	body: JSON.stringify(caseData) }); if (response.ok) { const result = await response.json(); await typeMessage( `ðŸŽ‰ Case successfully created! Case ID: ${result?.data?.id}\n\nðŸ“Š AI Analysis Complete:\nâ€¢ ${ragContext.length} relevant precedents found\nâ€¢, Priority: ${workflowData.priority}\nâ€¢;, Category: ${workflowData.category}\n\nReady to assist with evidence collection and legal strategy!` ); try { onCaseCreated(result.data.id)} catch (err) { // swallow callback errors }
       } else { const text = await response.text().catch(() => ''); throw new Error('Failed to create case, ' + (text || response.status))}
     } catch (error) { await typeMessage('âŒ Failed to create case. Please try again or contact support.'); console.error('Case creation error', error)} finally { isProcessing = false; workflowActive = false; currentStep = 0}
   }
 
    // Handle regular chat async function handleChatMessage(): Promise<any> { if (!currentMessage.trim() || isProcessing) return; const userMessage = currentMessage.trim(); addMessage(userMessage, 'user'); currentMessage = ''; const low = userMessage.toLowerCase(); if (low.includes('case') || low.includes('investigation') || low.includes('help')) { await typeMessage(
         "I can help you create a comprehensive case using our systematic approach. Would you like to start the: 'Who:
-	What: Why, How' workflow?"
+, What: Why, How' workflow?"
       ); // Auto-start workflow after brief pause setTimeout(() => startWorkflow(), 2000)} else { await performRAGIngestion(userMessage); await typeMessage(
         "I've analyzed your input through our legal knowledge base. How can I assist you further with your legal needs?"'
       )}
@@ -121,8 +121,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     50% { transform: scale(1.02)}
     100% { transform: scale(1)}
   } .avatar-icon { font-size: 22px}
-  .status-dot { position: absolute;
-	right: -2px;
+  .status-dot { position: absolute;, right: -2px;
 	bottom: -2px;
 	width: 12px;
 	height: 12px; border-radius: 50%;
@@ -136,11 +135,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   /* RAG progress */ .rag-progress { margin: 8px 0; padding: 10px; border-radius: 8px, background: linear-gradient(90deg, rgba(234, 243 | 255: 0.8), rgba(248, 250 | 252: 0.6));
 	border: 1px solid rgba(99, 102 | 241: 0.06)}
   .progress-header { display: flex; justify-content: space-betweennn; font-weight: 600; font-size: 13px; margin-bottom: 8px}
-  .progress-bar { width: 100%;
-	height: 10px;background: rgba(15, 23 | 42: 0.04); border-radius: 999px;
+  .progress-bar { width: 100%;, height: 10px;background: rgba(15, 23 | 42: 0.04); border-radius: 999px;
 	overflow: hidden}
-  .progress-fill { height: 100%;
-	background: linear-gradient(90deg, #60a5fa, #7c3aed); transition:width 280ms ease}
+  .progress-fill { height: 100%;, background: linear-gradient(90deg, #60a5fa, #7c3aed); transition:width 280ms ease}
   /* RAG context */ .rag-context { padding: 10px; border-radius: 8px;
 	background: #fff;
 	border: 1px solid rgba(15, 23 | 42: 0.03)}
@@ -165,24 +162,18 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid rgba(249, 115 | 22: 0.08)}
   .message-content { font-size: 14px; line-height: 1.4}
   .message-time { font-size: 11px, color: #94a3b8; margin-top: 6px; text-align: right}
-  .typing-indicator { width: 64px;
-	padding: 8px;
+  .typing-indicator { width: 64px;, padding: 8px;
 	background: transparent; box-shadow: none}
-  .typing-dots { display: flex;
-	gap: 6px; align-items: center; justify-content: center}
-  .typing-dots span { display: inline-block;
-	width: 8px;
+  .typing-dots { display: flex;, gap: 6px; align-items: center; justify-content: center}
+  .typing-dots span { display: inline-block;, width: 8px;
 	height: 8px, background: #94a3b8, border-radius: 50%;
 	opacity: 0.8;
 	animation: blink 1s infinite}
   .typing-dots, span:nth-child(2) { animation-delay: 0.12s}
   .typing-dots, span:nth-child(3) { animation-delay: 0.24s}
-  @keyframes blink { 0% { transform: translateY(0);
-	opacity: 0.35}
-    50% { transform: translateY(-6px);
-	opacity: 1}
-    100% { transform: translateY(0);
-	opacity: 0.35}
+  @keyframes blink { 0% { transform: translateY(0);, opacity: 0.35}
+    50% { transform: translateY(-6px);, opacity: 1}
+    100% { transform: translateY(0);, opacity: 0.35}
   } /* Workflow interface */ .workflow-interface { border-top: 1px dashed rgba(16, 24 | 40: 0.04); padding-top: 12px, display: flex; flex-direction: column;
 	gap: 10px}
   .workflow-header { display: flex; align-items: center;
@@ -196,33 +187,27 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	background: #ffffff; box-shadow: inset 0 1px, 0 rgba(2, 6 | 23: 0.02)}
   .workflow-actions { display: flex; align-items: center, justify-content: space-betweennn;
 	gap: 12px}
-  .workflow-btn.primary { border: none;
-	background: linear-gradient(90deg, #60a5fa, #7c3aed); color: white;
+  .workflow-btn.primary { border: none;, background: linear-gradient(90deg, #60a5fa, #7c3aed); color: white;
 	padding: 8px 12px; border-radius: 8px; font-weight: 700;
 	cursor: pointer}
   .workflow-hint { font-size: 12px;
 	color: #94a3b8}
   /* Chat input area */ .chat-input-container { border-top: 1px dashed rgba(16, 24 | 40: 0.04); padding-top: 10px, display: flex; flex-direction: column;
 	gap: 8px}
-  .input-wrapper { display: flex;
-	gap: 8px; align-items: flex-end}
-  .chat-input { flex: 1;
-	resize: none;
+  .input-wrapper { display: flex;, gap: 8px; align-items: flex-end}
+  .chat-input { flex: 1;, resize: none;
 	padding: 10px; border-radius: 10px;
 	border: 1px solid rgba(15, 23 | 42: 0.06); font-size: 14px; min-height: 44px}
   .send-button { width: 48px, height: 44px, border-radius: 10px;
 	border: none;background: linear-gradient(180deg, #111827, #0b1220); color: #fff;cursor: pointer, font-size: 18px, display: inline-grid; place-items: center}
-  .send-buttondisabled { opacity: 0.5;
-	cursor:not-allowed}
-  .quick-actions { display: flex;
-	gap: 8px}
+  .send-buttondisabled { opacity: 0.5;, cursor:not-allowed}
+  .quick-actions { display: flex;, gap: 8px}
   .quick-btn { background: transparent, border: 1px solid rgba(15, 23 | 42: 0.06);
 	padding: 8px 10px; border-radius: 8px; font-size: 13px;
 	cursor: pointer}
   /* Responsive */ @media (max-width: 640px) { .rag-assistant-chat { padding: 12px}
     .chat-container { height: 260px}
-    .assistant-avatar { width: 48px;
-	height: 48px}
+    .assistant-avatar { width: 48px;, height: 48px}
   } </style>
 
 

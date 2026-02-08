@@ -43,7 +43,7 @@
 			case 'analyzing':
 			case 'proposing':
 			case 'applying': return 'secondary';
-			default: return 'outline';
+			default:return 'outline';
 		}
 	}
 

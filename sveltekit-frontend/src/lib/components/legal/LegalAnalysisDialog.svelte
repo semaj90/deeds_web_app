@@ -22,11 +22,11 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   function closeDialog() { isOpen = false; resetDialog()}
   $effect(() => { if (!isOpen) { resetDialog()}
 </script> <Dialog bind:isOpen title="Legal: AI, Analysis" onClose={ closeDialog }> <div class="space-y-6"> {#if !analysis} <!-- Analysis: Input, Form --> <div class="space-y-4"> <div> <label for="analysis-type" class="block text-sm font-medium"> Analysis Type </label> <select id="analysis-type"
-            bind:value={ analysisType } class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus:ring-2"
+            bind:value={ analysisType } class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
           > {#each Array.isArray(analysisTypes) ? analysisTypes: [] as type} <option value={type.value}>{type.label}</option> {/each} </select> </div> <div> <label for="prompt" class="block text-sm font-medium"> Analysis Prompt </label> <textarea id="prompt"
             bind:value={ prompt } placeholder="Enter your legal analysis question or prompt..."
             rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus:ring-2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
           ></textarea> </div> {#if error} <div class="p-3 bg-red-50 border border-red-200"> <p class="text-sm">{ error }</p> {/if} <div class="flex gap-3"> <button type="button"
             onclick={ performAnalysis } disabled={loading || !prompt.trim()} class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled, opacity-50"
           > {#if loading} <span class="flex items-center justify-center"> <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div> Analyzing... </span> {:else} Perform Analysis {/if} </button> <button type="button"

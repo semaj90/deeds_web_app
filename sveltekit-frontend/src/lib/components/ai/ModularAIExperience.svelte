@@ -86,7 +86,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               placeholder="Enter text for T5 processing..."
             ></textarea> </div> {/if}
   <div class="flex items-center gap-4"> <label class="flex items-center"> <input type="checkbox" bind:checked={ enableWebGPU } /> <span class="text-sm">Use WebGPU Acceleration</span> </label> </div>
- <button onclick={ processComputation } disabled={ isProcessing } class="w-full mt-6 px-4" py-3 bg-blue-600 text-white rounded-lg font-semibold disabled: bg-gray-400, disabled, cursor-not-allowed, hover:bg-blue-700, transition-colors"
+ <button onclick={ processComputation } disabled={ isProcessing } class="w-full mt-6 px-4" py-3 bg-blue-600 text-white rounded-lg font-semibold disabled:bg-gray-400, disabled, cursor-not-allowed, hover:bg-blue-700, transition-colors"
       >
   {#if isProcessing} ðŸ”„ Processing... {:else} ðŸš€ Process Computation {/if}
   </button> </div>

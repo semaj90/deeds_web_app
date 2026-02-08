@@ -28,7 +28,7 @@ export const actions: Actions = {
  			headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	model: 'gemma3-legal:latest',
- 				prompt: `Analyze the following legal evidence query using ${mode} analysis: ${query}. Provide structured analysis with confidence scores.`,
+ 				prompt: `Analyze the following legal evidence query using ${mode}, analysis: ${query}. Provide structured analysis with confidence scores.`,
  				stream: false
  			})
  		});

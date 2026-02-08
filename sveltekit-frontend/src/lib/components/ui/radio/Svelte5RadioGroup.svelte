@@ -4,9 +4,7 @@
  * Accessible radio button group with Svelte 5 runes
  */
 
-interface RadioOption {
-	value: string;
-	label: string;
+interface RadioOption { value: string;, label: string;
 	description?: string;
 	disabled?: boolean;
 	icon?: string;
@@ -185,9 +183,7 @@ function getOptionClasses(option: RadioOption) {
 </fieldset>
 
 <style>
-	.sr-only {
-		position: absolute;
-	width: 1px;
+	.sr-only { position: absolute;, width: 1px;
 		height: 1px;
 	padding: 0;
 		margin: -1px;

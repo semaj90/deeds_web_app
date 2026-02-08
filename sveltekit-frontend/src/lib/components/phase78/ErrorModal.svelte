@@ -1,8 +1,6 @@
 <script lang="ts">
  // API Contract Types
- type ErrorEvent = {
- id: string;
-	routePath: string;
+ type ErrorEvent = { id: string;, routePath: string;
  file: string | null;
  kind: 'build' | 'runtime' | 'lint' | 'other';
  severity: 'info' | 'warn' | 'error' | 'fatal';
@@ -13,9 +11,7 @@
  collectedAt: string; // ISO
  };
 
- type ErrorSuggestion = {
- id: string;
-	clusterId: string;
+ type ErrorSuggestion = { id: string;, clusterId: string;
  title: string;
 	explanation: string;
  confidence: number | null;
@@ -54,9 +50,7 @@
  throw new Error(`HTTP ${res.status}`);
  }
 
- const data = (await res.json()) as {
- events: ErrorEvent[];
-	suggestions: ErrorSuggestion[];
+ const data = (await res.json()) as { events: ErrorEvent[];, suggestions: ErrorSuggestion[];
  };
 
  events = data.events ?? [];
@@ -126,7 +120,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	routePath: suggestionId,
+, routePath: suggestionId,
  state
  })
  });
@@ -271,7 +265,7 @@
  <div class="flex gap-1 px-1">
  <button
  type="button"
- class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-red-400 text-slate-300 hover: text-red-300, disabled: opacity-50, disabled, cursor-not-allowed"
+ class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-red-400 text-slate-300 hover:text-red-300, disabled:opacity-50, disabled, cursor-not-allowed"
  onclick={() => dismissSuggestion(s.id)}
  disabled={updatingStates.has(s.id) || suggestionStates[s.id] === 'dismissed'}
  title="Dismiss this suggestion"
@@ -280,7 +274,7 @@
  </button>
  <button
  type="button"
- class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-yellow-400 text-slate-300 hover: text-yellow-300, disabled: opacity-50, disabled, cursor-not-allowed"
+ class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-yellow-400 text-slate-300 hover:text-yellow-300, disabled:opacity-50, disabled, cursor-not-allowed"
  onclick={() => snoozeSuggestion(s.id)}
  disabled={updatingStates.has(s.id) || suggestionStates[s.id] === 'snoozed'}
  title="Snooze this suggestion"
@@ -294,7 +288,7 @@
 
  <button
  type="button"
- class="mt-2 w-full text-xs font-semibold rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 py-1 disabled: bg-slate-600, disabled, text-slate-300"
+ class="mt-2 w-full text-xs font-semibold rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 py-1 disabled:bg-slate-600, disabled, text-slate-300"
  onclick={ applySelectedSuggestion }
  disabled={!selectedSuggestionId || applying}
  >

@@ -19,10 +19,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	l1Usage: 0, l2Usage: 0, l3Usage: 0, totalCachedItems: 0 },
 	performance: {
 	averageQueryTime: 0, p95ResponseTime: 0, throughputQPS: 0;
-	errorRate: 0 }
+, errorRate: 0 }
   });
   let nintendoStats = $state({ memoryUsage: 0, maxMemory: 8192, activeBankId: 0, textureCount: 0, activeStreams: 0, evictions: 0;
-	bankSwitches: 0 });
+, bankSwitches: 0 });
   let recentQueries = $state<any[]>([]);
    let systemHealth = $state<string>('healthy');
    let isRefreshing = $state<boolean>(false);
@@ -31,21 +31,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    const totalRequests = cacheMetrics.retrieval.totalQueries + cacheMetrics.embedding.totalRequests; return totalRequests > 0 ? (totalHits / totalRequests) * 10 0 0});
   let memoryEfficiency = $derived(() => { const totalUsage = cacheMetrics.memory.l1Usage + cacheMetrics.memory.l2Usage + cacheMetrics.memory.l3Usage;
    const maxCapacity = 1024 + 2048 + 1024; // L1 + L2 + L3 budgets in KB return (totalUsage / maxCapacity) * 100});
-  let performanceGrade = $derived(() => { const hitRate = totalHitRate(); if (hitRate >= 80) return { grade: 'A';
-	color: 'text-green-500' }; if (hitRate >= 60) return { grade: 'B';
-	color: 'text-yellow-500' }; if (hitRate >= 40) return { grade: 'C';
-	color: 'text-orange-500' }; return { grade: 'D';
-	color: 'text-red-500' }}); $effect(() => { // Load initial data refreshMetrics(); // Set up auto-refresh if (autoRefresh) { refreshInterval = setInterval(refreshMetrics, 5000)}
+  let performanceGrade = $derived(() => { const hitRate = totalHitRate(); if (hitRate >= 80) return { grade: 'A';, color: 'text-green-500' }; if (hitRate >= 60) return { grade: 'B';, color: 'text-yellow-500' }; if (hitRate >= 40) return { grade: 'C';, color: 'text-orange-500' }; return { grade: 'D';, color: 'text-red-500' }}); $effect(() => { // Load initial data refreshMetrics(); // Set up auto-refresh if (autoRefresh) { refreshInterval = setInterval(refreshMetrics, 5000)}
   }); // TODO: Add as cleanup in $effect: return () => { if (refreshInterval) { clearInterval(refreshInterval)}
   }
   async function refreshMetrics(): Promise<any> { performance.mark('refresh-start'); if (isRefreshing) return; isRefreshing = true; try { // Parallel fetch from backend API endpoints. Fall back to local simulators on failure. const endpoints = { cache: '/api/cache/metrics', nintendo: '/api/cache/nintendo', recent: '/api/cache/recent-queries';
 	health: '/api/health/system'
       };
-   const [cacheResp, nintendoResp, recentResp, healthResp] = await Promise.allSettled([ fetch(endpoints.cache, { headers: {
-	Accept: 'application/json' } }), fetch(endpoints.nintendo, { headers: {
-	Accept: 'application/json' } }), fetch(endpoints.recent, { headers: {
-	Accept: 'application/json' } }), fetch(endpoints.health, { headers: {
-	Accept: 'application/json' } })]); // Handle cache metrics if (cacheResp.status === 'fulfilled' && cacheResp.value.ok) { try { const json = await cacheResp.value.json(); cacheMetrics = json} catch (e) { console.warn('Invalid JSON from cache metrics endpoint, using simulator.', e); await updateCacheMetrics()}
+   const [cacheResp, nintendoResp, recentResp, healthResp] = await Promise.allSettled([ fetch(endpoints.cache, { headers: {, Accept: 'application/json' } }), fetch(endpoints.nintendo, { headers: {, Accept: 'application/json' } }), fetch(endpoints.recent, { headers: {, Accept: 'application/json' } }), fetch(endpoints.health, { headers: {, Accept: 'application/json' } })]); // Handle cache metrics if (cacheResp.status === 'fulfilled' && cacheResp.value.ok) { try { const json = await cacheResp.value.json(); cacheMetrics = json} catch (e) { console.warn('Invalid JSON from cache metrics endpoint, using simulator.', e); await updateCacheMetrics()}
       } else { console.warn('Cache metrics endpoint failed, using simulator.', cacheResp); await updateCacheMetrics()}
 
       // Handle Nintendo stats if (nintendoResp.status === 'fulfilled' && nintendoResp.value.ok) { try { const json = await nintendoResp.value.json(); nintendoStats = json} catch (e) { console.warn('Invalid JSON from nintendo endpoint, using simulator.', e); await updateNintendoStats()}
@@ -58,8 +50,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       } else { console.warn('Health endpoint failed, re-evaluating locally.', healthResp); await checkSystemHealth()}
     } catch (error) { console.error('Failed to refresh metrics:', error); systemHealth = 'error'} finally { isRefreshing = false; performance.mark('refresh-end'); try { performance.measure('refreshMetrics', 'refresh-start', 'refresh-end')} catch (e) { // performance.measure may throw in some environments; ignore }
     } }
-  async function updateCacheMetrics(): Promise<any> { performance.mark('function-start'); // Simulate API call to get cache metrics await new Promise(resolve => setTimeout(resolve, 200)); cacheMetrics = { retrieval: {
-	hits: Math.floor(Math.random() * 1000) + 500, misses: Math.floor(Math.random() * 300) + 100, hitRate: 70 + Math.random() * 25, totalQueries: Math.floor(Math.random() * 1500) + 800, averageResponseTime: 45 + Math.random() * 30 },
+  async function updateCacheMetrics(): Promise<any> { performance.mark('function-start'); // Simulate API call to get cache metrics await new Promise(resolve => setTimeout(resolve, 200)); cacheMetrics = { retrieval: {, hits: Math.floor(Math.random() * 1000) + 500, misses: Math.floor(Math.random() * 300) + 100, hitRate: 70 + Math.random() * 25, totalQueries: Math.floor(Math.random() * 1500) + 800, averageResponseTime: 45 + Math.random() * 30 },
 	embedding: {
 	hits: Math.floor(Math.random() * 2000) + 800, misses: Math.floor(Math.random() * 200) + 50, hitRate: 85 + Math.random() * 10, totalRequests: Math.floor(Math.random() * 2500) + 1000, costSavings: (Math.random() * 50 + 25).toFixed(2) },
 	memory: {
@@ -83,11 +74,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function toggleAutoRefresh() { performance.mark('function-start'); autoRefresh = !autoRefresh; if (autoRefresh) { refreshInterval = setInterval(refreshMetrics, 5000)} else { clearInterval(refreshInterval)}
   }
   async function clearCache(): Promise<any> { performance.mark('function-start'); // In a real implementation, this would call the cache clearing API console.log('Clearing cache...'); await new Promise(resolve => setTimeout(resolve, 1000)); await refreshMetrics()}
-  function getHealthIcon() { performance.mark('function-start'); switch (systemHealth) { case: 'healthy': return { icon: CheckCircle;
-	color: 'text-green-500' }; case, 'warning': return { icon: AlertTriangle;
-	color: 'text-yellow-500' }; case, 'critical': return { icon: AlertTriangle;
-	color: 'text-red-500' }; default: return { icon: AlertTriangle;
-	color: 'text-gray-500' }}
+  function getHealthIcon() { performance.mark('function-start'); switch (systemHealth) { case: 'healthy': return { icon: CheckCircle;, color: 'text-green-500' }; case, 'warning': return { icon: AlertTriangle;, color: 'text-yellow-500' }; case, 'critical': return { icon: AlertTriangle;, color: 'text-red-500' }; default:return { icon: AlertTriangle;, color: 'text-gray-500' }}
   } </script>
  <div class="cache-dashboard"> <!-- Header --> <header class="dashboard-header"> <div class="header-content"> <div class="title-section"> <h1>âš¡ Legal AI Cache Performance</h1>
  <p>Nintendo-style memory management with intelligent caching</p> </div>
@@ -190,15 +177,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .system-health.healthy { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3)}
   .system-health.warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3)}
   .system-health.critical { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3)}
-  .control-buttons { display: flex;
-	gap: 0.5rem}
+  .control-buttons { display: flex;, gap: 0.5rem}
   .control-buttons button { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1); color: white;
 	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px, cursor: pointer; font-family: inherit; font-size: 0.875rem;
 	transition:all 0.2s}
   .control-buttons button:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3)}
-  .control-buttons button:disabled { opacity: 0.5;
-	cursor:not-allowed}
+  .control-buttons button:disabled { opacity: 0.5;, cursor:not-allowed}
   .auto-refresh-btn.active { background: rgba(34, 197, 94, 0.2); border-color: #22c55e}
   .clear-cache-btn { background: rgba(239, 68, 68, 0.2) !important; border-color: #ef4444 !important}
   .dashboard-content { padding: 2rem; max-width: 1400px;
@@ -209,8 +194,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	display: flex; align-items: center;
 	gap: 1rem}
   .metric-card.primary { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border-color: #3b82f6}
-  .metric-icon { color: #3b82f6;
-	opacity: 0.8}
+  .metric-icon { color: #3b82f6;, opacity: 0.8}
   .metric-content h3 { margin: 0, 0 0.5rem 0; font-size: 0.875rem, opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em}
   .metric-value { font-size: 1.75rem; font-weight: bold;
 	color: #ffffff;display: flex; align-items: baseline;
@@ -230,8 +214,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 1rem}
   .stat-bar { flex: 1, display: flex; align-items: center;
 	gap: 0.5rem}
-  .bar { flex: 1;
-	height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
+  .bar { flex: 1;, height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
   .fill { height: 100%; border-radius: 4px;
 	transition:width 0.5s ease}
@@ -246,10 +229,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .nintendo-stats { display: flex; flex-direction: column;
 	gap: 1rem}
   .memory-overview { text-align: center}
-  .memory-bar { height: 12px;
-	background: rgba(0, 0, 0, 0.3); border-radius: 6px, overflow: hidden; margin-bottom: 0.5rem}
-  .memory-fill { height: 100%;
-	background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); border-radius: 6px;
+  .memory-bar { height: 12px;, background: rgba(0, 0, 0, 0.3); border-radius: 6px, overflow: hidden; margin-bottom: 0.5rem}
+  .memory-fill { height: 100%;, background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); border-radius: 6px;
 	transition:width 0.5s ease}
   .bank-info { display: flex; justify-content: space-between, flex-wrap: wrap;
 	gap: 0.5rem}
@@ -268,8 +249,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .layer-info h4 { margin: 0, 0 0.25rem 0; font-size: 0.8rem; font-weight: bold}
   .layer-info span { font-size: 0.7rem;
 	opacity: 0.7}
-  .usage-bar { flex: 1;
-	height: 6px;background: rgba(255, 255, 255, 0.2); border-radius: 3px;
+  .usage-bar { flex: 1;, height: 6px;background: rgba(255, 255, 255, 0.2); border-radius: 3px;
 	overflow: hidden}
   .usage-fill { height: 100%, background: currentColor, border-radius: 3px;
 	transition:width 0.5s ease}

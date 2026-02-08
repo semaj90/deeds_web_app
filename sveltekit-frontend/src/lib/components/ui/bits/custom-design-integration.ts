@@ -25,14 +25,10 @@ export interface CustomComponentConfig {
 // DESIGN SYSTEM INTEGRATION
 // ======================================================================
 
-export interface DesignSystem {
-    name: string;
-	tokens: {
+export interface DesignSystem { name: string;, tokens: {
         colors: Record<string, string>;
         spacing: Record<string, string>;
-        typography: {
-	fontFamily: string;
-            fontSize: Record<string, string>;
+        typography: { fontFamily: string;, fontSize: Record<string, string>;
             lineHeight: Record<string, string>;
         };
         nes: Record<string, string>;
@@ -43,19 +39,14 @@ export interface DesignSystem {
 	breakpoints: BreakpointConfig;
 }
 
-export interface AnimationConfig {
-    duration: {
-	fast: string; normal: string;
+export interface AnimationConfig { duration: {, fast: string; normal: string;
 	slow: string };
-    easing: {
-	easeIn: string; easeOut: string;
+    easing: { easeIn: string;, easeOut: string;
 	easeInOut: string };
     transitions: Record<string, string>;
 }
 
-export interface BreakpointConfig {
-    sm: string;
-	md: string;
+export interface BreakpointConfig { sm: string;, md: string;
     lg: string;
 	xl: string;
     '2xl': string;
@@ -67,9 +58,7 @@ export interface BreakpointConfig {
 
 export const NESDesignSystem: DesignSystem = {
     name: 'NES Legal AI',
-    tokens: {
-	colors: {
-            primary: '#00ff41', // Matrix Green
+    tokens: { colors: {, primary: '#00ff41', // Matrix Green
             secondary: '#ff6b35', // Orange
             evidence: '#ffd700', // Gold
             ai: '#9d4edd', // Purple
@@ -116,8 +105,7 @@ export const NESDesignSystem: DesignSystem = {
         '--nes-font-family': '"Courier New", monospace',
     },
 	components: {},
-	animations: {
-	duration: { fast: '150ms', normal: '300ms', slow: '500ms' },
+	animations: { duration: {, fast: '150ms', normal: '300ms', slow: '500ms' },
 	easing: {
 	easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
             easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
@@ -142,9 +130,7 @@ export const NESDesignSystem: DesignSystem = {
 
 export const MinimalDesignSystem: DesignSystem = {
     name: 'Minimal Clean',
-    tokens: {
-	colors: {
-            primary: '#3b82f6',
+    tokens: { colors: {, primary: '#3b82f6',
             secondary: '#64748b',
             evidence: '#f59e0b',
             ai: '#8b5cf6',
@@ -191,8 +177,7 @@ export const MinimalDesignSystem: DesignSystem = {
         '--minimal-font-family': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     },
 	components: {},
-	animations: {
-	duration: { fast: '100ms', normal: '200ms', slow: '300ms' },
+	animations: { duration: {, fast: '100ms', normal: '200ms', slow: '300ms' },
 	easing: {
 	easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
             easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
@@ -307,9 +292,7 @@ export function createComponentVariant(
     variant: 'nes' | 'minimal' | 'custom',
     customStyles: Record<string, string> = {}
 ): Record<string, string> {
-    const variantStyles = {
-        nes: {
-	border: 'var(--nes-border-width, 4px) solid var(--nes-border, #ffffff)',
+    const variantStyles = { nes: {, border: 'var(--nes-border-width, 4px) solid var(--nes-border, #ffffff)',
             fontFamily: 'var(--nes-font-family, "Courier New", monospace)',
             borderRadius: 'var(--nes-border-radius, 0px)',
             boxShadow: 'var(--nes-shadow, 4px 4px 0px rgba(0, 0, 0, 0.8))',
@@ -331,9 +314,7 @@ export function createComponentVariant(
 // SSR-SAFE THEME PROVIDER
 // ======================================================================
 
-export interface ThemeContext {
-    designSystem: DesignSystem;
-	isDarkMode: boolean;
+export interface ThemeContext { designSystem: DesignSystem;, isDarkMode: boolean;
     toggleDarkMode: () => void;
     applyCustomTheme: (tokens: Partial<CustomDesignTokens>) => void;
 }

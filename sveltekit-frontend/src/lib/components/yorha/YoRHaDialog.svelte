@@ -31,9 +31,7 @@
     promptValue = value;
   });
 
-  const typeConfig = {
-    info: {
-	icon: '■', color: '#0ea5e9', label: 'NOTIFICATION' },
+  const typeConfig = { info: {, icon: '■', color: '#0ea5e9', label: 'NOTIFICATION' },
 	success: {
 	icon: '✓', color: '#10b981', label: 'NORMAL' },
 	warning: {

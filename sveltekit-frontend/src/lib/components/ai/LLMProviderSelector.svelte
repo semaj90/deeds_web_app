@@ -26,14 +26,14 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   	}); // Melt UI Select setup const { elements: { trigger, menu, option, group, groupLabel, label },
 	states: { selectedLabel, open, selected },
 	helpers: { isSelected } } = createSelect<LLMProvider>({ forceVisible: true, positioning: {
-	placement: 'bottom', fitViewport: true }
+, placement: 'bottom', fitViewport: true }
   	}); // Reactive selection handling $effect(() => { if ($selected && $selected.value !== selectedProvider) { selectedProvider = $selected.valu; ondispatch?.({ provider: selectedProvider })}
-  	}); // Status badge styling const getStatusColor = (status: LLMStatus) => { switch (status) { case: 'online': return 'bg-yorha-success text-yorha-bg-primary'; case, 'offline': return 'bg-yorha-danger text-yorha-bg-primary'; case, 'busy': return 'bg-yorha-warning text-yorha-bg-primary'; case, 'loading': return 'bg-yorha-accent text-yorha-bg-primary animate-pulse',default: return 'bg-yorha-text-secondary text-yorha-bg-primary'}
-  	} const getTypeIcon = (type: string) => { switch (type) { case: 'ollama': return 'ðŸ¦™'; case, 'vllm': return 'âš¡'; case, 'autogen': return 'ðŸ¤–'; case, 'crewai': return 'ðŸ‘¥',default: return 'ðŸ”§'}
+  	}); // Status badge styling const getStatusColor = (status: LLMStatus) => { switch (status) { case: 'online': return 'bg-yorha-success text-yorha-bg-primary'; case, 'offline': return 'bg-yorha-danger text-yorha-bg-primary'; case, 'busy': return 'bg-yorha-warning text-yorha-bg-primary'; case, 'loading': return 'bg-yorha-accent text-yorha-bg-primary animate-pulse',default:return 'bg-yorha-text-secondary text-yorha-bg-primary'}
+  	} const getTypeIcon = (type: string) => { switch (type) { case: 'ollama': return 'ðŸ¦™'; case, 'vllm': return 'âš¡'; case, 'autogen': return 'ðŸ¤–'; case, 'crewai': return 'ðŸ‘¥',default:return 'ðŸ”§'}
   	} </script>
  <div class="llm-provider-selector"> <!-- Label --> <label class="block text-sm font-medium text-yorha-text-primary"
 	> LLM Provider </label>
- <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder: text-yorha-text-tertiary, focus: outline-none, focus: ring-2, focus: ring-yorha-primary, focus: ring-offset-2, disabled: cursor-not-allowed, disabled, opacity-50 transition-all duration-200"; class:opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
+ <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder:text-yorha-text-tertiary, focus:outline-none, focus:ring-2, focus:ring-yorha-primary, focus:ring-offset-2, disabled:cursor-not-allowed, disabled, opacity-50 transition-all duration-200"; class:opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
 	> <span class="truncate">
   {#if selectedProvider} <span class="flex items-center"> <span class="text-lg" role="img">{getTypeIcon(selectedProvider.type)}</span>
  <span>{selectedProvider.name}</span>

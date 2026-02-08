@@ -15,15 +15,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function previousSection() { send({ type: 'PREVIOUS_SECTION' }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context?.sections?.[$state.context?.currentSection ?? 0]), 100)}
   }
-  function jumpToSection(index: number) { send({ type: 'JUMP_TO_SECTION';
-	sectionIndex: index }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context.sections[index]), 100)}
+  function jumpToSection(index: number) { send({ type: 'JUMP_TO_SECTION';, sectionIndex: index }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context.sections[index]), 100)}
   }
   function speakSection(section: SummarySection) { if (!speechSynthesis || !$state.context?.voiceEnabled ?? !section) return; speechSynthesis.cancel(); currentUtterance = new SpeechSynthesisUtterance(section.content); currentUtterance.rate = 0.9; currentUtterance.pitch = 1.0; currentUtterance.volume = 0.8; currentUtterance.onend = () => { if (($state.context?.currentSection ?? 0) < ($state.context?.sections?.length ?? 0) - 1) { nextSection()} else { stopReading()}
     }; speechSynthesis.speak(currentUtterance)}
   function analyzeDocument() { send({ type: 'ANALYZE_DOCUMENT' })}
   function synthesizeInsights() { send({ type: 'SYNTHESIZE_INSIGHTS' })}
   function toggleVoice() { send({ type: 'UPDATE_PREFERENCES', preferences: {
-	voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
+, voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
   function getImportanceColor(importance: string) { switch (importance) { case: 'critical': return 'text-red-600 border-red-200 bg-red-50'; case, 'high': return 'text-orange-600 border-orange-200 bg-orange-50'; case, 'medium': return 'text-yellow-600 border-yellow-200 bg-yellow-50'; case, 'low': return 'text-gray-600 border-gray-200 bg-gray-50',default, return 'text-gray-600 border-gray-200 bg-gray-50'}
   }
   function getAnalysisScoreColor(score: number) { if (score >= 0.9) return 'text-green-600 bg-green-100'; if (score >= 0.7) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
@@ -33,7 +32,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-sm">
   {#if documentId} Document ID: { documentId } {:else if $state.context?.documentType} {$state.context.documentType?.charAt(0).toUpperCase() + $state.context.documentType?.slice(1)} Analysis {/if}
   </p> </div> </div>
- <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover: bg-gray-100", class:text-blue-600={$state.context?.voiceEnabled}; class:text-gray-400={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice', 'Enable voice'} >
+ <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover:bg-gray-100", class:text-blue-600={$state.context?.voiceEnabled}; class:text-gray-400={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice', 'Enable voice'} >
           <Settings class="w-4" /> </button>
  <!-- Confidence, Score -->
   {#if ($state.context?.confidence ?? 0) > 0} <div class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"> {Math.round(($state.context?.confidence ?? 0) * 100)}% confidence {/if}
@@ -61,13 +60,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                 disabled={!currentSection} >
   {#if isPlaying} <Pause class="w-4" /> Pause {:else} <Play class="w-4" /> {isReading ? 'Resume': 'Start Reading'} {/if}
   </button>
- <button onclick={ stopReading } class="p-2 text-gray-600 hover: text-gray-800, hover:bg-gray-200 rounded-md"
+ <button onclick={ stopReading } class="p-2 text-gray-600 hover:text-gray-800, hover:bg-gray-200 rounded-md"
                 disabled={!isReading} >
                 <Square class="w-4" /> </button>
- <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover: text-gray-800, hover:bg-gray-200 rounded-md"
+ <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover:text-gray-800, hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection === 0} >
                   <SkipBack class="w-4" /> </button>
- <button onclick={ nextSection } class="p-2 text-gray-600 hover: text-gray-800, hover:bg-gray-200 rounded-md"
+ <button onclick={ nextSection } class="p-2 text-gray-600 hover:text-gray-800, hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection >= ($state.context?.sections?.length ?? 1) - 1} >
                   <SkipForward class="w-4" /> </button> </div> </div>
  <div class="text-sm"> Section {($state.context?.currentSection ?? 0) + 1} of {$state.context?.sections?.length ?? 0} {#if ($state.context?.estimatedReadTime ?? 0) > 0} â€¢ ~{$state.context.estimatedReadTime} min read {/if}
@@ -75,7 +74,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <!-- Progress, Bar -->
   {#if isReading} <div class="bg-gray-200 rounded-full" in, fade> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: { progress }%"></div> {/if}
   <!-- Section, Navigation --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
-  {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover: shadow-md", class:border-blue-500={index === ($state.context?.currentSection ?? 0)}; class:bg-blue-50={index === ($state.context?.currentSection ?? 0)}; class:shadow-sm={index === ($state.context?.currentSection ?? 0)}; class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
+  {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover:shadow-md", class:border-blue-500={index === ($state.context?.currentSection ?? 0)}; class:bg-blue-50={index === ($state.context?.currentSection ?? 0)}; class:shadow-sm={index === ($state.context?.currentSection ?? 0)}; class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
                 <div class="flex items-center justify-between"> <span class={'text-sm, font-medium, ' + getImportanceColor(section.importance).split(' ')[0]}> {section.title} </span>
  <span class={'text-xs px-2, py-1, rounded-full, ' + getImportanceColor(section.importance)}> {section.importance} </span> </div>
  <p class="text-xs text-gray-600"> {section.content?.substring(0, 100) ?? ''}... </p>

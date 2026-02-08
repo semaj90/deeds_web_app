@@ -83,7 +83,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		// 5. Get error cluster statistics
 .select({
 				total: sql<number>`COUNT(*)::int`,
-				active: sql<number>`COUNT(*) FILTER (WHERE resolved_at IS NULL)::int`,
+				active:sql<number>`COUNT(*) FILTER (WHERE resolved_at IS NULL)::int`,
 				resolved: sql<number>`COUNT(*) FILTER (WHERE resolved_at IS NOT NULL)::int`
 			})
 			.from(errorClusterTable)

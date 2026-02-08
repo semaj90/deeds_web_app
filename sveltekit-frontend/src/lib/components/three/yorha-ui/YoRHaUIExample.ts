@@ -106,7 +106,7 @@ this.scene.add(this.mainLayout);
 private createHeader(): void {
 // Header panel const headerPanel = new YoRHaPanel3D({
 title: 'YoRHa Interface System', variant: 'terminal', width: 8, height: 1.2, showCloseButton: false, false: glow: {
-	enabled: true, color: YORHA_COLORS.accent.gold, intensity: 0.3 }
+	enabled:true, color: YORHA_COLORS.accent.gold, intensity: 0.3 }
 });
   
 // Usage example export function createYoRHaUIDemo(container: HTMLElement): YoRHaUIExample {

@@ -121,7 +121,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			case 'critical': return 'border-purple-500/60 bg-purple-500/20 text-purple-100';
 			case 'medium': return 'border-orange-500/60 bg-orange-500/20 text-orange-100';
 			case 'low': return 'border-blue-500/60 bg-blue-500/20 text-blue-100';
-			default: return 'border-slate-500/60 bg-slate-500/20 text-slate-100';
+			default:return 'border-slate-500/60 bg-slate-500/20 text-slate-100';
 		}
 	}
 

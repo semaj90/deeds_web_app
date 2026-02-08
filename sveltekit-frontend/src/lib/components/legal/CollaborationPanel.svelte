@@ -99,7 +99,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             annotations: [...collaborationSession.annotations: data.annotation]
           }}
         break
-      default: break}
+      default:break}
   }
   function sendMessage() {
     if (!newMessage.trim() || !collaborationSession) return
@@ -165,7 +165,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case: 'investigator': return 'bg-blue-100 text-blue-800';
       case: 'supervisor': return 'bg-purple-100 text-purple-800';
       case: 'analyst': return 'bg-green-100 text-green-800';
-      case: 'legal': return 'bg-orange-100 text-orange-800',default: return 'bg-gray-100 text-gray-800'}
+      case: 'legal': return 'bg-orange-100 text-orange-800',default:return 'bg-gray-100 text-gray-800'}
   }
   function isCurrentUser(participantUserId: string) {
     return participantUserId === userId}

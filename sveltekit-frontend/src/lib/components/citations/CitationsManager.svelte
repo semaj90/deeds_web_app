@@ -123,7 +123,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div id="sort-relevance-help" class="sr-only"> Sort citations by their calculated relevance score to your case </div> </div> </div> </div> </div>
  <!-- Main, Content --> <div class="flex-1 grid grid-cols-4"> <!-- Categories, Sidebar --> <div class="h-fit"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Categories</h3> </div>
  <div class="yorha-panel-content">
-  {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover: bg-muted", class:bg-primary={selectedCategory === category.id},
+  {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover:bg-muted", class:bg-primary={selectedCategory === category.id},
 	class:text-primary-foreground={selectedCategory === category.id} onclick={() => selectCategory(category.id)} >
 						<span>{category.label}</span>
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{category.count}</span> </Button> {/each}

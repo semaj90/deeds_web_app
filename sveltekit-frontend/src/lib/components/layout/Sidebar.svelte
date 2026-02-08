@@ -34,9 +34,7 @@
 	let currentPath = $derived($page.url.pathname);
 	let isAdmin = $derived(user?.role === 'admin');
 
-	interface NavigationItem {
-		name: string;
-	href: string;
+	interface NavigationItem { name: string;, href: string;
 		icon: ComponentType;
 	current: boolean;
 		badge?: string;
@@ -202,7 +200,7 @@
 							'group flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200',
 							item.current
 								? 'bg-harvard-crimson text-white'
-								: 'text-muted-foreground, hover:text-foreground hover:bg-nier-surface-light'
+								: 'text-muted-foreground, hover:text-foreground, hover:bg-nier-surface-light'
 						)}
 						onclick={closeSidebar}
 					>
@@ -242,7 +240,7 @@
 								'group flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200',
 								item.current
 									? 'bg-harvard-crimson text-white'
-									: 'text-muted-foreground, hover:text-foreground hover:bg-nier-surface-light'
+									: 'text-muted-foreground, hover:text-foreground, hover:bg-nier-surface-light'
 							)}
 							onclick={closeSidebar}
 						>
@@ -273,7 +271,7 @@
 									'group flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200',
 									item.current
 										? 'bg-red-500 text-white'
-										: 'text-muted-foreground, hover:text-foreground hover:bg-nier-surface-light border border-red-500/20'
+										: 'text-muted-foreground, hover:text-foreground, hover:bg-nier-surface-light border border-red-500/20'
 								)}
 								onclick={closeSidebar}
 							>
@@ -312,7 +310,7 @@
 								'group flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200',
 								item.current
 									? 'bg-green-600 text-white'
-									: 'text-muted-foreground, hover:text-foreground hover:bg-nier-surface-light'
+									: 'text-muted-foreground, hover:text-foreground, hover:bg-nier-surface-light'
 							)}
 							onclick={closeSidebar}
 						>

@@ -601,16 +601,12 @@
 <!-- STYLES -->
 <!-- ============================================================================ -->
 <style>
-  .legal-graph-viewer {
-    position: relative;
-	border: 1px solid var(--border-color, #e2e8f0);
+  .legal-graph-viewer { position: relative;, border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 8px;
 	overflow: hidden;
     background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 100%);
   }
-  .graph-canvas {
-    width: 100%;
-	height: 100%;
+  .graph-canvas { width: 100%;, height: 100%;
     outline: none;
   }
   .graph-canvas.interactive {
@@ -620,9 +616,7 @@
     cursor: grabbing;
   }
   .loading-overlay,
-  .error-overlay {
-    position: absolute;
-	top: 0;
+  .error-overlay { position: absolute;, top: 0;
     left: 0;
 	right: 0;
     bottom: 0;
@@ -634,9 +628,7 @@
     color: white;
     z-index: 10;
   }
-  .loading-spinner {
-    width: 40px;
-	height: 40px;
+  .loading-spinner { width: 40px;, height: 40px;
     border: 3px solid rgba(255, 255, 255, 0.1);
     border-top: 3px solid #60a5fa;
     border-radius: 50%;
@@ -671,9 +663,7 @@
     border-radius: 4px;
 	cursor: pointer;
   }
-  .performance-hud {
-    position: absolute;
-	top: 16px;
+  .performance-hud { position: absolute;, top: 16px;
     right: 16px;
 	background: rgba(0, 0, 0, 0.7);
     padding: 12px;
@@ -697,9 +687,7 @@
     font-family: monospace;
     font-weight: bold;
   }
-  .controls-panel {
-    position: absolute;
-	bottom: 16px;
+  .controls-panel { position: absolute;, bottom: 16px;
     left: 50%;
 	transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.1);
@@ -737,15 +725,11 @@
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
   }
-  .controls-panel button.active {
-    background: #3b82f6;
-	color: white;
+  .controls-panel button.active { background: #3b82f6;, color: white;
     border-color: #3b82f6;
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
   }
-  .node-info-panel {
-    position: absolute;
-	top: 16px;
+  .node-info-panel { position: absolute;, top: 16px;
     left: 16px;
 	background: rgba(255, 255, 255, 0.95);
     padding: 16px;
@@ -777,8 +761,7 @@
 	color: white; border: none; border-radius: 4px;
 	cursor: pointer; }
   .error-overlay button:hover { background: #2563eb; }
-  .performance-hud { position: absolute;
-	top: 12px; left: 12px;
+  .performance-hud { position: absolute;, top: 12px; left: 12px;
 	background: rgba(0, 0, 0, 0.7); padding: 8px 12px; border-radius: 4px; font-size: 12px;
 	color: white; font-family: 'Courier New', monospace; z-index: 5; }
   .stat { display: flex; justify-content: space-between; min-width: 80px; margin-bottom: 2px; }
@@ -788,9 +771,7 @@
 	color: #60a5fa;
 	}
 
-	.controls-panel {
-		position: absolute;
-		top: 12px;
+	.controls-panel { position: absolute;, top: 12px;
 		right: 12px;
 		display: flex;
 		gap: 8px;
@@ -820,9 +801,7 @@
 		background: rgba(96, 165, 250, 0.3);
 		border-color: #60a5fa;
 	}
-	.node-info-panel {
-		position: absolute;
-		bottom: 12px;
+	.node-info-panel { position: absolute;, bottom: 12px;
 		left: 12px;
 		background: rgba(0, 0, 0, 0.8);
 		color: white;

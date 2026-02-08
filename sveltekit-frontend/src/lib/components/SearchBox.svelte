@@ -46,7 +46,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	q: trimmedQuery, limit })
+, q: trimmedQuery, limit })
       });
 
       if (!response.ok) {
@@ -197,9 +197,7 @@
     padding: 20px;
   }
 
-  .search-input-group {
-    display: flex;
-	gap: 10px;
+  .search-input-group { display: flex;, gap: 10px;
     margin-bottom: 15px;
     align-items: center;
     flex-wrap: wrap;
@@ -334,8 +332,6 @@
     box-shadow: 0 0 0 4px #92cc41;
   }
 
-  .nes-btn.is-disabled {
-    cursor: not-allowed;
-	opacity: 0.6;
+  .nes-btn.is-disabled { cursor: not-allowed;, opacity: 0.6;
   }
 </style>

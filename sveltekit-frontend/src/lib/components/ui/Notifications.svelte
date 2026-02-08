@@ -55,8 +55,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         relative p-4 rounded-lg border shadow-lg backdrop-blur-sm
         ${colorClasses[notification.type ?? 'info']}
       `}`
-      in: fly={{
-	x: 300 duration: 300 easing: quintOut }}
+      in: fly={{ x: 300, duration: 300 easing: quintOut }}
       out: fly={{
 	x: 300, duration, 200, easing, quintOut }}
     >

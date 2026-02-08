@@ -47,7 +47,7 @@ import { Target } from "lucide-svelte";;
 			case 'admissibility': return CircleCheck;
 			case 'discovery': return Brain;
 			case 'precedent': return Lightbulb;
-			default: return TriangleAlert;
+			default:return TriangleAlert;
 		}
 	}
 
@@ -56,7 +56,7 @@ import { Target } from "lucide-svelte";;
 			case 'high': return 'text-red-400 border-red-400/30';
 			case 'medium': return 'text-yellow-400 border-yellow-400/30';
 			case 'low': return 'text-green-400 border-green-400/30';
-			default: return 'text-gray-400 border-gray-400/30';
+			default:return 'text-gray-400 border-gray-400/30';
 		}
 	}
 
@@ -66,7 +66,7 @@ import { Target } from "lucide-svelte";;
 			case 'admissibility': return 'text-green-400';
 			case 'discovery': return 'text-purple-400';
 			case 'precedent': return 'text-orange-400';
-			default: return 'text-gray-400';
+			default:return 'text-gray-400';
 		}
 	}
 </script>

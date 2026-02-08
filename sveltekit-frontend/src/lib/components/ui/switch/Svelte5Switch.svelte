@@ -13,7 +13,7 @@ interface Props {
 	class?: string;
 	variant?: 'default' | 'nes';
 	size?: 'sm' | 'md' | 'lg';
-	onchange?: (checked: boolean) => void;
+	onchange?: (checked:boolean) => void;
 	children?: Snippet;
 }
 
@@ -30,9 +30,7 @@ let {
 }: Props = $props();
 
 // Size dimensions
-let dimensions = $derived({
-	sm: {
-		track: 'w-8 h-4',
+let dimensions = $derived({ sm: {, track: 'w-8 h-4',
 		thumb: 'w-3 h-3',
 		translate: 'translate-x-4'
 	},
@@ -42,7 +40,7 @@ let dimensions = $derived({
 		translate: 'translate-x-5'
 	},
 	lg: {
-		track: 'w-14 h-7',
+	, track: 'w-14 h-7',
 		thumb: 'w-6 h-6',
 		translate: 'translate-x-7'
 	}
@@ -56,7 +54,7 @@ let labelSizeClasses = $derived({
 
 // Variant classes
 let trackVariants = $derived({
-	default: checked
+	default:checked
 		? 'bg-blue-600'
 		: 'bg-slate-600',
 	nes: checked
@@ -137,9 +135,7 @@ function handleKeydown(e: KeyboardEvent) {
 </label>
 
 <style>
-	.sr-only {
-		position: absolute;
-	width: 1px;
+	.sr-only { position: absolute;, width: 1px;
 		height: 1px;
 	padding: 0;
 		margin: -1px;

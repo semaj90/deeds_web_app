@@ -2,12 +2,10 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface OCRHealthDetails {
- service: string; status: 'operational' | 'degraded' | 'offline';
+interface OCRHealthDetails { service: string;, status: 'operational' | 'degraded' | 'offline';
  port?: number; endpoint: string;
  features?: string[];
- performance?: { avgProcessingTime: number;
- documentsProcessed: number; errorRate: number;
+ performance?: { avgProcessingTime: number;, documentsProcessed: number; errorRate: number;
  };
  version?: string; lastChecked: string;
  responseTime: number;
@@ -16,8 +14,7 @@ interface OCRHealthDetails {
 interface OCRHealthResponse {
  status: 'healthy' | 'degraded' | 'unhealthy';
  timestamp: string; ocr: OCRHealthDetails;
- metadata: { checkDuration: number;
- environment: string;
+ metadata: { checkDuration: number;, environment: string;
  };
 }
 
@@ -71,7 +68,7 @@ async function performOCRHealthCheck(): Promise<OCRHealthDetails> {
 
  const response = await fetch(`${ocrBaseUrl}/status`, {
  method: 'GET',
- headers: { Accept: 'application/json',
+ headers: {, Accept: 'application/json',
  'User-Agent': 'LegalAI-HealthCheck/1.0',
  },
  signal: controller.signal,
@@ -267,7 +264,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  action: 'detailed-status',
  ...ocrHealth,
- additionalChecks: { batchProcessingAvailable: true,
+ additionalChecks: {, batchProcessingAvailable: true,
  extractionFormats: ['pdf', 'png', 'jpg', 'jpeg', 'txt'],
  maxFileSize: '50MB',
  },

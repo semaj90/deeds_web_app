@@ -44,7 +44,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ tool: 'system:health', args: {} })
+	body: JSON.stringify({, tool: 'system:health', args: {} })
 			});
 			const data = await res.json();
 			systemHealth = data.result?.services ?? {};
@@ -65,7 +65,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ tool: selectedTool, args })
+	body: JSON.stringify({, tool: selectedTool, args })
 			});
 			const data = await res.json();
 			result = data;
@@ -103,8 +103,7 @@
 				return '🟢';
 			case 'unhealthy':
 				return '🟡';
-			default:
-				return '🔴';
+			default:return '🔴';
 		}
 	}
 
@@ -294,9 +293,7 @@
 		font-size: 0.9rem;
 	}
 
-	.header-stats {
-		display: flex;
-		gap: 1rem;
+	.header-stats { display: flex;, gap: 1rem;
 	}
 
 	.stat {
@@ -318,9 +315,7 @@
 		color: #888;
 	}
 
-	.health-grid {
-		display: flex;
-		gap: 1rem;
+	.health-grid { display: flex;, gap: 1rem;
 		flex-wrap: wrap;
 	}
 
@@ -391,9 +386,7 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.category-filter select {
-		width: 100%;
-		padding: 0.6rem;
+	.category-filter select { width: 100%;, padding: 0.6rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 6px;
@@ -407,9 +400,7 @@
 		gap: 0.5rem;
 	}
 
-	.tool-item {
-		width: 100%;
-		display: flex;
+	.tool-item { width: 100%;, display: flex;
 		align-items: flex-start;
 		gap: 0.75rem;
 		padding: 0.75rem;
@@ -476,9 +467,7 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.args-section textarea {
-		width: 100%;
-		padding: 1rem;
+	.args-section textarea { width: 100%;, padding: 1rem;
 		background: rgba(0, 0, 0, 0.3);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px;
@@ -488,9 +477,7 @@
 		resize: vertical;
 	}
 
-	.execute-btn {
-		width: 100%;
-		background: linear-gradient(135deg, #00d4ff, #00ff88);
+	.execute-btn { width: 100%;, background: linear-gradient(135deg, #00d4ff, #00ff88);
 		color: #000;
 		border: none;
 		padding: 0.8rem 2rem;
@@ -506,9 +493,7 @@
 		box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
 	}
 
-	.execute-btn:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
+	.execute-btn:disabled { opacity: 0.6;, cursor: not-allowed;
 	}
 
 	.error-box {
@@ -528,17 +513,13 @@
 		overflow: hidden;
 	}
 
-	.result-box h3 {
-		margin: 0;
-		padding: 0.75rem 1rem;
+	.result-box h3 { margin: 0;, padding: 0.75rem 1rem;
 		background: rgba(255, 255, 255, 0.05);
 		font-size: 0.9rem;
 		color: #888;
 	}
 
-	.result-meta {
-		display: flex;
-		gap: 1rem;
+	.result-meta { display: flex;, gap: 1rem;
 		padding: 0.75rem 1rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	}
@@ -555,9 +536,7 @@
 		color: #888;
 	}
 
-	.result-json {
-		margin: 0;
-		padding: 1rem;
+	.result-json { margin: 0;, padding: 1rem;
 		font-family: 'Fira Code', monospace;
 		font-size: 0.85rem;
 		overflow-x: auto;

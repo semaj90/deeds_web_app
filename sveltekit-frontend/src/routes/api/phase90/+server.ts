@@ -26,14 +26,14 @@ export const GET: RequestHandler = async ({ url }) => {
       });
     }
 
-    // Default: list tools
+    // Default:list tools
     const tools = getPhase90ToolDefinitions();
     return json({
       success: true,
       tools,
       count: tools.length,
       description: 'Phase 90 RAG+KAG+DAG Unified Knowledge Base',
-      capabilities: { embeddings: 73313,
+      capabilities: {, embeddings: 73313,
         clusters: 12,
         redisKeys: 113644,
         cudaEnabled: true

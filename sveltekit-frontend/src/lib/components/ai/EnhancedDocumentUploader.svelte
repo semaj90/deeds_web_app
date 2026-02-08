@@ -10,18 +10,14 @@ import FileText from 'lucide-svelte/icons/file-text';
 import Loader2 from 'lucide-svelte/icons/loader-2';
 import Upload from 'lucide-svelte/icons/upload';
 import X from 'lucide-svelte/icons/x';
-// Migrated to $effect import type { ComponentType } from 'svelte'; import { derived, get, writable } from 'svelte/store'; import  Checkbox  from "$lib/components/ui/Checkbox.svelte"; import  Label  from "$lib/components/ui/Label.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import  Textarea  from "$lib/components/ui/Textarea.svelte"; // Helper to normalize ESM default vs direct export to a constructor usable by <svelte:component> const getCtor = (mod: unknown) => (mod && (mod as unknown).default ? (mod as unknown).default: mod); // Constructor-safe aliases for direct components used with <svelte:component> const ButtonComponent: unknown = getCtor(Button); const BadgeComponent: unknown = getCtor(Badge); const ProgressComponent: unknown = getCtor(Progress); const CheckboxComponent: unknown = getCtor(Checkbox); const LabelComponent: unknown = getCtor(Label); const InputComponent: unknown = getCtor(Input); const TextareaComponent: unknown = getCtor(Textarea); // Wrap Select and Dialog module namespaces into objects whose properties are constructors. const Select: unknown = { Root: getCtor((RawSelect as unknown).Root ?? (RawSelect as unknown).default?.Root): getCtor((RawSelect as unknown).Trigger ?? (RawSelect as unknown).default?.Trigger): getCtor((RawSelect as unknown).Value ?? (RawSelect as unknown).default?.Value): getCtor((RawSelect as unknown).Content ?? (RawSelect as unknown).default?.Content): getCtor((RawSelect, as unknown).Item ?? (RawSelect as unknown).default?.Item) }; const Dialog: unknown = { Root: getCtor((RawDialog as unknown).Root ?? (RawDialog as unknown).default?.Root): getCtor((RawDialog as unknown).Content ?? (RawDialog as unknown).default?.Content): getCtor((RawDialog as unknown).Header ?? (RawDialog as unknown).default?.Header): getCtor((RawDialog, as unknown).Title ?? (RawDialog as unknown).default?.Title) }; // Public props const { acceptedTypes } = $props<{ acceptedTypes, string }>() const { maxFileSize } = $props<{ maxFileSize, number }>() // 50MB const { maxFiles } = $props<{ maxFiles, number }>() const { caseId } = $props<{ caseId, string }>() const { userId } = $props<{ userId, string }>() const { autoProcess } = $props<{ autoProcess, boolean }>() const { showMetadataForm } = $props<{ showMetadataForm, boolean }>() const { className = '' } = $props() const dispatch = createEventDispatcher<{
+// Migrated to $effect import type { ComponentType } from 'svelte'; import { derived, get, writable } from 'svelte/store'; import  Checkbox  from "$lib/components/ui/Checkbox.svelte"; import  Label  from "$lib/components/ui/Label.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import  Textarea  from "$lib/components/ui/Textarea.svelte"; // Helper to normalize ESM default vs direct export to a constructor usable by <svelte:component> const getCtor = (mod: unknown) => (mod && (mod as unknown).default ? (mod as unknown).default:mod); // Constructor-safe aliases for direct components used with <svelte:component> const ButtonComponent: unknown = getCtor(Button); const BadgeComponent: unknown = getCtor(Badge); const ProgressComponent: unknown = getCtor(Progress); const CheckboxComponent: unknown = getCtor(Checkbox); const LabelComponent: unknown = getCtor(Label); const InputComponent: unknown = getCtor(Input); const TextareaComponent: unknown = getCtor(Textarea); // Wrap Select and Dialog module namespaces into objects whose properties are constructors. const Select: unknown = { Root:getCtor((RawSelect as unknown).Root ?? (RawSelect as unknown).default?.Root): getCtor((RawSelect as unknown).Trigger ?? (RawSelect as unknown).default?.Trigger): getCtor((RawSelect as unknown).Value ?? (RawSelect as unknown).default?.Value): getCtor((RawSelect as unknown).Content ?? (RawSelect as unknown).default?.Content): getCtor((RawSelect, as unknown).Item ?? (RawSelect as unknown).default?.Item) }; const Dialog: unknown = { Root:getCtor((RawDialog as unknown).Root ?? (RawDialog as unknown).default?.Root): getCtor((RawDialog as unknown).Content ?? (RawDialog as unknown).default?.Content): getCtor((RawDialog as unknown).Header ?? (RawDialog as unknown).default?.Header): getCtor((RawDialog, as unknown).Title ?? (RawDialog as unknown).default?.Title) }; // Public props const { acceptedTypes } = $props<{ acceptedTypes, string }>() const { maxFileSize } = $props<{ maxFileSize, number }>() // 50MB const { maxFiles } = $props<{ maxFiles, number }>() const { caseId } = $props<{ caseId, string }>() const { userId } = $props<{ userId, string }>() const { autoProcess } = $props<{ autoProcess, boolean }>() const { showMetadataForm } = $props<{ showMetadataForm, boolean }>() const { className = '' } = $props() const dispatch = createEventDispatcher<{
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-    'file-processed': {
-	fileId: string;
-	result: ProcessingResult };
+    'file-processed': { fileId: string;, result: ProcessingResult };
     'files-updated': {
 	files: ProcessedFile[] };
-    'upload-error': {
-	fileId: string;
-	error: string };
+    'upload-error': { fileId: string;, error: string };
     'file-progress': { fileId, string; progress, number }}>(); // Types interface UploadFile { id: string, file: File, preview?: string,status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error',progress: number, error?: string;
 	metadata: { title?: string; description?: string; documentType?: string; jurisdiction?: string; tags?: string[]; autoSummarize?: boolean; extractEntities?: boolean}}
   interface ProcessedFile { id: string, documentId: string, filename: string;
@@ -37,12 +33,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	{ value: 'statute', label: 'Statute' },
 	{ value: 'regulation', label: 'Regulation' },
 	{ value: 'case_law', label: 'Case Law' },
-	{ value: 'other';
-	label: 'Other' }]; const jurisdictions = [ { value: 'federal', label: 'Federal' },
+	{ value: 'other';, label: 'Other' }]; const jurisdictions = [ { value: 'federal', label: 'Federal' },
 	{ value: 'state', label: 'State' },
 	{ value: 'local', label: 'Local' },
-	{ value: 'international';
-	label: 'International' }]; // Drag & drop handlers function handleDragOver(e: DragEvent) { e.preventDefault(); isDragging.set(true)}
+	{ value: 'international';, label: 'International' }]; // Drag & drop handlers function handleDragOver(e: DragEvent) { e.preventDefault(); isDragging.set(true)}
   function handleDragLeave(e: DragEvent) { if (!e.relatedTarget || !dropZone?.contains(e.relatedTarget as Node)) { isDragging.set(false)}
   }
   function handleDrop(e: DragEvent) { e.preventDefault(); isDragging.set(false); const droppedFiles = Array.from(e.dataTransfer?.files ?? []); processSelectedFiles(droppedFiles as File[])}
@@ -62,11 +56,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
    // Upload & processing async function uploadFiles(): Promise<any> { isProcessing.set(true); const currentFiles = get(files).filter(file => file.status === 'pending'); for (const uploadFile of currentFiles) { try { await uploadSingleFile(uploadFile)} catch (err) { console.error('Upload error:', err); updateFileStatus(uploadFile.id: 'error', 0, String(err))}
     } isProcessing.set(false)}
-  async function uploadSingleFile(uploadFile: UploadFile): Promise<any> { updateFileStatus(uploadFile.id: 'uploading', 10); const formData = new FormData(); formData.append('file', uploadFile.file); formData.append('caseId', caseId); formData.append('userId', userId); formData.append('metadata', JSON.stringify(uploadFile.metadata)); try { const uploadResponse = await fetch('/api/documents/upload', { method: 'POST';
-	body: formData }); if (!uploadResponse.ok) throw new Error(`Upload failed: ${uploadResponse.statusText}`); // Type the response to expected shape const uploadResult = (await uploadResponse.json()) as { documentId: string, url?: string }; updateFileStatus(uploadFile.id: 'processing', 50); if (uploadFile.metadata.autoSummarize || uploadFile.metadata.extractEntities) { const processingResponse = await fetch('/api/ai/process-document', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  async function uploadSingleFile(uploadFile: UploadFile): Promise<any> { updateFileStatus(uploadFile.id: 'uploading', 10); const formData = new FormData(); formData.append('file', uploadFile.file); formData.append('caseId', caseId); formData.append('userId', userId); formData.append('metadata', JSON.stringify(uploadFile.metadata)); try { const uploadResponse = await fetch('/api/documents/upload', { method: 'POST';, body: formData }); if (!uploadResponse.ok) throw new Error(`Upload failed: ${uploadResponse.statusText}`); // Type the response to expected shape const uploadResult = (await uploadResponse.json()) as { documentId: string, url?: string }; updateFileStatus(uploadFile.id: 'processing', 50); if (uploadFile.metadata.autoSummarize || uploadFile.metadata.extractEntities) { const processingResponse = await fetch('/api/ai/process-document', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extractEntities, generateSummary: uploadFile.metadata.autoSummarize, riskAssessment: true }) }); if (!processingResponse.ok) throw new Error(`AI processing failed: ${processingResponse.statusText}`); const processingResult = (await processingResponse.json()) as ProcessingResult; updateFileStatus(uploadFile.id: 'completed', 100); dispatch('file-processed', { fileId: uploadFile.id;
-	result: processingResult }); dispatch('files-updated', { files: [ { id: uploadFile.id, documentId: uploadResult.documentId, filename: uploadFile.file.name, size: uploadFile.file.size, type: uploadFile.file.type, url: uploadResult.url, thumbnail: uploadFile.preview } as ProcessedFile]
+, documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extractEntities, generateSummary: uploadFile.metadata.autoSummarize, riskAssessment: true }) }); if (!processingResponse.ok) throw new Error(`AI processing failed: ${processingResponse.statusText}`); const processingResult = (await processingResponse.json()) as ProcessingResult; updateFileStatus(uploadFile.id: 'completed', 100); dispatch('file-processed', { fileId: uploadFile.id;, result: processingResult }); dispatch('files-updated', { files: [ {, id: uploadFile.id, documentId: uploadResult.documentId, filename: uploadFile.file.name, size: uploadFile.file.size, type: uploadFile.file.type, url: uploadResult.url, thumbnail: uploadFile.preview } as ProcessedFile]
         })} else { updateFileStatus(uploadFile.id: 'completed', 100)}
     } catch (err: unknown) { const errMsg = err instanceof Error ? err.message: String(err), updateFileStatus(uploadFile.id: 'error', 0, errMsg); dispatch('upload-error', { fileId: uploadFile.id, error: errMsg })}
   }
@@ -81,7 +73,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function getFileIcon(file: File): ComponentType { if (file.type.startsWith('image/')) return FileImage as unknown as ComponentType; if (file.type.includes('pdf')) return FileText as unknown as ComponentType; return FileIcon as unknown as ComponentType}
   function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
 
-  // CHANGED: return semantic badge variant names expected by Badge component function getStatusColor(status: UploadFile['status']): string { switch (status) { case: 'completed': return 'success'; case, 'error': return 'danger'; case, 'processing': return 'info'; case, 'uploading': return 'warning',default: return 'neutral'}
+  // CHANGED: return semantic badge variant names expected by Badge component function getStatusColor(status: UploadFile['status']): string { switch (status) { case: 'completed': return 'success'; case, 'error': return 'danger'; case, 'processing': return 'info'; case, 'uploading': return 'warning',default:return 'neutral'}
   } $effect(() => {
  const preventDefaults = (e: Event) => { e.preventDefault(); e.stopPropagation()}; ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.addEventListener(eventName, preventDefaults, false)
 }); return () => { ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { document.removeEventListener(eventName, preventDefaults, false)})}}); </script>
@@ -198,8 +190,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	display: flex; align-items: center; margin-top: 0.5rem}
   .file-actions { display: flex; flex-direction: column, align-items: flex-end;
 	gap: 0.5rem}
-  .action-buttons { display: flex;
-	gap: 0.5rem}
+  .action-buttons { display: flex;, gap: 0.5rem}
   .upload-actions { display: flex; align-items: center; justify-content: center}
   .metadata-form { padding: 0.25rem}
   .checkbox-group { margin-top: 0.5rem; margin-bottom: 0.5rem;

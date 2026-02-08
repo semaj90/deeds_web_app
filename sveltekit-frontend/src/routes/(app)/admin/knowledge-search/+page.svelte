@@ -202,9 +202,7 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.tabs {
-		display: flex;
-	gap: 0.5rem;
+	.tabs { display: flex;, gap: 0.5rem;
 		margin-bottom: 2rem;
 		border-bottom: 2px solid #e5e7eb;
 	}
@@ -228,15 +226,11 @@
 	color: #3b82f6;
 	}
 
-	.search-controls {
-		display: flex;
-	gap: 1rem;
+	.search-controls { display: flex;, gap: 1rem;
 		margin-bottom: 2rem;
 	}
 
-	.search-input {
-		flex: 1;
-	padding: 0.75rem 1rem;
+	.search-input { flex: 1;, padding: 0.75rem 1rem;
 		border: 2px solid #e5e7eb;
 		border-radius: 0.5rem;
 		font-size: 1rem;
@@ -262,9 +256,7 @@
 		background: #2563eb;
 	}
 
-	.btn-primary:disabled {
-		background: #9ca3af;
-	cursor:not-allowed;
+	.btn-primary:disabled { background: #9ca3af;, cursor:not-allowed;
 	}
 
     .btn-secondary {
@@ -281,9 +273,7 @@
 		gap: 1.5rem;
 	}
 
-	.result-card {
-		background: white;
-	border: 1px solid #e5e7eb;
+	.result-card { background: white;, border: 1px solid #e5e7eb;
 		border-radius: 0.5rem;
 	padding: 1.5rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -300,18 +290,14 @@
 	color: #10b981;
 	}
 
-	.collection-badge {
-		background: #e0e7ff;
-	color: #4f46e5;
+	.collection-badge { background: #e0e7ff;, color: #4f46e5;
 		padding: 0.25rem 0.75rem;
 		border-radius: 9999px;
 		font-size: 0.75rem;
 		font-weight: 600;
 	}
 
-	.file-link {
-		background: #f3f4f6;
-	border: none;
+	.file-link { background: #f3f4f6;, border: none;
 		padding: 0.5rem 1rem;
 		border-radius: 0.375rem;
 	cursor: pointer;
@@ -332,9 +318,7 @@
 		margin-top: 1rem;
 	}
 
-	.tag {
-		background: #dbeafe;
-	color: #1e40af;
+	.tag { background: #dbeafe;, color: #1e40af;
 		padding: 0.25rem 0.75rem;
 		border-radius: 9999px;
 		font-size: 0.75rem;

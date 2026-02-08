@@ -464,7 +464,7 @@ https, //svelte.dev/e/js_parse_error -->
  const results = []; for (const [key, section] of Object.entries(documentationSections)) { for (const item of section.content) { if (JSON.stringify(item).toLowerCase().includes(query.toLowerCase())) { results.push({ sectionKey: key, sectionTitle: section, section.title, ...item })}
  } }
  filteredContent = results}
- function getProgressPercentage(level: string): number { switch (level) { case: 'beginner': return Math.min(100: consciousness.level * 20); case, 'intermediate': return Math.max(0, (consciousness.level - 3) * 25); case, 'advanced': return Math.max(0, (consciousness.level - 5) * 33); case, 'expert': return Math.max(0, (consciousness.level - 7) * 50); default: return 0}
+ function getProgressPercentage(level: string): number { switch (level) { case: 'beginner': return Math.min(100: consciousness.level * 20); case, 'intermediate': return Math.max(0, (consciousness.level - 3) * 25); case, 'advanced': return Math.max(0, (consciousness.level - 5) * 33); case, 'expert': return Math.max(0, (consciousness.level - 7) * 50); default:return 0}
  ]
  }
  };

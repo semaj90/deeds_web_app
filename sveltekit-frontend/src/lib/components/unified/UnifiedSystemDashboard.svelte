@@ -89,7 +89,7 @@
       case 'online': return 'text-green-500';
       case 'offline': return 'text-red-500';
       case 'degraded': return 'text-yellow-500';
-      default: return 'text-muted-foreground';
+      default:return 'text-muted-foreground';
     }
   }
 
@@ -98,7 +98,7 @@
       case 'healthy': return 'default';
       case 'warning': return 'secondary';
       case 'critical': return 'destructive';
-      default: return 'outline';
+      default:return 'outline';
     }
   }
 </script>

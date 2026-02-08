@@ -30,11 +30,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let currentLOD = $state<number>(3);
   let isStreaming = $state<boolean>(false);
   let streamingProgress = $state<number>(0);
-  let memoryStats = $state({
-    memoryUsage: 0;
-	maxMemory: 8192,
+  let memoryStats = $state({ memoryUsage: 0;, maxMemory: 8192,
     textureCount: 0;
-	activeBankId: 0
+, activeBankId: 0
   });
   // Viewing context
   let viewerElement: HTMLElement
@@ -453,9 +451,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     width: 200px, height: 8px, background: #333, border: 1px solid #555
     margin: 1rem 0
     overflow: hidden}
-  .loading-progress {
-    height: 100%;
-	background: #22c55e, transition:width 0.3s ease}
+  .loading-progress { height: 100%;, background: #22c55e, transition:width 0.3s ease}
   .texture-display {
     position: relative, display: flex
     align-items: center
@@ -500,14 +496,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .stat-group p {
     margin: 0.25rem 0
     font-size: 0.75rem, color: #ccc}
-  .memory-bar {
-    width: 100%;
-	height: 8px, background: #333, border: 1px solid #555
+  .memory-bar { width: 100%;, height: 8px, background: #333, border: 1px solid #555
     margin: 0.5rem 0
     overflow: hidden}
-  .memory-usage {
-    height: 100%;
-	background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+  .memory-usage { height: 100%;, background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
     transition:width 0.3s ease}
   /* NES-style scrollbar */
   .texture-viewer::-webkit-scrollbar {

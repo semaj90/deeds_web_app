@@ -24,13 +24,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			extensions: [StarterKit],
 			content: content || '',
 			onUpdate: ({
-	editor: ed }) => {
+, editor: ed }) => {
 				const html = ed.getHTML();
 				onChange?.(html);
 			},
-	editorProps: {
-	attributes: {
-					class: 'prose prose-invert w-full focus:outline-none bg-neutral-950/90 text-neutral-100 p-4'
+	editorProps: { attributes: {, class: 'prose prose-invert w-full focus:outline-none bg-neutral-950/90 text-neutral-100 p-4'
 				}
 			}
 		});
@@ -146,9 +144,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		outline: none;
 	}
 
-	:global(.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before) {
-		color: #6b7280;
-	content: attr(data-placeholder);
+	:global(.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before) { color: #6b7280;, content: attr(data-placeholder);
 		float: left;
 	height: 0;
 		pointer-events: none;

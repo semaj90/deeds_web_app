@@ -20,8 +20,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		showCompare?: boolean;
 		autoCompare?: boolean;
 		oncompare?: (evidence: Evidence) => void;
-		oncompared?: (data: {
-	evidence: Evidence; result: unknown }) => void;
+		oncompared?: (data: {, evidence: Evidence;, result: unknown }) => void;
 	}
 
 	let {
@@ -48,8 +47,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				return Headphones;
 			case 'link':
 				return LinkIcon;
-			default:
-				return FileText;
+			default:return FileText;
 		}
 	};
 

@@ -1,14 +1,14 @@
 /** * Canvas & Visual Editor Components Export * Advanced visual editing and canvas manipulation components */ export {
-default: as_$1 }
+default:as_$1 }
 from './AdvancedEditor.svelte';
 export {
-default: as_$1 }
+default:as_$1 }
 from './EvidenceCanvasEditor.svelte';
 export {
-default: as_$1 }
+default:as_$1 }
 from './EvidenceNode.svelte';
 export {
-default: as_$1 }
+default:as_$1 }
 from './ReportNode.svelte';
 export type CanvasNodeType = 'evidence' | 'report' | 'connection' | 'note';
 export type CanvasPosition = {

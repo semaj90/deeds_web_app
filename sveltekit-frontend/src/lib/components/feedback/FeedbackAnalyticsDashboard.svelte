@@ -28,9 +28,7 @@ let selectedTimeframe = $state<string>('7d');
 let selectedRatingType = $state<string>('all');
 
 // Analytics data
-let dashboardData = $state<any>({
-  overview: {
-    totalRatings: 0,
+let dashboardData = $state<any>({ overview: {, totalRatings: 0,
     averageRating: 0,
     completionRate: 0,
     trendDirection: 'stable'
@@ -39,7 +37,7 @@ let dashboardData = $state<any>({
   insights: [],
   recommendations: [],
   trends: {
-    daily: [],
+   , daily: [],
     hourly: []
   },
   userSegments: [],
@@ -144,8 +142,7 @@ function getTrendIcon(direction: string) {
       return ArrowUpRight;
     case 'down':
       return ArrowDownRight;
-    default:
-      return TrendingUp;
+    default:return TrendingUp;
   }
 }
 
@@ -158,8 +155,7 @@ function getTrendColor(direction: string) {
       return 'text-green-600';
     case 'down':
       return 'text-red-600';
-    default:
-      return 'text-gray-600';
+    default:return 'text-gray-600';
   }
 }
 
@@ -502,9 +498,7 @@ function getStarRating(rating: number): string {
     flex-wrap: wrap;
   }
 
-  .filters {
-    display: flex;
-    gap: 0.5rem;
+  .filters { display: flex;, gap: 0.5rem;
   }
 
   .filter-select {
@@ -526,9 +520,7 @@ function getStarRating(rating: number): string {
     transition: all 0.2s;
   }
 
-  .refresh-button {
-    background: #3b82f6;
-    color: white;
+  .refresh-button { background: #3b82f6;, color: white;
     border: none;
   }
 
@@ -536,9 +528,7 @@ function getStarRating(rating: number): string {
     background: #2563eb;
   }
 
-  .export-button {
-    background: #10b981;
-    color: white;
+  .export-button { background: #10b981;, color: white;
     border: none;
   }
 
@@ -546,9 +536,7 @@ function getStarRating(rating: number): string {
     background: #059669;
   }
 
-  .error-banner {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+  .error-banner { background: #fef2f2;, border: 1px solid #fecaca;
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 2rem;
@@ -580,9 +568,7 @@ function getStarRating(rating: number): string {
     color: #6b7280;
   }
 
-  .loading-spinner {
-    width: 2rem;
-    height: 2rem;
+  .loading-spinner { width: 2rem;, height: 2rem;
     border: 3px solid #e5e7eb;
     border-top: 3px solid #3b82f6;
     border-radius: 50%;
@@ -615,9 +601,7 @@ function getStarRating(rating: number): string {
     gap: 1.5rem;
   }
 
-  .metric-card {
-    padding: 1.5rem;
-    border: 1px solid #e5e7eb;
+  .metric-card { padding: 1.5rem;, border: 1px solid #e5e7eb;
     border-radius: 8px;
     background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
   }
@@ -629,9 +613,7 @@ function getStarRating(rating: number): string {
     margin-bottom: 1rem;
   }
 
-  .metric-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+  .metric-icon { width: 1.25rem;, height: 1.25rem;
   }
 
   .metric-label {
@@ -668,17 +650,13 @@ function getStarRating(rating: number): string {
     color: #6b7280;
   }
 
-  .progress-bar {
-    width: 100%;
-    height: 4px;
+  .progress-bar { width: 100%;, height: 4px;
     background: #e5e7eb;
     border-radius: 2px;
     overflow: hidden;
   }
 
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  .progress-fill { height: 100%;, background: linear-gradient(90deg, #10b981 0%, #059669 100%);
     transition: width 0.3s ease;
   }
 
@@ -776,22 +754,16 @@ function getStarRating(rating: number): string {
     font-size: 0.75rem;
   }
 
-  .rating-label {
-    width: 2rem;
-    color: #6b7280;
+  .rating-label { width: 2rem;, color: #6b7280;
   }
 
-  .bar {
-    flex: 1;
-    height: 4px;
+  .bar { flex: 1;, height: 4px;
     background: #e5e7eb;
     border-radius: 2px;
     overflow: hidden;
   }
 
-  .bar-fill {
-    height: 100%;
-    transition: width 0.3s ease;
+  .bar-fill { height: 100%;, transition: width 0.3s ease;
   }
 
   .bar-fill.rating-5 {
@@ -838,9 +810,7 @@ function getStarRating(rating: number): string {
   }
 
   .insight-item,
-  .recommendation-item {
-    padding: 1rem;
-    background: white;
+  .recommendation-item { padding: 1rem;, background: white;
     border-radius: 6px;
     border: 1px solid #e5e7eb;
   }
@@ -879,9 +849,7 @@ function getStarRating(rating: number): string {
     padding-left: 1rem;
   }
 
-  .recommendation-item {
-    display: flex;
-    gap: 1rem;
+  .recommendation-item { display: flex;, gap: 1rem;
   }
 
   .recommendation-priority {
@@ -892,19 +860,13 @@ function getStarRating(rating: number): string {
     white-space: nowrap;
   }
 
-  .recommendation-priority.priority-high {
-    background: #fecaca;
-    color: #dc2626;
+  .recommendation-priority.priority-high { background: #fecaca;, color: #dc2626;
   }
 
-  .recommendation-priority.priority-medium {
-    background: #fed7aa;
-    color: #ea580c;
+  .recommendation-priority.priority-medium { background: #fed7aa;, color: #ea580c;
   }
 
-  .recommendation-priority.priority-low {
-    background: #bbf7d0;
-    color: #047857;
+  .recommendation-priority.priority-low { background: #bbf7d0;, color: #047857;
   }
 
   .recommendation-content {
@@ -922,9 +884,7 @@ function getStarRating(rating: number): string {
     margin-bottom: 0.75rem;
   }
 
-  .recommendation-action {
-    background: #3b82f6;
-    color: white;
+  .recommendation-action { background: #3b82f6;, color: white;
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -937,9 +897,7 @@ function getStarRating(rating: number): string {
     gap: 1rem;
   }
 
-  .issue-item {
-    display: flex;
-    gap: 1rem;
+  .issue-item { display: flex;, gap: 1rem;
     padding: 1rem;
     background: white;
     border-radius: 6px;
@@ -974,9 +932,7 @@ function getStarRating(rating: number): string {
     margin-bottom: 0.75rem;
   }
 
-  .issue-stats {
-    display: flex;
-    gap: 1rem;
+  .issue-stats { display: flex;, gap: 1rem;
     font-size: 0.875rem;
   }
 

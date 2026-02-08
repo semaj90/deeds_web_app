@@ -10,16 +10,14 @@
 
   // Define buttonVariants
   const buttonVariants = cva(
-    'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none nes-focus disabled: opacity-50 disabled:pointer-events-none cursor-pointer',
-    {
-      variants: {
-	variant: {
+    'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none nes-focus disabled:opacity-50 disabled:pointer-events-none cursor-pointer',
+    { variants: {, variant: {
           default: 'btn-nes-primary',
           destructive: 'btn-nes-danger',
-          outline: 'border-2 border-gray-400 bg-transparent hover: bg-gray-100 dark: hover, bg-gray-800',
+          outline: 'border-2 border-gray-400 bg-transparent hover:bg-gray-100 dark: hover, bg-gray-800',
           secondary: 'btn-nes-secondary',
           ghost: 'hover:bg-gray-100 dark: hover, bg-gray-800 rounded-none',
-          link: 'text-blue-500 underline-offset-4 hover: underline hover:text-blue-600',
+          link: 'text-blue-500 underline-offset-4 hover:underline hover:text-blue-600',
           legal: 'nes-legal-priority-medium yorha-3d-button',
           evidence: 'nes-legal-priority-critical yorha-3d-button',
           caseItem: 'nes-legal-priority-high yorha-3d-button',
@@ -38,7 +36,7 @@
         }
       },
 	defaultVariants: {
-	variant: 'default',
+, variant: 'default',
         size: 'default'
       }
     }
@@ -96,9 +94,7 @@
     dataTestid = undefined
   }: BitsButtonProps = $props();
 
-  const dispatch = createEventDispatcher<{
-    click: MouseEvent;
-	analytics: ButtonAnalyticsEvent;
+  const dispatch = createEventDispatcher<{ click: MouseEvent;, analytics: ButtonAnalyticsEvent;
     cache: {
 	key: string; action, string };
   }>();
@@ -129,11 +125,11 @@
 
       if (cacheKey) {
         lokiButtonCache.recordInteraction(cacheKey, analyticsEvent);
-        dispatch('cache', { key: cacheKey action: 'click' });
+        dispatch('cache', { key: cacheKey, action: 'click' });
       }
 
       if (searchKeywords && searchKeywords.length > 0) {
-        searchableButtonIndex.addButton({ id: id! keywords: searchKeywords });
+        searchableButtonIndex.addButton({ id: id!, keywords: searchKeywords });
       }
     }
 

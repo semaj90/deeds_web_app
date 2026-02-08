@@ -149,7 +149,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       currentData.map(item => ({
         ...item,
         rotation: {
-	x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
+, x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
           y: item.rotation.y + (item.animation === 'rotate' ? 0.02 : 0),
           z: item.rotation.z + (item.animation === 'rotate' ? 0.005 : 0)
         }
@@ -295,7 +295,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case 'STANDBY': return '#ffa500';
       case 'MAXIMUM': return '#ff0066';
       case 'OFFLINE': return '#666';
-      default: return '#00ff88';
+      default:return '#00ff88';
     }
   }
 </script>
@@ -454,12 +454,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }
 
   @keyframes dataFlow {
-      0% { transform: translateY(-100%);
-	opacity: 0; }
+      0% { transform: translateY(-100%);, opacity: 0; }
       20% { opacity: 0.5; }
       80% { opacity: 0.5; }
-      100% { transform: translateY(100vh);
-	opacity: 0; }
+      100% { transform: translateY(100vh);, opacity: 0; }
   }
 
   .glitch-effect {

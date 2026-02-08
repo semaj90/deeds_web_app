@@ -6,9 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter }
  import { fade, scale, fly } from 'svelte/transition';
  import { createLegalEvidenceAnalyzer } from "$lib/components/ui/enhanced-bits/builders/custom-legal-components.svelte";
 
-interface Citation {
-	id: string;
-	type: 'case' | 'statute' | 'regulation' | 'constitutional' | 'secondary' | 'foreign';
+interface Citation { id: string;, type: 'case' | 'statute' | 'regulation' | 'constitutional' | 'secondary' | 'foreign';
 	fullCitation: string;
 	shortForm: string;
 	pinpoint?: string;
@@ -33,15 +31,13 @@ interface CitationDatabase { citations: Citation[], categories: string[], jurisd
   }
 
 interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Promise<boolean>; onSearch?: (query: string) => Promise<Citation[]>; onExport?: (citations: Citation[];
-	format: string) => void}
+, format: string) => void}
   let { citations = [], onVerify, onSearch, onExport }: Props = $props(); // Enhanced-Bits builder for citations // Use a type assertion and runtime fallback so TS doesn't complain if the import is a Svelte component constructor. const citationBuilder = (createLegalEvidenceAnalyzer as unknown as (...args: unknown[]) => any)?.({ caseType: 'civil', urgency: 'medium';
-	aiModel: 'gemma3'
-  }) ?? { // lightweight fallback styling & animations so the component still renders safely styling: {
-	colors: { primary: '#9CA3AF', evidence: '#9D4ADD' },
+, aiModel: 'gemma3'
+  }) ?? { // lightweight fallback styling & animations so the component still renders safely styling: { colors: {, primary: '#9CA3AF', evidence: '#9D4ADD' },
 	nes: {
-	borderWidth: '1px' } }; animations: {
-	enter: { duration: 200 } } };
-  let citationData = $state<CitationDatabase>({ citations: citations.length > 0 ?, citations: [ { id: 'cit-001', type: 'case', fullCitation: 'Brown v. Board of Education, 347 U.S. 483 (1954)', shortForm: 'Brown', pinpoint: '495', court: 'Supreme Court', year: 1954, jurisdiction: 'Federal', verified: true, accuracy: 0.98, relevanceScore: 0.92, usageCount: 15, tags: ['education', 'civil rights', 'equal protection'], notes: 'Landmark decision overturning separate but equal doctrine', parentheticals: ['holding that separate educational facilities are inherently unequal'], status: 'active', dateAdded: '2025-09-15T1 0 0 0 00Z'; lastChecked: '2025-09-21T14:3 0 00Z'
+	borderWidth: '1px' } }; animations: { enter: {, duration: 200 } } };
+  let citationData = $state<CitationDatabase>({ citations: citations.length > 0 ?, citations: [ {, id: 'cit-001', type: 'case', fullCitation: 'Brown v. Board of Education, 347 U.S. 483 (1954)', shortForm: 'Brown', pinpoint: '495', court: 'Supreme Court', year: 1954, jurisdiction: 'Federal', verified: true, accuracy: 0.98, relevanceScore: 0.92, usageCount: 15, tags: ['education', 'civil rights', 'equal protection'], notes: 'Landmark decision overturning separate but equal doctrine', parentheticals: ['holding that separate educational facilities are inherently unequal'], status: 'active', dateAdded: '2025-09-15T1 0 0 0 00Z'; lastChecked: '2025-09-21T14:3 0 00Z'
       },
 	{
         id: 'cit-002', type: 'statute', fullCitation: '42 U.S.C. Â§ 1983', shortForm: 'Â§ 1983', jurisdiction: 'Federal', verified: true, accuracy: 0.95, relevanceScore: 0.88, usageCount: 8, tags: ['civil rights', 'section 1983', 'constitutional violations'], notes: 'Civil action for deprivation of rights under color of law', status: 'active', dateAdded: '2025-09-10T15:2 0 00Z'; lastChecked: '2025-09-21T12:15:00Z'
@@ -67,7 +63,7 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
 
     // Jurisdiction filter if (filterJurisdiction !== 'all') { filtered = filtered.filter(citation => citation.jurisdiction === filterJurisdiction)}
 
-    // Sort citations filtered.sort((a, b) => { let comparison = 0; switch (sortBy) { case: 'relevance': comparison = b.relevanceScore - a.relevanceScore; break; case, 'date': comparison = new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime(); break; case, 'usage': comparison = b.usageCount - a.usageCount; break; case, 'accuracy': comparison = b.accuracy - a.accuracy; break; default: comparison = 0}
+    // Sort citations filtered.sort((a, b) => { let comparison = 0; switch (sortBy) { case: 'relevance': comparison = b.relevanceScore - a.relevanceScore; break; case, 'date': comparison = new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime(); break; case, 'usage': comparison = b.usageCount - a.usageCount; break; case, 'accuracy': comparison = b.accuracy - a.accuracy; break; default:comparison = 0}
       return comparison}); return filtered});
   async function verifyCitation(citationId: string): Promise<any> { if (!onVerify) return; isVerifying = true; try { const verified = await onVerify(citationId);
    const citationIndex = citationData.citations.findIndex(c => c.id === citationId); if (citationIndex >= 0) { citationData.citations[citationIndex].verified = verified; citationData.citations[citationIndex].lastChecked = new Date().toISOString(); citationData.citations[citationIndex].accuracy = verified ? 0.95: 0.60}
@@ -220,32 +216,23 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   .title-section { display: flex; align-items: center;
 	gap: 1rem}
   .citation-icon { font-size: 2rem}
-  .title-text h2 { margin: 0;
-	color: var(--enhanced-bits-foreground); font-size: 1.5rem}
-  .citation-meta { display: flex;
-	gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
+  .title-text h2 { margin: 0;, color: var(--enhanced-bits-foreground); font-size: 1.5rem}
+  .citation-meta { display: flex;, gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
   .total-count, .verified-count, .pending-count { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px}
-  .citation-actions { display: flex;
-	gap: 0.5rem; align-items: center; flex-wrap}
-  .bulk-actions { display: flex;
-	gap: 0.5rem}
+  .citation-actions { display: flex;, gap: 0.5rem; align-items: center; flex-wrap}
+  .bulk-actions { display: flex;, gap: 0.5rem}
   .add-form, .bulk-panel { margin-bottom: 2rem;
 	padding: 1.5rem;border: 2px solid var(--enhanced-bits-border); border-radius: 8px;
 	background: rgba(255, 255, 255, 0.02)}
   .form-header, .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
-  .form-header h3, .panel-header h3 { margin: 0;
-	color: var(--enhanced-bits-foreground)}
-  .form-content, .bulk-controls { display: flex;
-	gap: 1rem; flex-wrap}
+  .form-header h3, .panel-header h3 { margin: 0;, color: var(--enhanced-bits-foreground)}
+  .form-content, .bulk-controls { display: flex;, gap: 1rem; flex-wrap}
   .controls-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;
 	gap: 1rem; flex-wrap}
-  .search-controls { display: flex;
-	gap: 1rem; flex: 1; min-width: 0}
+  .search-controls { display: flex;, gap: 1rem; flex: 1; min-width: 0}
   .citation-search { flex: 1; min-width: 300px}
-  .filter-controls { display: flex;
-	gap: 1rem}
-  .filter-select, .sort-select { background: var(--enhanced-bits-background);
-	border: 2px solid var(--enhanced-bits-border);color: var(--enhanced-bits-foreground): 0.5rem; border-radius: 4px; font-family: inherit}
+  .filter-controls { display: flex;, gap: 1rem}
+  .filter-select, .sort-select { background: var(--enhanced-bits-background);, border: 2px solid var(--enhanced-bits-border);color: var(--enhanced-bits-foreground): 0.5rem; border-radius: 4px; font-family: inherit}
   .stats-section { margin-bottom: 2rem}
   .stats-section h3 { margin: 0, 0 1rem 0; color: var(--enhanced-bits-foreground)}
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem}
@@ -266,21 +253,18 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   .citation-header { display: flex; align-items: center;
 	gap: 1rem; margin-bottom: 1rem}
   .citation-select { display: flex; align-items: center}
-  .citation-checkbox { width: 18px;
-	height: 18px; accent-color: var(--enhanced-bits-primary)}
+  .citation-checkbox { width: 18px;, height: 18px; accent-color: var(--enhanced-bits-primary)}
   .citation-type { display: flex; align-items: center;
 	gap: 0.5rem}
   .type-icon { font-size: 1.25rem}
   .type-label { font-size: 0.875rem; font-weight: bold;
 	color: var(--enhanced-bits-foreground)}
-  .citation-status { display: flex;
-	gap: 0.5rem; margin-left: auto}
+  .citation-status { display: flex;, gap: 0.5rem; margin-left: auto}
   .status-badge, .verification-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;
 	border: 1px solid}
   .verification-badge { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-color: #f59e0b}
   .verification-badge.verified { background: rgba(16, 185, 129, 0.2); color: #10b981; border-color: #10b981}
-  .citation-actions { display: flex;
-	gap: 0.5rem}
+  .citation-actions { display: flex;, gap: 0.5rem}
   .citation-content { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start}
   .citation-full { font-size: 1rem;
 	color: var(--enhanced-bits-foreground); margin-bottom: 0.5rem; line-height: 1.4}
@@ -306,11 +290,9 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
 	gap: 0.5rem}
   .metric-label { font-size: 0.875rem;
 	color: var(--enhanced-bits-muted-foreground)}
-  .metric-bar { height: 8px;
-	background: rgba(255, 255, 255, 0.1); border-radius: 4px;
+  .metric-bar { height: 8px;, background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
-  .metric-fill { height: 100%;
-	transition:width 300ms ease; border-radius: 4px}
+  .metric-fill { height: 100%;, transition:width 300ms ease; border-radius: 4px}
   .metric-value { font-size: 0.875rem; font-weight: bold;
 	color: var(--enhanced-bits-evidence)}
   .citation-dates { display: flex; flex-direction: column;

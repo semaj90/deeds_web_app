@@ -14,9 +14,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     nodes: GraphNode[],
     edges: GraphEdge[],
     error?: string | null,
-    analysis?: {
-	evidenceId: string;
-      keyEntities: Entity[];
+    analysis?: { evidenceId: string;, keyEntities: Entity[];
 	correlations: Correlation[];
       timeline: TimelineEvent[];
     }
@@ -107,7 +105,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       // Create edge from main to entity
       edges.push({
         source: mainNode.id,
-        target: entityNode.id,
+        target:entityNode.id,
         weight: entity.confidence,
         type: 'entity',
         color: [0.5, 0.5, 0.5, 0.5]
@@ -134,7 +132,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       // Create edge for correlation
       edges.push({
         source: mainNode.id,
-        target: correlationNode.id,
+        target:correlationNode.id,
         weight: correlation.strength,
         type: correlation.correlationType,
         color: getCorrelationColor(correlation.correlationType)
@@ -146,7 +144,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         if (entityNode) {
           edges.push({
             source: correlationNode.id,
-            target: entityNode.id,
+            target:entityNode.id,
             weight: 0.3,
             type: 'semantic',
             color: [0.7, 0.7, 0.3, 0.3]
@@ -176,7 +174,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       if (i > 0) {
         edges.push({
           source: `event-${i - 1}`,
-          target: eventNode.id,
+          target:eventNode.id,
           weight: 0.5,
           type: 'temporal',
           color: [0.6, 0.6, 0.6, 0.5]
@@ -186,7 +184,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       // Connect events to main evidence
       edges.push({
         source: mainNode.id,
-        target: eventNode.id,
+        target:eventNode.id,
         weight: event.confidence * 0.5,
         type: 'temporal',
         color: [0.5, 0.5, 0.5, 0.3]
@@ -290,7 +288,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case 'date': return [0.8, 0.8, 0.2, 1.0]; // Yellow
       case 'amount': return [0.8, 0.2, 0.8, 1.0]; // Magenta
       case 'object': return [0.4, 0.4, 0.4, 1.0]; // Gray
-      default: return [0.5, 0.5, 0.5, 1.0];
+      default:return [0.5, 0.5, 0.5, 1.0];
     }
   }
 
@@ -301,7 +299,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case 'causal': return [0.8, 0.8, 0.2, 0.8]; // Yellow
       case 'semantic': return [0.2, 0.8, 0.2, 0.8]; // Green
       case 'entity': return [0.8, 0.4, 0.2, 0.8]; // Orange
-      default: return [0.5, 0.5, 0.5, 0.8];
+      default:return [0.5, 0.5, 0.5, 0.8];
     }
   }
 

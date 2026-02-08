@@ -13,9 +13,7 @@ https, //svelte.dev/e/js_parse_error -->
  import PoliceReportGenerator from './PoliceReportGenerator.svelte';
  import TimelineReconstructionEngine from './TimelineReconstructionEngine.svelte';
 
- interface Evidence {
- id: string;
-	title: string;
+ interface Evidence { id: string;, title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -23,16 +21,12 @@ https, //svelte.dev/e/js_parse_error -->
  source?: string;
  }
 
- interface Witness {
- id: string;
-	name: string;
+ interface Witness { id: string;, name: string;
  statement?: string;
  credibility?: number;
  }
 
- interface Case {
- id: string;
-	title: string;
+ interface Case { id: string;, title: string;
  description?: string;
 	status: 'active' | 'closed' | 'pending';
  createdAt: string;
@@ -125,7 +119,7 @@ https, //svelte.dev/e/js_parse_error -->
  case 'cross-exam': return '⚖️';
  case 'judicial': return '🏛️';
  case 'timeline': return '⏰';
- default: return '🔍';
+ default:return '🔍';
  }
  }
 
@@ -136,7 +130,7 @@ https, //svelte.dev/e/js_parse_error -->
  case 'cross-exam': return 'Cross-Examination';
  case 'judicial': return 'Judicial Analysis';
  case 'timeline': return 'Timeline Reconstruction';
- default: return 'Detective Mode';
+ default:return 'Detective Mode';
  }
  }
 </script>

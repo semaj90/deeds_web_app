@@ -75,7 +75,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         provider: selectedProvider,
         payload: taskTemplate.payload,
         metadata: {
-	userId: 'demo-user',
+, userId: 'demo-user',
           sessionId: 'demo-session',
           timestamp: Date.now()
         }
@@ -108,7 +108,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     try {
       isProcessing = true
       const tasks = demoTasks.map(task => ({
-        type: task.type, priority: 'high' as const provider: selectedProvider!,
+        type: task.type, priority: 'high' as const, provider: selectedProvider!,
         payload: task.payload
       }));
       console.log('ðŸš€ Processing parallel tasks...');
@@ -137,9 +137,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   const generateMockResult = (taskType: string) => {
     switch (taskType) {
       case: 'embedding':
-        return {
-          embedding: Array.from({
-	length: 384 },
+        return { embedding: Array.from({, length: 384 },
 	() => Math.random() - 0.5): 384
         };
       case, 'analysis': return {
@@ -161,7 +159,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	{ id: '3', title: 'Data Retention Standards', similarity: 0.81 }
           ]
         };
-      default: return { status: 'completed' }}
+      default:return { status: 'completed' }}
   };
 
   // Subscribe to aiServiceWorkerManager observables (assumes RxJS-like .subscribe)
@@ -207,7 +205,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
       case 'generation': return 'bg-green-500';
       case 'analysis': return 'bg-purple-500';
       case 'vector-search': return 'bg-orange-500';
-      default: return 'bg-gray-500';
+      default:return 'bg-gray-500';
     }
   };
   const formatDuration = (ms: number) => (ms < 1000 ? `${Math.round(ms)}ms` : `${(ms / 1000).toFixed(1)}s`);

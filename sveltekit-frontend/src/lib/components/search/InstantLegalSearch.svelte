@@ -7,7 +7,7 @@
   // Svelte 5 Runes
   let searchQuery = $state("");
   let isLoading = $state(false);
-  let results = $state<{ id: string; title: string; type: string }[]>([]);
+  let results = $state<{ id: string;, title: string; type: string }[]>([]);
   let open = $state(false);
 
   // Mock Search (replace with real service later)

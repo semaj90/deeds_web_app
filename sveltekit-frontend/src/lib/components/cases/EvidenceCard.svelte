@@ -21,7 +21,7 @@
      case 'physical': return Archive;
      case 'digital': return FileText;
      case 'testimony': return FileText;
-     default: return FileText;
+     default:return FileText;
    }
   }
 
@@ -34,7 +34,7 @@
       case 'physical': return 'bg-yellow-100 text-yellow-800';
       case 'digital': return 'bg-indigo-100 text-indigo-800';
       case 'testimony': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default:return 'bg-gray-100 text-gray-800';
     }
   }
 

@@ -503,9 +503,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: #d4af37, cursor: pointer, border-radius: 50%, border: 2px solid #1a1d20
 	}
 
-	:global(.nes-range::-moz-range-thumb) {
-		width: 16px;
-	height: 16px;
+	:global(.nes-range::-moz-range-thumb) { width: 16px;, height: 16px;
 	background: #d4af37, cursor: pointer, border-radius: 50%;
 	border: 2px solid #1a1d20
 	}

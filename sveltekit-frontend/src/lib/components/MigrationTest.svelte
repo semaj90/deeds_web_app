@@ -10,8 +10,7 @@
   const counterStore = new GenericStore<number>(0);
 
   // 2. Async Store Example
-  interface UserData { id: number;
-	name: string }
+  interface UserData { id: number;, name: string }
   const userStore = new AsyncStore<UserData>();
 
   async function fetchUser() {

@@ -35,33 +35,27 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		ragIndexSize: 0,
 		ocrAccuracy: 0,
 		trends: {
-	totalCases: 5.2,
+, totalCases: 5.2,
 			activeCases: -2.1,
 			evidenceProcessed: 12.8,
 			aiQueries: 8.5
 		}
 	});
 
-	let activeCases = $state<Array<{
-		id: string;
-	title: string;
+	let activeCases = $state<Array<{ id: string;, title: string;
 		status: 'active' | 'pending' | 'critical';
 		lastActivity: string;
 	evidenceCount: number;
 		priority: 'low' | 'medium' | 'high' | 'urgent';
 	}>>([]);
 
-	let systemAlerts = $state<Array<{
-		id: string;
-	type: 'info' | 'warning' | 'error';
+	let systemAlerts = $state<Array<{ id: string;, type: 'info' | 'warning' | 'error';
 		message: string;
 	timestamp: string;
 		dismissed?: boolean;
 	}>>([]);
 
-	let notifications = $state<Array<{
-		id: string;
-	type: 'info' | 'success' | 'warning' | 'error';
+	let notifications = $state<Array<{ id: string;, type: 'info' | 'success' | 'warning' | 'error';
 		title: string;
 	message: string;
 		timestamp: string;
@@ -275,7 +269,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			case 'active': return 'text-blue-400';
 			case 'warning': return 'text-yellow-400';
 			case 'error': return 'text-red-400';
-			default: return 'text-gray-400';
+			default:return 'text-gray-400';
 		}
 	}
 
@@ -285,7 +279,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			case 'high': return 'bg-orange-500/20 text-orange-300 border-orange-500/30';
 			case 'medium': return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
 			case 'low': return 'bg-green-500/20 text-green-300 border-green-500/30';
-			default: return 'bg-gray-500/20 text-gray-300 border-gray-500/30';
+			default:return 'bg-gray-500/20 text-gray-300 border-gray-500/30';
 		}
 	}
 
@@ -294,7 +288,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			case 'error': return AlertTriangle;
 			case 'warning': return AlertTriangle;
 			case 'info': return Activity;
-			default: return Activity;
+			default:return Activity;
 		}
 	}
 
@@ -859,9 +853,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-size: 0.875rem;
 	}
 
-	.header-actions {
-		display: flex;
-	gap: 0.5rem;
+	.header-actions { display: flex;, gap: 0.5rem;
 		align-items: center;
 	}
 
@@ -874,15 +866,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 3px;
 	}
 
-	.refresh-btn:disabled {
-		opacity: 0.6;
-	cursor:not-allowed;
+	.refresh-btn:disabled { opacity: 0.6;, cursor:not-allowed;
 	}
 
 	/* Quick Actions Dropdown */
-	.quick-actions-dropdown {
-		position: absolute;
-	top: 100%;
+	.quick-actions-dropdown { position: absolute;, top: 100%;
 		right: 0;
 		margin-top: 0.5rem;
 	background: rgba(0, 0, 0, 0.9);
@@ -919,9 +907,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		position: relative;
 	}
 
-	.notification-badge {
-		position: absolute;
-	top: -8px;
+	.notification-badge { position: absolute;, top: -8px;
 		right: -8px;
 	background: #ef4444;
 		color: white;
@@ -936,9 +922,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: 2px solid rgba(15, 15, 35, 1);
 	}
 
-	.notifications-dropdown {
-		position: absolute;
-	top: 100%;
+	.notifications-dropdown { position: absolute;, top: 100%;
 		right: 0;
 		margin-top: 0.5rem;
 	background: rgba(0, 0, 0, 0.95);
@@ -1006,9 +990,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-size: 0.75rem;
 	}
 
-	.notification-actions {
-		display: flex;
-	gap: 0.5rem;
+	.notification-actions { display: flex;, gap: 0.5rem;
 		margin-top: 0.5rem;
 	}
 
@@ -1152,9 +1134,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		gap: 1.5rem;
 	}
 
-	.case-item {
-		padding: 1rem;
-	background: rgba(255, 255, 255, 0.05);
+	.case-item { padding: 1rem;, background: rgba(255, 255, 255, 0.05);
 		border-radius: 8px;
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	}
@@ -1179,9 +1159,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid;
 	}
 
-	.case-meta {
-		display: flex;
-	gap: 1rem;
+	.case-meta { display: flex;, gap: 1rem;
 		font-size: 0.75rem;
 	color: rgba(255, 255, 255, 0.6);
 	}
@@ -1276,9 +1254,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-size: 0.7rem;
 	}
 
-	.alert-dismiss {
-		background: none;
-	border: none;
+	.alert-dismiss { background: none;, border: none;
 		color: rgba(255, 255, 255, 0.5);
 		cursor: pointer;
 	padding: 0.25rem;

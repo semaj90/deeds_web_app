@@ -19,7 +19,7 @@ interface SwitchCommonProps {
 export interface SwitchProps extends SwitchCommonProps {
   checked?: boolean;
   disabled?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked:boolean) => void;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'destructive';
 }

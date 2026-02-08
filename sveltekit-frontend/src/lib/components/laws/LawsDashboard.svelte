@@ -3,9 +3,7 @@
 	import LawModal from './LawModal.svelte';
 	import LegalAutocomplete from './LegalAutocomplete.svelte';
 
-	interface TimelineEvent {
-		id: string;
-	action: string;
+	interface TimelineEvent { id: string;, action: string;
 		data: any;
 	createdAt: string;
 		formatted: string;
@@ -57,7 +55,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	caseId: citation, statute: statute.citation, title: statute.title
+, caseId: citation, statute: statute.citation, title: statute.title
 				})
 			});
 

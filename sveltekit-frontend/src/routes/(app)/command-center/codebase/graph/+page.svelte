@@ -21,9 +21,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	// Types
-	interface GraphNode {
-		id: string;
-	label: string;
+	interface GraphNode { id: string;, label: string;
 		type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
 		errorCount: number;
 	filePath: string;
@@ -33,9 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		functions?: string[];
 	}
 
-	interface GraphEdge {
-		source: string;
-	target: string;
+	interface GraphEdge { source: string;, target:string;
 		type: 'import' | 'export' | 'dependency';
 	}
 
@@ -379,21 +375,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		margin: 0;
 	}
 
-	.header-actions {
-		display: flex;
-	gap: 0.75rem;
+	.header-actions { display: flex;, gap: 0.75rem;
 		align-items: center;
 	}
 
-	.search-box {
-		position: relative;
-	display: flex;
+	.search-box { position: relative;, display: flex;
 		align-items: center;
 	}
 
-	.search-icon {
-		position: absolute;
-	left: 0.75rem;
+	.search-icon { position: absolute;, left: 0.75rem;
 		color: rgba(255, 255, 255, 0.5);
 	}
 
@@ -416,9 +406,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-color: rgba(0, 212, 255, 0.5);
 	}
 
-	.clear-search {
-		position: absolute;
-	right: 0.5rem;
+	.clear-search { position: absolute;, right: 0.5rem;
 		background: transparent;
 	border: none;
 		color: rgba(255, 255, 255, 0.5);
@@ -426,9 +414,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 0.25rem;
 	}
 
-	.filter-badge {
-		background: #00d4ff;
-	color: black;
+	.filter-badge { background: #00d4ff;, color: black;
 		font-size: 0.7rem;
 		font-weight: 600;
 	padding: 0.1rem 0.4rem;
@@ -442,9 +428,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 12px;
 	}
 
-	.filter-content {
-		display: flex;
-	gap: 2rem;
+	.filter-content { display: flex;, gap: 2rem;
 		align-items: flex-start;
 	padding: 1rem;
 	}
@@ -463,9 +447,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		letter-spacing: 0.05em;
 	}
 
-	.filter-chips {
-		display: flex;
-	gap: 0.5rem;
+	.filter-chips { display: flex;, gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 
@@ -515,9 +497,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		align-items: center;
 	}
 
-	.stats-bar {
-		display: flex;
-	gap: 2rem;
+	.stats-bar { display: flex;, gap: 2rem;
 		padding: 0.75rem 1rem;
 		background: rgba(255, 255, 255, 0.03);
 		border-radius: 8px;
@@ -540,17 +520,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: rgba(255, 255, 255, 0.5);
 	}
 
-	.graph-container {
-		flex: 1;
-	position: relative;
+	.graph-container { flex: 1;, position: relative;
 		background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px;
 	overflow: hidden;
 	}
 
-	.loading-state {
-		position: absolute;
-	inset: 0;
+	.loading-state { position: absolute;, inset: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -559,16 +535,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: rgba(255, 255, 255, 0.6);
 	}
 
-	.detail-panel-container {
-		position: absolute;
-	top: 1rem;
+	.detail-panel-container { position: absolute;, top: 1rem;
 		left: 1rem;
 		z-index: 20;
 	}
 
-	.hover-tooltip {
-		position: absolute;
-	bottom: 1rem;
+	.hover-tooltip { position: absolute;, bottom: 1rem;
 		left: 50%;
 	transform: translateX(-50%);
 		background: rgba(0, 0, 0, 0.9);
