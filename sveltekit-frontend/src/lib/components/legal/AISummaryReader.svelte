@@ -32,7 +32,7 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
  <p class="text-sm">
   {#if documentId} Document ID: { documentId } {:else if $state.context?.documentType} {$state.context.documentType?.charAt(0).toUpperCase() + $state.context.documentType?.slice(1)} Analysis {/if}
   </p> </div> </div>
- <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover:bg-gray-100", class:text-blue-600={$state.context?.voiceEnabled}; class:text-gray-400={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice' : 'Enable voice'} >
+ <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover:bg-gray-100" class:text-blue-600={$state.context?.voiceEnabled}; class:text-gray-400={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice' : 'Enable voice'} >
           <Settings class="w-4" /> </button>
  <!-- Confidence, Score -->
   {#if ($state.context?.confidence ?? 0) > 0} <div class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"> {Math.round(($state.context?.confidence ?? 0) * 100)}% confidence {/if}
@@ -74,7 +74,7 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
  <!-- Progress, Bar -->
   {#if isReading} <div class="bg-gray-200 rounded-full" in, fade> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: { progress }%"></div> {/if}
   <!-- Section, Navigation --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
-  {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover:shadow-md", class:border-blue-500={index === ($state.context?.currentSection ?? 0)}; class:bg-blue-50={index === ($state.context?.currentSection ?? 0)}; class:shadow-sm={index === ($state.context?.currentSection ?? 0)}; class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
+  {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover:shadow-md" class:border-blue-500={index === ($state.context?.currentSection ?? 0)}; class:bg-blue-50={index === ($state.context?.currentSection ?? 0)}; class:shadow-sm={index === ($state.context?.currentSection ?? 0)}; class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
                 <div class="flex items-center justify-between"> <span class={'text-sm, font-medium, ' + getImportanceColor(section.importance).split(' ')[0]}> {section.title} </span>
  <span class={'text-xs px-2, py-1, rounded-full, ' + getImportanceColor(section.importance)}> {section.importance} </span> </div>
  <p class="text-xs text-gray-600"> {section.content?.substring(0, 100) ?? ''}... </p>

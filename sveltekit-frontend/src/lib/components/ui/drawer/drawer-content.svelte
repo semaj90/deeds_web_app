@@ -45,7 +45,7 @@
 {#if drawerContext?.open}
 	<DrawerOverlay />
 	<div
-		transition, fly={flyParams()}
+		transition fly={flyParams()}
 		role="dialog"
 		aria-modal="true"
 		class="{baseClass} {sideClass()} {className}"

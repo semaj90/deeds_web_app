@@ -122,7 +122,7 @@ content: documentType,
 
 	<!-- Document Type Selection -->
 	<div class="mb-4">
-		<label for="documentType" class="block text-sm font-medium text-gray-700 mb-2">
+		<label htmlFor="documentType" class="block text-sm font-medium text-gray-700 mb-2">
 			Document Type
 		</label>
 		<select
@@ -143,7 +143,7 @@ content: documentType,
 
 	<!-- Custom Patterns -->
 	<div class="mb-4">
-		<label for="customPatternInput" class="block text-sm font-medium text-gray-700 mb-2">
+		<label htmlFor="customPatternInput" class="block text-sm font-medium text-gray-700 mb-2">
 			Custom Patterns to Look For
 		</label>
 		<div class="flex gap-2 mb-2">
@@ -195,7 +195,7 @@ content: documentType,
 
 	<!-- Content Input -->
 	<div class="mb-4">
-		<label for="content" class="block text-sm font-medium text-gray-700 mb-2">
+		<label htmlFor="content" class="block text-sm font-medium text-gray-700 mb-2">
 			Document Content
 		</label>
 		<textarea

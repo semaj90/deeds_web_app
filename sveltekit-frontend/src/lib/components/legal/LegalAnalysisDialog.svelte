@@ -21,9 +21,9 @@ analysis: string, confidence: number, sources: Array, recommendations: string[],
   function resetDialog() { prompt = ''; analysis = null; error = ''; loading = false}
   function closeDialog() { isOpen = false; resetDialog()}
   $effect(() => { if (!isOpen) { resetDialog()}
-</script> <Dialog bind:isOpen title="Legal: AI, Analysis" onClose={ closeDialog }> <div class="space-y-6"> {#if !analysis} <!-- Analysis: Input, Form --> <div class="space-y-4"> <div> <label for="analysis-type" class="block text-sm font-medium"> Analysis Type </label> <select id="analysis-type"
+</script> <Dialog bind:isOpen title="Legal: AI, Analysis" onClose={ closeDialog }> <div class="space-y-6"> {#if !analysis} <!-- Analysis: Input, Form --> <div class="space-y-4"> <div> <label htmlFor="analysis-type" class="block text-sm font-medium"> Analysis Type </label> <select id="analysis-type"
             bind:value={ analysisType } class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
-          > {#each Array.isArray(analysisTypes) ? analysisTypes: [] as type} <option value={type.value}>{type.label}</option> {/each} </select> </div> <div> <label for="prompt" class="block text-sm font-medium"> Analysis Prompt </label> <textarea id="prompt"
+          > {#each Array.isArray(analysisTypes) ? analysisTypes: [] as type} <option value={type.value}>{type.label}</option> {/each} </select> </div> <div> <label htmlFor="prompt" class="block text-sm font-medium"> Analysis Prompt </label> <textarea id="prompt"
             bind:value={ prompt } placeholder="Enter your legal analysis question or prompt..."
             rows="4"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2"

@@ -69,7 +69,7 @@ enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prose
 </span></div> {/if}
   <form method="POST"
       action="?/register"
-      use, enhance={({ formData, cancel }) => { if (!validateForm()) { cancel(); return}
+      use enhance={({ formData, cancel }) => { if (!validateForm()) { cancel(); return}
         isLoading = true; errorMessage = ''; successMessage = ''; return async ({ result }) => { isLoading = false; if ((result as { type?: any; data?: any }).type === 'success') { successMessage = 'Registration successful! Redirecting to dashboard...'; setTimeout(() => { goto('/dashboard')},
 	2000)} else if ((result as { type?: any; data?: any }).type === 'failure') { errorMessage = (result as { type?: any; data?: any }).data?.form?.errors?.email?.[0] ?? 'Registration failed. Please try again.'} else if ((result as { type?: any; data?: any }).type === 'error') { errorMessage = 'An error occurred during registration. Please try again.'}
         }}} class="space-y-4"
@@ -168,7 +168,7 @@ enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prose
               class="w-full sm, w-auto bits-btn bits-btn bits-btn"
               onclick={ triggerFileInput } disabled={ isLoading } >
               Upload Documents </Button>
- <input bind:this={fileInputEl} onchange={ onFilesSelected } type="file" multiple, class="hidden" /> </div>
+ <input bind:this={fileInputEl} onchange={ onFilesSelected } type="file" multiple class="hidden" /> </div>
  <div class="flex-1"> <Button type="button"
               class="w-full sm, w-auto bits-btn bits-ghost bits-btn"
               onclick={ uploadAllPending } disabled={isLoading || files.length === 0} >

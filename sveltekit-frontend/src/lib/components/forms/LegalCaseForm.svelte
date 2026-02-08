@@ -191,7 +191,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <div class="tab-content">
         <div class="form-grid">
           <div class="form-field">
-            <label for="caseTitle">📋 Case Title *</label>
+            <label htmlFor="caseTitle">📋 Case Title *</label>
             <input
               id="caseTitle"
               type="text"
@@ -205,7 +205,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           </div>
 
           <div class="form-field">
-            <label for="caseNumber">🔢 Case Number</label>
+            <label htmlFor="caseNumber">🔢 Case Number</label>
             <input
               id="caseNumber"
               type="text"
@@ -215,7 +215,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           </div>
 
           <div class="form-field">
-            <label for="clientName">👤 Client Name *</label>
+            <label htmlFor="clientName">👤 Client Name *</label>
             <input
               id="clientName"
               type="text"
@@ -229,7 +229,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           </div>
 
           <div class="form-field">
-            <label for="practiceArea">⚖️ Practice Area *</label>
+            <label htmlFor="practiceArea">⚖️ Practice Area *</label>
             <select
               id="practiceArea"
               bind:value={formData.practiceArea}
@@ -253,7 +253,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <div class="tab-content">
         <div class="form-grid">
           <div class="form-field">
-            <label for="jurisdiction">🏛️ Jurisdiction *</label>
+            <label htmlFor="jurisdiction">🏛️ Jurisdiction *</label>
             <select
               id="jurisdiction"
               bind:value={formData.jurisdiction}
@@ -270,7 +270,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           </div>
 
           <div class="form-field">
-            <label for="priority">🚨 Priority</label>
+            <label htmlFor="priority">🚨 Priority</label>
             <select id="priority" bind:value={formData.priority}>
               <option value="">Select priority...</option>
               {#each priorities as p}
@@ -280,7 +280,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           </div>
 
           <div class="form-field full-width">
-            <label for="description">📄 Case Description</label>
+            <label htmlFor="description">📄 Case Description</label>
             <textarea
               id="description"
               bind:value={formData.description}
@@ -297,7 +297,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <div class="tab-content">
         <div class="form-grid">
           <div class="form-field">
-            <label for="assignedAttorney">👨‍💼 Assigned Attorney</label>
+            <label htmlFor="assignedAttorney">👨‍💼 Assigned Attorney</label>
             <input
               id="assignedAttorney"
               type="text"
@@ -307,7 +307,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           </div>
 
           <div class="form-field">
-            <label for="estimatedHours">⏱️ Estimated Hours</label>
+            <label htmlFor="estimatedHours">⏱️ Estimated Hours</label>
             <input
               id="estimatedHours"
               type="number"
@@ -317,7 +317,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           </div>
 
           <div class="form-field">
-            <label for="budget">💰 Budget</label>
+            <label htmlFor="budget">💰 Budget</label>
             <input
               id="budget"
               type="number"
@@ -327,7 +327,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           </div>
 
           <div class="form-field">
-            <label for="deadline">📅 Deadline *</label>
+            <label htmlFor="deadline">📅 Deadline *</label>
             <input
               id="deadline"
               type="date"

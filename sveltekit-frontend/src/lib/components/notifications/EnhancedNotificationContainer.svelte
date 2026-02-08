@@ -102,12 +102,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Notification settings (can be toggled via, settings, page) -->
   {#if false} <div class="container mx-auto"> <h3 class="container mx-auto">Notification Settings</h3>
- <div class="container mx-auto"> <label for="pause-on-hover" class="container mx-auto"> <input id="pause-on-hover"
+ <div class="container mx-auto"> <label htmlFor="pause-on-hover" class="container mx-auto"> <input id="pause-on-hover"
           type="checkbox"
           bind:checked={ pauseOnHover } /> <span class="container mx-auto">Pause on hover</span> </label>
- <label for="enable-sounds" class="container mx-auto"> <input id="enable-sounds" type="checkbox" bind:checked={ enableSounds } /> <span class="container mx-auto">Enable sounds</span> </label>
- <label for="group-similar" class="container mx-auto"> <input id="group-similar" type="checkbox" bind:checked={ groupSimilar } /> <span class="container mx-auto">Group similar notifications</span> </label>
- <div> <label for="max-visible-range" class="container mx-auto"
+ <label htmlFor="enable-sounds" class="container mx-auto"> <input id="enable-sounds" type="checkbox" bind:checked={ enableSounds } /> <span class="container mx-auto">Enable sounds</span> </label>
+ <label htmlFor="group-similar" class="container mx-auto"> <input id="group-similar" type="checkbox" bind:checked={ groupSimilar } /> <span class="container mx-auto">Group similar notifications</span> </label>
+ <div> <label htmlFor="max-visible-range" class="container mx-auto"
           >Max visible</label >
 
         <input id="max-visible-range"
@@ -116,7 +116,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           max="10"
           bind:value={ maxVisible } class="container mx-auto px-4"
         /> <span class="container mx-auto">{ maxVisible } notifications</span> </div>
- <div> <label for="position-select" class="container mx-auto"
+ <div> <label htmlFor="position-select" class="container mx-auto"
           >Position</label >
 
         <select id="position-select"

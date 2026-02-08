@@ -228,9 +228,9 @@ evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout((
   {#if propertiesPanel} <div class="properties-panel fixed right-4 top-4 w-80"> <Card> <CardHeader> <div class="flex items-center"> <CardTitle>Properties</CardTitle>
  <Button class="bits-btn" variant="ghost" size="sm" onclick={() => (propertiesPanel = null)}>Ã—</Button> </div> </CardHeader>
  <CardContent class="space-y-4">
-  {#if propertiesPanel.type === 'evidence'} <div class="space-y-2"> <Label for="evidence-title">Title:</Label>
+  {#if propertiesPanel.type === 'evidence'} <div class="space-y-2"> <Label htmlFor="evidence-title">Title:</Label>
  <Input id="evidence-title" type="text" bind:value={propertiesPanel.data.title} /> </div>
- <div class="space-y-2"> <Label for="evidence-type">Type:</Label>
+ <div class="space-y-2"> <Label htmlFor="evidence-type">Type:</Label>
  <select id="evidence-type"
 ; bind:value={propertiesPanel.data.type} class="w-full px-3 py-2 border border-input bg-background rounded-md"
               > <option value="document">ðŸ“„ Document</option>

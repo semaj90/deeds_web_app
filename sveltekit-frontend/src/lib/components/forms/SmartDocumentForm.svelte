@@ -211,7 +211,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         </div>
         <!-- File: Drop, Zone -->
         <div
-          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover:border-yorha-primary, hover:bg-yorha-bg-secondary/50", class:border-yorha-primary={uploadedFile}
+          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover:border-yorha-primary, hover:bg-yorha-bg-secondary/50" class:border-yorha-primary={uploadedFile}
           ondrop={handleDrop}
           role="button"
           aria-label="Drop zone"

@@ -356,7 +356,7 @@ ttl: 60000 } })
           <h3 class="text-lg font-bold mb-4">Cache Operations</h3>
           <div class="space-y-4">
             <div>
-              <label for="cache-key" class="block text-sm font-medium mb-1">Cache Key</label>
+              <label htmlFor="cache-key" class="block text-sm font-medium mb-1">Cache Key</label>
               <Input
                 id="cache-key"
                 bind:value={cacheKey}
@@ -365,7 +365,7 @@ ttl: 60000 } })
               />
             </div>
             <div>
-              <label for="cache-value" class="block text-sm font-medium mb-1">Cache Value</label>
+              <label htmlFor="cache-value" class="block text-sm font-medium mb-1">Cache Value</label>
               <Input
                 id="cache-value"
                 bind:value={cacheValue}
@@ -375,7 +375,7 @@ ttl: 60000 } })
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="cache-ttl" class="block text-sm font-medium mb-1">TTL</label>
+                <label htmlFor="cache-ttl" class="block text-sm font-medium mb-1">TTL</label>
                 <select
                   id="cache-ttl"
                   bind:value={selectedTTL}
@@ -387,7 +387,7 @@ ttl: 60000 } })
                 </select>
               </div>
               <div>
-                <label for="priority-select" class="block text-sm font-medium mb-1">Priority</label>
+                <label htmlFor="priority-select" class="block text-sm font-medium mb-1">Priority</label>
                 <select
                   id="priority-select"
                   bind:value={selectedPriority}

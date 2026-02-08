@@ -144,7 +144,7 @@ statute_code: statuteCode, citation_id: citationId, citationId,
  </div>
  {:else}
  <div class="form-group">
- <label for="case-select">Select Case *</label>
+ <label htmlFor="case-select">Select Case *</label>
  <select
  id="case-select"
  bind:value={selectedCaseId}
@@ -161,7 +161,7 @@ statute_code: statuteCode, citation_id: citationId, citationId,
  </div>
 
  <div class="form-group">
- <label for="link-type">Link Type *</label>
+ <label htmlFor="link-type">Link Type *</label>
  <select id="link-type" bind:value={linkType} disabled={isSaving} required>
  {#each linkTypes as type}
  <option value={ type }>{ type }</option>
@@ -170,7 +170,7 @@ statute_code: statuteCode, citation_id: citationId, citationId,
  </div>
 
  <div class="form-group">
- <label for="notes">Notes</label>
+ <label htmlFor="notes">Notes</label>
  <textarea
  id="notes"
  bind:value={notes}

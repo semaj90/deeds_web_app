@@ -142,7 +142,7 @@
      <h2>GENERAL_SETTINGS</h2>
      <div class="form-grid">
       <div class="form-group">
-       <label for="theme">Theme System</label>
+       <label htmlFor="theme">Theme System</label>
        <select id="theme" bind:value={config.general.theme}>
         <option value="yorha">YoRHa (Dark)</option>
         <option value="light">Resistance (Light)</option>
@@ -151,7 +151,7 @@
       </div>
 
       <div class="form-group">
-       <label for="language">System Language</label>
+       <label htmlFor="language">System Language</label>
        <select id="language" bind:value={config.general.language}>
         <option value="en">English (US)</option>
         <option value="ja">Japanese</option>
@@ -174,7 +174,7 @@
      <h2>AI_MODEL_CONFIGURATION</h2>
      <div class="form-grid">
       <div class="form-group">
-       <label for="model">Primary Model</label>
+       <label htmlFor="model">Primary Model</label>
        <select id="model" bind:value={config.ai.model}>
         <option value="gemma3-legal">Gemma 3 Legal (Fine-tuned)</option>
         <option value="gpt-4o">GPT-4o (OpenAI)</option>
@@ -183,7 +183,7 @@
       </div>
 
       <div class="form-group">
-       <label for="temp">Temperature ({config.ai.temperature})</label>
+       <label htmlFor="temp">Temperature ({config.ai.temperature})</label>
        <input
         type="range"
         id="temp"
@@ -195,7 +195,7 @@
       </div>
 
       <div class="form-group">
-       <label for="endpoint">Ollama Endpoint</label>
+       <label htmlFor="endpoint">Ollama Endpoint</label>
        <input type="text" id="endpoint" bind:value={config.ai.ollamaEndpoint}>
       </div>
      </div>

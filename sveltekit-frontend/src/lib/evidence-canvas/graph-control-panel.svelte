@@ -86,7 +86,7 @@ import { createEventDispatcher } from 'svelte';
  <div class="control-section">
  <h4>Layout</h4>
  <div class="control-group">
- <label for="layout-algorithm">Algorithm:</label>
+ <label htmlFor="layout-algorithm">Algorithm:</label>
  <select id="layout-algorithm" bind:value={layoutAlgorithm}>
  {#each layoutAlgorithms as algorithm}
  <option value={algorithm}>
@@ -120,7 +120,7 @@ import { createEventDispatcher } from 'svelte';
  </div>
 
  <div class="control-group">
- <label for="node-size">Node Size:</label>
+ <label htmlFor="node-size">Node Size:</label>
  <input
  id="node-size"
  type="range"
@@ -132,7 +132,7 @@ import { createEventDispatcher } from 'svelte';
  </div>
 
  <div class="control-group">
- <label for="edge-opacity">Edge Opacity:</label>
+ <label htmlFor="edge-opacity">Edge Opacity:</label>
  <input
  id="edge-opacity"
  type="range"

@@ -154,7 +154,7 @@ aiModel: 'gemma3'
  <span class="stat-count">{citationData.stats.pending}</span> </div> </div> </div> </div>
  <!-- Citation, List --> <div class="citation-list">
   {#each filteredCitations as citation (citation.id)} <div class="citation-item"
-              class:selected={selectedCitations.has(citation.id)} transition, scale={citationBuilder.animations.enter} >
+              class:selected={selectedCitations.has(citation.id)} transition scale={citationBuilder.animations.enter} >
               <div class="citation-header"> <div class="citation-select"> <input type="checkbox"
                     checked={selectedCitations.has(citation.id)} onchange={() => toggleSelection(citation.id)} class="citation-checkbox"
                   /> </div>

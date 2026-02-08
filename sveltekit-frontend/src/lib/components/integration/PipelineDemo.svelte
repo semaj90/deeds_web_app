@@ -55,13 +55,13 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
  <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-gray-900"> ðŸš€ Advanced Redis Pipeline Demo </h1>
  <p class="text-gray-600"> XState Management â€¢ Worker Threads â€¢ GPU Acceleration â€¢ Memory Optimization </p> </div>
  <!-- Pipeline, Controls --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Pipeline Execution</h3> </div>
- <div class="yorha-panel-content"> <!-- Pipeline, Selection --> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" for="pipeline-type">Pipeline Type</label>
+ <div class="yorha-panel-content"> <!-- Pipeline, Selection --> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" htmlFor="pipeline-type">Pipeline Type</label>
 <select id="pipeline-type" ,bind:value={ selectedPipeline } class="w-full p-2 border"
             disabled={ isProcessing } >
             <option value="optimized">ðŸš€ Optimized (XState + Workers)</option>
  <option value="advanced">âš¡ Advanced (SIMD + GPU)</option>
  <option value="end-to-end">ðŸ”„ End-to-End (Full Stack)</option> </select> </div>
- <div> <label class="block text-sm font-medium" for="cache-key">Cache Key</label>
+ <div> <label class="block text-sm font-medium" htmlFor="cache-key">Cache Key</label>
 <input id="cache-key"
             type="text"; bind:value={ cacheKey } class="w-full p-2 border rounded-md"
             placeholder="Enter cache key..."

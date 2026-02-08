@@ -77,7 +77,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </script>
 <div class={["search-container", className].filter(Boolean).join(' ')}>
   <div class="nes-field">
-    <label for="search-input" class="search-label">
+    <label htmlFor="search-input" class="search-label">
       <i class="nes-icon"></i> Legal AI Search
     </label>
     <div class="search-input-wrapper">

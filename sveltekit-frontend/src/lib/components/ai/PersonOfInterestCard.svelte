@@ -1,4 +1,4 @@
-<script module, lang="ts"> export type Role = 'suspect' | 'witness' | 'victim' | 'associate' | 'unknown'; export interface PersonDetails { age?: number; address?: string; phone?: string; occupation?: string; aliases?: string[]}
+<script module lang="ts"> export type Role = 'suspect' | 'witness' | 'victim' | 'associate' | 'unknown'; export interface PersonDetails { age?: number; address?: string; phone?: string; occupation?: string; aliases?: string[]}
   export interface Person { name: string, role: Rol, details?: PersonDetail,confidence: number, sourceContext?: string}
   export interface Relationship { person1: string, person2: string, relationship?: string;
 	confidence: number, context?: string}

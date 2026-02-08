@@ -208,14 +208,14 @@ message: string }) => void;
     {#if currentStep === 0}
       <div class="space-y-4">
         <div>
-          <label for="title" class="block text-sm font-bold text-yorha-light mb-1">CASE TITLE *</label>
+          <label htmlFor="title" class="block text-sm font-bold text-yorha-light mb-1">CASE TITLE *</label>
           <input id="title" name="title" type="text" bind:value={formData.title} required
                  class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm, focus:outline-none transition-colors" />
           {#if formErrors.title}<p class="text-red-400 text-xs mt-1">{formErrors.title}</p>{/if}
         </div>
 
         <div>
-          <label for="description" class="block text-sm font-bold text-yorha-light mb-1">DESCRIPTION *</label>
+          <label htmlFor="description" class="block text-sm font-bold text-yorha-light mb-1">DESCRIPTION *</label>
           <textarea id="description" name="description" rows="4" bind:value={formData.description} required
                     class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm, focus:outline-none resize-none"></textarea>
           {#if formErrors.description}<p class="text-red-400 text-xs mt-1">{formErrors.description}</p>{/if}
@@ -223,7 +223,7 @@ message: string }) => void;
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="priority" class="block text-sm font-bold text-yorha-light mb-1">PRIORITY</label>
+            <label htmlFor="priority" class="block text-sm font-bold text-yorha-light mb-1">PRIORITY</label>
             <select id="priority" name="priority" bind:value={formData.priority}
                     class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm">
               <option value="low">🟢 Low</option>
@@ -233,7 +233,7 @@ message: string }) => void;
             </select>
           </div>
           <div>
-             <label for="caseType" class="block text-sm font-bold text-yorha-light mb-1">TYPE</label>
+             <label htmlFor="caseType" class="block text-sm font-bold text-yorha-light mb-1">TYPE</label>
              <select id="caseType" name="caseType" bind:value={formData.caseType}
                      class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm">
                 <option value="civil">⚖️ Civil</option>
@@ -257,12 +257,12 @@ message: string }) => void;
       <div class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
            <div>
-             <label for="location" class="block text-sm font-bold text-yorha-light mb-1">LOCATION</label>
+             <label htmlFor="location" class="block text-sm font-bold text-yorha-light mb-1">LOCATION</label>
              <input id="location" name="location" type="text" bind:value={formData.location}
                     class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm" />
            </div>
            <div>
-             <label for="jurisdiction" class="block text-sm font-bold text-yorha-light mb-1">JURISDICTION</label>
+             <label htmlFor="jurisdiction" class="block text-sm font-bold text-yorha-light mb-1">JURISDICTION</label>
              <input id="jurisdiction" name="jurisdiction" type="text" bind:value={formData.jurisdiction}
                     class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm" />
            </div>
@@ -270,19 +270,19 @@ message: string }) => void;
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="assignedTo" class="block text-sm font-bold text-yorha-light mb-1">ASSIGNED TO</label>
+              <label htmlFor="assignedTo" class="block text-sm font-bold text-yorha-light mb-1">ASSIGNED TO</label>
               <input id="assignedTo" name="assignedTo" type="text" bind:value={formData.assignedTo}
                      class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm" />
             </div>
             <div>
-              <label for="clientName" class="block text-sm font-bold text-yorha-light mb-1">CLIENT NAME</label>
+              <label htmlFor="clientName" class="block text-sm font-bold text-yorha-light mb-1">CLIENT NAME</label>
               <input id="clientName" name="clientName" type="text" bind:value={formData.clientName}
                      class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm" />
             </div>
          </div>
 
          <div>
-            <label for="notes" class="block text-sm font-bold text-yorha-light mb-1">NOTES</label>
+            <label htmlFor="notes" class="block text-sm font-bold text-yorha-light mb-1">NOTES</label>
             <textarea id="notes" name="notes" rows="3" bind:value={formData.notes}
                       class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm resize-none"></textarea>
          </div>

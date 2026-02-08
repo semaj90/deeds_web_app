@@ -112,7 +112,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   <!-- Input, Area --> <div class="p-4"> <div class="flex items-end"> <div class="flex-1"> <Input bind:value={ inputMessage } placeholder="Type your message... (Shift+Enter for new, line)"
           disabled={ isLoading } onkeypress={ handleKeyPress } class="w-full"
         /> </div>
- <div class="flex items-center"> <label class="nes-btn is-primary"> =ï¿½ <input type="file" multiple, onchange={ handleFileInput } class="hidden" disabled={ isLoading } /> </label>
+ <div class="flex items-center"> <label class="nes-btn is-primary"> =ï¿½ <input type="file" multiple onchange={ handleFileInput } class="hidden" disabled={ isLoading } /> </label>
  <Button class="bits-btn" variant="yorha"
           onclick={ handleSend } disabled={isLoading || (!inputMessage.trim() && attachedFiles.length === 0)} loading={ isLoading } loadingText="Sending..."
         > Send </Button> </div> </div>

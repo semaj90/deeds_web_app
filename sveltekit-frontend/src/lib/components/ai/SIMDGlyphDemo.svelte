@@ -48,16 +48,16 @@ tile_size: 16, compression_target: compressionTarget, shader_format: selectedFor
   function getCompressionColor(ratio) { if (ratio > 40) return 'text-green-600 font-bold'; if (ratio > 20) return 'text-blue-600 font-semibold'; if (ratio > 10) return 'text-orange-600'; return 'text-red-600'}
   $effect(() => { console.log('ðŸŽ¨ SIMD Glyph Demo component mounted')}); </script>
  <div class="p-6 max-w-7xl mx-auto"> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> ðŸ§¬ SIMD-Enhanced Legal Glyph Generation <span class="text-sm font-normal"> GPU-Accelerated Evidence Visualization with Neural Sprite Compression </span> </h3> </div>
- <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md, grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="-shader-format-"> Shader Format </label>
+ <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md, grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" htmlFor="-shader-format-"> Shader Format </label>
 <select id="-shader-format-" bind:value={ selectedFormat } class="w-full p-2 border"> <option value="webgpu">WebGPU Compute</option>
  <option value="webgl">WebGL Fragment</option>
  <option value="css">CSS Animation</option>
  <option value="svg">SVG Pattern</option> </select> </div>
- <div> <label class="block text-sm font-medium text-gray-700" for="-quality-tier-"> Quality Tier </label>
+ <div> <label class="block text-sm font-medium text-gray-700" htmlFor="-quality-tier-"> Quality Tier </label>
 <select id="-quality-tier-" bind:value={ selectedTier } class="w-full p-2 border"> <option value="nes">NES (8-bit)</option>
  <option value="snes">SNES (16-bit)</option>
  <option value="n64">N64 (64-bit)</option> </select> </div>
- <div> <label class="block text-sm font-medium text-gray-700" for="-compression-target-"> Compression Target </label>
+ <div> <label class="block text-sm font-medium text-gray-700" htmlFor="-compression-target-"> Compression Target </label>
 <select id="-compression-target-" bind:value={ compressionTarget } class="w-full p-2 border"> <option value={ 10 }>10:1 (High Quality)</option>
  <option value={ 25 }>25:1 (Balanced)</option>
  <option value={ 50 }>50:1 (High Compression)</option>

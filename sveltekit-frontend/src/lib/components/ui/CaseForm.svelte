@@ -56,7 +56,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                 required value={formValues.title || ""} error={formErrors.title} data-icon="${ 1 }"
                 clearable oninput={(e) => formApi?.setField(
                     "title", (e.target as HTMLInputElement)?.value )} blur={() => formApi?.touchField("title")} /> </div>
- <div class="container mx-auto"> <label for="case-description"
+ <div class="container mx-auto"> <label htmlFor="case-description"
                 class="container mx-auto px-4"
               > Description <span class="container mx-auto">*</span> </label>
  <textarea id="case-description"
@@ -68,7 +68,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if errors.description} <p class="container mx-auto"> {errors.description}
 </p> {/if}
   </div>
- <div> <label for="case-priority"
+ <div> <label htmlFor="case-priority"
                 class="container mx-auto px-4"
               > Priority <span class="container mx-auto">*</span> </label>
  <select id="case-priority"

@@ -123,7 +123,7 @@
   <div class="p-6 space-y-6">
     {#each fields as field}
       <div class="space-y-2">
-        <label for={field.id} class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        <label htmlFor={field.id} class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">
           {field.label}
           {#if field.required}<span class="text-red-500 ml-1">*</span>{/if}
         </label>

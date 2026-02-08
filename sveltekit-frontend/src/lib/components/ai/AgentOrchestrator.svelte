@@ -145,7 +145,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </p>
  <p class="text-xs text-blue-500 dark: text-blue-400"> Estimated time: {workflow?.estimatedTime}
 </p> </div> </div> {/if}
-  <div> <label for="orchestrator-input" class="block text-sm font-medium">Input</label>
+  <div> <label htmlFor="orchestrator-input" class="block text-sm font-medium">Input</label>
  <Textarea id="orchestrator-input"; bind:value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
           rows={ 4 } class="w-full"
         /> </div>

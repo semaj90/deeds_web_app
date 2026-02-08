@@ -19,7 +19,7 @@
   {/if}
 
   <div class="form-field">
-    <label for={`${formType}-email`}>Email</label>
+    <label htmlFor={`${formType}-email`}>Email</label>
     <input id={`${formType}-email`} name="email" type="email" bind:value={$form.email} />
     {#if $errors.email}
       <span class="error">{$errors.email}</span>
@@ -27,7 +27,7 @@
   </div>
 
   <div class="form-field">
-    <label for={`${formType}-password`}>Password</label>
+    <label htmlFor={`${formType}-password`}>Password</label>
     <input id={`${formType}-password`} name="password" type="password" bind:value={$form.password} />
     {#if $errors.password}
       <span class="error">{$errors.password}</span>
@@ -36,7 +36,7 @@
 
   {#if formType === 'register'}
     <div class="form-field">
-      <label for="confirmPassword">Confirm Password</label>
+      <label htmlFor="confirmPassword">Confirm Password</label>
       <input
         id="confirmPassword"
         name="confirmPassword"

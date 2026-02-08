@@ -324,7 +324,7 @@ caseId: fromEvidenceId,
 
  {#if linkMode}
  <div class="relationship-selector">
- <label for="relationship-type" class="relationship-label">Relationship Type:</label>
+ <label htmlFor="relationship-type" class="relationship-label">Relationship Type:</label>
  <select
  id="relationship-type"
  bind:value={selectedRelationshipType}

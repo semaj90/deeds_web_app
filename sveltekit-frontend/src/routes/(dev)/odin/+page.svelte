@@ -181,7 +181,7 @@
                 id="file-upload"
                 onchange={(e) => uploadFiles = (e.target as HTMLInputElement).files}
               />
-              <label for="file-upload" class="nes-btn nes-btn-primary cursor-pointer">
+              <label htmlFor="file-upload" class="nes-btn nes-btn-primary cursor-pointer">
                 SELECT FILES
               </label>
               {#if uploadFiles && uploadFiles.length > 0}

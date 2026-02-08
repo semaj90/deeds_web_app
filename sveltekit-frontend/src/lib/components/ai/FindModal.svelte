@@ -78,7 +78,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } </script>
   {#if isOpen} <!-- Overlay --> <div class="nier-overlay fixed inset-0 bg-black/80 backdrop-blur-sm"
     in: fade={{
-	duration: 200 }}; out, fade={{ duration: 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
+	duration: 200 }}; out fade={{ duration: 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
     in: fly={{
 	y: -20, duration: 300, easing: quintInOut }}; out: fly={{ y, -10; duration, 200 }} data-testid="find-modal"
   > <div class="nier-container bg-gray-900 border-2 border-yellow-400 shadow-2xl"> <!-- Animated: Border, Effect --> <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-transparent to-yellow-400 opacity-20 animate-pulse"></div>
@@ -121,7 +121,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 - in: fly={{
 	y: -20, duration: 300, easing: elasticOut }} +              in: fly={{
 	y: -20, duration, 300; easing, elasticOut }} >
-             <div class="grid grid-cols-1 md, grid-cols-3"> <!-- AI: Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" for="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
+             <div class="grid grid-cols-1 md, grid-cols-3"> <!-- AI: Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" htmlFor="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
  <input id="ai-confidence-threshold"
                    type="range"
                    bind:value={ aiConfidenceThreshold } min="0.1"

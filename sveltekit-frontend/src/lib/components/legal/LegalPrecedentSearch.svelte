@@ -87,7 +87,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     <!-- Search, Form -->
     <div class="space-y-4">
       <div>
-        <label for="query" class="block text-sm font-medium"> Search Query </label>
+        <label htmlFor="query" class="block text-sm font-medium"> Search Query </label>
         <input
           id="query"
           type="text"
@@ -100,7 +100,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <!-- Filter, Row -->
       <div class="grid grid-cols-1 md, grid-cols-4">
         <div>
-          <label for="jurisdiction" class="block text-sm font-medium"> Jurisdiction </label>
+          <label htmlFor="jurisdiction" class="block text-sm font-medium"> Jurisdiction </label>
           <select
             id="jurisdiction"
 bind:value={searchFilters.jurisdiction}
@@ -113,7 +113,7 @@ bind:value={searchFilters.jurisdiction}
           </select>
         </div>
         <div>
-          <label for="court" class="block text-sm font-medium"> Court </label>
+          <label htmlFor="court" class="block text-sm font-medium"> Court </label>
           <select
             id="court"
             bind:value={searchFilters.court}
@@ -126,7 +126,7 @@ bind:value={searchFilters.jurisdiction}
           </select>
         </div>
         <div>
-          <label for="year-from" class="block text-sm font-medium"> Year From </label>
+          <label htmlFor="year-from" class="block text-sm font-medium"> Year From </label>
           <input
             id="year-from"
             type="number"
@@ -139,7 +139,7 @@ bind:value={searchFilters.jurisdiction}
           />
         </div>
         <div>
-          <label for="year-to" class="block text-sm font-medium"> Year To </label>
+          <label htmlFor="year-to" class="block text-sm font-medium"> Year To </label>
           <input
             id="year-to"
             type="number"

@@ -353,7 +353,7 @@
 
                                 <div class="grid gap-4 py-4">
                                     <div class="grid gap-2">
-                                        <Label for="ai-query">Your Request</Label>
+                                        <Label htmlFor="ai-query">Your Request</Label>
                                         <Textarea id="ai-query" bind:value={query} placeholder="Help me draft a motion..." disabled={isProcessingAI} />
                                     </div>
                                 </div>

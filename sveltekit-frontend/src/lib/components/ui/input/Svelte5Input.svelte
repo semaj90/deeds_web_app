@@ -119,7 +119,7 @@ function handleBlur() {
 
 <div class="w-full {className}">
 	{#if label}
-		<label for={id} class="block text-sm font-medium text-slate-300 mb-1.5">
+		<label htmlFor={id} class="block text-sm font-medium text-slate-300 mb-1.5">
 			{label}
 			{#if required}
 				<span class="text-red-400 ml-1">*</span>

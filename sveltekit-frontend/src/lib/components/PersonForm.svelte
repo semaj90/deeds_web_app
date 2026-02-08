@@ -76,7 +76,7 @@
  {/if}
 
  <div class="form-group">
- <label for="name" class="form-label">
+ <label htmlFor="name" class="form-label">
  Full Name *
  <span class="label-hint">The person's complete legal name</span>
  </label>
@@ -92,7 +92,7 @@
  </div>
 
  <div class="form-group">
- <label for="alias" class="form-label">
+ <label htmlFor="alias" class="form-label">
  Known Alias
  <span class="label-hint">Alternative names, nicknames, or aliases</span>
  </label>
@@ -107,7 +107,7 @@
  </div>
 
  <div class="form-group">
- <label for="description" class="form-label">
+ <label htmlFor="description" class="form-label">
  Description & Context *
  <span class="label-hint">Detailed information about the person, their activities, and why they're a POI</span>
  </label>
@@ -123,7 +123,7 @@
  </div>
 
  <div class="form-group">
- <label for="caseId" class="form-label">
+ <label htmlFor="caseId" class="form-label">
  Associated Case ID
  <span class="label-hint">Optional:Link to an existing case</span>
  </label>

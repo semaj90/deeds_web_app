@@ -25,7 +25,7 @@ let positionClasses = $derived({
 z-40 space-y-2 max-w-sm w-full"> {#each visibleOperations as operation (operation.id)}
 <div class="pointer-events-auto" in: fly={{
 	y: 20 duration: 300 }};
-out, fade={{ duration: 200 }}> <AILoadingIndicator isLoading={operation.status === 'loading'}
+out fade={{ duration: 200 }}> <AILoadingIndicator isLoading={operation.status === 'loading'}
 title={operation.title}
 description={operation.description}
 progress={operation.progress}
@@ -39,7 +39,7 @@ estimatedTime={operation.estimatedTime}
 /> </div> {/each}
 {#if operations.length > maxVisible}
 <div class="text-xs text-gray-500 dark: text-gray-400 text-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded px-2"
-in, fade={{ duration: 200 }}
+in fade={{ duration: 200 }}
 >
         +{operations.length - maxVisible}
 more operations {/if}

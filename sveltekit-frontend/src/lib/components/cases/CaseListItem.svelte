@@ -97,7 +97,7 @@
 </script>
 
 <div
-  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md", class:bg-blue-50={isActive}
+  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md" class:bg-blue-50={isActive}
   class:border-blue-300={isActive}
   class:opacity-50={disabled}
   class:cursor-not-allowed={disabled}

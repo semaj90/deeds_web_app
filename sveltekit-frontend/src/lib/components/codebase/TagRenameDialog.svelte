@@ -123,7 +123,7 @@
 
         <!-- New Name Input -->
         <div class="field">
-          <label class="field-label" for="new-name">New Name</label>
+          <label class="field-label" htmlFor="new-name">New Name</label>
           <input
             id="new-name"
             type="text"

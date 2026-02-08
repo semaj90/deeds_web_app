@@ -211,7 +211,7 @@
 
 			<!-- Operation Select -->
 			<div class="mb-4">
-				<label class="block text-sm mb-1" for="operation">OPERATION</label>
+				<label class="block text-sm mb-1" htmlFor="operation">OPERATION</label>
 				<select
 					id="operation"
 					bind:value={selectedOperation}
@@ -228,7 +228,7 @@
 			<!-- Text Input -->
 			{#if selectedOperation !== 'ingest'}
 				<div class="mb-4">
-					<label class="block text-sm mb-1" for="input-text">INPUT TEXT</label>
+					<label class="block text-sm mb-1" htmlFor="input-text">INPUT TEXT</label>
 					<textarea
 						id="input-text"
 						bind:value={inputText}
@@ -241,7 +241,7 @@
 			<!-- User Context -->
 			<div class="grid grid-cols-2 gap-2 mb-4">
 				<div>
-					<label class="block text-xs mb-1" for="user-id">USER ID</label>
+					<label class="block text-xs mb-1" htmlFor="user-id">USER ID</label>
 					<input
 						id="user-id"
 						bind:value={userId}
@@ -249,7 +249,7 @@
 					/>
 				</div>
 				<div>
-					<label class="block text-xs mb-1" for="session-id">SESSION ID</label>
+					<label class="block text-xs mb-1" htmlFor="session-id">SESSION ID</label>
 					<input
 						id="session-id"
 						bind:value={sessionId}

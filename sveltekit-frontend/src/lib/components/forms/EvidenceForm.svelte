@@ -31,7 +31,7 @@ import type { Document } from '$lib/types';
     <div class="space-y-4">{serverData.form.message}</div>{/if}
   <div>
     <!-- replaced Label component with, native, label -->
-    <label for="title" class="block text-sm font-medium">Title</label>
+    <label htmlFor="title" class="block text-sm font-medium">Title</label>
 
     <!-- use native input and update form, via, helper -->
     <input
@@ -48,7 +48,7 @@ import type { Document } from '$lib/types';
   </div>
 
   <div>
-    <label for="description" class="block text-sm font-medium">Description</label>
+    <label htmlFor="description" class="block text-sm font-medium">Description</label>
 
     <textarea
       id="description"
@@ -60,7 +60,7 @@ import type { Document } from '$lib/types';
   </div>
 
   <div>
-    <label for="type" class="block text-sm font-medium">Type</label>
+    <label htmlFor="type" class="block text-sm font-medium">Type</label>
 
     <select
       id="type"
@@ -88,7 +88,7 @@ import type { Document } from '$lib/types';
   </div>
 
   <div>
-    <label for="url" class="block text-sm font-medium">URL</label>
+    <label htmlFor="url" class="block text-sm font-medium">URL</label>
 
     <input
       id="url"
@@ -104,7 +104,7 @@ import type { Document } from '$lib/types';
   </div>
 
   <div>
-    <label for="tags" class="block text-sm font-medium">Tags (comma-separated)</label>
+    <label htmlFor="tags" class="block text-sm font-medium">Tags (comma-separated)</label>
 
     <input
       id="tags"

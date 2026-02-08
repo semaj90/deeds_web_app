@@ -210,7 +210,7 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
               onclick={() => (retroTerminalMode = !retroTerminalMode)} title="Toggle Terminal Mode"
             > ðŸ’» Terminal </button> </div> </div> </div> </div> </header>
  <div class="w-full px-4"> <!-- Gaming-Style Search & Control Panel --> <div class="nes-container with-title is-rounded mb-6 relative"> <p class="title">ðŸ” AI-Powered Evidence Search & Control</p>
- <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-5 xl, grid-cols-6 gap-4"> <!-- Enhanced Search, Input --> <div class="lg, col-span-2"> <label for="search-input" class="nes-text is-primary text-sm mb-2">Search Query</label>
+ <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-5 xl, grid-cols-6 gap-4"> <!-- Enhanced Search, Input --> <div class="lg, col-span-2"> <label htmlFor="search-input" class="nes-text is-primary text-sm mb-2">Search Query</label>
  <div class="nes-field"> <input type="text"
               class="nes-input"
               id="search-input"
@@ -226,14 +226,14 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
   {#if suggestion.reasoning} <div class="text-xs opacity-75">{suggestion.reasoning}{/if}
   </button> {/each} {/if}
   </div>
- <!-- Filter, Selection --> <div> <label for="filter-select" class="nes-text is-primary text-sm mb-2">Evidence Type</label>
+ <!-- Filter, Selection --> <div> <label htmlFor="filter-select" class="nes-text is-primary text-sm mb-2">Evidence Type</label>
  <div class="nes-select"> <select id="filter-select" bind:value={ selectedFilter } onchange={ filterEvidence }> <option value="all">All Types</option>
  <option value="document">ðŸ“„ Documents</option>
  <option value="image">ðŸ–¼ï¸ Images</option>
  <option value="video">ðŸŽ¥ Videos</option>
  <option value="audio">ðŸŽµ Audio</option>
  <option value="other">ðŸ“Ž Other</option> </select> </div> </div>
- <!-- MinIO: Bucket, Selection --> <div> <label for="bucket-select" class="nes-text is-primary text-sm mb-2">Storage Bucket</label>
+ <!-- MinIO: Bucket, Selection --> <div> <label htmlFor="bucket-select" class="nes-text is-primary text-sm mb-2">Storage Bucket</label>
  <div class="nes-select"> <select id="bucket-select"
               bind:value={ currentBucket } onchange={() => { /* selection handled by bind */ }} >
   {#if buckets.length === 0} <option value="legal-documents">ðŸ“ Documents</option> {:else} {#each Array.isArray(buckets) ? buckets: [] as b} <option value={ b }>{ b }</option> {/each} {/if}

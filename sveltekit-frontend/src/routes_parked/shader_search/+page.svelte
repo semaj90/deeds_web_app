@@ -243,7 +243,7 @@
 
  <div class="filters-row">
  <div class="filter-group">
- <label for="operation-select">Operation</label>
+ <label htmlFor="operation-select">Operation</label>
  <select id="operation-select" bind:value={selectedOperation} onchange={ performSearch }>
  <option value="">All Operations</option>
  {#each availableOperations as op}
@@ -253,7 +253,7 @@
  </div>
 
  <div class="filter-group">
- <label for="shader-type-select">Shader Type</label>
+ <label htmlFor="shader-type-select">Shader Type</label>
  <select id="shader-type-select" bind:value={selectedShaderType} onchange={ performSearch }>
  <option value="all">All Types</option>
  <option value="webgpu">WebGPU</option>
@@ -262,7 +262,7 @@
  </div>
 
  <div class="filter-group">
- <label for="sort-by-select">Sort By</label>
+ <label htmlFor="sort-by-select">Sort By</label>
  <select id="sort-by-select" bind:value={sortBy} onchange={ performSearch }>
  <option value="relevance">Relevance</option>
  <option value="performance">Performance</option>
@@ -272,7 +272,7 @@
  </div>
 
  <div class="filter-group">
- <label for="limit-input">Limit</label>
+ <label htmlFor="limit-input">Limit</label>
  <input
  type="number"
  id="limit-input"

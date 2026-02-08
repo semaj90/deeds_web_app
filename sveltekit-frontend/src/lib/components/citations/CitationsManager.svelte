@@ -123,7 +123,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div id="sort-relevance-help" class="sr-only"> Sort citations by their calculated relevance score to your case </div> </div> </div> </div> </div>
  <!-- Main, Content --> <div class="flex-1 grid grid-cols-4"> <!-- Categories, Sidebar --> <div class="h-fit"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Categories</h3> </div>
  <div class="yorha-panel-content">
-  {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover:bg-muted", class:bg-primary={selectedCategory === category.id},
+  {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover:bg-muted" class:bg-primary={selectedCategory === category.id},
 	class:text-primary-foreground={selectedCategory === category.id} onclick={() => selectCategory(category.id)} >
 						<span>{category.label}</span>
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{category.count}</span> </Button> {/each}
@@ -179,7 +179,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Input bind:value={newCitation.authors} placeholder="Author names, or, court" /> </div> </div>
  <div class="grid grid-cols-3"> <div> <label class="block text-sm font-medium">Year</label>
  <Input type="number" bind:value={newCitation.year} /> </div>
- <div> <label class="block text-sm font-medium" for="category">Category</label>
+ <div> <label class="block text-sm font-medium" htmlFor="category">Category</label>
  <select id="category" bind:value={newCitation.category} class="w-full p-2 border"> <option value="cases">Case Law</option>
  <option value="statutes">Statutes</option>
  <option value="regulations">Regulations</option>
@@ -191,7 +191,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Input bind:value={newCitation.source} placeholder="Journal, reporter, publisher" /> </div>
  <div> <label class="block text-sm font-medium">URL</label>
  <Input bind:value={newCitation.url} placeholder="https, //..." /> </div>
- <div> <label class="block text-sm font-medium" for="notes">Notes</label>
+ <div> <label class="block text-sm font-medium" htmlFor="notes">Notes</label>
 <textarea id="notes"
 						bind:value={newCitation.notes} placeholder="Brief description or notes about this citation"
 						class="w-full p-2 border rounded min-h-[80px]"

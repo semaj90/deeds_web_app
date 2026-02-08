@@ -46,7 +46,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="dashboard-grid"> <!-- Evidence: List, Panel --> <Card.Root class="evidence-panel"> <CardHeader> <CardTitle>Evidence Items</CardTitle> </CardHeader>
  <CardContent> <!-- Upload, Zone --> <div class="upload-zone {dropZoneActive ? 'active' : ''}"
           ondrop={ handleDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
-          <input type="file" id="file-upload" class="hidden" onchange={ handleFileUpload } /> <label for="file-upload" class="upload-label"> <svg class="upload-icon" fill="none" stroke="currentColor" viewBox=" 0 0 , 24, 24"> <path stroke-linecap="round"
+          <input type="file" id="file-upload" class="hidden" onchange={ handleFileUpload } /> <label htmlFor="file-upload" class="upload-label"> <svg class="upload-icon" fill="none" stroke="currentColor" viewBox=" 0 0 , 24, 24"> <path stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M7 16a4, 4 0 01-.88-7.903A5, 5 0 1115.9 6L16 6a5, 5 | 0, 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"

@@ -216,12 +216,12 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {#if selectedWorkflow === 'legal-research'}
  <div class="space-y-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="research-query">Research Query</label>
+ <label class="block text-sm font-medium text-gray-700" htmlFor="research-query">Research Query</label>
  <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2, focus:ring-blue-500" rows="3"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="jurisdiction">Jurisdiction</label>
+ <label class="block text-sm font-medium text-gray-700" htmlFor="jurisdiction">Jurisdiction</label>
  <select id="jurisdiction" bind:value={legalResearchForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
  <option value="federal">Federal</option>
  <option value="state">State</option>
@@ -230,7 +230,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </select>
  </div>
  <div>
- <label class="block text-sm font-medium text-gray-700" for="user-role">User Role</label>
+ <label class="block text-sm font-medium text-gray-700" htmlFor="user-role">User Role</label>
  <select id="user-role" bind:value={legalResearchForm.userRole} class="w-full p-2 border border-gray-300 rounded">
  <option value="attorney">Attorney</option>
  <option value="paralegal">Paralegal</option>
@@ -245,11 +245,11 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {#if selectedWorkflow === 'document-processing'}
  <div class="space-y-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="document-content">Document Content</label>
+ <label class="block text-sm font-medium text-gray-700" htmlFor="document-content">Document Content</label>
  <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2, focus:ring-blue-500" rows="6"></textarea>
  </div>
  <div>
- <label class="block text-sm font-medium text-gray-700" for="document-type">Document Type</label>
+ <label class="block text-sm font-medium text-gray-700" htmlFor="document-type">Document Type</label>
  <select id="document-type" bind:value={documentProcessingForm.documentType} class="w-full p-2 border border-gray-300 rounded">
  <option value="contract">Contract</option>
  <option value="brief">Legal Brief</option>
@@ -264,16 +264,16 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {#if selectedWorkflow === 'case-creation'}
  <div class="space-y-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="case-title">Case Title</label>
+ <label class="block text-sm font-medium text-gray-700" htmlFor="case-title">Case Title</label>
  <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2, focus:ring-blue-500" />
  </div>
  <div>
- <label class="block text-sm font-medium text-gray-700" for="case-description">Case Description</label>
+ <label class="block text-sm font-medium text-gray-700" htmlFor="case-description">Case Description</label>
  <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2, focus:ring-blue-500" rows="4"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="case-type">Case Type</label>
+ <label class="block text-sm font-medium text-gray-700" htmlFor="case-type">Case Type</label>
  <select id="case-type" bind:value={caseCreationForm.caseType} class="w-full p-2 border border-gray-300 rounded">
  <option value="civil">Civil</option>
  <option value="criminal">Criminal</option>
@@ -283,7 +283,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </select>
  </div>
  <div>
- <label class="block text-sm font-medium text-gray-700" for="jurisdiction">Jurisdiction</label>
+ <label class="block text-sm font-medium text-gray-700" htmlFor="jurisdiction">Jurisdiction</label>
  <select id="jurisdiction" bind:value={caseCreationForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
  <option value="federal">Federal</option>
  <option value="state">State</option>

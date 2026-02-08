@@ -65,12 +65,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if visible} <aside bind:this={windowElement} role="dialog"
 		aria-labelledby="chat-window-title"
 		aria-describedby="chat-window-description"
-		class="fixed bg-yorha-bg-secondary border-2 border-yorha-primary shadow-2xl z-50 flex flex-col overflow-hidden font-mono focus-within:ring-2 focus-within: ring-yorha-primary/50", class:opacity-50={ isDragging } style="
+		class="fixed bg-yorha-bg-secondary border-2 border-yorha-primary shadow-2xl z-50 flex flex-col overflow-hidden font-mono focus-within:ring-2 focus-within: ring-yorha-primary/50" class:opacity-50={ isDragging } style="
 			width: { width }px; height: {minimized ? 60: height}px; left: {position.x}px; top: {position.y}px; transform: scale({isDragging ? 1.02: 1});
 		"
 		in: scale={{
 	duration: 300;
-	easing: elasticOut }}; out, scale={{ duration: 200 }} >
+	easing: elasticOut }}; out scale={{ duration: 200 }} >
 		<div class="absolute inset-0 overflow-hidden">
   {#each Array(5) as _, i} <div class="absolute w-1 h-1 bg-yorha-accent rounded-full opacity-60"
 					style="; left, {10 + (i * 20)}%; animation-delay: {i * 0.8} animation-duration {6 + (i * 2)}"
@@ -94,12 +94,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if minimized} <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 14l9-9, 3 3L9, 18l-4-4z" /> {:else} <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20, 12H4" /> {/if}
   </svg> </button>
  <button type="button" class="w-8 h-8 flex items-center justify-center border border-yorha-border text-yorha-text-secondary hover:border-red-500, hover:text-red-500, focus:border-red-500, focus:outline-none, focus:ring-2" onclick={ closeWindow } aria-label="Close chat, window"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24" aria-hidden="true"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12, 12" /> </svg> </button> </nav> </header>
-  {#if !minimized} {#if settingsOpen} <div class="border-b border-yorha-border bg-yorha-bg-primary"> <div class="space-y-3"> <div> <label class="block text-xs text-yorha-text-secondary" for="model">Model</label>
+  {#if !minimized} {#if settingsOpen} <div class="border-b border-yorha-border bg-yorha-bg-primary"> <div class="space-y-3"> <div> <label class="block text-xs text-yorha-text-secondary" htmlFor="model">Model</label>
  <select id="model" bind:value={settings.model} class="w-full bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary text-xs p-2"> <option value="gemma3-legal, latest">Gemma3 Legal (11.8B)</option>
  <option value="gemma3-legal, 7b">Gemma3 Legal (7B)</option> </select> </div>
  <div> <label class="block text-xs text-yorha-text-secondary">Temperature: {settings.temperature}</label>
  <input type="range" min="0" max="1" step="0.1" bind:value={settings.temperature} class="w-full" /> </div>
- <div> <label class="block text-xs text-yorha-text-secondary" for="max-tokens">Max Tokens</label>
+ <div> <label class="block text-xs text-yorha-text-secondary" htmlFor="max-tokens">Max Tokens</label>
  <input id="max-tokens" type="number" min="100" max="2048" bind:value={settings.maxTokens} class="w-full bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary text-xs p-2" /> </div>
  <div class="flex"> <button type="button" onclick={ updateSettings } class="flex-1 bg-yorha-primary text-yorha-bg-primary text-xs p-2 hover:bg-yorha-secondary">Apply</button>
  <button type="button" onclick={ clearChat } class="flex-1 bg-yorha-error text-white text-xs p-2 hover:bg-red-600">Clear</button> </div> </div> {/if}

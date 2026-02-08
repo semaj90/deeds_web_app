@@ -165,7 +165,7 @@ task: taskInput,
   {#if !status.running}
     <div class="config-panel">
       <div class="form-group">
-        <label for="task-input">Task Description</label>
+        <label htmlFor="task-input">Task Description</label>
         <textarea
           id="task-input"
           bind:value={taskInput}
@@ -176,7 +176,7 @@ task: taskInput,
 
       <div class="form-row">
         <div class="form-group">
-          <label for="provider-select">LLM Provider</label>
+          <label htmlFor="provider-select">LLM Provider</label>
           <select id="provider-select" bind:value={providerInput}>
             {#each providers as provider}
               <option value={provider.value}>
@@ -187,7 +187,7 @@ task: taskInput,
         </div>
 
         <div class="form-group">
-          <label for="iterations-input">Iterations</label>
+          <label htmlFor="iterations-input">Iterations</label>
           <input
             id="iterations-input"
             type="number"

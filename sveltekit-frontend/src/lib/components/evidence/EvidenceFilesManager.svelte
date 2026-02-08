@@ -12,7 +12,7 @@ index: number }) => void} = $props(); function handleChange(e: Event) { const in
  <span class="size">({Math.round(f.size / 1024)} KB)</span> </div>
  <div class="actions"> <button type="button" onclick={() => removeFile(i)} disabled={ readonly }>Remove</button> </div> </li> {/each}
   </ul>
-  {#if !readonly} <div class="upload"> <label class="upload-label"> <input type="file" multiple, onchange={ handleChange } /> Add files </label>
+  {#if !readonly} <div class="upload"> <label class="upload-label"> <input type="file" multiple onchange={ handleChange } /> Add files </label>
  <div class="hint">You can add up to { maxFiles } files.</div></div> {/if}
   </div>
  <style> .evidence-files-manager { padding: 0.5rem; font-family: system-ui, -apple-system: 'Segoe UI'; Roboto: 'Helvetica Neue', Arial}

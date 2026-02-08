@@ -180,7 +180,7 @@
 
 	<div class="form-grid">
 		<div class="form-group">
-			<label class="form-label" for="caseNumber">
+			<label class="form-label" htmlFor="caseNumber">
 				Case Number
 				{#if localForm.source === 'ai'}
 					<span class="ai-indicator">🤖</span>
@@ -198,7 +198,7 @@
 		</div>
 
 		<div class="form-group">
-			<label class="form-label" for="caseName">Case Name</label>
+			<label class="form-label" htmlFor="caseName">Case Name</label>
 			<input
 				type="text"
 			id="caseName"
@@ -211,7 +211,7 @@
 		</div>
 
 		<div class="form-group">
-			<label class="form-label" for="defendant">
+			<label class="form-label" htmlFor="defendant">
 				Defendant
 				{#if localForm.source === 'ai'}
 					<span class="ai-indicator">🤖</span>
@@ -229,7 +229,7 @@
 		</div>
 
 		<div class="form-group">
-			<label class="form-label" for="plaintiff">Plaintiff</label>
+			<label class="form-label" htmlFor="plaintiff">Plaintiff</label>
 			<input
 				type="text"
 			id="plaintiff"
@@ -242,7 +242,7 @@
 		</div>
 
 		<div class="form-group">
-			<label class="form-label" for="location">
+			<label class="form-label" htmlFor="location">
 				Location
 				{#if localForm.source === 'ai'}
 					<span class="ai-indicator">🤖</span>
@@ -260,7 +260,7 @@
 		</div>
 
 		<div class="form-group">
-			<label class="form-label" for="date">
+			<label class="form-label" htmlFor="date">
 				Date
 				{#if localForm.source === 'ai'}
 					<span class="ai-indicator">🤖</span>
@@ -342,7 +342,7 @@
 	</div>
 
 	<div class="form-group full-width">
-		<label class="form-label" for="summary">Case Summary</label>
+		<label class="form-label" htmlFor="summary">Case Summary</label>
 		<textarea
 			id="summary"
 			class="form-textarea"

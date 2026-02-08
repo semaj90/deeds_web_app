@@ -80,7 +80,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
                 placeholder="Ask a question about the legal document..."
               ></textarea> </div>
  <!-- Advanced, Filters --> <div class="space-y-3"> <h4 class="text-sm font-medium">Advanced Filters</h4>
- <div class="flex items-center"> <input type="checkbox" bind:checked={ useSemanticExpansion } id="semantic-expansion" class="rounded" /> <label for="semantic-expansion" class="text-sm"> Enable semantic concept expansion </label> </div>
+ <div class="flex items-center"> <input type="checkbox" bind:checked={ useSemanticExpansion } id="semantic-expansion" class="rounded" /> <label htmlFor="semantic-expansion" class="text-sm"> Enable semantic concept expansion </label> </div>
  <div> <label class="block text-sm text-gray-600"> Confidence Threshold: { confidenceThreshold } </label>
  <input type="range" bind:value={ confidenceThreshold } min="0.1" max="1.0" step="0.1" class="w-full" /> </div>
  <div> <label class="block text-sm text-gray-600">Entity Types</label>

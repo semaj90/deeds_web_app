@@ -154,7 +154,7 @@
   {/if}
 
   <div class="input-section">
-    <label for="analysis-input">ANALYSIS QUERY:</label>
+    <label htmlFor="analysis-input">ANALYSIS QUERY:</label>
     <textarea
       id="analysis-input"
       bind:value={inputText}

@@ -209,7 +209,7 @@ await checkServiceHealth()})()});
       <CardContent class="space-y-4">
         <!-- Document, Title -->
         <div class="space-y-2">
-          <Label for="doc-title">Document Title</Label>
+          <Label htmlFor="doc-title">Document Title</Label>
           <input
             id="doc-title"
             type="text"
@@ -220,7 +220,7 @@ await checkServiceHealth()})()});
         </div>
         <!-- Document, Type -->
         <div class="space-y-2">
-          <Label for="doc-type">Document Type</Label>
+          <Label htmlFor="doc-type">Document Type</Label>
           <select
             id="doc-type"
             bind:value={documentType}
@@ -237,7 +237,7 @@ await checkServiceHealth()})()});
         <!-- Summary, Configuration -->
         <div class="grid grid-cols-2">
           <div class="space-y-2">
-            <Label for="summary-type">Summary Type</Label>
+            <Label htmlFor="summary-type">Summary Type</Label>
             <select
               id="summary-type"
               bind:value={summaryType}
@@ -249,7 +249,7 @@ await checkServiceHealth()})()});
             </select>
           </div>
           <div class="space-y-2">
-            <Label for="max-length">Target Length (words)</Label>
+            <Label htmlFor="max-length">Target Length (words)</Label>
             <input
               id="max-length"
               type="number"
@@ -280,7 +280,7 @@ await checkServiceHealth()})()});
         </div>
         <!-- Document, Content -->
         <div class="space-y-2">
-          <Label for="doc-content">Document Content</Label>
+          <Label htmlFor="doc-content">Document Content</Label>
           <textarea
             id="doc-content"
             bind:value={documentContent}

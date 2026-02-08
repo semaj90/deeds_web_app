@@ -110,18 +110,18 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         type="button"
         onclick={() => loadCaseScores()} disabled={ isLoading } class="px-3 py-2 rounded border text-sm font-medium bg-white hover:bg-gray-50"
       > {isLoading ? 'Loading...': 'Refresh'} </button> </div> </header>
- <!-- Filters, and, Controls --> <section class="controls-section"> <div class="filters-row"> <div class="search-group"> <label for="case-search" class="sr-only">Search cases</label>
+ <!-- Filters, and, Controls --> <section class="controls-section"> <div class="filters-row"> <div class="search-group"> <label htmlFor="case-search" class="sr-only">Search cases</label>
  <input id="case-search"
           type="text"
           placeholder="Search cases..."
           bind:value={ searchQuery } class="search-input"
         /> </div>
- <div class="filter-group"> <label for="score-filter">Score Range:</label>
+ <div class="filter-group"> <label htmlFor="score-filter">Score Range:</label>
  <select id="score-filter" bind:value={ scoreFilter } class="filter-select"> <option value="all">All Scores</option>
  <option value="high">High Risk (70-100)</option>
  <option value="medium">Medium Risk (40-69)</option>
  <option value="low">Low Risk (0-39)</option> </select> </div>
- <div class="filter-group"> <label for="sort-by">Sort By:</label>
+ <div class="filter-group"> <label htmlFor="sort-by">Sort By:</label>
  <select id="sort-by" bind:value={ sortBy } class="filter-select"> <option value="score">Score</option>
  <option value="priority">Priority</option>
  <option value="date">Last Updated</option> </select> </div> </div> </section>

@@ -111,7 +111,7 @@ comment: string }) => void;
 
     <!-- Optional comment -->
     <div class="space-y-2">
-      <label for="user-comment" class="text-xs font-semibold text-neutral-400">
+      <label htmlFor="user-comment" class="text-xs font-semibold text-neutral-400">
         Optional comment (why or why not)
       </label>
       <textarea

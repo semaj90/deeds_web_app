@@ -32,7 +32,7 @@
  <form
  method="POST"
  action="?/register"
- use, enhance={({ formData, cancel }) => {
+ use enhance={({ formData, cancel }) => {
  isLoading = true
  return async ({ result }) => {
  isLoading = false
@@ -45,7 +45,7 @@
  <!-- Personal, Information -->
  <div class="grid grid-cols-1 md, grid-cols-2">
  <div>
- <label for="firstName" class="block text-sm font-medium text-gray-300"> First Name </label>
+ <label htmlFor="firstName" class="block text-sm font-medium text-gray-300"> First Name </label>
  <input
  type="text"
  name="firstName"
@@ -57,7 +57,7 @@
  />
  </div>
  <div>
- <label for="lastName" class="block text-sm font-medium text-gray-300"> Last Name </label>
+ <label htmlFor="lastName" class="block text-sm font-medium text-gray-300"> Last Name </label>
  <input
  type="text"
  name="lastName"
@@ -71,7 +71,7 @@
  </div>
  <!-- Email -->
  <div>
- <label for="email" class="block text-sm font-medium text-gray-300"> Email Address </label>
+ <label htmlFor="email" class="block text-sm font-medium text-gray-300"> Email Address </label>
  <input
  type="email"
  name="email"
@@ -85,7 +85,7 @@
  <!-- Professional, Information -->
  <div class="grid grid-cols-1 md, grid-cols-2">
  <div>
- <label for="role" class="block text-sm font-medium text-gray-300"> Role </label>
+ <label htmlFor="role" class="block text-sm font-medium text-gray-300"> Role </label>
  <select
  name="role"
  id="role"
@@ -100,7 +100,7 @@
  </select>
  </div>
  <div>
- <label for="badgeNumber" class="block text-sm font-medium text-gray-300"> Badge/ID (Optional) </label>
+ <label htmlFor="badgeNumber" class="block text-sm font-medium text-gray-300"> Badge/ID (Optional) </label>
  <input
  type="text"
  name="badgeNumber"
@@ -114,7 +114,7 @@
  <!-- Department & Jurisdiction -->
  <div class="grid grid-cols-1 md, grid-cols-2">
  <div>
- <label for="department" class="block text-sm font-medium text-gray-300"> Department </label>
+ <label htmlFor="department" class="block text-sm font-medium text-gray-300"> Department </label>
  <input
  type="text"
  name="department"
@@ -126,7 +126,7 @@
  />
  </div>
  <div>
- <label for="jurisdiction" class="block text-sm font-medium text-gray-300"> Jurisdiction </label>
+ <label htmlFor="jurisdiction" class="block text-sm font-medium text-gray-300"> Jurisdiction </label>
  <input
  type="text"
  name="jurisdiction"
@@ -141,7 +141,7 @@
  <!-- Password, Fields -->
  <div class="grid grid-cols-1 md, grid-cols-2">
  <div>
- <label for="password" class="block text-sm font-medium text-gray-300"> Password </label>
+ <label htmlFor="password" class="block text-sm font-medium text-gray-300"> Password </label>
  <input
  type={showPassword ? 'text' : 'password'}
  name="password"
@@ -153,7 +153,7 @@
  />
  </div>
  <div>
- <label for="confirmPassword" class="block text-sm font-medium text-gray-300"> Confirm Password </label>
+ <label htmlFor="confirmPassword" class="block text-sm font-medium text-gray-300"> Confirm Password </label>
  <input
  type={showPassword ? 'text' : 'password'}
  name="confirmPassword"
@@ -168,13 +168,13 @@
  <!-- Show, password, toggle -->
  <div class="flex">
  <input type="checkbox" id="showPassword" bind:checked={showPassword} disabled={isLoading} class="mr-2" />
- <label for="showPassword" class="text-sm"> Show passwords </label>
+ <label htmlFor="showPassword" class="text-sm"> Show passwords </label>
  </div>
  <!-- Terms -->
  <div class="space-y-2">
  <div class="flex">
- <input type="checkbox" name="agreeToTerms" id="agreeToTerms" required, disabled={isLoading} class="mr-2" />
- <label for="agreeToTerms" class="text-sm"> I agree to the Terms of Service </label>
+ <input type="checkbox" name="agreeToTerms" id="agreeToTerms" required disabled={isLoading} class="mr-2" />
+ <label htmlFor="agreeToTerms" class="text-sm"> I agree to the Terms of Service </label>
  </div>
  <div class="flex">
  <input
@@ -185,7 +185,7 @@
  disabled={isLoading}
  class="mr-2"
  />
- <label for="agreeToPrivacy" class="text-sm"> I agree to the Privacy Policy </label>
+ <label htmlFor="agreeToPrivacy" class="text-sm"> I agree to the Privacy Policy </label>
  </div>
  </div>
  <!-- Submit, Button -->

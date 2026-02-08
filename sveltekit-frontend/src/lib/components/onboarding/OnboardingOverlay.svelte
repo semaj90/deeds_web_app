@@ -94,7 +94,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
 </h3>
  <p id="onboarding-description" class="w-4"> {currentStepData.description}
 </p>
-  {#if currentStepData.content} <div class="w-4"> {@html currentStepData.content} {/if} {#if currentStepData.image} <div class="w-4"> <img src={currentStepData.image} alt={currentStepData.title} /> {/if} {#if currentStepData.video} <div class="w-4"> <video controls, src={currentStepData.video}> <track kind="captions" src="" srclang="en" label="English" /> Your browser does not support the video tag. </video> {/if}
+  {#if currentStepData.content} <div class="w-4"> {@html currentStepData.content} {/if} {#if currentStepData.image} <div class="w-4"> <img src={currentStepData.image} alt={currentStepData.title} /> {/if} {#if currentStepData.video} <div class="w-4"> <video controls src={currentStepData.video}> <track kind="captions" src="" srclang="en" label="English" /> Your browser does not support the video tag. </video> {/if}
   </div>
  <!-- Progress, bar --> <div class="w-4"> <div class="w-4"> <div class="w-4"
             style="width: {((currentStep + 1) / steps.length) * 100}%"

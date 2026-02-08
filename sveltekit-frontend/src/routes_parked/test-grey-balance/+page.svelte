@@ -228,7 +228,7 @@
  >
  <YoRHaHarvardButton
  variant="grey"
- pixelated,
+ pixelated
  onclick={() => alert('Terminal button clicked!')}
  >
  Execute Command

@@ -89,7 +89,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     <!-- Basic Information -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="space-y-2">
-        <Label for="name">Full Name *</Label>
+        <Label htmlFor="name">Full Name *</Label>
         <Input
           id="name"
           value={formData.name}
@@ -100,7 +100,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       </div>
 
       <div class="space-y-2">
-        <Label for="alias">Alias</Label>
+        <Label htmlFor="alias">Alias</Label>
         <Input
           id="alias"
           value={formData.alias}
@@ -112,7 +112,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     <!-- Threat Level -->
     <div class="space-y-2">
-      <Label for="threatLevel">Threat Level</Label>
+      <Label htmlFor="threatLevel">Threat Level</Label>
       <div class="flex items-center gap-2 mb-2">
         <span class="{getThreatColor(formData.threatLevel)} px-2 py-1 rounded text-xs font-semibold">
           {formData.threatLevel.toUpperCase()}
@@ -140,7 +140,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     <!-- Notes -->
     <div class="space-y-2">
-      <Label for="notes">Notes</Label>
+      <Label htmlFor="notes">Notes</Label>
       <Textarea
         id="notes"
         value={formData.notes}

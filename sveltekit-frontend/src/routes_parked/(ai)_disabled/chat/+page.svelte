@@ -289,7 +289,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </section>
 
  <section class="input-section">
- <label for="chat-input">Message</label>
+ <label htmlFor="chat-input">Message</label>
  <textarea
  id="chat-input"
  class="message-input"

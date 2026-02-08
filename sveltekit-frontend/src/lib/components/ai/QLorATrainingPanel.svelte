@@ -31,7 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <div class="space-y-4"> <div class="text-6xl">ðŸ“„</div>
  <div class="space-y-2"> <h3 class="text-xl font-semibold">Drop .case files here</h3>
  <p class="text-gray-400">or click to select files for training</p> </div>
- <label for="file-input" class="inline-block"> <Button class="bg-cyan-600 hover:bg-cyan-700 bits-btn bits-btn"> Select Files </Button> </label>
+ <label htmlFor="file-input" class="inline-block"> <Button class="bg-cyan-600 hover:bg-cyan-700 bits-btn bits-btn"> Select Files </Button> </label>
  <input id="file-input"
           type="file"
           multiple accept=".case,.json"
@@ -55,7 +55,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             {currentJob?.status === 'running' ? 'Training in Progress...': 'Start Training'}
 </button> {/if} {/if}
   <!-- Training, Progress -->
-  {#if currentJob} <div class="space-y-4" transition, fade={{ duration: 300 }}> <div class="flex items-center"> <h4 class="text-lg font-semibold">Training Progress</h4>
+  {#if currentJob} <div class="space-y-4" transition fade={{ duration: 300 }}> <div class="flex items-center"> <h4 class="text-lg font-semibold">Training Progress</h4>
  <Badge class={getStatusColor(currentJob.status) + ' text-white'}> {currentJob.status.toUpperCase()}
 </Badge> </div>
  <!-- Progress, Bars --> <div class="space-y-3"> <div> <div class="flex justify-between text-sm text-gray-400"> <span>Epoch {currentJob.progress.currentEpoch}/{currentJob.progress.totalEpochs}
@@ -102,14 +102,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           > âš™ï¸ Advanced Config </Button> </div> {/if}
   <!-- Advanced, Configuration -->
   {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition:fly={{ y, -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
- <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="text-sm font-medium" for="lora-rank">LoRA Rank</label>
+ <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="text-sm font-medium" htmlFor="lora-rank">LoRA Rank</label>
 <input id="lora-rank"
               type="number"
               value={config?.rank ?? 16} min="1"
               max="128"
               class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ rank: parseInt(e.target.value) })} /> </div>
- <div class="space-y-2"> <label class="text-sm font-medium" for="learning-rate">Learning Rate</label>
+ <div class="space-y-2"> <label class="text-sm font-medium" htmlFor="learning-rate">Learning Rate</label>
 <input id="learning-rate"
               type="number"
               value={config?.trainingParams.learningRate ?? 2e-4} step="0.0001"
@@ -117,7 +117,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               max="0.01"
               class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, learningRate: parseFloat(e.target.value) } })} /> </div>
- <div class="space-y-2"> <label class="text-sm font-medium" for="batch-size">Batch Size</label>
+ <div class="space-y-2"> <label class="text-sm font-medium" htmlFor="batch-size">Batch Size</label>
 <select id="batch-size"
               value={config?.trainingParams.batchSize ?? 4} class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus:border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, batchSize: parseInt(e.target.value) } })} >
@@ -125,7 +125,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <option value={ 2 }>2</option>
  <option value={ 4 }>4</option>
  <option value={ 8 }>8</option> </select> </div>
- <div class="space-y-2"> <label class="text-sm font-medium" for="epochs">Epochs</label>
+ <div class="space-y-2"> <label class="text-sm font-medium" htmlFor="epochs">Epochs</label>
 <input id="epochs"
               type="number"
               value={config?.trainingParams.epochs ?? 3} min="1"
@@ -139,7 +139,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               checked={config?.enableUserAnalytics ?? false} onchange={(e) => qloraTrainingService.updateConfig({ enableUserAnalytics: e.target.checked })} class="w-4 h-4 text-cyan-600 bg-gray-700 border-gray-600 rounded focus:ring-cyan-500"
             /> <span class="text-gray-300">Enable User Analytics</span> </label> </div> {/if}
   <!-- User Analytics, Summary -->
-  {#if analytics && config?.enableUserAnalytics} <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4" transition, fade={{ duration: 300 }}> <h5 class="text-blue-300 font-semibold">ðŸ“Š User Analytics</h5>
+  {#if analytics && config?.enableUserAnalytics} <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4" transition fade={{ duration: 300 }}> <h5 class="text-blue-300 font-semibold">ðŸ“Š User Analytics</h5>
  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4"> <div> <p class="text-gray-400">Interactions</p>
  <p class="text-blue-300">{analytics.interactions.length}
 </p> </div>

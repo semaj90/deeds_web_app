@@ -15,11 +15,11 @@
  <div class="nes-container">
  <h2 class="title">Profile Settings</h2>
  <div class="field">
- <label for="name">Name:</label>
+ <label htmlFor="name">Name:</label>
  <input type="text" id="name" class="nes-input is-dark" placeholder="Enter, your, name" />
  </div>
  <div class="field">
- <label for="email">Email:</label>
+ <label htmlFor="email">Email:</label>
  <input
  type="email"
  id="email"

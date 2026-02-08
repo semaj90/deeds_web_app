@@ -42,7 +42,7 @@
 
 <div
   class="upload-zone"
-  class: dragging, ondrop={handleDrop}; ondragover={handleDragOver}; on, dragleave={handleDragLeave}
+  class: dragging ondrop={handleDrop}; ondragover={handleDragOver}; on dragleave={handleDragLeave}
   role="button"
   tabindex="0"
   aria-label="File Upload Drop Zone"
@@ -55,7 +55,7 @@
     style="display: none;"
     id="file-upload"
   />
-  <label for="file-upload" class="cursor-pointer">
+  <label htmlFor="file-upload" class="cursor-pointer">
     {#if files && files.length > 0}
       <p>{files.length} file(s) selected</p>
     {:else}

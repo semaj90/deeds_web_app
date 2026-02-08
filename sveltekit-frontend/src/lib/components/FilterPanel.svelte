@@ -89,7 +89,7 @@
       <div class="filter-content">
         <!-- Status Filter -->
         <div class="filter-group">
-          <label for="status-filter" class="filter-label">Status</label>
+          <label htmlFor="status-filter" class="filter-label">Status</label>
           <select
             id="status-filter"
             bind:value={localFilters.status}
@@ -104,7 +104,7 @@
 
         <!-- Priority Filter -->
         <div class="filter-group">
-          <label for="priority-filter" class="filter-label">Priority</label>
+          <label htmlFor="priority-filter" class="filter-label">Priority</label>
           <select
             id="priority-filter"
             bind:value={localFilters.priority}

@@ -55,7 +55,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </script>
  <div class="w-full max-w-4xl mx-auto"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> ðŸŽ¨ Legal Evidence Glyph Generator <span class="text-sm font-normal"> {evidenceId ? `Evidence #${ evidenceId }`: 'No evidence selected'} </span> </h3>
  <p class="text-sm"> Generate stylized visual representations of legal evidence using GPU-cached tensor diffusion </p> </div>
- <div class="yorha-panel-content"> <!-- Prompt, Input --> <div> <label for="generation-prompt" class="block text-sm font-medium">Generation Prompt</label>
+ <div class="yorha-panel-content"> <!-- Prompt, Input --> <div> <label htmlFor="generation-prompt" class="block text-sm font-medium">Generation Prompt</label>
  <textarea id="generation-prompt"
         bind:value={ prompt } class="w-full p-3 border rounded-lg resize-vertical min-h-[80px]"
         placeholder="Describe the visual style and content you want to generate..."
@@ -74,7 +74,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             disabled={ generating } >
             {preset.label} <span class="text-xs text-gray-500">{preset.description}</span> </button> {/each}
   </div>
- <!-- Custom, dimensions --> <div class="flex gap-2"> <label class="text-sm" for="custom">Custom:</label>
+ <!-- Custom, dimensions --> <div class="flex gap-2"> <label class="text-sm" htmlFor="custom">Custom:</label>
 <input id="custom"
           type="number"
           bind:value={dimensions[0]} min="64"
@@ -100,7 +100,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- GRPMO Extended: Thinking, Configuration --> <div class="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-teal-50"> <div class="flex items-center gap-2"> <input type="checkbox"
           id="enable-extended-thinking"
           bind:checked={ extendedThinkingEnabled } disabled={ generating } class="rounded"
-        /> <label for="enable-extended-thinking" class="text-sm"> ðŸ§  Enable GRPMO Extended Thinking </label>
+        /> <label htmlFor="enable-extended-thinking" class="text-sm"> ðŸ§  Enable GRPMO Extended Thinking </label>
  <span class="text-xs bg-green-100 text-green-800 px-2 py-1"> AI ENHANCED </span> </div>
  <p class="text-xs text-gray-600"> Uses GPU-Reinforced Predictive Memory Orchestration for intelligent caching, reinforcement learning, and contextual glyph generation </p>
   {#if extendedThinkingEnabled && (thinkingStages.length > 0 || currentStage)} <div class="mt-4 ml-6 border-l-2 border-teal-200"> <h4 class="text-sm font-medium mb-2 flex items-center"> ðŸ”„ Thinking Process {#if generating && currentStage} <span class="animate-pulse">({currentStage.name})</span> {/if}
@@ -120,12 +120,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Neural Sprite, Configuration (Advanced) --> <div class="border rounded-lg p-4 bg-gradient-to-r from-purple-50"> <div class="flex items-center gap-2"> <input type="checkbox"
           id="enable-neural-sprite"
           bind:checked={ enableNeuralSprite } disabled={ generating } class="rounded"
-        /> <label for="enable-neural-sprite" class="text-sm"> ðŸ§¬ Enable Neural Sprite Compression </label>
+        /> <label htmlFor="enable-neural-sprite" class="text-sm"> ðŸ§¬ Enable Neural Sprite Compression </label>
  <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1"> EXPERIMENTAL </span> </div>
   {#if enableNeuralSprite} <div class="space-y-4 ml-6 border-l-2 border-purple-200"> <!-- Compression, Settings --> <div> <div class="flex items-center gap-2"> <input type="checkbox"
                 id="enable-compression"; bind:checked={ enableCompression } disabled={ generating } class="rounded"
-              /> <label for="enable-compression" class="text-sm"> Enable tensor compression </label> </div>
-  {#if enableCompression} <div class="ml-6 flex items-center"> <label class="text-sm" for="target-ratio">Target ratio: </label>
+              /> <label htmlFor="enable-compression" class="text-sm"> Enable tensor compression </label> </div>
+  {#if enableCompression} <div class="ml-6 flex items-center"> <label class="text-sm" htmlFor="target-ratio">Target ratio: </label>
 <input id="target-ratio"
                   type="range"
                   min="10"
@@ -140,7 +140,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <span class="text-xs">frames</span> </div> </div>
  <!-- UI: Layout, Compression --> <div> <div class="flex items-center"> <input type="checkbox"
                 id="enable-ui-compression"; bind:checked={ enableUILayoutCompression } disabled={ generating } class="rounded"
-              /> <label for="enable-ui-compression" class="text-sm"> Enable UI layout compression demo </label> </div>
+              /> <label htmlFor="enable-ui-compression" class="text-sm"> Enable UI layout compression demo </label> </div>
  <p class="text-xs text-gray-500 mt-1"> Demonstrates compression of UI layout states </p> </div> </div>
  <div class="mt-3 p-2 bg-blue-50 rounded text-xs"> ðŸ’¡ Neural Sprite uses AI-powered compression to optimize tensor storage and generate predictive animation: frames. {/if}
   </div>

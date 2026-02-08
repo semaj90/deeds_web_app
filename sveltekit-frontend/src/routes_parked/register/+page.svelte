@@ -100,7 +100,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  <form method="POST" use, enhance class="register-form">
  <div class="form-field">
- <label for="email" class="form-label">Email Address</label>
+ <label htmlFor="email" class="form-label">Email Address</label>
  <input
  id="email"
  name="email"
@@ -117,7 +117,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="form-field">
- <label for="password" class="form-label">Password</label>
+ <label htmlFor="password" class="form-label">Password</label>
  <input
  id="password"
  name="password"
@@ -150,7 +150,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="form-field">
- <label for="confirmPassword" class="form-label">Confirm Password</label>
+ <label htmlFor="confirmPassword" class="form-label">Confirm Password</label>
  <input
  id="confirmPassword"
  name="confirmPassword"
@@ -176,7 +176,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  class="form-checkbox"
  required
  />
- <label for="terms" class="checkbox-label">
+ <label htmlFor="terms" class="checkbox-label">
  I agree to the <a href="/terms" target="_blank" rel="noopener">Terms of Service</a>
  and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>
  </label>

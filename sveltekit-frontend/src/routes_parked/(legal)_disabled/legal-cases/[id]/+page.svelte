@@ -340,7 +340,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 {#if showNewCaseModal}
- <Root bind, open={showNewCaseModal}>
+ <Root bind open={showNewCaseModal}>
  <Overlay
  class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out
  data-[state=closed]:fade-out-0 data-[state=open], fade-in-0"
@@ -367,7 +367,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  }}
  >
  <div>
- <label for="case-title" class="mb-2 block text-sm font-medium">Title</label>
+ <label htmlFor="case-title" class="mb-2 block text-sm font-medium">Title</label>
  <input
  id="case-title"
  type="text"
@@ -377,7 +377,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  />
  </div>
  <div>
- <label for="case-description" class="mb-2 block text-sm font-medium">Description</label>
+ <label htmlFor="case-description" class="mb-2 block text-sm font-medium">Description</label>
  <textarea
  id="case-description"
  bind:value={newCaseData.description}
@@ -387,7 +387,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  ></textarea>
  </div>
  <div>
- <label for="case-priority" class="mb-2 block text-sm font-medium">Priority</label>
+ <label htmlFor="case-priority" class="mb-2 block text-sm font-medium">Priority</label>
  <select
  id="case-priority"
  bind:value={newCaseData.priority}

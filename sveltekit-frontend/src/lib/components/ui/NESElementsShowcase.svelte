@@ -114,15 +114,15 @@
         <fieldset>
           <legend>Form Controls</legend>
           <div class="nes-field">
-            <label for="text-input">Text Input:</label>
+            <label htmlFor="text-input">Text Input:</label>
             <input type="text" id="text-input" class="nes-input" bind:value={formData.text} />
           </div>
           <div class="nes-field">
-            <label for="textarea">Textarea:</label>
+            <label htmlFor="textarea">Textarea:</label>
             <textarea id="textarea" class="nes-textarea" bind:value={formData.textarea}></textarea>
           </div>
           <div class="nes-field">
-            <label for="select">Select:</label>
+            <label htmlFor="select">Select:</label>
             <div class="nes-select">
               <select id="select" bind:value={formData.select}>
                 <optgroup label="Options">

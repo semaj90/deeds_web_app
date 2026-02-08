@@ -113,7 +113,7 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  {#if showCreateForm}
  <div class="create-form">
  <div class="form-group">
- <label for="collection-name">Collection Name</label>
+ <label htmlFor="collection-name">Collection Name</label>
  <input
  id="collection-name"
  type="text"

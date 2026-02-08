@@ -84,12 +84,12 @@ image: Image, video: Video;
               size="sm"
               onclick={ handleClose } class="rounded-full bits-btn"
             > <X class="w-4" /> </Button> </div> </CardHeader>
- <CardContent class="p-6 overflow-y-auto"> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Left: Column: Basic, Info --> <div class="space-y-4"> <!-- Title --> <div> <Label for="title">Title *</Label>
+ <CardContent class="p-6 overflow-y-auto"> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Left: Column: Basic, Info --> <div class="space-y-4"> <!-- Title --> <div> <Label htmlFor="title">Title *</Label>
  <Input id="title"; bind:value={evidence.title} placeholder="Enter evidence, title"
                   class={errors.title ? 'border-red-500' : ''} disabled={mode === 'view'} />
   {#if errors.title} <p class="text-sm text-red-500">{errors.title}</p> {/if}
   </div>
- <!-- Type --> <div> <Label for="type">Type *</Label>
+ <!-- Type --> <div> <Label htmlFor="type">Type *</Label>
  <select id="type"
                   bind:value={evidence.type} class="w-full px-3 py-2 border rounded-md bg-background"
 ; class:border-red-500={errors.type} disabled={mode === 'view'} >
@@ -100,7 +100,7 @@ image: Image, video: Video;
  <option value="transcript">Transcript</option> </select>
   {#if errors.type} <p class="text-sm text-red-500">{errors.type}</p> {/if}
   </div>
- <!-- Content --> <div> <Label for="content">Content</Label>
+ <!-- Content --> <div> <Label htmlFor="content">Content</Label>
  <textarea id="content"
                   bind:value={evidence.content} placeholder="Enter evidence content or description"
                   rows="6"
@@ -108,7 +108,7 @@ image: Image, video: Video;
  class:border-red-500={errors.content} disabled={mode === 'view'} ></textarea>
   {#if errors.content} <p class="text-sm text-red-500">{errors.content}</p> {/if}
   </div>
- <!-- Tags --> <div> <Label for="tags">Tags</Label>
+ <!-- Tags --> <div> <Label htmlFor="tags">Tags</Label>
  <div class="space-y-2"> <div class="flex"> <Input bind:value={ tagInput } placeholder="Add, tag"
                       onkeydown={ handleTagKeydown } disabled={mode === 'view'} /> <Button class="bits-btn" size="sm"
                       variant="ghost"
@@ -144,11 +144,11 @@ image: Image, video: Video;
   {#if evidence.embeddings?.length} <div class="p-3 bg-muted/50"> <p class="text-sm text-green-600">âœ“ Embeddings generated</p>
  <p class="text-xs"> Dimension {evidence.embeddings.length} </p> </div> {:else} <div class="p-3 bg-muted/50"> <p class="text-sm"> No AI analysis available </p> {/if}
   </div>
- <!-- Position --> <div class="grid grid-cols-2"> <div> <Label for="x">X Position</Label>
+ <!-- Position --> <div class="grid grid-cols-2"> <div> <Label htmlFor="x">X Position</Label>
  <Input id="x"
                     type="number"
                     bind:value={evidence.x} disabled={mode === 'view'} /> </div>
- <div> <Label for="y">Y Position</Label>
+ <div> <Label htmlFor="y">Y Position</Label>
  <Input id="y"
                     type="number"; bind:value={evidence.y} disabled={mode === 'view'} /> </div> </div>
  <!-- Metadata -->

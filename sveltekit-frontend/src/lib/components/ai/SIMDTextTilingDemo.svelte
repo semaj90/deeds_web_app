@@ -70,21 +70,21 @@ qualityTier: qualityTier enableGPUAcceleration true; semanticClustering: true },
 	memoryEfficiencyAverage: 0 }
   } $effect(() => { addLog('ðŸ§¬ SIMD Text Tiling Demo initialized'); addLog('ðŸ’¡ Select processing mode and compression target, then click: "Process Sample"')}); </script>
  <div class="p-6 max-w-7xl mx-auto space-y-6"> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> ðŸ§¬ SIMD Text Tiling Demo <span class="text-sm font-normal"> 7-bit NES-style Compression with Instantaneous UI Generation </span> </h3> </div>
- <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md, grid-cols-5 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="processing-mode">Processing Mode</label>
+ <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md, grid-cols-5 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" htmlFor="processing-mode">Processing Mode</label>
 <select id="processing-mode" bind:value={ selectedMode } class="w-full p-2 border rounded-md"> <option value="direct-simd">Direct SIMD API</option>
  <option value="langchain-simd">LangChain + SIMD Bridge</option> </select> </div>
- <div> <label class="block text-sm font-medium text-gray-700" for="compression-target">Compression Target</label>
+ <div> <label class="block text-sm font-medium text-gray-700" htmlFor="compression-target">Compression Target</label>
 <select id="compression-target" bind:value={ compressionTarget } class="w-full p-2 border rounded-md"> <option value={ 10 }>10:1 (High Quality)</option>
  <option value={ 25 }>25:1 (Balanced)</option>
  <option value={ 50 }>50:1 (Compressed)</option>
  <option value={ 109 }>109:1 (7-bit NES)</option>
  <option value={ 200 }>200:1 (Ultra)</option> </select> </div>
- <div> <label class="block text-sm font-medium text-gray-700" for="quality-tier">Quality Tier</label>
+ <div> <label class="block text-sm font-medium text-gray-700" htmlFor="quality-tier">Quality Tier</label>
 <select id="quality-tier" bind:value={ qualityTier } class="w-full p-2 border rounded-md"> <option value="nes">NES (8-bit)</option>
  <option value="snes">SNES (16-bit)</option>
  <option value="n64">N64 (64-bit)</option> </select> </div>
  <div class="flex"> <label class="block text-sm font-medium text-gray-700">Options</label>
- <div class="flex items-center"> <input type="checkbox" bind:checked={ enableInstantUI } id="instant-ui" class="rounded" /> <label for="instant-ui" class="text-xs">Instant UI</label> </div> </div>
+ <div class="flex items-center"> <input type="checkbox" bind:checked={ enableInstantUI } id="instant-ui" class="rounded" /> <label htmlFor="instant-ui" class="text-xs">Instant UI</label> </div> </div>
  <div class="flex"> <Button.Root class="bits-btn bits-btn"
             onclick={() => processSingleText(Math.floor(Math.random() * sampleTexts.length))} disabled={ isProcessing } class="w-full text-sm"
           > {isProcessing ? 'ðŸ”„ Processing...': 'ðŸš€ Process Sample'}

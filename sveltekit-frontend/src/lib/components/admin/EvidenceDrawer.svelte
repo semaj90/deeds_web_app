@@ -170,7 +170,7 @@
 
 					<!-- Filename -->
 					<div class="form-group">
-						<label for="filename">Filename</label>
+						<label htmlFor="filename">Filename</label>
 						<input
 							id="filename"
 							type="text"
@@ -187,7 +187,7 @@
 
 					<!-- Jurisdiction -->
 					<div class="form-group">
-						<label for="jurisdiction">Jurisdiction</label>
+						<label htmlFor="jurisdiction">Jurisdiction</label>
 						<select
 							id="jurisdiction"
 							bind:value={formData.jurisdiction}
@@ -207,7 +207,7 @@
 
 					<!-- Processing Status -->
 					<div class="form-group">
-						<label for="status">Processing Status</label>
+						<label htmlFor="status">Processing Status</label>
 						<select
 							id="status"
 							bind:value={formData.processing_status}
@@ -227,7 +227,7 @@
 
 					<!-- Metadata JSON -->
 					<div class="form-group">
-						<label for="metadata">Metadata (JSON)</label>
+						<label htmlFor="metadata">Metadata (JSON)</label>
 						<textarea
 							id="metadata"
 							bind:value={metadataJson}

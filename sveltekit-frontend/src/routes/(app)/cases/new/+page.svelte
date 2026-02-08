@@ -108,7 +108,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="intake-form">
   <!-- Case Title -->
   <div class="form-section">
-  <label for="title">
+  <label htmlFor="title">
   <h2>Case Title</h2>
   <p>Provide a short, descriptive title for this case.</p>
   </label>
@@ -124,7 +124,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   <!-- Main narrative -->
   <div class="form-section">
-  <label for="narrative">
+  <label htmlFor="narrative">
   <h2>What Happened?</h2>
   <p>Describe the incident in your own words. Include people, dates, locations, and key events.</p>
   </label>
@@ -182,7 +182,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p>Answer these to help structure the case:</p>
 
  <div class="prompt-group">
- <label for="who">
+ <label htmlFor="who">
  <strong>WHO</strong> — Who is involved?
  </label>
  <input
@@ -194,7 +194,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="prompt-group">
- <label for="what">
+ <label htmlFor="what">
  <strong>WHAT</strong> — What happened?
  </label>
  <input
@@ -206,7 +206,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="prompt-group">
- <label for="when">
+ <label htmlFor="when">
  <strong>WHEN</strong> — When did it happen?
  </label>
  <input
@@ -218,7 +218,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="prompt-group">
- <label for="where">
+ <label htmlFor="where">
  <strong>WHERE</strong> — Where did it happen?
  </label>
  <input
@@ -230,7 +230,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="prompt-group">
- <label for="why">
+ <label htmlFor="why">
  <strong>WHY</strong> — Why is this conduct criminal?
  </label>
  <input
@@ -242,7 +242,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="prompt-group">
- <label for="how">
+ <label htmlFor="how">
  <strong>HOW</strong> — How did the suspect act?
  </label>
  <input

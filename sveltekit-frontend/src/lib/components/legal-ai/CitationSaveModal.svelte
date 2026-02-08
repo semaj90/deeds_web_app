@@ -126,7 +126,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  {/if}
 
  <div class="form-group">
- <label for="statute_code">Statute Code *</label>
+ <label htmlFor="statute_code">Statute Code *</label>
  <input
  id="statute_code"
  type="text"
@@ -138,7 +138,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  </div>
 
  <div class="form-group">
- <label for="statute_title">Statute Title</label>
+ <label htmlFor="statute_title">Statute Title</label>
  <input
  id="statute_title"
  type="text"
@@ -150,7 +150,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 
  <div class="form-row">
  <div class="form-group">
- <label for="jurisdiction">Jurisdiction</label>
+ <label htmlFor="jurisdiction">Jurisdiction</label>
  <select id="jurisdiction" bind:value={formData.jurisdiction} disabled={isSaving}>
  <option value="">Select jurisdiction</option>
  {#each jurisdictions as jurisdiction}
@@ -160,7 +160,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  </div>
 
  <div class="form-group">
- <label for="severity">Severity</label>
+ <label htmlFor="severity">Severity</label>
  <select id="severity" bind:value={formData.severity} disabled={isSaving}>
  <option value="">Select severity</option>
  {#each severities as severity}
@@ -170,7 +170,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  </div>
 
  <div class="form-group">
- <label for="year">Year</label>
+ <label htmlFor="year">Year</label>
  <input
  id="year"
  type="number"
@@ -184,7 +184,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 
  {#if highlightedText}
  <div class="form-group">
- <label for="highlighted_text">Highlighted Text</label>
+ <label htmlFor="highlighted_text">Highlighted Text</label>
  <textarea
  id="highlighted_text"
  bind:value={formData.highlighted_text}
@@ -196,7 +196,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  {/if}
 
  <div class="form-group">
- <label for="notes">Notes</label>
+ <label htmlFor="notes">Notes</label>
  <textarea
  id="notes"
  bind:value={formData.notes}

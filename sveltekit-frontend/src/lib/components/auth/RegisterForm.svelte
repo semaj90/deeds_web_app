@@ -224,7 +224,7 @@ email: formData.get('email') as string,
       <!-- Personal Information -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="field">
-          <label for="firstName" class="block text-sm font-medium mb-1">First Name</label>
+          <label htmlFor="firstName" class="block text-sm font-medium mb-1">First Name</label>
           <input
             id="firstName"
             name="firstName"
@@ -238,7 +238,7 @@ email: formData.get('email') as string,
         </div>
 
         <div class="field">
-          <label for="lastName" class="block text-sm font-medium mb-1">Last Name</label>
+          <label htmlFor="lastName" class="block text-sm font-medium mb-1">Last Name</label>
           <input
             id="lastName"
             name="lastName"
@@ -254,7 +254,7 @@ email: formData.get('email') as string,
 
       <!-- Email -->
       <div class="field">
-        <label for="email" class="block text-sm font-medium mb-1">Official Email Address</label>
+        <label htmlFor="email" class="block text-sm font-medium mb-1">Official Email Address</label>
         <input
           id="email"
           name="email"
@@ -270,7 +270,7 @@ email: formData.get('email') as string,
       <!-- Professional Information -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="field">
-          <label for="role" class="block text-sm font-medium mb-1">Professional Role</label>
+          <label htmlFor="role" class="block text-sm font-medium mb-1">Professional Role</label>
           <select
             id="role"
             name="role"
@@ -287,7 +287,7 @@ email: formData.get('email') as string,
         </div>
 
         <div class="field">
-          <label for="badgeNumber" class="block text-sm font-medium mb-1">Badge/ID Number (Optional)</label>
+          <label htmlFor="badgeNumber" class="block text-sm font-medium mb-1">Badge/ID Number (Optional)</label>
           <input
             id="badgeNumber"
             name="badgeNumber"
@@ -303,7 +303,7 @@ email: formData.get('email') as string,
       <!-- Department & Jurisdiction -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="field">
-          <label for="department" class="block text-sm font-medium mb-1">Department/Agency</label>
+          <label htmlFor="department" class="block text-sm font-medium mb-1">Department/Agency</label>
           <input
             id="department"
             name="department"
@@ -317,7 +317,7 @@ email: formData.get('email') as string,
         </div>
 
         <div class="field">
-          <label for="jurisdiction" class="block text-sm font-medium mb-1">Jurisdiction</label>
+          <label htmlFor="jurisdiction" class="block text-sm font-medium mb-1">Jurisdiction</label>
           <input
             id="jurisdiction"
             name="jurisdiction"
@@ -334,7 +334,7 @@ email: formData.get('email') as string,
       <!-- Password Fields -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="field">
-          <label for="password" class="block text-sm font-medium mb-1">Password</label>
+          <label htmlFor="password" class="block text-sm font-medium mb-1">Password</label>
           <div class="relative">
             <input
               id="password"
@@ -374,7 +374,7 @@ email: formData.get('email') as string,
         </div>
 
         <div class="field">
-          <label for="confirmPassword" class="block text-sm font-medium mb-1">Confirm Password</label>
+          <label htmlFor="confirmPassword" class="block text-sm font-medium mb-1">Confirm Password</label>
           <div class="relative">
             <input
               id="confirmPassword"

@@ -90,7 +90,7 @@ aiModel: 'gemma3'
   </div> </div>
  <!-- Evidence, List --> <div class="evidence-list">
   {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-item"
-            class:selected={selectedEvidence.has(evidence.id)} transition, scale={evidenceBuilder.animations.enter} >
+            class:selected={selectedEvidence.has(evidence.id)} transition scale={evidenceBuilder.animations.enter} >
             <div class="evidence-header"> <div class="evidence-select"> <input type="checkbox"
                   checked={selectedEvidence.has(evidence.id)} onchange={() => toggleSelection(evidence.id)} class="evidence-checkbox"
                 /> </div>

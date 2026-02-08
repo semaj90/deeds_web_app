@@ -135,7 +135,7 @@ function formatFileSize(bytes: number): string {
   <form method="POST" enctype="multipart/form-data" use:enhance class="space-y-6">
     <!-- File Upload Component -->
     <div class="space-y-2">
-      <Label for="file">File</Label>
+      <Label htmlFor="file">File</Label>
       <FileUpload
         multiple={false}
         maxFiles={1}
@@ -156,7 +156,7 @@ function formatFileSize(bytes: number): string {
 
     <!-- Title -->
     <div class="space-y-2">
-      <Label for="title">Title</Label>
+      <Label htmlFor="title">Title</Label>
       <Input
         id="title"
         name="title"
@@ -171,7 +171,7 @@ function formatFileSize(bytes: number): string {
 
     <!-- Description -->
     <div class="space-y-2">
-      <Label for="description">Description (Optional)</Label>
+      <Label htmlFor="description">Description (Optional)</Label>
       <Textarea
         id="description"
         name="description"
@@ -183,7 +183,7 @@ function formatFileSize(bytes: number): string {
 
     <!-- Type Selection -->
     <div class="space-y-2">
-      <Label for="type">Evidence Type</Label>
+      <Label htmlFor="type">Evidence Type</Label>
       <Select name="type" bind:value={$form.type}>
         <SelectTrigger>
           <SelectValue placeholder="Select evidence type" />
@@ -207,7 +207,7 @@ function formatFileSize(bytes: number): string {
     <!-- Case ID -->
     {#if !caseId}
       <div class="space-y-2">
-        <Label for="caseId">Case ID</Label>
+        <Label htmlFor="caseId">Case ID</Label>
         <Input
           id="caseId"
           name="caseId"
@@ -226,7 +226,7 @@ function formatFileSize(bytes: number): string {
     <!-- Options -->
     <div class="space-y-4 rounded-lg border p-4 bg-muted/50">
       <div class="flex items-center justify-between">
-        <Label for="aiAnalysis" class="flex-1 cursor-pointer">
+        <Label htmlFor="aiAnalysis" class="flex-1 cursor-pointer">
           Enable AI Analysis
           <span class="block text-sm font-normal text-muted-foreground">
             Extract text, generate embeddings, and summarize content
@@ -235,7 +235,7 @@ function formatFileSize(bytes: number): string {
         <Switch id="aiAnalysis" name="aiAnalysis" bind:checked={$form.aiAnalysis} />
       </div>
       <div class="flex items-center justify-between">
-        <Label for="isPrivate" class="flex-1 cursor-pointer">
+        <Label htmlFor="isPrivate" class="flex-1 cursor-pointer">
           Private Evidence
           <span class="block text-sm font-normal text-muted-foreground">
             Only visible to you and case administrators

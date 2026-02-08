@@ -68,7 +68,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
                   onchange={ handleFileUpload } class="hidden"
                 /> <button onclick={() => fileInput?.click()} class="yorha-button px-6 py-3 bg-blue-600 text-white"> Select Evidence Files </button>
  <p class="text-gray-400 text-sm">Supported: PDF | Images, Documents</p> </div>
- <div class="evidence-type-selector"> <label class="block text-sm font-medium text-gray-300" for="-evidence-type-"> Evidence Type </label>
+ <div class="evidence-type-selector"> <label class="block text-sm font-medium text-gray-300" htmlFor="-evidence-type-"> Evidence Type </label>
  <select id="-evidence-type-"
                   bind:value={ selectedEvidenceType } onchange={() => send({ type: 'SET_EVIDENCE_TYPE', evidenceType: selectedEvidenceType })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
                 > <option value="digital">Digital Evidence</option>
@@ -82,7 +82,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
             > <span class="flex items-center">
   {#if $machineContext?.caseTitle} <span class="text-green-400">âœ“</span> {/if}
   <span class="text-sm">Case Details</span> </span> </button> </h3>
- <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div> <label class="block text-sm font-medium text-gray-300" for="-case-title-"> Case Title </label>
+ <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div> <label class="block text-sm font-medium text-gray-300" htmlFor="-case-title-"> Case Title </label>
  <input id="-case-title-"
                   bind:value={ caseTitle } onblur={ handleCaseDetailsUpdate } type="text"
                   placeholder="Enter case title..."
@@ -90,7 +90,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
                 />
   {#if $machineContext?.validationErrors?.caseTitle} <p class="text-red-400 text-sm">{$machineContext.validationErrors.caseTitle}</p> {/if}
   </div>
- <div> <label class="block text-sm font-medium text-gray-300" for="-case-description-"> Case Description </label>
+ <div> <label class="block text-sm font-medium text-gray-300" htmlFor="-case-description-"> Case Description </label>
  <textarea id="-case-description-"
                   bind:value={ caseDescription } onblur={ handleCaseDetailsUpdate } rows="4"
                   placeholder="Detailed case description..."
@@ -98,7 +98,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
                 ></textarea>
   {#if $machineContext?.validationErrors?.caseDescription} <p class="text-red-400 text-sm">{$machineContext.validationErrors.caseDescription}</p> {/if}
   </div>
- <div> <label class="block text-sm font-medium text-gray-300" for="-priority-level-"> Priority Level </label>
+ <div> <label class="block text-sm font-medium text-gray-300" htmlFor="-priority-level-"> Priority Level </label>
  <select id="-priority-level-"
                   bind:value={ selectedPriority } onchange={() => send({ type: 'SET_PRIORITY', priority: selectedPriority })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
                 > <option value="low">Low Priority</option>

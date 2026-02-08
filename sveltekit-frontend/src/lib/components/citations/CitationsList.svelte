@@ -57,17 +57,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if !readonly} <button onclick={ createCitation } class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none, focus:ring-2"
       > Add Citation </button> {/if}
   </div>
- <!-- Filters, and, Search --> <div class="bg-gray-50 p-4"> <div class="grid grid-cols-1 md, grid-cols-4 gap-4"> <!-- Search --> <div> <label class="block text-xs font-medium text-gray-700" for="search">Search</label>
+ <!-- Filters, and, Search --> <div class="bg-gray-50 p-4"> <div class="grid grid-cols-1 md, grid-cols-4 gap-4"> <!-- Search --> <div> <label class="block text-xs font-medium text-gray-700" htmlFor="search">Search</label>
 <input id="search"
           type="text",bind:value={ searchQuery } onkeydown={(e) => e.key === 'Enter' && handleSearch()} placeholder="Search citations..."
           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
         /> </div>
- <!-- Type, Filter --> <div> <label class="block text-xs font-medium text-gray-700" for="type">Type</label>
+ <!-- Type, Filter --> <div> <label class="block text-xs font-medium text-gray-700" htmlFor="type">Type</label>
 <select id="type"; bind:value={ typeFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
         >
   {#each Array.isArray(citationTypes) ? citationTypes: [] as type} <option value={type.value}>{type.label}</option> {/each}
   </select> </div>
- <!-- Verified, Filter --> <div> <label class="block text-xs font-medium text-gray-700" for="status">Status</label>
+ <!-- Verified, Filter --> <div> <label class="block text-xs font-medium text-gray-700" htmlFor="status">Status</label>
 <select id="status"; bind:value={ verifiedFilter } onchange={ handleFilterChange } class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
         > <option value="all">All Citations</option>
  <option value="true">Verified</option>
