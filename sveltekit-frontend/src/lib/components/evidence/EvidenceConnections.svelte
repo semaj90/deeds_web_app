@@ -3,14 +3,14 @@
  import type { Writable } from 'svelte/store';
 
  // Define types locally to avoid importing server schema in browser
- type EvidenceNodeType = { id: string;, caseId: string;
+ type EvidenceNodeType = { id: string; caseId: string;
  title: string;
  description?: string;
 	evidenceType: string;
  fileType?: string;
  fileName?: string;
  fileUrl?: string;
-	canvasPosition: { x: number;, y: number };
+	canvasPosition: { x: number; y: number };
  uploadedBy?: number;
 	uploadedAt: string;
  updatedAt: string;
@@ -18,7 +18,7 @@
  y: number;
  };
 
- type EvidenceConnection = { id: string;, caseId: string;
+ type EvidenceConnection = { id: string; caseId: string;
  fromEvidenceId: string;
 	toEvidenceId: string;
  connectionType: string;
@@ -31,7 +31,7 @@
  updatedAt: string;
  };
 
- let { nodes, connections }: { nodes: Writable<EvidenceNodeType[]>;, connections: Writable<EvidenceConnection[]>;
+ let { nodes, connections }: { nodes: Writable<EvidenceNodeType[]>; connections: Writable<EvidenceConnection[]>;
  } = $props();
 
  let canvas: HTMLCanvasElement;
@@ -167,7 +167,7 @@
 ></canvas>
 
 <style>
- .connections-canvas { position: absolute;, top: 0;
+ .connections-canvas { position: absolute; top: 0;
  left: 0;
 	width: 100%;
  height: 100%;

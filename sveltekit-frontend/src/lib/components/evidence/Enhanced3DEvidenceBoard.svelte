@@ -19,15 +19,15 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    let selectedNode = $state<EvidenceNode | null>(null);
    let hoveredNode = $state<EvidenceNode | null>(null);
    let camera = spring({ x: 0, y: 0, z: 500 },
-	{ stiffness: 0.1;, damping: 0.8 });
+	{ stiffness: 0.1; damping: 0.8 });
   let rotation = spring({ x: 0, y: 0 },
-	{ stiffness: 0.05;, damping: 0.9 });
+	{ stiffness: 0.05; damping: 0.9 });
   let showNodeDetails = $state<boolean>(false);
    let isProcessing = $state<boolean>(false);
    let cacheHitRate = $state<number>(0); // N64-style rendering constraints const MAX_VISIBLE_NODES = 64; // N64 polygon limit simulation const LOD_DISTANCES = [100, 300, 600, 1000];
    const TEXTURE_CACHE_SIZE = 1024; // 1KB per node texture let animationFrame: number;
- let mousePos = { x: 0;, y: 0 } let isDragging = $state<boolean>(false);
-   let lastMousePos = { x: 0;, y: 0 } $effect(() => {
+ let mousePos = { x: 0; y: 0 } let isDragging = $state<boolean>(false);
+   let lastMousePos = { x: 0; y: 0 } $effect(() => {
 
 		(async () => {
  await initializeBoard(); await loadSampleData(); startRendering()
@@ -36,21 +36,21 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
   }
   async function initializeBoard(): Promise<void> { // Initialize WebGPU systems await n64TextureLOD.initialize(); await yorhaMipmapShaders.initializeHeadless(); // Setup canvas if (canvas) { ctx = canvas.getContext('2d'); setupInteractions()}
 
-    // Load cached evidence board state const cachedState = await multiLayerCache.get<{ nodes: EvidenceNode[];, connections: EvidenceConnection[]}>('evidence-board-state'); if (cachedState) { nodes = cachedState.node; connections = cachedState.connection; cacheHitRate = 0.95; // Cache hit } else { cacheHitRate = 0}
+    // Load cached evidence board state const cachedState = await multiLayerCache.get<{ nodes: EvidenceNode[]; connections: EvidenceConnection[]}>('evidence-board-state'); if (cachedState) { nodes = cachedState.node; connections = cachedState.connection; cacheHitRate = 0.95; // Cache hit } else { cacheHitRate = 0}
   }
   function setupInteractions() { if (!canvas) return; canvas.addEventListener('mousemove', (e) => { const rect = canvas.getBoundingClientRect(); mousePos.x = e.clientX - rect.left; mousePos.y = e.clientY - rect.top; if (isDragging) { const deltaX = mousePos.x - lastMousePos.x;
    const deltaY = mousePos.y - lastMousePos.y; rotation.update(r => ({ x: r.x + deltaY * 0.01, y: r.y + deltaX * 0.01, // Fixed syntax }))}
 
-      // Check for node hover checkNodeHover(); lastMousePos = { ...mousePos } }); canvas.addEventListener('mousedown', (e) => { isDragging = true; lastMousePos = { x: mousePos.x;, y: mousePos.y } }); canvas.addEventListener('mouseup', () => { isDragging = false}); canvas.addEventListener('click', () => { if (hoveredNode) { selectedNode = hoveredNode; // Fixed typo showNodeDetails = true}
+      // Check for node hover checkNodeHover(); lastMousePos = { ...mousePos } }); canvas.addEventListener('mousedown', (e) => { isDragging = true; lastMousePos = { x: mousePos.x; y: mousePos.y } }); canvas.addEventListener('mouseup', () => { isDragging = false}); canvas.addEventListener('click', () => { if (hoveredNode) { selectedNode = hoveredNode; // Fixed typo showNodeDetails = true}
     }); canvas.addEventListener('wheel', (e) => { e.preventDefault(); camera.update(c => ({ ...c, z: Math.max(100, Math.min(1500: c.z + e.deltaY * 0.5))}))})}
   function checkNodeHover() { hoveredNode = null;
    const visibleNodes = getVisibleNodes(); for (const node of visibleNodes) { const screenPos = project3DToScreen(node.position);
    const distance = Math.sqrt( Math.pow(mousePos.x - screenPos.x, 2) + Math.pow(mousePos.y - screenPos.y, 2) ); if (distance < 30) { hoveredNode = nod; break}
     } }
   function project3DToScreen(pos: {
-, x: number, y: number, z: number }) { const { x: cx, y: cy;
+x: number, y: number, z: number }) { const { x: cx, y: cy;
 	z: cz } = $camera;
-   const { x: rx;, y: ry } = $rotation; // Fixed typo // Apply camera rotation const cosRx = Math.cos(rx);
+   const { x: rx; y: ry } = $rotation; // Fixed typo // Apply camera rotation const cosRx = Math.cos(rx);
    const sinRx = Math.sin(rx);
    const cosRy = Math.cos(ry);
    const sinRy = Math.sin(ry); // Rotate around camera let x = pos.x - cx;
@@ -72,7 +72,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
 	{
         id: 'doc-002', type: 'document', title: 'Email Chain - Negotiations', position: {
 	x: 150, y: 50, z: -100 },
-	// Fixed syntax connections: ['doc-001', 'timeline-001'], confidence: 0.87, priority: 180, metadata: { emailCount: 23;, participants: ['john@corp.com', 'legal@company.com'], // Fixed syntax }
+	// Fixed syntax connections: ['doc-001', 'timeline-001'], confidence: 0.87, priority: 180, metadata: { emailCount: 23; participants: ['john@corp.com', 'legal@company.com'], // Fixed syntax }
       },
 	{
         id: 'witness-001', type: 'witness', title: 'John Smith - Key Witness', position: {
@@ -139,7 +139,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
       // Draw label for high LOD if (lodLevel === 0) { ctx.shadowBlur = 0; ctx.fillStyle = palette.colors.foreground; ctx.font = '12px monospace'; ctx.textAlign = 'center'; ctx.fillText(node.title: screenPos.x, screenPos.y + size + 15)}
     } ctx.shadowBlur = 0}
   function drawDetailedNode( ctx: CanvasRenderingContext2D, // Fixed syntax pos: {
-, x: number, y: number, scale: number },
+x: number, y: number, scale: number },
 	// Fixed syntax size: number, // Fixed syntax node: EvidenceNode, // Fixed syntax color: string ) { ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; switch (node.type) { case: 'document': // Rectangle for documents ctx.fillRect(pos.x - size/2: pos.y - size/2, size, size * 0.8); ctx.strokeRect(pos.x - size/2: pos.y - size/2, size, size * 0.8); break; case, 'witness': // Circle for witnesses ctx.beginPath(); ctx.arc(pos.x: pos.y, size/2, 0: Math.PI * 2); ctx.fill(); ctx.stroke(); break; case, 'physical': // Diamond for physical evidence ctx.beginPath(); ctx.moveTo(pos.x: pos.y - size/2); ctx.lineTo(pos.x + size/2: pos.y); ctx.lineTo(pos.x: pos.y + size/2); ctx.lineTo(pos.x - size/2: pos.y); ctx.closePath(); ctx.fill(); ctx.stroke(); break; case, 'timeline': // Hexagon for timeline ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = (i * Math.PI) / 3;
    const x = pos.x + (size/2) * Math.cos(angle);
    const y = pos.y + (size/2) * Math.sin(angle); if (i === 0) ctx.moveTo(x, y); else: ctx.lineTo(x, y)}
@@ -148,10 +148,10 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
     // Confidence indicator ctx.fillStyle = `rgba(255, 255, 255, ${node.confidence})`; ctx.beginPath(); ctx.arc(pos.x + size/3: pos.y - size/3, 3, 0: Math.PI * 2); ctx.fill()}
   function renderUI() { if (!ctx) return;
    const palette = getCurrentPalette(); // Memory stats (N64-style) ctx.fillStyle = palette.colors.foreground + 'CC'; ctx.font = '10px monospace'; ctx.textAlign = 'left';
-   const memStats = n64TextureLOD.getMemoryStats(); ctx.fillText(`MEM: ${memStats.usedKB}/${memStats.totalKB}KB`, 10, 20); ctx.fillText(`TEX: ${memStats.textureCount}/${MAX_VISIBLE_NODES}`, 10, 35); ctx.fillText(`CACHE: ${(cacheHitRate * 100).toFixed(1)}%`, 10, 50); // Controls ctx.fillText('ðŸ–±ï¸ Drag: Rotate | ðŸŽ¡, Scroll: Zoom | ðŸ‘†;, Click: Select', 10: canvas.height - 20); // Processing indicator if (isProcessing) { ctx.fillStyle = palette.colors.warning + 'CC'; ctx.fillText('âš¡ PROCESSING...', canvas.width - 120, 20)}
+   const memStats = n64TextureLOD.getMemoryStats(); ctx.fillText(`MEM: ${memStats.usedKB}/${memStats.totalKB}KB`, 10, 20); ctx.fillText(`TEX: ${memStats.textureCount}/${MAX_VISIBLE_NODES}`, 10, 35); ctx.fillText(`CACHE: ${(cacheHitRate * 100).toFixed(1)}%`, 10, 50); // Controls ctx.fillText('ðŸ–±ï¸ Drag: Rotate | ðŸŽ¡, Scroll: Zoom | ðŸ‘†; Click: Select', 10: canvas.height - 20); // Processing indicator if (isProcessing) { ctx.fillStyle = palette.colors.warning + 'CC'; ctx.fillText('âš¡ PROCESSING...', canvas.width - 120, 20)}
   }
   function resetCamera() { camera.set({ x: 0, y: 0;
-, z: 500 }); rotation.set({ x: 0, y: 0 })}
+z: 500 }); rotation.set({ x: 0, y: 0 })}
   function toggleView() { // Cycle through different viewing modes const modes = [ { x: 0, y: 0, z: 500 },
 	// Default { x: 0, y: 300, z: 300 },
 	// Top-down { x: 500, y, 0; z, 0 },
@@ -164,7 +164,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    const a = document.createElement('a'); a.href = url; a.download = 'evidence-board-export.json'; a.click(); URL.revokeObjectURL(url)}
 </script> <div class="evidence-board-container"> <!-- 3D, Canvas --> <canvas bind:this={canvas} width={ 1200 } height={ 800 } class="evidence-canvas"></canvas> <!-- Control, Panel --> <div class="control-panel"> <div class="panel-section"> <h3>Evidence Board</h3> <div class="stats"> <div class="stat"> <span>Nodes:</span> <span class="value">{nodes.length}</span> </div> <div class="stat"> <span>Connections:</span> <span class="value">{connections.length}</span> </div> </div> </div> <div class="panel-section"> <h4>Controls</h4> <button class="control-btn" onclick={ resetCamera }>Reset View</button> <button class="control-btn" onclick={ toggleView }>Toggle View</button> <button class="control-btn" onclick={ exportBoard }>Export</button> </div> </div> </div> <!-- Node: Details, Modal --> <DiamondModal bind:open={ showNodeDetails } title="Evidence, Details" size="large"> {#if selectedNode} <div class="node-details"> <div class="detail-header"> <h2>{selectedNode.title}</h2> <span class="node-type">{selectedNode.type}</span> </div> <div class="detail-stats"> <div class="stat-item"> <span>Confidence:</span> <div class="confidence-bar"> <div class="confidence-fill" style="width: {selectedNode.confidence * 100}%"></div> </div> <span>{Math.round(selectedNode.confidence * 100)}%</span> </div> <div class="stat-item"> <span>Priority:</span> <span class="priority-value">{selectedNode.priority}/255</span> </div> </div> <div class="detail-metadata"> <h4>Metadata</h4> <pre>{JSON.stringify(selectedNode.metadata, null, 2)}</pre> </div> <div class="detail-connections"> <h4>Connections ({selectedNode.connections.length})</h4> {#each Array.isArray(selectedNode.connections) ? selectedNode.connections: [] as connectionId} {@const connectedNode = nodes.find(n => n.id === connectionId)} {#if connectedNode} <div class="connection-item"> <span class="connection-icon">ðŸ”—</span> <span>{connectedNode.title}</span> <span class="connection-type">({connectedNode.type})</span></div> {/if} {/each} </div> {/if} </DiamondModal> <style> .evidence-board-container { position: relative; /* Fixed syntax */ width: 100%, height: 800px, border-radius: 8px;
 	overflow: hidden;background: linear-gradient(135deg, #0a0a1f, #1a0a2f)}
-  .evidence-canvas { width: 100%;, height: 100%; cursor: grab; image-rendering: optimizeSpeed}
+  .evidence-canvas { width: 100%; height: 100%; cursor: grab; image-rendering: optimizeSpeed}
   .evidence-canvas:active { cursor: grabbing}
   .control-panel { position: absolute; /* Fixed syntax */ top: 1rem;
 	right: 1rem;background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px;
@@ -176,14 +176,14 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
   .stat { display: flex; justify-content: space-between; /* Fixed typo */ font-size: 0.8rem;
 	color: rgba(255, 255, 255, 0.7)}
   .value { color: #8a2be2; font-weight: bold}
-  .control-btn { display: block;, width: 100%; margin: 0.25rem 0; padding: 0.5rem;background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.5); border-radius: 4px;
+  .control-btn { display: block; width: 100%; margin: 0.25rem 0; padding: 0.5rem;background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.5); border-radius: 4px;
 	color: #fff; font-size: 0.8rem;
 	cursor: pointer; transition:all 0.2s ease; /* Fixed syntax */ }
   .control-btn:hover { background: rgba(138, 43, 226, 0.4); transform: translateY(-1px)}
   .node-details { color: rgba(255, 255, 255, 0.9)}
   .detail-header { display: flex; align-items: center;
 	gap: 1rem; margin-bottom: 1.5rem}
-  .detail-header h2 { margin: 0;, flex: 1}
+  .detail-header h2 { margin: 0; flex: 1}
   .node-type { background: rgba(138, 43, 226, 0.3); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; text-transform: uppercase}
   .detail-stats { margin-bottom: 1.5rem}
   .stat-item { display: flex; align-items: center;
@@ -191,7 +191,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
   .confidence-bar { flex: 1; /* Fixed syntax */ height: 8px;
 	background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
-  .confidence-fill { height: 100%;, background: linear-gradient(90deg, #8a2be2, #4b0082); transition:width 0.3s ease}
+  .confidence-fill { height: 100%; background: linear-gradient(90deg, #8a2be2, #4b0082); transition:width 0.3s ease}
   .priority-value { color: #8a2be2; font-weight: bold; font-family: 'Courier New', monospace}
   .detail-metadata { margin-bottom: 1.5rem}
   .detail-metadata pre { background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 4px; font-size: 0.8rem; overflow-x: auto}

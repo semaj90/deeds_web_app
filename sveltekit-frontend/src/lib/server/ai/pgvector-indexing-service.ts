@@ -74,7 +74,7 @@ export class PgVectorIndexingService {
  if (doc.embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${doc.embedding.length}`
- , }
+ }
  // Upsert using raw SQL for pgvector support
  await this.db.execute(sql`
 INSERT INTO document_chunks (
@@ -169,7 +169,7 @@ ON CONFLICT DO NOTHING
  if (embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
- , }
+ }
  const limit = options.limit || this.maxResults;
  const threshold = options.threshold || 0.5;
  const vectorStr = this.vectorToString(embedding);
@@ -217,7 +217,7 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  if (embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
- , }
+ }
  const vectorStr = this.vectorToString(embedding);
 
  let query = `
@@ -252,7 +252,7 @@ WHERE 1=1
  // Delete from embeddings table
  const embedResult = await this.db.execute(
  sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
- , // Delete from document_chunks table
+ // Delete from document_chunks table
  await this.db.execute(sql`DELETE FROM document_chunks WHERE document_id = ${documentId}`);
  return Array.isArray(embedResult) ? embedResult.length : 0;
  } catch (error) {

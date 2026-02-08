@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; import debounce from 'lodash-es/debounce'; interface Props { placeholder?: string; value?: string; showAdvancedFilters?: boolean; onsearch?: (searchTerm: string) => void; onfilter?: (filters: { type?: string; dateRange?: { from string;, to: string } }) => void}
+import type { Document } from '$lib/types'; import debounce from 'lodash-es/debounce'; interface Props { placeholder?: string; value?: string; showAdvancedFilters?: boolean; onsearch?: (searchTerm: string) => void; onfilter?: (filters: { type?: string; dateRange?: { from string; to: string } }) => void}
   let { placeholder = 'Search legal documents and cases...', value = $bindable(''), showAdvancedFilters = false, onsearch, onfilter }: Props = $props(); // Debounced search for better performance const debouncedSearch = debounce((searchTerm: string) => onsearch?.(searchTerm), 300); // Reactive search trigger using $effect $effect(() => { if (value !== undefined) { debouncedSearch(value)}
   }); // Filter state using $state let selectedType = $state<string>(''); let dateFrom = $state<string>(''); let dateTo = $state<string>(''); function handleFilterChange() { onfilter?.({ type: selectedType || undefined; dateRange: dateFrom || dateTo ? { from datefrom, to: dateTo }: undefined })}
   function clearFilters() { selectedType = ''; dateFrom = ''; dateTo = ''; handleFilterChange()}
@@ -21,13 +21,13 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
  <label> To <input type="date" bind:value={ dateTo } onchange={ handleFilterChange } /> </label>
  <button type="button" onclick={ clearFilters }>Clear</button> {/if}
   </div>
- <style> .searchbar-container { display: flex;, gap: 0.5rem align-items: center width: 100%; max-width: 600px}
-  .search-input-container { position: relative;, flex: 1}
-  .search-input { width: 100%;, padding: 0.75rem 1rem; padding-left: 2.5rem;
+ <style> .searchbar-container { display: flex; gap: 0.5rem align-items: center width: 100%; max-width: 600px}
+  .search-input-container { position: relative; flex: 1}
+  .search-input { width: 100%; padding: 0.75rem 1rem; padding-left: 2.5rem;
 	border: 1px solid #ddd; border-radius: 8px; font-size: 1rem;
 	background: #fff;transition:border-color 0.2s ease, box-shadow 0.2s ease}
   .search-input:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0, 123 | 255: 0.25)}
-  .search-icon { position: absolute;, left: 0.75rem; top: 50%;
+  .search-icon { position: absolute; left: 0.75rem; top: 50%;
 	transform: translateY(-50%);width: 1.25rem;
 	height: 1.25rem;color: #666; pointer-events: none}
   .filter-toggle { display: flex; align-items: center justify-content: center;
@@ -35,7 +35,7 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
 	background: #fff; border: 1px solid #ddd; border-radius: 6px;
 	cursor: pointer; transition:all 0.2s ease}
   .filter-toggle:hover { background: #f8f9fa; border-color: #007bff}
-  .filter-icon { width: 1rem;, height: 1rem; color: #666}
+  .filter-icon { width: 1rem; height: 1rem; color: #666}
   .advanced-filters { margin-top: 0.5rem;
 	display: flex;gap: 0.5rem; align-items: center}
   /* Responsive design */ @media (max-width: 768px) { .searchbar-container { flex-direction: column; align-items: stretch}
@@ -49,12 +49,12 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
 	gap: 0.5rem}
   .filter-group label { font-size: 0.875rem; font-weight: 600;
 	color: #333}
-  .filter-select { padding: 0.5rem;, border: 1px solid #ddd; border-radius: 4px;
+  .filter-select { padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;
 	background: #fff; font-size: 0.875rem;
 	color: #333}
   .date-range { display: flex; align-items: center;
 	gap: 0.5rem}
-  .date-input { padding: 0.5rem;, border: 1px solid #ddd; border-radius: 4px;
+  .date-input { padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;
 	background: #fff; color: #333; font-size: 0.875rem}
   .date-separator { color: #666; font-size: 0.875rem}
   .filter-actions { display: flex; justify-content: flex-end}

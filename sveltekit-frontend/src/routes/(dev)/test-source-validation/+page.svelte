@@ -28,7 +28,7 @@ let citations = $state<CitationMetadata[]>([]);
 
 // Step 3: Knowledge Graph
 let entities = $state<string[]>([]);
-let relationships = $state<Array<{ from: string;, to: string; type: string }>>([]);
+let relationships = $state<Array<{ from: string; to: string; type: string }>>([]);
 let kagUpdateStatus = $state<string | null>(null);
 
 // ============================================================================
@@ -124,8 +124,8 @@ function extractEntities(text: string): string[] {
 
 function extractRelationships(
 	text: string
-): Array<{ from: string;, to: string; type: string }> {
-	const relationships: Array<{ from: string;, to: string; type: string }> = [];
+): Array<{ from: string; to: string; type: string }> {
+	const relationships: Array<{ from: string; to: string; type: string }> = [];
 
 	const patterns = [
 		{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },
@@ -321,7 +321,7 @@ function extractRelationships(
 		opacity: 1;
 	}
 
-	.step-number { width: 48px;, height: 48px;
+	.step-number { width: 48px; height: 48px;
 		border-radius: 50%; background: #e5e7eb;
 		color: #6b7280; display: flex;
 		align-items: center;
@@ -330,11 +330,11 @@ function extractRelationships(
 		font-size: 1.25rem; transition: all 0.3s;
 	}
 
-	.step.active .step-number { background: #3b82f6;, color: white;
+	.step.active .step-number { background: #3b82f6; color: white;
 		box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 	}
 
-	.step.completed .step-number { background: #10b981;, color: white;
+	.step.completed .step-number { background: #10b981; color: white;
 	}
 
 	.step-label {

@@ -12,7 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let selectedPipeline = $state<PipelineType>('optimized');
    let cacheKey = $state<string>('demo_legal_documents'); // Performance metrics let metrics = $state({ totalOperations: 0, averageTime: 0, successRate: 0, lastUpdate: new Date() }); // Pipeline execution with XState management async function executePipeline(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log(`ðŸš€ Starting ${selectedPipeline} pipeline execution`);
    const result = await pipelineManager.executePipeline(cacheKey, { type: selectedPipeline
-, enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); results = [result, ...results.slice(0, 9)]; // Keep last, 10 results updateMetrics()} catch (error) { console.error('Pipeline execution failed:', error)} finally { isProcessing = false}
+enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); results = [result, ...results.slice(0, 9)]; // Keep last, 10 results updateMetrics()} catch (error) { console.error('Pipeline execution failed:', error)} finally { isProcessing = false}
   }
 
    // Auto-select optimal pipeline async function autoExecutePipeline(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log('ðŸ§  Auto-selecting optimal pipeline');

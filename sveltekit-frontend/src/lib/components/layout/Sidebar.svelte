@@ -34,7 +34,7 @@
 	let currentPath = $derived($page.url.pathname);
 	let isAdmin = $derived(user?.role === 'admin');
 
-	interface NavigationItem { name: string;, href: string;
+	interface NavigationItem { name: string; href: string;
 		icon: ComponentType;
 	current: boolean;
 		badge?: string;

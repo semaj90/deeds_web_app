@@ -87,7 +87,7 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
 	aaStrength: {
 	value: 1.0 },
 	time: {
-, value: 0 }
+value: 0 }
             },
 	vertexShader: `
                 varying vec3 vPosition,

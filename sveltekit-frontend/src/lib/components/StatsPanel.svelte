@@ -1,12 +1,12 @@
 <script lang="ts">
- type StatsType = { total: number;, active:number;
+ type StatsType = { total: number; active:number;
  highRisk: number;
 	aiGenerated: number;
- byPriority: { low: number;, medium: number;
+ byPriority: { low: number; medium: number;
 	high: number;
  critical: number;
  };
- byStatus: { active:number;, inactive: number;
+ byStatus: { active:number; inactive: number;
 	archived: number;
  };
  };
@@ -320,7 +320,7 @@
  font-weight: 500;
  }
 
- .bar-container { flex: 1;, height: 24px;
+ .bar-container { flex: 1; height: 24px;
  background: rgba(255, 255, 255, 0.1);
  border-radius: 12px;
 	overflow: hidden;

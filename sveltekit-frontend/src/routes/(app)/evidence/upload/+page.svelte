@@ -301,7 +301,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: #2d2d2d;
 	}
 
-	.upload-header p { color: #666;, margin: 0;
+	.upload-header p { color: #666; margin: 0;
 	}
 
 	.upload-zone {
@@ -364,12 +364,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: #2d2d2d;
 	}
 
-	.filename { margin: 0;, color: #666;
+	.filename { margin: 0; color: #666;
 		font-size: 0.9rem;
 		word-break: break-all;
 	}
 
-	.progress-bar { width: 100%;, height: 8px;
+	.progress-bar { width: 100%; height: 8px;
 		background-color: #e0e0e0;
 		border-radius: 4px;
 	overflow: hidden;

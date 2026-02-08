@@ -40,7 +40,7 @@ let dimensions = $derived({ sm: { track: 'w-8 h-4',
 		translate: 'translate-x-5'
 	},
 	lg: {
-	, track: 'w-14 h-7',
+	track: 'w-14 h-7',
 		thumb: 'w-6 h-6',
 		translate: 'translate-x-7'
 	}
@@ -135,7 +135,7 @@ function handleKeydown(e: KeyboardEvent) {
 </label>
 
 <style>
-	.sr-only { position: absolute;, width: 1px;
+	.sr-only { position: absolute; width: 1px;
 		height: 1px;
 	padding: 0;
 		margin: -1px;

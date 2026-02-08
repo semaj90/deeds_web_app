@@ -30,7 +30,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	role: "system", content: `Commands: /help - Show this help /clear - Clear chat /embed - Show embeddings /gpu - GPU status /export - Export chat`, timestamp: new Date(), status: "complete"
         }); break; case, "clear": messages = [ { role: "system", content: "ðŸ§¹ Cleared", timestamp: new Date(), status: "complete"
           }]; break; case, "embed": const lastEmbed = messages.findLast((m) => m.embeddings); if (lastEmbed?.embeddings) { messages.push({ role: "system", content: `Embeddings (first 10): [${lastEmbed.embeddings .slice.map((e: number) => e.toFixed(3))
-, .join(", ")}...]`, timestamp: new Date(), status: "complete"
+.join(", ")}...]`, timestamp: new Date(), status: "complete"
           })}
         break; case, "gpu": checkGPUStatus(); break; case, "export": exportChat(); break; default:messages.push({
 	role: "system", content: `Unknown, command: ${cmd}`, timestamp: new Date(), status: "error"

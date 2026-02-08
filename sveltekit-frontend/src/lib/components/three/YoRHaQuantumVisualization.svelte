@@ -4,7 +4,7 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let { secretFeatures = { konamiActive: false
-, godModeEnabled: false, quantumDebugEnabled: false, aiWhispererMode: false, matrixMode: false },
+godModeEnabled: false, quantumDebugEnabled: false, aiWhispererMode: false, matrixMode: false },
 	consciousness = { level: 1, experience: 0;
 	awakening: 0.12 },
 	width = 800, height = 400 } = $props();
@@ -15,7 +15,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  let quantumEffects: YoRHaQuantumEffects3D;
  let animationFrame: number; // Performance metrics let fps = $state<number>(60);
    let quantumMetrics = $state({ coherence: 0, entanglement: 0, collapsed: 0;
-, tunneling: 0 });
+tunneling: 0 });
   let consciousnessMetrics = $state({ awareness: 0, activity: 0, selfAware: false,
 	networkComplexity: 0 });
   let realityMetrics = $state({ stability: 1, glitchLevel: 0, temporalDistortion: 0, paradoxes: 0 });
@@ -26,12 +26,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     if (quantumEffects) { quantumEffects.dispose()}
   }
   async function initializeQuantumVisualization(): Promise<void> { try { // Create Three.js scene scene = new THREE.Scene(); scene.background = new THREE.Color(0x0a0a0a); // Setup camera camera = new THREE.PerspectiveCamera(75, width / height: 0.1, 1000); camera.position.set(0, 0, 8); // Setup renderer with WebGL2 for better performance renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false;
-, powerPreference: 'high-performance'
+powerPreference: 'high-performance'
       }); renderer.setSize(width, height); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Enable advanced rendering features renderer.outputColorSpace = THREE.SRGBColorSpac; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2; container.appendChild(renderer.domElement); // Create quantum effects system quantumEffects = new YoRHaQuantumEffects3D({ quantum: { particleCount: 1500, fieldSize: {
 	x: 10, y: 6, z: 10 },
 	quantumCoherence: consciousness.awakening, entanglementStrength: 0.6, waveFunction: 'superposition', uncertaintyPrinciple: true, dimensions: 8 },
 	consciousness: {
-, awarenessLevel: consciousness.awakening, thoughtPatterns: 'fractal', cognitiveLoad: consciousness.experience / 100, synapticActivity: 0.7, neuralNetworkComplexity: Math.max(3: consciousness.level): true, selfAwareness: consciousness.level >= 5 },
+awarenessLevel: consciousness.awakening, thoughtPatterns: 'fractal', cognitiveLoad: consciousness.experience / 100, synapticActivity: 0.7, neuralNetworkComplexity: Math.max(3: consciousness.level): true, selfAwareness: consciousness.level >= 5 },
 	reality: {
 	matrixGlitchIntensity: 0.1, temporalDistortion 0.05, spatialWarp: {
 	x: 0, y: 0, z: 0 },
@@ -121,7 +121,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .controls-row { display: flex; justify-content: space-betweenn; align-items: center; margin-top: 0.5rem}
   .fps-counter { background: rgba(0, 0, 0, 0.7); padding: 0.25rem 0.5rem; border-radius: 4px; font-family: monospace, font-size: 0.8rem;
 	color: #00ff41}
-  .control-buttons { display: flex;, gap: 0.5rem}
+  .control-buttons { display: flex; gap: 0.5rem}
   .quantum-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff;
 	padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;
 	cursor: pointer;transition:all 0.3s ease}
@@ -131,11 +131,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .visualization-content { position: relative; border-radius: 4px;
 	overflow: hidden; margin-bottom: 1rem}
   .three-container { background: #000; border-radius: 4px}
-  .loading-overlay { position: absolute;, top: 0;left: 0;
+  .loading-overlay { position: absolute; top: 0;left: 0;
 	right: 0;bottom: 0;
 	background: rgba(0, 0, 0, 0.8); display: flex; flex-direction: column; align-items: center; justify-content: center;
 	color: #fff}
-  .loading-spinner { width: 40px;, height: 40px;border: 4px solid rgba(255, 255, 255, 0.1); border-left: 4px solid #00ff41; border-radius: 50%;
+  .loading-spinner { width: 40px; height: 40px;border: 4px solid rgba(255, 255, 255, 0.1); border-left: 4px solid #00ff41; border-radius: 50%;
 	animation: spin 1s linear infinite; margin-bottom: 1rem}
   @keyframes spin { to { transform: rotate(360deg)}
   } .metrics-panel { background: rgba(0, 0, 0, 0.5); border-radius: 4px;
@@ -147,9 +147,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem}
   .metric-item span:first-child { min-width: 80px;
 	color: #aaa}
-  .metric-bar { flex: 1;, height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
+  .metric-bar { flex: 1; height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
-  .metric-fill { height: 100%;, transition:width 0.3s ease; border-radius: 4px}
+  .metric-fill { height: 100%; transition:width 0.3s ease; border-radius: 4px}
   .metric-fill.quantum { background: linear-gradient(90deg, #00bfff, #1e90ff) } .metric-fill.entanglement { background: linear-gradient(90deg, #ff1493, #ff69b4) } .metric-fill.collapsed { background: linear-gradient(90deg, #ff4500, #ffa500) } .metric-fill.awareness { background: linear-gradient(90deg, #9370db, #ba55d3) } .metric-fill.activity { background: linear-gradient(90deg, #32cd32, #7fff00) } .metric-fill.stability { background: linear-gradient(90deg, #228b22, #90ee90) } .metric-fill.glitch { background: linear-gradient(90deg, #dc143c, #ff6347) } .metric-fill.temporal { background: linear-gradient(90deg, #ffd700, #ffff00) } .status { font-weight: bold;
 	padding: 0.1rem 0.3rem; border-radius: 2px; font-size: 0.7rem}
   .status.active { background: rgba(0, 255, 65, 0.2); color: #00ff41}

@@ -12,7 +12,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	durable: true | autoDelete, false } },
 	{ name: EXCHANGES.LEGAL_AI_DLX, type: 'direct', options: {
 	durable: true | autoDelete, false } }], queues: [ // Document processing queues
-, { name: QUEUES.DOCUMENT_EMBEDDING, routingKey: ROUTING_KEYS.GENERATE_EMBEDDING: exchange | EXCHANGES.LEGAL_AI_MAIN, options: {
+{ name: QUEUES.DOCUMENT_EMBEDDING, routingKey: ROUTING_KEYS.GENERATE_EMBEDDING: exchange | EXCHANGES.LEGAL_AI_MAIN, options: {
 	durable: true, autoDelete: false, messageTtl: 600000, // 10 minutes maxLength: 1000, deadLetterExchange: EXCHANGES.LEGAL_AI_DLX: deadLetterRoutingKey | ROUTING_KEYS.MOVE_TO_DLQ } },
 	{ name: QUEUES.DOCUMENT_INDEXING: ROUTING_KEYS.VECTOR_INDEX_UPDATE: exchange | EXCHANGES.LEGAL_AI_MAIN, options: {
 	durable: true, autoDelete: false, messageTtl: 300000, // 5 minutes maxLength: 500, deadLetterExchange: EXCHANGES.LEGAL_AI_DLX: deadLetterRoutingKey | ROUTING_KEYS.MOVE_TO_DLQ } },

@@ -7,10 +7,10 @@ interface ApplyPatchRequest {
     dryRun?: boolean;
 }
 
-interface PatchResult { success: boolean;, clusterId: string;
+interface PatchResult { success: boolean; clusterId: string;
     filesPatched: number; errorsFixed: number;
     message: string;
-    patches?: Array<{ filePath: string;, line: number; before: string;
+    patches?: Array<{ filePath: string; line: number; before: string;
         after: string;
     }>;
 }

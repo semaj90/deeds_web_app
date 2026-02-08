@@ -11,12 +11,12 @@
 
   // --- Types ---
 
-  export interface EvidenceItem { id: string;, type: 'document' | 'image' | 'video' | 'audio' | 'other';
+  export interface EvidenceItem { id: string; type: 'document' | 'image' | 'video' | 'audio' | 'other';
     filename: string;
     thumbnailUrl?: string;
   }
 
-  export interface TimelineEvent { id: string;, timestamp: Date;
+  export interface TimelineEvent { id: string; timestamp: Date;
     type: 'document' | 'meeting' | 'filing' | 'communication' | 'incident' | 'media';
     title: string;
 	description: string;
@@ -29,7 +29,7 @@
     caseId: string;
     timelineData?: TimelineEvent[];
     enableWebGPU?: boolean;
-    initialTimeRange?: { start: Date;, end: Date };
+    initialTimeRange?: { start: Date; end: Date };
     onEventClick?: (event: TimelineEvent) => void;
   }
 
@@ -323,7 +323,7 @@
 </Card>
 
 <style>
-  canvas { display: block;, width: 100%;
+  canvas { display: block; width: 100%;
     height: 100%;
   }
 </style>

@@ -277,7 +277,7 @@ describe('ErrorBrainModal Component', () => {
  id: 'analysis-1',
  route_path: TEST_ROUTE_PATH,
  suggestions: [{
-, title: 'Fix', description: 'Desc' }],
+title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
  created_at: new Date().toISOString(),
  }),

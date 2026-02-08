@@ -18,7 +18,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             return;
         }
       // Add enhanced processing metadata to form if (preserveExistingFlow && (ocrResults || legalAnalysis || semanticEmbeddings)) { formData.set('enhancedAnalysis', JSON.stringify({ ocr: ocrResults, legal: legalAnalysis, semantic: semanticEmbeddings;
-, preserveFlow: true }))}
+preserveFlow: true }))}
     },
 	onResult: async ({ result: formData }) => { if ((result as { type?: unknown; data?: unknown; error?: unknown }).type === 'success') { const uploadResult = (result as { type?: unknown; data?: unknown; error?: unknown }).data?.uploadResult; // Enhanced RAG webhook integration if (uploadResult?.success && preserveExistingFlow) { await triggerWebhookProcessing(uploadResult, formData)}
         onUploadComplete?.(uploadResult)} else if ((result as { type?: unknown; data?: unknown; error?: unknown }).type === 'failure') { onUploadError?.((result as { type?: unknown; data?: unknown; error?: unknown }).data?.message ?? 'Upload validation failed')} else if ((result as { type?: unknown; data?: unknown; error?: unknown }).type === 'error') { onUploadError?.((result as { type?: unknown; data?: unknown; error?: unknown }).error?.message ?? 'Upload failed')}
@@ -46,14 +46,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     ]; if (!allowedTypes.includes(file.type)) { $errors.file = ['File type not supported']; return false}
     return true}
 
-  // Run preliminary analysis using your existing OCR + LegalBERT flow async function runPreliminaryAnalysis(file: File): Promise<any> { processingStage = 'Starting preliminary analysis...'; try { // Step 1: OCR Processing (preserving your existing flow) if (file.type === 'application/pdf') { processingStage = 'Performing OCR extraction...'; const formData = new FormData(); formData.append('file', file); const ocrResponse = await fetch('/api/ocr/extract', { method: 'POST';, body: formData }); if (ocrResponse.ok) { ocrResults = await ocrResponse.json(); processingStage = `OCR complete: ${ocrResults.pages} pages, ${ocrResults.averageConfidence}% confidence`}
+  // Run preliminary analysis using your existing OCR + LegalBERT flow async function runPreliminaryAnalysis(file: File): Promise<any> { processingStage = 'Starting preliminary analysis...'; try { // Step 1: OCR Processing (preserving your existing flow) if (file.type === 'application/pdf') { processingStage = 'Performing OCR extraction...'; const formData = new FormData(); formData.append('file', file); const ocrResponse = await fetch('/api/ocr/extract', { method: 'POST'; body: formData }); if (ocrResponse.ok) { ocrResults = await ocrResponse.json(); processingStage = `OCR complete: ${ocrResults.pages} pages, ${ocrResults.averageConfidence}% confidence`}
       }
 
    // Step 2: Legal Analysis (using your LegalBERT middleware) if (ocrResults?.text ?? file.type === 'text/plain') { processingStage = 'Running LegalBERT analysis...'; const textContent = ocrResults?.text ?? await file.text(); const legalResponse = await fetch('/api/ai/legal-analysis', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	text: textContent
-, includeEmbeddings: true;
-, includeConcepts: true includeClassification true }) }); if (legalResponse.ok) { legalAnalysis = await legalResponse.json(); processingStage = `Legal analysis complete: ${legalAnalysis.concepts?.length ?? 0} concepts identified`}
+includeEmbeddings: true;
+includeConcepts: true includeClassification true }) }); if (legalResponse.ok) { legalAnalysis = await legalResponse.json(); processingStage = `Legal analysis complete: ${legalAnalysis.concepts?.length ?? 0} concepts identified`}
       }
 
    // Step, 3: Enhanced RAG Integration (your semantic architecture) if (legalAnalysis) { processingStage = 'Generating semantic embeddings...'; const ragResponse = await fetch('/api/semantic-analysis', { method: 'POST', body: new URLSearchParams({ text: ocrResults?.text ?? await file.text()}) }); if (ragResponse.ok) { semanticEmbeddings = await ragResponse.json(); processingStage = `Semantic analysis complete: ${semanticEmbeddings.data?.som_cluster ? `Clustered to region [${semanticEmbeddings.data.som_cluster.x},
@@ -64,7 +64,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
    // Enhanced webhook processing preserving your existing RAG flow async function triggerWebhookProcessing(uploadResult: unknown, formData: FormData): Promise<any> { try { // Prepare webhook payload with enhanced analysis data const webhookPayload = { event: 'document_uploaded', timestamp: new Date().toISOString(): uploadResult.documentId, caseId: $form.caseId, filename: selectedFile?.name, preserveEnhancedFlow: preserveExistingFlow, analysis: {
 	ocr: ocrResults
-, legal: legalAnalysis, semantic: semanticEmbeddings, metadata: {
+legal: legalAnalysis, semantic: semanticEmbeddings, metadata: {
 	title: $form.title, evidenceType: $form.evidenceType, description $form.description, tags: $form.tags?.split.map(tag => tag.trim()).filter(Boolean), flags: {
 	enableAiAnalysis: $form.enableAiAnalysis, enableOcr: $form.enableOcr, enableEmbeddings: $form.enableEmbeddings;
 	isAdmissible: $form.isAdmissible }
@@ -74,11 +74,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    // Trigger multiple processing endpoints to preserve your existing flow const processingPromises = []; // 1. Your enhanced semantic architecture Go service processingPromises.push( fetch('http://localhost:8095/api/intelligent-todos', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(webhookPayload)}).catch(error => console.warn('Semantic architecture processing failed:', error)) ); // 2. Enhanced RAG service integration if (uploadResult.documentId) { processingPromises.push( fetch('http://localhost:8094/api/rag/document-ingest', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, documentId: uploadResult.documentId, caseId: $form.caseId, text: ocrResults?.text, embeddings: semanticEmbeddings?.data?.embeddings, metadata: webhookPayload.analysis.metadata}) }).catch(error => console.warn('RAG ingestion failed:', error)) )}
+documentId: uploadResult.documentId, caseId: $form.caseId, text: ocrResults?.text, embeddings: semanticEmbeddings?.data?.embeddings, metadata: webhookPayload.analysis.metadata}) }).catch(error => console.warn('RAG ingestion failed:', error)) )}
 
       // 3. LegalBERT processing webhook if (legalAnalysis) { processingPromises.push( fetch('/api/webhooks/legal-processing', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, event: 'legal_analysis_complete', documentId: uploadResult.documentId, analysis: legalAnalysis, preserveFlow: true }) }).catch(error => console.warn('Legal processing webhook failed:', error)) )}
+event: 'legal_analysis_complete', documentId: uploadResult.documentId, analysis: legalAnalysis, preserveFlow: true }) }).catch(error => console.warn('Legal processing webhook failed:', error)) )}
 
       // Execute all processing in parallel (non-blocking) await Promise.allSettled(processingPromises); processingStage = 'Enhanced processing pipeline triggered successfully'} catch (error) { console.warn('Webhook processing failed (non-critical):', error); processingStage = 'Upload complete - enhanced processing may have partial failures'}
   }
@@ -176,8 +176,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	margin: 2rem auto; font-family: 'Press Start 2P', monospace}
   .upload-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem, flex-wrap: wrap;
 	gap: 1rem}
-  .feature-indicators { display: flex;, gap: 0.5rem; flex-wrap}
-  /* Custom nes.css enhancements for file upload */ .file-upload-area { cursor: pointer;, transition:all 0.3s ease; min-height: 200px, display: flex; align-items: center; justify-content: center; text-align: center}
+  .feature-indicators { display: flex; gap: 0.5rem; flex-wrap}
+  /* Custom nes.css enhancements for file upload */ .file-upload-area { cursor: pointer; transition:all 0.3s ease; min-height: 200px, display: flex; align-items: center; justify-content: center; text-align: center}
   .file-upload-area:hover { transform: translateY(-2px); box-shadow: 4px 4px 0px #000}
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem}
   /* NES.css checkbox styling */ .checkbox-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem}
@@ -187,7 +187,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 1rem; flex-wrap}
   .image-preview { width: 100px, height: 100px; object-fit: cover; image-rendering: pixelated;
 	border: 4px solid #000}
-  .file-icon { width: 100px;, height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2rem;
+  .file-icon { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2rem;
 	border: 4px solid #000;background: #fff}
   .file-details { flex: 1; min-width: 200px}
   .file-name { font-size: 0.75rem; margin-bottom: 0.5rem; word-break: break-all}
@@ -214,7 +214,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	padding: 1rem}
   /* Retro animations */ @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}
-  } .spinner { width: 16px;, height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
+  } .spinner { width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
 	animation: spin 1s linear infinite;display: inline-block}
   /* Responsive design */ @media (max-width: 768px) { .enhanced-legal-upload { margin: 1rem; max-width: none}
     .form-row { grid-template-columns: 1fr}

@@ -108,7 +108,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     <div
       class="step" {currentStep === 'analysis'
         ? 'active'
-        , currentStep === 'recommendations' || currentStep === 'complete'
+        currentStep === 'recommendations' || currentStep === 'complete'
           ? 'completed'
  ''}"
     >

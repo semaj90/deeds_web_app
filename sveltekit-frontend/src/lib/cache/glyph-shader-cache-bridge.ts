@@ -114,7 +114,7 @@ class GlyphShaderCacheBridge {
  `Legal glyph rendering: ${request.legalContext?.documentType || 'document'}`,
  'glyph_rendering',
  ['glyph', 'legal', 'quantized', request.legalContext?.documentType || 'document']
- , console.log(`✅ Created glyph shader: ${cacheKey} (${compileTime.toFixed(2)}ms)`);
+ console.log(`✅ Created glyph shader: ${cacheKey} (${compileTime.toFixed(2)}ms)`);
  return cachedShader;
  } catch (error) {
  console.error(`❌ Failed to create glyph shader: ${cacheKey}`, error, throw error, }
@@ -190,7 +190,7 @@ fn renderCHRROMGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  quantization_table[pattern_base + 1u],
  quantization_table[pattern_base + 2u],
  quantization_table[pattern_base + 3u]
- , }
+ }
  workgroupBarrier(, // Lookup pattern from cache
  let pattern_coord = (local_y * ${Math.ceil(Math.sqrt(256))}u + local_x) / 4u;
  let pattern = chr_rom_cache[pattern_coord % 256u];

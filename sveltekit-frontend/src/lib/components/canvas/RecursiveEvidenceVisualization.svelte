@@ -76,7 +76,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     } renderNode(hierarchy)}
   function createEvidenceCard(node: unknown | position , { x: number, y: number }): unknown { const cardWidth = 180;
    const cardHeight = 120; // Card background const bg = new (fabric.Rect as unknown)({ width: cardWidth
-, height: cardHeight, fill: getEvidenceCardColor(node), stroke: '#e5e7eb', strokeWidth: 2, rx: 8;
+height: cardHeight, fill: getEvidenceCardColor(node), stroke: '#e5e7eb', strokeWidth: 2, rx: 8;
 	ry: 8 }); // Evidence ID const idLabel = String(node?.evidenceId ?? '').substring(0, 12) + (String(node?.evidenceId ?? '').length > 12 ? '...': '');
    const evidenceId = new (fabric.Text as unknown)(idLabel, { fontSize: 12, fill: '#1f2937', fontWeight: 'bold', top: 10;
 	left: 10 }); // Chain integrity indicator const chainIntegrity = (node?.chainOfCustody?.completeness) ?? 0;

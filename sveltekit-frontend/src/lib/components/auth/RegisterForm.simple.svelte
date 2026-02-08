@@ -4,10 +4,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props { data?: RegisterFormData; redirectTo?: string; showLogin?: boolean}
   let { data, redirectTo = '/dashboard', showLogin = true }: Props = $props(); // Form state let showPassword = $state<boolean>(false); let showConfirmPassword = $state<boolean>(false); let isLoading = $state<boolean>(false); let errorMessage = $state<string>(''); let successMessage = $state<string>(''); // Form data let formData = $state({ email: '', firstName: '', lastName: '', password: '', confirmPassword: '', role: 'analyst', department: '', jurisdiction: '', badgeNumber: '', agreeToTerms: false, agreeToPrivacy: false;
-, enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prosecutor', label: 'Prosecutor' },
+enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prosecutor', label: 'Prosecutor' },
 	{ value: 'investigator', label: 'Investigator' },
 	{ value: 'analyst', label: 'Legal Analyst' },
-	{ value: 'admin';, label: 'Administrator' }]; // Form validation function validateForm(): boolean { if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) { errorMessage = 'Please fill in all required fields'; return false}
+	{ value: 'admin'; label: 'Administrator' }]; // Form validation function validateForm(): boolean { if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) { errorMessage = 'Please fill in all required fields'; return false}
     if (formData.password !== formData.confirmPassword) { errorMessage = 'Passwords do not match'; return false}
     if (formData.password.length < 8) { errorMessage = 'Password must be at least, 8 characters'; return false}
     if (!formData.agreeToTerms || !formData.agreeToPrivacy) {
@@ -19,7 +19,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // Password visibility toggles function togglePasswordVisibility() { showPassword = !showPassword}
   function toggleConfirmPasswordVisibility() { showConfirmPassword = !showConfirmPassword}
 
-  // Password strength checker function calculatePasswordStrength(password: string): { score: number;, feedback: string;
+  // Password strength checker function calculatePasswordStrength(password: string): { score: number; feedback: string;
 	color: string } { if (!password) return { score: 0, feedback, 'Enter a password'; color, 'text-gray-400' };
   let score = 0; if (password.length >= 8) score += 2; if (password.length >= 12) score += 1; if (/[a-z]/.test(password)) score += 1; if (/[A-Z]/.test(password)) score += 1; if (/\d/.test(password)) score += 1; if (/@$!%*?&/.test(password)) score += 1; if (score < 3) return { score, feedback: 'Weak';
 	color: 'text-red-500' }; if (score < 5) return { score, feedback: 'Fair';
@@ -195,11 +195,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <!-- Login, Link -->
   {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover:underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
   </div> </div> ``` <style> .animate-fade-in { animation: fadeIn 0.18s ease-out}`
-  @keyframes fadeIn { from { opacity: 0;, transform: translateY(4px)}
-    to { opacity: 1;, transform: translateY(0)}
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px)}
+    to { opacity: 1; transform: translateY(0)}
   } .bg-muted { background-color: var(--muted, #f3f4f6)}
   .bg-card { background-color: var(--card, #ffffff)}
-  .bits-ghost { background: transparent;, border: 1px solid var(--border, #e5e7eb)}
+  .bits-ghost { background: transparent; border: 1px solid var(--border, #e5e7eb)}
   @media (max-width: 640px) { .max-w-2xl { padding: 1rem}
   }
 </style>

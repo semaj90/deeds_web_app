@@ -40,7 +40,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     onDispatch?: (payload: Record<string, unknown>) => void;
     onsuccess?: (result: unknown) => void;
     onerror?: (error: {
-, message: string }) => void;
+message: string }) => void;
     onclose?: () => void;
   }>();
 
@@ -49,7 +49,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface FormIntegrationType { state: { subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => string };
     context: {
 	subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => unknown };
-    form: { form: Readable<CaseCreationSchemaType>;, submitting: Readable<boolean>;
+    form: { form: Readable<CaseCreationSchemaType>; submitting: Readable<boolean>;
 	allErrors: Readable<string[]>;
       errors: Readable<Record<string, string[]>>;
       enhance: (el: HTMLFormElement) => { destroy: () => void };

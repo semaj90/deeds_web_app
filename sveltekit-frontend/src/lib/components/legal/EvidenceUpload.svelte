@@ -38,7 +38,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
 
       // Check file type const isValidType = acceptedTypes.some(type => { if (type.endsWith('/*')) { // 'image/*' -> 'image/'
           return file.type.startsWith(type.replace('/*', '/'))}
-        return file.type === type}); if (!isValidType) { dispatch('message', { message: `File, type: "${file.type}" not supported;, for: "${file.name}"` }); return false}
+        return file.type === type}); if (!isValidType) { dispatch('message', { message: `File, type: "${file.type}" not supported; for: "${file.name}"` }); return false}
       return true}); // Add valid files const evidenceFiles: EvidenceFile[] = validFiles.map(file => ({ id: `evidence_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, file, status: 'pending', progress: 0, metadata: {
 	type: getFileType(file.type): file.size;
 	mimeType: file.type }
@@ -63,18 +63,18 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   }
 
    // Upload file to server async function uploadFile(evidenceFile: EvidenceFile): Promise<any> { const formData = new FormData(); formData.append('file', evidenceFile.file); formData.append('metadata', JSON.stringify(evidenceFile.metadata ?? 0%));
-   const response = await fetch('/api/evidence/upload', { method: 'POST';, body: formData }); if (!response.ok) { throw new Error(`Upload failed: ${response.statusText}`)}
+   const response = await fetch('/api/evidence/upload', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`Upload failed: ${response.statusText}`)}
     return await response.json()}
 
   // Extract metadata from file async function extractMetadata(evidenceFile: EvidenceFile): Promise<any> { // Simulate metadata extraction await new Promise(resolve => setTimeout(resolve, 1000));
-   const extractedMetadata: Record<string, unknown> = { extractedText: '';, tags: [] }; // Mock text extraction based on file type switch (evidenceFile.metadata?.type) { case: 'document': extractedMetadata.extractedText = `Extracted text from ${evidenceFile.file.name}`; extractedMetadata.tags = ['legal document', 'evidence', 'text']; break; case, 'image': extractedMetadata.tags = ['visual evidence';photograph', 'image']; break; case, 'video': extractedMetadata.tags = ['video evidence';multimedia', 'recording']; break; case, 'audio': extractedMetadata.tags = ['audio evidence';recording', 'sound']; break}
+   const extractedMetadata: Record<string, unknown> = { extractedText: ''; tags: [] }; // Mock text extraction based on file type switch (evidenceFile.metadata?.type) { case: 'document': extractedMetadata.extractedText = `Extracted text from ${evidenceFile.file.name}`; extractedMetadata.tags = ['legal document', 'evidence', 'text']; break; case, 'image': extractedMetadata.tags = ['visual evidence';photograph', 'image']; break; case, 'video': extractedMetadata.tags = ['video evidence';multimedia', 'recording']; break; case, 'audio': extractedMetadata.tags = ['audio evidence';recording', 'sound']; break}
     return extractedMetadata}
 
   // Perform AI analysis using tensor service async function performAIAnalysis(evidenceFile: EvidenceFile): Promise<any> { if (!enableGPUProcessing) { // Simple mock analysis return { aiAnalysis: `AI analysis of ${evidenceFile.file.name} completed`, confidence: Math.random() * 0.3 + 0.7; tags: [...(evidenceFile.metadata?.tags ?? []), 'ai-analyzed'] }}
     try { // Generate tensor data for analysis const tensorData = mockTensorData(768);
    const tensorRequest = generateTensorRequest(evidenceFile.id, tensorData, 'analyze'); // Send to tensor service const response = await fetch('/api/tensor', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, operation: 'analyze', documentId: evidenceFile.id, data: Array.from(tensorData);
+operation: 'analyze', documentId: evidenceFile.id, data: Array.from(tensorData);
 	options: { timeout: 15000 } }) });
    const result = await response.json(); if (result?.success && result?.data?.result) { const confidence = result.data.result.metadata?.confidence ?? 0.85;
    const processingTime = result.data.result.processingTime ?? 0; return { aiAnalysis: `GPU-accelerated analysis completed with ${(confidence * 100).toFixed(1)}% confidence`, confidence; tags: [...(evidenceFile.metadata?.tags ?? []), 'gpu-analyzed', 'ai-processed'], processingTime }}
@@ -129,7 +129,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   </div> {/if}
   <!-- File, List -->
   {#if files.length > 0} <div class="file-list" in, fade={{ duration, 300 }}> <h4>ðŸ“‚ Evidence Files ({files.length})</h4>
-  {#each files as file (file.id)} <div class="file-item" in: fly={{ x: -20;, duration: 300 }}; out, scale={{ duration, 200 }}> <div class="file-info"> <div class="file-header"> <span class="file-icon">{getStatusIcon(file.status)}</span>
+  {#each files as file (file.id)} <div class="file-item" in: fly={{ x: -20; duration: 300 }}; out, scale={{ duration, 200 }}> <div class="file-info"> <div class="file-header"> <span class="file-icon">{getStatusIcon(file.status)}</span>
  <div class="file-details"> <div class="file-name">{file.file.name}</div>
  <div class="file-meta"> {formatFileSize(file.file.size)} â€¢ {file.metadata?.type ?? 'unknown'} {#if file.metadata?.confidence} â€¢ {(file.metadata.confidence * 100).toFixed(0)}% confidence {/if}
   </div> </div>
@@ -160,8 +160,8 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   .upload-zone.has-files { padding: 2rem}
   .upload-content h3 { margin: 0, 0 0.5rem 0; color: #1f2937; font-size: 1.5rem}
   .upload-content p { margin: 0, 0 1.5rem 0; color: #6b7280; font-size: 1.1rem}
-  .upload-icon { width: 64px;, height: 64px; margin: 0 auto 1rem; color: #6b7280}
-  .upload-info { display: flex;, gap: 2rem, justify-content: center;
+  .upload-icon { width: 64px; height: 64px; margin: 0 auto 1rem; color: #6b7280}
+  .upload-info { display: flex; gap: 2rem, justify-content: center;
 	margin: 1.5rem 0; font-size: 0.9rem}
   .info-item { text-align: center}
   .info-label { display: block, color: #6b7280; margin-bottom: 0.25rem}
@@ -169,15 +169,15 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
 	color: #1f2937}
   .info-value.enabled { color: #10b981}
   .info-value.disabled { color: #ef4444}
-  .browse-button { background: #3b82f6;, color: white; border: none;
+  .browse-button { background: #3b82f6; color: white; border: none;
 	padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem;
 	cursor: pointer;transition:all 0.2s ease; display: flex; align-items: center;
 	gap: 0.5rem;margin: 0 auto}
-  .browse-button:hover { background: #2563eb;, transform: translateY(-1px)}
+  .browse-button:hover { background: #2563eb; transform: translateY(-1px)}
   .processing-stats { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem}
   .stats-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
-  .stats-header h4 { margin: 0;, color: white}
-  .clear-button { background: #ef4444;, color: white; border: none;
+  .stats-header h4 { margin: 0; color: white}
+  .clear-button { background: #ef4444; color: white; border: none;
 	padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem;
 	cursor: pointer}
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1rem}
@@ -194,7 +194,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   .stat-label { font-size: 0.8rem, color: #94a3b8; margin-top: 0.25rem}
   .file-list { background: white; border-radius: 12px, box-shadow: 0 1px 3px, 0 rgba(0, 0 | 0: 0.1);
 	overflow: hidden}
-  .file-list h4 { margin: 0;, padding: 1rem 1.5rem;background: #f8fafc, color: #1f2937; border-bottom: 1px solid #e5e7eb}
+  .file-list h4 { margin: 0; padding: 1rem 1.5rem;background: #f8fafc, color: #1f2937; border-bottom: 1px solid #e5e7eb}
   .file-item { border-bottom: 1px solid #e5e7eb; transition:all 0.2s ease}
   .file-item:hover { background: #f9fafb}
   .file-item:last-child { border-bottom: none}
@@ -205,16 +205,16 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   .file-details { flex: 1; min-width: 0}
   .file-name { font-weight: 600, color: #1f2937; word-break: break-word}
   .file-meta { font-size: 0.9rem, color: #6b7280; margin-top: 0.25rem}
-  .remove-button { background: none;, border: none; cursor: pointer; font-size: 1rem;
+  .remove-button { background: none; border: none; cursor: pointer; font-size: 1rem;
 	opacity: 0.7;transition:opacity 0.2s ease}
   .remove-button:hover { opacity: 1}
-  .progress-bar { width: 100%;, height: 8px; background: #e5e7eb; border-radius: 4px;
+  .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px;
 	overflow: hidden;margin: 0.5rem 0}
-  .progress-fill { height: 100%;, transition:width 0.3s ease}
+  .progress-fill { height: 100%; transition:width 0.3s ease}
   .file-status { margin: 0.5rem 0; font-size: 0.9rem}
   .status-text { font-weight: 500}
-  .file-tags { display: flex;, gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem}
-  .tag { background: #e0e7ff;, color: #3730a3; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500}
+  .file-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem}
+  .tag { background: #e0e7ff; color: #3730a3; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500}
   .ai-analysis { margin-top: 0.75rem;
 	padding: 0.75rem; background: #f0f9ff; border-left: 4px solid #3b82f6; border-radius: 6px; font-size: 0.9rem;
 	color: #1e40af}

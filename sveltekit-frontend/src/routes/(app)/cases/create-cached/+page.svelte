@@ -10,7 +10,7 @@
 
 	const cache = useCache();
 
-	interface CaseFormData { title: string;, description: string;
+	interface CaseFormData { title: string; description: string;
 		priority: 'low' | 'medium' | 'high' | 'critical';
 		caseType: string;
 	assignedTo: string;

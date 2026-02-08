@@ -241,7 +241,7 @@ typeof metrics?.totalRequests === 'number'
  : Number(metrics?.totalRequests) ?? 0;
 typeof metrics?.successfulRequests === 'number'
  ? metrics.successfulRequests
- , Number(metrics?.successfulRequests) ?? 0;
+ Number(metrics?.successfulRequests) ?? 0;
 
  const successRate = totalRequestsNum > 0 ? successfulRequestsNum / totalRequestsNum : undefined;
 

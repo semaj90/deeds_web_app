@@ -21,7 +21,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	document_type: 'brief', jurisdiction: 'federal', confidence: 0.8, content: doc.content;
 	vectorEmbedding: Array(384).fill.map(() => Math.random() * 2 - 1)}
       })); const results = await legalAIPipeline.processBulkLegalDocuments(bulkDocStrings, { enableParallelProcessing: true
-, batchSize: 3, enableClustering: true, progressCallback: (progress, message) => { addLog(`ðŸ“Š ${message} (${progress.toFixed(1)}%)`))}
+batchSize: 3, enableClustering: true, progressCallback: (progress, message) => { addLog(`ðŸ“Š ${message} (${progress.toFixed(1)}%)`))}
       }); bulkResults = result; const totalEntities = results.reduce((sum, r) => sum + (r.metadata.entities?.length ?? 0), 0); const totalCitations = results.reduce((sum, r) => sum + (r.metadata.citations?.length ?? 0), 0); const avgConfidence = results.reduce((sum, r) => sum + r.metadata.confidence, 0) / results.length; addLog(`âœ… Bulk processing complete:`), addLog(`ðŸ“„ ${results.length} documents processed`); addLog(`ðŸ›ï¸ ${totalEntities} total entities extracted`); addLog(`ðŸ“š ${totalCitations} total citations found`); addLog(`ðŸŽ¯ Average confidence: ${(avgConfidence * 100).toFixed(1)}%`)} catch (error) { addLog(`âŒ Bulk processing failed: ${error}`); console.error('Bulk processing error:', error)} finally { isBulkProcessing = false}
 '
   }

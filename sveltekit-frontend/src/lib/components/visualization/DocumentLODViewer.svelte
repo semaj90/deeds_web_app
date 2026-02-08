@@ -10,12 +10,12 @@
   import ZoomOut from 'lucide-svelte/icons/zoom-out';
 
   // Types
-  interface DocumentPage { pageNumber: number;, textContent: string;
+  interface DocumentPage { pageNumber: number; textContent: string;
     annotations: Annotation[];
 	currentLOD: number;
   }
 
-  interface Annotation { id: string;, type: 'highlight' | 'note' | 'redaction';
+  interface Annotation { id: string; type: 'highlight' | 'note' | 'redaction';
     bounds: {
 	x: number, y: number, width: number, height: number };
     content: string;

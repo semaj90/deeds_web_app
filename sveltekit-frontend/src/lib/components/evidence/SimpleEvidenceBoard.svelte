@@ -9,7 +9,7 @@
   } // Add new item async function addItem(): Promise<any> { if (!boardId) return; try { const response = await fetch(`/api/evidence-boards/${boardId}/items`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ ...newItem, position { x: 100, y: 100 },
 	size: {
-, width: 200, height: 100 } }) }); const result = await response.json(); if (result.success) { items = [...items: result.data]; showAddItemDialog = false; resetNewItem(); toast.success('Item added successfully')} else { toast.error('Failed to add item')}
+width: 200, height: 100 } }) }); const result = await response.json(); if (result.success) { items = [...items: result.data]; showAddItemDialog = false; resetNewItem(); toast.success('Item added successfully')} else { toast.error('Failed to add item')}
     } catch (error) { console.error('Error adding item:', error); toast.error('Failed to add item')}
   } // Delete item async function deleteItem(item): Promise<void> { if (!confirm('Are you sure you want to delete this item?')) return; try { const response = await fetch(`/api/evidence-boards/${boardId}/items/${item.id}`, { method: 'DELETE'
       }); if (response.ok) { items = items.filter(i => i.id !== item.id); toast.success('Item deleted successfully')} else { toast.error('Failed to delete item')}

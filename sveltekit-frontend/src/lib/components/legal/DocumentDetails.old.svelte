@@ -657,7 +657,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                       onclick={toggleGPUAnalysis}
                       class="text-sm" {showGPUAnalysis
                         ? 'bg-purple-100 text-purple-700'
-                        , 'bg-gray-100'},
+                        'bg-gray-100'},
 	hover:bg-purple-200 px-3 py-1 rounded"
                     >
                       {showGPUAnalysis ? 'ðŸ§  GPU Active' : 'âš¡ GPU Analysis'}

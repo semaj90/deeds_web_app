@@ -24,7 +24,7 @@ interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) =>
     },
 	{
       id: 'nomic-embed', name: 'nomic-embed-text', displayName: 'Nomic Embeddings', provider: 'ollama', size: '274MB', specialization: 'embedding', status: 'online', performance: {
-, tokensPerSecond: 500, memoryUsage: '512MB', responseTime: 100 },
+tokensPerSecond: 500, memoryUsage: '512MB', responseTime: 100 },
 	capabilities: ['text-embedding', 'similarity-search', 'vector-generation'], endpoint: 'http://localhost:11434'
     }]); // Filter models based on criteria let filteredModels = $derived( filterBy === 'all' ? availableModels: availableModels.filter(model => model.specialization === filterBy) ); // Melt UI Select Setup // const { // elements: { trigger, menu, option, label },
 	// states: { selectedLabel, open, selected },
@@ -53,7 +53,7 @@ interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) =>
    // Trigger reactivity availableModels = [...availableModels]}
   async function loadModel(model: LLMModel): Promise<any> { if (model.status === 'online') return; model.status = 'loading'; availableModels = [...availableModels]; try { const response = await fetch(`${model.endpoint}/api/pull`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, name: model.name }) }); if (response.ok) { model.status = 'online'} else { model.status = 'error'}
+name: model.name }) }); if (response.ok) { model.status = 'online'} else { model.status = 'error'}
     } catch (error) { model.status = 'error'}
     availableModels = [...availableModels]}
 </script>

@@ -75,7 +75,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         provider: selectedProvider,
         payload: taskTemplate.payload,
         metadata: {
-, userId: 'demo-user',
+userId: 'demo-user',
           sessionId: 'demo-session',
           timestamp: Date.now()
         }

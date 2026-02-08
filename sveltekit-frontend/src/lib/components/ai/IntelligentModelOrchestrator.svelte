@@ -102,7 +102,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             userContext: {
 	sessionId: 'demo' },
 	intent: {
-, category: 'general', confidence: 0.8 }
+category: 'general', confidence: 0.8 }
           }
         })}
     } catch (error) {

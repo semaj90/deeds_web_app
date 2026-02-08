@@ -28,7 +28,7 @@ export function useEvidenceCanvas() {
     let canvasState = $state<CanvasState>({
         zoom: 1.0,
         pan: {
-, x: 0, y: 0 },
+x: 0, y: 0 },
 	selectedItems: [],
         mode: 'view',
         showConnections: true,

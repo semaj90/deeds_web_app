@@ -1,7 +1,7 @@
 <script lang="ts">
  // Migrated to $effect
 
- interface MonitoringStats { timestamp: string;, summary: { totalErrors: number;, totalRoutes: number;
+ interface MonitoringStats { timestamp: string; summary: { totalErrors: number; totalRoutes: number;
  totalClusters: number;
 totalSuggestions: number;
  appliedSuggestions: number;
@@ -10,7 +10,7 @@ totalSuggestions: number;
 count: number }> };
  routes: { byHealth: Array<{ state: string;
 count: number }>;
- top: Array<{ routePath: string;, errorState: string;
+ top: Array<{ routePath: string; errorState: string;
 recentErrorCount: number;
  lastErrorAt: string;
  }>;
@@ -18,9 +18,9 @@ recentErrorCount: number;
  suggestions: { byRisk: Array<{ level: string;
 count: number }>; applied: number;
 effectiveness: number };
- topErrors: Array<{ tsCode: string;, count: number;
+ topErrors: Array<{ tsCode: string; count: number;
 messages: string[] }>;
- errorVelocity: Array<{ date: string;, count: number }>;
+ errorVelocity: Array<{ date: string; count: number }>;
  }
 
 	let stats = $state<MonitoringStats | null>(null);

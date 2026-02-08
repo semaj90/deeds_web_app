@@ -10,7 +10,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	timestamp: number, synthesizedInput?: unknown; legalAnalysis?: unknown; ragResults?: unknown; confidence?: number; processingTime?: number; metadata?: unknown}
 
   // State management let messages = writable<EnhancedMessage[]>([]); let currentInput = $state<string>(''); let isProcessing = $state<boolean>(false); let showAdvancedAnalysis = $state<boolean>(false); let showSettings = $state<boolean>(false); // Database integration state let currentSessionId = $state<string | null>(null); let relatedReports = $state<any[]>([]); let isSavingToDatabase = $state<boolean>(false); let lastSyncTime = $state<Date | null>(null); // Streaming typewriter effect state let streamingMessageId = $state<string | null>(null); let streamingContent = $state<string>(''); let isStreaming = $state<boolean>(false); let streamingChunks = $state<string[]>([]); let currentChunkIndex = $state<number>(0); let typewriterSpeed = $state<number>(30); // milliseconds per character // Advanced settings let settings = $state({ enableLegalBERT: true
-, enableRAG: true, enableInputSynthesis: true, maxDocuments: 10, enhancementLevel: 'comprehensive', includeConfidenceScores: true, enableStreamingResponse: true, enableTypewriterEffect: true;
+enableRAG: true, enableInputSynthesis: true, maxDocuments: 10, enhancementLevel: 'comprehensive', includeConfidenceScores: true, enableStreamingResponse: true, enableTypewriterEffect: true;
 	typewriterSpeed: 30, // milliseconds per character chunkSize: 3, // characters per chunk }); // UI state let chatContainer: HTMLDivElement;
  let inputElement: HTMLInputElement;
  let currentAnalysis = $state<any>(null); let systemStatus = $state({ legalBERT: 'unknown', rag: 'unknown', synthesis: 'unknown';
@@ -33,7 +33,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	metadata: msg.ai_metadata})); messages.set(loadedMessages); lastSyncTime = new Date())}
     } catch (error) { console.warn('Failed to load chat history:', error)}
   } /** * Save message to database with vector embedding */ async function saveMessageToDatabase(message: EnhancedMessage): Promise<any> { if (!currentSessionId || !persistConversation || !browser) return; try { isSavingToDatabase = true; const messageData = { sessionId: currentSessionId
-, role: message.role, content: message.content, synthesizedInput: message.synthesizedInput || null, legalAnalysis: message.legalAnalysis || null, ragResults: message.ragResults || null, confidence: message.confidence?.toString() ?? null, processingTime: message.processingTime?.toString() ?? null; aiMetadata: message.metadata || null}
+role: message.role, content: message.content, synthesizedInput: message.synthesizedInput || null, legalAnalysis: message.legalAnalysis || null, ragResults: message.ragResults || null, confidence: message.confidence?.toString() ?? null, processingTime: message.processingTime?.toString() ?? null; aiMetadata: message.metadata || null}
       const response = await fetch('/api/v1/chat/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(messageData)}); if ((response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { lastSyncTime = new Date())}
     } catch (error) { console.warn('Failed to save message to database:', error)} finally { isSavingToDatabase = false}

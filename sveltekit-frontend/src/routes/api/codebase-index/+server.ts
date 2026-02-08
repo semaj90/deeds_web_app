@@ -5,7 +5,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const COLLECTION_NAME = 'fastmcp_file_profiles';
 
-interface FileProfile { file_path: string;, role: string;
+interface FileProfile { file_path: string; role: string;
 	surface: string[]; dependencies: string[];
 	exports: string[]; imports: string[];
 	comments: string[]; risk: string;
@@ -14,7 +14,7 @@ interface FileProfile { file_path: string;, role: string;
 	generated_at: string;
 }
 
-interface QdrantPoint { id: number;, payload: FileProfile;
+interface QdrantPoint { id: number; payload: FileProfile;
 	vector?: number[];
 }
 

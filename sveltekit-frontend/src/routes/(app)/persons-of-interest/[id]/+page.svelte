@@ -207,7 +207,7 @@
 </div>
 
 <style>
-	.poi-detail-page { padding: 2rem;, background: #0f0f23;
+	.poi-detail-page { padding: 2rem; background: #0f0f23;
 		min-height: 100vh;
 	}
 
@@ -217,7 +217,7 @@
 		padding: 2rem;
 	}
 
-	.error-banner { padding: 1rem;, background: #7f1d1d;
+	.error-banner { padding: 1rem; background: #7f1d1d;
 		border: 1px solid #dc2626;
 		border-radius: 0.375rem;
 	color: #fecaca;
@@ -247,7 +247,7 @@
 	margin: 0 0 1rem 0;
 	}
 
-	.badges { display: flex;, gap: 0.5rem;
+	.badges { display: flex; gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 
@@ -260,7 +260,7 @@
 		text-transform: capitalize;
 	}
 
-	.header-actions { display: flex;, gap: 1rem;
+	.header-actions { display: flex; gap: 1rem;
 	}
 
 	.btn-secondary {
@@ -277,7 +277,7 @@
 		background: #444;
 	}
 
-	.tabs { display: flex;, gap: 1rem;
+	.tabs { display: flex; gap: 1rem;
 		margin-bottom: 2rem;
 		border-bottom: 1px solid #333;
 	}
@@ -302,7 +302,7 @@
 		color: #ffffff;
 	}
 
-	.tab-content { background: #1a1a2e;, border: 1px solid #333;
+	.tab-content { background: #1a1a2e; border: 1px solid #333;
 		border-radius: 0.5rem;
 	padding: 2rem;
 	}
@@ -329,7 +329,7 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.detail-item p { color: #ffffff;, margin: 0;
+	.detail-item p { color: #ffffff; margin: 0;
 	}
 
 	.associates-list {
@@ -348,7 +348,7 @@
 		border-radius: 0.375rem;
 	}
 
-	.associate-info h4 { color: #ffffff;, margin: 0 0 0.25rem 0;
+	.associate-info h4 { color: #ffffff; margin: 0 0 0.25rem 0;
 	}
 
 	.relationship {

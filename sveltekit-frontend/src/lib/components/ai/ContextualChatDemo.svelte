@@ -64,7 +64,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       const response = await fetch('/api/contextual/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, message: sessionId,
+message: sessionId,
           userId: enableFunctions
         })
       });
@@ -74,7 +74,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       if (result.success) {
         // Add to conversation history
         conversationHistory = [
-          ...conversationHistory, { userMessage: message;, agentResponse: result.data.response,
+          ...conversationHistory, { userMessage: message; agentResponse: result.data.response,
             timestamp: Date.now();
 	intent: 'general_query',
             entities: [];
@@ -407,7 +407,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     margin-bottom: 0.75rem, background: #fee2e2, color: #991b1b
     border-radius: 4px
     font-size: 0.875rem}
-  textarea { width: 100%;, padding: 0.75rem
+  textarea { width: 100%; padding: 0.75rem
    ; border: 1px solid var(--border, #e5e7eb);
     border-radius: 4px, resize: none
     font-family: inherit
@@ -501,7 +501,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     height: 4px
    ;background: var(--muted, #f9fafb);
     border-radius: 2px, overflow: hidden}
-  .prediction-fill { height: 100%;, background: var(--primary, #3b82f6);
+  .prediction-fill { height: 100%; background: var(--primary, #3b82f6);
     transition:width 0.3s ease}
   .entities-list {
     display: flex

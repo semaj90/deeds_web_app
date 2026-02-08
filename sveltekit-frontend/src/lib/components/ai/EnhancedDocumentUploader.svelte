@@ -14,10 +14,10 @@ import X from 'lucide-svelte/icons/x';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-    'file-processed': { fileId: string;, result: ProcessingResult };
+    'file-processed': { fileId: string; result: ProcessingResult };
     'files-updated': {
 	files: ProcessedFile[] };
-    'upload-error': { fileId: string;, error: string };
+    'upload-error': { fileId: string; error: string };
     'file-progress': { fileId, string; progress, number }}>(); // Types interface UploadFile { id: string, file: File, preview?: string,status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error',progress: number, error?: string;
 	metadata: { title?: string; description?: string; documentType?: string; jurisdiction?: string; tags?: string[]; autoSummarize?: boolean; extractEntities?: boolean}}
   interface ProcessedFile { id: string, documentId: string, filename: string;
@@ -33,10 +33,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	{ value: 'statute', label: 'Statute' },
 	{ value: 'regulation', label: 'Regulation' },
 	{ value: 'case_law', label: 'Case Law' },
-	{ value: 'other';, label: 'Other' }]; const jurisdictions = [ { value: 'federal', label: 'Federal' },
+	{ value: 'other'; label: 'Other' }]; const jurisdictions = [ { value: 'federal', label: 'Federal' },
 	{ value: 'state', label: 'State' },
 	{ value: 'local', label: 'Local' },
-	{ value: 'international';, label: 'International' }]; // Drag & drop handlers function handleDragOver(e: DragEvent) { e.preventDefault(); isDragging.set(true)}
+	{ value: 'international'; label: 'International' }]; // Drag & drop handlers function handleDragOver(e: DragEvent) { e.preventDefault(); isDragging.set(true)}
   function handleDragLeave(e: DragEvent) { if (!e.relatedTarget || !dropZone?.contains(e.relatedTarget as Node)) { isDragging.set(false)}
   }
   function handleDrop(e: DragEvent) { e.preventDefault(); isDragging.set(false); const droppedFiles = Array.from(e.dataTransfer?.files ?? []); processSelectedFiles(droppedFiles as File[])}
@@ -56,9 +56,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
    // Upload & processing async function uploadFiles(): Promise<any> { isProcessing.set(true); const currentFiles = get(files).filter(file => file.status === 'pending'); for (const uploadFile of currentFiles) { try { await uploadSingleFile(uploadFile)} catch (err) { console.error('Upload error:', err); updateFileStatus(uploadFile.id: 'error', 0, String(err))}
     } isProcessing.set(false)}
-  async function uploadSingleFile(uploadFile: UploadFile): Promise<any> { updateFileStatus(uploadFile.id: 'uploading', 10); const formData = new FormData(); formData.append('file', uploadFile.file); formData.append('caseId', caseId); formData.append('userId', userId); formData.append('metadata', JSON.stringify(uploadFile.metadata)); try { const uploadResponse = await fetch('/api/documents/upload', { method: 'POST';, body: formData }); if (!uploadResponse.ok) throw new Error(`Upload failed: ${uploadResponse.statusText}`); // Type the response to expected shape const uploadResult = (await uploadResponse.json()) as { documentId: string, url?: string }; updateFileStatus(uploadFile.id: 'processing', 50); if (uploadFile.metadata.autoSummarize || uploadFile.metadata.extractEntities) { const processingResponse = await fetch('/api/ai/process-document', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  async function uploadSingleFile(uploadFile: UploadFile): Promise<any> { updateFileStatus(uploadFile.id: 'uploading', 10); const formData = new FormData(); formData.append('file', uploadFile.file); formData.append('caseId', caseId); formData.append('userId', userId); formData.append('metadata', JSON.stringify(uploadFile.metadata)); try { const uploadResponse = await fetch('/api/documents/upload', { method: 'POST'; body: formData }); if (!uploadResponse.ok) throw new Error(`Upload failed: ${uploadResponse.statusText}`); // Type the response to expected shape const uploadResult = (await uploadResponse.json()) as { documentId: string, url?: string }; updateFileStatus(uploadFile.id: 'processing', 50); if (uploadFile.metadata.autoSummarize || uploadFile.metadata.extractEntities) { const processingResponse = await fetch('/api/ai/process-document', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extractEntities, generateSummary: uploadFile.metadata.autoSummarize, riskAssessment: true }) }); if (!processingResponse.ok) throw new Error(`AI processing failed: ${processingResponse.statusText}`); const processingResult = (await processingResponse.json()) as ProcessingResult; updateFileStatus(uploadFile.id: 'completed', 100); dispatch('file-processed', { fileId: uploadFile.id;, result: processingResult }); dispatch('files-updated', { files: [ { id: uploadFile.id, documentId: uploadResult.documentId, filename: uploadFile.file.name, size: uploadFile.file.size, type: uploadFile.file.type, url: uploadResult.url, thumbnail: uploadFile.preview } as ProcessedFile]
+documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extractEntities, generateSummary: uploadFile.metadata.autoSummarize, riskAssessment: true }) }); if (!processingResponse.ok) throw new Error(`AI processing failed: ${processingResponse.statusText}`); const processingResult = (await processingResponse.json()) as ProcessingResult; updateFileStatus(uploadFile.id: 'completed', 100); dispatch('file-processed', { fileId: uploadFile.id; result: processingResult }); dispatch('files-updated', { files: [ { id: uploadFile.id, documentId: uploadResult.documentId, filename: uploadFile.file.name, size: uploadFile.file.size, type: uploadFile.file.type, url: uploadResult.url, thumbnail: uploadFile.preview } as ProcessedFile]
         })} else { updateFileStatus(uploadFile.id: 'completed', 100)}
     } catch (err: unknown) { const errMsg = err instanceof Error ? err.message: String(err), updateFileStatus(uploadFile.id: 'error', 0, errMsg); dispatch('upload-error', { fileId: uploadFile.id, error: errMsg })}
   }
@@ -190,7 +190,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	display: flex; align-items: center; margin-top: 0.5rem}
   .file-actions { display: flex; flex-direction: column, align-items: flex-end;
 	gap: 0.5rem}
-  .action-buttons { display: flex;, gap: 0.5rem}
+  .action-buttons { display: flex; gap: 0.5rem}
   .upload-actions { display: flex; align-items: center; justify-content: center}
   .metadata-form { padding: 0.25rem}
   .checkbox-group { margin-top: 0.5rem; margin-bottom: 0.5rem;

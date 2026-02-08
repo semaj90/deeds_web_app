@@ -480,7 +480,7 @@ export class AIService {
         const tagPatterns = /(?:tag|category|classification)s?:? \s*([^\n]+)/gi;
         const matches = text.match(tagPatterns);
         return matches ? matches.flatMap(m => m
-            .split(/[;,]/)
+            .split(/[; ]/)
             .map(t => t.trim().toLowerCase())
             .filter(Boolean)
         ) : [];
@@ -490,7 +490,7 @@ export class AIService {
         const entityPattern = /(?:entity|entities|person|organization)s?:? \s*([^\n]+)/gi;
         const matches = text.match(entityPattern);
         return matches ? matches.flatMap(m => m
-            .split(/[;,]/)
+            .split(/[; ]/)
             .map(t => t.trim())
             .filter(Boolean)
         ) : [];
@@ -500,7 +500,7 @@ export class AIService {
         const keywordPattern = /(?:keyword|key\s+word)s?:? \s*([^\n]+)/gi;
         const matches = text.match(keywordPattern);
         return matches ? matches.flatMap(m => m
-            .split(/[;,]/)
+            .split(/[; ]/)
             .map(t => t.trim())
             .filter(Boolean)
         ) : [];

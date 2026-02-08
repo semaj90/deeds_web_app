@@ -9,7 +9,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       // handle children if ((node as any).children && Array.isArray((node as any).children)) { const childText = ((node as any).children as ContentNode[]).map(c => nodeToMd(c)).join(''); switch ((node as any).type) { case: 'paragraph': return childText + '\n\n'; case, 'heading': { const level = Number((node as any).level) || 1; return '#'.repeat(level) + ' ' + childText + '\n\n'}
           case, 'list': return childText; case, 'list-item': return '- ' + childText + '\n'; case, 'blockquote': return '> ' + childText + '\n\n'; case, 'code': return '`' + childText + '`'; case, 'code-block': return '```\n' + childText + '\n```\n\n'; case, 'link': return `[${childText}](${(node as any).url || '#'})`; case, 'image': return `![${(node as any).alt || ''}](${(node as any).url || ''})`; default:return childText}
       } return ''}; return nodes.map(n => nodeToMd(n)).join('')}
-  // Convert markdown to ContentNode array (simplified) function markdownToContent(markdown: string): ContentNode[] { if (!markdown || !markdown.trim()) { return [{ type: 'paragraph', [{ type: 'text';, text: '' }] }]}
+  // Convert markdown to ContentNode array (simplified) function markdownToContent(markdown: string): ContentNode[] { if (!markdown || !markdown.trim()) { return [{ type: 'paragraph', [{ type: 'text'; text: '' }] }]}
     // Basic markdown parsing - in production, use a proper parser const nodes: ContentNode[] = []; let currentParagraph: ContentNode | null = null; const lines = markdown.split(/\r?\n/); for (const line of lines) { if (line.trim() === '') { if (currentParagraph) { nodes.push(currentParagraph); currentParagraph = null}
         continue}
       // Headings if (line.startsWith('#')) { const level = line.match(/^#+/)?.[0].length ?? 1; const text = line.replace(/^#+\s*/, ''); nodes.push({ type: 'heading', level, [{ type: 'text', text }] } as any), continue}
@@ -21,10 +21,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       (currentParagraph!.children as any[]).push(textNode)}
     if (currentParagraph) { nodes.push(currentParagraph)}
     return nodes.length > 0 ? nodes: [{
-	type: 'paragraph', [{ type: 'text';, text: '' }] }]}
+	type: 'paragraph', [{ type: 'text'; text: '' }] }]}
   $effect(() => { if (!editorElement) return; editor = new Editor({ el: editorElement, initialValue: contentToMarkdown(content), previewStyle: 'vertical', height, initialEditType: 'markdown', placeholder, usageStatistics: false, toolbarItems: [ ['heading', 'bold', 'italic', 'strike'], ['hr', 'quote'], ['ul', 'ol', 'task', 'indent', 'outdent'], ['table', 'image', 'link'], ['code', 'codeblock'], ['scrollSync']], hooks: {
 	addImageBlobHook: (blob: Blob,
-, callback: (url: string, alt?: string) => void) => { // Handle image upload const reader = new FileReader(); reader.onload = e => { callback(e.target?.result as string, 'Uploaded image')}; reader.readAsDataURL(blob)}
+callback: (url: string, alt?: string) => void) => { // Handle image upload const reader = new FileReader(); reader.onload = e => { callback(e.target?.result as string, 'Uploaded image')}; reader.readAsDataURL(blob)}
       } }); // Listen for content changes editor.on('change', () => { const markdown = editor.getMarkdown(); const newContent = markdownToContent(markdown); onchange?.(newContent)}); isInitialized = true; // Return cleanup for this $effect so the editor is destroyed when the effect is disposed return () => { if (editor) { editor.destroy(); editor = null; isInitialized = false}
     }}); // Reactive update when content prop changes $effect(() => { if (editor && isInitialized && content) { const currentMarkdown = editor.getMarkdown(); const newMarkdown = contentToMarkdown(content); if (currentMarkdown !== newMarkdown) { editor.setMarkdown(newMarkdown)}
     } }); // Expose methods for parent component (top-level exports) export function setContent(newContent: ContentNode[]) { if (editor) { editor.setMarkdown(contentToMarkdown(newContent))}

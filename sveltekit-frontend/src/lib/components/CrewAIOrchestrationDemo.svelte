@@ -42,7 +42,7 @@
       response: {
         agentId,
         analysis: {
-, confidence: Math.random() * 0.4 + 0.6,
+confidence: Math.random() * 0.4 + 0.6,
           findings: [
             `Finding 1 from ${agentId}`,
             `Finding 2 from ${agentId}`,
@@ -314,7 +314,7 @@
     font-size: 1.1rem;
   }
 
-  .control-panel { background: #f9f9f9;, border: 1px solid #ddd;
+  .control-panel { background: #f9f9f9; border: 1px solid #ddd;
     border-radius: 8px;
 	padding: 1.5rem;
     margin-bottom: 2rem;
@@ -339,7 +339,7 @@
   }
 
   input,
-  select { padding: 0.5rem;, border: 1px solid #ddd;
+  select { padding: 0.5rem; border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
   }
@@ -369,24 +369,24 @@
 	transition:all 0.2s;
   }
 
-  .btn-primary { background: #0066cc;, color: white;
+  .btn-primary { background: #0066cc; color: white;
   }
 
   .btn-primary:hover:not(:disabled) {
     background: #0052a3;
   }
 
-  .btn-primary:disabled { background: #ccc;, cursor: not-allowed;
+  .btn-primary:disabled { background: #ccc; cursor: not-allowed;
   }
 
-  .btn-secondary { background: #e0e0e0;, color: #333;
+  .btn-secondary { background: #e0e0e0; color: #333;
   }
 
   .btn-secondary:hover {
     background: #d0d0d0;
   }
 
-  .btn-danger { background: #cc0000;, color: white;
+  .btn-danger { background: #cc0000; color: white;
   }
 
   .btn-danger:hover {
@@ -398,7 +398,7 @@
     font-size: 0.85rem;
   }
 
-  .btn-small.accept { background: #00cc66;, color: white;
+  .btn-small.accept { background: #00cc66; color: white;
   }
 
   .btn-small.accept:hover:not(:disabled) {
@@ -412,7 +412,7 @@
   .status-panel,
   .agents-panel,
   .responses-panel,
-  .recommendations-panel { background: white;, border: 1px solid #ddd;
+  .recommendations-panel { background: white; border: 1px solid #ddd;
     border-radius: 8px;
 	padding: 1.5rem;
     margin-bottom: 2rem;
@@ -422,7 +422,7 @@
     margin-bottom: 1.5rem;
   }
 
-  progress { width: 100%;, height: 24px;
+  progress { width: 100%; height: 24px;
     border-radius: 4px;
     margin-top: 0.5rem;
   }
@@ -431,18 +431,18 @@
     margin-bottom: 1.5rem;
   }
 
-  .quality-badge { display: inline-block;, padding: 0.25rem 0.75rem;
+  .quality-badge { display: inline-block; padding: 0.25rem 0.75rem;
     border-radius: 4px;
     font-weight: bold;
   }
 
-  .quality-badge.excellent { background: #00cc66;, color: white;
+  .quality-badge.excellent { background: #00cc66; color: white;
   }
 
-  .quality-badge.good { background: #ffaa00;, color: white;
+  .quality-badge.good { background: #ffaa00; color: white;
   }
 
-  .quality-badge.fair { background: #ff6600;, color: white;
+  .quality-badge.fair { background: #ff6600; color: white;
   }
 
   .metrics {
@@ -472,38 +472,38 @@
 	gap: 0.5rem;
   }
 
-  .badge { display: inline-block;, padding: 0.25rem 0.5rem;
+  .badge { display: inline-block; padding: 0.25rem 0.5rem;
     background: #e0e0e0;
     border-radius: 3px;
     font-size: 0.85rem;
   }
 
-  .badge.orchestrating { background: #0066cc;, color: white;
+  .badge.orchestrating { background: #0066cc; color: white;
   }
 
-  .badge.completed { background: #00cc66;, color: white;
+  .badge.completed { background: #00cc66; color: white;
   }
 
-  .badge.failed { background: #cc0000;, color: white;
+  .badge.failed { background: #cc0000; color: white;
   }
 
-  .badge.idle { background: #999;, color: white;
+  .badge.idle { background: #999; color: white;
   }
 
-  .error-box { background: #ffe0e0;, border: 1px solid #cc0000;
+  .error-box { background: #ffe0e0; border: 1px solid #cc0000;
     border-radius: 4px;
 	padding: 1rem;
     margin-top: 1rem;
 	color: #cc0000;
   }
 
-  .error-actions { display: flex;, gap: 0.5rem;
+  .error-actions { display: flex; gap: 0.5rem;
     margin-top: 0.75rem;
   }
 
   .agents-list,
   .responses-list,
-  .recommendations-list { display: grid;, gap: 0.75rem;
+  .recommendations-list { display: grid; gap: 0.75rem;
   }
 
   .agent-item {
@@ -521,7 +521,7 @@
     border-left-color: #00cc66;
   }
 
-  .response-item { padding: 1rem;, background: #f5f5f5;
+  .response-item { padding: 1rem; background: #f5f5f5;
     border-left: 4px solid #0066cc;
     border-radius: 4px;
   }
@@ -533,7 +533,7 @@
     margin-bottom: 0.5rem;
   }
 
-  .confidence { display: inline-block;, padding: 0.25rem 0.5rem;
+  .confidence { display: inline-block; padding: 0.25rem 0.5rem;
     background: #0066cc;
 	color: white;
     border-radius: 3px;
@@ -551,7 +551,7 @@
     font-size: 0.9rem;
   }
 
-  .recommendation-item { padding: 1rem;, background: #f0f8ff;
+  .recommendation-item { padding: 1rem; background: #f0f8ff;
     border-left: 4px solid #0066cc;
     border-radius: 4px;
   }
@@ -570,13 +570,13 @@
     margin-bottom: 0.75rem;
   }
 
-  .rec-header p { margin: 0;, flex: 1;
+  .rec-header p { margin: 0; flex: 1;
   }
 
-  .rec-actions { display: flex;, gap: 0.5rem;
+  .rec-actions { display: flex; gap: 0.5rem;
   }
 
-  .action-buttons { display: flex;, gap: 1rem;
+  .action-buttons { display: flex; gap: 1rem;
     justify-content: center;
 	padding: 2rem 0;
   }

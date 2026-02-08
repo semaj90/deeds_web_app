@@ -205,7 +205,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				<div class={message.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
 					<div class={message.role === 'user'
 							? 'max-w-[80%] p-3 rounded-lg nes-container is-primary'
-							, message.error
+							message.error
 								? 'max-w-[80%] p-3 rounded-lg nes-container is-error'
  'max-w-[80%] p-3 rounded-lg nes-container'}>
 						<div class="message-content">{message.content}</div>
@@ -503,7 +503,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: #d4af37, cursor: pointer, border-radius: 50%, border: 2px solid #1a1d20
 	}
 
-	:global(.nes-range::-moz-range-thumb) { width: 16px;, height: 16px;
+	:global(.nes-range::-moz-range-thumb) { width: 16px; height: 16px;
 	background: #d4af37, cursor: pointer, border-radius: 50%;
 	border: 2px solid #1a1d20
 	}

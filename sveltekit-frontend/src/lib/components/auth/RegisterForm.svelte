@@ -100,7 +100,7 @@
       authActor.send({
         type: 'START_REGISTRATION',
         data: {
-, email: formData.get('email') as string,
+email: formData.get('email') as string,
           firstName: formData.get('firstName') as string,
           lastName: formData.get('lastName') as string,
           password: formData.get('password') as string,
@@ -144,7 +144,7 @@
 
   let passwordStrength = $derived(calculatePasswordStrength($form.password || ''));
 
-  function calculatePasswordStrength(password: string): { score: number;, feedback: string;
+  function calculatePasswordStrength(password: string): { score: number; feedback: string;
 	color: string } {
     if (!password) return { score: 0, feedback: 'Enter a password', color: 'text-gray-400' };
 

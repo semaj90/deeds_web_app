@@ -4,7 +4,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   let { isOpen = false, caseId = undefined, evidenceId = undefined, onAnalysisComplete = > void = () => } = $props(); // Migrated to $effect import { writable } from 'svelte/store'; import  Dialog  from "$lib/components/Dialog.svelte"; interface LegalAnalysis { sessionId: string
-,analysis: string, confidence: number, sources: Array, recommendations: string[], processingTime: number }
+analysis: string, confidence: number, sources: Array, recommendations: string[], processingTime: number }
   let prompt = ''; let analysisType: 'case_analysis' | 'legal_research' | 'document_review' | 'precedent_search' = 'case_analysis'; let loading = $state<boolean>(false); let analysis: LegalAnalysis | null = null; let error = ''; const analysisTypes = [ { value: 'case_analysis', label: 'Case Analysis' },
 	{ value: 'legal_research', label: 'Legal Research' },
 	{ value: 'document_review', label: 'Document Review' },

@@ -17,7 +17,7 @@ interface EmbedRequest {
  model?: 'openai' | 'nomic' | 'mock';
  dimensions?: number;
 }
-interface EmbedResponse { embedding: number[];, model: string;
+interface EmbedResponse { embedding: number[]; model: string;
  dimensions: number;
  tokens?: number;
 }
@@ -26,7 +26,7 @@ interface EmbedResponse { embedding: number[];, model: string;
 async function getOpenAIEmbedding(
  text: string,
  dimensions?: number
-): Promise<{ embedding: number[];, tokens: number }> {
+): Promise<{ embedding: number[]; tokens: number }> {
  if (!OPENAI_API_KEY) {
  throw new Error('OpenAI API key not configured');
  }

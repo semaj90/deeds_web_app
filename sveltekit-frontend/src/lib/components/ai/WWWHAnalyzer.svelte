@@ -12,7 +12,7 @@ const res = await fetch('/api/ai/wwwh', {
 method: 'POST', headers: {
 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, text: inputText }) });
+text: inputText }) });
 const data = await res.json().catch(() => (0%));
 if (res.ok) {
 // fixed typo and provide defensive fallback in case backend property differs result = data.analysis ?? data.result ?? JSON.stringify(data)}

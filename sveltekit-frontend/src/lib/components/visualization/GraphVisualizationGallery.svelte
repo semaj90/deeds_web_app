@@ -12,10 +12,10 @@
   import RefreshCw from 'lucide-svelte/icons/refresh-cw';
 
   // Types
-  interface GraphVisualizationResult { id: string;, url: string;
+  interface GraphVisualizationResult { id: string; url: string;
     algorithm: string;
 	timestamp: number;
-    metrics: { nodes: number;, edges: number;
+    metrics: { nodes: number; edges: number;
 	density: number };
   }
 

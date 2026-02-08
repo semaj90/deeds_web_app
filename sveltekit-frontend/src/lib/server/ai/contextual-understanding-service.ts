@@ -85,7 +85,7 @@ export class ContextualUnderstandingService {
 const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HISTORY_LENGTH, const updatedHmm = hmmStateMachine.updateState(current.hmmState, newTurn, const { predictions } = hmmStateMachine.predictNextState(
   updatedHmm.currentState,
   updatedHistory
-  , const dedupedEntities = this.dedupeEntities([...current.extractedEntities, ...entities]);
+  const dedupedEntities = this.dedupeEntities([...current.extractedEntities, ...entities]);
   const updatedRecentAttachments =
   attachments.length > 0
   ? [...existingRecent, ...attachments].slice(-MAX_ATTACHMENT_HISTORY)
@@ -104,7 +104,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  const { predictions } = hmmStateMachine.predictNextState(
  state.hmmState.currentState,
  state.conversationHistory
- , return predictions, }
+ return predictions, }
 
  extractLegalEntities(text: string): LegalEntity[] {
  const entities: LegalEntity[] = [];

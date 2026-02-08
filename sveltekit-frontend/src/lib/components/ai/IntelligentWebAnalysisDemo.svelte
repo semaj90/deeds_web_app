@@ -11,7 +11,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	caseContext: {
 		activeCases: ['Demo Case v. Example'], currentTask: 'Document Analysis', relevantDocuments: [] } }); // Analysis metrics let analysisMetrics = $state({ totalElements: 0, chunksGenerated: 0, embeddingsGenerated: 0, cacheHits: 0, processingTime: 0, memoryUsage: 0,
 	qloraDataSize: 0 }); // Real-time logs let logs: string[] = $state([]); // Performance monitoring let performanceMetrics = $state({ domExtraction:0, ocrProcessing: 0, chunkGeneration: 0, embeddingGeneration: 0, tensorOptimization: 0, cacheOperations: 0, qloraPreparation: 0 }); // Live user tracking let liveInteractions = $state({ clickCount: 0, keystrokes: 0, scrollDistance: 0, focusChanges: 0, lastActivity: Date.now()}); // Settings let settings = $state({ autoAnalysis: true
-, ocrEnabled: true, cacheEnabled: true, qloraTraining: true, minChunkSize: 1000, maxChunkSize: 5000, analysisDepth: 'comprehensive' as 'quick' | 'standard' | 'comprehensive'
+ocrEnabled: true, cacheEnabled: true, qloraTraining: true, minChunkSize: 1000, maxChunkSize: 5000, analysisDepth: 'comprehensive' as 'quick' | 'standard' | 'comprehensive'
   });
   let analysisState = $state({ currentStep: '', progress: 0, elementsProcessed: 0,
 	chunksProcessed: 0 }); $effect(() => { (async () => { if (!browser) return; try { addLog('ðŸš€ Initializing Intelligent Web Analyzer...'); // Initialize with user context await intelligentWebAnalyzer.initialize(); intelligentWebAnalyzer.updateUserContext(userAnalytics); isInitialized = true; addLog('âœ… Intelligent Web Analyzer ready'); // Set up real-time user tracking setupRealTimeTracking(); // Auto-analysis if enabled if (settings.autoAnalysis) { setTimeout(() => analyzeCurrentPage(), 2000)}

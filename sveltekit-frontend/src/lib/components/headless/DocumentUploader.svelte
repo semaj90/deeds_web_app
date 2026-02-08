@@ -12,7 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     cacheResults?: boolean;
   }
 
-  interface UploadStats { isUploading: boolean;, queueLength: number;
+  interface UploadStats { isUploading: boolean; queueLength: number;
     completedCount: number;
 	progressMap: Map<string, UploadProgress>;
   }
@@ -37,17 +37,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     priority?: number;
     processingOptions?: ProcessingOptions;
     onFilesSelected?: (event: {
-, files: FileList }) => void;
+files: FileList }) => void;
     onUploadStart?: (event: {
-, files: File[] }) => void;
+files: File[] }) => void;
     onUploadProgress?: (event: {
-, progress: UploadProgress }) => void;
+progress: UploadProgress }) => void;
     onUploadComplete?: (event: {
-, file: MinIOFile }) => void;
+file: MinIOFile }) => void;
     onUploadError?: (event: {
-, error: string, file?: File }) => void;
+error: string, file?: File }) => void;
     onAllUploadsComplete?: (event: {
-, files: MinIOFile[] }) => void;
+files: MinIOFile[] }) => void;
     children?: Snippet<[SlotProps]>;
   }
 

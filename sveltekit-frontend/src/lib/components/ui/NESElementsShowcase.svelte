@@ -215,7 +215,7 @@
   .nes-progress {
     width: 100%;
   }
-  aside { background: var(--yorha-bg-secondary);, padding: 1rem;
+  aside { background: var(--yorha-bg-secondary); padding: 1rem;
     margin: 1rem 0;
     border: 2px solid var(--yorha-text-muted);
   }

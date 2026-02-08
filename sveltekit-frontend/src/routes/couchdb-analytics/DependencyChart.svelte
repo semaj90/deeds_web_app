@@ -12,7 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	let { apiBase }: Props = $props();
 
-	interface DependencyNode { import_path: string;, import_count: number;
+	interface DependencyNode { import_path: string; import_count: number;
 	}
 
 	let dependencies = $state<DependencyNode[]>([]);
@@ -191,7 +191,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		margin-bottom: 1.5rem;
 	}
 
-	.controls h3 { margin: 0;, color: #1f2937;
+	.controls h3 { margin: 0; color: #1f2937;
 		font-size: 1.25rem;
 	}
 
@@ -230,7 +230,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	}
 
-	.stats-summary { display: flex;, gap: 2rem;
+	.stats-summary { display: flex; gap: 2rem;
 		padding: 1rem;
 		background: #f9fafb;
 		border-radius: 8px;

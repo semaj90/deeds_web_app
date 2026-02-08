@@ -8,7 +8,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Define missing types
-	type SearchResult = { status: string;, sessionId: string;
+	type SearchResult = { status: string; sessionId: string;
 		analysisResults: {
 			summary?: string;
 			confidence?: number;
@@ -22,15 +22,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			model?: string;
 			processedAt?: string;
 			documentType?: string;
-			personsOfInterest?: { name: string;, role: string;
+			personsOfInterest?: { name: string; role: string;
 	confidence: number }[];
-			timeline?: { event: string;, date: string;
+			timeline?: { event: string; date: string;
 	importance: string }[];
 			legalImplications?: string;
 			confidenceScore?: number;
 			nextSteps?: string[];
 		};
-		metadata?: { source: string;, processingTime: string;
+		metadata?: { source: string; processingTime: string;
 	model: string;
 		};
 	};

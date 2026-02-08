@@ -35,7 +35,7 @@ https, //svelte.dev/e/js_parse_error -->
       const json = await res.json();
       data = json as ValidateResponse} catch (err) {
       console.error('API validation load failed:', err);
-      data = { ok: false;, message: 'Validation failed to load' }}
+      data = { ok: false; message: 'Validation failed to load' }}
   }
 
   // Pull required model from Ollama and re-validate
@@ -48,7 +48,7 @@ https, //svelte.dev/e/js_parse_error -->
       const res = await fetch('/api/ollama/pull', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, model: required })
+model: required })
       });
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`)}

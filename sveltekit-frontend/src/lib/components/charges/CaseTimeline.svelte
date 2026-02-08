@@ -13,7 +13,7 @@ https, //svelte.dev/e/css_empty_declaration -->
 		caseId?: string;
 	} = $props();
 
-	interface TimelineEvent { id: string;, actionType: string;
+	interface TimelineEvent { id: string; actionType: string;
 		description: string;
 	time: string;
 		payload: any;

@@ -110,7 +110,7 @@ function createEvidenceStore() {
             }
         },
 	uploadEvidence: async (file: File, metadata: {
-, caseId: string;, type: EvidenceType; tags?: string[], description?: string }) => {
+, caseId: string; type: EvidenceType; tags?: string[], description?: string }) => {
             const fileId = `ev-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             update(s => ({
                 ...s,

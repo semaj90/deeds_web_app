@@ -31,7 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, prompt: input })
+prompt: input })
       });
 
       if (!response.ok) {
@@ -211,7 +211,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     word-wrap: break-word;
   }
 
-  .loading-indicator { display: inline-block;, animation: pulse 1.5s ease-in-out infinite;
+  .loading-indicator { display: inline-block; animation: pulse 1.5s ease-in-out infinite;
   }
 
   @keyframes pulse {
@@ -223,17 +223,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     }
   }
 
-  .error-banner { padding: 0.75rem;, background: #3a1a1a;
+  .error-banner { padding: 0.75rem; background: #3a1a1a;
 	border: 1px solid #f44336;
     border-radius: 4px;
 	color: #ff6b6b;
     font-size: 0.9rem;
   }
 
-  .input-area { display: flex;, gap: 0.5rem;
+  .input-area { display: flex; gap: 0.5rem;
   }
 
-  textarea { flex: 1;, padding: 0.75rem;
+  textarea { flex: 1; padding: 0.75rem;
 	border: 1px solid #333;
     border-radius: 4px;
 	background: #1a1a1a;
@@ -249,7 +249,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.1);
   }
 
-  textarea:disabled { opacity: 0.5;, cursor: not-allowed;
+  textarea:disabled { opacity: 0.5; cursor: not-allowed;
   }
 
   button {
@@ -263,10 +263,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	transition:all 0.2s;
   }
 
-  button:hover:not(:disabled) { background: #00acc1;, transform: translateY(-2px);
+  button:hover:not(:disabled) { background: #00acc1; transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
   }
 
-  button:disabled { opacity: 0.5;, cursor: not-allowed;
+  button:disabled { opacity: 0.5; cursor: not-allowed;
   }
 </style>

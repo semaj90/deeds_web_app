@@ -13,7 +13,7 @@ https, //svelte.dev/e/js_parse_error -->
  import PoliceReportGenerator from './PoliceReportGenerator.svelte';
  import TimelineReconstructionEngine from './TimelineReconstructionEngine.svelte';
 
- interface Evidence { id: string;, title: string;
+ interface Evidence { id: string; title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -21,12 +21,12 @@ https, //svelte.dev/e/js_parse_error -->
  source?: string;
  }
 
- interface Witness { id: string;, name: string;
+ interface Witness { id: string; name: string;
  statement?: string;
  credibility?: number;
  }
 
- interface Case { id: string;, title: string;
+ interface Case { id: string; title: string;
  description?: string;
 	status: 'active' | 'closed' | 'pending';
  createdAt: string;

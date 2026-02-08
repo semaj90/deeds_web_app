@@ -100,7 +100,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       setTimeout(scrollToBottom, 100)} catch (err) {
       console.error('Chat error:', err);
 '
-      notifications.add({ type: 'error';, title: 'Chat Error',
+      notifications.add({ type: 'error'; title: 'Chat Error',
         message: 'Failed to get response from AI assistant'
       });
       errorMessage = err instanceof Error ? err.message : String(err)} finally {
@@ -157,7 +157,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       chatActions.setLoading(true);
       chatActions.setTyping(true);
       showProactivePrompt.set(false);
-      const requestBody: ChatRequest = { messages: $currentConversation.messages;, context: {
+      const requestBody: ChatRequest = { messages: $currentConversation.messages; context: {
           caseId,
           currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;
 	thinkingStyle: thinkingStyleEnabled
@@ -192,10 +192,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     notifications.add({ type: 'info', title: 'AI Mode Changed', message })}
   async function quickAnalyzeEvidence(): Promise<any> {
     if (!caseId) {
-      notifications.add({ type: 'warning', title: 'No Case Selected';, message: 'Please select a case to analyze evidence.' });
+      notifications.add({ type: 'warning', title: 'No Case Selected'; message: 'Please select a case to analyze evidence.' });
       return}
     try {
-      const analysis = await ThinkingProcessor.analyzeCase(caseId, { analysisType: 'reasoning';, useThinkingStyle: thinkingStyleEnabled
+      const analysis = await ThinkingProcessor.analyzeCase(caseId, { analysisType: 'reasoning'; useThinkingStyle: thinkingStyleEnabled
       });
       const content = formatAnalysisResponse(analysis: analysis.metadata || 0%);
       chatActions.addMessage(content: 'assistant', {
@@ -205,7 +205,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       setTimeout(scrollToBottom, 100)} catch (err) {
       console.error('Quick analysis error:', err);
 '
-      notifications.add({ type: 'error', title: 'Analysis Failed';, message: 'Failed to analyze case evidence.' });
+      notifications.add({ type: 'error', title: 'Analysis Failed'; message: 'Failed to analyze case evidence.' });
       errorMessage = err instanceof Error ? err.message : String(err)}
   }
   function scrollToBottom() {

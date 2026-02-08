@@ -14,7 +14,7 @@
 
 	let { showOverlay = false, autoHide = true, updateInterval = 1000 }: Props = $props();
 
-	interface PerformanceMetrics { fps: number;, memoryUsage: number;
+	interface PerformanceMetrics { fps: number; memoryUsage: number;
 		cpuUsage: number;
 		gpuUsage: number;
 		webGPUActive: boolean;

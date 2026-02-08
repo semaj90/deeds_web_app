@@ -56,7 +56,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       type: 'START_PROCESSING',
       document,
       options: {
-, extractEntities: true
+extractEntities: true
 ,
         generateSummary: true, assessRisk: true, generateEmbedding: true, storeInQdrant: true, useContext7: true, useSemanticSearch: false
       }
@@ -91,7 +91,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             ? 'bg-blue-500 animate-pulse'
             : isCompleted
               ? 'bg-green-500'
-              , isFailed
+              isFailed
                 ? 'bg-red-500'
  'bg-gray-300'}"
         ></div>

@@ -1,12 +1,12 @@
 <script lang="ts">
 	let code = $state<any>(undefined);
 
-	interface BundledCharge { citation: string;, title: string;
+	interface BundledCharge { citation: string; title: string;
 		reason: string;
 	frequency: number;
 	}
 
-	interface Precedent { caseId: string;, title: string;
+	interface Precedent { caseId: string; title: string;
 		year: number;
 	court: string;
 		relevance: number;

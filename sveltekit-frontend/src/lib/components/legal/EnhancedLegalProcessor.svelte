@@ -34,7 +34,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     id: 'legalProcessor',
     initial: 'idle',
     context: {
-, file: null as File | null,
+file: null as File | null,
       documentId: null as string | null,
       processingResults: null as any,
       analysisResults: null as any,
@@ -42,7 +42,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     },
 	states: {, idle: {, on: {, FILE_SELECTED: {, target: 'readyToUpload',
             actions: assign({
-, file: ({ event }: any) => event.file
+file: ({ event }: any) => event.file
             })
           }
         }

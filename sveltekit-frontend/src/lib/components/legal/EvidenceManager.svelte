@@ -3,9 +3,9 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	redacted: boolean, metadata?: { [key: string]: unknown }}
   interface Props { evidence?: EvidenceItem[]; onAnalyze?: (evidenceId: string) => Promise<void>; onUpload?: (files: FileList) => Promise<void>; onExport?: (evidenceIds: string[];
-, format: string) => void}
+format: string) => void}
   let { evidence = [], onAnalyze, onUpload, onExport }: Props = $props(); // Enhanced-Bits builder for evidence const evidenceBuilder = createLegalEvidenceAnalyzer({ caseType: 'criminal', urgency: 'high';
-, aiModel: 'gemma3'
+aiModel: 'gemma3'
   }); // Svelte, 5 runes / reactive primitives (keep existing project pattern) let selectedEvidence = $state<Set<string>>(new Set()); let searchTerm = $state<string>(''); let filterType = $state<string>('all'); let sortBy = $state<'date' | 'relevance' | 'type' | 'authenticity'>('relevance'); let isAnalyzing = $state<boolean>(false); let showUpload = $state<boolean>(false); // Sample evidence data if none provided let evidenceData = $state<EvidenceItem[]>(evidence.length > 0 ? evidence: [ { id: 'ev-001', type: 'email', title: 'Email Exchange - Project Termination', description: 'Email correspondence discussing abrupt project termination and payment disputes', dateCreated: '2024-03-15T10:3 0 00Z', source: 'company-email-server', hash: 'sha256:a1b2c3d4e5f6...', size: '45 KB', tags: ['communication', 'dispute', 'payment'], relevanceScore: 0.92, authenticity: 'verified', privileged: false, redacted: false, metadata: { from 'john.doe@company.com', to: 'legal@contractor.com';
 	subject: 'Re: Project Status Update'
       } },
@@ -16,7 +16,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       } },
 	{
       id: 'ev-003', type: 'transcript', title: 'Board Meeting Minutes - March 2024', description: 'Transcript of emergency board meeting discussing contractor issues', dateCreated: '2024-03-12T09:0 0 00Z', source: 'meeting-recorder', hash: 'sha256:1a2b3c4d5e6f...', size: '89 KB', tags: ['meeting', 'decision', 'contractor'], relevanceScore: 0.85, authenticity: 'pending', privileged: true, redacted: false, metadata: {
-	attendees: 7, duration: '2h 15m';, recorder: 'Legal Counsel'
+	attendees: 7, duration: '2h 15m'; recorder: 'Legal Counsel'
       } }
   ]); // Filtered and sorted evidence let filteredEvidence = $derived(() => { let filtered = evidenceData; // Filter by search term if (searchTerm) { filtered = filtered.filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()) || item.description.toLowerCase().includes(searchTerm.toLowerCase()) || item.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())) )}
 
@@ -42,7 +42,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' },
 	disputed: {
 	color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)' },
-	invalid: { color: '#6b7280';, background: 'rgba(107, 114, 128, 0.1)' } }
+	invalid: { color: '#6b7280'; background: 'rgba(107, 114, 128, 0.1)' } }
     return (styles as unknown)[authenticity] || styles.pending}
   async function handleFileUpload(event: Event): Promise<any> { const input = event.target as HTMLInputElement | null; if (!input) return; const files = input.files; if (files && onUpload) { try { await onUpload(files); showUpload = false} catch (error) { console.error('Upload failed:', error)}
     } }
@@ -140,28 +140,28 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .title-section { display: flex; align-items: center;
 	gap: 1rem}
   .evidence-icon { font-size: 2rem}
-  .title-text h2 { margin: 0;, color: var(--enhanced-bits-foreground); font-size: 1.5rem}
-  .evidence-meta { display: flex;, gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
+  .title-text h2 { margin: 0; color: var(--enhanced-bits-foreground); font-size: 1.5rem}
+  .evidence-meta { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
   .total-count, .verified-count, .privileged-count { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px}
-  .evidence-actions { display: flex;, gap: 0.5rem; align-items: center; flex-wrap}
-  .bulk-actions { display: flex;, gap: 0.5rem}
+  .evidence-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap}
+  .bulk-actions { display: flex; gap: 0.5rem}
   .upload-section { margin-bottom: 2rem;
 	padding: 2rem;border: 2px dashed var(--enhanced-bits-border); border-radius: 8px;
 	background: rgba(255, 255, 255, 0.02)}
   .upload-area { position: relative; text-align: center}
-  .file-input { position: absolute;, inset: 0; opacity: 0;
+  .file-input { position: absolute; inset: 0; opacity: 0;
 	cursor: pointer}
   .upload-instructions { display: flex; align-items: center, justify-content: center;
 	gap: 1rem}
   .upload-icon { font-size: 2rem}
-  .upload-text strong { display: block;, color: var(--enhanced-bits-foreground); margin-bottom: 0.5rem}
-  .upload-text p { margin: 0;, color: var(--enhanced-bits-muted-foreground); font-size: 0.875rem}
+  .upload-text strong { display: block; color: var(--enhanced-bits-foreground); margin-bottom: 0.5rem}
+  .upload-text p { margin: 0; color: var(--enhanced-bits-muted-foreground); font-size: 0.875rem}
   .controls-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;
 	gap: 1rem; flex-wrap}
-  .search-controls { display: flex;, gap: 1rem; flex: 1; min-width: 0 }
+  .search-controls { display: flex; gap: 1rem; flex: 1; min-width: 0 }
   .evidence-search { flex: 1; min-width: 300px}
-  .type-filter, .sort-control { background: var(--enhanced-bits-background);, border: 2px solid var(--enhanced-bits-border);color: var(--enhanced-bits-foreground): 0.5rem; border-radius: 4px; font-family: inherit}
-  .selection-controls { display: flex;, gap: 0.5rem}
+  .type-filter, .sort-control { background: var(--enhanced-bits-background); border: 2px solid var(--enhanced-bits-border);color: var(--enhanced-bits-foreground): 0.5rem; border-radius: 4px; font-family: inherit}
+  .selection-controls { display: flex; gap: 0.5rem}
   .stats-section { margin-bottom: 2rem}
   .stats-section h3 { margin: 0, 0 1rem 0; color: var(--enhanced-bits-foreground)}
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem}
@@ -182,13 +182,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .evidence-header { display: flex; align-items: center;
 	gap: 1rem; margin-bottom: 1rem}
   .evidence-select { display: flex; align-items: center}
-  .evidence-checkbox { width: 18px;, height: 18px; accent-color: var(--enhanced-bits-primary)}
+  .evidence-checkbox { width: 18px; height: 18px; accent-color: var(--enhanced-bits-primary)}
   .evidence-type { display: flex; align-items: center;
 	gap: 0.5rem}
   .type-icon { font-size: 1.25rem}
   .type-label { font-size: 0.875rem; font-weight: bold;
 	color: var(--enhanced-bits-foreground)}
-  .evidence-status { display: flex;, gap: 0.5rem; margin-left: auto}
+  .evidence-status { display: flex; gap: 0.5rem; margin-left: auto}
   .authenticity-badge, .privilege-badge, .redacted-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase}
   .privilege-badge { background: rgba(220, 38, 38, 0.2); color: #fca5a5}
   .redacted-badge { background: rgba(107, 114, 128, 0.2); color: #d1d5db}
@@ -214,9 +214,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem}
   .relevance-label { font-size: 0.875rem;
 	color: var(--enhanced-bits-muted-foreground)}
-  .relevance-bar { height: 8px;, background: rgba(255, 255, 255, 0.1); border-radius: 4px;
+  .relevance-bar { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden}
-  .relevance-fill { height: 100%;, transition:width 300ms ease; border-radius: 4px}
+  .relevance-fill { height: 100%; transition:width 300ms ease; border-radius: 4px}
   .relevance-value { font-size: 0.875rem; font-weight: bold;
 	color: var(--enhanced-bits-evidence)}
   .evidence-actions { display: flex; flex-wrap: wrap;

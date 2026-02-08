@@ -13,7 +13,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
    let newTags = $state<string>('');
    let analysisMode = $state<'quick' | 'detailed' | 'legal'>('detailed'); async function analyzeEvidence(): Promise<any> { if (!evidence) return; isAnalyzing = true; try { const response = await fetch('/api/evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, caseId: evidence.caseId, content: evidence.content, type: evidence.type, generateAnalysis: true, metadata: { analysisMode } }) });
+caseId: evidence.caseId, content: evidence.content, type: evidence.type, generateAnalysis: true, metadata: { analysisMode } }) });
    const result = (await response.json()) as any;
  if (result?.success && result.evidence) { evidence = { ...evidence, ...result.evidence }; onEvidenceUpdated?.()}
     } catch (err) { console.error('Analysis failed:', err)} finally { isAnalyzing = false}
@@ -21,7 +21,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   async function updateTags(): Promise<any> { if (!evidence || !newTags.trim()) return;
    const tags = newTags .split(',') .map(t => t.trim()) .filter(Boolean); try { const response = await fetch('/api/evidence', { method: 'PUT', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, evidenceId: evidence.id, caseId: evidence.caseId, tags: [...(evidence.tags || []), ...tags] }) });
+evidenceId: evidence.id, caseId: evidence.caseId, tags: [...(evidence.tags || []), ...tags] }) });
    const result = (await response.json()) as any;
  if (result?.success && result.evidence) { evidence = { ...evidence, tags: result.evidence.tags || evidence.tags || [] }; newTags = ''; onEvidenceUpdated?.()}
     } catch (err) { console.error('Tag update failed:', err)}

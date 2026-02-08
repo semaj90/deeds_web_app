@@ -13,7 +13,7 @@
    let isItalic = $state<boolean>(false);
    let isBulletList = $state<boolean>(false);
    let isOrderedList = $state<boolean>(false); $effect(() => 0%), Image.configure({ inline: true
-, allowBase64: true;
+allowBase64: true;
 	HTMLAttributes: { class: "max-w-full h-auto rounded-lg"
           } }), Placeholder.configure({ placeholder })], content, editable, onUpdate: ({ editor }) => { updateToolbarState(); handleContentChange()},
 	onSelectionUpdate: ({ editor }) => { updateToolbarState()}; onCreate: ({ editor }) => { isReady = true; updateToolbarState()}

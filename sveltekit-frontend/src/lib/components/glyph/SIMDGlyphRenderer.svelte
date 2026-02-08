@@ -21,7 +21,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const adapter = await navigator.gpu.requestAdapter(); if (!adapter) { throw new Error('No WebGPU adapter found')}
     webgpuDevice = await adapter.requestDevice();
    const context = canvas.getContext('webgpu'); if (!context) { throw new Error('Failed to get WebGPU context')}
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(); context.configure({ device: webgpuDevice;, format: presentationFormat}); // Create texture from tiled data const tiledData = glyphResult.simd_shader_data.tiled_data;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(); context.configure({ device: webgpuDevice; format: presentationFormat}); // Create texture from tiled data const tiledData = glyphResult.simd_shader_data.tiled_data;
    const texture = webgpuDevice.createTexture({ size: { width: height },
 	format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST }); // Upload tiled data to texture webgpuDevice.queue.writeTexture( { texture },
 	new Uint8Array(tiledData.map(x => x * 255)), { bytesPerRow: width * 4, rowsPerImage: height },

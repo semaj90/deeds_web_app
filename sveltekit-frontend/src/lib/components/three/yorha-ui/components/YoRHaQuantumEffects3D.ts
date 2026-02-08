@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { YoRHa3DComponent: YORHA_COLORS } from '../YoRHaUI3D';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-export interface QuantumFieldOptions { particleCount: number;, fieldSize: { x: number;, y: number; z: number };
+export interface QuantumFieldOptions { particleCount: number; fieldSize: { x: number; y: number; z: number };
 	quantumCoherence: number;
 	entanglementStrength: number;
 	waveFunction: 'sine' | 'cosine' | 'complex' | 'superposition';
@@ -16,7 +16,7 @@ export interface QuantumFieldOptions { particleCount: number;, fieldSize: { x: n
 	dimensions: 3 | 4 | 8;
 }
 
-export interface ConsciousnessVisualizationOptions { awarenessLevel: number;, thoughtPatterns: 'linear' | 'circular' | 'fractal' | 'chaotic';
+export interface ConsciousnessVisualizationOptions { awarenessLevel: number; thoughtPatterns: 'linear' | 'circular' | 'fractal' | 'chaotic';
 	cognitiveLoad: number;
 	synapticActivity: number;
 	neuralNetworkComplexity: number;
@@ -24,8 +24,8 @@ export interface ConsciousnessVisualizationOptions { awarenessLevel: number;, th
 	selfAwareness: boolean;
 }
 
-export interface RealityDistortionOptions { matrixGlitchIntensity: number;, temporalDistortion: number;
-	spatialWarp: { x: number;, y: number;
+export interface RealityDistortionOptions { matrixGlitchIntensity: number; temporalDistortion: number;
+	spatialWarp: { x: number; y: number;
 	z: number };
 	causalityLoop: boolean;
 	paradoxResolution: 'ignore' | 'branch' | 'collapse';
@@ -204,7 +204,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 
 		const material = new THREE.ShaderMaterial({ uniforms: { time: { value: 0 },
 	quantumCoherence: {
-, value: this.quantumOptions.quantumCoherence }
+value: this.quantumOptions.quantumCoherence }
 			},
 	vertexShader: this.getQuantumVertexShader(),
 			fragmentShader: this.getQuantumFragmentShader(),
@@ -264,7 +264,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 			const streamGeometry = new THREE.PlaneGeometry(0.1, 4);
 			const streamMaterial = new THREE.ShaderMaterial({ uniforms: { time: { value: 0 },
 	glitchIntensity: {
-, value: this.realityOptions.matrixGlitchIntensity }
+value: this.realityOptions.matrixGlitchIntensity }
 				},
 	vertexShader: this.getMatrixVertexShader(),
 				fragmentShader: this.getMatrixFragmentShader(),

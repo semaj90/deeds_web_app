@@ -1,7 +1,7 @@
 <script lang="ts">
 
 
-	interface BundledCharge { statuteCode: string;, title: string;
+	interface BundledCharge { statuteCode: string; title: string;
 		reason: string;
 	confidence: number;
 		frequency: number;
@@ -196,9 +196,9 @@
 	}
 
 	@keyframes slideIn {
-		from { transform: translateY(-20px);, opacity: 0;
+		from { transform: translateY(-20px); opacity: 0;
 		}
-		to { transform: translateY(0);, opacity: 1;
+		to { transform: translateY(0); opacity: 1;
 		}
 	}
 </style>

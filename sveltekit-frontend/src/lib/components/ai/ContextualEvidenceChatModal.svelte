@@ -7,14 +7,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  type QuickAction = 'chat' | 'report' | 'case' | 'evidence';
 
- type ChatMessage = { id: string;, role: 'user' | 'assistant';
+ type ChatMessage = { id: string; role: 'user' | 'assistant';
  content: string;
 	ts: number;
  status?: 'pending' | 'sent' | 'error';
  attachments?: AttachmentPreview[];
  error?: string };
 
- type AttachmentPreview = { id: string;, name: string;
+ type AttachmentPreview = { id: string; name: string;
 	size: number;
 	type: string;
  file?: File;
@@ -22,7 +22,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  metadata?: AttachmentMetadata;
  message?: string };
 
- type CaseOption = { id: string;, title: string; status?: string };
+ type CaseOption = { id: string; title: string; status?: string };
 
  const props = $props<{
  visible?: boolean;
@@ -611,7 +611,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 {/if}
 
 <style>
- .chat-modal-overlay { position: fixed;, inset: 0;
+ .chat-modal-overlay { position: fixed; inset: 0;
 	background: rgba(4, 6, 10, 0.85);
  backdrop-filter: blur(6px);
 	display: flex;
@@ -619,7 +619,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  justify-content: center;
 	padding: 2rem;
  z-index: 70 }
- .chat-modal { background: #0c1018;, border: 1px solid #1f2a3c;
+ .chat-modal { background: #0c1018; border: 1px solid #1f2a3c;
  border-radius: 18px;
 	width: min(1200px, 100%);
  max-height: 100%;
@@ -652,7 +652,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	width: 40px;
 	height: 40px;
 	cursor: pointer }
- .action-tabs { display: flex;, gap: 0.5rem;
+ .action-tabs { display: flex; gap: 0.5rem;
 	padding: 0.75rem 1.75rem;
  flex-wrap: wrap }
  .action-tabs button {
@@ -689,7 +689,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  font-size: 0.9rem;
 	color: rgba(255, 255, 255, 0.8);
  position: relative }
- .drop-zone input[type='file'] { position: absolute;, inset: 0;
+ .drop-zone input[type='file'] { position: absolute; inset: 0;
 	opacity: 0;
 	cursor: pointer }
  .drop-zone.drop-active {
@@ -715,7 +715,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  .attachment-pill[data-status='error'] {
  border-color: #f87171;
 	color: #fca5a5 }
- .attachment-pill button { border: none;, background: transparent;
+ .attachment-pill button { border: none; background: transparent;
 	color: inherit;
 	padding: 0;
 	cursor: pointer }
@@ -770,7 +770,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 0.55rem 1.25rem;
  border-radius: 999px;
 	cursor: pointer }
- button.primary:disabled { opacity: 0.6;, cursor:not-allowed }
+ button.primary:disabled { opacity: 0.6; cursor:not-allowed }
  .panel-block {
  display: flex;
  flex-direction: column;

@@ -51,10 +51,10 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 	'n64': {
 	buttonPress: '/sounds/n64/button-press.wav', menuMove: '/sounds/n64/menu-move.wav', error: '/sounds/n64/error.wav', success: '/sounds/n64/success.wav' }
 }; // Enhanced bit-level caching architecture with multi-tier storage export const ENHANCED_MEMORY_CACHING = { // Tier 1: JavaScript Redis-style in-memory cache
-,redisCache: {
+redisCache: {
 	enabled:true, maxMemoryMB: 64 64, // 64MB Redis-style cache evictionPolicy: 'lru', // Least Recently Used compressionEnabled: true, bitPackingEnabled: true, // Pack 8-bit values into single bytes keyExpiration: 3600, // 1 hour cache expiration hashSlots: 16384, // Redis cluster-style hash slots pipelineBufferSize: 1024, // Pipeline commands for efficiency clusterNodes: 3, // Simulate Redis cluster },
 	// Tier 2: Loki.js document store for structured game data
-,lokiCache: {
+lokiCache: {
 	enabled:true, autoSave: true, autoSaveInterval: 10000, // Auto-save every, 10 seconds serializationMethod: 'normal', throttledSaves: true, collections: {
 	sprites: { indices: ['id', 'type', 'era'], binary: true, // Binary indices for speed adaptiveBinaryIndices: true, cloneObjects: false, // Reference-based for memory efficiency disableChangesApi: false, ttl: 300000 300000, // 5 minute TTL },
 	textures: {
@@ -64,7 +64,7 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 	// Enhanced bit-level compression compression: {
 	enabled:true, algorithm: 'lz-string', // Fast JavaScript compression threshold: 1024, // Compress data > 1KB level: 6, // Compression level (1-9) } },
 	// Tier 3: WebGPU vertex buffers for graphics data
-,webgpuCache: {
+webgpuCache: {
 	enabled:true, deviceLimits: {
 	maxBufferSize: 268435456, // 256MB max buffer maxStorageBufferBindingSize: 134217728, // 128MB storage buffers maxVertexBuffers: 8, maxVertexAttributes: 16 16, maxBindGroups: 4 },
 	bufferTypes: {

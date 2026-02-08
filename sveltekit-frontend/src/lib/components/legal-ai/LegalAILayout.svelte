@@ -216,12 +216,12 @@
  color: #d4a574;
  }
 
- .sidebar-toggle { display: none;, background: none;
+ .sidebar-toggle { display: none; background: none;
  border: none; color: #f5f1e8;
  font-size: 1.5rem; cursor: pointer;
  }
 
- .sidebar-nav { flex: 1;, display: flex;
+ .sidebar-nav { flex: 1; display: flex;
  flex-direction: column; gap: 0.5rem;
  }
 
@@ -267,7 +267,7 @@
  font-size: 0.85rem;
  }
 
- .status-indicator { width: 8px;, height: 8px;
+ .status-indicator { width: 8px; height: 8px;
  border-radius: 50%;
  background-color: #ff4444; animation: pulse 2s infinite;
  }
@@ -379,7 +379,7 @@
  border-bottom: 1px solid #8b4513;
  }
 
- .terminal-content { padding: 0.75rem;, flex: 1;
+ .terminal-content { padding: 0.75rem; flex: 1;
  min-height: 60px; color: #44ff44;
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 0.8rem;
@@ -429,7 +429,7 @@
  border-radius: 3px; overflow: hidden;
  }
 
- .bar-fill { height: 100%;, background: linear-gradient(90deg, #8b4513, #d4a574);
+ .bar-fill { height: 100%; background: linear-gradient(90deg, #8b4513, #d4a574);
  border-radius: 3px;
  }
 
@@ -455,7 +455,7 @@
  background-color: #d4a574; color: #f5f1e8;
  }
 
- .mobile-toggle { display: none;, position: fixed;
+ .mobile-toggle { display: none; position: fixed;
  bottom: 1rem; right: 1rem;
  width: 50px; height: 50px;
  background-color: #8b4513; color: #f5f1e8;
@@ -481,7 +481,7 @@
  grid-template-columns: 1fr;
  }
 
- .sidebar { position: fixed;, left: 0;
+ .sidebar { position: fixed; left: 0;
  top: 0; height: 100vh;
  width: 250px;
  z-index: 999; transform: translateX(-100%);

@@ -9,7 +9,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // We'll trust 'bits-ui' exports Button.
 
   // Define the structure for the AI analysis results
-  export interface AnalysisResult { summary: string;, key_points: string[];
+  export interface AnalysisResult { summary: string; key_points: string[];
     recommendations: string[];
 	confidence_score: number;
   }

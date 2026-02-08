@@ -4,7 +4,7 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
-	type FormState = { caseName: string;, caseId: string;
+	type FormState = { caseName: string; caseId: string;
 		summary: string;
 	objectives: string;
 		charges: string;
@@ -36,7 +36,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		tone: 'trial-ready, confident, ethical',
 		audience: 'jury + judge',
 		deliverables: {
-, closingOutline: true,
+closingOutline: true,
 			storyAngles: true,
 			juryFocus: true,
 			investigativeGaps: false,
@@ -108,7 +108,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, caseId: form.caseId || undefined,
+caseId: form.caseId || undefined,
 					caseName: form.caseName || undefined,
 					summary: form.summary,
 					prosecutionGoals: form.objectives,
@@ -506,7 +506,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 1rem;
  }
 
- .card h3 { margin: 0;, color: #e0f2fe;
+ .card h3 { margin: 0; color: #e0f2fe;
  }
 
  label {
@@ -649,7 +649,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.65rem;
  }
 
- .row { display: flex;, gap: 0.75rem;
+ .row { display: flex; gap: 0.75rem;
  padding: 0.65rem;
  border-radius: 0.75rem;
 	background: rgba(15, 23, 42, 0.85);
@@ -713,7 +713,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  margin-bottom: 0.35rem;
  }
 
- .results-actions { display: flex;, gap: 1rem;
+ .results-actions { display: flex; gap: 1rem;
  align-items: center;
  }
 

@@ -49,7 +49,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, userId: 'current-user' }),
+userId: 'current-user' }),
  });
 
  if (response.ok) {

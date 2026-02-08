@@ -23,15 +23,15 @@ https://svelte.dev/e/expected_token -->
 			key_concerns?: string[];
 			recommendations?: string[];
 		};
-		patterns?: Array<{ type: string;, confidence: number;
+		patterns?: Array<{ type: string; confidence: number;
 	text: string;
 	category: string;
 			implications?: string;
 		}>;
-		clauses?: Array<{ name: string;, risk_level: 'high' | 'medium' | 'low';
+		clauses?: Array<{ name: string; risk_level: 'high' | 'medium' | 'low';
 			text: string; analysis, string;
 		}>;
-		metadata?: { document_type: string;, analysis_timestamp: string;
+		metadata?: { document_type: string; analysis_timestamp: string;
 	model_used: string;
 		};
 	}
@@ -69,7 +69,7 @@ https://svelte.dev/e/expected_token -->
 					'Content-Type': 'application/json'
 				},
 	body: JSON.stringify({
-, content: documentType,
+content: documentType,
 					patterns
 				})
 			});

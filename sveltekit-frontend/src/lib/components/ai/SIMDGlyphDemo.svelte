@@ -19,7 +19,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	enable_compression: true, compression_ratio: compressionTarget / 10, predictive_frames: 3 },
 	simd_config: {
 	enable_tiling: true
-, tile_size: 16, compression_target: compressionTarget, shader_format: selectedFormat, adaptive_quality: true, performance_tier: selectedTier ...customSettings }
+tile_size: 16, compression_target: compressionTarget, shader_format: selectedFormat, adaptive_quality: true, performance_tier: selectedTier ...customSettings }
       } console.log('ðŸŽ¨ Generating SIMD, glyph:', request);
    const response = await fetch('/api/glyph/simd-embeds', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(request)}); if (!(response as { ok?: any; statusText?: any; json?: any }).ok) { throw new Error(`Generation failed: ${(response as { ok?: any, statusText?: any, json?: any }).statusText}`)}

@@ -14,7 +14,7 @@
   import Users from 'lucide-svelte/icons/users';
   import { scale } from 'svelte/transition';
 
-  interface CaseData { id: string;, title: string;
+  interface CaseData { id: string; title: string;
     description?: string;
 	status: 'active' | 'pending' | 'closed' | 'archived';
     priority: 'critical' | 'high' | 'medium' | 'low';
@@ -23,7 +23,7 @@
     assignee?: {
 	name: string;
       avatar?: string };
-    stats: { evidence: number;, witnesses: number;
+    stats: { evidence: number; witnesses: number;
 	documents: number };
     tags?: string[];
     progress?: number }

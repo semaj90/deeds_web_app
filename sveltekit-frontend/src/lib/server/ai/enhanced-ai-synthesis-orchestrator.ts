@@ -32,7 +32,7 @@ interface HealthReport { status: 'healthy' | 'degraded' | 'unhealthy',initialize
 	START: `processing` } },
 	processing: {
 	entry: ['logProcessing'], // simplified flow: check cache -> fetch -> generate -> done
-,on: {
+on: {
 	MCP_ERROR: `idle` },
 	after: {
 	1000: `idle` } } }

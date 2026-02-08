@@ -8,7 +8,7 @@ import Upload from 'lucide-svelte/icons/upload';
 import X from 'lucide-svelte/icons/x';
 import Zap from 'lucide-svelte/icons/zap';
 
-interface UploadFile { id: string;, file: File;
+interface UploadFile { id: string; file: File;
 	progress: number;
 status: 'pending' | 'uploading' | 'completed' | 'error';
 minioPath?: string;

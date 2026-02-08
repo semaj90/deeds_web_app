@@ -44,7 +44,7 @@
 	};
 
     // Helper for circular type safety
-    interface GraphNode { id: string;, type: string;
+    interface GraphNode { id: string; type: string;
         label: string;
         errorType?: string;
         occurrences?: number;
@@ -213,18 +213,18 @@
 </div>
 
 <style>
-	.knowledge-graph { position: relative;, background: #1a1a2e;
+	.knowledge-graph { position: relative; background: #1a1a2e;
 		border-radius: 8px;
 		overflow: hidden;
     }
 
-	.controls { display: flex;, gap: 1rem;
+	.controls { display: flex; gap: 1rem;
 		padding: 0.5rem;
 		background: rgba(0, 0, 0, 0.3);
 		align-items: center;
     }
 
-	.filter-select { background: #2d2d44;, color: #fff;
+	.filter-select { background: #2d2d44; color: #fff;
 		border: 1px solid #4a4a6a;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
@@ -236,7 +236,7 @@
 		gap: 0.5rem;
     }
 
-	.zoom-controls button { background: #4f46e5;, color: white;
+	.zoom-controls button { background: #4f46e5; color: white;
 		border: none;
 		width: 24px;
 		height: 24px;
@@ -252,7 +252,7 @@
 		gap: 1rem;
     }
 
-	svg { display: block;, transition: transform 0.2s;
+	svg { display: block; transition: transform 0.2s;
         cursor: grab;
     }
 
@@ -284,7 +284,7 @@
 		pointer-events: none;
     }
 
-	.node-details { position: absolute;, bottom: 1rem;
+	.node-details { position: absolute; bottom: 1rem;
 		right: 1rem;
 		background: #2d2d44;
 		padding: 1rem;

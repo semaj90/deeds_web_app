@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  interface Link { id: string;, case_id: string;
+  interface Link { id: string; case_id: string;
     statute_code: string;
 	link_type: string;
     notes?: string;
@@ -49,7 +49,7 @@
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, link_type: editedLinkType,
+link_type: editedLinkType,
           notes: editedNotes || undefined
         })
       });
@@ -178,7 +178,7 @@
   }
 
   .form-group select,
-  .form-group textarea { padding: 0.75rem;, border: 1px solid #d4a574;
+  .form-group textarea { padding: 0.75rem; border: 1px solid #d4a574;
     border-radius: 4px;
     font-family: 'Source Sans 3', sans-serif;
     font-size: 0.95rem;
@@ -202,7 +202,7 @@
     resize: vertical;
   }
 
-  .form-actions { display: flex;, gap: 0.5rem;
+  .form-actions { display: flex; gap: 0.5rem;
   }
 
   .btn-save,
@@ -234,7 +234,7 @@
   }
 
   .btn-save:disabled,
-  .btn-cancel:disabled { opacity: 0.6;, cursor: not-allowed;
+  .btn-cancel:disabled { opacity: 0.6; cursor: not-allowed;
   }
 
   .display-content {
@@ -243,7 +243,7 @@
 	gap: 1rem;
   }
 
-  .metadata-item { display: flex;, gap: 1rem;
+  .metadata-item { display: flex; gap: 1rem;
     padding: 0.75rem;
     background-color: #f5f1e8;
     border-radius: 4px;
@@ -255,7 +255,7 @@
     min-width: 100px;
   }
 
-  .value { color: #333;, flex: 1;
+  .value { color: #333; flex: 1;
   }
 
   .btn-edit {

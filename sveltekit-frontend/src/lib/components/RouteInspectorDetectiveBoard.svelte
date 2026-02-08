@@ -1,7 +1,7 @@
 <script lang="ts">
 	let pkg = $state<any>(undefined);
 
-	type RouteDetail = { path: string;, kind: 'page' | 'layout' | 'endpoint';
+	type RouteDetail = { path: string; kind: 'page' | 'layout' | 'endpoint';
 		file: string;
 	summary: string;
 		category?: string;
@@ -16,7 +16,7 @@
 
 	type Phase72Status = {
 		errorCount: number;
-		lastError?: { code: string;, message: string;
+		lastError?: { code: string; message: string;
 	count: number;
 			lastSeen: string;
 		};
@@ -86,7 +86,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, route: route.path })
+route: route.path })
 			});
 		} finally {
 			actionInProgress = null;
@@ -101,7 +101,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, route: route.path })
+route: route.path })
 			});
 			if (res.ok) {
 				const data = await res.json();
@@ -135,7 +135,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, route: route.path })
+route: route.path })
 			});
 		} finally {
 			actionInProgress = null;

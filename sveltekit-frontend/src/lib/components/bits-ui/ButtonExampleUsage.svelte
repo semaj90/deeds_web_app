@@ -136,7 +136,7 @@
   code {
     font-family: 'JetBrains Mono', 'Roboto Mono', monospace
     font-size: 0.875rem
-   ,color: var(--color-nier-text-primary)}
+   color: var(--color-nier-text-primary)}
 </style>
 
 

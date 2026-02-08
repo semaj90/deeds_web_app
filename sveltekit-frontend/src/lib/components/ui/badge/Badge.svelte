@@ -17,7 +17,7 @@
         },
 	},
 	defaultVariants: {
-, variant: "default",
+variant: "default",
       },
 	}
   );

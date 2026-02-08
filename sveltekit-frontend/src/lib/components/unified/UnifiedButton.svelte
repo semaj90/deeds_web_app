@@ -303,13 +303,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 <style>
   /* minimal styling + CSS fallback glow when WebGL not available */
-  .unified-button-wrapper { position: relative;, display: inline-block;
+  .unified-button-wrapper { position: relative; display: inline-block;
   }
-  .canvas-layer { position: absolute;, inset: 0;
+  .canvas-layer { position: absolute; inset: 0;
     pointer-events: none;
     z-index: 0;
   }
-  .gl-canvas { width: 100%;, height: 100%;
+  .gl-canvas { width: 100%; height: 100%;
     display: block;
   }
   .unified-btn {

@@ -17,7 +17,7 @@
 		let lastIndex = 0;
 
 		// Find all citations
-		const citations: Array<{ start: number;, end: number;
+		const citations: Array<{ start: number; end: number;
 	type: string;
 			content: string;
 	reference: string;
@@ -139,7 +139,7 @@
 		word-wrap: break-word;
 	}
 
-	.citation-link { background: none;, border: none;
+	.citation-link { background: none; border: none;
 		padding: 0;
 	margin: 0;
 		font-size: inherit;

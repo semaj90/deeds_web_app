@@ -5,19 +5,19 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
-	interface Cluster { id: number;, error_count: number;
+	interface Cluster { id: number; error_count: number;
 		tags: string[];
 summary: string;
 		error_ids: number[];
 		centroid?: number[];
 	}
 
-	interface GraphNode { id: string;, file_path: string;
+	interface GraphNode { id: string; file_path: string;
 		error_count: number;
 dependencies: string[];
 	}
 
-	interface VectorSearchResult { id: string;, score: number;
+	interface VectorSearchResult { id: string; score: number;
 		payload: any;
 	}
 

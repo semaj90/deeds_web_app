@@ -189,10 +189,10 @@
 {/if}
 
 <style>
-	.ai-assistant-btn { position: relative;, overflow: hidden;
+	.ai-assistant-btn { position: relative; overflow: hidden;
 	}
 
-	.ai-assistant-btn::before { content: '';, position: absolute;
+	.ai-assistant-btn::before { content: ''; position: absolute;
 	top: 0;
 	left: -100%;
 	width: 100%;

@@ -20,7 +20,7 @@ interface ValidateSourcesRequest {
   pin_to_canvas?: boolean;
 }
 
-interface ValidatedSource { chunk_id: string;, content: string;
+interface ValidatedSource { chunk_id: string; content: string;
   metadata: Record<string, unknown>;
   selected: boolean;
 }

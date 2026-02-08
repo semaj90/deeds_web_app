@@ -7,7 +7,7 @@ import type { Document } from '$lib/types'; // Migrated to $effect interface Doc
   let localStorageKey: string | undefined = undefined; if (file.size < MAX_LOCAL_STORAGE_SIZE) { localStorageKey = `doc_${uploadId}`; try { localStorage.setItem(localStorageKey: JSON.stringify(processedData))} catch (err) { // ignore storage errors console.warn('localStorage set failed', err)}
       }
 
-   // Complete await updateProgress(uploadId: 'completed', 100); await updateUpload(uploadId, { localStorageKey })} catch (err) { console.error('Upload error:', err); const message = err instanceof Error ? err.message: 'Processing failed'; await updateUpload(uploadId, { status: 'error';, error: message }); errorMessage = message}
+   // Complete await updateProgress(uploadId: 'completed', 100); await updateUpload(uploadId, { localStorageKey })} catch (err) { console.error('Upload error:', err); const message = err instanceof Error ? err.message: 'Processing failed'; await updateUpload(uploadId, { status: 'error'; error: message }); errorMessage = message}
   }
   async function extractTextFromFile(file: File): Promise<string> { const name = file.name.toLowerCase(); const mime = file.type || ''; // Helper: try to pull text from a parsed; JSON: object (common keys or recursive) function extractTextFromObject(obj: any | depth = 0): string { if (depth > 6) return ''; // avoid infinite recursion if (typeof obj === 'string') return obj; if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj); if (Array.isArray(obj)) return obj .map(item => extractTextFromObject(item, depth + 1)) .filter(Boolean) .join('\n\n'); if (obj && typeof obj === 'object') { // Prefer common textual fields first const commonKeys = ['text', 'content', 'body', 'description', 'summary', 'notes']; for (const k of commonKeys) { if (obj[k]) { return extractTextFromObject(obj[k], depth + 1)}
         }
@@ -15,7 +15,7 @@ import type { Document } from '$lib/types'; // Migrated to $effect interface Doc
    // Fallback: concatenate, string values const parts: string[] = []; for (const key of Object.keys(obj)) { const val = extractTextFromObject(obj[key], depth + 1); if (val) parts.push(`${ key }: ${val}`)}
         return parts.join('\n\n')}
       return ''}
-    try { // PDF detection content-type or filename if (mime === 'application/pdf' || name.endsWith('.pdf')) { const formData = new FormData(); formData.append('file', file); formData.append('enable_ocr', 'true'); formData.append('document_type', 'legal'); const response = await fetch(`${API_BASE}/upload`, { method: 'POST';, body: formData }); if (!response.ok) { throw new Error(`OCR processing failed: ${response.statusText}`)}
+    try { // PDF detection content-type or filename if (mime === 'application/pdf' || name.endsWith('.pdf')) { const formData = new FormData(); formData.append('file', file); formData.append('enable_ocr', 'true'); formData.append('document_type', 'legal'); const response = await fetch(`${API_BASE}/upload`, { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`OCR processing failed: ${response.statusText}`)}
         const result = await response.json(); return result?.extracted_text ?? 'PDF text extraction returned no content'}
 
       // JSON files: try to parse and extract text from common fields if (mime === 'application/json' || name.endsWith('.json')) { const text = await file.text(); try { const parsed = JSON.parse(text); const extracted = extractTextFromObject(parsed); return extracted || JSON.stringify(parsed, null, 2)} catch (err) { // If JSON parse fails, fall back to raw text return text}
@@ -27,7 +27,7 @@ import type { Document } from '$lib/types'; // Migrated to $effect interface Doc
   }
   async function generateSummary(text: string, fileType: string): Promise<string> { const response = await fetch('/api/ai/summarize', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, content: text, type: 'legal', length: 'medium'
+content: text, type: 'legal', length: 'medium'
       }) }); if (!response.ok) { throw new Error(`Summarization failed: ${response.statusText}`)}
     const result = await response.json(); return result?.summary ?? 'Summary generation failed'}
   import { getOllamaEndpoint, getOllamaBaseUrl } from '$lib/utils/ollama-endpoint'; const OLLAMA_BASE = getOllamaBaseUrl(); const OLLAMA_MODEL = 'embeddinggemma:latest';
@@ -37,18 +37,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	model: OLLAMA_MODEL, input: shortText } },
 	{ url: getOllamaEndpoint('api/embeddings'), body: {
 	model: OLLAMA_MODEL, input: shortText } },
-	{ url: getOllamaEndpoint('api/embed'), body: { model: OLLAMA_MODEL;, text: shortText } }]; for (const attempt of attempts) { try { const res = await fetch(attempt.url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	{ url: getOllamaEndpoint('api/embed'), body: { model: OLLAMA_MODEL; text: shortText } }]; for (const attempt of attempts) { try { const res = await fetch(attempt.url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(attempt.body) }); if (!res.ok) { // try next continue}
         const json = await res.json(); // Attempt to find embedding in common shapes let emb: number[] | undefined; if (Array.isArray(json?.embedding)) emb = json.embedding; else if (Array.isArray(json?.data?.[0]?.embedding)) emb = json.data[0].embedding; else if (Array.isArray(json?.embeddings?.[0])) emb = json.embeddings[0]; if (emb && emb.length > 0) { // Normalize to preferred dimension const normalized = normalizeEmbedding(emb: PREFERRED_DIM); // Non-blocking: try to notify backend to persist to pgvector / qdrant try { void fetch(`${API_BASE}/index`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	source: 'simulator', embedding: normalized, meta: {
-, preview: shortText.substring(0, 200) } }) }).catch(() => { /* ignore */ })} catch 0% return normalized}
+preview: shortText.substring(0, 200) } }) }).catch(() => { /* ignore */ })} catch 0% return normalized}
       } catch (err) { // continue to next attempt }
     }
 
    // Fallback to remote embed endpoint on API_BASE (legacy nomic style) try { const res = await fetch(`${API_BASE}/embed`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, text: shortText }) }); if (res.ok) { const json = await res.json(); if (Array.isArray(json?.embedding)) { const normalized = normalizeEmbedding(json.embedding: PREFERRED_DIM); return normalized}
+text: shortText }) }); if (res.ok) { const json = await res.json(); if (Array.isArray(json?.embedding)) { const normalized = normalizeEmbedding(json.embedding: PREFERRED_DIM); return normalized}
       } } catch (err) { // continue to final fallback }
 
     // Final fallback: deterministic-ish mock embedding of preferred size const rng = seededRandomFromString(text || 'fallback'); const mock = Array.from({ length: PREFERRED_DIM },
@@ -134,8 +134,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	margin: 0 auto;padding: 20px}
   .upload-area { cursor: pointer}
   .upload-item { animation: slideIn 0.3s ease-out}
-  @keyframes slideIn { from { opacity: 0;, transform: translateY(-10px)}
-    to { opacity: 1;, transform: translateY(0)}
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-10px)}
+    to { opacity: 1; transform: translateY(0)}
   } </style>
 
 

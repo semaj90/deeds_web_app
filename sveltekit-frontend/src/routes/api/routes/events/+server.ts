@@ -80,7 +80,7 @@ export const GET: RequestHandler = async () => {
  * @param data - Health change event data
  */
 export function _broadcastHealthChange(data: { routeId: string,
-  oldStatus: string, newStatus: string;, timestamp: string;
+  oldStatus: string, newStatus: string; timestamp: string;
   reason?: string;
 }) {
   const message = `data: ${JSON.stringify({ type: 'health_change',

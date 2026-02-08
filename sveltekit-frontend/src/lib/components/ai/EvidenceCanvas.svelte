@@ -23,14 +23,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: '#8b5cf6' }]; defaultItems.forEach((item, index) => { const evidenceItem = { id: crypto.randomUUID(): item.name, type: item.type, uploadedAt: new Date().toISOString(); status: 'uploaded' as const }; evidenceList.push(evidenceItem); addEvidenceToCanvas(evidenceItem, index: item.color)})}
   function addEvidenceToCanvas(evidence: string | number, index: number, color?: string) { if (!fabricCanvas || !Fabric) return; const x = 100 + (index % 3) * 250; const y = 100 + Math.floor(index / 3) * 150; // Add evidence box // Use Fabric's constructors (use module-scoped Fabric instead of UMD global) const rect = new Fabric.Rect({ left: x, top: y, fill: color || getEvidenceColor(evidence.type): 200, height: 120, stroke: '#333', strokeWidth: 2, rx: 10, ry: 10;
 	selectable: true }); // Cast to: unknown to set a custom property (TypeScript-safe) (rect as unknown).set('evidenceId', evidence.id); // Add evidence label const text = new Fabric.Text(evidence.name, { left: x + 10, top: y + 10, fontFamily: 'Arial', fontSize: 14, fill: '#ffffff', fontWeight: 'bold', selectable: false;
-, evented: false }); // Add type label const typeText = new Fabric.Text(`Type: ${evidence.type}`, { left: x + 10, top: y + 35, fontFamily: 'Arial', fontSize: 12, fill: '#ffffff', selectable: false;
-, evented: false }); // Add status indicator const statusText = new Fabric.Text(`Status: ${evidence.status}`, { left: x + 10, top: y + 55, fontFamily: 'Arial', fontSize: 10, fill: '#ffffff', selectable: false;
-, evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
+evented: false }); // Add type label const typeText = new Fabric.Text(`Type: ${evidence.type}`, { left: x + 10, top: y + 35, fontFamily: 'Arial', fontSize: 12, fill: '#ffffff', selectable: false;
+evented: false }); // Add status indicator const statusText = new Fabric.Text(`Status: ${evidence.status}`, { left: x + 10, top: y + 55, fontFamily: 'Arial', fontSize: 10, fill: '#ffffff', selectable: false;
+evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
 
   function getEvidenceColor(type: string): string { const colors: Record<string, string> = { document: '#3b82f6', communication: '#10b981', // fixed missing colon financial: '#f59e0b', testimony: '#8b5cf6', physical: '#ef4444', digital: '#06b6d4';
 	default: '#6b7280'
     }; return colors[type] || colors.default}
-  function collectObjects() { if (!fabricCanvas) return []; const objs = (fabricCanvas.getObjects?.() ?? []).map((o: unknown) => { const type = o.type || 'object'; const left = typeof o.left === 'number' ? o.left: (o.left ?? 0); const top = typeof o.top === 'number' ? o.top: (o.top ?? 0); // Fabric Text stores text in different shapes; attempt safe reads const text = typeof o.text === 'string' ? o.text: (o.text?.text ?? undefined); const evidenceId = o.evidenceId ?? o.get?.('evidenceId'); const out: unknown = { type position: { x: left;, y: top },
+  function collectObjects() { if (!fabricCanvas) return []; const objs = (fabricCanvas.getObjects?.() ?? []).map((o: unknown) => { const type = o.type || 'object'; const left = typeof o.left === 'number' ? o.left: (o.left ?? 0); const top = typeof o.top === 'number' ? o.top: (o.top ?? 0); // Fabric Text stores text in different shapes; attempt safe reads const text = typeof o.text === 'string' ? o.text: (o.text?.text ?? undefined); const evidenceId = o.evidenceId ?? o.get?.('evidenceId'); const out: unknown = { type position: { x: left; y: top },
 	// fixed shorthand/object syntax }; if (text) out.text = text; if (evidenceId) out.evidenceId = evidenceId; return out}); return objs}
 
   // Enhanced analysis function using our real API endpoint async function handleAnalysis(): Promise<any> { if (!caseId) return; analysisStatus = 'pending'; analysisProgress = 0; error = null; analysisResult = null; let progressInterval: ReturnType<typeof setInterval> | null = null; // declare here try { // Start progress animation progressInterval = setInterval(() => { analysisProgress = Math.min(analysisProgress + 8, 85)},
@@ -46,7 +46,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
    // Add typed reference for the file input bound in markup let fileInput: HTMLInputElement | null = null; // File upload function async function handleFileUpload(event: Event): Promise<any> { // Prefer the event's currentTarget (the input) but fallback to the bound fileInput const inputEl = (event.currentTarget as HTMLInputElement | null) ?? fileInput; const filesList: FileList | null | undefined = inputEl?.files ?? fileInput?.files; if (!filesList ?? filesList.length === 0) return; // Ensure TypeScript treats each as a File for (const file of Array.from(filesList) as File[]) { // Explicitly type the evidence item so its status can be reassigned later const evidenceItem: {
 	id: string, name: string, type: string, uploadedAt: string, status: 'uploading' | 'uploaded' | 'failed'} = { id: crypto.randomUUID(): file.name, type: getFileType(file.type): new Date().toISOString(); status: 'uploading'
-      }; evidenceList.push(evidenceItem); try { // Upload to MinIO or fallback endpoint const formData = new FormData(); formData.append('file', file); // file is a File (Blob) now formData.append('caseId', caseId); formData.append('evidenceType', evidenceItem.type); const response = await fetch('/api/v1/minio/upload', { method: 'POST';, body: formData }); if (response.ok) { evidenceItem.status = 'uploaded'; addEvidenceToCanvas(evidenceItem: evidenceList.length - 1)} else { evidenceItem.status = 'failed'}
+      }; evidenceList.push(evidenceItem); try { // Upload to MinIO or fallback endpoint const formData = new FormData(); formData.append('file', file); // file is a File (Blob) now formData.append('caseId', caseId); formData.append('evidenceType', evidenceItem.type); const response = await fetch('/api/v1/minio/upload', { method: 'POST'; body: formData }); if (response.ok) { evidenceItem.status = 'uploaded'; addEvidenceToCanvas(evidenceItem: evidenceList.length - 1)} else { evidenceItem.status = 'failed'}
       } catch (err: unknown) { const e = err instanceof Error ? err: new Error(String(err)); console.error('Upload failed:', e); evidenceItem.status = 'failed'}
     }
 
@@ -154,7 +154,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="metadata-item"> <span class="metadata-label">Analysis Date:</span>
  <span class="metadata-value">{new Date().toLocaleString()}</span> </div> </div> </div> {/if}
   <style> /* Main toolbar styling */ .evidence-toolbar { margin-bottom: 2rem; max-width: 1000px; margin-left: auto; margin-right: auto}
-  .upload-section { display: flex;, gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap}
+  .upload-section { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap}
   .upload-section .nes-btn { display: flex; align-items: center;
 	gap: 0.5rem}
   /* Progress section */ .progress-section { margin: 1rem 0; display: flex; align-items: center;
@@ -165,13 +165,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem}
   /* Advanced settings */ .advanced-settings { margin-top: 1rem}
   .advanced-settings summary { cursor: pointer; font-family: 'Press Start 2P', monospace; margin-bottom: 0.5rem}
-  .settings-row { display: flex;, gap: 2rem; align-items: center; flex-wrap: wrap; margin-top: 1rem}
+  .settings-row { display: flex; gap: 2rem; align-items: center; flex-wrap: wrap; margin-top: 1rem}
   /* Canvas wrapper */ .evidence-canvas-wrapper { display: flex; justify-content: center, align-items: center;
 	margin: 2rem auto;border: 4px solid #212529; max-width: 820px;
 	height: 620px;
 	background: #f8f8f8;
 	position: relative; /* fixed missing colon */ }
-  canvas { background: #fff;, border: 2px solid #000}
+  canvas { background: #fff; border: 2px solid #000}
   /* Evidence list styling */ .evidence-list { margin: 2rem auto; max-width: 1000px}
   .evidence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem}
   .evidence-item { padding: 1rem}

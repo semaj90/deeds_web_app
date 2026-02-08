@@ -6,7 +6,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           'Content-Type': 'application/json'
         },
 	body: JSON.stringify({
-, query: query.trim() }) }); if (!response.ok) { const errText = await response.text(); let parsed; try { parsed = JSON.parse(errText)} catch { parsed = { error: errText || response.statusText }}
+query: query.trim() }) }); if (!response.ok) { const errText = await response.text(); let parsed; try { parsed = JSON.parse(errText)} catch { parsed = { error: errText || response.statusText }}
         throw new Error(parsed.error || `Search, failed: ${response.statusText}`)}
       const data = await response.json(); const searchTime = performance.now() - startTime; results = (data.results || []).map((r: any) => ({ id: r.id, title: r.title || `Document ${r.id}`, content: r.content || r.text || '', similarity: r.similarity ?? 0, documentType: r.documentType ?? 'deed', metadata: r.metadata })); metrics = { totalDocuments: (data.results || []).length, searchTime: Math.round(searchTime): data.vectorDimensions ?? 384, similarityThreshold: data.similarityThreshold ?? 0.0 }} catch (err) { error = err instanceof Error ? err.message: 'Search failed'; results = []; metrics = null} finally { isSearching = false}
   }

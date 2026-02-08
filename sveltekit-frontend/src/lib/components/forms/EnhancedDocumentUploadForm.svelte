@@ -24,14 +24,14 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   function handleReset() { actor.send({ type: "RESET" }); selectedFile = null; $formData = { title: "", description: "", documentType: "other", jurisdiction: undefined;
 	tags: [], file: null, aiProcessing: {
 	generateSummary: true
-, extractEntities: true, riskAssessment: true, generateRecommendations: false }
+extractEntities: true, riskAssessment: true, generateRecommendations: false }
     } persistence.clear()}
   function handleSaveDraft() { persistence.save($formData)}
   function loadDraft() { const draft = persistence.load(); if (draft) { Object.assign($formData, draft)}
   }
 
    // ============================================================================ // REACTIVE STATEMENTS // ============================================================================ let stateValue = $derived($state); let contextValue = $derived($context); let canSubmit = $derived($isValid && selectedFile && !$isSubmitting); let showProgress = $derived($progress > 0 && $progress < 100); let isCompleted = $derived(stateValue === "completed"); let isError = $derived(stateValue === "uploadError" || stateValue === "processingError" || stateValue === "failed"); // Ensure default form shape to prevent runtime errors // Ensure default form shape to prevent runtime errors // TODO: Convert to $derived if ($formData) { if (!$formData.aiProcessing) { $formData.aiProcessing = { generateSummary: true
-, extractEntities: true, riskAssessment, true, generateRecommendations, false }
+extractEntities: true, riskAssessment, true, generateRecommendations, false }
     } if (!$formData.tags) { $formData.tags = []}
     if (!$formData.documentType) { $formData.documentType = "other"}
   }

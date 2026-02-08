@@ -8,7 +8,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  // Migrated from createEventDispatcher to callback props;
 
- interface Evidence { id: string;, title: string;
+ interface Evidence { id: string; title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -18,7 +18,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  id: string;
  caseId?: string;
 	generatedAt: string;
- admissibility: Array<{ evidence: string;, ruling: 'admissible' | 'inadmissible' | 'conditional';
+ admissibility: Array<{ evidence: string; ruling: 'admissible' | 'inadmissible' | 'conditional';
  reasoning: string;
 	legalBasis: string;
  }>;
@@ -31,7 +31,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	overall: number; // 0-100
  prosecution: number;
 	defense: number;
- keyFactors: Array<{ factor: string;, impact: 'positive' | 'negative' | 'neutral';
+ keyFactors: Array<{ factor: string; impact: 'positive' | 'negative' | 'neutral';
  weight: number;
  }>;
  };
@@ -70,7 +70,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  'Content-Type': 'application/json'
  },
 	body: JSON.stringify({
-, caseId: evidence,
+caseId: evidence,
  charges: jurisdiction
  })
  });

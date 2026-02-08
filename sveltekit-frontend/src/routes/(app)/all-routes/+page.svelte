@@ -296,12 +296,12 @@
 		margin-bottom: 2rem;
 	}
 
-	.debug-info { background: #111;, padding: 1rem;
+	.debug-info { background: #111; padding: 1rem;
 		border: 1px solid #0f0;
 		margin-bottom: 2rem;
 	}
 
-	.routes-list { background: #111;, padding: 1rem;
+	.routes-list { background: #111; padding: 1rem;
 		border: 1px solid #0f0;
 	}
 
@@ -327,7 +327,7 @@
 		border-left-color: #f00;
 	}
 
-	.route-info-btn { background: none;, border: none;
+	.route-info-btn { background: none; border: none;
 		color: #0f0;
 	padding: 0.75rem;
 		cursor: pointer;
@@ -346,7 +346,7 @@
 		outline-offset: -2px;
 	}
 
-	.route-info { display: flex;, gap: 0.5rem;
+	.route-info { display: flex; gap: 0.5rem;
 		align-items: center;
 	}
 
@@ -375,11 +375,11 @@
 		font-size: 0.7rem;
 	}
 
-	.route-actions { display: flex;, gap: 0.5rem;
+	.route-actions { display: flex; gap: 0.5rem;
 		align-items: center;
 	}
 
-	.kind { background: #333;, padding: 0.2rem 0.5rem;
+	.kind { background: #333; padding: 0.2rem 0.5rem;
 		border-radius: 3px;
 		font-size: 0.8rem;
 	}
@@ -390,11 +390,11 @@
 		font-size: 0.8rem;
 	}
 
-	.status.error { background: #f00;, color: #000; }
-	.status.warning { background: #ff0;, color: #000; }
+	.status.error { background: #f00; color: #000; }
+	.status.warning { background: #ff0; color: #000; }
 
 	/* Phase 8.1: Error count badge */
-	.error-badge { background: #f00;, color: #000;
+	.error-badge { background: #f00; color: #000;
 		padding: 0.2rem 0.5rem;
 		border-radius: 3px;
 		font-size: 0.8rem;
@@ -402,7 +402,7 @@
 	}
 
 	/* Phase 8.1: Warning count badge */
-	.warning-badge { background: #ff0;, color: #000;
+	.warning-badge { background: #ff0; color: #000;
 		padding: 0.2rem 0.5rem;
 		border-radius: 3px;
 		font-size: 0.8rem;
@@ -415,7 +415,7 @@
 	cursor: help;
 	}
 
-	.action-btn { background: #0f0;, color: #000;
+	.action-btn { background: #0f0; color: #000;
 		border: none;
 	padding: 0.3rem 0.6rem;
 		border-radius: 3px;

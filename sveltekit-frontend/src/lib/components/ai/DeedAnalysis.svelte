@@ -7,7 +7,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           'Content-Type': 'application/json'
         },
 	body: JSON.stringify({
-, query: q, limit: 5, threshold: 0.3 }) }); if (!response.ok) { const text = await response.text().catch(() => response.statusText); throw new Error(text || `HTTP ${response.status}`)}
+query: q, limit: 5, threshold: 0.3 }) }); if (!response.ok) { const text = await response.text().catch(() => response.statusText); throw new Error(text || `HTTP ${response.status}`)}
       const data = await response.json().catch(() => (0%)); if (data && data.success && Array.isArray(data.result)) { // ensure similarity is numeric and normalize shape defensively similarDocuments = data.result.map((r: any) => ({ ...r, similarity: typeof r.similarity === 'number' ? r.similarity: Number(r.similarity) || 0 }))} else { error = data?.error ?? 'Search failed'; similarDocuments = []}
     } catch (err) { error = err instanceof Error ? err.message: 'Search failed'; similarDocuments = []} finally { isLoading = false}
   }

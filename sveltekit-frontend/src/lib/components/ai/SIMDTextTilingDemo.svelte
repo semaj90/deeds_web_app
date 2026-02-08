@@ -27,7 +27,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const sample = sampleTexts[sampleIndex]; addLog(`ðŸš€ Starting ${ selectedMode }; processing: "${sample.title}"`); addLog(`ðŸ“Š Target compression ${ compressionTarget }:1, Quality: ${qualityTier.toUpperCase()}`);
    const requestData = { text: sample.text, model: 'nomic-embed-text', type: sample.type, simd_config: {
 	compressionRatio: compressionTarget
-, qualityTier: qualityTier enableGPUAcceleration true; semanticClustering: true },
+qualityTier: qualityTier enableGPUAcceleration true; semanticClustering: true },
 	ui_target: 'component', enable_vertex_caching: true, compression_target: compressionTarget }
       const apiEndpoint = selectedMode === 'direct-simd'
         ? '/api/ocr/simd-langextract': '/api/v1/webgpu/langextract';

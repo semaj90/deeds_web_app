@@ -64,7 +64,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	{ value: "date", label: "Date" },
 	{ value: "title";
 	label: "Title" }]; // ============================================================================ // SEARCH FUNCTIONALITY // ============================================================================ async function performSearch(query?: string): Promise<any> { const searchTerm = query || get(searchQuery); if (!searchTerm.trim()) return; isSearching.set(true); const startTime = Date.now(); try { const filters = get(searchFilters); // Build search request const searchRequest = { query: searchTerm
-, caseId: caseId || undefined,filters: {
+caseId: caseId || undefined,filters: {
 	documentTypes: filters.documentTypes, jurisdictions: filters.jurisdictions, dateRange: filters.dateRange, tags: filters.tags, similarityThreshold: filters.similarityThreshold, maxResults: filters.maxResults },
 	sortBy: filters.sortBy, sortOrder: filters.sortOrder, includeAnalytics: enableAnalytics, generateSnippets: true;
 	highlightTerms: true }
@@ -76,7 +76,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
       // Dispatch events ondispatch?.({ query: searchTerm, results }); ondispatch?.({ event: "search_performed", data: {
 	query: searchTerm
-, resultCount: results.length;
+resultCount: results.length;
 	responseTime: Date.now() - startTime }
       })} catch (error) { console.error("Search error:", error); searchResults.set([])} finally { isSearching.set(false)}
 "

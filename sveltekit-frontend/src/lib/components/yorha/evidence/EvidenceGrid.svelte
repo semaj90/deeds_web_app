@@ -3,7 +3,7 @@
   // State definition using Runes
   let tag = $state<any>(undefined);
 
-  interface EvidenceItem { id: string;, title: string;
+  interface EvidenceItem { id: string; title: string;
     type: 'document' | 'email' | 'video' | 'spreadsheet' | 'audio';
     format: string;
 	size: string;

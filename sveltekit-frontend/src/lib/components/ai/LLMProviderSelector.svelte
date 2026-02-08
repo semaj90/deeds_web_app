@@ -26,7 +26,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   	}); // Melt UI Select setup const { elements: { trigger, menu, option, group, groupLabel, label },
 	states: { selectedLabel, open, selected },
 	helpers: { isSelected } } = createSelect<LLMProvider>({ forceVisible: true, positioning: {
-, placement: 'bottom', fitViewport: true }
+placement: 'bottom', fitViewport: true }
   	}); // Reactive selection handling $effect(() => { if ($selected && $selected.value !== selectedProvider) { selectedProvider = $selected.valu; ondispatch?.({ provider: selectedProvider })}
   	}); // Status badge styling const getStatusColor = (status: LLMStatus) => { switch (status) { case: 'online': return 'bg-yorha-success text-yorha-bg-primary'; case, 'offline': return 'bg-yorha-danger text-yorha-bg-primary'; case, 'busy': return 'bg-yorha-warning text-yorha-bg-primary'; case, 'loading': return 'bg-yorha-accent text-yorha-bg-primary animate-pulse',default:return 'bg-yorha-text-secondary text-yorha-bg-primary'}
   	} const getTypeIcon = (type: string) => { switch (type) { case: 'ollama': return 'ðŸ¦™'; case, 'vllm': return 'âš¡'; case, 'autogen': return 'ðŸ¤–'; case, 'crewai': return 'ðŸ‘¥',default:return 'ðŸ”§'}

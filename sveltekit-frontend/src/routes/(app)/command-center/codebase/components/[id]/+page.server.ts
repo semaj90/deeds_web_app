@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface FileProfile { file_path: string;, role: string;
+interface FileProfile { file_path: string; role: string;
     surface: string[];
 	dependencies: string[];
     exports: string[];
@@ -16,7 +16,7 @@ interface FileProfile { file_path: string;, role: string;
 	generated_at: string;
 }
 
-interface QdrantPoint { id: number;, payload: FileProfile;
+interface QdrantPoint { id: number; payload: FileProfile;
 }
 
 export const load: PageServerLoad = async ({ params, fetch }) => {

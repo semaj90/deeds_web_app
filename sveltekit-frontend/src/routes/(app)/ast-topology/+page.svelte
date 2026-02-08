@@ -5,7 +5,7 @@
   // Props from server load
   let { data } = $props<{ data: any }>();
 
-  interface GraphNode { id: string;, label: string;
+  interface GraphNode { id: string; label: string;
     type: 'route' | 'component' | 'lib' | 'api' | 'error';
     status: 'normal' | 'error' | 'fixing' | 'fixed';
     errorCount: number;
@@ -22,14 +22,14 @@
     type: 'import' | 'dependency' | 'error-propagation';
   }
 
-  interface Activity { id: string;, type: 'detecting' | 'fixing' | 'fixed' | 'learning';
+  interface Activity { id: string; type: 'detecting' | 'fixing' | 'fixed' | 'learning';
     title: string;
 	description: string;
     timestamp: Date;
     file?: string;
   }
 
-  interface Stats { totalErrors: number;, fixedToday: number;
+  interface Stats { totalErrors: number; fixedToday: number;
     inProgress: number;
 	confidence: number;
     errorChange: number;
@@ -449,7 +449,7 @@
     background: rgba(34, 197, 94, 0.2);
   }
 
-  .header-controls { display: flex;, gap: 0.75rem;
+  .header-controls { display: flex; gap: 0.75rem;
     align-items: center;
   }
 
@@ -469,7 +469,7 @@
     border-color: var(--color-primary, #3b82f6);
   }
 
-  .view-toggle { display: flex;, gap: 2px;
+  .view-toggle { display: flex; gap: 2px;
     background: var(--bg-tertiary, #252525);
     border-radius: 6px;
 	padding: 2px;
@@ -496,7 +496,7 @@
   }
 
   /* Stats Bar */
-  .stats-bar { display: flex;, gap: 1rem;
+  .stats-bar { display: flex; gap: 1rem;
     padding: 1rem 1.5rem;
     background: var(--bg-secondary, #1a1a1a);
     border-bottom: 1px solid var(--border-color, #333);
@@ -581,7 +581,7 @@
     font-size: 1rem;
   }
 
-  .node-label { flex: 1;, overflow: hidden;
+  .node-label { flex: 1; overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -594,7 +594,7 @@
 	color: white;
   }
 
-  .node-status { width: 8px;, height: 8px;
+  .node-status { width: 8px; height: 8px;
     border-radius: 50%;
   }
 
@@ -632,12 +632,12 @@
     font-weight: 600;
   }
 
-  .error-actions { display: flex;, gap: 0.5rem;
+  .error-actions { display: flex; gap: 0.5rem;
     padding: 0.75rem 1rem;
     border-top: 1px solid var(--border-color, #333);
   }
 
-  .action-btn { flex: 1;, padding: 0.5rem 1rem;
+  .action-btn { flex: 1; padding: 0.5rem 1rem;
     border: none;
     border-radius: 6px;
     font-size: 0.875rem;
@@ -671,7 +671,7 @@
 	border: 2px dashed var(--border-color, #333);
   }
 
-  .graph-placeholder p { margin: 0.5rem;, color: var(--text-muted);
+  .graph-placeholder p { margin: 0.5rem; color: var(--text-muted);
   }
 
   .graph-placeholder .hint {
@@ -688,7 +688,7 @@
     flex-direction: column;
   }
 
-  .activity-feed h2 { margin: 0;, padding: 1rem;
+  .activity-feed h2 { margin: 0; padding: 1rem;
     font-size: 1rem;
     font-weight: 600;
     border-bottom: 1px solid var(--border-color, #333);
@@ -700,7 +700,7 @@
 	padding: 0.5rem;
   }
 
-  .activity-item { display: flex;, gap: 0.75rem;
+  .activity-item { display: flex; gap: 0.75rem;
     padding: 0.75rem;
     border-radius: 6px;
     margin-bottom: 0.5rem;
@@ -709,9 +709,9 @@
   }
 
   @keyframes slideIn {
-    from { opacity: 0;, transform: translateX(20px);
+    from { opacity: 0; transform: translateX(20px);
     }
-    to { opacity: 1;, transform: translateX(0);
+    to { opacity: 1; transform: translateX(0);
     }
   }
 
@@ -731,7 +731,7 @@
     font-size: 1.25rem;
   }
 
-  .activity-content { flex: 1;, display: flex;
+  .activity-content { flex: 1; display: flex;
     flex-direction: column;
 	gap: 0.25rem;
   }

@@ -33,7 +33,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	margin: 1em 0; border-radius: 0 4px 4px 0}
             .ai-suggestion { background: #f0fdf4, border: 1px solid #bbf7d0, padding: 0.5em; border-radius: 4px;
 	margin: 0.5em 0}
-          `, setup: (editor: unknown) => { // Custom AI Assistant button editor.ui.registry.addButton('ai-assistant', { text: 'ðŸ¤– AI', tooltip: 'AI Assistant', onAction: () => openAIAssistant(editor.selection.getContent()) }); // Custom Citation Helper button editor.ui.registry.addButton('citation-helper', { text: 'ðŸ“š Cite', tooltip: 'Citation Helper', onAction: () => openCitationHelper(editor.selection.getContent()) }); // Auto-save functionality editor.on('NodeChange', () => { updateCounts(editor.getContent())}); // Content change listener editor.on('input', () => { const newContent = editor.getContent(); content = newContent; const wc = updateCounts(newContent); ondispatch?.({ content: newContent;, wordCount: wc })}); // Save handler editor.on('save', () => { ondispatch?.({ content: editor.getContent() })})},
+          `, setup: (editor: unknown) => { // Custom AI Assistant button editor.ui.registry.addButton('ai-assistant', { text: 'ðŸ¤– AI', tooltip: 'AI Assistant', onAction: () => openAIAssistant(editor.selection.getContent()) }); // Custom Citation Helper button editor.ui.registry.addButton('citation-helper', { text: 'ðŸ“š Cite', tooltip: 'Citation Helper', onAction: () => openCitationHelper(editor.selection.getContent()) }); // Auto-save functionality editor.on('NodeChange', () => { updateCounts(editor.getContent())}); // Content change listener editor.on('input', () => { const newContent = editor.getContent(); content = newContent; const wc = updateCounts(newContent); ondispatch?.({ content: newContent; wordCount: wc })}); // Save handler editor.on('save', () => { ondispatch?.({ content: editor.getContent() })})},
 	save_enablewhendirty: true, save_onsavecallback: () => { ondispatch?.({ content: hugerte.getContent() })},
 	autosave_interval: '10s', autosave_retention: '30m', // Legal document specific settings spellchecker_language: 'en_US', spellchecker_whitelist: ['appellant', 'appellee', 'plaintiff', 'defendant', 'jurisdiction'], word_count: true, character_count: true }`
       }; isInitialized = true} catch (error) { console.error('Failed to initialize editor:', error)}
@@ -44,14 +44,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   async function processAIRequest(): Promise<any> { if (!aiQuery.trim()) return; isProcessingAI = true; try { const response = await fetch('/api/ai/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	query: aiQuery, context: selectedText ? [{ role: 'user', content: `Selected, text: ${selectedText}` }]: [], options: {
-, maxSources: 5, provider: 'auto', enableLegalClassification: true }
+maxSources: 5, provider: 'auto', enableLegalClassification: true }
         }) }); const data = await response.json(); if (data.success) { aiResults = data.data.answer; ondispatch?.({ type: 'ai', selectedText; action: aiQuery })} else { aiResults = 'Sorry, I encountered an error processing your request.'}
     } catch (error) { console.error('AI request failed:', error); aiResults = 'Failed to connect to AI service.'} finally { isProcessingAI = false}
   }
   async function searchCitations(): Promise<any> { if (!citationQuery.trim()) return; try { const response = await fetch('/api/search/citations', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, query: citationQuery, limit: 10 }) }); const data = await response.json(); if (data.success) { citationResults = data.results.map((r: unknown) => ({ title: r.title, citation: r.citation;
-, relevance: r.similarity }))}
+query: citationQuery, limit: 10 }) }); const data = await response.json(); if (data.success) { citationResults = data.results.map((r: unknown) => ({ title: r.title, citation: r.citation;
+relevance: r.similarity }))}
     } catch (error) { console.error('Citation search failed:', error)}
   }
   function insertCitation(citation: unknown) { const citationHtml = ` <div class="citation" contenteditable="false"> <strong>${citation.title}</strong>
@@ -113,7 +113,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	overflow: hidden; background: white}
   .editor-toolbar { display: flex; justify-content: space-between, align-items: center;
 	padding: 0.5rem 1rem;background: #f9fafb; border-bottom: 1px solid #d1d5db}
-  .toolbar-left { display: flex;, gap: 0.5rem}
+  .toolbar-left { display: flex; gap: 0.5rem}
   .toolbar-btn { padding: 0.25rem 0.75rem; font-size: 0.875rem;
 	background: white; border: 1px solid #d1d5db; border-radius: 0.25rem;
 	transition:background-color 0.2s;cursor: pointer}
@@ -127,15 +127,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .collab-btn { border-color: #a5b4fc;
 	color: #3730a3}
   .collab-btn:hover { background: #eef2ff}
-  .toolbar-right { display: flex;, gap: 1rem, font-size: 0.875rem;
+  .toolbar-right { display: flex; gap: 1rem, font-size: 0.875rem;
 	color: #4b5563}
   .editor-content { width: 100%}
   .editor-content[contenteditable="true"] { outline: none, padding: 1rem; min-height: 100%}
   .editor-placeholder { pointer-events: none;
 	color: #9ca3af; padding: 1rem}
-  .selected-text { background: #eff6ff;, border: 1px solid #bfdbfe; border-radius: 0.25rem;
+  .selected-text { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.25rem;
 	padding: 0.75rem; margin-bottom: 1rem}
-  .ai-query-input, .cite-query-input { width: 100%;, padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; margin-bottom: 1rem;
+  .ai-query-input, .cite-query-input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; margin-bottom: 1rem;
 	resize: vertical; font-family: inherit}
   .ai-results { margin-top: 1rem;
 	padding: 1rem; background: #f0fdf4;
@@ -153,12 +153,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .btn { padding: 0.5rem 1rem; border-radius: 0.25rem; font-weight: 500;
 	transition:background-color 0.2s;cursor: pointer;
 	border: none}
-  .btn-primary { background: #2563eb;, color: white}
+  .btn-primary { background: #2563eb; color: white}
   .btn-primary:hover { background: #1d4ed8}
-  .btn-secondary { background: #e5e7eb;, color: #1f2937}
+  .btn-secondary { background: #e5e7eb; color: #1f2937}
   .btn-secondary:hover { background: #d1d5db}
   .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem}
-  .btn:disabled { opacity: 0.5;, cursor:not-allowed}
+  .btn:disabled { opacity: 0.5; cursor:not-allowed}
   .btn: disabled, hover { background: inherit}
 </style>
 

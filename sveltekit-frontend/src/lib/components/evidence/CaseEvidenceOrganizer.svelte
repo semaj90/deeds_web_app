@@ -266,7 +266,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	animation: spin 1s linear infinite;margin: 1rem auto}
   @keyframes spin { 0% { transform: rotate(0deg)}
     100% { transform: rotate(360
-, padding: 2rem}
+padding: 2rem}
   .evidence-card { background: white, border: 1px solid #e5e7eb; border-radius: 0.5rem;
 	padding: 1rem; cursor: pointer;
 	transition:all 0.2s; /*, Added: 's' for transition duration */ }

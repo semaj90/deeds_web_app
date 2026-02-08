@@ -18,7 +18,7 @@ const registerSchema = z.object({
 	lastName: z.string().min(1, 'Last name is required')
 });
 
-interface RegisterRequest { email: string;, password: string;
+interface RegisterRequest { email: string; password: string;
 	firstName: string; lastName: string;
 }
 

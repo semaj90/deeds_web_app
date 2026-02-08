@@ -155,7 +155,7 @@ import type { Case } from '$lib/types';
                 'font-medium',
                 similarityLevel === 'high'
                   ? 'text-green-400'
-                  , similarityLevel === 'medium'
+                  similarityLevel === 'medium'
                   ? 'text-yellow-400'
  'text-red-400'
               )}
@@ -171,7 +171,7 @@ import type { Case } from '$lib/types';
                 'font-medium',
                 relevanceLevel === 'high'
                   ? 'text-green-400'
-                  , relevanceLevel === 'medium'
+                  relevanceLevel === 'medium'
                   ? 'text-yellow-400'
  'text-red-400'
               )}

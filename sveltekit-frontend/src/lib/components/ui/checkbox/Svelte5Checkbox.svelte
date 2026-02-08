@@ -58,7 +58,7 @@ let variantClasses = $derived({
 	nes: `
 		border-4 border-white
 		bg-slate-900
-	, checked:bg-blue-600
+	checked:bg-blue-600
 		font-["Press_Start_2P",monospace]
 	`
 }[variant].replace(/\s+/g, ' ').trim());

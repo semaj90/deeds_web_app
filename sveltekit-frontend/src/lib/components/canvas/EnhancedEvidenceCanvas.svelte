@@ -83,12 +83,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const positions = (fabricCanvas.getObjects ? fabricCanvas.getObjects(): []) .filter((obj: any) => obj.evidenceId) .map((obj: any) => ({ evidenceId: obj.evidenceId, x: obj.left, y: obj.top, width: (obj.width ?? (obj.getScaledWidth ? obj.getScaledWidth(): 0)) * (obj.scaleX ?? 1); height: (obj.height ?? (obj.getScaledHeight ? obj.getScaledHeight(): 0)) * (obj.scaleY ?? 1) }));
    const response = await fetch('/api/canvas/save', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ caseId, canvasData, positions }) }); if (!response.ok) throw new Error('Failed to save canvas'); notifications.add({ type: 'success', title: 'Canvas Saved', message: 'Evidence board saved successfully.'
-      })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed';, message: 'Failed to save evidence board.'
+      })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed'; message: 'Failed to save evidence board.'
       }); console.error('Save error:', error)}
 '
   }
   async function exportCanvas(): Promise<any> { if (!fabricCanvas) return; try { const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.9;
-, multiplier: 2 });
+multiplier: 2 });
    const link = document.createElement('a'); link.download = `evidence-board-${caseId ?? 'canvas'}-${Date.now()}.png`; link.href = dataURL; link.click(); notifications.add({ type: 'success', title: 'Export Complete', message: 'Evidence board exported successfully.'
       })} catch (error) { console.error('Export error:', error); notifications.add({ type: 'error', title: 'Export Failed', message: 'Failed to export evidence board.'
       })}
@@ -136,7 +136,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if fabricLoaded && evidenceItems.length === 0} <div> <Image /> <p>Evidence Board</p>
  <p>Add evidence items to start building your case visualization</p> {/if}
   </div>
- <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%;, height: auto;display: block}
+ <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%; height: auto;display: block}
 </style>
 
 

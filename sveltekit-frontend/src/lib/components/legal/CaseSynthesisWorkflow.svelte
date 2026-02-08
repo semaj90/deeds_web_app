@@ -7,16 +7,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	dateCreated: string, author: string; // Added comma relevanceScore: number}}
   interface EvidenceReport { id: string; // Added comma title: string; // Added comma type: string; // Added comma status: string; // Added comma priority: string; // Added comma createdAt: string; // Added comma updatedAt: string; // Added comma analyst: any, evidence: any, methodology: any, findings: any; // Added comma legalImplications: any, attachments: any[]}
   interface SynthesisContext { caseId: string
-,documents: CaseDocument[], evidenceReports: EvidenceReport[], selectedItems: string[], synthesisMode: 'chronological' | 'thematic' | 'evidence_strength' | 'legal_strategy',synthesisResult: CaseSynthesis | null,progressStage: 'selecting' | 'analyzing' | 'synthesizing' | 'reviewing' | 'complete',error: string | null,loading: boolean}
+documents: CaseDocument[], evidenceReports: EvidenceReport[], selectedItems: string[], synthesisMode: 'chronological' | 'thematic' | 'evidence_strength' | 'legal_strategy',synthesisResult: CaseSynthesis | null,progressStage: 'selecting' | 'analyzing' | 'synthesizing' | 'reviewing' | 'complete',error: string | null,loading: boolean}
   interface CaseSynthesis { executiveSummary: string, timeline: TimelineEvent[], strengthAssessment: StrengthAssessment
-,legalStrategy: LegalStrategy
-,riskAnalysis: RiskAnalysis
-,recommendations: Recommendation[], gaps: string[], nextSteps: string[]}
+legalStrategy: LegalStrategy
+riskAnalysis: RiskAnalysis
+recommendations: Recommendation[], gaps: string[], nextSteps: string[]}
   interface TimelineEvent { date: string, event: string, sources: string[], significance: 'critical' | 'high' | 'medium' | 'low'}
   interface StrengthAssessment { overall: number; // Added comma evidenceQuality: number; // Added comma legalBasis: number; // Added comma witnessCredibility: number; // Added comma expertOpinions: number, areas: {
 	name: string, score: number, details: string}[]}
   interface LegalStrategy { primaryCharges: string[], supportingEvidence: string[], potentialDefenses: string[], prosecutionApproach: string
-,keyArguments: string[]}
+keyArguments: string[]}
   interface RiskAnalysis { challengePoints: { issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
   interface Recommendation { priority: 'immediate' | 'high' | 'medium' | 'low',category: 'evidence' | 'legal' | 'procedural' | 'strategic',action: string; // Added colon rationale: string, timeline, string}
   const synthesisMachine = createMachine<SynthesisContext>({ id: 'synthesis', initial: 'idle', context: { caseId, documents, evidenceReports, selectedItems: [], synthesisMode: 'thematic', synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma loading: false },
@@ -69,7 +69,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                   } ]
               },
 	legalStrategy: {
-, primaryCharges: [
+primaryCharges: [
                   "Computer Fraud and Abuse Act (18 U.S.C. Â§ 1030)",
                   "Wire Fraud (18 U.S.C. Â§ 1343)",
                   "Money Laundering (18 U.S.C. Â§ 1956)"

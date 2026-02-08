@@ -7,7 +7,7 @@
  import Users from 'lucide-svelte/icons/users';
  import { tick } from 'svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
- type ChatMessage = { id: string;, role: 'user' | 'assistant';
+ type ChatMessage = { id: string; role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
   keywords?: string[];
@@ -257,7 +257,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   margin-top: 0.25rem;
  }
 
- .status-dot { width: 8px;, height: 8px;
+ .status-dot { width: 8px; height: 8px;
   background: #10b981;
   border-radius: 50%;
   box-shadow: 0 0 8px #10b981;
@@ -296,7 +296,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   margin: 0;
  }
 
- .message-row { display: flex;, gap: 1rem;
+ .message-row { display: flex; gap: 1rem;
   max-width: 80%;
   animation: fadeIn 0.3s ease-out;
  }
@@ -311,11 +311,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  }
 
  @keyframes fadeIn {
-  from { opacity: 0;, transform: translateY(10px); }
-  to { opacity: 1;, transform: translateY(0); }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
  }
 
- .avatar { width: 36px;, height: 36px;
+ .avatar { width: 36px; height: 36px;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -323,10 +323,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   flex-shrink: 0;
  }
 
- .user .avatar { background: #2563eb;, color: white;
+ .user .avatar { background: #2563eb; color: white;
  }
 
- .assistant .avatar { background: #44403c;, color: #e7e5e4;
+ .assistant .avatar { background: #44403c; color: #e7e5e4;
   border: 1px solid #57534e;
  }
 
@@ -346,7 +346,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   text-align: right;
  }
 
- .text { background: #1c1917;, padding: 1rem;
+ .text { background: #1c1917; padding: 1rem;
   border-radius: 4px;
   border: 1px solid #292524;
   line-height: 1.6;
@@ -386,7 +386,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   margin-top: 0.5rem;
  }
 
- .suggestion-chip { background: #292524;, border: 1px solid #44403c;
+ .suggestion-chip { background: #292524; border: 1px solid #44403c;
   color: #a8a29e;
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
@@ -395,15 +395,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   transition: all 0.2s;
  }
 
- .suggestion-chip:hover { background: #44403c;, color: white;
+ .suggestion-chip:hover { background: #44403c; color: white;
   border-color: #78716c;
  }
 
- .input-area { padding: 1.5rem;, background: #1c1917;
+ .input-area { padding: 1.5rem; background: #1c1917;
   border-top: 1px solid #292524;
  }
 
- .input-wrapper { display: flex;, gap: 1rem;
+ .input-wrapper { display: flex; gap: 1rem;
   max-width: 1200px;
   margin: 0 auto;
   align-items: flex-end;
@@ -423,7 +423,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
  }
 
- .send-btn { height: 50px;, width: 50px;
+ .send-btn { height: 50px; width: 50px;
   flex-shrink: 0;
   background: #2563eb;
  }

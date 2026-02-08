@@ -71,7 +71,7 @@ Compact AI recommendations component for sidebar/dashboard use
             }
           : undefined,
         preferences: {
-, preferredActions: ['research', 'analysis', 'documentation'],
+preferredActions: ['research', 'analysis', 'documentation'],
           workflowStyle: 'systematic'
         }
       });

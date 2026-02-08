@@ -1,6 +1,6 @@
 <script lang="ts">
  // API Contract Types
- type ErrorEvent = { id: string;, routePath: string;
+ type ErrorEvent = { id: string; routePath: string;
  file: string | null;
  kind: 'build' | 'runtime' | 'lint' | 'other';
  severity: 'info' | 'warn' | 'error' | 'fatal';
@@ -11,7 +11,7 @@
  collectedAt: string; // ISO
  };
 
- type ErrorSuggestion = { id: string;, clusterId: string;
+ type ErrorSuggestion = { id: string; clusterId: string;
  title: string;
 	explanation: string;
  confidence: number | null;
@@ -50,7 +50,7 @@
  throw new Error(`HTTP ${res.status}`);
  }
 
- const data = (await res.json()) as { events: ErrorEvent[];, suggestions: ErrorSuggestion[];
+ const data = (await res.json()) as { events: ErrorEvent[]; suggestions: ErrorSuggestion[];
  };
 
  events = data.events ?? [];
@@ -120,7 +120,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-, routePath: suggestionId,
+routePath: suggestionId,
  state
  })
  });

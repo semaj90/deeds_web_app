@@ -7,7 +7,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let { caseId = '', enableYoRHaBoard = true, enableEvidenceCanvas = true, splitView = true, syncCanvases = true, initialMode = 'both'
   }: Props = $props(); // Component references let evidenceCanvasRef: string | number;
  let yorhaCanvasBoardRef: unknown; // State management const canvasState = writable({ mode: initialMode
-, evidenceObjects: [], drawingObjects: [], selectedObjects: [];
+evidenceObjects: [], drawingObjects: [], selectedObjects: [];
 	lastSync: 0 });
   let currentMode = $state(initialMode);
    let showYoRHaBoard = $state<boolean>(false);
