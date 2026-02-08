@@ -58,7 +58,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   <Trigger class={className}>
     <Value {placeholder} />
   </Trigger>
-  <BitsSelect.Portal>
+  <Select.Portal>
     <Content>
       {#if options.length > 0}
         {#each options as option (option.value)}
@@ -69,7 +69,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         {@render children()}
       {/if}
     </Content>
-  </BitsSelect.Portal>
+  </Select.Portal>
 </Root>
 
 

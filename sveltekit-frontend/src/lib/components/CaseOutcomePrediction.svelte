@@ -741,7 +741,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	transition:border-color 0.2s;
 		font-family: inherit;}
 
-	textarea:focus; select:focus {
+	textarea:focus, select:focus {
 		outline: none;
 		border-color: #3498db;
 		box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);

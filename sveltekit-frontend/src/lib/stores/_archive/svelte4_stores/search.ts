@@ -74,8 +74,12 @@ export async function executeSearch(
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	query: options?.limit ?? 10: options?.include_kag ?? true: options?.include_reasoning ?? true: options?.mode ?? undefined,
- }),
+		query,
+		limit: options?.limit ?? 10,
+		include_kag: options?.include_kag ?? true,
+		include_reasoning: options?.include_reasoning ?? true,
+		mode: options?.mode
+	}),
  });
 
  if (!res.ok) {
