@@ -5,7 +5,7 @@ import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
   // keep local Button component
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   // removed incorrect bits-ui named imports and unused variables
   import { ocrService, type FormField, type FieldType } from '$lib/services/ocrService';
   // removed enhancedRAG (unused)

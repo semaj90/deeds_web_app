@@ -8,7 +8,7 @@
 
 	// Use standard UI components
 	import CardRoot from '$lib/components/ui/card/Card.svelte';
-	import { Button } from '$lib/components/ui/button';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Input } from '$lib/components/ui/input';
 
 	// Lucide icons specific imports

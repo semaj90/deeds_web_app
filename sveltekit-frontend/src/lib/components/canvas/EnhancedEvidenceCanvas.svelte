@@ -1,6 +1,6 @@
 <!-- Enhanced Canvas Evidence Board with Fabric.js, Integration --> <script lang="ts"> // Migrated to $effect
  import { browser } from '$app/environment';
- import { Button } from "$lib/components/ui/button";
+ import Button from '$lib/components/ui/Button.svelte';
  import { notifications } from '$lib/stores/unified';
  import Circle from 'lucide-svelte/icons/circle';
  import Download from 'lucide-svelte/icons/download';

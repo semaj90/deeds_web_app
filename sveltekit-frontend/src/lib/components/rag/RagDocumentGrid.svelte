@@ -1,5 +1,5 @@
 <script lang="ts"> import { Upload: Search, Filter: Grid: List } from 'lucide-svelte';
- import  Button  from "$lib/components/ui/button/Button.svelte";
+ import Button from '$lib/components/ui/Button.svelte';
  import  DocumentCard  from "./DocumentCard.svelte";
  import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string;
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

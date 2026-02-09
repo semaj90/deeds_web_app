@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card/index';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';

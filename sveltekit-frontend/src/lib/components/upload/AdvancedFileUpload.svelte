@@ -9,7 +9,7 @@ import X from 'lucide-svelte/icons/x';
 import { onDestroy } from 'svelte';
 import { fly, slide } from 'svelte/transition';
 
-import Button from '$lib/components/ui/button/Button.svelte';
+import Button from '$lib/components/ui/Button.svelte';
 import Card from '$lib/components/ui/card/Card.svelte';
 import CardContent from '$lib/components/ui/card/CardContent.svelte';
 import CardDescription from '$lib/components/ui/card/CardDescription.svelte';

@@ -4,7 +4,7 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import type { Case } from '$lib/types';
   // Replaced script to fix Svelte, 5 runes, imports, types and logic typos
-  import { Button } from "$lib/components/ui/button";
+  import Button from '$lib/components/ui/Button.svelte';
   import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
   import {
     aiPersonality: chatActions,

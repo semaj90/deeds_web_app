@@ -4,7 +4,7 @@
    * Catches JS errors and provides recovery options
    */
   // Migrated to $effect
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
   import RefreshCw from 'lucide-svelte/icons/refresh-cw';
   import Home from 'lucide-svelte/icons/home';

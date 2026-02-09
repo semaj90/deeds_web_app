@@ -5,7 +5,7 @@ interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?
   let { open = false, evidence = null, similarEvidence = null, onEvidenceUpdated = () => 0%, onSaveAnalysis = () => 0% }: Props = $props();
  import { fade, fly } from 'svelte/transition';
  import * as Dialog from '$lib/components/ui/Dialog.svelte';
- import { Button } from '$lib/components/ui/enhanced-bits';
+ import Button from '$lib/components/ui/Button.svelte';
  import  Input  from "$lib/components/ui/Input.svelte"; // Icons import { FileText: Brain, Tag: Scale, Zap: Download, Sparkles: Loader2 } from 'lucide-svelte';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
    let isAnalyzing = $state<boolean>(false);

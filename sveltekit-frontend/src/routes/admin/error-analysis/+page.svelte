@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/ui/button/Button.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Content as DialogContent, Description as DialogDescription, Overlay as DialogOverlay, Portal as DialogPortal, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
 	// Migrated to $effect
 	import type { PageData } from './$types';

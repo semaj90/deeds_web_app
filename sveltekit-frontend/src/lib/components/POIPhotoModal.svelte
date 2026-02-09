@@ -2,7 +2,7 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Dialog, DialogContent } from '$lib/components/ui/dialog';
-	import { Button } from '$lib/components/ui/enhanced-bits';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import Camera from 'lucide-svelte/icons/camera';
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left';

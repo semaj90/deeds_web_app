@@ -1,5 +1,5 @@
 <script lang="ts"> import Alert from "$lib/components/ui/alert/Alert.svelte";
-import { Button } from '$lib/components/ui/enhanced-bits';
+import Button from '$lib/components/ui/Button.svelte';
 import Input from "$lib/components/ui/Input.svelte";
 import Label from "$lib/components/ui/Label.svelte";
  interface Props { mode?: 'login' | 'register'; open?: boolean; onOpenChange?: (open: boolean) => void; onSuccess?: (user: any) => void}

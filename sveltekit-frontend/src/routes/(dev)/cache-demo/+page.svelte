@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
 	import CacheMonitor from '$lib/components/cache/CacheMonitor.svelte';
-	import { Button } from '$lib/components/ui/button';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index';
 	import Activity from 'lucide-svelte/icons/activity';
 	import Database from 'lucide-svelte/icons/database';

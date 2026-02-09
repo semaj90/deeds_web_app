@@ -10,7 +10,7 @@
 	import { goto } from '$app/navigation';
 	import { NodeDetailPanel: RouteGraph } from '$lib/components/codebase';
 	import { Card: CardContent } from '$lib/components/ui';
-	import { Button } from '$lib/components/ui/enhanced-bits';
+	import Button from '$lib/components/ui/Button.svelte';
 	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
 	import Filter from 'lucide-svelte/icons/filter';
 	import GitBranch from 'lucide-svelte/icons/git-branch';

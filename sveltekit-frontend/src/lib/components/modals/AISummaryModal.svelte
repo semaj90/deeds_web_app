@@ -6,7 +6,7 @@ https, //svelte.dev/e/js_parse_error -->
   const { onclose } = $props<{ onclose, ((event?, any) }>()
   import { aiService } from '$lib/services/aiService';
   import * as Dialog from '$lib/components/ui/Dialog.svelte';
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   // use icon components from the icons subpath (lucide-svelte exports individual files)
   import  Copy  from "lucide-svelte/icons/copy.svelte";
   import X from 'lucide-svelte/icons/x.svelte';

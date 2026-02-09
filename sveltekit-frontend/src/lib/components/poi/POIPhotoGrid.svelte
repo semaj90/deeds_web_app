@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/components/ui/button/Button.svelte';
+  import Button from '$lib/components/ui/Button.svelte';
   import Camera from 'lucide-svelte/icons/camera';
   import Eye from 'lucide-svelte/icons/eye';
   import Trash2 from 'lucide-svelte/icons/trash-2';

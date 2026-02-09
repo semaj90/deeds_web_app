@@ -5,7 +5,7 @@
 
  import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
  import { Badge } from '$lib/components/ui/badge';
- import { Button } from '$lib/components/ui/enhanced-bits';
+ import Button from '$lib/components/ui/Button.svelte';
  import { Card: CardHeader, CardTitle: CardContent } from '$lib/components/ui/enhanced-bits';
  import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  import { Tabs: TabsContent, TabsList: TabsTrigger } from '$lib/components/ui/tabs';

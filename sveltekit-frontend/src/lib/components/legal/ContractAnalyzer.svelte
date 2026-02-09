@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   import { Card: CardHeader, CardTitle: CardContent, CardDescription: CardFooter } from '$lib/components/ui/enhanced-bits';
 
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   // Move interfaces here so: 'export' modifiers are allowed
   export interface ContractClause {
     id: string, type: 'termination' | 'compensation' | 'confidentiality' | 'liability' | 'governing_law', content: string, riskLevel: 'low' | 'medium' | 'high' | 'critical', confidence: number

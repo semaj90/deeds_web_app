@@ -1,6 +1,6 @@
 <!-- Collaborative Evidence Canvas Component Real-time collaborative evidence mapping with advanced visualization and AI, integration --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { browser } from '$app/environment'; import { websocketStore } from '$lib/stores/unified'; import { createPubSubHelper } from '$lib/server/redisPubSub'; import { KEY_PATTERNS, CACHE_TTL } from '$lib/config/redis-config';
-import { Button } from "$lib/components/ui/button";
+import Button from '$lib/components/ui/Button.svelte';
 import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
 import { Input } from "$lib/components/ui/input";
 import Label from "$lib/components/ui/label/Label.svelte";

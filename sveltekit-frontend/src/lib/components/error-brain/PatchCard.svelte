@@ -1,6 +1,6 @@
 <script lang="ts">
  import { Badge } from '$lib/components/ui/badge';
- import { Button } from '$lib/components/ui/enhanced-bits';
+ import Button from '$lib/components/ui/Button.svelte';
  import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/enhanced-bits';
 
  interface Props {

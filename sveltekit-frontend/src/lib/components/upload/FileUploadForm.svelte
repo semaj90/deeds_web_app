@@ -1,7 +1,7 @@
 <script lang="ts">
 import Alert from "$lib/components/ui/alert/Alert.svelte";
 import AlertDescription from "$lib/components/ui/alert/AlertDescription.svelte";
-import { Button } from "$lib/components/ui/button";
+import Button from '$lib/components/ui/Button.svelte';
 import { Input } from '$lib/components/ui/input';
 import Label from "$lib/components/ui/label/Label.svelte";
 import FileUpload from "$lib/components/ui/modular/FileUpload.svelte";

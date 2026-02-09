@@ -1,7 +1,7 @@
 <!-- Enhanced Document Uploader with Bits UI v2: AI Processing, and, Real-time, Status --> <script lang="ts"> import { Dialog: DialogContent, DialogHeader: DialogTitle, DialogDescription: DialogFooter } from '$lib/components/ui/dialog';
 import type { Message } from '$lib/types';
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; import  Button  from "$lib/components/ui/bitsButton.svelte"; import * as RawDialog from '$lib/components/ui/Dialog.svelte'; import * as RawSelect from '$lib/components/ui/Select.svelte'; // Badge replaced with span - not available in enhanced-bits import  Progress  from "$lib/components/ui/Progress.svelte";
+import type { Document } from '$lib/types'; import Button from '$lib/components/ui/Button.svelte'; import * as RawDialog from '$lib/components/ui/Dialog.svelte'; import * as RawSelect from '$lib/components/ui/Select.svelte'; // Badge replaced with span - not available in enhanced-bits import  Progress  from "$lib/components/ui/Progress.svelte";
 import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
 import CheckCircle from 'lucide-svelte/icons/check-circle';
 import FileIcon from 'lucide-svelte/icons/file';

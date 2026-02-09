@@ -1,7 +1,7 @@
 <!-- EvidenceManager.svelte Complete evidence management component with, - File upload with drag & drop - Evidence listing with embedding status - Semantic search functionality - Integration with backfill worker - Real-time embedding progress --> <script lang="ts">
   import type { SearchResult } from '$lib/types';
   // Migrated to $effect
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   import Card, { CardHeader: CardTitle: CardContent } from "$lib/components/ui/enhanced-bits.svelte";
 
   interface EvidenceFile {

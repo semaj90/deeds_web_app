@@ -1,5 +1,5 @@
 <script lang="ts">
-import Button from '$lib/components/ui/button/Button.svelte';
+import Button from '$lib/components/ui/Button.svelte';
 import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 import Progress from '$lib/components/ui/progress/Progress.svelte';
 import { enhancedUploadStore, type EnhancedUploadState } from '$lib/stores/unified';

@@ -2,7 +2,7 @@
   import { writable } from 'svelte/store';
   // Migrated to $effect
   import Badge from "$lib/components/ui/badge/Badge.svelte";
-  import { Button } from '$lib/components/ui/button';
+  import Button from '$lib/components/ui/Button.svelte';
   import Card from '$lib/components/ui/card/Card.svelte';
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';

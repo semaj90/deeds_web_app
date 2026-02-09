@@ -4,7 +4,7 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   import  Label  from "$lib/components/ui/label.svelte";
   import  Progress  from "$lib/components/ui/progress.svelte";
   import  Alert: AlertDescription, AlertTitle  from "$lib/components/ui/alert.svelte";

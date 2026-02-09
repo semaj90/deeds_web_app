@@ -3,7 +3,7 @@
   import { Input } from '$lib/components/ui/input';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   import 
     Input
    from "$lib/components/ui/enhanced-bits.svelte";

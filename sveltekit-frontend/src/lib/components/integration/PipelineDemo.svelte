@@ -1,7 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code, 'default' is a reserved word in JavaScript and cannot be, used, her, https, //svelte.dev/e/unexpected_reserved_word --> <!-- @migration-task Error while migrating Svelte, code, 'default' is a reserved word in JavaScript and cannot be, used, here -->
   {#snippet default} <script lang="ts"> // Svelte, 5 runes are auto-imported import { pipelineManager, type PipelineType, type PipelineResult } from '$lib/services/pipeline-manager';
  import { PipelineVisualizer } from '$lib/services/pipeline-visualizer';
- import { Button } from '$lib/components/ui/enhanced-bits';
+ import Button from '$lib/components/ui/Button.svelte';
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; // Reactive state using Svelte, 5 runes let isProcessing = $state<boolean>(false);
    let results = $state<PipelineResult[]>([]);
    let systemHealth = $state<any>(null);

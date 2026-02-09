@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token } --> <script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits'; // Svelte, 5 runes are auto-imported </script> // Migrated to $effect
+<!-- @migration-task Error while migrating Svelte, code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token } --> <script lang="ts"> import Button from '$lib/components/ui/Button.svelte'; // Svelte, 5 runes are auto-imported </script> // Migrated to $effect
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

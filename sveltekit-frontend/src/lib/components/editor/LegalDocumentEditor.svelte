@@ -7,7 +7,7 @@
   import * as Dialog from '$lib/components/ui/dialog';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as Tooltip from '$lib/components/ui/tooltip';
-  import { Button } from '$lib/components/ui/button';
+  import Button from '$lib/components/ui/Button.svelte';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
   import { Textarea } from '$lib/components/ui/textarea';

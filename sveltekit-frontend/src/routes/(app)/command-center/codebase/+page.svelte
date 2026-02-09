@@ -8,7 +8,7 @@
 	 * Purpose: Main codebase intelligence view with error overview and clusters
 	 */
 	import { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui';
-	import { Button } from '$lib/components/ui/enhanced-bits';
+	import Button from '$lib/components/ui/Button.svelte';
 	import Activity from 'lucide-svelte/icons/activity';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
 	import BarChart3 from 'lucide-svelte/icons/bar-chart-3';

@@ -14,7 +14,7 @@ import Save from 'lucide-svelte/icons/save';
 import Wand2 from 'lucide-svelte/icons/wand-2';
 import { slide } from 'svelte/transition';
 
-import Button from '$lib/components/ui/button/Button.svelte';
+import Button from '$lib/components/ui/Button.svelte';
 
 interface Props {
 	initialContent?: string;

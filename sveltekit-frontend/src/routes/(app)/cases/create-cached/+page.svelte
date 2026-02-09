@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
-	import { Button } from '$lib/components/ui/button';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index';
 	import AlertCircle from 'lucide-svelte/icons/alert-circle';
 	import Save from 'lucide-svelte/icons/save';

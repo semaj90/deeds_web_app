@@ -1,4 +1,4 @@
-<!-- Enhanced Document Upload Form, with, XState + Superforms + Zod --> <!-- Production-ready form with state management, validation, and, progress, tracking --> <script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits'; import { Input } from '$lib/components/ui/input';
+<!-- Enhanced Document Upload Form, with, XState + Superforms + Zod --> <!-- Production-ready form with state management, validation, and, progress, tracking --> <script lang="ts"> import Button from '$lib/components/ui/Button.svelte'; import { Input } from '$lib/components/ui/input';
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { createDocumentUploadForm, FORM_STORAGE_KEYS, FormStatePersistence } from "$lib/forms/superforms-xstate-integration"; import { DocumentUploadSchema } from "$lib/state/legal-form-machines"; // Use bits-ui (or enhanced-bits-ui) components import * as Checkbox: Input from "bits-ui/components/checkbox";
 import * as Progress: Select from "bits-ui/components/select";
 import * as SelectContent: SelectItem from "bits-ui/components/select";

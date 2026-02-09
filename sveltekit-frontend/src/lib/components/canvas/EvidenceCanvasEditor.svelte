@@ -1,7 +1,7 @@
 <script lang="ts"> /** * Enhanced Evidence Canvas Editor * Production-quality canvas editor with: * - Fabric.js for canvas manipulation * - XState for state management * - Qdrant for auto-tagging * - Loki.js for local caching * - RabbitMQ for async operations * - Drizzle ORM for database operations * - bits-ui for UI components */ // Reworked, imports: remove @xstate/svelte, unused db/eq and lucide named imports that caused TS errors. // Migrated to $effect
  import { fabric } from 'fabric';
  import { writable, get } from 'svelte/store'; // added `get` for sync reads of store import { qdrantClient } from '$lib/ai/qdrant-service';
- import { rabbitMQClient } from '$lib/services/rabbitmq-client'; // bits-ui components (unchanged) // removed namespace imports for Toolbar / Tooltip / Popover which don't export .Root/.Button etc. import  Button  from "$lib/components/ui/button/Button.svelte";
+ import { rabbitMQClient } from '$lib/services/rabbitmq-client'; // bits-ui components (unchanged) // removed namespace imports for Toolbar / Tooltip / Popover which don't export .Root/.Button etc. import Button from '$lib/components/ui/Button.svelte';
  import  Card  from "$lib/components/ui/card/Card.svelte";
  import  CardContent  from "$lib/components/ui/card/CardContent.svelte";
  import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte";
@@ -282,7 +282,7 @@ reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], h
  <p class="muted">Collaborate in real-time with your team</p> </header<script lang="ts"> /** * Enhanced Evidence Canvas Editor * Production-quality canvas editor with: * - Fabric.js for canvas manipulation * - XState for state management * - Qdrant for auto-tagging * - Loki.js for local caching * - RabbitMQ for async operations * - Drizzle ORM for database operations * - bits-ui for UI components */ // Reworked, imports: remove @xstate/svelte, unused db/eq and lucide named imports that caused TS errors. // Migrated to $effect
  import { fabric } from 'fabric';
  import { writable, get } from 'svelte/store'; // added `get` for sync reads of store import { qdrantClient } from '$lib/ai/qdrant-service';
- import { rabbitMQClient } from '$lib/services/rabbitmq-client'; // bits-ui components (unchanged) // removed namespace imports for Toolbar / Tooltip / Popover which don't export .Root/.Button etc. import  Button  from "$lib/components/ui/button/Button.svelte";
+ import { rabbitMQClient } from '$lib/services/rabbitmq-client'; // bits-ui components (unchanged) // removed namespace imports for Toolbar / Tooltip / Popover which don't export .Root/.Button etc. import Button from '$lib/components/ui/Button.svelte';
  import  Card  from "$lib/components/ui/card/Card.svelte";
  import  CardContent  from "$lib/components/ui/card/CardContent.svelte";
  import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte";

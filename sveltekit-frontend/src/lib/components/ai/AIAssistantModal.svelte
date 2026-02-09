@@ -1,5 +1,5 @@
 <script lang="ts"> import { getContext } from 'svelte';
- import { Button } from "$lib/components/ui/button";
+ import Button from '$lib/components/ui/Button.svelte';
  import { Card, CardHeader, CardTitle, CardContent } from "$lib/components/ui/card";
  import { aiGlobalStore, aiGlobalActions } from '$lib/stores/unified'; // Interface definitions interface EvidenceItem { id: string, title: string, description?: string;
 	type: string;

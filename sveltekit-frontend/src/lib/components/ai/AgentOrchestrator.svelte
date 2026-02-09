@@ -1,7 +1,7 @@
 
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <!-- Agent Orchestrator Component Manages AutoGen and CrewAI multi-agent, workflows --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { writable } from 'svelte/store';
- import { Button } from "$lib/components/ui/button";
+ import Button from '$lib/components/ui/Button.svelte';
  import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
  import Badge from "$lib/components/ui/badge/Badge.svelte";
  import { Input } from "$lib/components/ui/input";

@@ -7,7 +7,7 @@ Shows complete workflow from user input to AI-powered results -->
 	let suggestion = $state<any>(undefined);
 
 	// Svelte 5 runes are auto-imported
-	import { Button } from '$lib/components/ui/enhanced-bits';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Card } from '$lib/components/ui/enhanced-bits';
 	import CardContent from "$lib/components/ui/CardContent.svelte";
 	import CardHeader from "$lib/components/ui/CardHeader.svelte";

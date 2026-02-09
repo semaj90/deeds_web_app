@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { aiAssistantStore } from '$lib/stores/unified/ai-assistant-store.svelte.js';
 	import Loader2 from 'lucide-svelte/icons/loader-2';
 	import Zap from 'lucide-svelte/icons/zap';

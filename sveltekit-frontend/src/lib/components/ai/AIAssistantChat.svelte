@@ -1,5 +1,5 @@
 <script lang="ts"> // Migrated to $effect
-	import { Button } from "$lib/components/ui/button";
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Input } from "$lib/components/ui/input";
 	import { Card, CardHeader, CardTitle, CardContent } from "$lib/components/ui/card";
 	import Badge from "$lib/components/ui/badge/Badge.svelte"; import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte"; import  Switch  from "$lib/components/ui/switch"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import { aiAssistantManager, isAIActive, isProcessing, currentResponse, conversationHistory, currentModel, currentTemperature, aiError, clusterHealth, context7Analysis, aiUsage } from '$lib/stores/aiAssistant.svelte.js'; import { unifiedAIService } from '$lib/ai/unified-ai-service.js'; import type { UnifiedQueryOptions } from '$lib/ai/unified-ai-service.js'; // Component props using Svelte, 5 $props() interface Props { height?: string; showSettings?: boolean; enableContext7?: boolean; autoFocus?: boolean}

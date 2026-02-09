@@ -8,7 +8,7 @@
     (unified as any);
 
   import { goto } from '$app/navigation';
-  import * as Button from '$lib/components/ui/button';
+  import Button from '$lib/components/ui/Button.svelte';
 
   // Svelte, 5 runes - Props
   interface Props {

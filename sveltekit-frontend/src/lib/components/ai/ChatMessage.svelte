@@ -7,7 +7,7 @@ import type { Message } from '$lib/types';
   // receive props via Svelte, 5 rune
   let { message }: Props = $props();
   // Use named imports from lucide-svelte
-  import { Button } from "$lib/components/ui/button";
+  import Button from '$lib/components/ui/Button.svelte';
   import { chatActions } from '$lib/stores/chat'; // adjusted store path
   import { notifications } from '$lib/stores/unified';
   import Bot from 'lucide-svelte/icons/bot';

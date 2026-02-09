@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { Button } from '$lib/components/ui/button';
+  import Button from '$lib/components/ui/Button.svelte';
   import { WebGPUEvidenceGraph, type GraphEdge, type GraphNode } from '$lib/services/webgpu-evidence-graph';
   import { isWebGPUAvailable } from '$lib/webgpu/init';
 
