@@ -5,12 +5,29 @@
  */
 
 import { browser } from '$app/environment';
-import MultiTierCache from '$lib/ai/cache/multiTierCache.js';
-import shaderCacheManager from '$lib/webgpu/shader-cache-manager.js';
-import { cacheActions as cacheActor, getCacheStats } from './xstate-cache-integration.js';
+import { headlessUICache } from './headless-ui-cache.js';
+import { shaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
+import { cacheActor, getCacheStats } from './xstate-cache-integration.js';
 import { CHRROMPatternCache } from './chr-rom-pattern-cache.js';
-import getCache from '$lib/server/utils/server-cache.js';
-import setCache from '$lib/server/utils/server-cache.js';
+import { getCache, setCache } from '$lib/server/utils/server-cache.js';
+
+// Simple tier cache wrapper using prefixes
+class TierCache {
+	constructor(private prefix: string) {}
+
+	async get<T>(key: string): Promise<T | null> {
+		return headlessUICache.get<T>(`${this.prefix}${key}`);
+	}
+
+	async set<T>(key: string, data: T, ttl?: number): Promise<void> {
+		return headlessUICache.set(`${this.prefix}${key}`, data, ttl);
+	}
+
+	async clear(): Promise<void> {
+		// headlessUICache doesn't support prefix-based clearing, so this is a no-op
+		// In production, you'd implement pattern-based clearing
+	}
+}
 
 export interface CacheResourceAllocation {
 	cpuThreads: number;
@@ -95,9 +112,9 @@ type CacheActor = {
 };
 
 class ParallelCacheOrchestrator {
-	private l1Memory = new MultiTierCache({ memoryLimit: 1000, storagePrefix: 'l1:' });
-	private l2Memory = new MultiTierCache({ memoryLimit: 5000, storagePrefix: 'l2:' });
-	private l3Storage = new MultiTierCache({ memoryLimit: 10000, storagePrefix: 'l3:' });
+	private l1Memory = new TierCache('l1:');
+	private l2Memory = new TierCache('l2:');
+	private l3Storage = new TierCache('l3:');
 	private chrROMCache: CHRROMPatternCache | null = null;
 
 	private resourceAllocation: CacheResourceAllocation = {
@@ -395,7 +412,13 @@ class ParallelCacheOrchestrator {
 			const results: CacheEntry[] = [];
 
 			for (const key of request.keys) {
-				const pattern = await this.chrROMCache.getCachedPattern(key);
+				const pattern = await this.chrROMCache.getCachedPattern(key, {
+					documentType: 'contract',
+					riskLevel: 'medium',
+					visualStyle: 'modern',
+					colorScheme: 'default',
+					animated: false
+				});
 				if (pattern) {
 					results.push({
 						key,
@@ -664,8 +687,8 @@ class ParallelCacheOrchestrator {
 		};
 	}
 
-	private async getCacheSize(_cache: MultiTierCache): Promise<number> {
-		// Placeholder: MultiTierCache may expose size API - implement appropriately
+	private async getCacheSize(_cache: TierCache): Promise<number> {
+		// Placeholder: TierCache doesn't expose size API yet
 		return 0;
 	}
 
