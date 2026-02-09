@@ -41,7 +41,17 @@ const componentMap = {
   'Slider': 'slider',
   'Progress': 'progress',
   'Separator': 'separator',
-  'Label': 'label'
+  'Label': 'label',
+  'Select': 'select', // High-impact component
+  'Dialog': 'dialog', // High-impact component
+  'Command': 'command',
+  'Collapsible': 'collapsible',
+  'ContextMenu': 'context-menu',
+  'Menubar': 'menubar',
+  'NavigationMenu': 'navigation-menu',
+  'ScrollArea': 'scroll-area',
+  'Toggle': 'toggle',
+  'ToggleGroup': 'toggle-group'
 };
 
 async function fixFile(filePath) {

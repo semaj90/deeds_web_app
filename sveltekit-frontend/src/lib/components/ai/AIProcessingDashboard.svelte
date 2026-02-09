@@ -12,7 +12,8 @@ import CardContent from '$lib/components/ui/card/CardContent.svelte';
 import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 import * as Progress from "bits-ui/components/progress";
-import { Badge, Button } from 'bits-ui';
+import * as Button from "bits-ui/components/button";
+import Badge from '$lib/components/ui/Badge.svelte'; // Badge is a custom component
 import  LLMProviderSelector  from "./LLMProviderSelector.svelte";
   import { aiServiceWorkerManager, type AITaskResult } from '$lib/services/aiServiceWorkerManager';
   import type { LLMProvider } from '$lib/types/llm';
