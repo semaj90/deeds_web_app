@@ -5,7 +5,7 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
-	type CacheHealth = { isHealthy: boolean; memoryReady: boolean;
+	type CacheHealth = { isHealthy: boolean, memoryReady: boolean;
 		persistentReady: boolean;
 	lastCheck: number;
 	};
@@ -153,7 +153,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-	.cache-monitor { padding: 1.5rem; background: var(--bg-secondary, #f9fafb);
+	.cache-monitor { padding: 1.5rem, background: var(--bg-secondary, #f9fafb);
 		border-radius: 0.5rem;
 	border: 1px solid var(--border-color, #e5e7eb);
 	}
@@ -171,7 +171,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-weight: 600;
 	}
 
-	.actions { display: flex; gap: 0.5rem;
+	.actions { display: flex, gap: 0.5rem;
 	}
 
 	.btn-secondary,
@@ -198,7 +198,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		background: #fee2e2;
 	}
 
-	.health-card { background: white; padding: 1rem;
+	.health-card { background: white, padding: 1rem;
 		border-radius: 0.375rem;
 		margin-bottom: 1rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -210,7 +210,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-weight: 600;
 	}
 
-	.health-status { display: grid; gap: 0.75rem;
+	.health-status { display: grid, gap: 0.75rem;
 	}
 
 	.status-item {
@@ -231,13 +231,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-weight: 500;
 	}
 
-	.badge-success { background: #d1fae5; color: #065f46;
+	.badge-success { background: #d1fae5, color: #065f46;
 	}
 
-	.badge-error { background: #fee2e2; color: #991b1b;
+	.badge-error { background: #fee2e2, color: #991b1b;
 	}
 
-	.badge-warning { background: #fef3c7; color: #92400e;
+	.badge-warning { background: #fef3c7, color: #92400e;
 	}
 
 	.stats-grid {
@@ -247,7 +247,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		margin-bottom: 1rem;
 	}
 
-	.stat-card { background: white; padding: 1rem;
+	.stat-card { background: white, padding: 1rem;
 		border-radius: 0.375rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	}
@@ -272,13 +272,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: #f59e0b;
 	}
 
-	.progress-bar { width: 100%; height: 8px;
+	.progress-bar { width: 100%, height: 8px;
 		background: #e5e7eb;
 		border-radius: 9999px;
 	overflow: hidden;
 	}
 
-	.progress-fill { height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6);
+	.progress-fill { height: 100%, background: linear-gradient(90deg, #10b981, #3b82f6);
 		transition:width 0.3s;
 	}
 
@@ -288,7 +288,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		gap: 1rem;
 	}
 
-	.storage-card { background: white; padding: 1rem;
+	.storage-card { background: white, padding: 1rem;
 		border-radius: 0.375rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	}
@@ -300,7 +300,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: #374151;
 	}
 
-	.storage-stats { display: grid; gap: 0.5rem;
+	.storage-stats { display: grid, gap: 0.5rem;
 	}
 
 	.stat-row {

@@ -7,7 +7,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 logQueue }
 from './logQueue.js';
 // Define the type for the log entry data export interface LogEntryData {
-timestamp: string; level: string}
+timestamp: string, level: string}
 // Create a new RabbitMQ RabbitMQWorker instance // Ensure your Redis connection details are correct (same as logQueue) const logWorker = new RabbitMQWorker<LogEntryData>('logQueue', async (job) => {
 const {
 timestamp, level, message }= job.data;

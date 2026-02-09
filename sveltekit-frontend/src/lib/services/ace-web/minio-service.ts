@@ -6,7 +6,7 @@
 
 import {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-    DeleteObjectCommand: GetObjectCommand; HeadObjectCommand: ListObjectsV2Command,
+    DeleteObjectCommand: GetObjectCommand, HeadObjectCommand: ListObjectsV2Command,
     PutObjectCommand: S3Client
 } from '@aws-sdk/client-s3';
 
@@ -140,7 +140,7 @@ export class MinIOService {
   async storeChunks(
     docId: string,
     chunks: Array<{
-	text: string; metadata: object }>
+	text: string, metadata: object }>
   ): Promise<string> {
     this.validateInput(docId, 'docId');
     if (!Array.isArray(chunks) || chunks.length === 0) {
@@ -398,7 +398,7 @@ export class MinIOService {
     prefix: string,
     maxKeys: number = 1000
   ): Promise<Array<{
-	key: string; size: number;
+	key: string, size: number;
 	lastModified: Date }>> {
     this.validateInput(bucket, 'bucket');
 

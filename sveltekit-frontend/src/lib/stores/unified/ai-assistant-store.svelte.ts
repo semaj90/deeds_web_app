@@ -38,7 +38,7 @@ class AIAssistantStore {
 	isStreaming = $state(false);
 	activeContext = $state<AnalysisContext>({});
 	contextDocuments = $state<Array<{ id: string;
-	title: string; type: string }>>([]);
+	title: string, type: string }>>([]);
 	relevantCitations = $state<Array<{ id: string;
 	text: string }>>([]);
 	aiModel = $state<AIModel>('gemma3');

@@ -69,22 +69,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <style> .user-menu { position: relative;
 	display: inline-block;}
   .user-trigger { display: flex; align-items: center;
-	gap: 0.75rem;padding: 0.5rem 0.75rem; background: rgba(255, 255, 255, 0.1); border: 1px solid transparent; color: var(--console-fg, white); border-radius: 6px;
+	gap: 0.75rem;padding: 0.5rem 0.75rem, background: rgba(255, 255, 255, 0.1); border: 1px solid transparent, color: var(--console-fg, white); border-radius: 6px;
 	cursor: pointer;transition:all 0.2s; font-family: inherit;}
-  .user-trigger:hover { border-color: var(--console-primary, #00aa00); background: rgba(255, 255, 255, 0.15)}
+  .user-trigger:hover { border-color: var(--console-primary, #00aa00), background: rgba(255, 255, 255, 0.15)}
   .user-avatar { display: flex; align-items: center; justify-content: center;
-	width: 32px; height: 32px;
-	background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); border-radius: 50%; font-size: 1rem;}
+	width: 32px, height: 32px;
+	background: var(--console-primary, #00aa00), color: var(--console-bg, #0f0f23); border-radius: 50%; font-size: 1rem;}
   .user-info { display: flex; flex-direction: column; align-items: flex-start;
 	gap: 0.25rem;}
   .user-name { font-size: 0.9rem; font-weight: 500; line-height: 1;}
-  .user-role { font-size: 0.75rem; opacity: 0.7; line-height: 1;}
+  .user-role { font-size: 0.75rem, opacity: 0.7; line-height: 1;}
   .dropdown-arrow { font-size: 0.75rem;
 	transition:transform 0.2s;}
   .dropdown-arrow.open { transform: rotate(180deg)}
   .dropdown-menu { position: absolute;
-	top: 100%; right: 0; margin-top: 0.5rem;
-	background: var(--console-bg, #0f0f23); border: 2px solid var(--console-primary, #00aa00); border-radius: 8px; min-width: 320px; max-width: 400px; z-index: 1000; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); animation: slideDown 0.2s ease;}
+	top: 100%, right: 0; margin-top: 0.5rem;
+	background: var(--console-bg, #0f0f23), border: 2px solid var(--console-primary, #00aa00); border-radius: 8px; min-width: 320px; max-width: 400px; z-index: 1000; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), animation: slideDown 0.2s ease;}
   @keyframes slideDown { from { opacity: 0;
 	transform: translateY(-8px)}
     to { opacity: 1;
@@ -93,18 +93,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 1rem;padding: 1rem;
 	background: var(--console-gradient-header, linear-gradient(45deg, #1a1a2e, #2a2a4e)); border-bottom: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px 6px, 0 0;}
   .header-avatar { display: flex; align-items: center; justify-content: center;
-	width: 48px; height: 48px;
-	background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); border-radius: 50%; font-size: 1.5rem;}
-  .header-info { flex: 1; display: flex; flex-direction: column;
+	width: 48px, height: 48px;
+	background: var(--console-primary, #00aa00), color: var(--console-bg, #0f0f23); border-radius: 50%; font-size: 1.5rem;}
+  .header-info { flex: 1, display: flex; flex-direction: column;
 	gap: 0.25rem;}
   .header-name { font-size: 1rem; font-weight: 600;
 	color: var(--console-fg, white)}
   .header-email { font-size: 0.85rem;
 	opacity: 0.8;color: var(--console-fg, white)}
   .header-role { font-size: 0.75rem;
-	opacity: 0.7;color: var(--console-fg, white); display: flex; align-items: center;
+	opacity: 0.7;color: var(--console-fg, white), display: flex; align-items: center;
 	gap: 0.5rem;}
-  .admin-badge { padding: 0.25rem 0.5rem; background: var(--console-error, #ff5555); color: white; border-radius: 4px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase;}
+  .admin-badge { padding: 0.25rem 0.5rem, background: var(--console-error, #ff5555); color: white; border-radius: 4px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase;}
   .console-indicator { display: flex; flex-direction: column; align-items: center;
 	gap: 0.25rem;}
   .console-name { font-size: 0.7rem; font-weight: bold;
@@ -118,23 +118,23 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .nav-section { margin-bottom: 0.5rem;}
   .nav-sectionlast-child { margin-bottom: 0;}
   .section-title { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.5rem 1rem; margin: 0; font-size: 0.8rem; font-weight: 600;
+	gap: 0.5rem;padding: 0.5rem 1rem, margin: 0; font-size: 0.8rem; font-weight: 600;
 	color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;}
   .section-icon { font-size: 0.9rem;}
   .nav-list { list-style: none;
-	margin: 0; padding: 0;}
+	margin: 0, padding: 0;}
   .nav-item { display: flex; align-items: center;
 	gap: 0.75rem;width: 100%;
 	padding: 0.75rem 1rem;background: none;
 	border: none;color: var(--console-fg, white); text-align: left;
-	cursor: pointer; transition:all 0.2s; border-left: 3px solid transparent; font-family: inherit;}
+	cursor: pointer, transition:all 0.2s; border-left: 3px solid transparent; font-family: inherit;}
   .nav-item:hover { background: rgba(255, 255, 255, 0.1); border-left-color: var(--console-primary, #00aa00)}
-  .item-icon { font-size: 1.25rem; width: 24px; text-align: center;}
-  .item-content { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-start;}
+  .item-icon { font-size: 1.25rem, width: 24px; text-align: center;}
+  .item-content { flex: 1, display: flex; flex-direction: column, gap: 0.25rem; align-items: flex-start;}
   .item-name { font-size: 0.9rem; font-weight: 500; line-height: 1;}
-  .item-desc { font-size: 0.75rem; opacity: 0.7; line-height: 1;}
+  .item-desc { font-size: 0.75rem, opacity: 0.7; line-height: 1;}
   .item-arrow { font-size: 0.8rem;
-	opacity: 0.5; transition:opacity 0.2s;}
+	opacity: 0.5, transition:opacity 0.2s;}
   .nav-item:hover .item-arrow { opacity: 1;}
   .admin-section { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 0.5rem;}
   .admin-title { color: var(--console-error, #ff5555)}
@@ -144,14 +144,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.75rem;width: 100%;
 	padding: 0.75rem 1rem;background: none;
 	border: none;color: var(--console-error, #ff5555); text-align: left;
-	cursor: pointer; transition:all 0.2s; font-family: inherit;}
+	cursor: pointer, transition:all 0.2s; font-family: inherit;}
   .logout-buttonhover { background: rgba(255, 85, 85, 0.1)}
-  .logout-icon { font-size: 1.25rem; width: 24px; text-align: center;}
-  .logout-content { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-start;}
+  .logout-icon { font-size: 1.25rem, width: 24px; text-align: center;}
+  .logout-content { flex: 1, display: flex; flex-direction: column, gap: 0.25rem; align-items: flex-start;}
   .logout-text { font-size: 0.9rem; font-weight: 500; line-height: 1;}
   .logout-desc { font-size: 0.75rem;
 	opacity: 0.7; line-height: 1;}
-  .logout-indicator { font-size: 0.7rem; font-weight: bold; font-family: 'Courier New', monospace; padding: 0.25rem 0.5rem;background: var(--console-error, #ff5555); color: white; border-radius: 4px;}
+  .logout-indicator { font-size: 0.7rem; font-weight: bold; font-family: 'Courier New', monospace, padding: 0.25rem 0.5rem;background: var(--console-error, #ff5555), color: white; border-radius: 4px;}
   /* Mobile responsive */ @media (max-width: 768px) { .user-info { display: none;}
     .dropdown-menu { right: -8px; min-width: 280px;}
     .item-desc { display: none;}

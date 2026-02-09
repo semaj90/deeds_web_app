@@ -49,14 +49,14 @@ export interface CanvasItem extends BaseKnowledgeItem {
 export type KnowledgeCollectionName = 'evidence' | 'notes' | 'canvas';
 
 type KnowledgeRecordMap = {
-	evidence: EvidenceItem; notes: NoteItem;
+	evidence: EvidenceItem, notes: NoteItem;
 	canvas: CanvasItem;
 };
 
 type KnowledgeItem = KnowledgeRecordMap[KnowledgeCollectionName];
 
 interface CollectionContext<K extends KnowledgeCollectionName> {
-	name: K; collection: Collection<KnowledgeRecordMap[K]>;
+	name: K, collection: Collection<KnowledgeRecordMap[K]>;
 	fuse: Fuse<KnowledgeRecordMap[K]>;
 	fuseKeys: Array<FuseOptionKey<KnowledgeRecordMap[K]>>;
 }
@@ -93,7 +93,7 @@ export interface HybridConfig {
 }
 
 type BroadcastMessage = {
-	collection: KnowledgeCollectionName; action: 'upsert' | 'remove' | 'clear';
+	collection: KnowledgeCollectionName, action: 'upsert' | 'remove' | 'clear';
 	item?: KnowledgeItem;
 	itemId?: string;
 	instanceId?: string;

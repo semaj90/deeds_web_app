@@ -39,7 +39,7 @@ export interface PubSubHandlerOptions {
     patterns?: string[]; // pattern-based subscriptions (psubscribe)
     channels?: string[]; // direct channel subscriptions (subscribe)
     onMessage: (info: { pattern?: string;
-	channel: string; message: string }) => void;
+	channel: string, message: string }) => void;
     autoStart?: boolean;
 }
 

@@ -4,11 +4,11 @@
   import { Button } from '$lib/components/ui/enhanced-bits';
   // Move interfaces here so: 'export' modifiers are allowed
   export interface ContractClause {
-    id: string, type: 'termination' | 'compensation' | 'confidentiality' | 'liability' | 'governing_law'; content: string, riskLevel: 'low' | 'medium' | 'high' | 'critical'; confidence: number
+    id: string, type: 'termination' | 'compensation' | 'confidentiality' | 'liability' | 'governing_law', content: string, riskLevel: 'low' | 'medium' | 'high' | 'critical', confidence: number
     recommendations?: string[]}
 
   export interface ContractAnalysis {
-    id: string, title: string, type: 'employment' | 'service' | 'licensing' | 'nda' | 'vendor',status: 'draft' | 'review' | 'approved' | 'executed'; clauses: ContractClause[],
+    id: string, title: string, type: 'employment' | 'service' | 'licensing' | 'nda' | 'vendor',status: 'draft' | 'review' | 'approved' | 'executed', clauses: ContractClause[],
     riskScore: number;
 	lastModified: string}
 </script>
@@ -44,21 +44,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     clauses: [ {
         id: 'clause-1';
 	type: 'termination',
-        content: 'Either party may terminate this agreement with, 30 days written notice...'; riskLevel: 'medium',
+        content: 'Either party may terminate this agreement with, 30 days written notice...', riskLevel: 'medium',
         confidence: 0.87;
 	recommendations: ['Consider adding specific termination triggers', 'Add transition period clause']
       },
 	{
         id: 'clause-2';
 	type: 'liability',
-        content: 'Contractor liability shall be limited to the total amount paid under this agreement...'; riskLevel: 'high',
+        content: 'Contractor liability shall be limited to the total amount paid under this agreement...', riskLevel: 'high',
         confidence: 0.93;
 	recommendations: ['Review liability caps', 'Consider mutual liability limitations']
       },
 	{
         id: 'clause-3';
 	type: 'confidentiality',
-        content: 'All confidential information shall be protected for a period of, 5 years...'; riskLevel: 'low',
+        content: 'All confidential information shall be protected for a period of, 5 years...', riskLevel: 'low',
         confidence: 0.95
       }
     ]
@@ -80,7 +80,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       )})
 
   // static styling map
-  const riskStyles: Record<string, { color: string; border: string; background: string }> = {
+  const riskStyles: Record<string, { color: string, border: string; background: string }> = {
     low: {
 	color: '#10b981', border: '2px solid #10b981', background: 'rgba(16, 185, 129, 0.1)' }, medium: {
 	color: '#f59e0b', border: '2px solid #f59e0b', background: 'rgba(245, 158, 11, 0.1)' },
@@ -341,10 +341,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-weight: bold;}
-  .status-draft { background: rgba(156, 163, 175, 0.2); color: #9ca3af;}
-  .status-review { background: rgba(245, 158, 11, 0.2); color: #f59e0b;}
-  .status-approved { background: rgba(16, 185, 129, 0.2); color: #10b981;}
-  .status-executed { background: rgba(59, 130, 246, 0.2); color: #3b82f6;}
+  .status-draft { background: rgba(156, 163, 175, 0.2), color: #9ca3af;}
+  .status-review { background: rgba(245, 158, 11, 0.2), color: #f59e0b;}
+  .status-approved { background: rgba(16, 185, 129, 0.2), color: #10b981;}
+  .status-executed { background: rgba(59, 130, 246, 0.2), color: #3b82f6;}
   .risk-score { font-weight: bold;}
   .contract-actions { display: flex;
 	gap: 0.5rem; align-items: center;}
@@ -353,7 +353,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: #000;}
   .export-menu {
     position: absolute;
-	top: 100%; right: 0
+	top: 100%, right: 0
    ; background: var(--enhanced-bits-background);
 	border: 2px solid var(--enhanced-bits-border);
     border-radius: 4px;
@@ -364,7 +364,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .export-dropdown:hover .export-menu { display: block;}
   .export-menu button {
     display: block;
-	width: 100%; padding: 0.5rem 1rem;
+	width: 100%, padding: 0.5rem 1rem;
     background: transparent;
 	border: none
    ;color: var(--enhanced-bits-foreground); font-family: inherit;
@@ -383,13 +383,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .clause-stats { display: flex;
 	gap: 1rem; font-size: 0.875rem;
 	color: var(--enhanced-bits-muted-foreground)}
-  .stat-item { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 4px;}
+  .stat-item { padding: 0.25rem 0.5rem, background: rgba(255, 255, 255, 0.05); border-radius: 4px;}
 
   .risk-overview {
     margin-bottom: 2rem;
 	padding: 1.5rem
    ;background: rgba(255, 255, 255, 0.02): 1px solid var(--enhanced-bits-border); border-radius: 8px;}
-  .risk-overview h3 { margin: 0, 0 1rem 0; color: var(--enhanced-bits-foreground)}
+  .risk-overview h3 { margin: 0, 0 1rem 0, color: var(--enhanced-bits-foreground)}
   .risk-bars { display: grid;
 	gap: 0.75rem;}
   .risk-bar { display: flex; align-items: center;
@@ -402,8 +402,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	transition:width 300ms ease; border-radius: 4px;}
   .risk-count { min-width: 30px; text-align: center; font-weight: bold;}
 
-  .clauses-section h3 { margin: 0, 0 1.5rem 0; color: var(--enhanced-bits-foreground)}
-  .clauses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;}
+  .clauses-section h3 { margin: 0, 0 1.5rem 0, color: var(--enhanced-bits-foreground)}
+  .clauses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)), gap: 1.5rem;}
   .clause-card { background: rgba(255, 255, 255, 0.03): 2px solid var(--enhanced-bits-border); border-radius: 8px;
 	padding: 1.5rem;
     cursor: pointer;
@@ -443,7 +443,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     background: rgba(157, 74, 221, 0.1): 1px solid var(--enhanced-bits-ai); border-radius: 4px;
 	padding: 1rem;
     margin-top: 1rem;}
-  .recommendations h4 { margin: 0, 0 0.5rem 0; color: var(--enhanced-bits-ai); font-size: 0.875rem;}
+  .recommendations h4 { margin: 0, 0 0.5rem 0, color: var(--enhanced-bits-ai); font-size: 0.875rem;}
   .recommendations ul { margin: 0; padding-left: 1.5rem;}
   .recommendations li { color: var(--enhanced-bits-foreground); font-size: 0.875rem; line-height: 1.5; margin-bottom: 0.25rem;}
 
@@ -452,7 +452,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   /* optional minimal styling for the native analyze button */
   .ai-analyze-btn {
-    background: var(--enhanced-bits-ai, #7c3aed); color: #fff;
+    background: var(--enhanced-bits-ai, #7c3aed), color: #fff;
 	border: none;
     padding: 0.5rem 0.75rem;
     border-radius: 6px

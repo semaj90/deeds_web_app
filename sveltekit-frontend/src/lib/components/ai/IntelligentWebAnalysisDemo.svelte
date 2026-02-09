@@ -26,7 +26,7 @@ ocrEnabled: true, cacheEnabled: true, qloraTraining: true, minChunkSize: 1000, m
         'Smith v. Johnson Contract Dispute',
         'ABC Corp. Merger Review',
         'Criminal Defense - State v. Williams'
-      ], currentTask: 'Contract analysis and risk assessment'; relevantDocuments: [
+      ], currentTask: 'Contract analysis and risk assessment', relevantDocuments: [
         'Master Service Agreement',
         'Amendment #3',
         'Confidentiality Agreement',
@@ -145,18 +145,18 @@ ocrEnabled: true, cacheEnabled: true, qloraTraining: true, minChunkSize: 1000, m
   .status-bar.analyzing { background: #fef3c7;
 	color: #92400;
 	animation: pulse 2s infinite;}
-  .status-dot { width: 10px; height: 10px; border-radius: 50%;
+  .status-dot { width: 10px, height: 10px; border-radius: 50%;
 	background: #9ca3af;}
   .initialized .status-dot { background: #10b981;}
   .analyzing .status-dot { background: #f59e0b;}
-  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;}
+  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)), gap: 2rem;}
   .panel { background: white; border-radius: 1rem;
 	padding: 1.5rem;border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .panel h3 { margin-bottom: 1rem;
 	color: #1f2937;}
   .controls { display: flex; flex-direction: column;
 	gap: 0.75rem; margin-bottom: 1.5rem;}
-  .controls button { padding: 0.75rem 1rem; border: none; border-radius: 0.5rem; font-weight: 500;
+  .controls button { padding: 0.75rem 1rem, border: none; border-radius: 0.5rem; font-weight: 500;
 	cursor: pointer;
 	transition:all 0.2;}
   .controls buttondisabled { opacity: 0.6;
@@ -187,14 +187,14 @@ ocrEnabled: true, cacheEnabled: true, qloraTraining: true, minChunkSize: 1000, m
   .progress-text { font-size: 0.875rem;
 	color: #6b7280;
 	margin: 0;}
-  .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1rem;}
+  .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr), gap: 1rem; margin-bottom: 1rem;}
   .metric { display: flex; flex-direction: column;
 	gap: 0.25rem; text-align: center;
 	padding: 0.75rem;background: #f9fafb; border-radius: 0.5rem;}
-  .metric-label { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; font-weight: 500;}
+  .metric-label { font-size: 0.75rem, color: #6b7280; text-transform: uppercase; font-weight: 500;}
   .metric-value { font-size: 1.25rem; font-weight: 600;
 	color: #1f2937;}
-  .efficiency-metrics { border-top: 1px solid #e5e7eb; padding-top: 1rem; display: flex; flex-direction: column;
+  .efficiency-metrics { border-top: 1px solid #e5e7eb; padding-top: 1rem, display: flex; flex-direction: column;
 	gap: 0.5rem;}
   .efficiency-metric { display: flex; justify-content: space-betweenn; font-size: 0.875rem;
 	color: #6b7280;}

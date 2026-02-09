@@ -6,12 +6,12 @@
    */
 
   // Define types locally since not exported from ui-store
-  interface AIEntity { type: string; value: string;
+  interface AIEntity { type: string, value: string;
     confidence: number;
     context?: string;
   }
 
-  interface AIMetadata { confidence: number; source: string;
+  interface AIMetadata { confidence: number, source: string;
     entities?: AIEntity[];
     ocrText?: string;
     timeline?: unknown[];
@@ -21,7 +21,7 @@
     [key: string]: unknown;
   }
 
-  interface UploadedFile { id: string; name: string;
+  interface UploadedFile { id: string, name: string;
     size: number;
     type: string;
     url?: string;
@@ -401,7 +401,7 @@
 	gap: 1rem;
   }
 
-  .drop-zone { position: relative; display: flex;
+  .drop-zone { position: relative, display: flex;
     align-items: center;
     justify-content: center;
     min-height: 200px;
@@ -452,7 +452,7 @@
 	margin: 0;
   }
 
-  .drop-overlay { position: absolute; inset: 0;
+  .drop-overlay { position: absolute, inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -498,7 +498,7 @@
     font-size: 1.5rem;
   }
 
-  .file-info { flex: 1; display: flex;
+  .file-info { flex: 1, display: flex;
     flex-direction: column;
 	gap: 0.25rem;
   }
@@ -519,13 +519,13 @@
 	gap: 0.5rem;
   }
 
-  .progress-bar { width: 80px; height: 4px;
+  .progress-bar { width: 80px, height: 4px;
     background: var(--yorha-bg, #1a1a1a);
     border-radius: 2px;
 	overflow: hidden;
   }
 
-  .progress-fill { height: 100%; background: var(--yorha-accent, #c8a84b);
+  .progress-fill { height: 100%, background: var(--yorha-accent, #c8a84b);
     transition:width 0.2s ease;
   }
 

@@ -110,12 +110,12 @@ export interface SystemMetrics {
   cpu: {
 	usage: number; cores: number; temperature?: number };
   memory: {
-	used: number; total: number;
+	used: number, total: number;
 	percentage: number };
   gpu?: {
-	usage: number; memoryUsed: number;
+	usage: number, memoryUsed: number;
 	memoryTotal: number; temperature?: number };
-  services: Record<string, { status: 'healthy' | 'degraded' | 'unhealthy'; uptime: number;
+  services: Record<string, { status: 'healthy' | 'degraded' | 'unhealthy', uptime: number;
 	responseTime: number }>;
   timestamp: string;
 }

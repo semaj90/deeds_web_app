@@ -18,7 +18,7 @@ function getErrorMessage(e: unknown): string {
 
 // Helper for timeout signal
 function createTimeoutSignal(timeoutMs: number = 5000): {
-	signal: AbortSignal; clear: () => void } {
+	signal: AbortSignal, clear: () => void } {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
     return { signal: controller.signal, clear: () => clearTimeout(id) };

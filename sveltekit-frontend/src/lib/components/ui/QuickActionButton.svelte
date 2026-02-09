@@ -3,7 +3,7 @@
 
   import { browser } from '$app/environment';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-  interface Props { label: string; model: string;
+  interface Props { label: string, model: string;
     prompt: string;
     onActionComplete?: (response: any) => void;
     onActionError?: (error: Error) => void;

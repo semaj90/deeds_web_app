@@ -209,7 +209,7 @@ export class LegalDatabaseBridge {
 			title: caseData.title ?? 'New Case',
 			description: caseData.description ?? '',
 			case_type: caseData.case_type ?? 'civil',
-			jurisdiction: caseData.jurisdiction ?? 'federal'; status: caseData.status ?? 'active',
+			jurisdiction: caseData.jurisdiction ?? 'federal', status: caseData.status ?? 'active',
 			client_id: caseData.client_id ?? 'default_client',
 			created_at: now,
 			updated_at: now,

@@ -5,7 +5,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AnalysisResult { id: string; [key: string]: unknown}
 
-export interface Recommendation { id: string; status: 'pending' | 'completed' | 'failed',type: string; timing_suggestion: 'immediate' | 'normal' | 'long_term'; [key: string]: unknown}
+export interface Recommendation { id: string, status: 'pending' | 'completed' | 'failed',type: string, timing_suggestion: 'immediate' | 'normal' | 'long_term'; [key: string]: unknown}
 // XState machine for case workflow management with contextual memory // Handles: case creation â†’ document upload â†’ analysis â†’ recommendations â†’ action export interface CaseWorkflowContext { case_id?, string: user_id; string: current_step, string: case_data?; CaseData: Document[], analysis_results: AnalysisResult[], recommendations: Recommendation[], memory_context?: MemoryContext; error_message?: string,progress: {
 	total_steps: number, completed_steps: number, current_action: string}; settings: {
 	auto_analyze: boolean, notification_level: 'minimal' | 'normal' | 'detailed',ai_assistance_level: 'basic' | 'enhanced' | 'proactive'}}
@@ -19,7 +19,7 @@ export interface Recommendation { id: string; status: 'pending' | 'completed' | 
 	CREATE_CASE: { target: 'creatingCase', actions: assign({
 	case_data: (_: CaseWorkflowContext, event, event: CaseWorkflowEvent => { if (event.type === 'CREATE_CASE') return event.case_data;
  return undefined},
-	current_step: () => 'creating_case'; progress: (context: CaseWorkflowContext) => ({ ...context.progress, current_action: 'Creating case...' }) }) } } },
+	current_step: () => 'creating_case', progress: (context: CaseWorkflowContext) => ({ ...context.progress, current_action: 'Creating case...' }) }) } } },
 	creatingCase: {
 	invoke: { src, async (context: CaseWorkflowContext) => { const { case_data, user_id }= context; // Create case through orchestrator const result = await orchestrator.handle({ type: 'process', payload: {
 	action: 'create_case', case_data },

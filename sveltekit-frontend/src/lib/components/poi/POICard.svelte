@@ -25,7 +25,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  name: string;
  alias?: string;
 	threatLevel: string;
- photos?: Array<{ url: string; thumbnailUrl: string;
+ photos?: Array<{ url: string, thumbnailUrl: string;
  metadata?: any;
  ai?: any;
  }>;

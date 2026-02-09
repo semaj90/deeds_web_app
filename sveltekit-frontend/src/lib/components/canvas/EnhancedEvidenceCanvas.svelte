@@ -61,7 +61,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   async function addTextBox(): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
    const fabric = (mod as any).fabric ?? (mod as any).default ?? mod;
-   const textbox = new fabric.Textbox('Type here...', { left: 100, top: 100, width: 200, fontSize: 16, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: 'rgba(255, 255, 255, 0.9)'; padding: 8 }); textbox.set('customType', 'text'); fabricCanvas.add(textbox); fabricCanvas.setActiveObject(textbox); saveCanvasState()} catch (error) { console.error('Error adding text:', error)}
+   const textbox = new fabric.Textbox('Type here...', { left: 100, top: 100, width: 200, fontSize: 16, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: 8 }); textbox.set('customType', 'text'); fabricCanvas.add(textbox); fabricCanvas.setActiveObject(textbox); saveCanvasState()} catch (error) { console.error('Error adding text:', error)}
   }
   function saveCanvasState() { if (!fabricCanvas) return; try { const state = JSON.stringify(fabricCanvas.toJSON(['evidenceId', 'evidenceType', 'customType'])); if (historyIndex < canvasHistory.length - 1) { canvasHistory = canvasHistory.slice(0, historyIndex + 1)}
       canvasHistory.push(state); historyIndex = canvasHistory.length - 1; if (canvasHistory.length > 50) { canvasHistory = canvasHistory.slice(canvasHistory.length - 50); historyIndex = canvasHistory.length - 1}
@@ -80,10 +80,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const activeObjects = fabricCanvas.getActiveObjects ? fabricCanvas.getActiveObjects(): []; if (activeObjects.length > 0) { activeObjects.forEach((obj: any) => fabricCanvas.remove(obj)); fabricCanvas.discardActiveObject && fabricCanvas.discardActiveObject(); saveCanvasState()}
   }
   async function saveCanvas(): Promise<void> { if (!fabricCanvas) return; try { const canvasData = JSON.stringify(fabricCanvas.toJSON(['evidenceId', 'evidenceType', 'customType']));
-   const positions = (fabricCanvas.getObjects ? fabricCanvas.getObjects(): []) .filter((obj: any) => obj.evidenceId) .map((obj: any) => ({ evidenceId: obj.evidenceId, x: obj.left, y: obj.top, width: (obj.width ?? (obj.getScaledWidth ? obj.getScaledWidth(): 0)) * (obj.scaleX ?? 1); height: (obj.height ?? (obj.getScaledHeight ? obj.getScaledHeight(): 0)) * (obj.scaleY ?? 1) }));
+   const positions = (fabricCanvas.getObjects ? fabricCanvas.getObjects(): []) .filter((obj: any) => obj.evidenceId) .map((obj: any) => ({ evidenceId: obj.evidenceId, x: obj.left, y: obj.top, width: (obj.width ?? (obj.getScaledWidth ? obj.getScaledWidth(): 0)) * (obj.scaleX ?? 1), height: (obj.height ?? (obj.getScaledHeight ? obj.getScaledHeight(): 0)) * (obj.scaleY ?? 1) }));
    const response = await fetch('/api/canvas/save', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ caseId, canvasData, positions }) }); if (!response.ok) throw new Error('Failed to save canvas'); notifications.add({ type: 'success', title: 'Canvas Saved', message: 'Evidence board saved successfully.'
-      })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed'; message: 'Failed to save evidence board.'
+      })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed', message: 'Failed to save evidence board.'
       }); console.error('Save error:', error)}
 '
   }
@@ -136,7 +136,7 @@ multiplier: 2 });
   {#if fabricLoaded && evidenceItems.length === 0} <div> <Image /> <p>Evidence Board</p>
  <p>Add evidence items to start building your case visualization</p> {/if}
   </div>
- <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%; height: auto;display: block;}
+ <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%, height: auto;display: block;}
 </style>
 
 

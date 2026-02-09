@@ -44,7 +44,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	synthesizeOutputs: true }
       ); // simplified suggestions (typed as unknown to avoid shape/type mismatch) autoSuggestions = [ { type: 'enhancement', priority: 'high', suggestion: 'Implement semantic case clustering', implementation: 'Group similar cases using AI embeddings', mcpQuery: commonMCPQueries.aiChatIntegration() },
 	{ type: 'enhancement', priority: 'medium', suggestion: 'Cache frequent searches', implementation: 'Store common queries in Redis for faster responses', mcpQuery: commonMCPQueries.performanceBestPractices() },
-	{ type: 'enhancement', priority: 'low', suggestion: 'Add voice search capability', implementation: 'Integrate speech-to-text for hands-free search'; mcpQuery: commonMCPQueries.uiUxBestPractices() } ]} catch (error) { console.error('Failed to generate auto-suggestions:', error)}
+	{ type: 'enhancement', priority: 'low', suggestion: 'Add voice search capability', implementation: 'Integrate speech-to-text for hands-free search', mcpQuery: commonMCPQueries.uiUxBestPractices() } ]} catch (error) { console.error('Failed to generate auto-suggestions:', error)}
   }
 
    // Update memory graph with AI context async function updateMemoryWithAIContext(interaction: unknown): Promise<any> { try { await fetch('/api/mcp/memory/create-relations', { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -188,7 +188,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <div class="flex items-center"> <span>CTRL+K TO OPEN</span>
  <span>ESC TO CLOSE</span> </div> </div> </div> -    </Dialog.Content> -  </Dialog.Portal> -</Dialog> +  {/if}
-  <style> /* NieR Automata Theme Enhancements */ .nier-container { clip-path: polygon(0, 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px)); position: relative; max-height: 90vh;}
+  <style> /* NieR Automata Theme Enhancements */ .nier-container { clip-path: polygon(0, 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px)), position: relative; max-height: 90vh;}
   .nier-container: before { content: '';
 	position: absolute;
 	top: -2px;
@@ -196,8 +196,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	right: -2px;
 	bottom: -2px;background: linear-gradient(45deg, #fbbf24, #fbbf24, transparent, transparent, #fbbf24); clip-path: polygon(0, 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px)); z-index: -1;
 	animation: borderFlow 4s ease-in-out infinite;}
-  .nier-input { clip-path: polygon(0, 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); transition:all 0.3s ease;}
-  .nier-input:focus { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); transform: translateY(-1px)}
+  .nier-input { clip-path: polygon(0, 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)), transition:all 0.3s ease;}
+  .nier-input:focus { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), transform: translateY(-1px)}
   .nier-filter-btn { padding: 0.5rem 1rem; background-color: #1f2937;
 	border: 1px solid #4b5563;color: #d1d5db; font-family: monospace; font-size: 0.75rem;
 	transition:all 200ms;display: flex; align-items: center;
@@ -208,13 +208,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .nier-filter-btn.blue.active { background-color: #3b82f6; border-color: #3b82f6;}
   .nier-filter-btn.green.active { background-color: #22c55e; border-color: #22c55e;}
   .nier-filter-btn.purple.active { background-color: #a855f7; border-color: #a855f7;}
-  .nier-search-btn { clip-path: polygon(0, 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px)); position: relative;overflow: hidden;}
+  .nier-search-btn { clip-path: polygon(0, 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px)), position: relative;overflow: hidden;}
   .nier-search-btn: before { content: '';
 	position: absolute;
 	top: 0;
 	left: -100%;
 	width: 100%;
-	height: 100%;background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition:left 0.5s;}
+	height: 100%;background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent), transition:left 0.5s;}
   .nier-result-item { position: relative;}
   .nier-result-item: before { content: '';
 	position: absolute;
@@ -226,8 +226,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	transition:background 0.3s ease;}
   .nier-result-item: hover, before { background: linear-gradient(to bottom, #fbbf24, #f59e0b)}
   .nier-result-index { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
-  .nier-type-badge, .nier-confidence-badge { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px)); padding: 0.25rem 0.5rem; font-family: monospace; font-size: 0.75rem;}
-  .nier-confidence-badge { background-color: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24; display: flex; align-items: center;
+  .nier-type-badge, .nier-confidence-badge { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px)), padding: 0.25rem 0.5rem; font-family: monospace; font-size: 0.75rem;}
+  .nier-confidence-badge { background-color: rgba(251, 191, 36, 0.2), border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24, display: flex; align-items: center;
 	gap: 0.25rem;}
   .nier-advanced-panel { clip-path: polygon(0, 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px))}
   .nier-slider { background-color: #374151; border-radius: 0;
@@ -241,23 +241,23 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .nier-status-badge { padding: 0.25rem 0.5rem; font-family: monospace; font-size: 0.75rem;
 	display: flex; align-items: center;
 	gap: 0.25rem; clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
-  .nier-suggestion-card { clip-path: polygon(0, 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); transition:all 0.3s ease;}
+  .nier-suggestion-card { clip-path: polygon(0, 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)), transition:all 0.3s ease;}
   .nier-suggestion-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(251, 191, 36, 0.15)}
   .nier-priority-indicator.high { background-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6)}
   .nier-priority-indicator.medium { background-color: #eab308; box-shadow: 0 0 8px rgba(245, 158, 11, 0.6)}
   .nier-priority-indicator.low { background-color: #22c55e; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6)}
   .nier-icon-container { width: 2rem;
-	height: 2rem; background-color: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.5); display: flex; align-items: center; justify-content: center; clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
+	height: 2rem; background-color: rgba(251, 191, 36, 0.2), border: 1px solid rgba(251, 191, 36, 0.5); display: flex; align-items: center; justify-content: center; clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
   .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 	overflow: hidden;}
-  /* Animations */ @keyframes borderFlow { 0%; } 100% { background: linear-gradient(45deg, #fbbf24, transparent, transparent, #fbbf24); opacity: 0.8;}
-    25% { background: linear-gradient(135deg, transparent, #fbbf24, transparent, transparent); opacity: 1;}
-    50% { background: linear-gradient(225deg, transparent, transparent, #fbbf24, transparent); opacity: 0.8;}
-    75% { background: linear-gradient(315deg, transparent, transparent, transparent, #fbbf24); opacity: 1;}
+  /* Animations */ @keyframes borderFlow { 0%; } 100% { background: linear-gradient(45deg, #fbbf24, transparent, transparent, #fbbf24), opacity: 0.8;}
+    25% { background: linear-gradient(135deg, transparent, #fbbf24, transparent, transparent), opacity: 1;}
+    50% { background: linear-gradient(225deg, transparent, transparent, #fbbf24, transparent), opacity: 0.8;}
+    75% { background: linear-gradient(315deg, transparent, transparent, transparent, #fbbf24), opacity: 1;}
   } @keyframes glowPulse { 0%; } 100% { opacity: 0.6;} 50% { opacity: 1;} }
   .nier-spinner { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
-  /* Responsive Design */ @media (max-width: 768px) { .nier-container { clip-path: polygon(0, 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px)); margin: 1rem; max-height: calc(100vh - 2rem)}
+  /* Responsive Design */ @media (max-width: 768px) { .nier-container { clip-path: polygon(0, 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px)), margin: 1rem; max-height: calc(100vh - 2rem)}
     .nier-modal { max-width: calc(100vw - 2rem)}
   } /* Accessibility */ @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important;}
   } /* Focus Management */ .nier-input:focus, .nier-search-btn:focus, .nier-filter-btn:focus { outline: 2px solid #fbbf24; outline-offset: 2px;}

@@ -3,7 +3,7 @@
 	import LawModal from './LawModal.svelte';
 	import LegalAutocomplete from './LegalAutocomplete.svelte';
 
-	interface TimelineEvent { id: string; action: string;
+	interface TimelineEvent { id: string, action: string;
 		data: any;
 	createdAt: string;
 		formatted: string;

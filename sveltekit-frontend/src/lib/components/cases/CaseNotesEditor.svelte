@@ -349,10 +349,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <head>
  <title>AI Legal Memo</title>
  <style>
- body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6;}
+ body { font-family: Arial, sans-serif, margin: 40px; line-height: 1.6;}
  h1 { color: #333;}
  pre { white-space: pre-wrap;
-	background: #f5f5f5; padding: 20px; border-radius: 5px;}
+	background: #f5f5f5, padding: 20px; border-radius: 5px;}
  </style>
 
 

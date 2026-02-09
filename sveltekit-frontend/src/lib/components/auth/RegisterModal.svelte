@@ -4,8 +4,8 @@
   import Button from "$lib/components/ui/button/Button.svelte";
   import { registerSchema } from '$lib/schemas/auth';
   import X from 'lucide-svelte/icons/x';
-  import { zod } from 'sveltekit-superforms/adapters';
-  import { superForm } from 'sveltekit-superforms/client';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { superForm } from 'sveltekit-superforms';
   import type { ZodTypeAny } from 'zod';
   interface Props {
     onsuccess?: () => void
@@ -24,7 +24,7 @@
     },
 	{
       // cast the schema to ZodTypeAny to avoid the adapter's strict generic requirement'
-      validators: zod(registerSchema as unknown as ZodTypeAny),
+      validators: zodClient(registerSchema as unknown as ZodTypeAny),
       onUpdate({ form: f }) {
         if (f.valid) {
           onsuccess?.();

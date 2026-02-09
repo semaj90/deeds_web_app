@@ -1,6 +1,6 @@
 <script lang="ts">
  // Define types locally to avoid importing server schema in browser
- type EvidenceRelationship = { id: string; caseId: string;
+ type EvidenceRelationship = { id: string, caseId: string;
  fromEvidenceId: string;
 	toEvidenceId: string;
  relationshipType: string;
@@ -145,7 +145,7 @@
 </div>
 
 <style>
- .relationship-inspector { width: 320px; height: 100%;
+ .relationship-inspector { width: 320px, height: 100%;
  background: white;
  border-left: 1px solid #e5e7eb;
  display: flex;

@@ -85,7 +85,7 @@ function findBMU(
 	input: number[],
 	grid: SOMGrid
 ): {
-	x: number; y: number;
+	x: number, y: number;
 	minDistance: number } {
 	let minDistance = Infinity;
 	let bmuX = 0;
@@ -223,7 +223,7 @@ export function getSOMCentroids(grid: SOMGrid): number[][] {
  * Find SOM cluster for embedding
  */
 export function findSOMCluster(input: number[], grid: SOMGrid): {
-	x: number; y: number } {
+	x: number, y: number } {
 	const bmu = findBMU(input, grid);
 	return { x: bmu.x, y: bmu.y };
 }
@@ -242,7 +242,7 @@ export function getSOMClusterCoords(
 	clusterId: number,
 	gridWidth: number
 ): {
-	x: number; y: number } {
+	x: number, y: number } {
 	return {
 		x: clusterId % gridWidth,
 		y: Math.floor(clusterId / gridWidth)

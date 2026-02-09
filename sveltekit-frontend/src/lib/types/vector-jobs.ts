@@ -159,7 +159,7 @@ export interface LegalSimilarityResult {
 // Monitoring and metrics types
 export interface VectorServiceMetrics {
  queueDepth: {
-	embeddings: number; similarities: number;
+	embeddings: number, similarities: number;
 	indexing: number; clustering: number };
  processingStats: {
 	totalProcessed: number;
@@ -190,7 +190,7 @@ export interface VectorHealthStatus {
  webgpu: 'available' | 'unavailable' | 'not_supported';
  };
  queues: { [queueName: string]: {
-	depth: number; consumers: number;
+	depth: number, consumers: number;
 	processingRate: number } };
  lastHealthCheck: Date;
 }

@@ -6,10 +6,10 @@ import type { SvelteComponent } from 'svelte';
 // Enhanced Design System Tokens
 export interface DesignTokens {
  colors: {
-	primary: string; secondary: string;
-	success: string; warning: string;
-	error: string; info: string;
-	background: string; surface: string;
+	primary: string, secondary: string;
+	success: string, warning: string;
+	error: string, info: string;
+	background: string, surface: string;
 	text: {
  primary: string;
 	secondary: string;
@@ -17,26 +17,26 @@ export interface DesignTokens {
  };
  };
  spacing: {
-	xs: string; sm: string;
-	md: string; lg: string;
-	xl: string; xxl: string;
+	xs: string, sm: string;
+	md: string, lg: string;
+	xl: string, xxl: string;
  };
  borderRadius: {
-	sm: string; md: string;
-	lg: string; xl: string;
+	sm: string, md: string;
+	lg: string, xl: string;
  };
  shadows: {
-	sm: string; md: string;
-	lg: string; xl: string;
+	sm: string, md: string;
+	lg: string, xl: string;
  };
  typography: {
-	fontFamily: string; fontSize: {
-	xs: string; sm: string;
-	md: string; lg: string;
-	xl: string; xxl: string;
+	fontFamily: string, fontSize: {
+	xs: string, sm: string;
+	md: string, lg: string;
+	xl: string, xxl: string;
  };
  fontWeight: {
-	normal: number; medium: number;
+	normal: number, medium: number;
 	bold: number;
  };
  };

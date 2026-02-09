@@ -10,12 +10,12 @@
   import ZoomOut from 'lucide-svelte/icons/zoom-out';
 
   // Types
-  interface DocumentPage { pageNumber: number; textContent: string;
+  interface DocumentPage { pageNumber: number, textContent: string;
     annotations: Annotation[];
 	currentLOD: number;
   }
 
-  interface Annotation { id: string; type: 'highlight' | 'note' | 'redaction';
+  interface Annotation { id: string, type: 'highlight' | 'note' | 'redaction';
     bounds: {
 	x: number, y: number, width: number, height: number };
     content: string;
@@ -89,7 +89,7 @@
       <div
         class="document-page shadow-lg bg-white transition-transform duration-200"
         style="width: 600px;
-	height: 800px; transform: scale({zoomLevel}); transform-origin: center top;"
+	height: 800px, transform: scale({zoomLevel}); transform-origin: center top;"
       >
         <!-- Page Content Placeholder -->
         <div class="p-8 text-black opacity-20">

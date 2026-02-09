@@ -129,7 +129,7 @@ export function getFunctionParamPatterns(): PatternMatcher[] {
  * Apply function parameter fixes to content
  */
 export function fixFunctionParams(content: string): {
-	result: string; fixCount: number } {
+	result: string, fixCount: number } {
   let result = content;
   let totalFixes = 0;
 

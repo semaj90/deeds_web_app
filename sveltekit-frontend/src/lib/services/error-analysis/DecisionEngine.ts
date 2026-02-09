@@ -24,20 +24,20 @@ import type { strategy } from "sharp";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface DecisionEngineConfig {
-	highConfidenceThreshold: number; mediumConfidenceThreshold: number;
+	highConfidenceThreshold: number, mediumConfidenceThreshold: number;
 	lowConfidenceThreshold: number, criticalConfidenceThreshold: number;
 	maxValidationAttempts: number, autoApplyEnabled: boolean;
 },
 	export interface DecisionResult {
-	action: 'auto_apply' | 'validate_then_apply' | 'invoke_tools' | 'escalate'; confidence: number;
+	action: 'auto_apply' | 'validate_then_apply' | 'invoke_tools' | 'escalate', confidence: number;
 	strategy?: FixStrategy;
 	validationPassed?: boolean;
 	toolResults?: any[];
 	escalationReason?: string;
 },
 	export interface ProcessResult {
-	success: boolean; action: string;
-	confidence: number; fixApplied: boolean;
+	success: boolean, action: string;
+	confidence: number, fixApplied: boolean;
 	experienceId?: string;
 	error?: string;
 }

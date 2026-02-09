@@ -244,7 +244,7 @@ export const cache = {
 // RabbitMQ-compatible interface
 export const rabbit = {
 	async connect(): Promise<{
-	createChannel: () => { publish: typeof messageQueue.publish; consume: typeof messageQueue.consume } }> {
+	createChannel: () => { publish: typeof messageQueue.publish, consume: typeof messageQueue.consume } }> {
 		console.log('🐇 RabbitMQ (in-memory) connected');
 		return {
 			createChannel: () => ({
@@ -263,8 +263,8 @@ export const rabbit = {
 // Enhanced message queue with workflow support
 export class WorkflowQueue extends InMemoryQueue {
 	private workflows: Map<string, { id: string;
-	state: unknown; history: {
-	state: unknown; timestamp: number }[]; status: string }> = new Map();
+	state: unknown, history: {
+	state: unknown, timestamp: number }[]; status: string }> = new Map();
 
 	async startWorkflow(workflowId: string, initialState: unknown): Promise<void> {
 		this.workflows.set(workflowId, {

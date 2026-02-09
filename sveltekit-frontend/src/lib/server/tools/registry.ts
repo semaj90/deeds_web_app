@@ -209,9 +209,9 @@ export interface LangExtractResult {
   extractions: Array<{
 	doc_url: string;
     entities: Array<{
-	type: string; name: string; confidence, number }>;
+	type: string, name: string; confidence, number }>;
     relations: Array<{
-	type: string; source: string;
+	type: string, source: string;
 	target: string; confidence, number }>;
   }>;
   total_entities: number;

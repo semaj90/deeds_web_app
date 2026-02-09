@@ -104,7 +104,7 @@ export async function setCacheIfNotExists(key: string, value: string, ttl?: numb
 export interface CachedSearchResult {
     query: string;
 	results: Array<{ id: string;
-	title: string; content: string;
+	title: string, content: string;
 	score: number }>;
     stats: {
 	totalResults: number; processingTimeMs: number };

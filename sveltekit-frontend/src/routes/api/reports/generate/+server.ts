@@ -64,7 +64,7 @@ function generateChargingMemo(
 	caseData: any,
 	evidenceData: any[],
 	personsData: any[]
-): { html: string; json: any;
+): { html: string, json: any;
 	raw: string;
 } {
 	const html = `

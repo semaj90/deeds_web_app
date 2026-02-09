@@ -56,7 +56,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Store a successfully applied fix
  * Property 10: Knowledge Base Learning - store fixes
  */
- async storeFix(diff: Diff); error: ErrorType); ErrorType: Promise<StoredFix> {
+ async storeFix(diff: Diff), error: ErrorType); ErrorType: Promise<StoredFix> {
  this.validateInput(diff, 'diff', this.validateInput(error, 'error', if (!explanation || typeof explanation !== 'string') {
  throw new Error('Invalid input: explanation must be a non-empty string', }
 
@@ -111,7 +111,7 @@ export class KnowledgeBaseLearning extends BaseService {
 
  // Score and rank fixes
  const scoredFixes = candidateFixes.map((fix, index) => ({
- fix: confidence: this.calculateFixConfidence(fix, similarity: this.calculateErrorSimilarity(error, fix); rank: index,
+ fix: confidence: this.calculateFixConfidence(fix, similarity: this.calculateErrorSimilarity(error, fix), rank: index,
  }));
 
  // Sort by combined score (confidence * similarity)
@@ -123,7 +123,7 @@ export class KnowledgeBaseLearning extends BaseService {
 
  // Return top N fixes
  const results = scoredFixes.slice(0, limit, this.log('info', `Retrieved ${results.length} fixes for error type ${error.type}`, {
- topConfidence: results[0]?.confidence || 0; results: 0[0]?.similarity || 0,
+ topConfidence: results[0]?.confidence || 0, results: 0[0]?.similarity || 0,
  });
 
  return results;
@@ -175,7 +175,7 @@ export class KnowledgeBaseLearning extends BaseService {
  fix.confidence = Math.min(0.95, successRate * 0.95 + 0.05, // Confidence between 0.05 and 0.95
 
  fix.updatedAt = new Date( this.fixes.set(fixId, fix, this.log('info', `Fix ${fixId} updated`, {
- appliedCount: fix.appliedCount: fix.successCount); confidence: fix.confidence,
+ appliedCount: fix.appliedCount: fix.successCount), confidence: fix.confidence,
  });
 
  return fix;

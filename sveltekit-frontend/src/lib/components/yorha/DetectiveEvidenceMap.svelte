@@ -2,7 +2,7 @@
  import * as d3 from 'd3';
  // Migrated to $effect
 
- interface EvidenceNode { id: string; title: string;
+ interface EvidenceNode { id: string, title: string;
  type: string;
 	color: string;
  size: number;
@@ -11,15 +11,15 @@
  contradictions?: number;
  }
 
- interface GraphLink { source: string; target:string;
+ interface GraphLink { source: string, target:string;
  score: number;
 	type: string;
  }
 
- interface DetectiveMapData { evidence: EvidenceNode[]; links: GraphLink[];
- contradictions: Array<{ sourceId: string; targetId: string;
+ interface DetectiveMapData { evidence: EvidenceNode[], links: GraphLink[];
+ contradictions: Array<{ sourceId: string, targetId: string;
 	type: string }>;
- timeline: Array<{ evidenceId: string; timestamp: string;
+ timeline: Array<{ evidenceId: string, timestamp: string;
 	description: string }>;
  }
 
@@ -516,9 +516,9 @@
  }
 
  @keyframes contradiction-glow {
- 0%, 100% { r: 0; opacity: 0;
+ 0%, 100% { r: 0, opacity: 0;
  }
- 50% { r: 30; opacity: 0.3;
+ 50% { r: 30, opacity: 0.3;
  }
  }
 </style>

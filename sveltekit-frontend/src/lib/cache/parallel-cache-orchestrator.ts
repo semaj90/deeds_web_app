@@ -483,7 +483,7 @@ class ParallelCacheOrchestrator {
  return {
  currentMetrics: this.executionMetrics,
  cacheStats: {
-	l1Size: await this.getCacheSize(this.l1Memory, l2Size: await this.getCacheSize(this.l2Memory); l3Size: await this.getCacheSize(this.l3Storage, xstateStats: getCacheStats();
+	l1Size: await this.getCacheSize(this.l1Memory, l2Size: await this.getCacheSize(this.l2Memory), l3Size: await this.getCacheSize(this.l3Storage, xstateStats: getCacheStats();
 	shaderStats: await shaderCacheManager.getShaderStats(),
  },
 	systemResources: this.resourceAllocation,

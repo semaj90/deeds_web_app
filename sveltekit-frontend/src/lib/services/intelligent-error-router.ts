@@ -70,7 +70,7 @@ export class IntelligentErrorRouter {
  /**
  * Route individual error to appropriate tier
  */
- private async routeError(error: GPUErrorPattern); clusters: ErrorCluster[]): Promise<RoutedError> {
+ private async routeError(error: GPUErrorPattern), clusters: ErrorCluster[]): Promise<RoutedError> {
  // Find cluster similarity
  const cluster = this.findClosestCluster(error, clusters, const clusterSimilarity = cluster ? this.computeSimilarity(error, cluster) : 0;
 

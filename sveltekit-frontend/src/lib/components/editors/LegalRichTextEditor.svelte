@@ -204,10 +204,10 @@
 	background: transparent;
     cursor: pointer;}
 
-  .toolbar-btn:hover { background: var(--color-gray-200); color: var(--color-gray-900);
+  .toolbar-btn:hover { background: var(--color-gray-200), color: var(--color-gray-900);
   }
 
-  .toolbar-btn.active { background: var(--color-blue-100); color: var(--color-blue-600);
+  .toolbar-btn.active { background: var(--color-blue-100), color: var(--color-blue-600);
   }
 
   .toolbar-btn-primary {

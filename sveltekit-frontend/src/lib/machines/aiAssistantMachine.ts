@@ -30,7 +30,7 @@ type Channel = {
  assertQueue: (
  queue?: string,
  options?: Record<string, unknown>
- ) => Promise<{ queue: string; messageCount: number; consumerCount: number }>;
+ ) => Promise<{ queue: string, messageCount: number; consumerCount: number }>;
  bindQueue: (
  queue: string, source: string,
  pattern: string,
@@ -120,9 +120,9 @@ interface VectorSearchOptions {
 type LegalSearchFilters = Record<string, string | number | boolean>;
 
 interface CaseContextPayload {
- documents?: Array<{ id: string; title: string }>;
+ documents?: Array<{ id: string, title: string }>;
  keyFacts?: string[];
- timeline?: Array<{ date: string; event: string }>;
+ timeline?: Array<{ date: string, event: string }>;
 }
 
 interface Context7Options {
@@ -293,7 +293,7 @@ class MemoryManager {
  const perf = typeof performance !== 'undefined' ? performance  | undefined;
  if (perf && 'memory' in perf) {
  const memoryInfo = (
- perf as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }
+ perf as { memory?: { usedJSHeapSize: number, jsHeapSizeLimit: number } }
  ).memory;
  if (memoryInfo) {
  return memoryInfo.usedJSHeapSize / memoryInfo.jsHeapSizeLimit;
@@ -760,7 +760,7 @@ const rabbitmqService = new RabbitMQService();
 // --- Simplified machine that is syntactically correct and provides the same export name ---
 // Removed explicit two-type generic to let XState infer types and avoid "No overload expects 2 type arguments"
 export const aiAssistantMachine = createMachine({
- id: 'enhancedAiAssistant'; initial: 'initializing',
+ id: 'enhancedAiAssistant', initial: 'initializing',
  context: {
  currentQuery: '',
  response: '',
@@ -891,7 +891,7 @@ type TaskResult = { ok: boolean; result?: unknown; error?: string };
 // Add: type-guard for SEND_MESSAGE events to safely narrow `event` inside assign()
 function isSendMessage(
  event: unknown
-): event is { type: 'SEND_MESSAGE'; message: string; useContext7?: boolean; caseId?: string } {
+): event is { type: 'SEND_MESSAGE', message: string; useContext7?: boolean; caseId?: string } {
  // runtime-safe narrow without `any`
  if (typeof event !== 'object' || event === null) return false;
  const ev = event as Record<string, unknown>;

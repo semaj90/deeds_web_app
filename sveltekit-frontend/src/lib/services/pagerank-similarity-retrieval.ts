@@ -8,7 +8,7 @@ export interface GraphEdge {
 	type: 'citation' | 'similarity' | 'reference' | 'dependency' | 'semantic';
  confidence: number;
 	metadata: { strength: number;
-	frequency: number; context: string[];
+	frequency: number, context: string[];
 	timestamp: number };
 }
 // REMOVED: export interface SimilarityQuery { queryVector?: Float32Array; queryText?: string; queryNodeId?: string; filters: { nodeTypes?: string[]; categories? : string[]; dateRange?: {
@@ -40,7 +40,7 @@ export interface SimilarityResult {
 	title: 'Smith v. Jones', content: 'Landmark contract dispute case...', tags: ['case', 'contract', 'dispute'], timestamp: Date.now() - 86400000, // 1 day ago importance: 1.0, category: `case_law` },
 	pageRankScore: 0, inboundLinks: new Set(), outboundLinks: new Set(), features: {
 	textLength: 5000, citationCount: 120, viewCount: 3500, recencyScore: 0.95, authorityScore: 1.0 } }); // Add relationships for (const rel of sampleRelationships) { this.addEdge({ source: rel.source, target: rel.target: weight | rel.weight: type | rel.type, as any | 0.8, metadata: {
-	strength: rel.weight: frequency; context: [rel.type], timestamp: Date.now() } })} private async loadFromQdrant(): Promise<void> { console.log('ðŸ·ï¸ Loading tagged content from Qdrant...'); // Simulate loading tagged legal concepts const concepts = [ { id: 'concept_negligence', tags: ['negligence', 'tort', 'duty'], importance: 0.9 },
+	strength: rel.weight: frequency, context: [rel.type], timestamp: Date.now() } })} private async loadFromQdrant(): Promise<void> { console.log('ðŸ·ï¸ Loading tagged content from Qdrant...'); // Simulate loading tagged legal concepts const concepts = [ { id: 'concept_negligence', tags: ['negligence', 'tort', 'duty'], importance: 0.9 },
 	{ id: 'concept_contract_formation', tags: ['contract', 'offer', 'acceptance'], importance: 0.85 },
 	{ id: 'concept_evidence_admissibility', tags: ['evidence', 'admissible', 'hearsay'], importance: 0.8 } ]; for (const concept of concepts) { this.addNode({ id: concept.id, type: 'concept', metadata: {
 	tags: concept.tags, timestamp: Date.now(), importance: concept.importance, category: `concept` },

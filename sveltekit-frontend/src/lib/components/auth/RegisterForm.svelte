@@ -12,8 +12,8 @@
   import Shield from 'lucide-svelte/icons/shield';
   import UserPlus from 'lucide-svelte/icons/user-plus';
   import Zap from 'lucide-svelte/icons/zap';
-  import { zod } from 'sveltekit-superforms/adapters';
-  import { superForm } from 'sveltekit-superforms/client';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { superForm } from 'sveltekit-superforms';
   import { createActor } from 'xstate';
   import { z } from 'zod';
 
@@ -76,7 +76,7 @@
 
   // Superform setup
   const { form, errors, enhance: formEnhance, submitting } = superForm(data, {
-    validators: zod(registerSchema),
+    validators: zodClient(registerSchema),
     resetForm: false,
     delayMs: 300,
     timeoutMs: 15000,
@@ -144,7 +144,7 @@ email: formData.get('email') as string,
 
   let passwordStrength = $derived(calculatePasswordStrength($form.password || ''));
 
-  function calculatePasswordStrength(password: string): { score: number; feedback: string;
+  function calculatePasswordStrength(password: string): { score: number, feedback: string;
 	color: string } {
     if (!password) return { score: 0, feedback: 'Enter a password', color: 'text-gray-400' };
 

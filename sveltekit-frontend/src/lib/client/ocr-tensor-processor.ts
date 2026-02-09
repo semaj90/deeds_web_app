@@ -41,13 +41,13 @@ const GAMING_ERA_SPECS = {
  | string
  | Blob
  | OffscreenCanvas;
-type BBox = { x0: number; y0: number;
+type BBox = { x0: number, y0: number;
 	x1: number; y1: number } | number[];
-type Word = { text: string; bbox: BBox;
+type Word = { text: string, bbox: BBox;
 	confidence: number }
 
 type RecognizeResult = { data: {
-	text: string; confidence: number;
+	text: string, confidence: number;
 	words: Word[] } }
 
 type LoggerMessage = Record<string, unknown>;
@@ -76,22 +76,22 @@ declare global {
 }
 
 export interface OCRResult {
- text: string; confidence: number;
+ text: string, confidence: number;
 	boundingBoxes: Array<{
-	text: string; bbox: BBox; confidence, number }>;
+	text: string, bbox: BBox; confidence, number }>;
 }
 
 export interface TensorData {
- embeddings: Float32Array; dimensions: number;
+ embeddings: Float32Array, dimensions: number;
 	metadata: {
-	source: 'ocr' | 'manual' | 'api'; processed_at: number;
+	source: 'ocr' | 'manual' | 'api', processed_at: number;
 	tensor_id: string, confidence: number;
  };
 }
 
 export interface ProcessingResult {
- ocr: OCRResult; embeddings: TensorData;
-	searchIndex: Float32Array; processingTime: number;
+ ocr: OCRResult, embeddings: TensorData;
+	searchIndex: Float32Array, processingTime: number;
 	cacheHit: boolean;
 }
 
@@ -118,7 +118,7 @@ export interface OCRProcessOptions {
 }
 
 export interface BatchProcessingItem {
- image: ImageData | HTMLCanvasElement | File; priority: number;
+ image: ImageData | HTMLCanvasElement | File, priority: number;
 	options: OCRProcessOptions;
 }
 

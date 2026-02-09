@@ -19,12 +19,12 @@ interface IntegrationResult { document: { id: string;
     chunks: number;
     qdrantStored: boolean;
   };
-  recommendations: Array<{ similarity: number; content: string;
+  recommendations: Array<{ similarity: number, content: string;
     source?: string;
   }>;
 }
 
-interface SearchResult { content: string; similarity: number;
+interface SearchResult { content: string, similarity: number;
   source?: string;
   id?: string;
 }

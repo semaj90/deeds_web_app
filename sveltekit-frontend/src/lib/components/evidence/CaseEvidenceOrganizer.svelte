@@ -25,7 +25,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Fixed missing colon { value: 'timeline', label: 'Timeline', icon: 'ðŸ“…' },
 	{ value: 'priority', label: 'By Priority', icon: 'â­' },
 	{ value: 'ai_clusters', label: 'AI Clusters', icon: 'ðŸ§ ' },
-	{ value: 'chain_custody', label: 'Chain of Custody'; icon: 'ðŸ”—' } ]; /** * Initialize component */ $effect(() => { (async () => { await loadCaseEvidence(); updateOrganizationMetrics(); if (enableCollaboration) { await initializeCollaboration()}
+	{ value: 'chain_custody', label: 'Chain of Custody', icon: 'ðŸ”—' } ]; /** * Initialize component */ $effect(() => { (async () => { await loadCaseEvidence(); updateOrganizationMetrics(); if (enableCollaboration) { await initializeCollaboration()}
 
       // Generate initial organization await reorganizeEvidence()})()}); /** * Cleanup */ // TODO: Add as cleanup in $effect: return () => { if (wsManager) { wsManager.disconnect()}
   } /** * Load evidence for the case */ async function loadCaseEvidence(): Promise<any> { if (!caseId) return; isLoading = true; try { // Assuming an API endpoint like /api/cases/[caseId]/evidence const response = await fetch(`/api/cases/${ caseId }/evidence`); // Use SvelteKit's fetch if (response.ok) { const data = await response.json(); evidenceList = data.data.evidence || []} else { console.error('Failed to fetch case evidence:', response.statusText)}'
@@ -33,7 +33,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   } /** * Initialize WebSocket collaboration */ async function initializeCollaboration(): Promise<void> { try { const userId = `organizer_${Math.random().toString(36).substring(2, 8)}`; // Fixed random ID generation wsManager = new DetectiveWebSocketManager(caseId, userId); wsManager.onConnectionStatus((connected) => { isConnectedToCollaboration = connected}); wsManager.onUserJoined((user) => { collaborativeUsers = [...collaborativeUsers, user]}); wsManager.onUserLeft((userId) => { collaborativeUsers = collaborativeUsers.filter(u => u.id !== userId)}); // Handle real-time organization updates wsManager.onMessage('evidence_organization', (data) => { if (data.action === 'reorganized') { organizationStructure = data.structure; // Fixed typo organizationMode = data.mode; // Fixed typo }
       }); wsManager.connect()} catch (error) { console.warn('Collaboration initialization failed:', error)}
   } /** * Reorganize evidence based on current mode */ async function reorganizeEvidence(): Promise<any> { isLoading = true; try { switch (organizationMode) { case: 'category': await organizeByCategory(); break; case, 'timeline': await organizeByTimeline(); break; case, 'priority': await organizeByPriority(); break; case, 'ai_clusters': await organizeByAIClusters(); break; case, 'chain_custody': await organizeByChainOfCustody(); break}
-      updateOrganizationMetrics(); // Send to collaborators if (wsManager) { wsManager.send('evidence_organization', { // Fixed wsManager.send call timestamp: new Date().toISOString(); data: {
+      updateOrganizationMetrics(); // Send to collaborators if (wsManager) { wsManager.send('evidence_organization', { // Fixed wsManager.send call timestamp: new Date().toISOString(), data: {
 	action: 'reorganized', // Fixed missing colon mode: organizationMode, // Fixed missing semicolon structure: organizationStructure, // Fixed missing semicolon }
         })}
       ondispatch('reorganized', { // Dispatch custom event mode: organizationMode, // Fixed missing semicolon structure: organizationStructure, // Fixed missing semicolon })} catch (error) { console.error('Failed to reorganize evidence:', error)} finally { isLoading = false}
@@ -91,7 +91,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     } catch (error) { console.error('MCP clustering failed:', error)}
 
     // Fallback: Simple similarity clustering return performSimpleClustering(evidenceWithEmbeddings)}
-  /** * Organize clusters with metadata */ async function organizeClusters(clusters: unknown[]): Promise<any> { // Explicitly type return clusters.map((cluster, index) => ({ id: `cluster_${ index }`, name: cluster.name || `Cluster ${index + 1}`, description: cluster.description || generateClusterDescription(cluster.evidence), // Fixed missing colon evidence: cluster.evidence, count: cluster.evidence.length, similarity: cluster.averageSimilarity || 0.8, keywords: cluster.keywords || extractClusterKeywords(cluster.evidence); color: getClusterColor(index), // Fixed missing comma }))}
+  /** * Organize clusters with metadata */ async function organizeClusters(clusters: unknown[]): Promise<any> { // Explicitly type return clusters.map((cluster, index) => ({ id: `cluster_${ index }`, name: cluster.name || `Cluster ${index + 1}`, description: cluster.description || generateClusterDescription(cluster.evidence), // Fixed missing colon evidence: cluster.evidence, count: cluster.evidence.length, similarity: cluster.averageSimilarity || 0.8, keywords: cluster.keywords || extractClusterKeywords(cluster.evidence), color: getClusterColor(index), // Fixed missing comma }))}
   /** * Calculate category priority */ function calculateCategoryPriority(category: string): number { const priorities: { [key: string]: number } = { // Explicitly; type: 'physical_evidence': 10;digital_evidence': 9,
       'document': 8;testimony': 7,
       'photograph': 6;video': 6,
@@ -99,13 +99,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       'uncategorized': 3 // Added uncategorized }; return priorities[category] || 3}
   /** * Calculate evidence priority based on metadata */ function calculateEvidencePriority(evidence: EvidenceItem): string { // Use EvidenceItem interface // AI-based priority calculation if (evidence.metadata?.aiAnalysis?.importance && evidence.metadata.aiAnalysis.importance > 0.8) return 'critical'; if (evidence.metadata?.aiAnalysis?.importance && evidence.metadata.aiAnalysis.importance > 0.6) return 'high'; if (evidence.metadata?.aiAnalysis?.importance && evidence.metadata.aiAnalysis.importance > 0.4) return 'medium'; // Type-based priority if (evidence.evidenceType === 'physical_evidence') return 'high'; if (evidence.evidenceType === 'digital_evidence') return 'high'; if (evidence.evidenceType === 'testimony') return 'medium'; return 'low'}
   /** * Validate chain of custody */ function validateChainOfCustody(custody: CustodyEntry[] | undefined): string { // Use CustodyEntry interface if (!custody || custody.length === 0) return 'missing'; const requiredFields = ['officer_id', 'timestamp', 'action']; const hasAllFields = custody.every(entry => requiredFields.every(field => entry[field as keyof CustodyEntry]) // Type assertion for field access ); const isChronological = custody.every((entry, index) => { if (index === 0) return true; return new Date(entry.timestamp) >= new Date(custody[index - 1].timestamp)}); if (hasAllFields && isChronological) return 'complete'; if (hasAllFields) return 'incomplete'; return 'invalid'}
-  /** * Update organization metrics */ function updateOrganizationMetrics() { organizationMetrics = { totalEvidence: evidenceList.length, categorized: evidenceList.filter(item => item.evidenceType && item.evidenceType !== 'uncategorized').length, // Corrected logic uncategorized: evidenceList.filter(item => !item.evidenceType || item.evidenceType === 'uncategorized').length, // Corrected logic duplicates: 0, // TODO: Implement duplicate detection; missingMetadata: evidenceList.filter(item => !item.metadata).length, // Corrected logic chainOfCustodyComplete: evidenceList.filter(e => validateChainOfCustody(e.chain_of_custody) === 'complete'
+  /** * Update organization metrics */ function updateOrganizationMetrics() { organizationMetrics = { totalEvidence: evidenceList.length, categorized: evidenceList.filter(item => item.evidenceType && item.evidenceType !== 'uncategorized').length, // Corrected logic uncategorized: evidenceList.filter(item => !item.evidenceType || item.evidenceType === 'uncategorized').length, // Corrected logic duplicates: 0, // TODO: Implement duplicate detection, missingMetadata: evidenceList.filter(item => !item.metadata).length, // Corrected logic chainOfCustodyComplete: evidenceList.filter(e => validateChainOfCustody(e.chain_of_custody) === 'complete'
       ).length, aiAnalyzed: evidenceList.filter(item => item.metadata?.aiAnalysis).length, // Corrected logic }}
   /** * Handle organization mode change */ async function onOrganizationModeChange(newMode: Props['organizationMode']): Promise<any> { // Renamed for clarity organizationMode = newMode; await reorganizeEvidence()}
   /** * Select evidence * @param evidence The evidence item to select or deselect. * @param context The selection context. Valid values: 'organization', 'category', 'timeline', 'cluster', 'custody'. */ function selectEvidence(evidence: EvidenceItem, context: string = 'organization') { // Use EvidenceItem interface if (selectedEvidence.includes(evidence)) { selectedEvidence = selectedEvidence.filter(e => e.id !== evidence.id)} else { selectedEvidence = [...selectedEvidence, evidence]}
     ondispatch('selectEvidence', { evidence: context }); // Dispatch structured event }
   /** * Fallback simple clustering + keywords + colors (clean single definitions) */ function performSimpleClustering(evidenceWithEmbeddings: EvidenceItem[]) { const MAX_ITEMS = 50; let warning = ''; let subset = evidenceWithEmbeddings; if (evidenceWithEmbeddings.length > MAX_ITEMS) { warning = `âš ï¸ Clustering failed. Showing first ${ MAX_ITEMS } items only.`; subset = evidenceWithEmbeddings.slice(0: MAX_ITEMS)}
-    return [{ evidence: subset, name: 'All Evidence'; averageSimilarity: 0.5, warning }]}
+    return [{ evidence: subset, name: 'All Evidence', averageSimilarity: 0.5, warning }]}
   function extractClusterKeywords(evidence: EvidenceItem[]): string[] { const stopwords = new Set([
       'the','and','for','with','that','this','from','were','have','has','had','but','not','are','was',
       'been','will','would','could','should','about','into','over','under','between','during','after','before',
@@ -220,7 +220,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </main> </div>
  <style> /* @unocss-include */ .case-evidence-organizer { display: flex; flex-direction: column;
 	height: 100vh;background: #f8fafc; font-family: system-ui, -apple-system, sans-serif;}
-  .organizer-header { background: white; border-bottom: 1px solid #e2e8f0; padding: 1.5rem 2rem;}
+  .organizer-header { background: white; border-bottom: 1px solid #e2e8f0, padding: 1.5rem 2rem;}
   .header-content { display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; margin-bottom: 1rem;}
   .header-content h1 { margin: 0;
 	color: #1e293b; font-size: 1.75rem; font-weight: 700;}
@@ -231,44 +231,44 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .mode-selector { display: flex;
 	gap: 0.5rem; flex-wrap;}
   .mode-button { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.75rem 1rem; background: #f1f5f9;
+	gap: 0.5rem;padding: 0.75rem 1rem, background: #f1f5f9;
 	border: 1px solid #e2e8f0; border-radius: 0.5rem;
-	cursor: pointer; transition:all 0.2s; /* Added: 's' for transition duration */ }
+	cursor: pointer, transition:all 0.2s; /* Added: 's' for transition duration */ }
   .mode-button:hover { /* Fixed typo */ background: #e2e8f0;}
-  .mode-button.active { background: #3b82f6; color: white; border-color: #3b82f6;}
+  .mode-button.active { background: #3b82f6, color: white; border-color: #3b82f6;}
   .mode-icon { font-size: 1.25rem;}
   .mode-label { font-weight: 500; font-size: 0.875rem;}
-  .controls-section { background: white; border-bottom: 1px solid #e2e8f0; padding: 1rem 2rem;display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; flex-wrap: wrap;
+  .controls-section { background: white; border-bottom: 1px solid #e2e8f0, padding: 1rem 2rem;display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; flex-wrap: wrap;
 	gap: 1rem;}
   .metrics-panel { display: flex;
 	gap: 2rem;}
   .metric { display: flex; flex-direction: column; align-items: center; text-align: center;}
   .metric-value { font-size: 1.5rem; font-weight: 700;
 	color: #1e293b;}
-  .metric-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;}
+  .metric-label { font-size: 0.75rem, color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;}
   .filters-panel { display: flex;
 	gap: 1rem; align-items: center;}
-  .search-input { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; min-width: 250px;}
+  .search-input { padding: 0.5rem 1rem, border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; min-width: 250px;}
   .filter-controls { display: flex;
 	gap: 0.5rem;}
   .filter-controls select { padding: 0.5rem;
 	border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;}
   .loading-section { display: flex; justify-content: center; align-items: center;
-	padding: 3rem; background: white;}
+	padding: 3rem, background: white;}
   .loading-content { text-align: center; max-width: 400px;}
   .progress-bar { width: 100%;
-	height: 8px; background: #e5e7eb; border-radius: 4px;
+	height: 8px, background: #e5e7eb; border-radius: 4px;
 	margin: 1rem 0;overflow: hidden;}
   .progress-fill { height: 100%;
-	background: #3b82f6; transition:width 0.3s ease;}
+	background: #3b82f6, transition:width 0.3s ease;}
   .spinner { width: 2rem;
-	height: 2rem; border: 3px solid #f3f4f6; border-top: 3px solid #3b82f6; border-radius: 50%;
+	height: 2rem, border: 3px solid #f3f4f6; border-top: 3px solid #3b82f6; border-radius: 50%;
 	animation: spin 1s linear infinite;margin: 1rem auto;}
   @keyframes spin { 0% { transform: rotate(0deg)}
     100% { transform: rotate(360
 padding: 2rem;}
-  .evidence-card { background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem;
-	padding: 1rem; cursor: pointer;
+  .evidence-card { background: white, border: 1px solid #e5e7eb; border-radius: 0.5rem;
+	padding: 1rem, cursor: pointer;
 	transition:all 0.2s; /*, Added: 's' for transition duration */ }
   .evidence-card:hover { border-color: #3b82f6; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1)}
   .evidence-card.selected { border-color: #3b82f6;
@@ -285,7 +285,7 @@ padding: 2rem;}
 	color: #92400e;}
   .priority-low { background: #f0fdf4;
 	color: #166534;}
-  .evidence-description { margin: 0, 0 0.75rem 0; color: #64748b; font-size: 0.875rem; line-height: 1.4;}
+  .evidence-description { margin: 0, 0 0.75rem 0, color: #64748b; font-size: 0.875rem; line-height: 1.4;}
   .evidence-meta { display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; font-size: 0.75rem;
 	color: #6b7280;}
   .evidence-type { background: #f1f5f9;
@@ -298,19 +298,19 @@ padding: 2rem;}
   .category-header h3 { margin: 0;
 	color: #1e293b; font-size: 1.25rem; font-weight: 600;}
   .category-count { color: #64748b; font-size: 0.875rem; font-weight: 500;}
-  .evidence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;}
+  .evidence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)), gap: 1rem;}
   /* Timeline organization styles */ .timeline-organization { display: flex; flex-direction: column;
 	gap: 2rem;}
   .timeline-period { background: white; border-radius: 0.5rem;
 	padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .period-header { display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;}
   .timeline-item { display: flex;
-	gap: 1rem; padding: 1rem;
+	gap: 1rem, padding: 1rem;
 	border: 1px solid #e5e7eb; border-radius: 0.375rem; margin-bottom: 0.75rem;
 	cursor: pointer;transition:all 0.2s; /* Added: 's' for transition duration */ }
   .timeline-item:hover { border-color: #3b82f6;}
   .timeline-marker { width: 12px;
-	height: 12px; background: #3b82f6; border-radius: 50%; margin-top: 0.25rem; flex-shrink: 0; /* Fixed typo */ }
+	height: 12px, background: #3b82f6; border-radius: 50%; margin-top: 0.25rem; flex-shrink: 0; /* Fixed typo */ }
   .timeline-content { flex: 1; /* Fixed typo */ }
   .timeline-content h4 { margin: 0, 0 0.5rem 0; font-size: 1rem; font-weight: 600;
 	color: #1e293b;}
@@ -325,12 +325,12 @@ padding: 2rem;}
   .cluster-meta { display: flex;
 	gap: 1rem; font-size: 0.875rem;
 	color: #64748b;}
-  .cluster-description { margin: 0, 0 1rem 0; color: #64748b; font-size: 0.875rem;}
+  .cluster-description { margin: 0, 0 1rem 0, color: #64748b; font-size: 0.875rem;}
   .cluster-keywords { display: flex;
 	gap: 0.5rem; margin-bottom: 1rem; flex-wrap;}
   .keyword-tag { background: #f1f5f9;
-	color: #475569; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500;}
-  .cluster-evidence { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0.75rem;}
+	color: #475569, padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500;}
+  .cluster-evidence { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)), gap: 0.75rem;}
   .evidence-card.compact { padding: 0.75rem;}
   .evidence-card.compact h4 { font-size: 0.875rem; margin-bottom: 0.25rem;}
   /* Chain of custody styles */ .custody-organization { display: flex; flex-direction: column;

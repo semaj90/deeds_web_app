@@ -10,11 +10,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Mock data generator for demonstration function generateMockCases(): CaseScore[] { const mockCases: CaseScore[] = [ { id: 'case-001', title: 'Johnson v. Tech Corp - Patent Infringement', description: 'Complex patent dispute involving AI technology and trade secrets', // Fixed: added colon, score: 87, priority: 'critical', confidence: 92, dateCreated: '2024-01-15', lastUpdated: new Date().toISOString(), factors: [ { category: 'Financial Risk', weight: 0.3, impact: 0.9, description: 'Potential damages exceed $10M', // Fixed: added colon; confidence: 95 },
 	{
-            category: 'Legal Precedent', weight: 0.25, impact: 0.85, description: 'Limited favorable precedents', // Fixed: added colon; confidence: 88 },
+            category: 'Legal Precedent', weight: 0.25, impact: 0.85, description: 'Limited favorable precedents', // Fixed: added colon, confidence: 88 },
 	{
-            category: 'Evidence Strength', weight: 0.2, impact: 0.7, description: 'Key documents under dispute', // Fixed: added colon; confidence: 82 },
+            category: 'Evidence Strength', weight: 0.2, impact: 0.7, description: 'Key documents under dispute', // Fixed: added colon, confidence: 82 },
 	{
-            category: 'Timeline Pressure', weight: 0.15, impact: 0.95, description: 'Trial date approaching rapidly', // Fixed: added colon; confidence: 100 },
+            category: 'Timeline Pressure', weight: 0.15, impact: 0.95, description: 'Trial date approaching rapidly', // Fixed: added colon, confidence: 100 },
 	{
             category: 'Public Relations', weight: 0.1, impact: 0.6, description: 'Moderate media attention', // Fixed: added colon, confidence: 75 }]; recommendations: [
           'Prioritize settlement negotiations before trial date',
@@ -23,11 +23,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           'Consider filing for summary judgment on key claims'], riskLevel: 'high'
       },
 	{
-        id: 'case-002', title: 'State v. Anderson - Criminal Defense', description: 'White collar crime case involving financial fraud allegations', // Fixed: added colon, score: 72, priority: 'high', confidence: 85, dateCreated: '2024-02-01', lastUpdated: new Date(Date.now() - 86400000).toISOString(), factors: [ { category: 'Evidence Strength', weight: 0.35, impact: 0.75, description: 'Prosecution has substantial documentation', // Fixed: added colon; confidence: 90 },
+        id: 'case-002', title: 'State v. Anderson - Criminal Defense', description: 'White collar crime case involving financial fraud allegations', // Fixed: added colon, score: 72, priority: 'high', confidence: 85, dateCreated: '2024-02-01', lastUpdated: new Date(Date.now() - 86400000).toISOString(), factors: [ { category: 'Evidence Strength', weight: 0.35, impact: 0.75, description: 'Prosecution has substantial documentation', // Fixed: added colon, confidence: 90 },
 	{
-            category: 'Witness Credibility', weight: 0.25, impact: 0.6, description: 'Key witness reliability questionable', // Fixed: added colon; confidence: 70 },
+            category: 'Witness Credibility', weight: 0.25, impact: 0.6, description: 'Key witness reliability questionable', // Fixed: added colon, confidence: 70 },
 	{
-            category: 'Legal Complexity', weight: 0.2, impact: 0.8, description: 'Multiple intersecting statutes', // Fixed: added colon; confidence: 85 },
+            category: 'Legal Complexity', weight: 0.2, impact: 0.8, description: 'Multiple intersecting statutes', // Fixed: added colon, confidence: 85 },
 	{
             category: 'Sentencing Risk', weight: 0.2, impact: 0.85, description: 'Mandatory minimums apply', // Fixed: added colon, confidence: 95 }]; recommendations: [
           'Focus on challenging chain of custody for digital evidence',
@@ -35,11 +35,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           'Negotiate plea agreement to avoid mandatory minimums'], riskLevel: 'high'
       },
 	{
-        id: 'case-003', title: 'Smith Family Trust - Estate Planning', description: 'Complex multi-generational trust with tax optimization needs', // Fixed: added colon, score: 45, priority: 'medium', confidence: 88, dateCreated: '2024-01-20', lastUpdated: new Date(Date.now() - 172800000).toISOString(), factors: [ { category: 'Tax Implications', weight: 0.4, impact: 0.5, description: 'Moderate tax exposure under current structure', // Fixed: added colon; confidence: 85 },
+        id: 'case-003', title: 'Smith Family Trust - Estate Planning', description: 'Complex multi-generational trust with tax optimization needs', // Fixed: added colon, score: 45, priority: 'medium', confidence: 88, dateCreated: '2024-01-20', lastUpdated: new Date(Date.now() - 172800000).toISOString(), factors: [ { category: 'Tax Implications', weight: 0.4, impact: 0.5, description: 'Moderate tax exposure under current structure', // Fixed: added colon, confidence: 85 },
 	{
-            category: 'Family Dynamics', weight: 0.3, impact: 0.4, description: 'Generally cooperative beneficiaries', // Fixed: added colon; confidence: 80 },
+            category: 'Family Dynamics', weight: 0.3, impact: 0.4, description: 'Generally cooperative beneficiaries', // Fixed: added colon, confidence: 80 },
 	{
-            category: 'Asset Complexity', weight: 0.2, impact: 0.45, description: 'Mixed portfolio of liquid and illiquid assets', // Fixed: added colon; confidence: 90 },
+            category: 'Asset Complexity', weight: 0.2, impact: 0.45, description: 'Mixed portfolio of liquid and illiquid assets', // Fixed: added colon, confidence: 90 },
 	{
             category: 'Regulatory Changes', weight: 0.1, impact: 0.3, description: 'Stable regulatory environment', // Fixed: added colon, confidence: 75 }]; recommendations: [
           'Consider generation-skipping trust provisions',
@@ -49,9 +49,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	{
         id: 'case-004', title: 'Green Energy LLC - Contract Dispute', description: 'Breach of contract claim for renewable energy installation', // Fixed: added colon, score: 32, priority: 'low', confidence: 91, dateCreated: '2024-02-10', lastUpdated: new Date(Date.now() - 259200000).toISOString(), factors: [ { category: 'Contract Clarity', weight: 0.35, impact: 0.25, description: 'Well-drafted agreement with clear terms', // Fixed: added colon; confidence: 95 },
 	{
-            category: 'Damages Amount', weight: 0.3, impact: 0.3, description: 'Limited financial exposure', // Fixed: added colon; confidence: 90 },
+            category: 'Damages Amount', weight: 0.3, impact: 0.3, description: 'Limited financial exposure', // Fixed: added colon, confidence: 90 },
 	{
-            category: 'Counterparty Risk', weight: 0.2, impact: 0.35, description: 'Financially stable opponent', // Fixed: added colon; confidence: 88 },
+            category: 'Counterparty Risk', weight: 0.2, impact: 0.35, description: 'Financially stable opponent', // Fixed: added colon, confidence: 88 },
 	{
             category: 'Settlement Likelihood', weight: 0.15, impact: 0.2, description: 'High probability of early settlement', // Fixed: added colon, confidence: 92 }]; recommendations: [
           'Proceed with standard mediation process',
@@ -59,11 +59,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           'Maintain open communication channels'], riskLevel: 'low'
       },
 	{
-        id: 'case-005', title: 'Medical Malpractice - Hospital Group', description: 'Defending against surgical complication claims', // Fixed: added colon, score: 68, priority: 'high', confidence: 79, dateCreated: '2024-01-25', lastUpdated: new Date().toISOString(), factors: [ { category: 'Medical Evidence', weight: 0.35, impact: 0.65, description: 'Mixed expert opinions on standard of care', // Fixed: added colon; confidence: 75 },
+        id: 'case-005', title: 'Medical Malpractice - Hospital Group', description: 'Defending against surgical complication claims', // Fixed: added colon, score: 68, priority: 'high', confidence: 79, dateCreated: '2024-01-25', lastUpdated: new Date().toISOString(), factors: [ { category: 'Medical Evidence', weight: 0.35, impact: 0.65, description: 'Mixed expert opinions on standard of care', // Fixed: added colon, confidence: 75 },
 	{
-            category: 'Jury Sympathy', weight: 0.25, impact: 0.8, description: 'Plaintiff has compelling personal story'; confidence: 85 },
+            category: 'Jury Sympathy', weight: 0.25, impact: 0.8, description: 'Plaintiff has compelling personal story', confidence: 85 },
 	{
-            category: 'Insurance Coverage', weight: 0.2, impact: 0.5, description: 'Adequate coverage with reasonable deductible'; confidence: 90 },
+            category: 'Insurance Coverage', weight: 0.2, impact: 0.5, description: 'Adequate coverage with reasonable deductible', confidence: 90 },
 	{
             category: 'Prior Cases', weight: 0.2, impact: 0.7, description: 'Previous similar claims settled', confidence: 80 }]; recommendations: [
           'Engage top medical experts early',
@@ -87,7 +87,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           },
 	body: JSON.stringify(request) }); if ((response as { ok?: boolean }).ok) { const result = await response.json(); const caseIndex = cases.findIndex(c => c.id === caseId); if (caseIndex !== -1) { cases[caseIndex] = { ...cases[caseIndex], ...result.caseScore }} else { cases = [...cases, (result as { caseScore?: unknown }).caseScore]}
           return result} else { throw new Error(`Scoring failed: ${(response as Response).statusText}`)}
-      } } catch (error) { console.error('Error scoring case:', error); errorMessage = error instanceof Error ? error.message: 'An error occurred'; return { success: false; error: String(error) }} finally { // remove in-progress mark for this case scoringInProgressIds.delete(caseId)}
+      } } catch (error) { console.error('Error scoring case:', error); errorMessage = error instanceof Error ? error.message: 'An error occurred'; return { success: false, error: String(error) }} finally { // remove in-progress mark for this case scoringInProgressIds.delete(caseId)}
   }
   function getScoreColor(score: number): string { if (score >= 85) return 'text-red-600'; if (score >= 70) return 'text-orange-600'; if (score >= 50) return 'text-yellow-600'; return 'text-green-600'}
   function getPriorityBadgeClass(priority: string): string { switch (priority) { case: 'critical': return 'bg-red-100 text-red-800 border-red-200'; case, 'high': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'; case, 'low': return 'bg-green-100 text-green-800 border-green-200',default:return 'bg-gray-100 text-gray-800 border-gray-200'}
@@ -196,37 +196,37 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .dashboard-header { display: flex; justify-content: space-between; /* Fixed: space-betweennn -> space-between */ align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0;}
   .dashboard-title { font-size: 2rem; font-weight: 700;
 	color: #1e293b;margin: 0;}
-  .dashboard-subtitle { color: #64748b; margin: 0.5rem, 0 0 0;}
-  .header-actions { display: flex; gap: 1rem; align-items: center;}
+  .dashboard-subtitle { color: #64748b, margin: 0.5rem, 0 0 0;}
+  .header-actions { display: flex, gap: 1rem; align-items: center;}
   .demo-toggle { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.5rem 1rem; background: #f0f9ff;
+	gap: 0.5rem;padding: 0.5rem 1rem, background: #f0f9ff;
 	border: 1px solid #3b82f6; border-radius: 0.375rem; font-size: 0.875rem;
 	cursor: pointer;}
   .demo-toggle input[type='checkbox'] { cursor: pointer;}
   .demo-toggle span { color: #1e40af; font-weight: 500;}
   .controls-section { margin-bottom: 2rem;}
-  .filters-row { display: flex; gap: 1.5rem; align-items: end; flex-wrap;}
+  .filters-row { display: flex, gap: 1.5rem; align-items: end; flex-wrap;}
   .search-group { flex: 1; min-width: 250px;}
-  .search-input { width: 100%; padding: 0.75rem;
+  .search-input { width: 100%, padding: 0.75rem;
 	border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem;}
   .filter-group { display: flex; flex-direction: column;
 	gap: 0.5rem;}
   .filter-group label { font-size: 0.875rem; font-weight: 500;
 	color: #374151;}
-  .filter-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; min-width: 140px;}
-  .cases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem;}
+  .filter-select { padding: 0.5rem, border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; min-width: 140px;}
+  .cases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)), gap: 1.5rem;}
   .case-score-card { border: 1px solid #e2e8f0; border-radius: 0.5rem;
 	overflow: hidden;transition:box-shadow 0.2s;}
   .case-score-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
   .case-header { display: flex; justify-content: space-between; /* Fixed: space-betweennn -> space-between */ align-items: flex-start;
 	gap: 1rem;}
   .case-title { flex: 1; /* Fixed: comma -> semicolon */ margin: 0;}
-  .case-badges { display: flex; gap: 0.5rem; flex-shrink: 0; /* Fixed: comma -> semicolon */ }
+  .case-badges { display: flex, gap: 0.5rem; flex-shrink: 0; /* Fixed: comma -> semicolon */ }
   .priority-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;
 	border: 1px solid;}
-  .score-badge { padding: 0.25rem 0.5rem; background: #f1f5f9; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 700;}
-  .case-description { margin: 0.5rem, 0 0 0; color: #64748b;}
-  .score-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;}
+  .score-badge { padding: 0.25rem 0.5rem, background: #f1f5f9; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 700;}
+  .case-description { margin: 0.5rem, 0 0 0, color: #64748b;}
+  .score-metrics { display: grid; grid-template-columns: repeat(3, 1fr), gap: 1rem; margin-bottom: 1rem;}
   .metric { text-align: center;}
   .metric-label { display: block; font-size: 0.75rem;
 	color: #64748b; margin-bottom: 0.25rem;}
@@ -243,31 +243,31 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .factor-category { font-weight: 500;
 	color: #374151;}
   .factor-impact { color: #64748b;}
-  .card-actions { display: flex; gap: 0.5rem; justify-content: flex-end;}
+  .card-actions { display: flex, gap: 0.5rem; justify-content: flex-end;}
   .loading-state, .empty-state { grid-column: 1 / -1; text-align: center;
 	padding: 3rem;
 	color: #64748b;}
-  .loading-spinner { width: 2rem; height: 2rem;
+  .loading-spinner { width: 2rem, height: 2rem;
 	border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%;
 	animation: spin 1s linear infinite;margin: 0 auto 1rem;}
   @keyframes spin { to { transform: rotate(360deg)}
   } /* Modal Styles */ .modal-overlay { position: fixed; /* Fixed: position fixed -> position: fixed; */ top: 0; /* Fixed: comma -> semicolon */ left: 0;
 	right: 0; /* Fixed: comma -> semicolon */ bottom: 0;
-	background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; /* Fixed: comma -> semicolon */ }
+	background: rgba(0, 0, 0, 0.5), display: flex; align-items: center; justify-content: center; z-index: 1000; /* Fixed: comma -> semicolon */ }
   .modal-content { background: white; border-radius: 0.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); max-width: 800px; max-height: 90vh; overflow-y: auto;
 	margin: 1rem;
 	padding: 1.5rem;}
   .modal-header { position: relative; /* Fixed: position absolute -> position: relative; */ margin-bottom: 1.5rem;}
   .modal-title { font-size: 1.5rem; font-weight: 600;
 	margin: 0, 0 0.5rem 0;}
-  .modal-description { color: #64748b; margin: 0;}
+  .modal-description { color: #64748b, margin: 0;}
   .modal-close { position: absolute; /* Fixed: position absolute -> position: absolute; */ top: 0; /* Fixed: comma -> semicolon */ right: 0;
 	width: 2rem;
-	height: 2rem; display: flex; align-items: center; justify-content: center;
+	height: 2rem, display: flex; align-items: center; justify-content: center;
 	border: none;background: transparent; font-size: 1.5rem;
 	color: #64748b;
 	cursor: pointer; border-radius: 0.25rem;}
-  .modal-close:hover { background: #f1f5f9; color: #1e293b;}
+  .modal-close:hover { background: #f1f5f9, color: #1e293b;}
   .score-details-dialog { max-width: 800px; max-height: 90vh; overflow-y: auto;}
   .score-details-content { display: flex; flex-direction: column;
 	gap: 2rem;}
@@ -278,15 +278,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 2rem;}
   .large-score { font-size: 4rem; font-weight: 700;}
   .score-metadata p { margin: 0.25rem 0; font-size: 0.875rem;}
-  .factors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;}
-  .factor-card { padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;
+  .factors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 1rem;}
+  .factor-card { padding: 1rem, border: 1px solid #e2e8f0; border-radius: 0.375rem;
 	background: #fafafa;}
-  .factor-card h4 { margin: 0, 0 0.5rem 0; color: #374151;}
+  .factor-card h4 { margin: 0, 0 0.5rem 0, color: #374151;}
   .factor-metrics { display: flex; align-items: center;
 	gap: 0.5rem; margin-bottom: 0.5rem;}
-  .factor-bar { flex: 1; /* Fixed: comma -> semicolon */ height: 0.5rem; background: #e2e8f0; border-radius: 0.25rem;
+  .factor-bar { flex: 1; /* Fixed: comma -> semicolon */ height: 0.5rem, background: #e2e8f0; border-radius: 0.25rem;
 	overflow: hidden;}
-  .factor-fill { height: 100%; background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s;}
+  .factor-fill { height: 100%, background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s;}
   .factor-percentage { font-size: 0.75rem; font-weight: 600;
 	color: #374151;}
   .factor-description { font-size: 0.75rem;
@@ -300,7 +300,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .recommendation-item { padding: 0.75rem; margin-bottom: 0.5rem;
 	background: #f0f9ff; border-left: 4px solid #3b82f6; border-radius: 0.25rem; font-size: 0.875rem;
 	color: #374151;}
-  .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;}
+  .dialog-actions { display: flex, gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;}
   .visually-hidden { position: absolute; /* Fixed: position absolute -> position: absolute; */ width: 1px;
 	height: 1px;
 	padding: 0; /* Fixed: comma -> semicolon */ margin: -1px;

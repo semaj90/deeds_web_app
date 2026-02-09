@@ -11,11 +11,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const demoPrompts = [ { text: 'Contract analysis for merger agreement', style: 'corporate', evidence_id: 1001 },
 	{ text: 'Criminal evidence forensic examination', style: 'forensic', evidence_id: 1002 },
 	{ text: 'Intellectual property case documentation', style: 'legal', evidence_id: 1003 },
-	{ text: 'Detective investigation visual summary'; style: 'detective', evidence_id: 1004 } ];
+	{ text: 'Detective investigation visual summary', style: 'detective', evidence_id: 1004 } ];
    let processingStats = $state({ totalGenerated: 0, averageCompressionRatio: 0, averageProcessingTime: 0, bestCompressionRatio: 0;
 	cumulativeStats: [] });
   async function generateSIMDGlyph(prompt, customSettings = ): Promise<any> { try { isGenerating = true;
-   const request = { evidence_id: prompt.evidence_id, prompt: prompt.text, style: prompt.style, dimensions: [512, 512]; seed: Math.floor(Math.random() * 1000000), neural_sprite_config: {
+   const request = { evidence_id: prompt.evidence_id, prompt: prompt.text, style: prompt.style, dimensions: [512, 512], seed: Math.floor(Math.random() * 1000000), neural_sprite_config: {
 	enable_compression: true, compression_ratio: compressionTarget / 10, predictive_frames: 3 },
 	simd_config: {
 	enable_tiling: true

@@ -67,7 +67,7 @@ export interface ManualReviewReport {
 export class UnfixableLogger {
   private entries: UnfixableEntry[] = [];
   private patternAttempts: Map<string, { success: number;
-	failure: number; reasons: Map<UnfixableReason, number> }> = new Map();
+	failure: number, reasons: Map<UnfixableReason, number> }> = new Map();
 
   /**
    * Log an unfixable file

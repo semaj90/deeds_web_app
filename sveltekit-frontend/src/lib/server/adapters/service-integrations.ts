@@ -379,7 +379,7 @@ export class PgVectorAdapter implements PgVectorClient {
  async search(
  collection: string, vector: number[],
  limit?: number
- ): Promise<Array<{ id: string, similarity: number; metadata: Record<string, unknown> }>> {
+ ): Promise<Array<{ id: string, similarity: number, metadata: Record<string, unknown> }>> {
  const vectorStr = `[${vector.join(',')}]`;
  const sql = `
  SELECT id, 1 - (embedding <=> $1::vector) as similarity, metadata
@@ -467,7 +467,7 @@ export class MinIOAdapter implements MinIOClient {
  async listObjects(
  bucket: string,
  prefix?: string
- ): Promise<Array<{ name: string, size: number; etag: string }>> {
+ ): Promise<Array<{ name: string, size: number, etag: string }>> {
  await this.ensureClient();
  const stream = this.client.listObjects(bucket, prefix, true);
  const objects = [];

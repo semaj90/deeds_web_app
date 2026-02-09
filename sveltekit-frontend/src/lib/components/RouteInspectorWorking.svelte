@@ -1,22 +1,22 @@
 <script lang="ts">
-	type RouteInfo = { path: string; route: string;
+	type RouteInfo = { path: string, route: string;
 		file: string;
 		category?: string;
 		version?: string;
 		requiredPackages?: string[];
 	};
 
-	type Phase72ErrorSummary = { code: string; message: string;
+	type Phase72ErrorSummary = { code: string, message: string;
 		count: number;
 	lastSeen: string;
 	};
 
-	type UpgradeStatus = { label: string; filesUpgraded: number;
+	type UpgradeStatus = { label: string, filesUpgraded: number;
 		totalFiles: number;
 		lastRun?: string;
 	};
 
-	interface Props { open: boolean; route: RouteInfo | null;
+	interface Props { open: boolean, route: RouteInfo | null;
 		onClose?: () => void;
 	}
 
@@ -270,7 +270,7 @@ route: route.route })
 {/if}
 
 <style>
-	.route-modal-overlay { position: fixed; top: 0;
+	.route-modal-overlay { position: fixed, top: 0;
 		left: 0;
 	right: 0;
 		bottom: 0;
@@ -365,10 +365,10 @@ route: route.route })
 		background: #c41e3a;
 	}
 
-	.badge--error { background: #c41e3a; color: white;
+	.badge--error { background: #c41e3a, color: white;
 	}
 
-	.badge--upgrade { background: #1976d2; color: white;
+	.badge--upgrade { background: #1976d2, color: white;
 	}
 
 	.route-modal__body {
@@ -431,12 +431,12 @@ route: route.route })
 	color: var(--yorha-ink, #111);
 	}
 
-	.pill-row { display: flex; gap: 0.5rem;
+	.pill-row { display: flex, gap: 0.5rem;
 		flex-wrap: wrap;
 		margin-bottom: 1rem;
 	}
 
-	.pill { display: inline-block; padding: 0.4rem 0.8rem;
+	.pill { display: inline-block, padding: 0.4rem 0.8rem;
 		background: var(--yorha-ink, #111);
 		color: var(--yorha-paper, #faf8f3);
 		font-size: 0.75rem;
@@ -446,7 +446,7 @@ route: route.route })
 		letter-spacing: 0.5px;
 	}
 
-	.status-card { padding: 1rem; border: 1px solid var(--yorha-ink, #111);
+	.status-card { padding: 1rem, border: 1px solid var(--yorha-ink, #111);
 		border-radius: 0;
 		margin-bottom: 1rem;
 	background: var(--yorha-paper, #faf8f3);
@@ -471,7 +471,7 @@ route: route.route })
 		margin-bottom: 0.75rem;
 	}
 
-	.route-modal__footer { display: flex; gap: 0.75rem;
+	.route-modal__footer { display: flex, gap: 0.75rem;
 		padding: 1rem 1.5rem;
 		border-top: 2px solid var(--yorha-ink, #111);
 		background: var(--yorha-paper, #faf8f3);
@@ -492,7 +492,7 @@ route: route.route })
 		white-space: nowrap;
 	}
 
-	.btn:disabled { opacity: 0.6; cursor: not-allowed;
+	.btn:disabled { opacity: 0.6, cursor: not-allowed;
 	}
 
 	.btn--primary {
@@ -505,7 +505,7 @@ route: route.route })
 		color: var(--yorha-ink, #111);
 	}
 
-	.btn--secondary { background: transparent; color: var(--yorha-ink, #111);
+	.btn--secondary { background: transparent, color: var(--yorha-ink, #111);
 	}
 
 	.btn--secondary:hover:not(:disabled) {
@@ -513,7 +513,7 @@ route: route.route })
 		color: var(--yorha-paper, #faf8f3);
 	}
 
-	.btn--outline { background: transparent; color: var(--yorha-ink, #111);
+	.btn--outline { background: transparent, color: var(--yorha-ink, #111);
 		border-style: dashed;
 	}
 
@@ -523,7 +523,7 @@ route: route.route })
 		border-style: solid;
 	}
 
-	.btn--ghost { background: transparent; color: var(--yorha-ink, #111);
+	.btn--ghost { background: transparent, color: var(--yorha-ink, #111);
 		border: 1px solid #ccc;
 	}
 
@@ -531,7 +531,7 @@ route: route.route })
 		background: #f0f0f0;
 	}
 
-	.btn--neon { background: #00ff00; color: #000;
+	.btn--neon { background: #00ff00, color: #000;
 		border-color: #00ff00;
 		box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
 	}
@@ -540,7 +540,7 @@ route: route.route })
 		box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
 	}
 
-	.btn--warning { background: #f6b73c; color: #111;
+	.btn--warning { background: #f6b73c, color: #111;
 		border-color: #f6b73c;
 	}
 

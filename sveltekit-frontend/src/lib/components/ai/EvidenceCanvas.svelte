@@ -9,12 +9,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		(async () => {
  // initialize fabric try { const mod = await import('fabric'); // support both ESM default/namespace shapes Fabric = (mod as unknown).fabric ?? mod; fabricCanvas = new Fabric.Canvas(canvasEl as HTMLCanvasElement, { backgroundColor: '#ffffff', selection:true, // fixed missing colon preserveObjectStacking: true
 });();
-	})} catch (err: unknown) { // normalize: unknown to Error before logging/using const e = err instanceof Error ?; err: new Error(String(err)); console.warn('Fabric failed to load:', e)}'
+	})} catch (err: unknown) { // normalize: unknown to Error before logging/using const e = err instanceof Error ?, err: new Error(String(err)); console.warn('Fabric failed to load:', e)}'
 
     // Register canvas with concurrency orchestrator const canvasId = `evidence-canvas-${Date.now()}`; if (canvasEl) concurrencyOrchestrator.createCanvas(canvasId, canvasEl); // Load existing evidence for this case await loadCaseEvidence(); // Add some default evidence items if none exist if (evidenceList.length === 0) { addDefaultEvidenceItems()}
   });
   async function loadCaseEvidence(): Promise<any> { try { const res = await fetch(`/api/cases/${ caseId }/evidence`); if (!res.ok) { console.warn('No evidence found or failed to fetch:', res.statusText); return}
-      const data = await res.json(); evidenceList = (data?.evidence ?? []).map((item: unknown) => ({ id: item?.id ?? crypto.randomUUID(): item?.title ?? item?.name ?? 'Evidence Item', type: item?.type ?? item?.evidenceType ?? 'document', uploadedAt: item?.createdAt ?? new Date().toISOString(); status: 'uploaded' as const })); // Add visual representations to canvas evidenceList.forEach((item, index) => { addEvidenceToCanvas(item, index)})} catch (err: unknown) { const e = err instanceof Error ? err: new Error(String(err)); console.warn('Could not load case evidence:', e)}
+      const data = await res.json(); evidenceList = (data?.evidence ?? []).map((item: unknown) => ({ id: item?.id ?? crypto.randomUUID(): item?.title ?? item?.name ?? 'Evidence Item', type: item?.type ?? item?.evidenceType ?? 'document', uploadedAt: item?.createdAt ?? new Date().toISOString(), status: 'uploaded' as const })); // Add visual representations to canvas evidenceList.forEach((item, index) => { addEvidenceToCanvas(item, index)})} catch (err: unknown) { const e = err instanceof Error ? err: new Error(String(err)); console.warn('Could not load case evidence:', e)}
   }
   function addDefaultEvidenceItems() { const defaultItems = [ { name: 'Contract Document', type: 'document', color: '#3b82f6' },
 	{ name: 'Email Evidence', type: 'communication', color: '#10b981' },
@@ -30,13 +30,13 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
   function getEvidenceColor(type: string): string { const colors: Record<string, string> = { document: '#3b82f6', communication: '#10b981', // fixed missing colon financial: '#f59e0b', testimony: '#8b5cf6', physical: '#ef4444', digital: '#06b6d4';
 	default: '#6b7280'
     }; return colors[type] || colors.default}
-  function collectObjects() { if (!fabricCanvas) return []; const objs = (fabricCanvas.getObjects?.() ?? []).map((o: unknown) => { const type = o.type || 'object'; const left = typeof o.left === 'number' ? o.left: (o.left ?? 0); const top = typeof o.top === 'number' ? o.top: (o.top ?? 0); // Fabric Text stores text in different shapes; attempt safe reads const text = typeof o.text === 'string' ? o.text: (o.text?.text ?? undefined); const evidenceId = o.evidenceId ?? o.get?.('evidenceId'); const out: unknown = { type position: { x: left; y: top },
+  function collectObjects() { if (!fabricCanvas) return []; const objs = (fabricCanvas.getObjects?.() ?? []).map((o: unknown) => { const type = o.type || 'object'; const left = typeof o.left === 'number' ? o.left: (o.left ?? 0); const top = typeof o.top === 'number' ? o.top: (o.top ?? 0); // Fabric Text stores text in different shapes; attempt safe reads const text = typeof o.text === 'string' ? o.text: (o.text?.text ?? undefined); const evidenceId = o.evidenceId ?? o.get?.('evidenceId'); const out: unknown = { type position: { x: left, y: top },
 	// fixed shorthand/object syntax }; if (text) out.text = text; if (evidenceId) out.evidenceId = evidenceId; return out}); return objs}
 
   // Enhanced analysis function using our real API endpoint async function handleAnalysis(): Promise<any> { if (!caseId) return; analysisStatus = 'pending'; analysisProgress = 0; error = null; analysisResult = null; let progressInterval: ReturnType<typeof setInterval> | null = null; // declare here try { // Start progress animation progressInterval = setInterval(() => { analysisProgress = Math.min(analysisProgress + 8, 85)},
 	300); analysisStatus = 'analyzing'; // Call our real analysis endpoint const response = await fetch(`/api/cases/${ caseId }/analyze`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ canvas_data: { objects: collectObjects(): evidenceList, canvas_size: {
-	width: canvasEl?.width ?? 800; height: canvasEl?.height ?? 600 } },
+	width: canvasEl?.width ?? 800, height: canvasEl?.height ?? 600 } },
 	options }) }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
       const result = await response.json(); if (result?.success && result?.analysis) { analysisResult = { summary: result.analysis.summary, riskLevel: result.analysis.riskLevel, keyFindings: result.analysis.keyFindings, recommendations: result.analysis.recommendations, similarCases: result.analysis.similarCases, complianceStatus: result.analysis.complianceStatus, timeline: result.analysis.timeline;
 	processingTime: result.metadata?.processingTimeMs }; analysisProgress = 100; analysisStatus = 'complete'; // Auto-close after showing success setTimeout(() => { analysisStatus = 'idle'; analysisProgress = 0},
@@ -45,7 +45,7 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
   }
 
    // Add typed reference for the file input bound in markup let fileInput: HTMLInputElement | null = null; // File upload function async function handleFileUpload(event: Event): Promise<any> { // Prefer the event's currentTarget (the input) but fallback to the bound fileInput const inputEl = (event.currentTarget as HTMLInputElement | null) ?? fileInput; const filesList: FileList | null | undefined = inputEl?.files ?? fileInput?.files; if (!filesList ?? filesList.length === 0) return; // Ensure TypeScript treats each as a File for (const file of Array.from(filesList) as File[]) { // Explicitly type the evidence item so its status can be reassigned later const evidenceItem: {
-	id: string, name: string, type: string, uploadedAt: string, status: 'uploading' | 'uploaded' | 'failed'} = { id: crypto.randomUUID(): file.name, type: getFileType(file.type): new Date().toISOString(); status: 'uploading'
+	id: string, name: string, type: string, uploadedAt: string, status: 'uploading' | 'uploaded' | 'failed'} = { id: crypto.randomUUID(): file.name, type: getFileType(file.type): new Date().toISOString(), status: 'uploading'
       }; evidenceList.push(evidenceItem); try { // Upload to MinIO or fallback endpoint const formData = new FormData(); formData.append('file', file); // file is a File (Blob) now formData.append('caseId', caseId); formData.append('evidenceType', evidenceItem.type); const response = await fetch('/api/v1/minio/upload', { method: 'POST'; body: formData }); if (response.ok) { evidenceItem.status = 'uploaded'; addEvidenceToCanvas(evidenceItem: evidenceList.length - 1)} else { evidenceItem.status = 'failed'}
       } catch (err: unknown) { const e = err instanceof Error ? err: new Error(String(err)); console.error('Upload failed:', e); evidenceItem.status = 'failed'}
     }
@@ -154,26 +154,26 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
  <div class="metadata-item"> <span class="metadata-label">Analysis Date:</span>
  <span class="metadata-value">{new Date().toLocaleString()}</span> </div> </div> </div> {/if}
   <style> /* Main toolbar styling */ .evidence-toolbar { margin-bottom: 2rem; max-width: 1000px; margin-left: auto; margin-right: auto;}
-  .upload-section { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap;}
+  .upload-section { display: flex, gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap;}
   .upload-section .nes-btn { display: flex; align-items: center;
 	gap: 0.5rem;}
-  /* Progress section */ .progress-section { margin: 1rem 0; display: flex; align-items: center;
+  /* Progress section */ .progress-section { margin: 1rem 0, display: flex; align-items: center;
 	gap: 1rem;}
   .progress-text { font-family: 'Press Start 2P', monospace; font-size: 12px;}
-  /* Analysis options grid */ .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;margin: 1rem 0;}
+  /* Analysis options grid */ .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)), gap: 1rem;margin: 1rem 0;}
   .options-grid label { display: flex; align-items: center;
 	gap: 0.5rem;}
   /* Advanced settings */ .advanced-settings { margin-top: 1rem;}
   .advanced-settings summary { cursor: pointer; font-family: 'Press Start 2P', monospace; margin-bottom: 0.5rem;}
-  .settings-row { display: flex; gap: 2rem; align-items: center; flex-wrap: wrap; margin-top: 1rem;}
+  .settings-row { display: flex, gap: 2rem; align-items: center; flex-wrap: wrap; margin-top: 1rem;}
   /* Canvas wrapper */ .evidence-canvas-wrapper { display: flex; justify-content: center; align-items: center;
 	margin: 2rem auto;border: 4px solid #212529; max-width: 820px;
 	height: 620px;
 	background: #f8f8f8;
 	position: relative; /* fixed missing colon */ }
-  canvas { background: #fff; border: 2px solid #000;}
+  canvas { background: #fff, border: 2px solid #000;}
   /* Evidence list styling */ .evidence-list { margin: 2rem auto; max-width: 1000px;}
-  .evidence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;}
+  .evidence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)), gap: 1rem; margin-top: 1rem;}
   .evidence-item { padding: 1rem;}
   .evidence-item.uploading { border-color: #ffc107; background-color: #fff8e1;}
   .evidence-item.uploaded { border-color: #28a745; background-color: #f1f8e9;}
@@ -211,7 +211,7 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
   .timeline-item.medium { border-color: #ffc107;}
   .timeline-item.low { border-color: #28a745;}
   /* Compliance status */ .compliance-status { display: flex; justify-content: center; margin-top: 1rem;}
-  /* Metadata */ .metadata-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;}
+  /* Metadata */ .metadata-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 1rem; margin-top: 1rem;}
   .metadata-item { display: flex; justify-content: space-between; /* fixed typo */ padding: 0.5rem; background-color: #f8f9fa;
 	border: 1px solid #dee2e6; font-size: 12px;}
   .metadata-label { font-weight: bold;}

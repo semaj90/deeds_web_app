@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Migrated to $effect
 
-	interface Suggestion { id: string; routePath: string;
+	interface Suggestion { id: string, routePath: string;
 		summary: string;
 patch: string;
 		riskLevel: string;
@@ -10,7 +10,7 @@ createdAt: string;
 		appliedAt?: string;
 	}
 
-	interface StatusData { timestamp: string; stats: { totalSuggestions: number; pendingSuggestions: number;
+	interface StatusData { timestamp: string, stats: { totalSuggestions: number, pendingSuggestions: number;
 			highRisk: number;
 mediumRisk: number;
 			lowRisk: number;

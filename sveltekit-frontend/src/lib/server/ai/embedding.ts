@@ -48,7 +48,7 @@ export async function embedVision(item: VisionItem): Promise<VisionItem> {
 
 // Qdrant vector operations
 export interface VectorSearchResult {
- id: string; score: number;
+ id: string, score: number;
  payload?: Record<string, any>;
 }
 

@@ -31,7 +31,7 @@ interface RedisClient {
 // Define a type for the NES Memory module
 interface NESMemory {
     allocateDocument(
-        document: CachedDocument; data: ArrayBuffer,
+        document: CachedDocument, data: ArrayBuffer,
         options: {
 	compress: boolean;
 	preferredBank: string }

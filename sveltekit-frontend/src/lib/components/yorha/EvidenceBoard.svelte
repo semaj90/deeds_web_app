@@ -1,13 +1,13 @@
 <script lang="ts">
   // Migrated to $effect
 
-  interface Node { id: string; title: string;
+  interface Node { id: string, title: string;
     type: string;
 	x: number;
     y: number;
   }
 
-  interface Connection { id: string; from_id: string;
+  interface Connection { id: string, from_id: string;
     to_id: string;
   }
 
@@ -257,7 +257,7 @@
  position: absolute;
  }
 
- .inset-0 { top: 0; right: 0;
+ .inset-0 { top: 0, right: 0;
  bottom: 0;
 	left: 0;
  }

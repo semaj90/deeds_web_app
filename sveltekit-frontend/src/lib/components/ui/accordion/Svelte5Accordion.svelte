@@ -81,7 +81,7 @@ let variantClasses = $derived({
 
 {#snippet AccordionItemComponent({ item, variant }: {
 	item: AccordionItem variant: string })}
-	{@const ctx = getContext<{ isOpen: (id: string) => boolean; toggle: (id: string) => void }>('accordion')}
+	{@const ctx = getContext<{ isOpen: (id: string) => boolean, toggle: (id: string) => void }>('accordion')}
 	{@const isOpen = ctx?.isOpen(item.id) ?? false}
 
 	<div class="w-full" data-state={isOpen ? 'open' : 'closed'}>

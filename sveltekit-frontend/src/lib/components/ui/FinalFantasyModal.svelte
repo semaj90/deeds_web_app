@@ -5,8 +5,8 @@
   let { isOpen = false, title = 'Final Fantasy Modal', type = 'menu', size = 'medium', showBorder = true, cornerStyle = 'classic', backgroundOpacity = 0.8, children, actions }: Props = $props();
    let modalElement: HTMLDivElement = $state()!;
    let contentElement: HTMLDivElement = $state()!;
-   const sizeClasses = { small: 'w-80 h-64' medium: 'w-96 h-80' large: 'w-[32rem] h-96'; fullscreen: 'w-[90vw] h-[80vh]'
-  } const typeColors = { menu: 'from-blue-900/90 to-blue-800/90' dialog: 'from-purple-900/90 to-purple-800/90' battle: 'from-red-900/90 to-red-800/90' shop: 'from-green-900/90 to-green-800/90' inventory: 'from-amber-900/90 to-amber-800/90'; status: 'from-cyan-900/90 to-cyan-800/90'
+   const sizeClasses = { small: 'w-80 h-64' medium: 'w-96 h-80' large: 'w-[32rem] h-96', fullscreen: 'w-[90vw] h-[80vh]'
+  } const typeColors = { menu: 'from-blue-900/90 to-blue-800/90' dialog: 'from-purple-900/90 to-purple-800/90' battle: 'from-red-900/90 to-red-800/90' shop: 'from-green-900/90 to-green-800/90' inventory: 'from-amber-900/90 to-amber-800/90', status: 'from-cyan-900/90 to-cyan-800/90'
   } const cornerClasses = { classic: 'ff-corner-classic' modern: 'ff-corner-modern';
 	hybrid: 'ff-corner-hybrid'
   }
@@ -46,7 +46,7 @@
   .ff-corner-modern { border-radius: 0.5rem;
 	position: relative;}
   .ff-corner-modern::before { content: '';
-	position: absolute; inset: -2px;
+	position: absolute, inset: -2px;
 	background: linear-gradient(45deg, #fbbf24, #f59e0b, #d97706, #92400e); border-radius: 0.5rem; z-index: -1;}
   .ff-corner-hybrid { clip-path: polygon( 0% 0% 12px, 0% 12px 0%, 0% calc(100% - 12px) 0%, 0% 100% 12px, 0% 100% calc(100% - 12px), 0% calc(100% - 12px) 100%, 0% 12px 100%, 0% 0% calc(100% - 12px) 0% ); border-radius: 0.25rem;}
 /* Custom Scrollbar */ 0% .custom-scrollbar::-webkit-scrollbar { width: 8px;}
@@ -57,7 +57,7 @@
 /* FF-Style Animations */ 0% @keyframes ff-shimmer { 0%, 0% 100% { opacity: 0.8;}
     50% { opacity: 1;}
   } .ff-corner-classic::after { content: '';
-	position: absolute;inset: 0 background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%); animation: ff-shimmer 3s ease-in-out infinite;}
+	position: absolute;inset: 0 background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%), animation: ff-shimmer 3s ease-in-out infinite;}
 </style>
 
 

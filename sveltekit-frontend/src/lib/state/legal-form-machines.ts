@@ -447,7 +447,7 @@ export const caseCreationMachine = createMachine(
  onDone: {
  target: 'editing',
  actions: assign({
- lastSaved: () => new Date(); isAutoSaving: () => false,
+ lastSaved: () => new Date(), isAutoSaving: () => false,
  }),
  },
  onError: {
@@ -781,7 +781,7 @@ export const searchMachine = createMachine(
  async ({
  input,
  }: {
- input: { query: z.infer<typeof SearchQuerySchema> | null; page: number }, }): Promise<PerformSearchOutput> => {
+ input: { query: z.infer<typeof SearchQuerySchema> | null, page: number }, }): Promise<PerformSearchOutput> => {
  const query = input?.query || {};
  const page = input?.page || 1;
  const response = await fetch('/api/search/vector', {
@@ -909,7 +909,7 @@ export const aiAnalysisMachine = createMachine(
  streamedContent: ({ context: event,
  }, {
  context: AIAnalysisContext;
- event: { type: 'STREAM_CONTENT'; content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
+ event: { type: 'STREAM_CONTENT', content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
  }),
  },
  },

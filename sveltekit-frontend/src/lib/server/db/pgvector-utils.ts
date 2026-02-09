@@ -282,7 +282,7 @@ SELECT * FROM search_similar_evidence(
 export async function insertChatMessageWithEmbedding(messageData: {
 	id: string,
     sessionId: string, role: string;
-	content: string; embedding: number[];
+	content: string, embedding: number[];
     metadata?: Record<string, unknown>;
 }): Promise<boolean> {
     try {

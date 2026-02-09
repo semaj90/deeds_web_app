@@ -192,7 +192,7 @@ export class VectorOperationsService {
 		documentId: string,
 		analysisType: string
 	): Promise<{
-	documentId: string; analysisType: string;
+	documentId: string, analysisType: string;
 	result: string }> {
 		console.warn('analyzeDocument is a stub');
 		return { documentId, analysisType, result: 'mock_analysis_result' };

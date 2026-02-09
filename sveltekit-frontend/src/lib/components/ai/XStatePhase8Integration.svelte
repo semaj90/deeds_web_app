@@ -17,19 +17,19 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  // Initialize Phase, 8 components matrixCompiler = new MatrixUICompiler(); reranker = new LegalAIReranker(); prefetcher = new PredictivePrefetcher(); await prefetcher.initialize(); // Generate initial matrix UI nodes updateMatrixUINodes(); // Set up AI-aware prefetching await setupPredictivePrefetching()		
 });();
 	}); function updateMatrixUINodes(): void { const currentState = ((get(machineState) as unknown)?.value as string) ?? 'unknown'; const ctx = (get(machineContext) as unknown) || {}; matrixUINodes = [ { type: 'card', id: `state-card-${currentState}`, matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], styles: {
-	base: `yorha-card p-6 ${getStateCardClass(currentState)}`, hover: 'transform scale-105 transition-transform'; active: 'ring-2 ring-yellow-400'
+	base: `yorha-card p-6 ${getStateCardClass(currentState)}`, hover: 'transform scale-105 transition-transform', active: 'ring-2 ring-yellow-400'
         },
 	events: ['click', 'mouseover'], metadata: {
 	priority: 'high', confidence: ctx.confidence ?? aiConfidence, aiGenerated: true, workflowState: currentState }; as unknown },
 	{
         type: 'button', id: 'ai-help-btn', matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 300, 50, 0, 1], styles: {
-	base: 'yorha-button px-4 py-2 bg-blue-600 text-white', hover: 'bg-blue-700 transform scale-105'; disabled: 'opacity-50 cursor-not-allowed'
+	base: 'yorha-button px-4 py-2 bg-blue-600 text-white', hover: 'bg-blue-700 transform scale-105', disabled: 'opacity-50 cursor-not-allowed'
         },
 	events: ['click'], metadata: {
 	priority: 'medium', confidence: 90;
 	aiGenerated: false }
       }]}
-  function getStateCardClass(state: string): string { const classes = { evidenceUpload: 'border-blue-400 bg-blue-900/20', caseDetails: 'border-yellow-400 bg-yellow-900/20', review: 'border-purple-400 bg-purple-900/20', submitting: 'border-orange-400 bg-orange-900/20', success: 'border-green-400 bg-green-900/20'; error: 'border-red-400 bg-red-900/20'
+  function getStateCardClass(state: string): string { const classes = { evidenceUpload: 'border-blue-400 bg-blue-900/20', caseDetails: 'border-yellow-400 bg-yellow-900/20', review: 'border-purple-400 bg-purple-900/20', submitting: 'border-orange-400 bg-orange-900/20', success: 'border-green-400 bg-green-900/20', error: 'border-red-400 bg-red-900/20'
     }; return classes[state as keyof typeof classes] || 'border-gray-400 bg-gray-900/20'}
   async function setupPredictivePrefetching(): Promise<void> { const userContext: UserContext = { intent: 'create', timeOfDay: getTimeOfDay(), currentCase: 'NEW_CASE', recentActions: ['open_form', 'start_evidence_upload'], userRole: 'prosecutor';
 	workflowState: 'draft'
@@ -40,7 +40,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   // Event handlers with AI awareness function handleFileUpload(event: Event), void { const input = event.target as HTMLInputElement; const files = Array.from(input.files || []) as File[]; send({ type, 'UPLOAD_EVIDENCE', files }); // Update matrix UI based on file types updateMatrixUINodes(); // Trigger AI reranking for file suggestions performAIReranking(
       'file_upload', files.map(f => f.name) )}
-  function handleCaseDetailsUpdate(): void { send({ type: 'UPDATE_CASE_DETAILS'; title: caseTitle, description caseDescription }); // Update matrix UI updateMatrixUINodes(); // Trigger AI reranking for case suggestions performAIReranking('case_update', [caseTitle, caseDescription])}
+  function handleCaseDetailsUpdate(): void { send({ type: 'UPDATE_CASE_DETAILS', title: caseTitle, description caseDescription }); // Update matrix UI updateMatrixUINodes(); // Trigger AI reranking for case suggestions performAIReranking('case_update', [caseTitle, caseDescription])}
   async function performAIReranking(action: string, ctx: string[]): Promise<void> { try { const appContext = (get(machineContext) as Partial<LegalFormContext>) || {}; const userContext: UserContext = { intent: 'create', timeOfDay: getTimeOfDay(), focusedElement: `step-${appContext?.currentStep ?? 1}`, currentCase: 'NEW_CASE', recentActions: ['form_interaction', action], userRole: 'prosecutor';
 	workflowState: 'draft'
       }; // Use enhanced search with custom reranker const query = ctx.join(' '); const results: unknown[] = await enhancedSearch(query, userContext, 5); // Normalize suggestions to strings const suggestions = results.slice(0, 3).map(r => (r && ((r.title as string) || (r.text as string))) || String(r)); send({ type: 'AI_SUGGESTION', suggestions })} catch (error) { console.warn('AI reranking failed:', error)}
@@ -129,15 +129,15 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   </div> </div> </div> </div> </div> </div>
  <style> /* Converted Tailwind @apply rules to plain CSS to avoid: unknown at-rule errors */ .xstate-phase8-integration { max-width: 80rem; margin-left: auto; margin-right: auto;
 	padding: 1.5rem;}
-  .step-number { width: 1.5rem; height: 1.5rem; background-color: #fbbf24; color: #000; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 700;}
+  .step-number { width: 1.5rem, height: 1.5rem; background-color: #fbbf24, color: #000; border-radius: 9999px, display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 700;}
   .progress-fill { transition:width 0.5s ease-in-out;}
-  .loading-spinner { width: 2rem; height: 2rem;
+  .loading-spinner { width: 2rem, height: 2rem;
 	border: 2px solid #fbbf24; border-top-color: transparent; border-radius: 50%;
 	animation: spin 1s linear infinite;}
   .accordion-trigger[data-accordion-trigger] { background-color: rgba(255, 255, 255, 0.03)}
   .accordion-content { animation: slideDown 0.3s ease-out;}
-  @keyframes slideDown { from { height: 0; opacity: 0;}
-    to { height: auto; opacity: 1;}
+  @keyframes slideDown { from { height: 0, opacity: 0;}
+    to { height: auto, opacity: 1;}
   } @keyframes spin { to { transform: rotate(360deg)}
   } .suggestion-item { border-left: 3px solid rgb(59, 130 246)}
   .recommendation-item { border-left: 3px solid rgb(251, 191 36)}

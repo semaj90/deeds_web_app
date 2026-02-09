@@ -321,7 +321,7 @@ class CitationLibraryService {
 	 * Get popular tags
 	 */
 	async getPopularTags(limit: number = 20): Promise<{
-	tag: string; count: number }[]> {
+	tag: string, count: number }[]> {
 		try {
 			const tags = await db.execute(sql`
 				SELECT tag, COUNT(*) as count

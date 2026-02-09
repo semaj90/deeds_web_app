@@ -538,7 +538,7 @@ export class FullStackLegalAIWorkflow {
 		console.log('🚀 Running performance test...');
 		const startTime = now();
 
-		const testPromises: Promise<{ type: string; result: unknown }>[] = [];
+		const testPromises: Promise<{ type: string, result: unknown }>[] = [];
 
 		if (this.systemStatus.orchestrator) {
 			testPromises.push(

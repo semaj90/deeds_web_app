@@ -78,7 +78,7 @@ export interface IRabbitMQService {
     initialize(retries?: number, delay?: number): Promise<void>;
     publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean>;
     publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{
-	success: number; failed: number }>;
+	success: number, failed: number }>;
     purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean>;
     close(): Promise<void>;
     healthCheck(): Promise<any>;
@@ -96,7 +96,7 @@ class BrowserStub implements IRabbitMQService {
     async initialize() { return; }
     async publishDocumentProcessingJob(): Promise<boolean> { this.makeError(); }
     async publishBatchJobs(): Promise<{
-	success: number; failed: number }> { this.makeError(); }
+	success: number, failed: number }> { this.makeError(); }
     async purgeQueue(): Promise<boolean> { this.makeError(); }
     async close() { return; }
     async healthCheck() { return { healthy: false, error: 'Client: RabbitMQService not available' }; }
@@ -219,7 +219,7 @@ class RabbitMQService implements IRabbitMQService {
     }
 
     async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{
-	success: number; failed: number }> {
+	success: number, failed: number }> {
         let success = 0;
         let failed = 0;
 

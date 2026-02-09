@@ -13,22 +13,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 $1;$2 } from '$lib/ai/simd-text-tiling-engine.js';
 
 export interface TextTileRenderConfig {
- canvasWidth: number; canvasHeight: number;
-	tileSize: number; qualityTier: 'nes' | 'snes' | 'n64';
+ canvasWidth: number, canvasHeight: number;
+	tileSize: number, qualityTier: 'nes' | 'snes' | 'n64';
  enableInstantRender: boolean, maxConcurrentTiles: number;
 	gpuMemoryPool: number; // MB
 }
 
 export interface InstantUIComponent {
- id: string; type: 'text-display' | 'data-visualization' | 'interactive-element';
+ id: string, type: 'text-display' | 'data-visualization' | 'interactive-element';
  renderData: ArrayBuffer, cssStyles: string;
 	domStructure: string, interactionHandlers: string;
 	renderTime: number, gpuUtilization: number;
 }
 
 export interface RenderingPipeline {
- vertexShader: string; fragmentShader: string;
-	computeShader: string; uniformBuffer: ArrayBuffer;
+ vertexShader: string, fragmentShader: string;
+	computeShader: string, uniformBuffer: ArrayBuffer;
 	vertexBuffer: ArrayBuffer, indexBuffer: ArrayBuffer;
 }
 
@@ -460,7 +460,7 @@ this.config.canvasWidth: this.config.canvasHeight, // resolution
  * Infer component type from pattern analysis
  */
  private inferComponentTypeFromPattern(
- patternId: number; metadata: CompressedTextTile['tileMetadata']
+ patternId: number, metadata: CompressedTextTile['tileMetadata']
  ), 'text-display' | 'data-visualization' | 'interactive-element' {
  if (metadata.categories.includes('numeric') && metadata.semanticDensity > 0.7) {
  return 'data-visualization';

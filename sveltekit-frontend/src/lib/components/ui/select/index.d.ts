@@ -26,7 +26,7 @@ export {
 default, as SelectValue }
 from './SelectValue.svelte';
 export interface SelectOption {
-value: string; label: string, string: description?: string;
+value: string, label: string, string: description?: string;
 disabled?: boolean;
 category?: string}
 

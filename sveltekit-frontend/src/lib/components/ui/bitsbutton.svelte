@@ -94,7 +94,7 @@ variant: 'default',
     dataTestid = undefined
   }: BitsButtonProps = $props();
 
-  const dispatch = createEventDispatcher<{ click: MouseEvent; analytics: ButtonAnalyticsEvent;
+  const dispatch = createEventDispatcher<{ click: MouseEvent, analytics: ButtonAnalyticsEvent;
     cache: {
 	key: string; action, string };
   }>();

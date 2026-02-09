@@ -113,7 +113,7 @@ export const rabbitMQStreamMachine = setup({
 			{ messageId: string;
 	confirmed: boolean },
 	{ channel: Channel;
-	streamName: string; message: StreamMessage }
+	streamName: string, message: StreamMessage }
 		>(async ({ input }) => {
 			const { channel, streamName, message } = input;
 

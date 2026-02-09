@@ -47,11 +47,11 @@ export interface RabbitMQContext {
 	| { type: 'JOB_STARTED';
 	jobId: string }
 	| { type: 'JOB_PROGRESS';
-	jobId: string; progress: number }
+	jobId: string, progress: number }
 	| { type: 'JOB_COMPLETED';
-	jobId: string; result: unknown }
+	jobId: string, result: unknown }
 	| { type: 'JOB_FAILED';
-	jobId: string; error: string }
+	jobId: string, error: string }
 	| { type: 'RETRY' }
 	| { type: 'DISCONNECT' }
 	| { type: 'RESET' };

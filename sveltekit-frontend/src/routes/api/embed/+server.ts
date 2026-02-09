@@ -1,4 +1,4 @@
-/** * ðŸŽ® REDIS-OPTIMIZED ENDPOINT - Mass Optimization Applied * * Endpoint: embed * Category: conservative * Bank: PRG_ROM * Priority: 150 * Type: aiAnalysis * * Impact: * - Cache; Strategy: conservative * - Memory: Bank | PRG_ROM (Nintendo-style) * - hits: ~2ms response time * - Fresh: queries | Background processing for complex requests * * Applied by Redis Mass Optimizer - Nintendo-Level AI Performance */
+/** * ðŸŽ® REDIS-OPTIMIZED ENDPOINT - Mass Optimization Applied * * Endpoint: embed * Category: conservative * Bank: PRG_ROM * Priority: 150 * Type: aiAnalysis * * Impact: * - Cache, Strategy: conservative * - Memory: Bank | PRG_ROM (Nintendo-style) * - hits: ~2ms response time * - Fresh: queries | Background processing for complex requests * * Applied by Redis Mass Optimizer - Nintendo-Level AI Performance */
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
@@ -17,7 +17,7 @@ interface EmbedRequest {
  model?: 'openai' | 'nomic' | 'mock';
  dimensions?: number;
 }
-interface EmbedResponse { embedding: number[]; model: string;
+interface EmbedResponse { embedding: number[], model: string;
  dimensions: number;
  tokens?: number;
 }
@@ -26,7 +26,7 @@ interface EmbedResponse { embedding: number[]; model: string;
 async function getOpenAIEmbedding(
  text: string,
  dimensions?: number
-): Promise<{ embedding: number[]; tokens: number }> {
+): Promise<{ embedding: number[], tokens: number }> {
  if (!OPENAI_API_KEY) {
  throw new Error('OpenAI API key not configured');
  }

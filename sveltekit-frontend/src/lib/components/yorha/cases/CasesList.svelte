@@ -1,6 +1,6 @@
 <script lang="ts">
 
-  interface Case { id: string; title: string;
+  interface Case { id: string, title: string;
     status: 'active' | 'review' | 'closed';
     priority: 'high' | 'medium' | 'low';
     assignee: string;

@@ -11,13 +11,13 @@
 const API_BASE = '/api/upload';
 
 interface UploadResponse {
- doc_id: string; filename: string;
-	file_size: number; status: string;
+ doc_id: string, filename: string;
+	file_size: number, status: string;
 	progress_url: string;
 }
 
 interface ProgressEvent {
- type: 'progress' | 'done' | 'error'; data: {
+ type: 'progress' | 'done' | 'error', data: {
  doc_id?: string;
  status?: string;
  progress?: number;

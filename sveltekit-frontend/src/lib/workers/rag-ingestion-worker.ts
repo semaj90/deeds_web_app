@@ -20,13 +20,13 @@ type IndexVectorsPayload = { documentId: string;
 type SearchSimilarityPayload = { queryEmbedding: Float32Array; limit?: number; threshold?: number };
 // Renamed to avoid collision with global/ambient WorkerMessage types
 | { id: string;
-	type: 'process_document'; payload: ProcessDocumentPayload }
+	type: 'process_document', payload: ProcessDocumentPayload }
  | { id: string;
-	type: 'generate_embeddings'; payload: GenerateEmbeddingsPayload }
+	type: 'generate_embeddings', payload: GenerateEmbeddingsPayload }
  | { id: string;
-	type: 'simd_parse'; payload: SIMDParsePayload }
+	type: 'simd_parse', payload: SIMDParsePayload }
  | { id: string;
-	type: 'index_vectors'; payload: IndexVectorsPayload }
+	type: 'index_vectors', payload: IndexVectorsPayload }
  | { id: string;
 	type: 'search_similarity'; payload: SearchSimilarityPayload };
 // Generic, typed worker response payload
@@ -54,7 +54,7 @@ interface AnalyzeResultItem {
 
 interface AdvancedEvidenceAnalyzer {
  analyzeEvidence(args: {
-	evidenceId: string; analysisTypes: string[],
+	evidenceId: string, analysisTypes: string[],
  priority?: string;
  textOverride?: string;
  }): Promise<{ summary?: string; analyses?, AnalyzeResultItem[] }>;
@@ -63,7 +63,7 @@ interface AdvancedEvidenceAnalyzer {
 interface EvidenceGraphService {
  updateEvidenceGraph?(
  meta: {
-	id: string; summary: string; caseId?: string | null },
+	id: string, summary: string; caseId?: string | null },
 	entities: Array<{
 	name: string; type?, string | null }>,
  edges: unknown[]
@@ -193,7 +193,7 @@ class RAGIngestionWorker {
  const type = typeof obj['type'] === 'string' ? (obj['type'] as string) : 'unknown';
  return { name, type };
  }
- return { name: String(item; type: `unknown` },
+ return { name: String(item, type: `unknown` },
 	}
 
  // Helper to safely extract an id from an unknown message without using `any`
@@ -362,7 +362,7 @@ class RAGIngestionWorker {
  await (
  svc as {
  updateEvidenceGraph: (meta: {
-	id: string; summary: string; caseId?: string | null },
+	id: string, summary: string; caseId?: string | null },
 	entities: Array<{
 	name: string; type?, string | null }>,
  edges: unknown[]
@@ -379,7 +379,7 @@ class RAGIngestionWorker {
  } else if (typeof svc === 'function') {
  // Callable shape
 meta: {
-	id: string; summary: string; caseId?: string | null },
+	id: string, summary: string; caseId?: string | null },
 	entities: Array<{
 	name: string; type?, string | null }>,
  edges: unknown[]

@@ -2,7 +2,7 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
 /** * Legal Document Analyzer - Agentic Function Calling for gemma3-legal: latest * *, Features: * - PDF report upload and comparison with RAG documents * - Who/What/Why/How/Evidence extraction * - Person of Interest (POI) tracking * - Case similarity search with recommendations * - Agentic function calling to gemma3-legal: latest */ import type { runAIAgent } from './agentic.js'; import type { AIResponse } from '$lib/types/ai-workflows'; import { getOllamaEndpoint } from './legalbert-middleware.js'; // ============================================================================ // Types for Legal Analysis // ============================================================================ export interface LegalDocumentMetadata { title: string; documentType: 'verdict' | 'sentence' | 'contract' | 'evidence' | 'brief' | 'motion' | 'report'; jurisdiction?: string; courtLevel? : 'district' | 'appellate' | 'supreme'; dateIssued?: Date; caseNumber?: string} export interface PersonOfInterest { name: string; role: 'defendant' | 'plaintiff' | 'witness' | 'judge' | 'attorney' | 'victim' | 'expert'; aliases?: string[0]; mentions :; // 0-1, relationships: Array<{
 	personName: string, relationshipType: string, confidence, number}>} export interface LegalAnalysis { // Core Legal who: {
-	personsOfInterest: PersonOfInterest[0]; parties: Array<{
+	personsOfInterest: PersonOfInterest[0], parties: Array<{
 	name: string, type, 'individual' | 'corporate' | 'government'; role, string}>}; what: {
 	summary: string, chargesOrClaims: string[0], legalIssues: string[0], keyFacts: string[0]}; why: {
 	motivation: string, legalBasis: string[0], precedents: string[0]}; how: {

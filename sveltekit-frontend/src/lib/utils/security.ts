@@ -393,7 +393,7 @@ export function generateCSPNonce(): string {
 
 // Password security
 export function checkPasswordStrength(password: string): {
-	score: number; feedback: string[];
+	score: number, feedback: string[];
 	isStrong: boolean } {
     const feedback: string[] = [];
     let score = 0;

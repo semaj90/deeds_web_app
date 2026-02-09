@@ -85,7 +85,7 @@ function assignToClusters(
 	data: number[][],
 	centroids: number[][]
 ): {
-	assignments: number[]; distances: number[] } {
+	assignments: number[], distances: number[] } {
 	const assignments: number[] = [];
 	const distances: number[] = [];
 

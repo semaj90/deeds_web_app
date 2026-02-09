@@ -8,7 +8,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface LegalEntity {
- type: 'case' | 'statute' | 'precedent' | 'regulation' | 'contract' | 'person' | 'organization'; name: string;
+ type: 'case' | 'statute' | 'precedent' | 'regulation' | 'contract' | 'person' | 'organization', name: string;
  citation?: string;
  jurisdiction?: string;
 	confidence: number, context: string;
@@ -18,8 +18,8 @@ export interface LegalEntity {
 
 // Semantic Analysis Results
 export interface SemanticAnalysis {
- documentId: string; summary: string;
-	keyTopics: string[]; legalEntities: LegalEntity[];
+ documentId: string, summary: string;
+	keyTopics: string[], legalEntities: LegalEntity[];
 	sentiment: {
  score: number; // -1 to 1, confidence: number, aspects: {
 	aspect: string, sentiment: number }[];
@@ -33,7 +33,7 @@ export interface SemanticAnalysis {
 // Legal Reasoning Analysis
 export interface LegalReasoning {
  argumentStructure: {
-	premises: string[]; conclusions: string[];
+	premises: string[], conclusions: string[];
 	logicalConnections: Array<any>;
  };
  legalPrinciples: Array<any>, riskAssessment: {

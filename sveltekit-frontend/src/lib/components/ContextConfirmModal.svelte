@@ -8,7 +8,7 @@
    * Emits 'accept' or 'reject' events based on user choice.
    */
 
-  interface ContextData { context_id: string; source: string;
+  interface ContextData { context_id: string, source: string;
     score: number;
 	snippet: string;
     range?: { from_msg_id: number; to_msg_id: number };

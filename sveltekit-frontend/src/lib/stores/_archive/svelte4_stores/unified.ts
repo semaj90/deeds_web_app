@@ -138,12 +138,12 @@ type WebsocketState = {
  connected: boolean;
 	connecting: boolean;
  dashboardData: {
-	cases: unknown[]; evidence: unknown[];
+	cases: unknown[], evidence: unknown[];
 	stats: Record<string, unknown> };
  processingJobs: unknown[];
 	recentActivity: unknown[];
  systemHealth: {
-	api: string; database: string;
+	api: string, database: string;
 	aiServices: string; jobQueue: string };
  activeEditors: Record<string, string[]>;
 };

@@ -26,7 +26,7 @@ export interface QdrantClientLike {
 	points: QdrantPoint[] }): Promise<void>;
     search(collection: string, args: {
 	vector: number[]; limit?: number; score_threshold?: number; filter?: unknown; with_payload?: boolean }): Promise<Array<{
-	id: string | number; score: number; payload?: unknown }>>;
+	id: string | number, score: number; payload?: unknown }>>;
     delete(collection: string, args: { wait?: boolean;
 	points: (string | number)[] }): Promise<void>;
     getCollections(): Promise<{
@@ -215,7 +215,7 @@ export class VectorService {
     }
 
     async bulkIndex(documents: Array<{
-	id: string; content: string; metadata?: Record<string, any> }>): Promise<void> {
+	id: string, content: string; metadata?: Record<string, any> }>): Promise<void> {
        for (const doc of documents) {
            await this.storeDocument(doc.id, doc.content, doc.metadata);
        }

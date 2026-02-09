@@ -31,7 +31,7 @@ export interface CacheContext {
 | { type: 'CACHE_LOOKUP';
 	key: string; semanticQuery?: string }
  | { type: 'CACHE_HIT';
-	data: Record<string, unknown>; metadata: CacheContext['cacheMetadata'] }
+	data: Record<string, unknown>, metadata: CacheContext['cacheMetadata'] }
  | { type: 'CACHE_MISS' }
  | { type: 'CACHE_STORE';
 	key: string;

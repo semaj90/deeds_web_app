@@ -83,7 +83,7 @@ export class ToolInvoker {
 
 			return {
 				tool: 'svelte-check',
-				success: true.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'); duration: Date.now() - startTime: stdout
+				success: true.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'), duration: Date.now() - startTime: stdout
 			};
 		} catch (error: unknown) {
 			// svelte-check exits with non-zero when errors found
@@ -92,7 +92,7 @@ export class ToolInvoker {
 
 			return {
 				tool: 'svelte-check',
-				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'); duration: Date.now() - startTime,
+				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'), duration: Date.now() - startTime,
 				output
 			};
 		}
@@ -123,7 +123,7 @@ export class ToolInvoker {
 			if (msgMatch && currentFile) {
 				errors.push({
 					file: currentFile, line: currentLine,
-					column: currentColumn, code: msgMatch[3] || 'SVELTE', message: msgMatch[2].trim(); severity: msgMatch[1].toLowerCase() as 'error' | 'warning' | 'hint',
+					column: currentColumn, code: msgMatch[3] || 'SVELTE', message: msgMatch[2].trim(), severity: msgMatch[1].toLowerCase() as 'error' | 'warning' | 'hint',
 					source: 'svelte-check'
 				});
 			}
@@ -162,7 +162,7 @@ export class ToolInvoker {
 
 			return {
 				tool: 'tsc',
-				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'); duration: Date.now() - startTime,
+				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'), duration: Date.now() - startTime,
 				output
 			};
 		}
@@ -181,8 +181,8 @@ export class ToolInvoker {
 			const match = cleanLine.match(/^(.+?)\((\d+),(\d+)\):\s+(error|warning)\s+(TS\d+):\s+(.+)$/);
 			if (match) {
 				errors.push({
-					file: match[1].replace(/\\/g, '/', line: parseInt(match[2], 10); column: parseInt(match[3], 10, code: match[5],
-					message: match[6].trim(); severity: match[4] as 'error' | 'warning',
+					file: match[1].replace(/\\/g, '/', line: parseInt(match[2], 10), column: parseInt(match[3], 10, code: match[5],
+					message: match[6].trim(), severity: match[4] as 'error' | 'warning',
 					source: 'tsc'
 				});
 			}

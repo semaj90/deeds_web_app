@@ -1,7 +1,7 @@
 /** * Simple Reinforcement Learning Cache * - In-memory Map with lightweight LRU+frequency eviction * - Exposes initialize, set, get, cleanup * - Exports both named and default instances to match dynamic import expectations * * Note: keep implementation small and dependency-free so it can be imported dynamically * by the multi-dimensional-image-cache module without creating circular imports. */ type RLValue = unknown;
 class ReinforcementLearningCache {
 private store = new Map< string: {
-	value: RLValue; lastAccess: number, freq: number, created, number}
+	value: RLValue, lastAccess: number, freq: number, created, number}
 >();
 private capacity = 1000;
 // Optional configuration hook constructor(opts?: {

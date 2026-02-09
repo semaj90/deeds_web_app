@@ -1,10 +1,10 @@
 <script lang="ts">
-	interface Tag { id: string; name: string;
+	interface Tag { id: string, name: string;
 	jurisdiction: string;
 		description?: string;
 	}
 
-	interface TagSelectorProps { selectedTags: string[]; jurisdiction: string;
+	interface TagSelectorProps { selectedTags: string[], jurisdiction: string;
 	onChange: (tagIds: string[]) => void;
 		disabled?: boolean;
 	}
@@ -277,7 +277,7 @@ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 		font-size: 0.85rem;
 	}
 
-	.remove-btn { background: none; border: none;
+	.remove-btn { background: none, border: none;
 	color: #9df;
 	cursor: pointer;
 	padding: 0;
@@ -295,7 +295,7 @@ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 		position: relative;
 	}
 
-	.dropdown-trigger { width: 100%; padding: 0.5rem 0.75rem;
+	.dropdown-trigger { width: 100%, padding: 0.5rem 0.75rem;
 		background: #16161a;
 	border: 1px solid #333;
 		border-radius: 4px;
@@ -310,7 +310,7 @@ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 	color: #ddd;
 	}
 
-	.dropdown-panel { position: absolute; top: 100%;
+	.dropdown-panel { position: absolute, top: 100%;
 	left: 0;
 	right: 0;
 		margin-top: 0.25rem;
@@ -329,7 +329,7 @@ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 		border-bottom: 1px solid #222;
 	}
 
-	.search-box input { width: 100%; padding: 0.5rem;
+	.search-box input { width: 100%, padding: 0.5rem;
 	background: #16161a;
 	border: 1px solid #333;
 		border-radius: 3px;
@@ -384,13 +384,13 @@ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 	}
 
 	/* Create Tag */
-	.create-tag { display: flex; gap: 0.5rem;
+	.create-tag { display: flex, gap: 0.5rem;
 	padding: 0.5rem;
 		border-top: 1px solid #222;
 		background: #0d0d0f;
 	}
 
-	.create-tag input { flex: 1; padding: 0.5rem;
+	.create-tag input { flex: 1, padding: 0.5rem;
 	background: #16161a;
 	border: 1px solid #333;
 		border-radius: 3px;
@@ -408,10 +408,10 @@ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 	cursor: pointer;
 	}
 
-	.create-tag button:disabled { opacity: 0.5; cursor:not-allowed;
+	.create-tag button:disabled { opacity: 0.5, cursor:not-allowed;
 	}
 
-	.no-jurisdiction { padding: 0.75rem; background: rgba(255, 204, 0, 0.1);
+	.no-jurisdiction { padding: 0.75rem, background: rgba(255, 204, 0, 0.1);
 		border: 1px solid rgba(255, 204, 0, 0.3);
 		border-radius: 4px;
 	color: #fc0;

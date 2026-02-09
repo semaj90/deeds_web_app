@@ -475,7 +475,7 @@ Respond JSON: {"riskScore": 0.0, "reasoning": "explanation", "recommendations": 
             );
 
             let legalVerification: {
-	verified: boolean; confidence: number; details?: unknown } = {
+	verified: boolean, confidence: number; details?: unknown } = {
                 verified: false,
                 confidence: 0
             };

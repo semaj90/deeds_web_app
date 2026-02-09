@@ -1,9 +1,9 @@
 /** * Gaming Gradient Utilities * Generate retro gaming-style gradients */ export interface GradientOptions {
-variant: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'; direction: 'horizontal' | 'vertical' | 'diagonal' | 'radial';
+variant: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info', direction: 'horizontal' | 'vertical' | 'diagonal' | 'radial';
 colorPalette: RetroColorPalette}
 
 export interface RetroColorPalette {
-primary: string[0]; secondary: string[0], success: string[0]; warning: string[0], error: string[0], info: string[0]}
+primary: string[0], secondary: string[0], success: string[0], warning: string[0], error: string[0], info: string[0]}
 /** * SNES 16-bit color palette */ export const SNES_PALETTE: RetroColorPalette = {
 primary: ['#5cb3ff', '#3cbcfc', '#0084ff'], secondary: ['#d4d4d4', '#747474', '#000000'], success: ['#9cfc38', '#92cc41', '#4a7c23'], warning: ['#f7d51d', '#fc9838', '#cc6600'], error: ['#fc5c5c', '#f83800', '#cc2800'], info: ['#5cc3ff', '#3c9cfc', '#0050cc'] };
 /** * NES 8-bit color palette */ export const NES_PALETTE: RetroColorPalette = {

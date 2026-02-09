@@ -197,7 +197,7 @@ export function createValuesDiff(
 	oldValues: Record<string, unknown>,
 	newValues: Record<string, unknown>
 ): {
-	changed: string[]; added: string[];
+	changed: string[], added: string[];
 	removed: string[] } {
 	const changed: string[] = [];
 	const added: string[] = [];

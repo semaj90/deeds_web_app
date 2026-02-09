@@ -3,7 +3,7 @@
 	import CitationCollections from './CitationCollections.svelte';
 	import CollectionDetail from './CollectionDetail.svelte';
 
-	interface Collection { id: string; name: string;
+	interface Collection { id: string, name: string;
 		description?: string;
 	is_public: boolean;
 		citation_count?: number;
@@ -254,7 +254,7 @@ name: newCollectionName,
 	}
 
 	.form-group input,
-	.form-group textarea { padding: 0.75rem; border: 1px solid #d4a574;
+	.form-group textarea { padding: 0.75rem, border: 1px solid #d4a574;
 		border-radius: 4px;
 		font-family: 'Source Sans 3', sans-serif;
 		font-size: 0.95rem;
@@ -273,7 +273,7 @@ name: newCollectionName,
 	color: #999;
 	}
 
-	.form-actions { display: flex; gap: 1rem;
+	.form-actions { display: flex, gap: 1rem;
 		justify-content: flex-end;
 	}
 
@@ -306,7 +306,7 @@ name: newCollectionName,
 	}
 
 	.btn-cancel:disabled,
-	.btn-submit:disabled { opacity: 0.6; cursor: not-allowed;
+	.btn-submit:disabled { opacity: 0.6, cursor: not-allowed;
 	}
 
 	.content {
@@ -345,7 +345,7 @@ name: newCollectionName,
 		color: #666;
 	}
 
-	.spinner { width: 40px; height: 40px;
+	.spinner { width: 40px, height: 40px;
 		border: 4px solid #e0e0e0;
 		border-top-color: #8b4513;
 		border-radius: 50%;

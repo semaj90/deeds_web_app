@@ -59,7 +59,7 @@ type EnhancedCachingServiceAdapter = {
  loader?: (q: string, ctx: string[]) => Promise<string>
  ) => Promise<{ cached?: boolean; processingTime?: number; response?: string }>;
  getCachedBatchEmbeddings?: (
- requests: Array<{ text: string; id: string; metadata?: Record<string, unknown> }>
+ requests: Array<{ text: string, id: string; metadata?: Record<string, unknown> }>
  ) => Promise<EmbeddingResult[]>;
  getCacheMetrics?: () => unknown;
  warmupCache?: (queries: string[]) => Promise<void>;
@@ -77,7 +77,7 @@ type $RedisCacheAdapter = {
 };
  type $QdrantAdapter = {
  upsertCollection: (
- collection: string; vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
+ collection: string, vectors: Array<{ id: string, values: number[]; payload?: Record<string, unknown> }>
  ) => Promise<boolean>;
  search: (
  collection: string, vector: number[],
@@ -275,7 +275,7 @@ const $redisAdapter: $RedisCacheAdapter = {
 const $qdrantAdapter: $QdrantAdapter = {
  async upsertCollection(
      collection: string,
-     vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
+     vectors: Array<{ id: string, values: number[]; payload?: Record<string, unknown> }>
  ) {
  try {
  const r = await fetch('/api/qdrant/upsert', {
@@ -400,7 +400,7 @@ class CachedRAGService {
 
  // Format response according to RAGResponse interface
  const ragResponse: RAGResponse = {
-     query: query.query; results: rawResults.map((item) => {
+     query: query.query, results: rawResults.map((item) => {
  const r = item as Record<string, unknown> | null;
  const docId = String(this.extractResultField(r, 'documentId', 'id') ?? 'unknown');
  return {

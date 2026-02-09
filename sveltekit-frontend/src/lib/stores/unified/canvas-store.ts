@@ -268,7 +268,7 @@ class CanvasStore {
     // ========== SAVE & SYNC ==========
     saveCanvas = async () => {
         let stateSnapshot: {
-	canvasId: string | null; elements: CanvasElement[];
+	canvasId: string | null, elements: CanvasElement[];
 	connections: CanvasConnection[] } = {
             canvasId: null,
             elements: [],

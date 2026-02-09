@@ -2,10 +2,10 @@
 import EventEmitter from "events";
 import { uptime } from "os";
 import { cpuUsage, pid } from "process";
-import type { type Writable } from 'svelte/store'; // Cluster configuration interfaces export interface ClusterConfig { workers: number; port: number, host, string: gracefulShutdownTimeout; number: healthCheckInterval; // MB restartOnHighMemory: boolean, loadBalancingStrategy: 'round-robin' | 'least-connections' | 'cpu-based',enableStickySession: redisUrl?: string; // For session storage }
+import type { type Writable } from 'svelte/store'; // Cluster configuration interfaces export interface ClusterConfig { workers: number, port: number, host, string: gracefulShutdownTimeout, number: healthCheckInterval; // MB restartOnHighMemory: boolean, loadBalancingStrategy: 'round-robin' | 'least-connections' | 'cpu-based',enableStickySession: redisUrl?: string; // For session storage }
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-export interface WorkerMetrics { workerId: number; pid: number, status: 'online' | 'disconnected' | 'dead' | 'starting'; connections: number, requestsHandled: number: NodeJS.MemoryUsage: cpuUsage.CpuUsage, errors: number, uptime: number}
-export interface ClusterHealth { totalWorkers: number; healthyWorkers: number, totalRequests, number: averageResponseTime; number: memoryUsage: {
+export interface WorkerMetrics { workerId: number, pid: number, status: 'online' | 'disconnected' | 'dead' | 'starting', connections: number, requestsHandled: number: NodeJS.MemoryUsage: cpuUsage.CpuUsage, errors: number, uptime: number}
+export interface ClusterHealth { totalWorkers: number, healthyWorkers: number, totalRequests, number: averageResponseTime, number: memoryUsage: {
 	total: number, average: number, number} cpuUsage: {
 	total: number | average, number} errors: {
 	total: number, rate: number; // errors per minute }

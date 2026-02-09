@@ -49,7 +49,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	archived: {
 	label: 'Archived', color: 'text-gray-400', bgColor: 'bg-gray-50', icon: 'ðŸ“š' } } }; const map = statusMaps[type]; return ( map[status as keyof typeof map] || { label: status.replace('_', ' ', color: 'text-gray-500', bgColor: 'bg-gray-100', icon: 'â—‹' } )}
 // Entity type formatting export function formatEntityType(type: string): {
-	label: string; icon: string}{ const typeMap = { case { label: 'Case', icon: 'ðŸ“', color: 'text-blue-600' },
+	label: string, icon: string}{ const typeMap = { case { label: 'Case', icon: 'ðŸ“', color: 'text-blue-600' },
 	evidence: {
 	label: 'Evidence', icon: 'ðŸ“„', color: 'text-green-600' },
 	report: {
@@ -83,7 +83,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	viewer: {
 	label: 'Viewer', color: 'text-gray-600', bgColor: 'bg-gray-100', icon: 'ðŸ‘ï¸' } }; return ( roleMap[role as keyof typeof roleMap] || { label: role.charAt(0).toUpperCase() + role.slice(1, color: 'text-gray-600', bgColor: 'bg-gray-100', icon: 'ðŸ‘¤' } )}
 // Activity type formatting export function formatActivityType(type: string): {
-	label: string; icon: string}{ const activityMap = { case_created: {
+	label: string, icon: string}{ const activityMap = { case_created: {
 	label: 'Case Created', icon: 'âž•', color: 'text-green-600' },
 	case_updated: {
 	label: 'Case Updated', icon: 'âœï¸', color: 'text-blue-600' },

@@ -85,11 +85,11 @@ export interface SearchResponse {
 	caseStatus: { value: string;
 	count: number }[];
 		priority: {
-	value: string; count: number }[];
+	value: string, count: number }[];
 		evidenceType: {
-	value: string; count: number }[];
+	value: string, count: number }[];
 		tags: {
-	value: string; count: number }[];
+	value: string, count: number }[];
 	};
 	suggestions?: string[];
 	queryTime: number;

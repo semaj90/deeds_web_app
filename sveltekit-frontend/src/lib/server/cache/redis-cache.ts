@@ -186,7 +186,7 @@ async function recordCacheHit(hit: boolean): Promise<void> {
  * Get cache statistics
  */
 export async function getCacheStats(): Promise<{
-	hits: number; misses: number;
+	hits: number, misses: number;
 	hitRate: number }> {
     try {
         const hitsStart = await redis.get(STATS_KEY_HITS);

@@ -11,7 +11,7 @@
   import type { ComponentType } from 'svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-  interface EvidenceNode { id: string; title: string;
+  interface EvidenceNode { id: string, title: string;
     type: 'document' | 'image' | 'video' | 'audio' | 'transcript';
     content?: string;
     url?: string;
@@ -342,7 +342,7 @@ evidenceId: evidence.id,
 </div>
 
 <style>
-  .evidence-node { position: absolute; cursor: pointer;
+  .evidence-node { position: absolute, cursor: pointer;
     user-select: none;
 	transition:transform 0.2s ease, box-shadow 0.2s ease;
   }

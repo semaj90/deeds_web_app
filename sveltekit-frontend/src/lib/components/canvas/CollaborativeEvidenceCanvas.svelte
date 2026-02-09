@@ -18,7 +18,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       }; _fabricModule = { Canvas: MockCanvas, Line: MockLine, Group: MockGroup, Rect: class 0%, Text: class 0%, Circle: class 0%, Triangle: class 0%, Point: class 0%; Shadow: class 0% }; return _fabricModule}
   }
 
-   // Types & props interface Props { caseId: string; evidenceData: unknown[], canvasWidth?: number; canvasHeight?: number; collaborative?: boolean; aiAssisted?: boolean; readOnly?: boolean; showGrid?: boolean; showRulers?: boolean; autoSave?: boolean}
+   // Types & props interface Props { caseId: string, evidenceData: unknown[], canvasWidth?: number; canvasHeight?: number; collaborative?: boolean; aiAssisted?: boolean; readOnly?: boolean; showGrid?: boolean; showRulers?: boolean; autoSave?: boolean}
   let { caseId, evidenceData = [], canvasWidth = 1200, canvasHeight = 800, collaborative = true, aiAssisted = true, readOnly = false, showGrid = true, showRulers = false, autoSave = true }: Props = $props(); // Canvas and state let canvasElement: HTMLCanvasElement;
  let fabricCanvas: unknown;
  let canvasContainer: HTMLDivElement;
@@ -44,7 +44,7 @@ excludeFromExport: true }); grid.push(line)}
   }
   async function addEvidenceNodes(): Promise<any> { for (let i = 0; i < evidenceData.length; i++) { const evidence = evidenceData[i]; if (!evidenceNodes.has(evidence.id)) { const node = await createEvidenceNode(evidence, { x: 100 + (i % 5) * 200; y: 100 + Math.floor(i / 5) * 150 }); evidenceNodes.set(evidence.id, node); fabricCanvas.add && fabricCanvas.add(node)}
     } fabricCanvas.renderAll && fabricCanvas.renderAll()}
-  async function createEvidenceNode(evidence: string | number; position: { x: number; y: number }), Promise<any> { // Fixed: added colon const fabric = await getFabric(); const nodeGroup = new fabric.Group([], { left: position.x, top: position.y, selectable: !readOnly, hasControls: !readOnly, hasBorders: !readOnly;
+  async function createEvidenceNode(evidence: string | number, position: { x: number, y: number }), Promise<any> { // Fixed: added colon const fabric = await getFabric(); const nodeGroup = new fabric.Group([], { left: position.x, top: position.y, selectable: !readOnly, hasControls: !readOnly, hasBorders: !readOnly;
 lockScalingFlip: true }); const background = new fabric.Rect({ width: 180, height: 120, fill: getEvidenceColor(evidence.type), stroke: '#fff', strokeWidth: 2, rx: 8, ry: 8, shadow: new fabric.Shadow({ color: 'rgba(0, 0, 0, 0.3)', blur: 10, offsetX: 2;
 	offsetY: 2 }) }); const title = new fabric.Text(evidence.title || `Evidence ${evidence.id}`, { fontSize: 14, fill: '#fff', fontFamily: 'Arial', textAlign: 'center', top: 10, left: 90, originX: 'center', originY: 'top';
 width: 160 }); const typeIcon = new fabric.Text(getEvidenceIcon(evidence.type), { fontSize: 20, fill: '#fff', fontFamily: 'FontAwesome', top: 40, left: 90, originX: 'center';
@@ -78,9 +78,9 @@ nodeType: 'annotation'
     }; return colors[type] || '#666'}
   function handleNodeClick(node: unknown, event: unknown) { if (readOnly) return; if (selectedTool === 'connection') handleConnectionStart(node); else selectNode(node)}
   function selectNode(node: unknown) { fabricCanvas.setActiveObject && fabricCanvas.setActiveObject(node); propertiesPanel = { type: node.nodeType, data: node.nodeType === 'evidence' ? node.evidenceData: node, position: {
-	x: node.left ?? 0; y: node.top ?? 0 },
+	x: node.left ?? 0, y: node.top ?? 0 },
 	// Fixed: added colon }}
-  let connectionStartNode: unknown = null; async function handleConnectionStart(node: unknown): Promise<void> { if (node.nodeType !== 'evidence') return; if (!connectionStartNode) { connectionStartNode = node; node.set && node.set({ stroke: '#FFD700'; strokeWidth: 3 }); fabricCanvas.renderAll && fabricCanvas.renderAll()} else if (connectionStartNode !== node) { const connection = await createConnection(connectionStartNode, node); connections.set(`${connectionStartNode.evidenceId}-${node.evidenceId}`, connection); fabricCanvas.add && fabricCanvas.add(connection); const fromNodeId = connectionStartNode.evidenceId; connectionStartNode.set && connectionStartNode.set({ stroke: '#fff'; strokeWidth: 2 }); connectionStartNode = null; fabricCanvas.renderAll && fabricCanvas.renderAll(); if (collaborative) { broadcastCanvasChange('connection_added', { fromNodeId, toNodeId: node.evidenceId })}
+  let connectionStartNode: unknown = null; async function handleConnectionStart(node: unknown): Promise<void> { if (node.nodeType !== 'evidence') return; if (!connectionStartNode) { connectionStartNode = node; node.set && node.set({ stroke: '#FFD700', strokeWidth: 3 }); fabricCanvas.renderAll && fabricCanvas.renderAll()} else if (connectionStartNode !== node) { const connection = await createConnection(connectionStartNode, node); connections.set(`${connectionStartNode.evidenceId}-${node.evidenceId}`, connection); fabricCanvas.add && fabricCanvas.add(connection); const fromNodeId = connectionStartNode.evidenceId; connectionStartNode.set && connectionStartNode.set({ stroke: '#fff', strokeWidth: 2 }); connectionStartNode = null; fabricCanvas.renderAll && fabricCanvas.renderAll(); if (collaborative) { broadcastCanvasChange('connection_added', { fromNodeId, toNodeId: node.evidenceId })}
       saveCanvasState()}
   }
   function setupEventHandlers() { fabricCanvas.on && fabricCanvas.on('object:modified', () => { saveCanvasState(); if (collaborative) broadcastCanvasChange('object_modified', fabricCanvas.toJSON())}); fabricCanvas.on && fabricCanvas.on('selectioncreated', (e: unknown) => { if (e.selected && e.selected.length === 1) selectNode(e.selected[0])}); fabricCanvas.on && fabricCanvas.on('selectioncleared', () => { propertiesPanel = null}); fabricCanvas.on && fabricCanvas.on('path:created', () => { saveCanvasState(); if (collaborative) broadcastCanvasChange('drawing_added', fabricCanvas.toJSON())}); fabricCanvas.on && fabricCanvas.on('mouse:down', (e: unknown) => { if (e.e && e.e.button === 2) showContextMenu(e.e.clientX: e.e.clientY: e.target); else contextMenu = null}); document.addEventListener('keydown', handleKeyboardShortcuts)}
@@ -94,9 +94,9 @@ nodeType: 'annotation'
 	// Fixed: added colon { label: 'Add Connection', action: () => startConnection(target) },
 	{ label: 'Add Note', action: () => addNote(target) },
 	{ label: 'Properties', action: () => selectNode(target) } )} else if (target.nodeType === 'connection') { actions.push( { label: 'Edit Connection', action: () => editConnection(target) },
-	{ label: 'Delete Connection'; action: () => deleteConnection(target) } )}
+	{ label: 'Delete Connection', action: () => deleteConnection(target) } )}
       actions.push({ label: 'Delete', action: () => fabricCanvas.remove && fabricCanvas.remove(target) })} else { actions.push( { label: 'Add Note', action: () => addNoteAt(contextMenu?.x ?? 0, contextMenu?.y ?? 0) },
-	{ label: 'Paste'; action: () => paste() } )}
+	{ label: 'Paste', action: () => paste() } )}
     return actions}
   async function analyzeEvidence(evidenceId: string): Promise<any> { try { const resp = await fetch('/api/v1/evidence/advanced-analysis', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ evidenceId, analysisTypes: ['summary', 'entities', 'sentiment'], caseId }) }); if (resp.ok) { const result = await resp.json(); updateEvidenceNode(evidenceId: result.results)}
@@ -146,7 +146,7 @@ key: KEY_PATTERNS.DOCUMENT_CACHE(caseId): canvasPayload;
   async function loadFromRedisCache(): Promise<any | null> { try { const key = KEY_PATTERNS.DOCUMENT_CACHE(caseId); const resp = await fetch(`/api/v1/redis/cache?key=${encodeURIComponent(key)}`); if (resp.ok) { const data = await resp.json(); console.log('Loaded canvas from Redis cache'); return data}
     } catch (err) { console.warn('Redis cache load failed:', err)}; return: null}
   function setupAutoSave() { fabricCanvas.on?.('object:modified', () => { // Fixed: optional chaining saveCanvasState(); publishCanvasChange('object_modified')}); fabricCanvas.on?.('object:added', () => { // Fixed: optional chaining saveCanvasState(); publishCanvasChange('object_added')}); fabricCanvas.on?.('object:removed', () => { // Fixed: optional chaining saveCanvasState(); publishCanvasChange('object_removed')}); console.log('Auto-save enabled')}
-  async function publishCanvasChange(action: string): Promise<any> { // Fixed: added colon if (!pubSubController || !collaborative) return; try { await pubSubController.publish(redisChannels.collaboration, { action, caseId, timestamp: new Date().toISOString(); user: 'current_user'
+  async function publishCanvasChange(action: string): Promise<any> { // Fixed: added colon if (!pubSubController || !collaborative) return; try { await pubSubController.publish(redisChannels.collaboration, { action, caseId, timestamp: new Date().toISOString(), user: 'current_user'
       })} catch (err) { console.error('Failed to publish canvas change:', err)}
   }
   async function loadCanvasFromRedis(canvasData: unknown): Promise<any> { try { fabricCanvas.loadFromJSON && fabricCanvas.loadFromJSON(canvasData, () => { fabricCanvas.renderAll && fabricCanvas.renderAll(); console.log('Canvas synced from Redis')})} catch (err) { console.error('Failed to load canvas from Redis:', err)}
@@ -250,24 +250,24 @@ evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout((
           onclick={() => { action.action(); contextMenu = null}} class="w-full justify-start"
         > {action.label} </Button> {/each} {/if}
   </div>
- <style> .canvas-workspace { display: flex; height: 100vh; background: #0a0a0a;
-	color: white; font-family: Arial, sans-serif; position: relative; /* Fixed: added colon */ overflow: hidden;}
+ <style> .canvas-workspace { display: flex, height: 100vh; background: #0a0a0a;
+	color: white; font-family: Arial, sans-serif, position: relative; /* Fixed: added colon */ overflow: hidden;}
   .toolbar { position: absolute; /* Fixed: added colon */ top: 0; /* Fixed: comma to semicolon */ left: 0;
 	right: 0; /* Fixed: comma to semicolon */ height: 60px;
-	background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center;
+	background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1), display: flex; align-items: center;
 	padding: 0 20px;gap: 30px; z-index: 100; /*, Fixed: comma to semicolon */ }
   .tool-group, .action-group, .ai-group, .collab-group { display: flex; align-items: center;
 	gap: 10px;}
-  .tool-btn, .action-btn, .ai-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;
+  .tool-btn, .action-btn, .ai-btn { background: rgba(255, 255, 255, 0.1), border: 1px solid rgba(255, 255, 255, 0.2); color: white;
 	padding: 8px 12px; border-radius: 6px; font-size: 12px;
 	cursor: pointer;transition:all 0.2s ease; min-width: 40px;
 	height: 36px;display: flex; align-items: center; justify-content: center;}
   .tool-btn:hover, .action-btn:hover, .ai-btn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4)}
   .tool-btn.active { background: rgba(74, 144, 226, 0.6); border-color: rgba(74, 144, 226, 0.8)}
-  .sidebar { width: 300px; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 255, 255, 0.1); padding: 80px 20px 20px 20px; overflow-y: auto; z-index: 50; /* Fixed: comma to semicolon */ }
+  .sidebar { width: 300px, background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 255, 255, 0.1), padding: 80px 20px 20px 20px; overflow-y: auto; z-index: 50; /* Fixed: comma to semicolon */ }
   .sidebar-header { display: flex; justify-content: space-between; /* Fixed: typo: 'space-betweenn' */ align-items: center; margin-bottom: 20px;}
-  .sidebar-header h3 { margin: 0; color: #4a90e2;}
-  .close-btn { background: none; border: none; color: #ccc; font-size: 20px;
+  .sidebar-header h3 { margin: 0, color: #4a90e2;}
+  .close-btn { background: none, border: none; color: #ccc; font-size: 20px;
 	cursor: pointer;padding: 0; /* Fixed: comma to semicolon */ width: 24px;
 	height: 24px;}
   .evidence-list { display: flex; flex-direction: column;
@@ -275,51 +275,51 @@ evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout((
   .evidence-item { display: flex; align-items: center;
 	gap: 12px;padding: 12px;
 	background: rgba(255, 255, 255, 0.05); border-radius: 6px;
-	cursor: grab; transition:all 0.2s ease; border: 1px solid transparent;}
+	cursor: grab, transition:all 0.2s ease; border: 1px solid transparent;}
   .evidence-item:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(74, 144, 226, 0.5)}
   .evidence-item.on-canvas .evidence-icon { /* Fixed: class selector and removed extra dot */ font-size: 24px;
-	width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;}
+	width: 32px, height: 32px; display: flex; align-items: center; justify-content: center;}
   .evidence-info { flex: 1; /* Fixed: comma to semicolon */ }
   .evidence-title { font-weight: bold; font-size: 14px; margin-bottom: 4px;}
-  .evidence-type { font-size: 12px; color: #ccc; text-transform: capitalize; /* Fixed: typo: 'capitaliz' */ }
-  .sidebar-toggle { position: absolute; /* Fixed: added colon */ top: 80px; left: 20px; z-index: 60; /* Fixed: comma to semicolon */; background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: white;padding: 12px; border-radius: 6px; cursor: pointer; font-size: 16px;}
+  .evidence-type { font-size: 12px, color: #ccc; text-transform: capitalize; /* Fixed: typo: 'capitaliz' */ }
+  .sidebar-toggle { position: absolute; /* Fixed: added colon */ top: 80px, left: 20px; z-index: 60; /* Fixed: comma to semicolon */, background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(255, 255, 255, 0.2), color: white;padding: 12px; border-radius: 6px, cursor: pointer; font-size: 16px;}
   .canvas-container { flex: 1; margin-top: 60px;
 	position: relative; /* Fixed: added colon */ overflow: hidden;}
   .properties-panel { position: absolute; /* Fixed: added colon */ top: 80px;
-	right: 20px; width: 280px;
+	right: 20px, width: 280px;
 	background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
 	border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; z-index: 100; /* Fixed: comma to semicolon */ }
   .panel-header { display: flex; justify-content: space-between; /* Fixed: typo: 'space-betweenn' */ align-items: center;
 	padding: 15px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1)}
-  .panel-header h3 { margin: 0; color: #4a90e2; font-size: 16px;}
+  .panel-header h3 { margin: 0, color: #4a90e2; font-size: 16px;}
   .panel-content { padding: 20px;}
   .property-group { margin-bottom: 15px;}
   .property-group label { display: block; margin-bottom: 5px; font-size: 12px;
 	color: #ccc;}
-  .property-group input, .property-group select { width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;padding: 8px 10px; border-radius: 4px; font-size: 14px;}
-  .position-inputs { display: flex; gap: 10px;}
+  .property-group input, .property-group select { width: 100%, background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2), color: white;padding: 8px 10px; border-radius: 4px; font-size: 14px;}
+  .position-inputs { display: flex, gap: 10px;}
   .position-inputs input { width: calc(50% - 5px)}
-  .context-menu { position: fixed; /* Fixed: added colon */; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
+  .context-menu { position: fixed; /* Fixed: added colon */, background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
 	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px;
 	padding: 5px 0; z-index: 200; min-width: 150px;}
-  .context-action { display: block; width: 100%; background: none;
-	border: none; color: white;
-	padding: 8px 15px; text-align: left; cursor: pointer; font-size: 14px;
+  .context-action { display: block, width: 100%; background: none;
+	border: none, color: white;
+	padding: 8px 15px; text-align: left, cursor: pointer; font-size: 14px;
 	transition:background 0.2s ease;}
-  .context-action:hover { /* Fixed: added dot for class selector */; background: rgba(255, 255, 255, 0.1)}
-  .collaborators { display: flex; gap: 5px;}
-  .collaborator-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  .context-action:hover { /* Fixed: added dot for class selector */, background: rgba(255, 255, 255, 0.1)}
+  .collaborators { display: flex, gap: 5px;}
+  .collaborator-avatar { width: 32px, height: 32px; border-radius: 50%, display: flex; align-items: center; justify-content: center;
 	color: white; font-weight: bold; font-size: 14px;
 	border: 2px solid rgba(255, 255, 255, 0.3)}
   .save-status { font-size: 12px;
 	color: #ccc; margin-left: 15px;}
   .ai-suggestions { margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1)}
-  .ai-suggestions h4 { margin: 0, 0 15px 0; color: #4a90e2; font-size: 14px;}
+  .ai-suggestions h4 { margin: 0, 0 15px 0, color: #4a90e2; font-size: 14px;}
   .suggestion-item { display: flex; justify-content: space-between; /* Fixed: typo: 'space-betweenn' */ align-items: flex-start;
-	gap: 10px; padding: 10px;
+	gap: 10px, padding: 10px;
 	background: rgba(74, 144, 226, 0.1); border-radius: 4px; margin-bottom: 10px;}
   .suggestion-text { flex: 1; font-size: 12px; line-height: 1.4;}
-  .apply-btn { background: rgba(74, 144, 226, 0.6); border: none;color: white;
+  .apply-btn { background: rgba(74, 144, 226, 0.6), border: none;color: white;
 	padding: 4px 8px; border-radius: 3px; font-size: 10px;
 	cursor: pointer; white-space: nowrap;}
   .apply-btn:hover { background: rgba(74, 144, 226, 0.8)}

@@ -61,7 +61,7 @@ export interface GlyphResponse {
  * GPU Tensor Cache for hot tensor storage
  */
 class GPUTensorCache {
-    private cache = new Map<string, { data: Buffer; manifest: TensorManifest; last_access: number; device_ptr?: string }>();
+    private cache = new Map<string, { data: Buffer, manifest: TensorManifest; last_access: number; device_ptr?: string }>();
     private maxCacheSize = 2 * 1024 * 1024 * 1024; // 2GB VRAM cache
     private currentSize = 0;
 
@@ -183,7 +183,7 @@ class PNGTensorEmbedder {
     // Embed tensors into PNG custom chunks with neural sprite support
     static embedTensorsInPNG(
         originalPNG: Buffer,
-        tensors: Array<{ id: string; manifest: TensorManifest; data: Buffer }>,
+        tensors: Array<{ id: string, manifest: TensorManifest; data: Buffer }>,
         neuralSpriteData?: any
     ): Buffer {
         // This would use png-chunks-extract/encode in production

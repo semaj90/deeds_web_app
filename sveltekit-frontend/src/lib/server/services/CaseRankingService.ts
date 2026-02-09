@@ -823,7 +823,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
      * Determine risk level based on score
      */
     private determineRiskLevel(score: number, thresholds: {
-	low: number; medium: number;
+	low: number, medium: number;
 	high: number }): 'low' | 'medium' | 'high' | 'critical' {
         if (score >= thresholds.high) return 'critical';
         if (score >= thresholds.medium) return 'high';

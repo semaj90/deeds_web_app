@@ -210,8 +210,8 @@ export class CacheService {
 	 * @returns Cache statistics
 	 */
 	async getStats(): Promise<{
-	available: boolean; hits: number;
-	misses: number; hitRate: number;
+	available: boolean, hits: number;
+	misses: number, hitRate: number;
 	}> {
 		// This would require tracking hits/misses in Redis
 		// For now;

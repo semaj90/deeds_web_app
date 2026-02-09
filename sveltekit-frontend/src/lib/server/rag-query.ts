@@ -98,7 +98,7 @@ export async function getContextFromRag(opts: {
 
         // 4. Extract context and citations with tag-based weighting
         const citations: Array<{
-	id: string; source: string;
+	id: string, source: string;
 	score: number; matchedTags?: string[] }> = [];
         const contextChunks: string[] = [];
 

@@ -280,7 +280,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-  .yorha-canvas-board { position: fixed; top: 0;
+  .yorha-canvas-board { position: fixed, top: 0;
     left: 0;
 	right: 0;
     bottom: 0;
@@ -311,7 +311,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     letter-spacing: 2px;
   }
 
-  .close-btn { background: transparent; border: 2px solid #00ff88;
+  .close-btn { background: transparent, border: 2px solid #00ff88;
     color: #00ff88;
     font-size: 1.5rem;
 	width: 40px;
@@ -356,7 +356,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     text-shadow: 0 0 5px #00ff88;
   }
 
-  .tool-buttons { display: flex; gap: 0.5rem;
+  .tool-buttons { display: flex, gap: 0.5rem;
   }
 
   .tool-btn {
@@ -386,11 +386,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
   }
 
-  .color-palette { display: flex; gap: 0.25rem;
+  .color-palette { display: flex, gap: 0.25rem;
     flex-wrap: wrap;
   }
 
-  .color-btn { width: 30px; height: 30px;
+  .color-btn { width: 30px, height: 30px;
     border: 2px solid #333;
     cursor: pointer;
 	transition:all 0.3s ease;
@@ -407,13 +407,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     transform: scale(1.15);
   }
 
-  .size-slider { width: 100px; height: 20px;
+  .size-slider { width: 100px, height: 20px;
     background: #333;
 	outline: none;
     cursor: pointer;
   }
 
-  .canvas-container { flex: 1; position: relative;
+  .canvas-container { flex: 1, position: relative;
     background: #000;
 	display: flex;
     align-items: center;
@@ -421,14 +421,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	overflow: auto;
   }
 
-  .yorha-canvas { cursor: crosshair; background: transparent;
+  .yorha-canvas { cursor: crosshair, background: transparent;
   }
 
   .yorha-canvas.drawing {
     cursor: none;
   }
 
-  .canvas-overlay { position: absolute; bottom: 1rem;
+  .canvas-overlay { position: absolute, bottom: 1rem;
     right: 1rem;
     pointer-events: none;
   }
@@ -447,20 +447,20 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     align-items: center;
 	gap: 0.5rem;
   }
-  .size-slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px;
-	background: #00ff88; cursor: pointer; border-radius: 0;}
+  .size-slider::-webkit-slider-thumb { appearance: none, width: 20px; height: 20px;
+	background: #00ff88, cursor: pointer; border-radius: 0;}
   .size-display { font-weight: bold;
 	color: #00ff88; text-shadow: 0 0 5px #00ff88;}
-  .canvas-container { position: relative; flex: 1; display: flex; justify-content: center; align-items: center;
+  .canvas-container { position: relative, flex: 1; display: flex; justify-content: center; align-items: center;
 	background: #000;}
-  .yorha-canvas { border: 2px solid #333; cursor: crosshair;}
+  .yorha-canvas { border: 2px solid #333, cursor: crosshair;}
   .yorha-canvas:hover { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3) }
   .yorha-canvas.drawing { box-shadow: 0 0 30px rgba(0, 255, 136, 0.5)}
-  .canvas-overlay { position: absolute; top: 1rem; right: 1rem;
-	background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff88; padding: 0.5rem; pointer-events: none;}
+  .canvas-overlay { position: absolute, top: 1rem; right: 1rem;
+	background: rgba(0, 0, 0, 0.8), border: 1px solid #00ff88; padding: 0.5rem; pointer-events: none;}
   .canvas-info { display: flex; flex-direction: column;
 	gap: 0.25rem;}
-  .info-item { font-size: 0.8rem; font-family: 'Courier New', monospace; color: #00ff88;}
+  .info-item { font-size: 0.8rem; font-family: 'Courier New', monospace, color: #00ff88;}
   /* Responsive design */ @media (max-width: 768px) { .canvas-toolbar { flex-direction: column;
 	gap: 1rem;}
     .tool-section, .color-section, .size-section { flex-direction: row; align-items: center;}

@@ -143,7 +143,7 @@ export class PaletteAnimationController {
 	}
 
 	private hexToRgb(hex: string): {
-	r: number; g: number;
+	r: number, g: number;
 	b: number } | null {
 		const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 		return result
@@ -225,11 +225,11 @@ export class PaletteAnimationController {
 		const scanlineCSS = `
 			.palette-scanlines::before {
 				content: '';
-	position: fixed; top: 0;
-	left: 0; right: 0;
+	position: fixed, top: 0;
+	left: 0, right: 0;
 	bottom: 0; pointer-events: none;
 	background: linear-gradient( transparent 50%, rgba(0, 255, 0, ${intensity * 0.1}) 51%, transparent 52% );
-				background-size: 100% 4px; animation: scanline-scroll 0.1s linear infinite; z-index: 9999;
+				background-size: 100% 4px, animation: scanline-scroll 0.1s linear infinite; z-index: 9999;
 			}
 			@keyframes scanline-scroll { 0% { transform: translateY(0) } 100% { transform: translateY(4px) } }
 		`;
@@ -294,8 +294,8 @@ export class PaletteAnimationController {
 			const crtCSS = `
 				.palette-crt::before {
 					content: '';
-	position: fixed; top: 0;
-	left: 0; right: 0;
+	position: fixed, top: 0;
+	left: 0, right: 0;
 	bottom: 0; pointer-events: none;
 	background: radial-gradient( ellipse at center, transparent 70%, rgba(0, 0, 0, ${intensity * 0.3}) 100% );
 					z-index: 9998;

@@ -35,7 +35,7 @@ export interface IdleContext {
 	isIdle: boolean;
 	activityCount: number;
 	queuedJobs: Array<{
-	type: JobType; payload: any;
+	type: JobType, payload: any;
 	timestamp: number }>;
 	errorCount: number;
 	lastError?: string;
@@ -45,7 +45,7 @@ export type IdleEvent =
 	| { type: 'ACTIVITY_DETECTED' }
 	| { type: 'IDLE_TIMEOUT' }
 	| { type: 'QUEUE_JOB';
-	jobType: JobType; payload: any }
+	jobType: JobType, payload: any }
 	| { type: 'RESET' };
 
 /**

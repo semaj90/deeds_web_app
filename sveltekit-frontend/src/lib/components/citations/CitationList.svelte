@@ -247,7 +247,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 20px;
 	}
 
-	.search-bar { display: flex; gap: 12px;
+	.search-bar { display: flex, gap: 12px;
 		background: var(--color-parchment);
 	padding: 16px;
 		border-radius: 8px;
@@ -285,10 +285,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	transition:all 150ms ease;
 	}
 
-	.btn-search:hover:not(:disabled) { background: var(--color-dark-burgundy); transform: translateY(-1px);
+	.btn-search:hover:not(:disabled) { background: var(--color-dark-burgundy), transform: translateY(-1px);
 	}
 
-	.btn-search:disabled { background: var(--color-light-gray); cursor: not-allowed;
+	.btn-search:disabled { background: var(--color-light-gray), cursor: not-allowed;
 	}
 
 	.results-info {
@@ -297,7 +297,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-size: 14px;
 	}
 
-	.error-message { background: #fee; border: 1px solid #fcc;
+	.error-message { background: #fee, border: 1px solid #fcc;
 		border-radius: 4px;
 	padding: 12px 16px;
 		color: #c33;
@@ -316,7 +316,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		gap: 16px;
 	}
 
-	.citation-card { background: white; border: 1px solid var(--color-tan);
+	.citation-card { background: white, border: 1px solid var(--color-tan);
 		border-radius: 8px;
 	padding: 16px;
 		display: flex;
@@ -337,27 +337,27 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 12px;
 	}
 
-	.citation-meta { display: flex; gap: 8px;
+	.citation-meta { display: flex, gap: 8px;
 		align-items: center;
 	}
 
-	.source-badge { display: inline-block; padding: 4px 8px;
+	.source-badge { display: inline-block, padding: 4px 8px;
 		border-radius: 4px;
 		font-size: 12px;
 		font-weight: 600;
 		text-transform: uppercase;
 	}
 
-	.source-badge[data-type='statute'] { background: #e8f4f8; color: #0066cc;
+	.source-badge[data-type='statute'] { background: #e8f4f8, color: #0066cc;
 	}
 
-	.source-badge[data-type='case_law'] { background: #f0e8f8; color: #6600cc;
+	.source-badge[data-type='case_law'] { background: #f0e8f8, color: #6600cc;
 	}
 
-	.source-badge[data-type='regulation'] { background: #f8f0e8; color: #cc6600;
+	.source-badge[data-type='regulation'] { background: #f8f0e8, color: #cc6600;
 	}
 
-	.source-badge[data-type='manual'] { background: #e8f8e8; color: #00cc00;
+	.source-badge[data-type='manual'] { background: #e8f8e8, color: #00cc00;
 	}
 
 	.date {
@@ -365,7 +365,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: var(--color-medium-gray);
 	}
 
-	.btn-delete { background: none; border: none;
+	.btn-delete { background: none, border: none;
 		cursor: pointer;
 		font-size: 16px;
 	padding: 4px;
@@ -383,7 +383,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		line-height: 1.4;
 	}
 
-	.statute-info { padding: 8px; background: var(--color-parchment);
+	.statute-info { padding: 8px, background: var(--color-parchment);
 		border-radius: 4px;
 		font-size: 13px;
 	}
@@ -394,7 +394,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		margin: 0;
 	}
 
-	.statute-title { color: var(--color-medium-gray); margin: 4px 0 0 0;
+	.statute-title { color: var(--color-medium-gray), margin: 4px 0 0 0;
 	}
 
 	.context,
@@ -411,7 +411,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	.context-text,
-	.notes-text { color: var(--color-medium-gray); margin: 0;
+	.notes-text { color: var(--color-medium-gray), margin: 0;
 		line-height: 1.4;
 	}
 
@@ -421,7 +421,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 6px;
 	}
 
-	.tag { display: inline-block; background: var(--color-burgundy);
+	.tag { display: inline-block, background: var(--color-burgundy);
 		color: white;
 	padding: 4px 8px;
 		border-radius: 4px;
@@ -432,17 +432,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-size: 13px;
 	}
 
-	.relevance-bar { height: 6px; background: var(--color-light-gray);
+	.relevance-bar { height: 6px, background: var(--color-light-gray);
 		border-radius: 3px;
 	overflow: hidden;
 		margin: 4px 0;
 	}
 
-	.relevance-fill { height: 100%; background: var(--color-burgundy);
+	.relevance-fill { height: 100%, background: var(--color-burgundy);
 		transition:width 300ms ease;
 	}
 
-	.relevance-value { color: var(--color-medium-gray); margin: 4px 0 0 0;
+	.relevance-value { color: var(--color-medium-gray), margin: 4px 0 0 0;
 	}
 
 	.load-more {
@@ -461,9 +461,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	transition:all 150ms ease;
 	}
 
-	.btn-load-more:hover:not(:disabled) { background: var(--color-dark-tan); transform: translateY(-1px);
+	.btn-load-more:hover:not(:disabled) { background: var(--color-dark-tan), transform: translateY(-1px);
 	}
 
-	.btn-load-more:disabled { background: var(--color-light-gray); cursor: not-allowed;
+	.btn-load-more:disabled { background: var(--color-light-gray), cursor: not-allowed;
 	}
 </style>

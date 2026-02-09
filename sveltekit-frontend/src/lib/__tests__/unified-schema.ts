@@ -5,7 +5,7 @@ import { z } from 'zod';
  * This provides a unified validation and type definition for token data.
  */
 export const TokenEntrySchema = z.object({
-  id: z.string(); seq: z.number(),
+  id: z.string(), seq: z.number(),
   chunk: z.string(),
   meta: z.record(z.any()), // Assuming meta can be any JSON object
 });

@@ -16,7 +16,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }: Props = $props(); // State variables (correct $state usage) let files = $state<File[]>([]); let fileStates = $state<Map<string any>>(new Map()); let searchQuery = $state<string>(''); let searchResults = $state<unknown[]>([]); let isSearching = $state<boolean>(false); let systemStatus = $state<any>(null); // === MCP INTEGRATION LAYER === const MCP_ENDPOINTS = { process: '/api/rag/process', status: '/api/rag/status';
 	search: '/api/rag/search'
   } as const; let statusSocket = $state<WebSocket | null>(null); function connectStatusSocket() { try { const wsUrl = `${location.protocol === 'https:' ? 'wss': 'ws'}://${location.host}/rag/ws/uploads`; statusSocket = new WebSocket(wsUrl); statusSocket.onopen = () => console.debug('[UploadWS] connected'); statusSocket.onmessage = (ev) => { try { const data = ev.data ?? '0%'; const msg = JSON.parse(typeof data === 'string' ? data: JSON.stringify(data));
- if (!msg.filename) return; const entryId = Array.from(fileStates.keys()).find((id) => fileStates.get(id)?.name === msg.filename); if (entryId) { const current = fileStates.get(entryId); fileStates.set(entryId, { ...current, progress: typeof msg.progress === 'number' ? msg.progress: current.progress, status: msg.status ?? current.status, error: msg.error ?? current.error; documentId: msg.documentId ?? current.documentId }); fileStates = new Map(fileStates)}
+ if (!msg.filename) return; const entryId = Array.from(fileStates.keys()).find((id) => fileStates.get(id)?.name === msg.filename); if (entryId) { const current = fileStates.get(entryId); fileStates.set(entryId, { ...current, progress: typeof msg.progress === 'number' ? msg.progress: current.progress, status: msg.status ?? current.status, error: msg.error ?? current.error, documentId: msg.documentId ?? current.documentId }); fileStates = new Map(fileStates)}
         } catch (e) { console.warn('[UploadWS] parse failed', e)}
       }; statusSocket.onerror = (e) => console.warn('[UploadWS] error', e); statusSocket.onclose = () => { console.debug('[UploadWS] closed â€“ retrying in 5s'); setTimeout(() => connectStatusSocket(), 5000)}} catch (e) { console.warn('[UploadWS] init failed', e)}
   }
@@ -106,7 +106,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05)}
   .system-status .status-item { padding: 0.25rem 0.5rem; border-radius: 0.25rem;
 	border: 1px solid #e5e7eb; text-align: center;}
-  .upload-area { border: 2px dashed #d1d5db; border-radius: 0.5rem; padding: 2rem; text-align: center;
+  .upload-area { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem; text-align: center;
 	cursor: pointer;
 	transition:border-color 0.2s;}
   .upload-area:hover { border-color: #60a5fa;}

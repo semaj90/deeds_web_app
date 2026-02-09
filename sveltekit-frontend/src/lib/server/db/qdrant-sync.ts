@@ -96,7 +96,7 @@ async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
 						postgres_id: doc.id,
 						title: doc.title,
 						type: doc.metadata?.type ?? 'unknown',
-						source: doc.metadata?.source ?? 'unknown'; tags: doc.metadata?.tags ?? [],
+						source: doc.metadata?.source ?? 'unknown', tags: doc.metadata?.tags ?? [],
 						importance: doc.metadata?.importance ?? 0.5,
 						blob_url: doc.blob_url ?? null,
 						synced_at: new Date().toISOString()

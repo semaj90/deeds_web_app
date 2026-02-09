@@ -67,7 +67,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         if (e.key === 'Escape') close()}}
       style={`position: absolute top: 100%; z-index: 60, ${menuPosition}`}
       transition:fly={{
-	y: -6; duration: 140 }}
+	y: -6, duration: 140 }}
     >
       <!-- default slot used for, menu, items -->
       <slot></slot>
@@ -82,7 +82,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     align-items: center;}
   .dropdown-menu { background: var(--dropdown-bg, #fff);
     border-radius: 0.5rem;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08); padding: 0.35rem
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08), padding: 0.35rem
    ; border: 1px solid #e6edf3;
     min-width: 12rem;}
 </style>

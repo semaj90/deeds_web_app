@@ -1,9 +1,9 @@
 /** * Vertex Buffer Image Analyzer - GPU-Accelerated Image Processing * Extracts vertex buffers, geometry data, and performs GPU-accelerated analysis * Integrates with CUDA services and WebGPU for high-performance image processing */ import type { performance } from 'perf_hooks'; // === Vertex Buffer Types === export interface VertexData { positions: Float32Array // x, y, z normals: Float32Array // Normal vectors: Float32Array // RGB(A) color uvCoordinates: Float32Array // coordinates: indices | Uint32Array // Vertex indices for triangulation };
 export interface GeometryFeatures { boundingBox: {
-	min: { x: number; y: number, z: number }max: {
-	x: number; y: number, z: number } } } centroid: {
+	min: { x: number, y: number, z: number }max: {
+	x: number, y: number, z: number } } } centroid: {
 	x: number, y: number, z: number }surfaceArea: number, volume: number, complexity: number // Number of vertices / faces: symmetry | number // 0-1 symmetry score }
-export interface ImageAnalysisResult { vertexBuffers: VertexData; geometryFeatures: GeometryFeatures, embedding: Float32Array, metadata: {
+export interface ImageAnalysisResult { vertexBuffers: VertexData, geometryFeatures: GeometryFeatures, embedding: Float32Array, metadata: {
 	processingTimeMs: number, vertexCount: number, faceCount: number, compressionRatio: number, qualityScore: number, detectedObjects: string[]} webGPUTextures?: {
 	albedo: GPUTexture, normal: GPUTexture, roughness: GPUTexture} }export interface CUDAProcessingOptions { enableCUDAAcceleration: boolean; useFlashAttention: boolean, batchSize: number, precision: 'fp16' | 'fp32' | 'int8',optimizeForRTX3060Ti: boolean};
 // REMOVED: export interface WebGPUConfig { device: null queue, GPUCommandEncoder | shaderModules: Map<string, GPUShaderModule>, computePipelines: Map<string, GPUComputePipeline>}

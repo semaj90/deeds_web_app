@@ -1,7 +1,7 @@
 import { ServiceError } from './service-error.js';
 
 export function mapErrorToHttp(err: any): {
-	status: number; body: {
+	status: number, body: {
 	error: string; code?: string } } {
     if (err instanceof ServiceError) {
         switch (err.code) {

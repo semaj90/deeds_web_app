@@ -32,7 +32,7 @@ async function extractFromDocument(
   model: string,
   timeout: number
 ): Promise<{
-	entities: ExtractedEntity[]; relations: ExtractedRelation[] }> {
+	entities: ExtractedEntity[], relations: ExtractedRelation[] }> {
   // Try LangExtract first
   try {
     const controller = new AbortController();

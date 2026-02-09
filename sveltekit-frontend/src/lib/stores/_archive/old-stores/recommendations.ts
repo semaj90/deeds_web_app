@@ -79,7 +79,7 @@ export interface RecommendationState {
  isAnalyzing: boolean;
 	lastAnalysisTime: number | null;
  aiModelsStatus: {
-	nvidia_llama: boolean; gemma3_legal: boolean;
+	nvidia_llama: boolean, gemma3_legal: boolean;
 	recommendation_engine: boolean };
  // Performance
  analyticsLatency: number;

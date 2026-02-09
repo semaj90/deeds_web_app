@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <script lang="ts">
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported interface Props { isOpen?: any,caseId: string | undefined ,evidenceId: string | undefined ; onAnalysisComplete: (analysis: any) }
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported interface Props { isOpen?: any,caseId: string | undefined ,evidenceId: string | undefined , onAnalysisComplete: (analysis: any) }
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   let { isOpen = false, caseId = undefined, evidenceId = undefined, onAnalysisComplete = > void = () => } = $props(); // Migrated to $effect import { writable } from 'svelte/store'; import  Dialog  from "$lib/components/Dialog.svelte"; interface LegalAnalysis { sessionId: string

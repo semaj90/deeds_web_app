@@ -1,7 +1,7 @@
 <script lang="ts">
- let { caseId, initialContext } = $props<{ caseId: string; initialContext: string }>();
+ let { caseId, initialContext } = $props<{ caseId: string, initialContext: string }>();
 
-	let messages = $state<{ sender: 'user' | 'ai'; text: string }[]>([]);
+	let messages = $state<{ sender: 'user' | 'ai', text: string }[]>([]);
 
 	$effect(() => {
 		messages = [{

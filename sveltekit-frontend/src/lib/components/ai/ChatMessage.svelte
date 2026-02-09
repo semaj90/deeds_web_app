@@ -31,11 +31,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     if (!message?.content) return
     navigator.clipboard.writeText(message.content).then(
       () => {
-        (notifications as unknown)?.add?.({ type: 'success'; title: 'Copied',
+        (notifications as unknown)?.add?.({ type: 'success', title: 'Copied',
           message: 'Message copied to clipboard'
         })},
 	() => {
-        (notifications as unknown)?.add?.({ type: 'error'; title: 'Copy failed',
+        (notifications as unknown)?.add?.({ type: 'error', title: 'Copy failed',
           message: 'Could not copy message'
         })}
     )}
@@ -165,7 +165,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   :global(.message-content li) {
     margin-bottom: 0.25rem;}
   :global(.message-content code) {
-    background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem;
+    background: rgba(0, 0, 0, 0.1), padding: 0.125rem 0.25rem;
     border-radius: 0.25rem
     font-family: 'Courier New', monospace;
     font-size: 0.875em;}

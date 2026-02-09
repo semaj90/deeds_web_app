@@ -45,7 +45,7 @@ export interface DocumentChunk {
  id: string;
 	content: string;
  metadata: {
-	chunkIndex: number; startPosition: number;
+	chunkIndex: number, startPosition: number;
 	endPosition: number; wordCount: number };
 }
 export interface EmbeddingResult {

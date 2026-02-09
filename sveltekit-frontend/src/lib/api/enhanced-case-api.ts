@@ -234,7 +234,7 @@ export class EnhancedCaseAPI {
             priority?: string[];
             includeClusterData?: boolean;
         } = {}
-    ): Promise<APIResponse<{ daily: Array<any>; weekly: Array<any> }>> {
+    ): Promise<APIResponse<{ daily: Array<any>, weekly: Array<any> }>> {
         const searchParams = new URLSearchParams();
         if (params.dateRange) {
             searchParams.append('dateStart', params.dateRange.start);
@@ -260,7 +260,7 @@ export class EnhancedCaseAPI {
         algorithm?: 'kmeans' | 'som' | 'hierarchical';
         k?: number;
         includeEmbeddings?: boolean;
-    }): Promise<APIResponse<{ clusters: Array<any>; silhouetteScore: number; totalCases: number }>> {
+    }): Promise<APIResponse<{ clusters: Array<any>, silhouetteScore: number; totalCases: number }>> {
         return restClient.post('/cases/cluster', {
             ...params,
             algorithm: params?.algorithm ?? 'kmeans',

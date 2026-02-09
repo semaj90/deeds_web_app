@@ -98,7 +98,7 @@ class MockQdrantClient {
 		filter?: Record<string, any>;
 		scoreThreshold?: number;
 	}): Promise<Array<{
-	id: string | number; score: number;
+	id: string | number, score: number;
 	payload: Record<string, any> }>> {
 		if (!this.collections.has(collectionName)) {
 			return [];
@@ -397,7 +397,7 @@ class MockPostgreSQLClient {
 	 * Execute SQL query
 	 */
 	async query(sql: string, params?: any[]): Promise<{
-	rows: any[]; rowCount: number }> {
+	rows: any[], rowCount: number }> {
 		// Simple mock - just return empty results
 		// In real tests, you'd parse SQL and return appropriate data
 		const rows: any[] = [];
@@ -487,9 +487,9 @@ class MockMinIOClient {
 	 * List objects in bucket
 	 */
 	async listObjects(bucket: string, prefix?: string): Promise<Array<{
-	name: string; size: number }>> {
+	name: string, size: number }>> {
 		const results: Array<{
-	name: string; size: number }> = [];
+	name: string, size: number }> = [];
 
 		for (const [objectKey, object] of this.objects.entries()) {
 			if (object.bucket !== bucket) continue;

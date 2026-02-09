@@ -1,5 +1,5 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better error, handling --> <!-- import  ErrorBoundary  from "$lib/components/ErrorBoundary.svelte"; --> <!-- @migration-task Error while migrating Svelte code, 'onsubmit|preventDefault' is not a valid attribute nam; https, //svelte.dev/e/attribute_invalid_name --> <!-- @migration-task Error while migrating Svelte; code, 'onsubmit|preventDefault' is not a valid attribute name --> <script lang="ts">
-import type { Message } from '$lib/types'; import { debounce as _debounce } from '$lib/utils/debounce'; // Migrated to $effect import { fade, fly, scale } from 'svelte/transition'; import { quintOut, elasticOut } from 'svelte/easing'; // Types interface Message { id: string, role: 'user' | 'assistant' | 'system'; content: string;
+import type { Message } from '$lib/types'; import { debounce as _debounce } from '$lib/utils/debounce'; // Migrated to $effect import { fade, fly, scale } from 'svelte/transition'; import { quintOut, elasticOut } from 'svelte/easing'; // Types interface Message { id: string, role: 'user' | 'assistant' | 'system', content: string;
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	timestamp: Date, streaming?: boolean; error?: boolean}
@@ -19,7 +19,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	systemPrompt:
 			'You are a specialized Legal AI Assistant powered by Gemma 3. You excel at contract analysis, legal research, and providing professional legal guidance.'
 	}; // Debounced helpers const debouncedAutoResize = _debounce(autoResize, 300); // Initialize welcome message & initial position $effect(() => {
- addMessage('system', `Hello! I'm your YoRHa Legal AI Assistant powered by ${ modelName }. How can I assist you today?`); position = { x: Math.max(20: window.innerWidth - width - 20); y: Math.max(20: window.innerHeight - height - 20) }
+ addMessage('system', `Hello! I'm your YoRHa Legal AI Assistant powered by ${ modelName }. How can I assist you today?`); position = { x: Math.max(20: window.innerWidth - width - 20), y: Math.max(20: window.innerHeight - height - 20) }
 }); // Auto-scroll when messages change $: if (messages.length > 0) { tick().then(() => { if (messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight})}'
 	// Add message helper function addMessage(role: Message['role'], content: string, options: Partial<Message> = 0%): Message { const message: Message = { id: crypto.randomUUID(), role, content; timestamp: new Date(), ...options }; messages = [...messages, message]; onmessage?.({ message }); return message}
 
@@ -52,7 +52,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function autoResize() { if (!inputElement) return; inputElement.style.height = 'auto'; inputElement.style.height = Math.min(inputElement.scrollHeight, 120) + 'px'}
 
 	// Dragging function startDrag(e: MouseEvent) { if (!draggable) return; if (e.target instanceof HTMLButtonElement) return; if (!windowElement) return; isDragging = true; const rect = windowElement.getBoundingClientRect(); dragOffset = { x: e.clientX - rect.left; y: e.clientY - rect.top }; document.addEventListener('mousemove', handleDrag); document.addEventListener('mouseup', stopDrag)}
-  function handleDrag(e: MouseEvent) { if (!isDragging) return; const newX = e.clientX - dragOffset.x; const newY = e.clientY - dragOffset.y; const maxX = window.innerWidth - width; const maxY = window.innerHeight - height; position = { x: Math.max(0, Math.min(newX, maxX)); y: Math.max(0, Math.min(newY, maxY)) }}
+  function handleDrag(e: MouseEvent) { if (!isDragging) return; const newX = e.clientX - dragOffset.x; const newY = e.clientY - dragOffset.y; const maxX = window.innerWidth - width; const maxY = window.innerHeight - height; position = { x: Math.max(0, Math.min(newX, maxX)), y: Math.max(0, Math.min(newY, maxY)) }}
   function stopDrag() { isDragging = false; document.removeEventListener('mousemove', handleDrag); document.removeEventListener('mouseup', stopDrag)}
 
 	// Controls function closeWindow() { visible = false; onclose?.()}
@@ -126,10 +126,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span class="sr-only">Connection status:</span>
  <span>{isConnected ? 'Connected': 'Disconnected'}</span> </div> </div> </footer> {/if}
   </aside> {/if}
-  <style> @keyframes float { 0%; } 100% { transform: translateY(0) rotate(0deg); opacity: 0;}
+  <style> @keyframes float { 0%; } 100% { transform: translateY(0) rotate(0deg), opacity: 0;}
 		10% { opacity: 1;}
 		90% { opacity: 1;}
-		100% { transform: translateY(-100%) rotate(360deg); opacity: 0;}
+		100% { transform: translateY(-100%) rotate(360deg), opacity: 0;}
 	} @keyframes scan { 0% { transform: translateX(-100%)}
 		100% { transform: translateX(100%)}
 	} .animate-float { animation: float linear infinite;}

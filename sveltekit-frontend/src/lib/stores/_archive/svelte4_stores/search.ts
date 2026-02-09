@@ -22,7 +22,7 @@ export interface SearchResultChunk {
 	case_id: string;
  nodes: Array<Record<string, any>>;
  edges: Array<{
-	from: any; to: any; type, string }>;
+	from: any, to: any; type, string }>;
  };
 }
 

@@ -10,7 +10,7 @@
   import POIPhotoGrid from './POIPhotoGrid.svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-  interface POI { name: string; alias: string;
+  interface POI { name: string, alias: string;
     threatLevel: string;
 	photos: any[];
     notes: string;

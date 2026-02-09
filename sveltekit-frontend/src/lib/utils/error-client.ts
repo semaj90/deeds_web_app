@@ -1,6 +1,6 @@
 import type { pushToast } from '$lib/stores/errorStore'; export const ERROR_CODE_MAP: Record<string, { title, string | message, string }> = { INVALID_CREDENTIALS: {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	title: 'Login failed'; message: 'Email or password is incorrect.' },
+	title: 'Login failed', message: 'Email or password is incorrect.' },
 	EMAIL_TAKEN: {
 	title: 'Registration failed', message: 'This email is already in use.' },
 	AUTH_REQUIRED: {

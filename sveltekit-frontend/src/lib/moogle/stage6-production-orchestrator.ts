@@ -8,7 +8,7 @@ import { derived, writable, type Writable } from 'svelte/store';
 // import type { UniversalGPURuntime } from '../gpu/universal-runtime.js';
 
 // Mocks to allow compilation
-interface CacheEntry { componentName: string; props: any; }
+interface CacheEntry { componentName: string, props: any; }
 const headlessUICache = {
     get: async (key: string) => null as CacheEntry | null,
     set: async (key: string, value: any) => {}
@@ -112,7 +112,7 @@ class EnhancedBitsUIOrchestrator {
         componentName: string,
         props: { [key: string]: any },
         webgpuAcceleration = true
-    ): Promise<{ rendered: boolean; performance: ComponentPerformance }> {
+    ): Promise<{ rendered: boolean, performance: ComponentPerformance }> {
         const startTime = performance.now();
         try {
             // Check cache first
@@ -211,7 +211,7 @@ class BVHAcceleratorOrchestrator {
     async queryNearest(
         queryVector: number[],
         k: number = 10
-    ): Promise<{ results: unknown[]; performance: ComponentPerformance }> {
+    ): Promise<{ results: unknown[], performance: ComponentPerformance }> {
         const startTime = performance.now();
         if (!this.isInitialized) {
             await this.initialize();
@@ -278,7 +278,7 @@ class CyberElephantOrchestrator {
 
     async createDocumentVisualization(
         documents: unknown[]
-    ): Promise<{ created: boolean; performance: ComponentPerformance }> {
+    ): Promise<{ created: boolean, performance: ComponentPerformance }> {
         const startTime = performance.now();
         if (!this.isInitialized) {
             await this.initialize();
@@ -336,9 +336,9 @@ class MultipassCoordinatorOrchestrator {
     }
 
     async extractFromDocument(
-        document: { id: string; content: string },
+        document: { id: string, content: string },
         schema: string[]
-    ): Promise<{ results: unknown[]; performance: ComponentPerformance }> {
+    ): Promise<{ results: unknown[], performance: ComponentPerformance }> {
         const startTime = performance.now();
         if (!this.isHealthy) {
             await this.checkHealth();
@@ -421,7 +421,7 @@ class Neo4jRerankerOrchestrator {
         query: string,
         documents: unknown[],
         userContext: unknown
-    ): Promise<{ results: RerankingResult[]; performance: ComponentPerformance }> {
+    ): Promise<{ results: RerankingResult[], performance: ComponentPerformance }> {
         const startTime = performance.now();
         if (!this.isInitialized) {
             await this.initialize();
@@ -500,7 +500,7 @@ class CHRROMMemoryOrchestrator {
     async compressData(
         data: Uint8Array,
         dataType: 'legal_document' | 'embedding' | 'metadata' = 'legal_document'
-    ): Promise<{ compressed: Uint8Array; ratio: number; performance: ComponentPerformance }> {
+    ): Promise<{ compressed: Uint8Array, ratio: number; performance: ComponentPerformance }> {
         const startTime = performance.now();
         const originalSize = data.length;
         try {
@@ -774,7 +774,7 @@ export class MoogleGraphSynthesizerOrchestrator {
         return this.components.get(componentType)?.status || ComponentStatus.INITIALIZING;
     }
 
-    getSystemHealth(): { healthy: boolean; score: number; issues: string[] } {
+    getSystemHealth(): { healthy: boolean, score: number; issues: string[] } {
         const statuses = Array.from(this.components.values());
         const healthyCount = statuses.filter(c => c.status === ComponentStatus.READY).length;
         const totalCount = statuses.length;

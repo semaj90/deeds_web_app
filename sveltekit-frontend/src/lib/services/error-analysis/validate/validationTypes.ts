@@ -3,7 +3,7 @@ export type ValidationScope = {
  full?: boolean; // run full check
 };
 | { ok: true;
-	tscErrors: number; svelteErrors: number }
+	tscErrors: number, svelteErrors: number }
  | {
  ok: false;
 	code: 'TSC_FAILED' | 'SVELTE_CHECK_FAILED';

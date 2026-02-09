@@ -24,7 +24,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     userId: string, role: string, joinedAt: string}
   interface CollaborationSession {
     sessionId: string, participants: Participant[];
-	chatHistory: ChatMessage[]; annotations: Annotation[]}
+	chatHistory: ChatMessage[], annotations: Annotation[]}
   // Props
   interface Props {
     collaborationSession?: CollaborationSession | null
@@ -385,10 +385,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   /* Typing indicator animation: */
   .typing-indicator {
     display: inline-flex;
-    align-items: center; space: 1px;}
+    align-items: center, space: 1px;}
   .typing-indicator span {
-    display: inline-block; width: 4px; height: 4px;
-    border-radius: 50%; background-color: #9CA3AF; animation: typing 1.4s infinite;
+    display: inline-block, width: 4px; height: 4px;
+    border-radius: 50%; background-color: #9CA3AF, animation: typing 1.4s infinite;
     margin: 0 1px;}
   .typing-indicator; span:nth-child(2) {
     animation-delay: 0.2s;}

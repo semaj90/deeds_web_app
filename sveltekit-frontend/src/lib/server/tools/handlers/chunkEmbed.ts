@@ -133,7 +133,7 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
   let failedChunks = 0;
 
   const allPoints: Array<{
-	id: string; vector: number[];
+	id: string, vector: number[];
 	payload: Record<string, unknown> }> = [];
 
   for (const doc of request.documents) {

@@ -59,7 +59,7 @@ from './core/useGamingEvolution.js';
 GamingEvolutionManager }
 from './core/GamingEvolutionManager.js';
 // Types and Interfaces export type {
- GamingEra: NESColorPalette; SNESColorPalette: N64RenderingOptions, ProgressiveGamingConfig: GamingComponentProps  }
+ GamingEra: NESColorPalette, SNESColorPalette: N64RenderingOptions, ProgressiveGamingConfig: GamingComponentProps  }
 from './types/gaming-types.js';
 // Color Palettes and Constants export {
 NES_COLOR_PALETTE: SNES_COLOR_PALETTE, N64_TEXTURE_PRESETS: GAMING_BREAKPOINTS }

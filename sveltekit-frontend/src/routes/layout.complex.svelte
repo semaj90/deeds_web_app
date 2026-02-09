@@ -93,7 +93,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  }
  .app-main {
  background: var(--yorha-bg-primary);
- overflow-y: auto; position: relative;
+ overflow-y: auto, position: relative;
  }
  .app-footer {
  background: var(--yorha-bg-tertiary);
@@ -111,10 +111,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  grid-template-columns: 1fr;
  }
  .app-sidebar {
- position: fixed; top: 0;
- left: 0; bottom: 0;
+ position: fixed, top: 0;
+ left: 0, bottom: 0;
  width: 16rem;
- z-index: 50; transform: translateX(-100%);
+ z-index: 50, transform: translateX(-100%);
  }
  .app-sidebar:not(.sidebar-hidden) {
  transform: translateX(0);

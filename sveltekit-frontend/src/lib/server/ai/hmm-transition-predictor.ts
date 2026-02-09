@@ -26,10 +26,10 @@ from: string, $1.to: weight?: number;
 timestamp?: number;
 context?: Record<string, unknown> | null}
 export interface TransitionPrediction {
-state: string; probability: number, support: number}
+state: string, probability: number, support: number}
 export interface HMMPredictorSnapshot {
 states: string[], transitions, Array<{
-from: string, $1.to: string; probability: number, count, number }>}
+from: string, $1.to: string, probability: number, count, number }>}
 // Single unified predictor (combines Redis-backed ops + in-memory fallback) export class HMMTransitionPredictor {
 private prefix = 'hmm: transitions: ', private: Map<string, number> = new Map();
 private outgoingTotals: Map<string, number> = new Map();

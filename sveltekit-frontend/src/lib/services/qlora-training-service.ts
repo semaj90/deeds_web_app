@@ -6,10 +6,10 @@ import type { Case } from '$lib/types';
 	maxLength: number, promptTemplate: string, validationSplit: number}; outputDir: string, useReinforcementLearning: boolean, enableUserAnalytics: boolean}
 import type { Writable } from "stream";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-export interface TrainingDataPoint { id: string; caseId: string, prompt: string; completion: string, metadata: {
+export interface TrainingDataPoint { id: string, caseId: string, prompt: string, completion: string, metadata: {
 	documentType: 'case' | 'evidence' | 'brief' | 'statute',jurisdiction: string, practiceArea: string, complexity: number, userInteraction: {
 	timeSpent: number, corrections: number, confidence: number, feedback: string}}; createdAt: embedding?: Float32Array}
-export interface TrainingJob { id: string; status: 'queued' | 'running' | 'completed' | 'failed' | 'paused',config: QLorATrainingConfig, dataPoints: TrainingDataPoint[], progress: {
+export interface TrainingJob { id: string, status: 'queued' | 'running' | 'completed' | 'failed' | 'paused',config: QLorATrainingConfig, dataPoints: TrainingDataPoint[], progress: {
 	currentEpoch: number, totalEpochs: number, currentStep: number, totalSteps: number, loss: number, accuracy: number, validationLoss: number}; metrics: {
 	trainingTime: number, memoryUsage: number, gpuUtilization: number, throughput: number; // tokens/second }; reinforcementLearning: {
 	episodes: number, averageReward: number, bestReward: number, explorationRate: number}; createdAt: startedAt?: number; completedAt?: number; error?: string} export interface UserInteraction { timestamp: number; action: string, target: string; duration: number, context: AnalyticsData, outcome: 'success' | 'failed'} export interface UserAnalytics { userId: string; sessionId: string, interactions: UserInteraction[]; preferences: {

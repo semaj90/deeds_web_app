@@ -250,7 +250,7 @@ export class DualQdrantStrategy {
 	 * Get collection stats
 	 */
 	async getStats(): Promise<{
-	collection768: any; collection256: any }> {
+	collection768: any, collection256: any }> {
 		const [stats768, stats256] = await Promise.all([
 			this.client.getCollection(this.collection768),
 			this.client.getCollection(this.collection256)

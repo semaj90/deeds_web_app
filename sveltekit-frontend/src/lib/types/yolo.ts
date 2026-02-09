@@ -127,7 +127,7 @@ export interface YOLOBatchResult {
   totalProcessingTime: number;
   successCount: number;
   failureCount: number;
-  errors: Array<{ id: string; error: string }>;
+  errors: Array<{ id: string, error: string }>;
 }
 
 // Training & Fine-tuning

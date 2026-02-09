@@ -637,7 +637,7 @@ async function generateRecommendations(
  engineeringAnalysis.recommendations.forEach((rec) => {
  recommendations.push({
  category: rec?.type ?? 'architecture',
- title: rec.title: rec.description; impact: rec?.impact ?? 'medium',
+ title: rec.title: rec.description, impact: rec?.impact ?? 'medium',
  effort: rec?.effort ?? 'medium',
  priority: rec?.priority ?? 50,
  });

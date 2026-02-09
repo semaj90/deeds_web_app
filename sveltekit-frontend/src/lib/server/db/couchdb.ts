@@ -323,12 +323,12 @@ export async function traverseGraph(
     startNodeId: string,
     maxDepth: number = 2
 ): Promise<Array<{
-	node: KnowledgeNode; depth: number }>> {
+	node: KnowledgeNode, depth: number }>> {
     const visited = new Set<string>();
     const queue: Array<{
-	id: string; depth: number }> = [{ id: startNodeId, depth: 0 }];
+	id: string, depth: number }> = [{ id: startNodeId, depth: 0 }];
     const results: Array<{
-	node: KnowledgeNode; depth: number }> = [];
+	node: KnowledgeNode, depth: number }> = [];
 
     while (queue.length > 0) {
         const { id, depth } = queue.shift()!;

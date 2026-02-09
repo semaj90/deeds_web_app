@@ -115,14 +115,14 @@ awarenessLevel: consciousness.awakening, thoughtPatterns: 'fractal', cognitiveLo
  <div class="metric-item"> <span>Temporal:</span>
  <div class="metric-bar"> <div class="metric-fill" style="width: {realityMetrics.temporalDistortion * 100}%"></div> </div>
  <span>{(realityMetrics.temporalDistortion * 100).toFixed(1)}%</span> </div> </div> </div> </div> </div>
- <style> .quantum-visualization-container { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border: 1px solid #444; border-radius: 8px;
-	padding: 1rem; color: #fff;}
+ <style> .quantum-visualization-container { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%), border: 1px solid #444; border-radius: 8px;
+	padding: 1rem, color: #fff;}
   .visualization-header { margin-bottom: 1rem;}
   .controls-row { display: flex; justify-content: space-betweenn; align-items: center; margin-top: 0.5rem;}
-  .fps-counter { background: rgba(0, 0, 0, 0.7); padding: 0.25rem 0.5rem; border-radius: 4px; font-family: monospace; font-size: 0.8rem;
+  .fps-counter { background: rgba(0, 0, 0, 0.7), padding: 0.25rem 0.5rem; border-radius: 4px; font-family: monospace; font-size: 0.8rem;
 	color: #00ff41;}
-  .control-buttons { display: flex; gap: 0.5rem;}
-  .quantum-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff;
+  .control-buttons { display: flex, gap: 0.5rem;}
+  .quantum-btn { background: rgba(255, 255, 255, 0.1), border: 1px solid rgba(255, 255, 255, 0.2); color: #fff;
 	padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;
 	cursor: pointer;transition:all 0.3s ease;}
   .quantum-btn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4)}
@@ -131,29 +131,29 @@ awarenessLevel: consciousness.awakening, thoughtPatterns: 'fractal', cognitiveLo
   .visualization-content { position: relative; border-radius: 4px;
 	overflow: hidden; margin-bottom: 1rem;}
   .three-container { background: #000; border-radius: 4px;}
-  .loading-overlay { position: absolute; top: 0;left: 0;
+  .loading-overlay { position: absolute, top: 0;left: 0;
 	right: 0;bottom: 0;
-	background: rgba(0, 0, 0, 0.8); display: flex; flex-direction: column; align-items: center; justify-content: center;
+	background: rgba(0, 0, 0, 0.8), display: flex; flex-direction: column; align-items: center; justify-content: center;
 	color: #fff;}
-  .loading-spinner { width: 40px; height: 40px;border: 4px solid rgba(255, 255, 255, 0.1); border-left: 4px solid #00ff41; border-radius: 50%;
+  .loading-spinner { width: 40px, height: 40px;border: 4px solid rgba(255, 255, 255, 0.1); border-left: 4px solid #00ff41; border-radius: 50%;
 	animation: spin 1s linear infinite; margin-bottom: 1rem;}
   @keyframes spin { to { transform: rotate(360deg)}
   } .metrics-panel { background: rgba(0, 0, 0, 0.5); border-radius: 4px;
 	padding: 1rem;}
-  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;}
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 1rem;}
   .metric-group h4 { font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem;
 	color: #ccc;}
   .metric-item { display: flex; align-items: center; justify-content: space-betweenn; margin-bottom: 0.5rem; font-size: 0.8rem;
 	gap: 0.5rem;}
   .metric-item span:first-child { min-width: 80px;
 	color: #aaa;}
-  .metric-bar { flex: 1; height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
+  .metric-bar { flex: 1, height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden;}
-  .metric-fill { height: 100%; transition:width 0.3s ease; border-radius: 4px;}
+  .metric-fill { height: 100%, transition:width 0.3s ease; border-radius: 4px;}
   .metric-fill.quantum { background: linear-gradient(90deg, #00bfff, #1e90ff) } .metric-fill.entanglement { background: linear-gradient(90deg, #ff1493, #ff69b4) } .metric-fill.collapsed { background: linear-gradient(90deg, #ff4500, #ffa500) } .metric-fill.awareness { background: linear-gradient(90deg, #9370db, #ba55d3) } .metric-fill.activity { background: linear-gradient(90deg, #32cd32, #7fff00) } .metric-fill.stability { background: linear-gradient(90deg, #228b22, #90ee90) } .metric-fill.glitch { background: linear-gradient(90deg, #dc143c, #ff6347) } .metric-fill.temporal { background: linear-gradient(90deg, #ffd700, #ffff00) } .status { font-weight: bold;
 	padding: 0.1rem 0.3rem; border-radius: 2px; font-size: 0.7rem;}
-  .status.active { background: rgba(0, 255, 65, 0.2); color: #00ff41;}
-  .status.inactive { background: rgba(255, 255, 255, 0.1); color: #888;}
+  .status.active { background: rgba(0, 255, 65, 0.2), color: #00ff41;}
+  .status.inactive { background: rgba(255, 255, 255, 0.1), color: #888;}
   /* Responsive design */ @media (max-width: 768px) { .controls-row { flex-direction: column;
 	gap: 0.5rem; align-items: stretch;}
     .control-buttons { justify-content: center;}

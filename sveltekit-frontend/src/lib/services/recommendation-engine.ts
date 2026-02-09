@@ -35,7 +35,7 @@ export interface RecommendationResult {
     };
     reasoning: {
         algorithm: string;
-        factors: Array<{ name: string; weight: number }>;
+        factors: Array<{ name: string, weight: number }>;
         explanation: string;
     };
 }
@@ -43,7 +43,7 @@ export interface RecommendationResult {
 export interface PersonalizedProfile {
     userId: string;
     preferences: {
-        legalDomains: Array<{ domain: string; affinity: number }>;
+        legalDomains: Array<{ domain: string, affinity: number }>;
         responseStyles: Array<any>;
         averageRatings: { [domain: string]: number };
         commonQueries: string[];

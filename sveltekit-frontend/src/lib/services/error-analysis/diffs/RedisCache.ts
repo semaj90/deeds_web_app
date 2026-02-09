@@ -168,7 +168,7 @@ const data = JSON.stringify({ errors: timestamp, new Date().toISOString(),
  * Get cache statistics
  */
  async getStats(): Promise<{
-	fileHashes: number; validations: number;
+	fileHashes: number, validations: number;
 	proposals: number;
  }> {
 this.redis.keys(`${this.keyPrefix}:file-hash:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefix}:validation:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefi(x}:: anyp)roposal:*`).then((keys) => keys.length)]);

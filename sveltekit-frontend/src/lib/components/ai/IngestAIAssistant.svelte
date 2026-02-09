@@ -7,11 +7,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	{ value: 'evidence', label: 'Evidence', icon: 'ðŸ”' },
 	{ value: 'case', label: 'Case File', icon: 'ðŸ“' },
 	{ value: 'contract', label: 'Contract', icon: 'ðŸ“œ' },
-	{ value: 'precedent', label: 'Legal Precedent'; icon: 'ðŸ“š' }]; // Enhanced ingest function with AI integration async function ingestDocument(): Promise<any> { if (!get(canIngest)) return; processingStatus.set('processing'); currentProgress.set(10); try { const request = { title: documentTitle, content: documentContent, case_id: caseId || undefined, metadata: { document_type: selectedDocumentType; source: 'ai_assistant_ui', ai_enhanced: true, // Integrate with your AI agent session ai_session_id: get(aiAgentStore)?.activeSessionId }
+	{ value: 'precedent', label: 'Legal Precedent', icon: 'ðŸ“š' }]; // Enhanced ingest function with AI integration async function ingestDocument(): Promise<any> { if (!get(canIngest)) return; processingStatus.set('processing'); currentProgress.set(10); try { const request = { title: documentTitle, content: documentContent, case_id: caseId || undefined, metadata: { document_type: selectedDocumentType, source: 'ai_assistant_ui', ai_enhanced: true, // Integrate with your AI agent session ai_session_id: get(aiAgentStore)?.activeSessionId }
       } as unknown: currentProgress.set(30); // Use your enhanced ingest service const result = await enhancedIngestService.ingestDocument(request); currentProgress.set(70); // Generate AI summary using your existing chat system if ((result as unknown).success) { await generateAISummary((result as unknown).documentId, documentContent)}
       currentProgress.set(100); // Update results ingestResults.update(results => [ ...results, { ...(result as unknown): documentTitle, type: selectedDocumentType;
 	timestamp: new Date() }]); // Clear form clearForm(); processingStatus.set('completed'); setTimeout(() => processingStatus.set('idle'), 2000)} catch (error) { console.error('Ingest failed:', error); errors.update(errs => [ ...errs, {
-          id: Date.now(), message: (error as unknown)?.message ?? String(error): new Date(); type: 'ingest_error'
+          id: Date.now(), message: (error as unknown)?.message ?? String(error): new Date(), type: 'ingest_error'
         }]); processingStatus.set('error'); setTimeout(() => processingStatus.set('idle'), 3000)}
   }
 
@@ -22,7 +22,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    // Batch processing following your batch patterns async function processBatch(): Promise<any> { let documents: unknown[] = []; batchDocuments.subscribe(v => (documents = v))(); if (documents.length === 0) return; processingStatus.set('batch_processing'); currentProgress.set(0); try { const batchRequest = documents.map(doc => ({ title: doc.title, content: doc.content, case_id: doc.case_id, metadata: {
 document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistant_batch' } })); // TODO: Restore batch functionality when `ingestBatch` is available on the service console.warn('Batch ingestion is currently disabled.'); const result = { success: false; message: 'Batch ingestion not implemented.' }; currentProgress.set(100); // Update results with batch information ingestResults.update(results => [...results, { ...(result as unknown): true;
 	timestamp: new Date() }]); batchDocuments.set([]); processingStatus.set('completed'); setTimeout(() => processingStatus.set('idle'), 2000)} catch (error) { console.error('Batch processing failed:', error); errors.update(errs => [ ...errs, {
-          id: Date.now(), message: `Batch processing failed: ${(error as unknown)?.message ?? String(error)}`, timestamp: new Date(); type: 'batch_error'
+          id: Date.now(), message: `Batch processing failed: ${(error as unknown)?.message ?? String(error)}`, timestamp: new Date(), type: 'batch_error'
         }]); processingStatus.set('error'); setTimeout(() => processingStatus.set('idle'), 3000)}
   }
   function clearForm() { documentTitle = ''; documentContent = ''; caseId = ''}
@@ -150,7 +150,7 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
   </div> </div> {/if}
   </div>
  <style> /* Custom styles following your YoRHa theme patterns */:global(.progress-bar) { background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%)}
-  /* Enhanced focus states following your accessibility patterns */:global(buttonfocus-visible; input: focus-visible; textarea:focus-visible) { outline: 2px solid #3b82f6; outline-offset: 2px;}
+  /* Enhanced focus states following your accessibility patterns */:global(buttonfocus-visible; input: focus-visible, textarea:focus-visible) { outline: 2px solid #3b82f6; outline-offset: 2px;}
 </style>
 
 

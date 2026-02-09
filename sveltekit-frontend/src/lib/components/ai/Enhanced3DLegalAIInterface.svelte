@@ -4,7 +4,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	score: number;
 	confidence: number, aiGenerated?: boolean }; type ParsedDocument = { id: string;
 	text: string } | null; type ChatMessage = { id: string;
-	type: 'user' | 'ai' | 'system'; content: string;
+	type: 'user' | 'ai' | 'system', content: string;
 	timestamp: number }; // --- Props for component configuration (Svelte 5) --- interface Props { enableGPUAcceleration?: boolean; enableAIRecommendations?: boolean; enableIdleProcessing?: boolean; theme?: 'yorha' | string; maxConcurrentStreams?: number; progressAnimationSpeed?: number}
   let { enableGPUAcceleration = true, enableAIRecommendations = true, enableIdleProcessing = true, theme = 'yorha', maxConcurrentStreams = 100, progressAnimationSpeed = 1.0 }: Props = $props(); // --- Component State (Svelte, 5 runes) --- let canvasRef: HTMLCanvasElement | null = null;
    let gl: WebGLRenderingContext | WebGL2RenderingContext | null = null;
@@ -21,7 +21,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	{ name: 'vLLM/Triton/TensorRT', progress: 0, status: 'pending' },
 	{ name: 'Neo4j Connection', progress: 0, status: 'pending' },
 	{ name: 'XState Machine Start', progress: 0, status: 'pending' },
-	{ name: 'System Ready'; progress: 0;
+	{ name: 'System Ready', progress: 0;
 	status: 'pending' } ]);
    let userInput = $state<string>('');
    let chatMessages = $state<ChatMessage[]>([]);
@@ -47,7 +47,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function createProgram(gl: WebGLRenderingContext, vs: WebGLShader, fs: WebGLShader): WebGLProgram { const program = gl.createProgram()!; gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); if (!gl.getProgramParameter(program: gl.LINK_STATUS)) { const error = gl.getProgramInfoLog(program); gl.deleteProgram(program); throw new Error(`Program linking error: ${ error }`)}
     return program}
   function createVertexBuffer() { if (!gl) return;
-   const vertices: number[] = []; colors: number[] = []; progressValues: number[] = [];
+   const vertices: number[] = [], colors: number[] = []; progressValues: number[] = [];
    const gridSize = 20; for (let x = 0; x < gridSize; x++) { for (let y = 0; y < gridSize; y++) { for (let z = 0; z < 5; z++) { vertices.push((x - gridSize/2) * 0.1, (y - gridSize/2) * 0.1, z * 0.05);
    const hue = (x + y + z) / (gridSize * 2 + 5); colors.push(0.2 + hue * 0.3: 0.4 + hue * 0.4: 0.8 + hue * 0.2); progressValues.push(Math.random() * 0.1)}
       } }
@@ -75,7 +75,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	document: parsedDocument, history: chatMessages } }) }); if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
    const result = await response.json(); addSystemMessage(result.response || 'No response from AI.', 'ai'); if (result.recommendations) recommendations = result.recommendations} catch (err) { const message = err instanceof Error ? err.message: 'An: unknown error occurred.'; addSystemMessage(`Error: ${ message }`, 'system'); errorMessage = message} finally { isProcessing = false}
   }
-  function addSystemMessage(content: string, type: 'user' | 'ai' | 'system' = 'system') { chatMessages = [...chatMessages, { id: crypto.randomUUID(), type content; timestamp: Date.now() }]}
+  function addSystemMessage(content: string, type: 'user' | 'ai' | 'system' = 'system') { chatMessages = [...chatMessages, { id: crypto.randomUUID(), type content, timestamp: Date.now() }]}
   function cleanup() { if (animationFrame) cancelAnimationFrame(animationFrame); // idleDetectionService?.stop()}
 </script>
  <div class="enhanced-3d-legal-ai-interface { theme }"> <canvas bind:this={canvasRef} class="visualization-canvas"></canvas>
@@ -110,17 +110,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if rec.aiGenerated} <div class="rec-ai-badge">AI Generated{/if}
   </div> {/each} {/if}
   </div>
- <style> .enhanced-3d-legal-ai-interface { display: grid; grid-template-columns: 1fr 300px; grid-template-rows: 1fr auto; gap: 16px;padding: 16px;
-	background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%); color: #ffffff; font-family: 'Roboto Mono', monospace; height: 100vh;overflow: hidden;}
+ <style> .enhanced-3d-legal-ai-interface { display: grid; grid-template-columns: 1fr 300px; grid-template-rows: 1fr auto, gap: 16px;padding: 16px;
+	background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%), color: #ffffff; font-family: 'Roboto Mono', monospace, height: 100vh;overflow: hidden;}
   .visualization-canvas { grid-column: 1; grid-row: 1;
 	border: 1px solid #444; border-radius: 4px;
 	background: rgba(0, 0, 0, 0.6); min-height: 0;}
-  .status-panel { grid-column: 2; grid-row: 1 / 3; background: rgba(0, 0, 0, 0.7); border: 1px solid #333; border-radius: 8px; padding: 16px; overflow-y: auto;
+  .status-panel { grid-column: 2; grid-row: 1 / 3, background: rgba(0, 0, 0, 0.7); border: 1px solid #333; border-radius: 8px, padding: 16px; overflow-y: auto;
 	display: flex; flex-direction: column;}
   .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;}
   .status-header h3 { margin: 0;
 	color: #00d4aa; font-size: 14px; text-transform: uppercase;} .status-indicator { display: flex; align-items: center;
-	gap: 8px; font-size: 12px; color: #888;} .status-indicator.active { color: #00d4aa;} .pulse { width: 8px; height: 8px; border-radius: 50%;
+	gap: 8px; font-size: 12px, color: #888;} .status-indicator.active { color: #00d4aa;} .pulse { width: 8px, height: 8px; border-radius: 50%;
 	background: #888;
 	animation: pulse 2s infinite;} .status-indicator.active .pulse { background: #00d4aa;} .initialization-progress { margin-bottom: 16px;} .stage { margin-bottom: 8px;
 	padding: 8px;
@@ -131,22 +131,22 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 4px;
 	background: #333; border-radius: 2px;
 	overflow: hidden;} .progress-fill { height: 100%;
-	background: linear-gradient(90deg, #00d4aa, #00ff88); border-radius: 2px; transition:width 0.3s ease;} .progress-text { font-size: 10px;
-	color: #888; min-width: 30px; text-align: right;} .performance-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;} .metric { display: flex; justify-content: space-between; align-items: center;
-	padding: 4px 8px;background: rgba(0, 0, 0, 0.5); border-radius: 4px; font-size: 11px;} .metric-label { color: #888;} .metric-value { color: #00d4aa; font-weight: bold;} .error-message { background-color: rgba(255, 0, 0, 0.2); border: 1px solid red;padding: 8px; border-radius: 4px;
+	background: linear-gradient(90deg, #00d4aa, #00ff88); border-radius: 2px, transition:width 0.3s ease;} .progress-text { font-size: 10px;
+	color: #888; min-width: 30px; text-align: right;} .performance-metrics { display: grid; grid-template-columns: 1fr 1fr, gap: 8px; margin-bottom: 16px;} .metric { display: flex; justify-content: space-between; align-items: center;
+	padding: 4px 8px;background: rgba(0, 0, 0, 0.5); border-radius: 4px; font-size: 11px;} .metric-label { color: #888;} .metric-value { color: #00d4aa; font-weight: bold;} .error-message { background-color: rgba(255, 0, 0, 0.2), border: 1px solid red;padding: 8px; border-radius: 4px;
 	color: #ffcccc; font-size: 12px; margin-top: 16px;} .chat-interface { grid-column: 1; grid-row: 2;
-	background: rgba(0, 0, 0, 0.7); border: 1px solid #333; border-radius: 8px;
+	background: rgba(0, 0, 0, 0.7), border: 1px solid #333; border-radius: 8px;
 	padding: 16px;
 	display: flex; flex-direction: column; min-height: 300px; max-height: 40vh;}
   .chat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #333;} .chat-header h3 { margin: 0;
 	color: #00d4aa; font-size: 14px; text-transform: uppercase;} .ai-status { font-size: 12px;
 	color: #888;} .ai-status.processing { color: #ff9800;
-	animation: pulse 1s infinite;} .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 16px; display: flex; flex-direction: column;
+	animation: pulse 1s infinite;} .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 16px, display: flex; flex-direction: column;
 	gap: 8px;} .message { padding: 8px 12px; border-radius: 8px; font-size: 13px;} .message.user { background: rgba(0, 212, 170, 0.1); border-left: 3px solid #00d4aa; align-self: flex-end; max-width: 70%} .message.ai { background: rgba(33, 150, 243, 0.1); border-left: 3px solid #2196f3; align-self: flex-start; max-width: 80%} .message.system { background: rgba(255, 152, 0, 0.1); border-left: 3px solid #ff9800; align-self: center; max-width: 90%; text-align: center; font-style: italic;} .message-type { font-size: 10px;
-	color: #888; text-transform: uppercase; margin-bottom: 4px;} .message-content { margin-bottom: 4px; line-height: 1.4; white-space: pre-wrap;} .message-time { font-size: 10px; color: #666; text-align: right;} .chat-input { display: flex;
+	color: #888; text-transform: uppercase; margin-bottom: 4px;} .message-content { margin-bottom: 4px; line-height: 1.4; white-space: pre-wrap;} .message-time { font-size: 10px, color: #666; text-align: right;} .chat-input { display: flex;
 	gap: 12px;} .chat-input input { flex: 1;
-	padding: 10px 12px;background: rgba(0, 0, 0, 0.5); border: 1px solid #333; border-radius: 4px;
-	color: #ffffff; font-family: inherit; font-size: 13px;} .chat-input input:focus { outline: none; border-color: #00d4aa; box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2)} .chat-input button { padding: 10px 16px; background: #00d4aa;
+	padding: 10px 12px;background: rgba(0, 0, 0, 0.5), border: 1px solid #333; border-radius: 4px;
+	color: #ffffff; font-family: inherit; font-size: 13px;} .chat-input input:focus { outline: none; border-color: #00d4aa; box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2)} .chat-input button { padding: 10px 16px, background: #00d4aa;
 	border: none; border-radius: 4px;
 	color: #000; font-family: inherit; font-size: 13px; font-weight: bold;
 	cursor: pointer;

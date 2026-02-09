@@ -16,13 +16,13 @@ import { get } from 'svelte/store';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RedisCacheConfig {
-  url: string; defaultTTL: number; // seconds
+  url: string, defaultTTL: number; // seconds
   keyPrefix: string;
 }
 
 export interface CachedSearchResult {
-  results: SearchResult[]; cachedAt: string;
-	queryHash: string; ttl: number;
+  results: SearchResult[], cachedAt: string;
+	queryHash: string, ttl: number;
 }
 
 const DEFAULT_CONFIG: RedisCacheConfig = {

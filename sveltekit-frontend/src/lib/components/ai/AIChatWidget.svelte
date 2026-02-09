@@ -14,7 +14,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }); // Initialize with context message if provided $effect(() => { try { if (open && context && messages.length === 0) { addSystemMessage()}
     } catch (error) { console.error('Effect error:', error)}
 '
-  }); function addSystemMessage() { if (context) { messages = [ { id: Date.now(), role: 'system', content: `I have context, about: ${context.title || 'Legal Document'}. How can I help you understand or analyze this?`, timestamp: new Date().toISOString(); type: 'context'
+  }); function addSystemMessage() { if (context) { messages = [ { id: Date.now(), role: 'system', content: `I have context, about: ${context.title || 'Legal Document'}. How can I help you understand or analyze this?`, timestamp: new Date().toISOString(), type: 'context'
         }]}
   }
 

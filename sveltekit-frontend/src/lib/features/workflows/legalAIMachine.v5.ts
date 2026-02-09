@@ -77,10 +77,10 @@ export interface LegalAIContext {
 	items: Case[];
     currentCase: Case | null;
     filters: {
-	search: string; status: string;
+	search: string, status: string;
 	priority: string; category: string };
     pagination: {
-	page: number; limit: number;
+	page: number, limit: number;
 	total: number };
     loading: boolean;
 	error: string | null;
@@ -91,7 +91,7 @@ export interface LegalAIContext {
 	lastResponse: AIResponse | null;
     error: string | null;
     models: {
-	primary: string; embedding: string;
+	primary: string, embedding: string;
 	available: string[] };
   };
   system: {
@@ -106,7 +106,7 @@ export interface LegalAIContext {
 	neo4j: boolean;
     };
     metrics: {
-	errorCount: number; performanceScore: number;
+	errorCount: number, performanceScore: number;
 	uptime: number };
   };
 }

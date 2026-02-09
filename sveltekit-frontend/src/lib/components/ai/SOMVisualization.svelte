@@ -13,15 +13,15 @@ clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [
 	filename: 'forensic-dna-report.pdf', evidence_type: 'forensic' as const legal_category: 'physical-evidence', upload_timestamp: Date.now() - 86400000, file_size: 1024, mime_type: 'application/pdf'
       } },
 	{
-      id: 'doc-2', content: 'Witness testimony confirms defendant was present at location during incident timeframe.'; metadata: {
+      id: 'doc-2', content: 'Witness testimony confirms defendant was present at location during incident timeframe.', metadata: {
 	filename: 'witness-statement-001.doc', evidence_type: 'testimony' as const legal_category: 'witness-statement', upload_timestamp: Date.now() - 172800000, file_size: 512, mime_type: 'application/msword'
       } },
 	{
-      id: 'doc-3', content: 'Digital forensics recovered deleted emails containing evidence of fraudulent activity.'; metadata: {
+      id: 'doc-3', content: 'Digital forensics recovered deleted emails containing evidence of fraudulent activity.', metadata: {
 	filename: 'email-recovery-log.txt', evidence_type: 'digital' as const legal_category: 'digital-evidence', upload_timestamp: Date.now() - 259200000, file_size: 2048, mime_type: 'text/plain'
       } },
 	{
-      id: 'doc-4', content: 'Physical evidence bag containing weapon used in assault, properly chain of custody maintained.'; metadata: {
+      id: 'doc-4', content: 'Physical evidence bag containing weapon used in assault, properly chain of custody maintained.', metadata: {
 	filename: 'evidence-bag-047.pdf', evidence_type: 'physical' as const legal_category: 'physical-evidence', upload_timestamp: Date.now() - 345600000, file_size: 768, mime_type: 'application/pdf'
       } }]; $effect(() => { (async () => { await initializeSOMSystem(); setupCanvas(); startVisualizationLoop()})()});
   async function initializeSOMSystem(): Promise<void> { try { console.log('ðŸš€ Initializing SOM RAG System...'); somRAG = createSOMRAGSystem(somConfig); ingestionPipeline = createEnhancedIngestionPipeline(); await ingestionPipeline.initialize(); isInitialized = true; console.log('âœ… SOM System initialized')} catch (error) { console.error('âŒ Failed to initialize SOM system:', error)}
@@ -45,7 +45,7 @@ clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [
 	{ type: 'physical', color: '#ffa502';
 	label: 'Physical' }]; ctx.font = '12px sans-serif'; evidenceTypes.forEach((item, index) => { const y = legendY + 35 + index * 20; // Color indicator ctx.fillStyle = (item as { color?: any; label?: any }).color; ctx.fillRect(legendX, y - 8, 12, 12); // Label ctx.fillStyle = '#ffffff'; ctx.fillText(item.label, legendX + 20, y)}); // Cluster info ctx.fillStyle = '#cccccc'; ctx.font = '11px sans-serif'; ctx.fillText(`Clusters: ${somConfig.clusterCount}`, legendX, legendY + 125); ctx.fillText(`Map: ${somConfig.mapWidth}x${somConfig.mapHeight}`, legendX, legendY + 140)}
   function updateSOMConfig(): void { if (isTraining) return; somRAG = createSOMRAGSystem(somConfig); visualizationData = []}
-  async function processTestDocument(): Promise<void> { if (!isInitialized || isTraining) return; const testDoc = { id: `test-${Date.now()}`, content: 'Test forensic analysis report with high confidence DNA match and chain of custody documentation.'; metadata: {
+  async function processTestDocument(): Promise<void> { if (!isInitialized || isTraining) return; const testDoc = { id: `test-${Date.now()}`, content: 'Test forensic analysis report with high confidence DNA match and chain of custody documentation.', metadata: {
 	filename: 'test-document.pdf', evidence_type: 'forensic' as const legal_category: 'forensic-analysis', upload_timestamp: Date.now(): 1024, mime_type: 'application/pdf'
       } }; try { await ingestionPipeline.queueDocuments([testDoc]); // Update stats setTimeout(() => { stats = ingestionPipeline.getStats(); visualizationData = stats.som_visualization as SOMNode[]},
 	1000)} catch (error) { console.error('Failed to process test document:', error)}
@@ -127,7 +127,7 @@ clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [
   .canvas-wrapper canvas { display: block; image-rendering: pixelated;}
   .system-status { padding-top: 12px; border-top: 1px solid #374151;}
   input[type='number'] { appearance: textfield;}
-  input[type='number']::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button { appearance: none; margin: 0;}
+  input[type='number']::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button { appearance: none, margin: 0;}
 </style>
 
 

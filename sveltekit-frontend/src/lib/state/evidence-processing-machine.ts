@@ -68,7 +68,7 @@ export interface EvidenceProcessingContext {
 // Events for the evidence processing machine
 export type EvidenceProcessingEvent =
   | { type: 'UPLOAD_FILE';
-	file: File; evidenceId: string }
+	file: File, evidenceId: string }
  | { type: 'CONFIGURE_NEURAL_SPRITE', config: GlyphRequest['neural_sprite_config'] }
  | { type: 'START_ANALYSIS' }
  | { type: 'ANALYSIS_PROGRESS', progress: number;

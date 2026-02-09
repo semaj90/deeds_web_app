@@ -39,7 +39,7 @@ export interface AuthSession {
 }
 
 export interface AuthState {
-    user: AuthUser | null; session: AuthSession | null;
+    user: AuthUser | null, session: AuthSession | null;
     isLoading: boolean;
 	isAuthenticated: boolean;
 	permissions: Permission[];

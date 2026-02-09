@@ -168,7 +168,7 @@
 <div bind:this={editorElement} class="tiptap-editor"></div>
 
 <style>
-	.tiptap-toolbar { display: flex; gap: 0.25rem;
+	.tiptap-toolbar { display: flex, gap: 0.25rem;
 		padding: 0.5rem;
 		border-bottom: 1px solid rgb(30 41 59);
 		background: rgb(15 23 42);
@@ -199,7 +199,7 @@
 		color: white;
 	}
 
-	.toolbar-divider { width: 1px; background: rgb(51 65 85);
+	.toolbar-divider { width: 1px, background: rgb(51 65 85);
 		margin: 0 0.25rem;
 	}
 
@@ -218,7 +218,7 @@
 		min-height: 380px;
 	}
 
-	:global(.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before) { content: attr(data-placeholder); float: left;
+	:global(.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before) { content: attr(data-placeholder), float: left;
 		color: rgb(100 116 139);
 		pointer-events: none;
 		height: 0;

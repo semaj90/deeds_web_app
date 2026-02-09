@@ -6,18 +6,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  // Migrated from createEventDispatcher to callback props;
 
- interface Evidence { id: string; title: string;
+ interface Evidence { id: string, title: string;
  description?: string;
  content?: string;
  fileName?: string;
  }
 
- interface Witness { id: string; name: string;
+ interface Witness { id: string, name: string;
  statement?: string;
  credibility?: number;
  }
 
- interface CrossExamQuestion { id: string; question: string;
+ interface CrossExamQuestion { id: string, question: string;
  type: 'general' | 'timeline' | 'credibility' | 'contradiction';
  priority: 'high' | 'medium' | 'low';
  category: string;
@@ -25,7 +25,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  followUp?: string[];
  }
 
- interface CrossExamSession { id: string; witness: Witness;
+ interface CrossExamSession { id: string, witness: Witness;
  questions: CrossExamQuestion[];
 	generatedAt: string;
  strategy: string;

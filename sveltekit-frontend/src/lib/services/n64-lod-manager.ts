@@ -254,7 +254,7 @@ export class N64LODManager {
   async *streamTextureProgressive(
     assetId: string,
     targetLOD: number
-  ): AsyncGenerator<{ lodLevel: number; textureData: ArrayBuffer }> {
+  ): AsyncGenerator<{ lodLevel: number, textureData: ArrayBuffer }> {
     // Start with lowest quality and stream up to target
     for (let lod = 3; lod >= targetLOD; lod--) {
       const textureData = await this.streamTexture(assetId, lod, 'background');
@@ -269,7 +269,7 @@ export class N64LODManager {
    */
   private async generateMipmap(
     source: ImageData,
-    targetSize: { width: number; height: number }
+    targetSize: { width: number, height: number }
   ): Promise<ImageData> {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;

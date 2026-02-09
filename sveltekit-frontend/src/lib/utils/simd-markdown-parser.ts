@@ -4,7 +4,7 @@ import path from 'node:path';
 type MarkdownStrategy = 'go' | 'native' | 'python' | 'gpu' | 'js';
 
 interface NativeMarkdownAddon {
-	parseMarkdown: (; markdown: string,
+	parseMarkdown: (, markdown: string,
 		options?: {
 			format?: 'html' | 'ast' | 'tokens';
 		}

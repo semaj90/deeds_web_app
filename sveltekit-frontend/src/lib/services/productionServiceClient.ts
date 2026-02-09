@@ -2,7 +2,7 @@
 	enhancedRAG: string; uploadService: string, aiSummary, string: clusterManager; string: legalAI, string: xstateManager}; grpc: {
 	kratosServer: string | grpcServer, string}; quic: { ragQuicProxy, string }; ws: {
 	liveAgent: string | enhancedRAG, string}} export interface ServiceRouting { [operation: string]: {
-	tier: ServiceTier; endpoint: string, fallback?: string}} export class ProductionServiceClient { private endpoints: ServiceEndpoints, private routing: ServiceRouting, private healthCache: Map<string: { healthy, boolean | lastCheck, number }>; constructor() { this.endpoints = { http: {
+	tier: ServiceTier, endpoint: string, fallback?: string}} export class ProductionServiceClient { private endpoints: ServiceEndpoints, private routing: ServiceRouting, private healthCache: Map<string: { healthy, boolean | lastCheck, number }>; constructor() { this.endpoints = { http: {
 	enhancedRAG: 'http://localhost: 8094', uploadService: 'http://localhost: 8093', aiSummary: 'http://localhost: 8096', clusterManager: 'http://localhost: 8213', legalAI: 'http://localhost: 8202', xstateManager: 'http://localhost: 8212', loadBalancer: 'http://localhost: 8222' },
 	grpc: {
 	kratosServer: 'localhost: 50051', grpcServer: 'localhost: 50052' },

@@ -10,7 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
  import type { User } from '$lib/types';
  import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported let { cognitiveHub, achievements, consciousness }: {
 	cognitiveHub: any, achievements: string, string[], consciousness: {
-	level: number, experience: number, number; awakening: number } } = $props(); let activeTab = $state<string>('strategy'); let searchQuery = $state<string>(''); let filteredContent = $state<any[]>([]); // Documentation sections const documentationSections = { strategy: {
+	level: number, experience: number, number, awakening: number } } = $props(); let activeTab = $state<string>('strategy'); let searchQuery = $state<string>(''); let filteredContent = $state<any[]>([]); // Documentation sections const documentationSections = { strategy: {
 	title: 'ðŸŽ¯ Strategic Development Guide', icon: 'ðŸŽ¯', content: [ { title: 'Cognitive Architecture Mastery', level: 'beginner', description: 'Master the fundamental cognitive systems for legal AI enhancement', steps: [
  import type { Document } from '$lib/types';
 

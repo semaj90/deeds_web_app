@@ -257,7 +257,7 @@ description: suggestion },
  margin-bottom: 1rem;
  }
 
- .analysis-header h4 { margin: 0; color: #374151;
+ .analysis-header h4 { margin: 0, color: #374151;
  }
 
  .analysis-content {
@@ -296,7 +296,7 @@ description: suggestion },
  }
 
  .edit-form input,
- .edit-form textarea { padding: 0.5rem; border: 1px solid #d1d5db;
+ .edit-form textarea { padding: 0.5rem, border: 1px solid #d1d5db;
  border-radius: 4px;
  font-size: 0.9rem;
  }

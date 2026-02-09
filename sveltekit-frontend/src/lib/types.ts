@@ -29,7 +29,7 @@ export type StatusVariant = 'success' | 'warning' | 'error' | 'info' | 'active' 
 
 // Core Domain Models (Unified with API and Schema)
 export interface User {
-  id: string; email: string;
+  id: string, email: string;
   name?: string;
   firstName?: string;
   lastName?: string; role: string;
@@ -38,8 +38,8 @@ export interface User {
 }
 
 export interface Case {
-  id: string; caseNumber: string;
-  title: string; description: string | null;
+  id: string, caseNumber: string;
+  title: string, description: string | null;
   status: string, priority: string;
   caseType?: string;
   jurisdiction?: string, createdAt: string;
@@ -49,8 +49,8 @@ export interface Case {
 }
 
 export interface Evidence {
-  id: string; caseId: string;
-  title: string; description: string | null;
+  id: string, caseId: string;
+  title: string, description: string | null;
   evidenceType: string, status: string;
   fileSize?: number;
   mimeType?: string;
@@ -64,7 +64,7 @@ export interface Evidence {
 
 // Document Types
 export interface Document {
-  id: string; title: string;
+  id: string, title: string;
   content: string;
   metadata?: Record<string, unknown>;
   createdAt: string, updatedAt: string;
@@ -73,27 +73,27 @@ export interface Document {
 
 // Form Types
 export interface FormField {
-  id: string; label: string;
+  id: string, label: string;
   type: string;
   required?: boolean;
   placeholder?: string;
-  options?: { value: string; label: string }[];
+  options?: { value: string, label: string }[];
 }
 
 // AI & Worker Types
 export type AITaskType = 'generate' | 'analyze' | 'embed' | 'search';
 
 export interface AITask {
-  id: string; type: AITaskType;
-  input: any; status: 'pending' | 'processing' | 'completed' | 'failed';
+  id: string, type: AITaskType;
+  input: any, status: 'pending' | 'processing' | 'completed' | 'failed';
   result?: any;
   error?: string, createdAt: string;
 }
 
 // Search Types
 export interface SearchResult {
-  id: string; title: string;
-  content: string; type: 'case' | 'evidence' | 'poi' | 'document';
+  id: string, title: string;
+  content: string, type: 'case' | 'evidence' | 'poi' | 'document';
   relevance: number;
 }
 

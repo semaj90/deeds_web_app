@@ -12,7 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Zod schemas for type safety with Superforms
 export const QueueJobSchema = z.object({
-	id: cuidSchema; type: z.enum([
+	id: cuidSchema, type: z.enum([
 		'evidence_analysis',
 		'document_processing',
 		'case_synthesis',
@@ -59,9 +59,9 @@ export class QueueManager {
 	private pendingJobs = new Map<string, QueueJob>();
 	private processingJobs = new Map<string, QueueJob>();
 	private completedJobs = new Map<string, { job: QueueJob;
-	result: unknown; completedAt: Date }>();
+	result: unknown, completedAt: Date }>();
 	private failedJobs = new Map<string, { job: QueueJob;
-	error: Error; failedAt: Date }>();
+	error: Error, failedAt: Date }>();
 	private isRunning = false;
 	private processingInterval: NodeJS.Timeout | null = null;
 	private maxConcurrentJobs = 5;

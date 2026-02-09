@@ -1,9 +1,9 @@
 <script lang="ts">
  import { page } from '$app/state';
 
- interface Title { id: string; number: string;
+ interface Title { id: string, number: string;
  name: string;
-	sections: Array<{ id: string; number: string; title: string }>;
+	sections: Array<{ id: string, number: string; title: string }>;
  }
 
  let titles: Title[] = [
@@ -112,7 +112,7 @@
  margin-bottom: 0.25rem;
  }
 
- .title-button { width: 100%; padding: 0.75rem 1rem;
+ .title-button { width: 100%, padding: 0.75rem 1rem;
  background: none;
 	border: none;
  text-align: left;

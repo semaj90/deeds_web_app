@@ -6,10 +6,10 @@ export interface LODCache {
 	low: { vertices: Float32Array;
 	cssClasses: string[]; priority: number };
     mid: {
-	vertices: Float32Array; cssClasses: string[];
+	vertices: Float32Array, cssClasses: string[];
 	priority: number };
     high: {
-	vertices: Float32Array; cssClasses: string[];
+	vertices: Float32Array, cssClasses: string[];
 	priority: number };
   };
 }

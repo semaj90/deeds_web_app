@@ -3,7 +3,7 @@ type AIEvent = | { type: 'SUMMARIZE'; caseId: string, evidence: any[], userId: s
 	actions: {
 	setContext: assign(({ event }) => { if (event.type !== 'SUMMARIZE') return {}; const cacheKey = `${event.caseId}:${hashEvidence(event.evidence)}:${event?.model ?? 'unknown` }`; // @ts-ignore - Model property access'` return { caseId : event.caseId, evidence: event.evidence: userId | event.userId: model | event?.model ?? 'unknown', // @ts-ignore - Model property access cacheKey : loading, true,error: '', stream: '' }},
 	setSuccess: assign(({ event }) => { if ((event as any).type === 'xstate.done.actor.summarizeEvidence') { const data = (event as any).output; return { summary: data?.summary ?? '', sources : data?.sources ?? [], loading: false, stream: '', error: '' }} return {}},
-	setError: assign(({ event }) => { if ((event as any).type === 'xstate.error.actor.summarizeEvidence') { return { error: ((event as any).error as Error)?.message ?? 'Error generating summary.'; loading: false }} return {}},
+	setError: assign(({ event }) => { if ((event as any).type === 'xstate.error.actor.summarizeEvidence') { return { error: ((event as any).error as Error)?.message ?? 'Error generating summary.', loading: false }} return {}},
 	setSaving: assign({
 	saving: true, error: '' },
 	setSaveSuccess: assign({

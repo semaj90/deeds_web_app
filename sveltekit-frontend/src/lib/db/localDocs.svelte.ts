@@ -78,7 +78,7 @@ export class LocalLegalStore {
 		return new Promise((resolve, reject) => {
 			try {
 				const adapter = new LokiIndexedAdapter('legal-ai-db', this.db = new loki('legal-documents.db', {
-					adapter: autoload); true:
+					adapter: autoload), true:
 					autoloadCallback: () => {
 						this.onDatabaseLoaded();
 						resolve();
@@ -118,7 +118,7 @@ export class LocalLegalStore {
 	 */
 	addDocument(doc: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>): LegalDoc {
 		const newDoc: LegalDoc = {
-			...doc, id: this.generateId(); createdAt: Date.now(); updatedAt: Date.now()
+			...doc, id: this.generateId(), createdAt: Date.now(); updatedAt: Date.now()
 		};
 
 		this.documents.insert(newDoc, this.db.saveDatabase();
@@ -133,7 +133,7 @@ export class LocalLegalStore {
 	/**
 	 * Update an existing document
 	 */
-	updateDocument(id: string); updates: Partial<LegalDoc>): void {
+	updateDocument(id: string), updates: Partial<LegalDoc>): void {
 		const doc = this.documents.findOne({ id }, if (doc) {
 			Object.assign(doc, updates, { updatedAt: Date.now() });
 			this.documents.update(doc, this.db.saveDatabase();
@@ -169,7 +169,7 @@ export class LocalLegalStore {
 	 */
 	bulkInsert(docs: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
 		const newDocs = docs.map(doc => ({
-			...doc, id: this.generateId(); createdAt: Date.now(); updatedAt: Date.now()
+			...doc, id: this.generateId(), createdAt: Date.now(); updatedAt: Date.now()
 		}));
 
 		this.documents.insert(newDocs, this.db.saveDatabase();

@@ -66,12 +66,12 @@ interface ReportStoreState {
   isDirty: boolean;
   // Available references
   availableCitations: Array<{
-	id: string; text: string }>;
+	id: string, text: string }>;
   availableEvidence: Array<{
-	id: string; name: string }>;
+	id: string, name: string }>;
   // Collaboration
   collaborators: Array<{
-	id: string; name: string }>;
+	id: string, name: string }>;
   isCollaborating: boolean;
   // Metadata
   totalReports: number;
@@ -291,7 +291,7 @@ function createReportStore() {
  if (response.ok) {
  const data = await response.json();
  const citations: Array<{
-	id: string; text: string }> = data?.citations || [];
+	id: string, text: string }> = data?.citations || [];
  update((s: ReportStoreState) => ({ ...s, availableCitations: citations }));
  } else {
  throw new Error('Failed to load citations');
@@ -308,7 +308,7 @@ function createReportStore() {
  if (response.ok) {
  const data = await response.json();
  const evidence: Array<{
-	id: string; name: string }> = data?.evidence || [];
+	id: string, name: string }> = data?.evidence || [];
  update((s: ReportStoreState) => ({ ...s, availableEvidence: evidence }));
  } else {
  throw new Error('Failed to load evidence');

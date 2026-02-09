@@ -4,7 +4,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	title: string, content?: string; fileSize?: number; createdAt?: Date; riskScore?: number; evidenceType?: 'forensic' | 'document' | 'witness' | 'digital' | 'physical'; status?: 'pending' | 'verified' | 'disputed' | 'archived'; chainOfCustody?: boolean; confidentialityLevel?: 'public' | 'restricted' | 'confidential' | 'classified'}
   interface Props { caseFiles?: CaseFile[]; interactive?: boolean; showDetails?: boolean; theme?: 'dark' | 'light' | 'yorha'; onFileClick?: (file: CaseFile) => void; onFileHover?: (file: CaseFile | null) => void; children?: Snippet}
   let { caseFiles = [], interactive = true, showDetails = true, theme = 'yorha', onFileClick, onFileHover, children }: Props = $props(); let canvas: HTMLCanvasElement;
- let ctx: CanvasRenderingContext2D | null = null; let hoveredFile: CaseFile | null = null; let selectedFile: CaseFile | null = null; let mousePos = $state({ x: 0; y: 0 });
+ let ctx: CanvasRenderingContext2D | null = null; let hoveredFile: CaseFile | null = null; let selectedFile: CaseFile | null = null; let mousePos = $state({ x: 0, y: 0 });
   let animationFrame = 0; // Theme configurations const themes = { dark: { background: '#2f3542', text: '#ffffff', accent: '#3742fa', success: '#2ed573', warning: '#ffa502', danger: '#ff4757';
 	border: '#57606f'
     },
@@ -93,19 +93,19 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if selectedFile.fileSize} <div><strong>File, Size:</strong> {(selectedFile.fileSize / 1024 / 1024).toFixed(2)} MB{/if} {#if selectedFile.createdAt} <div><strong>Created:</strong> {selectedFile.createdAt.toLocaleDateString()}{/if}
   </div> {/if} {#if children} <div class="additional-content"> {@render children()} {/if}
   </div>
- <style> .evidence-canvas-container { margin: 1rem; padding: 1rem;background: var(--yorha-bg-secondary);
+ <style> .evidence-canvas-container { margin: 1rem, padding: 1rem;background: var(--yorha-bg-secondary);
 	border: 2px solid var(--yorha-text-muted)}
-  .canvas-wrapper { position: relative; display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary); margin-bottom: 1rem;}
-  .evidence-canvas { display: block; background: transparent; cursor: default; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
-  .controls-panel { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;}
+  .canvas-wrapper { position: relative, display: inline-block;border: 2px solid var(--yorha-secondary), background: var(--yorha-bg-primary); margin-bottom: 1rem;}
+  .evidence-canvas { display: block, background: transparent; cursor: default; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
+  .controls-panel { display: flex, gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;}
   .nes-field { margin: 0;}
   .nes-field label { font-family: 'Press Start 2P', monospace; font-size: 10px;
 	color: var(--yorha-text-accent); margin-right: 0.5rem;}
-  .file-details { padding: 1rem; background: var(--yorha-bg-tertiary);border: 2px solid var(--yorha-accent)}
-  .file-details h4 { margin: 0, 0 1rem 0; color: var(--yorha-text-accent); font-family: 'Press Start 2P', monospace; font-size: 12px;}
-  .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; font-family: 'Press Start 2P', monospace; font-size: 8px;
+  .file-details { padding: 1rem, background: var(--yorha-bg-tertiary);border: 2px solid var(--yorha-accent)}
+  .file-details h4 { margin: 0, 0 1rem 0, color: var(--yorha-text-accent); font-family: 'Press Start 2P', monospace; font-size: 12px;}
+  .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 0.5rem; font-family: 'Press Start 2P', monospace; font-size: 8px;
 	color: var(--yorha-text-primary)}
-  .details-grid div { padding: 0.25rem; background: var(--yorha-bg-primary);border: 1px solid var(--yorha-text-muted)}
+  .details-grid div { padding: 0.25rem, background: var(--yorha-bg-primary);border: 1px solid var(--yorha-text-muted)}
   .additional-content { margin-top: 1rem;
 	padding: 1rem;background: var(--yorha-bg-tertiary);
 	border: 1px solid var(--yorha-text-muted)}

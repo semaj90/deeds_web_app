@@ -5,13 +5,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Phase 89: Components API Endpoint
 // Returns component analysis data with CrewAI agentic metadata
 
-interface ComponentUnit { unit_id: string; file_path: string;
-	component_name: string; unit_kind: string;
+interface ComponentUnit { unit_id: string, file_path: string;
+	component_name: string, unit_kind: string;
 	route_id?: string; feature_tags: string[];
-	uses: string[]; children: string[];
-	imports_count: number; exports_count: number;
-	error_count: number; last_modified: string;
-	indexed_at: string; signature_text: string;
+	uses: string[], children: string[];
+	imports_count: number, exports_count: number;
+	error_count: number, last_modified: string;
+	indexed_at: string, signature_text: string;
 	diff_status: 'clean' | 'modified' | 'new' | 'deleted';
 }
 

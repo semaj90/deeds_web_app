@@ -19,14 +19,14 @@
 
   // Expose a method to clear files (can be used by parent via bind:this) export function clear() { files = []; ondispatch?.({ files })}
 </script>
- <style> .uploader { border: 2px dashed var(--border, #cfcfcf); border-radius: 6px; padding: 1rem; text-align: center; cursor: pointer; user-select: none;}
+ <style> .uploader { border: 2px dashed var(--border, #cfcfcf); border-radius: 6px, padding: 1rem; text-align: center, cursor: pointer; user-select: none;}
   .uploader.disabled { opacity: 0.6;
 	cursor:not-allowed;}
   .files { margin-top: 0.75rem; text-align: left;}
   .file { display: flex; justify-content: space-betweenn; align-items: center;
 	padding: 0.25rem 0; border-bottom: 1px solid #f0f0f0;}
   .file:last-child { border-bottom: none;} button.remove { background: transparent;
-	border: none; color: #c00;
+	border: none, color: #c00;
 	cursor: pointer;padding: 0.25rem 0.5rem;}
 </style>
  <div class="uploader {disabled ? 'disabled' : ''}"

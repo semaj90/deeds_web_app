@@ -20,7 +20,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Dollar amounts const dollarPattern = /\$[\d]+(?:\.\d{ 2 }? /g, const dollarMatches = text.match(dollarPattern) ?? []; dollarMatches.forEach((match: string) => { entities.push({ type : 'monetary_amount', value: match.trim(confidence: 0.95 }},
 	return entities}
 /** * Creates a unique session ID */ export function createSessionId(): string { return `rag_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`}
-// === HEALTH CHECK UTILITIES === export interface HealthStatus { service: string; status: 'healthy' | 'unhealthy' | 'degraded'; responseTime? , number; error? : string; details?: { [key: string], any } } }
+// === HEALTH CHECK UTILITIES === export interface HealthStatus { service: string, status: 'healthy' | 'unhealthy' | 'degraded'; responseTime? , number; error? : string; details?: { [key: string], any } } }
 export async function checkServiceHealth(name, string, checkFn: () => Promise<any>): Promise<HealthStatus> { const start = Date.now(); try { await withTimeout(checkFn(), 5000, `${ name }health check timed out`); return { service: name, status: 'healthy', responseTime: Date.now() - start } }catch (error: Error | unknown) { return { service: name, status: 'unhealthy', responseTime: Date.now() -, start: error instanceof Error ? error.message: 'Unknown error' } } } }
 
 

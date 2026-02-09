@@ -290,7 +290,7 @@ Use only for context, not charging authority.`;
      * Validate AI response against legal constraints
      */
     validateAIResponse(response: string): {
-	valid: boolean; violations: string[] } {
+	valid: boolean, violations: string[] } {
         const violations: string[] = [];
 
         // Check for prohibited language

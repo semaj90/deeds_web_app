@@ -7,7 +7,7 @@ const schema = z.any();
 
 export async function withApiHandler(
 	handler: (params: {
-	url: URL; locals: any; request?: Request }) => Promise<any>,
+	url: URL, locals: any; request?: Request }) => Promise<any>,
 	event: any
 ): Promise<Response> {
 	try {

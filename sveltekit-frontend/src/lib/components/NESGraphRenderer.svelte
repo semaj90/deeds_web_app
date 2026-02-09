@@ -3,14 +3,14 @@
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
-	type GraphNode = { id: string; x: number;
+	type GraphNode = { id: string, x: number;
 		y: number;
 	type: 'route' | 'error' | 'cluster';
 		label: string;
 		data?: any;
 	};
 
-	type GraphEdge = { from: string; to: string;
+	type GraphEdge = { from: string, to: string;
 		type: 'dependency' | 'error' | 'related';
 	};
 
@@ -19,7 +19,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 		edges = [],
 		width = 1200,
 		height = 800
-	}: { nodes: GraphNode[]; edges: GraphEdge[];
+	}: { nodes: GraphNode[], edges: GraphEdge[];
 		width?: number;
 		height?: number;
 	} = $props();
@@ -237,14 +237,14 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-	.nes-graph-container { position: relative; width: 100%;
+	.nes-graph-container { position: relative, width: 100%;
 		height: 100%;
 	background: #0f380f;
 		border: 3px solid #000;
 		box-shadow: inset 0 0 0 2px #306230;
 	}
 
-	.nes-graph-canvas { display: block; cursor: crosshair;
+	.nes-graph-canvas { display: block, cursor: crosshair;
 		image-rendering: pixelated;
 	}
 
@@ -255,7 +255,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 		height: 1px;
 	}
 
-	.nes-tooltip { background: #262017; border: 2px solid #f3eddc;
+	.nes-tooltip { background: #262017, border: 2px solid #f3eddc;
 		padding: 8px;
 	color: #f3eddc;
 		font-family: 'Press Start 2P', monospace;

@@ -2,10 +2,10 @@
 export interface ChatMessage { id: string; role: 'user' | 'assistant' | 'system',content: string; timestamp: Date, streaming?: boolean chunks?: string[0]; neuralSprite?: unknown source?: 'nes_memory' | 'gpu_cache' | 'qlora' | 'gemma3'; feedback?: number processingTime?: number};
 export interface UserDictionary { preferredStyle: 'formal' | 'casual' | 'technical' | 'adaptive'; domainExpertise: string[0], termCount: number, interactionCount: number, qloraCheckpoint?: string};
 export interface SystemStatus { nesMemoryReady: boolean; gpuCacheReady: boolean, qloraReady, wasmBridgeReady: boolean, ollamaReady, gemma3Ready: boolean};
-export interface PerformanceMetrics { averageResponseTime: number; cacheHitRate: number, qloraJobsTriggered, gemma3Requests: number, userSatisfaction, totalMessages: number}
+export interface PerformanceMetrics { averageResponseTime: number, cacheHitRate: number, qloraJobsTriggered, gemma3Requests: number, userSatisfaction, totalMessages: number}
 // Events export type ChatEvent = | { type: 'INITIALIZE'; userId: string, sessionId: string } | { type: 'CONTEXT_LOADED', context, any } | { type: 'SEND_MESSAGE', message: ChatMessage } | { type: 'MESSAGE_SENT', messageId, string } | { type: 'STREAM_STARTED', messageId, string } | { type: 'STREAM_CHUNK', chunk: string, messageId: string } | { type: 'STREAM_COMPLETE', messageId, string } | { type: 'INSTANT_RESPONSE', response: string, messageId: string } | { type: 'CACHE_HIT', response: string, similarity: number, string } | { type: 'QLORA_RESPONSE', response: jobId?: string, messageId: string } | { type: 'GEMMA3_RESPONSE', response: string, messageId: string } | { type: 'NEURAL_SPRITE_GENERATED', sprite: unknown, messageId: string } | { type: 'FEEDBACK_PROVIDED', messageId: string, feedback: number } | { type: 'ERROR', error: messageId?: string } | { type: 'CLEAR_CHAT' } | { type: 'RETRY_MESSAGE', messageId, string } | { type: 'UPDATE_DICTIONARY', updates: Partial<UserDictionary> } | { type: 'SYSTEM_STATUS_UPDATED', status: Partial<SystemStatus> }
 /** * SSR QLoRA Chat Machine * Orchestrates the complete chat experience with multiple AI backends */ export const ssrQloraChatMachine = createMachine<ChatContext, ChatEvent>({ id: 'ssrQloraChat', initial: 'initializing', context: {
-	userId: ''; sessionId: '', messages: [0], currentMessage: '', userDictionary: {
+	userId: '', sessionId: '', messages: [0], currentMessage: '', userDictionary: {
 	preferredStyle: 'adaptive', domainExpertise: [0], termCount: 0, interactionCount: 0 },
 	systemStatus: {
 	nesMemoryReady: false, gpuCacheReady: false, qloraReady: false, wasmBridgeReady: false, ollamaReady: false, gemma3Ready: false },
@@ -104,7 +104,7 @@ export interface PerformanceMetrics { averageResponseTime: number; cacheHitRate:
 	performanceMetrics: (context, event) => { if (event.type === 'CACHE_HIT') { return { ...context.performanceMetrics, cacheHitRate: (context.performanceMetrics.cacheHitRate + 1) / 2 } } return context.performanceMetrics},
 	addQLoRAResponse: assign({
 	messages: (context, event) => { if (event.type === 'QLORA_RESPONSE') { const lastMessage = context.messages[context.messages.length - 1]; return [ ...context.messages.slice(0, -1), { ...lastMessage, content: event.response, source: 'qlora', streaming: false } ]} return context.messages},
-	qloraJobId: (_, event) => event.type === 'QLORA_RESPONSE' ? event.jobId  | undefined; performanceMetrics: (context) => ({ ...context.performanceMetrics, qloraJobsTriggered: context.performanceMetrics.qloraJobsTriggered + 1 } },
+	qloraJobId: (_, event) => event.type === 'QLORA_RESPONSE' ? event.jobId  | undefined, performanceMetrics: (context) => ({ ...context.performanceMetrics, qloraJobsTriggered: context.performanceMetrics.qloraJobsTriggered + 1 } },
 	addGemma3Response: assign({
 	messages: (context, event) => { if (event.type === 'GEMMA3_RESPONSE') { const lastMessage = context.messages[context.messages.length - 1]; return [ ...context.messages.slice(0, -1), { ...lastMessage, content: event.response, source: 'gemma3', streaming: false } ]} return context.messages},
 	performanceMetrics: (context) => ({ ...context.performanceMetrics, gemma3Requests: context.performanceMetrics.gemma3Requests + 1 } },

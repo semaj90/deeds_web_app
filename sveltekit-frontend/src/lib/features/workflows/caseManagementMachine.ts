@@ -47,11 +47,11 @@ export interface CaseManagementContext {
 	| { type: 'CREATE_CASE';
 	caseData: Omit<CaseData, 'id' | 'createdAt' | 'updatedAt'> }
 	| { type: 'UPDATE_CASE';
-	caseId: string; updates: Partial<CaseData> }
+	caseId: string, updates: Partial<CaseData> }
 	| { type: 'DELETE_CASE';
 	caseId: string }
 	| { type: 'ADD_EVIDENCE';
-	caseId: string; evidence: Omit<EvidenceData, 'id' | 'createdAt'> }
+	caseId: string, evidence: Omit<EvidenceData, 'id' | 'createdAt'> }
 	| { type: 'SEARCH_CASES';
 	query: string }
 	| { type: 'LOAD_USER_CASES';

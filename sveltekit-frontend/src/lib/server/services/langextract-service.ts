@@ -220,7 +220,7 @@ For each section, provide: -, section_type: one of the above types
 - end_offset: character offset where section ends
 - confidence: confidence score (0-1)
 
-Also extract crime metadata: -; crime_code: statute reference (e.g., "PC 211")
+Also extract crime metadata: -, crime_code: statute reference (e.g., "PC 211")
 - crime_category: category (e.g., "robbery", "drug", "homicide")
 - crime_classification: "felony", "misdemeanor", "infraction", or "wobbler"
 - attempted: whether the crime was attempted
@@ -258,14 +258,14 @@ Return the result as a JSON object with sections array.`;
  */
 export async function extractSectionsBatch(
   documents: Array<{
-	id: string; text: string; type?: 'statute' | 'case' }>,
+	id: string, text: string; type?: 'statute' | 'case' }>,
   concurrency: number = 3
 ): Promise<LangExtractOutput[]> {
   console.log(`[LangExtract] Batch extracting sections from ${documents.length} documents`);
 
   const results: LangExtractOutput[] = [];
   const errors: Array<{
-	docId: string; error: string }> = [];
+	docId: string, error: string }> = [];
 
   // Process documents with concurrency limit
   for (let i = 0; i < documents.length; i += concurrency) {

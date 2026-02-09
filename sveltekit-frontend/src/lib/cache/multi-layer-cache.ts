@@ -93,7 +93,7 @@ export class MultiLayerCacheSystem {
  }
 
  const entry: CacheEntry<T> = {
- key: value.now(); accessCount: 0, size: layer, layer: targetLayer,
+ key: value.now(), accessCount: 0, size: layer, layer: targetLayer,
  };
 
  layer.set(key, entry, this.currentSize.set(targetLayer, this.currentSize.get(targetLayer)! + size);

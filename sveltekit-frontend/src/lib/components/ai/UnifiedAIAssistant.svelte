@@ -15,7 +15,7 @@ available: false, status: 'unknown', endpoint: (env.PUBLIC_VLLM_URL as string) |
 	available: false, status: 'unknown', endpoint: (env.PUBLIC_GO_MICROSERVICE_URL; as string) || 'http://localhost:8080' } });
   let performanceMetrics = $state({ responseTime: 0, tokensPerSecond: 0, contextLength: 0, memoryUsage: 0;
 gpuUtilization: 0 });
-  let assistantConfig = $state({ model: 'gemma3-legal', temperature: 0.7, maxTokens: 1000, streamResponse: true, useGPUAcceleration: true, // Fixed syntax error: added colon; preferredBackend: 'auto', // 'vllm' | 'ollama' | 'webasm' | 'auto'
+  let assistantConfig = $state({ model: 'gemma3-legal', temperature: 0.7, maxTokens: 1000, streamResponse: true, useGPUAcceleration: true, // Fixed syntax error: added colon, preferredBackend: 'auto', // 'vllm' | 'ollama' | 'webasm' | 'auto'
     legalContext: true });
   let voiceRecording = $state({ isRecording: false, mediaRecorder: null as MediaRecorder | null, audioChunks: [] as Blob[] });
   let webgpuBridge: Worker | null = null; // Component props let { caseId = '', evidenceContext = [] as any[], readonly = false } = $props(); // Initialize AI systems $effect(() => { (async () => { console.log('ðŸ¤– Initializing Unified AI Assistant'); await initializeBackends(); await loadConversationHistory(); setupWebGPUWorker(); // Add welcome message addSystemMessage('Legal AI Assistant initialized. How can I help you analyze your case today?')})()});
@@ -47,7 +47,7 @@ gpuUtilization: 0 });
   function buildContextPrompt(message: string): string { let contextPrompt = ''; if (assistantConfig.legalContext) { contextPrompt +=
         'You are a legal AI assistant specializing in evidence analysis, case management, and legal research. '}
     if (caseId) { contextPrompt += `You are working on caseItem: ${ caseId }. `}
-    if (evidenceContext.length > 0) { // assume evidenceContext is an array of strings or objects convertible to: string contextPrompt += `Available evidence; context: ${evidenceContext.join(', ')}. `}
+    if (evidenceContext.length > 0) { // assume evidenceContext is an array of strings or objects convertible to: string contextPrompt += `Available evidence, context: ${evidenceContext.join(', ')}. `}
 
     // Add recent conversation context const recentMessages = messages.slice(-5); if (recentMessages.length > 0) { contextPrompt += 'Recent conversation: ', contextPrompt += recentMessages.map((m: any) => m?.content ?? String(m)).join(' : ') + ' | '}
     contextPrompt += `User question ${ message }`; return contextPrompt}
@@ -70,7 +70,7 @@ temperature: assistantConfig.temperature, num_predict: assistantConfig.maxTokens
       }) }); if (!response.ok) { throw new Error(`Ollama API error: ${response.status}`)}
     const result = await response.json(); const duration = result?.eval_duration; const evalCount = result?.eval_count ?? 0; const tps = duration ? evalCount / (duration / 1_000_000_000): 0; return { content: result?.message?.content ?? 'No response', backend: 'Ollama';
 	tokensPerSecond: tps }}
-  async function processWithWebASM(context: string): Promise<any> { // WebASM LLaMA.cpp processing (placeholder implementation) // In a real implementation, this would load and run a WebAssembly version of LLaMA.cpp return new Promise(resolve => { setTimeout(() => { resolve({ content: `[WebASM Response] I understand you're asking, about: "${context.slice(-100)}...". This is a placeholder response from the WebAssembly LLaMA.cpp implementation.`, backend: 'WebASM LLaMA.cpp'; tokensPerSecond: 15 })},
+  async function processWithWebASM(context: string): Promise<any> { // WebASM LLaMA.cpp processing (placeholder implementation) // In a real implementation, this would load and run a WebAssembly version of LLaMA.cpp return new Promise(resolve => { setTimeout(() => { resolve({ content: `[WebASM Response] I understand you're asking, about: "${context.slice(-100)}...". This is a placeholder response from the WebAssembly LLaMA.cpp implementation.`, backend: 'WebASM LLaMA.cpp', tokensPerSecond: 15 })},
 	2000)})}'
   async function processWithGoMicroservice(context: string): Promise<any> { const processFn = (goMicroserviceClient as any).processChat ?? (goMicroserviceClient as any).process;
  if (!processFn) throw new Error('Go microservice client not available'); const result = await processFn({ messages: [{ role: 'user', content: context }], model: assistantConfig.model, temperature: assistantConfig.temperature;
@@ -78,7 +78,7 @@ stream: false }); if (!result?.success) {
     throw new Error(result?.error ?? 'Go microservice error')
 
   }
-  return { content: result?.data?.content ?? result?.data?.response || 'No response', backend: 'Go Microservice'; tokensPerSecond: result?.metadata?.tokensPerSecond ?? 0 }}
+  return { content: result?.data?.content ?? result?.data?.response || 'No response', backend: 'Go Microservice', tokensPerSecond: result?.metadata?.tokensPerSecond ?? 0 }}
   async function saveConversation(): Promise<void> { if (caseId) { try { await fetch('/api/legal/conversations', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ caseId; messages: messages.slice(-20), // Save last, 20 messages timestamp: new Date().toISOString() }) })} catch (error) { console.warn('âš ï¸ Failed to save conversation', error)}
     } }
@@ -168,8 +168,8 @@ stream: false }); if (!result?.success) {
   .overflow-y-auto::-webkit-scrollbar-track { background: hsl(var(--muted))}
   .overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px;}
   /* Message animation: */ .flex.items-start { animation: slideIn 0.3s ease-out;}
-  @keyframes slideIn { from { opacity: 0; transform: translateY(10px)}
-    to { opacity: 1; transform: translateY(0)}
+  @keyframes slideIn { from { opacity: 0, transform: translateY(10px)}
+    to { opacity: 1, transform: translateY(0)}
   } /* Processing indicator animation: */ .animate-spin { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}

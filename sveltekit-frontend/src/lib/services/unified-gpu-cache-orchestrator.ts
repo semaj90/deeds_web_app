@@ -122,8 +122,8 @@ export class UnifiedGPUCacheOrchestrator {
         query: string,
         options: { topK?: number, useCache?: boolean, enableGPUAcceleration?: boolean; filters?: Record<string, unknown> } = {}
     ): Promise<{
-	results: unknown[]; metrics: {
-	totalTime: number; cacheHitRate: number;
+	results: unknown[], metrics: {
+	totalTime: number, cacheHitRate: number;
 	gpuAcceleration: boolean; compressionSavings, number } }> {
         const startTime = performance.now();
         try {

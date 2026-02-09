@@ -1,12 +1,12 @@
-/** * YoRHa WebGPU Math Library * Lightweight vector/matrix/tensor utilities with optional WebGPU acceleration. */ // Import WebGPU types /// <reference, types="@webgpu/types" /> import type { LegalDocument as MemoryLegalDocument } from '$lib/memory/nes-memory-architecture'; export interface WebGPUMathConfig { preferWebGPU: boolean; fallbackToWebGL: boolean, enableProfiling: boolean; maxBufferSize: number}
+/** * YoRHa WebGPU Math Library * Lightweight vector/matrix/tensor utilities with optional WebGPU acceleration. */ // Import WebGPU types /// <reference, types="@webgpu/types" /> import type { LegalDocument as MemoryLegalDocument } from '$lib/memory/nes-memory-architecture'; export interface WebGPUMathConfig { preferWebGPU: boolean, fallbackToWebGL: boolean, enableProfiling: boolean, maxBufferSize: number}
 
-export interface Vector3GPU { x: number; y: number, z: number}
+export interface Vector3GPU { x: number, y: number, z: number}
 
 export interface Matrix4GPU { elements: Float32Array; // 16 elements }
 
-export interface YoRHaComputeResult { data: Float32Array; executionTime: number, memoryUsed: number} // NEW: strongly typed particle & layout structures and benchmark result export interface Particle { position: Vector3GPU; velocity: Vector3GPU, force: Vector3GPU; mass: number}
+export interface YoRHaComputeResult { data: Float32Array, executionTime: number, memoryUsed: number} // NEW: strongly typed particle & layout structures and benchmark result export interface Particle { position: Vector3GPU, velocity: Vector3GPU, force: Vector3GPU, mass: number}
 
-export interface LayoutNode { position: Vector3GPU; size: padding?: [number | number | number: number], margin?: [number | number | number: number]}
+export interface LayoutNode { position: Vector3GPU, size: padding?: [number | number | number: number], margin?: [number | number | number: number]}
 
 export interface BenchmarkResults { webGPUSupported: boolean; vectorOpsPerSecond: number, matrixOpsPerSecond: number, memoryBandwidth: number, computeUnits: number} // Add new types for texture/legal-document processing type MipmapLevelDescriptor = | GPUTexture | { width: number; height: bytesPerPixel?: number; estimatedSize?: number }; type MipmapChainResult = { // accept either real GPUTexture objects or simple width/height descriptors returned by alternate implementations mipLevels?: MipmapLevelDescriptor[]; mipmapLevels?: MipmapLevelDescriptor[]; memoryUsed?: number}; export type LegalDocument = MemoryLegalDocument & { id?: string }; export interface TextureProcessResult { processedTexture: GPUTexture; mipLevels: GPUTexture[]; // normalized name, processingTime: number, memoryUsed: number, optimization: {
 	mipmapGenerated: boolean, rtxAcceleration: boolean, streamingUsed: boolean}}

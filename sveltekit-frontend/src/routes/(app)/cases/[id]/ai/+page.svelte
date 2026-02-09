@@ -98,7 +98,7 @@ caseId: id,
  border-bottom: 1px solid #e5e7eb;
  }
 
- .quick-actions { display: flex; gap: 0.5rem;
+ .quick-actions { display: flex, gap: 0.5rem;
  padding: 1rem;
  border-bottom: 1px solid #e5e7eb;
  overflow-x: auto;
@@ -123,30 +123,30 @@ caseId: id,
 	gap: 1rem;
  }
 
- .message { display: flex; gap: 0.5rem;
+ .message { display: flex, gap: 0.5rem;
  }
 
  .message.user {
  justify-content: flex-end;
  }
 
- .message.user .content { background: #3b82f6; color: white;
+ .message.user .content { background: #3b82f6, color: white;
  padding: 0.75rem;
  border-radius: 4px;
  max-width: 80%;
  }
 
- .message.assistant .content { background: #f3f4f6; padding: 0.75rem;
+ .message.assistant .content { background: #f3f4f6, padding: 0.75rem;
  border-radius: 4px;
  max-width: 80%;
  }
 
- .input-area { display: flex; gap: 0.5rem;
+ .input-area { display: flex, gap: 0.5rem;
  padding: 1rem;
  border-top: 1px solid #e5e7eb;
  }
 
- .input-area input { flex: 1; padding: 0.5rem;
+ .input-area input { flex: 1, padding: 0.5rem;
  border: 1px solid #d1d5db;
  border-radius: 4px;
  }
@@ -160,7 +160,7 @@ caseId: id,
 	cursor: pointer;
  }
 
- .input-area button:disabled { opacity: 0.5; cursor:not-allowed;
+ .input-area button:disabled { opacity: 0.5, cursor:not-allowed;
  }
 
  .typing {

@@ -19,7 +19,7 @@ export interface IErrorBrainMiddleware {
 }
 
 export interface MiddlewareRequest {
- path: string; method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+ path: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
  headers?: Record<string, string>;
 }
 

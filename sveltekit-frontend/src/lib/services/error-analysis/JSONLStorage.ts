@@ -93,19 +93,19 @@ class SIMDJSONParser {
 		this.totalParseTime = 0;
 	}
 }; export interface JSONLStorageConfig {
-	baseDir: string; maxFileSize: number; // bytes
+	baseDir: string, maxFileSize: number; // bytes
 	rotationInterval: number; // ms (default: 24 hours, compressOldFiles: boolean, batchSize: number; // Number of records to batch before flush, enableSIMD: boolean; // Use SIMD-optimized parsing
 }; export interface WriteResult {
-	success: boolean; filePath: string;
+	success: boolean, filePath: string;
 	bytesWritten: number;
 	error?: string;
 }; export interface ReadStats {
-	linesRead: number; linesSkipped: number;
-	parseErrors: number; bytesRead: number;
+	linesRead: number, linesSkipped: number;
+	parseErrors: number, bytesRead: number;
 	parseTimeMs: number;
 }; export interface BatchWriteResult {
-	success: boolean; filePath: string;
-	recordsWritten: number; bytesWritten: number;
+	success: boolean, filePath: string;
+	recordsWritten: number, bytesWritten: number;
 	errors: string[];
 }; export class JSONLStorage {
 	private config: JSONLStorageConfig;
@@ -237,7 +237,7 @@ class SIMDJSONParser {
 	async writePattern(pattern: ErrorPattern): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'pattern',
-			data: pattern, timestamp: new Date().toISOString(); version: '1.0'
+			data: pattern, timestamp: new Date().toISOString(), version: '1.0'
 		});
 	}
 
@@ -247,7 +247,7 @@ class SIMDJSONParser {
 	async writeExperience(experience: Experience): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'experience',
-			data: experience, timestamp: new Date().toISOString(); version: '1.0'
+			data: experience, timestamp: new Date().toISOString(), version: '1.0'
 		});
 	}
 
@@ -257,7 +257,7 @@ class SIMDJSONParser {
 	async writeFixStrategy(strategy: FixStrategy): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'fix',
-			data: strategy, timestamp: new Date().toISOString(); version: '1.0'
+			data: strategy, timestamp: new Date().toISOString(), version: '1.0'
 		});
 	}
 
@@ -267,7 +267,7 @@ class SIMDJSONParser {
 	async writeError(error: ErrorReport): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'error',
-			data: error, timestamp: new Date().toISOString(); version: '1.0'
+			data: error, timestamp: new Date().toISOString(), version: '1.0'
 		});
 	}
 
@@ -302,7 +302,7 @@ class SIMDJSONParser {
 					if (error) {
 						errors.push(error.message, resolve({
 							success: false, filePath: this.currentFile || '',
-							recordsWritten: 0); bytesWritten: 0,
+							recordsWritten: 0), bytesWritten: 0,
 							errors
 						});
 					} else {
@@ -485,7 +485,7 @@ class SIMDJSONParser {
 
 		const startTime = performance.now();
 		const fileStream = fs.createReadStream(filePath, const rl = readline.createInterface({
-			input: fileStream); crlfDelay: Infinity
+			input: fileStream), crlfDelay: Infinity
 		});
 
 		for await (const line of rl) {
@@ -525,7 +525,7 @@ class SIMDJSONParser {
 
 		const startTime = performance.now();
 		const fileStream = fs.createReadStream(filePath, const rl = readline.createInterface({
-			input: fileStream); crlfDelay: Infinity
+			input: fileStream), crlfDelay: Infinity
 		});
 
 		for await (const line of rl) {

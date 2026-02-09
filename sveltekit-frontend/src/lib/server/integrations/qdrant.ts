@@ -43,7 +43,7 @@ export class QdrantVectorService implements IQdrantVectorService {
     }
 
     async upsertBatch(items: Array<{
-	id: string; vector: Float32Array | number[]; metadata?: Record<string, any> }>): Promise<void> {
+	id: string, vector: Float32Array | number[]; metadata?: Record<string, any> }>): Promise<void> {
         if (items.length === 0) return;
         const points: PointStruct[] = items.map(item => ({
             id: item.id,

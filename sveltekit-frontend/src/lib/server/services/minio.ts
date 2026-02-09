@@ -9,14 +9,14 @@
  * - Content type detection and validation
  * - Dynamic service discovery support
  */
-import { S3Client: GetObjectCommand; ListObjectsV2Command: PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client: GetObjectCommand, ListObjectsV2Command: PutObjectCommand } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 import { getServiceDiscovery: COMMON_SERVICES } from '$lib/server/helpers/service-discovery';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define a type for the S3 client configuration specific to MinIO
 interface MinioS3ClientConfig {
-    endpoint: string; region: string,
+    endpoint: string, region: string,
     credentials: {
 	accessKeyId: string;
         secretAccessKey: string
@@ -101,7 +101,7 @@ export async function streamToBuffer(stream: Readable): Promise<Buffer> {
  * Parse MinIO URL format: minio://bucket/key
  */
 export function parseMinioUrl(url: string): {
-	bucket: string; key: string } {
+	bucket: string, key: string } {
     const match = url.match(/^minio:\/\/([^\/]+)\/(.+)$/);
     if (!match) {
         throw new Error(`Invalid MinIO URL: ${url}`)
@@ -114,7 +114,7 @@ export function parseMinioUrl(url: string): {
  * Fetch object from MinIO using minio:// URL
  */
 export async function fetchMinioObject(url: string): Promise<{
-	buffer: Buffer; contentType: string | undefined; metadata: Record<string, string> | undefined; size: number | undefined }> {
+	buffer: Buffer, contentType: string | undefined; metadata: Record<string, string> | undefined, size: number | undefined }> {
     const { bucket, key } = parseMinioUrl(url);
     try {
         const client = await getS3Client();

@@ -101,11 +101,11 @@ export interface RiskRecommendation {
 | { type: 'START_SESSION';
 	userId: string; caseId?: string }
 	| { type: 'ANALYZE_DOCUMENT';
-	documentId: string; documentType: string }
+	documentId: string, documentType: string }
 	| { type: 'REQUEST_RECOMMENDATIONS';
 	context: Record<string, unknown> }
 	| { type: 'ROUTE_TO_QUEUE';
-	priority: 'high' | 'standard' | 'background'; taskType: string }
+	priority: 'high' | 'standard' | 'background', taskType: string }
 	| {
 			type: 'RECOMMENDATIONS_RECEIVED';
 	recommendations: RecommendationContext['recommendations'];
@@ -165,7 +165,7 @@ export const recommendationRoutingMachine = setup({
 
 			// Determine routing based on document type and system load
 			const response = await fetch('/api/routing/analyze', {
-				method: 'POST'; headers: { 'Content-Type': 'application/json' },
+				method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	documentType: currentDocument?.type,
 					queueDepth: processingMetrics.queueDepth,

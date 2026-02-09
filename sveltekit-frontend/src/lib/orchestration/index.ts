@@ -1,5 +1,5 @@
 /** * Orchestration Services Barrel Export * Fixes missing imports for state management and orchestration */ // Re-export from actual orchestration file export type {
- JobDefinition: JobType; JobPriority: RetryConfig: OptimizedRabbitMQOrchestrator  }
+ JobDefinition: JobType, JobPriority: RetryConfig: OptimizedRabbitMQOrchestrator  }
 from './optimized-rabbitmq-orchestrator.js';
 export {
 optimizedOrchestrator }

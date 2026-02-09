@@ -143,7 +143,7 @@ export async function ingestStatuteWithChunks(
  source: StatuteSource,
  chunkingOptions?: ChunkingOptions
 ): Promise<{
-	statuteId: string; chunksCreated: number }> {
+	statuteId: string, chunksCreated: number }> {
  // Ingest statute
  const statuteId = await ingestStatute(source);
 
@@ -160,7 +160,7 @@ export async function batchIngestStatutes(
  sources: StatuteSource[],
  chunkingOptions?: ChunkingOptions
 ): Promise<Array<{
-	statuteId: string; chunksCreated: number; error?: string }>> {
+	statuteId: string, chunksCreated: number; error?: string }>> {
  const results = [];
 
  for (const source of sources) {

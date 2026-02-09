@@ -24,7 +24,7 @@ export interface CHRROMPattern {
 }
 
 export interface CHRROMCache {
-	patterns: Map<string, CHRROMPattern>; banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
+	patterns: Map<string, CHRROMPattern>, banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
 	hotPatterns: string[]; // Most frequently accessed patterns
 	metrics: {
 	cacheHits: number;
@@ -357,7 +357,7 @@ export class CHRROMPatternCache {
 	}
 
 	private generateRenderData(tileData: Uint8Array, options: PatternGenerationOptions): {
-	colors: [number, number, number, number][]; positions: [number, number][]; attributes: number[] } {
+	colors: [number, number, number, number][], positions: [number, number][]; attributes: number[] } {
 		// Generate render data for WebGPU visualization
 		const colors: [number, number, number, number][] = [];
 		const positions: [number, number][] = [];

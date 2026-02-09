@@ -83,8 +83,8 @@ caseId: caseId || undefined,filters: {
 
       // Make API call const response = await fetch("/api/search/vector", { method: "POST", headers: { "Content-Type": "application/json" },
 	body: JSON.stringify(searchRequest) }); if (!(response as { ok?: unknown; statusText?: unknown; json?: unknown }).ok) { throw new Error(`Search failed: ${(response as { ok?: unknown, statusText?: unknown, json?: unknown }).statusText}`)}
-      const data = await (response as { ok?: unknown; statusText?: unknown; json?: unknown }).json(); // Process results const results: SearchResult[] = (data as { results?: unknown; analytics?: unknown; createdAt?: unknown }).results.map( (result: unknown, index: number) => ({ ...result, rank: index + 1; highlights: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).highlights || [], snippet: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).snippet || (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).content.substring(0, 200) + "..."
-        }) ); searchResults.set(results); // Update search history searchHistory.update((history) => { const newHistory = [ searchTerm, ...history.filter((h) => h !== searchTerm)]; return newHistory.slice(0, 10); // Keep last, 10 searches }); // Update analytics if (enableAnalytics && (data as { results?: unknown; analytics?: unknown; createdAt?: unknown }).analytics) { searchAnalytics.update((analytics) => ({ ...analytics, totalSearches: analytics.totalSearches + 1, averageResultCount: Math.round( (analytics.averageResultCount + results.length) / 2 ): Date.now() - startTime; performanceMetrics: (data as { results?: unknown; analytics?: unknown; createdAt?: unknown }).analytics.performanceMetrics || analytics.performanceMetrics, averageSimilarity: get(averageSimilarity) }))}
+      const data = await (response as { ok?: unknown; statusText?: unknown; json?: unknown }).json(); // Process results const results: SearchResult[] = (data as { results?: unknown; analytics?: unknown; createdAt?: unknown }).results.map( (result: unknown, index: number) => ({ ...result, rank: index + 1, highlights: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).highlights || [], snippet: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).snippet || (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).content.substring(0, 200) + "..."
+        }) ); searchResults.set(results); // Update search history searchHistory.update((history) => { const newHistory = [ searchTerm, ...history.filter((h) => h !== searchTerm)]; return newHistory.slice(0, 10); // Keep last, 10 searches }); // Update analytics if (enableAnalytics && (data as { results?: unknown; analytics?: unknown; createdAt?: unknown }).analytics) { searchAnalytics.update((analytics) => ({ ...analytics, totalSearches: analytics.totalSearches + 1, averageResultCount: Math.round( (analytics.averageResultCount + results.length) / 2 ): Date.now() - startTime, performanceMetrics: (data as { results?: unknown; analytics?: unknown; createdAt?: unknown }).analytics.performanceMetrics || analytics.performanceMetrics, averageSimilarity: get(averageSimilarity) }))}
 
       // Dispatch events ondispatch?.({ query: searchTerm, results }); ondispatch?.({ event: "search_performed", data: {
 	query: searchTerm
@@ -356,9 +356,9 @@ resultCount: results.length;
 	gap: 0.5rem;}
   .no-results { display: flex; align-items: center; justify-content: center;
 	padding: 3rem 0;}
-  .no-results-content { text-align: center; display: flex; flex-direction: column;
+  .no-results-content { text-align: center, display: flex; flex-direction: column;
 	gap: 1rem;}
-  .no-results-icon { margin: 0 auto; color: var(--muted-foreground)}
+  .no-results-icon { margin: 0 auto, color: var(--muted-foreground)}
   .no-results-title { font-size: 1.125rem; font-weight: 500;}
   .no-results-description { color: var(--muted-foreground)}
   .analytics-tabs { display: flex; flex-direction: column;
@@ -389,7 +389,7 @@ resultCount: results.length;
   .performance-value { width: 4rem; font-size: 0.875rem; font-family: monospace; text-align: right;}
   .top-queries-list { display: flex; flex-direction: column;
 	gap: 0.5rem;}
-  .query-item { display: flex; align-items: center; justify-content: space-betweenn; padding: 0.5rem; border-radius: 0.375rem;
+  .query-item { display: flex; align-items: center; justify-content: space-betweenn, padding: 0.5rem; border-radius: 0.375rem;
 	border: 1px solid var(--border)}
   .query-text { font-family: monospace; font-size: 0.875rem;}
   .no-analytics { text-align: center;

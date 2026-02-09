@@ -34,14 +34,14 @@ describe('LinkMetadataForm Component', () => {
  });
 
  it('should render link metadata form', () => {
- const { container } = render(LinkMetadataForm, { props: { link:mockLink; isEditing: false },
+ const { container } = render(LinkMetadataForm, { props: { link:mockLink, isEditing: false },
 	});
 
  expect(container.querySelector('.link-metadata-form')).toBeTruthy();
  });
 
  it('should display link type in display mode', () => {
- render(LinkMetadataForm, { props: { link:mockLink; isEditing: false },
+ render(LinkMetadataForm, { props: { link:mockLink, isEditing: false },
 	});
 
  expect(screen.getByText('CHARGED_UNDER')).toBeTruthy();

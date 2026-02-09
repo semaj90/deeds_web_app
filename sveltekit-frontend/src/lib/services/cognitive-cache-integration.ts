@@ -37,13 +37,13 @@ if (!browser) {
 
 // Thread synchronization primitives
 interface ThreadSafeCache {
- mutex: AsyncMutex; data: Map<string, unknown>;
+ mutex: AsyncMutex, data: Map<string, unknown>;
  jsonbIndex: Map<string, JsonbDocument>;
  gpuAccelerated: boolean;
 }
 
 interface JsonbDocument {
- id: string; content: unknown; // Changed from: unknown; metadata: {
+ id: string, content: unknown; // Changed from: unknown, metadata: {
  lastModified: number, accessCount: number;
  gpuProcessed: boolean;
  threadId?: string;
@@ -87,8 +87,8 @@ const internalCache: ThreadSafeCache = {
 }
 
 interface CacheStoreState {
- totalEntries: number; gpuAccelerated: boolean;
- threadSafe: boolean; lastOperation: string;
+ totalEntries: number, gpuAccelerated: boolean;
+ threadSafe: boolean, lastOperation: string;
 }
 // Store for reactive updates
 export const cacheStore: Writable<CacheStoreState> = writable({
@@ -346,9 +346,9 @@ export async function queryJsonb(
 }
 // Legal AI specific utilities
 export interface LegalDocument {
- caseId: string; title: string;
- content: string; metadata: {
- court: string; date: string;
+ caseId: string, title: string;
+ content: string, metadata: {
+ court: string, date: string;
  parties: unknown[], classification: string[];
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
  };
@@ -389,7 +389,7 @@ interface CacheContext {
 
 /** * Cache Entry Metadata * Contains metadata for each cache entry, including key, type, and context */
 interface CacheEntryMetadata {
- key: string; type: 'legal-data' | 'embedding' | 'llm-result' | 'session';
+ key: string, type: 'legal-data' | 'embedding' | 'llm-result' | 'session';
  context: CacheContext;
 }
 
@@ -419,7 +419,7 @@ async function sha256(str: string): Promise<string> {
 class CognitiveCacheManager {
  private localCache = new Map<
  string,
- { data: unknown, metadata: CacheEntryMetadata; options: CacheOptions, timestamp: number }
+ { data: unknown, metadata: CacheEntryMetadata, options: CacheOptions, timestamp: number }
  >();
 
  constructor() {

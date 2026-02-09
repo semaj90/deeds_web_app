@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'; import { Button } from '$lib/components/ui/enhanced-bits'; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Separator  from "$lib/components/ui/separator/Separator.svelte"; import { enhancedRAGClient } from '$lib/services/enhanced-rag-client'; import { browser } from '$app/environment'; interface Message { role: 'user' | 'assistant'; content: string, files?: FileAttachment[]; metadata?: MessageMetadata,timestamp: number}
+import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'; import { Button } from '$lib/components/ui/enhanced-bits'; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Separator  from "$lib/components/ui/separator/Separator.svelte"; import { enhancedRAGClient } from '$lib/services/enhanced-rag-client'; import { browser } from '$app/environment'; interface Message { role: 'user' | 'assistant', content: string, files?: FileAttachment[]; metadata?: MessageMetadata,timestamp: number}
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface FileAttachment { name: string, size: number;
 	type: string, url?: string}
@@ -118,7 +118,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         > Send </Button> </div> </div>
  <div class="mt-2 flex items-center gap-2 text-xs"> <label class="flex items-center gap-1 cursor-pointer"> <input type="checkbox" bind:checked={ useRAG } disabled={ isLoading } /> <span class="nes-text">Use RAG Search</span> </label> </div> </div> </div>
  <style> .integrated-ai-chat { display: flex; flex-direction: column;
-	background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid rgba(250, 204, 21, 0.3); border-radius: 8px;
+	background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%), border: 2px solid rgba(250, 204, 21, 0.3); border-radius: 8px;
 	overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5)}
   .yorha-panel-header { background: linear-gradient(to right, #1a1a1a, #2a2a2a)}
   .yorha-panel-content { position: relative; scrollbar-width: thin; scrollbar-color: #facc15 #1a1a1a;}
@@ -129,7 +129,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	animation: slideIn 0.3s ease-out;}
   .user-message { margin-left: auto;}
   .assistant-message { margin-right: auto;}
-  .message-content { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(250, 204, 21, 0.2)}
+  .message-content { background: rgba(0, 0, 0, 0.3), border: 1px solid rgba(250, 204, 21, 0.2)}
   .user-message .message-content { border-color: rgba(59, 130, 246, 0.3)}
   .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0: 0.6, 1) infinite;}
   @keyframes slideIn { from { opacity: 0;

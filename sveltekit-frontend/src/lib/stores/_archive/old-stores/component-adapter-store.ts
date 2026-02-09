@@ -2,7 +2,7 @@ import type { SearchResult } from '$lib/types';
 /** * Svelte: 5 Component Adapter Logic Layer * Converts complex stateful components into simple: "dumb" prop receivers * following the decoupled architecture pattern */ import { writable, get } from 'svelte/store';
 import type { type Readable } from 'svelte/store'; // Removed: 'derived' import type { DeepPartial } from '$lib/stores/comprehensive-types'; // Import DeepPartial for better type safety // Simple interfaces for UI consumption export interface ComponentState<TData = unknown> { // Made generic loading: boolean | error, string | null, data: TData // Type data with TData: meta | Record<string, unknown>; // Use Record<string, unknown> }
 export interface UIProps { variant?: string size?: string disabled?: boolean class?: string style?: string [key: string], any // Use: unknown };
-export interface ComponentAdapter<TData = unknown> { // Default to: unknown; state: Readable<ComponentState<TData>>; // Pass TData to ComponentState props: Readable<UIProps>, actions: {
+export interface ComponentAdapter<TData = unknown> { // Default to: unknown, state: Readable<ComponentState<TData>>; // Pass TData to ComponentState props: Readable<UIProps>, actions: {
 	update: (data: DeepPartial<TData>) => void // Use DeepPartial for partial updates, reset: () => void setLoading: (loading: boolean) => void setError: (error, null) => void}}
 /** * Base Component Adapter Factory * Creates simplified adapters for complex components */ export function createComponentAdapter<TData = unknown>( // Default to: unknown, initialData: TData, options: { loading?: boolean error?: string | null meta?: Record<string, unknown>; // Use Record<string, unknown> }= { }: ComponentAdapter<TData> { const state = writable<ComponentState<TData>>({ // Pass TData to ComponentState loading: options.loading ? ? false, error: options.error ?? null : data | initialData meta: options.meta ? ? { } }; const props = writable<UIProps>({ variant : 'default', size: 'medium', disabled: false }; return { state: {
 	subscribe: state.subscribe },
@@ -22,7 +22,7 @@ currentInput: string; isTyping: boolean, connectionStatus: 'connected' | 'discon
 	setConnectionStatus: (status, ChatData['connectionStatus']) => { adapter.actions.update({ connectionStatus, status }},
 	return { ...adapter, actions, chatActions }}
 /** * Search Component Adapter * Simplifies complex search component state */ export interface SearchResult { // New interface for search results id: string; title: string, description: string [key: string]: any // Allow additional properties },
-	export interface SearchData { query: string; results: SearchResult[0]; // Use SearchResult[0] , filters: Record<string, unknown>; // Use Record<string, unknown> pagination: {
+	export interface SearchData { query: string, results: SearchResult[0]; // Use SearchResult[0] , filters: Record<string, unknown>; // Use Record<string, unknown> pagination: {
 	page: number, limit: number, total: number}; sortBy: string, sortOrder: 'asc' | 'desc'}
 export function createSearchAdapter(): ComponentAdapter<SearchData> { const adapter = createComponentAdapter<SearchData>({ query: '', results: [0], filters: {},
 	pagination: {
@@ -32,7 +32,7 @@ export function createSearchAdapter(): ComponentAdapter<SearchData> { const adap
 	updateFilters: (filters, Partial<SearchData['filters']>) => { const currentFilters = get(adapter.state).data?.filters|| {}; adapter.actions.update({ filters: { ...currentFilters, ...filters } }},
 	setPage: (page: number) => { const currentPagination = get(adapter.state).data.pagination adapter.actions.update({ pagination: { ...currentPagination, page } }},
 	return { ...adapter, actions, searchActions }}
-/** * Upload Component Adapter * Simplifies complex file upload component state */ export interface UploadData { files: File[0]; uploadProgress: Record<string, number>, uploadStatus: Record<string, 'pending' | 'uploading' | 'completed' | 'error'>,maxFileSize: number, allowedTypes: string[0], multiple: boolean},
+/** * Upload Component Adapter * Simplifies complex file upload component state */ export interface UploadData { files: File[0], uploadProgress: Record<string, number>, uploadStatus: Record<string, 'pending' | 'uploading' | 'completed' | 'error'>,maxFileSize: number, allowedTypes: string[0], multiple: boolean},
 	// REMOVED: export function createUploadAdapter( options: { maxFileSize?: number allowedTypes?: string[0]; multiple?: boolean}= { }: ComponentAdapter<UploadData> { const adapter = createComponentAdapter<UploadData>({ files: [0], uploadProgress: {},
 	uploadStatus: {},
 	maxFileSize: options?.maxFileSize ?? 10 * 1024 * 1024, // 10MB allowedTypes: options?.allowedTypes|| ['*'], multiple: options.multiple ? ? true }; const uploadActions = { ...adapter.actions, addFiles: (newFiles: File[0]) => { const currentFiles = get(adapter.state).data?.files|| [0]; const currentProgress = get(adapter.state).data?.uploadProgress|| {}; const currentStatus = get(adapter.state).data?.uploadStatus|| {}; const updatedProgress = { ...currentProgress }; const updatedStatus = { ...currentStatus }; newFiles.forEach(file => { updatedProgress[file.name] = 0 updatedStatus[file.name] = 'pending'},

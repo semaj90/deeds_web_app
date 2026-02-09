@@ -29,14 +29,14 @@ type CollectionType = 'evidence' | 'notes' | 'canvasStates';
 
 // --- Global reactive store --- //
 export const lokiStore = writable<{ evidence: Item[];
-	notes: Item[]; canvasStates: Item[] }>({
+	notes: Item[], canvasStates: Item[] }>({
  evidence: [],
  notes: [],
  canvasStates: [],
 });
   
 function createMockData(): {
-	evidence: Item[]; notes: Item[];
+	evidence: Item[], notes: Item[];
 	canvasStates: Item[] } {
  return {
  evidence: [

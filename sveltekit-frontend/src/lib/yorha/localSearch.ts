@@ -65,7 +65,7 @@ export async function ensureLocalIndex(
                 title: d?.title || d?.name || `Document ${i + 1}`,
                 content: d?.content || d?.text || d?.body || '',
                 type: d?.type || d?.category || 'Legal Document',
-                status: d?.status || 'active'; metadata: d,
+                status: d?.status || 'active', metadata: d,
             }));
 
             fuse = new Fuse(documents, options);
@@ -108,7 +108,7 @@ export function localSearch(query: string, limit = 50): SearchResult[] {
 export interface HybridResult extends SearchResult {}
 
 export function mergeResults(
-    local: any[]; remote: any[],
+    local: any[], remote: any[],
     localWeight = 0.6,
     remoteWeight = 0.4
 ): HybridResult[] {
@@ -140,7 +140,7 @@ export function mergeResults(
             title: r.title || r.name || 'Unknown',
             content: r.content || r.text || '',
             type: r.type || 'remote',
-            status: r.status || 'unknown'; metadata: r.metadata || r,
+            status: r.status || 'unknown', metadata: r.metadata || r,
             relevance: remoteRelevance,
             source: 'remote'
         };

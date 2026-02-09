@@ -110,7 +110,7 @@ export class RedisWebGPUSIMDIntegration {
   private redisClient: any = null; // Mocked for now
   private config: RedisWebGPUConfig;
   private metrics: ProcessingMetrics;
-  private cache = new Map<string, { value: unknown; expiry: number }>();
+  private cache = new Map<string, { value: unknown, expiry: number }>();
 
   constructor(config: Partial<RedisWebGPUConfig> = {}) {
     this.config = {

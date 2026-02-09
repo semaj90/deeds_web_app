@@ -64,7 +64,7 @@ export interface DocumentChunk extends TextChunk {
 export interface DocumentStructure {
 	title?: string;
 	headers: Array<{ level: number;
-	text: string; position: number }>;
+	text: string, position: number }>;
 	sections: Array<{
 	id: string;
 		title: string;

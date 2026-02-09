@@ -10,7 +10,7 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Define types locally to avoid importing server schema in browser
- type EvidenceNodeType = { id: string; caseId: string;
+ type EvidenceNodeType = { id: string, caseId: string;
  title: string;
  description?: string;
 	evidenceType: string;
@@ -24,7 +24,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	x: number;
  y: number };
 
- type EvidenceConnection = { id: string; caseId: string;
+ type EvidenceConnection = { id: string, caseId: string;
  fromEvidenceId: string;
 	toEvidenceId: string;
  connectionType: string;
@@ -82,7 +82,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Grid snapping
  const GRID_SIZE = 50;
- function snapToGrid(x: number, y: number): { x: number; y: number } {
+ function snapToGrid(x: number, y: number): { x: number, y: number } {
  return {
  x: Math.round(x / GRID_SIZE) * GRID_SIZE,
  y: Math.round(y / GRID_SIZE) * GRID_SIZE,
@@ -402,7 +402,7 @@ caseId: fromEvidenceId,
  .mode-selector {
  min-width: 150px;}
 
- .actions { display: flex; gap: 0.5rem;
+ .actions { display: flex, gap: 0.5rem;
  align-items: center;}
 
  .relationship-selector {
@@ -428,9 +428,9 @@ caseId: fromEvidenceId,
  font-size: 0.875rem;
  min-width: 140px;}
 
- .board-main-content { flex: 1; display: flex;}
+ .board-main-content { flex: 1, display: flex;}
 
- .board-canvas { flex: 1; position: relative;
+ .board-canvas { flex: 1, position: relative;
  overflow: hidden;
 	background: white;}
 

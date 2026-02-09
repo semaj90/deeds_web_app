@@ -225,7 +225,7 @@ export class GPUMarkdownScanner {
 	headings: Array<{ position: number;
 	level: number }>;
         sections: Array<{
-	position: number; type: string }>;
+	position: number, type: string }>;
     }> {
         if (!this.device) await this.initialize();
 
@@ -312,9 +312,9 @@ export class GPUMarkdownScanner {
 
         // Process results
         const headings: Array<{
-	position: number; level: number }> = [];
+	position: number, level: number }> = [];
         const sections: Array<{
-	position: number; type: string }> = [];
+	position: number, type: string }> = [];
 
         const sectionTypes = ['', 'facts', 'reasoning', 'holding', 'conclusion'];
 
@@ -493,9 +493,9 @@ export class GPUMarkdownProcessor {
     private async createSections(
         text: string,
         headings: Array<{
-	position: number; level: number }>,
+	position: number, level: number }>,
         sections: Array<{
-	position: number; type: string }>
+	position: number, type: string }>
     ): Promise<MarkdownSection[]> {
         const result: MarkdownSection[] = [];
         const lines = text.split('\n');
@@ -582,12 +582,12 @@ export class GPUMarkdownProcessor {
 	headings: Array<{ position: number;
 	level: number }>;
         sections: Array<{
-	position: number; type: string }>;
+	position: number, type: string }>;
     } {
         const headings: Array<{
-	position: number; level: number }> = [];
+	position: number, level: number }> = [];
         const sections: Array<{
-	position: number; type: string }> = [];
+	position: number, type: string }> = [];
 
         const lines = text.split('\n');
         let currentPos = 0;
@@ -637,9 +637,9 @@ export class GPUMarkdownProcessor {
     private createSectionsCPU(
         text: string,
         headings: Array<{
-	position: number; level: number }>,
+	position: number, level: number }>,
         sections: Array<{
-	position: number; type: string }>
+	position: number, type: string }>
     ): MarkdownSection[] {
         const result: MarkdownSection[] = [];
 

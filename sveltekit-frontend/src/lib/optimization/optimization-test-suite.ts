@@ -42,8 +42,8 @@ interface RedisSOMCacheOptimizer {
  flushAll?(): Promise<void>;
 }
 interface DockerResourceUtilization {
- memory: number; cpu: number;
- containers: unknown[]; efficiency_score: number;
+ memory: number, cpu: number;
+ containers: unknown[], efficiency_score: number;
  total_memory_allocated: number, total_memory_used: number;
 }
 interface DockerOptimizer {
@@ -64,7 +64,7 @@ interface JsonParseResult {
  stats: JsonOptimizerStats;
 }
 interface JsonCompressResult {
- compressed: unknown; stats: JsonOptimizerStats;
+ compressed: unknown, stats: JsonOptimizerStats;
 }
 interface JsonOptimizer {
  parseJSON(jsonString: string): Promise<JsonParseResult>;
@@ -92,13 +92,13 @@ interface LocalEnhancedOptimizationSuite extends ImportedEnhancedOptimizationSui
  json?: JsonOptimizer;
 }
 interface PerformanceBenchmarks {
- vs_code_commands: number; cache_operations_per_second: number;
+ vs_code_commands: number, cache_operations_per_second: number;
  json_parse_speed_mb_per_second: number, docker_optimization_time_ms: number;
  memory_usage_mb: number;
 }
 // === Test Result Types ===
 export interface TestResult {
- name: string; passed: boolean;
+ name: string, passed: boolean;
  duration_ms: number;
  error?: string;
  details?: unknown;
@@ -106,8 +106,8 @@ export interface TestResult {
 }
 
 export interface TestSuite {
- name: string; tests: TestResult[];
- passed: number; failed: number;
+ name: string, tests: TestResult[];
+ passed: number, failed: number;
  total_duration_ms: number, overall_passed: boolean;
 }
 

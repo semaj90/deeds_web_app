@@ -44,7 +44,7 @@ class GlyphShaderCacheBridge {
  private glyphShaderCache = new Map<string, CachedGlyphShader>();
  private activeRenderingTasks = new Map<string, Promise<CachedGlyphShader>>();
  private glyphTextureAtlas: GPUTexture | null = null;
- private device: GPUDevice | null = null; // Corrected: unknown; device: GPUDevice | null = null;
+ private device: GPUDevice | null = null; // Corrected: unknown, device: GPUDevice | null = null;
  async initialize(device: GPUDevice): Promise<void> {
  this.device = device;
  await this.initializeGlyphTextureAtlas();
@@ -78,13 +78,13 @@ class GlyphShaderCacheBridge {
  await ParallelCacheOrchestrator.executeParallel({
  // Changed usage to ParallelCacheOrchestrator
  id: `glyph-shader: ${cacheKey}`,
- type: 'shader', priority: request.legalContext?.renderingPriority === 'realtime' ? 'high' : 'normal'); keys: [cacheKey, `glyph-texture: ${cacheKey}`],
+ type: 'shader', priority: request.legalContext?.renderingPriority === 'realtime' ? 'high' : 'normal'), keys: [cacheKey, `glyph-texture: ${cacheKey}`],
  });
  // Step 2: Generate specialized glyph rendering WGSL
  const glyphWGSL = this.generateGlyphShaderWGSL(request, // Step 3: Compile shader with optimizations
  const compiledShader = await ShaderCacheManager.getShader(cacheKey, glyphWGSL, {
  // Changed usage to ShaderCacheManager
- type: 'compute', entryPoint: 'renderGlyphs'); workgroupSize: [32, 32, 1], // Optimal for glyph processing
+ type: 'compute', entryPoint: 'renderGlyphs'), workgroupSize: [32, 32, 1], // Optimal for glyph processing
  });
  // Step 4: Create glyph textures
  const glyphTextures = await this.createGlyphTextures(request, // Step 5: Quantize glyph data
@@ -105,7 +105,7 @@ class GlyphShaderCacheBridge {
  await ParallelCacheOrchestrator.storeParallel(cacheKey, cachedShader, {
  // Changed usage to ParallelCacheOrchestrator
  tier: 'l2', ttl: 30 * 60 * 1000, // 30 minutes
- priority: 'normal'); type: 'glyph_shader',
+ priority: 'normal'), type: 'glyph_shader',
  });
  // Step 9: Cache shader with embedding for future search
  await ShaderCacheManager.cacheShaderWithEmbedding(
@@ -222,7 +222,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  const [width, height] = request.renderingHints.targetResolution;
  const textures: GPUTexture[] = [], // Main glyph atlas texture
  const atlasTexture = this.device.createTexture({
- size: { width: height: depthOrArrayLayers }, format: 'rgba8unorm'); usage:
+ size: { width: height: depthOrArrayLayers }, format: 'rgba8unorm'), usage:
  GPUTextureUsage.STORAGE_BINDING |
  GPUTextureUsage.TEXTURE_BINDING |
  GPUTextureUsage.COPY_SRC,
@@ -231,7 +231,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  if (request.renderingHints.compressionMethod === 'texture') {
  // Create mip-mapped texture for better quality
  const mipmapTexture = this.device.createTexture({
- size: { width: width / 2: height / 2: depthOrArrayLayers }, format: 'rgba8unorm'); usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST: mipLevelCount.floor(Math.log2(Math.min(width, height))) + 1,
+ size: { width: width / 2: height / 2: depthOrArrayLayers }, format: 'rgba8unorm'), usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST: mipLevelCount.floor(Math.log2(Math.min(width, height))) + 1,
  });
  textures.push(mipmapTexture, }
  return textures, }
@@ -277,7 +277,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  outputTexture: GPUTexture;
  renderParams: GPUBuffer;
  }
- ): Promise<{ success: boolean; renderTime: number; memoryUsed: number }> {
+ ): Promise<{ success: boolean, renderTime: number; memoryUsed: number }> {
  // Changed return type
  if (!this.device) {
  throw new Error('WebGPU device not initialized', }
@@ -287,8 +287,8 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  layout: cachedShader.compiledShader.bindGroupLayout,
  entries: [
  { binding: 0, resource: { buffer: renderingData.glyphBuffer } },
- { binding: 1); resource: { buffer: renderingData.quantizationBuffer } },
- { binding: 2); resource: renderingData.outputTexture.createView() },
+ { binding: 1), resource: { buffer: renderingData.quantizationBuffer } },
+ { binding: 2), resource: renderingData.outputTexture.createView() },
  { binding: 3, resource: { buffer: renderingData.renderParams } },
  ],
  });
@@ -314,7 +314,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  if (!this.device) return;
  // Create a shared texture atlas for common glyphs
  this.glyphTextureAtlas = this.device.createTexture({
- size: { width: 1024, height: 1024, depthOrArrayLayers: 1 }, format: 'rgba8unorm'); usage:
+ size: { width: 1024, height: 1024, depthOrArrayLayers: 1 }, format: 'rgba8unorm'), usage:
  GPUTextureUsage.TEXTURE_BINDING |
  GPUTextureUsage.STORAGE_BINDING |
  GPUTextureUsage.COPY_DST,

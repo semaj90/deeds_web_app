@@ -56,7 +56,7 @@ export interface DropdownOptions {
 export function accessibleClick(
  element: HTMLElement, params: AccessibleClickParams
 ): {
-	update: (params: AccessibleClickParams) => void; destroy: () => void } {
+	update: (params: AccessibleClickParams) => void, destroy: () => void } {
  let currentParams = params;
 
  function setupAccessibility() {
@@ -122,7 +122,7 @@ export function accessibleClick(
 export function focusManagement(
  element: HTMLElement, params: FocusManagementParams = {}
 ): {
-	update: (params: FocusManagementParams) => void; destroy: () => void } {
+	update: (params: FocusManagementParams) => void, destroy: () => void } {
  let currentParams = params;
  let previouslyFocused: null = null;
  let focusableElements: HTMLElement[] = [];
@@ -245,7 +245,7 @@ export function focusManagement(
 export function ariaState(
  element: HTMLElement, params: ARIAStateParams
 ): {
-	update: (params: ARIAStateParams) => void; destroy: () => void } {
+	update: (params: ARIAStateParams) => void, destroy: () => void } {
  let currentParams = params;
 
  function updateARIA() {
@@ -303,7 +303,7 @@ export function ariaState(
 export function keyboardNavigation(
  element: HTMLElement, params: KeyboardNavigationParams
 ): {
-	update: (params: KeyboardNavigationParams) => void; destroy: () => void } {
+	update: (params: KeyboardNavigationParams) => void, destroy: () => void } {
  let currentParams = params;
 
  function handleKeydown(event: KeyboardEvent) {

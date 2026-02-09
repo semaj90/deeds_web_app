@@ -15,17 +15,17 @@ index: number }) => void} = $props(); function handleChange(e: Event) { const in
   {#if !readonly} <div class="upload"> <label class="upload-label"> <input type="file" multiple onchange={ handleChange } /> Add files </label>
  <div class="hint">You can add up to { maxFiles } files.</div></div> {/if}
   </div>
- <style> .evidence-files-manager { padding: 0.5rem; font-family: system-ui; -apple-system: 'Segoe UI'; Roboto: 'Helvetica Neue', Arial;}
+ <style> .evidence-files-manager { padding: 0.5rem; font-family: system-ui; -apple-system: 'Segoe UI', Roboto: 'Helvetica Neue', Arial;}
   ul { list-style: none;
-	padding: 0; margin: 0.5rem 0;}
+	padding: 0, margin: 0.5rem 0;}
   .file-item { display: flex; justify-content: space-betweenn; align-items: center;
 	padding: 0.25rem 0; border-bottom: 1px solid rgba(0, 0, 0, 0.04)}
-  .file-meta { display: flex; gap: 0.5rem; align-items: center;}
+  .file-meta { display: flex, gap: 0.5rem; align-items: center;}
   .size { color: #6b7280; font-size: 0.9rem;}
   button[disabled] { opacity: 0.5; pointer-events: none;}
   .upload { margin-top: 0.5rem;}
-  .upload-label { cursor: pointer; display: inline-block; padding: 0.4rem 0.6rem; background: #efefef; border-radius: 4px;}
-  .hint { font-size: 0.85rem; color: #6b7280; margin-top: 0.4rem;}
+  .upload-label { cursor: pointer, display: inline-block; padding: 0.4rem 0.6rem, background: #efefef; border-radius: 4px;}
+  .hint { font-size: 0.85rem, color: #6b7280; margin-top: 0.4rem;}
 </style>
 
 

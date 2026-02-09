@@ -379,7 +379,7 @@ keywords.some((keyword: any) => sentence.toLowerCase().includes(keyword))
 	}
 
 	private analyseSentiment(text: string): {
-	sentiment: string; score: number;
+	sentiment: string, score: number;
 	confidence: number } {
 		const positiveTerms = ['favorable', 'compliant', 'beneficial', 'support', 'approved'];
 		const negativeTerms = ['breach', 'violation', 'risk', 'penalty', 'liability', 'dispute'];
@@ -425,7 +425,7 @@ text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
 		text: string,
 		options?: z.infer<typeof EvidenceAnalysisSchema>['options']
 	): {
-	matched: string[]; warnings: string[];
+	matched: string[], warnings: string[];
 	confidence: number } {
 		const patterns: Record<string, RegExp> = {
 			breachOfContract: /\bbreach\b|\bviolation\b/i,

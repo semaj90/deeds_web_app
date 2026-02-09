@@ -117,7 +117,7 @@ import type { Case } from '$lib/types';
        | undefined)
   // Replace icons with emoji/icon fallbacks to avoid lucide-svelte export issues
   let statusInfo: {
-	label: string; className: string, icon?: string } = statusConfig.cleared
+	label: string, className: string, icon?: string } = statusConfig.cleared
   let statusInfo = $derived(statusConfig[profile?.currentStatus ?? 'cleared'] ?? statusConfig.cleared)
   function formatDate(date: string | Date): string {
     return toDate(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}

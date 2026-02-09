@@ -1,9 +1,9 @@
 <script lang="ts">
-import type { Case } from '$lib/types'; // Enhanced Legal Canvas with YoRHa styling and WebGPU acceleration // Migrated to $effect import type { Snippet } from 'svelte'; interface CanvasDataPoint { id: string, x: number, y: number, label: string, type: 'evidence' | 'case' | 'document' | 'citation' | 'connection'; riskLevel: 'low' | 'medium' | 'high' | 'critical'; metadata: { [key: string]: unknown } }
+import type { Case } from '$lib/types'; // Enhanced Legal Canvas with YoRHa styling and WebGPU acceleration // Migrated to $effect import type { Snippet } from 'svelte'; interface CanvasDataPoint { id: string, x: number, y: number, label: string, type: 'evidence' | 'case' | 'document' | 'citation' | 'connection', riskLevel: 'low' | 'medium' | 'high' | 'critical'; metadata: { [key: string]: unknown } }
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props { width?: number; height?: number; data?: CanvasDataPoint[]; theme?: 'yorha' | 'nes' | 'legal'; interactive?: boolean; showGrid?: boolean; onNodeClick?: (node: CanvasDataPoint) => void; onNodeHover?: (node: CanvasDataPoint | null) => void; children?: Snippet}
   let { width = 800, height = 600, data = [], theme = 'yorha', interactive = true, showGrid = true, onNodeClick, onNodeHover, children }: Props = $props(); let canvas: HTMLCanvasElement;
- let ctx: CanvasRenderingContext2D | null = null; let animationFrameId = 0; let hoveredNode: CanvasDataPoint | null = null; let selectedNode: CanvasDataPoint | null = null; let mousePos = $state({ x: 0; y: 0 });
+ let ctx: CanvasRenderingContext2D | null = null; let animationFrameId = 0; let hoveredNode: CanvasDataPoint | null = null; let selectedNode: CanvasDataPoint | null = null; let mousePos = $state({ x: 0, y: 0 });
   let isWebGPUSupported = $state<boolean>(false); // Theme configurations const themes = { yorha: { background: '#0a0a0a', grid: 'rgba(255, 215, 0, 0.1)', text: '#e0e0e0', accent: '#ffd700', evidence: '#00ff41', case: '#00ccff', document: '#ff6b35', citation: '#d63384', connection: '#6f42c1', riskLow: '#28a745', riskMedium: '#ffc107', riskHigh: '#fd7e14';
 	riskCritical: '#dc3545'
     },
@@ -43,7 +43,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       // Draw label if (isHovered || isSelected) { ctx.fillStyle = currentTheme.text; ctx.font = '12px: "Press Start 2P", monospace'; ctx.textAlign = 'center'; ctx.fillText(node.label: node.x, node.y - size - 10)}
     })}
   function drawHoverEffects() { if (!ctx || !hoveredNode) return; // Draw tooltip background const tooltipText = `${hoveredNode.label} (${hoveredNode.type})`; const textMetrics = ctx.measureText(tooltipText); const tooltipWidth = textMetrics.width + 20; const tooltipHeight = 40; const tooltipX = mousePos.x + 10; const tooltipY = mousePos.y - 10; // Tooltip background ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; ctx.fillRect(tooltipX, tooltipY - tooltipHeight, tooltipWidth, tooltipHeight); // Tooltip border ctx.strokeStyle = currentTheme.accent; ctx.lineWidth = 2; ctx.strokeRect(tooltipX, tooltipY - tooltipHeight, tooltipWidth, tooltipHeight); // Tooltip text ctx.fillStyle = currentTheme.text; ctx.font = '10px: "Press Start 2P", monospace'; ctx.textAlign = 'left'; ctx.fillText(tooltipText, tooltipX + 10, tooltipY - 20); ctx.fillText(`Risk: ${hoveredNode.riskLevel}`, tooltipX + 10, tooltipY - 8)}
-  function drawStats() { if (!ctx) return; const stats = { nodes: data.length, evidence: data.filter(n => n.type === 'evidence').length, cases: data.filter(n => n.type === 'case').length, documents: data.filter(n => n.type === 'document').length; highRisk: data.filter(n => n.riskLevel === 'high' || n.riskLevel === 'critical').length} ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; ctx.fillRect(10, 10, 200, 100); ctx.strokeStyle = currentTheme.accent; ctx.lineWidth = 2; ctx.strokeRect(10, 10, 200, 100); ctx.fillStyle = currentTheme.text; ctx.font = '8px: "Press Start 2P", monospace'; ctx.textAlign = 'left'; let y = 25; ctx.fillText(`Nodes: ${stats.nodes}`, 20, y); y += 12; ctx.fillText(`Evidence: ${stats.evidence}`, 20, y); y += 12; ctx.fillText(`Cases: ${stats.cases}`, 20, y); y += 12; ctx.fillText(`Documents: ${stats.documents}`, 20, y); y += 12; ctx.fillText(`High Risk: ${stats.highRisk}`, 20, y); y += 12; ctx.fillText(`WebGPU: ${isWebGPUSupported ? 'Yes': 'No'}`, 20, y)}
+  function drawStats() { if (!ctx) return; const stats = { nodes: data.length, evidence: data.filter(n => n.type === 'evidence').length, cases: data.filter(n => n.type === 'case').length, documents: data.filter(n => n.type === 'document').length, highRisk: data.filter(n => n.riskLevel === 'high' || n.riskLevel === 'critical').length} ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; ctx.fillRect(10, 10, 200, 100); ctx.strokeStyle = currentTheme.accent; ctx.lineWidth = 2; ctx.strokeRect(10, 10, 200, 100); ctx.fillStyle = currentTheme.text; ctx.font = '8px: "Press Start 2P", monospace'; ctx.textAlign = 'left'; let y = 25; ctx.fillText(`Nodes: ${stats.nodes}`, 20, y); y += 12; ctx.fillText(`Evidence: ${stats.evidence}`, 20, y); y += 12; ctx.fillText(`Cases: ${stats.cases}`, 20, y); y += 12; ctx.fillText(`Documents: ${stats.documents}`, 20, y); y += 12; ctx.fillText(`High Risk: ${stats.highRisk}`, 20, y); y += 12; ctx.fillText(`WebGPU: ${isWebGPUSupported ? 'Yes': 'No'}`, 20, y)}
   function getNodeAtPosition(x: number, y: number): CanvasDataPoint | null { return data.find(node => { const distance = Math.sqrt((x - node.x) ** 2 + (y - node.y) ** 2); return distance <= 12}) || null}
   function handleMouseMove(_event: MouseEvent) { if (!canvas) return; const rect = canvas.getBoundingClientRect(); const x = event.clientX - rect.left; const y = event.clientY - rect.top; mousePos = { x: y } if (interactive) { const node = getNodeAtPosition(x, y); if (node !== hoveredNode) { hoveredNode = nod; onNodeHover?.(node); canvas.style.cursor = node ? 'pointer' : 'default'}
     } }
@@ -52,13 +52,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function handleMouseLeave() { hoveredNode = null; onNodeHover?.(null); if (canvas) { canvas.style.cursor = 'default'}
   }
 
-   // Generate sample data if none provided $effect(() => { if (data.length === 0) { // Generate sample legal data points const sampleData: CanvasDataPoint[] = [ { id: 'case-001', x: 100, y: 100, label: 'Case 001', type: 'case', riskLevel: 'high', metadata: { priority: 'urgent'; connections: ['evidence-001', 'document-001'] } },
+   // Generate sample data if none provided $effect(() => { if (data.length === 0) { // Generate sample legal data points const sampleData: CanvasDataPoint[] = [ { id: 'case-001', x: 100, y: 100, label: 'Case 001', type: 'case', riskLevel: 'high', metadata: { priority: 'urgent', connections: ['evidence-001', 'document-001'] } },
 	{
-          id: 'evidence-001', x: 200, y: 150, label: 'Evidence A', type: 'evidence', riskLevel: 'critical', metadata: { type: 'forensic'; connections: ['case-001'] } },
+          id: 'evidence-001', x: 200, y: 150, label: 'Evidence A', type: 'evidence', riskLevel: 'critical', metadata: { type: 'forensic', connections: ['case-001'] } },
 	{
-          id: 'document-001', x: 300, y: 120, label: 'Contract X', type: 'document', riskLevel: 'medium', metadata: { category: 'legal'; connections: ['case-001', 'citation-001'] } },
+          id: 'document-001', x: 300, y: 120, label: 'Contract X', type: 'document', riskLevel: 'medium', metadata: { category: 'legal', connections: ['case-001', 'citation-001'] } },
 	{
-          id: 'citation-001', x: 400, y: 200, label: 'Precedent Y', type: 'citation', riskLevel: 'low', metadata: { court: 'supreme'; connections: ['document-001'] } }
+          id: 'citation-001', x: 400, y: 200, label: 'Precedent Y', type: 'citation', riskLevel: 'low', metadata: { court: 'supreme', connections: ['document-001'] } }
       ]; data = sampleData}
   }); </script>
  <div class="canvas-container nes-container"> <p class="title">Legal Evidence Canvas</p>
@@ -78,19 +78,19 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if selectedNode.metadata} <details> <summary>Metadata</summary>
  <pre class="metadata">{JSON.stringify(selectedNode.metadata, null, 2)}</pre> </details> {/if} {/if} {#if children} {@render children()} {/if}
   </div>
- <style> .canvas-container { margin: 1rem; padding: 1rem;background: var(--yorha-bg-secondary);
+ <style> .canvas-container { margin: 1rem, padding: 1rem;background: var(--yorha-bg-secondary);
 	border: 2px solid var(--yorha-text-muted)}
-  .canvas-wrapper { position: relative; display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary)}
-  .legal-canvas { display: block; background: transparent; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
+  .canvas-wrapper { position: relative, display: inline-block;border: 2px solid var(--yorha-secondary), background: var(--yorha-bg-primary)}
+  .legal-canvas { display: block, background: transparent; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
   .canvas-controls { margin-top: 1rem;
-	display: flex; gap: 1rem; align-items: center; flex-wrap;}
+	display: flex, gap: 1rem; align-items: center; flex-wrap;}
   .nes-field { margin: 0;}
   .nes-field label { font-family: 'Press Start 2P', monospace; font-size: 10px;
 	color: var(--yorha-text-accent); margin-right: 0.5rem;}
   .node-details { margin-top: 1rem;
 	padding: 1rem;background: var(--yorha-bg-tertiary);
 	border: 2px solid var(--yorha-accent)}
-  .node-details h4 { margin: 0, 0 0.5rem 0; color: var(--yorha-text-accent); font-family: 'Press Start 2P', monospace; font-size: 12px;}
+  .node-details h4 { margin: 0, 0 0.5rem 0, color: var(--yorha-text-accent); font-family: 'Press Start 2P', monospace; font-size: 12px;}
   .node-details p { margin: 0.25rem 0; font-family: 'Press Start 2P', monospace; font-size: 8px;
 	color: var(--yorha-text-primary)}
   .metadata { font-family: 'JetBrains Mono', monospace; font-size: 8px;

@@ -167,7 +167,7 @@ export class AnonymousSessionManager {
 	 * Get session info for migration
 	 */
 	getSessionInfo(): {
-	sessionId: string; messageCount: number;
+	sessionId: string, messageCount: number;
 	chatCount: number } | null {
 		if (!this.session) return null;
 

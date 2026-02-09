@@ -53,9 +53,9 @@ export interface ProcessingMetrics {
 // Machine Context interface
 interface GPUProcessingContext {
  processingQueue: DocumentInput[];
-	activeProcessing: Map<string, DocumentInput>; completedDocuments: ProcessingResult[];
-	errorDocuments: ProcessingResult[]; serviceHealth: ServiceHealth;
-	metrics: ProcessingMetrics; maxConcurrent: number;
+	activeProcessing: Map<string, DocumentInput>, completedDocuments: ProcessingResult[];
+	errorDocuments: ProcessingResult[], serviceHealth: ServiceHealth;
+	metrics: ProcessingMetrics, maxConcurrent: number;
 	retryCount: Map<string, number>;
 }
 
@@ -64,9 +64,9 @@ interface GPUProcessingContext {
  | { type: 'BATCH_PROCESS';
 	documents: DocumentInput[] }
  | { type: 'DOCUMENT_COMPLETED';
-	documentId: string; result: ProcessingResult }
+	documentId: string, result: ProcessingResult }
  | { type: 'DOCUMENT_FAILED';
-	documentId: string; error: string }
+	documentId: string, error: string }
  | { type: 'PAUSE_PROCESSING' }
  | { type: 'RESUME_PROCESSING' }
  | { type: 'CLEAR_QUEUE' }
@@ -88,7 +88,7 @@ const hasQueuedDocuments = ({ context }: {
 };
 
 const canRetry = ({ context, event }: {
-	context: GPUProcessingContext; event: any }) => {
+	context: GPUProcessingContext, event: any }) => {
  const documentId = event.documentId;
  const retryCount = context.retryCount.get(documentId) ?? 0;
  return retryCount < 3; // Max 3 retries
@@ -99,7 +99,7 @@ const addToQueue = ({ context, event }: {
 	context: GPUProcessingContext; event, any }) => {
  if (event.type === 'PROCESS_DOCUMENT') {
  context.processingQueue.push({
- documentId: event.documentId; content: event.content,
+ documentId: event.documentId, content: event.content,
  title: event.title,
  options: event.options,
  });

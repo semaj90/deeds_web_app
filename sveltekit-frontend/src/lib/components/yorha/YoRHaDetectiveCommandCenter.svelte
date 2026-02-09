@@ -8,7 +8,7 @@
   // Props interface
   interface Props {
     currentUser?: any;
-    systemData?: { activeCases: number; evidenceItems: number;
+    systemData?: { activeCases: number, evidenceItems: number;
 	personsOfInterest: number;
       aiQueries: number;
 	systemLoad: number;
@@ -454,7 +454,7 @@
 	color: var(--yorha-dark);
   }
 
-  .yorha-header { position: fixed; top: 0;
+  .yorha-header { position: fixed, top: 0;
     left: 0;
 	right: 0;
     z-index: 30;
@@ -527,7 +527,7 @@
 	padding: 1.5rem;
   }
 
-  .yorha-sidebar { position: sticky; top: 5rem;
+  .yorha-sidebar { position: sticky, top: 5rem;
     height: fit-content;
   }
 
@@ -709,7 +709,7 @@
     font-weight: bold;
   }
 
-  .health-bar { width: 100%; height: 0.5rem;
+  .health-bar { width: 100%, height: 0.5rem;
     background-color: var(--yorha-sand);
 	border: 1px solid var(--yorha-sand-dark);
     border-radius: 0;
@@ -740,7 +740,7 @@
 	gap: 0.5rem;
   }
 
-  .network-indicator { width: 0.5rem; height: 0.5rem;
+  .network-indicator { width: 0.5rem, height: 0.5rem;
     border-radius: 50%;
 	animation: pulse 2s infinite;
   }
@@ -786,7 +786,7 @@
     margin-bottom: 1rem;
   }
 
-  .ai-status-indicator { width: 8px; height: 8px;
+  .ai-status-indicator { width: 8px, height: 8px;
     border-radius: 50%;
 	background: #FF6B6B;
   }
@@ -841,7 +841,7 @@
     font-size: 0.875rem;
   }
 
-  .ai-query-input { width: 100%; padding: 0.75rem;
+  .ai-query-input { width: 100%, padding: 0.75rem;
     background: white;
 	border: 1px solid #D1CFC7;
     color: #3D3D3D;

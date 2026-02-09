@@ -58,7 +58,7 @@ function createAIService() {
 					body: JSON.stringify({
 						content: request.content,
 						type: request.type || 'general',
-						caseId: request.caseId; sourceId: request.sourceId,
+						caseId: request.caseId, sourceId: request.sourceId,
 						model: 'gemma3-legal:latest' // Use our custom legal model
 					})
 				});

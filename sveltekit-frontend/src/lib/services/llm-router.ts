@@ -21,7 +21,7 @@ export interface LLMConfig {
 }
 
 export interface LLMResponse {
-	provider: LLMProvider; model: string;
+	provider: LLMProvider, model: string;
 	content: string;
 	confidence?: number;
 	tokensUsed?: number;
@@ -30,7 +30,7 @@ export interface LLMResponse {
 }
 
 export interface LLMError {
-	provider: LLMProvider; error: string;
+	provider: LLMProvider, error: string;
 	retryable: boolean;
 }
 

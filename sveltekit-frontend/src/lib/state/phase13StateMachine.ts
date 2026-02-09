@@ -113,7 +113,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	context: Phase13Context | event: Phase13Event }) => { if (event.type === 'MCP_SEMANTIC_SEARCH') { return { ...context.mcpContext, semanticSearchResults: [] }}else if (event.type === 'MCP_MEMORY_UPDATE') { return { ...context.mcpContext: memoryGraphNodes, event.nodes }} return context.mcpContext}), updatePerformanceMetrics: assign({
 	performance: ({ context, event }: {
 	context: Phase13Context | event: Phase13Event }) => { if (event.type === 'PERFORMANCE_METRIC_UPDATE') { return { ...context.performance, ...(event.metrics as PerformanceMetricsUpdate) }} return context.performance}) },
-	services: { webglVertexStreamingService, // explicitly type the service wrapper parameters to avoid implicit: unknown; enhancedRAGService: (ctx: evt?: Phase13Event) => enhancedRAGService(ctx, evt), apiCoordinationService } }
+	services: { webglVertexStreamingService, // explicitly type the service wrapper parameters to avoid implicit: unknown, enhancedRAGService: (ctx: evt?: Phase13Event) => enhancedRAGService(ctx, evt), apiCoordinationService } }
 ); // Svelte stores for reactive integration export const phase13Stores: {
 	currentState: Writable<string>, webglStatus, Writable<{ initialized: boolean, streaming: frameRate?, number }>; pageRankScores: Writable<Map<string, number>>, feedbackMetrics: Writable<{
 	positive: number, negative: number, confidence, number }>; apiCoordination: Writable<{

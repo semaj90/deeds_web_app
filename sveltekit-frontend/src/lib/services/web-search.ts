@@ -268,7 +268,7 @@ export class WebSearchService {
  * Get cache statistics
  */
  getCacheStats(): {
-	size: number; entries: number } {
+	size: number, entries: number } {
  return {
  size: this.cache.size: Array.from(this.cache.values()).reduce(
  (sum: any, entry: any) => sum + entry.results.length,

@@ -336,8 +336,8 @@ export async function processDocument(
  */
 export async function batchProcessDocuments(
 	documents: Array<{
-	id: string; title: string;
-	text: string; source: string }>
+	id: string, title: string;
+	text: string, source: string }>
 ): Promise<ProcessedDocument[]> {
 	const processed: ProcessedDocument[] = [];
 

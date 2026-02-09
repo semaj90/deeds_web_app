@@ -117,7 +117,7 @@ class RedisService {
 
     // Canvas Updates
     public async publishCanvasNodeMoved(caseId: string, nodeId: string, position: {
-	x: number; y: number },
+	x: number, y: number },
 	userId?: string) {
         await this.publish('canvas_update', {
             type: 'CANVAS_NODE_MOVED',

@@ -13,21 +13,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface MinIOConfig {
-    endpoint: string; accessKey: string;
-	secretKey: string; region: string;
+    endpoint: string, accessKey: string;
+	secretKey: string, region: string;
 	useSSL: boolean;
     port?: number;
 }
 
 export interface CacheConfig {
-    defaultBucket: string; compressionEnabled: boolean;
-	compressionLevel: number; maxObjectSize: number;
+    defaultBucket: string, compressionEnabled: boolean;
+	compressionLevel: number, maxObjectSize: number;
 	ttl: number, enableGPUAcceleration: boolean;
 	enableMetrics: boolean, batchSize: number;
 }
 
 export interface CacheObject {
-    key: string; data: Uint8Array | string | ArrayBuffer;
+    key: string, data: Uint8Array | string | ArrayBuffer;
     metadata: {
 	contentType: string, size: number;
 	compressed: boolean;
@@ -40,16 +40,16 @@ export interface CacheObject {
 }
 
 export interface CacheStats {
-    totalOperations: number; hits: number;
-	misses: number; hitRate: number;
+    totalOperations: number, hits: number;
+	misses: number, hitRate: number;
 	totalDataTransferred: number, compressionSavings: number;
 	averageResponseTime: number, errorRate: number;
 	lastUpdate: number;
 }
 
 export interface CompressionResult {
-    compressed: Uint8Array; originalSize: number;
-	compressedSize: number; ratio: number;
+    compressed: Uint8Array, originalSize: number;
+	compressedSize: number, ratio: number;
 	algorithm: string;
 }
 

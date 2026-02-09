@@ -114,7 +114,7 @@ export class RAGMinIOGPUSOMCache {
   private async findBMU(
     inputVector: Float32Array
   ): Promise<{
-	x: number; y: number;
+	x: number, y: number;
 	distance: number }> {
     let bestDistance = Infinity;
     let bestX = 0;
@@ -248,7 +248,7 @@ inputVector: this.somGrid[i][j].weights
   async semanticSearch(queryVector: Float32Array, limit = 10): Promise<CacheEntry[]> {
     const bmu = await this.findBMU(queryVector);
     const results: Array<{
-	entry: CacheEntry; similarity: number }> = [];
+	entry: CacheEntry, similarity: number }> = [];
 
     const pushIfFound = async (docId: string) => {
       const entry = this.l1Cache.get(docId) || this.l2Cache.get(docId) || this.l3Cache.get(docId);
@@ -364,9 +364,9 @@ inputVector: this.somGrid[i][j].weights
   }
 
   private getNeighboringClusters(x: number, y: number): Array<{
-	x: number; y: number }> {
+	x: number, y: number }> {
     const neighbors: Array<{
-	x: number; y: number }> = [];
+	x: number, y: number }> = [];
     for (let dx = -1; dx <= 1; dx++) {
       for (let dy = -1; dy <= 1; dy++) {
         const nx = x + dx;

@@ -169,8 +169,8 @@ async function generateEmbedding(text: string): Promise<number[]> {
 // Document Processing
 export async function processDocument(
     file: {
-	name: string; type: string;
-	size: number; arrayBuffer: () => Promise<ArrayBuffer> },
+	name: string, type: string;
+	size: number, arrayBuffer: () => Promise<ArrayBuffer> },
 	content: string
 ): Promise<any> {
 	await initializeIntegratedRAG();

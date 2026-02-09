@@ -231,7 +231,7 @@ export class GrpcStatusAdapter {
    * Get formatted stage info
    */
   static getStageInfo(event: ProcessingEvent): {
-	label: string; message: string;
+	label: string, message: string;
 	icon: string } {
     return {
       label: getStageLabelLabel(event.stage),

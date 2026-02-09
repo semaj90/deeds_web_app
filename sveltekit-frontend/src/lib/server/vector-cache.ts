@@ -118,7 +118,7 @@ export async function getVectorCache(
 	query: string,
 	options: Record<string, any> = {}
 ): Promise<{
-	entry: VectorCacheEntry | null; source: string | null }> {
+	entry: VectorCacheEntry | null, source: string | null }> {
 	const key = generateVectorKey(query, options);
 	const now = Date.now();
 
@@ -195,7 +195,7 @@ export async function getEmbeddingCache(
 	text: string,
 	model: string = 'default'
 ): Promise<{
-	entry: EmbeddingCacheEntry | null; source: string | null }> {
+	entry: EmbeddingCacheEntry | null, source: string | null }> {
 	const key = generateEmbeddingKey(text, model);
 	const now = Date.now();
 
@@ -292,7 +292,7 @@ export function getVectorCacheStats(): {
 	memory: { vectorEntries: number;
 	embeddingEntries: number; maxItems: number };
 	config: {
-	vectorTtlMs: number; embeddingTtlMs: number;
+	vectorTtlMs: number, embeddingTtlMs: number;
 	redisEnabled: boolean };
 } {
 	return {

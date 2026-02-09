@@ -7,10 +7,10 @@
   import { createEventDispatcher } from 'svelte';
 
   // Custom event types for this component
-  export interface TypingStateChangeEvent { state: TypingState; context: Partial<TypingContext>;
+  export interface TypingStateChangeEvent { state: TypingState, context: Partial<TypingContext>;
   }
 
-  export interface ContextualPromptEvent { prompts: string[]; context: Partial<TypingContext>;
+  export interface ContextualPromptEvent { prompts: string[], context: Partial<TypingContext>;
   }
 
   export interface AnalyticsUpdateEvent {

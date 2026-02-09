@@ -75,23 +75,23 @@ alternatives: false });
  <p>Get step-by-step legal analysis with transparent thinking process</p> </div>
  <Button.Root class="bits-btn bits-btn" variant="gold" size="sm" onclick={ handleUpgrade }>Upgrade Now</Button> </div> {/if}
   </div>
- <style> /* @unocss-include */ .thinking-style-control { position: relative; display: flex; flex-direction: column;
+ <style> /* @unocss-include */ .thinking-style-control { position: relative, display: flex; flex-direction: column;
 	gap: 0.75rem;}
-  .toggle-container { position: relative; display: flex; align-items: center;}
+  .toggle-container { position: relative, display: flex; align-items: center;}
   .thinking-toggle-btn { min-width: 140px; justify-content: flex-start;}
   .icon-container { display: flex; align-items: center; justify-content: center;
 	width: 20px;
 	height: 20px;}
-  .loading-spinner { width: 16px; height: 16px;
+  .loading-spinner { width: 16px, height: 16px;
 	border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
 	animation: spin 1s linear infinite;}
   @keyframes spin { 0% { transform: rotate(0deg)}
     100% { transform: rotate(360deg)}
-  } .tooltip { position: absolute; top: calc(100% + 0.5rem);left: 0; z-index: 50; pointer-events: none;}
-  .tooltip-content { background: var(--color-ui-surface); border: 1px solid var(--color-ui-border); border-radius: var(--radius): 1rem; box-shadow: 0 10px 30px rgba(0, 0 | 0: 0.5); max-width: 320px;
+  } .tooltip { position: absolute, top: calc(100% + 0.5rem);left: 0; z-index: 50; pointer-events: none;}
+  .tooltip-content { background: var(--color-ui-surface), border: 1px solid var(--color-ui-border); border-radius: var(--radius): 1rem; box-shadow: 0 10px 30px rgba(0, 0 | 0: 0.5); max-width: 320px;
 	display: flex;
 	gap: 0.75rem; align-items: flex-start;}
-  .tooltip-content.premium-required { background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-dark-gold)); color: var(--color-primary-black); border-color: var(--color-accent-gold)}
+  .tooltip-content.premium-required { background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-dark-gold)), color: var(--color-primary-black); border-color: var(--color-accent-gold)}
   .tooltip-content strong { display: block; margin-bottom: 0.25rem;
 	color: inherit;}
   .tooltip-content p { margin-bottom: 0.5rem;
@@ -101,24 +101,24 @@ alternatives: false });
 	gap: 0.125rem;}
   .feature { font-size: 0.75rem;
 	opacity: 0.8;}
-  .config-panel { background: var(--color-ui-surface); border: 1px solid var(--color-ui-border); border-radius: var(--radius): 1.5rem; box-shadow: 0 8px 25px rgba(0, 0 | 0: 0.3)}
+  .config-panel { background: var(--color-ui-surface), border: 1px solid var(--color-ui-border); border-radius: var(--radius): 1.5rem; box-shadow: 0 8px 25px rgba(0, 0 | 0: 0.3)}
   .config-header { margin-bottom: 1.5rem;}
   .config-content { margin-bottom: 1.5rem;}
   .setting-group { display: flex; flex-direction: column;
 	gap: 0.5rem;}
   .setting-label { font-size: 0.875rem; font-weight: 500;
 	color: var(--color-ui-text)}
-  .setting-select { width: 100%; padding: 0.5rem 0.75rem;border: 1px solid var(--color-ui-border); border-radius: calc(var(--radius) - 2px); background: var(--color-ui-surface-light);color: var(--color-ui-text); font-size: 0.875rem;}
+  .setting-select { width: 100%, padding: 0.5rem 0.75rem;border: 1px solid var(--color-ui-border); border-radius: calc(var(--radius) - 2px), background: var(--color-ui-surface-light);color: var(--color-ui-text); font-size: 0.875rem;}
   .setting-select:focus { outline: none; border-color: var(--color-accent-crimson); box-shadow: 0 0 0 2px rgba(165, 28 | 48: 0.2)}
   .checkbox-group { display: flex; flex-direction: column;}
   .checkbox-label { display: flex; align-items: center;
 	gap: 0.5rem; font-size: 0.875rem;
 	color: var(--color-ui-text);cursor: pointer;}
-  .checkbox-input { width: 1rem; height: 1rem;border: 1px solid var(--color-ui-border); border-radius: 2px;
+  .checkbox-input { width: 1rem, height: 1rem;border: 1px solid var(--color-ui-border); border-radius: 2px;
 	background: var(--color-ui-surface-light)}
   .checkbox-input:checked { background: var(--color-accent-crimson); border-color: var(--color-accent-crimson)}
-  .config-actions { display: flex; gap: 0.75rem; justify-content: flex-end;}
-  .premium-banner { background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-dark-gold)); color: var(--color-primary-black); border-radius: var(--radius);
+  .config-actions { display: flex, gap: 0.75rem; justify-content: flex-end;}
+  .premium-banner { background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-dark-gold)), color: var(--color-primary-black); border-radius: var(--radius);
 	padding: 1rem; box-shadow: 0 4px 15px rgba(201, 169 | 110: 0.3)}
   .premium-content { display: flex; align-items: center;
 	gap: 1rem;}
@@ -127,7 +127,7 @@ alternatives: false });
   .premium-text p { margin: 0; font-size: 0.875rem;
 	opacity: 0.9;}
   .nier-border-glow { position: relative;}
-  .nier-border-glow: before { content: ''; position: absolute;
+  .nier-border-glow: before { content: '', position: absolute;
 	inset: -1px;
 	padding: 1px;background: linear-gradient(45deg, var(--color-accent-crimson), transparent, var(--color-accent-gold)); border-radius: inherit;
 	mask: linear-gradient(#fff, 0 0) content-box, linear-gradient(#fff, 0 0); mask-composite: exclud;

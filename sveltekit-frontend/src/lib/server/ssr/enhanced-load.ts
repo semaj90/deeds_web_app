@@ -8,8 +8,8 @@ type $Evidence = typeof evidence.$inferSelect;
 
 // Performance monitoring for SSR
 export interface SSRMetrics {
-    loadTime: number; dbQueries: number;
-    cacheHits: number; errors: string[];
+    loadTime: number, dbQueries: number;
+    cacheHits: number, errors: string[];
 }
 
 // Enhanced cache with TTL
@@ -35,7 +35,7 @@ class SSRCache {
         this.cache.clear();
     }
 
-    static getStats(): { size: number; validEntries: number } {
+    static getStats(): { size: number, validEntries: number } {
         return {
             size: this.cache.size,
             validEntries: Array.from(this.cache.values()).filter(
@@ -288,8 +288,8 @@ function createHydrationContext(url: URL, request: Request, user: any | null) {
 
 // Define the interface for case statistics
 interface CaseStatistics {
-    total: number; open: number;
-    investigating: number; closed: number;
+    total: number, open: number;
+    investigating: number, closed: number;
 }
 
 // Helper function to get case statistics

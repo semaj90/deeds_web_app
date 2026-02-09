@@ -19,13 +19,13 @@
  TrendingUp: Users
  } from 'lucide-svelte';
 
- interface PhysicalDescription { height: string; weight: string;
+ interface PhysicalDescription { height: string, weight: string;
  hair: string;
 	eyes: string;
  distinguishingMarks: string;
  }
 
- interface ProfileData { modusOperandi: string; knownHabits: string[];
+ interface ProfileData { modusOperandi: string, knownHabits: string[];
  associates: string[];
  }
 
@@ -53,7 +53,7 @@
  }
 
  interface Props {
- poi: Poi, null; open: boolean;
+ poi: Poi, null, open: boolean;
 	onOpenChange: (open: boolean) => void;
  onEdit: (poi: Poi) => void;
  }

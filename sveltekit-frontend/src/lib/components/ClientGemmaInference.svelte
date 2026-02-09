@@ -2,7 +2,7 @@
   // Migrated to $effect
 
   interface Props {
-    evidenceItem?: { title: string; excerpt: string;
+    evidenceItem?: { title: string, excerpt: string;
 	type: string;
       relevance: number;
     };
@@ -220,7 +220,7 @@
     margin-bottom: 1rem;
   }
 
-  .input-section label { display: block; color: #00ff88;
+  .input-section label { display: block, color: #00ff88;
     font-family: 'Courier New', monospace;
     font-size: 0.75rem;
     margin-bottom: 0.5rem;
@@ -248,10 +248,10 @@
     width: 100%;
   }
 
-  .nes-btn.is-primary { background: #00ff88; color: #000;
+  .nes-btn.is-primary { background: #00ff88, color: #000;
   }
 
-  .nes-btn.is-disabled { background: #6c757d; color: #adb5bd;
+  .nes-btn.is-disabled { background: #6c757d, color: #adb5bd;
     cursor: not-allowed;
   }
 

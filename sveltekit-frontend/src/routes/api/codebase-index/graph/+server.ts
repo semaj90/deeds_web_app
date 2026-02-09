@@ -11,16 +11,16 @@ import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface GraphNode { id: string; label: string;
+interface GraphNode { id: string, label: string;
   type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
-  errorCount: number; filePath: string;
+  errorCount: number, filePath: string;
   cluster?: string;
   imports?: string[];
   exports?: string[];
   functions?: string[];
 }
 
-interface GraphEdge { source: string; target:string;
+interface GraphEdge { source: string, target:string;
   type: 'import' | 'export' | 'dependency';
 }
 

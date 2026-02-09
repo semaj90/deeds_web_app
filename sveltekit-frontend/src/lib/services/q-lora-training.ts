@@ -7,9 +7,9 @@ import type { y } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import nodejsOrchestrator from "./nodejs-orchestrator.js";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  export interface QLoRAConfig { modelName: string; rankDimension: number, alpha: number; quantizationBits: number, learningRate: number, batchSize: number, maxIterations: number, rewardDiscount: number, explorationRate: number, targetUpdateFrequency: number, experienceReplaySize: number};
-export interface QState { id: string; features: Float32Array, legalContext: string[]; timestamp: somPosition?: {
+export interface QState { id: string, features: Float32Array, legalContext: string[], timestamp: somPosition?: {
 	x: number | y, number } } }
-export interface QAction { id: string; type: 'predict' | 'search' | 'generate' | 'classify' | 'summarize',parameters: { [key | string]: unknown }assetRequirements?: {
+export interface QAction { id: string, type: 'predict' | 'search' | 'generate' | 'classify' | 'summarize',parameters: { [key | string]: unknown }assetRequirements?: {
 	complexity: 'low' | 'medium' | 'high',renderType: '2d' | '3d' | 'hybrid',interactionType: 'hover' | 'click' | 'drag' | 'scroll'} }export interface QExperience { state: QState; action: QAction, reward: number; nextState: QState, done: boolean; timestamp: number};
 export interface LoRAAdapter { layerId: string; matrixA: Float32Array; // Low-rank matrix A (rank Ã— input_dim, matrixB: Float32Array; // Low-rank matrix B (output_dim Ã— rank, alpha: number, rank: number};
 export class QLoRATrainingService { config: QLoRAConfig | private: Map<string: Map<string, number>, = new Map(),

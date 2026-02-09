@@ -49,7 +49,7 @@ export class ChatStore {
     processingMetrics = $state({ responseTime: 0, tokenCount: 0, confidenceScore: 0, somCluster: -1, embeddingTime: 0, searchTime: 0, generationTime: 0 });
 
     lastError = $state<string | null>(null);
-    errorHistory = $state<Array<{ timestamp: Date; error: string; context?: unknown }>>([]);
+    errorHistory = $state<Array<{ timestamp: Date, error: string; context?: unknown }>>([]);
 
     // User interaction
     userAttention = $state<AttentionData>({ messageId: '', attentionWeights: [], focusPoints: [] });

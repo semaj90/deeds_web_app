@@ -160,7 +160,7 @@ export class ClientEmbeddingGenerator {
             // Wait for worker initialization using one-time listener
             await this.postWorkerRequest(
                 (data: any) => data?.type === 'initialized',
-                { type: 'initialize'; model: this.embedModel },
+                { type: 'initialize', model: this.embedModel },
 	30000
             );
 

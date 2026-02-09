@@ -57,7 +57,7 @@ export interface Recommendation {
 
 export type IngestResult =
     | { success: true;
-	documentId: string; jobId: string }
+	documentId: string, jobId: string }
     | { success: false;
 	error: string };
 
@@ -530,7 +530,7 @@ class UnifiedSearchService {
             content: String(row.content ?? ''),
             filePath: String(row.file_path ?? '') || undefined,
             mimeType: String(row.mime_type ?? '') || undefined,
-            fileSize: typeof row.file_size === 'number' ? row.file_size  | undefined; metadata: {
+            fileSize: typeof row.file_size === 'number' ? row.file_size  | undefined, metadata: {
                 source,
                 userId: safeString(parsedMeta.userId),
                 tags: safeStringArray(parsedMeta.tags),

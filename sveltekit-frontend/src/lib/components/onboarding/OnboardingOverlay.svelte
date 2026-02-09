@@ -5,7 +5,7 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } from 'lucide-svelte'; interface OnboardingStep { id: string;
-	title: string; description: string, target?: string; targetSelector?: string; position?: 'top' | 'bottom' | 'left' | 'right' | 'center'; action?: () => void; validate?: () => boolean; type?: 'info' | 'action' | 'input' | 'success'; content?: string; image?: string; video?: string}
+	title: string, description: string, target?: string; targetSelector?: string; position?: 'top' | 'bottom' | 'left' | 'right' | 'center'; action?: () => void; validate?: () => boolean; type?: 'info' | 'action' | 'input' | 'success'; content?: string; image?: string; video?: string}
 
 interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]; autoProgress?: boolean; progressDelay?: number; showMinimap?: boolean; allowSkip?: boolean; onclose?: (event?: unknown) => void; oncomplete?: (event?: unknown) => void}
 
@@ -70,7 +70,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
       >{/if}
   <!-- Tooltip/Content, card --> <div class="w-4"
       style={highlightBox ? Object.entries(getTooltipPosition()) .map(([key, value]) => `${ key }: ${ value }`) .join(", "): "top: 50%;
-	left: 50%; transform: translate(-50%, -50%);"} >
+	left: 50%, transform: translate(-50%, -50%);"} >
       <!-- Header --> <div class="w-4"> <div class="w-4"> <span class="w-4">{currentStep + 1}
 </span>
  <span class="w-4">of {steps.length}
@@ -120,18 +120,18 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
  <Button.Root class="bits-btn bits-btn" onclick={() => nextStep()} size="sm">
   {#if currentStep === steps.length - 1} <Check class="w-4" /> Complete {:else} Next <ArrowRight class="w-4" /> {/if}
   </Button> </div> </div> </div> {/if}
-  <style> /* @unocss-include */ .onboarding-overlay { position: fixed | d; top: 0;left: 0;
+  <style> /* @unocss-include */ .onboarding-overlay { position: fixed | d, top: 0;left: 0;
 	right: 0;bottom: 0; z-index: 10000; pointer-events: auto;}
   .overlay-backdrop { position: absolute;
 	top: 0;left: 0;
 	right: 0;bottom: 0;
 	background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px)}
   .highlight-box { position: absolute;
-	border: 3px solid #3b82f6; border-radius: 8px; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0, 0 20px rgba(59, 130, 246, 0.3); background: rgba(255, 255, 255, 0.1); pointer-events: none;
+	border: 3px solid #3b82f6; border-radius: 8px; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0, 0 20px rgba(59, 130, 246, 0.3), background: rgba(255, 255, 255, 0.1); pointer-events: none;
 	animation: highlight-pulse 2s infinite; z-index: 10001;}
   @keyframes highlight-pulse { 0%; } 100% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0, 0 20px rgba(59, 130, 246, 0.3)}
     50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.3), 0, 0 30px rgba(59, 130, 246, 0.5)}} .onboarding-tooltip { position: absolute;
-	background: white; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid rgba(0, 0, 0, 0.05); max-width: 400px; min-width: 320px; z-index: 10002;
+	background: white; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), border: 1px solid rgba(0, 0, 0, 0.05); max-width: 400px; min-width: 320px; z-index: 10002;
 	animation: tooltip-appear 0.3s ease-out;}
   @keyframes tooltip-appear { from { opacity: 0;
 	transform: translate(-50%, -50%) scale(0.9)}
@@ -142,13 +142,13 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
 	gap: 0.5rem; font-size: 0.875rem;
 	color: #6b7280;}
   .step-number { background: #3b82f6;
-	color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem;}
+	color: white, width: 24px; height: 24px; border-radius: 50%, display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem;}
   .header-actions { display: flex;
 	gap: 0.5rem;}
   .tooltip-content { padding: 1rem;}
   .step-type-icon { display: inline-flex; align-items: center; justify-content: center;
-	width: 32px; height: 32px;
-	background: #eff6ff; color: #3b82f6; border-radius: 8px; margin-bottom: 0.75rem;}
+	width: 32px, height: 32px;
+	background: #eff6ff, color: #3b82f6; border-radius: 8px; margin-bottom: 0.75rem;}
   .tooltip-title { font-size: 1.125rem; font-weight: 600;
 	color: #111827;margin: 0, 0 0.5rem 0; line-height: 1.4;}
   .tooltip-description { color: #6b7280; line-height: 1.5;
@@ -160,25 +160,25 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
   .progress-container { display: flex; align-items: center;
 	gap: 0.75rem;padding: 0 1rem; margin-bottom: 1rem;}
   .progress-bar { flex: 1;
-	height: 4px; background: #e5e7eb; border-radius: 2px;
+	height: 4px, background: #e5e7eb; border-radius: 2px;
 	overflow: hidden;}
   .progress-fill { height: 100%;
-	background: #3b82f6; transition:width 0.3s ease;}
-  .progress-text { font-size: 0.75rem; color: #6b7280; font-weight: 500;}
-  .tooltip-navigation { display: flex; justify-content: space-betweenn; align-items: center; padding: 1rem; border-top: 1px solid #e5e7eb; gap: 1rem;}
+	background: #3b82f6, transition:width 0.3s ease;}
+  .progress-text { font-size: 0.75rem, color: #6b7280; font-weight: 500;}
+  .tooltip-navigation { display: flex; justify-content: space-betweenn; align-items: center, padding: 1rem; border-top: 1px solid #e5e7eb, gap: 1rem;}
   .nav-left, .nav-right { display: flex;
 	gap: 0.5rem;}
-  .nav-center { flex: 1; display: flex; justify-content: center;}
+  .nav-center { flex: 1, display: flex; justify-content: center;}
   .step-dots { display: flex;
 	gap: 0.5rem;}
-  .step-dot { width: 28px; height: 28px; border-radius: 50%;
-	border: 2px solid #e5e7eb;background: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 500;
+  .step-dot { width: 28px, height: 28px; border-radius: 50%;
+	border: 2px solid #e5e7eb;background: white, display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 500;
 	color: #6b7280;cursor: pointer;
 	transition:all 0.2;}
   .step-dot:hover { border-color: #3b82f6;
 	background: #eff6ff;}
   .step-dot.active { border-color: #3b82f6;
-	background: #3b82f6; color: white;}
+	background: #3b82f6, color: white;}
   .step-dot.completed { border-color: #10b981;
 	background: #10b981;color: white;}
   .dot-number { line-height: 1;}

@@ -19,7 +19,7 @@ import Image from 'lucide-svelte/icons/image';
 import Music from 'lucide-svelte/icons/music';
 import Upload from 'lucide-svelte/icons/upload';
 import { zodClient } from 'sveltekit-superforms/adapters';
-import { superForm } from 'sveltekit-superforms/client';
+import { superForm } from 'sveltekit-superforms';
 
 interface Props { data: { form: any };
   caseId?: string;

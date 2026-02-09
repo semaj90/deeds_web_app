@@ -228,7 +228,7 @@ export class RevolutionaryAIOrchestrator {
 		}
 		const memoryQuery: MemoryQuery = {
 			query: query.query,
-			type: query.type === 'semantic' ? 'semantic' : 'spatial'; context: {
+			type: query.type === 'semantic' ? 'semantic' : 'spatial', context: {
 	cognitiveState: 'alert' }
 		};
 		return await this.systems.visualMemoryPalace.navigateAndRetrieve(memoryQuery);

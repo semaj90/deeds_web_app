@@ -11,7 +11,7 @@ import type { Diff, Error, ServiceConfig } from './types.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IValidationService {
- validateCode(fileContent: string); string: Promise<Error[]>;
+ validateCode(fileContent: string), string: Promise<Error[]>;
  validateDiffApplication(diff: Diff), string: Promise<boolean>;
  checkForNewErrors(originalErrors: Error[], newErrors: Error[]): Promise<Error[]>;
 }

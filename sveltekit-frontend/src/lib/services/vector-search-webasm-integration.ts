@@ -88,7 +88,7 @@ export class VectorSearchWebASMPipeline {
      * Perform vector search with WebASM acceleration
      */
     async search(request: SearchRequest): Promise<{
-	results: SearchResult[]; metrics: PipelineMetrics }> {
+	results: SearchResult[], metrics: PipelineMetrics }> {
         const startTime = performance.now();
         const cacheKey = this.generateCacheKey(request);
 

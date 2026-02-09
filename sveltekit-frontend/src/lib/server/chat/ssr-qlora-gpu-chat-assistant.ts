@@ -103,7 +103,7 @@ export interface SSRChatContext {
 	gpuCacheState: any;
 	preloadedResponses: Map<string, string>;
 	currentCase?: {
-	caseId: string; documents: string[];
+	caseId: string, documents: string[];
 	activeContext: Float32Array };
 }
 

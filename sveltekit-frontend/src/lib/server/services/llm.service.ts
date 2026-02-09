@@ -13,9 +13,9 @@ interface SummaryContext {
 	charges: string[];
   evidence: string;
 	statutes: Array<{ code: string;
-	jurisdiction: string; title: string }>;
+	jurisdiction: string, title: string }>;
   caseLaw: Array<{
-	title: string; summary: string }>;
+	title: string, summary: string }>;
 }
 
 interface GeneratedSummary {

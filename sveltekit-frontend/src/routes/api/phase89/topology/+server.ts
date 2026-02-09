@@ -44,7 +44,7 @@ SELECT
     }));
 
     // Build edges based on file paths (same directory = connected)
-    const edges: Array<{ from: string; to: string; type, string }> = [];
+    const edges: Array<{ from: string, to: string; type, string }> = [];
     const dirGroups = new Map<string, string[]>();
 
     for (const node of nodes) {

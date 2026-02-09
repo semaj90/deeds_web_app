@@ -1,7 +1,7 @@
 import type { Document } from '$lib/types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-// @ts-nocheck import type { Meta, StoryObj } from '@storybook/svelte'; import AIAssistantMachine from './AIAssistantMachineComponent.svelte.js'; // NOTE: Typing loosened due to Storybook + Svelte, 5 (runes) inference friction; casting to: unknown to avoid blocking TS errors.; const meta: unknown = { title: 'XState/AI Assistant Machine', // @ts-expect-error Svelte, 5 component typing mismatch with Storybook inferred component type component: AIAssistantMachine; parameters: {
-	layout: 'fullscreen'; docs: {
+// @ts-nocheck import type { Meta, StoryObj } from '@storybook/svelte'; import AIAssistantMachine from './AIAssistantMachineComponent.svelte.js'; // NOTE: Typing loosened due to Storybook + Svelte, 5 (runes) inference friction; casting to: unknown to avoid blocking TS errors.; const meta: unknown = { title: 'XState/AI Assistant Machine', // @ts-expect-error Svelte, 5 component typing mismatch with Storybook inferred component type component: AIAssistantMachine, parameters: {
+	layout: 'fullscreen', docs: {
 	description: { component: 'Enterprise-grade XState, 5 AI Assistant Machine with full-stack legal AI integration, multi-protocol service support, and real-time capabilities' } } },
 	tags: ['autodocs'], // Cast argTypes to: unknown to suppress prop name validation (alignment not critical for current story functionality) argTypes: {
 	initialContext: { control: 'object', description: 'Initial context for the AI Assistant Machine', table: {

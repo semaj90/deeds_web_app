@@ -35,7 +35,7 @@ interface QdrantSearchHit<T> {
 }
 
 // Minimal request shapes used in this module
-type QdrantUpsertPoint = { id: string | number; vector: number[]; payload?: Record<string, unknown> }
+type QdrantUpsertPoint = { id: string | number, vector: number[]; payload?: Record<string, unknown> }
 
 type QdrantUpsertRequest = { wait?: boolean; points: QdrantUpsertPoint[] }
 
@@ -173,7 +173,7 @@ export class QdrantVectorStore {
 
  /** Store conversation turn with embedding */
  async storeConversationTurn(
- turnIndex: number, userMessage: string); agentResponse: string); metadata: { intent?: string; hmmState?: number; confidence?: number; entities?: LegalEntity[] }
+ turnIndex: number, userMessage: string), agentResponse: string); metadata: { intent?: string; hmmState?: number; confidence?: number; entities?: LegalEntity[] }
  ): Promise<string> {
  await this.ensureInitialized();
  const payload = {
@@ -200,7 +200,7 @@ export class QdrantVectorStore {
  }
 
  /** Store entity with embedding */
- async storeEntity(sessionId: string, entity: LegalEntity); embedding: number[]): Promise<string> {
+ async storeEntity(sessionId: string, entity: LegalEntity), embedding: number[]): Promise<string> {
  await this.ensureInitialized();
  const pointId = createHash("sha256")
  .update(`${sessionId}-${entity.type}-${entity.value}`)
@@ -227,7 +227,7 @@ const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
 
  /** Store conversation summary with embedding */
  async storeSummary(
- sessionId: string, summary: string); embedding: number[]); metadata: { turnCount?: number; currentState?: number; confidence?: number }
+ sessionId: string, summary: string), embedding: number[]); metadata: { turnCount?: number; currentState?: number; confidence?: number }
  ): Promise<string> {
  await this.ensureInitialized();
  const pointId = createHash("sha256")

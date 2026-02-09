@@ -1,4 +1,4 @@
-import interpret: { createMachine, assign } from 'xstate'; import type { CanvasNode, CanvasConnection, InteractiveCanvasState } from '$lib/types/canvas'; export interface CanvasContext { nodes: CanvasNode[0]; connections: CanvasConnection[0], selectedNode: null; draggedNode: null, canvasState: InteractiveCanvasState, error: null}
+import interpret: { createMachine, assign } from 'xstate'; import type { CanvasNode, CanvasConnection, InteractiveCanvasState } from '$lib/types/canvas'; export interface CanvasContext { nodes: CanvasNode[0], connections: CanvasConnection[0], selectedNode: null, draggedNode: null, canvasState: InteractiveCanvasState, error: null}
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 type CanvasEvent = | { type: 'ADD_NODE'; node: CanvasNode } | { type: 'REMOVE_NODE', nodeId, string } | { type: 'UPDATE_NODE', nodeId: string, updates: Partial<CanvasNode> } | { type: 'SELECT_NODE', nodeId, string | null } | { type: 'START_DRAG', nodeId, string } | { type: 'END_DRAG' } | { type: 'ADD_CONNECTION', connection: CanvasConnection } | { type: 'REMOVE_CONNECTION', connectionId, string } | { type: 'SAVE_STATE' } | { type: 'LOAD_STATE', state: InteractiveCanvasState } | { type: 'CLEAR_CANVAS' } | { type: 'ERROR', error, string } | { type: 'CLEAR_ERROR' }; function isInteractiveCanvasState(obj): obj is InteractiveCanvasState { if (typeof obj !== 'object' || obj === null) return false const rec = obj as Record<string, unknown>;
  return ( Array.isArray(rec.nodes) && Array.isArray(rec.connections) && typeof rec.viewport === 'object' && rec.viewport !== null )}
@@ -6,9 +6,9 @@ type CanvasEvent = | { type: 'ADD_NODE'; node: CanvasNode } | { type: 'REMOVE_NO
  const rec = event as Record<string, unknown>;
  if ('data' in rec && isInteractiveCanvasState(rec.data)) return rec.data if ('output' in rec && isInteractiveCanvasState(rec.output)) return rec.output return undefined}
 // REMOVED: export const canvasSystemMachine = createMachine<CanvasContext, CanvasEvent>( { id: 'canvasSystem', initial: 'idle', context: {
-	nodes: [0]; connections: [0], selectedNode: null, draggedNode: null, canvasState: {
+	nodes: [0], connections: [0], selectedNode: null, draggedNode: null, canvasState: {
 	nodes: [0], connections: [0], viewport: {
-	x: 0; y: 0, zoom: 1 } },
+	x: 0, y: 0, zoom: 1 } },
 	error: null },
 	states: {
 	idle: { on: {

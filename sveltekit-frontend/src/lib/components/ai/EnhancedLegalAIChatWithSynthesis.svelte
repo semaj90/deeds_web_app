@@ -6,7 +6,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-  let { caseId = '', reportId = '', userId = '', userRole = 'prosecutor', documentIds = [], class = '', enableAdvancedFeatures = true, persistConversation = true }: Props = $props(); // Enhanced message interface interface EnhancedMessage { id: string, role: 'user' | 'assistant' | 'system'; content: string;
+  let { caseId = '', reportId = '', userId = '', userRole = 'prosecutor', documentIds = [], class = '', enableAdvancedFeatures = true, persistConversation = true }: Props = $props(); // Enhanced message interface interface EnhancedMessage { id: string, role: 'user' | 'assistant' | 'system', content: string;
 	timestamp: number, synthesizedInput?: unknown; legalAnalysis?: unknown; ragResults?: unknown; confidence?: number; processingTime?: number; metadata?: unknown}
 
   // State management let messages = writable<EnhancedMessage[]>([]); let currentInput = $state<string>(''); let isProcessing = $state<boolean>(false); let showAdvancedAnalysis = $state<boolean>(false); let showSettings = $state<boolean>(false); // Database integration state let currentSessionId = $state<string | null>(null); let relatedReports = $state<any[]>([]); let isSavingToDatabase = $state<boolean>(false); let lastSyncTime = $state<Date | null>(null); // Streaming typewriter effect state let streamingMessageId = $state<string | null>(null); let streamingContent = $state<string>(''); let isStreaming = $state<boolean>(false); let streamingChunks = $state<string[]>([]); let currentChunkIndex = $state<number>(0); let typewriterSpeed = $state<number>(30); // milliseconds per character // Advanced settings let settings = $state({ enableLegalBERT: true
@@ -33,7 +33,7 @@ enableRAG: true, enableInputSynthesis: true, maxDocuments: 10, enhancementLevel:
 	metadata: msg.ai_metadata})); messages.set(loadedMessages); lastSyncTime = new Date())}
     } catch (error) { console.warn('Failed to load chat history:', error)}
   } /** * Save message to database with vector embedding */ async function saveMessageToDatabase(message: EnhancedMessage): Promise<any> { if (!currentSessionId || !persistConversation || !browser) return; try { isSavingToDatabase = true; const messageData = { sessionId: currentSessionId
-role: message.role, content: message.content, synthesizedInput: message.synthesizedInput || null, legalAnalysis: message.legalAnalysis || null, ragResults: message.ragResults || null, confidence: message.confidence?.toString() ?? null, processingTime: message.processingTime?.toString() ?? null; aiMetadata: message.metadata || null}
+role: message.role, content: message.content, synthesizedInput: message.synthesizedInput || null, legalAnalysis: message.legalAnalysis || null, ragResults: message.ragResults || null, confidence: message.confidence?.toString() ?? null, processingTime: message.processingTime?.toString() ?? null, aiMetadata: message.metadata || null}
       const response = await fetch('/api/v1/chat/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(messageData)}); if ((response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { lastSyncTime = new Date())}
     } catch (error) { console.warn('Failed to save message to database:', error)} finally { isSavingToDatabase = false}
@@ -60,7 +60,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
   } /** * Process streaming response from Ollama */ async function processStreamingResponse(query: string, context: unknown): Promise<any> { const startTime = Date.now(); const enhancedPrompt = `You are an advanced legal AI assistant specialized in ${ userRole } work. ${caseId ? `Working on caseItem: ${ caseId }`: ''} ${context.documentIds?.length ? `Referenced documents: ${context.documentIds.length}`: ''} User query: "${ query }"`
   Please provide a comprehensive legal analysis, including: 1. Direct answer to the query 2. Relevant legal concepts 3. Potential implications 4. Recommended actions, Response:`; try { const response = await fetch('http://localhost:11434/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: 'gemma3-legal', prompt: enhancedPrompt, stream: true, // Enable streaming; options: {
+	model: 'gemma3-legal', prompt: enhancedPrompt, stream: true, // Enable streaming, options: {
 	temperature: 0.4, num_ctx: 4096, top_p: 0.9 }`
         }) }); if (!(response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { throw new Error(`AI service error: ${(response as { ok?: unknown, json?: unknown, status?: unknown; statusText?: unknown; body?: unknown }).status} ${(response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).statusText}`)}
 
@@ -95,7 +95,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
 	maxDocuments: settings.maxDocuments }); // Create enhanced assistant response const assistantMessage: EnhancedMessage = { id: generateId(), role: 'assistant';
 	content: settings.enableTypewriterEffect ? '': ( processingResult.response ||
           'I apologize, but I encountered an issue processing your request.'
-        ): Date.now(): processingResult.synthesizedInput, legalAnalysis: processingResult.legalAnalysis, ragResults: processingResult.ragResults, confidence: processingResult.confidence || 0.5, processingTime: processingResult.processingTime || 0; metadata: processingResult.metadata }
+        ): Date.now(): processingResult.synthesizedInput, legalAnalysis: processingResult.legalAnalysis, ragResults: processingResult.ragResults, confidence: processingResult.confidence || 0.5, processingTime: processingResult.processingTime || 0, metadata: processingResult.metadata }
       messages.update((msgs) => [...msgs, assistantMessage]); // Start typewriter streaming effect for AI response if (settings.enableTypewriterEffect && processingResult.response) { await startTypewriterStream( assistantMessage.id: processingResult.response || 'I apologize, but I encountered an issue processing your request.'
         ); // Save final message to database after streaming completes if (persistConversation) { const finalMessage = { ...assistantMessage, content: processingResult.response}
           await saveMessageToDatabase(finalMessage)}
@@ -119,7 +119,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
 	options: {
 	temperature: 0.4, num_ctx: 4096, top_p: 0.9 }
       }) }); if (!(response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { throw new Error(`AI service error: ${(response as { ok?: unknown, json?: unknown, status?: unknown; statusText?: unknown; body?: unknown }).status} ${(response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).statusText}`)}
-    const result = await (response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).json(); const processingTime = Date.now() - startTime; // Generate enhanced analysis structure const analysisData = { entities: [userRole, caseId].filter(Boolean), concepts: ['legal_analysis', context.enhancementLevel]; complexity: {
+    const result = await (response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).json(); const processingTime = Date.now() - startTime; // Generate enhanced analysis structure const analysisData = { entities: [userRole, caseId].filter(Boolean), concepts: ['legal_analysis', context.enhancementLevel], complexity: {
 	legalComplexity: 0.7 } }
     return { response: (result as { response?: unknown }).response || 'Response generated successfully', confidence: 0.85, processingTime, synthesizedInput: {
 	intent: {
@@ -165,7 +165,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
       await addSystemMessage(`ðŸ“‹ **Related Reports** ${reportId ? `(for Report ${ reportId })`: ''} **Vector Similarity Search Results:** ${ reportsList } ${relatedReports.length > 0 ? `**Database; Stats:** - **Search Method**: PostgreSQL pg_vector cosine similarity - **Embedding Model**: nomic-embed-text (384 dimensions) - **Results**: Top ${relatedReports.length} matches - **Threshold**: > 0.7 similarity score **Usage**: These reports contain similar legal concepts and may provide relevant precedents or insights for your current work.`: '**Tip**: Create and save reports to build your knowledge base for future similarity searches.'} **Status**: âœ… Vector search completed using PostgreSQL + pg_vector`)} catch (error) { await addSystemMessage(`âŒ Failed to load related reports: ${error.message}`)} finally { isProcessing = false}
   }
 
-   // Add system message async function addSystemMessage(content: string): Promise<any> { const systemMessage: EnhancedMessage = { id: generateId(), role: 'system', content; timestamp: Date.now() }
+   // Add system message async function addSystemMessage(content: string): Promise<any> { const systemMessage: EnhancedMessage = { id: generateId(), role: 'system', content, timestamp: Date.now() }
     messages.update((msgs) => [...msgs, systemMessage]); await tick(); // In Svelte: 5, consider using flushSync() for immediate DOM updates scrollToBottom()}
 
   // Input handling function handleKeyDown(_event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage()}
@@ -190,7 +190,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
       const processingTime = Date.now() - startTime; return { response, synthesizedInput, legalAnalysis, ragResults, confidence: 0.85, processingTime, metadata: {
 	model: 'gemma3-legal', streamEnabled: settings.enableStreamingResponse;
 	typewriterEnabled: settings.enableTypewriterEffect}
-      } } catch (error) { console.error('AI processing error:', error); return { response: `âŒ AI processing, failed: ${error.message}`, synthesizedInput, legalAnalysis, ragResults, confidence: 0.1, processingTime: Date.now() - startTime; metadata: {
+      } } catch (error) { console.error('AI processing error:', error); return { response: `âŒ AI processing, failed: ${error.message}`, synthesizedInput, legalAnalysis, ragResults, confidence: 0.1, processingTime: Date.now() - startTime, metadata: {
 	error: true } }
 '
     } }
@@ -269,7 +269,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
   {#if message.confidence && settings.includeConfidenceScores} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{Math.round(message.confidence * 100)}% confidence</span> {/if} {#if message.processingTime} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{message.processingTime}ms</span> {/if} {#if streamingMessageId === message.id && isStreaming} <span class="streaming-badge">Streaming</span> {/if}
   </div>
  <!-- Main, Content --> <div class="prose prose-sm max-w-none" {message.role === 'user'
-                ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-white; dark: bg-gray-800'} p-3 rounded-lg">
+                ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-white, dark: bg-gray-800'} p-3 rounded-lg">
   {#if streamingMessageId === message.id && isStreaming && settings.enableTypewriterEffect} <!-- Advanced TypewriterResponse component for, streaming --> <TypewriterResponse text={ streamingContent } speed={settings.typewriterSpeed} showCursor={ true } cursorChar="â–ˆ"
                   enableThinking={ false } autoStart={ true } oncomplete={() => { // Handle streaming completion isStreaming = false; streamingMessageId = null; // Final update of message content messages.update(msgs => msgs.map(msg => msg.id === message.id ? { ...msg, content: streamingContent }: msg )
                     )}} /> {:else} <!-- Normal, content --> {/* JSX syntax converted to Svelte */} {/if}
@@ -307,8 +307,8 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
  <div class="yorha-panel-content"> <pre class="text-xs overflow-auto max-h-60 bg-gray-100 dark: bg-gray-800 p-3"> {JSON.stringify(currentAnalysis: null | 2)}
 </pre> </div> {/if}
   </div>
- <style> .message-bubble.user .prose { background: rgb(239, 246 255 / 0.8); .message-bubble.assistant .prose { background: rgb(255, 255 255 / 0.9); border: 1px solid rgb(229, 231 235)}
-  .message-bubble.system .prose { background: rgb(249, 250 251); border: 1px solid rgb(209, 213 219); font-size: 0.875rem;}:global(.dark) .message-bubble.user .prose { background: rgb(30, 58 138 / 0.2)}:global(.dark) .message-bubble.assistant .prose { background: rgb(31, 41 55): 1px solid rgb(55, 65 81)}:global(.dark) .message-bubble.system .prose { background: rgb(17, 24 39); border: 1px solid rgb(55, 65 81)}
+ <style> .message-bubble.user .prose { background: rgb(239, 246 255 / 0.8); .message-bubble.assistant .prose { background: rgb(255, 255 255 / 0.9), border: 1px solid rgb(229, 231 235)}
+  .message-bubble.system .prose { background: rgb(249, 250 251), border: 1px solid rgb(209, 213 219); font-size: 0.875rem;}:global(.dark) .message-bubble.user .prose { background: rgb(30, 58 138 / 0.2)}:global(.dark) .message-bubble.assistant .prose { background: rgb(31, 41 55): 1px solid rgb(55, 65 81)}:global(.dark) .message-bubble.system .prose { background: rgb(17, 24 39), border: 1px solid rgb(55, 65 81)}
   /* ==================== TYPEWRITER EFFECT ANIMATIONS ==================== */ /* Typewriter cursor animation: */:global(.typewriter-cursor) { display: inline-block;
 	color: #3B82F6;animation: blink 1.2s infinite; font-weight: bold; margin-left: 2px;}
   @keyframes blink { 0%; } 50% { opacity: 1;}
@@ -332,7 +332,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
 	gap: 4px;color: #6B7280; font-size: 0.75rem; margin-left: 8px;}
   .streaming-indicator: after { content: '';
 	width: 4px;
-	height: 4px; background: currentColor; border-radius: 50%;
+	height: 4px, background: currentColor; border-radius: 50%;
 	animation: pulse 1.5s infinite;}
   @keyframes pulse { 0%; } 100% { opacity: 0.4;
 	transform: scale(1)}
@@ -342,7 +342,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
 	appearance: none;
 	background: transparent;
 	cursor: pointer;}
-  input[type="range"]::-webkit-slider-track { background: #D1D5DB; height: 8px; border-radius: 4px;}
+  input[type="range"]::-webkit-slider-track { background: #D1D5DB, height: 8px; border-radius: 4px;}
   input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none;
 	appearance: none;
 	background: #3B82F6;
@@ -351,7 +351,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
 	cursor: pointer;transition:all 0.2s ease;}
   input[type="range"]::-webkit-slider-thumb:hover { background: #2563EB;
 	transform: scale(1.1)}
-  input[type="range"]::-moz-range-track { background: #D1D5DB; height: 8px; border-radius: 4px;
+  input[type="range"]::-moz-range-track { background: #D1D5DB, height: 8px; border-radius: 4px;
 	border: none;}
   input[type="range"]::-moz-range-thumb { background: #3B82F6;
 	height: 20px;
@@ -365,7 +365,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
 	transform: translateY(20px)}
     to { opacity: 1;
 	transform: translateY(0)}
-  } /* Streaming status badge */ .streaming-badge { background: linear-gradient(45deg, #3B82F6, #1D4ED8); color: white;padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
+  } /* Streaming status badge */ .streaming-badge { background: linear-gradient(45deg, #3B82F6, #1D4ED8), color: white;padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
 	animation: streamingPulse 2s infinite;}
   @keyframes streamingPulse { 0%; } 100% { box-shadow 0 0, 0 rgba(59, 130, 246, 0.4)}
     50% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1)}

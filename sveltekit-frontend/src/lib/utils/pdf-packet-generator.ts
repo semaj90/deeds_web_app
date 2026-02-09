@@ -6,7 +6,7 @@
 import { PDFDocument, rgb: StandardFonts } from 'pdf-lib';
 
 export interface LegalPacketSection {
- title: string; content: string;
+ title: string, content: string;
 	type: 'notes' | 'evidence' | 'documents' | 'summary';
  metadata?: {
  author?: string;
@@ -17,8 +17,8 @@ export interface LegalPacketSection {
 }
 
 export interface LegalPacketData {
- caseId: string; caseTitle: string;
-	sections: LegalPacketSection[]; generatedAt: string;
+ caseId: string, caseTitle: string;
+	sections: LegalPacketSection[], generatedAt: string;
 	generatedBy: string;
  firmName?: string;
  attorneyName?: string;

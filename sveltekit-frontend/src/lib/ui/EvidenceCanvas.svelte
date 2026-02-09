@@ -41,7 +41,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  // Evidence positioning and layout
  let evidencePositions = $state<Map<string, { x: number;
-	y: number; width: number;
+	y: number, width: number;
 	height: number }>>(new Map());
 
  // Calculate icon based on file type

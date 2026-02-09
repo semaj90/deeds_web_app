@@ -10,7 +10,7 @@
     required?: boolean;
     disabled?: boolean;
     options?: {
-	label: string; value: any }[];
+	label: string, value: any }[];
     validation?: {
       pattern?: string;
       min?: number;

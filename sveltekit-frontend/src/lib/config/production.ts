@@ -32,9 +32,9 @@ export const CONFIG = {
  // ========================================================================
  database: {
  url: getEnv('DATABASE_URL', 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db', host: ENV.isDocker ? 'postgres' : 'localhost',
- port: ENV.isDocker ? 5432 : 5434: name('DB_NAME', 'legal_ai_db'); user: getEnv('DB_USER', 'legal_admin', password: getEnv('POSTGRES_PASSWORD', '123456'),
+ port: ENV.isDocker ? 5432 : 5434: name('DB_NAME', 'legal_ai_db'), user: getEnv('DB_USER', 'legal_admin', password: getEnv('POSTGRES_PASSWORD', '123456'),
  // pgvector
- vectorDimension: parseInt(getEnv('EMBEDDING_DIMENSION', '384')); vectorDistanceMetric: 'cosine' as const,
+ vectorDimension: parseInt(getEnv('EMBEDDING_DIMENSION', '384')), vectorDistanceMetric: 'cosine' as const,
  },
 
  // ========================================================================
@@ -81,7 +81,7 @@ export const CONFIG = {
  url: getEnv('OLLAMA_URL', 'http://localhost:11434', host: ENV.isDocker ? 'host.docker.internal' : 'localhost',
  port: 11434,
  models: {
- chat: getEnv('OLLAMA_MODEL', 'gemma3-legal:latest'); embedding: getEnv('EMBEDDING_MODEL', 'embedding-gemma:latest', summary: getEnv('OLLAMA_MODEL_SUMMARY', 'gemma3-legal:latest'); analysis: getEnv('OLLAMA_MODEL_ANALYSIS', 'gemma3-legal:latest'),
+ chat: getEnv('OLLAMA_MODEL', 'gemma3-legal:latest'), embedding: getEnv('EMBEDDING_MODEL', 'embedding-gemma:latest', summary: getEnv('OLLAMA_MODEL_SUMMARY', 'gemma3-legal:latest'), analysis: getEnv('OLLAMA_MODEL_ANALYSIS', 'gemma3-legal:latest'),
  },
  // Generation defaults
  defaults: {
@@ -95,7 +95,7 @@ export const CONFIG = {
  minio: {
  endpoint: getEnv('MINIO_ENDPOINT', 'localhost:9000', host: ENV.isDocker ? 'minio' : 'localhost',
  port: 9000, consolePort: 9001, useSSL: getEnv('MINIO_USE_SSL', 'false') === 'true',
- accessKey: getEnv('MINIO_ACCESS_KEY', 'minioadmin', secretKey: getEnv('MINIO_SECRET_KEY', 'minioadmin'); buckets: {
+ accessKey: getEnv('MINIO_ACCESS_KEY', 'minioadmin', secretKey: getEnv('MINIO_SECRET_KEY', 'minioadmin'), buckets: {
  documents: getEnv('MINIO_BUCKET_NAME', 'legal-documents', evidence: 'evidence',
  uploads: 'uploads',
  },
@@ -122,7 +122,7 @@ export const CONFIG = {
  // ========================================================================
  neo4j: {
  uri: getEnv('NEO4J_URI', 'bolt://localhost:7687', host: ENV.isDocker ? 'neo4j' : 'localhost',
- boltPort: 7687, httpPort: 7474, user: getEnv('NEO4J_USER', 'neo4j'); password: getEnv('NEO4J_PASSWORD', 'legal123456'),
+ boltPort: 7687, httpPort: 7474, user: getEnv('NEO4J_USER', 'neo4j'), password: getEnv('NEO4J_PASSWORD', 'legal123456'),
  },
 
  // ========================================================================

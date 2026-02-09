@@ -11,7 +11,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Mock security functions to resolve missing imports and address TODO
 const logSecurityEvent = (event: {
-	type: string; details: unknown;
+	type: string, details: unknown;
 	severity: string }) => {
  console.log('Security Event: ', event);
  // In a real app, this would send logs to a security monitoring service
@@ -473,7 +473,7 @@ function validateImportData(
  data: Record<string, unknown> | Case[] | EvidenceItem[],
  type: 'cases' | 'evidence'
 ): {
-	success: boolean; errors: string[];
+	success: boolean, errors: string[];
 	warnings: string[] } {
  const errors: string[] = [];
  const warnings: string[] = [];

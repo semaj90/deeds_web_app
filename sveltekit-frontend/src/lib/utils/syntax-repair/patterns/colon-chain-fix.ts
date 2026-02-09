@@ -142,7 +142,7 @@ export const doubleColonChainPattern: PatternMatcher = createPattern(
 /**
  * Pattern to fix colon chains with type annotations
  * Before: param, Type: param: Type
- * After:  param: Type; param: Type
+ * After:  param: Type, param: Type
  */
 export const typeAnnotationColonChainPattern: PatternMatcher = createPattern(
   'type-annotation-colon-chain',
@@ -245,7 +245,7 @@ export const destructuringColonChainPattern: PatternMatcher = createPattern(
  * Before: ): {
 	a: Type, b: Type }
  * After:  ): {
-	a: Type; b: Type }
+	a: Type, b: Type }
  */
 export const returnTypeColonChainPattern: PatternMatcher = createPattern(
   'return-type-colon-chain',
@@ -262,7 +262,7 @@ export const returnTypeColonChainPattern: PatternMatcher = createPattern(
  * Before: Promise<{
 	a: Type, b: Type }>
  * After: Promise<{
-	a: Type; b: Type }>
+	a: Type, b: Type }>
  */
 export const genericColonChainPattern: PatternMatcher = createPattern(
   'generic-colon-chain',
@@ -373,7 +373,7 @@ export const spreadColonChainPattern: PatternMatcher = createPattern(
  * Pattern to fix colon chains in Svelte $props() destructuring
  * Before: let { prop: Type, another: Type } = $props()
  * After:  let { prop, another }: {
-	prop: Type; another: Type } = $props()
+	prop: Type, another: Type } = $props()
  */
 export const sveltePropsColonChainPattern: PatternMatcher = createPattern(
   'svelte-props-colon-chain',

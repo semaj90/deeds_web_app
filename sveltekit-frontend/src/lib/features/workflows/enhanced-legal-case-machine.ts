@@ -60,7 +60,7 @@ export interface EnhancedLegalCaseContext {
 	| { type: 'CREATE_CASE';
 	data: CaseForm }
 	| { type: 'ADD_EVIDENCE';
-	caseId: string; evidence: EvidenceInput }
+	caseId: string, evidence: EvidenceInput }
 	| { type: 'START_AI_ANALYSIS';
 	caseId: string }
 	| { type: 'RESET' };
@@ -261,7 +261,7 @@ const initialContext: EnhancedLegalCaseContext = {
 			addEvidence: fromPromise<
 				Evidence,
 				{ input: {
-	caseId: string; evidence: EvidenceInput } }
+	caseId: string, evidence: EvidenceInput } }
 			>(async ({ input }) => {
 				const response = await fetch(`/api/cases/${input.caseId}/evidence`, {
 					method: 'POST',

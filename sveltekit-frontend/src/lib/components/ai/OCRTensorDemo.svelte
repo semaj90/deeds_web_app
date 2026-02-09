@@ -94,7 +94,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .status-bar.processing { background: #fef3c7;
 	color: #92400;
 	animation: pulse 2s infinite;}
-  .status-dot { width: 8px; height: 8px; border-radius: 50%;
+  .status-dot { width: 8px, height: 8px; border-radius: 50%;
 	background: #9ca3af;}
   .initialized .status-dot { background: #10b981;}
   .processing .status-dot { background: #f59e0b;}
@@ -104,10 +104,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	padding: 1.5rem;border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .upload-section h3, .metrics-section h3, .cache-stats h3, .results-section h3, .logs-section h3 { margin-bottom: 1rem;
 	color: #1f2937;}
-  .file-info { margin: 1rem 0; padding: 0.75rem;background: #f3f4f6; border-radius: 0.5rem;}
+  .file-info { margin: 1rem 0, padding: 0.75rem;background: #f3f4f6; border-radius: 0.5rem;}
   .action-buttons { display: flex;
 	gap: 1rem; flex-wrap;}
-  .action-buttons button { padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; font-weight: 500;
+  .action-buttons button { padding: 0.75rem 1.5rem, border: none; border-radius: 0.5rem; font-weight: 500;
 	cursor: pointer;
 	transition:all 0.2;}
   .action-buttons buttondisabled { opacity: 0.6;
@@ -115,7 +115,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .action-buttons buttonfirst-child { background: #3b82f6;
 	color: white;}
   .action-buttons buttonfirst-child:hover:not(disabled) { background: #2563eb;}
-  .metrics-grid, .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;}
+  .metrics-grid, .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 1rem;}
   .metric, .stat { display: flex; flex-direction: column;
 	gap: 0.25rem;}
   .metric label, .stat label { font-size: 0.875rem;
@@ -141,10 +141,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: #6b7280; font-family: 'JetBrains Mono', monospace;}
   .result-content { display: grid;
 	gap: 1rem;}
-  .ocr-text p { margin: 0.5rem 0; padding: 0.5rem;background: white; border-radius: 0.5rem;
+  .ocr-text p { margin: 0.5rem 0, padding: 0.5rem;background: white; border-radius: 0.5rem;
 	border: 1px solid #e5e7eb;}
   .tensor-stats { display: flex;
-	gap: 1rem; font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;}
+	gap: 1rem; font-size: 0.875rem, color: #6b7280; margin-top: 0.5rem;}
   .logs-container { max-height: 300px; overflow-y: auto;
 	background: #1f2937; border-radius: 0.5rem;
 	padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem;}

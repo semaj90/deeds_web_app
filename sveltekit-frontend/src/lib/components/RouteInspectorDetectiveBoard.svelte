@@ -1,7 +1,7 @@
 <script lang="ts">
 	let pkg = $state<any>(undefined);
 
-	type RouteDetail = { path: string; kind: 'page' | 'layout' | 'endpoint';
+	type RouteDetail = { path: string, kind: 'page' | 'layout' | 'endpoint';
 		file: string;
 	summary: string;
 		category?: string;
@@ -16,7 +16,7 @@
 
 	type Phase72Status = {
 		errorCount: number;
-		lastError?: { code: string; message: string;
+		lastError?: { code: string, message: string;
 	count: number;
 			lastSeen: string;
 		};

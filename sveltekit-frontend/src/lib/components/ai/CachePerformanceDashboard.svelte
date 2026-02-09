@@ -46,7 +46,7 @@ bankSwitches: 0 });
       // Handle recent queries if (recentResp.status === 'fulfilled' && recentResp.value.ok) { try { const json = await recentResp.value.json(); recentQueries = Array.isArray(json) ? json: []} catch (e) { console.warn('Invalid JSON from recent queries endpoint, using simulator.', e); await updateRecentQueries()}
       } else { console.warn('Recent queries endpoint failed, using simulator.', recentResp); await updateRecentQueries()}
 
-      // Handle system health if (healthResp.status === 'fulfilled' && healthResp.value.ok) { try { const json = await healthResp.value.json(); // Accept either { status: 'healthy' } or plain: string systemHealth = typeof json === 'string' ?; json: (json?.status ?? systemHealth)} catch (e) { console.warn('Invalid JSON from health endpoint, re-evaluating locally.', e); await checkSystemHealth()}
+      // Handle system health if (healthResp.status === 'fulfilled' && healthResp.value.ok) { try { const json = await healthResp.value.json(); // Accept either { status: 'healthy' } or plain: string systemHealth = typeof json === 'string' ?, json: (json?.status ?? systemHealth)} catch (e) { console.warn('Invalid JSON from health endpoint, re-evaluating locally.', e); await checkSystemHealth()}
       } else { console.warn('Health endpoint failed, re-evaluating locally.', healthResp); await checkSystemHealth()}
     } catch (error) { console.error('Failed to refresh metrics:', error); systemHealth = 'error'} finally { isRefreshing = false; performance.mark('refresh-end'); try { performance.measure('refreshMetrics', 'refresh-start', 'refresh-end')} catch (e) { // performance.measure may throw in some environments; ignore }
     } }
@@ -56,9 +56,9 @@ bankSwitches: 0 });
 	memory: {
 	l1Usage: Math.random() * 80, l2Usage: Math.random() * 60, l3Usage: Math.random() * 90, totalCachedItems: Math.floor(Math.random() * 500) + 200 },
 	performance: {
-	averageQueryTime: 120 + Math.random() * 80, p95ResponseTime: 300 + Math.random() * 200, throughputQPS: 15 + Math.random() * 10; errorRate: Math.random() * 2 }
+	averageQueryTime: 120 + Math.random() * 80, p95ResponseTime: 300 + Math.random() * 200, throughputQPS: 15 + Math.random() * 10, errorRate: Math.random() * 2 }
     }}
-  async function updateNintendoStats(): Promise<any> { performance.mark('function-start'); // Simulate Nintendo memory manager stats nintendoStats = { memoryUsage: Math.random() * 6000 + 2000, maxMemory: 8192, activeBankId: Math.floor(Math.random() * 4): Math.floor(Math.random() * 50) + 10, activeStreams: Math.floor(Math.random() * 5): Math.floor(Math.random() * 10); bankSwitches: Math.floor(Math.random() * 3) }}
+  async function updateNintendoStats(): Promise<any> { performance.mark('function-start'); // Simulate Nintendo memory manager stats nintendoStats = { memoryUsage: Math.random() * 6000 + 2000, maxMemory: 8192, activeBankId: Math.floor(Math.random() * 4): Math.floor(Math.random() * 50) + 10, activeStreams: Math.floor(Math.random() * 5): Math.floor(Math.random() * 10), bankSwitches: Math.floor(Math.random() * 3) }}
   async function updateRecentQueries(): Promise<any> { performance.mark('function-start');
    const sampleQueries = [ { query: 'breach of contract elements', cached: true, responseTime: 23 },
 	{ query: 'negligence standard of care', cached: false, responseTime: 145 },
@@ -162,47 +162,47 @@ bankSwitches: 0 });
  <span class="value {cacheMetrics.performance.errorRate > 2 ? 'text-red-500': 'text-green-500'}"> {cacheMetrics.performance.errorRate.toFixed(2)}% </span> </div>
  <div class="perf-item"> <span>Cached Items:</span>
  <span class="value">{cacheMetrics.memory.totalCachedItems.toLocaleString()}</span> </div> </div> </div> </div> </main> </div>
- <style> .cache-dashboard { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); color: #ffffff; font-family: 'JetBrains Mono', monospace; min-height: 100vh;}
-  .dashboard-header { background: rgba(0, 0, 0, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem 2rem;}
+ <style> .cache-dashboard { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%), color: #ffffff; font-family: 'JetBrains Mono', monospace; min-height: 100vh;}
+  .dashboard-header { background: rgba(0, 0, 0, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.1), padding: 1.5rem 2rem;}
   .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
 	gap: 1rem; max-width: 1400px;
 	margin: 0 auto;}
   .title-section h1 { margin: 0, 0 0.25rem 0; font-size: 1.75rem;
 	background: linear-gradient(45deg, #22c55e, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;}
-  .title-section p { margin: 0; opacity: 0.7; font-size: 0.9rem;}
+  .title-section p { margin: 0, opacity: 0.7; font-size: 0.9rem;}
   .header-controls { display: flex; align-items: center;
 	gap: 1rem; flex-wrap;}
   .system-health { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; font-weight: 500;}
-  .system-health.healthy { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3)}
-  .system-health.warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3)}
-  .system-health.critical { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3)}
-  .control-buttons { display: flex; gap: 0.5rem;}
+  .system-health.healthy { background: rgba(34, 197, 94, 0.1), border: 1px solid rgba(34, 197, 94, 0.3)}
+  .system-health.warning { background: rgba(245, 158, 11, 0.1), border: 1px solid rgba(245, 158, 11, 0.3)}
+  .system-health.critical { background: rgba(239, 68, 68, 0.1), border: 1px solid rgba(239, 68, 68, 0.3)}
+  .control-buttons { display: flex, gap: 0.5rem;}
   .control-buttons button { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1); color: white;
-	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.875rem;
+	gap: 0.5rem;padding: 0.5rem 1rem, background: rgba(255, 255, 255, 0.1); color: white;
+	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px, cursor: pointer; font-family: inherit; font-size: 0.875rem;
 	transition:all 0.2s;}
   .control-buttons button:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3)}
-  .control-buttons button:disabled { opacity: 0.5; cursor:not-allowed;}
+  .control-buttons button:disabled { opacity: 0.5, cursor:not-allowed;}
   .auto-refresh-btn.active { background: rgba(34, 197, 94, 0.2); border-color: #22c55e;}
   .clear-cache-btn { background: rgba(239, 68, 68, 0.2) !important; border-color: #ef4444 !important;}
   .dashboard-content { padding: 2rem; max-width: 1400px;
 	margin: 0 auto;}
-  .metrics-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;}
-  .metric-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
+  .metrics-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)), gap: 1.5rem; margin-bottom: 2rem;}
+  .metric-card { background: rgba(255, 255, 255, 0.05), border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
 	padding: 1.5rem;
 	display: flex; align-items: center;
 	gap: 1rem;}
   .metric-card.primary { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border-color: #3b82f6;}
-  .metric-icon { color: #3b82f6; opacity: 0.8;}
-  .metric-content h3 { margin: 0, 0 0.5rem 0; font-size: 0.875rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em;}
+  .metric-icon { color: #3b82f6, opacity: 0.8;}
+  .metric-content h3 { margin: 0, 0 0.5rem 0; font-size: 0.875rem, opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em;}
   .metric-value { font-size: 1.75rem; font-weight: bold;
 	color: #ffffff;display: flex; align-items: baseline;
 	gap: 0.5rem;}
   .grade { font-size: 1rem;
 	opacity: 0.7;}
-  .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;}
-  .dashboard-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
+  .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)), gap: 1.5rem;}
+  .dashboard-card { background: rgba(255, 255, 255, 0.03), border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
 	padding: 1.5rem;}
   .dashboard-card h2 { margin: 0, 0 1rem 0; font-size: 1.1rem;
 	color: #f59e0b; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem;}
@@ -212,15 +212,15 @@ bankSwitches: 0 });
 	gap: 1rem;}
   .stat-row { display: flex; align-items: center;
 	gap: 1rem;}
-  .stat-bar { flex: 1; display: flex; align-items: center;
+  .stat-bar { flex: 1, display: flex; align-items: center;
 	gap: 0.5rem;}
-  .bar { flex: 1; height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
+  .bar { flex: 1, height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px;
 	overflow: hidden;}
   .fill { height: 100%; border-radius: 4px;
 	transition:width 0.5s ease;}
   .fill.retrieval { background: linear-gradient(90deg, #3b82f6, #1d4ed8)}
   .fill.embedding { background: linear-gradient(90deg, #22c55e, #16a34a)}
-  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;}
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr), gap: 1rem;}
   .stat-item { display: flex; flex-direction: column;
 	gap: 0.25rem;}
   .stat-item .label { font-size: 0.8rem;
@@ -229,8 +229,8 @@ bankSwitches: 0 });
   .nintendo-stats { display: flex; flex-direction: column;
 	gap: 1rem;}
   .memory-overview { text-align: center;}
-  .memory-bar { height: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 6px; overflow: hidden; margin-bottom: 0.5rem;}
-  .memory-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); border-radius: 6px;
+  .memory-bar { height: 12px, background: rgba(0, 0, 0, 0.3); border-radius: 6px, overflow: hidden; margin-bottom: 0.5rem;}
+  .memory-fill { height: 100%, background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); border-radius: 6px;
 	transition:width 0.5s ease;}
   .bank-info { display: flex; justify-content: space-between; flex-wrap: wrap;
 	gap: 0.5rem;}
@@ -242,16 +242,16 @@ bankSwitches: 0 });
 	gap: 1rem;}
   .memory-layer { display: flex; align-items: center;
 	gap: 1rem;padding: 0.75rem; border-radius: 6px;}
-  .memory-layer.l1 { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3)}
-  .memory-layer.l2 { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3)}
-  .memory-layer.l3 { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3)}
+  .memory-layer.l1 { background: rgba(34, 197, 94, 0.1), border: 1px solid rgba(34, 197, 94, 0.3)}
+  .memory-layer.l2 { background: rgba(59, 130, 246, 0.1), border: 1px solid rgba(59, 130, 246, 0.3)}
+  .memory-layer.l3 { background: rgba(245, 158, 11, 0.1), border: 1px solid rgba(245, 158, 11, 0.3)}
   .layer-info { min-width: 120px;}
   .layer-info h4 { margin: 0, 0 0.25rem 0; font-size: 0.8rem; font-weight: bold;}
   .layer-info span { font-size: 0.7rem;
 	opacity: 0.7;}
-  .usage-bar { flex: 1; height: 6px;background: rgba(255, 255, 255, 0.2); border-radius: 3px;
+  .usage-bar { flex: 1, height: 6px;background: rgba(255, 255, 255, 0.2); border-radius: 3px;
 	overflow: hidden;}
-  .usage-fill { height: 100%; background: currentColor; border-radius: 3px;
+  .usage-fill { height: 100%, background: currentColor; border-radius: 3px;
 	transition:width 0.5s ease;}
   .usage-text { min-width: 50px; text-align: right; font-size: 0.8rem;
 	opacity: 0.8;}

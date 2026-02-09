@@ -44,7 +44,7 @@ interface ExpectedFlashAttentionResult {
 interface IFlashAttention2Service {
 	initialize(): Promise<void>;
 	processLegalText(
-		text: string; context: string[],
+		text: string, context: string[],
 		analysisType: 'semantic' | 'legal' | 'precedent' | 'error_analysis'
 	): Promise<ExpectedFlashAttentionResult>;
 	getStatus(): unknown;

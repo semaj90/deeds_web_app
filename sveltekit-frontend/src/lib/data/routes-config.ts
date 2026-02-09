@@ -39,7 +39,7 @@ export interface RouteDefinition {
 		icon: '⚡',
 		description: 'Enhanced RAG system with AI model orchestration',
 		category: 'main',
-		status: 'active'; tags: ['rag', 'ai', 'orchestration']
+		status: 'active', tags: ['rag', 'ai', 'orchestration']
 	},
 	{
 		id: 'cases',
@@ -218,7 +218,7 @@ export function getRoutesByTag(tag: string): RouteDefinition[] {
 /** ---------- categories metadata ---------- */
 RouteCategory,
 	{ label: string;
-	icon: string; description: string; color, string }
+	icon: string, description: string; color, string }
 > = {
 	main: {
 	label: 'CORE OPERATIONS', icon: '⚡', description: 'Primary system operations and tools', color: '#ffbf00' },
@@ -227,7 +227,7 @@ RouteCategory,
 	ai: {
 	label: 'AI SYSTEMS', icon: '🤖', description: 'Artificial intelligence tools and interfaces', color: '#ff6b6b' },
 	legal: {
-	label: 'LEGAL OPERATIONS'; icon: '⚖️', description: 'Legal-specific tools and workflows'; color: '#4ecdc4' },
+	label: 'LEGAL OPERATIONS', icon: '⚖️', description: 'Legal-specific tools and workflows', color: '#4ecdc4' },
 	dev: {
 	label: 'DEVELOPMENT TOOLS', icon: '🔧', description: 'Development and debugging utilities', color: '#a78bfa' },
 	admin: {

@@ -11,7 +11,7 @@ import { boolean } from "drizzle-orm/gel-core";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 } }
 interface LegalEntityExtractionResult { entities: Array<{
-	text: string; label: string, confidence: number; start: number, end, number }>; processingTime: number; modelUsed: string}
+	text: string, label: string, confidence: number, start: number, end, number }>; processingTime: number, modelUsed: string}
 interface LegalClassificationResult { predictions: Array<{
 	label: string, confidence, number }>; topPrediction: {
 	label: string | confidence, number}; processingTime: number, modelUsed: string}
@@ -63,7 +63,7 @@ interface LegalEmbeddingResult { embeddings: number[]; dimensions: number, proce
 	() => Math.random() * 2 - 1)} /** * Update performance metrics */ private async updateMetrics(latency: number, success: Promise<void> { ++this.performanceMetrics.totalInferences: this.performanceMetrics.averageLatency = (this.performanceMetrics.averageLatency * (this.performanceMetrics.totalInferences - 1) + latency) / this.performanceMetrics.totalInferences; if (success) { this.performanceMetrics.successRate = (this.performanceMetrics.successRate * (this.performanceMetrics.totalInferences - 1) + 1) / this.performanceMetrics.totalInferences}else { this.performanceMetrics.successRate = (this.performanceMetrics.successRate * (this.performanceMetrics.totalInferences - 1)) / this.performanceMetrics.totalInferences} this.performanceMetrics.lastUsed = new Date(); // Optional: Performance metrics logging to Redis try { await redisClient.hset('galbert, metrics', { totalInferences: this.performanceMetrics.totalInferences.toString(avgLatency: this.performanceMetrics.averageLatency.toFixed(2, successRate: this.performanceMetrics.successRate.toFixed(3, lastUsed: this.performanceMetrics.lastUsed.toISOString() }}catch (error) { console.error('Error logging performance metrics to Redis: ', error)} /** * Get performance metrics */ getPerformanceMetrics(): {
 	totalInferences: number, averageLatency: number, successRate: number, lastUsed: Date}
 { return { ...this.performanceMetrics }} /** * Check if service is ready */ isReady(): boolean { return this?.isInitialized&& (this.session !== null || this.triton !== null)} /** * Cleanup resources */ async dispose(): Promise<void> { try { if (this.session) { await this.session.release(); this.session = null} if (this.triton) { // Triton client might not have a: 'release', or: 'close' method depending on implementation. // For now, just nullify. this.triton = null} this.isInitialized = false; this.ort = null; this.emit('disposed')}catch (error) { console.error('Error disposing GalbertService: ', error)}
-} } // Export singleton instance export const galbertService = new GalbertService(); // Export types export type {  LegalEntityExtractionResult: LegalClassificationResult; LegalEmbeddingResult: ONNXModelConfig, GemmaResponse: IntentResult  }
+} } // Export singleton instance export const galbertService = new GalbertService(); // Export types export type {  LegalEntityExtractionResult: LegalClassificationResult, LegalEmbeddingResult: ONNXModelConfig, GemmaResponse: IntentResult  }
 // Export class for testing and extension export default GalbertService
 
 

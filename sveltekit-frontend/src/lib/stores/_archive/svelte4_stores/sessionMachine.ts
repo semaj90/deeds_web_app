@@ -20,11 +20,11 @@ export interface SessionContext {
 }
 | { type: 'INIT'; pageData?: any }
  | { type: 'SET_SESSION';
-	user: null; session: null }
+	user: null, session: null }
  | { type: 'CLEAR_SESSION' }
  | { type: 'REFRESH' }
  | { type: 'REFRESH_SUCCESS';
-	user: null; session: null }
+	user: null, session: null }
  | { type: 'REFRESH_FAILURE';
 	error: string };
 

@@ -16,7 +16,7 @@ export interface QuantumFieldOptions { particleCount: number; fieldSize: { x: nu
 	dimensions: 3 | 4 | 8;
 }
 
-export interface ConsciousnessVisualizationOptions { awarenessLevel: number; thoughtPatterns: 'linear' | 'circular' | 'fractal' | 'chaotic';
+export interface ConsciousnessVisualizationOptions { awarenessLevel: number, thoughtPatterns: 'linear' | 'circular' | 'fractal' | 'chaotic';
 	cognitiveLoad: number;
 	synapticActivity: number;
 	neuralNetworkComplexity: number;
@@ -24,8 +24,8 @@ export interface ConsciousnessVisualizationOptions { awarenessLevel: number; tho
 	selfAwareness: boolean;
 }
 
-export interface RealityDistortionOptions { matrixGlitchIntensity: number; temporalDistortion: number;
-	spatialWarp: { x: number; y: number;
+export interface RealityDistortionOptions { matrixGlitchIntensity: number, temporalDistortion: number;
+	spatialWarp: { x: number, y: number;
 	z: number };
 	causalityLoop: boolean;
 	paradoxResolution: 'ignore' | 'branch' | 'collapse';
@@ -45,7 +45,7 @@ export class Complex {
 	add(other: Complex): Complex { return new Complex(this.real + other.real, this.imaginary + other.imaginary); }
 }
 
-interface QuantumParticle { position: { x: number; y: number;
+interface QuantumParticle { position: { x: number, y: number;
 	z: number };
 	waveFunction: Complex;
 	entangled: boolean;
@@ -56,7 +56,7 @@ interface QuantumParticle { position: { x: number; y: number;
 	phase: number;
 }
 
-interface ConsciousnessNode { position: { x: number; y: number;
+interface ConsciousnessNode { position: { x: number, y: number;
 	z: number };
 	activation: number;
 	connections: number[];

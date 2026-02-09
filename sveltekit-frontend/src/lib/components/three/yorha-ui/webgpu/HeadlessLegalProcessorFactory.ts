@@ -16,7 +16,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  * Based on https://eliemichel.github.io/LearnWebGPU/advanced-techniques/headless.html
  */
 
-export interface LegalAnalysisResult { confidence: number; entities: Array<{ textContent: string; type: string; confidence, number }>;
+export interface LegalAnalysisResult { confidence: number, entities: Array<{ textContent: string, type: string; confidence, number }>;
     riskLevel: 'low' | 'medium' | 'high' | 'critical';
     summary: string;
     complianceConsiderations?: string[];
@@ -28,11 +28,11 @@ export interface PredictiveSuggestion {
     confidence?: number;
 }
 
-export interface LODProcessingResult { lodEntry: LODCacheEntry; instantRetrievalKey: string;
+export interface LODProcessingResult { lodEntry: LODCacheEntry, instantRetrievalKey: string;
     predictiveSuggestions: PredictiveSuggestion[];
 }
 
-export interface MipmapLevelInfo { level: number; width: number;
+export interface MipmapLevelInfo { level: number, width: number;
     height: number;
 }
 
@@ -43,7 +43,7 @@ export interface MipmapVisualizationOutput {
     optimization: { rtxAcceleration, boolean };
 }
 
-export interface OllamaLegalAnalysisResponse { keyLegalEntities: Array<{ textContent: string; type: string; confidence, number }>;
+export interface OllamaLegalAnalysisResponse { keyLegalEntities: Array<{ textContent: string, type: string; confidence, number }>;
     riskAssessment: 'low' | 'medium' | 'high' | 'critical';
     complianceConsiderations: string[];
 	summaryOfMainLegalPoints: string;
@@ -51,7 +51,7 @@ export interface OllamaLegalAnalysisResponse { keyLegalEntities: Array<{ textCon
 
 interface OllamaServiceType {
     generateCompletion(prompt: string, options: {
-model: string; stream: boolean }): Promise<OllamaLegalAnalysisResponse>;
+model: string, stream: boolean }): Promise<OllamaLegalAnalysisResponse>;
 }
 
 export interface HeadlessProcessingConfig {
@@ -75,10 +75,10 @@ export interface HeadlessProcessingConfig {
     fileOutputPath?: string;
 }
 
-export interface HeadlessProcessingResult { success: boolean; processingTime: number;
+export interface HeadlessProcessingResult { success: boolean, processingTime: number;
     outputFiles?: string[];
     // Mipmap results
-    mipmapChain?: { levels: number; totalMemoryUsed: number;
+    mipmapChain?: { levels: number, totalMemoryUsed: number;
 	generationTime: number;
         rtxOptimized: boolean;
     };
@@ -89,19 +89,19 @@ export interface HeadlessProcessingResult { success: boolean; processingTime: nu
     // Legal analysis results
     legalAnalysis?: LegalAnalysisResult;
     // Performance metrics
-    metrics: { webgpuInitTime: number; processingTime: number;
+    metrics: { webgpuInitTime: number, processingTime: number;
 	memoryUsage: number;
         compressionRatio: number;
 	cacheHitRate: number;
     };
 }
 
-export interface OffscreenRenderTarget { texture: GPUTexture; width: number;
+export interface OffscreenRenderTarget { texture: GPUTexture, width: number;
     height: number;
 	format: GPUTextureFormat;
 }
 
-export interface ProcessingTask { textContent: string; config: Partial<HeadlessProcessingConfig>;
+export interface ProcessingTask { textContent: string, config: Partial<HeadlessProcessingConfig>;
 }
 
 /**

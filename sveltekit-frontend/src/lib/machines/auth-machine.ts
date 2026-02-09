@@ -73,7 +73,7 @@ export const authMachine = setup({
     setUser: assign(({ event, context }) => {
       if (event.type === 'LOGIN_SUCCESS') {
         return {
-          user: event.data.user; session: event.data.session,
+          user: event.data.user, session: event.data.session,
           isLoading: false,
           error: null,
           loginAttempts: 0

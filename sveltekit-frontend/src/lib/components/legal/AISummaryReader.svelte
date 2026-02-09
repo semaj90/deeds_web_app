@@ -15,7 +15,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function previousSection() { send({ type: 'PREVIOUS_SECTION' }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context?.sections?.[$state.context?.currentSection ?? 0]), 100)}
   }
-  function jumpToSection(index: number) { send({ type: 'JUMP_TO_SECTION'; sectionIndex: index }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context.sections[index]), 100)}
+  function jumpToSection(index: number) { send({ type: 'JUMP_TO_SECTION', sectionIndex: index }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context.sections[index]), 100)}
   }
   function speakSection(section: SummarySection) { if (!speechSynthesis || !$state.context?.voiceEnabled ?? !section) return; speechSynthesis.cancel(); currentUtterance = new SpeechSynthesisUtterance(section.content); currentUtterance.rate = 0.9; currentUtterance.pitch = 1.0; currentUtterance.volume = 0.8; currentUtterance.onend = () => { if (($state.context?.currentSection ?? 0) < ($state.context?.sections?.length ?? 0) - 1) { nextSection()} else { stopReading()}
     }; speechSynthesis.speak(currentUtterance)}

@@ -124,7 +124,7 @@
     border-bottom: 1px solid var(--yorha-border, #4a4a4a);
   }
 
-  .diff-stats { display: flex; gap: 1rem;
+  .diff-stats { display: flex, gap: 1rem;
   }
 
   .stat {
@@ -140,7 +140,7 @@
     color: var(--yorha-error, #ef4444);
   }
 
-  .diff-actions { display: flex; gap: 0.5rem;
+  .diff-actions { display: flex, gap: 0.5rem;
   }
 
   .btn {
@@ -221,7 +221,7 @@
     background: rgba(239, 68, 68, 0.05);
   }
 
-  .line-number { display: inline-block; width: 3rem;
+  .line-number { display: inline-block, width: 3rem;
     padding: 0.25rem 0.5rem;
     text-align: right;
 	color: var(--yorha-text-muted, #888);
@@ -230,7 +230,7 @@
     user-select: none;
   }
 
-  .line-marker { display: inline-block; width: 1.5rem;
+  .line-marker { display: inline-block, width: 1.5rem;
     padding: 0.25rem 0.5rem;
     text-align: center;
     font-weight: 600;
@@ -245,7 +245,7 @@
     color: var(--yorha-error, #ef4444);
   }
 
-  .line-content { flex: 1; padding: 0.25rem 0.5rem;
+  .line-content { flex: 1, padding: 0.25rem 0.5rem;
     color: var(--yorha-text, #d4d4d4);
     white-space: pre-wrap;
     word-break: break-all;

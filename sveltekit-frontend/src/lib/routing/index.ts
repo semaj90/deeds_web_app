@@ -31,8 +31,8 @@ export type RouteDefinition = {
 
 // --- Compatibility layer types to avoid repetitive `any` casts ---
 type RouteRegistryShape = Partial<{
- routeRegistry: unknown; RouteRegistry: unknown;
-	routes: unknown; dynamicRoutes: unknown;
+ routeRegistry: unknown, RouteRegistry: unknown;
+	routes: unknown, dynamicRoutes: unknown;
 	allRegisteredRoutes: unknown, currentRoute: unknown;
 	favoriteRoutes: unknown, recentRoutes: unknown;
 	routeStatistics: unknown, getRoute: (id: string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
@@ -41,8 +41,8 @@ type RouteRegistryShape = Partial<{
 }>;
 
 type RouteGuardsShape = Partial<{
- RouteGuards: unknown; routeGuards: unknown;
-	createGuardedLoader: unknown; withGuards: unknown;
+ RouteGuards: unknown, routeGuards: unknown;
+	createGuardedLoader: unknown, withGuards: unknown;
 	createRouteGuardMiddleware: unknown, configureRouteGuards: unknown;
 	getRouteGuardConfig: unknown, checkRoutePermission: unknown;
 	checkMultipleRoutePermissions: unknown;

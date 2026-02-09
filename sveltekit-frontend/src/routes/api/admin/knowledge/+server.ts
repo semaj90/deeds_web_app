@@ -4,9 +4,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const QDRANT_URL = 'http://127.0.0.1:6333';
 
-interface KBEntry { id: string; score: number;
-	content: string; tags: string[];
-	type: string; file_path: string;
+interface KBEntry { id: string, score: number;
+	content: string, tags: string[];
+	type: string, file_path: string;
 	timestamp: string;
 }
 

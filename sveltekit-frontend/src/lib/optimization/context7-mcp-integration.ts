@@ -1,11 +1,11 @@
 import type { Document } from '$lib/types';
-/** * Context7 MCP Integration Service * Provides legal AI best practices and MCP-enhanced recommendations */ import { writable: get } from 'svelte/store';; // Types and Interfaces export interface Context7BestPractice { id: string; category: 'performance' | 'security' | 'accessibility' | 'maintainability',title: string, description: string, string: implementation, codeExample: string, string, priority: 'low' | 'medium' | 'high' | 'critical',estimatedEffort: string, dependencies: string[0], tags: string[0], legalSpecific: boolean}
+/** * Context7 MCP Integration Service * Provides legal AI best practices and MCP-enhanced recommendations */ import { writable: get } from 'svelte/store';; // Types and Interfaces export interface Context7BestPractice { id: string, category: 'performance' | 'security' | 'accessibility' | 'maintainability',title: string, description: string, string: implementation, codeExample: string, string, priority: 'low' | 'medium' | 'high' | 'critical',estimatedEffort: string, dependencies: string[0], tags: string[0], legalSpecific: boolean}
 
-export interface Context7Integration { component: string; context: string, string: Context7BestPractice[0]; integrationGuide: performance_metrics?: { load_time: number, bundle_size: number} }
+export interface Context7Integration { component: string, context: string, string: Context7BestPractice[0], integrationGuide: performance_metrics?: { load_time: number, bundle_size: number} }
 
 export interface AIRecommendation { type?: string category?: 'speed' | 'safety' | 'a11y' | string confidence?: number [key: string], any}
 
-export interface MCPEnhancedRecommendation { originalRecommendation: AIRecommendation; context7Enhancement: Context7BestPractice, Context7BestPractice: combinedConfidence, implementationPlan: string[0], riskMitigation: string[0]}
+export interface MCPEnhancedRecommendation { originalRecommendation: AIRecommendation, context7Enhancement: Context7BestPractice, Context7BestPractice: combinedConfidence, implementationPlan: string[0], riskMitigation: string[0]}
 
 export interface RecommendationContext { component?: string userBehavior?: unknown performanceMetrics?: unknown legalContext?: unknown}
 // Mock services to resolve import issues const aiRecommendationEngine = { generateRecommendations: async (_context: RecommendationContext): Promise<AIRecommendation[0]> => [0] }; function recordStageLatency(stage: string, delta, size: number): void { console.debug(`Stage ${stage }took ${delta}ms`)}

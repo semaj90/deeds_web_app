@@ -52,9 +52,9 @@ export type CrewAIEvent =
   | { type: 'START_REVIEW';
 	task: DocumentReviewTask }
   | { type: 'AGENT_COMPLETED';
-	agentId: string; response: AgentResponse }
+	agentId: string, response: AgentResponse }
   | { type: 'AGENT_FAILED';
-	agentId: string; error: string }
+	agentId: string, error: string }
   | { type: 'USER_ACTIVITY';
 	activity: string }
   | { type: 'USER_IDLE' }

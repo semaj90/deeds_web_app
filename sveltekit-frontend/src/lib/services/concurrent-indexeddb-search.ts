@@ -1,8 +1,8 @@
 import Fuse from '$lib/utils/fuse-import';
 
 export interface SearchableDocument {
- id: string; content: string;
- path: string; type: 'error' | 'component' | 'api' | 'config';
+ id: string, content: string;
+ path: string, type: 'error' | 'component' | 'api' | 'config';
  metadata: {
  language: string, lastModified: number;
  size: number;
@@ -25,14 +25,14 @@ export interface SearchRequest {
 }
 
 export interface SearchWorkerMessage {
- type: 'search' | 'index' | 'clear'; data: Record<string, unknown>;
+ type: 'search' | 'index' | 'clear', data: Record<string, unknown>;
  workerId: string;
 }
 
 // Add typed worker message shapes to avoid `any` type
 type WorkerSearchEntry = { item: SearchableDocument; refIndex: number; score: number };
 type WorkerSearchData = {
- results: WorkerSearchEntry[]; processingTime: number;
+ results: WorkerSearchEntry[], processingTime: number;
  documentCount: number;
 };
 type WorkerIndexData = { success: true; documentsIndexed: number };
@@ -181,7 +181,7 @@ export class ConcurrentIndexedDBSearch {
  ? performance.now()
  : Date.now();
  self.postMessage({
- workerId: workerId; type: 'searchResult',
+ workerId: workerId, type: 'searchResult',
  data: {
  results: results, processingTime: end - start,
  documentCount: (documents || []).length,
@@ -486,7 +486,7 @@ export class ConcurrentIndexedDBSearch {
  }
 
  async indexTypeScriptErrors(
- errors: { code: string, message: string; file: string, line: number }[]
+ errors: { code: string, message: string, file: string, line: number }[]
  ): Promise<void> {
  const documents: SearchableDocument[] = errors.map((error, index) => ({
  id: `error-${index}-${Date.now()}`,

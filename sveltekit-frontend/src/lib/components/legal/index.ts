@@ -14,7 +14,7 @@ export type LegalDocumentType = 'contract' | 'evidence' | 'brief' | 'citation' |
 export type WorkflowStage = 'intake' | 'processing' | 'review' | 'approved' | 'archived';
 export type VerificationStatus = 'pending' | 'verified' | 'rejected' | 'requires_attention';
 export interface LegalDocument {
-id: string; type: LegalDocumentType, LegalDocumentType: title; content: string, string: stage, WorkflowStage: verification?: VerificationStatus;
+id: string, type: LegalDocumentType, LegalDocumentType: title, content: string, string: stage, WorkflowStage: verification?: VerificationStatus;
 metadata?: {
 [key | string] | any }
 }

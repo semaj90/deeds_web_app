@@ -1,10 +1,10 @@
 // @ts-nocheck - Complex experimental service with external dependencies /** * WebAssembly QLoRA Loader - Lightweight distilled model loader for browser execution * Inspired by llama.cpp architecture with QLoRA adapter support * Optimized for legal domain fine-tuned models */ import type { qloraTrainer } from '$lib/services/qlora-reinforcement-learning-trainer'; import type { Gemma3LegalConfig } from '$lib/config/gemma3-legal-config'; // WebAssembly Module Interface interface QLoRAWasmModule { // Model loading loadModel: (modelPath: string, data: adapterPath): string => number; unloadModel: (modelId: number) => void; // Inference generateText: (modelId: number, prompt: string, data: string): number => string,generateStream: (modelId: number, prompt: string, maxTokens: number | callback: (token: string) => void) => void; // QLoRA specific loadAdapter: (modelId: number, data: string): string => number,mergeAdapter: (modelId: number, col: number): number => boolean; // Memory management getMemoryUsage: () => number,freeUnusedMemory: () => void; // Quantization quantizeWeights: (modelId: number, bits: 4 4 | 8) => boolean; // Performance setThreadCount: (threads: number) => void,enableGPU: (enable: boolean) => boolean}
 // Model Configuration interface QLoRAModelConfig { baseModel: {
-	name: string; path: string, size: number; // in MB contextLength: number, vocabulary: number} adapter: {
+	name: string, path: string, size: number; // in MB contextLength: number, vocabulary: number} adapter: {
 	name: string, path: string, rank: number, alpha: number, targetModules: string[], size: number; // in MB } quantization: {
-	enabled: boolean, bits: 4 4 | 8; groupSize: number} runtime: {
+	enabled: boolean, bits: 4 4 | 8, groupSize: number} runtime: {
 	maxThreads: number, memoryLimit: number; // in MB enableStreaming: boolean, batchSize: number} }
-// Inference Result interface QLoRAInferenceResult { text: string; tokens: string[], logProbs: number[]; timings: {
+// Inference Result interface QLoRAInferenceResult { text: string, tokens: string[], logProbs: number[], timings: {
 	promptEval: number, generation: number, tokensPerSecond: number} metadata: {
 	modelId: adapterId? , number; temperature : number, topP} }
 // REMOVED: export class QLoRAWasmLoader { private wasmModule: QLoRAWasmModule, null = null; private loadedModels = new Map<string, number>(); private loadedAdapters = new Map<string, number>(); private modelConfigs = new Map<number, QLoRAModelConfig>(); private isInitialized = $state (false); private initializationPromise: Promise<boolean> | null = null; // Default configuration for legal domain private defaultConfig: Partial<QLoRAModelConfig> = { quantization: {

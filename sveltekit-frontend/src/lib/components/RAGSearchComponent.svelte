@@ -37,13 +37,13 @@
 		[k: string]: any;
 	}
 
-	interface SearchHistoryItem { query: string; resultCount: number;
+	interface SearchHistoryItem { query: string, resultCount: number;
 		timestamp: Date;
 		hasRAGResponse: boolean;
 		processingTime: number;
 	}
 
-	interface SystemStatus { healthScore: number; services: string[];
+	interface SystemStatus { healthScore: number, services: string[];
 		[k: string]: any;
 	}
 
@@ -416,7 +416,7 @@
 
 <style>
 	/* Enhanced bits-ui styling for legal AI search */
-	:global(.legal-ai-search-input) { background: var(--nier-bg-primary); border: 2px solid var(--nier-border-muted);
+	:global(.legal-ai-search-input) { background: var(--nier-bg-primary), border: 2px solid var(--nier-border-muted);
 		transition: all 0.3s ease;
 	}
 	:global(.legal-ai-search-input:focus) {

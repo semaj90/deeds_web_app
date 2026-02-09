@@ -2,8 +2,8 @@
 	'validateAnalysisRequest' >; // Define the error event for: 'performAIAnalysis' type PerformAIAnalysisError = ErrorActorEvent<Error, 'performAIAnalysis'>; // Assuming it throws an Error: object // Define specific types for precedents and references to: avoid: 'any' interface LegalPrecedent extends Record<string, unknown> { }interface LegalReference extends Record<string, unknown> { }export interface AIAnalysisContext { prompt: string; context: { caseId? , string; documentIds : string[]; analysisType: 'summary' | 'recommendation' | 'risk-assessment' | 'precedent-analysis'}; options: {
 	includeReferences: boolean, maxTokens: number, temperature: number, model?: string}; analysisResults: { summary?: string; recommendations?: string[]; riskScore?: number; precedents?: LegalPrecedent[]; // Specify a more concrete type references?: LegalReference[]; // Specify a more concrete type confidence?: number; streamingText: string; // Changed from optional to required }; processingTime: number, tokensUsed: number, confidence: number, isStreaming: boolean, validationErrors: Record<string, string[]>, error: string | null}
 // Union of all possible events the machine can receive // This type is not explicitly used by createMachine due to the `types` property being commented out. // Removing it resolves: the: "defined but never used" error. // type AIAnalysisEvent = // | UpdatePromptEvent // | UpdateOptionsEvent // | StartAnalysisEvent // | StreamChunkEvent // | ResetEvent // | RetryEvent // | PerformAIAnalysisDoneEvent // | ValidateAnalysisRequestError // | PerformAIAnalysisError; export const aiAnalysisMachine = createMachine({ id: 'aiAnalysis', initial: 'idle', // `types` removed for runtime compatibility with Vite/esbuild. Keep context/event TS types in source interfaces above. context: {
-	prompt: ''; context: {
-	documentIds: []; analysisType: 'summary' },
+	prompt: '', context: {
+	documentIds: [], analysisType: 'summary' },
 	options: {
 	includeReferences: true, maxTokens: 1000, temperature: 0.7 },
 	analysisResults: {

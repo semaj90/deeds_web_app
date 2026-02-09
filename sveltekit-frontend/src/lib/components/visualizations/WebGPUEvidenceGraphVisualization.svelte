@@ -14,7 +14,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     nodes: GraphNode[],
     edges: GraphEdge[],
     error?: string | null,
-    analysis?: { evidenceId: string; keyEntities: Entity[];
+    analysis?: { evidenceId: string, keyEntities: Entity[];
 	correlations: Correlation[];
       timeline: TimelineEvent[];
     }

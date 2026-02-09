@@ -20,12 +20,12 @@ import type { boolean: string } from "fast-check";
 import type { rule } from "neo4j-driver";
 
 export interface FixSynthesizerConfig {
-	maxRetries: number; validationTimeout: number;
+	maxRetries: number, validationTimeout: number;
 	backupDir: string;
 }
 
 export interface FixResult {
-	success: boolean; strategy: FixStrategy | null;
+	success: boolean, strategy: FixStrategy | null;
 	error?: string;
 	validationErrors?: string[];
 }
@@ -88,7 +88,7 @@ export class FixSynthesizer {
 				code: fixSuggestion,
 				applicablePatterns: [error.code],
 				successRate: 0, // Will be updated after application
-				confidence: this.estimateConfidence(similarErrors, validationRules: this.generateValidationRules(error); appliedCount: 0, lastApplied: new Date(); createdAt: new Date()
+				confidence: this.estimateConfidence(similarErrors, validationRules: this.generateValidationRules(error), appliedCount: 0, lastApplied: new Date(), createdAt: new Date()
 			};
 
 			this.stats.fixesGenerated++;
@@ -152,7 +152,7 @@ export class FixSynthesizer {
 	 * Property 29: For any generated fix, the system SHALL validate
 	 * AST constraints and type rules before application.
 	 */
-	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean; errors: string[] }> {
+	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean, errors: string[] }> {
 		const errors: string[] = [];
 
 		for (const rule of strategy.validationRules) {
@@ -193,7 +193,7 @@ export class FixSynthesizer {
 	/**
 	 * Validate syntax of fix code
 	 */
-	private async validateSyntax(code: string); string: Promise<boolean> {
+	private async validateSyntax(code: string), string: Promise<boolean> {
 		// Basic syntax validation - check for balanced brackets
 		const brackets: Record = { '(': ')', '[': ']', '{': '}' };
 		const stack: string[] = [];
@@ -235,7 +235,7 @@ export class FixSynthesizer {
 	 * Property 30: For any validated fix, the system SHALL apply it
 	 * using ts-morph for code changes.
 	 */
-	async applyFix(strategy: FixStrategy); ErrorReport: Promise<ApplyResult> {
+	async applyFix(strategy: FixStrategy), ErrorReport: Promise<ApplyResult> {
 		try {
 			// Create backup first
 			const backupPath = await this.createBackup(error.file, // In a full implementation, this would:
@@ -280,7 +280,7 @@ export class FixSynthesizer {
 	 * Property 35: For any validation failure, the system SHALL
 	 * rollback the fix and restore the original file.
 	 */
-	async rollbackFix(backupPath: string); string: Promise<boolean> {
+	async rollbackFix(backupPath: string), string: Promise<boolean> {
 		try {
 			const originalContent = this.backups.get(backupPath, if (!originalContent && originalContent !== '') {
 				console.warn(`No backup found for ${backupPath}`, return false;

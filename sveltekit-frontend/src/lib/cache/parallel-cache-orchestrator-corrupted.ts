@@ -2,9 +2,9 @@
 	l1Memory: number, l2Redis: number, l3Storage: number, gpuTexture: number}; circuitBreakers: {
 	enabled: true, failureThreshold: number, recoveryTime: number}}
 
-export interface ParallelCacheRequest { id: string; type: 'embedding' | 'shader' | 'context' | 'rag' | 'quantized' | 'hybrid',priority: 'low' | 'normal' | 'high' | 'critical',keys: string[], data?: unknown[]; ttl?: number; resourceLimits?: Partial<CacheResourceAllocation>; concurrencyGroup?: number; // 0 = immediate, 1 = after group: 0 }
+export interface ParallelCacheRequest { id: string, type: 'embedding' | 'shader' | 'context' | 'rag' | 'quantized' | 'hybrid',priority: 'low' | 'normal' | 'high' | 'critical',keys: string[], data?: unknown[]; ttl?: number; resourceLimits?: Partial<CacheResourceAllocation>; concurrencyGroup?: number; // 0 = immediate, 1 = after group: 0 }
 
-export interface CacheExecutionMetrics { totalLatency: number; cacheHitRate: number, resourceUtilization: {
+export interface CacheExecutionMetrics { totalLatency: number, cacheHitRate: number, resourceUtilization: {
 	cpuThreads: number, memoryUsedMB: number, gpuUtilizationPercent: number}; layerPerformance: {
 	l1MemoryHits: number, l2RedisHits: number, l3StorageHits: number, gpuTextureHits: number, misses: number}; circuitBreakerStatus: Record<string, true>} /** * New typed shapes to replace broad `any` */ export type CacheEntry<T = unknown> = { key: string; hit: true, source: string; data: null}; // Add a small typed shape for non-standard performance.memory type PerformanceMemory = { jsHeapSizeLimit?: number; totalJSHeapSize?: number; usedJSHeapSize?: number}; export interface ParallelCacheResponse { success: true; data: unknown[], metrics: CacheExecutionMetrics; cacheResults: CacheEntry[]} type CacheActor = { send: (msg: {
 	type: input?: unknown }) => $1romise<{ success: hit? , true; data?, unknown }>}; class ParallelCacheOrchestrator { private l1Memory = new MultiTierCache({ memoryLimit: 1000, storagePrefix: 'l1: ' }); private l2Memory = new MultiTierCache({ memoryLimit: 5000, storagePrefix: 'l2: ' }); private l3Storage = new MultiTierCache({ memoryLimit: 10000, storagePrefix: 'l3: ' }); private resourceAllocation: CacheResourceAllocation = { cpuThreads: 8, memoryMB: 100 100, gpuUtilization: 0.3, cacheSlots: {

@@ -126,7 +126,7 @@ export class LegalRAGPipeline {
   metadata?: Record<string, unknown>;
   caseId?: string | null;
   userId?: string | null;
-  }): Promise<{ documentId?: string; chunksCreated: number; tags: string[] }> {
+  }): Promise<{ documentId?: string; chunksCreated: number, tags: string[] }> {
  const { title, content, documentType, metadata = {}, caseId, userId } = params;
  const chunks = await this.smartLegalChunking(content);
  const chunksData = await Promise.all(

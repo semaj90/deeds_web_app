@@ -65,7 +65,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let isGeneratingSuggestions = $state(false);
 
  const steps: {
-	id: WizardStep; title: string;
+	id: WizardStep, title: string;
 	description: string }[] = [
  { id: 'basic-info', title: 'Basic Information', description: 'Victim details and contact information' },
 	{ id: 'incident-details', title: 'Incident Details', description: 'What happened, when, and where' },

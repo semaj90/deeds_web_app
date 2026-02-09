@@ -32,7 +32,7 @@ const initialContext: AuthContext = {
 };
 
 export const authMachine = setup({
-  types: {} as { context: AuthContext; events: AuthEvent },
+  types: {} as { context: AuthContext, events: AuthEvent },
   actions: {
     setLoading: assign({ isLoading: () => true }),
     clearLoading: assign({ isLoading: () => false }),

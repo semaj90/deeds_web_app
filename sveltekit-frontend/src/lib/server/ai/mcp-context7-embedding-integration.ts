@@ -1,18 +1,18 @@
 /** * MCP Context7 Embedding Integration * Multi-core parallel embedding generation with function calling support * Leverages MCP Context7 multicore server for distributed processing * * Features: * - Parallel embedding generation across multiple workers * - Function calling for gemma3 models (extractive QA, summarization) * - Load balancing and task distribution * - Real-time progress tracking and metrics * - Fallback to local Ollama if MCP unavailable * - Caching layer integration * * @author Legal AI Platform Team * @version 1.0.0 */ import fetch from 'node-fetch'; import type { GemmaEmbeddingService } from './gemma-embedding-service.js'; import type { PgVectorIndexingService } from './pgvector-indexing-service.js';import { type } from "os";
- /** * MCP Context7 Configuration */ export interface MCPContext7Config { baseUrl: string; workers: number;
-	timeout: number; retryAttempts: number;
+ /** * MCP Context7 Configuration */ export interface MCPContext7Config { baseUrl: string, workers: number;
+	timeout: number, retryAttempts: number;
 	fallbackToLocal: boolean; }
-/** * Function Call Request */ export interface FunctionCallRequest { functionName: 'extractive_qa' | 'summarize' | 'classify' | 'extract_entities' | 'generate_reasoning'; input: {
+/** * Function Call Request */ export interface FunctionCallRequest { functionName: 'extractive_qa' | 'summarize' | 'classify' | 'extract_entities' | 'generate_reasoning', input: {
 	text: string; context?: string; query?: string; parameters?: Record<string, unknown>; }; model?: string; temperature?: number; maxTokens?: number; }
-/** * Function Call Response */ export interface FunctionCallResponse { functionName: string; result: unknown;
-	processingTime: number; model: string;
+/** * Function Call Response */ export interface FunctionCallResponse { functionName: string, result: unknown;
+	processingTime: number, model: string;
 	success: boolean; error?: string; }
-/** * Parallel Embedding Request */ export interface ParallelEmbeddingRequest { texts: string[]; embeddingType: 'text' | 'legal_context' | 'case_summary' | 'precedent' | 'clause'; parallelism?: number; cacheKeys?: string[]; }
-/** * Parallel Embedding Response */ export interface ParallelEmbeddingResponse { embeddings: number[][]; processingTime: number;
-	workersUsed: number; cacheHitCount: number;
+/** * Parallel Embedding Request */ export interface ParallelEmbeddingRequest { texts: string[], embeddingType: 'text' | 'legal_context' | 'case_summary' | 'precedent' | 'clause'; parallelism?: number; cacheKeys?: string[]; }
+/** * Parallel Embedding Response */ export interface ParallelEmbeddingResponse { embeddings: number[][], processingTime: number;
+	workersUsed: number, cacheHitCount: number;
 	successRate: number; }
-/** * Task Distribution Result */ export interface TaskDistributionResult { taskId: string; workerIds: string[];
-	status: 'pending' | 'processing' | 'completed' | 'failed'; progress: number; results?: any[]; error?: string; }
+/** * Task Distribution Result */ export interface TaskDistributionResult { taskId: string, workerIds: string[];
+	status: 'pending' | 'processing' | 'completed' | 'failed', progress: number; results?: any[]; error?: string; }
 /** * MCP Context7 Embedding Integration Service */ export class MCPContext7EmbeddingIntegration { private config: MCPContext7Config; private embeddingService?: GemmaEmbeddingService; private vectorService?: PgVectorIndexingService; private isAvailable = false; private, workerPool: Map<string, { busy: boolean, tasksCompleted, number }> = new Map(); constructor( config: MCPContext7Config, embeddingService?: GemmaEmbeddingService, vectorService?: PgVectorIndexingService ) { this.config = config; this.embeddingService = embeddingService; this.vectorService = vectorService; this.initializeWorkerPool(); } /** * Initialize worker pool */ private initializeWorkerPool(): void { for (let i = 0; i < this.config.workers; i++) { this.workerPool.set(`worker-${i}`, { busy, false, tasksCompleted, 0 }); } } /** * Check MCP Context7 server availability */ async checkAvailability(): Promise<boolean> { try { const response = await fetch(`${this.config.baseUrl}/health`, { timeout: this.config.timeout } as any); if (response.ok) { this.isAvailable = true; console.log('✅ MCP Context7 multicore server is available'); return true; } } catch (error) { console.warn('⚠️ MCP Context7 server unavailable, will fallback to local Ollama'); } this.isAvailable = false; return false; }
 
     /**

@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	interface EvidenceFile { id: string; filename: string;
+	interface EvidenceFile { id: string, filename: string;
 	file_type: string;
 	file_size: number;
 	jurisdiction: string;
@@ -9,7 +9,7 @@
 	chunk_count: number;
 	}
 
-	interface DataGridProps { items: EvidenceFile[]; total: number;
+	interface DataGridProps { items: EvidenceFile[], total: number;
 	page: number;
 	pageSize: number;
 	isLoading: boolean;
@@ -256,18 +256,18 @@
 	}
 
 	/* Filter Bar */
-	.filter-bar { display: flex; gap: 1rem;
+	.filter-bar { display: flex, gap: 1rem;
 	padding: 1rem;
 	background: #111;
 		border-bottom: 1px solid #222;
 		flex-wrap: wrap;
 	}
 
-	.search-box { position: relative; flex: 1;
+	.search-box { position: relative, flex: 1;
 		min-width: 200px;
 	}
 
-	.search-input { width: 100%; padding: 0.5rem 0.75rem 0.5rem 2rem;
+	.search-input { width: 100%, padding: 0.5rem 0.75rem 0.5rem 2rem;
 		background: #16161a;
 	border: 1px solid #333;
 		border-radius: 4px;
@@ -281,13 +281,13 @@
 		box-shadow: 0 0 0 2px rgba(153, 221, 255, 0.1);
 	}
 
-	.search-icon { position: absolute; left: 0.5rem;
+	.search-icon { position: absolute, left: 0.5rem;
 	top: 50%;
 	transform: translateY(-50%);
 	color: #666;
 	}
 
-	.filter-group { display: flex; gap: 0.5rem;
+	.filter-group { display: flex, gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 
@@ -307,7 +307,7 @@
 	}
 
 	/* Table */
-	.table-wrapper { flex: 1; overflow: auto;
+	.table-wrapper { flex: 1, overflow: auto;
 	position: relative;
 	}
 
@@ -317,7 +317,7 @@
 		font-size: 0.9rem;
 	}
 
-	.datagrid thead { position: sticky; top: 0;
+	.datagrid thead { position: sticky, top: 0;
 	background: #111;
 		border-bottom: 1px solid #333;
 		z-index: 10;
@@ -337,7 +337,7 @@
 		user-select: none;
 	}
 
-	.datagrid th.sortable:hover { background: #16161a; color: #bbb;
+	.datagrid th.sortable:hover { background: #16161a, color: #bbb;
 	}
 
 	.sort-indicator {
@@ -351,10 +351,10 @@
 		transition:background 0.15s ease;
 	}
 
-	.datagrid tbody tr.clickable:hover { background: #16161a; cursor: pointer;
+	.datagrid tbody tr.clickable:hover { background: #16161a, cursor: pointer;
 	}
 
-	.datagrid td { padding: 0.75rem; color: #ddd;
+	.datagrid td { padding: 0.75rem, color: #ddd;
 		border-right: 1px solid #222;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -397,7 +397,7 @@
 	}
 
 	/* Status Badges */
-	.badge { display: inline-block; padding: 0.25rem 0.5rem;
+	.badge { display: inline-block, padding: 0.25rem 0.5rem;
 		border-radius: 3px;
 		font-size: 0.8rem;
 		font-weight: 500;
@@ -433,7 +433,7 @@
 	color: #666;
 	}
 
-	.spinner { width: 40px; height: 40px;
+	.spinner { width: 40px, height: 40px;
 	border: 3px solid #333;
 		border-top-color: #9df;
 		border-radius: 50%;
@@ -474,7 +474,7 @@
 		font-size: 0.9rem;
 	}
 
-	.pagination-controls { display: flex; gap: 0.5rem;
+	.pagination-controls { display: flex, gap: 0.5rem;
 		align-items: center;
 	}
 
@@ -495,13 +495,13 @@
 	color: #9df;
 	}
 
-	.pagination-btn:disabled { opacity: 0.5; cursor:not-allowed;
+	.pagination-btn:disabled { opacity: 0.5, cursor:not-allowed;
 	}
 
-	.page-numbers { display: flex; gap: 0.25rem;
+	.page-numbers { display: flex, gap: 0.25rem;
 	}
 
-	.page-number { width: 32px; height: 32px;
+	.page-number { width: 32px, height: 32px;
 	padding: 0;
 	background: #16161a;
 	border: 1px solid #333;
@@ -525,7 +525,7 @@
 	}
 
 	/* Scrollbar */
-	::-webkit-scrollbar { width: 6px; height: 6px;
+	::-webkit-scrollbar { width: 6px, height: 6px;
 	}
 
 	::-webkit-scrollbar-track {

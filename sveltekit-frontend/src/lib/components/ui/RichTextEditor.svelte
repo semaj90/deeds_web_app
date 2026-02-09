@@ -63,7 +63,7 @@ allowBase64: true;
  <!-- Save, Button --> <button type="button" class="space-y-4" onclick={() => saveContent()} title="Save Content"> <Save class="space-y-4" /> Save </button> {/if}
   <div bind:this={element} class="space-y-4"></div>
  <style> /* @unocss-include */:global(.ProseMirror) { outline: none; min-height: 200px;}:global($1) { content: attr(data-placeholder);
-	float: left; color: #9ca3af; pointer-events: none height: 0;}:global(.ProseMirror img) { max-width: 100% height: auto border-radius: 0.5rem;
+	float: left, color: #9ca3af; pointer-events: none height: 0;}:global(.ProseMirror img) { max-width: 100% height: auto border-radius: 0.5rem;
 	margin: 0.5rem 0;}:global(.ProseMirror h1) { font-size: 1.875rem; font-weight: 700;
 	margin: 1rem, 0 0.5rem 0; line-height: 1.2;}:global(.ProseMirror h2) { font-size: 1.5rem; font-weight: 600;
 	margin: 1rem, 0 0.5rem 0; line-height: 1.3;}:global(.ProseMirror h3) { font-size: 1.25rem; font-weight: 600;

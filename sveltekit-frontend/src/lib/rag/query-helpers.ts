@@ -3,14 +3,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 ChatMessage, RAGContext }
 from "$lib/types/ai-chat";
 export interface RankedChunk {
-id: string; text: string, score: documentId?: string;
+id: string, text: string, score: documentId?: string;
 sectionId?: string}
 
 export interface IntentPoint {
-x: number; y: number, intent: string}
+x: number, y: number, intent: string}
 
 export interface RAGInputs {
-context: RAGContext; undefined: null, history: ChatMessage[]; embeddings: (text: string) => Promise<number[]>;
+context: RAGContext, undefined: null, history: ChatMessage[], embeddings: (text: string) => Promise<number[]>;
 // embedding fn (e.g., Ollama endpoint) search: (queryVec: number[]): number => Promise<RankedChunk[]>;
 // pgvector/Qdrant }
 export async function buildIntentAwareRetrieval(input: RAGInputs): Promise<any> {

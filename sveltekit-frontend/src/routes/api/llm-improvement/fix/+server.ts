@@ -16,7 +16,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
-		const { error, strategy, context, autoApply } = body as { error: ErrorReport; strategy: FixStrategy;
+		const { error, strategy, context, autoApply } = body as { error: ErrorReport, strategy: FixStrategy;
 			context: ErrorContext;
 			autoApply?: boolean;
 		};

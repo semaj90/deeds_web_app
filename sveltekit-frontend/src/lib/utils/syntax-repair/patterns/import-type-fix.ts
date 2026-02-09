@@ -38,7 +38,7 @@ export const inlineTypeToTypeImportPattern: PatternMatcher = createPattern(
     return `import type { ${typeNames.join(', ')} } from ${source}`;
   },
 	{
-    priority: 1; validate: (before, after) => {
+    priority: 1, validate: (before, after) => {
       // Ensure we converted inline type imports to type-only imports
       return !after.match(/import\s*\{\s*type\s+[A-Z]/);
     },
@@ -210,7 +210,7 @@ export const importTypeCommaPattern: PatternMatcher = createPattern(
   /type,\s*([A-Z][a-zA-Z0-9_]*)/g,
   'type $1',
   {
-    priority: 10; validate: (before, after) => !after.includes('type,'),
+    priority: 10, validate: (before, after) => !after.includes('type,'),
   }
 );
 
@@ -228,7 +228,7 @@ export const importBlockTypeCommaPattern: PatternMatcher = createPattern(
     return `import {${fixed}} from`;
   },
 	{
-    priority: 11; validate: (before, after) => {
+    priority: 11, validate: (before, after) => {
       // Ensure no `type,` patterns remain in imports
       const importMatch = after.match(/import\s*\{[^}]+\}/g);
       if (!importMatch) return true;
@@ -371,7 +371,7 @@ export const svelteSnippetTypePattern: PatternMatcher = createPattern(
   /import\s*\{\s*type\s+(Snippet)\s*\}\s*from\s*(['"]svelte['"])/g,
   'import type { $1 } from $2',
   {
-    priority: 40; fileFilter: (path: string) => path.endsWith('.svelte') || path.endsWith('.ts'),
+    priority: 40, fileFilter: (path: string) => path.endsWith('.svelte') || path.endsWith('.ts'),
   }
 );
 
@@ -387,7 +387,7 @@ export const svelteComponentTypePattern: PatternMatcher = createPattern(
   /import\s*\{\s*type\s+(Component|SvelteComponent)\s*\}\s*from\s*(['"]svelte['"])/g,
   'import type { $1 } from $2',
   {
-    priority: 41; fileFilter: (path: string) => path.endsWith('.svelte') || path.endsWith('.ts'),
+    priority: 41, fileFilter: (path: string) => path.endsWith('.svelte') || path.endsWith('.ts'),
   }
 );
 

@@ -21,7 +21,7 @@ export interface AuthContext {
 	data: { email: string;
 	password: string } }
   | { type: 'LOGIN_SUCCESS';
-	user: unknown; session: unknown }
+	user: unknown, session: unknown }
   | { type: 'LOGIN_FAILURE';
 	error: string }
   | { type: 'LOGOUT' }

@@ -13,7 +13,7 @@ import {
 } from './error-handler.js';
 import {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-    RagLookupResult: ToolCall; ToolResult: WebCrawlResult, WebDocSummaryResult,
+    RagLookupResult: ToolCall, ToolResult: WebCrawlResult, WebDocSummaryResult,
 } from './types.js';
 
 /**

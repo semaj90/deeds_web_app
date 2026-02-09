@@ -4,13 +4,13 @@
  // Svelte, 5 runes are auto-imported import Move from 'lucide-svelte/icons/move';
  import RotateCcw from 'lucide-svelte/icons/rotate-ccw';
  import Trash2 from 'lucide-svelte/icons/trash-2';
- // Migrated to $effect interface Props { title: string ; fileUrl: string ; position?: unknown; size?: unknown; isSelected?: unknown; isDirty?: unknown}
+ // Migrated to $effect interface Props { title: string , fileUrl: string ; position?: unknown; size?: unknown; isSelected?: unknown; isDirty?: unknown}
   let { title = '', fileUrl = '', position = { x: 100, y: 100 },
-	size = { width: 400; height: 300 },
+	size = { width: 400, height: 300 },
 	isSelected = false, isDirty = false }: Props = $props(); // Fabric.js types type FabricCanvas = any; type FabricImage = any; type FabricObject = any; // Props - simplified for the Detective Mode interface let canvasEl = $state<HTMLCanvasElement | null>(null);
    let fabricCanvas: FabricCanvas | null = null; // fabric.Canvas when Fabric.js is loaded let nodeElement: HTMLElement;
  let canvasState = $state( ); $effect(() => { // Dynamically import Fabric.js to avoid SSR issues - use async IIFE (async () => { try { const mod = await import('fabric');
-   const fabric = mod.fabric || mod.default || mod; fabricCanvas = new fabric.Canvas(canvasEl, { width: size.width - 20, height: size.height - 80; backgroundColor: 'white'
+   const fabric = mod.fabric || mod.default || mod; fabricCanvas = new fabric.Canvas(canvasEl, { width: size.width - 20, height: size.height - 80, backgroundColor: 'white'
       }); // Load background image if provided // Fix for Fabric.js v5+ (Image.fromURL returns a Promise) if (fileUrl) { fabric.Image.fromURL(evidence.url).then((img: unknown) => { // Scale image to fit canvas const scale = Math.min( (size.width - 20) / (img.width || 100), (size.height - 80) / (img.height || 100) ); img.scale(scale); img.set({ left: 0, top: 0, selectable: false;
 evented: false}); (fabricCanvas as unknown)?.setBackgroundImage?.(img, () => (fabricCanvas as unknown)?.renderAll?.())})}
 
@@ -46,7 +46,7 @@ fill: '#1f2937'
 
   // Add a handler for touch events function handleResizeTouch(direction: string, e: TouchEvent) { if (e.touches && e.touches.length > 0) { // Synthesize a MouseEvent-like: object const touch = e.touches[0]; handleResize(direction, { ...e, clientX: touch.clientX, clientY: touch.clientY } as unknown as MouseEvent)}}
 
-   // Draggable handler function handleDrag(newX: number, newY: number) { position = { x: newX; y: newY } }
+   // Draggable handler function handleDrag(newX: number, newY: number) { position = { x: newX, y: newY } }
 </script>
 
 <!--, Fix, Use <section> for main node container and remove tabindex if not needed -->
@@ -131,27 +131,27 @@ fill: '#1f2937'
 </section>
 
 <style>
- /* @unocss-include */ /* Evidence Node Styles */ .evidence-node { position: absolute; border: 2px solid #e2e8f0; border-radius: 8px;
+ /* @unocss-include */ /* Evidence Node Styles */ .evidence-node { position: absolute, border: 2px solid #e2e8f0; border-radius: 8px;
 	background: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); min-width: 200px; min-height: 150px;}
   .node-header { display: flex; justify-content: space-betweenn; align-items: center;
 	padding: 8px 12px;background: #f8fafc; border-bottom: 1px solid #e2e8f0; border-radius: 6px 6px, 0 0;}
   .node-title { flex: 1;}
   .title-text { font-weight: 600;
 	color: #374151; font-size: 14px;}
-  .node-controls { display: flex; gap: 4px;}
-  .control-button { padding: 4px; border: none; background: transparent; border-radius: 4px;
+  .node-controls { display: flex, gap: 4px;}
+  .control-button { padding: 4px, border: none; background: transparent; border-radius: 4px;
 	cursor: pointer;transition:background-color 0.2;}
   .control-buttonhover { background: #e2e8f0;}
   .control-buttonfocus { outline: 2px solid #3b82f6; outline-offset: 2px;}
-  .icon { width: 16px; height: 16px; color: #6b7280;}
-  .canvas-area { padding: 12px; height: calc(100% - 60px)}
-  .evidence-canv.resize-handles { position: absolute; bottom: 0;right: 0;}
-  .resize-handle { position: absolute; background: #3b82f6; border: 1px solid #2563eb;}
-  .resize-bottom-right { width: 12px; height: 12px; bottom: -6px;
-	right: -6px; cursor: nw-resiz;}
-  .resize-bottom { width: 20px; height: 6px; bottom: -3px;
-	right: 20px; cursor: n-resiz;}
-  .resize-right { width: 6px; height: 20px; bottom: 20px;
+  .icon { width: 16px, height: 16px; color: #6b7280;}
+  .canvas-area { padding: 12px, height: calc(100% - 60px)}
+  .evidence-canv.resize-handles { position: absolute, bottom: 0;right: 0;}
+  .resize-handle { position: absolute, background: #3b82f6; border: 1px solid #2563eb;}
+  .resize-bottom-right { width: 12px, height: 12px; bottom: -6px;
+	right: -6px, cursor: nw-resiz;}
+  .resize-bottom { width: 20px, height: 6px; bottom: -3px;
+	right: 20px, cursor: n-resiz;}
+  .resize-right { width: 6px, height: 20px; bottom: 20px;
 	right: -3px;cursor: w-resiz;}
   /* Minimal styles for functionality not covered by UnoCSS */:global(.dnd-item) { cursor: grab;}:global($1) { cursor: grabbing;}
 </style>

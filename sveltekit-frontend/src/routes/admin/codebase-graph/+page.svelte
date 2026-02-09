@@ -4,7 +4,7 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
-	interface VectorCluster { id: number; cluster_id: number;
+	interface VectorCluster { id: number, cluster_id: number;
 		pattern: string;
 		error_count: number;
 		avg_similarity: number;
@@ -14,7 +14,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		embedding: number[];
 	}
 
-	interface GraphNode { id: string; label: string;
+	interface GraphNode { id: string, label: string;
 		type: 'file' | 'error' | 'cluster' | 'fix';
 		cluster_id?: number;
 		similarity?: number;
@@ -22,7 +22,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		fix_status?: 'pending' | 'in-progress' | 'applied' | 'failed';
 	}
 
-	interface GraphEdge { source: string; target:string;
+	interface GraphEdge { source: string, target:string;
 		weight: number;
 		type: 'similarity' | 'dependency' | 'fix-attempt';
 	}
@@ -193,7 +193,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-    .codebase-graph { padding: 2rem; background: #0f0f1a;
+    .codebase-graph { padding: 2rem, background: #0f0f1a;
         color: #e0e0e0;
         min-height: 100vh;
     }
@@ -209,7 +209,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         gap: 0.5rem;
         margin-top: 1rem;
     }
-    .node-item { padding: 0.5rem; background: rgba(255, 255, 255, 0.05);
+    .node-item { padding: 0.5rem, background: rgba(255, 255, 255, 0.05);
         border-radius: 4px;
         font-size: 0.8rem;
     }

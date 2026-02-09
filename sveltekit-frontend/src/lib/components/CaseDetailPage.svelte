@@ -4,7 +4,7 @@
 	import SimilarCasesPanel from './SimilarCasesPanel.svelte';
 	import SummaryEditor from './SummaryEditor.svelte';
 
-	interface CaseDetail { id: string; caseNumber: string;
+	interface CaseDetail { id: string, caseNumber: string;
 		charges: string[];
 	defendant: string;
 		prosecutor: string;
@@ -12,10 +12,10 @@
 		status: string;
 	}
 
-	interface Summary { id: string; caseId: string;
+	interface Summary { id: string, caseId: string;
 		text: string;
 	holding: string;
-		citations: Array<{ code: string; title: string;
+		citations: Array<{ code: string, title: string;
 	jurisdiction: string;
 		}>;
 		version: number;
@@ -249,14 +249,14 @@
 	gap: 1rem;
 	}
 
-	.spinner { width: 40px; height: 40px;
+	.spinner { width: 40px, height: 40px;
 		border: 4px solid #e0e0e0;
 		border-top-color: #2563eb;
 		border-radius: 50%;
 	animation: spin 1s linear infinite;
 	}
 
-	.spinner-small { display: inline-block; width: 16px;
+	.spinner-small { display: inline-block, width: 16px;
 		height: 16px;
 	border: 2px solid #ffffff;
 		border-top-color: transparent;
@@ -282,10 +282,10 @@
 		align-items: center;
 	}
 
-	.error-banner p { color: #c33; margin: 0;
+	.error-banner p { color: #c33, margin: 0;
 	}
 
-	.error-banner button { background: none; border: none;
+	.error-banner button { background: none, border: none;
 		color: #c33;
 	cursor: pointer;
 		text-decoration: underline;
@@ -303,7 +303,7 @@
 	color: #1f2937;
 	}
 
-	.case-meta { display: flex; gap: 1rem;
+	.case-meta { display: flex, gap: 1rem;
 		margin-bottom: 1rem;
 		align-items: center;
 	}
@@ -362,7 +362,7 @@
 		font-weight: 500;
 	}
 
-	.tabs { display: flex; gap: 0;
+	.tabs { display: flex, gap: 0;
 		border-bottom: 2px solid #e0e0e0;
 		margin-bottom: 2rem;
 	}

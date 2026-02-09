@@ -117,7 +117,7 @@ class ConversationService {
 
     /** Retrieve a conversation with its messages */
     async getConversationWithMessages( conversationId: string ): Promise<{
-	conversation: Conversation | null; messages: ChatMessage[] }> {
+	conversation: Conversation | null, messages: ChatMessage[] }> {
         let conversation = this.conversations.get(conversationId) ?? null;
         let messages = this.messages.get(conversationId) ?? [];
 

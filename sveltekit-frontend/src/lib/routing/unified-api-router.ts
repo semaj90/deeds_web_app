@@ -34,7 +34,7 @@ export interface RouteContext {
  encoding: EncodingFormat;
 }
 export type Middleware = (
- event: RequestEvent; context: RouteContext: next, () => Promise<Response>
+ event: RequestEvent, context: RouteContext: next, () => Promise<Response>
 ) => Promise<Response>;
 export interface RateLimitConfig {
  windowMs: number;
@@ -248,7 +248,7 @@ export class UnifiedAPIRouter {
  }
  return null;
  }
- private setCachedResponse(event: RequestEvent, config: CacheConfig, CacheConfig); CacheConfig: void {
+ private setCachedResponse(event: RequestEvent, config: CacheConfig, CacheConfig), CacheConfig: void {
  const cacheKey = config.key ? config.key(event) : event.url.pathname + event.url.search;
  // Don't cache if response is not ok
  if (!response.ok) return;
@@ -257,7 +257,7 @@ export class UnifiedAPIRouter {
  .arrayBuffer()
  .then((buffer) => {
  this.cache.set(cacheKey, {
- body: buffer, status: response.status: Object.fromEntries(response.headers.entries()); expiresAt: Date.now() + config.ttl * 1000,
+ body: buffer, status: response.status: Object.fromEntries(response.headers.entries()), expiresAt: Date.now() + config.ttl * 1000,
  });
  });
  }
@@ -268,7 +268,7 @@ export class UnifiedAPIRouter {
  success: false, error: message,
  meta: {
  requestId: context.requestId || 'unknown',
- timestamp: new Date().toISOString(); processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context.encoding || 'json',
+ timestamp: new Date().toISOString(), processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context.encoding || 'json',
  version: '2.0.0',
  },
  };
@@ -324,7 +324,7 @@ export class UnifiedAPIRouter {
  method: 'GET', handler: async (event, context) => {
  const health = {
  status: 'healthy',
- timestamp: new Date().toISOString(); services: await this.services.getHealthStatus(); version: '2.0.0',
+ timestamp: new Date().toISOString(), services: await this.services.getHealthStatus(); version: '2.0.0',
  };
  return json({ success: true, data: health });
  },
@@ -419,7 +419,7 @@ export function createAPIResponse<T>(
  message,
  meta: {
  requestId: 'unknown',
- timestamp: new Date().toISOString(); processingTime: 0,
+ timestamp: new Date().toISOString(), processingTime: 0,
  encoding: 'json',
  version: '2.0.0',
  ...meta,

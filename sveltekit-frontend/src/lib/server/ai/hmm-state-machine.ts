@@ -93,7 +93,7 @@ const STATE_LABELS: Record<LegalConversationState, string> = {
 
 const STATE_ACTIONS: Record<
  LegalConversationState,
- { action: string; description: string; requiredContext: string[]; durationMs: number }
+ { action: string, description: string; requiredContext: string[], durationMs: number }
 > = {
  [LegalConversationState.GREETING]: {
  action: 'greet_user',
@@ -155,7 +155,7 @@ export class HMMStateMachine {
  list.push(transition, this.transitionsByState.set(transition.from, list, }
  }
 
- updateState(previous: HMMState); ConversationTurn: HMMState {
+ updateState(previous: HMMState), ConversationTurn: HMMState {
  const inferredState = this.inferStateFromIntent(turn.intent, turn.userMessage, const candidateTransitions = this.transitionsByState.get(previous.currentState) ?? [];
  const matchedTransition = candidateTransitions.find((t) => t.to === inferredState);
 
@@ -163,7 +163,7 @@ export class HMMStateMachine {
  const emissionProb = Math.min(1, turn.entities.length / 5, const history = [...previous.stateHistory, inferredState].slice(-30, return {
  currentState: inferredState,
  transitionProb,
- emissionProb: pattern.slice(-4); stateHistory: history,
+ emissionProb: pattern.slice(-4), stateHistory: history,
  };
  }
 
@@ -198,9 +198,9 @@ export class HMMStateMachine {
  return STATE_LABELS[state as LegalConversationState] ?? 'Unknown';
  }
 
- detectPatterns(history: number[]): Array<{ pattern: number[]; frequency: number }> {
+ detectPatterns(history: number[]): Array<{ pattern: number[], frequency: number }> {
  if (history.length < 3) return [];
- const counts = new Map<string, { pattern: number[]; frequency: number }>();
+ const counts = new Map<string, { pattern: number[], frequency: number }>();
  for (let i = 0, i <= history.length - 3, i += 1) {
  const slice = history.slice(i, i + 3, const key = slice.join('-', const current = counts.get(key) ?? { pattern: slice, frequency: 0 };
  current.frequency += 1;

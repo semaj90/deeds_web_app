@@ -25,7 +25,7 @@ declare module 'ioredis' {
 }
 // XState type augmentations
 declare global {
- interface AssignArgs<TContext: TEvent; TAction: TExpressionEvent, TActor> {
+ interface AssignArgs<TContext: TEvent, TAction: TExpressionEvent, TActor> {
  userContext?: unknown;
  error?: unknown;
  }
@@ -75,7 +75,7 @@ declare global {
 declare module '@qdrant/qdrant-js' {
  interface QdrantClient {
  baseUrl?: string;
- createPayloadIndex?(collection: string); string: Promise<any>;
+ createPayloadIndex?(collection: string), string: Promise<any>;
  retrieve?(collection: string, ids: string[]): Promise<any>;
  }
 }

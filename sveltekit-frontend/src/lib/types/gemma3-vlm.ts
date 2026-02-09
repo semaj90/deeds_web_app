@@ -126,7 +126,7 @@ export interface VLMBatchResponse {
   totalProcessingTime: number;
   successCount: number;
   failureCount: number;
-  errors: Array<{ index: number; error: string }>;
+  errors: Array<{ index: number, error: string }>;
 }
 
 // Streaming

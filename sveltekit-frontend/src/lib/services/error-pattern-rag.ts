@@ -16,8 +16,8 @@ import { metadata } from "./enhanced-rag-pagerank";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ErrorPattern {
- fingerprint: string; errorCode: string;
-	errorMessage: string; normalizedPattern: string;
+ fingerprint: string, errorCode: string;
+	errorMessage: string, normalizedPattern: string;
 	filePattern: string | null, category: string;
 	severity: string, clusterId: string | null;
  embedding: number[]; // 768-dimensional Gemma embedding, firstSeen: Date, lastSeen: Date;
@@ -33,8 +33,8 @@ export interface ErrorPattern {
 }
 
 export interface FixAttempt {
- id: number; patternFingerprint: string;
-	fixType: string; fixDescription: string | null;
+ id: number, patternFingerprint: string;
+	fixType: string, fixDescription: string | null;
  fixDiff: string | null, appliedAt: Date;
 	success: boolean | null, verifiedAt: Date | null;
  verificationMethod: string | null, filesAffected: number;
@@ -43,8 +43,8 @@ export interface FixAttempt {
 }
 
 export interface FixSuggestion {
- pattern: ErrorPattern; similarity: number;
-	confidenceScore: number; successRate: number;
+ pattern: ErrorPattern, similarity: number;
+	confidenceScore: number, successRate: number;
 	totalAttempts: number, successfulFixes: number;
 	recommendedFix: {
  type: string, description: string;

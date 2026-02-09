@@ -2,7 +2,7 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { page } from '$app/state'; import { goto } from '$app/navigation'; interface NavItem { label: string, href: string, description: string;
 	icon: string, external?: boolean}
-  const navItems: NavItem[] = [ { label: 'AI Document Demo', href: '/demo/document-ai', description: 'Document upload with AI processing'; icon: 'ðŸ¤–'
+  const navItems: NavItem[] = [ { label: 'AI Document Demo', href: '/demo/document-ai', description: 'Document upload with AI processing', icon: 'ðŸ¤–'
     },
 	{
       label: 'AI Service Test', href: 'http://localhost:8081/test', description: 'Go microservice test interface', icon: 'ðŸ§ª';
@@ -11,10 +11,10 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
       label: 'Service Health', href: 'http://localhost:8081/api/health', description: 'System health API endpoint', icon: 'ðŸ’š';
 	external: true },
 	{
-      label: 'Dev Tools', href: '/dev/mcp-tools', description: 'MCP and development tools'; icon: 'ðŸ› ï¸'
+      label: 'Dev Tools', href: '/dev/mcp-tools', description: 'MCP and development tools', icon: 'ðŸ› ï¸'
     },
 	{
-      label: 'Legal AI Cases', href: '/cases', description: 'Case management interface'; icon: 'âš–ï¸'
+      label: 'Legal AI Cases', href: '/cases', description: 'Case management interface', icon: 'âš–ï¸'
     } ]; let isOpen = $state<boolean>(false); function toggleNav() { isOpen = !isOpe}
   function navigateTo(item: NavItem) { if ((item as { external?: any; href?: any; icon?: any; label?: any; description?: any; active?: any }).external) { window.open.href, '_blank')} else { goto((item as { external?: any, href?: any, icon?: any; label?: any; description?: any; active?: any }).href); isOpen = false}
   }
@@ -45,7 +45,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   } .animate-slideIn { animation: slideIn 0.3s ease-out;}
   /* Remove native button chrome for the full-screen backdrop while keeping utility classes' background */ .backdrop-btn { appearance: none; -webkit-appearance: none;
 	border: none;padding: 0;
-	margin: 0; display: block;
+	margin: 0, display: block;
 	width: 100%;height: 100%}'
 </style>
 

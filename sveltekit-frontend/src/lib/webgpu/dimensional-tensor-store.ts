@@ -182,7 +182,7 @@ export class DimensionalTensorStore {
   private cpuCache: Map<string, TensorSlice> = new Map();
   private textureMetadata: Map<
     string,
-    { lastAccessed: number; importance: number; position: [number, number, number] }
+    { lastAccessed: number, importance: number; position: [number, number, number] }
   > = new Map();
 
   // Streaming State
@@ -304,7 +304,7 @@ export class DimensionalTensorStore {
   private calculateTextureSize(
     axis: 1 | 2 | 3,
     scale: number
-  ): { width: number; height: number; depth: number } {
+  ): { width: number, height: number; depth: number } {
     const { documents, chunks, representations } = this.dimensions;
 
     switch (axis) {
@@ -541,7 +541,7 @@ export class DimensionalTensorStore {
   }
 
   // Helper: defensively read texture dimensions
-  private getTextureDimensions(texture: GPUTexture): { width: number; height: number } {
+  private getTextureDimensions(texture: GPUTexture): { width: number, height: number } {
     const w = (texture as unknown as { width?: number }).width;
     const h = (texture as unknown as { height?: number }).height;
     return {

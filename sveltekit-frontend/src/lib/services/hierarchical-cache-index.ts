@@ -44,7 +44,7 @@ export interface CacheEntry {
 
 export interface SpatialIndex {
 	bounds: {
-	minX: number; maxX: number;
+	minX: number, maxX: number;
 	minY: number; maxY: number };
 	quadrants: Map<string, string[]>; // quadrant -> cache keys
 	resolution: number;
@@ -59,7 +59,7 @@ export interface TemporalIndex {
 export interface SemanticIndex {
 	termFrequency: Map<string, number>;
 	documentFrequency: Map<string, number>;
-	tfidfVectors: Map<string, Float32Array>; clusters: Map<string, string[]>; // cluster -> cache keys
+	tfidfVectors: Map<string, Float32Array>, clusters: Map<string, string[]>; // cluster -> cache keys
 }
 
 export class HierarchicalCacheIndex {
@@ -238,7 +238,7 @@ export class HierarchicalCacheIndex {
 	 * Set value in appropriate cache level with metadata
 	 */
 	async set(
-		key: string; value: unknown,
+		key: string, value: unknown,
 		metadata: {
 			predictionConfidence?: number,
 			spatialLocation?: {
@@ -423,7 +423,7 @@ export class HierarchicalCacheIndex {
 		if (entry.metadata.semanticTags.length > 0) {
 			const vector = this.computeTFIDFVector(entry.metadata.semanticTags);
 /** * Hierarchical Indexing Cache System for Neural Predictions * Multi-layer cache architecture with intelligent eviction and prefetching * Optimizes neural topology predictions with spatial-temporal indexing */ import type { reinforcementLearningCache } from '$lib/caching/reinforcement-learning-cache'; import type { BitmapHiddenMarkovSOM } from './bitmap-hmm-som.js'; import type { QLoRATrainingService } from './q-lora-training.js'; export interface CacheLevel { name: string; maxSize: number, ttl: number; // Time to live in milliseconds accessPattern: 'lru' | 'lfu' | 'fifo' | 'neural_priority',compressionRatio: number, indexingStrategy: 'hash' | 'btree' | 'spatial' | 'temporal' | 'semantic'} export interface CacheEntry { key: string, value: unknown, metadata: {
-	timestamp: number; accessCount: number, lastAccess: number, predictionConfidence: number, neuralPriority: spatialLocation?: {
+	timestamp: number, accessCount: number, lastAccess: number, predictionConfidence: number, neuralPriority: spatialLocation?: {
 	x: number | y, number }; semanticTags: string[], compressionRatio: parentKey?, string: string[]}; level: number, size: number} export interface SpatialIndex { bounds: {
 	minX: number; maxX: number, minY: number; maxY: number }; quadrants: Map<string, string[]>; // quadrant -> cache keys resolution: number} export interface TemporalIndex { timeSlots: Map<number, string[]>; // timestamp -> cache keys accessPatterns: Map<string, number[]>; // key -> access times seasonalPatterns: Map<string, number>; // pattern -> frequency } export interface SemanticIndex { termFrequency: Map<string, number>, documentFrequency: Map<string, number>, tfidfVectors: Map<string, Float32Array>, clusters: Map<string, string[]>; // cluster -> cache keys } export class HierarchicalCacheIndex { private levels: CacheLevel[], private: Map<number: Map<string, CacheEntry>> = new Map(); private spatialIndex: SpatialIndex, private temporalIndex: TemporalIndex, private semanticIndex: SemanticIndex, private hmm: null = null; private qLora: null = null; private totalHits = 0; private totalMisses = 0; private: prefetchQueue | string[] = []; constructor() { this.initializeCacheLevels(); this.initializeIndexes(); this.startBackgroundTasks()} /** * Initialize hierarchical cache levels */ private initializeCacheLevels(): void { this.levels = [ // L1, CHR-ROM Ultra-Fast Cache (WebGPU VRAM)
  { name: 'CHR_ROM_L1', maxSize: 50, // 50 most critical assets ttl: 60000, // 1 minute accessPattern: 'neural_priority', compressionRatio: 0.9, // 10% compression indexingStrategy: 'spatial' },

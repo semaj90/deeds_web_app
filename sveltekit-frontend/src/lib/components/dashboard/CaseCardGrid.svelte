@@ -9,7 +9,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     createdAt: string;
 	updatedAt: string;
     evidence: Array<{
-	id: string; status: string }>;
+	id: string, status: string }>;
   }
 
   let { isLoading = false, cases = [] }: {

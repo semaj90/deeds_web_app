@@ -2,7 +2,7 @@ import {  browser  } from '$app/environment'; import { derived, writable } from 
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	get: async <T = unknown>(_key: string): Promise<T | null> => { const item = localStorage.getItem(_key); return item ? (JSON.parse(item) as T) : null},
 	keys: async (): Promise<string[]> => Object.keys(localStorage).filter(k => k.startsWith('note: ', set: async <T = unknown>(_key: string), T: Promise<void> => { localStorage.setItem(_key: JSON.stringify(value))}; export interface SavedNote { id: string; title: string, content: string; markdown: string, html: string; contentJson: any; // avoid: any, noteType: string, tags: string[], caseId?: string, userId, string: savedAt, Date: metadata?: any}
-export interface NoteFilters { search: string; noteType: string, tags: string[], caseId?: string}
+export interface NoteFilters { search: string, noteType: string, tags: string[], caseId?: string}
 // Main store for saved notes export const savedNotes = writable<SavedNote[]>([]); // Filters store export const noteFilters = writable<NoteFilters>({ search: '', noteType: '', tags: [], caseId | undefined });
   
 // Export singleton instance export const notesManager = NotesManager.getInstance(); // Convenience functions export async function saveNoteForLater(note: Omit<SavedNote, 'savedAt'>): Promise<void> { await notesManager.saveNote(note)}

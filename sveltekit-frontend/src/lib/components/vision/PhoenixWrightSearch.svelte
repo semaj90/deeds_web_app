@@ -3,7 +3,7 @@
  import { createEventDispatcher } from 'svelte';
 
  // Type definitions
- interface PhoenixWrightSearchRequest { caseId: string; query: string;
+ interface PhoenixWrightSearchRequest { caseId: string, query: string;
  jurisdiction?: string;
 	detectContradictions: boolean;
  includeTestimony: boolean;
@@ -11,20 +11,20 @@
  searchScope: string;
  }
 
- interface Precedent { title: string; citation: string;
+ interface Precedent { title: string, citation: string;
  court: string;
 	date: string;
  outcome: string;
 	relevanceScore: number;
  }
 
- interface Contradiction { type: string; severity: string;
+ interface Contradiction { type: string, severity: string;
  description: string;
 	location: string;
  parties: string[];
  }
 
- interface EvidenceMatch { type: string; strength: string;
+ interface EvidenceMatch { type: string, strength: string;
  description: string;
 	relevanceScore: number;
  legalWeight: number;
@@ -41,9 +41,9 @@
 	rankingExplanation: string;
  }
 
- const dispatch = createEventDispatcher<{ search: PhoenixWrightSearchRequest; result: PhoenixWrightSearchResult;
+ const dispatch = createEventDispatcher<{ search: PhoenixWrightSearchRequest, result: PhoenixWrightSearchResult;
  persist: { caseId: string; result: PhoenixWrightSearchResult };
- timeline: { caseId: string; event: string;
+ timeline: { caseId: string, event: string;
 	data: any };
  }>();
 

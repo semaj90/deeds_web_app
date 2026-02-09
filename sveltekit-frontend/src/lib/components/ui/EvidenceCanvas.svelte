@@ -9,7 +9,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // We'll trust 'bits-ui' exports Button.
 
   // Define the structure for the AI analysis results
-  export interface AnalysisResult { summary: string; key_points: string[];
+  export interface AnalysisResult { summary: string, key_points: string[];
     recommendations: string[];
 	confidence_score: number;
   }
@@ -292,7 +292,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     padding: 0.125rem 0.25rem;
     font-size: 11px;
   }
-  .card:hover { transform: translateY(-3px) scale(1.02); transition:transform 0.2s ease; }
+  .card:hover { transform: translateY(-3px) scale(1.02), transition:transform 0.2s ease; }
 
   /* Responsive grid */
   @media (max-width: 768px) {

@@ -17,7 +17,7 @@ from './hmm-transition-predictor.js';
 type RawClusterEvent = {
 type: string; timestamp: number, payload: unknown };
 export type ClusterEvent = | {
-type: 'som_bitmap'; userId: string, checksum: string; palette: string, metadata: Record<string, unknown>, svg?: string heatmapSample?: number[0],timestamp: number}
+type: 'som_bitmap', userId: string, checksum: string, palette: string, metadata: Record<string, unknown>, svg?: string heatmapSample?: number[0],timestamp: number}
 | {
 type: 'hmm_predictions', predictions: TransitionPrediction[0], context?: Record<string, unknown> | null, timestamp: number}
 | {

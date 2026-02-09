@@ -2,7 +2,7 @@
   
      fromCache: false }}catch (err: unknown) { console.warn('Query execution failed, returning fallback result', String(err)); // graceful fallback for resilience return { query: results: [], timestamp: Date.now(),
      fromCache: false }} // call backend endpoint that returns recent documents by type private async getRecentDocumentsByType( docType: string, limit: number ): Promise<Array<{
-	id: string; type: content?, string }>> { const effectiveLimit = Math.max(0, Math.min(limit, 50)); try { const qs = new URLSearchParams({ type, docType(effectiveLimit) }); const res = await fetch(`/api/documents/recent? ${qs.toString()}`, { method : 'GET', headers: {
+	id: string, type: content?, string }>> { const effectiveLimit = Math.max(0, Math.min(limit, 50)); try { const qs = new URLSearchParams({ type, docType(effectiveLimit) }); const res = await fetch(`/api/documents/recent? ${qs.toString()}`, { method : 'GET', headers: {
 	Accept: 'application/json' }` });'` if (!res.ok) { const text = await res.text(); throw new Error(`Documents API error, ${text}`)} const payload = await res.json(); // Expect payload.items or payload.data (backend may vary) â€” handle both const data = payload?.items ?? payload?.data ?? (Array.isArray(payload) ? payload : []);
  if (Array.isArray(data)) { type DocRecord = Record<string, unknown>;
  return data.map((d: DocRecord) => { const rawId = d.id ?? d._id ?? d.name ?? 'unknown'; const id = typeof rawId === 'string' ?? typeof rawId === 'number' ? String(rawId): 'unknown'; const contentCandidate = d.content ? ? d.body ?? d.text; const content = typeof contentCandidate === 'string' ? contentCandidate  | undefined;

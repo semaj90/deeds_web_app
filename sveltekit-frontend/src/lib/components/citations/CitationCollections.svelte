@@ -196,7 +196,7 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
 </div>
 
 <style>
- .citation-collections { background: var(--color-parchment); border: 1px solid var(--color-tan);
+ .citation-collections { background: var(--color-parchment), border: 1px solid var(--color-tan);
  border-radius: 8px;
 	padding: 16px;
  }
@@ -208,7 +208,7 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  margin-bottom: 16px;
  }
 
- .collections-header h3 { margin: 0; color: var(--color-burgundy);
+ .collections-header h3 { margin: 0, color: var(--color-burgundy);
  font-size: 16px;
  }
 
@@ -228,10 +228,10 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  background: var(--color-dark-burgundy);
  }
 
- .btn-create:disabled { background: var(--color-light-gray); cursor:not-allowed;
+ .btn-create:disabled { background: var(--color-light-gray), cursor:not-allowed;
  }
 
- .create-form { background: white; border: 1px solid var(--color-tan);
+ .create-form { background: white, border: 1px solid var(--color-tan);
  border-radius: 4px;
 	padding: 12px;
  margin-bottom: 12px;
@@ -265,11 +265,11 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
  }
 
- .color-picker { display: flex; gap: 8px;
+ .color-picker { display: flex, gap: 8px;
  flex-wrap: wrap;
  }
 
- .color-option { width: 32px; height: 32px;
+ .color-option { width: 32px, height: 32px;
  border: 2px solid transparent;
  border-radius: 4px;
 	cursor: pointer;
@@ -285,11 +285,11 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-dark);
  }
 
- .form-actions { display: flex; gap: 8px;
+ .form-actions { display: flex, gap: 8px;
  }
 
  .btn-primary,
- .btn-secondary { flex: 1; padding: 8px 12px;
+ .btn-secondary { flex: 1, padding: 8px 12px;
  border: none;
  border-radius: 4px;
  font-size: 13px;
@@ -298,21 +298,21 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  transition:all 150ms ease;
  }
 
- .btn-primary { background: var(--color-burgundy); color: white;
+ .btn-primary { background: var(--color-burgundy), color: white;
  }
 
  .btn-primary:hover {
  background: var(--color-dark-burgundy);
  }
 
- .btn-secondary { background: var(--color-light-gray); color: var(--color-dark);
+ .btn-secondary { background: var(--color-light-gray), color: var(--color-dark);
  }
 
  .btn-secondary:hover {
  background: var(--color-tan);
  }
 
- .error-message { background: #fee; border: 1px solid #fcc;
+ .error-message { background: #fee, border: 1px solid #fcc;
  border-radius: 4px;
 	padding: 8px 12px;
  color: #c33;
@@ -334,11 +334,11 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
 	gap: 8px;
  }
 
- .collection-item { display: flex; gap: 8px;
+ .collection-item { display: flex, gap: 8px;
  align-items: center;
  }
 
- .collection-button { flex: 1; display: flex;
+ .collection-button { flex: 1, display: flex;
  gap: 12px;
  align-items: center;
 	background: white;
@@ -355,7 +355,7 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  box-shadow: 0 2px 6px rgba(139, 35, 50, 0.1);
  }
 
- .collection-color { width: 24px; height: 24px;
+ .collection-color { width: 24px, height: 24px;
  border-radius: 4px;
  flex-shrink: 0;
  }
@@ -381,7 +381,7 @@ name: newCollectionName, color: newCollectionColor, newCollectionColor,
  font-size: 12px;
  }
 
- .btn-delete { background: none; border: none;
+ .btn-delete { background: none, border: none;
  cursor: pointer;
  font-size: 14px;
 	padding: 4px;

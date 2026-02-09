@@ -101,7 +101,7 @@ export function checkConditionalHeaders(
     etag?: string,
     lastModified?: Date
 ): {
-	isNotModified: boolean; shouldSend304: boolean } {
+	isNotModified: boolean, shouldSend304: boolean } {
     const ifNoneMatch = request.headers.get('If-None-Match');
     const ifModifiedSince = request.headers.get('If-Modified-Since');
     let isNotModified = false;

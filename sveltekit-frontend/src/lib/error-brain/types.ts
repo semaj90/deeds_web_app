@@ -60,10 +60,10 @@ export type ApplyResult = {
  }>;
 };
 | { type: 'run.started';
-	runId: string; ts: number }
+	runId: string, ts: number }
  | { type: 'run.progress';
-	runId: string; step: string;
-	pct: number; ts: number }
+	runId: string, step: string;
+	pct: number, ts: number }
  | {
  type: 'run.patch.proposed';
 	runId: string;
@@ -73,13 +73,13 @@ export type ApplyResult = {
 	ts: number;
  }
  | { type: 'run.patch.applied';
-	runId: string; file: string;
+	runId: string, file: string;
 	ts: number }
  | { type: 'run.failed';
-	runId: string; error: {
+	runId: string, error: {
 	code: string; message: string }; ts: number }
  | { type: 'run.completed';
-	runId: string; summary: unknown;
+	runId: string, summary: unknown;
 	ts: number };
 
 

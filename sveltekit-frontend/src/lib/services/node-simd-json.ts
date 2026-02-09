@@ -10,7 +10,7 @@ class NodeSIMDJSONService {
     private isOptimized: boolean = false;
     private optimizationLevel: 'none' | 'basic' | 'simd' = 'none';
     private performanceMetrics: {
-	type: string; time: number;
+	type: string, time: number;
 	size: number }[] = [];
 
     constructor() {
@@ -251,7 +251,7 @@ class NodeSIMDJSONService {
      * Get performance statistics
      */
     getStats(): {
-	avgParseTime: number; avgStringifyTime: number;
+	avgParseTime: number, avgStringifyTime: number;
 	totalOps: number } {
         const parseMetrics = this.performanceMetrics.filter(m => m.type === 'parse');
         const stringifyMetrics = this.performanceMetrics.filter(m => m.type === 'stringify');

@@ -51,21 +51,21 @@ export interface WebGPUCapabilities {
 }
 export interface ComputeShaderConfig {
  workgroupSize: [number, number, number];
- entryPoint: string; bindingLayout: GPUBindGroupLayoutDescriptor;
+ entryPoint: string, bindingLayout: GPUBindGroupLayoutDescriptor;
 }
 export interface AIComputeJob {
- id: string; type: 'attention' | 't5_inference' | 'dimensional_transform' | 'kernel_splice';
+ id: string, type: 'attention' | 't5_inference' | 'dimensional_transform' | 'kernel_splice';
  inputData: BufferLike, shape: number[];
  attentionWeights?: BufferLike;
  modelParams?: unknown; // from, priority: 'high' | 'medium' | 'low', createdAt: number;
 }
 // New interfaces for return types
 export interface DimensionalArrayProcessingResult {
- result: Float32Array; processingTime: number;
+ result: Float32Array, processingTime: number;
 	gpuMemoryUsed: number, recommendations: string[];
 }
 export interface T5InferenceResult {
- result: Float32Array; processingTime: number;
+ result: Float32Array, processingTime: number;
 	recommendations: string[];
 }
 export interface CustomAILibrary {
@@ -92,11 +92,11 @@ export interface CustomAILibrary {
  };
 }
 export interface EnginePerformanceStats {
- jobsProcessed: number; cachedShaders: number;
+ jobsProcessed: number, cachedShaders: number;
 	averageProcessingTime: number, gpuUtilization: number;
 }
 export interface EngineCapabilities {
- webgpu: WebGPUCapabilities; performance: EnginePerformanceStats;
+ webgpu: WebGPUCapabilities, performance: EnginePerformanceStats;
 	recommendations: string[];
 }
 export class WebGPUAIEngine {

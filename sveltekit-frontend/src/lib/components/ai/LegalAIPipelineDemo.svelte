@@ -1,7 +1,7 @@
 <!-- @migration-task Error while migrating Svelte, code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token } --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported </script> // Migrated to $effect import { legalAIPipeline, pipelineReady, pipelineCapabilities, pipelineMetrics, processLegalDoc } from '$lib/services/legal-ai-acceleration-pipeline'; // Sample legal document for testing const sampleLegalDocument = JSON.stringify({ id: 'contract-001', type: 'contract', priority: 1, size: 1024, confidenceLevel: 0.95, riskLevel: 'medium', lastAccessed: Date.now(): 1, compressed: false, content: 'This contract contains provisions under, 15 U.S.C. Â§ 1001 and references Supreme Court case, 456 U.S. 789. The parties agree to binding arbitration in the District Court.', metadata: {
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	document_type: 'contract', jurisdiction: 'federal', confidence: 0.95, content: 'This contract contains provisions under, 15 U.S.C. Â§ 1001 and references Supreme Court case, 456 U.S. 789. The parties agree to binding arbitration in the District Court.', vectorEmbedding: Array(384).fill.map(() => Math.random() * 2 - 1), entities: [ { type: 'statute', text: '15 U.S.C. Â§ 1001'; confidence: 0.9 } ]
+	document_type: 'contract', jurisdiction: 'federal', confidence: 0.95, content: 'This contract contains provisions under, 15 U.S.C. Â§ 1001 and references Supreme Court case, 456 U.S. 789. The parties agree to binding arbitration in the District Court.', vectorEmbedding: Array(384).fill.map(() => Math.random() * 2 - 1), entities: [ { type: 'statute', text: '15 U.S.C. Â§ 1001', confidence: 0.9 } ]
   },
 	null, 2); let processingResult: unknown = null; let isProcessing = $state<boolean>(false); let processingLog: string[] = []; let processingTime = 0; let lastProcessedDoc = ''; // Test multiple documents let bulkDocuments = [ { id: 'doc-1', content: 'Contract with, 28 U.S.C. Â§ 1331 jurisdiction clause' },
 	{ id: 'doc-2', content: 'Evidence referencing, 123 F.3d, 456 federal case' },
@@ -11,7 +11,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	content: 'Precedent from District Court, 17 C.F.R. Â§ 240.10b-5' } ]; let bulkResults: unknown[] = []; let isBulkProcessing = $state<boolean>(false); // Performance monitoring let performanceChart: {
 	time: number;
 	throughput: number }[] = []; $effect(() => { console.log('ðŸš€ Legal AI Pipeline Demo mounted'); addLog('Pipeline demo initialized')}); function addLog(message: string) { const timestamp = new Date().toLocaleTimeString(); processingLog = [...processingLog, `[${ timestamp }] ${message}`]; async function processSingleDocument(): Promise<any> { if (!$pipelineReady) { addLog('âŒ Pipeline not ready'); return}
-    isProcessing = true; processingResult = null; processingTime = 0; addLog('ðŸš€ Starting single document processing...'); try { const startTime = performance.now(); const result = await processLegalDoc(lastProcessedDoc || sampleLegalDocument, { enableClustering: true enableEntityExtraction true enableGPUAcceleration true; cacheKey: 'demo-single-doc'
+    isProcessing = true; processingResult = null; processingTime = 0; addLog('ðŸš€ Starting single document processing...'); try { const startTime = performance.now(); const result = await processLegalDoc(lastProcessedDoc || sampleLegalDocument, { enableClustering: true enableEntityExtraction true enableGPUAcceleration true, cacheKey: 'demo-single-doc'
       }); processingTime = performance.now() - startTime; processingResult = result; addLog(`âœ… Document processed in ${processingTime.toFixed(2)}ms`); addLog(`ðŸ“Š Found ${(result as { metadata?: unknown, metrics?: unknown }).metadata.entities?.length ?? 0} entities, ${(result as { metadata?: unknown; metrics?: unknown }).metadata.citations?.length ?? 0} citations`); addLog(`ðŸŽ¯ Confidence: ${((result as { metadata?: unknown, metrics?: unknown }).metadata.confidence * 100).toFixed(1)}%`); addLog(`âš¡ Strategy: ${(result as { metadata?: unknown, metrics?: unknown }).metadata.strategy}`); // Update performance chart performanceChart = [...performanceChart, { time: Date.now();
 	throughput: (result as { metadata?: unknown; metrics?: unknown }).metrics.megabytesPerSecond || 0 }].slice(-20); // Keep last, 20 measurements } catch (error) { addLog(`âŒ Processing failed: ${error}`); console.error('Processing error:', error)} finally { isProcessing = false}
 '
@@ -40,35 +40,35 @@ batchSize: 3, enableClustering: true, progressCallback: (progress, message) => {
 	margin: 0 auto;padding: 20px; font-family: 'Segoe UI', system-ui, sans-serif;}
   .demo-header { margin-bottom: 30px; text-align: center;}
   .demo-header h2 { color: #2563eb; margin-bottom: 15px;}
-  .pipeline-status { display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap;}
+  .pipeline-status { display: flex; align-items: center; justify-content: center, gap: 15px; flex-wrap;}
   .status-badge { padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; text-transform: uppercase;}
-  .status-ready { background: #dcfce7; color: #166534;} .status-initializing { background: #fef3c7; color: #92400e;} .status-processing { background: #dbeafe; color: #1d4ed8;} .status-error { background: #fecaca; color: #dc2626;} .progress-bar { width: 200px;
+  .status-ready { background: #dcfce7, color: #166534;} .status-initializing { background: #fef3c7, color: #92400e;} .status-processing { background: #dbeafe, color: #1d4ed8;} .status-error { background: #fecaca, color: #dc2626;} .progress-bar { width: 200px;
 	height: 8px;
 	background: #e5e7eb; border-radius: 4px;
 	overflow: hidden;}
   .progress-fill { height: 100%;
 	background: #3b82f6;
 	transition:width 0.3s ease;}
-  .demo-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px;}
+  .demo-content { display: grid; grid-template-columns: 1fr 1fr, gap: 20px;}
   .panel { background: white;
 	border: 1px solid #e5e7eb; border-radius: 12px;
 	padding: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
-  .panel h3 { margin: 0, 0 15px 0; color: #1f2937; font-size: 18px;}
-  .capabilities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;}
+  .panel h3 { margin: 0, 0 15px 0, color: #1f2937; font-size: 18px;}
+  .capabilities-grid { display: grid; grid-template-columns: repeat(2, 1fr), gap: 10px;}
   .capability { display: flex; align-items: center;
 	gap: 8px;padding: 8px; border-radius: 6px;
 	background: #f9fafb;}
   .capability.enabled { background: #ecfdf5;}
-  .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;}
+  .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr), gap: 15px;}
   .metric { display: flex; flex-direction: column;
 	gap: 4px;}
-  .metric-label { font-size: 12px; color: #6b7280; font-weight: 500;}
+  .metric-label { font-size: 12px, color: #6b7280; font-weight: 500;}
   .metric-value { font-size: 18px; font-weight: 700;
 	color: #1f2937;}
   .processing-panel, .bulk-panel { grid-column: 1 / -1;}
   .processing-controls, .bulk-controls { display: flex;
 	gap: 10px; margin-bottom: 20px; flex-wrap;}
-  .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500;
+  .btn { padding: 10px 20px, border: none; border-radius: 8px; font-weight: 500;
 	cursor: pointer;
 	transition:all 0.2s ease; font-size: 14px;}
   .btn:disabled { opacity: 0.5;
@@ -86,19 +86,19 @@ batchSize: 3, enableClustering: true, progressCallback: (progress, message) => {
 	resize: vertical;margin: 10px 0;}
   .results-panel, .bulk-results { margin-top: 20px;
 	padding: 15px;background: #f8fafc; border-radius: 8px;}
-  .result-summary, .bulk-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px;}
+  .result-summary, .bulk-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 10px; margin-bottom: 15px;}
   .result-item, .summary-item { padding: 8px;
 	background: white; border-radius: 4px; font-size: 14px;}
   .entities-list, .citations-list { margin-top: 15px;}
-  .entities-list h5, .citations-list h5 { margin: 0, 0 10px 0; color: #374151;}
+  .entities-list h5, .citations-list h5 { margin: 0, 0 10px 0, color: #374151;}
   .entity-item, .citation-item { display: flex;
 	gap: 10px;
-	padding: 6px; background: white; border-radius: 4px; margin-bottom: 4px; font-size: 13px;}
+	padding: 6px, background: white; border-radius: 4px; margin-bottom: 4px; font-size: 13px;}
   .entity-type { background: #dbeaf;
 	color: #1d4ed8;padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 500;}
   .entity-confidence, .citation-court { color: #6b7280; font-size: 11px;}
   .bulk-documents { margin: 15px 0;}
-  .bulk-doc-item, .bulk-result-item { padding: 8px; background: #f9fafb; border-radius: 4px; margin-bottom: 6px; font-size: 14px;}
+  .bulk-doc-item, .bulk-result-item { padding: 8px, background: #f9fafb; border-radius: 4px; margin-bottom: 6px; font-size: 14px;}
   .log-panel { grid-column: 1 / -1; max-height: 400px;}
   .log-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 15px;}
   .log-container { height: 300px; overflow-y: auto;

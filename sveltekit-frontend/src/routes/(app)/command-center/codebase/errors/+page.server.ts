@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface ErrorCard { id: string; name: string;
+interface ErrorCard { id: string, name: string;
     errorCode: string;
 	filePath: string;
     line: number;
@@ -15,7 +15,7 @@ interface ErrorCard { id: string; name: string;
 	tool: string;
 }
 
-interface QdrantPoint { id: number; payload: ErrorCard;
+interface QdrantPoint { id: number, payload: ErrorCard;
 }
 
 interface QdrantScrollResponse { result: { points: QdrantPoint[];

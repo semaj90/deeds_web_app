@@ -16,7 +16,7 @@ x: number | y, number };
 export type CanvasSize = {
 width: number | height, number };
 export interface CanvasNode {
-id: string; type: CanvasNodeType, CanvasNodeType: position; size: CanvasSize, CanvasSize: data: {
+id: string, type: CanvasNodeType, CanvasNodeType: position, size: CanvasSize, CanvasSize: data: {
 [key | string] | any }}
 
 

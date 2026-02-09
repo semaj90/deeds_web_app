@@ -74,7 +74,7 @@ export class AIService {
         userId: string,
         caseId?: string,
         options: AIQueryOptions = {}
-    ): Promise<{ response: string; confidence: number; contextUsed: string[]; queryId?: string }> {
+    ): Promise<{ response: string, confidence: number; contextUsed: string[]; queryId?: string }> {
         const startTime = Date.now();
         const { model = 'gemma3-legal', temperature = 0.7, maxTokens = 2000, includeContext = true, saveQuery = true } = options;
 
@@ -206,7 +206,7 @@ export class AIService {
             // Select stored embeddings so we can compute similarity locally (defensive)
             const rows = (await db.execute(
                 sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LIMIT 100` // Increased limit for re-ranking
-            )) as Array<{ id: string; document_id: string; content: string; metadata: Record<string, unknown>; embedding: string | number[] | null }>;
+            )) as Array<{ id: string, document_id: string; content: string, metadata: Record<string, unknown>; embedding: string | number[] | null }>;
 
             // Normalize and compute similarity results
             const results: VectorSearchResult[] = [];
@@ -259,7 +259,7 @@ export class AIService {
         queryEmbedding: number[],
         userId?: string,
         limit = 5
-    ): Promise<Array<{ query: string; response: string; similarity: number }>> {
+    ): Promise<Array<{ query: string, response: string; similarity: number }>> {
         try {
             // Simplified: return recent queries for the user or a global sample.
             // Ideally should use vector search if queries are embedded.
@@ -267,11 +267,11 @@ export class AIService {
             if (userId) {
                 rows = (await db.execute(
                     sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
-                )) as Array<{ query: string; response: string; similarity: number }>;
+                )) as Array<{ query: string, response: string; similarity: number }>;
             } else {
                 rows = (await db.execute(
                     sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
-                )) as Array<{ query: string; response: string; similarity: number }>;
+                )) as Array<{ query: string, response: string; similarity: number }>;
             }
 
             return rows.map(r => ({

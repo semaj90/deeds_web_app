@@ -56,7 +56,7 @@ export class MinIOService {
   }
 
   async uploadFile(file: File, userId: string): Promise<{
-	bucket: string; key: string;
+	bucket: string, key: string;
 	url: string }> {
     try {
       await this.ensureBucketExists();
@@ -92,7 +92,7 @@ export class MinIOService {
   }
 
   async getTextContent(key: string): Promise<{
-	content: string; metadata: Record<string, unknown> }> {
+	content: string, metadata: Record<string, unknown> }> {
     const buffer = await this.getObjectBuffer(key);
     return {
       content: buffer.toString('utf-8'),

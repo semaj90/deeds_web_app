@@ -16,8 +16,8 @@ export interface RouteOperation {
 	route: string;
  category: string;
 	priority: 'high' | 'medium' | 'low';
- phase: 72 | 82; operation: string;
-	status: 'success' | 'warning' | 'error'; details: Record<string, any>;
+ phase: 72 | 82, operation: string;
+	status: 'success' | 'warning' | 'error', details: Record<string, any>;
  duration?: number;
 }
 
@@ -43,7 +43,7 @@ export class RouteOperationLogger {
  category: string,
  priority: 'high' | 'medium' | 'low',
  error: {
-	code: string; message: string;
+	code: string, message: string;
 	count: number },
 	suggestion?: string
  ) {

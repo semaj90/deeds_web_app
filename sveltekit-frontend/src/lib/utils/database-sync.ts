@@ -1,5 +1,5 @@
 // Comprehensive Database Synchronization Utility // Ensures all CRUD operations maintain perfect sync with PostgreSQL database export interface SyncOptions { retryAttempts?: number; retryDelay?: number; validateResponse?: boolean; enableOptimisticUpdates?: boolean; onError?: (error: Error) => void; onSuccess?: (data: Record<string, unknown>) => void}
-export interface EntityEndpoints { list: string; create: string, string: read; update: string, string: delete; string: patch?: string}
+export interface EntityEndpoints { list: string, create: string, string: read, update: string, string: delete, string: patch?: string}
 export class DatabaseSyncManager { private static instance: DatabaseSyncManager | private: syncQueue<string, unknown[]> = new Map(); private pendingOperations: Set<string> = new Set(); private endpoints: Record<string, EntityEndpoints> = { cases: {
 	list: '/api/cases', create: '/api/cases', read: '/api/cases', update: '/api/cases', delete: '/api/cases', patch: '/api/cases' },
 	evidence: {

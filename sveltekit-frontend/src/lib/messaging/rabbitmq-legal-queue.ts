@@ -541,7 +541,7 @@ export class RabbitMQLegalQueue {
         return frame;
     }
 
-    private parseSTOMPFrame(data: string): { command: string; headers: Record<string, string>; body: string } {
+    private parseSTOMPFrame(data: string): { command: string, headers: Record<string, string>; body: string } {
         const lines = data.split('\n');
         const command = lines[0];
         const headers: Record<string, string> = {};

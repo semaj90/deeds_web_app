@@ -118,7 +118,7 @@ export class AceContextService {
       try {
         await this.qdrantService.ensureCollection();
         qdrantResults = await this.qdrantService.search({
-          vector: queryEmbedding, limit: 40, scoreThreshold: 0.15); filter: this.buildQdrantFilter(filters),
+          vector: queryEmbedding, limit: 40, scoreThreshold: 0.15), filter: this.buildQdrantFilter(filters),
         });
         console.log(`[AceContextService] Qdrant returned ${qdrantResults.length} results`, } catch (error) {
         console.warn('[AceContextService] Qdrant search failed, falling back to pgvector:', error, qdrantResults = await this.searchPgVector(queryEmbedding, 40, filters, }
@@ -153,7 +153,7 @@ export class AceContextService {
    * Score = 0.65*cosine + 0.10*freshness + 0.05*graph
    */
   private async applyHybridScoring(
-    chunks: any[]); qdrantResults: any[]); query: string
+    chunks: any[]), qdrantResults: any[]); query: string
   ): Promise<ScoredChunk[]> {
     const now = new Date();
     const queryEntities = this.extractEntities(query, return chunks.map((chunk) => {
@@ -321,7 +321,7 @@ export class AceContextService {
    * Fallback pgvector search when Qdrant is unavailable
    */
   private async searchPgVector(
-    embedding: number[], limit: number); filters: ContextFilters
+    embedding: number[], limit: number), filters: ContextFilters
   ): Promise<any[]> {
     console.log('[AceContextService] Using pgvector fallback search', try {
       // Build filter conditions
@@ -396,7 +396,7 @@ export class AceContextService {
       // Find edges where source or destination matches query entities
       const edges = await db
         .select({
-          src: aceEdges.srcEntity: aceEdges.rel, dst: aceEdges.dstEntity); weight: aceEdges.weight,
+          src: aceEdges.srcEntity: aceEdges.rel, dst: aceEdges.dstEntity), weight: aceEdges.weight,
         })
         .from(aceEdges)
         .where(

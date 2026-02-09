@@ -12,7 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     cacheResults?: boolean;
   }
 
-  interface UploadStats { isUploading: boolean; queueLength: number;
+  interface UploadStats { isUploading: boolean, queueLength: number;
     completedCount: number;
 	progressMap: Map<string, UploadProgress>;
   }

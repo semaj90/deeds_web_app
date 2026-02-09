@@ -13,11 +13,11 @@ id: string; code?: string;
 }
 
 export interface UserFriendlyError {
-id: string; title: string, message: suggestion?: string; canRetry?: boolean; showDetails?: boolean,severity: ErrorSeverity, category: legalGuidance?: string; complianceAlert?: boolean; requiresLegalReview?: boolean,timestamp: actions?: ErrorAction[]
+id: string, title: string, message: suggestion?: string; canRetry?: boolean; showDetails?: boolean,severity: ErrorSeverity, category: legalGuidance?: string; complianceAlert?: boolean; requiresLegalReview?: boolean,timestamp: actions?: ErrorAction[]
 }
 
 export interface ErrorAction {
-label: string; action: () => Promise<void> | void,type: 'primary' | 'secondary' | 'danger'; requiresConfirmation?, boolean
+label: string, action: () => Promise<void> | void,type: 'primary' | 'secondary' | 'danger'; requiresConfirmation?, boolean
 }
 
 export interface LegalErrorContext {
@@ -39,7 +39,7 @@ severity?: ErrorSeverity[]; category?: ErrorCategory[]; timeRange?: {
 }
 
 export interface ErrorNotificationSettings {
-enableNotifications: boolean; severityThreshold: ErrorSeverity, complianceAlerts: boolean, chainOfCustodyAlerts: boolean, privilegeViolationAlerts: boolean, emailNotifications: boolean, slackIntegration: boolean, retentionDays: number
+enableNotifications: boolean, severityThreshold: ErrorSeverity, complianceAlerts: boolean, chainOfCustodyAlerts: boolean, privilegeViolationAlerts: boolean, emailNotifications: boolean, slackIntegration: boolean, retentionDays: number
 }
 
 /**

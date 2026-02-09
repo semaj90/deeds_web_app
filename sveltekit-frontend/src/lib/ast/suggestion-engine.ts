@@ -50,7 +50,7 @@ export interface WebSearchResult {
 // Cluster type mappings
 const CLUSTER_TYPES: Record<string, ClusterInfo> = {
 	syntax: {
-	id: 1; label: 'Syntax', color: 'bg-red-500', icon: 'i-lucide-code' },
+	id: 1, label: 'Syntax', color: 'bg-red-500', icon: 'i-lucide-code' },
 	type: {
 	id: 2, label: 'Type', color: 'bg-blue-500', icon: 'i-lucide-type' },
 	import: {

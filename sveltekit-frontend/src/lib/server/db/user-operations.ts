@@ -20,7 +20,7 @@ export class UserAuthService {
         jurisdiction?: string;
         practiceAreas?: string[];
         profileData?: any;
-    }): Promise<{ user: any | null; success: boolean; error?: string }> {
+    }): Promise<{ user: any | null, success: boolean; error?: string }> {
         try {
             // Check if user already exists
             const existingUser = await db.select().from(users).where(eq(users.email, userData.email.toLowerCase())).limit(1);

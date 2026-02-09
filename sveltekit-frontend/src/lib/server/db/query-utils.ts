@@ -20,7 +20,7 @@ export interface QueryFilters {
 }
 
 export interface PaginationParams {
- page: number; limit: number;
+ page: number, limit: number;
 	offset: number;
 }
 
@@ -140,7 +140,7 @@ export class QueryBuilder {
 		filters: QueryFilters,
 		table: TableLike
 	): Promise<{
-	data: T; total: number;
+	data: T, total: number;
 	pagination: PaginationParams }> {
 		const conditions = this.buildFilters(table, filters);
 		const whereClause = this.applyFilters(conditions);

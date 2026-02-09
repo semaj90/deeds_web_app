@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types';
 
-interface FileProfile { file_path: string; role: string;
+interface FileProfile { file_path: string, role: string;
 	surface: string[];
 	dependencies: string[];
 	exports: string[];

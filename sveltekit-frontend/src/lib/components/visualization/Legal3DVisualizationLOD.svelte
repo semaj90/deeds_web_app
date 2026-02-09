@@ -9,7 +9,7 @@
   import ZoomOut from 'lucide-svelte/icons/zoom-out';
 
   // Types
-  interface Legal3DEntity { id: string; type: 'person' | 'organization' | 'document' | 'location' | 'event';
+  interface Legal3DEntity { id: string, type: 'person' | 'organization' | 'document' | 'location' | 'event';
     position: {
 	x: number, y: number;
 	z: number };
@@ -138,7 +138,7 @@
 </div>
 
 <style>
-  .nes-container { background: white; position: relative;
+  .nes-container { background: white, position: relative;
   }
   .canvas-container {
     border: 4px solid #000;

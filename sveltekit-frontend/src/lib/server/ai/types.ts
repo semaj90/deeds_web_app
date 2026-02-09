@@ -184,7 +184,7 @@ export interface AnalysisResult {
     riskFactors?: string[];
     recommendations?: string[];
     citations?: Array<{
-	text: string; source: string;
+	text: string, source: string;
 	confidence: number }>;
     metadata?: {
         modelUsed?: string;

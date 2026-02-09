@@ -79,7 +79,7 @@ export interface UserWorkflowContext extends WorkflowContext {
   | { type: 'REMOVE_COLLABORATOR';
 	userId: string }
   | { type: 'ADD_NOTIFICATION';
-	notification: { type: 'info' | 'warning' | 'error' | 'success'; message: string } }
+	notification: { type: 'info' | 'warning' | 'error' | 'success', message: string } }
   | { type: 'MARK_NOTIFICATION_READ';
 	notificationId: string }
   | { type: 'CLEAR_NOTIFICATIONS' }

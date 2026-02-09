@@ -15,7 +15,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // New interfaces for service return types
 interface ProcessEvidenceServiceResult {
- id: string; summary: string;
+ id: string, summary: string;
  confidence?: number;
  processingTime?: number;
 }
@@ -35,8 +35,8 @@ interface SearchServiceResult {
 }
 
 interface EmbeddingServiceResult {
- embedding: number[]; text: string;
-	model: string; dimensions: number;
+ embedding: number[], text: string;
+	model: string, dimensions: number;
 }
 
 interface RelatedEvidenceServiceResult {
@@ -46,7 +46,7 @@ interface RelatedEvidenceServiceResult {
 // Context types
 export interface LegalCaseContext {
  // Case data
- case: Case | null; caseId: string | null;
+ case: Case | null, caseId: string | null;
  // Evidence management
  evidence: Evidence[], selectedEvidence: Evidence | null;
  uploadQueue: File[];

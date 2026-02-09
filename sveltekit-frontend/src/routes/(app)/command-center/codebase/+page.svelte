@@ -41,7 +41,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		techBreakdown: {} as Record<string, number>
 	});
 
-	let recentClusters = $state<Array<{ id: string; name: string;
+	let recentClusters = $state<Array<{ id: string, name: string;
 		dominant_code: string;
 	member_count: number;
 		fix_suggestion: string;
@@ -376,7 +376,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		margin-top: 0.25rem;
 	}
 
-	.header-actions { display: flex; gap: 1rem;
+	.header-actions { display: flex, gap: 1rem;
 		align-items: center;
 	}
 
@@ -400,11 +400,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-color: rgba(0, 212, 255, 0.5);
 	}
 
-	.search-box { position: relative; display: flex;
+	.search-box { position: relative, display: flex;
 		align-items: center;
 	}
 
-	.search-icon { position: absolute; left: 0.75rem;
+	.search-icon { position: absolute, left: 0.75rem;
 		color: rgba(255, 255, 255, 0.5);
 	}
 
@@ -518,13 +518,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		min-width: 60px;
 	}
 
-	.error-bar-container { flex: 1; height: 8px;
+	.error-bar-container { flex: 1, height: 8px;
 		background: rgba(255, 255, 255, 0.1);
 		border-radius: 4px;
 	overflow: hidden;
 	}
 
-	.error-bar { height: 100%; background: linear-gradient(90deg, #ef4444, #f97316);
+	.error-bar { height: 100%, background: linear-gradient(90deg, #ef4444, #f97316);
 		border-radius: 4px;
 	transition: width 0.3s ease;
 	}
@@ -542,7 +542,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 1rem;
 	}
 
-	.cluster-item { display: block; padding: 1rem;
+	.cluster-item { display: block, padding: 1rem;
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.08);
 		border-radius: 8px;
@@ -586,7 +586,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		line-height: 1.4;
 	}
 
-	.cluster-tags { display: flex; gap: 0.5rem;
+	.cluster-tags { display: flex, gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 

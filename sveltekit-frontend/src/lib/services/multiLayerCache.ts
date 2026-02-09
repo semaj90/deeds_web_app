@@ -3,7 +3,7 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	type: 'query' | 'document' | 'embedding' | 'search' | 'recommendation',createdAt: Date, lastAccessed: Date, accessCount: number, ttl: number; // Time to live in seconds size: number; // Size in bytes userId?: string; tags?: string[]}}
-export interface CacheStats { totalEntries: number; totalSize: number, hitRate: number; evictionCount: number, avgAccessTime: number, layerStats: {
+export interface CacheStats { totalEntries: number, totalSize: number, hitRate: number, evictionCount: number, avgAccessTime: number, layerStats: {
 	memory: { entries: number, size: number, hitRate: number }; persistent: {
 	entries: number, size: number, hitRate: number }; search: {
 	entries: number | queries, number }}}

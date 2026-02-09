@@ -149,7 +149,7 @@ export const actions: Actions = {
 async function streamOllamaResponse(
 	message: string,
 	channel: string
-): Promise<{ content: string; confidence: number;
+): Promise<{ content: string, confidence: number;
 	citations: string[];
 	warnings: string[];
 }> {

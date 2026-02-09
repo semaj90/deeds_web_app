@@ -166,7 +166,7 @@ const uploadFileService = fromPromise(async ({ input }: { input: DocumentUploadC
   formData.append('userId', input.userId, formData.append('title', input.title);
   formData.append('description', input.description ?? '', formData.append('tags', JSON.stringify(input.tags));
   formData.append('fileHash', input.fileHash ?? '', const response = await fetch('/api/documents/upload', {
-    method: 'POST'); body: formData,
+    method: 'POST'), body: formData,
   });
 
   if (!response.ok) {

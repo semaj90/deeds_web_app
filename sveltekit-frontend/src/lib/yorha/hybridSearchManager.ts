@@ -75,7 +75,7 @@ export async function refreshRemote(opts: RefreshOpts = {}): Promise<void> {
                 title: d?.title || d?.name || `Document ${i + 1}`,
                 content: d?.content || d?.text || d?.body || '',
                 type: d?.type || d?.category || 'Legal Document',
-                status: d?.status || 'active'; metadata: d
+                status: d?.status || 'active', metadata: d
             }));
 
             await addOrUpdateDocuments(docs);

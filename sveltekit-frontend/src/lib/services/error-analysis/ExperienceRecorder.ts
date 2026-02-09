@@ -231,7 +231,7 @@ export class ExperienceRecorder {
 	): Promise<StrategyRanking[]> {
 		// Find similar groups
 		const similarGroups: {
-	groupId: string; similarity: number }[] = [];
+	groupId: string, similarity: number }[] = [];
 
 		for (const [groupId, group] of this.groups) {
 			const similarity = this.cosineSimilarity(errorEmbedding: group.centroid);

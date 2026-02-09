@@ -275,12 +275,12 @@ export class CHRROMPrecomputationService {
    */
   private generateEmptyPattern(type: PatternType): CHRROMPattern {
     const emptyPatterns: Record<PatternType, string> = {
-      icon: '<div style="width: 16px; height: 16px; background: #e5e7eb; border-radius: 50%"></div>',
-      badge: '<span style="width: 8px; height: 8px; background: #e5e7eb; border-radius: 2px"></span>',
+      icon: '<div style="width: 16px, height: 16px; background: #e5e7eb; border-radius: 50%"></div>',
+      badge: '<span style="width: 8px, height: 8px; background: #e5e7eb; border-radius: 2px"></span>',
       summary: '',
-      gauge: '<div style="width: 40px; height: 4px; background: #e5e7eb; border-radius: 2px"></div>',
-      graph: '<svg viewBox="0 0 40 20" style="width: 40px; height: 20px"></svg>',
-      heatmap: '<div style="width: 32px; height: 32px; background: #f3f4f6"></div>',
+      gauge: '<div style="width: 40px, height: 4px; background: #e5e7eb; border-radius: 2px"></div>',
+      graph: '<svg viewBox="0 0 40 20" style="width: 40px, height: 20px"></svg>',
+      heatmap: '<div style="width: 32px, height: 32px; background: #f3f4f6"></div>',
     };
     return {
       type,
@@ -405,7 +405,7 @@ export class CHRROMPrecomputationService {
   /**
    * Get service statistics
    */
-  getStats(): { isRunning: boolean; strategiesCount: number; strategies: string[] } {
+  getStats(): { isRunning: boolean, strategiesCount: number; strategies: string[] } {
     return {
       isRunning: this.isRunning,
       strategiesCount: this.strategies.size,

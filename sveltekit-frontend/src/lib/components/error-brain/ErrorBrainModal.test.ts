@@ -229,9 +229,9 @@ describe('ErrorBrainModal Component', () => {
  {
  title: 'Fix type error',
  description: 'Add type annotation',
- code: 'const; x: string = value;',
+ code: 'const, x: string = value;',
  }],
- phase: 'suggesting'; error_message: 'Type error on line 42',
+ phase: 'suggesting', error_message: 'Type error on line 42',
  created_at: new Date().toISOString(), patches: [],
  }];
 

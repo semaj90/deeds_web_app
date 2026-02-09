@@ -504,7 +504,7 @@ typeof obj['metadata'] === 'object' && obj['metadata'] !== null
 	 * Get service configuration
 	 */
 	public getConfig(): {
-	baseUrl: string; model: string;
+	baseUrl: string, model: string;
 	timeout: number } {
 		return {
 			baseUrl: this.baseUrl,

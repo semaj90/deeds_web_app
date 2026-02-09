@@ -19,7 +19,7 @@ export interface CasesTools {
   }): Promise<MCPToolResponse<any[]>>;
   createCase(caseData: any): Promise<MCPToolResponse<any>>;
   updateCase(caseId: string, updates: any): Promise<MCPToolResponse<any>>;
-  deleteCase(caseId: string): Promise<MCPToolResponse<{ deleted: boolean; id: string }>>;
+  deleteCase(caseId: string): Promise<MCPToolResponse<{ deleted: boolean, id: string }>>;
   findSimilarCases(embedding: number[], limit?: number): Promise<MCPToolResponse<any[]>>;
   getCaseAnalytics(userId: string): Promise<MCPToolResponse<any>>;
 }
@@ -32,7 +32,7 @@ export interface EvidenceTools {
   }): Promise<MCPToolResponse<any[]>>;
   createEvidence(evidenceData: any): Promise<MCPToolResponse<any>>;
   updateEvidence(evidenceId: string, updates: any): Promise<MCPToolResponse<any>>;
-  deleteEvidence(evidenceId: string): Promise<MCPToolResponse<{ deleted: boolean; id: string }>>;
+  deleteEvidence(evidenceId: string): Promise<MCPToolResponse<{ deleted: boolean, id: string }>>;
   findSimilarEvidence(params: { embedding: number[];
     caseId?: string; limit: number;
     threshold?: number;
@@ -55,16 +55,16 @@ export interface RAGTools {
       threshold?: number;
     }
   ): Promise<MCPToolResponse<any[]>>;
-  indexWebPage(url: string): Promise<MCPToolResponse<{ indexed: boolean; id: string }>>;
-  indexDirectory(path: string): Promise<MCPToolResponse<{ indexed: number; errors: string[] }>>;
-  syncMinIO(): Promise<MCPToolResponse<{ processed: number; skipped: number }>>;
-  getLangCacheStats(): Promise<MCPToolResponse<{ hits: number; misses: number; total: number }>>;
+  indexWebPage(url: string): Promise<MCPToolResponse<{ indexed: boolean, id: string }>>;
+  indexDirectory(path: string): Promise<MCPToolResponse<{ indexed: number, errors: string[] }>>;
+  syncMinIO(): Promise<MCPToolResponse<{ processed: number, skipped: number }>>;
+  getLangCacheStats(): Promise<MCPToolResponse<{ hits: number, misses: number; total: number }>>;
   clearLangCache(scope?: string): Promise<MCPToolResponse<{ cleared: number }>>;
 }
 
 export interface MCPTools {
-  cases: CasesTools; evidence: EvidenceTools;
-  users: UserTools; rag: RAGTools;
+  cases: CasesTools, evidence: EvidenceTools;
+  users: UserTools, rag: RAGTools;
   getAnalytics(params: Record<string, string>): Promise<MCPToolResponse<any>>;
   analyzeLegalDocument(document: any): Promise<MCPToolResponse<any>>;
   extractClauses(documentId: string): Promise<MCPToolResponse<any>>;

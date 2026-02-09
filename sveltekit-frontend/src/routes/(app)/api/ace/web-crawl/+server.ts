@@ -27,11 +27,11 @@ import type { RequestHandler } from './$types';
 /**
  * Web Crawl State Machine Context
  */
-interface WebCrawlContext { jobId: string; urls: string[];
+interface WebCrawlContext { jobId: string, urls: string[];
 	userId?: string;
 	sessionId?: string;
 	status: 'pending' | 'processing' | 'completed' | 'failed';
-	results: { screenshotsCaptured: number; htmlExtracted: number;
+	results: { screenshotsCaptured: number, htmlExtracted: number;
 		vectorsGenerated: number;
 		cudaProcessed: boolean;
 	};

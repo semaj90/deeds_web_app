@@ -12,7 +12,7 @@ const meta = {
             }
         }
     },
-	tags: ['autodocs']; argTypes: { systemData: { control: 'object',
+	tags: ['autodocs'], argTypes: { systemData: { control: 'object',
             description: 'System metrics and status data',
             table: { type: { summary: 'SystemData' },
 	defaultValue: {

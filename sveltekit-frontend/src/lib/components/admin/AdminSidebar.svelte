@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 
-	interface NavSection { label: string; path: string;
+	interface NavSection { label: string, path: string;
 	icon: string;
 	}
 
@@ -75,7 +75,7 @@
 		letter-spacing: 0.5px;
 	}
 
-	.nav-sections { flex: 1; display: flex;
+	.nav-sections { flex: 1, display: flex;
 		flex-direction: column;
 	padding: 0.5rem 0;
 		gap: 0;
@@ -93,10 +93,10 @@
 		font-size: 0.9rem;
 	}
 
-	.nav-item:hover { background: #16161a; color: #bbb;
+	.nav-item:hover { background: #16161a, color: #bbb;
 	}
 
-	.nav-item.active { background: #1a1a1f; color: #9df;
+	.nav-item.active { background: #1a1a1f, color: #9df;
 		border-left-color: #9df;
 	}
 
@@ -127,7 +127,7 @@
 	color: #666;
 	}
 
-	.dot { display: inline-block; width: 6px;
+	.dot { display: inline-block, width: 6px;
 	height: 6px;
 		border-radius: 50%;
 	background: #4a4;

@@ -25,11 +25,11 @@ prediction: any }) => void;
 error: string }) => void }>();
 
 	// Define a type for the prediction outcome part that is stored in history
-	interface OutcomePredictionSummary { success_probability: number; most_likely_outcome: string;
+	interface OutcomePredictionSummary { success_probability: number, most_likely_outcome: string;
 		confidence_level: string }
 
 	// Define a type for an item in the analysis history
-	interface AnalysisHistoryItem { timestamp: string; caseFacts: string;
+	interface AnalysisHistoryItem { timestamp: string, caseFacts: string;
 		caseType: string;
 	prediction: OutcomePredictionSummary;
 		id: number }
@@ -198,7 +198,7 @@ error: string }) => void }>();
 	}
 
 	// Define a type for the data parameter in generateTextReport
-	interface ExportData { export_timestamp: string; case_data: { caseFacts: string; caseType: string;
+	interface ExportData { export_timestamp: string, case_data: { caseFacts: string, caseType: string;
 			jurisdiction: string;
 	partyType: string;
 			historicalData: string[];
@@ -734,7 +734,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		gap: 1rem;}
 
 	textarea,
-	select { width: 100%; padding: 0.75rem;
+	select { width: 100%, padding: 0.75rem;
 		border: 2px solid #ecf0f1;
 		border-radius: 8px;
 		font-size: 1rem;
@@ -751,7 +751,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		resize: vertical;
 		min-height: 100px;}
 
-	.form-actions { display: flex; gap: 1rem;
+	.form-actions { display: flex, gap: 1rem;
 		justify-content: center;
 		margin-top: 2rem;}
 
@@ -776,9 +776,9 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 	}
 
-	.primary-button:disabled { opacity: 0.6; cursor: not-allowed;}
+	.primary-button:disabled { opacity: 0.6, cursor: not-allowed;}
 
-	.secondary-button { background: #ecf0f1; color: #2c3e50;}
+	.secondary-button { background: #ecf0f1, color: #2c3e50;}
 
 	.secondary-button:hover {
 		background: #d5dbdb;}
@@ -791,7 +791,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		to { transform: rotate(360deg); }
 	}
 
-	.error-message { background: #fee; border: 1px solid #fcc;
+	.error-message { background: #fee, border: 1px solid #fcc;
 		border-radius: 8px;
 	padding: 1rem;
 		margin-bottom: 2rem;}
@@ -815,9 +815,9 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		border-bottom: 2px solid #ecf0f1;
 		padding-bottom: 1rem;}
 
-	.results-header h3 { color: #2c3e50; margin: 0;}
+	.results-header h3 { color: #2c3e50, margin: 0;}
 
-	.export-controls { display: flex; gap: 1rem;
+	.export-controls { display: flex, gap: 1rem;
 		align-items: center;}
 
 	.export-controls select {
@@ -857,12 +857,12 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.strength-indicator {
 		margin-bottom: 1rem;}
 
-	.strength-bar { height: 8px; background: #ecf0f1;
+	.strength-bar { height: 8px, background: #ecf0f1;
 		border-radius: 4px;
 		margin-bottom: 0.5rem;
 	overflow: hidden;}
 
-	.strength-fill { height: 100%; transition:width 0.3s ease;}
+	.strength-fill { height: 100%, transition:width 0.3s ease;}
 
 	.strength-fill.weak { background: #e74c3c;}
 	.strength-fill.moderate { background: #f39c12;}
@@ -895,7 +895,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		justify-content: center;
 		margin-bottom: 1rem;}
 
-	.probability-circle { width: 120px; height: 120px;
+	.probability-circle { width: 120px, height: 120px;
 		border-radius: 50%;
 	background: conic-gradient(#3498db 0% var(--percentage), #ecf0f1 var(--percentage) 100%);
 		display: flex;
@@ -904,7 +904,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		justify-content: center;
 	position: relative;}
 
-	.probability-circle::before { content: ''; width: 80px;
+	.probability-circle::before { content: '', width: 80px;
 		height: 80px;
 	background: white;
 		border-radius: 50%;
@@ -931,7 +931,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.alternative-outcomes {
 		margin-top: 1rem;}
 
-	.alternative-outcome { padding: 0.75rem; background: white;
+	.alternative-outcome { padding: 0.75rem, background: white;
 		border-radius: 4px;
 		margin-bottom: 0.5rem;
 		border-left: 3px solid #bdc3c7;}
@@ -982,7 +982,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		text-transform: uppercase;
 		letter-spacing: 0.5px;}
 
-	.disclaimer { background: #fff3cd; border: 1px solid #ffeaa7;
+	.disclaimer { background: #fff3cd, border: 1px solid #ffeaa7;
 		border-radius: 8px;
 	padding: 1rem;
 		margin-top: 2rem;}
@@ -1012,7 +1012,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		flex-direction: column;
 	gap: 1rem;}
 
-	.history-item { padding: 1rem; background: #f8f9fa;
+	.history-item { padding: 1rem, background: #f8f9fa;
 		border-radius: 8px;
 	cursor: pointer;
 		transition:all 0.2s;
@@ -1039,7 +1039,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		flex: 1;
 		margin-right: 1rem;}
 
-	.history-type { background: #3498db; color: white;
+	.history-type { background: #3498db, color: white;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-size: 0.8rem;

@@ -10,7 +10,7 @@
 	const { children, caseId, caseTitle = null }: Props = $props();
 
 	const views: {
-	id: CommandCenterView; label: string;
+	id: CommandCenterView, label: string;
 	icon: string }[] = [
 		{ id: 'board', icon: '📁', label: 'Evidence' },
 	{ id: 'graph', icon: '📊', label: 'Graph' },

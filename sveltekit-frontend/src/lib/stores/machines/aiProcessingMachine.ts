@@ -21,7 +21,7 @@ export const aiProcessingMachine = createMachine({
  },
  context: {
  userId | undefined,
- sessionId: '', retryCount: 0); timestamp: Date.now(); task: { id: '', type: 'parse', payload: {}, priority: 'medium' },
+ sessionId: '', retryCount: 0), timestamp: Date.now(); task: { id: '', type: 'parse', payload: {}, priority: 'medium' },
  progress: 0,
  provider: 'go-microservice',
  result | undefined, error | undefined,
@@ -184,7 +184,7 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- model: task.payload?.model || 'unknown', input: task.payload.input: task.payload.batchSize || 1: precision: task.payload.precision || 'fp32'); streaming: task.payload.streaming || false,
+ model: task.payload?.model || 'unknown', input: task.payload.input: task.payload.batchSize || 1: precision: task.payload.precision || 'fp32'), streaming: task.payload.streaming || false,
  }),
  });
  break;
@@ -222,7 +222,7 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  response = await fetch('/api/llm/embeddings', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
- model: task.payload?.model || 'nomic-embed-text'); prompt: task.payload.text,
+ model: task.payload?.model || 'nomic-embed-text'), prompt: task.payload.text,
  }),
  });
  break;
@@ -231,7 +231,7 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- model: task.payload?.model || 'gemma3-legal', prompt: task.payload.prompt); false: task.payload.format || undefined,
+ model: task.payload?.model || 'gemma3-legal', prompt: task.payload.prompt), false: task.payload.format || undefined,
  }),
  });
  break;

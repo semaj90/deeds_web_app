@@ -96,7 +96,7 @@ export async function createCollection(client: QdrantClient, config: CollectionC
 }
 
 export async function initializeQdrantCollections(): Promise<{
-	success: boolean; created: string[];
+	success: boolean, created: string[];
 	failed: string[] }> {
     console.log('\n🎯 Qdrant Collection Initialization');
     const client = createQdrantClient();

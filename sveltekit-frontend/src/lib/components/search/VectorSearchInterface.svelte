@@ -8,7 +8,7 @@
   let {
     onSearch
   }: {
-    onSearch?: (params: { query: string; threshold: number, semantic: boolean }) => void
+    onSearch?: (params: { query: string, threshold: number, semantic: boolean }) => void
   } = $props();
 
   // State

@@ -8,7 +8,7 @@
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import Network from 'lucide-svelte/icons/network';
   // Explicitly typing $props to avoid interface merge issues on single lines
-  interface GraphNode { id: string; label: string;
+  interface GraphNode { id: string, label: string;
     type: string;
     x?: number;
     y?: number;
@@ -16,7 +16,7 @@
     importance: number;
   }
 
-  interface GraphEdge { source: string; target:string;
+  interface GraphEdge { source: string, target:string;
     value: number;
   }
 

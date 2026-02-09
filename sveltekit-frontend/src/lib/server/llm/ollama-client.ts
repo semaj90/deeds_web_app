@@ -150,10 +150,10 @@ ANSWER:`;
  */
 export function buildRelationshipPrompt(
     evidenceA: {
-	text: string; filename: string;
+	text: string, filename: string;
 	tags: string[] },
 	evidenceB: {
-	text: string; filename: string;
+	text: string, filename: string;
 	tags: string[] }
 ): string {
     return `You are a legal analyst examining two pieces of evidence for potential relationships.

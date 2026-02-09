@@ -531,7 +531,7 @@ SELECT
     }
 
     getStatus(): {
-	pgvector: VectorStoreStatus; qdrant: VectorStoreStatus } {
+	pgvector: VectorStoreStatus, qdrant: VectorStoreStatus } {
         return {
             pgvector: this.pgvectorStatus,
             qdrant: this.qdrantStatus

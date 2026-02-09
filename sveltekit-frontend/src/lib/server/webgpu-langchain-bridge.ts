@@ -109,7 +109,7 @@ export class WebGPULangChainBridge {
    * Process batch of documents with WebGPU optimization
    */
   async processBatchDocuments(
-    documents: Array<{ id: string; content: string; metadata?: unknown }>,
+    documents: Array<{ id: string, content: string; metadata?: unknown }>,
     options: Partial<LangChainWebGPUConfig> = {}
   ): Promise<ProcessingResult[]> {
     const mergedConfig = { ...this.config, ...options };
@@ -144,7 +144,7 @@ export class WebGPULangChainBridge {
   private async extractWithLangChain(
     text: string,
     config: LangChainWebGPUConfig
-  ): Promise<{ data: ExtractionData; processingTime: number }> {
+  ): Promise<{ data: ExtractionData, processingTime: number }> {
     const startTime = Date.now();
 
     try {
@@ -313,7 +313,7 @@ export async function processLegalDocumentWithWebGPU(
 }
 
 export async function processBatchDocumentsWithWebGPU(
-  documents: Array<{ id: string; content: string; metadata?: unknown }>,
+  documents: Array<{ id: string, content: string; metadata?: unknown }>,
   options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult[]> {
   return webgpuLangChainBridge.processBatchDocuments(documents, options);

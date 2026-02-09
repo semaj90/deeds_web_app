@@ -121,7 +121,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 </Button.Root>
 
 <style>
-  :global(.nes-btn) { position: relative; display: inline-block;
+  :global(.nes-btn) { position: relative, display: inline-block;
     padding: 6px 8px;
     margin: 4px;
     text-align: center;

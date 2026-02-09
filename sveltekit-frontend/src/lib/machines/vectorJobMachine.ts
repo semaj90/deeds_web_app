@@ -335,7 +335,7 @@ export type VectorJobMachine = typeof vectorJobMachine;
 export type VectorJobActor = ActorRefFrom<VectorJobMachine>;
 
 export function createVectorJob(
- ownerType: VectorJobContext['ownerType']; ownerId: string, operation: VectorJobContext['operation'],
+ ownerType: VectorJobContext['ownerType'], ownerId: string, operation: VectorJobContext['operation'],
  data?: unknown,
  vector?: number[],
  priority: VectorJobContext['priority'] = 'medium'

@@ -154,14 +154,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .action-btn { padding: 0.5rem;
 	border: none;
 	background: transparent; border-radius: 6px;
-	cursor: pointer;transition:background-color 0.2; border: 1px solid #d1d5db;}
+	cursor: pointer;transition:background-color 0.2, border: 1px solid #d1d5db;}
   .action-btn:hover:not(disabled) { background: #f3f4f6;}
   .action-btn:disabled { opacity: 0.5;
 	cursor:not-allowed;}
-  .settings-panel { padding: 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb;}
+  .settings-panel { padding: 1rem, background: #f9fafb; border-bottom: 1px solid #e5e7eb;}
   .setting-group { margin-bottom: 1rem;}
-  .setting-group label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;}
-  .backend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem;}
+  .setting-group label { display: block; font-size: 0.875rem; font-weight: 500, color: #374151; margin-bottom: 0.5rem;}
+  .backend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)), gap: 0.5rem;}
   .backend-btn { display: flex; flex-direction: column; align-items: center;
 	padding: 0.5rem;
 	border: 1px solid #d1d5db; border-radius: 6px;
@@ -184,8 +184,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: #6b7280;}
   .welcome-message h4 { color: #111827;
 	margin: 1rem, 0 0.5rem 0;}
-  .capabilities { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 1rem;}
-  .capability { padding: 0.5rem; background: #f3f4f6; border-radius: 6px; font-size: 0.875rem; text-align: center;}
+  .capabilities { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)), gap: 0.5rem; margin-top: 1rem;}
+  .capability { padding: 0.5rem, background: #f3f4f6; border-radius: 6px; font-size: 0.875rem; text-align: center;}
   .message { display: flex; flex-direction: column;
 	gap: 0.5rem; max-width: 85%}
   .message.user { align-self: flex-end;}
@@ -195,13 +195,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: #6b7280;}
   .role-indicator { display: flex; align-items: center;
 	gap: 0.25rem; font-weight: 500;}
-  .backend-tag, .processing-time { padding: 0.125rem 0.375rem; background: #f3f4f6; border-radius: 4px; font-size: 0.625rem;}
+  .backend-tag, .processing-time { padding: 0.125rem 0.375rem, background: #f3f4f6; border-radius: 4px; font-size: 0.625rem;}
   .message-content { padding: 0.75rem 1rem; border-radius: 12px; line-height: 1.5; white-space: pre-wrap; font-size: 0.875rem;}
-  .message.user .message-content { background: #3b82f6; color: white; border-bottom-right-radius: 4px;}
-  .message.assistant .message-content { background: #f3f4f6; color: #111827; border-bottom-left-radius: 4px;}
-  .confidence-indicator { font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;}
+  .message.user .message-content { background: #3b82f6, color: white; border-bottom-right-radius: 4px;}
+  .message.assistant .message-content { background: #f3f4f6, color: #111827; border-bottom-left-radius: 4px;}
+  .confidence-indicator { font-size: 0.75rem, color: #6b7280; margin-top: 0.25rem;}
   .typing-indicator { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.75rem 1rem; background: #f3f4f6; border-radius: 12px; border-bottom-left-radius: 4px; font-size: 0.875rem;
+	gap: 0.5rem;padding: 0.75rem 1rem, background: #f3f4f6; border-radius: 12px; border-bottom-left-radius: 4px; font-size: 0.875rem;
 	color: #6b7280;}
   .message-references { margin-top: 0.5rem;}
   .message-references h4 { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;
@@ -214,18 +214,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	border: none;
 	cursor: pointer; font-size: 0.875rem;}
   .reference-link:hover { color: #2563eb;}
-  .search-results-panel { border-bottom: 1px solid #e5e7eb; background: #f9fafb; max-height: 200px; overflow-y: auto;}
+  .search-results-panel { border-bottom: 1px solid #e5e7eb, background: #f9fafb; max-height: 200px; overflow-y: auto;}
   .search-header { display: flex; justify-content: space-betweenn; align-items: center;
 	padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb;}
   .search-header h4 { margin: 0; font-size: 0.875rem; font-weight: 600;}
-  .search-result { padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; cursor: pointer;transition:background 0.2;}
+  .search-result { padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb, cursor: pointer;transition:background 0.2;}
   .search-result:hover { background: #f3f4f6;}
   .result-content { font-size: 0.875rem; margin-bottom: 0.25rem;}
   .result-meta { font-size: 0.75rem;
 	color: #6b7280;}
   .no-results { padding: 1rem; text-align: center;
 	color: #6b7280; font-style: italic;}
-  .chat-input { padding: 1rem; border-top: 1px solid #e5e7eb; background: #f9fafb;display: flex; flex-direction: column;
+  .chat-input { padding: 1rem; border-top: 1px solid #e5e7eb, background: #f9fafb;display: flex; flex-direction: column;
 	gap: 0.5rem;}
   .input-controls { display: flex;
 	gap: 0.5rem;}
@@ -242,9 +242,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	gap: 0.5rem;}
   .input-wrapper textarea { flex: 1;
 	padding: 0.75rem;
-	border: 1px solid #d1d5db; border-radius: 8px; resize: vertical; min-height: 2.5rem; font-family: inherit; font-size: 0.875rem; line-height: 1.5;}
+	border: 1px solid #d1d5db; border-radius: 8px, resize: vertical; min-height: 2.5rem; font-family: inherit; font-size: 0.875rem; line-height: 1.5;}
   .input-wrapper textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
-  .submit-btn { padding: 0.75rem 1rem; background: #3b82f6;color: white;
+  .submit-btn { padding: 0.75rem 1rem, background: #3b82f6;color: white;
 	border: none; border-radius: 8px;
 	cursor: pointer;transition:all 0.2;}
   .submit-btn:hover:not(disabled) { background: #2563eb;}
@@ -253,30 +253,30 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   /* Modal styles */ .modal-overlay { position: fixed;
 	top: 0;left: 0;
 	right: 0;bottom: 0;
-	background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;}
+	background: rgba(0, 0, 0, 0.5), display: flex; align-items: center; justify-content: center; z-index: 1000;}
   .modal { background: white; border-radius: 12px; max-width: 500px;
 	width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2)}
   .modal-header { display: flex; align-items: center;
 	gap: 0.5rem;padding: 1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;}
   .modal-body { padding: 1rem;}
   .citation-box { background: #f9fafb;
-	border: 1px solid #e5e7eb; border-radius: 6px; padding: 1rem; margin-bottom: 1rem;}
+	border: 1px solid #e5e7eb; border-radius: 6px, padding: 1rem; margin-bottom: 1rem;}
   .citation-box p { margin: 0; font-family: monospace; font-size: 0.875rem; line-height: 1.5;}
   .modal-actions { display: flex;
 	gap: 0.5rem; margin-bottom: 1rem;}
-  .btn-primary { padding: 0.5rem 1rem; background: #3b82f6;color: white;
+  .btn-primary { padding: 0.5rem 1rem, background: #3b82f6;color: white;
 	border: none; border-radius: 6px;
 	cursor: pointer; font-size: 0.875rem;
 	transition:background-color 0.2;}
   .btn-primary:hover { background: #2563eb;}
-  .btn-secondary { padding: 0.5rem 1rem; background: #f3f4f6;color: #374151;
-	border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; font-size: 0.875rem;
+  .btn-secondary { padding: 0.5rem 1rem, background: #f3f4f6;color: #374151;
+	border: 1px solid #d1d5db; border-radius: 6px, cursor: pointer; font-size: 0.875rem;
 	transition:background-color 0.2;}
   .btn-secondary:hover { background: #e5e7eb;}
   .modal-footer { display: flex; justify-content: flex-end;
 	padding: 1rem; border-top: 1px solid #e5e7eb;}
-  .btn-close { padding: 0.5rem 1rem; background: #f3f4f6;color: #374151;
-	border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; font-size: 0.875rem;
+  .btn-close { padding: 0.5rem 1rem, background: #f3f4f6;color: #374151;
+	border: 1px solid #d1d5db; border-radius: 6px, cursor: pointer; font-size: 0.875rem;
 	transition:background-color 0.2;}
   .btn-close:hover { background: #e5e7eb;}
   /* Color utilities */ .text-gray-500 { color: #6b7280;} .text-green-500 { color: #10b981;} .text-yellow-500 { color: #f59e0b;} .text-red-500 { color: #ef4444;} /* Responsive adjustments */ @media (max-width: 768px) { .enhanced-ai-assistant { border-radius: 0;}

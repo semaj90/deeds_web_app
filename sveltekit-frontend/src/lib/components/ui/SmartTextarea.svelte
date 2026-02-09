@@ -39,7 +39,7 @@ text: string }) => void
   let textarea = $state<HTMLTextAreaElement | null>(null);
   let commandMenu = $state<any>(null);
   let showCommandMenu = $state<boolean>(false);
-  let commandMenuPosition = $state({ x: 0; y: 0 });
+  let commandMenuPosition = $state({ x: 0, y: 0 });
   let lastCursorPosition = $state<number>(0);
   function handleInput(e: Event) {
     const target = e.target as HTMLTextAreaElement
@@ -164,12 +164,12 @@ text: string }) => void
     font-family: inherit;
     font-size: 0.875rem;
     line-height: 1.5
-   ;background: var(--pico-card-background-color, #ffffff); color: var(--pico-color, #111827);
+   ;background: var(--pico-card-background-color, #ffffff), color: var(--pico-color, #111827);
     transition:border-color 0.15s ease, box-shadow 0.15s ease;}
   .smart-textarea:focus { outline: none;
     border-color: var(--pico-primary, #3b82f6);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
-  .smart-textarea:disabled { opacity: 0.6; cursor:not-allowed
+  .smart-textarea:disabled { opacity: 0.6, cursor:not-allowed
    ;background: var(--pico-card-sectioning-background-color, #f8fafc)}
   .smart-textarea[readonly] {
     background: var(--pico-card-sectioning-background-color, #f8fafc)}
@@ -178,11 +178,11 @@ text: string }) => void
     pointer-events: auto;}
   /* Help text styling */
   .smart-textarea-container::after {
-    content: 'Tip: Use # for commands or Ctrl/Cmd + K'; position: absolute;
+    content: 'Tip: Use # for commands or Ctrl/Cmd + K', position: absolute;
 	bottom: -1.5rem;
     right: 0;
     font-size: 0.75rem
-   ; color: var(--pico-muted-color, #6b7280); opacity: 0;
+   ; color: var(--pico-muted-color, #6b7280), opacity: 0;
 	transition:opacity 0.15s ease;}
   .smart-textarea-container:hover::after {
     opacity: 1;}

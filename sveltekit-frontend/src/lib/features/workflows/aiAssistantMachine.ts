@@ -91,7 +91,7 @@ export const aiAssistantMachine = createMachine({
 	currentQuery: ({ event }: {
 	event: Extract<AIAssistantEvent, { type: 'SEND_MESSAGE' }> }) => event.message,
                         conversationHistory: ({ context, event }: {
-	context: AIAssistantContext; event: Extract<AIAssistantEvent, { type: 'SEND_MESSAGE' }> }) => [
+	context: AIAssistantContext, event: Extract<AIAssistantEvent, { type: 'SEND_MESSAGE' }> }) => [
                             ...context.conversationHistory,
                             {
                                 id: `user_${Date.now()}`,
@@ -144,7 +144,7 @@ export const aiAssistantMachine = createMachine({
                         response: ({ event }: {
 	event: any }) => event.output,
                         conversationHistory: ({ context, event }: {
-	context: AIAssistantContext; event: any }) => [
+	context: AIAssistantContext, event: any }) => [
                             ...context.conversationHistory,
                             {
                                 id: `assistant_${Date.now()}`,
@@ -175,7 +175,7 @@ export const aiAssistantMachine = createMachine({
 	STREAM_CHUNK: {
 	actions: assign({
                         response: ({ context, event }: {
-	context: AIAssistantContext; event: Extract<AIAssistantEvent, { type: 'STREAM_CHUNK' }> }) => context.response + event.chunk
+	context: AIAssistantContext, event: Extract<AIAssistantEvent, { type: 'STREAM_CHUNK' }> }) => context.response + event.chunk
                     })
                 }
             }

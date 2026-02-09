@@ -137,7 +137,7 @@ import type { Document } from '$lib/types';
 <style>
   /* @unocss-include */
   form {
-    max-width: 500px; margin: 0 auto;}
+    max-width: 500px, margin: 0 auto;}
   .select-trigger {
     display: inline-flex;
     align-items: center;

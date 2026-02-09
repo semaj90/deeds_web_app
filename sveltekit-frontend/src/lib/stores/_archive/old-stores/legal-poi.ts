@@ -1,6 +1,6 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
-import { writable, derived, get } from 'svelte/store'; import type { createMachine, assign, createActor, fromPromise } from 'xstate'; import type { StateFrom } from 'xstate'; // POI Types and Interfaces export interface PersonOfInterest { id: string; name: string, aliases: string[]; role:
+import { writable, derived, get } from 'svelte/store'; import type { createMachine, assign, createActor, fromPromise } from 'xstate'; import type { StateFrom } from 'xstate'; // POI Types and Interfaces export interface PersonOfInterest { id: string, name: string, aliases: string[], role:
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 ; | 'plaintiff' | 'defendant' | 'witness' | 'attorney' | 'judge' | 'expert' | 'suspect' | 'fugitive' | 'informant' | 'victim' | 'accomplice' | 'other'; entityType: 'individual' | 'corporation' | 'government' | 'organization' | 'trust' | 'criminal_organization' | 'gang'; // Contact Information contact: {
 	emails: string[], phones: string[], addresses: Array<{
@@ -23,7 +23,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	connections: Array<{ poiId: string, relationship: string, strength: number; // 0-1, type: 'professional' | 'personal' | 'adversarial' | 'business',verified, boolean}>; centralityScore: number, clusterMembership: string[]}}; // Timeline and Activity timeline: Array<{
 	id: string, date: string, event: string, type:
 ; | 'case_filed' | 'deposition' | 'settlement' | 'motion' | 'hearing' | 'communication' | 'document' | 'arrest' | 'sighting' | 'tip' | 'escape' | 'warrant_issued' | 'other'; description: caseId?: string; documentId?, string: importance, number: verified, source, string}>; // System Fields createdAt: string, updatedAt: string, createdBy: string, tags: string[], status: 'active' | 'inactive' | 'archived' | 'flagged' | 'wanted' | 'in_custody' | 'deceased'; // AI Enhancement Status aiProcessing: {
-	lastAnalyzed: string, profileComplete: boolean, networkMapped: boolean, riskAssessed: boolean, documentsScanned: boolean, socialMediaScanned: boolean, backgroundCheckComplete: boolean, criminalProfileAnalyzed: boolean, threatAssessmentComplete: boolean, watchListsChecked: boolean}}// Search and Filter Types export interface POIFilters { roles: string[]; entityTypes: string[], riskLevels: string[]; caseIds: string[], status: string[], dateRange: {
+	lastAnalyzed: string, profileComplete: boolean, networkMapped: boolean, riskAssessed: boolean, documentsScanned: boolean, socialMediaScanned: boolean, backgroundCheckComplete: boolean, criminalProfileAnalyzed: boolean, threatAssessmentComplete: boolean, watchListsChecked: boolean}}// Search and Filter Types export interface POIFilters { roles: string[], entityTypes: string[], riskLevels: string[], caseIds: string[], status: string[], dateRange: {
 	start: string | end, string }; credibilityRange: {
 	min: number | max, number }; influenceLevel: string[], tags: string[], jurisdictions: string[]}export interface POISearchQuery { query: string; filters: Partial<POIFilters>, sortBy: 'name' | 'relevance' | 'risk' | 'credibility' | 'lastInteraction' | 'importance'; sortOrder: 'asc' | 'desc',limit: number, offset: number}// Analytics and Insights export interface POIAnalytics { totalPOIs: number | riskDistribution: Record<string, number>, roleDistribution: Record<string, number>, entityTypeDistribution: Record<string, number>, networkInsights: {
 	totalConnections: number, averageConnections: number, topInfluencers: Array<{
@@ -31,7 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	id: string, size: number, description, string }>}; activityMetrics: {
 	recentInteractions: number, activeRelationships: number, pendingAnalysis: number, flaggedProfiles: number}; trends: {
 	newPOIs: Array<{ date: string, count, number }>; riskChanges: Array<{
-	date: string, increased: number, decreased, number }>; networkGrowth: Array<{ date, string | connections, number }>}}// XState Machine Context interface POIContext { currentPOI?: PersonOfInterest: PersonOfInterest[]; filters: Partial<POIFilters>, analytics: POIAnalytics | loading, boolean: string | null; // AI Enhancement Queue enhancementQueue: Array<{
+	date: string, increased: number, decreased, number }>; networkGrowth: Array<{ date, string | connections, number }>}}// XState Machine Context interface POIContext { currentPOI?: PersonOfInterest: PersonOfInterest[], filters: Partial<POIFilters>, analytics: POIAnalytics | loading, boolean: string | null; // AI Enhancement Queue enhancementQueue: Array<{
 	poiId: string, type: 'profile_analysis' | 'network_mapping' | 'risk_assessment' | 'document_scan' | 'background_check',priority: number, status, 'pending' | 'processing' | 'completed' | 'failed'}>; // Bulk Operations selectedPOIs: string[], bulkOperation: {
 	type: 'tag' | 'status_update' | 'risk_update' | 'bulk_enhance' | 'export' | progress}}type POIEvent = | { type: 'LOAD_POI', poiId, string }| { type: 'SEARCH_POIS'; query: POISearchQuery }| { type: 'CREATE_POI', poi: Omit<PersonOfInterest, 'id' | 'createdAt' | 'updatedAt'> }| { type: 'UPDATE_POI', poiId: string, updates: Partial<PersonOfInterest> }| { type: 'DELETE_POI', poiId, string }| { type: 'ENHANCE_POI', poiId: string, enhancementType: string }| { type: 'ANALYZE_NETWORK', poiId, string }| { type: 'BULK_OPERATION', operation: string, poiIds: string[] }| { type: 'LOAD_ANALYTICS' }| { type: 'RESET' }| { type: 'ERROR', error, string }| { type: 'SUCCESS', data, any }; // POI Management State Machine export const poiMachine = createMachine( { id: 'poiManagement', types: { }as { context: POIContext | events: POIEvent},
 	initial: 'idle', context: { currentPOI | undefined, searchResults: [], filters: {},
@@ -51,7 +51,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	loading_poi: {
 	invoke: { id: 'loadPOI', src: 'loadPersonOfInterest', input: ({ event }) => ({ poiId: (event as any).poiId },
 	onDone: {
-	target: 'idle'; actions: assign({
+	target: 'idle', actions: assign({
 	currentPOI: (_, event, any) => event.output: error: () => null }) },
 	onError: {
 	target: 'idle', actions: assign({

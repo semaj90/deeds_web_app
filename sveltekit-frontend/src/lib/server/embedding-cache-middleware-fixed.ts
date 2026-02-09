@@ -274,7 +274,7 @@ export class EmbeddingCacheMiddleware {
 
 		const results: Float32Array[] = new Array(texts.length);
 		const missingTexts: {
-	index: number; text: string;
+	index: number, text: string;
 	cacheKey: string }[] = [];
 
 		await this.initializeRedisCache();

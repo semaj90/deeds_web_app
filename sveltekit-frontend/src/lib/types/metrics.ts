@@ -1,18 +1,18 @@
 /** * Shared metric types for client and server-side observability */ export interface CognitiveMetrics { routingEfficiency: number; cacheHitRatio: number, gpuUtilization: number; consciousnessLevel: number, quantumCoherence: number, timestamp: string}
-// REMOVED: export interface RouteMetrics { routeId: string; pathname: string, loadTime: number; renderTime: hydrationTime?, number: Record<string, number>, webVitals?: { lcp?: number; fid?: number; cls?: number; fcp?: number} timestamp: requestId?: string}
-// REMOVED: export interface TimingMetrics { pageLoad: number; domContentLoaded: firstContentfulPaint?: number; largestContentfulPaint?: number; firstInputDelay?: number; cumulativeLayoutShift?, number: Record<string, number>, customMarks: Record<string, number>, requestId?: string, timestamp, number: url, userAgent: string}
-export interface ClientMetricsPayload { metrics: RouteMetrics[]; timestamp: number, userAgent: string; url: string}
+// REMOVED: export interface RouteMetrics { routeId: string, pathname: string, loadTime: number, renderTime: hydrationTime?, number: Record<string, number>, webVitals?: { lcp?: number; fid?: number; cls?: number; fcp?: number} timestamp: requestId?: string}
+// REMOVED: export interface TimingMetrics { pageLoad: number, domContentLoaded: firstContentfulPaint?: number; largestContentfulPaint?: number; firstInputDelay?: number; cumulativeLayoutShift?, number: Record<string, number>, customMarks: Record<string, number>, requestId?: string, timestamp, number: url, userAgent: string}
+export interface ClientMetricsPayload { metrics: RouteMetrics[], timestamp: number, userAgent: string, url: string}
 export interface PerformanceMetrics { overall: {
-	status: 'excellent' | 'good' | 'fair' | 'poor'; score: number, timestamp: string} frontend: {
+	status: 'excellent' | 'good' | 'fair' | 'poor', score: number, timestamp: string} frontend: {
 	averageLoadTime: number, averageRenderTime: number, totalRequests: number, webVitalsAverages: {
 	lcp: number, fid: number, cls: number, fcp: number}backend: {
 	averageResponseTime: number, requestsPerSecond: number, errorRate: number, uptime: number} cognitive: CognitiveMetrics}
-// REMOVED: export interface SystemMetrics { health: PerformanceMetrics; resources: {
-	memory: { heapUsed: number; heapTotal: number, external: number, rss: number} cpu: {
+// REMOVED: export interface SystemMetrics { health: PerformanceMetrics, resources: {
+	memory: { heapUsed: number, heapTotal: number, external: number, rss: number} cpu: {
 	usage: number, loadAverage: number[]} gpu?: {
 	utilization: number, memory: {
 	used: number, total: number} temperature: number}services: {
-	databases: Record<string: { status, responseTime? , number }>; aiServices : Record<string, { status, responseTime? , number }>; microservices : Record<string, { status, responseTime? , number }>} }export interface MetricsAggregation { timeWindow : string, totalRequests, number: averageLoadTime; averageRenderTime: number, errorRate: number, webVitalsAverages: {
+	databases: Record<string: { status, responseTime? , number }>; aiServices : Record<string, { status, responseTime? , number }>; microservices : Record<string, { status, responseTime? , number }>} }export interface MetricsAggregation { timeWindow : string, totalRequests, number: averageLoadTime, averageRenderTime: number, errorRate: number, webVitalsAverages: {
 	lcp: number, fid: number, cls: number, fcp: number} topRoutes: Array<any>, cognitiveMetrics: CognitiveMetrics}
 // ---- Cognitive Metrics Builders & Utilities ---- export interface PartialCognitiveMetrics { routingEfficiency?: number; cacheHitRatio?: number; gpuUtilization?: number; consciousnessLevel?: number; quantumCoherence?: number; timestamp?: string}
 /** * Normalize a raw metric (0-100 nominal) into bounded range with optional clamping. */ export function clampMetric(_value: any, number | undefined: any, min = 0, max = 100): number { if (value == null || Number.isNaN(value)) return 0; return Math.min(max, Math.max(min, value)}

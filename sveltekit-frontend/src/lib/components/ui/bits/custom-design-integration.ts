@@ -25,10 +25,10 @@ export interface CustomComponentConfig {
 // DESIGN SYSTEM INTEGRATION
 // ======================================================================
 
-export interface DesignSystem { name: string; tokens: {
+export interface DesignSystem { name: string, tokens: {
         colors: Record<string, string>;
         spacing: Record<string, string>;
-        typography: { fontFamily: string; fontSize: Record<string, string>;
+        typography: { fontFamily: string, fontSize: Record<string, string>;
             lineHeight: Record<string, string>;
         };
         nes: Record<string, string>;
@@ -39,14 +39,14 @@ export interface DesignSystem { name: string; tokens: {
 	breakpoints: BreakpointConfig;
 }
 
-export interface AnimationConfig { duration: { fast: string; normal: string;
+export interface AnimationConfig { duration: { fast: string, normal: string;
 	slow: string };
-    easing: { easeIn: string; easeOut: string;
+    easing: { easeIn: string, easeOut: string;
 	easeInOut: string };
     transitions: Record<string, string>;
 }
 
-export interface BreakpointConfig { sm: string; md: string;
+export interface BreakpointConfig { sm: string, md: string;
     lg: string;
 	xl: string;
     '2xl': string;
@@ -314,7 +314,7 @@ export function createComponentVariant(
 // SSR-SAFE THEME PROVIDER
 // ======================================================================
 
-export interface ThemeContext { designSystem: DesignSystem; isDarkMode: boolean;
+export interface ThemeContext { designSystem: DesignSystem, isDarkMode: boolean;
     toggleDarkMode: () => void;
     applyCustomTheme: (tokens: Partial<CustomDesignTokens>) => void;
 }

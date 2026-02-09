@@ -11,7 +11,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function startCustodyTransfer() { if (transferReason.trim()) { custodyActor.send({ type: 'TRANSFER_CUSTODY', newCustodian: userId;
 	reason: transferReason } as EvidenceCustodyEvent); showTransferDialog = false; transferReason = ''}
   }
-  function joinCollaboration() { custodyActor.send({ type: 'JOIN_COLLABORATION', userId; role: 'investigator'
+  function joinCollaboration() { custodyActor.send({ type: 'JOIN_COLLABORATION', userId, role: 'investigator'
     } as EvidenceCustodyEvent); isCollaborationExpanded = true}
   function leaveCollaboration() { custodyActor.send({ type: 'LEAVE_COLLABORATION', userId } as EvidenceCustodyEvent)}
   function setupWebSocketConnection() { try { // derive URL from env/host in future; local dev fallback for now wsConnection = new WebSocket(`ws://localhost:3000/api/websocket?room=custody-${ evidenceId }`); wsConnection.onopen = () => { console.log('WebSocket connected for custody workflow')}; wsConnection.onmessage = (event) => { try { const data = JSON.parse(event.data); // Handle real-time collaboration updates if (data.type === 'collaboration-update') { handleCollaborationUpdate(data)}

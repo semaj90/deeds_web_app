@@ -236,7 +236,7 @@ export async function analyzeUserBehaviorService({
 	input: { userAnalytics: UserAnalytics;
 	context: UploadContext };
 }): Promise<{
-	updatedAnalytics: UserAnalytics; insights: unknown;
+	updatedAnalytics: UserAnalytics, insights: unknown;
 	behaviorScore: number }> {
 	try {
 		const response = await fetch('/api/ai/ollama/analyze-behavior', {
@@ -385,13 +385,13 @@ export type UploadEvent =
 	| { type: 'USER_TYPING';
 	speed: number }
 	| { type: 'USER_CLICK';
-	x: number; y: number;
+	x: number, y: number;
 	element: string; legalContext?: string }
 	| { type: 'TRACK_USER_ACTION';
 	data: { caseId?: string } }
 	| { type: 'START_UPLOAD' }
 	| { type: 'USER_REACTED_TO_PROMPT';
-	promptId: string; reaction: string }
+	promptId: string, reaction: string }
 	| { type: 'REQUEST_AI_SUGGESTIONS' }
 	| { type: 'CANCEL_UPLOAD' }
 	| { type: 'RESET' }
@@ -506,7 +506,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 	target: 'generatingPrompts',
 						actions: assign({
 	errors: ({ context, event }: {
-	context: UploadContext; event: any }) => [...context.errors, `User analysis failed: ${event.error}`]
+	context: UploadContext, event: any }) => [...context.errors, `User analysis failed: ${event.error}`]
 						})
 					}
 				},
@@ -514,7 +514,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 	USER_TYPING: {
 						actions: assign({
 	userAnalytics: ({ context, event }: {
-	context: UploadContext; event: any }) => ({
+	context: UploadContext, event: any }) => ({
 								...context.userAnalytics,
 								interactionMetrics: {
 									...context.userAnalytics.interactionMetrics,
@@ -526,7 +526,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 	USER_CLICK: {
 	actions: assign({
 							userAnalytics: ({ context, event }: {
-	context: UploadContext; event: any }) => ({
+	context: UploadContext, event: any }) => ({
 								...context.userAnalytics,
 								interactionMetrics: {
 									...context.userAnalytics.interactionMetrics,
@@ -547,7 +547,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 	TRACK_USER_ACTION: {
 	actions: assign({
 							userAnalytics: ({ context, event }: {
-	context: UploadContext; event: any }) => ({
+	context: UploadContext, event: any }) => ({
 								...context.userAnalytics,
 								caseContext: {
 									...context.userAnalytics.caseContext,
@@ -577,7 +577,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 	target: 'waitingForUpload',
 						actions: assign({
 	errors: ({ context, event }: {
-	context: UploadContext; event: any }) => [...context.errors, `Prompt generation failed: ${event.error}`]
+	context: UploadContext, event: any }) => [...context.errors, `Prompt generation failed: ${event.error}`]
 						})
 					}
 				}
@@ -588,7 +588,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 					USER_REACTED_TO_PROMPT: {
 	actions: assign({
 							contextualPrompts: ({ context, event }: {
-	context: UploadContext; event: any }) =>
+	context: UploadContext, event: any }) =>
 								context.contextualPrompts.map((prompt) =>
 									prompt.id === event.promptId ? { ...prompt, reaction: event.reaction as any } : prompt
 								)
@@ -607,14 +607,14 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 	target: 'waitingForUpload',
 						actions: assign({
 	contextualPrompts: ({ context, event }: {
-	context: UploadContext; event: any }) => [...context.contextualPrompts, ...event.output]
+	context: UploadContext, event: any }) => [...context.contextualPrompts, ...event.output]
 						})
 					},
 	onError: {
 	target: 'waitingForUpload',
 						actions: assign({
 	errors: ({ context, event }: {
-	context: UploadContext; event: any }) => [...context.errors, `Additional prompt generation failed: ${event.error}`]
+	context: UploadContext, event: any }) => [...context.errors, `Additional prompt generation failed: ${event.error}`]
 						})
 					}
 				}
@@ -702,7 +702,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 	target: 'error',
 								actions: assign({
 	errors: ({ context, event }: {
-	context: UploadContext; event: any }) => [...context.errors, `AI analysis failed: ${event.error}`],
+	context: UploadContext, event: any }) => [...context.errors, `AI analysis failed: ${event.error}`],
 									pipeline: ({ context }: {
 	context: UploadContext }) => ({
 										...context.pipeline,
@@ -790,7 +790,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 	target: 'error',
 								actions: assign({
 	errors: ({ context, event }: {
-	context: UploadContext; event: any }) => [...context.errors, `Database save failed: ${event.error}`],
+	context: UploadContext, event: any }) => [...context.errors, `Database save failed: ${event.error}`],
 									pipeline: ({ context }: {
 	context: UploadContext }) => ({
 										...context.pipeline,
@@ -829,7 +829,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 					onDone: {
 	actions: assign({
 							contextualPrompts: ({ context, event }: {
-	context: UploadContext; event: any }) => [
+	context: UploadContext, event: any }) => [
 								...context.contextualPrompts,
 								...event.output
 							]

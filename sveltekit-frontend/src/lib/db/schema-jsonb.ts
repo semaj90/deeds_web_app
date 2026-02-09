@@ -6,11 +6,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	fromDriver(_value: string): number[] { return JSON.parse(value)});
   
 
-export interface LegalIssue { issue: string; severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',description: precedents?: string[]}
+export interface LegalIssue { issue: string, severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',description: precedents?: string[]}
 
-export interface Recommendation { action: string; priority: 'IMMEDIATE' | 'HIGH' | 'MEDIUM' | 'LOW',rationale: timeline?: string}
+export interface Recommendation { action: string, priority: 'IMMEDIATE' | 'HIGH' | 'MEDIUM' | 'LOW',rationale: timeline?: string}
 
-export interface RiskAssessment { overall_risk: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'; risk_factors: Array<any>, mitigation: string[]}
+export interface RiskAssessment { overall_risk: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL', risk_factors: Array<any>, mitigation: string[]}
 
 export interface ProcessingMetrics { chunks_processed?: number; gpu_memory_used_mb?: number; model_temperature?: number; inference_time_ms?: number; queue_time_ms?: number}
 
@@ -18,7 +18,7 @@ export interface DocumentMetadata { source?: 'upload' | 'api' | 'email' | 'scan'
 
 export interface JobConfig { style?: 'executive' | 'technical' | 'judicial' | 'detailed' | 'brief'; max_length?: number; temperature?: number; include_citations?: boolean; focus_areas?: string[]; language?: string; model_override?: string}
 
-export interface UserPreferences { default_style: string; max_summary_length: number, include_citations: boolean; auto_summarize: notification_settings?: {
+export interface UserPreferences { default_style: string, max_summary_length: number, include_citations: boolean, auto_summarize: notification_settings?: {
 	email: boolean, push: webhook_url?: string}; api_limits?: {
 	daily_quota: number | rate_limit_per_minute, number}}
 // Main documents table export const aiSummarizedDocuments = pgTable('ai_summarized_documents', { id: uuid('id').defaultRandom().primaryKey(documentName, varchar('document_name', { length: 255 }).notNull( documentType: documentTypeEnum('document_type').default('other', originalText: text('original_text', filePath: varchar('file_path', { length: 500 },

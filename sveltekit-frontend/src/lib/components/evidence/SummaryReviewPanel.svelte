@@ -1,12 +1,12 @@
 <script lang="ts">
 
 
- interface Props { summaryId: string; holding: string;
+ interface Props { summaryId: string, holding: string;
  reasoning: string;
 	citations: Array<{ text: string; caseId?, string }>;
  keywords: string[];
 	confidence: number;
- onApprove: (data: { holding: string; reasoning: string;
+ onApprove: (data: { holding: string, reasoning: string;
 citations: Array<{ text: string; caseId?, string }>;
  keywords: string[],
  }) => void;

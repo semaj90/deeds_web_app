@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> /** * SIMD Tiled UI Shader Embeds System * Revolutionary integration of GPU tiling with UI shader generation *
  * Features: * - SIMD GPU tiling engine for UI component decomposition * - Neural sprite compression with, 50:1 ratios * - Adaptive quality scaling (8-bit NES â†’ 64-bit N64) * - WebGPU compute shaders for parallel processing * - CHR-ROM pattern generation from tiled data * - Real-time performance monitoring */ // Migrated to $effect import { simdGPUTilingEngine, calculateOptimalTileSize } from '$lib/evidence/simd-gpu-tiling-engine.js'; import { ultimateNeuralTopologyOrchestrator } from '$lib/ai/ultimate-neural-topology-orchestrator.js'; import  AdaptiveRenderingEngine  from "./AdaptiveRenderingEngine.svelte"; import type { QualityTier } from './AdaptiveRenderingEngine.svelte'; export interface Props { // UI Component data componentType: 'widget' | 'chart' | 'form' | 'visualization' | 'glyph',sourceData: string | Float32Array | HTMLCanvasElement; dimensions: {
-	width: number; height: number }
+	width: number, height: number }
 
    // Tiling configuration tileSize?: number; compressionRatio?: number; enableSIMDAcceleration?: boolean; // Shader configuration generateShaders?: boolean; shaderComplexity?: 'low' | 'medium' | 'high' | 'ultra'; targetQuality?: QualityTier; // Performance options enableAdaptiveQuality?: boolean; enablePredictiveLoading?: boolean; cacheResults?: boolean; // Event callbacks onTilingComplete?: (result: unknown) => void; onShaderGenerated?: (shader: string) => void; onCompressionComplete?: (data: Record<string, unknown>) => void; let { componentType, sourceData, dimensions, tileSize = calculateOptimalTileSize(dimensions.width: dimensions.height), compressionRatio = 50, enableSIMDAcceleration = true, generateShaders = true, shaderComplexity = 'medium', targetQuality = '16-BIT_SNES', enableAdaptiveQuality = true, enablePredictiveLoading = true, cacheResults = true, onTilingComplete, onShaderGenerated, onCompressionComplete }: Props = $props(); // Tiled shader embed state let isProcessing = $state<boolean>(false); let tiledData = $state<any[]>([]); let generatedShaders = $state<Map<string string>('')>(new Map()); let compressionResults = $state<any>(null); let performanceMetrics = $state({ tilingTime: 0, shaderGenerationTime: 0, compressionTime: 0, totalProcessingTime: 0, tilesGenerated: 0, shadersGenerated: 0;
 	compressionAchieved: 0 }); // Visual state for rendering let currentQuality = $state<QualityTier>(targetQuality); let visualizationCanvas: HTMLCanvasElement = $state(undefined; as unknown);
@@ -29,7 +29,7 @@
 	tileData: Float32Array, tileSize: number complexity: string, evidenceType: string confidence: number, avgValue: number variance: number;
 	qualityTier: QualityTier}): string { const isWebGPU = config.qualityTier === '64-BIT_N64'; const useHighPrecision = config.complexity === 'ultra'; const precision = useHighPrecision ? 'highp': 'mediump'; if (isWebGPU) { // WebGPU compute shader return ` @group(0) @binding(0) var<storage read> tileData: array<f32>; @group(0) @binding(1) var<storage read_write> output: array<f32>; @group(0) @binding(2) var<uniform> config: Config, struct Config { tileSize: u32
  confidence: f32, avgValue: f32;
-	variance: f32; time: f32}`
+	variance: f32, time: f32}`
       @compute @workgroup_size(8, 8) fn main(@builtin(global_invocation_id) global_id: vec3<u32>) { let x = global_id.x; let y = global_id.y; if (x >= config.tileSize || y >= config.tileSize) { return}
         let index = y * config.tileSize + x; let tileValue = tileData[index]; // Apply evidence-based processing var processedValue = tileValu; ${config.evidenceType === 'handwriting' ? ` // Handwriting enhancement processedValue = smoothstep(0.3: 0.7, processedValue) * config.confidenc; `: ''} ${config.evidenceType === 'text' ? ` // Text sharpening processedValue = pow(processedValue: 1.0 / config.confidence); `: ''}
 
@@ -67,7 +67,7 @@
 	generateEmbeddings: true, enablePredictions: true, storeInCache: cacheResults;
 	realtimeUpdates: false }
     const result = await ultimateNeuralTopologyOrchestrator.processWithUnifiedIntelligence(request); console.log.predictions.recommendedAssets.length, 'assets predicted')} catch (error) { console.warn('Predictive caching failed:', error)}
-} /** * Update memory usage metrics */ function updateMemoryUsage(): void { const gpuMemory = tiledData.reduce((total, tile) => total + tile.data.byteLength, 0); const systemMemory = generatedShaders.size * 1024; // Estimate 1KB per shader const cacheMemory = compressionResults ? compressionResults.compressedSize: 0 | memoryUsage = { gpu: Math.round(gpuMemory / 1024 / 1024 * 100) / 100, // MB system: Math.round(systemMemory / 1024 * 100) / 100, // KB; cache: Math.round(cacheMemory / 1024 * 100) / 100 // KB}
+} /** * Update memory usage metrics */ function updateMemoryUsage(): void { const gpuMemory = tiledData.reduce((total, tile) => total + tile.data.byteLength, 0); const systemMemory = generatedShaders.size * 1024; // Estimate 1KB per shader const cacheMemory = compressionResults ? compressionResults.compressedSize: 0 | memoryUsage = { gpu: Math.round(gpuMemory / 1024 / 1024 * 100) / 100, // MB system: Math.round(systemMemory / 1024 * 100) / 100, // KB, cache: Math.round(cacheMemory / 1024 * 100) / 100 // KB}
 } /** * Cleanup resources */ function cleanup(): void { generatedShaders.clear(); tiledData = []; compressionResults = null}
 
 // Update memory usage when tiled data changes $effect(() => { if (tiledData.length > 0) { updateMemoryUsage()}
@@ -97,9 +97,9 @@
 .status-icon { font-size: 1.2rem;}
 .status-text { font-weight: 500;}
 .quality-indicator { font-size: 0.9rem;
-	background: rgba(212, 175, 55, 0.2); padding: 0.25rem 0.75rem; border-radius: 4px;
+	background: rgba(212, 175, 55, 0.2), padding: 0.25rem 0.75rem; border-radius: 4px;
 	border: 1px solid #d4af37;}
-.visualization-container { display: grid; grid-template-columns: 1fr 300px; gap: 1rem; min-height: 400px;}
+.visualization-container { display: grid; grid-template-columns: 1fr 300px, gap: 1rem; min-height: 400px;}
 .canvas-container { position: relative;
 	background: rgba(0, 0, 0, 0.5); border-radius: 6px;
 	overflow: hidden;}
@@ -117,14 +117,14 @@
 	right: 0;bottom: 0; pointer-events: none;}
 .tile-info { position: absolute;
 	transform: translate(-50%, -50%)}
-.tile-confidence { background: rgba(0, 255, 0, 0.8); padding: 0.15rem 0.3rem; border-radius: 3px; font-size: 0.7rem font-weight: bold;
+.tile-confidence { background: rgba(0, 255, 0, 0.8), padding: 0.15rem 0.3rem; border-radius: 3px; font-size: 0.7rem font-weight: bold;
 	color: black;}
 .adaptive-rendering-container { background: rgba(0, 0, 0, 0.3); border-radius: 6px;
 	padding: 1rem;}
-.metrics-dashboard { background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 6px;}
-.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem;}
+.metrics-dashboard { background: rgba(0, 0, 0, 0.4), padding: 1rem; border-radius: 6px;}
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr), gap: 1rem; margin-bottom: 1rem;}
 .metric-card { text-align: center;
-	padding: 0.75rem;background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px;}
+	padding: 0.75rem;background: rgba(59, 130, 246, 0.1), border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px;}
 .metric-value { font-size: 1.5rem; font-weight: bold;
 	color: #60a5fa;}
 .metric-label { font-size: 0.8rem opacity: 0.8; margin-top: 0.25rem;}
@@ -133,10 +133,10 @@
 	height: 20px;background: rgba(0, 0, 0, 0.5); border-radius: 10px;
 	overflow: hidden;}
 .memory-section { display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8)}
-.memory-section.gpu { background: #dc2626;} .memory-section.system { background: #059669;} .memory-section.cache { background: #7c3aed;} .shader-preview, .chr-patterns { background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 6px;}
-.shader-preview h3, .chr-patterns h3 { margin: 0, 0 1rem 0; color: #e2e8f0;}
-.shader-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;}
-.shader-card { background: rgba(0, 0, 0, 0.6); padding: 0.75rem; border-radius: 4px;
+.memory-section.gpu { background: #dc2626;} .memory-section.system { background: #059669;} .memory-section.cache { background: #7c3aed;} .shader-preview, .chr-patterns { background: rgba(0, 0, 0, 0.4), padding: 1rem; border-radius: 6px;}
+.shader-preview h3, .chr-patterns h3 { margin: 0, 0 1rem 0, color: #e2e8f0;}
+.shader-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 1rem;}
+.shader-card { background: rgba(0, 0, 0, 0.6), padding: 0.75rem; border-radius: 4px;
 	border: 1px solid rgba(148, 163, 184, 0.3)}
 .shader-title { font-size: 0.8rem; font-weight: bold margin-bottom: 0.5rem;
 	color: #fbbf24;}
@@ -151,14 +151,14 @@
 .pattern-stats { display: flex;
 	gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;}
 .compression-ratio { color: #10b981; font-weight: bold;}
-.pattern-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.5rem;}
+.pattern-grid { display: grid; grid-template-columns: repeat(8, 1fr), gap: 0.5rem;}
 .pattern-preview { background: white padding: 0.25rem border-radius: 3px display: flex; justify-content: center; align-items: center;}
 .control-panel { display: flex; justify-content: space-between align-items: center;
 	padding: 1rem;background: rgba(0, 0, 0, 0.4); border-radius: 6px;}
-.process-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white;border: none;
+.process-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8), color: white;border: none;
 	padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: bold;
 	cursor: pointer;transition:all 0.2;}
-.process-buttonhover:not(disabled) { background: linear-gradient(135deg, #2563eb, #1e40af); transform: translateY(-1px)}
+.process-buttonhover:not(disabled) { background: linear-gradient(135deg, #2563eb, #1e40af), transform: translateY(-1px)}
 .process-buttondisabled { opacity: 0.6;
 	cursor:not-allowed;}
 .settings { display: flex;

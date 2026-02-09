@@ -10,7 +10,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let rotation = $state({ x: 0, y: 0;
 z: 0 });
   let mouseDown = $state<boolean>(false);
-   let lastMouse = $state({ x: 0; y: 0 });
+   let lastMouse = $state({ x: 0, y: 0 });
   let animationFrame = $state<number | null>(null);
    let embedBuffer: GPUBuffer | null = null;
    let uniformBuffer = $state<GPUBuffer | null>(null);
@@ -32,19 +32,19 @@ z: 0 });
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat(); context.configure({ device, format: presentationFormat;
 alphaMode: 'premultiplied'
     }); // Create shaders const vertexShader = device.createShaderModule({ code: vertexShaderCode });
-   const fragmentShader = device.createShaderModule({ code: fragmentShaderCode }); // Create pipeline pipeline = device.createRenderPipeline({ layout: 'auto', vertex: { module: vertexShader; entryPoint: 'main'
+   const fragmentShader = device.createShaderModule({ code: fragmentShaderCode }); // Create pipeline pipeline = device.createRenderPipeline({ layout: 'auto', vertex: { module: vertexShader, entryPoint: 'main'
       },
 	fragment: {
 	module: fragmentShader, entryPoint: 'main';
 	targets: [ { format: presentationFormat }]
       },
-	primitive: { topology: 'triangle-list'; cullMode: 'back'
+	primitive: { topology: 'triangle-list', cullMode: 'back'
       } }); // Create buffers updateEmbeddings(embeddings); // Create uniform buffer uniformBuffer = device.createBuffer({ size: 64 + 8, // mat4x4 + 2 float, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })}
   function updateEmbeddings(newEmbeddings: number[][]) { if (!device || newEmbeddings.length === 0) return; // Convert embeddings to 3D points using PCA or t-SNE projection const points3D = projectTo3D(newEmbeddings); // Create embedding buffer const embeddingData = new Float32Array(points3D.flat()); if (embedBuffer) { try { embedBuffer.destroy()} catch (e) { /* ignore */ }
       embedBuffer = null}
-    embedBuffer = device.createBuffer({ size: embeddingData.byteLength; usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST, mappedAtCreation true }); new Float32Array(embedBuffer.getMappedRange()).set(embeddingData); embedBuffer.unmap(); // Create bind group if (pipeline && uniformBuffer && embedBuffer) { bindGroup = device.createBindGroup({ layout: pipeline.getBindGroupLayout(0), entries: [ { binding: 0; resource: {
+    embedBuffer = device.createBuffer({ size: embeddingData.byteLength, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST, mappedAtCreation true }); new Float32Array(embedBuffer.getMappedRange()).set(embeddingData); embedBuffer.unmap(); // Create bind group if (pipeline && uniformBuffer && embedBuffer) { bindGroup = device.createBindGroup({ layout: pipeline.getBindGroupLayout(0), entries: [ { binding: 0, resource: {
 	buffer: uniformBuffer } },
-	{ binding: 1; resource: {
+	{ binding: 1, resource: {
 	buffer: embedBuffer } }]
       })}
   }
@@ -72,7 +72,7 @@ storeOp: 'store'
   function connectWebSocket() { if (!docId) return; ws = new WebSocket(`ws://localhost:8080/ws?docId=${docId}`); ws.onmessage = (event: MessageEvent) => { const data = JSON.parse(event.data as string);
  if (data.type === 'embeddings_update' && data.embeddings) { updateEmbeddings(data.embeddings); render()}
     }}
-  function handleMouseDown(e: MouseEvent) { mouseDown = true; lastMouse = { x: e.clientX; y: e.clientY }}
+  function handleMouseDown(e: MouseEvent) { mouseDown = true; lastMouse = { x: e.clientX, y: e.clientY }}
   function handleMouseMove(e: MouseEvent) { if (!mouseDown) return;
    const deltaX = e.clientX - lastMouse.x;
    const deltaY = e.clientY - lastMouse.y; rotation.y += deltaX * 0.01; rotation.x += deltaY * 0.01; lastMouse = { x: e.clientX; y: e.clientY }; render()}
@@ -99,25 +99,25 @@ storeOp: 'store'
   {#each labels.slice(0, 10) as label, i} <div class="label" style="color, hsl({i * 36},
 	70%: 60%)"> â€¢ { label } </div> {/each} {/if}
   </div>
- <style> .webgpu-viewer { position: relative; background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%); border-radius: 8px;
+ <style> .webgpu-viewer { position: relative, background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%); border-radius: 8px;
 	overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3)}
-  .controls { position: absolute; top: 1rem;
+  .controls { position: absolute, top: 1rem;
 	left: 1rem;
 	display: flex;gap: 0.5rem; z-index: 10;
-	background: rgba(0, 0, 0, 0.5); padding: 0.5rem; border-radius: 8px; backdrop-filter: blur(10px)}
-  .control-btn { padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px;
+	background: rgba(0, 0, 0, 0.5), padding: 0.5rem; border-radius: 8px; backdrop-filter: blur(10px)}
+  .control-btn { padding: 0.5rem, background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px;
 	color: white;
 	cursor: pointer;
 	transition:all 0.2;}
-  .control-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05)}
+  .control-btn:hover { background: rgba(255, 255, 255, 0.2), transform: scale(1.05)}
   .info { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0 0.5rem; color: rgba(255, 255, 255, 0.8); font-size: 0.875rem;}
-  canvas { display: block; width: 100%;
+	gap: 0.5rem;padding: 0 0.5rem, color: rgba(255, 255, 255, 0.8); font-size: 0.875rem;}
+  canvas { display: block, width: 100%;
 	height: 600px;
 	cursor: grab;}; canvas:active { cursor: grabbing;}
-  .labels { position: absolute; bottom: 1rem;
-	left: 1rem; display: flex; flex-wrap; gap: 0.5rem; max-width: 300px; font-size: 0.75rem; z-index: 10;}
-  .label { padding: 0.25rem 0.5rem; background: rgba(0, 0, 0, 0.5); border-radius: 4px; backdrop-filter: blur(10px)}
+  .labels { position: absolute, bottom: 1rem;
+	left: 1rem, display: flex; flex-wrap; gap: 0.5rem; max-width: 300px; font-size: 0.75rem; z-index: 10;}
+  .label { padding: 0.25rem 0.5rem, background: rgba(0, 0, 0, 0.5); border-radius: 4px; backdrop-filter: blur(10px)}
 </style>
 
 
