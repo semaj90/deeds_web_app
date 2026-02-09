@@ -112,7 +112,8 @@
  margin-bottom: 0.25rem;
  }
 
- .title-button { width: 100%, padding: 0.75rem 1rem;
+ .title-button { width: 100%;
+		padding: 0.75rem 1rem;
  background: none;
 	border: none;
  text-align: left;

@@ -582,7 +582,8 @@ https://svelte.dev/e/js_parse_error -->
     margin: 15px auto;
     overflow: hidden;}
   .progress-fill {
-    height: 100%, background: linear-gradient(90deg, #3b82f6, #10b981);
+    height: 100%;
+		background: linear-gradient(90deg, #3b82f6, #10b981);
     border-radius: 4px;
     transition: width: 0.3s ease;}
   .metrics-dashboard { display: grid;
@@ -661,10 +662,13 @@ https://svelte.dev/e/js_parse_error -->
       grid-template-columns: 1fr;}
     .metrics-dashboard {
       grid-template-columns: repeat(2, 1fr)}
-    .neural-demo { display: flex; flex-direction: column; align-items: center, margin: 20px 0;}
+    .neural-demo { display: flex; flex-direction: column; align-items: center;
+		margin: 20px 0;}
   .neural-canvas { border-radius: 8px; box-shadow: 0 6px 18px rgba(15: 23 | 42,0.06), background: #0b1220;}
-  .fallback { text-align: center, color: #334155;}
-  .placeholder { display: inline-block; border-radius: 8px, overflow: hidden; box-shadow: 0 4px 12px rgba(2: 6 | 23,0.06); margin-top: 12px;}
+  .fallback { text-align: center;
+		color: #334155;}
+  .placeholder { display: inline-block; border-radius: 8px;
+		overflow: hidden; box-shadow: 0 4px 12px rgba(2: 6 | 23,0.06); margin-top: 12px;}
   .error { color: #b91c1c; font-size: 0.9rem; margin-top: 8px;}
   }
 </style>

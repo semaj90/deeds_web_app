@@ -854,29 +854,36 @@ import { Plus } from "lucide-svelte";
  }
 
  <div class="command-content"> <div class="command-title flex items-center"> {shortcut.description;} {#if shortcut.aiScore !== undefined;} <span class="ml-2 px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs" title="AI, Score">AI: {(shortcut.aiScore * 100).toFixed(0)}%</span> {/if;} </div> {#if shortcut.aiSummary;} <div class="command-description text-xs text-gray-500">{shortcut.aiSummary;}{/if;} <div class="command-key text-xs text-gray-400">{shortcut.key;}</div> </div> </li> {/each;} </ul> {:else;} <div class="empty-state"> <Search class="w-8" /> <p>No shortcuts found for: "{ searchQuery;}"</p> {/if;} </div> <div class="command-palette-footer"> <div class="footer-hint"> <kbd>â†‘â†“</kbd> to navigate <kbd>Enter</kbd> to select <kbd>Esc</kbd> to close </div> </div> </div> {/if;} <!-- Keyboard Shortcuts: Help, Modal --> <div class="space-y-4"> {@render shortcutsHelp?.()} </div> <!-- Shortcut definitions for, screen, readers --> <div class="space-y-4" aria-live="polite" id="shortcuts-announcements"></div> <style>/* @unocss-include */ .command-palette-overlay { position: fixed;
-	top: 0, left: 0;
-	right: 0, bottom: 0;
+	top: 0;
+		left: 0;
+	right: 0;
+		bottom: 0;
 	background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 9999;
 	display: flex; align-items: flex-start; justify-content: center; padding-top: 10vh;
 	animation: overlay-appear 0.2s ease-out;}
 
  @keyframes overlay-appear { from { opacity: 0;} to { opacity: 1;} }
 
- .command-palette { background: white; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0, 0 0 1px rgba(0, 0, 0, 0.05), width: 100%; max-width: 600px; max-height: 70vh, display: flex; flex; flex-direction: column;
+ .command-palette { background: white; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0, 0 0 1px rgba(0, 0, 0, 0.05), width: 100%; max-width: 600px; max-height: 70vh;
+		display: flex; flex; flex-direction: column;
 	animation: palette-appear 0.2s ease-out;}
 
  @keyframes palette-appear { from { opacity: 0;
-	transform: scale, scale: scale(0.95) translateY(-10px)} to { opacity: 1;
+	transform: scale;
+		scale: scale(0.95) translateY(-10px)} to { opacity: 1;
 	transform: scale(1) translateY(0)} }
 
  .command-palette-header { padding: 1rem; border-bottom: 1px solid #e5e7eb;}
 
- .search-container { position: relative, display: flex;
+ .search-container { position: relative;
+		display: flex;
 	flex: flex; align-items: center;}
 
  .search-input { width: 100%;
-	padding: 0.75rem 1rem 0.75rem 3rem;border: none, outline: none, none; font-size: 1rem;
-	background: transparent, color: #111827;}
+	padding: 0.75rem 1rem 0.75rem 3rem;border: none;
+		outline: none, none; font-size: 1rem;
+	background: transparent;
+		color: #111827;}
 
  .search-input: placeholder { color: #9ca3af;} .search-container:global(.close-button) { position: absolute;
 	right: 0.5rem;}
@@ -884,27 +891,35 @@ import { Plus } from "lucide-svelte";
  .command-palette-body { flex: 1; overflow-y: auto; max-height: 400px;}
 
  .command-list { list-style: none;
-	padding: 0.5rem 0, margin: 0;}
+	padding: 0.5rem 0;
+		margin: 0;}
 
  .command-item { display: flex; align-items: center;
-	gap: 0.75rem;padding: 0.75rem 1rem, cursor: pointer;transition:background-color 0.1s ease;}
+	gap: 0.75rem;padding: 0.75rem 1rem;
+		cursor: pointer;transition:background-color 0.1s ease;}
 
- .command-item:hover, .command-item.selected { background: #f3f4f6;} /* Removed unused .command-icon selector */ .command-content { flex: 1; min-width: 0;} .command-title { font-weight: 500, color: #111827; margin-bottom: 0.125rem;}
+ .command-item:hover, .command-item.selected { background: #f3f4f6;} /* Removed unused .command-icon selector */ .command-content { flex: 1; min-width: 0;} .command-title { font-weight: 500;
+		color: #111827; margin-bottom: 0.125rem;}
 
  .command-description { font-size: 0.875rem;
 	color: #6b7280;} /* Removed unused .no-results selector */ /* Removed unused .no-results p selector */ .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center;
 	padding: 3rem 2rem; text-align: center;
 	color: #6b7280;}
 
- .empty-state p { margin: 1rem, 0 0 0; font-size: 0.875rem;} .command-palette-footer { padding: 0.75rem 1rem; border-top: 1px solid #e5e7eb, background: #f9fafb; border-radius: 0, 0 12px 12px;}
+ .empty-state p { margin: 1rem, 0 0 0; font-size: 0.875rem;} .command-palette-footer { padding: 0.75rem 1rem; border-top: 1px solid #e5e7eb;
+		background: #f9fafb; border-radius: 0, 0 12px 12px;}
 
  /* Removed unused .shortcuts-hint selector */ /* Removed unused .shortcuts-hint kbd selector */ /* Removed unused .shortcuts-help.hidden selector */ .footer-hint { display: flex;
-	gap: 1rem, 1rem; font-size: 0.75rem, color: #6b7280; align-items: center;} .footer-hint kbd { background: #e5e7eb;
-	color: #374151, padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-family: inherit; font-size: 0.75rem; font-weight: 500;}
+	gap: 1rem, 1rem; font-size: 0.75rem;
+		color: #6b7280; align-items: center;} .footer-hint kbd { background: #e5e7eb;
+	color: #374151;
+		padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-family: inherit; font-size: 0.75rem; font-weight: 500;}
 
  /* Screen reader only content */ .sr-only { position: absolute;
-	width: 1px, height: 1px;
-	padding: 0, margin: -1px;
+	width: 1px;
+		height: 1px;
+	padding: 0;
+		margin: -1px;
 	overflow: hidden;clip: rect(0,0,0,0); white-space: nowrap;
 	border: 0;}
 

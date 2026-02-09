@@ -431,13 +431,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     gap: 0.75rem;
   }
 
-  .progress-bar { width: 120px, height: 8px;
+  .progress-bar { width: 120px;
+		height: 8px;
     background: #334155;
     border-radius: 4px;
     overflow: hidden;
   }
 
-  .progress-fill { height: 100%, background: linear-gradient(90deg, #f59e0b, #d97706);
+  .progress-fill { height: 100%;
+		background: linear-gradient(90deg, #f59e0b, #d97706);
     transition:width 0.3s ease;
   }
 
@@ -447,7 +449,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     font-weight: 500;
   }
 
-  .tab-nav { display: flex, gap: 0.5rem;
+  .tab-nav { display: flex;
+		gap: 0.5rem;
     margin-bottom: 1.5rem;
     border-bottom: 1px solid #475569;
     padding-bottom: 0.5rem;
@@ -463,10 +466,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     transition:all 0.2s;
   }
 
-  .tab-btn:hover { background: #1e293b, color: #f1f5f9;
+  .tab-btn:hover { background: #1e293b;
+		color: #f1f5f9;
   }
 
-  .tab-btn.active { background: #f59e0b, color: #0f172a;
+  .tab-btn.active { background: #f59e0b;
+		color: #0f172a;
     font-weight: 600;
   }
 
@@ -498,7 +503,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   .form-field input,
   .form-field select,
-  .form-field textarea { padding: 0.75rem, border: 2px solid #475569;
+  .form-field textarea { padding: 0.75rem;
+		border: 2px solid #475569;
     border-radius: 0.5rem;
     background: #1e293b;
     color: #f1f5f9;
@@ -605,10 +611,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
   }
 
-  .btn-primary:disabled { opacity: 0.5, cursor: not-allowed;
+  .btn-primary:disabled { opacity: 0.5;
+		cursor: not-allowed;
   }
 
-  .btn-secondary { background: #334155, color: #f1f5f9;
+  .btn-secondary { background: #334155;
+		color: #f1f5f9;
   }
 
   .btn-secondary:hover {

@@ -92,7 +92,8 @@ import type { Document } from '$lib/types'; import  Button, Card, CardContent, C
   </div> </CardContent> </Card> {:else if query && !isSearching} <Card> <CardContent class="text-center py-8"> No results found for: "{ query }"
       </CardContent> </Card> {/if}
   </div>
- <style> /* Consolidated layout + compatibility styles */ .cuda-search-container { max-width: 64rem; /* approx Tailwind max-w-4xl */ margin: 0 auto, padding: 0 1rem;}
+ <style> /* Consolidated layout + compatibility styles */ .cuda-search-container { max-width: 64rem; /* approx Tailwind max-w-4xl */ margin: 0 auto;
+		padding: 0 1rem;}
 
   .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; /* vendor-prefixed */ line-clamp: 3; /* standard property for broader compatibility */ -webkit-box-orient: vertical; overflow: hidden;}
 </style>

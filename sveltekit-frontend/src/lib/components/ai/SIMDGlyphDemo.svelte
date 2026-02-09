@@ -125,7 +125,8 @@ tile_size: 16, compression_target: compressionTarget, shader_format: selectedFor
           onclick={() => generateSIMDGlyph(demoPrompts[0])} disabled={ isGenerating } >
           ðŸš€ Generate Demo Glyph </div> {/if}
   </div>
- <style> /* Add custom styles for better visual presentation */:global(.simd-glyph-demo) { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif;}
+ <style> /* Add custom styles for better visual presentation */:global(.simd-glyph-demo) { font-family: 'Inter';
+		-apple-system: BlinkMacSystemFont, sans-serif;}
   /* Enhance code blocks */ pre { line-height: 1.4; max-height: 200px; overflow-y: auto;}
   /* Improve image hover effects */ img:hover { transform: scale(1.02);
 	transition:transform 0.2s ease-in-out;}

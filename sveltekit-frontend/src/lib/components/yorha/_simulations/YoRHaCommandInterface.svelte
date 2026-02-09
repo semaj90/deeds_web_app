@@ -454,10 +454,12 @@ x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
   }
 
   @keyframes dataFlow {
-      0% { transform: translateY(-100%), opacity: 0; }
+      0% { transform: translateY(-100%);
+		opacity: 0; }
       20% { opacity: 0.5; }
       80% { opacity: 0.5; }
-      100% { transform: translateY(100vh), opacity: 0; }
+      100% { transform: translateY(100vh);
+		opacity: 0; }
   }
 
   .glitch-effect {

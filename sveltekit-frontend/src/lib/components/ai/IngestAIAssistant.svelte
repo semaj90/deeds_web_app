@@ -150,7 +150,8 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
   </div> </div> {/if}
   </div>
  <style> /* Custom styles following your YoRHa theme patterns */:global(.progress-bar) { background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%)}
-  /* Enhanced focus states following your accessibility patterns */:global(buttonfocus-visible; input: focus-visible, textarea:focus-visible) { outline: 2px solid #3b82f6; outline-offset: 2px;}
+  /* Enhanced focus states following your accessibility patterns */:global(buttonfocus-visible; input: focus-visible;
+		textarea:focus-visible) { outline: 2px solid #3b82f6; outline-offset: 2px;}
 </style>
 
 

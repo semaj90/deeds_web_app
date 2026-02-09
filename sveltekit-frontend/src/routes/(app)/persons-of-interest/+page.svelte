@@ -162,7 +162,8 @@
 </div>
 
 <style>
- .poi-list-page { padding: 2rem, background: #0f0f23;
+ .poi-list-page { padding: 2rem;
+		background: #0f0f23;
  min-height: 100vh;
  }
 
@@ -193,7 +194,8 @@
  background: #b91c1c;
  }
 
- .error-banner { padding: 1rem, background: #7f1d1d;
+ .error-banner { padding: 1rem;
+		background: #7f1d1d;
  border: 1px solid #dc2626;
  border-radius: 0.375rem;
 	color: #fecaca;
@@ -212,13 +214,15 @@
 	cursor: pointer;
  }
 
- .filters { display: flex, gap: 1rem;
+ .filters { display: flex;
+		gap: 1rem;
  margin-bottom: 2rem;
  flex-wrap: wrap;
  }
 
  .search-input,
- .filter-select { padding: 0.75rem, background: #1a1a2e;
+ .filter-select { padding: 0.75rem;
+		background: #1a1a2e;
  border: 1px solid #333;
  border-radius: 0.375rem;
 	color: #ffffff;
@@ -285,11 +289,13 @@
  margin-bottom: 1rem;
  }
 
- .card-header h3 { color: #ffffff, margin: 0 0 0.5rem 0;
+ .card-header h3 { color: #ffffff;
+		margin: 0 0 0.5rem 0;
  font-size: 1.125rem;
  }
 
- .badges { display: flex, gap: 0.5rem;
+ .badges { display: flex;
+		gap: 0.5rem;
  flex-wrap: wrap;
  }
 

@@ -227,7 +227,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .nier-result-item: hover, before { background: linear-gradient(to bottom, #fbbf24, #f59e0b)}
   .nier-result-index { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
   .nier-type-badge, .nier-confidence-badge { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px)), padding: 0.25rem 0.5rem; font-family: monospace; font-size: 0.75rem;}
-  .nier-confidence-badge { background-color: rgba(251, 191, 36, 0.2), border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24, display: flex; align-items: center;
+  .nier-confidence-badge { background-color: rgba(251, 191, 36, 0.2), border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24;
+		display: flex; align-items: center;
 	gap: 0.25rem;}
   .nier-advanced-panel { clip-path: polygon(0, 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px))}
   .nier-slider { background-color: #374151; border-radius: 0;

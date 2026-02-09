@@ -342,7 +342,8 @@ evidenceId: evidence.id,
 </div>
 
 <style>
-  .evidence-node { position: absolute, cursor: pointer;
+  .evidence-node { position: absolute;
+		cursor: pointer;
     user-select: none;
 	transition:transform 0.2s ease, box-shadow 0.2s ease;
   }

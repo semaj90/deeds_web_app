@@ -146,21 +146,24 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-    .error-analysis { padding: 2rem, color: #e0e0e0;
+    .error-analysis { padding: 2rem;
+		color: #e0e0e0;
         min-height: 100vh;
         background: #1a1a2e;
     }
     .controls {
         margin-bottom: 2rem;
     }
-    button { background: #00d4ff, color: #000;
+    button { background: #00d4ff;
+		color: #000;
         border: none;
         padding: 0.5rem 1rem;
         border-radius: 4px;
         cursor: pointer;
         font-weight: bold;
     }
-    button:disabled { opacity: 0.5, cursor: not-allowed;
+    button:disabled { opacity: 0.5;
+		cursor: not-allowed;
     }
     .cluster-item {
         background: rgba(255, 255, 255, 0.05);

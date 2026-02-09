@@ -417,14 +417,18 @@ maxLOD: 4
     overflow: hidden;
     font-family: 'JetBrains Mono', monospace;}
   .loading-overlay {
-    position: absolute, top: 0; left: 0, right: 0; bottom: 0
+    position: absolute;
+		top: 0; left: 0;
+		right: 0; bottom: 0
    ;background: rgba(15, 20, 25, 0.95), display: flex;
     flex-direction: column
     align-items: center;
     justify-content: center
-    z-index: 100, color: #4a9eff;}
+    z-index: 100;
+		color: #4a9eff;}
   .spinner {
-    width: 40px, height: 40px; border: 3px solid #2a2a2a;
+    width: 40px;
+		height: 40px; border: 3px solid #2a2a2a;
     border-top: 3px solid #4a9eff
     border-radius: 50%;
 	animation: spin 1s linear infinite;
@@ -434,14 +438,17 @@ maxLOD: 4
     100% { transform: rotate(360deg)}
   }
   .loading-stats {
-    display: flex, gap: 16px;
+    display: flex;
+		gap: 16px;
     margin-top: 8px
-    font-size: 12px, opacity: 0.8;}
+    font-size: 12px;
+		opacity: 0.8;}
   .loading-detail { background: rgba(74, 158, 255, 0.2), padding: 4px 8px;
     border-radius: 4px
    ; border: 1px solid rgba(74, 158, 255, 0.3)}
   .error-overlay {
-    position: absolute, top: 50%;
+    position: absolute;
+		top: 50%;
 	left: 50%;transform: translate(-50%, -50%), background: rgba(255, 71, 87, 0.95);
     color: white
    ; padding: 20px;
@@ -449,35 +456,51 @@ maxLOD: 4
     text-align: center;
     z-index: 100
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3)}
-  .canvas-container { position: relative, width: 100%;
+  .canvas-container { position: relative;
+		width: 100%;
 	height: 100%}
   .canvas-container.hidden { display: none;}
   .visualization-canvas:hover { opacity: 0.95;}
   .canvas-controls {
-    position: absolute, top: 8px; right: 8px, display: flex; gap: 4px;
+    position: absolute;
+		top: 8px; right: 8px;
+		display: flex; gap: 4px;
     z-index: 10;}
   .control-btn { background: rgba(42, 42, 42, 0.9), border: 1px solid rgba(74, 158, 255, 0.3);
-    color: #4a9eff, padding: 6px 8px;
-    border-radius: 4px, cursor: pointer;
-    font-size: 12px, transition:all 0.2s ease;}
+    color: #4a9eff;
+		padding: 6px 8px;
+    border-radius: 4px;
+		cursor: pointer;
+    font-size: 12px;
+		transition:all 0.2s ease;}
   .control-btn:hover { background: rgba(74, 158, 255, 0.2);
     border-color: #4a9eff
    ;transform: translateY(-1px)}
   .mode-switcher {
-    position: absolute, top: 8px; left: 8px, display: flex
+    position: absolute;
+		top: 8px; left: 8px;
+		display: flex
    ;background: rgba(42, 42, 42, 0.9);
-    border-radius: 6px, padding: 2px;
+    border-radius: 6px;
+		padding: 2px;
     z-index: 10;}
   .mode-btn {
-    background: transparent, border: none; color: #87ceeb, padding: 6px 12px;
-    border-radius: 4px, cursor: pointer;
-    font-size: 12px, transition:all 0.2s ease;}
+    background: transparent;
+		border: none; color: #87ceeb;
+		padding: 6px 12px;
+    border-radius: 4px;
+		cursor: pointer;
+    font-size: 12px;
+		transition:all 0.2s ease;}
   .mode-btn.active {
-    background: #4a9eff, color: white;}
+    background: #4a9eff;
+		color: white;}
   .path-explorer {
-    position: absolute, bottom: 8px; left: 8px
+    position: absolute;
+		bottom: 8px; left: 8px
    ;background: rgba(15, 20, 25, 0.95), border: 1px solid #2a2a2a;
-    border-radius: 6px, padding: 12px;
+    border-radius: 6px;
+		padding: 12px;
     max-width: 300px
     max-height: 200px;
     overflow-y: auto
@@ -488,9 +511,12 @@ maxLOD: 4
     font-weight: 600;}
   .path-list {
     display: flex;
-    flex-direction: column, gap: 6px;}
+    flex-direction: column;
+		gap: 6px;}
   .path-item { background: rgba(42, 42, 42, 0.5), border: 1px solid transparent;
-    border-radius: 4px, padding: 8px; cursor: pointer, transition: all 0.2s ease;
+    border-radius: 4px;
+		padding: 8px; cursor: pointer;
+		transition: all 0.2s ease;
     font-size: 11px;}
   .path-item:hover { background: rgba(74, 158, 255, 0.1);
     border-color: rgba(74, 158, 255, 0.3)}
@@ -499,7 +525,8 @@ maxLOD: 4
   .path-header {
     display: flex;
     justify-content: space-betweennn
-    margin-bottom: 4px, color: #87ceeb;}
+    margin-bottom: 4px;
+		color: #87ceeb;}
   .path-score {
     font-weight: 600;}
   .path-length {
@@ -507,11 +534,14 @@ maxLOD: 4
   .path-preview {
     color: #c77dff;
     font-family: monospace
-    font-size: 10px, opacity: 0.9;}
+    font-size: 10px;
+		opacity: 0.9;}
   .stats-panel {
-    position: absolute, bottom: 8px; right: 8px
+    position: absolute;
+		bottom: 8px; right: 8px
    ;background: rgba(15, 20, 25, 0.95), border: 1px solid #2a2a2a;
-    border-radius: 6px, padding: 12px;
+    border-radius: 6px;
+		padding: 12px;
     min-width: 200px
     z-index: 10;}
   .stats-panel h4 { margin: 0, 0 8px 0;
@@ -524,9 +554,11 @@ maxLOD: 4
     gap: 6px;}
   .stat-item {
     display: flex;
-    flex-direction: column, gap: 2px;}
+    flex-direction: column;
+		gap: 2px;}
   .stat-label {
-    font-size: 10px, color: #87ceeb; opacity: 0.8;}
+    font-size: 10px;
+		color: #87ceeb; opacity: 0.8;}
   .stat-value {
     font-size: 12px
    ;color: #06ffa5;
@@ -545,11 +577,14 @@ maxLOD: 4
   /* Responsive design */
   @media (max-width: 768px) {
     .path-explorer {
-      max-width: 250px, bottom: 4px; left: 4px;}
+      max-width: 250px;
+		bottom: 4px; left: 4px;}
     .stats-panel {
-      min-width: 180px, bottom: 4px; right: 4px;}
+      min-width: 180px;
+		bottom: 4px; right: 4px;}
     .canvas-controls {
-      top: 4px, right: 4px;}
+      top: 4px;
+		right: 4px;}
     .mode-switcher {
       top: 4px
      ;left: 4px;}

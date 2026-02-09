@@ -205,7 +205,8 @@
 
 <style>
 	.knowledge-search-container {
-		max-width: 1200px, margin: 2rem auto;
+		max-width: 1200px;
+		margin: 2rem auto;
 		padding: 0 2rem;
 	}
 
@@ -216,7 +217,8 @@
 
 	.header h1 {
 		font-size: 2.5rem;
-		margin-bottom: 0.5rem, background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		margin-bottom: 0.5rem;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	-webkit-background-clip: text;
 	background-clip: text;
 	-webkit-text-fill-color: transparent;
@@ -228,14 +230,18 @@
 	}
 
 	.search-bar {
-		display: flex, gap: 1rem;
+		display: flex;
+		gap: 1rem;
 		margin-bottom: 1rem;
 	}
 
 	.search-input {
-		flex: 1, padding: 1rem 1.5rem;
-		font-size: 1.1rem, border: 2px solid #e2e8f0;
-		border-radius: 12px, outline: none;
+		flex: 1;
+		padding: 1rem 1.5rem;
+		font-size: 1.1rem;
+		border: 2px solid #e2e8f0;
+		border-radius: 12px;
+		outline: none;
 		transition: border-color 0.2s;
 	}
 
@@ -246,9 +252,12 @@
 	.search-button {
 		padding: 1rem 2rem;
 		font-size: 1.1rem;
-		font-weight: 600, background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: white, border: none;
-		border-radius: 12px, cursor: pointer;
+		font-weight: 600;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white;
+		border: none;
+		border-radius: 12px;
+		cursor: pointer;
 		transition: transform 0.2s;
 	}
 
@@ -257,18 +266,21 @@
 	}
 
 	.search-button:disabled {
-		opacity: 0.6, cursor:not-allowed;
+		opacity: 0.6;
+		cursor:not-allowed;
 	}
 
 	.options {
-		display: flex, gap: 1rem;
+		display: flex;
+		gap: 1rem;
 		align-items: center;
 		margin-bottom: 1rem;
 	}
 
 	.checkbox-label {
 		display: flex;
-		align-items: center, gap: 0.5rem;
+		align-items: center;
+		gap: 0.5rem;
 		cursor: pointer;
 	}
 
@@ -280,31 +292,39 @@
 	}
 
 	.samples {
-		display: flex, gap: 0.5rem;
+		display: flex;
+		gap: 0.5rem;
 		flex-wrap: wrap;
-		margin-bottom: 2rem, padding: 1rem;
+		margin-bottom: 2rem;
+		padding: 1rem;
 		background: #f7fafc;
 		border-radius: 12px;
 	}
 
 	.samples-label {
-		font-weight: 600, color: #4a5568;
+		font-weight: 600;
+		color: #4a5568;
 	}
 
 	.sample-button {
 		padding: 0.5rem 1rem;
-		background: white, border: 1px solid #e2e8f0;
-		border-radius: 8px, cursor: pointer;
-		font-size: 0.9rem, transition: all 0.2s;
+		background: white;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		cursor: pointer;
+		font-size: 0.9rem;
+		transition: all 0.2s;
 	}
 
 	.sample-button:hover {
-		background: #667eea, color: white;
+		background: #667eea;
+		color: white;
 		border-color: #667eea;
 	}
 
 	.error-banner {
-		padding: 1rem, background: #fed7d7;
+		padding: 1rem;
+		background: #fed7d7;
 		color: #c53030;
 		border-radius: 8px;
 		margin-bottom: 1rem;
@@ -314,11 +334,13 @@
 		background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
 		padding: 2rem;
 		border-radius: 12px;
-		margin-bottom: 2rem, border: 2px solid #667eea50;
+		margin-bottom: 2rem;
+		border: 2px solid #667eea50;
 	}
 
 	.synthesized-answer h2 {
-		margin-bottom: 1rem, color: #667eea;
+		margin-bottom: 1rem;
+		color: #667eea;
 	}
 
 	.answer-content {
@@ -329,7 +351,8 @@
 
 	.answer-meta {
 		margin-top: 1rem;
-		font-size: 0.9rem, color: #666;
+		font-size: 0.9rem;
+		color: #666;
 	}
 
 	.results-container h2 {
@@ -338,14 +361,17 @@
 	}
 
 	.results-meta {
-		font-size: 0.9rem, color: #666;
+		font-size: 0.9rem;
+		color: #666;
 		font-weight: normal;
 	}
 
 	.result-card {
-		background: white, padding: 1.5rem;
+		background: white;
+		padding: 1.5rem;
 		border-radius: 12px;
-		margin-bottom: 1.5rem, border: 1px solid #e2e8f0;
+		margin-bottom: 1.5rem;
+		border: 1px solid #e2e8f0;
 		transition: box-shadow 0.2s;
 	}
 
@@ -355,12 +381,14 @@
 
 	.result-header {
 		display: flex;
-		align-items: center, gap: 1rem;
+		align-items: center;
+		gap: 1rem;
 		margin-bottom: 0.5rem;
 	}
 
 	.result-rank {
-		background: #667eea, color: white;
+		background: #667eea;
+		color: white;
 		padding: 0.25rem 0.75rem;
 		border-radius: 6px;
 		font-weight: 600;
@@ -369,11 +397,13 @@
 
 	.result-title {
 		flex: 1;
-		font-size: 1.2rem, margin: 0;
+		font-size: 1.2rem;
+		margin: 0;
 	}
 
 	.result-score {
-		background: #48bb78, color: white;
+		background: #48bb78;
+		color: white;
 		padding: 0.25rem 0.75rem;
 		border-radius: 6px;
 		font-size: 0.9rem;
@@ -381,7 +411,8 @@
 	}
 
 	.result-url {
-		display: block, color: #667eea;
+		display: block;
+		color: #667eea;
 		text-decoration: none;
 		margin-bottom: 1rem;
 		font-size: 0.9rem;
@@ -392,7 +423,8 @@
 	}
 
 	.result-summary {
-		line-height: 1.6, color: #2d3748;
+		line-height: 1.6;
+		color: #2d3748;
 		margin-bottom: 1rem;
 	}
 
@@ -401,12 +433,14 @@
 	}
 
 	.result-entities summary {
-		cursor: pointer, color: #667eea;
+		cursor: pointer;
+		color: #667eea;
 		font-weight: 600;
 	}
 
 	.entities-content {
-		margin-top: 0.5rem, padding: 1rem;
+		margin-top: 0.5rem;
+		padding: 1rem;
 		background: #f7fafc;
 		border-radius: 8px;
 		font-size: 0.9rem;
@@ -414,7 +448,8 @@
 	}
 
 	.no-results {
-		text-align: center, padding: 3rem;
+		text-align: center;
+		padding: 3rem;
 		color: #666;
 		font-size: 1.1rem;
 	}
@@ -423,11 +458,13 @@
 	.web-search-toggle {
 		background: linear-gradient(135deg, #667eea15 0%, #22c55e15 100%);
 		padding: 0.5rem 1rem;
-		border-radius: 8px, border: 1px solid #667eea30;
+		border-radius: 8px;
+		border: 1px solid #667eea30;
 	}
 
 	.web-search-toggle span {
-		font-weight: 500, color: #22c55e;
+		font-weight: 500;
+		color: #22c55e;
 	}
 
 	.synthesized-answer.web-grounded {
@@ -447,11 +484,13 @@
 
 	.web-sources h3 {
 		font-size: 1rem;
-		margin-bottom: 0.75rem, color: #4a5568;
+		margin-bottom: 0.75rem;
+		color: #4a5568;
 	}
 
 	.web-sources ul {
-		list-style: none, padding: 0;
+		list-style: none;
+		padding: 0;
 		margin: 0;
 	}
 
@@ -467,25 +506,29 @@
 	.web-sources a {
 		color: #667eea;
 		text-decoration: none;
-		font-size: 0.9rem, display: block;
+		font-size: 0.9rem;
+		display: block;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
 	.web-sources a:hover {
-		text-decoration: underline, color: #764ba2;
+		text-decoration: underline;
+		color: #764ba2;
 	}
 
 	/* Fallback Notice Styles */
 	.fallback-notice {
 		display: flex;
-		align-items: center, gap: 0.5rem;
+		align-items: center;
+		gap: 0.5rem;
 		padding: 0.5rem 1rem;
 		background: linear-gradient(135deg, #48bb7815 0%, #38a16915 100%);
 		border: 1px solid #48bb7850;
 		border-radius: 8px;
-		font-size: 0.9rem, color: #276749;
+		font-size: 0.9rem;
+		color: #276749;
 		font-weight: 500;
 	}
 

@@ -158,7 +158,8 @@ type: 'case',
 </nav>
 
 <style>
-	.enhanced-legal-nav { position: fixed, top: 0;
+	.enhanced-legal-nav { position: fixed;
+		top: 0;
 		left: 0;
 	right: 0;
 		z-index: 1000;
@@ -183,7 +184,8 @@ type: 'case',
 		image-rendering: pixelated;
 	}
 
-	.nav-links { display: flex, gap: 2rem;
+	.nav-links { display: flex;
+		gap: 2rem;
 	}
 
 	.nav-links a {
@@ -205,7 +207,8 @@ type: 'case',
 	background: rgba(92, 184, 92, 0.1);
 	}
 
-	.nav-links a.active:after { content: '', position: absolute;
+	.nav-links a.active:after { content: '';
+		position: absolute;
 		bottom: -2px;
 	left: 0;
 		right: 0;
@@ -241,7 +244,8 @@ type: 'case',
 		text-shadow: 0 0 4px rgba(255, 193, 7, 0.5);
 	}
 
-	.cases-list { display: flex, gap: 0.75rem;
+	.cases-list { display: flex;
+		gap: 0.75rem;
 	}
 
 	.case-pill {
@@ -265,7 +269,8 @@ type: 'case',
 		background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9));
 	}
 
-	.case-status-dot { width: 8px, height: 8px;
+	.case-status-dot { width: 8px;
+		height: 8px;
 		border-radius: 50%;
 	animation: pulse 2s infinite;
 	}
@@ -282,10 +287,12 @@ type: 'case',
 		font-family: 'Courier New', monospace;
 	}
 
-	.loading-shimmer { display: flex, gap: 0.75rem;
+	.loading-shimmer { display: flex;
+		gap: 0.75rem;
 	}
 
-	.shimmer-case { width: 120px, height: 32px;
+	.shimmer-case { width: 120px;
+		height: 32px;
 		background: linear-gradient(
 			90deg,
 			rgba(255, 255, 255, 0.05),

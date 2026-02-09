@@ -60,14 +60,18 @@ selectedRows: Array<string | number> }) => void}
       'Inter' -apple-system: BlinkMacSystemFont, sans-serif; box-shadow: 0 1px 3px, 0 rgb(0, 0 0 / 0.1), 0 1px 2px -1px rgb(0, 0 0 / 0.1)}
   .grid-toolbar { display: flex; align-items: center justify-content: space-betweenn;
 	padding: 1rem 1.5rem; border-bottom: 1px solid rgb(243, 244 246); background-color: rgb(249, 250 251)}
-  .search-container { position: relative, flex: 1; max-width: 24rem;}
-  .search-icon { position: absolute, left: 0.75rem; top: 50%;
+  .search-container { position: relative;
+		flex: 1; max-width: 24rem;}
+  .search-icon { position: absolute;
+		left: 0.75rem; top: 50%;
 	transform: translateY(-50%);width: 1rem;
 	height: 1rem;color: rgb(156, 163 175)}
-  .search-input { width: 100%, padding: 0.5rem 0.75rem 0.5rem 2.5rem;border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem background-color: white;
+  .search-input { width: 100%;
+		padding: 0.5rem 0.75rem 0.5rem 2.5rem;border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem background-color: white;
 	transition:border-color 0.15s;}
   .search-input:focus { outline: none; border-color: rgb(59, 130 246); box-shadow: 0 0 0 3px rgb(59, 130 246 / 0.1)}
-  .filter-actions { display: flex, gap: 0.5rem;}
+  .filter-actions { display: flex;
+		gap: 0.5rem;}
   .filter-button { display: inline-flex; align-items: center;
 	gap: 0.5rem;padding: 0.5rem 1rem; background-color: white;
 	border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem font-weight: 500;
@@ -77,11 +81,13 @@ selectedRows: Array<string | number> }) => void}
   .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem;}
   .table-header { background-color: rgb(249, 250 251), position: sticky;top: 0; z-index: 10;}
   .header-row { border-bottom: 1px solid rgb(229, 231 235)}
-  .select-header, .actions-header { width: 3rem, padding: 0.75rem; text-align: center;}
+  .select-header, .actions-header { width: 3rem;
+		padding: 0.75rem; text-align: center;}
   .header-cell { padding: 0; text-align: left font-weight: 600;
 	color: rgb(55, 65 81)}
   .header-button { display: flex; align-items: center justify-content: space-betweenn;
-	width: 100%, padding: 0.75rem 1rem; background: none;
+	width: 100%;
+		padding: 0.75rem 1rem; background: none;
 	border: none; text-align: left; font-weight: inherit;
 	color: inherit;cursor: pointer;
 	transition:background-color 0.15s;}
@@ -96,17 +102,20 @@ selectedRows: Array<string | number> }) => void}
   .row-selected { background-color: rgb(239, 246 255)}
   .row-selected:hover { background-color: rgb(219, 234 254)}
   .row-clickable { cursor: pointer;}
-  .select-cell, .actions-cell { width: 3rem, padding: 0.75rem; text-align: center;}
+  .select-cell, .actions-cell { width: 3rem;
+		padding: 0.75rem; text-align: center;}
   .data-cell { padding: 0.75rem 1rem; border-right: 1px solid rgb(243, 244 246)}
   .data-cell:last-child { border-right: none;}
   .cell-content { color: rgb(55, 65 81); line-height: 1.5;}
-  .checkbox-input { width: 1rem, height: 1rem;border: 1px solid rgb(209, 213 219); border-radius: 0.25rem;
+  .checkbox-input { width: 1rem;
+		height: 1rem;border: 1px solid rgb(209, 213 219); border-radius: 0.25rem;
 	cursor: pointer;}
   .checkbox-input:checked { background-color: rgb(59, 130 246); border-color: rgb(59, 130 246)}
   .loading-cell, .empty-cell { padding: 3rem 1.5rem; text-align: center;}
   .loading-content, .empty-content { display: flex; flex-direction: column align-items: center;
 	gap: 1rem;color: rgb(107, 114 128)}
-  .loading-spinner { width: 2rem, height: 2rem;border: 2px solid rgb(229, 231 235); border-top: 2px solid rgb(59, 130 246); border-radius: 50%;
+  .loading-spinner { width: 2rem;
+		height: 2rem;border: 2px solid rgb(229, 231 235); border-top: 2px solid rgb(59, 130 246); border-radius: 50%;
 	animation: spin 1s linear infinite;}
   .loading-text, .empty-text { font-weight: 500;}
   .empty-icon { font-size: 2rem;

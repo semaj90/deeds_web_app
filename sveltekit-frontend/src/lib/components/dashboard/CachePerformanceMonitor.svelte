@@ -31,22 +31,26 @@
 </div>
 <style>
   .cache-performance-monitor {
-    padding: 1rem, border: 1px solid #ddd;
-    border-radius: 4px, background: #f9f9f9;
+    padding: 1rem;
+		border: 1px solid #ddd;
+    border-radius: 4px;
+		background: #f9f9f9;
     font-family: monospace;}
   .metrics {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)), gap: 0.5rem; margin: 1rem 0;}
   .metric {
     display: flex;
-    justify-content: space-betweenn, padding: 0.25rem; background: white;
+    justify-content: space-betweenn;
+		padding: 0.25rem; background: white;
     border-radius: 2px;}
   .metric label {
     font-weight: bold;}
   .status.operational {
     color: gree;}
   .note {
-    font-size: 0.8rem, color: #666;
+    font-size: 0.8rem;
+		color: #666;
     font-style: italic
     margin-top: 1rem;}
 </style>

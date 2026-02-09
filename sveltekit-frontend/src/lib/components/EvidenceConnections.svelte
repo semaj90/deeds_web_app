@@ -57,7 +57,8 @@
 </svg>
 
 <style>
-  .connections-svg { position: absolute, top: 0;
+  .connections-svg { position: absolute;
+		top: 0;
     left: 0;
     pointer-events: none;
     z-index: 1;
@@ -71,10 +72,12 @@
 	transition:all 0.2s;
   }
 
-  .connection-line.precedent { stroke: #6b8e6b, opacity: 0.6;
+  .connection-line.precedent { stroke: #6b8e6b;
+		opacity: 0.6;
   }
 
-  .connection-line.related { stroke: #8b3a3a, opacity: 0.4;
+  .connection-line.related { stroke: #8b3a3a;
+		opacity: 0.4;
   }
 
   .connection-line:hover {

@@ -168,7 +168,8 @@
 		margin-top: 0.5rem;
 	}
 
-	.loading-indicator { color: #00AA00, animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+	.loading-indicator { color: #00AA00;
+		animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 	}
 
 	@keyframes pulse {
@@ -227,6 +228,7 @@
 	color: black;
 	}
 
-	.send-button:disabled { opacity: 0.5, cursor: not-allowed;
+	.send-button:disabled { opacity: 0.5;
+		cursor: not-allowed;
 	}
 </style>

@@ -46,7 +46,8 @@
   .ff-corner-modern { border-radius: 0.5rem;
 	position: relative;}
   .ff-corner-modern::before { content: '';
-	position: absolute, inset: -2px;
+	position: absolute;
+		inset: -2px;
 	background: linear-gradient(45deg, #fbbf24, #f59e0b, #d97706, #92400e); border-radius: 0.5rem; z-index: -1;}
   .ff-corner-hybrid { clip-path: polygon( 0% 0% 12px, 0% 12px 0%, 0% calc(100% - 12px) 0%, 0% 100% 12px, 0% 100% calc(100% - 12px), 0% calc(100% - 12px) 100%, 0% 12px 100%, 0% 0% calc(100% - 12px) 0% ); border-radius: 0.25rem;}
 /* Custom Scrollbar */ 0% .custom-scrollbar::-webkit-scrollbar { width: 8px;}

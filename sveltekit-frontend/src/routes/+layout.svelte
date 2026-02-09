@@ -76,23 +76,37 @@
 </div>
 
 <style>
-    .app-shell { display: flex, height: 100vh; font-family: monospace; }
-    aside { width: 250px, background: #f0f0f0; padding: 1rem, transition: width 0.3s; border-right: 1px solid #ccc; }
-    aside.closed { width: 0, padding: 0; overflow: hidden, border: none; }
-    main { flex: 1, display: flex; flex-direction: column; }
-    header { padding: 1rem, background: #e0e0e0; display: flex; align-items: center, gap: 1rem; border-bottom: 1px solid #ccc; }
-    .content { flex: 1, overflow: auto; padding: 1rem; }
+    .app-shell { display: flex;
+		height: 100vh; font-family: monospace; }
+    aside { width: 250px;
+		background: #f0f0f0; padding: 1rem;
+		transition: width 0.3s; border-right: 1px solid #ccc; }
+    aside.closed { width: 0;
+		padding: 0; overflow: hidden;
+		border: none; }
+    main { flex: 1;
+		display: flex; flex-direction: column; }
+    header { padding: 1rem;
+		background: #e0e0e0; display: flex; align-items: center;
+		gap: 1rem; border-bottom: 1px solid #ccc; }
+    .content { flex: 1;
+		overflow: auto; padding: 1rem; }
 
-    .dark { background: #1a1a1a, color: #e0e0e0; }
+    .dark { background: #1a1a1a;
+		color: #e0e0e0; }
     .dark aside { background: #2a2a2a; border-color: #444; }
     .dark header { background: #333; border-color: #444; }
-    .dark button { background: #444, color: white; border: 1px solid #555; }
+    .dark button { background: #444;
+		color: white; border: 1px solid #555; }
 
     .status-panel { margin-bottom: 2rem; }
     progress { width: 100%; }
-    button { padding: 0.5rem 1rem, cursor: pointer; }
-    .error-toast { background: #ff4444, color: white; padding: 0.5rem; border-radius: 4px; }
-    .home-link { text-decoration: none, color: inherit; font-weight: bold; }
+    button { padding: 0.5rem 1rem;
+		cursor: pointer; }
+    .error-toast { background: #ff4444;
+		color: white; padding: 0.5rem; border-radius: 4px; }
+    .home-link { text-decoration: none;
+		color: inherit; font-weight: bold; }
 </style>
 
 

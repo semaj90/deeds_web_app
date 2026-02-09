@@ -250,7 +250,8 @@ evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout((
           onclick={() => { action.action(); contextMenu = null}} class="w-full justify-start"
         > {action.label} </Button> {/each} {/if}
   </div>
- <style> .canvas-workspace { display: flex, height: 100vh; background: #0a0a0a;
+ <style> .canvas-workspace { display: flex;
+		height: 100vh; background: #0a0a0a;
 	color: white; font-family: Arial, sans-serif, position: relative; /* Fixed: added colon */ overflow: hidden;}
   .toolbar { position: absolute; /* Fixed: added colon */ top: 0; /* Fixed: comma to semicolon */ left: 0;
 	right: 0; /* Fixed: comma to semicolon */ height: 60px;
@@ -264,10 +265,13 @@ evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout((
 	height: 36px;display: flex; align-items: center; justify-content: center;}
   .tool-btn:hover, .action-btn:hover, .ai-btn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4)}
   .tool-btn.active { background: rgba(74, 144, 226, 0.6); border-color: rgba(74, 144, 226, 0.8)}
-  .sidebar { width: 300px, background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 255, 255, 0.1), padding: 80px 20px 20px 20px; overflow-y: auto; z-index: 50; /* Fixed: comma to semicolon */ }
+  .sidebar { width: 300px;
+		background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 255, 255, 0.1), padding: 80px 20px 20px 20px; overflow-y: auto; z-index: 50; /* Fixed: comma to semicolon */ }
   .sidebar-header { display: flex; justify-content: space-between; /* Fixed: typo: 'space-betweenn' */ align-items: center; margin-bottom: 20px;}
-  .sidebar-header h3 { margin: 0, color: #4a90e2;}
-  .close-btn { background: none, border: none; color: #ccc; font-size: 20px;
+  .sidebar-header h3 { margin: 0;
+		color: #4a90e2;}
+  .close-btn { background: none;
+		border: none; color: #ccc; font-size: 20px;
 	cursor: pointer;padding: 0; /* Fixed: comma to semicolon */ width: 24px;
 	height: 24px;}
   .evidence-list { display: flex; flex-direction: column;
@@ -275,40 +279,58 @@ evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout((
   .evidence-item { display: flex; align-items: center;
 	gap: 12px;padding: 12px;
 	background: rgba(255, 255, 255, 0.05); border-radius: 6px;
-	cursor: grab, transition:all 0.2s ease; border: 1px solid transparent;}
+	cursor: grab;
+		transition:all 0.2s ease; border: 1px solid transparent;}
   .evidence-item:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(74, 144, 226, 0.5)}
   .evidence-item.on-canvas .evidence-icon { /* Fixed: class selector and removed extra dot */ font-size: 24px;
-	width: 32px, height: 32px; display: flex; align-items: center; justify-content: center;}
+	width: 32px;
+		height: 32px; display: flex; align-items: center; justify-content: center;}
   .evidence-info { flex: 1; /* Fixed: comma to semicolon */ }
   .evidence-title { font-weight: bold; font-size: 14px; margin-bottom: 4px;}
-  .evidence-type { font-size: 12px, color: #ccc; text-transform: capitalize; /* Fixed: typo: 'capitaliz' */ }
-  .sidebar-toggle { position: absolute; /* Fixed: added colon */ top: 80px, left: 20px; z-index: 60; /* Fixed: comma to semicolon */, background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(255, 255, 255, 0.2), color: white;padding: 12px; border-radius: 6px, cursor: pointer; font-size: 16px;}
+  .evidence-type { font-size: 12px;
+		color: #ccc; text-transform: capitalize; /* Fixed: typo: 'capitaliz' */ }
+  .sidebar-toggle { position: absolute; /* Fixed: added colon */ top: 80px;
+		left: 20px; z-index: 60; /* Fixed: comma to semicolon */;
+		background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(255, 255, 255, 0.2), color: white;padding: 12px; border-radius: 6px;
+		cursor: pointer; font-size: 16px;}
   .canvas-container { flex: 1; margin-top: 60px;
 	position: relative; /* Fixed: added colon */ overflow: hidden;}
   .properties-panel { position: absolute; /* Fixed: added colon */ top: 80px;
-	right: 20px, width: 280px;
+	right: 20px;
+		width: 280px;
 	background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
 	border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; z-index: 100; /* Fixed: comma to semicolon */ }
   .panel-header { display: flex; justify-content: space-between; /* Fixed: typo: 'space-betweenn' */ align-items: center;
 	padding: 15px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1)}
-  .panel-header h3 { margin: 0, color: #4a90e2; font-size: 16px;}
+  .panel-header h3 { margin: 0;
+		color: #4a90e2; font-size: 16px;}
   .panel-content { padding: 20px;}
   .property-group { margin-bottom: 15px;}
   .property-group label { display: block; margin-bottom: 5px; font-size: 12px;
 	color: #ccc;}
-  .property-group input, .property-group select { width: 100%, background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2), color: white;padding: 8px 10px; border-radius: 4px; font-size: 14px;}
-  .position-inputs { display: flex, gap: 10px;}
+  .property-group input, .property-group select { width: 100%;
+		background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2), color: white;padding: 8px 10px; border-radius: 4px; font-size: 14px;}
+  .position-inputs { display: flex;
+		gap: 10px;}
   .position-inputs input { width: calc(50% - 5px)}
-  .context-menu { position: fixed; /* Fixed: added colon */, background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
+  .context-menu { position: fixed; /* Fixed: added colon */;
+		background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
 	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px;
 	padding: 5px 0; z-index: 200; min-width: 150px;}
-  .context-action { display: block, width: 100%; background: none;
-	border: none, color: white;
-	padding: 8px 15px; text-align: left, cursor: pointer; font-size: 14px;
+  .context-action { display: block;
+		width: 100%; background: none;
+	border: none;
+		color: white;
+	padding: 8px 15px; text-align: left;
+		cursor: pointer; font-size: 14px;
 	transition:background 0.2s ease;}
-  .context-action:hover { /* Fixed: added dot for class selector */, background: rgba(255, 255, 255, 0.1)}
-  .collaborators { display: flex, gap: 5px;}
-  .collaborator-avatar { width: 32px, height: 32px; border-radius: 50%, display: flex; align-items: center; justify-content: center;
+  .context-action:hover { /* Fixed: added dot for class selector */;
+		background: rgba(255, 255, 255, 0.1)}
+  .collaborators { display: flex;
+		gap: 5px;}
+  .collaborator-avatar { width: 32px;
+		height: 32px; border-radius: 50%;
+		display: flex; align-items: center; justify-content: center;
 	color: white; font-weight: bold; font-size: 14px;
 	border: 2px solid rgba(255, 255, 255, 0.3)}
   .save-status { font-size: 12px;
@@ -316,7 +338,8 @@ evented: false }); fabricCanvas.add && fabricCanvas.add(highlight); setTimeout((
   .ai-suggestions { margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1)}
   .ai-suggestions h4 { margin: 0, 0 15px 0, color: #4a90e2; font-size: 14px;}
   .suggestion-item { display: flex; justify-content: space-between; /* Fixed: typo: 'space-betweenn' */ align-items: flex-start;
-	gap: 10px, padding: 10px;
+	gap: 10px;
+		padding: 10px;
 	background: rgba(74, 144, 226, 0.1); border-radius: 4px; margin-bottom: 10px;}
   .suggestion-text { flex: 1; font-size: 12px; line-height: 1.4;}
   .apply-btn { background: rgba(74, 144, 226, 0.6), border: none;color: white;

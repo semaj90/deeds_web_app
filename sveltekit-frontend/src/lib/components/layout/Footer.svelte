@@ -310,7 +310,8 @@
 		margin: 0 !important;
 	}
 
-	.minimal-links { display: flex, gap: 1rem;
+	.minimal-links { display: flex;
+		gap: 1rem;
 	}
 
 	.demo-footer {
@@ -342,7 +343,8 @@
 		color: white !important;
 	}
 
-	.demo-actions { display: flex, gap: 1rem;
+	.demo-actions { display: flex;
+		gap: 1rem;
 		flex-wrap: wrap;
 		justify-content: center;
 	}

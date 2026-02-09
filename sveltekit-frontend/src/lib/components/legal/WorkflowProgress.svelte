@@ -236,9 +236,11 @@ Visual progress indicator for the Evidence Chain of Custody workflow
     animation: fadeInUp 0.5s ease-out;
   }
   @keyframes fadeInUp {
-    from { opacity: 0, transform: translateY(20px);
+    from { opacity: 0;
+		transform: translateY(20px);
     }
-    to { opacity: 1, transform: translateY(0);
+    to { opacity: 1;
+		transform: translateY(0);
     }
   }
   /* Smooth transitions for progress elements */

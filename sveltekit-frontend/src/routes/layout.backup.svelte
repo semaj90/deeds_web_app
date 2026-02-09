@@ -15,18 +15,23 @@
 
 <style>
  .app-layout {
- min-height: 100vh, display: grid;
+ min-height: 100vh;
+		display: grid;
  grid-template-rows: auto 1fr;
- gap: 1rem, padding: 1rem;
- background: #0a0a0a, color: #ffffff;
+ gap: 1rem;
+		padding: 1rem;
+ background: #0a0a0a;
+		color: #ffffff;
  }
  .app-header {
- background: #1e1e1, color: white;
+ background: #1e1e1;
+		color: white;
  padding: 1rem;
  border-radius: 0.5rem;
  }
  .app-main {
- background: #1a1a1a, padding: 1rem;
+ background: #1a1a1a;
+		padding: 1rem;
  border-radius: 0.5rem;
  }
 </style>

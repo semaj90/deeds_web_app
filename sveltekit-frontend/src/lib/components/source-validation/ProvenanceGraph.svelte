@@ -260,7 +260,8 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 		background: white;
 	}
 
-	:global(.knowledge-graph-svg) { display: block, width: 100%;
+	:global(.knowledge-graph-svg) { display: block;
+		width: 100%;
 		height: auto;
 	}
 
@@ -269,7 +270,8 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 		pointer-events: none;
 	}
 
-	:global(.knowledge-graph-svg circle) { cursor: pointer, transition: r 0.2s;
+	:global(.knowledge-graph-svg circle) { cursor: pointer;
+		transition: r 0.2s;
 	}
 
 	:global(.knowledge-graph-svg circle:hover) {

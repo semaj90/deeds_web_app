@@ -391,7 +391,8 @@
 		text-align: center;
 	}
 
-	.message { display: flex, gap: 0.75rem;
+	.message { display: flex;
+		gap: 0.75rem;
 		align-items: flex-start;
 	}
 
@@ -415,7 +416,8 @@
 		color: white;
 	}
 
-	.message-content { flex: 1, padding: 0.75rem;
+	.message-content { flex: 1;
+		padding: 0.75rem;
 		border-radius: 0.5rem;
 		background-color: #f9fafb;
 	}
@@ -456,7 +458,8 @@
 		padding: 0 1rem 1rem;
 	}
 
-	textarea { width: 100%, padding: 0.75rem;
+	textarea { width: 100%;
+		padding: 0.75rem;
 		border: 1px solid #e5e7eb;
 		border-radius: 0.375rem;
 		resize: vertical;
@@ -470,7 +473,8 @@
 		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 	}
 
-	.input-actions { display: flex, gap: 0.5rem;
+	.input-actions { display: flex;
+		gap: 0.5rem;
 		margin-top: 0.5rem;
 		justify-content: flex-end;
 	}
@@ -501,7 +505,8 @@
 		background-color: #2563eb;
 	}
 
-	.send-btn:disabled { opacity: 0.5, cursor: not-allowed;
+	.send-btn:disabled { opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	.advanced-toggle {
@@ -532,7 +537,8 @@
 	}
 
 	.advanced-options select,
-	.advanced-options input[type='range'] { padding: 0.5rem, border: 1px solid #e5e7eb;
+	.advanced-options input[type='range'] { padding: 0.5rem;
+		border: 1px solid #e5e7eb;
 		border-radius: 0.25rem;
 	}
 </style>

@@ -252,8 +252,8 @@ select {
  transition: all 0.2s ease;
 }
 
-input:focus,
-textarea:focus,
+input: focus;
+	textarea:focus,
 select:focus {
  outline: none;
  border-color: var(--sapphire-link);

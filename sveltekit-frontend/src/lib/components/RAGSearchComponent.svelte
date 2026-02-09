@@ -416,7 +416,8 @@
 
 <style>
 	/* Enhanced bits-ui styling for legal AI search */
-	:global(.legal-ai-search-input) { background: var(--nier-bg-primary), border: 2px solid var(--nier-border-muted);
+	:global(.legal-ai-search-input) { background: var(--nier-bg-primary);
+		border: 2px solid var(--nier-border-muted);
 		transition: all 0.3s ease;
 	}
 	:global(.legal-ai-search-input:focus) {

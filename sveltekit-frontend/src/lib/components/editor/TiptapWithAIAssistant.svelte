@@ -244,7 +244,8 @@ Markdown Supported
 outline: none;
 min-height: 100%;
 }
-:global(.ProseMirror p.is-editor-empty:first-child::before) { color: #64748b, content: attr(data-placeholder);
+:global(.ProseMirror p.is-editor-empty:first-child::before) { color: #64748b;
+		content: attr(data-placeholder);
 float: left;
 height: 0;
 pointer-events: none;

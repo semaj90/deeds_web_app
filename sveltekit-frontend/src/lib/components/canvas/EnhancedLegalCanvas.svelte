@@ -78,12 +78,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if selectedNode.metadata} <details> <summary>Metadata</summary>
  <pre class="metadata">{JSON.stringify(selectedNode.metadata, null, 2)}</pre> </details> {/if} {/if} {#if children} {@render children()} {/if}
   </div>
- <style> .canvas-container { margin: 1rem, padding: 1rem;background: var(--yorha-bg-secondary);
+ <style> .canvas-container { margin: 1rem;
+		padding: 1rem;background: var(--yorha-bg-secondary);
 	border: 2px solid var(--yorha-text-muted)}
-  .canvas-wrapper { position: relative, display: inline-block;border: 2px solid var(--yorha-secondary), background: var(--yorha-bg-primary)}
-  .legal-canvas { display: block, background: transparent; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
+  .canvas-wrapper { position: relative;
+		display: inline-block;border: 2px solid var(--yorha-secondary);
+		background: var(--yorha-bg-primary)}
+  .legal-canvas { display: block;
+		background: transparent; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
   .canvas-controls { margin-top: 1rem;
-	display: flex, gap: 1rem; align-items: center; flex-wrap;}
+	display: flex;
+		gap: 1rem; align-items: center; flex-wrap;}
   .nes-field { margin: 0;}
   .nes-field label { font-family: 'Press Start 2P', monospace; font-size: 10px;
 	color: var(--yorha-text-accent); margin-right: 0.5rem;}

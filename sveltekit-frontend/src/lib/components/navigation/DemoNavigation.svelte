@@ -45,7 +45,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   } .animate-slideIn { animation: slideIn 0.3s ease-out;}
   /* Remove native button chrome for the full-screen backdrop while keeping utility classes' background */ .backdrop-btn { appearance: none; -webkit-appearance: none;
 	border: none;padding: 0;
-	margin: 0, display: block;
+	margin: 0;
+		display: block;
 	width: 100%;height: 100%}'
 </style>
 

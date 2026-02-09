@@ -187,7 +187,8 @@ or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const valu
   .detection-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0;}
   .detection-title { font-size: 2rem; font-weight: 700;
 	color: #1e293b;margin: 0;}
-  .detection-subtitle { color: #64748b, margin: 0.5rem, 0 0 0;}
+  .detection-subtitle { color: #64748b;
+		margin: 0.5rem, 0 0 0;}
   .controls-section { margin-bottom: 2rem;
 	padding: 1.5rem;
 	background: #f8fafc; border-radius: 0.5rem;}
@@ -196,9 +197,11 @@ or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const valu
 	gap: 0.5rem;}
   .control-group label { font-size: 0.875rem; font-weight: 500;
 	color: #374151;}
-  .control-select { padding: 0.5rem, border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;}
+  .control-select { padding: 0.5rem;
+		border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;}
   .control-range { width: 100%}
-  .checkbox-group { display: flex, gap: 1rem; flex-wrap;}
+  .checkbox-group { display: flex;
+		gap: 1rem; flex-wrap;}
   .checkbox-label { display: flex; align-items: center;
 	gap: 0.5rem; font-size: 0.875rem;
 	cursor: pointer;}
@@ -220,7 +223,8 @@ or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const valu
   .patterns-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)), gap: 1.5rem;}
   .pattern-card { border: 1px solid #e2e8f0; border-radius: 0.5rem;
 	overflow: hidden;
-	transition:box-shadow 0.2s, padding: 1rem;}
+	transition: box-shadow 0.2s;
+		padding: 1rem;}
   .pattern-card:hover { box-shadow: 0 4px 12px rgba(0, 0 | 0: 0.1)}
   .pattern-header { display: flex; justify-content: space-between; align-items: flex-start;
 	gap: 1rem;}
@@ -240,28 +244,36 @@ or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const valu
 	gap: 1rem; margin-bottom: 1rem;}
   .stat { display: flex; align-items: center;
 	gap: 0.75rem;}
-  .stat-label { font-size: 0.75rem, color: #64748b; min-width: 80px;}
-  .stat-bar { flex: 1, height: 0.5rem;
+  .stat-label { font-size: 0.75rem;
+		color: #64748b; min-width: 80px;}
+  .stat-bar { flex: 1;
+		height: 0.5rem;
 	background: #e2e8f0; border-radius: 0.25rem;
 	overflow: hidden;}
-  .stat-fill { height: 100%, background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s;}
+  .stat-fill { height: 100%;
+		background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s;}
   .stat-value { font-size: 0.75rem; font-weight: 600;
 	color: #374151; min-width: 60px; text-align: right;}
   .pattern-entities h4, .pattern-correlations h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem;
 	color: #374151;}
   .entities-list { display: flex; flex-wrap: wrap;
 	gap: 0.5rem;}
-  .entity-tag { padding: 0.25rem 0.5rem, background: #e5e7eb; border-radius: 0.25rem; font-size: 0.75rem;
+  .entity-tag { padding: 0.25rem 0.5rem;
+		background: #e5e7eb; border-radius: 0.25rem; font-size: 0.75rem;
 	color: #374151;
 	cursor: help;}
-  .entity-more { padding: 0.25rem 0.5rem, background: #f3f4f6; border-radius: 0.25rem; font-size: 0.75rem, color: #6b7280; font-style: italic;}
+  .entity-more { padding: 0.25rem 0.5rem;
+		background: #f3f4f6; border-radius: 0.25rem; font-size: 0.75rem;
+		color: #6b7280; font-style: italic;}
   .correlations-preview { font-size: 0.75rem;
 	color: #64748b;}
-  .card-actions { display: flex, gap: 0.5rem; justify-content: flex-end;}
+  .card-actions { display: flex;
+		gap: 0.5rem; justify-content: flex-end;}
   .loading-state, .empty-state { grid-column: 1 / -1; text-align: center;
 	padding: 3rem;
 	color: #64748b;}
-  .loading-spinner { width: 2rem, height: 2rem;
+  .loading-spinner { width: 2rem;
+		height: 2rem;
 	border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%;
 	animation: spin 1s linear infinite;margin: 0 auto 1rem;}
   .loading-detail { font-size: 0.875rem; margin-top: 0.5rem;}
@@ -269,33 +281,39 @@ or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const valu
   /* Dialog Styles */ .pattern-details-dialog { max-width: 900px; max-height: 90vh; overflow-y: auto;}
   .pattern-details-content { display: flex; flex-direction: column;
 	gap: 2rem;}
-  .pattern-overview { display: grid; grid-template-columns: 2fr 1fr, gap: 2rem;padding: 1.5rem;
+  .pattern-overview { display: grid; grid-template-columns: 2fr 1fr;
+		gap: 2rem;padding: 1.5rem;
 	background: #f8fafc; border-radius: 0.5rem;}
   .overview-metrics { display: grid; grid-template-columns: repeat(2, 1fr), gap: 1rem;}
   .overview-metric { display: flex; flex-direction: column;
 	gap: 0.25rem;}
-  .overview-label { font-size: 0.75rem, color: #64748b; text-transform: uppercase; font-weight: 500;}
+  .overview-label { font-size: 0.75rem;
+		color: #64748b; text-transform: uppercase; font-weight: 500;}
   .overview-value { font-size: 1rem; font-weight: 600;
 	color: #374151;}
   .timeframe-info h4 { margin: 0, 0 0.5rem 0, color: #374151;}
   .timeframe-info p { margin: 0.25rem 0; font-size: 0.875rem;
 	color: #64748b;}
   .entities-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 1rem;}
-  .entity-card { padding: 1rem, border: 1px solid #e5e7eb; border-radius: 0.375rem;
+  .entity-card { padding: 1rem;
+		border: 1px solid #e5e7eb; border-radius: 0.375rem;
 	background: #fafafa;}
   .entity-card h4 { margin: 0, 0 0.5rem 0, color: #374151;}
   .entity-type .entity-role { margin: 0.25rem 0; font-size: 0.75rem;
 	color: #6b7280;}
-  .involvement-meter { width: 100%, height: 0.5rem;
+  .involvement-meter { width: 100%;
+		height: 0.5rem;
 	background: #e5e7eb; border-radius: 0.25rem;
 	overflow: hidden;margin: 0.5rem, 0 0.25rem 0;}
-  .involvement-fill { height: 100%, background: #3b82f6;
+  .involvement-fill { height: 100%;
+		background: #3b82f6;
 	transition:width 0.3s;}
   .involvement-percentage { font-size: 0.75rem; font-weight: 600;
 	color: #374151;}
   .correlations-list { display: flex; flex-direction: column;
 	gap: 1rem;}
-  .correlation-item { padding: 1rem, border: 1px solid #e5e7eb; border-radius: 0.375rem;
+  .correlation-item { padding: 1rem;
+		border: 1px solid #e5e7eb; border-radius: 0.375rem;
 	background: #fafafa;}
   .correlation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;}
   .correlation-type { font-size: 0.75rem; font-weight: 600;
@@ -311,9 +329,11 @@ or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const valu
 	background: #f0f9ff; border-left: 4px solid #3b82f6; border-radius: 0.25rem; font-size: 0.875rem;
 	color: #374151;}
   .evidence-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 0.5rem;}
-  .evidence-item { padding: 0.5rem, background: #f3f4f6; border-radius: 0.25rem; font-size: 0.75rem;
+  .evidence-item { padding: 0.5rem;
+		background: #f3f4f6; border-radius: 0.25rem; font-size: 0.75rem;
 	color: #6b7280; font-family: monospace;}
-  .dialog-actions { display: flex, gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;}
+  .dialog-actions { display: flex;
+		gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;}
   @media (max-width: 768px) { .detection-header { flex-direction: column;
 	gap: 1rem;}
     .controls-grid { grid-template-columns: 1fr;}

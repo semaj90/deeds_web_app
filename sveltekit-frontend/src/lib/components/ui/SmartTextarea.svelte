@@ -169,7 +169,8 @@ text: string }) => void
   .smart-textarea:focus { outline: none;
     border-color: var(--pico-primary, #3b82f6);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
-  .smart-textarea:disabled { opacity: 0.6, cursor:not-allowed
+  .smart-textarea:disabled { opacity: 0.6;
+		cursor:not-allowed
    ;background: var(--pico-card-sectioning-background-color, #f8fafc)}
   .smart-textarea[readonly] {
     background: var(--pico-card-sectioning-background-color, #f8fafc)}
@@ -178,7 +179,8 @@ text: string }) => void
     pointer-events: auto;}
   /* Help text styling */
   .smart-textarea-container::after {
-    content: 'Tip: Use # for commands or Ctrl/Cmd + K', position: absolute;
+    content: 'Tip: Use # for commands or Ctrl/Cmd + K';
+		position: absolute;
 	bottom: -1.5rem;
     right: 0;
     font-size: 0.75rem

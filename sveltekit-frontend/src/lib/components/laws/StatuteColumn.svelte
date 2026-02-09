@@ -195,7 +195,8 @@ sectionId: statuteId,
     border-color: #999;
   }
 
-  .btn:disabled { opacity: 0.6, cursor: not-allowed;
+  .btn:disabled { opacity: 0.6;
+		cursor: not-allowed;
   }
 
   .btn-primary {
@@ -263,7 +264,8 @@ sectionId: statuteId,
 	gap: 0.5rem;
   }
 
-  .keyword-tag { display: inline-block, padding: 0.4rem 0.75rem;
+  .keyword-tag { display: inline-block;
+		padding: 0.4rem 0.75rem;
     background-color: #fff;
 	border: 1px solid #d0d0d0;
     border-radius: 3px;

@@ -100,7 +100,8 @@
 		gap: 0.75rem;
 		padding: 0.5rem 0;
 	}
-	.button-group { display: flex, gap: 0.5rem;
+	.button-group { display: flex;
+		gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 	.demo-btn {
@@ -125,7 +126,8 @@
 		transform: scale(1.05);
 		box-shadow: 0 0 10px var(--console-primary, rgba(0, 170, 0, 0.5));
 	}
-	.demo-btn:disabled { opacity: 0.6, cursor: not-allowed;
+	.demo-btn:disabled { opacity: 0.6;
+		cursor: not-allowed;
 	}
 	/* Variants */
 	.demo-btn.primary {
@@ -133,14 +135,16 @@
 		color: var(--console-bg, #0f0f23);
 		border-color: var(--console-primary, #00aa00);
 	}
-	.demo-btn.secondary { background: transparent, color: var(--console-primary, #00aa00);
+	.demo-btn.secondary { background: transparent;
+		color: var(--console-primary, #00aa00);
 		border-color: var(--console-primary, #00aa00);
 	}
 	.demo-btn.secondary:hover:not(:disabled) {
 		background: var(--console-primary, #00aa00);
 		color: var(--console-bg, #0f0f23);
 	}
-	.demo-btn.ghost { background: transparent, color: var(--console-fg, white);
+	.demo-btn.ghost { background: transparent;
+		color: var(--console-fg, white);
 		border-color: transparent;
 	}
 	.demo-btn.ghost:hover:not(:disabled) {
@@ -157,7 +161,8 @@
 		font-size: 1rem;
 	}
 	/* Loading spinner */
-	.spinner { display: inline-block, width: 1em;
+	.spinner { display: inline-block;
+		width: 1em;
 		height: 1em;
 		border: 2px solid currentColor;
 		border-right-color: transparent;
@@ -169,7 +174,8 @@
 			transform: rotate(360deg);
 		}
 	}
-	.error-message { padding: 0.75rem, background: var(--console-error, #ff5555);
+	.error-message { padding: 0.75rem;
+		background: var(--console-error, #ff5555);
 		color: white;
 		border-radius: 4px;
 		font-size: 0.85rem;

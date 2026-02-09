@@ -131,25 +131,31 @@
 
 <style>
 	.streaming-demo {
-		max-width: 800px, margin: 2rem auto;
-		padding: 2rem, background: white;
+		max-width: 800px;
+		margin: 2rem auto;
+		padding: 2rem;
+		background: white;
 		border-radius: 8px;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
 	h2 {
-		margin-top: 0, color: #1a1a1a;
+		margin-top: 0;
+		color: #1a1a1a;
 	}
 
 	.controls {
 		display: flex;
-		flex-direction: column, gap: 1rem;
+		flex-direction: column;
+		gap: 1rem;
 		margin-bottom: 2rem;
 	}
 
 	input[type='text'] {
-		width: 100%, padding: 0.75rem;
-		font-size: 1rem, border: 1px solid #ccc;
+		width: 100%;
+		padding: 0.75rem;
+		font-size: 1rem;
+		border: 1px solid #ccc;
 		border-radius: 4px;
 	}
 
@@ -158,25 +164,31 @@
 	}
 
 	.mode-selector {
-		display: flex, gap: 1.5rem;
+		display: flex;
+		gap: 1.5rem;
 	}
 
 	.mode-selector label {
 		display: flex;
-		align-items: center, gap: 0.5rem;
+		align-items: center;
+		gap: 0.5rem;
 		cursor: pointer;
 	}
 
 	.actions {
-		display: flex, gap: 1rem;
+		display: flex;
+		gap: 1rem;
 	}
 
 	button {
 		padding: 0.75rem 1.5rem;
 		font-size: 1rem;
-		font-weight: 500, color: white;
-		background: #0066cc, border: none;
-		border-radius: 4px, cursor: pointer;
+		font-weight: 500;
+		color: white;
+		background: #0066cc;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
 		transition: background 0.2s;
 	}
 
@@ -185,7 +197,8 @@
 	}
 
 	button:disabled {
-		background: #ccc, cursor: not-allowed;
+		background: #ccc;
+		cursor: not-allowed;
 	}
 
 	button.stop {
@@ -197,18 +210,21 @@
 	}
 
 	.response-container {
-		margin-top: 2rem, padding: 1.5rem;
+		margin-top: 2rem;
+		padding: 1.5rem;
 		background: #f9f9f9;
 		border-radius: 4px;
 	}
 
 	.response-text {
 		white-space: pre-wrap;
-		line-height: 1.6, color: #1a1a1a;
+		line-height: 1.6;
+		color: #1a1a1a;
 	}
 
 	.cursor {
-		display: inline-block, animation: blink 1s infinite;
+		display: inline-block;
+		animation: blink 1s infinite;
 		color: #0066cc;
 	}
 
@@ -224,26 +240,33 @@
 	}
 
 	.metadata {
-		margin-top: 1rem, padding: 0.5rem;
-		background: white, border: 1px solid #ddd;
+		margin-top: 1rem;
+		padding: 0.5rem;
+		background: white;
+		border: 1px solid #ddd;
 		border-radius: 4px;
 	}
 
 	.metadata summary {
 		cursor: pointer;
-		font-weight: 500, color: #0066cc;
+		font-weight: 500;
+		color: #0066cc;
 	}
 
 	.metadata pre {
 		margin-top: 0.5rem;
-		font-size: 0.875rem, color: #555;
+		font-size: 0.875rem;
+		color: #555;
 		overflow-x: auto;
 	}
 
 	.error {
-		margin-top: 1rem, padding: 1rem;
-		background: #fee, border: 1px solid #fcc;
-		border-radius: 4px, color: #c00;
+		margin-top: 1rem;
+		padding: 1rem;
+		background: #fee;
+		border: 1px solid #fcc;
+		border-radius: 4px;
+		color: #c00;
 	}
 
 	.error strong {

@@ -237,10 +237,12 @@
  background-color: #d4a574;
  }
 
- .refresh-btn:disabled { opacity: 0.6, cursor:not-allowed;
+ .refresh-btn:disabled { opacity: 0.6;
+		cursor:not-allowed;
  }
 
- .filters { display: flex, gap: 1rem;
+ .filters { display: flex;
+		gap: 1rem;
  flex-wrap: wrap;
 	padding: 1rem;
  background-color: #f0ebe0;
@@ -259,7 +261,8 @@
 	color: #666;
  }
 
- .filter-group select { padding: 0.5rem, border: 1px solid #d4a574;
+ .filter-group select { padding: 0.5rem;
+		border: 1px solid #d4a574;
  border-radius: 4px;
  font-size: 0.85rem;
  }
@@ -280,7 +283,8 @@
  color: #666;
  }
 
- .spinner { width: 40px, height: 40px;
+ .spinner { width: 40px;
+		height: 40px;
  border: 4px solid #e0e0e0;
  border-top-color: #8b4513;
  border-radius: 50%;
@@ -353,10 +357,12 @@
  font-weight: 600;
  }
 
- .card-actions { display: flex, gap: 0.25rem;
+ .card-actions { display: flex;
+		gap: 0.25rem;
  }
 
- .action-btn { background: none, border: none;
+ .action-btn { background: none;
+		border: none;
  font-size: 0.9rem;
 	cursor: pointer;
  padding: 0.25rem;
@@ -372,7 +378,8 @@
  background-color: #ff6b6b;
  }
 
- .card-content { padding: 1rem, display: flex;
+ .card-content { padding: 1rem;
+		display: flex;
  flex-direction: column;
 	gap: 0.75rem;
  }

@@ -93,19 +93,26 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if selectedFile.fileSize} <div><strong>File, Size:</strong> {(selectedFile.fileSize / 1024 / 1024).toFixed(2)} MB{/if} {#if selectedFile.createdAt} <div><strong>Created:</strong> {selectedFile.createdAt.toLocaleDateString()}{/if}
   </div> {/if} {#if children} <div class="additional-content"> {@render children()} {/if}
   </div>
- <style> .evidence-canvas-container { margin: 1rem, padding: 1rem;background: var(--yorha-bg-secondary);
+ <style> .evidence-canvas-container { margin: 1rem;
+		padding: 1rem;background: var(--yorha-bg-secondary);
 	border: 2px solid var(--yorha-text-muted)}
-  .canvas-wrapper { position: relative, display: inline-block;border: 2px solid var(--yorha-secondary), background: var(--yorha-bg-primary); margin-bottom: 1rem;}
-  .evidence-canvas { display: block, background: transparent; cursor: default; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
-  .controls-panel { display: flex, gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;}
+  .canvas-wrapper { position: relative;
+		display: inline-block;border: 2px solid var(--yorha-secondary);
+		background: var(--yorha-bg-primary); margin-bottom: 1rem;}
+  .evidence-canvas { display: block;
+		background: transparent; cursor: default; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
+  .controls-panel { display: flex;
+		gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;}
   .nes-field { margin: 0;}
   .nes-field label { font-family: 'Press Start 2P', monospace; font-size: 10px;
 	color: var(--yorha-text-accent); margin-right: 0.5rem;}
-  .file-details { padding: 1rem, background: var(--yorha-bg-tertiary);border: 2px solid var(--yorha-accent)}
+  .file-details { padding: 1rem;
+		background: var(--yorha-bg-tertiary);border: 2px solid var(--yorha-accent)}
   .file-details h4 { margin: 0, 0 1rem 0, color: var(--yorha-text-accent); font-family: 'Press Start 2P', monospace; font-size: 12px;}
   .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 0.5rem; font-family: 'Press Start 2P', monospace; font-size: 8px;
 	color: var(--yorha-text-primary)}
-  .details-grid div { padding: 0.25rem, background: var(--yorha-bg-primary);border: 1px solid var(--yorha-text-muted)}
+  .details-grid div { padding: 0.25rem;
+		background: var(--yorha-bg-primary);border: 1px solid var(--yorha-text-muted)}
   .additional-content { margin-top: 1rem;
 	padding: 1rem;background: var(--yorha-bg-tertiary);
 	border: 1px solid var(--yorha-text-muted)}

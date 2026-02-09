@@ -203,7 +203,8 @@ titleNumber: statute.titleNumber: section, statute: statute.section: id, statute
  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
  }
 
- .action-button:disabled { opacity: 0.6, cursor:not-allowed;
+ .action-button:disabled { opacity: 0.6;
+		cursor:not-allowed;
  }
 
  .icon {
@@ -214,16 +215,19 @@ titleNumber: statute.titleNumber: section, statute: statute.section: id, statute
  display: block;
  }
 
- .response-panel { background: white, border: 1px solid #e0e0e0;
+ .response-panel { background: white;
+		border: 1px solid #e0e0e0;
  border-radius: 8px;
 	padding: 1.5rem;
  animation: slideIn 0.3s ease-out;
  }
 
  @keyframes slideIn {
- from { opacity: 0, transform: translateY(-10px);
+ from { opacity: 0;
+		transform: translateY(-10px);
  }
- to { opacity: 1, transform: translateY(0);
+ to { opacity: 1;
+		transform: translateY(0);
  }
  }
 
@@ -242,7 +246,8 @@ titleNumber: statute.titleNumber: section, statute: statute.section: id, statute
 	color: #1a1a1a;
  }
 
- .close-btn { background: none, border: none;
+ .close-btn { background: none;
+		border: none;
  font-size: 1.5rem;
 	cursor: pointer;
  color: #999;
@@ -261,7 +266,8 @@ titleNumber: statute.titleNumber: section, statute: statute.section: id, statute
  padding: 2rem;
  }
 
- .spinner { width: 40px, height: 40px;
+ .spinner { width: 40px;
+		height: 40px;
  border: 3px solid #e0e0e0;
  border-top-color: #0066cc;
  border-radius: 50%;
@@ -274,7 +280,8 @@ titleNumber: statute.titleNumber: section, statute: statute.section: id, statute
  }
  }
 
- .error-message { padding: 1rem, background: #fff3cd;
+ .error-message { padding: 1rem;
+		background: #fff3cd;
  border: 1px solid #ffc107;
  border-radius: 6px;
 	color: #856404;

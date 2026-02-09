@@ -125,7 +125,8 @@
 		box-shadow: 0 0 0 3px rgba(153, 221, 255, 0.2);
 	}
 
-	.jurisdiction-select:disabled { opacity: 0.6, cursor:not-allowed;
+	.jurisdiction-select:disabled { opacity: 0.6;
+		cursor:not-allowed;
 		background-color: #0d0d0f;
 	}
 
@@ -146,7 +147,8 @@
 	}
 
 	/* Option styling */
-	option { background: #111, color: #ddd;
+	option { background: #111;
+		color: #ddd;
 	padding: 0.5rem;
 	}; option:checked { background: #9df; color: #000;
 	}

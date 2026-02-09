@@ -67,10 +67,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .last-update { font-size: 0.75rem;
 	color: var(--text-secondary, #6c757d)}
   .refresh-button { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.5rem 1rem, background: var(--accent-primary, #0d6efd); color: white, border: none; border-radius: 6px, cursor: pointer; font-size: 0.875rem; font-weight: 500;
+	gap: 0.5rem;padding: 0.5rem 1rem;
+		background: var(--accent-primary, #0d6efd); color: white;
+		border: none; border-radius: 6px;
+		cursor: pointer; font-size: 0.875rem; font-weight: 500;
 	transition: background-color 0.2s;}
   .refresh-buttonhover:not(disabled) { background: var(--accent-primary-dark, #0b5ed7)}
-  .refresh-buttondisabled { opacity: 0.6, cursor:not-allowed;}
+  .refresh-buttondisabled { opacity: 0.6;
+		cursor:not-allowed;}
   .refresh-button.spinning:global(svg) { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
   .overall-status { display: flex; align-items: center;
@@ -88,7 +92,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: var(--text-primary, #212529); font-size: 0.875rem;}
   .service-desc { font-size: 0.75rem;
 	color: var(--text-secondary, #6c757d); margin-top: 0.125rem;}
-  .fallback-badge { padding: 0.25rem 0.5rem, background: rgba(255, 193, 7, 0.2); color: #856404; border-radius: 4px; font-size: 0.75rem; font-weight: 500;}
+  .fallback-badge { padding: 0.25rem 0.5rem;
+		background: rgba(255, 193, 7, 0.2); color: #856404; border-radius: 4px; font-size: 0.75rem; font-weight: 500;}
   .offline-queue { display: flex; align-items: center;
 	gap: 0.5rem;padding: 0.75rem;
 	background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; border-radius: 4px; margin-top: 1rem; font-size: 0.875rem;}

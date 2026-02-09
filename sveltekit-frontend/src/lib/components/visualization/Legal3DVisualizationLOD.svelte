@@ -138,7 +138,8 @@
 </div>
 
 <style>
-  .nes-container { background: white, position: relative;
+  .nes-container { background: white;
+		position: relative;
   }
   .canvas-container {
     border: 4px solid #000;

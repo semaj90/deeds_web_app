@@ -437,7 +437,8 @@ verification_status: verificationStatus, verification_message: verificationMessa
 </div>
 
 <style>
-	.error-brain-modal { position: fixed, top: 0;
+	.error-brain-modal { position: fixed;
+		top: 0;
 		left: 0;
 	right: 0;
 		bottom: 0;
@@ -447,14 +448,16 @@ verification_status: verificationStatus, verification_message: verificationMessa
 		justify-content: center;
 	}
 
-	.modal-backdrop { position: absolute, top: 0;
+	.modal-backdrop { position: absolute;
+		top: 0;
 		left: 0;
 	right: 0;
 		bottom: 0;
 	background: rgba(0, 0, 0, 0.8);
 	}
 
-	.modal-content { position: relative, width: 95vw;
+	.modal-content { position: relative;
+		width: 95vw;
 		max-width: 1400px;
 		max-height: 90vh;
 	background: #212529;
@@ -473,7 +476,8 @@ verification_status: verificationStatus, verification_message: verificationMessa
 		padding-bottom: 0.5rem;
 	}
 
-	.close-btn { width: 48px, height: 48px;
+	.close-btn { width: 48px;
+		height: 48px;
 		padding: 0;
 		font-size: 2rem;
 		line-height: 1;
@@ -492,7 +496,8 @@ verification_status: verificationStatus, verification_message: verificationMessa
 		border-radius: 4px;
 	}
 
-	.phase-indicator { display: flex, gap: 0.5rem;
+	.phase-indicator { display: flex;
+		gap: 0.5rem;
 		margin-bottom: 1rem;
 	padding: 0.5rem;
 		background: rgba(0, 0, 0, 0.3);
@@ -514,7 +519,8 @@ verification_status: verificationStatus, verification_message: verificationMessa
 	color: #00c853;
 	}
 
-	.modal-body { flex: 1, display: grid;
+	.modal-body { flex: 1;
+		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
 	overflow: hidden;
@@ -577,7 +583,8 @@ verification_status: verificationStatus, verification_message: verificationMessa
 		font-size: 0.9rem;
 	}
 
-	.patches-preview { display: flex, gap: 0.25rem;
+	.patches-preview { display: flex;
+		gap: 0.25rem;
 		margin-top: 0.5rem;
 	}
 
@@ -717,7 +724,8 @@ verification_status: verificationStatus, verification_message: verificationMessa
 		margin-top: 0.5rem;
 	}
 
-	.action-buttons { display: flex, gap: 0.5rem;
+	.action-buttons { display: flex;
+		gap: 0.5rem;
 		margin: 1rem 0;
 		flex-wrap: wrap;
 	}

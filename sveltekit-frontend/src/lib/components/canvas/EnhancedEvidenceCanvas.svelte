@@ -136,7 +136,8 @@ multiplier: 2 });
   {#if fabricLoaded && evidenceItems.length === 0} <div> <Image /> <p>Evidence Board</p>
  <p>Add evidence items to start building your case visualization</p> {/if}
   </div>
- <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%, height: auto;display: block;}
+ <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%;
+		height: auto;display: block;}
 </style>
 
 

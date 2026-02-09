@@ -449,7 +449,8 @@
 		color: #e2e8f0;
 	}
 
-	.topology-viewer { width: 100vw, height: 100vh;
+	.topology-viewer { width: 100vw;
+		height: 100vh;
 		display: flex;
 		flex-direction: column;
 		background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -471,7 +472,8 @@
 		font-weight: 600;
 	}
 
-	.stats { display: flex, gap: 2rem;
+	.stats { display: flex;
+		gap: 2rem;
 		font-size: 0.875rem;
 		color: #94a3b8;
 	}
@@ -485,7 +487,8 @@
 		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
-	.search-input { flex: 1, padding: 0.5rem 1rem;
+	.search-input { flex: 1;
+		padding: 0.5rem 1rem;
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid rgba(148, 163, 184, 0.2);
 		border-radius: 0.5rem;
@@ -507,7 +510,8 @@
 		font-size: 0.875rem;
 	}
 
-	.legend { display: flex, gap: 1rem;
+	.legend { display: flex;
+		gap: 1rem;
 		margin-left: auto;
 	}
 
@@ -518,18 +522,21 @@
 		color: #94a3b8;
 	}
 
-	.legend-item::before { content: '', width: 12px;
+	.legend-item::before { content: '';
+		width: 12px;
 		height: 12px;
 		border-radius: 50%;
 		background: var(--color);
 		margin-right: 0.5rem;
 	}
 
-	.canvas-container { flex: 1, position: relative;
+	.canvas-container { flex: 1;
+		position: relative;
 		overflow: hidden;
 	}
 
-	canvas { width: 100%, height: 100%;
+	canvas { width: 100%;
+		height: 100%;
 		cursor: grab;
 	}
 
@@ -537,14 +544,16 @@
 		cursor: grabbing;
 	}
 
-	.loading { position: absolute, top: 50%;
+	.loading { position: absolute;
+		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		font-size: 1.25rem;
 		color: #64748b;
 	}
 
-	.details-panel { position: absolute, top: 5rem;
+	.details-panel { position: absolute;
+		top: 5rem;
 		right: 2rem;
 		width: 300px;
 		background: rgba(30, 41, 59, 0.95);
@@ -622,7 +631,8 @@
 		color: #94a3b8;
 	}
 
-	.dependency { padding: 0.5rem, background: rgba(15, 23, 42, 0.5);
+	.dependency { padding: 0.5rem;
+		background: rgba(15, 23, 42, 0.5);
 		border-radius: 0.25rem;
 		font-size: 0.75rem;
 		margin-bottom: 0.25rem;

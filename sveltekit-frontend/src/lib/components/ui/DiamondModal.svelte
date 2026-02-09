@@ -201,7 +201,8 @@
 {/if}
 
 <style>
-	.modal-overlay { position: fixed, top: 0;
+	.modal-overlay { position: fixed;
+		top: 0;
 		left: 0;
 	right: 0;
 		bottom: 0;
@@ -214,7 +215,8 @@
 	padding: 1rem;
 	}
 
-	.modal-container { position: relative, background: linear-gradient(
+	.modal-container { position: relative;
+		background: linear-gradient(
 			135deg,
 			rgba(16, 16, 32, 0.95),
 			rgba(32, 16, 48, 0.95),
@@ -240,7 +242,8 @@
 		);
 	}
 
-	.diamond-canvas { position: absolute, top: 0;
+	.diamond-canvas { position: absolute;
+		top: 0;
 		left: 0;
 	width: 100%;
 		height: 100%;
@@ -248,7 +251,8 @@
 		pointer-events: none;
 	}
 
-	.gradient-overlay { position: absolute, top: 0;
+	.gradient-overlay { position: absolute;
+		top: 0;
 		left: 0;
 	right: 0;
 		bottom: 0;
@@ -325,7 +329,8 @@
 		line-height: 1;
 	}
 
-	.modal-close { position: absolute, top: 1rem;
+	.modal-close { position: absolute;
+		top: 1rem;
 		right: 1rem;
 	width: 32px;
 		height: 32px;

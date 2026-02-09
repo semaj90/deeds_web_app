@@ -242,7 +242,8 @@
 
   input,
   select,
-  textarea { padding: 0.75rem, background: #1a1a2e;
+  textarea { padding: 0.75rem;
+		background: #1a1a2e;
     border: 1px solid #333;
     border-radius: 0.375rem;
 	color: #ffffff;
@@ -251,7 +252,8 @@
 	transition:border-color 0.2s;
   }
 
-  input:focus, select:focus; textarea:focus {
+  input: focus;
+		select:focus; textarea:focus {
     outline: none;
     border-color: #dc2626;
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
@@ -291,6 +293,7 @@
     background: #b91c1c;
   }
 
-  .btn-primary:disabled { opacity: 0.5, cursor: not-allowed;
+  .btn-primary:disabled { opacity: 0.5;
+		cursor: not-allowed;
   }
 </style>

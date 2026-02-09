@@ -126,10 +126,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span class="sr-only">Connection status:</span>
  <span>{isConnected ? 'Connected': 'Disconnected'}</span> </div> </div> </footer> {/if}
   </aside> {/if}
-  <style> @keyframes float { 0%; } 100% { transform: translateY(0) rotate(0deg), opacity: 0;}
+  <style> @keyframes float { 0%; } 100% { transform: translateY(0) rotate(0deg);
+		opacity: 0;}
 		10% { opacity: 1;}
 		90% { opacity: 1;}
-		100% { transform: translateY(-100%) rotate(360deg), opacity: 0;}
+		100% { transform: translateY(-100%) rotate(360deg);
+		opacity: 0;}
 	} @keyframes scan { 0% { transform: translateX(-100%)}
 		100% { transform: translateX(100%)}
 	} .animate-float { animation: float linear infinite;}

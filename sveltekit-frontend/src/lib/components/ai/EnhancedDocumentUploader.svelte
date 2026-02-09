@@ -156,7 +156,8 @@ documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extrac
  <svelte, component | this={ ButtonComponent } class="bits-btn" onclick={ saveMetadataFromDialog }> Save </svelte:component> </div> {/if}
   </Dialog.Content> </Dialog> </div>
  <style> .enhanced-document-uploader { width: 100%}
-  .drop-zone { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem; text-align: center;
+  .drop-zone { border: 2px dashed #d1d5db; border-radius: 0.5rem;
+		padding: 2rem; text-align: center;
 	cursor: pointer;transition:border-color 0.2s, background 0.2s, background: #f9fafb;}
   .drop-zone.dragging { border-color: #2563eb;
 	background: rgba(37, 99, 235, 0.05)}
@@ -178,7 +179,8 @@ documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extrac
 	height: 3rem; border-radius: 0.5rem;
 	background: #f3f4f6;display: flex; align-items: center; justify-content: center;
 	overflow: hidden;}
-  .preview-image { width: 100%, height: 100%; object-fit: cover;}
+  .preview-image { width: 100%;
+		height: 100%; object-fit: cover;}
   .file-details { flex: 1, 1 0%; min-width: 0;}
   .file-name { font-weight: 500; white-space: nowrap;
 	overflow: hidden; text-overflow: ellipsis;}
@@ -190,7 +192,8 @@ documentId: uploadResult.documentId, extractEntities: uploadFile.metadata.extrac
 	display: flex; align-items: center; margin-top: 0.5rem;}
   .file-actions { display: flex; flex-direction: column; align-items: flex-end;
 	gap: 0.5rem;}
-  .action-buttons { display: flex, gap: 0.5rem;}
+  .action-buttons { display: flex;
+		gap: 0.5rem;}
   .upload-actions { display: flex; align-items: center; justify-content: center;}
   .metadata-form { padding: 0.25rem;}
   .checkbox-group { margin-top: 0.5rem; margin-bottom: 0.5rem;

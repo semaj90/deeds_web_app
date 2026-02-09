@@ -208,7 +208,8 @@ nodeId: string }) => void;
  animation: pulse 2s infinite;
  }
 
- .evidence-node.dragging { opacity: 0.8, transform: rotate(2deg);
+ .evidence-node.dragging { opacity: 0.8;
+		transform: rotate(2deg);
  z-index: 100;
  }
 

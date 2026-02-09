@@ -334,18 +334,21 @@
 </div>
 
 <style>
-	.route-graph { position: relative, width: 100%;
+	.route-graph { position: relative;
+		width: 100%;
 		height: 100%;
 	background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px;
 	overflow: hidden;}
 
-	.graph-svg { display: block, width: 100%;
+	.graph-svg { display: block;
+		width: 100%;
 		height: 100%;
 	}
 
 	.loading-overlay,
-	.empty-state { position: absolute, inset: 0;
+	.empty-state { position: absolute;
+		inset: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -354,7 +357,8 @@
 		color: rgba(255, 255, 255, 0.6);
 	}
 
-	.spinner { width: 40px, height: 40px;
+	.spinner { width: 40px;
+		height: 40px;
 		border: 3px solid rgba(255, 255, 255, 0.1);
 		border-top-color: #00d4ff;
 		border-radius: 50%;
@@ -364,7 +368,8 @@
 		to { transform: rotate(360deg); }
 	}
 
-	.empty-icon { width: 48px, height: 48px;
+	.empty-icon { width: 48px;
+		height: 48px;
 		color: rgba(255, 255, 255, 0.3);
 	}
 
@@ -373,14 +378,16 @@
 	color: rgba(255, 255, 255, 0.4);
 	}
 
-	.zoom-controls { position: absolute, top: 1rem;
+	.zoom-controls { position: absolute;
+		top: 1rem;
 		right: 1rem;
 	display: flex;
 		flex-direction: column;
 	gap: 0.25rem;
 		z-index: 10;}
 
-	.zoom-controls button { width: 32px, height: 32px;
+	.zoom-controls button { width: 32px;
+		height: 32px;
 		background: rgba(0, 0, 0, 0.6);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 6px;
@@ -397,7 +404,8 @@
 		border-color: rgba(0, 212, 255, 0.5);
 	}
 
-	.legend { position: absolute, bottom: 1rem;
+	.legend { position: absolute;
+		bottom: 1rem;
 		left: 1rem;
 	background: rgba(0, 0, 0, 0.7);
 		border: 1px solid rgba(255, 255, 255, 0.1);
@@ -419,7 +427,8 @@
 	gap: 0.5rem;
 		margin-bottom: 0.25rem;}
 
-	.legend-dot { width: 10px, height: 10px;
+	.legend-dot { width: 10px;
+		height: 10px;
 		border-radius: 50%;
 	}
 
@@ -428,7 +437,8 @@
 	color: rgba(255, 255, 255, 0.6);
 		text-transform: capitalize;}
 
-	.zoom-indicator { position: absolute, bottom: 1rem;
+	.zoom-indicator { position: absolute;
+		bottom: 1rem;
 		right: 1rem;
 	background: rgba(0, 0, 0, 0.6);
 		border: 1px solid rgba(255, 255, 255, 0.1);
@@ -438,7 +448,8 @@
 	color: rgba(255, 255, 255, 0.6);
 		font-family: 'JetBrains Mono', monospace;}
 
-	:global(.route-graph .node:hover, circle:first-child) {
+	: global(.route-graph .node:hover;
+		circle:first-child) {
 		filter: brightness(1.2);
 	}
 </style>

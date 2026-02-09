@@ -353,7 +353,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: #000;}
   .export-menu {
     position: absolute;
-	top: 100%, right: 0
+	top: 100%;
+		right: 0
    ; background: var(--enhanced-bits-background);
 	border: 2px solid var(--enhanced-bits-border);
     border-radius: 4px;
@@ -364,7 +365,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .export-dropdown:hover .export-menu { display: block;}
   .export-menu button {
     display: block;
-	width: 100%, padding: 0.5rem 1rem;
+	width: 100%;
+		padding: 0.5rem 1rem;
     background: transparent;
 	border: none
    ;color: var(--enhanced-bits-foreground); font-family: inherit;
@@ -383,7 +385,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .clause-stats { display: flex;
 	gap: 1rem; font-size: 0.875rem;
 	color: var(--enhanced-bits-muted-foreground)}
-  .stat-item { padding: 0.25rem 0.5rem, background: rgba(255, 255, 255, 0.05); border-radius: 4px;}
+  .stat-item { padding: 0.25rem 0.5rem;
+		background: rgba(255, 255, 255, 0.05); border-radius: 4px;}
 
   .risk-overview {
     margin-bottom: 2rem;

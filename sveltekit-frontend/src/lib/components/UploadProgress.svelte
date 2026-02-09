@@ -65,7 +65,8 @@
 </div>
 
 <style>
-	.progress-container { padding: 1.5rem, background: white;
+	.progress-container { padding: 1.5rem;
+		background: white;
 		border: 1px solid #e0ddd8;
 		border-radius: 4px;
 	display: flex;
@@ -108,13 +109,15 @@
 	color: #2d2d2d;
 	}
 
-	.progress-bar-container { width: 100%, height: 8px;
+	.progress-bar-container { width: 100%;
+		height: 8px;
 		background: #e0ddd8;
 		border-radius: 4px;
 	overflow: hidden;
 	}
 
-	.progress-bar { height: 100%, transition:width 0.3s ease;
+	.progress-bar { height: 100%;
+		transition:width 0.3s ease;
 		border-radius: 4px;
 	}
 
@@ -146,7 +149,8 @@
 		font-weight: 600;
 	}
 
-	.progress-info { padding: 1rem, background: #f0f5f0;
+	.progress-info { padding: 1rem;
+		background: #f0f5f0;
 		border-left: 3px solid #6b8e6b;
 		border-radius: 4px;
 	}
@@ -158,7 +162,8 @@
 	}
 
 	@media (max-width: 768px) {
-		.progress-container { padding: 1rem, gap: 0.75rem;
+		.progress-container { padding: 1rem;
+		gap: 0.75rem;
 		}
 
 		.progress-details {

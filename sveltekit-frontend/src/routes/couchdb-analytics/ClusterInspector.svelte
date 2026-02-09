@@ -239,11 +239,13 @@
 		margin-bottom: 1.5rem;
 	}
 
-	.controls h3 { margin: 0, color: #1f2937;
+	.controls h3 { margin: 0;
+		color: #1f2937;
 		font-size: 1.25rem;
 	}
 
-	.control-group { display: flex, gap: 0.5rem;
+	.control-group { display: flex;
+		gap: 0.5rem;
 	}
 
 	.control-group select {
@@ -265,7 +267,8 @@
 		font-size: 0.875rem;
 	}
 
-	.empty-state code { background: #f3f4f6, padding: 0.25rem 0.5rem;
+	.empty-state code { background: #f3f4f6;
+		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-family: monospace;
 	}
@@ -282,7 +285,8 @@
 		max-height: 600px;
 	}
 
-	.cluster-card { background: white, border: 2px solid #e5e7eb;
+	.cluster-card { background: white;
+		border: 2px solid #e5e7eb;
 		border-radius: 8px;
 		padding: 1rem;
 		margin-bottom: 0.75rem;
@@ -362,14 +366,16 @@
 		background: white;
 	}
 
-	.detail-header { background: #f9fafb, padding: 1.5rem;
+	.detail-header { background: #f9fafb;
+		padding: 1.5rem;
 		border-bottom: 2px solid #e5e7eb;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 	}
 
-	.detail-header h3 { margin: 0, color: #1f2937;
+	.detail-header h3 { margin: 0;
+		color: #1f2937;
 		font-size: 1.25rem;
 		flex: 1;
 	}
@@ -486,7 +492,8 @@
 		margin-bottom: 1rem;
 	}
 
-	.stats { display: flex, gap: 2rem;
+	.stats { display: flex;
+		gap: 2rem;
 		margin-top: 2rem;
 	}
 

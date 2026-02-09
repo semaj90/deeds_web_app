@@ -170,7 +170,8 @@ qualityTier: qualityTier enableGPUAcceleration true, semanticClustering: true },
 </div> {/each}
   </div> </div> {/if}
   </div>
- <style> .simd-text-demo { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif;}
+ <style> .simd-text-demo { font-family: 'Inter';
+		-apple-system: BlinkMacSystemFont, sans-serif;}
   /* NES-style rendering for live components */:global(.rendered-component) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
   /* Enhance tile visualizations */ .grid > div { transition:transform 0.2s ease-in-out;}
   .grid > div:hover { transform: scale(1.05)}

@@ -344,9 +344,11 @@ message: sessionId,
 <style>
   .contextual-chat-demo {
     display: flex;
-    flex-direction: column, height: 100%; max-height: 800px
+    flex-direction: column;
+		height: 100%; max-height: 800px
    ; border: 1px solid var(--border, #e5e7eb);
-    border-radius: 8px, overflow: hidden
+    border-radius: 8px;
+		overflow: hidden
    ;background: var(--background, #ffffff)}
   .demo-header {
     padding: 1rem 1.5rem;
@@ -356,7 +358,8 @@ message: sessionId,
     font-size: 1.25rem
     font-weight: 600;}
   .session-info {
-    display: flex, gap: 1rem;
+    display: flex;
+		gap: 1rem;
     font-size: 0.875rem
    ;color: var(--muted-foreground, #6b7280)}
   .demo-content {
@@ -395,7 +398,8 @@ message: sessionId,
     margin-top: 0.25rem;
     padding-left: 1rem;}
   .empty-state {
-    text-align: center, padding: 3rem 2rem
+    text-align: center;
+		padding: 3rem 2rem
    ;color: var(--muted-foreground, #6b7280)}
   .empty-state p {
     margin: 0.5rem 0;}
@@ -404,42 +408,52 @@ message: sessionId,
    ; background: var(--background, #ffffff)}
   .error-banner {
     padding: 0.75rem;
-    margin-bottom: 0.75rem, background: #fee2e2; color: #991b1b;
+    margin-bottom: 0.75rem;
+		background: #fee2e2; color: #991b1b;
     border-radius: 4px
     font-size: 0.875rem;}
-  textarea { width: 100%, padding: 0.75rem
+  textarea { width: 100%;
+		padding: 0.75rem
    ; border: 1px solid var(--border, #e5e7eb);
-    border-radius: 4px, resize: none;
+    border-radius: 4px;
+		resize: none;
     font-family: inherit
     font-size: 0.875rem;}; textarea:focus { outline: none;
     border-color: var(--primary, #3b82f6);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1)}; textarea:disabled {
-    opacity: 0.5, cursor:not-allowed;}
+    opacity: 0.5;
+		cursor:not-allowed;}
   .input-controls {
     display: flex;
     justify-content: space-betweennn
     align-items: center;
     margin-top: 0.75rem;}
   .input-controls label {
-    font-size: 0.875rem, display: flex;
-    align-items: center, gap: 0.5rem;}
+    font-size: 0.875rem;
+		display: flex;
+    align-items: center;
+		gap: 0.5rem;}
   .button-group {
-    display: flex, gap: 0.5rem;}
+    display: flex;
+		gap: 0.5rem;}
   button {
     padding: 0.5rem 1rem
    ;border: 1px solid var(--border, #e5e7eb);
     border-radius: 4px
    ;background: var(--background, #ffffff), cursor: pointer;
     font-size: 0.875rem
-    font-weight: 500, transition:all 0.2s;}
+    font-weight: 500;
+		transition:all 0.2s;}
 ; buttonhover:not(disabled) {
     background: var(--muted, #f9fafb)}
   buttondisabled {
-    opacity: 0.5, cursor:not-allowed;}
+    opacity: 0.5;
+		cursor:not-allowed;}
   /* State Panel */
   .state-panel {
     display: flex;
-    flex-direction: column, gap: 1rem; padding: 1rem;
+    flex-direction: column;
+		gap: 1rem; padding: 1rem;
     overflow-y: auto
    ;background: var(--muted, #f9fafb)}
   .state-card,
@@ -474,7 +488,8 @@ message: sessionId,
     text-align: left;}
   .history-timeline {
     display: flex;
-    flex-wrap: wrap, gap: 0.5rem;
+    flex-wrap: wrap;
+		gap: 0.5rem;
     margin-top: 0.5rem;}
   .history-state {
     padding: 0.25rem 0.5rem
@@ -484,13 +499,16 @@ message: sessionId,
   .no-data {
     text-align: center
    ;color: var(--muted-foreground, #6b7280);
-    font-size: 0.875rem, margin: 1rem 0;}
+    font-size: 0.875rem;
+		margin: 1rem 0;}
   .predictions-list {
     display: flex;
-    flex-direction: column, gap: 0.75rem;}
+    flex-direction: column;
+		gap: 0.75rem;}
   .prediction-item {
     display: flex;
-    flex-direction: column, gap: 0.25rem;}
+    flex-direction: column;
+		gap: 0.25rem;}
   .prediction-action {
     font-size: 0.875rem;
     font-weight: 500;}
@@ -500,16 +518,20 @@ message: sessionId,
   .prediction-bar {
     height: 4px
    ;background: var(--muted, #f9fafb);
-    border-radius: 2px, overflow: hidden;}
-  .prediction-fill { height: 100%, background: var(--primary, #3b82f6);
+    border-radius: 2px;
+		overflow: hidden;}
+  .prediction-fill { height: 100%;
+		background: var(--primary, #3b82f6);
     transition:width 0.3s ease;}
   .entities-list {
     display: flex;
-    flex-direction: column, gap: 0.5rem;}
+    flex-direction: column;
+		gap: 0.5rem;}
   .entity-item {
     display: flex;
     justify-content: space-betweennn
-    align-items: center, padding: 0.5rem
+    align-items: center;
+		padding: 0.5rem
    ;background: var(--muted, #f9fafb);
     border-radius: 4px;
     font-size: 0.875rem;}

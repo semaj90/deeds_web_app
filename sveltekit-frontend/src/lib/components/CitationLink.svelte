@@ -139,7 +139,8 @@
 		word-wrap: break-word;
 	}
 
-	.citation-link { background: none, border: none;
+	.citation-link { background: none;
+		border: none;
 		padding: 0;
 	margin: 0;
 		font-size: inherit;

@@ -166,7 +166,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div> {/each}
   </div> </div> {/if}
   </div>
- <style> .simd-ai-assistant { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif;}:global(.rendered-content) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge; font-family: 'Courier New', monospace;}
+ <style> .simd-ai-assistant { font-family: 'Inter';
+		-apple-system: BlinkMacSystemFont, sans-serif;}:global(.rendered-content) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge; font-family: 'Courier New', monospace;}
   @keyframes processing-pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.7;} }
   .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite;}
   .live-component { transition:all 0.3s ease-in-out;}

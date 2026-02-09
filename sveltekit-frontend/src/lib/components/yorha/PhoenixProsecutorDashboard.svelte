@@ -472,13 +472,15 @@
 
 
 <style>
-  .risk-wrapper { display: flex, gap: 1.25rem;
+  .risk-wrapper { display: flex;
+		gap: 1.25rem;
     padding: 1.5rem;
 	background: rgba(2, 6, 23, 0.7);
     border-bottom: 1px solid rgba(15, 118, 110, 0.2);
   }
 
-  .risk-meter { flex: 1, background: rgba(12, 17, 32, 0.9);
+  .risk-meter { flex: 1;
+		background: rgba(12, 17, 32, 0.9);
     border-radius: 1rem;
 	padding: 1.25rem;
     border: 1px solid rgba(148, 163, 184, 0.25);
@@ -543,14 +545,16 @@
     color: #cbd5f5;
   }
 
-  .risk-bar { width: 100%, height: 10px;
+  .risk-bar { width: 100%;
+		height: 10px;
     background: rgba(15, 23, 42, 0.8);
     border-radius: 999px;
 	overflow: hidden;
     margin-bottom: 0.75rem;
   }
 
-  .risk-bar-fill { height: 100%, transition:width 0.4s ease;
+  .risk-bar-fill { height: 100%;
+		transition:width 0.4s ease;
   }
 
   .risk-bar-fill.critical {
@@ -575,7 +579,8 @@
     color: #c7d2fe;
   }
 
-  .risk-insights-panel { width: 320px, background: rgba(12, 17, 32, 0.9);
+  .risk-insights-panel { width: 320px;
+		background: rgba(12, 17, 32, 0.9);
     border-radius: 1rem;
 	padding: 1.25rem;
     border: 1px solid rgba(148, 163, 184, 0.25);
@@ -601,7 +606,8 @@
 	gap: 0.75rem;
   }
 
-  .risk-insights-panel li { display: flex, gap: 0.5rem;
+  .risk-insights-panel li { display: flex;
+		gap: 0.5rem;
     font-size: 0.85rem;
 	color: #e2e8f0;
   }
@@ -613,7 +619,8 @@
     align-items: center;
   }
 
-  .risk-insights-panel small { display: block, color: #94a3b8;
+  .risk-insights-panel small { display: block;
+		color: #94a3b8;
   }
 
   .animate-pulse {

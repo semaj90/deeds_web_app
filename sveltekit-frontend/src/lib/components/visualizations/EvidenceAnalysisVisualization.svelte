@@ -387,7 +387,8 @@ labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.s
 </div>
 
 <style>
-  .evidence-analysis-visualization { padding: 1.5rem, background: #ffffff;
+  .evidence-analysis-visualization { padding: 1.5rem;
+		background: #ffffff;
     border-radius: 0.5rem;
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
   }
@@ -398,7 +399,8 @@ labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.s
     border-bottom: 1px solid #e5e7eb;
     padding-bottom: 1rem;
   }
-  .metadata { display: flex, gap: 0.75rem;
+  .metadata { display: flex;
+		gap: 0.75rem;
     align-items: center;
   }
   .badge {
@@ -414,7 +416,8 @@ labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.s
 	color: #1f2937;
     margin-bottom: 0.75rem;
   }
-  .summary-section { background: #f9fafb, padding: 1rem;
+  .summary-section { background: #f9fafb;
+		padding: 1rem;
     border-radius: 0.5rem;
   }
   .summary-text {
@@ -426,7 +429,8 @@ labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.s
     grid-template-columns: 1fr;
 	gap: 1.5rem;
   }
-  .chart-container { background: #f9fafb, padding: 1rem;
+  .chart-container { background: #f9fafb;
+		padding: 1rem;
     border-radius: 0.5rem;
 	position: relative;
     min-height: 250px;
@@ -437,7 +441,8 @@ labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.s
 	color: #374151;
     margin-bottom: 0.5rem;
   }
-  .risk-value { position: absolute, top: 50%;
+  .risk-value { position: absolute;
+		top: 50%;
     left: 50%;
 	transform: translate(-50%, -50%);
     text-align: center;
@@ -505,21 +510,25 @@ labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.s
 	color: #374151;
     margin-bottom: 0.5rem;
   }
-  .finding-relevance { height: 0.5rem, background: #e5e7eb;
+  .finding-relevance { height: 0.5rem;
+		background: #e5e7eb;
     border-radius: 9999px;
 	overflow: hidden;
   }
-  .relevance-bar { height: 100%, background: #6366f1;
+  .relevance-bar { height: 100%;
+		background: #6366f1;
     transition:all 0.3s;
   }
 
   .charts-grid { display: grid; grid-template-columns: 1fr;
 	gap: 1.5rem; }
-  .chart-container { background: #f9fafb, padding: 1rem; border-radius: 0.5rem;
+  .chart-container { background: #f9fafb;
+		padding: 1rem; border-radius: 0.5rem;
 	position: relative; min-height: 250px; }
   .chart-title { font-size: 0.875rem; font-weight: 500;
 	color: #374151; margin-bottom: 0.5rem; }
-  .risk-value { position: absolute, top: 50%; left: 50%;
+  .risk-value { position: absolute;
+		top: 50%; left: 50%;
 	transform: translate(-50%, -50%); text-align: center; }
   .risk-score { font-size: 1.75rem; font-weight: 700;
 	display: block; }
@@ -542,32 +551,41 @@ labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.s
 	color: #6b7280; }
   .finding-description { font-size: 0.875rem;
 	color: #374151; margin-bottom: 0.5rem; }
-  .finding-relevance { height: 0.5rem, background: #e5e7eb; border-radius: 9999px;
+  .finding-relevance { height: 0.5rem;
+		background: #e5e7eb; border-radius: 9999px;
 	overflow: hidden; }
-  .relevance-bar { height: 100%, background: #6366f1; transition:all 0.3s; }
+  .relevance-bar { height: 100%;
+		background: #6366f1; transition:all 0.3s; }
   .correlations-list { margin-top: 0.5rem; }
-  .correlation-item { display: flex, gap: 0.75rem; padding: 0.75rem;
+  .correlation-item { display: flex;
+		gap: 0.75rem; padding: 0.75rem;
 	background: #f9fafb; border-radius: 0.5rem; }
   .correlation-icon { font-size: 1.25rem; }
   .correlation-content { flex: 1; }
   .correlation-description { font-size: 0.875rem;
 	color: #374151; margin-bottom: 0.25rem; }
-  .correlation-meta { display: flex, gap: 0.75rem; font-size: 0.75rem;
+  .correlation-meta { display: flex;
+		gap: 0.75rem; font-size: 0.75rem;
 	color: #6b7280; }
   .shared-entities { display: flex; flex-wrap: wrap;
 	gap: 0.25rem; margin-top: 0.5rem; }
-  .entity-tag { padding: 0.25rem 0.5rem, background: #e5e7eb; border-radius: 0.25rem; font-size: 0.75rem; }
+  .entity-tag { padding: 0.25rem 0.5rem;
+		background: #e5e7eb; border-radius: 0.25rem; font-size: 0.75rem; }
   .recommendations-list { margin-top: 0.5rem; }
-  .recommendation-item { display: flex, gap: 0.75rem; }
-  .recommendation-number { width: 1.5rem, height: 1.5rem; background: #6366f1;
+  .recommendation-item { display: flex;
+		gap: 0.75rem; }
+  .recommendation-number { width: 1.5rem;
+		height: 1.5rem; background: #6366f1;
 	color: #ffffff; border-radius: 9999px;
 	display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600; }
   .entities-grid { display: grid; grid-template-columns: repeat(2, 1fr), gap: 0.75rem; }
-  .entity-card { padding: 0.75rem, background: #f9fafb; border-radius: 0.5rem; }
+  .entity-card { padding: 0.75rem;
+		background: #f9fafb; border-radius: 0.5rem; }
   .entity-type { font-size: 0.75rem;
 	color: #6b7280; text-transform: uppercase; }
   .entity-value { display: block; font-size: 0.875rem;
-	color: #111827, margin: 0.25rem 0; }
+	color: #111827;
+		margin: 0.25rem 0; }
   .entity-stats { display: flex; justify-content: space-between; font-size: 0.75rem;
 	color: #6b7280; }
 </style>

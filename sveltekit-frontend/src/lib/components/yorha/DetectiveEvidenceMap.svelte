@@ -516,9 +516,11 @@
  }
 
  @keyframes contradiction-glow {
- 0%, 100% { r: 0, opacity: 0;
+ 0%, 100% { r: 0;
+		opacity: 0;
  }
- 50% { r: 30, opacity: 0.3;
+ 50% { r: 30;
+		opacity: 0.3;
  }
  }
 </style>

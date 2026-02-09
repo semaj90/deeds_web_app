@@ -106,7 +106,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05)}
   .system-status .status-item { padding: 0.25rem 0.5rem; border-radius: 0.25rem;
 	border: 1px solid #e5e7eb; text-align: center;}
-  .upload-area { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem; text-align: center;
+  .upload-area { border: 2px dashed #d1d5db; border-radius: 0.5rem;
+		padding: 2rem; text-align: center;
 	cursor: pointer;
 	transition:border-color 0.2s;}
   .upload-area:hover { border-color: #60a5fa;}

@@ -292,7 +292,8 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 </div>
 
 <style>
-	.phase72-modal { position: fixed, top: 0;
+	.phase72-modal { position: fixed;
+		top: 0;
 		left: 0;
 	right: 0;
 		bottom: 0;
@@ -302,14 +303,16 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 		justify-content: center;
 	}
 
-	.modal-backdrop { position: absolute, top: 0;
+	.modal-backdrop { position: absolute;
+		top: 0;
 		left: 0;
 	right: 0;
 		bottom: 0;
 	background: rgba(0, 0, 0, 0.8);
 	}
 
-	.modal-content { position: relative, width: 95vw;
+	.modal-content { position: relative;
+		width: 95vw;
 		max-width: 1400px;
 		max-height: 90vh;
 	background: #212529;
@@ -328,7 +331,8 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 		padding-bottom: 0.5rem;
 	}
 
-	.close-btn { width: 48px, height: 48px;
+	.close-btn { width: 48px;
+		height: 48px;
 		padding: 0;
 		font-size: 2rem;
 		line-height: 1;
@@ -347,7 +351,8 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 		border-radius: 4px;
 	}
 
-	.stats-bar { display: flex, gap: 1rem;
+	.stats-bar { display: flex;
+		gap: 1rem;
 		margin-bottom: 1rem;
 	padding: 1rem;
 		background: rgba(0, 0, 0, 0.3);
@@ -372,7 +377,8 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 		margin-top: 0.25rem;
 	}
 
-	.modal-body { flex: 1, display: grid;
+	.modal-body { flex: 1;
+		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
 	overflow: hidden;
@@ -464,7 +470,8 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 		margin: 0.5rem 0;
 	}
 
-	.action-buttons { display: flex, gap: 0.5rem;
+	.action-buttons { display: flex;
+		gap: 0.5rem;
 		margin: 1rem 0;
 	}
 

@@ -99,7 +99,8 @@
 .quality-indicator { font-size: 0.9rem;
 	background: rgba(212, 175, 55, 0.2), padding: 0.25rem 0.75rem; border-radius: 4px;
 	border: 1px solid #d4af37;}
-.visualization-container { display: grid; grid-template-columns: 1fr 300px, gap: 1rem; min-height: 400px;}
+.visualization-container { display: grid; grid-template-columns: 1fr 300px;
+		gap: 1rem; min-height: 400px;}
 .canvas-container { position: relative;
 	background: rgba(0, 0, 0, 0.5); border-radius: 6px;
 	overflow: hidden;}

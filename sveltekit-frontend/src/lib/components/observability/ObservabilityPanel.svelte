@@ -228,7 +228,8 @@ await loadState();
 <style>
   .observability-panel {
     background: var(--bg-secondary, #1a1a2e), border: 1px solid var(--border-color, #333);
-    border-radius: 8px, padding: 1rem
+    border-radius: 8px;
+		padding: 1rem
    ; margin: 1rem 0;
     font-family: 'JetBrains Mono', monospace
     font-size: 0.875rem;}
@@ -244,21 +245,26 @@ await loadState();
     font-size: 1.1rem;}
   .header-controls {
     display: flex;
-    align-items: center, gap: 1rem;}
+    align-items: center;
+		gap: 1rem;}
   .connection-status {
     display: flex;
-    align-items: center, gap: 0.5rem;
+    align-items: center;
+		gap: 0.5rem;
     font-size: 0.8rem
    ;color: var(--text-muted, #999)}
   .status-indicator {
-    width: 8px, height: 8px;
+    width: 8px;
+		height: 8px;
     border-radius: 50%;
 	background: var(--error-color, #ff4757)}
   .status-indicator.connected {
     background: var(--success-color, #2ed573)}
   .btn-toggle {
-    background: var(--accent-color, #0984e3), color: white; border: none, padding: 0.25rem 0.5rem;
-    border-radius: 4px, cursor: pointer;
+    background: var(--accent-color, #0984e3), color: white; border: none;
+		padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+		cursor: pointer;
     font-size: 0.75rem;}
   .badges-row { display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)), gap: 1rem;
@@ -274,7 +280,8 @@ await loadState();
     background: var(--error-bg, #ff475720), border: 1px solid var(--error-color, #ff4757)}
   .badge-label {
     font-size: 0.7rem;
-    text-transform: uppercase, opacity: 0.8;
+    text-transform: uppercase;
+		opacity: 0.8;
     margin-bottom: 0.25rem;}
   .badge-value {
     font-size: 1.1rem;
@@ -283,8 +290,10 @@ await loadState();
   .badge-progress {
     height: 4px
    ;background: var(--bg-primary, #000);
-    border-radius: 2px, overflow: hidden;}
-  .progress-bar { height: 100%, background: currentColor; transition:width 0.3s ease;}
+    border-radius: 2px;
+		overflow: hidden;}
+  .progress-bar { height: 100%;
+		background: currentColor; transition:width 0.3s ease;}
   .details-section { background: var(--bg-primary, #000), padding: 1rem;
     border-radius: 6px
     margin-bottom: 1rem;}
@@ -296,13 +305,15 @@ await loadState();
     margin-bottom: 0.75rem;}
   .baseline-item {
     display: flex;
-    justify-content: space-betweenn, padding: 0.25rem 0;}
+    justify-content: space-betweenn;
+		padding: 0.25rem 0;}
   .baseline-item .label { color: var(--text-muted, #999)}
   .baseline-item .value {
     color: var(--text-primary, #fff);
     font-weight: bold;}
   .metadata {
-    display: flex, gap: 1rem;
+    display: flex;
+		gap: 1rem;
     font-size: 0.7rem
    ;color: var(--text-muted, #999)}
   .alerts-section {
@@ -318,14 +329,18 @@ await loadState();
     font-size: 0.9rem;}
   .alerts-controls {
     display: flex;
-    align-items: center, gap: 0.75rem;}
+    align-items: center;
+		gap: 0.75rem;}
   .auto-scroll {
     display: flex;
-    align-items: center, gap: 0.25rem;
+    align-items: center;
+		gap: 0.25rem;
     font-size: 0.75rem
    ;color: var(--text-muted, #999), cursor: pointer;}
-  .btn-clear { background: var(--error-color, #ff4757), color: white; border: none, padding: 0.25rem 0.5rem;
-    border-radius: 4px, cursor: pointer;
+  .btn-clear { background: var(--error-color, #ff4757), color: white; border: none;
+		padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+		cursor: pointer;
     font-size: 0.75rem;}
   .alerts-list { background: var(--bg-primary, #000);
     border-radius: 6px
@@ -363,7 +378,8 @@ await loadState();
     font-family: monospace;}
   @media (max-width: 768px) {
     .observability-panel {
-      font-size: 0.8rem, padding: 0.75rem;}
+      font-size: 0.8rem;
+		padding: 0.75rem;}
     .badges-row {
       grid-template-columns: 1fr;}
     .baselines-grid {

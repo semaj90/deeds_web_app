@@ -190,7 +190,8 @@ https, //svelte.dev/e/global_reference_invalid -->
  background: var(--bg-hover, #f3f4f6);
  }
 
- .hamburger-line { width: 20px, height: 2px;
+ .hamburger-line { width: 20px;
+		height: 2px;
  background: var(--text-primary, #111827);
  transition:all 0.3s;
  }
@@ -235,7 +236,8 @@ https, //svelte.dev/e/global_reference_invalid -->
  font-size: 1.125rem;
  }
 
- .mobile-nav-overlay { position: fixed, top: 0;
+ .mobile-nav-overlay { position: fixed;
+		top: 0;
  left: 0;
 	right: 0;
  bottom: 0;
@@ -271,7 +273,8 @@ https, //svelte.dev/e/global_reference_invalid -->
 	color: var(--text-primary, #111827);
  }
 
- .close-btn { background: none, border: none;
+ .close-btn { background: none;
+		border: none;
  font-size: 1.5rem;
 	cursor: pointer;
  color: var(--text-secondary, #6b7280);

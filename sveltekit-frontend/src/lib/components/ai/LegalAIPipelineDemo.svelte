@@ -40,16 +40,22 @@ batchSize: 3, enableClustering: true, progressCallback: (progress, message) => {
 	margin: 0 auto;padding: 20px; font-family: 'Segoe UI', system-ui, sans-serif;}
   .demo-header { margin-bottom: 30px; text-align: center;}
   .demo-header h2 { color: #2563eb; margin-bottom: 15px;}
-  .pipeline-status { display: flex; align-items: center; justify-content: center, gap: 15px; flex-wrap;}
+  .pipeline-status { display: flex; align-items: center; justify-content: center;
+		gap: 15px; flex-wrap;}
   .status-badge { padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; text-transform: uppercase;}
-  .status-ready { background: #dcfce7, color: #166534;} .status-initializing { background: #fef3c7, color: #92400e;} .status-processing { background: #dbeafe, color: #1d4ed8;} .status-error { background: #fecaca, color: #dc2626;} .progress-bar { width: 200px;
+  .status-ready { background: #dcfce7;
+		color: #166534;} .status-initializing { background: #fef3c7;
+		color: #92400e;} .status-processing { background: #dbeafe;
+		color: #1d4ed8;} .status-error { background: #fecaca;
+		color: #dc2626;} .progress-bar { width: 200px;
 	height: 8px;
 	background: #e5e7eb; border-radius: 4px;
 	overflow: hidden;}
   .progress-fill { height: 100%;
 	background: #3b82f6;
 	transition:width 0.3s ease;}
-  .demo-content { display: grid; grid-template-columns: 1fr 1fr, gap: 20px;}
+  .demo-content { display: grid; grid-template-columns: 1fr 1fr;
+		gap: 20px;}
   .panel { background: white;
 	border: 1px solid #e5e7eb; border-radius: 12px;
 	padding: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
@@ -62,13 +68,15 @@ batchSize: 3, enableClustering: true, progressCallback: (progress, message) => {
   .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr), gap: 15px;}
   .metric { display: flex; flex-direction: column;
 	gap: 4px;}
-  .metric-label { font-size: 12px, color: #6b7280; font-weight: 500;}
+  .metric-label { font-size: 12px;
+		color: #6b7280; font-weight: 500;}
   .metric-value { font-size: 18px; font-weight: 700;
 	color: #1f2937;}
   .processing-panel, .bulk-panel { grid-column: 1 / -1;}
   .processing-controls, .bulk-controls { display: flex;
 	gap: 10px; margin-bottom: 20px; flex-wrap;}
-  .btn { padding: 10px 20px, border: none; border-radius: 8px; font-weight: 500;
+  .btn { padding: 10px 20px;
+		border: none; border-radius: 8px; font-weight: 500;
 	cursor: pointer;
 	transition:all 0.2s ease; font-size: 14px;}
   .btn:disabled { opacity: 0.5;
@@ -93,12 +101,14 @@ batchSize: 3, enableClustering: true, progressCallback: (progress, message) => {
   .entities-list h5, .citations-list h5 { margin: 0, 0 10px 0, color: #374151;}
   .entity-item, .citation-item { display: flex;
 	gap: 10px;
-	padding: 6px, background: white; border-radius: 4px; margin-bottom: 4px; font-size: 13px;}
+	padding: 6px;
+		background: white; border-radius: 4px; margin-bottom: 4px; font-size: 13px;}
   .entity-type { background: #dbeaf;
 	color: #1d4ed8;padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 500;}
   .entity-confidence, .citation-court { color: #6b7280; font-size: 11px;}
   .bulk-documents { margin: 15px 0;}
-  .bulk-doc-item, .bulk-result-item { padding: 8px, background: #f9fafb; border-radius: 4px; margin-bottom: 6px; font-size: 14px;}
+  .bulk-doc-item, .bulk-result-item { padding: 8px;
+		background: #f9fafb; border-radius: 4px; margin-bottom: 6px; font-size: 14px;}
   .log-panel { grid-column: 1 / -1; max-height: 400px;}
   .log-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 15px;}
   .log-container { height: 300px; overflow-y: auto;

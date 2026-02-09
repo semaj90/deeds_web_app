@@ -402,7 +402,8 @@ caseId: fromEvidenceId,
  .mode-selector {
  min-width: 150px;}
 
- .actions { display: flex, gap: 0.5rem;
+ .actions { display: flex;
+		gap: 0.5rem;
  align-items: center;}
 
  .relationship-selector {
@@ -428,9 +429,11 @@ caseId: fromEvidenceId,
  font-size: 0.875rem;
  min-width: 140px;}
 
- .board-main-content { flex: 1, display: flex;}
+ .board-main-content { flex: 1;
+		display: flex;}
 
- .board-canvas { flex: 1, position: relative;
+ .board-canvas { flex: 1;
+		position: relative;
  overflow: hidden;
 	background: white;}
 

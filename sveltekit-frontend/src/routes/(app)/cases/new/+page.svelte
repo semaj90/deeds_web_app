@@ -278,7 +278,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
- .intake-container { background: var(--yorha-bg), color: var(--yorha-ink);
+ .intake-container { background: var(--yorha-bg);
+		color: var(--yorha-ink);
  font-family: var(--yorha-font);
 	padding: 2rem;
  min-height: 100vh;
@@ -308,7 +309,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	margin: 0 auto;
  }
 
- .form-section { background: var(--yorha-paper), border: 2px solid var(--yorha-ink);
+ .form-section { background: var(--yorha-paper);
+		border: 2px solid var(--yorha-ink);
  border-radius: 4px;
 	padding: 1.5rem;
  margin-bottom: 1.5rem;
@@ -326,7 +328,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  font-size: 0.875rem;
  }
 
- .narrative-box { width: 100%, padding: 1rem;
+ .narrative-box { width: 100%;
+		padding: 1rem;
  border: 1px solid #ddd;
  border-radius: 3px;
  font-family: var(--yorha-font);
@@ -342,7 +345,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
  }
 
- .title-input { width: 100%, padding: 0.75rem;
+ .title-input { width: 100%;
+		padding: 0.75rem;
  border: 1px solid #ddd;
  border-radius: 3px;
  font-family: var(--yorha-font);
@@ -373,7 +377,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: #fff5f5;
  }
 
- .file-drop-zone p { margin: 0, color: #666;
+ .file-drop-zone p { margin: 0;
+		color: #666;
  }
 
  .file-input {
@@ -409,7 +414,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  font-size: 0.875rem;
  }
 
- .uploaded-files button { background: none, border: none;
+ .uploaded-files button { background: none;
+		border: none;
  color: var(--yorha-crimson);
 	cursor: pointer;
  font-weight: bold;
@@ -434,7 +440,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  color: var(--yorha-crimson);
  }
 
- .prompt-group input { width: 100%, padding: 0.75rem;
+ .prompt-group input { width: 100%;
+		padding: 0.75rem;
  border: 1px solid #ddd;
  border-radius: 3px;
  font-family: var(--yorha-font);
@@ -448,7 +455,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
  }
 
- .error-message { background: #ffe6e6, border: 2px solid var(--yorha-crimson);
+ .error-message { background: #ffe6e6;
+		border: 2px solid var(--yorha-crimson);
  border-radius: 4px;
 	padding: 1rem;
  margin-bottom: 1rem;
@@ -478,7 +486,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
  }
 
- .btn-submit:disabled { opacity: 0.6, cursor:not-allowed;
+ .btn-submit:disabled { opacity: 0.6;
+		cursor:not-allowed;
  }
 
  .help-text {

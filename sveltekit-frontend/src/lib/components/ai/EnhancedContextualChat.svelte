@@ -461,8 +461,10 @@ enableFunctions: true
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;}
-  .header-actions { display: flex, gap: 0.5rem;}
-  .state-indicator { display: flex, gap: 1rem;
+  .header-actions { display: flex;
+		gap: 0.5rem;}
+  .state-indicator { display: flex;
+		gap: 1rem;
     align-items: center;
 	padding: 0.5rem 1rem;
     background: #2a2d30;
@@ -498,14 +500,16 @@ enableFunctions: true
     font-size: 10px;
     margin-bottom: 0.5rem;
 	color: #d4af37;}
-  .message-meta { display: flex, gap: 1rem;
+  .message-meta { display: flex;
+		gap: 1rem;
     margin-top: 0.5rem;
     font-size: 10px;
 	color: #888;}
   .empty-state {
     text-align: center;
 	padding: 3rem 2rem;}
-  .message-form { padding: 1rem, background: #1a1d20;
+  .message-form { padding: 1rem;
+		background: #1a1d20;
     border-top: 4px solid #d4af37;}
   .form-controls {
     display: flex;
@@ -519,7 +523,8 @@ enableFunctions: true
     overflow-y: auto;
 	padding: 1rem;
 	background: #1a1d20;}
-  .accordion-trigger { width: 100%, display: flex;
+  .accordion-trigger { width: 100%;
+		display: flex;
     justify-content: space-between;
     align-items: center;
 	padding: 0.75rem 1rem !important;
@@ -547,11 +552,13 @@ enableFunctions: true
     margin: 0.5rem 0;
     font-size: 10px;
 	color: #ccc;}
-  .confidence-bar { height: 6px, background: #2a2d30;
+  .confidence-bar { height: 6px;
+		background: #2a2d30;
 	border: 2px solid #444;
     border-radius: 2px;
 	overflow: hidden;}
-  .confidence-fill { height: 100%, background: linear-gradient(90deg, #d4af37, #4ade80);
+  .confidence-fill { height: 100%;
+		background: linear-gradient(90deg, #d4af37, #4ade80);
     transition:width 0.3s ease;}
   .entity-item {
     display: flex;
@@ -561,14 +568,17 @@ enableFunctions: true
   .entity-type {
     color: #d4af37;
     font-weight: bold;}
-  .history-item { display: flex, gap: 1rem;
+  .history-item { display: flex;
+		gap: 1rem;
 	padding: 0.5rem 1rem !important;}
   .history-index {
     color: #888;}
-  .dialog-overlay { position: fixed, inset: 0
+  .dialog-overlay { position: fixed;
+		inset: 0
    ;background: rgba(0, 0, 0, 0.8);
     z-index: 50;}
-  .dialog-content { position: fixed, top: 50%;
+  .dialog-content { position: fixed;
+		top: 50%;
 	left: 50%;transform: translate(-50%, -50%): 90%; max-width: 500px;
     max-height: 85vh;
 	padding: 2rem;

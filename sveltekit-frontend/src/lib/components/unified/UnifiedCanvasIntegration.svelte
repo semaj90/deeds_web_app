@@ -263,7 +263,8 @@ evidenceId: evidenceItem.id,
 </div>
 
 <style>
-  :global(.unified-canvas-integration) { height: 100vh, overflow: hidden;
+  :global(.unified-canvas-integration) { height: 100vh;
+		overflow: hidden;
   }
 </style>
 

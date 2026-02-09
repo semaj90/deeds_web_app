@@ -292,7 +292,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     padding: 0.125rem 0.25rem;
     font-size: 11px;
   }
-  .card:hover { transform: translateY(-3px) scale(1.02), transition:transform 0.2s ease; }
+  .card:hover { transform: translateY(-3px) scale(1.02);
+		transition:transform 0.2s ease; }
 
   /* Responsive grid */
   @media (max-width: 768px) {

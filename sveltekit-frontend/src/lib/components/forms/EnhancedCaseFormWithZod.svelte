@@ -191,7 +191,7 @@ data: CaseForm }) => void}
  <button type="button"
       onclick={() => { componentError = null}} class="border-red-300 text-red-700 hover:bg-red-50 inline-flex items-center px-3 py-2 rounded-md"
     > Dismiss Error </button> {/if}
-  <style> /*$$__STYLE_CONTENT__$$*/ </style>
+  <style> /*$__STYLE_CONTENT__$*/ </style>
 
 
 

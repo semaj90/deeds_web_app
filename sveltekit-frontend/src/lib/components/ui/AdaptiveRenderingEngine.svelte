@@ -173,17 +173,20 @@
 </div>
 
 <style>
-  .adaptive-rendering-container { position: relative, display: inline-block;
+  .adaptive-rendering-container { position: relative;
+		display: inline-block;
     border-radius: 4px;
     overflow: hidden;
     background: #000;
   }
 
-  .rendering-canvas { width: 100%, height: auto;
+  .rendering-canvas { width: 100%;
+		height: auto;
     display: block;
   }
 
-  .quality-indicator { position: absolute, top: 4px;
+  .quality-indicator { position: absolute;
+		top: 4px;
     right: 4px;
     display: flex;
     flex-direction: column;
@@ -205,7 +208,8 @@
   .tier-badge.snes { background: linear-gradient(45deg, #4444ff, #6666ff); }
   .tier-badge.n64 { background: linear-gradient(45deg, #44ff44, #66ff66); }
 
-  .performance-stats { display: flex, gap: 4px;
+  .performance-stats { display: flex;
+		gap: 4px;
     font-size: 6px;
     color: rgba(255, 255, 255, 0.8);
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);

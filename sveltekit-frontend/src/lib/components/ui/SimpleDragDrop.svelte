@@ -75,7 +75,8 @@ interface Props { accept?: string; multiple?: boolean; maxSize?: number; disable
   .file-list-title { font-size: 14px; font-weight: bold;
 	color: var(--yorha-text-primary, #e0e0e0); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;}
   .file-item { display: flex; align-items: center;
-	gap: 12px;padding: 8px 12px, background: var(--yorha-bg-tertiary, #2a2a2a); border-radius: 6px; margin-bottom: 8px;
+	gap: 12px;padding: 8px 12px;
+		background: var(--yorha-bg-tertiary, #2a2a2a); border-radius: 6px; margin-bottom: 8px;
 	transition:all 0.2s ease;}
   .file-item:hover { background: var(--yorha-bg-primary, #0a0a0a), transform: translateX(4px)}
   .file-icon { color: var(--nes-green, #92cc41); flex-shrink: 0;}

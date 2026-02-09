@@ -274,7 +274,8 @@ notes: editedNotes }),
 	color: #666;
  }
 
- .header-actions { display: flex, gap: 0.5rem;
+ .header-actions { display: flex;
+		gap: 0.5rem;
  flex-wrap: wrap;
  }
 
@@ -315,7 +316,8 @@ notes: editedNotes }),
  background-color: #ff5252;
  }
 
- .detail-content { padding: 1.5rem, display: flex;
+ .detail-content { padding: 1.5rem;
+		display: flex;
  flex-direction: column;
 	gap: 1.5rem;
  }
@@ -400,7 +402,8 @@ notes: editedNotes }),
 	gap: 0.75rem;
  }
 
- .notes-editor textarea { padding: 0.75rem, border: 1px solid #d4a574;
+ .notes-editor textarea { padding: 0.75rem;
+		border: 1px solid #d4a574;
  border-radius: 4px;
  font-family: 'Source Sans 3', sans-serif;
  font-size: 0.95rem;
@@ -418,7 +421,8 @@ notes: editedNotes }),
 	color: #999;
  }
 
- .editor-actions { display: flex, gap: 0.5rem;
+ .editor-actions { display: flex;
+		gap: 0.5rem;
  }
 
  .btn-primary,
@@ -440,7 +444,8 @@ notes: editedNotes }),
  background-color: #a0522d;
  }
 
- .btn-primary:disabled { opacity: 0.6, cursor:not-allowed;
+ .btn-primary:disabled { opacity: 0.6;
+		cursor:not-allowed;
  }
 
  .btn-secondary {
@@ -452,7 +457,8 @@ notes: editedNotes }),
  background-color: #d4a574;
  }
 
- .btn-secondary:disabled { opacity: 0.6, cursor:not-allowed;
+ .btn-secondary:disabled { opacity: 0.6;
+		cursor:not-allowed;
  }
 
  .notes-display {
@@ -494,7 +500,8 @@ notes: editedNotes }),
 	gap: 0.5rem;
  }
 
- .timestamp-item { display: flex, gap: 1rem;
+ .timestamp-item { display: flex;
+		gap: 1rem;
  font-size: 0.85rem;
  }
 

@@ -134,7 +134,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-weight: 500;
 	}
 
-	.save-button-container { display: flex, gap: 0.5rem;
+	.save-button-container { display: flex;
+		gap: 0.5rem;
 		padding: 0.75rem;
 		background-color: #f0ebe0;
 		border-radius: 4px;
@@ -208,7 +209,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-weight: 500;
 	}
 
-	.remove-btn { background: none, border: none;
+	.remove-btn { background: none;
+		border: none;
 		color: #999;
 	cursor: pointer;
 		font-size: 1rem;

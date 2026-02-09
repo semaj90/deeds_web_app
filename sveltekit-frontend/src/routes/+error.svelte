@@ -70,15 +70,18 @@
 
 <style>
   .error-page {
-    min-height: 100vh, display: flex;
+    min-height: 100vh;
+		display: flex;
     align-items: center;
-    justify-content: center, padding: 2rem;
+    justify-content: center;
+		padding: 2rem;
     background: linear-gradient(135deg, hsl(var(--b1)) 0%, hsl(var(--b2)) 100%);
   }
 
   .error-container {
     text-align: center;
-    max-width: 500px, padding: 3rem;
+    max-width: 500px;
+		padding: 3rem;
     background: hsl(var(--b1));
     border-radius: 1rem;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
@@ -86,7 +89,8 @@
 
   .error-icon {
     font-size: 4rem;
-    margin-bottom: 1rem, animation: pulse 2s ease-in-out infinite;
+    margin-bottom: 1rem;
+		animation: pulse 2s ease-in-out infinite;
   }
 
   @keyframes pulse {
@@ -97,7 +101,8 @@
   .error-code {
     font-size: 6rem;
     font-weight: 900;
-    line-height: 1, margin: 0;
+    line-height: 1;
+		margin: 0;
     background: linear-gradient(135deg, hsl(var(--p)) 0%, hsl(var(--s)) 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -106,7 +111,8 @@
 
   .error-title {
     font-size: 1.5rem;
-    font-weight: 600, margin: 1rem 0 0.5rem;
+    font-weight: 600;
+		margin: 1rem 0 0.5rem;
     color: hsl(var(--bc));
   }
 
@@ -117,7 +123,8 @@
   }
 
   .error-actions {
-    display: flex, gap: 1rem;
+    display: flex;
+		gap: 1rem;
     justify-content: center;
     margin-bottom: 2rem;
   }
@@ -125,12 +132,14 @@
   .btn {
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
-    font-weight: 600, cursor: pointer;
+    font-weight: 600;
+		cursor: pointer;
     transition: all 0.2s;
   }
 
   .btn-primary {
-    background: hsl(var(--p)), color: hsl(var(--pc));
+    background: hsl(var(--p));
+		color: hsl(var(--pc));
     border: none;
   }
 
@@ -140,7 +149,8 @@
   }
 
   .btn-ghost {
-    background: transparent, color: hsl(var(--bc));
+    background: transparent;
+		color: hsl(var(--bc));
     border: 1px solid hsl(var(--bc) / 0.2);
   }
 

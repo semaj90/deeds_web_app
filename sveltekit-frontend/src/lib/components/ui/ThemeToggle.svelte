@@ -57,7 +57,8 @@
     align-items: center;
   }
 
-  .theme-options { display: flex, gap: 0.5rem;
+  .theme-options { display: flex;
+		gap: 0.5rem;
     padding: 0.5rem;
     background: var(--yorha-bg-secondary, #2a2a2a);
     border: 1px solid var(--yorha-border, #4a4a4a);

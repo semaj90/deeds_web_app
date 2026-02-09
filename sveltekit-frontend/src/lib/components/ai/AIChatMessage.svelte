@@ -84,7 +84,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if message.metadata.fromCache} <div class="metadata-item"> <span class="label">Source:</span>
  <span class="value">Cached</span> {/if} {/if} {/if}
   </div> </div>
- <style> /* @unocss-include */ .chat-message { margin: 16px 0, padding: 16px; border-radius: 8px;
+ <style> /* @unocss-include */ .chat-message { margin: 16px 0;
+		padding: 16px; border-radius: 8px;
 	background: var(--bg-primary, #ffffff), border: 1px solid var(--border-color, #e2e8f0)}
   .chat-message.user { margin-left: 20%;
 	background: var(--bg-user, #3b82f6), color: white; border-color: var(--border-user, #2563eb)}
@@ -127,7 +128,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .sources-toggle svg, .metadata-toggle svg { transition:transform 0.2s ease;}
   .sources-toggle svg.rotated, .metadata-toggle svg.rotated { transform: rotate(180deg)}
   .sources-list { margin-top: 8px; border-left: 2px solid var(--border-accent, #3b82f6); padding-left: 12px;}
-  .source-item { margin: 8px 0, padding: 8px;background: var(--bg-secondary, #f8fafc); border-radius: 4px; font-size: 0.875rem;}
+  .source-item { margin: 8px 0;
+		padding: 8px;background: var(--bg-secondary, #f8fafc); border-radius: 4px; font-size: 0.875rem;}
   .source-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 4px; font-weight: 500;}
   .source-title { color: var(--text-primary, #1e293b)}
   .source-score { color: var(--text-accent, #3b82f6); font-weight: 600;}

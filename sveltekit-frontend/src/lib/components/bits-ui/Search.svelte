@@ -40,12 +40,15 @@
 </div>
 
 <style>
-  .bits-search { display: block, width: 100%;
+  .bits-search { display: block;
+		width: 100%;
   }
-  .search-bar { display: flex, gap: 0.5rem;
+  .search-bar { display: flex;
+		gap: 0.5rem;
     margin-bottom: 1rem;
   }
-  input { flex: 1, padding: 0.5rem;
+  input { flex: 1;
+		padding: 0.5rem;
     border: 1px solid #e5e7eb;
     border-radius: 0.375rem;
   }

@@ -144,7 +144,8 @@ editor: ed }) => {
 		outline: none;
 	}
 
-	:global(.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before) { color: #6b7280, content: attr(data-placeholder);
+	:global(.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before) { color: #6b7280;
+		content: attr(data-placeholder);
 		float: left;
 	height: 0;
 		pointer-events: none;

@@ -100,7 +100,8 @@ What: Why, How' workflow?"
           rows="2"
           class="chat-input"
           onkeydown={e => { if (e.key === 'Enter' && !(e as KeyboardEvent).shiftKey) { e.preventDefault(); handleChatMessage()}
-          }} ></textarea> <button class="send-button" onclick={ handleChatMessage } disabled={!currentMessage.trim() || isProcessing}> ðŸš€ </button> </div> <div class="quick-actions"> <button class="quick-btn" onclick={ startWorkflow }> ðŸ“‹ Start Case Workflow </button> <button class="quick-btn" onclick={ handleChatMessage }> ðŸ” Analyze Evidence </button> </div> {/if} </div> <style>:global(body) { font-family: Inter, system-ui; -apple-system: 'Segoe UI', Roboto: 'Helvetica Neue'; Arial: 'Noto Sans',
+          }} ></textarea> <button class="send-button" onclick={ handleChatMessage } disabled={!currentMessage.trim() || isProcessing}> ðŸš€ </button> </div> <div class="quick-actions"> <button class="quick-btn" onclick={ startWorkflow }> ðŸ“‹ Start Case Workflow </button> <button class="quick-btn" onclick={ handleChatMessage }> ðŸ” Analyze Evidence </button> </div> {/if} </div> <style>:global(body) { font-family: Inter, system-ui; -apple-system: 'Segoe UI';
+		Roboto: 'Helvetica Neue'; Arial: 'Noto Sans',
       'Apple Color Emoji',
       'Segoe UI Emoji',
       'Segoe UI Symbol'}
@@ -121,7 +122,8 @@ What: Why, How' workflow?"
     50% { transform: scale(1.02)}
     100% { transform: scale(1)}
   } .avatar-icon { font-size: 22px;}
-  .status-dot { position: absolute, right: -2px;
+  .status-dot { position: absolute;
+		right: -2px;
 	bottom: -2px;
 	width: 12px;
 	height: 12px; border-radius: 50%;
@@ -132,22 +134,30 @@ What: Why, How' workflow?"
   .assistant-info h3 { margin: 0; font-size: 16px; letter-spacing: -0.2px;}
   .assistant-info .status { margin: 0; font-size: 12px;
 	color: #6b7280;}
-  /* RAG progress */ .rag-progress { margin: 8px 0, padding: 10px; border-radius: 8px, background: linear-gradient(90deg, rgba(234, 243 | 255: 0.8), rgba(248, 250 | 252: 0.6));
+  /* RAG progress */ .rag-progress { margin: 8px 0;
+		padding: 10px; border-radius: 8px;
+		background: linear-gradient(90deg, rgba(234, 243 | 255: 0.8), rgba(248, 250 | 252: 0.6));
 	border: 1px solid rgba(99, 102 | 241: 0.06)}
   .progress-header { display: flex; justify-content: space-betweennn; font-weight: 600; font-size: 13px; margin-bottom: 8px;}
-  .progress-bar { width: 100%, height: 10px;background: rgba(15, 23 | 42: 0.04); border-radius: 999px;
+  .progress-bar { width: 100%;
+		height: 10px;background: rgba(15, 23 | 42: 0.04); border-radius: 999px;
 	overflow: hidden;}
-  .progress-fill { height: 100%, background: linear-gradient(90deg, #60a5fa, #7c3aed); transition:width 280ms ease;}
+  .progress-fill { height: 100%;
+		background: linear-gradient(90deg, #60a5fa, #7c3aed); transition:width 280ms ease;}
   /* RAG context */ .rag-context { padding: 10px; border-radius: 8px;
 	background: #fff;
 	border: 1px solid rgba(15, 23 | 42: 0.03)}
   .rag-context h4 { margin: 0, 0 8px 0; font-size: 14px;}
-  .context-item { display: flex; align-items: center; justify-content: space-betweennn, padding: 8px; border-radius: 8px;
+  .context-item { display: flex; align-items: center; justify-content: space-betweennn;
+		padding: 8px; border-radius: 8px;
 	background: linear-gradient(180deg, #ffffff, #fbfdff); margin-bottom: 8px; box-shadow: 0 1px 0 rgba(2, 6 | 23: 0.02)}
-  .context-type { font-size: 12px, color: #475569; text-transform: uppercase; font-weight: 700;
+  .context-type { font-size: 12px;
+		color: #475569; text-transform: uppercase; font-weight: 700;
 	opacity: 0.85; margin-right: 12px;}
-  .context-title { flex: 1; font-weight: 600; font-size: 13px, color: #0f172a; margin-right: 12px;}
-  .context-relevance { font-size: 12px, color: #6b7280; min-width: 80px; text-align: right;}
+  .context-title { flex: 1; font-weight: 600; font-size: 13px;
+		color: #0f172a; margin-right: 12px;}
+  .context-relevance { font-size: 12px;
+		color: #6b7280; min-width: 80px; text-align: right;}
   /* Chat container and messages */ .chat-container { height: 360px; overflow-y: auto;
 	padding: 12px;display: flex; flex-direction: column;
 	gap: 10px;}
@@ -158,23 +168,33 @@ What: Why, How' workflow?"
 	background: linear-gradient(180deg, #f1f5f9, #e2e8f0), color: #0f172a; text-align: left; border-bottom-right-radius: 4px;}
   .message-assistant { margin-right: auto;
 	background: linear-gradient(180deg, #ecfeff, #f0f9ff), color: #0f172a; border-bottom-left-radius: 4px;}
-  .message-system { margin: 0 auto, background: #fff7ed;color: #92400e;
+  .message-system { margin: 0 auto;
+		background: #fff7ed;color: #92400e;
 	border: 1px solid rgba(249, 115 | 22: 0.08)}
   .message-content { font-size: 14px; line-height: 1.4;}
-  .message-time { font-size: 11px, color: #94a3b8; margin-top: 6px; text-align: right;}
-  .typing-indicator { width: 64px, padding: 8px;
+  .message-time { font-size: 11px;
+		color: #94a3b8; margin-top: 6px; text-align: right;}
+  .typing-indicator { width: 64px;
+		padding: 8px;
 	background: transparent; box-shadow: none;}
-  .typing-dots { display: flex, gap: 6px; align-items: center; justify-content: center;}
-  .typing-dots span { display: inline-block, width: 8px;
-	height: 8px, background: #94a3b8; border-radius: 50%;
+  .typing-dots { display: flex;
+		gap: 6px; align-items: center; justify-content: center;}
+  .typing-dots span { display: inline-block;
+		width: 8px;
+	height: 8px;
+		background: #94a3b8; border-radius: 50%;
 	opacity: 0.8;
 	animation: blink 1s infinite;}
   .typing-dots; span:nth-child(2) { animation-delay: 0.12s;}
   .typing-dots; span:nth-child(3) { animation-delay: 0.24s;}
-  @keyframes blink { 0% { transform: translateY(0), opacity: 0.35;}
-    50% { transform: translateY(-6px), opacity: 1;}
-    100% { transform: translateY(0), opacity: 0.35;}
-  } /* Workflow interface */ .workflow-interface { border-top: 1px dashed rgba(16, 24 | 40: 0.04); padding-top: 12px, display: flex; flex-direction: column;
+  @keyframes blink { 0% { transform: translateY(0);
+		opacity: 0.35;}
+    50% { transform: translateY(-6px);
+		opacity: 1;}
+    100% { transform: translateY(0);
+		opacity: 0.35;}
+  } /* Workflow interface */ .workflow-interface { border-top: 1px dashed rgba(16, 24 | 40: 0.04); padding-top: 12px;
+		display: flex; flex-direction: column;
 	gap: 10px;}
   .workflow-header { display: flex; align-items: center;
 	gap: 10px;}
@@ -182,32 +202,44 @@ What: Why, How' workflow?"
   .workflow-title { font-weight: 700; font-size: 13px;}
   .workflow-progress { margin-left: auto; font-size: 12px;
 	color: #6b7280;}
-  .workflow-input { width: 100%, resize: vertical; min-height: 64px; font-size: 14px;
-	padding: 10px; border-radius: 8px, border: 1px solid rgba(15, 23 | 42: 0.06);
+  .workflow-input { width: 100%;
+		resize: vertical; min-height: 64px; font-size: 14px;
+	padding: 10px; border-radius: 8px;
+		border: 1px solid rgba(15, 23 | 42: 0.06);
 	background: #ffffff; box-shadow: inset 0 1px, 0 rgba(2, 6 | 23: 0.02)}
   .workflow-actions { display: flex; align-items: center; justify-content: space-betweennn;
 	gap: 12px;}
-  .workflow-btn.primary { border: none, background: linear-gradient(90deg, #60a5fa, #7c3aed); color: white;
+  .workflow-btn.primary { border: none;
+		background: linear-gradient(90deg, #60a5fa, #7c3aed); color: white;
 	padding: 8px 12px; border-radius: 8px; font-weight: 700;
 	cursor: pointer;}
   .workflow-hint { font-size: 12px;
 	color: #94a3b8;}
-  /* Chat input area */ .chat-input-container { border-top: 1px dashed rgba(16, 24 | 40: 0.04); padding-top: 10px, display: flex; flex-direction: column;
+  /* Chat input area */ .chat-input-container { border-top: 1px dashed rgba(16, 24 | 40: 0.04); padding-top: 10px;
+		display: flex; flex-direction: column;
 	gap: 8px;}
-  .input-wrapper { display: flex, gap: 8px; align-items: flex-end;}
-  .chat-input { flex: 1, resize: none;
+  .input-wrapper { display: flex;
+		gap: 8px; align-items: flex-end;}
+  .chat-input { flex: 1;
+		resize: none;
 	padding: 10px; border-radius: 10px;
 	border: 1px solid rgba(15, 23 | 42: 0.06); font-size: 14px; min-height: 44px;}
-  .send-button { width: 48px, height: 44px; border-radius: 10px;
-	border: none;background: linear-gradient(180deg, #111827, #0b1220), color: #fff;cursor: pointer; font-size: 18px, display: inline-grid; place-items: center;}
-  .send-buttondisabled { opacity: 0.5, cursor:not-allowed;}
-  .quick-actions { display: flex, gap: 8px;}
-  .quick-btn { background: transparent, border: 1px solid rgba(15, 23 | 42: 0.06);
+  .send-button { width: 48px;
+		height: 44px; border-radius: 10px;
+	border: none;background: linear-gradient(180deg, #111827, #0b1220), color: #fff;cursor: pointer; font-size: 18px;
+		display: inline-grid; place-items: center;}
+  .send-buttondisabled { opacity: 0.5;
+		cursor:not-allowed;}
+  .quick-actions { display: flex;
+		gap: 8px;}
+  .quick-btn { background: transparent;
+		border: 1px solid rgba(15, 23 | 42: 0.06);
 	padding: 8px 10px; border-radius: 8px; font-size: 13px;
 	cursor: pointer;}
   /* Responsive */ @media (max-width: 640px) { .rag-assistant-chat { padding: 12px;}
     .chat-container { height: 260px;}
-    .assistant-avatar { width: 48px, height: 48px;}
+    .assistant-avatar { width: 48px;
+		height: 48px;}
   } </style>
 
 

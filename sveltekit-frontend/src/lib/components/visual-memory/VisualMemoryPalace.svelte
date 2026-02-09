@@ -405,7 +405,8 @@
 	opacity: 0.7;
 	}
 
-	.palace-viewport { position: relative, display: flex;
+	.palace-viewport { position: relative;
+		display: flex;
 		align-items: center;
 		justify-content: center;
 	background: rgba(0, 0, 0, 0.3);
@@ -419,13 +420,15 @@
 		border-radius: 8px;
 	}
 
-	.palace-controls { position: absolute, bottom: 1rem;
+	.palace-controls { position: absolute;
+		bottom: 1rem;
 		right: 1rem;
 	display: flex;
 		gap: 0.5rem;
 	}
 
-	.control-btn { width: 40px, height: 40px;
+	.control-btn { width: 40px;
+		height: 40px;
 		border-radius: 50%;
 	background: rgba(0, 0, 0, 0.7);
 		border: 1px solid rgba(255, 255, 255, 0.2);
@@ -443,7 +446,8 @@
 		transform: scale(1.1);
 	}
 
-	.glyph-info { padding: 1rem, background: rgba(255, 255, 255, 0.05);
+	.glyph-info { padding: 1rem;
+		background: rgba(255, 255, 255, 0.05);
 		border-radius: 8px;
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	}

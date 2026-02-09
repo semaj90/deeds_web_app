@@ -100,9 +100,11 @@ caseAnalysis: 89 }); // Gaming-style AI responses const processAICommand = async
             '-'
           )[1]}-400/50 to-transparent animate-[scanner_3s_infinite]"
         ></div> </div> </div> {/if} <!-- Nier: Assistant, Integration -->
- {#if showNierAssistant} <NierAIAssistant isOpen={ showNierAssistant } { caseContext } onClose={() => (showNierAssistant = false)} /> {/if} <style> @keyframes scanner { 0% { top: 0%, opacity: 1;}
+ {#if showNierAssistant} <NierAIAssistant isOpen={ showNierAssistant } { caseContext } onClose={() => (showNierAssistant = false)} /> {/if} <style> @keyframes scanner { 0% { top: 0%;
+		opacity: 1;}
     50% { opacity: 0.3;}
-    100% { top: 100%, opacity: 1;}
+    100% { top: 100%;
+		opacity: 1;}
   }
 </style>
 

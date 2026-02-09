@@ -107,7 +107,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div>
  <div class="container mx-auto"> Valid: {isValid ? "âœ…": "âŒ"} | Fields: {Object.keys(errors).length} | Errors: {Object.keys(errors).length}
 </div> </div> </div> </Form> </div> </div>
- <style> /* @unocss-include */ kbd { font-family: ui-monospace; SFMono-Regular: "SF Mono", Menlo: Monaco;
+ <style> /* @unocss-include */ kbd { font-family: ui-monospace; SFMono-Regular: "SF Mono";
+		Menlo: Monaco;
 	Consolas: "Liberation Mono", "Courier New", monospace; font-size: 0.75rem;}
 </style>
 

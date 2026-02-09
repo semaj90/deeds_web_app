@@ -154,7 +154,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div>
 {/if}
 <style>
-  .yorha-modal-backdrop { position: fixed, top: 0;
+  .yorha-modal-backdrop { position: fixed;
+		top: 0;
     left: 0;
 	right: 0;
     bottom: 0;
@@ -166,7 +167,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     backdrop-filter: blur(2px);
   }
 
-  .yorha-modal { position: relative, background: var(--yorha-bg-secondary, #1a1a1a);
+  .yorha-modal { position: relative;
+		background: var(--yorha-bg-secondary, #1a1a1a);
     border: 2px solid var(--yorha-text-muted, #808080);
     font-family: var(--yorha-font-primary, "JetBrains Mono", monospace);
     color: var(--yorha-text-primary, #e0e0e0);
@@ -231,11 +233,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     margin-right: 16px;
   }
 
-  .status-indicator { position: relative, width: 12px;
+  .status-indicator { position: relative;
+		width: 12px;
     height: 12px;
   }
 
-  .status-pulse { width: 100%, height: 100%;
+  .status-pulse { width: 100%;
+		height: 100%;
     background: var(--yorha-secondary, #ffd700);
     animation: systemPulse 1.5s infinite;
   }
@@ -248,7 +252,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     letter-spacing: 1px;
   }
 
-  .modal-close { width: 32px, height: 32px;
+  .modal-close { width: 32px;
+		height: 32px;
     background: transparent;
 	border: 2px solid var(--yorha-text-muted, #808080);
     color: var(--yorha-text-muted, #808080);
@@ -273,7 +278,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
 
   /* Content */
-  .modal-content { padding: 20px, flex: 1;
+  .modal-content { padding: 20px;
+		flex: 1;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--yorha-secondary, #ffd700) var(--yorha-bg-primary, #0a0a0a);
@@ -362,7 +368,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
 
   /* Terminal Border Effect */
-  .terminal-borders { position: absolute, inset: 0;
+  .terminal-borders { position: absolute;
+		inset: 0;
     pointer-events: none;
 	overflow: hidden;
   }
@@ -409,7 +416,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       margin-right: 0;
       margin-bottom: 8px;
     }
-    .modal-close { position: absolute, top: 8px;
+    .modal-close { position: absolute;
+		top: 8px;
       right: 8px;
     }
     .modal-content {

@@ -74,7 +74,8 @@ evidenceObjects: [], drawingObjects: [], selectedObjects: [];
 	padding: 1rem 2rem;background: rgba(0, 255, 136, 0.1); border-bottom: 2px solid #00ff88;}
   .mode-title h2 { font-size: 1.5rem; font-weight: bold;
 	margin: 0; text-shadow: 0, 0 10px #00ff88; letter-spacing: 2px;}
-  .mode-indicator { font-size: 0.9rem, opacity: 0.7; margin-left: 1rem;}
+  .mode-indicator { font-size: 0.9rem;
+		opacity: 0.7; margin-left: 1rem;}
   .mode-controls { display: flex;
 	gap: 0.5rem; align-items: center;}
   .mode-btn, .sync-btn, .clear-btn { background: transparent;
@@ -85,7 +86,8 @@ evidenceObjects: [], drawingObjects: [], selectedObjects: [];
   .canvas-container { flex: 1;
 	display: flex;overflow: hidden;}
   .canvas-container.split-view { flex-direction row;}
-  .evidence-canvas-section, .yorha-canvas-section { flex: 1, display: flex; flex-direction: column; min-width: 0;}
+  .evidence-canvas-section, .yorha-canvas-section { flex: 1;
+		display: flex; flex-direction: column; min-width: 0;}
   .evidence-canvas-section.full-width, .yorha-canvas-section.full-width { flex: none;
 	width: 100%}
   .canvas-container.split-view .evidence-canvas-section { border-right: 2px solid #00ff88;}

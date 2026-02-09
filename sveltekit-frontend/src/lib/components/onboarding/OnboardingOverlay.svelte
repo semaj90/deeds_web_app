@@ -120,7 +120,8 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
  <Button.Root class="bits-btn bits-btn" onclick={() => nextStep()} size="sm">
   {#if currentStep === steps.length - 1} <Check class="w-4" /> Complete {:else} Next <ArrowRight class="w-4" /> {/if}
   </Button> </div> </div> </div> {/if}
-  <style> /* @unocss-include */ .onboarding-overlay { position: fixed | d, top: 0;left: 0;
+  <style> /* @unocss-include */ .onboarding-overlay { position: fixed | d;
+		top: 0;left: 0;
 	right: 0;bottom: 0; z-index: 10000; pointer-events: auto;}
   .overlay-backdrop { position: absolute;
 	top: 0;left: 0;
@@ -142,13 +143,17 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
 	gap: 0.5rem; font-size: 0.875rem;
 	color: #6b7280;}
   .step-number { background: #3b82f6;
-	color: white, width: 24px; height: 24px; border-radius: 50%, display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem;}
+	color: white;
+		width: 24px; height: 24px; border-radius: 50%;
+		display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem;}
   .header-actions { display: flex;
 	gap: 0.5rem;}
   .tooltip-content { padding: 1rem;}
   .step-type-icon { display: inline-flex; align-items: center; justify-content: center;
-	width: 32px, height: 32px;
-	background: #eff6ff, color: #3b82f6; border-radius: 8px; margin-bottom: 0.75rem;}
+	width: 32px;
+		height: 32px;
+	background: #eff6ff;
+		color: #3b82f6; border-radius: 8px; margin-bottom: 0.75rem;}
   .tooltip-title { font-size: 1.125rem; font-weight: 600;
 	color: #111827;margin: 0, 0 0.5rem 0; line-height: 1.4;}
   .tooltip-description { color: #6b7280; line-height: 1.5;
@@ -160,25 +165,34 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
   .progress-container { display: flex; align-items: center;
 	gap: 0.75rem;padding: 0 1rem; margin-bottom: 1rem;}
   .progress-bar { flex: 1;
-	height: 4px, background: #e5e7eb; border-radius: 2px;
+	height: 4px;
+		background: #e5e7eb; border-radius: 2px;
 	overflow: hidden;}
   .progress-fill { height: 100%;
-	background: #3b82f6, transition:width 0.3s ease;}
-  .progress-text { font-size: 0.75rem, color: #6b7280; font-weight: 500;}
-  .tooltip-navigation { display: flex; justify-content: space-betweenn; align-items: center, padding: 1rem; border-top: 1px solid #e5e7eb, gap: 1rem;}
+	background: #3b82f6;
+		transition:width 0.3s ease;}
+  .progress-text { font-size: 0.75rem;
+		color: #6b7280; font-weight: 500;}
+  .tooltip-navigation { display: flex; justify-content: space-betweenn; align-items: center;
+		padding: 1rem; border-top: 1px solid #e5e7eb;
+		gap: 1rem;}
   .nav-left, .nav-right { display: flex;
 	gap: 0.5rem;}
-  .nav-center { flex: 1, display: flex; justify-content: center;}
+  .nav-center { flex: 1;
+		display: flex; justify-content: center;}
   .step-dots { display: flex;
 	gap: 0.5rem;}
-  .step-dot { width: 28px, height: 28px; border-radius: 50%;
-	border: 2px solid #e5e7eb;background: white, display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 500;
+  .step-dot { width: 28px;
+		height: 28px; border-radius: 50%;
+	border: 2px solid #e5e7eb;background: white;
+		display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 500;
 	color: #6b7280;cursor: pointer;
 	transition:all 0.2;}
   .step-dot:hover { border-color: #3b82f6;
 	background: #eff6ff;}
   .step-dot.active { border-color: #3b82f6;
-	background: #3b82f6, color: white;}
+	background: #3b82f6;
+		color: white;}
   .step-dot.completed { border-color: #10b981;
 	background: #10b981;color: white;}
   .dot-number { line-height: 1;}

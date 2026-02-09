@@ -92,7 +92,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	border: 1px solid #0f3460; max-width: 80%}
   .message-user .message-content { background: rgba(100, 255, 218, 0.1); border-color: #64ffda; margin-left: auto;}
   .message-text { line-height: 1.5; word-wrap: break-word;}
-  .typing-indicator { animation: blink 1s infinite, color: #64ffda;}
+  .typing-indicator { animation: blink 1s infinite;
+		color: #64ffda;}
   .message-metadata { display: flex;
 	gap: 0.5rem; margin-top: 0.5rem; font-size: 0.7rem;}
   .source-badge { padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: bold; text-transform: uppercase;}
@@ -100,23 +101,29 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .similarity-badge { background: rgba(100, 255, 218, 0.2), color: #64ffda;padding: 0.2rem 0.4rem; border-radius: 4px;}
   .feedback-buttons { display: flex;
 	gap: 0.5rem; margin-top: 0.5rem;}
-  .feedback-btn { background: none, border: none; font-size: 1rem;
-	cursor: pointer, opacity: 0.6;
+  .feedback-btn { background: none;
+		border: none; font-size: 1rem;
+	cursor: pointer;
+		opacity: 0.6;
 	transition:opacity 0.2;}
   .feedback-btn:hover { opacity: 1;}
-  .neural-sprite-container { margin-top: 0.5rem, height: 100px; border-radius: 4px;
+  .neural-sprite-container { margin-top: 0.5rem;
+		height: 100px; border-radius: 4px;
 	overflow: hidden;}
-  .message-timestamp { font-size: 0.6rem, opacity: 0.5; margin-top: 0.5rem;}
+  .message-timestamp { font-size: 0.6rem;
+		opacity: 0.5; margin-top: 0.5rem;}
   .chat-input-area { padding: 1rem;
 	background: rgba(0, 0, 0, 0.3); border-top: 2px solid #0f3460;}
   .input-container { display: flex;
 	gap: 0.5rem; align-items: center;}
   .message-input { flex: 1;
-	padding: 0.75rem;background: rgba(15, 52, 96, 0.6), border: 1px solid #0f3460; border-radius: 4px, color: #e0e6ed; font-family: inherit;}
+	padding: 0.75rem;background: rgba(15, 52, 96, 0.6), border: 1px solid #0f3460; border-radius: 4px;
+		color: #e0e6ed; font-family: inherit;}
   .message-input:focus { outline: none; border-color: #64ffda; box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2)}
   .send-button, .clear-button { min-width: 80px;}
   .loading-spinner { width: 16px;
-	height: 16px, border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
+	height: 16px;
+		border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
 	animation: spin 1s linear infinite;}
   .processing-status { margin-top: 0.5rem; text-align: center; font-size: 0.8rem;
 	opacity: 0.7;}

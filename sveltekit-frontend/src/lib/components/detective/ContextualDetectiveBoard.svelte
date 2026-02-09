@@ -517,7 +517,8 @@ includeWeakConnections: true,
     font-size: 0.875rem;
   }
 
-  .analytics-panel { display: flex, gap: 1.5rem;
+  .analytics-panel { display: flex;
+		gap: 1.5rem;
   }
 
   .metric {
@@ -539,7 +540,8 @@ includeWeakConnections: true,
     font-size: 0.875rem;
   }
 
-  .analysis-area { flex: 1, padding: 2rem;
+  .analysis-area { flex: 1;
+		padding: 2rem;
     overflow-y: auto;
 	display: flex;
     flex-direction: column;
@@ -576,10 +578,12 @@ includeWeakConnections: true,
 	transition:all 0.2s;
   }
 
-  .typing-indicator.active { color: #059669, background: #dcfce7;
+  .typing-indicator.active { color: #059669;
+		background: #dcfce7;
   }
 
-  .analysis-input { width: 100%, padding: 1rem;
+  .analysis-input { width: 100%;
+		padding: 1rem;
     border: 1px solid #d1d5db;
     border-radius: 0.375rem;
     font-size: 1rem;
@@ -594,7 +598,8 @@ includeWeakConnections: true,
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
-  .input-actions { display: flex, gap: 1rem;
+  .input-actions { display: flex;
+		gap: 1rem;
     margin-top: 1rem;
   }
 
@@ -607,17 +612,20 @@ includeWeakConnections: true,
     transition:all 0.2s;
   }
 
-  .input-actions button:first-child { background: #3b82f6, color: white;
+  .input-actions button:first-child { background: #3b82f6;
+		color: white;
   }
 
   .input-actions button:first-child:hover:not(:disabled) {
     background: #2563eb;
   }
 
-  .input-actions button:first-child:disabled { background: #9ca3af, cursor: not-allowed;
+  .input-actions button:first-child:disabled { background: #9ca3af;
+		cursor: not-allowed;
   }
 
-  .input-actions button:last-child { background: #f3f4f6, color: #374151;
+  .input-actions button:last-child { background: #f3f4f6;
+		color: #374151;
   }
 
   .input-actions button:last-child:hover {
@@ -654,7 +662,8 @@ includeWeakConnections: true,
     transition:all 0.2s;
   }
 
-  .prompt-button:hover { background: #0ea5e9, color: white;
+  .prompt-button:hover { background: #0ea5e9;
+		color: white;
   }
 
   .connection-map,
@@ -672,7 +681,8 @@ includeWeakConnections: true,
 	color: #1e293b;
   }
 
-  .map-stats { display: flex, gap: 1rem;
+  .map-stats { display: flex;
+		gap: 1rem;
     margin-bottom: 1rem;
     font-size: 0.875rem;
 	color: #64748b;

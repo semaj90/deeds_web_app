@@ -93,7 +93,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .typewriter-cursor.blinking { animation: blink 1.06s infinite;}
   @keyframes blink { 0%; } 50% { opacity: 1;}
     51%; } 100% { opacity: 0;}
-  } /* Thinking Animation Styles */ .thinking-container { padding: 1rem, background: rgba(0, 255, 0, 0.05); border: 1px solid rgba(0, 255, 0, 0.2); border-radius: 0.5rem; margin-bottom: 1rem;}
+  } /* Thinking Animation Styles */ .thinking-container { padding: 1rem;
+		background: rgba(0, 255, 0, 0.05); border: 1px solid rgba(0, 255, 0, 0.2); border-radius: 0.5rem; margin-bottom: 1rem;}
   .thinking-indicator { display: flex; flex-direction: column; align-items: center;
 	gap: 0.5rem;}
   .thinking-dots { display: flex;
@@ -102,14 +103,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: 0.5rem;
 	background: #00ff00; border-radius: 50%;
 	display: inline-block;}
-  .thinking-text { font-size: 0.875rem, color: #00ff00; text-align: center; font-style: italic;}
+  .thinking-text { font-size: 0.875rem;
+		color: #00ff00; text-align: center; font-style: italic;}
   .thinking-progress { width: 100%;
 	height: 0.25rem;background: rgba(0, 255, 0, 0.1); border-radius: 0.125rem;
 	overflow: hidden;}
   .progress-bar { height: 100%;
 	background: linear-gradient(90deg, #00ff00, #00ff88), transition:width 0.3s ease;}
   /* Activity Replay Styles */ .activity-replay-indicator { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.5rem 1rem, background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 0.25rem; margin-bottom: 0.5rem; font-size: 0.875rem;}
+	gap: 0.5rem;padding: 0.5rem 1rem;
+		background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 0.25rem; margin-bottom: 0.5rem; font-size: 0.875rem;}
   .replay-icon { color: #ffa500; font-size: 1rem;}
   .replay-text { color: #ffa500;
 	flex: 1;}

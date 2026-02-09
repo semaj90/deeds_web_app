@@ -289,10 +289,12 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.drop-zone p { color: #a0a0a0, margin: 0.5rem 0;
+	.drop-zone p { color: #a0a0a0;
+		margin: 0.5rem 0;
 	}
 
-	.file-input-label { display: inline-block, background: #00d4ff;
+	.file-input-label { display: inline-block;
+		background: #00d4ff;
 		color: #1a1a2e;
 	padding: 0.75rem 1.5rem;
 		border-radius: 4px;
@@ -302,7 +304,8 @@
 		transition: all 0.3s;
 	}
 
-	.file-input-label:hover { background: #00ff00, transform: scale(1.05);
+	.file-input-label:hover { background: #00ff00;
+		transform: scale(1.05);
 	}
 
 	.file-input-label input {
@@ -330,10 +333,12 @@
 		margin-bottom: 1rem;
 	}
 
-	.uploads-header h3 { color: #00d4ff, margin: 0;
+	.uploads-header h3 { color: #00d4ff;
+		margin: 0;
 	}
 
-	.clear-btn { background: #ff6b6b, color: white;
+	.clear-btn { background: #ff6b6b;
+		color: white;
 		border: none;
 	padding: 0.5rem 1rem;
 		border-radius: 4px;
@@ -382,14 +387,16 @@
 		word-break: break-all;
 	}
 
-	.progress-bar { width: 100%, height: 6px;
+	.progress-bar { width: 100%;
+		height: 6px;
 		background: rgba(0, 212, 255, 0.2);
 		border-radius: 3px;
 	overflow: hidden;
 		margin-bottom: 0.25rem;
 	}
 
-	.progress-fill { height: 100%, background: linear-gradient(90deg, #00d4ff, #00ff00);
+	.progress-fill { height: 100%;
+		background: linear-gradient(90deg, #00d4ff, #00ff00);
 		transition: width 0.3s;
 	}
 
@@ -408,7 +415,8 @@
 		margin-left: 1rem;
 	}
 
-	.spinner { display: inline-block, animation: spin 1s linear infinite;
+	.spinner { display: inline-block;
+		animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {
@@ -432,7 +440,8 @@
 		margin-top: 0;
 	}
 
-	.info-box ul { color: #a0a0a0, margin: 0;
+	.info-box ul { color: #a0a0a0;
+		margin: 0;
 		padding-left: 1.5rem;
 	}
 

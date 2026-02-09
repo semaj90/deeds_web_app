@@ -145,7 +145,8 @@
 </div>
 
 <style>
- .relationship-inspector { width: 320px, height: 100%;
+ .relationship-inspector { width: 320px;
+		height: 100%;
  background: white;
  border-left: 1px solid #e5e7eb;
  display: flex;

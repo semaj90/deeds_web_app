@@ -208,8 +208,8 @@ select {
  transition: border-color var(--transition-fast);
 }
 
-input:focus,
-textarea:focus,
+input: focus;
+	textarea:focus,
 select:focus {
  outline: none;
  border-color: var(--color-highlight-border);

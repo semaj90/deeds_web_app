@@ -142,11 +142,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div>
 <style>
   .chat-input-wrapper {
-    position: relative, width: 100%}
+    position: relative;
+		width: 100%}
   /* --- Chat Input Styles --- */
   .input-container {
     display: flex;
-    align-items: flex-end, gap: 8px; padding: 12px
+    align-items: flex-end;
+		gap: 8px; padding: 12px
    ;background: var(--bg-primary, #ffffff), border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 8px
    ;transition:border-color 0.2s ease,
@@ -157,8 +159,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .chat-input {
     flex: 1;
     min-height: 20px
-    max-height: 120px, padding: 8px 0;
-    background: none, border: none; outline: none, resize: none;
+    max-height: 120px;
+		padding: 8px 0;
+    background: none;
+		border: none; outline: none;
+		resize: none;
     font-family: inherit
     font-size: 0.875rem;
     line-height: 1.5
@@ -172,7 +177,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     color: var(--text-error, #dc2626)}
   .input-actions {
     display: flex;
-    align-items: center, gap: 8px;
+    align-items: center;
+		gap: 8px;
     flex-shrink: 0; /* Fixed typo: changed comma to semicolon */
   }
   .character-count {
@@ -186,10 +192,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .send-button {
     display: flex;
     align-items: center
-    justify-content: center, width: 36px; height: 36px
+    justify-content: center;
+		width: 36px; height: 36px
    ;background: var(--bg-muted, #f1f5f9), color: var(--text-muted, #64748b);
     border: none;
-    border-radius: 6px, cursor: pointer
+    border-radius: 6px;
+		cursor: pointer
    ; transition:all 0.2s ease;}
   .send-button:hover:not(disabled) { /* Corrected selector for hover state */
     background: var(--bg-hover, #e2e8f0), color: var(--text-primary, #1e293b)}
@@ -198,14 +206,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .send-button.has-content:hover:not(disabled) {
     background: var(--accent-hover, #2563eb)}
   .send-button:disabled { /* Corrected selector for disabled state */
-    opacity: 0.5, cursor:not-allowed;}
+    opacity: 0.5;
+		cursor:not-allowed;}
   .input-hint {
-    margin-top: 8px, padding: 0 12px;}
+    margin-top: 8px;
+		padding: 0 12px;}
   .hint-text {
     font-size: 0.75rem
    ;color: var(--text-muted, #94a3b8)}
   .hint-text kbd {
-    font-size: 0.6875rem, padding: 2px 4px
+    font-size: 0.6875rem;
+		padding: 2px 4px
    ;background: var(--bg-secondary, #f8fafc), border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 3px;
     font-family: monospace
@@ -238,7 +249,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .input-container {
       padding: 8px;}
     .send-button {
-      width: 32px, height: 32px;}
+      width: 32px;
+		height: 32px;}
     .send-button svg {
       width: 16px
      ;height: 16px;}

@@ -440,7 +440,8 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .form-grid { display: grid, gap: 2rem;}
+  .form-grid { display: grid;
+		gap: 2rem;}
 
   .form-section h3 {
     margin: 0 0 1rem 0;
@@ -464,18 +465,21 @@
     font-weight: 500;
 	color: #374151;}
 
-  label.required::after { content: '*', color: #ef4444;
+  label.required::after { content: '*';
+		color: #ef4444;
     margin-left: 0.25rem;}
 
   input,
   select,
-  textarea { width: 100%, padding: 0.75rem;
+  textarea { width: 100%;
+		padding: 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 1rem;
 	transition:border-color 0.2s, box-shadow 0.2s;}
 
-  input:focus, select:focus; textarea:focus {
+  input: focus;
+		select:focus; textarea:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -490,7 +494,8 @@
     font-size: 0.875rem;
 	color: #ef4444;}
 
-  .tag-input { display: flex, gap: 0.5rem;
+  .tag-input { display: flex;
+		gap: 0.5rem;
     margin-bottom: 0.5rem;}
 
   .tag-input input {
@@ -524,7 +529,8 @@
     font-size: 0.875rem;
 	color: #374151;}
 
-  .tag button { background: none, border: none;
+  .tag button { background: none;
+		border: none;
     cursor: pointer;
     font-size: 1rem;
 	color: #6b7280;
@@ -537,7 +543,8 @@
     border-radius: 50%;
 	transition:background-color 0.2s;}
 
-  .tag button:hover { background: #d1d5db, color: #374151;}
+  .tag button:hover { background: #d1d5db;
+		color: #374151;}
 
   .form-actions {
     display: flex;
@@ -560,14 +567,16 @@
   .form-actions button:hover {
     background: #f9fafb;}
 
-  .form-actions button.primary { background: #3b82f6, color: white;
+  .form-actions button.primary { background: #3b82f6;
+		color: white;
     border-color: #3b82f6;}
 
   .form-actions button.primary:hover {
     background: #2563eb;
     border-color: #2563eb;}
 
-  .form-actions button:disabled { opacity: 0.5, cursor: not-allowed;}
+  .form-actions button:disabled { opacity: 0.5;
+		cursor: not-allowed;}
 
   @media (max-width: 768px) {
     .enhanced-case-form {

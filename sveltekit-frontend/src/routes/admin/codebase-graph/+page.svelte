@@ -193,7 +193,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-    .codebase-graph { padding: 2rem, background: #0f0f1a;
+    .codebase-graph { padding: 2rem;
+		background: #0f0f1a;
         color: #e0e0e0;
         min-height: 100vh;
     }
@@ -209,7 +210,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         gap: 0.5rem;
         margin-top: 1rem;
     }
-    .node-item { padding: 0.5rem, background: rgba(255, 255, 255, 0.05);
+    .node-item { padding: 0.5rem;
+		background: rgba(255, 255, 255, 0.05);
         border-radius: 4px;
         font-size: 0.8rem;
     }

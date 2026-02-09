@@ -196,24 +196,30 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .dashboard-header { display: flex; justify-content: space-between; /* Fixed: space-betweennn -> space-between */ align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0;}
   .dashboard-title { font-size: 2rem; font-weight: 700;
 	color: #1e293b;margin: 0;}
-  .dashboard-subtitle { color: #64748b, margin: 0.5rem, 0 0 0;}
-  .header-actions { display: flex, gap: 1rem; align-items: center;}
+  .dashboard-subtitle { color: #64748b;
+		margin: 0.5rem, 0 0 0;}
+  .header-actions { display: flex;
+		gap: 1rem; align-items: center;}
   .demo-toggle { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.5rem 1rem, background: #f0f9ff;
+	gap: 0.5rem;padding: 0.5rem 1rem;
+		background: #f0f9ff;
 	border: 1px solid #3b82f6; border-radius: 0.375rem; font-size: 0.875rem;
 	cursor: pointer;}
   .demo-toggle input[type='checkbox'] { cursor: pointer;}
   .demo-toggle span { color: #1e40af; font-weight: 500;}
   .controls-section { margin-bottom: 2rem;}
-  .filters-row { display: flex, gap: 1.5rem; align-items: end; flex-wrap;}
+  .filters-row { display: flex;
+		gap: 1.5rem; align-items: end; flex-wrap;}
   .search-group { flex: 1; min-width: 250px;}
-  .search-input { width: 100%, padding: 0.75rem;
+  .search-input { width: 100%;
+		padding: 0.75rem;
 	border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem;}
   .filter-group { display: flex; flex-direction: column;
 	gap: 0.5rem;}
   .filter-group label { font-size: 0.875rem; font-weight: 500;
 	color: #374151;}
-  .filter-select { padding: 0.5rem, border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; min-width: 140px;}
+  .filter-select { padding: 0.5rem;
+		border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; min-width: 140px;}
   .cases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)), gap: 1.5rem;}
   .case-score-card { border: 1px solid #e2e8f0; border-radius: 0.5rem;
 	overflow: hidden;transition:box-shadow 0.2s;}
@@ -221,10 +227,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .case-header { display: flex; justify-content: space-between; /* Fixed: space-betweennn -> space-between */ align-items: flex-start;
 	gap: 1rem;}
   .case-title { flex: 1; /* Fixed: comma -> semicolon */ margin: 0;}
-  .case-badges { display: flex, gap: 0.5rem; flex-shrink: 0; /* Fixed: comma -> semicolon */ }
+  .case-badges { display: flex;
+		gap: 0.5rem; flex-shrink: 0; /* Fixed: comma -> semicolon */ }
   .priority-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;
 	border: 1px solid;}
-  .score-badge { padding: 0.25rem 0.5rem, background: #f1f5f9; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 700;}
+  .score-badge { padding: 0.25rem 0.5rem;
+		background: #f1f5f9; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 700;}
   .case-description { margin: 0.5rem, 0 0 0, color: #64748b;}
   .score-metrics { display: grid; grid-template-columns: repeat(3, 1fr), gap: 1rem; margin-bottom: 1rem;}
   .metric { text-align: center;}
@@ -243,11 +251,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .factor-category { font-weight: 500;
 	color: #374151;}
   .factor-impact { color: #64748b;}
-  .card-actions { display: flex, gap: 0.5rem; justify-content: flex-end;}
+  .card-actions { display: flex;
+		gap: 0.5rem; justify-content: flex-end;}
   .loading-state, .empty-state { grid-column: 1 / -1; text-align: center;
 	padding: 3rem;
 	color: #64748b;}
-  .loading-spinner { width: 2rem, height: 2rem;
+  .loading-spinner { width: 2rem;
+		height: 2rem;
 	border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%;
 	animation: spin 1s linear infinite;margin: 0 auto 1rem;}
   @keyframes spin { to { transform: rotate(360deg)}
@@ -260,14 +270,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .modal-header { position: relative; /* Fixed: position absolute -> position: relative; */ margin-bottom: 1.5rem;}
   .modal-title { font-size: 1.5rem; font-weight: 600;
 	margin: 0, 0 0.5rem 0;}
-  .modal-description { color: #64748b, margin: 0;}
+  .modal-description { color: #64748b;
+		margin: 0;}
   .modal-close { position: absolute; /* Fixed: position absolute -> position: absolute; */ top: 0; /* Fixed: comma -> semicolon */ right: 0;
 	width: 2rem;
-	height: 2rem, display: flex; align-items: center; justify-content: center;
+	height: 2rem;
+		display: flex; align-items: center; justify-content: center;
 	border: none;background: transparent; font-size: 1.5rem;
 	color: #64748b;
 	cursor: pointer; border-radius: 0.25rem;}
-  .modal-close:hover { background: #f1f5f9, color: #1e293b;}
+  .modal-close:hover { background: #f1f5f9;
+		color: #1e293b;}
   .score-details-dialog { max-width: 800px; max-height: 90vh; overflow-y: auto;}
   .score-details-content { display: flex; flex-direction: column;
 	gap: 2rem;}
@@ -279,14 +292,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .large-score { font-size: 4rem; font-weight: 700;}
   .score-metadata p { margin: 0.25rem 0; font-size: 0.875rem;}
   .factors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 1rem;}
-  .factor-card { padding: 1rem, border: 1px solid #e2e8f0; border-radius: 0.375rem;
+  .factor-card { padding: 1rem;
+		border: 1px solid #e2e8f0; border-radius: 0.375rem;
 	background: #fafafa;}
   .factor-card h4 { margin: 0, 0 0.5rem 0, color: #374151;}
   .factor-metrics { display: flex; align-items: center;
 	gap: 0.5rem; margin-bottom: 0.5rem;}
-  .factor-bar { flex: 1; /* Fixed: comma -> semicolon */ height: 0.5rem, background: #e2e8f0; border-radius: 0.25rem;
+  .factor-bar { flex: 1; /* Fixed: comma -> semicolon */ height: 0.5rem;
+		background: #e2e8f0; border-radius: 0.25rem;
 	overflow: hidden;}
-  .factor-fill { height: 100%, background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s;}
+  .factor-fill { height: 100%;
+		background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition:width 0.3s;}
   .factor-percentage { font-size: 0.75rem; font-weight: 600;
 	color: #374151;}
   .factor-description { font-size: 0.75rem;
@@ -300,7 +316,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .recommendation-item { padding: 0.75rem; margin-bottom: 0.5rem;
 	background: #f0f9ff; border-left: 4px solid #3b82f6; border-radius: 0.25rem; font-size: 0.875rem;
 	color: #374151;}
-  .dialog-actions { display: flex, gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;}
+  .dialog-actions { display: flex;
+		gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;}
   .visually-hidden { position: absolute; /* Fixed: position absolute -> position: absolute; */ width: 1px;
 	height: 1px;
 	padding: 0; /* Fixed: comma -> semicolon */ margin: -1px;

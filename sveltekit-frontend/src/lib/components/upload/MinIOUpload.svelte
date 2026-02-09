@@ -419,7 +419,8 @@ file: (value: unknown) => {
 
   .form-input,
   .form-select,
-  .form-textarea { width: 100%, padding: 0.75rem;
+  .form-textarea { width: 100%;
+		padding: 0.75rem;
     border: 1px solid var(--border-color, #333);
     border-radius: 6px;
 	background: var(--bg-primary, #0f0f1a);
@@ -489,12 +490,14 @@ file: (value: unknown) => {
     text-align: left;
   }
 
-  .image-preview { width: 80px, height: 80px;
+  .image-preview { width: 80px;
+		height: 80px;
     object-fit: cover;
     border-radius: 6px;
   }
 
-  .file-icon { width: 80px, height: 80px;
+  .file-icon { width: 80px;
+		height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -544,13 +547,15 @@ file: (value: unknown) => {
     margin: 1rem 0;
   }
 
-  .progress-bar { width: 100%, height: 8px;
+  .progress-bar { width: 100%;
+		height: 8px;
     background: var(--bg-tertiary, #2a2a3e);
     border-radius: 4px;
 	overflow: hidden;
   }
 
-  .progress-fill { height: 100%, background: var(--accent-primary, #00d4ff);
+  .progress-fill { height: 100%;
+		background: var(--accent-primary, #00d4ff);
     transition:width 0.3s ease;
   }
 
@@ -565,7 +570,8 @@ file: (value: unknown) => {
     margin-top: 2rem;
   }
 
-  .submit-button { width: 100%, padding: 0.875rem;
+  .submit-button { width: 100%;
+		padding: 0.875rem;
     background: var(--accent-primary, #00d4ff);
     color: white;
 	border: none;
@@ -579,7 +585,8 @@ file: (value: unknown) => {
     background: var(--accent-primary-dark, #00b8e6);
   }
 
-  .submit-button:disabled { opacity: 0.6, cursor: not-allowed;
+  .submit-button:disabled { opacity: 0.6;
+		cursor: not-allowed;
   }
 
   .error-message {

@@ -182,7 +182,8 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 
 <style>
 	/* NES.css dialog fallback styles */
-	:global(.nes-dialog) { position: fixed, padding: 1.5rem;
+	:global(.nes-dialog) { position: fixed;
+		padding: 1.5rem;
 		border: 4px solid #fff;
 		background: #212529;
 	color: #fff;
