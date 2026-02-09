@@ -1,6 +1,6 @@
 
 <script lang="ts">
-  import { Combobox } from "bits-ui";
+  import * as Combobox from "bits-ui/components/combobox";
   import { fly } from "svelte/transition";
   import { Search, Scale, FileText, Check } from "lucide-svelte";
 

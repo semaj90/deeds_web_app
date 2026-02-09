@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import { Button } from "bits-ui";
+  import * as Button from "bits-ui/components/button";
   import type { Snippet } from "svelte";
   import { buttonVariants, type ButtonVariantProps } from "../button-variants";
 
