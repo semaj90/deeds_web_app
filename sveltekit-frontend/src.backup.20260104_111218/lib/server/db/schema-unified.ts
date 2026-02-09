@@ -1,1 +1,0 @@
-/** * Unified Database Schema with PostgreSQL + pgvector Support * Production-ready schema for Legal AI Platform */ 
