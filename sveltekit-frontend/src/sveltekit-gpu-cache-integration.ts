@@ -187,7 +187,7 @@ export class SvelteKitGPUCacheIntegration {
 									sessionId: this.generateSessionId(),
 									preferences: {}
 							  }
-							 | undefined
+							: undefined
 					};
 
 					this.memoryCache.set(key, clientEntry);
@@ -254,7 +254,7 @@ export class SvelteKitGPUCacheIntegration {
 							sessionId: this.generateSessionId(),
 							preferences: {}
 					  }
-					 | undefined
+					: undefined
 			};
 
 			this.memoryCache.set(key, clientEntry);
@@ -267,7 +267,7 @@ export class SvelteKitGPUCacheIntegration {
 				await this.safeRpcStore(key, data, {
 					tags: options.tags,
 					userId: options.userId,
-					compressionLevel: options.compression ? 6  | undefined
+					compressionLevel: options.compression ? 6 : undefined
 				});
 			}
 

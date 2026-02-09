@@ -74,7 +74,7 @@ export function createRedisInstance(options?: RedisConnectionOptions): RedisClie
     const finalOptions = { ...defaultOptions, ...options };
 
     // Guard REDIS_URL to avoid empty-string causing constructor confusion
-    const redisUrl = typeof REDIS_URL === 'string' && REDIS_URL.length > 0 ? REDIS_URL  | undefined;
+    const redisUrl = typeof REDIS_URL === 'string' && REDIS_URL.length > 0 ? REDIS_URL : undefined;
 
     const inst: RedisClient = redisUrl ? new Redis(redisUrl) : new Redis(finalOptions);
 
@@ -94,7 +94,7 @@ export function createRedisInstance(options?: RedisConnectionOptions): RedisClie
         console.error('Redis connection error: ', err);
     };
 
-    // attach handlers (guarded to avoid: "possibly | undefined" issues)
+    // attach handlers (guarded to avoid: "possibly: undefined" issues)
     if (hasOnMethod(inst)) {
         inst.on('error', handleRedisError);
         inst.on('connect', () => {
@@ -133,7 +133,7 @@ export function createRedisConnection(options?: Partial<RedisConnectionOptions>)
     }
 
     // Use single-argument form when REDIS_URL exists
-    const redisUrl2 = typeof REDIS_URL === 'string' && REDIS_URL.length > 0 ? REDIS_URL  | undefined;
+    const redisUrl2 = typeof REDIS_URL === 'string' && REDIS_URL.length > 0 ? REDIS_URL : undefined;
 
     const conn: RedisClient = redisUrl2 ? new Redis(redisUrl2) : new Redis(finalOptions);
 

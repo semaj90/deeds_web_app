@@ -233,7 +233,7 @@ class RedisService {
       connected: this.isConnected,
       status: this.isConnected ? 'connected' : 'disconnected',
       reconnectAttempts: this.reconnectAttempts,
-      config: { ...this.config, password: this.config.password ? '[REDACTED]'  | undefined },
+      config: { ...this.config, password: this.config.password ? '[REDACTED]' : undefined },
 	};
   }
 

@@ -206,7 +206,7 @@ export class RabbitMQServiceWorker {
     };
 
     const getField = (m: unknown, key: string): unknown =>
-      m && typeof m === 'object' ? (m as Record<string, unknown>)[key]  | undefined;
+      m && typeof m === 'object' ? (m as Record<string, unknown>)[key] : undefined;
 
     const getString = (m: unknown, key: string): string | undefined => {
       const v = getField(m, key);
@@ -361,7 +361,7 @@ export class RabbitMQServiceWorker {
 
     const rabbitmqHealth: RabbitMQHealth = {
       status: inferredStatus ?? 'unhealthy',
-      details: partial ? { ...partial }  | undefined,
+      details: partial ? { ...partial } : undefined,
     };
 
     return rabbitmqHealth;

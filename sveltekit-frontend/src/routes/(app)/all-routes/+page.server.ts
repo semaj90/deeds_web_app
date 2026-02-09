@@ -55,7 +55,7 @@ function astNodeToRouteNode(astNode: Record<string, unknown>): RouteNode {
 
 	// Parse SvelteKit route pattern to extract group
 	const groupMatch = routePath.match(/\(([^)]+)\)/);
-	const group = groupMatch ? `(${groupMatch[1]})`  | undefined;
+	const group = groupMatch ? `(${groupMatch[1]})` : undefined;
 
 	// Infer kind from file extension or name
 	let kind: RouteNode['kind'] = 'page';
@@ -80,7 +80,7 @@ function astNodeToRouteNode(astNode: Record<string, unknown>): RouteNode {
 		kind,
 		group,
 		status: 'ok',
-		tags: tags.length > 0 ? tags  | undefined,
+		tags: tags.length > 0 ? tags : undefined,
 		category: group ? `Routes/${group}` : 'Routes/root',
 		lastModified: astNode.lastModified as string | undefined,
 		hasLoad: (astNode.hasLoad as boolean) ?? false,

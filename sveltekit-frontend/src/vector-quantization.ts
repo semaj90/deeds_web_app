@@ -261,7 +261,7 @@ export class VectorQuantizationService {
             ['arbitration', 1.1],
             ['confidential', 1.3],
             ['proprietary', 1.2]
-        ])  | undefined;
+        ]) : undefined;
 
         // K-means clustering
         const centroids = await this.kMeansClustering(subvectors, numClusters, legalTermWeights);

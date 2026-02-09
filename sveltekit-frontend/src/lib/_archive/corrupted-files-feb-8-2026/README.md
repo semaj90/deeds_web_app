@@ -79,6 +79,15 @@ These files were archived during Session 10 error fixing due to extensive corrup
 - **Import Status**: ✅ **1 import from disabled file (`routes_parked/.../+server.ts.disabled`) - effectively orphaned**
 - **Recommended Fix**: Leave archived (not in active use)
 
+### 10. legal-performance-metrics.ts (1 error, 0 imports) **✅ ARCHIVED (Session 11)**
+- **Original Path**: `src/lib/monitoring/legal-performance-metrics.ts`
+- **Issues**:
+  - Severe formatting corruption - entire file compressed onto 3 lines
+  - All interface members using commas instead of semicolons
+  - Same compression pattern as vector-suggestions-service.ts
+- **Import Status**: ✅ **0 active imports - completely orphaned**
+- **Recommended Fix**: Complete rewrite if monitoring is needed, or leave archived
+
 ## Next Steps
 
 1. **XState Machines** (aiAssistantMachine): Rewrite using patterns from [xstate-svelte5.ts](../../utils/xstate-svelte5.ts)

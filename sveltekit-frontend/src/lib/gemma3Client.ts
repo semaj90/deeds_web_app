@@ -84,7 +84,7 @@ export class Gemma3Client {
 				signal:
 					typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
 						? (AbortSignal as any).timeout(10_000)
-						 | undefined
+						: undefined
 			});
 			return res.ok;
 		} catch (err) {

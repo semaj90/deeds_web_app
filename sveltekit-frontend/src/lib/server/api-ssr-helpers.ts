@@ -166,7 +166,7 @@ export function withSSRHandler<T>(
 			const result = await handler(event);
 			if (result instanceof Response) return result;
 
-			const cacheKey = options?.cacheKey ? options.cacheKey(event)  | undefined;
+			const cacheKey = options?.cacheKey ? options.cacheKey(event) : undefined;
 
 			return await createSSRResponse(result, {
 				cached: !!cacheKey,
