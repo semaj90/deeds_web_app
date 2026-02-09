@@ -1,7 +1,6 @@
 // Enhanced Case API Client
 // Integrates REST architecture with PostgreSQL-first workers and clustering
 import { restClient, type APIResponse } from './enhanced-rest-architecture';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CaseCreationRequest {
     // Core case fields
@@ -110,7 +109,7 @@ export class EnhancedCaseAPI {
             return {
                 success: false,
                 error: msg,
-                data | undefined,
+                data: undefined,
             };
         }
     }
@@ -161,7 +160,7 @@ export class EnhancedCaseAPI {
             return {
                 success: false,
                 error: msg,
-                data | undefined,
+                data: undefined,
             };
         }
     }

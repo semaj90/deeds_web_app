@@ -68,7 +68,7 @@ export class KnowledgeSearchStore {
     }
 
     get canUseWebSearch() {
-        return this?.isGemini&& this.useWebSearch;
+        return this.isGemini && this.useWebSearch;
     }
 
     get resultCount() {

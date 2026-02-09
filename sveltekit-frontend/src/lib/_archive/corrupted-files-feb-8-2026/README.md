@@ -88,6 +88,30 @@ These files were archived during Session 10 error fixing due to extensive corrup
 - **Import Status**: ✅ **0 active imports - completely orphaned**
 - **Recommended Fix**: Complete rewrite if monitoring is needed, or leave archived
 
+### 11. quic-gateway-client.ts (100+ errors, 1 import - orphaned) **✅ ARCHIVED (Session 11 Part 2)**
+- **Original Path**: `src/lib/services/quic-gateway-client.ts`
+- **Issues**:
+  - Severe compression corruption - entire file compressed onto 24 lines
+  - All interfaces/types compressed with mixed comma/colon/semicolon separators
+  - Corrupted emoji characters (âš ï¸, ðŸš€, âœ…, âŒ, ðŸ"—, ðŸ"„)
+  - Broken optional chaining: `($1?.$2)` throughout
+  - Duplicate boolean values: `multiplexing: true true`
+  - Missing property names before type annotations
+  - Malformed ternary expressions: `data | undefined` instead of `data: undefined`
+- **Import Status**: ✅ **1 import from unified-service-orchestrator.ts (also corrupted and orphaned)**
+- **Recommended Fix**: Complete rewrite if QUIC gateway is needed, or leave archived
+
+### 12. unified-service-orchestrator.ts (200+ errors, 0 imports) **✅ ARCHIVED (Session 11 Part 2)**
+- **Original Path**: `src/lib/services/unified-service-orchestrator.ts`
+- **Issues**:
+  - Severe compression corruption - entire file compressed onto 49 lines
+  - Same patterns as quic-gateway-client.ts (mixed separators, compressed interfaces)
+  - Type/value confusion throughout
+  - Malformed object literals and function parameters
+  - Backtick/quote corruption in string literals
+- **Import Status**: ✅ **0 active imports - completely orphaned**
+- **Recommended Fix**: Complete rewrite if service orchestration is needed, or leave archived
+
 ## Next Steps
 
 1. **XState Machines** (aiAssistantMachine): Rewrite using patterns from [xstate-svelte5.ts](../../utils/xstate-svelte5.ts)
