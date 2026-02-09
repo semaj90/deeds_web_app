@@ -27,21 +27,23 @@
 #### Component Import Patterns
 
 ```typescript
-// ❌ OLD (bits-ui v1.x / Svelte 4)
-import { Accordion } from "bits-ui";
+// ❌ OLD (bits-ui v1.x / Svelte 4) - aliased imports
 import { Checkbox as BitsCheckbox } from "bits-ui";
 
-// ✅ NEW (bits-ui v2.15.5 / Svelte 5)
-import * as Accordion from "bits-ui/components/accordion";
-import * as Checkbox from "bits-ui/components/checkbox";
-import * as Select from "bits-ui/components/select";
-import * as Dialog from "bits-ui/components/dialog";
+// ✅ CORRECT (bits-ui v2.14.4+ / Svelte 5) - named imports from main entry
+import { Accordion } from "bits-ui";
+import { Checkbox } from "bits-ui";
+import { Select } from "bits-ui";
+import { Dialog } from "bits-ui";
+
+// ❌ WRONG - subpath imports do NOT exist in bits-ui
+// import * as Dialog from "bits-ui/components/dialog";  // Module not found!
 ```
 
 **Usage Example:**
 ```svelte
 <script lang="ts">
-  import * as Accordion from "bits-ui/components/accordion";
+  import { Accordion } from "bits-ui";
 
   let value = $state<string | undefined>(undefined);
 </script>
