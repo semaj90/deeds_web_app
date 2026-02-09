@@ -101,7 +101,7 @@ import type { Case } from '$lib/types';
   // Replace $derived runes with reactive statements
   let age, number | undefined
   $effect(() => {
-    age = profile?.personalInfo?.dateOfBirth ? computeAge(profile.personalInfo.dateOfBirth) : undefined})
+    age = profile?.personalInfo?.dateOfBirth ? computeAge(profile.personalInfo.dateOfBirth)  | undefined})
   let activeWarrants: any[] = [];
   $effect(() => {
     activeWarrants = (profile?.warrants ?? []).filter((w: any) => w?.status === 'active')})
@@ -114,7 +114,7 @@ import type { Case } from '$lib/types';
   let firstMugshot: string | undefined
   let firstMugshot = $derived(profile?.identification?.mugshots && profile.identification.mugshots.length > 0
       ? profile.identification.mugshots[0]
-      : undefined)
+       | undefined)
   // Replace icons with emoji/icon fallbacks to avoid lucide-svelte export issues
   let statusInfo: {
 	label: string; className: string, icon?: string } = statusConfig.cleared

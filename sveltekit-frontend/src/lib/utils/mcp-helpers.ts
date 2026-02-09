@@ -299,11 +299,11 @@ export function getOllamaEndpoint(): string {
  /** * Resolve Ollama endpoint with the following precedence: * 1. Vite dev; config: import.meta.env.VITE_OLLAMA_URL * 2. Node env: process.env.OLLAMA_URL * 3. Optional docker-specific: env | process.env.DOCKER_OLLAMA_URL * 4. Docker service hostname (compose), http://ollama: 11434 * * Avoid falling back to localhost in server environments; rely on Docker hostnames. */
  type ViteEnvShape = ImportMetaEnv & { VITE_OLLAMA_URL?: string };
 typeof import.meta !== 'undefined'
- ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL : undefined; // Corrected syntax
+ ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL  | undefined; // Corrected syntax
 typeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL : undefined; // Corrected syntax
+ ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL  | undefined; // Corrected syntax
 typeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? (process.env as NodeJS.ProcessEnv).DOCKER_OLLAMA_URL : undefined; // Corrected syntax
+ ? (process.env as NodeJS.ProcessEnv).DOCKER_OLLAMA_URL  | undefined; // Corrected syntax
  const dockerDefault = 'http://ollama:11434'; // Corrected URL string
  // prefer explicit config first
  if (viteUrl) return viteUrl;
@@ -577,7 +577,7 @@ tryGetStringProp(contentVal, 'text') ?? tryGetStringProp(contentVal, 'content');
 function tryGetStringProp(obj: Record<string, unknown>, prop: string): string | undefined {
  // Added type
  const val = obj[prop];
- return typeof val === 'string' ? val : undefined;
+ return typeof val === 'string' ? val  | undefined;
 }
 /** * Quick access to MCP resources */
 export const mcpResources = {

@@ -332,7 +332,7 @@ export const brokenRelativePathPattern: PatternMatcher = createPattern(
 export const relativeDoubleSlashPattern: PatternMatcher = createPattern(
   'relative-double-slash-fix',
   'Fix double slashes in relative paths',
-  /from\s*(['"])(\.\.?)\/{2,}/g,
+  /from\s*(['"])(\.\.?)\/{2}/g,
   'from $1$2/',
   {
     priority: 31,

@@ -49,7 +49,7 @@ any: tech.split(',') } });
             must.push({ key: 'clusterId', match: { value, clusterId } });
         }
 
-        const filter = must.length > 0 ? { must } : undefined;
+        const filter = must.length > 0 ? { must }  | undefined;
 
         const response = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
             method: 'POST',

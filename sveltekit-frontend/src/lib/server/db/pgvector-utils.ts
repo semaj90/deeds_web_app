@@ -72,7 +72,7 @@ function asNumber(v: any, fallback = 0): number {
 }
 
 function asObject(v: any): Record<string, unknown> | undefined {
-    return v && typeof v === 'object' ? (v as Record<string, unknown>) : undefined;
+    return v && typeof v === 'object' ? (v as Record<string, unknown>)  | undefined;
 }
 
 export interface VectorSearchResult {
@@ -233,7 +233,7 @@ SELECT * FROM search_similar_messages(
         `;
         const results = (await db.execute(sql)) as Array<Row>;
         return (results || []).map((row: Row) => ({
-            id: asString(row.id, content: asString(row.content, similarity: asNumber(row.similarity, metadata: includeMetadata ? asObject(row.metadata) : undefined,
+            id: asString(row.id, content: asString(row.content, similarity: asNumber(row.similarity, metadata: includeMetadata ? asObject(row.metadata)  | undefined,
             documentType: 'chat_message'
         }));
     } catch (error: unknown) {
@@ -266,7 +266,7 @@ SELECT * FROM search_similar_evidence(
             id: asString(row.id, content: asString(row.description ?? row.title, similarity: asNumber(row.similarity, metadata: includeMetadata ? {
                 title: asString(row.title, evidenceType: asString(row.evidence_type, caseId: asString(row.case_id),
                 ...(asObject(row.metadata) ?? asObject(row.ai_analysis) ?? {})
-            } : undefined,
+            }  | undefined,
             documentType: 'evidence'
         }));
     } catch (error: unknown) {

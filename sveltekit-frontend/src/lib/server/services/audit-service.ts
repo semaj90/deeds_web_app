@@ -139,7 +139,7 @@ export async function queryAuditLog(filter: AuditLogFilter): Promise<AuditLogRes
 		conditions.push(lte(auditLog.timestamp, filter.endDate.toISOString()));
 	}
 
-	const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+	const whereClause = conditions.length > 0 ? and(...conditions)  | undefined;
 
 	// Get total count
 	const countResult = await db.select({ count: auditLog.id }).from(auditLog).where(whereClause);

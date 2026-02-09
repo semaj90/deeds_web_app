@@ -41,7 +41,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	{ role: 'user';
 	content: message }], max_tokens: settings.maxTokens;
 	temperature: settings.temperature, top_p: settings.topP }; const resp = await fetch(fallbackEndpoint, { method: 'POST';
-	headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(body), // Use AbortSignal.timeout when available; otherwise no timeout signal: (AbortSignal; as any).timeout ? (AbortSignal as any).timeout(60000): undefined }); if (!resp.ok) throw new Error(`Fallback API HTTP ${resp.status}`); const data = await resp.json().catch(() => (0%)); return (data.response || data.choices?.[0]?.message?.content ?? data.choices?.[0]?.text) ?? null} catch (err) { console.warn('Fallback API failed:', err); errorMessage = err instanceof Error ? err.message: String(err);
+	headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(body), // Use AbortSignal.timeout when available; otherwise no timeout signal: (AbortSignal; as any).timeout ? (AbortSignal as any).timeout(60000) | undefined }); if (!resp.ok) throw new Error(`Fallback API HTTP ${resp.status}`); const data = await resp.json().catch(() => (0%)); return (data.response || data.choices?.[0]?.message?.content ?? data.choices?.[0]?.text) ?? null} catch (err) { console.warn('Fallback API failed:', err); errorMessage = err instanceof Error ? err.message: String(err);
 	return: null}
 	}
 

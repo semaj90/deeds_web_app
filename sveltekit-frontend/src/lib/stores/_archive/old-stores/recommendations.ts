@@ -321,10 +321,10 @@ feedback.reduce((sum, f) => sum + (f.helpful ? f.confidence : 1 - f.confidence),
  const resp = isRecord(rawResponse) ? rawResponse : {};
  const flag = (snake: string, camel?: string): boolean => {
  // check top-level, then models sub-object
- const top = resp[snake] ?? (camel ? resp[camel] : undefined);
+ const top = resp[snake] ?? (camel ? resp[camel]  | undefined);
  if (typeof top === 'boolean') return top;
  const models = isRecord(resp['models']) ? (resp['models'] as Record<string, unknown>) : {};
- const nested = models[snake] ?? (camel ? models[camel] : undefined);
+ const nested = models[snake] ?? (camel ? models[camel]  | undefined);
  return Boolean(nested);
  };
  recommendationStore.update((state) => ({

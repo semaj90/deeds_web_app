@@ -170,7 +170,7 @@
  const response = await fetch(url, {
  method: endpoint.method,
  headers: endpoint.headers,
- body: endpoint.method === 'POST' ? JSON.stringify(endpoint.payload ?? {}) : undefined,
+ body: endpoint.method === 'POST' ? JSON.stringify(endpoint.payload ?? {})  | undefined,
  signal: controller.signal,
  });
 

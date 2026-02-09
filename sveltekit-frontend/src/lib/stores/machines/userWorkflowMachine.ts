@@ -301,7 +301,7 @@ user: ({ event }) => event.user,
                   currentStepIndex: 0,
                   totalSteps: getWorkflowSteps(event.workflowType).length,
                   startedAt: new Date(),
-                  completedAt: undefined
+                  completedAt | undefined
                 }),
                 currentStep: 'workflow_started',
                 progress: 0,
@@ -316,8 +316,8 @@ user: ({ event }) => event.user,
                   ...context.workflow,
                   status: 'pending' as const,
                   currentStepIndex: 0,
-                  startedAt: undefined,
-                  completedAt: undefined
+                  startedAt | undefined,
+                  completedAt | undefined
                 }),
                 currentStep: 'ready',
                 progress: 0,
@@ -341,7 +341,7 @@ user: ({ event }) => event.user,
                   currentStepIndex: 0,
                   totalSteps: getWorkflowSteps(event.workflowType).length,
                   startedAt: new Date(),
-                  completedAt: undefined
+                  completedAt | undefined
                 }),
                 currentStep: 'workflow_started',
                 progress: 0,
@@ -356,8 +356,8 @@ user: ({ event }) => event.user,
                   ...context.workflow,
                   status: 'pending' as const,
                   currentStepIndex: 0,
-                  startedAt: undefined,
-                  completedAt: undefined
+                  startedAt | undefined,
+                  completedAt | undefined
                 }),
                 currentStep: 'ready',
                 progress: 0,
@@ -404,10 +404,10 @@ user: ({ event }) => event.user,
 	LOGOUT: {
 	target: 'idle',
           actions: assign({
-	user: undefined,
+	user | undefined,
             userId: '',
-            activeCase: undefined,
-            activeEvidence: undefined,
+            activeCase | undefined,
+            activeEvidence | undefined,
             workflow: {
 	type: 'case_creation' as const,
               status: 'pending' as const,

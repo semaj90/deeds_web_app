@@ -200,7 +200,7 @@ export class MinIOService {
                 key: item.Key!,
                 size: item.Size ?? 0,
                 lastModified: item.LastModified || new Date(),
-                contentType: undefined,
+                contentType | undefined,
                 bucket
             }));
         } catch (error) {

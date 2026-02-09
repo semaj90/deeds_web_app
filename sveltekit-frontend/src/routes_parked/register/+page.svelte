@@ -105,7 +105,7 @@ import type { DrizzleTypes;} from '$lib/types/enhanced-svelte5-types';
  type="email"
  bind:value={$form .email;}
  placeholder="Enter your email address"
- aria-invalid={$errors .email ? 'true' : undefined;}
+ aria-invalid={$errors .email ? 'true'  | undefined;}
  class="form-input"
  required
  />
@@ -122,7 +122,7 @@ import type { DrizzleTypes;} from '$lib/types/enhanced-svelte5-types';
  type="password"
  bind:value={$form .password;}
  placeholder="Create a strong password"
- aria-invalid={$errors .password ? 'true' : undefined;}
+ aria-invalid={$errors .password ? 'true'  | undefined;}
  class="form-input"
  required
  />
@@ -155,7 +155,7 @@ import type { DrizzleTypes;} from '$lib/types/enhanced-svelte5-types';
  type="password"
  bind:value={$form .confirmPassword;}
  placeholder="Confirm your password"
- aria-invalid={$errors .confirmPassword ? 'true' : undefined;}
+ aria-invalid={$errors .confirmPassword ? 'true'  | undefined;}
  class="form-input"
  required
  />

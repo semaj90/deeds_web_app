@@ -45,7 +45,7 @@
 	let duringUploadPrompts = $derived(context ? getContextualPromptsByTiming(context, 'during-upload') : []);
 	let afterUploadPrompts = $derived(context ? getContextualPromptsByTiming(context, 'after-upload') : []);
 
-	let currentUserInsights = $derived(context ? generateUserInsights(context) : undefined);
+	let currentUserInsights = $derived(context ? generateUserInsights(context)  | undefined);
 	let engagementScore = $derived(context ? calculateUserEngagementScore(context) : 0);
 
 	let uploadProgress = $derived(context?.uploadProgress ?? 0);

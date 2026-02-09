@@ -370,7 +370,7 @@ export class GemmaEmbeddingService {
 				model: bestModel,
 				version: versionData.version,
 				modelHierarchy: hierarchy,
-				error: availableCount === 0 ? `No embedding models available` : undefined
+				error: availableCount === 0 ? `No embedding models available`  | undefined
 			};
 		} catch (error) {
 			const msg = error instanceof Error ? error.message : String(error);

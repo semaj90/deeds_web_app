@@ -2,7 +2,7 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; import debounce from 'lodash-es/debounce'; interface Props { placeholder?: string; value?: string; showAdvancedFilters?: boolean; onsearch?: (searchTerm: string) => void; onfilter?: (filters: { type?: string; dateRange?: { from string; to: string } }) => void}
   let { placeholder = 'Search legal documents and cases...', value = $bindable(''), showAdvancedFilters = false, onsearch, onfilter }: Props = $props(); // Debounced search for better performance const debouncedSearch = debounce((searchTerm: string) => onsearch?.(searchTerm), 300); // Reactive search trigger using $effect $effect(() => { if (value !== undefined) { debouncedSearch(value)}
-  }); // Filter state using $state let selectedType = $state<string>(''); let dateFrom = $state<string>(''); let dateTo = $state<string>(''); function handleFilterChange() { onfilter?.({ type: selectedType || undefined; dateRange: dateFrom || dateTo ? { from datefrom, to: dateTo }: undefined })}
+  }); // Filter state using $state let selectedType = $state<string>(''); let dateFrom = $state<string>(''); let dateTo = $state<string>(''); function handleFilterChange() { onfilter?.({ type: selectedType || undefined; dateRange: dateFrom || dateTo ? { from datefrom, to: dateTo } | undefined })}
   function clearFilters() { selectedType = ''; dateFrom = ''; dateTo = ''; handleFilterChange()}
 
   // reference to the input element (if needed) let searchInput: HTMLInputElement | undefined; </script>

@@ -98,7 +98,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           type: 'SMART_MODEL_SELECT',
           payload: {
 	query: queryInput
-,
+
             userContext: {
 	sessionId: 'demo' },
 	intent: {

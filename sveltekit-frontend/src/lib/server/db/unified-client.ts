@@ -95,7 +95,7 @@ const config: DatabaseConfig = {
 	qdrant: process.env.QDRANT_URL ? {
         url: process.env.QDRANT_URL,
         apiKey: process.env.QDRANT_API_KEY
-    } : undefined,
+    }  | undefined,
     environment: (process.env.NODE_ENV as any) ?? 'development'
 };
 
@@ -320,7 +320,7 @@ class DatabaseManager {
             if (qdrantClient) {
                 const qStart = Date.now();
                 try {
-                    const qFilter = Object.keys(filter).length ? { must: Object.entries(filter).map(([key, value]) => ({ key, match: { value } })) } : undefined;
+                    const qFilter = Object.keys(filter).length ? { must: Object.entries(filter).map(([key, value]) => ({ key, match: { value } })) }  | undefined;
 
                     const qRes = await qdrantClient.search(collection, {
                         vector: queryEmbedding,

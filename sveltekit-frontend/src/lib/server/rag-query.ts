@@ -82,7 +82,7 @@ export async function getContextFromRag(opts: {
                 ? {
                       must: filterConditions,
                   }
-                : undefined;
+                 | undefined;
 
         // 3. Search Qdrant
         console.log(`[RAG] Searching Qdrant collection: ${COLLECTION_NAME}`);

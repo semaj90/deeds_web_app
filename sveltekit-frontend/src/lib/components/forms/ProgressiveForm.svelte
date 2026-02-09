@@ -216,8 +216,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
     return {
       id: fieldId,
-      'aria-invalid': hasError(fieldName) ? 'true' : undefined,
-      'aria-describedby': hasError(fieldName) ? errorId : undefined,
+      'aria-invalid': hasError(fieldName) ? 'true'  | undefined,
+      'aria-describedby': hasError(fieldName) ? errorId  | undefined,
       'aria-required': 'true'
     };
   }
@@ -282,8 +282,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           bind:value={formState.data.firstName}
           oninput={(e) => handleFieldChange('firstName', (e.target as HTMLInputElement).value)}
           onblur={() => (formState.touched.firstName = true)}
-          aria-invalid={hasError('firstName') ? 'true' : undefined}
-          aria-describedby={hasError('firstName') ? progressiveForm.generateErrorId(fieldIds.firstName) : undefined}
+          aria-invalid={hasError('firstName') ? 'true'  | undefined}
+          aria-describedby={hasError('firstName') ? progressiveForm.generateErrorId(fieldIds.firstName)  | undefined}
           aria-required="true"
           required
         />
@@ -304,8 +304,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           bind:value={formState.data.lastName}
           oninput={(e) => handleFieldChange('lastName', (e.target as HTMLInputElement).value)}
           onblur={() => (formState.touched.lastName = true)}
-          aria-invalid={hasError('lastName') ? 'true' : undefined}
-          aria-describedby={hasError('lastName') ? progressiveForm.generateErrorId(fieldIds.lastName) : undefined}
+          aria-invalid={hasError('lastName') ? 'true'  | undefined}
+          aria-describedby={hasError('lastName') ? progressiveForm.generateErrorId(fieldIds.lastName)  | undefined}
           aria-required="true"
           required
         />
@@ -332,8 +332,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         bind:value={formState.data.email}
         oninput={(e) => handleFieldChange('email', (e.target as HTMLInputElement).value)}
         onblur={() => (formState.touched.email = true)}
-        aria-invalid={hasError('email') ? 'true' : undefined}
-        aria-describedby={hasError('email') ? progressiveForm.generateErrorId(fieldIds.email) : undefined}
+        aria-invalid={hasError('email') ? 'true'  | undefined}
+        aria-describedby={hasError('email') ? progressiveForm.generateErrorId(fieldIds.email)  | undefined}
         aria-required="true"
         autocomplete="email"
         required
@@ -355,8 +355,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         bind:value={formState.data.password}
         oninput={(e) => handleFieldChange('password', (e.target as HTMLInputElement).value)}
         onblur={() => (formState.touched.password = true)}
-        aria-invalid={hasError('password') ? 'true' : undefined}
-        aria-describedby={hasError('password') ? progressiveForm.generateErrorId(fieldIds.password) : undefined}
+        aria-invalid={hasError('password') ? 'true'  | undefined}
+        aria-describedby={hasError('password') ? progressiveForm.generateErrorId(fieldIds.password)  | undefined}
         aria-required="true"
         autocomplete="new-password"
         minlength="8"
@@ -380,8 +380,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         bind:value={formState.data.confirmPassword}
         oninput={(e) => handleFieldChange('confirmPassword', (e.target as HTMLInputElement).value)}
         onblur={() => (formState.touched.confirmPassword = true)}
-        aria-invalid={hasError('confirmPassword') ? 'true' : undefined}
-        aria-describedby={hasError('confirmPassword') ? progressiveForm.generateErrorId(fieldIds.confirmPassword) : undefined}
+        aria-invalid={hasError('confirmPassword') ? 'true'  | undefined}
+        aria-describedby={hasError('confirmPassword') ? progressiveForm.generateErrorId(fieldIds.confirmPassword)  | undefined}
         aria-required="true"
         autocomplete="new-password"
         required
@@ -406,7 +406,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         class="form-checkbox"
         checked={formState.data.terms as boolean}
         onchange={(e) => handleFieldChange('terms', (e.target as HTMLInputElement).checked)}
-        aria-describedby={hasError('terms') ? progressiveForm.generateErrorId(fieldIds.terms) : undefined}
+        aria-describedby={hasError('terms') ? progressiveForm.generateErrorId(fieldIds.terms)  | undefined}
         required
       />
       <label for={fieldIds.terms} class="checkbox-label">
@@ -427,7 +427,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       type="submit"
       class="submit-button primary"
       disabled={isSubmitting}
-      aria-describedby={submitMessage ? `${formId}-submit-status` : undefined}
+      aria-describedby={submitMessage ? `${formId}-submit-status`  | undefined}
     >
       {#if isSubmitting}
         <span class="loading-spinner" aria-hidden="true"></span>

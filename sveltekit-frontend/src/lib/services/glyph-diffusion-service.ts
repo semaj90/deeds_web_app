@@ -199,7 +199,7 @@ class PNGTensorEmbedder {
                 ui_layout_metrics: neuralSpriteData.ui_layout_metrics ? {
                     compression_ratio: neuralSpriteData.ui_layout_metrics.compressionRatio,
                     accuracy: neuralSpriteData.ui_layout_metrics.accuracy
-                } : undefined
+                }  | undefined
             } : { enabled: false },
             created_at: new Date().toISOString(),
             version: '2.0' // Bump version for neural sprite support

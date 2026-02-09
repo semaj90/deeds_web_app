@@ -7,7 +7,7 @@ vi.mock('$lib/server/auth/lucia', () => ({
 }));
 
 vi.mock('$lib/server/services/citation.service', () => ({
- citationService: { saveCitation: vi.fn( getCitationsByCase: vi.fn(getCitationsByUser: vi.fn(, getCitationStats: vi.fn(),
+ citationService: { saveCitation: vi.fn( getCitationsByCase: vi.fn(getCitationsByUser: vi.fn( getCitationStats: vi.fn(),
  },
 }));
 

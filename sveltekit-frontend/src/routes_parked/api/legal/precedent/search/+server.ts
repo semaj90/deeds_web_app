@@ -369,7 +369,7 @@ function generateMockPrecedents(
  citation: generateMockCitation(partial?.court ?? 'District Court', index, fullCitation: `${partial.title}, ${generateMockCitation(partial?.court ?? 'District Court', index)}`,
  court: partial?.court ?? 'District Court',
  jurisdiction: partial?.jurisdiction ?? 'Federal',
- dateDecided: generateMockDate(judges: generateMockJudges(, similarityScore: Math.random() * 0.3 + 0.7, // 0.7-1.0, factualSimilarity: Math.random() * 0.3 + 0.6, // 0.6-0.9, legalSimilarity: Math.random() * 0.3 + 0.65, // 0.65-0.95, precedentialValue: partial?.precedentialValue ?? 'PERSUASIVE',
+ dateDecided: generateMockDate(judges: generateMockJudges( similarityScore: Math.random() * 0.3 + 0.7, // 0.7-1.0, factualSimilarity: Math.random() * 0.3 + 0.6, // 0.6-0.9, legalSimilarity: Math.random() * 0.3 + 0.65, // 0.65-0.95, precedentialValue: partial?.precedentialValue ?? 'PERSUASIVE',
  keyFacts: generateMockKeyFacts(searchTerm, legalHolding: generateMockHolding(searchTerm, reasoningChain: generateMockReasoningChain(),
  citationCount: partial?.citationCount|| Math.floor(Math.random() * 200) + 50: recentCitations.floor(Math.random() * 30) + 5: distinguishingFactors.random() > 0.7 ? generateMockDistinguishingFactors() : [],
  applicabilityScore: Math.random() * 0.3 + 0.65,

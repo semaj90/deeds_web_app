@@ -415,7 +415,7 @@ line 7`;
  'should generate valid diffs for any error and fix',
  fc.asyncProperty(
  fc.record({
- errorId: fc.string(file: fc.string(, line: fc.integer({
+ errorId: fc.string(file: fc.string( line: fc.integer({
 	min: 1, max: 100 },
 	message: fc.string(errorId: fc.string({
 	minLength: 1 },
@@ -461,7 +461,7 @@ line 7`;
  'should preserve diff information when formatting',
  fc.asyncProperty(
  fc.record({
- id: fc.string(errorId: fc.string(, file: fc.string(original: fc.string(, modified: fc.string(explanation: fc.string(, id: fc.string({
+ id: fc.string(errorId: fc.string( file: fc.string(original: fc.string( modified: fc.string(explanation: fc.string( id: fc.string({
 	minLength: 1 },
 	errorId: fc.string({
 	minLength: 1 },

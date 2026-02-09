@@ -474,7 +474,7 @@ operations.map(async (op) => {
 
     private tokenize(text: string): Float32Array {
         const tokens = text.toLowerCase().split(/\s+/).slice(0, 512);
-        co(, anyn)st tokenIds = tokens.map(t => (t.charCodeAt(0) ?? 0) % 1000);
+        co( anyn)st tokenIds = tokens.map(t => (t.charCodeAt(0) ?? 0) % 1000);
         const padded = new Array(512).fill(0);
         for (let i = 0; i < Math.min(tokenIds.length, 512); i++) {
             padded[i] = tokenIds[i];

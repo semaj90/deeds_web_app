@@ -157,7 +157,7 @@ export class RedisCache {
 export class QdrantIndexer {
     private baseUrl: string;
     constructor(baseUrl?: string) {
-        this.baseUrl = baseUrl ?? ((typeof process !== 'undefined' ? process.env?.QDRANT_URL : undefined) as string) ?? 'http://localhost:6333';
+        this.baseUrl = baseUrl ?? ((typeof process !== 'undefined' ? process.env?.QDRANT_URL  | undefined) as string) ?? 'http://localhost:6333';
     }
 
     async upsert(collection: string, vectors: Array<{ id: string | number, vector: number[]; payload?: Record<string, unknown> }>) {

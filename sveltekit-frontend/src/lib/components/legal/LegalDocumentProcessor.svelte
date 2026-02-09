@@ -57,7 +57,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       document,
       options: {
 extractEntities: true
-,
+
         generateSummary: true, assessRisk: true, generateEmbedding: true, storeInQdrant: true, useContext7: true, useSemanticSearch: false
       }
     })}

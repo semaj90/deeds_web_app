@@ -73,8 +73,7 @@ export class LegalAIWorkflowOrchestrator {
             status: 'initialized',
             startTime: Date.now(),
             lastUpdated: Date.now(),
-            progress: 0
-        };
+            progress: 0 });
         this.workflows.update((w: any) => ({ ...w, [id]: workflow }));
         this.currentWorkflow.set(id);
         return id;

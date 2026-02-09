@@ -252,9 +252,9 @@ export class ProductionLogger {
             const errorInfo = error ? {
                 name: error.name,
                 message: error.message,
-                stack: this.config.includeStack ? error.stack : undefined,
+                stack: this.config.includeStack ? error.stack  | undefined,
                 code: (error as unknown as { code?: string | number }).code
-            } : undefined;
+            }  | undefined;
             this.log('error', message, context, metadata, errorInfo);
         }
     }
@@ -329,13 +329,13 @@ export class ProductionLogger {
             context,
             metadata,
             error,
-            tags: tags.length > 0 ? tags : undefined,
+            tags: tags.length > 0 ? tags  | undefined,
             performance: this.includePerformanceData()
                 ? {
                       memoryUsage: process.memoryUsage(),
                       cpuUsage: process.cpuUsage()
                   }
-                : undefined
+                 | undefined
         };
 
         this.updateMetrics(logEntry);
@@ -550,7 +550,7 @@ export class ProductionLogger {
                 }
             });
         } catch (_error: unknown) {
-            this.error('Failed to collect logger metrics', _error instanceof Error ? _error : undefined);
+            this.error('Failed to collect logger metrics', _error instanceof Error ? _error  | undefined);
         }
     }
 

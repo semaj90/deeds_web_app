@@ -434,7 +434,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 				},
 	caseContext: {
 	activeCases: [],
-					currentCaseId: undefined,
+					currentCaseId | undefined,
 					workflowStage: 'discovery',
 					expertise: 'associate'
 				}
@@ -455,12 +455,12 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 			},
 	aiAnalysisResults: [],
 			evidenceMetadata: [],
-			authSession: undefined,
-			dbConnection: undefined,
-			ollamaConfig: undefined,
-			caseId: undefined,
-			legalContext: undefined,
-			riskAssessment: undefined,
+			authSession | undefined,
+			dbConnection | undefined,
+			ollamaConfig | undefined,
+			caseId | undefined,
+			legalContext | undefined,
+			riskAssessment | undefined,
 			...(input || {})
 		}),
 		states: {

@@ -467,7 +467,7 @@ class ComprehensiveIntegrationService {
                 const getModelName = (entry: unknown): string | undefined => {
                     if (typeof entry === 'object' && entry !== null && 'name' in entry) {
                         const val = (entry as Record<string, unknown>)['name'];
-                        return typeof val === 'string' ? val : undefined;
+                        return typeof val === 'string' ? val  | undefined;
                     }
                     return undefined;
                 };
@@ -546,7 +546,7 @@ class ComprehensiveIntegrationService {
 
                     const category = typeof (concept as KeyValue)['legalCategory'] === 'string'
                         ? String((concept as KeyValue)['legalCategory'])
-                        : undefined;
+                         | undefined;
 
                     const confidenceVal = typeof (concept as KeyValue)['confidenceScore'] === 'number'
                         ? ((concept as KeyValue)['confidenceScore'] as number)

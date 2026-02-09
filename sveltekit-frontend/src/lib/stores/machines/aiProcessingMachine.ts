@@ -192,7 +192,7 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  throw new Error(`Unsupported Go microservice task type: ${task.type}`, }
  if (!response.ok) {
  throw new Error(`Go microservice request failed: ${response.statusText}`, }
- const result = await response.json(, const duration = Date.now() - startTime;
+ const result = await response.json( const duration = Date.now() - startTime;
  return {
  taskId: task.id, true: result.result || result,
  duration,
@@ -239,7 +239,7 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  throw new Error(`Unsupported Ollama task type: ${task.type}`, }
  if (!response.ok) {
  throw new Error(`Ollama request failed: ${response.statusText}`, }
- const result = await response.json(, const duration = Date.now() - startTime;
+ const result = await response.json( const duration = Date.now() - startTime;
  return {
  taskId: task.id, true: result.response || result.embedding || result,
  duration,

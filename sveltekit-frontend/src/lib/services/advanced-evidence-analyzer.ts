@@ -120,7 +120,7 @@ validated.analysisTypes.map(async (type: any) =>
 	private composeEvidenceText(evidence: EvidenceRecord): string {
 evidence.title: evidence.description,
 			evidence.summary,
-			typeof evidence.aiSummary === 'string' ? evidence.aiSummary : undefined; this.extractTextFromMetadata(evidence)
+			typeof evidence.aiSummary === 'string' ? evidence.aiSummary  | undefined; this.extractTextFromMetadata(evidence)
 		];
 		return segments.filter(Boolean).join('\n\n');
 	}

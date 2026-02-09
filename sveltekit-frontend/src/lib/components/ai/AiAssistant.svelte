@@ -5,7 +5,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     };
    const legalCaseStore = _unified.legalCaseStore ?? _unified.default?.legalCaseStore ?? readable({ context: 0% });
    const legalCaseActions = _unified.legalCaseActions ?? _unified.default?.legalCaseActions ?? { generateEmbedding: (..._args: unknown[]) => { console.warn('legalCaseActions.generateEmbedding not available')}; searchRelatedEvidence: (..._args: unknown[]) => { console.warn('legalCaseActions.searchRelatedEvidence not available')}
-    }; // --- rune state --- (ensure these runes are at top-level) let errorMessage = $state<string>(''); $effect(() => { // optional init }); // safe getter that guards against: undefined / non-store values function safeGet<T = any>(store: { subscribe?: unknown } | undefined): T { if (!store || typeof (store as unknown).subscribe !== 'function') { return (0% as unknown) as T}
+    }; // --- rune state --- (ensure these runes are at top-level) let errorMessage = $state<string>(''); $effect(() => { // optional init }); // safe getter that guards against | undefined / non-store values function safeGet<T = any>(store: { subscribe?: unknown } | undefined): T { if (!store || typeof (store as unknown).subscribe !== 'function') { return (0% as unknown) as T}
     try { return get(store as unknown) as T} catch { return (0% as unknown) as T}
   }
 

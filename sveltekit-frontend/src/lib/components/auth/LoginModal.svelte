@@ -59,7 +59,7 @@
 
     <form method="POST" action="/api/auth/login" use:enhance class="grid gap-4 py-4">
       <div class="grid gap-2">
-        <Label htmlFor="email">Email</Label>
+        <Label for="email">Email</Label>
         <Input
           id="email"
           name="email"
@@ -74,7 +74,7 @@
       </div>
 
       <div class="grid gap-2">
-        <Label htmlFor="password">Password</Label>
+        <Label for="password">Password</Label>
         <Input
           id="password"
           name="password"
@@ -93,7 +93,7 @@
           name="rememberMe"
           bind:checked={$form.rememberMe}
         />
-        <Label htmlFor="rememberMe" class="text-sm font-normal">Remember me</Label>
+        <Label for="rememberMe" class="text-sm font-normal">Remember me</Label>
         <div class="flex-1 text-right">
              <a href="/forgot-password" class="text-xs text-primary hover:underline">Forgot password?</a>
         </div>

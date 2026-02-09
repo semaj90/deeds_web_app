@@ -461,7 +461,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 				},
 				caseContext: {
 					activeCases: [],
-					currentCaseId: undefined,
+					currentCaseId | undefined,
 					workflowStage: 'discovery',
 					expertise: 'associate'
 				},

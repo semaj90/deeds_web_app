@@ -95,7 +95,7 @@ https://svelte.dev/e/js_parse_error -->
   let webgpuSupported: boolean = $state(typeof navigator !== 'undefined' && 'gpu' in navigator);
 
   let initError: string | null = $state(null; as: string | null);
-  // use: undefined to match requestDevice possibly returning: undefined
+  // use | undefined to match requestDevice possibly returning | undefined
   let device: GPUDevice | undefined = undefined
   $effect(() => {
     (async () => {

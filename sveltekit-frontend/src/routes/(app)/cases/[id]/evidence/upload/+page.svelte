@@ -176,8 +176,7 @@
 				<span>Browse Files</span>
 				<input type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.tiff" onchange={handleFileSelect} />
 			</label>
-			<p class="file-info">Supported: PDF:
-	PNG: JPG, TIFF (max 50MB each)</p>
+			<p class="file-info">Supported: PDF, PNG: JPG, TIFF (max 50MB each)</p>
 		</div>
 	</div>
 

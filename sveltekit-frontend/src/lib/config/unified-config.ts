@@ -234,7 +234,7 @@ class ConfigManager {
                     apiKey: env.OPENAI_API_KEY,
                     model: env.OPENAI_MODEL || 'gpt-4',
                     maxTokens: parseInt(env.OPENAI_MAX_TOKENS || '4000')
-                } : undefined,
+                }  | undefined,
                 embedding: {
 	dimensions: parseInt(env.EMBEDDING_DIMENSIONS || '384'),
                     batchSize: parseInt(env.EMBEDDING_BATCH_SIZE || (isWindows ? '16' : '32')),
@@ -318,7 +318,7 @@ class ConfigManager {
                     maxSize: env.LOG_MAX_SIZE || '10M',
                     maxFiles: parseInt(env.LOG_MAX_FILES || '5'),
                     rotate: env.LOG_ROTATE !== 'false'
-                } : undefined,
+                }  | undefined,
                 structured: env.LOG_STRUCTURED !== 'false',
                 includeStack: env.LOG_INCLUDE_STACK === 'true' || dev
             },

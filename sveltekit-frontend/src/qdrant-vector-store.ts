@@ -247,7 +247,7 @@ export class QdrantVectorStore {
     if (filter?.minConfidence !== undefined)
       must.push({ key: 'confidence', range: { gte: filter.minConfidence } });
 
-    const qdrantFilter: QdrantFilter = must.length > 0 ? { must } : undefined;
+    const qdrantFilter: QdrantFilter = must.length > 0 ? { must }  | undefined;
 
     const searchResult = (await this.client.search(COLLECTIONS.CONVERSATIONS, {
       vector: queryEmbedding,
@@ -288,7 +288,7 @@ export class QdrantVectorStore {
 
     const filter: QdrantFilter = entityType
       ? { must: [{ key: 'entityType', match: { value: entityType } }] }
-      : undefined;
+       | undefined;
 
     const searchResult = (await this.client.search(COLLECTIONS.ENTITIES, {
       vector: queryEmbedding,
@@ -358,7 +358,7 @@ export class QdrantVectorStore {
       const val = p.payload?.entityValue;
       if (!val) continue;
 
-      const existing = counts.get(val) ?? { count: 0, confidence: undefined };
+      const existing = counts.get(val) ?? { count: 0, confidence | undefined };
       existing.count += 1;
       if (p.payload?.confidence !== undefined) existing.confidence = p.payload.confidence;
       counts.set(val, existing);

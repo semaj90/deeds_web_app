@@ -108,7 +108,7 @@ for (const diag of diagnostics) {
 
  records.push({
  ...diag, originalLine: lines[idx] ?? '',
- lineBefore: idx > 0 ? lines[idx - 1] : undefined, idx < lines.length - 1 ? lines[idx + 1] : undefined,
+ lineBefore: idx > 0 ? lines[idx - 1]  | undefined, idx < lines.length - 1 ? lines[idx + 1]  | undefined,
  });
  } catch {
  // File read failed - include without context

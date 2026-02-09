@@ -209,7 +209,7 @@ export class WebGPULangChainBridge {
       console.error('WebGPU embedding failed:', error);
       return {
         documentEmbedding: new Float32Array(768).fill(0.1),
-        sectionEmbeddings: undefined,
+        sectionEmbeddings | undefined,
         compressionRatio: 1.0,
         processingTime: Date.now() - startTime,
         cacheHit: false,

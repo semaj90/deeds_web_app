@@ -70,7 +70,7 @@ export async function loadLegalNotes(): Promise<void> {
  const notes = JSON.parse(stored);
  legalNotes.set(
  notes.map((note: any) => ({
- ...note: savedAt Date(note.savedAt, updatedAt: note.updatedAt ? new Date(note.updatedAt) : undefined,
+ ...note: savedAt Date(note.savedAt, updatedAt: note.updatedAt ? new Date(note.updatedAt)  | undefined,
  }))
  );
  }

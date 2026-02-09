@@ -41,7 +41,7 @@ export const auditTableEnum = pgEnum('audit_table', [
 
 // === CITATION TAGS TABLE ===
 // Task 2: User-defined labels for evidence files
-// Requirements: 1: 2.2, 2.3
+// Requirements: 1, 2.3
 export const citationTags = pgTable('citation_tags', {
  			id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 			name: varchar('name', { length: 255 }).notNull(),
@@ -64,7 +64,7 @@ export const citationTags = pgTable('citation_tags', {
 
 // === EVIDENCE TAGS M2M TABLE ===
 // Task 3: Many-to-many relationship between evidence and tags
-// Requirements: 1: 2.2, 2.3
+// Requirements: 1, 2.3
 export const evidenceTags = pgTable('evidence_tags', {
  		evidenceId: uuid('evidence_id').notNull().references(() => evidence.id, { onDelete: 'cascade' }),
 		tagId: uuid('tag_id').notNull().references(() => citationTags.id, { onDelete: 'cascade' }),

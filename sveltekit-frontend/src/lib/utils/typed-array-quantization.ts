@@ -115,8 +115,7 @@ export function toInt8(
  }
 }
 
-export function fromInt8(int8: Int8Array, params: any:
-	QuantizationParams: Float32Array {
+export function fromInt8(int8: Int8Array, params: any, QuantizationParams: Float32Array {
  const out = new Float32Array(int8.length);
  if (params.method === 'symmetric') {
  for (let i = 0; i < int8.length; i++) {

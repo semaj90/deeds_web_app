@@ -85,7 +85,7 @@ export class EnhancedCaseAPI {
             return {
                 success: false,
                 error: error instanceof Error ? error.message : String(error),
-                data: undefined as unknown as CaseResponse,
+                data | undefined as unknown as CaseResponse,
             };
         }
     }
@@ -133,7 +133,7 @@ export class EnhancedCaseAPI {
             return {
                 success: false,
                 error: error instanceof Error ? error.message : String(error),
-                data: undefined as unknown as WorkerTriggerResponse,
+                data | undefined as unknown as WorkerTriggerResponse,
             };
         }
     }

@@ -27,18 +27,18 @@ test.describe('UI/UX Walkthrough', () => {
             }
         }
 
-        await capture('01-cases', 'http://localhost:5173/cases');
-        await capture('02-evidence', 'http://localhost:5173/evidence');
-        await capture('03-poi', 'http://localhost:5173/persons-of-interest');
-        await capture('04-analysis', 'http://localhost:5173/analysis-center');
-        await capture('05-global-search', 'http://localhost:5173/global-search');
-        await capture('06-system-config', 'http://localhost:5173/system-configuration');
-        await capture('07-terminal', 'http://localhost:5173/terminal');
+        await capture('01-cases', 'http://localhost:5175/cases');
+        await capture('02-evidence', 'http://localhost:5175/evidence');
+        await capture('03-poi', 'http://localhost:5175/persons-of-interest');
+        await capture('04-analysis', 'http://localhost:5175/analysis-center');
+        await capture('05-global-search', 'http://localhost:5175/global-search');
+        await capture('06-system-config', 'http://localhost:5175/system-configuration');
+        await capture('07-terminal', 'http://localhost:5175/terminal');
 
         // New Case Modal
         console.log('Testing New Case Modal...');
         try {
-            await page.goto('http://localhost:5173/cases');
+            await page.goto('http://localhost:5175/cases');
             await page.waitForLoadState('load');
             await page.waitForTimeout(2000);
 

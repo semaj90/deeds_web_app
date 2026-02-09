@@ -318,7 +318,7 @@ export class WebGPULangChainBridge {
 
                 return {
                     data: { documentEmbedding: embedding,
-                        sectionEmbeddings: undefined,
+                        sectionEmbeddings | undefined,
                         compressionRatio: 1.0,
                         processingTime: Date.now() - startTime,
                         cacheHit,
@@ -330,7 +330,7 @@ export class WebGPULangChainBridge {
             // Fallback if no embedding service available
             return {
                 data: { documentEmbedding: new Float32Array(768).fill(0.1),
-                    sectionEmbeddings: undefined,
+                    sectionEmbeddings | undefined,
                     compressionRatio: 1.0,
                     processingTime: Date.now() - startTime,
                     cacheHit: false,
@@ -342,7 +342,7 @@ export class WebGPULangChainBridge {
 
             return {
                 data: { documentEmbedding: new Float32Array(768).fill(0.1),
-                    sectionEmbeddings: undefined,
+                    sectionEmbeddings | undefined,
                     compressionRatio: 1.0,
                     processingTime: Date.now() - startTime,
                     cacheHit: false,

@@ -2,7 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════
  * Codebase Index Reindex API
  * ═══════════════════════════════════════════════════════════════════════
- * Task: 13.1: 16.1, 16.3 - Admin routes + File watcher + Clustering integration
+ * Task: 13.1, 16.3 - Admin routes + File watcher + Clustering integration
  * Endpoint: POST /api/codebase-index/reindex
  * Purpose: Trigger codebase reindexing and clustering
  */

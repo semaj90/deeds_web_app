@@ -123,7 +123,7 @@ export class AdvisoryLockService {
 				mode,
 				userId,
 				sessionId,
-				expiresAt: timeout ? new Date(Date.now() + timeout) : undefined,
+				expiresAt: timeout ? new Date(Date.now() + timeout)  | undefined,
 				metadata
 			};
 

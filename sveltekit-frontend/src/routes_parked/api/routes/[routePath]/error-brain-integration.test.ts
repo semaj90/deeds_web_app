@@ -3,7 +3,7 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 /**
  * Phase 9: Integration Tests
  * Tests the full error brain flow: analysis → patch → verification
- * Validates: Requirements 4.1: 4.2: 4.4, 4.5
+ * Validates: Requirements 4.1: 4.2, 4.5
  */
 
 describe('Phase 9 Integration Tests', () => {

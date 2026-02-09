@@ -60,7 +60,7 @@ https, //svelte.dev/e/js_parse_error -->
                 ? 'cursor-pointer hover:bg-gray-50, dark: hover, bg-gray-700'
                 : 'cursor-not-allowed'}
                                    rounded-lg p-2 transition-colors duration-200"
-              aria-current={status === 'current' ? 'step' : undefined}
+              aria-current={status === 'current' ? 'step'  | undefined}
             >
               <!-- Step, indicator -->
               <div class="flex-shrink-0">

@@ -119,7 +119,7 @@ class XStateStoreManager {
  const persistedState = this.loadPersistedState();
  // Create app actor with persistence
  this.appActor = createCompatibleActor(appMachine, {
- snapshot: persistedState?.appState, inspect: this.config.devtools ? this.createDevtoolsInspector('app') : undefined,
+ snapshot: persistedState?.appState, inspect: this.config.devtools ? this.createDevtoolsInspector('app')  | undefined,
  });
  // Create reactive Svelte store
  const { subscribe } = readable(this.appActor.getSnapshot(), (set: (v: unknown) => void) => {
@@ -164,7 +164,7 @@ class XStateStoreManager {
  const persistedState = this.loadPersistedState();
  // Create legal case actor
  this.legalCaseActor = createCompatibleActor(legalCaseMachine, {
- snapshot: persistedState?.legalCaseState, inspect: this.config.devtools ? this.createDevtoolsInspector('legalCase') : undefined,
+ snapshot: persistedState?.legalCaseState, inspect: this.config.devtools ? this.createDevtoolsInspector('legalCase')  | undefined,
  });
  // Create reactive Svelte store
  const { subscribe, subscribeCase } = readable(
@@ -310,7 +310,7 @@ class XStateStoreManager {
  // Private helper methods
  private createDevtoolsInspector(machineId: string) {
  return (inspectionEvent: Event) => {
- const win = typeof window !== 'undefined' ? (window as DevtoolsWindow) : undefined;
+ const win = typeof window !== 'undefined' ? (window as DevtoolsWindow)  | undefined;
  if ($1?.$2) {
  const devtools = win.__REDUX_DEVTOOLS_EXTENSION__.connect({
  name: `XState: ${ machineId }`,

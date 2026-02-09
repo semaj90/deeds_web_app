@@ -67,7 +67,7 @@ Compact AI recommendations component for sidebar/dashboard use
               priority: 'medium',
               status: 'active'
             }
-          : undefined,
+           | undefined,
         preferences: {
 preferredActions: ['research', 'analysis', 'documentation'],
           workflowStyle: 'systematic'

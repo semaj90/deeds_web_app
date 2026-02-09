@@ -85,8 +85,8 @@
 				type: selectedOperation,
 				payload: {
 					text: inputText || undefined,
-					documents: selectedOperation === 'ingest' ? sampleDocuments : undefined,
-					query: selectedOperation === 'search' ? inputText : undefined,
+					documents: selectedOperation === 'ingest' ? sampleDocuments  | undefined,
+					query: selectedOperation === 'search' ? inputText  | undefined,
 					userId,
 					sessionId,
 					options: {

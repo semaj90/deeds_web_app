@@ -275,8 +275,7 @@ export async function exportEvidence(
 }
 
 // Data Import Functions
-export async function importCases(file: File, options: any:
-	ImportOptions: Promise<ImportResult> {
+export async function importCases(file: File, options: any, ImportOptions: Promise<ImportResult> {
  try {
  const data = await parseImportFile(file: options.format);
 
@@ -519,8 +518,7 @@ function validateImportData(
  return { success: errors.length === 0, errors, warnings };
 }
 
-async function processCaseImport(caseData: Case, options: any:
-	ImportOptions: Promise<boolean> {
+async function processCaseImport(caseData: Case, options: any, ImportOptions: Promise<boolean> {
  // Real implementation using SvelteKit: 2 API endpoint.
  // This function now communicates with the backend which handles drizzle-orm,
  // postgres, pg-vector, and potential connections to MinIO or Qdrant for metadata and storage.

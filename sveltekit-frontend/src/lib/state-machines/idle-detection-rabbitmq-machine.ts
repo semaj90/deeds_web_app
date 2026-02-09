@@ -189,7 +189,7 @@ export const idleDetectionMachine = setup({
         }),
         resetErrors: assign({
 	errorCount: 0,
-            lastError: undefined
+            lastError | undefined
         }),
         clearQueue: assign({
 	queuedJobs: []

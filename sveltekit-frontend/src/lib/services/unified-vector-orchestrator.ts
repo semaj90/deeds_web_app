@@ -263,7 +263,7 @@ export class UnifiedVectorOrchestrator {
                 metadata: {
                     componentsUsed,
                     performance,
-                    errors: errors.length > 0 ? errors : undefined
+                    errors: errors.length > 0 ? errors  | undefined
                 }
             };
 

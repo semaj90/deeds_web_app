@@ -324,7 +324,7 @@ describe('Property 3, Search Result Schema Completeness', () => {
         fc.record({
           id: fc.string({
 	minLength: 1 },
-	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({
 	min: 0, max: 1, noNaN: true },
 	tfidf: fc.float({
 	min: 0, max: 1, noNaN: true })
@@ -628,7 +628,7 @@ describe('Property 8, Cache Hit Behavior', () => {
           fc.record({
             id: fc.string({
 	minLength: 1 },
-	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({
 	min: 0, max: 1, noNaN: true },
 	tfidf: fc.float({
 	min: 0, max: 1, noNaN: true })
@@ -777,7 +777,7 @@ Answer:`;
         fc.record({
           id: fc.string({
 	minLength: 1 },
-	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({
 	min: 0, max: 1, noNaN: true },
 	tfidf: fc.float({
 	min: 0, max: 1, noNaN: true },
@@ -1032,7 +1032,7 @@ describe('Property 11, API Response Schema Validation', () => {
           fc.record({
             id: fc.string({
 	minLength: 1 },
-	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({
 	min: 0, max: 1, noNaN: true },
 	tfidf: fc.float({
 	min: 0, max: 1, noNaN: true })

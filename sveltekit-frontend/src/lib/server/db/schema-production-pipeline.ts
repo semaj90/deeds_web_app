@@ -13,7 +13,7 @@ sql }
 from 'drizzle-orm';
 // Enable pgvector extension export const enableVectorExtension = sql`CREATE EXTENSION IF NOT EXISTS vector`;
 // ===== CRAWL & INGESTION TABLES ===== /** * Crawl Jobs - Tracks web crawling requests and status */ export const crawlJobs = pgTable('crawl_jobs', {
-id: uuid('id').primaryKey().defaultRandom(url, text('url').notNull(, domain: varchar('domain', {
+id: uuid('id').primaryKey().defaultRandom(url, text('url').notNull( domain: varchar('domain', {
 length: 255 },
 	crawlType: varchar('crawl_type', {
 length: 50 }).notNull().default('web_page'), // web_page, pdf_document, legal_database status: varchar('status', {

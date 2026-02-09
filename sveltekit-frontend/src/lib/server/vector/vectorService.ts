@@ -197,7 +197,7 @@ export class VectorService {
             });
             return qResults.map((r: any) => ({
                 id: r.id.toString(), score: r.score,
-                metadata: r.payload, content: r.payload ? (r.payload as any).content : undefined
+                metadata: r.payload, content: r.payload ? (r.payload as any).content  | undefined
             }));
         } catch (error) {
             console.error('search failed: ', error);

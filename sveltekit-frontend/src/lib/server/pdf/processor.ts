@@ -206,7 +206,7 @@ export async function processPDF(
 			subject: (pdfData.metadata as any).Subject,
 			createdAt: (pdfData.metadata as any).CreationDate
 				? new Date((pdfData.metadata as any).CreationDate)
-				: undefined
+				 | undefined
 		},
 	entities,
 		ocr: ocrResult,

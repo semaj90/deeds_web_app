@@ -110,7 +110,7 @@ export class EnhancedCaseAPI {
             return {
                 success: false,
                 error: msg,
-                data: undefined,
+                data | undefined,
             };
         }
     }
@@ -161,7 +161,7 @@ export class EnhancedCaseAPI {
             return {
                 success: false,
                 error: msg,
-                data: undefined,
+                data | undefined,
             };
         }
     }

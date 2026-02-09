@@ -152,20 +152,20 @@ export class LokiHybridStore {
 				chunkSize: 768,
 				chunkOverlap: 128
 			});
-		this.redis = cfg.redis ?? (cfg.redisUrl ? new Redis(cfg.redisUrl) : undefined);
+		this.redis = cfg.redis ?? (cfg.redisUrl ? new Redis(cfg.redisUrl)  | undefined);
 		this.qdrant =
 			cfg.qdrant ??
 			(cfg.qdrantUrl ? new QdrantClient({
 				url: cfg.qdrantUrl,
 				apiKey: cfg.qdrantApiKey
-			}) : undefined);
+			})  | undefined);
 		this.qdrantCollection = cfg.qdrantCollection ?? 'legal_documents';
-		this.pgPool = cfg.pgPool ?? (cfg.postgresUrl ? new Pool({ connectionString: cfg.postgresUrl }) : undefined);
+		this.pgPool = cfg.pgPool ?? (cfg.postgresUrl ? new Pool({ connectionString: cfg.postgresUrl })  | undefined);
 		this.neo4jDriver =
 			cfg.neo4jDriver ??
 			(cfg.neo4jUrl && cfg.neo4jUser && cfg.neo4jPassword
 				? neo4j.driver(cfg.neo4jUrl, neo4j.auth.basic(cfg.neo4jUser, cfg.neo4jPassword))
-				: undefined);
+				 | undefined);
 		this.embeddings = cfg.openAIEmbeddings;
 		this.openAiApiKey = cfg.openAIApiKey ?? process.env.OPENAI_API_KEY ?? process.env.OPENAI_KEY;
 		this.embeddingsExplicitlyDisabled = cfg.enableEmbeddings === false;

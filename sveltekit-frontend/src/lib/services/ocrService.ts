@@ -79,14 +79,14 @@ const FIELD_PATTERNS = {
     plaintiff: /plaintiff:\s*([^,\n]+)/i,
     defendant: /defendant:\s*([^,\n]+)/i,
     attorney: /attorney\s*(?:for)?:\s*([^,\n]+)/i,
-    amount: /(?:amount|damages?)\s*:\s*\$?([\d,]+\.?\d*)/i,
+    amount: /(?:amount|damages?)\s*:\s*\$?([\d]+\.?\d*)/i,
   },
 	contract: {
 	party_1: /(?:party|contractor)\s*(?:1|one|first)?:\s*([^,\n]+)/i,
     party_2: /(?:party|contractor)\s*(?:2|two|second)?:\s*([^,\n]+)/i,
     effective_date: /effective\s*date:\s*(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})/i,
     term: /term:\s*([^,\n]+)/i,
-    amount: /(?:amount|payment|fee):\s*\$?([\d,]+\.?\d*)/i,
+    amount: /(?:amount|payment|fee):\s*\$?([\d]+\.?\d*)/i,
     signature_1: /signature.*?([A-Za-z\s]{2,30})/i,
     signature_2: /signature.*?([A-Za-z\s]{2,30})/i,
   },
@@ -97,7 +97,7 @@ const FIELD_PATTERNS = {
     state: /state:\s*([A-Za-z]{2,20})/i,
     zip: /(?:zip|postal):\s*(\d{5}(?:-\d{4})?)/i,
     phone: /(?:phone|tel):\s*(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/i,
-    email: /email:\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i,
+    email: /email:\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2})/i,
     ssn: /(?:ssn|social):\s*(\d{3}-?\d{2}-?\d{4})/i,
   },
 	} as const;
@@ -108,7 +108,7 @@ const fieldValidationSchemas: Partial<Record<FieldType, z.ZodSchema>> = {
   email: z.string().email(),
   phone: z.string().regex(/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/),
   date: z.string().regex(/^\d{1,2}\/\d{1,2}\/\d{4}$|^\d{4}-\d{2}-\d{2}$/),
-  monetary_amount: z.string().regex(/^\$?[\d,]+\.?\d*$/),
+  monetary_amount: z.string().regex(/^\$?[\d]+\.?\d*$/),
   case_number: z.string().min(1),
   name: z.string().min(2).max(200),
 };
@@ -375,7 +375,7 @@ Return only one of: legal_document, contract, form.`;
     if (lowerName.includes('phone') || /\d{3}[-.\s]?\d{3}[-.\s]?\d{4}/.test(value)) return 'phone';
     if (lowerName.includes('date') || /\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2}/.test(value))
       return 'date';
-    if (lowerName.includes('amount') || /^\$?[\d,]+\.?\d*$/.test(value)) return 'monetary_amount';
+    if (lowerName.includes('amount') || /^\$?[\d]+\.?\d*$/.test(value)) return 'monetary_amount';
     if (lowerName.includes('case') || lowerName.includes('number')) return 'case_number';
     if (lowerName.includes('address') || lowerName.includes('street')) return 'address';
     if (lowerName.includes('name')) return 'name';

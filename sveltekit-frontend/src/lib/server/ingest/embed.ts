@@ -311,7 +311,7 @@ export async function embedImageBuffers(
     return {
         success: embeddings.length > 0,
         embeddings: embeddings,
-        errors: errors.length > 0 ? errors : undefined,
+        errors: errors.length > 0 ? errors  | undefined,
         metadata: {
 	batchSize: buffers.length,
             successCount: embeddings.length,

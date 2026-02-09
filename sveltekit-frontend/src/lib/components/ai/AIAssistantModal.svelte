@@ -17,7 +17,7 @@ interface AIStore { context: AIStoreContext}
 
   // Component props using Svelte, 5 $props() interface Props { contextItems?: unknown[]; caseId?: string}
   let { contextItems = [], caseId = '' }: Props = $props(); // Get user from context (SSR-safe) const getUser = getContext<unknown>('user');
-   const user = typeof getUser === 'function' ? getUser(): undefined;
+   const user = typeof getUser === 'function' ? getUser() | undefined;
    let errorMessage = $state<string>(''); // Component lifecycle $effect(() => { // Initialize if needed }); // Trigger summary function handleSummarize() { if (!user?.id) return; aiGlobalActions.summarize(caseId, contextItems, user?.id ?? '')}
 
   // Save summary to DB using the comprehensive summaries API async function saveSummary(): Promise<void> { if (!($aiGlobalStore as AIStore).context.summary || !caseId || !user?.id) return; try { const response = await fetch('/api/summaries', { method: 'POST', headers: { 'Content-Type': 'application/json' },

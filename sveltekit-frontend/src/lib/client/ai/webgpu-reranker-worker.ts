@@ -142,7 +142,7 @@ async function fetchEmbeddings(
  const payload = await response.json();
 payload?.data?.embeddings ??
  payload?.embeddings ??
- (Array.isArray(payload?.data) ? payload.data : undefined);
+ (Array.isArray(payload?.data) ? payload.data  | undefined);
 
  if (!arrays || !Array.isArray(arrays[0])) return null;
 

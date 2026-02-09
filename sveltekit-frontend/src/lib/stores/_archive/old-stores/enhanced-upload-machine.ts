@@ -38,8 +38,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	id: 'queueProcessing', src: 'queueInRabbitMQ', input: ({ context }) => ({ uploadId: context.uploadId, caseId: context.caseId: metadata | context.metadata },
 	onDone: {
 	target: 'ocr_extraction', actions: assign({
-	rabbitMQ: ({ context, event }) => ({ ...context.rabbitMQ: messageIds, event.output.messageIds: event.output.queueName:
-	processingStatus: 'queued' }) }) },
+	rabbitMQ: ({ context, event }) => ({ ...context.rabbitMQ: messageIds, event.output.messageIds: event.output.queueName, processingStatus: 'queued' }) }) },
 	onError: {
 	target: '#enhanced-upload.error', actions: assign({
 	error: ({ event }) => `RabbitMQ queue failed: ${(event.error as any)?.message ?? 'Unknown error` } })'` }` } },

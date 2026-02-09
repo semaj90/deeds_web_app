@@ -237,7 +237,7 @@ export class PgVectorService {
 		return {
 			success: errors.length === 0,
 			inserted,
-			errors: errors.length > 0 ? errors : undefined
+			errors: errors.length > 0 ? errors  | undefined
 		};
 	}
 

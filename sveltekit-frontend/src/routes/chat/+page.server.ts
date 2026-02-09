@@ -60,7 +60,7 @@ export const actions: Actions = {
             return {
                 success: true,
                 saved: !!locals.user, // Inform frontend if message was persisted
-                hint: isAnonymous ? 'Sign in to save your conversation history' : undefined
+                hint: isAnonymous ? 'Sign in to save your conversation history'  | undefined
             };
         } catch (error) {
             console.error("Failed to send to queue:", error);

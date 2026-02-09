@@ -261,18 +261,18 @@
       {#if mode === 'register'}
         <div class="grid grid-cols-2 gap-4">
           <div class="grid gap-2">
-            <Label htmlFor="firstName">First name</Label>
+            <Label for="firstName">First name</Label>
             <Input id="firstName" bind:value={formData.firstName} required />
           </div>
           <div class="grid gap-2">
-            <Label htmlFor="lastName">Last name</Label>
+            <Label for="lastName">Last name</Label>
             <Input id="lastName" bind:value={formData.lastName} required />
           </div>
         </div>
       {/if}
 
       <div class="grid gap-2">
-        <Label htmlFor="email">Email</Label>
+        <Label for="email">Email</Label>
         <Input id="email" type="email" bind:value={formData.email} placeholder="name@example.com" required />
         {#if formState.emailExists && mode === 'register'}
             <p class="text-xs text-red-500">Email already registered</p>
@@ -280,7 +280,7 @@
       </div>
 
       <div class="grid gap-2">
-        <Label htmlFor="password">Password</Label>
+        <Label for="password">Password</Label>
         <div class="relative">
              <Input id="password" type={formState.showPassword ? 'text' : 'password'} bind:value={formData.password} required />
              <button type="button" class="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700" onclick={() => formState.showPassword = !formState.showPassword}>
@@ -295,7 +295,7 @@
 
       {#if mode === 'register'}
         <div class="grid gap-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label for="confirmPassword">Confirm Password</Label>
             <div class="relative">
                 <Input id="confirmPassword" type={formState.showConfirmPassword ? 'text' : 'password'} bind:value={formData.confirmPassword} required />
                 <button type="button" class="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700" onclick={() => formState.showConfirmPassword = !formState.showConfirmPassword}>
@@ -309,14 +309,14 @@
 
         <div class="flex items-center space-x-2">
             <Checkbox id="terms" name="terms" class="" bind:checked={formData.acceptTerms} />
-            <Label htmlFor="terms" class="text-sm font-normal">I agree to the terms and service</Label>
+            <Label for="terms" class="text-sm font-normal">I agree to the terms and service</Label>
         </div>
       {/if}
 
       {#if mode === 'login'}
         <div class="flex items-center space-x-2">
             <Checkbox id="remember" name="remember" class="" bind:checked={formData.rememberMe} />
-            <Label htmlFor="remember" class="text-sm font-normal">Remember me</Label>
+            <Label for="remember" class="text-sm font-normal">Remember me</Label>
         </div>
       {/if}
 

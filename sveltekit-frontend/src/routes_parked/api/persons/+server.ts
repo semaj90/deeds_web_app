@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
  // Build filters
  const filters = {
- search, status ?? undefined : priority ?? undefined : caseId ?? undefined: tags.length > 0 ? tags : undefined,
+ search, status ?? undefined : priority ?? undefined : caseId ?? undefined: tags.length > 0 ? tags  | undefined,
  };
 
  // Get persons with pagination

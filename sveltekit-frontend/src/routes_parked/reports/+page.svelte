@@ -31,8 +31,8 @@ import type { Case } from '$lib/types';
           summary: it?.summary ?? '',
           reportType: it?.reportType ?? 'general',
           createdAt: it?.createdAt ?? new Date().toISOString(),
-          wordCount: typeof it?.wordCount === 'number' ? it.wordCount : undefined,
-          estimatedReadTime: typeof it?.estimatedReadTime === 'number' ? it.estimatedReadTime : undefined,
+          wordCount: typeof it?.wordCount === 'number' ? it.wordCount  | undefined,
+          estimatedReadTime: typeof it?.estimatedReadTime === 'number' ? it.estimatedReadTime  | undefined,
           status: it?.status ?? 'draft',
           tags: Array.isArray(it?.tags) ? it.tags : [],
           content: it?.content ?? ''

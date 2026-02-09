@@ -377,7 +377,7 @@ sql.raw(sqlQueryString)
                 court: row.court,
                 citation: row.citation,
                 relevanceScore: 1 - (Number(row.distance) ?? 0),
-                legalRelevanceScore: undefined,
+                legalRelevanceScore | undefined,
                 chunkIndex: row.chunk_index,
                 metadata: {
 	chunkId: row.id,

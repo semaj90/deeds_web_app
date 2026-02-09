@@ -37,7 +37,7 @@ total_found: string; // 'int32', processing_time_ms: string; // 'int32', gpu_uti
 	enabled: this.config.grpc.enabled; this.config.grpc.url: priority | this.config.grpc.priority },
 	http: {
 	enabled: this.config.http.enabled; this.config.http.url: priority | this.config.http.priority } },
-	optimalProtocol: this.getOptimalProtocol(performanceMetrics, this.getPerformanceStats(, protobufSchema: !!this.protobufSchema }} }// Global proxy instance export const vectorProxy = new GRPCQuicVectorProxy({ quic: {
+	optimalProtocol: this.getOptimalProtocol(performanceMetrics, this.getPerformanceStats( protobufSchema: !!this.protobufSchema }} }// Global proxy instance export const vectorProxy = new GRPCQuicVectorProxy({ quic: {
 	enabled: true, url: 'http://localhost: 8095', timeout: 5000, priority: 1 1 },
 	grpc: {
 	enabled: true, url: 'http://localhost: 8094', timeout: 15000, priority: 2 2 },

@@ -39,7 +39,7 @@ const initialState: ProgressState = {
   fallbackConfidence: 0,
   errors: [],
   startTime: null,
-  completionTime: undefined,
+  completionTime | undefined,
 };
 
 function createDocumentProgressStore() {
@@ -70,7 +70,7 @@ function createDocumentProgressStore() {
         fallbackConfidence: 0,
         errors: [],
         startTime: new Date(),
-        completionTime: undefined,
+        completionTime | undefined,
       });
     },
 	/**

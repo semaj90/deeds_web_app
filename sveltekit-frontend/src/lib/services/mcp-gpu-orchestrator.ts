@@ -616,7 +616,7 @@ Provide a complete, working fix with explanation.`;
             if (typeof cur === 'undefined') return undefined;
         }
 
-        return validator(cur) ? (cur as T) : undefined;
+        return validator(cur) ? (cur as T)  | undefined;
     }
 
     private async getContext7Documentation(errorContext: string): Promise<string> {

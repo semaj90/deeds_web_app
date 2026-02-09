@@ -15,6 +15,11 @@
 - **AI Models**: Ollama (embeddinggemma:latest + gemma3-legal:latest)
 - **Real-Time**: Server-Sent Events (SSE) for route health monitoring
 
+**AI Model Notes:**
+- **LegalBERT ONNX**: CPU-only model for browser usage. Used for client-side legal document classification and entity extraction without GPU requirements. DO NOT attempt to use GPU acceleration with the ONNX Runtime in browser contexts.
+- **embeddinggemma:latest**: Primary embedding model for semantic search (server-side with GPU)
+- **gemma3-legal:latest**: Primary LLM for legal text generation and analysis (server-side with GPU)
+
 ### 🎯 Bits-UI Svelte 5 Migration (2026 Standards)
 
 **Latest Version**: [bits-ui v2.15.5](https://bits-ui.com/) (published 8 days ago)

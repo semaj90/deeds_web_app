@@ -104,7 +104,7 @@ return { query: params, queryHash: hash.toString();
 	notifyRevalidation: context => { console.log('âœ… Background revalidation, complete: ', context.source)},
 	notifyError: () => { console.error('âŒ Graph cache error - retry available')},
 	updateCaches: () => { console.log('ðŸ’¾ Updating caches with new data')},
-	invalidateCache: (context: event | GraphCacheEvent) => { if (context.worker) { const key = event.type === 'INVALIDATE_CACHE' ? event.key : undefined, context.worker.postMessage({
+	invalidateCache: (context: event | GraphCacheEvent) => { if (context.worker) { const key = event.type === 'INVALIDATE_CACHE' ? event.key  | undefined, context.worker.postMessage({
 	type: 'cache_clear', key }},
 	provideTelemetry: context => { console.log('ðŸ“Š, Telemetry: ', context.telemetry)},
 	setError: () => { console.error('âŒ Query failed after max retries')},

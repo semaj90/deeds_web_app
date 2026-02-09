@@ -98,7 +98,7 @@
           options: {
 ttl: parseInt(selectedTTL) * 1000,
             priority: selectedPriority,
-            tags: tags.length > 0 ? tags : undefined
+            tags: tags.length > 0 ? tags  | undefined
           }
         })
       });

@@ -149,7 +149,7 @@ class OptimizedQdrantService {
 
   private initializeClient(): void {
     const env = (import.meta.env as any) || {};
-    const qdrantUrl = (typeof process !== 'undefined' ? (env.QDRANT_URL ?? env.VITE_QDRANT_URL) : undefined);
+    const qdrantUrl = (typeof process !== 'undefined' ? (env.QDRANT_URL ?? env.VITE_QDRANT_URL)  | undefined);
 
     if (!qdrantUrl) {
       logger.warn('Qdrant not configured - vector operations will be disabled', { component: 'QdrantOptimized' });
@@ -157,7 +157,7 @@ class OptimizedQdrantService {
     }
 
     try {
-      const qdrantApiKey = (typeof process !== 'undefined' ? (env.QDRANT_API_KEY ?? env.VITE_QDRANT_API_KEY) : undefined);
+      const qdrantApiKey = (typeof process !== 'undefined' ? (env.QDRANT_API_KEY ?? env.VITE_QDRANT_API_KEY)  | undefined);
 
       this.client = new QdrantClient({
         url: qdrantUrl,
@@ -758,12 +758,12 @@ export const optimizedQdrant = new OptimizedQdrantService();
 
 // Backward compatibility exports (tightened types)
 export const qdrantOptimized = {
-  search: (, collection: string,
+  search: ( collection: string,
     query: string | number[],
     options: { limit?: number; offset?: number; filter?: unknown; threshold?: number; useCache?: boolean } = {}
   ) => optimizedQdrant.search(collection, query, options),
 
-  upsertBatch: (, collection: string,
+  upsertBatch: ( collection: string,
     points: Array<{
 	id: string, vector: number[], payload?: Record<string, unknown> }>
   ) => optimizedQdrant.upsertBatch(collection, points),

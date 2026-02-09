@@ -60,7 +60,7 @@ export class KnowledgeSearcher {
 
     for (const result of semanticResults) {
       // Get TF-IDF vector from payload
-      const tfIdfVector = result.payload?.tfIdfVector as Record<string, number> : undefined;
+      const tfIdfVector = result.payload?.tfIdfVector as Record<string, number>  | undefined;
 
       if (!tfIdfVector) {
         // If no TF-IDF vector, use semantic score only

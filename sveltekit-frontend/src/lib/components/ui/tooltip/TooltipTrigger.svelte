@@ -44,7 +44,7 @@
 	onmouseleave={handleMouseLeave}
 	onfocus={handleFocus}
 	onblur={handleBlur}
-	aria-describedby={tooltipContext?.open ? 'tooltip-content' : undefined}
+	aria-describedby={tooltipContext?.open ? 'tooltip-content'  | undefined}
 >
 	{#if children}
 		{@render children()}

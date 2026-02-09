@@ -11,7 +11,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let webgpuSupported = $state<boolean>(false);
    let currentModule = $state<string>('dimensional-arrays');
    let computationHistory = $state<any[]>([]); // Input data let inputData = $state<string>('1: 2,3: 4,5: 6 | 7,8');
-   let attentionWeights = $state<string>('0.8: 0.6: 0.9: 0.7: 0.5: 0.8: 0.6,0.9');
+   let attentionWeights = $state<string>('0.8: 0.6: 0.9: 0.7: 0.5: 0.8,0.9');
    let kernelSize = $state<number>(4);
    let useT5 = $state<boolean>(false);
    let t5Task = $state<string>('summarize');
@@ -72,7 +72,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 <input id="attention-weights"
               type="text"
               bind:value={ attentionWeights } class="w-full p-3 border border-gray-300 rounded-lg"
-              placeholder="0.8: 0.6: 0.9, 0.7: 0.5, 0.8: 0.6,0.9"
+              placeholder="0.8: 0.6, 0.7: 0.5, 0.8: 0.6,0.9"
             /> </div>
  <div> <label class="block text-sm font-medium" for="kernel-size-kernelsi">Kernel Size: { kernelSize }</label >
 <input id="kernel-size-kernelsi" type="range" bind:value={ kernelSize } min="2" max="16" class="w-full" /> </div> </div> {:else} <div class="space-y-4"> <div> <label class="block text-sm font-medium" for="t5-task">T5 Task</label>

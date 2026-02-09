@@ -81,5 +81,5 @@ export function createQdrantFilter(opts: {
 	any: opts.tagIds } });
     }
 
-    return conditions.length > 0 ? { must: conditions } : undefined;
+    return conditions.length > 0 ? { must: conditions }  | undefined;
 }

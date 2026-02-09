@@ -310,7 +310,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			vlmResults: enableVLM ? analysisResults
 				.filter(r => r.vlm_analysis)
 				.map(r => ({
-					resultId: r.yorha_id: r.vlm_analysis?.image_description:, documentLayout: r.vlm_analysis?.document_layout: extractedEntities: r.vlm_analysis?.extracted_entities:, visualInsights: r.vlm_analysis?.visual_insights: confidence: r.vlm_analysis?.confidence
+					resultId: r.yorha_id: r.vlm_analysis?.image_description: documentLayout: r.vlm_analysis?.document_layout: extractedEntities: r.vlm_analysis?.extracted_entities: visualInsights: r.vlm_analysis?.visual_insights: confidence: r.vlm_analysis?.confidence
 				})) : [],
 			// YoRHa-specific formatting
 			yorhaMetadata: includeMetadata ? {
@@ -750,7 +750,7 @@ async function extractImageData(result: AnalysisResult): Promise<Buffer | string
 	try {
 		// Check if content contains base64 image data
 		if (result?.content&& result.content.includes('data:image')) {
-			const base64Match = result.content.match(/data:image\/[^,]+,base64,([^"']+)/);
+			const base64Match = result.content.match(/data:image\/[^]+,base64,([^"']+)/);
 			if (base64Match && base64Match[1]) {
 				return base64Match[1];
 			}

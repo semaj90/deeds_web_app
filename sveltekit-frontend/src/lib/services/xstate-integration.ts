@@ -16,8 +16,8 @@ let legalAIStateStore: Writable<LegalAISnapshot>;
 // Initialize robust fallback state
 const getFallbackState = (errorMsg: string = 'Initializing'): LegalAISnapshot => ({
     status: 'active',
-    output: undefined,
-    error: undefined,
+    output | undefined,
+    error | undefined,
     value: 'initializing',
     context: {
         user: { id: null, email: null, role: null, permissions: [], isAuthenticated: false },

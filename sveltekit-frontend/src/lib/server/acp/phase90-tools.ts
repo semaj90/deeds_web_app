@@ -192,7 +192,7 @@ export async function phase90_search_errors(
 		? { must: [{
 	key: 'cluster_id', match: {
 	value: clusterId } }] }
-		: undefined;
+		 | undefined;
 
 	const results = await client.scroll('phase90_cuda_embeddings', {
 		limit: topK,

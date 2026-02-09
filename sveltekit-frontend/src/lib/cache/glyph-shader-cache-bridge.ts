@@ -191,7 +191,7 @@ fn renderCHRROMGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  quantization_table[pattern_base + 2u],
  quantization_table[pattern_base + 3u]
  }
- workgroupBarrier(, // Lookup pattern from cache
+ workgroupBarrier( // Lookup pattern from cache
  let pattern_coord = (local_y * ${Math.ceil(Math.sqrt(256))}u + local_x) / 4u;
  let pattern = chr_rom_cache[pattern_coord % 256u];
  return vec4<f32>(pattern.rgb, 1.0, }
@@ -281,7 +281,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  // Changed return type
  if (!this.device) {
  throw new Error('WebGPU device not initialized', }
- const startTime = performance.now(, try {
+ const startTime = performance.now( try {
  // Create bind group
  const bindGroup = this.device.createBindGroup({
  layout: cachedShader.compiledShader.bindGroupLayout,
@@ -298,7 +298,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  passEncoder.setPipeline(cachedShader.compiledShader.pipeline, passEncoder.setBindGroup(0, bindGroup, // Dispatch based on target resolution
  const workgroupsX = Math.ceil(256 / 32, // Assuming 256x256 glyph atlas
  const workgroupsY = Math.ceil(256 / 32);
- passEncoder.dispatchWorkgroups(workgroupsX, workgroupsY, 1, passEncoder.end(, this.device.queue.submit([commandEncoder.finish()]);
+ passEncoder.dispatchWorkgroups(workgroupsX, workgroupsY, 1, passEncoder.end( this.device.queue.submit([commandEncoder.finish()]);
  const renderTime = performance.now() - startTime;
  // Update metrics
  this.updateMetrics(cachedShader, 'render_success', renderTime, return {

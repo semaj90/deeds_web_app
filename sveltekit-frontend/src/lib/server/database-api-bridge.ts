@@ -152,7 +152,7 @@ export class LegalDatabaseBridge {
 		try {
 			const documents = await queryLegalDocumentsSSR(
 				{
-					path: query.searchTerm ? 'title,content' : undefined,
+					path: query.searchTerm ? 'title,content'  | undefined,
 					operator: '@>', // Simplified placeholder logic
 					value: query.searchTerm ?? '',
 					conditions: {

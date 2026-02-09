@@ -658,7 +658,7 @@ export async function vectorSearch(
                             // Convert our search filters to semantic search format
                             category: filters?.documentType || filters.category,
                             jurisdiction: filters.jurisdiction,
-                            parties: filters.parties ? [filters.parties].flat() : undefined
+                            parties: filters.parties ? [filters.parties].flat()  | undefined
                         }
                     })
                 });

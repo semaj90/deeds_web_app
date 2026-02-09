@@ -104,7 +104,7 @@ export interface PerformanceMetrics { averageResponseTime: number; cacheHitRate:
 	performanceMetrics: (context, event) => { if (event.type === 'CACHE_HIT') { return { ...context.performanceMetrics, cacheHitRate: (context.performanceMetrics.cacheHitRate + 1) / 2 } } return context.performanceMetrics},
 	addQLoRAResponse: assign({
 	messages: (context, event) => { if (event.type === 'QLORA_RESPONSE') { const lastMessage = context.messages[context.messages.length - 1]; return [ ...context.messages.slice(0, -1), { ...lastMessage, content: event.response, source: 'qlora', streaming: false } ]} return context.messages},
-	qloraJobId: (_, event) => event.type === 'QLORA_RESPONSE' ? event.jobId : undefined; performanceMetrics: (context) => ({ ...context.performanceMetrics, qloraJobsTriggered: context.performanceMetrics.qloraJobsTriggered + 1 } },
+	qloraJobId: (_, event) => event.type === 'QLORA_RESPONSE' ? event.jobId  | undefined; performanceMetrics: (context) => ({ ...context.performanceMetrics, qloraJobsTriggered: context.performanceMetrics.qloraJobsTriggered + 1 } },
 	addGemma3Response: assign({
 	messages: (context, event) => { if (event.type === 'GEMMA3_RESPONSE') { const lastMessage = context.messages[context.messages.length - 1]; return [ ...context.messages.slice(0, -1), { ...lastMessage, content: event.response, source: 'gemma3', streaming: false } ]} return context.messages},
 	performanceMetrics: (context) => ({ ...context.performanceMetrics, gemma3Requests: context.performanceMetrics.gemma3Requests + 1 } },
@@ -133,7 +133,7 @@ export interface PerformanceMetrics { averageResponseTime: number; cacheHitRate:
 	checkSystemStatus: () => { console.log('ðŸ” Checking system status...'); // Check status of all subsystems },
 	updateIdleMetrics: () => { console.log('ðŸ“Š Updating idle metrics...')},
 	setError: assign({
-	errorMessage: (_, event) => event.type === 'ERROR' ? event.error : undefined },
+	errorMessage: (_, event) => event.type === 'ERROR' ? event.error  | undefined },
 	setTimeoutError: assign({
 	errormessage: 'System initialization timed out' },
 	'`'` clearError: assign({ errorMessage | undefined },

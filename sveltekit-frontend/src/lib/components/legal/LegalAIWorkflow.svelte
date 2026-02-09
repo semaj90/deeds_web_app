@@ -15,7 +15,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     // Processing options
     let processingOptions = $state({
         extract_entities: true
-,
+
         analyze_sentiment: true, classify_domain: true, generate_embedding: true, find_similar: true, risk_assessment: true
     });
     // Check services health on mount

@@ -27,7 +27,7 @@ export async function safeFetchJson<T = any>(url: string, options: FetchOptions 
             let data: T | undefined;
             const text = await res.text();
             try {
-                data = text ? JSON.parse(text) : undefined;
+                data = text ? JSON.parse(text)  | undefined;
             } catch {
                 // @ts-ignore
                 data = text;

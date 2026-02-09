@@ -226,7 +226,7 @@ export const createTypeSafeQuery = <Q extends Record<string, unknown>>(base: Q) 
     async execute(...args: any[]): Promise<DBRow[]> {
         try {
             const fn = (base as any).execute as ((...a: unknown[]) => Promise<unknown>) | undefined;
-            const res = fn ? await fn.apply(base, args) : undefined;
+            const res = fn ? await fn.apply(base, args)  | undefined;
             return handleQueryResult(res);
         } catch (e) {
             console.error('Query execute() error:', e);
@@ -236,7 +236,7 @@ export const createTypeSafeQuery = <Q extends Record<string, unknown>>(base: Q) 
 	async all(...args: any[]): Promise<DBRow[]> {
         try {
             const fn = (base as any).all ?? (base as any).execute;
-            const res = fn ? await fn.apply(base, args) : undefined;
+            const res = fn ? await fn.apply(base, args)  | undefined;
             return handleQueryResult(res);
         } catch (e) {
             console.error('Query all() error:', e);
@@ -246,7 +246,7 @@ export const createTypeSafeQuery = <Q extends Record<string, unknown>>(base: Q) 
 	async get(...args: any[]): Promise<DBRow | null> {
         try {
             const fn = (base as any).get ?? (base as any).execute;
-            const res = fn ? await fn.apply(base, args) : undefined;
+            const res = fn ? await fn.apply(base, args)  | undefined;
             const rows = handleQueryResult(res);
             return rows[0] ?? null;
         } catch (e) {

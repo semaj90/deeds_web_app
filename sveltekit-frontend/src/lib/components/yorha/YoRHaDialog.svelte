@@ -47,7 +47,7 @@
   const config = $derived(typeConfig[type]);
 
   function handleConfirm() {
-    onConfirm?.(type === 'prompt' ? promptValue : undefined);
+    onConfirm?.(type === 'prompt' ? promptValue  | undefined);
   }
 
   function handleCancel() {

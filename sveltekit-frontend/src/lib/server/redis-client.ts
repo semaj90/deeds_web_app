@@ -37,7 +37,7 @@ export function resolveRedisConfig(overrides?: RedisClientOptions): RedisResolve
 	const envPassword = env.REDIS_PASSWORD || process.env.REDIS_PASSWORD;
 	const url = overrides?.url ?? envUrl ?? 'redis://localhost:6379';
 	const password = overrides?.password ?? envPassword ?? undefined;
-	const finalPassword = password && password !== 'redis' ? password : undefined;
+	const finalPassword = password && password !== 'redis' ? password  | undefined;
 
 	return {
 		url: finalPassword ? injectPassword(url, finalPassword) : url,

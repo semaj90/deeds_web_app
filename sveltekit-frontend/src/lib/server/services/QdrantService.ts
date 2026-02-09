@@ -304,13 +304,13 @@ export class QdrantService {
           id: String(res['id']),
           score: Number(res['score']),
           payload,
-          vector: includeVector ? (res['vector'] as number[]) : undefined,
+          vector: includeVector ? (res['vector'] as number[])  | undefined,
           similarity: Number(res['score']),
           content: String(payload['content'] ?? ''),
           title: String(payload['title'] ?? ''),
           type: String(payload['type'] ?? 'document'),
           metadata: (payload['metadata'] as Record<string, unknown> | undefined) ?? {},
-	case_id: payload['case_id'] ? String(payload['case_id']) : undefined,
+	case_id: payload['case_id'] ? String(payload['case_id'])  | undefined,
           created_at: payload['created_at'] as string | undefined,
           relevance_score: Number(payload['relevance_score'] ?? res['score']),
         } as VectorSearchResult;
@@ -349,10 +349,10 @@ export class QdrantService {
         title: String(payload['title'] ?? ''),
         type: String(payload['type'] ?? 'document'),
         metadata: (payload['metadata'] as Record<string, unknown> | undefined) ?? {},
-	case_id: payload['case_id'] ? String(payload['case_id']) : undefined,
+	case_id: payload['case_id'] ? String(payload['case_id'])  | undefined,
         relevance_score: payload['relevance_score']
           ? Number(payload['relevance_score'])
-          : undefined,
+           | undefined,
       } as DocumentVector;
     } catch (error) {
       logger.error('Failed to get document', error);

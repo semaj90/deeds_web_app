@@ -63,7 +63,7 @@ export class SecureStorageClient {
  }
  const response = await fetch(`${this.baseUrl}/upload`, {
  method: 'POST',
- headers: this.getAuthHeaders(, body: formData,
+ headers: this.getAuthHeaders( body: formData,
  });
  const result: UploadResponse = await response.json();
  if (!response.ok) {

@@ -44,7 +44,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const data = (await res.json()) as OllamaEmbedResponse;
 
         // Handle both response formats
-        const embedding = data.embedding ?? (Array.isArray(data.embeddings) && data.embeddings.length > 0 ? data.embeddings[0] : undefined);
+        const embedding = data.embedding ?? (Array.isArray(data.embeddings) && data.embeddings.length > 0 ? data.embeddings[0]  | undefined);
 
         if (!embedding || embedding.length === 0) {
             console.error('❌ No embedding in response:', JSON.stringify(data).substring(0, 200));

@@ -105,7 +105,7 @@ export class ProductionLogger {
 								stack: entry.error.stack,
 								name: entry.error.name
 						  }
-						: undefined
+						 | undefined
 				}) + '\n';
 
 			await appendFile(filePath, logLine);

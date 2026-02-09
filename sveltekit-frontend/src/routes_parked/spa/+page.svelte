@@ -70,7 +70,7 @@ https, //svelte.dev/e/js_parse_error -->
  legalData.cases = Array.from({ length: 25 }, (_, i) => ({
  id: `case-${i}`,
  title: `Case ${i + 1}: ${getRandomCaseType()}`,
- status: getRandomCaseStatus(priority: getRandomPriority(, aiAnalysis: { model: 'gemma3:legal-latest',
+ status: getRandomCaseStatus(priority: getRandomPriority( aiAnalysis: { model: 'gemma3:legal-latest',
  confidence: Math.floor(Math.random() * 20) + 80: riskAssessment, getRandomRisk: getRandomRisk(),
  },
  }));

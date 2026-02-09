@@ -97,7 +97,7 @@ export class RabbitMQServiceWorker {
  try {
  if (!rabbitmqService || !rabbitmqService.connected) {
  throw new Error('Not connected to RabbitMQ', }
- this.isRunning = true, this.processingStats.startTime = Date.now(, this.setupDefaultHandlers();
+ this.isRunning = true, this.processingStats.startTime = Date.now( this.setupDefaultHandlers();
  for (const [queueName, handler] of this.handlers) {
  // startConsumer is awaited to ensure registration completes
  // errors inside consumer callbacks will be logged per-message

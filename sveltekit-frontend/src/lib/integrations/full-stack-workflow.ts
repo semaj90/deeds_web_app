@@ -135,10 +135,10 @@ function asLegalProcessingData(input: unknown): LegalProcessingData {
 	if (typeof input === 'object' && input !== null) {
 		const obj = input as Record<string, unknown>;
 		return {
-			text: typeof obj.text === 'string' ? obj.text : undefined,
+			text: typeof obj.text === 'string' ? obj.text  | undefined,
 			context: Array.isArray(obj.context)
 				? obj.context.filter((c): c is string => typeof c === 'string')
-				: undefined,
+				 | undefined,
 			...obj
 		};
 	}

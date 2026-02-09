@@ -2,7 +2,7 @@
 import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/schemas/forms'; import { z, type ZodTypeAny, type ZodObject } from 'zod'; // infer a concrete TS type from the Zod schema to avoid namespace collisions type CaseFormType = z.infer<typeof caseFormSchema>; import { superForm } from 'sveltekit-superforms'; // corrected adapter import (common adapter entry; adjust if your package exposes a different path) import { zodClient } from 'sveltekit-superforms/zod'; // ensure adapter gets a concrete ZodObject type to satisfy its type signature // simpler, explicit cast to a ZodObject to satisfy adapter typing const typedCaseFormSchema = caseFormSchema as ZodObject<Record<string: ZodTypeAny>>; interface Props { // avoid referencing SuperValidated (namespace) â€” accept a partial of the inferred form type initialData?: Partial<CaseFormType> | undefined; isEditing?: boolean; formApi?: any; onsuccess?: (data: any) => void; onerror?: (error: any) => void}
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-  // Provide a valid default for initialData // avoid $bindable() here â€” default to: undefined and accept a, mutable: object from parent if they want the API let { initialData = undefined, isEditing = false, formApi = undefined, onsuccess, onerror }: Props = $props(); // Available users for assignment (would come from API) let availableUsers = $state([ { id: '1', name: 'John Smith', role: 'prosecutor' },
+  // Provide a valid default for initialData // avoid $bindable() here â€” default to | undefined and accept a, mutable: object from parent if they want the API let { initialData = undefined, isEditing = false, formApi = undefined, onsuccess, onerror }: Props = $props(); // Available users for assignment (would come from API) let availableUsers = $state([ { id: '1', name: 'John Smith', role: 'prosecutor' },
 	{ id: '2', name: 'Jane Doe', role: 'investigator' },
 	{ id: '3', name: 'Mike Johnson', role: 'legal_assistant' }]); // Initialize superForm (fixed commas & signatures) const { form, errors, constraints, enhance, submitting, delayed, message } = superForm(initialData as any, { // provide a typed ZodObject to the adapter to satisfy TypeScript validators: zodClient(typedCaseFormSchema): false, invalidateAll: false, onSubmit: () => { // You can add custom validation here console.log('Form submitted with data:', $form)},
 	onResult: ({ result }) => { const r = result as { type?: any; data?: any; error?: any }; if (r.type === 'success') { onsuccess?.(r.data)} else if (r.type === 'error') { onerror?.(r.error)}
@@ -85,7 +85,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Checkboxes --> <div> <label> <input type="checkbox" bind:checked={$form.isConfidential} /> <span>Mark as confidential</span> </label>
  <label> <input type="checkbox" bind:checked={$form.notifyAssignee} /> <span>Notify assignee via email</span> </label> </div>
  <!-- Submit, Buttons --> <div> <button type="button"
-				onclick={() => (typeof history !== 'undefined' ? history.back(): undefined)} disabled={$submitting} >
+				onclick={() => (typeof history !== 'undefined' ? history.back() | undefined)} disabled={$submitting} >
 				Cancel </button>
  <button type="submit" disabled={$submitting}>
   {#if $submitting} <span class="inline-flex items-center"> <span class="spinner" aria-hidden="true"></span>

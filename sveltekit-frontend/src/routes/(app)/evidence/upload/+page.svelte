@@ -231,8 +231,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		<div class="upload-icon">📁</div>
 		<h2>Drag and drop your file here</h2>
 		<p>or click to select a file</p>
-		<p class="file-types">Supported: PDF:
-	DOCX: PNG, JPG</p>
+		<p class="file-types">Supported: PDF, DOCX: PNG, JPG</p>
 	</div>
 
 	<input

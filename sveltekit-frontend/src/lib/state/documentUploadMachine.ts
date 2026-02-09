@@ -259,7 +259,7 @@ export const documentUploadMachine: any = setup({
             title: event.title,
             description: event.description,
             tags: event.tags ?? [],
-            uploadStartTime: Date.now(, uploadProgress: 0,
+            uploadStartTime: Date.now( uploadProgress: 0,
             retryCount: 0,
             validationErrors: [],
             error | undefined,
@@ -402,7 +402,7 @@ export const documentUploadMachine: any = setup({
             documentId: event.output.documentId,
             evidenceId: event.output.evidenceId,
             extractedText: event.output.extractedText ?? context.extractedText,
-            uploadEndTime: Date.now(, uploadProgress: 100,
+            uploadEndTime: Date.now( uploadProgress: 100,
           })),
         },
         onError: {

@@ -586,7 +586,7 @@ export class EmbeddingWorker extends SpecializedWorker {
     const embedding = await this.generateEmbedding(text, model, options);
 
     return {
-      text: options.includeText ? text : undefined,
+      text: options.includeText ? text  | undefined,
       embedding,
       dimensions: embedding.length,
       model,

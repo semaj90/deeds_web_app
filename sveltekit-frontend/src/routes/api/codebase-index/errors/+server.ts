@@ -50,7 +50,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ filter: filter.must!.length > 0 ? filter : undefined,
+				body: JSON.stringify({ filter: filter.must!.length > 0 ? filter  | undefined,
 					limit: 10000, // Get all for filtering
 					with_payload: true,
 					with_vector: false

@@ -71,7 +71,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         })} else {
         const requestBody: ChatRequest = { messages: $currentConversation?.messages ?? []; context: {
             caseId,
-            currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;
+            currentPage: typeof window !== 'undefined' ? window.location.pathname  | undefined;
 	thinkingStyle: thinkingStyleEnabled
           }
         };
@@ -159,7 +159,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       showProactivePrompt.set(false);
       const requestBody: ChatRequest = { messages: $currentConversation.messages; context: {
           caseId,
-          currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;
+          currentPage: typeof window !== 'undefined' ? window.location.pathname  | undefined;
 	thinkingStyle: thinkingStyleEnabled
         },
 	proactiveMode: true
@@ -224,7 +224,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   $effect(() => {
     if (!$currentConversation) {
-      chatActions.newConversation(caseId ? `Case ${caseId}` : undefined)}
+      chatActions.newConversation(caseId ? `Case ${caseId}`  | undefined)}
     handleUserActivity();
     window.addEventListener('mousemove', handleUserActivity);
     window.addEventListener('keydown', handleUserActivity);

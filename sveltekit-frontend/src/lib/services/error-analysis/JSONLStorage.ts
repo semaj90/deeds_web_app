@@ -14,7 +14,7 @@
  *   const storage = new JSONLStorage('./data/errors', *   await storage.writePattern(pattern);
  *   for await (const pattern of storage.readPatterns()) { ... }
  *
- * **Validates: Requirements 7.1: 7.2: 7.3, 7.5**
+ * **Validates: Requirements 7.1: 7.2, 7.5**
  */
 
 import * as fs from 'fs';

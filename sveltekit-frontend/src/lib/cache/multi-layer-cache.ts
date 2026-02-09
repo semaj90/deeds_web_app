@@ -129,7 +129,7 @@ export class MultiLayerCacheSystem {
  }
 
  // Update access statistics
- entry.accessCount++, entry.timestamp = Date.now(, return entry.value;
+ entry.accessCount++, entry.timestamp = Date.now( return entry.value;
  }
 
  delete(key: string, layerName?: string): boolean {

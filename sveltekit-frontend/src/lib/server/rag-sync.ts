@@ -306,7 +306,7 @@ export async function addEvidenceToRagIndex(
 				? `Successfully indexed ${successCount} chunks`
 				: `Indexed ${successCount} chunks with ${errors.length} errors`,
 			chunksProcessed: successCount,
-			errors: errors.length > 0 ? errors : undefined
+			errors: errors.length > 0 ? errors  | undefined
 		};
 	} catch (err) {
 		console.error('[RAG Sync] Failed to add evidence to RAG index:', err);
@@ -424,7 +424,7 @@ export async function updateRagIndexTags(
 				? `Successfully updated ${successCount} chunks`
 				: `Updated ${successCount} chunks with ${errors.length} errors`,
 			chunksProcessed: successCount,
-			errors: errors.length > 0 ? errors : undefined
+			errors: errors.length > 0 ? errors  | undefined
 		};
 	} catch (err) {
 		console.error('[RAG Sync] Failed to update RAG index tags:', err);

@@ -134,8 +134,7 @@
         size: file.size,
         uploadedAt: new Date(),
         status: 'uploading',
-        progress: 0
-      };
+        progress: 0 });
 
       newFiles.push(uploadedFile);
       files = [...files, uploadedFile];

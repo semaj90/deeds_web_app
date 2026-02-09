@@ -1,6 +1,6 @@
 /**
  * Codebase Intelligence Components
- * Task: 13.2: 13.3, 14.1-14.3: 15.1-15.3 - Route graph, filters, tag management
+ * Task: 13.2, 14.1-14.3: 15.1-15.3 - Route graph, filters, tag management
  */
 export { default as RouteGraph } from './RouteGraph.svelte';
 export { default as NodeDetailPanel } from './NodeDetailPanel.svelte';

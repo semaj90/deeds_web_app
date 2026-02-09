@@ -18,7 +18,7 @@ import { createPattern, type PatternMatcher } from '../pattern-matcher';
 export const propertyTypePattern: PatternMatcher = createPattern(
   'property-type-fix',
   'Fix comma instead of colon in property type annotations',
-  /(\w+),\s*([A-Z][a-zA-Z0-9_<>\[\]|&\s]*?)([;}\),])/g,
+  /(\w+),\s*([A-Z][a-zA-Z0-9_<>\[\]|&\s]*?)([;}\)])/g,
   '$1: $2$3',
   {
     priority: 40,

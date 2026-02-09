@@ -155,9 +155,9 @@ const evidenceProcessingMachine = createMachine({
 	id: 'evidenceProcessing',
 	initial: 'idle',
 	context: {
-	currentFile: undefined,
-		result: undefined,
-		error: undefined,
+	currentFile | undefined,
+		result | undefined,
+		error | undefined,
 		progress: 0,
 		stage: 'upload',
 		retryCount: 0

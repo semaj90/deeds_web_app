@@ -69,7 +69,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				createdAt: x.createdAt ?? null,
 				updatedAt: x.updatedAt ?? null,
 				pinned: !!x.pinned,
-				score: typeof x.score === "number" ? x.score : undefined
+				score: typeof x.score === "number" ? x.score  | undefined
 			}));
 		} catch (e: any) {
 			searchError = e?.message ?? "Search error";

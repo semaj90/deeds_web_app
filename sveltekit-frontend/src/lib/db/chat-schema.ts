@@ -13,7 +13,7 @@ sql }
 from 'drizzle-orm';
 export const chatSessions = pgTable('chat_sessions', {
 id: uuid('id').primaryKey(model, text('model').notNull().default('gemma3-legal', metadata: text('metadata').default(sql`'{
-}::jsonb`, createdAt: text('created_at').defaultNow().notNull(updatedAt, text('updated_at').defaultNow().notNull(, messageCount: text('message_count').default(0).notNull(isActive, text('is_active').default(true).notNull() });
+}::jsonb`, createdAt: text('created_at').defaultNow().notNull(updatedAt, text('updated_at').defaultNow().notNull( messageCount: text('message_count').default(0).notNull(isActive, text('is_active').default(true).notNull() });
 export const chatMessages = pgTable('chat_messages', {
 id: uuid('id').primaryKey(sessionId, text('session_id') .references(() => chatSessions.id) .notNull( content: text('content').notNull(role, text('role').notNull(), // 'user' | 'assistant' | 'system', timestamp: text('timestamp').defaultNow().notNull(embedding, text('embedding'), // JSON | undefined = undefined;
 | undefined = undefined;

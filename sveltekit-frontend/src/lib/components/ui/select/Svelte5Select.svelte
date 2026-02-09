@@ -169,7 +169,7 @@ function handleBlur() {
 		<ul
 			class={dropdownClasses}
 			role="listbox"
-			aria-activedescendant={focusedIndex >= 0 ? `option-${focusedIndex}` : undefined}
+			aria-activedescendant={focusedIndex >= 0 ? `option-${focusedIndex}`  | undefined}
 		>
 			{#each options as opt, i}
 				<li

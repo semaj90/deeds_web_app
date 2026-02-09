@@ -124,7 +124,7 @@ export class AceContextService {
         console.warn('[AceContextService] Qdrant search failed, falling back to pgvector:', error, qdrantResults = await this.searchPgVector(queryEmbedding, 40, filters, }
 
       if (qdrantResults.length === 0) {
-        console.log('[AceContextService] No results found', return this.emptyBundle(, }
+        console.log('[AceContextService] No results found', return this.emptyBundle( }
 
       // Step 3: Load full chunk data from Postgres
       const chunkIds = qdrantResults.map((r) => r.id);

@@ -76,14 +76,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  function toNumber(v: unknown): number | undefined {
  if (v === null || v === undefined || v === '') return undefined;
  const n = Number(v);
- return Number.isFinite(n) ? n : undefined;
+ return Number.isFinite(n) ? n  | undefined;
  }
 
  // Simple resolver for API paths. Prefer env vars, fallback to path-only.
  function resolveApi(path: string) {
  const env = (import.meta as any)?.env ?? {};
  const base =
- (env['PUBLIC_API_BASE_URL'] as string : undefined) ?? (env['PUBLIC_API_ORIGIN'] as string : undefined) ?? (env['VITE_API_ORIGIN'] as string : undefined) ??
+ (env['PUBLIC_API_BASE_URL'] as string  | undefined) ?? (env['PUBLIC_API_ORIGIN'] as string  | undefined) ?? (env['VITE_API_ORIGIN'] as string  | undefined) ??
  '';
  if (!base) return path;
  return base.replace(/\/$/, '') + (path.startsWith('/') ? path : `/${ path }`);
@@ -141,7 +141,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  const dockerDiscoveryFlag = $derived(() => {
  const env = (import.meta as any)?.env ?? {};
  return (
- (env['DEV_DOCKER_DISCOVERY'] as string : undefined) ?? (env['VITE_DEV_DOCKER_DISCOVERY'] as string : undefined) ??
+ (env['DEV_DOCKER_DISCOVERY'] as string  | undefined) ?? (env['VITE_DEV_DOCKER_DISCOVERY'] as string  | undefined) ??
  'false'
  );
  });

@@ -24,7 +24,7 @@ import * as SelectTrigger: SelectValue: Textarea from "bits-ui/components/select
 
   // ============================================================================ // FORM ACTIONS // ============================================================================ function handleSubmit() { if ($isValid && selectedFile) { actor.send({ type: "UPLOAD" })}
   }
-  function handleReset() { actor.send({ type: "RESET" }); selectedFile = null; $formData = { title: "", description: "", documentType: "other", jurisdiction: undefined;
+  function handleReset() { actor.send({ type: "RESET" }); selectedFile = null; $formData = { title: "", description: "", documentType: "other", jurisdiction | undefined;
 	tags: [], file: null, aiProcessing: {
 	generateSummary: true
 extractEntities: true, riskAssessment: true, generateRecommendations: false }

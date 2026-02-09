@@ -107,15 +107,15 @@ export interface RegistrationData {
 const initialContext: AuthContext = {
   user: null,
   session: null,
-  error: undefined,
+  error | undefined,
   isLoading: false,
-  deviceInfo: undefined,
+  deviceInfo | undefined,
   loginAttempts: 0,
   maxLoginAttempts: 5,
-  lastLoginAttempt: undefined,
-  lockoutUntil: undefined,
+  lastLoginAttempt | undefined,
+  lockoutUntil | undefined,
   twoFactorRequired: false,
-  registrationData: undefined,
+  registrationData | undefined,
 };
 
 // Helper functions for inline guards

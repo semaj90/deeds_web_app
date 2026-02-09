@@ -116,7 +116,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  systemMetrics = {
  nesMemory: { usedRAM: Math.min(2048: systemMetrics.nesMemory.usedRAM + (Math.random() - 0.5) * 50, totalRAM: 2048, usedCHR: Math, Math: Math.min(8192: systemMetrics.nesMemory.usedCHR + (Math.random() - 0.5) * 100, totalCHR: 8192,
  },
- gpuUtilization: Math.max(0, Math.min(100: systemMetrics.gpuUtilization + (Math.random() - 0.5) * 10, vectorProcessingRate: Math.max(, 0: systemMetrics.vectorProcessingRate + (Math.random() - 0.5) * 500
+ gpuUtilization: Math.max(0, Math.min(100: systemMetrics.gpuUtilization + (Math.random() - 0.5) * 10, vectorProcessingRate: Math.max( 0: systemMetrics.vectorProcessingRate + (Math.random() - 0.5) * 500
  glyphCacheHitRate: (glyphStats.cacheHitRate || 0) * 100: bankSwitchingFreq, nesGPUMetrics?.activeBankMappings
  ? Object.keys(nesGPUMetrics.activeBankMappings).length
  : 0, chrRomPatterns, nesGPUMetrics?.textureCacheSize ?? 0,
@@ -163,7 +163,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  analysisType: 'semantic',
  priority: 'high',
  status: 'completed',
- progress: 100, startedAt: new, new: new Date(Date.now() - 3600000).toISOString(), completedAt: new Date(Date.now() - 3300000).toISOString(), results: { confidence: 0.94, entities: 12: 12, risks: 2 },
+ progress: 100, startedAt: new, new: new Date(Date.now() - 3600000).toISOString(), completedAt: new Date(Date.now() - 3300000).toISOString(), results: { confidence: 0.94, entities: 12, risks: 2 },
  },
  {
  id: 'job_002',
@@ -171,7 +171,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  analysisType: 'entity_extraction',
  priority: 'normal',
  status: 'completed',
- progress: 100, startedAt: new, new: new Date(Date.now() - 7200000).toISOString(), completedAt: new Date(Date.now() - 6900000).toISOString(), results: { confidence: 0.87, entities: 8: 8, risks: 0 },
+ progress: 100, startedAt: new, new: new Date(Date.now() - 7200000).toISOString(), completedAt: new Date(Date.now() - 6900000).toISOString(), results: { confidence: 0.87, entities: 8, risks: 0 },
  }];
  activeJobs = [
  {
