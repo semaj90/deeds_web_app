@@ -1,11 +1,10 @@
-import db from '$lib/server/database';
+import { db } from '$lib/server/database';
 import { autoTags, documentChunks, embeddingCache, userAiQueries } from '$lib/server/db/schema-postgres';
 import { OllamaService } from '$lib/services/ollamaService';
 import crypto from 'crypto';
 import type { InferInsertModel } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
 import { generateIdFromEntropySize } from 'lucia';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Infer types from schema
 type NewUserAiQuery = InferInsertModel<typeof userAiQueries>;
@@ -377,7 +376,7 @@ Format your response as JSON with the structure:
    */
   private async logQuery(data: {
     userId: string;
-    caseId?: string;
+    caseId?: string | undefined;
     query: string;
     response: string;
     model: string;
@@ -470,6 +469,7 @@ Format your response as JSON with the structure:
         id: generateIdFromEntropySize(10),
         documentId,
         documentType,
+        documentIndex: 0,
         chunkIndex: 0,
         content: content.slice(0, 2000),
         embedding: embeddingString,
@@ -478,7 +478,7 @@ Format your response as JSON with the structure:
           contentLength: content.length,
           generatedAt: new Date().toISOString(),
         },
-      } as NewDocumentChunk;
+      } as unknown as NewDocumentChunk;
 
       await (db as any).insert(documentChunks).values(chunkData);
     } catch (error: Error | unknown) {

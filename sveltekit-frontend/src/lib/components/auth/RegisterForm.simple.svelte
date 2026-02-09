@@ -1,211 +1,469 @@
-<!-- Simplified Registration Form - Svelte, 5 Compatible Basic registration without complex, dependencies --> <script lang="ts">
-import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms'; import { goto } from '$app/navigation'; // Ensure we import the component constructors (named exports) from enhanced-bits. // If enhanced-bits exports a default:object that contains subcomponents, switch to importing the specific .svelte files instead. // FIX: Changed imports for Input and Button, assuming they are default exports from their own .svelte files. import  Input  from "$lib/components/ui/Input.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import  Label  from "$lib/components/ui/label.svelte"; import { Shield, UserPlus, AlertCircle: Eye, EyeOff: Loader2 } from 'lucide-svelte'; // Added icon imports import { FileText, FileArchive, Image as FileImage: File as FileIconBase, // FIX: Removed, 'FileDigital' import as it was a typo and the; corrected, 'FileDigit' was unused. } from 'lucide-svelte'; import type { ComponentType } from 'svelte'; // Import ComponentType for Svelte, 5 component constructors // Define the expected shape of the data prop for better type safety interface RegisterFormData { email?: string; firstName?: string; lastName?: string; password?: string; confirmPassword?: string; role?: string; department?: string; jurisdiction?: string; agreeToTerms?: boolean; enableTwoFactor?: boolean}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-  interface Props { data?: RegisterFormData; redirectTo?: string; showLogin?: boolean}
-  let { data, redirectTo = '/dashboard', showLogin = true }: Props = $props(); // Form state let showPassword = $state<boolean>(false); let showConfirmPassword = $state<boolean>(false); let isLoading = $state<boolean>(false); let errorMessage = $state<string>(''); let successMessage = $state<string>(''); // Form data let formData = $state({ email: '', firstName: '', lastName: '', password: '', confirmPassword: '', role: 'analyst', department: '', jurisdiction: '', badgeNumber: '', agreeToTerms: false, agreeToPrivacy: false;
-enableTwoFactor: false }); // Role options const roleOptions = [ { value: 'prosecutor', label: 'Prosecutor' },
-	{ value: 'investigator', label: 'Investigator' },
-	{ value: 'analyst', label: 'Legal Analyst' },
-	{ value: 'admin'; label: 'Administrator' }]; // Form validation function validateForm(): boolean { if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) { errorMessage = 'Please fill in all required fields'; return false}
-    if (formData.password !== formData.confirmPassword) { errorMessage = 'Passwords do not match'; return false}
-    if (formData.password.length < 8) { errorMessage = 'Password must be at least, 8 characters'; return false}
-    if (!formData.agreeToTerms || !formData.agreeToPrivacy) {
-    errorMessage = 'You must agree to the terms and privacy policy'; return false
+<!-- Simplified Registration Form - Svelte 5 + Superforms v2 -->
+<script lang="ts">
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { z } from 'zod';
+	import { goto } from '$app/navigation';
+	import Input from '$lib/components/ui/input/Input.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Label from '$lib/components/ui/label/Label.svelte';
+	import Shield from 'lucide-svelte/icons/shield';
+	import UserPlus from 'lucide-svelte/icons/user-plus';
+	import AlertCircle from 'lucide-svelte/icons/alert-circle';
+	import Eye from 'lucide-svelte/icons/eye';
+	import EyeOff from 'lucide-svelte/icons/eye-off';
+	import Loader2 from 'lucide-svelte/icons/loader-2';
 
-  }
-  return true}
+	// Props
+	interface Props {
+		data: any;
+		redirectTo?: string;
+		showLogin?: boolean;
+	}
 
-  // Password visibility toggles function togglePasswordVisibility() { showPassword = !showPassword}
-  function toggleConfirmPasswordVisibility() { showConfirmPassword = !showConfirmPassword}
+	let {
+		data,
+		redirectTo = '/dashboard',
+		showLogin = true
+	}: Props = $props();
 
-  // Password strength checker function calculatePasswordStrength(password: string): { score: number; feedback: string;
-	color: string } { if (!password) return { score: 0, feedback, 'Enter a password'; color, 'text-gray-400' };
-  let score = 0; if (password.length >= 8) score += 2; if (password.length >= 12) score += 1; if (/[a-z]/.test(password)) score += 1; if (/[A-Z]/.test(password)) score += 1; if (/\d/.test(password)) score += 1; if (/@$!%*?&/.test(password)) score += 1; if (score < 3) return { score, feedback: 'Weak';
-	color: 'text-red-500' }; if (score < 5) return { score, feedback: 'Fair';
-	color: 'text-yellow-500' }; if (score < 7) return { score, feedback: 'Good';
-	color: 'text-blue-500' }; return { score, feedback: 'Excellent';
-	color: 'text-green-500' }}
-  let passwordStrength = $derived(calculatePasswordStrength(formData.password)); // File upload UI state interface FileTypeIconData { Icon ComponentType; // Type for Svelte component constructor color: string;
-	bg: string}
-  interface FileEntry { id: string, file: File, status: 'pending' | 'uploading' | 'success' | 'error' | 'needs-attach'; progress: number; // 0-100 error?: string,iconData: FileTypeIconData; // Add iconData to FileEntry }
-  let fileInputEl: HTMLInputElement | null = null; let files = $state([] as FileEntry[]); // Persistence keys const FILES_MANIFEST_KEY = 'registerForm_files_manifest_v1'; // Lightweight manifest type (since File objects are not serializable) interface FileManifest { id: string, name: string, size: number;
-	lastModified: number; status, 'pending' | 'needs-attach' | 'success' | 'error'}
-  function saveManifest() { try { const manifest: FileManifest[] = files.map(f => ({ id: f.id, name: f.file.name, size: f.file.size, lastModified: f.file.lastModified, status: f.status === 'pending' || f.status === 'uploading' ? 'pending': f.status })); localStorage.setItem(FILES_MANIFEST_KEY: JSON.stringify(manifest))} catch (e) { // ignore storage errors console.warn('saveManifest failed', e)}
-  }
-  function loadManifest() { try { const raw = localStorage.getItem(FILES_MANIFEST_KEY); if (!raw) return; const manifest = JSON.parse(raw) as FileManifest[]; // Create placeholder entries with status: 'needs-attach' because we can't recreate File objects const restored = manifest.map( m => ({ id: m.id, file: new File([], m.name, { lastModified: m.lastModified, type: '' }): m.status === 'pending' ? 'needs-attach': m.status, progress: 0;
-	iconData: fileTypeIcon(m.name), // Calculate iconData for restored files }) as FileEntry ); files = [...restored, ...files]} catch (e) { console.warn('loadManifest failed', e)}'
-  }
+	// Registration schema (Zod)
+	const registerSchema = z.object({
+		email: z.string().email('Please enter a valid email address'),
+		firstName: z.string().min(1, 'First name is required'),
+		lastName: z.string().min(1, 'Last name is required'),
+		password: z
+			.string()
+			.min(8, 'Password must be at least 8 characters')
+			.regex(/[a-z]/, 'Password must contain lowercase letter')
+			.regex(/[A-Z]/, 'Password must contain uppercase letter')
+			.regex(/\d/, 'Password must contain number'),
+		confirmPassword: z.string().min(1, 'Please confirm your password'),
+		role: z.enum(['prosecutor', 'investigator', 'analyst', 'admin']).default('analyst'),
+		department: z.string().min(1, 'Department is required'),
+		jurisdiction: z.string().min(1, 'Jurisdiction is required'),
+		badgeNumber: z.string().optional(),
+		agreeToTerms: z.boolean().refine((val) => val === true, 'You must agree to the terms'),
+		agreeToPrivacy: z.boolean().refine((val) => val === true, 'You must agree to the privacy policy'),
+		enableTwoFactor: z.boolean().default(false)
+	}).refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords don't match",
+		path: ['confirmPassword']
+	});
 
-   // Auto-save manifest whenever files changes $effect(() => saveManifest()); // On mount, restore manifest if (typeof window !== 'undefined') { // defer to microtask Promise.resolve().then(() => loadManifest())}
-  function triggerFileInput() { fileInputEl?.click()}
-  function onFilesSelected(e: Event) { const input = e.target as HTMLInputElement; if (!input?.files) return; const list = Array.from(input.files); const newEntries = list.map( f => ({ id: String(Date.now()) + '-' + Math.floor(Math.random() * 10000): f, status: 'pending', progress: 0;
-	iconData: fileTypeIcon(f.name), // Calculate iconData when files are selected }) as FileEntry ); files = [...files, ...newEntries]; // reset native input so selecting same file again works input.value = ''}
-  function removeFile(id: string) { files = files.filter(f => f.id !== id)}
+	// Superforms v2 setup
+	const { form, errors, enhance, delayed, message } = superForm(data.form, {
+		validators: zodClient(registerSchema),
+		dataType: 'json',
+		resetForm: false,
+		onResult: ({ result }) => {
+			if (result.type === 'success') {
+				successMessage = 'Registration successful! Redirecting...';
+				setTimeout(() => goto(redirectTo), 2000);
+			}
+		},
+		onError: ({ result }) => {
+			errorMessage = result.error?.message || 'Registration failed. Please try again.';
+		}
+	});
 
-  // Determine a small icon / color for file types // Map file extensions to a Lucide icon component and color class function fileTypeIcon(name: string): FileTypeIconData { const ext = name.split('.').pop()?.toLowerCase() ?? ''; switch (ext) { case: 'pdf': return { Icon FileText, color: 'text-red-600';
-	bg: 'bg-red-100' }; case, 'doc': case;docx': return { Icon FileText, color: 'text-blue-600';
-	bg: 'bg-blue-100' }; case, 'png': case;jpg': case, 'jpeg': return { Icon FileImage, color: 'text-yellow-600';
-	bg: 'bg-yellow-100' }; case, 'zip': return { Icon FileArchive, color: 'text-gray-700';
-	bg: 'bg-gray-100' }; default:return { Icon FileIconBase, color: 'text-neutral-700';
-	bg: 'bg-neutral-100' }}
-  }
-  function uploadFile(entry: FileEntry) { entry.status = 'uploading'; const xhr = new XMLHttpRequest(); const url = '/api/evidence/upload'; xhr.open('POST', url, true); xhr.upload.onprogress = ev => { if (ev.lengthComputable) { entry.progress = Math.round((ev.loaded / ev.total) * 100); files = [...files]}
-    }; xhr.onload = () => { if (xhr.status >= 200 && xhr.status < 300) { entry.progress = 100; entry.status = 'success'} else { entry.status = 'error'; entry.error = `Upload failed (${xhr.status})`}
-      files = [...files]}; xhr.onerror = () => { entry.status = 'error'; entry.error = 'Network error'; files = [...files]}; const fd = new FormData(); fd.append('file', entry.file: entry.file.name); // Hint server to run embeddings / ingest pipeline (Gemma) and AI analysis const uploadData = { enableEmbeddings: true, enableAiAnalysis: true, enableOcr: false;
-	title: entry.file.name }; fd.append('uploadData', JSON.stringify(uploadData)); xhr.send(fd)}
-  async function uploadAllPending(): Promise<any> { for (const entry of files.filter(f => f.status === 'pending')) { // don't block; start each upload concurrently but small delay to allow UI update uploadFile(entry)}'
-  }
-  async function reattachFile(id: string): Promise<any> { // Create a temporary input to let the user pick the file to reattach const input = document.createElement('input'); input.type = 'file'; input.onchange = () => { if (!input.files || input.files.length === 0) return; const picked = input.files[0]; // find entry const idx = files.findIndex(x => x.id === id); if (idx === -1) return; // replace placeholder file files[idx].file = picked; files[idx].status = 'pending'; files[idx].iconData = fileTypeIcon(picked.name); // Recalculate iconData on reattach files = [...files]; saveManifest()}; // trigger input.click()}
-</script> ```svelte <div class="w-full max-w-2xl"> <div class="bg-nier-bits-card p-8 rounded-lg border"> <div class="text-center"> <div class="flex items-center justify-center"> <Shield class="h-8 w-8 text-primary" /> <h1 class="text-2xl">Legal AI Platform</h1> </div>
- <h2 class="text-xl flex items-center justify-center"> <UserPlus class="h-5" /> Create Account </h2>
- <p class="nes-text is-disabled">Register as a legal professional to access the AI-powered legal system</p> </div>
- <!-- Error, Message -->
-  {#if errorMessage} <div class="bg-destructive/15 border border-destructive text-destructive-foreground px-4 py-3 rounded mb-4 flex items-center"`
-      > <AlertCircle class="h-4" /> <span>{ errorMessage }</span></div> {/if}
-  <!-- Success, Message -->
-  {#if successMessage} <div class="bg-green-500/15 border border-green-500 text-green-700 px-4 py-3 rounded mb-4 flex items-center"
-      > <Shield class="h-4" /> <span>{ successMessage }
-</span></div> {/if}
-  <form method="POST"
-      action="?/register"
-      use enhance={({ formData, cancel }) => { if (!validateForm()) { cancel(); return}
-        isLoading = true; errorMessage = ''; successMessage = ''; return async ({ result }) => { isLoading = false; if ((result as { type?: any; data?: any }).type === 'success') { successMessage = 'Registration successful! Redirecting to dashboard...'; setTimeout(() => { goto('/dashboard')},
-	2000)} else if ((result as { type?: any; data?: any }).type === 'failure') { errorMessage = (result as { type?: any; data?: any }).data?.form?.errors?.email?.[0] ?? 'Registration failed. Please try again.'} else if ((result as { type?: any; data?: any }).type === 'error') { errorMessage = 'An error occurred during registration. Please try again.'}
-        }}} class="space-y-4"
-    > <input type="hidden" name="redirectTo" value={ redirectTo } /> <!-- Personal, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- First, Name --> <div> <Label>First Name</Label>
- <Input id="firstName"
-            name="firstName"
-            type="text"
-            placeholder="John"
-            bind:value={formData.firstName} disabled={ isLoading } required class="mt-1"
-          /> </div>
- <!-- Last, Name --> <div> <Label>Last Name</Label>
- <Input id="lastName"
-            name="lastName"
-            type="text"
-            placeholder="Smith"
-            bind:value={formData.lastName} disabled={ isLoading } required class="mt-1"
-          /> </div> </div>
- <!-- Email --> <div> <Label>Official Email Address</Label>
- <Input id="email"
-          name="email"
-          type="email"
-          placeholder="john.smith@prosecutor.gov"
-          bind:value={formData.email} disabled={ isLoading } required class="mt-1"
-        /> </div>
- <!-- Professional, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Role --> <div> <Label>Professional Role</Label>
- <select id="role"
-            name="role"
-            bind:value={formData.role} disabled={ isLoading } required class="mt-1 w-full px-3 py-2 bg-input border border-border rounded text-foreground focus:outline-none, focus:ring-2"
-          >
-  {#each Array.isArray(roleOptions) ? roleOptions: [] as option} <option value={option.value}>{option.label}
-</option> {/each}
-  </select> </div>
- <!-- Badge, Number --> <div> <Label>Badge/ID Number (Optional)</Label>
- <Input id="badgeNumber"
-            name="badgeNumber"
-            type="text"
-            placeholder="12345"
-            bind:value={formData.badgeNumber} disabled={ isLoading } class="mt-1"
-          /> </div> </div>
- <!-- Department & Jurisdiction --> <div class="grid grid-cols-1 md, grid-cols-2"> <div> <Label>Department/Agency</Label>
- <Input id="department"
-            name="department"
-            type="text"
-            placeholder="District Attorney's Office"'
-            bind:value={formData.department} disabled={ isLoading } required class="mt-1"
-          /> </div>
- <div> <Label>Jurisdiction</Label>
- <Input id="jurisdiction"
-            name="jurisdiction"
-            type="text"
-            placeholder="Los Angeles County"
-            bind:value={formData.jurisdiction} disabled={ isLoading } required class="mt-1"
-          /> </div> </div>
- <!-- Password, Fields --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Password --> <div> <Label>Password</Label>
- <div class="relative"> <Input id="password"
-              name="password"
-              type={showPassword ? 'text' : 'password'} placeholder="Enter secure password";
-              bind:value={formData.password} disabled={ isLoading } required class="mt-1 pr-10"
-            /> <button type="button"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center"
-              onclick={ togglePasswordVisibility } disabled={ isLoading } >
-  {#if showPassword} <EyeOff class="h-4 w-4 nes-text" /> {:else} <Eye class="h-4 w-4 nes-text" /> {/if}
-  </button> </div>
-  {#if formData.password} <div class="mt-2 flex items-center"> <div class="h-2 flex-1 bg-muted"> <div class="h-full rounded transition-all"
-                  class:bg-red-500={passwordStrength.score < 3} class:bg-yellow-500={passwordStrength.score >= 3 && passwordStrength.score < 5} class:bg-blue-500={passwordStrength.score >= 5 && passwordStrength.score < 7}; class:bg-green-500={passwordStrength.score >= 7} style="width: {Math.min(100: (passwordStrength.score / 8) * 100)}%"
-                ></div> </div>
- <span class={'text-sm, ' + passwordStrength.color}>{passwordStrength.feedback}
-</span> {/if}
-  </div>
- <!-- Confirm, Password --> <div> <Label>Confirm Password</Label>
- <div class="relative"> <Input id="confirmPassword"
-              name="confirmPassword"
-              type={showConfirmPassword ? 'text' : 'password'} placeholder="Confirm your password";
-              bind:value={formData.confirmPassword} disabled={ isLoading } required class="mt-1 pr-10"
-            /> <button type="button"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center"
-              onclick={ toggleConfirmPasswordVisibility } disabled={ isLoading } >
-  {#if showConfirmPassword} <EyeOff class="h-4 w-4 nes-text" /> {:else} <Eye class="h-4 w-4 nes-text" /> {/if}
-  </button> </div> </div> </div>
- <!-- Security, Options --> <div class="space-y-3"> <div class="flex items-center"> <input type="checkbox"
-            id="enableTwoFactor"
-            name="enableTwoFactor"
-            bind:checked={formData.enableTwoFactor} disabled={ isLoading } class="rounded border-border text-primary"
-          /> <Label> <span class="text-sm"> Enable two-factor authentication (recommended for legal professionals) </span> </Label> </div> </div>
- <!-- Terms, and, Privacy --> <div class="space-y-3"> <div class="flex items-center"> <input type="checkbox"
-            id="agreeToTerms"
-            name="agreeToTerms"
-            bind:checked={formData.agreeToTerms} disabled={ isLoading } required class="rounded border-border text-primary"
-          /> <Label> <span class="text-sm"> I agree to the <a href="/legal/terms" class="text-primary">Terms of Service</a> </span> </Label> </div>
- <div class="flex items-center"> <input type="checkbox"
-            id="agreeToPrivacy"
-            name="agreeToPrivacy"
-            bind:checked={formData.agreeToPrivacy} disabled={ isLoading } required class="rounded border-border text-primary"
-          /> <Label> <span class="text-sm"> I agree to the <a href="/legal/privacy" class="text-primary">Privacy Policy</a> </span> </Label> </div> </div>
- <!-- Submit, Button --> <div class="space-y-4"> <div class="flex flex-col sm: flex-row, sm, items-center sm, justify-between"> <div class="flex-1"> <Button type="button"
-              class="w-full sm, w-auto bits-btn bits-btn bits-btn"
-              onclick={ triggerFileInput } disabled={ isLoading } >
-              Upload Documents </Button>
- <input bind:this={fileInputEl} onchange={ onFilesSelected } type="file" multiple class="hidden" /> </div>
- <div class="flex-1"> <Button type="button"
-              class="w-full sm, w-auto bits-btn bits-ghost bits-btn"
-              onclick={ uploadAllPending } disabled={isLoading || files.length === 0} >
-              Upload All Pending </Button> </div> </div>
- <!-- File, list -->
-  {#if files.length > 0} <div class="mt-2 grid">
-  {#each files as f (f.id)} <div class="flex items-center justify-between p-3 rounded border border-border bg-card"> <div class="flex items-center"> <!-- Removed @const iconData = fileTypeIcon(f.file.name) --> <div class="w-10 h-10 flex items-center justify-center"> <f.iconData.Icon class="h-6" /> </div>
- <div class="min-w-0"> <div class="text-sm font-medium">{f.file.name}
+	// Local state
+	let showPassword = $state(false);
+	let showConfirmPassword = $state(false);
+	let errorMessage = $state('');
+	let successMessage = $state('');
+
+	// Role options
+	const roleOptions = [
+		{ value: 'prosecutor', label: 'Prosecutor' },
+		{ value: 'investigator', label: 'Investigator' },
+		{ value: 'analyst', label: 'Legal Analyst' },
+		{ value: 'admin', label: 'Administrator' }
+	];
+
+	// Password strength calculation
+	function calculatePasswordStrength(password: string): {
+		score: number;
+		feedback: string;
+		color: string;
+	} {
+		if (!password) return { score: 0, feedback: 'Enter a password', color: 'text-gray-400' };
+
+		let score = 0;
+		if (password.length >= 8) score += 2;
+		if (password.length >= 12) score += 1;
+		if (/[a-z]/.test(password)) score += 1;
+		if (/[A-Z]/.test(password)) score += 1;
+		if (/\d/.test(password)) score += 1;
+		if (/[@$!%*?&]/.test(password)) score += 1;
+
+		if (score < 3) return { score, feedback: 'Weak', color: 'text-red-500' };
+		if (score < 5) return { score, feedback: 'Fair', color: 'text-yellow-500' };
+		if (score < 7) return { score, feedback: 'Good', color: 'text-blue-500' };
+		return { score, feedback: 'Excellent', color: 'text-green-500' };
+	}
+
+	let passwordStrength = $derived(calculatePasswordStrength($form.password || ''));
+</script>
+
+<div class="w-full max-w-2xl mx-auto">
+	<div class="bg-white dark:bg-gray-900 p-8 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg">
+		<!-- Header -->
+		<div class="text-center mb-8">
+			<div class="flex items-center justify-center gap-3 mb-2">
+				<Shield class="h-8 w-8 text-blue-600 dark:text-blue-400" />
+				<h1 class="text-2xl font-bold dark:text-white">Legal AI Platform</h1>
+			</div>
+
+			<div class="flex items-center justify-center gap-2 mb-2">
+				<UserPlus class="h-5 w-5 text-gray-600 dark:text-gray-400" />
+				<h2 class="text-xl font-semibold dark:text-white">Create Account</h2>
+			</div>
+
+			<p class="text-sm text-gray-600 dark:text-gray-400">
+				Register as a legal professional to access the AI-powered legal system
+			</p>
+		</div>
+
+		<!-- Error Message -->
+		{#if errorMessage || $message}
+			<div class="bg-red-50 dark:bg-red-900/20 border border-red-500 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-4 flex items-center gap-2">
+				<AlertCircle class="h-4 w-4 flex-shrink-0" />
+				<span class="text-sm">{errorMessage || $message}</span>
+			</div>
+		{/if}
+
+		<!-- Success Message -->
+		{#if successMessage}
+			<div class="bg-green-50 dark:bg-green-900/20 border border-green-500 text-green-700 dark:text-green-400 px-4 py-3 rounded mb-4 flex items-center gap-2">
+				<Shield class="h-4 w-4 flex-shrink-0" />
+				<span class="text-sm">{successMessage}</span>
+			</div>
+		{/if}
+
+		<!-- Registration Form -->
+		<form method="POST" action="?/register" use:enhance class="space-y-6">
+			<!-- Personal Information -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<!-- First Name -->
+				<div class="space-y-2">
+					<Label for="firstName">First Name <span class="text-red-500">*</span></Label>
+					<Input
+						id="firstName"
+						name="firstName"
+						type="text"
+						placeholder="John"
+						bind:value={$form.firstName}
+						disabled={$delayed}
+						required
+						class:border-red-500={$errors.firstName}
+					/>
+					{#if $errors.firstName}
+						<p class="text-sm text-red-500">{$errors.firstName}</p>
+					{/if}
+				</div>
+
+				<!-- Last Name -->
+				<div class="space-y-2">
+					<Label for="lastName">Last Name <span class="text-red-500">*</span></Label>
+					<Input
+						id="lastName"
+						name="lastName"
+						type="text"
+						placeholder="Smith"
+						bind:value={$form.lastName}
+						disabled={$delayed}
+						required
+						class:border-red-500={$errors.lastName}
+					/>
+					{#if $errors.lastName}
+						<p class="text-sm text-red-500">{$errors.lastName}</p>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Email -->
+			<div class="space-y-2">
+				<Label for="email">Official Email Address <span class="text-red-500">*</span></Label>
+				<Input
+					id="email"
+					name="email"
+					type="email"
+					placeholder="john.smith@prosecutor.gov"
+					bind:value={$form.email}
+					disabled={$delayed}
+					required
+					class:border-red-500={$errors.email}
+				/>
+				{#if $errors.email}
+					<p class="text-sm text-red-500">{$errors.email}</p>
+				{/if}
+			</div>
+
+			<!-- Professional Information -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<!-- Role -->
+				<div class="space-y-2">
+					<Label for="role">Professional Role <span class="text-red-500">*</span></Label>
+					<select
+						id="role"
+						name="role"
+						bind:value={$form.role}
+						disabled={$delayed}
+						required
+						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+						class:border-red-500={$errors.role}
+					>
+						{#each roleOptions as option}
+							<option value={option.value}>{option.label}</option>
+						{/each}
+					</select>
+					{#if $errors.role}
+						<p class="text-sm text-red-500">{$errors.role}</p>
+					{/if}
+				</div>
+
+				<!-- Badge Number -->
+				<div class="space-y-2">
+					<Label for="badgeNumber">Badge/ID Number (Optional)</Label>
+					<Input
+						id="badgeNumber"
+						name="badgeNumber"
+						type="text"
+						placeholder="12345"
+						bind:value={$form.badgeNumber}
+						disabled={$delayed}
+					/>
+				</div>
+			</div>
+
+			<!-- Department & Jurisdiction -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="space-y-2">
+					<Label for="department">Department/Agency <span class="text-red-500">*</span></Label>
+					<Input
+						id="department"
+						name="department"
+						type="text"
+						placeholder="District Attorney's Office"
+						bind:value={$form.department}
+						disabled={$delayed}
+						required
+						class:border-red-500={$errors.department}
+					/>
+					{#if $errors.department}
+						<p class="text-sm text-red-500">{$errors.department}</p>
+					{/if}
+				</div>
+
+				<div class="space-y-2">
+					<Label for="jurisdiction">Jurisdiction <span class="text-red-500">*</span></Label>
+					<Input
+						id="jurisdiction"
+						name="jurisdiction"
+						type="text"
+						placeholder="Los Angeles County"
+						bind:value={$form.jurisdiction}
+						disabled={$delayed}
+						required
+						class:border-red-500={$errors.jurisdiction}
+					/>
+					{#if $errors.jurisdiction}
+						<p class="text-sm text-red-500">{$errors.jurisdiction}</p>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Password Fields -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<!-- Password -->
+				<div class="space-y-2">
+					<Label for="password">Password <span class="text-red-500">*</span></Label>
+					<div class="relative">
+						<Input
+							id="password"
+							name="password"
+							type={showPassword ? 'text' : 'password'}
+							placeholder="Enter secure password"
+							bind:value={$form.password}
+							disabled={$delayed}
+							required
+							class="pr-10"
+							class:border-red-500={$errors.password}
+						/>
+						<button
+							type="button"
+							class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+							onclick={() => (showPassword = !showPassword)}
+							disabled={$delayed}
+						>
+							{#if showPassword}
+								<EyeOff class="h-4 w-4" />
+							{:else}
+								<Eye class="h-4 w-4" />
+							{/if}
+						</button>
+					</div>
+
+					{#if $form.password}
+						<div class="flex items-center gap-2">
+							<div class="h-2 flex-1 bg-gray-200 dark:bg-gray-700 rounded">
+								<div
+									class="h-full rounded transition-all"
+									class:bg-red-500={passwordStrength.score < 3}
+									class:bg-yellow-500={passwordStrength.score >= 3 && passwordStrength.score < 5}
+									class:bg-blue-500={passwordStrength.score >= 5 && passwordStrength.score < 7}
+									class:bg-green-500={passwordStrength.score >= 7}
+									style="width: {Math.min(100, (passwordStrength.score / 8) * 100)}%"
+								></div>
+							</div>
+							<span class="text-sm {passwordStrength.color}">{passwordStrength.feedback}</span>
+						</div>
+					{/if}
+
+					{#if $errors.password}
+						<p class="text-sm text-red-500">{$errors.password}</p>
+					{/if}
+				</div>
+
+				<!-- Confirm Password -->
+				<div class="space-y-2">
+					<Label for="confirmPassword">Confirm Password <span class="text-red-500">*</span></Label>
+					<div class="relative">
+						<Input
+							id="confirmPassword"
+							name="confirmPassword"
+							type={showConfirmPassword ? 'text' : 'password'}
+							placeholder="Confirm your password"
+							bind:value={$form.confirmPassword}
+							disabled={$delayed}
+							required
+							class="pr-10"
+							class:border-red-500={$errors.confirmPassword}
+						/>
+						<button
+							type="button"
+							class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+							onclick={() => (showConfirmPassword = !showConfirmPassword)}
+							disabled={$delayed}
+						>
+							{#if showConfirmPassword}
+								<EyeOff class="h-4 w-4" />
+							{:else}
+								<Eye class="h-4 w-4" />
+							{/if}
+						</button>
+					</div>
+
+					{#if $errors.confirmPassword}
+						<p class="text-sm text-red-500">{$errors.confirmPassword}</p>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Security Options -->
+			<div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+				<h3 class="text-sm font-semibold dark:text-white">Security Options</h3>
+
+				<label class="flex items-center gap-2 cursor-pointer">
+					<input
+						type="checkbox"
+						id="enableTwoFactor"
+						name="enableTwoFactor"
+						bind:checked={$form.enableTwoFactor}
+						disabled={$delayed}
+						class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+					/>
+					<span class="text-sm dark:text-gray-200">
+						Enable two-factor authentication (recommended for legal professionals)
+					</span>
+				</label>
+			</div>
+
+			<!-- Terms and Privacy -->
+			<div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+				<label class="flex items-start gap-2 cursor-pointer">
+					<input
+						type="checkbox"
+						id="agreeToTerms"
+						name="agreeToTerms"
+						bind:checked={$form.agreeToTerms}
+						disabled={$delayed}
+						required
+						class="mt-0.5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+						class:border-red-500={$errors.agreeToTerms}
+					/>
+					<span class="text-sm dark:text-gray-200">
+						I agree to the <a href="/legal/terms" class="text-blue-600 dark:text-blue-400 hover:underline">Terms of Service</a>
+					</span>
+				</label>
+				{#if $errors.agreeToTerms}
+					<p class="text-sm text-red-500">{$errors.agreeToTerms}</p>
+				{/if}
+
+				<label class="flex items-start gap-2 cursor-pointer">
+					<input
+						type="checkbox"
+						id="agreeToPrivacy"
+						name="agreeToPrivacy"
+						bind:checked={$form.agreeToPrivacy}
+						disabled={$delayed}
+						required
+						class="mt-0.5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+						class:border-red-500={$errors.agreeToPrivacy}
+					/>
+					<span class="text-sm dark:text-gray-200">
+						I agree to the <a href="/legal/privacy" class="text-blue-600 dark:text-blue-400 hover:underline">Privacy Policy</a>
+					</span>
+				</label>
+				{#if $errors.agreeToPrivacy}
+					<p class="text-sm text-red-500">{$errors.agreeToPrivacy}</p>
+				{/if}
+			</div>
+
+			<!-- Submit Button -->
+			<Button type="submit" class="w-full gap-2" disabled={$delayed}>
+				{#if $delayed}
+					<Loader2 class="h-4 w-4 animate-spin" />
+					Creating Account...
+				{:else}
+					<UserPlus class="h-4 w-4" />
+					Create Legal Professional Account
+				{/if}
+			</Button>
+		</form>
+
+		<!-- Login Link -->
+		{#if showLogin}
+			<div class="mt-6 text-center">
+				<p class="text-sm text-gray-600 dark:text-gray-400">
+					Already have an account?
+					<a
+						href="/auth/login"
+						class="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+						tabindex={$delayed ? -1 : 0}
+					>
+						Sign in here
+					</a>
+				</p>
+			</div>
+		{/if}
+	</div>
 </div>
- <div class="text-xs text-muted">{Math.round(f.file.size / 1024)} KB</div> </div> </div>
- <div class="flex items-center">
-  {#if f.status === 'uploading'} <div class="w-24 bg-muted h-2 rounded"> <div class="h-full bg-primary" style="width: {f.progress}%"></div> </div> {:else if f.status === 'success'} <div class="text-green-600">âœ“</div> {:else if f.status === 'error'} <div class="text-red-600" title={f.error}>âš </div> {:else if f.status === 'needs-attach'} <div class="text-sm">File missing â€” please reattach</div>
- <Button type="button"
-                      class="bits-btn bits-ghost text-xs px-2 py-1 bits-btn"
-                      onclick={() => reattachFile(f.id)} disabled={ isLoading }>Reattach</Button >
-                  {/if}
-  <Button type="button"
-                    class="bits-btn bits-ghost text-xs px-2 py-1 bits-btn"
-                    onclick={() => removeFile(f.id)} disabled={ isLoading }>Remove</Button >
-                </div> </div> {/each} {/if}
-  <!-- Main: Submit, Button --> <Button type="submit" class="w-full bits-btn bits-btn" disabled={ isLoading }>
-  {#if isLoading} <Loader2 class="mr-2 h-4 w-4" /> Creating Account... {:else} <UserPlus class="mr-2 h-4" /> Create Legal Professional Account {/if}
-  </Button> </div> </form>
- <!-- Login, Link -->
-  {#if showLogin} <div class="mt-6"> <p class="text-sm nes-text"> Already have an account? <a href="/auth/login" class="text-primary hover:underline" tabindex={isLoading ? -1, 0}> Sign in here </a> </p> {/if}
-  </div> </div> ``` <style> .animate-fade-in { animation: fadeIn 0.18s ease-out;}`
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px)}
-    to { opacity: 1; transform: translateY(0)}
-  } .bg-muted { background-color: var(--muted, #f3f4f6)}
-  .bg-card { background-color: var(--card, #ffffff)}
-  .bits-ghost { background: transparent; border: 1px solid var(--border, #e5e7eb)}
-  @media (max-width: 640px) { .max-w-2xl { padding: 1rem;}
-  }
+
+<style>
+	.animate-fade-in {
+		animation: fadeIn 0.18s ease-out;
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(4px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
 </style>
-
-
-
-
-
-

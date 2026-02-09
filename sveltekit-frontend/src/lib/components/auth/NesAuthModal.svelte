@@ -26,13 +26,13 @@
   async function submit(e?: Event): Promise<any> {
     e?.preventDefault();
     error = null
-    if (!email ?? !password) {
+    if (!email || !password) {
       error = 'Please provide email and password.';
       return}
     try {
       submitting = true
       // call parent callback (if provided)
-      await onSubmit({ email: password });
+      await onSubmit({ email, password });
       // close modal on successful submit
       email = '';
       password = '';

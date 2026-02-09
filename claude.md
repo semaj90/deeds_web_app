@@ -111,6 +111,298 @@ import * as Dialog from "bits-ui/components/dialog";
 
 ---
 
+## 📋 Superforms v2 + SvelteKit 2 (February 2026)
+
+### 📚 Official Documentation
+
+**Latest Version**: [sveltekit-superforms v2](https://superforms.rocks/) (SvelteKit 2 compatible)
+
+**Key Resources:**
+- [Official Documentation](https://superforms.rocks/)
+- [Get Started Tutorial](https://superforms.rocks/get-started)
+- [File Upload Guide](https://superforms.rocks/concepts/files)
+- [API Reference](https://github.com/ciscoheat/sveltekit-superforms/wiki/API-reference)
+- [GitHub Repository](https://github.com/ciscoheat/sveltekit-superforms)
+
+### 🎯 Core API Patterns (v2)
+
+#### 1. Basic Form Setup
+
+```typescript
+// +page.server.ts
+import { superValidate, message, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { z } from 'zod';
+
+const schema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email()
+});
+
+export const load = async () => {
+  const form = await superValidate(zod(schema));
+  return { form };
+};
+
+export const actions = {
+  default: async ({ request }) => {
+    const form = await superValidate(request, zod(schema));
+
+    if (!form.valid) {
+      return fail(400, { form });
+    }
+
+    // Process form data
+    console.log(form.data);
+
+    return message(form, 'Success!');
+  }
+};
+```
+
+```svelte
+<!-- +page.svelte -->
+<script lang="ts">
+  import { superForm } from 'sveltekit-superforms';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+
+  let { data } = $props();
+
+  const { form, errors, enhance, delayed, message } = superForm(data.form, {
+    validators: zodClient(schema)
+  });
+</script>
+
+<form method="POST" use:enhance>
+  <input name="name" bind:value={$form.name} />
+  {#if $errors.name}<span class="error">{$errors.name}</span>{/if}
+
+  <input name="email" type="email" bind:value={$form.email} />
+  {#if $errors.email}<span class="error">{$errors.email}</span>{/if}
+
+  <button type="submit" disabled={$delayed}>
+    {$delayed ? 'Submitting...' : 'Submit'}
+  </button>
+
+  {#if $message}<p>{$message}</p>{/if}
+</form>
+```
+
+#### 2. File Upload Handling
+
+**Schema Definition (Zod):**
+```typescript
+const uploadSchema = z.object({
+  file: z
+    .instanceof(File, { message: 'Please upload a file.' })
+    .refine((f) => f.size < 100_000_000, 'Max 100MB upload size.')
+    .refine(
+      (f) => ['application/pdf', 'image/jpeg', 'image/png'].includes(f.type),
+      'Supported: PDF, JPEG, PNG'
+    ),
+  caseId: z.string().min(1, 'Case ID is required'),
+  title: z.string().optional()
+});
+```
+
+**Server-Side (CRITICAL - Import from superforms, not @sveltejs/kit):**
+```typescript
+// +page.server.ts
+import { superValidate, fail, message } from 'sveltekit-superforms'; // ✅ Correct
+import { zod } from 'sveltekit-superforms/adapters';
+
+export const actions = {
+  upload: async ({ request }) => {
+    const form = await superValidate(request, zod(uploadSchema));
+
+    if (!form.valid) return fail(400, { form });
+
+    // File is available in form.data.file
+    const uploadedFile = form.data.file;
+    console.log(uploadedFile.name, uploadedFile.size);
+
+    // Process file (MinIO, S3, etc.)
+
+    return message(form, 'File uploaded successfully!');
+  }
+};
+```
+
+**Client-Side (use fileProxy):**
+```svelte
+<script lang="ts">
+  import { superForm, fileProxy } from 'sveltekit-superforms';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+
+  let { data } = $props();
+
+  const { form, errors, enhance, delayed } = superForm(data.form, {
+    validators: zodClient(uploadSchema),
+    dataType: 'form', // Important for file uploads
+    onSubmit: () => {
+      console.log('Uploading file:', $file);
+    }
+  });
+
+  // File proxy for reactive file binding
+  const file = fileProxy(form, 'file');
+</script>
+
+<form method="POST" action="?/upload" use:enhance enctype="multipart/form-data">
+  <input
+    type="file"
+    name="file"
+    accept=".pdf,.jpg,.png"
+    onchange={(e) => {
+      const target = e.target as HTMLInputElement;
+      const selectedFile = target.files?.[0];
+      if (selectedFile) $file = selectedFile;
+    }}
+  />
+
+  {#if $errors.file}<span class="error">{$errors.file}</span>{/if}
+
+  {#if $file}
+    <p>Selected: {$file.name} ({($file.size / 1024 / 1024).toFixed(2)} MB)</p>
+  {/if}
+
+  <button type="submit" disabled={$delayed || !$file}>
+    {$delayed ? 'Uploading...' : 'Upload File'}
+  </button>
+</form>
+```
+
+#### 3. Important v2 Changes
+
+**Critical Import Rule:**
+```typescript
+// ❌ WRONG - File objects cannot be serialized
+import { fail, message } from '@sveltejs/kit';
+
+// ✅ CORRECT - Use superforms versions for file handling
+import { fail, message, setError } from 'sveltekit-superforms';
+```
+
+**Form Options:**
+```typescript
+const { form, errors, enhance, delayed, message } = superForm(data.form, {
+  validators: zodClient(schema),       // Client-side validation
+  dataType: 'form',                    // Use 'form' for file uploads, 'json' otherwise
+  multipleSubmits: 'prevent',          // Prevent double submissions
+  resetForm: false,                    // Keep form data after success
+  invalidateAll: true,                 // Revalidate all data
+  onSubmit: ({ cancel }) => {
+    // Before submission
+  },
+  onResult: ({ result }) => {
+    if (result.type === 'success') {
+      // Handle success
+    }
+  },
+  onError: ({ result }) => {
+    // Handle error
+  }
+});
+```
+
+**File Proxy Helpers:**
+```typescript
+// Single file
+const file = fileProxy(form, 'avatar');
+
+// Multiple files
+const files = filesProxy(form, 'attachments');
+```
+
+### 🔥 Common Patterns
+
+**1. Custom Validation:**
+```typescript
+const form = await superValidate(request, zod(schema));
+
+if (!form.valid) return fail(400, { form });
+
+// Custom server-side validation
+if (form.data.email.includes('spam')) {
+  return setError(form, 'email', 'Email domain not allowed');
+}
+```
+
+**2. Database Integration:**
+```typescript
+export const load = async ({ params }) => {
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, params.id)
+  });
+
+  const form = await superValidate(user, zod(schema));
+  return { form };
+};
+```
+
+**3. Multiple Forms:**
+```svelte
+<script lang="ts">
+  const loginForm = superForm(data.loginForm, { ...config });
+  const signupForm = superForm(data.signupForm, { ...config });
+</script>
+
+<form method="POST" action="?/login" use:loginForm.enhance>
+  <!-- Login form -->
+</form>
+
+<form method="POST" action="?/signup" use:signupForm.enhance>
+  <!-- Signup form -->
+</form>
+```
+
+### 📦 Integration with Legal AI Platform
+
+**Example: Legal Document Upload (Production)**
+```typescript
+// File upload with OCR + LegalBERT + Embeddings pipeline
+const uploadSchema = z.object({
+  file: z.instanceof(File).refine((f) => f.size < 100_000_000, 'Max 100MB'),
+  caseId: z.string().min(1),
+  enableOcr: z.boolean().default(true),
+  enableAiAnalysis: z.boolean().default(true),
+  enableEmbeddings: z.boolean().default(true)
+});
+
+export const actions = {
+  upload: async ({ request }) => {
+    const form = await superValidate(request, zod(uploadSchema));
+    if (!form.valid) return fail(400, { form });
+
+    // Upload to MinIO (legal_ai_db bucket)
+    const fileKey = await uploadToMinIO(form.data.file, 'legal_ai_db');
+
+    // Trigger AI pipeline
+    if (form.data.enableOcr) {
+      await queueOCRJob(fileKey);
+    }
+
+    if (form.data.enableAiAnalysis) {
+      await queueLegalBERTAnalysis(fileKey);
+    }
+
+    if (form.data.enableEmbeddings) {
+      await generateEmbeddings(fileKey, 'embeddinggemma:latest');
+    }
+
+    return message(form, 'Document uploaded and queued for analysis!');
+  }
+};
+```
+
+**Sources:**
+- [Superforms Official Docs](https://superforms.rocks/)
+- [File Upload Concepts](https://superforms.rocks/concepts/files)
+- [Get Started Guide](https://superforms.rocks/get-started)
+- [GitHub Repository](https://github.com/ciscoheat/sveltekit-superforms)
+
+---
+
 ## 🎨 UnoCSS + CSS Best Practices (Phases 66-72)
 
 ### 📦 UnoCSS Configuration
