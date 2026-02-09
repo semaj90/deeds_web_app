@@ -1,6 +1,9 @@
-/** * CHR-ROM Pattern Cache Integration with Redis * Nintendo-inspired optimization for legal AI platform * Achieves 0.5-2ms response times for UI patterns */
+/**
+ * CHR-ROM Pattern Cache Integration with Redis
+ * Nintendo-inspired optimization for legal AI platform
+ * Achieves 0.5-2ms response times for UI patterns
+ */
 import Redis from 'ioredis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type LegalDocumentJSON = Record<string, unknown>;
 
@@ -24,14 +27,15 @@ export interface CHRROMPattern {
 }
 
 export interface CHRROMCache {
-	patterns: Map<string, CHRROMPattern>, banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
+	patterns: Map<string, CHRROMPattern>;
+	banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
 	hotPatterns: string[]; // Most frequently accessed patterns
 	metrics: {
-	cacheHits: number;
-	cacheMisses: number;
-	totalRequests: number;
-	averageResponseTime: number;
-	bankUtilization: number[];
+		cacheHits: number;
+		cacheMisses: number;
+		totalRequests: number;
+		averageResponseTime: number;
+		bankUtilization: number[];
 	};
 }
 
