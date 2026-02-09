@@ -13,22 +13,26 @@
 		onClose?: () => void;
 	}>();
 
-	interface Phase72Error { id: string, error_hash: string;
+	interface Phase72Error {
+		id: string;
+		error_hash: string;
 		error_code: string;
 		file_path: string;
 		line_num: number;
 		column_num: number;
 		occurrence_count: number;
-	message: string;
+		message: string;
 		severity: string;
-	last_seen: string;
+		last_seen: string;
 		cycle?: number;
 		created_at?: string;
 	}
 
-	interface StatsSummary { total_errors: number, unique_codes: number;
+	interface StatsSummary {
+		total_errors: number;
+		unique_codes: number;
 		affected_files: number;
-	total_occurrences: number;
+		total_occurrences: number;
 	}
 
 	let errors = $state<Phase72Error[]>([]);
@@ -47,7 +51,7 @@
 			if (routePath) params.set('route', routePath);
 			params.set('limit', '50');
 
-			const response = await fetch(`/api/phase72/errors? ${params}`);
+			const response = await fetch(`/api/phase72/errors?${params}`);
 			const data = await response.json();
 
 			errors = data.errors ?? [];
@@ -86,8 +90,9 @@
 			const response = await fetch('/api/phase72/similar', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-error_hash: errorHash, similar_errors: similarErrors, similarErrors,
+				body: JSON.stringify({
+					error_hash: errorHash,
+					similar_errors: similarErrors,
 					context: routePath ? `Route: ${routePath}` : null
 				})
 			});
@@ -130,10 +135,14 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 
 	function getSeverityColor(severity: string) {
 		switch (severity) {
-			case 'error': return '#e74856';
-			case 'warning': return '#f9a825';
-			case 'info': return '#0078d7';
-			default:return '#fff';
+			case 'error':
+				return '#e74856';
+			case 'warning':
+				return '#f9a825';
+			case 'info':
+				return '#0078d7';
+			default:
+				return '#fff';
 		}
 	}
 
@@ -292,33 +301,36 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 </div>
 
 <style>
-	.phase72-modal { position: fixed;
+	.phase72-modal {
+		position: fixed;
 		top: 0;
 		left: 0;
-	right: 0;
+		right: 0;
 		bottom: 0;
 		z-index: 9999;
-	display: flex;
+		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
-	.modal-backdrop { position: absolute;
+	.modal-backdrop {
+		position: absolute;
 		top: 0;
 		left: 0;
-	right: 0;
+		right: 0;
 		bottom: 0;
-	background: rgba(0, 0, 0, 0.8);
+		background: rgba(0, 0, 0, 0.8);
 	}
 
-	.modal-content { position: relative;
+	.modal-content {
+		position: relative;
 		width: 95vw;
 		max-width: 1400px;
 		max-height: 90vh;
-	background: #212529;
+		background: #212529;
 		border: 4px solid #fff;
 		overflow: hidden;
-	display: flex;
+		display: flex;
 		flex-direction: column;
 	}
 
@@ -331,7 +343,8 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 		padding-bottom: 0.5rem;
 	}
 
-	.close-btn { width: 48px;
+	.close-btn {
+		width: 48px;
 		height: 48px;
 		padding: 0;
 		font-size: 2rem;
@@ -340,7 +353,7 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 
 	.route-info {
 		margin-bottom: 1rem;
-	padding: 0.5rem;
+		padding: 0.5rem;
 		background: rgba(249, 168, 37, 0.1);
 		border-radius: 4px;
 	}
@@ -351,10 +364,11 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 		border-radius: 4px;
 	}
 
-	.stats-bar { display: flex;
+	.stats-bar {
+		display: flex;
 		gap: 1rem;
 		margin-bottom: 1rem;
-	padding: 1rem;
+		padding: 1rem;
 		background: rgba(0, 0, 0, 0.3);
 		border-radius: 8px;
 	}
@@ -373,15 +387,16 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 	.stat .label {
 		display: block;
 		font-size: 0.8rem;
-	opacity: 0.7;
+		opacity: 0.7;
 		margin-top: 0.25rem;
 	}
 
-	.modal-body { flex: 1;
+	.modal-body {
+		flex: 1;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
-	overflow: hidden;
+		overflow: hidden;
 	}
 
 	.error-list {
@@ -392,23 +407,23 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 	.error-items {
 		display: flex;
 		flex-direction: column;
-	gap: 0.5rem;
+		gap: 0.5rem;
 	}
 
 	.error-item {
 		width: 100%;
 		text-align: left;
-	padding: 0.75rem;
+		padding: 0.75rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 2px solid #444;
 		cursor: pointer;
-	transition:all 0.2s;
+		transition: all 0.2s;
 	}
 
 	.error-item:hover {
 		background: rgba(255, 255, 255, 0.1);
 		border-color: #fff;
-	transform: translateX(4px);
+		transform: translateX(4px);
 	}
 
 	.error-item.selected {
@@ -419,7 +434,7 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 	.error-header {
 		display: flex;
 		align-items: center;
-	gap: 0.5rem;
+		gap: 0.5rem;
 		margin-bottom: 0.5rem;
 	}
 
@@ -440,7 +455,7 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 
 	.occurrence-count {
 		margin-left: auto;
-	opacity: 0.6;
+		opacity: 0.6;
 		font-size: 0.9rem;
 	}
 
@@ -452,7 +467,7 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 
 	.error-location {
 		font-size: 0.75rem;
-	opacity: 0.6;
+		opacity: 0.6;
 		font-family: 'Courier New', monospace;
 	}
 
@@ -470,7 +485,8 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 		margin: 0.5rem 0;
 	}
 
-	.action-buttons { display: flex;
+	.action-buttons {
+		display: flex;
 		gap: 0.5rem;
 		margin: 1rem 0;
 	}
@@ -482,25 +498,25 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 	.similar-item {
 		margin: 0.5rem 0;
 		padding: 0.75rem;
-	background: rgba(249, 168, 37, 0.1);
+		background: rgba(249, 168, 37, 0.1);
 	}
 
 	.similarity-score {
 		font-size: 0.8rem;
-	opacity: 0.8;
+		opacity: 0.8;
 		margin-bottom: 0.5rem;
 	}
 
 	.file-path {
 		font-size: 0.75rem;
-	opacity: 0.6;
+		opacity: 0.6;
 		font-family: 'Courier New', monospace;
 		margin-top: 0.25rem;
 	}
 
 	.ai-suggestion {
 		margin-top: 1rem;
-	padding: 1rem;
+		padding: 1rem;
 		background: rgba(0, 200, 83, 0.1);
 		border: 2px solid #00c853;
 	}
@@ -513,12 +529,12 @@ error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 
 	.loading-spinner {
 		text-align: center;
-	padding: 2rem;
+		padding: 2rem;
 	}
 
 	.no-errors {
 		text-align: center;
-	padding: 2rem;
+		padding: 2rem;
 	}
 
 	/* Scrollbar styling */
