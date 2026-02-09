@@ -112,6 +112,18 @@ These files were archived during Session 10 error fixing due to extensive corrup
 - **Import Status**: ✅ **0 active imports - completely orphaned**
 - **Recommended Fix**: Complete rewrite if service orchestration is needed, or leave archived
 
+### 13. multi-dimensional-image-cache.ts (200+ errors, 0 imports) **✅ ARCHIVED (Session 11 Part 2)**
+- **Original Path**: `src/lib/caching/multi-dimensional-image-cache.ts`
+- **Issues**:
+  - Severe compression corruption - collapsed file structure
+  - Duplicate values throughout: `height: 8 8`, `ttl: 1800000, 1800000`, `cacheHits: 0 0`
+  - Mixed comma/colon/semicolon separators in object literals
+  - Missing closing braces and malformed nested objects
+  - Type/value confusion: `width: number | height, number` (should be separate properties)
+  - Ternary expression errors mixed with structural corruption
+- **Import Status**: ✅ **0 active imports - completely orphaned**
+- **Recommended Fix**: Complete rewrite if multi-dimensional caching is needed, or leave archived
+
 ## Next Steps
 
 1. **XState Machines** (aiAssistantMachine): Rewrite using patterns from [xstate-svelte5.ts](../../utils/xstate-svelte5.ts)
