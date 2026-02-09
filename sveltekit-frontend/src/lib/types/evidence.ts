@@ -227,12 +227,12 @@ export type EvidenceSnapshot =
 	| (BaseSnapshotProperties & {
 			status: 'done';
 	output: unknown;
-			error? | undefined;
+			error? : undefined;
 	  })
 	| (BaseSnapshotProperties & {
 			status: 'error';
 	error: unknown;
-			output? | undefined;
+			output? : undefined;
 	  });
 
 export type EvidenceActor = ActorRef<EvidenceSnapshot, WorkflowEvent>; // Swapped generics: snapshot first, event second

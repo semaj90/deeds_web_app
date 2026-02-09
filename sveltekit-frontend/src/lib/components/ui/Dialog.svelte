@@ -43,8 +43,8 @@ function handleBackdropClick(e: MouseEvent) {
 			class="dialog-content bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 {className}"
 			role="dialog"
 			aria-modal="true"
-			aria-labelledby={title ? 'dialog-title'  | undefined}
-			aria-describedby={description ? 'dialog-description'  | undefined}
+			aria-labelledby={title ? 'dialog-title'  : undefined}
+			aria-describedby={description ? 'dialog-description'  : undefined}
 		>
 			<div class="dialog-header flex items-start justify-between mb-4">
 				<div class="flex-1">

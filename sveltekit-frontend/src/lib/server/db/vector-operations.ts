@@ -68,7 +68,7 @@ export async function searchSimilarDocuments(
 
 		return (results as any[]).map((row) => ({
 			id: row.id !== undefined ? String(row.id) : '',
-			title: typeof row.title === 'string' ? row.title  | undefined,
+			title: typeof row.title === 'string' ? row.title  : undefined,
 			content: typeof row.content === 'string' ? row.content : '',
 			similarity: Number(row.similarity ?? 0),
 			metadata: {}
@@ -99,7 +99,7 @@ async function fallbackTextSearch(
 
 	return results.map((doc, index) => ({
 		id: doc.id !== undefined ? String(doc.id) : '',
-		title: typeof doc.title === 'string' ? doc.title  | undefined,
+		title: typeof doc.title === 'string' ? doc.title  : undefined,
 		content: typeof doc.content === 'string' ? doc.content : '',
 		similarity: 1 - index * 0.1,
 		metadata: {}
@@ -218,7 +218,7 @@ export async function hybridSearch(
 
 		const textSearchResults: SimilarityResult[] = (textResults as any[]).map((row) => ({
 			id: row.id !== undefined ? String(row.id) : '',
-			title: typeof row.title === 'string' ? row.title  | undefined,
+			title: typeof row.title === 'string' ? row.title  : undefined,
 			content: typeof row.content === 'string' ? row.content : '',
 			similarity: Number(row.rank ?? 0) * 0.5,
 			metadata: {

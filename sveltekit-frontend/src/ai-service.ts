@@ -341,7 +341,7 @@ Format your response as JSON with the structure:
         .where(sql`${embeddingCache.textHash} = ${textHash}`)
         .limit(1);
 
-      const cached = rows?.[0] as EmbeddingCacheRow | undefined;
+      const cached = rows?.[0] as EmbeddingCacheRow : undefined;
       if (cached?.embedding) {
         const embField = cached.embedding;
         if (typeof embField === 'string') {

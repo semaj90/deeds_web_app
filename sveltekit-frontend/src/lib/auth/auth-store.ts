@@ -91,7 +91,7 @@ export const DockerEndpoints = {
 };
 
 /* Derive PUBLIC_API_BASE from dynamic env at runtime; keep existing fallback */
-const PUBLIC_API_BASE = (PUBLIC_ENV?.PUBLIC_API_BASE as string | undefined) ?? undefined;
+const PUBLIC_API_BASE = (PUBLIC_ENV?.PUBLIC_API_BASE as string : undefined) ?? undefined;
 const API_BASE = PUBLIC_API_BASE ?? 'http://localhost:5173';
 
 export function buildApiUrl(path: string) {

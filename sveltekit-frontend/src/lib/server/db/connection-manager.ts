@@ -166,7 +166,7 @@ export async function testDatabaseConnection(): Promise<{
 		const conn = await pool.connect();
 		try {
 			const versionResult = await conn.query('SELECT version()');
-			const version = versionResult.rows?.[0]?.version as string | undefined;
+			const version = versionResult.rows?.[0]?.version as string : undefined;
 
 			const tablesResult = await conn.query(`
 				SELECT table_name

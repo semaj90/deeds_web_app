@@ -577,7 +577,7 @@ tryGetStringProp(contentVal, 'text') ?? tryGetStringProp(contentVal, 'content');
 function tryGetStringProp(obj: Record<string, unknown>, prop: string): string | undefined {
  // Added type
  const val = obj[prop];
- return typeof val === 'string' ? val  | undefined;
+ return typeof val === 'string' ? val  : undefined;
 }
 /** * Quick access to MCP resources */
 export const mcpResources = {

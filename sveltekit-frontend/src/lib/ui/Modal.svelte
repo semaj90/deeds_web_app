@@ -106,8 +106,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleClose(); }}
   role="dialog"
   aria-modal="true"
-  aria-labelledby={title ? 'modal-title'  | undefined}
-  aria-describedby={description ? 'modal-description'  | undefined}
+  aria-labelledby={title ? 'modal-title'  : undefined}
+  aria-describedby={description ? 'modal-description'  : undefined}
   tabindex="-1"
  >
   <div class="modal-content" role="document">

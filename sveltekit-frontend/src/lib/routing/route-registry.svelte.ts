@@ -263,7 +263,7 @@ class RouteRegistry {
     }
 
     private asString(v: any): string | undefined {
-        return typeof v === 'string' ? v  | undefined;
+        return typeof v === 'string' ? v  : undefined;
     }
 
     // Persistence

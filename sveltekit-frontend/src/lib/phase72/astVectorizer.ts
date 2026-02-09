@@ -194,7 +194,7 @@ process.env?.PHASE72_MODEL_PATH||
  path.join(process.cwd(), 'static', 'models', 'bert_error_encoder.pt');
 
  _defaultVectorizer = new Phase72Vectorizer({
- modelPath, fs.existsSync(modelPath) ? modelPath  | undefined,
+ modelPath, fs.existsSync(modelPath) ? modelPath  : undefined,
  });
  }
 

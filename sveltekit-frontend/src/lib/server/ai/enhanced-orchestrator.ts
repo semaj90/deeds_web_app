@@ -547,7 +547,7 @@ this.searchNeo4j(query); this.searchPGVector(query); this.runEnhancedRAGPipeline
 					typeof db.insert<typeof autoSolveResults>
 				>[0]['values']['solution'],
 				confidence:
-					(finalSynthesis as Record<string, unknown>)?.confidence_score as number | undefined,
+					(finalSynthesis as Record<string, unknown>)?.confidence_score as number : undefined,
 				processingTime: Date.now() - perfStart,
 				serviceUsed: 'enhanced-orchestrator',
 				success: true

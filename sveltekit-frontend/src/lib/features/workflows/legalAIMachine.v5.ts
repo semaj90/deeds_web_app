@@ -456,12 +456,12 @@ export const legalAIMachine = createMachine(
                 priority: (caseData.priority as string) ?? 'medium',
                 category: (caseData.category as string) ?? 'general',
                 createdAt:
-                  (caseData.createdAt as string) ?? (caseData.created_at as string | undefined),
+                  (caseData.createdAt as string) ?? (caseData.created_at as string : undefined),
                 updatedAt:
-                  (caseData.updatedAt as string) ?? (caseData.updated_at as string | undefined),
+                  (caseData.updatedAt as string) ?? (caseData.updated_at as string : undefined),
                 description: caseData.description as string | undefined,
                 assignedTo:
-                  (caseData.assignedTo as string) ?? (caseData.assigned_to as string | undefined),
+                  (caseData.assignedTo as string) ?? (caseData.assigned_to as string : undefined),
               }));
             } else {
               console.warn('Failed to load cases: ', response.error);

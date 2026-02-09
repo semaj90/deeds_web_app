@@ -12,7 +12,7 @@ analysis: string, confidence: number, sources: Array, recommendations: string[],
           'Content-Type': 'application/json'
         },
 	body: JSON.stringify({ prompt, caseId, userId: 'current-user', // This should come from auth context sessionType: analysisType, context: {
-	caseDetails: caseId ? { id: caseId } | undefined, evidenceIds: evidenceId ? [evidenceId] | undefined, requestedAnalysis: [analysisType] }
+	caseDetails: caseId ? { id: caseId } | undefined, evidenceIds: evidenceId ? [evidenceId] : undefined, requestedAnalysis: [analysisType] }
         }) }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
       analysis = await response.json(); onAnalysisComplete(analysis)} catch (err) { error = err instanceof Error ? err.message: 'Analysis failed'; console.error('Legal analysis, error:', err)} finally { loading = false}
 '

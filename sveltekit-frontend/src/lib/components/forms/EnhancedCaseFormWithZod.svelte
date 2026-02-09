@@ -135,7 +135,7 @@ data: CaseForm }) => void}
  <input id="dueDate"
                   name="dueDate"
                   type="datetime-local"
-                  value={$form?.dueDate ?? ''} oninput={e => setFormField('dueDate', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.dueDate ? 'true' | undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.dueDate ? 'border-destructive': ''}`} />
+                  value={$form?.dueDate ?? ''} oninput={e => setFormField('dueDate', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.dueDate ? 'true' : undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.dueDate ? 'border-destructive': ''}`} />
   {#if $errors?.dueDate} <p class="text-sm">{$errors.dueDate[0]}</p> {/if}
   </div>
  <!-- Tags --> <div class="space-y-2"> <label for="tags">Tags (max 10)</label>
@@ -144,7 +144,7 @@ data: CaseForm }) => void}
                   type="text"
                   placeholder="Enter tags separated by commas"
                   value={$form?.tags ?? ''} oninput={e => setFormField('tags', (e.target as HTMLInputElement).value as any)} class="w-full rounded-md border px-3 py-2 focus:outline-none"
-                  aria-invalid={$errors?.tags ? 'true' | undefined} /> <p class="text-sm nes-text">Use tags to categorize and organize cases</p> </div>
+                  aria-invalid={$errors?.tags ? 'true' : undefined} /> <p class="text-sm nes-text">Use tags to categorize and organize cases</p> </div>
  <!-- Options --> <div class="flex flex-col"> <div class="flex items-center"> <!-- Use checked + onchange to update the store, via, helper --> <input id="isConfidential"
                     name="isConfidential"
                     type="checkbox"

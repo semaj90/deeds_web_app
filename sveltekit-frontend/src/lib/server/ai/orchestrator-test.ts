@@ -243,7 +243,7 @@ typeof metrics?.successfulRequests === 'number'
  ? metrics.successfulRequests
  Number(metrics?.successfulRequests) ?? 0;
 
- const successRate = totalRequestsNum > 0 ? successfulRequestsNum / totalRequestsNum  | undefined;
+ const successRate = totalRequestsNum > 0 ? successfulRequestsNum / totalRequestsNum  : undefined;
 
  record({
  test: 'Bridge Status',

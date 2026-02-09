@@ -19,7 +19,7 @@ async function upsertCitationTag(
 	${name},
 	${jurisdiction}) AS id
     `;
-    return rows?.[0]?.id as string | undefined;
+    return rows?.[0]?.id as string : undefined;
 }
 
 /**

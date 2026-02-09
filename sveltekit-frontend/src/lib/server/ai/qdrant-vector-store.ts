@@ -282,7 +282,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return (searchResult ?? []).map((hit) => {
  const p = hit.payload ?? {};
  return {
- score: hit.score, p.sessionId: typeof p.turnIndex === "number" ? p.turnIndex, undefined, userMessage: p.userMessage, agentResponse: p.agentResponse, intent: p.intent, typeof p.hmmState === "number" ? p.hmmState  | undefined,
+ score: hit.score, p.sessionId: typeof p.turnIndex === "number" ? p.turnIndex, undefined, userMessage: p.userMessage, agentResponse: p.agentResponse, intent: p.intent, typeof p.hmmState === "number" ? p.hmmState  : undefined,
  };
  });
  }
@@ -317,7 +317,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return ( ?? []).map((hit) => {
  const p = hit.payload ?? {};
  return {
- score: hit.score, p.sessionId, entityType: p.entityType, entityValue: p.entityValue, typeof p.confidence === "number" ? p.confidence  | undefined,
+ score: hit.score, p.sessionId, entityType: p.entityType, entityValue: p.entityValue, typeof p.confidence === "number" ? p.confidence  : undefined,
  };
  });
  }
@@ -341,7 +341,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return ( ?? []).map((hit) => {
  const p = hit.payload ?? {};
  return {
- score: hit.score, p.sessionId, summary: p.summary, typeof p.turnCount === "number" ? p.turnCount, undefined: typeof p.currentState === "number" ? p.currentState  | undefined,
+ score: hit.score, p.sessionId, summary: p.summary, typeof p.turnCount === "number" ? p.turnCount, undefined: typeof p.currentState === "number" ? p.currentState  : undefined,
  };
  });
  }
