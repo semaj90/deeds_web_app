@@ -310,7 +310,7 @@ class XStateStoreManager {
  // Private helper methods
  private createDevtoolsInspector(machineId: string) {
  return (inspectionEvent: Event) => {
- const win = typeof window !== 'undefined' ? (window as DevtoolsWindow)  | undefined;
+ const win = typeof window !== 'undefined' ? (window as DevtoolsWindow)  : undefined;
  if ($1?.$2) {
  const devtools = win.__REDUX_DEVTOOLS_EXTENSION__.connect({
  name: `XState: ${ machineId }`,

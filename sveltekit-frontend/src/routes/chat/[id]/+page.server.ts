@@ -118,7 +118,7 @@ export const actions: Actions = {
 			return {
 				success: true,
 				saved: !!locals.user,
-				hint: isAnonymous ? '💡 Sign in to save this conversation'  | undefined,
+				hint: isAnonymous ? '💡 Sign in to save this conversation' : undefined,
 				response: aiResponse
 			};
 		} catch (error: any) {

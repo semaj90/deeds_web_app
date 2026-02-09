@@ -52,7 +52,8 @@ export class WebGPUPolyfillService {
 
  /** Initializes WebGPU if available; otherwise attempts WebGL2 fallback. */
  async initialize(): Promise<boolean> {
- // Try WebGPU firsttypeof navigator !== 'undefined' ? (navigator as unknown as NavigatorWithGPU)  | undefined;
+		// Try WebGPU first
+		const nav = typeof navigator !== 'undefined' ? (navigator as unknown as NavigatorWithGPU) : undefined;
  if (nav?.gpu) {
  try {
  this.adapter =

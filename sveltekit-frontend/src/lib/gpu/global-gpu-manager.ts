@@ -37,7 +37,7 @@ class GlobalGPUManager {
 
         try {
             // Attempt WebGPU initialization
-            const nav = (typeof navigator !== 'undefined' ? (navigator as unknown as NavigatorWithGPU)  | undefined);
+            const nav = (typeof navigator !== 'undefined' ? (navigator as unknown as NavigatorWithGPU)  : undefined);
 
             if (nav?.gpu) {
                 try {

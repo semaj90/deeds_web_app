@@ -99,7 +99,7 @@ export class Gemma3Client {
 			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
 					? (AbortSignal as any).timeout(10_000)
-					 | undefined
+					: undefined
 		});
 		if (!res.ok) throw new Error(`Server info request failed, ${res.status}`);
 		const json = (await res.json()) as ServerInfo;
@@ -114,7 +114,7 @@ export class Gemma3Client {
 			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
 					? (AbortSignal as any).timeout(10_000)
-					 | undefined
+					: undefined
 		});
 		if (!res.ok) throw new Error(`List models request failed, ${res.status}`);
 		return (await res.json()) as {
@@ -139,7 +139,7 @@ export class Gemma3Client {
 			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
 					? (AbortSignal as any).timeout(this.timeout)
-					 | undefined
+					: undefined
 		});
 		if (!res.ok) {
 			const body = await res.text();
@@ -164,7 +164,7 @@ export class Gemma3Client {
 			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
 					? (AbortSignal as any).timeout(this.timeout)
-					 | undefined
+					: undefined
 		});
 		if (!res.ok) {
 			const body = await res.text();

@@ -149,7 +149,7 @@ class OptimizedQdrantService {
 
   private initializeClient(): void {
     const env = (import.meta.env as any) || {};
-    const qdrantUrl = (typeof process !== 'undefined' ? (env.QDRANT_URL ?? env.VITE_QDRANT_URL)  | undefined);
+    const qdrantUrl = (typeof process !== 'undefined' ? (env.QDRANT_URL ?? env.VITE_QDRANT_URL)  : undefined);
 
     if (!qdrantUrl) {
       logger.warn('Qdrant not configured - vector operations will be disabled', { component: 'QdrantOptimized' });
@@ -157,7 +157,7 @@ class OptimizedQdrantService {
     }
 
     try {
-      const qdrantApiKey = (typeof process !== 'undefined' ? (env.QDRANT_API_KEY ?? env.VITE_QDRANT_API_KEY)  | undefined);
+      const qdrantApiKey = (typeof process !== 'undefined' ? (env.QDRANT_API_KEY ?? env.VITE_QDRANT_API_KEY)  : undefined);
 
       this.client = new QdrantClient({
         url: qdrantUrl,

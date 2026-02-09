@@ -15,6 +15,7 @@ export interface SearchResult {
 	score: number;
 	type?: string;
 	metadata?: Record<string, unknown>;
+	document?: CachedDocument;
 }
 
 // Define a type for the Redis client to avoid `any`

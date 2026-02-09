@@ -172,7 +172,7 @@ export async function ollamaEmbed(
  return texts.map((_t, i) => (i === 0 ? { embedding: emb, model } : ({} as EmbeddingResult)));
  } else if (batchEmbeddings) {
  return (((body as Record<string, unknown>)['embeddings'] as unknown[]) ?? []).map((e) => ({
- embedding: Array.isArray(e) ? (e as unknown[]).map(Number)  | undefined,
+ embedding: Array.isArray(e) ? (e as unknown[]).map(Number)  : undefined,
  model,
  }));
  }
