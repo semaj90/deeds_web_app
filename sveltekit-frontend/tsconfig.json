@@ -35,6 +35,8 @@
     "archived-components/**",
     ".svelte-check-tmp/**",
     "../.rag-metrics/**",
+    "src/lib/_archive/**",
+    "**/_archive/**",
     "src/tests/**",
     "src/stories/**",
     "src/lib/experimental/**",

@@ -55,6 +55,30 @@ These files were archived during Session 10 error fixing due to extensive corrup
 - **Import Status**: ✅ **0 active imports - truly orphaned!**
 - **Recommended Fix**: Complete rewrite if needed in future, or leave archived
 
+### 7. enhanced-case-api.ts (84 errors, 1 import - orphaned) **✅ ARCHIVED (Session 11)**
+- **Original Path**: `src/enhanced-case-api.ts`
+- **Issues**:
+  - Same corruption pattern as vector-suggestions-service.ts
+  - Object properties mixing commas and semicolons in type definitions
+  - Interface members using `,` instead of `;` separator
+  - Examples: `caseNumber: string, title: string;` (mixed separators)
+- **Import Status**: ✅ **1 import from excluded directory (`src/lib/yorha/**`) - effectively orphaned**
+- **Recommended Fix**: Complete rewrite if YoRHa components are reactivated, or leave archived
+
+### 8. qdrant-vector-store.ts (35 errors, 0 imports) **✅ ARCHIVED (Session 11)**
+- **Original Path**: `src/qdrant-vector-store.ts`
+- **Issues**: Not analyzed (file has 0 active imports)
+- **Import Status**: ✅ **0 active imports - completely orphaned**
+- **Recommended Fix**: Leave archived (not in use)
+
+### 9. webgpu-langchain-bridge.ts (32 errors, 1 import - orphaned) **✅ ARCHIVED (Session 11)**
+- **Original Path**: `src/lib/server/webgpu-langchain-bridge.ts`
+- **Issues**:
+  - Syntax errors: ',' expected, ';' expected, Expression expected (lines 212-216)
+  - Same comma/semicolon corruption pattern
+- **Import Status**: ✅ **1 import from disabled file (`routes_parked/.../+server.ts.disabled`) - effectively orphaned**
+- **Recommended Fix**: Leave archived (not in active use)
+
 ## Next Steps
 
 1. **XState Machines** (aiAssistantMachine): Rewrite using patterns from [xstate-svelte5.ts](../../utils/xstate-svelte5.ts)
