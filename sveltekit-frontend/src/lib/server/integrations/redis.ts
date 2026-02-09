@@ -181,7 +181,7 @@ export class RedisCacheService implements IRedisCacheService {
 
       const info = await this.client.info('memory');
       const usedMemoryMatch = info.match(/used_memory:(\d+)/);
-      const usedMemory = usedMemoryMatch ? parseInt(usedMemoryMatch[1])  | undefined;
+      const usedMemory = usedMemoryMatch ? parseInt(usedMemoryMatch[1]) : undefined;
 
       return {
         status: latency < 100 ? 'healthy' : 'degraded',

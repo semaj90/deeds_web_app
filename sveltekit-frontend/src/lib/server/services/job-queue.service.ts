@@ -173,7 +173,7 @@ export class JobQueueService {
 				.set({
 					status,
 					progress,
-					result: result ? JSON.stringify(result)  | undefined,
+					result: result ? JSON.stringify(result) : undefined,
 					error: error,
 					updatedAt: new Date(),
 					completedAt: status === 'completed' ? new Date()  | undefined

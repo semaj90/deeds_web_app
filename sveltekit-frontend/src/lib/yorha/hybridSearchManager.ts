@@ -136,7 +136,7 @@ export async function reRankWithPgVector(
 
         return current.map((item: any) => {
             const itemId = item.id ? String(item.id) : null;
-            const rawScore = itemId ? scoreMap.get(itemId)  | undefined;
+            const rawScore = itemId ? scoreMap.get(itemId) : undefined;
 
             if (rawScore == null) return item;
 

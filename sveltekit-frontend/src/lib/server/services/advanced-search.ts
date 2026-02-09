@@ -169,7 +169,7 @@ class AdvancedSearch {
 			);
 		}
 
-		const whereClause = conditions.length > 0 ? and(...conditions)  | undefined;
+		const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
 		const results = await db
 			.select({
@@ -219,7 +219,7 @@ class AdvancedSearch {
 			conditions.push(inArray(evidence.fileType, filters.evidenceType));
 		}
 
-		const whereClause = conditions.length > 0 ? and(...conditions)  | undefined;
+		const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
 		const results = await db
 			.select({

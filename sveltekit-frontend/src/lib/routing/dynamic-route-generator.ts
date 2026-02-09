@@ -109,7 +109,7 @@ export class DynamicRouteGenerator {
 
  private createRouteFromConfig(routeConfig: RouteDefinition): GeneratedRoute {
  const patternKey = this.findMatchingPattern(routeConfig);
- const cfg = patternKey ? this.patterns.get(patternKey)  | undefined;
+ const cfg = patternKey ? this.patterns.get(patternKey) : undefined;
  const path = routeConfig?.route ?? '/';
  const component = cfg?.component ?? routeConfig.component ?? this.inferComponentPath(path);
  const layout = cfg?.layout ?? routeConfig.layout;

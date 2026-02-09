@@ -312,7 +312,7 @@ export class RabbitMQLegalQueue {
                 case 'process':
                     // Store document in NES memory
                     const allocated = await nesMemory.allocateDocument(document, message.payload, {
-                        preferredBank: message.metadata.bankPreference ? parseInt(message.metadata.bankPreference)  | undefined,
+                        preferredBank: message.metadata.bankPreference ? parseInt(message.metadata.bankPreference) : undefined,
                         compress: true
                     });
                     if (allocated) {

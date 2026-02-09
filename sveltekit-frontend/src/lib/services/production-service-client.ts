@@ -97,7 +97,7 @@ class ProductionServiceClient {
           'Content-Type': 'application/json',
           ...options?.headers
         },
-        body: data ? JSON.stringify(data)  | undefined,
+        body: data ? JSON.stringify(data) : undefined,
         signal: AbortSignal.timeout(requestTimeout || this.timeout)
       });
 
