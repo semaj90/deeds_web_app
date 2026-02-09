@@ -98,6 +98,247 @@ import * as Dialog from "bits-ui/components/dialog";
 
 // OR single mode
 <Accordion.Root type="single" value="item-1">
+
+**4. Direct bits-ui Imports (No Local Wrappers)**
+```typescript
+// ❌ OBSOLETE - Local wrapper components with barrel exports
+import { Select, SelectContent, SelectItem } from '$lib/components/ui/select';
+import { Dialog, DialogContent } from '$lib/components/ui/dialog';
+
+// ✅ CORRECT - Direct bits-ui v2 namespace imports
+import * as Select from "bits-ui/components/select";
+import * as Dialog from "bits-ui/components/dialog";
+```
+
+**Why Local Wrappers Are Obsolete:**
+- Svelte 5 runes enable fine-grained reactivity in `.svelte.ts` files
+- No need for barrel exports or re-export facades
+- Direct bits-ui imports provide better type safety and tree-shaking
+- Wrapper components create maintenance burden and version drift
+
+---
+
+### 🎯 Svelte 5 Runes: State Management Without Stores
+
+**Key Insight**: Runes make the store API unnecessary because reactivity works directly in `.svelte.ts` files.
+
+#### The Three Core Runes
+
+**1. $state - Reactive State**
+```typescript
+// ❌ OLD (Svelte 4 - Stores)
+import { writable } from 'svelte/store';
+export const count = writable(0);
+
+// ✅ NEW (Svelte 5 - Runes)
+// In state/counter.svelte.ts
+export let count = $state(0);
+export function increment() { count++; }
+```
+
+**2. $derived - Computed Values**
+```typescript
+// ❌ OLD (Svelte 4 - Derived Stores)
+import { derived } from 'svelte/store';
+export const doubled = derived(count, $count => $count * 2);
+
+// ✅ NEW (Svelte 5 - Runes)
+export let doubled = $derived(count * 2);
+export let isEven = $derived(count % 2 === 0);
+```
+
+**3. $effect - Side Effects**
+```typescript
+// ❌ OLD (Svelte 4 - Reactive Statements)
+$: console.log('Count changed:', count);
+$: if (count > 10) alert('Too high!');
+
+// ✅ NEW (Svelte 5 - Runes)
+$effect(() => {
+  console.log('Count changed:', count);
+});
+
+$effect(() => {
+  if (count > 10) alert('Too high!');
+});
+```
+
+#### Why Barrel Stores Are Obsolete
+
+**Old Pattern (Svelte 4 - Obsolete):**
+```typescript
+// stores/unified.ts (barrel export)
+export { userStore } from './user';
+export { chatStore } from './chat';
+export { evidenceStore } from './evidence';
+
+// stores/user.ts
+import { writable } from 'svelte/store';
+export const userStore = writable({ name: '', email: '' });
+
+// Component.svelte
+import { userStore } from '$lib/stores/unified';
+let user;
+userStore.subscribe(value => { user = value; }); // Manual subscription
+// OR
+$: user = $userStore; // Auto-subscription with $prefix
+```
+
+**New Pattern (Svelte 5 - Recommended):**
+```typescript
+// state/user.svelte.ts
+export let user = $state({ name: '', email: '' });
+export let isAuthenticated = $derived(!!user.email);
+export let displayName = $derived(user.name || 'Guest');
+
+export function login(email: string, name: string) {
+  user.email = email;
+  user.name = name;
+}
+
+export function logout() {
+  user = { name: '', email: '' };
+}
+
+// Component.svelte
+import { user, isAuthenticated, login } from '$lib/state/user.svelte.ts';
+// Direct access - no subscriptions needed!
+<p>Welcome, {user.name}!</p>
+{#if isAuthenticated}
+  <button onclick={() => logout()}>Logout</button>
+{/if}
+```
+
+#### Key Advantages of Runes Over Stores
+
+| Feature | Stores (Svelte 4) | Runes (Svelte 5) |
+|---------|-------------------|------------------|
+| **Reactivity Location** | Only in `.svelte` files | `.svelte` AND `.svelte.ts` files |
+| **Subscription Management** | Manual or $ prefix | Automatic |
+| **Type Safety** | Generic types can be complex | Direct TypeScript types |
+| **Bundle Size** | Includes store runtime | No extra runtime |
+| **Learning Curve** | Must learn store API | Uses standard JS/TS |
+| **Barrel Exports** | Required for organization | Obsolete - direct imports |
+
+#### Migration Strategy: Stores → Runes
+
+**Step 1: Identify Store Usage**
+```bash
+# Find all store imports
+grep -r "from 'svelte/store'" src/
+grep -r "writable\|readable\|derived" src/
+```
+
+**Step 2: Convert Simple Stores**
+```typescript
+// BEFORE: stores/counter.ts
+import { writable } from 'svelte/store';
+export const count = writable(0);
+export const increment = () => count.update(n => n + 1);
+
+// AFTER: state/counter.svelte.ts
+export let count = $state(0);
+export function increment() { count++; }
+```
+
+**Step 3: Convert Derived Stores**
+```typescript
+// BEFORE: stores/cart.ts
+import { writable, derived } from 'svelte/store';
+export const items = writable([]);
+export const total = derived(items, $items =>
+  $items.reduce((sum, item) => sum + item.price, 0)
+);
+
+// AFTER: state/cart.svelte.ts
+export let items = $state<CartItem[]>([]);
+export let total = $derived(
+  items.reduce((sum, item) => sum + item.price, 0)
+);
+```
+
+**Step 4: Convert Complex Stores with Side Effects**
+```typescript
+// BEFORE: stores/websocket.ts
+import { writable } from 'svelte/store';
+const { subscribe, set, update } = writable({ connected: false, messages: [] });
+
+let ws;
+export const connect = () => {
+  ws = new WebSocket('ws://localhost:3000');
+  ws.onmessage = (e) => update(s => ({ ...s, messages: [...s.messages, e.data] }));
+};
+
+// AFTER: state/websocket.svelte.ts
+export let connected = $state(false);
+export let messages = $state<string[]>([]);
+
+let ws: WebSocket;
+export function connect() {
+  ws = new WebSocket('ws://localhost:3000');
+  ws.onopen = () => { connected = true; };
+  ws.onmessage = (e) => { messages = [...messages, e.data]; };
+  ws.onclose = () => { connected = false; };
+}
+
+$effect(() => {
+  // Auto-reconnect when connection drops
+  if (!connected && messages.length > 0) {
+    console.log('Connection lost, reconnecting...');
+    setTimeout(connect, 5000);
+  }
+});
+```
+
+#### Component Pattern: Local Wrappers → Direct bits-ui
+
+**Obsolete Pattern (Causes Maintenance Burden):**
+```
+src/lib/components/ui/
+├── select/
+│   ├── index.ts              # ❌ Barrel export
+│   ├── Select.svelte         # ❌ Wrapper around bits-ui
+│   ├── SelectRoot.svelte     # ❌ Wrapper
+│   ├── SelectTrigger.svelte  # ❌ Wrapper
+│   └── SelectContent.svelte  # ❌ Wrapper
+└── dialog/
+    ├── index.ts              # ❌ Barrel export
+    ├── Dialog.svelte         # ❌ Wrapper
+    └── DialogContent.svelte  # ❌ Wrapper
+```
+
+**Recommended Pattern (Direct, Tree-Shakeable):**
+```typescript
+// Components import bits-ui directly
+import * as Select from "bits-ui/components/select";
+import * as Dialog from "bits-ui/components/dialog";
+
+// No local wrappers needed!
+// Archive old wrapper directories to _archive/
+```
+
+**Benefits:**
+- ✅ No version drift between wrappers and bits-ui
+- ✅ Better TypeScript inference
+- ✅ Smaller bundle size (tree-shaking works)
+- ✅ Less maintenance (one source of truth)
+- ✅ Aligns with Svelte 5 philosophy (direct, explicit)
+
+---
+
+### 📚 Sources & References
+
+**Svelte 5 Runes:**
+- [Introducing runes](https://svelte.dev/blog/runes)
+- [Svelte 5 migration guide](https://svelte.dev/docs/svelte/v5-migration-guide)
+- [$state documentation](https://svelte.dev/docs/svelte/$state)
+- [$derived documentation](https://svelte.dev/docs/svelte/$derived)
+- [$effect documentation](https://svelte.dev/docs/svelte/$effect)
+- [Understanding $derived vs $effect](https://www.htmlallthethings.com/blog-posts/understanding-svelte-5-runes-derived-vs-effect)
+- [Runes and Global state: do's and don'ts](https://mainmatter.com/blog/2025/03/11/global-state-in-svelte-5/)
+- [Svelte's Growing Pains: Runes, Stores, and the Quest for Standards](https://dev.to/daniacu/sveltes-growing-pains-runes-stores-and-the-quest-for-standards-3j98)
+
+---
 ```
 
 ```typescript

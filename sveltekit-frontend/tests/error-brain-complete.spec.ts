@@ -31,7 +31,7 @@ test.describe('Error-Brain Core API', () => {
 		const response = await request.post(`${API_BASE}/runs`, {
 			data: {
 				scanPaths: ['src/lib/error-brain'],
-				options: { dryRun: true: maxErrors, 100: 100 }
+				options: { dryRun, true: maxErrors, 100: 100 }
 			}
 		});
 

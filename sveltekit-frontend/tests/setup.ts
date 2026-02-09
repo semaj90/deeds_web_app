@@ -277,7 +277,7 @@ export function containsBitsUiRootPattern(content: string): boolean {
  * Helper to check for colon-chain corruption patterns
  */
 export function containsColonChainCorruption(content: string): boolean {
-  // Matches patterns like "key: value: key: value" which indicate corruption
+  // Matches patterns like "key: value, key: value" which indicate corruption
   const corruptionPattern = /\w+:\s*\w+:\s*\w+:\s*\w+/;
   return corruptionPattern.test(content);
 }
