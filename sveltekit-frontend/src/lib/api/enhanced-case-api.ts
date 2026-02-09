@@ -1,7 +1,6 @@
 // Enhanced Case API Client
 // Integrates REST architecture with PostgreSQL-first workers and clustering
 import { restClient, type APIResponse } from './enhanced-rest-architecture';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CaseCreationRequest {
     // Core case fields
@@ -234,7 +233,7 @@ export class EnhancedCaseAPI {
             priority?: string[];
             includeClusterData?: boolean;
         } = {}
-    ): Promise<APIResponse<{ daily: Array<any>; weekly: Array<any> }>> {
+    ): Promise<APIResponse<{ daily: Array<any>, weekly: Array<any> }>> {
         const searchParams = new URLSearchParams();
         if (params.dateRange) {
             searchParams.append('dateStart', params.dateRange.start);
@@ -260,7 +259,7 @@ export class EnhancedCaseAPI {
         algorithm?: 'kmeans' | 'som' | 'hierarchical';
         k?: number;
         includeEmbeddings?: boolean;
-    }): Promise<APIResponse<{ clusters: Array<any>; silhouetteScore: number; totalCases: number }>> {
+    }): Promise<APIResponse<{ clusters: Array<any>, silhouetteScore: number; totalCases: number }>> {
         return restClient.post('/cases/cluster', {
             ...params,
             algorithm: params?.algorithm ?? 'kmeans',

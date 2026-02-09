@@ -267,7 +267,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  class="yorha-nav-link"
  onclick={() => navigateTo(item.path)}
  class:yorha-nav-active={isActivePath(item.path)}
- aria-current={isActivePath(item.path) ? 'page' : undefined}
+ aria-current={isActivePath(item.path) ? 'page'  | undefined}
  >
  {#if item.icon}
  <!-- render icon with svelte, component for dynamic components -->

@@ -1,5 +1,7 @@
 import { env } from '$env/dynamic/private';
+// @ts-expect-error - Proto files generated at build time
 import { VectorCacheServiceClient } from '$lib/proto/vector_cache_grpc_pb.js';
+// @ts-expect-error - Proto files generated at build time
 import { EmbedLookupRequest, EmbedStoreRequest } from '$lib/proto/vector_cache_pb.js';
 import type { ServiceError } from '@grpc/grpc-js';
 import { credentials } from '@grpc/grpc-js';

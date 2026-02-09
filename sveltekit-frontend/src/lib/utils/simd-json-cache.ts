@@ -323,7 +323,7 @@ class SIMDJSONCache {
 	}
 
 	public getSIMDStatus(): {
-	loaded: boolean; available: boolean;
+	loaded: boolean, available: boolean;
 	performance: string } {
 this.metrics.simdParses > 0 && this.metrics.nativeParses > 0
 				? `${Math.round((this.metrics.averageNativeTime / this.metrics.averageSIMDTime) * 100) / 100}x faster`
@@ -341,7 +341,7 @@ this.metrics.simdParses > 0 && this.metrics.nativeParses > 0
 	}
 
 	public getCacheStats(): {
-	memoryEntries: number; hitRate: number;
+	memoryEntries: number, hitRate: number;
 	compressionRatio: number } {
 this.metrics.totalParses > 0
 				? this.metrics.cacheHits / this.metrics.totalParses

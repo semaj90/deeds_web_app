@@ -4,32 +4,28 @@
    * Svelte 5 Component with bits-ui v2 compatible patterns
    * Phase 107 - Clean regeneration
    */
-  import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import {
-    Home,
-    Search,
-    Database,
-    Eye,
-    Folder,
-    Terminal,
-    Settings,
-    Bell,
-    Menu,
-    X,
-    Zap,
-    ChevronDown,
-    LogOut,
-    User,
-    Calendar,
-    Activity,
-    MessageSquare,
-    BarChart3
-  } from 'lucide-svelte';
   import { cn } from '$lib/utils';
+  import Activity from 'lucide-svelte/icons/activity';
+  import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
+  import Bell from 'lucide-svelte/icons/bell';
+  import Calendar from 'lucide-svelte/icons/calendar';
+  import ChevronDown from 'lucide-svelte/icons/chevron-down';
+  import Database from 'lucide-svelte/icons/database';
+  import Eye from 'lucide-svelte/icons/eye';
+  import Folder from 'lucide-svelte/icons/folder';
+  import Home from 'lucide-svelte/icons/home';
+  import Menu from 'lucide-svelte/icons/menu';
+  import MessageSquare from 'lucide-svelte/icons/message-square';
+  import Search from 'lucide-svelte/icons/search';
+  import Settings from 'lucide-svelte/icons/settings';
+  import Terminal from 'lucide-svelte/icons/terminal';
+  import User from 'lucide-svelte/icons/user';
+  import X from 'lucide-svelte/icons/x';
+  import Zap from 'lucide-svelte/icons/zap';
   import type { Snippet } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     title?: string;
@@ -346,9 +342,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     color: #f1f5f9;
   }
 
-  .overlay {
-    position: fixed;
-    inset: 0;
+  .overlay { position: fixed;
+		inset: 0;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(4px);
     z-index: 40;
@@ -357,9 +352,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
 
   /* Sidebar */
-  .sidebar {
-    position: fixed;
-    top: 0;
+  .sidebar { position: fixed;
+		top: 0;
     left: 0;
     height: 100%;
     background: linear-gradient(180deg, #0f172a, #1e293b);
@@ -402,9 +396,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     gap: 0.75rem;
   }
 
-  .logo-icon {
-    width: 2rem;
-    height: 2rem;
+  .logo-icon { width: 2rem;
+		height: 2rem;
     color: #f59e0b;
   }
 
@@ -421,9 +414,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     margin: 0;
   }
 
-  .close-mobile {
-    display: none;
-    padding: 0.5rem;
+  .close-mobile { display: none;
+		padding: 0.5rem;
     background: transparent;
     border: none;
     color: #94a3b8;
@@ -437,9 +429,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
 
   /* Navigation */
-  .sidebar-nav {
-    flex: 1;
-    padding: 1.5rem;
+  .sidebar-nav { flex: 1;
+		padding: 1.5rem;
     overflow-y: auto;
   }
 
@@ -457,9 +448,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border-bottom: 1px solid rgba(245, 158, 11, 0.1);
   }
 
-  .nav-item {
-    width: 100%;
-    display: flex;
+  .nav-item { width: 100%;
+		display: flex;
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem;
@@ -485,9 +475,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border-color: rgba(245, 158, 11, 0.5);
   }
 
-  .nav-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+  .nav-icon { width: 1.25rem;
+		height: 1.25rem;
     flex-shrink: 0;
   }
 
@@ -564,9 +553,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
 
   /* Main Content */
-  .main-content {
-    flex: 1;
-    display: flex;
+  .main-content { flex: 1;
+		display: flex;
     flex-direction: column;
     transition:margin-left 0.3s ease;
   }
@@ -587,9 +575,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
 
   /* Header */
-  .header {
-    position: sticky;
-    top: 0;
+  .header { position: sticky;
+		top: 0;
     z-index: 30;
     display: flex;
     align-items: center;
@@ -606,9 +593,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     gap: 1rem;
   }
 
-  .toggle-btn {
-    padding: 0.5rem;
-    background: transparent;
+  .toggle-btn { padding: 0.5rem;
+		background: transparent;
     border: none;
     color: #94a3b8;
     cursor: pointer;
@@ -616,9 +602,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     transition:all 0.2s;
   }
 
-  .toggle-btn:hover {
-    color: #f59e0b;
-    background: rgba(245, 158, 11, 0.1);
+  .toggle-btn:hover { color: #f59e0b;
+		background: rgba(245, 158, 11, 0.1);
   }
 
   .mobile-only {
@@ -643,9 +628,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     }
   }
 
-  .breadcrumb {
-    background: transparent;
-    border: none;
+  .breadcrumb { background: transparent;
+		border: none;
     color: #64748b;
     cursor: pointer;
     padding: 0.25rem 0.5rem;
@@ -662,9 +646,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-weight: 500;
   }
 
-  .breadcrumb-separator {
-    width: 1rem;
-    height: 1rem;
+  .breadcrumb-separator { width: 1rem;
+		height: 1rem;
     color: #475569;
     transform: rotate(-90deg);
   }
@@ -700,9 +683,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     gap: 0.5rem;
   }
 
-  .header-btn {
-    position: relative;
-    padding: 0.5rem;
+  .header-btn { position: relative;
+		padding: 0.5rem;
     background: transparent;
     border: none;
     color: #94a3b8;
@@ -711,14 +693,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     transition:all 0.2s;
   }
 
-  .header-btn:hover {
-    color: #f59e0b;
-    background: rgba(245, 158, 11, 0.1);
+  .header-btn:hover { color: #f59e0b;
+		background: rgba(245, 158, 11, 0.1);
   }
 
-  .notification-badge {
-    position: absolute;
-    top: 0.25rem;
+  .notification-badge { position: absolute;
+		top: 0.25rem;
     right: 0.25rem;
     width: 0.5rem;
     height: 0.5rem;
@@ -727,9 +707,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
 
   /* Page Content */
-  .page-content {
-    flex: 1;
-    padding: 1.5rem;
+  .page-content { flex: 1;
+		padding: 1.5rem;
   }
 
   .container {
@@ -759,8 +738,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     gap: 0.25rem;
   }
 
-  .footer-icon {
-    width: 0.75rem;
-    height: 0.75rem;
+  .footer-icon { width: 0.75rem;
+		height: 0.75rem;
   }
 </style>

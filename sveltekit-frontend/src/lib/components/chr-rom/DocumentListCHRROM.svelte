@@ -9,7 +9,6 @@
   import { drizzleCHRROMBridge } from '$lib/services/drizzle-chr-rom-bridge.js';
   import '$lib/styles/chr-rom-rendering.css';
   import { slide } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     documents?: unknown[];
@@ -245,25 +244,25 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       >
         <!-- Document Header with Instant Icons -->
         <div class="document-header">
-          <div class="document-icon {getPatternRenderingClass((doc as any).id, 'summary_icon')}">
+          <div class="document-icon {getPatternRenderingClass((doc as any).id 'summary_icon')}">
             {@html getPatternData((doc as any).id, 'summary_icon')}
           </div>
           <div class="document-title">
             <h3>{(doc as any).title}</h3>
           </div>
-          <div class="status-indicator {getPatternRenderingClass((doc as any).id, 'status_indicator')}">
+          <div class="status-indicator {getPatternRenderingClass((doc as any).id 'status_indicator')}">
             {@html getPatternData((doc as any).id, 'status_indicator')}
           </div>
         </div>
 
         <!-- Zero-Latency Metadata Display -->
         <div class="document-metadata">
-          <div class="confidence-badge {getPatternRenderingClass((doc as any).id, 'confidence_badge')}">
+          <div class="confidence-badge {getPatternRenderingClass((doc as any).id 'confidence_badge')}">
             {@html getPatternData((doc as any).id, 'confidence_badge')}
           </div>
           <div class="risk-gauge">
             <span class="label">Risk:</span>
-            <div class="{getPatternRenderingClass((doc as any).id, 'risk_gauge')}">
+            <div class="{getPatternRenderingClass((doc as any).id 'risk_gauge')}">
               {@html getPatternData((doc as any).id, 'risk_gauge')}
             </div>
           </div>
@@ -274,13 +273,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           <div class="hover-details" transition:slide>
             <div class="entity-heatmap">
               <span class="label">Entities:</span>
-              <div class="{getPatternRenderingClass((doc as any).id, 'entity_heatmap')}">
+              <div class="{getPatternRenderingClass((doc as any).id 'entity_heatmap')}">
                 {@html getPatternData((doc as any).id, 'entity_heatmap')}
               </div>
             </div>
             <div class="similarity-graph">
               <span class="label">Similarity:</span>
-              <div class="{getPatternRenderingClass((doc as any).id, 'similarity_graph')}">
+              <div class="{getPatternRenderingClass((doc as any).id 'similarity_graph')}">
                 {@html getPatternData((doc as any).id, 'similarity_graph')}
               </div>
             </div>

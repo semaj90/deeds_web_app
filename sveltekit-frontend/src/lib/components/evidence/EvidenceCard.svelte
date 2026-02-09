@@ -10,7 +10,6 @@
 	import type { ComponentType } from 'svelte';
 	import { quintOut } from 'svelte/easing';
 	import { scale } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
 		evidence: Evidence;
@@ -20,8 +19,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		showCompare?: boolean;
 		autoCompare?: boolean;
 		oncompare?: (evidence: Evidence) => void;
-		oncompared?: (data: {
-	evidence: Evidence; result: unknown }) => void;
+		oncompared?: (data: { evidence: Evidence, result: unknown }) => void;
 	}
 
 	let {
@@ -48,8 +46,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				return Headphones;
 			case 'link':
 				return LinkIcon;
-			default:
-				return FileText;
+			default:return FileText;
 		}
 	};
 

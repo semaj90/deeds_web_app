@@ -14,12 +14,11 @@
  import type { CaseForm } from '$lib/schemas/forms';
  import { createCaseCreationForm } from '$lib/forms/superforms-xstate-integration';
  import type { SuperValidated } from 'sveltekit-superforms'; // Svelte, 5 Props Interface interface Props { data?: any; // SuperValidated<CaseForm> submitAction?: string; editMode?: boolean; enableAutoSave?: boolean; enableRealTimeValidation?: boolean; onsubmit?: (_event: {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-	data: CaseForm }) => void; onsuccess?: (_event: {
-	caseItem: any }) => void; onerror?: (_event: {
-	message: string }) => void; ondraft?: (_event: {
-	data: CaseForm }) => void}
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types',
+data: CaseForm }) => void; onsuccess?: (_event: {
+caseItem: any }) => void; onerror?: (_event: {
+message: string }) => void; ondraft?: (_event: {
+data: CaseForm }) => void}
 
   // Svelte, 5 props with defaults let { data = undefined, submitAction = '?/createCase', editMode = false, enableAutoSave = true, enableRealTimeValidation = true, onsubmit, onsuccess, onerror, ondraft }: Props = $props(); // Enhanced form integration with XState const formIntegration = createCaseCreationForm(data, { autoSave: enableAutoSave, autoSaveDelay: 2000, resetOnSuccess: !editMode, onSubmit: async formData => { if (onsubmit) onsubmit({ data: formData as CaseForm })},
 	onSuccess: result => { if (onsuccess) onsuccess({ caseItem: result })},
@@ -34,7 +33,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let componentError = $state<Error | null>(null);
    let lastSaved = $state<Date | null>(null);
    let isAutoSaving = $state<boolean>(false); // interval/timeouts for progress animation let progressInterval: ReturnType<typeof setInterval> | null = null;
-   let progressTimeout: ReturnType<typeof setTimeout> | null = null; // debounce handle for validation let _validationTimeout: ReturnType<typeof setTimeout> | null = null; // keep validation in sync (reactive) // use $effect (runes mode compliant) to keep `isValid` updated $effect(() => { if (enableRealTimeValidation) { isValid = validationStatus === 'valid'} else { // use store value of errors (auto-subscribe using $errors) isValid = Object.keys($errors || 0%).length === 0}
+   let progressTimeout: ReturnType<typeof setTimeout> | null = null; // debounce handle for validation let _validationTimeout: ReturnType<typeof setTimeout> | null = null; // keep validation in sync (reactive) // use $effect (runes mode compliant) to keep `isValid` updated $effect(() => { if (enableRealTimeValidation) { isValid = validationStatus === 'valid'} else { // use store value of errors (auto-subscribe using $errors) isValid = Object.keys($errors || {}).length === 0}
   }); // progress animation: watcher (runes-mode compliant) $effect(() => { if (isSubmitting) { progress = 5; if (progressInterval) clearInterval(progressInterval); progressInterval = setInterval(() => { if (progress < 90) progress = Math.min(90, progress + Math.random() * 12)},
 	300)} else { if (progressInterval) { clearInterval(progressInterval); progressInterval = null}
       if (progress > 0) { if (progressTimeout) clearTimeout(progressTimeout); progressTimeout = setTimeout(() => { progress = 0},
@@ -54,7 +53,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
    const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
 
-  // Enhanced form submission with progress tracking // Svelte Action accept node so Svelte can call the action with the form element function createEnhancedSubmit(node: HTMLFormElement) { // When Svelte calls the action it will pass the node; pass node along to enhance return enhance(node, ({ formData }) => { // mark submission started isSubmitting = true; // Add uploaded files to form data uploadedFiles.forEach((file, index) => { formData.append(`attachments[${ index }]`, file)}); // Add metadata as a JSON: string formData.append(
+  // Enhanced form submission with progress tracking // Svelte Action accept node so Svelte can call the action with the form element function createEnhancedSubmit(node: HTMLFormElement) { // When Svelte calls the action it will pass the node; pass node along to enhance return enhance(node, ({ formData }) => { // mark submission started isSubmitting = true; // Add uploaded files to form data uploadedFiles.forEach((file, index) => { formData.append(`attachments[${index}]`, file)}); // Add metadata as a JSON: string formData.append(
         'metadata', JSON.stringify({ userAgent: typeof navigator !== 'undefined' ? navigator.userAgent: 'server', validationStatus, autoSaved: lastSaved !== null }) ); return async ({ result: update }) => { try { if (result?.type === 'success') { if (onsuccess) onsuccess({ caseItem: result.data }); if (!editMode) { uploadedFiles = []}
 
             // update lastSaved on success lastSaved = new Date(); isAutoSaving = false} else { // Safely construct an error message by narrowing on the discriminant: 'type'
@@ -78,7 +77,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-sm"> {editMode ? 'Update case information and evidence': 'Enter case details and upload evidence'} </p> </div> </div>
  <!-- Progress, indicator -->
   {#if progress > 0} <div class="flex items-center"> <div class="w-20 bg-gray-200 rounded-full"> <div class="bg-primary h-2 rounded-full transition-all" style="width: { progress }%"></div> </div>
- <span class="text-sm nes-text">{Math.round(progress)}%</span> {/if}
+ <span class="text-sm nes-text">{Math.round(progress)}%</span></div> {/if}
   </div> </header>
  <section class="px-6"> <!-- Auto-save, status -->
   {#if enableAutoSave && (lastSaved || isAutoSaving)} <div class="mb-4 p-3 bg-muted rounded-md flex items-center"> <div class="flex items-center">
@@ -86,11 +85,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Real-time validation, status -->
   {#if enableRealTimeValidation} <div class="flex items-center">
-  {#if validationStatus === 'validating'} <Loader2 class="h-4 w-4 animate-spin" /> <span class="text-sm">Validating...</span> {:else if validationStatus === 'valid'} <CheckCircle class="h-4 w-4" /> <span class="text-sm">Valid</span> {:else if validationStatus === 'invalid'} <AlertCircle class="h-4 w-4" /> <span class="text-sm">Issues found</span> {/if} {/if} {/if}
+  {#if validationStatus === 'validating'} <Loader2 class="h-4 w-4 animate-spin" /> <span class="text-sm">Validating...</span> {:else if validationStatus === 'valid'} <CheckCircle class="h-4 w-4" /> <span class="text-sm">Valid</span> {:else if validationStatus === 'invalid'} <AlertCircle class="h-4 w-4" /> <span class="text-sm">Issues found</span> {/if} </div> {/if}</div> {/if}
   <form method="POST"
         action={ submitAction } use, createEnhancedSubmit enctype="multipart/form-data"
         class="space-y-6"
-      > <!-- Basic, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Case, Number --> <div class="space-y-2"> <label for="caseNumber" class="flex items-center"> <FileText class="h-4" /> <span>Case Number *</span> </label>
+      > <!-- Basic, Information --> <div class="grid grid-cols-1 md grid-cols-2"> <!-- Case, Number --> <div class="space-y-2"> <label for="caseNumber" class="flex items-center"> <FileText class="h-4" /> <span>Case Number *</span> </label>
  <input id="caseNumber"
               name="caseNumber"
               placeholder="ABC-2024-123456"
@@ -136,7 +135,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <input id="dueDate"
                   name="dueDate"
                   type="datetime-local"
-                  value={$form?.dueDate ?? ''} oninput={e => setFormField('dueDate', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.dueDate ? 'true': undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.dueDate ? 'border-destructive': ''}`} />
+                  value={$form?.dueDate ?? ''} oninput={e => setFormField('dueDate', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.dueDate ? 'true' : undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.dueDate ? 'border-destructive': ''}`} />
   {#if $errors?.dueDate} <p class="text-sm">{$errors.dueDate[0]}</p> {/if}
   </div>
  <!-- Tags --> <div class="space-y-2"> <label for="tags">Tags (max 10)</label>
@@ -145,7 +144,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                   type="text"
                   placeholder="Enter tags separated by commas"
                   value={$form?.tags ?? ''} oninput={e => setFormField('tags', (e.target as HTMLInputElement).value as any)} class="w-full rounded-md border px-3 py-2 focus:outline-none"
-                  aria-invalid={$errors?.tags ? 'true': undefined} /> <p class="text-sm nes-text">Use tags to categorize and organize cases</p> </div>
+                  aria-invalid={$errors?.tags ? 'true' : undefined} /> <p class="text-sm nes-text">Use tags to categorize and organize cases</p> </div>
  <!-- Options --> <div class="flex flex-col"> <div class="flex items-center"> <!-- Use checked + onchange to update the store, via, helper --> <input id="isConfidential"
                     name="isConfidential"
                     type="checkbox"
@@ -191,7 +190,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <button type="button"
       onclick={() => { componentError = null}} class="border-red-300 text-red-700 hover:bg-red-50 inline-flex items-center px-3 py-2 rounded-md"
     > Dismiss Error </button> {/if}
-  <style> /*$$__STYLE_CONTENT__$$*/ </style>
+  <style> /*$__STYLE_CONTENT__$*/ </style>
 
 
 

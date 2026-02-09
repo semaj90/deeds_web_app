@@ -206,7 +206,7 @@ export function clearCache(): void {
  * Get cache statistics
  */
 export function getCacheStats(): {
-	size: number; entries: string[] } {
+	size: number, entries: string[] } {
     return {
         size: prefetchCache.size,
         entries: Array.from(prefetchCache.keys()),

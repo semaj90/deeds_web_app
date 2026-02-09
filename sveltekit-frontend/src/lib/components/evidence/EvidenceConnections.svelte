@@ -3,17 +3,14 @@
  import type { Writable } from 'svelte/store';
 
  // Define types locally to avoid importing server schema in browser
- type EvidenceNodeType = {
- id: string;
-	caseId: string;
+ type EvidenceNodeType = { id: string, caseId: string;
  title: string;
  description?: string;
 	evidenceType: string;
  fileType?: string;
  fileName?: string;
  fileUrl?: string;
-	canvasPosition: { x: number;
-	y: number };
+	canvasPosition: { x: number; y: number };
  uploadedBy?: number;
 	uploadedAt: string;
  updatedAt: string;
@@ -21,9 +18,7 @@
  y: number;
  };
 
- type EvidenceConnection = {
- id: string;
-	caseId: string;
+ type EvidenceConnection = { id: string, caseId: string;
  fromEvidenceId: string;
 	toEvidenceId: string;
  connectionType: string;
@@ -36,9 +31,7 @@
  updatedAt: string;
  };
 
- let { nodes, connections }: {
-	nodes: Writable<EvidenceNodeType[]>;
- connections: Writable<EvidenceConnection[]>;
+ let { nodes, connections }: { nodes: Writable<EvidenceNodeType[]>, connections: Writable<EvidenceConnection[]>;
  } = $props();
 
  let canvas: HTMLCanvasElement;
@@ -55,7 +48,7 @@
  if (!ctx || !$nodes .length) return;
 
  // Clear canvas
- ctx.clearRect(0, 0: canvas.width, canvas.height);
+ ctx.clearRect(0, 0, canvas.width, canvas.height);
 
  // Draw each connection
  $connections .forEach(connection => {
@@ -81,11 +74,11 @@
  ctx.stroke();
 
  // Draw arrowhead
- drawArrowhead(fromX, fromY, toX, toY: style.color);
+ drawArrowhead(fromX, fromY, toX, toY, style.color);
 
  // Draw connection label if strength is notable
  if (connection.strength > 0.3) {
- drawConnectionLabel(fromX, fromY, toX, toY: connection.strength);
+ drawConnectionLabel(fromX, fromY, toX, toY, connection.strength);
  }
  });
  }
@@ -148,13 +141,13 @@
  // Redraw when nodes or connections change
  const unsubscribeNodes = nodes.subscribe(() => {
  setTimeout(drawConnections, 0); // Defer to next tick for DOM updates
- 
+
 });
 
  const unsubscribeConnections = connections.subscribe(() => {
  setTimeout(drawConnections, 0);
  });
-  
+
  const handleResize = () => resizeCanvas();
  window.addEventListener('resize', handleResize);
 
@@ -174,9 +167,8 @@
 ></canvas>
 
 <style>
- .connections-canvas {
- position: absolute;
-	top: 0;
+ .connections-canvas { position: absolute;
+		top: 0;
  left: 0;
 	width: 100%;
  height: 100%;

@@ -4,7 +4,6 @@
   import { page } from '$app/stores';
   import { toastStore } from '$lib/stores/toast';
   import { applyConsolePalette, CONSOLE_PALETTES, type ConsolePaletteName } from '$lib/themes/retro-console-palettes';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface User {
     name?: string;

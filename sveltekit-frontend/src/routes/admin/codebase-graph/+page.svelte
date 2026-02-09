@@ -1,12 +1,10 @@
 <script lang="ts">
-	import Button from '$lib/components/ui/button/Button.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Close as DialogClose, Content as DialogContent, Overlay as DialogOverlay, Portal as DialogPortal, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
-	interface VectorCluster {
-		id: number;
-		cluster_id: number;
+	interface VectorCluster { id: number, cluster_id: number;
 		pattern: string;
 		error_count: number;
 		avg_similarity: number;
@@ -16,9 +14,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		embedding: number[];
 	}
 
-	interface GraphNode {
-		id: string;
-		label: string;
+	interface GraphNode { id: string, label: string;
 		type: 'file' | 'error' | 'cluster' | 'fix';
 		cluster_id?: number;
 		similarity?: number;
@@ -26,9 +22,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		fix_status?: 'pending' | 'in-progress' | 'applied' | 'failed';
 	}
 
-	interface GraphEdge {
-		source: string;
-		target: string;
+	interface GraphEdge { source: string, target:string;
 		weight: number;
 		type: 'similarity' | 'dependency' | 'fix-attempt';
 	}
@@ -90,7 +84,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 				edges.push({
 					source: `cluster-${cluster.cluster_id}`,
-					target: fileId,
+					target:fileId,
 					weight: cluster.avg_similarity || 0.5,
 					type: 'similarity'
 				});
@@ -109,7 +103,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-					query: searchQuery,
+				query: searchQuery,
 					limit: 10,
 					threshold: 0.7
 				})
@@ -129,7 +123,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-					cluster_id: cluster.cluster_id,
+				cluster_id: cluster.cluster_id,
 					embedding: cluster.embedding,
 					limit: 5
 				})
@@ -156,7 +150,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 					pattern: cluster.pattern,
 					file_paths: cluster.file_paths,
 					context: {
-						summary: cluster.summary,
+					summary: cluster.summary,
 						tags: cluster.tags,
 						similar_clusters: similarClusters.map((c) => c.pattern)
 					}
@@ -199,9 +193,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-    .codebase-graph {
-        padding: 2rem;
-        background: #0f0f1a;
+    .codebase-graph { padding: 2rem;
+		background: #0f0f1a;
         color: #e0e0e0;
         min-height: 100vh;
     }
@@ -217,9 +210,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         gap: 0.5rem;
         margin-top: 1rem;
     }
-    .node-item {
-        padding: 0.5rem;
-        background: rgba(255, 255, 255, 0.05);
+    .node-item { padding: 0.5rem;
+		background: rgba(255, 255, 255, 0.05);
         border-radius: 4px;
         font-size: 0.8rem;
     }

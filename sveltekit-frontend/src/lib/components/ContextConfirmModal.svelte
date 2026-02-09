@@ -8,13 +8,10 @@
    * Emits 'accept' or 'reject' events based on user choice.
    */
 
-  interface ContextData {
-    context_id: string;
-	source: string;
+  interface ContextData { context_id: string, source: string;
     score: number;
 	snippet: string;
-    range?: {
-	from_msg_id: number; to_msg_id: number };
+    range?: { from_msg_id: number; to_msg_id: number };
     timestamp?: string;
   }
 
@@ -22,9 +19,9 @@
     context: ContextData;
     hint?: string | null;
     onaccept?: (detail: {
-	comment: string }) => void;
+comment: string }) => void;
     onreject?: (detail: {
-	comment: string }) => void;
+comment: string }) => void;
   }
 
   let {

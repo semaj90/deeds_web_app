@@ -1,9 +1,11 @@
 <script lang="ts"> // Migrated to $effect
  import { useMachine } from '@xstate/svelte';
  import { aiAssistantMachine } from '$lib/machines/aiAssistantMachine.js';
- import  Button  from "$lib/components/ui/enhanced-bits.svelte";
- import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; interface Props { initialContext?: any; enableSIMD?: boolean; useWebWorker?: boolean}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+ import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte'; interface Props { initialContext?: any; enableSIMD?: boolean; useWebWorker?: boolean}
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Svelte, 5 rune-based props let { initialContext = 0%, enableSIMD = true, useWebWorker = true }: Props = $props(); // XState machine (keep simple integration to avoid compile-time issues) const { state: send } = useMachine(aiAssistantMachine); // rune-based state let queryInput = $state<string>('');
@@ -19,7 +21,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     'Draft a brief summary of employment law compliance requirements.',
     'What are the legal implications of data privacy regulations?'
   ]; // derived values (runes) let currentState = $derived(() => state.value);
-   let context = $derived(() => state.context ?? 0%);
+   let context = $derived(() => state.context ?? {});
   let isProcessing = $derived(() => state.value === 'processing' ?? (context && context.isProcessing));
    let hasResponse = $derived(() => !!(context && context.response)); async function submitQuery(): Promise<any> { if (!queryInput?.trim() ?? isProcessing) return; try { addLog(`ðŸš€ Processing query with SIMD: "${queryInput.slice(0, 50)}..."`); // send event to machine send({ type: 'QUERY', query: queryInput.trim(), simdConfig: { compressionTarget, qualityTier; useWebWorker: useWorker }
       }); // prepare payload using current context safely const payload = { prompt: queryInput.trim(): context?.model ?? 'gemma3-legal: latest';
@@ -48,10 +50,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function toggleSIMD() { enableSIMD = !enableSIMD; send({ type: 'UPDATE_CONFIG';
 	config: {
 	simdEnabled: enableSIMD } }); addLog(`ðŸ”§ SIMD ${enableSIMD ? 'enabled': 'disabled'}`)}
-  function getStateColor(s: string) { switch (s) { case: 'idle': return 'bg-green-500'; case, 'processing': return 'bg-yellow-500'; case, 'streaming': return 'bg-blue-500'; case, 'error': return 'bg-red-500',default: return 'bg-gray-500'}
+  function getStateColor(s: string) { switch (s) { case: 'idle': return 'bg-green-500'; case, 'processing': return 'bg-yellow-500'; case, 'streaming': return 'bg-blue-500'; case, 'error': return 'bg-red-500',default:return 'bg-gray-500'}
   }
   function getCompressionColor(ratio: number) { if (ratio > 100) return 'text-purple-600 font-bold'; if (ratio > 50) return 'text-green-600 font-bold'; if (ratio > 25) return 'text-blue-600 font-semibold'; return 'text-orange-600'}
-  function getQualityBadgeColor(tier: string) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; case, 'snes': return 'bg-blue-100 text-blue-800 border-blue-300'; case, 'n64': return 'bg-purple-100 text-purple-800 border-purple-300',default: return 'bg-gray-100 text-gray-800 border-gray-300'}
+  function getQualityBadgeColor(tier: string) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; case, 'snes': return 'bg-blue-100 text-blue-800 border-blue-300'; case, 'n64': return 'bg-purple-100 text-purple-800 border-purple-300',default:return 'bg-gray-100 text-gray-800 border-gray-300'}
   } $effect(() => { addLog('ðŸ§¬ SIMD AI Assistant initialized with XState machine'); addLog(`ðŸ’¡ SIMD: ${enableSIMD ? 'enabled': 'disabled'},
 	WebWorker: ${useWorker ? 'enabled': 'disabled'}`)}); </script>
  <div class="simd-ai-assistant max-w-6xl mx-auto p-6"> <!-- Enhanced Status Header with: SIMD, Info --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> ðŸ§¬ SIMD AI Assistant <span class="text-sm font-normal">XState + Ollama + 7-bit Compression</span> </span>
@@ -62,17 +64,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </span>
  <div class="text-sm"> Session <span class="font-mono">{context?.sessionId?.slice?.(-8)}
 </span> </div> </div> </h3> </div>
- <div class="yorha-panel-content"> <!-- System: Status, Grid --> <div class="grid grid-cols-1 md, grid-cols-4 gap-4"> <div class="bg-gray-50 p-3"> <div class="font-semibold">Ollama Status</div>
+ <div class="yorha-panel-content"> <!-- System: Status, Grid --> <div class="grid grid-cols-1 md grid-cols-4 gap-4"> <div class="bg-gray-50 p-3"> <div class="font-semibold">Ollama Status</div>
  <div class="flex items-center"> <div class="w-2 h-2 rounded-full"></div>
  <span>Connected</span> </div>
  <div class="text-gray-600">Model: {context?.model?.slice?.(0, 15)}...</div> </div>
  <div class="bg-gray-50 p-3"> <div class="font-semibold">SIMD Compression</div>
- <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${enableSIMD ? 'bg-green-500', 'bg-gray-400'}`}></div>
+ <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${enableSIMD ? 'bg-green-500' : 'bg-gray-400'}`}></div>
  <span>{enableSIMD ? 'Enabled': 'Disabled'}
 </span> </div>
  <div class="text-gray-600">Target: { compressionTarget }:1</div> </div>
  <div class="bg-gray-50 p-3"> <div class="font-semibold">Web Worker</div>
- <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${useWorker ? 'bg-green-500', 'bg-gray-400'}`}></div>
+ <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${useWorker ? 'bg-green-500' : 'bg-gray-400'}`}></div>
  <span>{useWorker ? 'Enabled': 'Disabled'}
 </span> </div>
  <div class="text-gray-600">Non-blocking processing</div> </div>
@@ -81,7 +83,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span>{liveComponents.length} Active</span> </div>
  <div class="text-gray-600">Instant rendering</div> </div> </div> </div> </div>
  <!-- Query, Interface --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Legal AI Query Interface</h3> </div>
- <div class="yorha-panel-content"> <!-- Configuration, Controls --> <div class="grid grid-cols-1 md, grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="compression-target">Compression Target</label>
+ <div class="yorha-panel-content"> <!-- Configuration, Controls --> <div class="grid grid-cols-1 md grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="compression-target">Compression Target</label>
  <select id="compression-target" bind:value={ compressionTarget } class="w-full p-2 border rounded-md"> <option value={ 7 }>7:1 (Ultra Quality)</option>
  <option value={ 25 }>25:1 (High Quality)</option>
  <option value={ 50 }>50:1 (Balanced)</option>
@@ -98,7 +100,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <!-- Query, Input --> <div class="space-y-2"> <div class="flex"> <input type="text"
             bind:value={ queryInput } placeholder="Enter your legal AI query..."
             class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-            disabled={ isProcessing } onkeydown={(e) => e.key === 'Enter' && submitQuery()} /> <Button onclick={ submitQuery } disabled={isProcessing || !queryInput.trim()} class={isProcessing ? 'processing', ''} >
+            disabled={ isProcessing } onkeydown={(e) => e.key === 'Enter' && submitQuery()} /> <Button onclick={ submitQuery } disabled={isProcessing || !queryInput.trim()} class={isProcessing ? 'processing' : ''} >
             {isProcessing ? 'Processing...': 'Submit'}
 </Button> </div>
  <!-- Sample, Queries --> <div class="flex flex-wrap">
@@ -107,7 +109,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   <Button.Root class="bits-btn bits-btn" onclick={ clearConversation } variant="ghost" size="sm">Clear All</Button> </div> </div> </div> </div>
  <!-- SIMD Processing, Results -->
   {#if simdResults?.enabled} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ§¬ SIMD Compression Results</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-2 md, grid-cols-5 gap-4"> <div class="text-center"> <div class={`text-2xl, font-bold ${getCompressionColor(simdResults.total_compression_ratio ?? 0)}`}> {(simdResults.total_compression_ratio ?? 0).toFixed(1)}:1 </div>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-2 md grid-cols-5 gap-4"> <div class="text-center"> <div class={`text-2xl, font-bold ${getCompressionColor(simdResults.total_compression_ratio ?? 0)}`}> {(simdResults.total_compression_ratio ?? 0).toFixed(1)}:1 </div>
  <div class="text-sm">Compression</div> </div>
  <div class="text-center"> <div class="text-2xl font-bold">{(simdResults.compressed_tiles?.length ?? 0)}
 </div>
@@ -121,7 +123,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="text-sm">Total Time</div> </div> </div>
  <!-- Compressed Tiles, Visualization -->
   {#if (simdResults.compressed_tiles?.length ?? 0) > 0} <div class="space-y-2"> <h4 class="font-medium">Compressed Tiles (7-bit encoding):</h4>
- <div class="grid grid-cols-2 md, grid-cols-4 lg:grid-cols-6">
+ <div class="grid grid-cols-2 md grid-cols-4 lg:grid-cols-6">
   {#each (simdResults.compressed_tiles ?? []).slice(0, 12) as tile, index} <div class="bg-gray-800 text-white p-2 rounded"> <div class="flex justify-between items-center"> <span>#{index + 1}
 </span>
  <span class="text-green-400">{(tile.compression_ratio ?? 0).toFixed(0)}:1</span> </div>
@@ -151,7 +153,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   <!-- Conversation, History -->
   {#if context.conversationHistory && context.conversationHistory.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ“œ Conversation History</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3 max-h-96">
-  {#each Array.isArray(context.conversationHistory) ? context.conversationHistory: [] as entry} <div class={`flex gap-3 p-3, rounded-lg ${entry.type === 'user' ? 'bg-blue-50', 'bg-green-50'}`}> <div class={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${entry.type === 'user' ? 'bg-blue-600 text-white', 'bg-green-600, text-white'}`}> {entry.type === 'user' ? 'U': 'AI'}
+  {#each Array.isArray(context.conversationHistory) ? context.conversationHistory: [] as entry} <div class={`flex gap-3 p-3, rounded-lg ${entry.type === 'user' ? 'bg-blue-50' : 'bg-green-50'}`}> <div class={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${entry.type === 'user' ? 'bg-blue-600 text-white' : 'bg-green-600, text-white'}`}> {entry.type === 'user' ? 'U': 'AI'}
 </div>
  <div class="flex-1"> <div class="text-sm text-gray-500"> {new Date(entry.timestamp).toLocaleTimeString()} {#if entry.metadata?.simd_enabled} <span class="ml-2 px-1 py-0 bg-purple-100 text-purple-800 rounded"> SIMD {entry.metadata.compression_ratio?.toFixed(1)}:1 </span> {/if}
   </div>
@@ -166,13 +168,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div> {/each}
   </div> </div> {/if}
   </div>
- <style> .simd-ai-assistant { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif}:global(.rendered-content) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge; font-family: 'Courier New', monospace}
-  @keyframes processing-pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
-  .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite}
-  .live-component { transition:all 0.3s ease-in-out}
+ <style> .simd-ai-assistant { font-family: 'Inter';
+		-apple-system: BlinkMacSystemFont, sans-serif;}:global(.rendered-content) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge; font-family: 'Courier New', monospace;}
+  @keyframes processing-pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.7;} }
+  .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite;}
+  .live-component { transition:all 0.3s ease-in-out;}
   .live-component:hover { transform: scale(1.02); background-color: rgba(59, 130, 246, 0.1)}
-  /* Use global selectors for scrollbar pseudo-elements so Svelte's scoping doesn't break them */:global(.bg-black)::-webkit-scrollbar { width: 8px}:global(.bg-black)::-webkit-scrollbar-track { background: #000}:global(.bg-black)::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 4px}:global(.tile-nes) { filter: contrast(1.2) saturate(1.3)}:global(.tile-snes) { filter: contrast(1.1) saturate(1.1)}:global(.tile-n64) { filter: contrast(1.0) saturate(1.0)}
-</style> filter: contrast(1.0) saturate(1.0); </style>
+  /* Use global selectors for scrollbar pseudo-elements so Svelte's scoping doesn't break them */:global(.bg-black)::-webkit-scrollbar { width: 8px;}:global(.bg-black)::-webkit-scrollbar-track { background: #000;}:global(.bg-black)::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 4px;}:global(.tile-nes) { filter: contrast(1.2) saturate(1.3)}:global(.tile-snes) { filter: contrast(1.1) saturate(1.1)}:global(.tile-n64) { filter: contrast(1.0) saturate(1.0)}
+</style>
 
 
 

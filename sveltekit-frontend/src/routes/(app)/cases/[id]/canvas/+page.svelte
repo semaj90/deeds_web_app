@@ -22,7 +22,7 @@
 		<!-- Placeholder grid background -->
 		<div class="pointer-events-none absolute inset-0 opacity-20">
 			<div
-				class="w-full h-full bg-[radial-gradient(circle,_rgba(148, 163, 184, 0.25)_1px,_transparent_1px)] bg-[length, 24px_24px]"
+				class="w-full h-full bg-[radial-gradient(circle _rgba(148 163 184 0.25)_1px _transparent_1px)] bg-[length 24px_24px]"
 			></div>
 		</div>
 

@@ -8,7 +8,7 @@
     placeholder?: string;
     rows?: number;
     options?: {
-	value: string; label: string }[];
+	value: string, label: string }[];
     defaultValue?: string;
   }
 

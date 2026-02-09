@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <!-- Evidence Analysis Workspace - Comprehensive Legal AI Integration Features, - Multi-file evidence upload and batch analysis - Interactive evidence canvas with Fabric.js - Timeline extraction and visualization - Legal citations discovery and verification - Cross-document relationship mapping - Real-time AI analysis with GPU, acceleration --> <script lang="ts"> import type { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '$lib/components/ui/card';
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Migrated to $effect import { Button } from '$lib/components/ui/enhanced-bits'; import * as Card from '$lib/components/ui/Card.svelte'; import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte'; import { Upload } from "lucide-svelte";
+import type { Document } from '$lib/types'; // Migrated to $effect import Button from '$lib/components/ui/Button.svelte'; import * as Card from '$lib/components/ui/Card.svelte'; import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte'; import { Upload } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
 import { Clock } from "lucide-svelte";
 import { Link } from "lucide-svelte";
@@ -79,7 +79,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
  onclick={() => (currentTab = 'canvas')} >
  <Eye class="w-4 h-4 inline" /> Evidence Canvas </button> </div> </div> </nav> <!-- Main, Content --> <main class="max-w-7xl mx-auto px-6">
- {#if currentTab === 'upload'} <!-- Upload and: Configuration, Tab --> <div class="grid lg:grid-cols-3"> <!-- File, Upload --> <div class="lg, col-span-2"> <Card> <Card.Header> <Card.Title class="flex"> <FileText class="w-5 h-5" /> Evidence Files </Card.Title> <Card.Description>Upload multiple evidence files for batch analysis</Card.Description> </Card.Header> <Card.Content> <div class="space-y-4"> <!-- File, Input --> <div class="border-2 border-dashed border-gray-300 rounded-lg p-6"> <input type="file"
+ {#if currentTab === 'upload'} <!-- Upload and: Configuration, Tab --> <div class="grid lg:grid-cols-3"> <!-- File, Upload --> <div class="lg col-span-2"> <Card> <Card.Header> <Card.Title class="flex"> <FileText class="w-5 h-5" /> Evidence Files </Card.Title> <Card.Description>Upload multiple evidence files for batch analysis</Card.Description> </Card.Header> <Card.Content> <div class="space-y-4"> <!-- File, Input --> <div class="border-2 border-dashed border-gray-300 rounded-lg p-6"> <input type="file"
  multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.mp4,.mp3"
  onchange={ handleFileUpload } class="hidden"
  id="file-upload"
@@ -108,11 +108,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {#if isAnalyzing} <div class="flex"> <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"
  ></div> Analyzing... ({ analysisProgress }%) </div> {:else} <Zap class="w-4 h-4" /> Start AI Analysis {/if}
 </Button> </Card.Content> </Card> </div> </div> {:else if currentTab === 'results'} <!-- Analysis Results, Tab -->
- {#if batchAnalysisResults} <div class="space-y-6"> <!-- Summary, Cards --> <div class="grid md, grid-cols-4"> <Card> <Card.Content class="p-4"> <div class="text-2xl font-bold"> {batchAnalysisResults.processing_summary.total_files}
+ {#if batchAnalysisResults} <div class="space-y-6"> <!-- Summary, Cards --> <div class="grid md grid-cols-4"> <Card> <Card.Content class="p-4"> <div class="text-2xl font-bold"> {batchAnalysisResults.processing_summary.total_files}
 </div> <div class="text-sm">Total Files</div> </Card.Content> </Card> <Card> <Card.Content class="p-4"> <div class="text-2xl font-bold"> {batchAnalysisResults.processing_summary.successful_analyses}
 </div> <div class="text-sm">Successful</div> </Card.Content> </Card> <Card> <Card.Content class="p-4"> <div class="text-2xl font-bold"> {batchAnalysisResults.cross_document_analysis?.correlation_analysis.common_entities.length ?? 0}
 </div> <div class="text-sm">Correlations</div> </Card.Content> </Card> <Card> <Card.Content class="p-4"> <div class="text-2xl font-bold"> {Math.round(batchAnalysisResults.processing_summary.processing_time_ms / 1000)}s </div> <div class="text-sm">Processing Time</div> </Card.Content> </Card> </div> <!-- Individual File, Results --> <Card> <Card.Header> <Card.Title>Individual File Analysis</Card.Title> </Card.Header> <Card.Content> <div class="space-y-4">
- {#each Array.isArray(batchAnalysisResults.individual_results) ? batchAnalysisResults.individual_results: [] as result} <div class="border rounded-lg p-4" {result.success ? 'border-green-200 bg-green-50', 'border-red-200 bg-red-50'}"
+ {#each Array.isArray(batchAnalysisResults.individual_results) ? batchAnalysisResults.individual_results: [] as result} <div class="border rounded-lg p-4" {result.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}"
  > <div class="flex items-center justify-between"> <h4 class="font-medium">{result.filename}
 </h4>
  {#if result.success} <CheckCircle class="w-5 h-5" /> {:else} <AlertCircle class="w-5 h-5" /> {/if}
@@ -127,7 +127,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </p> {/if}
 </div> {/each}
 </div> </Card.Content> </Card> <!-- Cross-Document, Analysis -->
- {#if batchAnalysisResults.cross_document_analysis} <Card> <Card.Header> <Card.Title class="flex"> <Network class="w-5 h-5" /> Cross-Document Analysis </Card.Title> </Card.Header> <Card.Content> <div class="grid md, grid-cols-2"> <!-- Common, Entities --> <div> <h4 class="font-medium">Common Entities</h4> <div class="space-y-2">
+ {#if batchAnalysisResults.cross_document_analysis} <Card> <Card.Header> <Card.Title class="flex"> <Network class="w-5 h-5" /> Cross-Document Analysis </Card.Title> </Card.Header> <Card.Content> <div class="grid md grid-cols-2"> <!-- Common, Entities --> <div> <h4 class="font-medium">Common Entities</h4> <div class="space-y-2">
  {#each Array.isArray(batchAnalysisResults.cross_document_analysis.correlation_analysis.common_entities) ? batchAnalysisResults.cross_document_analysis.correlation_analysis.common_entities: [] as entity} <div class="flex justify-between items-center p-2 bg-gray-50"> <span>{entity.entity}
 </span> <span class="text-sm">Ã—{entity.frequency}
 </span> </div> {/each}
@@ -147,7 +147,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </p> {/if}
 </div> </div> {/each}
 </div> </div> </Card.Content> </Card> {:else} <div class="text-center"> <Clock class="w-16 h-16 mx-auto text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">No Timeline Data</h3> <p class="text-gray-500">Timeline extraction requires completed analysis.</p> <Button class="bits-btn" onclick={ extractUnifiedTimeline } disabled={!batchAnalysisResults}>Extract Timeline</Button> </div> {/if} {:else if currentTab === 'citations'} <!-- Citations, Tab --> <Card> <Card.Header> <Card.Title class="flex"> <Link class="w-5 h-5" /> Legal Citations </Card.Title> <Card.Description>Discovered legal citations and references</Card.Description> </Card.Header> <Card.Content> <div class="text-center"> <Link class="w-16 h-16 mx-auto text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">Citations Discovery</h3> <p class="text-gray-500">Discover legal citations from analyzed documents.</p> <Button class="bits-btn" onclick={ discoverCitations }>Discover Citations</Button> </div> </Card.Content> </Card> {:else if currentTab === 'canvas'} <!-- Evidence Canvas, Tab --> <Card> <Card.Header> <Card.Title class="flex"> <Eye class="w-5 h-5" /> Evidence Canvas </Card.Title> <Card.Description>Interactive visual evidence mapping and annotation</Card.Description> </Card.Header> <Card.Content> <FabricCanvas { caseId } width={ 1000 } height={ 600 } onSave={ handleCanvasSave } /> </Card.Content> </Card> {/if}
-</main> </div> <style> .evidence-workspace { font-family: -apple-system; BlinkMacSystemFont: 'Segoe UI', 'Roboto', sans-serif}
+</main> </div> <style> .evidence-workspace { font-family: -apple-system; BlinkMacSystemFont: 'Segoe UI', 'Roboto', sans-serif;}
 </style>
 
 

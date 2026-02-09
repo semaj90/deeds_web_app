@@ -87,13 +87,13 @@ async function handleOCR(payload: {
 }
 
 async function handleAudioExtraction(payload: {
-	buffer: Uint8Array; filename: string }) {
+	buffer: Uint8Array, filename: string }) {
     const buffer = Buffer.from(payload.buffer);
     return await extractAudioFromBuffer(buffer, payload.filename);
 }
 
 async function handleVideoFrames(payload: {
-	buffer: Uint8Array; filename: string }) {
+	buffer: Uint8Array, filename: string }) {
     const buffer = Buffer.from(payload.buffer);
     return await sampleFramesFromVideo(buffer, payload.filename);
 }
@@ -104,7 +104,7 @@ async function handleJsonParsing(payload: {
 }
 
 async function handleEmbedding(payload: {
-	content: string | Uint8Array; contentType: string }) {
+	content: string | Uint8Array, contentType: string }) {
     if (typeof payload.content === 'string') {
         return await embedText(payload.content);
     } else {
@@ -114,7 +114,7 @@ async function handleEmbedding(payload: {
 }
 
 async function handleImageProcessing(payload: {
-	buffer: Uint8Array; operations: any[] }) {
+	buffer: Uint8Array, operations: any[] }) {
     // Stub
     return { success: true };
 }

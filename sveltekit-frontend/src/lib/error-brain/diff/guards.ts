@@ -17,7 +17,7 @@ export type GuardResult = { ok: true } | { ok: false;
 export function isGuardFailure(
  result: GuardResult
 ): result is { ok: false;
-	reason: string; code: string } {
+	reason: string, code: string } {
  return result.ok === false;
 }
 

@@ -4,10 +4,10 @@
  let { placeholder = 'Search...', value = '' } = $props();
 
  const dispatch = createEventDispatcher<{
- search, string;
+ search: string;
  }>();
 
- let searchTimeout: number;
+ let searchTimeout: any;
  let inputElement: HTMLInputElement;
 
  function handleInput() {
@@ -37,9 +37,11 @@
 
  // Cleanup timeout on destroy
  // Migrated to $effect
- // TODO: Add as cleanup in $effect: return () => {
+ $effect(() => {
+ return () => {
  clearTimeout(searchTimeout);
- }
+ };
+ });
 </script>
 
 <div class="search-bar">
@@ -48,7 +50,8 @@
  <input
  bind:this={inputElement}
  type="text"
- {placeholder}; bind:value
+ {placeholder}
+ bind:value
  oninput={handleInput}
  onkeydown={handleKeydown}
  class="search-input"
@@ -103,7 +106,7 @@
  background: rgba(255, 255, 255, 0.08);
  }
 
- .search-input: placeholder {
+ .search-input::placeholder {
  color: #888;
  }
 

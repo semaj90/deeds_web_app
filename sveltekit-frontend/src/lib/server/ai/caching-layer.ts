@@ -310,7 +310,7 @@ class CachingLayer {
         let accessCount = 1;
 
         // Hacky way to store access count in LRU meta or separate map?
-        // Simpler: Just verify if it's already in hot cache? No, this function PROMOTES.
+        // Simpler: Just verify if it's already in hot cache? No : this function PROMOTES.
         // We need to track frequency.
         // For simplicity in this fix, we'll use a probability promotion or just check if it was recently accessed.
 

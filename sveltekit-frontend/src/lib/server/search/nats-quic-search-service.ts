@@ -152,8 +152,7 @@ export class NatsQuicSearchService {
             query,
             searchType: options.type ?? 'hybrid',
             options: {
-	limit: options.limit,
-                threshold: options.threshold
+	limit: options.limit, threshold: options.threshold
             },
 	timestamp: Date.now()
         };
@@ -167,7 +166,7 @@ export class NatsQuicSearchService {
             // Connect to NATS with QUIC configuration - force IPv4
             try {
                 this.nats = (await connect({
-                    servers: [process.env?.NATS_URL ?? 'nats://127.0.0.1:4222'],
+                    servers: [process.env?.NATS_URL ?? 'nats://127.0.0.1, 4222'],
                     name: 'legal-ai-search-service',
                     maxReconnectAttempts: 3, // Reduced attempts for faster reconnect
                     reconnectTimeWait: 1000,

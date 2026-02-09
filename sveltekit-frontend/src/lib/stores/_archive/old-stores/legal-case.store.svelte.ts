@@ -93,10 +93,8 @@ export function createLegalCaseStore() {
  console.warn('Cases API not available, using mock data for development');
 // Explicitly type mockCases
  {
- id: '1',
- title: 'Contract Dispute - TechCorp vs StartupX',
- caseNumber: 'CASE-2024-001',
- description: 'Breach of software licensing agreement',
+ id: '1', title: 'Contract Dispute - TechCorp vs StartupX',
+ caseNumber: 'CASE-2024-001', description: 'Breach of software licensing agreement',
  status: 'active',
  priority: 'high',
  confidentialityLevel: 1,
@@ -138,10 +136,8 @@ export function createLegalCaseStore() {
  // Still provide mock data even on error
 // Explicitly type mockCases
  {
- id: '1',
- title: 'Sample Legal Case',
- caseNumber: 'CASE-DEMO-001',
- description: 'Demo case for testing analysis functionality',
+ id: '1', title: 'Sample Legal Case',
+ caseNumber: 'CASE-DEMO-001', description: 'Demo case for testing analysis functionality',
  status: 'active',
  priority: 'medium',
  confidentialityLevel: 1,
@@ -223,8 +219,7 @@ export function createLegalCaseStore() {
  const insights: AIInsights = await response.json(); // Explicitly type insights
  aiInsights[documentId] = insights;
  await auditService.logAction({
- type: 'DOCUMENT_ANALYSIS_COMPLETED',
- entityType: 'DOCUMENT',
+ type: 'DOCUMENT_ANALYSIS_COMPLETED', entityType: 'DOCUMENT',
  entityId: documentId, userId: currentUser?.id ?? 'unknown',
  details: {
 	complianceScore: insights.complianceChecks?.length ?? 0, riskLevel: insights.riskAssessment?.score, // Changed from 'level' to 'score'

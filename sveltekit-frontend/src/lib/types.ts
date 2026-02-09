@@ -32,7 +32,7 @@ export interface User {
   id: string, email: string;
   name?: string;
   firstName?: string;
-  lastName?: string, role: string;
+  lastName?: string; role: string;
   avatarUrl?: string;
   isActive?: boolean;
 }
@@ -77,7 +77,7 @@ export interface FormField {
   type: string;
   required?: boolean;
   placeholder?: string;
-  options?: { value: string; label: string }[];
+  options?: { value: string, label: string }[];
 }
 
 // AI & Worker Types

@@ -5,7 +5,6 @@
 
 import { gpuSummaryStore } from '$lib/stores/gpu-summary-store.svelte';
 import { memoryUsage } from "process";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface WebASMInferenceMetrics {
     modelName: string;

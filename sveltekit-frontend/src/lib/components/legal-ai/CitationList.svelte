@@ -70,7 +70,7 @@
  if (!confirm('Are you sure you want to delete this citation?')) return;
 
  try {
- const response = await fetch(`/api/citations/${ id }`, {
+ const response = await fetch(`/api/citations/${id}`, {
  method: 'DELETE',
  });
 

@@ -1,4 +1,4 @@
-// TypeScript types for Rust WASM Bridge integration export interface SystemInfo { os: string, arch: string, total_memory: number, available_memory: number, cpu_count: number, gpu_info: string[], timestamp: string}
+// TypeScript types for Rust WASM Bridge integration export interface SystemInfo { os: string; arch: string, total_memory: number; available_memory: number, cpu_count: number, gpu_info: string[], timestamp: string}
 export interface FileSystemResult { success: data?: string; error? : string; file_size?: number; file_type?: string}
 export interface PerformanceMetrics { timestamp?: number; memory_used?: number; cpu_usage?: number; memory_usage?: number; disk_io?: number; [key: string], any; // Allow additional metrics }
 export interface WindowsService { name: string, status: 'Running' | 'Stopped' | 'Error'; port?: number; description?: string}
@@ -16,13 +16,13 @@ export interface BatchProcessingResult { totalDocuments: number, successfullyPro
 	bytesReceived: number, bytesSent: number, packetsReceived: number, packetsSent: number} }export interface GpuInfo { name: string, vendor: 'NVIDIA' | 'AMD' | 'Intel' | 'Other',memory: number; // bytes computeCapability?: string; driverVersion?, string: supportsWebGL, boolean: supportsWebGPU, boolean: supportsCUDA?: boolean; supportsOpenCL?: boolean}
 // Configuration types export interface RustBridgeConfig { enableSystemMonitoring: boolean, enableFileSystemAccess: boolean, enableGpuAcceleration: boolean, allowedDirectories: string[], performanceLogging: boolean, securityLevel: 'strict' | 'normal' | 'permissive',cachingEnabled: boolean, maxCacheSize: number; // bytes }
 // Error types export interface RustBridgeError { code: string, message: details?, unknown: timestamp, string: stack?: string}
-// Event types for monitoring export interface SystemEvent { type: 'service-start' | 'service-stop' | 'resource-warning' | 'error' | 'info',timestamp: string, message: string, severity: 'low' | 'medium' | 'high' | 'critical',source: metadata?: unknown}
+// Event types for monitoring export interface SystemEvent { type: 'service-start' | 'service-stop' | 'resource-warning' | 'error' | 'info'; timestamp: string, message: string, severity: 'low' | 'medium' | 'high' | 'critical',source: metadata?: unknown}
 // Legal AI specific integration types export interface LegalAISystemStatus { database: {
 	postgres: boolean, connectionPool: number, activeQueries: number} ai: {
 	ollama: boolean, modelLoaded: string, availableModels: string[], queueLength: number} cache: {
 	redis: boolean, memoryUsage: number, hitRate: number} search: {
 	qdrant: boolean, indexedDocuments: number, searchPerformance: number; // ms average } services: {
-	go: boolean, python: boolean, node: boolean} }export interface LegalCaseContext { caseId: string, title: string, status: 'active' | 'closed' | 'pending',priority: 'low' | 'medium' | 'high' | 'urgent',assignedTo: string[], createdAt: string, updatedAt: string, tags: string[], relatedCases: string[]}
+	go: boolean, python: boolean, node: boolean} }export interface LegalCaseContext { caseId: string, title: string, status: 'active' | 'closed' | 'pending', priority: 'low' | 'medium' | 'high' | 'urgent',assignedTo: string[], createdAt: string, updatedAt: string, tags: string[], relatedCases: string[]}
 // Export utility types export type RustBridgeCallback<T = any> = (result: error?: RustBridgeError) => void; export type AsyncRustBridgeFunction<T = any> = (...args: unknown[]) => Promise<T>; export type SystemMetricType = keyof SystemResourceUsage
 
 

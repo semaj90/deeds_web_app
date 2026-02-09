@@ -13,9 +13,7 @@ https, //svelte.dev/e/js_parse_error -->
  import PoliceReportGenerator from './PoliceReportGenerator.svelte';
  import TimelineReconstructionEngine from './TimelineReconstructionEngine.svelte';
 
- interface Evidence {
- id: string;
-	title: string;
+ interface Evidence { id: string, title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -23,16 +21,12 @@ https, //svelte.dev/e/js_parse_error -->
  source?: string;
  }
 
- interface Witness {
- id: string;
-	name: string;
+ interface Witness { id: string, name: string;
  statement?: string;
  credibility?: number;
  }
 
- interface Case {
- id: string;
-	title: string;
+ interface Case { id: string, title: string;
  description?: string;
 	status: 'active' | 'closed' | 'pending';
  createdAt: string;
@@ -125,7 +119,7 @@ https, //svelte.dev/e/js_parse_error -->
  case 'cross-exam': return '⚖️';
  case 'judicial': return '🏛️';
  case 'timeline': return '⏰';
- default: return '🔍';
+ default:return '🔍';
  }
  }
 
@@ -136,7 +130,7 @@ https, //svelte.dev/e/js_parse_error -->
  case 'cross-exam': return 'Cross-Examination';
  case 'judicial': return 'Judicial Analysis';
  case 'timeline': return 'Timeline Reconstruction';
- default: return 'Detective Mode';
+ default:return 'Detective Mode';
  }
  }
 </script>
@@ -178,7 +172,7 @@ https, //svelte.dev/e/js_parse_error -->
  class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap
  {activeModule === module
  ? 'bg-blue-600 text-white'
- : 'text-slate-400, hover:text-white hover:bg-slate-800'}"
+ : 'text-slate-400 hover:text-white hover:bg-slate-800'}"
  >
  <span class="text-lg">{getModuleIcon(module)}</span>
  <span class="font-medium">{getModuleTitle(module)}</span>
@@ -219,7 +213,7 @@ https, //svelte.dev/e/js_parse_error -->
  witnessStatements={witnesses.map(w => ({
   name: w.name,
   statement: w.statement || '',
-  timestamp: undefined
+  timestamp | undefined
  }))}
  />
  {/if}

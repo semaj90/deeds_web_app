@@ -87,7 +87,7 @@ export async function generateEmbeddingsBatch(
 
     const embeddings: number[][] = new Array(texts.length);
     const errors: Array<{
-	index: number; error: any }> = [];
+	index: number, error: any }> = [];
 
     // Process texts with concurrency limit
     for (let i = 0; i < texts.length; i += concurrency) {

@@ -13,9 +13,7 @@ https, //svelte.dev/e/css_empty_declaration -->
 		caseId?: string;
 	} = $props();
 
-	interface TimelineEvent {
-		id: string;
-	actionType: string;
+	interface TimelineEvent { id: string, actionType: string;
 		description: string;
 	time: string;
 		payload: any;
@@ -40,7 +38,7 @@ https, //svelte.dev/e/css_empty_declaration -->
 
 		isLoading = true;
 		try {
-			const response = await fetch(`/api/cases/${ caseId }/timeline`);
+			const response = await fetch(`/api/cases/${caseId}/timeline`);
 			if (response.ok) {
 				const data = await response.json();
 				events = data.events || [];

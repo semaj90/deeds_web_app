@@ -1,5 +1,5 @@
 export interface ChatMessage {
-id: string, content: string, role: "user" | "assistant" | "system",timestamp: conversationId?: string; metadata?: { model?: string; tokensUsed?: number; references?: string[]; confidence?: number; legalContext?: any; executionTime?: number
+id: string, content: string, role: "user" | "assistant" | "system", timestamp: conversationId?: string; metadata?: { model?: string; tokensUsed?: number; references?: string[]; confidence?: number; legalContext?: any; executionTime?: number
 }
 
 export interface Conversation {
@@ -11,11 +11,11 @@ model: string, temperature: number, maxTokens: number, streaming: boolean, conte
 }
 
 export interface ServiceStatus {
-ollama: "unknown" | "loading" | "connected" | "error",qdrant: "unknown" | "loading" | "connected" | "error",database: "unknown" | "loading" | "connected" | "error",gemma3: "unknown" | "loading" | "ready" | "error"
+ollama: "unknown" | "loading" | "connected" | "error", qdrant: "unknown" | "loading" | "connected" | "error",database: "unknown" | "loading" | "connected" | "error",gemma3: "unknown" | "loading" | "ready" | "error"
 }
 
 export interface ChatContext {
-messages: ChatMessage[], conversations: Conversation[], currentConversation: Conversation | null,error: Error | null,settings: ChatSettings, isLoading: boolean, isTyping: boolean, isStreaming: boolean, modelStatus: "unknown" | "loading" | "ready" | "error",contextInjection: {
+messages: ChatMessage[], conversations: Conversation[], currentConversation: Conversation | null, error: Error | null,settings: ChatSettings, isLoading: boolean, isTyping: boolean, isStreaming: boolean, modelStatus: "unknown" | "loading" | "ready" | "error",contextInjection: {
 	enabled: boolean, documents: string[], vectorResults: any[], precedents?: string[]; caseContext?: any
 }
 

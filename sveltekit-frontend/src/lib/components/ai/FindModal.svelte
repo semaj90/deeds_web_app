@@ -3,7 +3,6 @@
  import { quintInOut, elasticOut } from 'svelte/easing';
  import { // only import what we use; types from external helpers caused mismatches so relax local typing below commonMCPQueries, copilotOrchestrator } from '$lib/utils/mcp-helpers';
  import { phase13Integration, getSystemHealth } from '$lib/integrations/phase13-full-integration';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const { ondispatch } = $props<{ ondispatch, (result: unknown) }>() // Svelte, 5 reactive state let isOpen = $state<boolean>(false);
@@ -44,7 +43,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	synthesizeOutputs: true }
       ); // simplified suggestions (typed as unknown to avoid shape/type mismatch) autoSuggestions = [ { type: 'enhancement', priority: 'high', suggestion: 'Implement semantic case clustering', implementation: 'Group similar cases using AI embeddings', mcpQuery: commonMCPQueries.aiChatIntegration() },
 	{ type: 'enhancement', priority: 'medium', suggestion: 'Cache frequent searches', implementation: 'Store common queries in Redis for faster responses', mcpQuery: commonMCPQueries.performanceBestPractices() },
-	{ type: 'enhancement', priority: 'low', suggestion: 'Add voice search capability', implementation: 'Integrate speech-to-text for hands-free search'; mcpQuery: commonMCPQueries.uiUxBestPractices() } ]} catch (error) { console.error('Failed to generate auto-suggestions:', error)}
+	{ type: 'enhancement', priority: 'low', suggestion: 'Add voice search capability', implementation: 'Integrate speech-to-text for hands-free search', mcpQuery: commonMCPQueries.uiUxBestPractices() } ]} catch (error) { console.error('Failed to generate auto-suggestions:', error)}
   }
 
    // Update memory graph with AI context async function updateMemoryWithAIContext(interaction: unknown): Promise<any> { try { await fetch('/api/mcp/memory/create-relations', { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -78,7 +77,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } </script>
   {#if isOpen} <!-- Overlay --> <div class="nier-overlay fixed inset-0 bg-black/80 backdrop-blur-sm"
     in: fade={{
-	duration: 200 }}; out, fade={{ duration, 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
+	duration: 200 }}; out fade={{ duration: 150 }} onclick={() => close()} /> <!-- Modal, Content --> <div class="nier-modal fixed left-1/2 top-1/2 z-50 w-full"
     in: fly={{
 	y: -20, duration: 300, easing: quintInOut }}; out: fly={{ y, -10; duration, 200 }} data-testid="find-modal"
   > <div class="nier-container bg-gray-900 border-2 border-yellow-400 shadow-2xl"> <!-- Animated: Border, Effect --> <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-transparent to-yellow-400 opacity-20 animate-pulse"></div>
@@ -88,7 +87,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if useMCPAnalysis} <div class="nier-status-badge bg-green-500/20 border border-green-500/50"> <Brain class="w-3" /> MCP {/if} {#if useSemanticSearch} <div class="nier-status-badge bg-blue-500/20 border border-blue-500/50"> -                  <Target class="w-3" /> +                  <span class="w-3" aria-hidden>ðŸŽ¯</span> SEMANTIC {/if}
   </div> </div> </div>
  <!-- Main: Search, Area --> <div class="p-6"> <!-- Search Input, with, Suggestions --> <div class="nier-search-container"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" /> <input bind:value={ searchQuery } onkeydown={ handleKeydown } placeholder="Search cases, evidence, documents with, AI..."
-              class="nier-input w-full pl-12 pr-16 py-4 bg-black border border-yellow-400/50 text-white font-mono placeholder-gray-500 focus: outline-none, focus: border-yellow-400, focus:shadow-lg"
+              class="nier-input w-full pl-12 pr-16 py-4 bg-black border border-yellow-400/50 text-white font-mono placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:shadow-lg"
               disabled={ isSearching } data-testid="search-input"
             /> <!-- Search Status, Indicator --> <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
   {#if isSearching} <div class="nier-spinner w-5 h-5 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full"></div> {:else if searchResults.length > 0} <div class="text-green-400 text-sm">{searchResults.length}{/if}
@@ -121,7 +120,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 - in: fly={{
 	y: -20, duration: 300, easing: elasticOut }} +              in: fly={{
 	y: -20, duration, 300; easing, elasticOut }} >
-             <div class="grid grid-cols-1 md, grid-cols-3"> <!-- AI: Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" for="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
+             <div class="grid grid-cols-1 md grid-cols-3"> <!-- AI: Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" for="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
  <input id="ai-confidence-threshold"
                    type="range"
                    bind:value={ aiConfidenceThreshold } min="0.1"
@@ -140,7 +139,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                        { query } </button> {/each}
   </div> </div> </div> {/if}
   <!-- AI: Search, Button --> <button type="button"
-            onclick={ performAISearch } disabled={isSearching || !searchQuery.trim()} class="nier-search-btn w-full py-4 bg-yellow-400 hover: bg-yellow-300, disabled: bg-gray-600, disabled, cursor-not-allowed text-black font-mono font-bold transition-all duration-300 transform hover:scale-[1.02]"
+            onclick={ performAISearch } disabled={isSearching || !searchQuery.trim()} class="nier-search-btn w-full py-4 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-600 disabled cursor-not-allowed text-black font-mono font-bold transition-all duration-300 transform hover:scale-[1.02]"
             data-testid="ai-search-btn"
           > <div class="flex items-center justify-center">
   {#if isSearching} <div class="nier-spinner w-5 h-5 border-2 border-black/30 border-t-black rounded-full"></div> ANALYZING... {:else} <Brain class="w-5" /> ðŸ¤– AI SEARCH {/if}
@@ -175,47 +174,47 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#each Array.isArray(mcpContext.recommendations.slice(0, 3)) ? mcpContext.recommendations.slice(0, 3): [] as suggestion} <li class="text-gray-300">â€¢ { suggestion }</li> {/each}
   </ul> {/if}
   </div> {:else if !searchQuery} <!-- Auto-Suggestions, Panel --> <div class="border-t border-yellow-400/30"> <h3 class="text-yellow-400 font-mono text-lg mb-4 flex items-center"> -              <Sparkles class="w-5" /> +              <span class="w-5" aria-hidden>âœ¨</span> INTELLIGENT SUGGESTIONS </h3>
- <div class="grid grid-cols-1 md, grid-cols-3">
+ <div class="grid grid-cols-1 md grid-cols-3">
   {#each Array.isArray(autoSuggestions) ? autoSuggestions: [] as suggestion} <div class="nier-suggestion-card bg-gray-800/50 border border-gray-600 p-4 hover:border-yellow-400/50 transition-colors group"
                       onclick={() => applyAutoSuggestion(suggestion)}> <div class="flex items-start"> -                    <div class="nier-priority-indicator {suggestion.priority} w-3 h-3 rounded-full flex-shrink-0"></div> +                    <div class={"nier-priority-indicator, " + (suggestion.priority || '') + " w-3 h-3 rounded-full flex-shrink-0 mt-1"}></div>
  <div class="flex-1"> <h4 class="text-white font-mono font-bold text-sm mb-1 group-hover:text-yellow-400"> -                        {suggestion.suggestion} +                        {suggestion.suggestion} </h4>
  <p class="text-gray-400 text-xs mb-2"> -                        {suggestion.implementation} +                        {suggestion.implementation} </p>
  <div class="flex items-center"> <span class="nier-type-badge bg-gray-900 border border-gray-700 px-2 py-1"> -                          {suggestion.type?.toUpperCase()} +                          {String(suggestion.type ?? '').toUpperCase()} </span>
- <span class={ suggestion.priority === 'high' ? 'text-red-400 text-xs font-mono', suggestion.priority === 'medium' ? 'text-yellow-400 text-xs font-mono', 'text-green-400 text-xs, font-mono' }> { (suggestion.priority ?? '').toUpperCase() } </span> </div> </div> </div> </div> {/each}
+ <span class={ suggestion.priority === 'high' ? 'text-red-400 text-xs font-mono', suggestion.priority === 'medium' ? 'text-yellow-400 text-xs font-mono' : 'text-green-400 text-xs, font-mono' }> { (suggestion.priority ?? '').toUpperCase() } </span> </div> </div> </div> </div> {/each}
   </div> {/if}
   <!-- Footer --> <div class="nier-footer border-t border-yellow-400/30 p-4 flex justify-between items-center text-xs text-gray-500 font-mono"> <div class="flex items-center"> <span>POWERED BY AI + CONTEXT7 MCP</span>
   {#if mcpContext} <span class="text-green-400">â€¢ MCP ACTIVE</span> {/if}
   </div>
  <div class="flex items-center"> <span>CTRL+K TO OPEN</span>
  <span>ESC TO CLOSE</span> </div> </div> </div> -    </Dialog.Content> -  </Dialog.Portal> -</Dialog> +  {/if}
-  <style> /* NieR Automata Theme Enhancements */ .nier-container { clip-path: polygon(0, 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px)); position: relative; max-height: 90vh}
+  <style> /* NieR Automata Theme Enhancements */ .nier-container { clip-path: polygon(0, 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px)), position: relative; max-height: 90vh;}
   .nier-container: before { content: '';
 	position: absolute;
 	top: -2px;
 	left: -2px;
 	right: -2px;
 	bottom: -2px;background: linear-gradient(45deg, #fbbf24, #fbbf24, transparent, transparent, #fbbf24); clip-path: polygon(0, 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px)); z-index: -1;
-	animation: borderFlow 4s ease-in-out infinite}
-  .nier-input { clip-path: polygon(0, 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); transition:all 0.3s ease}
-  .nier-input:focus { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); transform: translateY(-1px)}
+	animation: borderFlow 4s ease-in-out infinite;}
+  .nier-input { clip-path: polygon(0, 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)), transition:all 0.3s ease;}
+  .nier-input:focus { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), transform: translateY(-1px)}
   .nier-filter-btn { padding: 0.5rem 1rem; background-color: #1f2937;
-	border: 1px solid #4b5563;color: #d1d5db; font-family: monospace, font-size: 0.75rem;
+	border: 1px solid #4b5563;color: #d1d5db; font-family: monospace; font-size: 0.75rem;
 	transition:all 200ms;display: flex; align-items: center;
 	gap: 0.5rem; clip-path: polygon(0, 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))}
-  .nier-filter-btn:hover { background-color: #374151}
+  .nier-filter-btn:hover { background-color: #374151;}
   .nier-filter-btn.active { background-color: #fbbf24;
 	color: black; border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.4)}
-  .nier-filter-btn.blue.active { background-color: #3b82f6; border-color: #3b82f6}
-  .nier-filter-btn.green.active { background-color: #22c55e; border-color: #22c55e}
-  .nier-filter-btn.purple.active { background-color: #a855f7; border-color: #a855f7}
-  .nier-search-btn { clip-path: polygon(0, 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px)); position: relative;overflow: hidden}
+  .nier-filter-btn.blue.active { background-color: #3b82f6; border-color: #3b82f6;}
+  .nier-filter-btn.green.active { background-color: #22c55e; border-color: #22c55e;}
+  .nier-filter-btn.purple.active { background-color: #a855f7; border-color: #a855f7;}
+  .nier-search-btn { clip-path: polygon(0, 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px)), position: relative;overflow: hidden;}
   .nier-search-btn: before { content: '';
 	position: absolute;
 	top: 0;
 	left: -100%;
 	width: 100%;
-	height: 100%;background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition:left 0.5s}
-  .nier-result-item { position: relative}
+	height: 100%;background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent), transition:left 0.5s;}
+  .nier-result-item { position: relative;}
   .nier-result-item: before { content: '';
 	position: absolute;
 	left: 0;
@@ -223,16 +222,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	width: 2px;
 	height: 100%;
 	background: transparent;
-	transition:background 0.3s ease}
+	transition:background 0.3s ease;}
   .nier-result-item: hover, before { background: linear-gradient(to bottom, #fbbf24, #f59e0b)}
   .nier-result-index { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
-  .nier-type-badge, .nier-confidence-badge { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px)); padding: 0.25rem 0.5rem; font-family: monospace; font-size: 0.75rem}
-  .nier-confidence-badge { background-color: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24, display: flex; align-items: center;
-	gap: 0.25rem}
+  .nier-type-badge, .nier-confidence-badge { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px)), padding: 0.25rem 0.5rem; font-family: monospace; font-size: 0.75rem;}
+  .nier-confidence-badge { background-color: rgba(251, 191, 36, 0.2), border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24;
+		display: flex; align-items: center;
+	gap: 0.25rem;}
   .nier-advanced-panel { clip-path: polygon(0, 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px))}
   .nier-slider { background-color: #374151; border-radius: 0;
 	height: 0.5rem;cursor: pointer; -webkit-appearance: none;
-	appearance: none}
+	appearance: none;}
   .nier-slider::-webkit-slider-thumb { background-color: #fbbf24; border-radius: 0;
 	width: 1rem;height: 1rem;
 	cursor: pointer; -webkit-appearance: none; clip-path: polygon(0, 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px))}
@@ -241,26 +241,26 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .nier-status-badge { padding: 0.25rem 0.5rem; font-family: monospace; font-size: 0.75rem;
 	display: flex; align-items: center;
 	gap: 0.25rem; clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
-  .nier-suggestion-card { clip-path: polygon(0, 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); transition:all 0.3s ease}
+  .nier-suggestion-card { clip-path: polygon(0, 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)), transition:all 0.3s ease;}
   .nier-suggestion-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(251, 191, 36, 0.15)}
   .nier-priority-indicator.high { background-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6)}
   .nier-priority-indicator.medium { background-color: #eab308; box-shadow: 0 0 8px rgba(245, 158, 11, 0.6)}
   .nier-priority-indicator.low { background-color: #22c55e; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6)}
   .nier-icon-container { width: 2rem;
-	height: 2rem; background-color: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.5); display: flex; align-items: center; justify-content: center; clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
+	height: 2rem; background-color: rgba(251, 191, 36, 0.2), border: 1px solid rgba(251, 191, 36, 0.5); display: flex; align-items: center; justify-content: center; clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
   .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-	overflow: hidden}
-  /* Animations */ @keyframes borderFlow { 0%; } 100% { background: linear-gradient(45deg, #fbbf24, transparent, transparent, #fbbf24); opacity: 0.8}
-    25% { background: linear-gradient(135deg, transparent, #fbbf24, transparent, transparent); opacity: 1}
-    50% { background: linear-gradient(225deg, transparent, transparent, #fbbf24, transparent); opacity: 0.8}
-    75% { background: linear-gradient(315deg, transparent, transparent, transparent, #fbbf24); opacity: 1}
-  } @keyframes glowPulse { 0%; } 100% { opacity: 0.6} 50% { opacity: 1} }
-  .nier-spinner { animation: spin 1s linear infinite}
+	overflow: hidden;}
+  /* Animations */ @keyframes borderFlow { 0%; } 100% { background: linear-gradient(45deg, #fbbf24, transparent, transparent, #fbbf24), opacity: 0.8;}
+    25% { background: linear-gradient(135deg, transparent, #fbbf24, transparent, transparent), opacity: 1;}
+    50% { background: linear-gradient(225deg, transparent, transparent, #fbbf24, transparent), opacity: 0.8;}
+    75% { background: linear-gradient(315deg, transparent, transparent, transparent, #fbbf24), opacity: 1;}
+  } @keyframes glowPulse { 0%; } 100% { opacity: 0.6;} 50% { opacity: 1;} }
+  .nier-spinner { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
-  /* Responsive Design */ @media (max-width: 768px) { .nier-container { clip-path: polygon(0, 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px)); margin: 1rem; max-height: calc(100vh - 2rem)}
+  /* Responsive Design */ @media (max-width: 768px) { .nier-container { clip-path: polygon(0, 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px)), margin: 1rem; max-height: calc(100vh - 2rem)}
     .nier-modal { max-width: calc(100vw - 2rem)}
-  } /* Accessibility */ @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important}
-  } /* Focus Management */ .nier-input:focus, .nier-search-btn:focus, .nier-filter-btn:focus { outline: 2px solid #fbbf24; outline-offset: 2px}
+  } /* Accessibility */ @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important;}
+  } /* Focus Management */ .nier-input:focus, .nier-search-btn:focus, .nier-filter-btn:focus { outline: 2px solid #fbbf24; outline-offset: 2px;}
 </style>
 
 

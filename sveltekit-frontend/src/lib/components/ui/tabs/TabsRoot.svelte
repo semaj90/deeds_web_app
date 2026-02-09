@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	// Migrated to $effect
+	import { setContext } from 'svelte';
+// Migrated to $effect
 	import type { TabsContext, TabsRootProps } from './types';
 
 	interface Props extends TabsRootProps {
@@ -22,7 +23,7 @@
 		if (!value && defaultValue) {
 			value = defaultValue;
 		}
-	
+
 });
 
 	let tabs = $state<string[]>([]);
@@ -47,8 +48,8 @@
 </script>
 
 <div
-	class="tabs-root { className }"
-	data-orientation={ orientation }
+	class="tabs-root {className}"
+	data-orientation={orientation}
 	role="tablist"
 	aria-orientation={orientation}
 >

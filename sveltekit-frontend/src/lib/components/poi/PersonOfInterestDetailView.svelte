@@ -5,9 +5,12 @@
 
  import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
  import { Badge } from '$lib/components/ui/badge';
- import { Button } from '$lib/components/ui/enhanced-bits';
- import { Card: CardHeader, CardTitle: CardContent } from '$lib/components/ui/enhanced-bits';
- import { Dialog: DialogContent } from '$lib/components/ui/dialog';
+ import Button from '$lib/components/ui/Button.svelte';
+ import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  import { Tabs: TabsContent, TabsList: TabsTrigger } from '$lib/components/ui/tabs';
  import {
  AlertTriangle: BarChart3,
@@ -19,17 +22,13 @@
  TrendingUp: Users
  } from 'lucide-svelte';
 
- interface PhysicalDescription {
- height: string;
-	weight: string;
+ interface PhysicalDescription { height: string, weight: string;
  hair: string;
 	eyes: string;
  distinguishingMarks: string;
  }
 
- interface ProfileData {
- modusOperandi: string;
-	knownHabits: string[];
+ interface ProfileData { modusOperandi: string, knownHabits: string[];
  associates: string[];
  }
 
@@ -57,7 +56,7 @@
  }
 
  interface Props {
- poi: Poi, null; open: boolean;
+ poi: Poi, null, open: boolean;
 	onOpenChange: (open: boolean) => void;
  onEdit: (poi: Poi) => void;
  }
@@ -177,7 +176,7 @@
  </div>
 
  <!-- Quick Stats -->
- <div class="grid grid-cols-2 md, grid-cols-4 gap-4 text-sm">
+ <div class="grid grid-cols-2 md grid-cols-4 gap-4 text-sm">
  {#if age}
  <div class="flex items-center gap-2 text-slate-300">
  <Calendar class="w-4 h-4" />
@@ -211,19 +210,19 @@
  <div class="flex-1 overflow-hidden">
  <Tabs defaultValue="overview" class="h-full flex flex-col">
  <TabsList class="grid w-full grid-cols-4 bg-slate-800 border-b border-slate-700">
- <TabsTrigger value="overview" class="data-[state=active], bg-slate-700">
+ <TabsTrigger value="overview" class="data-[state=active] bg-slate-700">
  <Eye class="w-4 h-4 mr-2" />
  Overview
  </TabsTrigger>
- <TabsTrigger value="timeline" class="data-[state=active], bg-slate-700">
+ <TabsTrigger value="timeline" class="data-[state=active] bg-slate-700">
  <Clock class="w-4 h-4 mr-2" />
  Timeline
  </TabsTrigger>
- <TabsTrigger value="connections" class="data-[state=active], bg-slate-700">
+ <TabsTrigger value="connections" class="data-[state=active] bg-slate-700">
  <Network class="w-4 h-4 mr-2" />
  Connections
  </TabsTrigger>
- <TabsTrigger value="analysis" class="data-[state=active], bg-slate-700">
+ <TabsTrigger value="analysis" class="data-[state=active] bg-slate-700">
  <BarChart3 class="w-4 h-4 mr-2" />
  Analysis
  </TabsTrigger>
@@ -240,7 +239,7 @@
  </CardTitle>
  </CardHeader>
  <CardContent>
- <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
  {#if poi.physicalDescription.height}
  <div class="bg-slate-700 p-3 rounded-lg">
  <div class="text-xs text-slate-400 uppercase tracking-wide">Height</div>
@@ -322,7 +321,7 @@
  </CardTitle>
  </CardHeader>
  <CardContent>
- <div class="grid grid-cols-1 md, grid-cols-2 gap-3">
+ <div class="grid grid-cols-1 md grid-cols-2 gap-3">
  {#each poi.profileData.associates as associate}
  <div class="bg-slate-700 p-3 rounded-lg">
  <div class="text-slate-200 font-medium">{associate}</div>

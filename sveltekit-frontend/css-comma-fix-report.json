@@ -1,0 +1,880 @@
+{
+  "timestamp": "2026-02-08T21:41:12.737Z",
+  "filesProcessed": 1534,
+  "filesChanged": 218,
+  "totalFixes": 4702,
+  "changedFiles": [
+    {
+      "file": "src/lib/components/ActionPopup.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/CaseOutcomePrediction.svelte",
+      "fixes": 84
+    },
+    {
+      "file": "src/lib/components/ComprehensiveUploadAnalytics.svelte",
+      "fixes": 65
+    },
+    {
+      "file": "src/lib/components/DocumentUploadMachineIntegration.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/lib/components/PersonForm.svelte",
+      "fixes": 36
+    },
+    {
+      "file": "src/lib/components/ai/AIAssistantChat.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/AIAssistantModal.svelte",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/components/ai/AIAssistantPanel.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/AIButton.svelte",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/components/ai/AIButtonPortal.svelte",
+      "fixes": 11
+    },
+    {
+      "file": "src/lib/components/ai/AIChat.svelte",
+      "fixes": 16
+    },
+    {
+      "file": "src/lib/components/ai/AIChatInput.svelte",
+      "fixes": 40
+    },
+    {
+      "file": "src/lib/components/ai/AIChatInterface.svelte",
+      "fixes": 12
+    },
+    {
+      "file": "src/lib/components/ai/AIChatMessage.svelte",
+      "fixes": 25
+    },
+    {
+      "file": "src/lib/components/ai/AIChatWidget.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/AIServiceStatus.svelte",
+      "fixes": 22
+    },
+    {
+      "file": "src/lib/components/ai/AIStatusIndicator.svelte",
+      "fixes": 21
+    },
+    {
+      "file": "src/lib/components/ai/AiAssistant.svelte",
+      "fixes": 20
+    },
+    {
+      "file": "src/lib/components/ai/AiSetupBanner.svelte",
+      "fixes": 26
+    },
+    {
+      "file": "src/lib/components/ai/CachePerformanceDashboard.svelte",
+      "fixes": 86
+    },
+    {
+      "file": "src/lib/components/ai/CaseScoringDashboard.svelte",
+      "fixes": 77
+    },
+    {
+      "file": "src/lib/components/ai/ChatInterface.svelte",
+      "fixes": 9
+    },
+    {
+      "file": "src/lib/components/ai/ChatMessage.svelte",
+      "fixes": 11
+    },
+    {
+      "file": "src/lib/components/ai/ContextualChatDemo.svelte",
+      "fixes": 66
+    },
+    {
+      "file": "src/lib/components/ai/ContextualEvidenceChatModal.svelte",
+      "fixes": 32
+    },
+    {
+      "file": "src/lib/components/ai/CudaSearch.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/ai/DocumentUploadSimulator.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ai/Enhanced3DLegalAIInterface.svelte",
+      "fixes": 141
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedAIAssistant.simple.svelte",
+      "fixes": 21
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedAIAssistant.svelte",
+      "fixes": 108
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedAIChat.svelte",
+      "fixes": 19
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedAIChatTest.svelte",
+      "fixes": 13
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedContextualChat.svelte",
+      "fixes": 41
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedDocumentUploader.svelte",
+      "fixes": 30
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedFileUpload.svelte",
+      "fixes": 14
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte",
+      "fixes": 26
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedMCPIntegration.svelte",
+      "fixes": 26
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedRAGDemo.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ai/EnhancedVectorSearch.svelte",
+      "fixes": 63
+    },
+    {
+      "file": "src/lib/components/ai/EvidenceCanvas.svelte",
+      "fixes": 49
+    },
+    {
+      "file": "src/lib/components/ai/EvidenceTimelineCard.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ai/FindModal.svelte",
+      "fixes": 28
+    },
+    {
+      "file": "src/lib/components/ai/GPUStreamingChat.svelte",
+      "fixes": 45
+    },
+    {
+      "file": "src/lib/components/ai/GamingAIInterface.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ai/Gemma270MWebAssembly.svelte",
+      "fixes": 7
+    },
+    {
+      "file": "src/lib/components/ai/Gemma3LegalChat.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/ai/IngestAIAssistant.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ai/IntegratedAIChat.svelte",
+      "fixes": 11
+    },
+    {
+      "file": "src/lib/components/ai/IntelligentModelOrchestrator.svelte",
+      "fixes": 7
+    },
+    {
+      "file": "src/lib/components/ai/IntelligentWebAnalysisDemo.svelte",
+      "fixes": 63
+    },
+    {
+      "file": "src/lib/components/ai/LLMProviderSelector.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/LegalAIPipelineDemo.svelte",
+      "fixes": 69
+    },
+    {
+      "file": "src/lib/components/ai/LegalDocumentDrafting.svelte",
+      "fixes": 127
+    },
+    {
+      "file": "src/lib/components/ai/LegalDocumentSummarizer.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/LocalImageGenerator.svelte",
+      "fixes": 42
+    },
+    {
+      "file": "src/lib/components/ai/ModularAIExperience.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/ai/MultiAgentAnalysisCard.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/lib/components/ai/NESTextureStreamer.svelte",
+      "fixes": 106
+    },
+    {
+      "file": "src/lib/components/ai/NeuralTopology3DDemo.svelte",
+      "fixes": 42
+    },
+    {
+      "file": "src/lib/components/ai/OCRTensorDemo.svelte",
+      "fixes": 50
+    },
+    {
+      "file": "src/lib/components/ai/PatternDetectionInterface.svelte",
+      "fixes": 97
+    },
+    {
+      "file": "src/lib/components/ai/PersonOfInterestCard.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/lib/components/ai/Phase8Demo.svelte",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/components/ai/ProactivePrompt.svelte",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/components/ai/QLorATrainingPanel.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ai/RAGAssistantChat.svelte",
+      "fixes": 86
+    },
+    {
+      "file": "src/lib/components/ai/RecommendationEngine.svelte",
+      "fixes": 119
+    },
+    {
+      "file": "src/lib/components/ai/SIMDAIAssistantDemo.svelte",
+      "fixes": 9
+    },
+    {
+      "file": "src/lib/components/ai/SIMDGlyphDemo.svelte",
+      "fixes": 7
+    },
+    {
+      "file": "src/lib/components/ai/SIMDTextTilingDemo.svelte",
+      "fixes": 10
+    },
+    {
+      "file": "src/lib/components/ai/SOMVisualization.svelte",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/components/ai/SimpleWorkingChat.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/SmartSearchInterface.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/lib/components/ai/SoraGraphVisualization.svelte",
+      "fixes": 106
+    },
+    {
+      "file": "src/lib/components/ai/ThinkingStyleToggle.svelte",
+      "fixes": 27
+    },
+    {
+      "file": "src/lib/components/ai/TypewriterResponse.svelte",
+      "fixes": 38
+    },
+    {
+      "file": "src/lib/components/ai/UnifiedAIAssistant.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/lib/components/ai/XStatePhase8Integration.svelte",
+      "fixes": 20
+    },
+    {
+      "file": "src/lib/components/ai/ollama-agent-shell.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ai/webgpu-viewer.svelte",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/components/auth/NesAuthButton.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/auth/RegisterForm.simple.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/bits-ui/ButtonExampleUsage.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte",
+      "fixes": 45
+    },
+    {
+      "file": "src/lib/components/canvas/EnhancedEvidenceCanvas.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/canvas/EnhancedLegalCanvas.svelte",
+      "fixes": 11
+    },
+    {
+      "file": "src/lib/components/canvas/EvidenceCanvas.svelte",
+      "fixes": 10
+    },
+    {
+      "file": "src/lib/components/canvas/EvidenceNode.svelte",
+      "fixes": 17
+    },
+    {
+      "file": "src/lib/components/canvas/POINode.svelte",
+      "fixes": 21
+    },
+    {
+      "file": "src/lib/components/canvas/RecursiveEvidenceNode.svelte",
+      "fixes": 71
+    },
+    {
+      "file": "src/lib/components/canvas/RecursiveEvidenceVisualization.svelte",
+      "fixes": 27
+    },
+    {
+      "file": "src/lib/components/canvas/UnifiedCanvasIntegration.svelte",
+      "fixes": 25
+    },
+    {
+      "file": "src/lib/components/canvas/WebGPUCanvas.svelte",
+      "fixes": 13
+    },
+    {
+      "file": "src/lib/components/cases/CaseCard.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/cases/CaseNotesEditor.svelte",
+      "fixes": 44
+    },
+    {
+      "file": "src/lib/components/cases/CaseStats.svelte",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/components/cases/EvidenceCard.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/chat/ChatMessage.svelte",
+      "fixes": 22
+    },
+    {
+      "file": "src/lib/components/chat/SSRQLorAChatInterface.svelte",
+      "fixes": 52
+    },
+    {
+      "file": "src/lib/components/citations/CitationSaveForm.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/citations/CitationsList.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/citations/CitationsManager.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/citations/CitationsSaveButton.svelte",
+      "fixes": 16
+    },
+    {
+      "file": "src/lib/components/codebase/GraphExport.svelte",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/components/codebase/RouteGraph.svelte",
+      "fixes": 10
+    },
+    {
+      "file": "src/lib/components/dashboard/CachePerformanceMonitor.svelte",
+      "fixes": 17
+    },
+    {
+      "file": "src/lib/components/dashboard/EvidenceAnalysisDashboard.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/dashboard/LegalAIDashboard.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/detective/DetectiveBoard.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/detective/EvidenceCard.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/detective/UploadZone.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/editor/ReportToolbar.svelte",
+      "fixes": 19
+    },
+    {
+      "file": "src/lib/components/editor/RichTextEditor.svelte",
+      "fixes": 12
+    },
+    {
+      "file": "src/lib/components/editor/WysiwygEditor.svelte",
+      "fixes": 44
+    },
+    {
+      "file": "src/lib/components/editors/LegalRichTextEditor.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/lib/components/error-analysis/KnowledgeGraph.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/lib/components/evidence-editor/AIAssistantPanel.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/evidence-editor/VisualEvidenceEditor.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/evidence/+EvidenceUpload.svelte",
+      "fixes": 7
+    },
+    {
+      "file": "src/lib/components/evidence/CaseEvidenceOrganizer.svelte",
+      "fixes": 83
+    },
+    {
+      "file": "src/lib/components/evidence/Enhanced3DEvidenceBoard.svelte",
+      "fixes": 22
+    },
+    {
+      "file": "src/lib/components/evidence/EnhancedEvidenceBoard.svelte",
+      "fixes": 15
+    },
+    {
+      "file": "src/lib/components/evidence/EvidenceBoard.svelte",
+      "fixes": 10
+    },
+    {
+      "file": "src/lib/components/evidence/EvidenceCanvas.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/evidence/EvidenceFilesManager.svelte",
+      "fixes": 12
+    },
+    {
+      "file": "src/lib/components/evidence/EvidenceManager.svelte",
+      "fixes": 20
+    },
+    {
+      "file": "src/lib/components/evidence/EvidenceUploader.svelte",
+      "fixes": 12
+    },
+    {
+      "file": "src/lib/components/feedback/FeedbackIntegration.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/feedback/FeedbackWidget.svelte",
+      "fixes": 43
+    },
+    {
+      "file": "src/lib/components/forms/CaseForm.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/forms/EnhancedCaseForm.svelte",
+      "fixes": 28
+    },
+    {
+      "file": "src/lib/components/forms/EnhancedFileUpload.svelte",
+      "fixes": 123
+    },
+    {
+      "file": "src/lib/components/forms/EnhancedFormInput.svelte",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/components/forms/EvidenceForm.svelte",
+      "fixes": 11
+    },
+    {
+      "file": "src/lib/components/forms/SmartDocumentForm.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/glyph/GlyphGenerator.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/lib/components/glyph/SIMDGlyphRenderer.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/integration/LegalAIOrchestrationDemo.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/keyboard/KeyboardShortcuts.svelte",
+      "fixes": 70
+    },
+    {
+      "file": "src/lib/components/layout/EnhancedLayout.svelte",
+      "fixes": 38
+    },
+    {
+      "file": "src/lib/components/layout/EnhancedPageLayout.svelte",
+      "fixes": 23
+    },
+    {
+      "file": "src/lib/components/layout/PageLayout.svelte",
+      "fixes": 11
+    },
+    {
+      "file": "src/lib/components/layout/UserMenu.svelte",
+      "fixes": 63
+    },
+    {
+      "file": "src/lib/components/legal/AISummaryReader.svelte",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/components/legal/CitationManager.svelte",
+      "fixes": 63
+    },
+    {
+      "file": "src/lib/components/legal/CollaborationPanel.svelte",
+      "fixes": 18
+    },
+    {
+      "file": "src/lib/components/legal/ContractAnalyzer.svelte",
+      "fixes": 53
+    },
+    {
+      "file": "src/lib/components/legal/CriminalProfile.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/legal/CustodyTimeline.svelte",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/components/legal/DocumentDetails.old.svelte",
+      "fixes": 25
+    },
+    {
+      "file": "src/lib/components/legal/EvidenceCustodyFlow.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/legal/EvidenceManager.svelte",
+      "fixes": 65
+    },
+    {
+      "file": "src/lib/components/legal/EvidenceReportSummary.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/legal/EvidenceUpload.svelte",
+      "fixes": 58
+    },
+    {
+      "file": "src/lib/components/legal/LegalAIChat.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/legal/LegalAIWorkflow.svelte",
+      "fixes": 160
+    },
+    {
+      "file": "src/lib/components/legal/LegalDocumentProcessor.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/legal/LegalPrecedentCard.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/modals/AISummaryModal.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/modals/EvidenceCRUDModal.svelte",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/components/modals/EvidenceModal.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/navigation/DemoNavigation.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/notifications/DocumentUpdateNotifications.svelte",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/components/notifications/EnhancedNotificationContainer.svelte",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/components/observability/ObservabilityPanel.svelte",
+      "fixes": 59
+    },
+    {
+      "file": "src/lib/components/onboarding/OnboardingOverlay.svelte",
+      "fixes": 61
+    },
+    {
+      "file": "src/lib/components/poi/POIForm.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/prosecutor/EvidenceUploadComponent.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/rag/DocumentModal.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/subcomponents/ProgressIndicator.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/three/YoRHaQuantumVisualization.svelte",
+      "fixes": 26
+    },
+    {
+      "file": "src/lib/components/ui/CSSActivator.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ui/CaseForm.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/ui/ComponentValidationTest.svelte",
+      "fixes": 12
+    },
+    {
+      "file": "src/lib/components/ui/DataGrid.svelte",
+      "fixes": 31
+    },
+    {
+      "file": "src/lib/components/ui/DialogWrapper.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/ui/DragDropZone.svelte",
+      "fixes": 12
+    },
+    {
+      "file": "src/lib/components/ui/Dropdown.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ui/EvidenceCard.svelte",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/components/ui/FinalFantasyModal.svelte",
+      "fixes": 9
+    },
+    {
+      "file": "src/lib/components/ui/GPUInferenceDemo.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ui/GPULoadingProgress.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/ui/GlobalLoadingIndicator.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/ui/MarkdownRenderer.svelte",
+      "fixes": 30
+    },
+    {
+      "file": "src/lib/components/ui/Modal.svelte",
+      "fixes": 8
+    },
+    {
+      "file": "src/lib/components/ui/ModalManager.svelte",
+      "fixes": 5
+    },
+    {
+      "file": "src/lib/components/ui/RetroModal.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/ui/RichTextEditor.svelte",
+      "fixes": 10
+    },
+    {
+      "file": "src/lib/components/ui/SIMDTiledShaderEmbeds.svelte",
+      "fixes": 47
+    },
+    {
+      "file": "src/lib/components/ui/SearchBar.svelte",
+      "fixes": 19
+    },
+    {
+      "file": "src/lib/components/ui/SearchBox.svelte",
+      "fixes": 24
+    },
+    {
+      "file": "src/lib/components/ui/SimpleDragDrop.svelte",
+      "fixes": 23
+    },
+    {
+      "file": "src/lib/components/ui/SmartTextarea.svelte",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/components/ui/ToastContainer.svelte",
+      "fixes": 10
+    },
+    {
+      "file": "src/lib/components/ui/ZeroLatencyInteraction.svelte",
+      "fixes": 6
+    },
+    {
+      "file": "src/lib/components/unified/UnifiedDialog.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/unified/UnifiedVectorInterface.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/lib/components/upload/EnhancedLegalUpload.svelte",
+      "fixes": 40
+    },
+    {
+      "file": "src/lib/components/visualizations/WebGPUEvidenceGraphVisualization.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/components/yorha/PoliceReportGenerator.svelte",
+      "fixes": 3
+    },
+    {
+      "file": "src/lib/components/yorha/YoRHaDetectiveModal.svelte",
+      "fixes": 9
+    },
+    {
+      "file": "src/lib/components/yorha/_simulations/CanvasBoard.svelte",
+      "fixes": 11
+    },
+    {
+      "file": "src/routes__parked/evidence-workspace/+page.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/routes__parked/gaming-evidence-board/+page.svelte",
+      "fixes": 9
+    },
+    {
+      "file": "src/routes_parked/(ai)_disabled/chat-simple/+page.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/routes_parked/(legal)_disabled/legal-hub.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/routes_parked/(tools)_disabled/cuda-search/+page.svelte",
+      "fixes": 26
+    },
+    {
+      "file": "src/routes_parked/admin/users/[userId]/+page.svelte",
+      "fixes": 5
+    },
+    {
+      "file": "src/routes_parked/agent-demo/+page.svelte",
+      "fixes": 8
+    },
+    {
+      "file": "src/routes_parked/agent-demo/page-backup.svelte",
+      "fixes": 8
+    },
+    {
+      "file": "src/routes_parked/archive/demos/demo/legal-research/+page.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/routes_parked/archive/demos/vector-search-demo/+page.svelte",
+      "fixes": 4
+    },
+    {
+      "file": "src/routes_parked/auth/login/simple/+page.svelte",
+      "fixes": 39
+    },
+    {
+      "file": "src/routes_parked/graph/+page.svelte",
+      "fixes": 2
+    },
+    {
+      "file": "src/routes_parked/interactive-canvas/+page.svelte",
+      "fixes": 20
+    },
+    {
+      "file": "src/routes_parked/investigation/+page.svelte",
+      "fixes": 8
+    },
+    {
+      "file": "src/routes_parked/register/+page.svelte",
+      "fixes": 33
+    },
+    {
+      "file": "src/routes_parked/ui-preview/+page.svelte",
+      "fixes": 6
+    }
+  ]
+}

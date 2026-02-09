@@ -16,7 +16,6 @@ import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getPatternStorage } from './PatternStorage.js';
 import { getErrorClustering } from './ErrorClustering.js';
 import type { PolicyState, Experience } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface LearningPipelineConfig {
 	updateIntervalMs: number;
@@ -118,7 +117,7 @@ export class LearningPipeline {
 		this.updateTimer = setTimeout(async () => {
 			await this.runUpdateCycle();
 			this.scheduleNextUpdate();
-		}; this.config.updateIntervalMs);
+		}, this.config.updateIntervalMs);
 	}
 
 
@@ -199,7 +198,8 @@ export class LearningPipeline {
 				success: true,
 				version: policy.getState().version,
 				message: `Policy updated to v${policy.getState().version}`,
-				validationScore: rollback, false
+				validationScore,
+				rollback: false
 			};
 
 		} catch (error) {
@@ -219,8 +219,9 @@ export class LearningPipeline {
 			return {
 				success: false,
 				version: policy.getState().version,
-				message: error instanceof Error ? error.message : String(error, rollback: true
-			},
+				message: error instanceof Error ? error.message : String(error),
+				rollback: true
+			};
 	}
 	}
 

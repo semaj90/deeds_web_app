@@ -41,7 +41,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
         const validTypes = ['view', 'navigate', 'analyze', 'patch_apply'];
         if (!interaction_type || !validTypes.includes(interaction_type)) {
             return error(400, {
-                message: `Invalid interaction_type. Must be one of: ${validTypes.join(', ')}`,
+                message: `Invalid interaction_type. Must be one, of: ${validTypes.join(', ')}`,
             });
         }
 

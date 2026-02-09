@@ -4,7 +4,7 @@
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
-  import { Progress } from '$lib/components/ui/progress/index.js';
+  import * as Progress from '$lib/components/ui/progress/index.js';
   import * as Tabs from '$lib/components/ui/tabs/index.js';
   import Activity from 'lucide-svelte/icons/activity';
   import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
@@ -16,8 +16,6 @@
   import Trash2 from 'lucide-svelte/icons/trash-2';
   import XCircle from 'lucide-svelte/icons/x-circle';
   import Zap from 'lucide-svelte/icons/zap';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
 
   // State management (Svelte 5)
@@ -98,7 +96,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	key: cacheKey,
           value: cacheValue,
           options: {
-	ttl: parseInt(selectedTTL) * 1000,
+ttl: parseInt(selectedTTL) * 1000,
             priority: selectedPriority,
             tags: tags.length > 0 ? tags : undefined
           }
@@ -215,7 +213,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	operations: testData })
+operations: testData })
       });
       const result = await response.json();
       const duration = Date.now() - startTime;
@@ -255,7 +253,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	key: testKey, value: 'test_data', options: {
-	ttl: 60000 } })
+ttl: 60000 } })
       });
 
       // Test cache hit
@@ -303,7 +301,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     refreshStats();
     const interval = setInterval(refreshStats, 10000);
     return () => clearInterval(interval);
-  
+
 });
 </script>
 
@@ -459,7 +457,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
     <Tabs.Content value="statistics">
       {#if cacheStats}
-        <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
             <h4 class="text-sm text-gray-400 mb-2">Service Stats</h4>
             <div class="space-y-1">

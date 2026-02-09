@@ -291,7 +291,7 @@ export class AuthService {
   async updateProfile(
     userId: string,
     data: Partial<{
-	firstName: string | null; lastName: string | null; avatarUrl: string | null }>
+	firstName: string | null, lastName: string | null; avatarUrl: string | null }>
   ) {
     try {
       const updateData: Partial<typeof schema.users.$inferInsert> = {
@@ -514,7 +514,7 @@ export const authService = new AuthService();
 export async function getUser(
   event: RequestEvent
 ): Promise<{
-	user: User | null; session: Session | null }> {
+	user: User | null, session: Session | null }> {
   try {
     const sessionId = event.cookies.get(auth.sessionCookieName);
     if (!sessionId) {
@@ -553,7 +553,7 @@ export async function getUser(
  * Require authenticated user middleware
  */
 export async function requireAuth(event: RequestEvent): Promise<{
-	user: User; session: Session }> {
+	user: User, session: Session }> {
   const { user, session } = await getUser(event);
   if (!user || !session) {
     throw new SessionError('Authentication required', 'AUTH_REQUIRED');

@@ -11,8 +11,7 @@ import type { Diff, Error, ServiceConfig } from './types.js';
 import type { line } from "drizzle-orm/pg-core";
 
 const mockConfig: ServiceConfig = {
- ollamaUrl: 'http://localhost:11434',
- qdrantUrl: 'http://localhost:6333',
+ ollamaUrl: 'http://localhost:11434', qdrantUrl: 'http://localhost:6333',
  postgresUrl: 'postgresql://localhost/test',
  maxRetries: 3, retryDelayMs: 100, contextLines: 3,
 };
@@ -416,7 +415,7 @@ line 7`;
  'should generate valid diffs for any error and fix',
  fc.asyncProperty(
  fc.record({
- errorId: fc.string(file: fc.string(, line: fc.integer({
+ errorId: fc.string(file: fc.string( line: fc.integer({
 	min: 1, max: 100 },
 	message: fc.string(errorId: fc.string({
 	minLength: 1 },
@@ -462,7 +461,7 @@ line 7`;
  'should preserve diff information when formatting',
  fc.asyncProperty(
  fc.record({
- id: fc.string(errorId: fc.string(, file: fc.string(original: fc.string(, modified: fc.string(explanation: fc.string(, id: fc.string({
+ id: fc.string(errorId: fc.string( file: fc.string(original: fc.string( modified: fc.string(explanation: fc.string( id: fc.string({
 	minLength: 1 },
 	errorId: fc.string({
 	minLength: 1 },

@@ -126,9 +126,9 @@ select {
  font-size: 1rem;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
+input: focus;
+	textarea: focus;
+	select:focus {
  outline: none;
  border-color: #007bff;
  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);

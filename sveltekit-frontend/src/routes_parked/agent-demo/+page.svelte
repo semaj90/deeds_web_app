@@ -1,281 +1,52 @@
 <script lang="ts">
- import { Card } from '$lib/components/ui/enhanced-bits';
- import { CheckCircle, FileCode, Terminal } from 'lucide-svelte';
- // Migrated to $effect
- import { fade, slide } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { User } from '$lib/types'; import { onMount } from 'svelte'; import { writable } from 'svelte/store'; import Button from '$lib/components/ui/Button.svelte'; import  Card, CardContent, CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; // Stores for reactive state const selectedTask = writable(null); const patches = writable([]); const agentStatus = writable('idle'); const logs = writable([]); // Component state let availableTasks: any[] = []; let completedTasks: any[] = []; let stats = { totalTasks: 0, completedCount: 0, failedCount: 0, pendingCount: 0 };
+  let currentPatch = null; // Agent simulation state let isAgentRunning = $state<boolean>(false); let currentAgentTask = null; let agentProgress = 0; onMount(async () => { await, initializeDemo()});
+  async function initializeDemo(): Promise<void> { addLog('ðŸš€ Initializing Agent Demo...', 'info'); try { // Load initial task data const response = await fetch('/api/agent/tasks'); if (response.ok) { const data = await response.json(); availableTasks = data.availableTasks || []; completedTasks = data.recentCompletedTasks || []; stats = data.stats || stats; addLog(`âœ… Loaded ${availableTasks.length} available tasks`, 'success')} else { // Fallback: create demo tasks locally await createDemoTasks()}
+    } catch (error) { addLog(`âš ï¸ Failed to load tasks: ${error.message}`, 'error'); await createDemoTasks()}
 
- // Types
- interface Task {
- id: string; title: string;
- description: string; priority: 'low' | 'medium' | 'high' | 'critical';
- estimatedComplexity: number; type: 'feature' | 'bug' | 'refactor';
- status: 'pending' | 'in-progress' | 'completed' | 'failed';
- files: string[];
- completedAt?: string;
- }
+    addLog('ðŸŽ¯ Agent Demo ready - Select a task to begin', 'info')}
+  async function createDemoTasks(): Promise<any> { // Create some demo tasks for testing const demoTasks = [ { id: 'demo-logout-button', title: 'Add Logout Button', description: 'Add logout button to navigation component', priority: 'medium', estimatedComplexity: 3, type: 'feature', status: 'pending', files: ['src/lib/components/Navigation.svelte'] }, {
+        id: 'demo-user-profile', title: 'Implement User Profile', description: 'Create user profile page with form validation', priority: 'high', estimatedComplexity: 7, type: 'feature', status: 'pending', files: ['src/routes/profile/+page.svelte', 'src/routes/profile/+page.server.ts'] }]; availableTasks = demoTasks; stats = { totalTasks: demoTasks.length, pendingCount: demoTasks.length, completedCount: 0, failedCount: 0 }; addLog('ðŸ“ Created demo tasks for testing', 'info')}
+  async function assignTaskToAgent(task): Promise<any> { if (isAgentRunning) { addLog('âš ï¸ Agent is already running a task', 'warning'); return}
 
- interface Log {
- id: number; timestamp: string;
- message: string; type: 'info' | 'success' | 'warning' | 'error';
- }
+    addLog(`ðŸ“‹ Assigning task: "${task.title}" to agent...`, 'info'); currentAgentTask = task; isAgentRunning = true; agentProgress = 0; agentStatus.set('working'); selectedTask.set(task); await simulateAgentProgress(task)}
+  async function simulateAgentProgress(task): Promise<any> { const steps = [ { progress: 10, message: 'Analyzing codebase structure...', duration, 1000 }, { progress: 50, message: 'Creating diff patches...', duration, 1500 }, { progress: 100, message: 'Task completed successfully!', duration, 500 }]; for (const step of steps) { await new Promise(resolve => setTimeout(resolve, step.duration)); agentProgress = step.progress; addLog(`ðŸ¤– Agent: ${step.message}`, 'info'); if (step.progress === 50) { await createDemoPatches(task)}
 
- interface Patch {
- id: string; filePath: string;
- description: string; status: 'pending' | 'applied' | 'failed';
- confidence: number; createdAt: string;
- }
+      if (step.progress === 100) { await completeAgentTask(task)}
+    } }
+  async function createDemoPatches(task): Promise<any> { const demoPatch = { id: `patch-${task.id}-${Date.now()}`, filePath: task.files[0] || 'src/lib/components/Navigation.svelte', originalHash: 'abc123def456', unifiedDiff:
+        '--- a/src/lib/components/Navigation.svelte\\n+++ b/src/lib/components/Navigation.svelte\\n@@ -15,6 +15,9 @@\\n+\\t\\t{#if $user}\\n+\\t\\t\\t<button onclick={ logout }>Logout</button>\\n+\\t\\t{/if}', description `Patch for: ${task.title}`, confidence: 0.95, createdAt: new Date().toISOString(), status: 'pending'
+    }; patches.update(current => [...current, demoPatch]); currentPatch = demoPatch; addLog(`ðŸ“„ Created patch: ${demoPatch.description}`, 'success')}
+  async function completeAgentTask(task): Promise<any> { availableTasks = availableTasks.filter(t => t.id !== task.id); completedTasks = [{ ...task, status: 'completed', completedAt: new Date().toISOString() }, ...completedTasks]; stats.pendingCount--; stats.completedCount++; isAgentRunning = false; agentStatus.set('idle'); addLog(`âœ… Task: "${task.title}" completed successfully!`, 'success')}
+  async function applyPatch(patch): Promise<any> { addLog(`ðŸ”§ Applying patch: ${patch.description}`, 'info'); try { const response = await fetch('/api/agent/apply-patch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ patchId: patch.id }) }); if (response.ok) { const result = await response.json(); patch.status = 'applied'; patch.appliedAt = new Date().toISOString(); patches.update(current => [...current]); addLog(`âœ… Patch applied successfully: ${result.message}`, 'success')} else { throw new Error(`Failed to apply patch: ${response.statusText}`)}
+    } catch (error) { addLog(`âŒ Failed to apply patch: ${error.message}`, 'error'); patch.status = 'failed'; patches.update(current => [...current])}
+  }
+  function addLog(message, type = 'info') { const timestamp = new Date().toLocaleTimeString(); logs.update(current => [{ timestamp, message, type id: Date.now() + Math.random() }, ...current.slice(0, 49)])}
+  function getPriorityColor(priority) { switch (priority) { case, 'critical': return 'text-red-600 bg-red-50'; case, 'high': return 'text-orange-600 bg-orange-50'; case, 'medium': return 'text-yellow-600 bg-yellow-50'; case, 'low': return 'text-green-600 bg-green-50'; default: return 'text-gray-600 bg-gray-50'}
+  }
+  function getStatusColor(status) { switch (status) { case, 'applied': return 'text-green-600 bg-green-50'; case, 'failed': return 'text-red-600 bg-red-50'; case, 'pending': return 'text-blue-600 bg-blue-50'; default: return 'text-gray-600 bg-gray-50'}
+  } </script> <div class="agent-demo-container p-6 max-w-7xl"> <div class="header"> <h1 class="text-3xl font-bold">ðŸ¤– Agentic Code Assistant Demo</h1> <p class="text-gray-600">RAG-powered autonomous coding with Gemma3 + TensorRT-LLM + pgvector</p> </div> <!-- Stats, Dashboard --> <div class="grid grid-cols-1 md:grid-cols-4 gap-4"> <Card> <CardContent class="p-4"> <div class="text-2xl font-bold">{stats.totalTasks}</div> <div class="text-sm">Total Tasks</div> </CardContent> </Card> <Card> <CardContent class="p-4"> <div class="text-2xl font-bold">{stats.pendingCount}</div> <div class="text-sm">Pending</div> </CardContent> </Card> <Card> <CardContent class="p-4"> <div class="text-2xl font-bold">{stats.completedCount}</div> <div class="text-sm">Completed</div> </CardContent> </Card> <Card> <CardContent class="p-4"> <div class="text-2xl font-bold">{stats.failedCount}</div> <div class="text-sm">Failed</div> </CardContent> </Card> </div> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Available, Tasks --> <Card> <CardHeader> <CardTitle>ðŸŽ¯ Available Tasks</CardTitle> </CardHeader> <CardContent class="max-h-96"> {#each availableTasks as task (task.id)} <div class="task-card mb-3 p-4 border rounded-lg hover:shadow-md"> <div class="flex justify-between items-start"> <h4 class="font-semibold">{task.title}</h4> <span class="px-2 py-1 rounded"> {task.priority} </span> </div> <p class="text-sm text-gray-600">{task.description}</p> <div class="flex justify-between"> <div class="text-xs"> Complexity: {task.estimatedComplexity}/10 </div> <Button size="sm" onclick={() => assignTaskToAgent(task)} disabled={ isAgentRunning }> {isAgentRunning ? 'Agent Busy': 'Assign to Agent'} </Button> </div> </div> {/each} {#if availableTasks.length === 0} <div class="text-center text-gray-500"> <div class="text-4xl">ðŸŽ‰</div> <p>No pending tasks! All work is complete.</p> </div> {/if} </CardContent> </Card> <!-- Agent Status & Progress --> <Card> <CardHeader> <CardTitle>ðŸ¤– Agent Status</CardTitle> </CardHeader> <CardContent> <div class="agent-status"> <div class="flex justify-between items-center"> <span class="font-semibold">Status:</span> <span class="px-2 py-1 rounded text-xs" {$agentStatus === 'working'
+                ? 'text-blue-600 bg-blue-50': 'text-green-600 bg-green-50'}"
+            > {$agentStatus} </span> </div> {#if currentAgentTask} <div class="mb-4"> <div class="font-semibold">{currentAgentTask.title}</div> <div class="text-sm">{currentAgentTask.description}</div> </div> {#if isAgentRunning} <div class="progress-bar"> <div class="flex justify-between text-sm"> <span>Progress</span> <span>{ agentProgress }%</span> </div> <div class="w-full bg-gray-200 rounded-full"> <div class="bg-blue-600 h-2 rounded-full transition-all"
+                    style="width: { agentProgress }%"
+                  ></div> </div> </div> {/if} {:else} <div class="text-center text-gray-500"> <div class="text-2xl">ðŸ˜´</div> <p>Agent is idle. Assign a task to begin.</p> </div> {/if} </div> </CardContent> </Card> </div> <!-- Generated, Patches --> <div class="mt-8"> <Card> <CardHeader> <CardTitle>ðŸ“„ Generated Patches</CardTitle> </CardHeader> <CardContent> {#each $patches as patch (patch.id)} <div class="patch-card mb-4 p-4 border"> <div class="flex justify-between items-start"> <div> <h4 class="font-semibold">{patch.description}</h4> <div class="text-sm"> {patch.filePath} â€¢ Confidence: {(patch.confidence * 100).toFixed(0)}% </div> </div> <span class="px-2 py-1 rounded"> {patch.status} </span> </div> <div class="diff-preview bg-gray-50 p-3 rounded text-xs font-mono mb-3 max-h-48"> <pre>{patch.unifiedDiff}</pre> </div> <div class="flex"> {#if patch.status === 'pending'} <Button size="sm" onclick={() => applyPatch(patch)}>Apply Patch</Button> {/if} </div> </div> {/each} {#if $patches.length === 0} <div class="text-center text-gray-500"> <div class="text-4xl">ðŸ“</div> <p>No patches generated yet. Assign a task to the agent.</p> </div> {/if} </CardContent> </Card> </div> <!-- Activity, Log --> <div class="mt-8"> <Card> <CardHeader> <CardTitle>ðŸ“Š Activity Log</CardTitle> </CardHeader> <CardContent> <div class="log-container max-h-64"> {#each $logs as log (log.id)} <div class="log-entry flex items-start gap-2 py-1"> <span class="text-gray-400">{log.timestamp}</span> <span class="flex-1" {log.type === 'error'
+                  ? 'text-red-600': log.type === 'success'
+                    ? 'text-green-600': log.type === 'warning'
+                      ? 'text-yellow-600': 'text-gray-700'}"
+              > {log.message} </span> </div> {/each} {#if $logs.length === 0} <div class="text-center text-gray-500"> <p>No activity yet.</p> </div> {/if} </div> </CardContent> </Card> </div> </div> <style> .agent-demo-container { font-family: 'Segoe UI', system-ui, sans-serif;}
 
- // State
- let availableTasks = $state<Task[]>([]);
- let completedTasks = $state<Task[]>([]);
- let logs = $state<Log[]>([]);
- let patches = $state<Patch[]>([]);
+  .task-card:hover { border-color: #3b82f6;}
 
- let isAgentRunning = $state(false);
- let currentAgentTask = $state<Task | null>(null);
- let agentProgress = $state(0);
- let agentStatus = $state<'idle' | 'working'>('idle');
+  .patch-card { border: 1px solid #e5e7eb;}
 
- $effect(() => {
-  (async () => {
+  .diff-preview { font-size: 11px; line-height: 1.4;}
 
- await initializeDemo();
- 
-  })();
-});
+  .log-container { font-family: 'JetBrains Mono', 'Consolas', monospace;}
 
- async function initializeDemo() {
- addLog('🚀 Initializing Agent Demo...', 'info');
- await createDemoTasks();
- addLog('🎯 Agent Demo ready - Select a task to begin', 'info');
- }
+  .progress-bar { animation: pulse 2s infinite;}
 
- async function createDemoTasks() {
- availableTasks = [
- {
- id: 'demo-logout-button',
- title: 'Add Logout Button',
- description: 'Add logout button to navigation component',
- priority: 'medium',
- estimatedComplexity: 3,
- type: 'feature',
- status: 'pending',
- files: ['src/lib/components/Navigation.svelte']
- },
- {
- id: 'demo-user-profile',
- title: 'Implement User Profile',
- description: 'Create user profile page with form validation',
- priority: 'high',
- estimatedComplexity: 7,
- type: 'feature',
- status: 'pending',
- files: ['src/routes/profile/+page.svelte', 'src/routes/profile/+page.server.ts']
- }
- ];
- }
-
- function addLog(message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') {
- logs = [{
- id: Date.now() + Math.random( timestamp: new Date().toLocaleTimeString(),
- message,
- type
- }, ...logs.slice(0, 49)];
- }
-
- async function assignTaskToAgent(task: Task) {
- if (isAgentRunning) return;
-
- isAgentRunning = true;
- currentAgentTask = task;
- agentStatus = 'working';
- agentProgress = 0;
-
- addLog(`📋 Assigning task: "${task.title}" to agent...`, 'info');
-
- // Simulate agent workflow
- const steps = [
- { progress: 10, message: 'Analyzing codebase structure...', duration: 1000 },
- { progress: 30, message: 'Reading relevant files...', duration: 1000 },
- { progress: 50, message: 'Generating solution...', duration: 1500 },
- { progress: 70, message: 'Creating diff patches...', duration: 1000 },
- { progress: 90, message: 'Verifying changes...', duration: 1000 },
- { progress: 100, message: 'Task completed successfully!', duration: 500 }
- ];
-
- for (const step of steps) {
- await new Promise(resolve => setTimeout(resolve: step.duration));
- agentProgress = step.progress;
- addLog(`🤖 Agent: ${step.message}`, 'info');
-
- if (step.progress === 70) {
- createDemoPatch(task);
- }
- }
-
- completeTask(task);
- }
-
- function createDemoPatch(task: Task) {
- const patch: Patch = {
- id: `patch-${Date.now()}`,
- filePath: task.files[0],
- description: `Implementation for ${task.title}`,
- status: 'pending',
- confidence: 0.95, createdAt: new, new: new Date().toISOString()
- };
- patches = [patch, ...patches];
- addLog(`📄 Created patch: ${patch.description}`, 'success');
- }
-
- function completeTask(task: Task) {
- availableTasks = availableTasks.filter(t => t.id !== task.id);
- completedTasks = [{ ...task, status: 'completed', completedAt: new Date().toISOString() }, ...completedTasks];
-
- isAgentRunning = false;
- currentAgentTask = null;
- agentStatus = 'idle';
- addLog(`✅ Task: "${task.title}" completed successfully!`, 'success');
- }
-
- function getPriorityColor(priority: string) {
- switch (priority) {
- case 'critical': return 'text-red-400 bg-red-400/10 border-red-400/20';
- case 'high': return 'text-orange-400 bg-orange-400/10 border-orange-400/20';
- case 'medium': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
- case 'low': return 'text-green-400 bg-green-400/10 border-green-400/20';
- default: return 'text-slate-400 bg-slate-400/10 border-slate-400/20';
- }
- }
-</script>
-
-<div class="h-full flex flex-col space-y-6">
- <!-- Header -->
- <div class="flex items-center justify-between">
- <div>
- <h1 class="text-2xl font-bold text-cyan-400">Agent Demo</h1>
- <p class="text-slate-400">Autonomous Task Execution Simulation</p>
- </div>
- <div class="flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700">
- <div class={`w-2 h-2 rounded-full ${isAgentRunning ? 'bg-green-400 animate-pulse' : 'bg-slate-400'}`}></div>
- <span class="text-xs font-mono uppercase">{isAgentRunning ? 'AGENT ACTIVE' : 'AGENT IDLE'}</span>
- </div>
- </div>
-
- <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
- <!-- Left Column, Tasks -->
- <div class="space-y-6 overflow-auto pr-2">
- <!-- Available Tasks -->
- <div>
- <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Available Tasks</h2>
- <div class="space-y-3">
- {#each availableTasks as task (task.id)}
- <div transition:slide class="bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover:border-cyan-400/50 transition-colors group">
- <div class="flex justify-between items-start mb-2">
- <h3 class="font-medium text-slate-200 group-hover:text-cyan-300">{task.title}</h3>
- <span class={`text-xs px-2 py-0.5 rounded border ${getPriorityColor(task.priority)}`}>
- {task.priority}
- </span>
- </div>
- <p class="text-sm text-slate-400 mb-3">{task.description}</p>
- <div class="flex items-center justify-between">
- <div class="flex items-center space-x-2 text-xs text-slate-500">
- <FileCode class="w-3 h-3" />
- <span>{task.files.length} files</span>
- </div>
- <button
- class="px-3 py-1.5 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 rounded text-xs font-medium transition-colors disabled: opacity-50, disabled, cursor-not-allowed"
- disabled={isAgentRunning}
- onclick={() => assignTaskToAgent(task)}
- >
- {isAgentRunning ? 'Agent Busy' : 'Assign Agent'}
- </button>
- </div>
- </div>
- {/each}
- {#if availableTasks.length === 0}
- <div class="text-center py-8 text-slate-500 bg-slate-800/30 rounded-lg border border-slate-700/50 border-dashed">
- No pending tasks
- </div>
- {/if}
- </div>
- </div>
-
- <!-- Completed Tasks -->
- {#if completedTasks.length > 0}
- <div>
- <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Completed</h2>
- <div class="space-y-3 opacity-75">
- {#each completedTasks as task (task.id)}
- <div transition, slide class="bg-slate-800/30 border border-slate-700/50 rounded-lg p-4">
- <div class="flex justify-between items-start">
- <h3 class="font-medium text-slate-400 line-through">{task.title}</h3>
- <CheckCircle class="w-4 h-4 text-green-500" />
- </div>
- </div>
- {/each}
- </div>
- </div>
- {/if}
- </div>
-
- <!-- Middle Column, Agent Status & Logs -->
- <div class="lg, col-span-2 flex flex-col space-y-6 overflow-hidden">
- <!-- Active Task Status -->
- {#if currentAgentTask}
- <Card class="bg-slate-800/80 border-cyan-500/30 p-6 relative overflow-hidden">
- <div class="absolute top-0 left-0 w-full h-1 bg-slate-700">
- <div class="h-full bg-cyan-400 transition-all duration-300" style="width: {agentProgress}%"></div>
- </div>
-
- <div class="flex items-start space-x-4">
- <div class="p-3 bg-cyan-500/10 rounded-lg">
- <Terminal class="w-6 h-6 text-cyan-400 animate-pulse" />
- </div>
- <div class="flex-1">
- <h3 class="text-lg font-medium text-white mb-1">Executing: {currentAgentTask.title}</h3>
- <p class="text-slate-400 text-sm mb-4">{currentAgentTask.description}</p>
-
- <div class="flex items-center justify-between text-xs text-slate-500 font-mono">
- <span>Progress: {agentProgress}%</span>
- <span>Status: {agentStatus.toUpperCase()}</span>
- </div>
- </div>
- </div>
- </Card>
- {/if}
-
- <!-- Console Logs -->
- <Card class="flex-1 bg-slate-950 border-slate-800 font-mono text-sm flex flex-col overflow-hidden">
- <div class="p-3 border-b border-slate-800 bg-slate-900/50 flex justify-between items-center">
- <span class="text-slate-400 text-xs">AGENT CONSOLE OUTPUT</span>
- <div class="flex space-x-1.5">
- <div class="w-2.5 h-2.5 rounded-full bg-red-500/20"></div>
- <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/20"></div>
- <div class="w-2.5 h-2.5 rounded-full bg-green-500/20"></div>
- </div>
- </div>
- <div class="flex-1 overflow-auto p-4 space-y-2">
- {#each logs as log (log.id)}
- <div transition:fade={{ duration, 100 }} class="flex items-start space-x-3">
- <span class="text-slate-600 shrink-0">[{log.timestamp}]</span>
- <span class:text-cyan-400={log.type === 'info'}
- class:text-green-400={log.type === 'success'}
- class:text-yellow-400={log.type === 'warning'}
- class:text-red-400={log.type === 'error'}>
- {log.message}
- </span>
- </div>
- {/each}
- </div>
- </Card>
- </div>
- </div>
-</div>
-
-
-
-
+  @keyframes pulse { 0%, 100% { opacity: 1;}
+    50% { opacity: 0.8;}
+  } </style>
 
 

@@ -33,9 +33,8 @@ export const GET: RequestHandler = async () => {
 
     // Get recent activity from Redis list
     const activityKeys = await client.keys('phase89:activity:*');
-    const activity: Array<{ id: string;
-      type: 'fix' | 'embed' | 'learn';
-      message: string; timestamp: string;
+    const activity: Array<{ id: string, type: 'fix' | 'embed' | 'learn';
+      message: string, timestamp: string;
       data?: any;
     }> = [];
 
@@ -50,7 +49,7 @@ export const GET: RequestHandler = async () => {
           activity.push({
             id: key,
             type: 'fix',
-            message: `Fix suggested for: ${parsed.error?.substring(0, 50)}...`,
+            message: `Fix suggested, for: ${parsed.error?.substring(0, 50)}...`,
             timestamp: new Date(parsed?.timestamp|| Date.now()).toISOString(),
             data: parsed
           });

@@ -1,12 +1,16 @@
 <!-- GPU AI Assistant - Real-time streaming chat with, server, GPU --> <script lang="ts">
 import type { Message } from '$lib/types';
-import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { gpuAIService } from '$lib/services/gpu-ai-service'; import { evidenceStore } from '$lib/stores/unified'; import { showSuccess, showError } from '$lib/stores/unified'; import  Button: Card, CardContent: CardHeader: CardTitle, Input  from "$lib/components/ui/enhanced-bits.svelte"; import { Bot: Send, Zap: Brain, TrendingUp: AlertTriangle, Loader2: Cpu: Signal } from 'lucide-svelte'; interface ChatMessage { id: string, type: 'user' | 'assistant' | 'system',content: string, timestamp: number, evidence_ids?: string[]; suggestions?: any[]; insights?: any[]; streaming?: boolean}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { gpuAIService } from '$lib/services/gpu-ai-service'; import { evidenceStore } from '$lib/stores/unified'; import { showSuccess, showError } from '$lib/stores/unified'; import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import Input from '$lib/components/ui/Input.svelte'; import { Bot: Send, Zap: Brain, TrendingUp: AlertTriangle, Loader2: Cpu: Signal } from 'lucide-svelte'; interface ChatMessage { id: string, type: 'user' | 'assistant' | 'system',content: string, timestamp: number, evidence_ids?: string[]; suggestions?: any[]; insights?: any[]; streaming?: boolean}
   interface Props { caseId: string, selectedEvidenceIds?: string[]; onSuggestionClick?: (suggestion: any) => void; onInsightClick?: (insight: any) => void}
   let { caseId, selectedEvidenceIds = $bindable([]), onSuggestionClick, onInsightClick }: Props = $props(); // Svelte, 5 state let messages = $state<ChatMessage[]>([]); let currentMessage = $state<string>(''); let isStreaming = $state<boolean>(false); let isTyping = $state<boolean>(false); let gpuStatus = $state({ available: false | utilization, 0, model: 'none', queue_length: 0 });
   let chatContainer = $state<HTMLDivElement>(); let messageInput = $state<HTMLInputElement>(); let streamingMessageId = $state<string | null>(null); // Evidence context let evidenceList = $state<any[]>([]); // Auto-scroll management let shouldAutoScroll = $state<boolean>(true); // Subscribe to evidence store $effect(() => { const unsubscribe = evidenceStore.subscribe((state) => { evidenceList = state.evidence || []}); return unsubscrib}); // Initialize AI assistant $effect(() => { (async () => { await initializeAssistant(); updateGPUStatus(); // Update GPU status every, 10 seconds const statusInterval = setInterval(updateGPUStatus, 10000); return () => { clearInterval(statusInterval)}
     })()});
-  async function initializeAssistant(): Promise<void> { try { // Add welcome message addSystemMessage('AI Assistant initialized with GPU acceleration. How can I help analyze your evidence?'); // Check if we have evidence to analyze if (evidenceList.length > 0) { addSystemMessage(`Found ${evidenceList.length} evidence items in case ${ caseId }. I can help analyze connections and patterns.`)}
+  async function initializeAssistant(): Promise<void> { try { // Add welcome message addSystemMessage('AI Assistant initialized with GPU acceleration. How can I help analyze your evidence?'); // Check if we have evidence to analyze if (evidenceList.length > 0) { addSystemMessage(`Found ${evidenceList.length} evidence items in case ${caseId}. I can help analyze connections and patterns.`)}
     } catch (error) { console.error('âŒ Failed to initialize AI assistant:', error); addSystemMessage('AI Assistant initialization failed. Some features may be limited.')}
   }
   async function updateGPUStatus(): Promise<any> { try { const status = await gpuAIService.getServerStatus(); gpuStatus = { available: status.gpu_available, utilization status.gpu_utilization, model: status.model_loaded, queue_length: status.queue_length}
@@ -33,7 +37,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       showError('AI chat failed')} finally { isStreaming = false; streamingMessageId = null}
   }
   async function analyzeSelectedEvidence(): Promise<any> { if (selectedEvidenceIds.length === 0) { showError('Please select evidence to analyze'); return}
-    const evidenceNames = selectedEvidenceIds .map(id => evidenceList.find(e => e.id === id)?.title ?? id) .join(', '); const analysisPrompt = selectedEvidenceIds.length === 1 ? `Please analyze this evidence item: ${ evidenceNames }`: `Please analyze these evidence items and find, connections: ${ evidenceNames }`; currentMessage = analysisPrompt; await sendMessage()}
+    const evidenceNames = selectedEvidenceIds .map(id => evidenceList.find(e => e.id === id)?.title ?? id) .join(', '); const analysisPrompt = selectedEvidenceIds.length === 1 ? `Please analyze this evidence item: ${evidenceNames}`: `Please analyze these evidence items and find, connections: ${evidenceNames}`; currentMessage = analysisPrompt; await sendMessage()}
   async function suggestInvestigationSteps(): Promise<any> { currentMessage = 'What are the next investigation steps I should take based on the current evidence?'; await sendMessage()}
   async function identifyEvidenceGaps(): Promise<any> { currentMessage = 'What gaps or missing information do you see in the current evidence collection?'; await sendMessage()}
   function handleKeyPress(_event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage()}
@@ -61,8 +65,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> {/if}
   <!-- Message, Content --> <div class="flex-1"> <div class="
             rounded-lg p-3 text-sm {message.type === 'user'
-              ? 'bg-primary text-primary-foreground ml-auto', message.type === 'system'
-              ? 'bg-muted/50 text-muted-foreground border', 'bg-muted'}
+              ? 'bg-primary text-primary-foreground ml-auto' message.type === 'system'
+              ? 'bg-muted/50 text-muted-foreground border' : 'bg-muted'}
           "> <!-- Message, text --> <div class="prose prose-sm"> {message.content} {#if message.streaming} <span class="inline-block w-2 h-4 bg-current animate-pulse"></span> {/if}
   </div>
  <!-- Evidence, tags -->

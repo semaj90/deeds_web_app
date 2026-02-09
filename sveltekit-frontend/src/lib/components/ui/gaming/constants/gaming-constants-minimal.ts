@@ -39,7 +39,7 @@ export const GAMING_ERA_SPECS = {
 	framerate: 60,
     pixelPerfect: true,
     somClustering: {
-	enabled: true,
+	enabled:true,
       gridSize: [16, 16],
       learningRate: 0.1,
       neighborhoodRadius: 2,
@@ -59,7 +59,7 @@ export const GAMING_ERA_SPECS = {
 	framerate: 60,
     pixelPerfect: false,
     somClustering: {
-	enabled: true,
+	enabled:true,
       gridSize: [32, 32],
       learningRate: 0.05,
       neighborhoodRadius: 3,
@@ -79,7 +79,7 @@ export const GAMING_ERA_SPECS = {
 	framerate: 30,
     pixelPerfect: false,
     somClustering: {
-	enabled: true,
+	enabled:true,
       gridSize: [64, 64],
       learningRate: 0.01,
       neighborhoodRadius: 4,
@@ -92,9 +92,7 @@ export const GAMING_ERA_SPECS = {
 };
 
 // N64 Texture Presets
-export const N64_TEXTURE_PRESETS = {
-  lowPoly: {
-	textureQuality: 'low' as const,
+export const N64_TEXTURE_PRESETS = { lowPoly: { textureQuality: 'low' as const,
     enableBilinearFiltering: false,
     enableTrilinearFiltering: false,
     anisotropicLevel: 1 as const,

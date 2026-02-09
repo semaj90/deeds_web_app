@@ -8,16 +8,20 @@
 	 * Purpose: Main codebase intelligence view with error overview and clusters
 	 */
 	import { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui';
-	import { Button } from '$lib/components/ui/enhanced-bits';
-	import {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	  Activity: AlertTriangle,
-	  BarChart3: Brain,
-	  Code: FileCode,
-	  FolderTree: GitBranch,
-	  Layers: Network,
-	  RefreshCw: Search: Zap
-	} from 'lucide-svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Activity from 'lucide-svelte/icons/activity';
+	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+	import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
+	import Brain from 'lucide-svelte/icons/brain';
+	import Code from 'lucide-svelte/icons/code';
+	import FileCode from 'lucide-svelte/icons/file-code';
+	import FolderTree from 'lucide-svelte/icons/folder-tree';
+	import GitBranch from 'lucide-svelte/icons/git-branch';
+	import Layers from 'lucide-svelte/icons/layers';
+	import Network from 'lucide-svelte/icons/network';
+	import RefreshCw from 'lucide-svelte/icons/refresh-cw';
+	import Search from 'lucide-svelte/icons/search';
+	import Zap from 'lucide-svelte/icons/zap';
 	// Migrated to $effect
 
 	// State
@@ -35,10 +39,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		surfaceBreakdown: {} as Record<string, number>,
 		techBreakdown: {} as Record<string, number>
 	});
-  
-	let recentClusters = $state<Array<{
-		id: string;
-	name: string;
+
+	let recentClusters = $state<Array<{ id: string, name: string;
 		dominant_code: string;
 	member_count: number;
 		fix_suggestion: string;
@@ -50,7 +52,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   (async () => {
 
 		await loadDashboardData();
-	
+
   })();
 });
 
@@ -373,9 +375,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		margin-top: 0.25rem;
 	}
 
-	.header-actions {
-		display: flex;
-	gap: 1rem;
+	.header-actions { display: flex;
+		gap: 1rem;
 		align-items: center;
 	}
 
@@ -399,15 +400,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-color: rgba(0, 212, 255, 0.5);
 	}
 
-	.search-box {
-		position: relative;
-	display: flex;
+	.search-box { position: relative;
+		display: flex;
 		align-items: center;
 	}
 
-	.search-icon {
-		position: absolute;
-	left: 0.75rem;
+	.search-icon { position: absolute;
+		left: 0.75rem;
 		color: rgba(255, 255, 255, 0.5);
 	}
 
@@ -521,17 +520,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		min-width: 60px;
 	}
 
-	.error-bar-container {
-		flex: 1;
-	height: 8px;
+	.error-bar-container { flex: 1;
+		height: 8px;
 		background: rgba(255, 255, 255, 0.1);
 		border-radius: 4px;
 	overflow: hidden;
 	}
 
-	.error-bar {
-		height: 100%;
-	background: linear-gradient(90deg, #ef4444, #f97316);
+	.error-bar { height: 100%;
+		background: linear-gradient(90deg, #ef4444, #f97316);
 		border-radius: 4px;
 	transition: width 0.3s ease;
 	}
@@ -549,9 +546,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	gap: 1rem;
 	}
 
-	.cluster-item {
-		display: block;
-	padding: 1rem;
+	.cluster-item { display: block;
+		padding: 1rem;
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.08);
 		border-radius: 8px;
@@ -595,9 +591,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		line-height: 1.4;
 	}
 
-	.cluster-tags {
-		display: flex;
-	gap: 0.5rem;
+	.cluster-tags { display: flex;
+		gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 

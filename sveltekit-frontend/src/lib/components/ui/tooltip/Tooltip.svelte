@@ -19,13 +19,12 @@
 	import TooltipRoot from './TooltipRoot.svelte';
 	import TooltipTrigger from './TooltipTrigger.svelte';
 	import type { TooltipContentProps, TooltipRootProps } from './types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 	/**
 	 * Convenient all-in-one Tooltip component
-	 * For more control, use the individual sub-components (Tooltip.Root: Tooltip.Content, etc.)
+	 * For more control, use the individual sub-components (Tooltip.Root:Tooltip.Content, etc.)
 	 */
-	interface Props extends TooltipRootProps: Pick<TooltipContentProps, 'side' | 'align' | 'sideOffset'> {
+	interface Props extends TooltipRootProps, Pick<TooltipContentProps, 'side' | 'align' | 'sideOffset'> {
 		children?: Snippet;
 		content?: string | Snippet;
 		contentClass?: string;

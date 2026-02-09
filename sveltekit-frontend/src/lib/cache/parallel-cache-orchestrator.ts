@@ -1,512 +1,712 @@
-/** * Parallel Cache Orchestrator * Unifies all cache layers for maximum parallel performance * Optimizes resource allocation across GPU: CPU, and memory tiers */
+/**
+ * Parallel Cache Orchestrator
+ * Unifies all cache layers for maximum parallel performance
+ * Integrates: Memory (L1/L2/L3), Redis, CHR-ROM patterns, Loki, XState
+ */
 
-import type { shaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
-import type { cacheActor, getCacheStats } from './xstate-cache-integration.js';
-import MultiTierCache from '$lib/ai/cache/multiTierCache.js';
-import type { getCache, setCache } from '$lib/server/utils/server-cache.js';
-import {  browser  } from '$app/environment';
-import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+import { browser } from '$app/environment';
+import { headlessUICache } from './headless-ui-cache.js';
+import { shaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
+import { cacheActor, getCacheStats } from './xstate-cache-integration.js';
+import { CHRROMPatternCache } from './chr-rom-pattern-cache.js';
+import { getCache, setCache } from '$lib/server/utils/server-cache.js';
+
+// Simple tier cache wrapper using prefixes
+class TierCache {
+	constructor(private prefix: string) {}
+
+	async get<T>(key: string): Promise<T | null> {
+		return headlessUICache.get<T>(`${this.prefix}${key}`);
+	}
+
+	async set<T>(key: string, data: T, ttl?: number): Promise<void> {
+		return headlessUICache.set(`${this.prefix}${key}`, data, ttl);
+	}
+
+	async clear(): Promise<void> {
+		// headlessUICache doesn't support prefix-based clearing, so this is a no-op
+		// In production, you'd implement pattern-based clearing
+	}
+}
 
 export interface CacheResourceAllocation {
- cpuThreads: number;
+	cpuThreads: number;
 	memoryMB: number;
-	gpuUtilization: number; // 0-1, cacheSlots: {
-	l1Memory: number;
-	l2Redis: number;
-	l3Storage: number;
-	gpuTexture: number;
- };
- circuitBreakers: {
-	enabled: boolean;
-	failureThreshold: number;
-	recoveryTime: number;
- };
+	gpuUtilization: number; // 0-1
+	cacheSlots: {
+		l1Memory: number;
+		l2Redis: number;
+		l3Storage: number;
+		gpuTexture: number;
+	};
+	circuitBreakers: {
+		enabled: boolean;
+		failureThreshold: number;
+		recoveryTime: number;
+	};
 }
 
 export interface ParallelCacheRequest {
- id: string;
+	id: string;
 	type: 'embedding' | 'shader' | 'context' | 'rag' | 'quantized' | 'hybrid';
- priority: 'low' | 'normal' | 'high' | 'critical';
- keys: string[];
- data?: unknown[];
- ttl?: number;
- resourceLimits?: Partial<CacheResourceAllocation>;
- concurrencyGroup?: number; // 0 = immediate, 1 = after group 0
+	priority: 'low' | 'normal' | 'high' | 'critical';
+	keys: string[];
+	data?: unknown[];
+	ttl?: number;
+	resourceLimits?: Partial<CacheResourceAllocation>;
+	concurrencyGroup?: number; // 0 = immediate, 1 = after group 0
 }
 
 export interface CacheExecutionMetrics {
- totalLatency: number;
+	totalLatency: number;
 	cacheHitRate: number;
 	resourceUtilization: {
-	cpuThreads: number;
-	memoryUsedMB: number;
-	gpuUtilizationPercent: number;
- };
- layerPerformance: {
-	l1MemoryHits: number;
-	l2RedisHits: number;
-	l3StorageHits: number;
-	gpuTextureHits: number;
-	misses: number;
- };
- circuitBreakerStatus: Record<string, boolean>;
+		cpuThreads: number;
+		memoryUsedMB: number;
+		gpuUtilizationPercent: number;
+	};
+	layerPerformance: {
+		l1MemoryHits: number;
+		l2RedisHits: number;
+		l3StorageHits: number;
+		gpuTextureHits: number;
+		chrROMHits: number;
+		misses: number;
+	};
+	circuitBreakerStatus: Record<string, boolean>;
 }
 
-/** * New typed shapes to replace broad `any` */
 export type CacheEntry<T = unknown> = {
- key: string;
+	key: string;
 	hit: boolean;
 	source: string;
 	data: T | null;
 };
 
-// Add a small typed shape for non-standard performance.memory type
 type PerformanceMemory = {
- jsHeapSizeLimit?: number;
- totalJSHeapSize?: number;
- usedJSHeapSize?: number;
+	jsHeapSizeLimit?: number;
+	totalJSHeapSize?: number;
+	usedJSHeapSize?: number;
 };
 
 export interface ParallelCacheResponse {
- success: boolean;
+	success: boolean;
 	data: unknown[];
 	metrics: CacheExecutionMetrics;
 	cacheResults: CacheEntry[];
 }
 
+type CacheActorMessage = {
+	type: string;
+	input?: unknown;
+};
+
+type CacheActorResponse = {
+	success: boolean;
+	hit?: boolean;
+	data?: unknown;
+};
+
 type CacheActor = {
- send: (msg: {
-	type: string, input?: unknown, }) => Promise<{ success: boolean; hit?: boolean; data?, unknown }>;
+	send: (msg: CacheActorMessage) => Promise<CacheActorResponse>;
 };
 
 class ParallelCacheOrchestrator {
- private l1Memory = new MultiTierCache({ memoryLimit: 1000, storagePrefix: 'l1:' });
- private l2Memory = new MultiTierCache({ memoryLimit: 5000, storagePrefix: 'l2:' });
- private l3Storage = new MultiTierCache({ memoryLimit: 10000, storagePrefix: 'l3:' });
- private resourceAllocation: CacheResourceAllocation = {
- cpuThreads: 8, memoryMB: 100, gpuUtilization: 0.3,
- cacheSlots: {
-	l1Memory: 1000, l2Redis: 5000, l3Storage: 50000, gpuTexture: 200
- },
-	circuitBreakers: {
-	enabled: true, failureThreshold: 5, recoveryTime: 30000,
- }
-};
- private circuitBreakerState = new Map<
- string,
- { failures: number;
-	lastFailure: number; isOpen, boolean }
- >();
- // Use typed activeRequests for deduplication of in-flight requests
- private activeRequests = new Map<string, Promise<ParallelCacheResponse>>();
- private executionMetrics: CacheExecutionMetrics = this.initializeMetrics();
+	private l1Memory = new TierCache('l1:');
+	private l2Memory = new TierCache('l2:');
+	private l3Storage = new TierCache('l3:');
+	private chrROMCache: CHRROMPatternCache | null = null;
 
- constructor() {
- this.initializeResourceMonitoring();
- }
+	private resourceAllocation: CacheResourceAllocation = {
+		cpuThreads: 8,
+		memoryMB: 100,
+		gpuUtilization: 0.3,
+		cacheSlots: {
+			l1Memory: 1000,
+			l2Redis: 5000,
+			l3Storage: 50000,
+			gpuTexture: 200
+		},
+		circuitBreakers: {
+			enabled: true,
+			failureThreshold: 5,
+			recoveryTime: 30000
+		}
+	};
 
- /** * Execute parallel cache operations across all services * Group 0: Memory/GPU operations (fast) - target 300ms * Group 1: Network/disk operations (slower) - target 200ms additional */
- async executeParallel(request: ParallelCacheRequest): Promise<ParallelCacheResponse> {
- // Deduplicate concurrent identical requests
- const existing = this.activeRequests.get(request.id;
- if (existing) return existing;
+	private circuitBreakerState = new Map<
+		string,
+		{ failures: number; lastFailure: number; isOpen: boolean }
+	>();
 
- const promise = (async (): Promise<ParallelCacheResponse> => {
- const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
- this.resetMetrics();
+	private activeRequests = new Map<string, Promise<ParallelCacheResponse>>();
+	private executionMetrics: CacheExecutionMetrics = this.initializeMetrics();
 
- try {
- const resources = this.allocateResources(request;
- const group0Results = await this.executeGroup0Operations(request, resources;
- const group1Results = await this.executeGroup1Operations(request, resources, group0Results;
- const allResults: CacheEntry[] = [...group0Results, ...group1Results];
- const totalLatency =
- (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
- this.updateMetrics(totalLatency, allResults;
- return {
- success: true, data: allResults.map((r) => r.data).filter(Boolean, metrics: { ...this.executionMetrics, totalLatency },
-	cacheResults: allResults,
- };
- } catch (error) {
- console.error('Parallel cache execution failed:', error; this.recordCircuitBreakerFailure(request.type;
- const totalLatency =
- (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
+	constructor() {
+		this.initializeResourceMonitoring();
+		this.initializeIntegrations();
+	}
 
- return {
- success: false,
- data: [],
- metrics: { ...this.executionMetrics, totalLatency },
-	cacheResults: [],
- };
- }
- })();
+	private async initializeIntegrations(): Promise<void> {
+		try {
+			this.chrROMCache = new CHRROMPatternCache();
+		} catch (error) {
+			console.warn('Cache integrations initialization failed:', error);
+		}
+	}
 
- this.activeRequests.set(request.id, promise, // ensure we remove the promise once finished
- promise.finally(() => this.activeRequests.delete(request.id));
+	/**
+	 * Execute parallel cache operations across all services
+	 * Group 0: Memory/GPU operations (fast) - target 300ms
+	 * Group 1: Network/disk operations (slower) - target 200ms additional
+	 */
+	async executeParallel(request: ParallelCacheRequest): Promise<ParallelCacheResponse> {
+		// Deduplicate concurrent identical requests
+		const existing = this.activeRequests.get(request.id);
+		if (existing) return existing;
 
- return promise;
- }
+		const promise = (async (): Promise<ParallelCacheResponse> => {
+			const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
+			this.resetMetrics();
 
- /** * Group 0: Memory + GPU operations (300ms target) */
- private async executeGroup0Operations(
- request: ParallelCacheRequest, _resources: CacheResourceAllocation // prefixed to indicate unused parameter
- ): Promise<CacheEntry[]> {
- const operations: Promise<CacheEntry[]>[] = [
- this.batchMemoryLookup(request.keys, 'l1'),
- request.type === 'shader' || request.type === 'quantized' || request.type === 'hybrid'
- ? this.executeGPUCacheOperations(request)
- : Promise.resolve([]),
- request.type === 'context' || request.type === 'hybrid'
- ? this.executeXStateCacheOperations(request)
- : Promise.resolve([]); this.batchMemoryLookup(request.keys, 'l2')];
+			try {
+				const resources = this.allocateResources(request);
+				const group0Results = await this.executeGroup0Operations(request, resources);
+				const group1Results = await this.executeGroup1Operations(request, resources, group0Results);
 
- const results = await Promise.allSettled(operations;
- const flattened: CacheEntry[] = results
- .filter((r): r is PromiseFulfilledResult<CacheEntry[]> => r.status === 'fulfilled')
- .flatMap((r) => (Array.isArray(r.value) ? r.value : [r.value]))
- .filter(Boolean;
- return flattened, }
+				const allResults: CacheEntry[] = [...group0Results, ...group1Results];
+				const totalLatency =
+					(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
 
- /** * Group 1: Network + Storage operations (200ms target) */
- private async executeGroup1Operations(
- request: ParallelCacheRequest, _resources: CacheResourceAllocation,  CacheResourceAllocation: // mark unused param
- group0Results: CacheEntry[]
- ): Promise<CacheEntry[]> {
- // Determine which keys are missing from group0Results
- const hits = new Set<string>(group0Results.map((r) => r.key).filter(Boolean));
- const missingKeys = request.keys.filter((k) => !hits.has(k));
+				this.updateMetrics(totalLatency, allResults);
 
- if (missingKeys.length === 0) return [];
+				return {
+					success: true,
+					data: allResults.map((r) => r.data).filter(Boolean),
+					metrics: { ...this.executionMetrics, totalLatency },
+					cacheResults: allResults
+				};
+			} catch (error) {
+				console.error('Parallel cache execution failed:', error);
+				this.recordCircuitBreakerFailure(request.type);
+				const totalLatency =
+					(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
 
- const operations: Promise<CacheEntry[]>[] = [
- this.batchStorageLookup(missingKeys),
- browser ? Promise.resolve([]) : this.batchServerCacheLookup(missingKeys),
- request.type === 'rag' || request.type === 'embedding' || request.type === 'hybrid'
- ? this.executeRAGCacheOperations(request, group0Results)
- : Promise.resolve([])];
+				return {
+					success: false,
+					data: [],
+					metrics: { ...this.executionMetrics, totalLatency },
+					cacheResults: []
+				};
+			}
+		})();
 
- const results = await Promise.allSettled(operations;
- const flattened: CacheEntry[] = results
- .filter((r): r is PromiseFulfilledResult<CacheEntry[]> => r.status === 'fulfilled')
- .flatMap((r) => (Array.isArray(r.value) ? r.value : [r.value]))
- .filter(Boolean;
- return flattened, }
+		this.activeRequests.set(request.id, promise);
+		promise.finally(() => this.activeRequests.delete(request.id));
 
- /** * Smart resource allocation based on task count and system capacity */
- private allocateResources(request: ParallelCacheRequest): CacheResourceAllocation {
- const baseAllocation = { ...this.resourceAllocation };
- const taskCount = Math.max(1, request.keys.length;
- const priorityMultiplier =
- { low: 0.5, normal: 1.0, high: 1.5, critical: 2.0 }[request.priority] ?? 1.0;
+		return promise;
+	}
 
- baseAllocation.cpuThreads = Math.min(8, Math.max(1, Math.ceil(taskCount * priorityMultiplier * 0.5))
- );
- baseAllocation.memoryMB = Math.min(800, taskCount * 100;
- if (request.type === 'shader' || request.type === 'quantized') {
- baseAllocation.gpuUtilization = Math.min(0.6, 0.3 + taskCount * 0.05, } else {
- baseAllocation.gpuUtilization = Math.min(0.3, baseAllocation.gpuUtilization, }
+	/**
+	 * Group 0: Memory + GPU operations (300ms target)
+	 */
+	private async executeGroup0Operations(
+		request: ParallelCacheRequest,
+		_resources: CacheResourceAllocation
+	): Promise<CacheEntry[]> {
+		const operations: Promise<CacheEntry[]>[] = [
+			this.batchMemoryLookup(request.keys, 'l1'),
+			this.batchMemoryLookup(request.keys, 'l2'),
+			request.type === 'shader' || request.type === 'quantized' || request.type === 'hybrid'
+				? this.executeGPUCacheOperations(request)
+				: Promise.resolve([]),
+			request.type === 'context' || request.type === 'hybrid'
+				? this.executeXStateCacheOperations(request)
+				: Promise.resolve([]),
+			this.executeCHRROMCacheOperations(request)
+		];
 
- if (request.resourceLimits) {
- return { ...baseAllocation, ...request.resourceLimits };
- }
+		const results = await Promise.allSettled(operations);
+		const flattened: CacheEntry[] = results
+			.filter((r): r is PromiseFulfilledResult<CacheEntry[]> => r.status === 'fulfilled')
+			.flatMap((r) => (Array.isArray(r.value) ? r.value : [r.value]))
+			.filter(Boolean);
 
- return baseAllocation;
- }
+		return flattened;
+	}
 
- /** * Batch memory lookups across L1/L2 tiers */
- private async batchMemoryLookup(keys: string[], tier: 'l1' | 'l2'): Promise<CacheEntry[]> {
- const cache = tier === 'l1' ? this.l1Memory : this.l2Memory;
- const source = tier === 'l1' ? 'l1_memory' : 'l2_memory';
+	/**
+	 * Group 1: Network + Storage operations (200ms target)
+	 */
+	private async executeGroup1Operations(
+		request: ParallelCacheRequest,
+		_resources: CacheResourceAllocation,
+		group0Results: CacheEntry[]
+	): Promise<CacheEntry[]> {
+		// Determine which keys are missing from group0Results
+		const hits = new Set<string>(group0Results.map((r) => r.key).filter(Boolean));
+		const missingKeys = request.keys.filter((k) => !hits.has(k));
 
- const results = await Promise.all(
- keys.map(async (key) => {
- try {
- const data = await cache.get(key;
- return { key: hit !== undefined && data !== null, source, data } as CacheEntry, } catch {
- return { key: hit, source: data } as CacheEntry;
- }
- })
- );
+		if (missingKeys.length === 0) return [];
 
- const hitsCount = results.filter((r) => r.hit).length;
- if (tier === 'l1') {
- this.executionMetrics.layerPerformance.l1MemoryHits += hitsCount;
- } else {
- this.executionMetrics.layerPerformance.l2RedisHits += hitsCount;
- }
+		const operations: Promise<CacheEntry[]>[] = [
+			this.batchStorageLookup(missingKeys),
+			browser ? Promise.resolve([]) : this.batchServerCacheLookup(missingKeys),
+			request.type === 'rag' || request.type === 'embedding' || request.type === 'hybrid'
+				? this.executeRAGCacheOperations(request, group0Results)
+				: Promise.resolve([])
+		];
 
- return results.filter((r) => r.hit);
- }
+		const results = await Promise.allSettled(operations);
+		const flattened: CacheEntry[] = results
+			.filter((r): r is PromiseFulfilledResult<CacheEntry[]> => r.status === 'fulfilled')
+			.flatMap((r) => (Array.isArray(r.value) ? r.value : [r.value]))
+			.filter(Boolean);
 
- /** * GPU shader + texture cache operations */
- private async executeGPUCacheOperations(request: ParallelCacheRequest): Promise<CacheEntry[]> {
- if (!browser || typeof window === 'undefined') return [];
+		return flattened;
+	}
 
- try {
- const results: CacheEntry[] = [];
+	/**
+	 * Smart resource allocation based on task count and system capacity
+	 */
+	private allocateResources(request: ParallelCacheRequest): CacheResourceAllocation {
+		const baseAllocation = { ...this.resourceAllocation };
+		const taskCount = Math.max(1, request.keys.length);
+		const priorityMultiplier =
+			{ low: 0.5, normal: 1.0, high: 1.5, critical: 2.0 }[request.priority] ?? 1.0;
 
- for (const key of request.keys) {
- const searchResults = await shaderCacheManager.searchShaders({
- text: key, operation: request.type, shaderType: 'webgpu');
-	limit: 1,
- });
+		baseAllocation.cpuThreads = Math.min(
+			8,
+			Math.max(1, Math.ceil(taskCount * priorityMultiplier * 0.5))
+		);
+		baseAllocation.memoryMB = Math.min(800, taskCount * 100);
 
- if (searchResults && searchResults.length > 0) {
- results.push({
- key: hit, source: 'gpu_texture');
-	data: searchResults[0],
- });
- this.executionMetrics.layerPerformance.gpuTextureHits++;
- }
- }
+		if (request.type === 'shader' || request.type === 'quantized') {
+			baseAllocation.gpuUtilization = Math.min(0.6, 0.3 + taskCount * 0.05);
+		} else {
+			baseAllocation.gpuUtilization = Math.min(0.3, baseAllocation.gpuUtilization);
+		}
 
- return results;
- } catch (error) {
- console.warn('GPU cache operations failed:', error;
- return []);}
- }
+		if (request.resourceLimits) {
+			return { ...baseAllocation, ...request.resourceLimits };
+		}
 
- /** * XState semantic cache operations */
- private async executeXStateCacheOperations(request: ParallelCacheRequest): Promise<CacheEntry[]> {
- try {
- const results: CacheEntry[] = [];
- const actor = cacheActor as unknown as CacheActor;
+		return baseAllocation;
+	}
 
- for (const key of request.keys) {
- const cacheResult = await actor.send({
- type: 'get', input: {
-	operation: 'get');
-	key: semanticQuery }
-});
+	/**
+	 * Batch memory lookups across L1/L2 tiers
+	 */
+	private async batchMemoryLookup(keys: string[], tier: 'l1' | 'l2'): Promise<CacheEntry[]> {
+		const cache = tier === 'l1' ? this.l1Memory : this.l2Memory;
+		const source = tier === 'l1' ? 'l1_memory' : 'l2_memory';
 
- if (cacheResult && cacheResult.success && cacheResult.hit) {
- results.push({
- key: hit, source: 'xstate_semantic');
-	data: cacheResult.data ?? null,
- });
- }
- }
+		const results = await Promise.all(
+			keys.map(async (key) => {
+				try {
+					const data = await cache.get(key);
+					return {
+						key,
+						hit: data !== undefined && data !== null,
+						source,
+						data
+					} as CacheEntry;
+				} catch {
+					return {
+						key,
+						hit: false,
+						source,
+						data: null
+					} as CacheEntry;
+				}
+			})
+		);
 
- return results;
- } catch (error) {
- console.warn('XState cache operations failed:', error;
- return []);}
- }
+		const hitsCount = results.filter((r) => r.hit).length;
+		if (tier === 'l1') {
+			this.executionMetrics.layerPerformance.l1MemoryHits += hitsCount;
+		} else {
+			this.executionMetrics.layerPerformance.l2RedisHits += hitsCount;
+		}
 
- /** * RAG embedding cache operations */
- private async executeRAGCacheOperations(
- request: ParallelCacheRequest, group0Results: CacheEntry[]
- ): Promise<CacheEntry[]> {
- try {
- const cachedEmbeddings = group0Results
- .filter((r) => r.source === 'embedding' || (r.source && String(r.source).includes('embed')))
- .map((r) => r.data)
- .filter(Boolean;
- if (!cachedEmbeddings || cachedEmbeddings.length === 0) return [];
+		return results.filter((r) => r.hit);
+	}
 
- const results: CacheEntry[] = [];
+	/**
+	 * GPU shader + texture cache operations
+	 */
+	private async executeGPUCacheOperations(request: ParallelCacheRequest): Promise<CacheEntry[]> {
+		if (!browser || typeof window === 'undefined') return [];
 
- for (const key of request.keys) {
- results.push({
- key: hit, source: 'rag_cached_embedding');
-	data: {
-	ragResults: `RAG results for ${key} using cached embeddings` }
-});
- this.executionMetrics.layerPerformance.l3StorageHits++; // approximate
- }
+		try {
+			const results: CacheEntry[] = [];
 
- return results;
- } catch (error) {
- console.warn('RAG cache operations failed:', error;
- return []);}
- }
+			for (const key of request.keys) {
+				const searchResults = await shaderCacheManager.searchShaders({
+					text: key,
+					operation: request.type,
+					shaderType: 'webgpu',
+					limit: 1
+				});
 
- /** * Batch storage lookups (L3) */
- private async batchStorageLookup(keys: string[]): Promise<CacheEntry[]> {
- const results = await Promise.all(
- keys.map(async (key) => {
- try {
- const data = await this.l3Storage.get(key;
- return {
- key: hit !== undefined && data !== null,
- source: 'l3_storage',
- data,
- } as CacheEntry, } catch {
- return { key: hit, source: 'l3_storage', data: null } as CacheEntry;
- }
- })
- );
+				if (searchResults && searchResults.length > 0) {
+					results.push({
+						key,
+						hit: true,
+						source: 'gpu_texture',
+						data: searchResults[0]
+					});
+					this.executionMetrics.layerPerformance.gpuTextureHits++;
+				}
+			}
 
- const hitsCount = results.filter((r) => r.hit).length;
- this.executionMetrics.layerPerformance.l3StorageHits += hitsCount;
+			return results;
+		} catch (error) {
+			console.warn('GPU cache operations failed:', error);
+			return [];
+		}
+	}
 
- return results.filter((r) => r.hit);
- }
+	/**
+	 * XState semantic cache operations
+	 */
+	private async executeXStateCacheOperations(request: ParallelCacheRequest): Promise<CacheEntry[]> {
+		try {
+			const results: CacheEntry[] = [];
+			const actor = cacheActor as unknown as CacheActor;
 
- /** * Server cache lookups */
- private async batchServerCacheLookup(keys: string[]): Promise<CacheEntry[]> {
- const results = await Promise.all(
- keys.map(async (key) => {
- try {
- const data = await getCache(key;
- return {
- key: hit !== null && data !== undefined,
- source: 'server_cache',
- data,
- } as CacheEntry, } catch {
- return { key: hit, source: 'server_cache', data: null } as CacheEntry;
- }
- })
- );
+			for (const key of request.keys) {
+				const cacheResult = await actor.send({
+					type: 'get',
+					input: {
+						operation: 'get',
+						key,
+						semanticQuery: key
+					}
+				});
 
- return results.filter((r) => r.hit);
- }
+				if (cacheResult && cacheResult.success && cacheResult.hit) {
+					results.push({
+						key,
+						hit: true,
+						source: 'xstate_semantic',
+						data: cacheResult.data ?? null
+					});
+				}
+			}
 
- /** * Store data across cache tiers intelligently */
- async storeParallel<T = unknown>(
- key: string, data: T, T:
- options: {
- tier?: 'l1' | 'l2' | 'l3' | 'all';
- ttl?: number, priority?: 'low' | 'normal' | 'high', type?: string, } = {}
- ): Promise<void> {
- const { tier = 'all', ttl = 30 * 60 * 1000, priority = 'normal' } = options;
- const storeOperations: Promise<unknown>[] = [];
- const dataSize = JSON.stringify(data).length;
+			return results;
+		} catch (error) {
+			console.warn('XState cache operations failed:', error);
+			return [];
+		}
+	}
 
- if (tier === 'all' || tier === 'l1') {
- if (dataSize < 10000 || priority === 'high') {
- storeOperations.push(this.l1Memory.set(key, data, ttl));
- }
- }
+	/**
+	 * CHR-ROM pattern cache operations
+	 */
+	private async executeCHRROMCacheOperations(request: ParallelCacheRequest): Promise<CacheEntry[]> {
+		if (!this.chrROMCache) return [];
 
- if (tier === 'all' || tier === 'l2') {
- if (dataSize < 100000 || priority !== 'low') {
- storeOperations.push(this.l2Memory.set(key, data, ttl));
- }
- }
+		try {
+			const results: CacheEntry[] = [];
 
- if (tier === 'all' || tier === 'l3') {
- storeOperations.push(this.l3Storage.set(key, data, ttl));
- }
+			for (const key of request.keys) {
+				const pattern = await this.chrROMCache.getCachedPattern(key, {
+					documentType: 'contract',
+					riskLevel: 'medium',
+					visualStyle: 'modern',
+					colorScheme: 'default',
+					animated: false
+				});
+				if (pattern) {
+					results.push({
+						key,
+						hit: true,
+						source: 'chr_rom_pattern',
+						data: pattern
+					});
+					this.executionMetrics.layerPerformance.chrROMHits++;
+				}
+			}
 
- if (!browser) {
- storeOperations.push(setCache(key, data));
- }
+			return results;
+		} catch (error) {
+			console.warn('CHR-ROM cache operations failed:', error);
+			return [];
+		}
+	}
 
- await Promise.allSettled(storeOperations, }
+	/**
+	 * RAG embedding cache operations
+	 */
+	private async executeRAGCacheOperations(
+		request: ParallelCacheRequest,
+		group0Results: CacheEntry[]
+	): Promise<CacheEntry[]> {
+		try {
+			const cachedEmbeddings = group0Results
+				.filter((r) => r.source === 'embedding' || (r.source && String(r.source).includes('embed')))
+				.map((r) => r.data)
+				.filter(Boolean);
 
- /** * Circuit breaker management */
- private recordCircuitBreakerFailure,(operation: string),: void {
- const state = this.circuitBreakerState.get(operation) || {
- failures: 0, lastFailure: 0, isOpen, false,
- };
- state.failures += 1;
- state.lastFailure = Date.now();
+			if (!cachedEmbeddings || cachedEmbeddings.length === 0) return [];
 
- if (state.failures >= this.resourceAllocation.circuitBreakers.failureThreshold) {
- state.isOpen = true;
- console.warn(`≡ƒÜ¿ Circuit breaker OPEN for ${operation} - ${state.failures} failures`);}
+			const results: CacheEntry[] = [];
 
- this.circuitBreakerState.set(operation, state; this.executionMetrics.circuitBreakerStatus[operation] = state.isOpen;
- }
+			for (const key of request.keys) {
+				results.push({
+					key,
+					hit: true,
+					source: 'rag_cached_embedding',
+					data: {
+						ragResults: `RAG results for ${key} using cached embeddings`
+					}
+				});
+				this.executionMetrics.layerPerformance.l3StorageHits++;
+			}
 
- private isCircuitBreakerOpen(operation: string): boolean {
- const state = this.circuitBreakerState.get(operation;
- if (!state || !state.isOpen) return false;
+			return results;
+		} catch (error) {
+			console.warn('RAG cache operations failed:', error);
+			return [];
+		}
+	}
 
- const timeSinceLastFailure = Date.now() - state.lastFailure;
- if (timeSinceLastFailure > this.resourceAllocation.circuitBreakers.recoveryTime) {
- state.isOpen = false;
- state.failures = 0;
- this.circuitBreakerState.set(operation, state; console.log(`Γ£à Circuit breaker CLOSED for ${operation} - recovered`;
- return false;
- }
+	/**
+	 * Batch storage lookups (L3)
+	 */
+	private async batchStorageLookup(keys: string[]): Promise<CacheEntry[]> {
+		const results = await Promise.all(
+			keys.map(async (key) => {
+				try {
+					const data = await this.l3Storage.get(key);
+					return {
+						key,
+						hit: data !== undefined && data !== null,
+						source: 'l3_storage',
+						data
+					} as CacheEntry;
+				} catch {
+					return {
+						key,
+						hit: false,
+						source: 'l3_storage',
+						data: null
+					} as CacheEntry;
+				}
+			})
+		);
 
- return true;
- }
+		const hitsCount = results.filter((r) => r.hit).length;
+		this.executionMetrics.layerPerformance.l3StorageHits += hitsCount;
 
- /** * Performance metrics tracking */
- private initializeMetrics(): CacheExecutionMetrics {
- return {
- totalLatency: 0, cacheHitRate: 0, resourceUtilization: {
-	cpuThreads: 0, memoryUsedMB: 0, gpuUtilizationPercent: 0,
- },
-	layerPerformance: {
-	l1MemoryHits: 0, l2RedisHits: 0, l3StorageHits: 0, gpuTextureHits: 0, misses: 0,
- },
-	circuitBreakerStatus: {}
-};
- }
+		return results.filter((r) => r.hit);
+	}
 
- private resetMetrics(): void {
- this.executionMetrics = this.initializeMetrics();
- }
+	/**
+	 * Server cache lookups
+	 */
+	private async batchServerCacheLookup(keys: string[]): Promise<CacheEntry[]> {
+		const results = await Promise.all(
+			keys.map(async (key) => {
+				try {
+					const data = await getCache(key);
+					return {
+						key,
+						hit: data !== null && data !== undefined,
+						source: 'server_cache',
+						data
+					} as CacheEntry;
+				} catch {
+					return {
+						key,
+						hit: false,
+						source: 'server_cache',
+						data: null
+					} as CacheEntry;
+				}
+			})
+		);
 
- // Narrow results type to CacheEntry[] instead of `any[]`
- private updateMetrics(totalLatency: number, results: CacheEntry[]): void {
- const totalResults = results.length;
- const hits = results.filter((item) => item && item.hit).length;
+		return results.filter((r) => r.hit);
+	}
 
- this.executionMetrics.totalLatency = totalLatency;
- this.executionMetrics.cacheHitRate = totalResults > 0 ? hits / totalResults : 0;
- this.executionMetrics.layerPerformance.misses = Math.max(0, totalResults - hits, }
+	/**
+	 * Store data across cache tiers intelligently
+	 */
+	async storeParallel<T = unknown>(
+		key: string,
+		data: T,
+		options: {
+			tier?: 'l1' | 'l2' | 'l3' | 'all';
+			ttl?: number;
+			priority?: 'low' | 'normal' | 'high';
+			type?: string;
+		} = {}
+	): Promise<void> {
+		const { tier = 'all', ttl = 30 * 60 * 1000, priority = 'normal' } = options;
+		const storeOperations: Promise<unknown>[] = [];
+		const dataSize = JSON.stringify(data).length;
 
- private initializeResourceMonitoring(): void {
- // Monitor memory usage periodically (only in browser where available)
- // Use a typed view of performance.memory (non-standard) to avoid `any`
- if (browser && typeof (performance as { memory?: PerformanceMemory }).memory !== 'undefined') {
- setInterval(() => {
- const perf = performance as { memory?: PerformanceMemory };
- const mem = perf.memory;
- this.executionMetrics.resourceUtilization.memoryUsedMB = mem?.usedJSHeapSize
- ? mem.usedJSHeapSize / (1024 * 1024)
- : 0;
- },
-	30000);
- }
- }
+		if (tier === 'all' || tier === 'l1') {
+			if (dataSize < 10000 || priority === 'high') {
+				storeOperations.push(this.l1Memory.set(key, data, ttl));
+			}
+		}
 
- /** * Get performance statistics */
- async getPerformanceStats(): Promise<{
-	currentMetrics: CacheExecutionMetrics;
-	cacheStats: {
-	l1Size: number;
-	l2Size: number;
-	l3Size: number;
-	xstateStats: unknown;
-	shaderStats: unknown;
- };
- systemResources: CacheResourceAllocation;
- }> {
- return {
- currentMetrics: this.executionMetrics,
- cacheStats: {
-	l1Size: await this.getCacheSize(this.l1Memory, l2Size: await this.getCacheSize(this.l2Memory); l3Size: await this.getCacheSize(this.l3Storage, xstateStats: getCacheStats();
-	shaderStats: await shaderCacheManager.getShaderStats(),
- },
-	systemResources: this.resourceAllocation,
- };
- }
+		if (tier === 'all' || tier === 'l2') {
+			if (dataSize < 100000 || priority !== 'low') {
+				storeOperations.push(this.l2Memory.set(key, data, ttl));
+			}
+		}
 
- private async getCacheSize(_cache: MultiTierCache): Promise<number> {
- // Placeholder: MultiTierCache may expose size API - implement appropriately
- return 0;
- }
+		if (tier === 'all' || tier === 'l3') {
+			storeOperations.push(this.l3Storage.set(key, data, ttl));
+		}
 
- /** * Clear all cache tiers */
- async clearAll(): Promise<void> {
- await Promise.all,([this.l1Memory.clear(); this.l2Memory.clear(); this.l3Storage.clear()]);
- this.resetMetrics();
- this.circuitBreakerState.clear();
- }
+		if (!browser) {
+			storeOperations.push(setCache(key, data));
+		}
+
+		await Promise.allSettled(storeOperations);
+	}
+
+	/**
+	 * Circuit breaker management
+	 */
+	private recordCircuitBreakerFailure(operation: string): void {
+		const state = this.circuitBreakerState.get(operation) || {
+			failures: 0,
+			lastFailure: 0,
+			isOpen: false
+		};
+
+		state.failures += 1;
+		state.lastFailure = Date.now();
+
+		if (state.failures >= this.resourceAllocation.circuitBreakers.failureThreshold) {
+			state.isOpen = true;
+			console.warn(`🔒 Circuit breaker OPEN for ${operation} - ${state.failures} failures`);
+		}
+
+		this.circuitBreakerState.set(operation, state);
+		this.executionMetrics.circuitBreakerStatus[operation] = state.isOpen;
+	}
+
+	private isCircuitBreakerOpen(operation: string): boolean {
+		const state = this.circuitBreakerState.get(operation);
+		if (!state || !state.isOpen) return false;
+
+		const timeSinceLastFailure = Date.now() - state.lastFailure;
+		if (timeSinceLastFailure > this.resourceAllocation.circuitBreakers.recoveryTime) {
+			state.isOpen = false;
+			state.failures = 0;
+			this.circuitBreakerState.set(operation, state);
+			console.log(`✅ Circuit breaker CLOSED for ${operation} - recovered`);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Performance metrics tracking
+	 */
+	private initializeMetrics(): CacheExecutionMetrics {
+		return {
+			totalLatency: 0,
+			cacheHitRate: 0,
+			resourceUtilization: {
+				cpuThreads: 0,
+				memoryUsedMB: 0,
+				gpuUtilizationPercent: 0
+			},
+			layerPerformance: {
+				l1MemoryHits: 0,
+				l2RedisHits: 0,
+				l3StorageHits: 0,
+				gpuTextureHits: 0,
+				chrROMHits: 0,
+				misses: 0
+			},
+			circuitBreakerStatus: {}
+		};
+	}
+
+	private resetMetrics(): void {
+		this.executionMetrics = this.initializeMetrics();
+	}
+
+	private updateMetrics(totalLatency: number, results: CacheEntry[]): void {
+		const totalResults = results.length;
+		const hits = results.filter((item) => item && item.hit).length;
+
+		this.executionMetrics.totalLatency = totalLatency;
+		this.executionMetrics.cacheHitRate = totalResults > 0 ? hits / totalResults : 0;
+		this.executionMetrics.layerPerformance.misses = Math.max(0, totalResults - hits);
+	}
+
+	private initializeResourceMonitoring(): void {
+		// Monitor memory usage periodically (only in browser where available)
+		if (browser && typeof (performance as { memory?: PerformanceMemory }).memory !== 'undefined') {
+			setInterval(() => {
+				const perf = performance as { memory?: PerformanceMemory };
+				const mem = perf.memory;
+				this.executionMetrics.resourceUtilization.memoryUsedMB = mem?.usedJSHeapSize
+					? mem.usedJSHeapSize / (1024 * 1024)
+					: 0;
+			}, 30000);
+		}
+	}
+
+	/**
+	 * Get performance statistics
+	 */
+	async getPerformanceStats(): Promise<{
+		currentMetrics: CacheExecutionMetrics;
+		cacheStats: {
+			l1Size: number;
+			l2Size: number;
+			l3Size: number;
+			xstateStats: unknown;
+			shaderStats: unknown;
+		};
+		systemResources: CacheResourceAllocation;
+	}> {
+		return {
+			currentMetrics: this.executionMetrics,
+			cacheStats: {
+				l1Size: await this.getCacheSize(this.l1Memory),
+				l2Size: await this.getCacheSize(this.l2Memory),
+				l3Size: await this.getCacheSize(this.l3Storage),
+				xstateStats: getCacheStats(),
+				shaderStats: await shaderCacheManager.getShaderStats()
+			},
+			systemResources: this.resourceAllocation
+		};
+	}
+
+	private async getCacheSize(_cache: TierCache): Promise<number> {
+		// Placeholder: TierCache doesn't expose size API yet
+		return 0;
+	}
+
+	/**
+	 * Clear all cache tiers
+	 */
+	async clearAll(): Promise<void> {
+		await Promise.all([
+			this.l1Memory.clear(),
+			this.l2Memory.clear(),
+			this.l3Storage.clear()
+		]);
+
+		this.resetMetrics();
+		this.circuitBreakerState.clear();
+	}
 }
 
 // Export singleton instance
 export const parallelCacheOrchestrator = new ParallelCacheOrchestrator();
 export default parallelCacheOrchestrator;
-
-
-
-

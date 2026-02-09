@@ -1,9 +1,7 @@
 import type { PageServerLoad } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface ClusterCard {
-    id: string;
-	name: string;
+interface ClusterCard { id: string, name: string;
     cluster_id: string;
 	errorCode: string;
     count: number;
@@ -14,15 +12,12 @@ interface ClusterCard {
 	fix_suggestion: string;
     surface: string[];
 	tech: string[];
-    coordinates: {x: number;
-	y: number } | null;
+    coordinates: { x: number; y: number } | null;
     runId: string;
 	timestamp: string;
 }
 
-interface QdrantPoint {
-    id: number;
-	payload: ClusterCard;
+interface QdrantPoint { id: number, payload: ClusterCard;
 }
 
 interface QdrantScrollResponse {

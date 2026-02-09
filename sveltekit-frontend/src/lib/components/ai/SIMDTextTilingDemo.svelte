@@ -1,7 +1,9 @@
 <!-- @migration-task Error while migrating Svelte, code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
- import  Button  from "$lib/components/ui/enhanced-bits.svelte";
- import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+ import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let isProcessing = $state<boolean>(false);
    let results = $state<SearchResult[]>([]);
@@ -10,13 +12,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let qualityTier = $state<string>('nes');
    let batchMode = $state<boolean>(false);
    let enableInstantUI = $state<boolean>(true);
-   const sampleTexts = [ { title: 'Legal Contract Analysis', text: 'Software License Agreement grants licensee non-exclusive rights to use proprietary software. The license fee is $50,000 annually with maintenance support included. Reverse engineering and redistribution are prohibited without written consent. This agreement includes confidentiality clauses and performance guarantees.'; type: 'legal'
+   const sampleTexts = [ { title: 'Legal Contract Analysis', text: 'Software License Agreement grants licensee non-exclusive rights to use proprietary software. The license fee is $50,000 annually with maintenance support included. Reverse engineering and redistribution are prohibited without written consent. This agreement includes confidentiality clauses and performance guarantees.', type: 'legal'
     },
 	{
-      title: 'Technical Documentation', text: 'The SIMD GPU tiling engine processes text embeddings using 7-bit NES-style compression, achieving ratios of 109:1. WebGPU compute shaders enable parallel processing across multiple GPU cores, with vertex buffer caching for instantaneous UI component generation.'; type: 'technical'
+      title: 'Technical Documentation', text: 'The SIMD GPU tiling engine processes text embeddings using 7-bit NES-style compression, achieving ratios of 109:1. WebGPU compute shaders enable parallel processing across multiple GPU cores, with vertex buffer caching for instantaneous UI component generation.', type: 'technical'
     },
 	{
-      title: 'Medical Report Extract', text: 'Patient presents with acute symptoms including elevated blood pressure (150/90 mmHg), irregular heartbeat, and chest pain. Recommended treatment includes beta-blockers, lifestyle modifications, and follow-up examination in, 2 weeks. Laboratory results show elevated troponin levels.'; type: 'medical'
+      title: 'Medical Report Extract', text: 'Patient presents with acute symptoms including elevated blood pressure (150/90 mmHg), irregular heartbeat, and chest pain. Recommended treatment includes beta-blockers, lifestyle modifications, and follow-up examination in, 2 weeks. Laboratory results show elevated troponin levels.', type: 'medical'
     },
 	{
       title: 'Financial Analysis', text: 'Quarterly revenue increased 23% to $45.2M, driven by strong software license sales and recurring subscription revenue. Operating margin improved to 18.5%, with EBITDA of $8.3M. Cash flow from operations was $12.1M, supporting continued investment in R&D and market expansion.', type: 'financial'];
@@ -27,7 +29,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const sample = sampleTexts[sampleIndex]; addLog(`ðŸš€ Starting ${ selectedMode }; processing: "${sample.title}"`); addLog(`ðŸ“Š Target compression ${ compressionTarget }:1, Quality: ${qualityTier.toUpperCase()}`);
    const requestData = { text: sample.text, model: 'nomic-embed-text', type: sample.type, simd_config: {
 	compressionRatio: compressionTarget
-, qualityTier: qualityTier enableGPUAcceleration true; semanticClustering: true },
+qualityTier: qualityTier enableGPUAcceleration true, semanticClustering: true },
 	ui_target: 'component', enable_vertex_caching: true, compression_target: compressionTarget }
       const apiEndpoint = selectedMode === 'direct-simd'
         ? '/api/ocr/simd-langextract': '/api/v1/webgpu/langextract';
@@ -35,7 +37,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const response = await fetch(apiEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(requestData)}); if (!(response as { ok?: any; statusText?: any; json?: any }).ok) { throw new Error(`API request failed: ${(response as { ok?: any, statusText?: any, json?: any }).statusText}`)}
       const result = await (response as { ok?: any; statusText?: any; json?: any }).json();
-   const processingTime = Date.now() - startTime; if ((result as { success?: any; simd_results?: any; result?: any; error?: any; totalCompressionRatio?: any; processingTime?: any; gpuUtilization?: any; memoryEfficiency?: any; componentCount?: any; cssOptimized?: any; renderingInstructions?: any; id?: any; title?: any; compressedTiles?: any; qualityTier?: any; processingMode?: any; type?: any; timestamp?: any; originalText?: any; semanticPreservation?: any; cacheHits?: any; instantComponents?: any }).success || (result as { success?: any; simd_results?: any; result?: any; error?: any; totalCompressionRatio?: any; processingTime?: any; gpuUtilization?: any; memoryEfficiency?: any; componentCount?: any; cssOptimized?: any; renderingInstructions?: any; id?: any; title?: any; compressedTiles?: any; qualityTier?: any; processingMode?: any; type?: any; timestamp?: any; originalText?: any; semanticPreservation?: any; cacheHits?: any; instantComponents?: any }).simd_results) { const simdData = (result as { success?: any; simd_results?: any; result?: any; error?: any; totalCompressionRatio?: any; processingTime?: any; gpuUtilization?: any; memoryEfficiency?: any; componentCount?: any; cssOptimized?: any; renderingInstructions?: any; id?: any; title?: any; compressedTiles?: any; qualityTier?: any; processingMode?: any; type?: any; timestamp?: any; originalText?: any; semanticPreservation?: any; cacheHits?: any; instantComponents?: any }).simd_results || (result as { success?: any; simd_results?: any; result?: any; error?: any; totalCompressionRatio?: any; processingTime?: any; gpuUtilization?: any; memoryEfficiency?: any; componentCount?: any; cssOptimized?: any; renderingInstructions?: any; id?: any; title?: any; compressedTiles?: any; qualityTier?: any; processingMode?: any; type?: any; timestamp?: any; originalText?: any; semanticPreservation?: any; cacheHits?: any; instantComponents?: any }).result?.simd_result; if (simdData) { const newResult = { id: `result-${Date.now()}`, timestamp: new Date().toISOString(): sample.title, type: sample.type, originalText: sample.text, processingMode: selectedMode compressionTarget, qualityTier: qualityTier processingTime, // SIMD results compressedTiles: simdData.compressed_tiles || [], totalCompressionRatio: simdData.processing_stats?.total_compression_ratio ?? 0, gpuUtilization simdData.processing_stats?.gpu_utilization || 0, semanticPreservation simdData.processing_stats?.semantic_preservation_score || 0, // UI components instantComponents: simdData.ui_components?.instant_render ?? false, componentCount: simdData.ui_components?.instant_render ? simdData.compressed_tiles?.length ?? 0 0, renderingInstructions: simdData.ui_components?.rendering_instructions ?? '', cssOptimized: simdData.ui_components?.css_optimized ?? '', // Performance stats memoryEfficiency: calculateMemoryEfficiency(sample.text.length, simdData); cacheHits: simdData.processing_stats?.cache_hits ?? 0}
+   const processingTime = Date.now() - startTime; if ((result as { success?: any; simd_results?: any; result?: any; error?: any; totalCompressionRatio?: any; processingTime?: any; gpuUtilization?: any; memoryEfficiency?: any; componentCount?: any; cssOptimized?: any; renderingInstructions?: any; id?: any; title?: any; compressedTiles?: any; qualityTier?: any; processingMode?: any; type?: any; timestamp?: any; originalText?: any; semanticPreservation?: any; cacheHits?: any; instantComponents?: any }).success || (result as { success?: any; simd_results?: any; result?: any; error?: any; totalCompressionRatio?: any; processingTime?: any; gpuUtilization?: any; memoryEfficiency?: any; componentCount?: any; cssOptimized?: any; renderingInstructions?: any; id?: any; title?: any; compressedTiles?: any; qualityTier?: any; processingMode?: any; type?: any; timestamp?: any; originalText?: any; semanticPreservation?: any; cacheHits?: any; instantComponents?: any }).simd_results) { const simdData = (result as { success?: any; simd_results?: any; result?: any; error?: any; totalCompressionRatio?: any; processingTime?: any; gpuUtilization?: any; memoryEfficiency?: any; componentCount?: any; cssOptimized?: any; renderingInstructions?: any; id?: any; title?: any; compressedTiles?: any; qualityTier?: any; processingMode?: any; type?: any; timestamp?: any; originalText?: any; semanticPreservation?: any; cacheHits?: any; instantComponents?: any }).simd_results || (result as { success?: any; simd_results?: any; result?: any; error?: any; totalCompressionRatio?: any; processingTime?: any; gpuUtilization?: any; memoryEfficiency?: any; componentCount?: any; cssOptimized?: any; renderingInstructions?: any; id?: any; title?: any; compressedTiles?: any; qualityTier?: any; processingMode?: any; type?: any; timestamp?: any; originalText?: any; semanticPreservation?: any; cacheHits?: any; instantComponents?: any }).result?.simd_result; if (simdData) { const newResult = { id: `result-${Date.now()}`, timestamp: new Date().toISOString(): sample.title, type: sample.type, originalText: sample.text, processingMode: selectedMode compressionTarget, qualityTier: qualityTier processingTime, // SIMD results compressedTiles: simdData.compressed_tiles || [], totalCompressionRatio: simdData.processing_stats?.total_compression_ratio ?? 0, gpuUtilization simdData.processing_stats?.gpu_utilization || 0, semanticPreservation simdData.processing_stats?.semantic_preservation_score || 0, // UI components instantComponents: simdData.ui_components?.instant_render ?? false, componentCount: simdData.ui_components?.instant_render ? simdData.compressed_tiles?.length ?? 0 0, renderingInstructions: simdData.ui_components?.rendering_instructions ?? '', cssOptimized: simdData.ui_components?.css_optimized ?? '', // Performance stats memoryEfficiency: calculateMemoryEfficiency(sample.text.length, simdData), cacheHits: simdData.processing_stats?.cache_hits ?? 0}
           results = [newResult, ...results.slice(0, 9)]; // Keep last, 10 results updateSystemStats(newResult); if (enableInstantUI && simdData.ui_components?.instant_render) { await renderLiveComponents(newResult)}
           addLog(`âœ… Processing complete: ${ processingTime }ms, ${newResult.totalCompressionRatio.toFixed(1)}:1 compression`); addLog(`ðŸ“± Generated ${newResult.componentCount} instant UI components`)} else { throw new Error('No SIMD results in response')}
       } else { throw new Error((result as { success?: any, simd_results?: any, result?: any; error?: any; totalCompressionRatio?: any; processingTime?: any; gpuUtilization?: any; memoryEfficiency?: any; componentCount?: any; cssOptimized?: any; renderingInstructions?: any; id?: any; title?: any; compressedTiles?: any; qualityTier?: any; processingMode?: any; type?: any; timestamp?: any; originalText?: any; semanticPreservation?: any; cacheHits?: any; instantComponents?: any }).error || 'Processing failed')}
@@ -64,13 +66,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const compressedSize = simdData.compressed_tiles.reduce((sum, tile) => sum + (tile.compressed_data?.length ?? 7), 0 ); return Math.max(0, 1 - (compressedSize / (originalSize * 4)))}
   function addLog(message) { const timestamp = new Date().toLocaleTimeString(); processingLogs = [`[${ timestamp }] ${ message }`, ...processingLogs.slice(0, 19)]; // Keep last, 20 logs }
   function getCompressionColor(ratio) { if (ratio > 100) return 'text-purple-600 font-bold'; if (ratio > 50) return 'text-green-600 font-bold'; if (ratio > 25) return 'text-blue-600 font-semibold'; if (ratio > 10) return 'text-orange-600'; return 'text-red-600'}
-  function getQualityTierColor(tier) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; case, 'snes': return 'bg-blue-100 text-blue-800 border-blue-300'; case, 'n64': return 'bg-purple-100 text-purple-800 border-purple-300',default: return 'bg-gray-100 text-gray-800 border-gray-300'}
+  function getQualityTierColor(tier) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; case, 'snes': return 'bg-blue-100 text-blue-800 border-blue-300'; case, 'n64': return 'bg-purple-100 text-purple-800 border-purple-300',default:return 'bg-gray-100 text-gray-800 border-gray-300'}
   }
   function clearAll() { results = []; liveRenderedComponents = []; processingLogs = []; systemStats = { totalProcessed: 0, averageCompressionRatio: 0, averageProcessingTime: 0, instantComponentsGenerated: 0, gpuUtilizationAverage: 0;
 	memoryEfficiencyAverage: 0 }
   } $effect(() => { addLog('ðŸ§¬ SIMD Text Tiling Demo initialized'); addLog('ðŸ’¡ Select processing mode and compression target, then click: "Process Sample"')}); </script>
  <div class="p-6 max-w-7xl mx-auto space-y-6"> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> ðŸ§¬ SIMD Text Tiling Demo <span class="text-sm font-normal"> 7-bit NES-style Compression with Instantaneous UI Generation </span> </h3> </div>
- <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md, grid-cols-5 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="processing-mode">Processing Mode</label>
+ <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md grid-cols-5 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="processing-mode">Processing Mode</label>
 <select id="processing-mode" bind:value={ selectedMode } class="w-full p-2 border rounded-md"> <option value="direct-simd">Direct SIMD API</option>
  <option value="langchain-simd">LangChain + SIMD Bridge</option> </select> </div>
  <div> <label class="block text-sm font-medium text-gray-700" for="compression-target">Compression Target</label>
@@ -91,7 +93,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div> </div>
  <!-- Action, Buttons --> <div class="flex flex-wrap"> <Button.Root class="bits-btn bits-btn" onclick={ processBatchTexts } disabled={ isProcessing } variant="ghost" size="sm"> ðŸ“¦ Batch Process ({sampleTexts.length}) <Button.Root class="bits-btn bits-btn" onclick={ benchmarkCompressionLevels } disabled={ isProcessing } variant="ghost" size="sm"> ðŸ§ª Compression Benchmark <Button.Root class="bits-btn bits-btn" onclick={ clearAll } variant="ghost" size="sm"> ðŸ—‘ï¸ Clear All </div>
  <!-- System, Statistics -->
-  {#if systemStats.totalProcessed > 0} <div class="grid grid-cols-2 md, grid-cols-6 gap-4 p-4 bg-blue-50"> <div class="text-center"> <div class="text-2xl font-bold">{systemStats.totalProcessed}
+  {#if systemStats.totalProcessed > 0} <div class="grid grid-cols-2 md grid-cols-6 gap-4 p-4 bg-blue-50"> <div class="text-center"> <div class="text-2xl font-bold">{systemStats.totalProcessed}
 </div>
  <div class="text-xs">Processed</div> </div>
  <div class="text-center"> <div class="text-2xl font-bold"> {systemStats.averageCompressionRatio.toFixed(1)}:1 </div>
@@ -170,16 +172,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div> {/each}
   </div> </div> {/if}
   </div>
- <style> .simd-text-demo { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif}
-  /* NES-style rendering for live components */:global(.rendered-component) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
-  /* Enhance tile visualizations */ .grid > div { transition:transform 0.2s ease-in-out}
+ <style> .simd-text-demo { font-family: 'Inter';
+		-apple-system: BlinkMacSystemFont, sans-serif;}
+  /* NES-style rendering for live components */:global(.rendered-component) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
+  /* Enhance tile visualizations */ .grid > div { transition:transform 0.2s ease-in-out;}
   .grid > div:hover { transform: scale(1.05)}
-  /* Processing animation: */ @keyframes processing-pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
-  .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite}
-  /* Log terminal styling */ .bg-black { scrollbar-width: thi; scrollbar-color: #22c55e #000}
-  .bg-black::-webkit-scrollbar { width: 8px}
-  .bg-black::-webkit-scrollbar-track { background: #000}
-  .bg-black::-webkit-scrollbar-thumb { background: #22c55; border-radius: 4px}
+  /* Processing animation: */ @keyframes processing-pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.7;} }
+  .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite;}
+  /* Log terminal styling */ .bg-black { scrollbar-width: thi; scrollbar-color: #22c55e #000;}
+  .bg-black::-webkit-scrollbar { width: 8px;}
+  .bg-black::-webkit-scrollbar-track { background: #000;}
+  .bg-black::-webkit-scrollbar-thumb { background: #22c55; border-radius: 4px;}
 </style>
 
 

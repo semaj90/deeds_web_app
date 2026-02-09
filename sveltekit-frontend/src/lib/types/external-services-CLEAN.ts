@@ -97,7 +97,7 @@ export interface PgVectorClient {
     vector: number[],
     limit?: number
   ): Promise<Array<{
-	id: string; similarity: number;
+	id: string, similarity: number;
 	metadata: Record<string, unknown> }>>;
   insert(
     collection: string,
@@ -120,15 +120,14 @@ export interface MinIOConfig {
 
 export interface MinIOClient {
   putObject(
-    bucket: string,
-    key: string,
+    bucket: string, key: string,
     data: Buffer | ReadableStream,
     metadata?: Record<string, string>
   ): Promise<{ etag, string }>;
   getObject(bucket: string, key: string): Promise<ReadableStream>;
   removeObject(bucket: string, key: string): Promise<void>;
   listObjects(bucket: string, prefix?: string): Promise<Array<{
-	name: string; size: number; etag, string }>>;
+	name: string, size: number; etag, string }>>;
   makeBucket?(bucket: string, region?: string): Promise<void>;
   bucketExists?(bucket: string): Promise<boolean>;
 }

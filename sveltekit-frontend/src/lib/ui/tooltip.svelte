@@ -53,7 +53,7 @@
  }
 
  /* Mobile support */
- @media (hover: none) and (pointer: coarse) {
+ @media (hover:none) and (pointer: coarse) {
  .tooltip:active .tooltiptext {
  visibility: visible;
  }

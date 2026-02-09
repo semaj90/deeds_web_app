@@ -67,7 +67,7 @@ export const GET: RequestHandler = async () => {
  } catch (error: Error | unknown) {
  return json(
  {
- success: error instanceof Error ? error.message : String(error, stack: error instanceof Error ? error.stack : undefined, timestamp Date().toISOString(),
+ success: error instanceof Error ? error.message : String(error, stack: error instanceof Error ? error.stack  | undefined, timestamp Date().toISOString(),
  },
  { status: 500 }
  );

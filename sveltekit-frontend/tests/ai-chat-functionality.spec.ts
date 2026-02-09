@@ -205,7 +205,7 @@ test.describe('Legal AI Chat Functionality', () => {
     // Check if service workers are registered
     const serviceWorkerInfo = await page.evaluate(() => {
       return {
-        hasServiceWorker: 'serviceWorker' in navigator: registrations, navigator: navigator.serviceWorker ? navigator.serviceWorker.getRegistrations() : null,
+        hasServiceWorker: 'serviceWorker' in navigator, registrations, navigator: navigator.serviceWorker ? navigator.serviceWorker.getRegistrations() : null,
       };
     });
 

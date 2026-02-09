@@ -1,0 +1,452 @@
+/**
+ * CHR-ROM Pre-computation Service
+ * Generates hyper-optimized, ready-to-render UI patterns for zero-latency experience
+ *
+ * This service transforms raw legal data into tiny, pre-formatted patterns
+ * stored in Redis L1 cache for instant UI rendering
+ */
+
+import { redisWebGPUIntegration } from '$lib/integrations/redis-webgpu-simd-integration'; // Assuming this exists or will be mocked
+import type { LegalDocument } from '$lib/types/legal';
+
+// CHR-ROM Pattern Types - tiny, optimized UI representations
+export type PatternType = 'icon' | 'badge' | 'summary' | 'gauge' | 'graph' | 'heatmap';
+
+export interface CHRROMPattern {
+  type: PatternType;
+  size: 'xs' | 'sm' | 'md' | 'lg';
+  data: string; // Hyper-compressed representation
+  metadata: {
+    confidence: number;
+    timestamp: number;
+    version: string;
+  };
+}
+
+// Pre-computation strategies for different UI patterns
+export interface PrecomputationStrategy {
+  pattern: string;
+  priority: number;
+  frequency: number; // milliseconds
+  // Changed: accept Partial<LegalDocument> so lightweight/mock docs are valid
+  generator: (data: Partial<LegalDocument>) => Promise<CHRROMPattern>;
+  trigger: 'hover' | 'scroll' | 'focus' | 'background';
+}
+
+// Top-level PatternOptimizer type + dynamic loader interface
+interface PatternOptimizer {
+  // accept Partial<LegalDocument>
+  generateOptimizedPattern(name: string, doc: Partial<LegalDocument>): Promise<CHRROMPattern>;
+}
+
+async function loadPatternOptimizer(): Promise<PatternOptimizer> {
+  // @ts-ignore
+  const mod = await import('./chr-rom-pattern-optimizer.js');
+  // Support named export, default export, or module itself
+  // @ts-ignore
+  const candidate = (mod.chrROMPatternOptimizer ?? mod.default ?? mod) as PatternOptimizer;
+  if (!candidate || typeof candidate.generateOptimizedPattern !== 'function') {
+    throw new Error('Pattern optimizer module does not export generateOptimizedPattern');
+  }
+  return candidate;
+}
+
+// New: module-level type for precompute documents (moved out of class)
+export type PrecomputeDocument = Partial<LegalDocument> & {
+  analysis?: {
+    confidence: number;
+    riskLevel: number;
+    entities: string[];
+  };
+};
+
+export class CHRROMPrecomputationService {
+  private strategies: Map<string, PrecomputationStrategy> = new Map();
+  private backgroundTimer: ReturnType<typeof setInterval> | null = null;
+  private isRunning = false; // Transformed from $state(false) to normal property as this is a service
+
+  constructor() {
+    this.initializeStrategies();
+  }
+
+  /**
+   * Initialize all CHR-ROM pattern generation strategies
+   */
+  private initializeStrategies(): void {
+    // Document Summary Icons - 16x16 SVG patterns
+    this.strategies.set('doc_summary_icon', {
+      pattern: 'doc:{id}:summary:icon',
+      priority: 10,
+      frequency: 30000, // 30 seconds
+      generator: this.generateDocumentSummaryIcon.bind(this),
+      trigger: 'hover',
+    });
+
+    // Risk Assessment Gauges - Tiny progress bars
+    this.strategies.set('risk_gauge', {
+      pattern: 'doc:{id}:risk:gauge',
+      priority: 9,
+      frequency: 60000, // 1 minute
+      generator: this.generateRiskGauge.bind(this),
+      trigger: 'hover',
+    });
+
+    // Entity Relationship Heatmaps - 32x32 pixel patterns
+    this.strategies.set('entity_heatmap', {
+      pattern: 'doc:{id}:entities:heatmap',
+      priority: 8,
+      frequency: 120000, // 2 minutes
+      generator: this.generateEntityHeatmap.bind(this),
+      trigger: 'focus',
+    });
+
+    // Confidence Badges - Single color + number
+    this.strategies.set('confidence_badge', {
+      pattern: 'doc:{id}:confidence:badge',
+      priority: 7,
+      frequency: 45000, // 45 seconds
+      generator: this.generateConfidenceBadge.bind(this),
+      trigger: 'scroll',
+    });
+
+    // Similarity Graphs - Micro line graphs
+    this.strategies.set('similarity_graph', {
+      pattern: 'doc:{id}:similarity:graph',
+      priority: 6,
+      frequency: 180000, // 3 minutes
+      generator: this.generateSimilarityGraph.bind(this),
+      trigger: 'background',
+    });
+
+    // Category Color Patterns - Single hex color
+    this.strategies.set('category_color', {
+      pattern: 'doc:{id}:category:color',
+      priority: 10,
+      frequency: 15000, // 15 seconds
+      generator: this.generateCategoryColor.bind(this),
+      trigger: 'background',
+    });
+
+    // Processing Status Indicators - Animated SVG
+    this.strategies.set('status_indicator', {
+      pattern: 'doc:{id}:status:indicator',
+      priority: 9,
+      frequency: 10000, // 10 seconds
+      generator: this.generateStatusIndicator.bind(this),
+      trigger: 'background',
+    });
+  }
+
+  /**
+   * Start the pre-computation background service
+   */
+  async start(): Promise<void> {
+    console.log('🎮 Starting CHR-ROM Pre-computation Service...');
+    if (this.isRunning) {
+      console.log('⚠️ CHR-ROM service already running');
+      return;
+    }
+    this.isRunning = true;
+
+    // Start background processing
+    this.backgroundTimer = setInterval(() => {
+      void this.runBackgroundPrecomputation();
+    }, 5000); // Check every 5 seconds
+
+    // Immediate first run for high-priority patterns
+    setTimeout(() => void this.runBackgroundPrecomputation(), 1000);
+    console.log('✅ CHR-ROM Pre-computation Service started');
+  }
+
+  /**
+   * Run background pre-computation cycle
+   */
+  private async runBackgroundPrecomputation(): Promise<void> {
+    try {
+      // Get recent documents that need pattern generation
+      const recentDocs = await this.getRecentDocuments();
+
+      // Process each document with all strategies
+      const precomputePromises: Promise<void>[] = recentDocs.flatMap((doc) =>
+        Array.from(this.strategies.values())
+          .filter((strategy) => this.shouldRunStrategy(strategy))
+          .map((strategy) => this.precomputePattern(doc, strategy))
+      );
+
+      // Execute with concurrency limit
+      await this.executeWithConcurrencyLimit(precomputePromises, 3);
+    } catch (error) {
+      console.error('❌ Background pre-computation error: ', error);
+    }
+  }
+
+  /**
+   * Pre-compute a specific pattern for a document
+   */
+  private async precomputePattern(
+    doc: Partial<LegalDocument>,
+    strategy: PrecomputationStrategy
+  ): Promise<void> {
+    try {
+      const docId = String(doc.id);
+      const cacheKey = strategy.pattern.replace('{id}', docId);
+
+      // Check if pattern already exists and is recent
+      // @ts-ignore
+      const existing = await redisWebGPUIntegration.getCachedResult(cacheKey);
+      if (existing && this.isPatternFresh(existing, strategy.frequency)) {
+        return;
+      }
+
+      // Generate the CHR-ROM pattern
+      const pattern = await strategy.generator(doc);
+
+      // Store in Redis L1 cache with appropriate TTL (seconds)
+      // @ts-ignore
+      await redisWebGPUIntegration.cacheResult(cacheKey, pattern, {
+        ttl: Math.ceil(strategy.frequency / 1000) * 2, // 2x frequency in seconds
+        priority: strategy.priority,
+      });
+
+      console.log(`🎮 Generated CHR-ROM pattern: ${cacheKey}`);
+    } catch (error) {
+      console.error(`CHR-ROM pattern generation failed for ${strategy.pattern}: `, error);
+    }
+  }
+
+  /**
+   * Generate document summary icon using optimized format
+   */
+  private async generateDocumentSummaryIcon(doc: Partial<LegalDocument>): Promise<CHRROMPattern> {
+    const optimizer = await loadPatternOptimizer();
+    return optimizer.generateOptimizedPattern('doc_summary_icon', doc);
+  }
+
+  /**
+   * Generate risk assessment gauge using optimized format
+   */
+  private async generateRiskGauge(doc: Partial<LegalDocument>): Promise<CHRROMPattern> {
+    const optimizer = await loadPatternOptimizer();
+    return optimizer.generateOptimizedPattern('risk_gauge', doc);
+  }
+
+  /**
+   * Generate entity relationship heatmap using optimized format
+   */
+  private async generateEntityHeatmap(doc: Partial<LegalDocument>): Promise<CHRROMPattern> {
+    const optimizer = await loadPatternOptimizer();
+    return optimizer.generateOptimizedPattern('entity_heatmap', doc);
+  }
+
+  /**
+   * Generate confidence badge using optimized format
+   */
+  private async generateConfidenceBadge(doc: Partial<LegalDocument>): Promise<CHRROMPattern> {
+    const optimizer = await loadPatternOptimizer();
+    return optimizer.generateOptimizedPattern('confidence_badge', doc);
+  }
+
+  /**
+   * Generate similarity micro-graph using optimized format
+   */
+  private async generateSimilarityGraph(doc: Partial<LegalDocument>): Promise<CHRROMPattern> {
+    const optimizer = await loadPatternOptimizer();
+    return optimizer.generateOptimizedPattern('similarity_graph', doc);
+  }
+
+  /**
+   * Generate category color using optimized format
+   */
+  private async generateCategoryColor(doc: Partial<LegalDocument>): Promise<CHRROMPattern> {
+    const optimizer = await loadPatternOptimizer();
+    return optimizer.generateOptimizedPattern('category_color', doc);
+  }
+
+  /**
+   * Generate processing status indicator using optimized format
+   */
+  private async generateStatusIndicator(doc: Partial<LegalDocument>): Promise<CHRROMPattern> {
+    const optimizer = await loadPatternOptimizer();
+    return optimizer.generateOptimizedPattern('status_indicator', doc);
+  }
+
+  /**
+   * Generate empty pattern fallback
+   */
+  private generateEmptyPattern(type: PatternType): CHRROMPattern {
+    const emptyPatterns: Record<PatternType, string> = {
+      icon: '<div style="width: 16px, height: 16px; background: #e5e7eb; border-radius: 50%"></div>',
+      badge: '<span style="width: 8px, height: 8px; background: #e5e7eb; border-radius: 2px"></span>',
+      summary: '',
+      gauge: '<div style="width: 40px, height: 4px; background: #e5e7eb; border-radius: 2px"></div>',
+      graph: '<svg viewBox="0 0 40 20" style="width: 40px, height: 20px"></svg>',
+      heatmap: '<div style="width: 32px, height: 32px; background: #f3f4f6"></div>',
+    };
+    return {
+      type,
+      size: 'xs',
+      data: emptyPatterns[type] || '',
+      metadata: {
+        confidence: 0,
+        timestamp: Date.now(),
+        version: '1.0',
+      },
+    };
+  }
+
+  /**
+   * Fetch a list of recent documents to precompute patterns for.
+   * NOTE: This is a development/mock implementation.
+   * In production, you MUST use Drizzle ORM via $lib/server/db/client to fetch documents, per project guidelines.
+   */
+  private async getRecentDocuments(): Promise<PrecomputeDocument[]> {
+    // Mocked dataset for development / testing.
+    // In production, query your DB using Drizzle ORM ($lib/server/db/client) or another canonical source.
+    return [
+      {
+        id: 'doc_001',
+        metadata: { type: 'contract', category: 'nda' },
+        analysis: { confidence: 0.92, riskLevel: 0.2, entities: ['companyA', 'companyB'] },
+        processingStatus: 'completed',
+      },
+      {
+        id: 'doc_002',
+        metadata: { type: 'brief', category: 'litigation' },
+        analysis: { confidence: 0.85, riskLevel: 0.4, entities: ['plaintiff', 'defendant'] },
+        processingStatus: 'processing',
+      },
+      {
+        id: 'doc_003',
+        metadata: { type: 'agreement', category: 'agreement' },
+        analysis: { confidence: 0.76, riskLevel: 0.5, entities: ['client', 'vendor'] },
+        processingStatus: 'completed',
+      },
+    ] as PrecomputeDocument[];
+  }
+
+  /**
+   * Execute promises with concurrency limit using a dynamic pool for optimal resource utilization.
+   */
+  private async executeWithConcurrencyLimit<T>(promises: Promise<T>[], limit: number): Promise<T[]> {
+    const results: T[] = [];
+    let idx = 0;
+    const pool: Promise<void>[] = [];
+    const errors: any[] = [];
+
+    async function runNext(): Promise<void> {
+      if (idx >= promises.length) return;
+      const currentIdx = idx++;
+      try {
+        const value = await promises[currentIdx];
+        results.push(value);
+      } catch (err) {
+        errors.push(err);
+        console.warn('Batch item failed: ', err);
+      }
+      await runNext();
+    }
+
+    for (let i = 0; i < Math.min(limit, promises.length); i++) {
+      pool.push(runNext());
+    }
+    await Promise.all(pool);
+    return results;
+  }
+
+  /**
+   * Public API: Pre-compute specific pattern on demand
+   */
+  async precomputeOnDemand(docId: string, patternType: string): Promise<CHRROMPattern | null> {
+    const strategy = this.strategies.get(patternType);
+    if (!strategy) {
+      console.warn(`Unknown pattern type: ${patternType}`);
+      return null;
+    }
+
+    // Get document data (mock for now) - use same structure as getRecentDocuments
+    const doc: PrecomputeDocument = {
+      id: docId,
+      metadata: { type: 'contract', category: 'nda' },
+      analysis: { confidence: 0.92, riskLevel: 0.2, entities: ['companyA', 'companyB'] },
+      processingStatus: 'completed',
+    };
+
+    try {
+      const pattern = await strategy.generator(doc);
+
+      // Store in cache
+      const cacheKey = strategy.pattern.replace('{id}', docId);
+      // @ts-ignore
+      await redisWebGPUIntegration.cacheResult(cacheKey, pattern, {
+        ttl: 3600,
+        priority: 10,
+      });
+
+      return pattern;
+    } catch (error) {
+      console.error('On-demand pattern generation failed: ', error);
+      return null;
+    }
+  }
+
+  /**
+   * Stop the pre-computation service
+   */
+  stop(): void {
+    console.log('🛑 Stopping CHR-ROM Pre-computation Service...');
+    if (this.backgroundTimer) {
+      clearInterval(this.backgroundTimer);
+      this.backgroundTimer = null;
+    }
+    this.isRunning = false;
+    console.log('✅ CHR-ROM Pre-computation Service stopped');
+  }
+
+  /**
+   * Get service statistics
+   */
+  getStats(): { isRunning: boolean, strategiesCount: number; strategies: string[] } {
+    return {
+      isRunning: this.isRunning,
+      strategiesCount: this.strategies.size,
+      strategies: Array.from(this.strategies.keys()),
+    };
+  }
+
+  /**
+   * Decide whether a strategy should be executed during a background sweep.
+   * Conservative default:
+   * - Always run strategies with trigger === 'background'
+   * - Also run high-priority items (priority >= 9) on background sweeps
+   * - Skip hover/focus triggers unless explicitly backgrounded
+   */
+  private shouldRunStrategy(strategy: PrecomputationStrategy): boolean {
+    if (!strategy) return false;
+    if (strategy.trigger === 'background') return true;
+    // Run high priority ones in background to ensure UX freshness
+    if (typeof strategy.priority === 'number' && strategy.priority >= 9) return true;
+    // Otherwise skip for background pass (hover/scroll/focus handled by on-demand or UI triggers)
+    return false;
+  }
+
+  /**
+   * Determine whether an existing cached pattern is: "fresh" relative to the strategy frequency.
+   * Expects: cached object to have metadata.timestamp (ms). Returns true when cached item is recent.
+   */
+  private isPatternFresh(existing: any, frequencyMs: number): boolean {
+    try {
+      // attempt to safely pull timestamp
+      const maybeMeta = (existing as any)?.metadata;
+      const ts = typeof maybeMeta?.timestamp === 'number' ? maybeMeta.timestamp : NaN;
+      if (!Number.isFinite(ts)) return false;
+      const age = Date.now() - ts;
+      // Consider fresh if age is less than the strategy frequency (i.e., don't re-run until it's aged)
+      return age < Math.max(0, frequencyMs);
+    } catch {
+      return false;
+    }
+  }
+}
+
+// Singleton instance
+export const chrROMPrecomputation = new CHRROMPrecomputationService();

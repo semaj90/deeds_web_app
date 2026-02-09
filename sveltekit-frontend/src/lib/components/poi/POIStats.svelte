@@ -1,6 +1,8 @@
 <script lang="ts">
  import { poiService } from '$lib/services/poi';
- import { AlertTriangle, TrendingUp, Users } from 'lucide-svelte';
+ import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+ import TrendingUp from 'lucide-svelte/icons/trending-up';
+ import Users from 'lucide-svelte/icons/users';
  // Migrated to $effect
 
  // Props

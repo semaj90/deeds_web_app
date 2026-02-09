@@ -1,6 +1,4 @@
 <script lang="ts">
-	let onClose = $state<any>(undefined);
-
 	/**
 	 * Phase 72 Error Brain Modal
 	 * NES-styled real-time error viewer with AI suggestions
@@ -9,43 +7,42 @@
 
 	// Migrated to $effect
 	import { fade, fly } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	const { routePath = null, onClose = () => {} } = $props<{
 		routePath?: string | null;
-		onClose?, () => void;
+		onClose?: () => void;
 	}>();
 
 	interface Phase72Error {
 		id: string;
-	error_hash: string;
+		error_hash: string;
 		error_code: string;
-	file_path: string;
+		file_path: string;
 		line_num: number;
-	column_num: number;
+		column_num: number;
 		occurrence_count: number;
-	message: string;
+		message: string;
 		severity: string;
-	last_seen: string;
+		last_seen: string;
 		cycle?: number;
 		created_at?: string;
 	}
 
 	interface StatsSummary {
 		total_errors: number;
-	unique_codes: number;
+		unique_codes: number;
 		affected_files: number;
-	total_occurrences: number;
+		total_occurrences: number;
 	}
 
-	let errors: Phase72Error[] = [];
-	let stats: StatsSummary, null = null;
-	let loading = true;
-	let selectedError: Phase72Error, null = null;
-	let similarErrors: any[] = [];
-	let aiSuggestion = '';
-	let streamingFix = false;
-	let showSimilar = false;
+	let errors = $state<Phase72Error[]>([]);
+	let stats = $state<StatsSummary | null>(null);
+	let loading = $state(true);
+	let selectedError = $state<Phase72Error | null>(null);
+	let similarErrors = $state<any[]>([]);
+	let aiSuggestion = $state('');
+	let streamingFix = $state(false);
+	let showSimilar = $state(false);
 
 	async function loadErrors() {
 		loading = true;
@@ -54,7 +51,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			if (routePath) params.set('route', routePath);
 			params.set('limit', '50');
 
-			const response = await fetch(`/api/phase72/errors? ${params}`);
+			const response = await fetch(`/api/phase72/errors?${params}`);
 			const data = await response.json();
 
 			errors = data.errors ?? [];
@@ -93,9 +90,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			const response = await fetch('/api/phase72/similar', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	error_hash: errorHash, similar_errors: similarErrors, similarErrors,
-					context: routePath ? `Route: ${ routePath }` : null
+				body: JSON.stringify({
+					error_hash: errorHash,
+					similar_errors: similarErrors,
+					context: routePath ? `Route: ${routePath}` : null
 				})
 			});
 
@@ -137,24 +135,28 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	function getSeverityColor(severity: string) {
 		switch (severity) {
-			case 'error': return '#e74856';
-			case 'warning': return '#f9a825';
-			case 'info': return '#0078d7';
-			default: return '#fff';
+			case 'error':
+				return '#e74856';
+			case 'warning':
+				return '#f9a825';
+			case 'info':
+				return '#0078d7';
+			default:
+				return '#fff';
 		}
 	}
 
 	$effect(() => {
 
 		loadErrors();
-	
+
 });
 </script>
 
-<div class="phase72-modal" transitionfade={{ duration, 200 }}>
-	<div class="modal-backdrop" onclick={ onClose }></div>
+<div class="phase72-modal" transition:fade={{ duration: 200 }}>
+	<div class="modal-backdrop" role="button" tabindex="0" onclick={onClose} onkeydown={(e) => e.key === 'Escape' && onClose()}></div>
 
-	<div class="modal-content nes-container is-dark" transitionfly={{ y: 50, duration, 300 300 }}>
+	<div class="modal-content nes-container is-dark" transition:fly={{ y: 50, duration: 300 }}>
 		<!-- Header -->
 		<div class="modal-header">
 			<h2 class="nes-text is-primary">
@@ -237,7 +239,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 			<!-- Error Details & AI Suggestions -->
 			{#if selectedError}
-				<div class="error-details" transitionfly={{ x: 20, duration, 200 200 }}>
+				<div class="error-details" transition:fly={{ x: 20, duration: 200 }}>
 					<h3 class="nes-text is-primary">Error Details</h3>
 
 					<div class="detail-section nes-container is-dark">
@@ -269,7 +271,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 					<!-- Similar Errors -->
 					{#if showSimilar && similarErrors.length > 0}
-						<div class="similar-errors" transitionfly={{ y: 20, duration, 200 200 }}>
+						<div class="similar-errors" transition:fly={{ y: 20, duration: 200 }}>
 							<h4 class="nes-text">Similar Errors</h4>
 							{#each similarErrors as similar}
 								<div class="nes-container is-rounded similar-item">
@@ -283,12 +285,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 						</div>
 					{/if}
 
-					<!-- AI Suggestion -->
-					{#if aiSuggestion}
-						<div class="ai-suggestion nes-container is-rounded" transitionfly={{ y: 20, duration, 200 200 }}>
-							<h4 class="nes-text is-success">🤖 AI Suggestion</h4>
-							<div class="suggestion-content">
-								{@html aiSuggestion.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}
+				<!-- AI Suggestion -->
+				{#if aiSuggestion}
+					<div class="ai-suggestion nes-container is-rounded" transition:fly={{ y: 20, duration: 200 }}>
+						<h4 class="nes-text is-success">🤖 AI Suggestion</h4>
+						<div class="suggestion-content">
+							{@html aiSuggestion.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}
 							</div>
 						</div>
 					{/if}
@@ -301,34 +303,34 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 <style>
 	.phase72-modal {
 		position: fixed;
-	top: 0;
+		top: 0;
 		left: 0;
-	right: 0;
+		right: 0;
 		bottom: 0;
 		z-index: 9999;
-	display: flex;
+		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.modal-backdrop {
 		position: absolute;
-	top: 0;
+		top: 0;
 		left: 0;
-	right: 0;
+		right: 0;
 		bottom: 0;
-	background: rgba(0, 0, 0, 0.8);
+		background: rgba(0, 0, 0, 0.8);
 	}
 
 	.modal-content {
 		position: relative;
-	width: 95vw;
+		width: 95vw;
 		max-width: 1400px;
 		max-height: 90vh;
-	background: #212529;
+		background: #212529;
 		border: 4px solid #fff;
 		overflow: hidden;
-	display: flex;
+		display: flex;
 		flex-direction: column;
 	}
 
@@ -343,7 +345,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	.close-btn {
 		width: 48px;
-	height: 48px;
+		height: 48px;
 		padding: 0;
 		font-size: 2rem;
 		line-height: 1;
@@ -351,7 +353,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	.route-info {
 		margin-bottom: 1rem;
-	padding: 0.5rem;
+		padding: 0.5rem;
 		background: rgba(249, 168, 37, 0.1);
 		border-radius: 4px;
 	}
@@ -364,9 +366,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	.stats-bar {
 		display: flex;
-	gap: 1rem;
+		gap: 1rem;
 		margin-bottom: 1rem;
-	padding: 1rem;
+		padding: 1rem;
 		background: rgba(0, 0, 0, 0.3);
 		border-radius: 8px;
 	}
@@ -385,16 +387,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.stat .label {
 		display: block;
 		font-size: 0.8rem;
-	opacity: 0.7;
+		opacity: 0.7;
 		margin-top: 0.25rem;
 	}
 
 	.modal-body {
 		flex: 1;
-	display: grid;
+		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
-	overflow: hidden;
+		overflow: hidden;
 	}
 
 	.error-list {
@@ -405,23 +407,23 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.error-items {
 		display: flex;
 		flex-direction: column;
-	gap: 0.5rem;
+		gap: 0.5rem;
 	}
 
 	.error-item {
 		width: 100%;
 		text-align: left;
-	padding: 0.75rem;
+		padding: 0.75rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 2px solid #444;
 		cursor: pointer;
-	transition:all 0.2s;
+		transition: all 0.2s;
 	}
 
 	.error-item:hover {
 		background: rgba(255, 255, 255, 0.1);
 		border-color: #fff;
-	transform: translateX(4px);
+		transform: translateX(4px);
 	}
 
 	.error-item.selected {
@@ -432,7 +434,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.error-header {
 		display: flex;
 		align-items: center;
-	gap: 0.5rem;
+		gap: 0.5rem;
 		margin-bottom: 0.5rem;
 	}
 
@@ -453,7 +455,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	.occurrence-count {
 		margin-left: auto;
-	opacity: 0.6;
+		opacity: 0.6;
 		font-size: 0.9rem;
 	}
 
@@ -465,7 +467,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	.error-location {
 		font-size: 0.75rem;
-	opacity: 0.6;
+		opacity: 0.6;
 		font-family: 'Courier New', monospace;
 	}
 
@@ -485,7 +487,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	.action-buttons {
 		display: flex;
-	gap: 0.5rem;
+		gap: 0.5rem;
 		margin: 1rem 0;
 	}
 
@@ -496,25 +498,25 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	.similar-item {
 		margin: 0.5rem 0;
 		padding: 0.75rem;
-	background: rgba(249, 168, 37, 0.1);
+		background: rgba(249, 168, 37, 0.1);
 	}
 
 	.similarity-score {
 		font-size: 0.8rem;
-	opacity: 0.8;
+		opacity: 0.8;
 		margin-bottom: 0.5rem;
 	}
 
 	.file-path {
 		font-size: 0.75rem;
-	opacity: 0.6;
+		opacity: 0.6;
 		font-family: 'Courier New', monospace;
 		margin-top: 0.25rem;
 	}
 
 	.ai-suggestion {
 		margin-top: 1rem;
-	padding: 1rem;
+		padding: 1rem;
 		background: rgba(0, 200, 83, 0.1);
 		border: 2px solid #00c853;
 	}
@@ -527,12 +529,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	.loading-spinner {
 		text-align: center;
-	padding: 2rem;
+		padding: 2rem;
 	}
 
 	.no-errors {
 		text-align: center;
-	padding: 2rem;
+		padding: 2rem;
 	}
 
 	/* Scrollbar styling */

@@ -1,436 +1,258 @@
-import { setup, assign, fromPromise, type DoneActorEvent } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-// User type
+import { setup, assign, fromPromise, createActor } from 'xstate';
+
 export interface User {
-  id?: string;
-  email?: string;
+  id: string;
+  email: string;
   firstName?: string;
   lastName?: string;
-  role?: string;
-  department?: string;
-  jurisdiction?: string;
+  role: string;
   permissions?: string[];
-  isActive?: boolean;
-  emailVerified?: boolean;
+  avatarUrl?: string | null;
 }
 
-// Session type
 export interface Session {
-  id?: string;
-  expiresAt?: Date;
+  id: string;
+  expiresAt: string;
   fresh?: boolean;
 }
 
-type AuthenticateActorOutput = {
-  user: User;
-	session: Session;
-  requiresTwoFactor?: boolean;
-};
-
-// Authentication context interface
 export interface AuthContext {
   user: User | null;
   session: Session | null;
-  error?: string;
-	isLoading: boolean;
-  deviceInfo?: {
-    userAgent?: string;
-    platform?: string;
-    language?: string;
-    timezone?: string;
-    securityScore?: number;
-  };
+  error: string | null;
+  isLoading: boolean;
   loginAttempts: number;
-	maxLoginAttempts: number;
-  lastLoginAttempt?: Date;
-  lockoutUntil?: Date;
-	twoFactorRequired: boolean;
-  registrationData?: unknown;
+  maxLoginAttempts: number;
+  lockoutUntil: Date | null;
+  twoFactorRequired: boolean;
+  registrationData: any | null;
 }
 
-// Authentication events
 export type AuthEvent =
-  | { type: 'START_LOGIN';
-	data: LoginData }
-  | { type: 'START_REGISTRATION';
-	data: RegistrationData }
-  | { type: 'LOGIN_SUCCESS';
-	data: { user: User;
-	session: Session } }
-  | { type: 'LOGIN_FAILURE';
-	data: { error: string } }
-  | { type: 'REGISTRATION_SUCCESS';
-	data: { user: User } }
-  | { type: 'REGISTRATION_FAILURE';
-	data: { error: string } }
+  | { type: 'START_LOGIN'; data: any }
+  | { type: 'START_REGISTRATION'; data: any }
+  | { type: 'LOGIN_SUCCESS'; data: { user: User; session: Session } }
+  | { type: 'LOGIN_FAILURE'; data: { error: string } }
   | { type: 'LOGOUT' }
   | { type: 'SESSION_EXPIRED' }
   | { type: 'REQUIRE_TWO_FACTOR' }
-  | { type: 'TWO_FACTOR_SUCCESS';
-	data: { session: Session } }
-  | { type: 'TWO_FACTOR_FAILURE';
-	data: { error: string } }
+  | { type: 'TWO_FACTOR_SUCCESS'; data: { session: Session } }
+  | { type: 'TWO_FACTOR_FAILURE'; data: { error: string } }
   | { type: 'VERIFY_EMAIL' }
   | { type: 'EMAIL_VERIFIED' }
-  | { type: 'RESET_PASSWORD';
-	data: { email: string } }
-  | { type: 'PASSWORD_RESET_SENT' }
-  | { type: 'ACCOUNT_LOCKED' }
+  | { type: 'RESET_PASSWORD'; data: { email: string } }
   | { type: 'UNLOCK_ACCOUNT' }
-  | { type: 'UPDATE_PROFILE';
-	data: Partial<User> }
-  | { type: 'PROFILE_UPDATED' }
+  | { type: 'UPDATE_PROFILE'; data: Partial<User> }
   | { type: 'RETRY' };
-
-export interface LoginData {
-  email: string;
-	password: string;
-  rememberMe?: boolean;
-  twoFactorCode?: string;
-  deviceInfo?: unknown;
-}
-
-export interface RegistrationData {
-  email: string;
-	firstName: string;
-  lastName: string;
-	password: string;
-  role: string;
-	department: string;
-  jurisdiction: string;
-  badgeNumber?: string;
-  enableTwoFactor?: boolean;
-  deviceInfo?: unknown;
-}
 
 const initialContext: AuthContext = {
   user: null,
   session: null,
-  error: undefined,
+  error: null,
   isLoading: false,
-  deviceInfo: undefined,
   loginAttempts: 0,
   maxLoginAttempts: 5,
-  lastLoginAttempt: undefined,
-  lockoutUntil: undefined,
+  lockoutUntil: null,
   twoFactorRequired: false,
-  registrationData: undefined,
-};
-
-// Helper functions for inline guards
-const isMaxAttemptsReached = ({ context }: {
-	context: AuthContext }) => {
-  return context.loginAttempts >= context.maxLoginAttempts;
-};
-
-const isAccountLocked = ({ context }: {
-	context: AuthContext }) => {
-  return context.lockoutUntil ? new Date() < context.lockoutUntil : false;
+  registrationData: null
 };
 
 export const authMachine = setup({
-  types: {} as {
-    context: AuthContext;
-	events: AuthEvent;
+  types: {
+    context: {} as AuthContext,
+    events: {} as AuthEvent
   },
-	actions: {
-	setLoading: assign({
-      isLoading: () => true,
-      error: () => undefined,
-    }),
-    clearLoading: assign({
-	isLoading: () => false,
-    }),
-    setError: assign({
-	error: ({ event }) =>
-        (event as { data?: {
-	error: string } }).data?.error ?? 'An error occurred',
-      isLoading: () => false,
-    }),
-    setUser: assign({
-	user: ({ event, context }) => {
-        const payload = (
-          'output' in event ? event.output : 'data' in event ? event.data : null
-        ) as { user?: User } | null;
-        return payload && 'user' in payload ? payload.user : context.user;
-      },
-	session: ({ event, context }) => {
-        const payload = (
-          'output' in event ? event.output : 'data' in event ? event.data : null
-        ) as { session?: Session } | null;
-        return payload && 'session' in payload ? payload.session : context.session;
-      },
-	isLoading: () => false,
-      error: () => undefined,
-      loginAttempts: () => 0,
-    }),
-    clearUser: assign({
-	user: () => null,
-      session: () => null,
-      error: () => undefined,
-    }),
-    incrementLoginAttempts: assign({
-	loginAttempts: ({ context }) => context.loginAttempts + 1,
-      lastLoginAttempt: () => new Date(),
-    }),
-    resetLoginAttempts: assign({
-	loginAttempts: () => 0,
-      lastLoginAttempt: () => undefined,
-    }),
-    setLockout: assign({
-	lockoutUntil: () => new Date(Date.now() + 15 * 60 * 1000),
-      loginAttempts: () => 0,
-    }),
-    clearLockout: assign({
-	lockoutUntil: () => undefined,
-    }),
-    setTwoFactorRequired: assign({
-	twoFactorRequired: () => true,
-    }),
-    clearTwoFactor: assign({
-	twoFactorRequired: () => false,
-    }),
-    setRegistrationData: assign({
-	registrationData: ({ event }) => (event as { data: RegistrationData }).data,
-    }),
-    clearRegistrationData: assign({
-	registrationData: () => undefined,
-    }),
-  },
-	guards: {
-	isMaxAttemptsReached: ({ context }) => {
-      return context.loginAttempts >= context.maxLoginAttempts;
-    },
-	isAccountLocked: ({ context }) => {
-      return context.lockoutUntil ? new Date() < context.lockoutUntil : false;
-    },
-	},
-	actors: {
-	authenticate: fromPromise(async ({ input }: {
-	input: LoginData }) => {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      if (input.email === 'fail@test.com' || input.password !== 'password123') {
-        throw new Error('Invalid credentials');
-      }
-
-      if (input.email === '2fa@test.com') {
+  actions: {
+    setLoading: assign({ isLoading: true, error: null }),
+    clearLoading: assign({ isLoading: false }),
+    setError: assign(({ event }) => ({
+      error: (event as any).data?.error || 'An unknown error occurred',
+      isLoading: false
+    })),
+    setUser: assign(({ event, context }) => {
+      if (event.type === 'LOGIN_SUCCESS') {
         return {
-          user: {
-	id: '1',
-            email: input.email,
-            firstName: 'Legal',
-            lastName: 'Professional',
-            role: 'prosecutor',
-            permissions: ['read:cases', 'write:cases', 'ai:query'],
-          },
-	session: {
-	id: 'session_123',
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            fresh: false,
-          },
-	requiresTwoFactor: true,
+          user: event.data.user, session: event.data.session,
+          isLoading: false,
+          error: null,
+          loginAttempts: 0
         };
       }
+      return context;
+    }),
+    clearUser: assign({ user: null, session: null, error: null }),
+    incrementLoginAttempts: assign({
+      loginAttempts: ({ context }) => context.loginAttempts + 1
+    }),
+    resetLoginAttempts: assign({ loginAttempts: 0 }),
+    setLockout: assign({
+      lockoutUntil: () => new Date(Date.now() + 15 * 60 * 1000), // 15 mins
+      loginAttempts: 0
+    }),
+    clearLockout: assign({ lockoutUntil: null }),
+    setTwoFactorRequired: assign({ twoFactorRequired: true }),
+    clearTwoFactor: assign({ twoFactorRequired: false }),
+    setRegistrationData: assign(({ event }) => ({
+        registrationData: (event as any).data
+    })),
+    clearRegistrationData: assign({ registrationData: null })
+  },
+  guards: {
+    isMaxAttemptsReached: ({ context }) => context.loginAttempts >= context.maxLoginAttempts,
+    isAccountLocked: ({ context }) => !!context.lockoutUntil && new Date() < context.lockoutUntil
+  },
+  actors: {
+    authenticate: fromPromise(async ({ input }: { input: any }) => {
+      // Mock authentication
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (input.email?.includes('fail')) throw new Error('Invalid credentials');
+
+      // Sim 2FA
+      if (input.email?.includes('2fa')) {
+         return { requiresTwoFactor: true };
+      }
 
       return {
-        user: {
-	id: '1',
-          email: input.email,
-          firstName: 'Legal',
-          lastName: 'Professional',
-          role: 'prosecutor',
-          permissions: ['read:cases', 'write:cases', 'ai:query'],
-        },
-	session: {
-	id: 'session_123',
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-          fresh: true,
-        },
-	};
+        user: { id: '1', email: input.email || 'user@example.com', role: 'user', permissions: [] },
+        session: { id: 'sess_1', expiresAt: new Date(Date.now() + 86400000).toISOString() }
+      };
     }),
-    register: fromPromise(async ({ input }: {
-	input: RegistrationData }) => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      return {
-        user: {
-	id: '2',
-          email: input.email,
-          firstName: input.firstName,
-          lastName: input.lastName,
-          role: input.role,
-          department: input.department,
-          permissions: [],
-        },
-	};
+    register: fromPromise(async () => {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        return { success: true };
     }),
     logout: fromPromise(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return { success: true };
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return { success: true };
     }),
-    resetPassword: fromPromise(async ({ input: _input }: {
-	input: { email: string } }) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return { success: true };
-    }),
-  },
-	}).createMachine({
+    resetPassword: fromPromise(async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return { success: true };
+    })
+  }
+}).createMachine({
   id: 'auth',
   initial: 'idle',
   context: initialContext,
   states: {
-	idle: {
+    idle: {
       on: {
-	START_LOGIN: {
+        START_LOGIN: {
           target: 'authenticating',
-          guard: ({ context }) => !isAccountLocked({ context }),
+          guard: ({ context }) => !context.lockoutUntil || new Date() > context.lockoutUntil
         },
-	START_REGISTRATION: 'registering',
-        RESET_PASSWORD: 'resettingPassword',
-      },
-	},
-	authenticating: {
-	entry: 'setLoading',
+        START_REGISTRATION: 'registering',
+        RESET_PASSWORD: 'resettingPassword'
+      }
+    },
+    authenticating: {
+      entry: 'setLoading',
       invoke: {
-	src: 'authenticate',
-        input: ({ event }) => (event as { data: LoginData }).data,
+        src: 'authenticate',
+        input: ({ event }) => (event as any).data,
         onDone: [
           {
+            guard: ({ event }) => (event.output as any).requiresTwoFactor,
             target: 'requiresTwoFactor',
-            guard: ({ event }) =>
-              (event as DoneActorEvent<AuthenticateActorOutput>).output?.requiresTwoFactor === true,
-            actions: ['setTwoFactorRequired', 'clearLoading'],
+            actions: ['setTwoFactorRequired', 'clearLoading']
           },
-	{
+          {
             target: 'authenticated',
-            actions: ['setUser', 'resetLoginAttempts'],
-          },
-	],
+            actions: ['setUser', 'resetLoginAttempts']
+          }
+        ],
         onError: [
           {
+            guard: 'isMaxAttemptsReached',
             target: 'locked',
-            guard: ({ context }) => isMaxAttemptsReached({ context }),
-            actions: ['setLockout', 'setError'],
+            actions: ['setLockout', 'setError']
           },
-	{
+          {
             target: 'idle',
-            actions: ['incrementLoginAttempts', 'setError'],
-          },
-	],
-      },
-	},
-	requiresTwoFactor: {
-	on: {
+            actions: ['incrementLoginAttempts', 'setError']
+          }
+        ]
+      }
+    },
+    requiresTwoFactor: {
+      on: {
         TWO_FACTOR_SUCCESS: {
-	target: 'authenticated',
-          actions: ['setUser', 'clearTwoFactor', 'resetLoginAttempts'],
+          target: 'authenticated',
+          actions: ['setUser', 'clearTwoFactor', 'resetLoginAttempts']
         },
-	TWO_FACTOR_FAILURE: {
-	target: 'idle',
-          actions: ['setError', 'clearTwoFactor'],
-        },
-	},
-	},
-	authenticated: {
-	entry: 'clearLoading',
+        TWO_FACTOR_FAILURE: {
+          target: 'idle',
+          actions: ['setError', 'clearTwoFactor']
+        }
+      }
+    },
+    authenticated: {
+      entry: 'clearLoading',
       on: {
-	LOGOUT: 'loggingOut',
+        LOGOUT: 'loggingOut',
         SESSION_EXPIRED: 'idle',
-        UPDATE_PROFILE: 'updatingProfile',
-      },
-	},
-	loggingOut: {
-	entry: 'setLoading',
+        UPDATE_PROFILE: 'updatingProfile'
+      }
+    },
+    loggingOut: {
+      entry: 'setLoading',
       invoke: {
-	src: 'logout',
-        onDone: {
-	target: 'idle',
-          actions: ['clearUser', 'clearLoading'],
-        },
-	onError: {
-	target: 'idle',
-          actions: ['clearUser', 'setError'],
-        },
-	},
-	},
-	registering: {
-	entry: ['setLoading', 'setRegistrationData'],
+        src: 'logout',
+        onDone: { target: 'idle', actions: ['clearUser', 'clearLoading'] },
+        onError: { target: 'idle', actions: ['clearUser', 'setError'] }
+      }
+    },
+    registering: {
+      entry: ['setLoading', 'setRegistrationData'],
       invoke: {
-	src: 'register',
-        input: ({ event }) => (event as { data: RegistrationData }).data,
-        onDone: {
-	target: 'registrationSuccess',
-          actions: ['setUser', 'clearRegistrationData'],
-        },
-	onError: {
-	target: 'idle',
-          actions: ['setError', 'clearRegistrationData'],
-        },
-	},
-	},
-	registrationSuccess: {
-	on: {
-        EMAIL_VERIFIED: 'authenticated',
-        VERIFY_EMAIL: 'verifyingEmail',
-      },
-	after: {
-	5000: 'authenticated',
-      },
-	},
-	verifyingEmail: {
-	entry: 'setLoading',
-      after: {
-	2000: {
-          target: 'authenticated',
-          actions: 'clearLoading',
-        },
-	},
-	},
-	resettingPassword: {
-	entry: 'setLoading',
-      invoke: {
-	src: 'resetPassword',
-        input: ({ event }) => ({ email: (event as { data: {
-	email: string } }).data.email }),
-        onDone: {
-	target: 'passwordResetSent',
-          actions: 'clearLoading',
-        },
-	onError: {
-	target: 'idle',
-          actions: 'setError',
-        },
-	},
-	},
-	passwordResetSent: {
-	after: {
-        3000: 'idle',
-      },
-	},
-	locked: {
-	entry: 'setLockout',
+        src: 'register',
+        input: ({ event }) => (event as any).data,
+        onDone: { target: 'registrationSuccess', actions: ['clearRegistrationData'] },
+        onError: { target: 'idle', actions: ['setError', 'clearRegistrationData'] }
+      }
+    },
+    registrationSuccess: {
+        after: {
+            2000: 'idle'
+        }
+    },
+    resettingPassword: {
+        entry: 'setLoading',
+        invoke: {
+            src: 'resetPassword',
+            input: ({ event }) => (event as any).data,
+            onDone: { target: 'passwordResetSent', actions: 'clearLoading' },
+            onError: { target: 'idle', actions: 'setError' }
+        }
+    },
+    passwordResetSent: {
+        after: {
+            3000: 'idle'
+        }
+    },
+    locked: {
+      entry: 'setLockout',
       on: {
-	UNLOCK_ACCOUNT: {
-          target: 'idle',
-          actions: ['clearLockout', 'resetLoginAttempts'],
-        },
-	},
-	after: {
-	900000: {
-          target: 'idle',
-          actions: ['clearLockout', 'resetLoginAttempts'],
-        },
-	},
-	},
-	updatingProfile: {
-	entry: 'setLoading',
+        UNLOCK_ACCOUNT: {
+            target: 'idle',
+            actions: ['clearLockout', 'resetLoginAttempts']
+        }
+      },
       after: {
-	1500: {
-          target: 'authenticated',
-          actions: 'clearLoading',
-        },
-	},
-	},
-	},
-	});
+        900000: { // 15 minutes
+           target: 'idle',
+           actions: ['clearLockout', 'resetLoginAttempts']
+        }
+      }
+    },
+    updatingProfile: {
+        entry: 'setLoading',
+        after: {
+            1000: { target: 'authenticated', actions: 'clearLoading' }
+        }
+    }
+  }
+});
+
+export const authActor = createActor(authMachine);

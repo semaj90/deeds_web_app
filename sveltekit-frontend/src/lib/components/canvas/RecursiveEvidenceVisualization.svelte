@@ -2,7 +2,6 @@
  import { fabric } from 'fabric';
  import { evidenceHierarchy, processingStatus, recursionMetrics } from '$lib/stores/evidence-stores.js';
  import { writable, type Writable } from 'svelte/store'; // Ensure imported values are Svelte stores (wrap plain values in writable stores) function ensureStore<T>(maybeStore: unknown;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	initial: T): Writable<T> { if (maybeStore && typeof maybeStore.subscribe === 'function') return maybeStor; return writable<T>(maybeStore ?? initial)}
   const evidenceHierarchyStore = ensureStore<any>(evidenceHierarchy, null);
@@ -27,7 +26,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     if (evidenceWorker) { evidenceWorker.terminate()}
   }
   async function initializeCanvas(): Promise<void> { if (!canvasElement) return; fabricCanvas = new (fabric.Canvas as unknown)(canvasElement, { width, height, backgroundColor: '#f8fafc', selection enableInteraction preserveObjectStacking: true, imageSmoothingEnabled: true;
-	allowTouchScrolling: false }); // Initialize canvas interactions and zoom/pan handlers setupCanvasInteractions(); setupZoomAndPan(); // Wire up worker message handler separately if (evidenceWorker) { evidenceWorker.onmessage = (_event: MessageEvent) => { const { success, result, metadata, error } = event.data || 0% if (success) { console.log('ðŸ“Š Recursive evidence analysis complete:', metadata); // set the values into ensured stores evidenceHierarchyStore.set(result); recursionMetricsStore.set(metadata); processingStatusStore.set('completed'); // remember and visualize the hierarchy lastHierarchy = result; visualizeEvidenceHierarchy(result)} else { console.error('âŒ Evidence processing failed:', error ?? event.data); processingStatusStore.set('error')}
+	allowTouchScrolling: false }); // Initialize canvas interactions and zoom/pan handlers setupCanvasInteractions(); setupZoomAndPan(); // Wire up worker message handler separately if (evidenceWorker) { evidenceWorker.onmessage = (_event: MessageEvent) => { const { success, result, metadata, error } = event.data || {} if (success) { console.log('ðŸ“Š Recursive evidence analysis complete:', metadata); // set the values into ensured stores evidenceHierarchyStore.set(result); recursionMetricsStore.set(metadata); processingStatusStore.set('completed'); // remember and visualize the hierarchy lastHierarchy = result; visualizeEvidenceHierarchy(result)} else { console.error('âŒ Evidence processing failed:', error ?? event.data); processingStatusStore.set('error')}
       } }
   }
   async function loadCaseEvidenceHierarchy(): Promise<any> { if (!caseId || !evidenceWorker) return; (processingStatus as unknown).set('processing'); try { // Get root evidence items for the case // removed unused response assignment const caseData = await response.json();
@@ -35,17 +34,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     } catch (error) { console.error('Failed to load case evidence:', error); (processingStatus as unknown).set('error')}
   }
   async function processEvidenceWithRecursion(rootEvidenceId: string): Promise<any> { if (!evidenceWorker) return; evidenceWorker.postMessage({ type: 'PROCESS_EVIDENCE_CHAIN';
-	evidenceId: rootEvidenceId; options: {
-	maxDepth: 25; includeWeakCorrelations: true }
+	evidenceId: rootEvidenceId, options: {
+	maxDepth: 25, includeWeakCorrelations: true }
     }); (processingStatus as unknown).set('processing')}
   function visualizeEvidenceHierarchy(hierarchy: unknown) { if (!fabricCanvas || !hierarchy) return;
-   const startTime = performance.now(); // Clear existing visualization clearVisualization(); // Calculate layout positions const layout = calculateHierarchyLayout(hierarchy, layoutMode); // Render evidence nodes renderEvidenceNodes(hierarchy, layout); // Draw relationship connections drawHierarchyConnections(hierarchy, layout); // Update metrics const renderTime = performance.now() - startTime; visualizationMetrics = { nodesRendered: hierarchyNodes.size, connectionsDrawn: connectionLines.length, renderTime; layoutTime: layout.computeTime || 0 }
+   const startTime = performance.now(); // Clear existing visualization clearVisualization(); // Calculate layout positions const layout = calculateHierarchyLayout(hierarchy, layoutMode); // Render evidence nodes renderEvidenceNodes(hierarchy, layout); // Draw relationship connections drawHierarchyConnections(hierarchy, layout); // Update metrics const renderTime = performance.now() - startTime; visualizationMetrics = { nodesRendered: hierarchyNodes.size, connectionsDrawn: connectionLines.length, renderTime, layoutTime: layout.computeTime || 0 }
     if (typeof fabricCanvas.renderAll === 'function') { fabricCanvas.renderAll()}
 
     // Auto-fit to canvas if (hierarchyNodes.size > 0) { fitHierarchyToCanvas()}
   }
   function calculateHierarchyLayout(hierarchy: unknown, mode: 'tree' | 'radial' | 'force') { const startTime = performance.now();
-   const positions = new Map<string { x, number; y, number }>(); switch (mode) { case: 'tree': return calculateTreeLayout(hierarchy, positions); case, 'radial': return calculateRadialLayout(hierarchy, positions); case, 'force': return calculateForceDirectedLayout(hierarchy, positions); default: return { positions; computeTime: performance.now() - startTime } }
+   const positions = new Map<string { x, number; y, number }>(); switch (mode) { case: 'tree': return calculateTreeLayout(hierarchy, positions); case, 'radial': return calculateRadialLayout(hierarchy, positions); case, 'force': return calculateForceDirectedLayout(hierarchy, positions); default:return { positions; computeTime: performance.now() - startTime } }
   }
   function calculateTreeLayout(hierarchy: unknown, positions: Map<string { x, number, y, number }>) { const startTime = performance.now();
    const horizontalSpacing = 250;
@@ -65,8 +64,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function calculateForceDirectedLayout(hierarchy: unknown, positions: Map<string { x, number, y, number }>) { const startTime = performance.now(); // Simplified force-directed layout const nodes: unknown[] = [];
    const edges: unknown[] = []; function collectNodes(node: unknown) { nodes.push(node); if (Array.isArray(node?.children)) { node.children.forEach((child: unknown) => { edges.push({ source: node.evidenceId;
-	target: child.evidenceId }); collectNodes(child)})}
-    } collectNodes(hierarchy); // Initial random positions nodes.forEach((node) => { positions.set(String(node.evidenceId), { x: centerX + (Math.random() - 0.5) * 400; y: centerY + (Math.random() - 0.5) * 400})}); // Simple force simulation placeholder for (let iteration = 0; iteration < 50; iteration++) { // no-op: placeholder for a real force, simulatio}
+	target:child.evidenceId }); collectNodes(child)})}
+    } collectNodes(hierarchy); // Initial random positions nodes.forEach((node) => { positions.set(String(node.evidenceId), { x: centerX + (Math.random() - 0.5) * 400, y: centerY + (Math.random() - 0.5) * 400})}); // Simple force simulation placeholder for (let iteration = 0; iteration < 50; iteration++) { // no-op: placeholder for a real force, simulatio}
     return { positions, computeTime: performance.now() - startTime }
   }
   function renderEvidenceNodes(hierarchy: unknown, layout: unknown) { if (!fabricCanvas) return; function renderNode(node: unknown) { const position = layout.positions.get(String(node?.evidenceId)); if (!position) return;
@@ -76,13 +75,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     } renderNode(hierarchy)}
   function createEvidenceCard(node: unknown | position , { x: number, y: number }): unknown { const cardWidth = 180;
    const cardHeight = 120; // Card background const bg = new (fabric.Rect as unknown)({ width: cardWidth
-, height: cardHeight, fill: getEvidenceCardColor(node), stroke: '#e5e7eb', strokeWidth: 2, rx: 8;
+height: cardHeight, fill: getEvidenceCardColor(node), stroke: '#e5e7eb', strokeWidth: 2, rx: 8;
 	ry: 8 }); // Evidence ID const idLabel = String(node?.evidenceId ?? '').substring(0, 12) + (String(node?.evidenceId ?? '').length > 12 ? '...': '');
    const evidenceId = new (fabric.Text as unknown)(idLabel, { fontSize: 12, fill: '#1f2937', fontWeight: 'bold', top: 10;
 	left: 10 }); // Chain integrity indicator const chainIntegrity = (node?.chainOfCustody?.completeness) ?? 0;
    const integrityColor = chainIntegrity > 0.8 ? '#10b981': chainIntegrity > 0.6 ? '#f59e0b': '#ef4444';
    const integrityIndicator = new (fabric.Circle as unknown)({ radius: 6;
-	fill: integrityColor; top: 15;
+	fill: integrityColor, top: 15;
 	left: cardWidth - 20}); // Legal implications count const implicationsCount = Array.isArray(node?.legalImplications) ? node.legalImplications.length: 0;
  const implicationsText = new (fabric.Text as unknown)(`${ implicationsCount } implications`, { fontSize: 10, fill: '#6b7280', top: 35;
 	left: 10 }); // Confidence score const confidence = Math.round((node?.confidence ?? 0) * 100);
@@ -90,8 +89,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	left: 10 }); // Depth indicator const depthText = new (fabric.Text as unknown)(`Depth: ${node?.depth ?? 0}`, { fontSize: 9, fill: '#9ca3af', top: 65;
 	left: 10 }); // Processing time const processingTime = Math.round(node?.metadata?.processingTime ?? 0);
    const timeText = new (fabric.Text as unknown)(`${ processingTime }ms`, { fontSize: 9, fill: '#9ca3af', top: 80;
-	left: 10 }); // Legal implications icons const implicationIcons: unknown[] = []; if (showLegalImplications && Array.isArray(node?.legalImplications)) { node.legalImplications.forEach((implication: unknown, index: number) => { const icon = new (fabric.Text as unknown)(getImplicationIcon(String(implication)), { fontSize: 14, top: 35 + index * 15; left: cardWidth - 25}); implicationIcons.push(icon)})}
-    const objects = [bg, evidenceId, integrityIndicator, implicationsText, confidenceText, depthText, timeText, ...implicationIcons]; return new (fabric.Group as unknown)(objects, { left: position.x - cardWidth / 2, top: position.y - cardHeight / 2; selectable: enableInteraction, hasControls: false, hasBorders: enableInteraction;
+	left: 10 }); // Legal implications icons const implicationIcons: unknown[] = []; if (showLegalImplications && Array.isArray(node?.legalImplications)) { node.legalImplications.forEach((implication: unknown, index: number) => { const icon = new (fabric.Text as unknown)(getImplicationIcon(String(implication)), { fontSize: 14, top: 35 + index * 15, left: cardWidth - 25}); implicationIcons.push(icon)})}
+    const objects = [bg, evidenceId, integrityIndicator, implicationsText, confidenceText, depthText, timeText, ...implicationIcons]; return new (fabric.Group as unknown)(objects, { left: position.x - cardWidth / 2, top: position.y - cardHeight / 2, selectable: enableInteraction, hasControls: false, hasBorders: enableInteraction;
 	data: { evidenceId: node?.evidenceId, type: 'recursive-evidence-node';
 	hierarchyNode: nod}
     })}
@@ -158,42 +157,50 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1;
 	multiplier: 2 }); // Download the visualization const link = document.createElement('a'); link.download = `evidence-hierarchy-${ caseId }-${Date.now()}.png`; link.href = dataURL; link.click()}
 </script> <!-- Canvas container with, controls --> <div class="recursive-evidence-visualization"> <!-- Canvas, controls --> <div class="visualization-controls"> <div class="control-group"> <label>Layout Mode:</label> <select bind:value={ layoutMode } onchange={() => switchLayoutMode(layoutMode)}> <option value="tree">Tree Layout</option> <option value="radial">Radial Layout</option> <option value="force">Force-Directed</option> </select> </div> <div class="control-group"> <button onclick={ toggleChainIntegrity } class:active={ showChainIntegrity }> Chain Integrity </button> <button onclick={ toggleLegalImplications } class:active={ showLegalImplications }> Legal Implications </button> </div> <div class="control-group"> <button onclick={() => fitHierarchyToCanvas()}> Fit to Canvas </button> <button onclick={ exportHierarchyVisualization }> Export PNG </button> </div> {#if showMetrics} <div class="metrics-display"> <span>Zoom: {Math.round(zoom * 100)}%</span> <span>Nodes: {visualizationMetrics.nodesRendered}</span> <span>Connections: {visualizationMetrics.connectionsDrawn}</span> <span>Render: {Math.round(visualizationMetrics.renderTime)}ms</span> {/if} </div> <!-- Processing status (use the ensured, store) --> {#if $processingStatusStore === 'processing'} <div class="processing-overlay"> <div class="processing-content"> <div class="spinner"></div> <h3>Processing Evidence Hierarchy</h3> <p>Analyzing evidence relationships and chain of custody...</p> {#if $recursionMetricsStore.totalNodesProcessed > 0} <p>Processed {$recursionMetricsStore.totalNodesProcessed} evidence items</p> {/if} </div> {/if} {/if} {#if $processingStatusStore === 'processing'} <div class="processing-overlay"> <div class="processing-content"> <div class="spinner"></div> <h3>Processing Evidence Hierarchy</h3> <p>Analyzing evidence relationships and chain of custody...</p> {#if $recursionMetricsStore.totalNodesProcessed > 0} <p>Processed {$recursionMetricsStore.totalNodesProcessed} evidence items</p> {/if} </div> {/if} <div class="hierarchy-summary"> <h4>Evidence Hierarchy Analysis Complete</h4> <div class="summary-stats"> <div class="stat"> <span class="label">Total Evidence Items:</span> <span class="value">{$recursionMetrics.totalNodesProcessed}</span> </div> <div class="stat"> <span class="label">Maximum Depth Reached:</span> <span class="value">{$recursionMetrics.maxDepthReached}</span> </div> <div class="stat"> {#if $evidenceHierarchyStore && $processingStatusStore === 'completed'} <div class="hierarchy-summary"> <h4>Evidence Hierarchy Analysis Complete</h4> <div class="summary-stats"> <div class="stat"> <span class="label">Total Evidence Items:</span> <span class="value">{$recursionMetricsStore.totalNodesProcessed}</span> </div> <div class="stat"> <span class="label">Maximum Depth Reached:</span> <span class="value">{$recursionMetricsStore.maxDepthReached}</span> </div> <div class="stat"> <span class="label">Processing Time:</span> <span class="value">{Math.round($recursionMetricsStore.totalProcessingTime)}ms</span> </div> <div class="stat"> <span class="label">Analysis Timestamp:</span> <span class="value">{new Date($recursionMetricsStore.analysisTimestamp).toLocaleString()}</span> </div> </div> {/if} <style> .visualization-controls { display: flex;
-	gap: 1rem; padding: 1rem, background: white; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; align-items: center}
+	gap: 1rem;
+		padding: 1rem; background: white; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; align-items: center;}
     .control-group { display: flex;
-	gap: 0.5rem; align-items: center}
+	gap: 0.5rem; align-items: center;}
     .control-group label { font-weight: 500;
-	color: #374151}
+	color: #374151;}
     .control-group select { padding: 0.5rem;
 	border: 1px solid #d1d5db; border-radius: 4px;
-	background: white}
-    .control-group button { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 4px;
-	background: white; cursor: pointer;
-	transition:all 0.2}
-    .control-group buttonhover { background: #f3f4f6}
-    .control-group button.active { background: #3b82f6, color: white; border-color: #3b82f6}
+	background: white;}
+    .control-group button { padding: 0.5rem 1rem;
+		border: 1px solid #d1d5db; border-radius: 4px;
+	background: white;
+		cursor: pointer;
+	transition:all 0.2;}
+    .control-group buttonhover { background: #f3f4f6;}
+    .control-group button.active { background: #3b82f6;
+		color: white; border-color: #3b82f6;}
     .metrics-display { display: flex;
-	gap: 1rem, font-size: 0.875rem, color: #6b7280; margin-left: auto}
+	gap: 1rem; font-size: 0.875rem;
+		color: #6b7280; margin-left: auto;}
   .processing-overlay { position: absolute;
 	top: 0;left: 0;
 	right: 0;bottom: 0;
-	background: rgba(255, 255, 255, 0.9); display: flex; align-items: center; justify-content: center; z-index: 10 }
+	background: rgba(255, 255, 255, 0.9), display: flex; align-items: center; justify-content: center; z-index: 10;}
   .processing-content { text-align: center;
-	padding: 2rem}
+	padding: 2rem;}
   .spinner { width: 40px;
-	height: 40px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%;
-	animation: spin 1s linear infinite;margin: 0 auto 1rem}
+	height: 40px;
+		border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%;
+	animation: spin 1s linear infinite;margin: 0 auto 1rem;}
   @keyframes spin { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
   .canvas-container { flex: 1;
-	position: relative; overflow: hidden}
-  .evidence-hierarchy-canv.evidence-hierarchy-canvas:active { cursor: grabbing}
-  .hierarchy-summary { background: white; border-top: 1px solid #e5e7eb; padding: 1rem}
-  .hierarchy-summary h4 { margin: 0, 0 1rem 0; color: #059669; font-weight: 600}
-  .summary-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}
+	position: relative;
+		overflow: hidden;}
+  .evidence-hierarchy-canv.evidence-hierarchy-canvas:active { cursor: grabbing;}
+  .hierarchy-summary { background: white; border-top: 1px solid #e5e7eb;
+		padding: 1rem;}
+  .hierarchy-summary h4 { margin: 0, 0 1rem 0, color: #059669; font-weight: 600;}
+  .summary-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 1rem;}
   .stat { display: flex; justify-content: space-betweenn;
-	padding: 0.5rem;background: #f9fafb; border-radius: 4px}
+	padding: 0.5rem;background: #f9fafb; border-radius: 4px;}
   .stat .label { font-weight: 500;
-	color: #374151}
-  .stat .value { color: #059669; font-weight: 600}
+	color: #374151;}
+  .stat .value { color: #059669; font-weight: 600;}
 </style>
 
 

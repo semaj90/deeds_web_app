@@ -66,7 +66,7 @@
       case 'main': return '⚡';
       case 'demo': return '🎯';
       case 'admin': return '⚙️';
-      default: return '📁';
+      default:return '📁';
     }
   }
 
@@ -75,7 +75,7 @@
       case 'main': return 'CORE OPERATIONS';
       case 'demo': return 'AI SYSTEMS';
       case 'admin': return 'SYSTEM ADMIN';
-      default: return 'SECTION';
+      default:return 'SECTION';
     }
   }
 </script>
@@ -88,7 +88,7 @@
         <input
           bind:value={searchQuery}
           placeholder="Search menu..."
-          class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus: ring-1, focus:ring-cyan-500 outline-none transition-all"
+          class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all"
         />
         <div class="absolute right-3 top-2.5 text-slate-500">🔍</div>
       </div>
@@ -102,7 +102,7 @@
       <div class="space-y-1">
         {#each filteredRoutes as route}
           <button
-            class="w-full flex items-center gap-3 p-2 rounded transition-colors text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400, hover:bg-slate-800'}"
+            class="w-full flex items-center gap-3 p-2 rounded transition-colors text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:bg-slate-800'}"
             onclick={() => navigateToRoute(route.route)}
           >
             <span class="text-lg">{route.icon}</span>
@@ -141,7 +141,7 @@
               <div class="space-y-1 {collapsed ? '' : 'ml-2'}">
                 {#each sectionRoutes as route}
                   <button
-                    class="w-full relative flex items-center gap-3 p-2 rounded transition-all group text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.1)]' : 'text-slate-400, hover:bg-slate-800'}"
+                    class="w-full relative flex items-center gap-3 p-2 rounded transition-all group text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(34 211 238 0.1)]' : 'text-slate-400 hover:bg-slate-800'}"
                     onclick={() => navigateToRoute(route.route)}
                     onmouseenter={() => (hoveredRoute = route.id)}
                     onmouseleave={() => (hoveredRoute = null)}
@@ -152,7 +152,7 @@
                     {/if}
                     <!-- Active indicator -->
                     {#if isRouteActive(route.route)}
-                      <div class="absolute right-2 w-1 h-3 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.5)]"></div>
+                      <div class="absolute right-2 w-1 h-3 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34 211 238 0.5)]"></div>
                     {/if}
                   </button>
                 {/each}

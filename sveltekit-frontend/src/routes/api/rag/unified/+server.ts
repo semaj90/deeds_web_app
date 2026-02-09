@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 
 interface QdrantSearchResult {
     id: number | string;
-    score: number; payload: Record<string, unknown>;
+    score: number, payload: Record<string, unknown>;
 }
 
 interface SearchRequest {
@@ -140,7 +140,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 
         if (!searchResp.ok) {
             const errText = await searchResp.text();
-            return json({ error: `Qdrant search failed: ${errText}` }, { status: 500 });
+            return json({ error: `Qdrant search, failed: ${errText}` }, { status: 500 });
         }
 
         const searchData = await searchResp.json();
@@ -151,7 +151,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
             collection,
             resultCount: results.length,
             results: results.map(r => ({
-                id: r.id,
+               id: r.id,
                 score: r.score,
                 payload: r.payload
             }))

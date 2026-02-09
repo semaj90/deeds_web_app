@@ -1,6 +1,8 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
- import { Plus, Eye, Search } from 'lucide-svelte';
+ import Eye from 'lucide-svelte/icons/eye';
+ import Plus from 'lucide-svelte/icons/plus';
+ import Search from 'lucide-svelte/icons/search';
 
  // Props
  let { caseId = null } = $props();

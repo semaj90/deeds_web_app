@@ -1,6 +1,9 @@
 <!-- @migration-task Error while migrating Svelte code: Identifier, 'string' has already, been, declared, https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte code, ; Identifier, 'string' has already, been, declared --> <!-- SSR QLoRA Chat Interface - Revolutionary legal AI chat with instant SSR hydration Features, - Server-side rendered for instant loading - User dictionary learning with QLoRA fine-tuning - NES memory patterns for instant responses - GPU-accelerated inference caching - Real-time streaming with neural sprite visualization - XState machine integration for reliable state, management --> <script lang="ts">
-import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported let { userId, sessionId = '', preloadedData: unknown = null, ssrContext: unknown = null }: { userId, sessionId = '', preloadedData: unknown = null, ssrContext: unknown =; null: unknown } = $props(); // Migrated to $effect import { writable, derived } from 'svelte/store'; import { browser } from '$app/environment'; import { page } from '$app/state'; // XState machine integration import { useMachine } from '@xstate/svelte'; import { chatMachine } from '$lib/machines/chat-machine'; // Neural sprite rendering import  NeuralSpriteRenderer  from "$lib/components/three/NeuralSpriteRenderer.svelte"; // YoRHa UI components import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; // Props // Dispatcher // XState machine const { state: send } = useMachine(chatMachine, { context: { userId, sessionId, messages: [], userDictionary: ssrContext?.userDictionary ?? ; systemStatus: ssrContext?.systemStatus ?? } }); // Reactive state const messages = writable<any[]>([]); const currentMessage = writable(''); const isStreaming = writable(false); const neuralSprites = writable<any[]>([]); const userDictionary = writable(ssrContext?.userDictionary ?? ); const systemStatus = writable(ssrContext?.systemStatus ?? ); // Derived state const canSend = derived( [currentMessage, isStreaming], ([$currentMessage, $isStreaming]) => $currentMessage.trim.length > 0 && !$isStreaming ); const statusIndicator = derived(systemStatus, ($status) => ({ nes: $status.nesMemoryReady ? 'ðŸŸ¢': 'ðŸ”´', gpu: $status.gpuCacheReady ? 'ðŸŸ¢': 'ðŸ”´', qlora: $status.qloraReady ? 'ðŸŸ¢': 'ðŸŸ¡', wasm: $status.wasmBridgeReady ? 'ðŸŸ¢': 'ðŸ”´';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported let { userId, sessionId = '', preloadedData: unknown = null, ssrContext: unknown = null }: { userId, sessionId = '', preloadedData: unknown = null, ssrContext: unknown =, null: unknown } = $props(); // Migrated to $effect import { writable, derived } from 'svelte/store'; import { browser } from '$app/environment'; import { page } from '$app/state'; // XState machine integration import { useMachine } from '@xstate/svelte'; import { chatMachine } from '$lib/machines/chat-machine'; // Neural sprite rendering import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte'; // Props // Dispatcher // XState machine const { state: send } = useMachine(chatMachine, { context: { userId, sessionId, messages: [], userDictionary: ssrContext?.userDictionary ?? , systemStatus: ssrContext?.systemStatus ?? } }); // Reactive state const messages = writable<any[]>([]); const currentMessage = writable(''); const isStreaming = writable(false); const neuralSprites = writable<any[]>([]); const userDictionary = writable(ssrContext?.userDictionary ?? ); const systemStatus = writable(ssrContext?.systemStatus ?? ); // Derived state const canSend = derived( [currentMessage, isStreaming], ([$currentMessage, $isStreaming]) => $currentMessage.trim.length > 0 && !$isStreaming ); const statusIndicator = derived(systemStatus, ($status) => ({ nes: $status.nesMemoryReady ? 'ðŸŸ¢': 'ðŸ”´', gpu: $status.gpuCacheReady ? 'ðŸŸ¢': 'ðŸ”´', qlora: $status.qloraReady ? 'ðŸŸ¢': 'ðŸŸ¡', wasm: $status.wasmBridgeReady ? 'ðŸŸ¢': 'ðŸ”´';
 	ollama: $status.ollamaReady ? 'ðŸŸ¢': 'ðŸ”´'})); // Event source for streaming let eventSource: EventSource | null = null; let chatContainer: HTMLElement;
  let messageInput: HTMLInputElement, $effect(() => { if (!browser) return; (async () => { // Initialize session if not provided if (!sessionId) { sessionId = `session_${Date.now()}_${Math.random().toString().substr(2, 9)}`}
 
@@ -11,11 +14,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     } catch (error) { console.error('âŒ Failed to load SSR context:', error)}
   }
   async function sendMessage(): Promise<any> { const message = $currentMessage.trim(); if (!message || $isStreaming) return; // Add user message immediately const userMessage = { id: `msg_${Date.now()}`, role: 'user';
-	content: message; timestamp: new Date(); processed: false }
+	content: message, timestamp: new Date(); processed: false }
     messages.update(msgs => [...msgs, userMessage]); currentMessage.set(''); isStreaming.set(true); // Send to XState machine send({ type: 'SEND_MESSAGE';
 	message: userMessage }); // Scroll to bottom setTimeout(() => scrollToBottom(), 100); try { // Create AI response placeholder const aiMessage = { id: `ai_${Date.now()}`, role: 'assistant', content: '', timestamp: new Date(): true, chunks: [];
-	neuralSprite: null; source: 'qlora'
-      } messages.update(msgs => [...msgs, aiMessage]); // Start streaming response await startStreaming(message, aiMessage)} catch (error) { console.error('âŒ Failed to send message:', error); // Add error message messages.update(msgs => [...msgs, { id: `error_${Date.now()}`, role: 'system', content: 'Sorry, I encountered an error. Please try again.', timestamp: new Date(); error: true }]); send({ type: 'ERROR', error: error.message })} finally { isStreaming.set(false)}
+	neuralSprite: null, source: 'qlora'
+      } messages.update(msgs => [...msgs, aiMessage]); // Start streaming response await startStreaming(message, aiMessage)} catch (error) { console.error('âŒ Failed to send message:', error); // Add error message messages.update(msgs => [...msgs, { id: `error_${Date.now()}`, role: 'system', content: 'Sorry, I encountered an error. Please try again.', timestamp: new Date(), error: true }]); send({ type: 'ERROR', error: error.message })} finally { isStreaming.set(false)}
   }
   async function startStreaming(message: string, aiMessage: unknown): Promise<any> { // Close existing event source if (eventSource) { eventSource.close()}
 
@@ -47,19 +50,19 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#each $messages as message (message.id)} <div class="message" class:streaming={message.streaming}> <div class="message-content"> <div class="message-text"> {message.content} {#if message.streaming} <span class="typing-indicator">â–‹</span> {/if}
   </div>
   {#if message.source} <div class="message-metadata"> <span class="source-badge"> {message.source} </span>
-  {#if message.instant} <span class="instant-badge">âš¡</span> {/if} {#if message.similarity} <span class="similarity-badge"> {Math.round(message.similarity * 100)}% </span> {/if} {/if} {#if message.role === 'assistant' && !message.streaming} <div class="feedback-buttons"> <button class="feedback-btn positive"
+  {#if message.instant} <span class="instant-badge">âš¡</span> {/if} {#if message.similarity} <span class="similarity-badge"> {Math.round(message.similarity * 100)}% </span> {/if}</div> {/if} {#if message.role === 'assistant' && !message.streaming} <div class="feedback-buttons"> <button class="feedback-btn positive"
                 onclick={() => provideFeedback(message.id, 1)} title="Good response"
               > ðŸ‘ </button>
  <button class="feedback-btn"
                 onclick={() => provideFeedback(message.id, -1)} title="Poor response"
-              > ðŸ‘Ž </button> {/if}
+              > ðŸ‘Ž </button></div> {/if}
   </div>
  <!-- Neural: Sprite, Visualization -->
   {#if message.neuralSprite} <div class="neural-sprite-container"> <NeuralSpriteRenderer spriteData={message.neuralSprite} size="small"
-            /> {/if}
+            /></div> {/if}
   <div class="message-timestamp"> {message.timestamp.toLocaleTimeString()} </div> </div> {/each}
   </div>
- <!-- Input, Area --> <div class="chat-input-area"> <div class="input-container"> <input bind:this={messageInput}; bind:value={$currentMessage} onkeypress={ handleKeyPress } placeholder="Ask me about legal, matters..."
+ <!-- Input, Area --> <div class="chat-input-area"> <div class="input-container"> <input bind:this={messageInput} bind:value={$currentMessage} onkeypress={ handleKeyPress } placeholder="Ask me about legal, matters..."
         disabled={$isStreaming} class="message-input nes-input"
       /> <Button onclick={ sendMessage } disabled={!$canSend} class="send-button bits-btn bits-btn"
         variant="ghost"
@@ -73,64 +76,71 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> </div>
  <style> .ssr-qlora-chat-interface { display: flex; flex-direction: column;
 	height: 100vh; max-width: 1200px;
-	margin: 0 auto;background: linear-gradient(135deg, #1a1a2e, #16213e); color: #e0e6ed; font-family: 'Courier New', monospace}
-  .system-status-bar { display: flex; justify-content: space-betweenn, align-items: center;
-	padding: 0.5rem 1rem;background: rgba(0, 0, 0, 0.3); border-bottom: 2px solid #0f3460; font-size: 0.8rem}
-  .status-indicators span { margin-right: 0.5rem; font-size: 1rem}
+	margin: 0 auto;background: linear-gradient(135deg, #1a1a2e, #16213e), color: #e0e6ed; font-family: 'Courier New', monospace;}
+  .system-status-bar { display: flex; justify-content: space-betweenn; align-items: center;
+	padding: 0.5rem 1rem;background: rgba(0, 0, 0, 0.3); border-bottom: 2px solid #0f3460; font-size: 0.8rem;}
+  .status-indicators span { margin-right: 0.5rem; font-size: 1rem;}
   .user-info { display: flex;
-	gap: 1rem, font-size: 0.75rem;
-	opacity: 0.8}
-  .domain-expertise { color: #64ffda; font-weight: bold}
+	gap: 1rem; font-size: 0.75rem;
+	opacity: 0.8;}
+  .domain-expertise { color: #64ffda; font-weight: bold;}
   .chat-container { flex: 1; overflow-y: auto;
-	padding: 1rem; scroll-behavior: smooth}
+	padding: 1rem; scroll-behavior: smooth;}
   .message { margin-bottom: 1.5rem;
-	animation: messageSlideIn 0.3s ease-out}
-  .message-user { align-self: flex-end; text-align: right}
-  .message-assistant { align-self: flex-start}
+	animation: messageSlideIn 0.3s ease-out;}
+  .message-user { align-self: flex-end; text-align: right;}
+  .message-assistant { align-self: flex-start;}
   .message-content { position: relative;
-	background: rgba(15, 52, 96, 0.6); padding: 1rem; border-radius: 8px;
+	background: rgba(15, 52, 96, 0.6), padding: 1rem; border-radius: 8px;
 	border: 1px solid #0f3460; max-width: 80%}
-  .message-user .message-content { background: rgba(100, 255, 218, 0.1); border-color: #64ffda; margin-left: auto}
-  .message-text { line-height: 1.5; word-wrap: break-word}
-  .typing-indicator { animation: blink 1s infinite; color: #64ffda}
+  .message-user .message-content { background: rgba(100, 255, 218, 0.1); border-color: #64ffda; margin-left: auto;}
+  .message-text { line-height: 1.5; word-wrap: break-word;}
+  .typing-indicator { animation: blink 1s infinite;
+		color: #64ffda;}
   .message-metadata { display: flex;
-	gap: 0.5rem; margin-top: 0.5rem; font-size: 0.7rem}
-  .source-badge { padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: bold; text-transform: uppercase}
-  .source-nes_memory { background: #ff6b6b } .source-gpu_cache { background: #4ecdc4 } .source-qlora { background: #45b7d1 } .instant-badge { color: #ffd93d; font-weight: bold}
-  .similarity-badge { background: rgba(100, 255, 218, 0.2); color: #64ffda;padding: 0.2rem 0.4rem; border-radius: 4px}
+	gap: 0.5rem; margin-top: 0.5rem; font-size: 0.7rem;}
+  .source-badge { padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: bold; text-transform: uppercase;}
+  .source-nes_memory { background: #ff6b6b;} .source-gpu_cache { background: #4ecdc4;} .source-qlora { background: #45b7d1;} .instant-badge { color: #ffd93d; font-weight: bold;}
+  .similarity-badge { background: rgba(100, 255, 218, 0.2), color: #64ffda;padding: 0.2rem 0.4rem; border-radius: 4px;}
   .feedback-buttons { display: flex;
-	gap: 0.5rem; margin-top: 0.5rem}
-  .feedback-btn { background: none, border: none, font-size: 1rem;
-	cursor: pointer; opacity: 0.6;
-	transition:opacity 0.2}
-  .feedback-btn:hover { opacity: 1}
-  .neural-sprite-container { margin-top: 0.5rem, height: 100px, border-radius: 4px;
-	overflow: hidden}
-  .message-timestamp { font-size: 0.6rem, opacity: 0.5; margin-top: 0.5rem}
+	gap: 0.5rem; margin-top: 0.5rem;}
+  .feedback-btn { background: none;
+		border: none; font-size: 1rem;
+	cursor: pointer;
+		opacity: 0.6;
+	transition:opacity 0.2;}
+  .feedback-btn:hover { opacity: 1;}
+  .neural-sprite-container { margin-top: 0.5rem;
+		height: 100px; border-radius: 4px;
+	overflow: hidden;}
+  .message-timestamp { font-size: 0.6rem;
+		opacity: 0.5; margin-top: 0.5rem;}
   .chat-input-area { padding: 1rem;
-	background: rgba(0, 0, 0, 0.3); border-top: 2px solid #0f3460}
+	background: rgba(0, 0, 0, 0.3); border-top: 2px solid #0f3460;}
   .input-container { display: flex;
-	gap: 0.5rem; align-items: center}
+	gap: 0.5rem; align-items: center;}
   .message-input { flex: 1;
-	padding: 0.75rem;background: rgba(15, 52, 96, 0.6); border: 1px solid #0f3460; border-radius: 4px, color: #e0e6ed; font-family: inherit}
+	padding: 0.75rem;background: rgba(15, 52, 96, 0.6), border: 1px solid #0f3460; border-radius: 4px;
+		color: #e0e6ed; font-family: inherit;}
   .message-input:focus { outline: none; border-color: #64ffda; box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2)}
-  .send-button, .clear-button { min-width: 80px}
+  .send-button, .clear-button { min-width: 80px;}
   .loading-spinner { width: 16px;
-	height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
-	animation: spin 1s linear infinite}
-  .processing-status { margin-top: 0.5rem; text-align: center, font-size: 0.8rem;
-	opacity: 0.7}
-  .processing-indicator { animation: pulse 2s infinite}
+	height: 16px;
+		border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
+	animation: spin 1s linear infinite;}
+  .processing-status { margin-top: 0.5rem; text-align: center; font-size: 0.8rem;
+	opacity: 0.7;}
+  .processing-indicator { animation: pulse 2s infinite;}
   /* Animations */ @keyframes messageSlideIn { from { opacity: 0;
 	transform: translateY(20px)}
     to { opacity: 1;
 	transform: translateY(0)}
-  } @keyframes blink { 0%; } 50% { opacity: 1} 51%; } 100% { opacity: 0} }
+  } @keyframes blink { 0%; } 50% { opacity: 1;} 51%; } 100% { opacity: 0;} }
   @keyframes spin { to { transform: rotate(360deg) } }
-  @keyframes pulse { 0%; } 100% { opacity: 0.7} 50% { opacity: 1} }
+  @keyframes pulse { 0%; } 100% { opacity: 0.7;} 50% { opacity: 1;} }
   /* Responsive design */ @media (max-width: 768px) { .message-content { max-width: 90%}
     .system-status-bar { flex-direction: column;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   } </style>
 
 

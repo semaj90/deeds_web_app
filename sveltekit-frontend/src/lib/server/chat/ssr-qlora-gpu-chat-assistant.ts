@@ -19,7 +19,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // --- ADDED: missing type declarations to fix TS errors ---
 type GPUCache = {
 	getStats?: () => unknown;
-	findSimilar?: (, embedding: Float32Array,
+	findSimilar?: (; embedding: Float32Array,
 		threshold?: number
 	) => Promise<Array<{ metadata?: { response?: string }; similarity: number }> | undefined | null>;
 	storeVector?: (id: string, vector: Float32Array, metadata?: Record<string, unknown>) => Promise<void>;
@@ -103,7 +103,7 @@ export interface SSRChatContext {
 	gpuCacheState: any;
 	preloadedResponses: Map<string, string>;
 	currentCase?: {
-	caseId: string; documents: string[];
+	caseId: string, documents: string[];
 	activeContext: Float32Array };
 }
 

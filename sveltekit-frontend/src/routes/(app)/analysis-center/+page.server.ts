@@ -1,5 +1,4 @@
 import type { Actions, PageServerLoad } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Server-side only: no secrets leak to browser
 export const load: PageServerLoad = async () => {
@@ -28,7 +27,7 @@ export const actions: Actions = {
  			headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	model: 'gemma3-legal:latest',
- 				prompt: `Analyze the following legal evidence query using ${mode} analysis: ${query}. Provide structured analysis with confidence scores.`,
+ 				prompt: `Analyze the following legal evidence query using ${mode}, analysis: ${query}. Provide structured analysis with confidence scores.`,
  				stream: false
  			})
  		});

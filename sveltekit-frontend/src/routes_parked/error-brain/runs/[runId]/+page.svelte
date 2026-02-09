@@ -68,7 +68,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			<p class="text-muted-foreground font-mono text-sm">{runId}</p>
 		</div>
 		{#if run}
-			<Badge variant={run.state === 'done' ? 'default' , 'secondary'} class="text-lg px-4 py-2">
+			<Badge variant={run.state === 'done' ? 'default' : 'secondary'} class="text-lg px-4 py-2">
 				{run.state}
 			</Badge>
 		{/if}

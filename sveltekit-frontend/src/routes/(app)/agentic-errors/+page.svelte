@@ -1,29 +1,22 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Tabs from '$lib/components/ui/tabs';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
-	interface Cluster {
-		id: number;
-error_count: number;
+	interface Cluster { id: number, error_count: number;
 		tags: string[];
 summary: string;
 		error_ids: number[];
 		centroid?: number[];
 	}
 
-	interface GraphNode {
-		id: string;
-file_path: string;
+	interface GraphNode { id: string, file_path: string;
 		error_count: number;
 dependencies: string[];
 	}
 
-	interface VectorSearchResult {
-		id: string;
-score: number;
+	interface VectorSearchResult { id: string, score: number;
 		payload: any;
 	}
 
@@ -97,8 +90,7 @@ score: number;
 			const res = await fetch('/api/phase89/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-query: searchQuery,
+	body: JSON.stringify({ query: searchQuery,
 					top_k: 10,
 					similarity: 'cosine'
 				})
@@ -119,8 +111,7 @@ query: searchQuery,
 			const res = await fetch('/api/phase89/pipeline', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-action: 'cluster' })
+	body: JSON.stringify({ action: 'cluster' })
 			});
 			const data = await res.json();
 			if (data.success) {
@@ -144,7 +135,7 @@ action: 'cluster' })
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white p-8">
-	<div class="max-w-7xl mx-auto py-12 px-4 sm: px-6, lg:px-8">
+	<div class="max-w-7xl mx-auto py-12 px-4 sm: px-6 lg:px-8">
 		<!-- Header -->
 		<div class="mb-8">
 			<h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
@@ -220,7 +211,7 @@ action: 'cluster' })
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search for errors (e.g., 'svelte5 runes type error')"
-						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus: outline-none, focus:ring-2 focus:ring-purple-500"
+						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
 						onkeydown={(e) => e.key === 'Enter' && vectorSearch()}
 					/>
 					<button
@@ -381,7 +372,7 @@ action: 'cluster' })
 					<button
 						onclick={runClustering}
 						disabled={loading}
-						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover: from-purple-700, hover:to-pink-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
 					>
 						{loading ? '🚀 Pipeline Running...' : '🔥 Start All-in-One Analysis Pipeline'}
 					</button>

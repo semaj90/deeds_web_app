@@ -1,10 +1,7 @@
 import type { PageServerLoad } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define types for the data we return
-interface FileProfile {
-	file_path: string;
-	role: string;
+interface FileProfile { file_path: string, role: string;
 	surface: string[];
 	dependencies: string[];
 	exports: string[];
@@ -18,9 +15,7 @@ interface FileProfile {
 	generated_at: string;
 }
 
-interface Stats {
-	totalFiles: number;
-	byRole: Record<string, number>;
+interface Stats { totalFiles: number, byRole: Record<string, number>;
 	byRisk: Record<string, number>;
 	bySurface: Record<string, number>;
 }

@@ -89,7 +89,7 @@ function getEntityIcon(type: string) {
     case 'location': return MapPin;
     case 'date': return Calendar;
     case 'legal_concept': return Scale;
-    default: return FileText;
+    default:return FileText;
   }
 }
 

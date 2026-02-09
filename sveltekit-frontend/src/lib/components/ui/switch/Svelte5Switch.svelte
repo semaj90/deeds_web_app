@@ -13,7 +13,7 @@ interface Props {
 	class?: string;
 	variant?: 'default' | 'nes';
 	size?: 'sm' | 'md' | 'lg';
-	onchange?: (checked: boolean) => void;
+	onchange?: (checked:boolean) => void;
 	children?: Snippet;
 }
 
@@ -25,17 +25,25 @@ let {
 	class: className = '',
 	variant = 'default',
 	size = 'md',
-	onchange: children
+	onchange,
+	children
 }: Props = $props();
 
 // Size dimensions
-let dimensions = $derived({
-	sm: {
-	track: 'w-8 h-4', thumb: 'w-3 h-3', translate: 'translate-x-4' },
+let dimensions = $derived({ sm: { track: 'w-8 h-4',
+		thumb: 'w-3 h-3',
+		translate: 'translate-x-4'
+	},
 	md: {
-	track: 'w-11 h-6', thumb: 'w-5 h-5', translate: 'translate-x-5' },
+		track: 'w-11 h-6',
+		thumb: 'w-5 h-5',
+		translate: 'translate-x-5'
+	},
 	lg: {
-	track: 'w-14 h-7', thumb: 'w-6 h-6', translate: 'translate-x-7' }
+	track: 'w-14 h-7',
+		thumb: 'w-6 h-6',
+		translate: 'translate-x-7'
+	}
 }[size]);
 
 let labelSizeClasses = $derived({
@@ -49,7 +57,7 @@ let trackVariants = $derived({
 	default:checked
 		? 'bg-blue-600'
 		: 'bg-slate-600',
-	nes:checked
+	nes: checked
 		? 'bg-green-500 border-4 border-white'
 		: 'bg-red-500 border-4 border-white'
 }[variant]);
@@ -102,7 +110,8 @@ function handleKeydown(e: KeyboardEvent) {
 		class="relative inline-flex shrink-0 {dimensions.track}
 			   rounded-full cursor-pointer
 			   transition-colors duration-200 ease-in-out
-			   focus: outline-none, focus: ring-2, focus: ring-blue-500, focus: ring-offset-2, focus: ring-offset-slate-900, disabled, cursor-not-allowed
+			   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900
+			   disabled:cursor-not-allowed
 			   {trackVariants}"
 		onclick={() => !disabled && (checked = !checked, onchange?.(checked))}
 		onkeydown={handleKeydown}
@@ -113,7 +122,7 @@ function handleKeydown(e: KeyboardEvent) {
 				   rounded-full
 				   transform transition-transform duration-200 ease-in-out
 				   {thumbVariants}
-				   {checked ? dimensions.translate , 'translate-x-0.5'}"
+			   {checked ? dimensions.translate : 'translate-x-0.5'}"
 			aria-hidden="true"
 		></span>
 	</button>
@@ -126,9 +135,8 @@ function handleKeydown(e: KeyboardEvent) {
 </label>
 
 <style>
-	.sr-only {
-		position: absolute;
-	width: 1px;
+	.sr-only { position: absolute;
+		width: 1px;
 		height: 1px;
 	padding: 0;
 		margin: -1px;

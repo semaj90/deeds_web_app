@@ -96,14 +96,14 @@ export interface EvidenceCustodyContext {
   | { type: 'VERIFY_INTEGRITY' }
   | { type: 'START_AI_ANALYSIS' }
   | { type: 'JOIN_COLLABORATION';
-	userId: string; role: string }
+	userId: string, role: string }
   | { type: 'LEAVE_COLLABORATION';
 	userId: string }
   | { type: 'ADD_ANNOTATION';
-	userId: string; content: string;
+	userId: string, content: string;
 	position: unknown }
   | { type: 'TRANSFER_CUSTODY';
-	newCustodian: string; reason: string }
+	newCustodian: string, reason: string }
   | { type: 'APPROVE_CUSTODY' }
   | { type: 'REJECT_CUSTODY';
 	reason: string }

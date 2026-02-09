@@ -85,11 +85,11 @@ export interface SearchResponse {
 	caseStatus: { value: string;
 	count: number }[];
 		priority: {
-	value: string; count: number }[];
+	value: string, count: number }[];
 		evidenceType: {
-	value: string; count: number }[];
+	value: string, count: number }[];
 		tags: {
-	value: string; count: number }[];
+	value: string, count: number }[];
 	};
 	suggestions?: string[];
 	queryTime: number;
@@ -374,7 +374,7 @@ class AdvancedSearch {
 
 		const getPriorityValue = (r: SearchResult): number => {
 			if (r.type === 'case') {
-				const order: Record<string, number> = { high: 3, medium: 2, low: 1 };
+				const order: Record<string, number> = { high: 3; medium: 2, low: 1 };
 				return order[String(r.metadata.priority)] ?? 0;
 			}
 			return 0;

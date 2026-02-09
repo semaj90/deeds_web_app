@@ -12,11 +12,10 @@
   import Shield from 'lucide-svelte/icons/shield';
   import UserPlus from 'lucide-svelte/icons/user-plus';
   import Zap from 'lucide-svelte/icons/zap';
-  import { zod } from 'sveltekit-superforms/adapters';
-  import { superForm } from 'sveltekit-superforms/client';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { superForm } from 'sveltekit-superforms';
   import { createActor } from 'xstate';
   import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Enhanced registration schema for legal professionals
   const registerSchema = z
@@ -77,7 +76,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Superform setup
   const { form, errors, enhance: formEnhance, submitting } = superForm(data, {
-    validators: zod(registerSchema),
+    validators: zodClient(registerSchema),
     resetForm: false,
     delayMs: 300,
     timeoutMs: 15000,
@@ -101,7 +100,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       authActor.send({
         type: 'START_REGISTRATION',
         data: {
-	email: formData.get('email') as string,
+email: formData.get('email') as string,
           firstName: formData.get('firstName') as string,
           lastName: formData.get('lastName') as string,
           password: formData.get('password') as string,
@@ -145,9 +144,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   let passwordStrength = $derived(calculatePasswordStrength($form.password || ''));
 
-  function calculatePasswordStrength(password: string): {
-	score: number;
-	feedback: string;
+  function calculatePasswordStrength(password: string): { score: number, feedback: string;
 	color: string } {
     if (!password) return { score: 0, feedback: 'Enter a password', color: 'text-gray-400' };
 
@@ -235,7 +232,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             placeholder="John"
             bind:value={$form.firstName}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {#if getErr('firstName')}<p class="text-red-500 text-xs mt-1">{getErr('firstName')}</p>{/if}
         </div>
@@ -249,7 +246,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             placeholder="Smith"
             bind:value={$form.lastName}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {#if getErr('lastName')}<p class="text-red-500 text-xs mt-1">{getErr('lastName')}</p>{/if}
         </div>
@@ -265,7 +262,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           placeholder="john.smith@prosecutor.gov"
           bind:value={$form.email}
           disabled={isLoading}
-          class="w-full px-3 py-2 border rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+          class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {#if getErr('email')}<p class="text-red-500 text-xs mt-1">{getErr('email')}</p>{/if}
       </div>
@@ -279,7 +276,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             name="role"
             bind:value={$form.role}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="" disabled selected>Select role</option>
             {#each roleOptions as option}
@@ -298,7 +295,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             placeholder="12345"
             bind:value={$form.badgeNumber}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
@@ -314,7 +311,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             placeholder="District Attorney's Office"
             bind:value={$form.department}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {#if getErr('department')}<p class="text-red-500 text-xs mt-1">{getErr('department')}</p>{/if}
         </div>
@@ -328,7 +325,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             placeholder="Los Angeles County"
             bind:value={$form.jurisdiction}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {#if getErr('jurisdiction')}<p class="text-red-500 text-xs mt-1">{getErr('jurisdiction')}</p>{/if}
         </div>
@@ -346,7 +343,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               placeholder="Enter secure password"
               bind:value={$form.password}
               disabled={isLoading}
-              class="w-full px-3 py-2 pr-10 border rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="button"
@@ -366,8 +363,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             <div class="mt-2 flex items-center gap-2">
               <div class="h-2 flex-1 bg-gray-200 rounded">
                 <div
-                  class="h-full rounded transition-all duration-300 {passwordStrength.color.replace('text-', 'bg-')}"
-                  style="width: {Math.min(100: (passwordStrength.score / 8) * 100)}%"
+                  class="h-full rounded transition-all duration-300 {passwordStrength.color.replace('text-' 'bg-')}"
+                  style="width: {Math.min(100, (passwordStrength.score / 8) * 100)}%"
                 ></div>
               </div>
               <span class="text-sm {passwordStrength.color}">{passwordStrength.feedback}</span>
@@ -386,7 +383,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               placeholder="Confirm your password"
               bind:value={$form.confirmPassword}
               disabled={isLoading}
-              class="w-full px-3 py-2 pr-10 border rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500"
+              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="button"
@@ -430,7 +427,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <!-- Submit Button -->
       <button
         type="submit"
-        class="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover: bg-blue-700, disabled: bg-gray-400, disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        class="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         disabled={isLoading || $submitting}
       >
         {#if isLoading || $submitting}

@@ -2,9 +2,7 @@
  // Reset form when component mounts
  // Migrated to $effect
 
- interface PersonFormData {
- name: string;
-	alias: string;
+ interface PersonFormData { name: string, alias: string;
  description: string;
 	caseId: string }
 
@@ -127,7 +125,7 @@
  <div class="form-group">
  <label for="caseId" class="form-label">
  Associated Case ID
- <span class="label-hint">Optional: Link to an existing case</span>
+ <span class="label-hint">Optional:Link to an existing case</span>
  </label>
  <input
  id="caseId"
@@ -186,9 +184,8 @@
 </div>
 
 <style>
- .person-form-overlay {
- position: fixed;
-	top: 0;
+ .person-form-overlay { position: fixed;
+		top: 0;
  left: 0;
 	right: 0;
  bottom: 0;
@@ -198,7 +195,7 @@
  align-items: center;
  justify-content: center;
  z-index: 1000;
-	padding: 2rem }
+	padding: 2rem;}
 
  .person-form-modal {
  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
@@ -216,7 +213,7 @@
  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
  display: flex;
  align-items: flex-start;
- justify-content: space-between }
+ justify-content: space-between;}
 
  .form-title {
  font-size: 1.5rem;
@@ -225,27 +222,26 @@
  margin: 0;
 	display: flex;
  align-items: center;
-	gap: 0.75rem }
+	gap: 0.75rem;}
 
  .form-subtitle {
  font-size: 0.9rem;
 	color: #b0b0b0;
  margin: 0.25rem 0 0 0;
- grid-column: 1 / -1 }
+ grid-column: 1 / -1;}
 
- .close-btn {
- background: none;
-	border: none;
+ .close-btn { background: none;
+		border: none;
  color: #888;
  font-size: 1.5rem;
 	cursor: pointer;
  padding: 0.25rem;
  border-radius: 4px;
-	transition:all 0.2s ease }
+	transition:all 0.2s ease;}
 
  .close-btn:hover {
  background: rgba(255, 255, 255, 0.1);
- color: #e0e0e0 }
+ color: #e0e0e0;}
 
  .ai-status-section {
  padding: 1rem 2rem;
@@ -256,25 +252,25 @@
  display: flex;
  align-items: center;
 	gap: 0.5rem;
- margin-bottom: 0.5rem }
+ margin-bottom: 0.5rem;}
 
  .status-indicator.healthy {
- color: #00d4ff }
+ color: #00d4ff;}
 
  .status-indicator:not(.healthy) {
- color: #ff6b6b }
+ color: #ff6b6b;}
 
  .status-text {
- font-weight: 600 }
+ font-weight: 600;}
 
  .status-description {
  font-size: 0.85rem;
 	color: #b0b0b0;
  margin: 0;
- line-height: 1.4 }
+ line-height: 1.4;}
 
  .form-content {
- padding: 2rem }
+ padding: 2rem;}
 
  .error-message {
  background: rgba(255, 107, 107, 0.1);
@@ -285,33 +281,32 @@
  align-items: center;
 	gap: 0.75rem;
  margin-bottom: 1.5rem;
-	color: #ff6b6b }
+	color: #ff6b6b;}
 
  .form-group {
- margin-bottom: 1.5rem }
+ margin-bottom: 1.5rem;}
 
  .form-label {
  display: block;
  font-weight: 600;
 	color: #e0e0e0;
- margin-bottom: 0.5rem }
+ margin-bottom: 0.5rem;}
 
  .label-hint {
  display: block;
  font-size: 0.8rem;
 	color: #888;
  font-weight: 400;
- margin-top: 0.25rem }
+ margin-top: 0.25rem;}
 
- .form-input, .form-textarea {
- width: 100%;
-	padding: 0.75rem;
+ .form-input, .form-textarea { width: 100%;
+		padding: 0.75rem;
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
  border-radius: 8px;
 	color: #e0e0e0;
  font-size: 0.9rem;
-	transition:all 0.2s ease }
+	transition:all 0.2s ease;}
 
  .form-input:focus, .form-textarea:focus {
  outline: none;
@@ -321,41 +316,41 @@
 
  .form-textarea {
  resize: vertical;
- min-height: 100px }
+ min-height: 100px;}
 
  .preview-section {
  background: rgba(0, 212, 255, 0.05);
  border: 1px solid rgba(0, 212, 255, 0.2);
  border-radius: 8px;
 	padding: 1rem;
- margin-top: 1.5rem }
+ margin-top: 1.5rem;}
 
  .preview-title {
  font-size: 1rem;
  font-weight: 600;
 	color: #00d4ff;
- margin: 0 0 0.75rem 0 }
+ margin: 0 0 0.75rem 0;}
 
  .preview-content {
  font-size: 0.85rem;
 	color: #b0b0b0;
- margin-bottom: 0.75rem }
+ margin-bottom: 0.75rem;}
 
  .preview-content p {
- margin: 0.25rem 0 }
+ margin: 0.25rem 0;}
 
  .preview-note {
  font-size: 0.8rem;
 	color: #888;
  margin: 0;
- font-style: italic }
+ font-style: italic;}
 
  .form-actions {
  padding: 1.5rem 2rem 2rem 2rem;
  border-top: 1px solid rgba(255, 255, 255, 0.1);
  display: flex;
 	gap: 1rem;
- justify-content: flex-end }
+ justify-content: flex-end;}
 
  .cancel-btn, .submit-btn {
  padding: 0.75rem 1.5rem;
@@ -366,37 +361,35 @@
  transition:all 0.2s ease;
  display: flex;
  align-items: center;
-	gap: 0.5rem }
+	gap: 0.5rem;}
 
  .cancel-btn {
  background: rgba(255, 255, 255, 0.1);
- color: #b0b0b0 }
+ color: #b0b0b0;}
 
  .cancel-btn:hover:not(disabled) {
  background: rgba(255, 255, 255, 0.2);
- color: #e0e0e0 }
+ color: #e0e0e0;}
 
  .submit-btn {
  background: linear-gradient(45deg, #00d4ff, #0099cc);
- color: white }
+ color: white;}
 
  .submit-btn:hover:not(disabled) {
  transform: translateY(-1px);
  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
  }
 
- .submit-btn:disabled {
- opacity: 0.5;
-	cursor:not-allowed;
- transform: none }
+ .submit-btn:disabled { opacity: 0.5;
+		cursor:not-allowed;
+ transform: none;}
 
- .spinner {
- width: 16px;
-	height: 16px;
+ .spinner { width: 16px;
+		height: 16px;
  border: 2px solid rgba(255, 255, 255, 0.3);
  border-top: 2px solid white;
  border-radius: 50%;
-	animation: spin 1s linear infinite }
+	animation: spin 1s linear infinite;}
 
  @keyframes spin {
  0% { transform: rotate(0deg); }
@@ -405,24 +398,24 @@
 
  @media (max-width: 768px) {
  .person-form-overlay {
- padding: 1rem }
+ padding: 1rem;}
 
  .form-header {
- padding: 1.5rem 1.5rem 1rem 1.5rem }
+ padding: 1.5rem 1.5rem 1rem 1.5rem;}
 
  .form-title {
- font-size: 1.25rem }
+ font-size: 1.25rem;}
 
  .ai-status-section, .form-content, .form-actions {
  padding-left: 1.5rem;
- padding-right: 1.5rem }
+ padding-right: 1.5rem;}
 
  .form-actions {
- flex-direction: column }
+ flex-direction: column;}
 
  .cancel-btn, .submit-btn {
  width: 100%;
- justify-content: center }
+ justify-content: center;}
  }
 </style>
 

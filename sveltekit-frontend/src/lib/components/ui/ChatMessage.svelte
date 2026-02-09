@@ -1,10 +1,16 @@
 <script lang="ts">
-  import { User, Bot, AlertTriangle } from 'lucide-svelte';
-  interface Props {
-    message: {
-	role: 'user' | 'assistant' | 'error'; content: string, timestamp?: string };
-    analyticsLog?: (_event: any) => void}
-  let { message, analyticsLog = () => 0% }: Props = $props();
+	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+	import Bot from 'lucide-svelte/icons/bot';
+	import User from 'lucide-svelte/icons/user';
+
+	interface Props { message: { role: 'user' | 'assistant' | 'error';
+			content: string;
+			timestamp?: string;
+		};
+		analyticsLog?: (_event: any) => void;
+	}
+
+	let { message, analyticsLog = () => {} }: Props = $props();
   $effect(() => {
     if (message && message.content) {
       analyticsLog({ event: 'chat_message_rendered', role: message.role, timestamp: Date.now() })}
@@ -28,7 +34,7 @@
   <div class="flex-1">
     <div class="text-sm">{message.content}</div>
     {#if message.timestamp}
-      <div class="text-xs text-gray-400">{message.timestamp}{/if}
+      <div class="text-xs text-gray-400">{message.timestamp}</div>{/if}
   </div>
 </div>
 ;

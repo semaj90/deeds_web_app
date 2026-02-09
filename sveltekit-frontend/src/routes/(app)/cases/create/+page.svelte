@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	// State using Svelte 5 runes
@@ -121,12 +120,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			case 'critical': return 'border-purple-500/60 bg-purple-500/20 text-purple-100';
 			case 'medium': return 'border-orange-500/60 bg-orange-500/20 text-orange-100';
 			case 'low': return 'border-blue-500/60 bg-blue-500/20 text-blue-100';
-			default: return 'border-slate-500/60 bg-slate-500/20 text-slate-100';
+			default:return 'border-slate-500/60 bg-slate-500/20 text-slate-100';
 		}
 	}
 
 	async function navigateToCase(caseId: string) {
-		await goto(`/cases/${ caseId }`);
+		await goto(`/cases/${caseId}`);
 	}
 
 	$effect(() => {
@@ -253,7 +252,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 						id="case-title"
 						type="text"
 						bind:value={newCaseData.title}
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
 						required
 					/>
 				</div>
@@ -263,7 +262,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 						id="case-description"
 						bind:value={newCaseData.description}
 						rows="4"
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
 					></textarea>
 				</div>
 				<div>
@@ -271,7 +270,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 					<select
 						id="case-priority"
 						bind:value={newCaseData.priority}
-						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus: border-amber-400, focus:outline-none"
+						class="w-full rounded border border-slate-700 bg-black/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
 					>
 						<option value="low">Low</option>
 						<option value="medium">Medium</option>

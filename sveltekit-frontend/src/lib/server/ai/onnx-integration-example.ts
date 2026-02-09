@@ -103,7 +103,7 @@ export async function initializeONNXServices(): Promise<boolean> {
  * Example: Batch process multiple legal documents efficiently
  */
 export async function batchProcessLegalDocuments(documents: Array<{
-	id: string; text: string }>): Promise<unknown> {
+	id: string, text: string }>): Promise<unknown> {
     const results: unknown[] = [];
     const startTime = Date.now();
     console.log(`🔄 Batch processing ${documents.length} legal documents with ONNX...`);

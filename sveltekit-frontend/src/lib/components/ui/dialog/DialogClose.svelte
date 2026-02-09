@@ -24,7 +24,7 @@
 		rounded-sm opacity-70
 		ring-offset-slate-900
 		transition-opacity
-		hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-slate-400 focus: ring-offset-2, disabled:pointer-events-none
+		hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:pointer-events-none
 	`.replace(/\s+/g, ' ').trim();
 </script>
 

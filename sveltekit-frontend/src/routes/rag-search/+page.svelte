@@ -28,7 +28,6 @@ import type {
   ValidationStatus
 } from '$lib/types/rag-source-validation';
 import type { Component } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Type assertions for Svelte 5 component compatibility
 const SourceValidatorComponent = SourceValidator as unknown as Component;
@@ -247,7 +246,7 @@ function startNewSearch() {
               <button
                 class="btn btn-primary join-item"
                 onclick={handleSearch}
-                disabled={isSearching ?? !query.trim()}
+                disabled={isSearching || !query.trim()}
               >
                 {#if isSearching}
                   <span class="loading loading-spinner loading-sm"></span>

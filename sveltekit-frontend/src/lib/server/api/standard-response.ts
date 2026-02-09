@@ -120,7 +120,7 @@ export function withErrorHandling<T extends RequestEvent>(handler: (event: T) =>
 			// Only include stack in development mode for Error instances
 			const errorStack = error instanceof Error && process.env.NODE_ENV === 'development'
 				? error.stack
-				: undefined;
+				 : undefined;
 
 			console.error(`API Error [${requestId}]:`, error);
 

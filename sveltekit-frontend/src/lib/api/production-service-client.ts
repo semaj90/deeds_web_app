@@ -249,7 +249,7 @@ class ProductionServiceClient {
 function getProductionServiceBaseUrl(): string {
     // Prefer Node-style process.env, then Vite-style import.meta.env, then localhost fallback
     const fromProcess = typeof process !== 'undefined' && process.env
-        ? process.env['PRODUCTION_SERVICE_BASE_URL'] : undefined;
+        ? process.env['PRODUCTION_SERVICE_BASE_URL']: undefined;
 
     const fromVite = (import.meta as any).env?.VITE_PRODUCTION_SERVICE_BASE_URL;
 

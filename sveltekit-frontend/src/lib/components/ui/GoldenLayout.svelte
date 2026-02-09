@@ -48,8 +48,7 @@
         return 1;
       case 'custom':
         return mainFlex;
-      default:
-        return 1.618;
+      default:return 1.618;
     }
   });
 
@@ -63,8 +62,7 @@
         return 1;
       case 'custom':
         return sidebarFlex;
-      default:
-        return 1;
+      default:return 1;
     }
   });
 
@@ -85,7 +83,7 @@
 
 <div
   class="golden-layout {className}"
-  class: collapsed, class:sidebar-left={sidebarPosition === 'left'}
+  class: collapsed class:sidebar-left={sidebarPosition === 'left'}
 >
   {#if sidebarPosition === 'left' && sidebar}
     <aside

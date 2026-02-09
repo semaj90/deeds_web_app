@@ -27,9 +27,7 @@
   let progress = $state(100);
   let interval: any;
 
-  const typeConfig = {
-    info: {
-	icon: '■', color: '#0ea5e9' },
+  const typeConfig = { info: { icon: '■', color: '#0ea5e9' },
 	success: {
 	icon: '✓', color: '#10b981' },
 	warning: {

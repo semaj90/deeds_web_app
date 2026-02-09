@@ -14,11 +14,13 @@ https, //svelte.dev/e/block_unexpected_close -->
  import type { Document } from '$lib/types';
  // Svelte 5 runes are auto-imported
  // Migrated to $effect
- import { Button } from "$lib/components/ui/button";
- import { Card, CardHeader, CardTitle, CardContent } from "$lib/components/ui/card";
- import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
+ import Button from '$lib/components/ui/Button.svelte';
+ import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
  import type { VectorSearchResult, IntelligenceRecommendation, SemanticAnalysisResult, VectorIntelligenceState } from '$lib/services/vector-intelligence-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  // Component state
  let searchQuery = $state<string>('');
@@ -180,7 +182,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'insight': return Lightbulb;
  case 'warning': return AlertTriangle;
  case 'opportunity': return TrendingUp;
- default: return FileText;
+ default:return FileText;
  }
  }
  function getRecommendationColor(type: string) {
@@ -189,7 +191,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'insight': return 'recommendation-insight';
  case 'warning': return 'recommendation-warning';
  case 'opportunity': return 'recommendation-opportunity';
- default: return 'recommendation-item';
+ default:return 'recommendation-item';
  }
  }
  function getEntityIcon(type: string) {
@@ -199,7 +201,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'location': return Target;
  case 'date': return Clock;
  case 'legal_concept': return FileText;
- default: return Tag;
+ default:return Tag;
  }
  }
  function getEntityColor(type: string) {
@@ -209,7 +211,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'location': return 'semantic-entity-location';
  case 'date': return 'semantic-entity-date';
  case 'legal_concept': return 'semantic-entity-legal';
- default: return 'semantic-entity-tag';
+ default:return 'semantic-entity-tag';
  }
  }
  function getConfidenceColor(confidence: number) {
@@ -223,10 +225,10 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'good': return 'text-blue-600';
  case 'fair': return 'text-yellow-600';
  case 'poor': return 'text-red-600';
- default: return 'text-gray-600';
+ default:return 'text-gray-600';
  }
  }
-</script> <div class="w-full max-w-7xl mx-auto p-6"> <!-- Header --> <div class="text-center"> <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text"> Vector Intelligence Demo </h1> <p class="text-lg nes-text is-disabled max-w-3xl"> Experience the power of Phase, 4 Vector Intelligence with semantic search: AI recommendations, and advanced document analysis for legal professionals. </p> <div class="flex items-center justify-center gap-4"> <Badge class="bits-badge-default flex items-center"> <Brain class="h-3" /> Vector Intelligence </Badge> <Badge class="bits-badge-secondary flex items-center"> <Search class="h-3" /> Semantic Search </Badge> <Badge class="bits-badge-secondary flex items-center"> <Lightbulb class="h-3" /> AI Recommendations </Badge> <Badge class="bits-badge-secondary flex items-center"> <Activity class="h-3" /> Real-time Analysis </Badge> </div> </div> <!-- Demo, Examples --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4, 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-4-6v8M5 21V5a2, 2 0 012-2h10a2, 0, 012 012, 2v16l-5-3.5L9, 21z"></path> </svg> Quick Demo Examples </h3> </div> <div class="yorha-panel-content"> <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3"> <!-- Search, Examples --> <div class="space-y-3"> <h3 class="font-semibold text-sm flex items-center"> <Search class="h-4" /> Semantic Search </h3>
+</script> <div class="w-full max-w-7xl mx-auto p-6"> <!-- Header --> <div class="text-center"> <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text"> Vector Intelligence Demo </h1> <p class="text-lg nes-text is-disabled max-w-3xl"> Experience the power of Phase, 4 Vector Intelligence with semantic search: AI recommendations, and advanced document analysis for legal professionals. </p> <div class="flex items-center justify-center gap-4"> <Badge class="bits-badge-default flex items-center"> <Brain class="h-3" /> Vector Intelligence </Badge> <Badge class="bits-badge-secondary flex items-center"> <Search class="h-3" /> Semantic Search </Badge> <Badge class="bits-badge-secondary flex items-center"> <Lightbulb class="h-3" /> AI Recommendations </Badge> <Badge class="bits-badge-secondary flex items-center"> <Activity class="h-3" /> Real-time Analysis </Badge> </div> </div> <!-- Demo, Examples --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4, 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-4-6v8M5 21V5a2, 2 0 012-2h10a2, 0, 012 012, 2v16l-5-3.5L9, 21z"></path> </svg> Quick Demo Examples </h3> </div> <div class="yorha-panel-content"> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"> <!-- Search, Examples --> <div class="space-y-3"> <h3 class="font-semibold text-sm flex items-center"> <Search class="h-4" /> Semantic Search </h3>
  {#each Array.isArray(demoSearchQueries) ? demoSearchQueries: [] as example} <div class="demo-example-nier-bits-card" onclick={() => loadDemoQuery(example.query)}> <h4 class="font-medium text-sm">{example.category}
  </h4> <p class="text-xs nes-text is-disabled">{example.description}
  </p> <p class="text-xs bg-muted p-2 rounded">{example.query}
@@ -243,13 +245,13 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  variant={activeTab === 'search' ? 'default' : 'ghost'} size="sm"
  onclick={() => activeTab = 'search'}
  > <Search class="h-4" /> Search </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2 bits-btn"
- variant={activeTab === 'recommendations' ? 'default', 'ghost'} size="sm"
+ variant={activeTab === 'recommendations' ? 'default' : 'ghost'} size="sm"
  onclick={() => activeTab = 'recommendations'}
  > <Lightbulb class="h-4" /> Recommendations </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2 bits-btn"
- variant={activeTab === 'analysis' ? 'default', 'ghost'} size="sm"
+ variant={activeTab === 'analysis' ? 'default' : 'ghost'} size="sm"
  onclick={() => activeTab = 'analysis'}
  > <BarChart3 class="h-4" /> Analysis </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2 bits-btn"
- variant={activeTab === 'health' ? 'default', 'ghost'} size="sm"
+ variant={activeTab === 'health' ? 'default' : 'ghost'} size="sm"
  onclick={() => activeTab = 'health'}
  > <Activity class="h-4" /> Health </ButtonRoot> </div> <!-- Processing, Indicator -->
  {#if isProcessing} <div class="bits-nier-bits-card"> <div class="yorha-panel-content" variant="default" legal={ true }> <div class="flex items-center justify-center space-x-3"> <div class="animate-spin h-6 w-6 border border-primary border-t-transparent"></div> <span class="nes-text">{ processingStage }
@@ -257,7 +259,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  {#if activeTab === 'search'} <!-- Semantic: Search, Tab --> <div class="space-y-6"> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <Search class="h-5" /> Semantic Vector Search </h3> </div> <div class="yorha-panel-content bits-nier-bits-yorha-panel-content" variant="default" legal={ true }> <div class="space-y-2"> <label class="bits-label" for="search-query">Search Query</label> <textarea id="search-query"; bind:value={ searchQuery } placeholder="Enter your legal search, query..."
  class="vector-search-input min-h-[80px] w-full p-2 border rounded"
  ></textarea> </div>
- {#if showAdvancedOptions} <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="bits-label" for="case-type-filter">Case Type Filter</label> <select id="case-type-filter" bind:value={ selectedCaseType } class="bits-select-trigger w-full p-2 border"> <option value="criminal">Criminal</option> <option value="civil">Civil</option> <option value="corporate">Corporate</option> <option value="general">General</option> </select> </div> {/if} <div class="flex items-center"> <Button onclick={ performSearch } disabled={isProcessing || !searchQuery.trim()} class="bits-btn-default bits-btn bits-btn bits-btn"
+ {#if showAdvancedOptions} <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-2"> <label class="bits-label" for="case-type-filter">Case Type Filter</label> <select id="case-type-filter" bind:value={ selectedCaseType } class="bits-select-trigger w-full p-2 border"> <option value="criminal">Criminal</option> <option value="civil">Civil</option> <option value="corporate">Corporate</option> <option value="general">General</option> </select> </div> {/if} <div class="flex items-center"> <Button onclick={ performSearch } disabled={isProcessing || !searchQuery.trim()} class="bits-btn-default bits-btn bits-btn bits-btn"
  >
  {#if isProcessing} <Pause class="h-4 w-4" /> Searching... {:else} <Search class="h-4 w-4" /> Search {/if}
  </Button> <ButtonRoot class="bits-btn bits-btn"
@@ -279,7 +281,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  </div> {:else if activeTab === 'recommendations'} <!-- AI: Recommendations, Tab --> <div class="space-y-6"> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <Lightbulb class="h-5" /> AI Recommendations </h3> </div> <div class="yorha-panel-content bits-nier-bits-yorha-panel-content" variant="default" legal={ true }> <div class="space-y-2"> <label class="bits-label" for="context-description">Context Description</label> <textarea id="context-description"
  bind:value={ recommendationContext } placeholder="Describe your current situation or challenge..."
  class="vector-search-input min-h-[100px] w-full p-2 border rounded"
- ></textarea> </div> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="bits-label">Your Role</label> <Select bind:value={ selectedUserRole }> <SelectTrigger class="bits-select-trigger"> <SelectValue /> </SelectTrigger> <SelectContent> <SelectItem value="prosecutor">Prosecutor</SelectItem> <SelectItem value="detective">Detective</SelectItem> <SelectItem value="admin">Administrator</SelectItem> <SelectItem value="user">General User</SelectItem> </SelectContent> </Select> </div> <div class="space-y-2"> <label class="bits-label">Case Type</label> <Select bind:value={ selectedCaseType }> <SelectTrigger class="bits-select-trigger"> <SelectValue /> </SelectTrigger> <SelectContent> <SelectItem value="criminal">Criminal</SelectItem> <SelectItem value="civil">Civil</SelectItem> <SelectItem value="corporate">Corporate</SelectItem> <SelectItem value="general">General</SelectItem> </SelectContent> </Select> </div> </div> <Button onclick={ generateRecommendations } disabled={isProcessing || !recommendationContext.trim()} class="bits-btn-default bits-btn bits-btn bits-btn"
+ ></textarea> </div> <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-2"> <label class="bits-label">Your Role</label> <Select bind:value={ selectedUserRole }> <SelectTrigger class="bits-select-trigger"> <SelectValue /> </SelectTrigger> <SelectContent> <SelectItem value="prosecutor">Prosecutor</SelectItem> <SelectItem value="detective">Detective</SelectItem> <SelectItem value="admin">Administrator</SelectItem> <SelectItem value="user">General User</SelectItem> </SelectContent> </Select> </div> <div class="space-y-2"> <label class="bits-label">Case Type</label> <Select bind:value={ selectedCaseType }> <SelectTrigger class="bits-select-trigger"> <SelectValue /> </SelectTrigger> <SelectContent> <SelectItem value="criminal">Criminal</SelectItem> <SelectItem value="civil">Civil</SelectItem> <SelectItem value="corporate">Corporate</SelectItem> <SelectItem value="general">General</SelectItem> </SelectContent> </Select> </div> </div> <Button onclick={ generateRecommendations } disabled={isProcessing || !recommendationContext.trim()} class="bits-btn-default bits-btn bits-btn bits-btn"
  >
  {#if isProcessing} <Pause class="h-4 w-4" /> Generating... {:else} <Zap class="h-4 w-4" /> Generate Recommendations {/if}
  </Button> </div> </div> <!-- Recommendations, Results -->
@@ -330,13 +332,13 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  ></div> </div> </div> <Separator class="bits-separator" /> <div class="space-y-1"> <div class="flex"> <span>Overall Sentiment</span> <span class={semanticAnalysis.sentiment?.overall >= 0 ? 'text-green-600': 'text-red-600'}> {semanticAnalysis.sentiment?.overall?.toFixed(2) ?? 'N/A'}
  </span> </div> </div> </div> </div> </div> {/if}
  </div> {:else if activeTab === 'health'} <!-- System Health, Tab --> <div class="space-y-6"> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> <Activity class="h-5" /> Vector Intelligence System Health </span> <ButtonRoot class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ loadSystemHealth }> <RefreshCw class="h-4" /> </Button> </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
- {#if systemHealth} <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4"> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">System Status</p> <p class="text-2xl"> {systemHealth.systemHealth}
+ {#if systemHealth} <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4"> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">System Status</p> <p class="text-2xl"> {systemHealth.systemHealth}
  </p> </div> <Activity class="h-8" /> </div> </div> </div> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">Model Confidence</p> <p class="text-2xl"> {Math.round(systemHealth.modelConfidence * 100)}% </p> </div> <Star class="h-8 w-8" /> </div> </div> </div> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">Indexed Documents</p> <p class="text-2xl"> {systemHealth.indexedDocuments.toLocaleString()}
  </p> </div> <FileText class="h-8 w-8" /> </div> </div> </div> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">Vector Dimensions</p> <p class="text-2xl"> {systemHealth.vectorDimensions}
- </p> </div> <Network class="h-8 w-8" /> </div> </div> </div> </div> <Separator class="bits-separator" /> <div class="space-y-4"> <h3 class="text-lg">System Information</h3> <div class="grid grid-cols-1 md, grid-cols-2 gap-4"> <div class="space-y-2"> <div class="flex"> <span class="nes-text">Embedding Model:</span> <span class="font-mono">{systemHealth.embeddingModel}
- </span> </div> <div class="flex"> <span class="nes-text">Initialization Status:</span> <Badge class={systemHealth.isInitialized ? 'bits-badge-default', 'bits-badge-destructive'}> {systemHealth.isInitialized ? 'Initialized': 'Not Initialized'}
+ </p> </div> <Network class="h-8 w-8" /> </div> </div> </div> </div> <Separator class="bits-separator" /> <div class="space-y-4"> <h3 class="text-lg">System Information</h3> <div class="grid grid-cols-1 md grid-cols-2 gap-4"> <div class="space-y-2"> <div class="flex"> <span class="nes-text">Embedding Model:</span> <span class="font-mono">{systemHealth.embeddingModel}
+ </span> </div> <div class="flex"> <span class="nes-text">Initialization Status:</span> <Badge class={systemHealth.isInitialized ? 'bits-badge-default' : 'bits-badge-destructive'}> {systemHealth.isInitialized ? 'Initialized': 'Not Initialized'}
  </Badge> </div> </div> <div class="space-y-2"> <div class="flex"> <span class="nes-text">Last Update:</span> <span>{new Date(systemHealth.lastUpdateTime).toLocaleString()}
- </span> </div> <div class="flex"> <span class="nes-text">Performance:</span> <Badge class={getHealthColor(systemHealth.systemHealth).includes('green') ? 'bits-badge-default', 'bits-badge-secondary'}> Optimal </Badge> </div> </div> </div> </div> {:else} <div class="text-center"> <p class="nes-text">Loading system health information...</p> {/if}
+ </span> </div> <div class="flex"> <span class="nes-text">Performance:</span> <Badge class={getHealthColor(systemHealth.systemHealth).includes('green') ? 'bits-badge-default' : 'bits-badge-secondary'}> Optimal </Badge> </div> </div> </div> </div> {:else} <div class="text-center"> <p class="nes-text">Loading system health information...</p> {/if}
  </div> </div> {/if}
  </div> <style> /* @unocss-include */ </style>;
 

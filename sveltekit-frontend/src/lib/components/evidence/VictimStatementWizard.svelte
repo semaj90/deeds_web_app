@@ -13,7 +13,6 @@ https, //svelte.dev/e/js_parse_error -->
  import Input from '$lib/components/ui/input';
  import Progress from '$lib/components/ui/progress';
  import Textarea from '$lib/components/ui/textarea';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  type Statement = {
  victimName: string;
@@ -65,7 +64,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let isGeneratingSuggestions = $state(false);
 
  const steps: {
-	id: WizardStep; title: string;
+	id: WizardStep, title: string;
 	description: string }[] = [
  { id: 'basic-info', title: 'Basic Information', description: 'Victim details and contact information' },
 	{ id: 'incident-details', title: 'Incident Details', description: 'What happened, when, and where' },

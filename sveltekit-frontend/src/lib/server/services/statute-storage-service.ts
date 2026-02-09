@@ -160,7 +160,7 @@ export async function listStatuteSources(
     title: string,
     config: StorageConfig = DEFAULT_CONFIG
 ): Promise<{
-	xml: string | null; pdf: string | null }> {
+	xml: string | null, pdf: string | null }> {
     try {
         const { getMinIOStorage } = await import('$lib/server/ingest/minio.js');
         const minioClient = getMinIOStorage();

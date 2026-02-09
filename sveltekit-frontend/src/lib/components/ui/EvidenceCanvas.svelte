@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Dialog } from 'bits-ui';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+  import * as Dialog from "bits-ui/components/dialog";
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // If Button is a component, we use it directly. If it has subcomponents, we adapt.
@@ -9,9 +8,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // We'll trust 'bits-ui' exports Button.
 
   // Define the structure for the AI analysis results
-  export interface AnalysisResult {
-    summary: string;
-	key_points: string[];
+  export interface AnalysisResult { summary: string, key_points: string[];
     recommendations: string[];
 	confidence_score: number;
   }
@@ -102,11 +99,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#each evidenceItems as item (item.id)}
     <article
       class="card nes-container is-dark hover:shadow-lg cursor-pointer"
-      role="button"
-      tabindex="0"
-      aria-label={item.title ?? 'Evidence item'}
       onclick={() => handleItemClick(item)}
       onkeydown={(e) => (['Enter',' '].includes(e.key) && handleItemClick(item))}
+      tabindex="0"
+      role="button"
+      aria-label={item.title ?? 'Evidence item'}
     >
       {#if item.thumbnail}
         <img src={item.thumbnail} alt={item.title ?? 'Evidence'} class="rounded-md w-full aspect-video object-cover mb-2" />
@@ -152,7 +149,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <Dialog.Root bind:open={showModal}>
   <Dialog.Portal>
     <Dialog.Overlay class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm px-4" />
-    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border border-gray-700 bg-gray-900 p-6 shadow-lg sm: rounded-lg, md, w-full">
+    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border border-gray-700 bg-gray-900 p-6 shadow-lg sm: rounded-lg md w-full">
       {#if selectedItem}
         <Dialog.Title class="text-lg font-bold">{selectedItem.title ?? 'Evidence Details'}</Dialog.Title>
 
@@ -294,7 +291,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     padding: 0.125rem 0.25rem;
     font-size: 11px;
   }
-  .card:hover { transform: translateY(-3px) scale(1.02); transition:transform 0.2s ease; }
+  .card:hover { transform: translateY(-3px) scale(1.02);
+		transition:transform 0.2s ease; }
 
   /* Responsive grid */
   @media (max-width: 768px) {

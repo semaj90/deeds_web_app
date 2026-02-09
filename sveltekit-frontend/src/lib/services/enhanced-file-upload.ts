@@ -4,7 +4,6 @@
  */
 
 import localStorageFiles from './localStorage-file-fallback.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface UploadResponse {
 	success: boolean;
@@ -151,7 +150,7 @@ class EnhancedFileUpload {
 
 		return {
 			fileId,
-			url: result?.url ?? (fileId ? `/api/evidence/${fileId}` : undefined)
+			url: result?.url ?? (fileId ? `/api/evidence/${fileId}`  | undefined)
 		};
 	}
 
@@ -186,7 +185,7 @@ class EnhancedFileUpload {
 				storageType: 'localStorage',
 				fallbackUsed: false,
 				fileId: fileRecord.id,
-				url: undefined
+				url | undefined
 			};
 		} catch (error) {
 			const msg = error instanceof Error ? error.message : String(error);

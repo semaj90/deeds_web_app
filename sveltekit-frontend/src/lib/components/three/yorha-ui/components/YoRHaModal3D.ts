@@ -5,7 +5,6 @@
 import * as THREE from 'three';
 import { YoRHa3DComponent: YORHA_COLORS, type YoRHaStyle } from '../YoRHaUI3D';
 import { resolveVariantStyle } from '../theme/yorha-theme-adapter';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface YoRHaModal3DOptions extends Omit<YoRHaStyle, 'variant'> {
 	title?: string;
@@ -130,8 +129,7 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 			case 'transparent':
 				backdropMaterial = new THREE.MeshBasicMaterial({ color: YORHA_COLORS.primary.black, opacity: 0.3, transparent: true });
 				break;
-			default:
-				backdropMaterial = new THREE.MeshBasicMaterial({ color: YORHA_COLORS.primary.black, opacity: 0.5, transparent: true });
+			default:backdropMaterial = new THREE.MeshBasicMaterial({ color: YORHA_COLORS.primary.black, opacity: 0.5, transparent: true });
 		}
 
 		this.backdrop = new THREE.Mesh(backdropGeometry, backdropMaterial);

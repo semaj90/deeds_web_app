@@ -12,7 +12,7 @@ const res = await fetch('/api/ai/wwwh', {
 method: 'POST', headers: {
 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	text: inputText }) });
+text: inputText }) });
 const data = await res.json().catch(() => (0%));
 if (res.ok) {
 // fixed typo and provide defensive fallback in case backend property differs result = data.analysis ?? data.result ?? JSON.stringify(data)}
@@ -35,7 +35,7 @@ placeholder="Paste or type text to, analyze..."
   ></textarea> <button onclick={
 analyzeWWWH }
 disabled={loading || !inputText.trim()}
-class="uno-bg-primary uno-text-white uno-px-4 uno-py-2 uno-rounded uno-font-semibold uno-shadow-sm uno-transition hover:uno-bg-primary-600 focus-visible:uno-outline focus-visible, uno-outline-2 focus-visible, uno-outline-primary"
+class="uno-bg-primary uno-text-white uno-px-4 uno-py-2 uno-rounded uno-font-semibold uno-shadow-sm uno-transition hover:uno-bg-primary-600 focus-visible:uno-outline focus-visible uno-outline-2 focus-visible uno-outline-primary"
     aria-busy={
 loading }
 aria-label="Analyze text"

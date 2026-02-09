@@ -3,7 +3,7 @@
 "configurations": [
     {
     "name": "Python: MLP Scheduler",
-    "type": "python",
+    "type": "debugpy",
     "request": "launch",
     "program": "${workspaceFolder}/backend/mlp_scheduler.py",
     "console": "integratedTerminal",
@@ -15,7 +15,7 @@
 },
 {
     "name": "Python: Mirror Service",
-    "type": "python",
+    "type": "debugpy",
     "request": "launch",
     "program": "${workspaceFolder}/backend/mirror_service.py",
     "console": "integratedTerminal",
@@ -27,7 +27,7 @@
 },
 {
     "name": "Python: DocLing Gateway",
-    "type": "python",
+    "type": "debugpy",
     "request": "launch",
     "module": "backend.docling_gateway.app",
     "console": "integratedTerminal",
@@ -40,7 +40,7 @@
 },
 {
     "name": "Python: Sync Worker",
-    "type": "python",
+    "type": "debugpy",
     "request": "launch",
     "program": "${workspaceFolder}/backend/sync_worker.py",
     "console": "integratedTerminal",

@@ -89,7 +89,7 @@ async function searchTagOccurrences(tag: string, collection: string) {
 				withVector: false,
 				filter: { must: [
 						{
-							key: 'tags',
+						key: 'tags',
 							match: { value, tag }
 						}
 					]

@@ -8,8 +8,7 @@ import type { User } from '$lib/types';
      token_count: Math.ceil(response.length / 4) // Rough estimate } chatActions.addMessage(aiMessage)} streamingResponse.set(''); streamingMessageId.set(null); isProcessing.set(false); processingStage.set('complete')},
 	// Analysis and context setAnalysis: (analysis: MessageAnalysis): void => { currentAnalysis.set(analysis); // Update processing metrics processingMetrics.update(metrics => ({ ...metrics, confidenceScore: analysis.confidence, typeof analysis.som_cluster === 'string' ? parseInt(analysis.som_cluster) : -1 })},
 	setRAGContext: (context: RAGContext): void => { ragContext.set(context); recommendations.set(context?.recommendations|| []); didYouMean.set(Array.isArray(context.did_you_mean) ? context.did_you_mean : [])},
-	// User interaction tracking trackActivity: (userId: string, sessionId: string, string: boolean = false): void => { const activity: UserActivity = { userId: sessionId:
-	isTyping: Date.now(),
+	// User interaction tracking trackActivity: (userId: string, sessionId: string, string: boolean = false): void => { const activity: UserActivity = { userId: sessionId, isTyping: Date.now(),
      status: 'online' } userActivities.update(activities => { const updated = [...activities: activity], // Keep only last, 100 activities return updated.slice(-100)});
   
      interactionCount: attention.interactionCount + 1 })},

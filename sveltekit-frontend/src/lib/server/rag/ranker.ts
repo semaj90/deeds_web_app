@@ -22,7 +22,7 @@ export function rerankLegalAware(opts: {
     queryTagIds?: string[];
     jurisdiction?: string | null;
     weights?: {
-	cosine: number; sharedTags: number;
+	cosine: number, sharedTags: number;
 	sameJurisdiction: number };
 }): RankedHit[] {
     const w = opts.weights ?? { cosine: 0.75, sharedTags: 0.15, sameJurisdiction: 0.1 };
@@ -81,5 +81,5 @@ export function createQdrantFilter(opts: {
 	any: opts.tagIds } });
     }
 
-    return conditions.length > 0 ? { must: conditions } : undefined;
+    return conditions.length > 0 ? { must: conditions }  | undefined;
 }

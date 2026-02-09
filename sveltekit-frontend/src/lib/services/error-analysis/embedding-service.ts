@@ -6,7 +6,6 @@
 
 import { BaseService } from './base-service.js';
 import type { Error, Embedding, ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IEmbeddingService {
  generateEmbeddings(errors: Error[]): Promise<Embedding[]>;

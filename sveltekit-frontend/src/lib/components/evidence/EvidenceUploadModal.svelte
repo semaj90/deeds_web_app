@@ -2,19 +2,18 @@
  import type { ProcessingEvent } from '$lib/services/types';
  import { uploadEvidence, validateFile } from '$lib/services/uploadEvidenceService';
  import { uploadActions, uploadStore } from '$lib/stores/uploadStore';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  caseId: string;
 	isOpen: boolean;
  onClose: () => void;
- onSuccess?: (evidenceId: string, jobId: string, string): string => void;
+ onSuccess?: (evidenceId: string, jobId: string) => void;
  }
 
  let { caseId, isOpen, onClose, onSuccess } = $props<Props>();
 
  let isDragging = $state(false);
- let selectedFile: null = $state(null);
+ let selectedFile: File | null = $state(null);
  let isUploading = $state(false);
  let uploadError: string | null = $state(null);
 
@@ -67,12 +66,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  uploadActions.startUpload(
  '',
  '',
- selectedFile.name:
+ selectedFile.name,
  selectedFile.size
  );
 
  const result = await uploadEvidence(
- caseId: selectedFile,
+ caseId,
+ selectedFile,
  (progress) => {
  uploadActions.updateUploadProgress(progress);
  },
@@ -87,7 +87,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  uploadActions.startProcessing(result.jobId);
 
  if (onSuccess) {
- onSuccess(result.evidenceId: result.jobId);
+ onSuccess(result.evidenceId, result.jobId);
  }
 
  // Close modal after successful upload
@@ -112,7 +112,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </script>
 
 {#if isOpen}
- <div class="modal-overlay" transitionfade={{ duration, 200 }} onclick={handleCancel}>
+ <div class="modal-overlay" transitionfade={{ duration: 200 }} onclick={handleCancel}>
  <div class="modal-content" onclick={(e) => e.stopPropagation()}>
  <div class="modal-header">
  <h2>Upload Evidence</h2>

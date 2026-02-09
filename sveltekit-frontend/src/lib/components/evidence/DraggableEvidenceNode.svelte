@@ -9,11 +9,8 @@
   import Video from 'lucide-svelte/icons/video';
   import Zap from 'lucide-svelte/icons/zap';
   import type { ComponentType } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-  interface EvidenceNode {
-    id: string;
-	title: string;
+  interface EvidenceNode { id: string, title: string;
     type: 'document' | 'image' | 'video' | 'audio' | 'transcript';
     content?: string;
     url?: string;
@@ -126,7 +123,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	evidenceId: evidence.id,
+evidenceId: evidence.id,
           text: preprocessed.cleanText,
           embeddings: embeddingResult.embedding,
           metadata: evidence.metadata
@@ -344,9 +341,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-  .evidence-node {
-    position: absolute;
-	cursor: pointer;
+  .evidence-node { position: absolute;
+		cursor: pointer;
     user-select: none;
 	transition:transform 0.2s ease, box-shadow 0.2s ease;
   }

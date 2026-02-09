@@ -4,7 +4,6 @@
 
 import EnhancedAgenticPipeline from '../../../../../scripts/phase89-enhanced-pipeline.mjs';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Global pipeline instance (shared across SSE connections)
 let globalPipeline: InstanceType<typeof EnhancedAgenticPipeline> | null = null;

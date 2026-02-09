@@ -112,12 +112,10 @@ import type { Case } from '$lib/types';
       .sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime())
       .slice(0, 5)})
   let firstMugshot: string | undefined
-  let firstMugshot = $derived(profile?.identification?.mugshots && profile.identification.mugshots.length > 0
-      ? profile.identification.mugshots[0]
-      : undefined)
+  let firstMugshot = $derived(profile?.identification?.mugshots && profile.identification.mugshots.length > 0 ? profile.identification.mugshots[0] : undefined)
   // Replace icons with emoji/icon fallbacks to avoid lucide-svelte export issues
   let statusInfo: {
-	label: string; className: string, icon?: string } = statusConfig.cleared
+	label: string, className: string, icon?: string } = statusConfig.cleared
   let statusInfo = $derived(statusConfig[profile?.currentStatus ?? 'cleared'] ?? statusConfig.cleared)
   function formatDate(date: string | Date): string {
     return toDate(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
@@ -126,7 +124,7 @@ import type { Case } from '$lib/types';
     if (!showSensitiveInfo) return `***-**-${ssn.slice(-4)}`;
     return ssn}
   function getFullName(): string {
-    const { firstName = '', lastName = '' } = profile?.personalInfo ?? 0%;
+    const { firstName = '', lastName = '' } = profile?.personalInfo ?? {};
     return `${firstName} ${lastName}`.trim()}
 </script>
 <div
@@ -200,7 +198,7 @@ import type { Case } from '$lib/types';
         </div>
       </div>
     </div>
-    <!-- Active: Warrants, Alert -->
+    <!-- Active:Warrants, Alert -->
     {#if activeWarrants.length > 0}
       <div class="mt-3 p-3 bg-red-500/10 border border-red-500/20">
         <div class="flex items-center gap-2 text-red-400 font-medium text-sm font-mono">
@@ -221,7 +219,7 @@ import type { Case } from '$lib/types';
     {#if viewMode === 'full' || viewMode === 'identification'}
       <div>
         <h3 class="text-sm font-semibold text-yorha-text-primary font-mono mb-3">Personal Information</h3>
-        <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+        <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
           <div>
             <span class="text-yorha-text-secondary">Date of Birth:</span>
             <div class="text-yorha-text-primary">{formatDate(profile.personalInfo.dateOfBirth)}</div>
@@ -275,7 +273,7 @@ import type { Case } from '$lib/types';
     {#if viewMode === 'full' || viewMode === 'identification'}
       <div>
         <h3 class="text-sm font-semibold text-yorha-text-primary font-mono mb-3">Identification</h3>
-        <div class="grid grid-cols-1 md, grid-cols-2 gap-3 text-sm">
+        <div class="grid grid-cols-1 md grid-cols-2 gap-3 text-sm">
           {#if profile.identification.ssn}
             <div>
               <span class="text-yorha-text-secondary">SSN:</span>
@@ -294,7 +292,7 @@ import type { Case } from '$lib/types';
         </div>
         <!-- Biometric, Data -->
         {#if profile.identification.biometrics}
-          <div class="mt-3 grid grid-cols-1 md, grid-cols-2 gap-3 text-xs">
+          <div class="mt-3 grid grid-cols-1 md grid-cols-2 gap-3 text-xs">
             {#if profile.identification.biometrics.fingerprints?.length}
               <div class="flex items-center">
                 <span class="text-yorha-text-secondary">ðŸ”Ž</span>
@@ -400,28 +398,7 @@ import type { Case } from '$lib/types';
     {/if}
 </div>
 <style>
-  .criminal-profile { transition:all 0.2s ease}
-</style>
-          </p>
-        </div>
-      {/if}
-  </div>
-  <!-- Footer, Actions -->
-  {#if interactive && onUpdateProfile}
-    <div class="px-4 py-3 bg-yorha-bg-tertiary border-t">
-      <div class="flex">
-        <button
-          onclick={() => onUpdateProfile?.(profile)}
-          class="px-4 py-2 text-sm font-mono bg-yorha-primary/10 text-yorha-primary border border-yorha-primary/20 rounded hover:bg-yorha-primary/20 transition-colors"
-          type="button"
-        >
-          Update Profile
-        </button>
-      </div>
-    {/if}
-</div>
-<style>
-  .criminal-profile { transition:all 0.2s ease}
+  .criminal-profile { transition:all 0.2s ease;}
 </style>
 
 

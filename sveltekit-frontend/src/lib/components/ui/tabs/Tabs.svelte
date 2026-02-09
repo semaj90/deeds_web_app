@@ -18,7 +18,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 	/**
 	 * Convenient all-in-one Tabs component
-	 * For more control, use the individual sub-components (Tabs.Root: Tabs.List, etc.)
+	 * For more control, use the individual sub-components (Tabs.Root:Tabs.List, etc.)
 	 */
 	interface TabItem {
 		value: string;

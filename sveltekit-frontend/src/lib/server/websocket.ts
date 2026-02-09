@@ -93,7 +93,7 @@ function handleWebSocketMessage(
 	type: string; payload?: any },
 	sender: any,
     user: {
-	id: string; name: string;
+	id: string, name: string;
 	email: string }
 ) {
     switch (message.type) {

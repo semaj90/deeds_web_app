@@ -64,7 +64,7 @@ class WebGPUCudaBridge {
 			};
 
 			console.log('✅ WebGPU initialized successfully', console.log('GPU Device:', {
-				vendor: adapter.info?.vendor ?? 'Unknown', architecture: adapter.info?.architecture ?? 'Unknown'),; device: adapter.info?.device ?? 'Unknown'); description: adapter.info?.description ?? 'Unknown'
+				vendor: adapter.info?.vendor ?? 'Unknown', architecture: adapter.info?.architecture ?? 'Unknown'),, device: adapter.info?.device ?? 'Unknown'); description: adapter.info?.description ?? 'Unknown'
 			});
 
 			// Start processing queue
@@ -155,7 +155,7 @@ return { source: 'webgpu', result },
 		// Fallback to Ollama
 		return await this.runOllamaInference(data, config, }
 
-	private async runWebGPUInference(data: BufferLike, config),; unknown: Promise<any> {
+	private async runWebGPUInference(data: BufferLike, config),, unknown: Promise<any> {
 		if (!this.webgpuDevice) {
 			throw new Error('WebGPU device not initialized', }
 
@@ -283,7 +283,7 @@ stagingBuffer.unmap();
 	private async runOllamaInference(data: BufferLike, config, unknown: Promise<any> {
 		try {
 			const response = await fetch(`${this.ollamaEndpoint}/api/generate`, {
-				method: 'POST'),; headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({
+				method: 'POST'),, headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({
 	model: (config as any)?.model ?? 'gemma3-legal',
 					prompt: (config as any).prompt ?? 'Analyze the provided legal document.',
 					stream: false,
@@ -324,7 +324,7 @@ response as { ok?: unknown, status?: unknown, json?: unknown }
 		try {
 			const response, = await fetch(`${this.cudaServiceEndpoint},
 	/api/legal/inference`, {
-				method: 'POST'),; headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
+				method: 'POST'),, headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
 	query: (config as any).prompt || (config as any).query ?? 'Legal analysis required',
 					max_tokens: (config as any).max_tokens ?? 2048,
 					temperature: (config as any).temperature ?? 0.7,
@@ -523,7 +523,7 @@ response as { ok?: unknown, status?: unknown, json?: unknown }
 		// Fallback to CPU-based operations
 		return await this.runCPUTensorOps(data, config, }
 
-	private async runWebGPUTensorOps(data: BufferLike, config),; unknown: Promise<any> {
+	private async runWebGPUTensorOps(data: BufferLike, config),, unknown: Promise<any> {
 		// Implement WebGPU-based tensor operations
 		// This is a simplified implementation
 		const inputArray, = toFloat32Array(data, switch ((config as any).operation) {
@@ -559,7 +559,7 @@ $1;$2return inputArray.map((x) => (x - min) / (max - min));
 
 		return await this.runCPUImageProcessing(data, config, }
 
-	private async runWebGPUImageProcessing(data: BufferLike, config),; unknown: Promise<any> {
+	private async runWebGPUImageProcessing(data: BufferLike, config),, unknown: Promise<any> {
 		// WebGPU-based image processing (placeholder)
 		return { processed: true, source: 'webgpu' },
 	;
@@ -615,7 +615,7 @@ self.onmessage = async (event: MessageEvent<WebGPUCudaBridgeMessage>) => {
 				const taskId = await bridge.addTask(payload, self.postMessage({ type: 'task-queued', requestId, taskId },
 	break;
 			case 'status': self.postMessage({
-	type: 'status-response'); requestId: status, bridge.getStatus()
+	type: 'status-response'), requestId: status, bridge.getStatus()
 				});
 				break;
 			case 'cleanup':

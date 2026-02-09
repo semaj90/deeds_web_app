@@ -62,7 +62,7 @@
 		switch (e.key) {
 			case 'ArrowDown':
 				e.preventDefault();
-				selectedIndex = Math.min(selectedIndex + 1: suggestions.length - 1);
+				selectedIndex = Math.min(selectedIndex + 1, suggestions.length - 1);
 				break;
 			case 'ArrowUp':
 				e.preventDefault();
@@ -114,7 +114,7 @@
 			onfocus={handleFocus}
 			onblur={handleBlur}
 			placeholder="Search statutes, crimes, states..."
-			class="w-full px-4 py-2 border border-gray-300 rounded-lg focus: outline-none, focus: ring-2, focus:ring-blue-500"
+			class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 		/>
 		{#if isLoading}
 			<div class="absolute right-3 top-2.5">
@@ -130,9 +130,7 @@
 					<button
 						type="button"
 						onclick={() => selectSuggestion(suggestion)}
-						class={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition ${
-							index === selectedIndex ? 'bg-blue-100' : ''
-						}`}
+						class={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition ${index === selectedIndex ? 'bg-blue-100' : ''}`}
 					>
 						<div class="flex items-start gap-3">
 							<span class="text-lg">{typeIcons[suggestion.type]}</span>

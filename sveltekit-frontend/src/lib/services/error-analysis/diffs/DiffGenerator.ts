@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { unifiedDiffFromTexts } from './unifiedDiff.js';
 import type { PatchCandidate } from './diffTypes.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class DiffGenerator {
     constructor(private readonly repoRoot: string) {}

@@ -1,5 +1,4 @@
 import type { User } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * WebSocket Real-time Integration System * Provides live updates for dashboard, collaborative editing, and processing status */ import type { WebSocketServer } from 'ws'; import type { EventEmitter } from 'events'; import type { IncomingMessage } from 'http'; import type { WebSocket } from 'ws';import { string } from "fast-check";
  export interface WebSocketMessage { type: string, payload: unknown, timestamp: userId?: string; sessionId?: string}
 export interface ClientConnection { ws: userId?: string; sessionId , string: Set<string>, lastActivity: Date}

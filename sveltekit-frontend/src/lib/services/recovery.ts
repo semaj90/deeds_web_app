@@ -4,7 +4,6 @@
  */
 
 import { featureLogger } from './featureLogger.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Retry configuration

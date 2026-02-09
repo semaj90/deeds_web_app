@@ -664,3 +664,61 @@ npx tsx scripts/diagnostics/log-ollama-response.ts
 2. Sends a "Hello, are you online?" prompt to `gemma3-legal:latest`
 3. Logs the full response or error details
 4. Useful for verifying model availability before running complex RAG flows
+
+---
+
+## 🛑 Restoration & Consolidation Status (2026-02-04)
+
+### Needs Attention: 99 Corrupted Files
+Analysis identified 16% of backups (99 files) as corrupted in current version but clean in backup.
+**Action:** These must be restored BEFORE further cleanup to prevent data loss.
+
+### Manual Review: 51 Files
+51 items flagged where backup is larger than current version.
+**Areas:** AI services, cache bridges, DB migrations, storage services.
+
+### Safe to Delete: 468 Files
+75.7% of backups are identical/older/legacy.
+**Status:** Pending deletion after critical restoration.
+
+### Current Progress (3-5 PM Session Recovered)
+- **Directory Migration:** src/lib/services consolidated into src/lib/features/{ai,poi,evidence}.
+- **Git State:** Work was untracked but successfully identified and committed.
+- **Core Routes:** Verified passing tests/ui-ux-walkthrough.spec.ts.
+- **UI Fix:** YoRHa Legal AI title is now a clickable home link.
+
+## 🛠️ Restoration Log (2026-02-04)
+
+### Session Recovery
+- **Git State:** Recovered untracked `src/lib/features` work (150 files committed).
+- **Corrupted Files:** 99 files identified as 0-byte or corrupted.
+- **Backup Source:** `src.backup.20260104_111218`.
+
+### Restored Files
+1. `src/lib/server/ai/rag-pipeline.ts` (0 bytes → Restored)
+2. `src/lib/services/gpu-cache-rpc-client.ts` (0 bytes → Restored)
+3. `src/lib/services/llm-router.ts` (Corrupted → Restored)
+4. `src/routes/api/embed/+server.ts` (Restored from `routes_parked`)
+
+### Current Tasks
+- [ ] Analyze `sveltekit-gpu-cache-integration.ts` integrity.
+- [ ] Continue batch restoration.
+- [ ] Resolve path conflicts (`src/lib/features` vs legacy paths).
+
+## 🛡️ Phase 107 - AI Service & Component Hardening (February 7, 2026)
+
+### AI Service Refactoring
+- **ai-service.ts**: Resolved Drizzle ORM typing issues (`db.execute`, `select`, `insert`) by explicit typing/casting where necessary. Fixed `NewAutoTag` and `documentChunks` type mismatches.
+
+### Component Fixes
+- **RAGSearchComponent.svelte**: Fixed `Card` component import to bypass potentially broken index export (`import CardRoot from .../Card.svelte`).
+- **Modals (NesModal, RouteDecisionModal, RouteInspectorModal)**: Fixed accessibility warnings by adding `tabindex` and keyboard event handlers.
+
+### Remaining Warnings (Low Priority)
+- Unused CSS selectors (Tailwind/UnoCSS artifacts).
+- Svelte 5 state initialization warnings (intentional behavior).
+
+### Next Actions
+- Verify production build.
+- Continue Drizzle schema alignment.
+

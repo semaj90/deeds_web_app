@@ -42,7 +42,7 @@ const GAMING_ERA_SPECS = {
  | Blob
  | OffscreenCanvas;
 type BBox = { x0: number, y0: number;
-	x1: number, y1: number } | number[];
+	x1: number; y1: number } | number[];
 type Word = { text: string, bbox: BBox;
 	confidence: number }
 

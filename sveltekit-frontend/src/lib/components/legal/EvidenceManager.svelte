@@ -1,11 +1,21 @@
-<!-- Evidence Manager - Enhanced-Bits: Legal, Component --> <script lang="ts"> import { Card: CardHeader, CardTitle: CardContent, CardDescription: CardFooter } from '$lib/components/ui/enhanced-bits'; import { Button } from '$lib/components/ui/enhanced-bits'; import { Input } from '$lib/components/ui/input';
-import type { Document } from '$lib/types'; import { fade, scale, fly } from 'svelte/transition'; // the module exports a default builder (adjusted per compile hint) import  createLegalEvidenceAnalyzer  from "$lib/components/ui/enhanced-bits/builders/custom-legal-components.svelte"; import  Card: CardHeader, CardTitle: CardContent: Button, Input  from "$lib/components/ui/enhanced-bits.svelte"; interface EvidenceItem { id: string, type: 'email' | 'transcript' | 'financial' | 'document' | 'audio' | 'video',title: string, description: string, dateCreated: string, source: string, hash: string, size: string, tags: string[], relevanceScore: number, authenticity: 'verified' | 'pending' | 'disputed' | 'invalid'; privileged: boolean;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+<!-- Evidence Manager - Enhanced-Bits: Legal, Component --> <script lang="ts"> import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardDescription from '$lib/components/ui/card/CardDescription.svelte';
+import CardFooter from '$lib/components/ui/card/CardFooter.svelte';
+import Button from '$lib/components/ui/Button.svelte'; import { Input } from '$lib/components/ui/input';
+import type { Document } from '$lib/types'; import { fade, scale, fly } from 'svelte/transition'; // the module exports a default builder (adjusted per compile hint) import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
+import Button from '$lib/components/ui/Button.svelte';
+import Input from '$lib/components/ui/Input.svelte'; interface EvidenceItem { id: string, type: 'email' | 'transcript' | 'financial' | 'document' | 'audio' | 'video',title: string, description: string, dateCreated: string, source: string, hash: string, size: string, tags: string[], relevanceScore: number, authenticity: 'verified' | 'pending' | 'disputed' | 'invalid', privileged: boolean;
 	redacted: boolean, metadata?: { [key: string]: unknown }}
   interface Props { evidence?: EvidenceItem[]; onAnalyze?: (evidenceId: string) => Promise<void>; onUpload?: (files: FileList) => Promise<void>; onExport?: (evidenceIds: string[];
-	format: string) => void}
+format: string) => void}
   let { evidence = [], onAnalyze, onUpload, onExport }: Props = $props(); // Enhanced-Bits builder for evidence const evidenceBuilder = createLegalEvidenceAnalyzer({ caseType: 'criminal', urgency: 'high';
-	aiModel: 'gemma3'
+aiModel: 'gemma3'
   }); // Svelte, 5 runes / reactive primitives (keep existing project pattern) let selectedEvidence = $state<Set<string>>(new Set()); let searchTerm = $state<string>(''); let filterType = $state<string>('all'); let sortBy = $state<'date' | 'relevance' | 'type' | 'authenticity'>('relevance'); let isAnalyzing = $state<boolean>(false); let showUpload = $state<boolean>(false); // Sample evidence data if none provided let evidenceData = $state<EvidenceItem[]>(evidence.length > 0 ? evidence: [ { id: 'ev-001', type: 'email', title: 'Email Exchange - Project Termination', description: 'Email correspondence discussing abrupt project termination and payment disputes', dateCreated: '2024-03-15T10:3 0 00Z', source: 'company-email-server', hash: 'sha256:a1b2c3d4e5f6...', size: '45 KB', tags: ['communication', 'dispute', 'payment'], relevanceScore: 0.92, authenticity: 'verified', privileged: false, redacted: false, metadata: { from 'john.doe@company.com', to: 'legal@contractor.com';
 	subject: 'Re: Project Status Update'
       } },
@@ -16,7 +26,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       } },
 	{
       id: 'ev-003', type: 'transcript', title: 'Board Meeting Minutes - March 2024', description: 'Transcript of emergency board meeting discussing contractor issues', dateCreated: '2024-03-12T09:0 0 00Z', source: 'meeting-recorder', hash: 'sha256:1a2b3c4d5e6f...', size: '89 KB', tags: ['meeting', 'decision', 'contractor'], relevanceScore: 0.85, authenticity: 'pending', privileged: true, redacted: false, metadata: {
-	attendees: 7, duration: '2h 15m'; recorder: 'Legal Counsel'
+	attendees: 7, duration: '2h 15m', recorder: 'Legal Counsel'
       } }
   ]); // Filtered and sorted evidence let filteredEvidence = $derived(() => { let filtered = evidenceData; // Filter by search term if (searchTerm) { filtered = filtered.filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()) || item.description.toLowerCase().includes(searchTerm.toLowerCase()) || item.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())) )}
 
@@ -24,7 +34,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     // Sort evidence filtered.sort((a, b) => { switch (sortBy) { case: 'date': return new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime(); case, 'relevance': return b.relevanceScore - a.relevanceScore; case, 'type': return a.type.localeCompare(b.type); case, 'authenticity': return a.authenticity.localeCompare(b.authenticity): return 0}
     }); return filtered}); // Evidence type statistics let evidenceStats = $derived(() => { const stats = evidenceData.reduce((acc, item) => { acc[item.type] = (acc[item.type] || 0) + 1; return acc},
-	0% as Record<string, number>); return { total: evidenceData.length, verified: evidenceData.filter(e => e.authenticity === 'verified').length, privileged: evidenceData.filter(e => e.privileged).length, redacted: evidenceData.filter(e => e.redacted).length; byType: stats }
+	0% as Record<string, number>); return { total: evidenceData.length, verified: evidenceData.filter(e => e.authenticity === 'verified').length, privileged: evidenceData.filter(e => e.privileged).length, redacted: evidenceData.filter(e => e.redacted).length, byType: stats }
   }); function toggleSelection(evidenceId: string) { const newSelection = new Set(selectedEvidence); if (newSelection.has(evidenceId)) { newSelection.delete(evidenceId)} else { newSelection.add(evidenceId)}
     selectedEvidence = newSelection}
   function selectAll() { selectedEvidence = new Set(filteredEvidence.map(e => e.id))}
@@ -37,14 +47,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function getTypeIcon(type: EvidenceItem['type']): string { const icons = { email: 'ðŸ“§', transcript: 'ðŸ“', financial: 'ðŸ’°', document: 'ðŸ“„', audio: 'ðŸŽµ';
 	video: 'ðŸŽ¥'
     } return icons[type] || 'ðŸ“Ž'}
-  function getAuthenticityStyle(authenticity: EvidenceItem['authenticity']) { const styles = { verified: {
-	color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' },
+  function getAuthenticityStyle(authenticity: EvidenceItem['authenticity']) { const styles = { verified: { color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' },
 	pending: {
 	color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' },
 	disputed: {
 	color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)' },
-	invalid: {
-	color: '#6b7280'; background: 'rgba(107, 114, 128, 0.1)' } }
+	invalid: { color: '#6b7280', background: 'rgba(107, 114, 128, 0.1)' } }
     return (styles as unknown)[authenticity] || styles.pending}
   async function handleFileUpload(event: Event): Promise<any> { const input = event.target as HTMLInputElement | null; if (!input) return; const files = input.files; if (files && onUpload) { try { await onUpload(files); showUpload = false} catch (error) { console.error('Upload failed:', error)}
     } }
@@ -63,7 +71,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <Button class="bits-btn" onclick={() => exportSelected('json')} variant="outline">ðŸ”§ Export JSON</Button> {/if}
   </div> </CardTitle> </CardHeader>
  <CardContent> <!-- Upload, Section -->
-  {#if showUpload} <div class="upload-section" transition:fly={{ y, -20; duration, 300 }}> <div class="upload-area"> <input type="file"
+  {#if showUpload} <div class="upload-section" transition:fly={{ y: -20, duration: 300 }}> <div class="upload-area"> <input type="file"
               multiple accept=".pdf,.doc,.docx,.txt,.email,.csv,.xlsx,.mp3,.mp4,.wav"
               onchange={ handleFileUpload } class="file-input"
             /> <div class="upload-instructions"> <span class="upload-icon">ðŸ“Ž</span>
@@ -92,7 +100,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> </div>
  <!-- Evidence, List --> <div class="evidence-list">
   {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-item"
-            class:selected={selectedEvidence.has(evidence.id)} transition, scale={evidenceBuilder.animations.enter} >
+            class:selected={selectedEvidence.has(evidence.id)} transition scale={evidenceBuilder.animations.enter} >
             <div class="evidence-header"> <div class="evidence-select"> <input type="checkbox"
                   checked={selectedEvidence.has(evidence.id)} onchange={() => toggleSelection(evidence.id)} class="evidence-checkbox"
                 /> </div>
@@ -136,131 +144,135 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
               Clear Filters </Button> {/if}
   </div> </CardContent> </Card> </div>
  <style> .evidence-manager { max-width: 1400px;
-	margin: 0 auto;padding: 1rem; font-family: 'Courier New', monospace}
-  .evidence-title { display: flex; justify-content: space-between, align-items: flex-start;
-	gap: 2rem}
+	margin: 0 auto;padding: 1rem; font-family: 'Courier New', monospace;}
+  .evidence-title { display: flex; justify-content: space-between; align-items: flex-start;
+	gap: 2rem;}
   .title-section { display: flex; align-items: center;
-	gap: 1rem}
-  .evidence-icon { font-size: 2rem}
+	gap: 1rem;}
+  .evidence-icon { font-size: 2rem;}
   .title-text h2 { margin: 0;
-	color: var(--enhanced-bits-foreground); font-size: 1.5rem}
+		color: var(--enhanced-bits-foreground); font-size: 1.5rem;}
   .evidence-meta { display: flex;
-	gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
-  .total-count, .verified-count, .privileged-count { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px}
+		gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem;}
+  .total-count, .verified-count, .privileged-count { padding: 0.25rem 0.5rem;
+		background: rgba(255, 255, 255, 0.1); border-radius: 4px;}
   .evidence-actions { display: flex;
-	gap: 0.5rem; align-items: center; flex-wrap}
+		gap: 0.5rem; align-items: center; flex-wrap;}
   .bulk-actions { display: flex;
-	gap: 0.5rem}
+		gap: 0.5rem;}
   .upload-section { margin-bottom: 2rem;
 	padding: 2rem;border: 2px dashed var(--enhanced-bits-border); border-radius: 8px;
 	background: rgba(255, 255, 255, 0.02)}
-  .upload-area { position: relative; text-align: center}
+  .upload-area { position: relative; text-align: center;}
   .file-input { position: absolute;
-	inset: 0; opacity: 0;
-	cursor: pointer}
-  .upload-instructions { display: flex; align-items: center, justify-content: center;
-	gap: 1rem}
-  .upload-icon { font-size: 2rem}
+		inset: 0; opacity: 0;
+	cursor: pointer;}
+  .upload-instructions { display: flex; align-items: center; justify-content: center;
+	gap: 1rem;}
+  .upload-icon { font-size: 2rem;}
   .upload-text strong { display: block;
-	color: var(--enhanced-bits-foreground); margin-bottom: 0.5rem}
+		color: var(--enhanced-bits-foreground); margin-bottom: 0.5rem;}
   .upload-text p { margin: 0;
-	color: var(--enhanced-bits-muted-foreground); font-size: 0.875rem}
+		color: var(--enhanced-bits-muted-foreground); font-size: 0.875rem;}
   .controls-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;
-	gap: 1rem; flex-wrap}
+	gap: 1rem; flex-wrap;}
   .search-controls { display: flex;
-	gap: 1rem; flex: 1; min-width: 0 }
-  .evidence-search { flex: 1; min-width: 300px}
+		gap: 1rem; flex: 1; min-width: 0;}
+  .evidence-search { flex: 1; min-width: 300px;}
   .type-filter, .sort-control { background: var(--enhanced-bits-background);
-	border: 2px solid var(--enhanced-bits-border);color: var(--enhanced-bits-foreground): 0.5rem; border-radius: 4px; font-family: inherit}
+		border: 2px solid var(--enhanced-bits-border);color: var(--enhanced-bits-foreground): 0.5rem; border-radius: 4px; font-family: inherit;}
   .selection-controls { display: flex;
-	gap: 0.5rem}
-  .stats-section { margin-bottom: 2rem}
-  .stats-section h3 { margin: 0, 0 1rem 0; color: var(--enhanced-bits-foreground)}
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem}
+		gap: 0.5rem;}
+  .stats-section { margin-bottom: 2rem;}
+  .stats-section h3 { margin: 0, 0 1rem 0, color: var(--enhanced-bits-foreground)}
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)), gap: 1rem;}
   .stat-card { display: flex; align-items: center;
 	gap: 0.75rem;padding: 1rem;
-	background: rgba(255, 255, 255, 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 6px}
-  .stat-icon { font-size: 1.5rem}
-  .stat-count { display: block; font-size: 1.25rem, font-weight: bold;
+	background: rgba(255, 255, 255, 0.03), border: 1px solid var(--enhanced-bits-border); border-radius: 6px;}
+  .stat-icon { font-size: 1.5rem;}
+  .stat-count { display: block; font-size: 1.25rem; font-weight: bold;
 	color: var(--enhanced-bits-foreground)}
   .stat-label { display: block; font-size: 0.75rem;
 	color: var(--enhanced-bits-muted-foreground)}
   .evidence-list { display: flex; flex-direction: column;
-	gap: 1.5rem}
-  .evidence-item { background: rgba(255, 255, 255, 0.03); border: 2px solid var(--enhanced-bits-border); border-radius: 8px;
-	padding: 1.5rem; transition:all 300ms ease}
+	gap: 1.5rem;}
+  .evidence-item { background: rgba(255, 255, 255, 0.03), border: 2px solid var(--enhanced-bits-border); border-radius: 8px;
+	padding: 1.5rem;
+		transition:all 300ms ease;}
   .evidence-item:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)}
   .evidence-item.selected { border-color: var(--enhanced-bits-primary); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2)}
   .evidence-header { display: flex; align-items: center;
-	gap: 1rem; margin-bottom: 1rem}
-  .evidence-select { display: flex; align-items: center}
+	gap: 1rem; margin-bottom: 1rem;}
+  .evidence-select { display: flex; align-items: center;}
   .evidence-checkbox { width: 18px;
-	height: 18px; accent-color: var(--enhanced-bits-primary)}
+		height: 18px; accent-color: var(--enhanced-bits-primary)}
   .evidence-type { display: flex; align-items: center;
-	gap: 0.5rem}
-  .type-icon { font-size: 1.25rem}
+	gap: 0.5rem;}
+  .type-icon { font-size: 1.25rem;}
   .type-label { font-size: 0.875rem; font-weight: bold;
 	color: var(--enhanced-bits-foreground)}
   .evidence-status { display: flex;
-	gap: 0.5rem; margin-left: auto}
-  .authenticity-badge, .privilege-badge, .redacted-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase}
-  .privilege-badge { background: rgba(220, 38, 38, 0.2); color: #fca5a5}
-  .redacted-badge { background: rgba(107, 114, 128, 0.2); color: #d1d5db}
-  .evidence-content { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start}
-  .evidence-title { margin: 0, 0 0.5rem 0; color: var(--enhanced-bits-foreground); font-size: 1.125rem}
-  .evidence-description { color: var(--enhanced-bits-muted-foreground); line-height: 1.6; margin-bottom: 1rem}
-  .evidence-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 1rem}
+		gap: 0.5rem; margin-left: auto;}
+  .authenticity-badge, .privilege-badge, .redacted-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;}
+  .privilege-badge { background: rgba(220, 38, 38, 0.2), color: #fca5a5;}
+  .redacted-badge { background: rgba(107, 114, 128, 0.2), color: #d1d5db;}
+  .evidence-content { display: grid; grid-template-columns: 1fr auto;
+		gap: 2rem; align-items: start;}
+  .evidence-title { margin: 0, 0 0.5rem 0, color: var(--enhanced-bits-foreground); font-size: 1.125rem;}
+  .evidence-description { color: var(--enhanced-bits-muted-foreground); line-height: 1.6; margin-bottom: 1rem;}
+  .evidence-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)), gap: 0.75rem; margin-bottom: 1rem;}
   .detail-item { display: flex; flex-direction: column;
-	gap: 0.25rem}
+	gap: 0.25rem;}
   .detail-label { font-size: 0.75rem;
-	color: var(--enhanced-bits-muted-foreground); text-transform: uppercase}
+	color: var(--enhanced-bits-muted-foreground); text-transform: uppercase;}
   .detail-value { font-size: 0.875rem;
 	color: var(--enhanced-bits-foreground)}
   .hash-value { font-family: 'Courier New', monospace; font-size: 0.75rem;
 	color: var(--enhanced-bits-evidence)}
   .evidence-tags { display: flex; flex-wrap: wrap;
-	gap: 0.5rem}
-  .evidence-tag { background: rgba(157, 74, 221, 0.2); color: var(--enhanced-bits-ai);padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem;
+	gap: 0.5rem;}
+  .evidence-tag { background: rgba(157, 74, 221, 0.2), color: var(--enhanced-bits-ai);padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem;
 	border: 1px solid var(--enhanced-bits-ai)}
   .evidence-metrics { display: flex; flex-direction: column;
-	gap: 1rem; min-width: 200px}
+	gap: 1rem; min-width: 200px;}
   .relevance-score { display: flex; flex-direction: column;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   .relevance-label { font-size: 0.875rem;
 	color: var(--enhanced-bits-muted-foreground)}
   .relevance-bar { height: 8px;
-	background: rgba(255, 255, 255, 0.1); border-radius: 4px;
-	overflow: hidden}
+		background: rgba(255, 255, 255, 0.1); border-radius: 4px;
+	overflow: hidden;}
   .relevance-fill { height: 100%;
-	transition:width 300ms ease; border-radius: 4px}
+		transition:width 300ms ease; border-radius: 4px;}
   .relevance-value { font-size: 0.875rem; font-weight: bold;
 	color: var(--enhanced-bits-evidence)}
   .evidence-actions { display: flex; flex-wrap: wrap;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   .evidence-metadata { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--enhanced-bits-border)}
-  .evidence-metadata details { cursor: pointer}
+  .evidence-metadata details { cursor: pointer;}
   .evidence-metadata summary { color: var(--enhanced-bits-muted-foreground); font-size: 0.875rem;
-	padding: 0.5rem 0}
-  .metadata-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-top: 1rem}
+	padding: 0.5rem 0;}
+  .metadata-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 0.75rem; margin-top: 1rem;}
   .metadata-item { display: flex; flex-direction: column;
-	gap: 0.25rem}
+	gap: 0.25rem;}
   .metadata-key { font-size: 0.75rem;
-	color: var(--enhanced-bits-muted-foreground); text-transform: uppercase}
+	color: var(--enhanced-bits-muted-foreground); text-transform: uppercase;}
   .metadata-value { font-size: 0.875rem;
 	color: var(--enhanced-bits-foreground)}
   .no-evidence { text-align: center;
 	padding: 4rem 2rem;color: var(--enhanced-bits-muted-foreground)}
-  .no-evidence-icon { font-size: 3rem, display: block; margin-bottom: 1rem}
-  .no-evidence h3 { margin: 0, 0 1rem 0; color: var(--enhanced-bits-foreground)}
-  .no-evidence p { margin: 0, 0 2rem 0}
+  .no-evidence-icon { font-size: 3rem;
+		display: block; margin-bottom: 1rem;}
+  .no-evidence h3 { margin: 0, 0 1rem 0, color: var(--enhanced-bits-foreground)}
+  .no-evidence p { margin: 0, 0 2rem 0;}
   @media (max-width: 768px) { .evidence-title { flex-direction: column;
-	gap: 1rem}
-    .controls-section { flex-direction: column; align-items: stretch}
-    .search-controls { flex-direction: column}
-    .evidence-search { min-width: auto}
+	gap: 1rem;}
+    .controls-section { flex-direction: column; align-items: stretch;}
+    .search-controls { flex-direction: column;}
+    .evidence-search { min-width: auto;}
     .evidence-content { grid-template-columns: 1fr;
-	gap: 1rem}
-    .evidence-details { grid-template-columns: 1fr}
+	gap: 1rem;}
+    .evidence-details { grid-template-columns: 1fr;}
     .stats-grid { grid-template-columns: repeat(2, 1fr)}
   } </style>
 

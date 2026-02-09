@@ -27,10 +27,10 @@ interface QueryCacheEntry {
 
 interface CacheStats {
     embeddings: {
-	hits: number; misses: number;
+	hits: number, misses: number;
 	size: number };
     queries: {
-	hits: number; misses: number;
+	hits: number, misses: number;
 	size: number };
     sessions: {
 	active: number; total: number };

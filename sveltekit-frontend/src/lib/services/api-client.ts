@@ -1,5 +1,4 @@
 import { env } from '$env/dynamic/public';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // API Configuration
 export const API_CONFIG = {
@@ -110,12 +109,12 @@ export interface SystemMetrics {
   cpu: {
 	usage: number; cores: number; temperature?: number };
   memory: {
-	used: number; total: number;
+	used: number, total: number;
 	percentage: number };
   gpu?: {
-	usage: number; memoryUsed: number;
+	usage: number, memoryUsed: number;
 	memoryTotal: number; temperature?: number };
-  services: Record<string, { status: 'healthy' | 'degraded' | 'unhealthy'; uptime: number;
+  services: Record<string, { status: 'healthy' | 'degraded' | 'unhealthy', uptime: number;
 	responseTime: number }>;
   timestamp: string;
 }

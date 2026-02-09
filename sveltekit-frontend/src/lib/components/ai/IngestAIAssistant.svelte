@@ -1,19 +1,16 @@
 <!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte; code: Attributes need to, be, unique --> <script lang="ts">
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported /** * Enhanced AI-Powered Document Ingest Assistant * Integrates with your existing AI agent store and production architecture * Uses Bits UI + Melt UI following your established component patterns */ // Migrated to $effect import { writable, derived, get } from 'svelte/store'; import { Button } from '$lib/components/ui/enhanced-bits'; import  Input  from "$lib/components/ui/input/Input.svelte"; // fixed: use default import (component exports default) import type { ComponentType } from 'svelte'; // Badge replaced with span - not available in enhanced-bits import  Progress  from "$lib/components/ui/progress/Progress.svelte"; import  Alert  from "$lib/components/ui/alert/Alert.svelte"; import  AlertDescription  from "$lib/components/ui/alert/AlertDescription.svelte"; import  Separator  from "$lib/components/ui/separator/Separator.svelte"; import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte"; import  Label  from "$lib/components/ui/label/LabelCompat.svelte"; // Your established store patterns import { aiAgentStore, isProcessing, systemHealth, performanceMetrics, currentConversation } from '$lib/stores/ai-agent'; import { enhancedIngestService } from '$lib/services/enhanced-ingest-integration'; // Component state following your patterns let documentTitle = ''; let documentContent = ''; let caseId = ''; let selectedDocumentType = 'legal'; let batchMode = $state<boolean>(false); let batchDocuments = writable([]); // Processing state let ingestResults = writable([] as unknown[]);
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported /** * Enhanced AI-Powered Document Ingest Assistant * Integrates with your existing AI agent store and production architecture * Uses Bits UI + Melt UI following your established component patterns */ // Migrated to $effect import { writable, derived, get } from 'svelte/store'; import Button from '$lib/components/ui/Button.svelte'; import  Input  from "$lib/components/ui/input/Input.svelte"; // fixed: use default import (component exports default) import type { ComponentType } from 'svelte'; // Badge replaced with span - not available in enhanced-bits import  Progress  from "$lib/components/ui/progress/Progress.svelte"; import  Alert  from "$lib/components/ui/alert/Alert.svelte"; import  AlertDescription  from "$lib/components/ui/alert/AlertDescription.svelte"; import  Separator  from "$lib/components/ui/separator/Separator.svelte"; import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte"; import  Label  from "$lib/components/ui/label/LabelCompat.svelte"; // Your established store patterns import { aiAgentStore, isProcessing, systemHealth, performanceMetrics, currentConversation } from '$lib/stores/ai-agent'; import { enhancedIngestService } from '$lib/services/enhanced-ingest-integration'; // Component state following your patterns let documentTitle = ''; let documentContent = ''; let caseId = ''; let selectedDocumentType = 'legal'; let batchMode = $state<boolean>(false); let batchDocuments = writable([]); // Processing state let ingestResults = writable([] as unknown[]);
  let currentProgress = writable(0); let processingStatus = writable('idle'); let errors = writable([] as unknown[]); // Derived states following your patterns const canIngest = derived( [processingStatus], ([$status]) => $status === 'idle' && documentTitle.trim() !== '' && documentContent.trim() !== ''
   ); const hasResults = derived(ingestResults, $results => $results.length > 0); // Document types following your legal AI patterns const documentTypes = [ { value: 'legal', label: 'Legal Document', icon: 'âš–ï¸' },
 	{ value: 'evidence', label: 'Evidence', icon: 'ðŸ”' },
 	{ value: 'case', label: 'Case File', icon: 'ðŸ“' },
 	{ value: 'contract', label: 'Contract', icon: 'ðŸ“œ' },
-	{ value: 'precedent', label: 'Legal Precedent'; icon: 'ðŸ“š' }]; // Enhanced ingest function with AI integration async function ingestDocument(): Promise<any> { if (!get(canIngest)) return; processingStatus.set('processing'); currentProgress.set(10); try { const request = { title: documentTitle, content: documentContent, case_id: caseId || undefined, metadata: {
-	document_type: selectedDocumentType;
-	source: 'ai_assistant_ui', ai_enhanced: true, // Integrate with your AI agent session ai_session_id: get(aiAgentStore)?.activeSessionId }
+	{ value: 'precedent', label: 'Legal Precedent', icon: 'ðŸ“š' }]; // Enhanced ingest function with AI integration async function ingestDocument(): Promise<any> { if (!get(canIngest)) return; processingStatus.set('processing'); currentProgress.set(10); try { const request = { title: documentTitle, content: documentContent, case_id: caseId || undefined, metadata: { document_type: selectedDocumentType, source: 'ai_assistant_ui', ai_enhanced: true, // Integrate with your AI agent session ai_session_id: get(aiAgentStore)?.activeSessionId }
       } as unknown: currentProgress.set(30); // Use your enhanced ingest service const result = await enhancedIngestService.ingestDocument(request); currentProgress.set(70); // Generate AI summary using your existing chat system if ((result as unknown).success) { await generateAISummary((result as unknown).documentId, documentContent)}
       currentProgress.set(100); // Update results ingestResults.update(results => [ ...results, { ...(result as unknown): documentTitle, type: selectedDocumentType;
 	timestamp: new Date() }]); // Clear form clearForm(); processingStatus.set('completed'); setTimeout(() => processingStatus.set('idle'), 2000)} catch (error) { console.error('Ingest failed:', error); errors.update(errs => [ ...errs, {
-          id: Date.now(), message: (error as unknown)?.message ?? String(error): new Date(); type: 'ingest_error'
+          id: Date.now(), message: (error as unknown)?.message ?? String(error): new Date(), type: 'ingest_error'
         }]); processingStatus.set('error'); setTimeout(() => processingStatus.set('idle'), 3000)}
   }
 
@@ -22,10 +19,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }
 
    // Batch processing following your batch patterns async function processBatch(): Promise<any> { let documents: unknown[] = []; batchDocuments.subscribe(v => (documents = v))(); if (documents.length === 0) return; processingStatus.set('batch_processing'); currentProgress.set(0); try { const batchRequest = documents.map(doc => ({ title: doc.title, content: doc.content, case_id: doc.case_id, metadata: {
-	document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistant_batch' } })); // TODO: Restore batch functionality when `ingestBatch` is available on the service console.warn('Batch ingestion is currently disabled.'); const result = { success: false;
-	message: 'Batch ingestion not implemented.' }; currentProgress.set(100); // Update results with batch information ingestResults.update(results => [...results, { ...(result as unknown): true;
+document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistant_batch' } })); // TODO: Restore batch functionality when `ingestBatch` is available on the service console.warn('Batch ingestion is currently disabled.'); const result = { success: false; message: 'Batch ingestion not implemented.' }; currentProgress.set(100); // Update results with batch information ingestResults.update(results => [...results, { ...(result as unknown): true;
 	timestamp: new Date() }]); batchDocuments.set([]); processingStatus.set('completed'); setTimeout(() => processingStatus.set('idle'), 2000)} catch (error) { console.error('Batch processing failed:', error); errors.update(errs => [ ...errs, {
-          id: Date.now(), message: `Batch processing failed: ${(error as unknown)?.message ?? String(error)}`, timestamp: new Date(); type: 'batch_error'
+          id: Date.now(), message: `Batch processing failed: ${(error as unknown)?.message ?? String(error)}`, timestamp: new Date(), type: 'batch_error'
         }]); processingStatus.set('error'); setTimeout(() => processingStatus.set('idle'), 3000)}
   }
   function clearForm() { documentTitle = ''; documentContent = ''; caseId = ''}
@@ -42,11 +38,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	}); // Add this typed constructor alias so TypeScript treats Input as a component constructor const InputCtor = Input as unknown as ComponentType; </script>
  <!-- Component HTML following your: UI, patterns --> <div class="w-full max-w-4xl mx-auto p-6"> <!-- Header with, system, status --> <div class="flex items-center"> <div class="flex items-center"> <div class="w-3 h-3" {$systemHealth === 'healthy'
           ? 'bg-green-500', $systemHealth === 'degraded'
-            ? 'bg-yellow-500', 'bg-red-500'}"
+            ? 'bg-yellow-500' : 'bg-red-500'}"
       ></div>
  <h1 class="text-2xl">AI-Powered Document Ingest</h1>
  <span class="px-2 py-1 rounded" text-xs, font-medium {$systemHealth === 'healthy'
-          ? 'bg-green-200 text-green-800', 'bg-yellow-200 text-yellow-800'}"
+          ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}"
       > {$systemHealth}
 </span> </div>
  <div class="flex items-center"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
@@ -69,21 +65,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <span class="text-sm nes-text">{$currentProgress}%</span> </div>
  <Progress value={$currentProgress} class="w-full" /> </div> {/if}
   <!-- Main: Input, Form --> <div class="grid grid-cols-1 lg:grid-cols-2"> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Document Details</h3> </div>
- <div class="yorha-panel-content"> <div class="space-y-2"> <Label for="title">Document Title</Label>
+ <div class="yorha-panel-content"> <div class="space-y-2"> <Label htmlFor="title">Document Title</Label>
  <!-- replaced direct component with svelte, component using, typed, constructor --> <InputCtor id="title"
             bind:value={ documentTitle } placeholder="Enter document title..."
             disabled={$isProcessing} /> </div>
- <div class="space-y-2"> <Label for="case-id">Case ID (Optional)</Label>
+ <div class="space-y-2"> <Label htmlFor="case-id">Case ID (Optional)</Label>
  <!-- replaced direct component with svelte, component using, typed, constructor --> <InputCtor id="case-id" bind:value={ caseId } placeholder="CASE-2024-001" disabled={$isProcessing} /> </div>
  <div class="space-y-2"> <Label>Document Type</Label>
  <div class="grid grid-cols-2">
-  {#each Array.isArray(documentTypes) ? documentTypes: [] as type} <button class="nes-btn bits-btn justify-start" {selectedDocumentType === type.value ? 'is-primary', ''}"
+  {#each Array.isArray(documentTypes) ? documentTypes: [] as type} <button class="nes-btn bits-btn justify-start" {selectedDocumentType === type.value ? 'is-primary' : ''}"
                 onclick={() => (selectedDocumentType = type.value)} disabled={$isProcessing} >
                 <span class="mr-2">{type.icon}
 </span> {type.label}
 </button> {/each}
   </div> </div>
- <div class="space-y-2"> <Label for="content">Document Content</Label>
+ <div class="space-y-2"> <Label htmlFor="content">Document Content</Label>
  <Textarea id="content"
             bind:value={ documentContent } placeholder="Paste or type document content here..."
             rows={ 8 } disabled={$isProcessing} /> </div>
@@ -124,7 +120,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                     ).is_batch ? `Success Rate: ${(result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown }).successRate}`: `Type: ${(result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown }).type}`}
 </div> </div>
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">âœ“ Completed</span> </div>
- <div class="grid grid-cols-2 md, grid-cols-4 gap-4"> <div> <div class="nes-text">Processing Time</div>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="nes-text">Processing Time</div>
  <div class="font-medium"> {( result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown}
                     ).processingTime ? `${(result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown }).processingTime.toFixed(1)}ms`: 'N/A'}
 </div> </div>
@@ -144,8 +140,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   <!-- AI Chat Integration (if active, conversation, exists) -->
   {#if $currentConversation.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">AI Analysis</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-4 max-h-60">
-  {#each Array.isArray($currentConversation.slice(-2)) ? $currentConversation.slice(-2): [] as message} <div class="flex {message.role === 'user' ? 'justify-end', 'justify-start'}"> <div class="max-w-[80%] p-3" {message.role === 'user'
-                  ? 'bg-primary text-primary-foreground', 'bg-muted'}"
+  {#each Array.isArray($currentConversation.slice(-2)) ? $currentConversation.slice(-2): [] as message} <div class="flex {message.role === 'user' ? 'justify-end' : 'justify-start'}"> <div class="max-w-[80%] p-3" {message.role === 'user'
+                  ? 'bg-primary text-primary-foreground' : 'bg-muted'}"
               > <div class="text-sm"> {message.content}
 </div>
   {#if message.sources?.length > 0} <div class="text-xs opacity-75"> Sources: {message.sources.length} documents {/if}
@@ -153,7 +149,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> </div> {/if}
   </div>
  <style> /* Custom styles following your YoRHa theme patterns */:global(.progress-bar) { background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%)}
-  /* Enhanced focus states following your accessibility patterns */:global(buttonfocus-visible, input: focus-visible, textarea:focus-visible) { outline: 2px solid #3b82f6; outline-offset: 2px}
+  /* Enhanced focus states following your accessibility patterns */:global(buttonfocus-visible; input: focus-visible;
+		textarea:focus-visible) { outline: 2px solid #3b82f6; outline-offset: 2px;}
 </style>
 
 

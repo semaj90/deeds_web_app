@@ -29,7 +29,7 @@ export type QueueEvent =
     | { type: 'COMPLETE_JOB';
 	jobId: string; result?: any }
     | { type: 'FAIL_JOB';
-	jobId: string; error: string }
+	jobId: string, error: string }
     | { type: 'RETRY_JOB';
 	jobId: string }
     | { type: 'CANCEL_JOB';

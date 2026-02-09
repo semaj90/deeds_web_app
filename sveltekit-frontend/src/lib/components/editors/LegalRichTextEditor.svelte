@@ -47,9 +47,9 @@
   async function initEditor() {
     try {
       const [{ Editor },
-	{ default: StarterKit },
-	{ default: Placeholder },
-	{ default: Underline }] = await Promise.all([
+	{ default:StarterKit },
+	{ default:Placeholder },
+	{ default:Underline }] = await Promise.all([
         import('@tiptap/core'),
         import('@tiptap/starter-kit'),
         import('@tiptap/extension-placeholder'),
@@ -59,9 +59,7 @@
       editor = new Editor({
         element: editorElement,
         extensions: [
-          StarterKit.configure({
-            heading: {
-	levels: [1, 2, 3, 4] }
+          StarterKit.configure({ heading: { levels: [1, 2, 3, 4] }
           }),
           Placeholder.configure({ placeholder }),
           Underline
@@ -204,16 +202,14 @@
     transition:all 0.15s;
     border: none;
 	background: transparent;
-    cursor: pointer }
+    cursor: pointer;}
 
-  .toolbar-btn:hover {
-    background: var(--color-gray-200);
-	color: var(--color-gray-900);
+  .toolbar-btn:hover { background: var(--color-gray-200);
+		color: var(--color-gray-900);
   }
 
-  .toolbar-btn.active {
-    background: var(--color-blue-100);
-	color: var(--color-blue-600);
+  .toolbar-btn.active { background: var(--color-blue-100);
+		color: var(--color-blue-600);
   }
 
   .toolbar-btn-primary {
@@ -228,7 +224,7 @@
     font-weight: 500;
 	transition:background 0.15s;
     border: none;
-	cursor: pointer }
+	cursor: pointer;}
 
   .toolbar-btn-primary:hover {
     background: var(--color-blue-600);
@@ -239,9 +235,9 @@
     border-radius: 4px;
 	border: 1px solid var(--color-gray-300);
     background: white;
-    font-size: 0.875rem }
+    font-size: 0.875rem;}
 
   .editor-content :global(.ProseMirror) {
     outline: none;
-    min-height: inherit }
+    min-height: inherit;}
 </style>

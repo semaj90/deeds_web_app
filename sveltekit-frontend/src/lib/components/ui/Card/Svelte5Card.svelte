@@ -47,7 +47,7 @@ let paddingClasses = $derived({
 
 let interactiveClasses = $derived(
 	isClickable
-		? 'cursor-pointer transition-all duration-200 hover: border-blue-500, hover: shadow-lg, active:scale-[0.98]'
+		? 'cursor-pointer transition-all duration-200 hover:border-blue-500 hover:shadow-lg, active:scale-[0.98]'
 		: ''
 );
 </script>
@@ -55,7 +55,7 @@ let interactiveClasses = $derived(
 {#if href}
 	<a
 		{ href }
-		class="block rounded-lg overflow-hidden {variantClasses} {interactiveClasses} { className }"
+		class="block rounded-lg overflow-hidden {variantClasses} {interactiveClasses} {className}"
 		onclick={onclick}
 	>
 		{#if header}
@@ -78,8 +78,8 @@ let interactiveClasses = $derived(
 	</a>
 {:else}
 	<div
-		class="rounded-lg overflow-hidden {variantClasses} {interactiveClasses} { className }"
-		role={isClickable ? 'button' : undefined}
+		class="rounded-lg overflow-hidden {variantClasses} {interactiveClasses} {className}"
+		role={isClickable ? 'button'  : undefined}
 		tabindex={isClickable ? 0 , undefined}
 		onclick={onclick}
 		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && onclick?.()}

@@ -7,11 +7,11 @@ import type { Case } from '$lib/types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   // Test data for dropdown
   const legalCaseTypes = [
-    { value: 'contract', label: 'Contract Dispute' },
-	{ value: 'personal-injury', label: 'Personal Injury' },
-	{ value: 'criminal', label: 'Criminal Defense' },
-	{ value: 'family', label: 'Family Law' },
-	{ value: 'corporate', label: 'Corporate Law' }];
+    { value: 'contract' label: 'Contract Dispute' },
+	{ value: 'personal-injury' label: 'Personal Injury' },
+	{ value: 'criminal' label: 'Criminal Defense' },
+	{ value: 'family' label: 'Family Law' },
+	{ value: 'corporate' label: 'Corporate Law' }];
   // Component state
   let selectedCaseType = $state<string>('');
   let acceptTerms = $state<boolean>(false);
@@ -100,47 +100,47 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 <style>
   .validation-container {
-    max-width: 800px, margin: 2rem auto
-   ;padding: 2rem
-    font-family: system-ui, sans-serif}
+    max-width: 800px margin: 2rem auto
+   ;padding: 2rem;
+    font-family: system-ui, sans-serif;}
   .component-section {
-    margin-bottom: 2rem, padding: 1.5rem, border: 1px solid #ddd
-    border-radius: 8px, background: #fafafa}
-  .component-section h3 { margin: 0, 0 1rem 0
+    margin-bottom: 2rem padding: 1.5rem border: 1px solid #ddd;
+    border-radius: 8px background: #fafafa;}
+  .component-section h3 { margin: 0, 0 1rem 0;
     color: #333
-    border-bottom: 2px solid #007bff
-    padding-bottom: 0.5rem}
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;}
   .status {
-    margin-top: 1rem, padding: 0.5rem, background: #fff
-    border-radius: 4px, border: 1px solid #ddd
-    font-size: 0.9rem, color: #666}
+    margin-top: 1rem padding: 0.5rem background: #fff;
+    border-radius: 4px border: 1px solid #ddd;
+    font-size: 0.9rem color: #666;}
   .validation-results {
-    margin-top: 2rem, padding: 1.5rem, background: #f0f7ff, border: 2px solid #007bff
-    border-radius: 8px}
-  .validation-results h3 { margin: 0, 0 1rem 0
-    color: #007bff}
+    margin-top: 2rem padding: 1.5rem background: #f0f7ff border: 2px solid #007bff;
+    border-radius: 8px;}
+  .validation-results h3 { margin: 0, 0 1rem 0;
+    color: #007bff;}
   .result-item {
-    display: flex
-    align-items: center, margin: 0.5rem 0
-    font-weight: 500}
+    display: flex;
+    align-items: center margin: 0.5rem 0;
+    font-weight: 500;}
   .indicator {
-    margin-right: 0.5rem
-    font-size: 1.2rem}
+    margin-right: 0.5rem;
+    font-size: 1.2rem;}
   .indicator.success {
-    color: #28a745}
+    color: #28a745;}
   .indicator.pending {
-    color: #ffc107}
+    color: #ffc107;}
   .success-message {
-    margin-top: 1rem, padding: 1rem, background: #d4edda, color: #155724, border: 1px solid #c3e6cb
+    margin-top: 1rem padding: 1rem background: #d4edda color: #155724 border: 1px solid #c3e6cb;
     border-radius: 4px
-    text-align: center
-    font-size: 1.1rem}
+    text-align: center;
+    font-size: 1.1rem;}
   h2 {
     text-align: center
-   ;color: #333
+   ;color: #333;
     margin-bottom: 2rem
-    padding-bottom: 1rem
-    border-bottom: 3px solid #007bff}
+    padding-bottom: 1rem;
+    border-bottom: 3px solid #007bff;}
 </style>
 
 

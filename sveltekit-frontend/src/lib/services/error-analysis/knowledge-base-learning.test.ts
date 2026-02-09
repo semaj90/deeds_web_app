@@ -6,8 +6,7 @@ import type { ServiceConfig, Diff, Error as ErrorType } from './types.js';
 import type { line } from "drizzle-orm/pg-core";
 
 const mockConfig: ServiceConfig = {
- ollamaUrl: 'http://localhost:11434',
- qdrantUrl: 'http://localhost:6333',
+ ollamaUrl: 'http://localhost:11434', qdrantUrl: 'http://localhost:6333',
  postgresUrl: 'postgresql://localhost/test',
  maxRetries: 3, retryDelayMs: 100, contextLines: 5,
 };
@@ -500,7 +499,7 @@ describe('KnowledgeBaseLearning', () => {
  }
  }
  ),
- { numRuns, 100 }
+ { numRuns: 100 }
  );
  });
 

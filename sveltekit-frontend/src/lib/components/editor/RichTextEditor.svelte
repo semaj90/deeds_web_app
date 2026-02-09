@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { User } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Removed rune imports ($props, $effect, $state) - they are provided by the Svelte compiler and must not be imported // Migrated to $effect import Editor from '@tinymce/tinymce-svelte'; import { report, reportActions, editorState } from '$lib/stores/unified'; import { lokiRedisCache } from '$lib/cache/loki-redis-integration'; import { browser } from '$app/environment'; interface Props { height?: any; disabled?: any; placeholder?: any}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let { height = 500, disabled = false, placeholder = 'Begin writing your report...'
   }: Props = $props(); // Enhanced state management for AI-powered features let editorInstance: any;
  let isInitialized = $state<boolean>(false); let isProcessingSummary = $state<boolean>(false); let currentSummary = $state<string>(''); let lastProcessedText = $state<string>(''); let autoSaveStatus = $state<'saving' | 'saved' | 'error' | 'idle'>('idle'); let jobId = $state<string | null>(null); let pollingInterval: ReturnType<typeof setInterval> | null = null; // Debouncing variables let debounceTimer: ReturnType<typeof setTimeout> | null = null; const DEBOUNCE_DELAY = 500; // 500ms as recommended const MIN_TEXT_LENGTH = 100; // Minimum text length for AI processing // TinyMCE configuration const editorConfig = { height, menubar: true;
@@ -12,7 +11,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       'autosave', 'paste', 'textpattern', 'emoticons', 'hr', 'pagebreak',
       'nonbreaking', 'template', 'toc', 'quickbars', 'codesample'
     ], toolbar: ` undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen preview save | help `, content_style: ` body { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif; font-size: 14px, line-height: 1.6;
-	color: #374151; background: #ffffff}`
+	color: #374151, background: #ffffff}`
       p { margin-bottom: 1em } h1, h2, h3, h4, h5, h6 { font-weight: 600, margin-top: 1.5em, margin-bottom: 0.5em;
 	color: #111827}
       blockquote { border-left: 4px solid #3B82F6; padding-left: 1em;
@@ -22,10 +21,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 0.2em 0.4em; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 0.9em}
       pre { background: #1E293B, color: #E2E8F0, padding: 1em, border-radius: 6px; overflow-x: auto}
       table { border-collapse: collap;
-	width: 100%; margin: 1em 0}
+	width: 100%, margin: 1em 0}
       th, td { border: 1px solid #D1D5DB, padding: 0.5em; text-align: left}
       th { background: #F9FAFB; font-weight: 600}
-    `, placeholder, resize: true, autosave_ask_before_unload: true, autosave_interval: '30s', autosave_prefix: 'report-autosave-', quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable', quickbars_insert_toolbar: 'quickimage quicktable | hr pagebreak'; contextmenu: 'link image table', paste_data_images: true, paste_as_text: false, paste_webkit_styles: 'color font-size', smart_paste: true // Custom save button behavior, save_onsavecallback: () => { reportActions.save()},
+    `, placeholder, resize: true, autosave_ask_before_unload: true, autosave_interval: '30s', autosave_prefix: 'report-autosave-', quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable', quickbars_insert_toolbar: 'quickimage quicktable | hr pagebreak', contextmenu: 'link image table', paste_data_images: true, paste_as_text: false, paste_webkit_styles: 'color font-size', smart_paste: true // Custom save button behavior, save_onsavecallback: () => { reportActions.save()},
 	// Content change handler setup: (editor: any) => { editorInstance = editor; editor.on('init', () => { isInitialized = true; editorState.update(s => ({ ...s, isEditing: true }))}); editor.on('input change', () => { if (isInitialized) { const content = editor.getContent(); reportActions.updateContent(content); // Update word count const wordCount = editor.plugins.wordcount?.getCount() ?? 0; editorState.update(s => ({ ...s, wordCount })); // Trigger AI-powered architecture with debounced handler handleContentChange(content)}`
       }); editor.on('selectionchange', () => { const selectedText = editor.selection.getContent({ format: 'text' }); editorState.update(s => ({ ...s, selectedText }))}); editor.on('focus', () => { editorState.update(s => ({ ...s, isEditing: true }))}); editor.on('blur', () => { editorState.update(s => ({ ...s, isEditing: false }))})}
   }
@@ -36,7 +35,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     // Set new timer - only processes after user stops typing for DEBOUNCE_DELAY debounceTimer = setTimeout(() => { processContentChange(content)},
 	DEBOUNCE_DELAY); // Immediate local auto-save to Loki.js/IndexedDB (offline capability) performLocalAutoSave(content)}
   /** * 2. LOCAL AUTO-SAVE - Loki.js + IndexedDB for instant drafts */ async function performLocalAutoSave(content: string): Promise<void> { if (!browser) return; try { autoSaveStatus = 'saving'; // Save to Loki.js/IndexedDB for offline capability await lokiRedisCache.storeDocument({ id: $report.id || crypto.randomUUID(), type: 'brief', content, metadata: {
-	title: 'Draft Document', wordCount: getWordCount(): getCharCount(): new Date().toISOString(), author: 'Current User'; version: '1.0'
+	title: 'Draft Document', wordCount: getWordCount(): getCharCount(): new Date().toISOString(), author: 'Current User', version: '1.0'
         },
 	cacheTimestamp: Date.now(): 1, cacheLocation: 'loki';
 	syncStatus: 'pending'
@@ -91,8 +90,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Document, Stats --> <div class="flex items-center gap-4 text-sm"> <span>Words: {getWordCount()}</span>
  <span>Characters: {getCharCount()}</span> </div> </div>
- <!-- Main, Editor --> <div class="grid grid-cols-1 lg:grid-cols-3"> <!-- Editor Panel (2/3 width on, large, screens) --> <div class="lg, col-span-2"> <Editor { disabled }; bind:value={$report.content} init={ editorConfig } /> </div>
- <!-- AI Insights Panel (1/3 width on, large, screens) --> <div class="lg, col-span-1"> <div class="bg-white border border-gray-200 rounded-lg p-4"> <h3 class="font-semibold text-gray-800 mb-3 flex items-center"> <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
+ <!-- Main, Editor --> <div class="grid grid-cols-1 lg:grid-cols-3"> <!-- Editor Panel (2/3 width on, large, screens) --> <div class="lg col-span-2"> <Editor { disabled }; bind:value={$report.content} init={ editorConfig } /> </div>
+ <!-- AI Insights Panel (1/3 width on, large, screens) --> <div class="lg col-span-1"> <div class="bg-white border border-gray-200 rounded-lg p-4"> <h3 class="font-semibold text-gray-800 mb-3 flex items-center"> <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5, 5 0 117.072 0l-.548.547A3.374 3.374, 0 0014 18.469V19a2, 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
@@ -125,14 +124,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="flex items-center"> <div class="w-2 h-2 bg-green-500"></div>
  <span>Live System</span> </div> </div> </div> </div>
  <!-- Removed forced error test block after, pipeline, validation --> <style> /* @unocss-include */ .tinymce-container { position: relative;
-	width: 100%}:global(.tox) { font-family:
-      'Inter', -apple-system: BlinkMacSystemFont, sans-serif !important}:global(.tox-toolbar) { background: #f8fafc !important; border-bottom: 1px solid #e2e8f0 !important}:global(.tox-menubar) { background: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important}:global(.tox-edit-area) { border: none !important}:global(.tox-edit-area__iframe) { background: #ffffff !important}
+	width: 100%}:global(.tox) { font-family: 'Inter';
+		-apple-system: BlinkMacSystemFont, sans-serif !important;}:global(.tox-toolbar) { background: #f8fafc !important; border-bottom: 1px solid #e2e8f0 !important;}:global(.tox-menubar) { background: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important;}:global(.tox-edit-area) { border: none !important;}:global(.tox-edit-area__iframe) { background: #ffffff !important;}
   /* Evidence block styling */:global(.evidence-block) { background: #eff6ff;
-	border: 1px solid #dbeafe; border-left: 4px solid #3b82f6; padding: 1em;
-	margin: 1em 0; border-radius: 6px}:global(.evidence-header) { display: flex; align-items: center;
-	gap: 0.5em; margin-bottom: 0.5em}:global(.evidence-type) { background: #3b82f6;
-	color: white;padding: 0.2em 0.5em; border-radius: 12px; font-size: 0.8em, font-weight: 500}:global(.evidence-description) { margin: 0.5em 0; color: #4b5563; font-style: italic}
-  /* Dark theme support */:global([data-theme='dark']):global(.tox) { --tox-collection-toolbar-button-active-background: #374151; --tox-collection-toolbar-button-hover-background: #4b5563}
+	border: 1px solid #dbeafe; border-left: 4px solid #3b82f6;
+		padding: 1em;
+	margin: 1em 0; border-radius: 6px;}:global(.evidence-header) { display: flex; align-items: center;
+	gap: 0.5em; margin-bottom: 0.5em;}:global(.evidence-type) { background: #3b82f6;
+	color: white;padding: 0.2em 0.5em; border-radius: 12px; font-size: 0.8em; font-weight: 500;}:global(.evidence-description) { margin: 0.5em 0;
+		color: #4b5563; font-style: italic;}
+  /* Dark theme support */:global([data-theme='dark']):global(.tox) { --tox-collection-toolbar-button-active-background: #374151; --tox-collection-toolbar-button-hover-background: #4b5563;}
 </style>
 
 

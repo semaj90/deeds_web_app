@@ -560,7 +560,7 @@ export class ProductionLogger {
     }
 
     public async getHealthStatus(): Promise<{
-	status: 'healthy' | 'degraded' | 'unhealthy'; details: Record<string, unknown> }> {
+	status: 'healthy' | 'degraded' | 'unhealthy', details: Record<string, unknown> }> {
         const details: Record<string, unknown> = {
             totalLogs: this.metrics.totalLogs,
             errorRate: this.metrics.errorRate,

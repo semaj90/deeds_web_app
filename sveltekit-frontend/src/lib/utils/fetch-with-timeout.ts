@@ -200,7 +200,7 @@ retry.backoff === 'exponential'
 /** * Create a reusable AbortController with timeout */ export function createTimeoutController(
  timeout: number
 ): {
-	controller: AbortController; timeoutId: ReturnType<typeof setTimeout>; clear: () => void } {
+	controller: AbortController, timeoutId: ReturnType<typeof setTimeout>; clear: () => void } {
  const controller = new AbortController();
  const timeoutId = setTimeout(() => {
  controller.abort();

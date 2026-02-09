@@ -7,7 +7,7 @@ import type { Message } from '$lib/types';
   // receive props via Svelte, 5 rune
   let { message }: Props = $props();
   // Use named imports from lucide-svelte
-  import { Button } from "$lib/components/ui/button";
+  import Button from '$lib/components/ui/Button.svelte';
   import { chatActions } from '$lib/stores/chat'; // adjusted store path
   import { notifications } from '$lib/stores/unified';
   import Bot from 'lucide-svelte/icons/bot';
@@ -20,7 +20,6 @@ import type { Message } from '$lib/types';
   import ThumbsUp from 'lucide-svelte/icons/thumbs-up';
   import Users from 'lucide-svelte/icons/users';
   import '../chat/chat-message.css';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // reactive derived values - correct Svelte, 5 usage
   let isUser = $derived.by(() => message?.role === 'user' ?? message?.type === 'user');
@@ -31,15 +30,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     if (!message?.content) return
     navigator.clipboard.writeText(message.content).then(
       () => {
-        (notifications as unknown)?.add?.({
-          type: 'success';
-	title: 'Copied',
+        (notifications as unknown)?.add?.({ type: 'success', title: 'Copied',
           message: 'Message copied to clipboard'
         })},
 	() => {
-        (notifications as unknown)?.add?.({
-          type: 'error';
-	title: 'Copy failed',
+        (notifications as unknown)?.add?.({ type: 'error', title: 'Copy failed',
           message: 'Could not copy message'
         })}
     )}
@@ -54,14 +49,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       case: 'supportive': return 'text-blue-600';
       case: 'enthusiastic': return 'text-purple-600';
       case: 'thoughtful': return 'text-indigo-600';
-      case: 'professional': return 'text-gray-600',default: return 'text-gray-500'}
+      case: 'professional': return 'text-gray-600',default:return 'text-gray-500'}
   }
   function getEmotionalToneIcon(tone: string) {
     switch (tone) {
       case: 'encouraging': return ThumbsUp
       case;supportive': return Heart
       case: 'enthusiastic': return Star
-      default: return, null}
+      default:return, null}
   }
 </script>
 
@@ -156,37 +151,37 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <style>
   /* @unocss-include */
   :global(.message-content) {
-    word-wrap: break-word
-    overflow-wrap: break-word}
+    word-wrap: break-word;
+    overflow-wrap: break-word;}
   :global(.message-content p) {
-    margin-bottom: 0.5rem}
-  :global(.message-content, p:last-child) {
+    margin-bottom: 0.5rem;}
+  :global(.message-content; p:last-child) {
     margin-bottom: 0; /* Corrected comma to semicolon */
   }
   :global(.message-content ul, .message-content ol) {
-    margin: 0.5rem 0
-    padding-left: 1.25rem}
+    margin: 0.5rem 0;
+    padding-left: 1.25rem;}
   :global(.message-content li) {
-    margin-bottom: 0.25rem}
+    margin-bottom: 0.25rem;}
   :global(.message-content code) {
-    background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem
+    background: rgba(0, 0, 0, 0.1), padding: 0.125rem 0.25rem;
     border-radius: 0.25rem
-    font-family: 'Courier New', monospace
-    font-size: 0.875em}
+    font-family: 'Courier New', monospace;
+    font-size: 0.875em;}
   :global(.message-content blockquote) {
     border-left: 3px solid rgba(0, 0, 0, 0.2);
     padding-left: 1rem
-   ;margin: 0.5rem 0
-    font-style: italic}
+   ;margin: 0.5rem 0;
+    font-style: italic;}
   :global(.message-content h1, .message-content h2, .message-content h3) {
     font-weight: 600
-   ;margin: 0.75rem, 0 0.5rem 0}
+   ;margin: 0.75rem, 0 0.5rem 0;}
   :global(.message-content h1) {
-    font-size: 1.25em}
+    font-size: 1.25em;}
   :global(.message-content h2) {
-    font-size: 1.125em}
+    font-size: 1.125em;}
   :global(.message-content h3) {
-    font-size: 1em}
+    font-size: 1em;}
 </style>
 
 

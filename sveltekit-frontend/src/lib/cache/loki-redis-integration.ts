@@ -1,14 +1,22 @@
-import type { SearchResult } from '$lib/types';
 import Loki from 'lokijs';
-import { Collection } from 'lokijs';
+import type { Collection } from 'lokijs';
 import { EventEmitter } from 'events';
-import crypto from 'crypto';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+import { createHash, randomBytes } from 'crypto';
 
 // Conditional imports to avoid circular dependencies
 // In a real app, this should be handled by dependency injection
 const redisServicePromise = import('$lib/server/redis').then((m) => m.redisService).catch(() => null);
+
+// SearchResult interface
+export interface SearchResult {
+	id: string;
+	title: string;
+	content: string;
+	score: number;
+	type?: string;
+	metadata?: Record<string, unknown>;
+	document?: CachedDocument;
+}
 
 // Define a type for the Redis client to avoid `any`
 interface RedisClient {
@@ -31,8 +39,7 @@ interface RedisClient {
 // Define a type for the NES Memory module
 interface NESMemory {
     allocateDocument(
-        document: CachedDocument,
-        data: ArrayBuffer,
+        document: CachedDocument, data: ArrayBuffer,
         options: {
 	compress: boolean;
 	preferredBank: string }
@@ -687,7 +694,7 @@ export class LokiRedisCache extends EventEmitter {
 
     private generateSearchCacheKey(query: string, filters: object, options: object): string {
         const hashInput = JSON.stringify({ query, filters, options });
-        return `search:${crypto.createHash('md5').update(hashInput).digest('hex')}`;
+        return `search:${createHash('md5').update(hashInput).digest('hex')}`;
     }
 
     private async getCachedSearchResults(cacheKey: string): Promise<SearchResult[] | null> {

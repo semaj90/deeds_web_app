@@ -10,9 +10,7 @@ export type UploadResult = {
     message?: string;
 };
 
-export type FileState = {
-    file: File;
-	status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error' | 'canceled';
+export type FileState = { file: File, status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error' | 'canceled';
     progress: number; // 0-100
     attempts: number;
 	error: string | null;
@@ -121,7 +119,7 @@ export class UploadManager {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	fileName: state.file.name })
+fileName: state.file.name })
                     }).catch(() => null);
                 } catch {
                     // ignore GPU errors; not blocking
@@ -134,7 +132,7 @@ export class UploadManager {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	fileName: state.file.name })
+fileName: state.file.name })
                     }).catch(() => null);
                 } catch {
                      // ignore

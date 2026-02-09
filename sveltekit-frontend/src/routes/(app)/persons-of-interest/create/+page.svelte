@@ -1,7 +1,7 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
  import POIForm from '$lib/components/poi/POIForm.svelte';
- import { poiService } from '$lib/services/poi';
+ import { poiService } from '$lib/features/poi/services/poi';
  import type { POICreateRequest } from '$lib/types/poi';
 
  // Props

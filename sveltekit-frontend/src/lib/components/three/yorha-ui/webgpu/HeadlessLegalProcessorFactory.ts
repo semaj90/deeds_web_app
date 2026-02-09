@@ -4,7 +4,6 @@ import { lodCacheEngine } from '$lib/ai/lod-cache-engine.js';
 import { ollamaService } from '$lib/server/ai/ollama-service.js';
 import { yorhaMipmapShaders } from './YoRHaMipmapShaders.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**
@@ -16,10 +15,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  * Based on https://eliemichel.github.io/LearnWebGPU/advanced-techniques/headless.html
  */
 
-export interface LegalAnalysisResult {
-    confidence: number;
-	entities: Array<{ textContent: string;
-	type: string; confidence, number }>;
+export interface LegalAnalysisResult { confidence: number, entities: Array<{ textContent: string, type: string; confidence, number }>;
     riskLevel: 'low' | 'medium' | 'high' | 'critical';
     summary: string;
     complianceConsiderations?: string[];
@@ -31,15 +27,11 @@ export interface PredictiveSuggestion {
     confidence?: number;
 }
 
-export interface LODProcessingResult {
-    lodEntry: LODCacheEntry;
-	instantRetrievalKey: string;
+export interface LODProcessingResult { lodEntry: LODCacheEntry, instantRetrievalKey: string;
     predictiveSuggestions: PredictiveSuggestion[];
 }
 
-export interface MipmapLevelInfo {
-    level: number;
-	width: number;
+export interface MipmapLevelInfo { level: number, width: number;
     height: number;
 }
 
@@ -50,9 +42,7 @@ export interface MipmapVisualizationOutput {
     optimization: { rtxAcceleration, boolean };
 }
 
-export interface OllamaLegalAnalysisResponse {
-    keyLegalEntities: Array<{
-	textContent: string; type: string; confidence, number }>;
+export interface OllamaLegalAnalysisResponse { keyLegalEntities: Array<{ textContent: string, type: string; confidence, number }>;
     riskAssessment: 'low' | 'medium' | 'high' | 'critical';
     complianceConsiderations: string[];
 	summaryOfMainLegalPoints: string;
@@ -60,7 +50,7 @@ export interface OllamaLegalAnalysisResponse {
 
 interface OllamaServiceType {
     generateCompletion(prompt: string, options: {
-	model: string, stream: boolean }): Promise<OllamaLegalAnalysisResponse>;
+model: string, stream: boolean }): Promise<OllamaLegalAnalysisResponse>;
 }
 
 export interface HeadlessProcessingConfig {
@@ -84,14 +74,10 @@ export interface HeadlessProcessingConfig {
     fileOutputPath?: string;
 }
 
-export interface HeadlessProcessingResult {
-    success: boolean;
-	processingTime: number;
+export interface HeadlessProcessingResult { success: boolean, processingTime: number;
     outputFiles?: string[];
     // Mipmap results
-    mipmapChain?: {
-	levels: number;
-        totalMemoryUsed: number;
+    mipmapChain?: { levels: number, totalMemoryUsed: number;
 	generationTime: number;
         rtxOptimized: boolean;
     };
@@ -102,25 +88,19 @@ export interface HeadlessProcessingResult {
     // Legal analysis results
     legalAnalysis?: LegalAnalysisResult;
     // Performance metrics
-    metrics: {
-	webgpuInitTime: number;
-        processingTime: number;
+    metrics: { webgpuInitTime: number, processingTime: number;
 	memoryUsage: number;
         compressionRatio: number;
 	cacheHitRate: number;
     };
 }
 
-export interface OffscreenRenderTarget {
-    texture: GPUTexture;
-	width: number;
+export interface OffscreenRenderTarget { texture: GPUTexture, width: number;
     height: number;
 	format: GPUTextureFormat;
 }
 
-export interface ProcessingTask {
-    textContent: string;
-	config: Partial<HeadlessProcessingConfig>;
+export interface ProcessingTask { textContent: string, config: Partial<HeadlessProcessingConfig>;
 }
 
 /**
@@ -169,7 +149,7 @@ export class HeadlessLegalProcessorFactory {
                     // 'texture-compression-bc' // If available for better compression
                 ],
                 requiredLimits: {
-	maxBufferSize: 512 * 1024 * 1024, // 512MB for large legal documents
+maxBufferSize: 512 * 1024 * 1024, // 512MB for large legal documents
                     maxComputeWorkgroupStorageSize: 32768,
                     maxComputeInvocationsPerWorkgroup: 256,
                     maxStorageBufferBindingSize: 256 * 1024 * 1024, // 256MB storage buffers
@@ -212,9 +192,7 @@ export class HeadlessLegalProcessorFactory {
         if (!this.device) return;
         console.log('🔬 Testing headless WebGPU capabilities...');
         // Create minimal render target for testing
-        const testTexture = this.device.createTexture({
-            size: {
-	width: 256, height: 256 },
+        const testTexture = this.device.createTexture({ size: { width: 256, height: 256 },
 	format: 'rgba8unorm',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
         });
@@ -413,7 +391,7 @@ export class HeadlessLegalProcessorFactory {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {
-                    view: renderTarget.texture.createView(clearValue, { r: 1.0, g: 1.0, b: 1.0, a: 1.0 },
+                   view: renderTarget.texture.createView(clearValue, { r: 1.0, g: 1.0, b: 1.0, a: 1.0 },
 	// White background
                     loadOp: 'clear',
                     storeOp: 'store'

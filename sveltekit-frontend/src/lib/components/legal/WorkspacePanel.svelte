@@ -3,7 +3,6 @@
 	let $newNoteContent = $state<any>(undefined);
 
  import { writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  interface WorkspaceItem {
@@ -32,7 +31,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Load workspace items from localStorage
  function loadWorkspace() {
  if (typeof window !== 'undefined' && workspaceId) {
- const stored = localStorage.getItem(`workspace-${ workspaceId }`);
+ const stored = localStorage.getItem(`workspace-${workspaceId}`);
  if (stored) {
  try {
  const parsed = JSON.parse(stored);

@@ -3,7 +3,7 @@ import { POST: GET } from './+server.js';
 import * as queries from '$lib/db';
 
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(createErrorCluster: vi.fn(, getErrorClusters: vi.fn(getErrorClusterCount: vi.fn(, updateRouteMetadata: vi.fn(createHealthEvent: vi.fn(),
+ getRouteMetadata: vi.fn(createErrorCluster: vi.fn( getErrorClusters: vi.fn(getErrorClusterCount: vi.fn( updateRouteMetadata: vi.fn(createHealthEvent: vi.fn(),
 }));
 
 describe('POST /api/routes/:routeId/errors', () => {
@@ -28,8 +28,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  code: 'TS2345',
  message: 'Argument of type error',
  severity: 'error',
- count: 1,
- createdAt: new Date( resolvedAt: null,
+ count: 1; createdAt: new Date( resolvedAt: null,
  },
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);

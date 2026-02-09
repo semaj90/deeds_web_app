@@ -11,19 +11,18 @@ import LoadingButton from '$lib/headless/LoadingButton.svelte';
 
 // Enhanced-Bits Legal AI components
 import { Dialog } from '$lib/components/ui/dialog';
-import { Button, Card } from '$lib/components/ui/enhanced-bits';
+import Card from '$lib/components/ui/card/Card.svelte';
+import Button from '$lib/components/ui/Button.svelte';
 import { Input } from '$lib/components/ui/input';
 // Select is imported from enhanced-bits or a compatible source
-import { Select } from '$lib/components/ui/enhanced-bits';
+import * as Select from "bits-ui/components/select";
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 const EnhancedDialog = Dialog;
 const EnhancedSelect = Select;
 
 // Legal AI specific components
-export interface LegalEvidenceItem {
-    id: string;
-	title: string;
+export interface LegalEvidenceItem { id: string, title: string;
     type: "document" | "image" | "video" | "audio" | "transcript";
     priority: "critical" | "high" | "medium" | "low";
     confidence?: number;
@@ -32,16 +31,14 @@ export interface LegalEvidenceItem {
 	updatedAt: Date;
 }
 
-export interface AIAnalysisResult {
-    confidence: number;
-	entities: Array<any>;
+export interface AIAnalysisResult { confidence: number, entities: Array<any>;
     themes: Array<any>;
 	summary: string;
 }
 
 // Orchestrated Dialog - combines headless functionality with enhanced styling
 export const OrchestratedDialog = Object.assign(HeadlessDialog, {
-    Root: HeadlessDialog,
+    Root:HeadlessDialog,
     Content: HeadlessDialog, // Placeholder, usually HeadlessDialogContent
     Enhanced: EnhancedDialog,
     // Legal AI specific dialog variants

@@ -8,7 +8,7 @@ export const GET: RequestHandler = async () => {
  version: '1.0.0',
  type: 'sveltekit',
  sourceMap: true,
- devtools: { enabled: true,
+ devtools: { enabled:true,
  svelte: { inspector: true,
  hotReload: true,
  },

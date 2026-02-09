@@ -15,9 +15,11 @@
  let selectedStatus = $state<string>('');
  let selectedPriority = $state<string>('');
 
- // Load POIs on mount
+ // Load POIs on mount if caseId exists
  onMount(async () => {
-  await loadPOIs();
+  if (data.caseId) {
+    await loadPOIs();
+  }
  });
 
  async function loadPOIs() {
@@ -106,12 +108,17 @@
  </div>
 
  {#if loading}
- <div class="loading">Loading POIs...</div>
- {:else if filteredPOIs().length === 0}
- <div class="empty-state">
- <p>No persons of interest found</p>
- <a href="/persons-of-interest/create" class="btn-primary">Create First POI</a>
- </div>
+  <div class="loading">Loading POIs...</div>
+  {:else if !data.caseId}
+  <div class="empty-state">
+  <p>Please select a case to view Persons of Interest</p>
+  <a href="/cases" class="btn-primary">View Cases</a>
+  </div>
+  {:else if filteredPOIs().length === 0}
+  <div class="empty-state">
+  <p>No persons of interest found</p>
+  <a href="/persons-of-interest/create?caseId={data.caseId}" class="btn-primary">Create First POI</a>
+  </div>
  {:else}
  <div class="poi-grid">
  {#each filteredPOIs() as poi (poi.id)}
@@ -155,9 +162,8 @@
 </div>
 
 <style>
- .poi-list-page {
- padding: 2rem;
-	background: #0f0f23;
+ .poi-list-page { padding: 2rem;
+		background: #0f0f23;
  min-height: 100vh;
  }
 
@@ -188,9 +194,8 @@
  background: #b91c1c;
  }
 
- .error-banner {
- padding: 1rem;
-	background: #7f1d1d;
+ .error-banner { padding: 1rem;
+		background: #7f1d1d;
  border: 1px solid #dc2626;
  border-radius: 0.375rem;
 	color: #fecaca;
@@ -209,17 +214,15 @@
 	cursor: pointer;
  }
 
- .filters {
- display: flex;
-	gap: 1rem;
+ .filters { display: flex;
+		gap: 1rem;
  margin-bottom: 2rem;
  flex-wrap: wrap;
  }
 
  .search-input,
- .filter-select {
- padding: 0.75rem;
-	background: #1a1a2e;
+ .filter-select { padding: 0.75rem;
+		background: #1a1a2e;
  border: 1px solid #333;
  border-radius: 0.375rem;
 	color: #ffffff;
@@ -286,15 +289,13 @@
  margin-bottom: 1rem;
  }
 
- .card-header h3 {
- color: #ffffff;
-	margin: 0 0 0.5rem 0;
+ .card-header h3 { color: #ffffff;
+		margin: 0 0 0.5rem 0;
  font-size: 1.125rem;
  }
 
- .badges {
- display: flex;
-	gap: 0.5rem;
+ .badges { display: flex;
+		gap: 0.5rem;
  flex-wrap: wrap;
  }
 

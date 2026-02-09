@@ -20,7 +20,7 @@ export interface RAGContext {
 
 export class EnhancedVectorOperations {
 	async generateEmbedding(params: {
-	id: string; content: string }): Promise<void> {
+	id: string, content: string }): Promise<void> {
 		// Stub implementation - in production this would generate real embeddings
 		// console.log('Generating embedding for: ', params.id, 'with content length: ', params.content.length);
 	}

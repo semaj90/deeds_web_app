@@ -98,8 +98,7 @@
       case 'exit':
         addLog('TERMINATING SESSION...');
         break;
-      default:
-        addLog(`ERROR: Invalid command [${command}]`);
+      default:addLog(`ERROR: Invalid command [${command}]`);
     }
 
     onCommand?.(cmd);

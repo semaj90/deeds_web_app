@@ -27,7 +27,7 @@ export interface ChatCompletionResponse {
 		finish_reason?: string;
 	}>;
 	usage?: {
-	prompt_tokens: number; completion_tokens: number;
+	prompt_tokens: number, completion_tokens: number;
 	total_tokens: number };
 }
 
@@ -47,7 +47,7 @@ export interface CompletionResponse {
 	model: string;
 	choices: Array<{ index?: number; text?: string; finish_reason?: string }>;
 	usage?: {
-	prompt_tokens: number; completion_tokens: number;
+	prompt_tokens: number, completion_tokens: number;
 	total_tokens: number };
 }
 

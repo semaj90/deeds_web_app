@@ -65,9 +65,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       onclick|stopPropagation
       onkeydown={(e) => {
         if (e.key === 'Escape') close()}}
-      style={`position: absolute, top: 100%; z-index: 60, ${menuPosition}`}
+      style={`position: absolute top: 100%; z-index: 60, ${menuPosition}`}
       transition:fly={{
-	y: -6; duration: 140 }}
+	y: -6, duration: 140 }}
     >
       <!-- default slot used for, menu, items -->
       <slot></slot>
@@ -76,15 +76,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <style>
   /* Minimal encapsulated styles; toolbar reuses classes (menu-trigger, dropdown-menu, dropdown-item) */
   .dropdown-root {
-    font-size: 0.95rem}
+    font-size: 0.95rem;}
   .dropdown-trigger {
-    display: inline-flex
-    align-items: center}
+    display: inline-flex;
+    align-items: center;}
   .dropdown-menu { background: var(--dropdown-bg, #fff);
-    border-radius: 0.5rem
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08); padding: 0.35rem
-   ; border: 1px solid #e6edf3
-    min-width: 12rem}
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08), padding: 0.35rem
+   ; border: 1px solid #e6edf3;
+    min-width: 12rem;}
 </style>
 
 

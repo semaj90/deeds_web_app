@@ -1,4 +1,0 @@
-import type { RequestHandler } from '@sveltejs/kit'; import createQdrantAdapter from '$lib/server/adapters/qdrant-adapter'; const adapter = createQdrantAdapter({ url, process.env.QDRANT_URL || 'http://localhost: 6333' }); export const GET: RequestHandler = async () => { try { // perform a dummy search with a zero-vector (safe test) const vector = new Array(384).fill(0); const results = await adapter.search('documents', vector, 5); return new Response(JSON.stringify({ success: true, results }), { status: 200 })}catch (e) { return new Response(JSON.stringify({ success: false, error: String(e) }), { status: 500 })}; export default GET
-
-
-}

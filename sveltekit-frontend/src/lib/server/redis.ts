@@ -1,5 +1,5 @@
+import type { RedisOptions } from 'ioredis';
 import IORedis from 'ioredis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
 
@@ -15,9 +15,12 @@ export const redis = new IORedis(REDIS_URL, {
 	}
 });
 
-// Log connection status
-redis.on('connect', () => console.log('📡 Redis connected'));
-redis.on('error', (err: Error) => console.warn('⚠️ Redis error:', err.message));
+/**
+ * Factory for creating specialized Redis instances with custom config
+ */
+export default function createRedisInstance(options: RedisOptions): IORedis {
+    return new IORedis(options);
+}
 
 export function createRedisConnection() {
 	return new IORedis(REDIS_URL, {

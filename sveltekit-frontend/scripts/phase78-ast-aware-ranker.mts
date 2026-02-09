@@ -261,6 +261,7 @@ function extractDependencies(ast: any): { imports: string[]; exports: string[]; 
     }
   });
 
+  return { imports, exports, components };
 }
 
 /**

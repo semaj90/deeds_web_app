@@ -1,6 +1,5 @@
 <script lang="ts">
  import { createEventDispatcher } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Migrated from createEventDispatcher to callback props;
 
@@ -108,7 +107,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
  <!-- Upload Zone -->
  <div
- class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-cyan-400 bg-cyan-400/10' : 'border-slate-600, hover:border-slate-500'}"
+ class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-cyan-400 bg-cyan-400/10' : 'border-slate-600 hover:border-slate-500'}"
  role="region"
  ondragover={ handleDragOver }
  ondragleave={ handleDragLeave }
@@ -150,7 +149,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="flex items-center justify-between mb-4">
  <h4 class="text-sm font-medium text-slate-300">Files to Upload ({uploadedFiles.length})</h4>
  <button
- class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors disabled, opacity-50"
+ class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors disabled opacity-50"
  disabled={isUploading}
  onclick={ uploadFiles }
  >

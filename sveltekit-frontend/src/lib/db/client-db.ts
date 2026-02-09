@@ -176,7 +176,7 @@ export interface GraphVisualizationData {
     dimensions: 2 | 3;
   };
   cameraPosition?: {
-	x: number; y: number;
+	x: number, y: number;
 	z: number };
   createdAt: Date;
 	lastAccessed: Date;

@@ -18,7 +18,7 @@ import { createPattern, type PatternMatcher } from '../pattern-matcher';
 export const propertyTypePattern: PatternMatcher = createPattern(
   'property-type-fix',
   'Fix comma instead of colon in property type annotations',
-  /(\w+),\s*([A-Z][a-zA-Z0-9_<>\[\]|&\s]*?)([;}\),])/g,
+  /(\w+),\s*([A-Z][a-zA-Z0-9_<>\[\]|&\s]*?)([;}\)])/g,
   '$1: $2$3',
   {
     priority: 40,
@@ -77,7 +77,7 @@ export const genericTypeObjectPattern: PatternMatcher = createPattern(
 /**
  * Pattern to fix multiple properties in object type
  * Handles: {
-	a: TypeA; b: TypeB } → { a: TypeA;
+	a: TypeA, b: TypeB } → { a: TypeA;
 	b: TypeB }
  */
 export const multiPropertyTypePattern: PatternMatcher = createPattern(
@@ -138,7 +138,7 @@ export function getObjectLiteralPatterns(): PatternMatcher[] {
  * Apply object literal type fixes to content
  */
 export function fixObjectLiteralTypes(content: string): {
-	result: string; fixCount: number } {
+	result: string, fixCount: number } {
   let result = content;
   let totalFixes = 0;
 

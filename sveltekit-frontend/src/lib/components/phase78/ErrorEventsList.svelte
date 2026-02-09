@@ -1,6 +1,5 @@
 <script lang="ts">
  import type { ErrorEvent } from '$lib/server/db/schema/index.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  errors?: ErrorEvent[];
@@ -72,14 +71,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  type="text"
  placeholder="Search by message or error code..."
  bind:value={searchQuery}
- class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
+ class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
 
  <!-- Filters -->
  <div class="flex gap-3 flex-wrap">
  <select
  bind:value={sortBy}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
  >
  <option value="date">Sort by Date</option>
  <option value="severity">Sort by Severity</option>
@@ -88,7 +87,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  <select
  bind:value={filterSeverity}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
  >
  <option value={ null }>All Severities</option>
  <option value="fatal">Fatal</option>

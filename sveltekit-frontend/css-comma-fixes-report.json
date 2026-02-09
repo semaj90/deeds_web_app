@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-02-09T01:39:56.323Z",
+  "dryRun": false,
+  "filesProcessed": 1356,
+  "filesWithMatches": 4,
+  "totalFixes": 4,
+  "fixedFiles": [
+    {
+      "file": "src/lib/components/forms/EnhancedFileUpload.svelte",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/styles/fallback.css",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/styles/laws-global.css",
+      "fixes": 1
+    },
+    {
+      "file": "src/lib/styles/warden-theme.css",
+      "fixes": 1
+    }
+  ]
+}

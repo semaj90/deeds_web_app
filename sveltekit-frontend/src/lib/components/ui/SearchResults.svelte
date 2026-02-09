@@ -53,7 +53,7 @@
  }
 </script>
 
-<div class="search-results { className }">
+<div class="search-results {className}">
  {#if isLoading}
  <div class="loading-state">
  <div class="spinner"></div>

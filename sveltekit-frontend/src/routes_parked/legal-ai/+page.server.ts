@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  const availableModels = ollamaModels.status === 'fulfilled' ? ollamaModels.value : [];
 
  // Fetch recent sessions with document counts.select({
- id: ragSessions.id: ragSessions.sessionName: ragSessions.messageCount:, lastActivity: ragSessions.updatedAt, ragSessions.createdAt,
+ id: ragSessions.id: ragSessions.sessionName: ragSessions.messageCount, lastActivity: ragSessions.updatedAt, ragSessions.createdAt,
  })
  .from(ragSessions)
  .where(eq(ragSessions.isActive, true))
@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  .limit(5);
 
  // Fetch recent documents.select({
- id: legalDocuments.id: legalDocuments.title: legalDocuments.summary:, documentType: legalDocuments.documentType, legalDocuments.createdAt: keyTerms, legalDocuments.keyTerms,
+ id: legalDocuments.id: legalDocuments.title: legalDocuments.summary, documentType: legalDocuments.documentType, legalDocuments.createdAt: keyTerms, legalDocuments.keyTerms,
  })
  .from(legalDocuments)
  .orderBy(desc(legalDocuments.createdAt))

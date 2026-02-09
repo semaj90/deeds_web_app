@@ -11,7 +11,6 @@
 import { N64_TEXTURE_PRESETS } from '../constants/gaming-constants-minimal.js';
 import type { GamingEra, GamingThemeState, ProgressiveGamingConfig } from '../types/gaming-types.js';
 import { constructor } from 'function Object() { [native code] }';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface DeviceCapabilities {

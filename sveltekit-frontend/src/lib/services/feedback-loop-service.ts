@@ -8,7 +8,6 @@ import * as feedbackSchema from '$lib/server/db/schema-feedback'; // Import feed
 import { desc, eq, gte, sql } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'; // For typing Drizzle DB
 import { OllamaEmbeddingService, type EmbeddingService } from './ollama-embedding-client.js'; // NEW: Import centralized service
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // import { getOllamaEndpoint } from '$lib/utils/api-endpoints'; // Error: not a module
 const getOllamaEndpoint = () => 'http://localhost:11434'; // Fallback
 

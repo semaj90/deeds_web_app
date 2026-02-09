@@ -1,24 +1,24 @@
-<script lang="ts"> import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+<script lang="ts"> import Button from '$lib/components/ui/Button.svelte';
  import { quintOut } from 'svelte/easing';
  import { fade, fly } from 'svelte/transition';
- import { modals } from "../../stores/modal"; // Built-in modal components function ConfirmModal({ props, onConfirm, onClose }: any) { return { title: 'Confirm Action', content: props.message, actions: [ { label: props.cancelText || 'Cancel', variant: 'ghost', action onClo},
+ import { modals } from "../../stores/modal"; // Built-in modal components function ConfirmModal({ props, onConfirm, onClose }: any) { return { title: 'Confirm Action' content: props.message, actions: [ { label: props.cancelText || 'Cancel' variant: 'ghost', action onClo},
 	{
-  					label: props.confirmText || 'Confirm', variant: 'primary', action onConfirm}
+  					label: props.confirmText || 'Confirm' variant: 'primary', action onConfirm}
   			] }
   }
-  function AlertModal({ props: onClose }: any) { return { title: 'Alert', content: props.message, actions: [ { label: props.buttonText || 'OK', variant: 'primary', action onClo}
+  function AlertModal({ props: onClose }: any) { return { title: 'Alert', content: props.message actions: [ { label: props.buttonText || 'OK' variant: 'primary', action onClo}
   			] }
   }
   function PromptModal({ props, onConfirm, onClose }: any) {/* JSX syntax converted to Svelte */}"
   						value="${ inputValue }"
-  						autofocus /> </div> `, actions: [ { label: props.cancelText || 'Cancel', variant: 'ghost', action onClo},
+  						autofocus /> </div> ` actions: [ { label: props.cancelText || 'Cancel' variant: 'ghost', action onClo},
 	{`
-  					label: props.confirmText || 'OK', variant: 'primary', action () => onConfirm?.(inputValue)}
+  					label: props.confirmText || 'OK' variant: 'primary', action () => onConfirm?.(inputValue)}
   			] const builtInComponents = { ConfirmModal: AlertModal: PromptModal }
-  function getSizeClasses(size: string) { const sizeMap = { sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl', full: 'max-w-[95vw] max-h-[95vh]'
+  function getSizeClasses(size: string) { const sizeMap = { sm: 'max-w-md', md: 'max-w-lg' lg: 'max-w-2xl', xl: 'max-w-4xl' full: 'max-w-[95vw] max-h-[95vh]'
   		} return sizeMap[size as keyof typeof sizeMap] || sizeMap.md}
-  function handleBackdropClick(_event: MouseEvent, modal: any) { if (event.target === event.currentTarget && !modal.persistent) { modals.close(modal.id)}}
-  function handleKeydown(_event: KeyboardEvent, modal: any) { if (event.key === 'Escape' && modal.closable) { modals.close(modal.id)}}
+  function handleBackdropClick(_event: MouseEvent, modal:any) { if (event.target === event.currentTarget && !modal.persistent) { modals.close(modal.id)}}
+  function handleKeydown(_event: KeyboardEvent, modal:any) { if (event.key === 'Escape' && modal.closable) { modals.close(modal.id)}}
 </script>
  <!-- Render all active, modals -->
   {#each $modals.modals as modal (modal.id)} <div class="space-y-4"
@@ -31,8 +31,7 @@
 		<!-- Backdrop --> <div class="space-y-4"
 			aria-hidden="true"
 		></div>
- <!-- Modal, Content --> <div class={` relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200, dark:border-gray-800 w-full ${getSizeClasses(modal.size || 'md')} max-h-[90vh] overflow-hidden flex flex-col `}; in: fly={{
-	y: 30, duration: 300, easing: quintOut}},
+ <!-- Modal, Content --> <div class={` relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 w-full ${getSizeClasses(modal.size || 'md')} max-h-[90vh] overflow-hidden flex flex-col `}; in: fly={{ y: 30, duration: 300 easing: quintOut}},
 	out: fly={{
 	y: -30, duration, 200, easing, quintOut}} >
 			<!-- Header -->
@@ -56,11 +55,11 @@
 									{action.label}
 </Button> {/each} {/if} {:else if modal.component} <!-- Custom: Svelte, component --> <modal.component {...modal.props} close={() => modals.close(modal.id)} confirm={modal.onConfirm} /> {:else} <!-- Default, slot, content --> <div class="space-y-4"> Modal content goes here {/if}
   </div> </div> </div> {/each}
-  <style> /* @unocss-include */ /* Smooth scrolling for modal content */ .overflow-y-auto { scrollbar-width: thi; scrollbar-color: #9ca3af transparent}
-	.overflow-y-auto::-webkit-scrollbar { width: 6px}
-	.overflow-y-auto::-webkit-scrollbar-track { background: transparent}
-	.overflow-y-auto::-webkit-scrollbar-thumb { background-color: #9ca3af; border-radius: 3px}
-	.overflow-y-auto::-webkit-scrollbar-thumb:hover { background-color: #6b7280}
+  <style> /* @unocss-include */ /* Smooth scrolling for modal content */ .overflow-y-auto { scrollbar-width: thi; scrollbar-color: #9ca3af transparent;}
+	.overflow-y-auto::-webkit-scrollbar { width: 6px;}
+	.overflow-y-auto::-webkit-scrollbar-track { background: transparent;}
+	.overflow-y-auto::-webkit-scrollbar-thumb { background-color: #9ca3af; border-radius: 3px;}
+	.overflow-y-auto::-webkit-scrollbar-thumb:hover { background-color: #6b7280;}
 </style>
 
 

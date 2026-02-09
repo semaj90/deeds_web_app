@@ -1,9 +1,7 @@
 <script lang="ts">
 	let pkg = $state<any>(undefined);
 
-	type RouteDetail = {
-		path: string;
-	kind: 'page' | 'layout' | 'endpoint';
+	type RouteDetail = { path: string, kind: 'page' | 'layout' | 'endpoint';
 		file: string;
 	summary: string;
 		category?: string;
@@ -18,9 +16,7 @@
 
 	type Phase72Status = {
 		errorCount: number;
-		lastError?: {
-	code: string;
-			message: string;
+		lastError?: { code: string, message: string;
 	count: number;
 			lastSeen: string;
 		};
@@ -43,7 +39,8 @@
 	let phase72Status = $state<Phase72Status>({ errorCount: 0 });
 	let phase82Status = $state<Phase82Status>({
 		status: 'not_started',
-		filesUpgraded: 0, totalFiles: 0 0
+		filesUpgraded: 0,
+		totalFiles: 0
 	});
 
 	let loading = $state(false);
@@ -89,7 +86,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	route: route.path })
+route: route.path })
 			});
 		} finally {
 			actionInProgress = null;
@@ -104,13 +101,15 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	route: route.path })
+route: route.path })
 			});
 			if (res.ok) {
 				const data = await res.json();
 				phase82Status = {
 					status: 'complete',
-					filesUpgraded: data.filesUpgraded ?? phase82Status.filesUpgraded: totalFiles, data: data.totalFiles ?? phase82Status.totalFiles: lastRun, new Date().toISOString()
+					filesUpgraded: data.filesUpgraded ?? phase82Status.filesUpgraded,
+					totalFiles: data.totalFiles ?? phase82Status.totalFiles,
+					lastRun: new Date().toISOString()
 				};
 			}
 		} finally {
@@ -136,7 +135,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	route: route.path })
+route: route.path })
 			});
 		} finally {
 			actionInProgress = null;
@@ -147,7 +146,7 @@
 {#if open && route}
 <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
 	<div
-		class="w-[960px] max-w-[96vw] bg-[#f3eddc] text-[#111] border-[3px] border-[#262017] shadow-[0_0_0_2px_rgba(0, 0, 0, 0.35)] rounded-xl overflow-hidden"
+		class="w-[960px] max-w-[96vw] bg-[#f3eddc] text-[#111] border-[3px] border-[#262017] shadow-[0_0_0_2px_rgba(0 0 0 0.35)] rounded-xl overflow-hidden"
 	>
 		<!-- Header -->
 		<header
@@ -181,19 +180,17 @@
 			<div class="flex items-center gap-2">
 				{#if route.health}
 					<span
-						class={`px-2 py-[2px] text-[10px] font-mono tracking-[0.2em] uppercase border ${
-							route.health === 'green'
-								? 'bg-[#1d3b2a] text-[#d7f5dd] border-[#3f6b4e]'
-								: route.health === 'yellow'
-								? 'bg-[#5b4a1b] text-[#fff3bf] border-[#9f7f2e]'
-								, 'bg-[#5b1b1b] text-[#ffd7d7] border-[#a32929]'
-						}`}
+						class={`px-2 py-[2px] text-[10px] font-mono tracking-[0.2em] uppercase border ${route.health === 'green'
+							? 'bg-[#1d3b2a] text-[#d7f5dd] border-[#3f6b4e]'
+							: route.health === 'yellow'
+							? 'bg-[#5b4a1b] text-[#fff3bf] border-[#9f7f2e]'
+							: 'bg-[#5b1b1b] text-[#ffd7d7] border-[#a32929]'}`}
 					>
 						{route.health}
 					</span>
 				{/if}
 				<button
-					class="ml-4 h-8 w-8 text-sm border-[2px] border-[#262017] bg-[#b64545] text-[#f3eddc] hover: bg-[#d15454], active, translate-y-[1px]"
+					class="ml-4 h-8 w-8 text-sm border-[2px] border-[#262017] bg-[#b64545] text-[#f3eddc] hover:bg-[#d15454] active translate-y-[1px]"
 					onclick={() => (open = false)}
 				>
 					✕
@@ -270,7 +267,7 @@
 						{#each route.relatedRoutes as rel}
 							<button
 								type="button"
-								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover: bg-[#262017], hover:text-[#f3eddc]"
+								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover:bg-[#262017] hover:text-[#f3eddc]"
 								onclick={() => window.open(rel, '_blank')}
 							>
 								{ rel }
@@ -323,7 +320,7 @@
 						{/if}
 						<div class="pt-2 flex gap-2">
 							<button
-								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b36a] bg-[#133822] text-[#d7fbe3] hover: bg-[#1a4e30], disabled, opacity-50"
+								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b36a] bg-[#133822] text-[#d7fbe3] hover:bg-[#1a4e30] disabled opacity-50"
 								onclick={ askErrorBrain }
 								disabled={!!actionInProgress}
 							>
@@ -369,7 +366,7 @@
 
 						<div class="pt-2 flex gap-2">
 							<button
-								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#f0c14b] bg-[#8a6112] text-[#fff6dd] hover: bg-[#b87f19], disabled, opacity-50"
+								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#f0c14b] bg-[#8a6112] text-[#fff6dd] hover:bg-[#b87f19] disabled opacity-50"
 								onclick={ runCodemod }
 								disabled={!!actionInProgress}
 							>
@@ -401,7 +398,7 @@
 							errors, and feed them back into Phase 72.
 						</p>
 						<button
-							class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b3a9] bg-[#104442] text-[#d4fbf7] hover: bg-[#16635f], disabled, opacity-50"
+							class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b3a9] bg-[#104442] text-[#d4fbf7] hover:bg-[#16635f] disabled opacity-50"
 							onclick={ runPlaywrightCheck }
 							disabled={!!actionInProgress}
 						>

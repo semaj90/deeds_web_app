@@ -56,7 +56,7 @@
 
  try {
  const response = await fetch(
- `/api/citations/collections/${collection.id}/citations/${ citationId }`,
+ `/api/citations/collections/${collection.id}/citations/${citationId}`,
  { method: 'DELETE' }
  );
 

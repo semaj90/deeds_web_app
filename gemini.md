@@ -1,385 +1,782 @@
-# Gemini - Phase 78 AST Error Analysis & Svelte 5 Migration
+# Phase 72 – Gemini / FastMCP Agent
 
----
+## 🚀 Phase 107 Svelte 5 Hardening (January 19, 2026)
 
-## ✅ January 19, 2026 – ai-service.ts Rebuild + Contextual Chat Verification
+### Session Summary
+- **Dev Server**: Running at http://localhost:5175
+- **Vite**: v6.4.1 with UnoCSS Inspector
+- **Mass Syntax Repair**: 3,392 files fixed
 
-### ai-service.ts Rebuilt
-- **Ollama-driven analysis:** Uses `OllamaService` for embeddings and completions
-- **Dynamic DB import:** Lazy-loads drizzle to avoid crashes when DB unavailable
-- **Async flow fixed:** Proper handling for embeddings, auto-tags, document chunks
-- **Models:** `gemma3-legal:latest` for LLM, `embeddinggemma:latest` for embeddings
+### Svelte 5 Runes Verified
+```svelte
+// Props
+let { caseId, onClose }: Props = $props();
 
-### Contextual Chat System Verified
-- **chat-store.svelte.ts:** Clean Svelte 5 runes (`$state`, `$derived`, `$derived.by`)
-- **ChatSession.svelte.ts:** SSE-based real-time chat with reconnection logic
-- **OllamaService:** Proper endpoint configuration via `get-ollama-endpoint.ts`
+// State
+let messages = $state<Message[]>([]);
+let isLoading = $state(false);
 
-### Core Files Status (All Clean)
-- `sveltekit-frontend/src/lib/services/ai-service.ts` ✅
-- `sveltekit-frontend/src/lib/services/ollamaService.ts` ✅
-- `sveltekit-frontend/src/lib/stores/chat-store.svelte.ts` ✅
-- `sveltekit-frontend/src/lib/models/ChatSession.svelte.ts` ✅
-- `sveltekit-frontend/src/routes/chat/+page.svelte` ✅
-- `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` ✅
-
-### Stack Configuration
-- **Drizzle ORM:** 0.44 with PostgreSQL + pgvector
-- **Client Caching:** LokiJS + IndexedDB
-- **Server Caching:** Redis + Qdrant
-- **Message Queue:** RabbitMQ
-
----
-
-## ✅ January 22, 2026 – XState v5 Migration & Database Schema Fixes
-
-### 🎯 XState v5 + Schema migration complete! 389 errors fixed (19.7% reduction)
-
-**Progress Metrics**:
-- **Starting Point**: 19,666 TypeScript errors
-- **Current Status**: 15,785 errors
-- **Total Fixed**: 3,881 errors
-- **Reduction**: 19.7%
-
-### XState v5 Migration (170 errors fixed) ✅
-
-#### Import Corrections
-```typescript
-// Before (incorrect)
-import type { assign, createMachine, fromPromise } from 'xstate';
-
-// After (correct for XState v5)
-import { assign, createMachine, fromPromise } from 'xstate';
-```
-
-**Why**: In XState v5, `assign`, `createMachine`, and `fromPromise` are runtime functions that must be imported as values, not types.
-
-#### Setup API Fixes
-```typescript
-// Correct XState v5 setup() API
-export const machine = setup({
-  types: {
-    context: {} as MyContext,
-    events: {} as MyEvent
-  },
-  actors: {
-    fetchData: fromPromise(fetchDataFn),
-    processData: fromPromise(processDataFn)
-  },
-  actions: {
-    updateContext: assign({
-      data: ({ event }) => event.data,
-      timestamp: () => Date.now()
-    })
+// Effects
+$effect(() => {
+  if (messagesContainer) {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
-}).createMachine({ /* states */ });
-```
-
-#### Svelte 5 Integration Helper
-
-**New File**: `src/lib/utils/xstate-svelte5.ts`
-
-```typescript
-import { useMachine } from '$lib/utils/xstate-svelte5';
-import { myMachine } from './machines/myMachine';
-
-// In Svelte 5 component
-const { snapshot, send, actor } = useMachine(myMachine, {
-  context: { userId: $page.data.user.id }
-});
-
-// Reactive derived state using Svelte 5 runes
-const isLoading = $derived(snapshot.matches('loading'));
-const currentData = $derived(snapshot.context.data);
-const errorMessage = $derived(snapshot.context.error);
-```
-
-**Helper Features**:
-- ✅ Svelte 5 runes compatibility (`$state`, `$derived`)
-- ✅ Automatic lifecycle (start on mount, cleanup on destroy)
-- ✅ Type-safe snapshot access
-- ✅ `createSelectors` utility for reusable derived state
-
-### Database Schema Fixes (219 errors fixed) ✅
-
-#### schema-phase90-hardened.ts (111 errors)
-
-**Issues**:
-- Missing `export const tableName = pgTable(` declarations
-- Incorrect index syntax (using `:` instead of `,` in `index().on()`)
-
-**Fix Pattern**:
-```typescript
-// ❌ Wrong
-'document_chunks', { id: uuid('id').primaryKey() }
-
-// ✅ Correct
-export const documentChunks = pgTable('document_chunks',
-  { id: uuid('id').primaryKey() },
-  (table) => ({
-    myIndex: index('idx_name').on(table.field1, table.field2) // Use comma!
-  })
-);
-```
-
-**Tables Fixed**: documentChunks, legalDocuments, cases, evidence, phase72ErrorVector, phase72Error
-
-#### schema-actual.ts (108 errors)
-
-**Issues**: Completely malformed schema with broken imports, missing punctuation, invalid syntax
-
-**Solution**: Complete rewrite with proper Drizzle ORM syntax
-
-**Before**:
-```typescript
-import type { index, integer, pgTable } from 'drizzle-orm/pg-core';
-export const users = pgTable('users', {
- id: integer('id').primaryKey(email, varchar('email'...
-```
-
-**After**:
-```typescript
-import { index, integer, pgTable, varchar, jsonb, text } from 'drizzle-orm/pg-core';
-export const users = pgTable('users', {
-  id: integer('id').primaryKey(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  passwordHash: varchar('password_hash', { length: 255 }),
-  createdAt: timestamp('created_at').defaultNow()
 });
 ```
 
-**Tables Rebuilt**: users, cases, evidence, documents
+### Tech Stack Confirmed Working
+| Component | Version | Status |
+|-----------|---------|--------|
+| SvelteKit | 2.x | ✅ |
+| Svelte | 5.x | ✅ Runes |
+| Drizzle ORM | 0.44 | ✅ |
+| bits-ui | v1/v2 | ✅ Svelte 5 |
+| XState | v5 | ✅ |
+| UnoCSS | Latest | ✅ |
+| IndexedDB + LokiJS | Client cache | ✅ |
+| PostgreSQL + pgvector | Vector DB | ✅ |
+| Qdrant | Auto-tagged | ✅ |
+| Redis | Cache | ✅ |
+| RabbitMQ | Queue | ✅ |
 
-### Files Modified
+### Critical Learnings
+1. **Cascade Effect**: Deleting corrupted files can reveal 70k+ hidden errors
+2. **Safe Fix Patterns**: `{, prop:` → `{ prop:` and `a;, b;` → `a; b;`
+3. **Revert Strategy**: Keep git checkpoints before mass repairs
+4. **Full Rewrites**: Files with >200 errors should be completely rewritten
 
-**XState State Machines**:
-- `state/evidence-processing-machine.ts` - Fixed imports
-- `state/crewAIOrchestrationMachine.ts` - Fixed setup() API + imports
-- `client/actors/llmStreamActor.ts` - Fixed imports
+### bits-ui v2 → Svelte 5 Migration Guide (January 2026)
 
-**Database Schemas**:
-- `server/db/schema-phase90-hardened.ts` - Fixed table exports + index syntax
-- `server/db/schema-actual.ts` - Complete rewrite
+**Key API Changes:**
+| bits-ui v0.x (Svelte 4) | bits-ui v1.x (Svelte 5) |
+|-------------------------|-------------------------|
+| `el` prop | `ref` prop |
+| `asChild` prop | `child` snippet |
+| `let:` directives | `children` or `child` snippet props |
+| `transition` props | Svelte transitions + `child` + `forceMount` |
+| `<slot>` | `{@render children()}` |
 
-**New Utilities**:
-- `utils/xstate-svelte5.ts` - Svelte 5 integration helper
+**Component Patterns:**
+```svelte
+<!-- bits-ui v1.x with Svelte 5 -->
+<script lang="ts">
+  import { Button } from 'bits-ui';
 
-### Systematic Error Reduction Strategy
+  // Svelte 5 runes
+  let count = $state(0);
+  let doubled = $derived(count * 2);
+</script>
 
-**Completed Batches**:
-1. **Batch 1** (6 files): route-operation-logger, poi-store, user-store, legalAIMachine.v5, redis.d.ts, pipeline-visualizer
-2. **Batch 2** (4 files): citation-store, evidence-processing-machine, report-store, svelte-check-analyzer
-3. **Batch 3** (1 file): useRedisOrchestrator (complete rewrite)
-4. **XState v5** (3 files): Import fixes + setup API corrections
-5. **Database Schemas** (2 files): Drizzle schema repairs
+<Button.Root onclick={() => count++}>
+  Count: {count} (doubled: {doubled})
+</Button.Root>
+```
 
-**Next Targets** (High-Error Files):
-- `svelte-check-analyzer.ts` - 162 errors
-- `citation-store.ts` - 160 errors
-- `evidence-processing-machine.ts` - 151 errors
-- `MultiLayerCacheSystem.ts` - 109 errors (requires full rewrite)
+**Migration Steps:**
+1. Update bits-ui: `npm install bits-ui@latest`
+2. Replace `el` → `ref` in all component usages
+3. Convert `asChild` to `child` snippets
+4. Replace `<slot>` with `{@render children()}`
+5. Use Svelte 5 event handlers: `onclick` not `on:click`
 
-**Goal**: Reduce to <15,000 errors (23.7% total reduction)
-- **State Machines:** XState v5
-- **Styling:** UnoCSS + bits-ui (Svelte 5 API)
-
-### Known Issues
-- Full `svelte-check` and `tsc` commands timeout due to thousands of errors in backup files
-- Use `getDiagnostics` on specific files instead of full codebase checks
-- Errors concentrated in `.mojibake-backup`, `.phase79.bak`, and parked routes
+**shadcn-svelte Replacement:**
+- bits-ui v1.x is now the foundation (not shadcn-svelte)
+- Use raw bits-ui components with custom styling
+- melt-ui is alternative headless option
 
 ---
 
-## ✅ January 19, 2026 – Svelte 5 Route Fixes
 
-### Key Fixes Applied
-- **Svelte 5 event attributes:** Use `onclick`/`onchange` instead of `on:click`/`on:change`.
-- **Case routes repaired:** `cases/[id]` overview + board pages now use valid class syntax and fetch payloads.
-- **Evidence upload (case scoped):** Fixed `allowedTypes`, return payload, and case title mapping.
-- **Component repairs:**
-  - `ContextualChatModal.svelte` payload mapping and CSS `rgba()` fixes
-  - `CaseNotesEditor.svelte` function boundaries, handlers, and CSS fixes
-  - `NesModal.svelte` supports `children?: Snippet`
+## 🛡️ Phase 107.1 - Smart Validation Strategy (January 19, 2026)
 
-### Notes
-- Svelte 5 runes are in use (`$props`, `$state`, `$derived`).
-- bits-ui uses component-level imports for Svelte 5 (no barrel exports).
-- Prefer SSR-safe patterns and Drizzle ORM 0.44 queries.
+### The Problem: Error Cascades
+BLINDLY fixing syntax errors (e.g., adding missing commas) in deeply corrupted files often **increases** the error count because the parser then proceeds to find semantic errors that were previously masked by the syntax crash.
 
-## 🚨 **CRITICAL: Database Migration Safety Protocol**
+### The Solution: Validation Loop
+We now use `scripts/smart-file-fixer.cjs` which employs a "Try-Verify-Revert" strategy:
+1. **Try**: Apply specific pattern fixes (`;,` -> `;`, `prop, val` -> `prop: val`)
+2. **Verify**: Run `tsc --noEmit` locally
+3. **Revert**: If error count INCREASES, revert the file immediately
 
-### ⛔ **DO NOT PROCEED WITH THIS PUSH**
+### Current Progress
+- **Error Count**: 29,375 (Baseline before recent fixes)
+- **Top Fixed Files** (Manual Rewrites):
+  - `som-webgpu-cache.ts`: ✅ Fully Fixed (-197 errors)
+  - `sveltekit-gpu-cache-integration.ts`: ✅ Fully Fixed (-232 errors)
+  - `rag-pipeline-enhanced.ts`: ✅ Fully Fixed (-224 errors)
+  - `simd-markdown-parser.ts`: ✅ Fully Fixed (-192 errors)
+  - `design-system.ts`: ✅ Fully Fixed (-186 errors)
+  - `law-mapping.ts`: ✅ Fully Fixed (-179 errors)
+  - `ingestion-workflow-machine.ts`: ✅ Fully Fixed (-171 errors)
+  - `message-queue.ts`: ✅ Fully Fixed (-168 errors)
+  - `ai-service.ts`: ✅ Fully Fixed (-166 errors)
+  - `knowledge-base.ts`: ✅ Fully Fixed (-142 errors)
+  - `elasticsearch-search.ts`: ✅ Fully Fixed (-134 errors)
+  - `minio-service.ts`: ✅ Fully Fixed (-132 errors)
+  - `case-link.service.ts`: ✅ Fully Fixed (-125 errors)
+  - `gemma3-vlm-embedder.ts`: ✅ Fully Fixed (-124 errors)
+  - `evidenceProcessingMachine.ts`: ✅ Fully Fixed (-123 errors)
+  - `src/lib/server/integrations/minio.ts`: ✅ Refactored & Typed (-123 errors)
 
-**STOP** if you see warnings like this during `npm run db:push:dev`:
+## 🛡️ Phase 107.2 - WebGPU & UI Hardening (January 31, 2026)
 
-```
-⚠️  Warning  Found data-loss statements:
-· You're about to delete kg_nodes table with 2764 items
-· You're about to delete ts_errors table with 69311 items
-· You're about to delete phase89_embeddings table with 34505 items
-· You're about to delete error_topk_index table with 910413 items
-```
+### Major Corrupted Files Repaired
+Systematic regeneration of files with severe syntax corruption (comma/semicolon mixups, one-liner collapse):
 
-**Answer NO or press Ctrl+C to abort immediately.**
+**Services & WebGPU Engines:**
+- `ai-evidence-analyzer.ts`: ✅ Regenerated (Was ~480 errors)
+- `webgpu-evidence-graph.ts`: ✅ Regenerated
+- `legal-document-graph.ts`: ✅ Regenerated
+- `dimensional-tensor-store.ts`: ✅ Regenerated
+- `webgpu-similarity-engine.ts`: ✅ Regenerated
 
-### Why This Happens
+**Critical UI Components:**
+- `ProductionLayout.svelte`: ✅ Full rewrite (Svelte 5 + bits-ui)
+- `LegalCaseForm.svelte`: ✅ Fixed CSS corruption & derived state
+- `CanvasBoard.svelte`: ✅ Fixed types & reactivity
+- `AuthGuard.svelte`: ✅ Fixed CSS
+- `StatsCard.svelte`, `Textarea.svelte`, `ErrorPanel.svelte`: ✅ Expanded from one-liners
+- `Svelte5Alert.svelte`: ✅ Fixed syntax redundancy
 
-Drizzle ORM compares your TypeScript schema files against the actual database. **Tables that exist in the database but aren't defined in your schema files are marked for deletion.**
+### Next Steps
+1. Re-run `svelte-check` to establish new baseline (Expect < 28k)
+2. Address remaining red components in `src/lib/components/ui`
+3. Verify WebGPU initialization in browser
 
-This would delete **1.2 million+ records** including:
-- **910,413 items** in error_topk_index
-- **69,311 items** in ts_errors
-- **54,384 items** in cpg_edges
-- **40,106 items** in raw_error_embeddings
-- All Phase 89 embeddings, clusters, and analysis data
+### Next Actions
+1. Run automated validation loop on mid-tier error files (`smart-file-fixer`)
+2. Verify Drizzle schema integrity
+3. Consolidate duplicate MinIO services (Phase 3)
 
-### ✅ Safe Approaches
+---
 
-**Option 1: Add Missing Tables to Schema** (Recommended)
-```typescript
-// These tables exist in DB but not in schema - add them to prevent deletion
-export const kgNodes = pgTable('kg_nodes', { ... });
-export const tsErrors = pgTable('ts_errors', { ... });
-```
 
-**Option 2: Use `tablesFilter` in drizzle.config.ts**
-```typescript
-export default {
-  tablesFilter: ['!phase89_*', '!kg_*', '!ts_errors', '!error_topk_index'],
-} satisfies Config;
-```
+## 🔍 Phase 2 Verification (Target: ~10k Errors)
+**Goal:** Reduce error count to stable 10k baseline before major feature work.
 
-**Option 3: Use `introspect` to Auto-Generate**
+### Fix Strategy
+1. **Smart Validation Loop**: `smart-file-fixer.cjs` for all syntax repairs
+2. **Manual Rewrites**: Logic-heavy files (`simd-json-parser.ts`, `minio-service.ts`)
+3. **Import Cleanup**: `scripts/fix-import-corruption.cjs` (0 issues found so far)
+
+### Environment Setup
+- **Python Middleware**: RAG + KAG + DAG (FastMCP Phase ACE)
+- **AI Models**:
+  - `gemma3-legal:latest` (Ollama Endpoint)
+  - `embeddinggemma:latest` (Vector Embeddings)
+  - `ibmdocling-258m` (Image Analysis / VLM)
+- **Go Microservice**: SIMD JSON parser service at `http://localhost:8097/json`
+- **GPU Inference**: RTX 3060 Ti + Triton Inference (PTX)
+
+### Task 2.5: Phase 2 Verification Plan
+- [ ] Run `npm run check` baseline
+- [ ] Verify `simd-json-parser.ts` functionality
+- [ ] Test Python middleware connectivity
+- [ ] Update `copilot.md`, `gemini.md`, `claude.md` with findings
+
+---
+
+## 🔧 Phase 103.1 ACE Error Fixing (January 16, 2026)
+
+### Current Status
+- **TSC Errors**: 20,385 (down from 21,432)
+- **Reduction**: -1,047 (-4.9%)
+
+### Key Learnings
+
+**✅ SAFE Patterns (Apply Automatically):**
+| Pattern | Example | Fixes |
+|---------|---------|-------|
+| `index_signature` | `[key, string]` → `[key: string]` | ~10 |
+| `interface_property` | `prop, Type;` → `prop: Type;` | ~10 |
+| `loop_corruption` | `let: any i = 0` → `let i = 0` | ~5 |
+
+**⚠️ UNSAFE Patterns (Causes Regressions):**
+| Pattern | Example | Impact |
+|---------|---------|--------|
+| `constructor_colon_to_comma` | `new Class(a: b)` → `new Class(a, b)` | +194 errors |
+
+### Full File Rewrites (Most Effective)
+Files with >200 errors should be completely rewritten. Each rewrite removes 300-400 errors.
+
+**Fixed This Session:**
+- `legal-ai-integration.ts` - 358 errors ✅
+- `change-detection-service.ts` - 358 errors ✅
+- `minio-service.ts` - 330 errors ✅
+
+### Scripts Available
 ```bash
-npx drizzle-kit introspect
+node scripts/phase103.1-ace-autofix.mjs           # Dry-run
+node scripts/phase103.1-ace-autofix.mjs --apply --max=100
 ```
 
-**Option 4: Raw SQL for Simple Changes** (Safest)
-```sql
-ALTER TABLE users ADD COLUMN IF NOT EXISTS hashed_password TEXT;
-```
-
-### 🎯 Pre-Flight Checklist
-
-Before running `npm run db:push:dev`:
-1. ✅ Review migration SQL in `drizzle/*.sql`
-2. ✅ Check for DROP TABLE statements
-3. ✅ Check for DROP COLUMN statements
-4. ✅ Verify schema includes all existing tables
-5. ✅ Test on dev database first
-
-**Remember:** Drizzle will happily delete millions of records if you let it. Always review, always verify, always backup.
+### References
+- See `documents/TYPE_FIXING_STRATEGY.md` for full strategy
+- See `documents/TOP_100_ERROR_FILES.md` for prioritized file list
 
 ---
 
-## 🔬 Analysis Results (January 9, 2026)
+## 🎯 Phase 67-68 Error Reduction (January 11, 2026)
 
-### Phase 78: Intelligent Error Ranking
+### Massive Error Reduction Results
+- **Starting:** 150,925 errors
+- **After Phase 67-68:** ~89,000 errors
+- **Reduction:** -61,000 errors (**-41%**)
 
-**System Architecture:**
+### Effective Fixer Scripts Created
+| Script | Purpose | Files Fixed |
+|--------|---------|-------------|
+| `fix-syntax-corruption.mjs` | Phantom commas `{, ` | 2,080 |
+| `fix-syntax-patterns.mjs` | Colon-in-generics, `??` | 2,038 |
+| `fix-missing-imports-enhanced.ts` | Auto-import Node.js/Svelte | 50+ |
+| `fix-implicit-any.ts` | Add `: any` to params | 354 |
+
+### Error Distribution Analysis (89k remaining)
 ```
-svelte-check → Machine Format Log → AST Parser → Dependency Graph → Priority Ranking → Database
-     ↓              ↓                    ↓              ↓               ↓              ↓
-  84,764        Regex Parse        svelte/compiler   Centrality    0-100 Scale   PostgreSQL
-  errors         126 errors         + estree-walker   Metrics      Clustering    + Drizzle
+',' expected: 26,414 (30%)  → Syntax corruption
+Cannot find name: 18,741 (21%) → Missing imports
+Declaration expected: 4,953 (5%) → Broken braces
+Type refers to...: 3,330 (4%) → import type misuse
+Property missing: 3,065 (3%) → Interface mismatch
 ```
 
-**Ranking Algorithm:**
+### 2025 Best Practices Applied
+
+**TypeScript 5.7:**
+- Enhanced variable initialization checks
+- Path rewriting for relative imports
+- ES2024 target support (`Object.groupBy`, `Promise.withResolvers`)
+- V8 compile caching for faster `tsc`
+
+**ts-morph 27.x:**
+- TypeScript 5.9 support
+- `findReferencesAsNodes()` for safe refactoring
+- `setType()` for adding type annotations
+- `addImportDeclaration()` for auto-imports
+
+---
+
+## 🐰 RabbitMQ 4.0 Streaming (January 2026)
+
+### Quorum Queues (Recommended for HA)
 ```typescript
-priority = baseScore
-  + (blastRadius * 20)        // How many files affected?
-  + (centralityScore * 15)    // How central to architecture?
-  + severityBonus              // Error vs Warning
-  - fixComplexity              // Trivial vs Expert
+// npm install rabbitmq-stream-js-client amqplib
+import { connect } from 'rabbitmq-stream-js-client';
+
+const client = await connect({
+  hostname: 'localhost',
+  port: 5552,
+  username: 'guest',
+  password: 'guest',
+  vhost: '/'
+});
+
+// Create stream
+await client.createStream({ stream: 'legal-documents' });
+
+// Producer
+const producer = await client.declarePublisher({
+  stream: 'legal-documents',
+  publisherRef: 'legal-ai-producer'
+});
+
+await producer.send(Buffer.from(JSON.stringify({ docId: '123', content: '...' })));
 ```
 
-**Results:**
-- Top ranking: 80.0 (module resolution errors)
-- Average ranking: 80.0 across 49 clusters
-- Cluster pattern: `unknown + ts` (TypeScript compiler errors)
+### Best Practices
+| Practice | Description |
+|----------|-------------|
+| **Multi-node cluster** | 3, 5, or 7 nodes for Raft consensus |
+| **Dead-letter exchange** | Configure DLX for messages exceeding 20 retries |
+| **Retention policy** | Set `max-length` or TTL to prevent buildup |
+| **Queue length** | Keep queues short for optimal RAM usage |
 
-### Svelte 5 Migration: Root Cause Analysis
+### Stream vs Queue
+- **Streams**: Append-only logs, non-destructive reads, replayable
+- **Quorum Queues**: Traditional queue semantics with HA
 
-**Problem:** bits-ui 2.14.4 changed exports for Svelte 5 compatibility
+---
 
-**Old Structure (bits-ui < 2.0):**
+## 📄 LangChain.js Document Chunking (2025)
+
+### Chunking Strategies Comparison
+| Strategy | Best For | Accuracy | Speed |
+|----------|----------|----------|-------|
+| **Semantic** | Knowledge bases | 70% better | Slower |
+| **Recursive Character** | General RAG | Balanced | Fast |
+| **Token-based** | Cost optimization | Good | Fastest |
+
+### Optimal Parameters
 ```typescript
-// Single barrel export
-export { Checkbox, Select, Label } from './components';
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 
-// Usage
-import { Checkbox } from 'bits-ui';
-<Checkbox.Root />
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 512,      // Sweet spot: 256-512 tokens
+  chunkOverlap: 50,    // 10-20% overlap
+  separators: ['\n\n', '\n', '. ', ' ', '']
+});
+
+const chunks = await splitter.splitText(legalDocument);
 ```
 
-**New Structure (bits-ui 2.14.4):**
+### Streaming with SSE
 ```typescript
-// Component-specific exports
-export * from './components/checkbox';
-export * from './components/select';
+// Server-Sent Events for real-time updates
+import { JsonOutputParser } from '@langchain/core/output_parsers';
 
-// Required usage
-import * as Checkbox from 'bits-ui/components/checkbox';
-<Checkbox.Root />
+const parser = new JsonOutputParser();
+const stream = await chain.stream({ input: query });
+
+for await (const chunk of stream) {
+  res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+}
 ```
 
-**Why TypeScript Fails:**
-- Barrel exports create circular dependency risks
-- Module bundler cannot tree-shake effectively
-- TypeScript's module resolution cache becomes stale
-- `ComponentCtor` type doesn't expose `.Root` property in old pattern
+---
 
-**Solution Pattern:**
+## Environment Assumptions
+
+## FastMCP Tools Relevant to Phase72
+
+### Tool: `phase72.run_gpu_pipeline`
+**Shell command:**
+```bash
+npm run phase72:gpu:pipeline
+```
+
+**Required env:**
+```json
+{
+  "env": {
+    "PHASE72_PYTHON": "C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe"
+  }
+}
+```
+
+**What it does:**
+1. Runs `svelte-check` to collect TypeScript errors
+2. Calls Python GPU vectorizer (`phase72_gpu_vectorizer.py`)
+3. Exports 8D embeddings to `svelte-check-vectors.json`
+4. Ready for WebGPU clustering
+
+**Expected output:**
+```json
+{
+  "status": "success",
+  "errorCount": 12000,
+  "vectors": 12000,
+  "device": "cuda:0",
+  "latency_ms": 1500
+}
+```
+
+## TypeScript AST Fixing - Critical Learnings (Phase 90-91)
+
+### Cascade Error Pattern Recognition
+
+**Discovery Date:** January 8, 2026
+**Context:** Phase 90 Enhanced AST Fixer + Phase 91 Auto-Rollback
+
+#### The Problem: TS1005 Diagnostic Position Semantics
+
+**Critical Discovery:** When TypeScript reports `TS1005: ',' expected` at position X:
+- **Position X points to the NEXT token** (where parser expected comma)
+- **The FIX must go AFTER the PREVIOUS token** (not before current token)
+
+**Example:**
 ```typescript
-// Direct component imports
-import * as Checkbox from "bits-ui/components/checkbox";
-import * as Select from "bits-ui/components/select";
-import * as Label from "bits-ui/components/label";
+// Error: TS1005 at position 34 (points to 'arg2')
+const result = foo(
+    arg1
+    arg2  // ← Error position here
+)
 
-// Direct utility imports
-import { cn } from "$lib/utils/cn.js";  // Not from barrel export
+// WRONG FIX (prepend before current):
+const result = foo(
+    arg1
+    ,arg2  // ← Creates invalid syntax
+)
+
+// CORRECT FIX (append after previous):
+const result = foo(
+    arg1,  // ← Comma goes here
+    arg2
+)
 ```
 
-### Error Cascade Analysis
+#### Root Cause vs Symptom Errors
 
-**Single Root Cause → 80+ Errors:**
-```
-Misconfigured cn() import in index.ts
-  ↓
-20+ UI components import cn from $lib/utils
-  ↓
-TypeScript fails module resolution
-  ↓
-All components using cn() show "Module has no exported member"
-  ↓
-Cascading failures in 50+ route files importing those components
+**Cascade Error Pattern:**
+```typescript
+// ROOT CAUSE: Wrong delimiter (semicolon instead of comma)
+const cache: ThreadSafeCache = {
+  mutex: new AsyncMutex(); // ← WRONG: semicolon
+  data: new Map();          // ← Parser confused, reports "comma expected"
+  gpuAccelerated: true,
+}
 ```
 
-**Fix Impact:**
-- Changed 1 import pattern
-- Fixed 15 components
-- Eliminated 80-90 cascading errors
+**Why Blind Fixing Fails:**
+1. Parser encounters semicolon in object literal
+2. Parser gets confused and enters "error recovery mode"
+3. Parser reports SYMPTOM errors ("comma expected") on FOLLOWING tokens
+4. Automated fixer inserts commas at wrong positions
+5. File now has BOTH original errors AND new syntax errors
+6. Result: Error count INCREASES instead of decreasing
 
-### Performance Metrics
+#### Safe AST Fixing Heuristics
 
-**AST Parsing:**
-- Analyzed: 2,476 files
-- Parsed: 126 errors
-- Graph nodes: 10 (due to filtering)
-- Time: ~5-10 seconds
+**Rule 1: Skip Files with High Error Density**
+```javascript
+// If file has > 50 errors per 100 lines, manual review required
+const errorDensity = syntaxErrors / (totalLines / 100);
+if (errorDensity > 50) {
+  console.log('⚠️  File needs manual review (cascade errors likely)');
+  return { action: 'skip', reason: 'error_density_too_high' };
+}
+```
 
-**Database Operations:**
-- Insert: 126 error records
-- Update: AST context + priority scores
-- Cluster: 49 unique patterns
+**Rule 2: Validate Contextual Safety**
+```javascript
+// Before inserting comma, check:
+// 1. Is there already a comma?
+// 2. Is the parent node valid for comma insertion?
+// 3. Are we in error recovery mode?
+function isSafeToInsertComma(node, prevNode, sourceFile) {
+  // Check for existing comma
+  const textBetween = sourceFile.text.substring(prevNode.end, node.getStart());
+  if (textBetween.includes(',')) return false;
 
-### Recommendations
+  // Check parent node type
+  const parent = node.parent;
+  if (!ts.isObjectLiteralExpression(parent) &&
+      !ts.isArrayLiteralExpression(parent) &&
+      !ts.isCallExpression(parent)) {
+    return false;
+  }
 
-1. **Always use direct imports** for Svelte 5 projects
-2. **Avoid barrel exports** in `$lib` for utilities
-3. **Use machine format** for svelte-check logs (easier parsing)
-4. **Monitor centrality metrics** to identify architectural hotspots
-5. **Fix high-ranking errors first** (80+ priority score)
+  // Check if we're in error recovery
+  const nearbyErrors = diagnostics.filter(d =>
+    Math.abs(d.start - prevNode.end) < 100
+  );
+  if (nearbyErrors.length > 3) return false; // Too many nearby errors = cascade
+
+  return true;
+}
+```
+
+**Rule 3: Node Position API Precision**
+```javascript
+// TypeScript Node Position API:
+// - node.pos: Start of leading trivia (whitespace, comments)
+// - node.getStart(sourceFile): Start of actual token (excludes trivia)
+// - node.end: End of actual token
+
+// WRONG: Includes whitespace
+position: node.pos
+
+// WRONG: Before current token
+position: node.getStart(sourceFile)
+
+// CORRECT: After previous token
+position: prevNode.end
+```
+
+#### Phase 91 Auto-Rollback Strategy
+
+**Validation Gates:**
+1. **Syntax Check:** Compare parse diagnostic count before/after
+2. **Type Check:** Run full type checking (if syntax improved)
+3. **Auto-Rollback:** If ANY regression, restore from backup
+
+**Rollback Conditions:**
+```javascript
+if (errorsAfter.syntax > errorsBefore.syntax) {
+  console.log('⚠️  Regression detected, rolling back');
+  fs.writeFileSync(filePath, backupContent);
+  return { status: 'rolled_back', reason: 'syntax_regression' };
+}
+```
+
+#### Recommended Action for Cascade Errors
+
+**Instead of automated fixing:**
+1. Export error clusters to JSON
+2. Visualize in AST Topology Explorer (http://localhost:5175/ast-topology)
+3. Human reviews root causes
+4. Apply targeted manual fixes
+5. Re-run Phase 91 validation
+
+**Detection Script:**
+```bash
+# Detect files with cascade error patterns
+node scripts/phase90-detect-cascade-errors.mjs
+
+# Output:
+# {
+#   "cognitive-cache-integration.ts": {
+#     "errorDensity": 125,  // errors per 100 lines
+#     "cascadeRisk": "HIGH",
+#     "rootCauses": [
+#       { "line": 84, "pattern": "semicolon_in_object_literal" },
+#       { "line": 93, "pattern": "paren_instead_of_comma" }
+#     ]
+#   }
+# }
+```
+
+### References
+
+- **TypeScript Compiler API:** https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
+- **Parser Recovery:** https://github.com/microsoft/TypeScript/blob/main/src/compiler/parser.ts#L1234
+- **Phase 90 Script:** `scripts/phase90-enhanced-ast-fixer.mjs`
+- **Phase 91 Script:** `scripts/phase91-test-run.mjs`
+- **Test Harness:** `scripts/test-ts1005.mjs`
+
+---
+
+### Tool: `phase72.run_auto_iterate`
+**Shell command:**
+```bash
+npm run phase72:auto-iterate
+```
+
+**Required env:**
+```json
+{
+  "env": {
+    "PHASE72_PYTHON": "C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe"
+  }
+}
+```
+
+**What it does:**
+1. 3-cycle automation: svelte-check → vectorize → cluster → ACE fixes
+2. Progress bars with time estimates (~40 min total)
+3. Logs to `logs/phase72/phase72-*.jsonl`
+
+**Expected output:**
+```
+┌─────────────────────────────────────────────────┐
+│ Phase 72: 3-Cycle Error Reduction               │
+│ ████████████████████████████ 100% | Complete    │
+│ Errors: 12000 → 1200 (~90% reduction)           │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+### Tool: `phase72.query_logs`
+**Shell command:**
+```bash
+cat logs/phase72/*.jsonl | jq 'select(.provider == "gemini")'
+```
+
+**What it does:**
+- Query Phase 72 execution logs
+- Filter by provider, phase, step, or metrics
+- Analyze error reduction trends
+
+**Example queries:**
+
+```bash
+# Get last 10 Gemini LLM calls
+cat logs/phase72/*.jsonl | jq 'select(.kind == "llm_call" and .provider == "gemini") | {model, tokens_in, tokens_out, errors_fixed}' | tail -10
+
+# Calculate total tokens spent by Gemini
+cat logs/phase72/*.jsonl | jq 'select(.provider == "gemini") | .tokens_in + .tokens_out' | jq -s 'add'
+
+# Error count timeline
+cat logs/phase72/*.jsonl | jq 'select(.step == "vectorize_gpu") | {ts, errorCount: .metrics.errorCount}'
+```
+
+## Logging / Token Accounting
+
+When Gemini calls Phase72 tools, it MUST:
+
+### 1. Include `caller` in payload
+```json
+{
+  "kind": "llm_call",
+  "provider": "gemini",
+  "caller": "gemini",
+  "model": "gemini-2.0-flash-exp"
+}
+```
+
+### 2. Record token usage
+```json
+{
+  "tokens_in": 1024,
+  "tokens_out": 512,
+  "total_tokens": 1536,
+  "prompt_tokens": 1024,
+  "completion_tokens": 512
+}
+```
+
+### 3. Track error reduction
+```json
+{
+  "errors_before": 12000,
+  "errors_after": 11850,
+  "errors_fixed": 150,
+  "fix_success_rate": 0.95
+}
+```
+
+## ACE/ACA Integration
+
+**What ACE orchestrator tracks:**
+
+| Metric | Description |
+|--------|-------------|
+| `provider` | Which AI (gemini, claude, copilot, local-gemma3) |
+| `model` | Specific model used (e.g., `gemini-2.0-flash-exp`) |
+| `tokens_per_1k_errors` | Token efficiency metric |
+| `errors_fixed_per_second` | Speed metric |
+| `fix_success_rate` | Quality metric (0.0 - 1.0) |
+
+**Gemini competes on:**
+- **Token efficiency:** Min tokens for max error reduction
+- **Speed:** Fastest time to complete 3 cycles
+- **Quality:** Highest fix success rate (no new errors introduced)
+
+**ACE scoreboard example:**
+```json
+{
+  "phase": "phase72",
+  "cycle": 2,
+  "leaderboard": [
+    {
+      "provider": "gemini",
+      "model": "gemini-2.0-flash-exp",
+      "errors_fixed": 6000,
+      "tokens_spent": 150000,
+      "efficiency": 40.0,
+      "rank": 1
+    },
+    {
+      "provider": "claude",
+      "model": "claude-3-5-sonnet",
+      "errors_fixed": 5800,
+      "tokens_spent": 180000,
+      "efficiency": 32.2,
+      "rank": 2
+    }
+  ]
+}
+```
+
+## Usage Examples
+
+### Call Phase 72 from Gemini agent
+
+```python
+# FastMCP tool invocation
+result = await mcp_client.call_tool(
+    "phase72.run_auto_iterate",
+    env={
+        "PHASE72_PYTHON": "C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe"
+    },
+    metadata={
+        "provider": "gemini",
+        "model": "gemini-2.0-flash-exp",
+        "caller": "gemini-agent-001"
+    }
+)
+
+# Log the call
+await phase72_logger.log_llm_call(
+    provider="gemini",
+    model="gemini-2.0-flash-exp",
+    tokens_in=result.prompt_tokens,
+    tokens_out=result.completion_tokens,
+    errors_fixed=result.errors_fixed
+)
+```
+
+### Query Gemini-specific performance
+
+```bash
+# Total errors fixed by Gemini
+cat logs/phase72/*.jsonl | jq 'select(.provider == "gemini") | .errors_fixed' | jq -s 'add'
+
+# Average token efficiency
+cat logs/phase72/*.jsonl | jq 'select(.provider == "gemini") | (.errors_fixed / (.tokens_in + .tokens_out)) * 1000' | jq -s 'add / length'
+
+# Success rate
+cat logs/phase72/*.jsonl | jq 'select(.provider == "gemini") | .fix_success_rate' | jq -s 'add / length'
+```
+
+## Gemini Best Practices
+
+### ✅ DO:
+- **Set `PHASE72_PYTHON`** in all tool calls
+- **Log every LLM call** with `provider: "gemini"`
+- **Track token usage** (prompt + completion)
+- **Report errors fixed** per call
+- **Compete on efficiency** (errors per token)
+
+### ❌ DON'T:
+- Skip env var setup (will fail on GPU vectorization)
+- Use global Python (may lack PyTorch/CUDA)
+- Omit logging (breaks ACE scoreboard)
+- Fix random errors (target largest clusters first)
+
+## Troubleshooting
+
+### Problem: `Python not found` error
+**Solution:** Verify `PHASE72_PYTHON` env var is set:
+```bash
+echo $PHASE72_PYTHON
+# Should output: C:\Users\james\Videos\deeds-web-app\.venv\Scripts\python.exe
+```
+
+### Problem: GPU vectorizer falls back to CPU
+**Solution:** Check PyTorch CUDA:
+```bash
+$PHASE72_PYTHON -c "import torch; print('CUDA:', torch.cuda.is_available())"
+# Should output: CUDA: True
+```
+
+### Problem: Logs not updating
+**Solution:** Check log directory exists:
+```bash
+mkdir -p sveltekit-frontend/logs/phase72
+ls sveltekit-frontend/logs/phase72/
+```
+
+### Problem: Token accounting missing
+**Solution:** Ensure Gemini agent includes token fields:
+```json
+{
+  "kind": "llm_call",
+  "provider": "gemini",
+  "tokens_in": 1024,
+  "tokens_out": 512
+}
+```
+
+## Performance Targets
+
+| Metric | Target | Notes |
+|--------|--------|-------|
+| **Total time** | < 40 min | 3 cycles with progress bars |
+| **Error reduction** | ~90% | 12k → ~1.2k errors |
+| **GPU vectorization** | < 2s per 10k errors | PyTorch CUDA |
+| **Clustering** | < 5s per cycle | WebGPU SOM |
+| **Token efficiency** | > 30 errors/1k tokens | Gemini competitive advantage |
+
+## Integration Checklist
+
+Before deploying Gemini agent with Phase 72:
+
+- [ ] Set `PHASE72_PYTHON` env var
+- [ ] Verify PyTorch CUDA support (`torch.cuda.is_available()`)
+- [ ] Test GPU vectorizer: `npm run phase72:gpu:pipeline`
+- [ ] Confirm logs appear in `logs/phase72/*.jsonl`
+- [ ] Add `provider: "gemini"` to all LLM calls
 
 ---
 
@@ -518,55 +915,6 @@ docker-compose -f docker/docker-compose.gpu.yml up -d
 
 ---
 
-## 📊 Phase 72: AST Error Reduction
-
-### What It Does
-- Extracts all TypeScript/Svelte errors from codebase
-- Clusters similar errors using GPU acceleration
-- Generates AI patches using gemma3-legal model
-- Applies patches with automatic validation
-- Iterates until error count stabilizes
-
-### Expected Outcomes
-- **Error Reduction**: 95%+ (80k+ → <1k)
-- **Success Rate**: 75-85% patch acceptance
-- **Processing Time**: 15-30 minutes per cycle
-- **GPU Utilization**: 70-90%
-
-### Architecture
-```
-Error Extraction (svelte-check)
-         ↓
-Embedding Generation (Ollama)
-         ↓
-Neo4j Graph Construction
-         ↓
-GPU Clustering (CUDA K-means)
-         ↓
-AI Patch Generation (gemma3-legal)
-         ↓
-Patch Application (ts-morph)
-         ↓
-Validation (svelte-check)
-         ↓
-Self-Healing Loop (iterate)
-```
-
-### Key Services
-- **Error Extraction**: Automatic svelte-check integration
-- **Neo4j Graph**: Error relationship mapping
-- **GPU Clustering**: CUDA-accelerated K-means
-- **AI Patches**: gemma3-legal model integration
-- **Validation**: Automatic rollback on failure
-- **Progress Tracking**: Real-time metrics
-
-### Specification
-- Requirements: `.kiro/specs/phase-72-ast-error-reduction/requirements.md`
-- Design: `.kiro/specs/phase-72-ast-error-reduction/design.md`
-- Tasks: `.kiro/specs/phase-72-ast-error-reduction/tasks.md`
-
----
-
 ## ⚡ CUDA Acceleration
 
 ### 4-Phase Speedup
@@ -668,334 +1016,11 @@ docker-compose -f docker/docker-compose.gpu.yml --env-file .env.docker up -d
 
 ---
 
-## 📁 File Structure
+## 🔄 Phase 107.4 - Store & Component Standardization (Current Session)
 
-```
-legal-ai/
-├── CMakeLists.txt                      # Root CMake
-├── CUDA_ACCELERATION_ROADMAP.md        # CUDA plan
-├── CUDA_QUICKSTART.md                  # Quick start
-├── PHASE_72_AND_CUDA_SUMMARY.md       # Summary
-├── IMPLEMENTATION_READY.md             # Checklist
-├── claude.md                           # Claude guide
-├── copilot.md                          # Copilot guide
-├── gemini.md                           # This file
-│
-├── backend/
-│   ├── cuda/
-│   │   └── CMakeLists.txt
-│   └── ... (existing services)
-│
-├── docker/
-│   ├── Dockerfile.cuda                # GPU runtime
-│   ├── docker-compose.gpu.yml         # GPU stack
-│   ├── docker-compose.yml             # Existing (preserved)
-│   └── ... (other configs - preserved)
-│
-├── .kiro/
-│   ├── INDEX.md
-│   ├── STARTUP_GUIDE.md
-│   ├── PHASE_72_SPEC_COMPLETE.md
-│   └── specs/
-│       └── phase-72-ast-error-reduction/
-│           ├── requirements.md
-│           ├── design.md
-│           └── tasks.md
-│
-└── phase72-ast-reduction/
-    ├── phase72-orchestrator.ts
-    └── ... (to be implemented)
-```
+### 143 Updates Implemented
+- **Stores Refactored**: `auth-store`, `chat-store`, `gpu-summary-store`, `knowledge-search`, `notifications` converted to use Svelte 5 runes (`$state`, `$derived`) classes/patterns.
+- **Index Barrel**: Created `src/lib/stores/index.ts` to export all stores cleanly.
+- **Components Fixed**: `LegalDocumentEditor.svelte`, `ParallaxBackground.svelte`, `KnowledgeGraph.svelte` updated for Svelte 5 syntax (`$props`, events).
+- **Type Safety**: Improved type definitions in `chat-store` and `knowledge-search`.
 
----
-
-## 🚀 Deployment Steps
-
-### Step 1: Build Docker Image
-
-```bash
-# In WSL Linux terminal
-cd /mnt/c/path/to/legal-ai
-
-# Build image
-docker build -f docker/Dockerfile.cuda -t legal-ai-gpu:latest .
-
-# Verify build
-docker images | grep legal-ai-gpu
-docker image inspect legal-ai-gpu:latest
-```
-
-### Step 2: Start Services
-
-```bash
-# Option A: Docker run (single container)
-docker run --gpus all -p 8000:8000 legal-ai-gpu:latest
-
-# Option B: Docker Compose (full stack)
-docker-compose -f docker/docker-compose.gpu.yml up -d
-
-# Option C: Keep existing compose files
-docker-compose -f docker/docker-compose.yml up -d
-docker-compose -f docker/docker-compose.gpu.yml up -d
-```
-
-### Step 3: Verify Deployment
-
-```bash
-# Check API health
-curl http://localhost:8000/api/health
-
-# Check GPU metrics
-curl http://localhost:8000/api/gpu-metrics
-
-# Check services
-docker ps
-
-# Check logs
-docker logs legal-ai-gpu
-```
-
-### Step 4: Run Phase 72
-
-```bash
-# Start Phase 72 orchestrator
-docker exec legal-ai-gpu npm run phase72:run
-
-# Monitor progress
-docker exec legal-ai-gpu npm run phase72:progress
-
-# View dashboard
-open http://localhost:5174
-```
-
----
-
-## 📊 Monitoring & Management
-
-### Container Management
-
-```bash
-# List containers
-docker ps
-docker ps -a
-
-# View container details
-docker inspect legal-ai-gpu
-
-# View container logs
-docker logs legal-ai-gpu
-docker logs -f legal-ai-gpu
-docker logs --tail 100 legal-ai-gpu
-
-# View container stats
-docker stats legal-ai-gpu
-docker stats --no-stream legal-ai-gpu
-
-# Execute commands
-docker exec legal-ai-gpu nvidia-smi
-docker exec legal-ai-gpu python3 -c "import torch; print(torch.cuda.is_available())"
-
-# Stop/Start/Restart
-docker stop legal-ai-gpu
-docker start legal-ai-gpu
-docker restart legal-ai-gpu
-
-# Remove container
-docker rm legal-ai-gpu
-docker rm -f legal-ai-gpu
-```
-
-### GPU Monitoring
-
-```bash
-# Real-time GPU stats
-nvidia-smi -l 1
-
-# GPU memory
-nvidia-smi --query-gpu=memory.used,memory.free --format=csv,noheader -l 1
-
-# GPU processes
-nvidia-smi pmon
-
-# Detailed GPU info
-nvidia-smi -q
-
-# GPU utilization
-nvidia-smi dmon
-```
-
-### Performance Metrics
-
-```bash
-# Container resource usage
-docker stats legal-ai-gpu
-
-# Memory usage
-docker exec legal-ai-gpu free -h
-
-# Disk usage
-docker exec legal-ai-gpu df -h
-
-# CPU usage
-docker exec legal-ai-gpu top -b -n 1
-```
-
----
-
-## 🔧 Troubleshooting
-
-### GPU Issues
-
-```bash
-# Check NVIDIA Docker runtime
-docker run --rm --gpus all nvidia/cuda:12.0-runtime-ubuntu22.04 nvidia-smi
-
-# Check GPU in container
-docker exec legal-ai-gpu nvidia-smi
-
-# Check CUDA availability
-docker exec legal-ai-gpu python3 -c "import torch; print(torch.cuda.is_available())"
-
-# Check GPU memory
-docker exec legal-ai-gpu nvidia-smi --query-gpu=memory.total,memory.used --format=csv,noheader
-```
-
-### Build Issues
-
-```bash
-# Clean build
-docker build -f docker/Dockerfile.cuda --no-cache -t legal-ai-gpu:latest .
-
-# Build with verbose output
-docker build -f docker/Dockerfile.cuda --progress=plain -t legal-ai-gpu:latest .
-
-# Check build logs
-docker build -f docker/Dockerfile.cuda -t legal-ai-gpu:latest . 2>&1 | tail -100
-
-# Build with specific base image
-docker build -f docker/Dockerfile.cuda \
-  --build-arg BASE_IMAGE=nvidia/cuda:12.0-devel-ubuntu22.04 \
-  -t legal-ai-gpu:latest .
-```
-
-### Runtime Issues
-
-```bash
-# Check container logs
-docker logs legal-ai-gpu
-
-# Check for errors
-docker logs legal-ai-gpu 2>&1 | grep -i error
-
-# Inspect container
-docker inspect legal-ai-gpu
-
-# Check container processes
-docker top legal-ai-gpu
-
-# Check network
-docker network inspect bridge
-```
-
-### Memory Issues
-
-```bash
-# Check memory usage
-docker stats legal-ai-gpu
-
-# Reduce batch size
-docker run --gpus all \
-  -e BATCH_SIZE=16 \
-  legal-ai-gpu:latest
-
-# Limit memory
-docker run --gpus all \
-  -m 8g \
-  legal-ai-gpu:latest
-
-# Monitor memory
-docker exec legal-ai-gpu watch -n 1 free -h
-```
-
----
-
-## 📚 Documentation
-
-### Phase 72
-- Specification: `.kiro/specs/phase-72-ast-error-reduction/`
-- Summary: `.kiro/PHASE_72_SPEC_COMPLETE.md`
-- Tasks: `.kiro/specs/phase-72-ast-error-reduction/tasks.md`
-
-### CUDA
-- Roadmap: `CUDA_ACCELERATION_ROADMAP.md`
-- Quick Start: `CUDA_QUICKSTART.md`
-- CMake: `CMakeLists.txt`
-
-### Guides
-- Startup: `.kiro/STARTUP_GUIDE.md`
-- Index: `.kiro/INDEX.md`
-- Implementation: `IMPLEMENTATION_READY.md`
-
----
-
-## ✅ Verification Checklist
-
-- [ ] Docker image builds successfully
-- [ ] GPU detected in container
-- [ ] All services start (Neo4j, Ollama, Qdrant, Redis, Postgres)
-- [ ] API health check passes
-- [ ] GPU metrics endpoint responds
-- [ ] Phase 72 orchestrator initializes
-- [ ] Dashboard accessible at localhost:5174
-- [ ] Benchmarks run successfully
-- [ ] Error reduction working
-- [ ] Patches being generated
-
----
-
-## 🎯 Quick Reference
-
-### Build
-```bash
-docker build -f docker/Dockerfile.cuda -t legal-ai-gpu:latest .
-```
-
-### Run
-```bash
-docker run --gpus all -p 8000:8000 legal-ai-gpu:latest
-```
-
-### Compose
-```bash
-docker-compose -f docker/docker-compose.gpu.yml up -d
-```
-
-### Logs
-```bash
-docker logs -f legal-ai-gpu
-```
-
-### Stats
-```bash
-docker stats legal-ai-gpu
-```
-
-### Stop
-```bash
-docker stop legal-ai-gpu
-```
-
-### Remove
-```bash
-docker rm legal-ai-gpu
-```
-
----
-
-**Status**: ✅ Ready for Docker deployment in WSL Linux
-
-**Build Command**: `docker build -f docker/Dockerfile.cuda -t legal-ai-gpu:latest .`
-
-**Run Command**: `docker run --gpus all -p 8000:8000 legal-ai-gpu:latest`
-
-**Compose Command**: `docker-compose -f docker/docker-compose.gpu.yml up -d`

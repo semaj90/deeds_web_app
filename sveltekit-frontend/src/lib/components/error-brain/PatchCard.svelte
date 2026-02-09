@@ -1,9 +1,11 @@
 <script lang="ts">
  import { Badge } from '$lib/components/ui/badge';
- import { Button } from '$lib/components/ui/enhanced-bits';
- import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/enhanced-bits';
-
- interface Props {
+ import Button from '$lib/components/ui/Button.svelte';
+ import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+interface Props {
  id: number;
 	filePath: string;
  diffText: string;

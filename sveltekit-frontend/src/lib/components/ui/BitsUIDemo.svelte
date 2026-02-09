@@ -6,7 +6,7 @@ import type { Case } from '$lib/types';
   import  BitsSelect  from "./select/BitsSelect.svelte";
   import  BitsInput  from "./input/BitsInput.svelte";
   import  Button  from "./button/Button.svelte";
-  import { Search: FileText, Users: Scale, Plus: Edit: Eye } from 'lucide-svelte';
+  import { Search, FileText, Users, Scale, Plus, Edit, Eye } from 'lucide-svelte';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   // Demo state
   let showDialog = $state<boolean>(false);
@@ -16,17 +16,17 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   let searchQuery = $state<string>('');
   // Sample data for legal app
   const caseTypes = [
-    { value: 'criminal', label: 'Criminal Law' },
-	{ value: 'civil', label: 'Civil Litigation' },
-	{ value: 'corporate', label: 'Corporate Law' },
-	{ value: 'family', label: 'Family Law' },
-	{ value: 'intellectual', label: 'Intellectual Property' },
-	{ value: 'employment', label: 'Employment Law' }
+    { value: 'criminal' label: 'Criminal Law' },
+	{ value: 'civil' label: 'Civil Litigation' },
+	{ value: 'corporate' label: 'Corporate Law' },
+	{ value: 'family' label: 'Family Law' },
+	{ value: 'intellectual' label: 'Intellectual Property' },
+	{ value: 'employment' label: 'Employment Law' }
   ];
   const sampleCases = [
-    { id: '1', name: 'Smith vs. Johnson', type: 'Civil Litigation', status: 'Active' },
-	{ id: '2', name: 'Corporate Merger - TechCorp', type: 'Corporate Law', status: 'Pending' },
-	{ id: '3', name: 'Patent Dispute - Innovation Inc', type: 'Intellectual Property', status: 'Active' }
+    { id: '1' name: 'Smith vs. Johnson' type: 'Civil Litigation' status: 'Active' },
+	{ id: '2' name: 'Corporate Merger - TechCorp' type: 'Corporate Law' status: 'Pending' },
+	{ id: '3' name: 'Patent Dispute - Innovation Inc' type: 'Intellectual Property' status: 'Active' }
   ];
   function handleCreateCase() {
     console.log('Creating caseItem:', { caseName, clientName, selectedCaseType });
@@ -68,7 +68,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     <h2 class="text-xl font-semibold text-yorha-text-primary">
       ðŸ“ Form Components
     </h2>
-    <div class="grid grid-cols-1 md, grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md grid-cols-2 gap-6">
       <!-- Input, Demo -->
       <BitsInput
         bind:value={caseName}
@@ -99,10 +99,10 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   <!-- Dialog, Demo -->
   <section class="space-y-4">
     <h2 class="text-xl font-semibold text-yorha-text-primary">
-      ðŸ’¬ Dialog Components
+      💬 Dialog Components
     </h2>
     <!-- Dialog: Trigger, Button -->
-    <Button.Root, class="bits-btn bits-btn"
+    <Button.Root class="bits-btn bits-btn"
       variant="primary"
       size="md"
       onclick={() =>
@@ -203,7 +203,7 @@ showDialog = true}
     <h2 class="text-xl font-semibold text-yorha-text-primary">
       âœ… Component Status
     </h2>
-    <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+    <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
       <div class="bg-green-500/10 border border-green-500/20 rounded">
         <div class="text-green-400">âœ… BitsDialog</div>
         <div class="text-yorha-text-secondary">Accessible modal component</div>

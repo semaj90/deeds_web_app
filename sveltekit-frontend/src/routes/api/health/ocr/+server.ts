@@ -2,12 +2,10 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface OCRHealthDetails {
- service: string; status: 'operational' | 'degraded' | 'offline';
+interface OCRHealthDetails { service: string, status: 'operational' | 'degraded' | 'offline';
  port?: number; endpoint: string;
  features?: string[];
- performance?: { avgProcessingTime: number;
- documentsProcessed: number; errorRate: number;
+ performance?: { avgProcessingTime: number, documentsProcessed: number; errorRate: number;
  };
  version?: string; lastChecked: string;
  responseTime: number;
@@ -15,9 +13,8 @@ interface OCRHealthDetails {
 
 interface OCRHealthResponse {
  status: 'healthy' | 'degraded' | 'unhealthy';
- timestamp: string; ocr: OCRHealthDetails;
- metadata: { checkDuration: number;
- environment: string;
+ timestamp: string, ocr: OCRHealthDetails;
+ metadata: { checkDuration: number, environment: string;
  };
 }
 

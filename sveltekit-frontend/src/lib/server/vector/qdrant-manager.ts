@@ -65,7 +65,7 @@ export class QdrantManager {
     }
 
     async hybridSearch(params: {
-	query: string; queryEmbedding: number[];
+	query: string, queryEmbedding: number[];
 	collection: keyof typeof this.collections; filters?: any; limit?: number; scoreThreshold?: number }) {
         const startTime = Date.now();
         try {
@@ -107,7 +107,7 @@ export class QdrantManager {
     }
 
     async searchChatContext(params: {
-	userEmbedding: number[]; userId: string; sessionId?: string; limit?: number }) {
+	userEmbedding: number[], userId: string; sessionId?: string; limit?: number }) {
         const filters: any = {
             must: [{
 	key: 'user_id', match: {
@@ -138,7 +138,7 @@ export class QdrantManager {
     }
 
     async batchUpsert(params: {
-	collection: keyof typeof this.collections; points: any[]; batchSize?: number }) {
+	collection: keyof typeof this.collections, points: any[]; batchSize?: number }) {
         const batchSize = params.batchSize ?? 100;
         const collectionName = this.collections[params.collection];
         const batches = this.chunkArray(params.points, batchSize);
@@ -157,8 +157,8 @@ export class QdrantManager {
     }
 
     async storeDocument(document: {
-	id: string; title: string;
-	content: string; contentEmbedding: number[]; summaryEmbedding?: number[];
+	id: string, title: string;
+	content: string, contentEmbedding: number[]; summaryEmbedding?: number[];
 	metadata: Record<string, unknown> }) {
         const point: any = {
             id: document.id,

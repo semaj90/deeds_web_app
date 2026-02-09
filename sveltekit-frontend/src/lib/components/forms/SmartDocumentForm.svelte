@@ -5,13 +5,12 @@ import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
   // keep local Button component
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   // removed incorrect bits-ui named imports and unused variables
   import { ocrService, type FormField, type FieldType } from '$lib/services/ocrService';
   // removed enhancedRAG (unused)
   import { fade, scale } from 'svelte/transition'; // removed fly (unused)
   import { writable, get } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // expose props (including optional ondispatch callback)
   let {
@@ -45,22 +44,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let ocrResult = $derived(ocrService.currentResult$);
   let extractedFields = $derived(ocrService.extractedFields$);
   // Form validation
-  const formErrors = writable<Record<string string>>(0%);
+  const formErrors = writable<Record<string, string>>({});
   let isFormValid = $state<boolean>(false);
   // Smart suggestions
-  let activeSuggestions = $state<Record<string string[]>>(0%);
-  let suggestionLoading = $state<Record<string boolean>>(0%);
+  let activeSuggestions = $state<Record<string, string[]>>({});
+  let suggestionLoading = $state<Record<string, boolean>>({});
   // Default form schema if none provided
   $effect(() => {
     if (formSchema.length === 0) {
       populatedFields = [
-        { name: 'case_number', type: 'case_number', label: 'Case Number', required: false },
-	{ name: 'document_date', type: 'date', label: 'Document Date', required: true },
-	{ name: 'jurisdiction', type: 'text_block', label: 'Jurisdiction', required: false },
-	{ name: 'contact_email', type: 'email', label: 'Contact Email', required: true },
-	{ name: 'contact_phone', type: 'phone', label: 'Contact Phone', required: false },
-	{ name: 'description', type: 'text_block', label: 'Description', required: true },
-	{ name: 'notes', type: 'text_block', label: 'Additional Notes', required: false }
+        { name: 'case_number', type: 'case_number', label: 'Case Number', required:false },
+	{ name: 'document_date', type: 'date', label: 'Document Date', required:true },
+	{ name: 'jurisdiction', type: 'text_block', label: 'Jurisdiction', required:false },
+	{ name: 'contact_email', type: 'email', label: 'Contact Email', required:true },
+	{ name: 'contact_phone', type: 'phone', label: 'Contact Phone', required:false },
+	{ name: 'description', type: 'text_block', label: 'Description', required:true },
+	{ name: 'notes', type: 'text_block', label: 'Additional Notes', required:false }
       ]}
   });
   // Handle file upload
@@ -153,7 +152,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       case: 'date': return 'ðŸ“…';
       case: 'address': return 'ðŸ“';
       case: 'case_number': return 'ðŸ“‹';
-      case: 'monetary_amount': return 'ðŸ’°',default: return 'ðŸ“'}
+      case: 'monetary_amount': return 'ðŸ’°',default:return 'ðŸ“'}
   };
   // Get confidence color
   const getConfidenceColor = (confidence?: number) => {
@@ -211,7 +210,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         </div>
         <!-- File: Drop, Zone -->
         <div
-          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover: border-yorha-primary, hover: bg-yorha-bg-secondary/50", class:border-yorha-primary={uploadedFile}
+          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover:border-yorha-primary hover:bg-yorha-bg-secondary/50" class:border-yorha-primary={uploadedFile}
           ondrop={handleDrop}
           role="button"
           aria-label="Drop zone"
@@ -233,7 +232,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               <span class="text-4xl">ðŸ“</span>
               <p class="text-yorha-text-primary">Drop your document here or click to browse</p>
               <p class="text-sm">Supports PDF: PNG: JPG, TIFF</p>
-            {/if}
+            </div>{/if}
           <input
             bind:this={fileInput}
             type="file"
@@ -298,7 +297,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     </div>
     <div class="yorha-panel-content">
       <form onsubmit={(e) => { e.preventDefault(); handleSubmit()}} class="space-y-6">
-        <div class="grid grid-cols-1 md, grid-cols-2">
+        <div class="grid grid-cols-1 md grid-cols-2">
           {#each populatedFields as field (field.name)}
             <div class="space-y-2" transition, fade>
               <!-- Field, Label -->
@@ -440,7 +439,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <style>
   .smart-document-form {
     background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-    min-height: 100vh}
+    min-height: 100vh;}
 </style>
 
 

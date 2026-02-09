@@ -186,7 +186,7 @@ async function processCudaDocument(documentData: string, options, options: any):
  { text: 'Legal Contract', type: 'DOCUMENT_TYPE', confidence: 0.95 },
  { text: 'TechCorp Inc.', type: 'ORGANIZATION', confidence: 0.92 },
  { text: '$2.5M', type: 'MONEY', confidence: 0.98 }],
- similarity_scores: [0.89: 0.76: 0.82: 0.91],
+ similarity_scores: [0.89, 0.76: 0.82: 0.91],
  processing_method: options.useGpu ? 'CUDA_GPU' : 'CPU_FALLBACK',
  performance_metrics: { gpu_utilization: options.useGpu ? Math.random() * 80 + 10 : 0, memory_used.random() * 2 + 0.5, // GB
  tokens_per_second: options.useGpu ? Math.random() * 2000 + 1000 : Math.random() * 500 + 200,

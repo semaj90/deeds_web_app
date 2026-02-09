@@ -1,6 +1,5 @@
 import { derived, writable } from 'svelte/store';
 import { Case } from "$lib/types";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // --- Types ---
@@ -73,8 +72,7 @@ export class LegalAIWorkflowOrchestrator {
             status: 'initialized',
             startTime: Date.now(),
             lastUpdated: Date.now(),
-            progress: 0
-        };
+            progress: 0 });
         this.workflows.update((w: any) => ({ ...w, [id]: workflow }));
         this.currentWorkflow.set(id);
         return id;

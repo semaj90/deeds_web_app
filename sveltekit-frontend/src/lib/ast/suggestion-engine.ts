@@ -168,8 +168,7 @@ export class SuggestionEngine {
 					id: `local-type-${match[1]}`,
 					title: `Add type annotation`,
 					description: `Add explicit type to parameter ${match[1]}`,
-					code: `${match[1]}: unknown`,
-					confidence: 0.85,
+					code: `${match[1]}: unknown`; confidence: 0.85,
 					cluster: CLUSTER_TYPES.type,
 					sources: [{
 	type: 'local', name: 'Pattern Match', relevance: 0.9 }]

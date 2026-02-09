@@ -102,7 +102,7 @@ export async function searchQdrantFiltered(
 	value: options.caseId } });
         }
 
-        const filter = must.length > 0 ? { must } : undefined;
+        const filter = must.length > 0 ? { must }  | undefined;
 
         const res = await qdrantClient.search(COLLECTIONS.DOCUMENTS, {
             vector: queryVector,

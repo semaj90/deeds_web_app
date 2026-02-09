@@ -237,7 +237,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		method="POST"
 		action="?/chat"
 		enctype="multipart/form-data"
-		use, enhance={() => {
+		use enhance={() => {
 			isSubmitting = true;
 			return async ({ update }) => {
 				await update();

@@ -10,22 +10,22 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	import { ButtonRoot } from 'bits-ui';
 
  import Button from "$lib/components/ui/enhanced-bits.svelte";
- import { AlertTriangle } from "lucide-svelte";
- import { ArrowRight } from "lucide-svelte";
- import { Book } from "lucide-svelte";
- import { Clock } from "lucide-svelte";
- import { Download } from "lucide-svelte";
- import { ExternalLink } from "lucide-svelte";
- import { HelpCircle } from "lucide-svelte";
- import { Info } from "lucide-svelte";
- import { MessageSquare } from "lucide-svelte";
- import { Play } from "lucide-svelte";
- import { Search } from "lucide-svelte";
- import { Star } from "lucide-svelte";
- import { UserIcon } from "lucide-svelte";
- import { Video } from "lucide-svelte";
- import { Sparkles } from "lucide-svelte";
- import { Brain } from "lucide-svelte";
+ import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+ import ArrowRight from 'lucide-svelte/icons/arrow-right';
+ import Book from 'lucide-svelte/icons/book';
+ import Clock from 'lucide-svelte/icons/clock';
+ import Download from 'lucide-svelte/icons/download';
+ import ExternalLink from 'lucide-svelte/icons/external-link';
+ import HelpCircle from 'lucide-svelte/icons/help-circle';
+ import Info from 'lucide-svelte/icons/info';
+ import MessageSquare from 'lucide-svelte/icons/message-square';
+ import Play from 'lucide-svelte/icons/play';
+ import Search from 'lucide-svelte/icons/search';
+ import Star from 'lucide-svelte/icons/star';
+ import UserIcon from 'lucide-svelte/icons/user';
+ import Video from 'lucide-svelte/icons/video';
+ import Sparkles from 'lucide-svelte/icons/sparkles';
+ import Brain from 'lucide-svelte/icons/brain';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
@@ -494,7 +494,7 @@ Build on previous responses:
  <input
  type="text"
  placeholder="Search help articles..."
- class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus: ring-2, focus: ring-white, focus: ring-opacity-50", bind:value={searchQuery}
+ class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus: ring-2, focus: ring-white, focus: ring-opacity-50" bind:value={searchQuery}
  />
  <button
  onclick={ toggleSearchMode }

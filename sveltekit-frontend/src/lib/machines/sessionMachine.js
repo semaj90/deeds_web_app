@@ -7,6 +7,3 @@ export const sessionMachine = {
  },
 };
 export const sessionActions = {};
-
-
-

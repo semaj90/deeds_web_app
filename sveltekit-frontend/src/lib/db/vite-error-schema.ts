@@ -88,7 +88,7 @@ export const errorHistory = pgTable('error_history', {
     topFiles: jsonb('top_files').$type<Array<{
 	path: string; count, number }>>(),
     buildMetadata: jsonb('build_metadata').$type<{
-	command: string; duration: string;
+	command: string, duration: string;
 	exitCode: string; timestamp, string }>(),
     createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
 });

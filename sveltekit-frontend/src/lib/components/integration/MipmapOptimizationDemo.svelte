@@ -1,7 +1,10 @@
 <!-- @migration-task Error while migrating Svelte code, 'default' is a reserved word in JavaScript and cannot be, used, her, https, //svelte.dev/e/unexpected_reserved_word --> <!-- @migration-task Error while migrating Svelte, code, 'default' is a reserved word in JavaScript and cannot be, used, here -->
   {#snippet default} <script lang="ts">
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import  yorhaWebGPU  from "$lib/components/three/yorha-ui/webgpu/YoRHaWebGPUMath.svelte"; import  yorhaMipmapShaders  from "$lib/components/three/yorha-ui/webgpu/YoRHaMipmapShaders.svelte"; import  yorhaTextureManager  from "$lib/components/three/yorha-ui/webgpu/YoRHaOptimizedTextureManager.svelte"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; // Reactive state using Svelte, 5 runes let isInitialized = $state<boolean>(false); let isProcessing = $state<boolean>(false); let processingResults = $state<any[]>([]); let systemStats = $state<any>(null); let mipmapConfig = $state({ maxMipLevels: 12, filterMode: 'linear' as 'linear' | 'nearest' | 'cubic', rtxOptimized: true, enableStreaming: false, maxTextureSize: 2048 }); // Demo legal documents let legalDocuments = $state([ { id: 'contract_001', type: 'contract' as const title: 'Commercial Lease Agreement', priority: 200, riskLevel: 'high' as const textureSize: '2048x2048', estimatedComplexity: 'High'
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte'; // Reactive state using Svelte, 5 runes let isInitialized = $state<boolean>(false); let isProcessing = $state<boolean>(false); let processingResults = $state<any[]>([]); let systemStats = $state<any>(null); let mipmapConfig = $state({ maxMipLevels: 12, filterMode: 'linear' as 'linear' | 'nearest' | 'cubic', rtxOptimized: true, enableStreaming: false, maxTextureSize: 2048 }); // Demo legal documents let legalDocuments = $state([ { id: 'contract_001', type: 'contract' as const title: 'Commercial Lease Agreement', priority: 200, riskLevel: 'high' as const textureSize: '2048x2048', estimatedComplexity: 'High'
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     },
 	{
@@ -26,7 +29,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    // Process single legal document with mipmap optimization async function processDocument(docIndex: number): Promise<any> { if (!isInitialized || isProcessing) return; isProcessing = true; const document = legalDocuments[docIndex]; try { console.log(`ðŸš€ Processing document: ${document.title}`); // Parse texture size const [width, height] = document.textureSize.split.map(Number); const mockTexture = createMockTexture(width, height); if (!mockTexture) { throw new Error('Failed to create texture')}
 
       // Process with optimized mipmaps const result = await yorhaWebGPU.processTextureWithMipmaps(mockTexture, { generateMipmaps: true
-, filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, enableStreaming: mipmapConfig.enableStreaming, legalDocument: document }); // Store result processingResults = [{ document: document.title, processingTime: (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).processingTime, mipmapsGenerated: (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).mipmaps.length, memoryUsed: (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).memoryUsed, rtxAcceleration (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).optimization.rtxAcceleration, streamingUsed: (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).optimization.streamingUsed, timestamp: new Date() },
+filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, enableStreaming: mipmapConfig.enableStreaming, legalDocument: document }); // Store result processingResults = [{ document: document.title, processingTime: (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).processingTime, mipmapsGenerated: (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).mipmaps.length, memoryUsed: (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).memoryUsed, rtxAcceleration (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).optimization.rtxAcceleration, streamingUsed: (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).optimization.streamingUsed, timestamp: new Date() },
 	...processingResults.slice(0, 9)]; // Keep last, 10 results // Update performance metrics updatePerformanceMetrics(result); // Update system stats systemStats = yorhaTextureManager.getStatistics(); console.log.mipmaps.length} mip levels generated`)} catch (error) { console.error('Document processing failed:', error); alert(`Processing failed: ${error.message}`)} finally { isProcessing = false}`
   // Batch process all documents async function batchProcessDocuments(): Promise<any> { if (!isInitialized || isProcessing) return; isProcessing = true; try { console.log('ðŸš€ Starting batch processing of all legal documents'); // Create mock textures for all documents const documentsWithTextures = legalDocuments.map.map(Number); const texture = createMockTexture(width, height); return { ...doc, texture: texture!}
       }).filter(doc => doc.texture); // Filter out failed textures if (documentsWithTextures.length === 0) { throw new Error('No textures could be created')}
@@ -50,13 +53,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-gray-900"> ðŸ”¥ YoRHa Mipmap Optimization Demo </h1>
  <p class="text-gray-600"> NVIDIA RTX-Optimized â€¢ NES Memory Architecture â€¢ Vulkan-Style Compute Shaders </p> </div>
  <!-- Initialization, Status --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">System Status</h3> </div>
- <div class="yorha-panel-content"> <div class="flex items-center"> <div class="flex items-center"> <div class={`w-3 h-3, rounded-full ${isInitialized ? 'bg-green-500', 'bg-red-500'}`}></div>
+ <div class="yorha-panel-content"> <div class="flex items-center"> <div class="flex items-center"> <div class={`w-3 h-3, rounded-full ${isInitialized ? 'bg-green-500' : 'bg-red-500'}`}></div>
  <span class="font-medium"> {isInitialized ? 'âœ… System Initialized': 'âŒ Not Initialized'}
 </span> </div>
   {#if !isInitialized && !isProcessing} <Button.Root class="bits-btn bits-btn" onclick={ initializeSystem } size="sm"> ðŸ”„ Initialize System </Button> {/if} {#if isProcessing} <span class="text-blue-600">â³ Processing...</span> {/if}
   </div> </div> </div>
  <!-- Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Mipmap Configuration</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" for="max-mip-levels">Max Mip Levels</label>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-3"> <div> <label class="block text-sm font-medium" for="max-mip-levels">Max Mip Levels</label>
 <input id="max-mip-levels"
             type="number" ,bind:value={mipmapConfig.maxMipLevels} min="1"
             max="16"
@@ -92,7 +95,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Button.Root class="bits-btn bits-btn"
             onclick={ generateMipmapDemo } disabled={!isInitialized || isProcessing} variant="ghost"
           > ðŸ”¥ Mipmap Demo </Button> </div> </div> </div> </div>
- <!-- Performance, Metrics --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-5"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalTexturesProcessed}
+ <!-- Performance, Metrics --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-5"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalTexturesProcessed}
 </div>
  <div class="text-sm">Textures Processed</div> </div> </div> </div>
  <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalMipmapsGenerated}
@@ -108,7 +111,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="text-sm">RTX Accelerated</div> </div> </div> </div> </div>
  <!-- System, Statistics -->
   {#if systemStats} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">NES Memory Bank Statistics</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4">
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-4">
   {#each Object.entries(systemStats.banks) as [bankName, bankStats]} <div class="p-4 border"> <div class="font-semibold">{ bankName } Bank</div>
  <div class="space-y-1"> <div class="flex"> <span>Textures:</span>
  <span class="font-medium">{bankStats.textureCount}
@@ -117,7 +120,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span class="font-medium">{bankStats.memoryUsedMB}MB</span> </div>
  <div class="flex"> <span>Utilization</span>
  <span class="font-medium">{bankStats.utilization}%</span> </div> </div>
- <div class="mt-2"> <div class="w-full bg-gray-200 rounded-full"> <div class="bg-blue-600 h-2 rounded-full"; style, width="{bankStats.utilization}%"
+ <div class="mt-2"> <div class="w-full bg-gray-200 rounded-full"> <div class="bg-blue-600 h-2 rounded-full"; style width="{bankStats.utilization}%"
                   ></div> </div> </div> </div> {/each}
   </div> </div> {/if}
   <!-- Processing, Results -->
@@ -129,7 +132,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <div class="text-sm"> {formatTime((result as { processingTime?: any, mipmaps?: any, memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).processingTime)}
 </div> </div>
- <div class="grid grid-cols-2 md, grid-cols-4 gap-2"> <div> <span class="text-gray-500">Mipmaps:</span>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-2"> <div> <span class="text-gray-500">Mipmaps:</span>
  <span class="font-medium">{(result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).mipmapsGenerated}
 </span> </div>
  <div> <span class="text-gray-500">Memory:</span>

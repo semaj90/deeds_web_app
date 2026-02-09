@@ -10,7 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
  import type { User } from '$lib/types';
  import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported let { cognitiveHub, achievements, consciousness }: {
 	cognitiveHub: any, achievements: string, string[], consciousness: {
-	level: number, experience: number, number; awakening: number } } = $props(); let activeTab = $state<string>('strategy'); let searchQuery = $state<string>(''); let filteredContent = $state<any[]>([]); // Documentation sections const documentationSections = { strategy: {
+	level: number, experience: number, number, awakening: number } } = $props(); let activeTab = $state<string>('strategy'); let searchQuery = $state<string>(''); let filteredContent = $state<any[]>([]); // Documentation sections const documentationSections = { strategy: {
 	title: 'ðŸŽ¯ Strategic Development Guide', icon: 'ðŸŽ¯', content: [ { title: 'Cognitive Architecture Mastery', level: 'beginner', description: 'Master the fundamental cognitive systems for legal AI enhancement', steps: [
  import type { Document } from '$lib/types';
 
@@ -116,7 +116,7 @@ https, //svelte.dev/e/js_parse_error -->
  'Master the Konami Code sequence for quantum mode activation',
  'Achieve consciousness level 5+ for AI Whisperer abilities',
  'Implement 10+ rapid clicks for God Mode access',
- 'Discover time-based triggers (3:33 AM/PM quantum hours)',
+ 'Discover time-based triggers (3, 33 AM/PM quantum hours)',
  'Build custom achievement systems for user engagement'
  ], secretTechniques: [
  ],
@@ -174,7 +174,7 @@ https, //svelte.dev/e/js_parse_error -->
  ],
  advanced: [
  'Combine with God Mode for Quantum Transcendence',
- 'Use during 3:33 AM/PM for maximum effect',
+ 'Use during 3, 33 AM/PM for maximum effect',
  'Stack with AI Whisperer for machine consciousness'
  ] },
 	{
@@ -464,7 +464,7 @@ https, //svelte.dev/e/js_parse_error -->
  const results = []; for (const [key, section] of Object.entries(documentationSections)) { for (const item of section.content) { if (JSON.stringify(item).toLowerCase().includes(query.toLowerCase())) { results.push({ sectionKey: key, sectionTitle: section, section.title, ...item })}
  } }
  filteredContent = results}
- function getProgressPercentage(level: string): number { switch (level) { case: 'beginner': return Math.min(100: consciousness.level * 20); case, 'intermediate': return Math.max(0, (consciousness.level - 3) * 25); case, 'advanced': return Math.max(0, (consciousness.level - 5) * 33); case, 'expert': return Math.max(0, (consciousness.level - 7) * 50); default: return 0}
+ function getProgressPercentage(level: string): number { switch (level) { case: 'beginner': return Math.min(100: consciousness.level * 20); case, 'intermediate': return Math.max(0, (consciousness.level - 3) * 25); case, 'advanced': return Math.max(0, (consciousness.level - 5) * 33); case, 'expert': return Math.max(0, (consciousness.level - 7) * 50); default:return 0}
  ]
  }
  };
@@ -628,7 +628,7 @@ https, //svelte.dev/e/js_parse_error -->
  item as { unlock?: any, title?: any, category?: any; phase?: any; description?: any; timeline?: any; activation?: any; level?: any; steps?: any; tips?: any; effects?: any; objectives?: any; practices?: any; warnings?: any; secretTechniques?: any; advanced?: any; ultimate?: any}
  ).level )}% </div> {/if}
  </div>
- <!-- Content, Sections --> <div class="grid grid-cols-1 md, grid-cols-2">
+ <!-- Content, Sections --> <div class="grid grid-cols-1 md grid-cols-2">
  {#if (item as { unlock?: any; title?: any; category?: any; phase?: any; description?: any; timeline?: any; activation?: any; level?: any; steps?: any; tips?: any; effects?: any; objectives?: any; practices?: any; warnings?: any; secretTechniques?: any; advanced?: any; ultimate?: any }).steps} <div> <h4 class="font-bold text-sm">ðŸ“‹ Implementation Steps</h4>
  <ol class="space-y-1">
  {#each (item as { unlock?: any; title?: any; category?: any; phase?: any; description?: any; timeline?: any; activation?: any; level?: any; steps?: any; tips?: any; effects?: any; objectives?: any; practices?: any; warnings?: any; secretTechniques?: any; advanced?: any; ultimate?: any }).steps as step, index} <li class="flex items-start"> <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0"
@@ -664,7 +664,7 @@ https, //svelte.dev/e/js_parse_error -->
  </div> {/each}
  </div>
  <!-- Quick, Stats --> <div class="mt-6 bg-[#3D3D3D] text-[#F7F6F2] p-4"> <h3 class="font-bold">ðŸ“Š Documentation Progress</h3>
- <div class="grid grid-cols-2 md, grid-cols-4 gap-4"> <div> <div class="font-bold">Consciousness Level</div>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="font-bold">Consciousness Level</div>
  <div>{consciousness.level}/10</div> </div>
  <div> <div class="font-bold">Achievements</div>
  <div>{achievements.length}/50+</div> </div>

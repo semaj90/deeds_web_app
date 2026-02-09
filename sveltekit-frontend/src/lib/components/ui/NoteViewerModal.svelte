@@ -5,7 +5,6 @@
  import { fade, fly } from "svelte/transition";
  import { removeSavedNote, saveNoteForLater } from '$lib/stores/saved-notes';
  import  RichTextEditor  from "./RichTextEditor.svelte"; // Local state for mutable values that need to change let localMode = $state(mode);
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let localTitle = $state(title);
    let localContent = $state(content);
    let localMarkdown = $state(markdown);
@@ -23,14 +22,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function addTag() { const trimmed = newTag.trim(); if (trimmed && !editedTags.includes(trimmed)) { editedTags = [...editedTags, trimmed]; newTag = ""}
   }
   function removeTag(tag: string) { editedTags = editedTags.filter((t) => t !== tag)}
-  function handleEditorSave(_event: CustomEvent) { const { html: newHtml, markdown: newMarkdown, json newJson} = e(vent as CustomEvent).detail;
-   const updatedNote = { id:noteId, title: editedTitle, content: newMarkdown || newHtml markdown: newMarkdown, html: newHtml contentJson newJson noteType, tags: editedTags userId, caseId }
+  function handleEditorSave(_event: CustomEvent) { const { html: newHtml, markdown: newMarkdown, json newJson} = e(vent as CustomEvent).detail;
+   const updatedNote = { id:noteId, title: editedTitle content: newMarkdown || newHtml markdown: newMarkdown html: newHtml contentJson newJson noteType tags: editedTags userId, caseId }
     onSave?.(updatedNote); localMode = "view"; // Update local data localTitle = editedTitl; localContent = newMarkdown ?? newHtml; localMarkdown = newMarkdow; localHtml = newHtml; localContentJson = newJso; localTags = [...editedTags]}
   function startEdit() { localMode = "edit"; editedContent = content; editedTitle = titl; editedTags = [...tags]}
   function cancelEdit() { localMode = "view"; editedContent = content; editedTitle = titl; editedTags = [...tags]}
   function closeModal() { localIsOpen = false}
 </script>
-  {#if localIsOpen} <div class="space-y-4" transition, fade={{ duration, 150 }}> <div class="space-y-4" transition:fly={{ y, -20, duration, 200 }}> <!-- Header --> <div class="space-y-4"> <div class="space-y-4">
+  {#if localIsOpen} <div class="space-y-4" transition fade={{ duration: 150 }}> <div class="space-y-4" transition:fly={{ y, -20, duration, 200 }}> <!-- Header --> <div class="space-y-4"> <div class="space-y-4">
   {#if localMode === "edit"} <input bind:value={ editedTitle } class="space-y-4"
               placeholder="Note title..."
             /> {:else} <h2 class="space-y-4"> {localTitle || "Untitled Note"} </h2> {/if}

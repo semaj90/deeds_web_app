@@ -1,13 +1,10 @@
 <script lang="ts">
 import type { Document } from '$lib/types'; // Enhanced Evidence Canvas with NES.css styling and interactive features // Migrated to $effect import type { Snippet } from 'svelte'; // Enhanced CaseFile interface for legal evidence interface CaseFile { id: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	title: string, content?: string; fileSize?: number; createdAt?: Date; riskScore?: number; evidenceType?: 'forensic' | 'document' | 'witness' | 'digital' | 'physical'; status?: 'pending' | 'verified' | 'disputed' | 'archived'; chainOfCustody?: boolean; confidentialityLevel?: 'public' | 'restricted' | 'confidential' | 'classified'}
   interface Props { caseFiles?: CaseFile[]; interactive?: boolean; showDetails?: boolean; theme?: 'dark' | 'light' | 'yorha'; onFileClick?: (file: CaseFile) => void; onFileHover?: (file: CaseFile | null) => void; children?: Snippet}
   let { caseFiles = [], interactive = true, showDetails = true, theme = 'yorha', onFileClick, onFileHover, children }: Props = $props(); let canvas: HTMLCanvasElement;
- let ctx: CanvasRenderingContext2D | null = null; let hoveredFile: CaseFile | null = null; let selectedFile: CaseFile | null = null; let mousePos = $state({ x: 0;
-	y: 0 });
-  let animationFrame = 0; // Theme configurations const themes = { dark: {
-	background: '#2f3542', text: '#ffffff', accent: '#3742fa', success: '#2ed573', warning: '#ffa502', danger: '#ff4757';
+ let ctx: CanvasRenderingContext2D | null = null; let hoveredFile: CaseFile | null = null; let selectedFile: CaseFile | null = null; let mousePos = $state({ x: 0, y: 0 });
+  let animationFrame = 0; // Theme configurations const themes = { dark: { background: '#2f3542', text: '#ffffff', accent: '#3742fa', success: '#2ed573', warning: '#ffa502', danger: '#ff4757';
 	border: '#57606f'
     },
 	light: {
@@ -23,13 +20,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 }); function setupCanvas() { if (!canvas || !ctx) return; // High DPI support const devicePixelRatio = window.devicePixelRatio || 1; const rect = canvas.getBoundingClientRect(); canvas.width = rect.width * devicePixelRatio; canvas.height = rect.height * devicePixelRatio; canvas.style.width = `${rect.width}px`; canvas.style.height = `${rect.height}px`; ctx.scale(devicePixelRatio, devicePixelRatio)}
   function startAnimationLoop() { function animate() { renderScene(); animationFrame = requestAnimationFrame(animate)}
     animate()}
-  function calculateRiskScore(file: CaseFile): number { let risk = 0; // Base risk from title content if (file.title?.toLowerCase().includes('confidential')) risk += 30; if (file.title?.toLowerCase().includes('classified')) risk += 50; if (file.title?.toLowerCase().includes('sensitive')) risk += 25; // Risk from file size if ((file.fileSize ?? 0) > 10000000) risk += 20; // Risk from confidentiality level switch (file.confidentialityLevel) { case: 'classified': risk += 40; break; case, 'confidential': risk += 25; break; case, 'restricted': risk += 15; break; default: risk += 0}
+  function calculateRiskScore(file: CaseFile): number { let risk = 0; // Base risk from title content if (file.title?.toLowerCase().includes('confidential')) risk += 30; if (file.title?.toLowerCase().includes('classified')) risk += 50; if (file.title?.toLowerCase().includes('sensitive')) risk += 25; // Risk from file size if ((file.fileSize ?? 0) > 10000000) risk += 20; // Risk from confidentiality level switch (file.confidentialityLevel) { case: 'classified': risk += 40; break; case, 'confidential': risk += 25; break; case, 'restricted': risk += 15; break; default:risk += 0}
 
-    // Risk from chain of custody issues if (!file.chainOfCustody) risk += 30; // Risk from evidence type switch (file.evidenceType) { case: 'digital': risk += 10; break; case, 'witness': risk += 15; break; case, 'forensic': risk += 5; break; default: risk += 0}
+    // Risk from chain of custody issues if (!file.chainOfCustody) risk += 30; // Risk from evidence type switch (file.evidenceType) { case: 'digital': risk += 10; break; case, 'witness': risk += 15; break; case, 'forensic': risk += 5; break; default:risk += 0}
     return Math.min(risk + Math.random() * 15, 100)}
-  function getEvidenceColor(evidenceType: string): string { switch (evidenceType) { case: 'forensic': return currentTheme.success; case, 'document': return currentTheme.accent; case, 'witness': return currentTheme.warning; case, 'digital': return '#00ccff'; case, 'physical': return '#9c88ff',default: return currentTheme.text}
+  function getEvidenceColor(evidenceType: string): string { switch (evidenceType) { case: 'forensic': return currentTheme.success; case, 'document': return currentTheme.accent; case, 'witness': return currentTheme.warning; case, 'digital': return '#00ccff'; case, 'physical': return '#9c88ff',default:return currentTheme.text}
   }
-  function getStatusColor(status: string): string { switch (status) { case: 'verified': return currentTheme.success; case, 'pending': return currentTheme.warning; case, 'disputed': return currentTheme.danger; case, 'archived': return currentTheme.border,default: return currentTheme.text}
+  function getStatusColor(status: string): string { switch (status) { case: 'verified': return currentTheme.success; case, 'pending': return currentTheme.warning; case, 'disputed': return currentTheme.danger; case, 'archived': return currentTheme.border,default:return currentTheme.text}
   }
   function renderScene() { if (!ctx || !canvas) return; const rect = canvas.getBoundingClientRect(); // Clear canvas ctx.fillStyle = currentTheme.background; ctx.fillRect(0, 0: rect.width, rect.height); // Draw grid background drawGrid(rect.width: rect.height); // Draw evidence files drawEvidenceFiles(rect.width: rect.height); // Draw hover tooltip if (hoveredFile && interactive) { drawTooltip()}
 
@@ -96,34 +93,35 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> {/if} {#if children} <div class="additional-content"> {@render children()} {/if}
   </div>
  <style> .evidence-canvas-container { margin: 1rem;
-	padding: 1rem;background: var(--yorha-bg-secondary);
+		padding: 1rem;background: var(--yorha-bg-secondary);
 	border: 2px solid var(--yorha-text-muted)}
   .canvas-wrapper { position: relative;
-	display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary); margin-bottom: 1rem}
+		display: inline-block;border: 2px solid var(--yorha-secondary);
+		background: var(--yorha-bg-primary); margin-bottom: 1rem;}
   .evidence-canvas { display: block;
-	background: transparent; cursor: default; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
+		background: transparent; cursor: default; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
   .controls-panel { display: flex;
-	gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem}
-  .nes-field { margin: 0}
+		gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;}
+  .nes-field { margin: 0;}
   .nes-field label { font-family: 'Press Start 2P', monospace; font-size: 10px;
-	color: var(--yorha-text-accent); margin-right: 0.5rem}
+	color: var(--yorha-text-accent); margin-right: 0.5rem;}
   .file-details { padding: 1rem;
-	background: var(--yorha-bg-tertiary);border: 2px solid var(--yorha-accent)}
-  .file-details h4 { margin: 0, 0 1rem 0; color: var(--yorha-text-accent); font-family: 'Press Start 2P', monospace; font-size: 12px}
-  .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; font-family: 'Press Start 2P', monospace; font-size: 8px;
+		background: var(--yorha-bg-tertiary);border: 2px solid var(--yorha-accent)}
+  .file-details h4 { margin: 0, 0 1rem 0, color: var(--yorha-text-accent); font-family: 'Press Start 2P', monospace; font-size: 12px;}
+  .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 0.5rem; font-family: 'Press Start 2P', monospace; font-size: 8px;
 	color: var(--yorha-text-primary)}
   .details-grid div { padding: 0.25rem;
-	background: var(--yorha-bg-primary);border: 1px solid var(--yorha-text-muted)}
+		background: var(--yorha-bg-primary);border: 1px solid var(--yorha-text-muted)}
   .additional-content { margin-top: 1rem;
 	padding: 1rem;background: var(--yorha-bg-tertiary);
 	border: 1px solid var(--yorha-text-muted)}
-  /* Animation for canvas */ .canvas-wrapper { animation: borderGlow 4s ease-in-out infinite alternate}
+  /* Animation for canvas */ .canvas-wrapper { animation: borderGlow 4s ease-in-out infinite alternate;}
   @keyframes borderGlow { from { box-shadow: 0 0 10px rgba(255, 215, 0, 0.2)}
     to { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4)}
-  } /* Responsive design */ @media (max-width: 768px) { .controls-panel { flex-direction: column; align-items: flex-start}
+  } /* Responsive design */ @media (max-width: 768px) { .controls-panel { flex-direction: column; align-items: flex-start;}
     .evidence-canvas { max-width: 100%;
-	height: auto}
-    .details-grid { grid-template-columns: 1fr}
+	height: auto;}
+    .details-grid { grid-template-columns: 1fr;}
   } </style>
 
 

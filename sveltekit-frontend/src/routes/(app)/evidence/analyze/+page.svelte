@@ -1,16 +1,13 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card/index';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Progress } from '$lib/components/ui/progress';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Define missing types
-	type SearchResult = {
-		status: string;
-	sessionId: string;
+	type SearchResult = { status: string, sessionId: string;
 		analysisResults: {
 			summary?: string;
 			confidence?: number;
@@ -24,19 +21,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			model?: string;
 			processedAt?: string;
 			documentType?: string;
-			personsOfInterest?: {
-	name: string; role: string;
+			personsOfInterest?: { name: string, role: string;
 	confidence: number }[];
-			timeline?: {
-	event: string; date: string;
+			timeline?: { event: string, date: string;
 	importance: string }[];
 			legalImplications?: string;
 			confidenceScore?: number;
 			nextSteps?: string[];
 		};
-		metadata?: {
-	source: string;
-			processingTime: string;
+		metadata?: { source: string, processingTime: string;
 	model: string;
 		};
 	};
@@ -115,7 +108,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	evidenceId: crypto.randomUUID(),
+evidenceId: crypto.randomUUID(),
 					filename: evidenceFile?.name ?? 'uploaded_evidence.txt',
 					content: evidenceContent,
 					type: evidenceType,
@@ -154,8 +147,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			const notice = document.createElement('div');
 			notice.innerHTML = '⚠️ Failure, defaulting to mock';
 			notice.style.cssText = `position: fixed;
-	top: 20px; right: 20px;
-	background: rgba(220, 53, 69, 0.9); color: white;
+	top: 20px, right: 20px;
+	background: rgba(220, 53, 69, 0.9), color: white;
 	padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;`;
 			document.body.appendChild(notice);
 			setTimeout(() => notice.remove(), 3000);
@@ -224,14 +217,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<CardDescription>Upload or paste evidence content for AI-powered legal analysis.</CardDescription>
 		</CardHeader>
 		<CardContent>
-			<div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-4">
+			<div class="grid grid-cols-1 md grid-cols-2 gap-4 mb-4">
 				<div>
 					<Label htmlFor="caseId">Case ID</Label>
 					<Input id="caseId" bind:value={caseId} placeholder="Enter case ID" />
 				</div>
 				<div>
 					<Label htmlFor="evidenceType">Evidence Type</Label>
-					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
+					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700] focus:outline-none">
 						<option value="" disabled>Select type</option>
 						{#each evidenceTypes as type}
 							<option value={type.value}>{type.label}</option>
@@ -249,7 +242,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="priority">Priority</Label>
-				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
+				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700] focus:outline-none">
 					<option value="" disabled>Select priority</option>
 					{#each priorityOptions as option}
 						<option value={option.value}>{option.label}</option>
@@ -258,7 +251,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			</div>
 		</CardContent>
 		<CardFooter>
-			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover: bg-[#ffed4a], disabled: opacity-50, disabled, cursor-not-allowed bits-btn">
+			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover:bg-[#ffed4a] disabled:opacity-50 disabled cursor-not-allowed bits-btn">
 				{analyzing ? 'Analyzing...' : 'Start Analysis'}
 			</Button>
 			<Button onclick={ resetForm } variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover:bg-[#e5c51b] bits-btn">Reset</Button>
@@ -272,7 +265,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			</CardHeader>
 			<CardContent>
 				<Progress value={progress} class="mb-4" />
-				<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md grid-cols-2 gap-4">
 					{#each steps as step, index}
 						<div class="step flex items-center gap-2 {currentStep === index ? 'animate-pulse-glow' : ''}">
 							<span class="text-lg">{step.icon}</span>
@@ -298,7 +291,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 					<h3 class="text-lg font-semibold">Summary</h3>
 					<p>{results.analysisResults.summary || 'No summary available'}</p>
 				</div>
-				<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md grid-cols-2 gap-4">
 					<div>
 						<h4 class="font-semibold">Key Metrics</h4>
 						<ul class="list-disc list-inside">

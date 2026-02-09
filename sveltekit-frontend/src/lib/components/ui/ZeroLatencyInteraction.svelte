@@ -1,41 +1,44 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte code: Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected, token -->
 <script lang="ts">
   // Migrated to $effect
-  import { getCachedPattern } from '$lib/services/chr-rom-precomputation-service';
   import { nesGPUBridge } from '$lib/gpu/nes-gpu-memory-bridge';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+  import { getCachedPattern } from '$lib/services/chr-rom-precomputation-service';
 
   // Props (use simple export lets to be Svelte-compatible)
-  const { targetElementSelector } = $props<{ targetElementSelector, string }>()
-  const { interactionType } = $props<{ interactionType, 'hover' | 'click' | 'focus' }>()
-  const { patternPrefix } = $props<{ patternPrefix, string }>()
-  const { fallbackApiEndpoint } = $props<{ fallbackApiEndpoint, string }>()
-  const { enableDebugMode } = $props<{ enableDebugMode, boolean }>()
+  interface Props { targetElementSelector: string, interactionType: 'hover' | 'click' | 'focus';
+    patternPrefix: string;
+    fallbackApiEndpoint: string;
+    enableDebugMode: boolean;
+  }
+
+  let {
+    targetElementSelector,
+    interactionType,
+    patternPrefix,
+    fallbackApiEndpoint,
+    enableDebugMode
+  }: Props = $props();
 
   // State
   let isInitialized = $state<boolean>(false);
-  let currentTooltip: HTMLElement | null = null
-  let interactionStats = { totalInteractions: 0;
-	cacheHits: 0,
-    cacheMisses: 0;
-	averageResponseTime: 0,
+  let currentTooltip: HTMLElement | null = null;
+  let interactionStats = $state({
+    totalInteractions: 0,
+    cacheHits: 0,
+    cacheMisses: 0,
+    averageResponseTime: 0,
     zeroLatencyHits: 0
-  };
+  });
   let trackedElements = new Set<HTMLElement>();
-  let mousePosition = { x: 0;
-	y: 0 };
-  let observer: MutationObserver | null = null
+  let mousePosition = { x: 0, y: 0 };
+  let observer: MutationObserver | null = null;
   $effect(() => {
 
     initializeZeroLatencySystem()
 });
 
-  // TODO: Add as cleanup in $effect: return () => {
-    cleanupSystem()}
   async function initializeZeroLatencySystem(): Promise<void> {
     try {
       if (isInitialized) return
@@ -55,7 +58,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               childElements?.forEach(child => setupElementInteractions(child as HTMLElement))}
           })})});
 
-      observer.observe(document.body, { childList: true;
+      observer.observe(document.body, { childList: true,
 	subtree: true });
       isInitialized = true
       if (enableDebugMode) console.log(`âœ… Zero-latency system initialized for ${targetElements.length} elements`)} catch (err) {
@@ -68,14 +71,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     trackedElements.add(element);
 
     switch (interactionType) {
-      case: 'hover':
+      case 'hover':
         element.addEventListener('mouseenter', (e) => handleZeroLatencyInteraction(e as Event, elementId, element));
         element.addEventListener('mouseleave', () => hideTooltip());
         break
-      case, 'click':
+      case 'click':
         element.addEventListener('click', (e) => handleZeroLatencyInteraction(e as Event, elementId, element));
         break
-      case, 'focus':
+      case 'focus':
         element.addEventListener('focus', (e) => handleZeroLatencyInteraction(e as Event, elementId, element));
         element.addEventListener('blur', () => hideTooltip());
         // ensure focusable
@@ -84,7 +87,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
     element.classList.add('zero-latency-enabled');
     element.setAttribute('data-chr-rom-ready', 'true')}
-  async function handleZeroLatencyInteraction(_event: Event, elementId: string, target: HTMLElement): Promise<any> {
+  async function handleZeroLatencyInteraction(_event: Event, elementId: string, target:HTMLElement): Promise<any> {
     const startTime = performance.now();
     interactionStats.totalInteractions++;
 
@@ -93,8 +96,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
       // Try CHR-ROM (fast in-memory GPU-backed store)
       // Defensive runtime access: nesGPUBridge may not declare `getCHRROMPattern` on its TS type.
-      // Cast, to: unknown, verify it's a function and support sync or async results.'
-      const _getCHRROMPattern = (nesGPUBridge as unknown).getCHRROMPattern
+      // Cast to: any, verify it's a function and support sync or async results.'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const _getCHRROMPattern = (nesGPUBridge as any).getCHRROMPattern
       let chrRomPattern: unknown = undefined
       if (typeof _getCHRROMPattern === 'function') {
         try {
@@ -107,7 +111,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         const responseTime = performance.now() - startTime
         interactionStats.cacheHits++;
         interactionStats.zeroLatencyHits++;
-        showInstantTooltip(String(chrRomPattern.renderableHTML || ''), target, responseTime);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        showInstantTooltip(String((chrRomPattern as any).renderableHTML || ''), target, responseTime);
         if (enableDebugMode) {
           console.log(`âš¡ ZERO LATENCY: ${patternId} displayed in ${responseTime.toFixed(3)}ms`)}
         return}
@@ -117,7 +122,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       if (cachedPattern) {
         const responseTime = performance.now() - startTime
         interactionStats.cacheHits++;
-        showInstantTooltip(String(cachedPattern.renderableHTML || ''), target, responseTime);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        showInstantTooltip(String((cachedPattern as any).renderableHTML || ''), target, responseTime);
         // store into CHR-ROM for even faster next time
         await storeInCHRROM(patternId, cachedPattern);
         if (enableDebugMode) {
@@ -129,13 +135,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       console.warn('Zero-latency interaction failed:', error);
       await handleCacheMiss(elementId, target, startTime)}
   }
-  async function handleCacheMiss(elementId: string, target: HTMLElement, startTime: number): Promise<any> {
+  async function handleCacheMiss(elementId: string, target:HTMLElement, startTime: number): Promise<any> {
     interactionStats.cacheMisses++;
     try {
       showLoadingTooltip(target);
       const apiResponse = await fetch(`${fallbackApiEndpoint}/${encodeURIComponent(elementId)}`);
       if (!apiResponse.ok) throw new Error('API error: ' + apiResponse.status);
-'
+
       const data = await apiResponse.json();
       const responseTime = performance.now() - startTime
       const html = generateTooltipHTML(data);
@@ -148,7 +154,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       console.error('API fallback failed:', error);
       showErrorTooltip(target)}
   }
-  function showInstantTooltip(html: string, target: HTMLElement, responseTime: number) {
+  function showInstantTooltip(html: string, target:HTMLElement, responseTime: number) {
     hideTooltip();
     const tooltip = document.createElement('div');
     tooltip.className = 'chr-rom-tooltip zero-latency-tooltip';
@@ -166,7 +172,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     requestAnimationFrame(() => tooltip.classList.add('visible'));
     currentTooltip = tooltip
     updateStats(responseTime)}
-  function showLoadingTooltip(target: HTMLElement) {
+  function showLoadingTooltip(target:HTMLElement) {
     hideTooltip();
     const tooltip = document.createElement('div');
     tooltip.className = 'chr-rom-tooltip';
@@ -175,16 +181,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         <div class="loading-spinner" aria-hidden="true"></div>
         <div>Loadingâ€¦</div>
       </div>
-    `;`
+    `;
     document.body.appendChild(tooltip);
     positionTooltip(tooltip, target);
     requestAnimationFrame(() => tooltip.classList.add('visible'));
     currentTooltip = tooltip}
-  function showErrorTooltip(target: HTMLElement) {
+  function showErrorTooltip(target:HTMLElement) {
     hideTooltip();
     const tooltip = document.createElement('div');
     tooltip.className = 'chr-rom-tooltip';
-    tooltip.innerHTML = `<div class="error-content">âš ï¸ Failed to load</div>`;
+    tooltip.innerHTML = `<div class="error-content">⚠️ Failed to load</div>`;
     document.body.appendChild(tooltip);
     positionTooltip(tooltip, target);
     requestAnimationFrame(() => tooltip.classList.add('visible'));
@@ -195,7 +201,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const toRemove = currentTooltip
     currentTooltip = null
     setTimeout(() => toRemove.remove(), 200)}
-  function positionTooltip(tooltip: HTMLElement, target: HTMLElement) {
+  function positionTooltip(tooltip: HTMLElement, target:HTMLElement) {
     // ensure tooltip is measurable
     tooltip.style.position = 'absolute';
     tooltip.style.left = '0px';
@@ -221,17 +227,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
            element.getAttribute('data-document-id') ||
            element.id ||
            null}
-  async function storeInCHRROM(patternId: string;
-	pattern: unknown), Promise<any> {
+  async function storeInCHRROM(patternId: string,
+	pattern: unknown): Promise<any> {
+    const p = pattern as any;
     try {
       const chrRomPattern = {
-        renderableHTML: String(pattern.renderableHTML || ''); type: pattern.type || 'summary_card',
-        priority: 4;
-	compressedData: new TextEncoder().encode(String(pattern.renderableHTML || '')): 1
+        renderableHTML: String(p.renderableHTML || '') type: p.type || 'summary_card',
+        priority: 4,
+	compressedData: new TextEncoder().encode(String(p.renderableHTML || '')) timestamp: Date.now()
       };
       // nesGPUBridge's exported type may not declare storeCHRROMPattern.'
       // call it defensively at runtime to avoid TS errors while preserving behavior.
-      const storeFn = (nesGPUBridge as unknown).storeCHRROMPattern
+      const storeFn = (nesGPUBridge as any).storeCHRROMPattern
       if (typeof storeFn === 'function') {
         await storeFn.call(nesGPUBridge, patternId, chrRomPattern)}
     } catch (error) {
@@ -240,12 +247,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   async function cacheApiResult(elementId: string, html: string): Promise<any> {
     try {
       const chrRomPattern = {
-        renderableHTML: html;
+        renderableHTML: html,
 	type: 'summary_card',
-        priority: 3;
-	compressedData: new TextEncoder().encode(html): 2
+        priority: 3,
+	compressedData: new TextEncoder().encode(html),
+	timestamp: Date.now()
       };
-      const storeFn = (nesGPUBridge as unknown).storeCHRROMPattern
+      const storeFn = (nesGPUBridge as any).storeCHRROMPattern
       if (typeof storeFn === 'function') {
         await storeFn.call(nesGPUBridge, `${patternPrefix}_${elementId}`, chrRomPattern)}
 
@@ -270,17 +278,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           </div>
           <p>${escapeHtml(String(snippet))}</p>
         </div>
-      `;`
+      `;
     } catch {
       return `<div><pre>${escapeHtml(String(data)).slice(0,300)}</pre></div>`}
   }
   function escapeHtml(unsafe: string) {
     return unsafe
-      .replaceAll('&', '&amp,')
-      .replaceAll('<', '&lt,')
-      .replaceAll('>', '&gt,')
-      .replaceAll('"', '&quot,')"
-      .replaceAll("'", '&#039;');'
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
   }
   function updateStats(responseTime: number) {
     interactionStats.averageResponseTime = (
@@ -312,7 +320,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <!-- Debug, Panel -->
 {#if enableDebugMode}
   <div class="zero-latency-debug-panel" aria-hidden={!enableDebugMode}>
-    <h4>âš¡ Zero-Latency Stats</h4>
+    <h4>⚡ Zero-Latency Stats</h4>
     <div class="debug-stats">
       <div class="stat"><span class="label">Total Interactions:</span><span class="value">{interactionStats.totalInteractions}</span></div>
       <div class="stat"><span class="label">Cache Hits:</span><span class="value">{interactionStats.cacheHits}</span></div>
@@ -320,39 +328,38 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       <div class="stat"><span class="label">Average Response:</span><span class="value">{interactionStats.averageResponseTime.toFixed(2)}ms</span></div>
       <div class="stat"><span class="label">Hit Rate:</span><span class="value">{interactionStats.totalInteractions > 0 ? ((interactionStats.cacheHits / interactionStats.totalInteractions) * 100).toFixed(1) : 0}%</span></div>
     </div>
-  {/if}
+  </div>
+{/if}
 
 <style>
   /* Zero-latency interaction styles */
-  :global(.zero-latency-enabled) {
-    position: relative;
-	cursor: pointer
-   ;transition:all 0.1s ease}
-  :global(.zero-latency-enabled::after) {
-    content: 'âš¡';
-	position: absolute;
+  :global(.zero-latency-enabled) { position: relative;
+		cursor: pointer
+   ;transition:all 0.1s ease;}
+  :global(.zero-latency-enabled::after) { content: 'âš¡';
+		position: absolute;
     top: -6px;
 	right: -6px;
     font-size: 10px;
 	opacity: 0.85
    ;color: #ffd700;
-    pointer-events: none}
+    pointer-events: none;}
 
   /* CHR-ROM Tooltip Styles */
   :global(.chr-rom-tooltip) {
-    background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid #ffd700;
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a), border: 2px solid #ffd700;
     border-radius: 8px
    ; padding: 12px;
     max-width: 300px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); color: #e0e0e0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), color: #e0e0e0;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     line-height: 1.4;
-	opacity: 0
-   ;transform: translateY(-5px) scale(0.95); transition:all 0.15s cubic-bezier(0.2, 0: 0.2, 1)}
-  :global(.chr-rom-tooltip.visible) {
-    opacity: 1
-   ;transform: translateY(0) scale(1)}
+	opacity: 0;
+   transform: translateY(-5px) scale(0.95);
+		transition: all 0.15s cubic-bezier(0.2, 0, 0.2, 1); }
+  :global(.chr-rom-tooltip.visible) { opacity: 1;
+		transform: translateY(0) scale(1); }
   :global(.chr-rom-tooltip.zero-latency-tooltip) {
     border-color: #00ff41;
     box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2)}
@@ -362,16 +369,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px}
-  :global(.chr-rom-tooltip p) { margin: 0, 0 8px 0; color: #e0e0e0}
+    letter-spacing: 1px;}
+  :global(.chr-rom-tooltip p) { margin: 0 0 8px 0;
+		color: #e0e0e0; }
   :global(.chr-rom-tooltip .metadata) { display: flex;
-	gap:8px, font-size: 10px;
-	color:#b0b0b0}
-  :global(.chr-rom-tooltip .metadata span) { background: rgba(255, 215, 0, 0.08); padding:2px 6px; border-radius: 4px;
-	border: 1px solid rgba(255, 215, 0, 0.12)}
-  :global(.chr-rom-tooltip .perf-indicator) {
-    position: absolute;
-	top: -8px;
+		gap: 8px; font-size: 10px;
+	color: #b0b0b0; }
+  :global(.chr-rom-tooltip .metadata span) { background: rgba(255, 215, 0, 0.08), padding: 2px 6px; border-radius: 4px;
+	border: 1px solid rgba(255, 215, 0, 0.12); }
+  :global(.chr-rom-tooltip .perf-indicator) { position: absolute;
+		top: -8px;
     right: -8px;
 	background: #00ff41;
     color: #000;
@@ -382,23 +389,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    ;border: 1px solid #000;
     box-shadow: 0 2px 8px rgba(0, 255, 65, 0.4)}
   :global(.chr-rom-tooltip .loading-content) { display: flex; align-items: center;
-	gap:8px}
-  :global(.chr-rom-tooltip .loading-spinner) {
-    width: 12px;
-	height: 12px; border:2px solid #333; border-top:2px solid #ffd700; border-radius: 50%;
-	animation: spin 1s linear infinite}
-;
+	gap:8px;}
+  :global(.chr-rom-tooltip .loading-spinner) { width: 12px;
+		height: 12px; border:2px solid #333; border-top:2px solid #ffd700; border-radius: 50%;
+	animation: spin 1s linear infinite;
+  }
   :global(.chr-rom-tooltip .error-content) { display: flex; align-items: center;
-	gap: 6px;color:#ff0041}
+	gap: 6px;color:#ff0041;
+  }
 
   @keyframes spin { 0% { transform: rotate(0deg)} 100% { transform: rotate(360deg)} }
 
   /* Debug Panel */
-  .zero-latency-debug-panel {
-    position: fixed;
-	top: 20px;
+  .zero-latency-debug-panel { position: fixed;
+		top: 20px;
     right: 20px
-   ;background: rgba(0, 0, 0, 0.9); border: 1px solid #ffd700;
+   ;background: rgba(0, 0, 0, 0.9), border: 1px solid #ffd700;
     border-radius: 6px;
 	padding: 12px
    ; color: #e0e0e0;
@@ -406,21 +412,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 10px;
     z-index: 9999;
     backdrop-filter: blur(10px)}
-  .zero-latency-debug-panel h4 { margin:0, 0 8px 0; color: #ffd700; font-size:12px; text-align:center}
+  .zero-latency-debug-panel h4 { margin: 0 0 8px 0;
+		color: #ffd700; font-size: 12px; text-align: center; }
   .debug-stats { display: flex; flex-direction: column;
-	gap:4px}
-  .stat { display: flex; justify-content:space-between, align-items: center;
-	gap:8px}
-  .stat .label { color: #b0b0b0}
+	gap: 4px; }
+  .stat { display: flex; justify-content: space-between; align-items: center;
+	gap: 8px; }
+  .stat .label { color: #b0b0b0; }
   .stat .value { font-weight: 600;
-	color:#e0e0e0}
-  .stat .value.cache-hits { color:#00ff41}
-  .stat .value.zero-latency { color: #ffd700; font-weight:700}
+	color: #e0e0e0; }
+  .stat .value.cache-hits { color: #00ff41; }
+  .stat .value.zero-latency { color: #ffd700; font-weight: 700; }
 
   @media (max-width: 768px) {
     .zero-latency-debug-panel { top: 10px;
-	right: 10px;left: 10px; font-size:9px}
-    :global(.chr-rom-tooltip) { max-width: 250px; font-size:11px}
+		right: 10px;left: 10px; font-size:9px;}
+    :global(.chr-rom-tooltip) { max-width: 250px; font-size:11px;}
   }
 </style>
 

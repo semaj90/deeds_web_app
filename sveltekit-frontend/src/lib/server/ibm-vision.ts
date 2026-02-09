@@ -139,7 +139,7 @@ export class IBMVisionService {
 	private async classifyImage(
 		imageBase64: string
 	): Promise<Array<{
-	class: string; confidence: number }>> {
+	class: string, confidence: number }>> {
 		const params = {
 			images_file: {
 	value: Buffer.from(imageBase64, 'base64'),

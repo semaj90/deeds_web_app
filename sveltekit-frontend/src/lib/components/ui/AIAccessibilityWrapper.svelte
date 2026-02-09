@@ -2,11 +2,8 @@
   // Svelte, 5 runes are auto-imported
   import { aiAccessibilityPatterns } from '$lib/services/ai-accessibility-patterns';
 
-  import { accessibilityService } from '$lib/services/accessibility-service';
 
   import type { Snippet } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     children?: Snippet
     aiResult?: unknown
@@ -84,10 +81,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         content: value,
         level: index + 1
       }));
-      aiAccessibilityPatterns?.createProgressiveDisclosure(containerElement, aiResult, { summary: levels });
+      aiAccessibilityPatterns?.createProgressiveDisclosure(containerElement, obj, { summary, levels });
     } else {
       // Create simple accessible result card
-      aiAccessibilityPatterns?.createAccessibleAIResult(aiResult, containerElement);
+      aiAccessibilityPatterns?.createAccessibleAIResult(containerElement, aiResult);
     }
   }
   function handleVoiceCommand() {
@@ -110,9 +107,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         title="Voice Commands (Ctrl+Shift+V)"
       >
         {#if voiceCommandsActive}
-          ðŸŽ¤ Voice Active
+          🎤 Voice Active
         {:else}
-          ðŸŽ¤ Voice Commands
+          🎤 Voice Commands
         {/if}
       </button>
       {#if voiceCommandsActive}
@@ -206,7 +203,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 0.875rem;
     border-radius: 4px;
 	cursor: pointer;
-    transition:all 0.2s ease;
+    transition: all 0.2s ease;
   }
   .voice-status {
     font-size: 0.875rem;
@@ -279,7 +276,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     align-items: center;
 	gap: 0.5rem;
     font-weight: 500;
-	transition:background-color 0.2s ease;
+	transition: background-color 0.2s ease;
   }
   .help-toggle:hover {
     background: rgba(0, 188, 212, 0.1);
@@ -323,7 +320,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     .voice-toggle,
     .help-toggle {
       animation: none !important;
-      transition:none !important;
+      transition: none !important;
     }
   }
   /* High contrast mode support */

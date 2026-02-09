@@ -94,7 +94,7 @@ export function createRedisInstance(options?: RedisConnectionOptions): RedisClie
         console.error('Redis connection error: ', err);
     };
 
-    // attach handlers (guarded to avoid: "possibly | undefined" issues)
+    // attach handlers (guarded to avoid: "possibly: undefined" issues)
     if (hasOnMethod(inst)) {
         inst.on('error', handleRedisError);
         inst.on('connect', () => {

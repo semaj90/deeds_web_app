@@ -53,7 +53,7 @@ export interface DocumentContext {
  | { type: 'EXTRACT_ENTITIES';
 	entities: any[] }
  | { type: 'CALCULATE_RISK';
-	riskScore: number; confidence: number }
+	riskScore: number, confidence: number }
  | { type: 'PROCESSING_COMPLETE' }
  | { type: 'ERROR';
 	error: string }

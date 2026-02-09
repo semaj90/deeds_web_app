@@ -6,18 +6,17 @@ https, //svelte.dev/e/js_parse_error -->
   const { onclose } = $props<{ onclose, ((event?, any) }>()
   import { aiService } from '$lib/services/aiService';
   import * as Dialog from '$lib/components/ui/Dialog.svelte';
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   // use icon components from the icons subpath (lucide-svelte exports individual files)
   import  Copy  from "lucide-svelte/icons/copy.svelte";
   import X from 'lucide-svelte/icons/x.svelte';
   import  AlertCircle  from "lucide-svelte/icons/alert-circle.svelte";
   import  Check  from "lucide-svelte/icons/check.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // relax strict typing for our local UI components (prevents TS errors about: unknown props/events)
   declare module: '$lib/components/ui/dialog' {
-    export const Root: any
+    export const Root:any
     export const Content: any
     export const Title: any
     export const Description: any}
@@ -108,10 +107,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <style>
   /* @unocss-include */
   .prose {
-    max-width: none}
+    max-width: none;}
   /* minimal header/footer styles so layout remains consistent */
-  .dialog-header { margin-bottom: 0.75rem}
-  .dialog-footer { margin-top: 1rem}
+  .dialog-header { margin-bottom: 0.75rem;}
+  .dialog-footer { margin-top: 1rem;}
 </style>
 
 

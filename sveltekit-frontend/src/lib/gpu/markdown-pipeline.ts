@@ -389,7 +389,7 @@ export class LegalDocumentProcessor {
  return result.sections.map((section, index) => ({
  content: section.content,
  type: section.type,
- embedding: result.embeddings?.[index] ? Array.from(result.embeddings[index]) : undefined,
+ embedding: result.embeddings?.[index] ? Array.from(result.embeddings[index])  | undefined,
  metadata: {
 	level: section.level,
  startOffset: section.startOffset,

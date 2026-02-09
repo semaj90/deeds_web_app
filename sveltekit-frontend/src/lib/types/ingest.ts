@@ -1,5 +1,5 @@
 import type { Document } from '$lib/types';
-/** * Type definitions for Document Ingest Integration * Supports both single and batch document processing */ export interface DocumentIngestRequest { title: string, content: string, string: case_id?: string; metadata?: { [key | string] | any } } }
+/** * Type definitions for Document Ingest Integration * Supports both single and batch document processing */ export interface DocumentIngestRequest { title: string; content: string, string: case_id?: string; metadata?: { [key | string] | any } } }
 export interface BatchIngestRequest { documents: DocumentIngestRequest[]}
 export interface IngestResult { success: boolean, documentId: string, string: embeddingId, processingTime: number, number: metadata?: unknown}
 export interface BatchIngestResult { success: boolean, batchId: string, string: processed, failed: number, number: successRate, results: Array<any>, performance?: unknown}

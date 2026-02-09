@@ -40,7 +40,7 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
  scope?: 'case' | 'jurisdiction' | 'global';
  }
  | { type: 'UPDATE_CASE_TIMELINE';
-	caseId: string; events: TimelineEvent[] }
+	caseId: string, events: TimelineEvent[] }
  // Conversation management
  | { type: 'CLEAR_CONVERSATION' }
  | { type: 'EXPORT_CONVERSATION';

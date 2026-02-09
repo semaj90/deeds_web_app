@@ -1,6 +1,6 @@
 <script lang="ts">
   import Badge from "$lib/components/ui/Badge.svelte";
-  import Button from "$lib/components/ui/enhanced-bits.svelte";
+  import Button from '$lib/components/ui/Button.svelte';
   import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
   import Archive from 'lucide-svelte/icons/archive';
   import Calendar from 'lucide-svelte/icons/calendar';
@@ -13,11 +13,8 @@
   import Trash2 from 'lucide-svelte/icons/trash-2';
   import Users from 'lucide-svelte/icons/users';
   import { scale } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-  interface CaseData {
-    id: string;
-	title: string;
+  interface CaseData { id: string, title: string;
     description?: string;
 	status: 'active' | 'pending' | 'closed' | 'archived';
     priority: 'critical' | 'high' | 'medium' | 'low';
@@ -26,9 +23,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     assignee?: {
 	name: string;
       avatar?: string };
-    stats: {
-	evidence: number;
-      witnesses: number;
+    stats: { evidence: number, witnesses: number;
 	documents: number };
     tags?: string[];
     progress?: number }
@@ -50,9 +45,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   let open = $state(false);
 
-  const statusConfig = {
-    active: {
-	label: 'Active', class: 'bg-green-100 text-green-800', icon: CheckCircle },
+  const statusConfig = { active: { label: 'Active', class: 'bg-green-100 text-green-800', icon: CheckCircle },
 	pending: {
 	label: 'Pending', class: 'bg-yellow-100 text-yellow-800', icon: Clock },
 	closed: {
@@ -61,9 +54,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	label: 'Archived', class: 'bg-gray-100 text-gray-800', icon: Archive }
   };
 
-  const priorityConfig = {
-    critical: {
-	icon: '🔴', color: 'text-red-500' },
+  const priorityConfig = { critical: { icon: '🔴', color: 'text-red-500' },
 	high: {
 	icon: '🟠', color: 'text-orange-500' },
 	medium: {
@@ -104,7 +95,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             {currentPriority.icon}
           </span>
         </div>
-        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover: text-harvard-crimson, dark:group-hover:text-digital-green">
+        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover:text-harvard-crimson dark:group-hover:text-digital-green">
           {caseData.title}
         </h3>
         {#if caseData.description}
@@ -115,7 +106,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       </div>
 
       <div class="flex items-center gap-2">
-        <Badge variant="ghost" class={currentStatus.class}>
+        <Badge variant="outline" class={currentStatus.class}>
           {#if currentStatus.icon}
             {@const StatusIcon = currentStatus.icon}
             <StatusIcon class="w-3 h-3 mr-1" />
@@ -302,12 +293,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     -webkit-line-clamp: 1;
     line-clamp: 1;
     -webkit-box-orient: vertical;
-	overflow: hidden }
+	overflow: hidden;}
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
-	overflow: hidden }
+	overflow: hidden;}
 </style>
 

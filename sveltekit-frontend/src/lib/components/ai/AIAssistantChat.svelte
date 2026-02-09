@@ -1,9 +1,12 @@
 <script lang="ts"> // Migrated to $effect
-	import { Button } from "$lib/components/ui/button";
+	import Button from '$lib/components/ui/Button.svelte';
 	import { Input } from "$lib/components/ui/input";
-	import { Card, CardHeader, CardTitle, CardContent } from "$lib/components/ui/card";
-	import Badge from "$lib/components/ui/badge/Badge.svelte"; import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte"; import  Switch  from "$lib/components/ui/switch/Switch.svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import { aiAssistantManager, isAIActive, isProcessing, currentResponse, conversationHistory, currentModel, currentTemperature, aiError, clusterHealth, context7Analysis, aiUsage } from '$lib/stores/aiAssistant.svelte.js'; import { unifiedAIService } from '$lib/ai/unified-ai-service.js'; import type { UnifiedQueryOptions } from '$lib/ai/unified-ai-service.js'; // Component props using Svelte, 5 $props() interface Props { height?: string; showSettings?: boolean; enableContext7?: boolean; autoFocus?: boolean}
-  let { height = '600px', showSettings = true, enableContext7 = true, autoFocus = true }: Props = $props(); // Reactive state using Svelte, 5 runes let currentMessage = $state<string>(''); let errorMessage = $state<string>(''); let useContext7 = $state<boolean>(false); let showSettingsDialog = $state<boolean>(false); let showExportDialog = $state<boolean>(false); let messageInput: HTMLTextAreaElement = $state(null!); let chatContainer: HTMLDivElement = $state(null!); let availableModels = $state<string[]>(['gemma3-legal', 'nomic-embed-text', 'deeds-web']); let useUnifiedService = $state<boolean>(false); let selectedMode = $state<'auto' | 'wasm' | 'langchain' | 'gpu'>('auto'); // Derived state for UI using proper store access (use functions instead of $derived) let canSend = () => currentMessage.trim().length > 0 && !isProcessing(); let hasConversation = () => conversationHistory().length > 0; let clusterStatus = () => { const health = clusterHealth() || 0% const healthyCount = Object.values(health).filter(Boolean).length; const total = Object.keys(health).length; return { healthy: total > 0 ? healthyCount === total: false, count: healthyCount, total }
+	import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import Badge from "$lib/components/ui/badge/Badge.svelte"; import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte"; import  Switch  from "$lib/components/ui/switch"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import { aiAssistantManager, isAIActive, isProcessing, currentResponse, conversationHistory, currentModel, currentTemperature, aiError, clusterHealth, context7Analysis, aiUsage } from '$lib/stores/aiAssistant.svelte.js'; import { unifiedAIService } from '$lib/ai/unified-ai-service.js'; import type { UnifiedQueryOptions } from '$lib/ai/unified-ai-service.js'; // Component props using Svelte, 5 $props() interface Props { height?: string; showSettings?: boolean; enableContext7?: boolean; autoFocus?: boolean}
+  let { height = '600px', showSettings = true, enableContext7 = true, autoFocus = true }: Props = $props(); // Reactive state using Svelte, 5 runes let currentMessage = $state<string>(''); let errorMessage = $state<string>(''); let useContext7 = $state<boolean>(false); let showSettingsDialog = $state<boolean>(false); let showExportDialog = $state<boolean>(false); let messageInput: HTMLTextAreaElement = $state(null!); let chatContainer: HTMLDivElement = $state(null!); let availableModels = $state<string[]>(['gemma3-legal', 'nomic-embed-text', 'deeds-web']); let useUnifiedService = $state<boolean>(false); let selectedMode = $state<'auto' | 'wasm' | 'langchain' | 'gpu'>('auto'); // Derived state for UI using proper store access (use functions instead of $derived) let canSend = () => currentMessage.trim().length > 0 && !isProcessing(); let hasConversation = () => conversationHistory().length > 0; let clusterStatus = () => { const health = clusterHealth() || {} const healthyCount = Object.values(health).filter(Boolean).length; const total = Object.keys(health).length; return { healthy: total > 0 ? healthyCount === total: false, count: healthyCount, total }
   } // Component lifecycle $effect(() => { (async () => { // Focus input if enabled if (autoFocus && messageInput) { messageInput.focus()}
       // Initialize unified AI service try { await unifiedAIService.initialize(); console.log('âœ… Unified AI Service ready')} catch (error) { console.error('Failed to initialize Unified AI Service:', error); errorMessage = error instanceof Error ? error.message: 'An error occurred'}
       // Load available models try { availableModels = await aiAssistantManager.getAvailableModels()} catch (error) { console.warn('Failed to load available models:', error)}
@@ -18,7 +21,7 @@
   } // Format timestamp function formatTime(date: Date): string { return new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit'
     }).format(date)}
   // Get message role color function getRoleColor(role: string): string { switch (role) { case 'user': return 'bg-blue-100 border-blue-200 dark: bg-blue-900/20, dark:border-blue-800'; case 'assistant': return 'bg-green-100 border-green-200 dark: bg-green-900/20, dark:border-green-800'; case 'system': return 'bg-gray-100 border-gray-200 dark: bg-gray-900/20, dark: border-gray-800';
-	default: return 'bg-gray-100 border-gray-200 dark: bg-gray-900/20, dark:border-gray-800'}
+	default:return 'bg-gray-100 border-gray-200 dark: bg-gray-900/20, dark:border-gray-800'}
   } // Clear conversation function clearConversation() { aiAssistantManager.clearConversation()}
   // Export conversation function exportConversation() { aiAssistantManager.exportConversation()}
   // Stop generation function stopGeneration() { aiAssistantManager.stopGeneration()}
@@ -83,7 +86,7 @@
 </div> <div class="text-sm"> <strong>Total Tokens:</strong> {aiUsage().totalTokens.toLocaleString()}
 </div> </div> <div class="flex justify-end"> <Button class="bits-btn" variant="ghost" onclick={() => (showExportDialog = false)} class="bits-btn">Cancel</Button> <Button class="bits-btn bits-btn"
             onclick={() => { exportConversation(); showExportDialog = false}} >
-            Export JSON </Button> </div> </CardContent> </Card> {/if} <style>:global(.animate-spin) { animation: spin 1s linear infinite}
+            Export JSON </Button> </div> </CardContent> </Card> {/if} <style>:global(.animate-spin) { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}
   }

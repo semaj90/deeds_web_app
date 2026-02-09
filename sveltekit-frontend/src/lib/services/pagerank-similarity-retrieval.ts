@@ -1,5 +1,5 @@
-/** * PageRank Similarity Retrieval System * Implements PageRank algorithm for legal document ranking and similarity scoring * Integrates with GPU cache, vector databases, and Neo4j for high-performance retrieval */ // === PageRank Configuration === export interface PageRankConfig { dampingFactor: number, maxIterations: number, convergenceThreshold: number, enableGPUAcceleration: boolean, useSparseCaching: boolean, batchSize: number, parallelWorkers: number}
-// === Graph Data Structures === export interface GraphNode { id: string, type: 'document' | 'case' | 'evidence' | 'person' | 'concept',metadata: { title?: string; content? : string; tags?: string[],timestamp: number, importance: number, category: string}; embedding?: Float32Array, pageRankScore, number: Set<string>, outboundLinks: Set<string>, features: {
+/** * PageRank Similarity Retrieval System * Implements PageRank algorithm for legal document ranking and similarity scoring * Integrates with GPU cache, vector databases, and Neo4j for high-performance retrieval */ // === PageRank Configuration === export interface PageRankConfig { dampingFactor: number; maxIterations: number, convergenceThreshold: number; enableGPUAcceleration: boolean, useSparseCaching: boolean, batchSize: number, parallelWorkers: number}
+// === Graph Data Structures === export interface GraphNode { id: string; type: 'document' | 'case' | 'evidence' | 'person' | 'concept',metadata: { title?: string; content? : string; tags?: string[],timestamp: number, importance: number, category: string}; embedding?: Float32Array, pageRankScore, number: Set<string>, outboundLinks: Set<string>, features: {
 	textLength: number, citationCount: number, viewCount: number, recencyScore: number, authorityScore: number}}
 export interface GraphEdge {
  source: string;
@@ -8,10 +8,10 @@ export interface GraphEdge {
 	type: 'citation' | 'similarity' | 'reference' | 'dependency' | 'semantic';
  confidence: number;
 	metadata: { strength: number;
-	frequency: number; context: string[];
+	frequency: number, context: string[];
 	timestamp: number };
 }
-// REMOVED: export interface SimilarityQuery { queryVector?: Float32Array; queryText?: string; queryNodeId?: string,filters: { nodeTypes?: string[]; categories? : string[]; dateRange?: {
+// REMOVED: export interface SimilarityQuery { queryVector?: Float32Array; queryText?: string; queryNodeId?: string; filters: { nodeTypes?: string[]; categories? : string[]; dateRange?: {
 	start: Date | end: Date }; minPageRank?: number; tags?: string[]}; ranking: {
 	usePageRank: boolean, useSemanticSimilarity: boolean, useRecencyBoost: boolean, useAuthorityBoost: boolean, combinationStrategy: 'weighted' | 'product' | 'harmonic' | 'adaptive'}; limit: number, offset: number}
 export interface SimilarityResult {

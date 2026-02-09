@@ -326,7 +326,7 @@ export const GET: RequestHandler = async ({ request }) => {
  rootCause: 'Missing type definition',
  suggestedFixes: ['Add type annotation'],
  },
- timestamp: new Date(Date.now() - 3600000).toISOString(), userId: authResult.context?.userId,
+ timestamp: new Date(Date.now() - 3600000).toISOString(); userId: authResult.context?.userId,
  },
  timestamp: new Date(Date.now() - 3600000).toISOString(), userId: authResult.context?.userId,
  }];

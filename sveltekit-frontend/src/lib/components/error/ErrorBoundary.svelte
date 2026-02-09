@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import type { Snippet } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
@@ -161,9 +160,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		box-shadow: 0 20px 40px rgba(0, 255, 65, 0.2);
 	}
 
-	.error-icon {
-		color: #00ff41;
-	margin: 0 auto 2rem;
+	.error-icon { color: #00ff41;
+		margin: 0 auto 2rem;
 		opacity: 0.8;
 	}
 
@@ -190,9 +188,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	padding: 1rem;
 	}
 
-	.error-details summary {
-		cursor: pointer;
-	color: #00ff41;
+	.error-details summary { cursor: pointer;
+		color: #00ff41;
 		font-weight: bold;
 		margin-bottom: 1rem;
 	}
@@ -203,9 +200,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-size: 0.9rem;
 	}
 
-	.error-stack {
-		background: #000;
-	padding: 1rem;
+	.error-stack { background: #000;
+		padding: 1rem;
 		border-radius: 4px;
 		overflow-x: auto;
 		font-size: 0.8rem;

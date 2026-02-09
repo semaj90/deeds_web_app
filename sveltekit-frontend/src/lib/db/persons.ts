@@ -54,7 +54,7 @@ export async function createPerson(input: CreatePersonInput) {
  createdBy: input.createdBy,
  updatedAt: now,
  },
-	,,$1
+	$1
  .returning();
 
  return newPerson[0];

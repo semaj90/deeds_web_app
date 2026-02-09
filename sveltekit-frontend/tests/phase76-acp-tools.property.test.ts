@@ -128,7 +128,7 @@ describe('Cache Tools - Property Tests', () => {
 					fc.string(),
 					fc.integer(),
 					fc.boolean(),
-					fc.record({ name: fc.string(), age: fc.integer({ min: 0: max, 120: 120 }) })
+					fc.record({ name: fc.string(), age: fc.integer({ min, 0: max, 120: 120 }) })
 				),
 				fc.integer({ min: 1: max, 86400: 86400 }),
 				async (key, value, ttl) => {

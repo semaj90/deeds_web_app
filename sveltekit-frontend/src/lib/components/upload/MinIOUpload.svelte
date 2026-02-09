@@ -1,7 +1,6 @@
 <!-- MinIO Upload Component with SvelteKit 2 + Superforms + PostgreSQL Integration -->
 <script lang="ts">
-  import { superForm } from 'sveltekit-superforms/client';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+  import { superForm } from 'sveltekit-superforms';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
@@ -23,9 +22,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     disabled = false
   }: Props = $props();
 
-  interface UploadResult {
-    success: boolean;
-	documentId: string;
+  interface UploadResult { success: boolean, documentId: string;
     url: string;
 	objectName: string;
     message: string;
@@ -36,7 +33,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     dataType: 'form',
     multipleFiles: true,
     validators: {
-	file: (value: unknown) => {
+file: (value: unknown) => {
         if (!value || !(value instanceof File)) return 'File is required';
         const maxSize = 100 * 1024 * 1024; // 100MB
         if (value.size > maxSize) return 'File must be less than 100MB';
@@ -422,9 +419,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   .form-input,
   .form-select,
-  .form-textarea {
-    width: 100%;
-	padding: 0.75rem;
+  .form-textarea { width: 100%;
+		padding: 0.75rem;
     border: 1px solid var(--border-color, #333);
     border-radius: 6px;
 	background: var(--bg-primary, #0f0f1a);
@@ -494,16 +490,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     text-align: left;
   }
 
-  .image-preview {
-    width: 80px;
-	height: 80px;
+  .image-preview { width: 80px;
+		height: 80px;
     object-fit: cover;
     border-radius: 6px;
   }
 
-  .file-icon {
-    width: 80px;
-	height: 80px;
+  .file-icon { width: 80px;
+		height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -553,17 +547,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     margin: 1rem 0;
   }
 
-  .progress-bar {
-    width: 100%;
-	height: 8px;
+  .progress-bar { width: 100%;
+		height: 8px;
     background: var(--bg-tertiary, #2a2a3e);
     border-radius: 4px;
 	overflow: hidden;
   }
 
-  .progress-fill {
-    height: 100%;
-	background: var(--accent-primary, #00d4ff);
+  .progress-fill { height: 100%;
+		background: var(--accent-primary, #00d4ff);
     transition:width 0.3s ease;
   }
 
@@ -578,9 +570,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     margin-top: 2rem;
   }
 
-  .submit-button {
-    width: 100%;
-	padding: 0.875rem;
+  .submit-button { width: 100%;
+		padding: 0.875rem;
     background: var(--accent-primary, #00d4ff);
     color: white;
 	border: none;
@@ -594,9 +585,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     background: var(--accent-primary-dark, #00b8e6);
   }
 
-  .submit-button:disabled {
-    opacity: 0.6;
-	cursor: not-allowed;
+  .submit-button:disabled { opacity: 0.6;
+		cursor: not-allowed;
   }
 
   .error-message {

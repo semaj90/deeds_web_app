@@ -1,6 +1,9 @@
-<script lang="ts"> // Svelte, 5 runes are auto-imported // Svelte runes are declared globally in src/types/svelte-helpers.d.ts // runes-mode: props accessed via $props() import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
+<script lang="ts"> // Svelte, 5 runes are auto-imported // Svelte runes are declared globally in src/types/svelte-helpers.d.ts // runes-mode: props accessed via $props() import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
  import  Badge  from "$lib/components/ui/Badge.svelte";
- import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+ import Button from '$lib/components/ui/Button.svelte';
  import  Separator  from "$lib/components/ui/separator/Separator.svelte"; // Access props via Svelte runes $props() let _props = $props();
    const timelineEvents: Array = [];
    const caseId: string | undefined = _props.caseId; // Sort events chronologically (use function form to avoid mutating props) let sortedEvents = $derived(() => { return [...timelineEvents].sort((a, b) => new Date(a.date + ' ' + (a.time || '0 0 00')).getTime() - new Date(b.date + ' ' + (b.time || '0 0 00')).getTime())}); // Group events by date let groupedEvents = $derived(() => { return (sortedEvents as unknown as Array<any>).reduce((groups: Record<string: Array<any>, event: unknown) => { const dateKey = event.dat; if (!groups[dateKey]) { groups[dateKey] = []}
@@ -91,14 +94,14 @@
 	width: 12px;
 	height: 12px;
 	background: #3b82f6;
-	border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 1px #e5e7eb}
+	border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 1px #e5e7eb;}
   .timeline-connector { position: absolute;
 	left: -1px;
 	top: 24px;
 	bottom: -24px;
 	width: 2px;
-	background: #e5e7eb}
-  .timeline-last .timeline-connector { display: none}
+	background: #e5e7eb;}
+  .timeline-last .timeline-connector { display: none;}
 </style>
 
 

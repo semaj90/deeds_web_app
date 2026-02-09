@@ -13,7 +13,7 @@ type MemoryStats = {
 
 type WorkerToMain =
     | { type: 'initialized' }
-    | { type: 'memory_stats', stats: MemoryStats }
+    | { type: 'memory_stats'; stats: MemoryStats }
     | { type: 'response', success: boolean, embedding?: number[]; embeddings?: number[][]; error?: string }
     | { type: 'optimize_done' };
 

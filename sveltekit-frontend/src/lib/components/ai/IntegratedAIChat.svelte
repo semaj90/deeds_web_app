@@ -1,6 +1,5 @@
 <script lang="ts">
-import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'; import { Button } from '$lib/components/ui/enhanced-bits'; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Separator  from "$lib/components/ui/separator/Separator.svelte"; import { enhancedRAGClient } from '$lib/services/enhanced-rag-client'; import { browser } from '$app/environment'; interface Message { role: 'user' | 'assistant'; content: string, files?: FileAttachment[]; metadata?: MessageMetadata,timestamp: number}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'; import Button from '$lib/components/ui/Button.svelte'; import  Input  from "$lib/components/ui/Input.svelte"; // Badge replaced with span - not available in enhanced-bits import  Separator  from "$lib/components/ui/separator/Separator.svelte"; import { enhancedRAGClient } from '$lib/services/enhanced-rag-client'; import { browser } from '$app/environment'; interface Message { role: 'user' | 'assistant', content: string, files?: FileAttachment[]; metadata?: MessageMetadata,timestamp: number}
   interface FileAttachment { name: string, size: number;
 	type: string, url?: string}
   interface MessageMetadata { confidence?: number; tokensPerSecond?: number; ragResults?: number; processingTime?: number; model?: string}
@@ -65,11 +64,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </script>
  <div class="integrated-ai-chat"> <!-- Header with System, Status --> <div class="yorha-panel-header flex items-center justify-between p-4 border-b"> <div class="flex items-center"> <h2 class="text-lg font-bold">AI Legal Assistant</h2>
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{ model }</span> </div>
- <div class="flex items-center"> <Badge variant={connectionStatus.chat ? 'success', 'destructive'} size="sm"> Chat {connectionStatus.chat ? '': ''} </Badge>
- <Badge variant={connectionStatus.rag ? 'success', 'outline'} size="sm"> RAG {connectionStatus.rag ? '': 'ï¿½'} </Badge>
- <Badge variant={connectionStatus.quic ? 'success', 'outline'} size="sm"> QUIC {connectionStatus.quic ? '': 'ï¿½'} </Badge>
- <Badge variant={connectionStatus.redis ? 'success', 'outline'} size="sm"> Redis {connectionStatus.redis ? '': 'ï¿½'} </Badge>
- <Badge variant={connectionStatus.cuda ? 'success', 'outline'} size="sm"> CUDA {connectionStatus.cuda ? '': 'ï¿½'} </Badge> </div> </div>
+ <div class="flex items-center"> <Badge variant={connectionStatus.chat ? 'success' : 'destructive'} size="sm"> Chat {connectionStatus.chat ? '': ''} </Badge>
+ <Badge variant={connectionStatus.rag ? 'success' : 'outline'} size="sm"> RAG {connectionStatus.rag ? '': 'ï¿½'} </Badge>
+ <Badge variant={connectionStatus.quic ? 'success' : 'outline'} size="sm"> QUIC {connectionStatus.quic ? '': 'ï¿½'} </Badge>
+ <Badge variant={connectionStatus.redis ? 'success' : 'outline'} size="sm"> Redis {connectionStatus.redis ? '': 'ï¿½'} </Badge>
+ <Badge variant={connectionStatus.cuda ? 'success' : 'outline'} size="sm"> CUDA {connectionStatus.cuda ? '': 'ï¿½'} </Badge> </div> </div>
  <!-- System, Stats -->
   {#if systemStats.tokensPerSecond > 0 || systemStats.embeddingsCount > 0} <div class="px-4 py-2 bg-black/20 border-b border-yellow-400/20 flex items-center gap-4">
   {#if systemStats.tokensPerSecond > 0} <div class="flex items-center"> <span class="text-gray-400">Speed:</span>
@@ -82,7 +81,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   <!-- Messages, Container --> <div bind:this={scrollContainer} class="yorha-panel-content flex-1 overflow-y-auto p-4 space-y-4"
     ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } >
   {#if messages.length === 0} <div class="flex items-center justify-center h-full"> <div class="text-center"> <p class="text-lg">No messages yet</p>
- <p class="text-sm">Start a conversation or drag & drop files to analyze</p> </div> {/if} {#each Array.isArray(messages) ? messages: [] as message} <div class="message-bubble {message.role === 'user' ? 'user-message', 'assistant-message'}"> <div class="message-header flex items-center justify-between"> <div class="flex items-center"> <Badge variant={message.role === 'user' ? 'info', 'success'} size="sm"> {message.role === 'user' ? 'You': 'AI Assistant'} </Badge>
+ <p class="text-sm">Start a conversation or drag & drop files to analyze</p> </div> {/if} {#each Array.isArray(messages) ? messages: [] as message} <div class="message-bubble {message.role === 'user' ? 'user-message' : 'assistant-message'}"> <div class="message-header flex items-center justify-between"> <div class="flex items-center"> <Badge variant={message.role === 'user' ? 'info' : 'success'} size="sm"> {message.role === 'user' ? 'You': 'AI Assistant'} </Badge>
  <span class="text-xs">{formatTimestamp(message.timestamp)}</span> </div>
   {#if message.metadata} <div class="flex items-center">
   {#if message.metadata.confidence !== undefined} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{Math.round(message.metadata.confidence * 100)}% confidence</span> {/if} {#if message.metadata.tokensPerSecond && message.metadata.tokensPerSecond > 0} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{message.metadata.tokensPerSecond} tok/s</span> {/if} {#if message.metadata.ragResults && message.metadata.ragResults > 0} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{message.metadata.ragResults} RAG results</span> {/if} {/if}
@@ -112,38 +111,38 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   <!-- Input, Area --> <div class="p-4"> <div class="flex items-end"> <div class="flex-1"> <Input bind:value={ inputMessage } placeholder="Type your message... (Shift+Enter for new, line)"
           disabled={ isLoading } onkeypress={ handleKeyPress } class="w-full"
         /> </div>
- <div class="flex items-center"> <label class="nes-btn is-primary"> =ï¿½ <input type="file" multiple, onchange={ handleFileInput } class="hidden" disabled={ isLoading } /> </label>
+ <div class="flex items-center"> <label class="nes-btn is-primary"> =ï¿½ <input type="file" multiple onchange={ handleFileInput } class="hidden" disabled={ isLoading } /> </label>
  <Button class="bits-btn" variant="yorha"
           onclick={ handleSend } disabled={isLoading || (!inputMessage.trim() && attachedFiles.length === 0)} loading={ isLoading } loadingText="Sending..."
         > Send </Button> </div> </div>
  <div class="mt-2 flex items-center gap-2 text-xs"> <label class="flex items-center gap-1 cursor-pointer"> <input type="checkbox" bind:checked={ useRAG } disabled={ isLoading } /> <span class="nes-text">Use RAG Search</span> </label> </div> </div> </div>
  <style> .integrated-ai-chat { display: flex; flex-direction: column;
-	background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid rgba(250, 204, 21, 0.3); border-radius: 8px;
+	background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%), border: 2px solid rgba(250, 204, 21, 0.3); border-radius: 8px;
 	overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5)}
   .yorha-panel-header { background: linear-gradient(to right, #1a1a1a, #2a2a2a)}
-  .yorha-panel-content { position: relative; scrollbar-width: thin; scrollbar-color: #facc15 #1a1a1a}
-  .yorha-panel-content::-webkit-scrollbar { width: 8px}
-  .yorha-panel-content::-webkit-scrollbar-track { background: #1a1a1a}
-  .yorha-panel-content::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px}
+  .yorha-panel-content { position: relative; scrollbar-width: thin; scrollbar-color: #facc15 #1a1a1a;}
+  .yorha-panel-content::-webkit-scrollbar { width: 8px;}
+  .yorha-panel-content::-webkit-scrollbar-track { background: #1a1a1a;}
+  .yorha-panel-content::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px;}
   .message-bubble { max-width: 85%;
-	animation: slideIn 0.3s ease-out}
-  .user-message { margin-left: auto}
-  .assistant-message { margin-right: auto}
-  .message-content { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(250, 204, 21, 0.2)}
+	animation: slideIn 0.3s ease-out;}
+  .user-message { margin-left: auto;}
+  .assistant-message { margin-right: auto;}
+  .message-content { background: rgba(0, 0, 0, 0.3), border: 1px solid rgba(250, 204, 21, 0.2)}
   .user-message .message-content { border-color: rgba(59, 130, 246, 0.3)}
-  .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0: 0.6, 1) infinite}
+  .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0: 0.6, 1) infinite;}
   @keyframes slideIn { from { opacity: 0;
 	transform: translateY(10px)}
     to { opacity: 1;
 	transform: translateY(0)}
-  } @keyframes pulse { 0%; } 100% { opacity: 1}
-    50% { opacity: 0.3}
+  } @keyframes pulse { 0%; } 100% { opacity: 1;}
+    50% { opacity: 0.3;}
   } .sr-only { position: absolute;
 	width: 1px;
 	height: 1px;
 	padding: 0;
 	margin: -1px;
-	overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0 }
+	overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;}
 </style>
 
 

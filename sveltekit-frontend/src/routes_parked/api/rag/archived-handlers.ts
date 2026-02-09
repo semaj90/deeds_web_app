@@ -24,7 +24,7 @@ function errorMessage(err: any): string {
 type BackendResult = Record<string, unknown>;
 
 async function forwardToRAGBackend(
- endpoint: string, options: RequestInit = {}
+ endpoint: string; options: RequestInit = {}
 ): Promise<BackendResult> {
  const controller = new AbortController();
  const timeoutId = setTimeout(() => controller.abort(), RAG_TIMEOUT);
@@ -204,7 +204,7 @@ export async function handlePgaiProcess(request: Request): Promise<Response> {
  options: { temperature: 0.1, num_predict: 1500 },
  }),
  });
- const resultJson = (await response.json()) as Record<string, unknown>;typeof resultJson['response'] === 'string' ? (resultJson['response'] as string) : undefined;
+ const resultJson = (await response.json()) as Record<string, unknown>;typeof resultJson['response'] === 'string' ? (resultJson['response'] as string)  | undefined;
  let parsedResult: PGaiSummary | string | Record<string, unknown>;
  if (typeof respText === 'string') {
  try {

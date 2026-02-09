@@ -12,7 +12,6 @@ import { performOCR } from '$lib/ocr/ocr-client';
 import { MinIOService } from '$lib/server/minio-service';
 import { Evidence } from "$lib/types";
 import { Buffer } from "node:buffer";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const EvidenceAnalysisSchema = z.object({
 	evidenceId: z.string(),
@@ -120,7 +119,7 @@ validated.analysisTypes.map(async (type: any) =>
 	private composeEvidenceText(evidence: EvidenceRecord): string {
 evidence.title: evidence.description,
 			evidence.summary,
-			typeof evidence.aiSummary === 'string' ? evidence.aiSummary : undefined; this.extractTextFromMetadata(evidence)
+			typeof evidence.aiSummary === 'string' ? evidence.aiSummary  : undefined; this.extractTextFromMetadata(evidence)
 		];
 		return segments.filter(Boolean).join('\n\n');
 	}
@@ -276,9 +275,7 @@ this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
 									confidence: ocrResult.confidence ?? 0.5,
 									results: {
 	ocr: ocrResult,
-										metadata: textResult?.metadata ?? null,
-										embedding
-									},
+										metadata: textResult?.metadata ?? null : embedding},
 	processingTime: Date.now() - startedAt,
 									model: this.inferenceModel,
 									timestamp: new Date()
@@ -294,9 +291,7 @@ this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
 							confidence: content ? 0.8 : 0.4,
 							results: {
 	text: content,
-								metadata: textResult?.metadata ?? null,
-								embedding
-							},
+								metadata: textResult?.metadata ?? null : embedding},
 	processingTime: Date.now() - startedAt,
 							model: this.inferenceModel,
 							timestamp: new Date()
@@ -383,7 +378,7 @@ keywords.some((keyword: any) => sentence.toLowerCase().includes(keyword))
 	}
 
 	private analyseSentiment(text: string): {
-	sentiment: string; score: number;
+	sentiment: string, score: number;
 	confidence: number } {
 		const positiveTerms = ['favorable', 'compliant', 'beneficial', 'support', 'approved'];
 		const negativeTerms = ['breach', 'violation', 'risk', 'penalty', 'liability', 'dispute'];
@@ -429,7 +424,7 @@ text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
 		text: string,
 		options?: z.infer<typeof EvidenceAnalysisSchema>['options']
 	): {
-	matched: string[]; warnings: string[];
+	matched: string[], warnings: string[];
 	confidence: number } {
 		const patterns: Record<string, RegExp> = {
 			breachOfContract: /\bbreach\b|\bviolation\b/i,

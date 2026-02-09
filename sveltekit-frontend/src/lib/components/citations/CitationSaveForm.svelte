@@ -231,9 +231,8 @@
 </div>
 
 <style>
-	.citation-save-form {
-		background: var(--color-parchment);
-	border: 1px solid var(--color-tan);
+	.citation-save-form { background: var(--color-parchment);
+		border: 1px solid var(--color-tan);
 		border-radius: 8px;
 	padding: 24px;
 		max-width: 600px;
@@ -270,27 +269,23 @@
 		color: var(--color-dark);
 	}
 
-	textarea:focus,
-	input:focus,
-	select:focus {
+	textarea: focus;
+		input:focus; select:focus {
 		outline: none;
 		border-color: var(--color-burgundy);
 		box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
 	}
 
-	textarea:disabled,
-	input:disabled {
-		opacity: 0.6;
+	textarea: disabled;
+		input:disabled { opacity: 0.6;
 		cursor: not-allowed;
 	}
-	select:disabled {
-		background: var(--color-light-gray);
-	cursor: not-allowed;
+	select:disabled { background: var(--color-light-gray);
+		cursor: not-allowed;
 	}
 
-	.tag-input-group {
-		display: flex;
-	gap: 8px;
+	.tag-input-group { display: flex;
+		gap: 8px;
 	}
 
 	.tag-input-group input {
@@ -315,9 +310,8 @@
 		font-size: 13px;
 	}
 
-	.tag-remove {
-		background: none;
-	border: none;
+	.tag-remove { background: none;
+		border: none;
 		color: white;
 	cursor: pointer;
 		font-size: 16px;
@@ -329,14 +323,12 @@
 		opacity: 0.8;
 	}
 
-	.tag-remove:disabled {
-		cursor: not-allowed;
-	opacity: 0.6;
+	.tag-remove:disabled { cursor: not-allowed;
+		opacity: 0.6;
 	}
 
-	.btn-link {
-		background: none;
-	border: none;
+	.btn-link { background: none;
+		border: none;
 		color: var(--color-burgundy);
 	cursor: pointer;
 		font-size: 14px;
@@ -348,9 +340,8 @@
 		text-decoration: underline;
 	}
 
-	.btn-link:disabled {
-		cursor: not-allowed;
-	opacity: 0.6;
+	.btn-link:disabled { cursor: not-allowed;
+		opacity: 0.6;
 	}
 
 	.advanced-options {
@@ -362,9 +353,8 @@
 		border-radius: 4px;
 	}
 
-	.form-actions {
-		display: flex;
-	gap: 12px;
+	.form-actions { display: flex;
+		gap: 12px;
 		margin-top: 8px;
 	}
 
@@ -379,36 +369,31 @@
 		transition:all 150ms ease;
 	}
 
-	.btn-primary {
-		background: var(--color-burgundy);
-	color: white;
+	.btn-primary { background: var(--color-burgundy);
+		color: white;
 		flex: 1;
 	}
 
-	.btn-primary:hover:not(:disabled) {
-		background: var(--color-dark-burgundy);
-	transform: translateY(-1px);
+	.btn-primary:hover:not(:disabled) { background: var(--color-dark-burgundy);
+		transform: translateY(-1px);
 		box-shadow: 0 2px 8px rgba(139, 35, 50, 0.2);
 	}
 
-	.btn-primary:disabled {
-		background: var(--color-light-gray);
-	color: var(--color-medium-gray);
+	.btn-primary:disabled { background: var(--color-light-gray);
+		color: var(--color-medium-gray);
 		cursor: not-allowed;
 	}
 
-	.btn-secondary {
-		background: var(--color-tan);
-	color: var(--color-dark);
+	.btn-secondary { background: var(--color-tan);
+		color: var(--color-dark);
 	}
 
 	.btn-secondary:hover:not(:disabled) {
 		background: var(--color-dark-tan);
 	}
 
-	.btn-secondary:disabled {
-		background: var(--color-light-gray);
-	color: var(--color-medium-gray);
+	.btn-secondary:disabled { background: var(--color-light-gray);
+		color: var(--color-medium-gray);
 		cursor: not-allowed;
 	}
 </style>

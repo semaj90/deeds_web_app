@@ -41,7 +41,7 @@
 	data-state={indeterminate ? 'indeterminate' : value >= max ? 'complete' : 'loading'}
 	data-value={value}
 	data-max={ max }
-	class="{trackClass} { className }"
+	class="{trackClass} {className}"
 >
 	<div
 		class="{indicatorClass} {indeterminate ? 'animate-progress-indeterminate' : ''}"

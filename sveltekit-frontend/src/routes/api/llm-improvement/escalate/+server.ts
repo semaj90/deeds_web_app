@@ -132,8 +132,7 @@ export const PUT: RequestHandler = async ({ request }) => {
 				const closed = escalation.closeTicket(ticketId, resolution ?? 'Closed without resolution');
 				return json({ success, closed });
 
-			default:
-				return json({ error: 'Invalid action' }, { status: 400 });
+			default:return json({ error: 'Invalid action' }, { status: 400 });
 		}
 	} catch (err) {
 		return json(

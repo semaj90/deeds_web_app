@@ -375,7 +375,7 @@ export function getAISuggestions(context: LegalFormContext, state: any): string[
 	const baseSuggestions = context.aiSuggestions;
 
 	const stateSuggestions: Record<string, string[]> = {
-		evidenceUpload: ['Drag and drop files here', 'Supported formats: PDF:, JPG: PNG, DOC'],
+		evidenceUpload: ['Drag and drop files here', 'Supported formats: PDF, JPG: PNG, DOC'],
 		caseDetails: ['Be specific in descriptions', 'Include relevant case law if available'],
 		review: ['Double-check evidence classification', 'Verify priority level'],
 		submitting: ['Do not close this window', 'Submission in progress...']

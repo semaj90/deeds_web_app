@@ -728,7 +728,7 @@ export function getBitsUiMigrationPatterns(): PatternMatcher[] {
  * @requirements 1.2, 4.3
  */
 export function fixBitsUiMigration(content: string): {
-	result: string; fixCount: number } {
+	result: string, fixCount: number } {
   let result = content;
   let totalFixes = 0;
 
@@ -763,7 +763,7 @@ export function fixBitsUiMigrationMultiPass(
   content: string,
   maxPasses: number = 3
 ): {
-	result: string; fixCount: number;
+	result: string, fixCount: number;
 	passes: number } {
   let result = content;
   let totalFixes = 0;

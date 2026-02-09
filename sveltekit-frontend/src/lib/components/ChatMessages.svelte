@@ -76,9 +76,8 @@
 	gap: 1rem;
 	}
 
-	.message {
-		padding: 1rem;
-	background: #fafaf8;
+	.message { padding: 1rem;
+		background: #fafaf8;
 		border: 1px solid #e0ddd8;
 		border-radius: 4px;
 		border-left: 4px solid #8b3a3a;
@@ -89,16 +88,14 @@
 		border-left-color: #6b8e6b;
 	}
 
-	.message-header {
-		display: flex;
-	gap: 1rem;
+	.message-header { display: flex;
+		gap: 1rem;
 		align-items: center;
 		margin-bottom: 0.75rem;
 	}
 
-	.role-badge {
-		display: inline-block;
-	padding: 0.25rem 0.75rem;
+	.role-badge { display: inline-block;
+		padding: 0.25rem 0.75rem;
 		border-radius: 12px;
 	color: white;
 		font-size: 0.8rem;
@@ -124,9 +121,8 @@
 		word-wrap: break-word;
 	}
 
-	.citations {
-		display: flex;
-	gap: 0.5rem;
+	.citations { display: flex;
+		gap: 0.5rem;
 		flex-wrap: wrap;
 		margin-top: 0.75rem;
 		padding-top: 0.75rem;
@@ -139,9 +135,8 @@
 	color: #2d2d2d;
 	}
 
-	.citation-tag {
-		display: inline-block;
-	padding: 0.25rem 0.5rem;
+	.citation-tag { display: inline-block;
+		padding: 0.25rem 0.5rem;
 		background: #e8f0e8;
 	border: 1px solid #d0ddd0;
 		border-radius: 3px;
@@ -150,9 +145,8 @@
 		font-size: 0.8rem;
 	}
 
-	.evidence-refs {
-		display: flex;
-	gap: 0.5rem;
+	.evidence-refs { display: flex;
+		gap: 0.5rem;
 		flex-wrap: wrap;
 		margin-top: 0.5rem;
 		font-size: 0.85rem;
@@ -163,9 +157,8 @@
 	color: #2d2d2d;
 	}
 
-	.ref-tag {
-		display: inline-block;
-	padding: 0.25rem 0.5rem;
+	.ref-tag { display: inline-block;
+		padding: 0.25rem 0.5rem;
 		background: #f0e8e0;
 	border: 1px solid #ddd0c0;
 		border-radius: 3px;

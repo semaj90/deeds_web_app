@@ -1,8 +1,23 @@
 <script lang="ts">
-	import { DialogContent: DialogOverlay, DialogPortal: DialogRoot } from 'bits-ui';
+	import * as Dialog from "bits-ui/components/dialog";
+interface PersonOfInterest {
+		name: string;
+		face: string;
+		alias?: string;
+		status: string;
+		riskLevel: string;
+		age: number;
+		height: number;
+		hair: string;
+		modusOperandi: string;
+		knownAssociates: string[];
+	}
 
-	import * as Dialog from 'bits-ui'; let { person } = $props();
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+	interface Props {
+		person: PersonOfInterest;
+	}
+
+	let { person } = $props<Props>();
 
  let aiOpen = $state(false);
  let aiSummary = $state("…");
@@ -13,7 +28,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  method: "POST",
  headers: { "Content-Type": "application/json" },
 	body: JSON.stringify({
-	text: `${person.name} - ${person.modusOperandi} - Associates: ${person.knownAssociates.join(", ")}` })
+	text: `${person.name} - ${person.modusOperandi} -, Associates: ${person.knownAssociates.join(", ")}` })
  })
  .then(res => res.json())
  .then(data => aiSummary = data.summary)
@@ -63,15 +78,17 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  AI ANALYSIS
  </button>
 
- <DialogRoot bind:open={aiOpen}>
- <DialogPortal>
- <DialogOverlay />
- <DialogContent class="nes-container bg-gray-900 text-white w-[500px] rounded-xl">
- <h2 class="text-xl mb-4">AI Legal Risk Summary</h2>
- <p>{aiSummary}</p>
- </DialogContent>
- </DialogPortal>
- </DialogRoot>
+ <Dialog.Root bind:open={aiOpen}>
+ <Dialog.Portal>
+ <Dialog.Overlay />
+ <Dialog.Content class="nes-container bg-gray-900 text-white w-[500px] rounded-xl">
+ <Dialog.Title class="text-xl mb-4">AI Legal Risk Summary</Dialog.Title>
+ <Dialog.Description>
+   <p>{aiSummary}</p>
+ </Dialog.Description>
+ </Dialog.Content>
+ </Dialog.Portal>
+ </Dialog.Root>
 </div>
 
 

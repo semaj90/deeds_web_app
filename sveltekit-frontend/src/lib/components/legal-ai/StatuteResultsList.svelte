@@ -1,6 +1,5 @@
 <script lang="ts">
  import { createEventDispatcher } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Statute {
  id: string;

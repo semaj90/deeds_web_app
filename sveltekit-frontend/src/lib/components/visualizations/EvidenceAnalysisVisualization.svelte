@@ -58,7 +58,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       data: {
 	labels: ['Risk', 'Safe'],
         datasets: [{
-	data: [analysis.riskScore * 100, (1 - analysis.riskScore) * 100],
+data: [analysis.riskScore * 100, (1 - analysis.riskScore) * 100],
           backgroundColor: [
             `rgba(${255 * analysis.riskScore},
 	${255 * (1 - analysis.riskScore)},
@@ -72,13 +72,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-	legend: {
-            display: false
+        plugins: { legend: { display: false
           },
-	tooltip: {
-	callbacks: {
-              label: (context: any) => `${context.label}: ${context.parsed.toFixed(1)}%`
+	tooltip: { callbacks: { label: (context: any) => `${context.label}: ${context.parsed.toFixed(1)}%`
             }
           }
         }
@@ -102,7 +98,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
-	labels: entityTypes.map(t => t.charAt(0).toUpperCase() + t.slice(1)),
+labels: entityTypes.map(t => t.charAt(0).toUpperCase() + t.slice(1)),
         datasets: [{
 	label: 'Entity Count',
           data: entityCounts,
@@ -114,15 +110,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        scales: {
-	y: {
-            beginAtZero: true,
+        scales: { y: { beginAtZero: true,
             ticks: {
 	precision: 0 }
           }
         },
-	plugins: {
-	legend: { display: false }
+	plugins: { legend: { display: false }
         }
       }
     });
@@ -141,7 +134,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const chart = new Chart(ctx, {
       type: 'line',
       data: {
-	labels: sortedEvents.map(e => new Date(e.timestamp).toLocaleDateString()),
+labels: sortedEvents.map(e => new Date(e.timestamp).toLocaleDateString()),
         datasets: [{
 	label: 'Event Confidence',
           data: sortedEvents.map(e => (e.confidence as number) * 100),
@@ -154,9 +147,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        scales: {
-	y: {
-            beginAtZero: true,
+        scales: { y: { beginAtZero: true,
             max: 100,
             title: {
 	display: true,
@@ -164,9 +155,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             }
           }
         },
-	plugins: {
-	tooltip: {
-            callbacks: {
+	plugins: { tooltip: { callbacks: {
 	afterLabel: (context: any) => {
                 const event = sortedEvents[context.dataIndex];
                 return `${event.type}: ${event.description}`;
@@ -187,7 +176,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const chart = new Chart(ctx, {
       type: 'radar',
       data: {
-	labels: analysis.correlations.map((_, i) => `Evidence ${i + 1}`),
+labels: analysis.correlations.map((_, i) => `Evidence ${i + 1}`),
         datasets: [{
 	label: 'Correlation Strength',
           data: analysis.correlations.map(c => c.strength * 100),
@@ -202,9 +191,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        scales: {
-	r: {
-            beginAtZero: true,
+        scales: { r: { beginAtZero: true,
             max: 100,
             ticks: {
 	stepSize: 20 }
@@ -224,7 +211,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const chart = new Chart(ctx, {
       type: 'polarArea',
       data: {
-	labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.slice(1)),
+labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.slice(1)),
         datasets: [{
 	data: Object.values(emotions).map(v => v * 100),
           backgroundColor: [
@@ -241,11 +228,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	responsive: true,
         maintainAspectRatio: false,
-        scales: {
-	r: { beginAtZero: true, max: 100 }
+        scales: { r: { beginAtZero: true, max: 100 }
         },
-	plugins: {
-	legend: { position: 'right' }
+	plugins: { legend: { position: 'right' }
         }
       }
     });
@@ -259,7 +244,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       case 'match': return '✅';
       case 'contradiction': return '❌';
       case 'gap': return '❓';
-      default: return '📊';
+      default:return '📊';
     }
   }
 
@@ -270,7 +255,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       case 'causal': return '➡️';
       case 'semantic': return '💬';
       case 'entity': return '👥';
-      default: return '🔗';
+      default:return '🔗';
     }
   }
 </script>
@@ -402,9 +387,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-  .evidence-analysis-visualization {
-    padding: 1.5rem;
-	background: #ffffff;
+  .evidence-analysis-visualization { padding: 1.5rem;
+		background: #ffffff;
     border-radius: 0.5rem;
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
   }
@@ -415,9 +399,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     border-bottom: 1px solid #e5e7eb;
     padding-bottom: 1rem;
   }
-  .metadata {
-    display: flex;
-	gap: 0.75rem;
+  .metadata { display: flex;
+		gap: 0.75rem;
     align-items: center;
   }
   .badge {
@@ -433,9 +416,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: #1f2937;
     margin-bottom: 0.75rem;
   }
-  .summary-section {
-    background: #f9fafb;
-	padding: 1rem;
+  .summary-section { background: #f9fafb;
+		padding: 1rem;
     border-radius: 0.5rem;
   }
   .summary-text {
@@ -447,9 +429,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     grid-template-columns: 1fr;
 	gap: 1.5rem;
   }
-  .chart-container {
-    background: #f9fafb;
-	padding: 1rem;
+  .chart-container { background: #f9fafb;
+		padding: 1rem;
     border-radius: 0.5rem;
 	position: relative;
     min-height: 250px;
@@ -460,9 +441,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: #374151;
     margin-bottom: 0.5rem;
   }
-  .risk-value {
-    position: absolute;
-	top: 50%;
+  .risk-value { position: absolute;
+		top: 50%;
     left: 50%;
 	transform: translate(-50%, -50%);
     text-align: center;
@@ -530,27 +510,25 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: #374151;
     margin-bottom: 0.5rem;
   }
-  .finding-relevance {
-    height: 0.5rem;
-	background: #e5e7eb;
+  .finding-relevance { height: 0.5rem;
+		background: #e5e7eb;
     border-radius: 9999px;
 	overflow: hidden;
   }
-  .relevance-bar {
-    height: 100%;
-	background: #6366f1;
+  .relevance-bar { height: 100%;
+		background: #6366f1;
     transition:all 0.3s;
   }
 
   .charts-grid { display: grid; grid-template-columns: 1fr;
 	gap: 1.5rem; }
   .chart-container { background: #f9fafb;
-	padding: 1rem; border-radius: 0.5rem;
+		padding: 1rem; border-radius: 0.5rem;
 	position: relative; min-height: 250px; }
   .chart-title { font-size: 0.875rem; font-weight: 500;
 	color: #374151; margin-bottom: 0.5rem; }
   .risk-value { position: absolute;
-	top: 50%; left: 50%;
+		top: 50%; left: 50%;
 	transform: translate(-50%, -50%); text-align: center; }
   .risk-score { font-size: 1.75rem; font-weight: 700;
 	display: block; }
@@ -574,38 +552,40 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .finding-description { font-size: 0.875rem;
 	color: #374151; margin-bottom: 0.5rem; }
   .finding-relevance { height: 0.5rem;
-	background: #e5e7eb; border-radius: 9999px;
+		background: #e5e7eb; border-radius: 9999px;
 	overflow: hidden; }
   .relevance-bar { height: 100%;
-	background: #6366f1; transition:all 0.3s; }
+		background: #6366f1; transition:all 0.3s; }
   .correlations-list { margin-top: 0.5rem; }
   .correlation-item { display: flex;
-	gap: 0.75rem; padding: 0.75rem;
+		gap: 0.75rem; padding: 0.75rem;
 	background: #f9fafb; border-radius: 0.5rem; }
   .correlation-icon { font-size: 1.25rem; }
   .correlation-content { flex: 1; }
   .correlation-description { font-size: 0.875rem;
 	color: #374151; margin-bottom: 0.25rem; }
   .correlation-meta { display: flex;
-	gap: 0.75rem; font-size: 0.75rem;
+		gap: 0.75rem; font-size: 0.75rem;
 	color: #6b7280; }
   .shared-entities { display: flex; flex-wrap: wrap;
 	gap: 0.25rem; margin-top: 0.5rem; }
-  .entity-tag { padding: 0.25rem 0.5rem; background: #e5e7eb; border-radius: 0.25rem; font-size: 0.75rem; }
+  .entity-tag { padding: 0.25rem 0.5rem;
+		background: #e5e7eb; border-radius: 0.25rem; font-size: 0.75rem; }
   .recommendations-list { margin-top: 0.5rem; }
   .recommendation-item { display: flex;
-	gap: 0.75rem; }
+		gap: 0.75rem; }
   .recommendation-number { width: 1.5rem;
-	height: 1.5rem; background: #6366f1;
+		height: 1.5rem; background: #6366f1;
 	color: #ffffff; border-radius: 9999px;
 	display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600; }
-  .entities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .entities-grid { display: grid; grid-template-columns: repeat(2, 1fr), gap: 0.75rem; }
   .entity-card { padding: 0.75rem;
-	background: #f9fafb; border-radius: 0.5rem; }
+		background: #f9fafb; border-radius: 0.5rem; }
   .entity-type { font-size: 0.75rem;
 	color: #6b7280; text-transform: uppercase; }
   .entity-value { display: block; font-size: 0.875rem;
-	color: #111827; margin: 0.25rem 0; }
+	color: #111827;
+		margin: 0.25rem 0; }
   .entity-stats { display: flex; justify-content: space-between; font-size: 0.75rem;
 	color: #6b7280; }
 </style>

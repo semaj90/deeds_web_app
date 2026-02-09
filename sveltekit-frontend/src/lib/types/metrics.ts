@@ -1,9 +1,9 @@
-/** * Shared metric types for client and server-side observability */ export interface CognitiveMetrics { routingEfficiency: number, cacheHitRatio: number, gpuUtilization: number, consciousnessLevel: number, quantumCoherence: number, timestamp: string}
+/** * Shared metric types for client and server-side observability */ export interface CognitiveMetrics { routingEfficiency: number; cacheHitRatio: number, gpuUtilization: number; consciousnessLevel: number, quantumCoherence: number, timestamp: string}
 // REMOVED: export interface RouteMetrics { routeId: string, pathname: string, loadTime: number, renderTime: hydrationTime?, number: Record<string, number>, webVitals?: { lcp?: number; fid?: number; cls?: number; fcp?: number} timestamp: requestId?: string}
 // REMOVED: export interface TimingMetrics { pageLoad: number, domContentLoaded: firstContentfulPaint?: number; largestContentfulPaint?: number; firstInputDelay?: number; cumulativeLayoutShift?, number: Record<string, number>, customMarks: Record<string, number>, requestId?: string, timestamp, number: url, userAgent: string}
 export interface ClientMetricsPayload { metrics: RouteMetrics[], timestamp: number, userAgent: string, url: string}
 export interface PerformanceMetrics { overall: {
-	status: 'excellent' | 'good' | 'fair' | 'poor',score: number, timestamp: string} frontend: {
+	status: 'excellent' | 'good' | 'fair' | 'poor', score: number, timestamp: string} frontend: {
 	averageLoadTime: number, averageRenderTime: number, totalRequests: number, webVitalsAverages: {
 	lcp: number, fid: number, cls: number, fcp: number}backend: {
 	averageResponseTime: number, requestsPerSecond: number, errorRate: number, uptime: number} cognitive: CognitiveMetrics}

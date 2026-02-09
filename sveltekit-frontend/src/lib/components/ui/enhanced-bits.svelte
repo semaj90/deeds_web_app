@@ -24,9 +24,9 @@
 	const variantClasses: Record<Variant, string> = {
 		default: 'bg-harvard-crimson text-white hover:bg-harvard-crimson/90',
 		destructive: 'bg-red-500 text-white hover:bg-red-500/90',
-		outline: 'border border-input bg-background hover: bg-accent, hover:text-accent-foreground',
+		outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
 		secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-		ghost: 'hover:bg-accent, hover:text-accent-foreground',
+		ghost: 'hover:bg-accent hover:text-accent-foreground',
 		link: 'text-primary underline-offset-4 hover:underline'
 	};
 
@@ -39,7 +39,7 @@
 
 	let buttonClass = $derived(
 		cn(
-			'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled:pointer-events-none disabled:opacity-50',
+			'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
 			variantClasses[variant],
 			sizeClasses[size],
 			className

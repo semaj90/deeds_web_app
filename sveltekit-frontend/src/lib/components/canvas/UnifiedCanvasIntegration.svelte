@@ -2,12 +2,11 @@
  import { writable } from 'svelte/store';
  import  EvidenceCanvas  from "$lib/ui/enhanced/EvidenceCanvas.svelte";
  import  CanvasBoard  from "$lib/components/yorha/CanvasBoard.svelte";
- import  Button  from "$lib/components/ui/enhanced-bits.svelte"; interface Props { caseId?: string; enableYoRHaBoard?: boolean; enableEvidenceCanvas?: boolean; splitView?: boolean; syncCanvases?: boolean; initialMode?: 'evidence' | 'drawing' | 'both'}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+ import Button from '$lib/components/ui/Button.svelte'; interface Props { caseId?: string; enableYoRHaBoard?: boolean; enableEvidenceCanvas?: boolean; splitView?: boolean; syncCanvases?: boolean; initialMode?: 'evidence' | 'drawing' | 'both'}
   let { caseId = '', enableYoRHaBoard = true, enableEvidenceCanvas = true, splitView = true, syncCanvases = true, initialMode = 'both'
   }: Props = $props(); // Component references let evidenceCanvasRef: string | number;
  let yorhaCanvasBoardRef: unknown; // State management const canvasState = writable({ mode: initialMode
-, evidenceObjects: [], drawingObjects: [], selectedObjects: [];
+evidenceObjects: [], drawingObjects: [], selectedObjects: [];
 	lastSync: 0 });
   let currentMode = $state(initialMode);
    let showYoRHaBoard = $state<boolean>(false);
@@ -39,15 +38,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="unified-canvas-integration"> <!-- Mode: Control, Header --> <div class="canvas-mode-header"> <div class="mode-title"> <h2>ðŸŽ® UNIFIED EVIDENCE CANVAS</h2>
  <span class="mode-indicator">MODE: {currentMode.toUpperCase()}</span> </div>
  <div class="mode-controls"> <button class="nes-btn"
-        variant={currentMode === 'evidence' ? 'default', 'outline'} size="sm"
+        variant={currentMode === 'evidence' ? 'default' : 'outline'} size="sm"
         onclick={() => switchMode('evidence')} class="bits-btn mode-btn"
       > ðŸ“ Evidence Only </button>
  <button class="nes-btn"
-        variant={currentMode === 'drawing' ? 'default', 'outline'} size="sm"
+        variant={currentMode === 'drawing' ? 'default' : 'outline'} size="sm"
         onclick={() => switchMode('drawing')} class="bits-btn mode-btn"
       > ðŸŽ¨ Drawing Only </button>
  <button class="nes-btn"
-        variant={currentMode === 'both' ? 'default', 'outline'} size="sm"
+        variant={currentMode === 'both' ? 'default' : 'outline'} size="sm"
         onclick={() => switchMode('both')} class="bits-btn mode-btn"
       > ðŸ”„ Both </button>
  <Button variant="ghost"
@@ -69,43 +68,45 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         title="Export Canvas State"
       > ðŸ’¾ Export </div> </div> </div>
  <style> .unified-canvas-integration { display: flex; flex-direction: column;
-	height: 100vh;background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #00ff88; font-family: 'Courier New', monospace; overflow: hidden}
-  .canvas-mode-header { display: flex; justify-content: space-betweenn, align-items: center;
-	padding: 1rem 2rem;background: rgba(0, 255, 136, 0.1); border-bottom: 2px solid #00ff88}
+	height: 100vh;background: linear-gradient(135deg, #0a0a0a, #1a1a1a), color: #00ff88; font-family: 'Courier New', monospace, overflow: hidden;}
+  .canvas-mode-header { display: flex; justify-content: space-betweenn; align-items: center;
+	padding: 1rem 2rem;background: rgba(0, 255, 136, 0.1); border-bottom: 2px solid #00ff88;}
   .mode-title h2 { font-size: 1.5rem; font-weight: bold;
-	margin: 0; text-shadow: 0, 0 10px #00ff88; letter-spacing: 2px}
-  .mode-indicator { font-size: 0.9rem, opacity: 0.7; margin-left: 1rem}
+	margin: 0; text-shadow: 0, 0 10px #00ff88; letter-spacing: 2px;}
+  .mode-indicator { font-size: 0.9rem;
+		opacity: 0.7; margin-left: 1rem;}
   .mode-controls { display: flex;
-	gap: 0.5rem; align-items: center}
+	gap: 0.5rem; align-items: center;}
   .mode-btn, .sync-btn, .clear-btn { background: transparent;
 	border: 2px solid #00ff88;color: #00ff88;
 	padding: 0.5rem 1rem;cursor: pointer;
-	transition:all 0.3s ease; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold}
+	transition:all 0.3s ease; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold;}
   .mode-btn:hover, .sync-btn:hover, .clear-btn:hover { background: rgba(0, 255, 136, 0.1); box-shadow: 0 0 10px rgba(0, 255, 136, 0.3)}
   .canvas-container { flex: 1;
-	display: flex;overflow: hidden}
-  .canvas-container.split-view { flex-direction row}
-  .evidence-canvas-section, .yorha-canvas-section { flex: 1, display: flex; flex-direction: column; min-width: 0 }
+	display: flex;overflow: hidden;}
+  .canvas-container.split-view { flex-direction row;}
+  .evidence-canvas-section, .yorha-canvas-section { flex: 1;
+		display: flex; flex-direction: column; min-width: 0;}
   .evidence-canvas-section.full-width, .yorha-canvas-section.full-width { flex: none;
 	width: 100%}
-  .canvas-container.split-view .evidence-canvas-section { border-right: 2px solid #00ff88}
-  .canvas-status-bar { display: flex; justify-content: space-betweenn, align-items: center;
-	padding: 0.5rem 2rem;background: rgba(0, 0, 0, 0.8); border-top: 1px solid #00ff88; font-size: 0.8rem}
+  .canvas-container.split-view .evidence-canvas-section { border-right: 2px solid #00ff88;}
+  .canvas-status-bar { display: flex; justify-content: space-betweenn; align-items: center;
+	padding: 0.5rem 2rem;background: rgba(0, 0, 0, 0.8); border-top: 1px solid #00ff88; font-size: 0.8rem;}
   .status-info { display: flex;
-	gap: 2rem}
+	gap: 2rem;}
   .sync-status.syncing { color: #ffaa00;
-	animation: pulse 1s ease-in-out infinite}
+	animation: pulse 1s ease-in-out infinite;}
   .export-btn { background: transparent;
 	border: 1px solid #00ff88;color: #00ff88;
 	padding: 0.25rem 0.5rem;cursor: pointer; font-family: 'Courier New', monospace; font-size: 0.7rem;
-	transition:all 0.3s ease}
+	transition:all 0.3s ease;}
   .export-btn:hover { background: rgba(0, 255, 136, 0.1)}
-  @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.5} }
+  @keyframes pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.5;} }
   /* Responsive design */ @media (max-width: 768px) { .canvas-mode-header { flex-direction: column;
-	gap: 1rem}
-    .mode-controls { width: 100%; justify-content: center; flex-wrap}
-    .canvas-container.split-view { flex-direction: column}
-    .canvas-container.split-view .evidence-canvas-section { border-right: none; border-bottom: 2px solid #00ff88}
+	gap: 1rem;}
+    .mode-controls { width: 100%; justify-content: center; flex-wrap;}
+    .canvas-container.split-view { flex-direction: column;}
+    .canvas-container.split-view .evidence-canvas-section { border-right: none; border-bottom: 2px solid #00ff88;}
   } </style>
 
 

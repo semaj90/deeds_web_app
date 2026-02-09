@@ -103,8 +103,7 @@
 				return '🟢';
 			case 'unhealthy':
 				return '🟡';
-			default:
-				return '🔴';
+			default:return '🔴';
 		}
 	}
 
@@ -294,8 +293,7 @@
 		font-size: 0.9rem;
 	}
 
-	.header-stats {
-		display: flex;
+	.header-stats { display: flex;
 		gap: 1rem;
 	}
 
@@ -318,8 +316,7 @@
 		color: #888;
 	}
 
-	.health-grid {
-		display: flex;
+	.health-grid { display: flex;
 		gap: 1rem;
 		flex-wrap: wrap;
 	}
@@ -391,8 +388,7 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.category-filter select {
-		width: 100%;
+	.category-filter select { width: 100%;
 		padding: 0.6rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
@@ -407,8 +403,7 @@
 		gap: 0.5rem;
 	}
 
-	.tool-item {
-		width: 100%;
+	.tool-item { width: 100%;
 		display: flex;
 		align-items: flex-start;
 		gap: 0.75rem;
@@ -476,8 +471,7 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.args-section textarea {
-		width: 100%;
+	.args-section textarea { width: 100%;
 		padding: 1rem;
 		background: rgba(0, 0, 0, 0.3);
 		border: 1px solid rgba(255, 255, 255, 0.1);
@@ -488,8 +482,7 @@
 		resize: vertical;
 	}
 
-	.execute-btn {
-		width: 100%;
+	.execute-btn { width: 100%;
 		background: linear-gradient(135deg, #00d4ff, #00ff88);
 		color: #000;
 		border: none;
@@ -506,8 +499,7 @@
 		box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
 	}
 
-	.execute-btn:disabled {
-		opacity: 0.6;
+	.execute-btn:disabled { opacity: 0.6;
 		cursor: not-allowed;
 	}
 
@@ -528,16 +520,14 @@
 		overflow: hidden;
 	}
 
-	.result-box h3 {
-		margin: 0;
+	.result-box h3 { margin: 0;
 		padding: 0.75rem 1rem;
 		background: rgba(255, 255, 255, 0.05);
 		font-size: 0.9rem;
 		color: #888;
 	}
 
-	.result-meta {
-		display: flex;
+	.result-meta { display: flex;
 		gap: 1rem;
 		padding: 0.75rem 1rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -555,8 +545,7 @@
 		color: #888;
 	}
 
-	.result-json {
-		margin: 0;
+	.result-json { margin: 0;
 		padding: 1rem;
 		font-family: 'Fira Code', monospace;
 		font-size: 0.85rem;

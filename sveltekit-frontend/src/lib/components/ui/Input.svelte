@@ -16,7 +16,7 @@
 <input
 	bind:value
 	{ type }
-	class="input { className }"
+	class="input {className}"
 	{...restProps}
 />
 

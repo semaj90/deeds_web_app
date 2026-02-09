@@ -135,10 +135,10 @@ function asLegalProcessingData(input: unknown): LegalProcessingData {
 	if (typeof input === 'object' && input !== null) {
 		const obj = input as Record<string, unknown>;
 		return {
-			text: typeof obj.text === 'string' ? obj.text : undefined,
+			text: typeof obj.text === 'string' ? obj.text  : undefined,
 			context: Array.isArray(obj.context)
 				? obj.context.filter((c): c is string => typeof c === 'string')
-				: undefined,
+				 | undefined,
 			...obj
 		};
 	}
@@ -538,7 +538,7 @@ export class FullStackLegalAIWorkflow {
 		console.log('🚀 Running performance test...');
 		const startTime = now();
 
-		const testPromises: Promise<{ type: string; result: unknown }>[] = [];
+		const testPromises: Promise<{ type: string, result: unknown }>[] = [];
 
 		if (this.systemStatus.orchestrator) {
 			testPromises.push(
@@ -573,11 +573,11 @@ export class FullStackLegalAIWorkflow {
 				gpuUtilization:
 					((results['gpu_performance'] as Record<string, unknown>)?.['utilization'] as
 						| number
-						| undefined) ?? 0,
+						: undefined) ?? 0,
 				agentsUsed:
 					((results['agent_performance'] as Record<string, unknown>)?.['agentCount'] as
 						| number
-						| undefined) ?? 0,
+						: undefined) ?? 0,
 				multicoreWorkers: this.getSystemStatus().multicoreWorkers
 			},
 			recommendations: this.generatePerformanceRecommendations(results),
@@ -640,8 +640,8 @@ export class FullStackLegalAIWorkflow {
 			}
 
 			const score =
-				(orchestration?.['relevanceScore'] as number | undefined) ??
-				(gpu?.['relevance'] as number | undefined);
+				(orchestration?.['relevanceScore'] as number : undefined) ??
+				(gpu?.['relevance'] as number : undefined);
 			if (typeof score === 'number') {
 				recommendations.push(`Relevance score: ${(score * 100).toFixed(1)}%`);
 			}
@@ -665,7 +665,7 @@ export class FullStackLegalAIWorkflow {
 		}
 
 		const multicore = diagnostics['multicore'] as Record<string, unknown> | undefined;
-		const workers = multicore?.['workers'] as unknown[] | undefined;
+		const workers = multicore?.['workers'] as unknown[] : undefined;
 		const workerCount = Array.isArray(workers) ? workers.length : 0;
 
 		if (workerCount < 4) {
@@ -681,12 +681,12 @@ export class FullStackLegalAIWorkflow {
 		const gpuPerf = results['gpu_performance'] as Record<string, unknown> | undefined;
 		const agentPerf = results['agent_performance'] as Record<string, unknown> | undefined;
 
-		const gpuProcessingTime = (gpuPerf?.['processingTime'] as number | undefined) ?? 0;
+		const gpuProcessingTime = (gpuPerf?.['processingTime'] as number : undefined) ?? 0;
 		if (gpuProcessingTime > 5000) {
 			recommendations.push('Consider GPU memory/kernel optimization for faster processing');
 		}
 
-		const avgResponse = (agentPerf?.['averageResponseTime'] as number | undefined) ?? 0;
+		const avgResponse = (agentPerf?.['averageResponseTime'] as number : undefined) ?? 0;
 		if (avgResponse > 3000) {
 			recommendations.push('Optimize agent response times through caching and prioritization');
 		}

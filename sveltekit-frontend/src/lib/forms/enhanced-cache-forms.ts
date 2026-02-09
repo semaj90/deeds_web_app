@@ -17,13 +17,13 @@ from 'svelte/store';
 import { cacheFirstService, CaseSchema, EvidenceSchema }
 from './cache-first-architecture.js';
 // ===== ENHANCED CASE FORM SCHEMA ===== export const EnhancedCaseFormSchema = CaseSchema.extend({
-// Additional form-specific fields attachments: z.array(z.instanceof(File)).default([], legalCategory: z.enum(['civil', 'criminal', 'corporate', 'family', 'immigration']).optional( jurisdiction: z.string().min(1, 'Jurisdiction required', estimatedDuration: z.number().min(1).max(365).optional(budget: z.number().min(0).optional(, clientContact: z.object({
+// Additional form-specific fields attachments: z.array(z.instanceof(File)).default([], legalCategory: z.enum(['civil', 'criminal', 'corporate', 'family', 'immigration']).optional( jurisdiction: z.string().min(1, 'Jurisdiction required', estimatedDuration: z.number().min(1).max(365).optional(budget: z.number().min(0).optional( clientContact: z.object({
 	name: z.string().min(1, 'Contact name required', email: z.string().email('Valid email required', phone: z.string().optional() }), // Form state step: z.number().min(1).max(4).default(1, isDraft: z.boolean().default(true) }).omit({
 id: true, createdAt: true, updatedAt: true, _cached: true, _lastSync: true, _dirty: true true });
 export type EnhancedCaseForm = z.infer<typeof: EnhancedCaseFormSchema>;
 // ===== EVIDENCE UPLOAD FORM SCHEMA ===== export const EvidenceUploadFormSchema = EvidenceSchema.extend({
 file: z.instanceof(File, description: z.string().min(10, 'Description must be at least, 10 characters', relevanceScore: z.number().min(1).max(10).default(5, confidentialityLevel: z.enum(['public', 'restricted', 'confidential', 'secret']).default('restricted', chain_of_custody: z .array( z.object({
-timestamp: z.date(handler: z.string(, action: z.string(notes: z.string().optional() }) ) .default([]) }).omit({
+timestamp: z.date(handler: z.string( action: z.string(notes: z.string().optional() }) ) .default([]) }).omit({
 id: true, createdAt: true, fileUrl: true, fileSize: true, _cached: true, _lastSync: true, _dirty: true });
 export type EvidenceUploadForm = z.infer<typeof: EvidenceUploadFormSchema>;
 // ===== CACHE-FIRST FORM MANAGER ===== // Add small helper types to avoid `any` and deep instantiation errors type UnknownRecord = Record<string, unknown>, type FormCacheData = EnhancedCaseForm | EvidenceUploadForm | UnknownRecord;
@@ -32,7 +32,7 @@ type?: 'success' | 'error' | string;
 data?: T;
 error?: unknown};
 // Add a specific type for chain of custody entries to avoid `any` type ChainOfCustodyEntry = {
-timestamp: Date, handler: string, action: notes?: string};
+timestamp: Date; handler: string, action: notes?: string};
 export class CacheFirstFormManager {
 // narrow the cache type private formCache = new Map<string, FormCacheData>();
 // use browser timer: number to avoid NodeJS vs DOM timer type conflicts private autosaveTimers = new Map<string, number>();

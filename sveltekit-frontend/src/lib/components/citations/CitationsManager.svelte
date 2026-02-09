@@ -1,6 +1,10 @@
 <!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code: Attributes need to, be, unique --> <!-- Citations Manager - Legal Citation System with, AI-powered, search --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
-import type { User } from '$lib/types';
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import  Card: CardHeader, CardTitle: CardContent: Input, Badge  from "$lib/components/ui/enhanced-bits.svelte"; import { Button } from '$lib/components/ui/enhanced-bits';
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
+import Input from '$lib/components/ui/Input.svelte';
+import Badge from '$lib/components/ui/Badge.svelte'; import Button from '$lib/components/ui/Button.svelte';
 import Search from 'lucide-svelte/icons/search';
 import BookOpen from 'lucide-svelte/icons/book-open';
 import ExternalLink from 'lucide-svelte/icons/external-link';
@@ -16,7 +20,6 @@ import Eye from 'lucide-svelte/icons/eye';
 import Edit from 'lucide-svelte/icons/edit';
 import Trash2 from 'lucide-svelte/icons/trash-2';
 // Svelte, 5 state management let citations = $state<any[]>([]); let filteredCitations = $state<any[]>([]); let searchQuery = $state<string>(''); let selectedCategory = $state<string>('all'); let sortBy = $state<'date' | 'title' | 'relevance'>('date'); let isLoading = $state<boolean>(false); let citationCategories = $state([ { id: 'all', label: 'All Citations', count: 0 },
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	{ id: 'cases', label: 'Case Law', count: 0 },
 	{ id: 'statutes', label: 'Statutes', count: 0 },
@@ -77,7 +80,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 							data-enhanced-bits="true"
 							data-operation="add-citation"
 						> <Plus class="w-4 h-4" aria-hidden="true" role="img" aria-label="Plus, icon" /> Add Citation </Button>
- <div id="add-citation-help" class="sr-only"> Create a new legal citation with complete source information {/if}
+ <div id="add-citation-help" class="sr-only"> Create a new legal citation with complete source information </div> {/if}
   <Button class="enhanced-bits-btn nes-citation-control n64-enhanced lod-optimized bits-btn"
 						variant="ghost"
 						size="sm"
@@ -89,11 +92,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 						data-operation="export-citations"
 					> <Download class="w-4 h-4" aria-hidden="true" role="img" aria-label="Download, icon" /> Export </Button>
  <div id="export-help" class="sr-only"> Download all filtered citations as a JSON file for backup or sharing </div> </div> </div> </div> </div>
- <!-- Search, and, Filters --> <div class="mb-4"> <div class="yorha-panel-content"> <div class="flex flex-col lg, flex-row"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="w-4 h-4 absolute left-3 top-3 nes-text" /> <Input placeholder="Search, citations, authors, sources..."
+ <!-- Search, and, Filters --> <div class="mb-4"> <div class="yorha-panel-content"> <div class="flex flex-col lg flex-row"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="w-4 h-4 absolute left-3 top-3 nes-text" /> <Input placeholder="Search, citations, authors, sources..."
 							value={ searchQuery } oninput={ handleSearch } class="pl-9"
 						/> </div> </div>
  <!-- Sort, Options --> <div class="flex"> <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"
-						variant={sortBy === 'date' ? 'default', 'outline'} size="sm"
+						variant={sortBy === 'date' ? 'default' : 'outline'} size="sm"
 						onclick={() => changeSortBy('date')} aria-label={sortBy === 'date' ? 'Currently sorting by date': 'Sort citations by date added'} aria-describedby="sort-date-help"
 						role="button"
 						data-nes-theme="citation-sort"
@@ -103,7 +106,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 						<Calendar class="w-4 h-4" aria-hidden="true" role="img" aria-label="Calendar, icon" /> Date </Button>
  <div id="sort-date-help" class="sr-only"> Sort citations by the date they were added to the system </div>
  <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"
-						variant={sortBy === 'title' ? 'default', 'outline'} size="sm"
+						variant={sortBy === 'title' ? 'default' : 'outline'} size="sm"
 						onclick={() => changeSortBy('title')} aria-label={sortBy === 'title' ? 'Currently sorting by title': 'Sort citations alphabetically by title'} aria-describedby="sort-title-help"
 						role="button"
 						data-nes-theme="citation-sort"
@@ -113,7 +116,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 						<SortAsc class="w-4 h-4 mr-1" aria-hidden="true" role="img" aria-label="Sort, ascending, icon" /> Title </Button>
  <div id="sort-title-help" class="sr-only"> Sort citations alphabetically by title </div>
  <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"
-						variant={sortBy === 'relevance' ? 'default', 'outline'} size="sm"
+						variant={sortBy === 'relevance' ? 'default' : 'outline'} size="sm"
 						onclick={() => changeSortBy('relevance')} aria-label={sortBy === 'relevance' ? 'Currently sorting by relevance score': 'Sort citations by relevance score'} aria-describedby="sort-relevance-help"
 						role="button"
 						data-nes-theme="citation-sort"
@@ -124,7 +127,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div id="sort-relevance-help" class="sr-only"> Sort citations by their calculated relevance score to your case </div> </div> </div> </div> </div>
  <!-- Main, Content --> <div class="flex-1 grid grid-cols-4"> <!-- Categories, Sidebar --> <div class="h-fit"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Categories</h3> </div>
  <div class="yorha-panel-content">
-  {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover: bg-muted", class:bg-primary={selectedCategory === category.id},
+  {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover:bg-muted" class:bg-primary={selectedCategory === category.id},
 	class:text-primary-foreground={selectedCategory === category.id} onclick={() => selectCategory(category.id)} >
 						<span>{category.label}</span>
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{category.count}</span> </Button> {/each}
@@ -243,9 +246,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 							data-enhanced-bits="true"
 						> Close </Button> </div> </div> </div> </div> {/if}
   <style> /* Custom scrollbar for modal content */ .overflow-y-auto { scrollbar-width: thi; scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted))}
-	.overflow-y-auto::-webkit-scrollbar { width: 6px}
+	.overflow-y-auto::-webkit-scrollbar { width: 6px;}
 	.overflow-y-auto::-webkit-scrollbar-track { background: hsl(var(--muted))}
-	.overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px}
+	.overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px;}
 </style>
 
 

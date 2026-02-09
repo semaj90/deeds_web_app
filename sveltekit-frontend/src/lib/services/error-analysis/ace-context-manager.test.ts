@@ -182,8 +182,7 @@ describe('AceContextManager - Property-Based Tests (Task 12.1)', () => {
  modified: 'const, x: number = 123;',
  context: 'Type mismatch fix',
  explanation: 'Changed type from string to number',
- lineStart: 10, lineEnd: 10, status: 'applied',
- createdAt: new Date(),
+ lineStart: 10, lineEnd: 10, status: 'applied', createdAt: new Date(),
  };
 
  const updated = await manager.addFix(sessionId, diff);

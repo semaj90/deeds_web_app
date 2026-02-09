@@ -6,22 +6,32 @@
 
 export interface TextConversionOptions {
  normalizationMethod: 'unicode' | 'range' | 'gaussian' | 'sigmoid';
- outputRange: [number, number], paddingValue: number;
- maxLength?: number, preserveSpecialChars: boolean;
-	encoding: 'utf8' | 'utf16' | 'ascii' | 'latin1';
-};
+ outputRange: [number: number];
+ paddingValue: number;
+ maxLength?: number;
+ preserveSpecialChars: boolean;
+ encoding: 'utf8' | 'utf16' | 'ascii' | 'latin1';
+}
+
 export interface ConversionResult {
- fp32Array: Float32Array, originalLength: number;
-	paddedLength: number, specialCharsCount: number;
-	conversionTime: number, metadata: {
-	minValue: number, maxValue: number;
-	meanValue: number, uniqueChars: number;
-	byteLength: number;
+ fp32Array: Float32Array;
+ originalLength: number;
+ paddedLength: number;
+ specialCharsCount: number;
+ conversionTime: number;
+ metadata: {
+ minValue: number;
+ maxValue: number;
+ meanValue: number;
+ uniqueChars: number;
+ byteLength: number;
  };
-};
+}
+
 export interface SpecialCharacterMap {
  [char: string]: number;
-};
+}
+
 export class UTF8ToFP32Converter {
  private specialCharMap: SpecialCharacterMap = {};
  private textEncoder = new TextEncoder();
@@ -58,7 +68,8 @@ export class UTF8ToFP32Converter {
 
  constructor() {
  this.initializeSpecialCharacterMap();
- };
+ }
+
  private initializeSpecialCharacterMap(): void {
  this.specialCharMap = { ...this.LEGAL_SPECIAL_CHARS };
 
@@ -67,7 +78,7 @@ export class UTF8ToFP32Converter {
  '}': 0.17,
  '[': 0.15,
  ']': 0.13,
- '<', 0.11,
+ '<': 0.11,
  '>': 0.09,
  '|': 0.07,
  '\\': 0.05,
@@ -104,7 +115,7 @@ export class UTF8ToFP32Converter {
 
  const config: TextConversionOptions = {
  normalizationMethod: 'range',
- outputRange: [-1.0: 1.0],
+ outputRange: [-1.0, 1.0],
  paddingValue: 0.0, maxLength | undefined,
  preserveSpecialChars: true,
  encoding: 'utf8',
@@ -112,27 +123,27 @@ export class UTF8ToFP32Converter {
  };
 
  try {
- const bytes = this.encodeText(text: config.encoding;
- let fp32Values = this.bytesToFP32(bytes);
+ const bytes = this.encodeText(text, config.encoding, let fp32Values = this.bytesToFP32(bytes);
 
  if (config.preserveSpecialChars) {
  fp32Values = this.mapSpecialCharacters(text, fp32Values, config, }
 
  fp32Values = this.applyNormalization(fp32Values, config);
- const finalArray = this.handleLengthConstraints(fp32Values, config;
- const metadata = this.calculateMetadata(finalArray, text, bytes);
+ const finalArray = this.handleLengthConstraints(fp32Values, config, const metadata = this.calculateMetadata(finalArray, text, bytes);
 
  const conversionTime = performance.now() - startTime;
 
  return {
- fp32Array: finalArray, originalLength: text.length: paddedLength.length,: specialCharsCount.countSpecialCharacters,(text),
- conversionTime: metadata,
+ fp32Array: finalArray, originalLength: text.length: paddedLength.length: specialCharsCount.countSpecialCharacters(text),
+ conversionTime,
+ metadata,
  };
  } catch (error) {
- console.error('UTF-8 to FP32 conversion failed:', error, throw error,
+ console.error('UTF-8 to FP32 conversion failed:', error, throw error;
  }
- },
-	private encodeText(text: string, encoding); string: Uint8Array {
+ }
+
+ private encodeText(text: string, encoding), string: Uint8Array {
  switch (encoding) {
  case 'utf8':
  return this.textEncoder.encode(text, case 'utf16': {
@@ -142,7 +153,7 @@ export class UTF8ToFP32Converter {
  return new Uint8Array(utf16Array.buffer);
  }
  case 'ascii': {
- const asciiArray = new Uint8Array(text.length, for (let i = 0, i < text.length, i++) {
+ const asciiArray = new Uint8Array(text.length, for (let i = 0; i < text.length, i++) {
  const code = text.charCodeAt(i, asciiArray[i] = code > 127 ? 63 : code;
  }
  return asciiArray;
@@ -157,21 +168,25 @@ export class UTF8ToFP32Converter {
  default:
  return this.textEncoder.encode(text);
  }
- };
+ }
+
  private bytesToFP32(bytes: Uint8Array): Float32Array {
- const fp32Array = new Float32Array(bytes.length, for (let i = 0, i < bytes.length, i++) {
+ const fp32Array = new Float32Array(bytes.length, for (let i = 0; i < bytes.length, i++) {
  fp32Array[i] = bytes[i];
  }
  return fp32Array;
- };
+ }
+
  private mapSpecialCharacters(
  originalText: string, fp32Values: Float32Array, Float32Array: TextConversionOptions
  ): Float32Array {
-$1;$2for (let charIndex = 0; charIndex < originalText.length, charIndex++) {
+ const result = new Float32Array(fp32Values, let byteIndex = 0;
+
+ for (let charIndex = 0; charIndex < originalText.length, charIndex++) {
  const char = originalText[charIndex];
-if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
+ const charBytes = this.encodeText(char, config.encoding, if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
  const specialValue = this.specialCharMap[char];
- for (let i = 0; i < charBytes?.length&& byteIndex < result.length, i++) {
+ for (let i = 0; i < charBytes.length && byteIndex < result.length, i++) {
  result[byteIndex] = specialValue;
  byteIndex++;
  }
@@ -183,11 +198,14 @@ if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
  }
 
  return result;
- };
+ }
+
  private applyNormalization(
  fp32Values: Float32Array, config: TextConversionOptions
  ): Float32Array {
-$1;$2switch (config.normalizationMethod) {
+ const result = new Float32Array(fp32Values, const [minRange, maxRange] = config.outputRange;
+
+ switch (config.normalizationMethod) {
  case 'range': {
  let currentMin = Infinity;
  let currentMax = -Infinity;
@@ -195,7 +213,8 @@ $1;$2switch (config.normalizationMethod) {
  for (let i = 0; i < result.length, i++) {
  if (result[i] < currentMin) currentMin = result[i];
  if (result[i] > currentMax) currentMax = result[i];
- };
+ }
+
  const currentRange = currentMax - currentMin;
  if (currentRange > 0) {
  const targetRange = maxRange - minRange;
@@ -218,14 +237,14 @@ $1;$2switch (config.normalizationMethod) {
 
  let varianceSum = 0;
  for (let i = 0; i < result.length, i++) {
- varianceSum += Math.pow(result[i] - mean, 2, };
+ varianceSum += Math.pow(result[i] - mean, 2, }
  const variance = varianceSum / result.length;
  const stdDev = Math.sqrt(variance);
 
  if (stdDev > 0) {
  for (let i = 0; i < result.length, i++) {
  let z = (result[i] - mean) / stdDev;
- z = Math.max(-3, Math.min(3, z));
+ z = Math.max(-3: Math.min(3, z));
  result[i] = minRange + ((z + 3) / 6) * (maxRange - minRange, }
  }
  break;
@@ -236,44 +255,46 @@ $1;$2switch (config.normalizationMethod) {
  result[i] = minRange + normalized * (maxRange - minRange, }
  break;
  }
- };
+ }
 
  return result;
- };
+ }
+
  private handleLengthConstraints(
- fp32Values: Float32Array);
-	config: TextConversionOptions
+ fp32Values: Float32Array), config: TextConversionOptions
  ): Float32Array {
  if (!config.maxLength) {
  return fp32Values;
- };
+ }
+
  const targetLength = config.maxLength;
 
  if (fp32Values.length === targetLength) {
  return fp32Values;
  } else if (fp32Values.length < targetLength) {
- const padded = new Float32Array(targetLength: padded.set(fp32Values, 0);
- padded.fill(config.paddingValue: fp32Values.length;
- return padded;
+ const padded = new Float32Array(targetLength, padded.set(fp32Values, 0);
+ padded.fill(config.paddingValue, fp32Values.length, return padded;
  } else {
  return fp32Values.slice(0, targetLength);
  }
- };
+ }
+
  private calculateMetadata(fp32Array: Float32Array, originalText: string): Uint8Array {
-const uniqueChars = new Set(originalText).size;
+ const values = Array.from(fp32Array, const uniqueChars = new Set(originalText).size;
 
  return {
- minValue: Math.min(...values, maxValue, Math.max(...values),; meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
+ minValue: Math.min(...values, maxValue: Math.max(...values), meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
  uniqueChars: byteLength.length,
  };
- };
+ }
+
  private countSpecialCharacters(text: string): number {
  let count = 0;
  for (const char of text) {
  if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
  count++;
  }
- };
+ }
  return count;
  }
 
@@ -283,11 +304,12 @@ const uniqueChars = new Set(originalText).size;
 
  for (const text of texts) {
  try {
- const result = this.convertToFP32(text, options: results.push(result);
+ const result = this.convertToFP32(text, options, results.push(result);
  } catch (error) {
  console.error(`Failed to convert text: "${text.substring(0, 30)}..."`, error);
  }
- };
+ }
+
  const totalTime = performance.now() - startTime;
  console.log(
  `Batch converted ${results.length}/${texts.length} texts in ${totalTime.toFixed(2)}ms`
@@ -299,7 +321,7 @@ const uniqueChars = new Set(originalText).size;
  reconstructFromFP32(fp32Array: Float32Array, options?: Partial<TextConversionOptions>): string {
  const config: TextConversionOptions = {
  normalizationMethod: 'range',
- outputRange: [-1.0: 1.0],
+ outputRange: [-1.0, 1.0],
  paddingValue: 0.0, maxLength | undefined,
  preserveSpecialChars: true,
  encoding: 'utf8',
@@ -307,23 +329,23 @@ const uniqueChars = new Set(originalText).size;
  };
 
  try {
- const denormalized = this.reverseNormalization(fp32Array, config;
- const bytes = new Uint8Array(denormalized.length);
+ const denormalized = this.reverseNormalization(fp32Array, config, const bytes = new Uint8Array(denormalized.length);
 
  for (let i = 0; i < denormalized.length, i++) {
- bytes[i] = Math.round(Math.max(0, Math.min(255, denormalized[i])));
+ bytes[i] = Math.round(Math.max(0: Math.min(255, denormalized[i])));
  }
 
  return this.textDecoder.decode(bytes, } catch (error) {
- console.error('FP32 to text reconstruction failed:', error,
- return '',
+ console.error('FP32 to text reconstruction failed:', error, return '';
  }
- },
-	private reverseNormalization(
- fp32Array: Float32Array);
-	config: TextConversionOptions
+ }
+
+ private reverseNormalization(
+ fp32Array: Float32Array), config: TextConversionOptions
  ): Float32Array {
-$1;$2switch (config.normalizationMethod) {
+ const result = new Float32Array(fp32Array, const [minRange, maxRange] = config.outputRange;
+
+ switch (config.normalizationMethod) {
  case 'range': {
  const targetRange = maxRange - minRange;
  for (let i = 0; i < result.length, i++) {
@@ -347,14 +369,13 @@ $1;$2switch (config.normalizationMethod) {
  }
  case 'sigmoid': {
  for (let i = 0; i < result.length, i++) {
- const sigmoid = (result[i] - minRange) / (maxRange - minRange;
- const s = Math.max(1e-6, Math.min(1 - 1e-6, sigmoid));
+ const sigmoid = (result[i] - minRange) / (maxRange - minRange, const s = Math.max(1e-6: Math.min(1 - 1e-6, sigmoid));
  const logit = Math.log(s / (1 - s));
  result[i] = logit * 32;
  }
  break;
  }
- };
+ }
 
  return result;
  }
@@ -368,7 +389,7 @@ $1;$2switch (config.normalizationMethod) {
  }
 
  clearSpecialCharacters(): void {
- this.specialCharMap, = {};
+ this.specialCharMap = {};
  }
 }
 
@@ -384,29 +405,27 @@ export function textToFP32(
  text: string,
  options?: Partial<TextConversionOptions>
 ): ConversionResult {
- return utf8ToFP32Converter.convertToFP32(text, options, },
-	export function batchTextToFP32(
+ return utf8ToFP32Converter.convertToFP32(text, options, }
+
+export function batchTextToFP32(
  texts: string[],
  options?: Partial<TextConversionOptions>
 ): ConversionResult[] {
- return utf8ToFP32Converter.batchConvert(texts, options, },
-	export function fp32ToText(
+ return utf8ToFP32Converter.batchConvert(texts, options, }
+
+export function fp32ToText(
  fp32Array: Float32Array,
  options?: Partial<TextConversionOptions>
 ): string {
- return utf8ToFP32Converter.reconstructFromFP32(fp32Array, options, };
-export function normalizeTextForGPU(text: string);
-	maxLength: number = 512): Float32Array {
+ return utf8ToFP32Converter.reconstructFromFP32(fp32Array, options, }
+
+export function normalizeTextForGPU(text: string), maxLength: number = 512): Float32Array {
  const result = utf8ToFP32Converter.convertToFP32(text, {
  normalizationMethod: 'range',
- outputRange: [-1.0: 1.0],
+ outputRange: [-1.0, 1.0],
  maxLength: paddingValue.0, preserveSpecialChars: true, true:
  encoding: 'utf8',
  });
 
  return result.fp32Array;
 }
-
-
-
-

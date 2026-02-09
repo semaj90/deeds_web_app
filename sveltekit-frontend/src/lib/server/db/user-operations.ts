@@ -1,4 +1,3 @@
-import type { User } from '$lib/types/database-types';
 import bcrypt from 'bcryptjs';
 import { and, eq, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
@@ -21,7 +20,7 @@ export class UserAuthService {
         jurisdiction?: string;
         practiceAreas?: string[];
         profileData?: any;
-    }): Promise<{ user: User | null; success: boolean; error?: string }> {
+    }): Promise<{ user: any | null, success: boolean; error?: string }> {
         try {
             // Check if user already exists
             const existingUser = await db.select().from(users).where(eq(users.email, userData.email.toLowerCase())).limit(1);
@@ -45,7 +44,7 @@ export class UserAuthService {
         password: string,
         ipAddress?: string,
         userAgent?: string
-    ): Promise<{ user?: User; session?: any, success: boolean; error?: string }> {
+    ): Promise<{ user?: any; session?: any, success: boolean; error?: string }> {
         try {
             const userResult = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
             const user = userResult[0];
@@ -72,7 +71,7 @@ export class UserAuthService {
                 isActive: true
             } as any).returning();
 
-            return { user: user as unknown as User, session: sessionResult[0], success: true };
+            return { user: user as any, session: sessionResult[0], success: true };
         } catch (error: any) {
             console.error('Auth error:', error);
             return { success: false, error: error.message };
@@ -82,7 +81,7 @@ export class UserAuthService {
     /**
      * Validate session
      */
-    static async validateSession(sessionId: string): Promise<{ valid: boolean; user?: User }> {
+    static async validateSession(sessionId: string): Promise<{ valid: boolean; user?: any }> {
         try {
             // Query sessions directly since db.query.sessions typing is incomplete
             const sessionResults = await db.select().from(userSessions)
@@ -104,7 +103,7 @@ export class UserAuthService {
 
             if (!user) return { valid: false };
 
-            return { valid: true, user: user as unknown as User };
+            return { valid: true, user: user as any };
         } catch {
             return { valid: false };
         }

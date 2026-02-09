@@ -80,7 +80,7 @@ export class AIService {
 		caseId?: string,
 		options: AIQueryOptions = {}
 	): Promise<{
-	response: string; confidence: number;
+	response: string, confidence: number;
 	contextUsed: string[]; queryId?: string }> {
 		const startTime = Date.now();
 		const {
@@ -281,14 +281,14 @@ Format your response as JSON with the structure:
 		userId?: string,
 		limit = 5
 	): Promise<Array<{
-	query: string; response: string;
+	query: string, response: string;
 	similarity: number }>> {
 		try {
 			if (userId) {
 				const rows = (await db.execute(
 					sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
 				)) as Array<{ query: string;
-	response: string; similarity: number }>;
+	response: string, similarity: number }>;
 				return rows.map((r) => ({
 					query: r.query,
 					response: r.response,
@@ -298,7 +298,7 @@ Format your response as JSON with the structure:
 				const rows = (await db.execute(
 					sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
 				)) as Array<{ query: string;
-	response: string; similarity: number }>;
+	response: string, similarity: number }>;
 				return rows.map((r) => ({
 					query: r.query,
 					response: r.response,
@@ -492,7 +492,7 @@ Format your response as JSON with the structure:
 		return matches
 			? matches.flatMap((m) =>
 					m
-						.split(/[,]/)
+						.split(/[]/)
 						.map((t) => t.trim().toLowerCase())
 						.filter(Boolean)
 			  )
@@ -505,7 +505,7 @@ Format your response as JSON with the structure:
 		return matches
 			? matches.flatMap((m) =>
 					m
-						.split(/[,]/)
+						.split(/[]/)
 						.map((t) => t.trim())
 						.filter(Boolean)
 			  )
@@ -518,7 +518,7 @@ Format your response as JSON with the structure:
 		return matches
 			? matches.flatMap((m) =>
 					m
-						.split(/[,]/)
+						.split(/[]/)
 						.map((t) => t.trim())
 						.filter(Boolean)
 			  )

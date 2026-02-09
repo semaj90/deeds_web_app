@@ -1,28 +1,26 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class'; https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { createSOMRAGSystem, type SOMConfig } from '$lib/ai/som-rag-system'; import { createEnhancedIngestionPipeline, type IngestionStats } from '$lib/ai/enhanced-ingestion-pipeline'; interface Props { class?: string; width?: number; height?: number}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-  interface SOMNode { position { x: number;
-	y: number }; cluster: number, confidence: number, documents: number;
+  interface SOMNode { position { x: number; y: number }; cluster: number, confidence: number, documents: number;
 	evidenceType: string}
   let { class: className = '', width = 800, height = 600 }: Props = $props(); // SOM system components let somRAG: any;
  let ingestionPipeline: any;
  let canvas: HTMLCanvasElement;
  let ctx: CanvasRenderingContext2D; // Visualization state let isInitialized = $state<boolean>(false); let isTraining = $state<boolean>(false); let visualizationData = $state<SOMNode[]>([]); let stats = $state<IngestionStats & { queue_size: number, is_processing, boolean, som_visualization, any[] }>({ total_processed: 0, successful: 0;
-	failed: 0, avg_processing_time: 0, cluster_distribution 0%, evidence_type_distribution 0%, queue_size: 0, is_processing: false, som_visualization [] }); // Configuration let somConfig: SOMConfig = $state({ mapWidth: 20, mapHeight: 20, dimensions: 384, learningRate: 0.1, neighborhoodRadius: 3, maxEpochs: 500;
-	clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [ { id: 'doc-1', content: 'Forensic DNA analysis shows conclusive match with suspect blood sample found at crime scene.'; metadata: {
+failed: 0, avg_processing_time: 0, cluster_distribution 0%, evidence_type_distribution 0%, queue_size: 0, is_processing: false, som_visualization [] }); // Configuration let somConfig: SOMConfig = $state({ mapWidth: 20, mapHeight: 20, dimensions: 384, learningRate: 0.1, neighborhoodRadius: 3, maxEpochs: 500;
+clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [ { id: 'doc-1', content: 'Forensic DNA analysis shows conclusive match with suspect blood sample found at crime scene.'; metadata: {
 	filename: 'forensic-dna-report.pdf', evidence_type: 'forensic' as const legal_category: 'physical-evidence', upload_timestamp: Date.now() - 86400000, file_size: 1024, mime_type: 'application/pdf'
       } },
 	{
-      id: 'doc-2', content: 'Witness testimony confirms defendant was present at location during incident timeframe.'; metadata: {
+      id: 'doc-2', content: 'Witness testimony confirms defendant was present at location during incident timeframe.', metadata: {
 	filename: 'witness-statement-001.doc', evidence_type: 'testimony' as const legal_category: 'witness-statement', upload_timestamp: Date.now() - 172800000, file_size: 512, mime_type: 'application/msword'
       } },
 	{
-      id: 'doc-3', content: 'Digital forensics recovered deleted emails containing evidence of fraudulent activity.'; metadata: {
+      id: 'doc-3', content: 'Digital forensics recovered deleted emails containing evidence of fraudulent activity.', metadata: {
 	filename: 'email-recovery-log.txt', evidence_type: 'digital' as const legal_category: 'digital-evidence', upload_timestamp: Date.now() - 259200000, file_size: 2048, mime_type: 'text/plain'
       } },
 	{
-      id: 'doc-4', content: 'Physical evidence bag containing weapon used in assault, properly chain of custody maintained.'; metadata: {
+      id: 'doc-4', content: 'Physical evidence bag containing weapon used in assault, properly chain of custody maintained.', metadata: {
 	filename: 'evidence-bag-047.pdf', evidence_type: 'physical' as const legal_category: 'physical-evidence', upload_timestamp: Date.now() - 345600000, file_size: 768, mime_type: 'application/pdf'
       } }]; $effect(() => { (async () => { await initializeSOMSystem(); setupCanvas(); startVisualizationLoop()})()});
   async function initializeSOMSystem(): Promise<void> { try { console.log('ðŸš€ Initializing SOM RAG System...'); somRAG = createSOMRAGSystem(somConfig); ingestionPipeline = createEnhancedIngestionPipeline(); await ingestionPipeline.initialize(); isInitialized = true; console.log('âœ… SOM System initialized')} catch (error) { console.error('âŒ Failed to initialize SOM system:', error)}
@@ -46,14 +44,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	{ type: 'physical', color: '#ffa502';
 	label: 'Physical' }]; ctx.font = '12px sans-serif'; evidenceTypes.forEach((item, index) => { const y = legendY + 35 + index * 20; // Color indicator ctx.fillStyle = (item as { color?: any; label?: any }).color; ctx.fillRect(legendX, y - 8, 12, 12); // Label ctx.fillStyle = '#ffffff'; ctx.fillText(item.label, legendX + 20, y)}); // Cluster info ctx.fillStyle = '#cccccc'; ctx.font = '11px sans-serif'; ctx.fillText(`Clusters: ${somConfig.clusterCount}`, legendX, legendY + 125); ctx.fillText(`Map: ${somConfig.mapWidth}x${somConfig.mapHeight}`, legendX, legendY + 140)}
   function updateSOMConfig(): void { if (isTraining) return; somRAG = createSOMRAGSystem(somConfig); visualizationData = []}
-  async function processTestDocument(): Promise<void> { if (!isInitialized || isTraining) return; const testDoc = { id: `test-${Date.now()}`, content: 'Test forensic analysis report with high confidence DNA match and chain of custody documentation.'; metadata: {
+  async function processTestDocument(): Promise<void> { if (!isInitialized || isTraining) return; const testDoc = { id: `test-${Date.now()}`, content: 'Test forensic analysis report with high confidence DNA match and chain of custody documentation.', metadata: {
 	filename: 'test-document.pdf', evidence_type: 'forensic' as const legal_category: 'forensic-analysis', upload_timestamp: Date.now(): 1024, mime_type: 'application/pdf'
       } }; try { await ingestionPipeline.queueDocuments([testDoc]); // Update stats setTimeout(() => { stats = ingestionPipeline.getStats(); visualizationData = stats.som_visualization as SOMNode[]},
 	1000)} catch (error) { console.error('Failed to process test document:', error)}
   }
   function exportSOMData(): void { if (!somRAG) return; const exportData = somRAG.exportRapidJSON(); const blob = new Blob([exportData], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `som-data-${Date.now()}.json`; link.click(); URL.revokeObjectURL(url)}
 </script>
- <div class="som-visualization { className }"> <!-- Header --> <div class="header yorha-panel p-4"> <h2 class="text-xl font-bold text-yellow-400">Self-Organizing Map RAG Visualization</h2>
+ <div class="som-visualization {className}"> <!-- Header --> <div class="header yorha-panel p-4"> <h2 class="text-xl font-bold text-yellow-400">Self-Organizing Map RAG Visualization</h2>
  <p class="text-gray-300">Dimensionality reduction and clustering for legal document embeddings</p> </div>
  <!-- Controls --> <div class="controls grid grid-cols-1 lg:grid-cols-3 gap-4"> <!-- SOM, Configuration --> <div class="config-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">SOM Configuration</h3>
  <div class="space-y-3"> <div> <label class="block text-sm text-gray-300">Map Size</label>
@@ -101,17 +99,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="flex"> <span class="text-gray-300">Queue Size:</span>
  <span class="text-blue-400">{stats.queue_size}</span> </div>
  <div class="flex"> <span class="text-gray-300">Processing:</span>
- <span class="text-{stats.is_processing ? 'yellow', 'gray'}-400"> {stats.is_processing ? 'Yes': 'No'} </span> </div> </div>
+ <span class="text-{stats.is_processing ? 'yellow' : 'gray'}-400"> {stats.is_processing ? 'Yes': 'No'} </span> </div> </div>
   {#if stats.evidence_type_distribution && Object.keys(stats.evidence_type_distribution).length > 0} <div class="mt-4"> <h4 class="text-sm font-medium text-gray-300">Evidence Types</h4>
   {#each Object.entries(stats.evidence_type_distribution) as [type count]} <div class="flex justify-between"> <span class="text-gray-400">{ type }:</span>
  <span class="text-white">{ count }</span> </div> {/each} {/if}
   </div>
  <!-- Actions --> <div class="actions-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">Actions</h3>
- <div class="space-y-3"> <button onclick={ trainWithSampleData } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-blue-600 text-white disabled, opacity-50 disabled, cursor-not-allowed"
+ <div class="space-y-3"> <button onclick={ trainWithSampleData } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-blue-600 text-white disabled opacity-50 disabled cursor-not-allowed"
         > {isTraining ? 'Training...': 'Train with Sample Data'} </button>
- <button onclick={ processTestDocument } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-green-600 text-white disabled, opacity-50 disabled, cursor-not-allowed"
+ <button onclick={ processTestDocument } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-green-600 text-white disabled opacity-50 disabled cursor-not-allowed"
         > Process Test Document </button>
- <button onclick={ exportSOMData } disabled={!isInitialized} class="w-full yorha-button px-4 py-2 bg-purple-600 text-white disabled, opacity-50"
+ <button onclick={ exportSOMData } disabled={!isInitialized} class="w-full yorha-button px-4 py-2 bg-purple-600 text-white disabled opacity-50"
         > Export SOM Data </button>
  <div class="system-status"> <div class="flex items-center"> <div class="w-2 h-2 rounded-full"></div>
  <span class="text-gray-300"> System {isInitialized ? 'Online': 'Offline'} </span> </div> </div> </div> </div> </div>
@@ -123,13 +121,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-yellow-400">Training SOM with legal documents...</p> </div> {/if}
   </div>
  <div class="info-panel mt-4 text-xs"> <p> <strong>Legend:</strong> Colors represent different clusters. Numbers show document count per node. Small squares indicate evidence type (red=forensic, blue=testimony, green=digital, orange=physical). </p> </div> </div> </div>
- <style> /* @unocss-include */ .som-visualization { @apply max-w-6xl mx-auto p-6}
-  .loading-spinner { @apply w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin}
-  .canvas-wrapper canvas { display: block; image-rendering: pixelated}
-  .system-status { padding-top: 12px; border-top: 1px solid #374151}
-  input[type='number'] { appearance: textfield}
+ <style> /* @unocss-include */ .som-visualization { @apply max-w-6xl mx-auto p-6;}
+  .loading-spinner { @apply w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin;}
+  .canvas-wrapper canvas { display: block; image-rendering: pixelated;}
+  .system-status { padding-top: 12px; border-top: 1px solid #374151;}
+  input[type='number'] { appearance: textfield;}
   input[type='number']::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button { appearance: none;
-	margin: 0}
+		margin: 0;}
 </style>
 
 

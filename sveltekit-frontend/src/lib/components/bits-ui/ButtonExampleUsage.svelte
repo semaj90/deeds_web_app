@@ -130,13 +130,14 @@
 
 <style>
   pre {
-    background: var(--color-nier-bg-tertiary, padding: 1rem
+    background: var(--color-nier-bg-tertiary;
+		padding: 1rem;
     border-radius: 0.5rem
-    overflow-x: auto}
+    overflow-x: auto;}
   code {
-    font-family: 'JetBrains Mono', 'Roboto Mono', monospace
+    font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
     font-size: 0.875rem
-   ,color: var(--color-nier-text-primary)}
+   color: var(--color-nier-text-primary)}
 </style>
 
 

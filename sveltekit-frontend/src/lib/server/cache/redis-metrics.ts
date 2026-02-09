@@ -303,8 +303,8 @@ export class RedisMetricsCache {
 	 * Get key pattern statistics
 	 */
 	getKeyPatternStats(): Array<{
-	pattern: string; hits: number;
-	misses: number; hitRate: number }> {
+	pattern: string, hits: number;
+	misses: number, hitRate: number }> {
 		return Array.from(this.keyPatterns.entries())
 			.map(([pattern, stats]) => ({
 				pattern,

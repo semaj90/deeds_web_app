@@ -13,8 +13,8 @@
 	 *   {/snippet}
 	 * </Svelte5BitsDialog>
 	 */
-	import { Dialog } from 'bits-ui';
-	import X from 'lucide-svelte/icons/x';
+	import * as Dialog from "bits-ui/components/dialog";
+import X from 'lucide-svelte/icons/x';
 	import type { Snippet } from 'svelte';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
@@ -51,14 +51,14 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 		<Dialog.Overlay
 			class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm
 				data-[state=open]:animate-in data-[state=closed]:animate-out
-				data-[state=closed]:fade-out-0 data-[state=open], fade-in-0"
+				data-[state=closed]:fade-out-0 data-[state=open] fade-in-0"
 		/>
 		<Dialog.Content
 			class="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2
 				border-4 border-nes-border bg-nes-panel p-6 shadow-lg
 				data-[state=open]:animate-in data-[state=closed]:animate-out
 				data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
-				data-[state=closed]:zoom-out-95 data-[state=open], zoom-in-95
+				data-[state=closed]:zoom-out-95 data-[state=open] zoom-in-95
 				{ className }"
 		>
 			{#if title}
@@ -86,7 +86,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 			{/if}
 
 			<Dialog.Close
-				class="absolute right-4 top-4 rounded-sm opacity-70 hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-nes-accent, focus: ring-offset-2, disabled, pointer-events-none"
+				class="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-nes-accent focus:ring-offset-2 disabled pointer-events-none"
 			>
 				<X class="h-4 w-4" />
 				<span class="sr-only">Close</span>

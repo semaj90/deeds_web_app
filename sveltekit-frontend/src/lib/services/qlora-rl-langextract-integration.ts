@@ -6,7 +6,6 @@
 import type { LegalDocument } from '$lib/models/LegalDocument.svelte';
 import type { NESMemoryArchitecture } from '../memory/nes-memory-architecture';
 import type { WebGPUSOMCache } from '../webgpu/som-webgpu-cache';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Generic JSON value type
@@ -18,13 +17,13 @@ type UnknownRecord = Record<string, unknown>;
 function getStringProp(doc: LegalDocument, key: string): string | undefined {
 	const r = doc as unknown as UnknownRecord;
 	const v = r[key];
-	return typeof v === 'string' ? v : undefined;
+	return typeof v === 'string' ? v  : undefined;
 }
 
 function getNumberProp(doc: LegalDocument, key: string): number | undefined {
 	const r = doc as unknown as UnknownRecord;
 	const v = r[key];
-	return typeof v === 'number' ? v : undefined;
+	return typeof v === 'number' ? v  : undefined;
 }
 
 function getRiskLevel(doc: LegalDocument): 'low' | 'medium' | 'high' | 'critical' | undefined {

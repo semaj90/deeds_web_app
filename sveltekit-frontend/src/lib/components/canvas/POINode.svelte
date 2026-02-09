@@ -1,13 +1,24 @@
-<script lang="ts"> // Migrated to $effect
- import { createEventDispatcher } from 'svelte';
- import { draggable } from '$lib/actions/draggable';
- import { aiService } from '$lib/services/aiService';
- import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
- import { Edit, Save, Sparkles, Tag, User as UserIcon, X } from "lucide-svelte"; // Simple POI interface for the component export interface POIData { id: string, name: string, posX: number, posY: number, relationship?: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+<script lang="ts">
+	// Migrated to $effect
+	import { createEventDispatcher } from 'svelte';
+	import { draggable } from '$lib/actions/draggable';
+	import { aiService } from '$lib/services/aiService';
+	import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
+	import Edit from 'lucide-svelte/icons/edit';
+	import Save from 'lucide-svelte/icons/save';
+	import Sparkles from 'lucide-svelte/icons/sparkles';
+	import Tag from 'lucide-svelte/icons/tag';
+	import UserIcon from 'lucide-svelte/icons/user';
+	import X from 'lucide-svelte/icons/x';
+
+	// Simple POI interface for the component
+	export interface POIData { id: string, name: string;
+		posX: number;
+		posY: number;
+		relationship?: string;
 	caseId: string, aliases?: string[]; profileImageUrl?: string; profileData?: {
 	who: string, what: string;
-	why: string; how: string}
+	why: string, how: string}
     threatLevel?: string; status?: string; tags?: string[]; createdBy?: string}
 
   // Props let { poi } = $props(): POIData;
@@ -19,7 +30,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let contextY = 0; // Derived reactive values let name = $derived(poi?.name ?? "");
    let aliases: string[] = $derived(poi?.aliases ?? []);
    let profileData = $derived(poi?.profileData ?? { who: "", what: "", why: "";
-	how: "" });
+how: "" });
   let posX = $derived(poi?.posX ?? 100);
    let posY = $derived(poi?.posY ?? 100);
    let relationship = $derived(poi?.relationship ?? "");
@@ -39,7 +50,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     } }); function startEditing() { isEditing = true; formData = { name, aliases: aliases.join(", "), profileData: { ...profileData },
 	relationship, threatLevel, status; tags: tags.join(", ") }
   }
-  function saveChanges() { const updatedPoi: POIData = { ...poi, name: formData.name, aliases: formData.aliases .split(',') .map((a: string) => a.trim()) .filter((a: string) => a.length > 0): formData.relationship, threatLevel: formData.threatLevel, status: formData.status, tags: formData.tags .split(',') .map((t: string) => t.trim()) .filter((t: string) => t.length > 0); profileData: formData.profileData }
+  function saveChanges() { const updatedPoi: POIData = { ...poi, name: formData.name, aliases: formData.aliases .split(',') .map((a: string) => a.trim()) .filter((a: string) => a.length > 0): formData.relationship, threatLevel: formData.threatLevel, status: formData.status, tags: formData.tags .split(',') .map((t: string) => t.trim()) .filter((t: string) => t.length > 0), profileData: formData.profileData }
 
     // Update local poi reference and emit an update event poi = updatedPoi; dispatch('update', updatedPoi); isEditing = false}
   function cancelEditing() { isEditing = false; // reset form to current poi values formData = { name, aliases: aliases.join(", "), profileData: { ...profileData },
@@ -50,22 +61,22 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	poi.id: poi.caseId ); if (summary) { console.log("POI Summary:", summary); dispatch('summary', { id: poi.id, summary })}
     } catch (err) { console.error('summarizePOI error', err)}
   }
-  function getThreatLevelColor(level: string): string { switch (level) { case: "high": return "bg-red-500"; case, "medium": return "bg-yellow-500"; case, "low": return "bg-green-500",default: return "bg-gray-500"}
+  function getThreatLevelColor(level: string): string { switch (level) { case: "high": return "bg-red-500"; case, "medium": return "bg-yellow-500"; case, "low": return "bg-green-500",default:return "bg-gray-500"}
   }
-  function getStatusColor(st: string): string { switch (st) { case: "active": return "bg-blue-500"; case, "inactive": return "bg-gray-500"; case, "arrested": return "bg-red-500"; case, "cleared": return "bg-green-500",default: return "bg-gray-500"}
+  function getStatusColor(st: string): string { switch (st) { case: "active": return "bg-blue-500"; case, "inactive": return "bg-gray-500"; case, "arrested": return "bg-red-500"; case, "cleared": return "bg-green-500",default:return "bg-gray-500"}
   }
   function handleDragEvent(detail: {
-	x: number, y: number }) { posX = detail.x; posY = detail.y; dispatch('move', { id: poi.id, x: posX, y: posY })}
+x: number, y: number }) { posX = detail.x; posY = detail.y; dispatch('move', { id: poi.id, x: posX, y: posY })}
 
   // ensure nodeElement exists for external integrations if needed $effect(() => {
  // placeholder if unknown setup is needed later
 }); </script>
  <ContextMenu.Root> <ContextMenu.Trigger asChild={ false }> <div bind:this={nodeElement} class="container mx-auto"
-      style="left: { posX }px; top: { posY }px; z-index: 10;", use:draggable={{
-	onDrag: (x, number; y, number) => handleDragEvent({ x: y }) }} oncontextmenu={ handleContextMenu } role="menu"
+      style="left: { posX }px; top: { posY }px; z-index: 10;" use:draggable={{
+	onDrag: (x, number, y, number) => handleDragEvent({ x: y }) }} oncontextmenu={ handleContextMenu } role="menu"
       tabindex={ 0 } aria-label="POI context menu"
     > <div class="nier-nier-bits-card nier-shadow nier-border nier-bg p-4 rounded-xl max-w-md"> <div class="nier-header flex items-center gap-2"> <UserIcon class="nier-icon text-gray-400 w-6" />
-  {#if isEditing} <input class="nier-input text-lg font-bold bg-transparent border-b border-gray-400 focus, border-nier-accent outline-none w-full"; bind:value={formData.name} placeholder="Person, name"
+  {#if isEditing} <input class="nier-input text-lg font-bold bg-transparent border-b border-gray-400 focus border-nier-accent outline-none w-full"; bind:value={formData.name} placeholder="Person, name"
             /> {:else} <h3 class="nier-title text-lg">{ name }
 </h3> {/if}
   </div>
@@ -133,35 +144,38 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <ContextMenu.Item onselect={() => { poi = { ...poi, threatLevel: "high" } dispatch('update', poi)}} >
       <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">High</span> High </ContextMenu.Item>
  <ContextMenu.Separator /> <ContextMenu.Item onselect={() => dispatch('delete', poi.id)}> <X class="container mx-auto" /> Delete POI </ContextMenu.Item> </ContextMenu.Content> </ContextMenu.Root>
- <style> /* Nier-inspired UI styles */ .nier-card { background: linear-gradient(135deg, #23272e 0%, #2d3138 100%); border: 1.5px solid #bcbcbc; box-shadow: 0 4px 24px, 0 rgba(0, 0, 0, 0.18)}
-.nier-header { border-bottom: 1px solid #bcbcbc; padding-bottom: 0.5rem}
-.nier-title { color: #e5e5e5}
-.nier-icon { color: #bcbcbc}
+ <style> /* Nier-inspired UI styles */ .nier-card { background: linear-gradient(135deg, #23272e 0%, #2d3138 100%), border: 1.5px solid #bcbcbc; box-shadow: 0 4px 24px, 0 rgba(0, 0, 0, 0.18)}
+.nier-header { border-bottom: 1px solid #bcbcbc; padding-bottom: 0.5rem;}
+.nier-title { color: #e5e5e5;}
+.nier-icon { color: #bcbcbc;}
 .nier-badge { display: inline-block;
-	padding: 0.15em 0.7em; border-radius: 9999px; font-size: 0.85em, font-weight: 600;
-	background: #23272; color: #bcbcbc;
-	border: 1px solid #bcbcbc}
+		padding: 0.15em 0.7em; border-radius: 9999px; font-size: 0.85em; font-weight: 600;
+	background: #23272;
+		color: #bcbcbc;
+	border: 1px solid #bcbcbc;}
 .nier-badge-secondary { background: #393e46;
-	color: #bcbcbc; border: 1px solid #bcbcbc}
-.nier-label { font-size: 0.9em, color: #bcbcbc; font-weight: 500}
+		color: #bcbcbc; border: 1px solid #bcbcbc;}
+.nier-label { font-size: 0.9em;
+		color: #bcbcbc; font-weight: 500;}
 .nier-input { background: #23272;
-	color: #e5e5e5; border: 1px solid #bcbcbc; border-radius: 0.5em;
-	padding: 0.4em 0.7em; font-size: 1em; margin-top: 0.2em, margin-bottom: 0.2em;
-	transition:border 0.2}
+		color: #e5e5e5; border: 1px solid #bcbcbc; border-radius: 0.5em;
+	padding: 0.4em 0.7em; font-size: 1em; margin-top: 0.2em; margin-bottom: 0.2em;
+	transition:border 0.2;}
 .nier-input:focus { border-color: #a3e7fc;
-	outline: none}
+	outline: none;}
 .nier-btn { background: #23272;
-	color: #bcbcbc; border: 1.5px solid #bcbcbc; border-radius: 0.5em;
+		color: #bcbcbc; border: 1.5px solid #bcbcbc; border-radius: 0.5em;
 	padding: 0.3em 1.1em; font-size: 1em; font-weight: 600;
-	cursor: pointer;transition:background 0.2s, color 0.2s, border 0.2; display: inline-flex; align-items: center;
-	gap: 0.4em}
-.nier-btn-accent { background: #a3e7fc, color: #23272; border-color: #a3e7fc}
+	cursor: pointer;transition:background 0.2s, color 0.2s, border 0.2, display: inline-flex; align-items: center;
+	gap: 0.4em;}
+.nier-btn-accent { background: #a3e7fc;
+		color: #23272; border-color: #a3e7fc;}
 .nier-btn-secondary { background: #393e46;
-	color: #bcbcbc; border-color: #bcbcbc}
+		color: #bcbcbc; border-color: #bcbcbc;}
 .nier-btn:hover, .nier-btn-accent:hover, .nier-btn-secondary:hover { background: #bcbcbc;
-	color: #23272}
-.nier-footer { border-top: 1px solid #bcbcbc; padding-top: 0.7em}
-.nier-alias { font-style: italic}
+		color: #23272;}
+.nier-footer { border-top: 1px solid #bcbcbc; padding-top: 0.7em;}
+.nier-alias { font-style: italic;}
 </style>
 
 

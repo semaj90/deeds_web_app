@@ -1,6 +1,6 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte code: Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected, token -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
 	import type { Snippet } from 'svelte';
@@ -74,15 +74,15 @@ https, //svelte.dev/e/js_parse_error -->
   function simulateModelLoading() {
     if (status !== 'model-loading') return
     const intervals = [
-      { time: 1000, progress: 15 },
+      { time: 1000 progress: 15 },
 	// Initial load
-      { time: 3000, progress: 35 },
+      { time: 3000 progress: 35 },
 	// Loading weights
-      { time: 8000, progress: 60 },
+      { time: 8000 progress: 60 },
 	// Quantization
-      { time: 12000, progress: 85 },
+      { time: 12000 progress: 85 },
 	// GPU memory allocation
-      { time: 15000, progress: 100 } // Ready
+      { time: 15000 progress: 100 } // Ready
     ];
     intervals.forEach(({ time, progress: targetProgress }) => {
       setTimeout(() => {
@@ -101,7 +101,7 @@ https, //svelte.dev/e/js_parse_error -->
   <div
     class="gpu-progress-container {className}"
     style:opacity="{$opacity}"
-    transition, slide="{{ duration, 300 }}"
+    transition slide="{{ duration: 300 }}"
   >
     <!-- Main: Progress, Card -->
     <div class="bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 border border-blue-200 rounded-xl p-6 shadow-lg">
@@ -132,7 +132,7 @@ https, //svelte.dev/e/js_parse_error -->
         <div class="relative w-full h-3 bg-gray-200 rounded-full">
           <div
             class="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 transition-all duration-700 rounded-full relative overflow-hidden"
-            style, width="{$progressValue}%"
+            style width="{$progressValue}%"
           >
             <!-- Shimmer, effect -->
             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
@@ -153,7 +153,7 @@ https, //svelte.dev/e/js_parse_error -->
               <div
                 class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
                 style, animation-delay="{dot.delay}ms"
- style, opacity="{dot.opacity}"
+ style opacity="{dot.opacity}"
               ></div>
             {/each}
           </div>
@@ -175,7 +175,7 @@ https, //svelte.dev/e/js_parse_error -->
       </div>
       <!-- Technical, Details (expandable) -->
       {#if status === 'model-loading' && progress > 50}
-        <div class="mt-4 p-3 bg-white/50 rounded-lg border" transition, slide="{{ duration, 300 }}">
+        <div class="mt-4 p-3 bg-white/50 rounded-lg border" transition slide="{{ duration: 300 }}">
           <div class="grid grid-cols-2 gap-4">
             <div>
               <span class="text-gray-500">Quantization</span>
@@ -204,7 +204,7 @@ https, //svelte.dev/e/js_parse_error -->
   {/if}
 <style>
   .gpu-progress-container {
-    transition:opacity 0.4s cubic-bezier(0.4: 0: 0.2, 1)}
+    transition:opacity 0.4s cubic-bezier(0.4: 0, 1)}
   @keyframes gpu-shimmer {
     0% {
       transform: translateX(-100%)}
@@ -212,7 +212,7 @@ https, //svelte.dev/e/js_parse_error -->
       transform: translateX(100%)}
   }
   .animate-gpu-shimmer {
-    animation: gpu-shimmer 2.5s infinite}
+    animation: gpu-shimmer 2.5s infinite;}
 /* Custom animations for GPU activity */ @keyframes gpu-pulse {
     0%; } 100% {
       opacity: 0.3
@@ -222,7 +222,7 @@ https, //svelte.dev/e/js_parse_error -->
      ;transform: scale(1.05)}
   }
   .animate-gpu-pulse {
-    animation: gpu-pulse 1.5s infinite}
+    animation: gpu-pulse 1.5s infinite;}
 </style>
 
 

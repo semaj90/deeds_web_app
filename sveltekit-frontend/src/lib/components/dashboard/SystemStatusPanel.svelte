@@ -21,8 +21,7 @@
  return 'text-[#00AA00]';
  case 'offline':
  return 'text-[#CC0000]';
- default:
- return 'text-gray-500';
+ default:return 'text-gray-500';
  }
  };
 
@@ -32,8 +31,7 @@
  return 'bg-[#00AA00]';
  case 'offline':
  return 'bg-[#CC0000]';
- default:
- return 'bg-gray-400';
+ default:return 'bg-gray-400';
  }
  };
 

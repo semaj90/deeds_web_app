@@ -4,7 +4,6 @@
  * Integrates with: redis-service.ts, loki-redis-integration.ts, redis-helper.ts
  */
 import type { RedisOptions } from 'ioredis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Environment-based configuration
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -25,7 +24,6 @@ export const REDIS_BASE_CONFIG: RedisOptions = {
     family: 4,
     // Performance optimization - reduced retries to prevent flooding
     maxRetriesPerRequest: 1,
-    retryDelayOnFailover: 100,
     enableReadyCheck: true,
     // Connection pooling for high concurrency
     maxLoadingTimeout: 5000

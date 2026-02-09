@@ -49,7 +49,7 @@ export interface BatchEmbeddingResponse {
  success: boolean;
 	results: EmbeddingResponse[];
  summary: {
-	total: number; successful: number;
+	total: number, successful: number;
 	failed: number; processingTime: string };
 }
 export interface VectorDocument {

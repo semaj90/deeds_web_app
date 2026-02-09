@@ -7,7 +7,6 @@ import { line } from "drizzle-orm/pg-core";
 import type { context } from "fast-check";
 import { BaseService } from './base-service.js';
 import type { Diff, Error, ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IDiffGenerator {
  generateDiff(error: Error, fix: string): Promise<Diff>;

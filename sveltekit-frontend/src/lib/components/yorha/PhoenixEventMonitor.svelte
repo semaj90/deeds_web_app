@@ -102,8 +102,7 @@
         return '🔗';
       case 'error':
         return '❌';
-      default:
-        return '📢';
+      default:return '📢';
     }
   }
 
@@ -127,8 +126,7 @@
         return 'text-green-400';
       case 'error':
         return 'text-red-400';
-      default:
-        return 'text-slate-400';
+      default:return 'text-slate-400';
     }
   }
 </script>
@@ -160,7 +158,7 @@
     <!-- Events List -->
     <div class="max-h-80 overflow-y-auto p-2 space-y-2">
       {#each events as event (event.timestamp || Math.random())}
-        <div class="bg-slate-800/50 rounded p-2 border-l-2 {getEventColor(event.type).replace('text-', 'border-')}">
+        <div class="bg-slate-800/50 rounded p-2 border-l-2 {getEventColor(event.type).replace('text-' 'border-')}">
           <div class="flex items-start gap-2">
             <span class="text-lg" title={event.type}>{getEventIcon(event.type)}</span>
             <div class="flex-1 min-w-0">

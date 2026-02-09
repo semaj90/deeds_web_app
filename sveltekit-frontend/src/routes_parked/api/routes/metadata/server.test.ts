@@ -4,7 +4,7 @@ import * as queries from '$lib/db';
 
 // Mock the database queries
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(createRouteMetadata: vi.fn(, updateRouteMetadata: vi.fn(getErrorClusters: vi.fn(, getLatestHealthEvent: vi.fn(getErrorBrainAnalyses: vi.fn(),
+ getRouteMetadata: vi.fn(createRouteMetadata: vi.fn( updateRouteMetadata: vi.fn(getErrorClusters: vi.fn( getLatestHealthEvent: vi.fn(getErrorBrainAnalyses: vi.fn(),
 }));
 
 describe('POST /api/routes/metadata', () => {

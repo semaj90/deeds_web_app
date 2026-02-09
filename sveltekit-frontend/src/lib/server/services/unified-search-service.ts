@@ -57,7 +57,7 @@ export interface Recommendation {
 
 export type IngestResult =
     | { success: true;
-	documentId: string; jobId: string }
+	documentId: string, jobId: string }
     | { success: false;
 	error: string };
 
@@ -152,14 +152,14 @@ class UnifiedSearchService {
 
             const metadata: UnifiedDocument['metadata'] = {
                 source,
-                userId: typeof incomingMeta.userId === 'string' ? incomingMeta.userId : undefined,
+                userId: typeof incomingMeta.userId === 'string' ? incomingMeta.userId  : undefined,
                 tags: Array.isArray(incomingMeta.tags) ? incomingMeta.tags.filter(t => typeof t === 'string') : [],
                 category: normalizedCategory,
                 confidenceLevel: typeof incomingMeta.confidenceLevel === 'number' ? incomingMeta.confidenceLevel : 0,
-                priority: typeof incomingMeta.priority === 'string' ? incomingMeta.priority : undefined,
+                priority: typeof incomingMeta.priority === 'string' ? incomingMeta.priority  : undefined,
                 extractedEntities: Array.isArray(incomingMeta.extractedEntities) ? incomingMeta.extractedEntities.filter(e => typeof e === 'string') : [],
                 keyTerms: Array.isArray(incomingMeta.keyTerms) ? incomingMeta.keyTerms.filter(k => typeof k === 'string') : [],
-                neo4jNodeId: typeof incomingMeta.neo4jNodeId === 'string' ? incomingMeta.neo4jNodeId : undefined,
+                neo4jNodeId: typeof incomingMeta.neo4jNodeId === 'string' ? incomingMeta.neo4jNodeId  : undefined,
                 shaderData: incomingMeta.shaderData,
                 semantic_hash: contentHash,
                 ...Object.fromEntries(
@@ -198,9 +198,7 @@ class UnifiedSearchService {
                     documentId,
                     document.title,
                     document.content,
-                    document.filePath ?? null,
-                    document.mimeType ?? null,
-                    document.fileSize ?? 0,
+                    document.filePath ?? null : document.mimeType ?? null : document.fileSize ?? 0,
                     JSON.stringify(unifiedDoc.metadata || {})
                 ]
             );
@@ -514,7 +512,7 @@ class UnifiedSearchService {
         }
 
         const safeStringOrDefault = (v: unknown, d: string): string => (typeof v === 'string' ? v : d);
-        const safeString = (v: unknown): string | undefined => (typeof v === 'string' ? v : undefined);
+        const safeString = (v: unknown): string | undefined => (typeof v === 'string' ? v  : undefined);
         const safeStringArray = (v: unknown): string[] => Array.isArray(v) ? v.filter(x => typeof x === 'string') : [];
         const safeNumberFromUnknown = (v: unknown, d = 0): number => {
             if (typeof v === 'number') return v;
@@ -532,8 +530,7 @@ class UnifiedSearchService {
             content: String(row.content ?? ''),
             filePath: String(row.file_path ?? '') || undefined,
             mimeType: String(row.mime_type ?? '') || undefined,
-            fileSize: typeof row.file_size === 'number' ? row.file_size : undefined,
-            metadata: {
+            fileSize: typeof row.file_size === 'number' ? row.file_size  : undefined, metadata: {
                 source,
                 userId: safeString(parsedMeta.userId),
                 tags: safeStringArray(parsedMeta.tags),
@@ -546,7 +543,7 @@ class UnifiedSearchService {
                 shaderData: parsedMeta.shaderData,
                 semantic_hash: safeString(parsedMeta.semantic_hash),
             },
-	embeddings: undefined,
+	embeddings | undefined,
             searchable: {
 	fulltext: this.extractFulltext({ title: String(row.title ?? ''), content: String(row.content ?? '') }),
                 keywords: this.extractKeywords({

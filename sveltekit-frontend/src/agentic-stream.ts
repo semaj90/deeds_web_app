@@ -2,7 +2,6 @@
 // Token-level streaming for real-time evidence analysis
 
 import type { AIResponse, ChatMessage } from '$lib/types/evidence';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Environment configuration
 const TENSORRT_BASE = process.env?.TENSORRT_BASE_URL ?? 'http://localhost:8000';
@@ -56,7 +55,7 @@ async function streamFromOllama(
     fetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, model: options?.model ?? MODEL_NAME,
+      body: JSON.stringify({ model: options?.model ?? MODEL_NAME,
         prompt: options?.systemPrompt ? `${options.systemPrompt}\n\nUser: ${prompt}` : prompt,
         stream: true,
         options: { temperature: options?.temperature ?? 0.7,
@@ -123,7 +122,7 @@ async function streamFromTensorRT(
   const response = await fetch(`${TENSORRT_BASE}/v2/models/legal-llm/infer`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, inputs: [
+    body: JSON.stringify({ inputs: [
         {
           name: 'input_text',
           shape: [1],
@@ -166,11 +165,11 @@ export async function executeAITool(
   console.log(`[AI] Executing tool: ${toolName}`, params);
   switch (toolName) {
     case 'web_search':
-      return await webSearch(params.query as string);
+        return await webSearch(params.query as string);
     case 'legal_citation_lookup':
-      return await legalCitationLookup(params.citation as string);
+        return await legalCitationLookup(params.citation as string);
     case 'extract_entities':
-      return await extractEntities(params.text as string);
+        return await extractEntities(params.text as string);
     default:
       throw new Error(`Unknown tool: ${toolName}`);
   }
@@ -206,7 +205,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   const response = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, model: 'nomic-embed-text', prompt: text }),
+    body: JSON.stringify({ model: 'nomic-embed-text', prompt: text }),
   });
   if (!response.ok) {
     throw new Error(`Embedding generation failed: ${response.status}`);
@@ -224,7 +223,7 @@ export async function chatCompletion(
   const response = await fetch(`${getOllamaEndpoint()}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, model: options?.model ?? MODEL_NAME,
+    body: JSON.stringify({ model: options?.model ?? MODEL_NAME,
       messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
       stream: false,
       options: { temperature: options?.temperature ?? 0.7 },
@@ -259,7 +258,3 @@ export function getOllamaEndpoint(): string {
 
 // Export streaming functions
 export { streamFromOllama, streamFromTensorRT };
-
-
-
-

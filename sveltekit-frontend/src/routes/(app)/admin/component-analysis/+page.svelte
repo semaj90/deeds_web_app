@@ -3,7 +3,6 @@
 
 	// Migrated to $effect
 	import type { PageData } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// TODO: Convert to $props - // TODO: Convert to $props - 
@@ -98,7 +97,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Get related files for selected component
 	async function getRelatedFiles(componentId: string): Promise<RelatedFile[]> {
 		try {
-			const res = await fetch(`/api/phase89/related/${ componentId }`);
+			const res = await fetch(`/api/phase89/related/${componentId}`);
 			if (res.ok) {
 				const data = await res.json();
 				return data.related || [];
@@ -184,7 +183,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			switch (sortBy) {
 				case 'errors': return b.error_count - a.error_count;
 				case 'modified': return new Date(b.last_modified).getTime() - new Date(a.last_modified).getTime();
-				default: return a.component_name.localeCompare(b.component_name);
+				default:return a.component_name.localeCompare(b.component_name);
 			}
 		});
 	});

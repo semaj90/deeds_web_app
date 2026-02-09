@@ -1,14 +1,14 @@
 /** * Legal Components Export * Specialized legal workflow and document processing components */ export {
-default: as_$1 }
+default:as_$1 }
 from './CustodyTimeline.svelte';
 export {
-default: as_$1 }
+default:as_$1 }
 from './EnhancedLegalProcessor.svelte';
 export {
-default: as_$1 }
+default:as_$1 }
 from './IntegrityVerification.svelte';
 export {
-default: as_$1 }
+default:as_$1 }
 from './WorkflowProgress.svelte';
 export type LegalDocumentType = 'contract' | 'evidence' | 'brief' | 'citation' | 'deposition';
 export type WorkflowStage = 'intake' | 'processing' | 'review' | 'approved' | 'archived';

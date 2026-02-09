@@ -1,19 +1,21 @@
 <script lang="ts">
  // Migrated to Svelte 5 callback props pattern
 
+ interface Props {
+   message?: string;
+   show?: boolean;
+   autoHide?: boolean;
+   duration?: number;
+   onhide?: () => void;
+ }
+
  let {
    message = "CONTRADICTION DETECTED!",
    show = false,
    autoHide = true,
    duration = 3000,
    onhide
- } = $props<{
-   message?: string;
-   show?: boolean;
-   autoHide?: boolean;
-   duration?: number;
-   onhide?: () => void;
- }>();
+ }: Props = $props();
 
  let timeoutId: ReturnType<typeof setTimeout> | undefined;
 

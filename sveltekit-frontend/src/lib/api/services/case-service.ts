@@ -95,7 +95,7 @@ export async function listCases(options: CaseListOptions = {}): Promise<CaseList
  if (options.search) queryParams.append('search', options.search);
 
  const response = await fetch(`/api/cases?${queryParams}`, {
- method: 'GET', 
+ method: 'GET',
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
 	});
 
@@ -117,7 +117,7 @@ export async function listCases(options: CaseListOptions = {}): Promise<CaseList
 export async function getCaseById(caseId: string): Promise<LegalCase> {
  try {
  const response = await fetch(`/api/cases/${ caseId }`, {
- method: 'GET', 
+ method: 'GET',
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
 	});
 
@@ -139,7 +139,7 @@ export async function getCaseById(caseId: string): Promise<LegalCase> {
 export async function createCase(caseData: CreateCaseData): Promise<LegalCase> {
  try {
  const response = await fetch('/api/cases', {
- method: 'POST', 
+ method: 'POST',
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
 	body: JSON.stringify(caseData),
  });
@@ -162,7 +162,7 @@ export async function createCase(caseData: CreateCaseData): Promise<LegalCase> {
 export async function updateCase(caseId, string, updates: UpdateCaseData: Promise<LegalCase> {
  try {
  const response = await fetch(`/api/cases/${ caseId }`, {
- method: 'PUT', 
+ method: 'PUT',
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
 	body: JSON.stringify(updates),
  });
@@ -185,7 +185,7 @@ export async function updateCase(caseId, string, updates: UpdateCaseData: Promis
 export async function deleteCase(caseId: string): Promise<void> {
  try {
  const response = await fetch(`/api/cases/${ caseId }`, {
- method: 'DELETE', 
+ method: 'DELETE',
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
 	});
 
@@ -206,7 +206,7 @@ export async function deleteCase(caseId: string): Promise<void> {
 export async function getCaseDocuments(caseId: string): Promise<CaseDocument[]> {
  try {
  const response = await fetch(`/api/cases/${ caseId }/documents`, {
- method: 'GET', 
+ method: 'GET',
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
 	});
 
@@ -224,42 +224,42 @@ export async function getCaseDocuments(caseId: string): Promise<CaseDocument[]> 
  }
 }
 
-export async function assignLawyer(caseId, string, lawyerId, string: Promise<void> {
- try {
- const response = await fetch(`/api/cases/${caseId}/assign`, {
- method: 'POST', 
-  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-	body: JSON.stringify({ lawyerId }),
- });
+export async function assignLawyer(caseId: string, lawyerId: string): Promise<void> {
+    try {
+        const response = await fetch(`/api/cases/${caseId}/assign`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify({ lawyerId }),
+        });
 
- if (!response.ok) {
- const error = await response.json();
- throw new Error(error?.message ?? 'Failed to assign lawyer');
- }
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error?.message ?? 'Failed to assign lawyer');
+        }
 
- // TODO: Add audit logging for lawyer assignment
- console.log(`Assigned lawyer ${lawyerId} to case ${caseId}`);
- } catch(error: Error | unknown) {
- console.error('Lawyer assignment error: ', error);
- throw new Error(`Failed to assign lawyer: ${(error as Error).message}`);
- }
+        // TODO: Add audit logging for lawyer assignment
+        console.log(`Assigned lawyer ${lawyerId} to case ${caseId}`);
+    } catch (error: Error | unknown) {
+        console.error('Lawyer assignment error: ', error);
+        throw new Error(`Failed to assign lawyer: ${(error as Error).message}`);
+    }
 }
 
 // Search and Filter Utilities
 export async function searchCases(
- query: string, 
-  options: CaseListOptions = {}
+    query: string,
+    options: CaseListOptions = {}
 ): Promise<CaseListResponse> {
- return listCases({ ...options: search });
+    return listCases({ ...options, search: query });
 }
 
 export async function getCasesByClient(
- clientId: string, 
+ clientId: string,
   options: CaseListOptions = {}
 ): Promise<CaseListResponse> {
  try {
  const response = await fetch(`/api/clients/${clientId}/cases`, {
- method: 'GET', 
+ method: 'GET',
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
 	});
 
@@ -281,7 +281,7 @@ export async function getCasesByClient(
 export async function getCaseAnalytics(caseId: string): Promise<any> {
  try {
  const response = await fetch(`/api/cases/${caseId}/analytics`, {
- method: 'GET', 
+ method: 'GET',
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
 	});
 

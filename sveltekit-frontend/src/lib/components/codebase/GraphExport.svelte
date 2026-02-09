@@ -11,8 +11,6 @@
 	import FileJson from 'lucide-svelte/icons/file-json';
 	import FileSpreadsheet from 'lucide-svelte/icons/file-spreadsheet';
 	import Image from 'lucide-svelte/icons/image';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface GraphNode {
 		id: string;
@@ -24,7 +22,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface GraphEdge {
 		source: string;
-	target: string;
+	target:string;
 		type: string }
 
 	interface Props {
@@ -64,7 +62,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			};
 
 			const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-			downloadBlob(blob, `${ filename }.json`);
+			downloadBlob(blob, `${filename}.json`);
 			showSuccess('JSON');
 		} finally {
 			isExporting = false }
@@ -89,7 +87,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			const combinedCSV = `# Nodes\n${nodesCSV}\n\n# Edges\n${edgesCSV}`;
 
 			const blob = new Blob([combinedCSV], { type: 'text/csv' });
-			downloadBlob(blob, `${ filename }.csv`);
+			downloadBlob(blob, `${filename}.csv`);
 			showSuccess('CSV');
 		} finally {
 			isExporting = false }
@@ -104,7 +102,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		try {
 			const svgData = new XMLSerializer().serializeToString(svgElement);
 			const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-			downloadBlob(svgBlob, `${ filename }.svg`);
+			downloadBlob(svgBlob, `${filename}.svg`);
 			showSuccess('SVG');
 		} finally {
 			isExporting = false }
@@ -232,7 +230,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	.graph-export {
 		display: flex;
 		flex-direction: column;
-	gap: 0.5rem }
+	gap: 0.5rem;}
 
 	.export-header {
 		display: flex;
@@ -242,11 +240,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		font-weight: 500;
 	color: rgba(255, 255, 255, 0.5);
 		text-transform: uppercase;
-		letter-spacing: 0.05em }
+		letter-spacing: 0.05em;}
 
 	.export-options {
 		display: flex;
-	gap: 0.5rem }
+	gap: 0.5rem;}
 
 	.export-btn {
 		display: flex;
@@ -259,7 +257,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	color: rgba(255, 255, 255, 0.8);
 		font-size: 0.8rem;
 	cursor: pointer;
-		transition:all 0.2s ease }
+		transition:all 0.2s ease;}
 
 	.export-btn:hover:not(:disabled) {
 		background: rgba(255, 255, 255, 0.1);
@@ -268,11 +266,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	.export-btn:disabled {
 		opacity: 0.5;
-	cursor: not-allowed }
+	cursor: not-allowed;}
 
 	.success-icon {
 		color: #4ade80;
-	animation: pop 0.3s ease }
+	animation: pop 0.3s ease;}
 
 	@keyframes pop {
 		0% { transform: scale(0); }

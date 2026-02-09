@@ -4,11 +4,8 @@
 
  import type { LegalIntent } from '$lib/ai/intents';
  import { writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
- interface Props {
- statute: {
-	titleNumber: number;
+ interface Props { statute: { titleNumber: number;
  section: string;
 	id: string;
  fullCitation: string;
@@ -25,9 +22,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let streamingResponse = writable('');
  let error = writable('');
 
- const actions: Array<{
-	id: LegalIntent;
- label: string;
+ const actions: Array<{ id: LegalIntent, label: string;
 	icon: string;
  description: string; color, string;
  }> = [
@@ -78,9 +73,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	query: `${ intent }: ${statute.fullCitation}`,
+	query: `${intent}: ${statute.fullCitation}`,
  statute: {
-	titleNumber: statute.titleNumber: section, statute: statute.section: id, statute: statute.id,
+titleNumber: statute.titleNumber: section, statute: statute.section: id, statute: statute.id,
  },
 	userQuestion: `Please ${intent.toLowerCase().replace(/_/g, ' ')} this statute`,
  }),
@@ -207,9 +202,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
  }
 
- .action-button:disabled {
- opacity: 0.6;
-	cursor:not-allowed;
+ .action-button:disabled { opacity: 0.6;
+		cursor:not-allowed;
  }
 
  .icon {
@@ -220,22 +214,19 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  display: block;
  }
 
- .response-panel {
- background: white;
-	border: 1px solid #e0e0e0;
+ .response-panel { background: white;
+		border: 1px solid #e0e0e0;
  border-radius: 8px;
 	padding: 1.5rem;
  animation: slideIn 0.3s ease-out;
  }
 
  @keyframes slideIn {
- from {
- opacity: 0;
-	transform: translateY(-10px);
+ from { opacity: 0;
+		transform: translateY(-10px);
  }
- to {
- opacity: 1;
-	transform: translateY(0);
+ to { opacity: 1;
+		transform: translateY(0);
  }
  }
 
@@ -254,9 +245,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: #1a1a1a;
  }
 
- .close-btn {
- background: none;
-	border: none;
+ .close-btn { background: none;
+		border: none;
  font-size: 1.5rem;
 	cursor: pointer;
  color: #999;
@@ -275,9 +265,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  padding: 2rem;
  }
 
- .spinner {
- width: 40px;
-	height: 40px;
+ .spinner { width: 40px;
+		height: 40px;
  border: 3px solid #e0e0e0;
  border-top-color: #0066cc;
  border-radius: 50%;
@@ -290,9 +279,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  }
  }
 
- .error-message {
- padding: 1rem;
-	background: #fff3cd;
+ .error-message { padding: 1rem;
+		background: #fff3cd;
  border: 1px solid #ffc107;
  border-radius: 6px;
 	color: #856404;

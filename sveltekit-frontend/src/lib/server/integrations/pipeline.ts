@@ -353,7 +353,7 @@ export class LegalAIPipeline {
       maxTokens?: number;
     }
   ): AsyncGenerator<{
-	type: 'sources' | 'token' | 'done'; data: unknown }> {
+	type: 'sources' | 'token' | 'done', data: unknown }> {
     const topK = options?.topK ?? 5;
 
     // 1. Search for sources

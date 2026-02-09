@@ -18,7 +18,7 @@ export interface SOMGrid {
 	width: number;
 	height: number;
 	neurons: Array<Array<{
-	weights: number[]; x: number;
+	weights: number[], x: number;
 	y: number }>>;
 }
 

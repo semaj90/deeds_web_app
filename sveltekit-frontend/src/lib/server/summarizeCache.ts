@@ -127,7 +127,7 @@ export async function writeThroughRedis(
 export async function getCache(
     key: string
 ): Promise<{
-	entry: SummarizeCacheEntry | null; source: string }> {
+	entry: SummarizeCacheEntry | null, source: string }> {
     const mem = getFromMemory(key);
     if (mem) return { entry: mem, source: 'memory' };
     const red = await getFromRedis(key);

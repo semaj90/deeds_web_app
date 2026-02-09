@@ -2,9 +2,7 @@
 	// Migrated to $effect
 	import { writable } from 'svelte/store';
 
-	interface TopologyNode {
-		id: string;
-		name: string;
+	interface TopologyNode { id: string, name: string;
 		type: 'file' | 'component' | 'route' | 'lib';
 		errors: number;
 		complexity: number;
@@ -15,13 +13,11 @@
 		y: number;
 	}
 
-	interface Edge {
-		from: string;
-		to: string;
+	interface Edge { from: string, to: string;
 		type: 'import' | 'error' | 'dependency';
 	}
 
-	const topology = writable<{ nodes: TopologyNode[]; edges: Edge[] }>({ nodes: [], edges: [] });
+	const topology = writable<{ nodes: TopologyNode[], edges: Edge[] }>({ nodes: [], edges: [] });
 	const selectedNode = writable<TopologyNode | null>(null);
 	const filterTag = writable<string>('all');
 	const filterAction = writable<string>('all');
@@ -453,8 +449,7 @@
 		color: #e2e8f0;
 	}
 
-	.topology-viewer {
-		width: 100vw;
+	.topology-viewer { width: 100vw;
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
@@ -477,8 +472,7 @@
 		font-weight: 600;
 	}
 
-	.stats {
-		display: flex;
+	.stats { display: flex;
 		gap: 2rem;
 		font-size: 0.875rem;
 		color: #94a3b8;
@@ -493,8 +487,7 @@
 		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
-	.search-input {
-		flex: 1;
+	.search-input { flex: 1;
 		padding: 0.5rem 1rem;
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid rgba(148, 163, 184, 0.2);
@@ -517,8 +510,7 @@
 		font-size: 0.875rem;
 	}
 
-	.legend {
-		display: flex;
+	.legend { display: flex;
 		gap: 1rem;
 		margin-left: auto;
 	}
@@ -530,8 +522,7 @@
 		color: #94a3b8;
 	}
 
-	.legend-item::before {
-		content: '';
+	.legend-item::before { content: '';
 		width: 12px;
 		height: 12px;
 		border-radius: 50%;
@@ -539,14 +530,12 @@
 		margin-right: 0.5rem;
 	}
 
-	.canvas-container {
-		flex: 1;
+	.canvas-container { flex: 1;
 		position: relative;
 		overflow: hidden;
 	}
 
-	canvas {
-		width: 100%;
+	canvas { width: 100%;
 		height: 100%;
 		cursor: grab;
 	}
@@ -555,8 +544,7 @@
 		cursor: grabbing;
 	}
 
-	.loading {
-		position: absolute;
+	.loading { position: absolute;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
@@ -564,8 +552,7 @@
 		color: #64748b;
 	}
 
-	.details-panel {
-		position: absolute;
+	.details-panel { position: absolute;
 		top: 5rem;
 		right: 2rem;
 		width: 300px;
@@ -644,8 +631,7 @@
 		color: #94a3b8;
 	}
 
-	.dependency {
-		padding: 0.5rem;
+	.dependency { padding: 0.5rem;
 		background: rgba(15, 23, 42, 0.5);
 		border-radius: 0.25rem;
 		font-size: 0.75rem;

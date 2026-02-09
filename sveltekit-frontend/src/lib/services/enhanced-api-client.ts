@@ -6,7 +6,6 @@ import { z } from 'zod';
 import { goto } from '$app/navigation';
 import { browser } from '$app/environment';
 import { page } from "$app/stores";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Base API configuration
 const API_BASE_URL = '/api/v1';
@@ -466,8 +465,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  onProgress?: (progress: number) => void,
  signal?: AbortSignal
  ): Promise<{
-	fileUrl: string; fileName: string;
-	fileSize: number; mimeType: string;
+	fileUrl: string, fileName: string;
+	fileSize: number, mimeType: string;
 	hash: string }>
  {
  const formData = new FormData();
@@ -501,8 +500,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  // Expect server to return ApiResponse-like payload
  if ((parsed as ApiResponse<unknown>)?.success) {
  	resolve((parsed as ApiResponse<{ fileUrl: string;
-	fileName: string; fileSize: number;
-	mimeType: string; hash: string }>).data ?? (parsed as any));
+	fileName: string, fileSize: number;
+	mimeType: string, hash: string }>).data ?? (parsed as any));
  } else {
  	resolve(parsed as any);
  }
@@ -563,8 +562,7 @@ export const CreateEvidenceSchema = z.object({
  caseId: z.string().uuid('Invalid case ID'),
  title: z.string().min(1, 'Title is required').max(255, 'Title too long'),
  evidenceType: z.string().min(1, 'Evidence type is required'),
- description: z.string().optional(),
- fileUrl: z.string().url('Invalid file URL').optional(),
+ description: z.string().optional(), fileUrl: z.string().url('Invalid file URL').optional(),
  fileName: z.string().optional(),
  fileSize: z.number().int().nonnegative('File size must be non-negative').optional(),
  mimeType: z.string().optional(),
@@ -581,8 +579,7 @@ export const CreateReportSchema = z.object({
  title: z.string().min(1, 'Title is required').max(255, 'Title too long'),
  description: z.string().optional(),
  reportType: z.string().min(1, 'Report type is required'),
- caseId: z.string().uuid('Invalid case ID').optional(),
- content: z.string().optional(),
+ caseId: z.string().uuid('Invalid case ID').optional(), content: z.string().optional(),
  status: z.string().optional(),
  metadata: z.record(z.unknown()).optional(),
 });

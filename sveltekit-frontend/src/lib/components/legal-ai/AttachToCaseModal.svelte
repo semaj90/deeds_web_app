@@ -9,9 +9,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
  // Migrated to $effect
 
- interface Case {
- id: string;
-	title: string;
+ interface Case { id: string, title: string;
  number: string;
 	status: string;
  }
@@ -84,7 +82,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	statute_code: statuteCode, citation_id: citationId, citationId,
+statute_code: statuteCode, citation_id: citationId, citationId,
  link_type: linkType, notes, notes, notes || undefined,
  }),
  });
@@ -197,9 +195,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 {/if}
 
 <style>
- .modal-overlay {
- position: fixed;
-	top: 0;
+ .modal-overlay { position: fixed;
+		top: 0;
  left: 0;
 	right: 0;
  bottom: 0;
@@ -236,9 +233,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 	color: #2c2c2c;
  }
 
- .close-btn {
- background: none;
-	border: none;
+ .close-btn { background: none;
+		border: none;
  font-size: 1.5rem;
 	cursor: pointer;
  color: #666;
@@ -250,9 +246,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  color: #333;
  }
 
- .attach-form {
- padding: 1.5rem;
-	display: flex;
+ .attach-form { padding: 1.5rem;
+		display: flex;
  flex-direction: column;
 	gap: 1.5rem;
  }
@@ -278,9 +273,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  padding: 2rem;
  }
 
- .spinner {
- width: 40px;
-	height: 40px;
+ .spinner { width: 40px;
+		height: 40px;
  border: 4px solid #e0e0e0;
  border-top-color: #8b4513;
  border-radius: 50%;
@@ -306,9 +300,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .form-group select,
- .form-group textarea {
- padding: 0.75rem;
-	border: 1px solid #d4a574;
+ .form-group textarea { padding: 0.75rem;
+		border: 1px solid #d4a574;
  border-radius: 4px;
  font-family: 'Source Sans 3', sans-serif;
  font-size: 0.95rem;
@@ -332,9 +325,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  resize: vertical;
  }
 
- .form-actions {
- display: flex;
-	gap: 1rem;
+ .form-actions { display: flex;
+		gap: 1rem;
  justify-content: flex-end;
  padding-top: 1rem;
  border-top: 1px solid #e0d5c7;
@@ -370,9 +362,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .btn-cancel:disabled,
- .btn-attach:disabled {
- opacity: 0.6;
-	cursor:not-allowed;
+ .btn-attach:disabled { opacity: 0.6;
+		cursor:not-allowed;
  }
 </style>
 

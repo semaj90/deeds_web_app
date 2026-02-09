@@ -3,9 +3,7 @@
 	import { writable } from 'svelte/store';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-	interface RouteNode {
-		id: string;
-		path: string;
+	interface RouteNode { id: string, path: string;
 		type: 'page' | 'layout' | 'server' | 'api' | 'component';
 		errors: number;
 		complexity: number;
@@ -18,9 +16,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		last_modified: string;
 	}
 
-	interface KBEntry {
-		file_path: string;
-		content: string;
+	interface KBEntry { file_path: string, content: string;
 		embedding: number[];
 		tags: string[];
 		score: number;
@@ -32,8 +28,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	const viewMode = writable<'tree' | 'graph' | 'list'>('tree');
 	const filterType = writable<string>('all');
 	const loading = writable(true);
-	const agentStatus = writable<{ active: boolean; current_file: string; progress: number }>({
-		active: false,
+	const agentStatus = writable<{ active:boolean, current_file: string; progress: number }>({
+		active:false,
 		current_file: '',
 		progress: 0
 	});
@@ -110,7 +106,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-                    file_path: route.path,
+                   file_path: route.path,
 					error_count: route.errors
 				})
 			});
@@ -420,8 +416,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: #e2e8f0;
 	}
 
-	.route-explorer {
-		width: 100vw;
+	.route-explorer { width: 100vw;
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
@@ -481,8 +476,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
-	.search-input {
-		flex: 1;
+	.search-input { flex: 1;
 		padding: 0.5rem 1rem;
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid rgba(148, 163, 184, 0.2);
@@ -499,8 +493,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: #e2e8f0;
 	}
 
-	.view-modes {
-		display: flex;
+	.view-modes { display: flex;
 		gap: 0.5rem;
 	}
 
@@ -520,16 +513,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: #3b82f6;
 	}
 
-	.stats {
-		display: flex;
+	.stats { display: flex;
 		gap: 2rem;
 		font-size: 0.875rem;
 		color: #94a3b8;
 		margin-left: auto;
 	}
 
-	.content {
-		flex: 1;
+	.content { flex: 1;
 		display: grid;
 		grid-template-columns: 400px 1fr;
 		overflow: hidden;
@@ -644,8 +635,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		margin-bottom: 2rem;
 	}
 
-	.metric {
-		padding: 1rem;
+	.metric { padding: 1rem;
 		background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
 	}
@@ -690,8 +680,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		gap: 0.5rem;
 	}
 
-	.function-item, .dependency-item {
-		padding: 0.5rem;
+	.function-item, .dependency-item { padding: 0.5rem;
 		background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.25rem;
 		font-size: 0.875rem;
@@ -704,8 +693,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		gap: 1rem;
 	}
 
-	.kb-entry {
-		padding: 1rem;
+	.kb-entry { padding: 1rem;
 		background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
 	}

@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ request }) => {
       const validProviders = ['ollama', 'gemini', 'claude'];
       if (!validProviders.includes(body.llmProvider)) {
         return json(
-          { error: `llmProvider must be one of: ${validProviders.join(', ')}` },
+          { error: `llmProvider must be one, of: ${validProviders.join(', ')}` },
           { status: 400 }
         );
       }

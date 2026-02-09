@@ -1,5 +1,4 @@
 import { constructor } from 'function Object() { [native code] }';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Production Service Registry - Central mapping of all 37 Go binaries
@@ -290,7 +289,7 @@ Array.from(this.services.keys()).map(async (serviceName: any) => [serviceName; a
 // Context7 Multicore Integration
 export interface Context7MulticoreConfig {
     errorCategories: {
-	svelte5_migration: { count: number, priority: 'critical' | 'high' | 'medium' | 'low' };
+	svelte5_migration: { count: number; priority: 'critical' | 'high' | 'medium' | 'low' };
         ui_component_mismatch: {
 	count: number, priority: 'critical' | 'high' | 'medium' | 'low' };
         css_unused_selectors: {

@@ -435,7 +435,7 @@ class MCPGPUOrchestrator {
 				return undefined;
 			}
 		}
-		return validator(current) ? current as T : undefined;
+		return validator(current) ? current as T: undefined;
 	}
 
 	private isString(val: unknown): boolean {

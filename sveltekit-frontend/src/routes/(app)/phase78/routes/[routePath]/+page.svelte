@@ -33,7 +33,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			case 'healthy': return 'text-green-600';
 			case 'flaky': return 'text-yellow-600';
 			case 'broken': return 'text-red-600';
-			default: return 'text-gray-400';
+			default:return 'text-gray-400';
 		}
 	}
 
@@ -42,7 +42,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			case 'healthy': return '✅';
 			case 'flaky': return '⚠️';
 			case 'broken': return '❌';
-			default: return '❓';
+			default:return '❓';
 		}
 	}
 
@@ -91,7 +91,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <button
  onclick={refreshData}
  disabled={isLoading}
- class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled, bg-gray-400 transition"
+ class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled bg-gray-400 transition"
  >
  {isLoading ? 'Loading...' : 'Refresh'}
  </button>
@@ -123,21 +123,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="flex">
  <button
  onclick={() => (tab = 'errors')}
- class={`flex-1 py-4 px-6 font-semibold border-b-2 transition text-center ${
- tab === 'errors'
+ class={`flex-1 py-4 px-6 font-semibold border-b-2 transition text-center ${tab === 'errors'
  ? 'border-blue-600 text-blue-600 bg-blue-50'
- : 'border-transparent text-gray-600 hover:text-gray-900'
- }`}
+ : 'border-transparent text-gray-600 hover:text-gray-900'}`}
  >
  🔴 Errors ({errors.length})
  </button>
  <button
  onclick={() => (tab = 'suggestions')}
- class={`flex-1 py-4 px-6 font-semibold border-b-2 transition text-center ${
- tab === 'suggestions'
+ class={`flex-1 py-4 px-6 font-semibold border-b-2 transition text-center ${tab === 'suggestions'
  ? 'border-blue-600 text-blue-600 bg-blue-50'
- : 'border-transparent text-gray-600 hover:text-gray-900'
- }`}
+ : 'border-transparent text-gray-600 hover:text-gray-900'}`}
  >
  💡 Suggestions ({suggestions.length})
  </button>

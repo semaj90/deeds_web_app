@@ -73,7 +73,7 @@
   /* @unocss-include */
   /* remove invalid selectors that caused compiler errors and keep valid rules */
   :global(.nes-dialog) {
-    animation: modalSlideIn 0.3s ease-out}
+    animation: modalSlideIn 0.3s ease-out;}
   @keyframes modalSlideIn {
     from {
       opacity: 0
@@ -85,10 +85,10 @@
   .retro-modal-overlay {
     background: rgba(0, 0, 0, 0.5)}
   .modal-content {
-    max-height: 400px
-    overflow-y: auto}
+    max-height: 400px;
+    overflow-y: auto;}
   .modal-content :global(.nes-field) {
-    margin-bottom: 1rem}
+    margin-bottom: 1rem;}
 </style>
 
 

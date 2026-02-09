@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { evidenceCommandCenter } from '$lib/stores/evidenceCommandCenter.store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	const commands = [
 		{ id: 'board', label: 'Go to Evidence Board', hint: 'B' },

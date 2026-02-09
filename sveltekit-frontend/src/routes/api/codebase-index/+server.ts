@@ -5,23 +5,20 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const COLLECTION_NAME = 'fastmcp_file_profiles';
 
-interface FileProfile {
-	file_path: string; role: string;
-	surface: string[]; dependencies: string[];
-	exports: string[]; imports: string[];
-	comments: string[]; risk: string;
-	change_frequency: string; related_routes: string[];
-	tags: string[]; summary: string;
+interface FileProfile { file_path: string, role: string;
+	surface: string[], dependencies: string[];
+	exports: string[], imports: string[];
+	comments: string[], risk: string;
+	change_frequency: string, related_routes: string[];
+	tags: string[], summary: string;
 	generated_at: string;
 }
 
-interface QdrantPoint {
-	id: number; payload: FileProfile;
+interface QdrantPoint { id: number, payload: FileProfile;
 	vector?: number[];
 }
 
-interface QdrantScrollResponse {
-	result: { points: QdrantPoint[];
+interface QdrantScrollResponse { result: { points: QdrantPoint[];
 		next_page_offset?: number;
 	};
 	status: string;
@@ -73,7 +70,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			return json({
 				files: [],
 				stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
-				error: `Qdrant request failed: ${response.status}`
+				error: `Qdrant request, failed: ${response.status}`
 			}, { status: 200 });
   
 		}
@@ -158,7 +155,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (!searchResponse.ok) {
 			const errorText = await searchResponse.text();
-			return json({ error: `Qdrant search failed: ${errorText}` }, { status: 500 });
+			return json({ error: `Qdrant search, failed: ${errorText}` }, { status: 500 });
 		}
 
 		const data = await searchResponse.json();

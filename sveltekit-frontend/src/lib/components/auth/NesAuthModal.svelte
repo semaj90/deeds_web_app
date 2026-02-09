@@ -5,16 +5,14 @@
     open?: boolean
     title?: string
     onClose?: () => void
-    onSubmit?: (payload: {
-	email: string;
-	password: string }) => void
+    onSubmit?: (payload: { email: string, password: string }) => void
     form?: any}
-  // Svelte, 5 runes - props via $props()
+  // Svelte 5 runes - props via $props()
   let {
     open = $bindable(false),
     title = 'Sign in',
-    onClose = () => 0%,
-    onSubmit = () => 0%,
+    onClose = () => {},
+    onSubmit = () => {},
     form = null
   }: Props = $props();
   // component state
@@ -28,13 +26,13 @@
   async function submit(e?: Event): Promise<any> {
     e?.preventDefault();
     error = null
-    if (!email ?? !password) {
+    if (!email || !password) {
       error = 'Please provide email and password.';
       return}
     try {
       submitting = true
       // call parent callback (if provided)
-      await onSubmit({ email: password });
+      await onSubmit({ email, password });
       // close modal on successful submit
       email = '';
       password = '';
@@ -49,7 +47,7 @@
     <form class="relative z-10 w-full max-w-md rounded bg-neutral-900 p-6" onsubmit={submit}>
       <div class="mb-3 text-lg">{title}</div>
       {#if error}
-        <div class="mb-3 text-sm">{error}{/if}
+        <div class="mb-3 text-sm">{error}</div>{/if}
       <div class="space-y-3">
         <label class="block">Email
           <input
@@ -78,6 +76,7 @@
         </button>
       </div>
     </form>
+  </div>
   {/if}
 <style>
   /* Minimal modal styles; keep project-wide theming elsewhere */

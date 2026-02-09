@@ -1,5 +1,5 @@
 /** * Gaming Gradient Utilities * Generate retro gaming-style gradients */ export interface GradientOptions {
-variant: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info',direction: 'horizontal' | 'vertical' | 'diagonal' | 'radial';
+variant: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info', direction: 'horizontal' | 'vertical' | 'diagonal' | 'radial';
 colorPalette: RetroColorPalette}
 
 export interface RetroColorPalette {

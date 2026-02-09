@@ -4,7 +4,6 @@
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/ui/Card.svelte";
  // Migrated to $effect
  import type { IFrame } from '@stomp/stompjs'; // Explicit actor snapshot typing to satisfy accesses to currentState.context / matches interface StreamingUpdate { step: string, status: 'pending' | 'in_progress' | 'completed' | 'error'; progress?: number; message?: string}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface PortableArtifactInfo { enhancedPngUrl: string, compressionRatio?: number}
@@ -66,10 +65,10 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
 
   // Streaming connection management async function startProcessing(): Promise<any> { if (!selectedFile) return; try { // Start streaming API connection const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ evidenceId, file: {
-	name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
-	neuralSpriteConfig: neuralSpriteConfig.enable_compression ?, neuralSpriteConfig: undefined }) }); if (!response.body) { throw new Error('No response stream available')}
+name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
+	neuralSpriteConfig: neuralSpriteConfig.enable_compression ?, neuralSpriteConfig | undefined }) }); if (!response.body) { throw new Error('No response stream available')}
 
-      // Connect to SSE stream eventSource = new EventSource(`${ endpoint }? evidenceId=${encodeURIComponent(evidenceId)}`); eventSource.onmessage = (event) => { try { const data = JSON.parse(event.data); if (data.type === 'connection_established') { console.log('ðŸ”— Streaming connection established for', evidenceId); return}
+      // Connect to SSE stream eventSource = new EventSource(`${endpoint}? evidenceId=${encodeURIComponent(evidenceId)}`); eventSource.onmessage = (event) => { try { const data = JSON.parse(event.data); if (data.type === 'connection_established') { console.log('ðŸ”— Streaming connection established for', evidenceId); return}
 
           // Streaming progress update if (data.type === 'streaming_update' && data.payload) { currentState.context.streamingUpdates = [ ...(currentState.context.streamingUpdates ?? []), data.payload ]}
 
@@ -84,7 +83,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
   }
   function disconnectStream() { if (eventSource) { eventSource.close(); eventSource = null}
   }
-  async function cancelProcessing(): Promise<any> { try { await fetch(`${ endpoint }?evidenceId=${encodeURIComponent(evidenceId)}`, { method: 'DELETE'
+  async function cancelProcessing(): Promise<any> { try { await fetch(`${endpoint}?evidenceId=${encodeURIComponent(evidenceId)}`, { method: 'DELETE'
       }); actor.send({ type: 'CANCEL_PROCESSING' }); disconnectStream()} catch (error) { console.error('Failed to cancel processing:', error)}
   }
   async function retryProcessing(): Promise<any> { actor.send({ type: 'RETRY_CURRENT_STEP' }); if (selectedFile) { setTimeout(() => startProcessing(), 500)}

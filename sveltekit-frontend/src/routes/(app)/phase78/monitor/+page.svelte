@@ -1,37 +1,26 @@
 <script lang="ts">
  // Migrated to $effect
 
- interface MonitoringStats {
- timestamp: string;
-summary: {
- totalErrors: number;
-totalRoutes: number;
+ interface MonitoringStats { timestamp: string, summary: { totalErrors: number, totalRoutes: number;
  totalClusters: number;
 totalSuggestions: number;
  appliedSuggestions: number;
  };
- errors: {
-bySeverity: Array<{ severity: string;
+ errors: { bySeverity: Array<{ severity: string;
 count: number }> };
- routes: {
-byHealth: Array<{ state: string;
+ routes: { byHealth: Array<{ state: string;
 count: number }>;
- top: Array<{
-routePath: string;
- errorState: string;
+ top: Array<{ routePath: string, errorState: string;
 recentErrorCount: number;
  lastErrorAt: string;
  }>;
  };
- suggestions: {
-byRisk: Array<{ level: string;
+ suggestions: { byRisk: Array<{ level: string;
 count: number }>; applied: number;
 effectiveness: number };
- topErrors: Array<{
-tsCode: string; count: number;
+ topErrors: Array<{ tsCode: string, count: number;
 messages: string[] }>;
- errorVelocity: Array<{
-date: string; count: number }>;
+ errorVelocity: Array<{ date: string, count: number }>;
  }
 
 	let stats = $state<MonitoringStats | null>(null);
@@ -117,7 +106,7 @@ date: string; count: number }>;
  <button
  onclick={loadStats}
  disabled={isLoading}
- class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled:bg-gray-400 transition"
+ class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 transition"
  >
  {isLoading ? 'Loading...' : 'Refresh Now'}
  </button>
@@ -293,7 +282,7 @@ date: string; count: number }>;
  <td class="py-3 px-4">
  <a
  href="/phase78/routes/{encodeURIComponent(route.routePath)}"
- class="font-mono text-sm text-blue-600 hover: text-blue-700, hover:underline break-all"
+ class="font-mono text-sm text-blue-600 hover:text-blue-700 hover:underline break-all"
  >
  {route.routePath}
  </a>

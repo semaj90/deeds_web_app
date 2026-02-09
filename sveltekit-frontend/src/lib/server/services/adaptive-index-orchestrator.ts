@@ -60,7 +60,7 @@ export class AdaptiveIndexOrchestrator {
 	}
 
 	async decideRouting(context: {
-	caseId: string; fileSize: number }): Promise<RoutingDecision> {
+	caseId: string, fileSize: number }): Promise<RoutingDecision> {
 		const metrics = await aiAnalyticsService.getSystemLoad();
 
         const features = {
@@ -184,8 +184,7 @@ export class AdaptiveIndexOrchestrator {
                      id: item.id,
                      caseId: item.caseId,
                      type: item.type as any, // Cast if type mismatch
-                     title: item.title,
-                     content: item.text,
+                     title: item.title, content: item.text,
                      embedding: embedding,
                      timestamp: new Date().toISOString(),
                      ...item.metadata

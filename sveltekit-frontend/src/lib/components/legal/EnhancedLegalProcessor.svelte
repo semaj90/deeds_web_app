@@ -3,7 +3,6 @@ import type { Document } from '$lib/types';
   import { createMachine, assign, interpret } from 'xstate';
   import { slide } from 'svelte/transition';
   import { writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // Replace fromPromise-based API with plain async functions
   const apiClient = {
@@ -34,24 +33,20 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     id: 'legalProcessor',
     initial: 'idle',
     context: {
-	file: null as File | null,
+file: null as File | null,
       documentId: null as string | null,
       processingResults: null as any,
       analysisResults: null as any,
       errorMessage: null as string | null
     },
-	states: {
-	idle: {
-        on: {
-	FILE_SELECTED: { target: 'readyToUpload',
+	states: { idle: { on: { FILE_SELECTED: { target: 'readyToUpload',
             actions: assign({
-	file: ({ event }: any) => event.file
+file: ({ event }: any) => event.file
             })
           }
         }
       },
-	readyToUpload: {
-	on: { UPLOAD: 'uploading',
+	readyToUpload: { on: { UPLOAD: 'uploading',
           CANCEL: {
 	target: 'idle',
             actions: assign({
@@ -59,8 +54,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	uploading: {
-	invoke: { src: async ({ context }: any) => {
+	uploading: { invoke: { src: async ({ context }: any) => {
             // return a promise
             return apiClient.uploadDocument(context.file!)},
 	onDone: {
@@ -77,8 +71,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	processing: {
-	invoke: { src: async ({ context }: any) => {
+	processing: { invoke: { src: async ({ context }: any) => {
             return apiClient.processDocument(context.documentId!)},
 	onDone: {
 	target: 'analyzing',
@@ -94,8 +87,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	analyzing: {
-	invoke: { src: async ({ context }: any) => {
+	analyzing: { invoke: { src: async ({ context }: any) => {
             return apiClient.analyzeDocument(context.documentId!)},
 	onDone: {
 	target: 'complete',
@@ -111,9 +103,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	complete: {
-	on: {
-          RESET: {
+	complete: { on: { RESET: {
 	target: 'idle',
             actions: assign({
 	file: null,
@@ -125,9 +115,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           }
         }
       },
-	error: {
-	on: {
-          RESET: {
+	error: { on: { RESET: {
 	target: 'idle',
             actions: assign({
 	file: null,
@@ -259,7 +247,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         <h3 class="font-bold">âœ… Processing Complete</h3>
         <p>Document, '{$state.context.file?.name}' has been successfully analyzed.</p>
       </div>
-      <div class="grid grid-cols-1 md, grid-cols-2">
+      <div class="grid grid-cols-1 md grid-cols-2">
         <!-- Processing, Results -->
         <div class="bg-white rounded-lg border border-gray-200">
           <h4 class="font-semibold text-gray-800">Extraction Results</h4>

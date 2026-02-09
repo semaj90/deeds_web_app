@@ -1,5 +1,4 @@
 import type { User, Evidence } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import type { accessibilityService } from './accessibility-service.js';
 import type { aiAccessibilityPatterns } from './ai-accessibility-patterns.js';

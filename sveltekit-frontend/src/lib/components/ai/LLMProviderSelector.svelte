@@ -3,7 +3,6 @@
   	import { writable, derived, type Writable } from 'svelte/store';
  // Migrated to $effect
  import { fade, fly } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
    let { selectedProvider = $bindable(''), onProviderChange, availableProviders = [], disabled = false, class: className = '', id,
   		'data-testid': testId }: LLMProviderSelectorProps = $props(); // Mock providers - replace with real API calls const providers: Writable<LLMProvider[]> = writable([ { id: 'ollama-local', name: 'Ollama (Local)', type: 'ollama', endpoint: 'http://localhost:11434', status: 'online', capabilities: ['text-generation', 'embeddings', 'chat'], models: [ { id: 'gemma3-legal', name: 'Gemma3 Legal', size: '7.3GB', specialization: 'legal', performance: {
@@ -26,14 +25,14 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   	}); // Melt UI Select setup const { elements: { trigger, menu, option, group, groupLabel, label },
 	states: { selectedLabel, open, selected },
 	helpers: { isSelected } } = createSelect<LLMProvider>({ forceVisible: true, positioning: {
-	placement: 'bottom', fitViewport: true }
+placement: 'bottom', fitViewport: true }
   	}); // Reactive selection handling $effect(() => { if ($selected && $selected.value !== selectedProvider) { selectedProvider = $selected.valu; ondispatch?.({ provider: selectedProvider })}
-  	}); // Status badge styling const getStatusColor = (status: LLMStatus) => { switch (status) { case: 'online': return 'bg-yorha-success text-yorha-bg-primary'; case, 'offline': return 'bg-yorha-danger text-yorha-bg-primary'; case, 'busy': return 'bg-yorha-warning text-yorha-bg-primary'; case, 'loading': return 'bg-yorha-accent text-yorha-bg-primary animate-pulse',default: return 'bg-yorha-text-secondary text-yorha-bg-primary'}
-  	} const getTypeIcon = (type: string) => { switch (type) { case: 'ollama': return 'ðŸ¦™'; case, 'vllm': return 'âš¡'; case, 'autogen': return 'ðŸ¤–'; case, 'crewai': return 'ðŸ‘¥',default: return 'ðŸ”§'}
+  	}); // Status badge styling const getStatusColor = (status: LLMStatus) => { switch (status) { case: 'online': return 'bg-yorha-success text-yorha-bg-primary'; case, 'offline': return 'bg-yorha-danger text-yorha-bg-primary'; case, 'busy': return 'bg-yorha-warning text-yorha-bg-primary'; case, 'loading': return 'bg-yorha-accent text-yorha-bg-primary animate-pulse',default:return 'bg-yorha-text-secondary text-yorha-bg-primary'}
+  	} const getTypeIcon = (type: string) => { switch (type) { case: 'ollama': return 'ðŸ¦™'; case, 'vllm': return 'âš¡'; case, 'autogen': return 'ðŸ¤–'; case, 'crewai': return 'ðŸ‘¥',default:return 'ðŸ”§'}
   	} </script>
  <div class="llm-provider-selector"> <!-- Label --> <label class="block text-sm font-medium text-yorha-text-primary"
 	> LLM Provider </label>
- <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder: text-yorha-text-tertiary, focus: outline-none, focus: ring-2, focus: ring-yorha-primary, focus: ring-offset-2, disabled: cursor-not-allowed, disabled, opacity-50 transition-all duration-200"; class:opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
+ <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder:text-yorha-text-tertiary focus:outline-none focus:ring-2 focus:ring-yorha-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled opacity-50 transition-all duration-200", class:opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
 	> <span class="truncate">
   {#if selectedProvider} <span class="flex items-center"> <span class="text-lg" role="img">{getTypeIcon(selectedProvider.type)}</span>
  <span>{selectedProvider.name}</span>
@@ -67,7 +66,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   </div> </div> </div> {/each} {/if}
   </div>
  <style> .llm-provider-selector { /* @apply relative; */ /* Scan line animation: for cyberpunk theme */ @keyframes scan { 0% { transform: translateX(-100%) } 100% { transform: translateX(100%) } }
-	.animate-scan { animation: scan 2s linear infinite}
+	.animate-scan { animation: scan 2s linear infinite;}
 </style>
 
 

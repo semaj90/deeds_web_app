@@ -7,29 +7,23 @@
  import EvidenceConnections from './EvidenceConnections.svelte';
  import EvidenceNode from './EvidenceNode.svelte';
  import RelationshipInspector from './RelationshipInspector.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Define types locally to avoid importing server schema in browser
- type EvidenceNodeType = {
- id: string;
-	caseId: string;
+ type EvidenceNodeType = { id: string, caseId: string;
  title: string;
  description?: string;
 	evidenceType: string;
  fileType?: string;
  fileName?: string;
  fileUrl?: string;
-	canvasPosition: { x: number;
-	y: number };
+	canvasPosition: { x: number; y: number };
  uploadedBy?: number;
 	uploadedAt: string;
  updatedAt: string;
 	x: number;
  y: number };
 
- type EvidenceConnection = {
- id: string;
-	caseId: string;
+ type EvidenceConnection = { id: string, caseId: string;
  fromEvidenceId: string;
 	toEvidenceId: string;
  connectionType: string;
@@ -87,8 +81,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Grid snapping
  const GRID_SIZE = 50;
- function snapToGrid(x: number, y: number): {
-	x: number; y: number } {
+ function snapToGrid(x: number, y: number): { x: number, y: number } {
  return {
  x: Math.round(x / GRID_SIZE) * GRID_SIZE,
  y: Math.round(y / GRID_SIZE) * GRID_SIZE,
@@ -105,7 +98,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	nodes: currentNodes, connections: currentConnections,
+nodes: currentNodes, connections: currentConnections,
  caseId,
  }),
  });
@@ -166,7 +159,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	x: newX, y: newY }),
+x: newX, y: newY }),
  });
  }
 
@@ -179,7 +172,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	fromNodeId: selected[0],
+fromNodeId: selected[0],
  toNodeId: selected[1],
  caseId,
  strength: 0.5, // Default strength
@@ -202,7 +195,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	caseId: fromEvidenceId,
+caseId: fromEvidenceId,
  toEvidenceId: relationshipType,
  strength: 'medium',
  label: relationshipType.replace('_', ' ')
@@ -290,8 +283,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  case 'delete':
  deleteSelectedNodes();
  break;
- default:
- break }
+ default:break }
  }
 
  let canvasElement: HTMLDivElement;
@@ -395,7 +387,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  display: flex;
  flex-direction: column;
 	height: 100vh;
- background: #f8f9fa }
+ background: #f8f9fa;}
 
  .board-toolbar {
  display: flex;
@@ -404,15 +396,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 1rem;
  background: white;
  border-bottom: 1px solid #e9ecef;
- gap: 1rem }
+ gap: 1rem;}
 
  .mode-selector {
- min-width: 150px }
+ min-width: 150px;}
 
- .actions {
- display: flex;
-	gap: 0.5rem;
- align-items: center }
+ .actions { display: flex;
+		gap: 0.5rem;
+ align-items: center;}
 
  .relationship-selector {
  display: flex;
@@ -421,13 +412,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  background: #f0f9ff;
 	padding: 0.5rem;
  border-radius: 0.375rem;
-	border: 1px solid #0ea5e9 }
+	border: 1px solid #0ea5e9;}
 
  .relationship-label {
  font-size: 0.875rem;
  font-weight: 500;
 	color: #0c4a6e;
- white-space: nowrap }
+ white-space: nowrap;}
 
  .relationship-select {
  padding: 0.25rem 0.5rem;
@@ -435,23 +426,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  border-radius: 0.25rem;
 	background: white;
  font-size: 0.875rem;
- min-width: 140px }
+ min-width: 140px;}
 
- .board-main-content {
- flex: 1;
-	display: flex }
+ .board-main-content { flex: 1;
+		display: flex;}
 
- .board-canvas {
- flex: 1;
-	position: relative;
+ .board-canvas { flex: 1;
+		position: relative;
  overflow: hidden;
-	background: white }
+	background: white;}
 
  .board-canvas.grid-mode {
  background-image:
  linear-gradient(rgba(0,0,0,.1) 1px, transparent 1px),
  linear-gradient(90deg, rgba(0,0,0,.1) 1px, transparent 1px);
- background-size: 50px 50px }
+ background-size: 50px 50px;}
 
  .board-canvas.magnetic-mode {
  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);

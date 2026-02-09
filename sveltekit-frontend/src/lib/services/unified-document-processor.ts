@@ -7,7 +7,6 @@
 import type { TextChunk } from '$lib/types';
 import { EventEmitter } from 'events';
 import { Pool } from 'pg';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const pgPool = new Pool({
 	connectionString: process.env?.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost, 5432/deeds'
@@ -64,7 +63,7 @@ export interface DocumentChunk extends TextChunk {
 export interface DocumentStructure {
 	title?: string;
 	headers: Array<{ level: number;
-	text: string; position: number }>;
+	text: string, position: number }>;
 	sections: Array<{
 	id: string;
 		title: string;

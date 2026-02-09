@@ -36,7 +36,7 @@
  lineNumbers = Array.from({ length: lines },
 	(_, i) => i + 1);
  });
-  
+
  $effect(() => {
  highlightedLines = new Set(errors.map(e => e.line));
  });
@@ -91,7 +91,7 @@
 
  // Focus editor on mount
  editorRef?.focus();
- 
+
 });
 </script>
 
@@ -113,8 +113,9 @@
  <!-- Code Area -->
  <div class="code-area flex-1 relative">
  <textarea
- bind:this={editorRef}; bind:value={ code }
- oninput={ handleInput }
+ bind:this={editorRef}
+ bind:value={code}
+ oninput={handleInput}
  onkeydown={ handleKeyDown }
  { readonly }
  { placeholder }

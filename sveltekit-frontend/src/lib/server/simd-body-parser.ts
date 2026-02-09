@@ -286,10 +286,10 @@ class SIMDBodyParser {
     private extractLegalEntities(
         content: string
     ): Array<{
-	type: string; text: string;
+	type: string, text: string;
 	confidence: number }> {
         const entities: Array<{
-	type: string; text: string;
+	type: string, text: string;
 	confidence: number }> = [];
 
         const patterns = [
@@ -320,9 +320,9 @@ class SIMDBodyParser {
      * Extract legal citations with court identification
      */
     private extractCitations(content: string): Array<{
-	citation: string; court: string }> {
+	citation: string, court: string }> {
         const citations: Array<{
-	citation: string; court: string }> = [];
+	citation: string, court: string }> = [];
 
         const citationPattern = /(\d+)\s+(U\.S\.|F\.\d+d|S\.Ct\.)\s+(\d+)/g;
         let match: RegExpExecArray | null;

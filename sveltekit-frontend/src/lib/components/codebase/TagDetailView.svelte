@@ -1,8 +1,4 @@
 <script lang="ts">
-	let onClose = $state<any>(undefined);
-	let imp = $state<any>(undefined);
-	let exp = $state<any>(undefined);
-	let fn = $state<any>(undefined);
 
 	/**
 	 * ═══════════════════════════════════════════════════════════════════════
@@ -20,18 +16,13 @@
 	import Layers from 'lucide-svelte/icons/layers';
 	import Tag from 'lucide-svelte/icons/tag';
 	import X from 'lucide-svelte/icons/x';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-	interface EnhancedTag {
-		id: string;
-	name: string;
+	interface EnhancedTag { id: string, name: string;
 		filePath: string;
 	type: string;
 		category: string;
 	errorCount: number;
-		cluster?: {
-	id: string;
-			name: string;
+		cluster?: { id: string, name: string;
 	memberCount: number;
 		};
 		embedding?: number[];
@@ -275,15 +266,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
-	.header-content {
-		display: flex;
-	gap: 1rem;
+	.header-content { display: flex;
+		gap: 1rem;
 		align-items: flex-start;
 	}
 
-	.tag-icon {
-		width: 40px;
-	height: 40px;
+	.tag-icon { width: 40px;
+		height: 40px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -317,9 +306,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	width: fit-content;
 	}
 
-	.close-btn {
-		background: transparent;
-	border: none;
+	.close-btn { background: transparent;
+		border: none;
 		color: rgba(255, 255, 255, 0.5);
 		cursor: pointer;
 	padding: 0.25rem;
@@ -327,9 +315,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	transition:all 0.2s ease;
 	}
 
-	.close-btn:hover {
-		color: white;
-	background: rgba(255, 255, 255, 0.1);
+	.close-btn:hover { color: white;
+		background: rgba(255, 255, 255, 0.1);
 	}
 
 	.detail-content {
@@ -430,14 +417,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: rgba(255, 255, 255, 0.7);
 	}
 
-	.code-item.export {
-		color: #4ade80;
-	background: rgba(74, 222, 128, 0.1);
+	.code-item.export { color: #4ade80;
+		background: rgba(74, 222, 128, 0.1);
 	}
 
-	.code-item.function {
-		color: #60a5fa;
-	background: rgba(96, 165, 250, 0.1);
+	.code-item.function { color: #60a5fa;
+		background: rgba(96, 165, 250, 0.1);
 	}
 
 	.more-items {
@@ -455,9 +440,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		border-radius: 6px;
 	}
 
-	.embedding-cell {
-		width: 8px;
-	height: 8px;
+	.embedding-cell { width: 8px;
+		height: 8px;
 		border-radius: 2px;
 	}
 
@@ -502,9 +486,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		transition:all 0.2s ease;
 	}
 
-	.action-btn.secondary {
-		background: transparent;
-	border: 1px solid rgba(255, 255, 255, 0.2);
+	.action-btn.secondary { background: transparent;
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		color: rgba(255, 255, 255, 0.7);
 	}
 

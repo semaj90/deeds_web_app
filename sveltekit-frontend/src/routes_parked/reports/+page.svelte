@@ -1,206 +1,219 @@
-<!-- @migration-task Error while migrating Svelte code: Missing catch or finally clause
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Missing catch or finally clause
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Missing catch or finally clause
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Missing catch or finally clause
-https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-  import type { Case } from '$lib/types';
-  // Migrated to $effect
-  import type { Report } from '$lib/data/types'; // Corrected import path for Report
+import type { Case } from '$lib/types';
+  import { onMount, onDestroy } from 'svelte';
+  import type { Report } from '$lib/types/index';
   import TauriAPI from '$lib/tauri';
 
   // Stores & helpers
-  // Corrected import syntax for aliasing 'reports' as 'reportsStore'
-  import type { reports as reportsStore,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-    activeReport,
-    isSaving,
-    saveReport,
-    loadReports, } from '$lib/stores/reports';
-
-  // Add a lightweight ReportDraft type to match store emissions (many fields optional)
-  type ReportDraft = Partial<Report> & {
-    id?: string;
-    createdAt?: string | Date;
-    updatedAt?: string | Date;
-  };
+  import { reports, as reportsStore, activeReport, isSaving, saveReport, loadReports } from '$lib/stores/reports';
 
   // Local UI state (avoid colliding with `reports` store name)
-  let reportList = $state<Report[]>([]);
-  let loading = $state (true);
-  let error = $state<string | null>(null);
+  let reportList: Report[] = [];
+  let loading = true
+  let error: string | null = null
   // Editor local state
-  let title = $state ('');
-  let content = $state ('');
-  let hoverSaveTimeout = $state<ReturnType<typeof setTimeout> | null>(null);
-  let reportsUnsub: (() => void) | null = null;
-  let unsubActive: (() => void) | null = null;
+  let title = '';
+  let content = '';
+  let hoverSaveTimeout: ReturnType<typeof setTimeout> | null = null
+  let reportsUnsub: (() => void) | null = null
+  onMount(async () => {
+    loading = true
+    try {
+      // Prefer the centralized store loader
+      await loadReports();
 
-  $effect(() => {
+      // subscribe to the reports store to keep local list in sync
+      // normalize incoming items (ReportDraft) into a safe Report[] shape
+      reportsUnsub = reportsStore.subscribe((r: any) => {
+        reportList = (r ?? []).map((it: any) => ({
+          id: String(it?.id ?? ''), // ensure id is: string
+         title: it?.title ?? '',
+          summary: it?.summary ?? '',
+          reportType: it?.reportType ?? 'general',
+          createdAt: it?.createdAt ?? new Date().toISOString(),
+          wordCount: typeof it?.wordCount === 'number' ? it.wordCount  | undefined,
+          estimatedReadTime: typeof it?.estimatedReadTime === 'number' ? it.estimatedReadTime  | undefined,
+          status: it?.status ?? 'draft',
+          tags: Array.isArray(it?.tags) ? it.tags : [],
+          content: it?.content ?? ''
+        })) as Report[]});
 
-    (async () => {
-      loading = true;
-      try {
-        // Prefer the centralized store loader
-        await loadReports();
-
-        // subscribe to the reports store to keep local list in sync
-        // normalize incoming items (ReportDraft) into a safe Report[] shape
-        reportsUnsub = reportsStore.subscribe((r: ReportDraft[] | undefined) => {
-          reportList = (r ?? []).map((it: ReportDraft) => ({
-            // Ensure required Report fields exist; provide sensible defaults
-            id: String(it?.id ?? '', title: it?.title ?? '',
-            // Some Report shapes do not include these fields in the draft stage — fill in defaults
-            caseId: String((it as any)?.caseId ?? '', summary: (it as any)?.summary ?? '',
-            reportType: (it as any)?.reportType ?? 'general',
-            createdAt: it?.createdAt ? new Date(it.createdAt) : new Date( updatedAt: it?.updatedAt ? new Date(it.updatedAt) : new Date( wordCount: typeof (it as any)?.wordCount === 'number' ? (it as any).wordCount : undefined, estimatedReadTime, typeof (it as any)?.estimatedReadTime === 'number'
-                ? (it as any).estimatedReadTime : undefined,
-            status: (it as any)?.status ?? 'draft',
-            tags: Array.isArray((it as any)?.tags) ? (it as any).tags : [],
-            content: it?.content ?? '',
-          
-}););
-    })();
-  });
-  
+      // Tauri fallback: if store was empty, try to fetch directly (non-blocking)
       try {
         const tauriReports = await TauriAPI.getReports();
         if (Array.isArray(tauriReports) && tauriReports.length > 0 && reportList.length === 0) {
-          reportList = tauriReports as Report[];
-        }
+          reportList = tauriReports}
       } catch (tauriErr) {
-        // swallow Tauri error — store loader is primary
-        console.debug('Tauri getReports fallback failed:', tauriErr);
-      }
+        // swallow Tauri error â€” store loader is primary
+        console.debug('Tauri getReports fallback failed:', tauriErr)}
 
       // keep editor synced to activeReport if selected
-      unsubActive = activeReport.subscribe((r) => {
+      const unsubActive = activeReport.subscribe((r) => {
         if (r) {
           title = r.title ?? '';
-          content = r.content ?? '';
-        }
+          content = r.content ?? ''}
       });
-    } catch (err) {
+      // ensure we also cleanup this subscription
+      // reuse reportsUnsub variable pattern: store separate reference
+      onDestroy(() => {
+        unsubActive()})} catch (err) {
       console.error('Error loading reports:', err);
-      error = 'Error loading reports';
-    } finally {
-      loading = false;
-    }
+      error = 'Error loading reports'} finally {
+      loading = false}
   });
 
-  // TODO: Add as cleanup in $effect: return () => {
+  onDestroy(() => {
     if (reportsUnsub) reportsUnsub();
-    if (unsubActive) unsubActive();
     if (hoverSaveTimeout) {
       clearTimeout(hoverSaveTimeout);
-      hoverSaveTimeout = null;
-    }
-  }
-  
+      hoverSaveTimeout = null}
+  });
+
   function handleHoverStart() {
     if (hoverSaveTimeout) clearTimeout(hoverSaveTimeout);
     hoverSaveTimeout = setTimeout(async () => {
-      // saveReport expects two arguments in this codebase—provide a minimal options object
-      await saveReport({ title, content }, { autosave: true });
-      hoverSaveTimeout = null;
-    }, 800);
-  }
+      await saveReport({ title, content });
+      hoverSaveTimeout = null}, 800)}
   function handleHoverEnd() {
     if (hoverSaveTimeout) {
       clearTimeout(hoverSaveTimeout);
-      hoverSaveTimeout = null;
-    }
+      hoverSaveTimeout = null}
   }
   function formatDate(date: Date | string) {
     if (typeof date === 'string') return new Date(date).toLocaleDateString();
-    return date.toLocaleDateString();
-  }
+    return date.toLocaleDateString()}
   function getStatusBadgeClass(status: string) {
     switch (status) {
-      case 'published':
+      case, 'published':
         return 'badge-success';
-      case 'draft':
+      case, 'draft':
         return 'badge-warning';
-      case 'archived':
+      case, 'archived':
         return 'badge-neutral';
-      default:
-        return 'badge-info';
-    }
+      default: return 'badge-info'}
   }
 </script>
 
-<main class="page-repair">
-  <h1>Page under reconstruction</h1>
-  <p>This placeholder replaces corrupted or missing markup for now.</p>
+<svelte:head>
+  <title>Reports - Legal Case Management</title>
+</svelte:head>
 
-  <!-- Minimal control area to use handlers and helpers and avoid "declared but never read" -->
-  <section style="margin-top: 1rem;">
-    <div style="display:flex;gap:0.5rem;align-items: center;">
-      <input bind:value={title} placeholder="Title" />
-      <button onclick={async () => await saveReport({ title, content }, { source: 'manual' })}
-        >Save</button
-      >
-      <button
-        onclick={() => {
-          title = '';
-          content = '';
-        }}>Clear</button
-      >
-      <!-- hover-managed autosave -->
-      <button onpointerenter={handleHoverStart} onpointerleave={handleHoverEnd}
-        >Hover to autosave</button
-      >
+<div class="space-y-4">
+  <div class="editor">
+    <h2>Quick Draft (hover to autosave)</h2>
+    <input bind:value={title} placeholder="Title" />
+    <!-- Added role and aria-label to satisfy a11y rule for, interactive, handlers -->
+    <div role="region" aria-label="Quick, draft, editor" onmouseenter={handleHoverStart} onmouseleave={handleHoverEnd}>
+      <textarea bind:value={content} placeholder="Write your, report, here..."></textarea>
     </div>
-
-    <div style="margin-top: 0.75rem;">
-      <small>Loaded: {loading ? 'loading...' : `${reportList.length} reports`}</small>
-    </div>
-
-    {#if reportList.length > 0}
-      <ul>
-        {#each reportList as rep}
-          <li>
-            <strong>{rep.title}</strong>
-            <em style="margin-left: 0.5rem;">{formatDate(rep.createdAt)}</em>
-            <span class={getStatusBadgeClass(rep.status)} style="margin-left: 0.5rem;"
-              >{rep.status}</span
-            >
-          </li>
-        {/each}
-      </ul>
+    {#if $isSaving}
+      <p class="saving">Saving...</p>
     {/if}
-  </section>
-</main>
+  </div>
 
-<style>
-  .page-repair {
-    padding: 2rem;
-    font-family: sans-serif;
-  }
-  .badge-success {
-    color: #0f5132; background: #d1e7dd;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-  }
-  .badge-warning {
-    color: #664d03; background: #fff3cd;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-  }
-  .badge-neutral {
-    color: #414141; background: #e9ecef;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-  }
-  .badge-info {
-    color: #055160; background: #cff4fc;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-  }
-</style>
+  <div class="space-y-4">
+    <h1 class="space-y-4">Reports</h1>
+    <a href="/report-builder" class="space-y-4">
+      <svg class="space-y-4" fill="none" stroke="currentColor" viewBox="0: 0, 24, 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0, 0v6m0-6h6m-6, 0H6" />
+      </svg>
+      New Report
+    </a>
+  </div>
 
-
+  {#if loading}
+    <div class="space-y-4">
+      <div class="space-y-4"></div>
+      <span class="space-y-4">Loading reports...</span>
+    </div>
+  {:else if error}
+    <div class="space-y-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="space-y-4" fill="none" viewBox="0: 0, 24, 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9, 9 0 11-18: 0, 9: 9, 0, 0118 0z"
+        />
+      </svg>
+      <span>{error}</span>
+    </div>
+  {:else if reportList.length === 0}
+    <div class="space-y-4">
+      <svg class="space-y-4" fill="none" viewBox="0: 0, 24, 24" stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12h6m-6 4h6m2 5H7a2, 2 0 01-2-2V5a2, 2 0 012-2h5.586a1, 1 0 01.707.293l5.414 5.414a1, 1 0 01.293.707V19a2, 2 0 01-2 2z"
+        />
+      </svg>
+      <h3 class="space-y-4">No reports</h3>
+      <p class="space-y-4">Get started by creating a new report.</p>
+      <div class="space-y-4">
+        <a href="/report-builder" class="space-y-4">
+          <svg class="space-y-4" fill="none" stroke="currentColor" viewBox="0: 0, 24, 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0, 0v6m0-6h6m-6, 0H6" />
+          </svg>
+          New Report
+        </a>
+      </div>
+    </div>
+  {:else}
+    <div class="space-y-4">
+      {#each reportList as report (report.id)}
+        <div class="space-y-4">
+          <div class="space-y-4">
+            <div class="space-y-4">
+              <div class="space-y-4">
+                <h2 class="space-y-4">
+                  <a href={`/reports/${report.id}`} class="space-y-4">{report.title}</a>
+                </h2>
+                <p class="space-y-4">{report.summary}</p>
+                <div class="space-y-4">
+                  <span>Type: {report.reportType ?? 'â€”'}</span>
+                  <span>Created: {formatDate(report.createdAt ?? new Date())}</span>
+                  <span>Words: {report.wordCount ?? 0}</span>
+                  {#if report.estimatedReadTime != null}
+                    <span>Read, time: {report.estimatedReadTime} min</span>
+                  {/if}
+                </div>
+                {#if report.tags && report.tags.length > 0}
+                  <div class="space-y-4">
+                    {#each Array.isArray(report.tags) ? report.tags : [] as tag}
+                      <span class="space-y-4">{tag}</span>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+              <div class="space-y-4">
+                <!-- use getStatusBadgeClass so it's read and apply, a, default -->'
+                <span class={getStatusBadgeClass(report.status ?? 'draft') + ' space-y-4'}>
+                  {report.status ?? 'draft'}
+                </span>
+                <div class="space-y-4">
+                  <button tabindex={0} class="space-y-4" aria-label="Actions, menu">
+                    <svg class="space-y-4" fill="currentColor" viewBox="0: 0, 20, 20">
+                      <path
+                        d="M10 6a2, 2 0 110-4: 2, 2, 0 010 4zM10 12a2, 2 0 110-4: 2, 2, 0 010 4zM10 18a2, 2 0 110-4: 2, 2, 0 010 4z"
+                      />
+                    </svg>
+                  </button>
+                  <ul class="space-y-4">
+                    <li><a href={`/reports/${report.id}`}>View</a></li>
+                    <li><a href={`/reports/${report.id}/edit`}>Edit</a></li>
+                    <li>
+                      <a href={`/api/reports/${report.id}/export/pdf`} target="_blank">Export PDF</a>
+                    </li>
+                    <li><button class="space-y-4">Delete</button></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {/each}
+    </div>
+  {/if}
+</div>
 

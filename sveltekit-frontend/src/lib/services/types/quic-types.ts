@@ -1,7 +1,7 @@
-// QUIC protocol types for high-performance data transfer export interface QUICConnection { id: string, endpoint: string, protocol: 'quic' | 'http3',status: 'connecting' | 'connected' | 'disconnected' | 'error'; latency?: number; bandwidth?: number}
+// QUIC protocol types for high-performance data transfer export interface QUICConnection { id: string; endpoint: string, protocol: 'quic' | 'http3'; status: 'connecting' | 'connected' | 'disconnected' | 'error'; latency?: number; bandwidth?: number}
 // REMOVED: export interface TensorOperation { id: string, type: 'embedding' | 'inference' | 'training'; input: ArrayBuffer | Float32Array; output?: ArrayBuffer | Float32Array,metadata: {
 	shape: number[], dtype: 'float32' | 'float64' | 'int32',device: 'cpu' | 'gpu' | 'webgpu'} timing: {
-	start: end? , number; duration? : number} }export interface StreamingResponse<T = any> { id: string, sequence: number, type: 'data' | 'error' | 'complete',payload: metadata?: { total?: number; progress?: number; estimated_remaining?: number} }export interface QUICMetrics { connection: {
+	start: end? , number; duration? : number} }export interface StreamingResponse<T = any> { id: string, sequence: number, type: 'data' | 'error' | 'complete', payload: metadata?: { total?: number; progress?: number; estimated_remaining?: number} }export interface QUICMetrics { connection: {
 	latency: number, bandwidth: number, packetsLost, number: packetsReceived, number: bytesSent} performance: {
 	avgResponseTime: number, throughput: number, errorRate} endpoints: { [endpoint: string]: {
 	requestCount: number, avgLatency: number, number} } }

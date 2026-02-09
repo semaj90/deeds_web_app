@@ -32,7 +32,7 @@ export function unpackUint8ToFloat32(packed: Uint8Array, min: number, max: numbe
 }
 
 export function quantizeInt8Symmetric(vec: Float32Array): {
-	data: Int8Array; scale: number } {
+	data: Int8Array, scale: number } {
 	let maxAbs = 0;
 	for (let i = 0; i < vec.length; i++) {
 		const a = Math.abs(vec[i]);

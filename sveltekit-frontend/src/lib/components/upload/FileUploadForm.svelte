@@ -1,13 +1,13 @@
 <script lang="ts">
 import Alert from "$lib/components/ui/alert/Alert.svelte";
 import AlertDescription from "$lib/components/ui/alert/AlertDescription.svelte";
-import { Button } from "$lib/components/ui/button";
+import Button from '$lib/components/ui/Button.svelte';
 import { Input } from '$lib/components/ui/input';
 import Label from "$lib/components/ui/label/Label.svelte";
 import FileUpload from "$lib/components/ui/modular/FileUpload.svelte";
-import type { UploadFile } from '$lib/components/ui/modular/types.svelte';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "$lib/components/ui/select";
-import Switch from "$lib/components/ui/switch/Switch.svelte";
+import type { UploadFile } from '$lib/components/ui/modular/types';
+import * as Select from "bits-ui/components/select";
+import Switch from "$lib/components/ui/switch";
 import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
 import { fileUploadSchema } from '$lib/schemas/upload';
 import Binary from 'lucide-svelte/icons/binary';
@@ -19,10 +19,9 @@ import Image from 'lucide-svelte/icons/image';
 import Music from 'lucide-svelte/icons/music';
 import Upload from 'lucide-svelte/icons/upload';
 import { zodClient } from 'sveltekit-superforms/adapters';
-import { superForm } from 'sveltekit-superforms/client';
+import { superForm } from 'sveltekit-superforms';
 
-interface Props {
-  data: { form: any };
+interface Props { data: { form: any };
   caseId?: string;
 }
 
@@ -136,7 +135,7 @@ function formatFileSize(bytes: number): string {
   <form method="POST" enctype="multipart/form-data" use:enhance class="space-y-6">
     <!-- File Upload Component -->
     <div class="space-y-2">
-      <Label for="file">File</Label>
+      <Label htmlFor="file">File</Label>
       <FileUpload
         multiple={false}
         maxFiles={1}
@@ -157,7 +156,7 @@ function formatFileSize(bytes: number): string {
 
     <!-- Title -->
     <div class="space-y-2">
-      <Label for="title">Title</Label>
+      <Label htmlFor="title">Title</Label>
       <Input
         id="title"
         name="title"
@@ -172,7 +171,7 @@ function formatFileSize(bytes: number): string {
 
     <!-- Description -->
     <div class="space-y-2">
-      <Label for="description">Description (Optional)</Label>
+      <Label htmlFor="description">Description (Optional)</Label>
       <Textarea
         id="description"
         name="description"
@@ -184,7 +183,7 @@ function formatFileSize(bytes: number): string {
 
     <!-- Type Selection -->
     <div class="space-y-2">
-      <Label for="type">Evidence Type</Label>
+      <Label htmlFor="type">Evidence Type</Label>
       <Select name="type" bind:value={$form.type}>
         <SelectTrigger>
           <SelectValue placeholder="Select evidence type" />
@@ -208,7 +207,7 @@ function formatFileSize(bytes: number): string {
     <!-- Case ID -->
     {#if !caseId}
       <div class="space-y-2">
-        <Label for="caseId">Case ID</Label>
+        <Label htmlFor="caseId">Case ID</Label>
         <Input
           id="caseId"
           name="caseId"
@@ -227,7 +226,7 @@ function formatFileSize(bytes: number): string {
     <!-- Options -->
     <div class="space-y-4 rounded-lg border p-4 bg-muted/50">
       <div class="flex items-center justify-between">
-        <Label for="aiAnalysis" class="flex-1 cursor-pointer">
+        <Label htmlFor="aiAnalysis" class="flex-1 cursor-pointer">
           Enable AI Analysis
           <span class="block text-sm font-normal text-muted-foreground">
             Extract text, generate embeddings, and summarize content
@@ -236,7 +235,7 @@ function formatFileSize(bytes: number): string {
         <Switch id="aiAnalysis" name="aiAnalysis" bind:checked={$form.aiAnalysis} />
       </div>
       <div class="flex items-center justify-between">
-        <Label for="isPrivate" class="flex-1 cursor-pointer">
+        <Label htmlFor="isPrivate" class="flex-1 cursor-pointer">
           Private Evidence
           <span class="block text-sm font-normal text-muted-foreground">
             Only visible to you and case administrators

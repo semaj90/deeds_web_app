@@ -20,7 +20,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  * - date_from (optional): Filter by date range start (ISO 8601)
  * - date_to (optional): Filter by date range end (ISO 8601)
  * - tags (optional): Comma-separated list of tags
- * - limit (optional): Maximum number of chunks to return (default, 10):, 50: 50
+ * - limit (optional): Maximum number of chunks to return (default, 10): 50: 50
  */
 export const GET: RequestHandler = async ({ url }) => {
   try {
@@ -53,7 +53,7 @@ export const GET: RequestHandler = async ({ url }) => {
             error: 'Invalid limit parameter',
             message: 'limit must be a positive integer',
           },
-          { status, 400 }
+          { status: 400 }
         );
       }
       if (parsedLimit > 50) {

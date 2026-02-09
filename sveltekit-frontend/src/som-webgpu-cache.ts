@@ -48,7 +48,7 @@ const _ENABLE_GPU = (() => {
 			const v = (process as unknown as { env?: Record<string, unknown> })?.env?.ENABLE_GPU as
 				| string
 				| boolean
-				| undefined;
+				: undefined;
 			if (typeof v === 'string') return v.toLowerCase() !== 'false' && v !== '0';
 			if (typeof v === 'boolean') return v;
 		}

@@ -18,7 +18,7 @@ export interface ILLMPromptService {
 	updatePrompt(promptId: string, updates: Partial<LLMPrompt>): Promise<LLMPrompt>;
 	deletePrompt(promptId: string): Promise<void>;
 	getPromptStats(): Promise<{
-	total: number; byModel: Record<string, number> }>;
+	total: number, byModel: Record<string, number> }>;
 }
 
 export class LLMPromptService extends BaseService implements ILLMPromptService {
@@ -236,7 +236,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 	 * Get statistics about stored prompts
 	 */
 	async getPromptStats(): Promise<{
-	total: number; byModel: Record<string, number> }> {
+	total: number, byModel: Record<string, number> }> {
 		this.log('info', 'Calculating prompt statistics');
 
 		try {

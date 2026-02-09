@@ -3,6 +3,7 @@
 	import AdminSidebar from './AdminSidebar.svelte';
 
 	interface AdminLayoutProps {
+		children?: import('svelte').Snippet;
 		title?: string;
 		subtitle?: string;
 	}

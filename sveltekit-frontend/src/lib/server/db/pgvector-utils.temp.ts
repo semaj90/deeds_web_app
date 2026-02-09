@@ -207,7 +207,7 @@ export async function searchSimilarEvidence(
 						caseId: asString(row.case_id),
 						...asObject(row.ai_analysis)
 				  }
-				: undefined,
+				 : undefined,
 			documentType: 'evidence'
 		}));
 	} catch (error) {

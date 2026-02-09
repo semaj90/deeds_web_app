@@ -54,7 +54,7 @@ export function topKNearest<T extends string | number | symbol = string>(
 	id: T; embedding?: Vector | null }>,
     k = 5
 ): {
-	id: T; score: number }[] {
+	id: T, score: number }[] {
     if (!Array.isArray(query) || query.length === 0) return [];
 
     const results = items

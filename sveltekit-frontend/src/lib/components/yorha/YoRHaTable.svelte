@@ -103,8 +103,7 @@
         return new Date(String(value)).toLocaleDateString();
       case 'number':
         return typeof value === 'number' ? value.toLocaleString() : String(value);
-	default:
-        return String(value);
+	default:return String(value);
     }
   }
 </script>
@@ -116,7 +115,7 @@
       <input
         bind:value={searchQuery}
         placeholder="Filter records..."
-        class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-xs text-white placeholder-slate-500 focus: ring-1, focus:ring-cyan-500 outline-none"
+        class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-cyan-500 outline-none"
       />
     </div>
     {#if loading}
@@ -204,14 +203,14 @@
         <button
           disabled={currentPage === 1}
           onclick={() => currentPage--}
-          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled: hover, bg-slate-700, disabled:opacity-30 transition-all font-mono"
+          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled:hover bg-slate-700 disabled:opacity-30 transition-all font-mono"
         >
           PREV
         </button>
         <button
           disabled={currentPage === totalPages()}
           onclick={() => currentPage++}
-          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled: hover, bg-slate-700, disabled:opacity-30 transition-all font-mono"
+          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled:hover bg-slate-700 disabled:opacity-30 transition-all font-mono"
         >
           NEXT
         </button>

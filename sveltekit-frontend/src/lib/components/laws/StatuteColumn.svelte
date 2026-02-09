@@ -1,9 +1,7 @@
 <script lang="ts">
   // Migrated to $effect
 
-  interface Props {
-    title: string;
-	section: string;
+  interface Props { title: string, section: string;
     body: string;
 	statuteId: string;
   }
@@ -12,8 +10,7 @@
 
   let context: {
     prefetchToken?: string;
-    relatedStatutes?: Array<{
-	id: string; title: string }>;
+    relatedStatutes?: Array<{ id: string, title: string }>;
     semanticKeywords?: string[];
   } | null = $state(null);
   let isExplaining = $state(false);
@@ -41,7 +38,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	sectionId: statuteId,
+sectionId: statuteId,
           prefetchToken: context?.prefetchToken,
           stream: false
         })
@@ -198,9 +195,8 @@
     border-color: #999;
   }
 
-  .btn:disabled {
-    opacity: 0.6;
-	cursor: not-allowed;
+  .btn:disabled { opacity: 0.6;
+		cursor: not-allowed;
   }
 
   .btn-primary {
@@ -268,9 +264,8 @@
 	gap: 0.5rem;
   }
 
-  .keyword-tag {
-    display: inline-block;
-	padding: 0.4rem 0.75rem;
+  .keyword-tag { display: inline-block;
+		padding: 0.4rem 0.75rem;
     background-color: #fff;
 	border: 1px solid #d0d0d0;
     border-radius: 3px;

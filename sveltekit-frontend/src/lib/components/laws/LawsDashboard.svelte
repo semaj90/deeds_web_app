@@ -2,11 +2,8 @@
 	// Migrated to $effect
 	import LawModal from './LawModal.svelte';
 	import LegalAutocomplete from './LegalAutocomplete.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-	interface TimelineEvent {
-		id: string;
-	action: string;
+	interface TimelineEvent { id: string, action: string;
 		data: any;
 	createdAt: string;
 		formatted: string;
@@ -27,7 +24,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		return () => {
 			window.removeEventListener('select', handleAutocompleteSelect);
 		};
-	
+
 });
 
 	async function handleAutocompleteSelect(e: any) {
@@ -58,7 +55,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	caseId: citation, statute: statute.citation: title, statute: statute.title
+caseId: citation, statute: statute.citation, title: statute.title
 				})
 			});
 
@@ -116,21 +113,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		<div class="flex gap-4 mb-6 border-b border-gray-700">
 			<button
 				onclick={() => (activeTab = 'search')}
-				class={`px-4 py-3 font-semibold transition ${
-					activeTab === 'search'
+				class={`px-4 py-3 font-semibold transition ${activeTab === 'search'
 						? 'text-blue-400 border-b-2 border-blue-400'
-						: 'text-gray-400, hover:text-gray-300'
-				}`}
+						: 'text-gray-400, hover:text-gray-300'}`}
 			>
 				🔍 Search
 			</button>
 			<button
 				onclick={() => (activeTab = 'timeline')}
-				class={`px-4 py-3 font-semibold transition ${
-					activeTab === 'timeline'
+				class={`px-4 py-3 font-semibold transition ${activeTab === 'timeline'
 						? 'text-blue-400 border-b-2 border-blue-400'
-						: 'text-gray-400, hover:text-gray-300'
-				}`}
+						: 'text-gray-400, hover:text-gray-300'}`}
 			>
 				🕒 Timeline ({timelineEvents.length})
 			</button>
@@ -149,7 +142,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				</div>
 
 				<!-- Quick Links -->
-				<div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-4 gap-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 					<button
 						onclick={() => fetchStatute('273a')}
 						class="bg-red-900 hover:bg-red-800 text-white p-4 rounded-lg border border-red-700 transition"
@@ -181,7 +174,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				</div>
 
 				<!-- Info Cards -->
-				<div class="grid grid-cols-1 md, grid-cols-3 gap-4">
+				<div class="grid grid-cols-1 md grid-cols-3 gap-4">
 					<div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
 						<div class="text-2xl mb-2">🧠</div>
 						<h3 class="font-semibold text-white">AI-Powered</h3>

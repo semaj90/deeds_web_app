@@ -1,6 +1,28 @@
-# Gemini To-Do List: Stabilizing the Web App (SvelteKit 2, Drizzle, PostgreSQL, pg_vector)
+# Gemini Migration & Restoration Strategy
 
-This to-do list outlines the steps to get the application to a stable, working state with minimal errors, adhering to best practices for SvelteKit 2, Drizzle-kit, PostgreSQL, and pg_vector.
+**Date:** February 4, 2026
+**Context:** Web search + analytical synthesis for Svelte 5 migration
+**Branch:** `feature/directory-migration-consolidation`
+
+---
+
+## 🎯 Mission Brief
+
+**Objective:** Restore 99 corrupted files + Migrate 468 legacy files to Svelte 5 + Clean technical debt
+
+**Critical Discovery:** Backup analysis revealed systemic corruption affecting core infrastructure:
+- 18 AI/ML service files corrupted
+- 9 Cache/storage services broken
+- 6 Database/routing files failing
+- 12 UI components crashing
+
+**Root Cause:** Automated migration tools (Phase 72/76/79/89) introduced regressions when upgrading TypeScript 5.6 → 5.7 and attempting Svelte 4 → 5 conversions.
+
+---
+
+## 📊 Current Status Summary
+
+This document replaces the original to-do list with an actionable restoration and migration strategy based on backup analysis findings.
 
 ## Phase 1: Environment and Configuration
 

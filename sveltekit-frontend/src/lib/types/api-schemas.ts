@@ -5,7 +5,7 @@ export interface APIResponse<T = unknown> {
  success: boolean;
 	data: T;
  meta: {
-	timestamp: string; cached: boolean;
+	timestamp: string, cached: boolean;
 	source: 'ssr' | 'api' };
  error?: string;
 }
@@ -252,7 +252,7 @@ export interface ErrorResponse {
  success: false;
 	data: null;
  meta: {
-	timestamp: string; cached: false;
+	timestamp: string, cached: false;
 	source: 'ssr' | 'api' };
  error: string;
 }

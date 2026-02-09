@@ -17,8 +17,7 @@ export { toolRegistry as getToolDefinitions } from '../registry.js';
 
 // Re-export types
 export type { 
-  ScanRepoRequest: LangExtractBatchRequest,
-  ClusterTagRequest: KBSearchRequest,
+  ScanRepoRequest: LangExtractBatchRequest, ClusterTagRequest: KBSearchRequest,
   ChunkEmbedRequest: CrawlDocsRequest,
   ToolResult: ScanRepoResult,
   LangExtractResult: ClusterTagResult,

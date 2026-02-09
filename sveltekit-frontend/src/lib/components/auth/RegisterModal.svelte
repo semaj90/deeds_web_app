@@ -1,13 +1,12 @@
 <script lang="ts">
   // removed bits-ui Dialog import (module types didn't export Dialog.*). Using a local modal markup below.'
   // cast helper type to satisfy sveltekit-superforms zod adapter typing
-  import type { ZodTypeAny } from 'zod';
-  import  Button  from "$lib/components/ui/button/Button.svelte";
-  import X from 'lucide-svelte';
-  import { superForm } from 'sveltekit-superforms';
-  import { zod } from 'sveltekit-superforms/adapters';
+  import Button from '$lib/components/ui/Button.svelte';
   import { registerSchema } from '$lib/schemas/auth';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+  import X from 'lucide-svelte/icons/x';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { superForm } from 'sveltekit-superforms';
+  import type { ZodTypeAny } from 'zod';
   interface Props {
     onsuccess?: () => void
     open?: boolean}
@@ -25,7 +24,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     },
 	{
       // cast the schema to ZodTypeAny to avoid the adapter's strict generic requirement'
-      validators: zod(registerSchema as unknown as ZodTypeAny),
+      validators: zodClient(registerSchema as unknown as ZodTypeAny),
       onUpdate({ form: f }) {
         if (f.valid) {
           onsuccess?.();
@@ -75,7 +74,8 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     {#if $message}
       <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700">
         {$message}
-      {/if}
+      </div>
+    {/if}
     <form class="space-y-4" method="POST" action="/api/auth/register" use:enhance>
       <div>
         <label for={emailId} class="block text-sm font-medium text-slate-700">Email</label>
@@ -83,7 +83,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
           type="email"
           name="email"
           id={emailId}; bind:value={$form.email}
-          class="w-full px-3 py-2 border {$errors.email ? 'border-red-500' : 'border-slate-300'} rounded-md focus: outline-none, focus:ring-2"
+          class="w-full px-3 py-2 border {$errors.email ? 'border-red-500' : 'border-slate-300'} rounded-md focus:outline-none focus:ring-2"
           placeholder="you@example.com"
         />
         {#if $errors.email}
@@ -96,7 +96,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
           type="password"
           name="password"
           id={passwordId}; bind:value={$form.password}
-          class="w-full px-3 py-2 border {$errors.password ? 'border-red-500' : 'border-slate-300'} rounded-md focus: outline-none, focus:ring-2"
+          class="w-full px-3 py-2 border {$errors.password ? 'border-red-500' : 'border-slate-300'} rounded-md focus:outline-none focus:ring-2"
           placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
         />
         {#if $errors.password}
@@ -109,7 +109,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
           type="password"
           name="confirmPassword"
           id={confirmPasswordId}; bind:value={$form.confirmPassword}
-          class="w-full px-3 py-2 border {$errors.confirmPassword ? 'border-red-500' : 'border-slate-300'} rounded-md focus: outline-none, focus:ring-2"
+          class="w-full px-3 py-2 border {$errors.confirmPassword ? 'border-red-500' : 'border-slate-300'} rounded-md focus:outline-none focus:ring-2"
           placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
         />
         {#if $errors.confirmPassword}
@@ -154,7 +154,8 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         </Button>
       </div>
     </form>
-  {/if}
+  </div>
+{/if}
 
 
 

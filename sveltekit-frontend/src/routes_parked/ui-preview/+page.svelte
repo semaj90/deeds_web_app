@@ -2,7 +2,7 @@
 	let filename = $state<any>(undefined);
 
  import type { page } from '$app/stores';
- // Migrated to $effect
+ import { onMount } from 'svelte';
 // NES UI Components
  import Dialog from '$lib/components/ui/dialog/Dialog.svelte';
  import DialogContent from '$lib/components/ui/dialog/DialogContent.svelte';
@@ -19,8 +19,6 @@
  // NOTE: The following functions must be exported from '$lib/utils/formatting.ts'
  // for TypeScript errors to be fully resolved.
  import type { formatDetailedTimestamp,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  formatRelativeTime,
  getFileIcon,
  getPriorityColor,
@@ -29,15 +27,15 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  truncateText, } from '$lib/utils/formatting';
 
  // Component state
- let showDialog = $state<boolean>(false);
- let selectedTab = $state<string>('buttons');
- let showSidebar = $state<boolean>(true);
- let mockSessionActive = $state<boolean>(false);
+ let showDialog = $state <boolean>(false);
+ let selectedTab = $state <string>('buttons');
+ let showSidebar = $state <boolean>(true);
+ let mockSessionActive = $state <boolean>(false);
 
  // Modal states
- let showModal = $state<boolean>(false);
- let modalVariant = $state<string>('gradient');
- let modalSize = $state<string>('md');
+ let showModal = $state <boolean>(false);
+ let modalVariant = $state <string>('gradient');
+ let modalSize = $state <string>('md');
 
  // Mock user data for session/user demo
  let mockUser = $state ({
@@ -116,15 +114,13 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  }
 
  // Mock page store data simulation
- $effect(() => {
-
+ onMount(() => {
  // Initialize session store with page data (simulated)
  const { data } = $page ; // Destructure data from $page to avoid deprecation warning
  if (data?.user) {
  mockSessionActions.init(data);
  }
- 
-});
+ });
   
  let currentUser = $derived (mockSessionActive ? mockUser : null);
  let authenticated = $derived (mockSessionActive);
@@ -167,7 +163,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  { title: 'Criminal Defense - Armed Robbery Case', status: 'closed', priority: 'critical' },
  { title: 'Family Law Custody Battle', status: 'open', priority: 'low' }];
 
- let focusReady = $state<boolean>(false);
+ let focusReady = $state <boolean>(false);
  $effect (() => {
  focusReady = true;
  });
@@ -252,15 +248,15 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  <div class="grid avatars">
  <!-- Removed avatarSizes loop as avatarSizes is no longer declared -->
  <div class="avatar-placeholder small">
- <span class="i-carbon-user-avatar-filled" style="font-size: 24px;"></span>
+ <span class="i-carbon-user-avatar-filled" style="font-size, 24px;"></span>
  <p class="meta">small</p>
  </div>
  <div class="avatar-placeholder medium">
- <span class="i-carbon-user-avatar-filled" style="font-size: 48px;"></span>
+ <span class="i-carbon-user-avatar-filled" style="font-size, 48px;"></span>
  <p class="meta">medium</p>
  </div>
  <div class="avatar-placeholder large">
- <span class="i-carbon-user-avatar-filled" style="font-size: 64px;"></span>
+ <span class="i-carbon-user-avatar-filled" style="font-size, 64px;"></span>
  <p class="meta">large</p>
  </div>
  </div>
@@ -510,7 +506,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  display: grid; gap: 1rem;
  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
  }
- /* Removed unused CSS selector: h1 { font-family: 'Press Start 2P', monospace; font-size: 1.1rem} */
+ /* Removed unused CSS selector: h1 { font-family: 'Press Start 2P', monospace; font-size: 1.1rem;} */
  h2.section {
  margin: 0 0 0.75rem;
  font-size: 0.9rem;
@@ -641,8 +637,8 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  .sidebar-info {
  color: inherit;
  }
- /* Removed unused CSS selector: .feature-list { list-style: none; padding: 0; margin: 0.5rem 0} */
- /* Removed unused CSS selector: .feature-list li { margin: 0.25rem 0; padding: 0.25rem 0} */
+ /* Removed unused CSS selector: .feature-list { list-style: none; padding: 0; margin: 0.5rem 0;} */
+ /* Removed unused CSS selector: .feature-list li { margin: 0.25rem 0; padding: 0.25rem 0;} */
  .integration-notes {
  margin-top: 1rem;
  }
@@ -669,7 +665,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  justify-content: center;
  z-index: 100; border: none;
  padding: 0; cursor: pointer;
- } /* Added border: none, padding: 0, cursor: pointer */
+ } /* Added border: none; padding: 0; cursor: pointer */
  .modal-content {
  background: white; padding: 2rem;
  border-radius: 8px;

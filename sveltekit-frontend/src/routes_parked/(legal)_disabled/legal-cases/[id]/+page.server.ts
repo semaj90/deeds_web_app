@@ -159,7 +159,7 @@ tags: formData.getAll('tags'),
  errMessage = error;
  }
  await logError('UploadAction', error, {
- userMessage: errMessage, stack: error instanceof Error ? error.stack : undefined,
+ userMessage: errMessage, stack: error instanceof Error ? error.stack  | undefined,
  });
  return fail(500, { form, errMessage });
  }

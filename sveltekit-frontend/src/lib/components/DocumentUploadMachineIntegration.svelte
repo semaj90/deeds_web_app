@@ -76,7 +76,7 @@
     }
 </script>
 
-<div class="upload-container font-mono border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+<div class="upload-container font-mono border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0 0 0 1)]">
     <h2 class="text-2xl font-bold mb-4 tracking-tighter uppercase border-b-2 border-black pb-2">
         Document_Ingestion_System
     </h2>
@@ -184,7 +184,7 @@
                 {#if snapshot.matches('uploading')}
                     <div>> UPLOADING_DOCUMENT_PACKETS...</div>
                     <div>> PACKET_COUNT: {context.files.length}</div>
-                    <div>> TARGET: PostgreSQL17 + MinIO + Qdrant</div>
+                    <div>> TARGET:PostgreSQL17 + MinIO + Qdrant</div>
                 {:else}
                     <div>> CONNECTION_ESTABLISHED.</div>
                     <div>> ANALYZING_DOCUMENT_TOPOLOGY...</div>
@@ -234,7 +234,7 @@
 <style>
     .drop-zone.drag-over {
         background-color: rgba(0, 0, 0, 0.05);
-        border-color: black }
+        border-color: black;}
 
     .progress-fill {
         background-image: linear-gradient(
@@ -248,11 +248,11 @@
             transparent
         );
         background-size: 20px 20px;
-        animation: progress-stripes 1s linear infinite }
+        animation: progress-stripes 1s linear infinite;}
 
     @keyframes progress-stripes {
-        from { background-position: 0 0 }
-        to { background-position: 20px 0 }
+        from { background-position: 0 0;}
+        to { background-position: 20px 0;}
     }
 </style>
 

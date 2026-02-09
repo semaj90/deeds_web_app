@@ -209,8 +209,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div
  class={`max-w-md px-4 py-2 rounded-lg ${
  msg.role === 'user'
- ? 'bg-primary text-primary-content'
- , 'bg-base-700 text-neutral-100'
+ ? 'bg-primary text-primary-content' : 'bg-base-700 text-neutral-100'
  }`}
  >
  <div class="text-sm whitespace-pre-wrap">{msg.content}</div>

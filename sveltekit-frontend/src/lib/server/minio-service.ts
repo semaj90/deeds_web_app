@@ -98,7 +98,7 @@ export class MinIOService {
     private static client = client;
 
     static parseMinIOUrl(minioUrl: string): {
-	bucket: string; key: string } {
+	bucket: string, key: string } {
         const m = minioUrl.match(/^minio:\/\/([^/]+)\/(.+)$/);
         if (!m) throw new Error(`Invalid MinIO URL. Expected format: minio://bucket/key`);
         return { bucket: m[1], key: m[2] };
@@ -200,7 +200,7 @@ export class MinIOService {
                 key: item.Key!,
                 size: item.Size ?? 0,
                 lastModified: item.LastModified || new Date(),
-                contentType: undefined,
+                contentType | undefined,
                 bucket
             }));
         } catch (error) {

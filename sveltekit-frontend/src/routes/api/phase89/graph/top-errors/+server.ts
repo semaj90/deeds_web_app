@@ -74,7 +74,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		const links = linksResult.rows.map(row => ({
 			source: row.source_uri,
-			target: row.target_uri,
+			target:row.target_uri,
 			type: row.type,
 			weight: row.weight
 		}));

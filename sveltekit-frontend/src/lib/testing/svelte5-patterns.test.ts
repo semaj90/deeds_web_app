@@ -215,7 +215,7 @@ describe('SSR Compatibility', () => {
 	it('should have proper load function types', () => {
 		interface PageData {
 			cases: Array<{
-	id: string; title: string }>;
+	id: string, title: string }>;
 			totalCount: number;
 		}
 

@@ -1,17 +1,13 @@
 <script lang="ts">
   // Migrated to $effect
 
-  interface Node {
-    id: string;
-	title: string;
+  interface Node { id: string, title: string;
     type: string;
 	x: number;
     y: number;
   }
 
-  interface Connection {
-    id: string;
-	from_id: string;
+  interface Connection { id: string, from_id: string;
     to_id: string;
   }
 
@@ -102,7 +98,7 @@
     {/if}
   </div>
 
-  <div class="relative flex-1 bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:40px_40px]">
+  <div class="relative flex-1 bg-[radial-gradient(#1e293b_1px transparent_1px)] bg-[size:40px_40px]">
     {#if isLoading}
       <div class="absolute inset-0 flex items-center justify-center text-cyan-500 font-mono text-xs animate-pulse">
         CALIBRATING VISUAL ARRAY...
@@ -261,9 +257,8 @@
  position: absolute;
  }
 
- .inset-0 {
- top: 0;
-	right: 0;
+ .inset-0 { top: 0;
+		right: 0;
  bottom: 0;
 	left: 0;
  }

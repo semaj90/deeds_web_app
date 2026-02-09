@@ -22,10 +22,10 @@ export interface ProgressiveGamingConfig {
  thermalThrottling: boolean;
 	batteryOptimization: boolean;
  nesSettings: {
-	strictPalette: boolean; enableScanlines: boolean;
+	strictPalette: boolean, enableScanlines: boolean;
 	pixelScale: number };
  snesSettings: {
-	enableGradients: boolean; enableModeViitColors: boolean;
+	enableGradients: boolean, enableModeViitColors: boolean;
 	layerCount: number };
  n64Settings: {
 	enableAntiAliasing: boolean;

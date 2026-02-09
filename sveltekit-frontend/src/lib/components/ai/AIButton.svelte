@@ -54,11 +54,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // Variant configurations
   const variantClasses = {
     primary:
-      'bg-gradient-to-br from-yorha-primary to-yorha-secondary hover: from-yorha-secondary, hover:to-yorha-primary border-yorha-primary',
+      'bg-gradient-to-br from-yorha-primary to-yorha-secondary hover:from-yorha-secondary, hover:to-yorha-primary border-yorha-primary',
     secondary:
-      'bg-gradient-to-br from-yorha-bg-secondary to-yorha-bg-tertiary hover: from-yorha-bg-tertiary, hover:to-yorha-bg-secondary border-yorha-border',
+      'bg-gradient-to-br from-yorha-bg-secondary to-yorha-bg-tertiary hover:from-yorha-bg-tertiary, hover:to-yorha-bg-secondary border-yorha-border',
     accent:
-      'bg-gradient-to-br from-yorha-accent to-blue-400 hover: from-blue-400, hover:to-yorha-accent border-yorha-accent',
+      'bg-gradient-to-br from-yorha-accent to-blue-400 hover:from-blue-400, hover:to-yorha-accent border-yorha-accent',
   } as const;
 
   // Handle button click
@@ -112,7 +112,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       <div
         class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary text-sm font-mono whitespace-nowrap rounded-none shadow-lg"
         in: fade={{
-	duration: 150 }}; out, fade={{ duration, 100 }}
+	duration: 150 }}; out fade={{ duration: 100 }}
       >
         {tooltip}
         <div
@@ -133,10 +133,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				shadow-lg
 				transition-all duration-300 ease-in-out
 				transform-gpu;
-				focus: outline-none, focus: ring-2, focus: ring-yorha-primary, focus: ring-offset-2, focus: ring-offset-yorha-bg-primary;
+				focus:outline-none focus:ring-2 focus:ring-yorha-primary focus:ring-offset-2 focus:ring-offset-yorha-bg-primary;
 	active:scale-95
 				group
-				{disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110, hover: shadow-xl, hover:shadow-yorha-primary/20'}
+				{disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110 hover:shadow-xl hover:shadow-yorha-primary/20'}
 				{loading ? 'animate-pulse' : ''}
 			"
       {disabled}
@@ -212,17 +212,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   @keyframes float {
     0%; } 100% {
       transform: translateY(0) rotate(0deg);
-      opacity: 0 }
+      opacity: 0;}
     10% {
-      opacity: 1 }
+      opacity: 1;}
     90% {
-      opacity: 1 }
+      opacity: 1;}
     100% {
       transform: translateY(-100%) rotate(360deg);
-      opacity: 0 }
+      opacity: 0;}
   }
   .animate-float {
-    animation: float 3s linear infinite }
+    animation: float 3s linear infinite;}
 </style>
 
 

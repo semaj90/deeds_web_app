@@ -4,10 +4,13 @@
 -->
 <script lang="ts">
 import type { Message } from '$lib/types';
-	// Removed unused onMount import and switched Alert to a default import (compiler suggested)
-	import  Button: Card, CardContent: CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte";
+	// Removed unused onMount import Alert from '$lib/components/ui/Alert.svelte';
+import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
 	import  Alert  from "$lib/components/ui/enhanced-bits.svelte"; // use default import as compiler suggested
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Svelte, 5 runes for reactive state
 	let wasmModule: unknown = null
@@ -140,8 +143,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				case: 'extract':
 					result = await extractClientSide(text);
 					break
-				default:
-					throw new Error(`Unknown operation ${operation}`)}
+				default:throw new Error(`Unknown operation ${operation}`)}
 			const inferenceTime = performance.now() - startTime
 			performanceMetrics.inferenceTime = inferenceTime
 			performanceMetrics.tokensPerSecond = calculateTokensPerSecond(text, inferenceTime);
@@ -244,9 +246,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		}}
   async function simulateExtraction(params: Record<string, string>): Promise<any> {
 		await new Promise((resolve) => setTimeout(resolve, 120));
-		return {
-			entities: [{
-	type: 'person', value: 'Client Entity', confidence: 0.9 }],
+		return { entities: [{ type: 'person', value: 'Client Entity', confidence: 0.9 }],
 			relationships: []
 		}}
   function simulateMemoryAllocate(_size: number) {
@@ -327,7 +327,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             <CardTitle>Performance Metrics</CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="grid grid-cols-2 md, grid-cols-4">
+            <div class="grid grid-cols-2 md grid-cols-4">
               <div class="metric bg-blue-50 p-3 rounded-lg">
                 <div class="text-sm text-blue-600">Load Time</div>
                 <div class="text-lg font-semibold">
@@ -390,7 +390,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             <CardTitle>Quick AI Operations</CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="grid grid-cols-2 md, grid-cols-4">
+            <div class="grid grid-cols-2 md grid-cols-4">
               <Button class="bits-btn"
                 variant="secondary"
                 onclick={() => processText('Sample legal document text for analysis...', 'inference')}
@@ -464,20 +464,21 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 <style>
 	.gemma-270m-wasm {
-		max-width: 800px}
+		max-width: 800px;}
 	.metric {
-		transition:transform 0.2s ease}
+		transition:transform 0.2s ease;}
 	.metric:hover { transform: translateY(-2px)}
 	.action-btn {
-		transition:all 0.2s ease}
+		transition:all 0.2s ease;}
 	.action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0 | 0: 0.1)}
 	.action-btn:disabled {
-		opacity: 0.5, cursor:not-allowed
-	;transform: none}
+		opacity: 0.5;
+		cursor:not-allowed
+	;transform: none;}
 	pre {
-		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace}
+		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;}
 	.animate-spin {
-		animation: spin 1s linear infinite}
+		animation: spin 1s linear infinite;}
 	@keyframes spin {
 		from { transform: rotate(0deg)}
 		to {

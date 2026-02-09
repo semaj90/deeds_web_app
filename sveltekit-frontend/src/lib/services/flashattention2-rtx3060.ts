@@ -364,7 +364,7 @@ export class FlashAttention2RTX3060Service {
 	private async applyTritonOptimization(
 		embeddings: Float32Array,
 		attentionWeights: Float32Array
-	): Promise<{ embeddings: Float32Array; attentionWeights: Float32Array; speedup: number }> {
+	): Promise<{ embeddings: Float32Array, attentionWeights: Float32Array; speedup: number }> {
 		if (!this.config.triton?.enableTriton) {
 			return { embeddings, attentionWeights, speedup: 1.0 };
 		}

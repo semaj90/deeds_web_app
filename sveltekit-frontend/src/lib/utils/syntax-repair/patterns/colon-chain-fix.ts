@@ -1,17 +1,14 @@
 /**
  * Colon-Chain Corruption Fix Pattern
  *
- * Fixes corrupted syntax where `key: value:
-	key: value` patterns appear
+ * Fixes corrupted syntax where `key: value, key: value` patterns appear
  * instead of proper object literals or function parameters.
  *
  * This is a multi-pass repair pattern that handles cascading fixes.
  *
  * Examples of corruption patterns fixed:
- * 1. `{ key: value:
-	next: prop }` → `{ key: value, next: prop }`
- * 2. `{ a: b:
-	c: d }` → `{ a: b, c: d }`
+ * 1. `{ key: value, next: prop }` → `{ key: value, next: prop }`
+ * 2. `{ a: b, c: d }` → `{ a: b, c: d }`
  * 3. Nested: `{
 	outer: { inner: value, next } }` → `{ outer: {
 	inner: value, next } }`
@@ -28,8 +25,7 @@ import type { PatternMatcher } from '../pattern-matcher';
 
 /**
  * Pattern to fix longer import colon chains
- * Before: import { A: B:
-	C: D } from
+ * Before: import { A: B, C: D } from
  * After:  import { A, B, C, D } from
  */
 export const importLongColonChainPattern: PatternMatcher = createPattern(
@@ -106,8 +102,7 @@ export const tripleColonChainPattern: PatternMatcher = createPattern(
     // Determine if this is an object literal or type annotation
     // If val1 looks like a type (starts with uppercase), treat differently
     if (/^[A-Z]/.test(val1)) {
-      // This might be: prop:
-	Type: prop: Type -> prop: Type, prop: Type
+      // This might be: prop, Type: prop: Type -> prop: Type, prop: Type
       return `${key1}: ${val1},
 	${key2}: ${val2}`;
     }
@@ -122,8 +117,7 @@ export const tripleColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix double colon chains
- * Before: key:
-	value: nextKey
+ * Before: key, value: nextKey
  * After: key, value, nextKey
  */
 export const doubleColonChainPattern: PatternMatcher = createPattern(
@@ -147,8 +141,7 @@ export const doubleColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains with type annotations
- * Before: param:
-	Type: param: Type
+ * Before: param, Type: param: Type
  * After:  param: Type, param: Type
  */
 export const typeAnnotationColonChainPattern: PatternMatcher = createPattern(
@@ -163,8 +156,7 @@ export const typeAnnotationColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in function parameters
- * Before: function foo(a: string:
-	b: number)
+ * Before: function foo(a: string, b: number)
  * After:  function foo(a: string, b: number)
  */
 export const functionParamColonChainPattern: PatternMatcher = createPattern(
@@ -199,8 +191,7 @@ export const arrowFunctionColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in interface definitions
- * Before: interface Foo { a: string:
-	b: number }
+ * Before: interface Foo { a: string, b: number }
  * After:  interface Foo { a: string;
 	b: number }
  */
@@ -216,8 +207,7 @@ export const interfaceColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in type definitions
- * Before: type Foo = { a: string:
-	b: number }
+ * Before: type Foo = { a: string, b: number }
  * After:  type Foo = { a: string;
 	b: number }
  */
@@ -253,9 +243,9 @@ export const destructuringColonChainPattern: PatternMatcher = createPattern(
 /**
  * Pattern to fix colon chains in return type objects
  * Before: ): {
-	a: Type: b: Type }
+	a: Type, b: Type }
  * After:  ): {
-	a: Type; b: Type }
+	a: Type, b: Type }
  */
 export const returnTypeColonChainPattern: PatternMatcher = createPattern(
   'return-type-colon-chain',
@@ -270,9 +260,9 @@ export const returnTypeColonChainPattern: PatternMatcher = createPattern(
 /**
  * Pattern to fix generic colon chains
  * Before: Promise<{
-	a: Type: b: Type }>
+	a: Type, b: Type }>
  * After: Promise<{
-	a: Type; b: Type }>
+	a: Type, b: Type }>
  */
 export const genericColonChainPattern: PatternMatcher = createPattern(
   'generic-colon-chain',
@@ -347,8 +337,7 @@ export const innerBraceColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in object property assignments
- * Before: obj = { prop: value:
-	another: thing }
+ * Before: obj = { prop: value, another: thing }
  * After:  obj = { prop: value, another: thing }
  */
 export const objectPropertyColonChainPattern: PatternMatcher = createPattern(
@@ -382,10 +371,9 @@ export const spreadColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in Svelte $props() destructuring
- * Before: let { prop: Type:
-	another: Type } = $props()
+ * Before: let { prop: Type, another: Type } = $props()
  * After:  let { prop, another }: {
-	prop: Type; another: Type } = $props()
+	prop: Type, another: Type } = $props()
  */
 export const sveltePropsColonChainPattern: PatternMatcher = createPattern(
   'svelte-props-colon-chain',
@@ -473,9 +461,9 @@ export const booleanValueColonChainPattern: PatternMatcher = createPattern(
 /**
  * Pattern to fix colon chains with null/undefined values
  * Before: {
-	key: null, next: undefined }
+	key: null, next | undefined }
  * After: {
-	key: null, next: undefined }
+	key: null, next | undefined }
  */
 export const nullishValueColonChainPattern: PatternMatcher = createPattern(
   'nullish-value-colon-chain',

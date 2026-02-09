@@ -55,7 +55,7 @@
 		danger: 'border-nes-danger bg-nes-danger/20 text-nes-danger hover:bg-nes-danger/30',
 		success: 'border-nes-success bg-nes-success/20 text-nes-success hover:bg-nes-success/30',
 		ghost: 'border-transparent bg-transparent text-nes-text hover:bg-nes-panel',
-		link: 'border-transparent bg-transparent text-nes-accent underline hover:text-nes-accent2'
+		link: 'border-transparent bg-transparent text-nes-accent underline, hover:text-nes-accent2'
 	}[variant]);
 
 	// Derived size classes
@@ -72,7 +72,7 @@
 <button
 	{type}
 	class="inline-flex items-center justify-center gap-2 border-4 font-mono uppercase tracking-wide
-		transition-all duration-150 focus: outline-none, focus: ring-2, focus: ring-nes-accent, focus: ring-offset-2, disabled: opacity-50, disabled, cursor-not-allowed
+		transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-nes-accent focus:ring-offset-2 disabled:opacity-50 disabled cursor-not-allowed
 		{variantClasses} {sizeClasses} { className }"
 	disabled={isDisabled}
 	onclick={ onclick }

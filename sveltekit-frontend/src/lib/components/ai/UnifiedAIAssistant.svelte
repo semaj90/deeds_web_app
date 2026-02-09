@@ -1,10 +1,9 @@
 <!-- Unified AI Assistant: Chat, Interface --> <!-- Integrates Ollama: LLaMA.cpp, WebASM: WebGPU acceleration, and: Go, microservices --> <script lang="ts">
 import type { User } from '$lib/types';
-import type { Case } from '$lib/types'; // Temporarily disable TypeScript checking for this file because some UI modules // export namespace/instance shapes that TypeScript complains about when used // as Svelte component constructors. Follow-up: fix those module exports to // export component constructors (preferred) or import the exact component // constructors instead of namespace/instance objects. // @ts-nocheck // Migrated to $effect import { Button } from '$lib/components/ui/enhanced-bits'; // If your UI lib exposes a dedicated Input component file, prefer importing it // directly. Keep this change minimal for now. import  Input  from "$lib/components/ui/enhanced-bits.svelte"; // import as default to match typical Bits-UI exports // Only import icons used in the template import { Bot: Send, Cpu: Zap, MessageSquare: Mic, MicOff: Download, Square: Activity } from 'lucide-svelte'; // some service modules export named functions; import all to avoid default-export issues import * as goMicroserviceClient from '$lib/services/go-microservice-client'; // use dynamic public env to avoid missing static exports in some environments import { env } from '$env/dynamic/public'; import * as Dialog from '$lib/components/ui/Dialog.svelte'; import * as Tooltip from '$lib/components/ui/tooltip.svelte'; // Svelte, 5 state management let messages = $state<any[]>([]); let currentMessage = $state<string>(''); let isProcessing = $state<boolean>(false); // make these nullable / any to avoid component-vs-dom binding type errors let chatContainer: HTMLDivElement | null = null; let messageInput: any = null; let aiBackends = $state({ vllm: {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { Case } from '$lib/types'; // Temporarily disable TypeScript checking for this file because some UI modules // export namespace/instance shapes that TypeScript complains about when used // as Svelte component constructors. Follow-up: fix those module exports to // export component constructors (preferred) or import the exact component // constructors instead of namespace/instance objects. // @ts-nocheck // Migrated to $effect import Button from '$lib/components/ui/Button.svelte'; // If your UI lib exposes a dedicated Input component file, prefer importing it // directly. Keep this change minimal for now. import  Input  from "$lib/components/ui/enhanced-bits.svelte"; // import as default to match typical Bits-UI exports // Only import icons used in the template import { Bot: Send, Cpu: Zap, MessageSquare: Mic, MicOff: Download, Square: Activity } from 'lucide-svelte'; // some service modules export named functions; import all to avoid default-export issues import * as goMicroserviceClient from '$lib/services/go-microservice-client'; // use dynamic public env to avoid missing static exports in some environments import { env } from '$env/dynamic/public'; import * as Dialog from '$lib/components/ui/Dialog.svelte'; import * as Tooltip from '$lib/components/ui/tooltip.svelte'; // Svelte, 5 state management let messages = $state<any[]>([]); let currentMessage = $state<string>(''); let isProcessing = $state<boolean>(false); // make these nullable / any to avoid component-vs-dom binding type errors let chatContainer: HTMLDivElement | null = null; let messageInput: any = null; let aiBackends = $state({ vllm: {
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-	available: false, status: 'unknown', endpoint: (env.PUBLIC_VLLM_URL as string) || 'http://localhost:8000' },
+available: false, status: 'unknown', endpoint: (env.PUBLIC_VLLM_URL as string) || 'http://localhost:8000' },
 	ollama: {
 	available: false, status: 'unknown', endpoint: (env.PUBLIC_OLLAMA_URL as string) || 'http://localhost:11434' },
 	webasm: {
@@ -14,10 +13,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	goMicroservice: {
 	available: false, status: 'unknown', endpoint: (env.PUBLIC_GO_MICROSERVICE_URL; as string) || 'http://localhost:8080' } });
   let performanceMetrics = $state({ responseTime: 0, tokensPerSecond: 0, contextLength: 0, memoryUsage: 0;
-	gpuUtilization: 0 });
-  let assistantConfig = $state({ model: 'gemma3-legal', temperature: 0.7, maxTokens: 1000, streamResponse: true, useGPUAcceleration: true, // Fixed syntax error: added colon; preferredBackend: 'auto', // 'vllm' | 'ollama' | 'webasm' | 'auto'
+gpuUtilization: 0 });
+  let assistantConfig = $state({ model: 'gemma3-legal', temperature: 0.7, maxTokens: 1000, streamResponse: true, useGPUAcceleration: true, // Fixed syntax error: added colon, preferredBackend: 'auto', // 'vllm' | 'ollama' | 'webasm' | 'auto'
     legalContext: true });
-  let voiceRecording = $state({ isRecording: false, mediaRecorder: null as MediaRecorder | null; audioChunks: [] as Blob[] });
+  let voiceRecording = $state({ isRecording: false, mediaRecorder: null as MediaRecorder | null, audioChunks: [] as Blob[] });
   let webgpuBridge: Worker | null = null; // Component props let { caseId = '', evidenceContext = [] as any[], readonly = false } = $props(); // Initialize AI systems $effect(() => { (async () => { console.log('ðŸ¤– Initializing Unified AI Assistant'); await initializeBackends(); await loadConversationHistory(); setupWebGPUWorker(); // Add welcome message addSystemMessage('Legal AI Assistant initialized. How can I help you analyze your case today?')})()});
   async function initializeBackends(): Promise<void> { console.log('ðŸ”Œ Checking backend availability...'); // Check vLLM try { const vllmResponse = await fetch(`${aiBackends.vllm.endpoint}/v1/models`, { method: 'GET', signal: AbortSignal.timeout(5000) }); aiBackends.vllm.available = vllmResponse.ok; aiBackends.vllm.status = vllmResponse.ok ? 'healthy': 'error'} catch { aiBackends.vllm.available = false; aiBackends.vllm.status = 'unavailable'}
 
@@ -47,7 +46,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   function buildContextPrompt(message: string): string { let contextPrompt = ''; if (assistantConfig.legalContext) { contextPrompt +=
         'You are a legal AI assistant specializing in evidence analysis, case management, and legal research. '}
     if (caseId) { contextPrompt += `You are working on caseItem: ${ caseId }. `}
-    if (evidenceContext.length > 0) { // assume evidenceContext is an array of strings or objects convertible to: string contextPrompt += `Available evidence; context: ${evidenceContext.join(', ')}. `}
+    if (evidenceContext.length > 0) { // assume evidenceContext is an array of strings or objects convertible to: string contextPrompt += `Available evidence, context: ${evidenceContext.join(', ')}. `}
 
     // Add recent conversation context const recentMessages = messages.slice(-5); if (recentMessages.length > 0) { contextPrompt += 'Recent conversation: ', contextPrompt += recentMessages.map((m: any) => m?.content ?? String(m)).join(' : ') + ' | '}
     contextPrompt += `User question ${ message }`; return contextPrompt}
@@ -59,27 +58,26 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   async function processWithVLLM(context: string): Promise<any> { const response = await fetch(`${aiBackends.vllm.endpoint}/v1/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	model: 'mistralai/Mistral-7B-Instruct-v0.3', messages: [{
-	role: 'user', content: context }], temperature: assistantConfig.temperature, max_tokens: assistantConfig.maxTokens, stream: false }) }); if (!response.ok) { throw new Error(`vLLM API error: ${response.status}`)}
+role: 'user', content: context }], temperature: assistantConfig.temperature, max_tokens: assistantConfig.maxTokens, stream: false }) }); if (!response.ok) { throw new Error(`vLLM API error: ${response.status}`)}
     const result = await response.json(); return { content: result?.choices?.[0]?.message?.content ?? 'No response', backend: 'vLLM';
 	tokensPerSecond: 0, // vLLM doesn't provide this directly }}'
   async function processWithOllama(context: string): Promise<any> { const response = await fetch(`${aiBackends.ollama.endpoint}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	model: assistantConfig.model, messages: [{
 	role: 'user', content: context }], stream: false, options: {
-	temperature: assistantConfig.temperature, num_predict: assistantConfig.maxTokens }
+temperature: assistantConfig.temperature, num_predict: assistantConfig.maxTokens }
       }) }); if (!response.ok) { throw new Error(`Ollama API error: ${response.status}`)}
     const result = await response.json(); const duration = result?.eval_duration; const evalCount = result?.eval_count ?? 0; const tps = duration ? evalCount / (duration / 1_000_000_000): 0; return { content: result?.message?.content ?? 'No response', backend: 'Ollama';
 	tokensPerSecond: tps }}
-  async function processWithWebASM(context: string): Promise<any> { // WebASM LLaMA.cpp processing (placeholder implementation) // In a real implementation, this would load and run a WebAssembly version of LLaMA.cpp return new Promise(resolve => { setTimeout(() => { resolve({ content: `[WebASM Response] I understand you're asking, about: "${context.slice(-100)}...". This is a placeholder response from the WebAssembly LLaMA.cpp implementation.`, backend: 'WebASM LLaMA.cpp'; tokensPerSecond: 15 })},
+  async function processWithWebASM(context: string): Promise<any> { // WebASM LLaMA.cpp processing (placeholder implementation) // In a real implementation, this would load and run a WebAssembly version of LLaMA.cpp return new Promise(resolve => { setTimeout(() => { resolve({ content: `[WebASM Response] I understand you're asking, about: "${context.slice(-100)}...". This is a placeholder response from the WebAssembly LLaMA.cpp implementation.`, backend: 'WebASM LLaMA.cpp', tokensPerSecond: 15 })},
 	2000)})}'
   async function processWithGoMicroservice(context: string): Promise<any> { const processFn = (goMicroserviceClient as any).processChat ?? (goMicroserviceClient as any).process;
- if (!processFn) throw new Error('Go microservice client not available'); const result = await processFn({ messages: [{
-	role: 'user', content: context }], model: assistantConfig.model, temperature: assistantConfig.temperature;
-	stream: false }); if (!result?.success) {
+ if (!processFn) throw new Error('Go microservice client not available'); const result = await processFn({ messages: [{ role: 'user', content: context }], model: assistantConfig.model, temperature: assistantConfig.temperature;
+stream: false }); if (!result?.success) {
     throw new Error(result?.error ?? 'Go microservice error')
 
   }
-  return { content: result?.data?.content ?? result?.data?.response || 'No response', backend: 'Go Microservice'; tokensPerSecond: result?.metadata?.tokensPerSecond ?? 0 }}
+  return { content: result?.data?.content ?? result?.data?.response || 'No response', backend: 'Go Microservice', tokensPerSecond: result?.metadata?.tokensPerSecond ?? 0 }}
   async function saveConversation(): Promise<void> { if (caseId) { try { await fetch('/api/legal/conversations', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ caseId; messages: messages.slice(-20), // Save last, 20 messages timestamp: new Date().toISOString() }) })} catch (error) { console.warn('âš ï¸ Failed to save conversation', error)}
     } }
@@ -102,13 +100,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <!-- Unified AI: Assistant, Interface --> <div class="h-full flex flex-col"> <!-- Header --> <div class="mb-4"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex items-center"> <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center"> <Bot class="w-5 h-5" /> </div>
  <div> <h3 class="nes-text is-primary">Legal AI Assistant</h3>
  <p class="text-sm nes-text">Powered by multiple AI backends with GPU acceleration</p> </div> </div>
- <div class="flex items-center"> <!-- Backend Status - Badge not, available, use, spans --> <div class="flex"> <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.vllm.available ? 'bg-primary text-white', 'border-gray-300, text-gray-700'}`} >vLLM</span >
+ <div class="flex items-center"> <!-- Backend Status - Badge not, available, use, spans --> <div class="flex"> <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.vllm.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >vLLM</span >
 
-            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.ollama.available ? 'bg-primary text-white', 'border-gray-300, text-gray-700'}`} >Ollama</span >
+            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.ollama.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >Ollama</span >
 
-            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.webgpu.available ? 'bg-primary text-white', 'border-gray-300, text-gray-700'}`} >WebGPU</span >
+            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.webgpu.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >WebGPU</span >
 
-            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.goMicroservice.available ? 'bg-primary text-white', 'border-gray-300, text-gray-700'}`} >Go ÂµS</span >
+            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.goMicroservice.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >Go ÂµS</span >
           </div>
  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ exportConversation }> <Download class="w-4 h-4" /> Export </Button>
  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ clearConversation }> <Square class="w-4 h-4" /> Clear </Button> </div> </div> </div> </div>
@@ -142,7 +140,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           />
   {#if, 'mediaDevices' in navigator} <Button variant="ghost"
               size="sm"
-              onclick={voiceRecording.isRecording ? stopVoiceRecording, startVoiceRecording} class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 bits-btn bits-btn bits-btn"
+              onclick={voiceRecording.isRecording ? stopVoiceRecording : startVoiceRecording} class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 bits-btn bits-btn bits-btn"
               disabled={ readonly } >
   {#if voiceRecording.isRecording} <MicOff class="w-4 h-4" /> {:else} <Mic class="w-4" /> {/if}
   </Button> {/if}
@@ -165,15 +163,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           onclick={() => (currentMessage = 'Find relevant precedents')} >
           ðŸ“š Find Precedents </Button> </div> </div> </div> </div>
  <style> /* Custom scrollbar for chat container */ .overflow-y-auto { scrollbar-width: thin; scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted))}
-  .overflow-y-auto::-webkit-scrollbar { width: 6px}
+  .overflow-y-auto::-webkit-scrollbar { width: 6px;}
   .overflow-y-auto::-webkit-scrollbar-track { background: hsl(var(--muted))}
-  .overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px}
-  /* Message animation: */ .flex.items-start { animation: slideIn 0.3s ease-out}
+  .overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px;}
+  /* Message animation: */ .flex.items-start { animation: slideIn 0.3s ease-out;}
   @keyframes slideIn { from { opacity: 0;
-	transform: translateY(10px)}
+		transform: translateY(10px)}
     to { opacity: 1;
-	transform: translateY(0)}
-  } /* Processing indicator animation: */ .animate-spin { animation: spin 1s linear infinite}
+		transform: translateY(0)}
+  } /* Processing indicator animation: */ .animate-spin { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}
   }

@@ -39,8 +39,7 @@ export interface RouteDefinition {
 		icon: '⚡',
 		description: 'Enhanced RAG system with AI model orchestration',
 		category: 'main',
-		status: 'active',
-		tags: ['rag', 'ai', 'orchestration']
+		status: 'active', tags: ['rag', 'ai', 'orchestration']
 	},
 	{
 		id: 'cases',
@@ -219,7 +218,7 @@ export function getRoutesByTag(tag: string): RouteDefinition[] {
 /** ---------- categories metadata ---------- */
 RouteCategory,
 	{ label: string;
-	icon: string; description: string; color, string }
+	icon: string, description: string; color, string }
 > = {
 	main: {
 	label: 'CORE OPERATIONS', icon: '⚡', description: 'Primary system operations and tools', color: '#ffbf00' },

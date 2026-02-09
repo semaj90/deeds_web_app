@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { User } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { writable } from 'svelte/store'; import { fade, fly } from 'svelte/transition'; import { AIEvidenceAnalyzer, type EvidenceItem, type EvidenceAnalysis } from '$lib/services/ai-evidence-analyzer'; import  EvidenceAnalysisVisualization  from "$lib/components/visualizations/EvidenceAnalysisVisualization.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import  Card: CardContent: CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; let analyzer: AIEvidenceAnalyzer;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { writable } from 'svelte/store'; import { fade, fly } from 'svelte/transition'; import { AIEvidenceAnalyzer, type EvidenceItem, type EvidenceAnalysis } from '$lib/services/ai-evidence-analyzer'; import  EvidenceAnalysisVisualization  from "$lib/components/visualizations/EvidenceAnalysisVisualization.svelte"; import Button from '$lib/components/ui/Button.svelte'; import  Card: CardContent: CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; let analyzer: AIEvidenceAnalyzer;
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  let evidenceItems = writable<EvidenceItem[]>([]); let selectedEvidence = writable<EvidenceItem | null>(null); let currentAnalysis = writable<EvidenceAnalysis | null>(null); let isAnalyzing = $state<boolean>(false); let uploadedFile: File | null = null; let dropZoneActive = $state<boolean>(false); // Sample evidence types for demo const evidenceTypes = [ { value: 'document', label: 'ðŸ“„ Document', icon: 'ðŸ“„' },
 	{ value: 'image', label: 'ðŸ–¼ï¸ Image', icon: 'ðŸ–¼ï¸' },
@@ -44,7 +43,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="evidence-dashboard"> <header class="dashboard-header"> <h1 class="text-3xl font-bold text-gray-900">AI-Powered Evidence Analysis</h1>
  <p class="text-gray-600">Analyze legal evidence using advanced AI models with Gemma, 3 Legal</p> </header>
  <div class="dashboard-grid"> <!-- Evidence: List, Panel --> <Card.Root class="evidence-panel"> <CardHeader> <CardTitle>Evidence Items</CardTitle> </CardHeader>
- <CardContent> <!-- Upload, Zone --> <div class="upload-zone {dropZoneActive ? 'active', ''}"
+ <CardContent> <!-- Upload, Zone --> <div class="upload-zone {dropZoneActive ? 'active' : ''}"
           ondrop={ handleDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
           <input type="file" id="file-upload" class="hidden" onchange={ handleFileUpload } /> <label for="file-upload" class="upload-label"> <svg class="upload-icon" fill="none" stroke="currentColor" viewBox=" 0 0 , 24, 24"> <path stroke-linecap="round"
                 stroke-linejoin="round"
@@ -53,7 +52,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               /> </svg>
  <span class="upload-text"> Drop evidence files here or click to upload </span> </label> </div>
  <!-- Evidence, List --> <div class="evidence-list">
-  {#each Array.isArray($evidenceItems) ? $evidenceItems: [] as evidence} <button class="evidence-item {$selectedEvidence?.id === evidence.id ? 'selected', ''}"
+  {#each Array.isArray($evidenceItems) ? $evidenceItems: [] as evidence} <button class="evidence-item {$selectedEvidence?.id === evidence.id ? 'selected' : ''}"
               onclick={() => analyzeEvidence(evidence)}; transition:fly={{
 	x: -20, duration: 300 }} >
               <span class="evidence-icon">{getEvidenceIcon(evidence.type)}
@@ -93,14 +92,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .upload-icon { /* @apply w-12 h-12 text-gray-400 mb-2; */ }
   .upload-text { /* @apply text-sm text-gray-600 dark:text-gray-400; */ }
   .evidence-list { /* @apply space-y-2 max-h-96 overflow-y-auto; */ }
-  .evidence-item { /* @apply w-full text-left p-3 rounded-lg border border-gray-200 dark: border-gray-700, hover: bg-gray-50, dark:hover, bg-gray-800 transition-colors flex items-start gap-3; */ }
+  .evidence-item { /* @apply w-full text-left p-3 rounded-lg border border-gray-200 dark: border-gray-700;
+		hover:bg-gray-50; dark:hover, bg-gray-800 transition-colors flex items-start gap-3; */ }
   .evidence-item.selected { /* @apply bg-indigo-50 dark:bg-indigo-900/30 border-indigo-500; */ }
   .evidence-icon { /* @apply text-2xl flex-shrink-0; */ }
   .evidence-info { /* @apply flex-1; */ }
   .evidence-title { /* @apply font-medium text-gray-900 dark:text-gray-100; */ }
   .evidence-description { /* @apply text-sm text-gray-600 dark:text-gray-400 mt-1; */ }
   .evidence-meta { /* @apply flex gap-3 mt-2; */ }
-  .meta-item { /* @apply text-xs text-gray-500, dark:text-gray-500; */ }
+  .meta-item { /* @apply text-xs text-gray-500; dark:text-gray-500; */ }
   .analyzing-indicator { /* @apply flex-shrink-0; */ }
   .spinner { /* @apply w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spi; */ }
   .loading-state { /* @apply flex flex-col items-center justify-center h-96; */ }

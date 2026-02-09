@@ -202,7 +202,7 @@ export class UserRecommendationService {
 	 * Get comprehensive chat analytics for a user
 	 */
 	async getChatAnalytics(userId: string, timeRange?: {
-	from: Date; to: Date }): Promise<ChatAnalytics> {
+	from: Date, to: Date }): Promise<ChatAnalytics> {
 		try {
 			const whereCondition = timeRange
 				? and(
@@ -325,7 +325,7 @@ export class UserRecommendationService {
 	}
 
 	private async extractTopTopics(userId: string, limit: number): Promise<{
-	topic: string; count: number }[]> {
+	topic: string, count: number }[]> {
 		const queries = await db
 			.select({ query: userAiQueries.query })
 			.from(userAiQueries)

@@ -2,7 +2,7 @@ function getGlobalSimdUrl(): string | undefined {
  if (typeof window === 'undefined') return undefined;
  const gw = window as unknown as Record<string, unknown>;
  const val = gw['__SIMD_QUIC_URL__'];
- return typeof val === 'string' ? val : undefined;
+ return typeof val === 'string' ? val  : undefined;
 }
 getGlobalSimdUrl() ?? process.env.SIMD_QUIC_URL ?? 'https://localhost:8095/json';
 

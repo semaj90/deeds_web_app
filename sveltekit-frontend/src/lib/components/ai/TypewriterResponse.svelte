@@ -1,8 +1,7 @@
 <script lang="ts">
 import type { User } from '$lib/types'; // Migrated to $effect import { fade, fly } from 'svelte/transition'; import { quintOut, elasticOut } from 'svelte/easing'; import { advancedCache } from '$lib/services/advanced_cache_manager'; // Types interface UserActivity { timestamp: number;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	action: 'typing' | 'pause' | 'delete' | 'select'; content?: string; duration?: number; position?: number}
-  interface ThinkingState { phase: 'analyzing' | 'processing' | 'generating' | 'complete'; progress: number, currentThought?: string}
+  interface ThinkingState { phase: 'analyzing' | 'processing' | 'generating' | 'complete', progress: number, currentThought?: string}
 
   // Props interface interface Props { text?: string; speed?: number; showCursor?: boolean; cursorChar?: string; cacheKey?: string; userActivity?: UserActivity[]; enableThinking?: boolean; autoStart?: boolean; showControls?: boolean}
   let { text = '', speed = 50, showCursor = true, cursorChar = 'â–‹', cacheKey = '', userActivity = [], enableThinking = true, autoStart = true, showControls = false }: Props = $props(); // State let displayedText = $state<string>(''); let currentIndex = $state<number>(0); let isTyping = $state<boolean>(false); let isPaused = $state<boolean>(false); let cursorVisible = $state<boolean>(true); let thinkingState = $state<ThinkingState>({ phase: 'analyzing';
@@ -59,7 +58,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }); // Export component functions for external use export { pause, resume, stop, restart, setSpeed, setReplaySpeed }; </script>
  <!-- Thinking Animation (shown while LLM, loads) -->
   {#if enableThinking && thinkingState.phase !== 'complete' && isTyping && !displayedText} <div class="thinking-container" in: fade={{
-	duration: 300 }}; out, fade={{ duration, 200 }}> <div class="thinking-indicator"> <div class="thinking-dots"> <span class="dot" style="animation-delay: 0ms;"></span>
+	duration: 300 }}; out fade={{ duration: 200 }}> <div class="thinking-indicator"> <div class="thinking-dots"> <span class="dot" style="animation-delay: 0ms;"></span>
  <span class="dot" style="animation-delay: 150ms;"></span>
  <span class="dot" style="animation-delay: 300ms;"></span> </div>
  <div class="thinking-text"> {thinkingState.currentThought || 'Processing...'} </div>
@@ -70,10 +69,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <span class="replay-text">Replaying your activity...</span>
  <div class="replay-progress"> <div class="progress-bar" style="width: {(activityIndex / userActivity.length) * 100}%"></div> </div> {/if}
   <!-- Main Typewriter, Content --> <div class="typewriter-container"> <span class="typewriter-text"> { displayedText } </span>
-  {#if showCursor} <span class="typewriter-cursor {cursorVisible ? 'visible', 'hidden'}" class:blinking={!isTyping}> { cursorChar } </span> {/if}
+  {#if showCursor} <span class="typewriter-cursor {cursorVisible ? 'visible' : 'hidden'}" class:blinking={!isTyping}> { cursorChar } </span> {/if}
   </div>
  <!-- Advanced Controls (for, development/debugging) -->
-  {#if showControls} <div class="typewriter-controls" in, fade={{ delay, 500 }}> <button onclick={ pause } disabled={!isTyping || isPaused}>Pause</button>
+  {#if showControls} <div class="typewriter-controls" in fade={{ delay: 500 }}> <button onclick={ pause } disabled={!isTyping || isPaused}>Pause</button>
  <button onclick={ resume } disabled={!isPaused}>Resume</button>
  <button onclick={ restart }>Restart</button>
  <button onclick={ stop }>Stop</button>
@@ -84,60 +83,63 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           step="0.1"
  bind:value={ replaySpeed } onchange={() => setReplaySpeed(replaySpeed)} /> <span>{ replaySpeed }x</span> </label> </div> {/if}
   <style> .typewriter-container { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; line-height: 1.6;
-	position: relative}
-  .typewriter-text { white-space: pre-wrap; word-wrap: break-word}
+	position: relative;}
+  .typewriter-text { white-space: pre-wrap; word-wrap: break-word;}
   .typewriter-cursor { color: #00ff00; font-weight: bold;
-	transition:opacity 0.1s}
-  .typewriter-cursor.visible { opacity: 1}
-  .typewriter-cursor.hidden { opacity: 0}
-  .typewriter-cursor.blinking { animation: blink 1.06s infinite}
-  @keyframes blink { 0%; } 50% { opacity: 1}
-    51%; } 100% { opacity: 0}
-  } /* Thinking Animation Styles */ .thinking-container { padding: 1rem, background: rgba(0, 255, 0, 0.05); border: 1px solid rgba(0, 255, 0, 0.2); border-radius: 0.5rem; margin-bottom: 1rem}
-  .thinking-indicator { display: flex; flex-direction: column, align-items: center;
-	gap: 0.5rem}
+	transition:opacity 0.1s;}
+  .typewriter-cursor.visible { opacity: 1;}
+  .typewriter-cursor.hidden { opacity: 0;}
+  .typewriter-cursor.blinking { animation: blink 1.06s infinite;}
+  @keyframes blink { 0%; } 50% { opacity: 1;}
+    51%; } 100% { opacity: 0;}
+  } /* Thinking Animation Styles */ .thinking-container { padding: 1rem;
+		background: rgba(0, 255, 0, 0.05); border: 1px solid rgba(0, 255, 0, 0.2); border-radius: 0.5rem; margin-bottom: 1rem;}
+  .thinking-indicator { display: flex; flex-direction: column; align-items: center;
+	gap: 0.5rem;}
   .thinking-dots { display: flex;
-	gap: 0.25rem}
+	gap: 0.25rem;}
   .dot { width: 0.5rem;
 	height: 0.5rem;
 	background: #00ff00; border-radius: 50%;
-	display: inline-block}
-  .thinking-text { font-size: 0.875rem, color: #00ff00; text-align: center; font-style: italic}
+	display: inline-block;}
+  .thinking-text { font-size: 0.875rem;
+		color: #00ff00; text-align: center; font-style: italic;}
   .thinking-progress { width: 100%;
 	height: 0.25rem;background: rgba(0, 255, 0, 0.1); border-radius: 0.125rem;
-	overflow: hidden}
+	overflow: hidden;}
   .progress-bar { height: 100%;
-	background: linear-gradient(90deg, #00ff00, #00ff88); transition:width 0.3s ease}
+	background: linear-gradient(90deg, #00ff00, #00ff88), transition:width 0.3s ease;}
   /* Activity Replay Styles */ .activity-replay-indicator { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.5rem 1rem, background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 0.25rem; margin-bottom: 0.5rem; font-size: 0.875rem}
-  .replay-icon { color: #ffa500; font-size: 1rem}
+	gap: 0.5rem;padding: 0.5rem 1rem;
+		background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 0.25rem; margin-bottom: 0.5rem; font-size: 0.875rem;}
+  .replay-icon { color: #ffa500; font-size: 1rem;}
   .replay-text { color: #ffa500;
-	flex: 1 }
+	flex: 1;}
   .replay-progress { width: 4rem;
 	height: 0.25rem;background: rgba(255, 165, 0, 0.2); border-radius: 0.125rem;
-	overflow: hidden}
+	overflow: hidden;}
   /* Development Controls */ .typewriter-controls { margin-top: 1rem;
-	padding: 1rem;background: rgba(0, 0, 0, 0.1); border-radius: 0.5rem; font-size: 0.875rem}
+	padding: 1rem;background: rgba(0, 0, 0, 0.1); border-radius: 0.5rem; font-size: 0.875rem;}
   .typewriter-controls button { margin-right: 0.5rem;
 	padding: 0.25rem 0.5rem;background: #333;
 	color: #00ff00;
 	border: 1px solid #00ff00; border-radius: 0.25rem;
-	cursor: pointer}
-  .typewriter-controls, buttonhover:not(disabled) { background: rgba(0, 255, 0, 0.1)}
+	cursor: pointer;}
+  .typewriter-controls; buttonhover:not(disabled) { background: rgba(0, 255, 0, 0.1)}
   .typewriter-controls buttondisabled { opacity: 0.5;
-	cursor:not-allowed}
+	cursor:not-allowed;}
   .speed-controls { margin-top: 0.5rem;
 	display: flex;
-	gap: 1rem}
+	gap: 1rem;}
   .speed-controls label { display: flex; align-items: center;
-	gap: 0.5rem;color: #00ff00}
-  .speed-controls input[type='range'] { width: 6rem}
-  .speed-controls span { min-width: 3rem; text-align: right; font-family: monospace}
-  /* Responsive Design */ @media (max-width: 768px) { .typewriter-container { font-size: 0.875rem}
-    .thinking-container { padding: 0.75rem}
-    .typewriter-controls { font-size: 0.75rem}
+	gap: 0.5rem;color: #00ff00;}
+  .speed-controls input[type='range'] { width: 6rem;}
+  .speed-controls span { min-width: 3rem; text-align: right; font-family: monospace;}
+  /* Responsive Design */ @media (max-width: 768px) { .typewriter-container { font-size: 0.875rem;}
+    .thinking-container { padding: 0.75rem;}
+    .typewriter-controls { font-size: 0.75rem;}
     .speed-controls { flex-direction: column;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   } </style>
 
 

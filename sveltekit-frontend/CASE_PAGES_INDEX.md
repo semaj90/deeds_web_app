@@ -196,13 +196,21 @@ Both pages display Phase 72 error diagnostics:
 - [x] Pages created
 - [x] Phase 72 wired
 - [x] Tests written
+- [x] Wire TipTap editor (w/ TiptapWithAIAssistant)
+- [x] Implement /api/reports/generate
+- [x] Implement /api/reports/save
+- [x] Fix Lucide/Shadcn import compatibility (Svelte 5)
 - [ ] Verify in browser
 - [ ] Check console for errors
+- [ ] Test end-to-end flow
 
 ### Short Term (This week)
-- [ ] Wire TipTap editor
-- [ ] Implement /api/reports/generate
-- [ ] Test end-to-end flow
+- [x] Fix 10 new TipTap integration errors ✅ Fixed 41+ errors total!
+- [ ] **REACH SUB-800** (Targeting legacy component cleanup)
+- [ ] Refactor: Deprecate `ReportEditor.svelte` in favor of `TiptapWithAIAssistant.svelte`
+- [ ] Wire frontend UIs (Evidence Board, Command Center)
+- [ ] Deploy Citations feature (Phase 3)
+- [ ] Performance optimization
 
 ### Medium Term (Next week)
 - [ ] Add Phase 78 "Ask Error Brain"

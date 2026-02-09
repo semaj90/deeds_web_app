@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   export interface Case {
     id: string;
@@ -9,7 +8,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     createdAt: string;
 	updatedAt: string;
     evidence: Array<{
-	id: string; status: string }>;
+	id: string, status: string }>;
   }
 
   let { isLoading = false, cases = [] }: {
@@ -31,8 +30,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return 'border-l-4 border-l-[#9E0000]';
       case 'closed':
         return 'border-l-4 border-l-gray-400';
-      default:
-        return 'border-l-4 border-l-gray-300';
+      default:return 'border-l-4 border-l-gray-300';
     }
   };
 
@@ -42,8 +40,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return 'bg-[#9E0000] text-white';
       case 'closed':
         return 'bg-gray-400 text-white';
-      default:
-        return 'bg-gray-300 text-gray-900';
+      default:return 'bg-gray-300 text-gray-900';
     }
   };
 
@@ -52,7 +49,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   };
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
   {#if isLoading}
     {#each Array(3) as _}
       <div class="bg-white border-2 border-gray-300 p-6 rounded animate-pulse">

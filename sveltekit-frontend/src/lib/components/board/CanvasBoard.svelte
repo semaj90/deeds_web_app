@@ -1,18 +1,14 @@
 <script lang="ts">
   // Migrated to $effect
 
-  interface Evidence {
-    id: string;
-    title: string;
+  interface Evidence { id: string, title: string;
     classification: 'public' | 'confidential' | 'sealed';
     status: 'pending' | 'approved' | 'locked' | 'rejected';
     type: 'document' | 'image' | 'audio' | 'video';
     boardPosition: { x: number; y: number };
   }
 
-  interface Relationship {
-    id: string;
-    sourceNodeId: string;
+  interface Relationship { id: string, sourceNodeId: string;
     targetNodeId: string;
     type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
     confidence: number;
@@ -31,7 +27,7 @@
     zoomLevel?: number;
     panX?: number;
     panY?: number;
-    onUpdatePosition?: (event: { id: string; position: { x: number; y: number } }) => void;
+    onUpdatePosition?: (event: { id: string, position: { x: number, y: number } }) => void;
   }>();
 
   let canvas: HTMLCanvasElement;
@@ -66,7 +62,7 @@
       case 'approved': return '#00AA00';
       case 'locked': return '#9E0000';
       case 'rejected': return '#CC0000';
-      default: return '#CCCCCC';
+      default:return '#CCCCCC';
     }
   }
 

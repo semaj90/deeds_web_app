@@ -20,9 +20,7 @@
   }: Props = $props();
 
   // Form data interface
-  interface FormData {
-    title: string;
-	description: string;
+  interface FormData { title: string, description: string;
     caseNumber: string;
 	name: string;
     incidentDate: string;
@@ -442,9 +440,8 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .form-grid {
-    display: grid;
-	gap: 2rem }
+  .form-grid { display: grid;
+		gap: 2rem;}
 
   .form-section h3 {
     margin: 0 0 1rem 0;
@@ -452,61 +449,57 @@
     font-size: 1.1rem;
     font-weight: 600;
     border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 0.5rem }
+    padding-bottom: 0.5rem;}
 
   .field-group {
-    margin-bottom: 1.5rem }
+    margin-bottom: 1.5rem;}
 
   .field-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem }
+    gap: 1rem;}
 
   label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-	color: #374151 }
+	color: #374151;}
 
-  label.required::after {
-    content: '*';
-	color: #ef4444;
-    margin-left: 0.25rem }
+  label.required::after { content: '*';
+		color: #ef4444;
+    margin-left: 0.25rem;}
 
   input,
   select,
-  textarea {
-    width: 100%;
-	padding: 0.75rem;
+  textarea { width: 100%;
+		padding: 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 1rem;
-	transition:border-color 0.2s, box-shadow 0.2s }
+	transition:border-color 0.2s, box-shadow 0.2s;}
 
-  input:focus,
-  select:focus,
-  textarea:focus {
+  input: focus;
+		select:focus; textarea:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
   input.error {
-    border-color: #ef4444 }
+    border-color: #ef4444;}
 
   .field-error {
     display: block;
     margin-top: 0.25rem;
     font-size: 0.875rem;
-	color: #ef4444 }
+	color: #ef4444;}
 
-  .tag-input {
-    display: flex;
-	gap: 0.5rem;
-    margin-bottom: 0.5rem }
+  .tag-input { display: flex;
+		gap: 0.5rem;
+    margin-bottom: 0.5rem;}
 
   .tag-input input {
-    flex: 1 }
+    flex: 1;}
 
   .tag-input button {
     padding: 0.75rem 1rem;
@@ -516,15 +509,15 @@
     border-radius: 6px;
 	cursor: pointer;
     font-size: 0.875rem;
-	transition:background-color 0.2s }
+	transition:background-color 0.2s;}
 
   .tag-input button:hover {
-    background: #2563eb }
+    background: #2563eb;}
 
   .tags-list {
     display: flex;
     flex-wrap: wrap;
-	gap: 0.5rem }
+	gap: 0.5rem;}
 
   .tag {
     display: inline-flex;
@@ -534,11 +527,10 @@
     background: #e5e7eb;
     border-radius: 9999px;
     font-size: 0.875rem;
-	color: #374151 }
+	color: #374151;}
 
-  .tag button {
-    background: none;
-	border: none;
+  .tag button { background: none;
+		border: none;
     cursor: pointer;
     font-size: 1rem;
 	color: #6b7280;
@@ -549,11 +541,10 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-	transition:background-color 0.2s }
+	transition:background-color 0.2s;}
 
-  .tag button:hover {
-    background: #d1d5db;
-	color: #374151 }
+  .tag button:hover { background: #d1d5db;
+		color: #374151;}
 
   .form-actions {
     display: flex;
@@ -561,7 +552,7 @@
 	gap: 1rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #e5e7eb }
+    border-top: 1px solid #e5e7eb;}
 
   .form-actions button {
     padding: 0.75rem 1.5rem;
@@ -571,32 +562,30 @@
     color: #374151;
 	cursor: pointer;
     font-size: 1rem;
-	transition:all 0.2s }
+	transition:all 0.2s;}
 
   .form-actions button:hover {
-    background: #f9fafb }
+    background: #f9fafb;}
 
-  .form-actions button.primary {
-    background: #3b82f6;
-	color: white;
-    border-color: #3b82f6 }
+  .form-actions button.primary { background: #3b82f6;
+		color: white;
+    border-color: #3b82f6;}
 
   .form-actions button.primary:hover {
     background: #2563eb;
-    border-color: #2563eb }
+    border-color: #2563eb;}
 
-  .form-actions button:disabled {
-    opacity: 0.5;
-	cursor: not-allowed }
+  .form-actions button:disabled { opacity: 0.5;
+		cursor: not-allowed;}
 
   @media (max-width: 768px) {
     .enhanced-case-form {
-      padding: 1rem }
+      padding: 1rem;}
 
     .field-row {
-      grid-template-columns: 1fr }
+      grid-template-columns: 1fr;}
 
     .form-actions {
-      flex-direction: column }
+      flex-direction: column;}
   }
 </style>

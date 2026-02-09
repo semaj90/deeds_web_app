@@ -45,9 +45,9 @@ export const POST: RequestHandler = async ({ request }) => {
  body = {};
  }
 
- const obj = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};typeof obj.recommendationId === 'string' ? obj.recommendationId : undefined;
- const rating = typeof obj.rating === 'number' ? obj.rating : undefined;
- const feedback = typeof obj.feedback === 'string' ? obj.feedback : undefined;
+ const obj = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};typeof obj.recommendationId === 'string' ? obj.recommendationId  | undefined;
+ const rating = typeof obj.rating === 'number' ? obj.rating  | undefined;
+ const feedback = typeof obj.feedback === 'string' ? obj.feedback  | undefined;
 
  if (!recommendationId || typeof rating !== 'number') {
  return json(

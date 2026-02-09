@@ -166,7 +166,7 @@ export interface OptimizerStatus {
  version: string;
 	timestamp: string;
  go_service: {
-	available: boolean; health: unknown;
+	available: boolean, health: unknown;
 	url: string };
  performance: unknown;
 	capabilities: OptimizerCapabilities;
@@ -209,7 +209,7 @@ export interface OptimizerConfig {
 	batch_size_limits: { min: number;
 	max: number; optimal: number };
  performance_targets: {
-	latency_ms: number; throughput_eps: number;
+	latency_ms: number, throughput_eps: number;
 	success_rate: number };
 }
 

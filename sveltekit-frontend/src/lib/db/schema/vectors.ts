@@ -18,7 +18,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 sql }
 from 'drizzle-orm';
 // Using standard drizzle-orm pgvector support // Document vectors table for semantic search export const documentVectors = pgTable("document_vectors", {
-id: uuid("id").primaryKey().defaultRandom(documentId, uuid("document_id").references(() => documents.id).notNull( chunkIndex: integer("chunk_index").notNull(content, text("content").notNull(, embedding: vector("embedding", {
+id: uuid("id").primaryKey().defaultRandom(documentId, uuid("document_id").references(() => documents.id).notNull( chunkIndex: integer("chunk_index").notNull(content, text("content").notNull( embedding: vector("embedding", {
 dimensions: 384 }).notNull( metadata: jsonb("metadata", createdAt: timestamp("created_at").defaultNow().notNull() },
 	(table: unknown) => ({
 embeddingIdx: index("document_vectors_embedding_idx").using("ivfflat", table.embedding.op("vector_cosine_ops", documentIdx: index("document_vectors_document_idx").on(table.documentId) }));
@@ -28,7 +28,7 @@ dimensions: 384 }).notNull( confidence: real("confidence").default(1.0, lastUpda
 	(table: unknown) => ({
 embeddingIdx: index("case_summary_vectors_embedding_idx").using("ivfflat", table.embedding.op("vector_cosine_ops")) }));
 // Evidence vectors for evidence search export const evidenceVectors = pgTable("evidence_vectors", {
-id: uuid("id").primaryKey().defaultRandom(evidenceId, uuid("evidence_id").references(() => evidence.id).notNull( chunkIndex: integer("chunk_index").notNull(content, text("content").notNull(, embedding: vector("embedding", {
+id: uuid("id").primaryKey().defaultRandom(evidenceId, uuid("evidence_id").references(() => evidence.id).notNull( chunkIndex: integer("chunk_index").notNull(content, text("content").notNull( embedding: vector("embedding", {
 dimensions: 384 }).notNull( analysisType: text("analysis_type"), // summary, entities, sentiment, classification metadata: jsonb("metadata", createdAt: timestamp("created_at").defaultNow().notNull() },
 	(table: unknown) => ({
 embeddingIdx: index("evidence_vectors_embedding_idx").using("ivfflat", table.embedding.op("vector_cosine_ops", evidenceIdx: index("evidence_vectors_evidence_idx").on(table.evidenceId) }));
@@ -38,7 +38,7 @@ dimensions: 384 }).notNull( resultCount: integer("result_count").default(0, clic
 	(table: unknown) => ({
 embeddingIdx: index("query_vectors_embedding_idx").using("ivfflat", table.embedding.op("vector_cosine_ops", userIdx: index("query_vectors_user_idx").on(table.userId) }));
 // Knowledge graph nodes for recommendation system export const knowledgeNodes = pgTable("knowledge_nodes", {
-id: uuid("id").primaryKey().defaultRandom(nodeType, text("node_type").notNull(), // case evidence, document, entity nodeId: uuid("node_id").notNull(label, text("label").notNull(, embedding: vector("embedding", {
+id: uuid("id").primaryKey().defaultRandom(nodeType, text("node_type").notNull(), // case evidence, document, entity nodeId: uuid("node_id").notNull(label, text("label").notNull( embedding: vector("embedding", {
 dimensions: 384 }).notNull( properties: jsonb("properties", createdAt: timestamp("created_at").defaultNow().notNull(updatedAt, timestamp("updated_at").defaultNow().notNull() },
 	(table: unknown) => ({
 embeddingIdx: index("knowledge_nodes_embedding_idx").using("ivfflat", table.embedding.op("vector_cosine_ops", nodeTypeIdx: index("knowledge_nodes_type_idx").on(table.nodeType) }));

@@ -85,7 +85,7 @@ describe('Svelte 5 Runes Type Safety', () => {
 			role: 'user' | 'assistant';
 			content: string;
 			citations?: Array<{
-	type: string; id: string;
+	type: string, id: string;
 	text: string }>;
 		}
 
@@ -300,7 +300,7 @@ describe('API Client Response Types', () => {
 		}
 
 		const apiResponse: ApiResponse<{
-	id: string; name: string }> = {
+	id: string, name: string }> = {
 			success: true,
 			data: {
 	id: '1', name: 'Test' }

@@ -1,6 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let label = $state<any>(undefined);
 
 /**
  * Svelte 5 Progress Component
@@ -57,7 +55,7 @@ let variantClasses = $derived({
 }[variant]);
 
 let barClasses = $derived({
-	default: colorClasses,
+	default:colorClasses,
 	nes: `${colorClasses} border-r-2 border-white`,
 	gradient: 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500'
 }[variant]);
@@ -78,7 +76,7 @@ let barClasses = $derived({
 	<div
 		class="w-full bg-slate-700 overflow-hidden {sizeClasses} {variantClasses}"
 		role="progressbar"
-		aria-valuenow={indeterminate ? undefined , value}
+		aria-valuenow={indeterminate ? undefined : value}
 		aria-valuemin={ 0 }
 		aria-valuemax={ max }
 		aria-label={label || 'Progress'}

@@ -2,7 +2,7 @@ import type { FactContradiction } from '../types.js';
 
 export interface EvidenceBoard {
 	addLink(link: {
-	from: string | undefined; to: string | undefined; color: string;
+	from: string | undefined, to: string | undefined; color: string;
 	label: string }): void;
 }
 

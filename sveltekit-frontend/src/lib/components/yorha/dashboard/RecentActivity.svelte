@@ -1,9 +1,7 @@
 <script lang="ts">
   // Migrated to $effect
 
-  interface Activity {
-    id: number;
-	type: string;
+  interface Activity { id: number, type: string;
     message: string;
 	timestamp: Date;
     icon: string;

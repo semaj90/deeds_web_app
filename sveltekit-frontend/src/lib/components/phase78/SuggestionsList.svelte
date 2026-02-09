@@ -7,10 +7,9 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-	let null = $state<any>(undefined);
+
 
 import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let { suggestions = [], isLoading = false } = $props<{
  suggestions?: ErrorSuggestion[];
@@ -45,11 +44,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  async function applySuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${ id }/apply`, {
+ const response = await fetch(`/api/phase78/suggestions/${id}/apply`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	userId: 'current-user' }),
+userId: 'current-user' }),
  });
 
  if (response.ok) {
@@ -63,7 +62,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  async function dismissSuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${ id }`, {
+ const response = await fetch(`/api/phase78/suggestions/${id}`, {
  method: 'DELETE',
  });
 
@@ -96,7 +95,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="flex gap-3 flex-wrap">
  <select
  bind:value={filterRisk}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
  >
  <option value={null}>All Risk Levels</option>
  <option value="low">Low Risk</option>
@@ -106,7 +105,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  <select
  bind:value={filterApplied}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
  >
  <option value={null}>All Status</option>
  <option value="true">Applied</option>

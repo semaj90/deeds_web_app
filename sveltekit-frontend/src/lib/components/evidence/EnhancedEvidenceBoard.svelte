@@ -1,14 +1,11 @@
 <!-- Enhanced Evidence Board with AI Integration + NES-Yorha Hybrid + N64 Gaming UI Connects to Ollama legal model: CUDA services, and MinIO storage Features: Retro gaming aesthetics, advanced AI analysis, real-time collaboration --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { goto } from '$app/navigation';
  import  FabricEvidenceCanvas  from "../canvas/FabricEvidenceCanvas.svelte"; // Types interface EvidenceItem { id: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	filename: string; type: 'document' | 'image' | 'video' | 'audio' | 'other'; uploadedAt: string;
-	status: 'uploading' | 'processing' | 'ready' | 'error'; size: number;
-	mimeType: string; aiAnalysis?: { summary?: string; confidence?: number; relevantLaws?: string[]; suggestedTags?: string[]; prosecutionScore?: number; legalRelevance?: string; keyFindings?: string[]; recommendations?: string[]; storage?: { bucket?: string; key?: string; url?: string}; unifiedInsights?: unknown}; position { x: number;
-	y: number }; previewUrl?: string}
+	filename: string, type: 'document' | 'image' | 'video' | 'audio' | 'other'; uploadedAt: string;
+	status: 'uploading' | 'processing' | 'ready' | 'error', size: number;
+	mimeType: string; aiAnalysis?: { summary?: string; confidence?: number; relevantLaws?: string[]; suggestedTags?: string[]; prosecutionScore?: number; legalRelevance?: string; keyFindings?: string[]; recommendations?: string[]; storage?: { bucket?: string; key?: string; url?: string}; unifiedInsights?: unknown}; position { x: number; y: number }; previewUrl?: string}
 
-interface SearchSuggestion { text: string;
-	type: 'case' | 'law' | 'evidence' | 'precedent'; confidence: number;
+interface SearchSuggestion { text: string, type: 'case' | 'law' | 'evidence' | 'precedent'; confidence: number;
 	source: string; reasoning?: string}
 
   // State management using Svelte, 5 runes let evidenceItems = $state<EvidenceItem[]>([]);
@@ -42,7 +39,7 @@ interface SearchSuggestion { text: string;
       } catch (e) { // ignore console.warn('startup error', e)}
     })()}); // Service health checks async function checkServiceStatus(): Promise<any> { try { // Check Ollama connection (send a small health payload) const ollamaResponse = await fetch('/api/v1/evidence/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	evidenceId: 'health-check', filename: 'test.txt', content: 'health check', type: 'document'
+evidenceId: 'health-check', filename: 'test.txt', content: 'health check', type: 'document'
         }) }); ollamaConnected = ollamaResponse.status !== 500; // Check MinIO connection try { const minioResponse = await fetch('/api/v1/storage/health'); minioConnected = minioResponse.ok} catch (error) { console.warn('MinIO health check failed:', error); minioConnected = false}
       console.log('Service status - Ollama:', ollamaConnected ? 'âœ…': 'âŒ'); console.log('Service status - MinIO:', minioConnected ? 'âœ…': 'âŒ')} catch (error) { console.warn('Service health check failed:', error); ollamaConnected = false}
   }
@@ -86,24 +83,23 @@ interface SearchSuggestion { text: string;
    const position = { x: e.clientX - rect.left; y: e.clientY - rect.top }; await uploadFiles(files, position)}
 
   // File upload with AI processing async function uploadFiles(files: File[], position { x: number, y: number }): Promise<any> { isUploading = true; processingStatus = 'processing'; for (const file of files) { try { const evidenceId = crypto.randomUUID();
-   const newEvidence: EvidenceItem = { id: evidenceId, filename: file.name, type: detectFileType(file.type): new Date().toISOString(), status: 'uploading', size: file.size, mimeType: file.type position { x: position.x + evidenceItems.length * 20; y: position.y + evidenceItems.length * 20 }
+   const newEvidence: EvidenceItem = { id: evidenceId, filename: file.name, type: detectFileType(file.type): new Date().toISOString(), status: 'uploading', size: file.size, mimeType: file.type position { x: position.x + evidenceItems.length * 20, y: position.y + evidenceItems.length * 20 }
         }; if (file.type.startsWith('image/')) { (newEvidence as unknown).previewUrl = URL.createObjectURL(file)}
         evidenceItems = [...evidenceItems, newEvidence];
    const formData = new FormData(); formData.append('file', file); formData.append('position', JSON.stringify(newEvidence.position)); formData.append('bucket', currentBucket); formData.append('useMinIO', uploadToMinIO.toString()); if (uploadToMinIO) { try { const keyCandidate = `${(window as unknown).__CURRENT_USER_ID__ || 'anon'}/${file.name}`;
    const signedResp = await fetch('/api/v1/storage/signed-url', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	key: keyCandidate, bucket: currentBucket }) }); if (signedResp.ok) { const signedJson = await signedResp.json();
+key: keyCandidate, bucket: currentBucket }) }); if (signedResp.ok) { const signedJson = await signedResp.json();
    const uploadUrl = signedJson.url;
    const namespacedKey = signedJson.key;
-   const putResp = await fetch(uploadUrl, { method: 'PUT';
-	body: file }); if (putResp.ok) { // update item safely evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), storage: {
+   const putResp = await fetch(uploadUrl, { method: 'PUT'; body: file }); if (putResp.ok) { // update item safely evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || {}), storage: {
 	bucket: signedJson.bucket || currentBucket, key: namespacedKey;
 	url: signedJson.url }
                         } }: item ); toastMessage = `Uploaded ${file.name} â†’ ${signedJson.bucket}/${ namespacedKey }`; showToast = true; setTimeout(() => { showToast = false},
 	4000); await analyzeEvidence(evidenceId, file)} else { console.error('Direct PUT failed:', await putResp.text()); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'error' }: item )}
             } else { // fallback to server upload console.warn('Signed URL request failed, falling back to server upload');
    const uploadResp = await fetch('/api/v1/storage/upload', { method: 'POST', credentials: 'include';
-	body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), storage: {
+body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item as unknown).aiAnalysis || {}), storage: {
 	bucket: uploadJson.bucket, key: uploadJson.key;
 	url: uploadJson.url } }
                       }: item ); await analyzeEvidence(evidenceId, file)} else { evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'error' }: item )}
@@ -115,7 +111,7 @@ interface SearchSuggestion { text: string;
 
   // AI analysis of evidence async function analyzeEvidence(evidenceId: string, file: File): Promise<any> { try { let content = ''; if (file.type.startsWith('text/')) { content = await file.text()} else if (file.type === 'application/pdf') { content = `PDF document: ${file.name}`}
       const response = await fetch('/api/v1/evidence/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ evidenceId, filename: file.name, content: content.substring(0, 2000); type: detectFileType(file.type) }) }); if (response.ok) { const analysisResult = await response.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'ready', aiAnalysis: analysisResult.data?.analysis ?? analysisResult.data || 0% }: item )} else { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, status: 'error' }: item))}
+	body: JSON.stringify({ evidenceId, filename: file.name, content: content.substring(0, 2000); type: detectFileType(file.type) }) }); if (response.ok) { const analysisResult = await response.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'ready', aiAnalysis: analysisResult.data?.analysis ?? analysisResult.data || {} }: item )} else { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, status: 'error' }: item))}
     } catch (error) { console.error('AI analysis failed:', error); evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, status: 'error' }: item))}
     filterEvidence()}
 
@@ -149,7 +145,7 @@ interface SearchSuggestion { text: string;
     }; return icons[status]}
   function getScoreColor(score: number): string { if (score >= 0.8) return 'text-green-600 bg-green-100'; if (score >= 0.6) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
 
-  // Real-time updates (simulate with timer) function startRealTimeUpdates() { setInterval(() => { evidenceItems = evidenceItems.map(item => { if (item.status === 'processing' && Math.random() > 0.8) { return { ...item, status: 'ready', aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), summary: `AI analysis complete for ${(item as unknown).filename}`, confidence: Math.random() * 0.4 + 0.6, relevantLaws: ['Sample Law 1', 'Sample Law 2'], suggestedTags: ['evidence', 'legal'], prosecutionScore: Math.random() * 0.5 + 0.5, legalRelevance: 'High - Contains relevant legal information', keyFindings: ['Key finding 1', 'Key finding 2']; recommendations: ['Recommendation 1', 'Recommendation 2'] }
+  // Real-time updates (simulate with timer) function startRealTimeUpdates() { setInterval(() => { evidenceItems = evidenceItems.map(item => { if (item.status === 'processing' && Math.random() > 0.8) { return { ...item, status: 'ready', aiAnalysis: { ...((item as unknown).aiAnalysis || {}), summary: `AI analysis complete for ${(item as unknown).filename}`, confidence: Math.random() * 0.4 + 0.6, relevantLaws: ['Sample Law 1', 'Sample Law 2'], suggestedTags: ['evidence', 'legal'], prosecutionScore: Math.random() * 0.5 + 0.5, legalRelevance: 'High - Contains relevant legal information', keyFindings: ['Key finding 1', 'Key finding 2']; recommendations: ['Recommendation 1', 'Recommendation 2'] }
           } as EvidenceItem}
         return item})},
 	5000)}
@@ -162,11 +158,11 @@ interface SearchSuggestion { text: string;
 	parameters: {
 	similarityThreshold: 0.7, strategyType: 'comprehensive', correlationConfidence: 0.6, includeVisualization true },
 	context: {
-	caseType: 'commercial', urgency: 'medium'
+caseType: 'commercial', urgency: 'medium'
           } }) }); if (response.ok) { const analysis = await response.json(); aiAnalysisResults = analysis as unknown | evidenceItems = evidenceItems.map(item => { const id = item.id,
    const correlations = ((analysis as unknown).correlationAnalysis?.correlations ?? []).filter( (c: unknown) => c.evidenceA === id || c.evidenceB === id );
    const vectorGroup = ((analysis as unknown).vectorAnalysis?.similarityGroups ?? []).find( (g: unknown) => Array.isArray(g.evidenceIds) && g.evidenceIds.includes(id) );
-   const recs = ((analysis as unknown).unifiedInsights?.recommendations ?? []).filter((r: unknown) => String(r.action || '') .toLowerCase() .includes(((item as unknown).filename || '').toLowerCase()) ); return { ...item, aiAnalysis: { ...((item as unknown).aiAnalysis || 0%), unifiedInsights: { correlations, vectorGroup, strategicImportance: (analysis as unknown).strategyAnalysis?.primaryStrategy; recommendations: recs }
+   const recs = ((analysis as unknown).unifiedInsights?.recommendations ?? []).filter((r: unknown) => String(r.action || '') .toLowerCase() .includes(((item as unknown).filename || '').toLowerCase()) ); return { ...item, aiAnalysis: { ...((item as unknown).aiAnalysis || {}), unifiedInsights: { correlations, vectorGroup, strategicImportance: (analysis as unknown).strategyAnalysis?.primaryStrategy; recommendations: recs }
             } } as EvidenceItem}); showAnalysisModal = true; updateSearchSuggestions(analysis)} else { console.error('Advanced analysis failed'); alert('Advanced analysis failed. Please try again.')}
     } catch (error) { console.error('Advanced analysis error:', error); alert('Analysis error occurred. Please check your connection and try again.')} finally { isAnalyzing = false}
   }
@@ -183,19 +179,19 @@ interface SearchSuggestion { text: string;
   function handleEvidenceSelect(evidenceId: string | null) { if (evidenceId) { if (!selectedEvidence.includes(evidenceId)) { selectedEvidence = [...selectedEvidence, evidenceId]}
     } }
   function handleCanvasDropZone(data: {
-	x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 0) { uploadFiles(data.files, { x: data.x, y: data.y })} else { console.log('Canvas drop zone clicked at:', data)}
+x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 0) { uploadFiles(data.files, { x: data.x, y: data.y })} else { console.log('Canvas drop zone clicked at:', data)}
   } </script>
  <svelte:head> <title>ðŸŽ® Evidence Board - NESÃ—YoRHaÃ—N64 Legal AI</title>
  <link href="https, //unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" /> </svelte:head>
  <div class="nes-yorha-evidence-board min-h-screen bg-gradient-to-br from-nier-bg-primary via-nier-bg-secondary"
   class:retro-terminal={ retroTerminalMode }; class:particle-effects={ particleEffects } >
-  <!-- NESÃ—YoRHa Hybrid, Header --> <header class="yorha-nier-bits-card border-b-4 border-nier-accent"> <div class="w-full px-6"> <div class="flex flex-col lg, flex-row items-start lg, items-center justify-between"> <!-- Title Section with Gaming, Elements --> <div class="flex flex-col lg, flex-row items-start lg, items-center"> <div class="flex items-center"> <div class="nes-avatar"> <div class="flex items-center justify-center w-16 h-16 bg-nier-accent rounded">âš–ï¸</div> </div>
+  <!-- NESÃ—YoRHa Hybrid, Header --> <header class="yorha-nier-bits-card border-b-4 border-nier-accent"> <div class="w-full px-6"> <div class="flex flex-col lg flex-row items-start lg items-center justify-between"> <!-- Title Section with Gaming, Elements --> <div class="flex flex-col lg flex-row items-start lg items-center"> <div class="flex items-center"> <div class="nes-avatar"> <div class="flex items-center justify-center w-16 h-16 bg-nier-accent rounded">âš–ï¸</div> </div>
  <div> <h1 class="text-4xl font-bold nes-text is-primary">Evidence Board</h1>
  <p class="text-nier-text-secondary">NESÃ—YoRHaÃ—N64 Legal AI Assistant</p> </div> </div>
- <!-- System Status with NES, Badges --> <div class="flex flex-wrap"> <span class="nes-badge {ollamaConnected ? 'is-success', 'is-error'}"> ðŸ¤– {ollamaConnected ? 'AI Online': 'AI Offline'} </span>
- <span class="nes-badge {minioConnected ? 'is-success', 'is-error'}"> ðŸ“¦ {minioConnected ? 'MinIO Ready': 'Storage Offline'} </span>
- <span class="nes-badge {cudaConnected ? 'is-success', 'is-warning'}"> âš¡ {cudaConnected ? 'CUDA Active': 'CPU Mode'} </span> </div> </div>
- <!-- Gaming Controls & Stats --> <div class="flex flex-col lg, flex-row items-start lg, items-center"> <!-- Evidence Stats with N64, Style --> <div class="flex"> <div class="n64-stat-nier-bits-card bg-gradient-to-br from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all"
+ <!-- System Status with NES, Badges --> <div class="flex flex-wrap"> <span class="nes-badge {ollamaConnected ? 'is-success' : 'is-error'}"> ðŸ¤– {ollamaConnected ? 'AI Online': 'AI Offline'} </span>
+ <span class="nes-badge {minioConnected ? 'is-success' : 'is-error'}"> ðŸ“¦ {minioConnected ? 'MinIO Ready': 'Storage Offline'} </span>
+ <span class="nes-badge {cudaConnected ? 'is-success' : 'is-warning'}"> âš¡ {cudaConnected ? 'CUDA Active': 'CPU Mode'} </span> </div> </div>
+ <!-- Gaming Controls & Stats --> <div class="flex flex-col lg flex-row items-start lg items-center"> <!-- Evidence Stats with N64, Style --> <div class="flex"> <div class="n64-stat-nier-bits-card bg-gradient-to-br from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all"
             > <div class="text-xs">Total</div>
  <div class="text-xl">{ totalEvidence }</div> </div>
  <div class="n64-stat-nier-bits-card bg-gradient-to-br from-yellow-500 to-orange-600 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105"
@@ -205,15 +201,15 @@ interface SearchSuggestion { text: string;
             > <div class="text-xs">Ready</div>
  <div class="text-xl">{ readyCount }</div> </div> </div>
  <!-- Gaming: Mode, Toggle --> <div class="flex items-center"> <button type="button"
-              class="nes-btn {gamingMode ? 'is-success', ''}"
+              class="nes-btn {gamingMode ? 'is-success' : ''}"
               onclick={() => (gamingMode = !gamingMode)} title="Toggle Gaming Mode"
             > ðŸŽ® Gaming </button>
  <button type="button"
-              class="nes-btn {retroTerminalMode ? 'is-primary', ''}"
+              class="nes-btn {retroTerminalMode ? 'is-primary' : ''}"
               onclick={() => (retroTerminalMode = !retroTerminalMode)} title="Toggle Terminal Mode"
             > ðŸ’» Terminal </button> </div> </div> </div> </div> </header>
  <div class="w-full px-4"> <!-- Gaming-Style Search & Control Panel --> <div class="nes-container with-title is-rounded mb-6 relative"> <p class="title">ðŸ” AI-Powered Evidence Search & Control</p>
- <div class="grid grid-cols-1 md:grid-cols-2, lg:grid-cols-5 xl, grid-cols-6 gap-4"> <!-- Enhanced Search, Input --> <div class="lg, col-span-2"> <label for="search-input" class="nes-text is-primary text-sm mb-2">Search Query</label>
+ <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 xl grid-cols-6 gap-4"> <!-- Enhanced Search, Input --> <div class="lg col-span-2"> <label for="search-input" class="nes-text is-primary text-sm mb-2">Search Query</label>
  <div class="nes-field"> <input type="text"
               class="nes-input"
               id="search-input"
@@ -250,9 +246,9 @@ interface SearchSuggestion { text: string;
  <!-- Gaming, Options --> <div class="flex flex-col"> <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind:checked={ particleEffects } /> <span class="nes-text">âœ¨ Particle Effects</span> </label>
  <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind:checked={ spatialAudio } /> <span class="nes-text">ðŸ”Š Spatial Audio</span> </label> </div>
  <!-- Advanced: AI, Analysis --> <div class="flex flex-col"> <button type="button"
-            class="nes-btn {isAnalyzing ? 'is-disabled', 'is-primary'}"
-            onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 ?? isAnalyzing} >
-  {#if isAnalyzing} ðŸ”„ Analyzing... {:else} ðŸ§  AI Analysis ({selectedEvidence.length}) {/if}
+            class="nes-btn {isAnalyzing ? 'is-disabled' : 'is-primary'}"
+            onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 || isAnalyzing} >
+  {#if isAnalyzing} 🔄 Analyzing... {:else} 🧠 AI Analysis ({selectedEvidence.length}) {/if}
   </button>
   {#if selectedEvidence.length > 0} <div class="nes-text text-xs"> {selectedEvidence.length} items selected {/if}
   </div> </div> </div>
@@ -288,7 +284,7 @@ interface SearchSuggestion { text: string;
  <p class="nes-text">gemma3-legal model online</p> {/if} {#if minioConnected} <div class="nes-container is-primary p-4 inline-block"> <p class="nes-text">ðŸ“¦ MinIO Storage Ready</p>
  <p class="nes-text">Bucket: { currentBucket }</p> {/if} {/if} {/if}
   <!-- Fabric.js Evidence, Canvas --> <div class="evidence-canvas-container"> <FabricEvidenceCanvas width={ 1200 } height={ 600 } evidenceItems={ filteredEvidence } onEvidenceMove={ handleEvidenceMove } onEvidenceSelect={ handleEvidenceSelect } onDropZone={ handleCanvasDropZone } /> </div>
- <!-- Gaming-Style Evidence Cards (Alternative Grid: View) --> <div class="grid grid-cols-1 md:grid-cols-2, lg: grid-cols-4, xl, grid-cols-5"
+ <!-- Gaming-Style Evidence Cards (Alternative Grid: View) --> <div class="grid grid-cols-1 md:grid-cols-2 lg: grid-cols-4 xl grid-cols-5"
           style="display: none;"
         >
   {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-nier-bits-card" {selectedEvidence.includes(evidence.id) ? 'is-success': 'with-title'} relative" class:n64-glow={gamingMode && selectedEvidence.includes(evidence.id)} class:yorha-selected={selectedEvidence.includes(evidence.id)} >
@@ -341,48 +337,53 @@ interface SearchSuggestion { text: string;
  <div class="flex justify-end"> <button class="nes-btn" onclick={ cancelDelete }>Cancel</button>
  <button class="nes-btn" onclick={ confirmDelete }>Delete</button> </div> </div> {/if}
   <style>
-  .animate-spin { animation: spin 1s linear infinite}
+  .animate-spin { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
   .evidence-thumb { width: 40px;
-	height: 40px; object-fit: cover;
-	display: block}
+		height: 40px; object-fit: cover;
+	display: block;}
   .evidence-canvas-container { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px;
-	padding: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.1); border: 2px solid rgba(59, 130, 246, 0.2); position: relative;
-	overflow: hidden}
+	padding: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.1), border: 2px solid rgba(59, 130, 246, 0.2); position: relative;
+	overflow: hidden;}
   .evidence-canvas-container: before { content: '';
-	position: absolute; top: 0;
-	left: 0; right: 0;
-	height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981); border-radius: 12px 12px 0 0}
+		position: absolute; top: 0;
+	left: 0;
+		right: 0;
+	height: 4px;
+		background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981); border-radius: 12px 12px 0 0;}
 
   /* Gaming mode enhancements */
-  :global(.retro-glow) .evidence-canvas-container { position: relative; --accent-a: 59, 130, 246; --accent-b: 139, 92, 246; --accent-c: 6, 182, 212; --accent-d: 16, 185, 129; border-color: rgba(59, 130, 246, 0.9); box-shadow: 0 0 4px 2px rgba(59, 130, 246, 0.35), 0 0 18px 4px rgba(139, 92, 246, 0.3), 0 0 34px 6px rgba(6, 182, 212, 0.25), 0 0 52px 10px rgba(16, 185, 129, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 0 6px 2px rgba(139, 92, 246, 0.25); animation: canvasGlow 3.4s ease-in-out infinite alternate; transition:box-shadow 350ms ease, border-color 350ms ease, transform 400ms; will-change: box-shadow, transform}
+  :global(.retro-glow) .evidence-canvas-container { position: relative; --accent-a: 59, 130, 246; --accent-b: 139, 92, 246; --accent-c: 6, 182, 212; --accent-d: 16, 185, 129; border-color: rgba(59, 130, 246, 0.9); box-shadow: 0 0 4px 2px rgba(59, 130, 246, 0.35), 0 0 18px 4px rgba(139, 92, 246, 0.3), 0 0 34px 6px rgba(6, 182, 212, 0.25), 0 0 52px 10px rgba(16, 185, 129, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 0 6px 2px rgba(139, 92, 246, 0.25), animation: canvasGlow 3.4s ease-in-out infinite alternate; transition:box-shadow 350ms ease, border-color 350ms ease, transform 400ms; will-change: box-shadow, transform;}
 
   :global(.retro-glow) .evidence-canvas-container: after, :global(.retro-glow) .evidence-canvas-container: before { content: ''; pointer-events: none;
-	position: absolute; inset: 0; border-radius: 10px}
+	position: absolute;
+		inset: 0; border-radius: 10px;}
 
   :global(.retro-glow) .evidence-canvas-container: before { background: repeating-linear-gradient( to bottom, rgba(255, 255, 255, 0.04) 0px, rgba(255, 255, 255, 0.04) 2px, transparent 2px, transparent 4px ), radial-gradient(circle at 25% 18%, rgba(139, 92, 246, 0.18), transparent 65%), radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.18), transparent 70%); mix-blend-mode: overlay;
-	opacity: 0.55; animation: scanDrift 9s linear infinite}
+	opacity: 0.55;
+		animation: scanDrift 9s linear infinite;}
 
-  :global(.retro-glow) .evidence-canvas-container: after { background: linear-gradient(145deg, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.12), rgba(6, 182, 212, 0.1)), repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0 2px, rgba(0, 0, 0, 0.05) 2px 4px); filter: brightness(1.05) saturate(1.15); mix-blend-mode: soft-light;
-	opacity: 0.75; animation: hueShift 12s ease-in-out infinite}
+  :global(.retro-glow) .evidence-canvas-container: after { background: linear-gradient(145deg, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.12), rgba(6, 182, 212, 0.1)), repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0 2px, rgba(0, 0, 0, 0.05) 2px 4px), filter: brightness(1.05) saturate(1.15); mix-blend-mode: soft-light;
+	opacity: 0.75;
+		animation: hueShift 12s ease-in-out infinite;}
 
   :global(.retro-glow .n64-depth) .evidence-canvas-container { transform: translateZ(0) scale(1.012)}
   :global(.retro-glow .n64-depth:hover) .evidence-canvas-container { transform: translateY(-4px) scale(1.02); box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.35), 0 0 8px 2px rgba(59, 130, 246, 0.55), 0 0 26px 10px rgba(139, 92, 246, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.18)}
 
-  :global(.yorha-glow) .evidence-canvas-container { outline: 2px solid rgba(6, 182, 212, 0.8); animation: canvasGlow 2.1s ease-in-out infinite alternate, pulseRing 1.8s ease-in-out infinite}
+  :global(.yorha-glow) .evidence-canvas-container { outline: 2px solid rgba(6, 182, 212, 0.8), animation: canvasGlow 2.1s ease-in-out infinite alternate, pulseRing 1.8s ease-in-out infinite;}
 
-  :global(.retro-terminal.retro-glow) .evidence-canvas-container { box-shadow: 0 0 0 1px rgba(0, 255, 120, 0.4), 0 0 12px 2px rgba(0, 255, 120, 0.25), inset 0 0 8px rgba(0, 255, 120, 0.2); animation: none;
+  :global(.retro-terminal.retro-glow) .evidence-canvas-container { box-shadow: 0 0 0 1px rgba(0, 255, 120, 0.4), 0 0 12px 2px rgba(0, 255, 120, 0.25), inset 0 0 8px rgba(0, 255, 120, 0.2), animation: none;
 	filter: contrast(1.05) saturate(0.85)}
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.retro-glow) .evidence-canvas-container, :global(.retro-glow) .evidence-canvas-container: before, :global(.retro-glow) .evidence-canvas-container: after { animation: none !important}
+    :global(.retro-glow) .evidence-canvas-container, :global(.retro-glow) .evidence-canvas-container: before, :global(.retro-glow) .evidence-canvas-container: after { animation: none !important;}
   }
   @keyframes scanDrift { 0% { transform: translateY(0);
-	opacity: 0.55} 50% { transform: translateY(-6px);
-	opacity: 0.42} 100% { transform: translateY(0);
-	opacity: 0.55} }
+		opacity: 0.55;} 50% { transform: translateY(-6px);
+		opacity: 0.42;} 100% { transform: translateY(0);
+		opacity: 0.55;} }
   @keyframes hueShift { 0% { filter: brightness(1.05) saturate(1.15) hue-rotate(0deg)} 50% { filter: brightness(1.1) saturate(1.25) hue-rotate(25deg)} 100% { filter: brightness(1.05) saturate(1.15) hue-rotate(0deg)} }
-  @keyframes pulseRing { 0% { outline-offset: 0 } 100% { outline-offset: 4px} }
+  @keyframes pulseRing { 0% { outline-offset: 0;} 100% { outline-offset: 4px;} }
   @keyframes canvasGlow { 0% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.2)} 100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), 0 0 60px rgba(139, 92, 246, 0.3)} }
 </style>
 

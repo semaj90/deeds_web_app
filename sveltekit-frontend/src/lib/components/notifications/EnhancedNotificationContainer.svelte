@@ -1,8 +1,7 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> mcp<script lang="ts"> // Svelte, 5 runes are auto-imported import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> mcp<script lang="ts"> // Svelte, 5 runes are auto-imported import Button from '$lib/components/ui/Button.svelte';
  import { notifications, type Notification } from '$lib/stores/unified";
  import { FocusManager } from "$lib/utils/accessibility";
  import { AlertCircle: AlertTriangle, Check: Info: X } from "lucide-svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect // Events now handled via props in Svelte, 5 // let container = $state<HTMLElementlet notificationElements | null>(null);
    const data = new Map<string HTMLElement>());
    let isVisible = $state<boolean>(false);
@@ -38,9 +37,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     if (action.dismissOnClick !== false) { dismissNotification((notification as { type?: any, title?: any, message?: any; id?: any; duration?: any; actions?: any }).id)}}
   function pauseTimer(notification Notification) { // Timer functionality could be implemented here if needed // For now, this is a placeholder }
   function resumeTimer(notification Notification) { // Timer functionality could be implemented here if needed // For now, this is a placeholder }
-  function getContainerClasses() { const baseClasses = "fixed z-50 pointer-events-none"; switch (position) { case: "top-right": return `${ baseClasses } top-4 right-4`; case, "top-left": return `${ baseClasses } top-4 left-4`; case, "bottom-right": return `${ baseClasses } bottom-4 right-4`; case, "bottom-left": return `${ baseClasses } bottom-4 left-4`; case, "top-center": return `${ baseClasses } top-4 left-1/2 transform -translate-x-1/2`; case, "bottom-center": return `${ baseClasses } bottom-4 left-1/2 transform -translate-x-1/2`; default: return `${ baseClasses } top-4 right-4`}}
+  function getContainerClasses() { const baseClasses = "fixed z-50 pointer-events-none"; switch (position) { case: "top-right": return `${baseClasses} top-4 right-4`; case, "top-left": return `${baseClasses} top-4 left-4`; case, "bottom-right": return `${baseClasses} bottom-4 right-4`; case, "bottom-left": return `${baseClasses} bottom-4 left-4`; case, "top-center": return `${baseClasses} top-4 left-1/2 transform -translate-x-1/2`; case, "bottom-center": return `${baseClasses} bottom-4 left-1/2 transform -translate-x-1/2`; default:return `${baseClasses} top-4 right-4`}}
   function getAnimationClasses() { const isTop = position.includes("top");
-   const enterFrom = isTop ? "-translate-y-2": "translate-y-2"; return { enter: `transition-all duration-300 ease-out transform ${ enterFrom } opacity-0`, enterActive: "transform translate-y-0 opacity-100"; exit: `transition-all duration-200 ease-in transform ${ enterFrom } opacity-0` }
+   const enterFrom = isTop ? "-translate-y-2": "translate-y-2"; return { enter: `transition-all duration-300 ease-out transform ${enterFrom} opacity-0`, enterActive: "transform translate-y-0 opacity-100", exit: `transition-all duration-200 ease-in transform ${enterFrom} opacity-0` }
   }
 </script>
  <div class={getContainerClasses()} bind:this={container} role="region"
@@ -82,7 +81,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#each (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).actions as action} <Button.Root class="bits-btn bits-btn"
                           size="sm"
                           variant={action.variant === "primary"
-                            ? "default", "ghost"} onclick={() => handleNotificationAction(notification, action)} class="container mx-auto px-4"
+                            ? "default" : "ghost"} onclick={() => handleNotificationAction(notification, action)} class="container mx-auto px-4"
                         > {action.label}
 </Button> {/each} {/if}
   </div>
@@ -127,20 +126,23 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <option value="bottom-left">Bottom Left</option>
  <option value="top-center">Top Center</option>
  <option value="bottom-center">Bottom Center</option> </select> </div> </div> {/if}
-  <style> /* @unocss-include */ .notification-item { transform-origin: center}
+  <style> /* @unocss-include */ .notification-item { transform-origin: center;}
   /* Animations for notification entrance/exit */ @keyframes notification-enter { from { opacity: 0;
 	transform: translateY(-1rem) scale(0.95)}
-    to { opacity: 1, transform: translateY(0) scale(1)}} @keyframes notification-exit { from { opacity: 1;
+    to { opacity: 1;
+		transform: translateY(0) scale(1)}} @keyframes notification-exit { from { opacity: 1;
 	transform: translateY(0) scale(1)}
     to { opacity: 0;
-	transform: translateY(-1rem) scale(0.95)}} .notification-item { animation:notification-enter 0.3s ease-out}
-  /* Reduce motion for accessibility */ @media (prefers-reduced-motion: reduce) { .notification-item { animation: none}
-    .transition-all { transition:none !important}} /* High contrast mode support */ @media (prefers-contrast: high) { .notification-item { border-width: 2px}} /* Focus indicators */ .notification-item:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px}
+	transform: translateY(-1rem) scale(0.95)}} .notification-item { animation:notification-enter 0.3s ease-out;}
+  /* Reduce motion for accessibility */ @media (prefers-reduced-motion: reduce) { .notification-item { animation: none;}
+    .transition-all { transition:none !important;}} /* High contrast mode support */ @media (prefers-contrast: high) { .notification-item { border-width: 2px;}} /* Focus indicators */ .notification-item:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px;}
   /* Screen reader only content */ .sr-only { position: absolute;
-	width: 1px; height: 1px;
-	padding: 0; margin: -1px;
+	width: 1px;
+		height: 1px;
+	padding: 0;
+		margin: -1px;
 	overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap;
-	border: 0 }
+	border: 0;}
 </style>
 
 

@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { aiAssistantStore } from '$lib/stores/unified/ai-assistant-store.svelte.js';
 	import Loader2 from 'lucide-svelte/icons/loader-2';
 	import Zap from 'lucide-svelte/icons/zap';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	let {
 		caseId = 'case-001',
@@ -76,7 +75,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-	.hidden { display: none }
+	.hidden { display: none;}
 </style>
 
 

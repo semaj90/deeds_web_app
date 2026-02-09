@@ -14,7 +14,6 @@ import path from 'path';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const metaEnv = import.meta.env;
 type EvidenceType = InferInsertModel<typeof evidence>['evidenceType'];
@@ -183,7 +182,7 @@ export const actions: Actions = {
         .map((t) => t.toString())
         .filter(Boolean);
 
-      // 2) Optional: verify case exists if provided
+      // 2) Optional:verify case exists if provided
       if (caseId) {
         const caseRecord = await db.select().from(cases).where(eq(cases.id, caseId)).limit(1);
         if (!caseRecord || caseRecord.length === 0) {
@@ -297,8 +296,7 @@ export const actions: Actions = {
           };
           break;
         }
-        default:
-          tempMetadata = { ...tempMetadata, kind: (evidenceType as MetadataKind) ?? 'UNKNOWN' };
+        default:tempMetadata = { ...tempMetadata, kind: (evidenceType as MetadataKind) ?? 'UNKNOWN' };
       }
 
       // 9) Final metadata composition

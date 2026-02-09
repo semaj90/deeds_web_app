@@ -3,14 +3,14 @@ Workflow Progress Component
 Visual progress indicator for the Evidence Chain of Custody workflow
 -->
 <script lang="ts">
-  interface Props {
-    progress: number;
-	stage: string;
+  interface Props { progress: number, stage: string;
     stageName: string;
   }
   let { progress, stage, stageName }: Props = $props();
   import Progress from "$lib/components/ui/progress/Progress.svelte";
-  import { AlertCircle, CheckCircle, Clock } from 'lucide-svelte';
+  import AlertCircle from 'lucide-svelte/icons/alert-circle';
+  import CheckCircle from 'lucide-svelte/icons/check-circle';
+  import Clock from 'lucide-svelte/icons/clock';
   // Define workflow stages
   const workflowStages = [
     { id: 'idle', name: 'Idle', description: 'Waiting to start' },
@@ -58,8 +58,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
         return Clock;
       case 'pending':
         return AlertCircle;
-      default:
-        return Clock;
+      default:return Clock;
     }
   }
   function getStageColor(status: 'completed' | 'current' | 'pending'): string {
@@ -70,8 +69,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
         return 'text-blue-600 bg-blue-100 border-blue-200';
       case 'pending':
         return 'text-gray-400 bg-gray-50 border-gray-200';
-      default:
-        return 'text-gray-400 bg-gray-50 border-gray-200';
+      default:return 'text-gray-400 bg-gray-50 border-gray-200';
     }
   }
   function getConnectorColor(fromStage: string, toStage: string, currentStage: string): string {
@@ -238,13 +236,11 @@ Visual progress indicator for the Evidence Chain of Custody workflow
     animation: fadeInUp 0.5s ease-out;
   }
   @keyframes fadeInUp {
-    from {
-      opacity: 0;
-	transform: translateY(20px);
+    from { opacity: 0;
+		transform: translateY(20px);
     }
-    to {
-      opacity: 1;
-	transform: translateY(0);
+    to { opacity: 1;
+		transform: translateY(0);
     }
   }
   /* Smooth transitions for progress elements */

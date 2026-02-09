@@ -555,7 +555,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {/if}
  </div>
  {#if aiSystemStatus}
- <div class="mt-4 grid grid-cols-2 md, grid-cols-4 gap-4 text-sm">
+ <div class="mt-4 grid grid-cols-2 md grid-cols-4 gap-4 text-sm">
  <div class="bg-purple-50 p-3 rounded">
  <div class="font-medium">NAS Engine</div>
  <div class="text-purple-600">{aiSystemStatus.component_status?.nas_engine ? 'Active' : 'Inactive'}</div>
@@ -640,7 +640,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {#if fileMetadata}
  <section class="bg-white rounded-lg shadow p-4">
  <h2 class="text-xl font-semibold mb-4">Document Analysis</h2>
- <div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-4">
+ <div class="grid grid-cols-1 md grid-cols-2 gap-4 mb-4">
  <div>
  <span class="font-medium">Filename:</span> {fileMetadata.filename}
  </div>
@@ -690,7 +690,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  type="text"
  bind:value={searchQuery}
  placeholder="Search for evidence, keywords, or ask questions..."
- class="w-full p-3 border border-gray-300 rounded-lg focus: ring-2, focus: ring-blue-500, focus, border-transparent"
+ class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus border-transparent"
  />
  {#if isSearching}
  <div class="absolute right-3 top-3">

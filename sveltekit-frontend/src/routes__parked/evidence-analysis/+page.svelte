@@ -9,7 +9,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
  // Svelte, 5 runes are auto-imported
  import EvidenceAnalysisDashboard from '$lib/components/dashboard/EvidenceAnalysisDashboard.svelte';
- import { Button } from '$lib/components/ui/enhanced-bits';
+ import Button from '$lib/components/ui/Button.svelte';
  import WebGPUEvidenceGraphVisualization from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization.svelte';
  import * as Card from 'bits-ui/components/card';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

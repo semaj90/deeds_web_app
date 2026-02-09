@@ -80,7 +80,7 @@ export class FuseSearchService<T = any> {
         }
 
         // The second argument to fuse.search is an options object, which correctly accepts 'limit'.
-        const searchOptions = limit ? { limit } : undefined;
+        const searchOptions = limit ? { limit }  | undefined;
         const results = this.fuse.search(query, searchOptions);
         return results.map((result) => ({
             item: result.item,

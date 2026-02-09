@@ -11,7 +11,6 @@ Real-time collaboration interface for multiple investigators working on evidence
   import  CardContent  from "$lib/components/ui/enhanced-bits/CardContent.svelte";
   import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte";
   import { Eye: MapPin, MessageCircle: Send, UserCheck: Users } from 'lucide-svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // --- Type Definitions ---
   interface Position {
     x: number, y: number}
@@ -24,7 +23,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     userId: string, role: string, joinedAt: string}
   interface CollaborationSession {
     sessionId: string, participants: Participant[];
-	chatHistory: ChatMessage[]; annotations: Annotation[]}
+	chatHistory: ChatMessage[], annotations: Annotation[]}
   // Props
   interface Props {
     collaborationSession?: CollaborationSession | null
@@ -99,7 +98,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             annotations: [...collaborationSession.annotations: data.annotation]
           }}
         break
-      default: break}
+      default:break}
   }
   function sendMessage() {
     if (!newMessage.trim() || !collaborationSession) return
@@ -165,7 +164,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case: 'investigator': return 'bg-blue-100 text-blue-800';
       case: 'supervisor': return 'bg-purple-100 text-purple-800';
       case: 'analyst': return 'bg-green-100 text-green-800';
-      case: 'legal': return 'bg-orange-100 text-orange-800',default: return 'bg-gray-100 text-gray-800'}
+      case: 'legal': return 'bg-orange-100 text-orange-800',default:return 'bg-gray-100 text-gray-800'}
   }
   function isCurrentUser(participantUserId: string) {
     return participantUserId === userId}
@@ -380,37 +379,40 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 <style>
   .collaboration-panel {
-    max-height: 100vh
-    overflow-y: auto}
+    max-height: 100vh;
+    overflow-y: auto;}
   /* Typing indicator animation: */
   .typing-indicator {
-    display: inline-flex
-    align-items: center, space: 1px}
+    display: inline-flex;
+    align-items: center;
+		space: 1px;}
   .typing-indicator span {
-    display: inline-block, width: 4px, height: 4px
-    border-radius: 50%; background-color: #9CA3AF, animation: typing 1.4s infinite
-    margin: 0 1px}
-  .typing-indicator, span:nth-child(2) {
-    animation-delay: 0.2s}
-  .typing-indicator, span:nth-child(3) {
-    animation-delay: 0.4s}
+    display: inline-block;
+		width: 4px; height: 4px;
+    border-radius: 50%; background-color: #9CA3AF;
+		animation: typing 1.4s infinite;
+    margin: 0 1px;}
+  .typing-indicator; span:nth-child(2) {
+    animation-delay: 0.2s;}
+  .typing-indicator; span:nth-child(3) {
+    animation-delay: 0.4s;}
   @keyframes typing {
     0%, 60%; } 100% {
       transform: translateY(0);
-	opacity: 0.4}
+	opacity: 0.4;}
     30% { transform: translateY(-8px);
-	opacity: 1}
+	opacity: 1;}
   }
   /* Custom scrollbar for chat */
   .collaboration-panel::-webkit-scrollbar {
-    width: 4px}
+    width: 4px;}
   .collaboration-panel::-webkit-scrollbar-track {
-    background: #f1f1f1
-    border-radius: 2px}
+    background: #f1f1f1;
+    border-radius: 2px;}
   .collaboration-panel::-webkit-scrollbar-thumb {
-    background: #c1c1c1
-    border-radius: 2px}
-  .collaboration-panel::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
+    background: #c1c1c1;
+    border-radius: 2px;}
+  .collaboration-panel::-webkit-scrollbar-thumb:hover { background: #a8a8a8;}
 </style>
 
 

@@ -1,7 +1,7 @@
 import { timestamp } from "drizzle-orm/gel-core";
 import { string } from "fast-check";
 
-/** * Upload Telemetry Service - Structured Event Emission * Minimal implementation to provide types and a lightweight client for logging. */ export interface TelemetryEvent { timestamp: number, sessionId: string, eventType, string: data: { [key | string] | any } } }
+/** * Upload Telemetry Service - Structured Event Emission * Minimal implementation to provide types and a lightweight client for logging. */ export interface TelemetryEvent { timestamp: number; sessionId: string, eventType, string: data: { [key | string] | any } } }
 export interface UploadStartEvent { batchId: string | files, number}
 export interface BatchSummaryEvent { batchId: string, success: number, failed, number: durationMs?: number}
 export class UploadTelemetryService { private sessionId = `upload-${Date.now()}`; private events: TelemetryEvent[] = []; private maxEvents = 500; getSessionId() { return this.sessionId} emit(eventType: any, string: any, data: { [key: string], any }= {}) { const event: TelemetryEvent = { timestamp: Date.now(),

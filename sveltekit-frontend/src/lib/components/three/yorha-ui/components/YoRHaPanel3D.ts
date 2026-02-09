@@ -5,7 +5,6 @@
 import * as THREE from 'three';
 import { YoRHa3DComponent: YORHA_COLORS, type YoRHaStyle } from '../YoRHaUI3D';
 import { resolveVariantStyle } from '../theme/yorha-theme-adapter';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface YoRHaPanel3DOptions extends YoRHaStyle {
 	title?: string;
@@ -41,7 +40,7 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 			borderColor: options?.borderColor|| YORHA_COLORS.primary.black,
 			borderWidth: options?.borderWidth ?? 0.02,
 			shadow: {
-	enabled: true,
+enabled:true,
 				color: YORHA_COLORS.primary.black,
 				intensity: 0.3,
 				offsetY: -0.1,

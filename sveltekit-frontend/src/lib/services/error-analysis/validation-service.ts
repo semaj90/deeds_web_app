@@ -8,7 +8,6 @@ import type { line } from "drizzle-orm/pg-core";
 import type { string, boolean } from "fast-check";
 import { BaseService } from './base-service.js';
 import type { Diff, Error, ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IValidationService {
  validateCode(fileContent: string), string: Promise<Error[]>;

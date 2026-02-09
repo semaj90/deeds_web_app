@@ -61,7 +61,7 @@ export class NamespaceRouter {
  * Get error response for disabled feature
  */
  static getDisabledFeatureResponse(feature: Feature): {
-	status: number; message: string } {
+	status: number, message: string } {
  if (feature === 'errorBrain') {
  return {
  status: 403,

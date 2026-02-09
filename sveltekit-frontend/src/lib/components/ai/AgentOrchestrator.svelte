@@ -1,14 +1,17 @@
 
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <!-- Agent Orchestrator Component Manages AutoGen and CrewAI multi-agent, workflows --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { writable } from 'svelte/store';
- import { Button } from "$lib/components/ui/button";
- import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
- import Badge from "$lib/components/ui/badge/Badge.svelte";
+ import Button from '$lib/components/ui/Button.svelte';
+ import Card from '$lib/components/ui/card/Card.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import Badge from "$lib/components/ui/badge/Badge.svelte";
  import { Input } from "$lib/components/ui/input";
  import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
  import { mcpGPUOrchestrator } from '$lib/services/mcp-gpu-orchestrator';
- import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '$lib/components/ui/select/index.ts';
- import Users from 'lucide-svelte/icons/users';
+ import * as Select from "bits-ui/components/select";
+import Users from 'lucide-svelte/icons/users';
  import Brain from 'lucide-svelte/icons/brain';
  import Database from 'lucide-svelte/icons/database';
  import Play from 'lucide-svelte/icons/play';
@@ -30,7 +33,6 @@
  import { crewAIService, analyzeLegalCaseWithCrew, analyzeContractWithCrew } from '$lib/services/crewai-service.js';
  import type { AutoGenConversation, AutoGenMessage } from '$lib/services/autogen-service.js';
  import type { CrewExecution, CrewTaskResult } from '$lib/services/crewai-service.js'; interface Props { defaultWorkflow?: string; showAdvancedControls?: boolean; autoStartServices?: boolean}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { defaultWorkflow = 'case_analysis', showAdvancedControls = true, autoStartServices = true }: Props = $props(); // Component state let selectedWorkflow = $state(defaultWorkflow);
    let isLoading = $state<boolean>(false);
@@ -103,14 +105,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     } isProcessing = false; lastUpdate = 'Execution cancelled'}
   function clearResults() { conversationMessages = []; executionResults = []; activeConversation = null; activeExecution = null; executionProgress = 0; lastUpdate = ''}
   function formatDuration(ms: number): string { const seconds = Math.floor(ms / 1000);
-   const minutes = Math.floor(seconds / 60); if (minutes > 0) { return `${ minutes }m ${seconds % 60}s`}
-    return `${ seconds }s`}
+   const minutes = Math.floor(seconds / 60); if (minutes > 0) { return `${minutes}m ${seconds % 60}s`}
+    return `${seconds}s`}
   function downloadResults() { const results = selectedProvider === 'autogen'
       ? conversationMessages: executionResult;
  const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json'
     });
    const url = URL.createObjectURL(blob);
-   const a = document.createElement('a'); a.href = url; a.download = `${ selectedWorkflow }_${ selectedProvider }_results.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
+   const a = document.createElement('a'); a.href = url; a.download = `${ selectedWorkflow }_${selectedProvider}_results.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
   function getWorkflowIcon(workflowId: string) { return workflows.find(w => w.id === workflowId)?.icon ?? Activity}
   function getServiceStatusColor(status: boolean) { return status ? 'text-green-500': 'text-red-500'}
 </script>
@@ -126,7 +128,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   onclick={(_event: MouseEvent) => checkServiceStatus} >
 <RefreshCw class="h-4" /> </Button> </div> </div>
  <!-- Workflow, Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Settings class="h-5" /> Workflow Configuration </h3> </div>
- <main> <div class="grid grid-cols-1 md, grid-cols-2"> <div> <span id="label-workflow" class="block text-sm font-medium">Workflow Type</span>
+ <main> <div class="grid grid-cols-1 md grid-cols-2"> <div> <span id="label-workflow" class="block text-sm font-medium">Workflow Type</span>
  <Select aria-labelledby="label-workflow" bind:value={ selectedWorkflow }> <SelectTrigger id="workflow-select" aria-labelledby="label-workflow"> <SelectValue placeholder="Select, workflow..." /> </SelectTrigger>
  <SelectContent>
   {#each Array.isArray(workflows) ? workflows: [] as workflow} <SelectItem value={workflow.id}> <div class="flex items-center"> <workflow.icon class="h-4" /> {workflow.name}
@@ -149,7 +151,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Textarea id="orchestrator-input"; bind:value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
           rows={ 4 } class="w-full"
         /> </div>
- <div class="flex"> <Button class="bits-btn" onclick={(_event: MouseEvent) => executeWorkflow} disabled={isProcessing ?? !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"
+ <div class="flex"> <Button class="bits-btn" onclick={(_event: MouseEvent) => executeWorkflow} disabled={isProcessing || !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"
         >
   {#if isProcessing} <Pause class="h-4 w-4" /> Processing... {:else} <Play class="h-4 w-4" /> Execute Workflow {/if}
   </Button>
@@ -195,7 +197,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div> </div> {/if}
   <!-- Workflow, Templates -->
   {#if showAdvancedControls} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <FileText class="h-5" /> Quick Start Templates </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2"> <Button variant="ghost"
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-2"> <Button variant="ghost"
             class="h-auto p-4 justify-start bits-btn bits-btn bits-btn"
             onclick={(_event: MouseEvent) => ) => {
               selectedWorkflow = 'case_analysis'; selectedProvider = 'autogen'; inputText = 'John Smith was accused of embezzling $50,000 from his employer over a 6-month period. Evidence includes suspicious bank transfers, altered financial records, and witness testimony from colleagues who noticed unusual behavior.'}} >

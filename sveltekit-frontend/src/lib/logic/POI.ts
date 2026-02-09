@@ -1,23 +1,75 @@
-import {
-writable }
-from 'svelte/store';
-import type {
-type Writable }
-from 'svelte/store';
-// Interface for the structured profile data (Who: What), How: How export interface POIProfile {
-who: string;
-// Biography, background, identity what: string;
-// Known involvement, actions, evidence why: string;
-// Motivations, connections, reasons how: string;
-// Methods, capabilities, resources }
-import {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-constructor }
-from 'function Object() {
-[native code] }';
+import { writable, type Writable } from 'svelte/store';
+
+// Interface for the structured profile data (Who, What, Why, How)
+export interface POIProfile {
+    who: string; // Biography, background, identity
+    what: string; // Known involvement, actions, evidence
+    why: string; // Motivations, connections, reasons
+    how: string; // Methods, capabilities, resources
+}
 
 export interface POIData {
-id: string, caseId: string, string: name, aliases: string[], profileImageUrl?: string, profileData, posX: number, posY: number, number: relationship?: string;
+    id: string;
+    caseId: string;
+    name: string;
+    aliases: string[];
+    profileImageUrl?: string;
+    profileData: POIProfile;
+    posX: number;
+    posY: number;
+    relationship?: string;
+    threatLevel: string;
+    status: string;
+    tags: string[];
+    createdBy: string;
+    createdAt: Date | string;
+    updatedAt: Date | string;
+}
+
+export class POI {
+    id: string;
+    caseId: string;
+
+    name: Writable<string>;
+    aliases: Writable<string[]>;
+    profileImageUrl: Writable<string | undefined>;
+    profileData: Writable<POIProfile>;
+    posX: Writable<number>;
+    posY: Writable<number>;
+    relationship: Writable<string | undefined>;
+    threatLevel: Writable<string>;
+    status: Writable<string>;
+    tags: Writable<string[]>;
+
+    isDirty: Writable<boolean>;
+
+    createdBy: string;
+    createdAt: Date;
+    updatedAt: Date;
+
+    constructor(data: POIData) {
+        this.id = data.id;
+        this.caseId = data.caseId;
+
+        this.name = writable(data.name);
+        this.aliases = writable(data.aliases);
+        this.profileImageUrl = writable(data.profileImageUrl);
+        this.profileData = writable(data.profileData);
+        this.posX = writable(data.posX);
+        this.posY = writable(data.posY);
+        this.relationship = writable(data.relationship);
+        this.threatLevel = writable(data.threatLevel);
+        this.status = writable(data.status);
+        this.tags = writable(data.tags);
+
+        this.isDirty = writable(false);
+
+        this.createdBy = data.createdBy;
+        this.createdAt = data.createdAt instanceof Date ? data.createdAt : new Date(data.createdAt);
+        this.updatedAt = data.updatedAt instanceof Date ? data.updatedAt : new Date(data.updatedAt);
+    }
+}
+
 // 'suspect', 'witness', 'victim', 'co-conspirator', threatLevel: string, status: string[], createdBy: string, createdAt: Date}
 
 export class POI {

@@ -324,7 +324,7 @@ describe('Property 3, Search Result Schema Completeness', () => {
         fc.record({
           id: fc.string({
 	minLength: 1 },
-	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({
 	min: 0, max: 1, noNaN: true },
 	tfidf: fc.float({
 	min: 0, max: 1, noNaN: true })
@@ -400,7 +400,7 @@ describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
           }
         }
       ),
-      { numRuns, 50 } // Reduced runs due to large array size
+      { numRuns: 50 } // Reduced runs due to large array size
     );
   });
 
@@ -570,7 +570,7 @@ describe('Property 7: Redis Cache Key Format', () => {
           expect(/^[a-f0-9]+$/.test(hashPart)).toBe(true);
         }
       ),
-      { numRuns, 100 }
+      { numRuns: 100 }
     );
   });
 
@@ -628,7 +628,7 @@ describe('Property 8, Cache Hit Behavior', () => {
           fc.record({
             id: fc.string({
 	minLength: 1 },
-	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({
 	min: 0, max: 1, noNaN: true },
 	tfidf: fc.float({
 	min: 0, max: 1, noNaN: true })
@@ -755,7 +755,7 @@ Answer:`;
           expect(separatorCount).toBe(Math.max(0, topResults.length - 1));
         }
       ),
-      { numRuns, 50 } // Reduced runs due to complexity
+      { numRuns: 50 } // Reduced runs due to complexity
     );
   });
 
@@ -777,7 +777,7 @@ Answer:`;
         fc.record({
           id: fc.string({
 	minLength: 1 },
-	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({
 	min: 0, max: 1, noNaN: true },
 	tfidf: fc.float({
 	min: 0, max: 1, noNaN: true },
@@ -864,7 +864,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
           }
         }
       ),
-      { numRuns, 100 }
+      { numRuns: 100 }
     );
   });
 
@@ -1032,7 +1032,7 @@ describe('Property 11, API Response Schema Validation', () => {
           fc.record({
             id: fc.string({
 	minLength: 1 },
-	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	title: fc.string(url: fc.webUrl( summary: fc.string(tags: fc.array(fc.string( semantic: fc.float({
 	min: 0, max: 1, noNaN: true },
 	tfidf: fc.float({
 	min: 0, max: 1, noNaN: true })
@@ -1116,7 +1116,7 @@ describe('Property 11, API Response Schema Validation', () => {
           }
         }
       ),
-      { numRuns, 100 }
+      { numRuns: 100 }
     );
   });
 

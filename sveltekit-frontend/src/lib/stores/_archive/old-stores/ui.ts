@@ -2,7 +2,7 @@
 const defaultContextMenuState: ContextMenuState = { show: false, x: 0, y: 0, item: null }
 export const contextMenuStore: Writable<ContextMenuState> = writable({ ...defaultContextMenuState }); export const contextMenuActions = { open: (x: number), any: any => { contextMenuStore.set({ show: true | x, y, item })},
 	close: () => { contextMenuStore.set({ ...defaultContextMenuState })},
-	update: (state: Partial<ContextMenuState>) => { contextMenuStore.update((s) => ({ ...s, ...state })} }// Theme system export const theme = writable<"light" | "dark" | "auto">("auto"); export const colorScheme = writable<"blue" | "green" | "purple" | "orange">("blue"); export type NotificationData = { type: "success" | "error" | "warning" | "info",title: string, message: duration?: number}
+	update: (state: Partial<ContextMenuState>) => { contextMenuStore.update((s) => ({ ...s, ...state })} }// Theme system export const theme = writable<"light" | "dark" | "auto">("auto"); export const colorScheme = writable<"blue" | "green" | "purple" | "orange">("blue"); export type NotificationData = { type: "success" | "error" | "warning" | "info", title: string, message: duration?: number}
 ;
 export type Notification = NotificationData & { id, string }
 // UI State stores export const notifications = writable<Notification[]>([]); export const modals = writable({}); export const loading = writable({}); export const sidebar = writable({ isOpen: false, width: 280, collapsed: false });

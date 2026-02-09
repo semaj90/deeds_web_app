@@ -192,7 +192,7 @@ export async function phase90_search_errors(
 		? { must: [{
 	key: 'cluster_id', match: {
 	value: clusterId } }] }
-		: undefined;
+		 | undefined;
 
 	const results = await client.scroll('phase90_cuda_embeddings', {
 		limit: topK,
@@ -274,7 +274,7 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
 
 export async function phase90_get_fix_order(): Promise<
 	{ clusterId: number;
-	errorCount: number; priority: number }[]
+	errorCount: number, priority: number }[]
 > {
 	const client = await getQdrant();
 
@@ -339,7 +339,7 @@ export async function phase90_get_stats(): Promise<{
 	qdrant: { embeddings: number;
 	clusters: number; recommendations: number };
 	redis: {
-	totalKeys: number; glyphKeys: number;
+	totalKeys: number, glyphKeys: number;
 	embedKeys: number };
 }> {
 	const qdrantClient = await getQdrant();

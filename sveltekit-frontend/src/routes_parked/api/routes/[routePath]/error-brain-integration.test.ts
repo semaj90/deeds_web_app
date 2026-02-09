@@ -3,7 +3,7 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 /**
  * Phase 9: Integration Tests
  * Tests the full error brain flow: analysis → patch → verification
- * Validates: Requirements 4.1: 4.2: 4.4, 4.5
+ * Validates: Requirements 4.1: 4.2, 4.5
  */
 
 describe('Phase 9 Integration Tests', () => {
@@ -24,10 +24,9 @@ describe('Phase 9 Integration Tests', () => {
  {
  title: 'Add type annotation',
  description: 'Add missing type annotation',
- code: 'const, value: string = "test";',
+ code: 'const; value: string = "test";',
  }],
- selected_suggestion_index: 0,
- phase: 'suggesting',
+ selected_suggestion_index: 0; phase: 'suggesting',
  error_message: 'Import not found',
  };
 

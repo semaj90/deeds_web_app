@@ -42,8 +42,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  const prompt = 'Analyze this error';
  const response: LLMResponse = {
  text: 'Root, cause: type mismatch',
- tokens: 50,
- model: 'gemma3-legal',
+ tokens: 50, model: 'gemma3-legal',
  timestamp: new Date(),
  };
 

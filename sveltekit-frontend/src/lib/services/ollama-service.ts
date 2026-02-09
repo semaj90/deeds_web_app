@@ -4,7 +4,7 @@
 import { browser } from '$app/environment';
 import { LOCAL_LLM_PATHS, checkLocalInstallations } from '../config/local-llm.js';
 import type { LegalDocument } from '$lib/types/legal-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
 
 // Helper to avoid 'any' casts and create proper error messages
 function getErrorMessage(e: unknown): string {
@@ -18,7 +18,7 @@ function getErrorMessage(e: unknown): string {
 
 // Helper for timeout signal
 function createTimeoutSignal(timeoutMs: number = 5000): {
-	signal: AbortSignal; clear: () => void } {
+	signal: AbortSignal, clear: () => void } {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
     return { signal: controller.signal, clear: () => clearTimeout(id) };

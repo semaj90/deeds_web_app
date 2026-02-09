@@ -1,12 +1,16 @@
 <!-- Multi-LLM Orchestration Component Provides UI for managing multiple AI workers and orchestrating parallel, processing --> <script lang="ts">
-import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { derived, writable } from 'svelte/store'; import  Badge  from "$lib/components/ui/Badge.svelte"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Progress  from "$lib/components/ui/progress/Progress.svelte"; import { Play: Pause, Square: RefreshCw, Settings: Cpu, Brain: Zap, Database: Globe, Activity: Clock, CheckCircle: AlertCircle: X
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { derived, writable } from 'svelte/store'; import Badge from '$lib/components/ui/Badge.svelte';
+import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import  Progress  from "$lib/components/ui/progress/Progress.svelte"; import { Play: Pause, Square: RefreshCw, Settings: Cpu, Brain: Zap, Database: Globe, Activity: Clock, CheckCircle: AlertCircle: X
   } from 'lucide-svelte'; import { aiWorkerManager } from '$lib/services/ai-worker-manager.js'; import type { AITask, AIResponse, WorkerStatus, ProcessingMetrics, WorkerPool } from '$lib/types/ai-worker.js'; interface Props { autoStart?: boolean; showMetrics?: boolean; maxConcurrentTasks?: number; enabledProviders?: string[]}
-  let { autoStart = true, showMetrics = true, maxConcurrentTasks = 3, enabledProviders = ['ollama', 'autogen', 'crewai'] }: { autoStart = true, showMetrics = true, maxConcurrentTasks = 3, enabledProviders = ['ollama', 'autogen', 'crewai']: any } = $props(); // Component state let isInitialized = $state<boolean>(false); let isProcessing = $state<boolean>(false); let workerStatus = $state<WorkerStatus | null>(null); let workerPool = $state<WorkerPool | null>(null); let processingMetrics = $state<ProcessingMetrics[]>([]); let activeTasks = $state<Map<string AITask>('')>(new Map()); let completedTasks = $state<Map<string AIResponse>('')>(new Map()); let taskErrors = $state<Map<string Error>('')>(new Map()); // UI state let selectedTask = $state<string | null>(null); let showSettings = $state<boolean>(false); let statusRefreshInterval: number | null = null; // Provider configurations let providerConfigs = $state([ { id: 'ollama', name: 'Ollama', icon Cpu endpoint: 'http://localhost:11434', enabled: true, status: 'unknown', models: ['gemma3-legal', 'llama3:8b-instruct', 'nomic-embed-text']},
+  let { autoStart = true, showMetrics = true, maxConcurrentTasks = 3, enabledProviders = ['ollama', 'autogen', 'crewai'] }: { autoStart = true, showMetrics = true, maxConcurrentTasks = 3, enabledProviders = ['ollama', 'autogen', 'crewai']: any } = $props(); // Component state let isInitialized = $state<boolean>(false); let isProcessing = $state<boolean>(false); let workerStatus = $state<WorkerStatus | null>(null); let workerPool = $state<WorkerPool | null>(null); let processingMetrics = $state<ProcessingMetrics[]>([]); let activeTasks = $state<Map<string AITask>('')>(new Map()); let completedTasks = $state<Map<string AIResponse>('')>(new Map()); let taskErrors = $state<Map<string Error>('')>(new Map()); // UI state let selectedTask = $state<string | null>(null); let showSettings = $state<boolean>(false); let statusRefreshInterval: number | null = null; // Provider configurations let providerConfigs = $state([ { id: 'ollama', name: 'Ollama', icon Cpu endpoint: 'http://localhost:11434', enabled:true, status: 'unknown', models: ['gemma3-legal', 'llama3, 8b-instruct', 'nomic-embed-text']},
 	{
-      id: 'autogen', name: 'AutoGen', icon Brain endpoint: 'http://localhost:8001', enabled: true, status: 'unknown', models: ['autogen-agents']},
+      id: 'autogen', name: 'AutoGen', icon Brain endpoint: 'http://localhost:8001', enabled:true, status: 'unknown', models: ['autogen-agents']},
 	{
-      id: 'crewai', name: 'CrewAI', icon Database endpoint: 'http://localhost:8002', enabled: true, status: 'unknown', models: ['crewai-agents']}
+      id: 'crewai', name: 'CrewAI', icon Database endpoint: 'http://localhost:8002', enabled:true, status: 'unknown', models: ['crewai-agents']}
   ]); // Derived stores let totalTasks = $derived(activeTasks.size + completedTasks.size + taskErrors.size) let successRate = $derived(totalTasks > 0 ? Math.round((completedTasks.size / totalTasks) * 100): 0); let averageResponseTime = $derived(processingMetrics.length === 0 ? 0: Math.round(processingMetrics.reduce((sum, m) => sum + (m.processingTime || 0), 0) / processingMetrics.length) ); $effect(() => { (async () => { if (autoStart) { await initializeOrchestrator()}
 
     // Set up event handlers aiWorkerManager.onTaskComplete = handleTaskComplet; aiWorkerManager.onTaskError = handleTaskError; aiWorkerManager.onStatusUpdate = handleStatusUpdat; // Start status monitoring startStatusMonitoring()})()}); // TODO: Add as cleanup in $effect: return () => { if (statusRefreshInterval) { clearInterval(statusRefreshInterval)}
@@ -22,15 +26,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   function handleTaskError(taskId: string, error: Error) { activeTasks.delete(taskId); taskErrors.set(taskId, error); // Trigger reactivity activeTasks = new Map(activeTasks); taskErrors = new Map(taskErrors)}
   function handleStatusUpdate(status: WorkerStatus) { workerStatus = statu}
   async function submitTestTask(providerId: string): Promise<any> { const testTask: AITask = { taskId: crypto.randomUUID(), type: 'generate', providerId, model: providerConfigs.find(p => p.id === providerId)?.models[0] ?? 'default', prompt: 'Hello! Please respond with a brief test message to verify the connection.', timestamp: Date.now(), priority: 'medium', temperature: 0.1, maxTokens: 50 }
-    try { activeTasks.set(testTask.taskId, testTask); activeTasks = new Map(activeTasks); await aiWorkerManager.submitTask(testTask); console.log(`Test task submitted to ${ providerId }`)} catch (error) { console.error(`Failed to submit test task to ${ providerId }:`, error); activeTasks.delete(testTask.taskId); taskErrors.set(testTask.taskId, error as Error)}
+    try { activeTasks.set(testTask.taskId, testTask); activeTasks = new Map(activeTasks); await aiWorkerManager.submitTask(testTask); console.log(`Test task submitted to ${providerId}`)} catch (error) { console.error(`Failed to submit test task to ${providerId}:`, error); activeTasks.delete(testTask.taskId); taskErrors.set(testTask.taskId, error as Error)}
   }
   async function cancelTask(taskId: string): Promise<any> { try { await aiWorkerManager.cancelTask(taskId); activeTasks.delete(taskId); activeTasks = new Map(activeTasks)} catch (error) { console.error('Failed to cancel task:', error)}
   }
   async function clearCompletedTasks(): Promise<any> { completedTasks.clear(); taskErrors.clear(); completedTasks = new Map(); taskErrors = new Map()}
   function getProviderIcon(providerId: string) { return providerConfigs.find(p => p.id === providerId)?.icon ?? Glob}
-  function getStatusColor(status: string) { switch (status) { case: 'online': return 'text-green-500'; case, 'offline': return 'text-red-500'; case, 'unknown': return 'text-gray-400',default: return 'text-gray-400'}
+  function getStatusColor(status: string) { switch (status) { case: 'online': return 'text-green-500'; case, 'offline': return 'text-red-500'; case, 'unknown': return 'text-gray-400',default:return 'text-gray-400'}
   }
-  function formatDuration(ms: number): string { if (ms < 1000) return `${ ms }ms`; if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`; return `${(ms / 60000).toFixed(1)}m`}
+  function formatDuration(ms: number): string { if (ms < 1000) return `${ms}ms`; if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`; return `${(ms / 60000).toFixed(1)}m`}
 </script>
  <div class="w-full"> <!-- Header --> <div class="flex items-center"> <div> <h2 class="text-2xl font-bold text-gray-900"> Multi-LLM Orchestrator </h2>
  <p class="text-gray-600"> Manage and monitor multiple AI processing workers </p> </div>
@@ -46,7 +50,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if !isInitialized} <Button.Root class="bits-btn bits-btn" onclick={ initializeOrchestrator } disabled={ isProcessing }> <Play class="h-4 w-4" /> Initialize {/if}
   </div> </div>
  <!-- Status, Overview -->
-  {#if isInitialized && workerStatus} <div class="grid grid-cols-1 md, grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-gray-600">Active Tasks</p>
+  {#if isInitialized && workerStatus} <div class="grid grid-cols-1 md grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-gray-600">Active Tasks</p>
  <p class="text-2xl">{workerStatus.activeRequests}
 </p> </div>
  <Activity class="h-8 w-8" /> </div> </div> </div>
@@ -62,10 +66,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </p> </div>
  <Zap class="h-8 w-8" /> </div> </div> </div> {/if}
   <!-- Provider, Status --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Database class="h-5" /> AI Providers </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4">
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-4">
   {#each Array.isArray(providerConfigs) ? providerConfigs: [] as provider} <div class="border rounded-lg p-4 hover:shadow-md"> <div class="flex items-center justify-between"> <div class="flex items-center"> <provider.icon class="h-5 w-5" /> <span class="font-medium">{provider.name}
 </span> </div>
- <Badge class="px-2 py-1 text-xs {provider.status === 'online' ? 'bg-green-100 text-green-800', 'bg-red-100 text-red-800'}"
+ <Badge class="px-2 py-1 text-xs {provider.status === 'online' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
               > {provider.status}
 </Badge> </div>
  <div class="space-y-2"> <p class="text-xs">{provider.endpoint}
@@ -110,7 +114,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> </div> {/if}
   <!-- Worker Pool, Status -->
   {#if showMetrics && workerPool} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Cpu class="h-5" /> Worker Pool Status </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <p class="text-sm text-gray-600 dark: text-gray-400">Worker Distribution</p>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-3"> <div> <p class="text-sm text-gray-600 dark: text-gray-400">Worker Distribution</p>
  <p class="text-lg">{workerPool.taskDistribution}
 </p> </div>
  <div> <p class="text-sm text-gray-600 dark: text-gray-400">Active Workers</p>

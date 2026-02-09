@@ -7,7 +7,6 @@
 
 import * as Minio from 'minio';
 import type { Readable } from 'stream';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define loose types for MinIO if missing
 type MinioClient = any;
@@ -63,8 +62,7 @@ export class MinIOStorageService {
 
 		// @ts-ignore - Suppress potential type mismatch
 		this.client = new Minio.Client({
-			endPoint: this.config.endPoint,
-			port: this.config.port,
+			endPoint: this.config.endPoint, port: this.config.port,
 			useSSL: this.config.useSSL,
 			accessKey: this.config.accessKey,
 			secretKey: this.config.secretKey,

@@ -255,7 +255,7 @@ class Logger {
                       message: error.message,
                       stack: error.stack
                   }
-                : undefined
+                 | undefined
         };
 
         if (this.config.enableConsole) {
@@ -281,7 +281,7 @@ class Logger {
                       message: error.message,
                       stack: error.stack
                   }
-                : undefined
+                 | undefined
         };
 
         if (this.config.enableConsole) {

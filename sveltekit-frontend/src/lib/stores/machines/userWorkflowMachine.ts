@@ -79,7 +79,7 @@ export interface UserWorkflowContext extends WorkflowContext {
   | { type: 'REMOVE_COLLABORATOR';
 	userId: string }
   | { type: 'ADD_NOTIFICATION';
-	notification: { type: 'info' | 'warning' | 'error' | 'success'; message: string } }
+	notification: { type: 'info' | 'warning' | 'error' | 'success', message: string } }
   | { type: 'MARK_NOTIFICATION_READ';
 	notificationId: string }
   | { type: 'CLEAR_NOTIFICATIONS' }
@@ -118,12 +118,12 @@ export const userWorkflowMachine = createMachine({
     }
   },
 	states: {
-	idle: {
-      on: {
-	LOGIN: {
-          target: 'authenticated',
+idle: {
+     on: {
+LOGIN: {
+         target: 'authenticated',
           actions: assign({
-	user: ({ event }) => event.user,
+user: ({ event }) => event.user,
             userId: ({ event }) => event.user.id
           })
         }
@@ -301,7 +301,7 @@ export const userWorkflowMachine = createMachine({
                   currentStepIndex: 0,
                   totalSteps: getWorkflowSteps(event.workflowType).length,
                   startedAt: new Date(),
-                  completedAt: undefined
+                  completedAt | undefined
                 }),
                 currentStep: 'workflow_started',
                 progress: 0,
@@ -316,8 +316,8 @@ export const userWorkflowMachine = createMachine({
                   ...context.workflow,
                   status: 'pending' as const,
                   currentStepIndex: 0,
-                  startedAt: undefined,
-                  completedAt: undefined
+                  startedAt | undefined,
+                  completedAt | undefined
                 }),
                 currentStep: 'ready',
                 progress: 0,
@@ -341,7 +341,7 @@ export const userWorkflowMachine = createMachine({
                   currentStepIndex: 0,
                   totalSteps: getWorkflowSteps(event.workflowType).length,
                   startedAt: new Date(),
-                  completedAt: undefined
+                  completedAt | undefined
                 }),
                 currentStep: 'workflow_started',
                 progress: 0,
@@ -356,8 +356,8 @@ export const userWorkflowMachine = createMachine({
                   ...context.workflow,
                   status: 'pending' as const,
                   currentStepIndex: 0,
-                  startedAt: undefined,
-                  completedAt: undefined
+                  startedAt | undefined,
+                  completedAt | undefined
                 }),
                 currentStep: 'ready',
                 progress: 0,
@@ -404,10 +404,10 @@ export const userWorkflowMachine = createMachine({
 	LOGOUT: {
 	target: 'idle',
           actions: assign({
-	user: undefined,
+	user | undefined,
             userId: '',
-            activeCase: undefined,
-            activeEvidence: undefined,
+            activeCase | undefined,
+            activeEvidence | undefined,
             workflow: {
 	type: 'case_creation' as const,
               status: 'pending' as const,

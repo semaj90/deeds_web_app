@@ -1,11 +1,10 @@
-<script module, lang="ts"> export type Role = 'suspect' | 'witness' | 'victim' | 'associate' | 'unknown'; export interface PersonDetails { age?: number; address?: string; phone?: string; occupation?: string; aliases?: string[]}
+<script module lang="ts"> export type Role = 'suspect' | 'witness' | 'victim' | 'associate' | 'unknown'; export interface PersonDetails { age?: number; address?: string; phone?: string; occupation?: string; aliases?: string[]}
   export interface Person { name: string, role: Rol, details?: PersonDetail,confidence: number, sourceContext?: string}
   export interface Relationship { person1: string, person2: string, relationship?: string;
 	confidence: number, context?: string}
 </script> <script lang="ts"> import  Badge  from "$lib/components/ui/Badge.svelte"; interface Props { person?: Perso; relationships?: Relationship[]}
   let { person = { name: 'Unknown', role: 'unknown', confidence: 0 },
-	relationships = [] }: Props = $props(); // Filter relationships for this person const personRelationships = $derived(relationships.filter( (rel) => rel.person1 === person.name || rel.person2 === person.name )); // Role styling const roleConfig = { suspect: {
-	color: 'bg-red-100 text-red-800 border-red-200', icon: 'ðŸš¨', label: 'Suspect'
+	relationships = [] }: Props = $props(); // Filter relationships for this person const personRelationships = $derived(relationships.filter( (rel) => rel.person1 === person.name || rel.person2 === person.name )); // Role styling const roleConfig = { suspect: { color: 'bg-red-100 text-red-800 border-red-200', icon: 'ðŸš¨', label: 'Suspect'
     },
 	witness: {
 	color: 'bg-blue-100 text-blue-800 border-blue-200', icon: 'ðŸ‘ï¸', label: 'Witness'
@@ -23,10 +22,10 @@
         onclick={() => (showFullDetails = !showFullDetails)} type="button"
       > {showFullDetails ? 'Less': 'More'} Info </button> <button class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"
         type="button"
-      > ðŸ•¸ï¸ Graph View </button> {#if person.role === 'suspect'} <button type="button" class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"> ðŸ“‹ Profile </button> {:else if person.role === 'witness'} <button type="button" class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"> ðŸ“ž Contact </button> {/if} </div> </div> </div> </div> <style> .max-h-32 { scrollbar-width: thi; scrollbar-color: #cbd5e0 #f7fafc}
-  .max-h-32::-webkit-scrollbar { width: 4px}
-  .max-h-32::-webkit-scrollbar-track { background: #f7fafc}
-  .max-h-32::-webkit-scrollbar-thumb { background-color: #cbd5e0; border-radius: 2px}
+      > ðŸ•¸ï¸ Graph View </button> {#if person.role === 'suspect'} <button type="button" class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"> ðŸ“‹ Profile </button> {:else if person.role === 'witness'} <button type="button" class="flex-1 text-xs bits-btn bits-btn border border-gray-300 rounded px-2 py-1"> ðŸ“ž Contact </button> {/if} </div> </div> </div> </div> <style> .max-h-32 { scrollbar-width: thi; scrollbar-color: #cbd5e0 #f7fafc;}
+  .max-h-32::-webkit-scrollbar { width: 4px;}
+  .max-h-32::-webkit-scrollbar-track { background: #f7fafc;}
+  .max-h-32::-webkit-scrollbar-thumb { background-color: #cbd5e0; border-radius: 2px;}
 </style>
 
 

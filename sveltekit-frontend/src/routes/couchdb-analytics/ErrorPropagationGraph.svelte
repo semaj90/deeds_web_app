@@ -12,9 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	let { apiBase }: Props = $props();
 
-	interface ErrorNode {
-		file_path: string;
-		error_count: number;
+	interface ErrorNode { file_path: string, error_count: number;
 		imports: string[];
 	}
 
@@ -57,12 +55,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			imports: f.imports
 		}));
 
-		const links: Array<{source: string, target: string}> = [];
+		const links: Array<{source: string, target:string}> = [];
 		errorFiles.forEach(file => {
 			file.imports.forEach(imp => {
 				// Only create link if both files have errors
 				if (errorFiles.some(f => f.file_path === imp)) {
-					links.push({ source: file.file_path, target: imp });
+					links.push({ source: file.file_path, target:imp });
 				}
 			});
 		});
@@ -283,8 +281,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-size: 1.25rem;
 	}
 
-	.description {
-		margin: 0;
+	.description { margin: 0;
 		color: #6b7280;
 		font-size: 0.875rem;
 	}
@@ -311,8 +308,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		position: relative;
 	}
 
-	.legend {
-		position: absolute;
+	.legend { position: absolute;
 		top: 10px;
 		right: 10px;
 		background: white;
@@ -331,14 +327,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		font-size: 0.75rem;
 	}
 
-	.legend-color {
-		width: 12px;
+	.legend-color { width: 12px;
 		height: 12px;
 		border-radius: 50%;
 	}
 
-	.graph-wrapper {
-		width: 100%;
+	.graph-wrapper { width: 100%;
 		height: 600px;
 		border: 2px solid #e5e7eb;
 		border-radius: 8px;
@@ -352,8 +346,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		overflow: hidden;
 	}
 
-	.panel-header {
-		background: #f9fafb;
+	.panel-header { background: #f9fafb;
 		padding: 1rem;
 		border-bottom: 2px solid #e5e7eb;
 		display: flex;
@@ -367,8 +360,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: #1f2937;
 	}
 
-	.close-btn {
-		background: none;
+	.close-btn { background: none;
 		border: none;
 		font-size: 1.25rem;
 		cursor: pointer;
@@ -409,8 +401,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		word-break: break-all;
 	}
 
-	.error-badge {
-		display: inline-block;
+	.error-badge { display: inline-block;
 		background: #dc2626;
 		color: white;
 		padding: 0.25rem 0.75rem;
@@ -423,8 +414,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		overflow-y: auto;
 	}
 
-	.import-item {
-		padding: 0.5rem;
+	.import-item { padding: 0.5rem;
 		background: #f9fafb;
 		border-radius: 4px;
 		font-size: 0.75rem;

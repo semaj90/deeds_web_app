@@ -404,7 +404,7 @@ export class CitationManagementService {
 				casesWithCitations: Number(row.cases_with_citations),
 				uniqueStatutes: Number(row.unique_statutes),
 				totalCollections: Number(row.total_collections),
-				lastCitationDate: row.last_citation_date ? new Date(row.last_citation_date) : undefined
+				lastCitationDate: row.last_citation_date ? new Date(row.last_citation_date)  | undefined
 			};
 		} catch (error) {
 			console.error('Error getting citation statistics:', error);

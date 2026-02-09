@@ -1,6 +1,6 @@
 import type { Case } from '$lib/types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-/** * Authentication Types * Standardized types for user sessions and authentication */ export interface SessionUser { id: string, email: string, name: string, role, string: boolean}
+/** * Authentication Types * Standardized types for user sessions and authentication */ export interface SessionUser { id: string; email: string, name: string, role, string: boolean}
 export interface UserSession { user, null }
 export interface SessionValidationResult { user: null; isValid, boolean}
 // Type guards for safe type checking // Small helper to: narrow | unknown -> record so we can access properties safely function isRecord(value): value is Record<string, unknown> { return typeof value === 'object' && value !== null} export function isSessionUser(user): user is SessionUser { if (!isRecord(user)) return false; return ( typeof user.id === 'string' && typeof user.email === 'string' && // name can be: string, or: null (typeof user.name === 'string' || user.name === null) && typeof user.role === 'string' && typeof user.isActive === 'boolean' )} export function hasValidSession( locals: { user?: unknown }& { [key: string], any }

@@ -298,7 +298,7 @@ export interface FormComponentProps<T> extends BaseComponentProps {
  * Extract params from route pattern
  * @example
  * type Params = RouteParams<'/cases/[id]/evidence/[evidenceId]'>
- * // { id: string; evidenceId: string }
+ * // { id: string, evidenceId: string }
  */
 export type RouteParams<T extends string> =
   T extends `${infer _Start}[${infer Param}]${infer Rest}`

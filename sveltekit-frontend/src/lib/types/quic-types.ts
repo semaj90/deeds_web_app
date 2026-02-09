@@ -66,7 +66,7 @@ export interface DocumentEmbedding {
 export interface AttentionHeatmap {
  scores: Float32Array;
 	positions: { x: number;
-	y: number; timestamp: number }[];
+	y: number, timestamp: number }[];
  timestamp: number;
 	activeRegions: AttentionRegion[];
  documentId?: string;
@@ -140,7 +140,7 @@ export interface TensorMetadata {
  legalEntities: string[];
 	context: Record<string, unknown>;
  quality: {
-	completeness: number; accuracy: number;
+	completeness: number, accuracy: number;
 	relevance: number };
 }
 export interface TileConfiguration {
@@ -190,7 +190,7 @@ export interface WebGPUContext {
  maxBufferSize: number;
  };
  memoryUsage: {
-	allocated: number; available: number;
+	allocated: number, available: number;
 	peak: number };
 }
 export interface GPUBufferInfo {
@@ -220,7 +220,7 @@ export interface LegalDocumentAnalysis {
  confidence: number;
 	citedCases: CitedCase[];
  practiceAreaClassification: {
-	primary: string; secondary: string[];
+	primary: string, secondary: string[];
 	confidence: number };
  jurisdictionAnalysis: {
 	primary: string; applicable: string[]; conflicts?: string[] };
@@ -244,7 +244,7 @@ export interface RiskFactor {
  mitigation?: string;
 	confidence: number;
  impact: {
-	financial: number; operational: number;
+	financial: number, operational: number;
 	reputational: number };
  probability: number;
 	timeframe: 'IMMEDIATE' | 'SHORT_TERM' | 'MEDIUM_TERM' | 'LONG_TERM';
@@ -323,7 +323,7 @@ export interface SystemMetrics {
 	cpu: { usage: number;
 	cores: number; frequency: number };
  memory: {
-	used: number; available: number;
+	used: number, available: number;
 	total: number; swap: number };
  gpu?: {
 	usage: number;
@@ -333,10 +333,10 @@ export interface SystemMetrics {
 	power: number;
  };
  network: {
-	latency: number; throughput: number;
+	latency: number, throughput: number;
 	packetLoss: number };
  storage: {
-	read: number; write: number;
+	read: number, write: number;
 	usage: number };
  services: {
 	redis: 'healthy' | 'degraded' | 'down';
@@ -356,7 +356,7 @@ export interface QUICConfig {
  compressionLevel: number;
 	priorityMode: 'none' | 'static' | 'dynamic';
  flowControl: {
-	initialWindow: number; maxWindow: number;
+	initialWindow: number, maxWindow: number;
 	autoTuning: boolean };
 }
 export interface WebGPUConfig {

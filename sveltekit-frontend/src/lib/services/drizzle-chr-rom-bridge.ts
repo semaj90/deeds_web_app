@@ -6,7 +6,6 @@
  * to the CHR-ROM pre-computation system for pattern generation
  */
 
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface DrizzleLegalDocument {
@@ -238,8 +237,7 @@ export class DrizzleCHRROMBridge {
         summaryAvailable: analyses.some(a => a.analysis_type === 'summary')
       },
       embeddings: embeddings.map(emb => ({
-        type: emb.embedding_type,
-        vector: emb.embedding_vector,
+        type: emb.embedding_type, vector: emb.embedding_vector,
         chunkIndex: emb.chunk_index
       })),
       similarities: similarDocs.map(sim => ({

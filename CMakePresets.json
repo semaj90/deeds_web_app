@@ -5,18 +5,18 @@
       "name": "vs2022-cuda64",
       "displayName": "Visual Studio 2022 + CUDA (x64)",
       "description": "GPU build using MSVC and CUDA on Windows 10 64-bit",
-      "generator": "Visual Studio 17 2022",
-      "architecture": "x64",
-      "binaryDir": "${sourceDir}/out/build/vs2022-cuda64",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/sveltekit-frontend/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CONFIGURATION_TYPES": "Release",
         "CMAKE_CUDA_ARCHITECTURES": "86",
         "CMAKE_CUDA_COMPILER": "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin/nvcc.exe",
         "CMAKE_CUDA_STANDARD": "17",
         "CMAKE_CUDA_FLAGS": "--use_fast_math --expt-relaxed-constexpr",
         "CMAKE_C_COMPILER": "cl.exe",
         "CMAKE_CXX_COMPILER": "cl.exe",
-        "CMAKE_GENERATOR_PLATFORM": "x64"
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     }
   ],

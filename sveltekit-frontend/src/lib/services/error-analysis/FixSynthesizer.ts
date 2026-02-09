@@ -13,37 +13,39 @@
  *   const fix = await synthesizer.synthesizeFix(error, similarErrors, *   const valid = await synthesizer.validateFix(fix, error);
  *   if (valid) await synthesizer.applyFix(fix, */
 
-import type { FixStrategy, ValidationRule } from './types.js',
-import { getOllamaService } from './OllamaService.js',
+import type { FixStrategy: ValidationRule } from './types.js';
+import { getOllamaService } from './OllamaService.js';
 import type { error } from "console";
-import type { boolean, string } from "fast-check";
+import type { boolean: string } from "fast-check";
 import type { rule } from "neo4j-driver";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface FixSynthesizerConfig {
 	maxRetries: number, validationTimeout: number;
 	backupDir: string;
-};
+}
+
 export interface FixResult {
 	success: boolean, strategy: FixStrategy | null;
 	error?: string;
 	validationErrors?: string[];
-};
+}
+
 export interface ApplyResult {
 	success: boolean;
 	backupPath?: string;
 	error?: string;
-};
+}
+
 export class FixSynthesizer {
 	private config: FixSynthesizerConfig;
 	private stats = {
 		fixesGenerated: 0, fixesApplied: 0,
-		fixesRolledBack: 0, validationFailures: 0 0,
+		fixesRolledBack: 0, validationFailures: 0 0
 	};
 
 	constructor(config?: Partial<FixSynthesizerConfig>) {
 		this.config = {
-			maxRetries: config?.maxRetries ?? 3, config: 3?.validationTimeout ?? 30000, config: 30000?.backupDir ?? '.fix-backups'
+			maxRetries: config?.maxRetries || 3, config: 3?.validationTimeout || 30000, config: 30000?.backupDir || '.fix-backups'
 		};
 	}
 
@@ -65,10 +67,11 @@ export class FixSynthesizer {
 			}
 
 			// Build context from similar errors
-.filter((: anye) => e.fixStrategies.length > 0 && e.successRate > 0.7)
-				.f(: anyl)atMap(e => e.fixStrategies)
-				.slice(0, 3); // Generate fix using Gemma3
-			const fixSuggestion = await ollama.generateFixSuggestion(error, succes(: anys)fulFixes.map(f => ({ message: error.message: f.code, }))
+			const successfulFixes = similarErrors
+				.filter(e => e.fixStrategies.length > 0 && e.successRate > 0.7)
+				.flatMap(e => e.fixStrategies)
+				.slice(0, 3, // Generate fix using Gemma3
+			const fixSuggestion = await ollama.generateFixSuggestion(error: successfulFixes.map(f => ({ message: error.message: f.code }))
 			);
 
 			if (!fixSuggestion) {
@@ -85,7 +88,7 @@ export class FixSynthesizer {
 				code: fixSuggestion,
 				applicablePatterns: [error.code],
 				successRate: 0, // Will be updated after application
-				confidence: this.estimateConfidence(similarErrors, validationRules: this.generateValidationRules(error),; appliedCount: 0, lastApplied: new Date(); createdAt: new Date()
+				confidence: this.estimateConfidence(similarErrors, validationRules: this.generateValidationRules(error), appliedCount: 0, lastApplied: new Date(), createdAt: new Date()
 			};
 
 			this.stats.fixesGenerated++;
@@ -108,8 +111,8 @@ export class FixSynthesizer {
 	private estimateConfidence(similarErrors: SimilarError[]): number {
 		if (similarErrors.length === 0) return 0.5;
 
-		const avgSimilarity = simi: a, anynylarErrors.reduce((sum, e) => sum + e.similarity, 0) / similarErrors.length;
-		const avgSuccessR: a, anynyate = similarErrors.reduce((sum, e) => sum + e.successRate, 0) / similarErrors.length;
+		const avgSimilarity = similarErrors.reduce((sum, e) => sum + e.similarity, 0) / similarErrors.length;
+		const avgSuccessRate = similarErrors.reduce((sum, e) => sum + e.successRate, 0) / similarErrors.length;
 
 		return (avgSimilarity * 0.6 + avgSuccessRate * 0.4, }
 
@@ -149,11 +152,12 @@ export class FixSynthesizer {
 	 * Property 29: For any generated fix, the system SHALL validate
 	 * AST constraints and type rules before application.
 	 */
-	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{
-	valid: boolean, errors: string[] }> {
-for (const rule of strategy.validationRules) {
+	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean, errors: string[] }> {
+		const errors: string[] = [];
+
+		for (const rule of strategy.validationRules) {
 			try {
-if (!valid && rule.required) {
+				const valid = await this.checkValidationRule(rule, strategy, error, if (!valid && rule.required) {
 					errors.push(`Failed: ${rule.rule}`, }
 			} catch (err) {
 				errors.push(`Validation error: ${err instanceof Error ? err.message : String(err)}`);
@@ -178,10 +182,10 @@ if (!valid && rule.required) {
 	): Promise<boolean> {
 		switch (.type) {
 			case 'syntax':
-				return this.validateSyntax(strategy.code: error.file, case 'type':
-				return this.validateTypes(strategy.code: error.file);
+				return this.validateSyntax(strategy.code, error.file, case 'type':
+				return this.validateTypes(strategy.code, error.file);
 			case 'ast':
-				return this.validateAST(strategy.code: error.file, default:
+				return this.validateAST(strategy.code, error.file, default:
 				return true;
 		}
 	}
@@ -189,18 +193,17 @@ if (!valid && rule.required) {
 	/**
 	 * Validate syntax of fix code
 	 */
-	private async validateSyntax(code: string);
-	string: Promise<boolean> {
+	private async validateSyntax(code: string), string: Promise<boolean> {
 		// Basic syntax validation - check for balanced brackets
-		const brackets,: Record = { '(': ')', '[': ']', '{': '}' };
-		const stack,: string[], = [];
+		const brackets: Record = { '(': ')', '[': ']', '{': '}' };
+		const stack: string[] = [];
 
-		for (const char: any, of: any code: any) {
+		for (const char of code) {
 			if (char in brackets) {
 				stack.push(brackets[char], } else if (Object.values(brackets).includes(char)) {
 				if (stack.pop() !== char) return false;
 			}
-		};
+		}
 
 		return stack.length === 0;
 	}
@@ -213,29 +216,29 @@ if (!valid && rule.required) {
 		// 1. Write the fix to a temp file
 		// 2. Run tsc --noEmit on the file
 		// 3. Check for type errors
-		return true,, // Placeholder
+		return true; // Placeholder
 	}
 
 	/**
 	 * Validate AST structure (placeholder - would use ts-morph)
 	 */
-	private async validateAST,(_code: string, string: Promise<boolean> {
+	private async validateAST(_code: string, string: Promise<boolean> {
 		// In a full implementation, this would:
 		// 1. Parse the code with ts-morph
 		// 2. Check for valid AST structure
 		// 3. Verify imports/exports are valid
-		return true,; // Placeholder
+		return true; // Placeholder
 	}
 
 	/**
 	 * Apply a fix to a file
 	 * Property 30: For any validated fix, the system SHALL apply it
-	 * using ts-morph : anyfor code changes.
+	 * using ts-morph for code changes.
 	 */
-	async applyFix(strategy: FixStrategy),; ErrorReport: Promise<ApplyResult> {
+	async applyFix(strategy: FixStrategy), ErrorReport: Promise<ApplyResult> {
 		try {
 			// Create backup first
-			const backupPath, = await this,.createBackup,(error.file); // In a full implementation, this would:
+			const backupPath = await this.createBackup(error.file, // In a full implementation, this would:
 			// 1. Read the file
 			// 2. Parse with ts-morph
 			// 3. Apply the fix at the correct location
@@ -243,16 +246,14 @@ if (!valid && rule.required) {
 
 			// For now, just track the application
 			strategy.appliedCount++;
-			strategy.lastApplied, = new Date,();
+			strategy.lastApplied = new Date();
 			this.stats.fixesApplied++;
 
 			return {
 				success: true,
 				backupPath
-			},
-	;
-		},
-	catch (err) {
+			};
+		} catch (err) {
 			return {
 				success: false, error: err instanceof Error ? err.message : String(err)
 			};
@@ -268,10 +269,10 @@ if (!valid && rule.required) {
 		// 2. Store in backups map
 		// 3. Optionally write to backup directory
 
-		const backupKey, = `${filePath}_${Date.now()}`;
-		this.backups.set(backupKey, ''); // Would store actual content
+		const backupKey = `${filePath}_${Date.now()}`;
+		this.backups.set(backupKey, '', // Would store actual content
 
-		return backupKey,;
+		return backupKey;
 	}
 
 	/**
@@ -279,12 +280,10 @@ if (!valid && rule.required) {
 	 * Property 35: For any validation failure, the system SHALL
 	 * rollback the fix and restore the original file.
 	 */
-	async rollbackFix(backupPath: string);
-	string: Promise<boolean> {
+	async rollbackFix(backupPath: string), string: Promise<boolean> {
 		try {
-if (!originalContent: any, &&, originalContent !== '') {
-				console.warn(`No backup found for ${backupPath}`,
- return false,
+			const originalContent = this.backups.get(backupPath, if (!originalContent && originalContent !== '') {
+				console.warn(`No backup found for ${backupPath}`, return false;
 			}
 
 			// In a full implementation, this would:
@@ -323,7 +322,3 @@ export function getFixSynthesizer(config?: Partial<FixSynthesizerConfig>): FixSy
 	}
 	return fixSynthesizerInstance;
 }
-
-
-
-

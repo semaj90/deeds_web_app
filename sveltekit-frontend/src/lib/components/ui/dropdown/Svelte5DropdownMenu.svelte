@@ -1,12 +1,10 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
 
 /**
  * Svelte 5 Dropdown Menu Component
  * Accessible dropdown with Svelte 5 runes
  */
 import type { Snippet } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface MenuItem {
 	id: string;
@@ -36,8 +34,10 @@ let {
 	align = 'start',
 	side = 'bottom',
 	class: className = '',
-	onselect: onOpenChange,
-	children: trigger
+	onselect,
+	onOpenChange,
+	children,
+	trigger
 }: Props = $props();
 
 let menuRef = $state<HTMLDivElement | null>(null);
@@ -165,10 +165,10 @@ $effect(() => {
 						class="w-full px-3 py-2 text-left text-sm flex items-center gap-2
 							   transition-colors duration-100
 							   {item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-							   {item.danger ? 'text-red-400 hover:bg-red-900/30' : 'text-white, hover:bg-slate-700'}
+							   {item.danger ? 'text-red-400 hover:bg-red-900/30' : 'text-white hover:bg-slate-700'}
 							   {focusedIndex === i ? 'bg-slate-700' : ''}"
 						role="menuitem"
-						tabindex={focusedIndex === i ? 0 , -1}
+						tabindex={focusedIndex === i ? 0 : -1}
 						disabled={item.disabled}
 						onclick={() => selectItem(item)}
 						onmouseenter={() => focusedIndex = i}

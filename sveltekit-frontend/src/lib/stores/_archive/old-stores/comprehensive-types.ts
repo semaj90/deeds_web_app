@@ -92,9 +92,9 @@ export type RequestHandler = (_event: RequestEvent) => Promise<Response> | Respo
 
 // SvelteKit hooks
 export type Handle = (input: {
-	event: RequestEvent; resolve: any }) => Promise<Response>;
+	event: RequestEvent, resolve: any }) => Promise<Response>;
 export type HandleError = (input: {
-	error: any; event: RequestEvent }) => any;
+	error: any, event: RequestEvent }) => any;
 export type HandleFetch = (input: {
 	event: RequestEvent;
  request: Request;
@@ -479,7 +479,7 @@ export interface MockFunction<T extends (...args, any[]) => unknown = (...args: 
  mockRestore(): this;
 	calls: Parameters<T>[];
  results: {
-	type: 'return' | 'throw'; value: any }[];
+	type: 'return' | 'throw', value: any }[];
 }
 
 // ===== ENVIRONMENT TYPES =====

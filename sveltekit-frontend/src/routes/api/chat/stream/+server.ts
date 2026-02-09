@@ -267,7 +267,7 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 							}
 						})
 						.onConflictDoUpdate({
-							target: chatMessages.id,
+							target:chatMessages.id,
 							set: { content: fullResponse, updatedAt: new Date() }
 						});
 				}

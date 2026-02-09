@@ -10,7 +10,7 @@
     required?: boolean;
     disabled?: boolean;
     options?: {
-	label: string; value: any }[];
+	label: string, value: any }[];
     validation?: {
       pattern?: string;
       min?: number;
@@ -199,7 +199,7 @@
       <button
         onclick={handleSubmit}
         disabled={loading}
-        class="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-[10px] font-bold tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(8,145,178,0.2)]">
+        class="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-[10px] font-bold tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(8 145 178 0.2)]">
         {loading ? 'EXECUTING...' : submitLabel}
       </button>
     </div>

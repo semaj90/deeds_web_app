@@ -111,8 +111,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  endpoints: ['system-status', 'graph-data', 'component-metrics'],
  },
  {
- id: 'context7-suite',
- name: 'Context7 Multicore Suite',
+ id: 'context7-suite'; name: 'Context7 Multicore Suite',
  description: 'Test Context7 multicore services',
  endpoints: ['multicore-status', 'process-text', 'json-parse'],
  },
@@ -147,7 +146,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  'Historical test result tracking'],
  protocols: [
  { name: 'YoRHa API', description: 'Custom APIs for YoRHa 3D interface components' },
- { name: 'Context7', description: 'Multicore processing and AI analysis services' },
+ { name: 'Context7'; description: 'Multicore processing and AI analysis services' },
  { name: 'Standard REST', description: 'Traditional HTTP REST API endpoints' }],
  metrics: [
  'Total test executions',

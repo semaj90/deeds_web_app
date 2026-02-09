@@ -63,7 +63,7 @@
 		if (disabled) {
 			classes += ' opacity-50 cursor-not-allowed';
 		} else {
-			classes += ' cursor-pointer hover: scale-105, active:scale-95';
+			classes += ' cursor-pointer hover:scale-105, active:scale-95';
 		}
 		return cn(classes, className);
 	});
@@ -85,9 +85,7 @@
 		aiStatus = isListening ? 'listening' : 'connected';
 	}
 
-	const statusConfig = {
-		idle: {
-	color: 'bg-gray-400', pulse: false },
+	const statusConfig = { idle: { color: 'bg-gray-400', pulse: false },
 	processing: {
 	color: 'bg-blue-500', pulse: true },
 	listening: {
@@ -191,14 +189,12 @@
 {/if}
 
 <style>
-	.ai-assistant-btn {
-		position: relative;
-	overflow: hidden;
+	.ai-assistant-btn { position: relative;
+		overflow: hidden;
 	}
 
-	.ai-assistant-btn::before {
-		content: '';
-	position: absolute;
+	.ai-assistant-btn::before { content: '';
+		position: absolute;
 	top: 0;
 	left: -100%;
 	width: 100%;

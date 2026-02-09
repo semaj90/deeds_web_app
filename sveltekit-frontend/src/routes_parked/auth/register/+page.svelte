@@ -32,7 +32,7 @@
  <form
  method="POST"
  action="?/register"
- use, enhance={({ formData, cancel }) => {
+ use enhance={({ formData, cancel }) => {
  isLoading = true
  return async ({ result }) => {
  isLoading = false
@@ -173,7 +173,7 @@
  <!-- Terms -->
  <div class="space-y-2">
  <div class="flex">
- <input type="checkbox" name="agreeToTerms" id="agreeToTerms" required, disabled={isLoading} class="mr-2" />
+ <input type="checkbox" name="agreeToTerms" id="agreeToTerms" required disabled={isLoading} class="mr-2" />
  <label for="agreeToTerms" class="text-sm"> I agree to the Terms of Service </label>
  </div>
  <div class="flex">

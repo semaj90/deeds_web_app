@@ -1,9 +1,7 @@
 <script lang="ts">
 	// Migrated to $effect
 
-	interface Suggestion {
-		id: string;
-routePath: string;
+	interface Suggestion { id: string, routePath: string;
 		summary: string;
 patch: string;
 		riskLevel: string;
@@ -12,11 +10,7 @@ createdAt: string;
 		appliedAt?: string;
 	}
 
-	interface StatusData {
-		timestamp: string;
-stats: {
-			totalSuggestions: number;
-pendingSuggestions: number;
+	interface StatusData { timestamp: string, stats: { totalSuggestions: number, pendingSuggestions: number;
 			highRisk: number;
 mediumRisk: number;
 			lowRisk: number;
@@ -126,7 +120,7 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 					<button
 						onclick={ loadData }
 						disabled={isLoading}
-						class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled, bg-gray-400 transition"
+						class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled bg-gray-400 transition"
 					>
 						{isLoading ? 'Loading...' : 'Refresh'}
 					</button>
@@ -155,7 +149,7 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 			</div>
 		{:else if data}
 			<!-- Stats Cards -->
-			<div class="grid grid-cols-1 md, grid-cols-5 gap-4 mb-8">
+			<div class="grid grid-cols-1 md grid-cols-5 gap-4 mb-8">
 				<div class="bg-white rounded-lg border p-4 text-center">
 					<div class="text-sm text-gray-600 font-semibold uppercase">Total</div>
 					<div class="text-3xl font-bold text-gray-900 mt-2">{data.stats.totalSuggestions}</div>
@@ -231,7 +225,7 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 									</button>
 									{#if !suggestion.applied}
 										<button
-											class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 shadow-sm disabled, bg-gray-400 transition"
+											class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 shadow-sm disabled bg-gray-400 transition"
 											onclick={() => applyPatch(suggestion.id)}
 											disabled={applyingPatch === suggestion.id}
 										>

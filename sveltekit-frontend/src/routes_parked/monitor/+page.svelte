@@ -289,7 +289,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <!-- Service Status Grid -->
  <div class="grid grid-cols-1 lg: grid-cols-2, xl, grid-cols-3 gap-6 mb-8">
  {#each services as service}
- <div class="bg-white rounded-lg shadow p-6" transitionfade={{ duration, 300 }}>
+ <div class="bg-white rounded-lg shadow p-6" transitionfade={{ duration: 300 }}>
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-lg font-semibold text-gray-900">{service.name}</h3>
  <span class="px-2 py-1 rounded-full text-xs font-medium {getStatusColor(service.status)}">

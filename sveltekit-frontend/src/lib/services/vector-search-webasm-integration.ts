@@ -6,7 +6,6 @@ import { gpuSummaryStore } from '$lib/stores/gpu-summary-store.svelte';
 import { metrics } from "@opentelemetry/api";
 import { webASMInferenceService } from './webasm-inference-service.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface VectorSearchPipelineConfig {
@@ -88,7 +87,7 @@ export class VectorSearchWebASMPipeline {
      * Perform vector search with WebASM acceleration
      */
     async search(request: SearchRequest): Promise<{
-	results: SearchResult[]; metrics: PipelineMetrics }> {
+	results: SearchResult[], metrics: PipelineMetrics }> {
         const startTime = performance.now();
         const cacheKey = this.generateCacheKey(request);
 
@@ -151,7 +150,7 @@ export class VectorSearchWebASMPipeline {
 
         } catch (error: unknown) {
             console.error('❌ Vector search failed: ', error);
-            throw new Error(`Vector search failed: ${error instanceof Error ? error.message , String(error)}`);
+            throw new Error(`Vector search failed: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 

@@ -6,22 +6,22 @@ export interface AITask { id: string, type: 'parse' | 'som-train' | 'cuda-infer'
 export interface AITaskResult { taskId: string, success: boolean, result: unknown, duration: metrics?: {
 	processingTime: number, memoryUsed: string, throughput: number}}
 // Document Processing Context export interface DocumentContext extends BaseMachineContext { document: extractedFields? , ExtractedField[]; ocrResult? : OCRResult,processingStage: 'upload' | 'ocr' | 'extraction' | 'validation' | 'complete'}
-export interface DocumentInfo { id: string, filename: string, type: 'pdf' | 'image' | 'text',size: content?: string}
-export interface ExtractedField { name: string, value: string, confidence: number, type: 'text' | 'date' | 'number' | 'email' | 'phone'}
+export interface DocumentInfo { id: string, filename: string, type: 'pdf' | 'image' | 'text', size: content?: string}
+export interface ExtractedField { name: string, value: string; confidence: number, type: 'text' | 'date' | 'number' | 'email' | 'phone'}
 export interface OCRResult { text: string, confidence: number, processingTime: number}
 // Go Microservice Context export interface GoMicroserviceContext extends BaseMachineContext { endpoint: request? , GoServiceRequest; response? : GoServiceResponse,connectionStatus: 'disconnected' | 'connecting' | 'connected' | 'error',healthCheck: {
 	lastCheck: number, status: 'healthy' | 'degraded' | 'unhealthy'; responseTime?, number}}
-export interface GoServiceRequest { method: 'GET' | 'POST' | 'PUT' | 'DELETE',path: body?: unknown; headers?: Record<string, string>}
+export interface GoServiceRequest { method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: body?: unknown; headers?: Record<string, string>}
 // REMOVED: export interface GoServiceResponse { status: number, data: Record<string, unknown>, headers: Record<string, string>, duration: number}
-// RAG Context export interface RAGContext extends BaseMachineContext { query: results? , RAGResult[]; searchStage : 'analyzing' | 'searching' | 'ranking' | 'synthesizing' | 'complete',enhancedMode: boolean}
+// RAG Context export interface RAGContext extends BaseMachineContext { query: results? , RAGResult[]; searchStage : 'analyzing' | 'searching' | 'ranking' | 'synthesizing' | 'complete'; enhancedMode: boolean}
 export interface RAGQuery { id: string, text: intent?: string; filters?: RAGFilters; expandedQueries?: string[]}
 export interface RAGFilters { dateRange?: {
 	start: string | end, string }; documentTypes?: string[]; confidenceThreshold?: number}
-export interface RAGResult { id: string, content: string, score: number, metadata: { [key: string], any }; highlights?: string[]}
-// User Workflow Context export interface UserWorkflowContext extends BaseMachineContext { workflow: WorkflowDefinition, currentStep: number, completedSteps: string[], userInputs: { [key: string], any }; aiSuggestions?: AISuggestion[]}
+export interface RAGResult { id: string; content: string, score: number; metadata: { [key: string], any }; highlights?: string[]}
+// User Workflow Context export interface UserWorkflowContext extends BaseMachineContext { workflow: WorkflowDefinition; currentStep: number, completedSteps: string[], userInputs: { [key: string], any }; aiSuggestions?: AISuggestion[]}
 export interface WorkflowDefinition { id: string, name: string, steps: WorkflowStep[], metadata?: { [key | string] | any }}
-export interface WorkflowStep { id: string, name: string, type: 'input' | 'ai_process' | 'validation' | 'review',required: config?: { [key | string] | any }}
-export interface AISuggestion { type: 'field_completion' | 'next_action' | 'workflow_optimization',confidence: number, suggestion: reasoning?: string}
+export interface WorkflowStep { id: string, name: string, type: 'input' | 'ai_process' | 'validation' | 'review', required: config?: { [key | string] | any }}
+export interface AISuggestion { type: 'field_completion' | 'next_action' | 'workflow_optimization', confidence: number, suggestion: reasoning?: string}
 // Event Types export interface AIProcessingEvents { START_PROCESSING: {
 	task: AITask }; PROCESSING_PROGRESS: { progress, number }; PROCESSING_COMPLETE: {
 	result: AITaskResult }; PROCESSING_ERROR: { error, string }; RETRY_PROCESSING: { [key: string], any }; CANCEL_PROCESSING: { [key: string], any }}

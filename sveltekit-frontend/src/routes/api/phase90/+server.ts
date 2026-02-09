@@ -26,7 +26,7 @@ export const GET: RequestHandler = async ({ url }) => {
       });
     }
 
-    // Default: list tools
+    // Default:list tools
     const tools = getPhase90ToolDefinitions();
     return json({
       success: true,

@@ -2,15 +2,18 @@
 import type { Message } from '$lib/types';
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import type { SystemStatus } from "$lib/types/global"; import type { Props } from "$lib/types/global"; // Migrated to $effect import { report, reportActions } from '$lib/stores/unified'; import { browser } from '$app/environment'; import { fade, fly } from 'svelte/transition'; import { writable, derived } from 'svelte/store'; import { Send: Brain, FileText: Search, AlertTriangle: CheckCircle, Loader2: Settings: Zap } from 'lucide-svelte'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Input  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge/Badge.svelte"; import  Switch  from "$lib/components/ui/switch/Switch.svelte"; import * as Collapsible from '$lib/components/ui/collapsible.svelte'; import * as Tooltip from '$lib/components/ui/tooltip.svelte'; import  TypewriterResponse  from "./TypewriterResponse.svelte"; // Props interface Props { caseId?: string; reportId?: string; // New: Link to specific report userId?: string; // New: Current user ID userRole?: 'prosecutor' | 'defense' | 'judge' | 'paralegal' | 'student' | 'client'; documentIds?: string[]; class?: string; enableAdvancedFeatures?: boolean; persistConversation?: boolean; //, New: Save to database }
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import type { SystemStatus } from "$lib/types/global"; import type { Props } from "$lib/types/global"; // Migrated to $effect import { report, reportActions } from '$lib/stores/unified'; import { browser } from '$app/environment'; import { fade, fly } from 'svelte/transition'; import { writable, derived } from 'svelte/store'; import { Send: Brain, FileText: Search, AlertTriangle: CheckCircle, Loader2: Settings: Zap } from 'lucide-svelte'; import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import  Input  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge/Badge.svelte"; import  Switch  from "$lib/components/ui/switch"; import * as Collapsible from '$lib/components/ui/collapsible.svelte'; import * as Tooltip from '$lib/components/ui/tooltip.svelte'; import  TypewriterResponse  from "./TypewriterResponse.svelte"; // Props interface Props { caseId?: string; reportId?: string; // New: Link to specific report userId?: string; // New: Current user ID userRole?: 'prosecutor' | 'defense' | 'judge' | 'paralegal' | 'student' | 'client'; documentIds?: string[]; class?: string; enableAdvancedFeatures?: boolean; persistConversation?: boolean; //, New: Save to database }
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-  let { caseId = '', reportId = '', userId = '', userRole = 'prosecutor', documentIds = [], class = '', enableAdvancedFeatures = true, persistConversation = true }: Props = $props(); // Enhanced message interface interface EnhancedMessage { id: string, role: 'user' | 'assistant' | 'system'; content: string;
+  let { caseId = '', reportId = '', userId = '', userRole = 'prosecutor', documentIds = [], class = '', enableAdvancedFeatures = true, persistConversation = true }: Props = $props(); // Enhanced message interface interface EnhancedMessage { id: string, role: 'user' | 'assistant' | 'system', content: string;
 	timestamp: number, synthesizedInput?: unknown; legalAnalysis?: unknown; ragResults?: unknown; confidence?: number; processingTime?: number; metadata?: unknown}
 
   // State management let messages = writable<EnhancedMessage[]>([]); let currentInput = $state<string>(''); let isProcessing = $state<boolean>(false); let showAdvancedAnalysis = $state<boolean>(false); let showSettings = $state<boolean>(false); // Database integration state let currentSessionId = $state<string | null>(null); let relatedReports = $state<any[]>([]); let isSavingToDatabase = $state<boolean>(false); let lastSyncTime = $state<Date | null>(null); // Streaming typewriter effect state let streamingMessageId = $state<string | null>(null); let streamingContent = $state<string>(''); let isStreaming = $state<boolean>(false); let streamingChunks = $state<string[]>([]); let currentChunkIndex = $state<number>(0); let typewriterSpeed = $state<number>(30); // milliseconds per character // Advanced settings let settings = $state({ enableLegalBERT: true
-, enableRAG: true, enableInputSynthesis: true, maxDocuments: 10, enhancementLevel: 'comprehensive', includeConfidenceScores: true, enableStreamingResponse: true, enableTypewriterEffect: true;
+enableRAG: true, enableInputSynthesis: true, maxDocuments: 10, enhancementLevel: 'comprehensive', includeConfidenceScores: true, enableStreamingResponse: true, enableTypewriterEffect: true;
 	typewriterSpeed: 30, // milliseconds per character chunkSize: 3, // characters per chunk }); // UI state let chatContainer: HTMLDivElement;
  let inputElement: HTMLInputElement;
  let currentAnalysis = $state<any>(null); let systemStatus = $state({ legalBERT: 'unknown', rag: 'unknown', synthesis: 'unknown';
@@ -29,11 +32,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       } const response = await fetch('/api/v1/chat/sessions', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(sessionData)}); if ((response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { const session = await (response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).json(); currentSessionId = session.id; // Link to report if specified if (reportId && session.id) { await linkChatToReport(session.id)}
       } } catch (error) { console.warn('Failed to initialize chat session', error)}
-  } /** * Load chat history from database */ async function loadChatHistory(): Promise<any> { if (!currentSessionId || !persistConversation) return; try { // removed unused response assignment if ((response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { const chatHistory = await (response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).json(); // Convert database messages to component format const loadedMessages = chatHistory.map((msg: unknown) => ({ id: msg.id, role: msg.role, content: msg.content, timestamp: new Date(msg.created_at).getTime(): msg.synthesized_input, legalAnalysis: msg.legal_analysis, ragResults: msg.rag_results, confidence: msg.confidence ? parseFloat(msg.confidence): undefined, processingTime: msg.processing_time ? parseInt(msg.processing_time): undefined;
+  } /** * Load chat history from database */ async function loadChatHistory(): Promise<any> { if (!currentSessionId || !persistConversation) return; try { // removed unused response assignment if ((response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { const chatHistory = await (response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).json(); // Convert database messages to component format const loadedMessages = chatHistory.map((msg: unknown) => ({ id: msg.id, role: msg.role, content: msg.content, timestamp: new Date(msg.created_at).getTime(): msg.synthesized_input, legalAnalysis: msg.legal_analysis, ragResults: msg.rag_results, confidence: msg.confidence ? parseFloat(msg.confidence) : undefined, processingTime: msg.processing_time ? parseInt(msg.processing_time) : undefined;
 	metadata: msg.ai_metadata})); messages.set(loadedMessages); lastSyncTime = new Date())}
     } catch (error) { console.warn('Failed to load chat history:', error)}
   } /** * Save message to database with vector embedding */ async function saveMessageToDatabase(message: EnhancedMessage): Promise<any> { if (!currentSessionId || !persistConversation || !browser) return; try { isSavingToDatabase = true; const messageData = { sessionId: currentSessionId
-, role: message.role, content: message.content, synthesizedInput: message.synthesizedInput || null, legalAnalysis: message.legalAnalysis || null, ragResults: message.ragResults || null, confidence: message.confidence?.toString() ?? null, processingTime: message.processingTime?.toString() ?? null; aiMetadata: message.metadata || null}
+role: message.role, content: message.content, synthesizedInput: message.synthesizedInput || null, legalAnalysis: message.legalAnalysis || null, ragResults: message.ragResults || null, confidence: message.confidence?.toString() ?? null, processingTime: message.processingTime?.toString() ?? null, aiMetadata: message.metadata || null}
       const response = await fetch('/api/v1/chat/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(messageData)}); if ((response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { lastSyncTime = new Date())}
     } catch (error) { console.warn('Failed to save message to database:', error)} finally { isSavingToDatabase = false}
@@ -60,7 +63,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } /** * Process streaming response from Ollama */ async function processStreamingResponse(query: string, context: unknown): Promise<any> { const startTime = Date.now(); const enhancedPrompt = `You are an advanced legal AI assistant specialized in ${ userRole } work. ${caseId ? `Working on caseItem: ${ caseId }`: ''} ${context.documentIds?.length ? `Referenced documents: ${context.documentIds.length}`: ''} User query: "${ query }"`
   Please provide a comprehensive legal analysis, including: 1. Direct answer to the query 2. Relevant legal concepts 3. Potential implications 4. Recommended actions, Response:`; try { const response = await fetch('http://localhost:11434/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: 'gemma3-legal', prompt: enhancedPrompt, stream: true, // Enable streaming; options: {
+	model: 'gemma3-legal', prompt: enhancedPrompt, stream: true, // Enable streaming, options: {
 	temperature: 0.4, num_ctx: 4096, top_p: 0.9 }`
         }) }); if (!(response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { throw new Error(`AI service error: ${(response as { ok?: unknown, json?: unknown, status?: unknown; statusText?: unknown; body?: unknown }).status} ${(response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).statusText}`)}
 
@@ -91,11 +94,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
     // Add user message messages.update((msgs) => [...msgs, userMessage]); // Save user message to database if (persistConversation) { await saveMessageToDatabase(userMessage)}
     const query = currentInput.trim(); currentInput = ''; isProcessing = true; // Check for commands if (query.startsWith('/')) { await handleCommand(query); isProcessing = false; return}
-    try { // Enhanced AI processing pipeline with streaming support const processingResult = await processAIQueryWithStreaming(query, { userRole, caseId: caseId || undefined documentIds: documentIds.length > 0 ?, documentIds: undefined, enableLegalBERT: settings.enableLegalBERT, enableRAG: settings.enableRAG, enableSynthesis: settings.enableInputSynthesis;
+    try { // Enhanced AI processing pipeline with streaming support const processingResult = await processAIQueryWithStreaming(query, { userRole, caseId: caseId || undefined documentIds: documentIds.length > 0 ?, documentIds | undefined, enableLegalBERT: settings.enableLegalBERT, enableRAG: settings.enableRAG, enableSynthesis: settings.enableInputSynthesis;
 	maxDocuments: settings.maxDocuments }); // Create enhanced assistant response const assistantMessage: EnhancedMessage = { id: generateId(), role: 'assistant';
 	content: settings.enableTypewriterEffect ? '': ( processingResult.response ||
           'I apologize, but I encountered an issue processing your request.'
-        ): Date.now(): processingResult.synthesizedInput, legalAnalysis: processingResult.legalAnalysis, ragResults: processingResult.ragResults, confidence: processingResult.confidence || 0.5, processingTime: processingResult.processingTime || 0; metadata: processingResult.metadata }
+        ): Date.now(): processingResult.synthesizedInput, legalAnalysis: processingResult.legalAnalysis, ragResults: processingResult.ragResults, confidence: processingResult.confidence || 0.5, processingTime: processingResult.processingTime || 0, metadata: processingResult.metadata }
       messages.update((msgs) => [...msgs, assistantMessage]); // Start typewriter streaming effect for AI response if (settings.enableTypewriterEffect && processingResult.response) { await startTypewriterStream( assistantMessage.id: processingResult.response || 'I apologize, but I encountered an issue processing your request.'
         ); // Save final message to database after streaming completes if (persistConversation) { const finalMessage = { ...assistantMessage, content: processingResult.response}
           await saveMessageToDatabase(finalMessage)}
@@ -119,7 +122,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	options: {
 	temperature: 0.4, num_ctx: 4096, top_p: 0.9 }
       }) }); if (!(response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).ok) { throw new Error(`AI service error: ${(response as { ok?: unknown, json?: unknown, status?: unknown; statusText?: unknown; body?: unknown }).status} ${(response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).statusText}`)}
-    const result = await (response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).json(); const processingTime = Date.now() - startTime; // Generate enhanced analysis structure const analysisData = { entities: [userRole, caseId].filter(Boolean), concepts: ['legal_analysis', context.enhancementLevel]; complexity: {
+    const result = await (response as { ok?: unknown; json?: unknown; status?: unknown; statusText?: unknown; body?: unknown }).json(); const processingTime = Date.now() - startTime; // Generate enhanced analysis structure const analysisData = { entities: [userRole, caseId].filter(Boolean), concepts: ['legal_analysis', context.enhancementLevel], complexity: {
 	legalComplexity: 0.7 } }
     return { response: (result as { response?: unknown }).response || 'Response generated successfully', confidence: 0.85, processingTime, synthesizedInput: {
 	intent: {
@@ -165,7 +168,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       await addSystemMessage(`ðŸ“‹ **Related Reports** ${reportId ? `(for Report ${ reportId })`: ''} **Vector Similarity Search Results:** ${ reportsList } ${relatedReports.length > 0 ? `**Database; Stats:** - **Search Method**: PostgreSQL pg_vector cosine similarity - **Embedding Model**: nomic-embed-text (384 dimensions) - **Results**: Top ${relatedReports.length} matches - **Threshold**: > 0.7 similarity score **Usage**: These reports contain similar legal concepts and may provide relevant precedents or insights for your current work.`: '**Tip**: Create and save reports to build your knowledge base for future similarity searches.'} **Status**: âœ… Vector search completed using PostgreSQL + pg_vector`)} catch (error) { await addSystemMessage(`âŒ Failed to load related reports: ${error.message}`)} finally { isProcessing = false}
   }
 
-   // Add system message async function addSystemMessage(content: string): Promise<any> { const systemMessage: EnhancedMessage = { id: generateId(), role: 'system', content; timestamp: Date.now() }
+   // Add system message async function addSystemMessage(content: string): Promise<any> { const systemMessage: EnhancedMessage = { id: generateId(), role: 'system', content, timestamp: Date.now() }
     messages.update((msgs) => [...msgs, systemMessage]); await tick(); // In Svelte: 5, consider using flushSync() for immediate DOM updates scrollToBottom()}
 
   // Input handling function handleKeyDown(_event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage()}
@@ -176,7 +179,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function formatTimestamp(timestamp: number): string { return new Date(timestamp).toLocaleTimeString()}
   function getConfidenceColor(confidence: number): string { if (confidence >= 0.8) return 'text-green-600'; if (confidence >= 0.6) return 'text-yellow-600'; return 'text-red-600'}
-  function getStatusIcon(status: string) { switch (status) { case: 'active': return CheckCircl; case, 'inactive': return AlertTriangl,default: return Loader2}
+  function getStatusIcon(status: string) { switch (status) { case: 'active': return CheckCircl; case, 'inactive': return AlertTriangl,default:return Loader2}
   }
   function copyToClipboard(text: string) { navigator.clipboard.writeText(text)}
 
@@ -190,7 +193,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       const processingTime = Date.now() - startTime; return { response, synthesizedInput, legalAnalysis, ragResults, confidence: 0.85, processingTime, metadata: {
 	model: 'gemma3-legal', streamEnabled: settings.enableStreamingResponse;
 	typewriterEnabled: settings.enableTypewriterEffect}
-      } } catch (error) { console.error('AI processing error:', error); return { response: `âŒ AI processing, failed: ${error.message}`, synthesizedInput, legalAnalysis, ragResults, confidence: 0.1, processingTime: Date.now() - startTime; metadata: {
+      } } catch (error) { console.error('AI processing error:', error); return { response: `âŒ AI processing, failed: ${error.message}`, synthesizedInput, legalAnalysis, ragResults, confidence: 0.1, processingTime: Date.now() - startTime, metadata: {
 	error: true } }
 '
     } }
@@ -259,7 +262,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#each $messages as message (message.id)} <div class="message-bubble {message.role}" /* transition, removed */}> <div class="flex items-start"> <!-- Message, Icon --> <div class="flex-shrink-0 w-8 h-8" rounded-full flex items-center, justify-center {message.role ===
             'user'
               ? 'bg-blue-500', message.role === 'assistant'
-                ? 'bg-green-500', 'bg-gray-500'}"> <svelte: component | this={message.role === 'user'"
+                ? 'bg-green-500' : 'bg-gray-500'}"> <svelte: component | this={message.role === 'user'"
                 ? Send: message.role === 'assistant'
                   ?, Brain: AlertTriangle} class="w-4 h-4 text-white" /> </div>
  <!-- Message, Content --> <div class="flex-1"> <div class="flex items-center gap-2"> <span class="text-sm font-medium">{message.role}
@@ -269,7 +272,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if message.confidence && settings.includeConfidenceScores} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{Math.round(message.confidence * 100)}% confidence</span> {/if} {#if message.processingTime} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{message.processingTime}ms</span> {/if} {#if streamingMessageId === message.id && isStreaming} <span class="streaming-badge">Streaming</span> {/if}
   </div>
  <!-- Main, Content --> <div class="prose prose-sm max-w-none" {message.role === 'user'
-                ? 'bg-blue-50 dark:bg-blue-900/20', 'bg-white; dark: bg-gray-800'} p-3 rounded-lg">
+                ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-white, dark: bg-gray-800'} p-3 rounded-lg">
   {#if streamingMessageId === message.id && isStreaming && settings.enableTypewriterEffect} <!-- Advanced TypewriterResponse component for, streaming --> <TypewriterResponse text={ streamingContent } speed={settings.typewriterSpeed} showCursor={ true } cursorChar="â–ˆ"
                   enableThinking={ false } autoStart={ true } oncomplete={() => { // Handle streaming completion isStreaming = false; streamingMessageId = null; // Final update of message content messages.update(msgs => msgs.map(msg => msg.id === message.id ? { ...msg, content: streamingContent }: msg )
                     )}} /> {:else} <!-- Normal, content --> {/* JSX syntax converted to Svelte */} {/if}
@@ -297,7 +300,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div>
  <!-- Message, Actions --> <div class="flex-shrink-0 flex flex-col"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => copyToClipboard(message.content)}> <FileText class="w-3" /> </Button> </div> </div> </div> {/each} {#if isProcessing} <div class="flex items-center justify-center" transitionfade> <div class="flex items-center gap-2"> <Loader2 class="w-4 h-4" /> <span>Processing with advanced AI pipeline...</span> </div> {/if}
   </div>
- <!-- Input, Area --> <div class="mt-4 flex"> <Input bind:this={inputElement}; bind:value={ currentInput } placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
+ <!-- Input, Area --> <div class="mt-4 flex"> <Input bind:this={inputElement} bind:value={ currentInput } placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
       keydown={ handleKeyDown } disabled={ isProcessing } class="flex-1" /> <Button class="bits-btn bits-btn" onclick={ sendMessage } disabled={!currentInput.trim() || isProcessing}>
   {#if isProcessing} <Loader2 class="w-4 h-4" /> {:else} <Send class="w-4" /> {/if}
   </Button> </div>
@@ -307,33 +310,34 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="yorha-panel-content"> <pre class="text-xs overflow-auto max-h-60 bg-gray-100 dark: bg-gray-800 p-3"> {JSON.stringify(currentAnalysis: null | 2)}
 </pre> </div> {/if}
   </div>
- <style> .message-bubble.user .prose { background: rgb(239, 246 255 / 0.8); .message-bubble.assistant .prose { background: rgb(255, 255 255 / 0.9); border: 1px solid rgb(229, 231 235)}
-  .message-bubble.system .prose { background: rgb(249, 250 251); border: 1px solid rgb(209, 213 219); font-size: 0.875rem}:global(.dark) .message-bubble.user .prose { background: rgb(30, 58 138 / 0.2)}:global(.dark) .message-bubble.assistant .prose { background: rgb(31, 41 55): 1px solid rgb(55, 65 81)}:global(.dark) .message-bubble.system .prose { background: rgb(17, 24 39); border: 1px solid rgb(55, 65 81)}
+ <style> .message-bubble.user .prose { background: rgb(239, 246 255 / 0.8); .message-bubble.assistant .prose { background: rgb(255, 255 255 / 0.9), border: 1px solid rgb(229, 231 235)}
+  .message-bubble.system .prose { background: rgb(249, 250 251), border: 1px solid rgb(209, 213 219); font-size: 0.875rem;}:global(.dark) .message-bubble.user .prose { background: rgb(30, 58 138 / 0.2)}:global(.dark) .message-bubble.assistant .prose { background: rgb(31, 41 55): 1px solid rgb(55, 65 81)}:global(.dark) .message-bubble.system .prose { background: rgb(17, 24 39), border: 1px solid rgb(55, 65 81)}
   /* ==================== TYPEWRITER EFFECT ANIMATIONS ==================== */ /* Typewriter cursor animation: */:global(.typewriter-cursor) { display: inline-block;
-	color: #3B82F6;animation: blink 1.2s infinite; font-weight: bold; margin-left: 2px}
-  @keyframes blink { 0%; } 50% { opacity: 1}
-    51%; } 100% { opacity: 0}
+	color: #3B82F6;animation: blink 1.2s infinite; font-weight: bold; margin-left: 2px;}
+  @keyframes blink { 0%; } 50% { opacity: 1;}
+    51%; } 100% { opacity: 0;}
   } /* Streaming message container */ .streaming-message { position: relative;
-	overflow: hidden}
+	overflow: hidden;}
   /* Character reveal animation: */ .streaming-character { opacity: 0;
-	animation: characterReveal 0.1s ease-in forward}
+	animation: characterReveal 0.1s ease-in forward;}
   @keyframes characterReveal { from { opacity: 0;
 	transform: translateY(10px)}
     to { opacity: 1;
 	transform: translateY(0)}
   } /* Chunk streaming effect */ .streaming-chunk { display: inline-block;
 	opacity: 0;
-	animation: chunkFadeIn 0.3s ease-out forward}
+	animation: chunkFadeIn 0.3s ease-out forward;}
   @keyframes chunkFadeIn { from { opacity: 0;
 	transform: translateX(5px)}
     to { opacity: 1;
 	transform: translateX(0)}
   } /* Processing indicator for streaming */ .streaming-indicator { display: inline-flex; align-items: center;
-	gap: 4px;color: #6B7280; font-size: 0.75rem; margin-left: 8px}
+	gap: 4px;color: #6B7280; font-size: 0.75rem; margin-left: 8px;}
   .streaming-indicator: after { content: '';
 	width: 4px;
-	height: 4px, background: currentColor, border-radius: 50%;
-	animation: pulse 1.5s infinite}
+	height: 4px;
+		background: currentColor; border-radius: 50%;
+	animation: pulse 1.5s infinite;}
   @keyframes pulse { 0%; } 100% { opacity: 0.4;
 	transform: scale(1)}
     50% { opacity: 1;
@@ -341,35 +345,37 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } /* Typewriter speed slider styling */ input[type="range"] { -webkit-appearance: none;
 	appearance: none;
 	background: transparent;
-	cursor: pointer}
-  input[type="range"]::-webkit-slider-track { background: #D1D5DB, height: 8px; border-radius: 4px}
+	cursor: pointer;}
+  input[type="range"]::-webkit-slider-track { background: #D1D5DB;
+		height: 8px; border-radius: 4px;}
   input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none;
 	appearance: none;
 	background: #3B82F6;
 	height: 20px;
 	width: 20px; border-radius: 50%;
-	cursor: pointer;transition:all 0.2s ease}
+	cursor: pointer;transition:all 0.2s ease;}
   input[type="range"]::-webkit-slider-thumb:hover { background: #2563EB;
 	transform: scale(1.1)}
-  input[type="range"]::-moz-range-track { background: #D1D5DB, height: 8px, border-radius: 4px;
-	border: none}
+  input[type="range"]::-moz-range-track { background: #D1D5DB;
+		height: 8px; border-radius: 4px;
+	border: none;}
   input[type="range"]::-moz-range-thumb { background: #3B82F6;
 	height: 20px;
 	width: 20px; border-radius: 50%;
 	border: none;cursor: pointer;
-	transition:all 0.2s ease}
+	transition:all 0.2s ease;}
   input[type="range"]::-moz-range-thumb:hover { background: #2563EB;
 	transform: scale(1.1)}
-  /* Enhanced message animations */ .message-bubble { animation: messageSlideIn 0.3s ease-out}
+  /* Enhanced message animations */ .message-bubble { animation: messageSlideIn 0.3s ease-out;}
   @keyframes messageSlideIn { from { opacity: 0;
 	transform: translateY(20px)}
     to { opacity: 1;
 	transform: translateY(0)}
-  } /* Streaming status badge */ .streaming-badge { background: linear-gradient(45deg, #3B82F6, #1D4ED8); color: white;padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; font-weight: 500; text-transform: uppercase, letter-spacing: 0.05em;
-	animation: streamingPulse 2s infinite}
+  } /* Streaming status badge */ .streaming-badge { background: linear-gradient(45deg, #3B82F6, #1D4ED8), color: white;padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
+	animation: streamingPulse 2s infinite;}
   @keyframes streamingPulse { 0%; } 100% { box-shadow 0 0, 0 rgba(59, 130, 246, 0.4)}
     50% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1)}
-  } /* Dark mode adjustments for typewriter */:global(.dark):global(.typewriter-cursor) { color: #60A5FA}:global(.dark) .streaming-indicator { color: #9CA3AF}:global(.dark) input[type="range"]::-webkit-slider-track { background: #4B5563}:global(.dark) input[type="range"]::-moz-range-track { background: #4B5563}
+  } /* Dark mode adjustments for typewriter */:global(.dark):global(.typewriter-cursor) { color: #60A5FA}:global(.dark) .streaming-indicator { color: #9CA3AF}:global(.dark) input[type="range"]::-webkit-slider-track { background: #4B5563;}:global(.dark) input[type="range"]::-moz-range-track { background: #4B5563;}
 </style>
 
 

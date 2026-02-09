@@ -1,153 +1,349 @@
-<script lang="ts"> import { Input } from '$lib/components/ui/input';
-import type { Message } from '$lib/types';
-import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms'; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Input  from "$lib/components/ui/enhanced-bits.svelte"; import  Label  from "$lib/components/ui/label/Label.svelte"; import  Alert  from "$lib/components/ui/alert/Alert.svelte"; import  Badge  from "$lib/components/ui/badge/Badge.svelte"; import  Progress  from "$lib/components/ui/progress/Progress.svelte"; import  Checkbox  from "$lib/components/ui/checkbox/Checkbox.svelte"; import { mcpGPUOrchestrator } from '$lib/services/mcp-gpu-orchestrator.js'; import { scale, fade } from 'svelte/transition'; import { quartOut } from 'svelte/easing'; import type { EnhancedAuthFormProps } from '$lib/types/component-props.js'; let { mode = $bindable('login'), open = $bindable(false), onOpenChange, onSuccess, allowGuestMode = false, loading = false, class: className = '', id,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-    'data-testid': testId}: EnhancedAuthFormProps = $props(); // Enhanced Svelte, 5 reactive state let formData = $state({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', acceptTerms: false, rememberMe: false });
-  let formState = $state({ loading: false, error: '', success: '', passwordStrength: 0, showPassword: false, showConfirmPassword: false, emailExists: false, verificationSent: false }); // Form element references for focus management let emailInput: HTMLInputElement = $state(undefined as any);
- let passwordInput: HTMLInputElement = $state(undefined as any);
- let firstNameInput: HTMLInputElement = $state(undefined as any); // Enhanced validation with security requirements let validation = $derived(() => { const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; const hasValidEmail = emailRegex.test(formData.email); const hasStrongPassword = formData.password.length >= 8 && /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(formData.password); if (mode === 'register') { const passwordsMatch = formData.confirmPassword === formData.password; const hasName = formData.firstName.trim.length >= 2 && formData.lastName.trim.length >= 2; const termsAccepted = formData.acceptTerm; return { isValid: hasValidEmail && hasStrongPassword && passwordsMatch && hasName && termsAccepted hasValidEmail, hasStrongPassword, passwordsMatch, hasName, termsAccepted }
-    } return { isValid: hasValidEmail && formData.password.length >= 6, hasValidEmail, hasStrongPassword: true, passwordsMatch: true, hasName: true, termsAccepted: true }
-  }); // Password strength calculation let passwordStrength = $derived(() => { const password = formData.password; if (!password) return 0; let strength = $state<number>(0); if (password.length >= 8) strength += 25; if (/[a-z]/.test(password)) strength += 25; if (/[A-Z]/.test(password)) strength += 25; if (/\d/.test(password)) strength += 15; if (/[@$!%*?&]/.test(password)) strength += 10; return Math.min(strength, 100)}); // Real-time email validation async function checkEmailExists(): Promise<any> { if (!validation.hasValidEmail) return; try { const response = await fetch('/api/auth/check-email', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	email: formData.email }) }); const result = await (response as { json?: any; ok?: any }).json(); formState.emailExists = (result as { exists?: any; message?: any; requiresVerification?: any; user?: any; error?: any }).exist} catch (error) { console.error('Email check failed:', error)}
+<script lang="ts">
+  import { invalidateAll } from '$app/navigation';
+  import { mcpGPUOrchestrator } from '$lib/services/mcp-gpu-orchestrator.js';
+  import { fade, scale } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
+
+  // UI Components
+  import * as Dialog from "$lib/components/ui/dialog";
+  import Button from "$lib/components/ui/button";
+  import Input from "$lib/components/ui/input";
+  import { Label } from "$lib/components/ui/label";
+  import * as Alert from "$lib/components/ui/alert";
+  import { Checkbox } from "$lib/components/ui/checkbox";
+  import { Progress } from "$lib/components/ui/progress";
+  import Loader2 from 'lucide-svelte/icons/loader-2';
+  import AlertCircle from 'lucide-svelte/icons/alert-circle';
+  import CheckCircle from 'lucide-svelte/icons/check-circle';
+  import Eye from 'lucide-svelte/icons/eye';
+  import EyeOff from 'lucide-svelte/icons/eye-off';
+
+  interface Props {
+    mode?: 'login' | 'register';
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    onSuccess?: (user: any) => void;
+    allowGuestMode?: boolean;
+    loading?: boolean;
+    class?: string;
+    id?: string;
+    'data-testid'?: string;
   }
 
-   // Enhanced form submission with comprehensive security async function handleSubmit(_event: Event): Promise<any> { const form = event.target as HTMLFormElement; formState.loading = true; formState.error = ''; formState.success = ''; try { // Security context for AI analysis const authContext = { mode, email: formData.email, timestamp: new Date().toISOString(): navigator.userAgent, ipAddress: await getClientIP(): passwordStrength}
+  let {
+    mode = $bindable('login'),
+    open = $bindable(false),
+    onOpenChange,
+    onSuccess,
+    allowGuestMode = false,
+    loading = false,
+    class: className = '',
+    id,
+    'data-testid': testId
+  }: Props = $props();
 
-      // AI-powered security analysis const securityAnalysis = await mcpGPUOrchestrator.routeAPIRequest(
-        '/api/security/analyze-login-attempt', authContext, { userId: null, securityLevel: 'authentication' } ); if (securityAnalysis?.riskLevel === 'high') { formState.error = 'Security check failed. Please try again later.'; return}
-      const endpoint = mode === 'login' ? '/api/auth/login': '/api/auth/register'; const response = await fetch(endpoint, { method: 'POST', headers: {
+  // Form State
+  let formData = $state({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    firstName: '',
+    lastName: '',
+    acceptTerms: false,
+    rememberMe: false
+  });
+
+  let formState = $state({
+    loading: false,
+    error: '',
+    success: '',
+    passwordStrength: 0,
+    showPassword: false,
+    showConfirmPassword: false,
+    emailExists: false,
+    verificationSent: false
+  });
+
+  // Removed unused ref variables - not needed in Svelte 5
+
+  // Validation
+  let validation = $derived.by(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const hasValidEmail = emailRegex.test(formData.email);
+    const hasStrongPassword = formData.password.length >= 8;
+    // Simplified strength check for UI feedback, detailed check in strength calculation
+
+    if (mode === 'register') {
+      const passwordsMatch = formData.confirmPassword === formData.password;
+      const hasName = formData.firstName.trim().length >= 2 && formData.lastName.trim().length >= 2;
+      const termsAccepted = formData.acceptTerms;
+      return {
+        isValid: hasValidEmail && hasStrongPassword && passwordsMatch && hasName && termsAccepted,
+        hasValidEmail,
+        hasStrongPassword,
+        passwordsMatch,
+        hasName,
+        termsAccepted
+      };
+    }
+    return {
+      isValid: hasValidEmail && formData.password.length >= 1,
+      hasValidEmail,
+      hasStrongPassword: true,
+      passwordsMatch: true,
+      hasName: true,
+      termsAccepted: true
+    };
+  });
+
+  // Strength Calculation
+  $effect(() => {
+    const password = formData.password;
+    if (!password) {
+        formState.passwordStrength = 0;
+        return;
+    }
+    let strength = 0;
+    if (password.length >= 8) strength += 25;
+    if (/[a-z]/.test(password)) strength += 25;
+    if (/[A-Z]/.test(password)) strength += 25;
+    if (/\d/.test(password)) strength += 15;
+    if (/[@$!%*?&]/.test(password)) strength += 10;
+    formState.passwordStrength = Math.min(strength, 100);
+  });
+
+  // Check Email
+  async function checkEmailExists() {
+    if (!validation.hasValidEmail || mode !== 'register') return;
+    try {
+      const response = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email })
+      });
+      const result = await response.json();
+      formState.emailExists = result.exists;
+    } catch (error) {
+      console.error('Email check failed:', error);
+    }
+  }
+
+  // Effect for email checking
+  $effect(() => {
+      const timer = setTimeout(() => {
+          if (formData.email && mode === 'register') checkEmailExists();
+      }, 500);
+      return () => clearTimeout(timer);
+  });
+
+  // Focus management
+
+  async function getClientIP(): Promise<string> {
+      try {
+          const res = await fetch('https://api.ipify.org?format=json');
+          const data = await res.json();
+          return data.ip;
+      } catch {
+          return 'unknown';
+      }
+  }
+
+  async function handleSubmit(event: Event) {
+    event.preventDefault();
+    formState.loading = true;
+    formState.error = '';
+    formState.success = '';
+
+    try {
+      const ipAddress = await getClientIP();
+      const authContext = {
+        mode,
+        email: formData.email,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        ipAddress,
+        passwordStrength: formState.passwordStrength
+      };
+
+      const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest'
         },
-	body: JSON.stringify({ ...formData, securityContext: authContext }) }); const result = await (response as { json?: any; ok?: any }).json(); if ((response as { json?: any; ok?: any }).ok) { formState.success = (result as { exists?: any; message?: any; requiresVerification?: any; user?: any; error?: any }).message || `${mode === 'login' ? 'Login': 'Registration'} successful!`; if (mode === 'register' && (result as { exists?: any; message?: any; requiresVerification?: any; user?: any; error?: any }).requiresVerification) { formState.verificationSent = true; formState.success = 'Please check your email to verify your account.'}
+        body: JSON.stringify({ ...formData, securityContext: authContext })
+      });
 
-        // Log successful authentication await logAuthEvent('success', authContext, result); // Close dialog after delay setTimeout(() => { resetForm(); open = false; onSuccess?.((result as { exists?: any; message?: any; requiresVerification?: any; user?: any; error?: any }).user)},
-	mode === 'register' && (result as { exists?: any; message?: any; requiresVerification?: any; user?: any; error?: any }).requiresVerification ? 3000: 1500)} else { formState.error = (result as { exists?: any; message?: any; requiresVerification?: any; user?: any; error?: any }).error || 'Authentication failed'; await logAuthEvent('failed', authContext, result)}
-    } catch (err) { formState.error = 'Network error occurred. Please try again.'; console.error('Auth error:', err)} finally { formState.loading = false}
-'
+      const result = await response.json();
+
+      if (response.ok) {
+        formState.success = result.message || `${mode === 'login' ? 'Login' : 'Registration'} successful!`;
+        if (mode === 'register' && result.requiresVerification) {
+            formState.verificationSent = true;
+            formState.success = 'Please check your email to verify your account.';
+        }
+
+        await invalidateAll();
+
+        setTimeout(() => {
+            resetForm();
+            open = false;
+            onSuccess?.(result.user);
+        }, mode === 'register' && result.requiresVerification ? 3000 : 1500);
+      } else {
+        formState.error = result.error || 'Authentication failed';
+      }
+    } catch (err) {
+      formState.error = 'Network error occurred. Please try again.';
+      console.error('Auth error:', err);
+    } finally {
+      formState.loading = false;
+    }
   }
 
-   // Helper functions async function getClientIP(): Promise<string> { try { // removed unused response assignment const data = await (response as { json?: any; ok?: any }).json(); return (data as { ip?: any }).ip || 'unknown'} catch { return 'unknown'}
-  }
-  async function logAuthEvent(type: 'success' | 'failed', context: any, result: any): Promise<any> { try { await mcpGPUOrchestrator.processLegalDocument( `Authentication ${ type }: ${ mode } for ${formData.email}`, {
-          includeRAG: false
-, includeGraph: true, generateSummary: false, metadata: {
-	context: result } }
-      )} catch (error) { console.error('Failed to log auth event:', error)}
-  }
-  function resetForm() { formData = { email: '', password: '', confirmPassword: '', firstName: '', lastName: '', acceptTerms: false, rememberMe: false }
-    formState = { loading: false, error: '', success: '', passwordStrength: 0, showPassword: false, showConfirmPassword: false, emailExists: false, verificationSent: false }
-  }
-  function toggleMode() { mode = mode === 'login' ? 'register': 'login'; formState.error = ''; formState.success = ''; formData.confirmPassword = ''; formData.firstName = ''; formData.lastName = ''; formData.acceptTerms = false}
-  async function handleGuestLogin(): Promise<any> { if (!allowGuestMode) return; formState.loading = true; try { const response = await fetch('/api/auth/guest', { method: 'POST', headers: { 'Content-Type': 'application/json' } }); const result = await (response as { json?: any; ok?: any }).json(); if ((response as { json?: any; ok?: any }).ok) { onSuccess?.((result as { exists?: any; message?: any; requiresVerification?: any; user?: any; error?: any }).user); open = false}
-    } catch (error) { console.error('Guest login failed:', error)} finally { formState.loading = false}
-  }
-
-   // Effects for enhanced UX $effect(() => { if (open && emailInput) { setTimeout(() => emailInput?.focus(), 100)}
-  }); $effect(() => { if (onOpenChange) { onOpenChange(open)}
-  }); // Real-time email validation effect $effect(() => { if (formData.email && mode === 'register') { const debounce = setTimeout(checkEmailExists, 500); return () => clearTimeout(debounce)}
-  }); </script>
- <Dialog.Root bind:open> <Dialog.Portal> <Dialog.Overlay class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed], animate-out data-[state=closed], fade-out-0"
-    /> <Dialog.Content class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-6 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed], slide-out-to-top-[48%] data-[state=open], slide-in-from-left-1/2"
-      openautofocus={(e) => { e.preventDefault(); emailInput?.focus()}} >
-      <!-- Header --> <div class="flex flex-col space-y-2 text-center"> <Dialog.Title class="text-lg font-semibold leading-none"> {mode === 'login' ? 'Welcome back': 'Create your account'}
-</Dialog.Title>
- <Dialog.Description class="text-sm nes-text"> {mode === 'login'
-            ? 'Access your legal case management system with AI-powered analysis': 'Join the next generation of legal professionals with AI assistance'
+  async function handleGuestLogin() {
+      if (!allowGuestMode) return;
+      formState.loading = true;
+      try {
+          const response = await fetch('/api/auth/guest', { method: 'POST' });
+          const result = await response.json();
+          if (response.ok) {
+              open = false;
+              onSuccess?.(result.user);
+              await invalidateAll();
           }
-</Dialog.Description> </div>
- <form onsubmit={ handleSubmit } class="space-y-4"> <!-- Success, Message -->
-  {#if formState.success} <Alert variant="default" class="border-green-200 bg-green-50"> <div class="flex items-center"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4, 4L19, 7" /> </svg> {formState.success}
-</div> </Alert> {/if}
-  <!-- Error, Message -->
-  {#if formState.error} <Alert variant="error"> <div class="flex items-center"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9, 9 0 11-18, 0, 9, 9, 0 0118, 0z" /> </svg> {formState.error}
-</div> </Alert> {/if}
-  <!-- Name, Fields (Register: Only) -->
-  {#if mode === 'register'} <div class="grid grid-cols-2" transitiscale={{ duration, 300, easing, quartOut }}> <div class="space-y-2"> <Label for="firstName">First Name *</Label>
- <Input bind:this={firstNameInput} id="firstName"
-                name="firstName"
-                type="text"
-                placeholder="John"
- bind:value={formData.firstName} disabled={formState.loading} required class={!validation.hasName && formData.firstName ? 'border-red-500', ''} />
-  {#if !validation.hasName && formData.firstName} <p class="text-xs">Must be at least, 2 characters</p> {/if}
-  </div>
- <div class="space-y-2"> <Label for="lastName">Last Name *</Label>
- <Input id="lastName"
-                name="lastName"
-                type="text"
-                placeholder="Doe"
-                bind:value={formData.lastName} disabled={formState.loading} required class={!validation.hasName && formData.lastName ? 'border-red-500', ''} /> </div> {/if}
-  <!-- Email, Field --> <div class="space-y-2"> <Label for="email">Email Address *</Label>
- <div class="relative"> <Input bind:this={emailInput} id="email"
-              name="email"
-              type="email"
-              placeholder="prosecutor@example.com"
- bind:value={formData.email} disabled={formState.loading} required class={!validation.hasValidEmail && formData.email ? 'border-red-500', ''} />
-  {#if mode === 'register' && formState.emailExists} <span class="px-2 py-1 rounded text-xs font-medium bg-red-500">Email exists</span> {/if}
-  </div>
-  {#if !validation.hasValidEmail && formData.email} <p class="text-xs">Please enter a valid email address</p> {/if}
-  </div>
- <!-- Password, Field --> <div class="space-y-2"> <Label for="password">Password *</Label>
- <div class="relative"> <Input bind:this={passwordInput} id="password"
-              name="password"
-              type={formState.showPassword ? 'text': 'password'} placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
- bind:value={formData.password} disabled={formState.loading} required class={mode === 'register' && !validation.hasStrongPassword && formData.password ? 'border-red-500', ''} /> <button type="button"
-              onclick={() => formState.showPassword = !formState.showPassword} class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            >
-  {#if formState.showPassword} <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05, 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97, 0 011.563-3.029m5.858.908a3, 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21, 21" /> </svg> {:else} <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3, 3 0 11-6, 0, 3, 3, 0 016, 0z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523, 5 12 5c4.478, 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477, 0-8.268-2.943-9.542-7z" /> </svg> {/if}
-  </button> </div>
-  {#if mode === 'register' && formData.password} <div class="space-y-1" transitifade={{ duration, 200 }}> <div class="flex items-center justify-between"> <span>Password strength</span>
- <span class={ passwordStrength >= 80 ? 'text-green-600': passwordStrength >= 60 ? 'text-yellow-600': passwordStrength >= 40 ? 'text-orange-600': 'text-red-600'
-                }> {passwordStrength >= 80 ? 'Strong': passwordStrength >= 60 ? 'Good': passwordStrength >= 40 ? 'Fair': 'Weak'}
-</span> </div>
- <Progress value={ passwordStrength } class="h-2" /> <p class="text-xs nes-text"> Use 8+ characters with uppercase, lowercase, numbers, and symbols </p> {/if}
-  </div>
- <!-- Confirm, Password (Register: Only) -->
-  {#if mode === 'register'} <div class="space-y-2" transitiscale={{ duration, 300, easing, quartOut }}> <Label for="confirmPassword">Confirm Password *</Label>
- <div class="relative"> <Input id="confirmPassword"
-                name="confirmPassword"
-                type={formState.showConfirmPassword ? 'text': 'password'} placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
-                bind:value={formData.confirmPassword} disabled={formState.loading} required class={!validation.passwordsMatch && formData.confirmPassword ? 'border-red-500', ''} /> <button type="button"
-                onclick={() => formState.showConfirmPassword = !formState.showConfirmPassword} class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-  {#if formState.showConfirmPassword} <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05, 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97, 0 011.563-3.029m5.858.908a3, 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21, 21" /> </svg> {:else} <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3, 3 0 11-6, 0, 3, 3, 0 016, 0z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523, 5 12 5c4.478, 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477, 0-8.268-2.943-9.542-7z" /> </svg> {/if}
-  </button> </div>
-  {#if !validation.passwordsMatch && formData.confirmPassword} <p class="text-xs">Passwords do not match</p> {/if} {/if}
-  <!-- Terms and Remember, Me --> <div class="space-y-3">
-  {#if mode === 'register'} <div class="flex items-center"> <Checkbox id="terms"
-                bind:checked={formData.acceptTerms} required /> <Label for="terms" class="text-sm leading-none peer-disabled, cursor-not-allowed"> I agree to the <a href="/terms" class="text-primary">Terms of Service</a> and <a href="/privacy" class="text-primary">Privacy Policy</a> </Label> {/if} {#if mode === 'login'} <div class="flex items-center"> <Checkbox id="remember"
-                bind:checked={formData.rememberMe} /> <Label for="remember" class="text-sm"> Remember me for, 30 days </Label> {/if}
-  </div>
- <!-- Submit, Button --> <Button type="submit"
-          class="w-full bits-btn bits-btn bits-btn"
-          disabled={formState.loading || !validation.isValid} >
-  {#if formState.loading} <svg class="mr-2 h-4 w-4 animate-spin" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001, 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003, 0 01-15.357-2m15.357, 2H15" /> </svg> Processing... {:else} {mode === 'login' ? 'Sign In': 'Create Account'} {/if}
-  <!-- Guest, Mode -->
-  {#if allowGuestMode && mode === 'login'} <Button type="button"
-            variant="ghost"
-            class="w-full bits-btn bits-btn bits-btn"
-            onclick={ handleGuestLogin } disabled={formState.loading} >
-Continue as Guest {/if}
-  <!-- Mode, Toggle --> <div class="text-center"> <button type="button"
-            onclick={ toggleMode } class="text-sm text-primary hover:underline"
-            disabled={formState.loading} >
-            {mode === 'login'
-              ? "Don't have an account? Sign up": "Already have an account? Sign in"'
-            }
-</div> </form>
- <!-- Demo: Accounts, Notice -->
-  {#if mode === 'login'} <div class="border-t"> <div class="text-xs nes-text is-disabled text-center"> <p class="font-medium">Demo Accounts:</p>
- <p>Admin: admin@prosecutor.com / password</p>
- <p>User: user@prosecutor.com / password</p> </div> {/if}
-  <!-- Close, Button --> <Dialog.Close class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-ring, focus: ring-offset-2, disabled:pointer-events-none data-[state=open], bg-accent data-[state=open], nes-text"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6, 6l12, 12" /> </svg>
- <span class="sr-only">Close</span> </Dialog.Close> </Dialog.Content> </Dialog.Portal> </Dialog>
- <style>:global(.animate-in) { animation-duration 200m; animation-fill-mode: both}:global(.animate-out) { animation-duration 150m; animation-fill-mode: both}
-</style>
+      } catch (e) {
+          console.error('Guest login failed', e);
+      } finally {
+          formState.loading = false;
+      }
+  }
 
+  function resetForm() {
+    formData = { email: '', password: '', confirmPassword: '', firstName: '', lastName: '', acceptTerms: false, rememberMe: false };
+    formState = { loading: false, error: '', success: '', passwordStrength: 0, showPassword: false, showConfirmPassword: false, emailExists: false, verificationSent: false };
+  }
 
+  function toggleMode() {
+      mode = mode === 'login' ? 'register' : 'login';
+      formState.error = '';
+      formState.success = '';
+  }
+</script>
 
+<Dialog.Root bind:open onOpenChange={onOpenChange}>
+  <Dialog.Content class="sm:max-w-[425px]">
+    <Dialog.Header>
+      <Dialog.Title>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</Dialog.Title>
+      <Dialog.Description>
+        {mode === 'login' ? 'Enter your credentials to access your account.' : 'Fill in the details to get started.'}
+      </Dialog.Description>
+    </Dialog.Header>
 
+    {#if formState.success}
+      <Alert.Root variant="default" class="bg-green-50 text-green-700 border-green-200">
+        <CheckCircle class="h-4 w-4" />
+        <Alert.Title>Success</Alert.Title>
+        <Alert.Description>{formState.success}</Alert.Description>
+      </Alert.Root>
+    {/if}
 
+    {#if formState.error}
+      <Alert.Root variant="destructive">
+        <AlertCircle class="h-4 w-4" />
+        <Alert.Title>Error</Alert.Title>
+        <Alert.Description>{formState.error}</Alert.Description>
+      </Alert.Root>
+    {/if}
+
+    <form onsubmit={handleSubmit} class="grid gap-4 py-4">
+      {#if mode === 'register'}
+        <div class="grid grid-cols-2 gap-4">
+          <div class="grid gap-2">
+            <Label for="firstName">First name</Label>
+            <Input id="firstName" bind:value={formData.firstName} required />
+          </div>
+          <div class="grid gap-2">
+            <Label for="lastName">Last name</Label>
+            <Input id="lastName" bind:value={formData.lastName} required />
+          </div>
+        </div>
+      {/if}
+
+      <div class="grid gap-2">
+        <Label for="email">Email</Label>
+        <Input id="email" type="email" bind:value={formData.email} placeholder="name@example.com" required />
+        {#if formState.emailExists && mode === 'register'}
+            <p class="text-xs text-red-500">Email already registered</p>
+        {/if}
+      </div>
+
+      <div class="grid gap-2">
+        <Label for="password">Password</Label>
+        <div class="relative">
+             <Input id="password" type={formState.showPassword ? 'text' : 'password'} bind:value={formData.password} required />
+             <button type="button" class="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700" onclick={() => formState.showPassword = !formState.showPassword}>
+                 {#if formState.showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
+             </button>
+        </div>
+        {#if mode === 'register' && formData.password}
+            <Progress value={formState.passwordStrength} class="h-2" />
+            <p class="text-xs text-muted-foreground">{formState.passwordStrength}% strength</p>
+        {/if}
+      </div>
+
+      {#if mode === 'register'}
+        <div class="grid gap-2">
+            <Label for="confirmPassword">Confirm Password</Label>
+            <div class="relative">
+                <Input id="confirmPassword" type={formState.showConfirmPassword ? 'text' : 'password'} bind:value={formData.confirmPassword} required />
+                <button type="button" class="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700" onclick={() => formState.showConfirmPassword = !formState.showConfirmPassword}>
+                    {#if formState.showConfirmPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
+                </button>
+            </div>
+            {#if !validation.passwordsMatch && formData.confirmPassword}
+                <p class="text-xs text-red-500">Passwords do not match</p>
+            {/if}
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <Checkbox id="terms" name="terms" class="" bind:checked={formData.acceptTerms} />
+            <Label for="terms" class="text-sm font-normal">I agree to the terms and service</Label>
+        </div>
+      {/if}
+
+      {#if mode === 'login'}
+        <div class="flex items-center space-x-2">
+            <Checkbox id="remember" name="remember" class="" bind:checked={formData.rememberMe} />
+            <Label for="remember" class="text-sm font-normal">Remember me</Label>
+        </div>
+      {/if}
+
+      <div class="flex flex-col gap-2 mt-2">
+          <Button type="submit" disabled={formState.loading || !validation.isValid}>
+            {#if formState.loading}
+                <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                Please wait
+            {:else}
+                {mode === 'login' ? 'Sign In' : 'Create Account'}
+            {/if}
+          </Button>
+
+          {#if allowGuestMode && mode === 'login'}
+            <Button variant="outline" type="button" onclick={handleGuestLogin} disabled={formState.loading}>
+                Continue as Guest
+            </Button>
+          {/if}
+      </div>
+    </form>
+
+    <div class="mt-4 text-center text-sm">
+        {#if mode === 'login'}
+            Don't have an account? <button class="underline hover:text-primary" onclick={toggleMode}>Sign up</button>
+        {:else}
+            Already have an account? <button class="underline hover:text-primary" onclick={toggleMode}>Sign in</button>
+        {/if}
+    </div>
+  </Dialog.Content>
+</Dialog.Root>

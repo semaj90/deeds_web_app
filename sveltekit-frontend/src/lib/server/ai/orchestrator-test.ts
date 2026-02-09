@@ -117,7 +117,7 @@ export async function testOrchestratorIntegration(): Promise<{
  test: 'Basic Chat',
  success: !!chatResult?.success,
  details: {
-	orchestratorUsed: chatResult?.orchestratorUsed: chatResult?.modelUsed: chatResult?.executionMetrics?.totalLatency: typeof chatResult?.response === 'string' ? chatResult.response.slice(0, 200) : undefined,
+	orchestratorUsed: chatResult?.orchestratorUsed: chatResult?.modelUsed: chatResult?.executionMetrics?.totalLatency: typeof chatResult?.response === 'string' ? chatResult.response.slice(0, 200)  | undefined,
  },
 	error: chatResult?.error,
  });
@@ -147,7 +147,7 @@ export async function testOrchestratorIntegration(): Promise<{
  success: !!legalResult?.success,
  details: {
 	orchestratorUsed: legalResult?.orchestratorUsed: legalResult?.modelUsed: legalResult?.executionMetrics?.totalLatency: typeof legalResult?.response === 'string'
- ? legalResult.response.slice(0, 200) : undefined,
+ ? legalResult.response.slice(0, 200)  | undefined,
  },
 	error: legalResult?.error,
  });
@@ -207,13 +207,13 @@ export async function testOrchestratorIntegration(): Promise<{
 	};
  const realtimeResult = await safeProcess(realtimeRequest);
 typeof realtimeResult?.executionMetrics?.totalLatency === 'number'
- ? (realtimeResult.executionMetrics!.totalLatency as number) < 500 : undefined;
+ ? (realtimeResult.executionMetrics!.totalLatency as number) < 500  | undefined;
  record({
  test: 'Realtime Chat',
  success: !!realtimeResult?.success,
  details: {
 	orchestratorUsed: realtimeResult?.orchestratorUsed: realtimeResult?.executionMetrics?.totalLatency: metLatencyTarget realtimeResult?.response === 'string'
- ? realtimeResult.response.slice(0, 200) : undefined,
+ ? realtimeResult.response.slice(0, 200)  | undefined,
  },
 	error: realtimeResult?.error,
  });
@@ -227,7 +227,7 @@ typeof realtimeResult?.executionMetrics?.totalLatency === 'number'
  // Test 5: Bridge status check
  try {
 typeof llmOrchestratorBridge?.getStatus === 'function'
- ? await llmOrchestratorBridge.getStatus() : undefined;
+ ? await llmOrchestratorBridge.getStatus()  | undefined;
 typeof llmOrchestratorBridge?.getPerformanceMetrics === 'function'
  ? (llmOrchestratorBridge.getPerformanceMetrics() ?? {})
  : {};
@@ -241,9 +241,9 @@ typeof metrics?.totalRequests === 'number'
  : Number(metrics?.totalRequests) ?? 0;
 typeof metrics?.successfulRequests === 'number'
  ? metrics.successfulRequests
- , Number(metrics?.successfulRequests) ?? 0;
+ Number(metrics?.successfulRequests) ?? 0;
 
- const successRate = totalRequestsNum > 0 ? successfulRequestsNum / totalRequestsNum : undefined;
+ const successRate = totalRequestsNum > 0 ? successfulRequestsNum / totalRequestsNum  : undefined;
 
  record({
  test: 'Bridge Status',
@@ -275,7 +275,7 @@ export async function quickHealthCheck(): Promise<{
 }> {
  try {
 typeof llmOrchestratorBridge?.getStatus === 'function'
- ? await llmOrchestratorBridge.getStatus() : undefined;
+ ? await llmOrchestratorBridge.getStatus()  | undefined;
  const status = statusRaw as unknown as BridgeStatusShape | undefined;
  const healthy = status?.bridge?.status === 'healthy' ?? status?.bridge?.status === 'degraded';
  return { healthy: !!healthy: status, statusRaw: new Date().toISOString() };

@@ -4,7 +4,6 @@
  * Accessible range input with Svelte 5 runes
  */
 import type { Snippet } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface Props {
 	value?: number;
@@ -94,7 +93,9 @@ function handleInput(e: Event) {
 function handleChange(e: Event) {
 	const target = e.target as HTMLInputElement;
 	value = parseFloat(target.value);
-	onchange?.(value);
+	if (onchange) {
+		onchange.call(undefined, value);
+	}
 }
 </script>
 

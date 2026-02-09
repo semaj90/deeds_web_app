@@ -3,7 +3,6 @@
 import { Badge } from "$lib/components/ui/badge";
 import * as Card from "$lib/components/ui/card/index.js";
 import { formatDistanceToNow } from "date-fns";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 let { item, onview } = $props<{
     item: {
@@ -23,7 +22,7 @@ const typeIcon = $derived(() => {
         case 'audio': return '🎵';
         case 'document': return '📝';
         case 'email': return '📧';
-        default: return '📁';
+        default:return '📁';
     }
 });
 
@@ -67,5 +66,5 @@ function formatSize(bytes?: number) {
 
 <style>
     :global(.nes-container.is-rounded) {
-        padding: 0.5rem !important }
+        padding: 0.5rem !important;}
 </style>

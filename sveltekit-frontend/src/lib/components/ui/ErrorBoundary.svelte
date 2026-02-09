@@ -4,10 +4,12 @@
    * Catches JS errors and provides recovery options
    */
   // Migrated to $effect
-  import { Button } from '$lib/components/ui/enhanced-bits';
-  import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-svelte';
+  import Button from '$lib/components/ui/Button.svelte';
+  import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
+  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
+  import Home from 'lucide-svelte/icons/home';
+  import Bug from 'lucide-svelte/icons/bug';
   import type { Snippet } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
@@ -88,18 +90,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       window.addEventListener('error', handleError);
       window.addEventListener('unhandledrejection', handleError);
     }
-  });
 
-  // TODO: Add as cleanup in $effect: return () => {
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleError);
-    }
-  }
+    // TODO: Add cleanup: return () => { window.removeEventListener('error', handleError); window.removeEventListener('unhandledrejection', handleError); };
+  });
 </script>
 
 {#if error}
-  <div class="error-boundary min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark: from-red-950, dark:to-orange-950 flex items-center justify-center">
+  <div class="error-boundary min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark: from-red-950 dark:to-orange-950 flex items-center justify-center">
     <div class="max-w-2xl w-full mx-4">
       <!-- Error Card -->
       <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-red-200 dark:border-red-800 overflow-hidden">
@@ -156,7 +153,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           <!-- Technical Details (Collapsible) -->
           {#if showDetails && errorInfo}
             <details class="mt-4">
-              <summary class="cursor-pointer text-sm font-medium text-gray-700 dark: text-gray-300, hover:text-gray-900">
+              <summary class="cursor-pointer text-sm font-medium text-gray-700 dark: text-gray-300 hover:text-gray-900">
                 Technical Details
               </summary>
               <div class="mt-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">

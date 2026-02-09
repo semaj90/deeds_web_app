@@ -7,7 +7,6 @@
   import type { Readable } from 'svelte/store';
   import { get } from 'svelte/store';
   import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Temporary polyfill for FormStatePersistence if missing
   class FormStatePersistence {
@@ -40,20 +39,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     onDispatch?: (payload: Record<string, unknown>) => void;
     onsuccess?: (result: unknown) => void;
     onerror?: (error: {
-	message: string }) => void;
+message: string }) => void;
     onclose?: () => void;
   }>();
 
   // Minimal typing for the form integration
   type Subscriber<T = unknown> = (value: T) => void;
-  interface FormIntegrationType {
-    state: {
-	subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => string };
+  interface FormIntegrationType { state: { subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => string };
     context: {
 	subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => unknown };
-    form: {
-	form: Readable<CaseCreationSchemaType>;
-      submitting: Readable<boolean>;
+    form: { form: Readable<CaseCreationSchemaType>, submitting: Readable<boolean>;
 	allErrors: Readable<string[]>;
       errors: Readable<Record<string, string[]>>;
       enhance: (el: HTMLFormElement) => { destroy: () => void };
@@ -214,14 +209,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         <div>
           <label for="title" class="block text-sm font-bold text-yorha-light mb-1">CASE TITLE *</label>
           <input id="title" name="title" type="text" bind:value={formData.title} required
-                 class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus: border-yorha-accent-warm, focus:outline-none transition-colors" />
+                 class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm focus:outline-none transition-colors" />
           {#if formErrors.title}<p class="text-red-400 text-xs mt-1">{formErrors.title}</p>{/if}
         </div>
 
         <div>
           <label for="description" class="block text-sm font-bold text-yorha-light mb-1">DESCRIPTION *</label>
           <textarea id="description" name="description" rows="4" bind:value={formData.description} required
-                    class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus: border-yorha-accent-warm, focus:outline-none resize-none"></textarea>
+                    class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm focus:outline-none resize-none"></textarea>
           {#if formErrors.description}<p class="text-red-400 text-xs mt-1">{formErrors.description}</p>{/if}
         </div>
 
@@ -252,7 +247,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
       <div class="flex justify-end mt-6">
         <button type="button" onclick={nextStep} disabled={!formData.title || !formData.description}
-                class="px-6 py-2 bg-yorha-accent-warm text-yorha-dark font-bold rounded hover: bg-yorha-accent-warm/90, disabled:opacity-50">
+                class="px-6 py-2 bg-yorha-accent-warm text-yorha-dark font-bold rounded hover:bg-yorha-accent-warm/90 disabled:opacity-50">
           Next: Legal Details →
         </button>
       </div>
@@ -298,7 +293,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           ← Back
         </button>
         <button type="button" onclick={nextStep}
-                class="px-6 py-2 bg-yorha-accent-warm text-yorha-dark font-bold rounded hover: bg-yorha-accent-warm/90">, Next: Review →
+                class="px-6 py-2 bg-yorha-accent-warm text-yorha-dark font-bold rounded hover:bg-yorha-accent-warm/90">, Next: Review →
         </button>
       </div>
 
@@ -325,16 +320,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
       <div class="flex justify-between mt-6">
         <button type="button" onclick={previousStep} disabled={isSubmitting}
-                class="px-6 py-2 border border-yorha-accent-warm/50 text-yorha-light rounded hover: bg-yorha-accent-warm/10, disabled:opacity-50">
+                class="px-6 py-2 border border-yorha-accent-warm/50 text-yorha-light rounded hover:bg-yorha-accent-warm/10 disabled:opacity-50">
           ← Back
         </button>
         <div class="flex gap-2">
             <button type="button" onclick={handleClose} disabled={isSubmitting}
-                    class="px-6 py-2 border border-red-500/50 text-red-300 rounded hover: bg-red-900/20, disabled:opacity-50">
+                    class="px-6 py-2 border border-red-500/50 text-red-300 rounded hover:bg-red-900/20 disabled:opacity-50">
             Cancel
             </button>
             <button type="submit" disabled={isSubmitting || !isValid}
-                    class="px-6 py-2 bg-yorha-accent-warm text-yorha-dark font-bold rounded hover: bg-yorha-accent-warm/90, disabled:opacity-50 flex items-center gap-2">
+                    class="px-6 py-2 bg-yorha-accent-warm text-yorha-dark font-bold rounded hover:bg-yorha-accent-warm/90 disabled:opacity-50 flex items-center gap-2">
               {#if isSubmitting}
                 <div class="w-4 h-4 border-2 border-yorha-dark border-t-transparent rounded-full animate-spin"></div>
                 Creating...

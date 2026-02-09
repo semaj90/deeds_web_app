@@ -57,11 +57,11 @@ function validateVectorDimensions(dim: number): number {
 function adaptiveScalingDecision(
     avgMetrics: GPUPerformanceMetrics,
     thresholds: {
-	maxRenderTime: number; maxMemoryUsage: number;
+	maxRenderTime: number, maxMemoryUsage: number;
 	maxTemperature: number },
 	mode: AdaptiveScalingMode
 ): {
-	shouldScale: boolean; recommendedDimensions: VectorDimensions;
+	shouldScale: boolean, recommendedDimensions: VectorDimensions;
 	recommendedQuantization: QuantizationLevel } {
     // Simple decision logic
     const shouldScale =
@@ -92,8 +92,8 @@ const telemetryBus = {
         console.log('Vector encoding metrics:', { dimensions, processingTime, compressionRatio, gpuAccelerated });
     },
 	emitGPUEvent: (event: {
-	type: string; gpuUtilization: number;
-	memoryUsed: number; temperature: number }) => {
+	type: string, gpuUtilization: number;
+	memoryUsed: number, temperature: number }) => {
         // Stub: do nothing or log
         console.log('GPU event:', event);
     }
@@ -257,7 +257,7 @@ export class VectorMetadataEncoder {
      */
     async encodeBatch(
         batch: {
-	id: string; vector: number[] | Float32Array }[]
+	id: string, vector: number[] | Float32Array }[]
     ): Promise<AdaptiveEncodingResult> {
         return measureAsync('encodeBatch', async () => {
             const startTime = performance.now();

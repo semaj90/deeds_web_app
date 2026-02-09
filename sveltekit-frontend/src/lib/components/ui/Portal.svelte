@@ -7,7 +7,7 @@
   let { children }: Props = $props();
   // DOM refs (definite assignment for TS, defend at runtime)
   let portal!: HTMLDivElement
-  let target: HTMLElement | null = null
+  let target:HTMLElement | null = null
   $effect(() => {
 
     // Create portal target if it doesn't exist'

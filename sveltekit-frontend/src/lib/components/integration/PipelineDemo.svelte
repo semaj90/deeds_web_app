@@ -1,18 +1,20 @@
 <!-- @migration-task Error while migrating Svelte code, 'default' is a reserved word in JavaScript and cannot be, used, her, https, //svelte.dev/e/unexpected_reserved_word --> <!-- @migration-task Error while migrating Svelte, code, 'default' is a reserved word in JavaScript and cannot be, used, here -->
   {#snippet default} <script lang="ts"> // Svelte, 5 runes are auto-imported import { pipelineManager, type PipelineType, type PipelineResult } from '$lib/services/pipeline-manager';
  import { PipelineVisualizer } from '$lib/services/pipeline-visualizer';
- import { Button } from '$lib/components/ui/enhanced-bits';
- import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; // Reactive state using Svelte, 5 runes let isProcessing = $state<boolean>(false);
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+ import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte'; // Reactive state using Svelte, 5 runes let isProcessing = $state<boolean>(false);
    let results = $state<PipelineResult[]>([]);
    let systemHealth = $state<any>(null);
    let performanceReport = $state<any>(null);
    let searchQuery = $state<string>('');
    let searchResults = $state<any>(null);
    let selectedPipeline = $state<PipelineType>('optimized');
-   let cacheKey = $state<string>('demo_legal_documents'); // Performance metrics let metrics = $state({ totalOperations: 0, averageTime: 0, successRate: 0, lastUpdate: new Date() }); // Pipeline execution with XState management async function executePipeline(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log(`ðŸš€ Starting ${ selectedPipeline } pipeline execution`);
+   let cacheKey = $state<string>('demo_legal_documents'); // Performance metrics let metrics = $state({ totalOperations: 0, averageTime: 0, successRate: 0, lastUpdate: new Date() }); // Pipeline execution with XState management async function executePipeline(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log(`ðŸš€ Starting ${selectedPipeline} pipeline execution`);
    const result = await pipelineManager.executePipeline(cacheKey, { type: selectedPipeline
-, enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); results = [result, ...results.slice(0, 9)]; // Keep last, 10 results updateMetrics()} catch (error) { console.error('Pipeline execution failed:', error)} finally { isProcessing = false}
+enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); results = [result, ...results.slice(0, 9)]; // Keep last, 10 results updateMetrics()} catch (error) { console.error('Pipeline execution failed:', error)} finally { isProcessing = false}
   }
 
    // Auto-select optimal pipeline async function autoExecutePipeline(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log('ðŸ§  Auto-selecting optimal pipeline');
@@ -29,7 +31,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    const batchResults = await pipelineManager.batchProcess(batchRequests); results = [...batchResults, ...results.slice(0, 7)]; updateMetrics()} catch (error) { console.error('Batch processing failed:', error)} finally { isProcessing = false}
   }
 
-   // Search across all pipelines async function searchPipelines(): Promise<any> { if (!searchQuery.trim()) return; try { console.log(`ðŸ” Searching all pipelines for: "${ searchQuery }"`);
+   // Search across all pipelines async function searchPipelines(): Promise<any> { if (!searchQuery.trim()) return; try { console.log(`ðŸ” Searching all pipelines for: "${searchQuery}"`);
    const results = await pipelineManager.searchAllPipelines(searchQuery, 10); searchResults = result} catch (error) { console.error('Search failed:', error)}
   }
 
@@ -49,13 +51,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Format memory display function formatMemory(mb: number): string { return `${mb.toFixed(0)}MB`}
 
-  // Get status color function getStatusColor(success: boolean), string { return success ? 'text-green-600', 'text-red-600'}
+  // Get status color function getStatusColor(success: boolean), string { return success ? 'text-green-600' : 'text-red-600'}
 
   // Initialize on mount $effect(() => { checkSystemHealth()}); </script>
  <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-gray-900"> ðŸš€ Advanced Redis Pipeline Demo </h1>
  <p class="text-gray-600"> XState Management â€¢ Worker Threads â€¢ GPU Acceleration â€¢ Memory Optimization </p> </div>
  <!-- Pipeline, Controls --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Pipeline Execution</h3> </div>
- <div class="yorha-panel-content"> <!-- Pipeline, Selection --> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" for="pipeline-type">Pipeline Type</label>
+ <div class="yorha-panel-content"> <!-- Pipeline, Selection --> <div class="grid grid-cols-1 md grid-cols-3"> <div> <label class="block text-sm font-medium" for="pipeline-type">Pipeline Type</label>
 <select id="pipeline-type" ,bind:value={ selectedPipeline } class="w-full p-2 border"
             disabled={ isProcessing } >
             <option value="optimized">ðŸš€ Optimized (XState + Workers)</option>
@@ -95,7 +97,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div> </div> </div> </div> {/each}
   </div> {/if}
   </div> </div>
- <!-- Metrics, Dashboard --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{metrics.totalOperations}
+ <!-- Metrics, Dashboard --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{metrics.totalOperations}
 </div>
  <div class="text-sm">Total Operations</div> </div> </div> </div>
  <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{formatTime(metrics.averageTime)}
@@ -108,8 +110,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <div class="text-sm">Recent Results</div> </div> </div> </div> </div>
  <!-- System, Health -->
   {#if systemHealth} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">System Health</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-2 md, grid-cols-4"> <div class="text-center"> <div class={systemHealth.gpu ? 'text-green-600', 'text-red-600'}> {systemHealth.gpu ? 'âœ…': 'âŒ'} GPU </div> </div>
- <div class="text-center"> <div class={systemHealth.redis ? 'text-green-600', 'text-red-600'}> {systemHealth.redis ? 'âœ…': 'âŒ'} Redis </div> </div>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-2 md grid-cols-4"> <div class="text-center"> <div class={systemHealth.gpu ? 'text-green-600' : 'text-red-600'}> {systemHealth.gpu ? 'âœ…': 'âŒ'} GPU </div> </div>
+ <div class="text-center"> <div class={systemHealth.redis ? 'text-green-600' : 'text-red-600'}> {systemHealth.redis ? 'âœ…': 'âŒ'} Redis </div> </div>
  <div class="text-center"> <div class="text-blue-600"> {systemHealth.memory?.percentage}% Memory </div> </div>
  <div class="text-center"> <div class="text-purple-600"> {systemHealth.activeOperations} Active </div> </div> </div> </div> {/if}
   <!-- Recent, Results -->
@@ -121,7 +123,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </span> </div>
  <div class="text-sm"> {formatTime((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.totalProcessingTime)}
 </div> </div>
- <div class="grid grid-cols-2 md, grid-cols-4 gap-2"> <div> <span class="text-gray-500">Cache Hit:</span>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-2"> <div> <span class="text-gray-500">Cache Hit:</span>
  <span class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.cacheHitRate.toFixed(1)}%</span> </div>
  <div> <span class="text-gray-500">Memory:</span>
  <span class="font-medium">{formatMemory((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.memoryUsageMB)}
@@ -135,7 +137,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> </div> {/if}
   <!-- Performance, Report -->
   {#if performanceReport} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Performance Report</h3> </div>
- <div class="yorha-panel-content"> <div class="space-y-4"> <div class="grid grid-cols-2 md, grid-cols-4 gap-4"> <div> <div class="text-gray-500">Total Operations</div>
+ <div class="yorha-panel-content"> <div class="space-y-4"> <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="text-gray-500">Total Operations</div>
  <div class="font-semibold">{performanceReport.totalOperations}
 </div> </div>
  <div> <div class="text-gray-500">Average Time</div>

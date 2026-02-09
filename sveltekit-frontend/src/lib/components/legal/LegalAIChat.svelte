@@ -1,7 +1,6 @@
 <!-- Legal AI Chat Component - Svelte, 5 with: TensorRT, integration --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
- import { Button } from '$lib/components/ui/enhanced-bits';
+ import Button from '$lib/components/ui/Button.svelte';
  import  Card: CardContent: CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; interface LegalQuery { id?: number,prompt: string, response?: string; model_used?: string; tokens?: number; inference_time?: number; total_time?: number; similar_documents_found?: number; timestamp?: Date}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Svelte, 5 state let prompt = $state<string>('');
    let context = $state<string>('');
@@ -62,8 +61,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                 ></path> </svg> Processing... </span> {:else} Analyze {/if}
   </Button> </div> </CardContent> </Card>
  <!-- Sample, Prompts --> <Card.Root class="mb-8"> <CardHeader> <CardTitle>Sample Legal Queries</CardTitle> </CardHeader>
- <CardContent> <div class="grid grid-cols-1 md, grid-cols-2">
-  {#each Array.isArray(samplePrompts) ? samplePrompts: [] as sample} <button onclick={() => useSamplePrompt(sample)} class="p-3 text-left border border-gray-200 rounded-lg hover: border-blue-300, hover:bg-blue-50 transition-colors"
+ <CardContent> <div class="grid grid-cols-1 md grid-cols-2">
+  {#each Array.isArray(samplePrompts) ? samplePrompts: [] as sample} <button onclick={() => useSamplePrompt(sample)} class="p-3 text-left border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
             disabled={ isLoading } >
             <p class="text-sm">{ sample }
 </p> </button> {/each}
@@ -111,8 +110,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   </div> </CardContent> </Card> {/if}
   </div>
  <style> .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-	overflow: hidden}
-  .prose { line-height: 1.6}
+	overflow: hidden;}
+  .prose { line-height: 1.6;}
 </style>
 
 

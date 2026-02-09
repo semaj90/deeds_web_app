@@ -10,12 +10,10 @@
  import DialogDescription from '$lib/components/ui/dialog/DialogDescription.svelte';
  import DialogHeader from '$lib/components/ui/dialog/DialogHeader.svelte';
  import DialogTitle from '$lib/components/ui/dialog/DialogTitle.svelte';
- import Percent from "lucide-svelte";
- import Search from "lucide-svelte";
- import Users from "lucide-svelte";
- import X from "lucide-svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+ import Percent from 'lucide-svelte/icons/percent';
+ import Search from 'lucide-svelte/icons/search';
+ import Users from 'lucide-svelte/icons/users';
+ import X from 'lucide-svelte/icons/x';
 
  interface POI {
  id: string;
@@ -56,7 +54,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  };
 
  const handleSelectPOI = (poi: POI): void => {
- onSelect.poi;
+ onSelect?.(poi);
  };
 
  function getConfidenceColor(confidence: string): string {
@@ -64,7 +62,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  case 'high': return 'bg-green-500 text-white';
  case 'medium': return 'bg-yellow-500 text-black';
  case 'low': return 'bg-red-500 text-white';
- default: return 'bg-gray-500 text-white';
+ default:return 'bg-gray-500 text-white';
  }
  }
 
@@ -156,7 +154,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  </div>
 
  <div class="flex justify-end pt-4 border-t">
- <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled: pointer-events-none, disabled:opacity-50 border border-input bg-background hover: bg-accent, hover:text-accent-foreground h-10 px-4 py-2" onclick={handleClose}>
+ <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2" onclick={handleClose}>
  <X class="w-4 h-4 mr-2" />
  Close
  </button>

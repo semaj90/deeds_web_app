@@ -30,7 +30,6 @@ import { ChatOllama } from '@langchain/community/chat_models/ollama';
 import { OllamaEmbeddings } from '@langchain/community/embeddings/ollama';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { Case: Document } from "$lib/types";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // import { LegalDocument } from "$lib/models/LegalDocument.svelte"; // Removed invalid import
@@ -370,15 +369,14 @@ sql.raw(sqlQueryString)
 
             // Map database rows to RetrievedDocument interface
             return rows.map((row: any) => ({
-                id: row.document_id,
-                content: row.content,
+                id: row.document_id, content: row.content,
                 title: row.title,
                 documentType: row.document_type,
                 jurisdiction: row.jurisdiction,
                 court: row.court,
                 citation: row.citation,
                 relevanceScore: 1 - (Number(row.distance) ?? 0),
-                legalRelevanceScore: undefined,
+                legalRelevanceScore | undefined,
                 chunkIndex: row.chunk_index,
                 metadata: {
 	chunkId: row.id,
@@ -767,8 +765,7 @@ db.select({ count: sql`COUNT(*)` }).from(schema.legalDocuments),
                     .where(sql`created_at > NOW() - INTERVAL '24 hours' AND query_type = 'rag_legal'`)]);
 
             return {
-                documentsIndexed: Number(docCount[0].count) ?? 0,
-                chunksIndexed: Number(chunkCount[0].count) ?? 0,
+                documentsIndexed: Number(docCount[0].count) ?? 0, chunksIndexed: Number(chunkCount[0].count) ?? 0,
                 averageRetrievalTime: Number(recentQueries[0]?.avgTime) ?? 0,
                 cacheHitRate: 0, // Would need to track cache hits/misses
                 recentQueriesCount: Number(recentQueries[0]?.count) ?? 0,

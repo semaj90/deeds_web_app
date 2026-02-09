@@ -19,11 +19,11 @@
 	// Compute transition based on side
 	const flyParams = $derived(() => {
 		switch (drawerContext?.side) {
-			case 'left': return { x: -300, duration: 200 };
-			case 'right': return { x: 300, duration: 200 };
-			case 'top': return { y: -300, duration: 200 };
-			case 'bottom': return { y: 300, duration: 200 };
-			default: return { x: 300, duration: 200 };
+			case 'left': return { x: -300 duration: 200 };
+			case 'right': return { x: 300 duration: 200 };
+			case 'top': return { y: -300 duration: 200 };
+			case 'bottom': return { y: 300 duration: 200 };
+			default:return { x: 300 duration: 200 };
 		}
 	});
 
@@ -33,7 +33,7 @@
 			case 'right': return 'inset-y-0 right-0 h-full w-3/4 max-w-sm border-l';
 			case 'top': return 'inset-x-0 top-0 h-auto border-b';
 			case 'bottom': return 'inset-x-0 bottom-0 h-auto border-t';
-			default: return 'inset-y-0 right-0 h-full w-3/4 max-w-sm border-l';
+			default:return 'inset-y-0 right-0 h-full w-3/4 max-w-sm border-l';
 		}
 	});
 
@@ -45,10 +45,10 @@
 {#if drawerContext?.open}
 	<DrawerOverlay />
 	<div
-		transition, fly={flyParams()}
+		transition fly={flyParams()}
 		role="dialog"
 		aria-modal="true"
-		class="{baseClass} {sideClass()} { className }"
+		class="{baseClass} {sideClass()} {className}"
 	>
 		{#if children}
 			{@render children()}

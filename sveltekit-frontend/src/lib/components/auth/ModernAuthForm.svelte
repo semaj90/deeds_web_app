@@ -1,7 +1,8 @@
-<script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits';
- import  Alert  from "$lib/components/ui/alert/Alert.svelte";
- import  Label  from "$lib/components/ui/Label.svelte";
- import  Input  from "$lib/components/ui/Input.svelte"; interface Props { mode?: 'login' | 'register'; open?: boolean; onOpenChange?: (open: boolean) => void; onSuccess?: (user: any) => void}
+<script lang="ts"> import Alert from "$lib/components/ui/alert/Alert.svelte";
+import Button from '$lib/components/ui/Button.svelte';
+import Input from "$lib/components/ui/Input.svelte";
+import Label from "$lib/components/ui/Label.svelte";
+ interface Props { mode?: 'login' | 'register'; open?: boolean; onOpenChange?: (open: boolean) => void; onSuccess?: (user: any) => void}
   let { mode = $bindable('login'), open = $bindable(false), onOpenChange, onSuccess }: Props = $props();
    let formData = $state({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '' });
   let loading = $state<boolean>(false);
@@ -34,11 +35,11 @@
   > <p class="title">{mode === 'login' ? 'Login': 'Register'}</p>
  <!-- NOTE: Using the non-standard, 'onsubmit' attribute intentionally for Svelte, 5 runes compatibility. See: https://github.com/sveltejs/rfcs/blob/main/text/0127-runes.md and Svelte, 5 migration docs. If migrating to a different event system or reverting to idiomatic Svelte, use: 'onsubmit={ handleSubmit }' instead. This workaround is required for compatibility with the current runes-based event handling. MIGRATION INSTRUCTIon - If you are upgrading away from Svelte, 5 runes or restoring standard Svelte event, handling, replace, 'onsubmit={ handleSubmit }', with, 'onsubmit={ handleSubmit }' below. --> <form onsubmit={ handleSubmit } class="space-y-4">
   {#if success} <Alert variant="default" class="nes-text">{ success }</Alert> {/if} {#if error} <Alert variant="destructive" class="nes-text">{ error }</Alert> {/if} {#if mode === 'register'} <div class="grid grid-cols-2"> <div class="nes-field"> <Label for="firstName">First Name</Label>
- <Input id="firstName" bind:value={formData.firstName} required, class="nes-input" /> </div>
+ <Input id="firstName" bind:value={formData.firstName} required class="nes-input" /> </div>
  <div class="nes-field"> <Label for="lastName">Last Name</Label>
- <Input id="lastName" bind:value={formData.lastName} required, class="nes-input" /> </div> {/if}
+ <Input id="lastName" bind:value={formData.lastName} required class="nes-input" /> </div> </div>{/if}
   <div class="nes-field"> <Label for="email">Email</Label>
- <Input bind:this={emailInput} id="email" type="email", bind:value={formData.email} required, class="nes-input" /> </div>
+ <Input bind:this={emailInput} id="email" type="email" bind:value={formData.email} required class="nes-input" /> </div>
  <div class="nes-field"> <Label for="password">Password</Label>
  <Input bind:this={passwordInput} id="password"
           type="password"
@@ -48,11 +49,11 @@
  <Input id="confirmPassword"
             type="password"
             bind:value={formData.confirmPassword} required class="nes-input"
-          /> {/if}
+          /> </div> {/if}
   <Button type="submit" class="w-full nes-btn is-primary bits-btn" disabled={loading || !isValid}> {loading ? 'Processing...': mode === 'login' ? 'Sign In': 'Create Account'} </Button>
  <!-- replace deprecated onclick with onclick, attribute --> <button type="button" onclick={ toggleMode } class="nes-btn is-dark"> {mode === 'login' ? "Don't have an account? Sign up": 'Already have an account? Sign in'} </button> </form>
  <button type="button" onclick={() => (open = false)} class="absolute right-4 top-4 nes-btn is-error is-small"> Ã—'
-    </button> {/if}
+    </button></div> {/if}
   <style> /* Place to add: any component-specific styles */ </style>
 
 

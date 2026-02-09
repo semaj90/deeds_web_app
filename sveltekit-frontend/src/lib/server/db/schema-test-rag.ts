@@ -30,7 +30,7 @@ export const testRagDocuments = pgTable('test_rag_documents', {
 	confidence: real('confidence'),
 	legalAnalysis: jsonb('legal_analysis').$type<{
 		entities?: Array<{
-	type: string; value: string;
+	type: string, value: string;
 	offset: [number, number] }>;
 		parties?: string[];
 		dates?: string[];

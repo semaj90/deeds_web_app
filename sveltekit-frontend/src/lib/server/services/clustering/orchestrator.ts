@@ -44,10 +44,8 @@ export async function runClusteringWorkflow(
                     state: snapshot.value,
                     context: {
                         ...snapshot.context,
-                        previousLabels: snapshot.context.previousLabels
-                            ? Object.fromEntries(snapshot.context.previousLabels) : undefined,
-                        currentLabels: snapshot.context.currentLabels
-                            ? Object.fromEntries(snapshot.context.currentLabels) : undefined,
+                        previousLabels: snapshot.context.previousLabels ? Object.fromEntries(snapshot.context.previousLabels) : undefined,
+                        currentLabels: snapshot.context.currentLabels ? Object.fromEntries(snapshot.context.currentLabels) : undefined,
                     },
 	timestamp: new Date().toISOString(),
                 })

@@ -9,17 +9,13 @@
   import ZoomOut from 'lucide-svelte/icons/zoom-out';
 
   // Types
-  interface Legal3DEntity {
-    id: string;
-	type: 'person' | 'organization' | 'document' | 'location' | 'event';
+  interface Legal3DEntity { id: string, type: 'person' | 'organization' | 'document' | 'location' | 'event';
     position: {
 	x: number, y: number;
 	z: number };
   }
 
-  interface Camera3D {
-    position: {
-	x: number, y: number;
+  interface Camera3D { position: { x: number, y: number;
 	z: number };
     target: {
 	x: number, y: number;
@@ -44,9 +40,7 @@
   let isWebGPUActive = $state(false);
 
   // Constants
-  const LOD_CONFIG = {
-    0: {
-	description: 'Full Mesh Detail (High Poly)', distance: 0 },
+  const LOD_CONFIG = { 0: { description: 'Full Mesh Detail (High Poly)', distance: 0 },
 	1: {
 	description: 'Balanced (Mid Poly)', distance: 15 },
 	2: {
@@ -144,9 +138,8 @@
 </div>
 
 <style>
-  .nes-container {
-    background: white;
-	position: relative;
+  .nes-container { background: white;
+		position: relative;
   }
   .canvas-container {
     border: 4px solid #000;

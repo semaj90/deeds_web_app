@@ -1,6 +1,5 @@
 <script lang="ts">
  import { appActions, appStore } from '$lib/stores/app-store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  interface SystemProps {

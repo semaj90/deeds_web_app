@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';
+import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
 import { createActor } from 'xstate';
 import { createMetricsMachine } from '../metrics.js';
 
@@ -43,9 +43,8 @@ describe('Metrics State Machine', () => {
  actor.send({ type: 'FETCH' });
  actor.send({
  type: 'FETCH_SUCCESS',
- data: {
-	cpu_usage: 50, memory_usage: 60 },
-	});
+ data: { cpu_usage: 50, memory_usage: 60 },
+ });
 
  const state = actor.getSnapshot();
  expect(state.value).toBe('idle');
@@ -94,7 +93,7 @@ describe('Metrics State Machine', () => {
  }
  }
 
- actor.send({ type, 'RETRY' });
+ actor.send({ type: 'RETRY' });
  const state = actor.getSnapshot();
  expect(state.value).toBe('failed');
  });
@@ -107,9 +106,8 @@ describe('Metrics State Machine', () => {
  actor.send({ type: 'FETCH' });
  actor.send({
  type: 'FETCH_SUCCESS',
- data: {
-	cpu_usage: 50 },
-	});
+ data: { cpu_usage: 50 },
+ });
  actor.send({ type: 'RESET' });
 
  const state = actor.getSnapshot();
@@ -129,9 +127,8 @@ describe('Metrics State Machine', () => {
  actor.send({ type: 'RETRY' });
  actor.send({
  type: 'FETCH_SUCCESS',
- data: {
-	cpu_usage: 50 },
-	});
+ data: { cpu_usage: 50 },
+ });
 
  const state = actor.getSnapshot();
  expect(state.value).toBe('idle');
@@ -139,6 +136,3 @@ describe('Metrics State Machine', () => {
  expect(state.context.retryCount).toBe(0);
  });
 });
-
-
-

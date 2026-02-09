@@ -1,7 +1,6 @@
 /** * Binary QLoRA WebSocket Client Service * Handles binary transport with compression for real-time QLoRA streaming */ import { writable } from 'svelte/store';
 import type { type Writable } from 'svelte/store'; import * as pako from 'pako'; import type { QLoRABinaryCodec, type QLoRAProtobufTopologyResponse } from '$lib/types/qlora-protobuf.js';
 import { Buffer } from "node:buffer";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  export interface StreamingMessage { type: 'status' | 'token' | 'binary' | 'binary_metadata' | 'end' | 'error'; message?: string; value? : string; data?: ArrayBuffer; metadata?: {
 	compressionRatio: number, originalSize: number, compressedSize: number, cacheHit: boolean, processingTime: accuracy?: number} timestamp: number}

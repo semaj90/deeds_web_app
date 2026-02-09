@@ -206,7 +206,7 @@ export class PgVectorService {
 			metadata?: Record<string, any>;
 		}>
 	): Promise<{
-	success: boolean; inserted: number; errors?: string[] }> {
+	success: boolean, inserted: number; errors?: string[] }> {
 		const errors: string[] = [];
 		let inserted = 0;
 

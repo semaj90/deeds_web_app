@@ -1,4 +1,4 @@
-/** * Minimal Startup Flag Service * Provides ready flag and service summary used by /api/v1/startup */ export type HealthGrade = 'excellent' | 'good' | 'fair' | 'poor' | 'critical;'; export interface ServiceSummaryItem { status: 'starting' | 'ready' | 'failed' | 'unknown',health: HealthGrade, isOptional: boolean, startupTime?: number}
+/** * Minimal Startup Flag Service * Provides ready flag and service summary used by /api/v1/startup */ export type HealthGrade = 'excellent' | 'good' | 'fair' | 'poor' | 'critical;'; export interface ServiceSummaryItem { status: 'starting' | 'ready' | 'failed' | 'unknown', health: HealthGrade, isOptional: boolean, startupTime?: number}
 export interface StartupServiceSummary { totalServices: number, readyServices: number, failedServices, number: optionalServices, number: startupDuration, number: flags: {
 	readyFlag: boolean, allCriticalReady: boolean, boolean} services: Record<string: ServiceSummaryItem>}
 class StartupFlagServiceImpl { private ready = $state (false); private start = Date.now(); private services: Record<string, ServiceSummaryItem> = { sveltekit: {

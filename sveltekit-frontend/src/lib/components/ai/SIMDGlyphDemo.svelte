@@ -1,7 +1,9 @@
-<!-- @migration-task Error while migrating Svelte, code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token } --> <script lang="ts"> import { Button } from '$lib/components/ui/enhanced-bits'; // Svelte, 5 runes are auto-imported </script> // Migrated to $effect
- import  Button  from "$lib/components/ui/enhanced-bits.svelte";
- import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+<!-- @migration-task Error while migrating Svelte, code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token } --> <script lang="ts"> import Button from '$lib/components/ui/Button.svelte';
+import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let isGenerating = $state<boolean>(false);
    let results = $state<SearchResult[]>([]);
@@ -11,15 +13,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const demoPrompts = [ { text: 'Contract analysis for merger agreement', style: 'corporate', evidence_id: 1001 },
 	{ text: 'Criminal evidence forensic examination', style: 'forensic', evidence_id: 1002 },
 	{ text: 'Intellectual property case documentation', style: 'legal', evidence_id: 1003 },
-	{ text: 'Detective investigation visual summary'; style: 'detective', evidence_id: 1004 } ];
+	{ text: 'Detective investigation visual summary', style: 'detective', evidence_id: 1004 } ];
    let processingStats = $state({ totalGenerated: 0, averageCompressionRatio: 0, averageProcessingTime: 0, bestCompressionRatio: 0;
 	cumulativeStats: [] });
   async function generateSIMDGlyph(prompt, customSettings = ): Promise<any> { try { isGenerating = true;
-   const request = { evidence_id: prompt.evidence_id, prompt: prompt.text, style: prompt.style, dimensions: [512, 512]; seed: Math.floor(Math.random() * 1000000), neural_sprite_config: {
+   const request = { evidence_id: prompt.evidence_id, prompt: prompt.text, style: prompt.style, dimensions: [512, 512], seed: Math.floor(Math.random() * 1000000), neural_sprite_config: {
 	enable_compression: true, compression_ratio: compressionTarget / 10, predictive_frames: 3 },
 	simd_config: {
 	enable_tiling: true
-, tile_size: 16, compression_target: compressionTarget, shader_format: selectedFormat, adaptive_quality: true, performance_tier: selectedTier ...customSettings }
+tile_size: 16, compression_target: compressionTarget, shader_format: selectedFormat, adaptive_quality: true, performance_tier: selectedTier ...customSettings }
       } console.log('ðŸŽ¨ Generating SIMD, glyph:', request);
    const response = await fetch('/api/glyph/simd-embeds', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(request)}); if (!(response as { ok?: any; statusText?: any; json?: any }).ok) { throw new Error(`Generation failed: ${(response as { ok?: any, statusText?: any, json?: any }).statusText}`)}
@@ -43,12 +45,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const k = 1024;
    const sizes = ['B', 'KB', 'MB'];
    const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
-  function getQualityTierColor(tier) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800'; case, 'snes': return 'bg-blue-100 text-blue-800'; case, 'n64': return 'bg-purple-100 text-purple-800',default: return 'bg-gray-100 text-gray-800'}
+  function getQualityTierColor(tier) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800'; case, 'snes': return 'bg-blue-100 text-blue-800'; case, 'n64': return 'bg-purple-100 text-purple-800',default:return 'bg-gray-100 text-gray-800'}
   }
   function getCompressionColor(ratio) { if (ratio > 40) return 'text-green-600 font-bold'; if (ratio > 20) return 'text-blue-600 font-semibold'; if (ratio > 10) return 'text-orange-600'; return 'text-red-600'}
   $effect(() => { console.log('ðŸŽ¨ SIMD Glyph Demo component mounted')}); </script>
  <div class="p-6 max-w-7xl mx-auto"> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> ðŸ§¬ SIMD-Enhanced Legal Glyph Generation <span class="text-sm font-normal"> GPU-Accelerated Evidence Visualization with Neural Sprite Compression </span> </h3> </div>
- <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md, grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="-shader-format-"> Shader Format </label>
+ <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="-shader-format-"> Shader Format </label>
 <select id="-shader-format-" bind:value={ selectedFormat } class="w-full p-2 border"> <option value="webgpu">WebGPU Compute</option>
  <option value="webgl">WebGL Fragment</option>
  <option value="css">CSS Animation</option>
@@ -68,7 +70,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div> </div>
  <!-- Batch, Actions --> <div class="flex"> <Button.Root class="bits-btn bits-btn" onclick={ generateBatchDemo } disabled={ isGenerating } variant="ghost"> ðŸš€ Batch Demo <Button.Root class="bits-btn bits-btn" onclick={ testCompressionLevels } disabled={ isGenerating } variant="ghost"> ðŸ“Š Test Compression <Button.Root class="bits-btn bits-btn" onclick={() => results = []} variant="ghost"> ðŸ—‘ï¸ Clear Results </div>
  <!-- Processing, Statistics -->
-  {#if processingStats.totalGenerated > 0} <div class="grid grid-cols-2 md, grid-cols-4 gap-4 p-4 bg-blue-50"> <div class="text-center"> <div class="text-2xl font-bold">{processingStats.totalGenerated}
+  {#if processingStats.totalGenerated > 0} <div class="grid grid-cols-2 md grid-cols-4 gap-4 p-4 bg-blue-50"> <div class="text-center"> <div class="text-2xl font-bold">{processingStats.totalGenerated}
 </div>
  <div class="text-sm">Generated</div> </div>
  <div class="text-center"> <div class="text-2xl font-bold"> {processingStats.averageCompressionRatio.toFixed(1)}:1 </div>
@@ -87,10 +89,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="text-sm"> Style: {(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).style} â€¢ Evidence #{(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).evidence_id}
 </div> </div>
  <div class="yorha-panel-content"> <!-- Generated: Glyph, Display --> <div class="flex"> <div class="flex-1"> <div class="text-sm font-medium text-gray-700">Original Glyph</div>
- <img src={(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).glyph_url} alt={`${(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?, any }).style} glyph`} class="w-full h-32, object-cover rounded-lg"
+ <img src={(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).glyph_url} alt={`${(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?, any }).style} glyph`} class="w-full h-32 object-cover rounded-lg"
                 /> </div>
   {#if (result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).enhanced_artifact_url && (result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).enhanced_artifact_url !== (result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).glyph_url} <div class="flex-1"> <div class="text-sm font-medium text-gray-700">Enhanced Artifact</div>
- <img src={(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).enhanced_artifact_url} alt={`Enhanced ${(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?, any }).style} artifact`} class="w-full h-32, object-cover rounded-lg border-2 border-blue-200"
+ <img src={(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?: any }).enhanced_artifact_url} alt={`Enhanced ${(result as { success?: any; data?: any; metadata?: any; error?: any; simd_data?: any; id?: any; prompt?: any; style?: any; evidence_id?: any; glyph_url?: any; enhanced_artifact_url?: any; cache_hits?: any; timestamp?: any; processing_time?, any }).style} artifact`} class="w-full h-32 object-cover rounded-lg border-2 border-blue-200"
                   /> {/if}
   </div>
  <!-- SIMD: Optimization, Stats -->
@@ -125,12 +127,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           onclick={() => generateSIMDGlyph(demoPrompts[0])} disabled={ isGenerating } >
           ðŸš€ Generate Demo Glyph </div> {/if}
   </div>
- <style> /* Add custom styles for better visual presentation */:global(.simd-glyph-demo) { font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif}
-  /* Enhance code blocks */ pre { line-height: 1.4; max-height: 200px; overflow-y: auto}
+ <style> /* Add custom styles for better visual presentation */:global(.simd-glyph-demo) { font-family: 'Inter';
+		-apple-system: BlinkMacSystemFont, sans-serif;}
+  /* Enhance code blocks */ pre { line-height: 1.4; max-height: 200px; overflow-y: auto;}
   /* Improve image hover effects */ img:hover { transform: scale(1.02);
-	transition:transform 0.2s ease-in-out}
-  /* Add loading, animation: */ @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
-  .generating { animation: pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite}
+	transition:transform 0.2s ease-in-out;}
+  /* Add loading; animation: */ @keyframes pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.7;} }
+  .generating { animation: pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite;}
 </style>
 
 

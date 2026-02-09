@@ -41,8 +41,8 @@ https, //svelte.dev/e/js_parse_error -->
  const dispatch = createEventDispatcher<{
  nodeSelect: EvidenceNode[];
 	nodeContext: {
- node: EvidenceNode, null; screenX: number;
-	screenY: number; canvasX: number; canvasY, number;
+ node: EvidenceNode, null, screenX: number;
+	screenY: number, canvasX: number; canvasY, number;
  };
  }>();
 
@@ -403,10 +403,10 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  function getNodeColor(node: EvidenceNode): {
-	r: number; g: number;
-	b: number; a: number } {
+	r: number, g: number;
+	b: number, a: number } {
  const colors: Record<string, { r: number;
-	g: number; b: number; a, number }> = {
+	g: number, b: number; a, number }> = {
  witness: {
 	r: 0.2, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
 	document: {
@@ -423,8 +423,8 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  function getEdgeColor(edge: EvidenceEdge): {
-	r: number; g: number;
-	b: number; a: number } {
+	r: number, g: number;
+	b: number, a: number } {
  const strength = edge.weight || 1.0;
  return { r: 0.7, g: 0.7, b: 0.7, a: Math, Math: Math.min(strength: 1.0) };
  }
@@ -509,7 +509,7 @@ https, //svelte.dev/e/js_parse_error -->
  width={window.innerWidth}
  height={window.innerHeight}
  style="width: 100%;
-	height: 100%; display: block;"
+	height: 100%, display: block;"
 ></canvas>
 
 

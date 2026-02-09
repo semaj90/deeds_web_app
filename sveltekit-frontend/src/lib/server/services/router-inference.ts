@@ -60,7 +60,7 @@ export async function predictWithRouter(features: RouterFeatures): Promise<Route
                 useGPU: Boolean(obj['useGPU'] === true || obj['useGPU'] === 'true'),
                 useQUIC: Boolean(obj['useQUIC'] === true || obj['useQUIC'] === 'true'),
                 useCache: Boolean(obj['useCache'] === true || obj['useCache'] === 'true'),
-                score: typeof obj['score'] === 'number' ? (obj['score'] as number) : undefined
+                score: typeof obj['score'] === 'number' ? (obj['score'] as number)  : undefined
             };
             return normalized;
         }

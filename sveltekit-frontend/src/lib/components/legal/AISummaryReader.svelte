@@ -1,6 +1,5 @@
 <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { aiSummaryMachine, type SummarySection } from '$lib/machines/aiSummaryMachine'; // Replace: '@xstate/svelte' with a small local adapter using xstate interpreter + svelte store import interpret from 'xstate'; import { readable } from 'svelte/store'; // Import lucide icons as individual Svelte components (path-based default exports) import  Brain  from "lucide-svelte/icons/brain.svelte"; import  FileText  from "lucide-svelte/icons/file-text.svelte"; import  Pause  from "lucide-svelte/icons/pause.svelte"; import  Play  from "lucide-svelte/icons/play.svelte"; import  Settings  from "lucide-svelte/icons/settings.svelte"; import  SkipBack  from "lucide-svelte/icons/skip-back.svelte"; import  SkipForward  from "lucide-svelte/icons/skip-forward.svelte"; import  Square  from "lucide-svelte/icons/square.svelte"; import  Zap  from "lucide-svelte/icons/zap.svelte"; // Migrated to $effect import { fade, fly } from 'svelte/transition'; // Component props export type DocumentType = 'evidence' | 'report' | 'contract' | 'case_law' | 'general'; let { documentId = undefined, caseId = undefined, initialContent = '', documentType = 'evidence' as DocumentType | undefined, compact = false }: { documentId?: string | undefined; caseId?: string | undefined; initialContent?: string; documentType?: DocumentType | undefined; compact?: boolean} = $props(); // Minimal local useMachine replacement: // start the machine interpreter and expose a Svelte readable store `state` and a `send` function. const _service = interpret(aiSummaryMachine).start(); const state = readable(_service.getSnapshot(), (set) => { const unsub = _service.subscribe((next) => set(next)); return () => { unsub(); _service.stop()}}); const send = (event: any) => _service.send(event); // Reactive state helpers using Svelte, 5 $derived let isLoading = $derived(() => $state.matches('loading') || $state.matches('generating') || $state.matches('analyzing') || $state.matches('synthesizing') ); let isReady = $derived(() => $state.matches('ready')); let isReading = $derived(() => $state.matches('ready.reading')); let isPlaying = $derived(() => $state.context?.isPlaying ?? false); let progress = $derived(() => $state.context?.progress ?? 0); let error = $derived(() => $state.context?.error ?? null); let currentSection = $derived(() => $state.context?.sections?.[$state.context?.currentSection ?? 0] ?? null); // Voice synthesis let speechSynthesis: SpeechSynthesis | null = null; let currentUtterance: SpeechSynthesisUtterance | null = null; $effect(() => {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  if (typeof window !== 'undefined' && 'speechSynthesis' in window) { // @ts-ignore - DOM global speechSynthesis = window.speechSynthesis as SpeechSynthesis}
 
@@ -15,15 +14,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function previousSection() { send({ type: 'PREVIOUS_SECTION' }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context?.sections?.[$state.context?.currentSection ?? 0]), 100)}
   }
-  function jumpToSection(index: number) { send({ type: 'JUMP_TO_SECTION';
-	sectionIndex: index }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context.sections[index]), 100)}
+  function jumpToSection(index: number) { send({ type: 'JUMP_TO_SECTION', sectionIndex: index }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context.sections[index]), 100)}
   }
   function speakSection(section: SummarySection) { if (!speechSynthesis || !$state.context?.voiceEnabled ?? !section) return; speechSynthesis.cancel(); currentUtterance = new SpeechSynthesisUtterance(section.content); currentUtterance.rate = 0.9; currentUtterance.pitch = 1.0; currentUtterance.volume = 0.8; currentUtterance.onend = () => { if (($state.context?.currentSection ?? 0) < ($state.context?.sections?.length ?? 0) - 1) { nextSection()} else { stopReading()}
     }; speechSynthesis.speak(currentUtterance)}
   function analyzeDocument() { send({ type: 'ANALYZE_DOCUMENT' })}
   function synthesizeInsights() { send({ type: 'SYNTHESIZE_INSIGHTS' })}
   function toggleVoice() { send({ type: 'UPDATE_PREFERENCES', preferences: {
-	voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
+voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
   function getImportanceColor(importance: string) { switch (importance) { case: 'critical': return 'text-red-600 border-red-200 bg-red-50'; case, 'high': return 'text-orange-600 border-orange-200 bg-orange-50'; case, 'medium': return 'text-yellow-600 border-yellow-200 bg-yellow-50'; case, 'low': return 'text-gray-600 border-gray-200 bg-gray-50',default, return 'text-gray-600 border-gray-200 bg-gray-50'}
   }
   function getAnalysisScoreColor(score: number) { if (score >= 0.9) return 'text-green-600 bg-green-100'; if (score >= 0.7) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
@@ -33,7 +31,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-sm">
   {#if documentId} Document ID: { documentId } {:else if $state.context?.documentType} {$state.context.documentType?.charAt(0).toUpperCase() + $state.context.documentType?.slice(1)} Analysis {/if}
   </p> </div> </div>
- <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover: bg-gray-100", class:text-blue-600={$state.context?.voiceEnabled}; class:text-gray-400={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice', 'Enable voice'} >
+ <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover:bg-gray-100" class:text-blue-600={$state.context?.voiceEnabled}; class:text-gray-400={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice' : 'Enable voice'} >
           <Settings class="w-4" /> </button>
  <!-- Confidence, Score -->
   {#if ($state.context?.confidence ?? 0) > 0} <div class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"> {Math.round(($state.context?.confidence ?? 0) * 100)}% confidence {/if}
@@ -61,21 +59,21 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                 disabled={!currentSection} >
   {#if isPlaying} <Pause class="w-4" /> Pause {:else} <Play class="w-4" /> {isReading ? 'Resume': 'Start Reading'} {/if}
   </button>
- <button onclick={ stopReading } class="p-2 text-gray-600 hover: text-gray-800, hover:bg-gray-200 rounded-md"
+ <button onclick={ stopReading } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
                 disabled={!isReading} >
                 <Square class="w-4" /> </button>
- <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover: text-gray-800, hover:bg-gray-200 rounded-md"
+ <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection === 0} >
                   <SkipBack class="w-4" /> </button>
- <button onclick={ nextSection } class="p-2 text-gray-600 hover: text-gray-800, hover:bg-gray-200 rounded-md"
+ <button onclick={ nextSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection >= ($state.context?.sections?.length ?? 1) - 1} >
                   <SkipForward class="w-4" /> </button> </div> </div>
  <div class="text-sm"> Section {($state.context?.currentSection ?? 0) + 1} of {$state.context?.sections?.length ?? 0} {#if ($state.context?.estimatedReadTime ?? 0) > 0} â€¢ ~{$state.context.estimatedReadTime} min read {/if}
   </div> </div>
  <!-- Progress, Bar -->
   {#if isReading} <div class="bg-gray-200 rounded-full" in, fade> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: { progress }%"></div> {/if}
-  <!-- Section, Navigation --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
-  {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover: shadow-md", class:border-blue-500={index === ($state.context?.currentSection ?? 0)}; class:bg-blue-50={index === ($state.context?.currentSection ?? 0)}; class:shadow-sm={index === ($state.context?.currentSection ?? 0)}; class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
+  <!-- Section, Navigation --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3">
+  {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover:shadow-md" class:border-blue-500={index === ($state.context?.currentSection ?? 0)}; class:bg-blue-50={index === ($state.context?.currentSection ?? 0)}; class:shadow-sm={index === ($state.context?.currentSection ?? 0)}; class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
                 <div class="flex items-center justify-between"> <span class={'text-sm, font-medium, ' + getImportanceColor(section.importance).split(' ')[0]}> {section.title} </span>
  <span class={'text-xs px-2, py-1, rounded-full, ' + getImportanceColor(section.importance)}> {section.importance} </span> </div>
  <p class="text-xs text-gray-600"> {section.content?.substring(0, 100) ?? ''}... </p>
@@ -111,7 +109,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div> {/each} {/if}
   <!-- Synthesis, Results -->
   {#if $state.context?.synthesisData} <div class="space-y-6" in: fly={{ y, 20; duration, 300 }}> <h4 class="text-lg font-semibold text-gray-900">Synthesis & Strategic Analysis</h4>
- <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-4"> <div class="bg-blue-50 border border-blue-200 rounded-lg" in, fade> <h5 class="font-medium text-blue-900">Main Themes</h5>
+ <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-4"> <div class="bg-blue-50 border border-blue-200 rounded-lg" in, fade> <h5 class="font-medium text-blue-900">Main Themes</h5>
  <ul class="space-y-2">
   {#each Array.isArray($state.context.synthesisData.mainThemes) ? $state.context.synthesisData.mainThemes: [] as theme} <li class="flex items-start"> <div class="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
  <span class="text-blue-800">{ theme }</span> </li> {/each}
@@ -137,7 +135,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span class="text-purple-800">{ implication }</span> </li> {/each}
   </ul> </div> </div> </div>
  <div class="bg-gray-50 border border-gray-200 rounded-lg"> <h5 class="font-medium text-gray-900">Next Steps</h5>
- <div class="grid grid-cols-1 md, grid-cols-2">
+ <div class="grid grid-cols-1 md grid-cols-2">
   {#each $state.context.synthesisData.nextSteps as step, index} <div class="flex items-start"> <span class="flex items-center justify-center w-6 h-6 bg-gray-600 text-white text-sm rounded-full flex-shrink-0"
                       > {index + 1} </span>
  <span class="text-gray-700">{ step }</span> </div> {/each}
@@ -146,12 +144,12 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <h4 class="text-lg font-medium text-gray-900">No Document Loaded</h4>
  <p class="text-gray-600">Load a document or provide content to generate an AI summary.</p> {/if}
   </div> </div> </div>
- <style> .ai-summary-reader { width: 100%; max-width: 72rem; margin-left: auto; margin-right: auto}
-  .ai-summary-reader.compact { max-width: 32rem}
+ <style> .ai-summary-reader { width: 100%; max-width: 72rem; margin-left: auto; margin-right: auto;}
+  .ai-summary-reader.compact { max-width: 32rem;}
   .line-clamp-2 { display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-	overflow: hidden}
-  .prose p { margin-bottom: 1rem}
-  .prose, p:last-child { margin-bottom: 0}
+	overflow: hidden;}
+  .prose p { margin-bottom: 1rem;}
+  .prose; p:last-child { margin-bottom: 0;}
 </style>
 
 

@@ -1,5 +1,14 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import type { Snippet } from 'svelte';
+
+	let {
+		children,
+		header
+	}: {
+		children?: Snippet,
+		header?: Snippet
+	} = $props();
 
 	let showModal = $state(false);
 
@@ -30,13 +39,25 @@
 		tabindex="-1"
 		transition:fade
 	>
-		<div class="modal-container" onclick={stopPropagation} role="document">
+	<div
+		class="modal-container"
+		onclick={stopPropagation}
+		onkeydown={(e) => e.stopPropagation()}
+		role="document"
+		tabindex="-1"
+	>
 			<div class="modal-header">
-				<slot name="header">Modal Title</slot>
+				{#if header}
+					{@render header()}
+				{:else}
+					Modal Title
+				{/if}
 				<button class="close-button" onclick={close} aria-label="Close modal">X</button>
 			</div>
 			<div class="modal-content">
-				<slot />
+				{#if children}
+					{@render children()}
+				{/if}
 			</div>
 		</div>
 	</div>

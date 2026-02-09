@@ -3,7 +3,7 @@
 
 export interface ComponentModule {
     name: string;
-	default: any;
+	default:any;
 }
 
 export interface EnhancedComponentConfig {

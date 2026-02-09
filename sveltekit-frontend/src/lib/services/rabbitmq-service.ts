@@ -1,6 +1,5 @@
 import { browser } from '$app/environment';
 import { env } from '$lib/env';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Dynamic import for amqplib to handle type issues
 let amqp: any;
@@ -50,7 +49,7 @@ export interface IRabbitMQService {
     initialize(retries?: number, delay?: number): Promise<void>;
     publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean>;
     publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{
-	success: number; failed: number }>;
+	success: number, failed: number }>;
     purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean>;
     close(): Promise<void>;
     healthCheck(): Promise<any>;
@@ -68,7 +67,7 @@ class BrowserStub implements IRabbitMQService {
     async initialize() { return; }
     async publishDocumentProcessingJob(): Promise<boolean> { this.makeError(); }
     async publishBatchJobs(): Promise<{
-	success: number; failed: number }> { this.makeError(); }
+	success: number, failed: number }> { this.makeError(); }
     async purgeQueue(): Promise<boolean> { this.makeError(); }
     async close() { return; }
     async healthCheck() {
@@ -198,7 +197,7 @@ class RabbitMQService implements IRabbitMQService {
     }
 
     async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{
-	success: number; failed: number }> {
+	success: number, failed: number }> {
         let success = 0;
         let failed = 0;
 

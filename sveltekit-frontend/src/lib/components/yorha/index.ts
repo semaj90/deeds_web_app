@@ -13,9 +13,7 @@ export {
     YoRHaModal, YoRHaNavigation, YoRHaTable
 };
 
-export interface TableColumn {
-    key: string;
-	title: string;
+export interface TableColumn { key: string, title: string;
     sortable?: boolean;
     width?: string;
     align?: 'left' | 'center' | 'right';
@@ -37,7 +35,7 @@ export const YoRHa = {
     DataGrid: YoRHaDataGrid,
     Navigation: YoRHaNavigation,
     CommandCenter: YoRHaCommandCenter,
-    Modal: YoRHaModal,
+    Modal:YoRHaModal,
     Form: YoRHaForm,
     AIChat: YoRHaAIChat
 };

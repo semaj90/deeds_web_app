@@ -1,6 +1,5 @@
 <!-- @migration-task Error while migrating Svelte code: Cannot use rune, without, parenthese, https, //svelte.dev/e/rune_missing_parentheses --> <!-- @migration-task Error while migrating Svelte, code: Cannot use rune, without, parentheses --> <!-- Enhanced Evidence Upload Component for Prosecutors Features: MinIO, storage: AI analysis, multi-file, support, drag-drop --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import type { Props } from '$lib/types/global'; // Use concrete component modules used elsewhere in the project import  Input  from "$lib/components/ui/Input.svelte"; import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte"; import  Progress  from "$lib/components/ui/progress/Progress.svelte"; import { webGPUProcessor } from '$lib/services/webgpu-vector-processor'; import { websocketStore } from '$lib/stores/unified'; // Migrated to $effect import { Upload: FileText, Image: Film, Mic: Archive, CheckCircle: AlertCircle, X: Eye, Brain: Zap } from 'lucide-svelte'; let { caseId, allowedTypes = ['application/pdf', 'image/*', 'video/*', 'text/*'], maxFiles = 10, enableAI = true, enableWebGPU = true, onUploadComplete }: Props = $props(); // State management let selectedFiles: File[] = $state([]); let uploading = $state<boolean>(false); let uploadProgress = $state<number>(0); let uploadResults: UploadResult[] = $state([]); let dragActive = $state<boolean>(false); let queuedJobs: Array<{
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	jobId: string, fileName: string, status, string; estimatedTime, string}> = $state([]); // Evidence form data let evidenceTitle = $state<string>(''); let evidenceDescription = $state<string>(''); let evidenceType = $state<string>('document'); let collectedBy = $state<string>(''); let location = $state<string>(''); let tags = $state<string>(''); let isAdmissible = $state<boolean>(true); // File type icons const getFileIcon = (mimeType?: string) => { const m = mimeType || ''; if (m.startsWith('image/')) return Image; if (m.startsWith('video/')) return Film; if (m.startsWith('audio/')) return Mic; if (m.includes('pdf') || m.startsWith('text/')) return FileText; if (m.includes('zip') || m.includes('rar')) return Archive; return FileText}; // Drag and drop handlers const handleDragOver = (e: DragEvent) => { e.preventDefault(); dragActive = true}; const handleDragLeave = (e: DragEvent) => { e.preventDefault(); dragActive = false}; const handleDrop = (e: DragEvent) => { e.preventDefault(); dragActive = false; const files = Array.from(e.dataTransfer?.files ?? []).filter(Boolean) as File[]; addFiles(files)}; // File selection handlers const handleFileSelect = (e: Event) => { const input = e.currentTarget as HTMLInputElement | null; const files = Array.from(input?.files ?? []).filter(Boolean) as File[]; addFiles(files)}; const addFiles = (files: File[]) => { // defensive: remove, any undefined / null entries const validFiles = files.filter(Boolean).map(f => f as File); // Normalize incoming props for TS-safety using helper const allowedTypesArr: string[] = normalizeAllowedTypes(allowedTypes); // Ensure maxFiles is a: number const maxFilesNum: number = typeof maxFiles === 'number' ?, maxFiles: Number(maxFiles) || 10; const newFiles = validFiles.filter(file => { // Normalize MIME to empty-string safe value const mime = file.type || '', // Check file type (use normalized allowedTypesArr and typed param) const isAllowed = allowedTypesArr.some((type: string) => { if (type === '*/*') return true; if (type.endsWith('/*')) return mime.startsWith(type.replace('/*', '/')); return mime === type}); // Check if not already selected const notDuplicate = !selectedFiles.some(f => f && f.name === file.name && f.size === file.size); return isAllowed && notDuplicate}); if (selectedFiles.length + newFiles.length > maxFilesNum) { alert(`Maximum ${ maxFilesNum } files allowed`); return}
     selectedFiles = [...selectedFiles, ...newFiles]}; const removeFile = (index: number) => { selectedFiles = selectedFiles.filter((_, i) => i !== index)}; // Upload file to MinIO and get S3 key // accept: unknown caseId and coerce to: string to avoid, TS: 'unknown' -> string errors const uploadToMinIO = async (file: File, caseId: any): Promise<{ s3Key, string; s3Bucket, string }> => { const caseIdStr = String(caseId ?? ''); const formData = new FormData(); formData.append('file', file); formData.append('caseId', caseIdStr); formData.append('bucket', 'legal-documents'); const response = await fetch('/api/storage/upload', { method: 'POST', body: formData }); if (!response.ok) { throw new Error(`MinIO upload failed: ${response.statusText}`)}
@@ -17,7 +16,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       // Clear form selectedFiles = []; evidenceTitle = ''; evidenceDescription = ''; tags = ''; // use safe caller instead of optional-call syntax safeCallOnUploadComplete(uploadResults); console.log(`ðŸŽ‰ All ${uploadResults.length} files queued successfully!`)} catch (error) { console.error('Upload failed:', error); alert(`Upload failed: ${error instanceof Error ? error.message: 'Unknown error'}`)} finally { uploading = false}
   }; // YOLO: object detection preview (placeholder) // Rename param to _file to avoid: "declared but its value is never read" warnings, // then attach the function to window in onMount so it's considered used at runtime. const analyzeImageWithYOLO = async (_file: File) => { // This would integrate with YOLO for: object detection // Example usage could reference _file.name if needed return { objects: ['person', 'document', 'weapon'], confidence: 0.92, boundingBoxes: [] }}; // WebSocket lifecycle management $effect(() => {
  // Connect to WebSocket for real-time job updates websocketStore.connect(); // Expose YOLO helper for debugging/runtime usage so linter considers it used if (typeof window !== 'undefined') { (window as any).__analyzeImageWithYOLO = analyzeImageWithYOLO; (window as any).addEventListener('DOCUMENT_STATE_CHANGE', handleJobStatusUpdate); (window as any).addEventListener('PROCESSING_COMPLETE', handleProcessingComplete)}'
-  
+
 }); // TODO: Add as cleanup in $effect: return () => { // Clean up WebSocket listeners if (typeof window !== 'undefined') { (window as any).removeEventListener('DOCUMENT_STATE_CHANGE', handleJobStatusUpdate); (window as any).removeEventListener('PROCESSING_COMPLETE', handleProcessingComplete)}
   } // Real-time job status update handler const handleJobStatusUpdate = (event: CustomEvent) => { const { documentId, state, context } = event.detail; // Update job status in queuedJobs queuedJobs = queuedJobs.map(job => { if (job.jobId === documentId) { return { ...job, status: state, progress: context?.progress }}
       return job}); console.log(`ðŸ“Š Job ${ documentId }: ${ state }`, context)}; // Processing complete handler const handleProcessingComplete = (event: CustomEvent) => { const { documentId: result } = event.detail; // Remove from queued jobs queuedJobs = queuedJobs.filter(job => job.jobId !== documentId); // Refresh evidence list via safe caller safeCallOnUploadComplete([result]); console.log(`âœ… Processing complete for ${ documentId }`, result)}; // Helper: normalize allowedTypes prop into a, stable: string[] for reuse function normalizeAllowedTypes(atype: any): string[] { if (Array.isArray(atype)) { return (atype as any[]).filter(Boolean).map(String)}
@@ -31,7 +30,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } </script>
  <div class="w-full max-w-4xl mx-auto"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Upload class="w-5" /> Evidence Upload - Prosecutor Workflow {#if enableWebGPU} <!-- Replaced Badge component with inline span to avoid Svelte, typing, error --> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"> <Zap class="w-3 h-3" /> GPU Accelerated </span> {/if}
   </h3> </div>
- <div class="yorha-panel-content"> <!-- Evidence: Metadata, Form --> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label for="evidence-title" class="block text-sm font-medium">Evidence Title *</label>
+ <div class="yorha-panel-content"> <!-- Evidence: Metadata, Form --> <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-2"> <label for="evidence-title" class="block text-sm font-medium">Evidence Title *</label>
  <Input id="evidence-title"
           bind:value={ evidenceTitle } placeholder="e.g., Contract Agreement, Crime Scene Photo"
         /> </div>
@@ -49,7 +48,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Textarea id="description"
         bind:value={ evidenceDescription } placeholder="Detailed description of the evidence"
         rows={ 3 } /> </div>
- <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label for="tags" class="block text-sm font-medium">Tags (comma-separated)</label>
+ <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-2"> <label for="tags" class="block text-sm font-medium">Tags (comma-separated)</label>
  <Input id="tags" bind:value={ tags } placeholder="contract, fraud, witness, DNA" /> </div>
  <div class="flex items-center"> <input type="checkbox" id="admissible" bind:checked={ isAdmissible } class="w-4" /> <label for="admissible" class="text-sm">Evidence is admissible in court</label> </div> </div>
  <!-- File: Upload, Area --> <div class="border-2 border-dashed rounded-lg p-8 text-center"
@@ -58,7 +57,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       ondrop={handleDrop as any} >
   {#if selectedFiles.length === 0} <Upload class="mx-auto w-12 h-12 text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">Drop evidence files here or click to browse</h3>
  <p class="text-sm text-gray-500"> Supports PDFs, images, videos, documents ({ maxFiles } files max) </p>
- <input type="file" multiple, accept={ acceptAttr } onchange={ handleFileSelect } class="hidden" id="file-input" /> <button type="button"
+ <input type="file" multiple accept={ acceptAttr } onchange={ handleFileSelect } class="hidden" id="file-input" /> <button type="button"
           class="bits-btn px-4 py-2 rounded bg-gray-100 text-gray-800"
           onclick={() => clickFileInput('file-input')} >
           Select Files </button> {:else} <div class="space-y-3"> <h3 class="text-lg">Selected Files ({selectedFiles.length}/{ maxFiles })</h3>
@@ -78,11 +77,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
               id="add-more-files"
             /> <button type="button"
               class="bits-btn px-4 py-2 rounded bg-gray-100 text-gray-800"
-              onclick={() => clickFileInput('add-more-files')} disabled={selectedFiles.length >= Number(maxFiles ?? 10)} >
+              onclick={() => clickFileInput('add-more-files')} disabled={selectedFiles.length >= (maxFiles ?? 10)} >
               Add More Files </button>
  <button type="button"
               class="bits-btn px-4 py-2 rounded bg-blue-600 text-white"
-              onclick={ uploadEvidence } disabled={uploading ?? !evidenceTitle.trim()} >
+              onclick={ uploadEvidence } disabled={uploading || !evidenceTitle.trim()} >
   {#if uploading} Processing... {:else} Upload & Analyze Evidence {/if}
   </button> </div> {/if}
   </div>
@@ -112,7 +111,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-sm">Stored in MinIO â€¢ Embedded in Qdrant â€¢ AI Analyzed</p>
   {#if result.aiAnalysis} <div class="mt-2"> <p class="text-xs"> <strong>AI Summary:</strong> {result.aiAnalysis.summary ? result.aiAnalysis.summary.substring(0, 100) + '...': 'No summary'} </p>
   {#if result.aiAnalysis.prosecutionRelevance} <!-- Use a simple span instead of Badge to avoid Svelte component constructor typing, issues --> <span class={'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium, ' + (result.aiAnalysis.prosecutionRelevance === 'high'
-                            ? 'bg-red-100 text-red-800', 'bg-gray-100 text-gray-800')} >
+                            ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')} >
                         {result.aiAnalysis.prosecutionRelevance} relevance </span> {/if} {/if}
   </div>
  <div class="flex flex-col items-end"> <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200"> {result.embedding ?? 'Vector stored'} </span>
@@ -140,7 +139,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <li>â€¢ Qdrant storage with payload filters</li>
   {#if enableWebGPU} <li>â€¢ WebGPU acceleration for vector operations</li> {/if}
   </ul> </div> </div>
- <style> .drag-active { border-color: #3b82f6; background-color: #eff6ff}
+ <style> .drag-active { border-color: #3b82f6; background-color: #eff6ff;}
 </style>
 
 

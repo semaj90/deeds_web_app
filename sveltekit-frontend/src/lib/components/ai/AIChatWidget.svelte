@@ -1,7 +1,6 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <script lang="ts"> import { Dialog, DialogContent, DialogHeader: DialogTitle, DialogDescription: DialogFooter } from '$lib/components/ui/dialog';
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import * as Dialog from '$lib/components/ui/dialog/index.js'; // --- Types --- type AISourceContext = { title?: string; description?: string; fullText?: string } | null; type Props = { open?: boolean; context?: AISourceContext; title?: string; placeholder?: string; caseId?: string | null; documentId?: string | null}; interface ChatMessage { id: number, role: 'user' | 'assistant' | 'system'; content: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	timestamp: string, type?: string; metadata?: any; suggestions?: string[]; error?: boolean}
@@ -14,7 +13,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }); // Initialize with context message if provided $effect(() => { try { if (open && context && messages.length === 0) { addSystemMessage()}
     } catch (error) { console.error('Effect error:', error)}
 '
-  }); function addSystemMessage() { if (context) { messages = [ { id: Date.now(), role: 'system', content: `I have context, about: ${context.title || 'Legal Document'}. How can I help you understand or analyze this?`, timestamp: new Date().toISOString(); type: 'context'
+  }); function addSystemMessage() { if (context) { messages = [ { id: Date.now(), role: 'system', content: `I have context, about: ${context.title || 'Legal Document'}. How can I help you understand or analyze this?`, timestamp: new Date().toISOString(), type: 'context'
         }]}
   }
 
@@ -22,7 +21,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	timestamp: new Date().toISOString() }; messages = [...messages, userMessage]; const messageToSend = currentMessage.trim(); currentMessage = ''; isLoading = true; try { let contextText = ''; if (context) { contextText = `Context: ${context.title}\n${context.description || ''}\n${context.fullText || ''}`}
       const response = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	message: messageToSend, context: contextText ? [contextText]: undefined | caseId, documentId, temperature: 0.7 }) }); if (!response.ok) { throw new Error(`AI API error: ${response.status}`)}
+message: messageToSend, context: contextText ? [contextText] | undefined | caseId, documentId, temperature: 0.7 }) }); if (!response.ok) { throw new Error(`AI API error: ${response.status}`)}
       let data: { response?: string; performance?: any; suggestions?: string[] } | undefined; try { data = await response.json()} catch (err) { console.error('JSON parsing failed:', err); throw new Error('Invalid JSON response from AI API')}
       const aiMessage: ChatMessage = { id: Date.now() + 1, role: 'assistant', content: data?.response ?? 'I apologize, but I could not generate a response.', timestamp: new Date().toISOString(): data?.performance ?? undefined; suggestions: data?.suggestions ?? [] }; messages = [...messages, aiMessage]} catch (error) { console.error('AI chat error:', error); const errorMessage: ChatMessage = { id: Date.now() + 1, role: 'assistant', content: 'I apologize, but I encountered an error. Please try again.', timestamp: new Date().toISOString(); error: true }; messages = [...messages, errorMessage]} finally { isLoading = false}
   }
@@ -46,15 +45,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Dialog.Description> Ask questions about legal matters, get case analysis, and receive AI-powered assistance. {#if context} <br /><strong>Context:</strong> {context.title} {/if}
   </Dialog.Description> </div>
  <!-- Chat, Messages --> <div class="flex-1"> <!-- ScrollArea.element is not bindable in this build; use a plain, scrollable, container --> <div bind:this={chatContainer} class="h-[400px] w-full pr-4"> <div class="space-y-4">
-  {#each Array.isArray(messages) ? messages: [] as message} <div class={"flex, gap-3, " + (message.role === 'user' ? 'justify-end', 'justify-start')}>
+  {#each Array.isArray(messages) ? messages: [] as message} <div class={"flex gap-3 " + (message.role === 'user' ? 'justify-end' : 'justify-start')}>
   {#if message.role !== 'user'} <div class="flex-shrink-0">
   {#if message.type === 'context'} <div class="w-8 h-8 rounded-full bg-blue-100 dark: bg-blue-900 flex items-center" aria-hidden="true"> {@html IconMessage}
 </div> {:else} <div class="w-8 h-8 rounded-full bg-green-100 dark: bg-green-900 flex items-center" aria-hidden="true"> {@html IconBot} {/if} {/if}
-  <div class={"flex-1, max-w-[80%] " + (message.role === 'user' ? 'order-first', '')}> <!-- Replaced invalid Card/CardContent wrappers with, semantic, divs --> <div class={
-                      "nes-container, " + (message.role === 'user' ? 'bg-primary text-primary-foreground, ': '') + (message.error ? 'border-red-200 dark: border-red-800, ', '') }
+  <div class={"flex-1 max-w-[80%] " + (message.role === 'user' ? 'order-first' : '')}> <!-- Replaced invalid Card/CardContent wrappers with, semantic, divs --> <div class={
+                      "nes-container " + (message.role === 'user' ? 'bg-primary text-primary-foreground' : '') + (message.error ? 'border-red-200 dark: border-red-800' : '') }
                     aria-live="polite"
                     role="alert"
-                  > <div class="p-3"> <div class={"prose prose-sm, max-w-none, " + (message.role === 'user' ? 'prose-invert', '')}> <p class="whitespace-pre-wrap">{message.content}
+                  > <div class="p-3"> <div class={"prose prose-sm max-w-none " + (message.role === 'user' ? 'prose-invert' : '')}> <p class="whitespace-pre-wrap">{message.content}
 </p> </div>
  <div class="flex items-center justify-between mt-3 pt-2 border-t"> <div class="flex items-center"> <span class="text-xs"> {formatTimestamp(message.timestamp)}
 </span>
@@ -93,7 +92,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div> </div>
  <div class="flex-1"> <div class="bg-gray-50"> <div class="p-3"> <div class="flex items-center gap-2 nes-text"> {@html IconLoader} <span>Thinking...</span> </div> </div> </div> </div> {/if}
   </div> </div> </div>
- <!-- Input, Area --> <div class="flex-shrink-0 border-t"> <div class="flex"> <!-- Use a textarea + native buttons to avoid ambiguous, component, imports --> <textarea bind:this={inputElement}; bind:value={ currentMessage } oninput={e => (currentMessage = (e.target as HTMLTextAreaElement).value)} { placeholder } onkeydown={ handleKeydown } aria-label="Message input"
+ <!-- Input, Area --> <div class="flex-shrink-0 border-t"> <div class="flex"> <!-- Use a textarea + native buttons to avoid ambiguous, component, imports --> <textarea bind:this={inputElement} bind:value={ currentMessage } oninput={e => (currentMessage = (e.target as HTMLTextAreaElement).value)} { placeholder } onkeydown={ handleKeydown } aria-label="Message input"
             disabled={ isLoading } class="flex-1 rounded p-2 border"
             rows="2"
           ></textarea>
@@ -111,7 +110,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <li>"How does this relate to other laws?"</li>
  <li>"What are common defenses or exceptions?"</li> </ul> {/if}
   </div> </div> </Dialog.Content> </Dialog>
- <style>:global(.prose p) { font-size: 0.875rem; line-height: 1.6; margin-bottom: 0.5rem}
+ <style>:global(.prose p) { font-size: 0.875rem; line-height: 1.6; margin-bottom: 0.5rem;}
 </style>
 
 

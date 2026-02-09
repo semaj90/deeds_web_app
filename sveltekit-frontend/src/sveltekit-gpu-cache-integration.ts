@@ -1,7 +1,7 @@
 /**
  * SvelteKit GPU Cache Integration - SSR + Client Cache Orchestration
  * Provides seamless integration between server-side GPU caching and client-side caching
- * Integrates: IndexedDB:, LokiJS: User History, Predictive Prefetch
+ * Integrates: IndexedDB, LokiJS: User History, Predictive Prefetch
  */
 
 import { browser } from '$app/environment';

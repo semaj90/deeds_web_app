@@ -10,7 +10,6 @@
  */
 
 import type { CrawledDocument, IndexResult,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   ReindexStats, SearchResult } from './types.js';
 
 export interface KnowledgeIndexerConfig {
@@ -325,7 +324,7 @@ Summary:`;
     const tfVector = new Map<string, number>();
 
     // Tokenize and count
-    const words = content.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+    const words = content.toLowerCase().match(/\b[a-z]{3}\b/g) || [];
     const totalWords = words.length;
 
     if (totalWords === 0) return tfVector;

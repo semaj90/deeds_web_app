@@ -269,7 +269,7 @@ export class EmbeddingsService {
 	5000);
 
           const messageHandler = (event: MessageEvent) => {
-            const payload = event?.data as WorkerMessage | undefined;
+            const payload = event?.data as WorkerMessage : undefined;
             if (
               payload?.type === 'pong' &&
               (payload.id === id || typeof payload.id === 'undefined')
@@ -315,7 +315,7 @@ export class EmbeddingsService {
   }
 
   async cleanup(): Promise<void> {
-    for (const [, request] of this.pendingRequests) {
+    for (const [request] of this.pendingRequests) {
       try {
         request.reject(new Error('Service shutting down'));
       } catch {

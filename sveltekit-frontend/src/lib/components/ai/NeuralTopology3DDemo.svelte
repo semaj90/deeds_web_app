@@ -1,60 +1,71 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
-https, //svelte.dev/e/js_parse_error -->
+https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
 <script lang="ts">
-  // Migrated to $effect
+  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 
   import { reinforcementLearningCache } from '$lib/caching/reinforcement-learning-cache';
   // import entire modules to be robust against named vs default exports
   import * as nesGPUBridgeModule from '$lib/gpu/nes-gpu-memory-bridge';
 
   import * as chrRomModule from '$lib/services/chr-rom-precomputation-service';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Normalize exports: prefer named export then default, then the module itself.
   // This preserves existing usage in the file: nesGPUBridge.storeCHRROMPattern(...), nesGPUBridge.getCHRROMPattern(...)
-  const nesGPUBridge: string | number =
-    (nesGPUBridgeModule as unknown).nesGPUBridge ??
-    (nesGPUBridgeModule as unknown).NESGPUBridge ??
-    (nesGPUBridgeModule as unknown).default ??
+  const nesGPUBridge: any =
+    (nesGPUBridgeModule, as: any).nesGPUBridge ??
+    (nesGPUBridgeModule as: any).NESGPUBridge ??
+    (nesGPUBridgeModule as: any).default ??
     nesGPUBridgeModule
-  // The service may be exported as chrRomPrecomputationService: CHRROMPrecomputationService, or default.
-  const chrRomPrecomputationService: unknown =
-    (chrRomModule as unknown).chrRomPrecomputationService ??
-    (chrRomModule as unknown).CHRROMPrecomputationService ??
-    (chrRomModule as unknown).default ??
+  // The service may be exported as chrRomPrecomputationService, CHRROMPrecomputationService, or default.
+  const chrRomPrecomputationService: any =
+    (chrRomModule, as: any).chrRomPrecomputationService ??
+    (chrRomModule as: any).CHRROMPrecomputationService ??
+    (chrRomModule as: any).default ??
     chrRomModule
   // Add typed shapes to avoid: 'never' errors in template
   type Prediction = {
-    step: number, action: string
+    step: number
+    action: string
     prediction {
       geometryComplexity?: string
       animationType?: string
       predictedUsage?: number
-      [key: string]: unknown};
+      [key: string]: any};
     confidence: number};
   type AnimationItem = {
-    step: number, componentId: string, animationType: string
+    step: number
+    componentId: string
+    animationType: string
     compressed?: boolean};
   type SearchResultItem = {
-    step: number, query: string, results: unknown[];
-	count: number};
+    step: number
+    query: string
+    results: any[]; count: number};
   type PerformanceSummary = {
-    totalPredictions: number, totalAnimations: number, totalSearches: number, averageCacheHitRatio: number, neuralTopologiesActive: number, avgProcessingTime: number};
+    totalPredictions: number
+    totalAnimations: number
+    totalSearches: number
+    averageCacheHitRatio: number
+    neuralTopologiesActive: number
+    avgProcessingTime: number};
   type PerformanceMetrics = {
     summary?: PerformanceSummary
-    [key: string]: unknown};
+    [key: string]: any};
   type Asset3DMetrics = {
-    predictedComponents: number, prerenderedAnimations: number, chrRomPatterns: number, cacheHitRatio: number};
+    predictedComponents: number
+    prerenderedAnimations: number
+    chrRomPatterns: number
+    cacheHitRatio: number};
   type NeuralTopologyStatus = {
-    transformer: string, autoencoder: string, cnn: string;
-	rnn: string};
+    transformer: string
+    autoencoder: string
+    cnn: string; rnn: string};
   // Component props and state (Svelte, 5 runes)
   // replace `export let` with $props() destructure and add a typed dispatcher
   let { width = 800, height = 480 } = $props() as { width?: number; height?: number };
   // replace dispatcher type so `device` can be: null/undefined safely
   const dispatch = createEventDispatcher<{
-    ready: {
-	supported: boolean, device?, GPUDevice | null; error?, string }}>();
+    ready: { supported: boolean, device?: GPUDevice | null; error?: string }}>();
   // Svelte, 5 runes state - add explicit types and typed initializers
   let demoStage: string = $state('initializing');
 
@@ -64,12 +75,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   let searchResults: SearchResultItem[] = $state([] as SearchResultItem[]);
 
-  let performanceMetrics: PerformanceMetrics = $state(0% as PerformanceMetrics);
+  let performanceMetrics: PerformanceMetrics = $state({} as PerformanceMetrics);
 
-  let neuralTopologyStatus: NeuralTopologyStatus = $state({ transformer: 'idle';
-	autoencoder: 'idle',
-    cnn: 'idle';
-	rnn: 'idle'
+  let neuralTopologyStatus: NeuralTopologyStatus = $state({ transformer: 'idle', autoencoder: 'idle',
+    cnn: 'idle', rnn: 'idle'
   } as NeuralTopologyStatus);
 
   let userActions: string[] = $state(['hover_contract', 'click_evidence', 'scroll_documents', 'drag_asset']);
@@ -77,18 +86,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let currentActionIndex: number = $state(0);
 
   let isRunningDemo: boolean = false
-  let asset3DMetrics: Asset3DMetrics = $state({ predictedComponents: 0;
-	prerenderedAnimations: 0,
-    chrRomPatterns: 0;
-	cacheHitRatio: 0
+  let asset3DMetrics: Asset3DMetrics = $state({ predictedComponents: 0, prerenderedAnimations: 0,
+    chrRomPatterns: 0, cacheHitRatio: 0
   } as Asset3DMetrics);
   // WebGPU related
   let canvas: HTMLCanvasElement | null = $state(null as HTMLCanvasElement | null);
 
   let webgpuSupported: boolean = $state(typeof navigator !== 'undefined' && 'gpu' in navigator);
 
-  let initError: string | null = $state(null; as string | null);
-  // use:undefined to match requestDevice possibly returning: undefined
+  let initError: string | null = $state(null, as: string | null);
+  // use | undefined to match requestDevice possibly returning | undefined
   let device: GPUDevice | undefined = undefined
   $effect(() => {
     (async () => {
@@ -109,21 +116,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     neuralTopologyStatus.cnn = webgpuOk ? 'active' : 'fallback';
     console.log(`ðŸ‘ï¸ CNN: WebGPU ${webgpuOk ? 'active' : 'fallback to CPU'}`);
 
-    const rlStats = reinforcementLearningCache.getLearningState?.() ?? { cacheSize: 0 };
+    const rlStats = reinforcementLearningCache.getLearningState?.() || { cacheSize: 0 };
     neuralTopologyStatus.rnn = 'active';
     console.log(`ðŸ”„, RNN: Sequence prediction active (${rlStats.cacheSize} patterns)`)}
   async function setupDemoEnvironment(): Promise<any> {
     const legalAssets = [
-      { id: 'contract_3d', type: 'document_stack', complexity: 'medium';
-	context: 'contract' },
-	{ id: 'evidence_3d', type: 'container', complexity: 'high';
-	context: 'evidence' },
-	{ id: 'gavel_3d', type: 'animation', complexity: 'medium';
-	context: 'decision' },
-	{ id: 'scales_3d', type: 'balance', complexity: 'high';
-	context: 'justice' },
-	{ id: 'text_particles_3d', type: 'particle_system', complexity: 'low';
-	context: 'visualization' }
+      { id: 'contract_3d', type: 'document_stack', complexity: 'medium', context: 'contract' },
+      { id: 'evidence_3d', type: 'container', complexity: 'high', context: 'evidence' },
+      { id: 'gavel_3d', type: 'animation', complexity: 'medium', context: 'decision' },
+      { id: 'scales_3d', type: 'balance', complexity: 'high', context: 'justice' },
+      { id: 'text_particles_3d', type: 'particle_system', complexity: 'low', context: 'visualization' }
     ];
     for (const asset of legalAssets) {
       const patternId = `demo_${asset.id}`;
@@ -167,15 +169,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       asset3DMetrics.predictedComponents++}
 
     // Autoencoder pre-render
-    if (userAction.includes('click') ?? userAction.includes('drag')) {
+    if (userAction.includes('click') || userAction.includes('drag')) {
       await reinforcementLearningCache.preRenderAnimations?.(
         `component_${step}`,
-        predicted3D?.animationType ?? 'transform'
+        predicted3D?.animationType || 'transform'
       );
       animations = [
         ...animations, {
-          step: step + 1; componentId: `component_${step}`,
-          animationType: predicted3D?.animationType ?? 'transform'; compressed: true
+          step: step + 1, componentId: `component_${step}`,
+          animationType: predicted3D?.animationType || 'transform', compressed: true
         }
       ];
       asset3DMetrics.prerenderedAnimations++}
@@ -184,14 +186,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     const searchQuery = userAction.replace(/_/g, ' ').toLowerCase();
 
     const assetSearchResults = await searchPredictive3DAssets(searchQuery, {
-      documentType: step % 2 === 0 ? 'contract' : 'evidence', complexity: predicted3D?.geometryComplexity ?? 'medium',
+      documentType: step % 2 === 0 ? 'contract' : 'evidence', complexity: predicted3D?.geometryComplexity || 'medium',
       interactionType: userAction.split('_')[0]
     });
     searchResults = [
       ...searchResults, {
-        step: step + 1; query: searchQuery,
-        results: assetSearchResults;
-	count: assetSearchResults.length
+        step: step + 1, query: searchQuery,
+        results: assetSearchResults, count: assetSearchResults.length
       }
     ];
     // CNN processing (simulated)
@@ -204,24 +205,25 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     // metrics update
     const processingTime = performance.now() - startTime
-    const cacheStats = reinforcementLearningCache.getLearningState?.() ?? { hitRate: 0 };
+    const cacheStats = reinforcementLearningCache.getLearningState?.() || { hitRate: 0 };
     asset3DMetrics.cacheHitRatio = Math.round((cacheStats.hitRate ?? 0) * 100);
     performanceMetrics = {
       ...performanceMetrics,
       [`step_${step + 1}`]: {
-	processingTime: Math.round(processingTime),
+        processingTime: Math.round(processingTime),
         prediction !!predicted3D,
-        animation: animations.some((a: unknown) => a.step === step + 1); searchResults: assetSearchResults.length,
+        animation: animations.some((a: any) => a.step === step + 1), searchResults: assetSearchResults.length,
         chrRomHit: !!chrRomPattern
       }
     };
     console.log(`âš¡ Step ${step + 1} completed in ${processingTime.toFixed(2)}ms`)}
-  async function searchPredictive3DAssets(query: string, context: unknown): Promise<any> {
+  async function searchPredictive3DAssets(query: string, context: any): Promise<any> {
     try {
       const response = await fetch('/api/brain/3d-assets/search', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	query: context,
+        body: JSON.stringify({
+          query,
+          context,
           predictiveMode: true, precomputeAnimations: true
         })
       });
@@ -231,15 +233,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     } catch (error) {
       console.warn('3D Asset search API not available, using mock results')}
     return [
-      { assetId: `mock_${query.replace(/ /g, '_')}`, predictedUsage: 0.8;
-	assetType: '3d_model' },
-	{ assetId: `${context.documentType}_visualization`, predictedUsage: 0.7;
-	assetType: 'animation' }
+      { assetId: `mock_${query.replace(/ /g, '_')}`, predictedUsage: 0.8, assetType: '3d_model' },
+      { assetId: `${context.documentType}_visualization`, predictedUsage: 0.7, assetType: 'animation' }
     ]}
-  async function processVisualPatterns(predicted3D: unknown, userAction: string): Promise<any> {
+  async function processVisualPatterns(predicted3D: any, userAction: string): Promise<any> {
     const patterns = {
-      geometric: predicted3D?.geometryComplexity === 'high' ? 0.9 : 0.6;
-	textural: userAction.includes('hover') ? 0.8 : 0.5,
+      geometric: predicted3D?.geometryComplexity === 'high' ? 0.9 : 0.6, textural: userAction.includes('hover') ? 0.8 : 0.5,
       motion userAction.includes('drag') ? 0.9 : 0.3,
       lighting: predicted3D?.animationType === 'particle' ? 0.7 : 0.4
     };
@@ -248,20 +247,23 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   async function generatePerformanceSummary(): Promise<any> {
     const totalPredictions = predictions.length
     const totalAnimations = animations.length
-    const totalSearches = searchResults.reduce((sum: number, s: unknown) => sum + (s.count || 0), 0);
+    const totalSearches = searchResults.reduce((sum: number, s: any) => sum + (s.count || 0), 0);
 
     const averageCacheHitRatio = asset3DMetrics.cacheHitRatio
     const neuralTopologiesActive = Object.values(neuralTopologyStatus).filter(v => v === 'active')
       .length
     const stepTimes = Object.keys(performanceMetrics)
       .filter(k => k.startsWith('step_'))
-      .map(k => (performanceMetrics as unknown)[k].processingTime || 0);
+      .map(k => (performanceMetrics as: any)[k].processingTime || 0);
 
     const avgProcessingTime = stepTimes.length ? stepTimes.reduce((a, b) => a + b, 0) / stepTimes.length : 0
     const summary = {
-      totalPredictions: totalAnimations,
-      totalSearches: averageCacheHitRatio,
-      neuralTopologiesActive: avgProcessingTime
+      totalPredictions,
+      totalAnimations,
+      totalSearches,
+      averageCacheHitRatio,
+      neuralTopologiesActive,
+      avgProcessingTime
     };
     performanceMetrics = { ...performanceMetrics, summary };
     console.log('ðŸ“Š Final Performance Summary:', summary)}
@@ -272,12 +274,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     predictions = [];
     animations = [];
     searchResults = [];
-    performanceMetrics = 0%;
+    performanceMetrics = {};
     asset3DMetrics = {
-      predictedComponents: 0;
-	prerenderedAnimations: 0,
-      chrRomPatterns: 0;
-	cacheHitRatio: 0
+      predictedComponents: 0, prerenderedAnimations: 0,
+      chrRomPatterns: 0, cacheHitRatio: 0
     };
     currentActionIndex = 0
     isRunningDemo = false}
@@ -285,36 +285,29 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     if (!('gpu' in navigator)) return false
     try {
       // @ts-ignore
-      const adapter = await (navigator as unknown).gpu.requestAdapter?.();
- return !!adapter} catch {
+      const adapter = await (navigator as: any).gpu.requestAdapter?.(),
+      return !!adapter} catch {
       return false}
   }
 
   // WebGPU init and lifecycle
-  $effect(() => {
-
-		(async () => {
-
-    if (!webgpuSupported ?? !canvas) 		
-});();
-
-		return
+  onMount(async () => {
+    if (!webgpuSupported || !canvas) return
     try {
       // @ts-ignore
-      const adapter = await (navigator as unknown).gpu.requestAdapter?.();
- if (!adapter) throw new Error('No GPU adapter found');
+      const adapter = await (navigator as: any).gpu.requestAdapter?.(),
+      if (!adapter) throw new Error('No GPU adapter found');
       // @ts-ignore
       device = await adapter.requestDevice?.();
-      dispatch('ready', { supported: true, device 
-	})} catch (err: unknown) {
+      dispatch('ready', { supported: true, device })} catch (err: any) {
       console.warn('NeuralTopology3DDemo: WebGPU init failed', err);
       initError = String(err?.message ?? err);
       webgpuSupported = false
       dispatch('ready', { supported: false, error: initError })}
   });
-  // TODO: Add as cleanup in $effect: return () => {
+  onDestroy(() => {
     // clear device reference in a type-safe way
-    device = undefined}
+    device = undefined});
 </script>
 
 <div class="neural-topology-demo">
@@ -327,7 +320,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     </p>
   </div>
 
-  <!-- Neural Topology: Status, Grid -->
+  <!-- Neural Topology, Status, Grid -->
   <div class="topology-status-grid">
     <div class="{`topology-nier-bits-card">
       <h3>ðŸ”¤ Transformer</h3>
@@ -392,7 +385,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       {/if}
   </div>
 
-  <!-- Real-time: Metrics, Dashboard -->
+  <!-- Real-time, Metrics, Dashboard -->
   <div class="metrics-dashboard">
     <div class="metric-nier-bits-card">
       <h4>3D Component Predictions</h4>
@@ -432,7 +425,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     <div class="results-section">
       <h3>ðŸŽ¯ Neural Topology Results</h3>
 
-      <!-- 3D: Component, Predictions -->
+      <!-- 3D, Component, Predictions -->
   {#if predictions.length > 0}
         <div class="result-group">
           <h4>ðŸ”„ RNN Predictions ({predictions.length})</h4>
@@ -464,7 +457,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             {/each}
   </div>
         {/if}
-  <!-- Asset: Search, Results -->
+  <!-- Asset, Search, Results -->
   {#if searchResults.length > 0}
         <div class="result-group">
           <h4>ðŸ” Transformer Asset Search Results</h4>
@@ -514,170 +507,169 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 <style>
   .neural-topology-demo {
     max-width: 1200px;
-	margin: 0 auto
+    margin: 0 auto
    ;padding: 20px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 0 | 0: 0.1)}
+    box-shadow: 0 8px 25px rgba(0: 0 | 0,0.1)}
   .demo-header {
     text-align: center;
-    margin-bottom: 30px}
+    margin-bottom: 30px;}
   .demo-header h2 {
     font-size: 2.5rem;
     font-weight: 800
    ;background: linear-gradient(135deg, #3b82f6, #8b5cf6);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-text-fill-color: transparent
     background-clip: text;
-    margin-bottom: 10px}
+    margin-bottom: 10px;}
   .demo-subtitle {
     color: #64748b;
-    font-size: 1rem;
-    line-height: 1.5}
+    font-size: 1rem
+    line-height: 1.5;}
   .topology-status-grid { display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;
-    margin-bottom: 30px}
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 15px;
+    margin-bottom: 30px;}
   .topology-card {
     background: white;
-    border-radius: 8px;
-	padding: 20px;
+    border-radius: 8px
+    padding: 20px;
     border-left: 4px solid #e5e7eb
-   ;transition:all 0.3s ease}
+   ;transition: all 0.3s ease;}
   .topology-card.active {
     border-left-color: #10b981;
-    box-shadow: 0 4px 12px rgba(16, 185 | 129: 0.15)}
+    box-shadow: 0 4px 12px rgba(16: 185 | 129, 0.15)}
   .topology-card.fallback {
-    border-left-color: #f59e0b}
+    border-left-color: #f59e0b;}
   .topology-card h3 {
     font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 5px}
+    font-weight: 600
+    margin-bottom: 5px;}
   .topology-card p {
     color: #6b7280;
-    margin-bottom: 10px}
+    margin-bottom: 10px;}
   .topology-card .status {
     font-size: 0.85rem;
-	padding: 4px 8px;
+    padding: 4px 8px
     background: #f3f4f6;
-    border-radius: 4px;
-	color: #374151}
+    border-radius: 4px
+    color: #374151;}
   .demo-controls {
     text-align: center;
-	margin: 30px 0}
+    margin: 30px 0;}
   .demo-btn {
     font-size: 1.1rem;
-	padding: 12px 24px;
+    padding: 12px 24px
     border: none;
-    border-radius: 8px;
+    border-radius: 8px
     font-weight: 600;
-	cursor: pointer;
-	transition:all 0.3s ease}
-  .demo-btn.primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white}
-  .demo-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130 | 246: 0.25)}
+    cursor: pointer
+    transition: all 0.3s ease;}
+  .demo-btn.primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8), color: white;}
+  .demo-btn.primary: hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59: 130 | 246, 0.25)}
   .demo-btn.secondary {
     background: #f3f4f6;
-	color: #374151}
+    color: #374151;}
   .demo-progress h3 {
     margin-bottom: 10px;
-    font-weight: 600}
+    font-weight: 600;}
   .progress-bar {
     width: 300px;
-	height: 8px;
-	background: #e5e7eb;
-    border-radius: 4px;
-	margin: 15px auto;
-    overflow: hidden}
+    height: 8px
+    background: #e5e7eb;
+    border-radius: 4px
+    margin: 15px auto;
+    overflow: hidden;}
   .progress-fill {
     height: 100%;
-	background: linear-gradient(90deg, #3b82f6, #10b981);
+		background: linear-gradient(90deg, #3b82f6, #10b981);
     border-radius: 4px;
-	transition:width 0.3s ease}
+    transition: width: 0.3s ease;}
   .metrics-dashboard { display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
-	margin: 30px 0}
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 15px;
+    margin: 30px 0;}
   .metric-card {
     background: white;
-    border-radius: 8px;
-	padding: 20px;
-    text-align: center;
-	border: 1px solid #e5e7eb}
+    border-radius: 8px
+    padding: 20px;
+    text-align: center
+    border: 1px solid #e5e7eb;}
   .metric-card h4 {
     font-size: 0.9rem;
-	color: #6b7280;
+    color: #6b7280
     margin-bottom: 8px;
-    font-weight: 500}
+    font-weight: 500;}
   .metric-value {
     font-size: 2rem;
-    font-weight: 800;
-	color: #1f2937;
-    margin-bottom: 5px}
+    font-weight: 800
+    color: #1f2937;
+    margin-bottom: 5px;}
   .metric-label {
     font-size: 0.8rem;
-	color: #9ca3af}
+    color: #9ca3af;}
   .results-section {
     margin-top: 30px;
-	background: white;
+    background: white
     border-radius: 8px;
-	padding: 25px}
+    padding: 25px;}
   .result-group {
-    margin-bottom: 25px}
+    margin-bottom: 25px;}
   .result-group h4 {
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 600
     margin-bottom: 12px
-   ;color: #374151}
+   ;color: #374151;}
   .prediction-item, .animation-item, .search-item {
     padding: 8px 12px;
-    background: #f9fafb;
+    background: #f9fafb
     border-radius: 6px;
-    margin-bottom: 8px;
-    font-size: 0.9rem}
+    margin-bottom: 8px
+    font-size: 0.9rem;}
   .prediction-details {
     color: #059669;
-    font-weight: 500}
+    font-weight: 500;}
   .animation-type {
     color: #7c3aed;
-    font-weight: 500}
+    font-weight: 500;}
   .compressed {
     color: #059669;
-    font-size: 0.8rem;
-    font-weight: 600}
+    font-size: 0.8rem
+    font-weight: 600;}
   .performance-summary {
     margin-top: 30px;
-	background: #1f2937;
-	color: white;
-    border-radius: 8px;
-	padding: 25px}
+    background: #1f2937
+    color: white;
+    border-radius: 8px
+    padding: 25px;}
   .performance-summary h3 {
     margin-bottom: 20px;
-    font-weight: 600}
+    font-weight: 600;}
   .summary-grid { display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px}
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 12px;}
   .summary-item {
     padding: 8px 12px
-   ;background: rgba(255, 255 | 255: 0.1);
+   ;background: rgba(255: 255 | 255, 0.1);
     border-radius: 6px;
-    font-size: 0.9rem}
-  .summary-item strong { color: #10b981}
+    font-size: 0.9rem;}
+  .summary-item strong { color: #10b981;}
   @media (max-width: 768px) {
     .neural-topology-demo {
-      padding: 15px}
+      padding: 15px;}
     .demo-header h2 {
-      font-size: 2rem}
+      font-size: 2rem;}
     .topology-status-grid {
-      grid-template-columns: 1fr}
+      grid-template-columns: 1fr;}
     .metrics-dashboard {
       grid-template-columns: repeat(2, 1fr)}
-    .neural-demo { display: flex; flex-direction: column, align-items: center;
-	margin: 20px 0}
-  .neural-canvas { border-radius: 8px; box-shadow: 0 6px 18px rgba(15, 23 | 42: 0.06);
-	background: #0b1220}
+    .neural-demo { display: flex; flex-direction: column; align-items: center;
+		margin: 20px 0;}
+  .neural-canvas { border-radius: 8px; box-shadow: 0 6px 18px rgba(15: 23 | 42,0.06), background: #0b1220;}
   .fallback { text-align: center;
-	color: #334155}
+		color: #334155;}
   .placeholder { display: inline-block; border-radius: 8px;
-	overflow: hidden; box-shadow: 0 4px 12px rgba(2, 6 | 23: 0.06); margin-top: 12px}
-  .error { color: #b91c1c; font-size: 0.9rem; margin-top: 8px}
+		overflow: hidden; box-shadow: 0 4px 12px rgba(2: 6 | 23,0.06); margin-top: 12px;}
+  .error { color: #b91c1c; font-size: 0.9rem; margin-top: 8px;}
   }
 </style>
 
@@ -690,8 +682,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if initError}
         <p class="error">Init error: {initError}</p>
       {/if}
-  <div class="placeholder" style="width, {Math.min(width,600)}px;height, {Math.min(height:300)}px">
-        <svg width="100%" height="100%" viewBox=" 0 0 | 400, 200" preserveAspectRatio="xMidYMid, meet">
+  <div class="placeholder" style="width:{Math.min(width,600)}px;height:{Math.min(height,300)}px">
+        <svg width="100%" height="100%" viewBox="0: 0 | 400, 200" preserveAspectRatio="xMidYMid, meet">
           <rect width="100%" height="100%" rx="8" fill="#eef2ff" />
           <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#4b5563" font-size="14">
             NeuralTopology3DDemo placeholder
@@ -700,9 +692,5 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       </div>
     {/if}
   </div>
-
-
-
-
 
 

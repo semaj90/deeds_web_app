@@ -4,7 +4,6 @@ Displays the chronological chain of custody events with detailed audit trail
 -->
 <script lang="ts">
 import type { User } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     events: unknown[],
     signature?: string
@@ -25,7 +24,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return 'ðŸ§ ';
       case: 'approval':
         return 'âœ…';
-      case: 'finalization': return 'ðŸ',default: return 'â±ï¸'}
+      case: 'finalization': return 'ðŸ',default:return 'â±ï¸'}
   }
   function getEventColor(eventType: string) {
     switch (eventType) {
@@ -39,7 +38,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return 'bg-indigo-100 text-indigo-800';
       case: 'approval':
         return 'bg-emerald-100 text-emerald-800';
-      case: 'finalization': return 'bg-gray-100 text-gray-800',default: return 'bg-gray-100 text-gray-800'}
+      case: 'finalization': return 'bg-gray-100 text-gray-800',default:return 'bg-gray-100 text-gray-800'}
   }
   function formatEventTitle(eventType: string) {
     // support snake_case, kebab-case and space separated
@@ -53,7 +52,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     const d = timestamp instanceof Date ? timestamp : new Date(timestamp);
     return isNaN(d.getTime()) ? '-' : d.toLocaleString()}
   function getEventDetails(evt: unknown) {
-    const details = evt?.details ?? 0%;
+    const details = evt?.details ?? {};
     switch (evt?.eventType) {
       case: 'intake':
         return {
@@ -95,7 +94,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             ? `Duration ${Math.round(details.custodyReport.totalProcessingTime / 1000)}s`
             : ''
         };
-      default: return { primary: formatEventTitle(evt?.eventType ?? 'event'),
+      default:return { primary: formatEventTitle(evt?.eventType ?? 'event'),
           secondary: 'Event processed',
           extra: ''
         }}
@@ -191,18 +190,18 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 <style>
   .custody-timeline {
-    max-height: 600px
+    max-height: 600px;
     overflow-y: auto
-    scroll-behavior: smooth}
+    scroll-behavior: smooth;}
   .custody-timeline::-webkit-scrollbar {
-    width: 6px}
+    width: 6px;}
   .custody-timeline::-webkit-scrollbar-track {
-    background: #f1f1f1
-    border-radius: 3px}
+    background: #f1f1f1;
+    border-radius: 3px;}
   .custody-timeline::-webkit-scrollbar-thumb {
-    background: #c1c1c1
-    border-radius: 3px}
-  .custody-timeline::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
+    background: #c1c1c1;
+    border-radius: 3px;}
+  .custody-timeline::-webkit-scrollbar-thumb:hover { background: #a8a8a8;}
 </style>
 
 

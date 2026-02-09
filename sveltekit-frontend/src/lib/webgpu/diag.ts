@@ -121,7 +121,7 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagResult> {
  warnings: powerPreferenceTried, tried: t1 ? { requestAdapterMs: t1 - t0 } : {} ? {
  label: (adapter as any).label ??, undefined: features: Array.from,(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {},
 	isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined,
- } : undefined, recommended
+ }  | undefined, recommended
  };
 }
 }

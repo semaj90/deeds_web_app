@@ -13,7 +13,6 @@
 import type { SearchResult, SearchOptions,
   SearchFilters, FullDocument, IndexResult } from './types.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface PostgresConfig {
   connectionString: string;
@@ -83,11 +82,11 @@ export class PostgresKnowledgeStore {
   async upsertDocument(doc: {
 	qdrantId: number,
     url: string, urlHash: string;
-	title: string; summary: string;
-	entities: string[]; tags: string[];
-	source: string; scrapedAt: Date;
-	contentLength: number; minioKey: string;
-	embedding: number[]; tfIdfVector: Map<string, number>;
+	title: string, summary: string;
+	entities: string[], tags: string[];
+	source: string, scrapedAt: Date;
+	contentLength: number, minioKey: string;
+	embedding: number[], tfIdfVector: Map<string, number>;
   }): Promise<number> {
     // Property 12: Ensure embedding has same dimension Qdrant (768)
     if (doc.embedding.length !== 768) {

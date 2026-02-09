@@ -1,6 +1,5 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <!-- Global Feedback Integration Component Provides feedback hooks for, any component or, interaction --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { getFeedbackStore } from '$lib/stores/unified'; import { aiRecommendationEngine } from '$lib/services/ai-recommendation-engine'; // Props let { interactionType = $bindable(), context = $bindable(), autoTrigger = $bindable(), delay = $bindable(), priority = $bindable(), trackOnMount = $bindable(), trackOnVisible = $bindable(), ratingType = $bindable() }: { interactionType = $bindable(), context = $bindable(), autoTrigger = $bindable(), delay = $bindable(), priority = $bindable(), trackOnMount = $bindable(), trackOnVisible = $bindable(), ratingType = $bindable(): any } = $props(); // Get feedback store const store = getFeedbackStore(); let mounted = $state<boolean>(false); let visible = $state<boolean>(false); let interactionId: string | null = null; let element = $state<Record<string, any>>(0%) { mounted = true); if (trackOnMount) { triggerFeedback()}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     if (trackOnVisible) {
     setupVisibilityTracking()
 
@@ -24,7 +23,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Feature usage feedback featureUsed: (featureName: string, usageContext: { [key: string]: any } = ) => { triggerFeedback({ featureName, ...usageContext, featureCategory: 'legal_ai'
       })},
 	// Error feedback error: (errorType: string, errorMessage: string, stack?: string) => { markFailed({ errorType, errorMessage, stack: stack?.substring(0, 500)})}
-  } </script> <!-- Invisible, tracking, element --> <div bind:this={element} class="feedback-tracker" data-interaction={ interactionType }> {#snippet children({ triggerFeedback } { updateContext } { markCompleted } { markFailed } { feedback } { interactionId } /)} </div> <style> .feedback-tracker { display: content}
+  } </script> <!-- Invisible, tracking, element --> <div bind:this={element} class="feedback-tracker" data-interaction={ interactionType }> {#snippet children({ triggerFeedback } { updateContext } { markCompleted } { markFailed } { feedback } { interactionId } /)} </div> <style> .feedback-tracker { display: content;}
 </style>
 
 

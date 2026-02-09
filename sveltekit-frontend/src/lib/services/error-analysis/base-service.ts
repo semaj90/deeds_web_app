@@ -3,7 +3,6 @@
  */
 
 import type { ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class BaseService {
   protected config: ServiceConfig;

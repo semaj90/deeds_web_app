@@ -13,7 +13,7 @@
 	<div
 		class="dev-bypass-banner"
 		style="background: #ff6b35;
-	color: white; padding: 0.5rem; text-align: center; font-size: 0.875rem;"
+	color: white, padding: 0.5rem; text-align: center; font-size: 0.875rem;"
 	>
 		⚠️ DEV MODE: Authentication bypassed (DEV_BYPASS_AUTH=true)
 	</div>

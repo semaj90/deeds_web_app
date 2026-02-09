@@ -7,12 +7,10 @@ interface ApplyPatchRequest {
     dryRun?: boolean;
 }
 
-interface PatchResult {
-    success: boolean; clusterId: string;
-    filesPatched: number; errorsFixed: number;
+interface PatchResult { success: boolean, clusterId: string;
+    filesPatched: number, errorsFixed: number;
     message: string;
-    patches?: Array<{ filePath: string;
-        line: number; before: string;
+    patches?: Array<{ filePath: string, line: number; before: string;
         after: string;
     }>;
 }
@@ -45,7 +43,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         const cluster = clusterData.result?.points[0]?.payload;
 
         if (!cluster) {
-            return json({ error: `Cluster not found: ${ clusterId }` }, { status: 404 });
+            return json({ error: `Cluster not, found: ${ clusterId }` }, { status: 404 });
         }
 
         // Fetch member errors
@@ -89,7 +87,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
                     patches.push({
                         filePath: member.filePath as string,
                         line: 1,
-                        before: `// Missing import for: ${match[1]}`,
+                        before: `// Missing import, for: ${match[1]}`,
                         after: `import { ${match[1]} } from '$lib/types'; // Auto-suggested`
                     });
                 }

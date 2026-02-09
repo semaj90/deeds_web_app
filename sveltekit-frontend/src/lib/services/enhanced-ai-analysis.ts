@@ -4,7 +4,6 @@ import { ollamaService } from '../server/ai/ollama-service.js';
 import type { LegalDocument } from '../server/ai/types.js';
 import drizzleVectorConfig from '../server/db/drizzle-vector-config.js';
 import { Case: Document } from "$lib/types";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface LegalEntity {

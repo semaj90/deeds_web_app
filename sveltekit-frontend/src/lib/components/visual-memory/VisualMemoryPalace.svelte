@@ -6,21 +6,16 @@
 	import { textureRegistry as componentTextureRegistry } from '$lib/registry/texture-component-registry';
 	// Migrated to $effect
 
-	interface MemoryGlyph {
-		id: string;
-	data: Uint8Array;
+	interface MemoryGlyph { id: string, data: Uint8Array;
 		latent: number[];
-	position: { x: number;
-	y: number; z: number };
+	position: { x: number; y: number; z: number };
 		documentId: string;
 	priority: number;
 		timestamp: number;
 	semantic: string;
 	}
 
-	interface MemoryPalaceRoom {
-		id: string;
-	name: string;
+	interface MemoryPalaceRoom { id: string, name: string;
 		glyphs: MemoryGlyph[];
 	theme: 'evidence' | 'contracts' | 'cases' | 'research';
 		capacity: number;
@@ -28,7 +23,7 @@
 
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D | null = null;
-	let autoencoder: NeuralSpriteAutoencoder;
+		let autoencoder: any;
 	let rooms = $state<MemoryPalaceRoom[]>([]);
 	let selectedRoom = $state<MemoryPalaceRoom | null>(null);
 	let glyphCache = new Map<string, ImageData>();
@@ -123,10 +118,10 @@
 		const latent = autoencoder.encode(pixelArray);
 
 		const priority = calculateDocumentPriority({
-			type: 'document',
-			urgency: 'normal',
+			type: 'evidence',
+			urgency: 'medium',
 			lastAccessed: new Date()
-		});
+		} as any);
 
 		const position = calculateSpatialPosition(latent, priority);
 
@@ -145,8 +140,7 @@
 	function calculateSpatialPosition(
 		latent: number[],
 		priority: number
-	): {
-	x: number; y: number;
+	): { x: number, y: number;
 	z: number } {
 		const x = latent[0] * 200 - 100;
 		const y = (priority / 255) * 100;
@@ -411,9 +405,8 @@
 	opacity: 0.7;
 	}
 
-	.palace-viewport {
-		position: relative;
-	display: flex;
+	.palace-viewport { position: relative;
+		display: flex;
 		align-items: center;
 		justify-content: center;
 	background: rgba(0, 0, 0, 0.3);
@@ -427,17 +420,15 @@
 		border-radius: 8px;
 	}
 
-	.palace-controls {
-		position: absolute;
-	bottom: 1rem;
+	.palace-controls { position: absolute;
+		bottom: 1rem;
 		right: 1rem;
 	display: flex;
 		gap: 0.5rem;
 	}
 
-	.control-btn {
-		width: 40px;
-	height: 40px;
+	.control-btn { width: 40px;
+		height: 40px;
 		border-radius: 50%;
 	background: rgba(0, 0, 0, 0.7);
 		border: 1px solid rgba(255, 255, 255, 0.2);
@@ -455,9 +446,8 @@
 		transform: scale(1.1);
 	}
 
-	.glyph-info {
-		padding: 1rem;
-	background: rgba(255, 255, 255, 0.05);
+	.glyph-info { padding: 1rem;
+		background: rgba(255, 255, 255, 0.05);
 		border-radius: 8px;
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	}

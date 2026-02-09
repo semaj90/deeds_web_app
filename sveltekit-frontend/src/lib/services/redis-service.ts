@@ -1,7 +1,6 @@
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
 import { redis, ensureRedisReady } from '$lib/server/redis-client';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RedisConfig {
     url: string;
@@ -117,7 +116,7 @@ class RedisService {
 
     // Canvas Updates
     public async publishCanvasNodeMoved(caseId: string, nodeId: string, position: {
-	x: number; y: number },
+	x: number, y: number },
 	userId?: string) {
         await this.publish('canvas_update', {
             type: 'CANVAS_NODE_MOVED',

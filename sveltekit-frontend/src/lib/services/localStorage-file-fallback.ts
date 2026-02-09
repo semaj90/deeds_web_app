@@ -236,7 +236,7 @@ class LocalStorageFiles {
      * Import files from JSON (for restore)
      */
     importFiles(jsonData: string): {
-	success: number; failed: number } {
+	success: number, failed: number } {
         let success = 0;
         let failed = 0;
 

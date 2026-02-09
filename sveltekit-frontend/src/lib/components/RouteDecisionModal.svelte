@@ -33,8 +33,20 @@
 </script>
 
 {#if open && route}
-	<div class="modal-overlay" onclick={ handleCancel }>
-		<div class="modal-content" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="modal-overlay"
+		onclick={handleCancel}
+		onkeydown={(e) => e.key === 'Escape' && handleCancel()}
+		role="button"
+		tabindex="0"
+	>
+		<div
+			class="modal-content"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="document"
+			tabindex="-1"
+		>
 			<div class="modal-header">
 				<h2>Route Decision: {route.path}</h2>
 				<button class="close-btn" onclick={ handleCancel }>✕</button>

@@ -26,7 +26,7 @@ export {
 
 // Compatibility namespace for legacy "bits.DropdownMenu.*" usage
 export const DropdownMenu = {
-    Root: DropdownRoot,
+    Root:DropdownRoot,
     Trigger: DropdownTrigger,
     Content: DropdownContent,
     Item: DropdownItem,

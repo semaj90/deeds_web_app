@@ -16,12 +16,10 @@ declare global {
  var __lucia_instance: typeof lucia | undefined;
 }
 
-interface HealthWarning {
- code: string; message: string;
+interface HealthWarning { code: string, message: string;
 }
 
-interface RecentSession {
- id: string; userId: string;
+interface RecentSession { id: string, userId: string;
  expiresAt: Date;
 }
 

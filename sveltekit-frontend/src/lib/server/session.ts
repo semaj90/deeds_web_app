@@ -96,7 +96,7 @@ function resolveSignFn(): SignFn {
 export async function validateSessionToken(
     token: string
 ): Promise<{
-	session: Session | null; user: User | null }> {
+	session: Session | null, user: User | null }> {
     try {
         const verifyFn: VerifyFn = resolveVerifyFn();
 

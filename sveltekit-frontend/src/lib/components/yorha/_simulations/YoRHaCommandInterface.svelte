@@ -2,7 +2,6 @@
 <script lang="ts">
   import type { CommandResult, HolographicData, SystemMetrics, YoRHaModule } from '$lib/types/yorha-interface';
   import { get, writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Interface for command responses
   interface CommandResponse {
@@ -149,7 +148,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       currentData.map(item => ({
         ...item,
         rotation: {
-	x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
+x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
           y: item.rotation.y + (item.animation === 'rotate' ? 0.02 : 0),
           z: item.rotation.z + (item.animation === 'rotate' ? 0.005 : 0)
         }
@@ -295,7 +294,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case 'STANDBY': return '#ffa500';
       case 'MAXIMUM': return '#ff0066';
       case 'OFFLINE': return '#666';
-      default: return '#00ff88';
+      default:return '#00ff88';
     }
   }
 </script>
@@ -385,7 +384,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       </div>
 
       <!-- Center/Right: Terminal -->
-      <div class="lg:col-span-3 flex flex-col bg-black/80 border border-cyan-500/50 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(6,182,212,0.1)]">
+      <div class="lg:col-span-3 flex flex-col bg-black/80 border border-cyan-500/50 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(6 182 212 0.1)]">
         <!-- Terminal Output -->
         <div class="flex-1 p-4 overflow-y-auto font-mono text-sm space-y-2 min-h-[400px]" id="terminal-output">
              {#each $commandHistory as result (result.id)}
@@ -455,11 +454,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   @keyframes dataFlow {
       0% { transform: translateY(-100%);
-	opacity: 0; }
+		opacity: 0; }
       20% { opacity: 0.5; }
       80% { opacity: 0.5; }
       100% { transform: translateY(100vh);
-	opacity: 0; }
+		opacity: 0; }
   }
 
   .glitch-effect {

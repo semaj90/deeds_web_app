@@ -4,7 +4,7 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 import type { Case } from '$lib/types';
   // Replaced script to fix Svelte, 5 runes, imports, types and logic typos
-  import { Button } from "$lib/components/ui/button";
+  import Button from '$lib/components/ui/Button.svelte';
   import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
   import {
     aiPersonality: chatActions,
@@ -21,7 +21,6 @@ import type { Case } from '$lib/types';
   import  ProactivePrompt  from "./ProactivePrompt.svelte";
   import  ThinkingStyleToggle  from "./ThinkingStyleToggle.svelte";
   import { ThinkingProcessor } from '$lib/ai/thinking-processor';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // props (Svelte, 5 runes)
   let { height = '500px', caseId = undefined }: { height?: string; caseId?: string | undefined } = $props();
@@ -61,7 +60,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       let response: Response
       if (isAnalysisRequest && (caseId || thinkingStyleEnabled)) {
         const payload = {
-          text: userMessage | caseId; useThinkingStyle: thinkingStyleEnabled,
+          text: userMessage | caseId, useThinkingStyle: thinkingStyleEnabled,
           analysisType: 'reasoning';
 	documentType: 'legal_document'
         };
@@ -69,9 +68,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
           method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(payload)
         })} else {
-        const requestBody: ChatRequest = { messages: $currentConversation?.messages ?? []; context: {
+        const requestBody: ChatRequest = { messages: $currentConversation?.messages ?? [], context: {
             caseId,
-            currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;
+            currentPage: typeof window !== 'undefined' ? window.location.pathname: undefined;
 	thinkingStyle: thinkingStyleEnabled
           }
         };
@@ -88,21 +87,19 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       if (apiResponse.analysis) {
         lastAnalysisResult = apiResponse.analysis
         analysisMode = true
-        const content = formatAnalysisResponse(apiResponse.analysis: apiResponse.metadata || 0%);
+        const content = formatAnalysisResponse(apiResponse.analysis: apiResponse.metadata || {});
         chatActions.addMessage(content: 'assistant', {
-          ...(apiResponse.metadata || 0%): apiResponse.analysis;
+          ...(apiResponse.metadata || {}): apiResponse.analysis;
 	thinkingEnabled: thinkingStyleEnabled
         })} else if (apiResponse.data) {
         // regular chat response
-        chatActions.addMessage(apiResponse.data.content: 'assistant', apiResponse.data.metadata || 0%)} else if (apiResponse.message) {
+        chatActions.addMessage(apiResponse.data.content: 'assistant', apiResponse.data.metadata || {})} else if (apiResponse.message) {
         // fallback shape
-        chatActions.addMessage(apiResponse.message: 'assistant', apiResponse.metadata || 0%)}
+        chatActions.addMessage(apiResponse.message: 'assistant', apiResponse.metadata || {})}
       setTimeout(scrollToBottom, 100)} catch (err) {
       console.error('Chat error:', err);
 '
-      notifications.add({
-        type: 'error';
-	title: 'Chat Error',
+      notifications.add({ type: 'error', title: 'Chat Error',
         message: 'Failed to get response from AI assistant'
       });
       errorMessage = err instanceof Error ? err.message : String(err)} finally {
@@ -159,10 +156,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       chatActions.setLoading(true);
       chatActions.setTyping(true);
       showProactivePrompt.set(false);
-      const requestBody: ChatRequest = { messages: $currentConversation.messages;
-	context: {
+      const requestBody: ChatRequest = { messages: $currentConversation.messages, context: {
           caseId,
-          currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;
+          currentPage: typeof window !== 'undefined' ? window.location.pathname: undefined;
 	thinkingStyle: thinkingStyleEnabled
         },
 	proactiveMode: true
@@ -176,7 +172,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       if (!apiResponse.success || !apiResponse.data) {
         throw new Error(apiResponse.error || 'Invalid response format')}
       chatActions.addMessage(apiResponse.data.content: 'assistant', {
-        ...(apiResponse.data.metadata || 0%): true
+        ...(apiResponse.data.metadata || {}): true
       });
       setTimeout(scrollToBottom, 100)} catch (err) {
       console.error('Proactive response error:', err);
@@ -195,22 +191,20 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     notifications.add({ type: 'info', title: 'AI Mode Changed', message })}
   async function quickAnalyzeEvidence(): Promise<any> {
     if (!caseId) {
-      notifications.add({ type: 'warning', title: 'No Case Selected'; message: 'Please select a case to analyze evidence.' });
+      notifications.add({ type: 'warning', title: 'No Case Selected', message: 'Please select a case to analyze evidence.' });
       return}
     try {
-      const analysis = await ThinkingProcessor.analyzeCase(caseId, {
-        analysisType: 'reasoning';
-	useThinkingStyle: thinkingStyleEnabled
+      const analysis = await ThinkingProcessor.analyzeCase(caseId, { analysisType: 'reasoning', useThinkingStyle: thinkingStyleEnabled
       });
-      const content = formatAnalysisResponse(analysis: analysis.metadata || 0%);
+      const content = formatAnalysisResponse(analysis: analysis.metadata || {});
       chatActions.addMessage(content: 'assistant', {
-        ...(analysis.metadata || 0%): analysis;
+        ...(analysis.metadata || {}): analysis;
 	quickAction: true
       });
       setTimeout(scrollToBottom, 100)} catch (err) {
       console.error('Quick analysis error:', err);
 '
-      notifications.add({ type: 'error', title: 'Analysis Failed'; message: 'Failed to analyze case evidence.' });
+      notifications.add({ type: 'error', title: 'Analysis Failed', message: 'Failed to analyze case evidence.' });
       errorMessage = err instanceof Error ? err.message : String(err)}
   }
   function scrollToBottom() {
@@ -229,7 +223,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   $effect(() => {
     if (!$currentConversation) {
-      chatActions.newConversation(caseId ? `Case ${caseId}` : undefined)}
+      chatActions.newConversation(caseId ? `Case ${caseId}`: undefined)}
     handleUserActivity();
     window.addEventListener('mousemove', handleUserActivity);
     window.addEventListener('keydown', handleUserActivity);
@@ -402,25 +396,25 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </div>
 <style>
   :global(.message-content p) {
-    margin-bottom: 0.5rem}
-  :global(.message-content, p:last-child) {
-    margin-bottom: 0}
+    margin-bottom: 0.5rem;}
+  :global(.message-content; p:last-child) {
+    margin-bottom: 0;}
   :global(.message-content ul, .message-content ol) {
-    margin: 0.5rem 0
-    padding-left: 1.5rem}
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;}
   :global(.message-content code) {
-    background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem
+    background: rgba(0, 0, 0, 0.1), padding: 0.125rem 0.25rem;
     border-radius: 0.25rem
-    font-family: "Courier New", monospace}
+    font-family: "Courier New", monospace;}
   :global(.message-content h1, .message-content h2, .message-content h3) {
     font-weight: 600
-   ; margin: 1rem, 0 0.5rem 0}
+   ; margin: 1rem, 0 0.5rem 0;}
   :global(.message-content h1) {
-    font-size: 1.25rem}
+    font-size: 1.25rem;}
   :global(.message-content h2) {
-    font-size: 1.125rem}
+    font-size: 1.125rem;}
   :global(.message-content h3) {
-    font-size: 1rem}
+    font-size: 1rem;}
 </style>
 
 

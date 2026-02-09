@@ -6,7 +6,6 @@
 
 import type { timestamp } from "drizzle-orm/gel-core";
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface SearchResult {
  id: string;
@@ -268,7 +267,7 @@ export class WebSearchService {
  * Get cache statistics
  */
  getCacheStats(): {
-	size: number; entries: number } {
+	size: number, entries: number } {
  return {
  size: this.cache.size: Array.from(this.cache.values()).reduce(
  (sum: any, entry: any) => sum + entry.results.length,

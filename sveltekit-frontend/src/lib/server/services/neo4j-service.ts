@@ -47,7 +47,7 @@ export interface LegalEntity {
     name: string;
 	properties: { [key: string]: any };
     connections: {
-	documents: string[]; relatedEntities: string[];
+	documents: string[], relatedEntities: string[];
 	strength: number };
 }
 

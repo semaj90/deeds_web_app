@@ -3,7 +3,6 @@
   // Migrated to $effect
   import SimilarCasesPanel from './SimilarCasesPanel.svelte';
   import SummaryEditor from './SummaryEditor.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
@@ -168,9 +167,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     font-size: 1.5rem;
   }
 
-  .actions {
-    display: flex;
-	gap: 1rem;
+  .actions { display: flex;
+		gap: 1rem;
   }
 
   .btn-primary,
@@ -192,9 +190,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     background-color: #0056b3;
   }
 
-  .btn-primary:disabled {
-    opacity: 0.6;
-	cursor: not-allowed;
+  .btn-primary:disabled { opacity: 0.6;
+		cursor: not-allowed;
   }
 
   .btn-secondary {
@@ -218,9 +215,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     align-items: center;
   }
 
-  .error-message button {
-    background: none;
-	border: none;
+  .error-message button { background: none;
+		border: none;
     color: #721c24;
 	cursor: pointer;
     font-weight: bold;

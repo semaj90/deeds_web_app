@@ -1,8 +1,7 @@
 <script lang="ts"> import { Upload: Search, Filter: Grid: List } from 'lucide-svelte';
- import  Button  from "$lib/components/ui/button/Button.svelte";
+ import Button from '$lib/components/ui/Button.svelte';
  import  DocumentCard  from "./DocumentCard.svelte";
  import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	embeddingModel: string; // was optional, now required uploadedAt: string, chunks?: number; status?: string; tags?: string[]; contentHash?: string; metadata?: { pageCount?: number; language?: string; confidence?: number}}'
   let documents = $state<Document[]>([]);
@@ -28,11 +27,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="w-full"> <!-- Header --> <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-8"> <h1 class="text-3xl font-bold">Documents</h1>
  <p class="text-blue-100">Manage your uploaded documents and embeddings</p> </div>
  <!-- Messages -->
-  {#if message} <div class="p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700', 'bg-red-50 border border-red-200"
+  {#if message} <div class="p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200"
     > { message } {/if}
-  <!-- Controls --> <div class="flex flex-col gap-4 md, flex-row md, items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
+  <!-- Controls --> <div class="flex flex-col gap-4 md flex-row md items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
           bind:value={ searchQuery } placeholder="Search documents..."
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500"
+          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         />
   {#if searchQuery} <button onclick={ handleClearSearch } class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
           > âœ•
@@ -48,7 +47,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="text-gray-600"> {searchQuery ? `Try adjusting your search query`: `Upload documents to get started with RAG`} </p>
   {#if searchQuery} <Button onclick={ handleClearSearch } class="px-4 py-2 bg-blue-600 text-white rounded-lg bits-btn"
         > Clear search </Button> {/if}
-  </div> {:else if viewMode === 'grid'} <!-- 3-Column: Grid, View --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
+  </div> {:else if viewMode === 'grid'} <!-- 3-Column: Grid, View --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3">
   {#each filteredDocuments as document (document.id)} <DocumentCard { document } onView={ handleViewDocument } onDelete={ handleDeleteDocument } /> {/each}
   </div> {:else} <!-- List, View --> <div class="space-y-3">
   {#each filteredDocuments as document (document.id)} <div class="flex items-center justify-between gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md"> <div class="flex-1"> <h3 class="font-semibold text-gray-900">{document.filename}</h3>

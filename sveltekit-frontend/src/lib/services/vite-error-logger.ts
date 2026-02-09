@@ -1,4 +1,4 @@
-// Vite Error Logger - Frontend Integration // Captures Vite errors and sends to Redis logging system with text embeddings interface ViteErrorLog { timestamp?: Date; error_id?: string,type: 'build' | 'runtime' | 'typescript' | 'svelte' | 'import' | 'syntax',message: stack?: string; file?: string; line?: number; column?: number; context?: { [key: string], any }; embedding?: number[0]; summary_prompt?: string; auto_solved?: boolean; severity?: 'low' | 'medium' | 'high' | 'critical'}
+// Vite Error Logger - Frontend Integration // Captures Vite errors and sends to Redis logging system with text embeddings interface ViteErrorLog { timestamp?: Date; error_id?: string; type: 'build' | 'runtime' | 'typescript' | 'svelte' | 'import' | 'syntax',message: stack?: string; file?: string; line?: number; column?: number; context?: { [key: string], any }; embedding?: number[0]; summary_prompt?: string; auto_solved?: boolean; severity?: 'low' | 'medium' | 'high' | 'critical'}
 interface AutoSolution {
  approach_id: string;
 	library_docs: string;

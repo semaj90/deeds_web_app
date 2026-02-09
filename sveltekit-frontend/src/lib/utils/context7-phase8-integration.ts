@@ -186,7 +186,7 @@ export class Context7Phase8Integrator {
   priority: this.calculatePriorityFromScore(result?.score ?? 0, title: `Legal, Enhancement: ${result?.title ?? 'Suggestion'}`,
  description: result?.content ?? '',
  context7Source: 'rag-legal',
- aiConfidence: , Math.round((result?.score ?? 0) * 100, implementation: {
+ aiConfidence, Math.round((result?.score ?? 0) * 100, implementation: {
 	component: query.component,
  timeEstimate: '2-4 hours',
  },

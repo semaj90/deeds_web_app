@@ -5,7 +5,9 @@
   import * as Select from "$lib/components/ui/select";
   import { aiPipeline } from "$lib/services/ai-pipeline";
   import type { LegalDocument } from "$lib/types/legal";
-  import { Loader2, Search, X } from "lucide-svelte";
+  import Loader2 from 'lucide-svelte/icons/loader-2';
+  import Search from 'lucide-svelte/icons/search';
+  import X from 'lucide-svelte/icons/x';
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
 

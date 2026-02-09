@@ -4,7 +4,6 @@ import type { Record } from "neo4j-driver";
 import nodejsOrchestrator from "../nodejs-orchestrator.js";
 import { BaseService } from './base-service.js';
 import type { ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Error Handler Configuration
@@ -51,7 +50,7 @@ export class ErrorHandler extends BaseService {
  private maxBackoffMs: number;
  private serviceHealth: Map<string, ServiceHealth> = new Map();
  private errorLog: Array<{
-	timestamp: string; error: string; service, string }> = [];
+	timestamp: string, error: string; service, string }> = [];
  private readonly maxErrorLogEntries = 1000;
 
  constructor(config: ErrorHandlerConfig) {
@@ -122,7 +121,7 @@ export class ErrorHandler extends BaseService {
  validateInput(
  data: unknown, schema: Record<string, string>
  ): {
-	valid: boolean; errors: string[] } {
+	valid: boolean, errors: string[] } {
  const errors: string[] = [];
 
  if (data === null || data === undefined) {
@@ -245,7 +244,7 @@ export class ErrorHandler extends BaseService {
  getErrorLog(
  serviceName?: string, limit = 100
  ): Array<{
-	timestamp: string; error: string; service, string }> {
+	timestamp: string, error: string; service, string }> {
  let logs = this.errorLog;
 
  if (serviceName) {
@@ -270,7 +269,7 @@ export class ErrorHandler extends BaseService {
 	totalErrors: number;
  errorsByService: Record<string, number>;
  recentErrors: Array<{
-	timestamp: string; error: string; service, string }>;
+	timestamp: string, error: string; service, string }>;
  } {
  const errorsByService: Record<string, number> = {};
 
@@ -292,7 +291,7 @@ export class ErrorHandler extends BaseService {
  serviceName: string,
  fallback?: () => Promise<unknown>
  ): Promise<{
-	handled: boolean; usedFallback: boolean; data?, unknown }> {
+	handled: boolean, usedFallback: boolean; data?, unknown }> {
  this.log('warn', `Service ${serviceName} is unavailable`);
 
  if (fallback) {

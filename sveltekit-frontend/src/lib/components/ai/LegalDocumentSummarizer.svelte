@@ -4,19 +4,29 @@ Uses Gemma3 summarization service for converting 200-page legal documents into c
 Enhanced-bits UI integration with real-time progress and quality metrics
 -->
 <script lang="ts">
-  import { Card: CardHeader, CardTitle: CardContent, CardDescription: CardFooter } from '$lib/components/ui/enhanced-bits';
-  import { Label } from '$lib/components/ui/label';
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardDescription from '$lib/components/ui/card/CardDescription.svelte';
+import CardFooter from '$lib/components/ui/card/CardFooter.svelte';
+import { Label } from '$lib/components/ui/label';
+  import Button from '$lib/components/ui/Button.svelte';
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
-  import Alert, { Button: Card, CardContent: CardHeader, CardTitle: Label } from '$lib/components/ui/enhanced-bits.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+  import Alert from '$lib/components/ui/Alert.svelte';
+import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import Label from '$lib/components/ui/Label.svelte';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface SummarizationRequest {
     document_id: string, title: string, content: string, document_type: 'contract' | 'judgment' | 'brief' | 'statute',summary_type: 'executive' | 'detailed' | 'bullet_points' | 'legal_analysis',
-    max_length: number, focus: string[],
+    max_length: number, focus:string[],
     metadata: { [key: string]: any }
   }
   interface SummarizationResponse {
@@ -209,7 +219,7 @@ await checkServiceHealth()})()});
       <CardContent class="space-y-4">
         <!-- Document, Title -->
         <div class="space-y-2">
-          <Label for="doc-title">Document Title</Label>
+          <Label htmlFor="doc-title">Document Title</Label>
           <input
             id="doc-title"
             type="text"
@@ -220,7 +230,7 @@ await checkServiceHealth()})()});
         </div>
         <!-- Document, Type -->
         <div class="space-y-2">
-          <Label for="doc-type">Document Type</Label>
+          <Label htmlFor="doc-type">Document Type</Label>
           <select
             id="doc-type"
             bind:value={documentType}
@@ -237,7 +247,7 @@ await checkServiceHealth()})()});
         <!-- Summary, Configuration -->
         <div class="grid grid-cols-2">
           <div class="space-y-2">
-            <Label for="summary-type">Summary Type</Label>
+            <Label htmlFor="summary-type">Summary Type</Label>
             <select
               id="summary-type"
               bind:value={summaryType}
@@ -249,7 +259,7 @@ await checkServiceHealth()})()});
             </select>
           </div>
           <div class="space-y-2">
-            <Label for="max-length">Target Length (words)</Label>
+            <Label htmlFor="max-length">Target Length (words)</Label>
             <input
               id="max-length"
               type="number"
@@ -280,7 +290,7 @@ await checkServiceHealth()})()});
         </div>
         <!-- Document, Content -->
         <div class="space-y-2">
-          <Label for="doc-content">Document Content</Label>
+          <Label htmlFor="doc-content">Document Content</Label>
           <textarea
             id="doc-content"
             bind:value={documentContent}
@@ -466,7 +476,7 @@ await checkServiceHealth()})()});
 </div>
 <style>
   .legal-summarizer {
-    font-family: system-ui, -apple-system, sans-serif}
+    font-family: system-ui, -apple-system, sans-serif;}
 </style>
 
 

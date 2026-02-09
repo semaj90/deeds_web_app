@@ -1,5 +1,4 @@
 import { constructor } from 'function Object() { [native code] }';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * YoRHa 3D Layout Management System * Advanced CSS-like layout system for 3D UI components */ import * as THREE from 'three'; import type { YoRHa3DComponent } from './YoRHaUI3D.js'; export interface YoRHaLayoutOptions { type: 'flex' | 'grid' | 'absolute' | 'stack' | 'flow'; direction?: 'row' | 'column' | 'row-reverse' | 'column-reverse'; justify?: 'start' | 'end' | 'center' | 'space-between' | 'space-around' | 'space-evenly'; align?: 'start' | 'end' | 'center' | 'stretch' | 'baseline'; wrap?: 'nowrap' | 'wrap' | 'wrap-reverse'; gap?: number; padding?: YoRHaPadding3D; gridColumns?: number; gridRows?: number; gridTemplate?: string; zSpacing?: number; // 3D-specific spacing }
 
 export interface YoRHaPadding3D { top?: number; right?: number; bottom?: number; left?: number; front?: number; // 3D-specific back?: number; // 3D-specific }

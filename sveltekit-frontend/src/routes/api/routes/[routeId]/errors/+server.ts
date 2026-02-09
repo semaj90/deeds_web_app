@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     // Validate required fields
     if (!body?.tool|| !body?.code|| !body?.message|| !body.severity) {
       return error(400, {
-        message: 'Missing required fields: tool, code, message, severity',
+        message: 'Missing required, fields: tool, code, message, severity',
       });
     }
 
@@ -44,7 +44,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const validSeverities = ['error', 'warning', 'info'];
     if (!validSeverities.includes(body.severity)) {
       return error(400, {
-        message: `Invalid severity. Must be one of: ${validSeverities.join(', ')}`,
+        message: `Invalid severity. Must be one, of: ${validSeverities.join(', ')}`,
       });
     }
 

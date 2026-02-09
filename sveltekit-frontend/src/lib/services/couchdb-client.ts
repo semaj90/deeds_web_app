@@ -1,7 +1,6 @@
 import { process } from "node:process";
 import { Buffer } from "node:buffer";
 import { path } from "node:path";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * CouchDB Client for ACE Graph Analysis
@@ -242,7 +241,7 @@ export const aceGraphs = {
     imports?: string[];
     exports?: string[];
     errors?: {
-	line: number; code: string;
+	line: number, code: string;
 	message: string }[];
   }) {
     const doc = {
@@ -269,8 +268,8 @@ export const aceGraphs = {
 	async storeCluster(cluster: {
 	cluster_id: number,
     collection: string, size: number;
-	centroid_id: string; summary: string;
-	tags: string[]; sample_ids: string[];
+	centroid_id: string, summary: string;
+	tags: string[], sample_ids: string[];
   }) {
     const doc = {
       _id: `cluster_${cluster.collection}_${cluster.cluster_id}`,
@@ -298,7 +297,7 @@ export const aceGraphs = {
 export const aceLLM = {
   async storeSummary(summary, { source_type: 'cluster' | 'file' | 'component' | 'error_pattern',
     source_id: string, model: string;
-	summary_text: string; tags: string[];
+	summary_text: string, tags: string[];
 	confidence: number;
   }) {
     const doc = {

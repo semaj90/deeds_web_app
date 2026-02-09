@@ -4,12 +4,11 @@
 
   import  useChatActor, chatActions  from "\/stores/chat.svelte";
 
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
 
   import  Input  from "$lib/components/ui/bits/Input.svelte";
 
   import  serviceStatus  from "\/stores/chat.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Use the XState machine through the store
   const actor = useChatActor();
 
@@ -110,36 +109,40 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 <style>
   .chat-message {
-    display: flex
+    display: flex;
     margin-bottom: 1rem
     max-width: 80%}
   .chat-message.user {
-    margin-left: auto
-    justify-content: flex-end}
+    margin-left: auto;
+    justify-content: flex-end;}
   .chat-message.assistant {
-    margin-right: auto
-    justify-content: flex-start}
+    margin-right: auto;
+    justify-content: flex-start;}
   .chat-message.error {
-    margin-right: auto
-    justify-content: flex-start}
+    margin-right: auto;
+    justify-content: flex-start;}
   .message-bubble {
-    padding: 0.75rem 1rem
+    padding: 0.75rem 1rem;
     border-radius: 1rem
-    background-color: #e9ecef, color: #212529}
+    background-color: #e9ecef;
+		color: #212529;}
   .user .message-bubble {
-    background-color: #3b82f6, color: white
-    border-bottom-right-radius: 0.25rem}
+    background-color: #3b82f6;
+		color: white;
+    border-bottom-right-radius: 0.25rem;}
   .assistant .message-bubble {
-    background-color: #f3f4f6
-    border-bottom-left-radius: 0.25rem}
+    background-color: #f3f4f6;
+    border-bottom-left-radius: 0.25rem;}
   .error-bubble {
-    background-color: #fee2e2, color: #991b1b}
+    background-color: #fee2e2;
+		color: #991b1b;}
   .typing-indicator {
-    display: inline-block, width: 5px, height: 5px
+    display: inline-block;
+		width: 5px; height: 5px;
     border-radius: 50%; background-color: currentColor
    ; animation: typing 1s infinite steps(4, end);
-    margin-left: 8px
-    vertical-align: middl}
+    margin-left: 8px;
+    vertical-align: middl;}
   @keyframes typing {
     0%; } 100% {
       transform: translateY(0)}

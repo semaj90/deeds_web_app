@@ -2,7 +2,7 @@
 
 export type ProgressMsg =
     | { type: 'upload-progress';
-	fileId: string; progress: number }
+	fileId: string, progress: number }
     | {
           type: 'processing-step';
 	fileId: string;
@@ -13,7 +13,7 @@ export type ProgressMsg =
     | { type: 'processing-complete';
 	fileId: string; finalResult?: unknown }
     | { type: 'error';
-	fileId: string; error: {
+	fileId: string, error: {
 	message: string; code?: string; meta?: unknown } };
 
 export interface EvidenceProcessRequest {

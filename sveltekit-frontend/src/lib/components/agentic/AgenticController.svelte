@@ -168,7 +168,7 @@
       <button
         onclick={queryFixSuggestions}
         disabled={loading || !errorQuery.trim()}
-        class="px-4 py-2 bg-blue-600 hover: bg-blue-700, disabled:opacity-50 rounded text-white"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-white"
       >
         Search
       </button>

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { Progress as ProgressPrimitive } from 'bits-ui';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     value?: number
     max?: number
@@ -27,9 +25,9 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   
   let sizeClasses = $derived('h-2'); // keep simple, allow override via class prop
 </script>
-<!-- accessible, SSR-friendly, progress, bar -->
-<div class={['relative, w-full', className].filter(Boolean).join(' ')}>
-  <div class="w-full bg-gray-200 dark: bg-gray-700 rounded-full">
+<!-- accessible, SSR-friendly, progress bar -->
+<div class={['relative w-full', className].filter(Boolean).join(' ')}>
+  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full">
     <div
       role="progressbar"
       aria-valuemin="0"
@@ -39,26 +37,30 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
       style="width: {percentage}%"
     >
       {#if variant === 'yorha'}
-        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent">{/if}
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+      {/if}
     </div>
   </div>
   {#if showPercentage}
-    <div class="text-xs font-mono text-gray-600 dark: text-gray-400 mt-1 text-right">
+    <div class="text-xs font-mono text-gray-600 dark:text-gray-400 mt-1 text-right">
       {Math.round(percentage)}%
-    {/if}
+    </div>
+  {/if}
 </div>
 <style>
   @keyframes shimmer {
-    0% { transform: translateX(-100%)}
-    100% { transform: translateX(100%)}
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
-  .animate-shimmer { animation: shimmer 2s infinite}
+  .animate-shimmer { animation: shimmer 2s infinite; }
   /* minimal NES-like pattern for legal variant */
   .nes-progress.is-pattern::before {
     content: '';
-	position: absolute;inset: 0
+    position: absolute;
+    inset: 0;
     background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.06) 10px, rgba(255, 255, 255, 0.06) 20px);
-    pointer-events: none}
+    pointer-events: none;
+  }
 </style>
 
 

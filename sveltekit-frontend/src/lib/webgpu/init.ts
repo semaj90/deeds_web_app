@@ -8,8 +8,6 @@
  */
 
 import { browser } from '$app/environment';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface WebGPUContext {
   adapter: GPUAdapter, device: GPUDevice;
@@ -51,7 +49,7 @@ export async function initWebGPU(
 
   try {
     // Request adapter with power preference
-    const adapter = await navigator.gpu.requestAdapter({
+    const adapter = await (navigator as any).gpu.requestAdapter({
       powerPreference: options.powerPreference || 'high-performance'
     });
 
@@ -96,7 +94,7 @@ export async function initWebGPU(
     });
 
     // Get preferred canvas format
-    const format = navigator.gpu.getPreferredCanvasFormat();
+    const format = (navigator as any).gpu.getPreferredCanvasFormat();
 
     return { adapter, device, format };
 
@@ -206,7 +204,7 @@ export async function getWebGPUCapabilities(): Promise<{
   }
 
   try {
-    const adapter = await navigator.gpu.requestAdapter();
+    const adapter = await (navigator as any).gpu.requestAdapter();
     if (!adapter) {
       return {
         available: false,

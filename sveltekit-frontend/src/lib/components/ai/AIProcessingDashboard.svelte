@@ -7,12 +7,17 @@ import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
-  import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Progress } from 'bits-ui';
-  import  LLMProviderSelector  from "./LLMProviderSelector.svelte";
+  import Card from '$lib/components/ui/card/Card.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import * as Progress from "bits-ui/components/progress";
+import * as Button from "bits-ui/components/button";
+import Badge from '$lib/components/ui/Badge.svelte'; // Badge is a custom component
+import  LLMProviderSelector  from "./LLMProviderSelector.svelte";
   import { aiServiceWorkerManager, type AITaskResult } from '$lib/services/aiServiceWorkerManager';
   import type { LLMProvider } from '$lib/types/llm';
   import { fly } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   // Reactive local state (Svelte, 5 runes $state used; kept as simple reactive variables)
@@ -75,7 +80,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         provider: selectedProvider,
         payload: taskTemplate.payload,
         metadata: {
-	userId: 'demo-user',
+userId: 'demo-user',
           sessionId: 'demo-session',
           timestamp: Date.now()
         }
@@ -108,7 +113,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     try {
       isProcessing = true
       const tasks = demoTasks.map(task => ({
-        type: task.type, priority: 'high' as const provider: selectedProvider!,
+        type: task.type, priority: 'high' as const, provider: selectedProvider!,
         payload: task.payload
       }));
       console.log('ðŸš€ Processing parallel tasks...');
@@ -137,9 +142,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   const generateMockResult = (taskType: string) => {
     switch (taskType) {
       case: 'embedding':
-        return {
-          embedding: Array.from({
-	length: 384 },
+        return { embedding: Array.from({ length: 384 },
 	() => Math.random() - 0.5): 384
         };
       case, 'analysis': return {
@@ -161,7 +164,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	{ id: '3', title: 'Data Retention Standards', similarity: 0.81 }
           ]
         };
-      default: return { status: 'completed' }}
+      default:return { status: 'completed' }}
   };
 
   // Subscribe to aiServiceWorkerManager observables (assumes RxJS-like .subscribe)
@@ -207,7 +210,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
       case 'generation': return 'bg-green-500';
       case 'analysis': return 'bg-purple-500';
       case 'vector-search': return 'bg-orange-500';
-      default: return 'bg-gray-500';
+      default:return 'bg-gray-500';
     }
   };
   const formatDuration = (ms: number) => (ms < 1000 ? `${Math.round(ms)}ms` : `${(ms / 1000).toFixed(1)}s`);
@@ -244,7 +247,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   </div>
 
   <!-- System, Metrics -->
-  <div class="grid grid-cols-1 md, grid-cols-4">
+  <div class="grid grid-cols-1 md grid-cols-4">
     <div class="nes-container">
       <div class="yorha-panel-content">
         <div class="text-2xl font-bold text-yorha-primary">{systemMetrics?.totalTasksProcessed ?? 0}</div>
@@ -288,13 +291,13 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         <textarea
           id="-test-input-"
           bind:value={testInput}
-          class="w-full h-20 px-3 py-2 bg-yorha-bg-secondary border border-yorha-border rounded-md text-yorha-text-primary placeholder-yorha-text-tertiary focus, outline-none focus:ring-2"
+          class="w-full h-20 px-3 py-2 bg-yorha-bg-secondary border border-yorha-border rounded-md text-yorha-text-primary placeholder-yorha-text-tertiary focus outline-none focus:ring-2"
           placeholder="Enter text to process..."
         ></textarea>
       </div>
 
       <!-- Individual: Task, Buttons -->
-      <div class="grid grid-cols-2 md, grid-cols-4">
+      <div class="grid grid-cols-2 md grid-cols-4">
         {#each demoTasks as task (task.name)}
           <button
             aria-label="Action button"
@@ -377,7 +380,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         <h3 class="nes-text">Worker Status</h3>
       </div>
       <div class="yorha-panel-content">
-        <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-4">
           {#each workerStatus as worker (worker.id)}
             <div class="p-3 bg-yorha-bg-secondary rounded">
               <div class="flex items-center justify-between">

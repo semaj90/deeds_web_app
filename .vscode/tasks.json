@@ -105,7 +105,6 @@
       },
       "isBackground": true,
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -127,7 +126,6 @@
       },
       "isBackground": true,
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -149,7 +147,6 @@
         }
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -172,7 +169,6 @@
         }
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -196,7 +192,6 @@
         }
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -217,7 +212,6 @@
         }
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -238,7 +232,6 @@
         }
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -256,7 +249,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -274,7 +266,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -292,7 +283,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -310,7 +300,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -328,7 +317,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -346,7 +334,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "none",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "silent",
@@ -368,7 +355,6 @@
         "Dev: QUIC (Phase 14 env)"
       ],
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -389,7 +375,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -407,7 +392,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -425,7 +409,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -443,7 +426,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -462,7 +444,6 @@
       },
       "isBackground": true,
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -480,7 +461,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -498,7 +478,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -522,7 +501,6 @@
         }
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -543,7 +521,6 @@
         }
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -564,7 +541,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -582,7 +558,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -603,7 +578,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -621,7 +595,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -639,7 +612,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -657,7 +629,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -675,7 +646,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -693,7 +663,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -711,7 +680,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -737,7 +705,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -758,7 +725,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -779,7 +745,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -803,7 +768,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -825,7 +789,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -846,7 +809,6 @@
         "cwd": "${workspaceFolder}"
       },
       "group": "build",
-      "problemMatcher": [],
       "dependsOn": [
         "✅ Phase 66: Verify Error Count"
       ],
@@ -870,7 +832,6 @@
         "kind": "build",
         "isDefault": false
       },
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -901,7 +862,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     },
     {
       "label": "📊 Phase 94: Redis Cache Stats",
@@ -920,7 +881,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     },
     {
       "label": "🔍 Phase 94: Query Cluster Errors",
@@ -940,7 +901,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     },
     {
       "label": "🔧 Phase 94: List All FastMCP Tools",
@@ -959,7 +920,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     },
     {
       "label": "🤖 Phase 94: Get AI Recommendation",
@@ -981,7 +942,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     },
     {
       "label": "🔎 Phase 94: Analyze Current File",
@@ -1003,7 +964,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     },
     {
       "label": "🚀 Phase 94: Batch Fix Cluster 0 (Dry-Run)",
@@ -1025,7 +986,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     },
     {
       "label": "✅ Phase 94: Validate Fix",
@@ -1070,7 +1031,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     }
   ],
   "inputs": [

@@ -1,4 +1,4 @@
-// Minimal stub for SIMD GPU Parser Integration to unblock build // Provides the interface expected by unified-legal-simd-pgvector.ts export interface ExtractedEntity { text: string, type: string, start: number, end: number, confidence: number}
+// Minimal stub for SIMD GPU Parser Integration to unblock build // Provides the interface expected by unified-legal-simd-pgvector.ts export interface ExtractedEntity { text: string; type: string, start: number; end: number, confidence: number}
 export interface DidYouMeanSuggestion { original: string, suggestion: string, confidence: number}
 export interface ParsedDocument { content: title?: string; documentType? : string; jurisdiction?: string; practiceAreas?: string[],entities: ExtractedEntity[], suggestions: DidYouMeanSuggestion[], processingTimeMs: number, confidence: number}
 export interface ParsingConfig { enableSpellCheck: boolean, enableEntityExtraction: boolean, enableLegalTermSuggestions: boolean, enableCitationValidation: boolean, confidenceThreshold: number, maxSuggestions: number, simdOptimization: boolean, gpuAcceleration: boolean}

@@ -6,15 +6,13 @@
 // Original AST processor
 export { ASTProcessor } from './ast-processor.js';
 export type { 
-    ASTNode: AutosuggestContext,
-    AutosuggestResult: Autosuggestion
+    ASTNode: AutosuggestContext, AutosuggestResult: Autosuggestion
  } from './ast-processor.js';
 
 // Svelte-check analyzer
 export { SvelteCheckAnalyzer as svelteCheckAnalyzer } from './svelte-check-analyzer.js';
 export type { 
-    ASTAnalysisResult: ASTError,
-    FunctionInfo: TypeInfo: VariableInfo
+    ASTAnalysisResult: ASTError, FunctionInfo: TypeInfo: VariableInfo
  } from './svelte-check-analyzer.js';
 
 // Suggestion engine

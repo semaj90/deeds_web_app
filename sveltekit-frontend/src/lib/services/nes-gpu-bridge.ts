@@ -56,8 +56,8 @@ interface CanvasMetadata { nesGpuProcessed?: boolean; tensorShape?: number[]; pr
 interface FabricObject { left?: number; top?: number; width?: number; height?: number; scaleX?: number; scaleY?: number; angle?: number; opacity?: number; skewX?: number; skewY?: number; fill?: string; stroke?: string; strokeWidth?: number; visible?: boolean; selectable?: boolean; evented?: boolean; type?: string; zIndex?: number; rotation?: number; shadow?: FabricShadow }
 interface FabricShadow { blur?: number; color?: string; offsetX?: number; offsetY?: number }
 interface MultiDimArray { shape: number[];
-	data: Float32Array; dimensions: number;
-	layout: string; cacheKey: string;
+	data: Float32Array, dimensions: number;
+	layout: string, cacheKey: string;
 	lodLevel: number }
 
 export class NESStyleGPUBridge {

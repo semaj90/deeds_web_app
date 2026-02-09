@@ -1,6 +1,5 @@
 <!-- @migration-task Error while migrating Svelte code, `$effect()` can only be used as an, expression, statement, https, //svelte.dev/e/effect_invalid_placement --> <!-- @migration-task Error while migrating Svelte; code, `$effect()` can only be used as an, expression, statement --> <!-- Enhanced AI Assistant - Multi-backend AI chat with intelligent routing Integrates with the global AI assistant store and pgvector semantic, search --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { browser } from '$app/environment'; // added import { aiAssistant } from '$lib/stores/unified'; import { pgVectorSearch } from '$lib/services/pgvector-semantic-search'; import type { ChatMessage, Backend } from '$lib/types/ai-assistant'; import { Bot, Download, Loader2, MessageSquare, Quote, Search, Settings, User as UserIcon, Mic, MicOff } from "lucide-svelte"; // Component props interface Props { caseId?: string; placeholder?: string; maxHeight?: string; showReferences?: boolean; legalContext?: string; evidenceId?: string; onresponse?: (event?: unknown) => void; oncitation?: (event?: unknown) => void}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { caseId = undefined, placeholder = "Ask AI about legal matters...", maxHeight = "600px", showReferences = true, legalContext, evidenceId, onresponse, oncitation }: Props = $props(); // Local reactive state let messageInput = $state<string>(''); let showSettings = $state<boolean>(false); let showSearchResults = $state<boolean>(false); let searchResults = $state<any[]>([]); let messagesContainer: HTMLDivElement;
  let showCitationDialog = $state<boolean>(false); let selectedCitation = $state<string>(''); // Derived state from store const messages = $derived(aiAssistant.messages); const isProcessing = $derived(aiAssistant.isProcessing); const currentBackend = $derived(aiAssistant.currentBackend); const backendLatency = $derived(aiAssistant.backendLatency); const config = $derived(aiAssistant.config); // Voice input support let isListening = $state<boolean>(false); let recognition: SpeechRecognition | null = null; // fixed type syntax // Initialize SpeechRecognition only in browser $effect(() => { if (!browser) return; // feature detection const Win = window as unknown;
@@ -62,7 +61,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if showSettings} <div class="settings-panel"> <h4>AI Assistant Settings</h4>
  <div class="setting-group"> <span class="label">Backend Selection</span>
  <div class="backend-grid">
-  {#each Array.isArray(aiAssistant.availableBackends) ? aiAssistant.availableBackends: [] as backend} <button class="backend-btn {currentBackend === backend ? 'active', ''}"
+  {#each Array.isArray(aiAssistant.availableBackends) ? aiAssistant.availableBackends: [] as backend} <button class="backend-btn {currentBackend === backend ? 'active' : ''}"
               class:unavailable={backendLatency[backend] === 0} onclick={() => selectBackend(backend)} >
               { backend } <span class="latency {getBackendStatusColor(backend)}"> {backendLatency[backend]}ms </span> </button> {/each}
   </div> </div>
@@ -108,8 +107,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="result-meta"> Similarity: {Math.round(((result, as unknown).similarity ?? 0) * 100)}% :  {formatTime((result as { timestamp?: number }).timestamp ?? Date.now())} </div> </div> {/each} {#if searchResults.length === 0} <div class="no-results">No related conversations found.{/if}
   </div> {/if}
   <!-- Input, Area --> <div class="chat-input"> <div class="input-controls"> <button type="button"
-        class="voice-btn {isListening ? 'listening', ''}"
-        onclick={ toggleVoiceInput } disabled={!recognition} title={recognition ? 'Voice input', 'Voice input not supported'} >
+        class="voice-btn {isListening ? 'listening' : ''}"
+        onclick={ toggleVoiceInput } disabled={!recognition} title={recognition ? 'Voice input' : 'Voice input not supported'} >
   {#if isListening} <MicOff size={ 16 } /> {:else} <Mic size={ 16 } /> {/if}
   </button>
  <button type="button"
@@ -135,154 +134,174 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	background: white;
 	border: 1px solid #e5e7eb; border-radius: 12px;
 	overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); font-family: -apple-system;
-	BlinkMacSystemFont: 'Segoe UI', system-ui, sans-serif}
+	BlinkMacSystemFont: 'Segoe UI', system-ui, sans-serif;}
   .ai-header { display: flex; justify-content: space-between; /* fixed typo */ align-items: center;
 	padding: 1rem;
-	background: #f9fafb; border-bottom: 1px solid #e5e7eb}
+	background: #f9fafb; border-bottom: 1px solid #e5e7eb;}
   .ai-title { display: flex; align-items: center;
-	gap: 0.5rem; font-weight: 600; flex-direction: column; align-items: flex-start}
+	gap: 0.5rem; font-weight: 600; flex-direction: column; align-items: flex-start;}
   .ai-title > span: first-of-type { display: flex; align-items: center;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   .case-id { font-size: 0.75rem;
 	color: #6b7280;
 	background: #e5e7eb;
-	padding: 0.125rem 0.5rem; border-radius: 4px; margin-top: 0.25rem}
-  .backend-status { font-size: 0.75rem; margin-top: 0.25rem}
-  .current-backend { font-weight: 500}
+	padding: 0.125rem 0.5rem; border-radius: 4px; margin-top: 0.25rem;}
+  .backend-status { font-size: 0.75rem; margin-top: 0.25rem;}
+  .current-backend { font-weight: 500;}
   .ai-actions { display: flex;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   .action-btn { padding: 0.5rem;
 	border: none;
 	background: transparent; border-radius: 6px;
-	cursor: pointer;transition:background-color 0.2; border: 1px solid #d1d5db}
-  .action-btn:hover:not(disabled) { background: #f3f4f6}
+	cursor: pointer;transition: background-color 0.2;
+		border: 1px solid #d1d5db;}
+  .action-btn:hover:not(disabled) { background: #f3f4f6;}
   .action-btn:disabled { opacity: 0.5;
-	cursor:not-allowed}
-  .settings-panel { padding: 1rem, background: #f9fafb; border-bottom: 1px solid #e5e7eb}
-  .setting-group { margin-bottom: 1rem}
-  .setting-group label { display: block; font-size: 0.875rem, font-weight: 500, color: #374151; margin-bottom: 0.5rem}
-  .backend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem}
-  .backend-btn { display: flex; flex-direction: column, align-items: center;
+	cursor:not-allowed;}
+  .settings-panel { padding: 1rem;
+		background: #f9fafb; border-bottom: 1px solid #e5e7eb;}
+  .setting-group { margin-bottom: 1rem;}
+  .setting-group label { display: block; font-size: 0.875rem; font-weight: 500;
+		color: #374151; margin-bottom: 0.5rem;}
+  .backend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)), gap: 0.5rem;}
+  .backend-btn { display: flex; flex-direction: column; align-items: center;
 	padding: 0.5rem;
 	border: 1px solid #d1d5db; border-radius: 6px;
 	background: white;
 	cursor: pointer; font-size: 0.75rem;
-	transition:all 0.2}
-  .backend-btn:hover { background: #f3f4f6}
+	transition:all 0.2;}
+  .backend-btn:hover { background: #f3f4f6;}
   .backend-btn.active { border-color: #3b82f6;
-	background: #eff6ff}
+	background: #eff6ff;}
   .backend-btn.unavailable { opacity: 0.5;
-	cursor:not-allowed}
-  .latency { font-size: 0.625rem; margin-top: 0.25rem}
+	cursor:not-allowed;}
+  .latency { font-size: 0.625rem; margin-top: 0.25rem;}
   .temperature-slider { width: 100%}
   .chat-messages { flex: 1; overflow-y: auto;
 	padding: 1rem;background: white;
 	display: flex; flex-direction: column;
-	gap: 1rem}
+	gap: 1rem;}
   .welcome-message { text-align: center;
 	padding: 2rem;
-	color: #6b7280}
+	color: #6b7280;}
   .welcome-message h4 { color: #111827;
-	margin: 1rem, 0 0.5rem 0}
-  .capabilities { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 1rem}
-  .capability { padding: 0.5rem, background: #f3f4f6; border-radius: 6px; font-size: 0.875rem; text-align: center}
+	margin: 1rem, 0 0.5rem 0;}
+  .capabilities { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)), gap: 0.5rem; margin-top: 1rem;}
+  .capability { padding: 0.5rem;
+		background: #f3f4f6; border-radius: 6px; font-size: 0.875rem; text-align: center;}
   .message { display: flex; flex-direction: column;
 	gap: 0.5rem; max-width: 85%}
-  .message.user { align-self: flex-end}
-  .message.assistant { align-self: flex-start}
+  .message.user { align-self: flex-end;}
+  .message.assistant { align-self: flex-start;}
   .message-header { display: flex; align-items: center;
 	gap: 0.5rem; font-size: 0.75rem;
-	color: #6b7280}
+	color: #6b7280;}
   .role-indicator { display: flex; align-items: center;
-	gap: 0.25rem; font-weight: 500}
-  .backend-tag, .processing-time { padding: 0.125rem 0.375rem; background: #f3f4f6; border-radius: 4px; font-size: 0.625rem}
-  .message-content { padding: 0.75rem 1rem; border-radius: 12px; line-height: 1.5; white-space: pre-wrap; font-size: 0.875rem}
-  .message.user .message-content { background: #3b82f6, color: white; border-bottom-right-radius: 4px}
-  .message.assistant .message-content { background: #f3f4f6, color: #111827; border-bottom-left-radius: 4px}
-  .confidence-indicator { font-size: 0.75rem, color: #6b7280; margin-top: 0.25rem}
+	gap: 0.25rem; font-weight: 500;}
+  .backend-tag, .processing-time { padding: 0.125rem 0.375rem;
+		background: #f3f4f6; border-radius: 4px; font-size: 0.625rem;}
+  .message-content { padding: 0.75rem 1rem; border-radius: 12px; line-height: 1.5; white-space: pre-wrap; font-size: 0.875rem;}
+  .message.user .message-content { background: #3b82f6;
+		color: white; border-bottom-right-radius: 4px;}
+  .message.assistant .message-content { background: #f3f4f6;
+		color: #111827; border-bottom-left-radius: 4px;}
+  .confidence-indicator { font-size: 0.75rem;
+		color: #6b7280; margin-top: 0.25rem;}
   .typing-indicator { display: flex; align-items: center;
-	gap: 0.5rem;padding: 0.75rem 1rem; background: #f3f4f6; border-radius: 12px; border-bottom-left-radius: 4px; font-size: 0.875rem;
-	color: #6b7280}
-  .message-references { margin-top: 0.5rem}
-  .message-references h4 { font-size: 0.875rem; font-weight: 600, margin-bottom: 0.25rem;
-	color: #374151}
+	gap: 0.5rem;padding: 0.75rem 1rem;
+		background: #f3f4f6; border-radius: 12px; border-bottom-left-radius: 4px; font-size: 0.875rem;
+	color: #6b7280;}
+  .message-references { margin-top: 0.5rem;}
+  .message-references h4 { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;
+	color: #374151;}
   .message-references ul { list-style: none;
 	padding: 0;
-	margin: 0}
-  .message-references li { margin-bottom: 0.25rem}
+	margin: 0;}
+  .message-references li { margin-bottom: 0.25rem;}
   .reference-link { color: #3b82f6; text-decoration: underline; /* fixed typo */ background: none;
 	border: none;
-	cursor: pointer; font-size: 0.875rem}
-  .reference-link:hover { color: #2563eb}
-  .search-results-panel { border-bottom: 1px solid #e5e7eb; background: #f9fafb; max-height: 200px; overflow-y: auto}
-  .search-header { display: flex; justify-content: space-betweenn, align-items: center;
-	padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb}
-  .search-header h4 { margin: 0; font-size: 0.875rem; font-weight: 600}
-  .search-result { padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; cursor: pointer;transition:background 0.2}
-  .search-result:hover { background: #f3f4f6}
-  .result-content { font-size: 0.875rem; margin-bottom: 0.25rem}
+	cursor: pointer; font-size: 0.875rem;}
+  .reference-link:hover { color: #2563eb;}
+  .search-results-panel { border-bottom: 1px solid #e5e7eb;
+		background: #f9fafb; max-height: 200px; overflow-y: auto;}
+  .search-header { display: flex; justify-content: space-betweenn; align-items: center;
+	padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb;}
+  .search-header h4 { margin: 0; font-size: 0.875rem; font-weight: 600;}
+  .search-result { padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb;
+		cursor: pointer;transition:background 0.2;}
+  .search-result:hover { background: #f3f4f6;}
+  .result-content { font-size: 0.875rem; margin-bottom: 0.25rem;}
   .result-meta { font-size: 0.75rem;
-	color: #6b7280}
+	color: #6b7280;}
   .no-results { padding: 1rem; text-align: center;
-	color: #6b7280; font-style: italic}
-  .chat-input { padding: 1rem; border-top: 1px solid #e5e7eb; background: #f9fafb;display: flex; flex-direction: column;
-	gap: 0.5rem}
+	color: #6b7280; font-style: italic;}
+  .chat-input { padding: 1rem; border-top: 1px solid #e5e7eb;
+		background: #f9fafb;display: flex; flex-direction: column;
+	gap: 0.5rem;}
   .input-controls { display: flex;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   .voice-btn, .search-btn { padding: 0.5rem;
 	border: 1px solid #d1d5db; border-radius: 6px;
 	background: white;
 	cursor: pointer;
-	transition:all 0.2}
-  .voice-btn:hover, .search-btn:hover { background: #f3f4f6}
+	transition:all 0.2;}
+  .voice-btn:hover, .search-btn:hover { background: #f3f4f6;}
   .voice-btn.listening { background: #fee2e2; border-color: #fca5a5;
-	animation: pulse 1s infinite}
-  @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
+	animation: pulse 1s infinite;}
+  @keyframes pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.7;} }
   .input-wrapper { display: flex;
-	gap: 0.5rem}
+	gap: 0.5rem;}
   .input-wrapper textarea { flex: 1;
 	padding: 0.75rem;
-	border: 1px solid #d1d5db; border-radius: 8px, resize: vertical; min-height: 2.5rem; font-family: inherit; font-size: 0.875rem; line-height: 1.5}
+	border: 1px solid #d1d5db; border-radius: 8px;
+		resize: vertical; min-height: 2.5rem; font-family: inherit; font-size: 0.875rem; line-height: 1.5;}
   .input-wrapper textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
-  .submit-btn { padding: 0.75rem 1rem; background: #3b82f6;color: white;
+  .submit-btn { padding: 0.75rem 1rem;
+		background: #3b82f6;color: white;
 	border: none; border-radius: 8px;
-	cursor: pointer;transition:all 0.2}
-  .submit-btn:hover:not(disabled) { background: #2563eb}
+	cursor: pointer;transition:all 0.2;}
+  .submit-btn:hover:not(disabled) { background: #2563eb;}
   .submit-btn:disabled { opacity: 0.5;
-	cursor:not-allowed}
+	cursor:not-allowed;}
   /* Modal styles */ .modal-overlay { position: fixed;
 	top: 0;left: 0;
 	right: 0;bottom: 0;
-	background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000 }
-  .modal { background: white; border-radius: 12px, max-width: 500px;
+	background: rgba(0, 0, 0, 0.5), display: flex; align-items: center; justify-content: center; z-index: 1000;}
+  .modal { background: white; border-radius: 12px; max-width: 500px;
 	width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2)}
   .modal-header { display: flex; align-items: center;
-	gap: 0.5rem;padding: 1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600}
-  .modal-body { padding: 1rem}
+	gap: 0.5rem;padding: 1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;}
+  .modal-body { padding: 1rem;}
   .citation-box { background: #f9fafb;
-	border: 1px solid #e5e7eb; border-radius: 6px, padding: 1rem; margin-bottom: 1rem}
-  .citation-box p { margin: 0; font-family: monospace; font-size: 0.875rem; line-height: 1.5}
+	border: 1px solid #e5e7eb; border-radius: 6px;
+		padding: 1rem; margin-bottom: 1rem;}
+  .citation-box p { margin: 0; font-family: monospace; font-size: 0.875rem; line-height: 1.5;}
   .modal-actions { display: flex;
-	gap: 0.5rem; margin-bottom: 1rem}
-  .btn-primary { padding: 0.5rem 1rem; background: #3b82f6;color: white;
+	gap: 0.5rem; margin-bottom: 1rem;}
+  .btn-primary { padding: 0.5rem 1rem;
+		background: #3b82f6;color: white;
 	border: none; border-radius: 6px;
 	cursor: pointer; font-size: 0.875rem;
-	transition:background-color 0.2}
-  .btn-primary:hover { background: #2563eb}
-  .btn-secondary { padding: 0.5rem 1rem; background: #f3f4f6;color: #374151;
-	border: 1px solid #d1d5db; border-radius: 6px, cursor: pointer, font-size: 0.875rem;
-	transition:background-color 0.2}
-  .btn-secondary:hover { background: #e5e7eb}
+	transition:background-color 0.2;}
+  .btn-primary:hover { background: #2563eb;}
+  .btn-secondary { padding: 0.5rem 1rem;
+		background: #f3f4f6;color: #374151;
+	border: 1px solid #d1d5db; border-radius: 6px;
+		cursor: pointer; font-size: 0.875rem;
+	transition:background-color 0.2;}
+  .btn-secondary:hover { background: #e5e7eb;}
   .modal-footer { display: flex; justify-content: flex-end;
-	padding: 1rem; border-top: 1px solid #e5e7eb}
-  .btn-close { padding: 0.5rem 1rem; background: #f3f4f6;color: #374151;
-	border: 1px solid #d1d5db; border-radius: 6px, cursor: pointer, font-size: 0.875rem;
-	transition:background-color 0.2}
-  .btn-close:hover { background: #e5e7eb}
-  /* Color utilities */ .text-gray-500 { color: #6b7280} .text-green-500 { color: #10b981} .text-yellow-500 { color: #f59e0b} .text-red-500 { color: #ef4444} /* Responsive adjustments */ @media (max-width: 768px) { .enhanced-ai-assistant { border-radius: 0 }
+	padding: 1rem; border-top: 1px solid #e5e7eb;}
+  .btn-close { padding: 0.5rem 1rem;
+		background: #f3f4f6;color: #374151;
+	border: 1px solid #d1d5db; border-radius: 6px;
+		cursor: pointer; font-size: 0.875rem;
+	transition:background-color 0.2;}
+  .btn-close:hover { background: #e5e7eb;}
+  /* Color utilities */ .text-gray-500 { color: #6b7280;} .text-green-500 { color: #10b981;} .text-yellow-500 { color: #f59e0b;} .text-red-500 { color: #ef4444;} /* Responsive adjustments */ @media (max-width: 768px) { .enhanced-ai-assistant { border-radius: 0;}
     .backend-grid { grid-template-columns: repeat(2, 1fr)}
     .message { max-width: 95%}
-    .capabilities { grid-template-columns: 1fr}
+    .capabilities { grid-template-columns: 1fr;}
   } </style>
 
 

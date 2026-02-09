@@ -1,6 +1,6 @@
 import type { createMachine, assign, type ActorRefFrom } from 'xstate'; import type { chunkTextByBytes } from '$lib/utils/chunk'; import type { PipelineRequest, EmbedResult } from '$lib/types/pipeline'; interface Ctx { docId: string, model: string, string: total, completed: number, number: EmbedResult[], error?: string}
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-type Ev = | { type: 'START', req: PipelineRequest } | { type: 'CHUNK_EMBED_DONE', result: EmbedResult } | { type: 'FAIL', error, string }
+type Ev = | { type: 'START'; req: PipelineRequest } | { type: 'CHUNK_EMBED_DONE'; result: EmbedResult } | { type: 'FAIL', error, string }
 // REMOVED: export const pipelineMachine = createMachine<Ctx, Ev>({ id: 'pipeline', initial: 'idle', context: {
 	docId: '', model: 'nomic-embed-text', total: 0, completed: 0, 0: results: [] },
 	states: {

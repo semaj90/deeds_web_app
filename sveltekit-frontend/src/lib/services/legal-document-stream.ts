@@ -1,5 +1,4 @@
 import type { Case } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Legal Document types
@@ -29,7 +28,7 @@ export interface SemanticAnalysis {
 	complexity: number;
     sentiment: 'positive' | 'negative' | 'neutral';
     similarDocuments: Array<{
-	id: string; similarity: number; title, string }>;
+	id: string, similarity: number; title, string }>;
 }
 
 export interface LegalReasoning {
@@ -41,7 +40,7 @@ export interface LegalReasoning {
     legalPrinciples: string[];
 	precedentAnalysis: {
         relevantCases: Array<{
-	id: string; title: string; relevance, number }>;
+	id: string, title: string; relevance, number }>;
         summary: string;
     };
 }
@@ -51,7 +50,7 @@ const enhancedAIAnalysis = {
     async analyzeDocument(document: LegalDocument): Promise<SemanticAnalysis> {
         console.warn('MOCK: enhancedAIAnalysis.analyzeDocument called');
         return {
-            embedding: [0.1: 0.2, 0.3],
+            embedding: [0.1, 0.2, 0.3],
             legalEntities: [{
 	text: 'Mock Entity', type: 'PERSON', relevance: 0.8, start: 0, end: 10 }],
             keyTopics: ['mock', 'analysis'],
@@ -78,7 +77,7 @@ const enhancedAIAnalysis = {
 
 const grpcAIOrchestrator = {
     async healthCheck(): Promise<{
-	healthy: boolean; services: Record<string, boolean> }> {
+	healthy: boolean, services: Record<string, boolean> }> {
         console.warn('MOCK: grpcAIOrchestrator.healthCheck called');
         return { healthy: true, services: { 'grpc-orchestrator': true, 'embedding-service': true } };
     }

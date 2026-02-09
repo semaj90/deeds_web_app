@@ -175,14 +175,14 @@ export type OrchestratorEvent =
   | { type: 'SUBMIT_JOB';
 	job: JobDefinition }
   | { type: 'JOB_COMPLETED';
-	jobId: string; metrics: unknown }
+	jobId: string, metrics: unknown }
   | { type: 'JOB_FAILED';
-	jobId: string; error: string }
+	jobId: string, error: string }
   | { type: 'WORKER_HEARTBEAT';
-	workerId: string; metrics: WorkerMetrics }
+	workerId: string, metrics: WorkerMetrics }
   | { type: 'OPTIMIZE_SYSTEM' }
   | { type: 'SCALE_WORKERS';
-	direction: 'up' | 'down'; count: number }
+	direction: 'up' | 'down', count: number }
   | { type: 'BOTTLENECK_DETECTED';
 	report: BottleneckReport }
   | { type: 'UPDATE_RULES';
@@ -345,7 +345,7 @@ export class OptimizedRabbitMQOrchestrator {
   }
 
   getState(): {
-	isRunning: boolean; queueLength: number;
+	isRunning: boolean, queueLength: number;
 	activeJobs: number } {
     return {
       isRunning: this.isRunning,
@@ -355,7 +355,7 @@ export class OptimizedRabbitMQOrchestrator {
   }
 
   getMetrics(): {
-	queueLength: number; activeJobs: number;
+	queueLength: number, activeJobs: number;
 	workerCount: number } {
     return {
       queueLength: this.jobQueue.length,

@@ -5,7 +5,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ClientConnection {
     ws: WebSocket;
-    userId?: string, subscriptions: Set<string>;
+    userId?: string; subscriptions: Set<string>;
 }
 
 export class RealTimeServer {

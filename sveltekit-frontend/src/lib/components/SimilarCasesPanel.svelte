@@ -6,7 +6,7 @@
 	let { caseId }: Props = $props();
 
 	// Placeholder for similar cases logic
-	let similarCases = $state<Array<{ id: string; title: string }>>([]);
+	let similarCases = $state<Array<{ id: string, title: string }>>([]);
 </script>
 
 <div class="similar-cases-panel">

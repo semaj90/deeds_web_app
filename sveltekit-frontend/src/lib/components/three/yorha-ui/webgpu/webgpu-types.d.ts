@@ -36,7 +36,7 @@ interface GPUComputePipelineDescriptor {
 type GPUMapModeFlags = number;
 type GPUBufferUsageFlags = number;
 const GPUBufferUsage: {
-	STORAGE: number, COPY_SRC: number, COPY_DST: number};
+	STORAGE: number; COPY_SRC: number, COPY_DST: number};
 const GPUMapMode: {
 READ, number }}
 

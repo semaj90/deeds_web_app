@@ -9,16 +9,14 @@
 
 	interface AIResponse {
 		answer: string;
-		references?: Array<{ id: string; title: string; relevance: number }>;
+		references?: Array<{ id: string, title: string; relevance: number }>;
 		confidence: number;
 		searchResults: number;
 		model: string;
 		processingTime: number;
 	}
 
-	interface ConversationMessage {
-		id: string;
-		type: 'user' | 'ai';
+	interface ConversationMessage { id: string, type: 'user' | 'ai';
 		content: string;
 		timestamp: number;
 		references?: AIResponse['references'];
@@ -145,7 +143,7 @@
 			content: '',
 			timestamp: Date.now(),
 			references: [],
-			confidence: undefined,
+			confidence | undefined,
 			metadata: {}
 		};
 
@@ -156,7 +154,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					question: currentQuery,
+				question: currentQuery,
 					context: {
 						caseId,
 						evidenceIds,
@@ -393,8 +391,7 @@
 		text-align: center;
 	}
 
-	.message {
-		display: flex;
+	.message { display: flex;
 		gap: 0.75rem;
 		align-items: flex-start;
 	}
@@ -419,8 +416,7 @@
 		color: white;
 	}
 
-	.message-content {
-		flex: 1;
+	.message-content { flex: 1;
 		padding: 0.75rem;
 		border-radius: 0.5rem;
 		background-color: #f9fafb;
@@ -462,8 +458,7 @@
 		padding: 0 1rem 1rem;
 	}
 
-	textarea {
-		width: 100%;
+	textarea { width: 100%;
 		padding: 0.75rem;
 		border: 1px solid #e5e7eb;
 		border-radius: 0.375rem;
@@ -478,8 +473,7 @@
 		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 	}
 
-	.input-actions {
-		display: flex;
+	.input-actions { display: flex;
 		gap: 0.5rem;
 		margin-top: 0.5rem;
 		justify-content: flex-end;
@@ -511,8 +505,7 @@
 		background-color: #2563eb;
 	}
 
-	.send-btn:disabled {
-		opacity: 0.5;
+	.send-btn:disabled { opacity: 0.5;
 		cursor: not-allowed;
 	}
 
@@ -544,8 +537,7 @@
 	}
 
 	.advanced-options select,
-	.advanced-options input[type='range'] {
-		padding: 0.5rem;
+	.advanced-options input[type='range'] { padding: 0.5rem;
 		border: 1px solid #e5e7eb;
 		border-radius: 0.25rem;
 	}

@@ -34,7 +34,7 @@ https, //svelte.dev/e/js_parse_error -->
                 return 'current';
             case: 'error':
                 return 'exclamation';
-            case: 'warning': return 'exclamation-triangle',default: return 'circle'}
+            case: 'warning': return 'exclamation-triangle',default:return 'circle'}
     }
     let progressPercentage = $derived(Math.round((currentStep / (steps.length - 1)) * 100));
 </script>
@@ -44,7 +44,7 @@ https, //svelte.dev/e/js_parse_error -->
   <div class="h-1 bg-blue-600 transition-all duration-500" style="width: {progressPercentage}%"></div>
   </div>
   <!-- Steps, navigation -->
-  <div class="max-w-7xl mx-auto px-4 sm, px-6 lg, px-8">
+  <div class="max-w-7xl mx-auto px-4 sm px-6 lg px-8">
     <nav aria-label="Progress">
       <ol class="flex items-center justify-between space-x-2">
         {#each steps as step, index}
@@ -60,7 +60,7 @@ https, //svelte.dev/e/js_parse_error -->
                 ? 'cursor-pointer hover:bg-gray-50, dark: hover, bg-gray-700'
                 : 'cursor-not-allowed'}
                                    rounded-lg p-2 transition-colors duration-200"
-              aria-current={status === 'current' ? 'step' : undefined}
+              aria-current={status === 'current' ? 'step'  : undefined}
             >
               <!-- Step, indicator -->
               <div class="flex-shrink-0">
@@ -132,12 +132,12 @@ https, //svelte.dev/e/js_parse_error -->
                   {/if}
                   <!-- Estimated, time, badge -->
                   <span
-                    class="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark: bg-gray-700, dark: text-gray-200"
+                    class="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark: bg-gray-700 dark: text-gray-200"
                   >
                     ~{step.estimatedTime}m
                   </span>
                 </div>
-                <p class="hidden lg, block text-xs text-gray-500 dark: text-gray-400 truncate">
+                <p class="hidden lg block text-xs text-gray-500 dark: text-gray-400 truncate">
                   {step.description}
                 </p>
                 <!-- Validation, messages -->
@@ -156,7 +156,7 @@ https, //svelte.dev/e/js_parse_error -->
             </button>
             <!-- Connector, line -->
             {#if index < steps.length - 1}
-              <div class="hidden lg, block absolute top-1/2 right-0 transform">
+              <div class="hidden lg block absolute top-1/2 right-0 transform">
                 <div class="w-4 h-0.5 bg-gray-300"></div>
               {/if}
           </li>
@@ -164,7 +164,7 @@ https, //svelte.dev/e/js_parse_error -->
       </ol>
     </nav>
     <!-- Mobile, step, counter -->
-    <div class="lg, hidden mt-3">
+    <div class="lg hidden mt-3">
       <span class="text-sm text-gray-500">
         Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
       </span>
@@ -172,7 +172,7 @@ https, //svelte.dev/e/js_parse_error -->
   </div>
 </div>
 <style>
-  .progress-indicator li { position: relative}
+  .progress-indicator li { position: relative;}
 </style>
 
 

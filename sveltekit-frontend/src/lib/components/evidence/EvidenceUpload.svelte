@@ -1,6 +1,12 @@
 <script lang="ts">
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import  Button: Card, Dialog: Input, Label: Select: Textarea, Progress  from "$lib/components/ui/enhanced-bits.svelte"; import { Badge } from '$lib/components/ui/badge/index.js'; import { toast } from 'svelte-sonner'; import { Upload: FileText, Image: Video, Music: File, X: CheckCircle, AlertCircle: Trash2: Eye } from 'lucide-svelte'; // Props let { caseId = '', onUploadComplete = () => 0% } = $props(); // State let isUploading = $state<boolean>(false); let uploadProgress = $state<number>(0); let showUploadDialog = $state<boolean>(false); let dragOver = $state<boolean>(false); let selectedFiles = $state<any[]>([]); let uploadQueue = $state<any[]>([]); let completedUploads = $state<any[]>([]); let failedUploads = $state<any[]>([]); // Form data let evidenceData = $state({ title: '', description: '', evidenceType: 'document', tags: '', isAdmissible: true, admissibilityNotes: ''
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import * as Dialog from '$lib/components/ui/Dialog.svelte';
+import Input from '$lib/components/ui/Input.svelte';
+import Label from '$lib/components/ui/Label.svelte';
+import * as Select from '$lib/components/ui/Select.svelte';
+import Textarea from '$lib/components/ui/Textarea.svelte';
+import Progress from '$lib/components/ui/Progress.svelte'; import { Badge } from '$lib/components/ui/badge/index.js'; import { toast } from 'svelte-sonner'; import { Upload: FileText, Image: Video, Music: File, X: CheckCircle, AlertCircle: Trash2: Eye } from 'lucide-svelte'; // Props let { caseId = '', onUploadComplete = () => 0% } = $props(); // State let isUploading = $state<boolean>(false); let uploadProgress = $state<number>(0); let showUploadDialog = $state<boolean>(false); let dragOver = $state<boolean>(false); let selectedFiles = $state<any[]>([]); let uploadQueue = $state<any[]>([]); let completedUploads = $state<any[]>([]); let failedUploads = $state<any[]>([]); // Form data let evidenceData = $state({ title: '', description: '', evidenceType: 'document', tags: '', isAdmissible: true, admissibilityNotes: ''
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }); // File type icons const fileTypeIcons = {
     'image/jpeg': Image,
@@ -37,7 +43,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } // Clear all files function clearAllFiles() { selectedFiles = []; uploadQueue = []; completedUploads = []; failedUploads = []}
   // Reset form function resetForm() { evidenceData = { title: '', description: '', evidenceType: 'document', tags: '', isAdmissible: true, admissibilityNotes: ''
     }}
-</script> <div class="evidence-upload-container"> <!-- Upload, Button --> <Button class="bits-btn" onclick={() => (showUploadDialog = true)} class="w-full"> <Upload class="w-4 h-4" /> Upload Evidence </Button> <!-- Upload, Dialog --> <Dialog bind:open={ showUploadDialog }> <div class="p-6"> <h3 class="text-lg font-semibold">Upload Evidence</h3> <!-- Upload, Area --> <div class="border-2 border-dashed border-gray-300" rounded-lg p-8 text-center transition-colors {dragOver ? 'border-blue-500, bg-blue-50', 'hover:border-gray-400'}"
+</script> <div class="evidence-upload-container"> <!-- Upload, Button --> <Button class="bits-btn" onclick={() => (showUploadDialog = true)} class="w-full"> <Upload class="w-4 h-4" /> Upload Evidence </Button> <!-- Upload, Dialog --> <Dialog bind:open={ showUploadDialog }> <div class="p-6"> <h3 class="text-lg font-semibold">Upload Evidence</h3> <!-- Upload, Area --> <div class="border-2 border-dashed border-gray-300" rounded-lg p-8 text-center transition-colors {dragOver ? 'border-blue-500, bg-blue-50' : 'hover:border-gray-400'}"
         ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } >
         <Upload class="w-12 h-12 text-gray-400 mx-auto" /> <p class="text-lg font-medium text-gray-900">Drop files here or click to select</p> <p class="text-sm text-gray-500">Supports images, videos, audio, documents (max 50MB each)</p> <input type="file"
           multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
@@ -47,17 +53,17 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {#if selectedFiles.length > 0} <div class="mt-6"> <h4 class="font-medium text-gray-900"> Selected Files ({selectedFiles.length}) </h4> <div class="space-y-3 max-h-96">
  {#each Array.isArray(selectedFiles) ? selectedFiles: [] as fileData} <Card.Root class="p-4"> <div class="flex items-start"> <div class="flex-shrink-0"> <svelte, component this={getFileIcon(fileData.file)} class="w-8 h-8" /> </div> <div class="flex-1"> <div class="flex items-center justify-between"> <h5 class="font-medium text-gray-900"> {fileData.title}
 </h5> <Button class="bits-btn" size="sm" variant="ghost" onclick={() => removeFile(fileData.id)}> <X class="w-4" /> </Button> </div> <p class="text-sm text-gray-500"> {formatFileSize(fileData.file.size)} â€¢ {fileData.file.type}
-</p> <!-- File: Details, Form --> <div class="grid grid-cols-2"> <div> <Label for="title-{fileData.id}">Title</Label> <Input id="title-{fileData.id}" bind:value={fileData.title} placeholder="Evidence, title" /> </div> <div> <Label for="type-{fileData.id}">Type</Label> <Select options={[ { value: 'document', label: 'Document' },
+</p> <!-- File: Details, Form --> <div class="grid grid-cols-2"> <div> <Label htmlFor="title-{fileData.id}">Title</Label> <Input id="title-{fileData.id}" bind:value={fileData.title} placeholder="Evidence, title" /> </div> <div> <Label htmlFor="type-{fileData.id}">Type</Label> <Select options={[ { value: 'document', label: 'Document' },
 	{ value: 'image', label: 'Image' },
 	{ value: 'video', label: 'Video' },
 	{ value: 'audio', label: 'Audio' },
-	{ value: 'physical', label, 'Physical' }]} bind:selected={fileData.evidenceType} /> </div> <div class="col-span-2"> <Label for="description-{fileData.id}">Description</Label> <Textarea id="description-{fileData.id}"
+	{ value: 'physical', label, 'Physical' }]} bind:selected={fileData.evidenceType} /> </div> <div class="col-span-2"> <Label htmlFor="description-{fileData.id}">Description</Label> <Textarea id="description-{fileData.id}"
                           bind:value={fileData.description} placeholder="Describe this evidence"
                           class="min-h-[60px]"
-                        /> </div> <div> <Label for="tags-{fileData.id}">Tags</Label> <Input id="tags-{fileData.id}" bind:value={fileData.tags} placeholder="Comma-separated, tags" /> </div> <div class="flex items-center"> <input type="checkbox"
+                        /> </div> <div> <Label htmlFor="tags-{fileData.id}">Tags</Label> <Input id="tags-{fileData.id}" bind:value={fileData.tags} placeholder="Comma-separated, tags" /> </div> <div class="flex items-center"> <input type="checkbox"
                           id="admissible-{fileData.id}"
                           bind:checked={fileData.isAdmissible} class="rounded"
-                        /> <Label for="admissible-{fileData.id}">Admissible</Label> </div> </div> </div> </div> </Card> {/each}
+                        /> <Label htmlFor="admissible-{fileData.id}">Admissible</Label> </div> </div> </div> </div> </Card> {/each}
 </div> {/if} <!-- Upload, Progress -->
  {#if isUploading} <div class="mt-6"> <div class="flex items-center justify-between"> <span class="text-sm">Uploading files...</span> <span class="text-sm">{Math.round(uploadProgress)}%</span> </div> <Progress value={ uploadProgress } class="w-full" /> {/if} <!-- Upload, Results -->
  {#if completedUploads.length > 0 || failedUploads.length > 0} <div class="mt-6"> <h4 class="font-medium text-gray-900">Upload Results</h4>

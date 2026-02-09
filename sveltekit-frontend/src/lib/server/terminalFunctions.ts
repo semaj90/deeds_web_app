@@ -285,9 +285,9 @@ export async function executeTerminalFunction(
 export function parseFunctionCalls(
 	response: string
 ): Array<{
-	name: string; args: Record<string, any> }> {
+	name: string, args: Record<string, any> }> {
 	const functionCalls: Array<{
-	name: string; args: Record<string, any> }> = [];
+	name: string, args: Record<string, any> }> = [];
 
 	// Match patterns like: search_evidence(query="test", caseId="123")
 	const functionCallRegex = /FUNCTION_CALL:\s*(\w+)\s*\((.*?)\)(?=\s|$|FUNCTION_CALL)/gs;

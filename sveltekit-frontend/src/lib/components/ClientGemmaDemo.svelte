@@ -11,8 +11,7 @@
 	let isGenerating = $state(false);
 
 	let embeddingText = $state('This is a sample legal document for testing embeddings.');
-	let embeddingResult = $state<{ embedding: number[];
-	dimensions: number } | null>(null);
+	let embeddingResult = $state<{ embedding: number[]; dimensions: number } | null>(null);
 	let isGeneratingEmbedding = $state(false);
 
 	// No initialization needed
@@ -37,7 +36,7 @@
 					prompt,
 					stream: false,
 					options: {
-						temperature: 0.7,
+					temperature: 0.7,
 						num_predict: 200
 					}
 				})
@@ -154,21 +153,18 @@
 		font-weight: 500;
 	}
 
-	.status.initializing {
-		background: #e3f2fd;
-	color: #1976d2;
+	.status.initializing { background: #e3f2fd;
+		color: #1976d2;
 		border: 1px solid #bbdefb;
 	}
 
-	.status.success {
-		background: #e8f5e8;
-	color: #2e7d32;
+	.status.success { background: #e8f5e8;
+		color: #2e7d32;
 		border: 1px solid #c8e6c9;
 	}
 
-	.status.error {
-		background: #ffebee;
-	color: #c62828;
+	.status.error { background: #ffebee;
+		color: #c62828;
 		border: 1px solid #ffcdd2;
 	}
 
@@ -185,9 +181,8 @@
 	color: #333;
 	}
 
-	textarea {
-		width: 100%;
-	padding: 12px;
+	textarea { width: 100%;
+		padding: 12px;
 		border: 1px solid #ccc;
 		border-radius: 4px;
 		font-family: inherit;
@@ -213,23 +208,20 @@
 		transition:background-color 0.2s;
 	}
 
-	button:disabled {
-		opacity: 0.6;
-	cursor: not-allowed;
+	button:disabled { opacity: 0.6;
+		cursor: not-allowed;
 	}
 
-	.generate-btn {
-		background: #1976d2;
-	color: white;
+	.generate-btn { background: #1976d2;
+		color: white;
 	}
 
 	.generate-btn:hover:not(:disabled) {
 		background: #1565c0;
 	}
 
-	.embed-btn {
-		background: #7b1fa2;
-	color: white;
+	.embed-btn { background: #7b1fa2;
+		color: white;
 	}
 
 	.embed-btn:hover:not(:disabled) {
@@ -251,9 +243,8 @@
 	color: #333;
 	}
 
-	pre {
-		background: #f5f5f5;
-	padding: 8px;
+	pre { background: #f5f5f5;
+		padding: 8px;
 		border-radius: 4px;
 		overflow-x: auto;
 		white-space: pre-wrap;

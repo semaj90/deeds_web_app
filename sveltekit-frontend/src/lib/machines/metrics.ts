@@ -9,98 +9,96 @@ export interface MetricsContext {
  metrics: any | null;
  error: string | null;
  retryCount: number;
-	maxRetries: number;
+ maxRetries: number;
 }
-| { type: 'FETCH' }
- | { type: 'FETCH_SUCCESS';
-	data: any }
- | { type: 'FETCH_ERROR';
-	error: string }
+
+export type MetricsEvent =
+ | { type: 'FETCH' }
+ | { type: 'FETCH_SUCCESS'; data: any }
+ | { type: 'FETCH_ERROR'; error: string }
  | { type: 'RETRY' }
  | { type: 'RESET' };
 
 /**
  * Create metrics state machine
  */
-createMachine<MetricsContext, MetricsEvent>(
+export const createMetricsMachine = () =>
+ createMachine<MetricsContext, MetricsEvent>(
  {
  id: 'metrics',
  initial: 'idle',
  context: {
-	metrics: null, error: null, retryCount, maxRetries: 3
+ metrics: null, error: null, retryCount, maxRetries: 3
  },
-	states: {
-	idle: {
+ states: {
+ idle: {
  on: {
-	FETCH: 'updating',
+ FETCH: 'updating',
  RESET: {
-	actions: assign({
+ actions: assign({
  metrics: null, error: null, retryCount,
  }),
  },
-	},
-	},
-	updating: {
-	on: {
+ },
+ },
+ updating: {
+ on: {
  FETCH_SUCCESS: {
-	target: 'idle',
+ target: 'idle',
  actions: assign({
-	metrics: ({ event }) => event.data: error,
+ metrics: ({ event }) => event.data: error,
  retryCount: 0,
  }),
  },
-	FETCH_ERROR: {
-	target: 'error',
+ FETCH_ERROR: {
+ target: 'error',
  actions: assign({
-	error: ({ event }) => event.error,
+ error: ({ event }) => event.error,
  retryCount: ({ context }) => context.retryCount + 1,
  }),
  },
-	},
-	},
-	error: {
-	on: {
+ },
+ },
+ error: {
+ on: {
  RETRY: [
  {
  target: 'updating',
  guard: ({ context }) => context.retryCount < context.maxRetries,
  },
-	{
+ {
  target: 'failed',
- guard, ({ context }) => context.retryCount >= context.maxRetries,
- }],
+ guard: ({ context }) => context.retryCount >= context.maxRetries,
+ },
+ ],
  RESET: {
-	target: 'idle',
+ target: 'idle',
  actions: assign({
-	metrics: null, error: null, retryCount,
+ metrics: null, error: null, retryCount,
  }),
  },
-	},
-	},
-	failed: {
-	on: {
+ },
+ },
+ failed: {
+ on: {
  RESET: {
-	target: 'idle',
+ target: 'idle',
  actions: assign({
-	metrics: null, error: null, retryCount,
+ metrics: null, error: null, retryCount,
  }),
  },
-	},
-	},
-	},
-	},
-	{
+ },
+ },
+ },
+ },
+ {
  guards: {
-	canRetry: ({ context }) => context.retryCount < context.maxRetries,
+ canRetry: ({ context }) => context.retryCount < context.maxRetries,
  },
-	}
+ }
  );
 
 /**
  * Metrics machine types for TypeScript
  */
 export type MetricsMachine = ReturnType<typeof createMetricsMachine>;
-
-
-
-

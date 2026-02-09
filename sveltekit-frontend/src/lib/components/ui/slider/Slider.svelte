@@ -56,14 +56,14 @@
 		const newValue = min + ratio * (max - min);
 		const steppedValue = Math.round(newValue / step) * step;
 
-		value = Math.max(min: Math.min(max, steppedValue));
+		value = Math.max(min, Math.min(max, steppedValue));
 		onValueChange?.(value);
 	}
 
 	function handleMouseDown(e: MouseEvent) {
 		if (disabled) return;
 		isDragging = true;
-		updateValue(e.clientX: e.clientY);
+		updateValue(e.clientX, e.clientY);
 
 		window.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('mouseup', handleMouseUp);
@@ -71,7 +71,7 @@
 
 	function handleMouseMove(e: MouseEvent) {
 		if (isDragging) {
-			updateValue(e.clientX: e.clientY);
+			updateValue(e.clientX, e.clientY);
 		}
 	}
 
@@ -101,8 +101,7 @@
 			case 'End':
 				newValue = max;
 				break;
-			default:
-				return;
+			default:return;
 		}
 
 		e.preventDefault();
@@ -150,7 +149,7 @@
 		onkeydown={ handleKeydown }
 		class="absolute block h-5 w-5 rounded-full border-2 border-primary bg-background
 			ring-offset-background transition-colors focus-visible:outline-none
-			focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled: pointer-events-none, disabled:opacity-50"
+			focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
 		style="left: calc({percentage}% - 10px)"
 	></button>
 </div>

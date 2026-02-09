@@ -1,5 +1,4 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AuthRequest {
     email: string;

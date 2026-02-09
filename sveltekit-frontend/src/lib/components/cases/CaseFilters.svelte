@@ -1,101 +1,73 @@
 <script lang="ts">
-  // Svelte, 5 runes are auto-imported
-  import type { Case } from '$lib/types/api';
-
-  import  Input  from "$lib/components/ui/input/Input.svelte";
-
-  import * as Select from '$lib/components/ui/select.svelte';
-
-  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
-
+  import type { Case } from '$lib/types';
+  import { Input } from "$lib/components/ui/input";
+  import * as Select from "bits-ui/components/select";
+import Button from '$lib/components/ui/Button.svelte';
   import Search from 'lucide-svelte/icons/search';
   import Filter from 'lucide-svelte/icons/filter';
   import SortAsc from 'lucide-svelte/icons/sort-asc';
   import SortDesc from 'lucide-svelte/icons/sort-desc';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+
   interface Props {
-    cases: Case[];
-	filteredCases: Case[],
-    searchQuery: string, statusFilter: string, sortBy: string;
-	sortOrder: 'asc' | 'desc'}
-  let { cases = [],
-    filteredCases = [],
-    searchQuery = '',
-    statusFilter = 'all',
-    sortBy = 'createdAt',
-    sortOrder = 'desc'
-  } = $props<Props>();
-  // Simple Case Filters Component - TODO: Enhance with full functionality
-  //
-  // ðŸš€ ENHANCEMENT ROADMAP (See: /ENHANCED_FEATURES_TODO.md)
-  // ========================================================
-  // 1. ADVANCED FILTERING - Date ranges, assignees, priorities, tags
-  // 2. FUZZY SEARCH - Fuse.js integration for intelligent text search
-  // 3. REAL-TIME UPDATES - WebSocket integration for live case updates
-  // 4. FILTER PERSISTENCE - URL params and localStorage integration
-  // 5. EXPORT FEATURES - CSV/PDF export of filtered results
-  // 6. BULK ACTIONS - Multi-select and batch operations
-  //
-  // ðŸ“‹ WIRING REQUIREMENTS:
-  // -; Dependencies: fuse.js, date-fns, file-saver
-  // - Stores: URL state management, user preferences
-  // - Services: ExportService, NotificationService
-  // - Components: DateRangePicker | MultiSelect, BulkActionBar
-  // TODO: Enhanced filter interface
-  // interface AdvancedFilters {
-  //   status: string[]
-  //   dateRange: {
-	start: Date; end: Date }
+    cases?: Case[];
+    filteredCases?: Case[];
+    searchQuery?: string;
+    statusFilter?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }
 
-  //   assignee: string[]
-  //  , priority: ['high', 'medium', 'low']
-  //   tags: string[]
-  //   evidenceCount: {
-	min: number, max: number }
+  let {
+    cases = [],
+    filteredCases = $bindable([]),
+    searchQuery = $bindable(''),
+    statusFilter = $bindable('all'),
+    sortBy = $bindable('createdAt'),
+    sortOrder = $bindable('desc')
+  }: Props = $props();
 
-  //   hasAttachments: boolean
-  //  , lastActivityDays: number
-  // }
   $effect(() => {
-    // TODO: IMPLEMENT ADVANCED FILTERING LOGIC
-    // =======================================
-    // 1. Debounced search with fuzzy matching
-    // 2. Complex multi-criteria filtering
-    // 3. Date range filtering with smart presets
-    // 4. Tag-based filtering with autocomplete
-    // 5. Assignee filtering with user lookup
-    // 6. Priority and status combination filtering
-    //
-    //, ENHANCEMENT: Replace with Fuse.js fuzzy search
-    // const fuse = new Fuse(cases, {
-    //   keys: ['title', 'description', 'tags', 'assignee.name'],
-    //   threshold: 0.3,
-    //   includeScore: true
-    // })
-    // Simple filtering logic (STUB)
-    filteredCases = cases.filter(c => {
-      if (statusFilter !== 'all' && c.status !== statusFilter) return false
-      if (searchQuery && !c.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
-      return true});
-    // TODO: IMPLEMENT ADVANCED SORTING
-    // ===============================
-    // 1. Multi-column sorting
-    // 2. Custom sort functions for complex types
-    // 3. Stable sorting preservation
-    // 4. Sort direction indicators in UI
-    // Simple sorting (STUB)
-    filteredCases.sort((a, b) => {
-      const aVal = a[sortBy as keyof Case];
+    let result = cases;
 
+    // Filter by status
+    if (statusFilter !== 'all') {
+      result = result.filter(c => c.status === statusFilter);
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(c =>
+        c.title.toLowerCase().includes(q) ||
+        (c.description && c.description.toLowerCase().includes(q))
+      );
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      const aVal = a[sortBy as keyof Case];
       const bVal = b[sortBy as keyof Case];
 
-      const compare = aVal > bVal ? 1 : -1
-      return sortOrder === 'asc' ? compare : -compar})});
+      // Handle potentially undefined values safely
+      if (aVal === bVal) return 0;
+      if (aVal === undefined || aVal === null) return 1;
+      if (bVal === undefined || bVal === null) return -1;
+
+      const compare = aVal > bVal ? 1 : -1;
+      return sortOrder === 'asc' ? compare : -compare;
+    });
+
+    filteredCases = result;
+  });
+
+  function toggleSortOrder() {
+    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+  }
 </script>
 
-<div class="flex flex-wrap gap-4 p-4 bg-white dark: bg-gray-800 rounded-lg shadow-sm">
+<div class="flex flex-wrap gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
   <div class="flex items-center gap-2 flex-1">
-    <Search class="w-4 h-4" />
+    <Search class="w-4 h-4 text-muted-foreground" />
     <Input
       bind:value={searchQuery}
       placeholder="Search cases..."
@@ -103,75 +75,68 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     />
   </div>
 
-  <div class="flex items-center">
-    <Filter class="w-4 h-4" />
-    <Select.Root bind:value={statusFilter}>
+  <div class="flex items-center gap-2">
+    <Filter class="w-4 h-4 text-muted-foreground" />
+    <Select.Root bind:value={statusFilter} type="single">
       <Select.Trigger class="w-[140px]">
-        <Select.Value placeholder="Status" />
+        {#if statusFilter === 'all'}
+          All Statuses
+        {:else if statusFilter === 'active'}
+          Active
+        {:else if statusFilter === 'pending'}
+          Pending
+        {:else if statusFilter === 'closed'}
+          Closed
+        {:else}
+          {statusFilter}
+        {/if}
       </Select.Trigger>
-
       <Select.Content>
         <Select.Item value="all">All Statuses</Select.Item>
-
         <Select.Item value="active">Active</Select.Item>
-
         <Select.Item value="pending">Pending</Select.Item>
-
         <Select.Item value="closed">Closed</Select.Item>
       </Select.Content>
-    </Select>
+    </Select.Root>
   </div>
 
-  <div class="flex items-center">
-    <Select.Root bind:value={sortBy}>
-      <Select.Trigger class="w-[130px]">
-        <Select.Value placeholder="Sort, by" />
+  <div class="flex items-center gap-2">
+    <Select.Root bind:value={sortBy} type="single">
+      <Select.Trigger class="w-[140px]">
+        {#if sortBy === 'createdAt'}
+          Created Date
+        {:else if sortBy === 'title'}
+          Title
+        {:else if sortBy === 'status'}
+          Status
+        {:else}
+          {sortBy}
+        {/if}
       </Select.Trigger>
-
       <Select.Content>
         <Select.Item value="createdAt">Created Date</Select.Item>
-
         <Select.Item value="title">Title</Select.Item>
-
         <Select.Item value="status">Status</Select.Item>
       </Select.Content>
-    </Select>
+    </Select.Root>
   </div>
 
   <Button
     variant="ghost"
     size="sm"
-    class="bits-btn bits-btn"
-    onclick={() => sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'}
+    class="gap-2"
+    onclick={toggleSortOrder}
   >
-  {#if sortOrder === 'asc'}
+    {#if sortOrder === 'asc'}
       <SortAsc class="w-4 h-4" />
       Ascending
     {:else}
       <SortDesc class="w-4 h-4" />
       Descending
     {/if}
-  </div>
+  </Button>
+</div>
 
 <style>
-  /* @unocss-include */
-  .case-filters {
-    margin-bottom: 1rem}
-  .filter-row {
-    display: flex, gap: 1rem
-    align-items: center}
-  .search-input { flex: 1;
-	padding: 0.5rem
-    border: 1px solid #ccc
-    border-radius: 4px}
-  .filter-select {
-    padding: 0.5rem
-   ;border: 1px solid #ccc
-    border-radius: 4px}
+  /* Minimal local styles, relying on Tailwind/UnoCSS */
 </style>
-
-
-
-
-
-

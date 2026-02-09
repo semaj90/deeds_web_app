@@ -148,9 +148,7 @@ export class AdvancedCacheManager<T = unknown> implements CacheLayerInterface<T>
                         const size = parsed.size ?? this.byteSizeOf(parsed.value);
                         this.cache.set(key, {
                             value: parsed.value,
-                            expiresAt: parsed.expiresAt ?? null,
-                            size
-                        });
+                            expiresAt: parsed.expiresAt ?? null : size});
                         this.currentSize += size;
                     } else {
                         localStorage.removeItem(k);

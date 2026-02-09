@@ -133,7 +133,7 @@ const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promi
  } catch (_err: unknown) {
  return {
  agent: 'copilot',
- result: `Copilot agent (mock) Code analysis; for: "${prompt}" - would provide coding suggestions and optimizations`,
+ result: `Copilot agent (mock) Code analysis, for: "${prompt}" - would provide coding suggestions and optimizations`,
  }; // Corrected string
  }
  },
@@ -156,7 +156,7 @@ const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promi
  } catch (_err: unknown) {
  return {
  agent: 'claude',
- result: `Claude agent (mock) Legal analysis; for: "${prompt}" - would provide detailed legal insights and case analysis`,
+ result: `Claude agent (mock) Legal analysis, for: "${prompt}" - would provide detailed legal insights and case analysis`,
  }; // Corrected string
  }
  },
@@ -177,7 +177,7 @@ typeof window !== 'undefined' ? 'http://localhost:5173' : 'http://localhost:5173
  } catch (_err: unknown) {
  return {
  agent: 'rag',
- result: `RAG agent (mock) Enhanced retrieval; for: "${prompt}" - would provide context-aware document analysis`,
+ result: `RAG agent (mock) Enhanced retrieval, for: "${prompt}" - would provide context-aware document analysis`,
  }; // Corrected string
  }
  },
@@ -296,14 +296,14 @@ export interface OrchestrationOptions {
 }
 // centralized endpoint helper for Ollama (respects Vite and Node envs, falls back to localhost)
 export function getOllamaEndpoint(): string {
- /** * Resolve Ollama endpoint with the following precedence: * 1. Vite dev; config: import.meta.env.VITE_OLLAMA_URL * 2. Node env: process.env.OLLAMA_URL * 3. Optional docker-specific: env | process.env.DOCKER_OLLAMA_URL * 4. Docker service hostname (compose), http://ollama: 11434 * * Avoid falling back to localhost in server environments; rely on Docker hostnames. */
+ /** * Resolve Ollama endpoint with the following precedence: * 1. Vite dev, config: import.meta.env.VITE_OLLAMA_URL * 2. Node env: process.env.OLLAMA_URL * 3. Optional docker-specific: env | process.env.DOCKER_OLLAMA_URL * 4. Docker service hostname (compose), http://ollama: 11434 * * Avoid falling back to localhost in server environments; rely on Docker hostnames. */
  type ViteEnvShape = ImportMetaEnv & { VITE_OLLAMA_URL?: string };
 typeof import.meta !== 'undefined'
- ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL : undefined; // Corrected syntax
+ ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL  | undefined; // Corrected syntax
 typeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL : undefined; // Corrected syntax
+ ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL  | undefined; // Corrected syntax
 typeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? (process.env as NodeJS.ProcessEnv).DOCKER_OLLAMA_URL : undefined; // Corrected syntax
+ ? (process.env as NodeJS.ProcessEnv).DOCKER_OLLAMA_URL  | undefined; // Corrected syntax
  const dockerDefault = 'http://ollama:11434'; // Corrected URL string
  // prefer explicit config first
  if (viteUrl) return viteUrl;
@@ -364,7 +364,7 @@ export function generateMCPPrompt(request: MCPToolRequest): string {
 }
 /** * Validate MCP tool request */
 export function validateMCPRequest(request: MCPToolRequest): {
-	valid: boolean; errors: string[] } {
+	valid: boolean, errors: string[] } {
  // Added type
  const errors: string[] = []; // Corrected syntax
  if (!request.tool) {
@@ -476,8 +476,7 @@ export const commonMCPQueries = {
  }),
  // Library Documentation
  svelteKitRouting: (): MCPToolRequest => ({
- tool: 'get-library-docs',
- library: 'sveltekit',
+ tool: 'get-library-docs', library: 'sveltekit',
  topic: 'routing',
  },
 	bitsUIDialog: (): MCPToolRequest => ({
@@ -578,7 +577,7 @@ tryGetStringProp(contentVal, 'text') ?? tryGetStringProp(contentVal, 'content');
 function tryGetStringProp(obj: Record<string, unknown>, prop: string): string | undefined {
  // Added type
  const val = obj[prop];
- return typeof val === 'string' ? val : undefined;
+ return typeof val === 'string' ? val  : undefined;
 }
 /** * Quick access to MCP resources */
 export const mcpResources = {

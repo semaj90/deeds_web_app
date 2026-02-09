@@ -7,7 +7,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  *
  * Purpose: Provide Server-Sent Events fallback for WebSocket-restricted environments
  *
- * Message Format: *, data: {"type":"health_update","route_path":"...","new_status":"..."}
+ * Message Format: *; data: {"type":"health_update","route_path":"...","new_status":"..."}
  */
 
 // Global set to track all connected SSE clients

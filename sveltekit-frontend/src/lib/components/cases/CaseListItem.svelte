@@ -7,7 +7,6 @@
   import Clock from "lucide-svelte/icons/clock";
   import FileText from "lucide-svelte/icons/file-text";
   import User from "lucide-svelte/icons/user";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface CaseData {
     id: string;
@@ -59,8 +58,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return "bg-blue-100 text-blue-800";
       case "archived":
         return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      default:return "bg-gray-100 text-gray-800";
     }
   }
 
@@ -74,8 +72,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return "bg-orange-100 text-orange-800";
       case "urgent":
         return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      default:return "bg-gray-100 text-gray-800";
     }
   }
 
@@ -89,8 +86,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return Archive;
       case "archived":
         return Archive;
-      default:
-        return FileText;
+      default:return FileText;
     }
   }
 
@@ -101,7 +97,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </script>
 
 <div
-  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover: shadow-md", class:bg-blue-50={isActive}
+  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md" class:bg-blue-50={isActive}
   class:border-blue-300={isActive}
   class:opacity-50={disabled}
   class:cursor-not-allowed={disabled}
@@ -126,12 +122,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     <!-- Status and Priority Badges -->
     <div class="flex gap-2 flex-wrap">
-      <Badge variant="ghost">
+      <Badge variant="outline">
         <span class="px-2 py-1 rounded text-xs {getStatusColor(caseData.status)}">
           {caseData.status.replace('_', ' ')}
         </span>
       </Badge>
-      <Badge variant="ghost">
+      <Badge variant="outline">
         <span class="px-2 py-1 rounded text-xs {getPriorityColor(caseData.priority)}">
           {caseData.priority}
         </span>

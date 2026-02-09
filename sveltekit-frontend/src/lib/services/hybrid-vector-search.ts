@@ -136,7 +136,7 @@ export class HybridVectorSearchService {
         stored_in: string[];
     }> {
         const results = await gemmaEmbeddingsService.batchGenerateEmbeddings(texts, {
-            document_type: options.document_type,
+            document_type: options.document_type as 'legal_document' | 'evidence' | 'case' | 'note' | 'unknown',
             metadata: options.metadata,
             model: options.model
         });
@@ -221,8 +221,7 @@ export class HybridVectorSearchService {
                 if (request.document_types && request.document_types.length > 0) {
                     qdrantRequest.filter = {
                         must: request.document_types.map(type => ({
-                            key: 'document_type',
-                            match: { value: type }
+                            key: 'document_type', match: { value: type }
                         }))
                     };
                 }

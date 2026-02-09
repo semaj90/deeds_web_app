@@ -21,7 +21,6 @@ import type { LegalDocumentJSON, SIMDJSONAccelerator, SIMDParsingMetrics } from 
 import { simdJSONAccelerator } from '$lib/wasm/simd-json-wrapper';
 import type { CacheMetrics, EmbeddingCacheResult, EnhancedCachingService } from './enhanced-caching-service.js';
 import { enhancedCachingService } from './enhanced-caching-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface RevolutionaryAIQuery {
@@ -228,8 +227,7 @@ export class RevolutionaryAIOrchestrator {
 		}
 		const memoryQuery: MemoryQuery = {
 			query: query.query,
-			type: query.type === 'semantic' ? 'semantic' : 'spatial',
-			context: {
+			type: query.type === 'semantic' ? 'semantic' : 'spatial', context: {
 	cognitiveState: 'alert' }
 		};
 		return await this.systems.visualMemoryPalace.navigateAndRetrieve(memoryQuery);

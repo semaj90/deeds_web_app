@@ -100,8 +100,8 @@ export type JobType =
   | 'search_indexing';
 
 export interface JobDefinition {
-  id: string; type: JobType;
-  priority: number; data: Record<string, unknown>;
+  id: string, type: JobType;
+  priority: number, data: Record<string, unknown>;
   options?: {
     delay?: number;
     attempts?: number;
@@ -110,7 +110,7 @@ export interface JobDefinition {
 }
 
 export interface JobStatus {
-  id: string; status: 'pending' | 'active' | 'completed' | 'failed' | 'delayed';
+  id: string, status: 'pending' | 'active' | 'completed' | 'failed' | 'delayed';
   progress: number;
   result?: unknown;
   error?: string; createdAt: Date;
@@ -119,8 +119,8 @@ export interface JobStatus {
 }
 
 export interface QueueState {
-  name: string; size: number;
-  processing: number; completed: number;
+  name: string, size: number;
+  processing: number, completed: number;
   failed: number;
 }
 
@@ -128,7 +128,7 @@ export interface QueueState {
 export interface AsyncStateContext {
   jobs: Map<string, JobStatus>;
   queues: Map<string, QueueState>;
-  errors: string[]; isProcessing: boolean;
+  errors: string[], isProcessing: boolean;
 }
 
 

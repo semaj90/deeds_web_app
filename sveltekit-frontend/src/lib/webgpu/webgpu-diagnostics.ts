@@ -273,7 +273,7 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagnostics> {
 
 // Browser compatibility check
 export function checkBrowserCompatibility(): {
-	compatible: boolean; message: string } {
+	compatible: boolean, message: string } {
  if (typeof navigator === 'undefined') {
  return { compatible: false, message: 'Running in a server-side environment' };
  }

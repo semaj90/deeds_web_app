@@ -1,9 +1,7 @@
 <script lang="ts">
   interface Props {
     pendingFile?: File | { name: string; [key: string]: unknown };
-    onSelect?: (event: {
-	file: unknown;
-	action: string }) => void;
+    onSelect?: (event: { file: unknown, action: string }) => void;
     onClose?: () => void }
 
   let {
@@ -44,11 +42,11 @@
 
 <style>
   .animate-fade-in {
-    animation: fadeIn 0.3s ease-in-out }
+    animation: fadeIn 0.3s ease-in-out;}
   @keyframes fadeIn {
     from { opacity: 0;
-	transform: translateY(20px); }
+		transform: translateY(20px); }
     to { opacity: 1;
-	transform: translateY(0); }
+		transform: translateY(0); }
   }
 </style>

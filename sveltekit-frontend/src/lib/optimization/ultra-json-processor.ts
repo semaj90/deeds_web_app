@@ -48,7 +48,7 @@ interface ObjectCharacteristics {
 export class UltraHighPerformanceJSONProcessor extends EventEmitter {
     private config: JSONOptimizationConfig;
     private cache: Map<string, { value: unknown;
-	timestamp: number; accessCount: number }> = new Map();
+	timestamp: number, accessCount: number }> = new Map();
     private metrics: JSONPerformanceMetrics;
     private isInitialized = false;
 

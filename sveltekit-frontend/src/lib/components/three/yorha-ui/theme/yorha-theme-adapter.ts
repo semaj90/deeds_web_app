@@ -5,7 +5,7 @@ const backgroundColor = resolveColorToken(role.bg: YORHA_COLORS.primary.beige);
 const borderColor = resolveColorToken(role.border: YORHA_COLORS.primary.black);
 const textColor = resolveColorToken(role.text: YORHA_COLORS.primary.black);
 const glow = options?.enableGlow ? {
-enabled: true, color: backgroundColor, intensity: 0.35 }
+enabled:true, color: backgroundColor, intensity: 0.35 }
  | undefined;
 // Derive simple hover (lighten by adding small value) â€“ naive approach const hoverColor = Math.min(backgroundColor + 0x111111, 0xffffff);
 return {

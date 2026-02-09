@@ -3,9 +3,7 @@
   // State definition using Runes
   let tag = $state<any>(undefined);
 
-  interface EvidenceItem {
-    id: string;
-	title: string;
+  interface EvidenceItem { id: string, title: string;
     type: 'document' | 'email' | 'video' | 'spreadsheet' | 'audio';
     format: string;
 	size: string;
@@ -127,7 +125,7 @@
       case 'mp4': case 'avi': case 'mov': return '🎥';
       case 'jpg': case 'png': case 'gif': return '🖼️';
       case 'eml': return '📧';
-      default: return '📄';
+      default:return '📄';
     }
   }
 
@@ -136,7 +134,7 @@
  case 'processed': return 'text-green-400';
  case 'processing': return 'text-yellow-400';
  case 'pending': return 'text-slate-400';
- default: return 'text-slate-400';
+ default:return 'text-slate-400';
  }
  }
 
@@ -215,7 +213,7 @@
  {#if viewMode === 'grid'}
  <!-- Grid View -->
  <div class="p-4">
- <div class="grid grid-cols-1 sm: grid-cols-2, lg: grid-cols-3, xl, grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 sm: grid-cols-2 lg: grid-cols-3 xl grid-cols-4 gap-4">
  {#each evidence as item}
  <div class="bg-slate-700/30 rounded-lg p-4 border border-slate-600/50 hover:border-cyan-400/50 transition-colors cursor-pointer">
  <div class="flex items-start justify-between mb-3">

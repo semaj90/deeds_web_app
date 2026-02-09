@@ -16,7 +16,7 @@
 	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<div class="{defaultClass} { className }">
+<div class="{defaultClass} {className}">
 	{#if children}
 		{@render children()}
 	{/if}

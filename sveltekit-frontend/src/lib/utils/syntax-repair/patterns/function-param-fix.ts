@@ -11,8 +11,7 @@ import { createPattern, type PatternMatcher } from '../pattern-matcher';
 
 /**
  * Pattern to fix parameter lists with double colons
- * Detects: param:
-	Type: NextType and converts to param: Type, nextParam: NextType
+ * Detects: param, Type: NextType and converts to param: Type, nextParam: NextType
  */
 export const doubleColonParamPattern: PatternMatcher = createPattern(
   'double-colon-param',
@@ -130,7 +129,7 @@ export function getFunctionParamPatterns(): PatternMatcher[] {
  * Apply function parameter fixes to content
  */
 export function fixFunctionParams(content: string): {
-	result: string; fixCount: number } {
+	result: string, fixCount: number } {
   let result = content;
   let totalFixes = 0;
 

@@ -3,15 +3,14 @@
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   import { AsyncStore, GenericStore } from '$lib/stores/generic.svelte';
 
   // 1. Generic Store Example
   const counterStore = new GenericStore<number>(0);
 
   // 2. Async Store Example
-  interface UserData { id: number;
-	name: string }
+  interface UserData { id: number, name: string }
   const userStore = new AsyncStore<UserData>();
 
   async function fetchUser() {

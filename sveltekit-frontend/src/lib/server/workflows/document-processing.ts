@@ -13,7 +13,7 @@ export interface DocumentProcessingContext {
 
 export type DocumentProcessingEvent =
 	| { type: 'START_PROCESSING';
-	documentId: string; content: string }
+	documentId: string, content: string }
 	| { type: 'COMPLETE' }
 	| { type: 'FAIL';
 	error: string };

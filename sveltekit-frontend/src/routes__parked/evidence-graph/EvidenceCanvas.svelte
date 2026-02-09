@@ -56,7 +56,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  gpuMemory: '0MB',
  processingTime: '0ms'
  });
-  
+
  let eventSource = $state<EventSource, null>(null);
 
  // Control panel state
@@ -83,7 +83,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  } finally {
  isLoading = false;
  }
- 
+
 });();
  });
 
@@ -95,7 +95,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  };
  window.addEventListener('click', handler);
  return () => window.removeEventListener('click', handler);
- 
+
 });
 
  // TODO: Add as cleanup in $effect: return () => {
@@ -487,7 +487,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p class="menu-title">{contextMenu.node?.label ?? 'Canvas'}</p>
  {#each contextActions as action}
  <button
- class={`nes-btn ${action.accent ? `is-${action.accent}` , ''}`}
+ class={`nes-btn ${action.accent ? `is-${action.accent}` : ''}`}
  onclick={() => action.handler(contextMenu.node)}
  >
  {action.label}

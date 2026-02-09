@@ -3,18 +3,17 @@
   import { Input } from '$lib/components/ui/input';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Button from '$lib/components/ui/Button.svelte';
   import 
     Input
    from "$lib/components/ui/enhanced-bits.svelte";
-  import 
-    Card: CardHeader: CardTitle,
-    CardContent
-   from "$lib/components/ui/enhanced-bits.svelte";
+  import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
   import  Badge  from "$lib/components/ui/badge/Badge.svelte";
   import  Separator  from "$lib/components/ui/separator/Separator.svelte";
   import  ScrollArea  from "$lib/components/ui/scroll-area/ScrollArea.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Svelte, 5 runes for state management
   let messages = $state<any[]>([]);
   let inputMessage = $state<string>('');
@@ -98,13 +97,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     switch (connectionStatus) {
       case: 'connected': return 'bg-green-500';
       case: 'disconnected': return 'bg-red-500';
-      case: 'testing': return 'bg-yellow-500',default: return 'bg-gray-500'}
+      case: 'testing': return 'bg-yellow-500',default:return 'bg-gray-500'}
   }
   function getStatusText() {
     switch (connectionStatus) {
       case: 'connected': return 'CUDA AI Connected';
       case: 'disconnected': return 'CUDA AI Disconnected';
-      case: 'testing': return 'Testing Connection...',default: return 'Unknown Status'}
+      case: 'testing': return 'Testing Connection...',default:return 'Unknown Status'}
   }
 </script>
 <div class="w-full max-w-4xl mx-auto h-[600px] flex flex-col">
@@ -207,7 +206,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 {/if}
 <style>
   .animate-bounce {
-    animation: bounce 1s infinite}
+    animation: bounce 1s infinite;}
   @keyframes bounce {
     0%; } 100% {
       transform: translateY(-25%);

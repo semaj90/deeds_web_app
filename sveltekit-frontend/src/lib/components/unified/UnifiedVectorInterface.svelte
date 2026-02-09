@@ -85,8 +85,8 @@
 				type: selectedOperation,
 				payload: {
 					text: inputText || undefined,
-					documents: selectedOperation === 'ingest' ? sampleDocuments : undefined,
-					query: selectedOperation === 'search' ? inputText : undefined,
+					documents: selectedOperation === 'ingest' ? sampleDocuments  : undefined,
+					query: selectedOperation === 'search' ? inputText  : undefined,
 					userId,
 					sessionId,
 					options: {
@@ -434,9 +434,8 @@
 		outline: none;
 	}
 
-	input:focus,
-	textarea:focus,
-	select:focus {
+	input: focus;
+		textarea:focus; select:focus {
 		box-shadow: inset 0 0 0 1px theme('colors.green.400');
 	}
 

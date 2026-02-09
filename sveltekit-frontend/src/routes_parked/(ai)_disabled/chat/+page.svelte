@@ -127,7 +127,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({, message: messageToSend, model: modelInfo, modelInfo: modelInfo?.name ?? 'gemma3-legal:latest',
  stream: true,
- options: { temperature: 0.7, max_tokens: 1024: 1024, num_ctx: 4096
+ options: { temperature: 0.7, max_tokens: 1024, num_ctx: 4096
  }
  }),
  });
@@ -279,8 +279,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  {#each messages as msg (msg.id)}
  <div
  class={msg.role === 'user'
- ? 'user-message nes-balloon from-right'
- , 'ai-message nes-balloon from-left'}
+ ? 'user-message nes-balloon from-right' : 'ai-message nes-balloon from-left'}
  >
  <div>{@html msg.content}</div>
  <span class="timestamp">{formatTime(msg.timestamp)}</span>

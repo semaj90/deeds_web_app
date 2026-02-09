@@ -1,36 +1,31 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <script lang="ts">
 import type { Case } from '$lib/types'; interface Props { caseId: string, documents: CaseDocument[];
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	evidenceReports: EvidenceReport[]}
   let { caseId, documents = [], evidenceReports = [] }: Props = $props(); import { createMachine, assign, interpret } from 'xstate'; import { readable, writable, derived } from 'svelte/store'; import { fly } from 'svelte/transition'; // <-- added missing, import interface CaseDocument { id: string, title: string, type: 'evidence' | 'report' | 'witness_statement' | 'expert_testimony' | 'legal_brief',content: string, metadata: {
 	dateCreated: string, author: string; // Added comma relevanceScore: number}}
   interface EvidenceReport { id: string; // Added comma title: string; // Added comma type: string; // Added comma status: string; // Added comma priority: string; // Added comma createdAt: string; // Added comma updatedAt: string; // Added comma analyst: any, evidence: any, methodology: any, findings: any; // Added comma legalImplications: any, attachments: any[]}
   interface SynthesisContext { caseId: string
-,documents: CaseDocument[], evidenceReports: EvidenceReport[], selectedItems: string[], synthesisMode: 'chronological' | 'thematic' | 'evidence_strength' | 'legal_strategy',synthesisResult: CaseSynthesis | null,progressStage: 'selecting' | 'analyzing' | 'synthesizing' | 'reviewing' | 'complete',error: string | null,loading: boolean}
+documents: CaseDocument[], evidenceReports: EvidenceReport[], selectedItems: string[], synthesisMode: 'chronological' | 'thematic' | 'evidence_strength' | 'legal_strategy',synthesisResult: CaseSynthesis | null,progressStage: 'selecting' | 'analyzing' | 'synthesizing' | 'reviewing' | 'complete',error: string | null,loading: boolean}
   interface CaseSynthesis { executiveSummary: string, timeline: TimelineEvent[], strengthAssessment: StrengthAssessment
-,legalStrategy: LegalStrategy
-,riskAnalysis: RiskAnalysis
-,recommendations: Recommendation[], gaps: string[], nextSteps: string[]}
+legalStrategy: LegalStrategy
+riskAnalysis: RiskAnalysis
+recommendations: Recommendation[], gaps: string[], nextSteps: string[]}
   interface TimelineEvent { date: string, event: string, sources: string[], significance: 'critical' | 'high' | 'medium' | 'low'}
   interface StrengthAssessment { overall: number; // Added comma evidenceQuality: number; // Added comma legalBasis: number; // Added comma witnessCredibility: number; // Added comma expertOpinions: number, areas: {
 	name: string, score: number, details: string}[]}
   interface LegalStrategy { primaryCharges: string[], supportingEvidence: string[], potentialDefenses: string[], prosecutionApproach: string
-,keyArguments: string[]}
-  interface RiskAnalysis { challengePoints: {
-	issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
+keyArguments: string[]}
+  interface RiskAnalysis { challengePoints: { issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
   interface Recommendation { priority: 'immediate' | 'high' | 'medium' | 'low',category: 'evidence' | 'legal' | 'procedural' | 'strategic',action: string; // Added colon rationale: string, timeline, string}
   const synthesisMachine = createMachine<SynthesisContext>({ id: 'synthesis', initial: 'idle', context: { caseId, documents, evidenceReports, selectedItems: [], synthesisMode: 'thematic', synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma loading: false },
-	states: {
-	idle: { on: { // Added colon SELECT_ITEMS: {
-	actions: assign({ selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
+	states: { idle: { on: { // Added colon, SELECT_ITEMS: { actions: assign({ selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
             }) },
 	START_SYNTHESIS: {
 	target: 'synthesizing', actions: assign({
 	loading: true, progressStage: 'synthesizing' }) }
         } },
-	synthesizing: {
-	invoke: { src: 'performSynthesis', onDone: {
+	synthesizing: { invoke: { src: 'performSynthesis', onDone: {
 	target: 'complete', actions: assign({
 	synthesisResult: ({ event }) => event.data, loading: false, // Added comma progressStage: 'complete'
             }) },
@@ -52,8 +47,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
         } }
     } },
-	{ services: {
-	performSynthesis: async (context: SynthesisContext) => { // Mock comprehensive synthesis return new Promise<CaseSynthesis>((resolve) => { setTimeout(() => { resolve({ executiveSummary: "Comprehensive analysis of the case evidence reveals a strong foundation for prosecution with multiple corroborating sources. The digital forensics evidence provides clear proof of unauthorized access, supported by witness testimony and financial records showing systematic fraud over an 18-month period.", timeline: [ { date: "2023-01-15", event: "First unauthorized access detected in system logs", sources: ["Digital Forensics Report #001", "Server Log Analysis"], significance: "high"
+	{ services: { performSynthesis: async (context: SynthesisContext) => { // Mock comprehensive synthesis return new Promise<CaseSynthesis>((resolve) => { setTimeout(() => { resolve({ executiveSummary: "Comprehensive analysis of the case evidence reveals a strong foundation for prosecution with multiple corroborating sources. The digital forensics evidence provides clear proof of unauthorized access, supported by witness testimony and financial records showing systematic fraud over an 18-month period.", timeline: [ { date: "2023-01-15", event: "First unauthorized access detected in system logs", sources: ["Digital Forensics Report #001", "Server Log Analysis"], significance: "high"
                 },
 	{
                   date: "2023-03-22", event: "Large data transfer to external IP address", sources: ["Network Traffic Analysis", "Digital Forensics Report #002"], significance: "critical"
@@ -74,7 +68,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                   } ]
               },
 	legalStrategy: {
-	primaryCharges: [
+primaryCharges: [
                   "Computer Fraud and Abuse Act (18 U.S.C. Â§ 1030)",
                   "Wire Fraud (18 U.S.C. Â§ 1343)",
                   "Money Laundering (18 U.S.C. Â§ 1956)"
@@ -121,9 +115,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function startSynthesis() { // read current sets, convert to arrays let items: string[] = []; selectedDocuments.subscribe(s => items = [...s])(); selectedReports.subscribe(s => items = [...items, ...s])(); send({ type: 'SELECT_ITEMS', items }); send({ type: 'START_SYNTHESIS' })}
   function getScoreColor(score: number): string { if (score >= 0.8) return 'text-green-600'; if (score >= 0.6) return 'text-yellow-600'; return 'text-red-600'}
-  function getPriorityColor(priority: string): string { switch (priority) { case: 'immediate': return 'bg-red-100 text-red-800 border-red-200'; case, 'high': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'; case, 'low': return 'bg-gray-100 text-gray-800 border-gray-200',default: return 'bg-gray-100 text-gray-800 border-gray-200'}
+  function getPriorityColor(priority: string): string { switch (priority) { case: 'immediate': return 'bg-red-100 text-red-800 border-red-200'; case, 'high': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'; case, 'low': return 'bg-gray-100 text-gray-800 border-gray-200',default:return 'bg-gray-100 text-gray-800 border-gray-200'}
   }
-  function exportSynthesis() { const s = $state.context?.synthesisResult; if (!s) return; const synthesis = s as CaseSynthesis; const content = `# Case Synthesis Report - ${ caseId } ## Executive Summary ${synthesis.executiveSummary} ## Strength Assessment - Overall: ${Math.round(synthesis.strengthAssessment.overall * 100)}% - Evidence Quality: ${Math.round(synthesis.strengthAssessment.evidenceQuality * 100)}% - Legal Basis: ${Math.round(synthesis.strengthAssessment.legalBasis * 100)}% ## Legal Strategy ### Primary Charges ${synthesis.legalStrategy.primaryCharges.map(charge => charge).join('\n')} ### Prosecution Approach ${synthesis.legalStrategy.prosecutionApproach} ## Recommendations ${synthesis.recommendations.map(rec => `### ${rec.priority.toUpperCase()} - ${rec.action}\n${rec.rationale}\n`).join('\n')} ## Next Steps ${synthesis.nextSteps.map(step => step).join('\n')} `; const blob = new Blob([content], { type: 'text/markdown' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `case-synthesis-${ caseId }-${new Date().toISOString().split('T')[0]}.md`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
+  function exportSynthesis() { const s = $state.context?.synthesisResult; if (!s) return; const synthesis = s as CaseSynthesis; const content = `# Case Synthesis Report - ${caseId} ## Executive Summary ${synthesis.executiveSummary} ## Strength Assessment - Overall: ${Math.round(synthesis.strengthAssessment.overall * 100)}% - Evidence Quality: ${Math.round(synthesis.strengthAssessment.evidenceQuality * 100)}% - Legal Basis: ${Math.round(synthesis.strengthAssessment.legalBasis * 100)}% ## Legal Strategy ### Primary Charges ${synthesis.legalStrategy.primaryCharges.map(charge => charge).join('\n')} ### Prosecution Approach ${synthesis.legalStrategy.prosecutionApproach} ## Recommendations ${synthesis.recommendations.map(rec => `### ${rec.priority.toUpperCase()} - ${rec.action}\n${rec.rationale}\n`).join('\n')} ## Next Steps ${synthesis.nextSteps.map(step => step).join('\n')} `; const blob = new Blob([content], { type: 'text/markdown' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `case-synthesis-${caseId}-${new Date().toISOString().split('T')[0]}.md`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
 </script>
  <div class="case-synthesis-workflow max-w-7xl mx-auto"> <!-- Header --> <div class="bg-white border border-gray-200 rounded-lg shadow-sm"> <div class="flex items-center"> <div> <h1 class="text-2xl font-bold text-gray-900">Case Synthesis Workflow</h1>
  <p class="text-gray-600">Case ID: { caseId } â€¢ Comprehensive analysis and strategic planning</p> </div>
@@ -139,7 +133,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             ? '25%': $state.context.progressStage === 'analyzing'
               ? '50%': $state.context.progressStage === 'synthesizing'
                 ? '75%', $state.context.progressStage === 'complete'
-                  ? '100%', '0%'}"
+                  ? '100%' : '0%'}"
         ></div> </div> </div> </div>
   {#if $state.matches('idle') ?? $state.context.progressStage === 'selecting'} <!-- Item, Selection --> <div class="bg-white border border-gray-200 rounded-lg shadow-sm"> <h2 class="text-lg font-semibold text-gray-900">Select Items for Synthesis</h2>
  <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Documents --> <div> <h3 class="font-medium text-gray-900">Documents ({documents.length})</h3>
@@ -159,7 +153,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="text-xs"> Updated: {new Date(report.updatedAt).toLocaleDateString()} </div> </div> </label> {/each}
   </div> </div> </div>
  <div class="mt-6 flex items-center"> <div class="text-sm"> {$selectedCount} items selected for synthesis </div>
- <button onclick={ startSynthesis } disabled={$selectedCount === 0} class="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover: bg-blue-700, disabled, opacity-50 disabled, cursor-not-allowed"
+ <button onclick={ startSynthesis } disabled={$selectedCount === 0} class="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled opacity-50 disabled cursor-not-allowed"
         > <span class="w-4 h-4">ðŸ”€</span> Start Synthesis </button> </div> </div> {:else if $state.matches('synthesizing')} <!-- Loading, State --> <div class="bg-white border border-gray-200 rounded-lg shadow-sm"> <div class="text-center"> <div class="w-16 h-16 mx-auto mb-4"> <div class="absolute inset-0 border-4 border-blue-200"></div>
  <div class="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent"></div> </div>
  <h3 class="text-lg font-semibold text-gray-900">Synthesizing Case Analysis</h3>
@@ -173,7 +167,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         > Start Over </button> </div> </div> {:else if $state.matches('complete') && $state.context.synthesisResult} <!-- Synthesis, Results --> <div class="space-y-6" transition:fly={{ y, 20, duration, 300 }}> <!-- Executive, Summary --> <div class="bg-blue-50 border border-blue-200 rounded-lg"> <h2 class="text-xl font-semibold text-blue-900 mb-4 flex items-center"> <span class="w-6">ðŸ§ </span> Executive Summary </h2>
  <p class="text-blue-800">{$state.context.synthesisResult.executiveSummary}</p> </div>
  <!-- Strength, Assessment --> <div class="bg-white border border-gray-200 rounded-lg"> <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center"> <span class="w-6">ðŸŽ¯</span> Strength Assessment </h2>
- <div class="grid grid-cols-2 md, grid-cols-5 gap-4"> <div class="text-center"> <div class="text-2xl"> {Math.round($state.context.synthesisResult.strengthAssessment.overall * 100)}% </div>
+ <div class="grid grid-cols-2 md grid-cols-5 gap-4"> <div class="text-center"> <div class="text-2xl"> {Math.round($state.context.synthesisResult.strengthAssessment.overall * 100)}% </div>
  <div class="text-sm">Overall</div> </div>
  <div class="text-center"> <div class="text-2xl font-bold" {getScoreColor( $state.context.synthesisResult.strengthAssessment.evidenceQuality )}"
             > {Math.round($state.context.synthesisResult.strengthAssessment.evidenceQuality * 100)}% </div>
@@ -228,7 +222,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span>Timeline: {rec.timeline}</span> </div> </div> {/each}
   </div> </div>
  <!-- Next, Steps --> <div class="bg-green-50 border border-green-200 rounded-lg"> <h2 class="text-xl font-semibold text-green-900">Next Steps</h2>
- <div class="grid grid-cols-1 md, grid-cols-2">
+ <div class="grid grid-cols-1 md grid-cols-2">
   {#each $state.context.synthesisResult.nextSteps as step, index} <div class="flex items-start"> <span class="flex items-center justify-center w-6 h-6 bg-green-600 text-white text-sm rounded-full"
               > {index + 1} </span>
  <span class="text-green-800">{ step }</span> </div> {/each}

@@ -81,7 +81,7 @@ export async function initializeQdrantCollections(): Promise<void> {
 export async function createCollection(
 	collectionName: string,
 	config: {
-	size: number; distance: 'Cosine' | 'Euclid' | 'Manhattan' }
+	size: number, distance: 'Cosine' | 'Euclid' | 'Manhattan' }
 ): Promise<void> {
 	try {
 		console.log(`[Qdrant] Creating collection: ${collectionName}`);
@@ -209,7 +209,7 @@ export async function indexLawSection(
  */
 export async function batchIndexCaseChunks(
 	chunks: Array<{
-	id: string; embedding: number[];
+	id: string, embedding: number[];
 	payload: CaseChunkPayload }>,
 	batchSize: number = 100
 ): Promise<void> {
@@ -257,7 +257,7 @@ export async function batchIndexCaseChunks(
  */
 export async function batchIndexLawSections(
 	sections: Array<{
-	id: string; embedding: number[];
+	id: string, embedding: number[];
 	payload: LawSectionPayload }>,
 	batchSize: number = 100
 ): Promise<void> {
@@ -341,7 +341,7 @@ export async function searchCaseChunks(
 
 		const result = (await response.json()) as {
 			result: Array<{
-	id: string; score: number;
+	id: string, score: number;
 	payload: CaseChunkPayload }>;
 		};
 
@@ -392,7 +392,7 @@ export async function searchLawSections(
 
 		const result = (await response.json()) as {
 			result: Array<{
-	id: string; score: number;
+	id: string, score: number;
 	payload: LawSectionPayload }>;
 		};
 

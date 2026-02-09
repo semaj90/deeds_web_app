@@ -1,11 +1,9 @@
 <script lang="ts">
-	let pkg = $state<any>(undefined);
+	// Removed unused pkg
 
 	type RouteHealth = 'green' | 'yellow' | 'red';
 
-	type RouteDetail = {
-		path: string;
-	kind: 'page' | 'layout' | 'endpoint';
+	type RouteDetail = { path: string, kind: 'page' | 'layout' | 'endpoint';
 		file: string;
 	summary: string;
 		category?: string;
@@ -19,11 +17,11 @@
 	};
 
 	interface Props {
-		open: boolean;
-	route: RouteDetail | null;
+		open?: boolean;
+	route?: RouteDetail | null;
 	}
 
-	let { open = $bindable(), route = $state.snapshot({} as RouteDetail) }: Props = $props();
+	let { open = $bindable(false), route = null }: Props = $props();
 
 	let isOpen = $state(open);
 
@@ -56,7 +54,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	route: route.path })
+route: route.path })
 			});
 
 			if (res.ok) {
@@ -76,8 +74,20 @@
 </script>
 
 {#if isOpen && route}
-	<div class="route-modal-backdrop" onclick={close}>
-		<div class="route-modal" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="route-modal-backdrop"
+		onclick={close}
+		onkeydown={(e) => e.key === 'Escape' && close()}
+		role="button"
+		tabindex="0"
+	>
+		<div
+			class="route-modal"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="document"
+			tabindex="-1"
+		>
 			<header class="route-modal__header">
 				<div class="route-modal__title-block">
 					<span class="route-modal__kind-chip">
@@ -201,9 +211,8 @@
 {/if}
 
 <style>
-	.route-modal-backdrop {
-		position: fixed;
-	inset: 0;
+	.route-modal-backdrop { position: fixed;
+		inset: 0;
 		background: rgba(10, 8, 4, 0.65);
 		display: flex;
 		align-items: center;
@@ -322,9 +331,8 @@
 	color: var(--yorha-muted, #7c6b4a);
 	}
 
-	.route-modal__code-chip code {
-		display: inline-block;
-	padding: 4px 6px;
+	.route-modal__code-chip code { display: inline-block;
+		padding: 4px 6px;
 		border-radius: 8px;
 	background: #111;
 		color: #f8f0d9;
@@ -362,14 +370,12 @@
 		letter-spacing: 0.12em;
 	}
 
-	.health-green {
-		background: #1e8f3c;
-	color: #f8f0d9;
+	.health-green { background: #1e8f3c;
+		color: #f8f0d9;
 	}
 
-	.health-yellow {
-		background: #f6b73c;
-	color: #111;
+	.health-yellow { background: #f6b73c;
+		color: #111;
 	}
 
 	.health-red {
@@ -377,9 +383,8 @@
 		color: #f8f0d9;
 	}
 
-	.health-unknown {
-		background: #555;
-	color: #f8f0d9;
+	.health-unknown { background: #555;
+		color: #f8f0d9;
 	}
 
 	.health-chip__count {
@@ -437,9 +442,8 @@
 	gap: 4px;
 	}
 
-	.error-code {
-		display: inline-block;
-	padding: 2px 6px;
+	.error-code { display: inline-block;
+		padding: 2px 6px;
 		border-radius: 999px;
 	border: 1px solid #f8f0d9;
 		font-size: 10px;
@@ -456,9 +460,8 @@
 	}
 
 	.route-modal__footer-left,
-	.route-modal__footer-right {
-		display: flex;
-	gap: 8px;
+	.route-modal__footer-right { display: flex;
+		gap: 8px;
 	}
 
 	.yorha-btn {
@@ -491,9 +494,8 @@
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 	}
 
-	.yorha-btn.ghost {
-		background: transparent;
-	color: #111;
+	.yorha-btn.ghost { background: transparent;
+		color: #111;
 	}
 
 	.yorha-btn.ghost:hover {

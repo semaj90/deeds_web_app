@@ -4,7 +4,6 @@
  */
 
 import type { ProcessingEvent } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface UploadInitiation {
@@ -221,7 +220,7 @@ export async function uploadEvidence(
   onProcessingEvent?: (event: ProcessingEvent) => void,
   onError?: (error: Error) => void
 ): Promise<{
-	evidenceId: string; jobId: string }> {
+	evidenceId: string, jobId: string }> {
   try {
     // Validate file
     const validation = await validateFile(file);

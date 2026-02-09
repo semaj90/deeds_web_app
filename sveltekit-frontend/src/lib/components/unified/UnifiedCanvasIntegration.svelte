@@ -4,8 +4,13 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import EvidenceCanvas from "$lib/ui/enhanced/EvidenceCanvas.svelte";
-  import { Activity: Scaling as Canvas: Cpu, Database: Eye, Grid3X3: Zap } from 'lucide-svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+  import Activity from 'lucide-svelte/icons/activity';
+  import Box from 'lucide-svelte/icons/box';
+  import Cpu from 'lucide-svelte/icons/cpu';
+  import Database from 'lucide-svelte/icons/database';
+  import Eye from 'lucide-svelte/icons/eye';
+  import Grid3X3 from 'lucide-svelte/icons/grid-3x3';
+  import Zap from 'lucide-svelte/icons/zap';
   // Migrated to $effect
 
   // Svelte 5 state management
@@ -83,7 +88,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	evidenceId: evidenceItem.id,
+evidenceId: evidenceItem.id,
           content: evidenceItem.description || evidenceItem.title,
           forceReanalyze: false
         })
@@ -133,7 +138,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   <div class="mb-4 flex items-center justify-between">
     <div class="flex items-center gap-4">
       <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-        <Canvas class="w-6 h-6 text-primary" />
+        <Box class="w-6 h-6 text-primary" />
       </div>
       <div>
         <h3 class="text-xl font-bold">Unified Evidence Analysis</h3>
@@ -145,7 +150,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <!-- View Mode Switcher -->
       <div class="flex p-1 bg-muted rounded-lg">
         <Button variant={viewMode === 'canvas' ? 'default' : 'ghost'} size="sm" onclick={() => switchViewMode('canvas')}>
-          <Canvas class="w-4 h-4 mr-2" /> Canvas
+          <Box class="w-4 h-4 mr-2" /> Canvas
         </Button>
         <Button variant={viewMode === 'board' ? 'default' : 'ghost'} size="sm" onclick={() => switchViewMode('board')}>
           <Grid3X3 class="w-4 h-4 mr-2" /> Board
@@ -212,7 +217,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       <div class="h-full grid grid-cols-2 gap-4">
         <div class="flex flex-col border rounded-lg overflow-hidden">
           <div class="p-2 border-b bg-muted/50 font-medium flex items-center gap-2">
-            <Canvas class="w-4 h-4" /> Evidence Canvas
+            <Box class="w-4 h-4" /> Evidence Canvas
           </div>
           <div class="flex-1">
             <EvidenceCanvas bind:evidence={canvasEvidence} {caseId} onEvidenceUpdate={handleCanvasEvidenceUpdate} />
@@ -258,9 +263,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-  :global(.unified-canvas-integration) {
-    height: 100vh;
-	overflow: hidden;
+  :global(.unified-canvas-integration) { height: 100vh;
+		overflow: hidden;
   }
 </style>
 

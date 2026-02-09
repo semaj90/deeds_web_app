@@ -395,7 +395,7 @@ export const utilityFunctions = {
       timeout = setTimeout(() => func(...args), wait);
     };
   },
-	}; // ===== MAIN BARREL STORE EXPORT ===== export const barrelStore = { testing: testingFramework, cache: cacheLayerMethods, database: databaseEntityProperties, webgpu: webGPUExtendedMethods, loki: lokiCollectionMethods, config: configurationProperties, utils: utilityFunctions }; // Export everything for easy access export default barrelStore; // Type definitions for barrel store export interface BarrelStore { testing: typeof, testingFramework: typeof, cacheLayerMethods: typeof, databaseEntityProperties: typeof, webGPUExtendedMethods: typeof, lokiCollectionMethods: typeof, configurationProperties: typeof utilityFunctions}
+	}; // ===== MAIN BARREL STORE EXPORT ===== export const barrelStore = { testing: testingFramework, cache: cacheLayerMethods, database: databaseEntityProperties, webgpu: webGPUExtendedMethods, loki: lokiCollectionMethods, config: configurationProperties, utils: utilityFunctions }; // Export everything for easy access export default barrelStore; // Type definitions for barrel store export interface BarrelStore { testing: typeof; testingFramework: typeof, cacheLayerMethods: typeof; databaseEntityProperties: typeof, webGPUExtendedMethods: typeof, lokiCollectionMethods: typeof, configurationProperties: typeof utilityFunctions}
 // REMOVED: // Global augmentation for missing types declare global { interface Window { barrelStore?: BarrelStore} }
 
 

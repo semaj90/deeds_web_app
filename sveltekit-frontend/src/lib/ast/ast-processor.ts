@@ -357,8 +357,7 @@ export class ASTProcessor {
 	{ text: 'from "svelte/"', kind: 'import' as const, description: 'Svelte framework' },
 	{
                 text: 'import { getOllamaEndpoint } from "$lib/utils/ollama-endpoints"',
-                kind: 'import' as const,
-                description: 'Ollama utilities',
+                kind: 'import' as const, description: 'Ollama utilities',
             },
 	{
                 text: 'import type { OllamaEndpoints } from "$lib/utils/ollama-endpoints"',

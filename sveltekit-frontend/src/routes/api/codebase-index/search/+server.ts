@@ -11,10 +11,9 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface SearchResult {
-  id: string; filePath: string;
-  label: string; type: string;
-  score: number; errorCount: number;
+interface SearchResult { id: string, filePath: string;
+  label: string, type: string;
+  score: number, errorCount: number;
   snippet?: string;
 }
 

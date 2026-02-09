@@ -47,7 +47,7 @@ export interface OCRResult {
 export async function extractPDFText(
 	filePath: string
 ): Promise<{
-	text: string; pages: number;
+	text: string, pages: number;
 	metadata: Record<string, unknown> }> {
 	const dataBuffer = await readFile(filePath);
 	const data = await pdfParse(dataBuffer, {
@@ -206,7 +206,7 @@ export async function processPDF(
 			subject: (pdfData.metadata as any).Subject,
 			createdAt: (pdfData.metadata as any).CreationDate
 				? new Date((pdfData.metadata as any).CreationDate)
-				: undefined
+				 | undefined
 		},
 	entities,
 		ocr: ocrResult,
@@ -247,8 +247,7 @@ export async function processImage(
  * Auto-detect file type and process accordingly
  */
 export async function processDocument(
-	filePath: string,
-	mimeType: string,
+	filePath: string, mimeType: string,
 	options: { lang?: string; extractNLP?: boolean; performOCR?: boolean } = {}
 ): Promise<PDFProcessingResult> {
 	if (mimeType === 'application/pdf') {

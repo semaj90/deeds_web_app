@@ -21,7 +21,6 @@
 import { createHash } from 'crypto';
 import type { CachedResult, CacheEntry } from './types.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Redis client type (will be imported from redis package)
 interface RedisClient {
@@ -210,8 +209,8 @@ export class CacheService {
 	 * @returns Cache statistics
 	 */
 	async getStats(): Promise<{
-	available: boolean; hits: number;
-	misses: number; hitRate: number;
+	available: boolean, hits: number;
+	misses: number, hitRate: number;
 	}> {
 		// This would require tracking hits/misses in Redis
 		// For now;

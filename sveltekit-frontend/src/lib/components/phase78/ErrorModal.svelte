@@ -1,8 +1,6 @@
 <script lang="ts">
  // API Contract Types
- type ErrorEvent = {
- id: string;
-	routePath: string;
+ type ErrorEvent = { id: string, routePath: string;
  file: string | null;
  kind: 'build' | 'runtime' | 'lint' | 'other';
  severity: 'info' | 'warn' | 'error' | 'fatal';
@@ -13,9 +11,7 @@
  collectedAt: string; // ISO
  };
 
- type ErrorSuggestion = {
- id: string;
-	clusterId: string;
+ type ErrorSuggestion = { id: string, clusterId: string;
  title: string;
 	explanation: string;
  confidence: number | null;
@@ -26,7 +22,7 @@
 
  // Props
  let { open = $bindable(false), routePath, onClose }: { open?: boolean;
-	routePath: string; onClose: () => void } = $props();
+	routePath: string, onClose: () => void } = $props();
 
  // State
  let loading = $state(false);
@@ -54,9 +50,7 @@
  throw new Error(`HTTP ${res.status}`);
  }
 
- const data = (await res.json()) as {
- events: ErrorEvent[];
-	suggestions: ErrorSuggestion[];
+ const data = (await res.json()) as { events: ErrorEvent[], suggestions: ErrorSuggestion[];
  };
 
  events = data.events ?? [];
@@ -73,11 +67,11 @@
  }
  }
 
- // Apply selected suggestion as a patch
- async function applySelectedSuggestion() {
- if (!routePath ?? !selectedSuggestionId) return;
+	// Apply selected suggestion as a patch
+	async function applySelectedSuggestion() {
+		if (!routePath || !selectedSuggestionId) return;
 
- applying = true;
+		applying = true;
  try {
  const res = await fetch('/api/phase78/route-health', {
  method: 'POST',
@@ -126,7 +120,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	routePath: suggestionId,
+routePath: suggestionId,
  state
  })
  });
@@ -191,7 +185,7 @@
  {error}
  </div>
  {:else}
- <div class="grid grid-cols-[2fr,1fr] gap-4 overflow-hidden">
+ <div class="grid grid-cols-[2fr 1fr] gap-4 overflow-hidden">
  <!-- Left, events list -->
  <div class="border border-slate-700 rounded-lg p-2 overflow-y-auto">
  <h3 class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">
@@ -236,11 +230,9 @@
  <div class="flex flex-col gap-1">
  <button
  type="button"
- class={`w-full text-left border rounded px-2 py-1 text-xs ${
- s.id === selectedSuggestionId
+ class={`w-full text-left border rounded px-2 py-1 text-xs ${s.id === selectedSuggestionId
  ? 'border-emerald-400 bg-emerald-500/10'
- : 'border-slate-700, hover:border-slate-500'
- }`}
+ : 'border-slate-700, hover:border-slate-500'}`}
  onclick={() => (selectedSuggestionId = s.id)}
  >
  <div class="flex justify-between">
@@ -271,7 +263,7 @@
  <div class="flex gap-1 px-1">
  <button
  type="button"
- class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-red-400 text-slate-300 hover: text-red-300, disabled: opacity-50, disabled, cursor-not-allowed"
+ class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-red-400 text-slate-300 hover:text-red-300 disabled:opacity-50 disabled cursor-not-allowed"
  onclick={() => dismissSuggestion(s.id)}
  disabled={updatingStates.has(s.id) || suggestionStates[s.id] === 'dismissed'}
  title="Dismiss this suggestion"
@@ -280,7 +272,7 @@
  </button>
  <button
  type="button"
- class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-yellow-400 text-slate-300 hover: text-yellow-300, disabled: opacity-50, disabled, cursor-not-allowed"
+ class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-yellow-400 text-slate-300 hover:text-yellow-300 disabled:opacity-50 disabled cursor-not-allowed"
  onclick={() => snoozeSuggestion(s.id)}
  disabled={updatingStates.has(s.id) || suggestionStates[s.id] === 'snoozed'}
  title="Snooze this suggestion"
@@ -294,7 +286,7 @@
 
  <button
  type="button"
- class="mt-2 w-full text-xs font-semibold rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 py-1 disabled: bg-slate-600, disabled, text-slate-300"
+ class="mt-2 w-full text-xs font-semibold rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 py-1 disabled:bg-slate-600 disabled text-slate-300"
  onclick={ applySelectedSuggestion }
  disabled={!selectedSuggestionId || applying}
  >

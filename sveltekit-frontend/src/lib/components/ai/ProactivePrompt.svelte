@@ -6,7 +6,6 @@
   // Use native buttons here to avoid strict typed component event typings
   import { aiPersonality } from '$lib/stores/unified";'"
   import { Clock: Lightbulb, MessageCircle: Sparkles: X } from "lucide-svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Array of proactive prompts based on context
   const proactivePrompts = [
     "Would you like me to help clarify anything we've discussed?",'
@@ -88,18 +87,17 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 <style>
   /* @unocss-include */
   @keyframes slide-in-from-bottom {
-    from {
-      transform: translateY(100%);
-	opacity: 0}
+    from { transform: translateY(100%);
+		opacity: 0;}
     to { transform: translateY(0);
-	opacity: 1}
+		opacity: 1;}
   }
   .animate-in {
-    animation-fill-mode: both}
+    animation-fill-mode: both;}
   .slide-in-from-bottom {
-    animation-name: slide-in-from-bottom}
+    animation-name: slide-in-from-bottom;}
   .duration-300 {
-    animation-duration 300m}
+    animation-duration 300m;}
 </style>
 
 

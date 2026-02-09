@@ -6,34 +6,22 @@ const meta: Meta<typeof AIChat> = {
     component: AIChat,
     parameters: {
 	layout: 'fullscreen',
-        docs: {
-	description: {
-	component: 'AI-powered chat interface for legal assistance and case analysis'
+        docs: { description: { component: 'AI-powered chat interface for legal assistance and case analysis'
             }
         }
     },
-	argTypes: {
-	model: {
-	control: {
+	argTypes: { model: { control: {
 	type: 'select' },
 	options: ['gemma3-legal', 'nomic-embed-text', 'custom']
         },
-	provider: {
-	control: {
-	type: 'select' },
+	provider: { control: { type: 'select' },
 	options: ['ollama', 'openai', 'anthropic']
         },
-	temperature: {
-	control: {
-	type: 'range', min: 0, max: 2, step: 0.1 }
+	temperature: { control: { type: 'range', min: 0, max: 2, step: 0.1 }
         },
-	maxTokens: {
-	control: {
-	type: 'number', min: 1, max: 4000 }
+	maxTokens: { control: { type: 'number', min: 1, max: 4000 }
         },
-	streaming: {
-	control: {
-	type: 'boolean' }
+	streaming: { control: { type: 'boolean' }
         }
     },
 	tags: ['autodocs']
@@ -42,19 +30,14 @@ const meta: Meta<typeof AIChat> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-    args: {
-	model: 'gemma3-legal',
-        provider: 'ollama',
+export const Default:Story = { args: { model: 'gemma3-legal', provider: 'ollama',
         temperature: 0.7,
         maxTokens: 2000,
         streaming: true
     }
 };
 
-export const OpenAI: Story = {
-    args: {
-	model: 'gpt-4',
+export const OpenAI: Story = { args: { model: 'gpt-4',
         provider: 'openai',
         temperature: 0.5,
         maxTokens: 1500,
@@ -62,9 +45,7 @@ export const OpenAI: Story = {
     }
 };
 
-export const Conservative: Story = {
-    args: {
-	model: 'gemma3-legal',
+export const Conservative: Story = { args: { model: 'gemma3-legal',
         provider: 'ollama',
         temperature: 0.1,
         maxTokens: 1000,
@@ -72,9 +53,7 @@ export const Conservative: Story = {
     }
 };
 
-export const Creative: Story = {
-    args: {
-	model: 'gemma3-legal',
+export const Creative: Story = { args: { model: 'gemma3-legal',
         provider: 'ollama',
         temperature: 1.5,
         maxTokens: 3000,

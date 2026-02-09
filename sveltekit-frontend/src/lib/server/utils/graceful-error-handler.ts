@@ -154,7 +154,7 @@ export async function withFallback<T>(
 		logError?: boolean;
 	} = {}
 ): Promise<{
-	data: T; fromFallback: boolean; error?: string }> {
+	data: T, fromFallback: boolean; error?: string }> {
 	const { service = 'unknown', logError = true } = options;
 
 	try {

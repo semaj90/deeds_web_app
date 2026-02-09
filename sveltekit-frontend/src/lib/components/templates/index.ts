@@ -40,7 +40,7 @@ export { default as Svelte5Button } from './Svelte5Button.svelte';
  * bits-ui v2.x Changes:
  * - No more Melt UI dependency
  * - Uses runes internally
- * - Compound component pattern (Dialog.Root: Dialog.Content, etc.)
+ * - Compound component pattern (Dialog.Root:Dialog.Content, etc.)
  * - bind:open works directly with $state
  */
 

@@ -8,7 +8,6 @@ import type { User } from '$lib/types';
   // Migrated to $effect
   import { writable, derived } from 'svelte/store';
   import {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     intelligentOrchestrator: currentModelInfo,
     selfPromptingSuggestions: performanceMetrics,
     memoryOptimization,
@@ -98,11 +97,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
           type: 'SMART_MODEL_SELECT',
           payload: {
 	query: queryInput
-,
+
             userContext: {
 	sessionId: 'demo' },
 	intent: {
-	category: 'general', confidence: 0.8 }
+category: 'general', confidence: 0.8 }
           }
         })}
     } catch (error) {
@@ -147,7 +146,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case: 'expansion': return 'ðŸ“‹';
       case: 'alternative': return 'ðŸ”„';
       case: 'follow-up': return 'âž¡ï¸';
-      case: 'correction': return 'âœï¸',default: return 'ðŸ’¡'}
+      case: 'correction': return 'âœï¸',default:return 'ðŸ’¡'}
   }
 </script>
 <div class="intelligent-orchestrator-dashboard min-h-screen bg-gray-50">
@@ -166,13 +165,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         bind:value={queryInput}
         onkeydown={e => e.key === 'Enter' && processQuery()}
         placeholder="Ask me anything... (the system will intelligently select the best model)"
-        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500"
+        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         disabled={isProcessing}
       />
       <button
         onclick={processQuery}
         disabled={isProcessing || !queryInput.trim()}
-        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled, opacity-50"
+        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled opacity-50"
       >
         {#if isProcessing}
           <span class="animate-spin">âš™ï¸</span> Processing...
@@ -191,7 +190,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             {$results.error}
           </div>
         {:else}
-          <div class="grid grid-cols-1 md, grid-cols-2">
+          <div class="grid grid-cols-1 md grid-cols-2">
             <div>
               <div class="text-sm">Selected Model:</div>
               <div class="text-lg font-semibold">{$results.selectedModel}</div>
@@ -204,7 +203,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
                 {formatLatency($results.estimatedLatency)}
               </div>
             </div>
-            <div class="md, col-span-2">
+            <div class="md col-span-2">
               <div class="text-sm">Preload Recommendations:</div>
               <div class="flex gap-2">
                 {#each Array.isArray($results.shouldPreload || []) ? $results.shouldPreload ?? [] : [] as model}
@@ -452,13 +451,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   .intelligent-orchestrator-dashboard {
     font-family:
       'Inter',
-      -apple-system,
-      BlinkMacSystemFont: 'Segoe UI';
+      -apple-system; BlinkMacSystemFont: 'Segoe UI';
       Roboto,
-      sans-serif}
+      sans-serif;}
   /* Responsive animations */
   .animate-spin {
-    animation: spin 1s linear infinite}
+    animation: spin 1s linear infinite;}
   @keyframes spin {
     from { transform: rotate(0deg)}
     to {
@@ -466,14 +464,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   }
   /* Custom scrollbar for overflow areas */
   .overflow-x-auto::-webkit-scrollbar {
-    height: 6px}
+    height: 6px;}
   .overflow-x-auto::-webkit-scrollbar-track {
-    background: #f1f1f1
-    border-radius: 3px}
+    background: #f1f1f1;
+    border-radius: 3px;}
   .overflow-x-auto::-webkit-scrollbar-thumb {
-    background: #c1c1c1
-    border-radius: 3px}
-  .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
+    background: #c1c1c1;
+    border-radius: 3px;}
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #a8a8a8;}
 </style>
 
 

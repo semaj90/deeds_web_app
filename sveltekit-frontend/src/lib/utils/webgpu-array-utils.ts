@@ -239,7 +239,7 @@ export function createWebGPUBuffer(
 export function batchProcessArrays(
     device: GPUDevice,
     arrays: {
-	name: string; data: SupportedArrayTypes;
+	name: string, data: SupportedArrayTypes;
 	usage: GPUBufferUsageFlags }[],
     quantization?: QuantizationConfig
 ): Map<string, { buffer: GPUBuffer; conversionResult?: ArrayConversionResult }> {
@@ -309,8 +309,8 @@ export function analyzeMemoryUsage(
 	{ precision: 'uint8' }
     ]
 ): Array<{
-	precision: string; sizeBytes: number;
-	compressionRatio: number; estimatedAccuracyLoss: number }> {
+	precision: string, sizeBytes: number;
+	compressionRatio: number, estimatedAccuracyLoss: number }> {
     const float32Data = ensureFloat32Array(original);
     const originalSize = float32Data.length * 4;
 

@@ -9,13 +9,12 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 	let tag = $state<any>(undefined);
 
- import Badge from "$lib/components/ui/Badge.svelte";
- import { Search } from "lucide-svelte";
-import { FileText } from "lucide-svelte";
-import { Users } from "lucide-svelte";
- import Fuse from 'fuse.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-
+	import Badge from '$lib/components/ui/Badge.svelte';
+	import Search from 'lucide-svelte/icons/search';
+	import FileText from 'lucide-svelte/icons/file-text';
+	import Users from 'lucide-svelte/icons/users';
+	import Fuse from 'fuse.js';
+	
  interface Props {
  selectedNode?: any;
  caseId?: string;
@@ -32,9 +31,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let fuse = $state<Fuse<any> | null>(null); // explicitly type insight shapes to avoid `never` element inference type Connection = { entity?: string; description?: string; [k: string]: any }; type Similar = { name?: string; reason?: string; id?: string; [k: string]: any }; type Action = { title?: string; description?: string; [k: string]: any };
  let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: [];
 	suggestedActions: [] });
-  
+
  });
-  
+
  }); function clearSearch() { searchQuery = ''; searchResults = []}
  async function analyzeWithAI(): Promise<any> { if (!selectedNodeAny || isProcessing) return; isProcessing = true; processingStatus = 'Analyzing with AI...'; try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -66,13 +65,13 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  timeline: [],
  suggestedActions: []
  });
-  
+
  let selectedNodeAny = $state<any | null>(null);
 
  $effect(() => {
  selectedNodeAny = selectedNode as any;
  });
-  
+
  $effect(() => {
  if (evidenceList.length > 0) {
  fuse = new Fuse(evidenceList, {
@@ -81,7 +80,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  });
  }
  });
-  
+
  $effect(() => {
  if (fuse && searchQuery.trim()) {
  const results = fuse.search(searchQuery);
@@ -207,11 +206,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  />
  {#if searchQuery} <!-- native button instead of custom: Button, component --> <button class="bits-btn px-3 py-2 rounded text-sm bg-transparent hover:bg-gray-100" onclick={ clearSearch } disabled={ isProcessing }> Clear </button> {/if}
  </div>
+ </div>
  {/if}
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
  <div class="space-y-2 max-h-60">
- {#each Array.isArray(searchResults) ? searchResults: [] as result} <button onclick={() => selectEvidence(result)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50"
+ {#each Array.isArray(searchResults) ? searchResults: [] as result} <button onclick={() => selectEvidence(result)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600 hover:bg-gray-50"
  > <div class="flex justify-between"> <div class="flex-1"> <p class="font-medium text-gray-900"> {(result: as, any): any, any.name || (result as: any).title || 'Unknown'} </p>
  {#if (result as: any).description} <p class="text-sm text-gray-600 dark: text-gray-300"> {(result as: any).description} </p> {/if} {#if (result as: any).tags && (result as: any).tags.length > 0} <div class="flex flex-wrap gap-1">
  {#each Array.isArray((result as: any).tags.slice(0, 3)) ? (result as: any).tags.slice(0, 3): [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{ tag }</span> {/each} {/if}
@@ -240,7 +240,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark: bg-gray-700, dark: hover, bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200 dark: bg-gray-700 dark: hover bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -258,7 +258,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark: hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600 hover:bg-gray-50 dark: hover bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">
@@ -306,7 +306,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover: bg-gray-200, dark: bg-gray-700, dark: hover, bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200 dark: bg-gray-700 dark: hover bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -336,7 +336,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  {#if aiInsights.connections.length > 0} <div> <h4 class="font-medium text-gray-900 dark: text-white mb-3 flex items-center"> <Users class="w-4" /> Connections </h4>
 
  <div class="space-y-2">
- {#each Array.isArray(aiInsights.connections) ? aiInsights.connections: [] as connection} <button onclick={() => selectConnection(connection)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50"
+ {#each Array.isArray(aiInsights.connections) ? aiInsights.connections: [] as connection} <button onclick={() => selectConnection(connection)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600 hover:bg-gray-50"
  </div> {/if} {#if aiInsights.suggestedActions.length > 0} <div> <h4 class="font-medium text-gray-900 dark: text-white mb-3 flex items-center"> <span>â°</span> Suggested Actions </h4>
  <div class="space-y-2">
  {#each Array.isArray(aiInsights.suggestedActions) ? aiInsights.suggestedActions: [] as action} <div class="p-3 bg-blue-50 dark: bg-blue-900/20 rounded-md border border-blue-200"> <p class="text-sm font-medium text-blue-900"> {action.title} </p>
@@ -353,7 +353,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark: hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600 hover:bg-gray-50 dark: hover bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">
@@ -374,201 +374,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  {/each}
  </div>
  <style> .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
-	overflow: hidden}
+	overflow: hidden;}
  </style>
-
-
-
- {/if}
- </div>
- {#if result.score !== undefined}
- <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark: text-gray-400">
- {Math.round((1 - result.score) * 100)}% match
- </span>
- {/if}
- </div>
- </button>
- {/each}
- </div>
- </div>
- {/if}
- </div>
- </div>
-
- <!-- Selected Evidence Analysis -->
- {#if selectedNodeAny}
- <div class="nes-container">
- <div class="yorha-panel-header">
- <h3 class="nes-text is-primary">Selected Evidence</h3>
- </div>
- <div class="yorha-panel-content space-y-4">
- <div class="p-3 bg-gray-50 dark: bg-gray-800 rounded">
- <p class="font-medium text-gray-900 dark: text-white">
- {selectedNodeAny?.name ?? selectedNodeAny?.title || 'Selected Evidence'}
- </p>
- {#if selectedNodeAny?.description}
- <p class="text-sm text-gray-600 dark: text-gray-300 mt-1">
- {selectedNodeAny.description}
- </p>
- {/if}
- </div>
-
- <div class="flex gap-2">
- <button
- onclick={analyzeWithAI}
- disabled={isProcessing}
- class="flex-1 bits-btn px-3 py-2 rounded bg-blue-600 text-white hover: bg-blue-700, disabled, opacity-50 flex items-center justify-center gap-2"
- >
- <span>✨</span>
- {isProcessing ? 'Analyzing...' : 'Analyze with AI'}
- </button>
- <button
- class="bits-btn px-3 py-2 rounded border border-gray-200 dark: border-gray-700, hover: bg-gray-50, dark: hover, bg-gray-800"
- onclick={generateInsights}
- disabled={isProcessing}
- >
- Generate Insights
- </button>
- </div>
-
- <!-- AI Analysis Results -->
- {#if selectedNodeAny?.aiTags ?? selectedNodeAny?.aiSummary}
- <div class="space-y-3 p-4 border border-gray-200 dark: border-gray-600 rounded">
- <h4 class="font-semibold text-gray-900 dark: text-white flex items-center gap-2">
- <span>🤖</span>
- AI Analysis Results
- </h4>
-
- {#if selectedNodeAny?.aiSummary}
- <div>
- <p class="text-sm font-medium text-gray-700 dark: text-gray-300">Summary:</p>
- <p class="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark: bg-gray-800 p-3 rounded mt-1">
- {selectedNodeAny.aiSummary}
- </p>
- </div>
- {/if}
-
- {#if selectedNodeAny?.aiTags?.tags?.length > 0}
- <div>
- <p class="text-sm font-medium text-gray-700 dark: text-gray-300">AI, Tags:</p>
- <div class="flex flex-wrap gap-1 mt-1">
- {#each selectedNodeAny.aiTags.tags as tag}
- <Badge>{tag}</Badge>
- {/each}
- </div>
- </div>
- {/if}
- </div>
- {:else}
- <div class="text-center py-8 text-gray-500">
- <div class="text-4xl mb-2">🤖</div>
- <p class="text-sm">No AI analysis available yet</p>
- </div>
- {/if}
- </div>
- </div>
- {/if}
-
- <!-- AI Insights -->
- {#if aiInsights.connections.length > 0 || aiInsights.similarEvidence.length > 0 || aiInsights.suggestedActions.length > 0}
- <div class="nes-container">
- <div class="yorha-panel-header">
- <h3 class="nes-text is-primary flex items-center gap-2">
- <span>✨</span>
- AI Insights
- </h3>
- </div>
- <div class="yorha-panel-content space-y-6">
- {#if aiInsights.connections.length > 0}
- <div>
- <h4 class="font-medium text-gray-900 dark: text-white mb-3 flex items-center gap-2">
- <Users class="w-4 h-4" />
- Connections
- </h4>
- <div class="space-y-2">
- {#each aiInsights.connections as connection}
- <button
- onclick={() => selectConnection(connection)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark: hover, bg-gray-800 transition-colors"
- >
- <p class="font-medium text-gray-900 dark: text-white">
- {connection.entity}
- </p>
- <p class="text-sm text-gray-600 dark: text-gray-300">
- {connection.description}
- </p>
- </button>
- {/each}
- </div>
- </div>
- {/if}
-
- {#if aiInsights.similarEvidence.length > 0}
- <div>
- <h4 class="font-medium text-gray-900 dark: text-white mb-3 flex items-center gap-2">
- <FileText class="w-4 h-4" />
- Similar Evidence
- </h4>
- <div class="space-y-2">
- {#each aiInsights.similarEvidence as similar}
- <button
- onclick={() => selectEvidence(similar)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover: bg-gray-50, dark: hover, bg-gray-800 transition-colors"
- >
- <p class="font-medium text-gray-900 dark: text-white">
- {similar.name}
- </p>
- <p class="text-sm text-gray-600 dark: text-gray-300">
- {similar.reason}
- </p>
- </button>
- {/each}
- </div>
- </div>
- {/if}
-
- {#if aiInsights.suggestedActions.length > 0}
- <div>
- <h4 class="font-medium text-gray-900 dark: text-white mb-3 flex items-center gap-2">
- <span>⏰</span>
- Suggested Actions
- </h4>
- <div class="space-y-2">
- {#each aiInsights.suggestedActions as action}
- <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark: border-blue-800">
- <p class="text-sm font-medium text-blue-900 dark: text-blue-100">
- {action.title}
- </p>
- <p class="text-sm text-blue-700 dark: text-blue-200">
- {action.description}
- </p>
- </div>
- {/each}
- </div>
- </div>
- {/if}
- </div>
- </div>
- {/if}
-
- <!-- Empty State -->
- {#if !selectedNode}
- <div class="text-center py-12 text-gray-500">
- <FileText class="w-12 h-12 mx-auto mb-4 text-gray-400" />
- <p class="text-lg font-medium">No evidence selected</p>
- <p class="text-sm">Select an evidence item to begin AI analysis</p>
- </div>
- {/if}
-</div>
-<style>
- .line-clamp-2 {
- display: -webkit-box;
- -webkit-line-clamp: 2;
- line-clamp: 2;
- -webkit-box-orient: vertical;
-	overflow: hidden;
- }
-</style>
 
 
 

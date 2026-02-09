@@ -77,7 +77,7 @@
 </script>
 
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
-  <div class="flex flex-col lg: flex-row, lg:items-center lg:justify-between space-y-4 lg:space-y-0 gap-4">
+  <div class="flex flex-col lg: flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 gap-4">
     <!-- Search -->
     <div class="flex-1 max-w-md">
       <div class="relative">

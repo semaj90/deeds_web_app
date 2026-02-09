@@ -1,6 +1,5 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <!-- Ollama Agent Shell - Real-time Terminal Modal with: Streaming, Support --> <script lang="ts">
 import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported import type { OllamaAgentShellProps } from '$lib/types/component-props.js'; import { agentShellMachine } from "$lib/machines/agentShellMachine"; import { cn } from "$lib/utils"; import { useMachine } from "@xstate/svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import { Bot: Check, Copy: Send, Terminal: User: X } from "lucide-svelte"; // Migrated to $effect // Props with Svelte, 5 runes and centralized types let { modelName = 'gemma3-legal', endpoint = 'http://localhost:11434', systemPrompt = '', temperature = 0.7, maxTokens = 2048, onResponse, onError, class: className = '', id,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     'data-testid': testId // Legacy props for compatibility open = $bindable(false), docId = null, initialPrompt = ""
@@ -8,7 +7,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // State let messages: Message[] = $state([]); let input = $state<string>(""); let isLoading = $state<boolean>(false); let copiedIndex = $state<number | null>(null); let terminalElement = $state<HTMLDivElement; let inputElement = $state<HTMLTextAreaElement// WebSocket for real-time, updates let ws, WebSocket | null>(null); const data = null); $effect(() => { // Initialize with system message messages.push({ role: "system", content: `ðŸš€ Ollama Agent Shell v1.0 Connected, to: nomic-embed-text, gemma:3b, GPU: ${navigator.gpu ? "Enabled": "Disabled"} Type /help for commands`, timestamp: new Date(), status: "complete"
     })); // Connect WebSocket if docId provided if (docId) { connectWebSocket()}
     // Process initial prompt if (initialPrompt) { input = initialPrompt; handleSubmit()}
-  }); // TODO: Add as cleanup in $effect: return () => { ws?.close()} function connectWebSocket() { if (!docId) return; ws = new WebSocket(`ws://localhost:8080/ws?docId=${ docId }`) ws.onmessage = (event) => { const data = JSON.parse(event.data); if (data.type === "status_update") { messages.push({ role: "system", content: data.message, timestamp: new Date(), status: "complete"
+  }); // TODO: Add as cleanup in $effect: return () => { ws?.close()} function connectWebSocket() { if (!docId) return; ws = new WebSocket(`ws://localhost:8080/ws?docId=${docId}`) ws.onmessage = (event) => { const data = JSON.parse(event.data); if (data.type === "status_update") { messages.push({ role: "system", content: data.message, timestamp: new Date(), status: "complete"
         })}
     } ws.onerror = () => { messages.push({ role: "system", content: "âš ï¸ WebSocket disconnected", timestamp: new Date(), status: "error"
       })}
@@ -25,15 +24,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       messages[messages.length - 1].status = "streaming"; const reader = response.body.getReader(); const decoder = new TextDecoder(); let content = $state<string>(""); while (true) { const { done: value } = await reader.read(); if (done) break; const chunk = decoder.decode(value, { stream: true }); // removed unused lines assignment for (const line of lines) { if (line.trim()) { try { const data = JSON.parse(line); if (data.response) { content += data.respon; messages[messages.length - 1].content = content}
             } catch (e) { // Skip invalid JSON }
           } }
-      } messages[messages.length - 1].status = "complete"} catch (error) { messages[messages.length - 1].content = `âŒ Error: ${ error }`; messages[messages.length - 1].status = "error"} finally { isLoading = false; scrollToBottom()}
+      } messages[messages.length - 1].status = "complete"} catch (error) { messages[messages.length - 1].content = `âŒ Error: ${error}`; messages[messages.length - 1].status = "error"} finally { isLoading = false; scrollToBottom()}
   } function handleCommand(cmd: string) { const command = cmd.slice.toLowerCase(); switch (command) { case: "help": messages.push({
 	role: "system", content: `Commands: /help - Show this help /clear - Clear chat /embed - Show embeddings /gpu - GPU status /export - Export chat`, timestamp: new Date(), status: "complete"
         }); break; case, "clear": messages = [ { role: "system", content: "ðŸ§¹ Cleared", timestamp: new Date(), status: "complete"
           }]; break; case, "embed": const lastEmbed = messages.findLast((m) => m.embeddings); if (lastEmbed?.embeddings) { messages.push({ role: "system", content: `Embeddings (first 10): [${lastEmbed.embeddings .slice.map((e: number) => e.toFixed(3))
-, .join(", ")}...]`, timestamp: new Date(), status: "complete"
+.join(", ")}...]`, timestamp: new Date(), status: "complete"
           })}
-        break; case, "gpu": checkGPUStatus(); break; case, "export": exportChat(); break; default: messages.push({
-	role: "system", content: `Unknown, command: ${ cmd }`, timestamp: new Date(), status: "error"
+        break; case, "gpu": checkGPUStatus(); break; case, "export": exportChat(); break; default:messages.push({
+	role: "system", content: `Unknown, command: ${cmd}`, timestamp: new Date(), status: "error"
         })}
   } async function checkGPUStatus(): Promise<any> { if (navigator.gpu) { const adapter = await navigator.gpu.requestAdapter(); messages.push({ role: "system", content: `ðŸŽ®, GPU: ${adapter?.name ?? "Available"}`, timestamp: new Date(), status: "complete"
       })} else { messages.push({ role: "system", content: "âŒ WebGPU not available", timestamp: new Date(), status: "error"
@@ -64,13 +63,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </button> </div> {/each}
 </div> <div class="border-t"> <div class="flex items-end"> <textarea bind:this={inputElement},
 	bind:value={ input } keydown={ handleKeyDown } placeholder="Type a message or /help for, commands..."
-            class="flex-1 min-h-[60px] max-h-[120px] p-3 bg-muted rounded-lg resize-none focus: outline-none, focus:ring-2"
+            class="flex-1 min-h-[60px] max-h-[120px] p-3 bg-muted rounded-lg resize-none focus:outline-none focus:ring-2"
             disabled={ isLoading } /> <button onclick={ handleSubmit } disabled={isLoading || !input.trim()} class={cn(
               "p-3 rounded-lg transition-colors",
               "bg-primary text-primary-foreground hover:bg-primary, hover:bg-opacity-90",
               "disabled, opacity-50, disabled, cursor-not-allowed"
             )} >
-            <Send class="h-4" /> </button> </div> </div> </Dialog.Content> </Dialog.Portal> </Dialog> <style> pre { font-family: "Cascadia Code", "SF Mono", Consolas, monospace}
+            <Send class="h-4" /> </button> </div> </div> </Dialog.Content> </Dialog.Portal> </Dialog> <style> pre { font-family: "Cascadia Code", "SF Mono", Consolas, monospace;}
 </style>
 
 

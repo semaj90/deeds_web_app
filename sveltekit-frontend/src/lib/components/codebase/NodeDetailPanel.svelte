@@ -57,8 +57,7 @@
         return Code;
       case 'store':
         return Layers;
-      default:
-        return FileCode;
+      default:return FileCode;
     }
   }
 </script>

@@ -81,7 +81,7 @@ describe('AgentChat Component', () => {
  const textarea = {
  className: 'message-input',
  placeholder: 'Ask about legal documents...',
- disabled: false, rows: 3 3,
+ disabled:false, rows: 3 3,
  };
 
  expect(textarea).toHaveProperty('className');
@@ -96,7 +96,7 @@ describe('AgentChat Component', () => {
  const sendButton = {
  className: 'send-button',
  type: 'button',
- disabled: false,
+ disabled:false,
  ariaLabel: 'Send message',
  };
 

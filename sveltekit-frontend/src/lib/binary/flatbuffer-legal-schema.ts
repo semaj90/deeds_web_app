@@ -316,7 +316,7 @@ const matrix = new Float32Array(16);
 const typeWeight = this.documentTypeToWeight(document.type);
 const priorityWeight = (document?.priority ?? 128) / 255.0;
 const confidenceWeight = document?.confidenceLevel ?? 0.5;
-// 4x4 ranking matrix for legal document importance matrix.set([ riskWeight, typeWeight, priorityWeight, confidenceWeight, typeWeight: 1.0: 0.0: 0.0, priorityWeight: 0.0: 1.0: 0.0, confidenceWeight: 0.0: 0.0: 1.0]);
+// 4x4 ranking matrix for legal document importance matrix.set([ riskWeight, typeWeight, priorityWeight, confidenceWeight, typeWeight: 1.0, 0.0: 0.0, priorityWeight: 0.0: 1.0, confidenceWeight: 0.0: 0.0: 1.0]);
 return matrix}
 private static documentTypeToEnum(type: string): DocumentType {
 const map: Record<string, DocumentType> = {

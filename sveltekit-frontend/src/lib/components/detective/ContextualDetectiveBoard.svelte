@@ -28,8 +28,7 @@
   // State
   let userInput = $state<string>('');
   let connectionMap = $state<{
-    nodes?: {
-	type: string; label: string;
+    nodes?: { type: string, label: string;
 	color: string }[];
     edges?: unknown[];
     clusters?: unknown[];
@@ -39,10 +38,8 @@
   let typingContext = $state<TypingContext | undefined>(undefined);
   let contextualPrompts = $state<string[]>([]);
   let detectiveAnalysis = $state<{
-    keyEntities?: {
-	name: string; type: string }[];
-    suggestedConnections?: {
-	description: string; confidence: number }[];
+    keyEntities?: { name: string, type: string }[];
+    suggestedConnections?: { description: string, confidence: number }[];
     anomalies?: unknown[];
     timelineGaps?: unknown[];
   } | null>(null);
@@ -56,7 +53,7 @@
     connectedUsers: 0,
     typingUsers: 0,
     focusDistribution: {
-	evidence: 0, connections: 0, analysis: 0 }
+evidence: 0, connections: 0, analysis: 0 }
   });
 
   // Typing behavior element binding
@@ -132,14 +129,14 @@
       });
 
       // Handle real-time updates
-      wsManager.onMessage('connection_map_update', (data: { action?: string; connectionMap?: unknown }) => {
+      wsManager.onMessage('connection_map_update', (data: { action?: string, connectionMap?: unknown }) => {
         if (data.action === 'generated') {
           connectionMap = data.connectionMap as typeof connectionMap;
           console.log('[Collaboration] Connection map updated by remote user');
         }
       });
 
-      wsManager.onMessage('evidence_analysis', (data: { action?: string; evidenceId?: string; analysis?: unknown }) => {
+      wsManager.onMessage('evidence_analysis', (data: { action?: string; evidenceId?: string, analysis?: unknown }) => {
         if (data.action === 'completed') {
           // Update evidence list with remote analysis
           evidenceList = evidenceList.map((item: unknown) => {
@@ -172,8 +169,7 @@
   /**
    * Handle typing state changes from the headless listener
    */
-  function handleTypingStateChange(event: CustomEvent<{
-	state: TypingState; context: TypingContext }>) {
+  function handleTypingStateChange(event: CustomEvent<{ state: TypingState, context: TypingContext }>) {
     currentTypingState = event.detail.state;
     typingContext = event.detail.context;
 
@@ -191,8 +187,7 @@
   /**
    * Handle contextual prompts from typing behavior
    */
-  function handleContextualPrompt(event: CustomEvent<{
-	prompts: string[]; context: TypingContext }>) {
+  function handleContextualPrompt(event: CustomEvent<{ prompts: string[], context: TypingContext }>) {
     contextualPrompts = [...event.detail.prompts];
 
     // Add detective-specific contextual prompts
@@ -210,8 +205,7 @@
   /**
    * Handle analytics updates from typing behavior
    */
-  function handleAnalyticsUpdate(event: CustomEvent<{
-	analytics: unknown }>) {
+  function handleAnalyticsUpdate(event: CustomEvent<{ analytics: unknown }>) {
     if (enableAnalytics) {
       console.log('[ContextualDetectiveBoard] Analytics update:', event.detail.analytics);
     }
@@ -229,7 +223,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	text: userInput,
+text: userInput,
           caseId,
           evidence: evidenceList,
           analysisType: 'contextual_detective',
@@ -267,7 +261,7 @@
           connectionStrength: 0.4,
           maxDepth: 3,
           options: {
-	includeWeakConnections: true,
+includeWeakConnections: true,
             includePredictedConnections: true,
             clusterSimilar: true,
             layout: 'force'
@@ -523,9 +517,8 @@
     font-size: 0.875rem;
   }
 
-  .analytics-panel {
-    display: flex;
-	gap: 1.5rem;
+  .analytics-panel { display: flex;
+		gap: 1.5rem;
   }
 
   .metric {
@@ -547,9 +540,8 @@
     font-size: 0.875rem;
   }
 
-  .analysis-area {
-    flex: 1;
-	padding: 2rem;
+  .analysis-area { flex: 1;
+		padding: 2rem;
     overflow-y: auto;
 	display: flex;
     flex-direction: column;
@@ -586,14 +578,12 @@
 	transition:all 0.2s;
   }
 
-  .typing-indicator.active {
-    color: #059669;
-	background: #dcfce7;
+  .typing-indicator.active { color: #059669;
+		background: #dcfce7;
   }
 
-  .analysis-input {
-    width: 100%;
-	padding: 1rem;
+  .analysis-input { width: 100%;
+		padding: 1rem;
     border: 1px solid #d1d5db;
     border-radius: 0.375rem;
     font-size: 1rem;
@@ -608,9 +598,8 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
-  .input-actions {
-    display: flex;
-	gap: 1rem;
+  .input-actions { display: flex;
+		gap: 1rem;
     margin-top: 1rem;
   }
 
@@ -623,23 +612,20 @@
     transition:all 0.2s;
   }
 
-  .input-actions button:first-child {
-    background: #3b82f6;
-	color: white;
+  .input-actions button:first-child { background: #3b82f6;
+		color: white;
   }
 
   .input-actions button:first-child:hover:not(:disabled) {
     background: #2563eb;
   }
 
-  .input-actions button:first-child:disabled {
-    background: #9ca3af;
-	cursor: not-allowed;
+  .input-actions button:first-child:disabled { background: #9ca3af;
+		cursor: not-allowed;
   }
 
-  .input-actions button:last-child {
-    background: #f3f4f6;
-	color: #374151;
+  .input-actions button:last-child { background: #f3f4f6;
+		color: #374151;
   }
 
   .input-actions button:last-child:hover {
@@ -676,9 +662,8 @@
     transition:all 0.2s;
   }
 
-  .prompt-button:hover {
-    background: #0ea5e9;
-	color: white;
+  .prompt-button:hover { background: #0ea5e9;
+		color: white;
   }
 
   .connection-map,
@@ -696,9 +681,8 @@
 	color: #1e293b;
   }
 
-  .map-stats {
-    display: flex;
-	gap: 1rem;
+  .map-stats { display: flex;
+		gap: 1rem;
     margin-bottom: 1rem;
     font-size: 0.875rem;
 	color: #64748b;

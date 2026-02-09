@@ -217,7 +217,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   onpointerdown={(e) => onCardPointerDown(e, item.id)}
   role="presentation"
   >
-  <div class="panel-soft p-3 {activeId === item.id ? 'shadow-[0_4px_12px_rgba(0,0,0, 0.3)]' : ''}">
+  <div class="panel-soft p-3 {activeId === item.id ? 'shadow-[0_4px_12px_rgba(0 0 0 0.3)]' : ''}">
   <div class="flex items-center justify-between mb-1">
   <span class="tag {item.type === 'video' ? 'pill-blue' : item.type === 'photo' ? 'pill-green' : 'pill-yellow'}">
   {typeLabel(item.type)}

@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // WebGPU-accelerated canvas for high-performance legal data visualization // Migrated to $effect import type { Snippet } from 'svelte'; interface WebGPUCanvasProps { width?: number; height?: number; enableWebGPU?: boolean; fallbackTo2D?: boolean; onWebGPUStatus?: (supported: boolean, device?: GPUDevice) => void; children?: Snippet}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { width = 800, height = 600, enableWebGPU = true, fallbackTo2D = true, onWebGPUStatus, children }: WebGPUCanvasProps = $props(); let canvas: HTMLCanvasElement;
  let webgpuDevice: GPUDevice | null = null; let webgpuContext: GPUCanvasContext | null = null; let canvas2dContext: CanvasRenderingContext2D | null = null; let isWebGPUSupported = $state<boolean>(false); let isWebGPUInitialized = $state<boolean>(false); let renderingMode = $state<'webgpu' | '2d' | 'none'>('none'); let fps = $state<number>(0); let frameCount = 0; let lastTime = 0; // WebGPU shader source (WGSL) const vertexShaderSource = ` struct VertexOutput { @builtin(position) position vec4<f32>; @location(0) color: vec3<f32>}`
@@ -17,7 +16,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       webgpuDevice = await adapter.requestDevice(); if (!webgpuDevice) { console.warn('Failed to get WebGPU device'); return}
       webgpuContext = canvas.getContext('webgpu') as unknown as GPUCanvasContext; if (!webgpuContext) { console.warn('Failed to get WebGPU context'); return}
       const canvasFormat = navigator.gpu.getPreferredCanvasFormat(); webgpuContext.configure({ device: webgpuDevice, format: canvasFormat;
-	alphaMode: 'premultiplied'
+alphaMode: 'premultiplied'
       }); await createRenderPipeline(canvasFormat); isWebGPUSupported = true; isWebGPUInitialized = true; renderingMode = 'webgpu'; onWebGPUStatus?.(true, webgpuDevice); console.log('WebGPU initialized successfully')} catch (error) { console.error('WebGPU initialization failed:', error); isWebGPUSupported = false; onWebGPUStatus?.(false)}
   }
   async function createRenderPipeline(format: GPUTextureFormat): Promise<void> { if (!webgpuDevice) return; const vertexShader = webgpuDevice.createShaderModule({ code: vertexShaderSource }); const fragmentShader = webgpuDevice.createShaderModule({ code: fragmentShaderSource }); renderPipeline = webgpuDevice.createRenderPipeline({ layout: 'auto', vertex: {
@@ -27,7 +26,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	module: fragmentShader, entryPoint: 'fs_main', targets: [ { format }]
       },
 	primitive: {
-	topology: 'triangle-list'
+topology: 'triangle-list'
       } })}
   function initialize2D(): void { canvas2dContext = canvas.getContext('2d') as CanvasRenderingContext2D | null; if (canvas2dContext) { renderingMode = '2d'; console.log('2D Canvas fallback initialized')}
   }
@@ -50,51 +49,55 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	{ label: 'Document C', color: '#ff6b35', angle: Math.PI },
 	{ label: 'Citation D', color, '#d63384'; angle, (3 * Math.PI) / 2 }]; nodes.forEach(node => { const animatedAngle = node.angle + time * 0.5, const x = centerX + Math.cos(animatedAngle) * radius; const y = centerY + Math.sin(animatedAngle) * radius; // Draw connection lines ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.lineTo(x, y); ctx.stroke(); // Draw node ctx.fillStyle = node.color; ctx.beginPath(); ctx.arc(x, y, 12, 0: Math.PI * 2); ctx.fill(); // Draw node border ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke(); // Draw label ctx.fillStyle = '#ffffff'; ctx.font = '10px: "Press Start 2P", monospace'; ctx.textAlign = 'center'; ctx.fillText(node.label, x, y - 20)}); // Draw center node ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(centerX, centerY, 16, 0: Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.stroke(); ctx.fillStyle = '#000000'; ctx.font = '8px: "Press Start 2P", monospace'; ctx.textAlign = 'center'; ctx.fillText('CORE', centerX, centerY + 3)}
   function handleCanvasClick(): void { console.log(`Canvas clicked - Mode: ${ renderingMode },
-	WebGPU: ${ isWebGPUSupported }`)}
+	WebGPU: ${isWebGPUSupported}`)}
 
-  // Set canvas size $effect(() => { if (canvas) { canvas.width = width; canvas.height = height; canvas.style.width = `${ width }px`; canvas.style.height = `${ height }px`}
-  }); </script> <div class="webgpu-canvas-container nes-container"> <p class="title">WebGPU Legal Visualization</p> <div class="canvas-info"> <div class="info-row"> <span class="nes-text">Mode:</span> <span class="mode-indicator">{renderingMode.toUpperCase()}</span> </div> <div class="info-row"> <span class="nes-text">WebGPU:</span> <span class="nes-text {isWebGPUSupported ? 'is-success', 'is-error'}"> {isWebGPUSupported ? 'Supported': 'Not Available'} </span> </div> <div class="info-row"> <span class="nes-text">FPS:</span> <span class="fps-counter">{ fps }</span> </div> </div> <div class="canvas-wrapper"> <canvas bind:this={canvas} { width } { height } onclick={ handleCanvasClick } class="webgpu-canvas"></canvas> </div> <div class="canvas-controls"> <button class="nes-btn {renderingMode === 'webgpu' ? 'is-success', ''}"
-      onclick={() => enableWebGPU && initializeWebGPU()} disabled={!enableWebGPU ?? renderingMode === 'webgpu'} >
-      WebGPU Mode </button> <button class="nes-btn {renderingMode === '2d' ? 'is-primary', ''}"
+  // Set canvas size $effect(() => { if (canvas) { canvas.width = width; canvas.height = height; canvas.style.width = `${width}px`; canvas.style.height = `${height}px`}
+  }); </script> <div class="webgpu-canvas-container nes-container"> <p class="title">WebGPU Legal Visualization</p> <div class="canvas-info"> <div class="info-row"> <span class="nes-text">Mode:</span> <span class="mode-indicator">{renderingMode.toUpperCase()}</span> </div> <div class="info-row"> <span class="nes-text">WebGPU:</span> <span class="nes-text {isWebGPUSupported ? 'is-success' : 'is-error'}"> {isWebGPUSupported ? 'Supported': 'Not Available'} </span> </div> <div class="info-row"> <span class="nes-text">FPS:</span> <span class="fps-counter">{ fps }</span> </div> </div> <div class="canvas-wrapper"> <canvas bind:this={canvas} { width } { height } onclick={ handleCanvasClick } class="webgpu-canvas"></canvas> </div> <div class="canvas-controls"> <button class="nes-btn {renderingMode === 'webgpu' ? 'is-success' : ''}"
+      onclick={() => enableWebGPU && initializeWebGPU()} disabled={!enableWebGPU || renderingMode === 'webgpu'} >
+      WebGPU Mode </button> <button class="nes-btn {renderingMode === '2d' ? 'is-primary' : ''}"
       onclick={() => initialize2D()} disabled={renderingMode === '2d'} >
       2D Fallback </button> <button class="nes-btn" onclick={() => location.reload()}> Reset Canvas </button> </div> {#if children} <div class="additional-content"> {@render children()} {/if} </div> <style> .webgpu-canvas-container { margin: 1rem;
-	padding: 1rem;background: var(--yorha-bg-secondary);
+		padding: 1rem;background: var(--yorha-bg-secondary);
 	border: 2px solid var(--yorha-text-muted)}
   .canvas-info { display: flex;
-	gap: 2rem, margin-bottom: 1rem;
+		gap: 2rem; margin-bottom: 1rem;
 	padding: 0.5rem;background: var(--yorha-bg-primary);
-	border: 1px solid var(--yorha-text-muted); font-family: 'Press Start 2P', monospace; font-size: 8px}
+	border: 1px solid var(--yorha-text-muted); font-family: 'Press Start 2P', monospace; font-size: 8px;}
   .info-row { display: flex;
-	gap: 0.5rem; align-items: center}
-  .mode-indicator { padding: 0.25rem 0.5rem; border: 1px solid; font-weight: bold}
+		gap: 0.5rem; align-items: center;}
+  .mode-indicator { padding: 0.25rem 0.5rem;
+		border: 1px solid; font-weight: bold;}
   .mode-indicator.mode-webgpu { color: var(--yorha-accent); border-color: var(--yorha-accent);
-	background: rgba(255, 215, 0, 0.1); animation: webgpuGlow 2s ease-in-out infinite alternate}
+	background: rgba(255, 215, 0, 0.1), animation: webgpuGlow 2s ease-in-out infinite alternate;}
   .mode-indicator.mode-2d { color: var(--yorha-text-primary); border-color: var(--yorha-text-muted);
 	background: rgba(224, 224, 224, 0.1)}
   .mode-indicator.mode-none { color: var(--yorha-danger); border-color: var(--yorha-danger);
 	background: rgba(220, 53, 69, 0.1)}
-  .fps-counter { color: var(--yorha-accent); font-weight: bold; min-width: 30px; text-align: right}
+  .fps-counter { color: var(--yorha-accent); font-weight: bold; min-width: 30px; text-align: right;}
   .canvas-wrapper { position: relative;
-	display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2)}
+		display: inline-block;border: 2px solid var(--yorha-secondary);
+		background: var(--yorha-bg-primary); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2)}
   .webgpu-canvas { display: block;
-	background: transparent;cursor: crosshair; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
+		background: transparent;cursor: crosshair; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge;}
   .webgpu-canvas:hover { box-shadow: inset, 0 0 10px rgba(255, 215, 0, 0.3)}
   .canvas-controls { margin-top: 1rem;
-	display: flex; gap: 1rem; flex-wrap}
+	display: flex;
+		gap: 1rem; flex-wrap;}
   .additional-content { margin-top: 1rem;
 	padding: 1rem;background: var(--yorha-bg-tertiary);
 	border: 1px solid var(--yorha-text-muted)}
   @media (max-width: 768px) { .canvas-info { flex-direction: column;
-	gap: 0.5rem}
-    .canvas-controls { flex-direction: column}
+	gap: 0.5rem;}
+    .canvas-controls { flex-direction: column;}
     .webgpu-canvas { max-width: 100%;
-	height: auto}
+	height: auto;}
   } @keyframes webgpuGlow { from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3)}
     to { box-shadow: 0 0 15px rgba(255, 215, 0, 0.6)}
   } .canvas-wrapper: before { content: '';
-	position: absolute;top: 0;
+		position: absolute;top: 0;
 	left: 0;right: 0;
-	bottom: 0;background: linear-gradient(45deg, transparent 40%, rgba(255, 215, 0, 0.1) 50%, transparent 60%); background-size: 200% 200%; animation: scanline 3s linear infinite; pointer-events: none; z-index: 1 }
+	bottom: 0;background: linear-gradient(45deg, transparent 40%, rgba(255, 215, 0, 0.1) 50%, transparent 60%); background-size: 200% 200%;
+		animation: scanline 3s linear infinite; pointer-events: none; z-index: 1;}
   @keyframes scanline { 0% { background-position -200% -200%}
     100% { background-position 200% 200%}
   } </style>

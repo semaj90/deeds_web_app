@@ -10,7 +10,6 @@ import * as minioGPUCache from './minio-gpu-cache-integration.js';
 import { vectorSearchPipeline } from './vector-search-webasm-integration.js';
 import { webASMGPUBridge } from './webasm-gpu-bridge.js';
 import { webASMInferenceService } from './webasm-inference-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface UnifiedCacheConfig {
@@ -122,8 +121,8 @@ export class UnifiedGPUCacheOrchestrator {
         query: string,
         options: { topK?: number, useCache?: boolean, enableGPUAcceleration?: boolean; filters?: Record<string, unknown> } = {}
     ): Promise<{
-	results: unknown[]; metrics: {
-	totalTime: number; cacheHitRate: number;
+	results: unknown[], metrics: {
+	totalTime: number, cacheHitRate: number;
 	gpuAcceleration: boolean; compressionSavings, number } }> {
         const startTime = performance.now();
         try {
@@ -474,7 +473,7 @@ operations.map(async (op) => {
 
     private tokenize(text: string): Float32Array {
         const tokens = text.toLowerCase().split(/\s+/).slice(0, 512);
-        co(, anyn)st tokenIds = tokens.map(t => (t.charCodeAt(0) ?? 0) % 1000);
+        co( anyn)st tokenIds = tokens.map(t => (t.charCodeAt(0) ?? 0) % 1000);
         const padded = new Array(512).fill(0);
         for (let i = 0; i < Math.min(tokenIds.length, 512); i++) {
             padded[i] = tokenIds[i];

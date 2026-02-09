@@ -96,8 +96,7 @@ export const PUT: RequestHandler = async ({ request }) => {
 				}
 				return json({ success: true, message: 'Pipeline configured' });
 
-			default:
-				return json({ error: 'Invalid action' }, { status: 400 });
+			default:return json({ error: 'Invalid action' }, { status: 400 });
 		}
 	} catch (err) {
 		return json(

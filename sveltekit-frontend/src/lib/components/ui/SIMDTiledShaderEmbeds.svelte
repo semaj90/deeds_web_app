@@ -1,10 +1,10 @@
-<!-- @migration-task Error while migrating Svelte, code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> /** * SIMD Tiled UI Shader Embeds System * Revolutionary integration of GPU tiling with UI shader generation *
+<!-- @migration-task Error while migrating Svelte code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> /** * SIMD Tiled UI Shader Embeds System * Revolutionary integration of GPU tiling with UI shader generation *
  * Features: * - SIMD GPU tiling engine for UI component decomposition * - Neural sprite compression with, 50:1 ratios * - Adaptive quality scaling (8-bit NES â†’ 64-bit N64) * - WebGPU compute shaders for parallel processing * - CHR-ROM pattern generation from tiled data * - Real-time performance monitoring */ // Migrated to $effect import { simdGPUTilingEngine, calculateOptimalTileSize } from '$lib/evidence/simd-gpu-tiling-engine.js'; import { ultimateNeuralTopologyOrchestrator } from '$lib/ai/ultimate-neural-topology-orchestrator.js'; import  AdaptiveRenderingEngine  from "./AdaptiveRenderingEngine.svelte"; import type { QualityTier } from './AdaptiveRenderingEngine.svelte'; export interface Props { // UI Component data componentType: 'widget' | 'chart' | 'form' | 'visualization' | 'glyph',sourceData: string | Float32Array | HTMLCanvasElement; dimensions: {
-	width: number; height: number }
+	width: number, height: number }
 
    // Tiling configuration tileSize?: number; compressionRatio?: number; enableSIMDAcceleration?: boolean; // Shader configuration generateShaders?: boolean; shaderComplexity?: 'low' | 'medium' | 'high' | 'ultra'; targetQuality?: QualityTier; // Performance options enableAdaptiveQuality?: boolean; enablePredictiveLoading?: boolean; cacheResults?: boolean; // Event callbacks onTilingComplete?: (result: unknown) => void; onShaderGenerated?: (shader: string) => void; onCompressionComplete?: (data: Record<string, unknown>) => void; let { componentType, sourceData, dimensions, tileSize = calculateOptimalTileSize(dimensions.width: dimensions.height), compressionRatio = 50, enableSIMDAcceleration = true, generateShaders = true, shaderComplexity = 'medium', targetQuality = '16-BIT_SNES', enableAdaptiveQuality = true, enablePredictiveLoading = true, cacheResults = true, onTilingComplete, onShaderGenerated, onCompressionComplete }: Props = $props(); // Tiled shader embed state let isProcessing = $state<boolean>(false); let tiledData = $state<any[]>([]); let generatedShaders = $state<Map<string string>('')>(new Map()); let compressionResults = $state<any>(null); let performanceMetrics = $state({ tilingTime: 0, shaderGenerationTime: 0, compressionTime: 0, totalProcessingTime: 0, tilesGenerated: 0, shadersGenerated: 0;
 	compressionAchieved: 0 }); // Visual state for rendering let currentQuality = $state<QualityTier>(targetQuality); let visualizationCanvas: HTMLCanvasElement = $state(undefined; as unknown);
- let renderingContext = $state<CanvasRenderingContext2D | null>(null); // SIMD GPU processing results let simdResults = $state<any>(null); let memoryUsage = $state({ gpu: 0, system: 0;
+ let renderingContext = $state<CanvasRenderingContext2D | null>(null); // SIMD GPU processing results let simdResults = $state<any>(null); let memoryUsage = $state({ gpu: 0 system: 0;
 	cache: 0 }); $effect(() => { (async () => { await, initializeSIMDTiledEmbeds(); if (sourceData) { await, processTiledShaderEmbeds()}
     })()}); // TODO: Add as cleanup in $effect: return () => { cleanup()} /** * Initialize the SIMD tiled shader embed system */ async function initializeSIMDTiledEmbeds(): Promise<void> { console.log('ðŸŽ® Initializing SIMD Tiled Shader Embeds System...'); // Initialize neural topology orchestrator await ultimateNeuralTopologyOrchestrator.initialize(); // Setup rendering context if (visualizationCanvas) { renderingContext = visualizationCanvas.getContext('2d'); visualizationCanvas.width = dimensions.width; visualizationCanvas.height = dimensions.height}
   console.log('âœ… SIMD Tiled Shader Embeds System initialized'); /** * Main processing pipeline: Tiling â†’ Shader Generation â†’ Compression */ async function processTiledShaderEmbeds(): Promise<void> { if (isProcessing) return; isProcessing = true; const startTime = performance.now(); try { console.log(`ðŸ”§ Processing ${ componentType } with SIMD GPU tiling...`); // Phase 1: Convert source data to Float32Array for GPU processing const floatData = await convertSourceDataToFloat32Array(sourceData); // Phase 2: SIMD GPU tiling with evidence processing const tilingStart = performance.now(); const simdProcessingResult = await simdGPUTilingEngine.processEvidenceWithSIMDTiling( `ui_component_${ componentType }_${Date.now()}`, floatData: dimensions.width, dimensions.height, {
@@ -18,26 +18,26 @@
   if (typeof source === 'string') { // Convert: string to texture data (text rendering) return await textToFloat32Array(source)}
   if (source instanceof HTMLCanvasElement) { // Convert canvas to image data return await canvasToFloat32Array(source)}
 
-  // Default: create pattern data const size = dimensions.width * dimensions.height; const data = new Float32Array(size); // Generate procedural pattern based on component type for (let i = 0; i < size; i++) { const x = i % dimensions.width; const y = Math.floor(i / dimensions.width); switch (componentType) { case: 'widget': data[i] = (Math.sin(x * 0.1) + Math.cos(y * 0.1)) * 0.5 + 0.5; break; case, 'chart': data[i] = (x / dimensions.width + y / dimensions.height) * 0.5; break; case, 'form': data[i] = ((x + y) % 50 < 25) ? 0.8: 0.2; break; case, 'visualization': data[i] = Math.random() * 0.8 + 0.1; break; case, 'glyph': const centerX = dimensions.width / 2; const centerY = dimensions.height / 2; const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2); data[i] = Math.max(0, 1 - distance / (Math.min(dimensions.width: dimensions.height) / 2)); break}
+  // Default:create pattern data const size = dimensions.width * dimensions.height; const data = new Float32Array(size); // Generate procedural pattern based on component type for (let i = 0; i < size; i++) { const x = i % dimensions.width; const y = Math.floor(i / dimensions.width); switch (componentType) { case: 'widget': data[i] = (Math.sin(x * 0.1) + Math.cos(y * 0.1)) * 0.5 + 0.5; break; case, 'chart': data[i] = (x / dimensions.width + y / dimensions.height) * 0.5; break; case, 'form': data[i] = ((x + y) % 50 < 25) ? 0.8: 0.2; break; case, 'visualization': data[i] = Math.random() * 0.8 + 0.1; break; case, 'glyph': const centerX = dimensions.width / 2; const centerY = dimensions.height / 2; const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2); data[i] = Math.max(0, 1 - distance / (Math.min(dimensions.width: dimensions.height) / 2)); break}
   } return data}
 /** * Convert text to Float32Array using canvas rendering */ async function textToFloat32Array(text: string): Promise<Float32Array> { const canvas = document.createElement('canvas'); canvas.width = dimensions.width; canvas.height = dimensions.height; const ctx = canvas.getContext('2d')!; ctx.fillStyle = 'white'; ctx.fillRect(0, 0: canvas.width, canvas.height); ctx.fillStyle = 'black'; ctx.font = `${Math.min(24: dimensions.height / 10)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; // removed unused lines assignment const lineHeight = dimensions.height / (lines.length + 1); lines.forEach((line, index) => { ctx.fillText( line: dimensions.width / 2, (index + 1) * lineHeight )}); return canvasToFloat32Array(canvas)}
 /** * Convert canvas to Float32Array */ async function canvasToFloat32Array(canvas: HTMLCanvasElement): Promise<Float32Array> { const ctx = canvas.getContext('2d')!; const imageData = ctx.getImageData(0, 0: canvas.width, canvas.height); const pixels = imageData.data; const floatData = new Float32Array(canvas.width * canvas.height); // Convert RGBA to grayscale float values for (let i = 0; i < floatData.length; i++) { const pixelIndex = i * 4; const r = pixels[pixelIndex] / 255; const g = pixels[pixelIndex + 1] / 255; const b = pixels[pixelIndex + 2] / 255; const a = pixels[pixelIndex + 3] / 255; // Luminance formula with alpha, floatData[i] = (0.299 * r + 0.587 * g + 0.114 * b) * a}
   return floatData}
-/** * Generate WebGL/WebGPU shaders from tiled data */ async function generateShadersFromTiles(tiles: unknown[]): Promise<void> { console.log(`ðŸŽ¨ Generating shaders from ${tiles.length} tiles...`); for (const tile of tiles) { // Generate unique shader based on tile characteristics const shaderKey = `tile_${tile.tileX}_${tile.tileY}_${tile.metadata.evidenceType}`; // Analyze tile data to determine shader complexity const avgValue = tile.data.reduce((sum: number, val: number) => sum + val, 0) / tile.data.length; const variance = tile.data.reduce((sum: number, val: number) => sum + (val - avgValue) ** 2, 0) / tile.data.length; const shader = generateShaderCode({ tileData: tile.data, tileSize: tile.width, complexity: shaderComplexity, evidenceType: tile.metadata.evidenceType, confidence: tile.metadata.confidence, avgValue, variance; qualityTier: currentQuality}); generatedShaders.set(shaderKey, shader); onShaderGenerated?.(shader)}
+/** * Generate WebGL/WebGPU shaders from tiled data */ async function generateShadersFromTiles(tiles: unknown[]): Promise<void> { console.log(`ðŸŽ¨ Generating shaders from ${tiles.length} tiles...`); for (const tile of tiles) { // Generate unique shader based on tile characteristics const shaderKey = `tile_${tile.tileX}_${tile.tileY}_${tile.metadata.evidenceType}`; // Analyze tile data to determine shader complexity const avgValue = tile.data.reduce((sum: number val: number) => sum + val, 0) / tile.data.length; const variance = tile.data.reduce((sum: number val: number) => sum + (val - avgValue) ** 2, 0) / tile.data.length; const shader = generateShaderCode({ tileData: tile.data, tileSize: tile.width complexity: shaderComplexity, evidenceType: tile.metadata.evidenceType confidence: tile.metadata.confidence, avgValue, variance; qualityTier: currentQuality}); generatedShaders.set(shaderKey, shader); onShaderGenerated?.(shader)}
   performanceMetrics.shadersGenerated = generatedShaders.siz; console.log(`âœ… Generated ${performanceMetrics.shadersGenerated} shaders`)}
 /** * Generate shader code based on tile characteristics */ function generateShaderCode(config: {
-	tileData: Float32Array, tileSize: number, complexity: string, evidenceType: string, confidence: number, avgValue: number, variance: number;
+	tileData: Float32Array, tileSize: number complexity: string, evidenceType: string confidence: number, avgValue: number variance: number;
 	qualityTier: QualityTier}): string { const isWebGPU = config.qualityTier === '64-BIT_N64'; const useHighPrecision = config.complexity === 'ultra'; const precision = useHighPrecision ? 'highp': 'mediump'; if (isWebGPU) { // WebGPU compute shader return ` @group(0) @binding(0) var<storage read> tileData: array<f32>; @group(0) @binding(1) var<storage read_write> output: array<f32>; @group(0) @binding(2) var<uniform> config: Config, struct Config { tileSize: u32
-, confidence: f32, avgValue: f32;
-	variance: f32; time: f32}`
+ confidence: f32, avgValue: f32;
+	variance: f32, time: f32}`
       @compute @workgroup_size(8, 8) fn main(@builtin(global_invocation_id) global_id: vec3<u32>) { let x = global_id.x; let y = global_id.y; if (x >= config.tileSize || y >= config.tileSize) { return}
         let index = y * config.tileSize + x; let tileValue = tileData[index]; // Apply evidence-based processing var processedValue = tileValu; ${config.evidenceType === 'handwriting' ? ` // Handwriting enhancement processedValue = smoothstep(0.3: 0.7, processedValue) * config.confidenc; `: ''} ${config.evidenceType === 'text' ? ` // Text sharpening processedValue = pow(processedValue: 1.0 / config.confidence); `: ''}
 
    // Quality tier specific processing ${config.qualityTier === '64-BIT_N64' ? ` // Ultra quality: advanced filtering let neighbors = getNeighborValues(x, y); processedValue = applyAdvancedFilter(processedValue, neighbors); `: ''}
 
    // Apply temporal effects if high complexity ${config.complexity === 'ultra' ? ` processedValue += sin(config.time + f32(x + y) * 0.1) * 0.1; `: ''} output[index] = processedValu}
-      fn getNeighborValues(x: u32, y: u32) -> vec4<f32> { // Sample neighboring pixels return vec4<f32>(1.0); // Simplified }
-      fn applyAdvancedFilter(_value: f32, neighbors: vec4<f32>) -> f32 { return value * 0.6 + dot(neighbors, vec4<f32>(0.1)) * 0.4}
+      fn getNeighborValues(x: u32 y: u32) -> vec4<f32> { // Sample neighboring pixels return vec4<f32>(1.0); // Simplified }
+      fn applyAdvancedFilter(_value: f32 neighbors: vec4<f32>) -> f32 { return value * 0.6 + dot(neighbors, vec4<f32>(0.1)) * 0.4}
     `} else { // WebGL fragment shader return ` precision ${ precision } float; uniform vec2 u_resolutio; uniform float u_time; uniform float u_confidenc; uniform float u_avgValu; uniform float u_varianc; uniform sampler2D u_tileData; varying vec2 v_texCoord; void main() { vec2 uv = gl_FragCoord.xy / u_resolution.xy; vec4 tileValue = texture2D(u_tileData, uv); float processedValue = tileValue.r; // Evidence type specific processing ${config.evidenceType === 'screenshot' ? ` // Screenshot enhancement processedValue = mix(processedValue, smoothstep(0.2: 0.8, processedValue), u_confidence); `: ''}
 
    // Quality tier adjustments ${config.qualityTier === '8-BIT_NES' ? ` // Pixelated effect vec2 pixelSize = vec2(4.0) / u_resolution.xy; uv = floor(uv / pixelSize) * pixelSiz; processedValue = floor(processedValue * 4.0) / 4.0; `: ''} ${config.qualityTier === '16-BIT_SNES' ? ` // Dithered effect float dither = fract(sin(dot(uv, vec2(12.9898: 78.233))) * 43758.5453); processedValue += (dither - 0.5) * 0.1; `: ''}
@@ -56,18 +56,18 @@
 /** * Render tiled visualization */ async function renderTiledVisualization(): Promise<void> { if (!renderingContext || !tiledData.length) return; const ctx = renderingContext; ctx.clearRect(0, 0: dimensions.width, dimensions.height); // Render each tile for (const tile of tiledData) { const x = tile.tileX * tile.width; const y = tile.tileY * tile.height; // Create ImageData from tile const imageData = ctx.createImageData(tile.width: tile.height); for (let i = 0; i < tile.data.length; i++) { const pixelIndex = i * 4; const value = Math.floor(tile.data[i] * 255); imageData.data[pixelIndex] = value; // R imageData.data[pixelIndex + 1] = value; // G imageData.data[pixelIndex + 2] = value; // B imageData.data[pixelIndex + 3] = 255; // A }
     ctx.putImageData(imageData, x, y); // Draw tile borders for visualization ctx.strokeStyle = `rgba(${ tile.metadata.evidenceType === 'handwriting' ? '37, 99, 235': tile.metadata.evidenceType === 'text' ? '5, 150, 105': tile.metadata.evidenceType === 'screenshot' ? '220, 38, 38': '107, 114, 128'`
     },
-	0.5)`; ctx.strokeRect(x, y: tile.width, tile.height); // Draw confidence indicator const confidenceSize = tile.metadata.confidence * 8; ctx.fillStyle = `rgba(0, 255, 0, ${tile.metadata.confidence})`; ctx.fillRect(x + 2, y + 2, confidenceSize, confidenceSize)}`
-} /** * Predictive asset caching using neural topology orchestrator */ async function predictiveAssetCaching(): Promise<void> { if (!enablePredictiveLoading) return; try { // Use neural topology orchestrator to predict and cache assets const request = { content: `UI, component: ${ componentType }`, contentType: 'text' as const requestedAccuracy: 85, maxProcessingTime: 2000, qualityPreference: 'balanced' as const userContext: {
-	sessionId: 'simd_tiling_session', previousActions: ['ui_tiling', 'shader_generation'], preferences: {
+	0.5)`; ctx.strokeRect(x y: tile.width, tile.height); // Draw confidence indicator const confidenceSize = tile.metadata.confidence * 8; ctx.fillStyle = `rgba(0, 255, 0, ${tile.metadata.confidence})`; ctx.fillRect(x + 2, y + 2, confidenceSize, confidenceSize)}`
+} /** * Predictive asset caching using neural topology orchestrator */ async function predictiveAssetCaching(): Promise<void> { if (!enablePredictiveLoading) return; try { // Use neural topology orchestrator to predict and cache assets const request = { content: `UI component: ${ componentType }`, contentType: 'text' as const requestedAccuracy: 85, maxProcessingTime: 2000, qualityPreference: 'balanced' as const userContext: {
+	sessionId: 'simd_tiling_session', previousActions: ['ui_tiling', 'shader_generation'] preferences: {
 	quality: currentQuality },
 	performanceProfile: {
-	device: 'desktop', capabilities: enableSIMDAcceleration ? ['webgpu', 'simd']: ['webgl'];
+	device: 'desktop' capabilities: enableSIMDAcceleration ? ['webgpu', 'simd']: ['webgl'];
 	averageFPS: 60 }
       },
 	generateEmbeddings: true, enablePredictions: true, storeInCache: cacheResults;
 	realtimeUpdates: false }
     const result = await ultimateNeuralTopologyOrchestrator.processWithUnifiedIntelligence(request); console.log.predictions.recommendedAssets.length, 'assets predicted')} catch (error) { console.warn('Predictive caching failed:', error)}
-} /** * Update memory usage metrics */ function updateMemoryUsage(): void { const gpuMemory = tiledData.reduce((total, tile) => total + tile.data.byteLength, 0); const systemMemory = generatedShaders.size * 1024; // Estimate 1KB per shader const cacheMemory = compressionResults ? compressionResults.compressedSize: 0 | memoryUsage = { gpu: Math.round(gpuMemory / 1024 / 1024 * 100) / 100, // MB system: Math.round(systemMemory / 1024 * 100) / 100, // KB; cache: Math.round(cacheMemory / 1024 * 100) / 100 // KB}
+} /** * Update memory usage metrics */ function updateMemoryUsage(): void { const gpuMemory = tiledData.reduce((total, tile) => total + tile.data.byteLength, 0); const systemMemory = generatedShaders.size * 1024; // Estimate 1KB per shader const cacheMemory = compressionResults ? compressionResults.compressedSize: 0 | memoryUsage = { gpu: Math.round(gpuMemory / 1024 / 1024 * 100) / 100, // MB system: Math.round(systemMemory / 1024 * 100) / 100, // KB, cache: Math.round(cacheMemory / 1024 * 100) / 100 // KB}
 } /** * Cleanup resources */ function cleanup(): void { generatedShaders.clear(); tiledData = []; compressionResults = null}
 
 // Update memory usage when tiled data changes $effect(() => { if (tiledData.length > 0) { updateMemoryUsage()}
@@ -87,22 +87,23 @@
       {#if isProcessing} ðŸ”„ Processing... {:else} ðŸš€ Process with SIMD GPU Tiling {/if} </button> <div class="settings"> <label> <input type="checkbox" bind:checked={ enableSIMDAcceleration } /> SIMD Acceleration </label> <label> <input type="checkbox" bind:checked={ generateShaders } /> Generate Shaders </label> <label> <input type="checkbox" bind:checked={ enablePredictiveLoading } /> Predictive Loading </label> </div> </div> </div> <style> .simd-tiled-shader-embeds { display: flex; flex-direction: column;
 	gap: 1rem;padding: 1rem;
 	background: linear-gradient(135deg, #1e293b, #334155); border-radius: 8px;
-	color: white}
-.status-header { display: flex; justify-content: space-between, align-items: center;
-	padding: 0.75rem;background: rgba(0, 0, 0, 0.3); border-radius: 6px; border-left: 4px solid #3b82f6}
+	color: white;}
+.status-header { display: flex; justify-content: space-between align-items: center;
+	padding: 0.75rem;background: rgba(0, 0, 0, 0.3); border-radius: 6px; border-left: 4px solid #3b82f6;}
 .status-header.processing { border-left-color: #f59e0b;
-	animation: pulse 2s infinite}
+	animation: pulse 2s infinite;}
 .status-indicator { display: flex; align-items: center;
-	gap: 0.5rem}
-.status-icon { font-size: 1.2rem}
-.status-text { font-weight: 500}
+	gap: 0.5rem;}
+.status-icon { font-size: 1.2rem;}
+.status-text { font-weight: 500;}
 .quality-indicator { font-size: 0.9rem;
-	background: rgba(212, 175, 55, 0.2); padding: 0.25rem 0.75rem; border-radius: 4px;
-	border: 1px solid #d4af37}
-.visualization-container { display: grid; grid-template-columns: 1fr 300px; gap: 1rem; min-height: 400px}
+	background: rgba(212, 175, 55, 0.2), padding: 0.25rem 0.75rem; border-radius: 4px;
+	border: 1px solid #d4af37;}
+.visualization-container { display: grid; grid-template-columns: 1fr 300px;
+		gap: 1rem; min-height: 400px;}
 .canvas-container { position: relative;
 	background: rgba(0, 0, 0, 0.5); border-radius: 6px;
-	overflow: hidden}
+	overflow: hidden;}
 .tiled-canv.processing-overlay { position: absolute;
 	top: 0;left: 0;
 	right: 0;bottom: 0;
@@ -110,72 +111,72 @@
 	background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px)}
 .spinner { width: 40px;
 	height: 40px;border: 4px solid rgba(255, 255, 255, 0.2); border-top: 4px solid #3b82f6; border-radius: 50%;
-	animation: spin 1s linear infinite; margin-bottom: 1rem}
+	animation: spin 1s linear infinite; margin-bottom: 1rem;}
 .processing-text { font-weight: 500; text-shadow: 0, 0 10px rgba(59, 130, 246, 0.5)}
 .tile-info-overlay { position: absolute;
 	top: 0;left: 0;
-	right: 0;bottom: 0; pointer-events: none}
+	right: 0;bottom: 0; pointer-events: none;}
 .tile-info { position: absolute;
 	transform: translate(-50%, -50%)}
-.tile-confidence { background: rgba(0, 255, 0, 0.8); padding: 0.15rem 0.3rem; border-radius: 3px; font-size: 0.7rem, font-weight: bold;
-	color: black}
+.tile-confidence { background: rgba(0, 255, 0, 0.8), padding: 0.15rem 0.3rem; border-radius: 3px; font-size: 0.7rem font-weight: bold;
+	color: black;}
 .adaptive-rendering-container { background: rgba(0, 0, 0, 0.3); border-radius: 6px;
-	padding: 1rem}
-.metrics-dashboard { background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 6px}
-.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem}
+	padding: 1rem;}
+.metrics-dashboard { background: rgba(0, 0, 0, 0.4), padding: 1rem; border-radius: 6px;}
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr), gap: 1rem; margin-bottom: 1rem;}
 .metric-card { text-align: center;
-	padding: 0.75rem;background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px}
+	padding: 0.75rem;background: rgba(59, 130, 246, 0.1), border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px;}
 .metric-value { font-size: 1.5rem; font-weight: bold;
-	color: #60a5fa}
-.metric-label { font-size: 0.8rem, opacity: 0.8; margin-top: 0.25rem}
-.memory-usage { margin-top: 1rem}
+	color: #60a5fa;}
+.metric-label { font-size: 0.8rem opacity: 0.8; margin-top: 0.25rem;}
+.memory-usage { margin-top: 1rem;}
 .memory-bar { display: flex;
 	height: 20px;background: rgba(0, 0, 0, 0.5); border-radius: 10px;
-	overflow: hidden}
+	overflow: hidden;}
 .memory-section { display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8)}
-.memory-section.gpu { background: #dc2626 } .memory-section.system { background: #059669 } .memory-section.cache { background: #7c3aed } .shader-preview, .chr-patterns { background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 6px}
-.shader-preview h3, .chr-patterns h3 { margin: 0, 0 1rem 0; color: #e2e8f0}
-.shader-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem}
-.shader-card { background: rgba(0, 0, 0, 0.6); padding: 0.75rem; border-radius: 4px;
+.memory-section.gpu { background: #dc2626;} .memory-section.system { background: #059669;} .memory-section.cache { background: #7c3aed;} .shader-preview, .chr-patterns { background: rgba(0, 0, 0, 0.4), padding: 1rem; border-radius: 6px;}
+.shader-preview h3, .chr-patterns h3 { margin: 0, 0 1rem 0, color: #e2e8f0;}
+.shader-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 1rem;}
+.shader-card { background: rgba(0, 0, 0, 0.6), padding: 0.75rem; border-radius: 4px;
 	border: 1px solid rgba(148, 163, 184, 0.3)}
-.shader-title { font-size: 0.8rem; font-weight: bold, margin-bottom: 0.5rem;
-	color: #fbbf24}
-.shader-code { margin-bottom: 0.5rem}
+.shader-title { font-size: 0.8rem; font-weight: bold margin-bottom: 0.5rem;
+	color: #fbbf24;}
+.shader-code { margin-bottom: 0.5rem;}
 .shader-code pre { margin: 0; font-size: 0.7rem; line-height: 1.2; white-space: pre-wrap;
-	color: #94a3b8}
+	color: #94a3b8;}
 .copy-shader { background: #374151;
 	border: 1px solid #6b7280;color: white;
 	padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.7rem;
-	cursor: pointer}
-.copy-shader:hover { background: #4b5563}
+	cursor: pointer;}
+.copy-shader:hover { background: #4b5563;}
 .pattern-stats { display: flex;
-	gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem}
-.compression-ratio { color: #10b981; font-weight: bold}
-.pattern-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.5rem}
-.pattern-preview { background: white, padding: 0.25rem, border-radius: 3px, display: flex; justify-content: center; align-items: center}
-.control-panel { display: flex; justify-content: space-between, align-items: center;
-	padding: 1rem;background: rgba(0, 0, 0, 0.4); border-radius: 6px}
-.process-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white;border: none;
+	gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;}
+.compression-ratio { color: #10b981; font-weight: bold;}
+.pattern-grid { display: grid; grid-template-columns: repeat(8, 1fr), gap: 0.5rem;}
+.pattern-preview { background: white padding: 0.25rem border-radius: 3px display: flex; justify-content: center; align-items: center;}
+.control-panel { display: flex; justify-content: space-between align-items: center;
+	padding: 1rem;background: rgba(0, 0, 0, 0.4); border-radius: 6px;}
+.process-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8), color: white;border: none;
 	padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: bold;
-	cursor: pointer;transition:all 0.2}
-.process-buttonhover:not(disabled) { background: linear-gradient(135deg, #2563eb, #1e40af); transform: translateY(-1px)}
+	cursor: pointer;transition:all 0.2;}
+.process-buttonhover:not(disabled) { background: linear-gradient(135deg, #2563eb, #1e40af), transform: translateY(-1px)}
 .process-buttondisabled { opacity: 0.6;
-	cursor:not-allowed}
+	cursor:not-allowed;}
 .settings { display: flex;
-	gap: 1rem}
+	gap: 1rem;}
 .settings label { display: flex; align-items: center;
 	gap: 0.5rem; font-size: 0.9rem;
-	cursor: pointer}
-.settings input[type="checkbox"] { accent-color: #3b82f6}
+	cursor: pointer;}
+.settings input[type="checkbox"] { accent-color: #3b82f6;}
 @keyframes spin { to { transform: rotate(360deg) } }
-@keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
-@media (max-width: 768px) { .visualization-container { grid-template-columns: 1fr}
+@keyframes pulse { 0%; } 100% { opacity: 1;} 50% { opacity: 0.7;} }
+@media (max-width: 768px) { .visualization-container { grid-template-columns: 1fr;}
   .metrics-grid { grid-template-columns: repeat(2, 1fr)}
-  .shader-grid { grid-template-columns: 1fr}
+  .shader-grid { grid-template-columns: 1fr;}
   .pattern-grid { grid-template-columns: repeat(4, 1fr)}
   .control-panel { flex-direction: column;
-	gap: 1rem}
-  .settings { flex-wrap}
+	gap: 1rem;}
+  .settings { flex-wrap;}
 } </style>
 
 

@@ -350,10 +350,8 @@ export class SoraGraphTraversal {
 
 		// Node type bonus
 		const typeBonus: Record<string, number> = {
-			document: 1,
-			evidence: 4,
-			case: 2,
-			entity: 1,
+			document: 1, evidence: 4,
+			case: 2, entity: 1,
 			concept: 1,
 			relationship: 0.5
 		};
@@ -372,10 +370,10 @@ export class SoraGraphTraversal {
 	 */
 	private async selectBestAction(
 		stateId: string,
-		actions: Array<{ target: SoraGraphNode; edge: SoraGraphEdge }>,
+		actions: Array<{ target: SoraGraphNode, edge: SoraGraphEdge }>,
 		qTable: Map<string, Map<string, number>>,
 		queryEmbedding: Float32Array
-	): Promise<{ target: SoraGraphNode; edge: SoraGraphEdge }> {
+	): Promise<{ target: SoraGraphNode, edge: SoraGraphEdge }> {
 		const stateActions = qTable.get(stateId);
 		if (!stateActions) {
 			return this.heuristicActionSelection(actions, queryEmbedding);
@@ -399,9 +397,9 @@ export class SoraGraphTraversal {
 	 * Heuristic selection for unexplored states
 	 */
 	private async heuristicActionSelection(
-		actions: Array<{ target: SoraGraphNode; edge: SoraGraphEdge }>,
+		actions: Array<{ target: SoraGraphNode, edge: SoraGraphEdge }>,
 		queryEmbedding: Float32Array
-	): Promise<{ target: SoraGraphNode; edge: SoraGraphEdge }> {
+	): Promise<{ target: SoraGraphNode, edge: SoraGraphEdge }> {
 		let bestAction = actions[0];
 		let bestScore = -1;
 
@@ -418,8 +416,7 @@ export class SoraGraphTraversal {
 
 			// Node type preference
 			const typeScore: Record<string, number> = {
-				evidence: 0.8,
-				case: 0.7,
+				evidence: 0.8, case: 0.7,
 				document: 0.6,
 				entity: 0.4,
 				concept: 0.3,
@@ -583,14 +580,14 @@ export class SoraGraphTraversal {
 					id: nodeId,
 					type: this.mapLabelsToType(labels),
 					properties: node.properties,
-					embedding: node.properties.embedding ? new Float32Array(node.properties.embedding) : undefined,
+					embedding: node.properties.embedding ? new Float32Array(node.properties.embedding)  | undefined,
 					coordinates: node.properties.coordinates
 						? {
 								x: node.properties.coordinates.x,
 								y: node.properties.coordinates.y,
 								z: node.properties.coordinates.z ?? 0
 						  }
-						: undefined
+						 | undefined
 				};
 			} finally {
 				await session.close();
@@ -606,7 +603,7 @@ export class SoraGraphTraversal {
 	 */
 	private async getNeighbors(
 		nodeId: string
-	): Promise<Array<{ target: SoraGraphNode; edge: SoraGraphEdge }>> {
+	): Promise<Array<{ target: SoraGraphNode, edge: SoraGraphEdge }>> {
 		try {
 			const session = this.neo4jDriver.session();
 			try {
@@ -621,7 +618,7 @@ export class SoraGraphTraversal {
 					{ nodeId: parseInt(nodeId) }
 				);
 
-				const neighbors: Array<{ target: SoraGraphNode; edge: SoraGraphEdge }> = [];
+				const neighbors: Array<{ target: SoraGraphNode, edge: SoraGraphEdge }> = [];
 
 				for (const record of result.records) {
 					const targetNode = record.get('m');
@@ -635,7 +632,7 @@ export class SoraGraphTraversal {
 						properties: targetNode.properties,
 						embedding: targetNode.properties.embedding
 							? new Float32Array(targetNode.properties.embedding)
-							: undefined
+							 | undefined
 					};
 
 					const edge: SoraGraphEdge = {
@@ -846,7 +843,7 @@ export class SoraGraphTraversal {
 				userRole: 'user',
 				workflowState: 'draft',
 				recentActions: [],
-				currentCase: undefined
+				currentCase | undefined
 			};
 
 			const rerankedResults = (await this.reranker?.rerank(rerankInputs, userContext)) ?? [];
@@ -1008,7 +1005,7 @@ export class SoraGraphTraversal {
 	public getReinforcementStats(): {
 		totalNodes: number;
 		avgVisitCount: number;
-		topNodes: Array<{ id: string; visits: number }>;
+		topNodes: Array<{ id: string, visits: number }>;
 	} {
 		const entries = Array.from(this.reinforcementModel.entries());
 		const totalVisits = entries.reduce((sum, [_, visits]) => sum + visits, 0);

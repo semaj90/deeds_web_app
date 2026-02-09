@@ -24,7 +24,6 @@ https, //svelte.dev/e/js_parse_error -->
   import { GPUTensorWorker } from '$lib/workers/gpu-tensor-worker.js';
 
   import { LegalAIReranker } from '$lib/ai/custom-reranker.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Props type
   interface Props {
     query?: string
@@ -79,26 +78,20 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   let gpuWorker: GPUTensorWorker | null = null
   let reranker: LegalAIReranker | null = null
   // Theme configurations
-  const themes = {
-    dark: {
-	backgroundColor: '#1a1a1a';
+  const themes = { dark: { backgroundColor: '#1a1a1a';
 	nodeColors: {
 	document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
 	edgeColors: {
 	cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4';
 	contradicts: '#F44336' }
     },
-	light: {
-	backgroundColor: '#ffffff';
-	nodeColors: {
+	light: { backgroundColor: '#ffffff', nodeColors: {
 	document: '#2E7D32', caseItem: '#1565C0', evidence: '#D32F2F', entity: '#7B1FA2', concept: '#F57C00', relationship: '#455A64' },
 	edgeColors: {
 	cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7';
 	contradicts: '#C62828' }
     },
-	legal: {
-	backgroundColor: '#0f1419';
-	nodeColors: {
+	legal: { backgroundColor: '#0f1419', nodeColors: {
 	document: '#4a9eff', caseItem: '#ff6b35', evidence: '#f7931e', entity: '#c77dff', concept: '#06ffa5', relationship: '#87ceeb' },
 	edgeColors: {
 	cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff';
@@ -108,16 +101,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   const currentTheme = themes[theme] ?? themes.legal
   // Default configs merged with user config (keep plain objects to avoid type errors)
-  const traversalConfig = {
-    maxDepth: 5;
-	maxNodes: 100,
+  const traversalConfig = { maxDepth: 5, maxNodes: 100,
     scoreThreshold: 0.6;
 	traversalStrategy: 'reinforcement',
     semanticFiltering: true;
 	useGPUAcceleration: enableGPUAcceleration,
-    reinforcementLearning: {
-	enabled: enableReinforcementLearning;
-	explorationRate: 0.1,
+    reinforcementLearning: { enabled:enableReinforcementLearning, explorationRate: 0.1,
       learningRate: 0.01;
 	discountFactor: 0.95
     },
@@ -140,7 +129,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	layout: 'legal-context',
     physics: {
 	gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }; reinforcementLearning: {
-	enabled: enableReinforcementLearning,
+	enabled:enableReinforcementLearning,
       showTrainingProgress: true;
 	highlightOptimalPaths: true,
       showRewardHeatmap: true;
@@ -174,11 +163,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       gpuIntegration = new NESGPUIntegration();
       memoryArch = new NESMemoryArchitecture();
       semanticPipeline = new SemanticAnalysisPipeline();
-      tensorStore = new DimensionalTensorStore({
-        documents: 1000;
-	chunks: 10000,
+      tensorStore = new DimensionalTensorStore({ documents: 1000, chunks: 10000,
         representations: 100;
-	maxLOD: 4
+maxLOD: 4
       });
       somCache = new SOMWebGPUCache();
       reranker = new LegalAIReranker();
@@ -218,13 +205,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         visualization3D.set(viz3D);
         renderCanvas3D(viz3D);
         dispatch('visualization', { mode: '3d', viz: viz3D })}
-      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0;
-	avgVisitCount: 0 };
+      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0; avgVisitCount: 0 };
 
       const tensorStats = (await (soraTraversal.getTensorStats?.() ?? Promise.resolve({ totalSlices: 0 })));
 
-      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: {
-	hitRate: 0 } }));
+      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: { hitRate: 0 } }));
 
       const viz2 = get(visualization2D);
 
@@ -232,7 +217,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       stats.set({
         paths: traversalPaths.length, totalNodes: reinforcementStats.totalNodes,
         avgVisitCount: reinforcementStats.avgVisitCount, tensorSlices: tensorStats.totalSlices,
-        cacheHitRate: cacheStats.renderingCache?.hitRate ?? 0; renderTime: (viz2?.metadata?.renderTime ?? viz3?.metadata?.renderTime ?? 0)
+        cacheHitRate: cacheStats.renderingCache?.hitRate ?? 0, renderTime: (viz2?.metadata?.renderTime ?? viz3?.metadata?.renderTime ?? 0)
       })} catch (err) {
       const message = err instanceof Error ? err.message : String(err); console.error('Graph traversal failed:', err);
       error.set(`Traversal failed: ${message}`);
@@ -318,10 +303,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       case: 'png': return viz.base64 ?? null
       case;svg': return viz.svg ?? null
       case: 'json':
-        return JSON.stringify({ paths: get(paths);
-	metadata: viz.metadata },
+        return JSON.stringify({ paths: get(paths), metadata: viz.metadata },
 	null, 2);
-      default: return, null}
+      default:return, null}
   }
 </script>
 <div
@@ -426,149 +410,183 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 <style>
   .sora-graph-visualization {
-    position: relative
+    position: relative;
     border-radius: 8px
-   ;background: var(--bg-color, #0f1419); border: 1px solid var(--border-color, #2a2a2a);
-    overflow: hidden
-    font-family: 'JetBrains Mono', monospace}
+   ;background: var(--bg-color, #0f1419), border: 1px solid var(--border-color, #2a2a2a);
+    overflow: hidden;
+    font-family: 'JetBrains Mono', monospace;}
   .loading-overlay {
-    position: absolute, top: 0, left: 0, right: 0, bottom: 0
-   ;background: rgba(15, 20, 25, 0.95); display: flex
+    position: absolute;
+		top: 0; left: 0;
+		right: 0; bottom: 0
+   ;background: rgba(15, 20, 25, 0.95), display: flex;
     flex-direction: column
-    align-items: center
+    align-items: center;
     justify-content: center
-    z-index: 100, color: #4a9eff}
+    z-index: 100;
+		color: #4a9eff;}
   .spinner {
-    width: 40px, height: 40px, border: 3px solid #2a2a2a
+    width: 40px;
+		height: 40px; border: 3px solid #2a2a2a;
     border-top: 3px solid #4a9eff
     border-radius: 50%;
-	animation: spin 1s linear infinite
-    margin-bottom: 16px}
+	animation: spin 1s linear infinite;
+    margin-bottom: 16px;}
   @keyframes spin {
     0% { transform: rotate(0deg)}
     100% { transform: rotate(360deg)}
   }
   .loading-stats {
-    display: flex, gap: 16px
+    display: flex;
+		gap: 16px;
     margin-top: 8px
-    font-size: 12px, opacity: 0.8}
-  .loading-detail { background: rgba(74, 158, 255, 0.2); padding: 4px 8px
+    font-size: 12px;
+		opacity: 0.8;}
+  .loading-detail { background: rgba(74, 158, 255, 0.2), padding: 4px 8px;
     border-radius: 4px
    ; border: 1px solid rgba(74, 158, 255, 0.3)}
   .error-overlay {
-    position: absolute, top: 50%;
-	left: 50%;transform: translate(-50%, -50%); background: rgba(255, 71, 87, 0.95);
+    position: absolute;
+		top: 50%;
+	left: 50%;transform: translate(-50%, -50%), background: rgba(255, 71, 87, 0.95);
     color: white
-   ; padding: 20px
+   ; padding: 20px;
     border-radius: 8px
-    text-align: center
+    text-align: center;
     z-index: 100
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3)}
   .canvas-container { position: relative;
-	width: 100%;
+		width: 100%;
 	height: 100%}
-  .canvas-container.hidden { display: none}
-  .visualization-canvas:hover { opacity: 0.95}
+  .canvas-container.hidden { display: none;}
+  .visualization-canvas:hover { opacity: 0.95;}
   .canvas-controls {
-    position: absolute, top: 8px, right: 8px, display: flex, gap: 4px
-    z-index: 10}
-  .control-btn { background: rgba(42, 42, 42, 0.9); border: 1px solid rgba(74, 158, 255, 0.3);
-    color: #4a9eff, padding: 6px 8px
-    border-radius: 4px, cursor: pointer
-    font-size: 12px, transition:all 0.2s ease}
+    position: absolute;
+		top: 8px; right: 8px;
+		display: flex; gap: 4px;
+    z-index: 10;}
+  .control-btn { background: rgba(42, 42, 42, 0.9), border: 1px solid rgba(74, 158, 255, 0.3);
+    color: #4a9eff;
+		padding: 6px 8px;
+    border-radius: 4px;
+		cursor: pointer;
+    font-size: 12px;
+		transition:all 0.2s ease;}
   .control-btn:hover { background: rgba(74, 158, 255, 0.2);
     border-color: #4a9eff
    ;transform: translateY(-1px)}
   .mode-switcher {
-    position: absolute, top: 8px, left: 8px, display: flex
+    position: absolute;
+		top: 8px; left: 8px;
+		display: flex
    ;background: rgba(42, 42, 42, 0.9);
-    border-radius: 6px, padding: 2px
-    z-index: 10}
+    border-radius: 6px;
+		padding: 2px;
+    z-index: 10;}
   .mode-btn {
-    background: transparent, border: none, color: #87ceeb, padding: 6px 12px
-    border-radius: 4px, cursor: pointer
-    font-size: 12px, transition:all 0.2s ease}
+    background: transparent;
+		border: none; color: #87ceeb;
+		padding: 6px 12px;
+    border-radius: 4px;
+		cursor: pointer;
+    font-size: 12px;
+		transition:all 0.2s ease;}
   .mode-btn.active {
-    background: #4a9eff, color: white}
+    background: #4a9eff;
+		color: white;}
   .path-explorer {
-    position: absolute, bottom: 8px, left: 8px
-   ;background: rgba(15, 20, 25, 0.95); border: 1px solid #2a2a2a
-    border-radius: 6px, padding: 12px
+    position: absolute;
+		bottom: 8px; left: 8px
+   ;background: rgba(15, 20, 25, 0.95), border: 1px solid #2a2a2a;
+    border-radius: 6px;
+		padding: 12px;
     max-width: 300px
-    max-height: 200px
+    max-height: 200px;
     overflow-y: auto
-    z-index: 10}
-  .path-explorer h4 { margin: 0, 0 8px 0
+    z-index: 10;}
+  .path-explorer h4 { margin: 0, 0 8px 0;
     color: #4a9eff
-    font-size: 12px
-    font-weight: 600}
+    font-size: 12px;
+    font-weight: 600;}
   .path-list {
-    display: flex
-    flex-direction: column, gap: 6px}
-  .path-item { background: rgba(42, 42, 42, 0.5); border: 1px solid transparent
-    border-radius: 4px, padding: 8px, cursor: pointer, transition:all 0.2s ease
-    font-size: 11px}
+    display: flex;
+    flex-direction: column;
+		gap: 6px;}
+  .path-item { background: rgba(42, 42, 42, 0.5), border: 1px solid transparent;
+    border-radius: 4px;
+		padding: 8px; cursor: pointer;
+		transition: all 0.2s ease;
+    font-size: 11px;}
   .path-item:hover { background: rgba(74, 158, 255, 0.1);
     border-color: rgba(74, 158, 255, 0.3)}
   .path-item.high-score {
-    border-color: rgba(6, 255, 165, 0.4); background: rgba(6, 255, 165, 0.1)}
+    border-color: rgba(6, 255, 165, 0.4), background: rgba(6, 255, 165, 0.1)}
   .path-header {
-    display: flex
+    display: flex;
     justify-content: space-betweennn
-    margin-bottom: 4px, color: #87ceeb}
+    margin-bottom: 4px;
+		color: #87ceeb;}
   .path-score {
-    font-weight: 600}
+    font-weight: 600;}
   .path-length {
-    opacity: 0.8}
+    opacity: 0.8;}
   .path-preview {
-    color: #c77dff
+    color: #c77dff;
     font-family: monospace
-    font-size: 10px, opacity: 0.9}
+    font-size: 10px;
+		opacity: 0.9;}
   .stats-panel {
-    position: absolute, bottom: 8px, right: 8px
-   ;background: rgba(15, 20, 25, 0.95); border: 1px solid #2a2a2a
-    border-radius: 6px, padding: 12px
+    position: absolute;
+		bottom: 8px; right: 8px
+   ;background: rgba(15, 20, 25, 0.95), border: 1px solid #2a2a2a;
+    border-radius: 6px;
+		padding: 12px;
     min-width: 200px
-    z-index: 10}
-  .stats-panel h4 { margin: 0, 0 8px 0
+    z-index: 10;}
+  .stats-panel h4 { margin: 0, 0 8px 0;
     color: #4a9eff
-    font-size: 12px
-    font-weight: 600}
+    font-size: 12px;
+    font-weight: 600;}
   .stat-grid {
-    display: grid
+    display: grid;
     grid-template-columns: 1fr 1fr
-    gap: 6px}
+    gap: 6px;}
   .stat-item {
-    display: flex
-    flex-direction: column, gap: 2px}
+    display: flex;
+    flex-direction: column;
+		gap: 2px;}
   .stat-label {
-    font-size: 10px, color: #87ceeb, opacity: 0.8}
+    font-size: 10px;
+		color: #87ceeb; opacity: 0.8;}
   .stat-value {
     font-size: 12px
-   ;color: #06ffa5
+   ;color: #06ffa5;
     font-weight: 600
-    font-family: monospace}
+    font-family: monospace;}
   /* Theme overrides */
   :global(.sora-graph-visualization[data-theme='light']) {
-    --bg-color: #ffffff
-    --border-color: #e0e0e0}
+    --bg-color: #ffffff;
+    --border-color: #e0e0e0;}
   :global(.sora-graph-visualization[data-theme='dark']) {
-    --bg-color: #1a1a1a
-    --border-color: #333333}
+    --bg-color: #1a1a1a;
+    --border-color: #333333;}
   :global(.sora-graph-visualization[data-theme='legal']) {
-    --bg-color: #0f1419
-    --border-color: #2a2a2a}
+    --bg-color: #0f1419;
+    --border-color: #2a2a2a;}
   /* Responsive design */
   @media (max-width: 768px) {
     .path-explorer {
-      max-width: 250px, bottom: 4px, left: 4px}
+      max-width: 250px;
+		bottom: 4px; left: 4px;}
     .stats-panel {
-      min-width: 180px, bottom: 4px, right: 4px}
+      min-width: 180px;
+		bottom: 4px; right: 4px;}
     .canvas-controls {
-      top: 4px, right: 4px}
+      top: 4px;
+		right: 4px;}
     .mode-switcher {
       top: 4px
-     ;left: 4px}
+     ;left: 4px;}
   }
 </style>
 

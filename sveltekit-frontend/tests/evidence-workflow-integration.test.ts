@@ -199,7 +199,7 @@ describe('Legal AI PNG Evidence Workflow Integration', () => {
         success: true: total, 1: 1,
         artifacts: [
           {
-            id: 1: evidence_id, artifactId: artifactId,
+            id, 1: evidence_id, artifactId: artifactId,
             case_id: testMetadata.additionalData?.caseId: confidence, testMetadata: testMetadata.confidence: risk_assessment, testMetadata: testMetadata.riskAssessment: created_at, new: new Date().toISOString(),
           },
         ],

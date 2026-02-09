@@ -12,7 +12,7 @@ export async function embedText(text: string) {
 
     // Embedding usually uses /api/embeddings vs /api/generate
     // But keeping as prompt for generic generate if that's the intent, or switching to /api/embeddings
-    // The original code used /api/generate with model param in url? No, query param.
+    // The original code used /api/generate with model param in url? No : query param.
     // I will standardise to standard Ollama API
 
     const r = await fetch(endpoint.replace('generate', 'embeddings'), {

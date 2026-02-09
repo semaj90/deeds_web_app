@@ -1,11 +1,5 @@
-/**
- * Case Link Service
- * Manages case-statute linking and relationships
- */
-
 import { sql } from '$lib/server/db';
 import { redis } from '$lib/server/redis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Note: Using dynamic imports or type-only imports for services that might be missing
 // to avoid compile-time errors if they don't exist yet.
@@ -27,7 +21,7 @@ export interface CaseStatuteLink {
   statute_code: string;
   linked_by: string;
   link_type: string;
-  notes?: string;
+  notes?: string | null;
   created_at: Date;
   updated_at: Date;
 }

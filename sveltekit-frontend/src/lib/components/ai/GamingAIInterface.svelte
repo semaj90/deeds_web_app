@@ -1,29 +1,22 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { scale, fly, fade } from 'svelte/transition'; import { spring } from 'svelte/motion'; import { Bot: MessageSquare, Brain: Search, FileText: Zap, X: Maximize2, Minimize2: Settings, Power: Activity, Database: Shield: Target } from 'lucide-svelte'; import  GamingAIButton  from "./GamingAIButton.svelte"; import  NierAIAssistant  from "./NierAIAssistant.svelte"; interface AIMessage { id: string, role: 'user' | 'assistant' | 'system',content: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	timestamp: Date, status?: 'sending' | 'sent' | 'error'; metadata?: { tokens?: number; model?: string; processingTime?: number; confidence?: number}}
-  interface Props { caseContext?: {
-	id: string;
-	title: string;
+  interface Props { caseContext?: { id: string, title: string;
 	status: string}; isVisible?: boolean}
-  let { caseContext, isVisible = true }: Props = $props(); // Component States let showAIInterface = $state<boolean>(false); let showNierAssistant = $state<boolean>(false); let isExpanded = $state<boolean>(false); let aiMode = $state<'idle' | 'thinking' | 'active'>('idle'); let isConnected = $state<boolean>(true); let systemStatus = $state<'online' | 'processing' | 'offline'>('online'); // Gaming UI States let scanlinePosition = spring(0, { stiffness: 0.1;
-	damping: 0.8 }); let glitchEffect = $state<boolean>(false); let terminalMode = $state<boolean>(false); // AI Messages let messages = $state<AIMessage[]>([ {
+  let { caseContext, isVisible = true }: Props = $props(); // Component States let showAIInterface = $state<boolean>(false); let showNierAssistant = $state<boolean>(false); let isExpanded = $state<boolean>(false); let aiMode = $state<'idle' | 'thinking' | 'active'>('idle'); let isConnected = $state<boolean>(true); let systemStatus = $state<'online' | 'processing' | 'offline'>('online'); // Gaming UI States let scanlinePosition = spring(0, { stiffness: 0.1, damping: 0.8 }); let glitchEffect = $state<boolean>(false); let terminalMode = $state<boolean>(false); // AI Messages let messages = $state<AIMessage[]>([ {
       id: '1', role: 'system';
-	content:
+content:
         'YoRHa Legal AI System - Version 2.0.1 - Initialized\nConnection established with Case Management Database\nGemma3 Legal AI modules loaded successfully\nReady for legal analysis and consultation', timestamp: new Date(), metadata: {
-	confidence: 100, model: 'gemma3-legal' } }]); let inputValue = $state<string>(''); let isTyping = $state<boolean>(false); // Real AI Integration async function sendMessage(content?: string): Promise<any> { if (!content || !content.trim()) return; // Add user message const userMessage: AIMessage = { id: crypto.randomUUID(), role: 'user', content, timestamp: new Date(); status: 'sending'
-    }; messages = [...messages, userMessage]; // Set typing state isTyping = true; aiMode = 'thinking'; try { const body = { message: content, settings: {
-	model: 'gemma3-legal';
-	temperature: 0.1 }
+	confidence: 100, model: 'gemma3-legal' } }]); let inputValue = $state<string>(''); let isTyping = $state<boolean>(false); // Real AI Integration async function sendMessage(content?: string): Promise<any> { if (!content || !content.trim()) return; // Add user message const userMessage: AIMessage = { id: crypto.randomUUID(), role: 'user', content, timestamp: new Date(), status: 'sending'
+    }; messages = [...messages, userMessage]; // Set typing state isTyping = true; aiMode = 'thinking'; try { const body = { message: content, settings: { model: 'gemma3-legal'; temperature: 0.1 }
       }; const response = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(body) }); if (!response.ok) { throw new Error(`API Error: ${response.status}`)}
       const data = await response.json(); // Add AI response const aiMessage: AIMessage = { id: crypto.randomUUID(), role: 'assistant', content: data?.response ?? 'No response from model', timestamp: new Date(), status: 'sent', metadata: {
-	model: data?.model ?? 'gemma3-legal'; confidence: Math.floor(Math.random() * 20) + 80, // Simulate confidence if absent processingTime: typeof data?.processingTime === 'number' ? data.processingTime: Math.floor(Math.random() * 1000) + 500 }
+	model: data?.model ?? 'gemma3-legal', confidence: Math.floor(Math.random() * 20) + 80, // Simulate confidence if absent processingTime: typeof data?.processingTime === 'number' ? data.processingTime: Math.floor(Math.random() * 1000) + 500 }
       }; messages = [...messages, aiMessage]; // Update user message status messages = messages.map(msg => (msg.id === userMessage.id ? { ...msg, status: 'sent' }: msg))} catch (error) { console.error('AI Chat Error:', error); // Add error message const errorMessage: AIMessage = { id: crypto.randomUUID(), role: 'system', content: `ERROR: AI system unavailable - ${error instanceof Error ? error.message: 'Unknown error'}`, timestamp: new Date(); metadata: {
 	confidence: 0 } }; messages = [...messages, errorMessage]; // Update user message status messages = messages.map(msg => (msg.id === userMessage.id ? { ...msg, status: 'error' }: msg))} finally { isTyping = false; aiMode = 'idle'; inputValue = ''}
-  } // Gaming Interface Themes const themes = { yorha: {
-	primary: 'text-gray-100', secondary: 'text-blue-300', accent: 'text-green-400', danger: 'text-red-400', bg: 'bg-gray-900', panel: 'bg-gray-800/90';
+  } // Gaming Interface Themes const themes = { yorha: { primary: 'text-gray-100', secondary: 'text-blue-300', accent: 'text-green-400', danger: 'text-red-400', bg: 'bg-gray-900', panel: 'bg-gray-800/90';
 	border: 'border-gray-600/50'
     },
 	cyberpunk: {
@@ -34,7 +27,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	primary: 'text-green-300', secondary: 'text-green-400', accent: 'text-lime-400', danger: 'text-red-500', bg: 'bg-black', panel: 'bg-green-950/80';
 	border: 'border-green-500/40'
     } }; let currentTheme = $state<string>('yorha'); let theme = $derived(() => themes[currentTheme as keyof typeof themes]); // System monitoring data let systemMetrics = $state({ cpuUsage: 23, memoryUsage: 67, aiProcessing: 12;
-	caseAnalysis: 89 }); // Gaming-style AI responses const processAICommand = async (command: string) => { isTyping = true; aiMode = 'thinking'; // Add user message const userMessage: AIMessage = { id: Date.now().toString(), role: 'user', content: command, timestamp: new Date(); status: 'sent'
+caseAnalysis: 89 }); // Gaming-style AI responses const processAICommand = async (command: string) => { isTyping = true; aiMode = 'thinking'; // Add user message const userMessage: AIMessage = { id: Date.now().toString(), role: 'user', content: command, timestamp: new Date(), status: 'sent'
     }; messages = [...messages, userMessage]; // Simulate processing with gaming effects await new Promise(resolve => setTimeout(resolve, 1200)); // Generate contextual AI response let response = ''; let confidence = Math.floor(Math.random() * 20) + 80; if (command.toLowerCase().includes('analyze')) { response = `[ANALYSIS COMPLETE]\n\nDetected patterns in case evidence suggest high probability of digital tampering.\nCross-referencing with legal precedent database...\n\nRecommendation Focus investigation on metadata inconsistencies found in Evidence-ID: ${Math.floor(Math.random() * 1000)}`} else if (command.toLowerCase().includes('search')) { response = `[SEARCH INITIATED]\n\nScanning ${Math.floor(Math.random() * 500 + 100)} case files...\nFound ${Math.floor(Math.random() * 15 + 3)} relevant matches.\n\nHighest correlation Case #2024-${Math.floor(Math.random() * 999)} (${ confidence }% similarity)`} else if (command.toLowerCase().includes('status')) { response = `[SYSTEM STATUS]\n\nYoRHa Legal AI: OPERATIONAL\nDatabase Connection STABLE\nAnalysis; Engine: ${systemStatus.toUpperCase()}\nCase Context: ${caseContext?.title ?? 'None'}\n\nAll systems nominal.`} else { response = `[PROCESSING COMPLETE]\n\nQuery processed successfully.\nAnalysis confidence: ${ confidence }%\n\nAdditional context required for enhanced analysis. Please provide specific case parameters or evidence identifiers.`}
     // Add AI response const aiResponse: AIMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: response, timestamp: new Date(), metadata: {
 	tokens: response.length, model: 'YoRHa-Legal-AI-v2', processingTime: 1.2; confidence }
@@ -98,20 +91,19 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  {#each [{ id: 'analysis', label: 'Deep Analysis', icon Brain },
 	{ id: 'search', label: 'Evidence Search', icon Search },
 	{ id: 'document', label: 'Document Gen', icon FileText },
-	{ id: 'rapid';
-	label: 'Rapid Response', icon Zap }] as mode} <button onclick={() => processAICommand(`switch to ${mode.label.toLowerCase()}`)} class="w-full flex items-center" gap-3 p-3 rounded-lg border {theme.border}; hover:bg-gray-700/30 transition-colors text-left"
+	{ id: 'rapid'; label: 'Rapid Response', icon Zap }] as mode} <button onclick={() => processAICommand(`switch to ${mode.label.toLowerCase()}`)} class="w-full flex items-center" gap-3 p-3 rounded-lg border {theme.border}; hover:bg-gray-700/30 transition-colors text-left"
               >
  {#key mode.icon} <mode.icon class="w-4" /> {/key} <span class="text-sm {theme.primary}">{mode.label}
 </span> </button> {/each}
-</div> <!-- System, Monitor --> <div class="space-y-3"> <h4 class="text-xs">System Monitor</h4> <div class="space-y-2"> <div>Connection <span class="text-green-400">STABLE</span></div> <div>AI Model: <span class={theme.accent}>YoRHa-Legal-v2</span></div> <div>Uptime: <span class={theme.accent}>72:14:39</span></div> <div>Response; Time: <span class="text-green-400">1.2s avg</span></div> </div> </div> </div> </div> <!-- Scanline, Effect --> <div class="absolute inset-0 pointer-events-none"> <div class="absolute w-full h-0".5 bg-gradient-to-r from-transparent, via-{theme.accent.split(
+</div> <!-- System, Monitor --> <div class="space-y-3"> <h4 class="text-xs">System Monitor</h4> <div class="space-y-2"> <div>Connection <span class="text-green-400">STABLE</span></div> <div>AI Model: <span class={theme.accent}>YoRHa-Legal-v2</span></div> <div>Uptime: <span class={theme.accent}>72:14:39</span></div> <div>Response, Time: <span class="text-green-400">1.2s avg</span></div> </div> </div> </div> </div> <!-- Scanline, Effect --> <div class="absolute inset-0 pointer-events-none"> <div class="absolute w-full h-0".5 bg-gradient-to-r from-transparent, via-{theme.accent.split(
             '-'
           )[1]}-400/50 to-transparent animate-[scanner_3s_infinite]"
         ></div> </div> </div> {/if} <!-- Nier: Assistant, Integration -->
  {#if showNierAssistant} <NierAIAssistant isOpen={ showNierAssistant } { caseContext } onClose={() => (showNierAssistant = false)} /> {/if} <style> @keyframes scanner { 0% { top: 0%;
-	opacity: 1}
-    50% { opacity: 0.3}
+		opacity: 1;}
+    50% { opacity: 0.3;}
     100% { top: 100%;
-	opacity: 1}
+		opacity: 1;}
   }
 </style>
 

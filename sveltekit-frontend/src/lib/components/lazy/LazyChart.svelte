@@ -2,7 +2,6 @@
 <script lang="ts">
 	import type { LazyComponentState } from '$lib/utils/intersection-observer.js';
 	import LazyLoader from '../LazyLoader.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
 		data?: unknown[];
@@ -52,8 +51,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 						props: { data, config, height, width }
 					};
 					break;
-				default:
-					throw new Error(`Unsupported chart type: ${chartType}`);
+				default:throw new Error(`Unsupported chart type: ${chartType}`);
 			}
 		} catch (error) {
 			loadError = error instanceof Error ? error : new Error('Failed to load chart component');
@@ -61,8 +59,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		}
 	}
 
-	function generatePlaceholderBars(): Array<{
-	height: number; delay: number }> {
+	function generatePlaceholderBars(): Array<{ height: number, delay: number }> {
 		const barCount = Math.min(data.length || 5, 10);
 		return Array.from({ length: barCount },
 	(_, i) => ({
@@ -169,9 +166,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	width: 100%;
 	}
 
-	.chart-content {
-		flex: 1;
-	position: relative;
+	.chart-content { flex: 1;
+		position: relative;
 	}
 
 	.mock-chart {
@@ -207,27 +203,23 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		max-width: 400px;
 	}
 
-	.placeholder-title {
-		height: 20px;
-	background: rgba(255, 255, 255, 0.2);
+	.placeholder-title { height: 20px;
+		background: rgba(255, 255, 255, 0.2);
 		border-radius: 4px;
 		margin-bottom: 20px;
 	animation: placeholder-pulse 2s infinite;
 	}
 
-	.placeholder-line-chart {
-		width: 100%;
-	height: 150px;
+	.placeholder-line-chart { width: 100%;
+		height: 150px;
 	}
 
-	.placeholder-svg {
-		width: 100%;
-	height: 100%;
+	.placeholder-svg { width: 100%;
+		height: 100%;
 	}
 
-	.placeholder-line {
-		fill: none;
-	stroke: rgba(255, 255, 255, 0.3);
+	.placeholder-line { fill: none;
+		stroke: rgba(255, 255, 255, 0.3);
 		stroke-width: 2;
 		stroke-dasharray: 5, 5;
 		animation: dash-move 2s linear infinite;
@@ -246,9 +238,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		gap: 8px;
 	}
 
-	.placeholder-bar {
-		flex: 1;
-	background: rgba(255, 255, 255, 0.2);
+	.placeholder-bar { flex: 1;
+		background: rgba(255, 255, 255, 0.2);
 		border-radius: 2px 2px 0 0;
 		animation: bar-grow 1.5s ease-out infinite;
 	}
@@ -258,18 +249,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		justify-content: center;
 	}
 
-	.placeholder-pie {
-		width: 120px;
-	height: 120px;
+	.placeholder-pie { width: 120px;
+		height: 120px;
 		border-radius: 50%;
 	position: relative;
 		overflow: hidden;
 	animation: pie-rotate 3s linear infinite;
 	}
 
-	.pie-slice {
-		position: absolute;
-	width: 50%;
+	.pie-slice { position: absolute;
+		width: 50%;
 		height: 50%;
 		transform-origin: 100% 100%;
 	}
@@ -306,9 +295,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		gap: 12px;
 	}
 
-	.generic-bar {
-		flex: 1;
-	background: rgba(255, 255, 255, 0.2);
+	.generic-bar { flex: 1;
+		background: rgba(255, 255, 255, 0.2);
 		border-radius: 4px;
 	animation: bar-pulse 2s ease-in-out infinite;
 	}
@@ -398,14 +386,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			width: 95%;
 		}
 
-		.placeholder-bar-chart {
-			height: 100px;
-	gap: 4px;
+		.placeholder-bar-chart { height: 100px;
+		gap: 4px;
 		}
 
-		.placeholder-pie {
-			width: 100px;
-	height: 100px;
+		.placeholder-pie { width: 100px;
+		height: 100px;
 		}
 	}
 

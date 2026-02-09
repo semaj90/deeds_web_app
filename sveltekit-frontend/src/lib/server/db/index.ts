@@ -1,5 +1,5 @@
 import { sql as drizzleSql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/postgres-js';
+import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 // @ts-ignore
 import postgres from 'postgres';
 import * as schema from './schema';
@@ -11,7 +11,7 @@ const connectionString = process.env?.DATABASE_URL|| DEFAULT_DATABASE_URL;
 
 const client = postgres(connectionString);
 export const sql = drizzleSql; // Export Drizzle's sql template tag, not the client
-export const db = drizzle(client, { schema });
+export const db: PostgresJsDatabase<typeof schema> = drizzle(client, { schema });
 
 export * from './schema';
 

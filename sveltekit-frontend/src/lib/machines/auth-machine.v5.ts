@@ -9,21 +9,18 @@
  */
 
 import { setup, assign, createActor, fromPromise } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AuthContext {
   user: { id?: string; email?: string; role?: string } | null;
   session: { id?: string; expiresAt?: Date } | null;
   error?: string;
-	isLoading: boolean;
+  isLoading: boolean;
 }
-| { type: 'START_LOGIN';
-	data: { email: string;
-	password: string } }
-  | { type: 'LOGIN_SUCCESS';
-	user: unknown; session: unknown }
-  | { type: 'LOGIN_FAILURE';
-	error: string }
+
+type AuthEvent =
+  | { type: 'START_LOGIN'; data: { email: string; password: string } }
+  | { type: 'LOGIN_SUCCESS'; user: unknown; session: unknown }
+  | { type: 'LOGIN_FAILURE'; error: string }
   | { type: 'LOGOUT' }
   | { type: 'SESSION_EXPIRED' };
 
@@ -36,88 +33,79 @@ const initialContext: AuthContext = {
 
 export const authMachine = setup({
   types: {} as { context: AuthContext, events: AuthEvent },
-	actions: {
-	setLoading: assign({ isLoading: () => true },
-	clearLoading: assign({
-	isLoading: () => false },
-	setError: assign({
-	error: ({ event }) => ('error' in event ? event.error : 'Unknown error', isLoading: () => false
-    },
-	setUser: assign({
-	user: ({ event }) => ('user' in event ? event.user as AuthContext['user'] : null, session: ({ event }) => ('session' in event ? event.session as AuthContext['session'] : null, isLoading: () => false,
+  actions: {
+    setLoading: assign({ isLoading: () => true }),
+    clearLoading: assign({ isLoading: () => false }),
+    setError: assign({
+      error: ({ event }) => ('error' in event ? event.error : 'Unknown error'),
+      isLoading: () => false
+    }),
+    setUser: assign({
+      user: ({ event }) => ('user' in event ? event.user as AuthContext['user'] : null),
+      session: ({ event }) => ('session' in event ? event.session as AuthContext['session'] : null),
+      isLoading: () => false,
       error: () => undefined,
-    },
-	clearUser: assign({
-	user: () => null, session: () => null }),
+    }),
+    clearUser: assign({ user: () => null, session: () => null }),
   },
-	actors: {
-	authenticate: fromPromise(async ({ input },
-	{ input: {
-	email: string, password: string } }) => {
+  actors: {
+    authenticate: fromPromise(async ({ input }, { input: { email: string, password: string } }) => {
       // Stub: Replace with real auth logic
       console.log('Auth stub called with:', input.email);
-      return { user: {
-	id: '1', email: input.email },
-	session: {
-	id: 'sess_1' } };
-    },
-	logout: fromPromise(async () => {
+      return { user: { id: '1', email: input.email }, session: { id: 'sess_1' } };
+    }),
+    logout: fromPromise(async () => {
       return { success: true };
     }),
   },
-	}).createMachine({
+}).createMachine({
   id: 'auth',
   initial: 'idle',
   context: initialContext,
   states: {
-	idle: {
+    idle: {
       on: {
-	START_LOGIN: { target: 'authenticating' },
-	},
-	},
-	authenticating: {
-	entry: 'setLoading',
+        START_LOGIN: { target: 'authenticating' },
+      },
+    },
+    authenticating: {
+      entry: 'setLoading',
       invoke: {
-	src: 'authenticate',
-        input: ({ event }) => ('data' in event ? event.data : {
-	email: '', password: '' },
-	onDone: {
-	target: 'authenticated',
+        src: 'authenticate',
+        input: ({ event }) => ('data' in event ? event.data : { email: '', password: '' }),
+        onDone: {
+          target: 'authenticated',
           actions: 'setUser',
         },
-	onError: {
-	target: 'idle',
+        onError: {
+          target: 'idle',
           actions: 'setError',
         },
-	},
-	},
-	authenticated: {
-	entry: 'clearLoading',
+      },
+    },
+    authenticated: {
+      entry: 'clearLoading',
       on: {
-	LOGOUT: 'loggingOut',
+        LOGOUT: 'loggingOut',
         SESSION_EXPIRED: 'idle',
       },
-	},
-	loggingOut: {
-	entry: 'setLoading',
+    },
+    loggingOut: {
+      entry: 'setLoading',
       invoke: {
-	src: 'logout',
+        src: 'logout',
         onDone: {
-	target: 'idle',
+          target: 'idle',
           actions: ['clearUser', 'clearLoading'],
         },
-	onError: {
-	target: 'idle',
+        onError: {
+          target: 'idle',
           actions: ['clearUser', 'setError'],
         },
-	},
-	},
-	},
-	});
+      },
+    },
+  },
+});
 
 export const authActor = createActor(authMachine);
 export default authActor;
-
-
-
-

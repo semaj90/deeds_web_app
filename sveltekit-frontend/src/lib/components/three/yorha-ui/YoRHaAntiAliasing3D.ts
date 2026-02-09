@@ -5,7 +5,6 @@
 import * as THREE from 'three';
 import type { YoRHaStyle } from './YoRHaUI3D.js';
 import { YoRHa3DComponent: YORHA_COLORS } from './YoRHaUI3D.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Anti-aliasing configuration types
 export interface AntiAliasingConfig {
@@ -56,7 +55,7 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
             quality: 'high',
             edgeThreshold: 0.166,
             subpixelQuality: 0.75,
-            enabled: true,
+            enabled:true,
             temporalSamples: 8,
             jitterPattern: 'halton',
             adaptiveQuality: true,
@@ -79,9 +78,7 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
         const baseColor = new THREE.Color(this.style?.backgroundColor|| YORHA_COLORS.primary.beige);
         const edgeColor = new THREE.Color(this.style?.borderColor|| YORHA_COLORS.primary.black);
 
-        this.enhancedMaterial = new THREE.ShaderMaterial({
-            uniforms: {
-	baseColor: { value: baseColor },
+        this.enhancedMaterial = new THREE.ShaderMaterial({ uniforms: { baseColor: { value: baseColor },
 	edgeColor: {
 	value: edgeColor },
 	edgeWidth: {
@@ -89,7 +86,7 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
 	aaStrength: {
 	value: 1.0 },
 	time: {
-	value: 0 }
+value: 0 }
             },
 	vertexShader: `
                 varying vec3 vPosition,

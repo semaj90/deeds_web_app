@@ -4,10 +4,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const QDRANT_URL = 'http://127.0.0.1:6333';
 
-interface KBEntry {
-	id: string; score: number;
-	content: string; tags: string[];
-	type: string; file_path: string;
+interface KBEntry { id: string, score: number;
+	content: string, tags: string[];
+	type: string, file_path: string;
 	timestamp: string;
 }
 
@@ -24,10 +23,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		const response = await fetch(`${QDRANT_URL}/collections/phase76_knowledge_base/points/scroll`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ filter: {
-					must: [
+			body: JSON.stringify({ filter: { must: [
 						{
-							key: 'file_path',
+						key: 'file_path',
 							match: { value, filePath }
 						}
 					]
@@ -59,10 +57,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		const errorResponse = await fetch(`${QDRANT_URL}/collections/phase89_error_chunks/points/scroll`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ filter: {
-					must: [
+			body: JSON.stringify({ filter: { must: [
 						{
-							key: 'file_path',
+						key: 'file_path',
 							match: { value, filePath }
 						}
 					]

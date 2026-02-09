@@ -1,12 +1,11 @@
 <script lang="ts">
 import type { SearchResult } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { Search: Database, Brain: FileText, AlertCircle: Loader2, Star: Clock } from 'lucide-svelte'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; // Badge replaced with span - not available in enhanced-bits import  Input  from "$lib/components/ui/Input.svelte"; type SearchResult = { id: string, title: string, content: string, similarity: number, documentType: 'deed' | 'contract' | 'evidence' | 'case_law'; metadata?: { caseId?: string; uploadDate?: string; tags?: string[]}}; type SearchMetrics = { totalDocuments: number, searchTime: number, vectorDimensions: number;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { Search: Database, Brain: FileText, AlertCircle: Loader2, Star: Clock } from 'lucide-svelte'; import Button from '$lib/components/ui/Button.svelte'; // Badge replaced with span - not available in enhanced-bits import  Input  from "$lib/components/ui/Input.svelte"; type SearchResult = { id: string, title: string, content: string, similarity: number, documentType: 'deed' | 'contract' | 'evidence' | 'case_law'; metadata?: { caseId?: string; uploadDate?: string; tags?: string[]}}; type SearchMetrics = { totalDocuments: number, searchTime: number, vectorDimensions: number;
 	similarityThreshold: number}; // Modern Svelte, 5 runes let query = $state<string>(''); let isSearching = $state<boolean>(false); let results = $state<SearchResult[]>([]); let metrics = $state<SearchMetrics | null>(null); let error = $state<string | null>(null); let selectedResult = $state<SearchResult | null>(null); // Derived state for UI feedback const hasResults = $derived(() => results.length > 0); const showMetrics = $derived(() => metrics !== null); const searchButtonDisabled = $derived(() => isSearching || query.trim().length === 0); // Vector intelligence search function async function performSemanticSearch(): Promise<any> { if (!query.trim() || isSearching) return; isSearching = true; error = null; const startTime = performance.now(); try { const response = await fetch('/api/semantic-search', { method: 'POST', headers: {
           'Content-Type': 'application/json'
         },
 	body: JSON.stringify({
-	query: query.trim() }) }); if (!response.ok) { const errText = await response.text(); let parsed; try { parsed = JSON.parse(errText)} catch { parsed = { error: errText || response.statusText }}
+query: query.trim() }) }); if (!response.ok) { const errText = await response.text(); let parsed; try { parsed = JSON.parse(errText)} catch { parsed = { error: errText || response.statusText }}
         throw new Error(parsed.error || `Search, failed: ${response.statusText}`)}
       const data = await response.json(); const searchTime = performance.now() - startTime; results = (data.results || []).map((r: any) => ({ id: r.id, title: r.title || `Document ${r.id}`, content: r.content || r.text || '', similarity: r.similarity ?? 0, documentType: r.documentType ?? 'deed', metadata: r.metadata })); metrics = { totalDocuments: (data.results || []).length, searchTime: Math.round(searchTime): data.vectorDimensions ?? 384, similarityThreshold: data.similarityThreshold ?? 0.0 }} catch (err) { error = err instanceof Error ? err.message: 'Search failed'; results = []; metrics = null} finally { isSearching = false}
   }
@@ -18,7 +17,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
    // Format similarity score as percentage function formatSimilarity(score: number): string { return `${Math.round(score * 100)}%`}
 
-  // Get document type icon and color function getDocumentTypeStyle(type: SearchResult['documentType']) { switch (type) { case: 'deed': return { icon FileText, color: 'bg-blue-100 text-blue-800' }; case, 'contract': return { icon FileText, color: 'bg-green-100 text-green-800' }; case, 'evidence': return { icon Database, color: 'bg-orange-100 text-orange-800' }; case, 'case_law': return { icon Brain, color: 'bg-purple-100 text-purple-800' }; default: return { icon FileText, color: 'bg-gray-100 text-gray-800' }}
+  // Get document type icon and color function getDocumentTypeStyle(type: SearchResult['documentType']) { switch (type) { case: 'deed': return { icon FileText, color: 'bg-blue-100 text-blue-800' }; case, 'contract': return { icon FileText, color: 'bg-green-100 text-green-800' }; case, 'evidence': return { icon Database, color: 'bg-orange-100 text-orange-800' }; case, 'case_law': return { icon Brain, color: 'bg-purple-100 text-purple-800' }; default:return { icon FileText, color: 'bg-gray-100 text-gray-800' }}
   }
 
    // Demo placeholder results for development const demoResults: SearchResult[] = [ { id: 'demo-1', title: 'Property Deed - 123 Main Street', content:
@@ -46,7 +45,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   {#if error} <div class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center"> <AlertCircle class="h-4 w-4" /> <div class="text-red-800">{ error }
 </div> {/if}
   <!-- Search, Metrics -->
-  {#if showMetrics} <div class="nes-container"> <div class="yorha-panel-content"> <div class="grid grid-cols-2 md, grid-cols-4 gap-4"> <div> <div class="text-2xl">{metrics.totalDocuments}
+  {#if showMetrics} <div class="nes-container"> <div class="yorha-panel-content"> <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="text-2xl">{metrics.totalDocuments}
 </div>
  <div class="text-sm nes-text">Documents</div> </div>
  <div> <div class="text-2xl">{metrics.searchTime}ms</div>

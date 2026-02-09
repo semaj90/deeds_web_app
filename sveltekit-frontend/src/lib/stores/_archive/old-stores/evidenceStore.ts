@@ -16,7 +16,7 @@ export interface Evidence {
  location?: {
 	latitude: number; longitude: number; address?: string };
  classification?: {
-	category: string; relevance: number;
+	category: string, relevance: number;
 	confidence: number };
  timeline?: {
 	createdAt: string; updatedAt: string; collectedAt?: string };

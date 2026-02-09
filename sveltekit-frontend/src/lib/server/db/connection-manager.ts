@@ -12,7 +12,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Minimal pool/client types
 type LocalClientLike = {
-	query: (, textOrConfig: string | { text: string; values?: any[] },
+	query: (; textOrConfig: string | { text: string; values?: any[] },
 	params?: any[]
 	) => Promise<{ rows?: Record<string, unknown>[] }>;
 	release?: () => void;
@@ -166,7 +166,7 @@ export async function testDatabaseConnection(): Promise<{
 		const conn = await pool.connect();
 		try {
 			const versionResult = await conn.query('SELECT version()');
-			const version = versionResult.rows?.[0]?.version as string | undefined;
+			const version = versionResult.rows?.[0]?.version as string : undefined;
 
 			const tablesResult = await conn.query(`
 				SELECT table_name

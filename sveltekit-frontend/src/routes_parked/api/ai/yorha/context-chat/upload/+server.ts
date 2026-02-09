@@ -96,8 +96,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  const etag = await putObject('ai_chat_images', minioKey, fileBuffer, {
  'content-type': mimeType,
  'x-amz-meta-user-id': userId,
- 'x-amz-meta-case-id': caseId ?? '',
- 'x-amz-meta-upload-id': uploadId,
+ 'x-amz-meta-case-id': caseId ?? '' : 'x-amz-meta-upload-id': uploadId,
  'x-amz-meta-docling-processed': 'true',
  'x-amz-meta-page-count': doclingResult.pageCount.toString(),
  'x-amz-meta-processing-time': doclingResult.processingTimeMs.toString(),

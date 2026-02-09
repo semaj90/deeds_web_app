@@ -7,9 +7,7 @@
 
 	// Migrated to $effect
 
-	interface RouteNode {
-		path: string;
-	file: string;
+	interface RouteNode { path: string, file: string;
 		type: 'page' | 'layout' | 'server' | 'error';
 		children?: RouteNode[];
 		hasPageTs?: boolean;
@@ -112,7 +110,7 @@
 
 <!-- Route Tree Node Component (recursive) -->
 {#snippet RouteTreeNode(props: {
-	route: RouteNode, expandedPaths: Set<string>, toggleExpand: (path: string) => void; openFile: (file: string, line?: number) => void; searchQuery: string })}
+route: RouteNode, expandedPaths: Set<string>, toggleExpand: (path: string) => void, openFile: (file: string, line?: number) => void, searchQuery: string })}
 	<div class="route-node">
 		<div class="route-header">
 			{#if props.route.children && props.route.children.length > 0}
@@ -187,9 +185,8 @@
 	flex: 1;
 	}
 
-	.search-input {
-		flex: 2;
-	padding: 0.5rem;
+	.search-input { flex: 2;
+		padding: 0.5rem;
 		border: 1px solid var(--border-color);
 		border-radius: 4px;
 	background: var(--surface-1);
@@ -197,18 +194,16 @@
 		font-size: 0.875rem;
 	}
 
-	.refresh-btn {
-		padding: 0.5rem;
-	background: transparent;
+	.refresh-btn { padding: 0.5rem;
+		background: transparent;
 		border: 1px solid var(--border-color);
 		border-radius: 4px;
 	cursor: pointer;
 		transition:all 0.2s;
 	}
 
-	.refresh-btn:hover {
-		background: var(--surface-3);
-	transform: rotate(90deg);
+	.refresh-btn:hover { background: var(--surface-3);
+		transform: rotate(90deg);
 	}
 
 	.loading,
@@ -245,9 +240,8 @@
 		background: var(--surface-2);
 	}
 
-	.expand-btn {
-		width: 20px;
-	height: 20px;
+	.expand-btn { width: 20px;
+		height: 20px;
 		padding: 0;
 	background: transparent;
 		border: none;
@@ -263,9 +257,8 @@
 		width: 20px;
 	}
 
-	.route-link {
-		flex: 1;
-	display: flex;
+	.route-link { flex: 1;
+		display: flex;
 		align-items: center;
 	gap: 0.5rem;
 		padding: 0.5rem;
@@ -296,26 +289,21 @@
 		text-transform: uppercase;
 	}
 
-	.type-page {
-		background: #3b82f6;
-	color: white;
+	.type-page { background: #3b82f6;
+		color: white;
 	}
-	.type-layout {
-		background: #8b5cf6;
-	color: white;
+	.type-layout { background: #8b5cf6;
+		color: white;
 	}
-	.type-server {
-		background: #10b981;
-	color: white;
+	.type-server { background: #10b981;
+		color: white;
 	}
-	.type-error {
-		background: #ef4444;
-	color: white;
+	.type-error { background: #ef4444;
+		color: white;
 	}
 
-	.route-badges {
-		display: flex;
-	gap: 0.25rem;
+	.route-badges { display: flex;
+		gap: 0.25rem;
 	}
 
 	.badge {

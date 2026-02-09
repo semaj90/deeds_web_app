@@ -90,7 +90,7 @@
       case 'pending': return 'text-yellow-400';
       case 'closed':
       case 'completed': return 'text-slate-400';
-      default: return 'text-slate-400';
+      default:return 'text-slate-400';
     }
   }
 
@@ -100,7 +100,7 @@
       case 'critical': return 'border-red-400';
       case 'medium': return 'border-yellow-400';
       case 'low': return 'border-green-400';
-      default: return 'border-slate-400';
+      default:return 'border-slate-400';
     }
   }
 </script>

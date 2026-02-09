@@ -2,7 +2,6 @@
  import type { ProcessingStage } from '$lib/services/types';
  import { retryProcessing } from '$lib/services/uploadEvidenceService';
  import { uploadActions, uploadStore } from '$lib/stores/uploadStore';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  onRetry?: () => void;
@@ -44,8 +43,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  return '✅';
  case 'failed':
  return '❌';
- default:
- return '⏳';
+ default:return '⏳';
  }
  };
 

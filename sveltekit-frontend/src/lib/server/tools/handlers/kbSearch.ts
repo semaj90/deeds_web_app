@@ -38,7 +38,7 @@ async function searchQdrant(
     filters?: Record<string, unknown>;
   }
 ): Promise<Array<{
-	id: string; score: number;
+	id: string, score: number;
 	payload: Record<string, unknown> }>> {
   const body: Record<string, unknown> = {
     vector: embedding,
@@ -68,7 +68,7 @@ async function searchQdrant(
   }
 
   const data = await response.json() as { result: Array<{
-	id: string; score: number;
+	id: string, score: number;
 	payload: Record<string, unknown> }> };
   return data.result;
 }
@@ -96,7 +96,7 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
 
   // Search all collections
   const allResults: Array<{
-	id: string; score: number;
+	id: string, score: number;
 	content: string; metadata?: Record<string, unknown> }> = [];
 
   for (const collection of request.collections) {

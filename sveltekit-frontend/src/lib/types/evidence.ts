@@ -189,12 +189,12 @@ export type SearchResponse = APIResponse<{
 // ==================== WebSocket Message Types ====================
 export type EvidenceWebSocketMessage =
  | { type: 'PROCESSING_UPDATE';
-	fileId: string; stage: string;
+	fileId: string, stage: string;
 	progress: number }
  | { type: 'ANALYSIS_COMPLETE';
-	fileId: string; result: EvidenceAnalysisResult }
+	fileId: string, result: EvidenceAnalysisResult }
  | { type: 'ERROR';
-	fileId: string; error: string }
+	fileId: string, error: string }
  | { type: 'CHAT_MESSAGE';
 	message: ChatMessage }
  | { type: 'VECTOR_SEARCH_RESULT';
@@ -227,12 +227,12 @@ export type EvidenceSnapshot =
 	| (BaseSnapshotProperties & {
 			status: 'done';
 	output: unknown;
-			error?: undefined;
+			error? : undefined;
 	  })
 	| (BaseSnapshotProperties & {
 			status: 'error';
 	error: unknown;
-			output?: undefined;
+			output? : undefined;
 	  });
 
 export type EvidenceActor = ActorRef<EvidenceSnapshot, WorkflowEvent>; // Swapped generics: snapshot first, event second

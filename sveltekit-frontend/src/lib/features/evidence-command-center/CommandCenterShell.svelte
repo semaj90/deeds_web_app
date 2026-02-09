@@ -10,7 +10,7 @@
 	const { children, caseId, caseTitle = null }: Props = $props();
 
 	const views: {
-	id: CommandCenterView; label: string;
+	id: CommandCenterView, label: string;
 	icon: string }[] = [
 		{ id: 'board', icon: '📁', label: 'Evidence' },
 	{ id: 'graph', icon: '📊', label: 'Graph' },
@@ -53,7 +53,7 @@
 		</div>
 	</header>
 
-	<div class="flex-1 grid grid-cols-[220px,1fr] gap-2">
+	<div class="flex-1 grid grid-cols-[220px 1fr] gap-2">
 		<!-- Left sidebar, views + status -->
 		<aside
 			class="border-[3px] border-[#f5f5f5] bg-[#15151f] p-2 flex flex-col gap-2 text-[11px] shadow-[4px_4px_0_0_#000]"

@@ -31,7 +31,7 @@ export interface MatrixUINode {
     };
     content?: string;
     bounds?: {
-	x: number; y: number;
+	x: number, y: number;
 	width: number; height: number };
 }
 
@@ -64,7 +64,7 @@ export interface EventMapping {
 	handler: string;
         matrix: number[];
 	bounds: { x: number;
-	y: number; width: number;
+	y: number, width: number;
 	height: number };
     }[];
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
-  import Button from '$lib/components/ui/button/Button.svelte';
+  import Button from '$lib/components/ui/Button.svelte';
   import Input from '$lib/components/ui/input/Input.svelte';
   import Label from '$lib/components/ui/label/Label.svelte';
   import Textarea from '$lib/components/ui/textarea/Textarea.svelte';
@@ -8,11 +8,8 @@
   import Save from 'lucide-svelte/icons/save';
   import X from 'lucide-svelte/icons/x';
   import POIPhotoGrid from './POIPhotoGrid.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-  interface POI {
-    name: string;
-	alias: string;
+  interface POI { name: string, alias: string;
     threatLevel: string;
 	photos: any[];
     notes: string;
@@ -74,8 +71,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         return 'bg-yellow-500 text-black';
       case 'low':
         return 'bg-green-500 text-white';
-      default:
-        return 'bg-gray-500 text-white';
+      default:return 'bg-gray-500 text-white';
     }
   }
 </script>
@@ -92,7 +88,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     <!-- Basic Information -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="space-y-2">
-        <Label for="name">Full Name *</Label>
+        <Label htmlFor="name">Full Name *</Label>
         <Input
           id="name"
           value={formData.name}
@@ -103,7 +99,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       </div>
 
       <div class="space-y-2">
-        <Label for="alias">Alias</Label>
+        <Label htmlFor="alias">Alias</Label>
         <Input
           id="alias"
           value={formData.alias}
@@ -115,7 +111,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     <!-- Threat Level -->
     <div class="space-y-2">
-      <Label for="threatLevel">Threat Level</Label>
+      <Label htmlFor="threatLevel">Threat Level</Label>
       <div class="flex items-center gap-2 mb-2">
         <span class="{getThreatColor(formData.threatLevel)} px-2 py-1 rounded text-xs font-semibold">
           {formData.threatLevel.toUpperCase()}
@@ -132,7 +128,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
       </div>
       <select
         bind:value={formData.threatLevel}
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus:ring-2 focus:ring-blue-500"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <option value="low">Low Risk</option>
         <option value="medium">Medium Risk</option>
@@ -143,7 +139,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     <!-- Notes -->
     <div class="space-y-2">
-      <Label for="notes">Notes</Label>
+      <Label htmlFor="notes">Notes</Label>
       <Textarea
         id="notes"
         value={formData.notes}

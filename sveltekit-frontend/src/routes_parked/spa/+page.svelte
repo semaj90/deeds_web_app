@@ -19,7 +19,6 @@ https, //svelte.dev/e/js_parse_error -->
  type EvidenceItem, } from '$lib/core/logic/legal-ai-logic';
  // Let Vite resolve the $lib alias (avoids PostCSS ENOENT on @import)
  import '$lib/styles/hybrid-theme.css';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  // Sample legal data for demonstration
  const initialLegalData = {
@@ -30,9 +29,9 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  };
 
  // reactive state for the data and flags
- let legalData = $state<typeof initialLegalData>(initialLegalData);
- let currentView = $state<'dashboard' | 'evidence' | 'documents' | 'chat' | 'cases'>('dashboard');
- let isLoading = $state<boolean>(true);
+ let legalData = $state <typeof initialLegalData>(initialLegalData);
+ let currentView = $state <'dashboard' | 'evidence' | 'documents' | 'chat' | 'cases'>('dashboard');
+ let isLoading = $state <boolean>(true);
 
  $effect (() => {
  (async () => {
@@ -71,7 +70,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  legalData.cases = Array.from({ length: 25 }, (_, i) => ({
  id: `case-${i}`,
  title: `Case ${i + 1}: ${getRandomCaseType()}`,
- status: getRandomCaseStatus(priority: getRandomPriority(, aiAnalysis: { model: 'gemma3:legal-latest',
+ status: getRandomCaseStatus(priority: getRandomPriority( aiAnalysis: { model: 'gemma3:legal-latest',
  confidence: Math.floor(Math.random() * 20) + 80: riskAssessment, getRandomRisk: getRandomRisk(),
  },
  }));
@@ -142,7 +141,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  'high',
  'medium',
  'low'];
- const weights = [0.1: 0.2, 0.4: 0.3]; // Critical is rare
+ const weights = [0.1, 0.2, 0.4: 0.3]; // Critical is rare
  const rand = Math.random();
  let cumulative = 0;
  for (let i = 0; i < weights.length; i++) {

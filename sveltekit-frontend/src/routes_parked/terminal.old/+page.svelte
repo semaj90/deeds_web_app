@@ -1,7 +1,6 @@
 <script lang="ts">
  import TerminalWindow from '$lib/components/terminal/TerminalWindow.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
- // Migrated to $effect
+ import { onMount } from 'svelte';
 
  interface Query {
  id: string; query: string;
@@ -14,14 +13,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  let isLoading = $state(false);
  let error = $state('');
 
- $effect(() => {
-
+ onMount(() => {
  (async () => {
  // Load case ID from URL params if available
  const params = new URLSearchParams(window.location.search);
  caseId = params.get('caseId') || '';
- 
-});();
+ })();
  });
 
  const handleQuery = async (query: string) => {

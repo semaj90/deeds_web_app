@@ -14,7 +14,7 @@ interface FixRequest {
 
 interface AgentProgress {
 	status: 'analyzing' | 'fixing' | 'testing' | 'complete' | 'failed';
-	file_path: string; progress: number;
+	file_path: string, progress: number;
 	message: string;
 	fixes?: string[];
 }

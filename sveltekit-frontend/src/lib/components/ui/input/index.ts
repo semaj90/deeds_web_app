@@ -1,5 +1,5 @@
-// Re-export the actual Input implementation used in this UI package
+// Input Component - Svelte 5
 export { default as Input } from './Input.svelte';
-export { default } from './InputBits.svelte';
+export { default } from './Input.svelte';
 
 

@@ -1,11 +1,8 @@
 <script lang="ts">
  import Button from '$lib/components/ui/button';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
- type EvidenceNodeType = {
- id: string;
-	x: number;
+ type EvidenceNodeType = { id: string, x: number;
  y: number;
 	evidenceType: string;
  title: string;
@@ -27,13 +24,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  isSelected?: boolean;
  isPendingLinkSource?: boolean;
  linkMode?: boolean;
-	onSelect: (data: {
-	nodeId: string; multiSelect: boolean }) => void;
- onMove: (data: {
-	nodeId: string; x: number;
-	y: number }) => void;
+	onSelect: (data: { nodeId: string, multiSelect: boolean }) => void;
+ onMove: (data: { nodeId: string, x: number,
+y: number }) => void;
  onLink?: (data: {
-	nodeId: string }) => void;
+nodeId: string }) => void;
  } = $props();
 
  let isDragging = $state(false);
@@ -212,9 +207,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  animation: pulse 2s infinite;
  }
 
- .evidence-node.dragging {
- opacity: 0.8;
-	transform: rotate(2deg);
+ .evidence-node.dragging { opacity: 0.8;
+		transform: rotate(2deg);
  z-index: 100;
  }
 

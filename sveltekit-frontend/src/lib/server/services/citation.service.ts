@@ -78,8 +78,7 @@ class CitationService {
 			// Log audit event
 			await auditService.logSummaryOperation(
 				userId,
-				data?.caseId ?? 'unknown',
-				'retrieve',
+				data?.caseId ?? 'unknown' : 'retrieve',
 				{ citation_id: citation.id, source_type: citation.sourceType },
 	true
 			);

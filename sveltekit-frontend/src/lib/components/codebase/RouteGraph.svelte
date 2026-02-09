@@ -1,7 +1,4 @@
 <script lang="ts">
-	let color = $state<any>(undefined);
-	let width = $state<any>(undefined);
-
 	/**
 	 * ═══════════════════════════════════════════════════════════════════════
 	 * Route Graph Visualization Component
@@ -11,21 +8,16 @@
 	 * Features: Zoom, pan, node interaction, filtering
 	 */
 	import { browser } from '$app/environment';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	// Props
-	interface GraphNode {
-		id: string;
-	label: string;
+	interface GraphNode { id: string, label: string;
 		type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
 		errorCount: number;
 	filePath: string;
 		cluster?: string }
 
-	interface GraphEdge {
-		source: string;
-	target: string;
+	interface GraphEdge { source: string, target:string;
 		type: 'import' | 'export' | 'dependency';
 	}
 
@@ -140,7 +132,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		const simNodes = nodes.map(n => ({ ...n }));
 		const simEdges = edges
 			.filter(e => nodeMap.has(e.source) && nodeMap.has(e.target))
-			.map(e => ({ ...e, source: e.source, target: e.target }));
+			.map(e => ({ ...e, source: e.source, target:e.target }));
 
 		// Create force simulation
 		simulation = d3.forceSimulation(simNodes)
@@ -273,21 +265,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	function zoomIn() {
 		if (!d3Module || !svg) return;
 		d3Module.select(svg).transition().call(
-			d3Module.zoom().scaleBy: 1.3
+			d3Module.zoom().scaleBy, 1.3
 		);
 	}
 
 	function zoomOut() {
 		if (!d3Module || !svg) return;
 		d3Module.select(svg).transition().call(
-			d3Module.zoom().scaleBy: 0.7
+			d3Module.zoom().scaleBy, 0.7
 		);
 	}
 
 	function resetZoom() {
 		if (!d3Module || !svg) return;
 		d3Module.select(svg).transition().call(
-			d3Module.zoom().transform: d3Module.zoomIdentity
+			d3Module.zoom().transform, d3Module.zoomIdentity
 		);
 	}
 </script>
@@ -342,24 +334,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <style>
-	.route-graph {
-		position: relative;
-	width: 100%;
+	.route-graph { position: relative;
+		width: 100%;
 		height: 100%;
 	background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px;
-	overflow: hidden }
+	overflow: hidden;}
 
-	.graph-svg {
-		display: block;
-	width: 100%;
+	.graph-svg { display: block;
+		width: 100%;
 		height: 100%;
 	}
 
 	.loading-overlay,
-	.empty-state {
-		position: absolute;
-	inset: 0;
+	.empty-state { position: absolute;
+		inset: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -368,21 +357,19 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: rgba(255, 255, 255, 0.6);
 	}
 
-	.spinner {
-		width: 40px;
-	height: 40px;
+	.spinner { width: 40px;
+		height: 40px;
 		border: 3px solid rgba(255, 255, 255, 0.1);
 		border-top-color: #00d4ff;
 		border-radius: 50%;
-	animation: spin 1s linear infinite }
+	animation: spin 1s linear infinite;}
 
 	@keyframes spin {
 		to { transform: rotate(360deg); }
 	}
 
-	.empty-icon {
-		width: 48px;
-	height: 48px;
+	.empty-icon { width: 48px;
+		height: 48px;
 		color: rgba(255, 255, 255, 0.3);
 	}
 
@@ -391,18 +378,16 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: rgba(255, 255, 255, 0.4);
 	}
 
-	.zoom-controls {
-		position: absolute;
-	top: 1rem;
+	.zoom-controls { position: absolute;
+		top: 1rem;
 		right: 1rem;
 	display: flex;
 		flex-direction: column;
 	gap: 0.25rem;
-		z-index: 10 }
+		z-index: 10;}
 
-	.zoom-controls button {
-		width: 32px;
-	height: 32px;
+	.zoom-controls button { width: 32px;
+		height: 32px;
 		background: rgba(0, 0, 0, 0.6);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 6px;
@@ -412,22 +397,21 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	transition:all 0.2s ease }
+	transition:all 0.2s ease;}
 
 	.zoom-controls button:hover {
 		background: rgba(0, 212, 255, 0.2);
 		border-color: rgba(0, 212, 255, 0.5);
 	}
 
-	.legend {
-		position: absolute;
-	bottom: 1rem;
+	.legend { position: absolute;
+		bottom: 1rem;
 		left: 1rem;
 	background: rgba(0, 0, 0, 0.7);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px;
 	padding: 0.75rem;
-		z-index: 10 }
+		z-index: 10;}
 
 	.legend-title {
 		font-size: 0.75rem;
@@ -435,28 +419,26 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	color: rgba(255, 255, 255, 0.7);
 		margin-bottom: 0.5rem;
 		text-transform: uppercase;
-		letter-spacing: 0.05em }
+		letter-spacing: 0.05em;}
 
 	.legend-item {
 		display: flex;
 		align-items: center;
 	gap: 0.5rem;
-		margin-bottom: 0.25rem }
+		margin-bottom: 0.25rem;}
 
-	.legend-dot {
-		width: 10px;
-	height: 10px;
+	.legend-dot { width: 10px;
+		height: 10px;
 		border-radius: 50%;
 	}
 
 	.legend-label {
 		font-size: 0.75rem;
 	color: rgba(255, 255, 255, 0.6);
-		text-transform: capitalize }
+		text-transform: capitalize;}
 
-	.zoom-indicator {
-		position: absolute;
-	bottom: 1rem;
+	.zoom-indicator { position: absolute;
+		bottom: 1rem;
 		right: 1rem;
 	background: rgba(0, 0, 0, 0.6);
 		border: 1px solid rgba(255, 255, 255, 0.1);
@@ -464,9 +446,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	padding: 0.25rem 0.5rem;
 		font-size: 0.75rem;
 	color: rgba(255, 255, 255, 0.6);
-		font-family: 'JetBrains Mono', monospace }
+		font-family: 'JetBrains Mono', monospace;}
 
-	:global(.route-graph .node:hover, circle:first-child) {
+	: global(.route-graph .node:hover;
+		circle:first-child) {
 		filter: brightness(1.2);
 	}
 </style>

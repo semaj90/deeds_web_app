@@ -13,7 +13,6 @@
 	import Trash2 from 'lucide-svelte/icons/trash-2';
 	import Mic from 'lucide-svelte/icons/mic';
 	import MicOff from 'lucide-svelte/icons/mic-off';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
@@ -175,7 +174,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				{#if enableVoiceInput}
 					<button type="button"
 						class="nes-btn is-small"
-						onclick={ toggleVoiceInput } title={isListening ? 'Stop Voice Input', 'Start Voice Input'} aria-label={isListening ? 'Stop Voice Input', 'Start Voice Input'} >
+						onclick={ toggleVoiceInput } title={isListening ? 'Stop Voice Input' : 'Start Voice Input'} aria-label={isListening ? 'Stop Voice Input' : 'Start Voice Input'} >
 						{#if isListening}
 							<MicOff class="w-4" />
 						{:else}
@@ -205,7 +204,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				<div class={message.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
 					<div class={message.role === 'user'
 							? 'max-w-[80%] p-3 rounded-lg nes-container is-primary'
-							, message.error
+							message.error
 								? 'max-w-[80%] p-3 rounded-lg nes-container is-error'
  'max-w-[80%] p-3 rounded-lg nes-container'}>
 						<div class="message-content">{message.content}</div>
@@ -376,8 +375,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		background-color: #dbeafe !important;
 		/* Light blue for user messages */
 		margin-left: 20%;
-		text-align: right
-	}
+		text-align: right;}
 
 	.message.assistant .nes-container {
 		background-color: #f3f4f6 !important;
@@ -392,8 +390,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	.message-content {
 		white-space: pre-wrap;
-		line-height: 1.5
-	}
+		line-height: 1.5;}
 
 	.references {
 		/* margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; */
@@ -441,47 +438,38 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	:global(.nes-btn.is-primary) {
 		background-color: #d4af37 !important;
-		color: #1a1d20 !important
-	}
+		color: #1a1d20 !important;}
 
 	:global(.nes-btn.is-primary:hover) {
-		background-color: #e0c26e !important
-	}
+		background-color: #e0c26e !important;}
 
 	:global(.nes-btn.is-small) {
 		padding: 0.5rem 0.75rem;
-		font-size: 0.75rem
-	}
+		font-size: 0.75rem;}
 
 	:global(.nes-input) {
 		background-color: #2a2d30;
 	color: #eee;
-	border: 2px solid #d4af37
-	}
+	border: 2px solid #d4af37;}
 
 	:global(.nes-input:focus) {
 		outline: none;
-		box-shadow: 0 0 0 2px #d4af37
-	}
+		box-shadow: 0 0 0 2px #d4af37;}
 
 	.nes-field.is-inline {
 		display: flex;
-		align-items: center
-	}
+		align-items: center;}
 
 	:global(.nes-field.is-inline .nes-input) {
-		flex-grow: 1
-	}
+		flex-grow: 1;}
 
 	:global(.nes-select) select {
 		background-color: #2a2d30;
 	color: #eee;
-	border: 2px solid #d4af37
-	}
+	border: 2px solid #d4af37;}
 
 	:global(.nes-select: after) {
-		border-color: #d4af37
-	}
+		border-color: #d4af37;}
 
 	:global(.nes-range) {
 		-webkit-appearance: none;
@@ -492,23 +480,22 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	opacity: 0.7;
 		-webkit-transition:0.2s;
 	transition:opacity 0.2s;
-		border-radius: 4px
-	}
+		border-radius: 4px;}
 
 	:global(.nes-range::-webkit-slider-thumb) {
 		-webkit-appearance: none;
 	appearance: none;
 	width: 16px;
 	height: 16px;
-	background: #d4af37, cursor: pointer, border-radius: 50%, border: 2px solid #1a1d20
-	}
+	background: #d4af37;
+		cursor: pointer; border-radius: 50%;
+		border: 2px solid #1a1d20;}
 
-	:global(.nes-range::-moz-range-thumb) {
-		width: 16px;
-	height: 16px;
-	background: #d4af37, cursor: pointer, border-radius: 50%;
-	border: 2px solid #1a1d20
-	}
+	:global(.nes-range::-moz-range-thumb) { width: 16px;
+		height: 16px;
+	background: #d4af37;
+		cursor: pointer; border-radius: 50%;
+	border: 2px solid #1a1d20;}
 
 	:global(.nes-checkbox input[type="checkbox"]) {
 		/* NES.css handles checkbox styling */

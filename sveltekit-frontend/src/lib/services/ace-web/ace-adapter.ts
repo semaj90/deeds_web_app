@@ -15,12 +15,11 @@
 import { AceContextService } from './ace-context-service.js';
 import { WebSearchService } from './web-search-service.js';
 import type { ContextBundle, ToolPlan } from './ace-context-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AceRequest {
   userRequest: string;
   errorContext?: {
-	message: string; filePath: string;
+	message: string, filePath: string;
 	lineNumber: number;
     code?: string;
   };
@@ -33,12 +32,12 @@ export interface AceResponse {
   response: string;
 	context: ContextBundle;
   toolCalls: Array<{
-	tool: string; params: Record<string, unknown>;
+	tool: string, params: Record<string, unknown>;
     reason: string;
   }>;
   metadata: {
-	sessionId: string; timestamp: string;
-	contextQuality: 'sufficient' | 'stale' | 'insufficient'; webSearchTriggered: boolean;
+	sessionId: string, timestamp: string;
+	contextQuality: 'sufficient' | 'stale' | 'insufficient', webSearchTriggered: boolean;
 	llmProvider: string;
   };
 }

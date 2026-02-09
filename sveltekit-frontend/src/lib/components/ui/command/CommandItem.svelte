@@ -26,7 +26,7 @@
 			textContent = element.textContent || '';
 			commandContext?.registerItem(value, textContent);
 		}
-	
+
 });
 
 	// TODO: Add as cleanup in $effect: return () => {
@@ -53,7 +53,7 @@
 	const defaultClass = `
 		relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none
 		aria-selected:bg-accent aria-selected:text-accent-foreground
-		data-[disabled]:pointer-events-none data-[disabled]: opacity-50, hover: bg-accent, hover:text-accent-foreground
+		data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-accent hover:text-accent-foreground
 	`.replace(/\s+/g, ' ').trim();
 </script>
 
@@ -63,10 +63,10 @@
 		role="option"
 		aria-selected={isSelected}
 		data-disabled={disabled || undefined}
-		tabindex={disabled ? -1 , 0}
+	tabindex={disabled ? -1 : 0}
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
-		class="{defaultClass} { className }"
+		class="{defaultClass} {className}"
 	>
 		{#if children}
 			{@render children()}

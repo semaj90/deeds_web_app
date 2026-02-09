@@ -7,9 +7,7 @@
 
 	let { apiBase }: Props = $props();
 
-	interface Cluster {
-		cluster_id: string;
-		cluster_label: string;
+	interface Cluster { cluster_id: string, cluster_label: string;
 		affected_files: string[];
 		severity: string;
 		first_seen: string;
@@ -61,7 +59,7 @@
 			case 'error': return '#dc2626';
 			case 'warning': return '#f59e0b';
 			case 'info': return '#3b82f6';
-			default: return '#6b7280';
+			default:return '#6b7280';
 		}
 	}
 
@@ -70,7 +68,7 @@
 			case 'error': return '❌';
 			case 'warning': return '⚠️';
 			case 'info': return 'ℹ️';
-			default: return '•';
+			default:return '•';
 		}
 	}
 
@@ -241,14 +239,12 @@
 		margin-bottom: 1.5rem;
 	}
 
-	.controls h3 {
-		margin: 0;
+	.controls h3 { margin: 0;
 		color: #1f2937;
 		font-size: 1.25rem;
 	}
 
-	.control-group {
-		display: flex;
+	.control-group { display: flex;
 		gap: 0.5rem;
 	}
 
@@ -271,8 +267,7 @@
 		font-size: 0.875rem;
 	}
 
-	.empty-state code {
-		background: #f3f4f6;
+	.empty-state code { background: #f3f4f6;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-family: monospace;
@@ -290,8 +285,7 @@
 		max-height: 600px;
 	}
 
-	.cluster-card {
-		background: white;
+	.cluster-card { background: white;
 		border: 2px solid #e5e7eb;
 		border-radius: 8px;
 		padding: 1rem;
@@ -372,8 +366,7 @@
 		background: white;
 	}
 
-	.detail-header {
-		background: #f9fafb;
+	.detail-header { background: #f9fafb;
 		padding: 1.5rem;
 		border-bottom: 2px solid #e5e7eb;
 		display: flex;
@@ -381,8 +374,7 @@
 		align-items: center;
 	}
 
-	.detail-header h3 {
-		margin: 0;
+	.detail-header h3 { margin: 0;
 		color: #1f2937;
 		font-size: 1.25rem;
 		flex: 1;
@@ -500,8 +492,7 @@
 		margin-bottom: 1rem;
 	}
 
-	.stats {
-		display: flex;
+	.stats { display: flex;
 		gap: 2rem;
 		margin-top: 2rem;
 	}

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { LazyComponentState } from '$lib/utils/intersection-observer.js';
 	import type { Snippet } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
 		preset?: string;
@@ -115,9 +114,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		color: #666;
 	}
 
-	.spinner {
-		width: 20px;
-	height: 20px;
+	.spinner { width: 20px;
+		height: 20px;
 		border: 2px solid #ddd;
 		border-top-color: #666;
 		border-radius: 50%;

@@ -17,7 +17,7 @@ export class EvidenceFastAPIBridge {
     static async processEvidence(
         evidenceId: string,
         fileData?: {
-	buffer: Buffer; filename: string;
+	buffer: Buffer, filename: string;
 	mimeType: string }
     ) {
         try {
@@ -72,7 +72,7 @@ export class EvidenceFastAPIBridge {
     private static async uploadToFastAPI(
         evidenceId: string,
         fileData: {
-	buffer: Buffer; filename: string;
+	buffer: Buffer, filename: string;
 	mimeType: string }
     ) {
         const formData = new FormData();

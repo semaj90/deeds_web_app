@@ -2,7 +2,7 @@
   // Migrated to $effect
   import { browser } from '$app/environment';
   import { Badge } from "$lib/components/ui/badge";
-  import { Button } from "$lib/components/ui/button";
+  import Button from '$lib/components/ui/Button.svelte';
   import * as THREE from 'three';
 
   // Mock types for Three.js interactions

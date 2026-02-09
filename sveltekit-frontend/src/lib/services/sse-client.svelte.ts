@@ -11,7 +11,6 @@ import { constructor } from 'function Object() { [native code] }';
 import { connect } from "http2";
 import type { url } from "inspector";
 import { config, off, disconnect } from "process";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface SSEMessage {
   type: string;

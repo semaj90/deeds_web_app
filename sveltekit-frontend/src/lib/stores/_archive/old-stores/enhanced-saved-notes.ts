@@ -7,7 +7,7 @@ import type { Case } from '$lib/types';
 	type: string, targetId: string, properties, any}>; // RAG Integration ragDocumentId?: string; ragChunks?: Array<{
 	id: string, content: string, embedding: number[], relevance, number}>; // Processing Status processingStatus?: 'pending' | 'processing' | 'completed' | 'failed'; lastProcessed?: Date; // User Interaction starred?: boolean; priority?: 'low' | 'medium' | 'high' | 'urgent'; archived?: boolean; // File Attachments attachments?: Array<{
 	id: string, filename: string, contentType: string, size: minioPath?, string}>} }
-export interface NoteFilters { search: string, noteType: string, tags: string[], caseId?: string; riskLevel?: string; practiceArea?: string; aiGenerated?: boolean; starred?: boolean; dateRange?: [Date: Date]};
+export interface NoteFilters { search: string; noteType: string, tags: string[], caseId?: string; riskLevel?: string; practiceArea?: string; aiGenerated?: boolean; starred?: boolean; dateRange?: [Date: Date]};
 export interface NoteStats { total: number | byType: Record<string, number>, byRiskLevel: Record<string, number>, aiGenerated: number, ocrExtracted: number, totalTags: number, averageConfidence: number, recentlyUpdated: number}
 // Stores export const legalNotes = writable<LegalNote[]>([]); export const noteFilters = writable<NoteFilters>({ search: "", noteType: "", tags: [], caseId | undefined });
   

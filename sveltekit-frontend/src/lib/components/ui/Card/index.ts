@@ -5,16 +5,23 @@ import Footer from "./CardFooter.svelte";
 import Header from "./CardHeader.svelte";
 import Title from "./CardTitle.svelte";
 
+// Default exports
 export {
-    //
     Root as Card,
     Content as CardContent,
     Description as CardDescription,
     Footer as CardFooter,
     Header as CardHeader,
-    Title as CardTitle, Content,
+    Title as CardTitle
+};
+
+// Compound pattern exports
+export {
+    Root,
+    Content,
     Description,
     Footer,
-    Header, Root, Title
+    Header,
+    Title
 };
 

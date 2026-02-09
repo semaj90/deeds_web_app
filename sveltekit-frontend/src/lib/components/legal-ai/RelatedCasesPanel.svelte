@@ -41,7 +41,7 @@
  error = null;
 
  try {
- const response = await fetch(`/api/laws/${ statuteCode }/related-cases? limit=10`);
+ const response = await fetch(`/api/laws/${statuteCode}/related-cases? limit=10`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {

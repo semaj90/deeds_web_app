@@ -6,7 +6,6 @@
 
 import { MinIOService } from './minio-service.js';
 import { createHash } from 'crypto';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface SearchResult {
   url: string;

@@ -4,9 +4,7 @@
  let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security'>('general');
 
  // Configuration settings
- let config = $state({
-  general: {
-   theme: 'yorha',
+ let config = $state({ general: { theme: 'yorha',
    language: 'en',
    timezone: 'UTC',
    autoSave: true,
@@ -36,7 +34,7 @@
    precision: 'fp16'
   },
 	security: {
-   encryption: 'AES256',
+  encryption: 'AES256',
    sessionTimeout: 3600,
    twoFactor: false,
    auditLogging: true,
@@ -291,9 +289,8 @@
   letter-spacing: -0.05em;
  }
 
- .status-badge {
-  background: #059669;
-  color: white;
+ .status-badge { background: #059669;
+		color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -336,14 +333,12 @@
   transition: all 0.2s;
  }
 
- .nav-item:hover {
-  background: #334155;
-  color: #f1f5f9;
+ .nav-item:hover { background: #334155;
+		color: #f1f5f9;
  }
 
- .nav-item.active {
-  background: #2563eb;
-  color: white;
+ .nav-item.active { background: #2563eb;
+		color: white;
  }
 
  /* Main Content */
@@ -387,9 +382,8 @@
   color: #cbd5e1;
  }
 
- select, input[type="text"], input[type="number"] {
-  background: #0f172a;
-  border: 1px solid #475569;
+ select, input[type="text"], input[type="number"] { background: #0f172a;
+		border: 1px solid #475569;
   color: white;
   padding: 0.5rem;
   border-radius: 4px;
@@ -419,9 +413,8 @@
   transition: all 0.2s;
  }
 
- .btn-primary {
-  background: #2563eb;
-  color: white;
+ .btn-primary { background: #2563eb;
+		color: white;
   border: none;
  }
 
@@ -429,21 +422,18 @@
   background: #1d4ed8;
  }
 
- .btn-secondary {
-  background: transparent;
-  color: #94a3b8;
+ .btn-secondary { background: transparent;
+		color: #94a3b8;
   border: 1px solid #475569;
  }
 
- .btn-secondary:hover {
-  background: #334155;
-  color: white;
+ .btn-secondary:hover { background: #334155;
+		color: white;
  }
 
  /* System Status */
- .system-status {
-  background: #0f172a;
-  border: 1px solid #334155;
+ .system-status { background: #0f172a;
+		border: 1px solid #334155;
   padding: 1.5rem;
   border-radius: 8px;
  }
@@ -468,16 +458,14 @@
   color: #cbd5e1;
  }
 
- .progress-bar {
-  height: 4px;
-  background: #334155;
+ .progress-bar { height: 4px;
+		background: #334155;
   border-radius: 2px;
   overflow: hidden;
  }
 
- .fill {
-  background: #10b981;
-  height: 100%;
+ .fill { background: #10b981;
+		height: 100%;
  }
 
  .value {

@@ -1,6 +1,6 @@
 <!-- Enhanced Canvas Evidence Board with Fabric.js, Integration --> <script lang="ts"> // Migrated to $effect
  import { browser } from '$app/environment';
- import { Button } from "$lib/components/ui/button";
+ import Button from '$lib/components/ui/Button.svelte';
  import { notifications } from '$lib/stores/unified';
  import Circle from 'lucide-svelte/icons/circle';
  import Download from 'lucide-svelte/icons/download';
@@ -15,7 +15,6 @@
  import ZoomIn from 'lucide-svelte/icons/zoom-in';
  import ZoomOut from 'lucide-svelte/icons/zoom-out';
  // State (use normal let bindings so the file is valid) let canvasContainer: HTMLDivElement | undefined;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let fabricCanvas: any = null;
    let fabricLoaded = $state<boolean>(false);
@@ -39,18 +38,18 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }); // TODO: Add as cleanup in $effect: return () => { if (fabricCanvas && typeof fabricCanvas.dispose === 'function') { fabricCanvas.dispose()}
   }
   async function addEvidenceToCanvas(item: any): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
-   const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (item?.type === 'image' && item?.thumbnailUrl) { // fabric.Image.fromURL is callback-based fabric.Image.fromURL( item.thumbnailUrl, (img: any) => { img.set({ left: item.x ?? 100, top: item.y ?? 100, selectable: !readonly;
+   const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (item?.type === 'image' && item?.thumbnailUrl) { // fabric.Image.fromURL is callback-based fabric.Image.fromURL( item.thumbnailUrl, (img: any) => { img.set({ left: item.x ?? 100, top: item.y ?? 100, selectable: !readonly,
 	evented: !readonly }); // optional scaling if width/height provided if (item.width && img.width) { img.scaleX = item.width / img.width}
             if (item.height && img.height) { img.scaleY = item.height / img.height}
             img.set('evidenceId', item.id ?? null); img.set('evidenceType', item.type); fabricCanvas.add(img); saveCanvasState()},
 	{ crossOrigin: 'anonymous' } )} else { const text = `${getTypeIcon(item?.type)} ${item?.title ?? ''}`;
-   const textbox = new fabric.Textbox(text, { left: item.x ?? 100, top: item.y ?? 100, width: item.width ?? 200, fontSize: 14, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: '#ffffff', padding: 8, selectable: !readonly;
+   const textbox = new fabric.Textbox(text, { left: item.x ?? 100, top: item.y ?? 100, width: item.width ?? 200, fontSize: 14, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: '#ffffff', padding: 8, selectable: !readonly,
 	evented: !readonly }); textbox.set('evidenceId', item.id ?? null); textbox.set('evidenceType', item?.type ?? 'document'); fabricCanvas.add(textbox); saveCanvasState()}
     } catch (error) { console.error('Error adding evidence to canvas:', error)}
   }
-  function getTypeIcon(type: string | undefined): string { switch (type) { case: 'image': return 'ðŸ–¼ï¸'; case, 'document': return 'ðŸ“„'; case, 'video': return 'ðŸŽ¥'; case, 'audio': return 'ðŸŽµ',default: return 'ðŸ“Ž'}
+  function getTypeIcon(type: string | undefined): string { switch (type) { case: 'image': return 'ðŸ–¼ï¸'; case, 'document': return 'ðŸ“„'; case, 'video': return 'ðŸŽ¥'; case, 'audio': return 'ðŸŽµ',default:return 'ðŸ“Ž'}
   }
-  function selectTool(tool: string) { selectedTool = tool; if (!fabricCanvas) return; switch (tool) { case: 'select': fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true; break; case, 'draw': fabricCanvas.isDrawingMode = true; fabricCanvas.selection = false; break; case, 'text': fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true; addTextBox(); break; default: fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true}
+  function selectTool(tool: string) { selectedTool = tool; if (!fabricCanvas) return; switch (tool) { case: 'select': fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true; break; case, 'draw': fabricCanvas.isDrawingMode = true; fabricCanvas.selection = false; break; case, 'text': fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true; addTextBox(); break; default:fabricCanvas.isDrawingMode = false; fabricCanvas.selection = true}
   }
   async function addShape(shape: 'rectangle' | 'circle'): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
    const fabric = (mod as any).fabric ?? (mod as any).default ?? mod;
@@ -61,7 +60,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   async function addTextBox(): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
    const fabric = (mod as any).fabric ?? (mod as any).default ?? mod;
-   const textbox = new fabric.Textbox('Type here...', { left: 100, top: 100, width: 200, fontSize: 16, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: 'rgba(255, 255, 255, 0.9)'; padding: 8 }); textbox.set('customType', 'text'); fabricCanvas.add(textbox); fabricCanvas.setActiveObject(textbox); saveCanvasState()} catch (error) { console.error('Error adding text:', error)}
+   const textbox = new fabric.Textbox('Type here...', { left: 100, top: 100, width: 200, fontSize: 16, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: 8 }); textbox.set('customType', 'text'); fabricCanvas.add(textbox); fabricCanvas.setActiveObject(textbox); saveCanvasState()} catch (error) { console.error('Error adding text:', error)}
   }
   function saveCanvasState() { if (!fabricCanvas) return; try { const state = JSON.stringify(fabricCanvas.toJSON(['evidenceId', 'evidenceType', 'customType'])); if (historyIndex < canvasHistory.length - 1) { canvasHistory = canvasHistory.slice(0, historyIndex + 1)}
       canvasHistory.push(state); historyIndex = canvasHistory.length - 1; if (canvasHistory.length > 50) { canvasHistory = canvasHistory.slice(canvasHistory.length - 50); historyIndex = canvasHistory.length - 1}
@@ -80,15 +79,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const activeObjects = fabricCanvas.getActiveObjects ? fabricCanvas.getActiveObjects(): []; if (activeObjects.length > 0) { activeObjects.forEach((obj: any) => fabricCanvas.remove(obj)); fabricCanvas.discardActiveObject && fabricCanvas.discardActiveObject(); saveCanvasState()}
   }
   async function saveCanvas(): Promise<void> { if (!fabricCanvas) return; try { const canvasData = JSON.stringify(fabricCanvas.toJSON(['evidenceId', 'evidenceType', 'customType']));
-   const positions = (fabricCanvas.getObjects ? fabricCanvas.getObjects(): []) .filter((obj: any) => obj.evidenceId) .map((obj: any) => ({ evidenceId: obj.evidenceId, x: obj.left, y: obj.top, width: (obj.width ?? (obj.getScaledWidth ? obj.getScaledWidth(): 0)) * (obj.scaleX ?? 1); height: (obj.height ?? (obj.getScaledHeight ? obj.getScaledHeight(): 0)) * (obj.scaleY ?? 1) }));
+   const positions = (fabricCanvas.getObjects ? fabricCanvas.getObjects(): []) .filter((obj: any) => obj.evidenceId) .map((obj: any) => ({ evidenceId: obj.evidenceId, x: obj.left, y: obj.top, width: (obj.width ?? (obj.getScaledWidth ? obj.getScaledWidth(): 0)) * (obj.scaleX ?? 1), height: (obj.height ?? (obj.getScaledHeight ? obj.getScaledHeight(): 0)) * (obj.scaleY ?? 1) }));
    const response = await fetch('/api/canvas/save', { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ caseId, canvasData, positions }) }); if (!response.ok) throw new Error('Failed to save canvas'); notifications.add({ type: 'success', title: 'Canvas Saved', message: 'Evidence board saved successfully.'
-      })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed'; message: 'Failed to save evidence board.'
+      })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed', message: 'Failed to save evidence board.'
       }); console.error('Save error:', error)}
 '
   }
   async function exportCanvas(): Promise<any> { if (!fabricCanvas) return; try { const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.9;
-	multiplier: 2 });
+multiplier: 2 });
    const link = document.createElement('a'); link.download = `evidence-board-${caseId ?? 'canvas'}-${Date.now()}.png`; link.href = dataURL; link.click(); notifications.add({ type: 'success', title: 'Export Complete', message: 'Evidence board exported successfully.'
       })} catch (error) { console.error('Export error:', error); notifications.add({ type: 'error', title: 'Export Failed', message: 'Failed to export evidence board.'
       })}
@@ -97,15 +96,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
 </script>
  <div class="space-y-4"> <!-- Toolbar --> <div class="space-y-4"> <div class="space-y-4"> <!-- Tool, Selection --> <div class="space-y-4"> <Button class="bits-btn bits-btn"
-          variant={selectedTool === 'select' ? 'primary', 'outline'} size="sm"
+          variant={selectedTool === 'select' ? 'primary' : 'outline'} size="sm"
           onclick={() => selectTool('select')} disabled={ readonly } >
           <Move /> </Button>
  <Button class="bits-btn bits-btn"
-          variant={selectedTool === 'draw' ? 'primary', 'outline'} size="sm"
+          variant={selectedTool === 'draw' ? 'primary' : 'outline'} size="sm"
           onclick={() => selectTool('draw')} disabled={ readonly } >
           âœï¸ </Button>
  <Button class="bits-btn bits-btn"
-          variant={selectedTool === 'text' ? 'primary', 'outline'} size="sm"
+          variant={selectedTool === 'text' ? 'primary' : 'outline'} size="sm"
           onclick={() => selectTool('text')} disabled={ readonly } >
           <Type /> </Button> </div>
  <!-- Shapes -->
@@ -114,7 +113,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   <!-- History --> <div class="space-y-4"> <Button class="bits-btn bits-btn"
           variant="ghost"
           size="sm"
-          onclick={() => undo()} disabled={readonly ?? historyIndex <= 0} >
+          onclick={() => undo()} disabled={readonly || historyIndex <= 0} >
           <Undo /> </Button>
  <Button class="bits-btn bits-btn"
           variant="ghost"
@@ -137,7 +136,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <p>Add evidence items to start building your case visualization</p> {/if}
   </div>
  <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%;
-	height: auto;display: block}
+		height: auto;display: block;}
 </style>
 
 

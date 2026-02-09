@@ -261,11 +261,19 @@ class DatabaseManager {
             if (!exists) {
                 await qdrant.createCollection(collectionName, {
                     vectors: {
-	size: vectorSize, distance },
-	optimizers_config: {
-	default_segment_number: 2, memmap_threshold: 20000, indexing_threshold: 20000 },
-	hnsw_config: {
-	m: 16, ef_construct: 64, full_scan_threshold: 10000 }
+						size: vectorSize,
+						distance: distance
+					},
+					optimizers_config: {
+						default_segment_number: 2,
+						memmap_threshold: 20000,
+						indexing_threshold: 20000
+					},
+					hnsw_config: {
+						m: 16,
+						ef_construct: 64,
+						full_scan_threshold: 10000
+					}
                 });
                 console.log(`✅ Created collection: ${collectionName}`);
             }

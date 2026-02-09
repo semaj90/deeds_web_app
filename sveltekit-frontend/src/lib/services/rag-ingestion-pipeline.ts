@@ -109,7 +109,7 @@ export const ragIngestionMachine = setup({
             };
             return document;
         }),
-        performOCR: fromPromise(async ({ input }: { input: { document: RAGDocument; file: File | Buffer; options?: IngestionInput['options'] } }) => {
+        performOCR: fromPromise(async ({ input }: { input: { document: RAGDocument, file: File | Buffer, options?: IngestionInput['options'] } }) => {
             const startTime = Date.now();
 
             // Check if OCR is needed
@@ -169,7 +169,7 @@ export const ragIngestionMachine = setup({
                  throw e;
             }
         }),
-        chunkDocument: fromPromise(async ({ input }: { input: { document: RAGDocument; content: string; options?: IngestionInput['options'] } }) => {
+        chunkDocument: fromPromise(async ({ input }: { input: { document: RAGDocument, content: string, options?: IngestionInput['options'] } }) => {
             const chunkSize = input.options?.chunk_size ?? 600;
             const chunkOverlap = input.options?.chunk_overlap ?? 100;
             const chunks: RAGChunk[] = [];
@@ -204,7 +204,7 @@ export const ragIngestionMachine = setup({
             }
             return chunks;
         }),
-        generateEmbeddings: fromPromise(async ({ input }: { input: { chunks: RAGChunk[]; document: RAGDocument; options?: IngestionInput['options'] } }) => {
+        generateEmbeddings: fromPromise(async ({ input }: { input: { chunks: RAGChunk[], document: RAGDocument, options?: IngestionInput['options'] } }) => {
             const texts = input.chunks.map(chunk => chunk.content);
 
             // Batch generate embeddings using embedding-gemma:latest (512-dim)
@@ -238,17 +238,17 @@ export const ragIngestionMachine = setup({
     id: 'ragIngestion',
     initial: 'idle',
     context: {
-        progress: 0,
+       progress: 0,
         stage: 'idle'
     } as IngestionContext,
     states: {
-        idle: {
-            on: {
-                START_INGESTION: 'uploading'
+       idle: {
+           on: {
+               START_INGESTION: 'uploading'
             }
         },
         uploading: {
-            entry: assign(({ event }) => ({
+           entry: assign(({ event }) => ({
                 progress: 10,
                 stage: 'Uploading document...',
                 initialFile: event.file,

@@ -1,0 +1,158 @@
+{
+  "timestamp": "2026-02-08T19:55:31.523Z",
+  "filesProcessed": 2160,
+  "filesWithIssues": 30,
+  "totalChanges": 67,
+  "results": [
+    {
+      "file": "src\\lib\\services\\rag-ingestion-pipeline.ts",
+      "fixes": 6,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\legal\\CaseSynthesisWorkflow.svelte",
+      "fixes": 5,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\legal\\EnhancedLegalProcessor.svelte",
+      "fixes": 5,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\stores\\machines\\userWorkflowMachine.ts",
+      "fixes": 5,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\state\\evidence-processing-machine.ts",
+      "fixes": 5,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\SummaryReviewPanel.svelte",
+      "fixes": 4,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\board\\CanvasBoard.svelte",
+      "fixes": 3,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\stores\\unified\\evidence-store.ts",
+      "fixes": 3,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\ActionPopup.svelte",
+      "fixes": 2,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\auth\\NesAuthModal.svelte",
+      "fixes": 2,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EvidenceCard.svelte",
+      "fixes": 2,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EvidenceNode.svelte",
+      "fixes": 2,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\forms\\EnhancedFileUpload.svelte",
+      "fixes": 2,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\search\\VectorSearchInterface.svelte",
+      "fixes": 2,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\ui\\SmartTextarea.svelte",
+      "fixes": 2,
+      "changes": []
+    },
+    {
+      "file": "src\\routes\\api\\phase89\\topology\\+server.ts",
+      "fixes": 2,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\stores\\unified\\report-store.ts",
+      "fixes": 2,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedAIChatTest.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\ai\\Gemma3LegalChat.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\canvas\\AdvancedEditor.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\canvas\\FabricCanvas.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\canvas\\POINode.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\detective\\ContextualDetectiveBoard.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\forms\\EnhancedCaseFormWithZod.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\headless\\DocumentUploader.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\notes\\LegalNotesManager.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\components\\ui\\core\\Textarea.svelte",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\routes\\api\\codebase\\apply-patch\\+server.ts",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\routes\\api\\topology\\+server.ts",
+      "fixes": 1,
+      "changes": []
+    },
+    {
+      "file": "src\\lib\\state\\xstate-store.ts",
+      "fixes": 1,
+      "changes": []
+    }
+  ]
+}

@@ -65,7 +65,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 <svelte, window onkeydown={ handleKeydown } />
 
-<div class="context-menu-root { className }">
+<div class="context-menu-root {className}">
 	{#if children}
 		{@render children()}
 	{/if}

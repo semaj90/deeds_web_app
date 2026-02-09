@@ -1,5 +1,4 @@
 import type { openDB, type IDBPDatabase } from 'idb';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Define the Document interface as it's used by this service.

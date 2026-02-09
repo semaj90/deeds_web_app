@@ -31,7 +31,7 @@ export type ContextChatResponse = {
     suggestions: Suggestion[];
 	latencyMs: number;
     citations?: Array<{
-	id: string; source: string;
+	id: string, source: string;
 	score: number }>;
 };
 

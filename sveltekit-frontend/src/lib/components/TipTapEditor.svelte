@@ -1,7 +1,6 @@
 <script lang="ts">
 	import StarterKit from '@tiptap/starter-kit';
 	import { Editor, EditorContent } from 'svelte-tiptap';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
 		content?: string;
@@ -24,13 +23,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			extensions: [StarterKit],
 			content: content || '',
 			onUpdate: ({
-	editor: ed }) => {
+editor: ed }) => {
 				const html = ed.getHTML();
 				onChange?.(html);
 			},
-	editorProps: {
-	attributes: {
-					class: 'prose prose-invert w-full focus:outline-none bg-neutral-950/90 text-neutral-100 p-4'
+	editorProps: { attributes: { class: 'prose prose-invert w-full focus:outline-none bg-neutral-950/90 text-neutral-100 p-4'
 				}
 			}
 		});
@@ -85,7 +82,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 			<button
 				onclick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-				class="px-2 py-1 rounded text-xs font-medium transition-colors {editor?.isActive('heading', {
+				class="px-2 py-1 rounded text-xs font-medium transition-colors {editor?.isActive('heading' {
 					level: 1
 				})
 					? 'bg-neutral-700 text-neutral-100'
@@ -97,7 +94,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 			<button
 				onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-				class="px-2 py-1 rounded text-xs font-medium transition-colors {editor?.isActive('heading', {
+				class="px-2 py-1 rounded text-xs font-medium transition-colors {editor?.isActive('heading' {
 					level: 2
 				})
 					? 'bg-neutral-700 text-neutral-100'
@@ -146,9 +143,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		outline: none;
 	}
 
-	:global(.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before) {
-		color: #6b7280;
-	content: attr(data-placeholder);
+	:global(.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before) { color: #6b7280;
+		content: attr(data-placeholder);
 		float: left;
 	height: 0;
 		pointer-events: none;

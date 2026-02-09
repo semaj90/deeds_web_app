@@ -1,6 +1,5 @@
 <!-- @migration-task Error while migrating Svelte code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code: Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> // Migrated to $effect
  import type { GlyphEmbedResult } from '$lib/api/glyph-embeds-client.js'; interface Props { glyphResult: GlyphEmbedResult, renderMode?: 'webgpu' | 'webgl' | 'canvas2d'; width?: number; height?: number; autoRender?: boolean; showStats?: boolean;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let { glyphResult, renderMode = 'webgpu', width = 512, height = 512, autoRender = true, showStats = false }: Props = $props();
    let canvas: HTMLCanvasElement;
@@ -21,10 +20,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     const adapter = await navigator.gpu.requestAdapter(); if (!adapter) { throw new Error('No WebGPU adapter found')}
     webgpuDevice = await adapter.requestDevice();
    const context = canvas.getContext('webgpu'); if (!context) { throw new Error('Failed to get WebGPU context')}
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(); context.configure({ device: webgpuDevice;
-	format: presentationFormat}); // Create texture from tiled data const tiledData = glyphResult.simd_shader_data.tiled_data;
-   const texture = webgpuDevice.createTexture({ size: {
-	width: height },
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(); context.configure({ device: webgpuDevice, format: presentationFormat}); // Create texture from tiled data const tiledData = glyphResult.simd_shader_data.tiled_data;
+   const texture = webgpuDevice.createTexture({ size: { width: height },
 	format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST }); // Upload tiled data to texture webgpuDevice.queue.writeTexture( { texture },
 	new Uint8Array(tiledData.map(x => x * 255)), { bytesPerRow: width * 4, rowsPerImage: height },
 	{ width: height } ); console.log('âœ… WebGPU initialized with SIMD texture data')}
@@ -52,8 +49,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }
   function renderWebGPUFrame() { if (!webgpuDevice) return;
    const commandEncoder = webgpuDevice.createCommandEncoder();
-   const renderPassDescriptor: GPURenderPassDescriptor = { colorAttachments: [{
-	view: (canvas.getContext('webgpu') as GPUCanvasContext).getCurrentTexture.createView(), clearValue: {
+   const renderPassDescriptor: GPURenderPassDescriptor = { colorAttachments: [{ view: (canvas.getContext('webgpu') as GPUCanvasContext).getCurrentTexture.createView(), clearValue: {
 	r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
 	loadOp: 'clear', storeOp: 'store'
       }] }
@@ -89,16 +85,16 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div> <span class="text-gray-400">Tiles:</span>
  <span class="ml-2">{glyphResult.simd_shader_data.tile_map.length}</span> {/if}
   </div> {/if}
-  <!-- Controls --> <div class="mt-4 flex"> <button onclick={ startRendering } disabled={ isRendering } class="px-3 py-1 bg-green-600 hover:bg-green-700 disabled, bg-gray-600 text-white text-sm rounded transition-colors"
+  <!-- Controls --> <div class="mt-4 flex"> <button onclick={ startRendering } disabled={ isRendering } class="px-3 py-1 bg-green-600 hover:bg-green-700 disabled bg-gray-600 text-white text-sm rounded transition-colors"
     > Start </button>
- <button onclick={ stopRendering } disabled={!isRendering} class="px-3 py-1 bg-red-600 hover:bg-red-700 disabled, bg-gray-600 text-white text-sm rounded"
+ <button onclick={ stopRendering } disabled={!isRendering} class="px-3 py-1 bg-red-600 hover:bg-red-700 disabled bg-gray-600 text-white text-sm rounded"
     > Stop </button>
  <select ,bind:value={ renderMode } class="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white"
     > <option value="webgpu">WebGPU</option>
  <option value="webgl">WebGL</option>
  <option value="canvas2d">Canvas 2D</option> </select> </div> </div>
  <style> .simd-glyph-renderer { /* @apply w-full; */ }
-  canvas { display: block; image-rendering: pixelated}
+  canvas { display: block; image-rendering: pixelated;}
 </style>
 
 

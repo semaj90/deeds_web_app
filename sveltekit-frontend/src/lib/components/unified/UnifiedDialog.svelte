@@ -138,7 +138,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     <button
       type="button"
       class="fixed inset-0 bg-black/50 backdrop-blur-sm appearance-none border-none p-0 m-0"
-      transition, fade={{ duration, 150 }}
+      transition fade={{ duration: 150 }}
       onclick={() => closeDialog()}
       aria-label="Close dialog"
     ></button>
@@ -255,7 +255,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
           <div
             class="absolute pointer-events-none z-10"
             style="left: {cursor.x}px; top: {cursor.y}px; color: {cursor.color}"
-            transition, fade={{ duration, 200 }}
+            transition fade={{ duration: 200 }}
           >
             <svg class="w-4 h-4" fill="currentColor" viewBox=" 0 0 | 24, 24">
               <path d="M7 2L17 12L12 13L13, 18L7, 2Z"/>
@@ -274,10 +274,10 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 <style>
   .image-rendering-pixelated {
-    image-rendering: -moz-crisp-edge
+    image-rendering: -moz-crisp-edge;
     image-rendering: -webkit-crisp-edge
-    image-rendering: pixelated
-    image-rendering: crisp-edge}
+    image-rendering: pixelated;
+    image-rendering: crisp-edge;}
   /* WebGPU canvas optimization */
   canvas {
     will-change: transform
