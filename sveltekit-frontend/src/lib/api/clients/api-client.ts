@@ -33,10 +33,10 @@ export async function apiFetch<T = unknown>(
  const timeoutMs = retry?.timeoutMs ?? 0;
  let lastErr: unknown;
  for (let i = 0; i < attempts; i++) {
- const controller = timeoutMs > 0 ? new AbortController()  | undefined;
- const t = timeoutMs > 0 ? setTimeout(() => controller!.abort(), timeoutMs)  | undefined;
+ const controller = timeoutMs > 0 ? new AbortController(): undefined;
+ const t = timeoutMs > 0 ? setTimeout(() => controller!.abort(), timeoutMs): undefined;
  try {
- const res = await fetch(`${url}${qs}`, { method: headers: { 'Content-Type': 'application/json', ...(headers || {}) } !== undefined ? JSON.stringify(body)  | undefined, controller?.signal,
+ const res = await fetch(`${url}${qs}`, { method: headers: { 'Content-Type': 'application/json', ...(headers || {}) } !== undefined ? JSON.stringify(body): undefined, controller?.signal,
  } as RequestInit);
  if (!res.ok) throw new Error(`HTTP ${res.status}`);
  const ct = res.headers.get('content-type') ?? '';

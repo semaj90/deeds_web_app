@@ -150,7 +150,7 @@
  id: `user-${Date.now()}`,
  role: 'user',
  content: messageText, ts: Date, Date: Date.now(),
- attachments: queuedAttachment ? [queuedAttachment]  | undefined,
+ attachments: queuedAttachment ? [queuedAttachment]: undefined,
  status: 'pending'
  };
  chatMessages = [...chatMessages, userMessage];

@@ -93,7 +93,7 @@ data: CaseForm }) => void}
  <input id="caseNumber"
               name="caseNumber"
               placeholder="ABC-2024-123456"
-              value={$form?.caseNumber ?? ''} oninput={e => setFormField('caseNumber', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.caseNumber ? 'true' | undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.caseNumber ? 'border-destructive': ''}`} />
+              value={$form?.caseNumber ?? ''} oninput={e => setFormField('caseNumber', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.caseNumber ? 'true': undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.caseNumber ? 'border-destructive': ''}`} />
   {#if $errors?.caseNumber} <p class="text-sm text-destructive flex items-center"> <AlertCircle class="h-3" /> <span>{$errors.caseNumber[0]}</span> </p> {/if}
   </div>
  <!-- Priority --> <div class="space-y-2"> <label for="priority" class="flex items-center"> <AlertCircle class="h-4" /> <span>Priority Level *</span> </label>
@@ -109,7 +109,7 @@ data: CaseForm }) => void}
  <input id="title"
             name="title"
             placeholder="Enter a descriptive case title"
-            value={$form?.title ?? ''} oninput={e => setFormField('title', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.title ? 'true' | undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.title ? 'border-destructive': ''}`} />
+            value={$form?.title ?? ''} oninput={e => setFormField('title', (e.target as HTMLInputElement).value as any)} aria-invalid={$errors?.title ? 'true': undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.title ? 'border-destructive': ''}`} />
   {#if $errors?.title} <p class="text-sm">{$errors.title[0]}</p> {/if}
   </div>
  <!-- Description --> <div class="space-y-2"> <label for="description">Description</label>
@@ -117,7 +117,7 @@ data: CaseForm }) => void}
             name="description"
             placeholder="Provide detailed case description (optional)"
             value={$form?.description ?? ''} oninput={e => setFormField('description', (e.target as HTMLTextAreaElement).value as any)} rows="4"
-            aria-invalid={$errors?.description ? 'true' | undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.description ? 'border-destructive': ''}`} ></textarea>
+            aria-invalid={$errors?.description ? 'true': undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.description ? 'border-destructive': ''}`} ></textarea>
   {#if $errors?.description} <p class="text-sm">{$errors.description[0]}</p> {/if}
   <p class="text-sm nes-text"> {$form?.description?.length ?? 0}/1000 characters </p> </div>
  <!-- Advanced, Options --> <div class="border-t"> <!-- Use native button to avoid passing, unknown, 'type' prop to Button, component --> <button type="button"
