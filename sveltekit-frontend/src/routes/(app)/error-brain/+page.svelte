@@ -5,7 +5,7 @@ import CardContent from '$lib/components/ui/card/CardContent.svelte';
 import CardDescription from '$lib/components/ui/card/CardDescription.svelte';
 import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
-import { Button } from '$lib/components/ui/enhanced-bits.svelte';
+import Button from '$lib/components/ui/Button.svelte';
 // Migrated to $effect
 
  let status = $state<any>(null);

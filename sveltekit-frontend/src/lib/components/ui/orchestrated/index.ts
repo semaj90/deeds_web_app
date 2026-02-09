@@ -12,7 +12,7 @@ import LoadingButton from '$lib/headless/LoadingButton.svelte';
 // Enhanced-Bits Legal AI components
 import { Dialog } from '$lib/components/ui/dialog';
 import Card from '$lib/components/ui/card/Card.svelte';
-import { Button } from '$lib/components/ui/enhanced-bits.svelte';
+import Button from '$lib/components/ui/Button.svelte';
 import { Input } from '$lib/components/ui/input';
 // Select is imported from enhanced-bits or a compatible source
 import { Select } from '$lib/components/ui/enhanced-bits';

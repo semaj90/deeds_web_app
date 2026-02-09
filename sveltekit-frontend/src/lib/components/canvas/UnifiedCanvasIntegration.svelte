@@ -2,7 +2,7 @@
  import { writable } from 'svelte/store';
  import  EvidenceCanvas  from "$lib/ui/enhanced/EvidenceCanvas.svelte";
  import  CanvasBoard  from "$lib/components/yorha/CanvasBoard.svelte";
- import  Button  from "$lib/components/ui/enhanced-bits.svelte"; interface Props { caseId?: string; enableYoRHaBoard?: boolean; enableEvidenceCanvas?: boolean; splitView?: boolean; syncCanvases?: boolean; initialMode?: 'evidence' | 'drawing' | 'both'}
+ import Button from '$lib/components/ui/Button.svelte'; interface Props { caseId?: string; enableYoRHaBoard?: boolean; enableEvidenceCanvas?: boolean; splitView?: boolean; syncCanvases?: boolean; initialMode?: 'evidence' | 'drawing' | 'both'}
   let { caseId = '', enableYoRHaBoard = true, enableEvidenceCanvas = true, splitView = true, syncCanvases = true, initialMode = 'both'
   }: Props = $props(); // Component references let evidenceCanvasRef: string | number;
  let yorhaCanvasBoardRef: unknown; // State management const canvasState = writable({ mode: initialMode

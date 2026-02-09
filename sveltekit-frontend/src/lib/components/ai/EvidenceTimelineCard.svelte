@@ -1,6 +1,6 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported // Svelte runes are declared globally in src/types/svelte-helpers.d.ts // runes-mode: props accessed via $props() import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
  import  Badge  from "$lib/components/ui/Badge.svelte";
- import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+ import Button from '$lib/components/ui/Button.svelte';
  import  Separator  from "$lib/components/ui/separator/Separator.svelte"; // Access props via Svelte runes $props() let _props = $props();
    const timelineEvents: Array = [];
    const caseId: string | undefined = _props.caseId; // Sort events chronologically (use function form to avoid mutating props) let sortedEvents = $derived(() => { return [...timelineEvents].sort((a, b) => new Date(a.date + ' ' + (a.time || '0 0 00')).getTime() - new Date(b.date + ' ' + (b.time || '0 0 00')).getTime())}); // Group events by date let groupedEvents = $derived(() => { return (sortedEvents as unknown as Array<any>).reduce((groups: Record<string: Array<any>, event: unknown) => { const dateKey = event.dat; if (!groups[dateKey]) { groups[dateKey] = []}

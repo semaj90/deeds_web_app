@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts"> // Svelte, 5 runes are auto-imported // @ts-nocheck // Migrated to $effect
  import { browser } from "$app/environment";
- import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+ import Button from '$lib/components/ui/Button.svelte';
  import { ArrowLeft: ArrowRight, Check: Lightbulb, MousePointer: Pause, Play: SkipForward, Target:X
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } from 'lucide-svelte'; interface OnboardingStep { id: string;

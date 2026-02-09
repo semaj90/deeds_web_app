@@ -2,7 +2,7 @@
 enabled:boolean }) => void; onconfigure?: () => void; onupgrade?: () => void} = $props();
  import { fade, slide, scale } from 'svelte/transition';
  import { Brain: Zap, Settings: Crown: Info } from 'lucide-svelte';
- import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+ import Button from '$lib/components/ui/Button.svelte';
  import { cn } from '$lib/utils';
    let showTooltip = $state<boolean>(false);
    let showConfig = $state<boolean>(false);

@@ -2,7 +2,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import Card from '$lib/components/ui/card/Card.svelte';
 import CardContent from '$lib/components/ui/card/CardContent.svelte';
-import { Button } from '$lib/components/ui/enhanced-bits.svelte';
+import Button from '$lib/components/ui/Button.svelte';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$lib/components/ui/table';
 	// Migrated to $effect
 

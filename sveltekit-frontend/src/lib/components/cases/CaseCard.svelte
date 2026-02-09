@@ -1,6 +1,6 @@
 <script lang="ts">
   import Badge from "$lib/components/ui/Badge.svelte";
-  import Button from "$lib/components/ui/enhanced-bits.svelte";
+  import Button from '$lib/components/ui/Button.svelte';
   import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
   import Archive from 'lucide-svelte/icons/archive';
   import Calendar from 'lucide-svelte/icons/calendar';

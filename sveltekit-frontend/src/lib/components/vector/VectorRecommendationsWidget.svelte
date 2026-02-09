@@ -6,7 +6,7 @@ Compact AI recommendations component for sidebar/dashboard use
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
   import Badge from "$lib/components/ui/badge/Badge.svelte";
-  import Button from "$lib/components/ui/enhanced-bits.svelte";
+  import Button from '$lib/components/ui/Button.svelte';
   import type { IntelligenceRecommendation } from '$lib/services/vector-intelligence-service.js';
   import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
   import RefreshCw from 'lucide-svelte/icons/refresh-cw';

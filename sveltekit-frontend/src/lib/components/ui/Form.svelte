@@ -1,6 +1,6 @@
 <script lang="ts">
 // Svelte 5 runes are auto-imported
-import Button from "$lib/components/ui/enhanced-bits.svelte";
+import Button from '$lib/components/ui/Button.svelte';
 // TODO: Fix form store exports
 // import { createFormStore, type FormOptions } from '$lib/stores/form.svelte';
 

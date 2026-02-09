@@ -1,7 +1,7 @@
 <script lang="ts"> // Migrated to $effect
  import { useMachine } from '@xstate/svelte';
  import { aiAssistantMachine } from '$lib/machines/aiAssistantMachine.js';
- import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+ import Button from '$lib/components/ui/Button.svelte';
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; interface Props { initialContext?: any; enableSIMD?: boolean; useWebWorker?: boolean}
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 

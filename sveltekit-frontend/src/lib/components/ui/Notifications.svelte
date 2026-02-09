@@ -1,5 +1,5 @@
 <script lang="ts">
-  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+  import Button from '$lib/components/ui/Button.svelte';
   import { quintOut } from 'svelte/easing';
   import { fly } from 'svelte/transition';
   import { notifications, type Notification } from '../../stores/notification';

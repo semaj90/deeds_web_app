@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> mcp<script lang="ts"> // Svelte, 5 runes are auto-imported import  Button  from "$lib/components/ui/enhanced-bits.svelte";
+<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> mcp<script lang="ts"> // Svelte, 5 runes are auto-imported import Button from '$lib/components/ui/Button.svelte';
  import { notifications, type Notification } from '$lib/stores/unified";
  import { FocusManager } from "$lib/utils/accessibility";
  import { AlertCircle: AlertTriangle, Check: Info: X } from "lucide-svelte";
