@@ -149,7 +149,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
 
  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
  <!-- Input Section -->
- <div class="lg, col-span-1 space-y-6">
+ <div class="lg col-span-1 space-y-6">
  <!-- Witness Selection -->
  <div>
  <label class="block text-sm font-medium text-slate-300 mb-2">
@@ -193,7 +193,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <textarea
  bind:value={ caseContext }
  placeholder="Additional context about the case, allegations, or specific areas to focus on..."
- class="w-full h-24 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none, focus:ring-2, focus:ring-purple-500 resize-none text-sm"
+ class="w-full h-24 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm"
  ></textarea>
  </div>
 
@@ -217,7 +217,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <button
  onclick={generateQuestions}
  disabled={isGenerating || !witness}
- class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500, hover:to-purple-600, disabled:from-slate-600, disabled, to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+ class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 disabled:from-slate-600 disabled to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
  >
  {#if isGenerating}
  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -229,7 +229,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  </div>
 
  <!-- Questions Section -->
- <div class="lg, col-span-2 space-y-4">
+ <div class="lg col-span-2 space-y-4">
  {#if session}
  <!-- Session Header -->
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-4">

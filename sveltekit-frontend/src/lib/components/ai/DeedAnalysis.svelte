@@ -17,12 +17,12 @@ query: q, limit: 5, threshold: 0.3 }) }); if (!response.ok) { const text = await
  <div class="flex"> <input id="search-query"
       type="text"
       bind:value={ searchQuery } placeholder="Enter search query (e.g., 'property deed transfer', 'contract liability'...)"
-      class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none, focus:ring-2, focus:ring-blue-500"
-    /> <button onclick={() => performSemanticSearch(searchQuery)} disabled={isLoading || !(searchQuery && String(searchQuery).trim())} class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600, disabled:opacity-50"
+      class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    /> <button onclick={() => performSemanticSearch(searchQuery)} disabled={isLoading || !(searchQuery && String(searchQuery).trim())} class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
     > {isLoading ? 'ðŸ”„': 'ðŸ”'} </button> </div> </div>
  <!-- Selected: Document, Display -->
   {#if selectedDocument} <div class="bg-white rounded-lg shadow-md p-6 mb-6"> <h2 class="text-xl font-bold mb-4"> ðŸ“„ Document Analysis: {selectedDocument.title} </h2>
- <div class="grid grid-cols-1 md, grid-cols-2 gap-4"> <div> <p class="text-sm"><strong>ID:</strong> {selectedDocument.id}</p>
+ <div class="grid grid-cols-1 md grid-cols-2 gap-4"> <div> <p class="text-sm"><strong>ID:</strong> {selectedDocument.id}</p>
  <p class="text-sm"><strong>Type:</strong> {selectedDocument.documentType}</p> </div>
  <div>
   {#if selectedDocument.caseId} <p class="text-sm"><strong>Case ID:</strong> {selectedDocument.caseId}</p> {/if}

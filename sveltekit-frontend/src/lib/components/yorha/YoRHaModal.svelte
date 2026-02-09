@@ -81,7 +81,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 >
   <div
     bind:this={modalElement}
-    class="bg-slate-900 border-2 border-slate-700 shadow-2xl flex flex-col overflow-hidden relative {sizeClasses[size]} {type === 'system' ? 'border-cyan-500/50 shadow-[0_0_30px_rgba(34,211,238,0.1)]' : ''}"
+    class="bg-slate-900 border-2 border-slate-700 shadow-2xl flex flex-col overflow-hidden relative {sizeClasses[size]} {type === 'system' ? 'border-cyan-500/50 shadow-[0_0_30px_rgba(34 211 238 0.1)]' : ''}"
     transition:scale={{
 	duration: 300, easing: quintOut, start: 0.95 }}
     tabindex="-1"
@@ -148,7 +148,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
     <!-- Decorative scanline/terminal effect -->
     <div class="absolute inset-0 pointer-events-none opacity-[0.03] overflow-hidden">
-      <div class="w-full h-full bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>
+      <div class="w-full h-full bg-[linear-gradient(rgba(18 16 16 0)_50% rgba(0 0 0 0.25)_50%) linear-gradient(90deg rgba(255 0 0 0.06) rgba(0 255 0 0.02) rgba(0 0 255 0.06))] bg-[length:100%_2px 3px_100%]"></div>
     </div>
   </div>
 </div>

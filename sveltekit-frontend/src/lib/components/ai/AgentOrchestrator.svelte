@@ -125,7 +125,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   onclick={(_event: MouseEvent) => checkServiceStatus} >
 <RefreshCw class="h-4" /> </Button> </div> </div>
  <!-- Workflow, Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Settings class="h-5" /> Workflow Configuration </h3> </div>
- <main> <div class="grid grid-cols-1 md, grid-cols-2"> <div> <span id="label-workflow" class="block text-sm font-medium">Workflow Type</span>
+ <main> <div class="grid grid-cols-1 md grid-cols-2"> <div> <span id="label-workflow" class="block text-sm font-medium">Workflow Type</span>
  <Select aria-labelledby="label-workflow" bind:value={ selectedWorkflow }> <SelectTrigger id="workflow-select" aria-labelledby="label-workflow"> <SelectValue placeholder="Select, workflow..." /> </SelectTrigger>
  <SelectContent>
   {#each Array.isArray(workflows) ? workflows: [] as workflow} <SelectItem value={workflow.id}> <div class="flex items-center"> <workflow.icon class="h-4" /> {workflow.name}
@@ -194,7 +194,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </div> </div> {/if}
   <!-- Workflow, Templates -->
   {#if showAdvancedControls} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <FileText class="h-5" /> Quick Start Templates </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2"> <Button variant="ghost"
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-2"> <Button variant="ghost"
             class="h-auto p-4 justify-start bits-btn bits-btn bits-btn"
             onclick={(_event: MouseEvent) => ) => {
               selectedWorkflow = 'case_analysis'; selectedProvider = 'autogen'; inputText = 'John Smith was accused of embezzling $50,000 from his employer over a 6-month period. Evidence includes suspicious bank transfers, altered financial records, and witness testimony from colleagues who noticed unusual behavior.'}} >

@@ -210,7 +210,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         </div>
         <!-- File: Drop, Zone -->
         <div
-          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover:border-yorha-primary, hover:bg-yorha-bg-secondary/50" class:border-yorha-primary={uploadedFile}
+          class="border-2 border-dashed border-yorha-border rounded-lg p-8 text-center transition-colors duration-200 hover:border-yorha-primary hover:bg-yorha-bg-secondary/50" class:border-yorha-primary={uploadedFile}
           ondrop={handleDrop}
           role="button"
           aria-label="Drop zone"
@@ -297,7 +297,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     </div>
     <div class="yorha-panel-content">
       <form onsubmit={(e) => { e.preventDefault(); handleSubmit()}} class="space-y-6">
-        <div class="grid grid-cols-1 md, grid-cols-2">
+        <div class="grid grid-cols-1 md grid-cols-2">
           {#each populatedFields as field (field.name)}
             <div class="space-y-2" transition, fade>
               <!-- Field, Label -->

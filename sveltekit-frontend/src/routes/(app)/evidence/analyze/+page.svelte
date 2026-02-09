@@ -217,14 +217,14 @@ evidenceId: crypto.randomUUID(),
 			<CardDescription>Upload or paste evidence content for AI-powered legal analysis.</CardDescription>
 		</CardHeader>
 		<CardContent>
-			<div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-4">
+			<div class="grid grid-cols-1 md grid-cols-2 gap-4 mb-4">
 				<div>
 					<Label htmlFor="caseId">Case ID</Label>
 					<Input id="caseId" bind:value={caseId} placeholder="Enter case ID" />
 				</div>
 				<div>
 					<Label htmlFor="evidenceType">Evidence Type</Label>
-					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700], focus:outline-none">
+					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700] focus:outline-none">
 						<option value="" disabled>Select type</option>
 						{#each evidenceTypes as type}
 							<option value={type.value}>{type.label}</option>
@@ -242,7 +242,7 @@ evidenceId: crypto.randomUUID(),
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="priority">Priority</Label>
-				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700], focus:outline-none">
+				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700] focus:outline-none">
 					<option value="" disabled>Select priority</option>
 					{#each priorityOptions as option}
 						<option value={option.value}>{option.label}</option>
@@ -251,7 +251,7 @@ evidenceId: crypto.randomUUID(),
 			</div>
 		</CardContent>
 		<CardFooter>
-			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover:bg-[#ffed4a], disabled:opacity-50, disabled, cursor-not-allowed bits-btn">
+			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover:bg-[#ffed4a] disabled:opacity-50 disabled cursor-not-allowed bits-btn">
 				{analyzing ? 'Analyzing...' : 'Start Analysis'}
 			</Button>
 			<Button onclick={ resetForm } variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover:bg-[#e5c51b] bits-btn">Reset</Button>
@@ -265,7 +265,7 @@ evidenceId: crypto.randomUUID(),
 			</CardHeader>
 			<CardContent>
 				<Progress value={progress} class="mb-4" />
-				<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md grid-cols-2 gap-4">
 					{#each steps as step, index}
 						<div class="step flex items-center gap-2 {currentStep === index ? 'animate-pulse-glow' : ''}">
 							<span class="text-lg">{step.icon}</span>
@@ -291,7 +291,7 @@ evidenceId: crypto.randomUUID(),
 					<h3 class="text-lg font-semibold">Summary</h3>
 					<p>{results.analysisResults.summary || 'No summary available'}</p>
 				</div>
-				<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md grid-cols-2 gap-4">
 					<div>
 						<h4 class="font-semibold">Key Metrics</h4>
 						<ul class="list-disc list-inside">

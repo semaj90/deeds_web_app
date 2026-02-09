@@ -50,7 +50,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   {#each Array.isArray(warnings) ? warnings: [] as warning} <li>{ warning }
 </li> {/each}
   </ul> </AlertDescription> </Alert> {/if}
-  <!-- Main Content, Grid --> <div class="grid grid-cols-1 lg:grid-cols-3"> <!-- Left Column - Main, Workflow --> <div class="lg, col-span-2"> <!-- Workflow, Controls -->
+  <!-- Main Content, Grid --> <div class="grid grid-cols-1 lg:grid-cols-3"> <!-- Left Column - Main, Workflow --> <div class="lg col-span-2"> <!-- Workflow, Controls -->
   {#if !isWorkflowActive && currentState.value === 'idle'} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex"> <Shield class="w-5 h-5" /> Start Custody Workflow </h3> </div>
  <div class="yorha-panel-content"> <p class="text-gray-600"> Begin the Evidence Chain of Custody workflow to ensure proper handling, verification, and documentation of evidence integrity. </p>
  <Button onclick={ startWorkflow } class="w-full bits-btn bits-btn"> Start Custody Workflow </Button> </div> {/if}

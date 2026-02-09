@@ -323,7 +323,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             <CardTitle>Performance Metrics</CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="grid grid-cols-2 md, grid-cols-4">
+            <div class="grid grid-cols-2 md grid-cols-4">
               <div class="metric bg-blue-50 p-3 rounded-lg">
                 <div class="text-sm text-blue-600">Load Time</div>
                 <div class="text-lg font-semibold">
@@ -386,7 +386,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
             <CardTitle>Quick AI Operations</CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="grid grid-cols-2 md, grid-cols-4">
+            <div class="grid grid-cols-2 md grid-cols-4">
               <Button class="bits-btn"
                 variant="secondary"
                 onclick={() => processText('Sample legal document text for analysis...', 'inference')}

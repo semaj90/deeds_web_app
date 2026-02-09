@@ -128,7 +128,7 @@ content: documentType,
 		<select
 			id="documentType"
 			bind:value={ documentType }
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 		>
 			<option value="contract">Contract</option>
 			<option value="agreement">Agreement</option>
@@ -151,7 +151,7 @@ content: documentType,
 				id="customPatternInput"
 				type="text"
 				placeholder="Add specific pattern (e.g., indemnification, force majeure)"
-				class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+				class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 				onkeydown={(e) => { // Changed back to onkeydown
 					if (e.key === 'Enter') {
 						e.preventDefault();
@@ -169,7 +169,7 @@ content: documentType,
 						input.value = '';
 					}
 				}}
-				class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700, focus:outline-none, focus:ring-2, focus:ring-blue-500"
+				class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
 			>
 				Add
 			</button>
@@ -203,7 +203,7 @@ content: documentType,
 			bind:value={content}
 			placeholder="Paste or type the legal document content here..."
 			rows="8"
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500 resize-vertical"
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
 		></textarea>
 	</div>
 
@@ -213,7 +213,7 @@ content: documentType,
 			type="button"
 			onclick={analyzePatterns} // Changed back to onclick
 			disabled={isAnalyzing || !content.trim()}
-			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700, focus:outline-none, focus:ring-2, focus:ring-blue-500, disabled:opacity-50, disabled, cursor-not-allowed"
+			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled cursor-not-allowed"
 		>
 			{#if isAnalyzing}
 				<span class="flex items-center justify-center">
@@ -232,7 +232,7 @@ content: documentType,
 			<button
 				type="button"
 				onclick={ clearAnalysis } // Changed back to onclick
-				class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700, focus:outline-none, focus:ring-2, focus:ring-gray-500"
+				class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
 			>
 				Clear
 			</button>
@@ -263,14 +263,14 @@ content: documentType,
 			{#if analysis.risk_assessment}
 				<div class="bg-gray-50 rounded-lg p-4">
 					<h4 class="text-md font-semibold text-gray-900 mb-3">Risk Assessment</h4>
-					<div class="grid grid-cols-1 md, grid-cols-3 gap-4">
+					<div class="grid grid-cols-1 md grid-cols-3 gap-4">
 						<div class="text-center">
 							<div class="text-2xl font-bold {analysis.risk_assessment.overall_risk === 'high' ? 'text-red-600' : analysis.risk_assessment.overall_risk === 'medium' ? 'text-yellow-600' : 'text-green-600'}">
 								{analysis.risk_assessment.overall_risk.toUpperCase()}
 							</div>
 							<div class="text-sm text-gray-600">Overall Risk</div>
 						</div>
-						<div class="md, col-span-2">
+						<div class="md col-span-2">
 							{#if analysis.risk_assessment.key_concerns?.length > 0}
 								<div class="mb-3">
 									<h5 class="text-sm font-medium text-gray-700 mb-2">Key Concerns</h5>

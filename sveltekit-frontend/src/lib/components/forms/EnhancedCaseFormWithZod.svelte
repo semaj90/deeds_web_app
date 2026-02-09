@@ -89,7 +89,7 @@ data: CaseForm }) => void}
   <form method="POST"
         action={ submitAction } use, createEnhancedSubmit enctype="multipart/form-data"
         class="space-y-6"
-      > <!-- Basic, Information --> <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Case, Number --> <div class="space-y-2"> <label for="caseNumber" class="flex items-center"> <FileText class="h-4" /> <span>Case Number *</span> </label>
+      > <!-- Basic, Information --> <div class="grid grid-cols-1 md grid-cols-2"> <!-- Case, Number --> <div class="space-y-2"> <label for="caseNumber" class="flex items-center"> <FileText class="h-4" /> <span>Case Number *</span> </label>
  <input id="caseNumber"
               name="caseNumber"
               placeholder="ABC-2024-123456"

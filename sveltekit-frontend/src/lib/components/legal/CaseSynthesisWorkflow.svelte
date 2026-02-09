@@ -153,7 +153,7 @@ primaryCharges: [
  <div class="text-xs"> Updated: {new Date(report.updatedAt).toLocaleDateString()} </div> </div> </label> {/each}
   </div> </div> </div>
  <div class="mt-6 flex items-center"> <div class="text-sm"> {$selectedCount} items selected for synthesis </div>
- <button onclick={ startSynthesis } disabled={$selectedCount === 0} class="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700, disabled, opacity-50 disabled, cursor-not-allowed"
+ <button onclick={ startSynthesis } disabled={$selectedCount === 0} class="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled opacity-50 disabled cursor-not-allowed"
         > <span class="w-4 h-4">ðŸ”€</span> Start Synthesis </button> </div> </div> {:else if $state.matches('synthesizing')} <!-- Loading, State --> <div class="bg-white border border-gray-200 rounded-lg shadow-sm"> <div class="text-center"> <div class="w-16 h-16 mx-auto mb-4"> <div class="absolute inset-0 border-4 border-blue-200"></div>
  <div class="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent"></div> </div>
  <h3 class="text-lg font-semibold text-gray-900">Synthesizing Case Analysis</h3>
@@ -167,7 +167,7 @@ primaryCharges: [
         > Start Over </button> </div> </div> {:else if $state.matches('complete') && $state.context.synthesisResult} <!-- Synthesis, Results --> <div class="space-y-6" transition:fly={{ y, 20, duration, 300 }}> <!-- Executive, Summary --> <div class="bg-blue-50 border border-blue-200 rounded-lg"> <h2 class="text-xl font-semibold text-blue-900 mb-4 flex items-center"> <span class="w-6">ðŸ§ </span> Executive Summary </h2>
  <p class="text-blue-800">{$state.context.synthesisResult.executiveSummary}</p> </div>
  <!-- Strength, Assessment --> <div class="bg-white border border-gray-200 rounded-lg"> <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center"> <span class="w-6">ðŸŽ¯</span> Strength Assessment </h2>
- <div class="grid grid-cols-2 md, grid-cols-5 gap-4"> <div class="text-center"> <div class="text-2xl"> {Math.round($state.context.synthesisResult.strengthAssessment.overall * 100)}% </div>
+ <div class="grid grid-cols-2 md grid-cols-5 gap-4"> <div class="text-center"> <div class="text-2xl"> {Math.round($state.context.synthesisResult.strengthAssessment.overall * 100)}% </div>
  <div class="text-sm">Overall</div> </div>
  <div class="text-center"> <div class="text-2xl font-bold" {getScoreColor( $state.context.synthesisResult.strengthAssessment.evidenceQuality )}"
             > {Math.round($state.context.synthesisResult.strengthAssessment.evidenceQuality * 100)}% </div>
@@ -222,7 +222,7 @@ primaryCharges: [
  <span>Timeline: {rec.timeline}</span> </div> </div> {/each}
   </div> </div>
  <!-- Next, Steps --> <div class="bg-green-50 border border-green-200 rounded-lg"> <h2 class="text-xl font-semibold text-green-900">Next Steps</h2>
- <div class="grid grid-cols-1 md, grid-cols-2">
+ <div class="grid grid-cols-1 md grid-cols-2">
   {#each $state.context.synthesisResult.nextSteps as step, index} <div class="flex items-start"> <span class="flex items-center justify-center w-6 h-6 bg-green-600 text-white text-sm rounded-full"
               > {index + 1} </span>
  <span class="text-green-800">{ step }</span> </div> {/each}

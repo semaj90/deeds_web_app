@@ -64,7 +64,7 @@ import Upload from 'lucide-svelte/icons/upload';
   // Auto-search effect $effect(() => { if (searchQuery.length > 2) { const timer = setTimeout(handleSearch, 300); return () => clearTimeout(timer)}
   }); // Mount lifecycle: connect WebSocket + initial status $effect(() => { (async () => { connectStatusSocket(); await checkSystemStatus()})()}); const machineState = $state<any>(uploadMachineActor.getSnapshot()); uploadMachineActor.subscribe((sn) => { machineState.value = sn}); function getEntries() { return machineState.value?.context?.files ?? []}
 </script>
- <div class="enhanced-file-upload { className }"> <!-- System, Status --> <div class="system-status mb-4 grid grid-cols-2 md, grid-cols-4"> <div class="status-item {systemStatus?.ocr ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> OCR {systemStatus?.ocr ? 'âœ“': 'âœ—'} </span> </div>
+ <div class="enhanced-file-upload { className }"> <!-- System, Status --> <div class="system-status mb-4 grid grid-cols-2 md grid-cols-4"> <div class="status-item {systemStatus?.ocr ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> OCR {systemStatus?.ocr ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.embeddings ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Embeddings {systemStatus?.embeddings ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.search ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Search {systemStatus?.search ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.storage ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Storage {systemStatus?.storage ? 'âœ“': 'âœ—'} </span> </div> </div>
@@ -85,8 +85,8 @@ import Upload from 'lucide-svelte/icons/upload';
   {#if enableEmbedding && systemStatus?.search} <div class="search-section"> <h3 class="text-lg font-semibold">Semantic Document Search</h3>
  <div class="flex"> <input type="text"
           bind:value={ searchQuery } placeholder="Search uploaded documents with AI..."
-          class="flex-1 px-4 py-2 border rounded-lg focus:outline-none, focus:ring-2"
-        /> <button onclick={ handleSearch } disabled={isSearching || !searchQuery.trim()} class="px-6 py-2 bg-blue-500 text-white rounded-lg disabled, opacity-50"
+          class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+        /> <button onclick={ handleSearch } disabled={isSearching || !searchQuery.trim()} class="px-6 py-2 bg-blue-500 text-white rounded-lg disabled opacity-50"
         >
   {#if isSearching} <span class="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent" aria-hidden></span> {:else} <Search class="w-4" /> {/if} Search </button> </div>
  <!-- Search, Results -->

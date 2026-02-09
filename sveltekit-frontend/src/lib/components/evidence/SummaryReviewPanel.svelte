@@ -69,7 +69,7 @@ citations: Array<{ text: string; caseId?, string }>;
  {#if showEditMode}
  <textarea
  bind:value={editedHolding}
- class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2, focus:ring-blue-500, focus:border-transparent"
+ class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  rows="3"
  ></textarea>
  {:else}
@@ -87,7 +87,7 @@ citations: Array<{ text: string; caseId?, string }>;
  {#if showEditMode}
  <textarea
  bind:value={editedReasoning}
- class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2, focus:ring-blue-500, focus:border-transparent"
+ class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  rows="4"
  ></textarea>
  {:else}
@@ -161,7 +161,7 @@ citations: Array<{ text: string; caseId?, string }>;
  <button
  onclick={handleApprove}
  disabled={isApproving}
- class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700, disabled, bg-gray-400 font-medium transition"
+ class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled bg-gray-400 font-medium transition"
  >
  {isApproving ? 'Approving...' : 'Approve & Save'}
  </button>

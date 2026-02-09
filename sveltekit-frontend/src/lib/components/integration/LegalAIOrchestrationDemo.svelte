@@ -217,7 +217,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="research-query">Research Query</label>
- <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2, focus:ring-blue-500" rows="3"></textarea>
+ <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
@@ -246,7 +246,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-content">Document Content</label>
- <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2, focus:ring-blue-500" rows="6"></textarea>
+ <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="6"></textarea>
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-type">Document Type</label>
@@ -265,11 +265,11 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-title">Case Title</label>
- <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2, focus:ring-blue-500" />
+ <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" />
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-description">Case Description</label>
- <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2, focus:ring-blue-500" rows="4"></textarea>
+ <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>

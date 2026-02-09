@@ -333,7 +333,7 @@ caseId: searchResult,
  <textarea
  bind:value={searchQuery}
  placeholder="Describe the legal case, evidence, or question..."
- class="w-full h-24 p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400, focus:outline-none resize-none"
+ class="w-full h-24 p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none resize-none"
  disabled={isSearching}
  ></textarea>
  </div>
@@ -345,7 +345,7 @@ caseId: searchResult,
  <input
  bind:value={jurisdiction}
  placeholder="e.g., California: Federal, etc."
- class="w-full p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400, focus:outline-none"
+ class="w-full p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
  disabled={isSearching}
  />
  </div>
@@ -354,7 +354,7 @@ caseId: searchResult,
  <button
  onclick={performPhoenixWrightSearch}
  disabled={isSearching || !searchQuery.trim()}
- class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700, disabled, bg-gray-600 text-white rounded font-medium transition-colors"
+ class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled bg-gray-600 text-white rounded font-medium transition-colors"
  >
  {#if isSearching}
  <span class="flex items-center justify-center">
@@ -392,7 +392,7 @@ caseId: searchResult,
  <button
  onclick={() => exportResults('json')}
  disabled={isExporting}
- class="px-3 py-1 bg-green-600 hover:bg-green-700, disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
  >
  {#if isExporting}
  <div class="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
@@ -404,7 +404,7 @@ caseId: searchResult,
  <button
  onclick={() => exportResults('pdf')}
  disabled={isExporting}
- class="px-3 py-1 bg-red-600 hover:bg-red-700, disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
  >
  {#if isExporting}
  <div class="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
@@ -416,7 +416,7 @@ caseId: searchResult,
  <button
  onclick={() => addToFavorites(searchResult)}
  disabled={favorites.some(fav => fav.id === searchResult.id)}
- class="px-3 py-1 bg-yellow-600 hover:bg-yellow-700, disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
  >
  ⭐ Favorite
  </button>

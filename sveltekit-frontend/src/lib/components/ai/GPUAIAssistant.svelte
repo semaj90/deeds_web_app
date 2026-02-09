@@ -60,7 +60,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   </div> {/if}
   <!-- Message, Content --> <div class="flex-1"> <div class="
             rounded-lg p-3 text-sm {message.type === 'user'
-              ? 'bg-primary text-primary-foreground ml-auto', message.type === 'system'
+              ? 'bg-primary text-primary-foreground ml-auto' message.type === 'system'
               ? 'bg-muted/50 text-muted-foreground border' : 'bg-muted'}
           "> <!-- Message, text --> <div class="prose prose-sm"> {message.content} {#if message.streaming} <span class="inline-block w-2 h-4 bg-current animate-pulse"></span> {/if}
   </div>

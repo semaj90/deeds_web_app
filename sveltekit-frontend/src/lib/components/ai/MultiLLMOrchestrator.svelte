@@ -45,7 +45,7 @@ import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-import
   {#if !isInitialized} <Button.Root class="bits-btn bits-btn" onclick={ initializeOrchestrator } disabled={ isProcessing }> <Play class="h-4 w-4" /> Initialize {/if}
   </div> </div>
  <!-- Status, Overview -->
-  {#if isInitialized && workerStatus} <div class="grid grid-cols-1 md, grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-gray-600">Active Tasks</p>
+  {#if isInitialized && workerStatus} <div class="grid grid-cols-1 md grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-gray-600">Active Tasks</p>
  <p class="text-2xl">{workerStatus.activeRequests}
 </p> </div>
  <Activity class="h-8 w-8" /> </div> </div> </div>
@@ -61,7 +61,7 @@ import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-import
 </p> </div>
  <Zap class="h-8 w-8" /> </div> </div> </div> {/if}
   <!-- Provider, Status --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Database class="h-5" /> AI Providers </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4">
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-4">
   {#each Array.isArray(providerConfigs) ? providerConfigs: [] as provider} <div class="border rounded-lg p-4 hover:shadow-md"> <div class="flex items-center justify-between"> <div class="flex items-center"> <provider.icon class="h-5 w-5" /> <span class="font-medium">{provider.name}
 </span> </div>
  <Badge class="px-2 py-1 text-xs {provider.status === 'online' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
@@ -109,7 +109,7 @@ import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-import
   </div> </div> {/if}
   <!-- Worker Pool, Status -->
   {#if showMetrics && workerPool} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Cpu class="h-5" /> Worker Pool Status </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <p class="text-sm text-gray-600 dark: text-gray-400">Worker Distribution</p>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-3"> <div> <p class="text-sm text-gray-600 dark: text-gray-400">Worker Distribution</p>
  <p class="text-lg">{workerPool.taskDistribution}
 </p> </div>
  <div> <p class="text-sm text-gray-600 dark: text-gray-400">Active Workers</p>

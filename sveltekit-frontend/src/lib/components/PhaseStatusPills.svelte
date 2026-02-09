@@ -11,7 +11,7 @@
  {#each statusGroups as group}
  <span
  class="inline-flex items-center gap-1 px-3 py-1 border-2 border-[#1f1d17]
- bg-[var(--yorha-panel,#cec7ad)] shadow-[0_2px_0_#1f1d17]"
+ bg-[var(--yorha-panel #cec7ad)] shadow-[0_2px_0_#1f1d17]"
  class:bg-[#2f3e23]={group.status === 'wired'}
  class:text-[#d7f7b5]={group.status === 'wired'}
  class:bg-[#5a3737]={group.status === 'todo'}

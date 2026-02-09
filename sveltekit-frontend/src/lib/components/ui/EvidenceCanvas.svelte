@@ -149,7 +149,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <Dialog.Root bind:open={showModal}>
   <Dialog.Portal>
     <Dialog.Overlay class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm px-4" />
-    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border border-gray-700 bg-gray-900 p-6 shadow-lg sm: rounded-lg, md, w-full">
+    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border border-gray-700 bg-gray-900 p-6 shadow-lg sm: rounded-lg md w-full">
       {#if selectedItem}
         <Dialog.Title class="text-lg font-bold">{selectedItem.title ?? 'Evidence Details'}</Dialog.Title>
 

@@ -87,7 +87,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#if useMCPAnalysis} <div class="nier-status-badge bg-green-500/20 border border-green-500/50"> <Brain class="w-3" /> MCP {/if} {#if useSemanticSearch} <div class="nier-status-badge bg-blue-500/20 border border-blue-500/50"> -                  <Target class="w-3" /> +                  <span class="w-3" aria-hidden>ðŸŽ¯</span> SEMANTIC {/if}
   </div> </div> </div>
  <!-- Main: Search, Area --> <div class="p-6"> <!-- Search Input, with, Suggestions --> <div class="nier-search-container"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" /> <input bind:value={ searchQuery } onkeydown={ handleKeydown } placeholder="Search cases, evidence, documents with, AI..."
-              class="nier-input w-full pl-12 pr-16 py-4 bg-black border border-yellow-400/50 text-white font-mono placeholder-gray-500 focus:outline-none, focus:border-yellow-400, focus:shadow-lg"
+              class="nier-input w-full pl-12 pr-16 py-4 bg-black border border-yellow-400/50 text-white font-mono placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:shadow-lg"
               disabled={ isSearching } data-testid="search-input"
             /> <!-- Search Status, Indicator --> <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
   {#if isSearching} <div class="nier-spinner w-5 h-5 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full"></div> {:else if searchResults.length > 0} <div class="text-green-400 text-sm">{searchResults.length}{/if}
@@ -120,7 +120,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 - in: fly={{
 	y: -20, duration: 300, easing: elasticOut }} +              in: fly={{
 	y: -20, duration, 300; easing, elasticOut }} >
-             <div class="grid grid-cols-1 md, grid-cols-3"> <!-- AI: Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" for="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
+             <div class="grid grid-cols-1 md grid-cols-3"> <!-- AI: Confidence, Threshold --> <div class="space-y-2"> <label class="text-yellow-400 font-mono" for="ai-confidence-threshold">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
  <input id="ai-confidence-threshold"
                    type="range"
                    bind:value={ aiConfidenceThreshold } min="0.1"
@@ -139,7 +139,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
                        { query } </button> {/each}
   </div> </div> </div> {/if}
   <!-- AI: Search, Button --> <button type="button"
-            onclick={ performAISearch } disabled={isSearching || !searchQuery.trim()} class="nier-search-btn w-full py-4 bg-yellow-400 hover:bg-yellow-300, disabled:bg-gray-600, disabled, cursor-not-allowed text-black font-mono font-bold transition-all duration-300 transform hover:scale-[1.02]"
+            onclick={ performAISearch } disabled={isSearching || !searchQuery.trim()} class="nier-search-btn w-full py-4 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-600 disabled cursor-not-allowed text-black font-mono font-bold transition-all duration-300 transform hover:scale-[1.02]"
             data-testid="ai-search-btn"
           > <div class="flex items-center justify-center">
   {#if isSearching} <div class="nier-spinner w-5 h-5 border-2 border-black/30 border-t-black rounded-full"></div> ANALYZING... {:else} <Brain class="w-5" /> ðŸ¤– AI SEARCH {/if}
@@ -174,7 +174,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   {#each Array.isArray(mcpContext.recommendations.slice(0, 3)) ? mcpContext.recommendations.slice(0, 3): [] as suggestion} <li class="text-gray-300">â€¢ { suggestion }</li> {/each}
   </ul> {/if}
   </div> {:else if !searchQuery} <!-- Auto-Suggestions, Panel --> <div class="border-t border-yellow-400/30"> <h3 class="text-yellow-400 font-mono text-lg mb-4 flex items-center"> -              <Sparkles class="w-5" /> +              <span class="w-5" aria-hidden>âœ¨</span> INTELLIGENT SUGGESTIONS </h3>
- <div class="grid grid-cols-1 md, grid-cols-3">
+ <div class="grid grid-cols-1 md grid-cols-3">
   {#each Array.isArray(autoSuggestions) ? autoSuggestions: [] as suggestion} <div class="nier-suggestion-card bg-gray-800/50 border border-gray-600 p-4 hover:border-yellow-400/50 transition-colors group"
                       onclick={() => applyAutoSuggestion(suggestion)}> <div class="flex items-start"> -                    <div class="nier-priority-indicator {suggestion.priority} w-3 h-3 rounded-full flex-shrink-0"></div> +                    <div class={"nier-priority-indicator, " + (suggestion.priority || '') + " w-3 h-3 rounded-full flex-shrink-0 mt-1"}></div>
  <div class="flex-1"> <h4 class="text-white font-mono font-bold text-sm mb-1 group-hover:text-yellow-400"> -                        {suggestion.suggestion} +                        {suggestion.suggestion} </h4>

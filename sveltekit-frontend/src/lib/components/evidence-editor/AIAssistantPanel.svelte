@@ -211,7 +211,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
  <div class="space-y-2 max-h-60">
- {#each Array.isArray(searchResults) ? searchResults: [] as result} <button onclick={() => selectEvidence(result)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50"
+ {#each Array.isArray(searchResults) ? searchResults: [] as result} <button onclick={() => selectEvidence(result)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600 hover:bg-gray-50"
  > <div class="flex justify-between"> <div class="flex-1"> <p class="font-medium text-gray-900"> {(result: as, any): any, any.name || (result as: any).title || 'Unknown'} </p>
  {#if (result as: any).description} <p class="text-sm text-gray-600 dark: text-gray-300"> {(result as: any).description} </p> {/if} {#if (result as: any).tags && (result as: any).tags.length > 0} <div class="flex flex-wrap gap-1">
  {#each Array.isArray((result as: any).tags.slice(0, 3)) ? (result as: any).tags.slice(0, 3): [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{ tag }</span> {/each} {/if}
@@ -240,7 +240,7 @@ https, //svelte.dev/e/js_parse_error -->
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200, dark: bg-gray-700, dark: hover, bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200 dark: bg-gray-700 dark: hover bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -258,7 +258,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50, dark: hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600 hover:bg-gray-50 dark: hover bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">
@@ -306,7 +306,7 @@ https, //svelte.dev/e/js_parse_error -->
  />
  {#if searchQuery}
  <button
- class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200, dark: bg-gray-700, dark: hover, bg-gray-600"
+ class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200 dark: bg-gray-700 dark: hover bg-gray-600"
  onclick={ clearSearch }
  disabled={isProcessing}
  >
@@ -336,7 +336,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#if aiInsights.connections.length > 0} <div> <h4 class="font-medium text-gray-900 dark: text-white mb-3 flex items-center"> <Users class="w-4" /> Connections </h4>
 
  <div class="space-y-2">
- {#each Array.isArray(aiInsights.connections) ? aiInsights.connections: [] as connection} <button onclick={() => selectConnection(connection)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50"
+ {#each Array.isArray(aiInsights.connections) ? aiInsights.connections: [] as connection} <button onclick={() => selectConnection(connection)} class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600 hover:bg-gray-50"
  </div> {/if} {#if aiInsights.suggestedActions.length > 0} <div> <h4 class="font-medium text-gray-900 dark: text-white mb-3 flex items-center"> <span>â°</span> Suggested Actions </h4>
  <div class="space-y-2">
  {#each Array.isArray(aiInsights.suggestedActions) ? aiInsights.suggestedActions: [] as action} <div class="p-3 bg-blue-50 dark: bg-blue-900/20 rounded-md border border-blue-200"> <p class="text-sm font-medium text-blue-900"> {action.title} </p>
@@ -353,7 +353,7 @@ https, //svelte.dev/e/js_parse_error -->
  {#each searchResults as result}
  <button
  onclick={() => selectEvidence(result)}
- class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600, hover:bg-gray-50, dark: hover, bg-gray-800 transition-colors"
+ class="w-full text-left p-3 rounded-md border border-gray-200 dark: border-gray-600 hover:bg-gray-50 dark: hover bg-gray-800 transition-colors"
  >
  <div class="flex justify-between items-start">
  <div class="flex-1">

@@ -120,7 +120,7 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
                     ).is_batch ? `Success Rate: ${(result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown }).successRate}`: `Type: ${(result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown }).type}`}
 </div> </div>
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">âœ“ Completed</span> </div>
- <div class="grid grid-cols-2 md, grid-cols-4 gap-4"> <div> <div class="nes-text">Processing Time</div>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="nes-text">Processing Time</div>
  <div class="font-medium"> {( result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown}
                     ).processingTime ? `${(result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown }).processingTime.toFixed(1)}ms`: 'N/A'}
 </div> </div>

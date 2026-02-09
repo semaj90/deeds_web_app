@@ -59,7 +59,7 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md, grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 md grid-cols-4 gap-4 mb-8">
         <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50">
             <div class="text-3xl font-bold text-white">{data.totalErrors.toLocaleString()}</div>
             <div class="text-slate-400 text-sm">Total Errors</div>
@@ -88,7 +88,7 @@
                     type="text"
                     bind:value={searchQuery}
                     placeholder="Search by file, message, or code..."
-                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none, focus:ring-2, focus:ring-blue-500"
+                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
 
@@ -97,7 +97,7 @@
                 <label class="block text-sm text-slate-400 mb-2">Error Code</label>
                 <select
                     bind:value={selectedErrorCode}
-                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none, focus:ring-2, focus:ring-blue-500"
+                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="">All Codes</option>
                     {#each Object.entries(data.errorCodeCounts).sort((a, b) => b[1] - a[1]) as [code, count]}
@@ -111,7 +111,7 @@
                 <label class="block text-sm text-slate-400 mb-2">Surface</label>
                 <select
                     bind:value={selectedSurface}
-                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none, focus:ring-2, focus:ring-blue-500"
+                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="">All Surfaces</option>
                     {#each Object.entries(data.surfaceCounts).sort((a, b) => b[1] - a[1]) as [s, count]}
@@ -125,7 +125,7 @@
                 <label class="block text-sm text-slate-400 mb-2">Tech</label>
                 <select
                     bind:value={selectedTech}
-                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none, focus:ring-2, focus:ring-blue-500"
+                    class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="">All Tech</option>
                     {#each Object.entries(data.techCounts).sort((a, b) => b[1] - a[1]) as [t, count]}

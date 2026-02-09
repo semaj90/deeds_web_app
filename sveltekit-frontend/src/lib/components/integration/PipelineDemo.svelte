@@ -54,7 +54,7 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
  <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-gray-900"> ðŸš€ Advanced Redis Pipeline Demo </h1>
  <p class="text-gray-600"> XState Management â€¢ Worker Threads â€¢ GPU Acceleration â€¢ Memory Optimization </p> </div>
  <!-- Pipeline, Controls --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Pipeline Execution</h3> </div>
- <div class="yorha-panel-content"> <!-- Pipeline, Selection --> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" for="pipeline-type">Pipeline Type</label>
+ <div class="yorha-panel-content"> <!-- Pipeline, Selection --> <div class="grid grid-cols-1 md grid-cols-3"> <div> <label class="block text-sm font-medium" for="pipeline-type">Pipeline Type</label>
 <select id="pipeline-type" ,bind:value={ selectedPipeline } class="w-full p-2 border"
             disabled={ isProcessing } >
             <option value="optimized">ðŸš€ Optimized (XState + Workers)</option>
@@ -94,7 +94,7 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
 </div> </div> </div> </div> {/each}
   </div> {/if}
   </div> </div>
- <!-- Metrics, Dashboard --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{metrics.totalOperations}
+ <!-- Metrics, Dashboard --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{metrics.totalOperations}
 </div>
  <div class="text-sm">Total Operations</div> </div> </div> </div>
  <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{formatTime(metrics.averageTime)}
@@ -107,7 +107,7 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
  <div class="text-sm">Recent Results</div> </div> </div> </div> </div>
  <!-- System, Health -->
   {#if systemHealth} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">System Health</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-2 md, grid-cols-4"> <div class="text-center"> <div class={systemHealth.gpu ? 'text-green-600' : 'text-red-600'}> {systemHealth.gpu ? 'âœ…': 'âŒ'} GPU </div> </div>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-2 md grid-cols-4"> <div class="text-center"> <div class={systemHealth.gpu ? 'text-green-600' : 'text-red-600'}> {systemHealth.gpu ? 'âœ…': 'âŒ'} GPU </div> </div>
  <div class="text-center"> <div class={systemHealth.redis ? 'text-green-600' : 'text-red-600'}> {systemHealth.redis ? 'âœ…': 'âŒ'} Redis </div> </div>
  <div class="text-center"> <div class="text-blue-600"> {systemHealth.memory?.percentage}% Memory </div> </div>
  <div class="text-center"> <div class="text-purple-600"> {systemHealth.activeOperations} Active </div> </div> </div> </div> {/if}
@@ -120,7 +120,7 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
 </span> </div>
  <div class="text-sm"> {formatTime((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.totalProcessingTime)}
 </div> </div>
- <div class="grid grid-cols-2 md, grid-cols-4 gap-2"> <div> <span class="text-gray-500">Cache Hit:</span>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-2"> <div> <span class="text-gray-500">Cache Hit:</span>
  <span class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.cacheHitRate.toFixed(1)}%</span> </div>
  <div> <span class="text-gray-500">Memory:</span>
  <span class="font-medium">{formatMemory((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.memoryUsageMB)}
@@ -134,7 +134,7 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
   </div> </div> {/if}
   <!-- Performance, Report -->
   {#if performanceReport} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Performance Report</h3> </div>
- <div class="yorha-panel-content"> <div class="space-y-4"> <div class="grid grid-cols-2 md, grid-cols-4 gap-4"> <div> <div class="text-gray-500">Total Operations</div>
+ <div class="yorha-panel-content"> <div class="space-y-4"> <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="text-gray-500">Total Operations</div>
  <div class="font-semibold">{performanceReport.totalOperations}
 </div> </div>
  <div> <div class="text-gray-500">Average Time</div>

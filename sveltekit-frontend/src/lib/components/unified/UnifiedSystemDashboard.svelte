@@ -105,7 +105,7 @@
 
 <div class="space-y-6">
   <!-- Top Header Section -->
-  <div class="flex flex-col md: flex-row, md:items-center justify-between gap-4">
+  <div class="flex flex-col md: flex-row md:items-center justify-between gap-4">
     <div class="flex items-center gap-4">
       <div class="p-3 bg-primary/10 rounded-xl">
         <Shield class="w-8 h-8 text-primary" />
@@ -135,7 +135,7 @@
     </div>
   </div>
 
-  <div class="grid gap-4 md:grid-cols-2, lg:grid-cols-4">
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
     <!-- Resource Usage Cards -->
     <Card.Root>
       <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -192,9 +192,9 @@
       <Card.Content>
         <div class="space-y-4">
           {#each services as service}
-            <div class="flex items-center justify-between border-b border-border/40 pb-3 last: border-0, last:pb-0">
+            <div class="flex items-center justify-between border-b border-border/40 pb-3 last: border-0 last:pb-0">
               <div class="flex items-center gap-3">
-                <div class="w-2 h-2 rounded-full {service.status === 'online' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-500'}"></div>
+                <div class="w-2 h-2 rounded-full {service.status === 'online' ? 'bg-green-500 shadow-[0_0_8px_rgba(34 197 94 0.6)]' : 'bg-red-500'}"></div>
                 <div>
                   <div class="font-medium">{service.name}</div>
                   <div class="text-[10px] text-muted-foreground uppercase tracking-wider">{service.id}</div>

@@ -101,7 +101,7 @@
       >
         {isLoading ? 'SYNCING...' : 'FORCE SYNC'}
       </button>
-      <div class="h-2 w-2 bg-cyan-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.5)]"></div>
+      <div class="h-2 w-2 bg-cyan-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(6 182 212 0.5)]"></div>
     </div>
   </div>
 
@@ -122,13 +122,13 @@
         <div class="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
         <div class="flex justify-between items-start mb-4">
           <span class="text-[10px] text-slate-500 uppercase tracking-wider">Processor Load</span>
-          <span class="text-xl font-bold {getHealthColor(m.cpu_usage, t.cpu_warning, t.cpu_critical)}">
+          <span class="text-xl font-bold {getHealthColor(m.cpu_usage t.cpu_warning t.cpu_critical)}">
             {Math.round(m.cpu_usage)}%
           </span>
         </div>
         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
           <div
-            class="h-full transition-all duration-500 {getBarColor(m.cpu_usage, t.cpu_warning, t.cpu_critical)}"
+            class="h-full transition-all duration-500 {getBarColor(m.cpu_usage t.cpu_warning t.cpu_critical)}"
             style="width: {m.cpu_usage}%">
           </div>
         </div>
@@ -139,7 +139,7 @@
         <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
         <div class="flex justify-between items-start mb-4">
           <span class="text-[10px] text-slate-500 uppercase tracking-wider">Memory Allocation</span>
-          <span class="text-xl font-bold {getHealthColor(m.memory_usage, t.memory_warning, t.memory_critical)}">
+          <span class="text-xl font-bold {getHealthColor(m.memory_usage t.memory_warning t.memory_critical)}">
             {Math.round(m.memory_usage)}%
           </span>
         </div>
@@ -156,7 +156,7 @@
         <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
         <div class="flex justify-between items-start mb-4">
           <span class="text-[10px] text-slate-500 uppercase tracking-wider">Neural Engine</span>
-          <span class="text-xl font-bold {getHealthColor(m.gpu_utilization, t.gpu_warning, t.gpu_critical)}">
+          <span class="text-xl font-bold {getHealthColor(m.gpu_utilization t.gpu_warning t.gpu_critical)}">
             {Math.round(m.gpu_utilization)}%
           </span>
         </div>

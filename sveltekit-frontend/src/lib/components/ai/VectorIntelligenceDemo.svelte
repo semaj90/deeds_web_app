@@ -45,7 +45,7 @@ query: query.trim() }) }); if (!response.ok) { const errText = await response.te
   {#if error} <div class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center"> <AlertCircle class="h-4 w-4" /> <div class="text-red-800">{ error }
 </div> {/if}
   <!-- Search, Metrics -->
-  {#if showMetrics} <div class="nes-container"> <div class="yorha-panel-content"> <div class="grid grid-cols-2 md, grid-cols-4 gap-4"> <div> <div class="text-2xl">{metrics.totalDocuments}
+  {#if showMetrics} <div class="nes-container"> <div class="yorha-panel-content"> <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="text-2xl">{metrics.totalDocuments}
 </div>
  <div class="text-sm nes-text">Documents</div> </div>
  <div> <div class="text-2xl">{metrics.searchTime}ms</div>

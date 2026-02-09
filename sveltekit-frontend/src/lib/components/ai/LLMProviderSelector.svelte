@@ -32,7 +32,7 @@ placement: 'bottom', fitViewport: true }
   	} </script>
  <div class="llm-provider-selector"> <!-- Label --> <label class="block text-sm font-medium text-yorha-text-primary"
 	> LLM Provider </label>
- <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder:text-yorha-text-tertiary, focus:outline-none, focus:ring-2, focus:ring-yorha-primary, focus:ring-offset-2, disabled:cursor-not-allowed, disabled, opacity-50 transition-all duration-200", class:opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
+ <!-- Select, Trigger --> <button class="flex h-10 w-full items-center justify-between rounded-md border border-yorha-border bg-yorha-bg-secondary px-3 py-2 text-sm placeholder:text-yorha-text-tertiary focus:outline-none focus:ring-2 focus:ring-yorha-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled opacity-50 transition-all duration-200", class:opacity-50={ disabled } { disabled } aria-label="Select LLM, Provider"
 	> <span class="truncate">
   {#if selectedProvider} <span class="flex items-center"> <span class="text-lg" role="img">{getTypeIcon(selectedProvider.type)}</span>
  <span>{selectedProvider.name}</span>

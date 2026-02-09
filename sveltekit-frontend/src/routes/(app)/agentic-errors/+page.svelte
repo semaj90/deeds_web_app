@@ -135,7 +135,7 @@ dependencies: string[];
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white p-8">
-	<div class="max-w-7xl mx-auto py-12 px-4 sm: px-6, lg:px-8">
+	<div class="max-w-7xl mx-auto py-12 px-4 sm: px-6 lg:px-8">
 		<!-- Header -->
 		<div class="mb-8">
 			<h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
@@ -211,7 +211,7 @@ dependencies: string[];
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search for errors (e.g., 'svelte5 runes type error')"
-						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none, focus:ring-2 focus:ring-purple-500"
+						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
 						onkeydown={(e) => e.key === 'Enter' && vectorSearch()}
 					/>
 					<button
@@ -372,7 +372,7 @@ dependencies: string[];
 					<button
 						onclick={runClustering}
 						disabled={loading}
-						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700, hover:to-pink-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
 					>
 						{loading ? '🚀 Pipeline Running...' : '🔥 Start All-in-One Analysis Pipeline'}
 					</button>

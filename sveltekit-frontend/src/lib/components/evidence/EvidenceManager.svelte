@@ -265,7 +265,7 @@
   }
 </script>
 <div class="evidence-manager"> <!-- Embedding: Stats, Card --> <div class="mb-6"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ“Š Embedding Status</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-4 gap-4"> <div class="stat-item"> <div class="text-2xl font-bold">{embeddingStats.total}
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-4 gap-4"> <div class="stat-item"> <div class="text-2xl font-bold">{embeddingStats.total}
 </div>
  <div class="text-sm">Total Files</div> </div>
  <div class="stat-item"> <div class="text-2xl font-bold">{embeddingStats.withEmbeddings}

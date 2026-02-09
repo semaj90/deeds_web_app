@@ -103,7 +103,7 @@
   </div> {/if} {/if}
   </div> </div>
  <!-- Recommendations & History -->
-  {#if recommendations} <div class="recommendations-section mt-6 grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4"> <!-- Pick Up Where Left, Off -->
+  {#if recommendations} <div class="recommendations-section mt-6 grid grid-cols-1 md grid-cols-2 lg:grid-cols-4"> <!-- Pick Up Where Left, Off -->
   {#if computationHistory.length > 0} <div class="recommendation-nier-bits-card bg-green-50 p-4 rounded-lg border"> <h4 class="font-semibold text-green-800">ðŸ”„ Resume</h4>
  <button onclick={ pickUpWhereLeftOff } class="text-sm text-green-700 hover:text-green-900"> Pick up where you left off? </button> {/if}
   <!-- Did You, Mean -->

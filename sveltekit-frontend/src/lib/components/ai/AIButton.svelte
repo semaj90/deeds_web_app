@@ -133,10 +133,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				shadow-lg
 				transition-all duration-300 ease-in-out
 				transform-gpu;
-				focus:outline-none, focus:ring-2, focus:ring-yorha-primary, focus:ring-offset-2, focus:ring-offset-yorha-bg-primary;
+				focus:outline-none focus:ring-2 focus:ring-yorha-primary focus:ring-offset-2 focus:ring-offset-yorha-bg-primary;
 	active:scale-95
 				group
-				{disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110, hover:shadow-xl, hover:shadow-yorha-primary/20'}
+				{disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110 hover:shadow-xl hover:shadow-yorha-primary/20'}
 				{loading ? 'animate-pulse' : ''}
 			"
       {disabled}

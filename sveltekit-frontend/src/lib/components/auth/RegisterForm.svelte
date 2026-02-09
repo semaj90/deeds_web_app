@@ -232,7 +232,7 @@ email: formData.get('email') as string,
             placeholder="John"
             bind:value={$form.firstName}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {#if getErr('firstName')}<p class="text-red-500 text-xs mt-1">{getErr('firstName')}</p>{/if}
         </div>
@@ -246,7 +246,7 @@ email: formData.get('email') as string,
             placeholder="Smith"
             bind:value={$form.lastName}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {#if getErr('lastName')}<p class="text-red-500 text-xs mt-1">{getErr('lastName')}</p>{/if}
         </div>
@@ -262,7 +262,7 @@ email: formData.get('email') as string,
           placeholder="john.smith@prosecutor.gov"
           bind:value={$form.email}
           disabled={isLoading}
-          class="w-full px-3 py-2 border rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+          class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {#if getErr('email')}<p class="text-red-500 text-xs mt-1">{getErr('email')}</p>{/if}
       </div>
@@ -276,7 +276,7 @@ email: formData.get('email') as string,
             name="role"
             bind:value={$form.role}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="" disabled selected>Select role</option>
             {#each roleOptions as option}
@@ -295,7 +295,7 @@ email: formData.get('email') as string,
             placeholder="12345"
             bind:value={$form.badgeNumber}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
@@ -311,7 +311,7 @@ email: formData.get('email') as string,
             placeholder="District Attorney's Office"
             bind:value={$form.department}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {#if getErr('department')}<p class="text-red-500 text-xs mt-1">{getErr('department')}</p>{/if}
         </div>
@@ -325,7 +325,7 @@ email: formData.get('email') as string,
             placeholder="Los Angeles County"
             bind:value={$form.jurisdiction}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {#if getErr('jurisdiction')}<p class="text-red-500 text-xs mt-1">{getErr('jurisdiction')}</p>{/if}
         </div>
@@ -343,7 +343,7 @@ email: formData.get('email') as string,
               placeholder="Enter secure password"
               bind:value={$form.password}
               disabled={isLoading}
-              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="button"
@@ -363,7 +363,7 @@ email: formData.get('email') as string,
             <div class="mt-2 flex items-center gap-2">
               <div class="h-2 flex-1 bg-gray-200 rounded">
                 <div
-                  class="h-full rounded transition-all duration-300 {passwordStrength.color.replace('text-', 'bg-')}"
+                  class="h-full rounded transition-all duration-300 {passwordStrength.color.replace('text-' 'bg-')}"
                   style="width: {Math.min(100, (passwordStrength.score / 8) * 100)}%"
                 ></div>
               </div>
@@ -383,7 +383,7 @@ email: formData.get('email') as string,
               placeholder="Confirm your password"
               bind:value={$form.confirmPassword}
               disabled={isLoading}
-              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="button"
@@ -427,7 +427,7 @@ email: formData.get('email') as string,
       <!-- Submit Button -->
       <button
         type="submit"
-        class="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700, disabled:bg-gray-400, disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        class="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         disabled={isLoading || $submitting}
       >
         {#if isLoading || $submitting}

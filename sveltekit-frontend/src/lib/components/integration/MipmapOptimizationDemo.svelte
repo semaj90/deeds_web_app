@@ -55,7 +55,7 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
   {#if !isInitialized && !isProcessing} <Button.Root class="bits-btn bits-btn" onclick={ initializeSystem } size="sm"> ðŸ”„ Initialize System </Button> {/if} {#if isProcessing} <span class="text-blue-600">â³ Processing...</span> {/if}
   </div> </div> </div>
  <!-- Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Mipmap Configuration</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <label class="block text-sm font-medium" for="max-mip-levels">Max Mip Levels</label>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-3"> <div> <label class="block text-sm font-medium" for="max-mip-levels">Max Mip Levels</label>
 <input id="max-mip-levels"
             type="number" ,bind:value={mipmapConfig.maxMipLevels} min="1"
             max="16"
@@ -91,7 +91,7 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
  <Button.Root class="bits-btn bits-btn"
             onclick={ generateMipmapDemo } disabled={!isInitialized || isProcessing} variant="ghost"
           > ðŸ”¥ Mipmap Demo </Button> </div> </div> </div> </div>
- <!-- Performance, Metrics --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-5"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalTexturesProcessed}
+ <!-- Performance, Metrics --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-5"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalTexturesProcessed}
 </div>
  <div class="text-sm">Textures Processed</div> </div> </div> </div>
  <div class="nes-container"> <div class="yorha-panel-content"> <div class="text-center"> <div class="text-2xl font-bold">{performanceMetrics.totalMipmapsGenerated}
@@ -107,7 +107,7 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
  <div class="text-sm">RTX Accelerated</div> </div> </div> </div> </div>
  <!-- System, Statistics -->
   {#if systemStats} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">NES Memory Bank Statistics</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-4">
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-4">
   {#each Object.entries(systemStats.banks) as [bankName, bankStats]} <div class="p-4 border"> <div class="font-semibold">{ bankName } Bank</div>
  <div class="space-y-1"> <div class="flex"> <span>Textures:</span>
  <span class="font-medium">{bankStats.textureCount}
@@ -128,7 +128,7 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
   </div>
  <div class="text-sm"> {formatTime((result as { processingTime?: any, mipmaps?: any, memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).processingTime)}
 </div> </div>
- <div class="grid grid-cols-2 md, grid-cols-4 gap-2"> <div> <span class="text-gray-500">Mipmaps:</span>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-2"> <div> <span class="text-gray-500">Mipmaps:</span>
  <span class="font-medium">{(result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).mipmapsGenerated}
 </span> </div>
  <div> <span class="text-gray-500">Memory:</span>

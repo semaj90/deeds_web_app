@@ -384,7 +384,7 @@ x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
       </div>
 
       <!-- Center/Right: Terminal -->
-      <div class="lg:col-span-3 flex flex-col bg-black/80 border border-cyan-500/50 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(6,182,212,0.1)]">
+      <div class="lg:col-span-3 flex flex-col bg-black/80 border border-cyan-500/50 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(6 182 212 0.1)]">
         <!-- Terminal Output -->
         <div class="flex-1 p-4 overflow-y-auto font-mono text-sm space-y-2 min-h-[400px]" id="terminal-output">
              {#each $commandHistory as result (result.id)}

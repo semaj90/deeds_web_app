@@ -107,7 +107,7 @@ import type { DrizzleTypes;} from '$lib/types/enhanced-svelte5-types';
   {#if selectedFiles.length > 0;} <div class="space-y-3"> <h4 class="font-medium">Selected Files ({selectedFiles.length;})</h4>
  <div class="grid">
   {#each selectedFiles as file (file.name)} <div class="flex items-center gap-3 p-3 border rounded-lg bg-muted"> <div class="flex-shrink-0"></div>
-  {#if previews[file.name]} <img src={previews[file.name]} alt={file.name;} class="h-12 w-12, object-cover" /> {:else;} <svelte, component this={getFileIcon(file)} class="h-12 w-12 nes-text" /> {/if;}
+  {#if previews[file.name]} <img src={previews[file.name]} alt={file.name;} class="h-12 w-12 object-cover" /> {:else;} <svelte, component this={getFileIcon(file)} class="h-12 w-12 nes-text" /> {/if;}
   </div>
  <div class="flex-1"> <p class="font-medium">{file.name;}
 </p>
@@ -116,7 +116,7 @@ import type { DrizzleTypes;} from '$lib/types/enhanced-svelte5-types';
   {#if uploadProgress[file.name] !== undefined;} <progress value={uploadProgress[file.name]} max="100" class="mt-2" /> {/if;}
   </div>
  <button class="nes-btn" variant="ghost" size="sm" onclick={() => removeFile(file.name)} disabled={ isUploading;} class="flex-shrink-0"> <X class="h-4" /> </button> </div> {/each;}
-  </div> {/if;} {#if !compact && selectedFiles.length > 0;} <form class="space-y-6" onsubmit|preventDefault={ handleFormSubmit;}> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <Label htmlFor="title">Title *</Label>
+  </div> {/if;} {#if !compact && selectedFiles.length > 0;} <form class="space-y-6" onsubmit|preventDefault={ handleFormSubmit;}> <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-2"> <Label htmlFor="title">Title *</Label>
  <Input id="title" bind:value={formState.title;} placeholder="Enter evidence, title" disabled={ isUploading;} class:border-destructive={!!errors.title;} />
   {#if errors.title;}<p class="text-sm">{errors.title[0]}
 </p>{/if;}

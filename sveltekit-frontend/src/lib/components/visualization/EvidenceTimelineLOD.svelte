@@ -265,7 +265,7 @@
          <div class="flex rounded-md bg-slate-900 p-1">
             {#each Object.entries(lodConfig) as [level, config]}
                 <button
-                    class="px-2 py-1 text-xs rounded transition-colors {currentLOD === Number(level) ? 'bg-slate-700 text-white' : 'text-slate-500, hover:text-slate-300'}"
+                    class="px-2 py-1 text-xs rounded transition-colors {currentLOD === Number(level) ? 'bg-slate-700 text-white' : 'text-slate-500 hover:text-slate-300'}"
                     onclick={() => { currentLOD = Number(level); updateVisibleEvents(); }}
                 >
                     {config.label}

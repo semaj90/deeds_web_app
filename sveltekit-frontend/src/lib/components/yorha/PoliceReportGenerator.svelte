@@ -170,7 +170,7 @@ narrative: narrative.trim(),
  id="narrative-input"
  bind:value={narrative}
  placeholder="Describe what happened... (e.g., 'I was walking home when I noticed someone following me...')"
- class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none, focus:ring-2 focus:ring-blue-500 resize-none"
+ class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
  ></textarea>
  </div>
 
@@ -210,7 +210,7 @@ narrative: narrative.trim(),
  <button
  onclick={generateReport}
  disabled={isGenerating || (!narrative.trim() && selectedEvidence.length === 0)}
- class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500, hover:to-blue-600, disabled:from-slate-600, disabled, to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+ class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-slate-600 disabled to-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
  >
  {#if isGenerating}
  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -263,7 +263,7 @@ narrative: narrative.trim(),
  <!-- Report Sections -->
  <div class="bg-slate-800 border border-slate-600 rounded-lg overflow-hidden">
  {#each generatedReport.sections as section (section.title)}
- <div class="border-b border-slate-700 last, border-b-0">
+ <div class="border-b border-slate-700 last border-b-0">
  <button
  onclick={() => activeSection = activeSection === section.title ? null : section.title}
  class="w-full text-left px-4 py-3 hover:bg-slate-700 transition-colors flex items-center justify-between"

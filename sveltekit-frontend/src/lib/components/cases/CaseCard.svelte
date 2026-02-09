@@ -95,7 +95,7 @@
             {currentPriority.icon}
           </span>
         </div>
-        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover:text-harvard-crimson, dark:group-hover:text-digital-green">
+        <h3 class="text-lg font-semibold nier-heading line-clamp-1 group-hover:text-harvard-crimson dark:group-hover:text-digital-green">
           {caseData.title}
         </h3>
         {#if caseData.description}

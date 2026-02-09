@@ -196,7 +196,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	</div>
 
 	<!-- Research Configuration -->
-	<div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-6">
+	<div class="grid grid-cols-1 md grid-cols-2 gap-4 mb-6">
 		<div>
 			<label for="jurisdiction" class="block text-sm font-medium text-gray-700 mb-2">
 				Jurisdiction
@@ -204,7 +204,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<select
 				id="jurisdiction"
 				bind:value={ jurisdiction }
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 			>
 				<option value="federal">Federal</option>
 				<option value="state">State</option>
@@ -221,7 +221,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<select
 				id="caseType"
 				bind:value={caseType}
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 			>
 				<option value="civil">Civil</option>
 				<option value="criminal">Criminal</option>
@@ -240,7 +240,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<select
 				id="depth"
 				bind:value={ depth }
-				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 			>
 				<option value="brief">Brief Overview</option>
 				<option value="standard">Standard Analysis</option>
@@ -280,7 +280,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			bind:value={query}
 			placeholder="Enter your legal research question (e.g., 'What are the requirements for establishing undue influence in contract formation?')"
 			rows="3"
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2, focus:ring-blue-500 resize-vertical"
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
 		></textarea>
 	</div>
 
@@ -290,7 +290,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			type="button"
 			onclick={performResearch}
 			disabled={isResearching || !query.trim()}
-			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700, focus:outline-none, focus:ring-2, focus:ring-blue-500, disabled:opacity-50, disabled, cursor-not-allowed"
+			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled cursor-not-allowed"
 		>
 			{#if isResearching}
 				<span class="flex items-center justify-center">
@@ -309,7 +309,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<button
 				type="button"
 				onclick={clearResearch}
-				class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700, focus:outline-none, focus:ring-2, focus:ring-gray-500"
+				class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
 			>
 				Clear
 			</button>
@@ -317,7 +317,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<button
 				type="button"
 				onclick={ exportResearch }
-				class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700, focus:outline-none, focus:ring-2, focus:ring-green-500"
+				class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
 			>
 				Export
 			</button>
@@ -333,7 +333,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 					<button
 						type="button"
 						onclick={() => loadPreviousResearch(item)}
-						class="w-full text-left p-3 border rounded-md hover:bg-gray-50, focus:outline-none, focus:ring-2, focus:ring-blue-500"
+						class="w-full text-left p-3 border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
 					>
 						<div class="font-medium text-gray-900 truncate">{item.query}</div>
 						<div class="text-sm text-gray-500">{new Date(item.timestamp).toLocaleString()}</div>
@@ -461,7 +461,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			{#if currentResearch.practical_analysis}
 				<div class="bg-white border rounded-lg p-4">
 					<h4 class="text-md font-semibold text-gray-900 mb-3">Practical Analysis</h4>
-					<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
+					<div class="grid grid-cols-1 md grid-cols-2 gap-4">
 						{#if currentResearch.practical_analysis.key_considerations?.length}
 							<div>
 								<h5 class="font-medium text-gray-900 mb-2">Key Considerations</h5>
@@ -525,7 +525,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			{#if currentResearch.research_gaps}
 				<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
 					<h4 class="text-md font-semibold text-yellow-900 mb-3">Research Gaps & Recommendations</h4>
-					<div class="grid grid-cols-1 md, grid-cols-3 gap-4">
+					<div class="grid grid-cols-1 md grid-cols-3 gap-4">
 						{#if currentResearch.research_gaps.additional_research_needed?.length}
 							<div>
 								<h5 class="font-medium text-yellow-900 mb-2">Additional Research Needed</h5>
@@ -590,7 +590,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<!-- Metadata -->
 			{#if currentResearch.metadata}
 				<div class="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
-					<div class="grid grid-cols-2 md, grid-cols-4 gap-4">
+					<div class="grid grid-cols-2 md grid-cols-4 gap-4">
 						<div>
 							<strong>Research Time:</strong><br>
 							{new Date(currentResearch.metadata.research_timestamp).toLocaleString()}

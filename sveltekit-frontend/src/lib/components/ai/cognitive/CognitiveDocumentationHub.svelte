@@ -628,7 +628,7 @@ https, //svelte.dev/e/js_parse_error -->
  item as { unlock?: any, title?: any, category?: any; phase?: any; description?: any; timeline?: any; activation?: any; level?: any; steps?: any; tips?: any; effects?: any; objectives?: any; practices?: any; warnings?: any; secretTechniques?: any; advanced?: any; ultimate?: any}
  ).level )}% </div> {/if}
  </div>
- <!-- Content, Sections --> <div class="grid grid-cols-1 md, grid-cols-2">
+ <!-- Content, Sections --> <div class="grid grid-cols-1 md grid-cols-2">
  {#if (item as { unlock?: any; title?: any; category?: any; phase?: any; description?: any; timeline?: any; activation?: any; level?: any; steps?: any; tips?: any; effects?: any; objectives?: any; practices?: any; warnings?: any; secretTechniques?: any; advanced?: any; ultimate?: any }).steps} <div> <h4 class="font-bold text-sm">ðŸ“‹ Implementation Steps</h4>
  <ol class="space-y-1">
  {#each (item as { unlock?: any; title?: any; category?: any; phase?: any; description?: any; timeline?: any; activation?: any; level?: any; steps?: any; tips?: any; effects?: any; objectives?: any; practices?: any; warnings?: any; secretTechniques?: any; advanced?: any; ultimate?: any }).steps as step, index} <li class="flex items-start"> <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0"
@@ -664,7 +664,7 @@ https, //svelte.dev/e/js_parse_error -->
  </div> {/each}
  </div>
  <!-- Quick, Stats --> <div class="mt-6 bg-[#3D3D3D] text-[#F7F6F2] p-4"> <h3 class="font-bold">ðŸ“Š Documentation Progress</h3>
- <div class="grid grid-cols-2 md, grid-cols-4 gap-4"> <div> <div class="font-bold">Consciousness Level</div>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="font-bold">Consciousness Level</div>
  <div>{consciousness.level}/10</div> </div>
  <div> <div class="font-bold">Achievements</div>
  <div>{achievements.length}/50+</div> </div>

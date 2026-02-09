@@ -87,7 +87,7 @@
  </CardContent>
  </Card>
  {:else if status}
- <div class="grid gap-4 md, grid-cols-3">
+ <div class="grid gap-4 md grid-cols-3">
  <Card>
  <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
  <CardTitle class="text-sm font-medium">System Status</CardTitle>

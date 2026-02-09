@@ -30,7 +30,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   } </script>
  <div class="w-full max-w-4xl mx-auto"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Upload class="w-5" /> Evidence Upload - Prosecutor Workflow {#if enableWebGPU} <!-- Replaced Badge component with inline span to avoid Svelte, typing, error --> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"> <Zap class="w-3 h-3" /> GPU Accelerated </span> {/if}
   </h3> </div>
- <div class="yorha-panel-content"> <!-- Evidence: Metadata, Form --> <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label for="evidence-title" class="block text-sm font-medium">Evidence Title *</label>
+ <div class="yorha-panel-content"> <!-- Evidence: Metadata, Form --> <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-2"> <label for="evidence-title" class="block text-sm font-medium">Evidence Title *</label>
  <Input id="evidence-title"
           bind:value={ evidenceTitle } placeholder="e.g., Contract Agreement, Crime Scene Photo"
         /> </div>
@@ -48,7 +48,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <Textarea id="description"
         bind:value={ evidenceDescription } placeholder="Detailed description of the evidence"
         rows={ 3 } /> </div>
- <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label for="tags" class="block text-sm font-medium">Tags (comma-separated)</label>
+ <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-2"> <label for="tags" class="block text-sm font-medium">Tags (comma-separated)</label>
  <Input id="tags" bind:value={ tags } placeholder="contract, fraud, witness, DNA" /> </div>
  <div class="flex items-center"> <input type="checkbox" id="admissible" bind:checked={ isAdmissible } class="w-4" /> <label for="admissible" class="text-sm">Evidence is admissible in court</label> </div> </div>
  <!-- File: Upload, Area --> <div class="border-2 border-dashed rounded-lg p-8 text-center"

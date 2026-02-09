@@ -84,7 +84,7 @@ function handleChange(e: Event) {
 			{ disabled }
 			{required}
 			bind:checked bind:indeterminate
-			class="peer appearance-none {sizeClasses} {variantClasses} cursor-pointer disabled, cursor-not-allowed"
+			class="peer appearance-none {sizeClasses} {variantClasses} cursor-pointer disabled cursor-not-allowed"
 			onchange={ handleChange }
 		/>
 

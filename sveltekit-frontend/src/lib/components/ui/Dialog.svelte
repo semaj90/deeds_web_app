@@ -61,7 +61,7 @@ function handleBackdropClick(e: MouseEvent) {
 				</div>
 				<button
 					type="button"
-					class="dialog-close text-gray-400 hover:text-gray-600 dark: hover, text-gray-300"
+					class="dialog-close text-gray-400 hover:text-gray-600 dark: hover text-gray-300"
 					onclick={handleClose}
 					aria-label="Close dialog"
 				>

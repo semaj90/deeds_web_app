@@ -221,7 +221,7 @@ import type { Case } from '$lib/types';
     {#if viewMode === 'full' || viewMode === 'identification'}
       <div>
         <h3 class="text-sm font-semibold text-yorha-text-primary font-mono mb-3">Personal Information</h3>
-        <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+        <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
           <div>
             <span class="text-yorha-text-secondary">Date of Birth:</span>
             <div class="text-yorha-text-primary">{formatDate(profile.personalInfo.dateOfBirth)}</div>
@@ -275,7 +275,7 @@ import type { Case } from '$lib/types';
     {#if viewMode === 'full' || viewMode === 'identification'}
       <div>
         <h3 class="text-sm font-semibold text-yorha-text-primary font-mono mb-3">Identification</h3>
-        <div class="grid grid-cols-1 md, grid-cols-2 gap-3 text-sm">
+        <div class="grid grid-cols-1 md grid-cols-2 gap-3 text-sm">
           {#if profile.identification.ssn}
             <div>
               <span class="text-yorha-text-secondary">SSN:</span>
@@ -294,7 +294,7 @@ import type { Case } from '$lib/types';
         </div>
         <!-- Biometric, Data -->
         {#if profile.identification.biometrics}
-          <div class="mt-3 grid grid-cols-1 md, grid-cols-2 gap-3 text-xs">
+          <div class="mt-3 grid grid-cols-1 md grid-cols-2 gap-3 text-xs">
             {#if profile.identification.biometrics.fingerprints?.length}
               <div class="flex items-center">
                 <span class="text-yorha-text-secondary">ðŸ”Ž</span>

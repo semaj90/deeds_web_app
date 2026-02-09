@@ -59,20 +59,20 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
                 disabled={!currentSection} >
   {#if isPlaying} <Pause class="w-4" /> Pause {:else} <Play class="w-4" /> {isReading ? 'Resume': 'Start Reading'} {/if}
   </button>
- <button onclick={ stopReading } class="p-2 text-gray-600 hover:text-gray-800, hover:bg-gray-200 rounded-md"
+ <button onclick={ stopReading } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
                 disabled={!isReading} >
                 <Square class="w-4" /> </button>
- <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover:text-gray-800, hover:bg-gray-200 rounded-md"
+ <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection === 0} >
                   <SkipBack class="w-4" /> </button>
- <button onclick={ nextSection } class="p-2 text-gray-600 hover:text-gray-800, hover:bg-gray-200 rounded-md"
+ <button onclick={ nextSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection >= ($state.context?.sections?.length ?? 1) - 1} >
                   <SkipForward class="w-4" /> </button> </div> </div>
  <div class="text-sm"> Section {($state.context?.currentSection ?? 0) + 1} of {$state.context?.sections?.length ?? 0} {#if ($state.context?.estimatedReadTime ?? 0) > 0} â€¢ ~{$state.context.estimatedReadTime} min read {/if}
   </div> </div>
  <!-- Progress, Bar -->
   {#if isReading} <div class="bg-gray-200 rounded-full" in, fade> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: { progress }%"></div> {/if}
-  <!-- Section, Navigation --> <div class="grid grid-cols-1 md, grid-cols-2 lg:grid-cols-3">
+  <!-- Section, Navigation --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3">
   {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover:shadow-md" class:border-blue-500={index === ($state.context?.currentSection ?? 0)}; class:bg-blue-50={index === ($state.context?.currentSection ?? 0)}; class:shadow-sm={index === ($state.context?.currentSection ?? 0)}; class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
                 <div class="flex items-center justify-between"> <span class={'text-sm, font-medium, ' + getImportanceColor(section.importance).split(' ')[0]}> {section.title} </span>
  <span class={'text-xs px-2, py-1, rounded-full, ' + getImportanceColor(section.importance)}> {section.importance} </span> </div>
@@ -109,7 +109,7 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
   </div> {/each} {/if}
   <!-- Synthesis, Results -->
   {#if $state.context?.synthesisData} <div class="space-y-6" in: fly={{ y, 20; duration, 300 }}> <h4 class="text-lg font-semibold text-gray-900">Synthesis & Strategic Analysis</h4>
- <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-4"> <div class="bg-blue-50 border border-blue-200 rounded-lg" in, fade> <h5 class="font-medium text-blue-900">Main Themes</h5>
+ <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-4"> <div class="bg-blue-50 border border-blue-200 rounded-lg" in, fade> <h5 class="font-medium text-blue-900">Main Themes</h5>
  <ul class="space-y-2">
   {#each Array.isArray($state.context.synthesisData.mainThemes) ? $state.context.synthesisData.mainThemes: [] as theme} <li class="flex items-start"> <div class="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
  <span class="text-blue-800">{ theme }</span> </li> {/each}
@@ -135,7 +135,7 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
  <span class="text-purple-800">{ implication }</span> </li> {/each}
   </ul> </div> </div> </div>
  <div class="bg-gray-50 border border-gray-200 rounded-lg"> <h5 class="font-medium text-gray-900">Next Steps</h5>
- <div class="grid grid-cols-1 md, grid-cols-2">
+ <div class="grid grid-cols-1 md grid-cols-2">
   {#each $state.context.synthesisData.nextSteps as step, index} <div class="flex items-start"> <span class="flex items-center justify-center w-6 h-6 bg-gray-600 text-white text-sm rounded-full flex-shrink-0"
                       > {index + 1} </span>
  <span class="text-gray-700">{ step }</span> </div> {/each}

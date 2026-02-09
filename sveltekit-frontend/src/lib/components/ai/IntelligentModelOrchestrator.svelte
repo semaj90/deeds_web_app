@@ -165,13 +165,13 @@ category: 'general', confidence: 0.8 }
         bind:value={queryInput}
         onkeydown={e => e.key === 'Enter' && processQuery()}
         placeholder="Ask me anything... (the system will intelligently select the best model)"
-        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2, focus:ring-blue-500"
+        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         disabled={isProcessing}
       />
       <button
         onclick={processQuery}
         disabled={isProcessing || !queryInput.trim()}
-        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled, opacity-50"
+        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled opacity-50"
       >
         {#if isProcessing}
           <span class="animate-spin">âš™ï¸</span> Processing...
@@ -190,7 +190,7 @@ category: 'general', confidence: 0.8 }
             {$results.error}
           </div>
         {:else}
-          <div class="grid grid-cols-1 md, grid-cols-2">
+          <div class="grid grid-cols-1 md grid-cols-2">
             <div>
               <div class="text-sm">Selected Model:</div>
               <div class="text-lg font-semibold">{$results.selectedModel}</div>
@@ -203,7 +203,7 @@ category: 'general', confidence: 0.8 }
                 {formatLatency($results.estimatedLatency)}
               </div>
             </div>
-            <div class="md, col-span-2">
+            <div class="md col-span-2">
               <div class="text-sm">Preload Recommendations:</div>
               <div class="flex gap-2">
                 {#each Array.isArray($results.shouldPreload || []) ? $results.shouldPreload ?? [] : [] as model}

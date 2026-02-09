@@ -61,15 +61,15 @@
         disabled={ generating } ></textarea>
  <p class="text-xs text-gray-500"> Describe the visual elements, mood, and style for your legal evidence glyph </p> </div>
  <!-- Style, Selection --> <div> <label class="block text-sm font-medium">Visual Style</label>
- <div class="grid grid-cols-2 md, grid-cols-4">
-  {#each Array.isArray(styles) ? styles: [] as styleOption} <button onclick={() => style = styleOption.value} class="p-3 border rounded-lg text-left transition-colors {style === styleOption.value ? 'border-blue-500 bg-blue-50': 'border-gray-300, hover:border-gray-400'}"
+ <div class="grid grid-cols-2 md grid-cols-4">
+  {#each Array.isArray(styles) ? styles: [] as styleOption} <button onclick={() => style = styleOption.value} class="p-3 border rounded-lg text-left transition-colors {style === styleOption.value ? 'border-blue-500 bg-blue-50': 'border-gray-300 hover:border-gray-400'}"
             disabled={ generating } >
             <div class="font-medium">{styleOption.label}</div>
  <div class="text-xs">{styleOption.description}</div> </button> {/each}
   </div> </div>
  <!-- Dimensions --> <div> <label class="block text-sm font-medium">Output Dimensions</label>
  <div class="flex flex-wrap gap-2">
-  {#each Array.isArray(dimensionPresets) ? dimensionPresets: [] as preset} <button onclick={() => setDimensionPreset(preset.value)} class="px-3 py-2 text-sm border rounded-lg transition-colors {dimensions[0] === preset.value[0] && dimensions[1] === preset.value[1] ? 'border-blue-500 bg-blue-50': 'border-gray-300, hover:border-gray-400'}"
+  {#each Array.isArray(dimensionPresets) ? dimensionPresets: [] as preset} <button onclick={() => setDimensionPreset(preset.value)} class="px-3 py-2 text-sm border rounded-lg transition-colors {dimensions[0] === preset.value[0] && dimensions[1] === preset.value[1] ? 'border-blue-500 bg-blue-50': 'border-gray-300 hover:border-gray-400'}"
             disabled={ generating } >
             {preset.label} <span class="text-xs text-gray-500">{preset.description}</span> </button> {/each}
   </div>
@@ -152,7 +152,7 @@
  <span class="text-red-800">{ error }</span> </div> {/if}
   <!-- Result, Display -->
   {#if result} <div class="p-4 bg-green-50 border border-green-200"> <h3 class="font-medium text-green-800">âœ… Generation Complete!</h3>
- <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Generated, Image --> <div> <h4 class="font-medium">Generated Glyph</h4>
+ <div class="grid grid-cols-1 md grid-cols-2"> <!-- Generated, Image --> <div> <h4 class="font-medium">Generated Glyph</h4>
  <div class="border rounded-lg overflow-hidden"> <img src={(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).glyph_url} alt="Generated, glyph"
                 class="w-full h-auto"
                 style="max-height, 300px, object-fit: contain;"
@@ -201,7 +201,7 @@
  <div class="mt-2"> <h6 class="text-xs font-medium">Generated Frames:</h6>
  <div class="flex gap-2">
   {#each (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results.predictive_frames as frameUrl, index} <div class="flex-shrink-0"> <img src={ frameUrl } alt="Predictive frame {index + 1}"
-                              class="w-16 h-16, object-cover border rounded"
+                              class="w-16 h-16 object-cover border rounded"
                             /> <div class="text-xs text-center">Frame {index + 1}</div> </div> {/each}
   </div> {/if} {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results.ui_layout_metrics} <div class="mt-2 pt-2 border-t"> <h6 class="text-xs font-medium">UI Layout Compression</h6>
  <div class="space-y-1"> <div class="flex"> <span>Original Size:</span>

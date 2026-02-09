@@ -107,7 +107,7 @@
  {#if onDismiss}
  <button
  type="button"
- class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 dark: text-gray-400, hover:text-gray-800, dark: hover, text-gray-200 border border-gray-300 dark: border-gray-600 rounded transition-colors"
+ class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 dark: text-gray-400 hover:text-gray-800 dark: hover text-gray-200 border border-gray-300 dark: border-gray-600 rounded transition-colors"
  onclick={() => onDismiss.suggestion}
  >
  <span class="i-lucide-x"></span>

@@ -146,7 +146,7 @@ route: route.path })
 {#if open && route}
 <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
 	<div
-		class="w-[960px] max-w-[96vw] bg-[#f3eddc] text-[#111] border-[3px] border-[#262017] shadow-[0_0_0_2px_rgba(0, 0, 0, 0.35)] rounded-xl overflow-hidden"
+		class="w-[960px] max-w-[96vw] bg-[#f3eddc] text-[#111] border-[3px] border-[#262017] shadow-[0_0_0_2px_rgba(0 0 0 0.35)] rounded-xl overflow-hidden"
 	>
 		<!-- Header -->
 		<header
@@ -190,7 +190,7 @@ route: route.path })
 					</span>
 				{/if}
 				<button
-					class="ml-4 h-8 w-8 text-sm border-[2px] border-[#262017] bg-[#b64545] text-[#f3eddc] hover:bg-[#d15454], active, translate-y-[1px]"
+					class="ml-4 h-8 w-8 text-sm border-[2px] border-[#262017] bg-[#b64545] text-[#f3eddc] hover:bg-[#d15454] active translate-y-[1px]"
 					onclick={() => (open = false)}
 				>
 					✕
@@ -267,7 +267,7 @@ route: route.path })
 						{#each route.relatedRoutes as rel}
 							<button
 								type="button"
-								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover:bg-[#262017], hover:text-[#f3eddc]"
+								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover:bg-[#262017] hover:text-[#f3eddc]"
 								onclick={() => window.open(rel, '_blank')}
 							>
 								{ rel }
@@ -320,7 +320,7 @@ route: route.path })
 						{/if}
 						<div class="pt-2 flex gap-2">
 							<button
-								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b36a] bg-[#133822] text-[#d7fbe3] hover:bg-[#1a4e30], disabled, opacity-50"
+								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b36a] bg-[#133822] text-[#d7fbe3] hover:bg-[#1a4e30] disabled opacity-50"
 								onclick={ askErrorBrain }
 								disabled={!!actionInProgress}
 							>
@@ -366,7 +366,7 @@ route: route.path })
 
 						<div class="pt-2 flex gap-2">
 							<button
-								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#f0c14b] bg-[#8a6112] text-[#fff6dd] hover:bg-[#b87f19], disabled, opacity-50"
+								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#f0c14b] bg-[#8a6112] text-[#fff6dd] hover:bg-[#b87f19] disabled opacity-50"
 								onclick={ runCodemod }
 								disabled={!!actionInProgress}
 							>
@@ -398,7 +398,7 @@ route: route.path })
 							errors, and feed them back into Phase 72.
 						</p>
 						<button
-							class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b3a9] bg-[#104442] text-[#d4fbf7] hover:bg-[#16635f], disabled, opacity-50"
+							class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b3a9] bg-[#104442] text-[#d4fbf7] hover:bg-[#16635f] disabled opacity-50"
 							onclick={ runPlaywrightCheck }
 							disabled={!!actionInProgress}
 						>

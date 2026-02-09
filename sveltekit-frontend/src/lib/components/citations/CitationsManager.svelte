@@ -87,7 +87,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 						data-operation="export-citations"
 					> <Download class="w-4 h-4" aria-hidden="true" role="img" aria-label="Download, icon" /> Export </Button>
  <div id="export-help" class="sr-only"> Download all filtered citations as a JSON file for backup or sharing </div> </div> </div> </div> </div>
- <!-- Search, and, Filters --> <div class="mb-4"> <div class="yorha-panel-content"> <div class="flex flex-col lg, flex-row"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="w-4 h-4 absolute left-3 top-3 nes-text" /> <Input placeholder="Search, citations, authors, sources..."
+ <!-- Search, and, Filters --> <div class="mb-4"> <div class="yorha-panel-content"> <div class="flex flex-col lg flex-row"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="w-4 h-4 absolute left-3 top-3 nes-text" /> <Input placeholder="Search, citations, authors, sources..."
 							value={ searchQuery } oninput={ handleSearch } class="pl-9"
 						/> </div> </div>
  <!-- Sort, Options --> <div class="flex"> <Button class="enhanced-bits-btn nes-citation-sort n64-enhanced lod-optimized bits-btn"

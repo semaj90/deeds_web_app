@@ -91,7 +91,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  <button
  onclick={refreshData}
  disabled={isLoading}
- class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled, bg-gray-400 transition"
+ class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled bg-gray-400 transition"
  >
  {isLoading ? 'Loading...' : 'Refresh'}
  </button>

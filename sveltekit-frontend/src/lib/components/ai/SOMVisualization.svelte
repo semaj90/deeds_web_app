@@ -105,11 +105,11 @@ clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [
  <span class="text-white">{ count }</span> </div> {/each} {/if}
   </div>
  <!-- Actions --> <div class="actions-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">Actions</h3>
- <div class="space-y-3"> <button onclick={ trainWithSampleData } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-blue-600 text-white disabled, opacity-50 disabled, cursor-not-allowed"
+ <div class="space-y-3"> <button onclick={ trainWithSampleData } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-blue-600 text-white disabled opacity-50 disabled cursor-not-allowed"
         > {isTraining ? 'Training...': 'Train with Sample Data'} </button>
- <button onclick={ processTestDocument } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-green-600 text-white disabled, opacity-50 disabled, cursor-not-allowed"
+ <button onclick={ processTestDocument } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-green-600 text-white disabled opacity-50 disabled cursor-not-allowed"
         > Process Test Document </button>
- <button onclick={ exportSOMData } disabled={!isInitialized} class="w-full yorha-button px-4 py-2 bg-purple-600 text-white disabled, opacity-50"
+ <button onclick={ exportSOMData } disabled={!isInitialized} class="w-full yorha-button px-4 py-2 bg-purple-600 text-white disabled opacity-50"
         > Export SOM Data </button>
  <div class="system-status"> <div class="flex items-center"> <div class="w-2 h-2 rounded-full"></div>
  <span class="text-gray-300"> System {isInitialized ? 'Online': 'Offline'} </span> </div> </div> </div> </div> </div>

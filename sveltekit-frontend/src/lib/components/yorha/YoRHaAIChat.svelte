@@ -245,7 +245,7 @@ message: trimmed, history: messages })
         bind:value={messageInput}
         onkeydown={handleKeydown}
         placeholder="ENTER_COMMAND_OR_QUERY..."
-        class="flex-1 bg-black border border-zinc-800 p-3 text-sm focus:outline-none, focus:border-cyan-500 resize-none"
+        class="flex-1 bg-black border border-zinc-800 p-3 text-sm focus:outline-none focus:border-cyan-500 resize-none"
         rows="2"
       ></textarea>
       <Button variant="outline" class="h-auto px-6 border-zinc-800 bg-black hover:bg-zinc-900" onclick={sendMessage}>

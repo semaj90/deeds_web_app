@@ -61,7 +61,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </span>
  <div class="text-sm"> Session <span class="font-mono">{context?.sessionId?.slice?.(-8)}
 </span> </div> </div> </h3> </div>
- <div class="yorha-panel-content"> <!-- System: Status, Grid --> <div class="grid grid-cols-1 md, grid-cols-4 gap-4"> <div class="bg-gray-50 p-3"> <div class="font-semibold">Ollama Status</div>
+ <div class="yorha-panel-content"> <!-- System: Status, Grid --> <div class="grid grid-cols-1 md grid-cols-4 gap-4"> <div class="bg-gray-50 p-3"> <div class="font-semibold">Ollama Status</div>
  <div class="flex items-center"> <div class="w-2 h-2 rounded-full"></div>
  <span>Connected</span> </div>
  <div class="text-gray-600">Model: {context?.model?.slice?.(0, 15)}...</div> </div>
@@ -80,7 +80,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <span>{liveComponents.length} Active</span> </div>
  <div class="text-gray-600">Instant rendering</div> </div> </div> </div> </div>
  <!-- Query, Interface --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Legal AI Query Interface</h3> </div>
- <div class="yorha-panel-content"> <!-- Configuration, Controls --> <div class="grid grid-cols-1 md, grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="compression-target">Compression Target</label>
+ <div class="yorha-panel-content"> <!-- Configuration, Controls --> <div class="grid grid-cols-1 md grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="compression-target">Compression Target</label>
  <select id="compression-target" bind:value={ compressionTarget } class="w-full p-2 border rounded-md"> <option value={ 7 }>7:1 (Ultra Quality)</option>
  <option value={ 25 }>25:1 (High Quality)</option>
  <option value={ 50 }>50:1 (Balanced)</option>
@@ -106,7 +106,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   <Button.Root class="bits-btn bits-btn" onclick={ clearConversation } variant="ghost" size="sm">Clear All</Button> </div> </div> </div> </div>
  <!-- SIMD Processing, Results -->
   {#if simdResults?.enabled} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ§¬ SIMD Compression Results</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-2 md, grid-cols-5 gap-4"> <div class="text-center"> <div class={`text-2xl, font-bold ${getCompressionColor(simdResults.total_compression_ratio ?? 0)}`}> {(simdResults.total_compression_ratio ?? 0).toFixed(1)}:1 </div>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-2 md grid-cols-5 gap-4"> <div class="text-center"> <div class={`text-2xl, font-bold ${getCompressionColor(simdResults.total_compression_ratio ?? 0)}`}> {(simdResults.total_compression_ratio ?? 0).toFixed(1)}:1 </div>
  <div class="text-sm">Compression</div> </div>
  <div class="text-center"> <div class="text-2xl font-bold">{(simdResults.compressed_tiles?.length ?? 0)}
 </div>
@@ -120,7 +120,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="text-sm">Total Time</div> </div> </div>
  <!-- Compressed Tiles, Visualization -->
   {#if (simdResults.compressed_tiles?.length ?? 0) > 0} <div class="space-y-2"> <h4 class="font-medium">Compressed Tiles (7-bit encoding):</h4>
- <div class="grid grid-cols-2 md, grid-cols-4 lg:grid-cols-6">
+ <div class="grid grid-cols-2 md grid-cols-4 lg:grid-cols-6">
   {#each (simdResults.compressed_tiles ?? []).slice(0, 12) as tile, index} <div class="bg-gray-800 text-white p-2 rounded"> <div class="flex justify-between items-center"> <span>#{index + 1}
 </span>
  <span class="text-green-400">{(tile.compression_ratio ?? 0).toFixed(0)}:1</span> </div>

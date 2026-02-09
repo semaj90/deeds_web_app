@@ -69,7 +69,7 @@ qualityTier: qualityTier enableGPUAcceleration true, semanticClustering: true },
 	memoryEfficiencyAverage: 0 }
   } $effect(() => { addLog('ðŸ§¬ SIMD Text Tiling Demo initialized'); addLog('ðŸ’¡ Select processing mode and compression target, then click: "Process Sample"')}); </script>
  <div class="p-6 max-w-7xl mx-auto space-y-6"> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> ðŸ§¬ SIMD Text Tiling Demo <span class="text-sm font-normal"> 7-bit NES-style Compression with Instantaneous UI Generation </span> </h3> </div>
- <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md, grid-cols-5 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="processing-mode">Processing Mode</label>
+ <div class="yorha-panel-content"> <!-- Configuration, Panel --> <div class="grid grid-cols-1 md grid-cols-5 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="processing-mode">Processing Mode</label>
 <select id="processing-mode" bind:value={ selectedMode } class="w-full p-2 border rounded-md"> <option value="direct-simd">Direct SIMD API</option>
  <option value="langchain-simd">LangChain + SIMD Bridge</option> </select> </div>
  <div> <label class="block text-sm font-medium text-gray-700" for="compression-target">Compression Target</label>
@@ -90,7 +90,7 @@ qualityTier: qualityTier enableGPUAcceleration true, semanticClustering: true },
 </div> </div>
  <!-- Action, Buttons --> <div class="flex flex-wrap"> <Button.Root class="bits-btn bits-btn" onclick={ processBatchTexts } disabled={ isProcessing } variant="ghost" size="sm"> ðŸ“¦ Batch Process ({sampleTexts.length}) <Button.Root class="bits-btn bits-btn" onclick={ benchmarkCompressionLevels } disabled={ isProcessing } variant="ghost" size="sm"> ðŸ§ª Compression Benchmark <Button.Root class="bits-btn bits-btn" onclick={ clearAll } variant="ghost" size="sm"> ðŸ—‘ï¸ Clear All </div>
  <!-- System, Statistics -->
-  {#if systemStats.totalProcessed > 0} <div class="grid grid-cols-2 md, grid-cols-6 gap-4 p-4 bg-blue-50"> <div class="text-center"> <div class="text-2xl font-bold">{systemStats.totalProcessed}
+  {#if systemStats.totalProcessed > 0} <div class="grid grid-cols-2 md grid-cols-6 gap-4 p-4 bg-blue-50"> <div class="text-center"> <div class="text-2xl font-bold">{systemStats.totalProcessed}
 </div>
  <div class="text-xs">Processed</div> </div>
  <div class="text-center"> <div class="text-2xl font-bold"> {systemStats.averageCompressionRatio.toFixed(1)}:1 </div>

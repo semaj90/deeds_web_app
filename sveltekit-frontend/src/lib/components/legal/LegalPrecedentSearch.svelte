@@ -92,18 +92,18 @@ https, //svelte.dev/e/js_parse_error -->
           type="text"
           bind:value={searchFilters.query}
           placeholder="Enter legal concepts, case names, or keywords..."
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
           onkeydown={e => e.key === 'Enter' && searchPrecedents()}
         />
       </div>
       <!-- Filter, Row -->
-      <div class="grid grid-cols-1 md, grid-cols-4">
+      <div class="grid grid-cols-1 md grid-cols-4">
         <div>
           <label for="jurisdiction" class="block text-sm font-medium"> Jurisdiction </label>
           <select
             id="jurisdiction"
 bind:value={searchFilters.jurisdiction}
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
           >
             <option value="">All Jurisdictions</option>
             {#each Array.isArray(jurisdictions) ? jurisdictions : [] as jurisdiction}
@@ -116,7 +116,7 @@ bind:value={searchFilters.jurisdiction}
           <select
             id="court"
             bind:value={searchFilters.court}
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
           >
             <option value="">All Courts</option>
             {#each Array.isArray(courts) ? courts : [] as court}
@@ -134,7 +134,7 @@ bind:value={searchFilters.jurisdiction}
             placeholder="1900"
             min="1900"
             max="2024"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
           />
         </div>
         <div>
@@ -146,7 +146,7 @@ bind:value={searchFilters.yearTo}
             placeholder="2024"
             min="1900"
             max="2024"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none, focus:ring-2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
           />
         </div>
       </div>
@@ -156,7 +156,7 @@ bind:value={searchFilters.yearTo}
           type="button"
           onclick={searchPrecedents}
           disabled={loading || !searchFilters.query.trim()}
-          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled, opacity-50"
+          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled opacity-50"
         >
           {#if loading}
             <span class="flex items-center">
@@ -263,7 +263,7 @@ bind:value={searchFilters.yearTo}
                 type="button"
                 onclick={() => changePage(currentPage - 1)}
                 disabled={currentPage <= 1}
-                class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 disabled, opacity-50"
+                class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 disabled opacity-50"
               >
                 Previous
               </button>
@@ -271,7 +271,7 @@ bind:value={searchFilters.yearTo}
                 type="button"
                 onclick={() => changePage(currentPage + 1)}
                 disabled={currentPage >= totalPages}
-                class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50, disabled:opacity-50"
+                class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
               >
                 Next
               </button>

@@ -63,7 +63,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 </button> </div> {/each}
 </div> <div class="border-t"> <div class="flex items-end"> <textarea bind:this={inputElement},
 	bind:value={ input } keydown={ handleKeyDown } placeholder="Type a message or /help for, commands..."
-            class="flex-1 min-h-[60px] max-h-[120px] p-3 bg-muted rounded-lg resize-none focus:outline-none, focus:ring-2"
+            class="flex-1 min-h-[60px] max-h-[120px] p-3 bg-muted rounded-lg resize-none focus:outline-none focus:ring-2"
             disabled={ isLoading } /> <button onclick={ handleSubmit } disabled={isLoading || !input.trim()} class={cn(
               "p-3 rounded-lg transition-colors",
               "bg-primary text-primary-foreground hover:bg-primary, hover:bg-opacity-90",

@@ -534,7 +534,7 @@
 			{@const b = selectedBounds()}
 			{#if b}
 				<div
-					class="absolute rounded-xl border border-blue-400/50 shadow-[0_0_0_1px_rgba(59,130,246,0.2)]"
+					class="absolute rounded-xl border border-blue-400/50 shadow-[0_0_0_1px_rgba(59 130 246 0.2)]"
 					style="left:{b.x}px; top:{b.y}px; width:{b.w}px; height:{b.h}px;"
 				>
 					<div
