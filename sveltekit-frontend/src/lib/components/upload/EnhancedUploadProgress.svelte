@@ -1,6 +1,9 @@
 <script lang="ts">
 import Button from '$lib/components/ui/Button.svelte';
-import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+import Card from '$lib/components/ui/card/Card.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 import Progress from '$lib/components/ui/progress/Progress.svelte';
 import { enhancedUploadStore, type EnhancedUploadState } from '$lib/stores/unified';
 import AlertCircle from 'lucide-svelte/icons/alert-circle';

@@ -15,8 +15,11 @@ https, //svelte.dev/e/block_unexpected_close -->
  // Svelte 5 runes are auto-imported
  // Migrated to $effect
  import Button from '$lib/components/ui/Button.svelte';
- import { Card, CardHeader, CardTitle, CardContent } from "$lib/components/ui/card";
- import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
+ import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
  import type { VectorSearchResult, IntelligenceRecommendation, SemanticAnalysisResult, VectorIntelligenceState } from '$lib/services/vector-intelligence-service.js';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  // Component state

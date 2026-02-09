@@ -1,7 +1,12 @@
 <script lang="ts">
  import { Badge } from '$lib/components/ui/badge';
- import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/enhanced-bits';
- // Migrated to $effect
+ import Card from '$lib/components/ui/card/Card.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardDescription from '$lib/components/ui/card/CardDescription.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import { Button } from '$lib/components/ui/enhanced-bits.svelte';
+// Migrated to $effect
 
  let status = $state<any>(null);
  let runs = $state<any[]>([]);

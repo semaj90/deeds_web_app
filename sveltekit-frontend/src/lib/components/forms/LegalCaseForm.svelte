@@ -4,9 +4,8 @@
    * Multi-step form for creating new legal cases
    * Phase 107 - Clean regeneration
    */
-  import { Card } from '$lib/components/ui/enhanced-bits';
-
-  // Form state using Svelte 5 runes
+  import Card from '$lib/components/ui/card/Card.svelte';
+// Form state using Svelte 5 runes
   let formData = $state({
     caseTitle: '',
     caseNumber: '',

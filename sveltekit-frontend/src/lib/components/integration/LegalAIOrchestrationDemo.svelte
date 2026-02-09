@@ -8,8 +8,8 @@ Shows complete workflow from user input to AI-powered results -->
 
 	// Svelte 5 runes are auto-imported
 	import Button from '$lib/components/ui/Button.svelte';
-	import { Card } from '$lib/components/ui/enhanced-bits';
-	import CardContent from "$lib/components/ui/CardContent.svelte";
+	import Card from '$lib/components/ui/card/Card.svelte';
+import CardContent from "$lib/components/ui/CardContent.svelte";
 	import CardHeader from "$lib/components/ui/CardHeader.svelte";
 	import CardTitle from "$lib/components/ui/CardTitle.svelte";
 	import type { CaseCreationWorkflowRequest, DocumentProcessingWorkflowRequest, LegalResearchWorkflowRequest } from '$lib/services/end-to-end-api-integration';

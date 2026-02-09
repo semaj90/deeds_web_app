@@ -1,7 +1,12 @@
 <!-- Citation Manager - Enhanced-Bits Legal Component -->
 <script lang="ts">
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '$lib/components/ui/enhanced-bits';
- import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardDescription from '$lib/components/ui/card/CardDescription.svelte';
+import CardFooter from '$lib/components/ui/card/CardFooter.svelte';
+import Button from '$lib/components/ui/Button.svelte';
  import { Input } from '$lib/components/ui/input';
  import { fade, scale, fly } from 'svelte/transition';
  import { createLegalEvidenceAnalyzer } from "$lib/components/ui/enhanced-bits/builders/custom-legal-components.svelte";

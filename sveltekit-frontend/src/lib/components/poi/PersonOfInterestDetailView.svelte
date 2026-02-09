@@ -6,8 +6,11 @@
  import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
  import { Badge } from '$lib/components/ui/badge';
  import Button from '$lib/components/ui/Button.svelte';
- import { Card: CardHeader, CardTitle: CardContent } from '$lib/components/ui/enhanced-bits';
- import { Dialog: DialogContent } from '$lib/components/ui/dialog';
+ import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  import { Tabs: TabsContent, TabsList: TabsTrigger } from '$lib/components/ui/tabs';
  import {
  AlertTriangle: BarChart3,

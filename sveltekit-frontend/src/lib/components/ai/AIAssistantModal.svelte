@@ -1,7 +1,10 @@
 <script lang="ts"> import { getContext } from 'svelte';
  import Button from '$lib/components/ui/Button.svelte';
- import { Card, CardHeader, CardTitle, CardContent } from "$lib/components/ui/card";
- import { aiGlobalStore, aiGlobalActions } from '$lib/stores/unified'; // Interface definitions interface EvidenceItem { id: string, title: string, description?: string;
+ import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import { aiGlobalStore, aiGlobalActions } from '$lib/stores/unified'; // Interface definitions interface EvidenceItem { id: string, title: string, description?: string;
 	type: string;
 	createdAt: string, metadata?: Record<string, unknown>}
 

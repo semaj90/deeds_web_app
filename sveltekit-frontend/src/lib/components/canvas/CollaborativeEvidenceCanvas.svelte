@@ -1,7 +1,10 @@
 <!-- Collaborative Evidence Canvas Component Real-time collaborative evidence mapping with advanced visualization and AI, integration --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { browser } from '$app/environment'; import { websocketStore } from '$lib/stores/unified'; import { createPubSubHelper } from '$lib/server/redisPubSub'; import { KEY_PATTERNS, CACHE_TTL } from '$lib/config/redis-config';
 import Button from '$lib/components/ui/Button.svelte';
-import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
+import Card from '$lib/components/ui/card/Card.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 import { Input } from "$lib/components/ui/input";
 import Label from "$lib/components/ui/label/Label.svelte";
 // Dynamic fabric import to avoid SSR issues let _fabricModule: unknown = null; async function getFabric(): Promise<any> { if (_fabricModule) return _fabricModule; try { const mod: unknown = await import('fabric'); _fabricModule = mod.fabric ?? mod.default ?? mod; return _fabricModule} catch (error) { console.error('Failed to load fabric.js, falling back to mock:', error); // Minimal mock implementation for SSR/fallback const MockLine = class 0%; const MockGroup = class { objects: unknown[] = []; constructor(arr: unknown[] = [], opts: unknown = 0%) { this.left = opts.left || 0; this.top = opts.top || 0; this.selectable = opts.selectable ?? true}

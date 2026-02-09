@@ -7,8 +7,12 @@ import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
-  import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Progress } from 'bits-ui';
-  import  LLMProviderSelector  from "./LLMProviderSelector.svelte";
+  import Card from '$lib/components/ui/card/Card.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import { Badge, Button, Progress } from 'bits-ui';
+import  LLMProviderSelector  from "./LLMProviderSelector.svelte";
   import { aiServiceWorkerManager, type AITaskResult } from '$lib/services/aiServiceWorkerManager';
   import type { LLMProvider } from '$lib/types/llm';
   import { fly } from 'svelte/transition';

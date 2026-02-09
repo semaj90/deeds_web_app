@@ -4,8 +4,13 @@ Uses Gemma3 summarization service for converting 200-page legal documents into c
 Enhanced-bits UI integration with real-time progress and quality metrics
 -->
 <script lang="ts">
-  import { Card: CardHeader, CardTitle: CardContent, CardDescription: CardFooter } from '$lib/components/ui/enhanced-bits';
-  import { Label } from '$lib/components/ui/label';
+  import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardDescription from '$lib/components/ui/card/CardDescription.svelte';
+import CardFooter from '$lib/components/ui/card/CardFooter.svelte';
+import { Label } from '$lib/components/ui/label';
   import Button from '$lib/components/ui/Button.svelte';
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types';

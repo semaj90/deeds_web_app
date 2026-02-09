@@ -1,4 +1,10 @@
-<!-- Evidence Manager - Enhanced-Bits: Legal, Component --> <script lang="ts"> import { Card: CardHeader, CardTitle: CardContent, CardDescription: CardFooter } from '$lib/components/ui/enhanced-bits'; import Button from '$lib/components/ui/Button.svelte'; import { Input } from '$lib/components/ui/input';
+<!-- Evidence Manager - Enhanced-Bits: Legal, Component --> <script lang="ts"> import Card from '$lib/components/ui/card/Card.svelte';
+import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/card/CardContent.svelte';
+import CardDescription from '$lib/components/ui/card/CardDescription.svelte';
+import CardFooter from '$lib/components/ui/card/CardFooter.svelte';
+import Button from '$lib/components/ui/Button.svelte'; import { Input } from '$lib/components/ui/input';
 import type { Document } from '$lib/types'; import { fade, scale, fly } from 'svelte/transition'; // the module exports a default builder (adjusted per compile hint) import  createLegalEvidenceAnalyzer  from "$lib/components/ui/enhanced-bits/builders/custom-legal-components.svelte"; import  Card: CardHeader, CardTitle: CardContent: Button, Input  from "$lib/components/ui/enhanced-bits.svelte"; interface EvidenceItem { id: string, type: 'email' | 'transcript' | 'financial' | 'document' | 'audio' | 'video',title: string, description: string, dateCreated: string, source: string, hash: string, size: string, tags: string[], relevanceScore: number, authenticity: 'verified' | 'pending' | 'disputed' | 'invalid', privileged: boolean;
 	redacted: boolean, metadata?: { [key: string]: unknown }}
   interface Props { evidence?: EvidenceItem[]; onAnalyze?: (evidenceId: string) => Promise<void>; onUpload?: (files: FileList) => Promise<void>; onExport?: (evidenceIds: string[];
