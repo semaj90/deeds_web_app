@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Dialog from "bits-ui/components/dialog";
 import * as Separator from "bits-ui/components/separator";
-import { Button } from 'bits-ui';
+import * as Button from "bits-ui/components/button";
 let open = $state(false);
 	let selectedValue = $state('apple');
 
