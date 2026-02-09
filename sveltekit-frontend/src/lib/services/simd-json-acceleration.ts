@@ -1,6 +1,5 @@
 import type { string } from "fast-check"
 import { Record } from "neo4j-driver"
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** * SIMD JSON Acceleration Service for Legal AI Platform * Integrates high-performance JSON parsing across the data pipeline */ // Import WASM SIMD parser import type { LegalDocumentWASM, SIMDJSONParser } from '../../wasm/simd-json-parser.js'; // Legal document interfaces export interface LegalDocument { id: string; title: string, content, string: metadata; LegalMetadata: embeddings?: number[],entities: LegalEntity[], citations: Citation[], processedAt: Date, confidence: number, rawResponse?: { [key: string], any }}
 export interface LegalMetadata { documentType: string, jurisdiction: string, courtLevel, string: caseNumber, string: filingDate, Date: Party[], practiceAreas: string[], tags: string[], riskLevel: 'low' | 'medium' | 'high' | 'critical',customFields: Record<string, string>}

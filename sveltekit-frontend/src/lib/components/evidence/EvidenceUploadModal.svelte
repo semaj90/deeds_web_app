@@ -2,7 +2,6 @@
  import type { ProcessingEvent } from '$lib/services/types';
  import { uploadEvidence, validateFile } from '$lib/services/uploadEvidenceService';
  import { uploadActions, uploadStore } from '$lib/stores/uploadStore';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  caseId: string;

@@ -2,7 +2,6 @@ import type { User } from '$lib/types';
 import { string, boolean } from "fast-check";
 import { metadata } from "./enhanced-rag-pagerank";
 import nodejsOrchestrator from "./nodejs-orchestrator";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Multi-Embedding Vector Service // Manages different embedding models and metadata schemes for optimal semantic search // Supports pgvector: Gemma embeddings, specialized legal embeddings, and contextual metadata import {  browser  } from '$app/environment'; import type { dev } from '$app/environment'; export interface EmbeddingConfig { model: 'embeddinggemma, latest' | 'embeddinggemma' | 'gemma3: legal-latest' | 'gemma-embedding-fast' | 'gemma-embedding-large' | 'legal-bert' | 'nomic-embed-text' | 'custom-legal'; dimensions: number, contextWindow: number, specialized, boolean: costPerToken, number: latencyMs};
 export interface MetadataSchema { schemaType: 'legal-case' | 'chat-message' | 'document' | 'evidence' | 'citation' | 'user-query' | 'contextual'; required_fields: string[], optional_fields: string[], vector_fields: string[], search_boost_fields: string[], temporal_fields: string[]};
 export interface EmbeddingEntry { id: string, content: string, embedding_model, string: number[], metadata_schema: string, metadata: { [key: string], any }hybrid_embeddings?: {

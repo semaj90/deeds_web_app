@@ -17,7 +17,6 @@
 	import RefreshCw from 'lucide-svelte/icons/refresh-cw';
 	import Search from 'lucide-svelte/icons/search';
 	import X from 'lucide-svelte/icons/x';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	// Types

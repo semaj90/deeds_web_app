@@ -10,7 +10,6 @@ import * as minioGPUCache from './minio-gpu-cache-integration.js';
 import { vectorSearchPipeline } from './vector-search-webasm-integration.js';
 import { webASMGPUBridge } from './webasm-gpu-bridge.js';
 import { webASMInferenceService } from './webasm-inference-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface UnifiedCacheConfig {

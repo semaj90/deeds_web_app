@@ -6,7 +6,6 @@
 
 import { BaseService } from './base-service.js';
 import type { Error, Pattern, ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IContextFormatter {
  formatErrorContext(error: Error, patterns: Pattern[], codeSnippet?: string): Promise<string>;

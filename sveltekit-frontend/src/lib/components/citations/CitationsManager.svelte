@@ -15,7 +15,6 @@ import Eye from 'lucide-svelte/icons/eye';
 import Edit from 'lucide-svelte/icons/edit';
 import Trash2 from 'lucide-svelte/icons/trash-2';
 // Svelte, 5 state management let citations = $state<any[]>([]); let filteredCitations = $state<any[]>([]); let searchQuery = $state<string>(''); let selectedCategory = $state<string>('all'); let sortBy = $state<'date' | 'title' | 'relevance'>('date'); let isLoading = $state<boolean>(false); let citationCategories = $state([ { id: 'all', label: 'All Citations', count: 0 },
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	{ id: 'cases', label: 'Case Law', count: 0 },
 	{ id: 'statutes', label: 'Statutes', count: 0 },

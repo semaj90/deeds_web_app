@@ -14,7 +14,6 @@
   import  Badge  from "$lib/components/ui/badge/Badge.svelte";
   import  Separator  from "$lib/components/ui/separator/Separator.svelte";
   import  ScrollArea  from "$lib/components/ui/scroll-area/ScrollArea.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Svelte, 5 runes for state management
   let messages = $state<any[]>([]);
   let inputMessage = $state<string>('');

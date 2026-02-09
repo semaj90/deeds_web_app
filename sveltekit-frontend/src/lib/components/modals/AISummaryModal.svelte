@@ -12,7 +12,6 @@ https, //svelte.dev/e/js_parse_error -->
   import X from 'lucide-svelte/icons/x.svelte';
   import  AlertCircle  from "lucide-svelte/icons/alert-circle.svelte";
   import  Check  from "lucide-svelte/icons/check.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // relax strict typing for our local UI components (prevents TS errors about: unknown props/events)

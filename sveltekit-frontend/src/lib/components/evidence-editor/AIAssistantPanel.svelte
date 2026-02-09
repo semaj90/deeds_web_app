@@ -14,8 +14,7 @@ https, //svelte.dev/e/js_parse_error -->
 	import FileText from 'lucide-svelte/icons/file-text';
 	import Users from 'lucide-svelte/icons/users';
 	import Fuse from 'fuse.js';
-	import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-
+	
  interface Props {
  selectedNode?: any;
  caseId?: string;

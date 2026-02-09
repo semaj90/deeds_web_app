@@ -3,7 +3,6 @@
  import { aiComputationMachine } from '$lib/machines/ai-computation-machine';
  import { dimensionalCache } from '$lib/ai/dimensional-cache-engine';
  import { webgpuAI } from '$lib/webgpu/webgpu-ai-engine'; // Props let { userId = $bindable('user123'), initialContext = $bindable('kernel attention'), enableWebGPU = $bindable(true), enableModularSwitching = $bindable(true) }: { userId?: string; initialContext?: string; enableWebGPU?: boolean; enableModularSwitching?: boolean} = $props(); // State let aiActor = $state<any>(null);
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
    let currentComputation = $state<any>(null);
    let recommendations = $state<any>(null);
    let isProcessing = $state<boolean>(false);

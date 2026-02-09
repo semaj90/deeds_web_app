@@ -1,5 +1,4 @@
 import type { Message } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * Chat Machine - XState v5 Compatible * Handles chat conversation state with streaming support */ import type { createMachine, assign, fromPromise, createActor, type StateFrom } from 'xstate'; // Message types export interface ChatMessage { role: 'user' | 'assistant' | 'system', content: timestamp?: string; id?: string}
 
 export interface ChatSettings { model: string, temperature: number, maxTokens: systemPrompt?: string}

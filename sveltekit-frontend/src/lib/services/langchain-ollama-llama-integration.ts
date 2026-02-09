@@ -1,7 +1,6 @@
 import type { SearchResult } from '$lib/types';
 /** * LangChain.js Integration with Ollama and llama.cpp GPU Parsing * Complete AI pipeline with Go microservice integration */ import type { Ollama } from '@langchain/ollama'; import type { ChatOllama } from '@langchain/ollama'; import type { OllamaEmbeddings } from '@langchain/ollama'; import type { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'; import type { MemoryVectorStore } from 'langchain/vectorstores/memory'; import type { RetrievalQAChain } from 'langchain/chains'; import { StringOutputParser } from '@langchain/core/output_parsers'; import type { Document } from 'langchain/document'; import { PromptTemplate } from '@langchain/core/prompts'; import crypto from 'crypto';import { constructor } from "assert";
 import { config } from "process";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  export interface LangChainConfig { ollamaBaseUrl: string, models: {
 	chat: 'gemma3-legal'; embedding: 'embeddinggemma' | 'nomic-embed-text'}; gpu: {
 	enabled: boolean, device: 'RTX3060Ti', llamaCppConfig: {

@@ -20,7 +20,6 @@ import { getRedisCacheService } from './RedisCacheService.js';
 import { stream } from "glob";
 import type { url } from "inspector";
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class KnowledgeSearcher {
   private qdrant = getQdrantKnowledgeStore();

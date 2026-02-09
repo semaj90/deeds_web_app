@@ -3,7 +3,6 @@
 // Migrated to $effect
 import { browser } from '$app/environment';
 import type { ChatMessage } from '$lib/types/ai-chat';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Props using Svelte 5 $props
 type Props = {

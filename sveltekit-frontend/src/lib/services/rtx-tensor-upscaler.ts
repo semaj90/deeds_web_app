@@ -1,5 +1,4 @@
 import type { Document } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * RTX Tensor Core Upscaler Service * Revolutionary Neural Sprite Auto-Encoder with RTX, 3060 Ti Optimization * Achieves 50:1 compression ratios with semantic preservation */ import { browser } from '$app/environment'; import type { GPUDevice, GPUBuffer, GPUTexture } from '@webgpu/types'; export interface RTXTensorConfig { tensorCores: boolean; compressionRatio: number, qualityMode: 'legal-document' | 'high-quality' | 'fast' | 'ultra-fast'; realTimeProcessing: boolean, flashAttention2: boolean, quantization: '4bit' | '8bit' | '16bit',batchSize: number, gpuMemoryLimit: number; // MB };
 export interface NeuralSpriteResult { compressedData: ArrayBuffer; originalSize: number, compressedSize: number; compressionRatio: number, processingTime: number, semanticFidelity: number, tensorCoreUtilization: number};

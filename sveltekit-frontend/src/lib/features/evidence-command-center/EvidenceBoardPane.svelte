@@ -5,7 +5,6 @@
 	import { enhance } from '$app/forms';
 	import { evidenceCommandCenter } from '$lib/stores/evidenceCommandCenter.store';
 	import type { ActionData, PageData } from '../../../routes/cases/[id]/evidence/$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {

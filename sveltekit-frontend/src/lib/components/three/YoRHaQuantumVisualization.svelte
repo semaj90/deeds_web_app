@@ -1,7 +1,6 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import * as THREE from 'three';
  import { YoRHaQuantumEffects3D } from './yorha-ui/components/YoRHaQuantumEffects3D';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let { secretFeatures = { konamiActive: false
 godModeEnabled: false, quantumDebugEnabled: false, aiWhispererMode: false, matrixMode: false },

@@ -4,7 +4,6 @@ import { object, string } from "fast-check";
 import { title } from "process";
 import { metadata } from "./enhanced-rag-pagerank.js";
 import { sha256 } from "./error-analysis/diffs/unifiedDiff.js";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // (module does not export this type, so define it locally for compilation) type EmbeddingResult = { embedding?: number[]; // numeric array embedding (may be | undefined on error) }; // ADD: Imports for external service types from chr-rom-precomputation-service.ts import type { UltraJSONParser, WasmClusteringService, NESGPUBridge } from './chr-rom-precomputation-service.js'; // Minimal typed adapters for external services referenced by the orchestrator. // Fill with concrete implementations / imports when integrating. type $UltraJSONParser = UltraJSONParser; // Use imported type type $WasmClusteringService = WasmClusteringService; // Use imported type type $NesGPUBridge = NESGPUBridge; // Use imported type // Cache config and runtime types interface CacheConfig { retrieval: {
 	ttl: number; maxResults: number, keyPrefix: string}; embedding: {
 	ttl: number, keyPrefix: string; dimensions: number}; invalidation: {

@@ -12,7 +12,6 @@
  */
 
 import type { FullDocument } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface MinioConfig {
   endpoint: string;

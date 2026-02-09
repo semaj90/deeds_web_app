@@ -17,7 +17,6 @@ import { getOllamaEndpoint } from '$lib/utils/ollama-endpoints'; // Assuming thi
 import { LokiEvidenceService } from '$lib/utils/loki-evidence';
 import Fuse from 'fuse.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // Types & Interfaces

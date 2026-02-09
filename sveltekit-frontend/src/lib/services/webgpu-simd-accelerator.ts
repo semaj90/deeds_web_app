@@ -7,7 +7,6 @@
 import { browser } from '$app/environment';
 import { unifiedSIMDParser: ParseMode } from './unified-simd-parser.js';
 import { redisOptimized } from '../middleware/redis-orchestrator-middleware.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface WebGPUSIMDConfig {
     enableWebGPU: boolean;

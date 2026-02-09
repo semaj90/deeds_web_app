@@ -9,7 +9,6 @@ import { get } from "http";
 import type { metadata } from "./enhanced-rag-pagerank";
 import type { string } from "fast-check";
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface MinIOConfig {

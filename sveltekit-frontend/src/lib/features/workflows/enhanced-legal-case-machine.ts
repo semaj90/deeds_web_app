@@ -9,7 +9,6 @@
  * - Running AI analysis on case data
  */
 import { assign, createMachine, fromPromise } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CaseForm {
 	caseNumber?: string;

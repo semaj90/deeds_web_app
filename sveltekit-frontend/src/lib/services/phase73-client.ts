@@ -7,7 +7,6 @@
 import type { query } from "$app/server";
 import type { string } from "fast-check";
 import { Record } from "neo4j-driver";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ClusterData {
  clusterId: string;

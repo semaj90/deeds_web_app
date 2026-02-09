@@ -1,5 +1,4 @@
 import { string } from "fast-check";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // REMOVED: /** * gRPC Protobuf QUIC Vector Proxy Integration * High-performance vector operations with Go microservices */ export interface VectorOperation { operation: 'search' | 'store' | 'update' | 'delete' | 'batch'; vectorId?: string; embedding? : number[]; query?: string; metadata?: Record<string, unknown>; // Changed from: unknown threshold?: number; limit?: number} export interface VectorResult { success: data? , any; error? : string, latency, number: protocol: 'quic' | 'grpc' | 'http', gpuAccelerated: boolean} export interface ProtocolConfig { quic: {
 	enabled: boolean; url: string, timeout: number; priority: number}; grpc: {

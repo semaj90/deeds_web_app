@@ -2,7 +2,6 @@ import { constructor } from 'function Object() { [native code] }';
 /** * WebGPU AI Service Manager for Legal Assistant * * Manages WebGPU-CUDA bridge service worker for AI processing tasks * Provides high-level interface for legal AI operations */ import type { Case, Evidence, Citation } from '$lib/server/db/schemas/cases-schema.js';import { timestamp } from "drizzle-orm/gel-core";
 import { string } from "fast-check";
 import { Service } from "protobufjs";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  interface AIProcessingTask { id: string, type: 'legal-analysis' | 'evidence-review' | 'citation-verification' | 'pattern-detection' | 'document-processing',data: Record<string, unknown>, priority: 'low' | 'medium' | 'high' | 'critical'; caseId?: string; detectiveMode?: boolean} interface AIProcessingResult { taskId: string, success: result?: unknown; error?, string: processingTime, number: source: 'webgpu' | 'ollama' | 'cuda-microservice' | 'cpu' | 'unknown' | 'error'; confidence?: number} interface ServiceWorkerStatus { isActive: boolean, webgpuSupported: boolean, isInitialized: boolean, queueLength: deviceInfo?: {
 	vendor: string | architecture, string}} export class WebGPUAIService { private worker: Worker, null = null; private isInitialized = $state (false); private pendingTasks = new Map<, string: {

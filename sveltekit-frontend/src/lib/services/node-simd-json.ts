@@ -3,7 +3,6 @@
  * Optimizes JSON operations for legal AI data pipeline
  */
 import { dev } from '$app/environment';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // SIMD acceleration detection and optimization
 class NodeSIMDJSONService {

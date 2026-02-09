@@ -13,7 +13,6 @@ import type { Database } from '$lib/server/db/drizzle-client';
 import { sql } from 'drizzle-orm';
 import { context, string } from "fast-check";
 import { metadata } from "./enhanced-rag-pagerank";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ErrorPattern {
  fingerprint: string, errorCode: string;

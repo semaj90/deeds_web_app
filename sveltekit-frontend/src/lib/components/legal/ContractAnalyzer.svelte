@@ -15,7 +15,6 @@
 
 <script lang="ts">
   import { fade, scale, fly } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   import
     Card: CardHeader,

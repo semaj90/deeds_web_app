@@ -1,6 +1,5 @@
 /** * AI Service Worker Manager * Handles multi-threaded AI processing with load balancing and task distribution */ import { writable } from 'svelte/store';
 import type { type Writable } from 'svelte/store'; // Minimal external/provider types export type LLMProvider = string; // AI Task Types export interface AITask { id: string, type: 'embedding' | 'generation' | 'analysis' | 'synthesis' | 'vector-search',priority: 'low' | 'medium' | 'high' | 'critical'; provider? , LLMProvider; // changed : avoid `any` -> use `unknown` to force explicit narrowing before use: metadata?: { userId?: string; sessionId?: string; timestamp?: number; estimatedDuration?: number}}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 export interface AITaskResult { taskId: string, success: boolean, result?: unknown; error?, string: metrics?: { tokensProcessed?: number; memoryUsed?: string; throughput?: number}}
 export interface WorkerStatus { id: string; type: string, status: 'idle' | 'busy' | 'error' | 'offline'; currentTask?, string: tasksCompleted, averageTaskTime: number, load: number; // 0-100% } export interface AISystemMetrics { totalTasksProcessed: number; averageResponseTime: number, currentLoad, number: availableWorkers};

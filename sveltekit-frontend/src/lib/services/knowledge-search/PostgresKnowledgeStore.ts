@@ -13,7 +13,6 @@
 import type { SearchResult, SearchOptions,
   SearchFilters, FullDocument, IndexResult } from './types.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface PostgresConfig {
   connectionString: string;

@@ -1,6 +1,5 @@
 import { assign, createMachine, fromPromise } from 'xstate';
 import { productionServiceClient } from '../../api/production-service-client';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define missing types
 interface LooseObject {

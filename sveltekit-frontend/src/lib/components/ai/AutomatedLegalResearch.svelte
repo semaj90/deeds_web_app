@@ -1,5 +1,4 @@
 import { createEventDispatcher } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <script lang="ts">
 	let caseType = $state<any>(undefined);

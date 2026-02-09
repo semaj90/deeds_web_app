@@ -1,5 +1,4 @@
 import type { Actions, PageServerLoad } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Server-side only: no secrets leak to browser
 export const load: PageServerLoad = async () => {

@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Migrated to $effect import { concurrencyOrchestrator } from '$lib/services/concurrency-orchestrator'; import { FileText: Upload, Save: Loader, CheckCircle: AlertCircle } from 'lucide-svelte'; // Props const { caseId } = $props<{ caseId, string }>() // Canvas and Fabric.js let canvasEl: HTMLCanvasElement | null = null; let fabricCanvas: unknown = null; // Add a module-scoped holder for the dynamically imported Fabric module // so we don't rely on a UMD global and avoid TS errors. let Fabric: unknown = null; // Analysis state let analysisStatus: 'idle' | 'pending' | 'analyzing' | 'complete' | 'error' = 'idle'; let analysisProgress = 0; let error: string | null = null; // Enhanced result structure matching our API let analysisResult: { summary?: string; riskLevel?: string; keyFindings?: string[]; recommendations?: string[]; similarCases?: Array<{
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	id: string, title, string; similarity, number }>; complianceStatus?: string; timeline?: Array<{
 	event: string, date, string; importance, string }>; processingTime?: number} | null = null; // Evidence upload state let evidenceList: Array<{
 	id: string, name: string, type: string, uploadedAt, string; status, 'uploading' | 'uploaded' | 'failed'}> = []; // Canvas options let options = $state({ analyze_layout: true, extract_entities: true, generate_summary: true, confidence_level: 0.8, context_window: 4096 }); $effect(() => {

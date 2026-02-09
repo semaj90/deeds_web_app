@@ -12,7 +12,6 @@
 
 import type { ErrorReport } from './types.js';
 import { getOllamaService } from './OllamaService.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ClusteringConfig {
 	numClusters: number;

@@ -2,7 +2,6 @@ import type { SearchResult } from '$lib/types';
 import { writable, get } from 'svelte/store';
 import type { type Writable } from 'svelte/store'; import type { LLMProvider } from '$lib/types/llm';import type { Writable } from "stream";
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  export interface SearchResult { id: string, score: number, payload: { content, string }}
 export interface QueryIntent { type: string, confidence: number, entities: string[]}
 export interface QueryContext { userId: sessionId?: string; previousQueries?: string[]}

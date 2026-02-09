@@ -1,5 +1,4 @@
 import { setup, assign, fromPromise, type DoneActorEvent } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // User type
 export interface User {

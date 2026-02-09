@@ -13,7 +13,6 @@
 	import Trash2 from 'lucide-svelte/icons/trash-2';
 	import Mic from 'lucide-svelte/icons/mic';
 	import MicOff from 'lucide-svelte/icons/mic-off';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 

@@ -3,7 +3,6 @@ import type { Document } from '$lib/types';
   // onMount was unused â€” removed
   // Use a namespace import to safely access public env vars without TS named-export errors
   import * as env from '$env/static/public';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     placeholder?: string

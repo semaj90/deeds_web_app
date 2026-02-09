@@ -8,7 +8,6 @@ import type { User } from '$lib/types';
   // Migrated to $effect
   import { writable, derived } from 'svelte/store';
   import {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     intelligentOrchestrator: currentModelInfo,
     selfPromptingSuggestions: performanceMetrics,
     memoryOptimization,

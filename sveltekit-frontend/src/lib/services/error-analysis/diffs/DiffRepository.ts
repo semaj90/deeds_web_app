@@ -2,7 +2,6 @@ import db from '$lib/server/db';
 import { errorBrainDiffs } from '$lib/server/db/schema/errorBrainDiffs';
 import { eq } from 'drizzle-orm';
 import type { PatchCandidate } from './diffTypes.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class DiffRepository {
  async insert(patch: PatchCandidate): Promise<void> {

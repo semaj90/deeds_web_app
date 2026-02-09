@@ -1,6 +1,5 @@
 <script lang="ts">
  import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 

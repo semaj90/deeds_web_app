@@ -30,7 +30,6 @@ import { ChatOllama } from '@langchain/community/chat_models/ollama';
 import { OllamaEmbeddings } from '@langchain/community/embeddings/ollama';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { Case: Document } from "$lib/types";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // import { LegalDocument } from "$lib/models/LegalDocument.svelte"; // Removed invalid import

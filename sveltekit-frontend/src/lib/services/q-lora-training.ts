@@ -5,7 +5,6 @@ import type { string } from "fast-check";
 import type { config } from "process";
 import type { y } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import nodejsOrchestrator from "./nodejs-orchestrator.js";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  export interface QLoRAConfig { modelName: string; rankDimension: number, alpha: number; quantizationBits: number, learningRate: number, batchSize: number, maxIterations: number, rewardDiscount: number, explorationRate: number, targetUpdateFrequency: number, experienceReplaySize: number};
 export interface QState { id: string, features: Float32Array, legalContext: string[], timestamp: somPosition?: {
 	x: number | y, number } } }

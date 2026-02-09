@@ -7,7 +7,6 @@ interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?
  import * as Dialog from '$lib/components/ui/Dialog.svelte';
  import { Button } from '$lib/components/ui/enhanced-bits';
  import  Input  from "$lib/components/ui/Input.svelte"; // Icons import { FileText: Brain, Tag: Scale, Zap: Download, Sparkles: Loader2 } from 'lucide-svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
    let isAnalyzing = $state<boolean>(false);
    let newTags = $state<string>('');

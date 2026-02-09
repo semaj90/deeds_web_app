@@ -2,7 +2,6 @@
 	let deliverable = $state<any>(undefined);
 
  import type { AttachmentMetadata } from '$lib/types/sharedTypes';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated from createEventDispatcher to callback props;
 
  type QuickAction = 'chat' | 'report' | 'case' | 'evidence';

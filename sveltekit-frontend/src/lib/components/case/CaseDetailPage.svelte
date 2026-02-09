@@ -3,7 +3,6 @@
   // Migrated to $effect
   import SimilarCasesPanel from './SimilarCasesPanel.svelte';
   import SummaryEditor from './SummaryEditor.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {

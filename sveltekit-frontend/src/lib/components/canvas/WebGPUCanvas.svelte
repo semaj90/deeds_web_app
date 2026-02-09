@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // WebGPU-accelerated canvas for high-performance legal data visualization // Migrated to $effect import type { Snippet } from 'svelte'; interface WebGPUCanvasProps { width?: number; height?: number; enableWebGPU?: boolean; fallbackTo2D?: boolean; onWebGPUStatus?: (supported: boolean, device?: GPUDevice) => void; children?: Snippet}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { width = 800, height = 600, enableWebGPU = true, fallbackTo2D = true, onWebGPUStatus, children }: WebGPUCanvasProps = $props(); let canvas: HTMLCanvasElement;
  let webgpuDevice: GPUDevice | null = null; let webgpuContext: GPUCanvasContext | null = null; let canvas2dContext: CanvasRenderingContext2D | null = null; let isWebGPUSupported = $state<boolean>(false); let isWebGPUInitialized = $state<boolean>(false); let renderingMode = $state<'webgpu' | '2d' | 'none'>('none'); let fps = $state<number>(0); let frameCount = 0; let lastTime = 0; // WebGPU shader source (WGSL) const vertexShaderSource = ` struct VertexOutput { @builtin(position) position vec4<f32>; @location(0) color: vec3<f32>}`

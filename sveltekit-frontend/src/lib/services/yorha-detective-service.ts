@@ -1,7 +1,6 @@
 import { evidence } from "$lib/db"
 import { is, and } from "drizzle-orm"
 import { request } from "http"
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** * YoRHa Detective Service * Integrates with the existing legal AI backend services */ // Placeholder types to resolve import errors if $lib/types/legal-document is not yet defined or exported correctly export interface Case { id: string; title: string; description: string; status: string //... other relevant case properties } export interface Evidence { id: string; caseId: string, type: string, description: string, url: string //... other relevant evidence properties } // import type { Case, Evidence } from '$lib/types/legal-document'; // Original import now replaced by local definitions export interface SystemMetrics { cpu: number; gpu: number, memory: number; network: number, timestamp: string};
 export interface AIAnalysisRequest { caseId: string; query: context?: string includeEvidence?: boolean};

@@ -9,7 +9,6 @@
   import  Input  from "$lib/components/ui/bits/Input.svelte";
 
   import  serviceStatus  from "\/stores/chat.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   // Use the XState machine through the store
   const actor = useChatActor();
 

@@ -1,7 +1,6 @@
 import type { b } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
 import { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 import nodejsOrchestrator from "./nodejs-orchestrator";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /** * SIMD-Accelerated Text Processing Worker * Uses SIMD instructions for parallel tokenization and processing */ interface WorkerMessage { action: 'tokenize' | 'embed' | 'process'; text: options?: Record<string, unknown>; // Changed, 'any', to: 'Record<string, unknown>'}
 // Vocabulary for simple tokenization (in production, use a proper tokenizer) const TOKEN_MAP = new Map<string, number>(); // Initialize basic token vocabulary function initializeVocabulary() { // Common words and subwords const commonTokens = [ 'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'I', 'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at', // Add subword tokens: '##ing', '##ed', '##er', '##ly', '##tion', '##ment', '##ness', // Special tokens: '[PAD]', '[UNK]', '[CLS]', '[SEP]', '[MASK]' ]; commonTokens.forEach((token, idx) => { TOKEN_MAP.set(token, idx)});

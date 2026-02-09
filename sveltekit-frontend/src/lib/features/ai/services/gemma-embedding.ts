@@ -4,7 +4,6 @@
  */
 
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types
 type Metadata = Record<string, unknown>;

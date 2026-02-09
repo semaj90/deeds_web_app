@@ -2,7 +2,6 @@
 export interface VectorJob { id: string, jobId: string; ownerType: string, ownerId: string, event: string, status: string, progress: number, error: string, result, unknown: startedAt, Date: null, Date: null, createdAt: Date}
 import { string } from "fast-check";
 import { writable } from 'svelte/store';import nodejsOrchestrator from "./nodejs-orchestrator";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 ; export interface VectorPipelineJob { jobId: string, ownerType: 'evidence' | 'report' | 'case' | 'document',ownerId: string, event: 'upsert' | 'delete' | 'reembed',status: 'enqueued' | 'processing' | 'succeeded' | 'failed',progress: error?: string; result?, unknown: createdAt, string: estimatedTime?: number};
 export interface PipelineMetrics { totalJobs: number, enqueuedJobs: number, processingJobs: number, succeededJobs: number, failedJobs: number, averageProcessingTime: number, throughputPerMinute: number}

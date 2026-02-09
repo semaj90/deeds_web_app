@@ -2,7 +2,6 @@
 import { existsSync } from 'fs';
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const RUNTIME_DIR = '.runtime';
 const STATE_FILE = join(RUNTIME_DIR, 'observability-state.json');

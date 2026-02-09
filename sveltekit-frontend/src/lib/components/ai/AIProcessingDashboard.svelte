@@ -12,7 +12,6 @@ import type { Document } from '$lib/types';
   import { aiServiceWorkerManager, type AITaskResult } from '$lib/services/aiServiceWorkerManager';
   import type { LLMProvider } from '$lib/types/llm';
   import { fly } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   // Reactive local state (Svelte, 5 runes $state used; kept as simple reactive variables)

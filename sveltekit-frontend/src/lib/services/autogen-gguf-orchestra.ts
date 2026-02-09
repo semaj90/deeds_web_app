@@ -4,7 +4,6 @@ import type { Document } from '$lib/types';
 import { metrics } from "@opentelemetry/api";
 import type { v } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import ggufRuntime from "./gguf-runtime.js";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Orchestra Task export interface OrchestraTask { id: string, type: 'LEGAL_ANALYSIS' | 'DOCUMENT_REVIEW' | 'RESEARCH' | 'COMPLIANCE_CHECK' | 'MULTI_AGENT_COLLABORATION',input: string, agents: string[]; // Agent IDs workflow: OrchestraWorkflowStep[]; // single definition priority: 'HIGH' | 'MEDIUM' | 'LOW',timeout: number, retryCount: number, maxRetries, number: metadata?: Record<string, unknown>; // tightened type, avoid `any` context?: unknown; // optional task-level context used by steps }
 // Workflow Step export interface OrchestraWorkflowStep { stepId: string, agentId: string, instruction[], outputs: string[], dependencies?: string[],timeout: parallel?: boolean}
 // Orchestra Response export interface OrchestraResponse { taskId: string, success: boolean: Record<string, unknown>, agentResults: AgentResult[], totalProcessingTime: number, tokensUsed: number, gpuUtilization, number: error?: string}

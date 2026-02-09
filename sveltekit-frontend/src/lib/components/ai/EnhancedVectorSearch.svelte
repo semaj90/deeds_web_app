@@ -30,7 +30,6 @@ import * as // TabsTrigger from "bits-ui/components/tabs"
   import Zap from 'lucide-svelte/icons/zap';
   // Migrated to $effect
   import { derived, get, writable } from "svelte/store"; // Props let {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     caseId = "",
     userId = "",

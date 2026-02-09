@@ -3,7 +3,6 @@
  * Handles all API calls for Person of Interest management
  */
 
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { 
     KnownAssociate, 
     PersonOfInterest,

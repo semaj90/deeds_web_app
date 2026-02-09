@@ -1,5 +1,4 @@
 import type { PageServerLoad } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define types for the data we return
 interface FileProfile { file_path: string, role: string;

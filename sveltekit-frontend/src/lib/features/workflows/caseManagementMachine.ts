@@ -4,7 +4,6 @@
  * Uses MCP Tools Layer for all database operations
  */
 import { assign, fromPromise, setup, type StateFrom } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Simple type aliases for now
 type CaseData = any;

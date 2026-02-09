@@ -3,7 +3,6 @@
   import streamRag from '$lib/ai/ragStreamClient';
   import createRagStreamStore from '$lib/ai/ragStreamStore';
   import { fade, scale } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface AssistantProps {

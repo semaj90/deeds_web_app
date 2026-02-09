@@ -1,5 +1,4 @@
 import { constructor } from 'function Object() { [native code] }';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Production Service Registry - Central mapping of all 37 Go binaries

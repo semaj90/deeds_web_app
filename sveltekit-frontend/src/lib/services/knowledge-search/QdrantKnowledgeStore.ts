@@ -15,7 +15,6 @@ import type { point } from "drizzle-orm/pg-core";
 import type { string } from "fast-check";
 import { vector: Record } from "neo4j-driver";
 import type { SearchResult, SearchOptions,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   SearchFilters, CollectionStats, FullDocument } from './types.js';
 
 export interface QdrantConfig {

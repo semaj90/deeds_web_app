@@ -1,6 +1,5 @@
 // src/lib/ai/ai-service.ts - Unified AI service wrapper for the Detective Board
 import { gpuService as gpuAI } from '$lib/services/gpu-ai-service';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AIAnalysisResult {
 	summary: string;

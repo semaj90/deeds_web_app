@@ -2,7 +2,6 @@ import { writable, type Writable } from 'svelte/store';
 import { createWorker, type Worker } from 'tesseract.js';
 import { z } from 'zod';
 import { getOllamaEndpoint } from '$lib/services/get-ollama-endpoint';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Types

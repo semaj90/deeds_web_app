@@ -7,7 +7,6 @@ import { timestamp } from "drizzle-orm/gel-core";
 import { line } from "drizzle-orm/pg-core";
 import { BaseService } from './base-service.js';
 import type { Diff, ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IDiffStorage {
  saveDiff(diff: Diff): Promise<Diff>;

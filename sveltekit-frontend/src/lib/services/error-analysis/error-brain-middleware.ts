@@ -9,7 +9,6 @@ import path from "path";
 import { BaseService } from './base-service.js';
 import { FeatureFlags } from './feature-flags.js';
 import type { ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IErrorBrainMiddleware {
  checkErrorBrainEnabled(): boolean;

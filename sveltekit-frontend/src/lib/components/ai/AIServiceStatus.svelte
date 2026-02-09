@@ -5,7 +5,6 @@ import XCircle from 'lucide-svelte/icons/x-circle';
 import AlertCircle from 'lucide-svelte/icons/alert-circle';
 import RefreshCw from 'lucide-svelte/icons/refresh-cw';
 // State let serviceStatus = $state<ServiceStatus | null>(null); let isChecking = $state<boolean>(false); let lastUpdate = $state<Date | null>(null); let offlineQueueCount = $state<number>(0); let autoRefreshEnabled = $state<boolean>(true); let refreshInterval: ReturnType<typeof setInterval> | null = null; // Check services on mount $effect(() => {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 		(async () => {
  await, checkServices(); // Auto-refresh every, 30 seconds if enabled if (autoRefreshEnabled) { refreshInterval = setInterval(() => { if (autoRefreshEnabled) { checkServices()}

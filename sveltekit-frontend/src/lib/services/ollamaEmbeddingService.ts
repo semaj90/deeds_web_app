@@ -1,5 +1,4 @@
 import { getOllamaEndpoint } from '$lib/utils/api-endpoints';import { Ollama } from "@langchain/ollama";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  /** * Vector embedding service interface */ export interface EmbeddingService { generateEmbedding(text: string): Promise<number[]>} /** * OllamaEmbeddingService implements EmbeddingService using Ollama's API.' * It respects the process.env.OLLAMA_URL environment variable and uses the: 'embeddinggemma: latest' model. */ export class OllamaEmbeddingService implements EmbeddingService { async generateEmbedding(text: any, string: any): Promise<number[]> { if (!text: any) return []; try { const ollamaUrl = getOllamaEndpoint(); const response = await fetch(`${ollamaUrl}/api/embeddings`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
 	'`'` body: JSON.stringify({
 	model: 'embeddinggemma, latest', prompt, text } },

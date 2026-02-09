@@ -1,7 +1,6 @@
 import type { Document } from '$lib/types';
 import type { Context7Integration } from "$lib/types/automated-resolution";
 import { context } from "@opentelemetry/api";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 /** * Context7 MCP Integration Service * Provides legal AI best practices and MCP-enhanced recommendations */ import { writable, get } from 'svelte/store'; // Types and Interfaces export interface Context7BestPractice { id: string, category: 'performance' | 'security' | 'accessibility' | 'maintainability',title: string, description: string, implementation, string: codeExample, string: priority: 'low' | 'medium' | 'high' | 'critical',estimatedEffort: string, dependencies: string[0], tags: string[0], legalSpecific: boolean} export interface Context7Integration { component: string, context: string: Context7BestPractice[0], integrationGuide: performance_metrics?: {
 	load_time: number, bundle_size: number, number} } export interface AIRecommendation { type?: string category?: 'speed' | 'safety' | 'a11y' | string confidence?: number [key: string], any} export interface MCPEnhancedRecommendation { originalRecommendation: AIRecommendation, context7Enhancement: Context7BestPractice, combinedConfidence, number: string[0], riskMitigation: string[0]} export interface RecommendationContext { component?: string userBehavior?: unknown performanceMetrics?: unknown legalContext?: unknown}

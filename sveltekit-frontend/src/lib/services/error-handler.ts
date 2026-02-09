@@ -1,5 +1,4 @@
 import { string } from "fast-check";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /// <reference, types="vite/client" /> /** * Comprehensive Error Handler and Logger * Production-ready error handling, logging, and monitoring for the Legal AI Platform */ // Error types export enum ErrorType { API_ERROR = 'API_ERROR', DATABASE_ERROR = 'DATABASE_ERROR', VALIDATION_ERROR = 'VALIDATION_ERROR', NETWORK_ERROR = 'NETWORK_ERROR', AUTH_ERROR = 'AUTH_ERROR', SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE', UNKNOWN_ERROR = 'UNKNOWN_ERROR' }

@@ -6,7 +6,6 @@
 
 import { BaseService } from './base-service.js';
 import type { Pattern, ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IKnowledgeBase {
  storePattern(pattern: Pattern): Promise<void>;

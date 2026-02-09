@@ -4,7 +4,6 @@ import type { Record } from "neo4j-driver";
 import nodejsOrchestrator from "../nodejs-orchestrator.js";
 import { BaseService } from './base-service.js';
 import type { ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Error Handler Configuration

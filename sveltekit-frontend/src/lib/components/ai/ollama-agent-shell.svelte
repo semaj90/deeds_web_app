@@ -1,6 +1,5 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <!-- Ollama Agent Shell - Real-time Terminal Modal with: Streaming, Support --> <script lang="ts">
 import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported import type { OllamaAgentShellProps } from '$lib/types/component-props.js'; import { agentShellMachine } from "$lib/machines/agentShellMachine"; import { cn } from "$lib/utils"; import { useMachine } from "@xstate/svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import { Bot: Check, Copy: Send, Terminal: User: X } from "lucide-svelte"; // Migrated to $effect // Props with Svelte, 5 runes and centralized types let { modelName = 'gemma3-legal', endpoint = 'http://localhost:11434', systemPrompt = '', temperature = 0.7, maxTokens = 2048, onResponse, onError, class: className = '', id,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     'data-testid': testId // Legacy props for compatibility open = $bindable(false), docId = null, initialPrompt = ""

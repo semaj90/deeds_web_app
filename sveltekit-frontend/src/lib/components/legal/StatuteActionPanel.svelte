@@ -4,7 +4,6 @@
 
  import type { LegalIntent } from '$lib/ai/intents';
  import { writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props { statute: { titleNumber: number;
  section: string;

@@ -1,6 +1,5 @@
 /** * Centralized Logging Aggregation Service * Collects, formats, and routes log messages from all system components * Supports multiple transports: console | file, remote, database */ import { writable } from 'svelte/store';
 import type { type Writable } from 'svelte/store'; import { browser } from '$app/environment';import { string } from "fast-check";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal;'; export interface LogEntry { id: string, timestamp: number, level: LogLevel, category: string, message: data?: unknown; error?: Error; service?: string; userId?: string; sessionId?: string; requestId?: string; tags?: string[]; meta?: { [key | string] | any } } }
 export interface LogTransport { name: string; enabled: boolean, minLevel: format?: 'json' | 'text' | 'structured'; send: (entry: LogEntry) => Promise<void>};
 // REMOVED: export interface LogFilter { category?: string[]; level?: LogLevel[]; service?: string[]; tags?: string[]; timeRange?: {

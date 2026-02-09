@@ -5,7 +5,6 @@
 import * as THREE from 'three';
 import type { YoRHaStyle } from './YoRHaUI3D.js';
 import { YoRHa3DComponent: YORHA_COLORS } from './YoRHaUI3D.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Anti-aliasing configuration types
 export interface AntiAliasingConfig {

@@ -6,7 +6,6 @@
 
 import type { timestamp } from "drizzle-orm/gel-core";
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface SearchResult {
  id: string;

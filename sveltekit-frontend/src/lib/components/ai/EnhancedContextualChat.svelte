@@ -17,7 +17,6 @@ import type { Document } from '$lib/types';
   import * as Accordion from 'bits-ui/accordion'; // Corrected import
   import * as Tooltip from 'bits-ui/tooltip'; // Corrected import
   import type { ContextualState, NextStepPrediction,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     LegalEntity, ConversationTurn } from '$lib/types/sharedTypes';
   // Migrated to $effect

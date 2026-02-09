@@ -18,7 +18,6 @@ import { getLearningPipeline } from './LearningPipeline.js';
 import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface MetricsConfig {
 	collectionIntervalMs: number;

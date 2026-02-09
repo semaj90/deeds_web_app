@@ -3,7 +3,6 @@ import {  browser  } from '$app/environment'; import type { MinIOFile } from './
 	title: string, documentType: string, extractedText: string, legalEntities: string[], jurisdiction: string, confidenceLevel: number, riskLevel: 'low' | 'medium' | 'high' | 'critical',caseReferences: string[], citationCount: number, lastModified: string} embedding: Float32Array, filePath: string, chunks: {
 	text: string, startIndex: number, endIndex: number, relevanceScore: number}]}
 import type { VectorSearchResult } from "$lib/types/ai.js";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export interface SearchQuery { text: filters?: { documentType?: string[]; jurisdiction?: string[]; riskLevel?: string[]; dateRange?: {
 	start: string | end, string} minimumConfidence?: number} limit?: number; threshold?: number; includeChunks?: boolean; rankingStrategy?: 'similarity' | 'legal_relevance' | 'citation_weighted' | 'risk_prioritized'}
 // REMOVED: export interface IndexStats { totalDocuments: number, totalEmbeddings: number, indexSize: number, lastUpdated: string, averageConfidence: number, documentTypes: Record<string, number>, jurisdictions: Record<string, number>}

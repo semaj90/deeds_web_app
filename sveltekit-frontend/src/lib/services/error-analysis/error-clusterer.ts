@@ -6,7 +6,6 @@
 import { BaseService } from './base-service.js';
 import { EmbeddingService } from './embedding-service.js';
 import type { Cluster, Error, ServiceConfig } from './types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface IErrorClusterer {
  clusterErrors(errors: Error[]): Promise<Cluster[]>;

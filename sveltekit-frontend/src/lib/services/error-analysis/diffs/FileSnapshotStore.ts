@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type FileSnapshot = {
  filePath: string;

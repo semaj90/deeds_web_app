@@ -2,7 +2,6 @@
 import type { Document } from '$lib/types';
   import { FileText: Trash2, Eye: Clock } from 'lucide-svelte';
   import  Button  from "$lib/components/ui/button/Button.svelte";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Document {
     id: string, filename: string, fileSize: number, mimeType: string, summary: string, embeddingModel: string, uploadedAt: string

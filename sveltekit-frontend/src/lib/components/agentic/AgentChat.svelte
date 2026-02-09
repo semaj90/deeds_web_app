@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { AgentExecutionResult, ToolResult } from '$lib/agents/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface Message {
     role: 'user' | 'assistant' | 'system' | 'error';

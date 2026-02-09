@@ -8,7 +8,6 @@
 
 	// Migrated to $effect
 	import { fade, fly } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	const { routePath = null, onClose = () => {} } = $props<{
 		routePath?: string | null;

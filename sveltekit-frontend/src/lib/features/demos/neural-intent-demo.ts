@@ -5,7 +5,6 @@
  * and Self-Organizing Map clustering for legal AI intent recognition.
  */
 import { cudaCacheOptimizer } from '../ai/cuda-cache-memory-optimizer.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // Demo queries representing different legal AI use cases

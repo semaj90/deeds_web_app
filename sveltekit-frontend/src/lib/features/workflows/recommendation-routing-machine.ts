@@ -6,7 +6,6 @@
 
 import { writable } from 'svelte/store';
 import { assign, fromPromise, setup, type ActorRefFrom } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ===== Context Types =====
 

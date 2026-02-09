@@ -1,5 +1,4 @@
 import type { Document } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /** * N64-Inspired Level of Detail Manager for Legal AI Platform * Manages texture streaming with NES-style memory constraints */ export interface LODLevel {
  level: 0 | 1 | 2 | 3;
  resolution: {

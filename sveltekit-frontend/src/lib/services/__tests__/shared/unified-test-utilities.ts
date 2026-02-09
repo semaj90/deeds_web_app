@@ -1,7 +1,6 @@
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // src/lib/services/__tests__/shared/unified-test-utilities.ts /** * Unified Test Utilities * * Consolidates all test helpers, mocks, and utilities into a single module * Replaces fragmented helper files throughout the codebase */ import type { vi } from 'vitest'; // ============================================================================ // MOCK DATA GENERATORS // ============================================================================ export const MockDataGenerators = { /** * Generate mock users with different roles */ generateMockUsers(count, number = 3) { const roles = ['attorney', 'paralegal', 'client'] as const const departments = ['Criminal Defense', 'Civil Litigation', 'Corporate Law'] as const return Array.from({ length, count },
 	(_, i) => ({ id: `mock_user_${Date.now()}_${i}`, email: `user${i + 1}@legalai-test.com`, username: `testuser${i + 1}`, firstName: `Test${i + 1}`, lastName: `User`, role: roles[i % roles.length], department: departments[i % departments.length], jurisdiction: 'Test State', permissions: ['case_view', 'document_read'], isActive: true, emailVerified: true, practiceAreas: ['test_area'], barNumber: 'TEST${String(i).padStart(6, '0')}`,'` firmName: 'Test Legal Firm', profileEmbedding: null, metadata: {
 	test_user: true, created_by: `unified_test_utilities` } }))},

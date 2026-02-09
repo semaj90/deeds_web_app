@@ -2,7 +2,6 @@
 import type { string } from "fast-check";
 import { blob } from "stream/consumers";
 import type { y } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  export interface EvidenceFile { id: string; name: string, type: string; size: number, minioKey: string; uploadedAt: processedAt?: string,metadata: { caseId?: string; tags?: string[]; extractedText?: string; embeddings?: Float32Array; thumbnailKey?: string,processingStatus: 'pending' | 'processing' | 'completed' | 'failed',processingMethod: 'webgpu' | 'cuda' | 'cpu'}; position?: {
 	x: number | y, number }}

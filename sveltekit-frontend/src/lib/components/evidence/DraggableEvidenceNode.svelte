@@ -9,7 +9,6 @@
   import Video from 'lucide-svelte/icons/video';
   import Zap from 'lucide-svelte/icons/zap';
   import type { ComponentType } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface EvidenceNode { id: string, title: string;
     type: 'document' | 'image' | 'video' | 'audio' | 'transcript';

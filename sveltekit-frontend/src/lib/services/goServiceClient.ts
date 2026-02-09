@@ -5,7 +5,6 @@
  */
 
 import { fetch } from 'node-fetch'; // Assuming this is available in the environment
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types
 export interface RAGResponse {

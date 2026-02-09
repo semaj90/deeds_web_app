@@ -6,7 +6,6 @@
  import Send from 'lucide-svelte/icons/send';
  import Users from 'lucide-svelte/icons/users';
  import { tick } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  type ChatMessage = { id: string, role: 'user' | 'assistant';
   content: string;
   timestamp: Date;

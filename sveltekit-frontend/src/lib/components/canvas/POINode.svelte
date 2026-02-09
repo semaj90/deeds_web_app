@@ -16,7 +16,6 @@
 		posX: number;
 		posY: number;
 		relationship?: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	caseId: string, aliases?: string[]; profileImageUrl?: string; profileData?: {
 	who: string, what: string;
 	why: string, how: string}

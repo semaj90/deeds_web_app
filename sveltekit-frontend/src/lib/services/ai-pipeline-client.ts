@@ -12,7 +12,6 @@ import { timestamp, boolean } from "drizzle-orm/gel-core";
 import { Record } from "neo4j-driver";
 import type { text } from "stream/consumers";
 import { process } from "node:process";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Service availability tracking
 export interface ServiceStatus {

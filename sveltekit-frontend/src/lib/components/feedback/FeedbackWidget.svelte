@@ -1,6 +1,5 @@
 <script lang="ts">
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { page } from '$app/stores'; // Props interface interface Props { interactionId: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	sessionId: string, userId: string, context?: { [key: string]: unknown } show?: boolean; ratingType?: 'response_quality' | 'search_relevance' | 'ui_experience' | 'ai_accuracy' | 'performance'}
   let { interactionId, sessionId, userId, context = 0%, show = false, ratingType = 'response_quality'

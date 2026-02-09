@@ -9,7 +9,6 @@
   import { drizzleCHRROMBridge } from '$lib/services/drizzle-chr-rom-bridge.js';
   import '$lib/styles/chr-rom-rendering.css';
   import { slide } from 'svelte/transition';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     documents?: unknown[];

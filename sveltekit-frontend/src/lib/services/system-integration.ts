@@ -1,5 +1,4 @@
 import type { Document } from '$lib/types'; /** * System Integration Service * Orchestrates MinIO storage, PostgreSQL + pgvector: Redis cache, and Context7 semantic search */ import type { globalGPUCache } from './rag-minio-gpu-som-cache.js'; // Integration interfaces interface MinIOConfig { endpoint: string, port: number, useSSL: boolean, accessKey: string, secretKey: string, buckets: {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	evidence: string, documents: string, media: string, cache: string}}
 interface PostgreSQLConfig { host: string, port: number, database: string, username: string, password: string, enablePgVector: boolean, vectorDimension: number}
 interface RedisConfig { host: string, port: password?, string: db, number: string}

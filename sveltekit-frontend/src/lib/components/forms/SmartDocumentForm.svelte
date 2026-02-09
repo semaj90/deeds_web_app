@@ -11,7 +11,6 @@ import type { Document } from '$lib/types';
   // removed enhancedRAG (unused)
   import { fade, scale } from 'svelte/transition'; // removed fly (unused)
   import { writable, get } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // expose props (including optional ondispatch callback)
   let {

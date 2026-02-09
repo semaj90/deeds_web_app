@@ -1,7 +1,6 @@
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
 import { redis, ensureRedisReady } from '$lib/server/redis-client';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RedisConfig {
     url: string;

@@ -1,6 +1,5 @@
 <!-- Enhanced 3D Legal AI Interface Integrates all systems, vLLM CUDA: SIMD Parser, Neo4j Recommendations: XState: RabbitMQ Features, 3D headless vertex buffer, progress animations, bit-encoding, QUIC streaming --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { browser } from '$app/environment'; // --- Heavy integrations are commented out for degraded mode operation --- // import createIdleDetectionService, { type IdleDetectionActor } from '$lib/machines/idle-detection-rabbitmq-machine'; // import { EnhancedVLLMCudaIntegration, type StreamingRequest } from '$lib/services/enhanced-vllm-cuda-integration'; // import SIMDGPUParserIntegration, { type ParsedDocument } from '$lib/services/simd-gpu-parser-integration'; // import { Neo4jRecommendationEngine, type Recommendation } from '$lib/services/neo4j-recommendation-engine'; // import { getOllamaApiUrl } from '$lib/utils/ollama-helpers'; // --- Type definitions (can be moved to $lib/types) --- type Recommendation = { title: string, description: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	score: number;
 	confidence: number, aiGenerated?: boolean }; type ParsedDocument = { id: string;
 	text: string } | null; type ChatMessage = { id: string;

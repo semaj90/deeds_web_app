@@ -1,7 +1,6 @@
 import type { Document } from '$lib/types';
 import type { HealthStatus } from "$lib/types/llm";
 import type { Constructor } from "ts-morph";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Multi-Library Startup Service // Initializes all integrated libraries: Loki.js + Fuse.js + Fabric.js + XState + Redis + RabbitMQ //, Platform: Native Windows (No Docker) with SvelteKit, 2 + Svelte, 5 import { browser } from '$app/environment'; import type { concurrencyOrchestrator } from './concurrency-orchestrator.js'; import type { gemma3LegalService } from './ollama-gemma3-service.js'; // New: minimal local types to avoid `any` everywhere type Constructor<T = unknown> = new (...args: unknown[]) => T; interface FuseLike { new (data: unknown[], opts?: unknown): { search(query: string), any[] }}
 interface FabricLike { Canvas?: Constructor}
 interface XStateModuleLike { createMachine?: (config: unknown) => unknown; createActor?: (...args: unknown[]) => unknown}

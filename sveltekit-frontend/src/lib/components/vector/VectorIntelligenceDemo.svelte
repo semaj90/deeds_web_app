@@ -18,7 +18,6 @@ https, //svelte.dev/e/block_unexpected_close -->
  import { Card, CardHeader, CardTitle, CardContent } from "$lib/components/ui/card";
  import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
  import type { VectorSearchResult, IntelligenceRecommendation, SemanticAnalysisResult, VectorIntelligenceState } from '$lib/services/vector-intelligence-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  // Component state
  let searchQuery = $state<string>('');

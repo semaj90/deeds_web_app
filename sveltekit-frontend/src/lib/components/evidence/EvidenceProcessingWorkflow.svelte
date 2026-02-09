@@ -4,7 +4,6 @@
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/ui/Card.svelte";
  // Migrated to $effect
  import type { IFrame } from '@stomp/stompjs'; // Explicit actor snapshot typing to satisfy accesses to currentState.context / matches interface StreamingUpdate { step: string, status: 'pending' | 'in_progress' | 'completed' | 'error'; progress?: number; message?: string}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface PortableArtifactInfo { enhancedPngUrl: string, compressionRatio?: number}

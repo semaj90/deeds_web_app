@@ -1,7 +1,6 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
 import type { createMachine, assign } from 'xstate'; import type { DoneInvokeEvent, ActorRefFrom } from 'xstate'; import type { caseMemoryEngine } from '../services/case-memory-engine.js'; import type { UnifiedLegalOrchestrator } from '../services/unified-legal-orchestrator.js'; // import { rabbitmq } from '../server/queue/rabbitmq-manager.js' // --- Small typed adapter so TS knows: 'handle' exists on the orchestrator instance --- type OrchestratorHandleInput = { type: payload?: Record<string, unknown>, context? : Record<string, unknown>}; type OrchestratorWithHandle = { handle(input: OrchestratorHandleInput): Promise<Record<string, unknown>>}; const orchestrator = new UnifiedLegalOrchestrator() as unknown as OrchestratorWithHandle; // --- Type Definitions for Clarity --- export type CaseData = Record<string, unknown>, export type Metadata = Record<string, unknown>, export type MemoryContext = Record<string, unknown>, export interface Document { id: string; content: string, type: string; [key: string]: unknown}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AnalysisResult { id: string; [key: string]: unknown}
 

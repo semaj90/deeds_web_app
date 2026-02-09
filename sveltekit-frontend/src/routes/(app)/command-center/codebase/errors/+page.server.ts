@@ -1,5 +1,4 @@
 import type { PageServerLoad } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface ErrorCard { id: string, name: string;
     errorCode: string;

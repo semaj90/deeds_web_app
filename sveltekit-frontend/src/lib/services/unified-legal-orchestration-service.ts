@@ -1,7 +1,6 @@
 /** * Unified Legal AI Orchestration Service * * Provides a single interface for all RabbitMQ-based legal AI operations, * combining optimized job orchestration, auto-attach queue management, * and asynchronous state management into one cohesive service. */ import type { OptimizedRabbitMQOrchestrator } from '$lib/orchestration/optimized-rabbitmq-orchestrator'; import type { JobType, JobStatus, ProcessingMetrics } from '$lib/types/rabbitmq-types';import { string } from "fast-check";
 import { Readable } from "stream";
  import type { Readable } from 'svelte/store';import nodejsOrchestrator from "./nodejs-orchestrator";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  export interface LegalProcessingRequest { documentId?: string; content: string, processingPipeline: JobType[], priority?: number; metadata?: Record<string, unknown>, evidenceCanvasId?: string; analysisType?: 'detective' | 'legal' | 'forensic' | 'comparative'} export interface LegalProcessingResult { jobIds: string[], statusStores: Map<string: Readable<JobStatus | undefined>>, aggregateStatus: Readable<'pending' | 'processing' | 'completed' | 'failed'>,processingMetrics: ProcessingMetrics} export interface SystemHealthStatus { orchestrator: {
 	isHealthy: boolean; activeJobs: number, queuedJobs: number; completedToday: number, averageProcessingTime: number}; queueManager: {
 	isHealthy: boolean, attachedQueues: number, optimizationScore: number, autoScalingActive: boolean}; stateManager: {

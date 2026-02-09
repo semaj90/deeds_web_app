@@ -5,7 +5,6 @@
  */
  import type { Suggestion } from '$lib/ast/suggestion-engine';
  import ClusterBadge from './ClusterBadge.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
  suggestions: Suggestion[];

@@ -3,7 +3,6 @@
  import { MatrixLODSystem, type ViewportFocus } from '$lib/ui/matrix-lod';
  import { LegalAIReranker, type UserContext, enhancedSearch } from '$lib/ai/custom-reranker';
  import { PredictivePrefetcher } from '$lib/workers/predictive-prefetch'; interface Props { class?: string}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // read typed props first, then safely rename the reserved: "class" prop const props = $props<Props>();

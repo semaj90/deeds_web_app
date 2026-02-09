@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	interface Props {

@@ -4,7 +4,6 @@ Displays the chronological chain of custody events with detailed audit trail
 -->
 <script lang="ts">
 import type { User } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     events: unknown[],
     signature?: string

@@ -3,7 +3,6 @@
 <script lang="ts">
   import { minioService, type MinIOFile, type UploadProgress } from '$lib/services/minio-service';
   import type { Snippet } from 'svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   interface ProcessingOptions {
     extractText?: boolean;

@@ -9,7 +9,6 @@
  */
 
 import { setup, assign, createActor, fromPromise } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface AuthContext {
   user: { id?: string; email?: string; role?: string } | null;

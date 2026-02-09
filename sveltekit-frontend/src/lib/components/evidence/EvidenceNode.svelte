@@ -1,6 +1,5 @@
 <script lang="ts">
  import Button from '$lib/components/ui/button';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  type EvidenceNodeType = { id: string, x: number;

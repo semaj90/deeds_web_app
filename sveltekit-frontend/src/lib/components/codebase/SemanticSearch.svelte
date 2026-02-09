@@ -11,7 +11,6 @@
 	import Loader2 from 'lucide-svelte/icons/loader-2';
 	import Search from 'lucide-svelte/icons/search';
 	import X from 'lucide-svelte/icons/x';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	interface SearchResult { id: string, filePath: string;

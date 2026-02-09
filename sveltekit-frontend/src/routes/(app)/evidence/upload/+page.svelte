@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	let { data }: {
 	data: PageData } = $props();

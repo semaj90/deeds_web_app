@@ -1,7 +1,6 @@
 <!-- Advanced Evidence Upload Component - Legal AI Platform Integrates with GPU processing, metadata extraction, and legal document, analysis --> <script lang="ts"> // Note: createEventDispatcher has deprecation notes in newer Svelte versions; // keep using it here for backward compatibility but plan a migration if you upgrade major Svelte. import { createEventDispatcher } from 'svelte';
  import { generateTensorRequest, mockTensorData } from '$lib/services/go-tensor-service-client';
  import { fade, fly, scale } from 'svelte/transition'; // Props (use export let pattern) let { maxFiles = 10, maxFileSize = 100 * 1024 * 1024, acceptedTypes = [
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     'image/*',
     'application/pdf',

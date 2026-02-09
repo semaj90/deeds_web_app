@@ -1,6 +1,5 @@
 import { string } from "fast-check";
 import { text } from "stream/consumers";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // PostgreSQL Vector Service - Stub Implementation // Provides fallback functionality when vector database is not available import {  browser  } from '$app/environment'; export interface VectorSearchResult { id: string, content: string, similarity: metadata?: { [key: string], any }}

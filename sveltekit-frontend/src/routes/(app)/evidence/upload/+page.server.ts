@@ -14,7 +14,6 @@ import path from 'path';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const metaEnv = import.meta.env;
 type EvidenceType = InferInsertModel<typeof evidence>['evidenceType'];

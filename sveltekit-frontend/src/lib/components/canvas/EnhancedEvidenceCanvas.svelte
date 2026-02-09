@@ -15,7 +15,6 @@
  import ZoomIn from 'lucide-svelte/icons/zoom-in';
  import ZoomOut from 'lucide-svelte/icons/zoom-out';
  // State (use normal let bindings so the file is valid) let canvasContainer: HTMLDivElement | undefined;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let fabricCanvas: any = null;
    let fabricLoaded = $state<boolean>(false);

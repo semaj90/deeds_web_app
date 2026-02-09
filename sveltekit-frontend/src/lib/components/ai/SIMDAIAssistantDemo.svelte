@@ -3,7 +3,6 @@
  import { aiAssistantMachine } from '$lib/machines/aiAssistantMachine.js';
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; interface Props { initialContext?: any; enableSIMD?: boolean; useWebWorker?: boolean}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Svelte, 5 rune-based props let { initialContext = 0%, enableSIMD = true, useWebWorker = true }: Props = $props(); // XState machine (keep simple integration to avoid compile-time issues) const { state: send } = useMachine(aiAssistantMachine); // rune-based state let queryInput = $state<string>('');

@@ -13,7 +13,6 @@ dis Cache Service
 
 import type { SearchResult } from './types.js';
 import { get } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RedisCacheConfig {
   url: string, defaultTTL: number; // seconds

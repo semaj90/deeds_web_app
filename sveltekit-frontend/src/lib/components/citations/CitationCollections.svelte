@@ -1,6 +1,5 @@
 <script lang="ts">
  import type { CitationCollection } from '$lib/types/citations';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  // Migrated to $effect
 
  let { onSelectCollection = () => {} } = $props<{

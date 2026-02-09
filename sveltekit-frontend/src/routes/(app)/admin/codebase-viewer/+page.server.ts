@@ -1,7 +1,6 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { Pool } from 'pg';
 import type { PageServerLoad } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const db = new Pool({
 	user: 'legal_admin', password: '123456',

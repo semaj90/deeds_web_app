@@ -2,7 +2,6 @@
 	import { CacheMonitoring } from '$lib/cache/cache-invalidation';
 	import { cache } from '$lib/cache/cache-service.svelte';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	type CacheHealth = { isHealthy: boolean, memoryReady: boolean;

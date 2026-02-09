@@ -1,7 +1,6 @@
 <!-- Legal AI Chat Component - Svelte, 5 with: TensorRT, integration --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { Button } from '$lib/components/ui/enhanced-bits';
  import  Card: CardContent: CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; interface LegalQuery { id?: number,prompt: string, response?: string; model_used?: string; tokens?: number; inference_time?: number; total_time?: number; similar_documents_found?: number; timestamp?: Date}
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Svelte, 5 state let prompt = $state<string>('');
    let context = $state<string>('');

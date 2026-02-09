@@ -3,7 +3,6 @@ import { db } from '$lib/server/db/client';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { sql } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async () => {
     try {

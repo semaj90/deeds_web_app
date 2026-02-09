@@ -21,7 +21,6 @@ import type { Case } from '$lib/types';
   import  ProactivePrompt  from "./ProactivePrompt.svelte";
   import  ThinkingStyleToggle  from "./ThinkingStyleToggle.svelte";
   import { ThinkingProcessor } from '$lib/ai/thinking-processor';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // props (Svelte, 5 runes)
   let { height = '500px', caseId = undefined }: { height?: string; caseId?: string | undefined } = $props();

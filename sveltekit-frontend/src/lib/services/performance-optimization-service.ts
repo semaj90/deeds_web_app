@@ -1,6 +1,5 @@
  /** * Performance Optimization Service * Advanced optimization patterns for LangChain-Ollama integration * Features: Connection pooling, request batching, memory management, GPU optimization */ import { writable } from 'svelte/store';
 import type { type Writable } from 'svelte/store'; import { browser } from '$app/environment'; export interface PerformanceMetrics { memory: {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	heapUsed: number, heapTotal: number, external: number, arrayBuffers: number} gpu: {
 	utilization: number, memoryUsed: number, memoryTotal: number, temperature: number} latency: {

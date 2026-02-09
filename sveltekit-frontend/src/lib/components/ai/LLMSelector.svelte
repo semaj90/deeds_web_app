@@ -1,6 +1,5 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect // import * as Select from 'bits-ui'; // Removed melt dependency import { fade, fly } from 'svelte/transition';
  import { ChevronDown: CheckCircle, AlertCircle: Loader2, Cpu: Brain, Zap: Database, Globe: Settings } from 'lucide-svelte'; // LLM Provider Types interface LLMModel { id: string, name: string, displayName: string, provider: 'ollama' | 'autogen' | 'crewai' | 'langchain',size: string, specialization: 'general' | 'legal' | 'code' | 'reasoning' | 'embedding',status: 'online' | 'offline' | 'loading' | 'error',performance: {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	tokensPerSecond: number, memoryUsage: string, responseTime: number}; capabilities: string[];
 	endpoint: string}

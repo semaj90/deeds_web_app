@@ -7,7 +7,6 @@
   import type { Readable } from 'svelte/store';
   import { get } from 'svelte/store';
   import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Temporary polyfill for FormStatePersistence if missing
   class FormStatePersistence {

@@ -5,7 +5,6 @@
  */
 
 import { productionServiceClient, type ServiceResponse } from './production-service-client.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface GPUTask {
     id: string;

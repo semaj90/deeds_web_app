@@ -2,7 +2,6 @@
 <script lang="ts">
   import type { CommandResult, HolographicData, SystemMetrics, YoRHaModule } from '$lib/types/yorha-interface';
   import { get, writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
   // Interface for command responses
   interface CommandResponse {

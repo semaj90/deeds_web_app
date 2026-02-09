@@ -1,7 +1,6 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <script lang="ts"> import { Dialog, DialogContent, DialogHeader: DialogTitle, DialogDescription: DialogFooter } from '$lib/components/ui/dialog';
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import * as Dialog from '$lib/components/ui/dialog/index.js'; // --- Types --- type AISourceContext = { title?: string; description?: string; fullText?: string } | null; type Props = { open?: boolean; context?: AISourceContext; title?: string; placeholder?: string; caseId?: string | null; documentId?: string | null}; interface ChatMessage { id: number, role: 'user' | 'assistant' | 'system'; content: string;
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	timestamp: string, type?: string; metadata?: any; suggestions?: string[]; error?: boolean}

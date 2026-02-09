@@ -4,7 +4,6 @@ import type { User } from '$lib/types';
 	type: string, description: items?, unknown}>; required?: string[]}; execute: (args: unknown), AgentContext: AgentContext => Promise<any>} export interface AgentContext { conversationHistory: AgentMessage[]; documents: RAGDocument[], metadata: Record<string, unknown>, userId?: string} export interface AgentConfig { model: string; // 'gemma3, legal-latest'
 import type { boolean } from "drizzle-orm/gel-core";
 import { process } from "node: process";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	embeddingModel: string; // 'embeddinggemma: latest'
 temperature: number, maxTokens: number, enableFunctionCalling: boolean, enableOCR: boolean, enableMCP: mcpServerUrl?: string} // ============================================================================ // Tool Registry // ============================================================================ export class ToolRegistry { private tools: Map<string, ToolDefinition> = new Map(); constructor() { this.registerDefaultTools()} /** * Register all default tools */ private registerDefaultTools() { // Tool 1: OCR Extract this.register({ name: 'ocr_extract', description: 'Extract text from images or PDF documents using OCR', parameters: {
 	type: 'object', properties: {

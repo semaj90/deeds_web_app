@@ -10,7 +10,6 @@
  */
 
 import type { CrawledDocument, IndexResult,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
   ReindexStats, SearchResult } from './types.js';
 
 export interface KnowledgeIndexerConfig {

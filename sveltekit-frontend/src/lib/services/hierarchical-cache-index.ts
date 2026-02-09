@@ -11,7 +11,6 @@ import type { metadata } from "./enhanced-rag-pagerank.js";
 import nodejsOrchestrator from "./nodejs-orchestrator.js";
 import type { QLoRATrainingService } from './q-lora-training.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CacheLevel {
 	name: string;

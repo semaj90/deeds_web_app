@@ -4,7 +4,6 @@ import { sha256 } from './unifiedDiff.js';
 import type { PatchCandidate } from './diffTypes.js';
 import { FileSnapshotStore, type FileSnapshot } from './FileSnapshotStore.js';
 import { string, boolean } from "fast-check";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 | { ok: true; applied: boolean; reason?: string }
  | {
  ok: false, code: 'FILE_MISSING' | 'HASH_MISMATCH' | 'PATCH_TOO_LARGE' | 'WRITE_FAILED';

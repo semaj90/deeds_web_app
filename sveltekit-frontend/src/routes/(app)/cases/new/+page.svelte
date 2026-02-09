@@ -1,6 +1,5 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  let title = $state('');

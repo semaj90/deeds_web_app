@@ -6,7 +6,6 @@
  * to the CHR-ROM pre-computation system for pattern generation
  */
 
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface DrizzleLegalDocument {

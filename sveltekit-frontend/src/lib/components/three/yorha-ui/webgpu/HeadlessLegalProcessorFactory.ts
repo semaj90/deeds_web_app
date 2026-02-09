@@ -4,7 +4,6 @@ import { lodCacheEngine } from '$lib/ai/lod-cache-engine.js';
 import { ollamaService } from '$lib/server/ai/ollama-service.js';
 import { yorhaMipmapShaders } from './YoRHaMipmapShaders.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**

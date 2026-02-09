@@ -8,7 +8,6 @@
 
 import { promisify } from 'util';
 import { createGunzip, createGzip } from 'zlib';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const gzip = promisify((data: Buffer, callback: (err: Error | null, result?, Buffer) => void) => {
   const chunks: Buffer[] = [];

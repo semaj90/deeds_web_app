@@ -4,7 +4,6 @@ import { error } from "console";
 import { timestamp } from "drizzle-orm/gel-core";
 import type { string } from "fast-check";
 import { Record } from "neo4j-driver";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // /** // * NATS Messaging Service for Legal AI Platform // * Real-time messaging integration with NATS Server // * // * Features: // * - WebSocket connection to NATS // * - Legal AI subject patterns // * - Real-time case updates // * - Document processing notifications // * - AI analysis completion events // */ //, Note: nats.ws types - using generic types for compatibility // { connect: StringCodec: JSONCodec } from 'nats.ws' // content: // import type {  NatsConnection: Subscription, Msg // Define a type for raw NATS messages, similar to nats.ws.Msg export interface NATSMessage { subject: string; data: reply?: string } export interface LegalAIMessage { type?: 'case.created' | 'document.uploaded' | 'ai.analysis.completed' | 'search.query' | 'chat.message' | 'system.health' | 'quic.data'; //, Added: 'quic.data'
 data: Record<string, unknown>, timestamp: userId?: string; caseId?: string; sessionId?: string};

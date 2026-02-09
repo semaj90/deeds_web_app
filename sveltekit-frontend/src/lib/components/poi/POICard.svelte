@@ -16,7 +16,6 @@ https, //svelte.dev/e/js_parse_error -->
  import Eye from 'lucide-svelte/icons/eye';
  import Trash2 from 'lucide-svelte/icons/trash-2';
  import User from 'lucide-svelte/icons/user';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let {
  poi: onView,

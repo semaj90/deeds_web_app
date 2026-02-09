@@ -1,7 +1,6 @@
 import { process } from "node:process";
 import { Buffer } from "node:buffer";
 import { path } from "node:path";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * CouchDB Client for ACE Graph Analysis

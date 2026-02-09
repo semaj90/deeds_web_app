@@ -1,135 +1,229 @@
-<!-- @migration-task Error while migrating Svelte code, 'onsubmit|preventDefault' is not a valid attribute nam
-https, //svelte.dev/e/attribute_invalid_name -->
-<!-- @migration-task Error while migrating Svelte, code, 'onsubmit|preventDefault' is not a valid attribute name -->
+<!-- Evidence Modal Component - Svelte 5 + bits-ui v2 -->
 <script lang="ts">
-  // Svelte, 5 runes are auto-imported
-  import  Dialog  from "bits-ui/Dialog.svelte";
+  import { Dialog } from 'bits-ui';
+  import { Button } from '$lib/components/ui/button';
+  import X from 'lucide-svelte/icons/x';
+  import FileText from 'lucide-svelte/icons/file-text';
+  import Edit from 'lucide-svelte/icons/edit';
+  import Save from 'lucide-svelte/icons/save';
 
-  import  Button  from "bits-ui/Button.svelte";
+  // Props interface
+  interface EvidenceItem {
+    jsonData: {
+      title: string;
+      description: string;
+      tags?: string[];
+      tagsString?: string;
+      type?: string;
+    };
+  }
 
-  // Migrated to $effect
+  interface Props {
+    item: EvidenceItem;
+    open?: boolean;
+    onSave?: (data: EvidenceItem) => void;
+  }
 
-  import { superValidate } from 'sveltekit-superforms/client';
+  let { item, open = $bindable(false), onSave }: Props = $props();
 
-  import { evidenceSchema } from '$lib/schemas/client';
+  // State
+  let isEditing = $state(false);
+  let title = $state('');
+  let description = $state('');
+  let tagsString = $state('');
+  let type = $state('');
 
-  import { createMachine } from 'xstate';
-  // Props
-  let { item,
-    open = $bindable(false)
-   }: { item: { jsonData: {
-	title: string, description: string
-        tags?: string[];
-        tagsString?: string
-        type?: string}
-    }
-    open?: boolean} = $props();
-
-  let form = $state<any >(null);
-
-  let title = $state<string>('');
-
-  let description = $state<string>('');
-
-  let tagsString = $state<string>('');
-
-  let type = $state<string>('');
-  // XState machine for tag/type grouping
-  const evidenceMachine = createMachine({
-    id: 'evidence',
-    initial: 'view',
-    context: { item },
-	states: {
-	view: { on { EDIT: 'edit' } },
-	edit: { on { SAVE: 'view', CANCEL: 'view' } }
-    }
-  });
-  // Use initialState property for xstate v5+ or .initialState for v4
-  let state = evidenceMachine.initialStat
-  // Use zod adapter for superValidate
-  import { zod } from 'sveltekit-superforms/adapters';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+  // Initialize form values from item
   $effect(() => {
-    (async () => {
-form = await superValidate(zod(evidenceSchema), { initialValues: item
-    })()});
-    if (form && form.values && form.values.jsonData) {
-      title = form.values.jsonData.title || '';
-      description = form.values.jsonData.description || '';
-      tagsString = form.values.jsonData.tagsString ?? (form.values.jsonData.tags ?? []).join(', ');
-      type = form.values.jsonData.type ?? ''}
+    if (item?.jsonData) {
+      title = item.jsonData.title || '';
+      description = item.jsonData.description || '';
+      tagsString = item.jsonData.tagsString ?? (item.jsonData.tags ?? []).join(', ');
+      type = item.jsonData.type ?? '';
+    }
   });
+
   function handleEdit() {
-    state = evidenceMachine.transition(state, { type: 'EDIT' })}
-  function handleSave() {
-    if (form && form.values && form.values.jsonData) {
-      form.values.jsonData.title = titl
-      form.values.jsonData.description = descriptio
-      form.values.jsonData.type = typ
-      form.values.jsonData.tagsString = tagsString
-      form.values.jsonData.tags = tagsString
-        ? tagsString.split.map((t: string) => t.trim()).filter(Boolean)
-        : []}
-    state = evidenceMachine.transition(state, { type: 'SAVE' });
-    open = false}
+    isEditing = true;
+  }
+
+  function handleSave(event: SubmitEvent) {
+    event.preventDefault();
+
+    const updatedItem: EvidenceItem = {
+      jsonData: {
+        title,
+        description,
+        type,
+        tagsString,
+        tags: tagsString
+          ? tagsString.split(',').map((t: string) => t.trim()).filter(Boolean)
+          : []
+      }
+    };
+
+    onSave?.(updatedItem);
+    isEditing = false;
+    open = false;
+  }
+
   function handleCancel() {
-    state = evidenceMachine.transition(state, { type: 'CANCEL' });
-    open = false}
+    // Reset to original values
+    if (item?.jsonData) {
+      title = item.jsonData.title || '';
+      description = item.jsonData.description || '';
+      tagsString = item.jsonData.tagsString ?? (item.jsonData.tags ?? []).join(', ');
+      type = item.jsonData.type ?? '';
+    }
+    isEditing = false;
+  }
+
+  function closeModal() {
+    open = false;
+    isEditing = false;
+  }
 </script>
 
-<Dialog.Root bind:open={open}>
-  <div class="uno-p-4 uno-bg-white">
-    <div class="mb-4">
-      <h2 class="text-lg font-bold">Evidence Details</h2>
-    </div>
-  {#if state.value === 'view'}
-      <div class="mb-2">
-        <div class="font-bold">{title}
-</div>
-
-        <div class="text-sm">{description}
-</div>
-
-        <!-- Add other view-only fields, as, needed -->
-      </div>
-
-      <div class="flex gap-2">
-        <Button.Root class="bits-btn bits-btn" onclick={handleEdit}>
-Edit
-      </div>
-    {:else}
-      <form class="flex flex-col gap-2" onsubmit|preventDefault={handleSave}>
-        <input name="jsonData.title" bind:value={title} placeholder="Title" class="input" />
-        <input name="jsonData.description" bind:value={description} placeholder="Description" class="input" />
-        <input name="jsonData.tags" bind:value={tagsString} placeholder="Tags (comma, separated)" class="input" />
-        <input name="jsonData.type" bind:value={type} placeholder="Type" class="input" />
-        <div class="flex gap-2">
-          <Button type="submit" class="uno-bg-green-600 uno-text-white uno-px-3 uno-py-1 uno-rounded bits-btn bits-btn">
-Save
-          <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={handleCancel}>
-Cancel
+<Dialog.Root bind:open>
+  <Dialog.Portal>
+    <Dialog.Overlay class="fixed inset-0 bg-black/60 z-40" />
+    <Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg bg-gray-900 border border-gray-700 rounded-lg shadow-xl">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-700">
+        <div class="flex items-center gap-2">
+          <FileText class="h-5 w-5 text-blue-400" />
+          <Dialog.Title class="text-lg font-semibold text-white">
+            Evidence Details
+          </Dialog.Title>
         </div>
-      </form>
-    {/if}
-  <div class="mt-4 flex">
-      <Button.Root class="bits-btn bits-btn" onclick={() =>
-(open = false)} variant="ghost">Close
-    </div>
-  </div>
-</Dialog>
+        <Dialog.Close>
+          <button
+            type="button"
+            onclick={closeModal}
+            class="p-1 hover:bg-gray-700 rounded transition-colors"
+            aria-label="Close"
+          >
+            <X class="h-5 w-5 text-gray-400" />
+          </button>
+        </Dialog.Close>
+      </div>
+
+      <!-- Content -->
+      <div class="p-4">
+        {#if !isEditing}
+          <!-- View Mode -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-1">Title</label>
+              <div class="text-white font-medium">{title || 'Untitled'}</div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-1">Description</label>
+              <div class="text-gray-300">{description || 'No description'}</div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-1">Type</label>
+              <div class="text-gray-300">{type || 'Not specified'}</div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-1">Tags</label>
+              <div class="flex flex-wrap gap-1">
+                {#if tagsString}
+                  {#each tagsString.split(',').map(t => t.trim()).filter(Boolean) as tag}
+                    <span class="px-2 py-1 bg-blue-600/20 text-blue-400 text-xs rounded">{tag}</span>
+                  {/each}
+                {:else}
+                  <span class="text-gray-500">No tags</span>
+                {/if}
+              </div>
+            </div>
+          </div>
+
+          <!-- View Mode Actions -->
+          <div class="flex justify-end gap-2 mt-6 pt-4 border-t border-gray-700">
+            <Button variant="ghost" onclick={closeModal}>
+              Close
+            </Button>
+            <Button variant="default" onclick={handleEdit} class="gap-2">
+              <Edit class="h-4 w-4" />
+              Edit
+            </Button>
+          </div>
+        {:else}
+          <!-- Edit Mode -->
+          <form onsubmit={handleSave} class="space-y-4">
+            <div>
+              <label for="evidence-title" class="block text-sm font-medium text-gray-300 mb-1">
+                Title
+              </label>
+              <input
+                id="evidence-title"
+                type="text"
+                bind:value={title}
+                placeholder="Evidence title"
+                class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label for="evidence-description" class="block text-sm font-medium text-gray-300 mb-1">
+                Description
+              </label>
+              <textarea
+                id="evidence-description"
+                bind:value={description}
+                placeholder="Evidence description"
+                rows="3"
+                class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              ></textarea>
+            </div>
+
+            <div>
+              <label for="evidence-type" class="block text-sm font-medium text-gray-300 mb-1">
+                Type
+              </label>
+              <input
+                id="evidence-type"
+                type="text"
+                bind:value={type}
+                placeholder="Evidence type"
+                class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label for="evidence-tags" class="block text-sm font-medium text-gray-300 mb-1">
+                Tags (comma-separated)
+              </label>
+              <input
+                id="evidence-tags"
+                type="text"
+                bind:value={tagsString}
+                placeholder="tag1, tag2, tag3"
+                class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <!-- Edit Mode Actions -->
+            <div class="flex justify-end gap-2 pt-4 border-t border-gray-700">
+              <Button type="button" variant="ghost" onclick={handleCancel}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="default" class="gap-2 bg-green-600 hover:bg-green-700">
+                <Save class="h-4 w-4" />
+                Save Changes
+              </Button>
+            </div>
+          </form>
+        {/if}
+      </div>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
 
 <style>
   /* @unocss-include */
-  .uno-shadow {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08)}
-  .input.input-bordered {
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem
-   ;padding: 0.5rem 0.75rem;
-    font-size: 1rem;}
 </style>
-
-
-
-
-

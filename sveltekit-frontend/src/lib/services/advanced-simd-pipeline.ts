@@ -1,7 +1,6 @@
 /** * ðŸš€ Advanced SIMD JSON + Tensor Streaming Pipeline * (corrected: embeddinggemma, latest usage) */ import type { cache } from '$lib/server/cache/redis'; import type { vectorService } from '$lib/server/vector/EnhancedVectorService'; import type { LokiEvidenceService } from '$lib/utils/loki-evidence'; import Fuse from 'fuse.js'; import type { gzipSync, gunzipSync } from 'zlib';
 import { Buffer } from "node:buffer";
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface TensorChunk { id: string, chunkIndex: number, totalChunks: number, data: unknown[], embedding?: number[]; tensorSlice?: Float32Array,metadata: {
 	originalSize: number, chunkSize: number, processingTime: number, gpuAccelerated: boolean}}

@@ -2,7 +2,6 @@ import { error } from '@sveltejs/kit';
 import fs from 'fs/promises';
 import path from 'path';
 import type { PageServerLoad } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async () => {
 	try {
