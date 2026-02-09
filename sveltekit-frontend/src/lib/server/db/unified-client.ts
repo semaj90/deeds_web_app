@@ -95,7 +95,7 @@ const config: DatabaseConfig = {
 	qdrant: process.env.QDRANT_URL ? {
         url: process.env.QDRANT_URL,
         apiKey: process.env.QDRANT_API_KEY
-    }  | undefined,
+    } : undefined,
     environment: (process.env.NODE_ENV as any) ?? 'development'
 };
 
@@ -261,11 +261,19 @@ class DatabaseManager {
             if (!exists) {
                 await qdrant.createCollection(collectionName, {
                     vectors: {
-	size: vectorSize, distance },
-	optimizers_config: {
-	default_segment_number: 2, memmap_threshold: 20000, indexing_threshold: 20000 },
-	hnsw_config: {
-	m: 16, ef_construct: 64, full_scan_threshold: 10000 }
+						size: vectorSize,
+						distance: distance
+					},
+					optimizers_config: {
+						default_segment_number: 2,
+						memmap_threshold: 20000,
+						indexing_threshold: 20000
+					},
+					hnsw_config: {
+						m: 16,
+						ef_construct: 64,
+						full_scan_threshold: 10000
+					}
                 });
                 console.log(`✅ Created collection: ${collectionName}`);
             }
@@ -320,7 +328,7 @@ class DatabaseManager {
             if (qdrantClient) {
                 const qStart = Date.now();
                 try {
-                    const qFilter = Object.keys(filter).length ? { must: Object.entries(filter).map(([key, value]) => ({ key, match: { value } })) }  | undefined;
+                    const qFilter = Object.keys(filter).length ? { must: Object.entries(filter).map(([key, value]) => ({ key, match: { value } })) } : undefined;
 
                     const qRes = await qdrantClient.search(collection, {
                         vector: queryEmbedding,
