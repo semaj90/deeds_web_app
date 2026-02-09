@@ -16,7 +16,13 @@ import type { Message } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
-  import Alert, { Button: Card, CardContent: CardHeader, CardTitle: Label } from '$lib/components/ui/enhanced-bits.svelte';
+  import Alert from '$lib/components/ui/Alert.svelte';
+import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import Label from '$lib/components/ui/Label.svelte';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface SummarizationRequest {
     document_id: string, title: string, content: string, document_type: 'contract' | 'judgment' | 'brief' | 'statute',summary_type: 'executive' | 'detailed' | 'bullet_points' | 'legal_analysis',

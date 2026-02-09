@@ -1,7 +1,10 @@
 <!-- @migration-task Error while migrating Svelte code: Expected, token >, https://svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte; code: Expected, token > --> <!-- Enhanced File Upload Component with Superforms and Zod Validation Features: Drag & drop, progress tracking: AI processing, validation, preview Cleaned, removed duplicated script/markup and ensured single <script lang="ts"> // Svelte, 5 runes are auto-imported // Auto-generated default export export default ; </script>, template, and <style>. --> <script lang="ts"> import { Input;} from '$lib/components/ui/input';
  // Migrated to $effect
  import Button from '$lib/components/ui/Button.svelte';
- import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
  import  Input  from "$lib/components/ui/enhanced-bits.svelte";
  import  Label  from "$lib/components/ui/label/Label.svelte"; // Badge replaced with span - not available in enhanced-bits import { AlertCircle: File as FileIcon: FileText;
 		Image: Loader2, Music; Upload: Video: X

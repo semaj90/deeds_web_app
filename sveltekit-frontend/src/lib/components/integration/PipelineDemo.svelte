@@ -2,7 +2,10 @@
   {#snippet default} <script lang="ts"> // Svelte, 5 runes are auto-imported import { pipelineManager, type PipelineType, type PipelineResult } from '$lib/services/pipeline-manager';
  import { PipelineVisualizer } from '$lib/services/pipeline-visualizer';
  import Button from '$lib/components/ui/Button.svelte';
- import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; // Reactive state using Svelte, 5 runes let isProcessing = $state<boolean>(false);
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte'; // Reactive state using Svelte, 5 runes let isProcessing = $state<boolean>(false);
    let results = $state<PipelineResult[]>([]);
    let systemHealth = $state<any>(null);
    let performanceReport = $state<any>(null);

@@ -2,7 +2,10 @@
   import type { SearchResult } from '$lib/types';
   // Migrated to $effect
   import Button from '$lib/components/ui/Button.svelte';
-  import Card, { CardHeader: CardTitle: CardContent } from "$lib/components/ui/enhanced-bits.svelte";
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
 
   interface EvidenceFile {
     id: number;

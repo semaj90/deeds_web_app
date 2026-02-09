@@ -1,4 +1,7 @@
-<script lang="ts"> // Svelte, 5 runes are auto-imported // Svelte runes are declared globally in src/types/svelte-helpers.d.ts // runes-mode: props accessed via $props() import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
+<script lang="ts"> // Svelte, 5 runes are auto-imported // Svelte runes are declared globally in src/types/svelte-helpers.d.ts // runes-mode: props accessed via $props() import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
  import  Badge  from "$lib/components/ui/Badge.svelte";
  import Button from '$lib/components/ui/Button.svelte';
  import  Separator  from "$lib/components/ui/separator/Separator.svelte"; // Access props via Svelte runes $props() let _props = $props();

@@ -1,8 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import { Select } from "bits-ui";
-
-  interface Props {
+  import * as Select from "bits-ui/components/select";
+interface Props {
     class?: string;
     [key: string]: any;
   }

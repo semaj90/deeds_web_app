@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Case } from '$lib/types';
   import { Input } from "$lib/components/ui/input";
-  import { Select } from "bits-ui";
-  import Button from '$lib/components/ui/Button.svelte';
+  import * as Select from "bits-ui/components/select";
+import Button from '$lib/components/ui/Button.svelte';
   import Search from 'lucide-svelte/icons/search';
   import Filter from 'lucide-svelte/icons/filter';
   import SortAsc from 'lucide-svelte/icons/sort-asc';

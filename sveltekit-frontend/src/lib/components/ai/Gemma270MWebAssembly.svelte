@@ -4,8 +4,12 @@
 -->
 <script lang="ts">
 import type { Message } from '$lib/types';
-	// Removed unused onMount import and switched Alert to a default import (compiler suggested)
-	import  Button: Card, CardContent: CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte";
+	// Removed unused onMount import Alert from '$lib/components/ui/Alert.svelte';
+import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
 	import  Alert  from "$lib/components/ui/enhanced-bits.svelte"; // use default import as compiler suggested
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Svelte, 5 runes for reactive state

@@ -7,10 +7,10 @@
   import 
     Input
    from "$lib/components/ui/enhanced-bits.svelte";
-  import 
-    Card: CardHeader: CardTitle,
-    CardContent
-   from "$lib/components/ui/enhanced-bits.svelte";
+  import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
   import  Badge  from "$lib/components/ui/badge/Badge.svelte";
   import  Separator  from "$lib/components/ui/separator/Separator.svelte";
   import  ScrollArea  from "$lib/components/ui/scroll-area/ScrollArea.svelte";

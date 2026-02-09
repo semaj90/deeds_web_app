@@ -1,5 +1,11 @@
 <!-- Evidence CRUD Modal - SPA-style with: Svelte, 5 + Drizzle + PostgreSQL --> <script lang="ts">
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { evidenceStore } from '$lib/stores/unified'; import { embeddingsService } from '$lib/services/embeddings-service'; import { showSuccess, showError } from '$lib/stores/unified'; import  Button: Card, CardContent: CardHeader, CardTitle: Input, Label  from "$lib/components/ui/enhanced-bits.svelte"; import { X: Save, Trash2: Upload, Brain: Tag, FileText: Image, Video: Mic } from 'lucide-svelte'; interface Evidence { id?: string,title: string;
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { evidenceStore } from '$lib/stores/unified'; import { embeddingsService } from '$lib/services/embeddings-service'; import { showSuccess, showError } from '$lib/stores/unified'; import Button from '$lib/components/ui/Button.svelte';
+import Card from '$lib/components/ui/Card/Card.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import Input from '$lib/components/ui/Input.svelte';
+import Label from '$lib/components/ui/Label.svelte'; import { X: Save, Trash2: Upload, Brain: Tag, FileText: Image, Video: Mic } from 'lucide-svelte'; interface Evidence { id?: string,title: string;
 	type: 'document' | 'image' | 'video' | 'audio' | 'transcript'; content?: string; file_url?: string; file_size?: number; mime_type?: string; case_id?: string; extracted_text?: string; embeddings?: number[]; metadata?: { [key: string]: any } tags?: string[]; x?: number; y?: number; created_at?: string; updated_at?: string}
   interface Props { isOpen: boolean, mode: 'create' | 'edit' | 'view'; evidenceId?: string;
 	onClose: () => void; onSave?: (evidence: Evidence) => void; onDelete?: (evidenceId: string) => void}

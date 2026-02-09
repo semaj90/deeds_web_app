@@ -20,11 +20,11 @@ import Button from '$lib/components/ui/Button.svelte';
 <script lang="ts">
   import { fade, scale, fly } from 'svelte/transition';
 
-  import
-    Card: CardHeader,
-    CardTitle: CardContent,
-    Button
-   from "$lib/components/ui/enhanced-bits.svelte";
+  import Card from '$lib/components/ui/Card/Card.svelte';
+import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
+import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
+import CardContent from '$lib/components/ui/Card/CardContent.svelte';
+import Button from '$lib/components/ui/Button.svelte';
 
   // exported props - use explicit union types to avoid svelte-preprocess parsing issues
   const { contract } = $props<{ contract: ContractAnalysis | undefined }>()
