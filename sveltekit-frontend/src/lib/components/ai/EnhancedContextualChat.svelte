@@ -15,8 +15,10 @@ import type { Document } from '$lib/types';
   import { chatMessageSchema } from '$lib/forms/contextual-chat-schema';
   import * as Dialog from "bits-ui/components/dialog";
 // Corrected import
-  import * as Accordion from 'bits-ui/accordion'; // Corrected import
-  import * as Tooltip from 'bits-ui/tooltip'; // Corrected import
+  import * as Accordion from "bits-ui/components/accordion";
+// Corrected import
+  import * as Tooltip from "bits-ui/components/tooltip";
+// Corrected import
   import type { ContextualState, NextStepPrediction,
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     LegalEntity, ConversationTurn } from '$lib/types/sharedTypes';

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import { DropdownMenu } from "bits-ui";
-  import type { Snippet } from "svelte";
+  import * as DropdownMenu from "bits-ui/components/dropdown-menu";
+import type { Snippet } from "svelte";
 
   interface DropdownItem {
     label: string;

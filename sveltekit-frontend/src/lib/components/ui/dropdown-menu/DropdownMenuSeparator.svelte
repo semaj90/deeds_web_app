@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import { DropdownMenu } from "bits-ui";
-  let { class: className = "", ...rest } = $props();
+  import * as DropdownMenu from "bits-ui/components/dropdown-menu";
+let { class: className = "", ...rest } = $props();
 </script>
 
 <DropdownMenu.Separator

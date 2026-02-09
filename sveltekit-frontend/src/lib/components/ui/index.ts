@@ -10,8 +10,7 @@
 // Note: For bits-ui components, import directly from 'bits-ui' in your components:
 // import * as Dialog from "bits-ui/components/dialog";
 import * as Select from "bits-ui/components/select";
-import { Tabs } from "bits-ui";
-
+import * as Tabs from "bits-ui/components/tabs";
 // ============================================
 // Custom UI Components
 // ============================================

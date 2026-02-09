@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import { DropdownMenu } from "bits-ui";
-  let { children, class: className = "", inset, ...rest } = $props();
+  import * as DropdownMenu from "bits-ui/components/dropdown-menu";
+let { children, class: className = "", inset, ...rest } = $props();
 </script>
 
 <DropdownMenu.Item
