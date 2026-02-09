@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { Dialog } from "bits-ui";
-
-	interface PersonOfInterest {
+	import * as Dialog from "bits-ui/components/dialog";
+interface PersonOfInterest {
 		name: string;
 		face: string;
 		alias?: string;

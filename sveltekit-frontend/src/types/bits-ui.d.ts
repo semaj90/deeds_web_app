@@ -45,8 +45,8 @@ declare module 'bits-ui' {
 }
 
 declare module 'bits-ui/dialog' {
- import * as Dialog from 'bits-ui/dist/bits/dialog';
- export = Dialog;
+ import * as Dialog from "bits-ui/components/dialog";
+export = Dialog;
 }
 
 

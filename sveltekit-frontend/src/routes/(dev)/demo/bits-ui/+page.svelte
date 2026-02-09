@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Dialog, Button, Separator } from 'bits-ui';
-
-	let open = $state(false);
+	import * as Dialog from "bits-ui/components/dialog";
+import { Button, Separator } from 'bits-ui';
+let open = $state(false);
 	let selectedValue = $state('apple');
 
 	const fruits = [
@@ -222,8 +222,9 @@
 
 			<pre class="p-6 bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto text-sm">
 				<code class="text-gray-300">{`<script lang="ts">
-  import { Dialog, Button } from 'bits-ui';
-  let open = $state(false);
+  import * as Dialog from "bits-ui/components/dialog";
+import { Button } from 'bits-ui';
+let open = $state(false);
 </script>
 
 <Button.Root

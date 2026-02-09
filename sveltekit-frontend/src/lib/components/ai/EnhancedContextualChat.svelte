@@ -13,7 +13,8 @@ import type { Document } from '$lib/types';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import { chatMessageSchema } from '$lib/forms/contextual-chat-schema';
-  import * as Dialog from 'bits-ui/Dialog'; // Corrected import
+  import * as Dialog from "bits-ui/components/dialog";
+// Corrected import
   import * as Accordion from 'bits-ui/accordion'; // Corrected import
   import * as Tooltip from 'bits-ui/tooltip'; // Corrected import
   import type { ContextualState, NextStepPrediction,

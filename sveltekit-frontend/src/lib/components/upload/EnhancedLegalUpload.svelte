@@ -3,8 +3,8 @@
 	import { superForm, fileProxy } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod';
-	import { Dialog } from "bits-ui";
-	import Button from '$lib/components/ui/Button.svelte';
+	import * as Dialog from "bits-ui/components/dialog";
+import Button from '$lib/components/ui/Button.svelte';
 	import Upload from 'lucide-svelte/icons/upload';
 	import FileText from 'lucide-svelte/icons/file-text';
 	import Brain from 'lucide-svelte/icons/brain';

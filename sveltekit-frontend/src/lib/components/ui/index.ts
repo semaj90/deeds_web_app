@@ -8,7 +8,7 @@
 // Import directly from 'bits-ui' in components for full type support
 // ============================================
 // Note: For bits-ui components, import directly from 'bits-ui' in your components:
-// import { Dialog } from "bits-ui";
+// import * as Dialog from "bits-ui/components/dialog";
 import * as Select from "bits-ui/components/select";
 import { Tabs } from "bits-ui";
 

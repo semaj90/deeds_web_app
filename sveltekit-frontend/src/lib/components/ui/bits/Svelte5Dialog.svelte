@@ -8,7 +8,7 @@
  * - UnoCSS-style utility classes
  * - Accessible by default (ESC to close, focus trap)
  */
-import { Dialog } from "bits-ui";
+import * as Dialog from "bits-ui/components/dialog";
 import type { Snippet } from 'svelte';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 

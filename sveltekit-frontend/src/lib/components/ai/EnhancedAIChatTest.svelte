@@ -4,8 +4,8 @@
 	import type { Document } from '$lib/types';
 	import { browser } from '$app/environment';
 	import { tick } from 'svelte';
-	import { Dialog } from "bits-ui";
-	import Button from "$lib/components/ui/Button.svelte";
+	import * as Dialog from "bits-ui/components/dialog";
+import Button from "$lib/components/ui/Button.svelte";
 	import Input from "$lib/components/ui/Input.svelte";
 	import Card from "$lib/components/ui/card/Card.svelte";
 	import CardHeader from "$lib/components/ui/card/CardHeader.svelte";
