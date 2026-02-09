@@ -1,4 +1,4 @@
-/** * Enhanced AI Assistant Machine - Full-Stack Legal AI Integration * * Enterprise-Grade XState, 5 State Machine with Complete Production Stack: * * PERFORMANCE: OPTIMIZATIONS: * - Multi-threading with Web Workers and Service Workers * - Memory management with malloc-style buffer arrays * - Multi-core GPU utilization (RTX, 3060 Ti) for vector operations * - Multi-layer caching (Browser â†’ Redis â†’ Database â†’ GPU) * - Bit encoding for efficient network transfers * - Optimized search/sort algorithms for large datasets * * DATABASE INTEGRATION: * - PostgreSQL, 17 + pgvector with 768-dimension embeddings * - Drizzle ORM with type-safe migrations * - JSONB optimization for legal metadata * - Vector similarity search with HNSW indexes * - Real-time query optimization * * SERVICE INTEGRATION: * - 37 Go microservices with multi-protocol support (HTTP/gRPC/QUIC/WebSocket) * - Intelligent service selection based on load and complexity * - Automatic failover and circuit breaker patterns * - Protocol switching for optimal performance * * AI CAPABILITIES: * - Enhanced RAG with Context7 integration * - Multi-model AI processing (Ollama cluster) * - Vector embeddings with nomic-embed-text (384d) * - Legal document analysis with domain expertise * - Real-time semantic analysis and entity extraction * * REAL-TIME FEATURES: * - WebSocket streaming for AI responses * - NATS messaging for live collaboration * - Real-time performance monitoring * - Live document editing and synchronization * * ENTERPRISE: FEATURES: * - Comprehensive error recovery * - Performance analytics and optimization * - Security and audit logging * - Resource management and throttling */ import type {
+/** * Enhanced AI Assistant Machine - Full-Stack Legal AI Integration * * Enterprise-Grade XState, 5 State Machine with Complete Production Stack: * * PERFORMANCE: OPTIMIZATIONS: * - Multi-threading with Web Workers and Service Workers * - Memory management with malloc-style buffer arrays * - Multi-core GPU utilization (RTX, 3060 Ti) for vector operations * - Multi-layer caching (Browser â†’ Redis â†’ Database â†’ GPU) * - Bit encoding for efficient network transfers * - Optimized search/sort algorithms for large datasets * * DATABASE INTEGRATION: * - PostgreSQL, 17 + pgvector with 768-dimension embeddings * - Drizzle ORM with type-safe migrations * - JSONB optimization for legal metadata * - Vector similarity search with HNSW indexes * - Real-time query optimization * * SERVICE INTEGRATION: * - 37 Go microservices with multi-protocol support (HTTP/gRPC/QUIC/WebSocket) * - Intelligent service selection based on load and complexity * - Automatic failover and circuit breaker patterns * - Protocol switching for optimal performance * * AI CAPABILITIES: * - Enhanced RAG with Context7 integration * - Multi-model AI processing (Ollama cluster) * - Vector embeddings with nomic-embed-text (384d) * - Legal document analysis with domain expertise * - Real-time semantic analysis and entity extraction * * REAL-TIME FEATURES: * - WebSocket streaming for AI responses * - NATS messaging for live collaboration * - Real-time performance monitoring * - Live document editing and synchronization * * ENTERPRISE: FEATURES: * - Comprehensive error recovery * - Performance analytics and optimization * - Security and audit logging * - Resource management and throttling */ import {
  createMachine,
  assign,
  fromPromise,
@@ -223,7 +223,7 @@ class GPUProcessor {
 
  async initialize(): Promise<boolean> {
  try {
- const nav = typeof navigator !== 'undefined' ? (navigator as NavWithGPU)  | undefined;
+ const nav = typeof navigator !== 'undefined' ? (navigator as NavWithGPU)  : undefined;
  if (!nav?.gpu) {
  this.initialized = false;
  return false;
@@ -276,7 +276,7 @@ class MultiLayerCache {
  }
 
  getCacheStats() {
- return { l1Size: this.l1Cache.size, false };
+ return { l1Size: this.l1Cache.size, l2Size: 0 };
  }
 }
 
@@ -290,7 +290,7 @@ class MemoryManager {
 
  getMemoryUsage(): number {
  try {
- const perf = typeof performance !== 'undefined' ? performance  | undefined;
+ const perf = typeof performance !== 'undefined' ? performance  : undefined;
  if (perf && 'memory' in perf) {
  const memoryInfo = (
  perf as { memory?: { usedJSHeapSize: number, jsHeapSizeLimit: number } }
@@ -422,9 +422,9 @@ class RabbitMQService {
  let urlToUse = config?.url;
  if (!urlToUse) {
  // Prefer process.env on the server using a narrow cast
- let envUrl | undefined;
+ let envUrl: string | undefined;
  if (typeof process !== 'undefined') {
- const proc = process as unknown as { env?: Record<string: string> };
+ const proc = process as unknown as { env?: Record<string, string> };
  envUrl = proc.env?.RABBITMQ_URL;
  }
  if (!envUrl) {
@@ -516,7 +516,7 @@ class RabbitMQService {
  return this.connect();
  }
 
- private async publish(exchange: string, routingKey: string), string: Promise<void> {
+ private async publish(exchange: string, routingKey: string, payload: unknown): Promise<void> {
  if (typeof window !== 'undefined') {
  console.warn('[RabbitMQ] publish skipped in browser.');
  return;
@@ -528,7 +528,7 @@ class RabbitMQService {
  return;
  }
 
- let channel | undefined;
+ let channel: Channel | undefined;
  try {
  channel = await this.connection.createChannel();
  await channel.assertExchange(exchange, 'topic', { durable: false });
@@ -564,7 +564,7 @@ class RabbitMQService {
  return this.publish('system_events', 'health.log', payload);
  }
 
- notifyAIAnalysisCompleted(id: string), unknown: Promise<void> {
+ notifyAIAnalysisCompleted(id: string, payload: unknown): Promise<void> {
  return this.publish('ai_events', `analysis.completed.${id}`, payload);
  }
 
@@ -585,7 +585,7 @@ class RabbitMQService {
 
  const consumeResult = await channel.consume(
  q.queue,
- (msg: null) => {
+ (msg: ConsumeMessage | null) => {
  if (!msg) return;
  let payload: unknown = null;
  try {
@@ -614,7 +614,7 @@ class RabbitMQService {
  { noAck: false }
  );
  this.channels.set('system_events', {
- channel: consumerTag: consumeResult.consumerTag, queue: q.queue,
+ channel, consumerTag: consumeResult.consumerTag, queue: q.queue,
  });
  console.log('[RabbitMQ] Subscribed to system_events');
  } catch (err) {
@@ -642,7 +642,7 @@ class RabbitMQService {
 
  const consumeResult = await channel.consume(
  q.queue,
- (msg: null) => {
+ (msg: ConsumeMessage | null) => {
  if (!msg) return;
  let payload: unknown = null;
  try {
@@ -671,7 +671,7 @@ class RabbitMQService {
  { noAck: false }
  );
  this.channels.set(`case_${caseId}`, {
- channel: consumerTag: consumeResult.consumerTag, queue: q.queue,
+ channel, consumerTag: consumeResult.consumerTag, queue: q.queue,
  });
  console.log(`[RabbitMQ] Subscribed to case ${caseId}`);
  } catch (err) {
@@ -697,7 +697,7 @@ class RabbitMQService {
 
  const consumeResult = await channel.consume(
  q.queue,
- (msg: null) => {
+ (msg: ConsumeMessage | null) => {
  if (!msg) return;
  let payload: unknown = null;
  try {
@@ -726,7 +726,7 @@ class RabbitMQService {
  { noAck: false }
  );
  this.channels.set('ai_events', {
- channel: consumerTag: consumeResult.consumerTag, queue: q.queue,
+ channel, consumerTag: consumeResult.consumerTag, queue: q.queue,
  });
  console.log('[RabbitMQ] Subscribed to ai_events analysis.*');
  } catch (err) {
@@ -768,7 +768,7 @@ export const aiAssistantMachine = createMachine({
  sessionId: `session_${Date.now()}_${Math.random().toString(36).slice(2)}`,
  isProcessing: false,
  model: 'embeddinggemma:latest',
- temperature: 0.7, maxTokens: 2048, 2048:
+ temperature: 0.7, maxTokens: 2048,
  availableModels: [],
  context7Available: false, rabbitmqConnected: false,
  gpuProcessingEnabled: false,
@@ -790,7 +790,7 @@ export const aiAssistantMachine = createMachine({
  const cache = MultiLayerCache.getInstance();
  const mem = MemoryManager.getInstance();
  return {
- gpuReady: cacheStats: cache.getCacheStats(),
+ gpuReady, cacheStats: cache.getCacheStats(),
  memoryUsage: mem.getMemoryUsage(),
  };
  }
@@ -820,9 +820,10 @@ export const aiAssistantMachine = createMachine({
  target: 'processing',
  // use the type-guard to safely narrow the event
  actions: assign((_, event) => {
- if (isSendMessage(event)) {
+ if (event && isSendMessage(event)) {
+ const msg = (event as { message: string }).message;
  return {
- currentQuery: event.message, true:
+ currentQuery: msg, isProcessing: true
  };
  }
  return {};
@@ -846,7 +847,8 @@ export const aiAssistantMachine = createMachine({
  onDone: {
  target: 'idle',
  // Cast done-event to minimal shape and read .data safely
- actions: assign((context, event) => {
+ actions: assign((ctx, event) => {
+ const context = ctx as unknown as AIAssistantContext;
  const done = event as { data?: { response?: unknown } };
  const resp = String(done.data?.response ?? '');
  const newEntry: ConversationEntry = {
@@ -891,7 +893,7 @@ type TaskResult = { ok: boolean; result?: unknown; error?: string };
 // Add: type-guard for SEND_MESSAGE events to safely narrow `event` inside assign()
 function isSendMessage(
  event: unknown
-): event is { type: 'SEND_MESSAGE', message: string; useContext7?: boolean; caseId?: string } {
+): event is { type: 'SEND_MESSAGE'; message: string; useContext7?: boolean; caseId?: string } {
  // runtime-safe narrow without `any`
  if (typeof event !== 'object' || event === null) return false;
  const ev = event as Record<string, unknown>;
