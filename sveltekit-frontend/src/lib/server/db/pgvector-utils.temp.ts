@@ -42,7 +42,7 @@ function asNumber(v: unknown, fallback = 0): number {
 }
 
 function asObject(v: unknown): Record<string, unknown> | undefined {
-	return v && typeof v === 'object' ? (v as Record<string, unknown>)  | undefined;
+	return v && typeof v === 'object' ? (v as Record<string, unknown>) : undefined;
 }
 
 function escapeLiteral(val: any): string {
@@ -152,7 +152,7 @@ export async function searchSimilarMessages(
 			id: asString(row.id),
 			content: asString(row.content),
 			similarity: asNumber(row.similarity),
-			metadata: includeMetadata ? asObject(row.metadata)  | undefined,
+			metadata: includeMetadata ? asObject(row.metadata) : undefined,
 			documentType: 'chat_message'
 		}));
 	} catch (error) {
@@ -207,7 +207,7 @@ export async function searchSimilarEvidence(
 						caseId: asString(row.case_id),
 						...asObject(row.ai_analysis)
 				  }
-				 | undefined,
+				 : undefined,
 			documentType: 'evidence'
 		}));
 	} catch (error) {
