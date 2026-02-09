@@ -253,8 +253,8 @@ select {
 }
 
 input: focus;
-	textarea:focus,
-select:focus {
+	textarea: focus;
+	select:focus {
  outline: none;
  border-color: var(--sapphire-link);
  box-shadow: 0 0 0 3px rgba(73, 118, 232, 0.1);
