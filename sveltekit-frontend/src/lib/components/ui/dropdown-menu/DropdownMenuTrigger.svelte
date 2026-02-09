@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib";
-  import * as DropdownMenu from "bits-ui/components/dropdown-menu";
-  let { children, class: className = "", ...rest } = $props();
+  import { DropdownMenu } from "bits-ui";
+let { children, class: className = "", ...rest } = $props();
 </script>
 
 <DropdownMenu.Trigger

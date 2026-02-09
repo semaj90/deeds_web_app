@@ -5,7 +5,7 @@
 
 import { browser } from '$app/environment';
 import { xstateIntegration } from '$lib/services/xstate-integration';
-import * as Button from 'bits-ui/components/button';
+import { Button } from "bits-ui";
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';

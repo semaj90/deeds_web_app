@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as Tooltip from "bits-ui/components/tooltip";
+	import { Tooltip } from "bits-ui";
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 

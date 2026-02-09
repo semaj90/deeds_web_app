@@ -10,7 +10,7 @@ import Badge from "$lib/components/ui/badge/Badge.svelte";
  import { Input } from "$lib/components/ui/input";
  import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
  import { mcpGPUOrchestrator } from '$lib/services/mcp-gpu-orchestrator';
- import * as Select from "bits-ui/components/select";
+ import { Select } from "bits-ui";
 import Users from 'lucide-svelte/icons/users';
  import Brain from 'lucide-svelte/icons/brain';
  import Database from 'lucide-svelte/icons/database';

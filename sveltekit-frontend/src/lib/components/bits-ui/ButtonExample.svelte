@@ -3,8 +3,8 @@
    * Modern bits-ui Button Component - Svelte 5 Pattern
    * Uses bits-ui v2.11.6 with Svelte 5 runes.
    */
-  import * as Button from 'bits-ui/components/button';
-  import type { Snippet } from 'svelte';
+  import { Button } from "bits-ui";
+import type { Snippet } from 'svelte';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {

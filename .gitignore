@@ -940,3 +940,13 @@ sveltekit-frontend/static/embeddinggemma_300m_onnx/tokenizer_config.json
 sveltekit-frontend/static/embeddinggemma_300m_onnx/tokenizer.json
 sveltekit-frontend/svelte-check-machine.ndjson
 langextract-go/
+
+# VS Code Performance Fix - Ignore large backup/archive directories
+.svelte-error-fixes-backup/
+unocss-main/
+archives/
+_archive/
+documents/large-files/
+*.backup
+*.bak
+

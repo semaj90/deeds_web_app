@@ -13,7 +13,7 @@
 	 *   {/snippet}
 	 * </Svelte5BitsDialog>
 	 */
-	import * as Dialog from "bits-ui/components/dialog";
+	import { Dialog } from "bits-ui";
 import X from 'lucide-svelte/icons/x';
 	import type { Snippet } from 'svelte';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';

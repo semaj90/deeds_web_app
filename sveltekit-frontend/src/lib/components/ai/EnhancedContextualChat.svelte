@@ -13,11 +13,11 @@ import type { Document } from '$lib/types';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import { chatMessageSchema } from '$lib/forms/contextual-chat-schema';
-  import * as Dialog from "bits-ui/components/dialog";
+  import { Dialog } from "bits-ui";
 // Corrected import
-  import * as Accordion from "bits-ui/components/accordion";
+  import { Accordion } from "bits-ui";
 // Corrected import
-  import * as Tooltip from "bits-ui/components/tooltip";
+  import { Tooltip } from "bits-ui";
 // Corrected import
   import type { ContextualState, NextStepPrediction,
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';

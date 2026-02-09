@@ -1,6 +1,6 @@
 <!-- Evidence Modal Component - Svelte 5 + bits-ui v2 -->
 <script lang="ts">
-  import * as Dialog from "bits-ui/components/dialog";
+  import { Dialog } from "bits-ui";
 import Button from '$lib/components/ui/Button.svelte';
   import X from 'lucide-svelte/icons/x';
   import FileText from 'lucide-svelte/icons/file-text';
