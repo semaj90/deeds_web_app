@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
+import { onMount } from 'svelte';
 	import Card from '$lib/components/ui/card/Card.svelte';
 import CardContent from '$lib/components/ui/card/CardContent.svelte';
 import Button from '$lib/components/ui/Button.svelte';

@@ -1,20 +1,14 @@
 <script lang="ts">
 	let thumb = $state<any>(undefined);
-
- import { createEventDispatcher } from 'svelte';
-
- const dispatch = createEventDispatcher<{
- select: { src, string };
- }>();
-
- interface Props {
+interface Props {
+  onselect?: (...args: any[]) => void;
  selectedThumbs?: string[];
  }
 
- let { selectedThumbs = $bindable([]) }: Props = $props();
+ let { selectedThumbs = $bindable([]) , onselect }: Props = $props();
 
  function choose(src: string) {
- 	dispatch('select', { src, string: '' });
+ 	onselect?.({ src, string: '' });
  }
 </script>
 
@@ -32,6 +26,4 @@
  </div>
  {/each}
 </div>
-
-
 

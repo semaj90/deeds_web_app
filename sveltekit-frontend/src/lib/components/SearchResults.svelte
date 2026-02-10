@@ -1,13 +1,5 @@
-<script lang="ts">let { results = [] } = $props();
-
-	import { createEventDispatcher } from 'svelte';
-
-	
-
-	const dispatch = createEventDispatcher();
-
-	function handleSelectResult(result) {
-		dispatch('select', result);
+<script lang="ts">let { results = [] , onselect } = $props();function handleSelectResult(result) {
+		onselect?.(result);
 	}
 
 	function truncateText(text, maxLength = 150) {

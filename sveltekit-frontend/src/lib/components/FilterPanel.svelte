@@ -1,21 +1,13 @@
-<script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  interface Filters { status: string, priority: string;
+<script lang="ts">interface Filters { status: string, priority: string;
     tags: string[];
   }
 
   interface Props {
+  onfilter?: (...args: any[]) => void;
     filters: Filters;
   }
 
-  let { filters }: Props = $props();
-
-  const dispatch = createEventDispatcher<{
-    filter: Filters;
-  }>();
-
-  let showPanel = $state(false);
+  let { filters , onfilter }: Props = $props();let showPanel = $state(false);
   let localFilters = $state<Filters>({ ...filters });
 
   $effect(() => {
@@ -23,7 +15,7 @@
   });
 
   function applyFilters() {
-    dispatch('filter', { ...localFilters });
+    onfilter?.({ ...localFilters });
     showPanel = false;
   }
 
@@ -33,7 +25,7 @@
       priority: '',
       tags: []
     };
-    dispatch('filter', { ...localFilters });
+    onfilter?.({ ...localFilters });
   }
 
   function toggleTag(tag: string) {

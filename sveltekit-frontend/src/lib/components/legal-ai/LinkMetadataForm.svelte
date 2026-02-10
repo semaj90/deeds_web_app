@@ -1,7 +1,4 @@
-<script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  interface Link { id: string, case_id: string;
+<script lang="ts">interface Link { id: string, case_id: string;
     statute_code: string;
 	link_type: string;
     notes?: string;
@@ -10,15 +7,12 @@
   }
 
   interface Props {
+  onupdated?: (...args: any[]) => void;
     link:Link;
     isEditing?: boolean;
   }
 
-  let { link, isEditing = false }: Props = $props();
-
-  const dispatch = createEventDispatcher();
-
-  let editedLinkType = $state(link.link_type);
+  let { link, isEditing = false , onupdated }: Props = $props();let editedLinkType = $state(link.link_type);
   let editedNotes = $state(link.notes || '');
   let isSaving = $state(false);
   let error = $state<string | null>(null);
@@ -59,7 +53,7 @@ link_type: editedLinkType,
         if (data.success) {
           link = data.link;
           localIsEditing = false;
-          dispatch('updated', link);
+          onupdated?.(link);
         } else {
           error = data.error || 'Failed to update link';
         }

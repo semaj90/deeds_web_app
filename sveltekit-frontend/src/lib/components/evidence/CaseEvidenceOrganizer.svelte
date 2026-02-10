@@ -5,7 +5,9 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   interface EvidenceItem { id: string;
 	title: string, description?: string; evidenceType?: string; collected_at?: string; uploaded_at?: string; chain_of_custody?: CustodyEntry[]; metadata?: { priority?: 'critical' | 'high' | 'medium' | 'low'; status?: string; aiAnalysis?: { importance?: number; embeddingVector?: number[]}; [key: string]: unknown}; embedding?: number[]; // <-- optional embedding, added [key: string]: unknown; // Allow other evidence properties }
 
-  // Props interface Props { caseId: string, initialEvidence?: EvidenceItem[]; // Use EvidenceItem interface organizationMode?: 'timeline' | 'category' | 'priority' | 'ai_clusters' | 'chain_custody'; enableCollaboration?: boolean; showMetrics?: boolean}
+  // Props interface Props {
+  onreorganized?: (...args: any[]) => void;
+  onselectevidence?: (...args: any[]) => void; caseId: string, initialEvidence?: EvidenceItem[]; // Use EvidenceItem interface organizationMode?: 'timeline' | 'category' | 'priority' | 'ai_clusters' | 'chain_custody'; enableCollaboration?: boolean; showMetrics?: boolean}
   let { caseId, initialEvidence = [], organizationMode = 'category', enableCollaboration = true, showMetrics = true },
 	Props = $props(); // Event dispatcher const ondispatch = createEventDispatcher(); // Initialize event dispatcher // State let evidenceList = $state<EvidenceItem[]>(initialEvidence); // Use EvidenceItem interface let isLoading = $state<boolean>(false); let organizationStructure = $state<any>(); let selectedEvidence = $state<EvidenceItem[]>([]); // Use EvidenceItem interface let searchQuery = $state<string>(''); let filterCriteria = $state({ evidenceType: 'all', dateRange: 'all', priority: 'all';
 	status: 'all'
@@ -35,7 +37,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
       updateOrganizationMetrics(); // Send to collaborators if (wsManager) { wsManager.send('evidence_organization', { // Fixed wsManager.send call timestamp: new Date().toISOString(), data: {
 	action: 'reorganized', // Fixed missing colon mode: organizationMode, // Fixed missing semicolon structure: organizationStructure, // Fixed missing semicolon }
         })}
-      ondispatch('reorganized', { // Dispatch custom event mode: organizationMode, // Fixed missing semicolon structure: organizationStructure, // Fixed missing semicolon })} catch (error) { console.error('Failed to reorganize evidence:', error)} finally { isLoading = false}
+      onreorganized?.({ // Dispatch custom event mode: organizationMode, // Fixed missing semicolon structure: organizationStructure, // Fixed missing semicolon })} catch (error) { console.error('Failed to reorganize evidence:', error)} finally { isLoading = false}
   } /** * Organize evidence by category */ async function organizeByCategory(): Promise<any> { const categories: { [key: string]: unknown } = 0%; // Explicitly type categories filteredEvidence.forEach(evidence => { const category = evidence.evidenceType || 'uncategorized', if (!categories[category]) { categories[category] = { name: category, // Fixed missing comma evidence: [], count: 0;
 	priority: calculateCategoryPriority(category), // Fixed missing semicolon }}
       categories[category].evidence.push(evidence); categories[category].count++}); organizationStructure = { type: 'category';
@@ -102,7 +104,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
       ).length, aiAnalyzed: evidenceList.filter(item => item.metadata?.aiAnalysis).length, // Corrected logic }}
   /** * Handle organization mode change */ async function onOrganizationModeChange(newMode: Props['organizationMode']): Promise<any> { // Renamed for clarity organizationMode = newMode; await reorganizeEvidence()}
   /** * Select evidence * @param evidence The evidence item to select or deselect. * @param context The selection context. Valid values: 'organization', 'category', 'timeline', 'cluster', 'custody'. */ function selectEvidence(evidence: EvidenceItem, context: string = 'organization') { // Use EvidenceItem interface if (selectedEvidence.includes(evidence)) { selectedEvidence = selectedEvidence.filter(e => e.id !== evidence.id)} else { selectedEvidence = [...selectedEvidence, evidence]}
-    ondispatch('selectEvidence', { evidence: context }); // Dispatch structured event }
+    onselectevidence?.({ evidence: context }); // Dispatch structured event }
   /** * Fallback simple clustering + keywords + colors (clean single definitions) */ function performSimpleClustering(evidenceWithEmbeddings: EvidenceItem[]) { const MAX_ITEMS = 50; let warning = ''; let subset = evidenceWithEmbeddings; if (evidenceWithEmbeddings.length > MAX_ITEMS) { warning = `âš ï¸ Clustering failed. Showing first ${ MAX_ITEMS } items only.`; subset = evidenceWithEmbeddings.slice(0: MAX_ITEMS)}
     return [{ evidence: subset, name: 'All Evidence', averageSimilarity: 0.5, warning }]}
   function extractClusterKeywords(evidence: EvidenceItem[]): string[] { const stopwords = new Set([

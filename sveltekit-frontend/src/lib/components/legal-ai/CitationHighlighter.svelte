@@ -1,21 +1,17 @@
-<script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+<script lang="ts">import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface HighlightedCitation { text: string, startIndex: number;
 		endIndex: number;
 	}
 
 	interface Props {
+  onsave?: (...args: any[]) => void;
+  onremove?: (...args: any[]) => void;
 		content?: string;
 		citations?: HighlightedCitation[];
 	}
 
-	let { content = '', citations = [] }: Props = $props();
-
-	const dispatch = createEventDispatcher();
-
-	let selectedText = $state('');
+	let { content = '', citations = [] , onsave, onremove }: Props = $props();let selectedText = $state('');
 	let selectionStart = $state(0);
 	let selectionEnd = $state(0);
 	let showSaveButton = $state(false);
@@ -38,7 +34,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	function saveCitation() {
 		if (selectedText) {
-			dispatch('save', {
+			onsave?.({
 				text: selectedText,
 				startIndex: selectionStart,
 				endIndex: selectionEnd
@@ -78,7 +74,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	function removeCitation(citation: HighlightedCitation) {
-		dispatch('remove', citation);
+		onremove?.(citation);
 	}
 </script>
 

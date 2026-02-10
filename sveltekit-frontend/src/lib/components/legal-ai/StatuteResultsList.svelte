@@ -1,7 +1,4 @@
-<script lang="ts">
- import { createEventDispatcher } from 'svelte';
-
- interface Statute {
+<script lang="ts">interface Statute {
  id: string;
 	code: string;
  title?: string;
@@ -15,12 +12,8 @@
  statutes?: Statute[];
  error?: string | null;
  isLoading?: boolean;
- }>();
-
- const dispatch = createEventDispatcher();
-
- function selectStatute(statute: Statute) {
- dispatch('select', statute);
+ }>();function selectStatute(statute: Statute) {
+ onselect?.(statute);
  }
 
  function getRelevanceColor(score?: number) {

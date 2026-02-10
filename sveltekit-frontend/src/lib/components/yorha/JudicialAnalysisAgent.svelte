@@ -1,11 +1,7 @@
-<script lang="ts">
- import { createEventDispatcher } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+<script lang="ts">import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	let charge = $state<any>(undefined);
 	let rec = $state<any>(undefined);
-	let risk = $state<any>(undefined);
-
- // Migrated from createEventDispatcher to callback props;
+	let risk = $state<any>(undefined);
 
  interface Evidence { id: string, title: string;
  description?: string;
@@ -40,17 +36,14 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  }
 
  interface Props {
+  onanalysiscomplete?: (...args: any[]) => void;
   caseId?: string | null;
   evidence?: Evidence[];
   charges?: string[];
   jurisdiction?: 'federal' | 'state' | 'local';
  }
 
- let { caseId = null, evidence = [], charges = [], jurisdiction = 'federal' }: Props = $props();
-
- const dispatch = createEventDispatcher();
-
- let isAnalyzing = $state(false);
+ let { caseId = null, evidence = [], charges = [], jurisdiction = 'federal' , onanalysiscomplete }: Props = $props();let isAnalyzing = $state(false);
  let analysis = $state<JudicialAnalysis | null>(null);
  let activeTab = $state<'overview' | 'admissibility' | 'probable-cause' | 'case-strength' | 'recommendations'>('overview');
 
@@ -81,7 +74,7 @@ caseId: evidence,
  const result = await response.json();
  analysis = result.analysis;
 
- dispatch('analysisComplete', { analysis });
+ onanalysiscomplete?.({ analysis });
  } catch (error) {
  console.error('Error performing judicial analysis:', error);
  alert('Failed to perform judicial analysis. Please try again.');

@@ -1,14 +1,7 @@
 <script lang="ts">
  import { uploadEvidenceImage, uploadEvidenceVideo } from '$lib/vision/api';
- import { createEventDispatcher } from 'svelte';
 
- const dispatch = createEventDispatcher<{ updated: Array<{ embeddingId: string;
- thumbUrl: string;
- embedding?: number[] | null;
- frameIndex?: number;
- timestamp?: number;
- }>;
- }>();
+ let { onupdated }: { onupdated?: (data: any) => void } = $props();
 
  let caseId = $state('');
  let evidenceId = $state('');
@@ -37,7 +30,7 @@
  });
  }
 
- dispatch('updated', results);
+ onupdated?.(results);
  } catch (error) {
  console.error('Image upload failed:', error);
  // TODO: Show error toast
@@ -74,7 +67,7 @@
  }
  }
 
- dispatch('updated', results);
+ onupdated?.(results);
  } catch (error) {
  console.error('Video upload failed:', error);
  // TODO: Show error toast
@@ -130,6 +123,3 @@
  <div class="mt-3 text-sm animate-pulse">Uploading…</div>
  {/if}
 </div>
-
-
-

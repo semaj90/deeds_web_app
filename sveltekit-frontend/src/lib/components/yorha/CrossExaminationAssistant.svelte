@@ -1,9 +1,5 @@
-<script lang="ts">
- import { createEventDispatcher } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-	let followUp = $state<any>(undefined);
-
- // Migrated from createEventDispatcher to callback props;
+<script lang="ts">import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+	let followUp = $state<any>(undefined);
 
  interface Evidence { id: string, title: string;
  description?: string;
@@ -31,16 +27,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  }
 
  interface Props {
+  onquestionsgenerated?: (...args: any[]) => void;
   witness?: Witness | null;
   evidence?: Evidence[];
   caseContext?: string;
  }
 
- let { witness = null, evidence = [], caseContext = '' }: Props = $props();
-
- const dispatch = createEventDispatcher();
-
- let isGenerating = $state(false);
+ let { witness = null, evidence = [], caseContext = '' , onquestionsgenerated }: Props = $props();let isGenerating = $state(false);
  let session = $state<CrossExamSession | null>(null);
  let selectedQuestionType = $state<'all' | 'general' | 'timeline' | 'credibility' | 'contradiction'>('all');
  let selectedPriority = $state<'all' | 'high' | 'medium' | 'low'>('all');
@@ -73,7 +66,7 @@ witness: evidence,
  const data = await response.json();
  session = data.session;
 
- dispatch('questionsGenerated', { session });
+ onquestionsgenerated?.({ session });
  } catch (error) {
  console.error('Error generating cross-examination questions:', error);
  alert('Failed to generate questions. Please try again.');

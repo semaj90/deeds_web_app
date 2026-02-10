@@ -1,8 +1,5 @@
 <script lang="ts">
- import { parseLegalDocument } from '$lib/utils/simd-json-parser';
- import { createEventDispatcher } from 'svelte';
-
- // Type definitions
+ import { parseLegalDocument } from '$lib/utils/simd-json-parser';// Type definitions
  interface PhoenixWrightSearchRequest { caseId: string, query: string;
  jurisdiction?: string;
 	detectContradictions: boolean;
@@ -41,11 +38,12 @@
 	rankingExplanation: string;
  }
 
- const dispatch = createEventDispatcher<{ search: PhoenixWrightSearchRequest, result: PhoenixWrightSearchResult;
- persist: { caseId: string; result: PhoenixWrightSearchResult };
- timeline: { caseId: string, event: string;
-	data: any };
- }>();
+ let { onsearch, onresult, onpersist, ontimeline }: {
+   onsearch?: (data: any) => void;
+   onresult?: (data: any) => void;
+   onpersist?: (data: any) => void;
+   ontimeline?: (data: any) => void;
+ } = $props();
 
  let searchQuery = $state('');
  let jurisdiction = $state('');
@@ -100,7 +98,7 @@
  searchScope: 'broad'
  };
 
- dispatch('search', request);
+ onsearch?.(request);
 
  // Call the API endpoint
  const response = await fetch('/api/legal/phoenix-wright-search', {
@@ -129,9 +127,9 @@
  localStorage.setItem('phoenix-wright-history', JSON.stringify(searchHistory));
 
  // Dispatch events
- dispatch('result', result);
-		dispatch('persist', { caseId, result });
-		dispatch('timeline', {
+ onresult?.(result);
+		onpersist?.({ caseId, result });
+		ontimeline?.({
 			caseId,
 			event: 'phoenix_wright_search',
 			data: {

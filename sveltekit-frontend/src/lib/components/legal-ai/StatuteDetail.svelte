@@ -17,12 +17,7 @@
  let { statute = null, isLoading = false } = $props<{
  statute?: Statute | null;
  isLoading?: boolean;
- }>();
-
-
- const dispatch = createEventDispatcher();
-
- let context: string[] = [];
+ }>();let context: string[] = [];
  let relatedCases: any[] = [];
  let contextLoading = false;
 

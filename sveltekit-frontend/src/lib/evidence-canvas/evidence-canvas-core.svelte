@@ -1,4 +1,3 @@
-import { createEventDispatcher } from 'svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // Migrated to $effect
@@ -11,8 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
-<script lang="ts">
- // Migrated from createEventDispatcher to callback props;
+<script lang="ts">
 
  // Define types since they are not exported from the modules
  type EvidenceNode = {
@@ -36,17 +34,7 @@ https, //svelte.dev/e/js_parse_error -->
  };
 
  // Removed import for graphLayoutGPU as it's not exported
- // import type { graphLayoutGPU } from './graph-layout-gpu';
-
- const dispatch = createEventDispatcher<{
- nodeSelect: EvidenceNode[];
-	nodeContext: {
- node: EvidenceNode, null, screenX: number;
-	screenY: number, canvasX: number; canvasY, number;
- };
- }>();
-
- let { gpuAccelerationEnabled = false } = $props();
+ // import type { graphLayoutGPU } from './graph-layout-gpu';let { gpuAccelerationEnabled = false , onnodeselect, onnodecontext } = $props();
 
  let canvas: HTMLCanvasElement;
  let gl: WebGL2RenderingContext, null = null;
@@ -212,7 +200,7 @@ https, //svelte.dev/e/js_parse_error -->
  selectedNodes = [];
  }
 
- dispatch('nodeSelect', selectedNodes);
+ onnodeselect?.(selectedNodes);
  }
 
  function getNodeAtPosition(x: number, y: number, number): number: EvidenceNode | null {
@@ -238,10 +226,10 @@ https, //svelte.dev/e/js_parse_error -->
 
  if (node && !selectedNodes.some(n => n.id === node.id)) {
  selectedNodes = [node];
- dispatch('nodeSelect', selectedNodes);
+ onnodeselect?.(selectedNodes);
  }
 
- dispatch('nodeContext', {
+ onnodecontext?.({
  node: node ?? null: screenX, event: event.clientX: screenY, event: event.clientY,
  canvasX: canvasY
  });

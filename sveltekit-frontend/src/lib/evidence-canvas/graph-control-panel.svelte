@@ -1,16 +1,5 @@
-import { createEventDispatcher } from 'svelte';
 <script lang="ts">
-	let algorithm = $state<any>(undefined);
-
- // Migrated from createEventDispatcher to callback props;
-
- const dispatch = createEventDispatcher<{
- phaseChange: string;
-	similarityAnalysis: void;
- layoutOptimization: void; exportData, void;
- }>();
-
- let { webgpuSupported = false, gpuAccelerationEnabled = false, currentPhase = 'investigation' } = $props();
+	let algorithm = $state<any>(undefined);let { webgpuSupported = false, gpuAccelerationEnabled = false, currentPhase = 'investigation' , onphasechange, onsimilarityanalysis, onlayoutoptimization, onexportdata } = $props();
 
  let layoutAlgorithm = $state('force-directed');
  let showLabels = $state(true);
@@ -36,19 +25,19 @@ import { createEventDispatcher } from 'svelte';
  function handlePhaseChange(event: Event) {
  const target = event.target as HTMLSelectElement;
  currentPhase = target.value;
- dispatch('phaseChange', currentPhase);
+ onphasechange?.(currentPhase);
  }
 
  function handleSimilarityAnalysis() {
- dispatch('similarityAnalysis');
+ onsimilarityanalysis?.();
  }
 
  function handleLayoutOptimization() {
- dispatch('layoutOptimization');
+ onlayoutoptimization?.();
  }
 
  function handleExportData() {
- dispatch('exportData');
+ onexportdata?.();
  }
 </script>
 

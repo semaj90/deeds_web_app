@@ -1,107 +1,105 @@
 <script lang="ts">
- import { createEventDispatcher } from 'svelte';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
- // Migrated from createEventDispatcher to callback props;
 
- const dispatch = createEventDispatcher();
+let { onfilesadded, onuploadcomplete }: {
+  onfilesadded?: (data: { files: File[] }) => void;
+  onuploadcomplete?: (data: { files: File[] }) => void;
+} = $props();
 
- let isDragOver = $state(false);
- let uploadedFiles: File[] = $state([]);
- let uploadProgress = $state(0);
- let isUploading = $state(false);
+let isDragOver = $state(false);
+let uploadedFiles: File[] = $state([]);
+let uploadProgress = $state(0);
+let isUploading = $state(false);
 
- function handleDragOver(event: DragEvent) {
- event.preventDefault();
- isDragOver = true;
- }
+function handleDragOver(event: DragEvent) {
+  event.preventDefault();
+  isDragOver = true;
+}
 
- function handleDragLeave(event: DragEvent) {
- event.preventDefault();
- isDragOver = false;
- }
+function handleDragLeave(event: DragEvent) {
+  event.preventDefault();
+  isDragOver = false;
+}
 
- function handleDrop(event: DragEvent) {
- event.preventDefault();
- isDragOver = false;
+function handleDrop(event: DragEvent) {
+  event.preventDefault();
+  isDragOver = false;
 
- const files = Array.from(event.dataTransfer?.files ?? []);
- handleFiles(files);
- }
+  const files = Array.from(event.dataTransfer?.files ?? []);
+  handleFiles(files);
+}
 
- function handleFileSelect(event: Event) {
- const input = event.target as HTMLInputElement;
- const files = Array.from(input.files || []);
- handleFiles(files);
- }
+function handleFileSelect(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const files = Array.from(input.files || []);
+  handleFiles(files);
+}
 
- function handleFiles(files: File[]) {
- // Filter for supported file types
- const supportedTypes = [
- 'application/pdf',
- 'application/msword',
- 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
- 'application/vnd.ms-excel',
- 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
- 'message/rfc822',
- 'video/mp4',
- 'video/avi',
- 'video/quicktime',
- 'image/jpeg',
- 'image/png',
- 'image/gif'
- ];
+function handleFiles(files: File[]) {
+  const supportedTypes = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'message/rfc822',
+    'video/mp4',
+    'video/avi',
+    'video/quicktime',
+    'image/jpeg',
+    'image/png',
+    'image/gif'
+  ];
 
- const validFiles = files.filter(file => supportedTypes.includes(file.type));
+  const validFiles = files.filter(file => supportedTypes.includes(file.type));
 
- if (validFiles.length !== files.length) {
- console.warn(`${files.length - validFiles.length} files were skipped due to unsupported format`);
- }
+  if (validFiles.length !== files.length) {
+    console.warn(`${files.length - validFiles.length} files were skipped due to unsupported format`);
+  }
 
- uploadedFiles = [...uploadedFiles, ...validFiles];
- dispatch('filesAdded', { files: validFiles });
- }
+  uploadedFiles = [...uploadedFiles, ...validFiles];
+  onfilesadded?.({ files: validFiles });
+}
 
- function removeFile(index: number) {
- uploadedFiles = uploadedFiles.filter((_, i) => i !== index);
- }
+function removeFile(index: number) {
+  uploadedFiles = uploadedFiles.filter((_, i) => i !== index);
+}
 
- async function uploadFiles() {
- if (uploadedFiles.length === 0) return;
+async function uploadFiles() {
+  if (uploadedFiles.length === 0) return;
 
- isUploading = true;
- uploadProgress = 0;
+  isUploading = true;
+  uploadProgress = 0;
 
- // Simulate upload process
- for (let i = 0; i <= 100; i += 10) {
- await new Promise(resolve => setTimeout(resolve, 200));
- uploadProgress = i;
- }
+  for (let i = 0; i <= 100; i += 10) {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    uploadProgress = i;
+  }
 
- // Dispatch upload complete event
- dispatch('uploadComplete', { files: uploadedFiles });
-  
- uploadedFiles = [];
- isUploading = false;
- uploadProgress = 0;
- }
+  onuploadcomplete?.({ files: uploadedFiles });
 
- function formatFileSize(bytes: number): string {
- if (bytes === 0) return '0 Bytes';
- const k = 1024;
- const sizes = ['Bytes', 'KB', 'MB', 'GB'];
- const i = Math.floor(Math.log(bytes) / Math.log(k));
- return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
- }
+  uploadedFiles = [];
+  isUploading = false;
+  uploadProgress = 0;
+}
 
- function getFileIcon(type: string): string {
- if (type.startsWith('application/pdf')) return '📄';
- if (type.includes('word')) return '📝';
- if (type.includes('excel') || type.includes('spreadsheet')) return '📊';
- if (type.startsWith('message/')) return '📧';
- if (type.startsWith('video/')) return '🎥';
- if (type.startsWith('image/')) return '🖼️';
- return '📄';
- }
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function getFileIcon(type: string): string {
+  if (type.startsWith('application/pdf')) return '📄';
+  if (type.includes('word')) return '📝';
+  if (type.includes('excel') || type.includes('spreadsheet')) return '📊';
+  if (type.startsWith('message/')) return '📧';
+  if (type.startsWith('video/')) return '🎥';
+  if (type.startsWith('image/')) return '🖼️';
+  return '📄';
+}
 </script>
 
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
@@ -139,7 +137,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </label>
 
  <div class="mt-4 text-xs text-slate-500">
- Supported: PDF: Word, Excel: Email: Video, Images
+ Supported: PDF, Word, Excel, Email, Video, Images
  </div>
  </div>
 
@@ -149,7 +147,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="flex items-center justify-between mb-4">
  <h4 class="text-sm font-medium text-slate-300">Files to Upload ({uploadedFiles.length})</h4>
  <button
- class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors disabled opacity-50"
+ class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors disabled:opacity-50"
  disabled={isUploading}
  onclick={ uploadFiles }
  >
@@ -157,7 +155,6 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </button>
  </div>
 
- <!-- Upload Progress -->
  {#if isUploading}
  <div class="mb-4">
  <div class="flex justify-between text-sm mb-1">
@@ -173,7 +170,6 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </div>
  {/if}
 
- <!-- File List -->
  <div class="space-y-2 max-h-64 overflow-y-auto">
  {#each uploadedFiles as file, index}
  <div class="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
@@ -197,16 +193,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </div>
  {/if}
 
- <!-- Upload Tips -->
  <div class="mt-6 pt-4 border-t border-slate-700/50">
  <h4 class="text-sm font-medium text-slate-300 mb-2">Upload Tips</h4>
  <ul class="text-xs text-slate-400 space-y-1">
- <li>• Maximum file size: 100MB per file</li>
- <li>• Files are automatically scanned for viruses</li>
- <li>• AI analysis begins immediately after upload</li>
- <li>• All uploads are encrypted and stored securely</li>
+ <li>Maximum file size: 100MB per file</li>
+ <li>Files are automatically scanned for viruses</li>
+ <li>AI analysis begins immediately after upload</li>
+ <li>All uploads are encrypted and stored securely</li>
  </ul>
  </div>
 </div>
-
-

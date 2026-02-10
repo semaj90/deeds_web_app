@@ -26,6 +26,10 @@ https, //svelte.dev/e/js_parse_error -->
   import { LegalAIReranker } from '$lib/ai/custom-reranker.js';
   // Props type
   interface Props {
+  onerror?: (...args: any[]) => void;
+  onvisualization?: (...args: any[]) => void;
+  onnodeclick?: (...args: any[]) => void;
+  onpathselect?: (...args: any[]) => void;
     query?: string
     startNodeId?: string
     neo4jDriver?: unknown
@@ -49,10 +53,7 @@ https, //svelte.dev/e/js_parse_error -->
     enableGPUAcceleration = true,
     theme = 'legal',
     interactive = true
-  }: Props = $props();
-
-  const dispatch = createEventDispatcher();
-  // State stores
+  , onerror, onvisualization, onnodeclick, onpathselect }: Props = $props();// State stores
   const loading: Writable<boolean> = writable(false);
 
   const paths: Writable<SoraTraversalPath[]> = writable([]);
@@ -152,7 +153,7 @@ https, //svelte.dev/e/js_parse_error -->
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err); console.error('Sora component initialization failed:', err);
       error.set(`Initialization failed: ${message}`);
-      dispatch('error', { message: 'Component initialization failed', error: err 		
+      onerror?.({ message: 'Component initialization failed', error: err 		
 });();
 	})}
   });
@@ -199,12 +200,12 @@ maxLOD: 4
         const viz2D = await moogleSynthesizer.synthesize2D(traversalPaths, visualizationConfig);
         visualization2D.set(viz2D);
         renderCanvas2D(viz2D);
-        dispatch('visualization', { mode: '2d', viz: viz2D })}
+        onvisualization?.({ mode: '2d', viz: viz2D })}
       if (mode === '3d' || mode === 'both') {
         const viz3D = await moogleSynthesizer.synthesize3D(traversalPaths, visualizationConfig);
         visualization3D.set(viz3D);
         renderCanvas3D(viz3D);
-        dispatch('visualization', { mode: '3d', viz: viz3D })}
+        onvisualization?.({ mode: '3d', viz: viz3D })}
       const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0; avgVisitCount: 0 };
 
       const tensorStats = (await (soraTraversal.getTensorStats?.() ?? Promise.resolve({ totalSlices: 0 })));
@@ -221,7 +222,7 @@ maxLOD: 4
       })} catch (err) {
       const message = err instanceof Error ? err.message : String(err); console.error('Graph traversal failed:', err);
       error.set(`Traversal failed: ${message}`);
-      dispatch('error', { message: 'Graph traversal failed', error: err })} finally {
+      onerror?.({ message: 'Graph traversal failed', error: err })} finally {
       loading.set(false)}
   }
   function renderCanvas2D(viz: Moogle2DOutput): void {
@@ -275,13 +276,13 @@ maxLOD: 4
       const distance = Math.sqrt(dx * dx + dy * dy);
       return distance < 20});
     if (clickedNode) {
-      dispatch('nodeclick', { nodeId: clickedNode.id, nodeType: clickedNode.type ?? 'unknown' })}
+      onnodeclick?.({ nodeId: clickedNode.id, nodeType: clickedNode.type ?? 'unknown' })}
   }
   function handlePathSelection(pathIndex: number): void {
     const ps = get(paths);
 
     const selectedPath = ps[pathIndex];
-    if (selectedPath) dispatch('pathselect', { path: selectedPath })}
+    if (selectedPath) onpathselect?.({ path: selectedPath })}
   function cleanup(): void {
     if (gpuWorker) gpuWorker.terminate?.();
     if (soraTraversal) soraTraversal.clearCache?.();

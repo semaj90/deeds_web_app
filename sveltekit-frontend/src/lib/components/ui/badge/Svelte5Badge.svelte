@@ -24,7 +24,8 @@ let {
 	dot = false,
 	removable = false,
 	class: className = '',
-	onremove: children
+	onremove,
+	children
 }: Props = $props();
 
 let variantClasses = $derived({

@@ -1,4 +1,3 @@
-import { createEventDispatcher } from 'svelte';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <script lang="ts">
 	let caseType = $state<any>(undefined);
@@ -27,11 +26,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	research: Research;
 		researchHistory?: ResearchHistoryItem[];
 		error?, string | null;
-	}>();
-
-	const dispatch = createEventDispatcher();
-
-	// Type Definitions
+	}>();// Type Definitions
 	interface ResearchMetadata {
 		confidence_level?: 'high' | 'medium' | 'low';
 		disclaimer?: string;
@@ -148,11 +143,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			currentResearch = result;
 
 			// Dispatch event for parent components
-			dispatch('researchComplete', { research: result });
+			onresearchcomplete?.({ research: result });
 
 		} catch (err) {
 			currentError = err instanceof Error ? err.message : 'Research failed';
-			dispatch('researchError', { error: err });
+			onresearcherror?.({ error: err });
 		} finally {
 			isResearching = false;
 		}

@@ -1,11 +1,6 @@
 <script lang="ts">
- // Migrated from createEventDispatcher to callback props;
-
- import { createEventDispatcher } from 'svelte';
-
- const dispatch = createEventDispatcher();
-
- let searchQuery = $state('');
+let { onfilter }: { onfilter?: (data: any) => void } = $props();
+let searchQuery = $state('');
  let typeFilter = $state('all');
  let statusFilter = $state('all');
  let caseFilter = $state('all');
@@ -50,7 +45,7 @@
  ];
 
  function applyFilters() {
- dispatch('filter', {
+ onfilter?.({
  search: searchQuery, type: typeFilter,
  status: statusFilter, case: caseFilter,
  dateRange, aiAnalyzed: aiAnalyzedFilter

@@ -11,15 +11,13 @@
  updated_at: string;
  }
 
- let { caseId, showActions = true } = $props<{
+ let { caseId, showActions = true, ondeleted, onedit, onview } = $props<{
  caseId: string;
  showActions?: boolean;
- }>();
-
-
- const dispatch = createEventDispatcher();
-
- let links: CaseStatuteLink[] = [];
+ ondeleted?: (data: any) => void;
+ onedit?: (data: any) => void;
+ onview?: (data: any) => void;
+ }>();let links: CaseStatuteLink[] = [];
  let isLoading = true;
  let error: string | null = null;
  let stats = {
@@ -77,7 +75,7 @@
 
  if (response.ok) {
  links = links.filter((l) => l.statute_code !== statuteCode);
- dispatch('deleted', { statute_code: statuteCode });
+ ondeleted?.({ statute_code: statuteCode });
  } else {
  alert('Failed to delete link');
  }
@@ -88,11 +86,11 @@
  }
 
  function editLink(link:CaseStatuteLink) {
- dispatch('edit', link);
+ onedit?.(link);
  }
 
  function viewLink(link:CaseStatuteLink) {
- dispatch('view', link);
+ onview?.(link);
  }
 
  let filteredLinks = $derived(links.filter((link) => {

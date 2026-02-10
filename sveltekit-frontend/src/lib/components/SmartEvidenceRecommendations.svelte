@@ -6,8 +6,7 @@ https://svelte.dev/e/tag_invalid_name -->
 https://svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
 https://svelte.dev/e/tag_invalid_name -->
-<script lang="ts">
-	// Migrated from createEventDispatcher to callback props;
+<script lang="ts">
 	import Brain from "lucide-svelte/icons/brain";
 	import TriangleAlert from "lucide-svelte/icons/triangle-alert";
 	import CircleCheck from "lucide-svelte/icons/circle-check";
@@ -15,30 +14,25 @@ https://svelte.dev/e/tag_invalid_name -->
 	import Target from "lucide-svelte/icons/target";
 	import type { Recommendation } from '$lib/types/recommendation'; // Import the interface
 
-	let { evidenceId, caseId = undefined, recommendations = [], isLoading = false, error = null } = $props<{
+	let { evidenceId, caseId = undefined, recommendations = [], isLoading = false, error = null, ongenerate, onapply, ondismiss } = $props<{
 		evidenceId: string;
 		caseId?: string;
 		recommendations?: Recommendation[];
 		isLoading?: boolean;
 		error?: string | null;
-	}>();
-
-	const dispatch = createEventDispatcher<{
-		generate: { evidenceId: string; caseId?: string };
-		apply: { recommendationId: string };
-		dismiss: { recommendationId: string };
-	}>();
-
-	function generateRecommendations() {
-		dispatch('generate', { evidenceId, caseId });
+		ongenerate?: (data: { evidenceId: string; caseId?: string }) => void;
+		onapply?: (data: { recommendationId: string }) => void;
+		ondismiss?: (data: { recommendationId: string }) => void;
+	}>();function generateRecommendations() {
+		ongenerate?.({ evidenceId, caseId });
 	}
 
 	function applyRecommendation(recommendationId: string) {
-		dispatch('apply', { recommendationId });
+		onapply?.({ recommendationId });
 	}
 
 	function dismissRecommendation(recommendationId: string) {
-		dispatch('dismiss', { recommendationId });
+		ondismiss?.({ recommendationId });
 	}
 
 	function getTypeIcon(type: string) {

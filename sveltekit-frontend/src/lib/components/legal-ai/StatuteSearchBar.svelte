@@ -1,16 +1,13 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  interface Props {
+interface Props {
+  onsearch?: (...args: any[]) => void;
+  onclear?: (...args: any[]) => void;
     placeholder?: string;
     isLoading?: boolean;
   }
 
-  let { placeholder = 'Search statutes by code or title...', isLoading = false }: Props = $props();
-
-  const dispatch = createEventDispatcher();
-
-  let query = $state('');
+  let { placeholder = 'Search statutes by code or title...', isLoading = false , onsearch, onclear }: Props = $props();
+let query = $state('');
   let jurisdiction = $state('');
   let severity = $state('');
   let category = $state('');
@@ -20,7 +17,7 @@
   const categories = ['Criminal', 'Civil', 'Administrative', 'Constitutional'];
 
   function handleSearch() {
-    dispatch('search', {
+    onsearch?.({
       query,
       jurisdiction: jurisdiction || undefined,
       severity: severity || undefined,
@@ -33,7 +30,7 @@
     jurisdiction = '';
     severity = '';
     category = '';
-    dispatch('clear');
+    onclear?.();
   }
 
   function handleKeydown(e: KeyboardEvent) {

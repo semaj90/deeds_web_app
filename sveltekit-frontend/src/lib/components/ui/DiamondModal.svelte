@@ -6,6 +6,7 @@
 	import Portal from './Portal.svelte';
 
 	interface Props {
+  onclose?: (...args: any[]) => void;
 		open: boolean;
 		title?: string;
 		size?: 'small' | 'medium' | 'large' | 'fullscreen';
@@ -25,11 +26,7 @@
 		diamondPattern = true,
 		children,
 		footer
-	}: Props = $props();
-
-	const dispatch = createEventDispatcher<{ close: void }>();
-
-	let modalElement: HTMLDivElement | null = null;
+	, onclose }: Props = $props();let modalElement: HTMLDivElement | null = null;
 	let canvasElement: HTMLCanvasElement | null = null;
 	let animationFrame: number;
 
@@ -120,7 +117,7 @@
 
 	function closeModal() {
 		open = false;
-		dispatch('close');
+		onclose?.();
 	}
 
 	function handleKeydown(event: KeyboardEvent) {

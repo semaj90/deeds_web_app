@@ -10,13 +10,10 @@
 	created_at: string;
  }
 
- let { collection } = $props<{
+ let { collection, ondeleted } = $props<{
  collection: Collection;
- }>();
-
- const dispatch = createEventDispatcher();
-
- let citations: any[] = [];
+ ondeleted?: (data: any) => void;
+ }>();let citations: any[] = [];
  let isLoading = true;
  let error: string | null = null;
 
@@ -76,7 +73,7 @@
 
  try {
  // TODO: Implement delete endpoint
- dispatch('deleted', collection.id);
+ ondeleted?.(collection.id);
  } catch (error) {
  console.error('Error deleting collection:', error);
  alert('Error deleting collection');

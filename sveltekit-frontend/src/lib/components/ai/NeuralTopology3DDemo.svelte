@@ -2,7 +2,7 @@
 https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
 <script lang="ts">
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
 
   import { reinforcementLearningCache } from '$lib/caching/reinforcement-learning-cache';
   // import entire modules to be robust against named vs default exports
@@ -62,11 +62,8 @@ https://svelte.dev/e/js_parse_error -->
     cnn: string; rnn: string};
   // Component props and state (Svelte, 5 runes)
   // replace `export let` with $props() destructure and add a typed dispatcher
-  let { width = 800, height = 480 } = $props() as { width?: number; height?: number };
-  // replace dispatcher type so `device` can be: null/undefined safely
-  const dispatch = createEventDispatcher<{
-    ready: { supported: boolean, device?: GPUDevice | null; error?: string }}>();
-  // Svelte, 5 runes state - add explicit types and typed initializers
+  let { width = 800, height = 480 , onready } = $props() as { width?: number; height?: number };
+  // replace dispatcher type so `device` can be: null/undefined safely// Svelte, 5 runes state - add explicit types and typed initializers
   let demoStage: string = $state('initializing');
 
   let predictions: Prediction[] = $state([] as Prediction[]);
@@ -299,11 +296,11 @@ https://svelte.dev/e/js_parse_error -->
       if (!adapter) throw new Error('No GPU adapter found');
       // @ts-ignore
       device = await adapter.requestDevice?.();
-      dispatch('ready', { supported: true, device })} catch (err: any) {
+      onready?.({ supported: true, device })} catch (err: any) {
       console.warn('NeuralTopology3DDemo: WebGPU init failed', err);
       initError = String(err?.message ?? err);
       webgpuSupported = false
-      dispatch('ready', { supported: false, error: initError })}
+      onready?.({ supported: false, error: initError })}
   });
   onDestroy(() => {
     // clear device reference in a type-safe way

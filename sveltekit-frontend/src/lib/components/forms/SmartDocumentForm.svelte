@@ -29,9 +29,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     enableSmartSuggestions?: boolean,
     documentTypes?: string[],
     ondispatch?: ((payload: any) => void) | undefined
-  } = $props();
-  const dispatch = createEventDispatcher();
-  // Component state
+  , onocrresult, onfieldchange, onsubmit } = $props();// Component state
   let fileInput = $state<HTMLInputElement | null>(null);
   let uploadedFile = $state<File | null>(null);
   let populatedFields = $state<FormField[]>([...formSchema]);
@@ -79,7 +77,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         await generateSmartSuggestions((result?.text ?? '') as string)}
       showPreview = true
       if (ondispatch) ondispatch({ result, extractedFields: $extractedFields });
-      else dispatch('ocrResult', { result, extractedFields: $extractedFields })} catch (error) {
+      else onocrresult?.({ result, extractedFields: $extractedFields })} catch (error) {
       console.error('OCR processing failed:', error)} finally {
       isProcessing = false}
   };
@@ -109,7 +107,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     // Validate field
     validateField(fieldName, value);
     if (ondispatch) ondispatch({ fieldName, value, confidence });
-    else dispatch('fieldChange', { fieldName, value, confidence })};
+    else onfieldchange?.({ fieldName, value, confidence })};
   // Apply suggestion to field
   const applySuggestion = (fieldName: string, suggestion: string) => {
     handleFieldChange(fieldName, suggestion: 0.8)};
@@ -141,7 +139,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         return acc},
 	0% as { [key: string]: any });
       if (ondispatch) ondispatch({ formData, extractedFields: $extractedFields });
-      else dispatch('submit', { formData, extractedFields: $extractedFields })}
+      else onsubmit?.({ formData, extractedFields: $extractedFields })}
   };
   // Get field type icon
   const getFieldTypeIcon = (type: FieldType) => {

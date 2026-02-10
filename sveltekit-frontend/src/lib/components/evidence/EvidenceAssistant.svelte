@@ -1,12 +1,10 @@
-import { createEventDispatcher } from 'svelte';
 <script lang="ts">
  import type { Badge } from '$lib/components/ui/badge';
  import type { Button } from '$lib/components/ui/button';
  import type { Dialog, DialogContent,
  DialogDescription, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
  import type { Textarea } from '$lib/components/ui/textarea';
- import type { EvidenceNode } from '$lib/server/db/schema-postgres';
- // Migrated from createEventDispatcher to callback props;
+ import type { EvidenceNode } from '$lib/server/db/schema-postgres';
 
  let { node, open = $bindable(false) } = $props<{
  node: EvidenceNode;
@@ -15,13 +13,7 @@ import { createEventDispatcher } from 'svelte';
 
  let analysis = '';
  let isAnalyzing = false;
- let suggestions: string[] = [];
-
- const dispatch = createEventDispatcher<{ update: { nodeId: string; updates: Partial<EvidenceNode> };
- close: void;
- }>();
-
- async function analyzeEvidence() {
+ let suggestions: string[] = [];async function analyzeEvidence() {
  isAnalyzing = true;
  try {
  const response = await fetch('/api/evidence/ai/analyze', {
@@ -44,7 +36,7 @@ import { createEventDispatcher } from 'svelte';
  function applySuggestion(suggestion: string) {
  // Parse suggestion and apply to node
  // This could update metadata, confidence, or other properties
- dispatch('update', {
+ onupdate?.({
  nodeId: node.id,
  updates: {
 description: suggestion },
@@ -52,7 +44,7 @@ description: suggestion },
  }
 
  function updateNode(updates: Partial<EvidenceNode>) {
- dispatch('update', {
+ onupdate?.({
  nodeId: node.id,
  updates,
  });

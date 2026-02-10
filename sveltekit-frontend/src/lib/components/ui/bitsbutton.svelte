@@ -1,8 +1,6 @@
 <script lang="ts">
   import { cva, type VariantProps } from 'class-variance-authority';
-  import { cn } from '$lib/utils';
-  import { createEventDispatcher } from 'svelte';
-  import { browser } from '$app/environment';
+  import { cn } from '$lib/utils';import { browser } from '$app/environment';
   import { userAnalyticsStore } from '$lib/stores/unified';
   import { lokiButtonCache } from '$lib/services/loki-cache';
   import { searchableButtonIndex } from '$lib/services/fuse-search';
@@ -68,6 +66,8 @@ variant: 'default',
     cacheKey?: string;
     role?: string;
     dataTestid?: string;
+    onanalytics?: (event: ButtonAnalyticsEvent) => void;
+    oncache?: (data: { key: string; action: string }) => void;
   }
 
   let {
@@ -91,15 +91,10 @@ variant: 'default',
     searchKeywords = [],
     cacheKey = undefined,
     role = 'button',
-    dataTestid = undefined
-  }: BitsButtonProps = $props();
-
-  const dispatch = createEventDispatcher<{ click: MouseEvent, analytics: ButtonAnalyticsEvent;
-    cache: {
-	key: string; action, string };
-  }>();
-
-  let isDisabled = $derived(disabled || loading);
+    dataTestid = undefined,
+    onanalytics = undefined,
+    oncache = undefined
+  }: BitsButtonProps = $props();let isDisabled = $derived(disabled || loading);
   let buttonClass = $derived(cn(buttonVariants({ variant, size }), className));
 
   function handleClick(event: MouseEvent) {
@@ -121,11 +116,11 @@ variant: 'default',
 
     if (browser) {
       userAnalyticsStore.trackButtonClick(analyticsEvent);
-      dispatch('analytics', analyticsEvent);
+      onanalytics?.(analyticsEvent);
 
       if (cacheKey) {
         lokiButtonCache.recordInteraction(cacheKey, analyticsEvent);
-        dispatch('cache', { key: cacheKey, action: 'click' });
+        oncache?.({ key: cacheKey, action: 'click' });
       }
 
       if (searchKeywords && searchKeywords.length > 0) {
@@ -133,8 +128,7 @@ variant: 'default',
       }
     }
 
-    if (onclick) onclick(event);
-    dispatch('click', event);
+    onclick?.(event);
   }
 </script>
 

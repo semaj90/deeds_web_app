@@ -6,10 +6,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 https, //svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
 https, //svelte.dev/e/attribute_invalid_event_handler -->
-<script lang="ts">
- import { createEventDispatcher } from 'svelte';
-
- interface SaveCitationData {
+<script lang="ts">interface SaveCitationData {
  statute_code: string;
  statute_title?: string;
  jurisdiction?: string;
@@ -24,11 +21,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  isOpen?: boolean;
  caseId?: string | null;
  highlightedText?, string | null;
- }>();
-
- const dispatch = createEventDispatcher();
-
- let formData: SaveCitationData = {
+ }>();let formData: SaveCitationData = {
  statute_code: '',
  statute_title: '',
  jurisdiction: '',
@@ -86,7 +79,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
- dispatch('saved', data.citation);
+ onsaved?.(data.citation);
  closeModal();
  } else {
  error = data.error || 'Failed to save citation';

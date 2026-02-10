@@ -1,7 +1,8 @@
-<script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import type { CaseTheoryPlan } from '$lib/types/case-theory';
+<script lang="ts">import type { CaseTheoryPlan } from '$lib/types/case-theory';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+
+let { ongenerated }: { ongenerated?: (data: { plan: any }) => void } = $props();
+
 
 	type FormState = { caseName: string, caseId: string;
 		summary: string;
@@ -41,11 +42,7 @@ closingOutline: true,
 			investigativeGaps: false,
 			pressTalkingPoints: false
 		}
-	});
-
-	const dispatch = createEventDispatcher<{ generated: { plan: CaseTheoryPlan } }>();
-
-	let isSubmitting = $state(false);
+	});let isSubmitting = $state(false);
 	let plan = $state<CaseTheoryPlan | null>(null);
 	let rawOutput = $state<string | null>(null);
 	let errorMessage = $state<string | null>(null);
@@ -132,7 +129,7 @@ caseId: form.caseId || undefined,
 
 			plan = data.plan as CaseTheoryPlan;
 			rawOutput = data.raw ?? null;
-			dispatch('generated', { plan });
+			ongenerated?.({ plan });
 		} catch (error) {
 			console.error(error);
 			errorMessage = 'Unable to generate theory right now.';

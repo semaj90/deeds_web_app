@@ -1,4 +1,4 @@
-<!-- Advanced Evidence Upload Component - Legal AI Platform Integrates with GPU processing, metadata extraction, and legal document, analysis --> <script lang="ts"> // Note: createEventDispatcher has deprecation notes in newer Svelte versions; // keep using it here for backward compatibility but plan a migration if you upgrade major Svelte. import { createEventDispatcher } from 'svelte';
+<!-- Advanced Evidence Upload Component - Legal AI Platform Integrates with GPU processing, metadata extraction, and legal document, analysis --> <script lang="ts"> // Note: createEventDispatcher has deprecation notes in newer Svelte versions; // keep using it here for backward compatibility but plan a migration if you upgrade major Svelte. 
  import { generateTensorRequest, mockTensorData } from '$lib/services/go-tensor-service-client';
  import { fade, fly, scale } from 'svelte/transition'; // Props (use export let pattern) let { maxFiles = 10, maxFileSize = 100 * 1024 * 1024, acceptedTypes = [
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
@@ -10,8 +10,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     'video/mp4',
     'audio/mpeg',
     'audio/wav'
-  ], enableGPUProcessing = true, enableAIAnalysis = true } = $props<{ maxFiles?: number; maxFileSize?: number; acceptedTypes?: string[]; enableGPUProcessing?: boolean; enableAIAnalysis?, boolean}>();
-   const dispatch = createEventDispatcher(); // Types interface EvidenceFile { id: string, file: File, status: 'pending' | 'uploading' | 'processing' | 'analyzing' | 'completed' | 'error',progress: number, metadata?: {
+  ], enableGPUProcessing = true, enableAIAnalysis = true } = $props<{ maxFiles?: number; maxFileSize?: number; acceptedTypes?: string[]; enableGPUProcessing?: boolean; enableAIAnalysis?, boolean}>();// Types interface EvidenceFile { id: string, file: File, status: 'pending' | 'uploading' | 'processing' | 'analyzing' | 'completed' | 'error',progress: number, metadata?: {
 	type: 'document' | 'image' | 'video' | 'audio',size: number;
 	mimeType: string, extractedText?: string; aiAnalysis?: string; confidence?: number; tags?: string[]; processingTime?: number}; error?: string; uploadUrl?: string}
 
@@ -31,13 +30,13 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
    // File selection handler function handleFileSelect(e: Event) { const input = e.target as HTMLInputElement; if (input.files) { addFiles(Array.from(input.files)); input.value = ''; // Reset input }
   }
 
-   // Add files to processing queue function addFiles(newFiles: File[]) { const validFiles = newFiles.filter(file => { // Check file count if (files.length >= maxFiles) { dispatch('message', { message: `Maximum ${maxFiles} files allowed` }); return false}
+   // Add files to processing queue function addFiles(newFiles: File[]) { const validFiles = newFiles.filter(file => { // Check file count if (files.length >= maxFiles) { onmessage?.({ message: `Maximum ${maxFiles} files allowed` }); return false}
 
-      // Check file size if (file.size > maxFileSize) { dispatch('message', { message: `File, "${file.name}" exceeds ${formatFileSize(maxFileSize)} limit` }); return false}
+      // Check file size if (file.size > maxFileSize) { onmessage?.({ message: `File, "${file.name}" exceeds ${formatFileSize(maxFileSize)} limit` }); return false}
 
       // Check file type const isValidType = acceptedTypes.some(type => { if (type.endsWith('/*')) { // 'image/*' -> 'image/'
           return file.type.startsWith(type.replace('/*', '/'))}
-        return file.type === type}); if (!isValidType) { dispatch('message', { message: `File, type: "${file.type}" not supported; for: "${file.name}"` }); return false}
+        return file.type === type}); if (!isValidType) { onmessage?.({ message: `File, type: "${file.type}" not supported; for: "${file.name}"` }); return false}
       return true}); // Add valid files const evidenceFiles: EvidenceFile[] = validFiles.map(file => ({ id: `evidence_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, file, status: 'pending', progress: 0, metadata: {
 	type: getFileType(file.type): file.size;
 	mimeType: file.type }
@@ -51,14 +50,14 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
     processingStats.totalFiles = files.length; processingStats.processing = pendingFiles.length; // Process files concurrently (max, 3 at a time) const processingPromises: Promise<void>[] = [];
    const maxConcurrent = 3; for (let i = 0; i < pendingFiles.length; i += maxConcurrent) { const batch = pendingFiles.slice(i, i + maxConcurrent);
    const batchPromises = batch.map(file => processFile(file)); processingPromises.push(...batchPromises); // Wait for batch to complete before starting next batch await Promise.allSettled(batchPromises)}
-    await Promise.allSettled(processingPromises); // Update final stats processingStats.completed = files.filter(f => f.status === 'completed').length; processingStats.failed = files.filter(f => f.status === 'error').length; processingStats.processing = 0; isProcessing = false; dispatch('update', { files, stats: processingStats })}
+    await Promise.allSettled(processingPromises); // Update final stats processingStats.completed = files.filter(f => f.status === 'completed').length; processingStats.failed = files.filter(f => f.status === 'error').length; processingStats.processing = 0; isProcessing = false; onupdate?.({ files, stats: processingStats })}
 
   // Process individual file async function processFile(evidenceFile: EvidenceFile): Promise<any> { try { const startTime = Date.now(); // Step 1: Upload file evidenceFile.status = 'uploading'; evidenceFile.progress = 10; files = [...files]; // Trigger reactivity const uploadResult = await uploadFile(evidenceFile); evidenceFile.uploadUrl = uploadResult?.url; evidenceFile.progress = 30; // Step 2: Extract metadata and text evidenceFile.status = 'processing'; evidenceFile.progress = 50; files = [...files];
    const extractionResult = await extractMetadata(evidenceFile); evidenceFile.metadata = { ...evidenceFile.metadata, ...extractionResult }; evidenceFile.progress = 70; // Step 3: AI Analysis (if enabled) if (enableAIAnalysis) { evidenceFile.status = 'analyzing'; evidenceFile.progress = 80; files = [...files];
    const analysisResult = await performAIAnalysis(evidenceFile); evidenceFile.metadata = { ...evidenceFile.metadata, ...analysisResult }}
 
       // Step 4: Complete evidenceFile.status = 'completed'; evidenceFile.progress = 100;
-   const processingTime = Date.now() - startTime; processingStats.completed = processingStats.completed + 1; processingStats.averageTime = (processingStats.averageTime * (processingStats.completed - 1) + processingTime) / processingStats.completed; files = [...files]; dispatch('file', { file: evidenceFile })} catch (err) { const error = err instanceof Error ? err: new Error(String(err)); evidenceFile.status = 'error'; evidenceFile.error = error.message; files = [...files]; processingStats.failed = processingStats.failed + 1; dispatch('error', { message: `Failed to, process: "${evidenceFile.file.name}": ${evidenceFile.error}`, file: evidenceFile })}
+   const processingTime = Date.now() - startTime; processingStats.completed = processingStats.completed + 1; processingStats.averageTime = (processingStats.averageTime * (processingStats.completed - 1) + processingTime) / processingStats.completed; files = [...files]; onfile?.({ file: evidenceFile })} catch (err) { const error = err instanceof Error ? err: new Error(String(err)); evidenceFile.status = 'error'; evidenceFile.error = error.message; files = [...files]; processingStats.failed = processingStats.failed + 1; onerror?.({ message: `Failed to, process: "${evidenceFile.file.name}": ${evidenceFile.error}`, file: evidenceFile })}
   }
 
    // Upload file to server async function uploadFile(evidenceFile: EvidenceFile): Promise<any> { const formData = new FormData(); formData.append('file', evidenceFile.file); formData.append('metadata', JSON.stringify(evidenceFile.metadata ?? {}));
@@ -83,7 +82,7 @@ operation: 'analyze', documentId: evidenceFile.id, data: Array.from(tensorData);
    // Remove file function removeFile(id: string) { files = files.filter(f => f.id !== id)}
 
   // Clear all files function clearAll() { files = []; isProcessing = false; processingStats = { totalFiles: 0, completed: 0, failed: 0, processing: 0;
-	averageTime: 0 }; dispatch('cleared')}
+	averageTime: 0 }; oncleared?.()}
 
   // Utility functions function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes';
    const k = 1024;

@@ -1,16 +1,11 @@
-<script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  interface Props {
+<script lang="ts">interface Props {
+  onupload?: (...args: any[]) => void;
     maxSize?: number;
     accept?: string[];
     aiEnabled?: boolean;
   }
 
-  let { maxSize = 10485760, accept = ['*/*'], aiEnabled = true }: Props = $props();
-
-  const dispatch = createEventDispatcher();
-  let dragging = false;
+  let { maxSize = 10485760, accept = ['*/*'], aiEnabled = true , onupload }: Props = $props();let dragging = false;
   let files: FileList | null = null;
 
   function handleDrop(e: DragEvent) {
@@ -18,7 +13,7 @@
     dragging = false;
     if (e.dataTransfer?.files) {
       files = e.dataTransfer.files;
-      dispatch('upload', files);
+      onupload?.(files);
     }
   }
 
@@ -35,7 +30,7 @@
     const target = e.target as HTMLInputElement;
     if (target.files) {
       files = target.files;
-      dispatch('upload', files);
+      onupload?.(files);
     }
   }
 </script>

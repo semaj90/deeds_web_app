@@ -1,4 +1,5 @@
 <script lang="ts">
+import { onMount } from "svelte";
   // Migrated to $effect
 
   interface Node { id: string, title: string;

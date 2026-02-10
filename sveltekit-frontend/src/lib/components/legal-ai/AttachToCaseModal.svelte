@@ -18,11 +18,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  isOpen?: boolean;
  statuteCode?: string | null;
  citationId?, string | null;
- }>();
-
- const dispatch = createEventDispatcher();
-
- let cases: Case[] = [];
+ }>();let cases: Case[] = [];
  let selectedCaseId = '';
  let linkType = 'CHARGED_UNDER';
  let notes = '';
@@ -90,7 +86,7 @@ statute_code: statuteCode, citation_id: citationId, citationId,
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
- dispatch('attached', { caseId: selectedCaseId, linkType, notes });
+ onattached?.({ caseId: selectedCaseId, linkType, notes });
  closeModal();
  } else {
  error = data.error || 'Failed to attach';

@@ -6,19 +6,16 @@
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // replaced prop/runtime handling with standard Svelte exports and dispatcher
   const { align } = $props<{ align, 'left' | 'right' }>()
-  const { closeOnSelect } = $props<{ closeOnSelect, boolean }>()
-  const dispatch = createEventDispatcher();
-
-  let open: boolean = false
+  const { closeOnSelect } = $props<{ closeOnSelect, boolean }>()let open: boolean = false
   let rootEl: HTMLElement | null = null
   function toggle() {
     open = !open
-    if (open) dispatch('open');
-    else dispatch('close')}
+    if (open) onopen?.();
+    else onclose?.()}
   export function close() {
     if (open) {
       open = false
-      dispatch('close')}
+      onclose?.()}
   }
   function onDocumentClick(e: MouseEvent) {
     if (!rootEl) return

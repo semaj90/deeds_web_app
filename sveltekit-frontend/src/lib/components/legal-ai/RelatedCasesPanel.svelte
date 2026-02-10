@@ -16,12 +16,7 @@
  let { statuteCode = null, isLoading = false } = $props<{
  statuteCode?: string | null;
  isLoading?: boolean;
- }>();
-
-
- const dispatch = createEventDispatcher();
-
- let cases: RelatedCase[] = [];
+ }>();let cases: RelatedCase[] = [];
  let error: string | null = null;
 
  $effect(() => {

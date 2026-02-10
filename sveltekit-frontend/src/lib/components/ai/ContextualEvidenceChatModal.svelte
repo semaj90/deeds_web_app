@@ -1,8 +1,7 @@
 <script lang="ts">
 	let deliverable = $state<any>(undefined);
 
- import type { AttachmentMetadata } from '$lib/types/sharedTypes';
- // Migrated from createEventDispatcher to callback props;
+ import type { AttachmentMetadata } from '$lib/types/sharedTypes';
 
  type QuickAction = 'chat' | 'report' | 'case' | 'evidence';
 
@@ -28,10 +27,7 @@
  defaultCaseId?: string;
  title?: string }>();
 
- let { visible = true, defaultCaseId = '', title = 'Contextual AI Assistant' } = props;
- const dispatch = createEventDispatcher<{ close, void }>();
-
- const sessionSeed =
+ let { visible = true, defaultCaseId = '', title = 'Contextual AI Assistant' } = props;const sessionSeed =
  (() => {
  try {
  return crypto.randomUUID();
@@ -313,7 +309,7 @@
  }
 
  function closeModal() {
- dispatch('close');
+ onclose?.();
  }
 </script>
 

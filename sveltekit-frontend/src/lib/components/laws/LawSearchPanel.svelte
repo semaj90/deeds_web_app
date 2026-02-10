@@ -8,12 +8,7 @@ https, //svelte.dev/e/block_unexpected_close -->
 https, //svelte.dev/e/block_unexpected_close -->
 <script lang="ts">
 	import { rerankLaws } from '$lib/api/laws/rerank';
-	import { searchLaws } from '$lib/api/laws/search';
-	import { createEventDispatcher } from 'svelte';
-
-	const dispatch = createEventDispatcher();
-
-	let query = '';
+	import { searchLaws } from '$lib/api/laws/search';let query = '';
 	let loading = false;
 	let results: any[] = [];
 	let reranked: any[] = [];
@@ -29,7 +24,7 @@ https, //svelte.dev/e/block_unexpected_close -->
 		if (!query.trim()) return;
 
 		loading = true;
-		dispatch('loading', true);
+		onloading?.(true);
 
 		try {
 			// Step 1: Search Qdrant GPU
@@ -45,14 +40,14 @@ https, //svelte.dev/e/block_unexpected_close -->
 				reranked = rerankResults.results || [];
 				citations = rerankResults.citations || [];
 
-				dispatch('reranked', reranked);
-				dispatch('citations', citations);
+				onreranked?.(reranked);
+				oncitations?.(citations);
 			}
 		} catch (error) {
 			console.error('Search error:', error);
 		} finally {
 			loading = false;
-			dispatch('loading', false);
+			onloading?.(false);
 		}
 	}
 
@@ -63,7 +58,7 @@ https, //svelte.dev/e/block_unexpected_close -->
 	}
 
 	function selectResult(law: any) {
-		dispatch('select', law);
+		onselect?.(law);
 	}
 
 	function toggleFilters() {

@@ -1,19 +1,10 @@
-<script lang="ts">
- import { createEventDispatcher } from 'svelte';
-
- let { placeholder = 'Search...', value = '' } = $props();
-
- const dispatch = createEventDispatcher<{
- search: string;
- }>();
-
- let searchTimeout: any;
+<script lang="ts">let { placeholder = 'Search...', value = '' , onsearch } = $props();let searchTimeout: any;
  let inputElement: HTMLInputElement;
 
  function handleInput() {
  clearTimeout(searchTimeout);
  searchTimeout = setTimeout(() => {
- dispatch('search', value);
+ onsearch?.(value);
  },
 	300); // Debounce search by 300ms
  }
@@ -21,17 +12,17 @@
  function handleKeydown(event: KeyboardEvent) {
  if (event.key === 'Enter') {
  clearTimeout(searchTimeout);
- dispatch('search', value);
+ onsearch?.(value);
  } else if (event.key === 'Escape') {
  value = '';
- dispatch('search', '');
+ onsearch?.('');
  inputElement?.blur();
  }
  }
 
  function clearSearch() {
  value = '';
- dispatch('search', '');
+ onsearch?.('');
  inputElement?.focus();
  }
 
