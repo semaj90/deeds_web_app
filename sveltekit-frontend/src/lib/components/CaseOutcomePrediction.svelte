@@ -739,11 +739,12 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		border: 2px solid #ecf0f1;
 		border-radius: 8px;
 		font-size: 1rem;
-	transition:border-color 0.2s;
-		font-family: inherit;}
+	transition: border-color 0.2s;
+		font-family: inherit;
+	}
 
-	textarea: focus;
-		select:focus {
+	textarea:focus,
+	select:focus {
 		outline: none;
 		border-color: #3498db;
 		box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);

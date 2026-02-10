@@ -232,7 +232,7 @@
 	transition:all 0.2s ease;
 	}
 
-	.search-input: placeholder {
+	.search-input::placeholder {
 		color: rgba(255, 255, 255, 0.4);
 	}
 

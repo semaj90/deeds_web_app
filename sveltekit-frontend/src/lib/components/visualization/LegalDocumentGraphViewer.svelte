@@ -774,7 +774,7 @@
   .error-overlay button:hover { background: #2563eb; }
   .performance-hud { position: absolute;
 		top: 12px; left: 12px;
-	background: rgba(0, 0, 0, 0.7), padding: 8px 12px; border-radius: 4px; font-size: 12px;
+	background: rgba(0, 0, 0, 0.7); padding: 8px 12px; border-radius: 4px; font-size: 12px;
 	color: white; font-family: 'Courier New', monospace; z-index: 5; }
   .stat { display: flex; justify-content: space-between; min-width: 80px; margin-bottom: 2px; }
   .stat:last-child { margin-bottom: 0; }

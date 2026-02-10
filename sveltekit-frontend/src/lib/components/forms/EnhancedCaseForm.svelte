@@ -476,10 +476,12 @@
     border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 1rem;
-	transition:border-color 0.2s, box-shadow 0.2s;}
+	transition: border-color 0.2s, box-shadow 0.2s;
+  }
 
-  input: focus;
-		select:focus; textarea:focus {
+  input:focus,
+  select:focus,
+  textarea:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);

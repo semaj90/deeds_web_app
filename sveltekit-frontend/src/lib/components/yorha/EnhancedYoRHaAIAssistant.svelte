@@ -594,7 +594,7 @@ enabled:true, storage: 'session' }
   .evidence-controls button:hover { background: #ffd700;
 		color: #000; }
   .evidence-grid { flex: 1;
-		display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)), gap: 1rem; overflow-y: auto; }
+		display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; overflow-y: auto; }
   .evidence-item { background: #1a1a1a;
 		border: 1px solid #333; border-radius: 8px;
 	padding: 1rem;
@@ -617,7 +617,7 @@ enabled:true, storage: 'session' }
 
   .analysis-container { flex: 1;
 		padding: 1rem; overflow-y: auto; }
-  .analysis-stats { display: grid; grid-template-columns: repeat(3, 1fr), gap: 1rem; margin-bottom: 2rem; }
+  .analysis-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
   .stat-card { background: #1a1a1a;
 		border: 1px solid #333; padding: 1rem; text-align: center; border-radius: 8px; }
   .stat-value { font-size: 2rem; font-weight: bold;

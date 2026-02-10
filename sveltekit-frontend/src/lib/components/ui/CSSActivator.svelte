@@ -224,17 +224,17 @@
 </div>
 
 <style>
-  /* Ensure this component doesn't affect layout */'
   :global(.css-activator-hidden) {
-    position absolute !important
+    position: absolute !important;
     left: -9999px !important;
-    top: -9999px !important
+    top: -9999px !important;
     visibility: hidden !important;
-    pointer-events: none !important
+    pointer-events: none !important;
     opacity: 0 !important;
-    width: 1px !important
-    height: 1px !important
-   ;overflow: hidden !important;}
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+  }
 </style>
 
 

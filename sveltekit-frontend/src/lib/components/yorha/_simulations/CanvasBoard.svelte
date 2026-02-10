@@ -470,10 +470,10 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   .yorha-canvas.drawing { box-shadow: 0 0 30px rgba(0, 255, 136, 0.5)}
   .canvas-overlay { position: absolute;
 		top: 1rem; right: 1rem;
-	background: rgba(0, 0, 0, 0.8), border: 1px solid #00ff88; padding: 0.5rem; pointer-events: none;}
+	background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff88; padding: 0.5rem; pointer-events: none;}
   .canvas-info { display: flex; flex-direction: column;
 	gap: 0.25rem;}
-  .info-item { font-size: 0.8rem; font-family: 'Courier New', monospace, color: #00ff88;}
+  .info-item { font-size: 0.8rem; font-family: 'Courier New', monospace; color: #00ff88;}
   /* Responsive design */ @media (max-width: 768px) { .canvas-toolbar { flex-direction: column;
 	gap: 1rem;}
     .tool-section, .color-section, .size-section { flex-direction: row; align-items: center;}
