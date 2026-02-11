@@ -1,6 +1,5 @@
 
-import { createMachine, assign, fromPromise, createActor } from 'xstate';
-import type { productionServiceClient } from '$lib/api/production-service-client';
+import { setup, assign, fromPromise } from 'xstate';
 
 // Define missing types
 interface LooseObject {
@@ -156,204 +155,190 @@ const initialContext: LegalAIContext = {
   },
 };
 
-export const legalAIMachine = createMachine(
-  {
-    id: 'legalAI',
-    initial: 'initializing',
-    context: initialContext,
-    states: {
-      initializing: {
-        invoke: {
-          src: 'checkSystemStatus',
-          onDone: { target: 'idle', actions: ['updateSystem'] },
-          onError: { target: 'error', actions: ['setSystemError'] },
+export const legalAIMachine = setup({
+  types: {} as {
+    context: LegalAIContext;
+    events: LegalAIEvent;
+  },
+  actions: {
+    updateSystem: assign(({ event }) => {
+      const doneEvent = event as { output?: typeof initialContext.system };
+      return { system: doneEvent?.output ?? initialContext.system };
+    }),
+    setSystemError: assign(({ context }) => ({
+      system: { ...context.system, connected: false },
+    })),
+    setUser: assign(({ event }) => {
+      const doneEvent = event as { output?: AuthResponse };
+      const out = doneEvent?.output;
+      return {
+        user: {
+          id: out?.id ?? null,
+          email: out?.email ?? null,
+          role: out?.role ?? null,
+          permissions: (out?.permissions ?? []) as string[],
+          isAuthenticated: true,
         },
+      };
+    }),
+    clearUser: assign(() => ({
+      user: {
+        id: null,
+        email: null,
+        role: null,
+        permissions: [] as string[],
+        isAuthenticated: false,
       },
-      idle: {
-        on: {
-          'AUTH.LOGIN': 'authenticating',
-          'AUTH.REGISTER': 'registering',
-          'CASES.LOAD': 'loadingCases',
-          'CASES.CREATE': 'creatingCase',
-          'AI.QUERY': 'processingAI',
-          'SYSTEM.CHECK_STATUS': 'checkingStatus',
+    })),
+    setCases: assign(({ context, event }) => {
+      const doneEvent = event as { output?: Case[] };
+      const casesOutput = doneEvent?.output ?? [];
+      return { cases: { ...context.cases, items: casesOutput, loading: false } };
+    }),
+    setCurrentCase: assign(({ context, event }) => {
+      const selectEvent = event as Extract<LegalAIEvent, { type: 'CASES.SELECT' }>;
+      return {
+        cases: { ...context.cases, currentCase: selectEvent?.case ?? context.cases.currentCase },
+      };
+    }),
+    setAIResponse: assign(({ context, event }) => {
+      const doneEvent = event as { output?: AIResponse };
+      const aiResponse = doneEvent?.output ?? null;
+      return { ai: { ...context.ai, lastResponse: aiResponse, isProcessing: false } };
+    }),
+    setAIError: assign(({ context, event }) => {
+      const errorEvent = event as { error?: Error };
+      const message = errorEvent?.error?.message ?? 'AI processing failed';
+      return { ai: { ...context.ai, error: message, isProcessing: false } };
+    }),
+    startAIProcessing: assign(({ context, event }) => {
+      const queryEvent = event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>;
+      return {
+        ai: {
+          ...context.ai,
+          isProcessing: true,
+          currentQuery: queryEvent?.prompt ?? '',
+          error: null,
         },
-      },
-      authenticating: {
-        invoke: {
-          src: 'authenticateUser',
-          input: ({ event }) => ({
-            credentials: (event as Extract<LegalAIEvent, { type: 'AUTH.LOGIN' }>).credentials,
-          }),
-          onDone: { target: 'authenticated', actions: ['setUser'] },
-          onError: { target: 'idle', actions: ['clearUser'] },
+      };
+    }),
+  },
+  actors: {
+    checkSystemStatus: fromPromise(async () => {
+      return {
+        connected: true,
+        services: {
+          database: true, redis: true, ollama: true, gpu: true,
+          pgvector: true, qdrant: true, neo4j: true
         },
+        metrics: { errorCount: 0, performanceScore: 100, uptime: Date.now() }
+      };
+    }),
+    authenticateUser: fromPromise(async ({ input }: { input: { credentials: { email: string; password: string } } }): Promise<AuthResponse> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return {
+        id: 'user_123',
+        email: input.credentials.email,
+        role: 'admin',
+        permissions: ['all']
+      };
+    }),
+    loadCases: fromPromise(async ({ input }: { input: { filters?: Partial<LegalAIContext['cases']['filters']> } }): Promise<Case[]> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return [];
+    }),
+    processAIQuery: fromPromise(async ({ input }: { input: { prompt: string } }): Promise<AIResponse> => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return {
+        response: 'Mock AI Response',
+        confidence: 0.95,
+        sources: [],
+        timestamp: new Date().toISOString(),
+        model: 'mock-model',
+        metadata: {}
+      };
+    }),
+  },
+}).createMachine({
+  id: 'legalAI',
+  initial: 'initializing',
+  context: initialContext,
+  states: {
+    initializing: {
+      invoke: {
+        src: 'checkSystemStatus',
+        onDone: { target: 'idle', actions: ['updateSystem'] },
+        onError: { target: 'error', actions: ['setSystemError'] },
       },
-      authenticated: {
-        initial: 'ready',
-        states: {
-          ready: {
-            on: {
-              'CASES.LOAD': '#legalAI.loadingCases',
-              'AI.QUERY': '#legalAI.processingAI',
-              'AUTH.LOGOUT': '#legalAI.idle',
-            },
+    },
+    idle: {
+      on: {
+        'AUTH.LOGIN': 'authenticating',
+        'AUTH.REGISTER': 'registering',
+        'CASES.LOAD': 'loadingCases',
+        'CASES.CREATE': 'creatingCase',
+        'AI.QUERY': 'processingAI',
+        'SYSTEM.CHECK_STATUS': 'checkingStatus',
+      },
+    },
+    authenticating: {
+      invoke: {
+        src: 'authenticateUser',
+        input: ({ event }) => ({
+          credentials: (event as Extract<LegalAIEvent, { type: 'AUTH.LOGIN' }>).credentials,
+        }),
+        onDone: { target: 'authenticated', actions: ['setUser'] },
+        onError: { target: 'idle', actions: ['clearUser'] },
+      },
+    },
+    authenticated: {
+      initial: 'ready',
+      states: {
+        ready: {
+          on: {
+            'CASES.LOAD': '#legalAI.loadingCases',
+            'AI.QUERY': '#legalAI.processingAI',
+            'AUTH.LOGOUT': '#legalAI.idle',
           },
         },
       },
-      loadingCases: {
-        invoke: {
-          src: 'loadCases',
-          input: ({ event }) => ({
-            filters: (event as Extract<LegalAIEvent, { type: 'CASES.LOAD' }>).filters,
-          }),
-          onDone: { target: 'authenticated', actions: 'setCases' },
-          onError: { target: 'authenticated' },
-        },
+    },
+    loadingCases: {
+      invoke: {
+        src: 'loadCases',
+        input: ({ event }) => ({
+          filters: (event as Extract<LegalAIEvent, { type: 'CASES.LOAD' }>).filters,
+        }),
+        onDone: { target: 'authenticated', actions: 'setCases' },
+        onError: { target: 'authenticated' },
       },
-      processingAI: {
-        entry: 'startAIProcessing',
-        invoke: {
-          src: 'processAIQuery',
-          input: ({ event }) => ({
-            prompt: (event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>).prompt,
-          }),
-          onDone: { target: 'authenticated', actions: 'setAIResponse' },
-          onError: { target: 'authenticated', actions: 'setAIError' },
-        },
+    },
+    processingAI: {
+      entry: 'startAIProcessing',
+      invoke: {
+        src: 'processAIQuery',
+        input: ({ event }) => ({
+          prompt: (event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>).prompt,
+        }),
+        onDone: { target: 'authenticated', actions: 'setAIResponse' },
+        onError: { target: 'authenticated', actions: 'setAIError' },
       },
-      error: {
-        on: {
-          'SYSTEM.CHECK_STATUS': 'initializing',
-        },
+    },
+    error: {
+      on: {
+        'SYSTEM.CHECK_STATUS': 'initializing',
       },
-      registering: {
-        after: { 1000: 'idle' },
-      },
-      creatingCase: {
-        after: { 1000: 'idle' },
-      },
-      checkingStatus: {
-        after: { 1000: 'idle' },
-      },
+    },
+    registering: {
+      after: { 1000: 'idle' },
+    },
+    creatingCase: {
+      after: { 1000: 'idle' },
+    },
+    checkingStatus: {
+      after: { 1000: 'idle' },
     },
   },
-  {
-    actions: {
-      updateSystem: assign((_, event) => {
-        const doneEvent = event as { output?: typeof initialContext.system } | undefined;
-        return { system: doneEvent?.output ?? initialContext.system };
-      }),
-      setSystemError: assign((context) => ({
-        system: { ...context.system, connected: false },
-      })),
-      setUser: assign((_, event) => {
-        const doneEvent = event as { output?: AuthResponse } | undefined;
-        const out = doneEvent?.output;
-        return {
-          user: {
-            id: out?.id ?? null,
-            email: out?.email ?? null,
-            role: out?.role ?? null,
-            permissions: (out?.permissions ?? []) as string[],
-            isAuthenticated: true,
-          },
-        };
-      }),
-      clearUser: assign(() => ({
-        user: {
-          id: null,
-          email: null,
-          role: null,
-          permissions: [] as string[],
-          isAuthenticated: false,
-        },
-      })),
-      setCases: assign((context, event) => {
-        const doneEvent = event as { output?: Case[] } | undefined;
-        const casesOutput = doneEvent?.output ?? [];
-        return { cases: { ...context.cases, items: casesOutput, loading: false } };
-      }),
-      setCurrentCase: assign((context, event) => {
-        const selectEvent = event as Extract<LegalAIEvent, { type: 'CASES.SELECT' }>;
-        return {
-          cases: { ...context.cases, currentCase: selectEvent?.case ?? context.cases.currentCase },
-        };
-      }),
-      setAIResponse: assign((context, event) => {
-        const doneEvent = event as { output?: AIResponse } | undefined;
-        const aiResponse = doneEvent?.output ?? null;
-        return { ai: { ...context.ai, lastResponse: aiResponse, isProcessing: false } };
-      }),
-      setAIError: assign((context, event) => {
-        const errorEvent = event as { error?: Error } | undefined;
-        const message = errorEvent?.error?.message ?? 'AI processing failed';
-        return { ai: { ...context.ai, error: message, isProcessing: false } };
-      }),
-      startAIProcessing: assign((context, event) => {
-        const queryEvent = event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>;
-        return {
-          ai: {
-            ...context.ai,
-            isProcessing: true,
-            currentQuery: queryEvent?.prompt ?? '',
-            error: null,
-          },
-        };
-      }),
-    },
-
-    services: {
-      checkSystemStatus: fromPromise(async () => {
-         // Mock implementation for now to avoid dependency import circles
-         return {
-            connected: true,
-            services: {
-              database: true, redis: true, ollama: true, gpu: true,
-              pgvector: true, qdrant: true, neo4j: true
-            },
-            metrics: { errorCount: 0, performanceScore: 100, uptime: Date.now() }
-         };
-      }),
-
-      authenticateUser: fromPromise(async ({ input }: { input: { credentials: { email: string, password: string } } }): Promise<AuthResponse> => {
-           // Simplified mock
-           await new Promise(resolve => setTimeout(resolve, 500));
-           return {
-             id: 'user_123',
-             email: input.credentials.email,
-             role: 'admin',
-             permissions: ['all']
-           };
-      }),
-
-      loadCases: fromPromise(
-        async ({
-          input,
-        }: {
-          input: { filters?: Partial<LegalAIContext['cases']['filters']> };
-        }): Promise<Case[]> => {
-          // Simplified mock
-          await new Promise(resolve => setTimeout(resolve, 500));
-          return [];
-        }
-      ),
-
-      processAIQuery: fromPromise(
-        async ({ input }: { input: { prompt: string } }): Promise<AIResponse> => {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return {
-                response: 'Mock AI Response',
-                confidence: 0.95,
-                sources: [],
-                timestamp: new Date().toISOString(),
-                model: 'mock-model',
-                metadata: {}
-            };
-        }
-      ),
-    },
-  }
-);
+});
 
 export default legalAIMachine;

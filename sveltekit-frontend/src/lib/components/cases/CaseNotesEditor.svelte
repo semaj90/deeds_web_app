@@ -67,7 +67,7 @@
 				createdAt: x.createdAt ?? null,
 				updatedAt: x.updatedAt ?? null,
 				pinned: !!x.pinned,
-				score: typeof x.score === "number" ? x.score  | undefined
+				score: typeof x.score === "number" ? x.score : undefined
 			}));
 		} catch (e: any) {
 			searchError = e?.message ?? "Search error";
@@ -347,13 +347,26 @@
  <head>
  <title>AI Legal Memo</title>
  <style>
- body { font-family: Arial, sans-serif, margin: 40px; line-height: 1.6;}
- h1 { color: #333;}
- pre { white-space: pre-wrap;
-	background: #f5f5f5;
-		padding: 20px; border-radius: 5px;}
+ body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+ h1 { color: #333; }
+ pre { white-space: pre-wrap; background: #f5f5f5; padding: 20px; border-radius: 5px; }
  </style>
+ </head>
+ <body>
+ <h1>AI Legal Memo</h1>
+ <pre>${data.memo || 'No memo generated'}</pre>
+ </body>
+ </html>`);
+ memoWindow.document.close();
+ }
+ } catch (err) {
+ error = err instanceof Error ? err.message : 'Failed to generate AI memo';
+ } finally {
+ isExportingMemo = false;
+ }
+ }
+</script>
 
-
-
-
+<div class="case-notes-editor">
+ <p>Case Notes Editor - {caseId}</p>
+</div>

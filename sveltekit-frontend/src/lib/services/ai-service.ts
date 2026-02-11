@@ -101,7 +101,7 @@ export class AIService {
   }> {
     const startTime = Date.now();
     const {
-      model = 'gemma3-legal',
+      model = 'gemma3:270m', // gemma3-legal returns 400 for /api/generate
       temperature = 0.7,
       maxTokens = 2000,
       includeContext = true,
@@ -456,7 +456,7 @@ Format your response as JSON with the structure:
         tag: t,
         confidence: confidence,
         source: 'ai_analysis',
-        model: 'gemma3-legal:latest',
+        model: 'gemma3:270m',
       }));
       await (db as any).insert(autoTags).values(tagData);
     } catch (error: Error | unknown) {

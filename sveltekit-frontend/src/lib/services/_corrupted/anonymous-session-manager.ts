@@ -228,7 +228,7 @@ export class AnonymousSessionManager {
 	hasUnsavedChats(): boolean {
 		if (!this.session) return false;
 
-		for (const [messages] of this.session.chats) {
+		for (const [, messages] of this.session.chats) {
 			if (messages.some((m) => !m.saved)) {
 				return true;
 			}
@@ -244,7 +244,7 @@ export class AnonymousSessionManager {
 		if (!this.session) return 0;
 
 		let count = 0;
-		for (const [messages] of this.session.chats) {
+		for (const [, messages] of this.session.chats) {
 			count += messages.filter((m) => !m.saved).length;
 		}
 

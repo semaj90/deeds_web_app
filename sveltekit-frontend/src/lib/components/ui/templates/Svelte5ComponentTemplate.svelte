@@ -54,9 +54,12 @@ let {
 	disabled = false,
 	open = $bindable(false),
 	checked = $bindable(false),
-	children: header,
-	footer: icon,
-	onclick: onchange,
+	children,
+	header,
+	footer,
+	icon,
+	onclick,
+	onchange,
 	class: className = ''
 }: Props = $props();
 

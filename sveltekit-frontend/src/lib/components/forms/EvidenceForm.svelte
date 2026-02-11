@@ -7,8 +7,8 @@ import type { Document } from '$lib/types';
   }: Props = $props();
   import { invalidateAll } from "$app/navigation";
   import superForm from "sveltekit-superforms/client";
-  // cast server data to: unknown to avoid: 'unknown' access errors
-  const serverData = data as unknown
+  // cast server data to Record to allow property access
+  const serverData = data as Record<string, any> | null;
   const initialValues = evidence || (serverData?.form ?? {});
   const { form, enhance, errors, submitting } = superForm(
     initialValues, {
@@ -20,7 +20,7 @@ import type { Document } from '$lib/types';
   );
   // helper to update a field in the form store
   function updateField(key: string, value: unknown) {
-    form.update((f: unknown) => ({ ...(f ?? {}), [key]: value }))}
+    form.update((f: Record<string, any>) => ({ ...f, [key]: value }))}
 </script>
 
 <form method="POST" use:enhance class="space-y-4">

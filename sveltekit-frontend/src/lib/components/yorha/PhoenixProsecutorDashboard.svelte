@@ -1,6 +1,7 @@
 <script lang="ts">
   import LegalHUD from '$lib/components/evidence-graph/LegalHUD.svelte';
-  import { WebGPUEvidenceGraphVisualization } from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization';
+  // WebGPUEvidenceGraphVisualization component file is missing, use placeholder
+  // import { WebGPUEvidenceGraphVisualization } from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization';
 // Migrated to $effect
   import ContradictionReveal from './ContradictionReveal.svelte';
   import EvidenceComparisonOverlay from './evidence/EvidenceComparisonOverlay.svelte';
@@ -345,7 +346,9 @@
       <div class="bg-slate-900/50 rounded-lg p-4 h-full">
         <h2 class="text-lg font-bold mb-4 text-cyan-400">🔗 Evidence Relationship Graph</h2>
         <div class="h-[calc(100%-3rem)]">
-          <WebGPUEvidenceGraphVisualization nodes={[]} edges={[]} />
+          <div class="flex items-center justify-center h-full text-slate-500">
+            <p>Evidence Graph Visualization (WebGPU)</p>
+          </div>
         </div>
       </div>
     </div>

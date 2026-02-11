@@ -6,10 +6,9 @@
   import { Checkbox } from "$lib/components/ui/checkbox";
   import X from 'lucide-svelte/icons/x';
   import { goto } from '$app/navigation';
-  import superForm from 'sveltekit-superforms';
+  import { superForm } from 'sveltekit-superforms';
   import { zod } from 'sveltekit-superforms/adapters';
   import { loginSchema } from '$lib/schemas/auth';
-  import { toastStore } from '$lib/stores/toast';
 
   interface Props {
     open?: boolean;
@@ -24,7 +23,7 @@
       validators: zod(loginSchema),
       onUpdate({ form: f }) {
         if (f.valid) {
-          toastStore.success('Signed in successfully!');
+          console.log('Signed in successfully!');
           onlogin?.();
           open = false;
           setTimeout(() => {

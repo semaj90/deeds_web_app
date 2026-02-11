@@ -2574,12 +2574,44 @@ docker build -f docker/Dockerfile.cuda --progress=plain -t legal-ai-gpu:latest .
 
 ---
 
-## 🎯 February 10, 2026 – Session 14: Schema Verification + Migration Safety
+## 🎯 February 11, 2026 – Session 15: P1 Rewrites + TypeScript Checking Strategy
 
 ### Current Status
-- **Errors**: 623 in 339 files (248 warnings)
-- **Down from**: 1,414+ errors
-- **Target**: <400 errors
+- **Errors**: 397 in 298 files (270 warnings)
+- **Down from**: 462 errors (start of session)
+- **Target**: <400 errors (**ACHIEVED**)
+
+### TypeScript Checking Strategy (`tsconfig.json`)
+
+**`src/lib/services/**` uses a blanket exclude** because 312 of 564 service files are corrupted (minified/broken). Removing the blanket exclude exposes 20K+ errors from these files.
+
+**Key insight: Clean services ARE still type-checked.** TypeScript's `exclude` only affects automatic file discovery. Files imported by other included files are always checked transitively. So:
+- `ai-service.ts`, `case-link.service.ts`, `ai-pipeline-client.ts`, `ollamaService.ts` etc. are fully type-checked when imported by routes/components
+- The blanket exclude only hides 312 corrupted files from discovery
+- Verified: clean services show 0 errors in svelte-check
+
+**DO NOT remove the blanket `src/lib/services/**` exclude** unless most corrupted files are cleaned first. The targeted-exclude approach was tested and results in 20K+ errors (143 files with errors, top offenders: `native-windows-service-manager.ts` 719 errors, `hierarchical-cache-index.ts` 669 errors, etc.)
+
+**Service file stats** (Feb 2026):
+- 564 total `.ts` files in `src/lib/services/`
+- 252 clean (well-formatted, no corruption)
+- 312 corrupted (303 minified + 9 switch syntax errors)
+- Clean files that are imported → type-checked transitively
+- Corrupted files → excluded from discovery
+
+**Clean service files (verified, imported and checked):**
+- `ai-service.ts` (597 lines) - AI pipeline client
+- `case-link.service.ts` (253 lines) - Case-statute linking
+- `ai-pipeline-client.ts` (457 lines) - AI service health
+- `ollamaService.ts` (202 lines) - Ollama integration
+- `adaptive-index-orchestrator.ts` (174 lines)
+- `agentShellMachine.ts` (165 lines)
+- `agentic-stream.ts` (253 lines)
+- `accessibility-service.ts` (372 lines)
+- `api-client.ts` (280 lines)
+- `chatService.ts` (202 lines)
+
+### Drizzle ORM 0.44 Migration Safety
 
 ### Drizzle ORM 0.44 Migration Safety
 
@@ -2608,26 +2640,25 @@ Drizzle's generator doesn't detect renames — it sees a missing table and a new
 
 ### TODO — Core Route Consolidation & API Development
 
-**P0: API Endpoints (planned, in development)**
-- [ ] Create `POST /api/citations/+server.ts` (insert into citations + statutes)
-- [ ] Create `POST /api/cases/[id]/laws/+server.ts` (link statute to case)
-- [ ] Create `POST /api/cases/[id]/citations/+server.ts` (link citation to case)
-- [ ] Create `case_statute_links` junction table via `drizzle-kit migrate`
-  - Schema: id, caseId, statuteId, linkType (enum), notes, createdBy, createdAt
-  - Link types: CHARGED_UNDER, CITED_IN, RELATED_TO, OVERRULED_BY, AFFIRMED_BY
-- [ ] Align `GET /api/cases` response shape (`data.data` vs `data.cases`)
+**P0: API Endpoints (COMPLETED)**
+- [x] `POST /api/citations/+server.ts` (insert into citations + statutes)
+- [x] `POST /api/cases/[id]/laws/+server.ts` (link statute to case)
+- [x] `POST /api/cases/[id]/citations/+server.ts` (link citation to case)
+- [x] `case_statute_links` junction table via schema + migration
+- [x] `GET /api/cases` response shape aligned (`data.data`)
 
-**P1: High-Impact File Rewrites (svelte:component corruption, 14 files)**
-- [ ] `EnhancedDocumentUploader.svelte` (17 corrupted tags)
-- [ ] `CitationManager.svelte` (10+ corruptions + diff markers)
-- [ ] `UserMenu.svelte` (minified + CSS corruption)
-- [ ] `AIServiceStatus.svelte` (4 corrupted tags)
-- [ ] 10 more files with 1-2 `<svelte, component` issues
+**P1: High-Impact File Rewrites (COMPLETED - 4/4 files, commit 35fe5b636b)**
+- [x] `EnhancedDocumentUploader.svelte` (209→923 lines, 17 corruptions fixed)
+- [x] `CitationManager.svelte` (353→1204 lines, 10+ corruptions + diff markers)
+- [x] `UserMenu.svelte` (183→573 lines, svelte:window + CSS)
+- [x] `AIServiceStatus.svelte` (109→357 lines, 4 corrupted tags)
+- [ ] ~10 more files with 1-2 `<svelte, component` issues
 
-**P2: Remaining Error Fixes (~470 errors)**
-- [ ] Missing module imports (~150)
-- [ ] Type mismatches in component props (~200)
-- [ ] Svelte template + CSS errors (~120)
+**P2: Remaining Error Fixes (~397 errors in 298 files)**
+- [ ] Missing module imports (~100)
+- [ ] Type mismatches in component props (~150)
+- [ ] Svelte template + CSS errors (~100)
+- [ ] Service file cleanup (312 corrupted, 252 clean)
 
 **P3: UX Enhancement (later)**
 - [ ] Loading skeletons, toast notifications, virtualized lists

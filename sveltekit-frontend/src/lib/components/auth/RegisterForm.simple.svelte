@@ -156,7 +156,7 @@
 						bind:value={$form.firstName}
 						disabled={$delayed}
 						required
-						class:border-red-500={$errors.firstName}
+						class={$errors.firstName ? 'border-red-500' : ''}
 					/>
 					{#if $errors.firstName}
 						<p class="text-sm text-red-500">{$errors.firstName}</p>

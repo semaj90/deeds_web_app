@@ -6,7 +6,7 @@
 // Type declarations
 declare global {
   interface Window {
-    __TELEMETRY__?: TelemetryEventBus;
+    __TELEMETRY__?: unknown;
     __GPU_MANAGER__?: {
       getAcceleration(): unknown;
     };

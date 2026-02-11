@@ -11,10 +11,12 @@
 		jurisdiction?: string;
 	}
 
- let { summary, caseId = null } = $props<{
- summary: CaseSummary;
- caseId?: string | null;
- }>();
+	interface Props {
+		summary: CaseSummary;
+		caseId?: string | null;
+	}
+
+	let { summary, caseId = null }: Props = $props();
 
  let isEditing = $state(false);
 	let editedText = $derived(summary.text);

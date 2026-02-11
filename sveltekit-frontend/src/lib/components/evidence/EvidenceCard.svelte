@@ -196,7 +196,7 @@
 			<div class="flex flex-wrap gap-2 mt-2">
 				{#if evidence?.metadata?.createdAt || evidence?.createdAt}
 					<span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
-						{new Date(evidence?.metadata?.createdAt ?? evidence?.createdAt ?? '').toLocaleDateString()}
+						{new Date(String(evidence?.metadata?.createdAt ?? evidence?.createdAt ?? '')).toLocaleDateString()}
 					</span>
 				{/if}
 				{#if fileSize > 0}
@@ -206,7 +206,7 @@
 				{/if}
 				{#if evidence?.metadata?.format}
 					<span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
-						{evidence.metadata.format.toUpperCase()}
+						{String(evidence.metadata.format).toUpperCase()}
 					</span>
 				{/if}
 			</div>

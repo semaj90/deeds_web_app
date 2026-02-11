@@ -113,8 +113,12 @@
     "**/*.*bak*",
     "**/*.corruption-backup",
     "**/*.replaced",
-    // Corrupted services directories (2000+ errors each)
-    "src/lib/services/**",
+    // Corrupted services: moved to _corrupted
+    // 9 clean services remain in src/lib/services/ and ARE included
+    "src/lib/services/_corrupted/**",
+    "src/lib/services/_archive/**",
+    "src/lib/services/error-analysis/**",
+    "src/lib/services/__tests__/**",
     "src/lib/optimization/**",
     "src/lib/orchestration/**",
     "src/lib/machines/**",

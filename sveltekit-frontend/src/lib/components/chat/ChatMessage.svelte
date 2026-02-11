@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ChatMessage } from '$lib/stores/chat.svelte';
+	import type { ChatMessage } from '$lib/types/chat';
 	import DOMPurify from 'dompurify';
 	import Bot from 'lucide-svelte/icons/bot';
 	import User from 'lucide-svelte/icons/user';
@@ -24,6 +24,7 @@
 				})
 			: ''
 	);
+	let meta = $derived(meta as Record<string, any> | undefined);
 </script>
 
 <div
@@ -57,21 +58,21 @@
 				{@html sanitizedContent}
 			</div>
 
-			{#if message.metadata}
+			{#if meta}
 				<div class="message-metadata">
-					{#if message.metadata.confidence}
+					{#if meta.confidence}
 						<span class="metadata-item">
-							Confidence: {Math.round(message.metadata.confidence * 100)}%
+							Confidence: {Math.round(meta.confidence * 100)}%
 						</span>
 					{/if}
-					{#if message.metadata.model}
+					{#if meta.model}
 						<span class="metadata-item">
-							Model: {message.metadata.model}
+							Model: {meta.model}
 						</span>
 					{/if}
-					{#if message.metadata.executionTime}
+					{#if meta.executionTime}
 						<span class="metadata-item">
-							{Math.round(message.metadata.executionTime)}ms
+							{Math.round(meta.executionTime)}ms
 						</span>
 					{/if}
 				</div>

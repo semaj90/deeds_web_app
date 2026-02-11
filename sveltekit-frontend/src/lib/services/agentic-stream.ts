@@ -1,15 +1,55 @@
 /**
- * AI Agentic Streaming with Ollama + TensorRT Fallback
+ * AI Agentic Streaming with Ollama (Windows Native) + TensorRT Fallback
  * Token-level streaming for real-time evidence analysis
  *
- * Stack: Ollama (gemma3-legal:latest) + TensorRT-LLM Triton Inference Server
+ * Primary: Host Ollama at localhost:11434 (Windows native, NOT Docker)
+ *   - gemma3:270m → text generation (working)
+ *   - embeddinggemma:latest → embeddings (working)
+ *   - gemma3-legal:latest → HTTP 400 for /api/generate (needs Modelfile fix)
+ *
+ * TODO: TRT-LLM Triton Inference Server integration
+ *   - Once gemma3-legal:latest Modelfile is rebuilt with generate support,
+ *     add TRT-LLM engine export and Triton model repository config
+ *   - Target: ONNX → TensorRT engine → Triton HTTP/gRPC serving
+ *   - See: docs/VITE_HMR_GO_OPTIMIZATION.md for GPU pipeline plan
+ *
+ * Stack: Ollama (gemma3:270m) + pgvector + Redis
  */
 
 import type { AIResponse, ChatMessage } from '$lib/types/evidence';
 
-// Environment configuration (Docker container endpoints)
+// ──────────────────────────────────────────────────────────────
+// Configuration — uses Windows native Ollama (not Docker)
+// ──────────────────────────────────────────────────────────────
+
+/** Centralized Ollama endpoint — Windows native service at localhost:11434 */
+export function getOllamaEndpoint(): string {
+  return (
+    process.env?.OLLAMA_URL ??
+    process.env?.OLLAMA_BASE_URL ??
+    'http://localhost:11434'
+  );
+}
+
+/** Working generation model (gemma3-legal returns 400 for /api/generate) */
+const GENERATION_MODEL = process.env?.AI_MODEL ?? 'gemma3:270m';
+
+/** Embedding model (768-dim vectors) */
+const EMBEDDING_MODEL = process.env?.EMBEDDING_MODEL ?? 'embeddinggemma:latest';
+
+/**
+ * TODO: TRT-LLM Triton Inference Server
+ * Once gemma3-legal:latest is rebuilt with proper generate support:
+ *   1. Export ONNX from Ollama: ollama export gemma3-legal:latest --format onnx
+ *   2. Convert ONNX → TensorRT engine: trtllm-build --model_dir ./onnx_out --output_dir ./trt_engines
+ *   3. Deploy to Triton: model_repository/gemma3-legal/1/model.plan
+ *   4. Serve via: http://localhost:8000/v2/models/gemma3-legal/infer
+ */
 const TENSORRT_BASE = process.env?.TENSORRT_BASE_URL ?? 'http://localhost:8000';
-const MODEL_NAME = process.env?.AI_MODEL ?? 'gemma3-legal:latest';
+
+// ──────────────────────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────────────────────
 
 type StreamCallback = (token: string, fullText: string) => void | Promise<void>;
 
@@ -26,48 +66,71 @@ interface TensorRTRequest {
   outputs: Array<{ name: string }>;
 }
 
+// ──────────────────────────────────────────────────────────────
+// Main Streaming API
+// ──────────────────────────────────────────────────────────────
+
 /**
- * Main streaming function with Ollama primary + TensorRT fallback
+ * Main streaming function — Ollama primary, TRT-LLM fallback (future)
  */
 export async function runAIAgentStream(
   prompt: string,
   onToken: (token: string, fullText: string) => Promise<void>,
   options?: { systemPrompt?: string; temperature?: number; maxTokens?: number }
 ): Promise<string> {
-  console.log(`[AI Agent Stream] Running for prompt: ${prompt}`);
-  console.log('Options:', options);
+  try {
+    const result = await streamFromOllama(prompt, onToken, {
+      model: GENERATION_MODEL,
+      ...options,
+    });
+    return result.text;
+  } catch (ollamaErr) {
+    console.warn('[AI Agent] Ollama streaming failed, falling back:', ollamaErr);
 
-  // Simulate streaming
-  const simulatedText = 'This is a simulated analysis summary. #tag1 #tag2';
-  let fullText = '';
+    // TODO: Enable TRT-LLM fallback once Triton is deployed
+    // try {
+    //   const result = await streamFromTensorRT(prompt, onToken, options);
+    //   return result.text;
+    // } catch (trtErr) {
+    //   console.error('[AI Agent] TRT-LLM fallback also failed:', trtErr);
+    // }
 
-  for (const char of simulatedText) {
-    fullText += char;
-    await onToken(char, fullText);
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    // Simulated fallback for dev
+    const simulatedText = `[Ollama unavailable] Analysis pending for: ${prompt.slice(0, 50)}...`;
+    let fullText = '';
+    for (const char of simulatedText) {
+      fullText += char;
+      await onToken(char, fullText);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    return simulatedText;
   }
-
-  return simulatedText;
 }
 
+// ──────────────────────────────────────────────────────────────
+// Ollama Streaming (Windows Native @ localhost:11434)
+// ──────────────────────────────────────────────────────────────
+
 /**
- * Ollama streaming via HTTP (Docker container at localhost:11434)
+ * Ollama streaming via HTTP — uses getOllamaEndpoint() for Windows native service
  */
-async function streamFromOllama(
+export async function streamFromOllama(
   prompt: string,
   onChunk: StreamCallback,
   options?: { model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }
 ): Promise<AIResponse> {
   const startTime = Date.now();
+  const endpoint = getOllamaEndpoint();
+  const model = options?.model ?? GENERATION_MODEL;
   let fullText = '';
   let tokensGenerated = 0;
 
   return new Promise((resolve, reject) => {
-    fetch(`${getOllamaEndpoint()}/api/generate`, {
+    fetch(`${endpoint}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: options?.model ?? MODEL_NAME,
+        model,
         prompt: options?.systemPrompt
           ? `${options.systemPrompt}\n\nUser: ${prompt}`
           : prompt,
@@ -80,12 +143,10 @@ async function streamFromOllama(
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`Ollama HTTP error: ${response.status}`);
+          throw new Error(`Ollama HTTP ${response.status} at ${endpoint}/api/generate (model: ${model})`);
         }
         const reader = response.body?.getReader();
-        if (!reader) {
-          throw new Error('No response body reader');
-        }
+        if (!reader) throw new Error('No response body reader');
         const decoder = new TextDecoder();
 
         const processChunk = async (): Promise<void> => {
@@ -94,7 +155,7 @@ async function streamFromOllama(
             resolve({
               text: fullText,
               source: 'ollama',
-              model: options?.model ?? MODEL_NAME,
+              model,
               tokensUsed: tokensGenerated,
               responseTimeMs: Date.now() - startTime,
             });
@@ -111,8 +172,8 @@ async function streamFromOllama(
                 tokensGenerated++;
                 await onChunk(parsed.response, fullText);
               }
-            } catch (error) {
-              console.error('[AI] Parse error:', error);
+            } catch {
+              // Skip malformed JSON chunks
             }
           }
           return processChunk();
@@ -124,8 +185,17 @@ async function streamFromOllama(
   });
 }
 
+// ──────────────────────────────────────────────────────────────
+// TRT-LLM Triton Inference (Future — once gemma3-legal plan exists)
+// ──────────────────────────────────────────────────────────────
+
 /**
- * TensorRT streaming via Triton Inference Server (Docker container)
+ * TODO: TRT-LLM streaming via Triton Inference Server
+ * This is a stub — will be wired up once:
+ *   1. gemma3-legal:latest Modelfile is fixed for /api/generate
+ *   2. ONNX export is verified
+ *   3. TensorRT engine is built and deployed to Triton
+ *   4. Triton model repository is configured at TENSORRT_BASE
  */
 async function streamFromTensorRT(
   prompt: string,
@@ -160,14 +230,11 @@ async function streamFromTensorRT(
   const result = await response.json();
   const fullText = result.outputs[0]?.data?.[0] ?? '';
 
-  // Simulate token-by-token streaming for UI consistency
+  // Simulate token-by-token delivery for UI consistency
   const tokens = fullText.split(' ');
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i] + (i < tokens.length - 1 ? ' ' : '');
-    await onChunk(
-      token,
-      tokens.slice(0, i + 1).join(' ') + (i < tokens.length - 1 ? ' ' : '')
-    );
+    await onChunk(token, tokens.slice(0, i + 1).join(' '));
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
 
@@ -179,6 +246,10 @@ async function streamFromTensorRT(
     responseTimeMs: Date.now() - startTime,
   };
 }
+
+// ──────────────────────────────────────────────────────────────
+// Agentic Tool Execution
+// ──────────────────────────────────────────────────────────────
 
 /**
  * AI tool execution (for agentic workflows)
@@ -203,7 +274,7 @@ export async function executeAITool(
 // Stub: Web search tool
 async function webSearch(query: string): Promise<{ results: string[] }> {
   console.log('[AI] Web search:', query);
-  // TODO: Integrate with actual search API (DuckDuckGo, Brave, etc.)
+  // TODO: Integrate with search API (DuckDuckGo, Brave, etc.)
   return { results: [`Search result for: ${query}`] };
 }
 
@@ -223,21 +294,30 @@ async function extractEntities(text: string): Promise<{ entities: string[] }> {
   return { entities: [...new Set(entities)] };
 }
 
+// ──────────────────────────────────────────────────────────────
+// Embeddings (embeddinggemma:latest @ localhost:11434)
+// ──────────────────────────────────────────────────────────────
+
 /**
- * Generate embeddings for vector search via Ollama
+ * Generate embeddings via Ollama (embeddinggemma:latest, 768-dim)
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
+  const endpoint = getOllamaEndpoint();
+  const response = await fetch(`${endpoint}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'nomic-embed-text', prompt: text }),
+    body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: text }),
   });
   if (!response.ok) {
-    throw new Error(`Embedding generation failed: ${response.status}`);
+    throw new Error(`Embedding failed: ${response.status} at ${endpoint}`);
   }
   const result = await response.json();
   return result.embedding as number[];
 }
+
+// ──────────────────────────────────────────────────────────────
+// Chat Completion (non-streaming)
+// ──────────────────────────────────────────────────────────────
 
 /**
  * Chat completion (non-streaming) via Ollama
@@ -247,11 +327,14 @@ export async function chatCompletion(
   options?: { model?: string; temperature?: number }
 ): Promise<AIResponse> {
   const startTime = Date.now();
-  const response = await fetch(`${getOllamaEndpoint()}/api/chat`, {
+  const endpoint = getOllamaEndpoint();
+  const model = options?.model ?? GENERATION_MODEL;
+
+  const response = await fetch(`${endpoint}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: options?.model ?? MODEL_NAME,
+      model,
       messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
       stream: false,
       options: { temperature: options?.temperature ?? 0.7 },
@@ -259,28 +342,16 @@ export async function chatCompletion(
   });
 
   if (!response.ok) {
-    throw new Error(`Chat completion failed: ${response.status}`);
+    throw new Error(`Chat completion failed: ${response.status} at ${endpoint}`);
   }
   const result = await response.json();
   return {
     text: result.message.content,
     source: 'ollama',
-    model: options?.model ?? MODEL_NAME,
+    model,
     responseTimeMs: Date.now() - startTime,
   };
 }
 
-/**
- * Centralized Ollama endpoint helper
- * Resolves Docker container or localhost endpoint
- */
-export function getOllamaEndpoint(): string {
-  return (
-    process.env?.OLLAMA_URL ??
-    process.env?.OLLAMA_BASE_URL ??
-    'http://localhost:11434'
-  );
-}
-
-// Export streaming functions
-export { streamFromOllama, streamFromTensorRT };
+// Export for use by other services
+export { streamFromTensorRT, GENERATION_MODEL, EMBEDDING_MODEL };

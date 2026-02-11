@@ -4,8 +4,7 @@
 -->
 <script lang="ts">
   import { chrROMCacheReader } from '$lib/services/chr-rom-cache-reader.js';
-  import { chrROMPatternOptimizer } from '$lib/services/chr-rom-pattern-optimizer.js';
-  import type { CHRROMPattern } from '$lib/services/chr-rom-precomputation.js';
+  import type { CHRROMPattern } from '$lib/services/chr-rom-pattern-optimizer.js';
   import { drizzleCHRROMBridge } from '$lib/services/drizzle-chr-rom-bridge.js';
   import '$lib/styles/chr-rom-rendering.css';
   import { slide } from 'svelte/transition';
@@ -40,20 +39,6 @@
         // Initialize the Drizzle bridge
         await drizzleCHRROMBridge.initialize();
 
-        // If no documents provided, get from Drizzle
-        if (documents.length === 0) {
-          const docIds = drizzleCHRROMBridge.getAllDocumentIds();
-          documents = docIds.map(id => {
-            const doc = drizzleCHRROMBridge.getDocument(id);
-            return {
-              id,
-              title: doc?.title ?? `Document ${id}`,
-              type: doc?.document_type ?? 'unknown',
-              status: doc?.processing_status ?? 'pending'
-            };
-          });
-        }
-
         // Prefetch patterns for all visible documents
         await prefetchAllPatterns();
 
@@ -78,39 +63,40 @@
 
     const startTime = performance.now();
 
-    // Use batch pattern retrieval for optimal performance
-    const requests = docIds.flatMap((docId: string) =>
-      patternTypes.map(patternType => ({ docId, patternType }))
-    );
-
+    // Retrieve patterns individually using available API
     try {
-      const batchResults = await chrROMCacheReader.getBatchPatterns(requests);
-
-      for (const result of batchResults) {
-        const typedResult = result as {
-          docId: string;
-	patternType: string;
-          pattern: CHRROMPattern | null;
-          source: string;
-	latency: number;
-        };
-
-        if (!documentPatterns.has(typedResult.docId)) {
-          documentPatterns.set(typedResult.docId, new Map());
+      for (const docId of docIds) {
+        if (!documentPatterns.has(docId)) {
+          documentPatterns.set(docId, new Map());
         }
-
-        documentPatterns.get(typedResult.docId)!.set(typedResult.patternType, typedResult.pattern);
-
-        // Track performance
-        totalRequests++;
-        if (typedResult.source === 'cache') {
-          cacheHits++;
+        for (const patternType of patternTypes) {
+          const result = await chrROMCacheReader.getPattern(docId, patternType);
+          totalRequests++;
+          if (result.hit && result.pattern) {
+            const pattern: CHRROMPattern = {
+              type: (result.pattern.type as CHRROMPattern['type']) ?? 'default',
+              size: 'md',
+              data: result.pattern.data,
+              metadata: {
+                confidence: 0,
+                timestamp: Date.now(),
+                version: '1.0',
+                ...(result.pattern.metadata ?? {})
+              }
+            };
+            documentPatterns.get(docId)!.set(patternType, pattern);
+          } else {
+            documentPatterns.get(docId)!.set(patternType, null);
+          }
+          if (result.source === 'cache') {
+            cacheHits++;
+          }
+          averageLatency = (averageLatency * (totalRequests - 1) + result.latencyMs) / totalRequests;
         }
-        averageLatency = (averageLatency * (totalRequests - 1) + typedResult.latency) / totalRequests;
       }
 
       const totalTime = performance.now() - startTime;
-      console.log(`✅ Prefetch completed in ${totalTime.toFixed(1)}ms (${batchResults.length} patterns)`);
+      console.log(`Prefetch completed in ${totalTime.toFixed(1)}ms`);
     } catch (error) {
       console.error('Prefetch failed:', error);
     }
@@ -121,9 +107,13 @@
    */
   function startPerformanceMonitoring(): void {
     setInterval(() => {
-      performanceStats = chrROMCacheReader.getPerformanceStats();
-    },
-	5000);
+      performanceStats = {
+        hitRate: totalRequests > 0 ? cacheHits / totalRequests : 0,
+        averageLatency,
+        totalRequests,
+        performance: averageLatency < 5 ? 'excellent' : averageLatency < 20 ? 'good' : 'slow'
+      };
+    }, 5000);
   }
 
   function getPattern(docId: string, patternType: string): CHRROMPattern | null {
@@ -144,7 +134,9 @@
   function getPatternRenderingClass(docId: string, patternType: string): string {
     const pattern = getPattern(docId, patternType);
     if (!pattern) return 'chr-rom-pattern chr-rom-auto';
-    return 'chr-rom-pattern ' + chrROMPatternOptimizer.getOptimizedClass(pattern);
+    // Generate optimized CSS class based on pattern metadata
+    const hint = pattern.metadata?.renderingHint ?? 'auto';
+    return `chr-rom-pattern chr-rom-${hint}`;
   }
 
   async function handleDocumentHover(docId: string): Promise<void> {
@@ -154,14 +146,28 @@
     const hoverPatterns = ['entity_heatmap', 'similarity_graph'];
 
     for (const patternType of hoverPatterns) {
-      const result = await chrROMCacheReader.get(docId, patternType);
+      const result = await chrROMCacheReader.getPattern(docId, patternType);
 
       if (!documentPatterns.has(docId)) {
         documentPatterns.set(docId, new Map());
       }
 
-      const typedResult = result as { pattern: CHRROMPattern | null; latency: number };
-      documentPatterns.get(docId)!.set(patternType, typedResult.pattern);
+      if (result.hit && result.pattern) {
+        const pattern: CHRROMPattern = {
+          type: (result.pattern.type as CHRROMPattern['type']) ?? 'default',
+          size: 'md',
+          data: result.pattern.data,
+          metadata: {
+            confidence: 0,
+            timestamp: Date.now(),
+            version: '1.0',
+            ...(result.pattern.metadata ?? {})
+          }
+        };
+        documentPatterns.get(docId)!.set(patternType, pattern);
+      } else {
+        documentPatterns.get(docId)!.set(patternType, null);
+      }
     }
   }
 

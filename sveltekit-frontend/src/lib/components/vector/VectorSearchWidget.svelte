@@ -1,6 +1,13 @@
 <script lang="ts">
 import Badge from "$lib/components/ui/Badge.svelte";
-import { vectorIntelligenceService, type VectorSearchResult } from '$lib/services/vector-intelligence-service.js';
+import { vectorIntelligenceService, type VectorSearchResult as BaseSearchResult } from '$lib/services/vector-intelligence-service.js';
+
+// Extended type for UI-specific search result fields
+interface VectorSearchResult extends BaseSearchResult {
+  similarity?: number;
+  highlights?: string[];
+  relevanceScore?: number;
+}
 import Calendar from 'lucide-svelte/icons/calendar';
 import FileText from 'lucide-svelte/icons/file-text';
 import Loader2 from 'lucide-svelte/icons/loader-2';
@@ -50,14 +57,11 @@ async function performSearch(): Promise<void> {
   if (!searchQuery.trim() || isSearching) return;
   isSearching = true;
   try {
-    const results = await vectorIntelligenceService.semanticSearch({
-      query: searchQuery,
+    const results = await vectorIntelligenceService.search(searchQuery, {
       threshold,
-      limit: maxResults,
-      includeMetadata: true,
-      contextFilter
+      limit: maxResults
     });
-    searchResults = results;
+    searchResults = results as VectorSearchResult[];
     isOpen = results.length > 0;
   } catch (error) {
     console.error('Vector search failed:', error);

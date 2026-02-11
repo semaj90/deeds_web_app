@@ -4,7 +4,15 @@
  import { Dialog, DialogContent,
  DialogDescription, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
  import { Textarea } from '$lib/components/ui/textarea';
- import type { EvidenceNode } from '$lib/server/db/schema-postgres';
+ // Local EvidenceNode type (schema exports YoRHaEvidenceNode which has a different shape)
+ interface EvidenceNode {
+   id: string;
+   title: string;
+   type: string;
+   description?: string;
+   confidence?: number;
+   metadata?: Record<string, unknown>;
+ }
 
  type Props = {
   node: EvidenceNode;
@@ -14,9 +22,9 @@
 
  let { node, open = $bindable(false), onupdate }: Props = $props();
 
- let analysis = '';
- let isAnalyzing = false;
- let suggestions: string[] = [];
+ let analysis = $state('');
+ let isAnalyzing = $state(false);
+ let suggestions = $state<string[]>([]);
 async function analyzeEvidence() {
  isAnalyzing = true;
  try {

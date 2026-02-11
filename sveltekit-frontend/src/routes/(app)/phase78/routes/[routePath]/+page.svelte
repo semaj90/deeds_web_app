@@ -1,18 +1,18 @@
 <script lang="ts">
 	import ErrorEventsList from '$lib/components/phase78/ErrorEventsList.svelte';
 	import SuggestionsList from '$lib/components/phase78/SuggestionsList.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	let { data } = $props();
 
 	let routePath = $derived(data.routePath);
 
-	let health: any = null;
-	let errors: any[] = [];
-	let suggestions: any[] = [];
-	let isLoading = false;
-	let tab = 'errors';
+	let health = $state<any>(null);
+	let errors = $state<any[]>([]);
+	let suggestions = $state<any[]>([]);
+	let isLoading = $state(false);
+	let tab = $state('errors');
+	let error = $state<string | null>(null);
 
 	async function loadData() {
 		isLoading = true;

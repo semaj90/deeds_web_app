@@ -7,8 +7,19 @@ Compact AI recommendations component for sidebar/dashboard use
   // Migrated to $effect
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import Button from '$lib/components/ui/Button.svelte';
-  import type { IntelligenceRecommendation } from '$lib/services/vector-intelligence-service.js';
+  import type { IntelligenceRecommendation as BaseRecommendation } from '$lib/services/vector-intelligence-service.js';
   import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
+
+  // Extended type for UI-specific recommendation fields
+  interface IntelligenceRecommendation extends BaseRecommendation {
+    priority: string;
+    category: string;
+    confidence: number;
+    estimatedImpact?: {
+      timeToComplete: number;
+      successProbability: number;
+    };
+  }
   import RefreshCw from 'lucide-svelte/icons/refresh-cw';
   import FileText from 'lucide-svelte/icons/file-text';
   import Clock from 'lucide-svelte/icons/clock';
@@ -41,7 +52,7 @@ Compact AI recommendations component for sidebar/dashboard use
   let recommendations = $state<IntelligenceRecommendation[]>([]);
   let isLoading = $state<boolean>(false);
   let lastUpdated = $state<Date | null>(null);
-  let refreshTimer = $state<number | null>(null);
+  let refreshTimer = $state<ReturnType<typeof setInterval> | null>(null);
 
   $effect(() => {
     loadRecommendations();
@@ -58,33 +69,14 @@ Compact AI recommendations component for sidebar/dashboard use
     if (isLoading) return
     isLoading = true
     try {
-      const result = await vectorIntelligenceService.generateRecommendations({
-        context,
-        userProfile: {
-	role: userRole,
-          experience: 'senior',
-          specialization: ['legal-analysis', 'case-management']
-        },
-	currentCase: currentCaseId
-          ? { id: currentCaseId,
-              type: 'general',
-              priority: 'medium',
-              status: 'active'
-            }
-           : undefined,
-        preferences: {
-preferredActions: ['research', 'analysis', 'documentation'],
-          workflowStyle: 'systematic'
-        }
-      });
+      const result = await vectorIntelligenceService.getRecommendations(
+        currentCaseId ?? context,
+        maxRecommendations
+      ) as unknown as IntelligenceRecommendation[];
 
-      // Safely handle result that may be an array or wrapped: object
+      // Safely handle result that may be an array or wrapped object
       if (Array.isArray(result)) {
         recommendations = result.slice(0, maxRecommendations);
-      } else if (result && Array.isArray((result as any).items)) {
-        recommendations = (result as any).items.slice(0, maxRecommendations);
-      } else if ((result as any).slice) {
-        recommendations = (result as any).slice(0, maxRecommendations);
       } else {
         recommendations = [];
       }

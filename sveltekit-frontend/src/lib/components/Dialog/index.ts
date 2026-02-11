@@ -1,3 +1,3 @@
-export { default as Dialog } from './Dialog.svelte';
+export { default as Dialog } from '../ui/Dialog.svelte';
 
 

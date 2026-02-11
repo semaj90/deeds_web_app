@@ -581,7 +581,7 @@ Provide a complete, working fix with explanation.`;
 
     // --- Helpers: safe extraction and protocol normalization ---
     private normalizeProtocol(protocol?: GPUTaskConfig['protocol']): 'http' | 'grpc' | 'quic' {
-        if (!protocol || protocol === 'auto') return 'http';
+        if (!protocol || protocol === 'ws') return 'http';
         if (protocol === 'grpc') return 'grpc';
         if (protocol === 'quic') return 'quic';
         return 'http';

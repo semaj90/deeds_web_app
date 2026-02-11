@@ -112,8 +112,9 @@ function generateRecommendations() {
 				<div class="recommendation-card priority-{recommendation.priority}">
 					<div class="card-header">
 						<div class="type-indicator">
-							{@const Icon = getTypeIcon(recommendation.type)}
-							<Icon class="type-icon {getTypeColor(recommendation.type)}" />
+							<span class="type-icon {getTypeColor(recommendation.type)}">
+								{#if recommendation.type === 'evidence'}📁{:else if recommendation.type === 'case'}⚖️{:else if recommendation.type === 'witness'}👤{:else}📄{/if}
+							</span>
 							<span class="type-label capitalize">{recommendation.type}</span>
 						</div>
 

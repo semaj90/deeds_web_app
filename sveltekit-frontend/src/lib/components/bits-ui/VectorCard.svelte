@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { Document } from '$lib/types';
   
-  const { r } = $props<{ r, any }>();
+  interface Props { r: any; onclick?: () => void; }
+  let { r, onclick }: Props = $props();
 </script>
 
-<div class="vector-card">
+<div class="vector-card" role="button" tabindex="0" {onclick} onkeydown={(e) => e.key === 'Enter' && onclick?.()}>
   <div class="title">{r?.meta?.title ?? r?.id ?? 'Document'}</div>
   <div class="snippet">{r?.meta?.snippet ?? r?.text?.slice(0, 200)}</div>
   <div class="meta">Score: {r?.score ?? r?.distance ?? 'n/a'}</div>

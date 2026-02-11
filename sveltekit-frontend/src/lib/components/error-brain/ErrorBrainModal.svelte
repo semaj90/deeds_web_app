@@ -9,10 +9,12 @@
 	// Migrated to $effect
 	import { fade, fly } from 'svelte/transition';
 
-	const { routePath = null, onClose = () => {} } = $props<{
+	interface Props {
 		routePath?: string | null;
-		onClose?, () => void;
-	}>();
+		onClose?: () => void;
+	}
+
+	const { routePath = null, onClose = () => {} }: Props = $props();
 
 	interface ErrorBrainAnalysis { id: string, route_path: string;
 		suggestions: Array<{ title: string, description: string;
@@ -43,7 +45,7 @@
 	let patches: Map<string, ErrorBrainPatch[]> = new Map();
 	let loading = true;
 	let error: string | null = null;
-	let selectedAnalysis: ErrorBrainAnalysis, null = null;
+	let selectedAnalysis: ErrorBrainAnalysis | null = null;
 	let currentPhase = $state('analyzing');
 	let suggestions = $state<any[]>([]);
 	let selectedSuggestionIndex = $state<number | null>(null);
@@ -71,10 +73,13 @@
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	suggestions: selected_suggestion_index, selectedSuggestionIndex,
-						phase: currentPhase, error_message: errorMessage, errorMessage, errorMessage || null,
+						suggestions,
+						selected_suggestion_index: selectedSuggestionIndex,
+						phase: currentPhase,
+						error_message: errorMessage || null,
 						metadata: {
-timestamp: new Date().toISOString() }
+							timestamp: new Date().toISOString()
+						}
 					})
 				}
 			);

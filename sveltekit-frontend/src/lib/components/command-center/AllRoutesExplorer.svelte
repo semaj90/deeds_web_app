@@ -7,7 +7,7 @@
 
 	// Migrated to $effect
 
-	interface RouteNode { path: string, file: string;
+	interface RouteNode { path: string; file: string;
 		type: 'page' | 'layout' | 'server' | 'error';
 		children?: RouteNode[];
 		hasPageTs?: boolean;
@@ -101,7 +101,7 @@
 		<div class="route-tree">
 			{#each routes as route}
 				{#if filterRoutes(route, searchQuery)}
-					<RouteTreeNode {route} {expandedPaths} {toggleExpand} {openFile} {searchQuery} />
+					{@render RouteTreeNode({ route, expandedPaths, toggleExpand, openFile, searchQuery })}
 				{/if}
 			{/each}
 		</div>
@@ -151,7 +151,7 @@ route: RouteNode, expandedPaths: Set<string>, toggleExpand: (path: string) => vo
 			<div class="route-children">
 			{#each props.route.children as child}
 				{#if filterRoutes(child, props.searchQuery)}
-					{@render RouteTreeNode({ ...props, route: child, child })}
+					{@render RouteTreeNode({ ...props, route: child })}
 					{/if}
 				{/each}
 			</div>

@@ -1,7 +1,7 @@
 <script lang="ts">
+ import { fade } from 'svelte/transition';
  import type { ProcessingEvent } from '$lib/services/types';
  import { uploadEvidence, validateFile } from '$lib/services/uploadEvidenceService';
- import { uploadActions, uploadStore } from '$lib/stores/uploadStore';
 
  interface Props {
  caseId: string;
@@ -10,12 +10,13 @@
  onSuccess?: (evidenceId: string, jobId: string) => void;
  }
 
- let { caseId, isOpen, onClose, onSuccess } = $props<Props>();
+ let { caseId, isOpen, onClose, onSuccess }: Props = $props();
 
  let isDragging = $state(false);
  let selectedFile: File | null = $state(null);
  let isUploading = $state(false);
  let uploadError: string | null = $state(null);
+ let uploadProgress = $state(0);
 
  const handleDragOver = (e: DragEvent) => {
  e.preventDefault();
@@ -63,28 +64,21 @@
  uploadError = null;
 
  try {
- uploadActions.startUpload(
- '',
- '',
- selectedFile.name,
- selectedFile.size
- );
+ uploadProgress = 0;
 
  const result = await uploadEvidence(
  caseId,
  selectedFile,
- (progress) => {
- uploadActions.updateUploadProgress(progress);
+ (progress: number) => {
+ uploadProgress = progress;
  },
-	(event: ProcessingEvent) => {
- uploadActions.updateProcessingEvent(event);
+	(_event: ProcessingEvent) => {
+ // Processing event received
  },
-	(error) => {
- uploadActions.setError(error.message);
+	(error: Error) => {
+ uploadError = error.message;
  }
  );
-
- uploadActions.startProcessing(result.jobId);
 
  if (onSuccess) {
  onSuccess(result.evidenceId, result.jobId);
@@ -93,12 +87,11 @@
  // Close modal after successful upload
  setTimeout(() => {
  onClose();
- uploadActions.reset();
+ uploadProgress = 0;
  },
 	1000);
  } catch (error) {
  uploadError = error instanceof Error ? error.message : 'Upload failed';
- uploadActions.setError(uploadError);
  } finally {
  isUploading = false;
  }
@@ -152,12 +145,12 @@
  </div>
  </div>
 
- {#if $uploadStore.uploadProgress > 0 && $uploadStore.uploadProgress < 100}
+ {#if uploadProgress > 0 && uploadProgress < 100}
  <div class="progress-container">
  <div class="progress-bar">
- <div class="progress-fill" style="width: {$uploadStore.uploadProgress}%"></div>
+ <div class="progress-fill" style="width: {uploadProgress}%"></div>
  </div>
- <p class="progress-text">{$uploadStore.uploadProgress}% uploaded</p>
+ <p class="progress-text">{uploadProgress}% uploaded</p>
  </div>
  {/if}
 

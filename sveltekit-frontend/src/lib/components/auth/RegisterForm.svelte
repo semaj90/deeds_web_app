@@ -406,7 +406,7 @@ email: formData.get('email') as string,
       <!-- Security Options -->
       <div class="space-y-3">
         <label class="flex items-center space-x-2">
-          <Checkbox id="enableTwoFactor" name="enableTwoFactor" bind:checked={$form.enableTwoFactor} disabled={isLoading} />
+          <Checkbox id="enableTwoFactor" name="enableTwoFactor" bind:checked={$form.enableTwoFactor} disabled={isLoading} class="" />
           <span class="text-sm">Enable two-factor authentication (recommended for legal professionals)</span>
         </label>
       </div>
@@ -414,12 +414,12 @@ email: formData.get('email') as string,
       <!-- Terms and Privacy -->
       <div class="space-y-3">
         <label class="flex items-center space-x-2">
-          <Checkbox id="agreeToTerms" name="agreeToTerms" bind:checked={$form.agreeToTerms} disabled={isLoading} />
+          <Checkbox id="agreeToTerms" name="agreeToTerms" bind:checked={$form.agreeToTerms} disabled={isLoading} class="" />
           <span class="text-sm">I agree to the <a href="/legal/terms" class="text-blue-600 hover:underline">Terms of Service</a></span>
         </label>
 
         <label class="flex items-center space-x-2">
-          <Checkbox id="agreeToPrivacy" name="agreeToPrivacy" bind:checked={$form.agreeToPrivacy} disabled={isLoading} />
+          <Checkbox id="agreeToPrivacy" name="agreeToPrivacy" bind:checked={$form.agreeToPrivacy} disabled={isLoading} class="" />
           <span class="text-sm">I agree to the <a href="/legal/privacy" class="text-blue-600 hover:underline">Privacy Policy</a></span>
         </label>
       </div>

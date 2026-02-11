@@ -4,6 +4,7 @@ import { createRequire } from 'module';
 import path from 'path';
 import UnoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
+import { goHMRBridge, goModuleGraph } from './vite-plugins/go-hmr-bridge';
 // import { bitsUiIntegrityPlugin } from './scripts/vite-plugin-bits-ui-integrity.mjs';
 
 const require = createRequire(import.meta.url);
@@ -108,6 +109,8 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       stripDashedDefineKeys,
+      goHMRBridge(),
+      goModuleGraph(),
       ENABLE_CJS_RESOLVER_PATCH && esbuildCommonJsResolverPatch,
       sveltekit({
         compilerOptions: {

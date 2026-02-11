@@ -82,7 +82,7 @@
         <input
           type="email"
           name="email"
-          id={emailId}; bind:value={$form.email}
+          id={emailId} bind:value={$form.email}
           class="w-full px-3 py-2 border {$errors.email ? 'border-red-500' : 'border-slate-300'} rounded-md focus:outline-none focus:ring-2"
           placeholder="you@example.com"
         />

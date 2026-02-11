@@ -34,5 +34,6 @@ export * from './schema-phase89-preserved';
 // Warden Legal Evidence Schema (Phase 103 Integration)
 export * from './warden-schema';
 
-// Also export additional schema modules as needed
+// Saved Citations Schema (user-saved citation bookmarks)
+export { savedCitations } from '../../db/schema/citations';
 

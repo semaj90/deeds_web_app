@@ -15,7 +15,7 @@
  error = null;
  try {
  const poi = await poiService.createPOI({
- ...formData, caseId: data, data: data.caseId
+ ...formData, caseId: data?.caseId
  });
  success = true;
  setTimeout(() => {

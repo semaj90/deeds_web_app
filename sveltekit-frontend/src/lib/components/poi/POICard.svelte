@@ -2,7 +2,7 @@
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
 	import { Badge } from '$lib/components/ui/badge';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index.js';
 	import Camera from 'lucide-svelte/icons/camera';
 	import Edit from 'lucide-svelte/icons/edit';
 	import Eye from 'lucide-svelte/icons/eye';

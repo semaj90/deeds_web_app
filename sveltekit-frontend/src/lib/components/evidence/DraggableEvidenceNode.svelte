@@ -73,7 +73,7 @@
 
   let IconComponent = $derived(iconMap[evidence.type] || FileText);
 
-  let confidenceColor = $derived(() => {
+  let confidenceColor = $derived.by(() => {
     const confidence = evidence.metadata?.confidence ?? 0;
     if (confidence > 0.8) return 'text-green-600';
     if (confidence > 0.6) return 'text-yellow-600';
@@ -180,7 +180,7 @@ evidenceId: evidence.id,
         const droppedEvidence = JSON.parse(droppedData);
         if (droppedEvidence.id !== evidence.id) {
           onConnect?.(droppedEvidence.id, evidence.id);
-          showSuccess(`Connected ${droppedEvidence.title} to ${evidence.title}`);
+          toastStore.success(`Connected ${droppedEvidence.title} to ${evidence.title}`);
         }
       } catch (error) {
         console.error('Failed to create connection', error);
@@ -246,7 +246,7 @@ evidenceId: evidence.id,
       <div class="flex items-center gap-1">
         {#if evidence.metadata?.confidence}
           <div
-            class="w-2 h-2 rounded-full {confidenceColor()}"
+            class="w-2 h-2 rounded-full {confidenceColor}"
             title="Confidence: {Math.round((evidence.metadata.confidence || 0) * 100)}%"
           ></div>
         {/if}

@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/public';
 import { DEFAULT_OLLAMA } from '$lib/services/get-ollama-endpoint';
 import type { Redis } from 'ioredis';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+
 
 // NOTE: ioredis is server-side only
 // Lazy-load on demand and skip in browser

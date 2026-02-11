@@ -1,7 +1,6 @@
 <!-- Feedback Analytics Dashboard for Legal AI Platform
 Provides comprehensive insights into user feedback and system performance -->
 <script lang="ts">
-import type { User } from '$lib/types';
 // Svelte 5 runes are auto-imported
 import { fade, fly } from 'svelte/transition';
 import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
@@ -206,7 +205,7 @@ function getStarRating(rating: number): string {
           disabled={refreshing}
           class="action-button refresh-button"
         >
-          <RefreshCw class="w-4" class:animate-spin={refreshing} />
+          <RefreshCw class="w-4 {refreshing ? 'animate-spin' : ''}" />
           {refreshing ? 'Refreshing...' : 'Refresh'}
         </button>
 
@@ -252,7 +251,13 @@ function getStarRating(rating: number): string {
               {dashboardData.overview?.totalRatings?.toLocaleString() ?? 0}
             </div>
             <div class="metric-trend {getTrendColor(dashboardData.overview?.trendDirection)}">
-              <svelte:component this={getTrendIcon(dashboardData.overview?.trendDirection)} class="w-4" />
+              {#if dashboardData.overview?.trendDirection === 'up'}
+                <ArrowUpRight class="w-4" />
+              {:else if dashboardData.overview?.trendDirection === 'down'}
+                <ArrowDownRight class="w-4" />
+              {:else}
+                <TrendingUp class="w-4" />
+              {/if}
               <span>vs last period</span>
             </div>
           </div>

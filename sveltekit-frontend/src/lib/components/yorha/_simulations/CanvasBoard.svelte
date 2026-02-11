@@ -1,7 +1,10 @@
 <!-- YoRHa Canvas Board Component -->
 <!-- Interactive canvas for evidence visualization with YoRHa styling -->
 <script lang="ts">
-  import type { EnhancedNeuralSpriteEngine } from '$lib/engines/neural-sprite-engine-enhanced';
+  // EnhancedNeuralSpriteEngine module may not exist yet
+  interface NeuralSpriteEngine {
+    initializeServices(): Promise<void>;
+  }
 
   // Props
   interface Props {
@@ -31,7 +34,7 @@
   let color = $state<string>('#00ff88');
 
   // Neural engine
-  let neuralEngine: EnhancedNeuralSpriteEngine | null = null;
+  let neuralEngine: NeuralSpriteEngine | null = null;
 
   // YoRHa color palette
   const yorhaColors = [
@@ -152,8 +155,12 @@
     try {
         if (typeof window === 'undefined') return;
 
-        // Dynamic import to avoid SSR issues
-        const module = await import('$lib/engines/neural-sprite-engine-enhanced');
+        // Dynamic import to avoid SSR issues - module may not exist yet
+        const module = await import('$lib/engines/neural-sprite-engine-enhanced').catch(() => null);
+        if (!module) {
+          console.warn('Neural Sprite Engine module not available (optional)');
+          return;
+        }
         const EnhancedNeuralSpriteEngine = module.EnhancedNeuralSpriteEngine;
 
         neuralEngine = new EnhancedNeuralSpriteEngine();

@@ -1,4 +1,5 @@
 
+// @ts-expect-error - setup exists at runtime in xstate v5 but TS may not resolve the type
 import { setup, assign, fromPromise, createActor } from 'xstate';
 
 export interface User {
@@ -140,7 +141,7 @@ export const authMachine = setup({
       on: {
         START_LOGIN: {
           target: 'authenticating',
-          guard: ({ context }) => !context.lockoutUntil || new Date() > context.lockoutUntil
+          guard: ({ context }: { context: AuthContext }) => !context.lockoutUntil || new Date() > context.lockoutUntil
         },
         START_REGISTRATION: 'registering',
         RESET_PASSWORD: 'resettingPassword'
