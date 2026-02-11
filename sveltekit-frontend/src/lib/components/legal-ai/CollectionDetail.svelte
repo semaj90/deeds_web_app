@@ -23,7 +23,7 @@ let citations: any[] = [];
  (async () => {
  await loadCitations();
  
-});();
+})();
  });
 
  async function loadCitations() {

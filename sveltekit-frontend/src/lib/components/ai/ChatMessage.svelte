@@ -20,7 +20,6 @@ import type { Message } from '$lib/types';
   import ThumbsUp from 'lucide-svelte/icons/thumbs-up';
   import Users from 'lucide-svelte/icons/users';
   import '../chat/chat-message.css';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // reactive derived values - correct Svelte, 5 usage
   let isUser = $derived.by(() => message?.role === 'user' ?? message?.type === 'user');
   let isAssistant = $derived.by(() => message?.role === 'assistant' ?? message?.type === 'assistant');

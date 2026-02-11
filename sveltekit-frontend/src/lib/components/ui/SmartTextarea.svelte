@@ -3,7 +3,6 @@
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
   import  CommandMenu  from "./CommandMenu.svelte";
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Props {
     value?: string
     placeholder?: string

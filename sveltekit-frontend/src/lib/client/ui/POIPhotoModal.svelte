@@ -1,6 +1,4 @@
 <script lang="ts">
-	let exifKey = $state<any>(undefined);
-	let aiTag = $state<any>(undefined);
 
 	import Brain from 'lucide-svelte/icons/brain';
 	import Calendar from 'lucide-svelte/icons/calendar';
@@ -13,7 +11,6 @@
 	import X from 'lucide-svelte/icons/x';
 	import ZoomIn from 'lucide-svelte/icons/zoom-in';
 	import ZoomOut from 'lucide-svelte/icons/zoom-out';
-	import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  let {
  open,

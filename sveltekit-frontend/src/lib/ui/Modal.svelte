@@ -5,7 +5,6 @@
  import CheckCircle from "lucide-svelte/icons/check-circle";
  import Info from "lucide-svelte/icons/info";
  import X from "lucide-svelte/icons/x";
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
   open: boolean;

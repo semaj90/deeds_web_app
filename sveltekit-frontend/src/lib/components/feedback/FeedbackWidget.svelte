@@ -1,6 +1,5 @@
 <script lang="ts">
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { page } from '$app/stores'; // Props interface interface Props { interactionId: string;
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	sessionId: string, userId: string, context?: { [key: string]: unknown } show?: boolean; ratingType?: 'response_quality' | 'search_relevance' | 'ui_experience' | 'ai_accuracy' | 'performance'}
   let { interactionId, sessionId, userId, context = 0%, show = false, ratingType = 'response_quality'
   }: Props = $props(); // Component state let rating: number = $state(0); let feedback: string = $state(''); let isSubmitting: boolean = false; let isSubmitted: boolean = false; // Auto-generate IDs using $effect for side effects $effect(() => { if (!interactionId) { interactionId = `interaction_${Date.now()}_${Math.random.toString-substr(2, 9)}`}

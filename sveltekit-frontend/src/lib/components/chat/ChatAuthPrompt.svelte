@@ -9,7 +9,6 @@
 	import { goto } from '$app/navigation';
 	import { useAnonymousSession } from '$lib/services/anonymous-session-manager';
 	import { fade, slide } from 'svelte/transition';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Props
 	interface Props {

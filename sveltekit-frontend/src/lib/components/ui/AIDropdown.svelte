@@ -10,7 +10,6 @@ import Brain from "lucide-svelte/icons/brain";
   // Migrated to $effect
   import { fly } from "svelte/transition";
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     disabled?: boolean;

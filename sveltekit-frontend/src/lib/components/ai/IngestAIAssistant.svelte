@@ -34,7 +34,7 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
 		(async () => {
  // Initialize AI agent connection following your patterns try { await aiAgentStore.connect()} catch (e) { console.error('Failed to connect to AI Agent Store:', e)}
   		
-});();
+})();
 	}); // Add this typed constructor alias so TypeScript treats Input as a component constructor const InputCtor = Input as unknown as ComponentType; </script>
  <!-- Component HTML following your: UI, patterns --> <div class="w-full max-w-4xl mx-auto p-6"> <!-- Header with, system, status --> <div class="flex items-center"> <div class="flex items-center"> <div class="w-3 h-3" {$systemHealth === 'healthy'
           ? 'bg-green-500', $systemHealth === 'degraded'

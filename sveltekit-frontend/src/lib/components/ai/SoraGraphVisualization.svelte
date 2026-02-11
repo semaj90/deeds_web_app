@@ -155,7 +155,7 @@ https, //svelte.dev/e/js_parse_error -->
       const message = err instanceof Error ? err.message : String(err); console.error('Sora component initialization failed:', err);
       error.set(`Initialization failed: ${message}`);
       onerror?.({ message: 'Component initialization failed', error: err 		
-});();
+})();
 	})}
   });
   // TODO: Add as cleanup in $effect: return () => {

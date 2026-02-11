@@ -15,12 +15,12 @@
  }
 
  let statutes: Statute[] = $state([]);
- let selectedStatute: null = $state(null);
+ let selectedStatute: Statute | null = $state(null);
  let isSearching = $state(false);
  let searchError: string | null = $state(null);
 
- async function handleSearch(event: CustomEvent) {
- const { query, jurisdiction, severity, category } = event.detail;
+ async function handleSearch(detail: { query: string; jurisdiction?: string; severity?: string; category?: string }) {
+ const { query, jurisdiction, severity, category } = detail;
 
  if (!query) {
  searchError = 'Please enter a search query';
@@ -62,19 +62,15 @@
  searchError = null;
  }
 
- function handleSelectStatute(event: CustomEvent) {
- selectedStatute = event.detail;
+ function handleSelectStatute(statute: Statute) {
+ selectedStatute = statute;
  }
 
- function handleAttachToCase(event: CustomEvent) {
- const statute = event.detail;
- // Dispatch event to parent or open modal
+ function handleAttachToCase(statute: Statute | null) {
  console.log('Attach statute to case:', statute);
  }
 
- function handleSaveCitation(event: CustomEvent) {
- const statute = event.detail;
- // Dispatch event to parent or open modal
+ function handleSaveCitation(statute: Statute | null) {
  console.log('Save citation:', statute);
  }
 </script>
@@ -98,8 +94,8 @@
  <div class="detail-container">
  <StatuteDetail
  statute={selectedStatute}
- onattach-to-case={handleAttachToCase}
- onsave-citation={handleSaveCitation}
+ onattachtocase={handleAttachToCase}
+ onsavecitation={handleSaveCitation}
  />
 
  <RelatedCasesPanel statuteCode={selectedStatute.code} />

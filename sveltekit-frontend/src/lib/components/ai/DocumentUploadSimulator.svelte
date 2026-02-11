@@ -31,7 +31,6 @@ content: text, type: 'legal', length: 'medium'
       }) }); if (!response.ok) { throw new Error(`Summarization failed: ${response.statusText}`)}
     const result = await response.json(); return result?.summary ?? 'Summary generation failed'}
   import { getOllamaEndpoint, getOllamaBaseUrl } from '$lib/utils/ollama-endpoint'; const OLLAMA_BASE = getOllamaBaseUrl(); const OLLAMA_MODEL = 'embeddinggemma:latest';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  const PREFERRED_DIM = 1536; // prefer pgvector-friendly dimension async function generateEmbeddings(text: string): Promise<number[]> { // Try Ollama embeddings with a few common endpoint shapes, fall back gracefully const shortText = (text || '').substring(0, 10000); const attempts = [ { url: getOllamaEndpoint('embeddings'), body: {
 	model: OLLAMA_MODEL, input: shortText } },
 	{ url: getOllamaEndpoint('api/embeddings'), body: {

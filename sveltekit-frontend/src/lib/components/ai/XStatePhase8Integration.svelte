@@ -16,7 +16,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 		(async () => {
  // Initialize Phase, 8 components matrixCompiler = new MatrixUICompiler(); reranker = new LegalAIReranker(); prefetcher = new PredictivePrefetcher(); await prefetcher.initialize(); // Generate initial matrix UI nodes updateMatrixUINodes(); // Set up AI-aware prefetching await setupPredictivePrefetching()		
-});();
+})();
 	}); function updateMatrixUINodes(): void { const currentState = ((get(machineState) as unknown)?.value as string) ?? 'unknown'; const ctx = (get(machineContext) as unknown) || {}; matrixUINodes = [ { type: 'card', id: `state-card-${currentState}`, matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], styles: {
 	base: `yorha-card p-6 ${getStateCardClass(currentState)}`, hover: 'transform scale-105 transition-transform', active: 'ring-2 ring-yellow-400'
         },

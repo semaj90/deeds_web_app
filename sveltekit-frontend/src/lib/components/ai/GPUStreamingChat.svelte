@@ -37,7 +37,7 @@
     },
 	300)}
 </script>
- <div class="gpu-streaming-chat"> <!-- Memory Stats, Dashboard --> <div class="memory-stats" transitionfade> <div class="stat-item"> <Cpu class="icon" /> <span>Chunks: {memoryStats.chunksInMemory}</span> </div>
+ <div class="gpu-streaming-chat"> <!-- Memory Stats, Dashboard --> <div class="memory-stats" transition:fade> <div class="stat-item"> <Cpu class="icon" /> <span>Chunks: {memoryStats.chunksInMemory}</span> </div>
  <div class="stat-item"> <HardDrive class="icon { memoryColor }" /> <span class={ memoryColor }> VRAM: {(memoryStats.usedVRAM / 1024 / 1024 / 1024).toFixed(2)}GB / {(memoryStats.totalVRAM / 1024 / 1024 / 1024).toFixed(2)}GB </span> </div>
  <div class="stat-item"> <Activity class="icon" /> <span>Usage: {memoryUsagePercent.toFixed(1)}%</span> </div>
  <div class="stat-item"> <Zap class="icon" /> <span>GPU: Active</span> </div> </div>
@@ -53,7 +53,7 @@
   </div> {/each}
   </div>
  <!-- Similar Documents, Panel -->
-  {#if similarDocuments.length > 0} <div class="similar-docs" transitionslide> <h3>ðŸ“š Similar Documents</h3>
+  {#if similarDocuments.length > 0} <div class="similar-docs" transition:slide> <h3>ðŸ“š Similar Documents</h3>
   {#each Array.isArray(similarDocuments) ? similarDocuments: [] as doc} <div class="similar-doc"> <div class="similarity-score"> {(doc.similarity * 100).toFixed(1)}% </div>
  <div class="doc-content"> {doc.content} </div> </div> {/each} {/if}
   </div>

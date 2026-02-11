@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported interface Props { content?: string; placeholder?: string; readonly?: boolean; height?: string; theme?: 'default' | 'nes' | 'dark' | 'retro'; enableAI?: boolean; enableCitation?: boolean; enableCollaboration?: boolean; ondispatch?: (detail: unknown) => void}
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { content = '', placeholder = 'Start typing your legal document...', readonly = false, height = '400px', enableAI = true, enableCitation = true, enableCollaboration = false, ondispatch }: Props = $props(); // removed unused onMount import and external Dialog dependency (not available). // We'll render lightweight in-file modal markup instead of importing bits-ui/dialog. import { writable } from 'svelte/store'; import type { Writable } from 'svelte/store'; // Stores let editorElement: HTMLElement;
  let hugerte: unknown;
  let isInitialized = $state<boolean>(false); const wordCount: Writable<number> = writable(0); const charCount: Writable<number> = writable(0); const aiOpen = writable(false); const citeOpen = writable(false); // collaboration toggle so `enableCollaboration` is used const collaborationActive = writable(false); function toggleCollaboration() { collaborationActive.update(v => !v)}'

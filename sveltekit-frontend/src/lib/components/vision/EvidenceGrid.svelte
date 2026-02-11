@@ -1,5 +1,4 @@
 <script lang="ts">
-	let thumb = $state<any>(undefined);
 interface Props {
   onselect?: (...args: any[]) => void;
  selectedThumbs?: string[];

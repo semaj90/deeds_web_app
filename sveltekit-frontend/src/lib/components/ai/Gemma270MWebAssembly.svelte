@@ -11,7 +11,6 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
 import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
 	import  Alert  from "$lib/components/ui/enhanced-bits.svelte"; // use default import as compiler suggested
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	// Svelte, 5 runes for reactive state
 	let wasmModule: unknown = null
 	let isLoaded = $state<boolean>(false);

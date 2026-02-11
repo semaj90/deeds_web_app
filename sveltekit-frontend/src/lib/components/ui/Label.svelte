@@ -1,15 +1,15 @@
 <script lang="ts">
-  interface Props {
-    for_?: string;
-    class_?: string;
-    children?: any;
+  import type { Snippet } from 'svelte';
+  import type { HTMLLabelAttributes } from 'svelte/elements';
+
+  interface Props extends HTMLLabelAttributes {
+    children?: Snippet;
   }
-  let { for_ = '', class_ = '', children }: Props = $props();
+  let { children, ...restProps }: Props = $props();
 </script>
 
-<label for={for_} class="text-sm font-medium text-gray-700">
+<label {...restProps} class="text-sm font-medium text-gray-700">
   {@render children?.()}
 </label>
-;
 
 

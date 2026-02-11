@@ -1,65 +1,62 @@
 <script lang="ts">
-	let item = $state<any>(undefined);
+  interface Statute {
+    id: string;
+    code: string;
+    title?: string;
+    full_text?: string;
+    jurisdiction?: string;
+    severity?: string;
+    category?: string;
+    year?: number;
+  }
 
- // Migrated to $effect
+  interface Props {
+    statute?: Statute | null;
+    isLoading?: boolean;
+    onattachtocase?: (statute: Statute | null) => void;
+    onsavecitation?: (statute: Statute | null) => void;
+  }
 
- interface Statute {
- id: string;
-	code: string;
- title?: string;
- full_text?: string;
- jurisdiction?: string;
- severity?: string;
- category?: string;
- year?: number;
- }
+  let { statute = null, isLoading = false, onattachtocase, onsavecitation }: Props = $props();
 
- let { statute = null, isLoading = false } = $props<{
- statute?: Statute | null;
- isLoading?: boolean;
- }>();
-let context: string[] = [];
- let relatedCases: any[] = [];
- let contextLoading = false;
+  let context: string[] = $state([]);
+  let relatedCases: any[] = $state([]);
+  let contextLoading = $state(false);
 
- $effect(() => {
+  $effect(() => {
+    if (statute) {
+      loadContext();
+    }
+  });
 
- (async () => {
- if (statute) {
- await loadContext();
- }
- 
-});();
- });
+  async function loadContext() {
+    if (!statute) return;
 
- async function loadContext() {
- if (!statute) return;
+    contextLoading = true;
 
- contextLoading = true;
+    try {
+      const response = await fetch(`/api/laws/${statute.code}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          context = data.context || [];
+          relatedCases = data.relatedCases || [];
+        }
+      }
+    } catch (error) {
+      console.error('Error loading statute context:', error);
+    } finally {
+      contextLoading = false;
+    }
+  }
 
- try {
- const response = await fetch(`/api/laws/${statute.code}`);
- if (response.ok) {
- const data = await response.json();
- if (data.success) {
- context = data.context || [];
- relatedCases = data.relatedCases || [];
- }
- }
- } catch (error) {
- console.error('Error loading statute context:', error);
- } finally {
- contextLoading = false;
- }
- }
+  function attachToCase() {
+    onattachtocase?.(statute);
+  }
 
- function attachToCase() {
- onattachtocase?.(statute);
- }
-
- function saveCitation() {
- onsavecitation?.(statute);
- }
+  function saveCitation() {
+    onsavecitation?.(statute);
+  }
 </script>
 
 {#if statute}

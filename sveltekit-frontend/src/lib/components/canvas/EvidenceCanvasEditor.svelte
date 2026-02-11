@@ -51,7 +51,7 @@ reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], h
     // Setup RabbitMQ for collaboration if (enableCollaboration) { await setupCollaboration()}
 
     // Load cached state from Loki loadCachedState()		
-});();
+})();
 	});
   async function initializeCanvas(): Promise<void> { try { canvas = new fabric.Canvas(canvasElement, { width, height, backgroundColor: '#ffffff', selection: !readOnly, isDrawingMode: false }); // Setup event handlers setupCanvasEvents(); // Enable grid if requested if (gridEnabled) { enableGrid()}
 
@@ -288,7 +288,6 @@ reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], h
  import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte";
  import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: {
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	x: number, y: number, width: number, height: number }}
 
 interface CanvasState { id?: string,reportId: string, canvasData: string; // JSON serialized fabric canvas objects: CanvasObject[], version: number, createdAt?: Date; updatedAt?: Date}
@@ -334,7 +333,7 @@ reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], h
     // Setup RabbitMQ for collaboration if (enableCollaboration) { await setupCollaboration()}
 
     // Load cached state from Loki loadCachedState()		
-});();
+})();
 	});
   async function initializeCanvas(): Promise<void> { try { canvas = new fabric.Canvas(canvasElement, { width, height, backgroundColor: '#ffffff', selection: !readOnly, isDrawingMode: false }); // Setup event handlers setupCanvasEvents(); // Enable grid if requested if (gridEnabled) { enableGrid()}
 

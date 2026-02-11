@@ -1,6 +1,5 @@
 <script lang="ts">
 
-	let followUp = $state<any>(undefined);
 
 
  interface Evidence { id: string, title: string;

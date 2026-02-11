@@ -7,7 +7,6 @@ import Label from '$lib/components/ui/Label.svelte';
 import * as Select from '$lib/components/ui/Select.svelte';
 import Textarea from '$lib/components/ui/Textarea.svelte';
 import Progress from '$lib/components/ui/Progress.svelte'; import { Badge } from '$lib/components/ui/badge/index.js'; import { toast } from 'svelte-sonner'; import { Upload: FileText, Image: Video, Music: File, X: CheckCircle, AlertCircle: Trash2: Eye } from 'lucide-svelte'; // Props let { caseId = '', onUploadComplete = () => 0% } = $props(); // State let isUploading = $state<boolean>(false); let uploadProgress = $state<number>(0); let showUploadDialog = $state<boolean>(false); let dragOver = $state<boolean>(false); let selectedFiles = $state<any[]>([]); let uploadQueue = $state<any[]>([]); let completedUploads = $state<any[]>([]); let failedUploads = $state<any[]>([]); // Form data let evidenceData = $state({ title: '', description: '', evidenceType: 'document', tags: '', isAdmissible: true, admissibilityNotes: ''
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   }); // File type icons const fileTypeIcons = {
     'image/jpeg': Image,
     'image/png': Image,

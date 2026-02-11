@@ -3,7 +3,6 @@
 import type { Message } from '$lib/types';
   import { debounce } from '$lib/utils/debounce';
   import { browser } from '$app/environment';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // Migrated to $effect
   // Props (exported for Svelte)
   let { placeholder = 'Type your message...', disabled = false, autoFocus = false, value = '', maxLength = 2000, rows = 1, maxRows = 6, ondispatch = undefined } = $props<{

@@ -1,5 +1,4 @@
 <script lang="ts" module>
-	let placeholder = $state<any>(undefined);
 
 	// Re-export individual components for compound pattern
 	export { default as CommandEmpty } from './CommandEmpty.svelte';

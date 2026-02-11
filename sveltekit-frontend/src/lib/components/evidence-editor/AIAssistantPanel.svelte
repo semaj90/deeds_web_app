@@ -7,7 +7,6 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-	let tag = $state<any>(undefined);
 
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Search from 'lucide-svelte/icons/search';

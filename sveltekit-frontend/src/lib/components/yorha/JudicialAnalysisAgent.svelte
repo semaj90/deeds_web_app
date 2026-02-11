@@ -1,8 +1,5 @@
 <script lang="ts">
 
-	let charge = $state<any>(undefined);
-	let rec = $state<any>(undefined);
-	let risk = $state<any>(undefined);
 
 
  interface Evidence { id: string, title: string;

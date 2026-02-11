@@ -1,7 +1,6 @@
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
     import { legalAIClient, legalAIUtils, type LegalDocumentResponse, type RecommendationResponse } from '$lib/services/legal-ai-client';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     // State management with Svelte, 5 patterns
     let uploadedFile = $state<File | null>(null);
     let analysisResult = $state<LegalDocumentResponse | null>(null);

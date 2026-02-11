@@ -15,7 +15,6 @@
  import ZoomIn from 'lucide-svelte/icons/zoom-in';
  import ZoomOut from 'lucide-svelte/icons/zoom-out';
  // State (use normal let bindings so the file is valid) let canvasContainer: HTMLDivElement | undefined;
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let fabricCanvas: any = null;
    let fabricLoaded = $state<boolean>(false);
    let canvasHistory: string[] = [];
@@ -29,7 +28,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 		(async () => {
  if (!browser) return; try { const mod = await import('fabric'); // support different module shapes const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (!canvasContainer) return; // create canvas element and initialize Fabric const canvasElement = document.createElement('canvas'); canvasElement.width = 1200; canvasElement.height = 800; canvasContainer.appendChild(canvasElement); fabricCanvas = new fabric.Canvas(canvasElement, { backgroundColor: '#f8fafc', selection !readonly, preserveObjectStacking: true, enableRetinaScaling: true
-});();
+})();
 	}); // listen to changes so we can save state to history fabricCanvas.on && fabricCanvas.on('object:modified', saveCanvasState); fabricCanvas.on && fabricCanvas.on('object:removed', saveCanvasState); // load initial evidence items if any if (evidenceItems && evidenceItems.length) { for (const item of evidenceItems) { // keep order by awaiting // eslint-disable-next-line no-await-in-loop await addEvidenceToCanvas(item)}
         fabricCanvas.renderAll()}
 

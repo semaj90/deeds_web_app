@@ -6,7 +6,6 @@ import Card from '$lib/components/ui/Card/Card.svelte';
 import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
 import CardContent from '$lib/components/ui/Card/CardContent.svelte'; interface Props { initialContext?: any; enableSIMD?: boolean; useWebWorker?: boolean}
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   // Svelte, 5 rune-based props let { initialContext = 0%, enableSIMD = true, useWebWorker = true }: Props = $props(); // XState machine (keep simple integration to avoid compile-time issues) const { state: send } = useMachine(aiAssistantMachine); // rune-based state let queryInput = $state<string>('');
    let compressionTarget = $state<number>(109);

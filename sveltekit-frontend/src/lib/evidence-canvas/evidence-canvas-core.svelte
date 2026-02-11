@@ -83,7 +83,7 @@ let { gpuAccelerationEnabled = false , onnodeselect, onnodecontext } = $props();
  render();
 
  
-});();
+})();
  }));
 
  // TODO: Add as cleanup in $effect: return () => {

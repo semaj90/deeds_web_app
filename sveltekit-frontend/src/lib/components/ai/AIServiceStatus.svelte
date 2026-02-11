@@ -11,7 +11,7 @@ import RefreshCw from 'lucide-svelte/icons/refresh-cw';
       },
 	30000)}
 
-});();
+})();
 
 		return () => { if (refreshInterval) clearInterval(refreshInterval)}
 	});

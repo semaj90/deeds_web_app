@@ -27,7 +27,7 @@
  extractedText = metadata.extractedText as string;
  }
 
-});();
+})();
  });
 
  const confidenceColor = (conf: number) => {

@@ -3,7 +3,6 @@
  Retro gaming-style button with pixel art aesthetics
 -->
 <script lang="ts">
-	let disabled = $state<any>(undefined);
 
  import type { Snippet } from 'svelte';
 

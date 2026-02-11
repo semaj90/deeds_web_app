@@ -8,7 +8,6 @@ import type { Document } from '$lib/types';
   import  SSRWebGPULoader_  from "$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte";
   const SSRWebGPULoader = SSRWebGPULoader_ as unknown
   import { fade, scale, slide } from 'svelte/transition';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   // Svelte, 5 props
   let {
     documentId,

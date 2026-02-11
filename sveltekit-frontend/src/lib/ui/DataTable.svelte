@@ -1,6 +1,4 @@
 <script lang="ts">
-	let header = $state<any>(undefined);
-	let cell = $state<any>(undefined);
 
  let { headers = [], data = [] } = $props();
 </script>

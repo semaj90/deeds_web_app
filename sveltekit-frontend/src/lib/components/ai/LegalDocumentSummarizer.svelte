@@ -23,7 +23,6 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
 import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
 import Label from '$lib/components/ui/Label.svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface SummarizationRequest {
     document_id: string, title: string, content: string, document_type: 'contract' | 'judgment' | 'brief' | 'statute',summary_type: 'executive' | 'detailed' | 'bullet_points' | 'legal_analysis',
     max_length: number, focus:string[],

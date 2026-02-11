@@ -1,70 +1,65 @@
 <script lang="ts">
-	let isLoading = $state<any>(undefined);
-	let charge = $state<any>(undefined);
+  interface RelatedCase {
+    id: string;
+    caseNumber: string;
+    title: string;
+    charges?: string[];
+    outcome?: string;
+    relevanceScore?: number;
+  }
 
- // Migrated to $effect
+  interface Props {
+    statuteCode?: string | null;
+    isLoading?: boolean;
+    onviewcase?: (caseItem: RelatedCase) => void;
+  }
 
- interface RelatedCase {
- id: string;
-	caseNumber: string;
- title: string;
- charges?: string[];
- outcome?: string;
- relevanceScore?: number;
- }
+  let { statuteCode = null, isLoading = false, onviewcase }: Props = $props();
 
- let { statuteCode = null, isLoading = false } = $props<{
- statuteCode?: string | null;
- isLoading?: boolean;
- }>();
-let cases: RelatedCase[] = [];
- let error: string | null = null;
+  let cases: RelatedCase[] = $state([]);
+  let error: string | null = $state(null);
 
- $effect(() => {
+  $effect(() => {
+    if (statuteCode) {
+      loadRelatedCases();
+    }
+  });
 
- (async () => {
- if (statuteCode) {
- await loadRelatedCases();
- }
- 
-});();
- });
+  async function loadRelatedCases() {
+    if (!statuteCode) return;
 
- async function loadRelatedCases() {
- if (!statuteCode) return;
+    isLoading = true;
+    error = null;
 
- isLoading = true;
- error = null;
+    try {
+      const response = await fetch(`/api/laws/${statuteCode}/related-cases?limit=10`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          cases = data.cases ?? [];
+        } else {
+          error = data.error || 'Failed to load related cases';
+        }
+      } else {
+        error = 'Failed to load related cases';
+      }
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'An error occurred';
+    } finally {
+      isLoading = false;
+    }
+  }
 
- try {
- const response = await fetch(`/api/laws/${statuteCode}/related-cases? limit=10`);
- if (response.ok) {
- const data = await response.json();
- if (data.success) {
- cases = data.cases ?? [];
- } else {
- error = data.error || 'Failed to load related cases';
- }
- } else {
- error = 'Failed to load related cases';
- }
- } catch (err) {
- error = err instanceof Error ? err.message : 'An error occurred';
- } finally {
- isLoading = false;
- }
- }
+  function viewCase(caseItem: RelatedCase) {
+    onviewcase?.(caseItem);
+  }
 
- function viewCase(caseItem: RelatedCase) {
- onviewcase?.(caseItem);
- }
-
- function getRelevanceColor(score?: number) {
- if (!score) return '#999';
- if (score >= 0.8) return '#44ff44';
- if (score >= 0.6) return '#ffd700';
- return '#ff6b6b';
- }
+  function getRelevanceColor(score?: number) {
+    if (!score) return '#999';
+    if (score >= 0.8) return '#44ff44';
+    if (score >= 0.6) return '#ffd700';
+    return '#ff6b6b';
+  }
 </script>
 
 <div class="related-cases-panel">

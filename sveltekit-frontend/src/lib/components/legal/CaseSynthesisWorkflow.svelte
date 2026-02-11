@@ -1,6 +1,5 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <script lang="ts">
 import type { Case } from '$lib/types'; interface Props { caseId: string, documents: CaseDocument[];
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	evidenceReports: EvidenceReport[]}
   let { caseId, documents = [], evidenceReports = [] }: Props = $props(); import { createMachine, assign, interpret } from 'xstate'; import { readable, writable, derived } from 'svelte/store'; import { fly } from 'svelte/transition'; // <-- added missing, import interface CaseDocument { id: string, title: string, type: 'evidence' | 'report' | 'witness_statement' | 'expert_testimony' | 'legal_brief',content: string, metadata: {
 	dateCreated: string, author: string; // Added comma relevanceScore: number}}

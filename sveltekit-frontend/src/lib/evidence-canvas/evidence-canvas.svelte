@@ -7,7 +7,6 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-	let item = $state<any>(undefined);
 
  // Migrated to $effect
  import type { AISuggestion, SuggestionContext } from './ai-suggestions-service';
@@ -20,7 +19,6 @@ https, //svelte.dev/e/js_parse_error -->
  import { graphLayoutGPU } from './graph-layout-gpu';
  import { webgpuInitService } from './webgpu-init-service';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  type EvidenceEdge = { source: string, target: string };
 
  let { caseId, caseType = 'general', jurisdiction = 'general', initialNodes = [], initialEdges = [] } = $props<{ caseId: string; caseType?: string; jurisdiction?: string; initialNodes?: EvidenceNode[]; initialEdges?, EvidenceEdge[]; }>();
@@ -56,7 +54,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  await loadCaseData();
 
  
-});();
+})();
  }));
 
  // TODO: Add as cleanup in $effect: return () => {

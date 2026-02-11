@@ -8,7 +8,6 @@ import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
 import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import  Input  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge/Badge.svelte"; import  Switch  from "$lib/components/ui/switch"; import * as Collapsible from '$lib/components/ui/collapsible.svelte'; import * as Tooltip from '$lib/components/ui/tooltip.svelte'; import  TypewriterResponse  from "./TypewriterResponse.svelte"; // Props interface Props { caseId?: string; reportId?: string; // New: Link to specific report userId?: string; // New: Current user ID userRole?: 'prosecutor' | 'defense' | 'judge' | 'paralegal' | 'student' | 'client'; documentIds?: string[]; class?: string; enableAdvancedFeatures?: boolean; persistConversation?: boolean; //, New: Save to database }
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { caseId = '', reportId = '', userId = '', userRole = 'prosecutor', documentIds = [], class = '', enableAdvancedFeatures = true, persistConversation = true }: Props = $props(); // Enhanced message interface interface EnhancedMessage { id: string, role: 'user' | 'assistant' | 'system', content: string;
 	timestamp: number, synthesizedInput?: unknown; legalAnalysis?: unknown; ragResults?: unknown; confidence?: number; processingTime?: number; metadata?: unknown}
 
@@ -298,7 +297,7 @@ role: message.role, content: message.content, synthesizedInput: message.synthesi
  <div><strong>Sources:</strong> {message.ragResults.sources?.length ?? 0}
 </div> </div> </details> {/if} {/if}
   </div>
- <!-- Message, Actions --> <div class="flex-shrink-0 flex flex-col"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => copyToClipboard(message.content)}> <FileText class="w-3" /> </Button> </div> </div> </div> {/each} {#if isProcessing} <div class="flex items-center justify-center" transitionfade> <div class="flex items-center gap-2"> <Loader2 class="w-4 h-4" /> <span>Processing with advanced AI pipeline...</span> </div> {/if}
+ <!-- Message, Actions --> <div class="flex-shrink-0 flex flex-col"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => copyToClipboard(message.content)}> <FileText class="w-3" /> </Button> </div> </div> </div> {/each} {#if isProcessing} <div class="flex items-center justify-center" transition:fade> <div class="flex items-center gap-2"> <Loader2 class="w-4 h-4" /> <span>Processing with advanced AI pipeline...</span> </div> {/if}
   </div>
  <!-- Input, Area --> <div class="mt-4 flex"> <Input bind:this={inputElement} bind:value={ currentInput } placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
       keydown={ handleKeyDown } disabled={ isProcessing } class="flex-1" /> <Button class="bits-btn bits-btn" onclick={ sendMessage } disabled={!currentInput.trim() || isProcessing}>

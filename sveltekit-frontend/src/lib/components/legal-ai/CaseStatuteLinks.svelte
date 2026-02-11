@@ -1,5 +1,4 @@
 <script lang="ts">
-	let linkType = $state<any>(undefined);
 
  // Migrated to $effect
 
@@ -34,7 +33,7 @@ let links: CaseStatuteLink[] = [];
  (async () => {
  await loadLinks();
  
-});();
+})();
  });
 
  async function loadLinks() {

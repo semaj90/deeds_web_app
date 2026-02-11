@@ -3,7 +3,6 @@
  Gaming-style button with 3D effects and particle animations
 -->
 <script lang="ts">
-	let disabled = $state<any>(undefined);
 
  import type { Snippet } from 'svelte';
 

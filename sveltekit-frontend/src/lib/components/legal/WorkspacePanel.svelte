@@ -3,7 +3,6 @@
 	let $newNoteContent = $state<any>(undefined);
 
  import { writable } from 'svelte/store';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  interface WorkspaceItem {
  id: string;

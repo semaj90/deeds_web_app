@@ -4,7 +4,6 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Progress } from '$lib/components/ui/progress';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Define missing types
 	type SearchResult = { status: string, sessionId: string;

@@ -1,5 +1,4 @@
 <script lang="ts">
-	let pkg = $state<any>(undefined);
 
 	type RouteDetail = { path: string, kind: 'page' | 'layout' | 'endpoint';
 		file: string;

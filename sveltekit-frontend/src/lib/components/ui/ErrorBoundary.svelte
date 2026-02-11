@@ -10,7 +10,6 @@
   import Home from 'lucide-svelte/icons/home';
   import Bug from 'lucide-svelte/icons/bug';
   import type { Snippet } from 'svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     fallback?: string;

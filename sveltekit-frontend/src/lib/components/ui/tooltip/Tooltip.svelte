@@ -1,10 +1,4 @@
 <script lang="ts" module>
-	let className = $state<any>(undefined);
-	let contentClass = $state<any>(undefined);
-	let side = $state<any>(undefined);
-	let align = $state<any>(undefined);
-	let sideOffset = $state<any>(undefined);
-	let content = $state<any>(undefined);
 
 	// Re-export sub-components for compound component pattern
 	export { default as Content } from './TooltipContent.svelte';

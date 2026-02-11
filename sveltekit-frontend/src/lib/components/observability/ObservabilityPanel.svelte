@@ -6,7 +6,6 @@ https, //svelte.dev/e/js_parse_error -->
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
   import type { ObservabilityState } from '$lib/services/observability-persistence';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface Alert {
     id: string, type: 'p99_breach' | 'error_spike' | 'anomaly_spike' | 'baseline_drift', message: string, timestamp: string, severity: 'info' | 'warning' | 'critical',
     value?: number

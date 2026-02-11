@@ -1,5 +1,4 @@
 <script lang="ts">
-	let onclick = $state<any>(undefined);
 
 /**
  * Svelte 5 Card Component

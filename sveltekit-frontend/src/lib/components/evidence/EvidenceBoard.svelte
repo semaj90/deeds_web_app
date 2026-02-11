@@ -1,5 +1,4 @@
 <script lang="ts">
-	let evidenceNode = $state<any>(undefined);
 
  import Button from '$lib/components/ui/button';
  import { get, writable } from 'svelte/store';

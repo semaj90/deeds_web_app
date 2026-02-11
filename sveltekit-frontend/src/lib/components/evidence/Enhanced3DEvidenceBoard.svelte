@@ -6,7 +6,6 @@
  import { getCurrentPalette } from '$lib/themes/retro-console-palettes';
  import  DiamondModal  from "$lib/components/ui/DiamondModal.svelte"; interface EvidenceNode { id: string, type: 'document' | 'witness' | 'physical' | 'digital' | 'timeline',title: string, position: {
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	x: number, y: number;
 	z: number }; // Fixed syntax connections: string[], confidence: number, priority: number;
 	metadata: Record<string, unknown>, glyphData?: Uint8Array}
@@ -31,7 +30,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
 
 		(async () => {
  await initializeBoard(); await loadSampleData(); startRendering()
-});();
+})();
 	}); // TODO: Add as cleanup in $effect: return () => { if (animationFrame) { cancelAnimationFrame(animationFrame)}
   }
   async function initializeBoard(): Promise<void> { // Initialize WebGPU systems await n64TextureLOD.initialize(); await yorhaMipmapShaders.initializeHeadless(); // Setup canvas if (canvas) { ctx = canvas.getContext('2d'); setupInteractions()}

@@ -58,7 +58,7 @@
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 	};
 
-	const fileSize = evidence?.metadata?.size ?? evidence?.fileSize ?? 0;
+	const fileSize: number = Number(evidence?.metadata?.size ?? evidence?.fileSize ?? 0);
 	let isHovered = $state<boolean>(false);
 	let comparing = $state<boolean>(false);
 	let compareError: string | null = $state(null);
@@ -194,7 +194,7 @@
 
 			<!-- Metadata -->
 			<div class="flex flex-wrap gap-2 mt-2">
-				{#if evidence?.metadata?.createdAt ?? evidence?.createdAt}
+				{#if evidence?.metadata?.createdAt || evidence?.createdAt}
 					<span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
 						{new Date(evidence?.metadata?.createdAt ?? evidence?.createdAt ?? '').toLocaleDateString()}
 					</span>

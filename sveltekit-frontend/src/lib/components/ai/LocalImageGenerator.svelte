@@ -1,6 +1,5 @@
 <!-- Local Image Generation Component Supports Stable Diffusion WebUI: ComfyUI, and Ollama integration Production-ready with native Windows, support --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { imageGenerationService, imageGenerationStore, // removed problematic `type` imports to avoid TS namespace errors when importing from .js } from '$lib/services/local-image-generation-service.js'; // minimal local types to avoid external namespace errors interface ImageGenerationRequest { prompt: string, negativePrompt?: string; width?: number; height?: number; steps?: number; cfgScale?: number; seed?: number; style?: string; provider?: string}
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface ImageGenerationResult { id?: string,prompt: string;
 	imageUrl: string, provider?: string; parameters?: Record<string, any>; metadata?: { seed?: number; size?: { width: number; height: number }; [k: string]: unknown }; timestamp?: number | string | Date; processingTime?: number}

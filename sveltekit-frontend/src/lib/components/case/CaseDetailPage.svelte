@@ -3,7 +3,6 @@
   // Migrated to $effect
   import SimilarCasesPanel from './SimilarCasesPanel.svelte';
   import SummaryEditor from './SummaryEditor.svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     caseId: string;
@@ -23,7 +22,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       await loadSummary();
       await loadSimilarCases();
     
-});();
+})();
   });
 
   async function loadSummary() {

@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { User } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { writable } from 'svelte/store'; import { fade, fly } from 'svelte/transition'; import { AIEvidenceAnalyzer, type EvidenceItem, type EvidenceAnalysis } from '$lib/services/ai-evidence-analyzer'; import  EvidenceAnalysisVisualization  from "$lib/components/visualizations/EvidenceAnalysisVisualization.svelte"; import Button from '$lib/components/ui/Button.svelte'; import  Card: CardContent: CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; let analyzer: AIEvidenceAnalyzer;
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  let evidenceItems = writable<EvidenceItem[]>([]); let selectedEvidence = writable<EvidenceItem | null>(null); let currentAnalysis = writable<EvidenceAnalysis | null>(null); let isAnalyzing = $state<boolean>(false); let uploadedFile: File | null = null; let dropZoneActive = $state<boolean>(false); // Sample evidence types for demo const evidenceTypes = [ { value: 'document', label: 'ðŸ“„ Document', icon: 'ðŸ“„' },
 	{ value: 'image', label: 'ðŸ–¼ï¸ Image', icon: 'ðŸ–¼ï¸' },
 	{ value: 'video', label: 'ðŸŽ¥ Video', icon: 'ðŸŽ¥' },
@@ -69,9 +68,9 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   </button> {/each}
   </div> </CardContent> </Card>
  <!-- Analysis Results, Panel --> <div class="analysis-panel">
-  {#if $isAnalyzing} <div class="loading-state" transitionfade> <div class="loading-spinner"></div>
+  {#if $isAnalyzing} <div class="loading-state" transition:fade> <div class="loading-spinner"></div>
  <h2 class="text-xl font-semibold text-gray-700">Analyzing Evidence...</h2>
- <p class="text-gray-500">Using Gemma, 3 Legal AI to process evidence</p> </div> {:else if $currentAnalysis} <div class="analysis-content" transitionfade> <div class="analysis-actions"> <Button class="bits-btn" onclick={ exportAnalysis } variant="secondary">Export Analysis</Button>
+ <p class="text-gray-500">Using Gemma, 3 Legal AI to process evidence</p> </div> {:else if $currentAnalysis} <div class="analysis-content" transition:fade> <div class="analysis-actions"> <Button class="bits-btn" onclick={ exportAnalysis } variant="secondary">Export Analysis</Button>
  <Button class="bits-btn" onclick={() => $selectedEvidence && analyzeEvidence($selectedEvidence)} variant="primary"> Re-analyze </Button> </div>
  <EvidenceAnalysisVisualization analysis={$currentAnalysis} /> </div> {:else} <div class="empty-state"> <svg class="empty-icon" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"

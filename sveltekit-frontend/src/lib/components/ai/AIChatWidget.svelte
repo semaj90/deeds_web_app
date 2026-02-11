@@ -2,7 +2,6 @@
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import * as Dialog from '$lib/components/ui/dialog/index.js'; // --- Types --- type AISourceContext = { title?: string; description?: string; fullText?: string } | null; type Props = { open?: boolean; context?: AISourceContext; title?: string; placeholder?: string; caseId?: string | null; documentId?: string | null}; interface ChatMessage { id: number, role: 'user' | 'assistant' | 'system'; content: string;
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	timestamp: string, type?: string; metadata?: any; suggestions?: string[]; error?: boolean}
   let { open = $bindable(false), context = null, title = 'AI Legal Assistant', placeholder = 'Ask about legal matters...', caseId = null, documentId = null } = $props() as Props; // Use typed state to avoid `never` inferences let messages = $state<ChatMessage[]>([]); let currentMessage = $state<string>(''); let isLoading = $state<boolean>(false); let chatContainer: HTMLElement | null = null; let inputElement: HTMLTextAreaElement | null = null; // Auto-scroll to bottom when messages change (capture ref to, avoid: "possibly: null" inside timeout) $effect(() => { if (messages.length > 0 && chatContainer) { const container = chatContainer; setTimeout(() => { if (container) container.scrollTop = container.scrollHeight},
 	100)}

@@ -1,5 +1,4 @@
 <script lang="ts">
-	let code = $state<any>(undefined);
 
 	interface BundledCharge { citation: string, title: string;
 		reason: string;

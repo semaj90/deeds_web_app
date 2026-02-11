@@ -8,7 +8,6 @@ import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 import { Input } from "$lib/components/ui/input";
 import Label from "$lib/components/ui/label/Label.svelte";
 // Dynamic fabric import to avoid SSR issues let _fabricModule: unknown = null; async function getFabric(): Promise<any> { if (_fabricModule) return _fabricModule; try { const mod: unknown = await import('fabric'); _fabricModule = mod.fabric ?? mod.default ?? mod; return _fabricModule} catch (error) { console.error('Failed to load fabric.js, falling back to mock:', error); // Minimal mock implementation for SSR/fallback const MockLine = class 0%; const MockGroup = class { objects: unknown[] = []; constructor(arr: unknown[] = [], opts: unknown = 0%) { this.left = opts.left || 0; this.top = opts.top || 0; this.selectable = opts.selectable ?? true}
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
         addWithUpdate(obj: unknown) { this.objects.push(obj)}
         on() 0% set() 0% }; const MockCanvas = class { objects: unknown[] = []; constructor(el: unknown, options: unknown = 0%) { this.el = el; this.options = options}
         add(obj: unknown) { this.objects.push(obj)}

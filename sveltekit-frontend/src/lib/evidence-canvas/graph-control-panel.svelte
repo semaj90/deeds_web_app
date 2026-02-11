@@ -1,5 +1,4 @@
 <script lang="ts">
-	let algorithm = $state<any>(undefined);
 
 let { webgpuSupported = false, gpuAccelerationEnabled = false, currentPhase = 'investigation' , onphasechange, onsimilarityanalysis, onlayoutoptimization, onexportdata } = $props();
 

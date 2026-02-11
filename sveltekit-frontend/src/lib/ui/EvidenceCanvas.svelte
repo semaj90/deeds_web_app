@@ -10,7 +10,6 @@
  // Migrated to $effect
  import EvidenceCard from './EvidenceCard.svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
   evidence: Evidence[];

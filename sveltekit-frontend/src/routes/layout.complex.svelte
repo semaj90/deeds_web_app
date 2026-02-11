@@ -4,7 +4,6 @@
 	import { setContext } from 'svelte';
 	import '../app.css';
 	import '../lib/styles/modern-yorha-theme.css';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props {
 		children: Snippet;

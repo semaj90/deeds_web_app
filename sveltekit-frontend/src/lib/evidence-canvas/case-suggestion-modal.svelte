@@ -7,7 +7,6 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-	let nodeId = $state<any>(undefined);
 
  import type { type AISuggestion } from './ai-suggestions-service';
 

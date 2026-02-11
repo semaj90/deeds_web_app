@@ -33,7 +33,6 @@ import Users from 'lucide-svelte/icons/users';
  import { crewAIService, analyzeLegalCaseWithCrew, analyzeContractWithCrew } from '$lib/services/crewai-service.js';
  import type { AutoGenConversation, AutoGenMessage } from '$lib/services/autogen-service.js';
  import type { CrewExecution, CrewTaskResult } from '$lib/services/crewai-service.js'; interface Props { defaultWorkflow?: string; showAdvancedControls?: boolean; autoStartServices?: boolean}
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { defaultWorkflow = 'case_analysis', showAdvancedControls = true, autoStartServices = true }: Props = $props(); // Component state let selectedWorkflow = $state(defaultWorkflow);
    let isLoading = $state<boolean>(false);
    let selectedProvider = $state<'autogen' | 'crewai'>('autogen');

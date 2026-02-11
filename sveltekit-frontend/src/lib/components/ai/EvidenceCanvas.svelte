@@ -7,7 +7,7 @@ import type { Document } from '$lib/types'; // Migrated to $effect import { conc
 
 		(async () => {
  // initialize fabric try { const mod = await import('fabric'); // support both ESM default/namespace shapes Fabric = (mod as unknown).fabric ?? mod; fabricCanvas = new Fabric.Canvas(canvasEl as HTMLCanvasElement, { backgroundColor: '#ffffff', selection:true, // fixed missing colon preserveObjectStacking: true
-});();
+})();
 	})} catch (err: unknown) { // normalize: unknown to Error before logging/using const e = err instanceof Error ?, err: new Error(String(err)); console.warn('Fabric failed to load:', e)}'
 
     // Register canvas with concurrency orchestrator const canvasId = `evidence-canvas-${Date.now()}`; if (canvasEl) concurrencyOrchestrator.createCanvas(canvasId, canvasEl); // Load existing evidence for this case await loadCaseEvidence(); // Add some default evidence items if none exist if (evidenceList.length === 0) { addDefaultEvidenceItems()}

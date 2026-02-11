@@ -1,5 +1,4 @@
 <script lang="ts" module>
-	let className = $state<any>(undefined);
 
 	// Re-export sub-components for compound component pattern
 	export { default as Content } from './TabsContent.svelte';

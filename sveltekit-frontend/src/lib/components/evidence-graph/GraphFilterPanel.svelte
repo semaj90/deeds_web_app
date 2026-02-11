@@ -1,7 +1,9 @@
 <script lang="ts">
-	let onFilterChange = $state<any>(undefined);
-
- let { filters, onFilterChange } = $props();
+  interface Props {
+    filters: Record<string, any>;
+    onFilterChange: () => void;
+  }
+  let { filters, onFilterChange }: Props = $props();
 </script>
 
 <div class="nes-container with-title bg-gray-900 text-white p-4 rounded-lg">

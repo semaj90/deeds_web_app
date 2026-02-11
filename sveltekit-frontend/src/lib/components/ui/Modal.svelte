@@ -1,6 +1,5 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported import { fade } from 'svelte/transition';
  import type { Snippet } from 'svelte'; interface Props { open?: boolean; title?: string; size?: 'sm' | 'md' | 'lg' | 'xl'; closeOnOutsideClick?: boolean; closeOnEscape?: boolean; onclose?: () => void}
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { open = $bindable(false), title = '', size = 'md', closeOnOutsideClick = true, closeOnEscape = true, onclose, children, footer }: Props & { children?: Snippet; footer?: Snippet } = $props();
    let modalElement = $state<HTMLDivElement>(); function handleClose() { open = false; onclose?.()}
   function handleKeydown(_event: KeyboardEvent) { if (_event.key === 'Escape' && closeOnEscape) { handleClose()}

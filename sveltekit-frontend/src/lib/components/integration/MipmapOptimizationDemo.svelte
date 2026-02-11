@@ -5,7 +5,6 @@ import Card from '$lib/components/ui/Card/Card.svelte';
 import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
 import CardContent from '$lib/components/ui/Card/CardContent.svelte'; // Reactive state using Svelte, 5 runes let isInitialized = $state<boolean>(false); let isProcessing = $state<boolean>(false); let processingResults = $state<any[]>([]); let systemStats = $state<any>(null); let mipmapConfig = $state({ maxMipLevels: 12, filterMode: 'linear' as 'linear' | 'nearest' | 'cubic', rtxOptimized: true, enableStreaming: false, maxTextureSize: 2048 }); // Demo legal documents let legalDocuments = $state([ { id: 'contract_001', type: 'contract' as const title: 'Commercial Lease Agreement', priority: 200, riskLevel: 'high' as const textureSize: '2048x2048', estimatedComplexity: 'High'
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     },
 	{
       id: 'evidence_001', type: 'evidence' as const title: 'Financial Records Evidence', priority: 180, riskLevel: 'critical' as const textureSize: '4096x4096', estimatedComplexity: 'Very High'

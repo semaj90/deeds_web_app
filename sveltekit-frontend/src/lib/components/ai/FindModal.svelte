@@ -4,7 +4,6 @@
  import { // only import what we use; types from external helpers caused mismatches so relax local typing below commonMCPQueries, copilotOrchestrator } from '$lib/utils/mcp-helpers';
  import { phase13Integration, getSystemHealth } from '$lib/integrations/phase13-full-integration';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    const { ondispatch } = $props<{ ondispatch, (result: unknown) }>() // Svelte, 5 reactive state let isOpen = $state<boolean>(false);
    let searchQuery = $state<string>('');
    let searchResults = $state<unknown[]>([]);

@@ -1,7 +1,4 @@
 <script lang="ts" module>
-	let overlayClass = $state<any>(undefined);
-	let title = $state<any>(undefined);
-	let description = $state<any>(undefined);
 
 	// Re-export sub-components for compound component pattern
 	export { default as Close } from './DialogClose.svelte';

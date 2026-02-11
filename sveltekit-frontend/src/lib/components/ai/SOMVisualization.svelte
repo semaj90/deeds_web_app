@@ -1,6 +1,5 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class'; https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { createSOMRAGSystem, type SOMConfig } from '$lib/ai/som-rag-system'; import { createEnhancedIngestionPipeline, type IngestionStats } from '$lib/ai/enhanced-ingestion-pipeline'; interface Props { class?: string; width?: number; height?: number}
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   interface SOMNode { position { x: number; y: number }; cluster: number, confidence: number, documents: number;
 	evidenceType: string}
   let { class: className = '', width = 800, height = 600 }: Props = $props(); // SOM system components let somRAG: any;

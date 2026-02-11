@@ -2,7 +2,6 @@
   // Svelte 5 runes are auto-imported
   import { fly, fade } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';

@@ -4,7 +4,6 @@ import Card from '$lib/components/ui/Card/Card.svelte';
 import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
 import CardContent from '$lib/components/ui/Card/CardContent.svelte';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
    let isGenerating = $state<boolean>(false);
    let results = $state<SearchResult[]>([]);
    let selectedFormat = $state<string>('webgpu');

@@ -3,7 +3,6 @@
   import type { Snippet } from "svelte";
   import { quintOut } from "svelte/easing";
   import { fade, scale } from "svelte/transition";
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface ModalProps {
     open?: boolean;

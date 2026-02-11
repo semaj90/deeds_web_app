@@ -1,7 +1,4 @@
 <script lang="ts" module>
-	let className = $state<any>(undefined);
-	let title = $state<any>(undefined);
-	let description = $state<any>(undefined);
 
 	// Re-export individual components for compound pattern
 	export { default as DrawerContent } from './drawer-content.svelte';

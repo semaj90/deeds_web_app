@@ -1,6 +1,5 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <script lang="ts">
 import type { Message } from '$lib/types'; import { browser } from '$app/environment'; import { slide } from 'svelte/transition'; let { message, showSources = false, showMetadata = false }: {
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	message: {
 	id: string, role: 'user' | 'assistant' | 'system',content: string;
 	timestamp: Date, sources?: Array<any>; metadata?: {

@@ -1,22 +1,26 @@
 <script lang="ts">
-interface Statute {
- id: string;
-	code: string;
- title?: string;
- jurisdiction?: string;
- severity?: string;
- category?: string;
- relevance_score?: number;
- }
+  interface Statute {
+    id: string;
+    code: string;
+    title?: string;
+    jurisdiction?: string;
+    severity?: string;
+    category?: string;
+    relevance_score?: number;
+  }
 
- let { statutes = [], error = null, isLoading = false } = $props<{
- statutes?: Statute[];
- error?: string | null;
- isLoading?: boolean;
- }>();
-function selectStatute(statute: Statute) {
- onselect?.(statute);
- }
+  interface Props {
+    statutes?: Statute[];
+    error?: string | null;
+    isLoading?: boolean;
+    onselect?: (statute: Statute) => void;
+  }
+
+  let { statutes = [], error = null, isLoading = false, onselect }: Props = $props();
+
+  function selectStatute(statute: Statute) {
+    onselect?.(statute);
+  }
 
  function getRelevanceColor(score?: number) {
  if (!score) return '#999';

@@ -1,5 +1,4 @@
 <script lang="ts">
-	let charge = $state<any>(undefined);
 
  import type { SimilarCase } from '$lib/types/case-summary';
 

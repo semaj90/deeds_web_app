@@ -14,7 +14,6 @@
 	import Mic from 'lucide-svelte/icons/mic';
 	import MicOff from 'lucide-svelte/icons/mic-off';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	// Props (Svelte 5 runes-mode)
 	const {

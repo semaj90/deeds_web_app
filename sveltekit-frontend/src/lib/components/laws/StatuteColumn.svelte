@@ -28,7 +28,7 @@
         console.error('Prefetch failed:', error);
       }
     
-});();
+})();
   });
 
   async function explainSection() {

@@ -12,7 +12,6 @@
   import type { Snippet } from 'svelte';
   // Migrated to $effect
   import { spring } from 'svelte/motion';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
     variant?: 'primary' | 'secondary' | 'legal' | 'evidence' | 'case' | 'ghost';

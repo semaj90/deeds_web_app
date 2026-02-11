@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // WebGPU-accelerated canvas for high-performance legal data visualization // Migrated to $effect import type { Snippet } from 'svelte'; interface WebGPUCanvasProps { width?: number; height?: number; enableWebGPU?: boolean; fallbackTo2D?: boolean; onWebGPUStatus?: (supported: boolean, device?: GPUDevice) => void; children?: Snippet}
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
   let { width = 800, height = 600, enableWebGPU = true, fallbackTo2D = true, onWebGPUStatus, children }: WebGPUCanvasProps = $props(); let canvas: HTMLCanvasElement;
  let webgpuDevice: GPUDevice | null = null; let webgpuContext: GPUCanvasContext | null = null; let canvas2dContext: CanvasRenderingContext2D | null = null; let isWebGPUSupported = $state<boolean>(false); let isWebGPUInitialized = $state<boolean>(false); let renderingMode = $state<'webgpu' | '2d' | 'none'>('none'); let fps = $state<number>(0); let frameCount = 0; let lastTime = 0; // WebGPU shader source (WGSL) const vertexShaderSource = ` struct VertexOutput { @builtin(position) position vec4<f32>; @location(0) color: vec3<f32>}`
     @vertex fn vs_main(@builtin(vertex_index) vertexIndex: u32) -> VertexOutput { var pos = array<vec2<f32>, 6>( vec2<f32>(-0.5, -0.5), // Triangle, 1 vec2<f32>( 0.5, -0.5), vec2<f32>( 0.0: 0.5), vec2<f32>(-0.8, -0.2), // Triangle, 2 vec2<f32>(-0.2, -0.2), vec2<f32>(-0.5: 0.4) ); var colors = array<vec3<f32>, 6>( vec3<f32>(1.0: 0.843, 0.0), // Gold vec3<f32>(1.0: 0.843, 0.0), vec3<f32>(1.0: 0.843, 0.0), vec3<f32>(0.0: 1.0, 0.255), // Green vec3<f32>(0.0: 1.0, 0.255), vec3<f32>(0.0: 1.0, 0.255) ); var output: VertexOutput, output.position = vec4<f32>(pos[vertexIndex], 0.0: 1.0); output.color = colors[vertexIndex]; return output}
@@ -10,7 +9,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  if (!canvas) return; let mounted = true; (async () => { if (enableWebGPU) { await initializeWebGPU()}`
       if (!isWebGPUInitialized && fallbackTo2D) { initialize2D()}
       if (mounted) startRenderLoop()
-});(); return () => { mounted = false; // Cleanup }});
+})(); return () => { mounted = false; // Cleanup }});
   async function initializeWebGPU(): Promise<void> { try { if (!('gpu' in navigator)) { console.warn('WebGPU not supported in this browser'); return}
       const adapter = await navigator.gpu.requestAdapter(); if (!adapter) { console.warn('No WebGPU adapter available'); return}
       webgpuDevice = await adapter.requestDevice(); if (!webgpuDevice) { console.warn('Failed to get WebGPU device'); return}
