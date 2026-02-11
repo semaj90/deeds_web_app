@@ -2574,3 +2574,65 @@ docker build -f docker/Dockerfile.cuda --progress=plain -t legal-ai-gpu:latest .
 
 ---
 
+## 🎯 February 10, 2026 – Session 14: Schema Verification + Migration Safety
+
+### Current Status
+- **Errors**: 623 in 339 files (248 warnings)
+- **Down from**: 1,414+ errors
+- **Target**: <400 errors
+
+### Drizzle ORM 0.44 Migration Safety
+
+**Always use `drizzle-kit migrate`** for production/real data:
+- Applies SQL migration files sequentially
+- Records migrations as applied (idempotent)
+- Reviewable SQL before execution
+
+**Never use `drizzle-kit push`** on databases with real data:
+- Directly syncs schema, can prompt for destructive renames/drops
+- No migration history recorded
+- Risk of data loss on tables not in schema files
+
+**Pro-Tip: Renaming Tables without Dropping (Drizzle 0.44)**
+
+1. Don't just rename the TypeScript variable. Drizzle uses the string inside `pgTable("old_name", { ... })`.
+2. Change it to `pgTable("new_name", { ... })`.
+3. Run `npx drizzle-kit generate`.
+4. Open the generated SQL file. If it says `DROP TABLE "old_name"`, change it manually to:
+   ```sql
+   ALTER TABLE "old_name" RENAME TO "new_name";
+   ```
+5. Then run `npx drizzle-kit migrate`.
+
+Drizzle's generator doesn't detect renames — it sees a missing table and a new table, so it generates DROP + CREATE. Always review the SQL before applying.
+
+### TODO — Core Route Consolidation & API Development
+
+**P0: API Endpoints (planned, in development)**
+- [ ] Create `POST /api/citations/+server.ts` (insert into citations + statutes)
+- [ ] Create `POST /api/cases/[id]/laws/+server.ts` (link statute to case)
+- [ ] Create `POST /api/cases/[id]/citations/+server.ts` (link citation to case)
+- [ ] Create `case_statute_links` junction table via `drizzle-kit migrate`
+  - Schema: id, caseId, statuteId, linkType (enum), notes, createdBy, createdAt
+  - Link types: CHARGED_UNDER, CITED_IN, RELATED_TO, OVERRULED_BY, AFFIRMED_BY
+- [ ] Align `GET /api/cases` response shape (`data.data` vs `data.cases`)
+
+**P1: High-Impact File Rewrites (svelte:component corruption, 14 files)**
+- [ ] `EnhancedDocumentUploader.svelte` (17 corrupted tags)
+- [ ] `CitationManager.svelte` (10+ corruptions + diff markers)
+- [ ] `UserMenu.svelte` (minified + CSS corruption)
+- [ ] `AIServiceStatus.svelte` (4 corrupted tags)
+- [ ] 10 more files with 1-2 `<svelte, component` issues
+
+**P2: Remaining Error Fixes (~470 errors)**
+- [ ] Missing module imports (~150)
+- [ ] Type mismatches in component props (~200)
+- [ ] Svelte template + CSS errors (~120)
+
+**P3: UX Enhancement (later)**
+- [ ] Loading skeletons, toast notifications, virtualized lists
+- [ ] Search/filter in AttachToCaseModal, keyboard nav
+- [ ] Dark mode / YoRHa theme consistency
+
+---
+
