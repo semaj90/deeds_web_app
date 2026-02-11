@@ -1,7 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let content = $state<any>(undefined);
-
 /**
  * Svelte 5 Tooltip Component
  * Native HTML with Svelte 5 runes and accessible tooltip
@@ -22,7 +19,8 @@ let {
 	position = 'top',
 	delay = 200,
 	class: className = '',
-	children: tooltip
+	children,
+	tooltip
 }: Props = $props();
 
 let isVisible = $state(false);

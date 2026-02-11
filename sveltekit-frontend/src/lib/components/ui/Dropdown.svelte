@@ -1,91 +1,131 @@
 <script lang="ts">
-
-  // Migrated to $effect
-
   import { fly } from 'svelte/transition';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-  // replaced prop/runtime handling with standard Svelte exports and dispatcher
-  const { align } = $props<{ align, 'left' | 'right' }>()
-  const { closeOnSelect } = $props<{ closeOnSelect, boolean }>()let open: boolean = false
-  let rootEl: HTMLElement | null = null
+  import type { Snippet } from 'svelte';
+
+  interface Props {
+    align?: 'left' | 'right';
+    closeOnSelect?: boolean;
+    onopen?: () => void;
+    onclose?: () => void;
+    children?: Snippet;
+    trigger?: Snippet<[{ open: boolean }]>;
+  }
+
+  let {
+    align = 'left',
+    closeOnSelect = true,
+    onopen,
+    onclose,
+    children,
+    trigger
+  }: Props = $props();
+
+  let open = $state(false);
+  let rootEl: HTMLElement | null = $state(null);
+
   function toggle() {
-    open = !open
-    if (open) onopen?.();
-    else onclose?.()}
+    open = !open;
+    if (open) {
+      onopen?.();
+    } else {
+      onclose?.();
+    }
+  }
+
   export function close() {
     if (open) {
-      open = false
-      onclose?.()}
+      open = false;
+      onclose?.();
+    }
   }
-  function onDocumentClick(e: MouseEvent) {
-    if (!rootEl) return
-    if (!rootEl.contains(e.target as Node)) close()}
-  function onKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape') close()}
 
-  // optional helper for menu items to close the menu after action
   export function maybeCloseFromItem() {
-    if (closeOnSelect) close()}
+    if (closeOnSelect) close();
+  }
+
+  function onDocumentClick(e: MouseEvent) {
+    if (!rootEl) return;
+    if (!rootEl.contains(e.target as Node)) {
+      close();
+    }
+  }
+
+  function onKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      close();
+    }
+  }
+
   $effect(() => {
-
     document.addEventListener('click', onDocumentClick);
-    document.addEventListener('keydown', onKeydown)
-});
-  // TODO: Add as cleanup in $effect: return () => {
-    document.removeEventListener('click', onDocumentClick);
-    document.removeEventListener('keydown', onKeydown)}
+    document.addEventListener('keydown', onKeydown);
 
-  const menuPosition = $derived(align === 'right' ? 'right: 0);' : 'left: 0;';
+    return () => {
+      document.removeEventListener('click', onDocumentClick);
+      document.removeEventListener('keydown', onKeydown);
+    };
+  });
 
+  const menuPosition = $derived(align === 'right' ? 'right: 0;' : 'left: 0;');
 </script>
-<div class="dropdown-root" bind:this={rootEl} style="position, relative; display: inline-block;">
+
+<div class="dropdown-root" bind:this={rootEl} style="position: relative; display: inline-block;">
   <button
     type="button"
     class="dropdown-trigger"
- onclick|stopPropagation={() => toggle()}
+    onclick={(e) => {
+      e.stopPropagation();
+      toggle();
+    }}
     onkeydown={(e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        toggle()}
+        toggle();
+      }
     }}
     aria-haspopup="true"
     aria-expanded={open}
   >
-    <!-- named slot for trigger; parent, can, receive `let, open` -->
-    <slot name="trigger" {open}></slot>
+    {#if trigger}
+      {@render trigger({ open })}
+    {/if}
   </button>
+
   {#if open}
     <div
       role="menu"
       tabindex="-1"
       class="dropdown-menu"
-      onclick|stopPropagation
+      onclick={(e) => e.stopPropagation()}
       onkeydown={(e) => {
-        if (e.key === 'Escape') close()}}
-      style={`position: absolute top: 100%; z-index: 60, ${menuPosition}`}
-      transition:fly={{
-	y: -6, duration: 140 }}
+        if (e.key === 'Escape') close();
+      }}
+      style={`position: absolute; top: 100%; z-index: 60; ${menuPosition}`}
+      transition:fly={{ y: -6, duration: 140 }}
     >
-      <!-- default slot used for, menu, items -->
-      <slot></slot>
-    {/if}
+      {#if children}
+        {@render children()}
+      {/if}
+    </div>
+  {/if}
 </div>
+
 <style>
-  /* Minimal encapsulated styles; toolbar reuses classes (menu-trigger, dropdown-menu, dropdown-item) */
   .dropdown-root {
-    font-size: 0.95rem;}
+    font-size: 0.95rem;
+  }
+
   .dropdown-trigger {
     display: inline-flex;
-    align-items: center;}
-  .dropdown-menu { background: var(--dropdown-bg, #fff);
+    align-items: center;
+  }
+
+  .dropdown-menu {
+    background: var(--dropdown-bg, #fff);
     border-radius: 0.5rem;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08), padding: 0.35rem
-   ; border: 1px solid #e6edf3;
-    min-width: 12rem;}
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    padding: 0.35rem;
+    border: 1px solid #e6edf3;
+    min-width: 12rem;
+  }
 </style>
-
-
-
-
-
-

@@ -1,22 +1,23 @@
 <script lang="ts">
-	let ariaLabel = $state<any>(undefined);
-	let icon = $state<any>(undefined);
+	import type { Snippet } from 'svelte';
 
- let { children, icon = null, variant = 'default', disabled = false, ariaLabel = undefined } = $props<{
- icon?: string | null;
- variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link';
- disabled?: boolean;
- ariaLabel?: string;
- }>();
+	interface Props {
+		children?: Snippet;
+		icon?: string | null;
+		variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link';
+		disabled?: boolean;
+		ariaLabel?: string;
+	}
+
+	let { children, icon = null, variant = 'default', disabled = false, ariaLabel = undefined }: Props = $props();
 </script>
 
-<button type="button" class={`quick-action ${variant}`} { disabled } aria-label={ariaLabel}>
- {#if icon}
- <span class={`icon ${icon}`} aria-hidden="true"></span>
- {/if}
- <span class="label">{@render children?.()}</span>
+<button type="button" class={`quick-action ${variant}`} {disabled} aria-label={ariaLabel}>
+	{#if icon}
+		<span class={`icon ${icon}`} aria-hidden="true"></span>
+	{/if}
+	<span class="label">{@render children?.()}</span>
 </button>
-
 <style>
  .quick-action {
  display: inline-flex;

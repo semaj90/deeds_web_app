@@ -50,7 +50,9 @@
   let loadingDocument = $state<boolean>(false);
   let documentLoadError = $state<string>("");
 
-  interface Citation { id: string, text: string;
+  interface Citation {
+    id: string;
+    text: string;
     source: string;
     type: string;
   }
@@ -65,7 +67,9 @@
   let saveError = $state<string>("");
   let hasUnsavedChanges = $state<boolean>(false);
 
-  interface DocumentData { id: string, title: string;
+  interface DocumentData {
+    id: string;
+    title: string;
     content: string;
     type: "brief" | "contract" | "motion" | "evidence";
     caseId?: string;
@@ -327,21 +331,20 @@
                             <BookOpen class="h-4 w-4" />
                         </Button>
 
+                        <Button variant="ghost" size="sm" title="AI Assistant" onclick={() => aiDialogOpen = true}>
+                            <Brain class="h-5 w-5 text-purple-600" />
+                        </Button>
+
                         <Dialog.Root bind:open={aiDialogOpen}>
-                            <Dialog.Trigger>
-                                <Button variant="ghost" size="sm" title="AI Assistant">
-                                    <Brain class="h-5 w-5 text-purple-600" />
-                                </Button>
-                            </Dialog.Trigger>
                             <Dialog.Content class="sm:max-w-[500px]">
-                                <Dialog.Header>
+                                <div class="flex flex-col space-y-1.5 text-center sm:text-left">
                                     <Dialog.Title class="flex items-center gap-2">
                                         <Brain class="h-6 w-6 text-purple-600" /> AI Legal Assistant
                                     </Dialog.Title>
                                     <Dialog.Description>
                                         Ask for help drafting, researching, or refining your document.
                                     </Dialog.Description>
-                                </Dialog.Header>
+                                </div>
 
                                 {#if error}
                                     <div class="bg-red-50 text-red-600 p-3 rounded text-sm flex gap-2 items-center">
@@ -356,7 +359,7 @@
                                     </div>
                                 </div>
 
-                                <Dialog.Footer>
+                                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
                                     <Button variant="secondary" onclick={() => aiDialogOpen = false}>Cancel</Button>
                                     <Button onclick={handleAIRequest} disabled={!query.trim() || isProcessingAI} class="gap-2">
                                         {#if isProcessingAI}
@@ -365,7 +368,7 @@
                                             <Brain class="h-4 w-4" /> Get Help
                                         {/if}
                                     </Button>
-                                </Dialog.Footer>
+                                </div>
                             </Dialog.Content>
                         </Dialog.Root>
                     </div>

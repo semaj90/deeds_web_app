@@ -55,7 +55,7 @@ notes: editedNotes }),
  citation.notes = editedNotes;
  citation.updated_at = data.citation.updated_at;
  isEditing = false;
- dispatch('updated', citation);
+ onupdated?.(citation);
  } else {
  alert(data.error || 'Failed to update notes');
  }

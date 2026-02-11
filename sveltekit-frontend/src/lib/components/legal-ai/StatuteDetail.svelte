@@ -54,11 +54,11 @@ let context: string[] = [];
  }
 
  function attachToCase() {
- dispatch('attach-to-case', statute);
+ onattachtocase?.(statute);
  }
 
  function saveCitation() {
- dispatch('save-citation', statute);
+ onsavecitation?.(statute);
  }
 </script>
 

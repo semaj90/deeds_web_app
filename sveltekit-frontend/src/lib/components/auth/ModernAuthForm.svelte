@@ -10,7 +10,7 @@ import Label from "$lib/components/ui/Label.svelte";
    let success = $state<string>('');
    let emailInput: any = null;
    let passwordInput: any = null;
-   let isValid = $derived(() => { const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   let isValid = $derived.by(() => { const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
    const hasValidEmail = emailRegex.test(formData.email);
    const hasPassword = formData.password.length >= 6; if (mode === 'register') {
     const hasConfirmPassword = formData.confirmPassword === formData.password;
@@ -52,7 +52,7 @@ import Label from "$lib/components/ui/Label.svelte";
           /> </div> {/if}
   <Button type="submit" class="w-full nes-btn is-primary bits-btn" disabled={loading || !isValid}> {loading ? 'Processing...': mode === 'login' ? 'Sign In': 'Create Account'} </Button>
  <!-- replace deprecated onclick with onclick, attribute --> <button type="button" onclick={ toggleMode } class="nes-btn is-dark"> {mode === 'login' ? "Don't have an account? Sign up": 'Already have an account? Sign in'} </button> </form>
- <button type="button" onclick={() => (open = false)} class="absolute right-4 top-4 nes-btn is-error is-small"> Ã—'
+ <button type="button" onclick={() => (open = false)} class="absolute right-4 top-4 nes-btn is-error is-small"> ×
     </button></div> {/if}
   <style> /* Place to add: any component-specific styles */ </style>
 

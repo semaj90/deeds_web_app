@@ -56,7 +56,7 @@ let cases: RelatedCase[] = [];
  }
 
  function viewCase(caseItem: RelatedCase) {
- dispatch('view-case', caseItem);
+ onviewcase?.(caseItem);
  }
 
  function getRelevanceColor(score?: number) {
