@@ -2,7 +2,7 @@
  * Integrated System Tests - Production Ready
  * Tests: File upload, RAG search, AI chat, CUDA detection
  */
-import type { test, expect  } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.describe('Integrated AI Chat System', () => {
   test('should load AI chat page with QUIC proxy', async ({ page }) => {

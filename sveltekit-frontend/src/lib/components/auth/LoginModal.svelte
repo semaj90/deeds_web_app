@@ -6,7 +6,7 @@
   import { Checkbox } from "$lib/components/ui/checkbox";
   import X from 'lucide-svelte/icons/x';
   import { goto } from '$app/navigation';
-  import { superForm } from 'sveltekit-superforms';
+  import { superForm } from 'sveltekit-superforms/client';
   import { zod } from 'sveltekit-superforms/adapters';
   import { loginSchema } from '$lib/schemas/auth';
 
@@ -90,6 +90,7 @@
         <Checkbox
           id="rememberMe"
           name="rememberMe"
+          class=""
           bind:checked={$form.rememberMe}
         />
         <Label for="rememberMe" class="text-sm font-normal">Remember me</Label>

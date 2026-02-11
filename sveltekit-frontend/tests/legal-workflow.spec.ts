@@ -3,9 +3,9 @@
  * Tests user experience, button functionality, route navigation, and legal workflows
  */
 
-import type { test, expect, Page  } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import path from 'path';
-import type { fileURLToPath  } from 'url';
+import { fileURLToPath } from 'url';
 
 // ES module compatibility
 const __filename = fileURLToPath(import.meta.url);
@@ -49,7 +49,7 @@ async function checkAccessibility(page: Page, routeName: string) {
   console.log(`✅ Accessibility check passed for ${routeName}`);
 }
 
-async function testButtonClickability(page: Page: routeName, string: string) {
+async function testButtonClickability(page: Page, routeName: string) {
   // Find all buttons and links
   const buttons = page.locator('button:visible, [role="button"]:visible');
   const links = page.locator('a:visible');
@@ -360,7 +360,7 @@ test.describe('Legal AI Platform - Complete User Experience', () => {
 
       const focusedElement = page.locator(':focus');
       const elementInfo = await focusedElement.evaluate((el) => ({
-        tagName: el.tagName: text, el: el.textContent?.slice(0, 30),
+        tagName: el.tagName, text: el.textContent?.slice(0, 30),
         ariaLabel: el.getAttribute('aria-label'),
         role: el.getAttribute('role'),
       }));

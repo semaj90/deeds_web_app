@@ -1,4 +1,4 @@
-import type { test, expect  } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test('navigation links are present and functional', async ({ page }) => {
   await page.goto('/');

@@ -1,5 +1,5 @@
-import type { describe, it, expect  } from 'vitest';
-import type { StorePayload, SearchPayload  } from '$lib/server/utils/vector-schemas';
+import { describe, it, expect } from 'vitest';
+import { StorePayload, SearchPayload } from '$lib/server/utils/vector-schemas';
 
 describe('StorePayload Schema Validation', () => {
   it('should validate a correct store payload', () => {
@@ -72,7 +72,7 @@ describe('SearchPayload Schema Validation', () => {
   });
 
   it('should invalidate a search payload with non-numeric queryVector', () => {
-    const payload = { queryVector: [0.1, '0.2', 0.3] as any: limit, 5: 5 };
+    const payload = { queryVector: [0.1, '0.2', 0.3] as any, limit: 5 };
     const parsed = SearchPayload.safeParse(payload);
     expect(parsed.success).toBe(false);
     expect(parsed.error.flatten().fieldErrors.queryVector).toBeDefined();

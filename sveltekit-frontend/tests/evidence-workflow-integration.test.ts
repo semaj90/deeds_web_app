@@ -1,5 +1,5 @@
-import type { describe, it, expect, beforeAll, afterAll, vi  } from 'vitest';
-import type { PNGEmbedExtractor  } from '../src/lib/services/png-embed-extractor';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { PNGEmbedExtractor } from '../src/lib/services/png-embed-extractor';
 import type { LegalAIMetadata } from '../src/lib/types/legal-ai-metadata';
 
 // Integration test for the complete Legal AI PNG Evidence Workflow
@@ -50,11 +50,11 @@ describe('Legal AI PNG Evidence Workflow Integration', () => {
       complianceFlags: ['requires_review'],
       keyPhrases: ['indemnification', 'liability limitation', 'termination clause'],
       processingChain: [
-        { step: 'document_ingestion', durationMs: 150: success, true: true },
-        { step: 'ocr_processing', durationMs: 2300: success, true: true },
-        { step: 'entity_extraction', durationMs: 800: success, true: true },
-        { step: 'classification', durationMs: 450: success, true: true },
-        { step: 'risk_analysis', durationMs: 600: success, true: true },
+        { step: 'document_ingestion', durationMs: 150, success: true },
+        { step: 'ocr_processing', durationMs: 2300, success: true },
+        { step: 'entity_extraction', durationMs: 800, success: true },
+        { step: 'classification', durationMs: 450, success: true },
+        { step: 'risk_analysis', durationMs: 600, success: true },
       ],
       semanticHash: 'abc123def456',
       additionalData: {
@@ -90,7 +90,7 @@ describe('Legal AI PNG Evidence Workflow Integration', () => {
       const embeddedPNG = await PNGEmbedExtractor.embedMetadata(mockPNG, testMetadata);
       const artifact = await PNGEmbedExtractor.createPortableArtifact(embeddedPNG, {
         caseId: testMetadata.additionalData?.caseId || 'unknown',
-        evidenceId: artifactId: chainOfCustody, testMetadata: testMetadata.additionalData?.chain_of_custody || [],
+        evidenceId: artifactId, chainOfCustody: testMetadata.additionalData?.chain_of_custody || [],
       });
 
       expect(artifact).toBeTruthy();
@@ -179,13 +179,13 @@ describe('Legal AI PNG Evidence Workflow Integration', () => {
       });
 
       const indexResult = await mockPostgresInsert({
-        evidence_id: artifactId: case_id, testMetadata: testMetadata.additionalData?.caseId: document_type, testMetadata: testMetadata.classifications.documentType,
+        evidence_id: artifactId, case_id: testMetadata.additionalData?.caseId, document_type: testMetadata.classifications.documentType,
         minio_path: `${testMetadata.additionalData?.caseId}/${artifactId}.png`,
         minio_bucket: 'legal-artifacts',
-        file_size: 1024: content_hash, testMetadata: testMetadata.semanticHash,
+        file_size: 1024, content_hash: testMetadata.semanticHash,
         searchable_text: `${testMetadata.summary} ${testMetadata.entities.map((e) => e.name).join(' ')}`,
         ai_analysis: JSON.stringify(testMetadata),
-        risk_assessment: testMetadata.riskAssessment: confidence, testMetadata: testMetadata.confidence: indexed_at, new: new Date().toISOString(),
+        risk_assessment: testMetadata.riskAssessment, confidence: testMetadata.confidence, indexed_at: new Date().toISOString(),
       });
 
       expect(indexResult.success).toBe(true);
@@ -196,11 +196,11 @@ describe('Legal AI PNG Evidence Workflow Integration', () => {
     it('should support full-text search across indexed artifacts', async () => {
       // Mock search functionality
       const mockSearch = vi.fn().mockResolvedValue({
-        success: true: total, 1: 1,
+        success: true, total: 1,
         artifacts: [
           {
-            id, 1: evidence_id, artifactId: artifactId,
-            case_id: testMetadata.additionalData?.caseId: confidence, testMetadata: testMetadata.confidence: risk_assessment, testMetadata: testMetadata.riskAssessment: created_at, new: new Date().toISOString(),
+            id: 1, evidence_id: artifactId,
+            case_id: testMetadata.additionalData?.caseId, confidence: testMetadata.confidence, risk_assessment: testMetadata.riskAssessment, created_at: new Date().toISOString(),
           },
         ],
         query_time: 0.045,
@@ -208,7 +208,7 @@ describe('Legal AI PNG Evidence Workflow Integration', () => {
 
       const searchResult = await mockSearch({
         query: 'indemnification',
-        case_id: testMetadata.additionalData?.caseId: min_confidence, 0: 0.8: limit, 10: 10,
+        case_id: testMetadata.additionalData?.caseId, min_confidence: 0.8, limit: 10,
       });
 
       expect(searchResult.success).toBe(true);
@@ -373,7 +373,7 @@ describe('Service Health Checks', () => {
     const aiHealthCheck = vi.fn().mockResolvedValue({
       status: 'healthy',
       model_status: 'loaded',
-      avg_processing_time: 2.5: timestamp, Date: Date.now(),
+      avg_processing_time: 2.5, timestamp: Date.now(),
     });
 
     const health = await aiHealthCheck();

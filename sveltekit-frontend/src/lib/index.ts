@@ -33,7 +33,7 @@ export {
 // ===== FILE UPLOAD SERVICES =====
 // Note: enhancedFileUpload may need to be a default export
 // export { enhancedFileUpload } from './services/enhanced-file-upload.js';
-export { default as localStorageFileFallback } from './services/localStorage-file-fallback.js';
+// export { default as localStorageFileFallback } from './services/localStorage-file-fallback.js';
 
 // ===== UTILITIES & TYPES =====
 export {
@@ -48,9 +48,9 @@ export type {
 } from './utils.js';
 
 // ===== OLLAMA INTEGRATION SERVICES =====
-export {
-    ollamaIntegrationLayer
-} from './services/ollama-integration-layer.js';
+// export {
+//     ollamaIntegrationLayer
+// } from './services/ollama-integration-layer.js';
 
 // ===== SERVER SERVICES (Server-side only) =====
 // Note: These should only be imported on the server side
@@ -102,7 +102,7 @@ export const DEV_TOOLS = {
 export { default as globalUserStore } from './stores/_archive/old-stores/global-user-store.svelte';
 
 // Hybrid Vector Operations
-export { getVectorSystemHealth, syncVectorData } from './services/hybrid-vector-operations.js';
+// export { getVectorSystemHealth, syncVectorData } from './services/hybrid-vector-operations.js';
 
 // Search Types
 export type {

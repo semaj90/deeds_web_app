@@ -17,6 +17,12 @@ export default defineConfig({
   // Test directory - includes both general tests and e2e subdirectory
   testDir: './tests',
 
+  // Only match .spec.ts files (exclude vitest .test.ts files)
+  testMatch: '**/*.spec.ts',
+
+  // Ignore vitest-based spec files that conflict with Playwright's expect
+  testIgnore: ['**/vector-routes.spec.ts', '**/stores-smoke-test.spec.ts'],
+
   // Sequential execution for user flow tests (login → case creation → evidence upload)
   fullyParallel: false,
 

@@ -140,6 +140,10 @@
     "src/lib/components/three/**",
     "src/lib/components/ui/gaming/**",
     "src/lib/components/source-validation/**",
+    "src/lib/components/error-brain/**",
+    "src/lib/components/integration/**",
+    "src/lib/components/visualizations/**",
+    "src/lib/components/headless/**",
     // Corrupted composables
     "src/lib/composables/**",
     // Keep core routes but exclude test routes

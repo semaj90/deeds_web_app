@@ -13,7 +13,7 @@
 
 	let { message, showTimestamp = true, showAvatar = true }: Props = $props();
 
-	let sanitizedContent = $derived(DOMPurify.sanitize(message.content));
+	let sanitizedContent = $derived((DOMPurify as any).sanitize(message.content));
 	let isUser = $derived(message.role === 'user');
 	let isAssistant = $derived(message.role === 'assistant');
 	let formattedTime = $derived(
@@ -24,7 +24,7 @@
 				})
 			: ''
 	);
-	let meta = $derived(meta as Record<string, any> | undefined);
+	let meta = $derived((message as any).meta as Record<string, any> | undefined);
 </script>
 
 <div

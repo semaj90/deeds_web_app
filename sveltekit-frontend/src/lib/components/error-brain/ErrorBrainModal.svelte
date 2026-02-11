@@ -101,7 +101,7 @@
 	 * Task 6: Save Patch
 	 * Saves error brain patch to database
 	 */
-	async function savePatch(filePath: string, patchContent: string, string): string {
+	async function savePatch(filePath: string, patchContent: string): Promise<void> {
 		if (!routePath) {
 			error = 'Route path is required';
 			return;
@@ -311,7 +311,7 @@ verification_status: verificationStatus, verification_message: verificationMessa
 			<!-- Analysis Details -->
 			{#if selectedAnalysis}
 				<div class="analysis-details" transition:fly={{
-	x: 20, duration, 200 200 }}>
+	x: 20, duration: 200 }}>
 					<h3 class="nes-text is-primary">Analysis Details</h3>
 
 					<div class="detail-section nes-container is-dark">
@@ -408,7 +408,7 @@ verification_status: verificationStatus, verification_message: verificationMessa
 					<!-- Verification Form -->
 					{#if showVerification}
 						<div class="verification-form nes-container is-rounded" transition:fly={{
-	y: 20, duration, 200 200 }}>
+	y: 20, duration: 200 }}>
 							<h4 class="nes-text">Patch Verification</h4>
 
 							<div class="form-group">

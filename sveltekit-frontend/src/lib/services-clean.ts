@@ -50,8 +50,9 @@ export { AdaptiveIndexOrchestrator } from './services/adaptive-index-orchestrato
 export { AIErrorFixer } from './services/ai-error-fixer';
 
 // ─── Client-Server Sync ───
-export { ClientServerSyncService, syncService, syncStatus, offlineCapabilities, isOnline, canSync } from './services/client-server-sync';
-export type { SyncStatus, SyncOperation } from './services/client-server-sync';
+// NOTE: Disabled - client-server-sync.ts imports from $lib/db/client-db (excluded)
+// export { ClientServerSyncService, syncService, syncStatus, offlineCapabilities, isOnline, canSync } from './services/client-server-sync';
+// export type { SyncStatus, SyncOperation } from './services/client-server-sync';
 
 // ─── Ollama Endpoint Utility ───
 export { getOllamaEndpoint, DEFAULT_OLLAMA } from './services/get-ollama-endpoint';

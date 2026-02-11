@@ -35,5 +35,5 @@ export * from './schema-phase89-preserved';
 export * from './warden-schema';
 
 // Saved Citations Schema (user-saved citation bookmarks)
-export { savedCitations } from '../../db/schema/citations';
+export { savedCitations } from './schema/citations';
 

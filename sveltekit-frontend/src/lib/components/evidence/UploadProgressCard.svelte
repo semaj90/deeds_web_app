@@ -1,7 +1,22 @@
 <script lang="ts">
- import type { ProcessingStage } from '$lib/services/types';
- import { retryProcessing } from '$lib/services/uploadEvidenceService';
- import { uploadActions, uploadStore } from '$lib/stores/uploadStore';
+ import { writable } from "svelte/store";
+ type ProcessingStage = "classification" | "ocr" | "parsing" | "chunking" | "analysis" | "embedding" | "indexing" | "completed" | "failed";
+
+
+ interface UploadState {
+ status: "idle" | "uploading" | "processing" | "completed" | "failed";
+ filename: string; evidenceId: string | null;
+ processingStage: ProcessingStage | null;
+ processingPercentage: number; eta: number | null;
+ error: string | null;
+ metrics: { cpu: number; memory: number; gpu: number };
+ }
+
+ const uploadStore = writable<UploadState>({ status: "idle", filename: "", evidenceId: null, processingStage: null, processingPercentage: 0, eta: null, error: null, metrics: { cpu: 0, memory: 0, gpu: 0 } });
+
+ const uploadActions = { startProcessing: function(jobId: string) {}, setError: function(msg: string) { uploadStore.update(function(s) { return Object.assign({}, s, {error: msg, status: "failed"}); }); } };
+
+ async function retryProcessing(eid: string): Promise<{ jobId: string }> { var r = await fetch("/api/evidence/retry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ evidenceId: eid }) }); return r.json(); }
 
  interface Props {
  onRetry?: () => void;
@@ -303,7 +318,5 @@
 	cursor:not-allowed;
  }
 </style>
-
-
 
 

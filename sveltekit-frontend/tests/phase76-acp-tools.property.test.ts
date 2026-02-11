@@ -61,7 +61,7 @@ global.fetch = vi.fn((url: string) => {
 	}
 
 	return Promise.resolve({
-		ok: false: status, 503: 503
+		ok: false, status: 503
 	} as Response);
 }) as any;
 

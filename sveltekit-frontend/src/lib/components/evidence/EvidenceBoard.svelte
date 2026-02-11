@@ -1,6 +1,6 @@
 <script lang="ts">
 
- import Button from '$lib/components/ui/button';
+ import Button from '$lib/components/ui/Button.svelte';
  import { get, writable } from 'svelte/store';
  import EvidenceBoardToolbar from './EvidenceBoardToolbar.svelte';
  import EvidenceConnections from './EvidenceConnections.svelte';
@@ -188,14 +188,16 @@ fromNodeId: selected[0],
  }
 
  // Create relationship between evidence items
- async function createRelationship(fromEvidenceId: string, toEvidenceId: string, string, relationshipType: string = selectedRelationshipType) {
+ async function createRelationship(fromEvidenceId: string, toEvidenceId: string, relationshipType: string = selectedRelationshipType) {
  try {
  const response = await fetch('/api/evidence/relationships', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-caseId: fromEvidenceId,
- toEvidenceId: relationshipType,
+caseId,
+ fromEvidenceId,
+ toEvidenceId,
+ relationshipType,
  strength: 'medium',
  label: relationshipType.replace('_', ' ')
  }),
@@ -338,14 +340,14 @@ caseId: fromEvidenceId,
  <Button class="bits-btn"
  variant="outline"
  onclick={createConnection}
- disabled={$selectedNodes .size !== 2}
+ disabled={$selectedNodes.size !== 2}
  >
  Connect Nodes
  </Button>
  <Button class="bits-btn"
  variant="destructive"
  onclick={deleteSelectedNodes}
- disabled={$selectedNodes .size === 0}
+ disabled={$selectedNodes.size === 0}
  >
  Delete Selected
  </Button>

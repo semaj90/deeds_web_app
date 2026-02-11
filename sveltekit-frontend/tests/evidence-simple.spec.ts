@@ -1,4 +1,4 @@
-import type { test, expect  } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import type { getTestBaseURL  } from './helpers/port-detector';
 
 let BASE_URL: string;

@@ -1,4 +1,4 @@
-import type { test  } from '@playwright/test';
+import { test } from '@playwright/test';
 
 test('FugitiveDx Screenshot', async ({ page }) => {
   // Navigate to the persons of interest page using direct URL

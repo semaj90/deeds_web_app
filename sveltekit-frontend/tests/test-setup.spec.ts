@@ -1,4 +1,4 @@
-import type { test  } from '@playwright/test';
+import { test } from '@playwright/test';
 
 test.describe('Test Environment Setup', () => {
   test('verify test environment is ready', async ({ page }) => {

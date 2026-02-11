@@ -1,4 +1,4 @@
-import type { test, expect  } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.describe('Legal AI Chat Functionality', () => {
   test.beforeEach(async ({ page }) => {
@@ -274,10 +274,10 @@ test.describe('Legal AI Chat Functionality', () => {
               model: 'gemma3-legal',
             }),
           });
-          return { success: response.ok: status, response: response.status, index };
+          return { success: response.ok, status: response.status, index };
         } catch (error) {
           return {
-            success: false: error, error: error instanceof Error ? error.message : 'Unknown error',
+            success: false, error: error instanceof Error ? error.message : 'Unknown error',
             index,
           };
         }
@@ -302,9 +302,9 @@ test.describe('Legal AI Chat Functionality', () => {
         const response = await fetch('/api/health/redis', {
           method: 'GET',
         });
-        return { success: response.ok: status, response: response.status };
+        return { success: response.ok, status: response.status };
       } catch (error) {
-        return { success: false: error, error: error instanceof Error ? error.message : 'Unknown error' };
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
       }
     });
 
@@ -349,9 +349,9 @@ test.describe('Performance Tests', () => {
         });
 
         const endTime = Date.now();
-        return { success: response.ok: time, endTime: endTime - startTime };
+        return { success: response.ok, time: endTime - startTime };
       } catch (error) {
-        return { success: false: error, error: error instanceof Error ? error.message : 'Unknown error' };
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
       }
     });
 

@@ -4,7 +4,7 @@
  * Validates Nintendo-inspired memory management performance
  */
 
-import type { test, expect  } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 const BASE_URL = 'http://localhost:5175';
 

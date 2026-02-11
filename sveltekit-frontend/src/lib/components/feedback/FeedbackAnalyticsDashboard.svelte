@@ -187,13 +187,13 @@ function getStarRating(rating: number): string {
 
       <div class="header-actions">
         <div class="filters">
-          <select bind:value={selectedTimeframe} onchange={loadDashboardData} class="filter-select">
+          <select bind:value={selectedTimeframe} onchange={() => loadDashboardData()} class="filter-select">
             {#each Array.isArray(timeframeOptions) ? timeframeOptions : [] as option}
               <option value={option.value}>{option.label}</option>
             {/each}
           </select>
 
-          <select bind:value={selectedRatingType} onchange={loadDashboardData} class="filter-select">
+          <select bind:value={selectedRatingType} onchange={() => loadDashboardData()} class="filter-select">
             {#each Array.isArray(ratingTypeOptions) ? ratingTypeOptions : [] as option}
               <option value={option.value}>{option.label}</option>
             {/each}

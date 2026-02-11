@@ -1,4 +1,4 @@
-import type { test, expect  } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.describe('Store Consolidation Smoke Tests', () => {
   test('auth store loads without errors', async ({ page }) => {

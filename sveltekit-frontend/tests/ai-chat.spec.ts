@@ -1,4 +1,4 @@
-import type { test, expect  } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.describe('Legal AI Chat Testing', () => {
   test.beforeEach(async ({ page }) => {

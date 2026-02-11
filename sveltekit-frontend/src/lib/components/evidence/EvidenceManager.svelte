@@ -1,6 +1,4 @@
 <!-- EvidenceManager.svelte Complete evidence management component with, - File upload with drag & drop - Evidence listing with embedding status - Semantic search functionality - Integration with backfill worker - Real-time embedding progress --> <script lang="ts">
-  import type { SearchResult } from '$lib/types';
-  // Migrated to $effect
   import Button from '$lib/components/ui/Button.svelte';
 import Card from '$lib/components/ui/Card/Card.svelte';
 import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
@@ -16,17 +14,20 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
 	mime_type: string;
     uploaded_at: string;
     case_id?: string;
-    hasEmbedding?: boolean }
+    hasEmbedding?: boolean;
+  }
 
   interface EmbeddingStats {
     total: number;
 	withEmbeddings: number;
     withoutEmbeddings: number;
-	percentage: number }
+	percentage: number;
+  }
 
-  interface SearchResult extends EvidenceFile {
+  interface EvidenceSearchResult extends EvidenceFile {
     similarity: number;
-	similarityDistance: number }
+	similarityDistance: number;
+  }
 
   interface EvidenceFilesResponse {
     success: boolean;
@@ -53,13 +54,14 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
 
   interface SearchResponse {
     success: boolean;
-	result: SearchResult[];
+	result: EvidenceSearchResult[];
     error?: string }
 
   interface Props {
     caseId?: string;
     showUpload?: boolean;
-    showSearch?: boolean }
+    showSearch?: boolean;
+  }
 
   let { caseId = '', showUpload = true, showSearch = true }: Props = $props();
 
@@ -280,11 +282,11 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
  <div class="stat-item"> <div class="text-2xl font-bold">{embeddingStats.percentage}%</div>
  <div class="text-sm">Complete</div> </div> </div>
  <div class="flex"> <Button onclick={ loadEmbeddingStats } disabled={loading.stats} variant="ghost"
-          class="text-sm bits-btn bits-btn"
+          class="text-sm"
         > {loading.stats ? 'Refreshing...': 'ðŸ”„ Refresh Stats'}
 </Button>
  <Button onclick={ triggerEmbeddingBackfill } disabled={loading.backfill || embeddingStats.withoutEmbeddings === 0} variant="secondary"
-          class="text-sm bits-btn bits-btn"
+          class="text-sm"
         > {loading.backfill ? 'Processing...': `ðŸš€ Generate Embeddings (${embeddingStats.withoutEmbeddings})`}
 </Button> </div> </div> </div>
  <!-- Upload, Section -->
@@ -293,10 +295,10 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
           ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } role="region" aria-label="Drop zone" ondrop={ handleDrop } >
           <input bind:this={fileInput} type="file"
             multiple class="hidden"
-            onchange={(e: Event) => { const target = e.target as HTMLInputElement; // Correctly access target if (target?.files) handleFileUpload(target.files)}} /> <div class="text-center"> <div class="text-4xl">ðŸ“Ž</div>
+            onchange={(e: Event) => { const target = e.target as HTMLInputElement; if (target?.files) handleFileUpload(target.files); }} /> <div class="text-center"> <div class="text-4xl">ðŸ“Ž</div>
  <p class="text-lg">Drop files here or click to browse</p>
  <p class="text-sm text-gray-600">Supports PDFs, images, documents, and more</p>
- <Button.Root class="bits-btn bits-btn"
+ <Button 
               onclick={() => fileInput?.click()} disabled={loading.upload} >
               {loading.upload ? 'Uploading...': 'Select Files'}
 </Button> </div> </div>
@@ -308,13 +310,13 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
  <div class="yorha-panel-content"> <div class="flex gap-2"> <input bind:value={ searchQuery } type="text"
             placeholder="Search for similar evidence..."
             class="flex-1 px-3 py-2 border rounded-lg"
-            onkeydown={(e) => e.key === 'Enter' && performSemanticSearch()} /> <Button.Root class="bits-btn bits-btn"
+            onkeydown={(e) => e.key === 'Enter' && performSemanticSearch()} /> <Button 
             onclick={ performSemanticSearch } disabled={loading.search || !searchQuery.trim()} >
             {loading.search ? 'Searching...': 'Search'}
 </Button> </div>
   {#if showSearchResults} <div class="search-results"> <div class="flex justify-between items-center"> <h4 class="font-semibold">Search Results ({searchResults.length})</h4>
- <Button class="bits-btn" onclick={() => { showSearchResults = false; searchResults = []}} variant="ghost"
-                class="bits-btn text-sm"
+ <Button  onclick={() => { showSearchResults = false; searchResults = []}} variant="ghost"
+                class="text-sm"
               > Clear Results </Button> </div>
   {#if searchResults.length === 0} <p class="text-gray-600">No similar evidence found.</p> {:else} <div class="space-y-3">
   {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="search-result-item p-4 border rounded-lg bg-gray-50 hover:bg-gray-100"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{result.title}
@@ -334,7 +336,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
   </div> {/if}
   <!-- Evidence: Files, List --> <div class="nes-container"> <div class="yorha-panel-header"> <div class="flex justify-between"> <h3 class="nes-text">ðŸ“‹ Evidence Files ({evidenceFiles.length})</h3>
  <Button onclick={ loadEvidenceFiles } disabled={loading.files} variant="ghost"
-          class="text-sm bits-btn bits-btn"
+          class="text-sm"
         > {loading.files ? 'Loading...': 'ðŸ”„ Refresh'}
 </Button> </div> </div>
  <div class="yorha-panel-content">
@@ -366,8 +368,8 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
  <div class="error-content"> <h4 class="error-title">Error</h4>
  <p class="error-message">{ error }
 </p>
- <Button class="bits-btn" onclick={() => { error = ''}} variant="ghost"
-            class="bits-btn mt-3 text-xs dismiss-btn"
+ <Button  onclick={() => { error = ''}} variant="ghost"
+            class="mt-3 text-xs dismiss-btn"
           > Dismiss </Button> </div> </div> {/if}
   </div>
  <style>

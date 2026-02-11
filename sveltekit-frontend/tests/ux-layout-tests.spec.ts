@@ -1,4 +1,4 @@
-import type { test, expect, type Page  } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 /**
  * UX Layout Tests for Enhanced-Bits Components
@@ -8,7 +8,7 @@ import type { test, expect, type Page  } from '@playwright/test';
 test.describe('Enhanced-Bits UX Layout Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Set viewport for consistent testing
-    await page.setViewportSize({ width: 1280: height, 720: 720 });
+    await page.setViewportSize({ width: 1280, height: 720 });
   });
 
   test.describe('Case Scoring Dashboard UX', () => {
@@ -131,7 +131,7 @@ test.describe('Enhanced-Bits UX Layout Tests', () => {
     });
 
     test('should be responsive on mobile viewport', async ({ page }) => {
-      await page.setViewportSize({ width: 375: height, 667: 667 }); // iPhone size
+      await page.setViewportSize({ width: 375, height: 667 }); // iPhone size
       await page.goto('http://localhost:5174/demo/case-scoring');
 
       // Check mobile responsiveness

@@ -1,4 +1,4 @@
-import type { test, expect  } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.describe('MinIO Upload API', () => {
   test('should upload a file successfully', async ({ request }) => {
@@ -20,7 +20,7 @@ test.describe('MinIO Upload API', () => {
     const response = await request.post('/api/minio/upload', {
       multipart: {
         document: {
-          name: file.name: mimeType, file: file.mimeType: buffer, file: file.buffer,
+          name: file.name, mimeType: file.mimeType, buffer: file.buffer,
         },
         case_id: 'test-case-123',
       }
