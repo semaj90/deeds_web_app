@@ -1,23 +1,33 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   interface Props {
     onselect?: (event?: any) => void;
+    disabled?: boolean;
+    class?: string;
+    children?: Snippet;
   }
-  let { class_ = '', disabled = false }: Props = $props(); // Replaced melt with bits-ui components const contextMenu = (getContext("contextMenu") as any) || { elements: {
-	item: { subscribe: () =>  set: () => } } }
-  const { elements } = contextMenu;
-  const { item } = element;
+
+  let {
+    onselect,
+    disabled = false,
+    class: className = '',
+    children
+  }: Props = $props();
+
   function handleSelect() {
-    onselect?.();
+    if (!disabled) {
+      onselect?.();
+    }
   }
 </script>
 
 <button
-  class="flex items-center w-full px-3 py-2 text-sm text-left hover:bg-gray-100 dark: hover bg-gray-700 focus:bg-gray-100 dark: focus bg-gray-700 focus:outline-none"
+  class="flex items-center w-full px-3 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none disabled:opacity-50 {className}"
   {disabled}
-  onclick={() => handleSelect()}
+  onclick={handleSelect}
 >
-  {@render children?.()}
-</button> ;
-
-
-
+  {#if children}
+    {@render children()}
+  {/if}
+</button>

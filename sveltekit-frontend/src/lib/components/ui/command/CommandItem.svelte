@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	// Migrated to $effect
+	import { getContext } from 'svelte';
 	import type { CommandContext, CommandItemProps } from './types';
 
 	interface Props extends CommandItemProps {
@@ -21,17 +21,15 @@
 	let element: HTMLDivElement | undefined = $state();
 
 	$effect(() => {
-
 		if (element) {
 			textContent = element.textContent || '';
 			commandContext?.registerItem(value, textContent);
 		}
 
-});
-
-	// TODO: Add as cleanup in $effect: return () => {
-		commandContext?.unregisterItem(value);
-	}
+		return () => {
+			commandContext?.unregisterItem(value);
+		};
+	});
 
 	function handleClick() {
 		if (!disabled) {

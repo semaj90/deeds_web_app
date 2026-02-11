@@ -13,46 +13,44 @@
 
   let { children, permissions, fallback, requireAll = false, caseId, resourceOwner }: Props = $props();
 
-  let requiredPermissions = $derived(() => {
-    return Array.isArray(permissions) ? permissions : [permissions];
-  });
+  let requiredPermissions = $derived(Array.isArray(permissions) ? permissions : [permissions]);
 
-  let hasAccess = $derived(() => {
+  let hasAccess = $derived.by(() => {
     if (!authStore.isAuthenticated || !authStore.user) {
       return false;
     }
 
     // Check resource ownership if specified
-    if (resourceOwner && authStore.user.id !== resourceOwner && authStore.user.role !== 'admin') {
+    if (resourceOwner && authStore.user.id !== resourceOwner && (authStore.user as any).role !== 'admin') {
       return false;
     }
 
-    const perms = requiredPermissions();
+    const perms = requiredPermissions;
 
     // Check case-specific permissions
     if (caseId) {
       if (requireAll) {
-        return perms.every(permission => {
-          if (permission === 'read') return authStore.canAccessCase?.(caseId) ?? false;
-          if (permission === 'write') return authStore.canEditCase?.(caseId) ?? false;
-          if (permission === 'delete') return authStore.canDeleteCase?.(caseId) ?? false;
-          return authStore.hasPermission?.(permission) ?? false;
+        return perms.every((permission: string) => {
+          if (permission === 'read') return (authStore as any).canAccessCase?.(caseId) ?? false;
+          if (permission === 'write') return (authStore as any).canEditCase?.(caseId) ?? false;
+          if (permission === 'delete') return (authStore as any).canDeleteCase?.(caseId) ?? false;
+          return (authStore as any).hasPermission?.(permission) ?? false;
         });
       } else {
-        return perms.some(permission => {
-          if (permission === 'read') return authStore.canAccessCase?.(caseId) ?? false;
-          if (permission === 'write') return authStore.canEditCase?.(caseId) ?? false;
-          if (permission === 'delete') return authStore.canDeleteCase?.(caseId) ?? false;
-          return authStore.hasPermission?.(permission) ?? false;
+        return perms.some((permission: string) => {
+          if (permission === 'read') return (authStore as any).canAccessCase?.(caseId) ?? false;
+          if (permission === 'write') return (authStore as any).canEditCase?.(caseId) ?? false;
+          if (permission === 'delete') return (authStore as any).canDeleteCase?.(caseId) ?? false;
+          return (authStore as any).hasPermission?.(permission) ?? false;
         });
       }
     }
 
     // Standard permission check
     if (requireAll) {
-      return perms.every((permission) => authStore.hasPermission?.(permission) ?? false);
+      return perms.every((permission: string) => (authStore as any).hasPermission?.(permission) ?? false);
     } else {
-      return perms.some((permission) => authStore.hasPermission?.(permission) ?? false);
+      return perms.some((permission: string) => (authStore as any).hasPermission?.(permission) ?? false);
     }
   });
 </script>

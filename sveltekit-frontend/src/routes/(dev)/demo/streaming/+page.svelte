@@ -70,9 +70,12 @@
 		streaming = false;
 	}
 
-	// TODO: Add as cleanup in $effect: return () => {
-		eventSource?.close();
-	}
+	// Cleanup on unmount
+	$effect(() => {
+		return () => {
+			eventSource?.close();
+		};
+	});
 </script>
 
 <div class="streaming-demo">

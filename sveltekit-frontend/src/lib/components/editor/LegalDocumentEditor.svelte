@@ -4,9 +4,7 @@
   import { quintOut } from 'svelte/easing';
 
   // UI Components
-  import * as Dialog from '$lib/components/ui/dialog';
-  import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-  import * as Tooltip from '$lib/components/ui/tooltip';
+  import { Dialog, DropdownMenu, Tooltip } from 'bits-ui';
   import Button from '$lib/components/ui/Button.svelte';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
@@ -273,8 +271,8 @@
 
         <div class="flex items-center gap-2">
             <Tooltip.Root>
-                <Tooltip.Trigger asChild let:builder>
-                    <Button variant="ghost" size="icon" builders={[builder]}>
+                <Tooltip.Trigger>
+                    <Button variant="ghost" size="sm">
                         <AlertCircle class="h-5 w-5" />
                     </Button>
                 </Tooltip.Trigger>
@@ -284,12 +282,12 @@
             </Tooltip.Root>
 
             <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild let:builder>
-                    <Button variant="outline" builders={[builder]} class="gap-2">
+                <DropdownMenu.Trigger>
+                    <Button variant="outline" class="gap-2">
                         <Settings class="h-4 w-4" /> Actions <ChevronDown class="h-4 w-4" />
                     </Button>
                 </DropdownMenu.Trigger>
-                <DropdownMenu.Content class="w-56">
+                <DropdownMenu.Content>
                     <DropdownMenu.Item onclick={() => console.log('Preview')}>
                         <Eye class="mr-2 h-4 w-4" /> Preview
                     </DropdownMenu.Item>
@@ -297,8 +295,8 @@
                         <Share2 class="mr-2 h-4 w-4" /> Share
                     </DropdownMenu.Item>
                     <DropdownMenu.Separator />
-                    <DropdownMenu.Item onclick={() => console.log('Delete')} class="text-red-500">
-                        <X class="mr-2 h-4 w-4" /> Delete
+                    <DropdownMenu.Item onclick={() => console.log('Delete')}>
+                        <span class="text-red-500 flex items-center"><X class="mr-2 h-4 w-4" /> Delete</span>
                     </DropdownMenu.Item>
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
@@ -320,18 +318,18 @@
                 <!-- Toolbar -->
                 <div class="mb-4 flex items-center justify-between border-b pb-2">
                     <div class="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" title="Bold"><strong>B</strong></Button>
-                        <Button variant="ghost" size="icon" title="Italic"><em>I</em></Button>
-                        <Button variant="ghost" size="icon" title="Underline"><u>U</u></Button>
+                        <Button variant="ghost" size="sm" title="Bold"><strong>B</strong></Button>
+                        <Button variant="ghost" size="sm" title="Italic"><em>I</em></Button>
+                        <Button variant="ghost" size="sm" title="Underline"><u>U</u></Button>
                         <div class="w-px h-6 bg-border mx-2"></div>
-                        <Button variant="ghost" size="icon" title="Insert Citation"
+                        <Button variant="ghost" size="sm" title="Insert Citation"
                                 onclick={() => insertCitation({ id: crypto.randomUUID(), text: 'Sample Citation', source: 'Smith v. Jones, 123 F.3d 456', type: 'case' })}>
                             <BookOpen class="h-4 w-4" />
                         </Button>
 
                         <Dialog.Root bind:open={aiDialogOpen}>
-                            <Dialog.Trigger asChild let:builder>
-                                <Button variant="ghost" size="icon" builders={[builder]} title="AI Assistant">
+                            <Dialog.Trigger>
+                                <Button variant="ghost" size="sm" title="AI Assistant">
                                     <Brain class="h-5 w-5 text-purple-600" />
                                 </Button>
                             </Dialog.Trigger>

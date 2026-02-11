@@ -15,6 +15,10 @@ Compact AI recommendations component for sidebar/dashboard use
   import Lightbulb from 'lucide-svelte/icons/lightbulb';
   import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
   import Zap from 'lucide-svelte/icons/zap';
+  import Target from 'lucide-svelte/icons/target';
+  import TrendingUp from 'lucide-svelte/icons/trending-up';
+  import ChevronRight from 'lucide-svelte/icons/chevron-right';
+  import Star from 'lucide-svelte/icons/star';
   interface Props {
     context?: string
     userRole?: 'prosecutor' | 'detective' | 'admin' | 'user';
@@ -67,7 +71,7 @@ Compact AI recommendations component for sidebar/dashboard use
               priority: 'medium',
               status: 'active'
             }
-           | undefined,
+           : undefined,
         preferences: {
 preferredActions: ['research', 'analysis', 'documentation'],
           workflowStyle: 'systematic'
@@ -76,10 +80,14 @@ preferredActions: ['research', 'analysis', 'documentation'],
 
       // Safely handle result that may be an array or wrapped: object
       if (Array.isArray(result)) {
-        recommendations = result.slice(0, maxRecommendations)} else if (result && Array.isArray((result as unknown).items)) {
-        recommendations = (result as unknown).items.slice(0, maxRecommendations)} else if ((result as unknown).slice) {
-        recommendations = (result as unknown).slice(0, maxRecommendations)} else {
-        recommendations = []}
+        recommendations = result.slice(0, maxRecommendations);
+      } else if (result && Array.isArray((result as any).items)) {
+        recommendations = (result as any).items.slice(0, maxRecommendations);
+      } else if ((result as any).slice) {
+        recommendations = (result as any).slice(0, maxRecommendations);
+      } else {
+        recommendations = [];
+      }
 
       lastUpdated = new Date()} catch (error) {
       console.error('Failed to load recommendations:', error);

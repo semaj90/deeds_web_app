@@ -66,7 +66,7 @@ export class ChatStore {
     conversationSummary = $derived.by(() => {
         const userMessages = this.messages.filter(item => item.role === 'user');
         const aiMessages = this.messages.filter(item => item.role === 'assistant');
-        const totalTokens = this.messages.reduce((sum, m) => sum + (m?.token_count ?? 0), 0);
+        const totalTokens = this.messages.reduce((sum, m) => sum + ((m?.metadata as any)?.tokenCount ?? 0), 0);
         return {
             totalMessages: this.messages.length,
             totalTokens,
@@ -74,19 +74,19 @@ export class ChatStore {
         };
     });
 
-    isSessionActive = $derived(this.session?.is_active ?? false);
+    isSessionActive = $derived(this.session?.isActive ?? false);
 
     sessionMetrics = $derived.by(() => {
         if (!this.session) return null;
-        const sessionMessages = this.messages.filter(m => m.session_id === this.session!.id);
-        const startTime = this.session!.start_time ? new Date(this.session!.start_time).getTime() : Date.now();
+        const sessionMessages = this.messages.filter(m => (m as any).session_id === this.session!.id);
+        const startTime = (this.session as any).start_time ? new Date((this.session as any).start_time).getTime() : Date.now();
         const duration = Date.now() - startTime;
 
         return {
             messageCount: sessionMessages.length,
-            tokensUsed: sessionMessages.reduce((sum, m) => sum + (m?.token_count ?? 0), 0),
+            tokensUsed: sessionMessages.reduce((sum, m) => sum + ((m?.metadata as any)?.tokenCount ?? 0), 0),
             duration,
-            lastActivity: this.session!.last_activity
+            lastActivity: (this.session as any).last_activity
         };
     });
 
@@ -200,11 +200,10 @@ export class ChatStore {
             const session = this.session;
             const aiMessage: ChatMessage = {
                 id: messageId,
-                session_id: session?.id ?? '',
                 role: 'assistant',
                 content: response,
-                timestamp: new Date().toISOString(),
-                token_count: Math.ceil(response.length / 4) // Rough estimate
+                timestamp: new Date(),
+                metadata: { session_id: session?.id ?? '', tokenCount: Math.ceil(response.length / 4) }
             };
             this.addMessage(aiMessage);
         }
@@ -219,14 +218,14 @@ export class ChatStore {
         // Update processing metrics
         this.processingMetrics = {
             ...this.processingMetrics,
-            confidenceScore: analysis.confidence,
-            somCluster: typeof analysis.som_cluster === 'string' ? parseInt(analysis.som_cluster) : -1
+            confidenceScore: (analysis as any).confidence ?? 0,
+            somCluster: typeof (analysis as any).som_cluster === 'string' ? parseInt((analysis as any).som_cluster) : -1
         };
     }
 
     setRAGContext(context: RAGContext): void {
         this.ragContext = context;
-        this.recommendations = context?.recommendations || [];
+        this.recommendations = (context?.recommendations || []) as any;
         this.didYouMean = Array.isArray(context.did_you_mean) ? context.did_you_mean : [];
     }
 

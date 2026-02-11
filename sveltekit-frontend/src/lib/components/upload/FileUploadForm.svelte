@@ -5,11 +5,12 @@ import Button from '$lib/components/ui/Button.svelte';
 import { Input } from '$lib/components/ui/input';
 import Label from "$lib/components/ui/label/Label.svelte";
 import FileUpload from "$lib/components/ui/modular/FileUpload.svelte";
-import type { UploadFile } from '$lib/components/ui/modular/types';
 import { Select } from "bits-ui";
 import Switch from "$lib/components/ui/switch";
 import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
-import { fileUploadSchema } from '$lib/schemas/upload';
+import { uploadSchema } from '$lib/schemas/upload';
+
+interface UploadFile { id: string; file: File; name: string; type: string; size: number; status: string; progress: number; error?: string; }
 import Binary from 'lucide-svelte/icons/binary';
 import CheckCircle from 'lucide-svelte/icons/check-circle';
 import FileText from 'lucide-svelte/icons/file-text';
@@ -19,7 +20,7 @@ import Image from 'lucide-svelte/icons/image';
 import Music from 'lucide-svelte/icons/music';
 import Upload from 'lucide-svelte/icons/upload';
 import { zodClient } from 'sveltekit-superforms/adapters';
-import { superForm } from 'sveltekit-superforms';
+import superForm from 'sveltekit-superforms';
 
 interface Props { data: { form: any };
   caseId?: string;
@@ -28,7 +29,7 @@ interface Props { data: { form: any };
 let { data, caseId = '' }: Props = $props();
 
 const { form, errors, enhance, submitting, delayed, message } = superForm(data.form, {
-  validators: zodClient(fileUploadSchema),
+  validators: zodClient(uploadSchema),
   multipleSubmits: 'prevent',
   onSubmit: ({ formData }) => {
     // Set the file in formData
@@ -142,9 +143,9 @@ function formatFileSize(bytes: number): string {
         maxSize={50 * 1024 * 1024}
         accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.mp4,.mp3,.wav"
         bind:files={uploadFiles}
-        on:fileschange={(e) => handleFilesChange(e.detail)}
-        on:upload={(e) => handleFileUpload(e.detail)}
-        on:remove={(e) => handleFileRemove(e.detail)}
+        onfileschange={(files) => handleFilesChange(files)}
+        onupload={(file) => handleFileUpload(file)}
+        onremove={(fileId) => handleFileRemove(fileId)}
         dragDropText="Drop evidence files here or click to browse"
         browseText="Browse Evidence Files"
         supportedFormats={['PDF', 'Word', 'Images', 'Video', 'Audio']}
@@ -184,21 +185,21 @@ function formatFileSize(bytes: number): string {
     <!-- Type Selection -->
     <div class="space-y-2">
       <Label htmlFor="type">Evidence Type</Label>
-      <Select name="type" bind:value={$form.type}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select evidence type" />
-        </SelectTrigger>
-        <SelectContent>
+      <Select.Root type="single" name="type" bind:value={$form.type}>
+        <Select.Trigger>
+          {$form.type || "Select evidence type"}
+        </Select.Trigger>
+        <Select.Content>
             {#each Object.entries(fileTypeIcons) as [value, Icon]}
-            <SelectItem {value}>
+            <Select.Item {value}>
               <div class="flex items-center gap-2">
                 <Icon class="h-4 w-4" />
                 <span class="capitalize">{value}</span>
               </div>
-            </SelectItem>
+            </Select.Item>
           {/each}
-        </SelectContent>
-      </Select>
+        </Select.Content>
+      </Select.Root>
       {#if $errors.type}
         <span class="text-sm text-red-500">{$errors.type}</span>
       {/if}
@@ -241,7 +242,7 @@ function formatFileSize(bytes: number): string {
             Only visible to you and case administrators
           </span>
         </Label>
-        <Switch id="isPrivate" name="isPrivate" bind:checked={$form.isPrivate} onCheckedChange={(v) => $form.isPrivate = v} />
+        <Switch id="isPrivate" name="isPrivate" bind:checked={$form.isPrivate} onchange={() => $form.isPrivate = !$form.isPrivate} />
       </div>
     </div>
 

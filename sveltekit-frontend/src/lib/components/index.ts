@@ -4,7 +4,7 @@
 // UI Components (Shadcn/Bits)
 export * from './ui/alert';
 export * from './ui/badge';
-export * from './ui/breadcrumb';
+// breadcrumb module does not exist - removed
 export * from './ui/button';
 export {
     Card,
@@ -18,7 +18,7 @@ export * from './ui/dialog';
 export * from './ui/form';
 export * from './ui/input';
 export * from './ui/label';
-export * from './ui/select';
+// select: use bits-ui Select directly instead of local wrapper
 export * from './ui/separator';
 export * from './ui/slider';
 export * from './ui/switch';
