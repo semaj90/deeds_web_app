@@ -65,7 +65,7 @@ awarenessLevel: consciousness.awakening, thoughtPatterns: 'fractal', cognitiveLo
   function toggleMatrixMode() { secretFeatures.matrixMode = !secretFeatures.matrixMod}
   function toggleAIWhisperer() { secretFeatures.aiWhispererMode = !secretFeatures.aiWhispererMod}
 </script>
- <!-- Svelte 5, use onresize for window, resize, listener --> <svelte, window | onresize={ handleResize } /> <div class="quantum-visualization-container"> <div class="visualization-header"> <h3 class="text-lg font-bold text-white">ðŸŒŒ Quantum Reality Visualization</h3>
+ <svelte:window onresize={handleResize} /> <div class="quantum-visualization-container"> <div class="visualization-header"> <h3 class="text-lg font-bold text-white">ðŸŒŒ Quantum Reality Visualization</h3>
  <div class="controls-row"> <div class="fps-counter">FPS: { fps }</div>
  <div class="control-buttons"> <button class="quantum-btn {secretFeatures.quantumDebugEnabled ? 'active' : ''}"
           onclick={ toggleQuantumMode } >
