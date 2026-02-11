@@ -928,6 +928,41 @@ export const statutes = pgTable('statutes', {
  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// === CASE ↔ STATUTE JUNCTION TABLE ===
+export const caseLinkTypeEnum = pgEnum('case_link_type', [
+	'CHARGED_UNDER',
+	'CITED_IN',
+	'RELATED_TO',
+	'OVERRULED_BY',
+	'AFFIRMED_BY',
+]);
+
+export const caseStatuteLinks = pgTable('case_statute_links',
+	{
+		id: uuid('id')
+			.default(sql`gen_random_uuid()`)
+			.primaryKey()
+			.notNull(),
+		caseId: uuid('case_id')
+			.notNull()
+			.references(() => cases.id, { onDelete: 'cascade' }),
+		statuteId: uuid('statute_id')
+			.references(() => statutes.id, { onDelete: 'set null' }),
+		citationId: uuid('citation_id')
+			.references(() => citations.id, { onDelete: 'set null' }),
+		linkType: caseLinkTypeEnum('link_type').notNull().default('CITED_IN'),
+		notes: text('notes'),
+		createdBy: uuid('created_by')
+			.references(() => users.id, { onDelete: 'set null' }),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+	},
+	(table) => ({
+		caseIdIdx: index('case_statute_links_case_id_idx').on(table.caseId),
+		statuteIdIdx: index('case_statute_links_statute_id_idx').on(table.statuteId),
+		citationIdIdx: index('case_statute_links_citation_id_idx').on(table.citationId),
+	})
+);
+
 // Chunked statute sections for RAG search
 export const statuteChunks = pgTable('statute_chunks',
  {
@@ -1099,6 +1134,14 @@ export const casesRelations = relations(cases, ({ one, many }) => ({
  caseScores: many(caseScores),
  userAiQueries: many(userAiQueries),
  canvasStates: many(canvasStates),
+ statuteLinks: many(caseStatuteLinks),
+}));
+
+export const caseStatuteLinksRelations = relations(caseStatuteLinks, ({ one }) => ({
+ case: one(cases, { fields: [caseStatuteLinks.caseId], references: [cases.id] }),
+ statute: one(statutes, { fields: [caseStatuteLinks.statuteId], references: [statutes.id] }),
+ citation: one(citations, { fields: [caseStatuteLinks.citationId], references: [citations.id] }),
+ createdBy: one(users, { fields: [caseStatuteLinks.createdBy], references: [users.id] }),
 }));
 
 export const criminalsRelations = relations(criminals, ({ one, many }) => ({

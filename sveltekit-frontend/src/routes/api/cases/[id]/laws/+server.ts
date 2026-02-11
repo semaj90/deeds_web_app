@@ -1,0 +1,117 @@
+import { caseStatuteLinks, statutes, cases, db } from '$lib/server/db/client';
+import { error, json } from '@sveltejs/kit';
+import { eq, and } from 'drizzle-orm';
+import type { RequestHandler } from './$types';
+
+/**
+ * GET /api/cases/[id]/laws
+ * Fetch all statute links for a case
+ */
+export const GET: RequestHandler = async ({ locals, params }) => {
+	if (!locals.user) {
+		throw error(401, 'Unauthorized');
+	}
+
+	const caseId = params.id;
+
+	try {
+		const links = await db
+			.select({
+				id: caseStatuteLinks.id,
+				linkType: caseStatuteLinks.linkType,
+				notes: caseStatuteLinks.notes,
+				createdAt: caseStatuteLinks.createdAt,
+				statuteId: statutes.id,
+				statuteTitle: statutes.title,
+				statuteSection: statutes.section,
+				statuteJurisdiction: statutes.jurisdiction,
+			})
+			.from(caseStatuteLinks)
+			.leftJoin(statutes, eq(caseStatuteLinks.statuteId, statutes.id))
+			.where(eq(caseStatuteLinks.caseId, caseId));
+
+		return json({ success: true, data: links });
+	} catch (err) {
+		console.error('Error fetching case laws:', err);
+		throw error(500, 'Failed to fetch case laws');
+	}
+};
+
+/**
+ * POST /api/cases/[id]/laws
+ * Link a statute to a case
+ * Body: { statute_code, link_type, notes? }
+ */
+export const POST: RequestHandler = async ({ locals, params, request }) => {
+	if (!locals.user) {
+		throw error(401, 'Unauthorized');
+	}
+
+	const caseId = params.id;
+
+	try {
+		const body = await request.json();
+
+		if (!body?.statute_code?.trim()) {
+			throw error(400, 'Missing required field: statute_code');
+		}
+
+		// Verify case exists
+		const [targetCase] = await db
+			.select({ id: cases.id })
+			.from(cases)
+			.where(eq(cases.id, caseId))
+			.limit(1);
+
+		if (!targetCase) {
+			throw error(404, 'Case not found');
+		}
+
+		// Find or create statute by section code
+		let statute = await db
+			.select()
+			.from(statutes)
+			.where(eq(statutes.section, body.statute_code.trim()))
+			.limit(1)
+			.then((rows) => rows[0]);
+
+		if (!statute) {
+			const [newStatute] = await db
+				.insert(statutes)
+				.values({
+					title: body.statute_code.trim(),
+					content: body.statute_code.trim(),
+					section: body.statute_code.trim(),
+				})
+				.returning();
+			statute = newStatute;
+		}
+
+		// Create the link
+		const [link] = await db
+			.insert(caseStatuteLinks)
+			.values({
+				caseId,
+				statuteId: statute.id,
+				linkType: body.link_type || 'CITED_IN',
+				notes: body.notes || null,
+				createdBy: locals.user.id,
+			})
+			.returning();
+
+		return json(
+			{
+				success: true,
+				data: link,
+				message: 'Statute linked to case',
+			},
+			{ status: 201 }
+		);
+	} catch (err) {
+		console.error('Error linking statute to case:', err);
+		if (err instanceof Error && 'status' in err) {
+			throw err;
+		}
+		throw error(500, 'Failed to link statute to case');
+	}
+};
