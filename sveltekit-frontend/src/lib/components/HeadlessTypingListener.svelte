@@ -55,7 +55,7 @@
       sessionDuration: 0,
       totalInteractions: wordCount,
       contextSwitches: 0
-    }  | undefined
+    } : undefined
   });
 
   function updateState(newState: TypingState) {

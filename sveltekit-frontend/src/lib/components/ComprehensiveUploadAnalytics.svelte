@@ -705,7 +705,7 @@ status: 'pending' },
 	.analytics-dashboard summary { padding: 1rem;
 		cursor: pointer; font-weight: 500;}
 	.analytics-content { padding: 1rem; border-top: 1px solid #e5e7eb;
-		display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 1rem;}
+		display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;}
 	.insight-card { background: #f9fafb;
 		padding: 1rem; border-radius: 0.5rem;}
 	.insight-card h4 { margin: 0 0 0.5rem 0;

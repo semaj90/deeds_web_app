@@ -112,7 +112,7 @@
     <div class="metric-item flex flex-col">
       <span class="text-xs text-slate-400 uppercase tracking-wider">Network</span>
       <div class="flex items-baseline gap-2">
-        <span class="text-xl font-mono {getStatusColor(systemMetrics.network true)}">{systemMetrics.network}%</span>
+        <span class="text-xl font-mono {getStatusColor(systemMetrics.network, true)}">{systemMetrics.network}%</span>
         <div class="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden self-center">
             <div class="h-full bg-current transition-all duration-500" style="width: {systemMetrics.network}%"></div>
         </div>

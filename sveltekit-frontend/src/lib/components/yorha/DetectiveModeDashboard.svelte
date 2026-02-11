@@ -213,7 +213,7 @@ https, //svelte.dev/e/js_parse_error -->
  witnessStatements={witnesses.map(w => ({
   name: w.name,
   statement: w.statement || '',
-  timestamp | undefined
+  timestamp: w.timestamp || undefined
  }))}
  />
  {/if}

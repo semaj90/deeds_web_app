@@ -192,7 +192,7 @@
    />
    <Button
     variant="default"
-    size="icon"
+    size="sm"
     class="send-btn"
     onclick={sendMessage}
     disabled={isTyping || !currentMessage.trim()}
@@ -219,7 +219,7 @@
   height: 100vh;
   font-family: 'JetBrains Mono', monospace;
   background-color: #0c0a09;
-  background-image: linear-gradient(rgba(12, 10, 9, 0.9), rgba(12, 10, 9, 0.9));
+  background-image: linear-gradient(rgba(12, 10, 9, 0.9), rgba(12, 10, 9, 0.9)),
         url('/grid-pattern.png');
  }
 

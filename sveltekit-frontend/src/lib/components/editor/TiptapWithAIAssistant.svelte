@@ -124,13 +124,13 @@ return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 <!-- Toolbar -->
 {#if !readOnly}
 <div class="border-b bg-muted/40 p-2 flex items-center gap-1 flex-wrap">
-<Button variant="ghost" size="icon"
+<Button variant="ghost" size="sm"
 class={isActive.bold ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleBold().run()}
 >
 <Bold class="w-4 h-4" />
 </Button>
-<Button variant="ghost" size="icon"
+<Button variant="ghost" size="sm"
 class={isActive.italic ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleItalic().run()}
 >
@@ -139,13 +139,13 @@ onclick={() => editor?.chain().focus().toggleItalic().run()}
 
 <div class="w-px h-6 bg-border mx-1"></div>
 
-<Button variant="ghost" size="icon"
+<Button variant="ghost" size="sm"
 class={isActive.h1 ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
 >
 <Heading1 class="w-4 h-4" />
 </Button>
-<Button variant="ghost" size="icon"
+<Button variant="ghost" size="sm"
 class={isActive.h2 ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
 >
@@ -154,13 +154,13 @@ onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
 
 <div class="w-px h-6 bg-border mx-1"></div>
 
-<Button variant="ghost" size="icon"
+<Button variant="ghost" size="sm"
 class={isActive.bullet ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleBulletList().run()}
 >
 <List class="w-4 h-4" />
 </Button>
-<Button variant="ghost" size="icon"
+<Button variant="ghost" size="sm"
 class={isActive.ordered ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleOrderedList().run()}
 >

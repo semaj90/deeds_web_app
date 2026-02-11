@@ -578,7 +578,7 @@ labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.s
 		height: 1.5rem; background: #6366f1;
 	color: #ffffff; border-radius: 9999px;
 	display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600; }
-  .entities-grid { display: grid; grid-template-columns: repeat(2, 1fr), gap: 0.75rem; }
+  .entities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
   .entity-card { padding: 0.75rem;
 		background: #f9fafb; border-radius: 0.5rem; }
   .entity-type { font-size: 0.75rem;

@@ -549,13 +549,13 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  </div>
  </div>
  <div class="flex gap-2">
- <Button class="bits-btn" variant="outline" size="icon" onclick={() => (showFilters = !showFilters)} class="md:hidden border-yellow-600 text-yellow-400 hover:bg-yellow-900/20">
+ <Button class="bits-btn" variant="outline" size="sm" onclick={() => (showFilters = !showFilters)} class="md:hidden border-yellow-600 text-yellow-400 hover:bg-yellow-900/20">
  <Filter class="w-4 h-4" />
  </Button>
- <Button class="bits-btn" variant="outline" size="icon" onclick={() => (viewMode = 'grid')} class={cn("border-yellow-600 text-yellow-400 hover:bg-yellow-900/20", viewMode === 'grid' && 'bg-yellow-900/30')}> <!-- Fixed to set 'grid' -->
+ <Button class="bits-btn" variant="outline" size="sm" onclick={() => (viewMode = 'grid')} class={cn("border-yellow-600 text-yellow-400 hover:bg-yellow-900/20", viewMode === 'grid' && 'bg-yellow-900/30')}> <!-- Fixed to set 'grid' -->
  <LayoutGrid class="w-4 h-4" />
  </Button>
- <Button class="bits-btn" variant="outline" size="icon" onclick={() => (viewMode = 'list')} class={cn("border-yellow-600 text-yellow-400 hover:bg-yellow-900/20", viewMode === 'list' && 'bg-yellow-900/30')}>
+ <Button class="bits-btn" variant="outline" size="sm" onclick={() => (viewMode = 'list')} class={cn("border-yellow-600 text-yellow-400 hover:bg-yellow-900/20", viewMode === 'list' && 'bg-yellow-900/30')}>
  <List class="w-4 h-4" />
  </Button>
  </div>

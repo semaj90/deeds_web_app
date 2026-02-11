@@ -117,7 +117,7 @@ https, //svelte.dev/e/css_empty_declaration -->
 <style>
 	:global(.timeline-container) {
 		max-height: 500px;
-		overflow-y-auto;
+		overflow-y: auto;
 	}
 </style>
 

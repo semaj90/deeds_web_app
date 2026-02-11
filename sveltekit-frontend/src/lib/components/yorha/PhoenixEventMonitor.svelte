@@ -102,7 +102,7 @@
         return '🔗';
       case 'error':
         return '❌';
-      default:return '📢';
+      default: return '📢';
     }
   }
 
@@ -126,7 +126,7 @@
         return 'text-green-400';
       case 'error':
         return 'text-red-400';
-      default:return 'text-slate-400';
+      default: return 'text-slate-400';
     }
   }
 </script>
