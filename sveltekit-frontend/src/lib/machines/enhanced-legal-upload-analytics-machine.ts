@@ -461,7 +461,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 				},
 				caseContext: {
 					activeCases: [],
-					currentCaseId | undefined,
+					currentCaseId: undefined,
 					workflowStage: 'discovery',
 					expertise: 'associate'
 				},
@@ -477,7 +477,13 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  } as PipelineStatus,
  aiAnalysisResults: [] as AIAnalysisResult[],
  evidenceMetadata: [] as EvidenceMetadata[],
- // optional production integrations left | undefined, authSession | undefined as, AuthSession | undefined, dbConnection | undefined as, DatabaseConnection | undefined, ollamaConfig | undefined as, OllamaConfig | undefined, caseId | undefined as, string | undefined, legalContext | undefined as, LegalContext | undefined, riskAssessment | undefined as, RiskAssessment | undefined,
+ // optional production integrations
+ authSession: undefined as AuthSession | undefined,
+ dbConnection: undefined as DatabaseConnection | undefined,
+ ollamaConfig: undefined as OllamaConfig | undefined,
+ caseId: undefined as string | undefined,
+ legalContext: undefined as LegalContext | undefined,
+ riskAssessment: undefined as RiskAssessment | undefined,
  },
  states: {
  idle: {

@@ -3,7 +3,7 @@
   import type { Case } from '$lib/types';
   import { caseFormSchema } from '$lib/schemas/forms';
   import { z } from 'zod';
-  import { superForm } from 'sveltekit-superforms';
+  import superForm from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
   // Infer form type from schema

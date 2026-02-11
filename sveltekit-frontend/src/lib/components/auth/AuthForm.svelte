@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { superForm } from 'sveltekit-superforms';
+  import superForm from 'sveltekit-superforms';
 
   interface Props {
     data: Record<string, unknown>;

@@ -6,7 +6,7 @@
   import { Checkbox } from "$lib/components/ui/checkbox";
   import X from 'lucide-svelte/icons/x';
   import { goto } from '$app/navigation';
-  import { superForm } from 'sveltekit-superforms';
+  import superForm from 'sveltekit-superforms';
   import { zod } from 'sveltekit-superforms/adapters';
   import { loginSchema } from '$lib/schemas/auth';
   import { toastStore } from '$lib/stores/toast';

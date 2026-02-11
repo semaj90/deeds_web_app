@@ -50,7 +50,7 @@ const _ENABLE_GPU = (() => {
   try {
     // @ts-ignore
     if (typeof process !== 'undefined') {
-      const v = process.env?.ENABLE_GPU as string : undefined;
+      const v = process.env?.ENABLE_GPU as string | undefined;
       if (typeof v === 'string') return v.toLowerCase() !== 'false' && v !== '0';
     }
   } catch {

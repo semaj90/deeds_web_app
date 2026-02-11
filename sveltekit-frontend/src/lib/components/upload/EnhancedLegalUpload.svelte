@@ -1,6 +1,7 @@
 <!-- Enhanced Legal Upload Component - Superforms v2 + MinIO + Legal AI -->
 <script lang="ts">
-	import { superForm, fileProxy } from 'sveltekit-superforms';
+	import superForm from 'sveltekit-superforms';
+	import { fileProxy } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod';
 	import { Dialog } from "bits-ui";

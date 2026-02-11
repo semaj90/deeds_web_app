@@ -1,6 +1,6 @@
 <!-- Simplified Registration Form - Svelte 5 + Superforms v2 -->
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
+	import superForm from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod';
 	import { goto } from '$app/navigation';

@@ -19,11 +19,11 @@
 	// Compute transition based on side
 	const flyParams = $derived(() => {
 		switch (drawerContext?.side) {
-			case 'left': return { x: -300 duration: 200 };
-			case 'right': return { x: 300 duration: 200 };
-			case 'top': return { y: -300 duration: 200 };
-			case 'bottom': return { y: 300 duration: 200 };
-			default:return { x: 300 duration: 200 };
+			case 'left': return { x: -300, duration: 200 };
+			case 'right': return { x: 300, duration: 200 };
+			case 'top': return { y: -300, duration: 200 };
+			case 'bottom': return { y: 300, duration: 200 };
+			default: return { x: 300, duration: 200 };
 		}
 	});
 

@@ -6,7 +6,7 @@ import type { Document } from '$lib/types';
     data = null
   }: Props = $props();
   import { invalidateAll } from "$app/navigation";
-  import { superForm } from "sveltekit-superforms/client";
+  import superForm from "sveltekit-superforms/client";
   // cast server data to: unknown to avoid: 'unknown' access errors
   const serverData = data as unknown
   const initialValues = evidence || (serverData?.form ?? {});

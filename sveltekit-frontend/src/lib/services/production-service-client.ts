@@ -83,9 +83,9 @@ class ProductionServiceClient {
    * Generic request method used by legalAIMachine
    */
   async makeRequest<T = unknown>(
-    endpoint: string;
-    data?: unknown;
-    options?: RequestInit;
+    endpoint: string,
+    data?: unknown,
+    options?: RequestInit,
     requestTimeout?: number
   ): Promise<ServiceResponse<T>> {
     const startTime = Date.now();

@@ -5,7 +5,7 @@
   import { registerSchema } from '$lib/schemas/auth';
   import X from 'lucide-svelte/icons/x';
   import { zodClient } from 'sveltekit-superforms/adapters';
-  import { superForm } from 'sveltekit-superforms';
+  import superForm from 'sveltekit-superforms';
   import type { ZodTypeAny } from 'zod';
   interface Props {
     onsuccess?: () => void

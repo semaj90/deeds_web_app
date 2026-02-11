@@ -77,7 +77,7 @@ export class TelemetryEventBus {
     maxBufferSize: 100,
     flushInterval: 30000,
     enableDebug: false,
-    endpoint | undefined,
+    endpoint: undefined,
   };
 
   private constructor() {

@@ -1,6 +1,6 @@
 <!-- MinIO Upload Component with SvelteKit 2 + Superforms + PostgreSQL Integration -->
 <script lang="ts">
-  import { superForm } from 'sveltekit-superforms';
+  import superForm from 'sveltekit-superforms';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {

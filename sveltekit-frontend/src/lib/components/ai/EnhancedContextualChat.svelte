@@ -10,7 +10,7 @@
   import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
-  import { superForm } from 'sveltekit-superforms';
+  import superForm from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import { chatMessageSchema } from '$lib/forms/contextual-chat-schema';
   import { Dialog } from "bits-ui";

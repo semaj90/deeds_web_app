@@ -269,7 +269,7 @@ export class EmbeddingsService {
 	5000);
 
           const messageHandler = (event: MessageEvent) => {
-            const payload = event?.data as WorkerMessage : undefined;
+            const payload = event?.data as WorkerMessage | undefined;
             if (
               payload?.type === 'pong' &&
               (payload.id === id || typeof payload.id === 'undefined')

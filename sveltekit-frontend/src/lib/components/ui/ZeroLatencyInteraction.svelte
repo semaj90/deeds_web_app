@@ -232,9 +232,11 @@ https, //svelte.dev/e/js_parse_error -->
     const p = pattern as any;
     try {
       const chrRomPattern = {
-        renderableHTML: String(p.renderableHTML || '') type: p.type || 'summary_card',
+        renderableHTML: String(p.renderableHTML || ''),
+        type: p.type || 'summary_card',
         priority: 4,
-	compressedData: new TextEncoder().encode(String(p.renderableHTML || '')) timestamp: Date.now()
+	compressedData: new TextEncoder().encode(String(p.renderableHTML || '')),
+        timestamp: Date.now()
       };
       // nesGPUBridge's exported type may not declare storeCHRROMPattern.'
       // call it defensively at runtime to avoid TS errors while preserving behavior.
