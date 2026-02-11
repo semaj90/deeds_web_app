@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	// Migrated to $effect
+	import { getContext } from 'svelte';
 	import { scale } from 'svelte/transition';
 	import type { AlertDialogContentProps, AlertDialogContext } from './types';
 
@@ -23,25 +23,19 @@
 			if (onEscapeKeydown) {
 				onEscapeKeydown(e);
 			}
-			// Note: AlertDialog typically doesn't close on Escape
-			// This is different from regular Dialog
 		}
 	}
 
 	$effect(() => {
-
 		if (dialogContext?.open) {
-			// Prevent scroll
 			document.body.style.overflow = 'hidden';
-			// Focus the content
 			contentRef?.focus();
 		}
-	
-});
 
-	// TODO: Add as cleanup in $effect: return () => {
-		document.body.style.overflow = '';
-	}
+		return () => {
+			document.body.style.overflow = '';
+		};
+	});
 
 	const defaultClass = `
 		fixed left-1/2 top-1/2 z-50
@@ -57,10 +51,9 @@
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		bind:this={contentRef}
-		class="{defaultClass} { className }"
-		transition:scale={{
-	duration: 150 start: 0.95 }}
-		onkeydown={ handleKeydown }
+		class="{defaultClass} {className}"
+		transition:scale={{ duration: 150, start: 0.95 }}
+		onkeydown={handleKeydown}
 		role="alertdialog"
 		aria-modal="true"
 		tabindex="-1"
@@ -71,6 +64,3 @@
 		{/if}
 	</div>
 {/if}
-
-
-

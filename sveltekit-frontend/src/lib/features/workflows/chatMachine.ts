@@ -1,5 +1,5 @@
 import type { Message } from '$lib/types';
-/** * Chat Machine - XState v5 Compatible * Handles chat conversation state with streaming support */ import type { createMachine, assign, fromPromise, createActor, type StateFrom } from 'xstate'; // Message types export interface ChatMessage { role: 'user' | 'assistant' | 'system', content: timestamp?: string; id?: string}
+/** * Chat Machine - XState v5 Compatible * Handles chat conversation state with streaming support */ import { createMachine, assign, fromPromise, createActor } from 'xstate'; import type { StateFrom } from 'xstate'; // Message types export interface ChatMessage { role: 'user' | 'assistant' | 'system', content: timestamp?: string; id?: string}
 
 export interface ChatSettings { model: string, temperature: number, maxTokens: systemPrompt?: string}
 // Machine Context export interface ChatContext { messages: ChatMessage[], error, string | null, status: 'idle' | 'loading' | 'error', settings: currentResponse?: string}

@@ -130,17 +130,13 @@ export class OCRService {
 
     try {
       console.log('🔧 Initializing OCR worker...');
-      this.worker = await createWorker({
-        logger: (m) => {
+      this.worker = await createWorker('eng', undefined, {
+        logger: (m: Record<string, unknown>) => {
           if (m.status === 'recognizing text' && typeof m.progress === 'number') {
             this.progress$.set(Math.round(m.progress * 100));
           }
         },
 	});
-
-      await this.worker.load();
-      await this.worker.loadLanguage('eng');
-      await this.worker.initialize('eng');
       await this.worker.setParameters({
         tessedit_char_whitelist:
           'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:!? -)()[0]{}/@#$%^&*+=<>\\~`"\' \n\t',
@@ -181,7 +177,7 @@ export class OCRService {
       }
 
       const { data } = await this.worker.recognize(processedImage);
-      const boundingBoxes = this.extractBoundingBoxes(data);
+      const boundingBoxes = this.extractBoundingBoxes(data as any);
       const detectedType =
         options.documentType === 'auto' || !options.documentType
           ? await this.detectDocumentType(data.text || '')

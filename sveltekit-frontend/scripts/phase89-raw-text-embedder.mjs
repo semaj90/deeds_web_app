@@ -23,17 +23,17 @@ const { Pool } = pg;
 
 const CONFIG = {
   postgres: {
-    host: '127.0.0.1',
-    port: 5434,
-    database: 'legal',
-    user: 'user',
-    password: 'pass'
+    host: process.env.PGHOST || '127.0.0.1',
+    port: parseInt(process.env.PGPORT || '5434'),
+    database: process.env.PGDATABASE || 'legal',
+    user: process.env.PGUSER || 'user',
+    password: process.env.PGPASSWORD || 'pass'
   },
   redis: {
-    url: 'redis://127.0.0.1:6379'
+    url: process.env.REDIS_URL || 'redis://127.0.0.1:6379'
   },
   ollama: {
-    host: 'http://localhost:11434',
+    host: process.env.OLLAMA_URL || 'http://localhost:11434',
     embeddingModel: 'embeddinggemma:latest'
   },
   chunking: {
@@ -50,7 +50,7 @@ async function main() {
 
   // Connect
   db = new Pool(CONFIG.postgres);
-  console.log('✅ Connected to Postgres (legal_ai_db @ 5434)');
+  console.log(`✅ Connected to Postgres (${CONFIG.postgres.database} @ ${CONFIG.postgres.host}:${CONFIG.postgres.port})`);
 
   redis = createClient({ url: CONFIG.redis.url });
   await redis.connect();

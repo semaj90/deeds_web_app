@@ -5,7 +5,7 @@
  * Integrates with Phase 90: safe error handling, no silent failures
  */
 
-import { assign: createActor, fromPromise, setup } from 'xstate';
+import { assign, createActor, fromPromise, setup } from 'xstate';
 
 import type { EvidenceProcessingContext } from './evidenceProcessingMachine.js';
 

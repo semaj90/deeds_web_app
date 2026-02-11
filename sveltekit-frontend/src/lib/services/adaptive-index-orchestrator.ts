@@ -1,11 +1,11 @@
 /**
  * Adaptive Index Orchestrator
  * Manages dynamic indexing of legal documents based on usage patterns
- * Phase 72 - Task 6
+ *
+ * Stack: EventEmitter-based service for managing vector indices
  */
 
 import { EventEmitter } from 'events';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types
 export interface IndexConfig {
@@ -90,7 +90,6 @@ export class AdaptiveIndexOrchestrator extends EventEmitter {
     if (!stats) return;
 
     const newQueryCount = stats.queryCount + 1;
-    // Moving average for latency
     const newAvgLatency =
       (stats.avgLatencyMs * stats.queryCount + latencyMs) / newQueryCount;
 
@@ -109,7 +108,6 @@ export class AdaptiveIndexOrchestrator extends EventEmitter {
     const stats = this.stats.get(indexName);
     if (!stats) return;
 
-    // Simple heuristic: if latency is high and usage is high
     if (stats.avgLatencyMs > 200 && stats.queryCount > this.config.minUsageThreshold) {
       this.emit('optimizeNeeded', indexName);
     }
@@ -123,9 +121,7 @@ export class AdaptiveIndexOrchestrator extends EventEmitter {
     let minScore = Infinity;
 
     for (const [name, stats] of this.stats) {
-      // Score based on query count and recency (higher is better/more cached)
-      // Here we want lowest score for eviction
-      const timeFactor = (Date.now() - stats.lastUpdated) / (1000 * 60 * 60); // Hours since update
+      const timeFactor = (Date.now() - stats.lastUpdated) / (1000 * 60 * 60);
       const score = stats.queryCount / (timeFactor + 1);
 
       if (score < minScore) {

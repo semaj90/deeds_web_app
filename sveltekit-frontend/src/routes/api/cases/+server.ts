@@ -16,8 +16,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	}
 
 	// Parse query parameters
-	const limit = Number(url.searchParams.get('limit')) ?? 10;
-	const offset = Number(url.searchParams.get('offset')) ?? 0;
+	const limit = Number(url.searchParams.get('limit')) || 10;
+	const offset = Number(url.searchParams.get('offset')) || 0;
 	const status = url.searchParams.get('status');
 	const priority = url.searchParams.get('priority');
 	const search = url.searchParams.get('search');
@@ -50,7 +50,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		return json({
 			success: true,
 			data: userCases,
-			pagination: { limit: offset,
+			pagination: { limit, offset,
 				hasMore: userCases.length === limit
 			}
 		});

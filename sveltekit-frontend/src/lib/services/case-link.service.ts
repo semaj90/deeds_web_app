@@ -1,19 +1,35 @@
+/**
+ * Case-Statute Link Service
+ *
+ * Manages relationships between legal cases and statutes in legal_ai_db.
+ * Uses PostgreSQL for CRUD, Redis for cache invalidation.
+ *
+ * Stack: PostgreSQL (legal_ai_db) + Redis + Drizzle ORM
+ */
+
 import { sql } from '$lib/server/db';
 import { redis } from '$lib/server/redis';
 
-// Note: Using dynamic imports or type-only imports for services that might be missing
-// to avoid compile-time errors if they don't exist yet.
+// Note: Using dynamic imports for services that might be missing
 let graphService: any;
 try {
   // @ts-ignore
-  import('./graph.service.js').then((m) => (graphService = m.graphService)).catch(() => {});
-} catch (e) {}
+  import('$lib/services/graph.service.js')
+    .then((m) => (graphService = m.graphService))
+    .catch(() => {});
+} catch (_e) {
+  // graph service not available
+}
 
 let auditService: any;
 try {
   // @ts-ignore
-  import('./audit.service.js').then((m) => (auditService = m.auditService)).catch(() => {});
-} catch (e) {}
+  import('$lib/services/audit.service.js')
+    .then((m) => (auditService = m.auditService))
+    .catch(() => {});
+} catch (_e) {
+  // audit service not available
+}
 
 export interface CaseStatuteLink {
   id: string;
@@ -21,7 +37,7 @@ export interface CaseStatuteLink {
   statute_code: string;
   linked_by: string;
   link_type: string;
-  notes?: string | null;
+  notes: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -49,12 +65,12 @@ class CaseLinkService {
       statute_code: data.statute_code,
       linked_by: userId,
       link_type: data.link_type,
-      notes: data.notes,
+      notes: data.notes ?? null,
       created_at: new Date(),
       updated_at: new Date(),
     };
 
-    // Save to database
+    // Save to legal_ai_db
     await sql`
       INSERT INTO case_statute_links
       (id, case_id, statute_code, linked_by, link_type, notes, created_at, updated_at)
@@ -62,14 +78,14 @@ class CaseLinkService {
       (${link.id}, ${link.case_id}, ${link.statute_code}, ${link.linked_by}, ${link.link_type}, ${link.notes ?? null}, ${link.created_at}, ${link.updated_at})
     `;
 
-    // Create Neo4j relationship
+    // Create Neo4j relationship (if graph service available)
     if (graphService?.createCaseStatuteRelationship) {
       await graphService
         .createCaseStatuteRelationship(caseId, data.statute_code, link.link_type)
         .catch(console.warn);
     }
 
-    // Invalidate cache
+    // Invalidate Redis cache
     await this.invalidateCaseCache(caseId);
 
     // Log audit event
@@ -89,7 +105,7 @@ class CaseLinkService {
   }
 
   /**
-   * Get case statutes
+   * Get case statutes from legal_ai_db
    */
   async getCaseStatutes(caseId: string, linkType?: string): Promise<CaseStatuteLink[]> {
     if (linkType) {
@@ -112,7 +128,7 @@ class CaseLinkService {
    * Unlink statute from case
    */
   async unlinkStatute(caseId: string, statuteCode: string, userId: string): Promise<void> {
-    // Delete from database
+    // Delete from legal_ai_db
     await sql`DELETE FROM case_statute_links WHERE case_id = ${caseId} AND statute_code = ${statuteCode}`;
 
     // Delete Neo4j relationship
@@ -120,7 +136,7 @@ class CaseLinkService {
       await graphService.deleteCaseStatuteRelationship(caseId, statuteCode).catch(console.warn);
     }
 
-    // Invalidate cache
+    // Invalidate Redis cache
     await this.invalidateCaseCache(caseId);
 
     // Log audit event
@@ -161,7 +177,7 @@ class CaseLinkService {
 
     const updatedLink = result[0];
 
-    // Invalidate cache
+    // Invalidate Redis cache
     await this.invalidateCaseCache(caseId);
 
     // Log audit event
@@ -221,7 +237,7 @@ class CaseLinkService {
   }
 
   /**
-   * Invalidate case cache
+   * Invalidate case cache in Redis
    */
   private async invalidateCaseCache(caseId: string): Promise<void> {
     try {

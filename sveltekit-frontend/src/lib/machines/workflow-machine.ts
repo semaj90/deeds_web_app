@@ -1,4 +1,4 @@
-/** * XState Workflow Management System * Production-ready state machines for legal case workflows */ import type { createMachine, assign, setup } from 'xstate'; import type { EventObject, StateValue } from 'xstate'; // ==================== DOCUMENT PROCESSING WORKFLOW ==================== export interface DocumentContext {
+/** * XState Workflow Management System * Production-ready state machines for legal case workflows */ import { createMachine, assign, setup } from 'xstate'; import type { EventObject, StateValue } from 'xstate'; // ==================== DOCUMENT PROCESSING WORKFLOW ==================== export interface DocumentContext {
 	documentId: string;
 	fileName: string;
 	fileSize: number;

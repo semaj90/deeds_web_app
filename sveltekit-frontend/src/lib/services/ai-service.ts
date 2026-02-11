@@ -1,5 +1,19 @@
+/**
+ * AI Service - Server-side AI Processing
+ *
+ * Handles Ollama inference, embedding generation, auto-tagging,
+ * and vector search operations against legal_ai_db (PostgreSQL + pgvector).
+ *
+ * Stack: Drizzle ORM + PostgreSQL + Ollama (gemma3-legal) + pgvector
+ */
+
 import { db } from '$lib/server/database';
-import { autoTags, documentChunks, embeddingCache, userAiQueries } from '$lib/server/db/schema-postgres';
+import {
+  autoTags,
+  documentChunks,
+  embeddingCache,
+  userAiQueries
+} from '$lib/server/db/schema-postgres';
 import { OllamaService } from '$lib/services/ollamaService';
 import crypto from 'crypto';
 import type { InferInsertModel } from 'drizzle-orm';
@@ -224,7 +238,7 @@ Format your response as JSON with the structure:
   }
 
   /**
-   * Find similar documents using vector search
+   * Find similar documents using vector search (pgvector cosine similarity)
    */
   async findSimilarDocuments(
     queryEmbedding: number[],
@@ -341,7 +355,7 @@ Format your response as JSON with the structure:
         .where(sql`${embeddingCache.textHash} = ${textHash}`)
         .limit(1);
 
-      const cached = rows?.[0] as EmbeddingCacheRow : undefined;
+      const cached = rows?.[0] as EmbeddingCacheRow | undefined;
       if (cached?.embedding) {
         const embField = cached.embedding;
         if (typeof embField === 'string') {
@@ -350,10 +364,10 @@ Format your response as JSON with the structure:
         return embField as number[];
       }
 
-      // Generate new embedding
+      // Generate new embedding via Ollama
       const embedding = await this.ollama.generateEmbedding(text);
 
-      // Cache the embedding
+      // Cache the embedding in legal_ai_db
       const insertData: NewEmbeddingCache = {
         id: generateIdFromEntropySize(10),
         textHash,

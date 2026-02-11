@@ -1,5 +1,6 @@
 import type { Document } from '$lib/types';
-import type { createMachine, assign, type ActorRefFrom } from 'xstate';
+import { createMachine, assign } from 'xstate';
+import type { ActorRefFrom } from 'xstate';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**

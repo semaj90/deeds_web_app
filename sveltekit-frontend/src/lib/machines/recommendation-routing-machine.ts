@@ -1,4 +1,4 @@
-import type { setup, assign, fromPromise } from 'xstate';
+import { assign, createActor, fromPromise, setup } from 'xstate';
 import { writable } from 'svelte/store';
 import type { Actor, StateFrom } from 'xstate';
 
@@ -671,7 +671,6 @@ export type RecommendationState = StateFrom<typeof recommendationRoutingMachine>
 export type RecommendationActor = Actor<typeof recommendationRoutingMachine>;
 
 // Store integration
-import type { createActor } from 'xstate';
 
 function createRecommendationStore() {
  const actor = createActor(recommendationRoutingMachine);

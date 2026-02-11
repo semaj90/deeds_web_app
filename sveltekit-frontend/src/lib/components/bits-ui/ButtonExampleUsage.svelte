@@ -13,21 +13,30 @@
   let activeAction = $state<string | null>(null);
 
   // Mock case data matching schema-postgres.ts cases table
-  let currentCase = $state({
+  let currentCase = $state<{
+    id: string;
+    title: string;
+    caseNumber: string;
+    status: 'open' | 'in_progress' | 'pending_review' | 'closed';
+    priority: 'low' | 'medium' | 'high' | 'critical';
+    jurisdiction: string;
+    practiceArea: string;
+  }>({
     id: crypto.randomUUID(),
     title: 'State v. Johnson - Financial Fraud',
     caseNumber: 'CAS-2026-482910',
-    status: 'open' as const,
-    priority: 'high' as const,
+    status: 'open',
+    priority: 'high',
     jurisdiction: 'Federal',
     practiceArea: 'Criminal Law'
   });
 
   // Mock evidence items matching schema-postgres.ts evidence table
-  let evidenceItems = $state([
-    { id: crypto.randomUUID(), title: 'Bank Statement Q4 2025', evidenceType: 'document' as const, fileType: 'application/pdf' },
-    { id: crypto.randomUUID(), title: 'Security Camera Footage', evidenceType: 'video' as const, fileType: 'video/mp4' },
-    { id: crypto.randomUUID(), title: 'Witness Deposition - M. Chen', evidenceType: 'witness_statement' as const, fileType: 'application/pdf' }
+  type EvidenceType = 'document' | 'video' | 'witness_statement' | 'forensic';
+  let evidenceItems = $state<Array<{ id: string; title: string; evidenceType: EvidenceType; fileType: string }>>([
+    { id: crypto.randomUUID(), title: 'Bank Statement Q4 2025', evidenceType: 'document', fileType: 'application/pdf' },
+    { id: crypto.randomUUID(), title: 'Security Camera Footage', evidenceType: 'video', fileType: 'video/mp4' },
+    { id: crypto.randomUUID(), title: 'Witness Deposition - M. Chen', evidenceType: 'witness_statement', fileType: 'application/pdf' }
   ]);
 
   let evidenceCount = $derived(evidenceItems.length);

@@ -117,7 +117,7 @@ let isDisabled = $derived(disabled || loading);
     };
 
     if (browser) {
-      userAnalyticsStore.trackButtonClick(analyticsEvent);
+      userAnalyticsStore.trackButtonClick(analyticsEvent as unknown as Record<string, unknown>);
       onanalytics?.(analyticsEvent);
 
       if (cacheKey) {
@@ -126,7 +126,7 @@ let isDisabled = $derived(disabled || loading);
       }
 
       if (searchKeywords && searchKeywords.length > 0) {
-        searchableButtonIndex.addButton({ id: id!, keywords: searchKeywords });
+        searchableButtonIndex.addButton({ id: id!, keywords: searchKeywords, label: analyticsLabel || '', element: null });
       }
     }
 

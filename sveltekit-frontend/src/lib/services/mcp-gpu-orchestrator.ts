@@ -35,7 +35,7 @@ export interface GPUTaskConfig {
     useContext7?: boolean;
     enableSOMClustering?: boolean;
     enableAttentionAnalysis?: boolean;
-    protocol?: 'quic' | 'grpc' | 'http' | 'auto';
+    protocol?: 'quic' | 'grpc' | 'http' | 'ws';
     timeout?: number;
 }
 
@@ -272,9 +272,10 @@ class MCPGPUOrchestrator {
 
         if (uploadResult?.success && task.config?.useRAG) {
             // Trigger RAG indexing
+            const resultData = uploadResult.data as Record<string, unknown> | undefined;
             await productionServiceClient.callService('/api/v1/vector/index', {
-                documentId: uploadResult.data.documentId,
-                content: uploadResult.data.extractedText
+                documentId: resultData?.documentId,
+                content: resultData?.extractedText
             });
         }
 
@@ -626,7 +627,7 @@ Provide a complete, working fix with explanation.`;
                 format: 'typescript'
             });
 
-            return response?.success ? (response.data?.content ?? '') : '';
+            return response?.success ? ((response.data as Record<string, unknown>)?.content as string ?? '') : '';
         } catch {
             return '';
         }
@@ -657,7 +658,7 @@ Provide a complete, working fix with explanation.`;
         try {
             const response = await productionServiceClient.callService('/api/gpu/metrics', {},
 	{ timeout: 5000 });
-            return response?.success ? (response.data?.utilization ?? 0) : 0;
+            return response?.success ? ((response.data as Record<string, unknown>)?.utilization as number ?? 0) : 0;
         } catch {
             return 0;
         }
@@ -667,7 +668,7 @@ Provide a complete, working fix with explanation.`;
         try {
             const response = await productionServiceClient.callService('/api/gpu/memory-status', {},
 	{ timeout: 5000 });
-            return response?.success ? (response.data?.memory_used ?? 0) : 0;
+            return response?.success ? ((response.data as Record<string, unknown>)?.memory_used as number ?? 0) : 0;
         } catch {
             return 0;
         }

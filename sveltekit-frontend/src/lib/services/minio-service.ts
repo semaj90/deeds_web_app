@@ -152,6 +152,9 @@ class MinIOService {
     }
 }
 
+/** Singleton instance of the MinIO service */
+export const minioService = new MinIOService();
+
 
 
 

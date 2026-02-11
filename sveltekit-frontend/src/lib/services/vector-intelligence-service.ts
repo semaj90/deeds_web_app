@@ -1,2 +1,82 @@
-// --- small runtime config + helpers --- function getRandomId(bytes = 8): string { try { if (typeof (globalThis as any).crypto !== 'undefined' && typeof (globalThis as any).crypto.randomUUID === 'function') { return (globalThis as any).crypto.randomUUID()} if (typeof (globalThis as any).crypto !== 'undefined' && typeof (globalThis as any).crypto.getRandomValues === 'function') { const arr = new Uint8Array(bytes); (globalThis as any).crypto.getRandomValues(arr); return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('')}catch { // ignore } try { // attempt Node fallback if available at runtime // eslint-disable-next-line @typescript-eslint/no-var-requires // @ts-ignore const nodeCrypto = (typeof require === 'function' ? require('crypto') : null); if (nodeCrypto?.randomBytes) return nodeCrypto.randomBytes(bytes).toString('hex')}catch { } // fallback let out = ''; for (let i = 0; i < bytes; i++) out += Math.floor(Math.random() * 256).toString(16).padStart(2, '0'); return out} // helper to fetch embeddings from Ollama (robust to response shapes) private async getEmbeddingFromOllama(text: string): Promise<Float32Array> { try { const res = await fetch($1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1$1
+/**
+ * Vector Intelligence Service
+ * Provides semantic search, recommendations, and analysis for legal documents
+ */
 
+// === Types ===
+
+export interface VectorSearchResult {
+	id: string;
+	content: string;
+	score: number;
+	metadata?: Record<string, unknown>;
+	source?: string;
+	documentId?: string;
+}
+
+export interface IntelligenceRecommendation {
+	id: string;
+	title: string;
+	description: string;
+	relevanceScore: number;
+	type: 'document' | 'case' | 'statute' | 'citation';
+	metadata?: Record<string, unknown>;
+}
+
+export interface SemanticAnalysisResult {
+	summary: string;
+	entities: string[];
+	topics: string[];
+	sentiment: number;
+	confidence: number;
+	keyTerms: string[];
+}
+
+export interface VectorIntelligenceState {
+	isSearching: boolean;
+	isAnalyzing: boolean;
+	lastQuery: string | null;
+	results: VectorSearchResult[];
+	recommendations: IntelligenceRecommendation[];
+	error: string | null;
+}
+
+// === Service ===
+
+class VectorIntelligenceService {
+	private baseUrl: string;
+
+	constructor(baseUrl = '/api/vector') {
+		this.baseUrl = baseUrl;
+	}
+
+	async search(query: string, options?: { limit?: number; threshold?: number }): Promise<VectorSearchResult[]> {
+		const res = await fetch(`${this.baseUrl}/search`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query, ...options }),
+		});
+		if (!res.ok) throw new Error(`Search failed: ${res.statusText}`);
+		const data = await res.json();
+		return data.results ?? [];
+	}
+
+	async getRecommendations(documentId: string, limit = 5): Promise<IntelligenceRecommendation[]> {
+		const res = await fetch(`${this.baseUrl}/recommendations?documentId=${documentId}&limit=${limit}`);
+		if (!res.ok) throw new Error(`Recommendations failed: ${res.statusText}`);
+		const data = await res.json();
+		return data.recommendations ?? [];
+	}
+
+	async analyze(content: string): Promise<SemanticAnalysisResult> {
+		const res = await fetch(`${this.baseUrl}/analyze`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ content }),
+		});
+		if (!res.ok) throw new Error(`Analysis failed: ${res.statusText}`);
+		return await res.json();
+	}
+}
+
+export const vectorIntelligenceService = new VectorIntelligenceService();

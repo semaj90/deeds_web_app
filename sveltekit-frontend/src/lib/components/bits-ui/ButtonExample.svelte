@@ -72,7 +72,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   {#if children}
     {@render children()}
   {/if}
-</Button>
+</Button.Root>
 
 <style>
   :global(.yorha-button) {

@@ -18,13 +18,18 @@
 		onClose?.();
 	}
 
-	const variantClass = $derived(() => {
+	const variantClass = $derived.by(() => {
 		switch (variant) {
-			case 'success': return 'border-green-500 bg-green-50 text-green-900 dark: bg-green-900/20 dark:text-green-100';
-			case 'error': return 'border-red-500 bg-red-50 text-red-900 dark: bg-red-900/20 dark:text-red-100';
-			case 'warning': return 'border-yellow-500 bg-yellow-50 text-yellow-900 dark: bg-yellow-900/20 dark:text-yellow-100';
-			case 'info': return 'border-blue-500 bg-blue-50 text-blue-900 dark: bg-blue-900/20 dark: text-blue-100';
-	default:return 'border-border bg-background text-foreground';
+			case 'success':
+				return 'border-green-500 bg-green-50 text-green-900 dark:bg-green-900/20 dark:text-green-100';
+			case 'error':
+				return 'border-red-500 bg-red-50 text-red-900 dark:bg-red-900/20 dark:text-red-100';
+			case 'warning':
+				return 'border-yellow-500 bg-yellow-50 text-yellow-900 dark:bg-yellow-900/20 dark:text-yellow-100';
+			case 'info':
+				return 'border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-100';
+			default:
+				return 'border-border bg-background text-foreground';
 		}
 	});
 
@@ -40,14 +45,13 @@
 </script>
 
 <div
-	transition:fly={{
-	x: 100, duration, 200 }}
-	class="{baseClass} {variantClass()} {className}"
+	transition:fly={{ x: 100, duration: 200 }}
+	class="{baseClass} {variantClass} {className}"
 	role="alert"
 >
 	<div class="flex-1">
 		{#if title}
-			<div class="text-sm font-semibold">{ title }</div>
+			<div class="text-sm font-semibold">{title}</div>
 		{/if}
 		{#if description}
 			<div class="text-sm opacity-90">{description}</div>
@@ -58,7 +62,7 @@
 		<button
 			type="button"
 			onclick={action.onClick}
-			class="inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled opacity-50"
+			class="inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
 		>
 			{action.label}
 		</button>
@@ -66,12 +70,12 @@
 
 	<button
 		type="button"
-		onclick={ handleClose }
+		onclick={handleClose}
 		class={closeButtonClass}
 		aria-label="Close"
 	>
 		<svg
-			xmlns="http, //www.w3.org/2000/svg"
+			xmlns="http://www.w3.org/2000/svg"
 			width="16"
 			height="16"
 			viewBox="0 0 24 24"
@@ -86,7 +90,3 @@
 		</svg>
 	</button>
 </div>
-
-
-
-

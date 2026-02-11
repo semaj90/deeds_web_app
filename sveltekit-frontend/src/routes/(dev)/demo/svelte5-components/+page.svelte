@@ -106,12 +106,13 @@ const tabs = [
 			<Svelte5Tabs bind:value={activeTab} {tabs} variant="nes">
 				<Svelte5TabPanel value="form">
 					<div class="space-y-4 p-4 bg-slate-800 rounded-lg">
-						<Svelte5Input
-							bind:value={inputValue}
-							label="Document Name"
-							placeholder="Enter document name..."
-							variant="nes"
-						/>
+						<div>
+							<label class="block text-sm font-medium text-slate-300 mb-1">Document Name</label>
+							<Svelte5Input
+								bind:value={inputValue}
+								placeholder="Enter document name..."
+							/>
+						</div>
 
 						<Svelte5Select
 							bind:value={selectValue}
@@ -120,7 +121,7 @@ const tabs = [
 						/>
 
 						<div class="flex items-center gap-6">
-							<Svelte5Checkbox bind:checked={checkboxChecked}>
+							<Svelte5Checkbox bind:checked={checkboxChecked} class="peer h-4 w-4" name="ai-analysis">
 								Enable AI Analysis
 							</Svelte5Checkbox>
 
@@ -165,13 +166,14 @@ const tabs = [
 							Tip: You can drag and drop files directly into the upload area.
 						</Svelte5Alert>
 
-						<Svelte5Progress
-							value={progressValue}
-							max={100}
-							label="Processing"
-							showValue
-							color="green"
-						/>
+						<div>
+							<span class="block text-sm font-medium text-slate-300 mb-1">Processing</span>
+							<Svelte5Progress
+								value={progressValue}
+								max={100}
+								aria-label="Processing"
+							/>
+						</div>
 					</div>
 				</Svelte5TabPanel>
 
@@ -195,21 +197,16 @@ const tabs = [
 						</div>
 
 						<div class="flex gap-4 items-center">
-							<Svelte5Tooltip content="Click for more options" position="top">
+							<Svelte5Tooltip content="Click for more options" side="top">
 								<Svelte5Button variant="secondary" onclick={() => showDialog = true}>
 									Open Dialog
 								</Svelte5Button>
 							</Svelte5Tooltip>
 
-							<Svelte5DropdownMenu
-								items={menuItems}
-								onselect={(id) => console.log('Selected:', id)}
-							>
-								{#snippet trigger()}
-									<Svelte5Button variant="ghost">
-										Actions ▼
-									</Svelte5Button>
-								{/snippet}
+							<Svelte5DropdownMenu>
+								<Svelte5Button variant="ghost">
+									Actions ▼
+								</Svelte5Button>
 							</Svelte5DropdownMenu>
 						</div>
 					</div>
@@ -248,14 +245,14 @@ const tabs = [
 			<li>Confidence: {sliderValue}%</li>
 		</ul>
 
-		{#snippet footer()}
+		<div class="flex gap-3 mt-4 justify-end">
 			<Svelte5Button variant="ghost" onclick={() => showDialog = false}>
 				Cancel
 			</Svelte5Button>
 			<Svelte5Button variant="primary" onclick={() => showDialog = false}>
 				Confirm
 			</Svelte5Button>
-		{/snippet}
+		</div>
 	</Dialog>
 </div>
 

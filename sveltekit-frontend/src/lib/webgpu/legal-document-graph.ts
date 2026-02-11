@@ -83,7 +83,7 @@ export class WebGPULegalDocumentGraph {
   private device: GPUDevice | null = null;
   private context: GPUCanvasContext | null = null;
   private canvas: HTMLCanvasElement;
-  private config: WebGPUGraphConfig;
+  public config: WebGPUGraphConfig;
 
   // ADD: store preferred canvas format after init to avoid re-casting navigator
   private preferredFormat: GPUTextureFormat | null = null;
