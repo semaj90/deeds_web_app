@@ -12,20 +12,21 @@
 		created_at: string;
 	}
 
+	interface Props {
+		caseId?: string | null;
+		limit?: number;
+		onview?: (citation: Citation) => void;
+		onedit?: (citation: Citation) => void;
+		ondeleted?: () => void;
+	}
+
 	let {
 		caseId = null,
 		limit = 20,
 		onview = () => {},
 		onedit = () => {},
 		ondeleted = () => {}
-	} = $props<{
-		caseId?: string | null;
-		limit?: number;
-		onview?: (citation: Citation) => void;
-		onedit?: (citation: Citation) => void;
-		ondeleted?: () => void;
-	}>();
-
+	}: Props = $props();
 
 	let citations: Citation[] = $state([]);
 	let isLoading = $state(true);

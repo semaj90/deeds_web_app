@@ -21,7 +21,7 @@ export default defineConfig({
   testMatch: '**/*.spec.ts',
 
   // Ignore vitest-based spec files that conflict with Playwright's expect
-  testIgnore: ['**/vector-routes.spec.ts', '**/stores-smoke-test.spec.ts'],
+  testIgnore: ['**/vector-routes.spec.ts'],
 
   // Sequential execution for user flow tests (login → case creation → evidence upload)
   fullyParallel: false,

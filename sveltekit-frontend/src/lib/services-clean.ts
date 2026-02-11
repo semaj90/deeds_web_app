@@ -50,12 +50,25 @@ export { AdaptiveIndexOrchestrator } from './services/adaptive-index-orchestrato
 export { AIErrorFixer } from './services/ai-error-fixer';
 
 // ─── Client-Server Sync ───
-// NOTE: Disabled - client-server-sync.ts imports from $lib/db/client-db (excluded)
-// export { ClientServerSyncService, syncService, syncStatus, offlineCapabilities, isOnline, canSync } from './services/client-server-sync';
-// export type { SyncStatus, SyncOperation } from './services/client-server-sync';
+export { ClientServerSyncService, syncService, syncStatus, offlineCapabilities, isOnline, canSync } from './services/client-server-sync';
+export type { SyncStatus, SyncOperation } from './services/client-server-sync';
 
 // ─── Ollama Endpoint Utility ───
 export { getOllamaEndpoint, DEFAULT_OLLAMA } from './services/get-ollama-endpoint';
 
 // ─── Ollama Service (client wrapper) ───
 export { OllamaService } from './services/ollamaService';
+
+// ─── Neural Sprite Autoencoder ───
+export { default as NeuralSpriteAutoencoder } from './services/neural-sprite-autoencoder';
+export type { Latent } from './services/neural-sprite-autoencoder';
+
+// ─── PNG Tensor Embedding ───
+export {
+  PNGEmbedExtractor,
+  embedLegalMetadata,
+  extractLegalMetadata,
+  createPortableEvidence,
+  validatePortableEvidence
+} from './services/png-embed-extractor';
+export type { LegalAIMetadata, RiskAssessment, LegalEntity } from './services/png-embed-extractor';

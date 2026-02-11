@@ -12,19 +12,21 @@
 		updated_at: string;
 	}
 
+	interface Props {
+		citation: Citation;
+		showActions?: boolean;
+		onupdated?: () => void;
+		ondelete?: () => void;
+		onattachtocase?: (citation: Citation) => void;
+	}
+
 	let {
 		citation,
 		showActions = true,
 		onupdated = () => {},
 		ondelete = () => {},
 		onattachtocase = () => {}
-	} = $props<{
-		citation: Citation;
-		showActions?: boolean;
-		onupdated?: () => void;
-		ondelete?: () => void;
-		onattachtocase?: (citation: Citation) => void;
-	}>();
+	}: Props = $props();
 
 	let isEditing = $state(false);
 	let editedNotes = $state(citation.notes || '');

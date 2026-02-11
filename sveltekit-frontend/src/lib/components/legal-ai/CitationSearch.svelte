@@ -1,18 +1,20 @@
 <script lang="ts">
 	import { debounce } from '$lib/utils/debounce';
 
+	interface Props {
+		placeholder?: string;
+		minChars?: number;
+		onselect?: (citation: Citation) => void;
+		onupdated?: () => void;
+	}
+
 	// Svelte 5 props
 	let {
 		placeholder = 'Search citations...',
 		minChars = 2,
 		onselect = () => {},
 		onupdated = () => {}
-	} = $props<{
-		placeholder?: string;
-		minChars?: number;
-		onselect?: (citation: Citation) => void;
-		onupdated?: () => void;
-	}>();
+	}: Props = $props();
 
 	interface Citation {
 		id: string;

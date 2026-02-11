@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code: Attributes need to, be, unique --> <!-- Citations Manager - Legal Citation System with, AI-powered, search --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
+<!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code: Attributes need to, be, unique --> <!-- Citations Manager - Legal Citation System with, AI-powered, search --> <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import Card from '$lib/components/ui/Card/Card.svelte';
 import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
@@ -129,7 +129,7 @@ import Trash2 from 'lucide-svelte/icons/trash-2';
   {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover:bg-muted" class:bg-primary={selectedCategory === category.id}
 	class:text-primary-foreground={selectedCategory === category.id} onclick={() => selectCategory(category.id)} >
 						<span>{category.label}</span>
- <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{category.count}</span> </Button> {/each}
+ <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{category.count}</span> </button> {/each}
   </div> </div>
  <!-- Citations, List --> <div class="col-span-3">
   {#if isLoading} <div class="nes-container"> <div class="yorha-panel-content py-8"> <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
