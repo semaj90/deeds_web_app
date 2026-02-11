@@ -1,5 +1,5 @@
 <script lang="ts">
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+
 
 let { onfilesadded, onuploadcomplete }: {
   onfilesadded?: (data: { files: File[] }) => void;

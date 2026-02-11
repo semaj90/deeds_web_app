@@ -6,20 +6,12 @@ import { browser } from '$app/environment';
 import Fuse from 'fuse.js';
 import type { Collection } from 'lokijs';
 import Loki from 'lokijs';
-import type {
-    CachingTypes,
-    LokiTypes,
-    IndexedDBTypes,
-    RedisTypes
-} from '$lib/types/enhanced-svelte5-types';
-
-// Use enhanced types with proper structure
-interface CacheEntry<T = unknown> extends CachingTypes.CacheEntry<T> {
+interface CacheEntry<T = unknown> {
     key: string;
     value: T;
     timestamp: number;
     ttl: number;
-    layer: CachingTypes.CacheLayer;
+    layer?: string;
     priority: number;
     accessCount: number;
     sizeBytes: number;
@@ -405,7 +397,9 @@ export class MultiLayerCacheSystem {
                     }
                 }
                 break;
-            case 'all': default, this.memoryCollection.clear();
+            case 'all':
+            default:
+                this.memoryCollection.clear();
                 if (browser && this.indexedDB) {
                     const transaction = this.indexedDB.transaction(['cache'], 'readwrite');
                     const store = transaction.objectStore('cache');

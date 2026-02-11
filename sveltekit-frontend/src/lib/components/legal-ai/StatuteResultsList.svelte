@@ -1,4 +1,5 @@
-<script lang="ts">interface Statute {
+<script lang="ts">
+interface Statute {
  id: string;
 	code: string;
  title?: string;
@@ -12,7 +13,8 @@
  statutes?: Statute[];
  error?: string | null;
  isLoading?: boolean;
- }>();function selectStatute(statute: Statute) {
+ }>();
+function selectStatute(statute: Statute) {
  onselect?.(statute);
  }
 

@@ -1,5 +1,5 @@
-<script lang="ts">import type { CaseTheoryPlan } from '$lib/types/case-theory';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+<script lang="ts">
+import type { CaseTheoryPlan } from '$lib/types/case-theory';
 
 let { ongenerated }: { ongenerated?: (data: { plan: any }) => void } = $props();
 
@@ -42,7 +42,8 @@ closingOutline: true,
 			investigativeGaps: false,
 			pressTalkingPoints: false
 		}
-	});let isSubmitting = $state(false);
+	});
+let isSubmitting = $state(false);
 	let plan = $state<CaseTheoryPlan | null>(null);
 	let rawOutput = $state<string | null>(null);
 	let errorMessage = $state<string | null>(null);

@@ -1,11 +1,13 @@
-<script lang="ts">interface Props {
+<script lang="ts">
+interface Props {
   onupload?: (...args: any[]) => void;
     maxSize?: number;
     accept?: string[];
     aiEnabled?: boolean;
   }
 
-  let { maxSize = 10485760, accept = ['*/*'], aiEnabled = true , onupload }: Props = $props();let dragging = false;
+  let { maxSize = 10485760, accept = ['*/*'], aiEnabled = true , onupload }: Props = $props();
+let dragging = false;
   let files: FileList | null = null;
 
   function handleDrop(e: DragEvent) {
@@ -37,7 +39,10 @@
 
 <div
   class="upload-zone"
-  class: dragging ondrop={handleDrop}; ondragover={handleDragOver}; on dragleave={handleDragLeave}
+  class:dragging
+  ondrop={handleDrop}
+  ondragover={handleDragOver}
+  ondragleave={handleDragLeave}
   role="button"
   tabindex="0"
   aria-label="File Upload Drop Zone"

@@ -7,12 +7,12 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
- import Button from '$lib/components/ui/button';
- import type { Dialog, DialogContent,
- DialogDescription, DialogHeader, DialogTitle, } from '$lib/components/ui/dialog';
+ import Button from '$lib/components/ui/Button.svelte';
+ import { Dialog, DialogContent,
+ DialogDescription, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
  import Input from '$lib/components/ui/input';
- import Progress from '$lib/components/ui/progress';
- import Textarea from '$lib/components/ui/textarea';
+ import { Progress } from '$lib/components/ui/progress';
+ import { Textarea } from '$lib/components/ui/textarea';
 
  type Statement = {
  victimName: string;
@@ -37,9 +37,10 @@ https, //svelte.dev/e/js_parse_error -->
 
  let {
  open = $bindable(false),
- caseId: onSave,
+ caseId,
+ onSave,
  onCancel
- } = $props<Props>();
+ }: Props = $props();
 
  type WizardStep = 'basic-info' | 'incident-details' | 'impact-assessment' | 'evidence-links' | 'review';
 
@@ -145,12 +146,12 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  // Reactive progress update
- $effect(() => {() => {
+ $effect(() => {
  updateProgress();
  });
 </script>
 
-<Dialog bind:open onopenChange={(e) => !e.detail && cancelWizard()}>
+<Dialog bind:open>
  <DialogContent class="victim-wizard-dialog">
  <DialogHeader>
  <DialogTitle>Victim Statement Wizard</DialogTitle>
@@ -161,7 +162,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  <!-- Progress Bar -->
  <div class="wizard-progress">
- <Progress bind:value={stepProgress} class="progress-bar" />
+ <Progress value={stepProgress} class="progress-bar" />
  <div class="step-indicators">
  {#each steps as step, index}
  <div
@@ -183,104 +184,104 @@ https, //svelte.dev/e/js_parse_error -->
  <div class="form-group">
  <label for="victimName">Victim Name:</label>
  <Input
- id="victimName"
- value={statement.victimName}
- oninput={(e) => statement.victimName = e.target.value}
- placeholder="Full name of the victim"
+  id="victimName"
+  value={statement.victimName}
+  oninput={(e: Event) => statement.victimName = (e.target as HTMLInputElement).value}
+  placeholder="Full name of the victim"
  />
+ </div>
  <div class="form-group">
  <label for="victimContact">Contact Information:</label>
  <Input
- id="victimContact"
- value={statement.victimContact}
- oninput={(e) => statement.victimContact = e.target.value}
- placeholder="Phone, email, or address"
+  id="victimContact"
+  value={statement.victimContact}
+  oninput={(e: Event) => statement.victimContact = (e.target as HTMLInputElement).value}
+  placeholder="Phone, email, or address"
  />
- </div>
  </div>
  </div>
  {/if}
 
  {#if currentStep === 'incident-details'}
+ <div class="step-content">
+ <h3>Incident Details</h3>
  <div class="form-group">
  <label for="incidentDate">Date of Incident:</label>
  <Input
- id="incidentDate"
- type="date"
- value={statement.incidentDate}
- oninput={(e) => statement.incidentDate = e.target.value}
+  id="incidentDate"
+  type="date"
+  value={statement.incidentDate}
+  oninput={(e: Event) => statement.incidentDate = (e.target as HTMLInputElement).value}
  />
+ </div>
  <div class="form-group">
  <label for="incidentLocation">Location:</label>
  <Input
- id="incidentLocation"
- value={statement.incidentLocation}
- oninput={(e) => statement.incidentLocation = e.target.value}
- placeholder="Where did the incident occur?"
+  id="incidentLocation"
+  value={statement.incidentLocation}
+  oninput={(e: Event) => statement.incidentLocation = (e.target as HTMLInputElement).value}
+  placeholder="Where did the incident occur?"
  />
+ </div>
  <div class="form-group">
  <label for="incidentDescription">Description:</label>
  <Textarea
- value={statement.incidentDescription}
- oninput={(e) => statement.incidentDescription = e.target.value}
- placeholder="Detailed description of what happened"
- rows={ 6 }
- />
- </div>nd:value={statement.incidentDescription}
- placeholder="Detailed description of what happened"
- rows={ 6 }
+  value={statement.incidentDescription}
+  oninput={(e: Event) => statement.incidentDescription = (e.target as HTMLTextAreaElement).value}
+  placeholder="Detailed description of what happened"
+  rows={6}
  />
  </div>
  <Button class="bits-btn"
- onclick={ generateAISuggestions }
+ onclick={generateAISuggestions}
  disabled={isGeneratingSuggestions}
  variant="outline"
  size="sm"
  >
  {#if isGeneratingSuggestions}
- Generating...
+  Generating...
  {:else}
- Get AI Suggestions
+  Get AI Suggestions
  {/if}
  </Button>
  {#if aiSuggestions}
  <div class="ai-suggestions">
- <h4>AI Suggestions:</h4>
- <p>{aiSuggestions}</p>
+  <h4>AI Suggestions:</h4>
+  <p>{aiSuggestions}</p>
  </div>
  {/if}
  </div>
+ {/if}
+
+ {#if currentStep === 'impact-assessment'}
+ <div class="step-content">
+ <h3>Impact Assessment</h3>
  <div class="form-group">
  <label for="emotionalImpact">Emotional Impact:</label>
  <Textarea
- value={statement.emotionalImpact}
- oninput={(e) => statement.emotionalImpact = e.target.value}
- placeholder="How has this affected you emotionally?"
- rows={ 4 }
+  value={statement.emotionalImpact}
+  oninput={(e: Event) => statement.emotionalImpact = (e.target as HTMLTextAreaElement).value}
+  placeholder="How has this affected you emotionally?"
+  rows={4}
  />
+ </div>
  <div class="form-group">
  <label for="physicalImpact">Physical Impact:</label>
  <Textarea
- value={statement.physicalImpact}
- oninput={(e) => statement.physicalImpact = e.target.value}
- placeholder="Any physical effects or injuries?"
- rows={4}
+  value={statement.physicalImpact}
+  oninput={(e: Event) => statement.physicalImpact = (e.target as HTMLTextAreaElement).value}
+  placeholder="Any physical effects or injuries?"
+  rows={4}
  />
+ </div>
  <div class="form-group">
  <label for="financialImpact">Financial Impact:</label>
  <Textarea
- value={statement.financialImpact}
- oninput={(e) => statement.financialImpact = e.target.value}
- placeholder="Any financial losses or costs incurred?"
- rows={4}
+  value={statement.financialImpact}
+  oninput={(e: Event) => statement.financialImpact = (e.target as HTMLTextAreaElement).value}
+  placeholder="Any financial losses or costs incurred?"
+  rows={4}
  />
- </div>lass="form-group">
- <label for="financialImpact">Financial Impact:</label>
- <textarea
- bind:value={statement.financialImpact}
- placeholder="Any financial losses or costs incurred?"
- rows={4}
- ></textarea>
  </div>
  </div>
  {/if}

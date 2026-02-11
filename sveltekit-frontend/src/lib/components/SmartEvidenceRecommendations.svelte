@@ -6,7 +6,8 @@ https://svelte.dev/e/tag_invalid_name -->
 https://svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
 https://svelte.dev/e/tag_invalid_name -->
-<script lang="ts">
+<script lang="ts">
+
 	import Brain from "lucide-svelte/icons/brain";
 	import TriangleAlert from "lucide-svelte/icons/triangle-alert";
 	import CircleCheck from "lucide-svelte/icons/circle-check";
@@ -23,7 +24,8 @@ https://svelte.dev/e/tag_invalid_name -->
 		ongenerate?: (data: { evidenceId: string; caseId?: string }) => void;
 		onapply?: (data: { recommendationId: string }) => void;
 		ondismiss?: (data: { recommendationId: string }) => void;
-	}>();function generateRecommendations() {
+	}>();
+function generateRecommendations() {
 		ongenerate?.({ evidenceId, caseId });
 	}
 

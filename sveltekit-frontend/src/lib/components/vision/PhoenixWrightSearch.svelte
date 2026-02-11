@@ -1,5 +1,6 @@
 <script lang="ts">
- import { parseLegalDocument } from '$lib/utils/simd-json-parser';// Type definitions
+ import { parseLegalDocument } from '$lib/utils/simd-json-parser';
+// Type definitions
  interface PhoenixWrightSearchRequest { caseId: string, query: string;
  jurisdiction?: string;
 	detectContradictions: boolean;

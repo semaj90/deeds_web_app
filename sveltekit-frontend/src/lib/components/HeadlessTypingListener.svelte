@@ -3,7 +3,8 @@
   Provides typing state, contextual prompts, and analytics
 -->
 <script lang="ts">
-  import type { TypingContext, TypingState, TypingEvent } from '$lib/machines/userTypingStateMachine';// Custom event types for this component
+  import type { TypingContext, TypingState, TypingEvent } from '$lib/machines/userTypingStateMachine';
+// Custom event types for this component
   export interface TypingStateChangeEvent { state: TypingState, context: Partial<TypingContext>;
   }
 

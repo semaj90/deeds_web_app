@@ -1,7 +1,9 @@
-<script lang="ts">import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+<script lang="ts">
+
 	let charge = $state<any>(undefined);
 	let rec = $state<any>(undefined);
-	let risk = $state<any>(undefined);
+	let risk = $state<any>(undefined);
+
 
  interface Evidence { id: string, title: string;
  description?: string;
@@ -43,7 +45,8 @@
   jurisdiction?: 'federal' | 'state' | 'local';
  }
 
- let { caseId = null, evidence = [], charges = [], jurisdiction = 'federal' , onanalysiscomplete }: Props = $props();let isAnalyzing = $state(false);
+ let { caseId = null, evidence = [], charges = [], jurisdiction = 'federal' , onanalysiscomplete }: Props = $props();
+let isAnalyzing = $state(false);
  let analysis = $state<JudicialAnalysis | null>(null);
  let activeTab = $state<'overview' | 'admissibility' | 'probable-cause' | 'case-strength' | 'recommendations'>('overview');
 

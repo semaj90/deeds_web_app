@@ -1,15 +1,16 @@
-<script lang="ts">let { results = [] , onselect } = $props();function handleSelectResult(result) {
+<script lang="ts">let { results = [] , onselect } = $props();
+function handleSelectResult(result: any) {
 		onselect?.(result);
 	}
 
-	function truncateText(text, maxLength = 150) {
+	function truncateText(text: string, maxLength = 150) {
 		if (text.length > maxLength) {
 			return text.substring(0, maxLength) + '...';
 		}
 		return text;
 	}
 
-	function formatScore(score) {
+	function formatScore(score: number) {
 		return (score * 100).toFixed(0);
 	}
 </script>

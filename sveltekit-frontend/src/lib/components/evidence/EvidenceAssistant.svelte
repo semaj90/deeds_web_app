@@ -1,19 +1,23 @@
 <script lang="ts">
- import type { Badge } from '$lib/components/ui/badge';
- import type { Button } from '$lib/components/ui/button';
- import type { Dialog, DialogContent,
+ import { Badge } from '$lib/components/ui/badge';
+ import Button from '$lib/components/ui/Button.svelte';
+ import { Dialog, DialogContent,
  DialogDescription, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
- import type { Textarea } from '$lib/components/ui/textarea';
- import type { EvidenceNode } from '$lib/server/db/schema-postgres';
+ import { Textarea } from '$lib/components/ui/textarea';
+ import type { EvidenceNode } from '$lib/server/db/schema-postgres';
 
- let { node, open = $bindable(false) } = $props<{
- node: EvidenceNode;
- open?: boolean;
- }>();
+ type Props = {
+  node: EvidenceNode;
+  open?: boolean;
+  onupdate?: (data: { nodeId: string; updates: Partial<EvidenceNode> }) => void;
+ };
+
+ let { node, open = $bindable(false), onupdate }: Props = $props();
 
  let analysis = '';
  let isAnalyzing = false;
- let suggestions: string[] = [];async function analyzeEvidence() {
+ let suggestions: string[] = [];
+async function analyzeEvidence() {
  isAnalyzing = true;
  try {
  const response = await fetch('/api/evidence/ai/analyze', {
@@ -166,7 +170,7 @@ description: suggestion },
  </label>
 
  <label>
- Description: <Textarea, bind:value={node.description}
+ Description: <Textarea bind:value={node.description}
  onchange={(e) => updateNode({ description: e.currentTarget.value })}
  rows={ 3 }
  />

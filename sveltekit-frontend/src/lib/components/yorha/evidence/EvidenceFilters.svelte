@@ -1,6 +1,8 @@
 <script lang="ts">
 let { onfilter }: { onfilter?: (data: any) => void } = $props();
-let searchQuery = $state('');
+
+
+let searchQuery = $state('');
  let typeFilter = $state('all');
  let statusFilter = $state('all');
  let caseFilter = $state('all');

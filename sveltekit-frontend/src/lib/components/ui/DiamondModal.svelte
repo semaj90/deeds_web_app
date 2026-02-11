@@ -26,7 +26,8 @@
 		diamondPattern = true,
 		children,
 		footer
-	, onclose }: Props = $props();let modalElement: HTMLDivElement | null = null;
+	, onclose }: Props = $props();
+let modalElement: HTMLDivElement | null = null;
 	let canvasElement: HTMLCanvasElement | null = null;
 	let animationFrame: number;
 

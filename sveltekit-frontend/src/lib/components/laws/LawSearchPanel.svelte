@@ -8,7 +8,8 @@ https, //svelte.dev/e/block_unexpected_close -->
 https, //svelte.dev/e/block_unexpected_close -->
 <script lang="ts">
 	import { rerankLaws } from '$lib/api/laws/rerank';
-	import { searchLaws } from '$lib/api/laws/search';let query = '';
+	import { searchLaws } from '$lib/api/laws/search';
+let query = '';
 	let loading = false;
 	let results: any[] = [];
 	let reranked: any[] = [];

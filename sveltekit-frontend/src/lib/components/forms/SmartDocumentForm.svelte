@@ -11,7 +11,7 @@ import type { Document } from '$lib/types';
   // removed enhancedRAG (unused)
   import { fade, scale } from 'svelte/transition'; // removed fly (unused)
   import { writable, get } from 'svelte/store';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+
   // expose props (including optional ondispatch callback)
   let {
     title = "Smart Document Form",
@@ -29,7 +29,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     enableSmartSuggestions?: boolean,
     documentTypes?: string[],
     ondispatch?: ((payload: any) => void) | undefined
-  , onocrresult, onfieldchange, onsubmit } = $props();// Component state
+  , onocrresult, onfieldchange, onsubmit } = $props();
+// Component state
   let fileInput = $state<HTMLInputElement | null>(null);
   let uploadedFile = $state<File | null>(null);
   let populatedFields = $state<FormField[]>([...formSchema]);

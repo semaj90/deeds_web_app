@@ -1,4 +1,5 @@
-<script lang="ts">interface Filters { status: string, priority: string;
+<script lang="ts">
+interface Filters { status: string, priority: string;
     tags: string[];
   }
 
@@ -7,7 +8,8 @@
     filters: Filters;
   }
 
-  let { filters , onfilter }: Props = $props();let showPanel = $state(false);
+  let { filters , onfilter }: Props = $props();
+let showPanel = $state(false);
   let localFilters = $state<Filters>({ ...filters });
 
   $effect(() => {

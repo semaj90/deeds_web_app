@@ -1,4 +1,4 @@
-<script lang="ts">import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+<script lang="ts">
 
 	interface HighlightedCitation { text: string, startIndex: number;
 		endIndex: number;
@@ -11,7 +11,8 @@
 		citations?: HighlightedCitation[];
 	}
 
-	let { content = '', citations = [] , onsave, onremove }: Props = $props();let selectedText = $state('');
+	let { content = '', citations = [] , onsave, onremove }: Props = $props();
+let selectedText = $state('');
 	let selectionStart = $state(0);
 	let selectionEnd = $state(0);
 	let showSaveButton = $state(false);

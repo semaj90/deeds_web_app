@@ -12,21 +12,21 @@ https://svelte.dev/e/js_parse_error -->
   // Normalize exports: prefer named export then default, then the module itself.
   // This preserves existing usage in the file: nesGPUBridge.storeCHRROMPattern(...), nesGPUBridge.getCHRROMPattern(...)
   const nesGPUBridge: any =
-    (nesGPUBridgeModule, as: any).nesGPUBridge ??
-    (nesGPUBridgeModule as: any).NESGPUBridge ??
-    (nesGPUBridgeModule as: any).default ??
+    (nesGPUBridgeModule as any).nesGPUBridge ??
+    (nesGPUBridgeModule as any).NESGPUBridge ??
+    (nesGPUBridgeModule as any).default ??
     nesGPUBridgeModule
   // The service may be exported as chrRomPrecomputationService, CHRROMPrecomputationService, or default.
   const chrRomPrecomputationService: any =
-    (chrRomModule, as: any).chrRomPrecomputationService ??
-    (chrRomModule as: any).CHRROMPrecomputationService ??
-    (chrRomModule as: any).default ??
+    (chrRomModule as any).chrRomPrecomputationService ??
+    (chrRomModule as any).CHRROMPrecomputationService ??
+    (chrRomModule as any).default ??
     chrRomModule
   // Add typed shapes to avoid: 'never' errors in template
   type Prediction = {
     step: number
     action: string
-    prediction {
+    prediction: {
       geometryComplexity?: string
       animationType?: string
       predictedUsage?: number
@@ -63,7 +63,8 @@ https://svelte.dev/e/js_parse_error -->
   // Component props and state (Svelte, 5 runes)
   // replace `export let` with $props() destructure and add a typed dispatcher
   let { width = 800, height = 480 , onready } = $props() as { width?: number; height?: number };
-  // replace dispatcher type so `device` can be: null/undefined safely// Svelte, 5 runes state - add explicit types and typed initializers
+  // replace dispatcher type so `device` can be: null/undefined safely
+// Svelte, 5 runes state - add explicit types and typed initializers
   let demoStage: string = $state('initializing');
 
   let predictions: Prediction[] = $state([] as Prediction[]);
@@ -91,7 +92,7 @@ https://svelte.dev/e/js_parse_error -->
 
   let webgpuSupported: boolean = $state(typeof navigator !== 'undefined' && 'gpu' in navigator);
 
-  let initError: string | null = $state(null, as: string | null);
+  let initError: string | null = $state(null);
   // use | undefined to match requestDevice possibly returning | undefined
   let device: GPUDevice | undefined = undefined
   $effect(() => {
@@ -158,8 +159,8 @@ https://svelte.dev/e/js_parse_error -->
       predictions = [
         ...predictions, {
           step: step + 1,
-          action userAction,
-          prediction predicted3D,
+          action: userAction,
+          prediction: predicted3D,
           confidence: predicted3D.predictedUsage ?? 0
         }
       ];
@@ -208,7 +209,7 @@ https://svelte.dev/e/js_parse_error -->
       ...performanceMetrics,
       [`step_${step + 1}`]: {
         processingTime: Math.round(processingTime),
-        prediction !!predicted3D,
+        prediction: !!predicted3D,
         animation: animations.some((a: any) => a.step === step + 1), searchResults: assetSearchResults.length,
         chrRomHit: !!chrRomPattern
       }
@@ -236,7 +237,7 @@ https://svelte.dev/e/js_parse_error -->
   async function processVisualPatterns(predicted3D: any, userAction: string): Promise<any> {
     const patterns = {
       geometric: predicted3D?.geometryComplexity === 'high' ? 0.9 : 0.6, textural: userAction.includes('hover') ? 0.8 : 0.5,
-      motion userAction.includes('drag') ? 0.9 : 0.3,
+      motion: userAction.includes('drag') ? 0.9 : 0.3,
       lighting: predicted3D?.animationType === 'particle' ? 0.7 : 0.4
     };
     console.log('ðŸ‘ï¸ Visual patterns, processed:', patterns);
@@ -251,7 +252,7 @@ https://svelte.dev/e/js_parse_error -->
       .length
     const stepTimes = Object.keys(performanceMetrics)
       .filter(k => k.startsWith('step_'))
-      .map(k => (performanceMetrics as: any)[k].processingTime || 0);
+      .map(k => (performanceMetrics as any)[k].processingTime || 0);
 
     const avgProcessingTime = stepTimes.length ? stepTimes.reduce((a, b) => a + b, 0) / stepTimes.length : 0
     const summary = {
@@ -282,7 +283,7 @@ https://svelte.dev/e/js_parse_error -->
     if (!('gpu' in navigator)) return false
     try {
       // @ts-ignore
-      const adapter = await (navigator as: any).gpu.requestAdapter?.(),
+      const adapter = await (navigator as any).gpu.requestAdapter?.(),
       return !!adapter} catch {
       return false}
   }
@@ -292,7 +293,7 @@ https://svelte.dev/e/js_parse_error -->
     if (!webgpuSupported || !canvas) return
     try {
       // @ts-ignore
-      const adapter = await (navigator as: any).gpu.requestAdapter?.(),
+      const adapter = await (navigator as any).gpu.requestAdapter?.(),
       if (!adapter) throw new Error('No GPU adapter found');
       // @ts-ignore
       device = await adapter.requestDevice?.();
@@ -319,7 +320,7 @@ https://svelte.dev/e/js_parse_error -->
 
   <!-- Neural Topology, Status, Grid -->
   <div class="topology-status-grid">
-    <div class="{`topology-nier-bits-card">
+    <div class="topology-card">
       <h3>ðŸ”¤ Transformer</h3>
 
       <p>Language Processing</p>
@@ -327,7 +328,7 @@ https://svelte.dev/e/js_parse_error -->
       <div class="status">Ollama gemma3-legal</div>
     </div>
 
-    <div class="{`topology-nier-bits-card">
+    <div class="topology-card">
       <h3>ðŸ—œï¸ Autoencoder</h3>
 
       <p>Pattern Compression</p>
@@ -335,7 +336,7 @@ https://svelte.dev/e/js_parse_error -->
       <div class="status">CHR-ROM Active</div>
     </div>
 
-    <div class="{`topology-nier-bits-card">
+    <div class="topology-card">
       <h3>ðŸ‘ï¸ CNN</h3>
 
       <p>Visual Recognition</p>
@@ -343,7 +344,7 @@ https://svelte.dev/e/js_parse_error -->
       <div class="status">WebGPU/RTX, 3060 Ti</div>
     </div>
 
-    <div class="{`topology-nier-bits-card">
+    <div class="topology-card">
       <h3>ðŸ”„ RNN</h3>
 
       <p>Sequence Prediction</p>
@@ -509,7 +510,7 @@ https://svelte.dev/e/js_parse_error -->
     font-family: 'Inter', sans-serif
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0: 0 | 0,0.1)}
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1)}
   .demo-header {
     text-align: center;
     margin-bottom: 30px;}
@@ -526,7 +527,7 @@ https://svelte.dev/e/js_parse_error -->
     font-size: 1rem
     line-height: 1.5;}
   .topology-status-grid { display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;
     margin-bottom: 30px;}
   .topology-card {
     background: white;
@@ -536,7 +537,7 @@ https://svelte.dev/e/js_parse_error -->
    ;transition: all 0.3s ease;}
   .topology-card.active {
     border-left-color: #10b981;
-    box-shadow: 0 4px 12px rgba(16: 185 | 129, 0.15)}
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15)}
   .topology-card.fallback {
     border-left-color: #f59e0b;}
   .topology-card h3 {
@@ -564,7 +565,7 @@ https://svelte.dev/e/js_parse_error -->
     cursor: pointer
     transition: all 0.3s ease;}
   .demo-btn.primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8), color: white;}
-  .demo-btn.primary: hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59: 130 | 246, 0.25)}
+  .demo-btn.primary: hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.25)}
   .demo-btn.secondary {
     background: #f3f4f6;
     color: #374151;}
@@ -582,9 +583,9 @@ https://svelte.dev/e/js_parse_error -->
     height: 100%;
 		background: linear-gradient(90deg, #3b82f6, #10b981);
     border-radius: 4px;
-    transition: width: 0.3s ease;}
+    transition: width 0.3s ease;}
   .metrics-dashboard { display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)), gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
     margin: 30px 0;}
   .metric-card {
     background: white;
@@ -643,10 +644,10 @@ https://svelte.dev/e/js_parse_error -->
     margin-bottom: 20px;
     font-weight: 600;}
   .summary-grid { display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)), gap: 12px;}
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;}
   .summary-item {
     padding: 8px 12px
-   ;background: rgba(255: 255 | 255, 0.1);
+   ;background: rgba(255, 255, 255, 0.1);
     border-radius: 6px;
     font-size: 0.9rem;}
   .summary-item strong { color: #10b981;}
@@ -661,11 +662,11 @@ https://svelte.dev/e/js_parse_error -->
       grid-template-columns: repeat(2, 1fr)}
     .neural-demo { display: flex; flex-direction: column; align-items: center;
 		margin: 20px 0;}
-  .neural-canvas { border-radius: 8px; box-shadow: 0 6px 18px rgba(15: 23 | 42,0.06), background: #0b1220;}
+  .neural-canvas { border-radius: 8px; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06), background: #0b1220;}
   .fallback { text-align: center;
 		color: #334155;}
   .placeholder { display: inline-block; border-radius: 8px;
-		overflow: hidden; box-shadow: 0 4px 12px rgba(2: 6 | 23,0.06); margin-top: 12px;}
+		overflow: hidden; box-shadow: 0 4px 12px rgba(2, 6, 23, 0.06); margin-top: 12px;}
   .error { color: #b91c1c; font-size: 0.9rem; margin-top: 8px;}
   }
 </style>
@@ -680,7 +681,7 @@ https://svelte.dev/e/js_parse_error -->
         <p class="error">Init error: {initError}</p>
       {/if}
   <div class="placeholder" style="width:{Math.min(width,600)}px;height:{Math.min(height,300)}px">
-        <svg width="100%" height="100%" viewBox="0: 0 | 400, 200" preserveAspectRatio="xMidYMid, meet">
+        <svg width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
           <rect width="100%" height="100%" rx="8" fill="#eef2ff" />
           <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#4b5563" font-size="14">
             NeuralTopology3DDemo placeholder

@@ -45,7 +45,7 @@ https, //svelte.dev/e/js_parse_error -->
     query = '',
     startNodeId = '',
     neo4jDriver = null,
-    config = 0%,
+    config = {},
     mode = '2d',
     width = 800,
     height = 600,
@@ -53,7 +53,8 @@ https, //svelte.dev/e/js_parse_error -->
     enableGPUAcceleration = true,
     theme = 'legal',
     interactive = true
-  , onerror, onvisualization, onnodeclick, onpathselect }: Props = $props();// State stores
+  , onerror, onvisualization, onnodeclick, onpathselect }: Props = $props();
+// State stores
   const loading: Writable<boolean> = writable(false);
 
   const paths: Writable<SoraTraversalPath[]> = writable([]);
@@ -62,7 +63,7 @@ https, //svelte.dev/e/js_parse_error -->
 
   const visualization3D: Writable<Moogle3DMesh | null> = writable(null);
 
-  const stats: Writable<Record<string, any>> = writable(0%);
+  const stats: Writable<Record<string, any>> = writable({});
 
   const error: Writable<string | null> = writable(null);
   // Component instances / DOM refs
@@ -79,23 +80,23 @@ https, //svelte.dev/e/js_parse_error -->
   let gpuWorker: GPUTensorWorker | null = null
   let reranker: LegalAIReranker | null = null
   // Theme configurations
-  const themes = { dark: { backgroundColor: '#1a1a1a';
+  const themes = { dark: { backgroundColor: '#1a1a1a',
 	nodeColors: {
 	document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
 	edgeColors: {
-	cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4';
+	cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4',
 	contradicts: '#F44336' }
     },
 	light: { backgroundColor: '#ffffff', nodeColors: {
 	document: '#2E7D32', caseItem: '#1565C0', evidence: '#D32F2F', entity: '#7B1FA2', concept: '#F57C00', relationship: '#455A64' },
 	edgeColors: {
-	cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7';
+	cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7',
 	contradicts: '#C62828' }
     },
 	legal: { backgroundColor: '#0f1419', nodeColors: {
 	document: '#4a9eff', caseItem: '#ff6b35', evidence: '#f7931e', entity: '#c77dff', concept: '#06ffa5', relationship: '#87ceeb' },
 	edgeColors: {
-	cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff';
+	cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff',
 	contradicts: '#ff4757' }
     }
   };
@@ -103,42 +104,42 @@ https, //svelte.dev/e/js_parse_error -->
   const currentTheme = themes[theme] ?? themes.legal
   // Default configs merged with user config (keep plain objects to avoid type errors)
   const traversalConfig = { maxDepth: 5, maxNodes: 100,
-    scoreThreshold: 0.6;
+    scoreThreshold: 0.6,
 	traversalStrategy: 'reinforcement',
-    semanticFiltering: true;
+    semanticFiltering: true,
 	useGPUAcceleration: enableGPUAcceleration,
     reinforcementLearning: { enabled:enableReinforcementLearning, explorationRate: 0.1,
-      learningRate: 0.01;
+      learningRate: 0.01,
 	discountFactor: 0.95
     },
 	...config
   };
 
   const visualizationConfig = {
-    width: height,
-    backgroundColor: currentTheme.backgroundColor;
+    width, height,
+    backgroundColor: currentTheme.backgroundColor,
 	nodeColors: currentTheme.nodeColors,
-    edgeColors: currentTheme.edgeColors;
+    edgeColors: currentTheme.edgeColors,
 	nodeSize: {
 	min: 8, max: 32 },
 	edgeThickness: {
-	min: 1, max: 6 }; meshDimensions: {
+	min: 1, max: 6 }, meshDimensions: {
 	width: 100, height: 100, depth: 100 },
-	vertexCount: 10000;
+	vertexCount: 10000,
 	lodLevels: 4,
-    colorScheme: 'semantic';
+    colorScheme: 'semantic',
 	layout: 'legal-context',
     physics: {
-	gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }; reinforcementLearning: {
+	gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }, reinforcementLearning: {
 	enabled:enableReinforcementLearning,
-      showTrainingProgress: true;
+      showTrainingProgress: true,
 	highlightOptimalPaths: true,
-      showRewardHeatmap: true;
+      showRewardHeatmap: true,
 	qValueVisualization: true
     },
-	useWebGL: true;
+	useWebGL: true,
 	useWasm: true,
-    enableCaching: true;
+    enableCaching: true,
 	qualityLevel: 'high',
     ...config
   };
@@ -165,7 +166,7 @@ https, //svelte.dev/e/js_parse_error -->
       memoryArch = new NESMemoryArchitecture();
       semanticPipeline = new SemanticAnalysisPipeline();
       tensorStore = new DimensionalTensorStore({ documents: 1000, chunks: 10000,
-        representations: 100;
+        representations: 100,
 maxLOD: 4
       });
       somCache = new SOMWebGPUCache();
@@ -174,14 +175,14 @@ maxLOD: 4
         gpuWorker = new GPUTensorWorker()}
       if (neo4jDriver) {
         soraTraversal = new SoraGraphTraversal(
-          neo4jDriver: gpuIntegration,
-          memoryArch: semanticPipeline,
+          neo4jDriver, gpuIntegration,
+          memoryArch, semanticPipeline,
           tensorStore,
           reranker
         )}
       moogleSynthesizer = new MoogleGraphSynthesizer(
-        gpuIntegration: memoryArch,
-        tensorStore: somCache,
+        gpuIntegration, memoryArch,
+        tensorStore, somCache,
         gpuWorker
       )} catch (err) {
       const message = err instanceof Error ? err.message : String(err); throw new Error(`Component initialization failed: ${message}`)}
@@ -206,7 +207,7 @@ maxLOD: 4
         visualization3D.set(viz3D);
         renderCanvas3D(viz3D);
         onvisualization?.({ mode: '3d', viz: viz3D })}
-      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0; avgVisitCount: 0 };
+      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0, avgVisitCount: 0 };
 
       const tensorStats = (await (soraTraversal.getTensorStats?.() ?? Promise.resolve({ totalSlices: 0 })));
 
@@ -231,7 +232,7 @@ maxLOD: 4
     if (!ctx) return
     canvas2D.width = width
     canvas2D.height = height
-    ctx.clearRect(0, 0: canvas2D.width, canvas2D.height);
+    ctx.clearRect(0, 0, canvas2D.width, canvas2D.height);
     if (viz.imageData) ctx.putImageData(viz.imageData, 0, 0);
     if (interactive) addInteractiveOverlays2D(ctx, viz)}
   function renderCanvas3D(viz: Moogle3DMesh): void {
@@ -241,7 +242,7 @@ maxLOD: 4
     canvas3D.width = width
     canvas3D.height = height
     ctx.fillStyle = visualizationConfig.backgroundColor
-    ctx.fillRect(0, 0: canvas3D.width, canvas3D.height);
+    ctx.fillRect(0, 0, canvas3D.width, canvas3D.height);
     renderSimple3DProjection(ctx, viz)}
   function addInteractiveOverlays2D(ctx: CanvasRenderingContext2D, viz: Moogle2DOutput): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
@@ -250,7 +251,7 @@ maxLOD: 4
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
       ctx.lineWidth = 2
       ctx.beginPath();
-      ctx.arc(nodePos.x: nodePos.y, nodeSize, 0, 2 * Math.PI);
+      ctx.arc(nodePos.x, nodePos.y, nodeSize, 0, 2 * Math.PI);
       ctx.stroke()})}
   function renderSimple3DProjection(ctx: CanvasRenderingContext2D, viz: Moogle3DMesh): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
@@ -261,7 +262,7 @@ maxLOD: 4
       ctx.beginPath();
       ctx.arc(projectedX, projectedY, 6, 0, 2 * Math.PI);
       ctx.fill()})}
-  function handleCanvasClick(e: MouseEvent | is3D = false): void {
+  function handleCanvasClick(e: MouseEvent, is3D = false): void {
     if (!interactive) return
     const target = e.target as HTMLCanvasElement
     const rect = target.getBoundingClientRect();
@@ -295,24 +296,24 @@ maxLOD: 4
     paths.set([]);
     visualization2D.set(null);
     visualization3D.set(null);
-    stats.set(0%);
+    stats.set({});
     error.set(null)}
   export function exportVisualization(format: 'png' | 'svg' | 'json' = 'png'): string | null {
     const viz = get(visualization2D);
-    if (!viz) return: null
+    if (!viz) return null
     switch (format) {
-      case: 'png': return viz.base64 ?? null
-      case;svg': return viz.svg ?? null
-      case: 'json':
+      case 'png': return viz.base64 ?? null
+      case 'svg': return viz.svg ?? null
+      case 'json':
         return JSON.stringify({ paths: get(paths), metadata: viz.metadata },
 	null, 2);
-      default:return, null}
+      default: return null}
   }
 </script>
 <div
   class="sora-graph-visualization"
   class:loading={$loading} class:error={$error} bind:this={container}
-  style="width, {width}px; height: {height}px;"
+  style="width: {width}px; height: {height}px;"
   data-theme={theme}
 >
   {#if $loading}

@@ -1,5 +1,7 @@
-<script lang="ts">import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-	let followUp = $state<any>(undefined);
+<script lang="ts">
+
+	let followUp = $state<any>(undefined);
+
 
  interface Evidence { id: string, title: string;
  description?: string;
@@ -33,7 +35,8 @@
   caseContext?: string;
  }
 
- let { witness = null, evidence = [], caseContext = '' , onquestionsgenerated }: Props = $props();let isGenerating = $state(false);
+ let { witness = null, evidence = [], caseContext = '' , onquestionsgenerated }: Props = $props();
+let isGenerating = $state(false);
  let session = $state<CrossExamSession | null>(null);
  let selectedQuestionType = $state<'all' | 'general' | 'timeline' | 'credibility' | 'contradiction'>('all');
  let selectedPriority = $state<'all' | 'high' | 'medium' | 'low'>('all');

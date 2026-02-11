@@ -1,6 +1,7 @@
 <script lang="ts">
   import { cva, type VariantProps } from 'class-variance-authority';
-  import { cn } from '$lib/utils';import { browser } from '$app/environment';
+  import { cn } from '$lib/utils';
+import { browser } from '$app/environment';
   import { userAnalyticsStore } from '$lib/stores/unified';
   import { lokiButtonCache } from '$lib/services/loki-cache';
   import { searchableButtonIndex } from '$lib/services/fuse-search';
@@ -12,9 +13,9 @@
     { variants: { variant: {
           default: 'btn-nes-primary',
           destructive: 'btn-nes-danger',
-          outline: 'border-2 border-gray-400 bg-transparent hover:bg-gray-100 dark: hover, bg-gray-800',
+          outline: 'border-2 border-gray-400 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800',
           secondary: 'btn-nes-secondary',
-          ghost: 'hover:bg-gray-100 dark: hover, bg-gray-800 rounded-none',
+          ghost: 'hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none',
           link: 'text-blue-500 underline-offset-4 hover:underline hover:text-blue-600',
           legal: 'nes-legal-priority-medium yorha-3d-button',
           evidence: 'nes-legal-priority-critical yorha-3d-button',
@@ -94,7 +95,8 @@ variant: 'default',
     dataTestid = undefined,
     onanalytics = undefined,
     oncache = undefined
-  }: BitsButtonProps = $props();let isDisabled = $derived(disabled || loading);
+  }: BitsButtonProps = $props();
+let isDisabled = $derived(disabled || loading);
   let buttonClass = $derived(cn(buttonVariants({ variant, size }), className));
 
   function handleClick(event: MouseEvent) {
@@ -145,7 +147,7 @@ variant: 'default',
     onclick={handleClick}
   >
     {#if loading}
-      <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http, //www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+      <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
         <path
           class="opacity-75"
@@ -168,7 +170,7 @@ variant: 'default',
     onclick={handleClick}
   >
     {#if loading}
-      <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http, //www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+      <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
         <path
           class="opacity-75"

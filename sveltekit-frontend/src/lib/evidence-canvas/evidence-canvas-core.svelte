@@ -1,5 +1,5 @@
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+
 // Migrated to $effect
 // Migrated to $effect
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
@@ -10,7 +10,8 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
-<script lang="ts">
+<script lang="ts">
+
 
  // Define types since they are not exported from the modules
  type EvidenceNode = {
@@ -34,7 +35,8 @@ https, //svelte.dev/e/js_parse_error -->
  };
 
  // Removed import for graphLayoutGPU as it's not exported
- // import type { graphLayoutGPU } from './graph-layout-gpu';let { gpuAccelerationEnabled = false , onnodeselect, onnodecontext } = $props();
+ // import type { graphLayoutGPU } from './graph-layout-gpu';
+let { gpuAccelerationEnabled = false , onnodeselect, onnodecontext } = $props();
 
  let canvas: HTMLCanvasElement;
  let gl: WebGL2RenderingContext, null = null;

@@ -13,7 +13,8 @@
  let { collection, ondeleted } = $props<{
  collection: Collection;
  ondeleted?: (data: any) => void;
- }>();let citations: any[] = [];
+ }>();
+let citations: any[] = [];
  let isLoading = true;
  let error: string | null = null;
 

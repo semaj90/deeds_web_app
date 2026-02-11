@@ -1,13 +1,4 @@
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 <script lang="ts">
-	let caseType = $state<any>(undefined);
-	let consideration = $state<any>(undefined);
-	let argument = $state<any>(undefined);
-	let risk = $state<any>(undefined);
-	let recommendation = $state<any>(undefined);
-	let term = $state<any>(undefined);
-	let topic = $state<any>(undefined);
-
 	// Migrated to Svelte 5 $props
 
 	let {
@@ -23,36 +14,37 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		jurisdiction?: string;
 		caseType?: string;
 		depth?: string;
-	research: Research;
+		research: Research;
 		researchHistory?: ResearchHistoryItem[];
-		error?, string | null;
-	}>();// Type Definitions
+		error?: string | null;
+	}>();
+// Type Definitions
 	interface ResearchMetadata {
 		confidence_level?: 'high' | 'medium' | 'low';
 		disclaimer?: string;
-	research_timestamp: string;
-	model_used: string;
+		research_timestamp: string;
+		model_used: string;
 	}
 
 	interface LegalPrinciple {
 		principle: string;
-	explanation: string;
+		explanation: string;
 		application?: string;
 		authority?: string;
 	}
 
 	interface StatutoryAnalysisItem {
 		statute: string;
-	provision: string;
+		provision: string;
 		interpretation?: string;
 		relevance?: string;
 	}
 
 	interface CaseLawItem {
 		citation: string;
-	case_name: string;
-	year: string;
-	holding: string;
+		case_name: string;
+		year: string;
+		holding: string;
 		relevance?: string;
 	}
 
@@ -71,14 +63,15 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface ResearchHistoryItem {
 		timestamp: string;
-		// Add other properties as needed based on usage
+		query: string;
+		result: Research;
 	}
 
 	interface Research {
 		query: string;
-	jurisdiction: string;
-	case_type: string;
-	research_depth: string;
+		jurisdiction: string;
+		case_type: string;
+		research_depth: string;
 		legal_principles?: LegalPrinciple[];
 		statutory_analysis?: StatutoryAnalysisItem[];
 		case_law?: CaseLawItem[];
@@ -87,20 +80,20 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 		metadata?: {
 			confidence_level?: string;
 			disclaimer?: string;
-	research_timestamp: string;
-	model_used: string;
+			research_timestamp: string;
+			model_used: string;
 		};
 	}
 
 	// Reactive state
-	let isResearching = false;
-	let currentResearch: ResearchResult, null = null;
-	let currentError: string | null = null;
-	let includePrecedents = true;
-	let includeStatutes = true;
+	let isResearching = $state(false);
+	let currentResearch: Research | null = $state(null);
+	let currentError: string | null = $state(null);
+	let includePrecedents = $state(true);
+	let includeStatutes = $state(true);
 
 	// Research history
-	let currentResearchHistory: ResearchHistoryItem[] = [];
+	let currentResearchHistory: ResearchHistoryItem[] = $state([]);
 
 	// Perform legal research
 	async function performResearch() {
@@ -119,8 +112,8 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				headers: {
 					'Content-Type': 'application/json'
 				},
-	body: JSON.stringify({
-	query: query.trim(),
+				body: JSON.stringify({
+					query: query.trim(),
 					jurisdiction: caseType,
 					depth: includePrecedents,
 					includeStatutes
@@ -131,11 +124,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 				throw new Error(`Research failed: ${response.statusText}`);
 			}
 
-			const result: ResearchResult = await response.json();
+			const result: Research = await response.json();
 
 			// Add to history
 			currentResearchHistory = [{
-				query: query.trim(timestamp: new Date().toISOString(),
+				query: query.trim(),
 				result
 			},
 	...currentResearchHistory.slice(0, 9)]; // Keep last 10
@@ -191,7 +184,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	</div>
 
 	<!-- Research Configuration -->
-	<div class="grid grid-cols-1 md grid-cols-2 gap-4 mb-6">
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
 		<div>
 			<label for="jurisdiction" class="block text-sm font-medium text-gray-700 mb-2">
 				Jurisdiction
@@ -285,11 +278,11 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			type="button"
 			onclick={performResearch}
 			disabled={isResearching || !query.trim()}
-			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled cursor-not-allowed"
+			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
 		>
 			{#if isResearching}
 				<span class="flex items-center justify-center">
-					<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http, //www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+					<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 					</svg>
@@ -456,7 +449,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			{#if currentResearch.practical_analysis}
 				<div class="bg-white border rounded-lg p-4">
 					<h4 class="text-md font-semibold text-gray-900 mb-3">Practical Analysis</h4>
-					<div class="grid grid-cols-1 md grid-cols-2 gap-4">
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						{#if currentResearch.practical_analysis.key_considerations?.length}
 							<div>
 								<h5 class="font-medium text-gray-900 mb-2">Key Considerations</h5>
@@ -520,7 +513,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			{#if currentResearch.research_gaps}
 				<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
 					<h4 class="text-md font-semibold text-yellow-900 mb-3">Research Gaps & Recommendations</h4>
-					<div class="grid grid-cols-1 md grid-cols-3 gap-4">
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 						{#if currentResearch.research_gaps.additional_research_needed?.length}
 							<div>
 								<h5 class="font-medium text-yellow-900 mb-2">Additional Research Needed</h5>
@@ -585,7 +578,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 			<!-- Metadata -->
 			{#if currentResearch.metadata}
 				<div class="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
-					<div class="grid grid-cols-2 md grid-cols-4 gap-4">
+					<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 						<div>
 							<strong>Research Time:</strong><br>
 							{new Date(currentResearch.metadata.research_timestamp).toLocaleString()}

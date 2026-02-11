@@ -17,7 +17,8 @@
  ondeleted?: (data: any) => void;
  onedit?: (data: any) => void;
  onview?: (data: any) => void;
- }>();let links: CaseStatuteLink[] = [];
+ }>();
+let links: CaseStatuteLink[] = [];
  let isLoading = true;
  let error: string | null = null;
  let stats = {

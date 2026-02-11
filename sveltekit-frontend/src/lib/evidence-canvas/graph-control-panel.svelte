@@ -1,5 +1,7 @@
 <script lang="ts">
-	let algorithm = $state<any>(undefined);let { webgpuSupported = false, gpuAccelerationEnabled = false, currentPhase = 'investigation' , onphasechange, onsimilarityanalysis, onlayoutoptimization, onexportdata } = $props();
+	let algorithm = $state<any>(undefined);
+
+let { webgpuSupported = false, gpuAccelerationEnabled = false, currentPhase = 'investigation' , onphasechange, onsimilarityanalysis, onlayoutoptimization, onexportdata } = $props();
 
  let layoutAlgorithm = $state('force-directed');
  let showLabels = $state(true);

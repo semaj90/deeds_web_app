@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
-	import type { Badge } from '$lib/components/ui/badge';
-	import type { Button } from '$lib/components/ui/button';
-	import type { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
+	import { Badge } from '$lib/components/ui/badge';
+	import Button from '$lib/components/ui/Button.svelte';
+	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import Camera from 'lucide-svelte/icons/camera';
 	import Edit from 'lucide-svelte/icons/edit';
 	import Eye from 'lucide-svelte/icons/eye';

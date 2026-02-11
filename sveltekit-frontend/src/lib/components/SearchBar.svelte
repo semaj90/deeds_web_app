@@ -1,4 +1,6 @@
-<script lang="ts">let { placeholder = 'Search...', value = '' , onsearch } = $props();let searchTimeout: any;
+<script lang="ts">
+let { placeholder = 'Search...', value = '' , onsearch } = $props();
+let searchTimeout: any;
  let inputElement: HTMLInputElement;
 
  function handleInput() {

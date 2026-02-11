@@ -1,4 +1,5 @@
-<script lang="ts">interface Link { id: string, case_id: string;
+<script lang="ts">
+interface Link { id: string, case_id: string;
     statute_code: string;
 	link_type: string;
     notes?: string;
@@ -12,7 +13,8 @@
     isEditing?: boolean;
   }
 
-  let { link, isEditing = false , onupdated }: Props = $props();let editedLinkType = $state(link.link_type);
+  let { link, isEditing = false , onupdated }: Props = $props();
+let editedLinkType = $state(link.link_type);
   let editedNotes = $state(link.notes || '');
   let isSaving = $state(false);
   let error = $state<string | null>(null);
