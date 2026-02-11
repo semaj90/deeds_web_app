@@ -65,7 +65,7 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
  <a
  href={route.route}
  class="route-link"
- class:active={$page.url.pathname === route.route}; class:beta={route.status === 'beta'}
+ class:active={$page.url.pathname === route.route} class:beta={route.status === 'beta'}
  >
  <span class="route-icon">{route.icon}</span>
  <span class="route-label">{route.label}</span>

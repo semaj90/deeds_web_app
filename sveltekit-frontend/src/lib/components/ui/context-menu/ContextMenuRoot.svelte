@@ -1,8 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	// Migrated to $effect
+	import { setContext } from 'svelte';
 	import type { ContextMenuContext, ContextMenuRootProps } from './types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 	interface Props extends ContextMenuRootProps {
 		children?: Snippet;
@@ -44,31 +43,26 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	}
 
 	$effect(() => {
-
 		document.addEventListener('click', handleOutsideClick);
-	
-});
-
-	// TODO: Add as cleanup in $effect: return () => {
-		document.removeEventListener('click', handleOutsideClick);
-	}
+		return () => {
+			document.removeEventListener('click', handleOutsideClick);
+		};
+	});
 
 	const context: ContextMenuContext = {
 		get open() { return open; },
-	get position() { return position; },
-	setOpen: setPosition,
+		get position() { return position; },
+		setOpen,
 		close,
 	};
 
 	setContext<ContextMenuContext>('context-menu', context);
 </script>
 
-<svelte, window onkeydown={ handleKeydown } />
+<svelte:window onkeydown={handleKeydown} />
 
 <div class="context-menu-root {className}">
 	{#if children}
 		{@render children()}
 	{/if}
 </div>
-
-

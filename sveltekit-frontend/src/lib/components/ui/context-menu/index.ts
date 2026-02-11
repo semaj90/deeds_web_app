@@ -1,6 +1,5 @@
 // Context Menu - Svelte 5 Implementation
 // Export local components
-export { default as ContextMenu } from './ContextMenu.svelte';
 export { default as ContextMenuContent } from './ContextMenuContent.svelte';
 export { default as ContextMenuItem } from './ContextMenuItem.svelte';
 export { default as ContextMenuRoot } from './ContextMenuRoot.svelte';

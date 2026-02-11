@@ -82,7 +82,7 @@ image: Image, video: Video;
     aria-modal="true"
     tabindex="-1"
   > <!-- Modal, Container --> <div bind:this={modalElement} class="relative w-full max-w-4xl max-h-[90vh] m-4 overflow-hidden rounded-lg bg-background"
-      class:animate-scaleIn={!isClosing}; class:animate-scaleOut={ isClosing } >
+      class:animate-scaleIn={!isClosing} class:animate-scaleOut={ isClosing } >
   {#if isLoading} <!-- Loading, State --> <div class="flex items-center justify-center"> <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent"></div>
  <span class="ml-3">Loading evidence...</span> </div> {:else} <!-- Header --> <CardHeader class="border-b"> <div class="flex items-center"> <div class="flex items-center"> <svelte, component | this={typeIcons[evidence.type]} class="w-6" /> <CardTitle> {mode === 'create' ? 'Create Evidence': mode === 'edit' ? 'Edit Evidence': 'View Evidence'} </CardTitle> </div>
  <Button variant="ghost"
@@ -126,7 +126,7 @@ image: Image, video: Video;
   </div> </div> </div>
  <!-- Right Column, File & Analysis --> <div class="space-y-4"> <!-- File, Upload -->
   {#if mode !== 'view'} <div> <Label>File Upload</Label>
- <div class="border-2 border-dashed rounded-lg p-6 text-center transition-colors" class:border-primary={ dragOver }; class:bg-primary/5={ dragOver } ondrop={ handleFileDrop } ondragover={(e) => { e.preventDefault(); dragOver = true }} ondragleave={() => dragOver = false} role="button"
+ <div class="border-2 border-dashed rounded-lg p-6 text-center transition-colors" class:border-primary={ dragOver } class:bg-primary/5={ dragOver } ondrop={ handleFileDrop } ondragover={(e) => { e.preventDefault(); dragOver = true }} ondragleave={() => dragOver = false} role="button"
                     tabindex="0"
                   >
   {#if uploadedFile} <div class="space-y-2"> <Upload class="w-8 h-8 mx-auto" /> <p class="font-medium">{uploadedFile.name}</p>

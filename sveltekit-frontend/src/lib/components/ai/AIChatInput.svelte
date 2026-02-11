@@ -92,8 +92,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
       {disabled}
       maxlength={maxLength}
       class="chat-input"
-      class: disabled, class:near-limit={isNearLimit}
-; class:at-limit={isAtLimit}
+      class: disabled, class:near-limit={isNearLimit} class:at-limit={isAtLimit}
       {rows}
       oninput={debouncedHandleInput}
       onkeydown={handleKeydown}

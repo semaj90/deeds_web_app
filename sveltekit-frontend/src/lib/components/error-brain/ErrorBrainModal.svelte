@@ -290,7 +290,7 @@ verification_status: verificationStatus, verification_message: verificationMessa
 										{#each patches.get(analysis.id) ?? [] as patch}
 											<span
 												class="patch-status"
-												class:passed={patch.verification_status === 'passed'}; class:failed={patch.verification_status === 'failed'}; class:pending={patch.verification_status === 'pending'}
+												class:passed={patch.verification_status === 'passed'} class:failed={patch.verification_status === 'failed'} class:pending={patch.verification_status === 'pending'}
 											>
 												{patch.verification_status}
 											</span>
@@ -347,7 +347,7 @@ verification_status: verificationStatus, verification_message: verificationMessa
 										<span class="file-path">{patch.file_path}</span>
 										<span
 											class="verification-badge"
-											class:passed={patch.verification_status === 'passed'}; class:failed={patch.verification_status === 'failed'}; class:pending={patch.verification_status === 'pending'}
+											class:passed={patch.verification_status === 'passed'} class:failed={patch.verification_status === 'failed'} class:pending={patch.verification_status === 'pending'}
 										>
 											{patch.verification_status}
 										</span>

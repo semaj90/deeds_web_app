@@ -82,7 +82,7 @@ editor: ed }) => {
 
 			<button
 				onclick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-				class="px-2 py-1 rounded text-xs font-medium transition-colors {editor?.isActive('heading' {
+				class="px-2 py-1 rounded text-xs font-medium transition-colors {editor?.isActive('heading', {
 					level: 1
 				})
 					? 'bg-neutral-700 text-neutral-100'
@@ -94,7 +94,7 @@ editor: ed }) => {
 
 			<button
 				onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-				class="px-2 py-1 rounded text-xs font-medium transition-colors {editor?.isActive('heading' {
+				class="px-2 py-1 rounded text-xs font-medium transition-colors {editor?.isActive('heading', {
 					level: 2
 				})
 					? 'bg-neutral-700 text-neutral-100'

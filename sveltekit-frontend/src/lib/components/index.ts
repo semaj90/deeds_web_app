@@ -2,9 +2,10 @@
 // Legal AI Platform
 
 // UI Components (Shadcn/Bits)
+// Note: dialog, tabs, switch removed to avoid name collisions (Root, Content, Trigger)
+// Import those directly: '$lib/components/ui/dialog', '$lib/components/ui/tabs', or bits-ui
 export * from './ui/alert';
 export * from './ui/badge';
-// breadcrumb module does not exist - removed
 export * from './ui/button';
 export {
     Card,
@@ -14,15 +15,11 @@ export {
     CardHeader,
     CardTitle
 } from './ui/card';
-export * from './ui/dialog';
 export * from './ui/form';
 export * from './ui/input';
 export * from './ui/label';
-// select: use bits-ui Select directly instead of local wrapper
 export * from './ui/separator';
 export * from './ui/slider';
-export * from './ui/switch';
-export * from './ui/tabs';
 export * from './ui/textarea';
 
 // Business Components

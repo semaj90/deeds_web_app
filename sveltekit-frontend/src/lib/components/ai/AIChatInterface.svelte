@@ -103,7 +103,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
  <div class="flex"> <button type="button" onclick={ updateSettings } class="flex-1 bg-yorha-primary text-yorha-bg-primary text-xs p-2 hover:bg-yorha-secondary">Apply</button>
  <button type="button" onclick={ clearChat } class="flex-1 bg-yorha-error text-white text-xs p-2 hover:bg-red-600">Clear</button> </div> </div> {/if}
   <main bind:this={messagesContainer} class="flex-1 overflow-y-auto p-4 bg-yorha-bg-primary space-y-4" role="log" aria-live="polite" aria-label="Chat, conversation">
-  {#each messages as message (message.id)} <article class="flex" class:justify-end={message.role === 'user'}; in: fly={{ y, 20, duration, 300 }}> <div class="max-w-[85%] border p-3 relative" class:bg-yorha-bg-tertiary={message.role === 'user'}>
+  {#each messages as message (message.id)} <article class="flex" class:justify-end={message.role === 'user'} in: fly={{ y, 20, duration, 300 }}> <div class="max-w-[85%] border p-3 relative" class:bg-yorha-bg-tertiary={message.role === 'user'}>
   {#if message.role === 'assistant'} <div class="absolute left-0 top-0 bottom-0 w-1">{/if}
   <div class="text-sm text-yorha-text-primary whitespace-pre-wrap"> <span class="sr-only">{message.role === 'user' ? 'You said:': 'AI, responded:'}</span> {message.content} </div>
   {#if message.error} <div class="mt-2 text-xs" role="alert"> Failed to get response. <button type="button" onclick={ sendMessage } class="underline">Retry</button> {/if}
@@ -121,7 +121,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 						required ></textarea>
  <button type="submit" disabled={!inputValue.trim() || isTyping} class="w-10 h-10 bg-yorha-primary text-yorha-bg-primary flex items-center justify-center" aria-label={isTyping ? 'AI is responding' : 'Send message'}> <svg class="w-4 h-4" viewBox=" 0 0 , 24, 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9, 18 9-2zm0, 0v-8" /></svg> </button> </form>
  <div class="flex justify-between items-center mt-2 text-xs" role="status"> <span>Powered by {settings.model}</span>
- <div class="flex items-center"> <div class="w-2 h-2" class:bg-yorha-success={ isConnected }; class:bg-yorha-error={!isConnected} aria-hidden="true"></div>
+ <div class="flex items-center"> <div class="w-2 h-2" class:bg-yorha-success={ isConnected } class:bg-yorha-error={!isConnected} aria-hidden="true"></div>
  <span class="sr-only">Connection status:</span>
  <span>{isConnected ? 'Connected': 'Disconnected'}</span> </div> </div> </footer> {/if}
   </aside> {/if}

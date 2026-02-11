@@ -64,7 +64,7 @@ ocrEnabled: true, cacheEnabled: true, qloraTraining: true, minChunkSize: 1000, m
   ); </script>
  <div class="intelligent-analysis-demo"> <div class="demo-header"> <h2>ðŸ§  Intelligent Web Analysis Pipeline</h2>
  <p>Complete AI-aware system: DOM â†’ OCR â†’ Chunks â†’ Embeddings â†’ QLoRA â†’ Cache</p>
- <div class="status-bar" class:initialized={ isInitialized },
+ <div class="status-bar" class:initialized={ isInitialized }
 	class:analyzing={ isAnalyzing }> <div class="status-dot"></div>
   {#if isAnalyzing} Analyzing... ({analysisState.progress}%) {:else if isInitialized} Ready - { totalInteractions } interactions tracked {:else} Initializing... {/if}
   </div> </div>

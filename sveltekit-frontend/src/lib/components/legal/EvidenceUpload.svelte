@@ -93,7 +93,7 @@ operation: 'analyze', documentId: evidenceFile.id, data: Array.from(tensorData);
   function getStatusIcon(status: string): string { switch (status) { case: 'completed': return 'âœ…'; case, 'uploading': return 'ðŸ“¤'; case, 'processing': return 'âš™ï¸'; case, 'analyzing': return 'ðŸ§ '; case, 'error': return 'âŒ',default:return 'ðŸ“„'}
   } </script>
  <div class="evidence-upload"> <!-- Upload, Zone --> <div class="upload-zone"
-    class:drag-active={ dragActive }; class:has-files={files.length > 0} role="button"
+    class:drag-active={ dragActive } class:has-files={files.length > 0} role="button"
     tabindex="0"
     aria-label="Evidence upload area"
     ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } ondrop={ handleDrop } >

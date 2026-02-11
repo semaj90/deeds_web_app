@@ -208,7 +208,7 @@ primaryCharges: [
  <div class="space-y-4">
   {#each Array.isArray($state.context.synthesisResult.timeline) ? $state.context.synthesisResult.timeline: [] as event} <div class="flex"> <div class="flex-shrink-0 w-24 text-sm"> {new Date(event.date).toLocaleDateString()} </div>
  <div class="flex-shrink-0"> <div class="w-4 h-4 rounded-full"
-                  class:bg-red-500={event.significance === 'critical'}; class:bg-orange-500={event.significance === 'high'}; class:bg-yellow-500={event.significance === 'medium'},
+                  class:bg-red-500={event.significance === 'critical'} class:bg-orange-500={event.significance === 'high'} class:bg-yellow-500={event.significance === 'medium'}
 	class:bg-gray-500={event.significance === 'low'} ></div> </div>
  <div class="flex-1"> <p class="font-medium">{event.event}</p>
  <div class="text-sm text-gray-600"> Sources: {event.sources.join(', ')} </div> </div> </div> {/each}

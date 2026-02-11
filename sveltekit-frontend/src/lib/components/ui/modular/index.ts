@@ -10,16 +10,13 @@ export { default as Progress } from './Progress.svelte';
 export { default as Badge } from './Badge.svelte';
 export { default as FileUpload } from './FileUpload.svelte';
 
-// Type exports
+// Type exports (only export types that exist in ./types)
 export type {
   ButtonProps,
   CardProps,
   DialogProps,
   InputProps,
-  FormProps,
-  ProgressProps,
-  BadgeProps,
-  FileUploadProps
+  BaseProps
 } from './types';
 
 // Component variants and types for external use

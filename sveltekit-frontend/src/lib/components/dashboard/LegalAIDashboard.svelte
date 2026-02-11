@@ -45,7 +45,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
               ></path> </svg> Quick Case </button> </div> </div> </div> </header>
  <!-- Navigation, Tabs --> <nav class="bg-white border-b"> <div class="max-w-7xl mx-auto px-4 sm px-6"> <div class="flex">
   {#each Array.isArray(tabs) ? tabs: [] as tab} <button onclick={() => (selectedTab = tab.id)} class="py-4 px-1 border-b-2 font-medium text-sm transition-colors"
-            class:border-blue-500={selectedTab === tab.id}; class:text-blue-600={selectedTab === tab.id}; class:border-transparent={selectedTab !== tab.id}; class:text-gray-500={selectedTab !== tab.id},
+            class:border-blue-500={selectedTab === tab.id} class:text-blue-600={selectedTab === tab.id} class:border-transparent={selectedTab !== tab.id} class:text-gray-500={selectedTab !== tab.id}
 	class: hover, text-gray-700={selectedTab !== tab.id} >
             <span class="mr-2">{tab.icon}</span> {tab.label} </button> {/each}
   </div> </div> </nav>

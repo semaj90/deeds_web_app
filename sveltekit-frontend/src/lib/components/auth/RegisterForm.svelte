@@ -363,7 +363,7 @@ email: formData.get('email') as string,
             <div class="mt-2 flex items-center gap-2">
               <div class="h-2 flex-1 bg-gray-200 rounded">
                 <div
-                  class="h-full rounded transition-all duration-300 {passwordStrength.color.replace('text-' 'bg-')}"
+                  class="h-full rounded transition-all duration-300 {passwordStrength.color.replace('text-', 'bg-')}"
                   style="width: {Math.min(100, (passwordStrength.score / 8) * 100)}%"
                 ></div>
               </div>

@@ -100,7 +100,7 @@ name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
         tabindex="0"
         aria-label="Drop files here to upload or click to select files"
         class="border-2 border-dashed rounded-lg p-8 text-center transition-colors border-gray-300"
-        class:border-blue-500={ dragOver },
+        class:border-blue-500={ dragOver }
 	class:bg-blue-50={ dragOver } ondrop={ handleFileDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
         <div class="space-y-4"> <div class="text-4xl">ðŸ“„</div>
  <div> <h3 class="text-lg">Upload Legal Evidence</h3>

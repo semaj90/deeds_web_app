@@ -76,7 +76,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     if (pollingInterval) { clearInterval(pollingInterval)}
   }); </script>
  <!-- AI-Powered Editor with: Status, UI --> <div class="space-y-4"> <!-- Status Header - Shows AI, processing, status --> <div class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200"> <div class="flex items-center"> <!-- Auto-save, Status --> <div class="flex items-center"> <div class="w-2 h-2"
-          class:bg-green-500={autoSaveStatus === 'saved'}; class:bg-yellow-500={autoSaveStatus === 'saving'}; class:bg-red-500={autoSaveStatus === 'error'}; class:bg-gray-300={autoSaveStatus === 'idle'} ></div>
+          class:bg-green-500={autoSaveStatus === 'saved'} class:bg-yellow-500={autoSaveStatus === 'saving'} class:bg-red-500={autoSaveStatus === 'error'} class:bg-gray-300={autoSaveStatus === 'idle'} ></div>
  <span class="text-sm"> {autoSaveStatus === 'saved'
             ? 'Draft Saved': autoSaveStatus === 'saving'
               ? 'Saving...': autoSaveStatus === 'error'

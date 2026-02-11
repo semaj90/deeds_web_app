@@ -311,7 +311,7 @@ maxLOD: 4
 </script>
 <div
   class="sora-graph-visualization"
-  class:loading={$loading}; class:error={$error}; bind:this={container}
+  class:loading={$loading} class:error={$error} bind:this={container}
   style="width, {width}px; height: {height}px;"
   data-theme={theme}
 >

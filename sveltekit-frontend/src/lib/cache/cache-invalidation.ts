@@ -4,8 +4,6 @@
  */
 
 import { cache } from './cache-service.svelte';
-import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Standardized cache keys for the application
@@ -44,7 +42,7 @@ export const CacheInvalidation = {
 	async invalidateAllCases() {
 		await Promise.all([
 			cache.delete(CacheKeys.CASES_LIST),
-			cache.clear() // Clear all for simplicity, or iterate case IDs
+			cache.clearAll() // Clear all for simplicity, or iterate case IDs
 		]);
 		console.log('🗑️ Invalidated all case caches');
 	},
@@ -164,7 +162,7 @@ export const CacheMonitoring = {
 	 * Get cache health status
 	 */
 	async getHealth() {
-		return await cache.health();
+		return cache.getStats();
 	},
 	/**
 	 * Get cache statistics
@@ -178,12 +176,12 @@ export const CacheMonitoring = {
 	logMetrics() {
 		const stats = cache.getStats();
 		console.table({
-			'Total Operations': stats.total,
-			'Cache Hits': stats.hits,
+			'Total Operations': stats.totalRequests,
+			'Cache Hits': stats.totalHits,
 			'Cache Misses': stats.misses,
-			'Hit Rate': `${stats.hitRate.toFixed(2)}%`,
-			'Memory Items': stats.memoryItems,
-			'Persistent Items': stats.persistentItems
+			'Hit Rate': stats.hitRate,
+			'Memory Items': stats.memoryStats.documents,
+			'Persistent Hits': stats.persistentHits
 		});
 	}
 } as const;

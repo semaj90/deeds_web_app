@@ -62,7 +62,7 @@ const _ENABLE_GPU = (() => {
     const gv = (globalThis as unknown as Record<string, unknown>)?.ENABLE_GPU as
       | string
       | boolean
-      : undefined;
+      | undefined;
     if (typeof gv === 'string') return gv.toLowerCase() !== 'false' && gv !== '0';
     if (typeof gv === 'boolean') return gv;
   } catch {
