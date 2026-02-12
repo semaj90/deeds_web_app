@@ -253,7 +253,7 @@
           min="1"
           max="50"
           value={brushSize}
-          onchange={(e) => setBrushSize(parseInt(e.currentTarget.value))}
+          onchange={(e) => setBrushSize(parseInt((e.currentTarget as HTMLInputElement).value))}
           class="size-slider"
         />
         <span class="size-display">{brushSize}px</span>

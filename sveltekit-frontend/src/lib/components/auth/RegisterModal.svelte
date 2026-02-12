@@ -95,7 +95,7 @@
         <input
           type="password"
           name="password"
-          id={passwordId}; bind:value={$form.password}
+          id={passwordId} bind:value={$form.password}
           class="w-full px-3 py-2 border {$errors.password ? 'border-red-500' : 'border-slate-300'} rounded-md focus:outline-none focus:ring-2"
           placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
         />

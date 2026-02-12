@@ -1,10 +1,9 @@
 import { browser } from '$app/environment';
-import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 import { error } from '@sveltejs/kit';
 import type { LayoutLoad } from './$types.js';
 
 // Dynamically import cache service (browser only)
-let cacheService: CachingTypes.UnifiedCache<unknown> | null = null;
+let cacheService: any = null;
 if (browser) {
  import('$lib/cache/cache-service.svelte').then(mod => {
  cacheService = mod.cache;

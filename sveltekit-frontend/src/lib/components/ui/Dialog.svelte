@@ -18,7 +18,8 @@ let {
 	title = '',
 	description = '',
 	class: className = '',
-	children: footer
+	children,
+	footer
 }: Props = $props();
 
 function handleClose() {

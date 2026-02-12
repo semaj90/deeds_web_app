@@ -7,7 +7,7 @@
  * Stack: Drizzle ORM + PostgreSQL + Ollama (gemma3-legal) + pgvector
  */
 
-import { db } from '$lib/server/database';
+import db from '$lib/server/database';
 import {
   autoTags,
   documentChunks,

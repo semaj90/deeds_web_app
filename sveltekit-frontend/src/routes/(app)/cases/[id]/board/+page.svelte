@@ -61,7 +61,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         {#key caseId}
             <HybridBoard
                 bind:this={board}
-                initialSnapshot={initialState}
+                initialSnapshot={initialState as any}
                 onDirtyChange={(d) => isDirty = d}
                 {caseId}
             />

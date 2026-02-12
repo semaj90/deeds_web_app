@@ -150,7 +150,7 @@
  <p class="text-gray-600 mt-1">This route is running smoothly!</p>
  </div>
  {:else}
- <ErrorEventsList {routePath} { errors } isLoading={ false } />
+ <ErrorEventsList errors={errors} isLoading={false} />
  {/if}
  {:else if tab === 'suggestions'}
  {#if suggestions.length === 0}

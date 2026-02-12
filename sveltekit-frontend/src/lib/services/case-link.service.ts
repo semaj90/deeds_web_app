@@ -15,7 +15,7 @@ let graphService: any;
 try {
   // @ts-ignore
   import('$lib/services/graph.service.js')
-    .then((m) => (graphService = m.graphService))
+    .then((m: any) => (graphService = m.graphService))
     .catch(() => {});
 } catch (_e) {
   // graph service not available
@@ -25,7 +25,7 @@ let auditService: any;
 try {
   // @ts-ignore
   import('$lib/services/audit.service.js')
-    .then((m) => (auditService = m.auditService))
+    .then((m: any) => (auditService = m.auditService))
     .catch(() => {});
 } catch (_e) {
   // audit service not available

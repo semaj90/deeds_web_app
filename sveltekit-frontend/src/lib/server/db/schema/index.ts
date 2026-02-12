@@ -1,8 +1,7 @@
 // Prosecutor MVP tables
 export * from '../schema-prosecutor.js';
 
-// Core Application Tables
-export * from './cases.js';
+// Core Application Tables (legal-cases.js is canonical for 'cases' table + relations)
 export * from './citations.js';
 export * from './evidence.js';
 export * from './legal-cases.js';

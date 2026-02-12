@@ -1,5 +1,5 @@
-<!-- YoRHa, Terminal/Console, Component --> <script lang="ts">
-  // Migrated to $effect
+<!-- YoRHa Terminal/Console Component --> <script lang="ts">
+  import { tick } from 'svelte';
 
   interface Props {
     title?: string;

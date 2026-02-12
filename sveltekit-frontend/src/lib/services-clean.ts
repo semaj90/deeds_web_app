@@ -37,7 +37,7 @@ export {
 } from './services/agentic-stream';
 
 // ─── Case-Statute Linking ───
-export { caseLinkService, CaseLinkService } from './services/case-link.service';
+export { caseLinkService } from './services/case-link.service';
 export type { CaseStatuteLink, LinkCaseStatuteRequest } from './services/case-link.service';
 
 // ─── Agent Shell State Machine ───
@@ -50,8 +50,9 @@ export { AdaptiveIndexOrchestrator } from './services/adaptive-index-orchestrato
 export { AIErrorFixer } from './services/ai-error-fixer';
 
 // ─── Client-Server Sync ───
-export { ClientServerSyncService, syncService, syncStatus, offlineCapabilities, isOnline, canSync } from './services/client-server-sync';
-export type { SyncStatus, SyncOperation } from './services/client-server-sync';
+// Note: client-server-sync module excluded from build - import directly if needed
+// export { ClientServerSyncService, syncService, syncStatus, offlineCapabilities, isOnline, canSync } from './services/client-server-sync';
+// export type { SyncStatus, SyncOperation } from './services/client-server-sync';
 
 // ─── Ollama Endpoint Utility ───
 export { getOllamaEndpoint, DEFAULT_OLLAMA } from './services/get-ollama-endpoint';
@@ -61,7 +62,7 @@ export { OllamaService } from './services/ollamaService';
 
 // ─── Neural Sprite Autoencoder ───
 export { default as NeuralSpriteAutoencoder } from './services/neural-sprite-autoencoder';
-export type { Latent } from './services/neural-sprite-autoencoder';
+export type { Latent, AutoencoderOptions } from './services/neural-sprite-autoencoder';
 
 // ─── PNG Tensor Embedding ───
 export {

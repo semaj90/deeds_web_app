@@ -15,7 +15,7 @@
 	interface Props {
 		citation: Citation;
 		showActions?: boolean;
-		onupdated?: () => void;
+		onupdated?: (citation?: Citation) => void;
 		ondelete?: () => void;
 		onattachtocase?: (citation: Citation) => void;
 	}
