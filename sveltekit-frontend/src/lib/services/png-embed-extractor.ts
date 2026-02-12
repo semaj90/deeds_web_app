@@ -164,8 +164,8 @@ async function gzipDecodeUtf8(bytes: Uint8Array): Promise<string> {
     const writer = ds.writable.getWriter();
     const reader = ds.readable.getReader();
 
-    // DecompressionStream expects BufferSource
-    await writer.write(bytes);
+    // DecompressionStream expects BufferSource - cast for TS 5.7+ ArrayBuffer strictness
+    await writer.write(bytes as any);
     await writer.close();
 
     const chunks: Uint8Array[] = [];

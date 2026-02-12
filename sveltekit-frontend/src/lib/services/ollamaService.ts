@@ -14,12 +14,12 @@ async function getRedisClient(): Promise<Redis | null> {
     // If running in the browser, don't attempt to load ioredis
     if (typeof window !== 'undefined') return null;
 
-	try {
+    try {
         // Dynamically import the shared redis client from server modules
         const mod = await import('$lib/server/redis-client');
-		redisClient = mod.redis;
-		return redisClient;
-	} catch (err) {
+        redisClient = mod.redis;
+        return redisClient;
+    } catch (err) {
         // If dynamic import fails, treat as unavailable (no caching)
         console.warn('OllamaService: failed to initialize Redis (caching disabled)', err);
         redisClient = null;
@@ -30,7 +30,7 @@ async function getRedisClient(): Promise<Redis | null> {
 type HealthCheckResult = {
     status: 'healthy' | 'unhealthy';
     embedMode: boolean;
-	llmMode: boolean;
+    llmMode: boolean;
     model: string[];
 };
 
@@ -78,13 +78,13 @@ export class OllamaService {
         }
     }
 
-    async generateEmbedding(text: string): Promise<number[] | null> {
+    async generateEmbedding(text: string, options?: { model?: string }): Promise<number[] | null> {
         try {
             const response = await fetch(`${this.baseUrl}/api/embeddings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	model: this.embedModel,
+                body: JSON.stringify({
+                    model: options?.model || this.embedModel,
                     prompt: text
                 })
             });
@@ -108,8 +108,8 @@ export class OllamaService {
             const response = await fetch(`${this.baseUrl}/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	model: this.llmModel,
+                body: JSON.stringify({
+                    model: this.llmModel,
                     prompt,
                     stream: false,
                     ...options

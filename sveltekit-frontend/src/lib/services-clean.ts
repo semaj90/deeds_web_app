@@ -64,6 +64,11 @@ export { OllamaService } from './services/ollamaService';
 export { default as NeuralSpriteAutoencoder } from './services/neural-sprite-autoencoder';
 export type { Latent, AutoencoderOptions } from './services/neural-sprite-autoencoder';
 
+// ─── Pipeline V2 (Ingestion & Vector DB) ───
+// NOTE: These modules will be created as part of pipeline-v2 implementation
+// export { PipelineOrchestrator, pipelineOrchestrator } from './services/pipeline-orchestrator';
+// export { QdrantService, qdrantService } from './services/qdrant-service';
+
 // ─── PNG Tensor Embedding ───
 export {
   PNGEmbedExtractor,

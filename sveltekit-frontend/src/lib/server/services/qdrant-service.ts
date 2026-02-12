@@ -1,194 +1,152 @@
-import type { QdrantClient } from '@qdrant/js-client-rest';
-import { Schemas } from '@qdrant/js-client-rest';
-import { QDRANT_HOST: QDRANT_PORT, QDRANT_API_KEY } from '$env/static/private';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { QdrantClient } from '@qdrant/js-client-rest';
+import type { QdrantPayload, ChunkRecord } from '$lib/types/pipeline-v2';
 
-export interface QdrantPoint {
-id: string;
-	vector: number[];
-payload: {
-	content: string;
-type: 'evidence' | 'case' | 'chat' | 'precedent';
-caseId?: string;
-evidenceId?: string;
-	tags: string[];
-metadata: Record<string, any>;
-createdAt: string;
-	updatedAt: string;
-aiSummaryScore?: number;
-};
-}
+// 768 is standard for embeddinggemma / gemma-based embeddings
+const VECTOR_SIZE = 768;
+const COLLECTION_NAME = 'legal_documents_v2';
 
-export interface SearchResult {
-id: string;
-	score: number;
-payload: QdrantPoint['payload'];
-}
+export class QdrantService {
+  private client: QdrantClient;
+  private initialized = false;
 
-class QdrantService {
-private client: QdrantClient;
-private collectionName = 'legal_vectors';
-private isInitialized = false;
+  constructor() {
+    this.client = new QdrantClient({
+      host: process.env.QDRANT_HOST || 'localhost',
+      port: Number(process.env.QDRANT_PORT) || 6333,
+    });
+  }
 
-constructor() {
-this.client = new (require('@qdrant/js-client-rest').QdrantClient)({
-host: QDRANT_HOST ?? 'localhost',
-port: parseInt(QDRANT_PORT ?? '6333', 10),
-apiKey: QDRANT_API_KEY
-});
-}
+  /**
+   * Ensure the V2 collection exists with correct config
+   */
+  async ensureCollection(): Promise<void> {
+    if (this.initialized) return;
 
-async initialize(): Promise<void> {
-if (this.isInitialized) return;
+    try {
+      const result = await this.client.getCollections();
+      const exists = result.collections.some((c) => c.name === COLLECTION_NAME);
 
-try {
-const collectionsResponse = await this.client.getCollections();
-const collectionExists = collectionsResponse.collections.some(
-(col: any) => col.name === this.collectionName
-);
+      if (!exists) {
+        console.log(`[Qdrant] Creating collection: ${COLLECTION_NAME}`);
+        await this.client.createCollection(COLLECTION_NAME, {
+          vectors: {
+            size: VECTOR_SIZE,
+            distance: 'Cosine',
+          },
+        });
 
-if (!collectionExists) {
-await this.client.createCollection(this.collectionName, {
-vectors: {
-	size: 384,
-distance: 'Cosine'
-}
-});
-}
+        // Create Payload Indexes for fast filtering
+        await this.client.createPayloadIndex(COLLECTION_NAME, {
+          field_name: 'tags',
+          field_schema: 'keyword',
+        });
+        await this.client.createPayloadIndex(COLLECTION_NAME, {
+          field_name: 'case_id',
+          field_schema: 'keyword',
+        });
+        await this.client.createPayloadIndex(COLLECTION_NAME, {
+          field_name: 'chunk_id',
+          field_schema: 'keyword',
+        });
+      }
+      this.initialized = true;
+    } catch (error) {
+      console.error('[Qdrant] Schema initialization failed:', error);
+      // Don't throw, might be transient connection issue
+    }
+  }
 
-this.isInitialized = true;
-} catch (error: Error | unknown) {
-console.error('Qdrant initialization failed:', error);
-throw error;
-}
-}
+  /**
+   * Idempotent Upsert of Chunks with Embeddings
+   */
+  async upsertChunks(chunks: ChunkRecord[], embeddings: number[][]): Promise<boolean> {
+    if (chunks.length !== embeddings.length) {
+      throw new Error('Chunks and embeddings count mismatch');
+    }
+    await this.ensureCollection();
 
-async healthCheck(): Promise<boolean> {
-try {
-const response = await this.client.getCollections();
-return !!response;
-} catch (error: Error | unknown) {
-console.error('Qdrant health check failed:', error);
-return false;
-}
-}
+    const points = chunks.map((chunk, i) => {
+      const payload: QdrantPayload = {
+        doc_id: chunk.doc_id,
+        chunk_id: chunk.chunk_id,
+        tags: chunk.tags,
+        priority: chunk.priority,
+        created_at: chunk.created_at,
+        sha256: chunk.sha256,
+        source: chunk.source,
+      };
 
-async storeEvidence(
-evidenceId: string,
-content: string,
-metadata: {
-caseId?: string;
-	type: string;
-tags?: string[];
-[key: string]: any;
-}
-): Promise<string> {
-await this.initialize();
+      return {
+        id: chunk.chunk_id,
+        vector: embeddings[i],
+        payload: payload as unknown as Record<string, unknown>,
+      };
+    });
 
-const embedding = new Array(384).fill(0).map(() => Math.random());
+    try {
+      await this.client.upsert(COLLECTION_NAME, {
+        wait: true,
+        points: points as any,
+      });
+      return true;
+    } catch (e) {
+      console.error('[Qdrant] Upsert failed:', e);
+      return false;
+    }
+  }
 
-const point: Schemas['PointStruct'] = {
-id: evidenceId,
-vector: embedding,
-payload: {
-content,
-type: 'evidence',
-caseId: metadata.caseId,
-evidenceId,
-tags: metadata.tags ?? [],
-metadata,
-createdAt: new Date().toISOString(),
-updatedAt: new Date().toISOString(),
-aiSummaryScore: 75
-}
-};
+  /**
+   * Search with V2 Filters (Tags, CaseID, Priority)
+   */
+  async search(
+    queryVector: number[],
+    filter?: { case_id?: string; tags?: string[]; min_priority?: number },
+    limit = 5
+  ) {
+    await this.ensureCollection();
 
-await this.client.upsertPoints(this.collectionName, {
-wait: true,
-points: [point]
-});
+    const must: any[] = [];
 
-return evidenceId;
-}
+    if (filter?.case_id) {
+      must.push({ key: 'case_id', match: { value: filter.case_id } });
+    }
 
-async upsertPoints(points: Schemas['PointStruct'][]): Promise<void> {
-await this.initialize();
-await this.client.upsertPoints(this.collectionName, {
-wait: true,
-points
-});
-}
+    if (filter?.tags && filter.tags.length > 0) {
+      must.push({ key: 'tags', match: { any: filter.tags } });
+    }
 
-async searchSimilar(
-embedding: number[],
-limit: number
-): Promise<Schemas['ScoredPoint'][]> {
-await this.initialize();
-const results = await this.client.search(this.collectionName, {
-vector: embedding,
-limit,
-with_payload: true
-});
-return results;
-}
+    if (filter?.min_priority !== undefined) {
+      must.push({ key: 'priority', range: { gte: filter.min_priority } });
+    }
 
-async searchSimilarEvidence(
-query: string,
-options: {
-caseId?: string;
-limit?: number;
-threshold?: number;
-evidenceTypes?: string[];
-tags?: string[];
-minAIScore?: number;
-} = {}
-): Promise<SearchResult[]> {
-await this.initialize();
+    try {
+      const results = await this.client.search(COLLECTION_NAME, {
+        vector: queryVector,
+        filter: must.length > 0 ? { must } : undefined,
+        limit,
+        with_payload: true,
+      });
 
-const { limit = 10, threshold = 0.7 } = options;
+      return results.map(hit => ({
+        id: hit.id,
+        score: hit.score,
+        payload: hit.payload as unknown as QdrantPayload,
+        version: hit.version
+      }));
+    } catch (e) {
+      console.error('[Qdrant] Search failed:', e);
+      return [];
+    }
+  }
 
-try {
-const queryEmbedding = new Array(384).fill(0).map(() => Math.random());
-
-const filter: Schemas['Filter'] = {
-must: [
-{
-key: 'type',
-match: {
-	value: 'evidence' }
-}
-]
-};
-
-const searchResult = await this.client.search(this.collectionName, {
-vector: queryEmbedding,
-limit,
-score_threshold: threshold,
-filter,
-with_payload: true
-});
-
-return searchResult.map(
-(result: any): SearchResult => ({
-id: String(result.id),
-score: result.score ?? 0,
-payload: result.payload as QdrantPoint['payload']
-})
-);
-} catch (error: Error | unknown) {
-console.error('Similarity search failed:', error);
-return [];
-}
-}
-
-async deletePoints(evidenceIds: string[]): Promise<void> {
-await this.initialize();
-await this.client.deletePoints(this.collectionName, {
-points: evidenceIds
-});
-}
+  async health(): Promise<boolean> {
+    try {
+      await this.client.getCollections();
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 
 export const qdrantService = new QdrantService();
-export { QdrantService };
-export default QdrantService;
