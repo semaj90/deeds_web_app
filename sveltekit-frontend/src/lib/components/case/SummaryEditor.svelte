@@ -97,22 +97,17 @@
  </div>
  {:else}
  <div class="citation-list-view">
-\t\t\t\t<div class="search-section">
-\t\t\t\t\t<h4>Search Citations</h4>
-\t\t\t\t\t<CitationSearch
-\t\t\t\t\t\tonselect={(citation) => (selectedCitation = citation)}
-\t\t\t\t\t\tonupdated={() => {}}
-\t\t\t\t\t/>
-\t\t\t\t</div>
+    <div class="search-section">
+     <h4>Search Citations</h4>
+     <CitationSearch
+      {...{onselect: (citation: any) => (selectedCitation = citation), onupdated: () => {}} as any}
+     />
+    </div>
 
-\t\t\t\t<div class="list-section">
-\t\t\t\t\t<CitationList
-\t\t\t\t\t\tcaseId={caseId}
-\t\t\t\t\t\tlimit={10}
-\t\t\t\t\t\tonview={(citation) => (selectedCitation = citation)}
-\t\t\t\t\t\tonedit={(citation) => (selectedCitation = citation)}
-\t\t\t\t\t\tondeleted={() => {}}
-\t\t\t\t\t/>
+    <div class="list-section">
+     <CitationList
+      {...{caseId, limit: 10, onview: (citation: any) => (selectedCitation = citation), onedit: (citation: any) => (selectedCitation = citation), ondeleted: () => {}} as any}
+     />
  </div>
  </div>
  {/if}

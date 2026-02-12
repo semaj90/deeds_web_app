@@ -1779,3 +1779,85 @@ await channel.assertQueue('doc-stream', {
 - [Publisher Confirms](https://www.rabbitmq.com/docs/confirms)
 - [Stream Protocol](https://github.com/rabbitmq/rabbitmq-server/blob/main/deps/rabbitmq_stream/docs/PROTOCOL.adoc)
 
+---
+
+## 🚀 Pipeline V2 Architecture (February 2026)
+
+### Overview
+
+Pipeline V2 is the Redis-backed RAG ingestion and synthesis architecture with stable IDs, 3-tier caching, and SSE progress streaming.
+
+### Data Flow
+
+```
+Input → Parse/Chunk → Embed → Index (Qdrant) → Retrieve → Synthesize → ContextPack
+  │         │            │          │              │            │             │
+  MinIO   LangChain   embeddinggemma  Qdrant     Vector     gemma3-legal   ACE Format
+          splitter     :latest       upsert     search      :latest        JSON
+```
+
+### Core Types (`src/lib/types/pipeline-v2.ts`)
+
+| Type | Purpose |
+|------|---------|
+| `ChunkRecord` | Canonical chunk with stable `chunk_id` (sha256-based), source, priority 0-255, tags |
+| `QdrantPayload` | Vector payload for search filters (case_id, evidence_id, mime, source) |
+| `ContextFragment` | Retrieved chunk with similarity score |
+| `ContextPack` | Full synthesis output: ACE format v2.0 with memory tiers, citations, summary |
+| `PipelineRunResponse` | Job submission response with SSE events URL |
+| `PipelineHealth` | Service health check (Redis, Qdrant, Postgres, MinIO, GPU) |
+
+### Cache Key Strategy (3-Tier)
+
+```typescript
+cache_keys: {
+  retrieval_key: string;  // hash(query + filters + collection + top_k) → Redis 5min TTL
+  prompt_key: string;     // hash(template + model + pack_id) → Redis 30min TTL
+  output_key: string;     // hash(prompt_key + final_answer) → Redis 1hr TTL
+}
+```
+
+### Memory Tiers (ACE Format)
+
+| Tier | Purpose | TTL |
+|------|---------|-----|
+| `stable` | Permanent knowledge (statutes, case law) | Infinite |
+| `recent` | Session context (last 10 queries) | 30min |
+| `task` | Current task fragments (active analysis) | 5min |
+
+### API Endpoints (Planned)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/pipeline/run` | Trigger ingestion pipeline, returns `job_id` + SSE URL |
+| `GET` | `/api/pipeline/status/:jobId` | Poll job status |
+| `GET` | `/api/pipeline/events/:jobId` | SSE stream for real-time progress |
+| `POST` | `/api/retrieve` | Vector search with filters |
+| `POST` | `/api/synthesize` | RAG synthesis → ContextPack |
+| `GET` | `/api/pipeline/health` | Service health check |
+
+### E2E Test (`tests/e2e/pipeline-happy-path.spec.ts`)
+
+Covers the full happy path:
+1. Upload PDF evidence to case
+2. Trigger pipeline run
+3. Poll/SSE for completion (30s timeout)
+4. Verify Qdrant retrieval returns chunks
+5. Verify synthesis returns valid ContextPack v2.0
+
+### Models
+
+| Role | Model | Dimensions |
+|------|-------|------------|
+| Embedding | `embeddinggemma:latest` | 768 |
+| Synthesis | `gemma3-legal:latest` | - |
+
+### Stable ID Strategy
+
+```
+chunk_id = sha256(doc_id + chunk_index + offsets + chunk_text_sha)
+pack_id  = sha256(key fields of ContextPack)
+```
+
+IDs are deterministic and stable across re-runs for deduplication and citation anchoring.
+

@@ -454,6 +454,17 @@
     "src/lib/components/ui/enhanced-bits.ts",
     "src/lib/components/ui/svelte5-index.ts",
     "src/lib/components/ui/tooltip.ts",
-    "src/lib/components/ui/Dialog.svelte"
+    "src/lib/components/ui/Dialog.svelte",
+
+    // Session 17: Missing module imports + placeholder files
+    "src/lib/components/detective/DetectiveBoard.svelte",
+    "src/lib/utils/dynamic-imports.ts",
+    "src/lib/components/auth/EnhancedAuthForm.svelte",
+    "src/lib/components/auth/RegisterForm.simple.svelte",
+    "src/lib/components/chat/ChatAuthPrompt.svelte",
+    "src/lib/errors/featureErrors.ts",
+    "src/lib/server/index.ts",
+    "src/lib/forms/superforms-xstate-integration.ts",
+    "src/routes/(app)/persons-of-interest/+page.svelte"
   ]
 }

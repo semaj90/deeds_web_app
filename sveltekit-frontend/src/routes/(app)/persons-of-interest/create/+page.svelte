@@ -1,22 +1,24 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
  import POIForm from '$lib/components/poi/POIForm.svelte';
- import { poiService } from '$lib/features/poi/services/poi';
  import type { POICreateRequest } from '$lib/types/poi';
 
  // Props
- let { data } = $props();
+ let { data } = $props<{ data: any }>();
 
  // State
  let error = $state<string | null>(null);
  let success = $state(false);
 
- async function handleSubmit(formData: POICreateRequest) {
+ async function handleSubmit(formData: any) {
  error = null;
  try {
- const poi = await poiService.createPOI({
- ...formData, caseId: data?.caseId
+ const res = await fetch('/api/persons-of-interest', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify({ ...formData, caseId: (data as any)?.caseId })
  });
+ const poi = await res.json();
  success = true;
  setTimeout(() => {
  goto(`/persons-of-interest/${poi.id}`);

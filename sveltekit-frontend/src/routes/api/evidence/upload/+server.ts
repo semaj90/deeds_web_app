@@ -1,71 +1,37 @@
-import db from '$lib/server/db/client';
-import type { RequestEvent } from '@sveltejs/kit';
-import { error, json } from '@sveltejs/kit';
-import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { json, type RequestEvent } from '@sveltejs/kit';
 
 /**
  * POST /api/evidence/upload
- * Upload evidence to MinIO staging + create DB row in evidence_ingest_jobs
- *
- * Body: FormData, with:
- * - file: File
- * - caseId: string
- * - artifactType: "document" | "image" | "audio" | "video" | "email"
- * - metadata?: { key, value }
+ * STUB: Mock upload handler for development/testing.
+ * Returns a successful job ID without actual storage/DB ops.
  */
 export async function POST({ request }: RequestEvent) {
- if (request.method !== 'POST') {
- return error(405, 'Method not allowed');
- }
+  try {
+    const formData = await request.formData();
+    const file = formData.get('file');
+    const caseId = formData.get('caseId');
+    // const artifactType = formData.get('artifactType');
 
- try {
- const formData = await request.formData();
- const file = formData.get('file') as File;
- const caseId = formData.get('caseId') as string;
- const artifactType = formData.get('artifactType') as string;
+    if (!file) {
+      return json({ error: 'No file provided' }, { status: 400 });
+    }
 
- if (!file || !caseId || !artifactType) {
- return error(400, 'Missing required fields: file, caseId, artifactType');
- }
+    // Mock processing
+    const jobId = `job-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    const docId = `doc-${Date.now()}`;
 
- // Validate artifact type
- const validTypes = ['document', 'image', 'audio', 'video', 'email'];
- if (!validTypes.includes(artifactType)) {
- return error(400, `Invalid artifactType. Must be one of: ${validTypes.join(', ')}`);
- }
+    console.log(`[STUB] Upload received for case ${caseId}. Assigned Job: ${jobId}`);
 
- // MinIO upload (simplified - replace with actual MinIO SDK)
- const minioKey = `${caseId}/${Date.now()}-${file.name}`;
- console.log(`📤 Uploading to MinIO: ${minioKey}`);
+    return json({
+      jobId,
+      doc_id: docId,
+      status: 'pending',
+      message: 'Upload successful (stub)',
+      minioKey: `uploads/${caseId}/${(file as File).name}`
+    }, { status: 201 });
 
- // TODO: Implement actual MinIO upload
- // const minio = getMinioClient();
- // await minio.putObject('legal-evidence', minioKey: file.stream());
-
-  // Create DB row
- const jobId = `job-${Date.now()}-${Math.random().toString(36).substring(7)}`;INSERT INTO evidence_ingest_jobs (id, case_id, artifact_type, minio_key, status, created_at)
- VALUES (${jobId}, ${caseId}, ${artifactType}, ${minioKey}, 'pending', NOW())
- RETURNING id
- `);
-
- const job = result.rows[0];
-
- return json(
- {
- jobId: job.id,
- status: 'pending',
- minioKey,
- createdAt: new Date().toISOString(),
- nextStep: `POST /api/evidence/${job.id}/sanitize to strip metadata`,
- },
- { status: 201 }
- );
- } catch (e) {
- console.error('❌ Evidence upload error:', e);
- return error(500, e instanceof Error ? e.message : 'Unknown error');
- }
+  } catch (err) {
+    console.error('Upload error:', err);
+    return json({ error: 'Internal Server Error' }, { status: 500 });
+  }
 }
-
-
-

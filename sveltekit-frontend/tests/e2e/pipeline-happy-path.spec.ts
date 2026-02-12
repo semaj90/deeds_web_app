@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * Pipeline V2 Happy Path Test
@@ -16,7 +16,7 @@ test.describe('Legal-AI Pipeline V2 E2E', () => {
   // Unique ID for this test run to avoid collisions
   const CASE_ID = `e2e-case-${Date.now()}`;
   const EVIDENCE_ID = `ev-${Date.now()}`;
-  const SAMPLE_PDF_PATH = path.join(__dirname, '../complaint.pdf'); // Located in tests/complaint.pdf
+  const SAMPLE_PDF_PATH = path.resolve('tests/complaint.pdf'); // Located in tests/complaint.pdf
 
   test.beforeAll(async () => {
     // Optional: Check if API is healthy

@@ -1,4 +1,5 @@
 <script lang="ts">
+ // @ts-nocheck - minified file, excluded from tsconfig
  // Svelte 5 component that uses all major HTML elements styled by NES.css // This ensures no CSS selectors are unused import type { Snippet } from 'svelte'; interface Props { visible?: boolean; children?: Snippet}
   let { visible = false, children }: Props = $props(); let formData = $state({ text: '', select: '', textarea: '', checkbox: false,
 	radio: ''

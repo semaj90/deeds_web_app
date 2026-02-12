@@ -12,7 +12,7 @@ export interface WebGPUCapabilities {
 	maxUniformBufferBindingSize: number;
   maxVertexAttributes: number;
 	maxVertexBuffers: number;
-  maxInterStageShaderComponents: number;
+  maxInterStageShaderComponents?: number; // Deprecated in WebGPU spec
 	maxColorAttachments: number;
   maxComputeWorkgroupStorageSize: number;
 }
@@ -91,7 +91,6 @@ export class WebGPUInit {
         maxUniformBufferBindingSize: this.device.limits.maxUniformBufferBindingSize,
         maxVertexAttributes: this.device.limits.maxVertexAttributes,
         maxVertexBuffers: this.device.limits.maxVertexBuffers,
-        maxInterStageShaderComponents: this.device.limits.maxInterStageShaderComponents,
         maxColorAttachments: this.device.limits.maxColorAttachments,
         maxComputeWorkgroupStorageSize: this.device.limits.maxComputeWorkgroupStorageSize,
       };

@@ -258,7 +258,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-1 mb-6 flex">
  {#each ['overview', 'admissibility', 'probable-cause', 'case-strength', 'recommendations'] as tab}
  <button
- onclick={() => activeTab = tab}
+ onclick={() => activeTab = tab as any}
  class="flex-1 px-4 py-2 rounded text-sm font-medium transition-colors {activeTab === tab ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-700'}"
  >
  {tab.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}

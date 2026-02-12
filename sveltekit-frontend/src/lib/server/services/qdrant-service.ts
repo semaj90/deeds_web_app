@@ -69,11 +69,13 @@ export class QdrantService {
       const payload: QdrantPayload = {
         doc_id: chunk.doc_id,
         chunk_id: chunk.chunk_id,
+        case_id: chunk.case_id,
         tags: chunk.tags,
         priority: chunk.priority,
         created_at: chunk.created_at,
         sha256: chunk.sha256,
         source: chunk.source,
+        text: chunk.text,
       };
 
       return {

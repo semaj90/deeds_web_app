@@ -3,7 +3,8 @@
  * Handles errors for feature-disabled scenarios
  */
 
-import { featureLogger } from '../services/featureLogger.js';
+// featureLogger module not yet created — use console fallback
+const featureLogger = { warn: console.warn, error: console.error, info: console.info };
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**

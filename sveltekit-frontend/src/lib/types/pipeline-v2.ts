@@ -7,6 +7,7 @@
 // Canonical Chunk Record (Postgres/Redis)
 export type ChunkRecord = {
   doc_id: string;
+  case_id: string;           // critical for scoped retrieval
   chunk_id: string;          // stable across runs = sha256(doc_id + chunk_index + offsets + chunk_text_sha)
   source: 'pdf'|'ocr'|'web'|'user';
   text: string;
@@ -14,6 +15,7 @@ export type ChunkRecord = {
   priority: number;          // 0..255 (normalized for NES priority system)
   tags: string[];
   created_at: string;        // ISO
+  version?: number;
   offsets?: { start: number; end: number }; // optional
 };
 
@@ -29,6 +31,7 @@ export type QdrantPayload = {
   evidence_id?: string;
   mime?: string;
   source?: string;
+  text?: string;
 };
 
 // Retrieved Fragment (for Context Pack)

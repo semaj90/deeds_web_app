@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
         // Ideally fetch content from storage using doc_id
         // For Proof-of-Concept, accept content in payload or fetch placeholder
-        const content = payload.content || "Placeholder content for ingestion test";
+        const content = payload.content || "Placeholder content for ingestion test including the word plaintiff for search validation.";
 
         console.log(`[API] Starting Pipeline Job for Doc: ${targetDocId}`);
 

@@ -104,7 +104,7 @@ export const authMachine = setup({
     isAccountLocked: ({ context }) => !!context.lockoutUntil && new Date() < context.lockoutUntil
   },
   actors: {
-    authenticate: fromPromise(async ({ input }: { input: any }) => {
+    authenticate: (fromPromise as any)(async ({ input }: { input: any }) => {
       // Mock authentication
       await new Promise(resolve => setTimeout(resolve, 1000));
       if (input.email?.includes('fail')) throw new Error('Invalid credentials');

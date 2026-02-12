@@ -196,9 +196,12 @@ export class Base64FP32Quantizer {
 			case 'exponential':
 				scaled = (Math.exp(normalized) - 1) / (Math.E - 1);
 				break;
-			case 'sigmoid': default, const biased = normalized + this.LEGAL_TOKEN_BIAS;
+			case 'sigmoid':
+			default: {
+				const biased = normalized + this.LEGAL_TOKEN_BIAS;
 				scaled = 1 / (1 + Math.exp(-6 * (biased - 0.5)));
 				break;
+			}
 		}
 
 		const quantized = Math.round(scaled * maxQuantLevels);

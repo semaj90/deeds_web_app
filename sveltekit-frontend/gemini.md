@@ -729,3 +729,30 @@ run
 check:production validates
 clean
 services
+
+# Legal-AI Pipeline V2 Specification (Feb 2026)
+
+**Architecture:** Redis Pipeline + RAG/KAG/DAG + Svelte 5 Streaming
+**Models:**
+- Retrieval: Qdrant (vectors + tags) + Postgres mirror
+- Embedding: embeddinggemma:latest (cached, deduped)
+- Synthesis: gemma3-legal:latest (Context Packs)
+
+**Data Contracts:**
+- ChunkRecord: Stable chunk_id (SHA-256), normalized priority (0-255).
+- ContextPack: Versioned synthesis output with citations anchor.
+
+**Pipeline Flow:**
+1. Ingest (PDF/OCR) -> Chunking -> Embed (Batch) -> Upsert (Qdrant + Tags).
+2. Retrieve (Query + Tags) -> RAG/KAG Context Assembly.
+3. Synthesize -> Stream Progress (SSE) -> UI (Svelte 5 Runes).
+
+**Key Implementation Goals:**
+- **Fast Dev Loop**: npm run dev:quic:full.
+- **Resilience**: Fallback to text search if Qdrant down; Cache hits if embedding fails.
+- **Observability**: Job IDs, SSE events, structured logs.
+
+**Status:**
+- Types defined in src/lib/types/pipeline-v2.ts.
+- E2E Test created at tests/e2e/pipeline-happy-path.spec.ts.
+- Clean Services: neural-sprite-autoencoder.ts, png-embed-extractor.ts restored.

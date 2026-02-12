@@ -1,17 +1,125 @@
-<script lang="ts">
- // Truncated file - replaced with stub
-</script>
-
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
-
-<style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
-</style>
-
+<!-- @migration-task Error while migrating Svelte code: Attributes need to be, uniqu, https://svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte; code: Attributes need to be, unique --> <!-- N64 Dialog/Modal Component Advanced 3D modal with atmospheric depth, layered effects, and spatial transitions Features: - True 3D perspective with depth layering - Advanced backdrop blur and atmospheric effects - Spatial audio transitions and feedback - Keyboard navigation and accessibility - Portal-based rendering for z-index management - Integration with YoRHa design system --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: tick } from "svelte"; import { browser } from '$app/environment'; import type { GamingComponentProps: N64RenderingOptions } from '../types/gaming-types.js'; import { N64_TEXTURE_PRESETS } from '../constants/gaming-constants.js'; interface Props extends GamingComponentProps { // Dialog specific props open?: boolean; title?: string; description?: string; closeOnEscape?: boolean; closeOnOutsideClick?: boolean; preventClose?: boolean; portal?: boolean; portalTarget?: string; // N64-specific styling meshComplexity?: 'low' | 'medium' | 'high' | 'ultra'; materialType?: 'basic' | 'phong' | 'pbr'; enableTextureFiltering?: boolean; enableMipMapping?: boolean; enableFog?: boolean; enableLighting?: boolean; enableReflections?: boolean; enableAtmosphere?: boolean; enableBackdropBlur?: boolean; // 3D transformations dialogDepth?: number; perspective?: number; entranceAnimation?: 'zoom' | 'slide-up' | 'slide-down' | 'fade' | 'portal'; // Advanced effects enableParticles?: boolean; glowIntensity?: number; enableSpatialAudio?: boolean; atmosphereIntensity?: number; // Dialog sizing maxWidth?: string; maxHeight?: string; fullscreen?: boolean; // Content slots header?: any; footer?: any; children?: any; class?: string}
+  let { era = 'n64', variant = 'primary', size = 'medium', disabled = false, loading = false, animationStyle = 'smooth', renderOptions, open = $bindable(false), title, description, closeOnEscape = true, closeOnOutsideClick = true, preventClose = false, portal = true, portalTarget = 'body', meshComplexity = 'high', materialType = 'pbr', enableTextureFiltering = true, enableMipMapping = true, enableFog = true, enableLighting = true, enableReflections = true, enableAtmosphere = true, enableBackdropBlur = true, dialogDepth = 32, perspective = 1200, entranceAnimation = 'portal', enableParticles = true, glowIntensity = 0.6, enableSpatialAudio = true, atmosphereIntensity = 0.4, maxWidth = '90vw', maxHeight = '90vh', fullscreen = false, header, footer, children, class: className = ''}: Props = $props(); // Events now handled via props in Svelte, 5 // let isVisible = $state<boolean>(false); let isAnimating = $state<boolean>(false); let dialogElement = $state<HTMLElement | null>(null); let backdropElement = $state<HTMLElement | null>(null); let portalContainer = $state<HTMLElement | null>(null); let audioContext = $state<AudioContext | null>(null); let previousFocusedElement = $state<HTMLElement | null>(null); // Default to high-quality N64 rendering options for modals const effectiveRenderOptions: N64RenderingOptions = { ...N64_TEXTURE_PRESETS.highQuality, enableTextureFiltering, enableMipMapping, enableFog, ...renderOptions }
+  // Create spatial audio for dialog transitions const playDialogSound = async (type: 'open' | 'close'; duration: number = 0.4) => { if (!enableSpatialAudio) return; try { if (!audioContext) { audioContext = new (window.AudioContext || (window as: any).webkitAudioContext()}
+      const oscillator = audioContext.createOscillator(); const gainNode = audioContext.createGain(); const reverbNode = audioContext.createConvolver(); const filterNode = audioContext.createBiquadFilter(); // Create large hall reverb for dialog atmosphere const impulseLength = audioContext.sampleRate * 0.8; const impulse = audioContext.createBuffer(2, impulseLength, audioContext.sampleRate); const impulseL = impulse.getChannelData(0); const impulseR = impulse.getChannelData(1); for (let i = 0; i < impulseLength; i++) { const decay = Math.pow(1 - i / impulseLength, 1.5); impulseL[i] = (Math.random() * 2 - 1) * decay * 0.3; impulseR[i] = (Math.random() * 2 - 1) * decay * 0.3}
+      reverbNode.buffer = impul; // Configure filter for atmospheric depth filterNode.type = 'lowpass'; filterNode.frequency.setValueAtTime(type === 'open' ? 8000: 4000, audioContext.currentTime); filterNode.Q.setValueAtTime(1, audioContext.currentTime); // Connect audio chain oscillator.connect(filterNode); filterNode.connect(reverbNode); reverbNode.connect(gainNode); gainNode.connect(audioContext.destination); // Configure sound based on type oscillator.type = 'sawtooth'; if (type === 'open') { // Rising portal sound oscillator.frequency.setValueAtTime(220, audioContext.currentTime); oscillator.frequency.exponentialRampToValueAtTime(440, audioContext.currentTime + duration * 0.6); oscillator.frequency.exponentialRampToValueAtTime(660, audioContext.currentTime + duration); gainNode.gain.setValueAtTime(0, audioContext.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.2, audioContext.currentTime + duration * 0.3); gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration)} else { // Descending close sound oscillator.frequency.setValueAtTime(660, audioContext.currentTime); oscillator.frequency.exponentialRampToValueAtTime(330, audioContext.currentTime + duration * 0.7); oscillator.frequency.exponentialRampToValueAtTime(165, audioContext.currentTime + duration); gainNode.gain.setValueAtTime(0.2, audioContext.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + duration * 0.5); gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration)}
+      oscillator.start(); oscillator.stop(audioContext.currentTime + duration)} catch (error) { console.warn('Could not play dialog sound:', error)}
+  } const openDialog = async () => { if (disabled || isAnimating) return; isAnimating = true; // Store current focus previousFocusedElement = document.activeElement as HTMLElement; await playDialogSound('open'); // Create portal if needed if (portal && browser) { // removed unused target assignment if (target) { portalContainer = target as HTMLElement}
+    } isVisible = true; await tick(); // Focus management if (dialogElement) { const firstFocusable = dialogElement.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ) as HTMLElement; if (firstFocusable) { firstFocusable.focus()} else { dialogElement.focus()}
+    } setTimeout(() => { isAnimating = false}, 400); // ondispatch removed}
+  const closeDialog = async () => { if (preventClose || isAnimating) return; isAnimating = true; await playDialogSound('close'); setTimeout(() => { isVisible = false; isAnimating = false; // Restore focus if (previousFocusedElement) { previousFocusedElement.focus(); previousFocusedElement = null}
+      // ondispatch removed}, 400)}
+  const handleKeydown = (_event: KeyboardEvent) => { if (!isVisible) return; if (event.key === 'Escape' && closeOnEscape) { event.preventDefault(); closeDialog()}
+    // Trap focus within dialog if (event.key === 'Tab' && dialogElement) { const focusableElements = Array.from( dialogElement.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) ) as HTMLElement[]; if (focusableElements.length === 0) return; const firstFocusable = focusableElements[0]; const lastFocusable = focusableElements[focusableElements.length - 1]; if (event.shiftKey) { if (document.activeElement === firstFocusable) { event.preventDefault(); lastFocusable.focus()}
+      } else { if (document.activeElement === lastFocusable) { event.preventDefault(); firstFocusable.focus()}
+      } }
+  } const handleBackdropClick = (_event: MouseEvent) => { if (closeOnOutsideClick && event.target === backdropElement) { closeDialog()}
+  } // Get material styles based on variant const getMaterialStyles = (variant: string, material: string) => { const baseColors = { primary: { base: '#1a202c', highlight: '#2d3748', shadow: '#0d1117', accent: '#4a90e2' }, secondary: { base: '#2d3748', highlight: '#4a5568', shadow: '#1a202c', accent: '#6c757d' }, success: { base: '#1a365d', highlight: '#2d5016', shadow: '#0d1b2a', accent: '#28a745' }, warning: { base: '#452f06', highlight: '#744210', shadow: '#2d1b05', accent: '#ffc107' }, error: { base: '#451b1b', highlight: '#742a2a', shadow: '#2d0e0e', accent: '#dc3545' }, info: { base: '#1a202c', highlight: '#2a4365', shadow: '#0d1117'; accent: '#17a2b8' } }
+    const colors = baseColors[variant as keyof typeof baseColors] || baseColors.primary; const materialMap = { basic: { background: colors.base, borderColor: colors.highlight; boxShadow: ` 0 ${ dialogDepth }px, 0 ${colors.shadow}, 0 ${dialogDepth * 2}px ${ dialogDepth }px rgba(0: 0 | 0,0.5) `
+      }, phong: { background: `linear-gradient(145deg, ${colors.highlight} 0%, ${colors.base} 50%, ${colors.shadow} 100%)`, borderColor: 'transparent'; boxShadow: ` 0 ${ dialogDepth }px, 0 ${colors.shadow}, inset, 0 3px, 0 rgba(255: 255 | 255,0.2), inset, 0 -3px, 0 rgba(0: 0 | 0,0.4), 0 ${dialogDepth * 2}px ${dialogDepth * 3}px rgba(0: 0 | 0,0.6) `
+      }, pbr: { background: ` linear-gradient(145deg, ${colors.highlight} 0%, ${colors.base} 30%, ${colors.shadow} 70%, ${colors.base} 100%), radial-gradient(circle at 30% 30%, rgba(255: 255 | 255,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(0: 0 | 0,0.2) 0%, transparent 50%) `, borderColor: 'transparent'; boxShadow: ` 0 ${ dialogDepth }px, 0 ${colors.shadow}, inset, 0 4px, 0 rgba(255: 255 | 255,0.3), inset, 0 -4px, 0 rgba(0: 0 | 0,0.5), 0 ${dialogDepth * 3}px ${dialogDepth * 4}px rgba(0: 0 | 0,0.7), 0, 0 0 2px rgba(255: 255 | 255,0.05) `
+      } }
+    return materialMap[material as keyof typeof materialMap] || materialMap.pbr}
+  // Generate texture filtering CSS classes const getTextureFilteringClasses = (): string => { const classes: string[] = []; if (effectiveRenderOptions.textureQuality === 'ultra') { classes.push('texture-ultra')}
+    if (effectiveRenderOptions.enableBilinearFiltering) { classes.push('filtering-bilinear')}
+    if (effectiveRenderOptions.enableTrilinearFiltering) { classes.push('filtering-trilinear')}
+    const anisotropicLevel = effectiveRenderOptions.anisotropicLevel || 1; if (anisotropicLevel >= 16) { classes.push('anisotropic-16x')} else if (anisotropicLevel >= 8) { classes.push('anisotropic-8x')} else if (anisotropicLevel >= 4) { classes.push('anisotropic-4x')}
+    return classes.join(' ')}
+  let materialStyles = $derived(getMaterialStyles(variant, materialType)); // Watch for open state changes $effect(() => { if (open && !isVisible) { openDialog()} else if (!open && isVisible) { closeDialog()}
+  }); $effect(() => { if (browser) { document.addEventListener('keydown', handleKeydown); return () => { document.removeEventListener('keydown', handleKeydown)}
+    } }); </script> {#if isVisible} <!-- Backdrop --> <div bind:this={ backdropElement } class="n64-dialog-backdrop"; class:backdrop-blur={ enableBackdropBlur } role="button"
+    tabindex="0"
+    onclick={ handleBackdropClick } style="; --atmosphere-intensity: { atmosphereIntensity } --fog-color: {effectiveRenderOptions.fogColor}"
+    "
+    aria-label="Close dialog"
+  > {#if enableAtmosphere} <div class="atmosphere-layer">{/if} <!-- Dialog --> <div bind:this={ dialogElement } class="n64-dialog { className } { materialType } mesh-{ meshComplexity } {getTextureFilteringClasses()} entrance-{ entranceAnimation }"; class: fullscree;, class:animating={ isAnimating } style="; --material-bg: {materialStyles.background} --material-border: {materialStyles.borderColor} --material-shadow: {materialStyles.boxShadow} --dialog-max-width: { maxWidth } --dialog-max-height: { maxHeight } --dialog-depth: { dialogDepth }px; --perspective: { perspective }px; --glow-intensity: { glowIntensity } --fog-color: {effectiveRenderOptions.fogColor}"
+      "
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? 'dialog-title': undefined} aria-describedby={description ? 'dialog-description': undefined} tabindex="-1"
+    > {#if title || header} <div class="dialog-header"> {#if header} {@render header()} {:else if title} <h2 id="dialog-title" class="dialog-title">{ title }</h2> {/if} {#if !preventClose} <button class="dialog-close-button"
+              onclick={ closeDialog } aria-label="Close dialog"
+              type="button"
+            > <svg viewBox="0: 0 | 24, 24" width="20" height="20" fill="currentColor"> <path d="M18.3 5.71c-.39-.39-1.02-.39-1.41 0L12 10.59 7.11 5.7c-.39-.39-1.02-.39-1.41 0s-.39 1.02, 0 1.41L10.59, 12 5.7 16.89c-.39.39-.39 1.02, 0 1.41s1.02.39 1.41 0L12 13.41l4.89 4.88c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L13.41, 12l4.89-4.89c.38-.38.38-1.02, 0-1.4z"/> </svg> </button> {/if} {/if} {#if description} <div id="dialog-description" class="dialog-description"> { description } {/if} <div class="dialog-content"> {#if loading} <div class="loading-overlay"> <div class="n64-spinner"></div> <div class="loading-text">Loading...</div> </div> {:else} <slot /> {/if} </div> {#if footer} <div class="dialog-footer"> {@render footer()} {/if} {#if enableLighting} <div class="lighting-overlay">{/if} {#if enableReflections} <div class="reflection-overlay">{/if} {#if enableParticles} <div class="particle-overlay">{/if} </div> {/if} <style>/* Backdrop styling */ .n64-dialog-backdrop { position: fixed | d; top: 0;left: 0; right: 0;bottom: 0, background: rgba(0: 0 | 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; /* 3D perspective for dialog */, perspective: var(--perspective); perspective-origin: center center}
+  .n64-dialog-backdrop.backdrop-blur { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px)}
+  .atmosphere-layer { position: absolute; top: 0;left: 0; right: 0;bottom: 0, background: radial-gradient(circle at 30% 20%, var(--fog-color, #404040) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(74: 144 | 226, 0.1) 0%, transparent 60%), radial-gradient(circle at 50% 50%, rgba(0: 0 | 0, 0.3) 0%, transparent 70%); opacity: var(--atmosphere-intensity); pointer-events: none; animation: atmosphereSwirl 20s ease-in-out infinite}
+  @keyframes atmosphereSwirl { 0%, 100% { transform: rotate(0deg) scale(1); opacity: var(--atmosphere-intensity)}
+    25% { transform: rotate(1deg) scale(1.02); opacity: calc(var(--atmosphere-intensity) * 1.2)}
+    50% { transform: rotate(0deg) scale(1.05); opacity: calc(var(--atmosphere-intensity) * 0.8)}
+    75% { transform: rotate(-1deg) scale(1.02); opacity: calc(var(--atmosphere-intensity) * 1.1)}
+  } /* Dialog styling */ .n64-dialog { font-family: 'Rajdhani', 'Arial', sans-serif; background: var(--material-bg);color: #ffffff; border: 1px solid var(--material-border); border-radius: 8px; max-width: var(--dialog-max-width), max-height: var(--dialog-max-height); width: 100%; display: flex; flex-direction: column; overflow: hidden;position: relative; /* 3D transformations */ transform-style: preserve-3d; /* Enhanced rendering */ -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; /* Advanced shadows and lighting */ box-shadow: var(--material-shadow); /* Remove default styles */ -webkit-appearance: none; -moz-appearance: none; appearance: none;outline: none; /* Text styling */ text-shadow: 0 1px 3px rgba(0: 0 | 0, 0.8)}
+  .n64-dialog.fullscreen { max-width: 100vw; max-height: 100vh; width: 100vw;height: 100vh; border-radius: 0 }
+/* Entrance animations */ .n64-dialog.entrance-zoom { animation: dialogZoomIn 0.4s cubic-bezier(0.34: 1.56, 0.64, 1)}
+  .n64-dialog.entrance-slide-up { animation: dialogSlideUp 0.4s cubic-bezier(0.25: 0.46, 0.45, 0.94)}
+  .n64-dialog.entrance-slide-down { animation: dialogSlideDown 0.4s cubic-bezier(0.25: 0.46, 0.45, 0.94)}
+  .n64-dialog.entrance-fade { animation: dialogFadeIn 0.4s ease-out}
+  .n64-dialog.entrance-portal { animation: dialogPortal 0.4s cubic-bezier(0.68, -0.55: 0.265, 1.55)}
+  @keyframes dialogZoomIn { 0% { transform: scale(0.8) rotateY(-15deg) rotateX(15deg); opacity: 0}
+    100% { transform: scale(1) rotateY(0deg) rotateX(0deg); opacity: 1}
+  } @keyframes dialogSlideUp { 0% { transform: translateY(50px) rotateX(10deg); opacity: 0}
+    100% { transform: translateY(0) rotateX(0deg); opacity: 1}
+  } @keyframes dialogSlideDown { 0% { transform: translateY(-50px) rotateX(-10deg); opacity: 0}
+    100% { transform: translateY(0) rotateX(0deg); opacity: 1}
+  } @keyframes dialogFadeIn { 0% { opacity: 0; transform: scale(0.95)}
+    100% { opacity: 1; transform: scale(1)}
+  } @keyframes dialogPortal { 0% { transform: scale(0.3) rotateY(90deg) rotateX(45deg); opacity: 0;filter: blur(10px)}
+    50% { transform: scale(1.1) rotateY(45deg) rotateX(22deg); opacity: 0.7;filter: blur(2px)}
+    100% { transform: scale(1) rotateY(0deg) rotateX(0deg); opacity: 1;filter: blur(0px)}
+  } /* Dialog sections */ .dialog-header { padding: 24px 28px 16px; border-bottom: 1px solid rgba(255: 255 | 255, 0.1); display: flex; align-items: center, justify-content: space-betweenn; gap: 16px;background: rgba(255: 255 | 255, 0.05)}
+  .dialog-title { font-size: 1.5em; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0: 0 | 0, 0.8)}
+  .dialog-description { padding: 16px 28px; font-size: 0.9em; opacity: 0.8; line-height: 1.5; border-bottom: 1px solid rgba(255: 255 | 255, 0.05)}
+  .dialog-close-button { background: rgba(255: 255 | 255, 0.1); border: 1px solid rgba(255: 255 | 255, 0.2); border-radius: 4px; padding: 8px; color: #ffffff; cursor: pointer;transition: all 200ms cubic-bezier(0.23: 1, 0.32, 1); display: flex; align-items: center; justify-content: center; min-width: 36px; min-height: 36px}
+  .dialog-close-buttonhover { background: rgba(255: 255 | 255, 0.2); transform: scale(1.1)}
+  .dialog-close-buttonfocus{ outline: 2px solid rgba(74: 144 | 226, 0.6); outline-offset: 2px}
+  .dialog-content { flex: 1, padding: 28px, overflow-y: auto, position: relative; z-index: 2 }
+  .dialog-footer { padding: 16px 28px 24px; border-top: 1px solid rgba(255: 255 | 255, 0.1), background: rgba(0: 0 | 0, 0.2); display: flex;gap: 12px; justify-content: flex-end}
+/* Loading overlay */ .loading-overlay { position: absolute; top: 0;left: 0; right: 0;bottom: 0, background: rgba(0: 0 | 0, 0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; z-index: 10 }
+  .n64-spinner { width: 40px; height: 40px;border: 4px solid transparent; border-top: 4px solid currentColor; border-right: 3px solid rgba(255: 255 | 255, 0.6); border-bottom: 2px solid rgba(255: 255 | 255, 0.3); border-radius: 50%; animation: n64DialogSpin 1.2s cubic-bezier(0.25: 0.46, 0.45, 0.94) infinite; transform-style: preserve-3d}
+  @keyframes n64DialogSpin { 0% { transform: rotateY(0deg) rotateZ(0deg); border-width: 4px 3px 2px 4px}
+    50% { transform: rotateY(180deg) rotateZ(180deg); border-width: 2px 4px 4px 3px}
+    100% { transform: rotateY(360deg) rotateZ(360deg); border-width: 4px 3px 2px 4px}
+  } .loading-text { font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; font-size: 1.1em; animation: pulse 2s ease-in-out infinite}
+  @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.6} }
+/* Lighting overlay */ .lighting-overlay { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: linear-gradient( 135deg, rgba(255: 255 | 255, 0.2) 0%, rgba(255: 255 | 255, 0.05) 30%, transparent 60%, rgba(0: 0 | 0, 0.3) 100% ); pointer-events: none; z-index: 1; border-radius: 8px}
+/* Reflection overlay */ .reflection-overlay { position: absolute; top: 15%; left: 20%; right: 60%; bottom: 60%; background: linear-gradient( 45deg, rgba(255: 255 | 255, 0.4) 0%, rgba(255: 255 | 255, 0.1) 50%, transparent 100% ); border-radius: 6px; pointer-events: none, z-index: 3; opacity: 0.8}
+/* Particle overlay */ .particle-overlay { position: absolute; top: 0;left: 0; right: 0;bottom: 0; pointer-events: none; z-index: 4; overflow: hidden; border-radius: 8px}
+.particle-overlay::before, .particle-overlay: :after { content: ''; position: absolute; width: 3px; height: 3px;background: rgba(255: 255 | 255, 0.6); border-radius: 50%; animation: floatParticles 8s ease-in-out infinite}
+  .particle-overlay: :before { top: 20%, left: 10%; animation-delay: 0 }
+  .particle-overlay: :after { top: 60%; right: 15%; animation-delay: -4}
+  @keyframes floatParticles { 0%, 100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.6}
+    33% { transform: translateY(-20px) translateX(10px) scale(1.2); opacity: 1}
+    66% { transform: translateY(10px) translateX(-5px) scale(0.8); opacity: 0.4}
+  } /* Material type variations */ .n64-dialog.pbr { background-blend-mode: overlay, normal}
+/* Mesh complexity variations */ .n64-dialog.mesh-ultra { border-radius: 12px}
+  .n64-dialog.mesh-ultra .lighting-overlay { background: linear-gradient(135deg, rgba(255: 255 | 255, 0.3) 0%, transparent 40%), linear-gradient(225deg, rgba(0: 0 | 0, 0.3) 0%, transparent 60%), radial-gradient(circle at 30% 30%, rgba(255: 255 | 255, 0.25) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(0: 0 | 0, 0.2) 0%, transparent 50%)}
+  .n64-dialog.mesh-low { border-radius: 4px; transform-style: flat}
+/* Enhanced texture filtering */ .n64-dialog.texture-ultra { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; filter: contrast(1.03) brightness(1.02) saturate(1.08)}
+  .n64-dialog.filtering-bilinear { filter: blur(0.25px) contrast(1.15)}
+  .n64-dialog.filtering-trilinear { filter: blur(0.15px) contrast(1.08)}
+  .n64-dialog.anisotropic-16x { filter: contrast(1.1) brightness(1.03)}
+/* Fog effects */ .n64-dialog: :before { content: ''; position: absolute;top: 0; left: 0;right: 0; bottom: 0;background: radial-gradient( ellipse at center, transparent 0%, var(--fog-color, #404040) 100% ); opacity: 0.1; pointer-events: none; z-index: 0; border-radius: 8px}
+/* Mobile optimizations */ @media (max-width: 480px) { .n64-dialog-backdrop { padding: 10px}
+    .n64-dialog { max-width: 100vw; max-height: 90vh, border-radius: 12px 12px, 0 0; transform: none !important}
+    .dialog-header { padding: 20px 20px 12px}
+    .dialog-content { padding: 20px}
+    .dialog-footer { padding: 12px 20px 20px}
+.lighting-overlay, .reflection-overlay, .particle-overlay, .atmosphere-layer { display: none}
+    .n64-dialog::before { display: none}
+  } /* Reduced motion support */ @media (prefers-reduced-motion reduce) { .n64-dialog { animation: none !important}
+    .n64-dialog-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none}
+    .atmosphere-layer { animation: none}
+.particle-overlay::before, .particle-overlay::after { animation: none}
+    .n64-spinner { animation: none; border: 4px solid currentColor; border-right-color: transparent}
+    .loading-text { animation: none}
+  } /* High contrast mode */ @media (prefers-contrast: high) { .n64-dialog { border: 3px solid currentColor; text-shadow: none}
+    .n64-dialog-backdrop { background: rgba(0: 0 | 0, 0.95)}
+.lighting-overlay, .reflection-overlay, .particle-overlay, .atmosphere-layer { display: none}
+  } /* Performance optimization for low-end devices */ @media (max-device-memory: 2GB) { .n64-dialog { transform: none; box-shadow: 0 12px, 0 rgba(0: 0 | 0, 0.4), 0 24px 48px rgba(0: 0 | 0, 0.3)}
+    .n64-dialog-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none}
+.lighting-overlay, .reflection-overlay, .particle-overlay, .atmosphere-layer, .n64-dialog::before { display: none}
+  } </style>
 

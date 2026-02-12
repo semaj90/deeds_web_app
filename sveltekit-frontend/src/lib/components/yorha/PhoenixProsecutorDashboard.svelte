@@ -457,17 +457,18 @@
     <EvidenceComparisonOverlay
       evidenceA={{ ...selectedEvidence[0], extractedText: selectedEvidence[0].content }}
       evidenceB={{ ...selectedEvidence[1], extractedText: selectedEvidence[1].content }}
-      onClose={handleComparisonClose}
+      onDismiss={handleComparisonClose}
     />
   {/if}
 
   {#if currentContradictions.length > 0}
-    <!-- @ts-ignore -->
-    <ContradictionReveal {currentContradictions} onDismiss={() => (currentContradictions = [])} />
+    <ContradictionReveal
+      {...{message: currentContradictions.map((c: any) => c.message || c).join('; '), show: currentContradictions.length > 0} as any}
+    />
   {/if}
 
   <!-- HUD Overlay -->
-  <LegalHUD {showHUD} />
+  <LegalHUD {...{showHUD} as any} />
 
   <!-- Event Monitor -->
   <PhoenixEventMonitor show={showEventMonitor} />

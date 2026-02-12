@@ -78,13 +78,13 @@ const CaseCreationSchema = z.object({
 
 const SearchQuerySchema = z.object({
   query: z.string().min(1),
-  filters: z.record(z.unknown()).optional()
+  filters: z.record(z.string(), z.unknown()).optional()
 });
 
 const AIAnalysisSchema = z.object({
   documentId: z.string(),
   analysisType: z.string().optional(),
-  options: z.record(z.unknown()).optional()
+  options: z.record(z.string(), z.unknown()).optional()
 });
 
 // Placeholder machines - these should be imported from actual machine files

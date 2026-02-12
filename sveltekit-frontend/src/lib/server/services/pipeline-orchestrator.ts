@@ -60,15 +60,15 @@ export class PipelineOrchestrator {
           chunkRecords.push({
              chunk_id: chunkId,
              doc_id: docId,
-             content: chunkContent,
+             case_id: metadata.case_id,
+             text: chunkContent,
              sha256: sha256,
              tags: metadata.tags || [],
              priority: 1,
              version: 1,
              source: metadata.source as any,
              created_at: new Date().toISOString(),
-             range_start: 0,
-             range_end: 0
+             offsets: { start: 0, end: 0 }
           });
           embeddings.push(vec);
         }));
