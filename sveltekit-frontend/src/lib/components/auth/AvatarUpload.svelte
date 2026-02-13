@@ -5,12 +5,16 @@ interface Props {
 userId?: string;
 currentAvatar?: string}
   let {
-userId: currentAvatar }: Props = $props();
+userId, currentAvatar }: Props = $props();
 let uploading = $state<boolean>(false);
 let message = $state<string>('');
 let messageType = $state<'success' | 'error'>('success');
 let fileInput: HTMLInputElement | undefined;
-let preview = $state(currentAvatar || '');
+let preview = $state('');
+
+$effect(() => {
+  preview = currentAvatar || '';
+});
 async function handleFileSelect(event: Event): Promise<any> {
 const input = event.target as HTMLInputElement;
 const file = input.files?.[0];

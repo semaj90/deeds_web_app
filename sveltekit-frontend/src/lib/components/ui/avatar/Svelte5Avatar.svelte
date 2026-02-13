@@ -30,7 +30,12 @@ let {
 }: Props = $props();
 
 let hasError = $state(false);
-let isLoading = $state(!!src);
+let isLoading = $state(false);
+
+$effect(() => {
+	isLoading = !!src;
+	hasError = false;
+});
 
 // Size classes
 let sizeClasses = $derived({

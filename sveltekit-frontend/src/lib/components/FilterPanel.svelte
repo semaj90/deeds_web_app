@@ -10,7 +10,7 @@ interface Filters { status: string, priority: string;
 
   let { filters , onfilter }: Props = $props();
 let showPanel = $state(false);
-  let localFilters = $state<Filters>({ ...filters });
+  let localFilters = $state<Filters>({ status: '', priority: '', tags: [] });
 
   $effect(() => {
     localFilters = { ...filters };

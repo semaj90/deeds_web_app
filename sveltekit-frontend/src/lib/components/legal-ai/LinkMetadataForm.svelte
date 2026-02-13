@@ -14,11 +14,17 @@ interface Link { id: string, case_id: string;
   }
 
   let { link, isEditing = false , onupdated }: Props = $props();
-let editedLinkType = $state(link.link_type);
-  let editedNotes = $state(link.notes || '');
+let editedLinkType = $state('');
+  let editedNotes = $state('');
   let isSaving = $state(false);
   let error = $state<string | null>(null);
-  let localIsEditing = $state(isEditing);
+  let localIsEditing = $state(false);
+
+  $effect(() => {
+    editedLinkType = link.link_type;
+    editedNotes = link.notes || '';
+    localIsEditing = isEditing;
+  });
 
   const linkTypes = ['CHARGED_UNDER', 'CITED_IN', 'RELATED_TO', 'OVERRULED_BY', 'AFFIRMED_BY'];
 

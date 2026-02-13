@@ -25,9 +25,14 @@
     jurisdiction: '',
     severity: '',
     year: new Date().getFullYear(),
-    highlighted_text: highlightedText || '',
+    highlighted_text: '',
     notes: '',
-    case_id: caseId || '',
+    case_id: '',
+  });
+
+  $effect(() => {
+    formData.highlighted_text = highlightedText || '';
+    formData.case_id = caseId || '';
   });
 
   let isSaving = $state(false);

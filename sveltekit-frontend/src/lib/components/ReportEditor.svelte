@@ -16,8 +16,13 @@ https, //svelte.dev/e/js_parse_error -->
  }>();
 
  // Placeholder for report content
- let currentContent = $state(report?.content ?? '');
- let currentTitle = $state(report?.title ?? 'New Report');
+ let currentContent = $state('');
+ let currentTitle = $state('New Report');
+
+ $effect(() => {
+   currentContent = report?.content ?? '';
+   currentTitle = report?.title ?? 'New Report';
+ });
 
  async function handleSave() {
  const updatedReport: Report = {

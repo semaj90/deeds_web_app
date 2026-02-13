@@ -45,7 +45,7 @@
 	const statuses = ['pending', 'processing', 'completed', 'failed'];
 	const fileTypes = ['pdf', 'docx', 'txt'];
 
-	const totalPages = Math.ceil(total / pageSize);
+	let totalPages = $derived(Math.ceil(total / pageSize));
 
 	function handleSearch(e: Event) {
 		const target = e.target as HTMLInputElement;

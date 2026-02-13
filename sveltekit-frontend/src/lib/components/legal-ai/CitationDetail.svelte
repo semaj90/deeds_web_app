@@ -29,7 +29,7 @@
 	}: Props = $props();
 
 	let isEditing = $state(false);
-	let editedNotes = $state(citation.notes || '');
+	let editedNotes = $state('');
 	let isSaving = $state(false); function startEdit() {
  isEditing = true;
  editedNotes = citation.notes || '';

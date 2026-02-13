@@ -11,10 +11,15 @@
 
  let systemHealth = $state({
  overall: 85,
- webgpu: webgpuCapabilities?.hasWebGPU ? 95 : 60,
- cpu: cpuCapabilities?.hasWebGL ? 90 : 70,
+ webgpu: 60,
+ cpu: 70,
  memory: 75,
  network: 100
+ });
+
+ $effect(() => {
+   systemHealth.webgpu = webgpuCapabilities?.hasWebGPU ? 95 : 60;
+   systemHealth.cpu = cpuCapabilities?.hasWebGL ? 90 : 70;
  });
 
  let systemMetrics = $state<any>(null);

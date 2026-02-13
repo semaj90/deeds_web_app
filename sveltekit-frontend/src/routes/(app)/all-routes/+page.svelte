@@ -10,8 +10,11 @@
 	data: PageData } = $props();
 
 	// Make routes reactive so SSE updates trigger re-renders
-	// Initialize from server data immediately (not in $effect which runs after render)
-	let routes = $state<any[]>(data.routes || []);
+	let routes = $state<any[]>([]);
+
+	$effect(() => {
+		routes = data.routes || [];
+	});
 
 	// Phase 10: Real-Time Updates (SSE)
 	// ─────────────────────────────────────

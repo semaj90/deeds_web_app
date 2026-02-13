@@ -10,7 +10,8 @@
 	} = $props();
 
 	// Generate a unique ID if not provided
-	const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+	const fallbackId = `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+	let checkboxId = $derived(id || fallbackId);
 </script>
 
 <div class="checkbox-container">

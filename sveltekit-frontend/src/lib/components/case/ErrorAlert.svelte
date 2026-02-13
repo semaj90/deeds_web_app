@@ -9,10 +9,10 @@
 		onRetry?: (() => void) | null;
 	} = $props();
 
-	let localError = $state<string | null>(error);
+	let localError = $state<string | null>(null);
 
 	$effect(() => {
-		localError = error;
+		localError = error ?? null;
 	});
 
 	function dismiss() {

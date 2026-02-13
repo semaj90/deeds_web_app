@@ -38,7 +38,11 @@
 	let frameCount = 0;
 	let lastFrameTime = typeof performance !== 'undefined' ? performance.now() : 0;
 	let intervalId: ReturnType<typeof setInterval> | undefined;
-	let isVisible = $state(showOverlay);
+	let isVisible = $state(false);
+
+	$effect(() => {
+		isVisible = showOverlay;
+	});
 
 	function updateMetrics() {
 		if (typeof performance === 'undefined') return;

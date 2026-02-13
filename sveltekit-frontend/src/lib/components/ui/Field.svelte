@@ -19,11 +19,11 @@
 	control: Snippet<{ id, string }>;
  }>();
 
- const autoId =
- id ?? `f_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+ : _+$/g, "")}`;
+ let autoId = $derived(
+ id ?? `f_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+ : _+$/g, "")}`);
 
- const hintId = `${autoId}__hint`;
- const errId = `${autoId}__err`;
+ let hintId = $derived(`${autoId}__hint`);
+ let errId = $derived(`${autoId}__err`);
 </script>
 
 <div class="space-y-1.5">

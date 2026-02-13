@@ -3,11 +3,11 @@
 
  interface Props { summaryId: string, holding: string;
  reasoning: string;
-	citations: Array<{ text: string; caseId?, string }>;
+	citations: Array<{ text: string; caseId?: string }>;
  keywords: string[];
 	confidence: number;
  onApprove: (data: { holding: string, reasoning: string;
-citations: Array<{ text: string; caseId?, string }>;
+citations: Array<{ text: string; caseId?: string }>;
  keywords: string[],
  }) => void;
  onReject: () => void;
@@ -16,11 +16,18 @@ citations: Array<{ text: string; caseId?, string }>;
 
  let { summaryId, holding, reasoning, citations, keywords, confidence, onApprove, onReject, isApproving = false }: Props = $props();
 
- let editedHolding = $state(holding);
- let editedReasoning = $state(reasoning);
- let editedCitations = $state(citations);
- let editedKeywords = $state(keywords);
+ let editedHolding = $state('');
+ let editedReasoning = $state('');
+ let editedCitations = $state<Array<{ text: string; caseId?: string }>>([]);
+ let editedKeywords = $state<string[]>([]);
  let showEditMode = $state(false);
+
+ $effect(() => {
+   editedHolding = holding;
+   editedReasoning = reasoning;
+   editedCitations = [...citations];
+   editedKeywords = [...keywords];
+ });
 
  const handleApprove = () => {
  onApprove({
