@@ -14,7 +14,7 @@ export function getOllamaEndpoint(): string {
  */
 export function getEnvUrl(envName: string, dockerHost: string, localFallback?: string): string {
  // prefer process.env, then docker host, then optional local fallback
- return process.env[envName] || dockerHost || localFallback ?? '';
+ return process.env[envName] || dockerHost || (localFallback ?? '');
 }
 
 export function getEnhancedRagEndpoint(): string {

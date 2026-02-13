@@ -149,7 +149,7 @@ class EnhancedOllamaService extends Events {
                 console.warn('Ollama generation failed, returning stub', error);
 
                 // Fallback stub
-                return { model: created_at, new Date().toISOString(),
+                return { model, created_at: new Date().toISOString(),
                     response: `[Stub] Response to: ${prompt.slice(0, 50)}...`,
                     done: true,
                     total_duration: 0
@@ -218,7 +218,7 @@ class EnhancedOllamaService extends Events {
         }
     }
 
-    private startQueueProcessor(), void {
+    private startQueueProcessor(): void {
         if (!this.queueIntervalId) {
             this.queueIntervalId = setInterval(() => this.processQueue(), 100);
         }

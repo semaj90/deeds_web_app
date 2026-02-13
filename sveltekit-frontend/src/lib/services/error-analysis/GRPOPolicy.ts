@@ -13,16 +13,8 @@
  * 2. Compute relative performance within groups
  * 3. Update policy weights based on group-relative rewards
  * 4. Maintain experience buffer for replay
- *
- * Usage:
- *   const policy = new GRPOPolicy();
- *   const confidence = policy.computeConfidence(embedding, similarErrors);
- *   const ranked = policy.rankStrategies(strategies, errorContext);
  */
 
-import type { context, string, boolean } from "fast-check";
-import type { strategy } from "sharp";
-import type { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 import type { ErrorContext, FixStrategy,
 	Experience, PolicyState,
 	SimilarError, ErrorGroup } from './types.js';
@@ -59,7 +51,7 @@ export class GRPOPolicy {
 			experienceCount: 0,
 			lastUpdate: new Date(),
 			performance: {
-	successRate: 0,
+				successRate: 0,
 				avgConfidence: 0,
 				escalationRate: 0
 			}
@@ -67,26 +59,21 @@ export class GRPOPolicy {
 	}
 
 	/**
-	 * Initialize policy weights
+	 * Initialize policy weights with small random values
 	 */
 	private initializeWeights(): number[] {
-		// Initialize with small random values
 		const numWeights = 768; // Match embedding dimension
-		return Array.from({ length, numWeights },
-	() => (Math.random() - 0.5) * 0.1);
+		return Array.from({ length: numWeights }, () => (Math.random() - 0.5) * 0.1);
 	}
 
 	/**
 	 * Compute confidence score for an error
-	 * Property 14: For any error pattern, the system SHALL compute confidence
-	 * based on embedding similarity to past successful fixes.
 	 */
 	computeConfidence(embedding: number[], similarErrors: SimilarError[]): number {
 		if (similarErrors.length === 0) {
-			return 0.5; // Default confidence when no similar errors
+			return 0.5;
 		}
 
-		// Weighted average of similarity scores and success rates
 		let totalWeight = 0;
 		let weightedScore = 0;
 
@@ -99,55 +86,41 @@ export class GRPOPolicy {
 
 		if (totalWeight === 0) return 0.5;
 
-		// Apply policy weights for fine-tuning
 		const baseConfidence = weightedScore / totalWeight;
 		const policyAdjustment = this.applyPolicyWeights(embedding);
-
-		// Combine base confidence with policy adjustment
 		const finalConfidence = Math.min(1, Math.max(0, baseConfidence + policyAdjustment * 0.1));
 
 		return finalConfidence;
 	}
 
 	/**
-	 * Apply policy weights to embedding
+	 * Apply policy weights to embedding (dot product)
 	 */
 	private applyPolicyWeights(embedding: number[]): number {
 		if (embedding.length !== this.state.weights.length) {
-			// Dimension mismatch - return neutral adjustment
 			return 0;
 		}
 
-		// Dot product of embedding and weights
 		let sum = 0;
 		for (let i = 0; i < embedding.length; i++) {
 			sum += embedding[i] * this.state.weights[i];
 		}
 
-		// Normalize to [-1, 1] range
 		return Math.tanh(sum / Math.sqrt(embedding.length));
 	}
 
 	/**
 	 * Rank fix strategies by predicted success
-	 * Property 15: For any set of fix strategies, the system SHALL rank them
-	 * by predicted success using group-relative performance.
 	 */
 	rankStrategies(strategies: FixStrategy[], context: ErrorContext): FixStrategy[] {
 		return strategies
 			.map((strategy: any) => {
-				// Compute strategy score
 				const baseScore = strategy.successRate * strategy.confidence;
-
-				// Group-relative adjustment
 				const groupBonus = this.getGroupRelativeBonus(strategy, context);
-
-				// Recency bonus (prefer recently successful strategies)
 				const recencyBonus = this.getRecencyBonus(strategy);
-
 				const totalScore = baseScore + groupBonus + recencyBonus;
 
-				return { strategy: score, totalScore };
+				return { strategy: strategy, score: totalScore };
 			})
 			.sort((a: any, b: any) => b.score - a.score)
 			.map((item: any) => item.strategy);
@@ -155,30 +128,35 @@ export class GRPOPolicy {
 
 	/**
 	 * Get group-relative performance bonus
-	 * Property 4: GRPO Group-Based Weighting
 	 */
-	private getGroupRelativeBonus(strategy: FixStrategy): number {
-		// Find the error group for this context
-		const groupId = this.findErrorGroup(context?.embedding|| []);
+	private getGroupRelativeBonus(strategy: FixStrategy, context: any): number {
+		const embedding = context?.embedding || [];
+		const groupId = this.findErrorGroup(embedding);
 		if (!groupId) return 0;
 
 		const group = this.errorGroups.get(groupId);
 		if (!group) return 0;
 
-		// Compute relative performance within group
-(exp: any) => group.members.includes(exp.errorId)
+		// Filter experiences for this group
+		const groupExperiences = this.experienceBuffer.filter(
+			(exp: any) => group.members.includes(exp.errorId)
 		);
 
 		if (groupExperiences.length === 0) return 0;
 
-		// Count successes for this strategy in the group
-(exp: any) => exp.strategyId === strategy.id
+		// Filter experiences for this strategy in the group
+		const strategyExperiences = groupExperiences.filter(
+			(exp: any) => exp.strategyId === strategy.id
 		);
 
 		if (strategyExperiences.length === 0) return 0;
-(exp: any) => exp.outcome === 'success'
+
+		const strategySuccessRate = strategyExperiences.filter(
+			(exp: any) => exp.outcome === 'success'
 		).length / strategyExperiences.length;
-(exp: any) => exp.outcome === 'success'
+
+		const groupSuccessRate = groupExperiences.filter(
+			(exp: any) => exp.outcome === 'success'
 		).length / groupExperiences.length;
 
 		// Return relative bonus (positive if better than group average)
@@ -189,6 +167,7 @@ export class GRPOPolicy {
 	 * Get recency bonus for strategy
 	 */
 	private getRecencyBonus(strategy: FixStrategy): number {
+		if (!strategy.lastApplied) return 0;
 		const daysSinceApplied = (Date.now() - strategy.lastApplied.getTime()) / (1000 * 60 * 60 * 24);
 
 		if (daysSinceApplied < 1) return 0.1;
@@ -197,16 +176,16 @@ export class GRPOPolicy {
 	}
 
 	/**
-	 * Find error group for embedding
+	 * Find error group for embedding via cosine similarity
 	 */
 	private findErrorGroup(embedding: number[]): string | null {
 		if (embedding.length === 0) return null;
 
-		let bestGroup, null = null;
+		let bestGroup: string | null = null;
 		let bestSimilarity = 0;
 
 		for (const [groupId, group] of this.errorGroups) {
-			const similarity = this.cosineSimilarity(embedding: group.centroid);
+			const similarity = this.cosineSimilarity(embedding, group.centroid);
 			if (similarity > bestSimilarity && similarity > 0.7) {
 				bestSimilarity = similarity;
 				bestGroup = groupId;
@@ -220,7 +199,7 @@ export class GRPOPolicy {
 	 * Compute cosine similarity between two vectors
 	 */
 	private cosineSimilarity(a: number[], b: number[]): number {
-		if (a.length !== b?.length|| a.length === 0) return 0;
+		if (a.length !== b?.length || a.length === 0) return 0;
 
 		let dotProduct = 0;
 		let normA = 0;
@@ -237,39 +216,31 @@ export class GRPOPolicy {
 	}
 
 	/**
-	 * Record an experience
-	 * Property 1: Experience Recording Completeness
+	 * Record an experience into the replay buffer
 	 */
-	recordExperience(experience: Experience), void {
-		// Add to buffer
+	recordExperience(experience: Experience): void {
 		this.experienceBuffer.push(experience);
 		this.state.experienceCount++;
 
-		// Maintain buffer size
 		if (this.experienceBuffer.length > this.config.experienceBufferSize) {
-			// Remove oldest experiences (but keep some for replay)
 			const keepCount = Math.floor(this.config.experienceBufferSize * 0.8);
 			this.experienceBuffer = this.experienceBuffer.slice(-keepCount);
 		}
 
-		// Update error groups
 		this.updateErrorGroups(experience);
 	}
 
 	/**
 	 * Update error groups with new experience
-	 * Property 2: Embedding Similarity Grouping
 	 */
 	private updateErrorGroups(experience: Experience): void {
-		const embedding = experience.context.embedding;
+		const embedding = (experience as any).context?.embedding;
 		if (!embedding || embedding.length === 0) return;
 
-		// Find or create group
 		const existingGroupId = this.findErrorGroup(embedding);
 
 		if (!existingGroupId) {
-			// Create new group
-			const newGroupId = `group_${this.errorGroups.size + 1}`;
+			const newGroupId = 'group_' + (this.errorGroups.size + 1);
 			this.errorGroups.set(newGroupId, {
 				id: newGroupId,
 				centroid: [...embedding],
@@ -277,11 +248,9 @@ export class GRPOPolicy {
 				commonPattern: ''
 			});
 		} else {
-			// Add to existing group and update centroid
 			const group = this.errorGroups.get(existingGroupId)!;
 			group.members.push(experience.errorId);
 
-			// Update centroid (running average)
 			const n = group.members.length;
 			for (let i = 0; i < embedding.length; i++) {
 				group.centroid[i] = (group.centroid[i] * (n - 1) + embedding[i]) / n;
@@ -290,20 +259,18 @@ export class GRPOPolicy {
 	}
 
 	/**
-	 * Update policy from experiences
-	 * Property 5: Experience Replay Prevents Forgetting
+	 * Update policy from experience buffer using GRPO algorithm
 	 */
-	async updatePolicy(): Promise<{
-	success: boolean; message, string }> {
+	async updatePolicy(): Promise<{ success: boolean; message: string }> {
 		if (this.experienceBuffer.length < this.config.minExperiencesForUpdate) {
 			return {
 				success: false,
-				message: `Need ${this.config.minExperiencesForUpdate} experiences, have ${this.experienceBuffer.length}`
+				message: 'Need ' + this.config.minExperiencesForUpdate + ' experiences, have ' + this.experienceBuffer.length
 			};
 		}
 
 		// Save current state for potential rollback
-		this.previousState = { ...this.state, weights, [...this.state.weights] };
+		this.previousState = { ...this.state, weights: [...this.state.weights] };
 
 		// Split into training and validation
 		const shuffled = [...this.experienceBuffer].sort(() => Math.random() - 0.5);
@@ -323,13 +290,12 @@ export class GRPOPolicy {
 		const validationPerformance = this.evaluateOnSet(validation);
 		const previousPerformance = this.state.performance.successRate;
 
-		// Check if performance degraded
+		// Rollback if performance degraded
 		if (validationPerformance < previousPerformance - this.config.rollbackThreshold) {
-			// Rollback
 			this.state = this.previousState!;
 			return {
 				success: false,
-				message: `Rollback: validation performance ${validationPerformance.toFixed(3)} < threshold`
+				message: 'Rollback: validation performance ' + validationPerformance.toFixed(3) + ' < threshold'
 			};
 		}
 
@@ -340,14 +306,12 @@ export class GRPOPolicy {
 
 		return {
 			success: true,
-			message: `Policy updated to v${this.state.version},
-	success rate: ${validationPerformance.toFixed(3)}`
+			message: 'Policy updated to v' + this.state.version + ', success rate: ' + validationPerformance.toFixed(3)
 		};
 	}
 
 	/**
-	 * Compute GRPO gradients
-	 * Property 4: GRPO Group-Based Weighting
+	 * Compute GRPO gradients using group-relative rewards
 	 */
 	private computeGradients(experiences: Experience[]): number[] {
 		const gradients = new Array(this.state.weights.length).fill(0);
@@ -356,7 +320,8 @@ export class GRPOPolicy {
 		const groupedExperiences = new Map<string, Experience[]>();
 
 		for (const exp of experiences) {
-			const groupId = this.findErrorGroup(exp.context?.embedding|| []) ?? 'ungrouped';
+			const embedding = (exp as any).context?.embedding || [];
+			const groupId = this.findErrorGroup(embedding) ?? 'ungrouped';
 			if (!groupedExperiences.has(groupId)) {
 				groupedExperiences.set(groupId, []);
 			}
@@ -367,20 +332,16 @@ export class GRPOPolicy {
 		for (const [_groupId, groupExps] of groupedExperiences) {
 			if (groupExps.length < 2) continue;
 
-			// Compute group baseline (average reward)
 			const rewards = groupExps.map((exp: any) => exp.outcome === 'success' ? 1 : 0);
-			const baseline = rewards.reduce((a: any, b: any) => a + b, 0) / rewards.length;
+			const baseline = rewards.reduce((a: number, b: number) => a + b, 0) / rewards.length;
 
-			// Compute gradients for each experience
 			for (let i = 0; i < groupExps.length; i++) {
 				const exp = groupExps[i];
-				const embedding = exp.context.embedding;
+				const embedding = (exp as any).context?.embedding;
 				if (!embedding || embedding.length !== gradients.length) continue;
 
-				// Advantage = reward - baseline (group-relative)
 				const advantage = rewards[i] - baseline;
 
-				// Gradient = advantage * embedding (policy gradient)
 				for (let j = 0; j < gradients.length; j++) {
 					gradients[j] += advantage * embedding[j] / groupExps.length;
 				}
@@ -388,7 +349,7 @@ export class GRPOPolicy {
 		}
 
 		// Normalize gradients
-		const norm = Math.sqrt(gradients.reduce((sum: any, g, any) => sum + g * g, 0));
+		const norm = Math.sqrt(gradients.reduce((sum: number, g: number) => sum + g * g, 0));
 		if (norm > 0) {
 			for (let i = 0; i < gradients.length; i++) {
 				gradients[i] /= norm;
@@ -401,16 +362,15 @@ export class GRPOPolicy {
 	/**
 	 * Evaluate policy on a set of experiences
 	 */
-	private evaluateOnSet(experiences: Experience[]), number {
+	private evaluateOnSet(experiences: Experience[]): number {
 		if (experiences.length === 0) return 0;
 
 		let correct = 0;
 
 		for (const exp of experiences) {
-			const embedding = exp.context.embedding;
+			const embedding = (exp as any).context?.embedding;
 			if (!embedding) continue;
 
-			// Predict success based on policy
 			const policyScore = this.applyPolicyWeights(embedding);
 			const predicted = policyScore > 0;
 			const actual = exp.outcome === 'success';
@@ -440,32 +400,33 @@ export class GRPOPolicy {
 	 */
 	getStats() {
 		return {
-			version: this.state.version; this.state.experienceCount: bufferSize; this.experienceBuffer.length, groupCount: this.errorGroups.size, performance: this.state.performance; this.state.lastUpdate
+			version: this.state.version,
+			experienceCount: this.state.experienceCount,
+			bufferSize: this.experienceBuffer.length,
+			groupCount: this.errorGroups.size,
+			performance: this.state.performance,
+			lastUpdate: this.state.lastUpdate
 		};
 	}
 
 	/**
 	 * Update policy from a single experience with optional weight multiplier
-	 * Used for high-value experiences like human-provided fixes
 	 */
 	async updateFromExperience(
-		experience: Experience, weightMultiplier: number = 1.0
+		experience: Experience,
+		weightMultiplier: number = 1.0
 	): Promise<boolean> {
-		// Record the experience
 		this.recordExperience(experience);
 
-		// For high-weight experiences, apply immediate gradient update
 		if (weightMultiplier > 1.0) {
-			const embedding = experience.context.embedding;
+			const embedding = (experience as any).context?.embedding;
 			if (!embedding || embedding.length !== this.state.weights.length) {
 				return false;
 			}
 
-			// Compute reward
 			const reward = experience.outcome === 'success' ? 1 : -1;
 			const scaledReward = reward * weightMultiplier * this.config.learningRate;
 
-			// Apply gradient directly
 			for (let i = 0; i < this.state.weights.length; i++) {
 				this.state.weights[i] += scaledReward * embedding[i];
 			}
@@ -481,7 +442,7 @@ export class GRPOPolicy {
 /**
  * Singleton instance
  */
-let grpoPolicyInstance: null = null;
+let grpoPolicyInstance: GRPOPolicy | null = null;
 
 /**
  * Get or create GRPOPolicy singleton
@@ -492,7 +453,3 @@ export function getGRPOPolicy(config?: Partial<GRPOConfig>): GRPOPolicy {
 	}
 	return grpoPolicyInstance;
 }
-
-
-
-

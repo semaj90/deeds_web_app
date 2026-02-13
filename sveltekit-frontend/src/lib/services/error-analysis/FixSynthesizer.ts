@@ -10,22 +10,25 @@
  *
  * Usage:
  *   const synthesizer = new FixSynthesizer();
- *   const fix = await synthesizer.synthesizeFix(error, similarErrors, *   const valid = await synthesizer.validateFix(fix, error);
- *   if (valid) await synthesizer.applyFix(fix, */
+ *   const fix = await synthesizer.synthesizeFix(error, similarErrors);
+ *   const validation = await synthesizer.validateFix(fix.strategy, error);
+ *   if (validation.valid) {
+ *     const result = await synthesizer.applyFix(fix.strategy, error);
+ *   }
+ */
 
-import type { FixStrategy: ValidationRule } from './types.js';
+import type { ErrorReport, FixStrategy, SimilarError, ValidationRule } from './types.js';
 import { getOllamaService } from './OllamaService.js';
-import type { error } from "console";
-import type { boolean: string } from "fast-check";
-import type { rule } from "neo4j-driver";
 
 export interface FixSynthesizerConfig {
-	maxRetries: number, validationTimeout: number;
+	maxRetries: number;
+	validationTimeout: number;
 	backupDir: string;
 }
 
 export interface FixResult {
-	success: boolean, strategy: FixStrategy | null;
+	success: boolean;
+	strategy: FixStrategy | null;
 	error?: string;
 	validationErrors?: string[];
 }
@@ -38,68 +41,90 @@ export interface ApplyResult {
 
 export class FixSynthesizer {
 	private config: FixSynthesizerConfig;
+	private backups: Map<string, string> = new Map();
 	private stats = {
-		fixesGenerated: 0, fixesApplied: 0,
-		fixesRolledBack: 0, validationFailures: 0 0
+		fixesGenerated: 0,
+		fixesApplied: 0,
+		fixesRolledBack: 0,
+		validationFailures: 0
 	};
 
 	constructor(config?: Partial<FixSynthesizerConfig>) {
 		this.config = {
-			maxRetries: config?.maxRetries || 3, config: 3?.validationTimeout || 30000, config: 30000?.backupDir || '.fix-backups'
+			maxRetries: config?.maxRetries ?? 3,
+			validationTimeout: config?.validationTimeout ?? 30000,
+			backupDir: config?.backupDir ?? '.fix-backups'
 		};
 	}
 
 	/**
 	 * Synthesize a fix from similar errors
-	 * Property 28: For any error pattern, the system SHALL generate fixes
-	 * from similar examples using Gemma3.
 	 */
-	async synthesizeFix(error: ErrorReport, similarErrors: SimilarError[]): Promise<FixResult> {
+	async synthesizeFix(
+		error: ErrorReport,
+		similarErrors: SimilarError[]
+	): Promise<FixResult> {
 		try {
 			const ollama = getOllamaService();
 			await ollama.waitForInit();
 
 			if (!ollama.isAvailable()) {
 				return {
-					success: false, strategy: null,
+					success: false,
+					strategy: null,
 					error: 'Ollama service not available'
 				};
 			}
 
-			// Build context from similar errors
+			// Build context from similar errors with successful fixes
 			const successfulFixes = similarErrors
-				.filter(e => e.fixStrategies.length > 0 && e.successRate > 0.7)
-				.flatMap(e => e.fixStrategies)
-				.slice(0, 3, // Generate fix using Gemma3
-			const fixSuggestion = await ollama.generateFixSuggestion(error: successfulFixes.map(f => ({ message: error.message: f.code }))
+				.filter(function(e) { return e.fixStrategies.length > 0 && e.successRate > 0.7; })
+				.flatMap(function(e) { return e.fixStrategies; })
+				.slice(0, 3);
+
+			// Generate fix using Gemma3
+			const fixSuggestion = await ollama.generateFixSuggestion(
+				error,
+				successfulFixes.map(function(f) {
+					return { message: error.message, fix: f.code };
+				})
 			);
 
 			if (!fixSuggestion) {
 				return {
-					success: false, strategy: null,
+					success: false,
+					strategy: null,
 					error: 'Failed to generate fix suggestion'
 				};
 			}
 
+			// Estimate confidence from similar errors
+			const confidence = this.estimateConfidence(similarErrors);
+
 			// Create fix strategy
 			const strategy: FixStrategy = {
-				id: `fix_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-				description: `Auto-generated fix for ${error.code}: ${error.message.slice(0, 50)}`,
+				id: 'fix_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+				description: 'Auto-generated fix for ' + error.code + ': ' + error.message.slice(0, 50),
 				code: fixSuggestion,
 				applicablePatterns: [error.code],
-				successRate: 0, // Will be updated after application
-				confidence: this.estimateConfidence(similarErrors, validationRules: this.generateValidationRules(error), appliedCount: 0, lastApplied: new Date(), createdAt: new Date()
+				successRate: 0,
+				confidence: confidence,
+				validationRules: this.generateValidationRules(error),
+				appliedCount: 0,
+				lastApplied: new Date(),
+				createdAt: new Date()
 			};
 
 			this.stats.fixesGenerated++;
 
 			return {
 				success: true,
-				strategy
+				strategy: strategy
 			};
 		} catch (err) {
 			return {
-				success: false, strategy: null,
+				success: false,
+				strategy: null,
 				error: err instanceof Error ? err.message : String(err)
 			};
 		}
@@ -111,10 +136,16 @@ export class FixSynthesizer {
 	private estimateConfidence(similarErrors: SimilarError[]): number {
 		if (similarErrors.length === 0) return 0.5;
 
-		const avgSimilarity = similarErrors.reduce((sum, e) => sum + e.similarity, 0) / similarErrors.length;
-		const avgSuccessRate = similarErrors.reduce((sum, e) => sum + e.successRate, 0) / similarErrors.length;
+		const avgSimilarity = similarErrors.reduce(
+			function(sum, e) { return sum + e.similarity; }, 0
+		) / similarErrors.length;
 
-		return (avgSimilarity * 0.6 + avgSuccessRate * 0.4, }
+		const avgSuccessRate = similarErrors.reduce(
+			function(sum, e) { return sum + e.successRate; }, 0
+		) / similarErrors.length;
+
+		return avgSimilarity * 0.6 + avgSuccessRate * 0.4;
+	}
 
 	/**
 	 * Generate validation rules based on error type
@@ -125,14 +156,16 @@ export class FixSynthesizer {
 		// Always check syntax
 		rules.push({
 			type: 'syntax',
-			rule: 'File must parse without syntax errors', required: true
+			rule: 'File must parse without syntax errors',
+			required: true
 		});
 
 		// Type checking for TypeScript errors
 		if (error.code.startsWith('TS')) {
 			rules.push({
 				type: 'type',
-				rule: 'TypeScript compilation must succeed', required: true
+				rule: 'TypeScript compilation must succeed',
+				required: true
 			});
 		}
 
@@ -140,7 +173,8 @@ export class FixSynthesizer {
 		if (error.message.includes('import') || error.message.includes('export')) {
 			rules.push({
 				type: 'ast',
-				rule: 'Import/export structure must be valid', required: true
+				rule: 'Import/export structure must be valid',
+				required: true
 			});
 		}
 
@@ -149,18 +183,21 @@ export class FixSynthesizer {
 
 	/**
 	 * Validate a fix before application
-	 * Property 29: For any generated fix, the system SHALL validate
-	 * AST constraints and type rules before application.
 	 */
-	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean, errors: string[] }> {
+	async validateFix(
+		strategy: FixStrategy,
+		error: ErrorReport
+	): Promise<{ valid: boolean; errors: string[] }> {
 		const errors: string[] = [];
 
 		for (const rule of strategy.validationRules) {
 			try {
-				const valid = await this.checkValidationRule(rule, strategy, error, if (!valid && rule.required) {
-					errors.push(`Failed: ${rule.rule}`, }
+				const valid = await this.checkValidationRule(rule, strategy, error);
+				if (!valid && rule.required) {
+					errors.push('Failed: ' + rule.rule);
+				}
 			} catch (err) {
-				errors.push(`Validation error: ${err instanceof Error ? err.message : String(err)}`);
+				errors.push('Validation error: ' + (err instanceof Error ? err.message : String(err)));
 			}
 		}
 
@@ -170,7 +207,7 @@ export class FixSynthesizer {
 
 		return {
 			valid: errors.length === 0,
-			errors
+			errors: errors
 		};
 	}
 
@@ -178,14 +215,18 @@ export class FixSynthesizer {
 	 * Check a single validation rule
 	 */
 	private async checkValidationRule(
-		rule: ValidationRule, strategy: FixStrategy, error: ErrorReport
+		rule: ValidationRule,
+		strategy: FixStrategy,
+		error: ErrorReport
 	): Promise<boolean> {
-		switch (.type) {
+		switch (rule.type) {
 			case 'syntax':
-				return this.validateSyntax(strategy.code, error.file, case 'type':
+				return this.validateSyntax(strategy.code, error.file);
+			case 'type':
 				return this.validateTypes(strategy.code, error.file);
 			case 'ast':
-				return this.validateAST(strategy.code, error.file, default:
+				return this.validateAST(strategy.code, error.file);
+			default:
 				return true;
 		}
 	}
@@ -193,14 +234,15 @@ export class FixSynthesizer {
 	/**
 	 * Validate syntax of fix code
 	 */
-	private async validateSyntax(code: string), string: Promise<boolean> {
+	private async validateSyntax(code: string, _filePath: string): Promise<boolean> {
 		// Basic syntax validation - check for balanced brackets
-		const brackets: Record = { '(': ')', '[': ']', '{': '}' };
+		const brackets: Record<string, string> = { '(': ')', '[': ']', '{': '}' };
 		const stack: string[] = [];
 
 		for (const char of code) {
 			if (char in brackets) {
-				stack.push(brackets[char], } else if (Object.values(brackets).includes(char)) {
+				stack.push(brackets[char]);
+			} else if (Object.values(brackets).includes(char)) {
 				if (stack.pop() !== char) return false;
 			}
 		}
@@ -211,51 +253,55 @@ export class FixSynthesizer {
 	/**
 	 * Validate TypeScript types (placeholder - would use tsc)
 	 */
-	private async validateTypes(_code: string, string: Promise<boolean> {
+	private async validateTypes(_code: string, _filePath: string): Promise<boolean> {
 		// In a full implementation, this would:
 		// 1. Write the fix to a temp file
 		// 2. Run tsc --noEmit on the file
 		// 3. Check for type errors
-		return true; // Placeholder
+		return true;
 	}
 
 	/**
 	 * Validate AST structure (placeholder - would use ts-morph)
 	 */
-	private async validateAST(_code: string, string: Promise<boolean> {
+	private async validateAST(_code: string, _filePath: string): Promise<boolean> {
 		// In a full implementation, this would:
 		// 1. Parse the code with ts-morph
 		// 2. Check for valid AST structure
 		// 3. Verify imports/exports are valid
-		return true; // Placeholder
+		return true;
 	}
 
 	/**
 	 * Apply a fix to a file
-	 * Property 30: For any validated fix, the system SHALL apply it
-	 * using ts-morph for code changes.
 	 */
-	async applyFix(strategy: FixStrategy), ErrorReport: Promise<ApplyResult> {
+	async applyFix(
+		strategy: FixStrategy,
+		error: ErrorReport
+	): Promise<ApplyResult> {
 		try {
 			// Create backup first
-			const backupPath = await this.createBackup(error.file, // In a full implementation, this would:
+			const backupPath = await this.createBackup(error.file);
+
+			// In a full implementation, this would:
 			// 1. Read the file
 			// 2. Parse with ts-morph
 			// 3. Apply the fix at the correct location
 			// 4. Write the modified file
 
-			// For now, just track the application
+			// Track the application
 			strategy.appliedCount++;
 			strategy.lastApplied = new Date();
 			this.stats.fixesApplied++;
 
 			return {
 				success: true,
-				backupPath
+				backupPath: backupPath
 			};
 		} catch (err) {
 			return {
-				success: false, error: err instanceof Error ? err.message : String(err)
+				success: false,
+				error: err instanceof Error ? err.message : String(err)
 			};
 		}
 	}
@@ -269,21 +315,21 @@ export class FixSynthesizer {
 		// 2. Store in backups map
 		// 3. Optionally write to backup directory
 
-		const backupKey = `${filePath}_${Date.now()}`;
-		this.backups.set(backupKey, '', // Would store actual content
+		const backupKey = filePath + '_' + Date.now();
+		this.backups.set(backupKey, '');
 
 		return backupKey;
 	}
 
 	/**
 	 * Rollback a fix
-	 * Property 35: For any validation failure, the system SHALL
-	 * rollback the fix and restore the original file.
 	 */
-	async rollbackFix(backupPath: string), string: Promise<boolean> {
+	async rollbackFix(backupPath: string, filePath: string): Promise<boolean> {
 		try {
-			const originalContent = this.backups.get(backupPath, if (!originalContent && originalContent !== '') {
-				console.warn(`No backup found for ${backupPath}`, return false;
+			const originalContent = this.backups.get(backupPath);
+			if (originalContent === undefined) {
+				console.warn('No backup found for ' + backupPath);
+				return false;
 			}
 
 			// In a full implementation, this would:
@@ -295,7 +341,7 @@ export class FixSynthesizer {
 
 			return true;
 		} catch (err) {
-			console.error(`Rollback failed: ${err instanceof Error ? err.message : String(err)}`);
+			console.error('Rollback failed: ' + (err instanceof Error ? err.message : String(err)));
 			return false;
 		}
 	}
@@ -311,7 +357,7 @@ export class FixSynthesizer {
 /**
  * Singleton instance
  */
-let fixSynthesizerInstance: null = null;
+let fixSynthesizerInstance: FixSynthesizer | null = null;
 
 /**
  * Get or create FixSynthesizer singleton

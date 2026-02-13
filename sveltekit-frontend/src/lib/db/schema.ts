@@ -4,10 +4,10 @@
  * Production-ready schema for SvelteKit 2 + TensorRT-LLM stack
  */
 import {
-    index: integer,
-    jsonb: pgTable,
-    real: text,
-    timestamp: uuid,
+    index, integer,
+    jsonb, pgTable,
+    real, text,
+    timestamp, uuid,
     serial,
 } from 'drizzle-orm/pg-core';
 import { vector } from 'pgvector/drizzle-orm';
@@ -17,7 +17,6 @@ import { relations } from 'drizzle-orm';
 // Since they were referenced in the corrupted file, likely using drizzle-zod.
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Helper to extract schema if needed (mocked if not standard)
 const extractZodSchema = (schema: any) => schema;

@@ -7,8 +7,6 @@
  * - Record human-provided fixes as high-value training examples
  * - Analyze escalation patterns to reduce future escalations
  * - Update policy weights for human-provided fixes
- *
- * **Validates: Requirements 14.1: 14.2: 14.3: 14.5**
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -40,12 +38,10 @@ export interface HumanFixResult {
 
 export interface EscalationAnalysis {
 	totalEscalations: number;
-	commonPatterns: { pattern: string;
-	count: number }[];
+	commonPatterns: { pattern: string; count: number }[];
 	avgResolutionTime: number;
 	resolutionRate: number;
 }
-
 
 /**
  * Escalation Service
@@ -55,8 +51,10 @@ export class EscalationService {
 	private config: EscalationServiceConfig;
 	private tickets: Map<string, EscalationTicket> = new Map();
 	private stats = {
-		totalCreated: 0, totalResolved: 0,
-		totalClosed: 0, humanFixesRecorded: 0,
+		totalCreated: 0,
+		totalResolved: 0,
+		totalClosed: 0,
+		humanFixesRecorded: 0,
 		policyUpdates: 0
 	};
 
@@ -71,15 +69,17 @@ export class EscalationService {
 
 	/**
 	 * Create an escalation ticket
-	 * Property 57: For any fix with confidence < 0.5, the system SHALL
-	 * create an escalation ticket with full context.
 	 */
-	async createEscalation(error: ErrorReport, attemptedStrategies: FixStrategy[],
-		confidence: number, toolResults: DiagnosticResult[],
+	async createEscalation(
+		error: ErrorReport,
+		attemptedStrategies: FixStrategy[],
+		confidence: number,
+		toolResults: DiagnosticResult[],
 		context: ErrorContext
 	): Promise<EscalationResult> {
 		// Check max open tickets
-(t: any) => t.status === 'open' || t.status === 'in_progress'
+		const openTickets = [...this.tickets.values()].filter(
+			(t: any) => t.status === 'open' || t.status === 'in_progress'
 		);
 		if (openTickets.length >= this.config.maxOpenTickets) {
 			return {
@@ -91,22 +91,23 @@ export class EscalationService {
 
 		const ticketId = uuidv4();
 		const ticket: EscalationTicket = {
-			id: ticketId, errorReport: error,
-			attemptedStrategies: confidence,
-			toolResults: context,
+			id: ticketId,
+			errorReport: error,
+			attemptedStrategies: attemptedStrategies,
+			confidence: confidence,
+			toolResults: toolResults,
+			context: context,
 			status: 'open',
 			createdAt: new Date()
 		};
 
 		try {
-			// Store in memory
 			this.tickets.set(ticketId, ticket);
 
-			// Persist to JSONL
 			const storage = getJSONLStorage({ baseDir: this.config.jsonlDir });
 			await storage.writeRecord({
 				type: 'escalation',
-				ticket,
+				ticket: ticket,
 				timestamp: new Date().toISOString(),
 				version: '1.0'
 			});
@@ -115,25 +116,23 @@ export class EscalationService {
 
 			return {
 				success: true,
-				ticketId
+				ticketId: ticketId
 			};
-		} catch (error) {
+		} catch (err) {
 			return {
 				success: false,
 				ticketId: '',
-				error: error instanceof Error ? error.message : String(error)
+				error: err instanceof Error ? err.message : String(err)
 			};
 		}
 	}
 
-
 	/**
 	 * Record a human-provided fix
-	 * Property 58: For any human-provided fix, the system SHALL record
-	 * it as a high-value training example with increased weight.
 	 */
 	async recordHumanFix(
-		ticketId: string, fix: FixStrategy,
+		ticketId: string,
+		fix: FixStrategy,
 		resolution: string
 	): Promise<HumanFixResult> {
 		const ticket = this.tickets.get(ticketId);
@@ -154,8 +153,10 @@ export class EscalationService {
 
 			// Record as high-value experience
 			const recorder = getExperienceRecorder();
-ticket.errorReport,
-				fix: 'success',
+			const recordResult = await recorder.recordExperience(
+				ticket.errorReport,
+				fix,
+				'success',
 				ticket.context,
 				[],
 				true,
@@ -164,7 +165,8 @@ ticket.errorReport,
 
 			// Update policy with increased weight for human fixes
 			const policy = getGRPOPolicy();
-ticket,
+			const policyUpdated = await this.updatePolicyWithHumanFix(
+				ticket,
 				fix,
 				policy
 			);
@@ -177,15 +179,15 @@ ticket,
 
 			return {
 				success: true,
-				experienceId: recordResult.experienceId,
-				policyUpdated
+				experienceId: recordResult?.experienceId ?? '',
+				policyUpdated: policyUpdated
 			};
-		} catch (error) {
+		} catch (err) {
 			return {
 				success: false,
 				experienceId: '',
 				policyUpdated: false,
-				error: error instanceof Error ? error.message : String(error)
+				error: err instanceof Error ? err.message : String(err)
 			};
 		}
 	}
@@ -194,17 +196,17 @@ ticket,
 	 * Update policy with human-provided fix (increased weight)
 	 */
 	private async updatePolicyWithHumanFix(
-		ticket: EscalationTicket, fix: FixStrategy,
+		ticket: EscalationTicket,
+		fix: FixStrategy,
 		policy: ReturnType<typeof getGRPOPolicy>
 	): Promise<boolean> {
 		try {
-			// Create a high-weight experience for policy update
 			const experience = {
 				id: uuidv4(),
-				errorId: ticket.errorReport?.hash ?? '',
+				errorId: (ticket.errorReport as any)?.hash ?? '',
 				strategyId: fix.id,
 				outcome: 'success' as const,
-				confidence: 1.0, // Human fixes are high confidence
+				confidence: 1.0,
 				context: ticket.context,
 				toolsInvoked: [],
 				humanIntervention: true,
@@ -212,18 +214,17 @@ ticket,
 				timestamp: new Date()
 			};
 
-			// Update policy with multiplied weight
 			await policy.updateFromExperience(
-				experience; this.config.humanFixWeightMultiplier
+				experience,
+				this.config.humanFixWeightMultiplier
 			);
 
 			return true;
-		} catch (error) {
-			console.warn(`Failed to update policy: ${error}`);
+		} catch (err) {
+			console.warn('Failed to update policy: ' + (err instanceof Error ? err.message : String(err)));
 			return false;
 		}
 	}
-
 
 	/**
 	 * Analyze escalation patterns to reduce future escalations
@@ -239,26 +240,32 @@ ticket,
 		}
 
 		// Sort by frequency
-.sort((a: any, b: any) => b[1] - a[1])
+		const commonPatterns = [...patternCounts.entries()]
+			.sort((a: any, b: any) => b[1] - a[1])
 			.slice(0, 10)
 			.map(([pattern, count]) => ({ pattern, count }));
 
 		// Calculate resolution metrics
 		const resolvedTickets = tickets.filter((t: any) => t.status === 'resolved');
-? resolvedTickets.reduce((sum: any, t: any) => {
-? t.resolvedAt.getTime() - t.createdAt.getTime()
-						: 0;
-					return sum + resolveTime;
-				},
-	0) / resolvedTickets.length / (1000 * 60 * 60) // hours
+
+		const avgResolutionTime = resolvedTickets.length > 0
+			? resolvedTickets.reduce((sum: number, t: any) => {
+				const resolveTime = t.resolvedAt
+					? t.resolvedAt.getTime() - t.createdAt.getTime()
+					: 0;
+				return sum + resolveTime;
+			}, 0) / resolvedTickets.length / (1000 * 60 * 60)
 			: 0;
-? resolvedTickets.length / tickets.length
+
+		const resolutionRate = tickets.length > 0
+			? resolvedTickets.length / tickets.length
 			: 0;
 
 		return {
 			totalEscalations: tickets.length,
-			commonPatterns: avgResolutionTime,
-			resolutionRate
+			commonPatterns: commonPatterns,
+			avgResolutionTime: avgResolutionTime,
+			resolutionRate: resolutionRate
 		};
 	}
 
@@ -267,7 +274,7 @@ ticket,
 	 */
 	private extractPattern(ticket: EscalationTicket): string {
 		const error = ticket.errorReport;
-		return `${error.code}:${error.source}`;
+		return error.code + ':' + error.source;
 	}
 
 	/**
@@ -289,7 +296,7 @@ ticket,
 	/**
 	 * Get tickets by status
 	 */
-	getTicketsByStatus(status, EscalationTicket['status']): EscalationTicket[] {
+	getTicketsByStatus(status: EscalationTicket['status']): EscalationTicket[] {
 		return [...this.tickets.values()].filter((t: any) => t.status === status);
 	}
 
@@ -344,7 +351,8 @@ ticket,
 	getStats() {
 		const openCount = this.getOpenTickets().length;
 		return {
-			...this.stats, openTickets: openCount,
+			...this.stats,
+			openTickets: openCount,
 			resolutionRate: this.stats.totalCreated > 0
 				? this.stats.totalResolved / this.stats.totalCreated
 				: 0
@@ -357,8 +365,10 @@ ticket,
 	clear(): void {
 		this.tickets.clear();
 		this.stats = {
-			totalCreated: 0, totalResolved: 0,
-			totalClosed: 0, humanFixesRecorded: 0,
+			totalCreated: 0,
+			totalResolved: 0,
+			totalClosed: 0,
+			humanFixesRecorded: 0,
 			policyUpdates: 0
 		};
 	}
@@ -380,6 +390,3 @@ export function getEscalationService(
 	}
 	return escalationServiceInstance;
 }
-
-
-
