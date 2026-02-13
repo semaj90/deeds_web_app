@@ -99,7 +99,6 @@ function getOptionClasses(option: RadioOption) {
 <fieldset
 	class="w-full {className}"
 	{ disabled }
-	aria-required={required}
 >
 	{#if label}
 		<legend class="text-sm font-medium text-slate-300 mb-3">

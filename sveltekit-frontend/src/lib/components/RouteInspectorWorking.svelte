@@ -164,6 +164,7 @@ route: route.route })
 		role="button"
 		tabindex="0"
 	>
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 		<div
 			class="route-modal"
 			onclick={(e) => e.stopPropagation()}

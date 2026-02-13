@@ -95,6 +95,7 @@
 </script>
 
 {#if isOpen && tag}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="dialog-overlay" onclick={onClose} role="presentation">
     <div class="dialog" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" tabindex="-1">
       <!-- Header -->
@@ -115,7 +116,7 @@
       <div class="dialog-content">
         <!-- Current Name -->
         <div class="field">
-          <label class="field-label">Current Name</label>
+          <span class="field-label">Current Name</span>
           <div class="current-name">
             <code>{tag.name}</code>
           </div>

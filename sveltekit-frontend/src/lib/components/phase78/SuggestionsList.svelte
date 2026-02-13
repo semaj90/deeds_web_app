@@ -183,7 +183,9 @@ userId: 'current-user' }),
 
 <style>
  :global(.suggestions-list) {
- @apply space-y-3;
+ display: flex;
+ flex-direction: column;
+ gap: 0.75rem;
  }
 </style>
 

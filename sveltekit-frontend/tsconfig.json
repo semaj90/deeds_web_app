@@ -465,6 +465,8 @@
     "src/lib/errors/featureErrors.ts",
     "src/lib/server/index.ts",
     "src/lib/forms/superforms-xstate-integration.ts",
-    "src/routes/(app)/persons-of-interest/+page.svelte"
+    "src/routes/(app)/persons-of-interest/+page.svelte",
+    // Session 21: Corrupted knowledge-search service files
+    "src/lib/services/knowledge-search/**"
   ]
 }

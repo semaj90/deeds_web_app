@@ -127,11 +127,6 @@
 		color: var(--primary-foreground, white);
 	}
 
-	.avatar-icon {
-		width: 16px;
-		height: 16px;
-	}
-
 	.message-content {
 		flex: 1;
 		min-width: 0;

@@ -167,6 +167,8 @@
 		ondragover={ handleDragOver }
 		ondragleave={ handleDragLeave }
 		ondrop={ handleDrop }
+		role="region"
+		aria-label="File drop zone"
 	>
 		<div class="drop-content">
 			<div class="drop-icon">📁</div>

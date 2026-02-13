@@ -108,13 +108,13 @@ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 </script>
 
 <div class="tag-selector" class:disabled>
-	<label class="selector-label">
+	<span class="selector-label">
 		🏷️ Citation Tags
 		<span class="tag-count">({selectedTags.length} selected)</span>
 		{#if selectedTags.length > 0}
 			<span class="boost-indicator">1.5x boost</span>
 		{/if}
-	</label>
+	</span>
 
 	<!-- Selected Tags -->
 	<div class="selected-tags">

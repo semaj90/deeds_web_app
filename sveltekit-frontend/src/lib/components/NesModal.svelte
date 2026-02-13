@@ -39,6 +39,7 @@
 		tabindex="-1"
 		transition:fade
 	>
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		class="modal-container"
 		onclick={stopPropagation}

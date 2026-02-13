@@ -51,7 +51,8 @@
     enableGPUValidation?: boolean;
   }
 
-  let { data, redirectTo = '/dashboard', showLogin = true, enableGPUValidation = true }: Props = $props();
+  let { data: rawData, redirectTo = '/dashboard', showLogin = true, enableGPUValidation = true }: Props = $props();
+  let data = $derived(rawData);
 
   // Form state
   let showPassword = $state(false);
@@ -75,6 +76,7 @@
   authActor.start();
 
   // Superform setup
+  // svelte-ignore state_referenced_locally — superForm() initializes once with the server data
   const { form, errors, enhance: formEnhance, submitting } = superForm(data, {
     validators: zodClient(registerSchema),
     resetForm: false,

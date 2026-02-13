@@ -17,7 +17,7 @@ function handleSelectResult(result: any) {
 
 <div class="results-container">
 	{#each results as result (result.chunk_id)}
-		<div class="result-item" onclick={() => handleSelectResult(result)}>
+		<button type="button" class="result-item" onclick={() => handleSelectResult(result)}>
 			<div class="result-header">
 				<div class="rank-badge">#{result.rank}</div>
 				<div class="score-badge">
@@ -51,7 +51,7 @@ function handleSelectResult(result: any) {
 			<div class="result-footer">
 				<span class="click-hint">Click to view details →</span>
 			</div>
-		</div>
+		</button>
 	{/each}
 </div>
 
@@ -69,6 +69,11 @@ function handleSelectResult(result: any) {
 		border-bottom: 1px solid #e0ddd8;
 		cursor: pointer;
 	transition:background 0.2s;
+		width: 100%;
+		text-align: left;
+		background: none;
+		border: none;
+		font: inherit;
 	}
 
 	.result-item:hover {

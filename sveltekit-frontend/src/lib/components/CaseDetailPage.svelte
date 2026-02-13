@@ -345,13 +345,6 @@
 	gap: 0.5rem;
 	}
 
-	.info-item label {
-		font-weight: 600;
-	color: #6b7280;
-		font-size: 0.875rem;
-		text-transform: uppercase;
-	}
-
 	.charges {
 		display: flex;
 		flex-wrap: wrap;

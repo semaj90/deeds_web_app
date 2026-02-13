@@ -169,7 +169,7 @@
   <!-- Links -->
   <a href="/" style="opacity: 0;" onclick={(e) => e.preventDefault()}>Link</a>
 
-  <a style="opacity: 0;">Link without href</a>
+  <a href="#no-href" style="opacity: 0;">Link without href</a>
 
   <!-- Content elements that might be, styled, globally -->
   <article style="opacity: 0;"><h1>H1</h1></article>
@@ -214,7 +214,7 @@
 
     <samp>Sample</samp>
 
-    <img src="" alt="Image" style="opacity: 0;" />
+    <img src="" alt="Placeholder" style="opacity: 0;" />
     <svg><rect /></svg>
 
     <abbr title="Abbreviation">Abbr</abbr>

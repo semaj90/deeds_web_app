@@ -143,7 +143,9 @@
 
 <style>
  :global(.error-events) {
- @apply space-y-4;
+ display: flex;
+ flex-direction: column;
+ gap: 1rem;
  }
 </style>
 

@@ -145,8 +145,9 @@
 		<!-- Filters -->
 		<div class="mb-6 flex items-center gap-4">
 			<div class="flex items-center gap-2">
-				<label class="text-sm text-slate-400">Role:</label>
+				<label for="codebase-role-filter" class="text-sm text-slate-400">Role:</label>
 				<select
+					id="codebase-role-filter"
 					bind:value={selectedRole}
 					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus:border-cyan-500 focus:outline-none"
 				>
@@ -159,8 +160,9 @@
 				</select>
 			</div>
 			<div class="flex items-center gap-2">
-				<label class="text-sm text-slate-400">Risk:</label>
+				<label for="codebase-risk-filter" class="text-sm text-slate-400">Risk:</label>
 				<select
+					id="codebase-risk-filter"
 					bind:value={selectedRisk}
 					class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm focus:border-cyan-500 focus:outline-none"
 				>

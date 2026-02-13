@@ -80,6 +80,7 @@ let selectedText = $state('');
 </script>
 
 <div class="citation-highlighter">
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="content" onmouseup={handleTextSelection} ontouchend={handleTextSelection}>
 		{@html renderContent()}
 	</div>

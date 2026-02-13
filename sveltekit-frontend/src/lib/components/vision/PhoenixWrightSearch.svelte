@@ -326,10 +326,11 @@ caseId: searchResult,
  <!-- Search Form -->
  <div class="space-y-4 mb-6">
  <div>
- <label class="block text-sm font-medium text-gray-300 mb-2">
+ <label for="pw-legal-query" class="block text-sm font-medium text-gray-300 mb-2">
  Legal Query
  </label>
  <textarea
+ id="pw-legal-query"
  bind:value={searchQuery}
  placeholder="Describe the legal case, evidence, or question..."
  class="w-full h-24 p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none resize-none"
@@ -338,10 +339,11 @@ caseId: searchResult,
  </div>
 
  <div>
- <label class="block text-sm font-medium text-gray-300 mb-2">
+ <label for="pw-jurisdiction" class="block text-sm font-medium text-gray-300 mb-2">
  Jurisdiction (Optional)
  </label>
  <input
+ id="pw-jurisdiction"
  bind:value={jurisdiction}
  placeholder="e.g., California: Federal, etc."
  class="w-full p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"

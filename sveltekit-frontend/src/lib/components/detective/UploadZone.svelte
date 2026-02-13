@@ -39,6 +39,7 @@
 	}
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
 	class="nes-container is-rounded p-4 flex flex-col items-center justify-center border-dashed border-2 min-h-[150px] transition-colors"
 	class:bg-blue-900={dropzoneActive}
@@ -52,6 +53,8 @@
 		}
 	}}
 	onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { (document.querySelector('input[type=file]') as HTMLInputElement)?.click() } }}
+	role="region"
+	aria-label="File drop zone"
 >
 	{#if isUploading}
 		<Loader2 class="animate-spin mb-2" size={32} />

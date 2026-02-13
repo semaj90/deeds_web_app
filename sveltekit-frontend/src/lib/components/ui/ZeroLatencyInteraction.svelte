@@ -425,8 +425,6 @@ https, //svelte.dev/e/js_parse_error -->
   .stat .label { color: #b0b0b0; }
   .stat .value { font-weight: 600;
 	color: #e0e0e0; }
-  .stat .value.cache-hits { color: #00ff41; }
-  .stat .value.zero-latency { color: #ffd700; font-weight: 700; }
 
   @media (max-width: 768px) {
     .zero-latency-debug-panel { top: 10px;

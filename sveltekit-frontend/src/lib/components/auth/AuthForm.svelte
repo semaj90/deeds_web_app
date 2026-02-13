@@ -8,6 +8,7 @@
 
   let { data, formType }: Props = $props();
 
+  // svelte-ignore state_referenced_locally — superForm() initializes once with the server data
   const { form, enhance, errors, message } = superForm(data, {
     resetForm: true
   });

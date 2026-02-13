@@ -120,10 +120,14 @@
  {:else}
  <div class="citations-grid">
  {#each citations as citation (citation.id)}
+ <!-- svelte-ignore a11y_no_static_element_interactions -->
  <div
  class="citation-card"
+ role="button"
+ tabindex="0"
  class:selected={selectedCitation?.id === citation.id}
  onclick={() => (selectedCitation = citation)}
+ onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedCitation = citation; }}}
  >
  <div class="card-header">
  <span class="statute-code">{citation.statute_code}</span>
@@ -304,6 +308,9 @@
  border-radius: 6px;
 	cursor: pointer;
  transition:all 0.2s;
+ width: 100%;
+ text-align: left;
+ font: inherit;
  }
 
  .citation-card:hover {

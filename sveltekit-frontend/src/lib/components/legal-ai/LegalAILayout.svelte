@@ -180,8 +180,7 @@
  min-height: 100vh;
  background-color: #f5f1e8;
 		color: #2c2c2c;
- font-family: 'Source Sans 3';
-		-apple-system: BlinkMacSystemFont, 'Segoe UI', sans-serif;
+ font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
  }
 
  /* Sidebar */

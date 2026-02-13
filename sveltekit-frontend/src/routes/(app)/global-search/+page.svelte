@@ -269,9 +269,13 @@
 
  <div class="results-list">
 				{#each searchResults as result}
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						class="result-item {selectedResult?.id === result.id ? 'selected' : ''}"
 						onclick={() => selectedResult = result}
+						onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedResult = result; } }}
+						role="button"
+						tabindex="0"
 					>
  <div class="result-icon">
  <span class="type-icon">{getTypeIcon(result.type)}</span>

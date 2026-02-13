@@ -43,7 +43,7 @@
 </script>
 {#if open}
   <div class="fixed inset-0 z-50 grid" role="dialog" aria-modal="true" aria-label={title}>
-  <div class="fixed inset-0" onclick={close}></div>
+  <button type="button" class="fixed inset-0 bg-transparent border-none cursor-default" onclick={close} aria-label="Close dialog"></button>
     <form class="relative z-10 w-full max-w-md rounded bg-neutral-900 p-6" onsubmit={submit}>
       <div class="mb-3 text-lg">{title}</div>
       {#if error}
@@ -56,7 +56,6 @@
             bind:value={email}
             class="w-full rounded border border-neutral-700 bg-neutral-800 p-2 mt-1"
             placeholder="you@example.com"
-            autofocus
           />
         </label>
         <label class="block">Password

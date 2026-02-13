@@ -194,7 +194,6 @@
   .bg-slate-950 { background-color: #0a0a0a; }
   .bg-slate-900 { background-color: #1a1a1a; }
   .bg-slate-800 { background-color: #2a2a2a; }
-  .bg-slate-700 { background-color: #3a3a3a; }
   .bg-slate-600 { background-color: #4a4a4a; }
   .text-slate-500 { color: #b0b0b0; }
   .text-slate-400 { color: #d0d0d0; }

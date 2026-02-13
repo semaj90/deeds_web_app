@@ -583,7 +583,6 @@ status: 'pending' },
 
 	.ai-prompts.before-upload { background: #fef3c7; border-color: #f59e0b;}
 	.ai-prompts.during-upload { background: #dbeafe; border-color: #3b82f6;}
-	.ai-prompts.after-upload { background: #dcfce7; border-color: #10b981;}
 
 	.ai-prompts h3 { margin: 0 0 1rem 0;
 		color: #374151;}

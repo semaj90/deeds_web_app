@@ -86,7 +86,7 @@
  <span class={getSourceIcon(source.type)}></span>
  {source.name}
  {#if source.url}
- <a href={source.url} target="_blank" rel="noopener" class="i-lucide-external-link text-blue-500 hover:text-blue-600"></a>
+ <a href={source.url} target="_blank" rel="noopener" class="i-lucide-external-link text-blue-500 hover:text-blue-600" aria-label="Open {source.name} in new tab"></a>
  {/if}
  </span>
  {/each}

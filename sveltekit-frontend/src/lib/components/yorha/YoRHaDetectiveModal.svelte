@@ -53,6 +53,7 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title"
+    tabindex="-1"
   >
     <!-- Modal Panel -->
     <div class="modal-panel bg-yorha-dark border border-yorha-accent-warm/30 rounded-lg shadow-xl w-full max-w-2xl mx-4 transform transition-all p-6 relative">

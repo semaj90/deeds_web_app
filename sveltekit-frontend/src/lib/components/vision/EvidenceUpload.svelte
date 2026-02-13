@@ -95,8 +95,9 @@
 
  <div class="flex flex-col gap-3">
  <div>
- <label class="font-semibold">Images</label>
+ <label for="evidence-images" class="font-semibold">Images</label>
  <input
+ id="evidence-images"
  type="file"
  accept="image/*"
  multiple
@@ -107,8 +108,9 @@
  </div>
 
  <div>
- <label class="font-semibold">Videos</label>
+ <label for="evidence-videos" class="font-semibold">Videos</label>
  <input
+ id="evidence-videos"
  type="file"
  accept="video/*"
  multiple
