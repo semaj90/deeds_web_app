@@ -1,21 +1,78 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
-  // Migrated to $effect
-  import type { ActionData, PageData } from './$types';
-	let { data, form } = $props<{ data: PageData;
-	form: ActionData }>();
+	import { applyAction, enhance } from '$app/forms';
+	import type { ActionData, PageData } from './$types';
+
+	let { data, form } = $props<{ data: PageData; form: ActionData }>();
 
 	let isDragging = $state(false);
 	let isUploading = $state(false);
 	let uploadError = $state<string | null>(null);
 	let selectedFile = $state<File | null>(null);
+	let searchQuery = $state('');
+	let typeFilter = $state('all');
+	let viewMode = $state<'grid' | 'list'>('grid');
+
+	const typeIcons: Record<string, string> = {
+		'application/pdf': '📄',
+		'image/jpeg': '🖼️',
+		'image/png': '🖼️',
+		'image/gif': '🖼️',
+		'application/msword': '📝',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '📝',
+		'text/plain': '📃',
+		default: '📎'
+	};
+
+	const typeLabels: Record<string, string> = {
+		'application/pdf': 'PDF',
+		'image/jpeg': 'Image',
+		'image/png': 'Image',
+		'image/gif': 'Image',
+		'application/msword': 'Document',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Document',
+		'text/plain': 'Text',
+		default: 'File'
+	};
+
+	let filteredEvidence = $derived(
+		(data.evidence ?? []).filter((doc: any) => {
+			const matchesSearch = !searchQuery ||
+				doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				doc.fileName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				doc.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+			const matchesType = typeFilter === 'all' ||
+				(typeFilter === 'pdf' && doc.fileType?.includes('pdf')) ||
+				(typeFilter === 'image' && doc.fileType?.startsWith('image/')) ||
+				(typeFilter === 'document' && (doc.fileType?.includes('word') || doc.fileType?.includes('text')));
+
+			return matchesSearch && matchesType;
+		})
+	);
 
 	function formatFileSize(bytes: number): string {
-		if (bytes === 0) return '0 B';
+		if (!bytes || bytes === 0) return '0 B';
 		const k = 1024;
 		const sizes = ['B', 'KB', 'MB', 'GB'];
 		const i = Math.floor(Math.log(bytes) / Math.log(k));
 		return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+	}
+
+	function formatDate(date: string | Date): string {
+		if (!date) return '';
+		return new Date(date).toLocaleDateString('en-US', {
+			month: 'short',
+			day: 'numeric',
+			year: 'numeric'
+		});
+	}
+
+	function getIcon(fileType: string): string {
+		return typeIcons[fileType] ?? typeIcons.default;
+	}
+
+	function getTypeLabel(fileType: string): string {
+		return typeLabels[fileType] ?? typeLabels.default;
 	}
 
 	function handleFileSelect(event: Event) {
@@ -42,373 +99,192 @@
 		if (event.dataTransfer?.files?.[0]) {
 			selectedFile = event.dataTransfer.files[0];
 			uploadError = null;
-
-			// Manually set the file input if needed for form submission
-			// But for drag and drop with form actions, we typically need to bind or simulate input
-			// Here we just set state, the user still needs to click "Start Upload" which submits the form
-			// If we want auto-submit, we'd need to manually trigger submit
 		}
 	}
-
-	// Real-time updates via SSE
-	$effect(() => {
-
-		if (typeof EventSource !== 'undefined') {
-			const sse = new EventSource('/api/evidence/realtime');
-			sse.onmessage = (event) => {
-				try {
-					const data = JSON.parse(event.data);
-					if (data.type === 'progress') {
-						console.log('Processing progress:', data.progress);
-					} else if (data.type === 'complete') {
-						console.log('Processing complete:', data.docId);
-						isUploading = false;
-						// Trigger a refresh/invalidation if needed
-					}
-				} catch (e) {
-					console.error('SSE Error:', e);
-				}
-			};
-			return () => sse.close();
-		}
-	
-});
 </script>
 
-<div class="evidence-container">
-	<!-- Header -->
-	<div class="header">
-		<h1>📄 Evidence Upload</h1>
-		<p>Upload legal documents for GPU-accelerated processing</p>
-	</div>
+<div class="min-h-screen bg-gray-50">
+	<div class="max-w-7xl mx-auto px-4 py-8">
+		<!-- Header -->
+		<div class="flex items-center justify-between mb-8">
+			<div>
+				<h1 class="text-3xl font-bold text-gray-900">Evidence Gallery</h1>
+				<p class="text-gray-500 mt-1">{data.evidence?.length ?? 0} items{data.caseId ? ` for case` : ''}</p>
+			</div>
+			<a href="/evidence/upload" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+				+ Upload Evidence
+			</a>
+		</div>
 
-	<!-- Upload Area -->
-	<div class="upload-section">
-		<form
-			method="POST"
-			action="?/upload"
-			use:enhance={() => {
-				isUploading = true;
-				return async ({ result }) => {
-					isUploading = false;
-					if (result.type === 'failure') {
-						uploadError = result.data?.error as string;
-					} else if (result.type === 'success') {
-						selectedFile = null;
-						// Optionally invalidateAll() here to refresh the list
-					}
-					await applyAction(result);
-				};
-			}}
-			enctype="multipart/form-data"
-		>
-			<div
-				class="drop-zone"
-				class:dragging={isDragging}
-				class:disabled={isUploading}
-				ondragover={handleDragOver}
-				ondragleave={handleDragLeave}
-				ondrop={handleDrop}
-				role="button"
-				tabindex="0"
+		<!-- Upload Drop Zone -->
+		<div class="mb-8">
+			<form
+				method="POST"
+				action="?/upload"
+				use:enhance={() => {
+					isUploading = true;
+					return async ({ result }) => {
+						isUploading = false;
+						if (result.type === 'failure') {
+							uploadError = result.data?.error as string;
+						} else if (result.type === 'success') {
+							selectedFile = null;
+						}
+						await applyAction(result);
+					};
+				}}
+				enctype="multipart/form-data"
 			>
-				{#if isUploading}
-					<div class="processing-state">
-						<div class="spinner"></div>
-						<p>Uploading and Processing...</p>
-					</div>
-				{:else}
-					<div class="upload-prompt">
-						<span class="icon">📁</span>
-						<p>Drop files here or click to upload</p>
-						<small>PDF: Images, Documents</small>
+				<div
+					class={`border-2 border-dashed rounded-lg p-6 text-center transition cursor-pointer ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white hover:border-gray-400'}`}
+					ondragover={handleDragOver}
+					ondragleave={handleDragLeave}
+					ondrop={handleDrop}
+					role="button"
+					tabindex="0"
+				>
+					{#if isUploading}
+						<div class="flex items-center justify-center gap-3">
+							<div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+							<span class="text-gray-600">Uploading & processing...</span>
+						</div>
+					{:else if selectedFile}
+						<div class="flex items-center justify-center gap-3">
+							<span class="text-2xl">{getIcon(selectedFile.type)}</span>
+							<div class="text-left">
+								<p class="font-medium text-gray-900">{selectedFile.name}</p>
+								<p class="text-sm text-gray-500">{formatFileSize(selectedFile.size)}</p>
+							</div>
+							<button type="submit" class="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+								Upload
+							</button>
+							<button type="button" onclick={() => (selectedFile = null)} class="px-3 py-2 text-gray-500 hover:text-gray-700 text-sm">
+								Cancel
+							</button>
+						</div>
+					{:else}
+						<p class="text-gray-500">Drop files here or <label class="text-blue-600 hover:underline cursor-pointer">browse<input type="file" name="file" accept=".pdf,image/*,.doc,.docx" onchange={handleFileSelect} class="hidden" /></label></p>
+						<p class="text-xs text-gray-400 mt-1">PDF, images, documents (max 100MB)</p>
+					{/if}
+				</div>
 
-						<input
-							type="file"
-							name="file"
-							accept=".pdf,image/*,.doc,.docx"
-							onchange={handleFileSelect}
-							id="file-input"
-							class="hidden-input"
-							style="display: none;"
-						/>
-						<button type="button" onclick={() => document.getElementById('file-input')?.click()}>
-							Choose File
-						</button>
+				{#if form?.error ?? uploadError}
+					<div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+						<p class="text-red-700 text-sm">{form?.error ?? uploadError}</p>
 					</div>
 				{/if}
-			</div>
+			</form>
+		</div>
 
-			<!-- Selected File Info & Submit -->
-			{#if selectedFile && !isUploading}
-				<div class="file-info">
-					<div class="file-details">
-						<span class="filename">{selectedFile.name}</span>
-						<span class="filesize">{formatFileSize(selectedFile.size)}</span>
-					</div>
-					<button type="submit" class="upload-btn">
-						Start Upload
+		<!-- Filters -->
+		<div class="flex flex-wrap items-center gap-4 mb-6">
+			<input
+				type="text"
+				bind:value={searchQuery}
+				placeholder="Search evidence..."
+				class="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+			/>
+			<div class="flex gap-2">
+				{#each [{ value: 'all', label: 'All' }, { value: 'pdf', label: 'PDF' }, { value: 'image', label: 'Images' }, { value: 'document', label: 'Docs' }] as ft (ft.value)}
+					<button
+						onclick={() => (typeFilter = ft.value)}
+						class={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${typeFilter === ft.value ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+					>
+						{ft.label}
 					</button>
-				</div>
-			{/if}
-
-			<!-- Server Error Message -->
-			{#if form?.error ?? uploadError}
-				<div class="error-message">
-					<span class="icon">⚠️</span>
-					<p>{form?.error ?? uploadError}</p>
-				</div>
-			{/if}
-		</form>
-	</div>
-
-	<!-- Info Panel -->
-	<div class="info-panel">
-		<h3>🚀 GPU Processing Pipeline</h3>
-		<ul>
-			<li>
-				<strong>DocLing GPU:</strong> Extracts text, layout, tables, and OCR from documents
-			</li>
-			<li>
-				<strong>EmbeddingGemma:</strong> Generates 768-dim embeddings with fp16 compression
-			</li>
-			<li>
-				<strong>Qdrant GPU:</strong> Indexes embeddings for fast cosine similarity search
-			</li>
-			<li>
-				<strong>Postgres pgvector:</strong> Stores metadata, citations, and case relationships
-			</li>
-			<li>
-				<strong>MiniLM Reranker:</strong> Reranks top-K results to top-5 for precision
-			</li>
-		</ul>
-	</div>
-
-	<!-- Evidence List (Server Data) -->
-	<div class="evidence-list">
-		<h3>Recent Uploads</h3>
-		{#if data.evidence && data.evidence.length > 0}
-			<ul>
-				{#each data.evidence as doc}
-					<li>{doc.title} ({doc.status}) - {new Date(doc.createdAt).toLocaleDateString()}</li>
 				{/each}
-			</ul>
+			</div>
+			<div class="flex gap-1 border border-gray-200 rounded-lg overflow-hidden">
+				<button
+					onclick={() => (viewMode = 'grid')}
+					class={`px-2 py-1.5 text-xs ${viewMode === 'grid' ? 'bg-gray-200' : 'bg-white hover:bg-gray-50'}`}
+					title="Grid view"
+				>Grid</button>
+				<button
+					onclick={() => (viewMode = 'list')}
+					class={`px-2 py-1.5 text-xs ${viewMode === 'list' ? 'bg-gray-200' : 'bg-white hover:bg-gray-50'}`}
+					title="List view"
+				>List</button>
+			</div>
+		</div>
+
+		<!-- Evidence Gallery -->
+		{#if filteredEvidence.length === 0}
+			<div class="text-center py-16 bg-white rounded-lg shadow">
+				<p class="text-4xl mb-4">📂</p>
+				<p class="text-gray-600 text-lg">
+					{searchQuery || typeFilter !== 'all' ? 'No evidence matches your filters.' : 'No evidence uploaded yet.'}
+				</p>
+				{#if searchQuery || typeFilter !== 'all'}
+					<button onclick={() => { searchQuery = ''; typeFilter = 'all'; }} class="mt-3 text-blue-600 hover:underline text-sm">
+						Clear filters
+					</button>
+				{/if}
+			</div>
+		{:else if viewMode === 'grid'}
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+				{#each filteredEvidence as doc (doc.id)}
+					<div class="bg-white rounded-lg shadow hover:shadow-md transition p-5 border border-gray-100">
+						<div class="flex items-start gap-3 mb-3">
+							<span class="text-3xl">{getIcon(doc.fileType)}</span>
+							<div class="flex-1 min-w-0">
+								<h3 class="font-medium text-gray-900 truncate">{doc.title || doc.fileName}</h3>
+								<p class="text-xs text-gray-400 mt-0.5">{getTypeLabel(doc.fileType)} &middot; {formatFileSize(doc.fileSize)}</p>
+							</div>
+						</div>
+						{#if doc.description}
+							<p class="text-sm text-gray-600 line-clamp-2 mb-3">{doc.description}</p>
+						{/if}
+						<div class="flex items-center justify-between text-xs text-gray-400">
+							<span>{formatDate(doc.createdAt)}</span>
+							<form method="POST" action="?/delete" use:enhance>
+								<input type="hidden" name="evidenceId" value={doc.id} />
+								<button type="submit" class="text-red-400 hover:text-red-600 transition" title="Delete">Remove</button>
+							</form>
+						</div>
+					</div>
+				{/each}
+			</div>
 		{:else}
-			<p>No evidence found.</p>
+			<div class="bg-white rounded-lg shadow overflow-hidden">
+				<table class="w-full">
+					<thead>
+						<tr class="border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+							<th class="px-4 py-3">File</th>
+							<th class="px-4 py-3">Type</th>
+							<th class="px-4 py-3">Size</th>
+							<th class="px-4 py-3">Uploaded</th>
+							<th class="px-4 py-3 text-right">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each filteredEvidence as doc (doc.id)}
+							<tr class="border-b border-gray-100 hover:bg-gray-50">
+								<td class="px-4 py-3">
+									<div class="flex items-center gap-2">
+										<span class="text-lg">{getIcon(doc.fileType)}</span>
+										<div>
+											<p class="font-medium text-gray-900 text-sm">{doc.title || doc.fileName}</p>
+											{#if doc.description}
+												<p class="text-xs text-gray-500 truncate max-w-[300px]">{doc.description}</p>
+											{/if}
+										</div>
+									</div>
+								</td>
+								<td class="px-4 py-3 text-sm text-gray-600">{getTypeLabel(doc.fileType)}</td>
+								<td class="px-4 py-3 text-sm text-gray-600">{formatFileSize(doc.fileSize)}</td>
+								<td class="px-4 py-3 text-sm text-gray-500">{formatDate(doc.createdAt)}</td>
+								<td class="px-4 py-3 text-right">
+									<form method="POST" action="?/delete" use:enhance class="inline">
+										<input type="hidden" name="evidenceId" value={doc.id} />
+										<button type="submit" class="text-red-400 hover:text-red-600 text-sm transition">Remove</button>
+									</form>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
 		{/if}
 	</div>
 </div>
-
-<style>
-	/* Preserving original styles */
-	.evidence-container {
-		max-width: 900px;
-	margin: 0 auto;
-		padding: 2rem;
-		font-family: 'Inter', sans-serif;
-	}
-
-	.header {
-		text-align: center;
-		margin-bottom: 3rem;
-	}
-
-	.header h1 {
-		font-size: 2rem;
-	color: #2d2d2d;
-		margin: 0 0 0.5rem 0;
-	}
-
-	.header p {
-		color: #666;
-	margin: 0;
-	}
-
-	.upload-section {
-		margin-bottom: 2rem;
-	}
-
-	.drop-zone {
-		border: 2px dashed #ccc;
-		border-radius: 8px;
-	padding: 3rem;
-		text-align: center;
-	background: #f9f9f9;
-		transition: all 0.3s ease;
-		cursor: pointer;
-	}
-
-	.drop-zone.dragging {
-		border-color: #8b3a3a;
-	background: #f5f0f0;
-	}
-
-	.drop-zone.disabled {
-		opacity: 0.6;
-	cursor: not-allowed;
-	}
-
-	.upload-prompt {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	gap: 1rem;
-	}
-
-	.upload-prompt .icon {
-		font-size: 3rem;
-	}
-
-	.upload-prompt p {
-		margin: 0;
-		font-size: 1.1rem;
-	color: #2d2d2d;
-	}
-
-	.upload-prompt small {
-		color: #999;
-	}
-
-	.upload-prompt button {
-		padding: 0.75rem 1.5rem;
-		background: #8b3a3a;
-	color: white;
-		border: none;
-		border-radius: 4px;
-	cursor: pointer;
-		font-weight: 500;
-	transition: background 0.3s ease;
-	}
-
-	.upload-prompt button:hover {
-		background: #6b2a2a;
-	}
-
-	.processing-state {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	gap: 1rem;
-	}
-
-	.spinner {
-		width: 40px;
-	height: 40px;
-		border: 4px solid #f3f3f3;
-		border-top: 4px solid #8b3a3a;
-		border-radius: 50%;
-	animation: spin 1s linear infinite;
-	}
-
-	@keyframes spin {
-		0% {
-			transform: rotate(0deg);
-		}
-		100% {
-			transform: rotate(360deg);
-		}
-	}
-
-	.file-info {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	padding: 1rem;
-		background: #f5f5f5;
-		border-radius: 4px;
-		margin-top: 1rem;
-	}
-
-	.file-details {
-		display: flex;
-		flex-direction: column;
-	gap: 0.25rem;
-	}
-
-	.filename {
-		font-weight: 500;
-	color: #2d2d2d;
-	}
-
-	.filesize {
-		font-size: 0.9rem;
-	color: #999;
-	}
-
-	.upload-btn {
-		padding: 0.75rem 1.5rem;
-		background: #8b3a3a;
-	color: white;
-		border: none;
-		border-radius: 4px;
-	cursor: pointer;
-		font-weight: 500;
-	transition: background 0.3s ease;
-	}
-
-	.upload-btn:hover {
-		background: #6b2a2a;
-	}
-
-	.error-message {
-		display: flex;
-		align-items: center;
-	gap: 0.75rem;
-		padding: 1rem;
-	background: #fee;
-		border: 1px solid #fcc;
-		border-radius: 4px;
-		margin-top: 1rem;
-	color: #c33;
-	}
-
-	.error-message .icon {
-		font-size: 1.5rem;
-	}
-
-	.info-panel {
-		background: #f5f4f0;
-	padding: 1.5rem;
-		border-radius: 8px;
-		border-left: 4px solid #8b3a3a;
-		margin-bottom: 2rem;
-	}
-
-	.info-panel h3 {
-		margin: 0 0 1rem 0;
-		color: #2d2d2d;
-	}
-
-	.info-panel ul {
-		list-style: none;
-	padding: 0;
-		margin: 0;
-	}
-
-	.info-panel li {
-		padding: 0.5rem 0;
-		color: #666;
-		line-height: 1.6;
-	}
-
-	.info-panel strong {
-		color: #2d2d2d;
-	}
-
-	.evidence-list {
-		margin-top: 2rem;
-	}
-
-	.evidence-list ul {
-		list-style: none;
-	padding: 0;
-	}
-
-	.evidence-list li {
-		padding: 0.75rem;
-		border-bottom: 1px solid #eee;
-	}
-</style>
-
-
-

@@ -4,6 +4,7 @@
 	import CaseNotesEditor from '$lib/components/cases/CaseNotesEditor.svelte';
 	import ContextualChatModal from '$lib/components/cases/ContextualChatModal.svelte';
 	import CitationSaveModal from '$lib/components/legal-ai/CitationSaveModal.svelte';
+	import StreamingAnalysisPanel from '$lib/components/cases/StreamingAnalysisPanel.svelte';
 	import { onMount } from "svelte";
 import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
 import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
@@ -548,8 +549,11 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
 
  </div>
 
- <!-- Right, Preview & Summary -->
+ <!-- Right Column: Preview, Analysis & Stats -->
  <div class="space-y-6">
+ <!-- AI Analysis Panel -->
+ <StreamingAnalysisPanel {caseId} />
+
  {#if selectedEvidence}
  {#if !suggestedSummary}
  <EvidenceUploadPreview
