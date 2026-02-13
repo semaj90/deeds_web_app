@@ -199,7 +199,7 @@ export interface ScanRepoResult {
     column?: number;
 	content: string;
     pattern_name?: string;
-    context?, string[];
+    context?: string[];
   }>;
   total_matches: number;
 	files_scanned: number;

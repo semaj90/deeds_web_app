@@ -20,7 +20,7 @@ async function fetchVectors(collection: string, limit: number): Promise<Array<{
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	limit: with_vector, true,
+	limit, with_vector: true,
       with_payload: false
     })
   });
@@ -30,7 +30,7 @@ async function fetchVectors(collection: string, limit: number): Promise<Array<{
   }
 
   const data = await response.json() as { result: {
-	points: Array<{ id: string; vector, number[] }> } };
+	points: Array<{ id: string; vector: number[] }> } };
   return data.result.points;
 }
 
@@ -40,7 +40,8 @@ async function generateClusterSummary(clusterPoints: string[], model: string): P
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: prompt: `Summarize this cluster of ${clusterPoints.length} error points. Generate a concise 1-2 sentence summary.`,
+	model,
+        prompt: `Summarize this cluster of ${clusterPoints.length} error points. Generate a concise 1-2 sentence summary.`,
         stream: false,
         options: {
 	temperature: 0.3 }
@@ -60,7 +61,7 @@ async function generateClusterSummary(clusterPoints: string[], model: string): P
 
 async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult<ClusterTagResult>> {
   // Fetch vectors from Qdrant
-  const points = await fetchVectors(request.collection: request.options?.batch_size ?? 10000);
+  const points = await fetchVectors(request.collection, request.options?.batch_size ?? 10000);
 
   if (points.length === 0) {
     return {
@@ -82,7 +83,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
 	id: number;
     size: number;
 	centroid_id: string;
-    summary?: string; tags, string[];
+    summary?: string; tags?: string[];
   }> = [];
 
   const clusterSize = Math.max(5, Math.floor(points.length / 10));
@@ -92,7 +93,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     const clusterPoints = points.slice(i, i + clusterSize);
     const centroid = clusterPoints[0];
 
-    let summary, string | undefined;
+    let summary: string | undefined;
     if (request.tag_config?.generate_summaries) {
       summary = await generateClusterSummary(
         clusterPoints.map(p => String(p.id)),
@@ -114,7 +115,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     run_id: request.run_id,
     tool: 'cluster_tag',
     data: {
-	clusters: total_clusters, clusters.length,
+	total_clusters: clusters.length,
       noise_points: points.length % clusterSize
     },
 	duration_ms: 0,

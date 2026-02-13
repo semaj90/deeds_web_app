@@ -78,8 +78,10 @@ async function runRipgrep(
         const json = JSON.parse(line);
         if (json.type === 'match') {
           matches.push({
-            file: json.data.path.text, line: json.data.line_number,
-            content: json.data.lines.text.trim(column: json.data.submatches?.[0]?.start
+            file: json.data.path.text,
+            line: json.data.line_number,
+            content: json.data.lines.text.trim(),
+            column: json.data.submatches?.[0]?.start
           });
         }
       } catch {
@@ -110,7 +112,7 @@ async function scanRepoHandler(request: ScanRepoRequest): Promise<ToolResult<Sca
   };
 
   for (const patternDef of request.patterns) {
-patternDef.pattern: request.paths,
+    const matches = await searchWithPattern(patternDef.pattern, request.paths,
       {
         ...options,
         isRegex: patternDef.type === 'regex'

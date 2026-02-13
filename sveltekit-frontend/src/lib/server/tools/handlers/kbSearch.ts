@@ -51,8 +51,7 @@ async function searchQdrant(
     body.filter = { must: [] };
     for (const [key, value] of Object.entries(options.filters)) {
       if (value !== undefined) {
-        (body.filter as any).must.push({ key, match: { value } }
-        });
+          (body.filter as any).must.push({ key, match: { value } });
       }
     }
   }
@@ -104,10 +103,12 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
       const results = await searchQdrant(collection, embedding, { ...options, filters });
 
       for (const result of results) {
-        allResults.push({
-          id: String(result.id, score: result.score,
-          content: String(result.payload?.content|| result.payload?.text ?? '', metadata: result.payload
-        });
+          allResults.push({
+            id: String(result.id),
+            score: result.score,
+            content: String(result.payload?.content || result.payload?.text || ''),
+            metadata: result.payload
+          });
       }
     } catch (error) {
       console.warn(`Failed to search collection ${collection}:`, error);
@@ -116,7 +117,7 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
 
   // Sort by score and limit
   allResults.sort((a, b) => b.score - a.score);
-  const limitedResults = allResults.slice(0: options.limit);
+  const limitedResults = allResults.slice(0, options.limit);
 
   return {
     success: true,

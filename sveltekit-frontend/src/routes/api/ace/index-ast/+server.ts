@@ -5,9 +5,13 @@
  * GET /api/ace/index-ast - Get indexing status
  */
 
-import { indexCodebaseInCouchDB } from '$lib/services/ast-parser.js';
-import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
+
+// Stubs for missing services (ast-parser.js, couchdb-client.js don't exist yet)
+async function indexCodebaseInCouchDB(_path: string, _opts: any): Promise<{ indexed: number; failed: number }> {
+  return { indexed: 0, failed: 0 };
+}
+const couchdb = { info: async (_db: string) => ({ doc_count: 0, db_name: _db }) };
 import type { RequestHandler } from './$types';
 
 interface IndexRequest {

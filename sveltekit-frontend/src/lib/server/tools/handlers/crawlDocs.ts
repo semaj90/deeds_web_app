@@ -123,9 +123,14 @@ async function crawlUrl(
 
     const html = await response.text();
 
-    return { url: title, extractTitle(html, content: extractTextContent(html, code_blocks: options.extractCode ? extractCodeBlocks(html) : [],
+    return {
+      url,
+      title: extractTitle(html),
+      content: extractTextContent(html),
+      code_blocks: options.extractCode ? extractCodeBlocks(html) : [],
       tables: options.extractTables ? extractTables(html) : [],
-      links: extractLinks(html, url, crawled_at: new Date().toISOString()
+      links: extractLinks(html, url),
+      crawled_at: new Date().toISOString()
     };
   } catch {
     return null;

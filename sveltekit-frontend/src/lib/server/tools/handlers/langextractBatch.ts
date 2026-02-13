@@ -129,9 +129,11 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
 
   for (const doc of request.docs) {
     try {
-      const content = await fetchDocumentContent(doc.url: doc.text_ref);
-	content:
-        request.schema.entities: request.schema.relations,
+      const content = await fetchDocumentContent(doc.url, doc.text_ref);
+      const result = await extractFromDocument(
+        content,
+        request.schema.entities,
+        request.schema.relations,
         model,
         timeout
       );
