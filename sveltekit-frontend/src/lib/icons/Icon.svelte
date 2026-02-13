@@ -3,18 +3,22 @@
 	 * Base Icon Component - Svelte 5 Runes Mode
 	 * Zero dependencies, pure SVG wrapper
 	 */
+	import type { Snippet } from 'svelte';
+
 	interface Props {
 		size?: number | string;
 		strokeWidth?: number;
 		color?: string;
 		class?: string;
+		children?: Snippet;
 	}
 
 	let {
 		size = 24,
 		strokeWidth = 2,
 		color = 'currentColor',
-		class: className = ''
+		class: className = '',
+		children
 	}: Props = $props();
 
 	const sizeValue = $derived(typeof size === 'number' ? `${size}px` : size);
@@ -34,5 +38,5 @@
 	role="img"
 	aria-hidden="true"
 >
-	<slot />
+	{#if children}{@render children()}{/if}
 </svg>

@@ -8,8 +8,8 @@ import Label from "$lib/components/ui/Label.svelte";
   let loading = $state<boolean>(false);
    let error = $state<string>('');
    let success = $state<string>('');
-   let emailInput: any = null;
-   let passwordInput: any = null;
+   let emailInput: any = $state(null);
+   let passwordInput: any = $state(null);
    let isValid = $derived.by(() => { const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
    const hasValidEmail = emailRegex.test(formData.email);
    const hasPassword = formData.password.length >= 6; if (mode === 'register') {

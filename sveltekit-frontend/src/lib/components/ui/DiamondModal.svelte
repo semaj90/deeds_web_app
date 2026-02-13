@@ -27,8 +27,8 @@
 		children,
 		footer
 	, onclose }: Props = $props();
-let modalElement: HTMLDivElement | null = null;
-	let canvasElement: HTMLCanvasElement | null = null;
+let modalElement: HTMLDivElement | null = $state(null);
+	let canvasElement: HTMLCanvasElement | null = $state(null);
 	let animationFrame: number;
 
 	const sizeClasses: Record<string, string> = {

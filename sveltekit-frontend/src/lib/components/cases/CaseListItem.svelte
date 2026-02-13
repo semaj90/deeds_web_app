@@ -109,7 +109,7 @@
   <div class="space-y-3">
     <!-- Case Title and Number -->
     <div class="flex items-center gap-2">
-      <svelte:component this={StatusIcon} class="w-5 h-5 text-gray-500" />
+      <StatusIcon class="w-5 h-5 text-gray-500" />
       <h3 class="font-semibold text-lg truncate">
         {caseData.title}
       </h3>

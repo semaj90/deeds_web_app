@@ -10,7 +10,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     let initialState = $derived(data.initialState);
 
     // State
-    let board: HybridBoard; // Component instance
+    let board: HybridBoard = $state() as HybridBoard; // Component instance
     let isDirty = $state(false);
     let isSaving = $state(false);
 

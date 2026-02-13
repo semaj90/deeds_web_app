@@ -55,7 +55,7 @@
 		}
 	}
 
-	let evidenceIcon = $derived(getEvidenceIcon(evidence.evidenceType || evidence.type));
+	let EvidenceIcon = $derived(getEvidenceIcon(evidence.evidenceType || evidence.type));
 	let formattedDate = $derived(
 		formatDistanceToNow(
 			new Date(evidence.createdAt || evidence.dateCollected || Date.now()),
@@ -87,7 +87,7 @@
 >
 	<div class="flex items-start">
 		<div class="flex-shrink-0">
-			<svelte:component this={evidenceIcon} class="h-6 w-6" />
+			<EvidenceIcon class="h-6 w-6" />
 		</div>
 
 		<div class="flex-1">

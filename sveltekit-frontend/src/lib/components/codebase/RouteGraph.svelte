@@ -41,10 +41,10 @@
 	}: Props = $props();
 
 	// State
-	let container: HTMLDivElement;
-	let svg: SVGSVGElement;
-	let simulation: any = null;
-	let d3Module: any = null;
+	let container: HTMLDivElement = $state() as HTMLDivElement;
+	let svg: SVGSVGElement = $state() as SVGSVGElement;
+	let simulation: any = $state(null);
+	let d3Module: any = $state(null);
 	let isLoading = $state(true);
 	let transform = $state({ x: 0, y: 0, k: 1 });
 

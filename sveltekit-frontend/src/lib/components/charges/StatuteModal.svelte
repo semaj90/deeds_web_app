@@ -16,8 +16,8 @@
 		onAttach?: (charge: any) => void;
 	}>();
 
-	let isAttaching = false;
-	let attachError = '';
+	let isAttaching = $state(false);
+	let attachError = $state('');
 
 	async function handleAttach() {
 		if (!statute || !caseId) return;

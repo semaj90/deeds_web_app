@@ -17,16 +17,16 @@
  onedit?: (data: any) => void;
  onview?: (data: any) => void;
  }>();
-let links: CaseStatuteLink[] = [];
- let isLoading = true;
- let error: string | null = null;
- let stats = {
+let links: CaseStatuteLink[] = $state([]);
+ let isLoading = $state(true);
+ let error: string | null = $state(null);
+ let stats = $state({
  total: 0,
- byLinkType: {},
-	};
+ byLinkType: {} as Record<string, number>,
+	});
 
  // Filters
- let selectedLinkType = '';
+ let selectedLinkType = $state('');
 
  $effect(() => {
 
