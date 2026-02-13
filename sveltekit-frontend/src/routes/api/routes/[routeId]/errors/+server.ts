@@ -15,7 +15,7 @@ import {
 } from '$lib/db/queries/nes-command-center.js';
 import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
 import { error, json } from '@sveltejs/kit';
-import { broadcastErrorCountChange, broadcastHealthChange } from '../../events/+server.js';
+import { _broadcastErrorCountChange, _broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
 
 /**
@@ -88,7 +88,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
         reason: 'error_cluster_created',
       });
 
-      broadcastHealthChange({
+      _broadcastHealthChange({
         routeId, oldStatus,
         newStatus,
         timestamp: new Date().toISOString(),
@@ -102,7 +102,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const infoCount = unresolvedErrors.filter((e: any) => e.severity === 'info').length;
 
     // Broadcast error count change via SSE
-    broadcastErrorCountChange({
+    _broadcastErrorCountChange({
       routeId, errorCount,
       warningCount, infoCount,
       timestamp: new Date().toISOString(),

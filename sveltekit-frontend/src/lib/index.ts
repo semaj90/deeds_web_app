@@ -57,8 +57,10 @@ export type {
 export type { AuthService } from './server/auth.js';
 
 // ===== SERVER DATABASE EXPORTS =====
-export { aceChunks, aceDocs, aceSources } from './db/schema/ace-web.js';
-export { adminDb as db } from './server/db/client.js';
+// Commented: server-only DB exports must not be in barrel file (leaks into browser bundles)
+// Import directly from '$lib/server/db/client' or '$lib/db/schema/ace-web' in server code
+// export { aceChunks, aceDocs, aceSources } from './db/schema/ace-web.js';
+// export { adminDb as db } from './server/db/client.js';
 
 // ===== VERSION INFO =====
 export const VERSION = '2.0.0';

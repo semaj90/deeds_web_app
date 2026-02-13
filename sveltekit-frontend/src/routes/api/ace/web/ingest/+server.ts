@@ -4,7 +4,8 @@
  * Enqueues URLs for web crawling and ingestion into ACE knowledge base
  */
 
-import { aceSources, db } from '$lib';
+import { aceSources } from '$lib/db/schema/ace-web.js';
+import { adminDb as db } from '$lib/server/db/client.js';
 import { json } from '@sveltejs/kit';
 import * as amqp from 'amqplib';
 import * as crypto from 'crypto';

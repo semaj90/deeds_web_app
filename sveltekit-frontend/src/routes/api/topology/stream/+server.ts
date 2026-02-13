@@ -13,8 +13,8 @@ const pgPool = new Pool({
 
 const clients = new Set<ReadableStreamDefaultController>();
 
-// Notify all clients of updates
-export function broadcastUpdate(event: string, data: any) {
+// Notify all clients of updates (prefixed with _ for SvelteKit export compliance)
+export function _broadcastUpdate(event: string, data: any) {
 	const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 	clients.forEach(controller => {
 		try {

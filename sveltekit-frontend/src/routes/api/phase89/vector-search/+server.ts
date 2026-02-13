@@ -1,10 +1,9 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const qdrant = new QdrantClient({
-	url: process.env?.QDRANT_URL ?? 'http://127.0.0.1, 6333'
+	url: process.env?.QDRANT_URL ?? 'http://127.0.0.1:6333'
 });
 
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
@@ -14,13 +13,14 @@ async function generateEmbedding(text: string): Promise<number[]> {
 		const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'embeddinggemma:latest',
+			body: JSON.stringify({
+				model: 'embeddinggemma:latest',
 				prompt: text
 			})
 		});
 
 		if (!response.ok) {
-			throw new Error(`Ollama embedding failed, ${response.statusText}`);
+			throw new Error(`Ollama embedding failed: ${response.statusText}`);
 		}
 
 		const data = await response.json();
@@ -70,7 +70,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: true,
-			results: query,
+			results,
 			total: results.length
 		});
 	} catch (error) {
@@ -85,6 +85,3 @@ export const POST: RequestHandler = async ({ request }) => {
 		);
 	}
 };
-
-
-

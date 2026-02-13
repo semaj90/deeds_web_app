@@ -11,6 +11,7 @@
  * - Centralized schema management
  */
 
+import { building } from '$app/environment';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -446,8 +447,8 @@ class DatabaseManager {
 
 const dbManager = DatabaseManager.getInstance();
 
-// Initialize in background (except dev/test where we might want explicit control)
-if (!isDev && process.env.NODE_ENV !== 'test') {
+// Initialize in background (except dev/test/build where we might want explicit control)
+if (!building && !isDev && process.env.NODE_ENV !== 'test') {
     dbManager.initialize().catch(console.error);
 }
 

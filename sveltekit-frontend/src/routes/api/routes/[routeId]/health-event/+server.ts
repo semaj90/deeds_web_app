@@ -14,7 +14,7 @@ import {
     getRouteMetadata
 } from '$lib/db/queries/nes-command-center';
 import { error, json } from '@sveltejs/kit';
-import { broadcastHealthChange } from '../../events/+server.js';
+import { _broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
 
 interface NewRouteHealthEvent {
@@ -58,7 +58,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
     const healthEvent = await createHealthEvent(healthEventData);
 
-    broadcastHealthChange({
+    _broadcastHealthChange({
       routeId,
       oldStatus: healthEventData.oldStatus,
       newStatus: healthEventData.newStatus,

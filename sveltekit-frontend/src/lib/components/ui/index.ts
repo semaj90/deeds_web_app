@@ -67,7 +67,8 @@ export { default as ThemeToggle } from './ThemeToggle.svelte';
 
 // Layout
 export { default as ExpandGrid } from './ExpandGrid.svelte';
-export { default as LazyLoader } from './LazyLoader.svelte';
+// LazyLoader removed: pulls in dynamic-imports.ts → DetectiveBoard → ai-service → server DB (browser leak)
+// Import directly: import LazyLoader from '$lib/components/ui/LazyLoader.svelte'
 export { default as Portal } from './Portal.svelte';
 
 // Theme

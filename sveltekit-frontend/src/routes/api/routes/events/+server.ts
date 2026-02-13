@@ -146,7 +146,6 @@ export function _getConnectionCount(): number {
 
 
 
-// Public aliases (used by sibling routes)
-export const broadcastHealthChange = _broadcastHealthChange;
-export const broadcastErrorCountChange = _broadcastErrorCountChange;
-export const getConnectionCount = _getConnectionCount;
+// Re-exported with _ prefix for SvelteKit compliance (sibling routes import these)
+// SvelteKit only allows GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD, fallback,
+// prerender, trailingSlash, config, entries, or anything with a '_' prefix
