@@ -1,31 +1,25 @@
 import { db } from '$lib/server/db/client';
-import { chatMessages, chatSessions } from '$lib/server/db/schema-postgres';
+import { chatMessages, chatMetadata } from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Server-Sent Events endpoint for contextual chat streaming
- * Replaces WebSocket for simpler, more reliable real-time updates
- *
- * Benefits over WebSocket:
- * - Auto-reconnect built-in (EventSource API)
- * - Works over HTTP/2
- * - Simpler error handling
- * - No need for persistent connection management
+ * Case-aware: injects case context (evidence, citations) into AI prompts
  *
  * Supports two modes:
- * 1. Query mode: ?q=query&mode=ollama (simple streaming without session)
+ * 1. Query mode: ?q=query&mode=ollama&caseId=xxx (streaming, optional case context)
  * 2. Session mode: ?sessionId=xxx (full chat history + streaming)
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
 	const query = url.searchParams.get('q');
 	const mode = url.searchParams.get('mode') ?? 'ollama';
 	const sessionId = url.searchParams.get('sessionId');
+	const caseId = url.searchParams.get('caseId');
 
 	// Query mode: Simple streaming without authentication/session
 	if (query && !sessionId) {
-		return handleQueryMode(query, mode);
+		return handleQueryMode(query, mode, caseId);
 	}
 
 	// Session mode: Requires authentication
@@ -37,25 +31,96 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		return new Response('Missing query or sessionId parameter', { status: 400 });
 	}
 
-	// Verify session belongs to user
-	const session = await db
+	// Verify session belongs to user via chatMetadata
+	const sessionMeta = await db
 		.select()
-		.from(chatSessions)
-		.where(eq(chatSessions.id, sessionId))
+		.from(chatMetadata)
+		.where(eq(chatMetadata.chatId, sessionId))
 		.limit(1);
 
-	if (!session?.length || session[0].userId !== locals.user.id) {
+	if (sessionMeta.length > 0 && sessionMeta[0].userId !== locals.user.id) {
 		return new Response('Session not found or unauthorized', { status: 404 });
 	}
 
-	return handleSessionMode(sessionId);
+	// Get case association from metadata
+	const sessionCaseId = sessionMeta[0]?.caseId ?? caseId ?? null;
+
+	return handleSessionMode(sessionId, sessionCaseId);
 };
 
 /**
- * Query Mode: Simple streaming without session
- * Used for testing and simple queries
+ * Load case context from DB for injection into AI prompts
  */
-function handleQueryMode(query: string, mode: string): Response {
+async function loadCaseContext(caseId: string): Promise<string | null> {
+	try {
+		const { cases } = await import('$lib/server/db/schema');
+
+		const caseRows = await db
+			.select()
+			.from(cases)
+			.where(eq(cases.id, caseId))
+			.limit(1);
+
+		if (!caseRows.length) return null;
+
+		const c = caseRows[0];
+		let context = `## Active Case Context\n`;
+		context += `- **Title**: ${c.title}\n`;
+		if (c.caseNumber) context += `- **Case #**: ${c.caseNumber}\n`;
+		if (c.jurisdiction) context += `- **Jurisdiction**: ${c.jurisdiction}\n`;
+		if (c.court) context += `- **Court**: ${c.court}\n`;
+		if (c.status) context += `- **Status**: ${c.status}\n`;
+		if (c.description) context += `- **Description**: ${c.description}\n`;
+
+		// Load recent evidence for this case
+		try {
+			const { evidence } = await import('$lib/server/db/schema');
+			const evidenceRows = await db
+				.select()
+				.from(evidence)
+				.where(eq(evidence.caseId, caseId))
+				.limit(5);
+
+			if (evidenceRows.length > 0) {
+				context += `\n## Evidence (${evidenceRows.length} items)\n`;
+				for (const e of evidenceRows) {
+					context += `- ${e.title ?? e.type ?? 'Untitled'}: ${e.description ?? ''}\n`;
+				}
+			}
+		} catch {
+			// Evidence table may not exist yet
+		}
+
+		// Load citations linked to this case
+		try {
+			const { savedCitations } = await import('$lib/server/db/schema');
+			const citationRows = await db
+				.select()
+				.from(savedCitations)
+				.where(eq(savedCitations.caseId, caseId))
+				.limit(10);
+
+			if (citationRows.length > 0) {
+				context += `\n## Citations (${citationRows.length} items)\n`;
+				for (const cit of citationRows) {
+					context += `- ${cit.statuteCode}: ${cit.statuteTitle ?? ''}\n`;
+				}
+			}
+		} catch {
+			// Citations table may not exist yet
+		}
+
+		return context;
+	} catch (error) {
+		console.warn('Failed to load case context:', error);
+		return null;
+	}
+}
+
+/**
+ * Query Mode: Simple streaming with optional case context
+ */
+function handleQueryMode(query: string, mode: string, caseId: string | null): Response {
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
@@ -66,15 +131,29 @@ function handleQueryMode(query: string, mode: string): Response {
 			};
 
 			try {
-				// Send initial metadata
-				send({ type: 'start', query, mode, timestamp: new Date().toISOString() });
+				send({ type: 'start', query, mode, caseId, timestamp: new Date().toISOString() });
+
+				// Load case context if available
+				let caseContext = '';
+				if (caseId) {
+					const ctx = await loadCaseContext(caseId);
+					if (ctx) {
+						caseContext = ctx;
+						send({ type: 'case_context', caseId, hasContext: true });
+					}
+				}
+
+				// Build prompt with case context
+				const prompt = caseContext
+					? `${caseContext}\n\n## User Question\n${query}`
+					: query;
 
 				// Import LLM router dynamically
 				const { llmRouter } = await import('$lib/server/llm-router');
 
 				// Stream response
 				const responseStream = await llmRouter.generateStream({
-					prompt: query,
+					prompt,
 					provider: mode === 'rag' ? 'gemini' : 'ollama',
 					model: mode === 'rag' ? 'gemini-2.0-flash-exp' : 'gemma3-legal:latest'
 				});
@@ -105,35 +184,32 @@ function handleQueryMode(query: string, mode: string): Response {
 }
 
 /**
- * Session Mode: Full chat history + streaming
+ * Session Mode: Full chat history + streaming with case context
  */
-function handleSessionMode(sessionId: string): Response {
+function handleSessionMode(sessionId: string, caseId: string | null): Response {
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
 
-			// Helper to send SSE message
 			const send = (event: string, data: unknown) => {
 				const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 				controller.enqueue(encoder.encode(message));
 			};
 
-			// Send initial connection message
-			send('connected', { sessionId, timestamp: new Date().toISOString() });
+			send('connected', { sessionId, caseId, timestamp: new Date().toISOString() });
 
-			// Poll for new messages (simplified - in production, use Redis pub/sub)
+			// Poll for new messages
 			let lastMessageId: string | null = null;
 			const pollInterval = setInterval(async () => {
 				try {
 					const messages = await db
 						.select()
 						.from(chatMessages)
-						.where(eq(chatMessages.sessionId, sessionId))
+						.where(eq(chatMessages.chatId, sessionId))
 						.orderBy(desc(chatMessages.createdAt))
 						.limit(10);
 
 					if (lastMessageId) {
-						// Get messages newer than last seen
 						const newMessages = messages.filter((m) => m.id > lastMessageId!);
 
 						for (const msg of newMessages.reverse()) {
@@ -146,7 +222,6 @@ function handleSessionMode(sessionId: string): Response {
 							lastMessageId = msg.id;
 						}
 					} else {
-						// First poll - get latest message
 						if (messages.length > 0) {
 							lastMessageId = messages[0].id;
 							send('message', {
@@ -161,13 +236,7 @@ function handleSessionMode(sessionId: string): Response {
 					console.error('SSE poll error:', error);
 					send('error', { message: 'Failed to fetch messages' });
 				}
-			}, 1000); // Poll every second
-
-			// Cleanup on client disconnect
-			const cleanup = () => {
-				clearInterval(pollInterval);
-				controller.close();
-			};
+			}, 1000);
 
 			// Keep-alive ping every 30 seconds
 			const keepAlive = setInterval(() => {
@@ -182,7 +251,6 @@ function handleSessionMode(sessionId: string): Response {
 		},
 
 		cancel() {
-			// Called when client disconnects
 			console.log('SSE client disconnected');
 		}
 	});
@@ -192,38 +260,70 @@ function handleSessionMode(sessionId: string): Response {
 			'Content-Type': 'text/event-stream',
 			'Cache-Control': 'no-cache',
 			Connection: 'keep-alive',
-			'X-Accel-Buffering': 'no' // Disable nginx buffering
+			'X-Accel-Buffering': 'no'
 		}
 	});
 }
 
 /**
  * POST endpoint to send messages (trigger streaming response)
+ * Supports case association via caseId parameter
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
 		return new Response('Unauthorized', { status: 401 });
 	}
 
-	const { sessionId, message } = await request.json();
+	const { sessionId, message, caseId } = await request.json();
 
 	if (!sessionId || !message) {
 		return new Response('Missing required fields', { status: 400 });
 	}
 
 	try {
+		// Ensure chat metadata exists (upsert session with case association)
+		await db
+			.insert(chatMetadata)
+			.values({
+				chatId: sessionId,
+				userId: locals.user.id,
+				caseId: caseId ?? null,
+				title: message.slice(0, 100),
+				createdAt: new Date(),
+				updatedAt: new Date()
+			})
+			.onConflictDoUpdate({
+				target: chatMetadata.chatId,
+				set: {
+					updatedAt: new Date(),
+					lastMessageAt: new Date(),
+					...(caseId ? { caseId } : {})
+				}
+			});
+
 		// Save user message
+		const msgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 		await db.insert(chatMessages).values({
-			sessionId,
+			id: msgId,
+			chatId: sessionId,
+			userId: locals.user.id,
 			role: 'user',
-			content: message,
-			createdAt: new Date()
+			content: message
 		});
 
-		// Trigger AI response generation with RAG/KAG streaming
-		await generateAIResponse(sessionId, message, locals.user.id);
+		// Load case context for AI response
+		const sessionMeta = await db
+			.select()
+			.from(chatMetadata)
+			.where(eq(chatMetadata.chatId, sessionId))
+			.limit(1);
 
-		return new Response(JSON.stringify({ success: true }), {
+		const resolvedCaseId = sessionMeta[0]?.caseId ?? caseId ?? null;
+
+		// Trigger AI response generation
+		await generateAIResponse(sessionId, message, locals.user.id, resolvedCaseId);
+
+		return new Response(JSON.stringify({ success: true, sessionId, caseId: resolvedCaseId }), {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	} catch (error) {
@@ -234,20 +334,35 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 /**
  * AI Response Generator with RAG/KAG/DAG Integration
- * - Streams chunks via SSE
- * - Saves to database incrementally
- * - Uses RabbitMQ for async embedding generation
+ * Case-aware: injects case context into prompts for relevant responses
  */
-async function generateAIResponse(sessionId: string, userMessage: string, userId: string) {
+async function generateAIResponse(
+	sessionId: string,
+	userMessage: string,
+	userId: string,
+	caseId: string | null
+) {
 	try {
+		// Load case context
+		let caseContext = '';
+		if (caseId) {
+			const ctx = await loadCaseContext(caseId);
+			if (ctx) caseContext = ctx;
+		}
+
+		// Build case-aware prompt
+		const prompt = caseContext
+			? `${caseContext}\n\n## User Question\n${userMessage}`
+			: userMessage;
+
 		// Import streaming utilities
 		const { streamRAGResponse } = await import('$lib/server/streaming/chunked-response');
 
-		// Start streaming RAG response
 		let fullResponse = '';
 		let chunkCount = 0;
+		const assistantMsgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-		for await (const chunk of streamRAGResponse(userMessage)) {
+		for await (const chunk of streamRAGResponse(prompt)) {
 			if (chunk.type === 'content' && chunk.content) {
 				fullResponse += chunk.content;
 				chunkCount++;
@@ -257,60 +372,103 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 					await db
 						.insert(chatMessages)
 						.values({
-							sessionId,
+							id: assistantMsgId,
+							chatId: sessionId,
+							userId,
 							role: 'assistant',
 							content: fullResponse,
-							createdAt: new Date(),
-							metadata: { streaming: true,
+							metadata: JSON.stringify({
+								streaming: true,
 								chunks: chunkCount,
+								caseId,
 								confidence: chunk.metadata?.confidence ?? 0.8
-							}
+							})
 						})
 						.onConflictDoUpdate({
-							target:chatMessages.id,
-							set: { content: fullResponse, updatedAt: new Date() }
+							target: chatMessages.id,
+							set: {
+								content: fullResponse,
+								metadata: JSON.stringify({
+									streaming: true,
+									chunks: chunkCount,
+									caseId,
+									confidence: chunk.metadata?.confidence ?? 0.8
+								}),
+								updatedAt: new Date()
+							}
 						});
 				}
 			} else if (chunk.type === 'done') {
 				// Final save with complete response
-				await db.insert(chatMessages).values({
-					sessionId,
-					role: 'assistant',
-					content: fullResponse,
-					createdAt: new Date(),
-					metadata: { streaming: false,
-						chunks: chunkCount,
-						confidence: chunk.metadata?.confidence ?? 0.8,
-						sources: chunk.metadata?.sources || []
-					}
-				});
+				await db
+					.insert(chatMessages)
+					.values({
+						id: assistantMsgId,
+						chatId: sessionId,
+						userId,
+						role: 'assistant',
+						content: fullResponse,
+						metadata: JSON.stringify({
+							streaming: false,
+							chunks: chunkCount,
+							caseId,
+							confidence: chunk.metadata?.confidence ?? 0.8,
+							sources: chunk.metadata?.sources || []
+						})
+					})
+					.onConflictDoUpdate({
+						target: chatMessages.id,
+						set: {
+							content: fullResponse,
+							metadata: JSON.stringify({
+								streaming: false,
+								chunks: chunkCount,
+								caseId,
+								confidence: chunk.metadata?.confidence ?? 0.8,
+								sources: chunk.metadata?.sources || []
+							}),
+							updatedAt: new Date()
+						}
+					});
 
-				// Queue embedding generation via RabbitMQ (async)
+				// Update chat metadata message count
+				await db
+					.update(chatMetadata)
+					.set({
+						lastMessageAt: new Date(),
+						updatedAt: new Date()
+					})
+					.where(eq(chatMetadata.chatId, sessionId));
+
+				// Queue embedding generation via RabbitMQ (async, non-critical)
 				try {
 					const { publishToQueue } = await import('$lib/server/rabbitmq');
 					await publishToQueue('embedding.generation', {
 						type: 'chat_message',
 						sessionId,
 						userId,
+						caseId,
 						message: fullResponse
 					});
-				} catch (rabbitError) {
-					console.warn('RabbitMQ not available:', rabbitError);
-					// Continue without queuing - non-critical
+				} catch {
+					// RabbitMQ not available - non-critical
 				}
 			}
 		}
 	} catch (error) {
 		console.error('AI response generation failed:', error);
-		// Save error message
+		const errorMsgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 		await db.insert(chatMessages).values({
-			sessionId,
+			id: errorMsgId,
+			chatId: sessionId,
+			userId,
 			role: 'assistant',
 			content: 'Sorry, I encountered an error processing your request.',
-			createdAt: new Date(),
-			metadata: { error: true,
+			metadata: JSON.stringify({
+				error: true,
+				caseId,
 				message: error instanceof Error ? error.message : 'Unknown error'
-			}
+			})
 		});
 	}
 }
