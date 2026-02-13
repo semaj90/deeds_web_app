@@ -3,6 +3,8 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
 import type { Actions, PageServerLoad } from './$types.js';
+import { db } from '$lib/server/db/client';
+import { personsOfInterest } from '$lib/db/schema';
 
 const poiSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
@@ -37,20 +39,22 @@ export const actions: Actions = {
 
 		try {
 			const caseId = (locals as { caseId?: string }).caseId;
-			const response = await fetch('http://localhost:8000/api/persons-of-interest', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-case_id: caseId,
-					...form.data
-				})
-			});
 
-			if (!response.ok) {
+			const newPerson = await db.insert(personsOfInterest)
+				.values({
+					name: form.data.name,
+					description: form.data.physicalDescription ?? '',
+					threatLevel: form.data.threatLevel ?? 'low',
+					status: form.data.status ?? 'person_of_interest',
+					relationship: 'person_of_interest',
+				} as any)
+				.returning();
+
+			const poi = newPerson[0];
+			if (!poi) {
 				return fail(500, { form, error: 'Failed to create POI' });
 			}
 
-			const poi = await response.json();
 			redirect(303, `/persons-of-interest/${poi.id}`);
 		} catch (error) {
 			return fail(500, { form, error: 'Server error' });
