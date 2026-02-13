@@ -166,7 +166,7 @@ export interface OptimizerStatus {
  version: string;
 	timestamp: string;
  go_service: {
-	available: boolean, health: unknown;
+	available: boolean; health: unknown;
 	url: string };
  performance: unknown;
 	capabilities: OptimizerCapabilities;
@@ -209,14 +209,15 @@ export interface OptimizerConfig {
 	batch_size_limits: { min: number;
 	max: number; optimal: number };
  performance_targets: {
-	latency_ms: number, throughput_eps: number;
+	latency_ms: number; throughput_eps: number;
 	success_rate: number };
 }
 
 export interface ProcessingPriority {
  level: 'low' | 'normal' | 'high' | 'urgent';
  timeout_multiplier: number;
-	resource_allocation: number; // 0.0 - 1.0, queue_priority: number;
+	resource_allocation: number; // 0.0 - 1.0
+	queue_priority: number;
 }
 
 // Error Categories & Analysis
@@ -314,14 +315,14 @@ export interface ErrorEvent extends WebSocketEvent {
 }
 
 // Export utility types
-| 'auto'
+export type FixStrategy = 'auto'
  | 'optimized'
  | 'gpu_first'
  | 'llama_thinking'
  | 'template_only'
  | 'hybrid'
  | 'streaming';
-| 'queued'
+export type ProcessingStatus = 'queued'
  | 'processing'
  | 'completed'
  | 'failed'
@@ -329,7 +330,7 @@ export interface ErrorEvent extends WebSocketEvent {
  | 'streaming';
 
 export type PerformanceGrade = 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';
-| 'minimal'
+export type OptimizationTier = 'minimal'
  | 'basic'
  | 'standard'
  | 'professional'

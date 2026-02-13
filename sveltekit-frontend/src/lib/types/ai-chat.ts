@@ -78,7 +78,8 @@ export interface ChatStore {
  recommendations: Recommendation[];
 } // New small typed shapes to avoid `any`
 export interface Entity {
- type: string; // e.g., "PERSON", "ORG", "DATE", text: string; // raw matched text
+ type: string; // e.g., "PERSON", "ORG", "DATE"
+ text: string; // raw matched text
  start?: number; // optional character start index
  end?: number; // optional character end index
  confidence?: number; // model confidence 0..1

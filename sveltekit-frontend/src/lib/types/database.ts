@@ -100,7 +100,7 @@ export type Case = DBCase;
 export interface CaseMetadata {
   jurisdiction?: string;
   parties?: Array<{
-	role: string, name: string;
+	role: string; name: string;
 	type: string }>;
   courtLevel?: 'district' | 'appellate' | 'supreme';
   caseNumber?: string;

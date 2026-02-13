@@ -274,7 +274,7 @@ export interface VectorStoreConfig {
 export interface GPUConfig {
   enabled: boolean;
 	devices: Array<{ id: number;
-	name: string, memory: number }>;
+	name: string; memory: number }>;
   cudaVersion?: string;
 }
 

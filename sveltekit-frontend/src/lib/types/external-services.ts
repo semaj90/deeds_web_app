@@ -6,7 +6,7 @@ export interface OllamaClient {
   generateText?(prompt: string, opts?: { model?: string; maxTokens?: number }): Promise<string>;
   chat?(
     messages: Array<{
-	role: string; content, string }>,
+	role: string; content: string }>,
     opts?: { model?: string; stream?: boolean }
   ): Promise<string | AsyncIterable<string>>;
 }
@@ -102,12 +102,12 @@ export interface PgVectorClient {
     vector: number[],
     limit?: number
   ): Promise<Array<{
-	id: string, similarity: number;
+	id: string; similarity: number;
 	metadata: Record<string, unknown> }>>;
   insert(
     collection: string,
     vectors: Array<{
-	id: string, vector: number[], metadata?: Record<string, unknown> }>
+	id: string; vector: number[]; metadata?: Record<string, unknown> }>
   ): Promise<void>;
   createExtension?(): Promise<void>;
   disconnect(): Promise<void>;
@@ -128,11 +128,11 @@ export interface MinIOClient {
     bucket: string, key: string,
     data: Buffer | ReadableStream,
     metadata?: Record<string, string>
-  ): Promise<{ etag, string }>;
+  ): Promise<{ etag: string }>;
   getObject(bucket: string, key: string): Promise<ReadableStream>;
   removeObject(bucket: string, key: string): Promise<void>;
   listObjects(bucket: string, prefix?: string): Promise<Array<{
-	name: string, size: number; etag, string }>>;
+	name: string; size: number; etag: string }>>;
   makeBucket?(bucket: string, region?: string): Promise<void>;
   bucketExists?(bucket: string): Promise<boolean>;
 }
@@ -148,7 +148,7 @@ export interface Neo4jConfig {
 
 export interface Neo4jClient {
   run<T = unknown>(cypher: string, params?: Record<string, unknown>): Promise<{
-	records: Array<{ toObject(), T }> }>;
+	records: Array<{ toObject(): T }> }>;
   close(): Promise<void>;
   verifyConnectivity?(): Promise<void>;
 }

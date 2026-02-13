@@ -64,7 +64,7 @@ export interface EnhancedSearchResult {
  updatedAt?: Date;
  };
  highlights?: {
-	field: string, matches: string[] }[];
+	field: string; matches: string[] }[];
  confidence: number;
 	relevanceScore: number;
  analysisResults?: {

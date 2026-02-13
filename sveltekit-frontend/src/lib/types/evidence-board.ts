@@ -1,7 +1,8 @@
 // Evidence board types for YoRHa Legal AI
 
 export type TopicNode = {
- id: string; // "caseId:topicId", caseId: string;
+ id: string; // "caseId:topicId"
+	caseId: string;
 	topicId: number;
  title: string; // Short label, maybe from Gemma
  somX: number; // 0..1 normalized
@@ -12,7 +13,8 @@ export type TopicNode = {
 };
 
 export type ShardNode = {
- id: string; // "docId:shardId", docId: string;
+ id: string; // "docId:shardId"
+	docId: string;
 	shardId: number;
  checkpointMax: number; // Highest checkpoint reached
  status: 'pending' | 'ready' | 'embedded' | 'analyzed' | 'error';

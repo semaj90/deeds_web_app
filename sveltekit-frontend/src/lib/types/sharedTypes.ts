@@ -30,10 +30,10 @@ export interface BoundingBox {
 
 export interface LayoutInfo {
  blocks: Array<{
-	bbox: BoundingBox, text: string;
+	bbox: BoundingBox; text: string;
 	confidence: number }>;
  tables?: Array<{
-	rows: number, cols: number;
+	rows: number; cols: number;
 	cells: string[][] }>;
  headers?: string[];
 }

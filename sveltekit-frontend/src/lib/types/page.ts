@@ -1,9 +1,9 @@
 // Type definitions for SvelteKit page data
 export type Props = {
  data: {
-	availableRoutes: Array<{ path: string; icon?: string; description?, string }>;
+	availableRoutes: Array<{ path: string; icon?: string; description?: string }>;
  routeInventory?: {
-	fileRoutesSample: Array<{ route: string; title, string }>;
+	fileRoutesSample: Array<{ route: string; title: string }>;
  };
  };
 };

@@ -17,7 +17,7 @@
  | 'relationship-mapping'
  | 'pattern-detection'
  | 'forensic-timeline';
-| 'pending'
+export type JobStatus = 'pending'
  | 'queued'
  | 'processing'
  | 'completed'
@@ -46,7 +46,8 @@ export interface ProcessingMetrics {
 	processingTime: number; // ms
  averageProcessingTime: number; // ms
  throughput: number; // jobs/sec
- errorRate: number; // 0..1, queueDepth: number;
+ errorRate: number; // 0..1
+	queueDepth: number;
 	activeWorkers: number;
 }
 

@@ -193,7 +193,7 @@ export interface UserPreferences {
  language: string;
 	timezone: string;
  notifications: {
-	email: boolean, push: boolean;
+	email: boolean; push: boolean;
 	sms: boolean };
  ui: {
 	density: 'compact' | 'comfortable' | 'spacious'; sidebarCollapsed: boolean };

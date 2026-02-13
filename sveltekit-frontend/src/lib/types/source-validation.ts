@@ -132,7 +132,7 @@ export interface ValidationUIState {
 
 	// KAG phase
 	extractedEntities: string[];
-	extractedRelationships: Array<{ from: string, to: string; type: string }>;
+	extractedRelationships: Array<{ from: string; to: string; type: string }>;
 	isUpdatingKAG: boolean;
 	kagError: string | null;
 }
@@ -169,7 +169,7 @@ export interface CitationInspectorProps {
 export interface ProvenanceGraphProps {
 	validationId: string;
 	entities: string[];
-	relationships: Array<{ from: string, to: string; type: string }>;
+	relationships: Array<{ from: string; to: string; type: string }>;
 	width?: number;
 	height?: number;
 }

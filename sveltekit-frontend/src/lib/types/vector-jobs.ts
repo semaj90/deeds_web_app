@@ -32,7 +32,8 @@ export interface VectorJobResult {
 export interface CUDAProcessingStatus {
  jobId: string;
 	stage: 'initializing' | 'preprocessing' | 'computing' | 'postprocessing' | 'completed';
- progress: number; // 0-100, currentOperation: string;
+ progress: number; // 0-100
+ currentOperation: string;
  estimatedTimeRemainingMs?: number;
  gpuUtilization?: number;
  memoryUsage?: number;
@@ -159,7 +160,7 @@ export interface LegalSimilarityResult {
 // Monitoring and metrics types
 export interface VectorServiceMetrics {
  queueDepth: {
-	embeddings: number, similarities: number;
+	embeddings: number; similarities: number;
 	indexing: number; clustering: number };
  processingStats: {
 	totalProcessed: number;
@@ -190,8 +191,8 @@ export interface VectorHealthStatus {
  webgpu: 'available' | 'unavailable' | 'not_supported';
  };
  queues: { [queueName: string]: {
-	depth: number, consumers: number;
-	processingRate: number } };
+	depth: number; consumers: number;
+	processingRate: number; }; };
  lastHealthCheck: Date;
 }
 // Error types for vector processing
@@ -208,19 +209,19 @@ export class VectorProcessingError extends Error {
  }
 }
 export class CUDAError extends VectorProcessingError {
- constructor(message: string, jobId: string): string {
+ constructor(message: string, jobId: string, operation: string) {
  super(message, jobId, operation, 'cuda_processing', false);
  this.name = 'CUDAError';
  }
 }
 export class WebGPUError extends VectorProcessingError {
- constructor(message: string, jobId: string): string {
+ constructor(message: string, jobId: string, operation: string) {
  super(message, jobId, operation, 'webgpu_processing', true);
  this.name = 'WebGPUError';
  }
 }
 export class RedisStreamError extends VectorProcessingError {
- constructor(message: string, jobId: string): string {
+ constructor(message: string, jobId: string, operation: string) {
  super(message, jobId, operation, 'redis_streaming', true);
  this.name = 'RedisStreamError';
  }
