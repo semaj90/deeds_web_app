@@ -52,7 +52,7 @@ export { default as Svelte5DropdownMenu } from './dropdown-menu/DropdownMenu.sve
 export { default as Svelte5Input } from './input/Input.svelte';
 export { default as Svelte5Progress } from './progress/Progress.svelte';
 export { default as Svelte5RadioGroup } from './radio/Svelte5RadioGroup.svelte';
-export { default as Svelte5Select } from './select/Svelte5Select.svelte';
+// export { default as Svelte5Select } from './select/Svelte5Select.svelte'; // Directory missing
 export { default as Svelte5Slider } from './slider/Svelte5Slider.svelte';
 export { default as Svelte5Switch } from './switch/Svelte5Switch.svelte';
 export { default as Svelte5TabPanel } from './tabs/Svelte5TabPanel.svelte';

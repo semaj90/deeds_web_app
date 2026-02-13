@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { broadcastAgentProgress } from '../routes/stream/+server.js';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const OLLAMA_URL = 'http://127.0.0.1:11434';
 const QDRANT_URL = 'http://127.0.0.1:6333';
@@ -42,12 +41,12 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 		const searchResponse = await fetch(`${QDRANT_URL}/collections/phase76_knowledge_base/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ vector: limit: 5,
+			body: JSON.stringify({ vector, limit: 5,
 				with_payload: true,
 				filter: { should: [
 						{
 							key: 'file_path',
-							match: { value, filePath }
+							match: { value: filePath }
 						},
 						{
 							key: 'type',
@@ -66,7 +65,8 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 		const results = searchData?.result|| [];
 
 		// Concatenate relevant knowledge
-.map((r: any) => r.payload?.content ?? r.payload?.text ?? '')
+		const knowledge = results
+			.map((r: any) => r.payload?.content ?? r.payload?.text ?? '')
 			.filter(Boolean)
 			.join('\n\n');
 
@@ -214,7 +214,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: true,
-			file_path: fixes,
+			file_path, fixes,
 			auto_applied: auto_apply,
 			kb_context_used: knowledge.length > 0,
 			timestamp: new Date().toISOString()

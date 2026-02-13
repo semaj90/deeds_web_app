@@ -1,15 +1,11 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════
  * Codebase Index Stats API
- * ═══════════════════════════════════════════════════════════════════════
- * Task: 13.1: 16.2 - Create admin route structure + FastAPI integration
  * Endpoint: GET /api/codebase-index/stats
  * Purpose: Return codebase indexing statistics and error metrics
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const QDRANT_URL = env?.QDRANT_URL ?? 'http://localhost:6333';
 const FASTAPI_URL = env?.FASTAPI_URL ?? 'http://localhost:8090';
@@ -18,7 +14,7 @@ const CLUSTER_COLLECTION = 'phase90_error_clusters';
 
 export const GET: RequestHandler = async ({ fetch }) => {
 	try {
-		// Try FastAPI backend first (Task 16.2 integration)
+		// Try FastAPI backend first
 		try {
 			const backendResponse = await fetch(`${FASTAPI_URL}/api/codebase/stats`, {
 				headers: {
@@ -37,11 +33,13 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		}
 
 		// Fallback: Get error cards count and stats directly from Qdrant
-`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
+		const errorCardsResponse = await fetch(
+			`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ limit: 10000,
+				body: JSON.stringify({
+					limit: 10000,
 					with_payload: true,
 					with_vector: false
 				})
@@ -49,7 +47,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		);
 
 		let totalErrors = 0;
-		let topErrorCodes: Array<{ code: string; count, number }> = [];
+		let topErrorCodes: Array<{ code: string; count: number }> = [];
 		let surfaceBreakdown: Record<string, number> = {};
 		let techBreakdown: Record<string, number> = {};
 		let lastIndexed: string | null = null;
@@ -61,7 +59,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
 			// Calculate error code histogram
 			const codeCount: Record<string, number> = {};
-			points.forEach((p: { payload: { errorCode?: string, surface?: string[], tech?: string[], timestamp?: string } }) => {
+			points.forEach((p: { payload: { errorCode?: string; surface?: string[]; tech?: string[]; timestamp?: string } }) => {
 				const code = p.payload?.errorCode ?? 'UNKNOWN';
 				codeCount[code] = (codeCount[code] ?? 0) + 1;
 
@@ -69,12 +67,12 @@ export const GET: RequestHandler = async ({ fetch }) => {
 				(p.payload?.surface ?? []).forEach((s: string) => {
 					surfaceBreakdown[s] = (surfaceBreakdown[s] ?? 0) + 1;
 				});
-  
+
 				(p.payload?.tech ?? []).forEach((t: string) => {
 					techBreakdown[t] = (techBreakdown[t] ?? 0) + 1;
 				});
-  
-				if (p.payload?.timestamp && (!lastIndexed ?? p.payload.timestamp > lastIndexed)) {
+
+				if (p.payload?.timestamp && (!lastIndexed || p.payload.timestamp > lastIndexed)) {
 					lastIndexed = p.payload.timestamp;
 				}
 			});
@@ -85,7 +83,8 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		}
 
 		// Get cluster count
-`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/count`,
+		const clustersResponse = await fetch(
+			`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/count`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -100,11 +99,14 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		}
 
 		return json({
-			totalFiles: 0, // Would come from file indexer
+			totalFiles: 0,
 			indexedFiles: 0,
-			totalErrors: errorClusters,
-			topErrorCodes: surfaceBreakdown,
-			techBreakdown: lastIndexed
+			totalErrors,
+			errorClusters,
+			topErrorCodes,
+			surfaceBreakdown,
+			techBreakdown,
+			lastIndexed
 		});
 	} catch (error) {
 		console.error('Failed to get codebase stats:', error);
@@ -124,6 +126,3 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		);
 	}
 };
-
-
-

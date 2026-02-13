@@ -58,9 +58,9 @@ export async function consumeFromQueue(queueName, processor) {
  });
  console.log(`ðŸ”„ Starting consumer for queue: ${queueName}`);
  await ch.consume(queueName, async (msg) => {
- if (!msg) return);
+ if (!msg) return;
  try {
- const payload = JSON.parse(msg.content.toString();
+ const payload = JSON.parse(msg.content.toString());
  await processor(
  payload, () => ch.ack(msg), () => ch.nack(msg, false, false)
  ) } catch (error) {

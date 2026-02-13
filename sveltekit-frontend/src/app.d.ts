@@ -49,6 +49,13 @@ declare global {
   }
 }
 
+declare module 'marked' {
+  export function marked(src: string, options?: any): string;
+  export function parse(src: string, options?: any): string;
+  export function lexer(src: string, options?: any): any[];
+  export function parser(tokens: any[], options?: any): string;
+}
+
 export {};
 
 

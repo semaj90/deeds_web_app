@@ -1,6 +1,5 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Phase 89: Related Files API
 // Uses cosine similarity from Qdrant to find related components
@@ -34,7 +33,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		const searchResponse = await fetch('http://localhost:6333/collections/phase89_code_units/points/search', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ vector: limit: 10,
+			body: JSON.stringify({ vector, limit: 10,
 				with_payload: true,
 				score_threshold: 0.7
 			})

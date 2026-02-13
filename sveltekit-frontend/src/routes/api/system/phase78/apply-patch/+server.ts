@@ -5,21 +5,13 @@ import { eq } from 'drizzle-orm';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Phase 78 Auto-Patch Application API
  *
  * Applies AI-generated TypeScript patches to source files
- *
- * Security:
- * - Requires authentication
- * - Creates backup before modification
- * - Validates patch structure
- * - Records application in database
  */
 export const POST: RequestHandler = async ({ locals, request }) => {
-	// 🔒 SECURITY: Only authenticated users can apply patches
 	if (!locals.user) {
 		throw error(401, 'Unauthorized - Authentication required');
 	}
@@ -58,11 +50,11 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		try {
 			fileContent = await readFile(filePath, 'utf-8');
 		} catch (err) {
-			throw error(500, `Failed to read file: ${filePath}`);
+			throw error(500, 'Failed to read file: ' + filePath);
 		}
 
 		// 4. Create backup
-		const backupPath = `${filePath}.phase78.backup`;
+		const backupPath = filePath + '.phase78.backup';
 		await writeFile(backupPath, fileContent, 'utf-8');
 
 		// 5. Extract and apply the patch
@@ -100,7 +92,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		}
 
 		const message = err instanceof Error ? err.message : 'Unknown error';
-		throw error(500, `Failed to apply patch: ${message}`);
+		throw error(500, 'Failed to apply patch: ' + message);
 	}
 };
 
@@ -108,34 +100,26 @@ export const POST: RequestHandler = async ({ locals, request }) => {
  * Convert route path to file system path
  */
 function routePathToFile(routePath: string): string {
-	// Remove leading slash
 	const cleanPath = routePath.startsWith('/') ? routePath.slice(1) : routePath;
-
-	// Handle dynamic routes: /cases/[id]/overview -> src/routes/cases/[id]/overview/+page.svelte
 	const srcPath = join(process.cwd(), 'src', 'routes', cleanPath);
-
-	// Default to +page.svelte (can be enhanced to detect +page.ts, +server.ts, etc.)
-	return `${srcPath}/+page.svelte`;
+	return srcPath + '/+page.svelte';
 }
 
 /**
  * Extract code from patch (handles code blocks)
  */
 function extractPatchCode(patch: string): string | null {
-	// Match code blocks: ```typescript ... ```
 	const codeBlockMatch = patch.match(/```(?:typescript|ts)?\s*\n([\s\S]*?)\n```/);
 
 	if (codeBlockMatch) {
 		return codeBlockMatch[1].trim();
 	}
 
-	// If no code block, check if patch contains "AFTER:" section
-	const afterMatch = patch.match(/\/\/ AFTER:\s*\n([\s\S]*?)(? =\n\/\/ : $)/);
+	const afterMatch = patch.match(/\/\/ AFTER:\s*\n([\s\S]*?)(?=\n\/\/|$)/);
 	if (afterMatch) {
 		return afterMatch[1].trim();
 	}
 
-	// Fallback: treat entire patch as code
 	return patch.trim();
 }
 
@@ -143,32 +127,30 @@ function extractPatchCode(patch: string): string | null {
  * Apply patch to file content
  */
 function applyPatch(
-	originalContent: string, patchCode: string,
+	originalContent: string,
+	patchCode: string,
 	suggestion: typeof errorSuggestionsTable.$inferSelect
 ): string {
 	const timestamp = new Date().toISOString();
 
-	// Add Phase 78 marker comment
-$1;$2// ═══════════════════════════════════════════════════════════════
-// 🤖 Phase 78 AI-Applied Patch
-// Risk Level: ${suggestion.riskLevel}
-// Applied: ${timestamp}
-// Suggestion: ${suggestion.summary}
-// ═══════════════════════════════════════════════════════════════
+	const lines = [
+		'',
+		'// ═══════════════════════════════════════════════════════════════',
+		'// Phase 78 AI-Applied Patch',
+		'// Risk Level: ' + (suggestion.riskLevel || 'unknown'),
+		'// Applied: ' + timestamp,
+		'// Suggestion: ' + (suggestion.summary || ''),
+		'// ═══════════════════════════════════════════════════════════════',
+		'',
+		patchCode,
+		'',
+		'// ═══════════════════════════════════════════════════════════════',
+	];
+	const patchComment = lines.join('\n');
 
-${patchCode}
-
-// ═══════════════════════════════════════════════════════════════
-`;
-
-	// Append at the end (before </script> tag in Svelte files)
 	if (originalContent.includes('</script>')) {
-		return originalContent.replace('</script>', `${patchComment}\n</script>`);
+		return originalContent.replace('</script>', patchComment + '\n</script>');
 	}
 
-	// Otherwise append at end
 	return originalContent + '\n' + patchComment;
 }
-
-
-

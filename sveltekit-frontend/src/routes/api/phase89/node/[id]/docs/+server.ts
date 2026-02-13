@@ -6,7 +6,6 @@
 import { json } from '@sveltejs/kit';
 import postgres from 'postgres';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const sql = postgres(process.env?.DATABASE_URL ?? 'postgresql://user:pass@127.0.0.1:5434/legal');
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://127.0.0.1:6333';
@@ -16,7 +15,8 @@ async function generateEmbedding(text: string): Promise<number[]> {
   const response = await fetch('http://127.0.0.1:11434/api/embeddings', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({model: 'embeddinggemma:latest',
+    body: JSON.stringify({
+      model: 'embeddinggemma:latest',
       prompt: text,
     }),
   });
@@ -28,8 +28,8 @@ export const GET: RequestHandler = async ({ params }) => {
   const { id } = params;
 
   try {
-    // Get node detailsSELECT id, kind, label, meta, embedding FROM kg_nodes WHERE id = ${id}
-    `;
+    // Get node details
+    const [node] = await sql`SELECT id, kind, label, meta, embedding FROM kg_nodes WHERE id = ${id}`;
 
     if (!node) {
       return json({ error: 'Node not found' }, { status: 404 });
@@ -40,21 +40,23 @@ export const GET: RequestHandler = async ({ params }) => {
     if (node.kind === 'error') {
       const code = node.meta?.code ?? '';
       const message = node.meta?.message ?? '';
-      query = `Fix TypeScript error ${code}: ${message}`;
+      query = 'Fix TypeScript error ' + code + ': ' + message;
     } else if (node.kind === 'file') {
-      query = `Code examples for ${node.label}`;
+      query = 'Code examples for ' + node.label;
     } else if (node.kind === 'symbol') {
-      query = `Documentation for ${node.label}`;
+      query = 'Documentation for ' + node.label;
     }
 
     // Generate embedding for query
     const embedding = await generateEmbedding(query);
 
     // Search Qdrant
-    const response = await fetch(`${QDRANT_URL}/collections/${KNOWLEDGE_COLLECTION}/points/search`, {
+    const qdrantUrl = QDRANT_URL + '/collections/' + KNOWLEDGE_COLLECTION + '/points/search';
+    const response = await fetch(qdrantUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({vector: embedding,
+      body: JSON.stringify({
+        vector: embedding,
         limit: 5,
         with_payload: true,
       }),
@@ -62,7 +64,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
     const searchResults = await response.json();
 
-    const results = (searchResults?.result|| []).map((hit: any) => ({
+    const results = (searchResults?.result || []).map((hit: any) => ({
       title: hit.payload?.title ?? hit.payload?.source ?? 'Unknown',
       snippet: hit.payload?.content?.substring(0, 200) ?? hit.payload?.text?.substring(0, 200) ?? '',
       score: hit.score,
@@ -72,6 +74,6 @@ export const GET: RequestHandler = async ({ params }) => {
     return json({ results, query });
   } catch (error) {
     console.error('Error retrieving docs:', error);
-    return json({ error: error.message }, { status: 500 });
+    return json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 };

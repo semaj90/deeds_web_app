@@ -3,7 +3,8 @@ import { Pool } from 'pg';
 import type { PageServerLoad } from './$types';
 
 const db = new Pool({
-	user: 'legal_admin', password: '123456',
+	user: 'legal_admin',
+	password: '123456',
 	host: 'localhost',
 	port: 5434,
 	database: 'legal_ai_db'
@@ -15,17 +16,21 @@ export const load: PageServerLoad = async () => {
 	try {
 		// Get Qdrant collections
 		const collections = await qdrant.getCollections();
-collections.collections.map(async (col) => {
-			const info = await qdrant.getCollection(col.name);
-			return {
-				name: col.name,
-				pointsCount: info?.points_count ?? 0,
-				vectorSize: info.config?.params?.vectors?.size ?? 0,
-				status: info.status
-			};
-		})
-	);		// Get PostgreSQL embedded files
-SELECT
+		const collectionStats = await Promise.all(
+			collections.collections.map(async (col) => {
+				const info = await qdrant.getCollection(col.name);
+				return {
+					name: col.name,
+					pointsCount: info?.points_count ?? 0,
+					vectorSize: (info.config?.params?.vectors as any)?.size ?? 0,
+					status: info.status
+				};
+			})
+		);
+
+		// Get PostgreSQL embedded files
+		const pgEmbeddings = await db.query(`
+			SELECT
 				source,
 				COUNT(*) as error_count,
 				MAX(indexed_at) as last_indexed,
@@ -38,9 +43,10 @@ SELECT
 		`);
 
 		// Get file timeline from PostgreSQL
-SELECT
-				file_path: indexed_at,
-				tagged_at: edited_at,
+		const timeline = await db.query(`
+			SELECT
+				file_path, indexed_at,
+				tagged_at, edited_at,
 				analyzed_at,
 				metadata
 			FROM phase89_file_timeline
@@ -49,7 +55,8 @@ SELECT
 		`).catch(() => ({ rows: [] }));
 
 		// Get embedding statistics
-SELECT
+		const embeddingStats = await db.query(`
+			SELECT
 				COUNT(DISTINCT source) as total_files,
 				COUNT(*) as total_errors,
 				COUNT(DISTINCT error_code) as unique_error_codes,
@@ -60,11 +67,11 @@ SELECT
 
 		return {
 			qdrant: {
-	collections: collectionStats,
-				totalPoints: collectionStats.reduce((sum, col) => sum + col.pointsCount, 0)
+				collections: collectionStats,
+				totalPoints: collectionStats.reduce((sum: number, col: any) => sum + col.pointsCount, 0)
 			},
-	postgres: {
-	embeddings: pgEmbeddings.rows,
+			postgres: {
+				embeddings: pgEmbeddings.rows,
 				timeline: timeline.rows,
 				stats: embeddingStats.rows[0]
 			}
@@ -72,14 +79,9 @@ SELECT
 	} catch (error) {
 		console.error('Error loading codebase data:', error);
 		return {
-			qdrant: {
-	collections: [], totalPoints: 0 },
-	postgres: {
-	embeddings: [], timeline: [], stats: {} },
-	error: String(error)
+			qdrant: { collections: [], totalPoints: 0 },
+			postgres: { embeddings: [], timeline: [], stats: {} },
+			error: String(error)
 		};
 	}
 };
-
-
-

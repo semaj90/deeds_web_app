@@ -9,13 +9,12 @@
  */
 
 import {
-    getInteractions: getRouteMetadata,
+    getInteractions, getRouteMetadata,
     logInteraction,
     type NewRouteInteractionLog
 } from '$lib/db/queries/nes-command-center';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST /api/routes/:routeId/interactions

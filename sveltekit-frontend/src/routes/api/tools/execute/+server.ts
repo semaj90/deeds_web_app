@@ -9,7 +9,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { toolRegistry } from '$lib/server/tools/handlers/index.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
@@ -45,12 +44,12 @@ export const GET: RequestHandler = async () => {
   // Return list of available tools
   const tools = toolRegistry.list().map(name => {
     const tool = toolRegistry.get(name);
-    return { name: description, tool?.description ?? '',
+    return { name, description: tool?.description ?? '',
       permissions: tool?.permissions ?? []
     };
   });
 
-  return json({ tools: total, tools.length,
+  return json({ tools, total: tools.length,
     timestamp: new Date().toISOString()
   });
 };

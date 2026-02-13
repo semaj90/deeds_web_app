@@ -7,7 +7,6 @@ import { json } from '@sveltejs/kit';
 import { spawn } from 'child_process';
 import { createClient } from 'redis';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
@@ -24,19 +23,21 @@ export const POST: RequestHandler = async ({ request }) => {
     });
     await redis.connect().catch(() => null);
 
-    const requestId = `fix_req_${Date.now()}`;
+    const requestId = 'fix_req_' + Date.now();
 
     if (redis.isOpen) {
-      await redis.set(`phase89:fix:${requestId}`, JSON.stringify({
-        file: errorId,
+      await redis.set('phase89:fix:' + requestId, JSON.stringify({
+        file,
+        errorId,
         status: 'pending',
         timestamp: Date.now()
       }), { EX: 3600 });
-  
     }
 
     // Trigger the agentic fixer in background
-    // This runs the phase89-gemma3-prompt.mjs script'scripts/phase89-gemma3-prompt.mjs',
+    // This runs the phase89-gemma3-prompt.mjs script
+    const fixProcess = spawn('node', [
+      'scripts/phase89-gemma3-prompt.mjs',
       'fix',
       errorId || file
     ], {
@@ -52,7 +53,7 @@ export const POST: RequestHandler = async ({ request }) => {
     return json({
       success: true,
       requestId,
-      message: `Fix triggered for ${file || errorId}`,
+      message: 'Fix triggered for ' + (file || errorId),
       status: 'processing'
     });
   } catch (error: any) {
@@ -63,5 +64,3 @@ export const POST: RequestHandler = async ({ request }) => {
     }, { status: 500 });
   }
 };
-
-

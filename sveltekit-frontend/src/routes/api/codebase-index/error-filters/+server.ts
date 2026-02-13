@@ -8,14 +8,12 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
 export const GET: RequestHandler = async () => {
 	try {
-`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
+		const response = await fetch(`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },

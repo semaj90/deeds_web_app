@@ -1,6 +1,9 @@
 <script lang="ts">
-	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
-	import { Svelte5Button as Button } from '$lib/components/ui/svelte5-index';
+	import Card from '$lib/components/ui/card/Card.svelte';
+	import CardContent from '$lib/components/ui/card/CardContent.svelte';
+	import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+	import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import Activity from 'lucide-svelte/icons/activity';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
 	import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
@@ -83,30 +86,24 @@ totalCases: 5.2,
 
 	// Add click outside listener
 	$effect(() => {
+		(async () => {
+			await loadAllData();
+			refreshInterval = setInterval(async () => {
+				await loadAllData();
+			}, 30000);
+		})();
 
- (async () => {
- 		await loadAllData();
- 		// Set up real-time updates every 30 seconds
- 		refreshInterval = setInterval(async () => {
- 			await loadAllData();
- 		},
-	30000);
+		document.addEventListener('keydown', handleKeydown);
+		document.addEventListener('click', handleClickOutside);
 
- 		// Keyboard shortcuts
- 		document.addEventListener('keydown', handleKeydown);
- 		// Click outside handler
- 		document.addEventListener('click', handleClickOutside);
- 
-})();
- });
-
-	// TODO: Add as cleanup in $effect: return () => {
-		if (refreshInterval) {
-			clearInterval(refreshInterval);
-		}
-		document.removeEventListener('keydown', handleKeydown);
-		document.removeEventListener('click', handleClickOutside);
-	}
+		return () => {
+			if (refreshInterval) {
+				clearInterval(refreshInterval);
+			}
+			document.removeEventListener('keydown', handleKeydown);
+			document.removeEventListener('click', handleClickOutside);
+		};
+	});
 
 	async function loadAllData() {
 		isRefreshing = true;
@@ -549,19 +546,19 @@ totalCases: 5.2,
 						</Button>
 					</li>
 					<li class="nav-item" class:active={currentView === 'cases'}>
-						<Button class="bits-btn" onclick={() => currentView = 'cases'} class="nav-link">
+						<Button class="bits-btn nav-link" onclick={() => currentView = 'cases'}>
 							<Gavel class="h-4 w-4" />
 							Cases
 						</Button>
 					</li>
 					<li class="nav-item" class:active={currentView === 'evidence'}>
-						<Button class="bits-btn" onclick={() => currentView = 'evidence'} class="nav-link">
+						<Button class="bits-btn nav-link" onclick={() => currentView = 'evidence'}>
 							<FileText class="h-4 w-4" />
 							Evidence
 						</Button>
 					</li>
 					<li class="nav-item" class:active={currentView === 'ai'}>
-						<Button class="bits-btn" onclick={() => currentView = 'ai'} class="nav-link">
+						<Button class="bits-btn nav-link" onclick={() => currentView = 'ai'}>
 							<Brain class="h-4 w-4" />
 							AI Chat
 						</Button>
@@ -573,13 +570,13 @@ totalCases: 5.2,
 				<h3 class="nav-title">Intelligence</h3>
 				<ul class="nav-list">
 					<li class="nav-item" class:active={currentView === 'persons'}>
-						<Button class="bits-btn" onclick={() => currentView = 'persons'} class="nav-link">
+						<Button class="bits-btn nav-link" onclick={() => currentView = 'persons'}>
 							<Users class="h-4 w-4" />
 							Persons
 						</Button>
 					</li>
 					<li class="nav-item" class:active={currentView === 'analysis'}>
-						<Button class="bits-btn" onclick={() => currentView = 'analysis'} class="nav-link">
+						<Button class="bits-btn nav-link" onclick={() => currentView = 'analysis'}>
 							<Search class="h-4 w-4" />
 							Analysis
 						</Button>
@@ -591,7 +588,7 @@ totalCases: 5.2,
 				<h3 class="nav-title">System</h3>
 				<ul class="nav-list">
 					<li class="nav-item" class:active={currentView === 'system'}>
-						<Button class="bits-btn" onclick={() => currentView = 'system'} class="nav-link">
+						<Button class="bits-btn nav-link" onclick={() => currentView = 'system'}>
 							<Database class="h-4 w-4" />
 							System
 						</Button>
@@ -773,9 +770,8 @@ totalCases: 5.2,
 													<AlertIcon class="h-4 w-4" />
 													<span class="alert-message">{alert.message}</span>
 													<span class="alert-time">{alert.timestamp}</span>
-													<Button class="bits-btn"
+													<Button class="bits-btn alert-dismiss"
 														onclick={() => dismissAlert(alert.id)}
-														class="alert-dismiss"
 														aria-label="Dismiss alert"
 													>
 														<X class="h-3 w-3" />

@@ -39,8 +39,7 @@ export const load: PageServerLoad = async () => {
 					`SELECT
 						c.cluster_id,
 						COUNT(*) as error_count,
-						STRING_AGG(DISTINCT i.source, ', ') as files,
-						ARRAY_AGG(DISTINCT unnest(i.tags)) as tags
+						STRING_AGG(DISTINCT i.source, ', ') as files
 					FROM phase89_error_clusters c
 					JOIN phase89_error_instances i ON c.error_instance_id = i.id
 					WHERE c.cluster_id = $1
@@ -56,8 +55,7 @@ export const load: PageServerLoad = async () => {
 					pattern: payload?.pattern ?? 'Unknown',
 					error_count: Number.parseInt(String(data.error_count ?? '0'), 10) || 0,
 					files: data?.files ?? '',
-					tags: data?.tags ?? [],
-					payload_tags: payload?.tags ?? []
+					tags: payload?.tags ?? []
 				};
 			})
 		);

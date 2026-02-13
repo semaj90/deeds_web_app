@@ -4,13 +4,10 @@
  *
  * Provides real-time LLM synthesis via Server-Sent Events (SSE).
  * Streams tokens as they're generated for responsive UI.
- *
- * Requirements: Task 13 - Real-time streaming
  */
 
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -19,7 +16,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (!query || typeof query !== 'string' || query.trim().length === 0) {
 			return new Response(
-				JSON.stringify({ error: 'Query is required' }), { status: 400, headers: { 'Content-Type': 'application/json' } }
+				JSON.stringify({ error: 'Query is required' }),
+				{ status: 400, headers: { 'Content-Type': 'application/json' } }
 			);
 		}
 
@@ -28,7 +26,6 @@ export const POST: RequestHandler = async ({ request }) => {
 			async start(controller) {
 				const encoder = new TextEncoder();
 
-				// Helper to send SSE events
 				const sendEvent = (event: string, data: unknown) => {
 					const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 					controller.enqueue(encoder.encode(message));
@@ -36,45 +33,44 @@ export const POST: RequestHandler = async ({ request }) => {
 
 				try {
 					// Step 1: Send search started event
-					sendEvent('search_started', { query: timestamp: Date.now() });
+					sendEvent('search_started', { query, timestamp: Date.now() });
 
 					const searcher = getKnowledgeSearcher();
-					const results = await searcher.search(query, { topK: includeContent, true
-					});
+					const results = await searcher.search(query, { topK, includeContent: true });
 
 					sendEvent('search_results', {
 						count: results.length,
-						results: results.map(r => ({
-						id: r.id,
+						results: results.map((r: any) => ({
+							id: r.id,
 							title: r.title,
 							score: r.score,
 							url: r.url
 						}))
 					});
-.slice(0, topK)
-						.map((r, idx) => `[${idx + 1}] ${r.title}: ${r?.summary|| r.content?.slice(0, 500) ?? 'No content'}`)
+
+					// Build context from results
+					const context = results
+						.slice(0, topK)
+						.map((r: any, idx: number) => `[${idx + 1}] ${r.title}: ${r?.summary || (r.content?.slice(0, 500) ?? 'No content')}`)
 						.join('\n\n');
-Question: ${query}
 
-Context:
-${context}
-
-Provide a clear, comprehensive answer. Reference the source numbers [1], [2], etc. when citing information.`;
+					const prompt = `Question: ${query}\n\nContext:\n${context}\n\nProvide a clear, comprehensive answer. Reference the source numbers [1], [2], etc. when citing information.`;
 
 					// Step 5: Stream LLM response
-					sendEvent('synthesis_started', { provider, llmProvider });
+					sendEvent('synthesis_started', { provider: llmProvider });
 
 					if (llmProvider === 'ollama') {
 						await streamOllamaResponse(prompt, controller, encoder, sendEvent);
 					} else if (llmProvider === 'gemini') {
 						await streamGeminiResponse(prompt, controller, encoder, sendEvent);
 					} else {
-						// Fallback: non-streaming synthesis
 						sendEvent('synthesis_chunk', { text: 'Streaming not supported for this provider.' });
 					}
 
 					// Step 6: Send completion event
-					sendEvent('complete', { query: resultsCount, results.length,
+					sendEvent('complete', {
+						query,
+						resultsCount: results.length,
 						timestamp: Date.now()
 					});
 
@@ -94,14 +90,15 @@ Provide a clear, comprehensive answer. Reference the source numbers [1], [2], et
 				'Content-Type': 'text/event-stream',
 				'Cache-Control': 'no-cache',
 				'Connection': 'keep-alive',
-				'X-Accel-Buffering': 'no' // Disable nginx buffering
+				'X-Accel-Buffering': 'no'
 			}
 		});
 
 	} catch (error) {
 		console.error('SSE Stream error:', error);
 		return new Response(
-			JSON.stringify({ error, 'Stream initialization failed' }) => { status: 500, headers: { 'Content-Type': 'application/json' } }
+			JSON.stringify({ error: 'Stream initialization failed' }),
+			{ status: 500, headers: { 'Content-Type': 'application/json' } }
 		);
 	}
 };
@@ -111,8 +108,8 @@ Provide a clear, comprehensive answer. Reference the source numbers [1], [2], et
  */
 async function streamOllamaResponse(
 	prompt: string,
-	controller: ReadableStreamDefaultController,
-	encoder: TextEncoder,
+	_controller: ReadableStreamDefaultController,
+	_encoder: TextEncoder,
 	sendEvent: (event: string, data: any) => void
 ): Promise<void> {
 	const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
@@ -121,17 +118,16 @@ async function streamOllamaResponse(
 	const response = await fetch(`${OLLAMA_URL}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: MODEL,
+		body: JSON.stringify({
+			model: MODEL,
 			prompt,
 			stream: true,
-			options: { temperature: 0.3,
-				num_predict: 2048
-			}
+			options: { temperature: 0.3, num_predict: 2048 }
 		})
 	});
 
-	if (!response?.ok|| !response.body) {
-		throw new Error(`Ollama request failed, ${response.statusText}`);
+	if (!response?.ok || !response.body) {
+		throw new Error(`Ollama request failed: ${response.statusText}`);
 	}
 
 	const reader = response.body.getReader();
@@ -148,14 +144,16 @@ async function streamOllamaResponse(
 
 			for (const line of lines) {
 				try {
-					const json = JSON.parse(line);
-					if (json.response) {
-						fullResponse += json.response;
-						sendEvent('synthesis_chunk', { text: json.response });
+					const parsed = JSON.parse(line);
+					if (parsed.response) {
+						fullResponse += parsed.response;
+						sendEvent('synthesis_chunk', { text: parsed.response });
 					}
-					if (json.done) {
-						sendEvent('synthesis_complete', { fullResponse: evalCount, json.eval_count,
-							evalDuration: json.eval_duration
+					if (parsed.done) {
+						sendEvent('synthesis_complete', {
+							fullResponse,
+							evalCount: parsed.eval_count,
+							evalDuration: parsed.eval_duration
 						});
 					}
 				} catch {
@@ -173,8 +171,8 @@ async function streamOllamaResponse(
  */
 async function streamGeminiResponse(
 	prompt: string,
-	controller: ReadableStreamDefaultController,
-	encoder: TextEncoder,
+	_controller: ReadableStreamDefaultController,
+	_encoder: TextEncoder,
 	sendEvent: (event: string, data: any) => void
 ): Promise<void> {
 	const apiKey = process.env.GEMINI_API_KEY;
@@ -203,10 +201,7 @@ async function streamGeminiResponse(
 
 	} catch (error) {
 		sendEvent('error', {
-			message: `Gemini streaming, failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+			message: `Gemini streaming failed: ${error instanceof Error ? error.message : 'Unknown error'}`
 		});
 	}
 }
-
-
-

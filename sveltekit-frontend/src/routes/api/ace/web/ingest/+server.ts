@@ -256,7 +256,8 @@ function getPriorityValue(priority?: 'high' | 'normal' | 'low'): number {
       return 10;
     case 'low':
       return 1;
-    case 'normal': default;
+    case 'normal':
+      default:
  return 5;
   }
 }

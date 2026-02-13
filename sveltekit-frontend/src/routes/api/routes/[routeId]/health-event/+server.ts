@@ -9,59 +9,58 @@
  */
 
 import {
-    createHealthEvent: getHealthEvents,
-    getRouteMetadata,$1;$2} from '$lib/db/queries/nes-command-center';
+    createHealthEvent,
+    getHealthEvents,
+    getRouteMetadata
+} from '$lib/db/queries/nes-command-center';
 import { error, json } from '@sveltejs/kit';
 import { broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
+interface NewRouteHealthEvent {
+  routeId: string;
+  oldStatus: string;
+  newStatus: string;
+  reason?: string;
+}
 
 /**
  * POST /api/routes/:routeId/health-event
  *
  * Create a health event for a route
- *
- * Task 4.1: Implement POST /api/routes/:routeId/health-event
- * Task 10.2: Broadcast health changes via SSE
- * - Accept old_status, new_status, reason
- * - Validate route_id exists in route_metadata (return 409 if not)
- * - Create route_health_event record
- * - Update route_metadata status field
- * - Broadcast to all connected SSE clients
- * - Return created health event record
  */
 export const POST: RequestHandler = async ({ params, request }) => {
   const { routeId } = params;
 
   try {
-    // Parse request body
     const body = await request.json();
     const { old_status, new_status, reason } = body;
 
-    // Validate required fields
     if (!new_status) {
       return error(400, {
-        message: 'Missing required, field: new_status',
+        message: 'Missing required field: new_status',
       });
     }
 
-    // Validate route exists
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(409, {
-        message: `Route ${ routeId } not found in route_metadata`,
+        message: 'Route ' + routeId + ' not found in route_metadata',
       });
     }
 
-    // Create health event
-    const healthEventData: NewRouteHealthEvent = { routeId: oldStatus, old_status || route?.status ?? 'unknown',
-      newStatus: new_status ?? null,
+    const healthEventData: NewRouteHealthEvent = {
+      routeId,
+      oldStatus: old_status || (route?.status ?? 'unknown'),
+      newStatus: new_status,
+      reason: reason ?? undefined,
     };
 
     const healthEvent = await createHealthEvent(healthEventData);
 
-    // Broadcast to all connected SSE clients (Task 10.2)
-    broadcastHealthChange({ routeId: oldStatus, healthEventData.oldStatus,
+    broadcastHealthChange({
+      routeId,
+      oldStatus: healthEventData.oldStatus,
       newStatus: healthEventData.newStatus,
       timestamp: new Date().toISOString(),
       reason: healthEventData?.reason ?? undefined,
@@ -69,7 +68,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
     return json(healthEvent, { status: 201 });
   } catch (err) {
-    console.error('[POST /api/routes/: routeId/health-event], Error:', err);
+    console.error('[POST /api/routes/' + routeId + '/health-event] Error:', err);
     return error(500, {
       message: 'Failed to create health event',
     });
@@ -80,42 +79,34 @@ export const POST: RequestHandler = async ({ params, request }) => {
  * GET /api/routes/:routeId/health-history
  *
  * Get health event history for a route
- *
- * Task 4.2: Implement GET /api/routes/:routeId/health-history
- * - Accept limit, offset query parameters
- * - Query route_health_event for route_id
- * - Order by timestamp descending
- * - Return paginated results with total count
  */
 export const GET: RequestHandler = async ({ params, url }) => {
   const { routeId } = params;
 
   try {
-    // Parse query parameters
     const limit = parseInt(url.searchParams.get('limit') ?? '50');
     const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
-    // Validate route exists
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(404, {
-        message: `Route ${ routeId } not found`,
+        message: 'Route ' + routeId + ' not found',
       });
     }
 
-    // Get health events
     const result = await getHealthEvents(routeId, { limit, offset });
 
     return json({
       events: result.events,
-      pagination: {total: result.total,
+      pagination: {
+        total: result.total,
         limit: result.limit,
         offset: result.offset,
         hasMore: result.offset + result.limit < result.total,
       },
     });
   } catch (err) {
-    console.error('[GET /api/routes/: routeId/health-history], Error:', err);
+    console.error('[GET /api/routes/' + routeId + '/health-history] Error:', err);
     return error(500, {
       message: 'Failed to fetch health events',
     });

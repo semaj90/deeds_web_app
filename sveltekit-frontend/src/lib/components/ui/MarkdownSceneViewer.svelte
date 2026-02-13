@@ -3,7 +3,7 @@
 	 * MarkdownSceneViewer Component
 	 * Renders AI-generated scene summaries for human validation
 	 */
-	import marked from 'marked';
+	import { marked } from 'marked';
 
 	// Define type locally since not exported from ui-store
 	interface MarkdownScene {

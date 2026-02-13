@@ -149,7 +149,7 @@ export class RAGRetriever {
 				limit: topK,
 				with_payload: true,
 				score_threshold: this.config.similarityThreshold
-			},
+			}),
 	signal: AbortSignal.timeout(10000)
 		});
 

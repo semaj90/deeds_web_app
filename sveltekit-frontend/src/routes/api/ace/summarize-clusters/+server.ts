@@ -13,16 +13,19 @@ import type { RequestHandler } from './$types';
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 
-interface CollectionSummary { collection: string, points: number;
-  summary: string, tags: string[];
+interface CollectionSummary {
+  collection: string;
+  points: number;
+  summary: string;
+  tags: string[];
   summarized_at: string;
 }
 
-async function getCollectionInfo(name: string): Promise<{ points_count, number } | null> {
+async function getCollectionInfo(name: string): Promise<{ points_count: number } | null> {
   try {
     const response = await fetch(`${QDRANT_URL}/collections/${ name }`);
     if (!response.ok) return null;
-    const data = await response.json() as { result: { points_count, number } };
+    const data = await response.json() as { result: { points_count: number } };
     return { points_count: data.result.points_count };
   } catch {
     return null;
@@ -67,7 +70,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // Get all collections
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
-    const listData = await listResponse.json() as { result: { collections: Array<{ name, string }> } };
+    const listData = await listResponse.json() as { result: { collections: Array<{ name: string }> } };
 
     let targetCollections = listData.result.collections.map(c => c.name);
     if (body.collections?.length) {
@@ -76,7 +79,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const summaries: CollectionSummary[] = [];
 
-    for (const collectionName of targetCollections.slice(0: body?.limit ?? 30)) {
+    for (const collectionName of targetCollections.slice(0, body?.limit ?? 30)) {
       const info = await getCollectionInfo(collectionName);
       if (!info || info.points_count === 0) continue;
 
@@ -89,7 +92,8 @@ export const POST: RequestHandler = async ({ request }) => {
       const result: CollectionSummary = {
         collection: collectionName,
         points: info.points_count,
-        summary: tags,
+        summary,
+        tags,
         summarized_at: new Date().toISOString()
       };
 
@@ -132,7 +136,7 @@ export const GET: RequestHandler = async () => {
     }>('llm_summaries', { type: 'llm_summary', source_type: 'cluster' }, { limit: 100 });
 
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
-    const listData = await listResponse.json() as { result: { collections: Array<{ name, string }> } };
+    const listData = await listResponse.json() as { result: { collections: Array<{ name: string }> } };
 
     return json({
       collections: listData.result.collections.length,

@@ -154,7 +154,7 @@ export const GET: RequestHandler = async () => {
  status: overallStatus,
  timestamp: new Date().toISOString(),
  ocr: ocrHealth,
- metadata: { checkDuration: environment, process.env?.NODE_ENV ?? 'development',
+ metadata: { checkDuration, environment: process.env?.NODE_ENV ?? 'development',
  },
  };
 
@@ -184,7 +184,7 @@ export const GET: RequestHandler = async () => {
  timestamp: new Date().toISOString(),
  error: 'OCR health check system failure',
  message: getErrorMessage(err),
- metadata: { checkDuration: environment, process.env?.NODE_ENV ?? 'development',
+ metadata: { checkDuration, environment: process.env?.NODE_ENV ?? 'development',
  },
  },
  {

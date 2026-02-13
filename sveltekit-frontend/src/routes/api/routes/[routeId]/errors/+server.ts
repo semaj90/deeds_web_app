@@ -9,15 +9,14 @@
  */
 
 import {
-    createErrorCluster: createHealthEvent,
-    getErrorClusterCount: getErrorClusters,
-    getRouteMetadata: updateRouteMetadata,
+    createErrorCluster, createHealthEvent,
+    getErrorClusterCount, getErrorClusters,
+    getRouteMetadata, updateRouteMetadata,
 } from '$lib/db/queries/nes-command-center.js';
 import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
 import { error, json } from '@sveltejs/kit';
 import { broadcastErrorCountChange, broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * POST /api/routes/:routeId/errors
@@ -57,7 +56,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     }
 
     // Create error cluster
-    const errorClusterData: NewErrorCluster = { routeId: tool, body.tool,
+    const errorClusterData: NewErrorCluster = { routeId, tool: body.tool,
       code: body.code,
       message: body.message,
       severity: body.severity,
@@ -81,16 +80,16 @@ export const POST: RequestHandler = async ({ params, request }) => {
     // Update route status if changed
     const oldStatus = route?.status ?? 'healthy';
     if (oldStatus !== newStatus) {
-      await updateRouteMetadata(routeId, { status, newStatus });
+      await updateRouteMetadata(routeId, { status: newStatus });
 
       await createHealthEvent({
-        routeId: oldStatus,
+        routeId, oldStatus,
         newStatus,
         reason: 'error_cluster_created',
       });
 
       broadcastHealthChange({
-        routeId: oldStatus,
+        routeId, oldStatus,
         newStatus,
         timestamp: new Date().toISOString(),
         reason: 'error_cluster_created',
@@ -104,8 +103,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
     // Broadcast error count change via SSE
     broadcastErrorCountChange({
-      routeId: errorCount,
-      warningCount: infoCount,
+      routeId, errorCount,
+      warningCount, infoCount,
       timestamp: new Date().toISOString(),
     });
 
@@ -157,7 +156,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
     return json({
       data: filtered,
-      total: limit,
+      total, limit,
       offset,
     });
   } catch (err) {

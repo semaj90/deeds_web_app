@@ -1,6 +1,5 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Phase 89: Components API Endpoint
 // Returns component analysis data with CrewAI agentic metadata
@@ -71,7 +70,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			// Ignore
 		}
 
-		return json({ components: stats: { totalComponents: components.length,
+		return json({ components, stats: { totalComponents: components.length,
 				totalErrors,
 				totalFiles: new Set(components.map(c => c.file_path)).size,
 				lastIndexed: components[0]?.indexed_at ?? '',

@@ -13,7 +13,7 @@ import { getRAGRetriever } from '$lib/services/error-analysis/RAGRetriever';
 import type { ErrorContext, ErrorReport } from '$lib/services/error-analysis/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -47,8 +47,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		const confidence = policy.computeConfidence(embedding, similarErrors);
 
 		// Get fix strategies from similar errors
-.flatMap(se => se.fixStrategies)
-			.filter((s, i, arr) => arr.findIndex(x => x.id === s.id) === i);
+		const strategies = similarErrors
+			.flatMap((se: any) => se.fixStrategies ?? [])
+			.filter((s: any, i: number, arr: any[]) => arr.findIndex(x => x.id === s.id) === i);
 
 		// Rank strategies
 		const errorContext: ErrorContext = {
@@ -60,13 +61,16 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: true,
-			analysis: { error: embedding.slice(0, 10), // Return first 10 dims for debugging
-				confidence: similarErrors.map(se => ({
+			analysis: {
+				embeddingPreview: embedding.slice(0, 10),
+				confidence,
+				similarErrors: similarErrors.map((se: any) => ({
 					id: se.id,
 					similarity: se.similarity,
 					successRate: se.successRate
 				})).slice(0, 5),
-				rootCause: strategies.slice(0, 5).map(s => ({
+				rootCause,
+				strategies: rankedStrategies.slice(0, 5).map((s: any) => ({
 					id: s.id,
 					description: s.description,
 					confidence: s.confidence,
