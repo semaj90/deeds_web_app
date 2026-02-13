@@ -42,6 +42,21 @@ const esbuildCommonJsResolverPatch = {
   },
 };
 
+// Stub out native .node addons (canvas, etc.) that can't be bundled by Rollup
+const stubNativeAddons = {
+  name: 'stub-native-addons',
+  resolveId(id) {
+    if (id.endsWith('.node') || id.includes('canvas.node')) {
+      return { id: '\0native-addon-stub', external: false };
+    }
+  },
+  load(id) {
+    if (id === '\0native-addon-stub') {
+      return 'export default {};';
+    }
+  },
+};
+
 // Strip dashed define keys that cause esbuild errors
 const stripDashedDefineKeys = {
   name: 'strip-dashed-define-keys',
@@ -108,6 +123,7 @@ export default defineConfig(({ mode }) => {
       SVELTEKIT_dev: mode === 'development' ? 'true' : 'false',
     },
     plugins: [
+      stubNativeAddons,
       stripDashedDefineKeys,
       goHMRBridge(),
       goModuleGraph(),
@@ -274,6 +290,9 @@ export default defineConfig(({ mode }) => {
       define: {},
     },
     clearScreen: false,
+    ssr: {
+      external: ['canvas', '@napi-rs/canvas'],
+    },
     resolve: {
       alias: {
         __SERVER__: serverInternals,

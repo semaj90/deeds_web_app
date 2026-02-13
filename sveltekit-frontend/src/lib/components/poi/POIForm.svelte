@@ -1,14 +1,7 @@
 <script lang="ts">
   import { zodClient } from 'sveltekit-superforms/adapters';
-  import superForm from 'sveltekit-superforms';
+  import { superForm } from 'sveltekit-superforms';
   import { z } from 'zod';
-
-  interface Props {
-    poi?: Record<string, unknown> | null;
-    onSubmit?: ((formData: FormData) => Promise<void>) | null;
-  }
-
-  let { poi = null, onSubmit = null }: Props = $props();
 
   const poiSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -24,17 +17,15 @@
     physicalDescription: z.string().optional()
   });
 
-  // Use a function to get current poi value
-  const getInitialData = () => poi || {};
+  interface Props {
+    formData: any;
+  }
 
-  const { form, errors, enhance, submitting } = superForm(getInitialData(),
-	{
+  let { formData }: Props = $props();
+
+  const { form, errors, enhance, submitting, message } = superForm(formData, {
     validators: zodClient(poiSchema),
-    onSubmit: async ({ formData }) => {
-      if (onSubmit) {
-        await onSubmit(formData);
-      }
-    }
+    resetForm: false
   });
 
   const statusOptions = [

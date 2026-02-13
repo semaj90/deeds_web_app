@@ -850,7 +850,6 @@
     "glob": "11.0.3",
     "inquirer": "^12.9.3",
     "jscodeshift": "^17.3.0",
-    "jsdom": "25.0.1",
     "lokijs": "1.5.12",
     "mode-watcher": "^1.1.0",
     "msw": "^2.11.2",
@@ -928,6 +927,7 @@
     "@upstash/redis": "^1.35.6",
     "bcryptjs": "3.0.3",
     "bindings": "1.5.0",
+    "canvas": "*",
     "cheerio": "1.1.2",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
@@ -976,7 +976,8 @@
     "uuid": "^10.0.0",
     "vitest": "^3.2.4",
     "ws": "^8.18.3",
-    "xstate": "5.24.0"
+    "xstate": "5.24.0",
+    "jsdom": "25.0.1"
   },
   "exports": {
     ".": {
