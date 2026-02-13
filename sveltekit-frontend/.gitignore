@@ -57,3 +57,6 @@ svelte-check-current.json
 reports/
 .kiro/backup-consolidation-manifest*.json
 .kiro/*.sh
+
+# Quarantined vendored C++ libraries (too large for git)
+_archived/native-simdjson/src/native/simdjson-addon/simdjson/

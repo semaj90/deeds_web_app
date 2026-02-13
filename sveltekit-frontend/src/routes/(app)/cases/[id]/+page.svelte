@@ -3,16 +3,12 @@
 	import { page } from '$app/state';
 	import CaseNotesEditor from '$lib/components/cases/CaseNotesEditor.svelte';
 	import ContextualChatModal from '$lib/components/cases/ContextualChatModal.svelte';
+	import CitationSaveModal from '$lib/components/legal-ai/CitationSaveModal.svelte';
 	import { onMount } from "svelte";
-// Evidence components temporarily disabled for core build
- // TODO: Re-enable after de-minification tool runs
 import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
 import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
-// import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
- // import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
  import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
- // Migrated to $effect
 
  const cache = useCache();
 
@@ -41,11 +37,38 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  let isExportingPacket = $state(false);
  let exportPacketError = $state('');
 
+ // Citation & Statute state
+ interface CitationLink {
+   id: string;
+   linkType: string;
+   notes: string | null;
+   createdAt: string;
+   citationId: string | null;
+   citationText: string | null;
+   sourceUrl: string | null;
+ }
+ interface StatuteLink {
+   id: string;
+   linkType: string;
+   notes: string | null;
+   createdAt: string;
+   statuteId: string | null;
+   statuteTitle: string | null;
+   statuteSection: string | null;
+   statuteJurisdiction: string | null;
+ }
+ let citations = $state<CitationLink[]>([]);
+ let statutes = $state<StatuteLink[]>([]);
+ let isLoadingCitations = $state(false);
+ let isLoadingStatutes = $state(false);
+ let showCitationModal = $state(false);
+ let activeTab = $state<'evidence' | 'citations'>('evidence');
+
  const caseId = page.params.id;
 
  onMount(async () => {
  await loadCase();
- await loadEvidence();
+ await Promise.all([loadEvidence(), loadCitations(), loadStatutes()]);
  });
 
  const loadCase = async () => {
@@ -113,6 +136,38 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  } finally {
  isLoading = false;
  }
+ };
+
+ const loadCitations = async () => {
+   isLoadingCitations = true;
+   try {
+     const response = await fetch(`/api/cases/${caseId}/citations`);
+     if (!response.ok) throw new Error('Failed to load citations');
+     const data = await response.json();
+     citations = data.data ?? [];
+   } catch (err) {
+     console.error('Failed to load citations:', err);
+   } finally {
+     isLoadingCitations = false;
+   }
+ };
+
+ const loadStatutes = async () => {
+   isLoadingStatutes = true;
+   try {
+     const response = await fetch(`/api/cases/${caseId}/laws`);
+     if (!response.ok) throw new Error('Failed to load statutes');
+     const data = await response.json();
+     statutes = data.data ?? [];
+   } catch (err) {
+     console.error('Failed to load statutes:', err);
+   } finally {
+     isLoadingStatutes = false;
+   }
+ };
+
+ const handleCitationSaved = async () => {
+   await loadCitations();
  };
 
  const handleFileUpload = async (event: Event) => {
@@ -314,6 +369,13 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  <ContextualChatModal {caseId} onClose={() => showChatModal = false} />
  </NesModal>
 
+ <!-- Citation Save Modal -->
+ <CitationSaveModal
+   isOpen={showCitationModal}
+   {caseId}
+   onsaved={handleCitationSaved}
+ />
+
  <!-- Main Content -->
  <main class="max-w-7xl mx-auto px-4 py-8">
  {#if error}
@@ -323,15 +385,32 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  {/if}
 
  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
- <!-- Left, Upload & Evidence List -->
+ <!-- Left Column: Tabs for Evidence / Citations -->
  <div class="lg:col-span-2 space-y-6">
+ <!-- Tab Navigation -->
+ <div class="flex border-b border-gray-200 bg-white rounded-t-lg shadow px-4">
+   <button
+     onclick={() => (activeTab = 'evidence')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'evidence' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Evidence ({evidence.length})
+   </button>
+   <button
+     onclick={() => (activeTab = 'citations')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'citations' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Citations & Laws ({citations.length + statutes.length})
+   </button>
+ </div>
+
+ {#if activeTab === 'evidence'}
  <!-- Upload Section -->
  <div class="bg-white rounded-lg shadow p-6">
  <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload Evidence</h2>
 
  <label class="block">
  <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition">
- <p class="text-gray-600 mb-2">📄 Click to upload or drag and drop</p>
+ <p class="text-gray-600 mb-2">Click to upload or drag and drop</p>
  <p class="text-sm text-gray-500">PDF, images, documents</p>
  <input
  type="file"
@@ -363,7 +442,7 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  onclick={() => (selectedEvidence = item)}
  class={`w-full text-left p-4 rounded-lg border-2 transition ${selectedEvidence?.id === item.id
  ? 'border-blue-500 bg-blue-50'
-  : 'border-gray-200, hover:border-gray-300'}`}
+  : 'border-gray-200 hover:border-gray-300'}`}
  >
  <div class="flex items-start justify-between">
  <div>
@@ -387,6 +466,86 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  </div>
  {/if}
  </div>
+
+ {:else}
+ <!-- Citations & Laws Tab -->
+ <div class="bg-white rounded-lg shadow p-6">
+   <div class="flex items-center justify-between mb-4">
+     <h2 class="text-lg font-semibold text-gray-900">Citations</h2>
+     <button
+       onclick={() => (showCitationModal = true)}
+       class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
+     >
+       + Add Citation
+     </button>
+   </div>
+
+   {#if isLoadingCitations}
+     <p class="text-gray-600">Loading citations...</p>
+   {:else if citations.length === 0}
+     <p class="text-gray-500 text-sm">No citations linked to this case yet.</p>
+   {:else}
+     <div class="space-y-3">
+       {#each citations as cite (cite.id)}
+         <div class="p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition">
+           <div class="flex items-start justify-between">
+             <div class="flex-1">
+               <p class="font-medium text-gray-900">{cite.citationText || 'Untitled citation'}</p>
+               {#if cite.sourceUrl}
+                 <a href={cite.sourceUrl} target="_blank" rel="noopener" class="text-sm text-blue-600 hover:underline mt-1 block">
+                   {cite.sourceUrl}
+                 </a>
+               {/if}
+             </div>
+             <span class="px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 ml-2 whitespace-nowrap">
+               {cite.linkType}
+             </span>
+           </div>
+           {#if cite.notes}
+             <p class="text-sm text-gray-500 mt-2">{cite.notes}</p>
+           {/if}
+         </div>
+       {/each}
+     </div>
+   {/if}
+ </div>
+
+ <!-- Statutes / Laws -->
+ <div class="bg-white rounded-lg shadow p-6">
+   <h2 class="text-lg font-semibold text-gray-900 mb-4">Applicable Laws</h2>
+
+   {#if isLoadingStatutes}
+     <p class="text-gray-600">Loading statutes...</p>
+   {:else if statutes.length === 0}
+     <p class="text-gray-500 text-sm">No statutes linked to this case yet.</p>
+   {:else}
+     <div class="space-y-3">
+       {#each statutes as statute (statute.id)}
+         <div class="p-4 rounded-lg border border-gray-200 hover:border-amber-300 transition">
+           <div class="flex items-start justify-between">
+             <div class="flex-1">
+               <p class="font-medium text-gray-900">{statute.statuteTitle || 'Untitled statute'}</p>
+               {#if statute.statuteSection}
+                 <p class="text-sm text-gray-600 mt-1">{statute.statuteSection}</p>
+               {/if}
+               {#if statute.statuteJurisdiction}
+                 <p class="text-xs text-gray-400 mt-1">{statute.statuteJurisdiction}</p>
+               {/if}
+             </div>
+             <span class="px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 ml-2 whitespace-nowrap">
+               {statute.linkType}
+             </span>
+           </div>
+           {#if statute.notes}
+             <p class="text-sm text-gray-500 mt-2">{statute.notes}</p>
+           {/if}
+         </div>
+       {/each}
+     </div>
+   {/if}
+ </div>
+ {/if}
+
  </div>
 
  <!-- Right, Preview & Summary -->
@@ -436,6 +595,14 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  <div class="flex justify-between">
  <span class="text-gray-600">Approved</span>
  <span class="font-medium text-green-600">{getApprovedCount()}</span>
+ </div>
+ <div class="flex justify-between">
+ <span class="text-gray-600">Citations</span>
+ <span class="font-medium text-blue-600">{citations.length}</span>
+ </div>
+ <div class="flex justify-between">
+ <span class="text-gray-600">Statutes</span>
+ <span class="font-medium text-amber-600">{statutes.length}</span>
  </div>
  </div>
  </div>

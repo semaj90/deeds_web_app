@@ -1,6 +1,6 @@
 <script lang="ts">
   import { zodClient } from 'sveltekit-superforms/adapters';
-  import { superForm } from 'sveltekit-superforms';
+  import superForm from 'sveltekit-superforms';
   import { z } from 'zod';
 
   const poiSchema = z.object({

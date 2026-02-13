@@ -291,7 +291,7 @@ export default defineConfig(({ mode }) => {
     },
     clearScreen: false,
     ssr: {
-      external: ['canvas', '@napi-rs/canvas'],
+      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm'],
     },
     resolve: {
       alias: {

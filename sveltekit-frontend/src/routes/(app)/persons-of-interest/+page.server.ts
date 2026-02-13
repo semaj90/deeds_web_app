@@ -1,19 +1,38 @@
+import { db } from '$lib/server/db/client';
+import { personsOfInterest } from '$lib/server/db/schema-postgres';
+import { desc, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types.js';
 
-export const load: PageServerLoad = async ({ locals, url }) => {
-  // Get case ID from query params or session
-  const caseId = url.searchParams.get('caseId') || (locals as any).caseId;
+export const load: PageServerLoad = async ({ url }) => {
+	const caseId = url.searchParams.get('caseId') || null;
 
-  if (!caseId) {
-    // Return null instead of throwing to allow UI to handle empty state
-    return {
-      caseId: null
-    };
-  }
+	try {
+		const query = caseId
+			? db.select().from(personsOfInterest).where(eq(personsOfInterest.caseId, caseId))
+			: db.select().from(personsOfInterest);
 
-  return {
-    caseId,
-  };
+		const pois = await query.orderBy(desc(personsOfInterest.createdAt)).limit(100);
+
+		return {
+			caseId,
+			pois: pois.map((p) => ({
+				id: p.id,
+				name: p.name,
+				status: p.status,
+				threatLevel: p.threatLevel,
+				description: p.description,
+				lastLocation: p.lastLocation,
+				caseId: p.caseId,
+				createdAt: p.createdAt?.toISOString() ?? '',
+				updatedAt: p.updatedAt?.toISOString() ?? ''
+			}))
+		};
+	} catch (error) {
+		console.error('Failed to load POIs:', error);
+		return {
+			caseId,
+			pois: [],
+			error: 'Failed to load persons of interest'
+		};
+	}
 };
-
-

@@ -2,6 +2,21 @@
 
 ---
 
+## ⚠️ IDE Linter Reverts File Edits (February 13, 2026)
+
+**Problem**: VS Code ESLint/Prettier auto-reformats files on disk change, reverting Claude Edit tool changes. NOT caused by AST fixer scripts.
+
+**Workarounds (in order of reliability):**
+1. **Write tool** for full file rewrites — linter reformats style only, not logic
+2. **Bash `cat >>`** for appending exports/functions to end of file
+3. **Bash `sed -i`** for targeted single-line replacements
+4. **Re-read after Edit** to verify changes survived linter pass
+5. **Batch edits** into single Write instead of multiple Edit calls
+
+**Detection**: System reminders saying "file was modified by user or linter" after Edit tool = linter reverted. Re-apply with Write or Bash.
+
+---
+
 ## 🚀 February 8, 2026 – Production-Ready Legal AI Platform Guide
 
 ### 📚 Architecture Overview

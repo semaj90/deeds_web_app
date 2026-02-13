@@ -1,49 +1,20 @@
 <script lang="ts">
-	import { poiService } from '$lib/services/poi';
-	import type { PersonOfInterest } from '$lib/types/poi';
-
-	// Props
 	let { data } = $props();
 
-	// State
-	let pois = $state<PersonOfInterest[]>([]);
-	let loading = $state(false);
-	let error = $state<string | null>(null);
 	let searchQuery = $state('');
-	let selectedStatus = $state<string>('');
-	let selectedPriority = $state<string>('');
+	let selectedStatus = $state('');
+	let selectedThreatLevel = $state('');
 
-	// Reactive filtered list
 	let filtered = $derived(
-		pois.filter((poi) => {
+		(data.pois ?? []).filter((poi: any) => {
 			const matchesSearch =
 				poi.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				poi.occupation?.toLowerCase().includes(searchQuery.toLowerCase());
+				poi.description?.toLowerCase().includes(searchQuery.toLowerCase());
 			const matchesStatus = !selectedStatus || poi.status === selectedStatus;
-			const matchesPriority = !selectedPriority || poi.priority === selectedPriority;
-			return matchesSearch && matchesStatus && matchesPriority;
+			const matchesThreat = !selectedThreatLevel || poi.threatLevel === selectedThreatLevel;
+			return matchesSearch && matchesStatus && matchesThreat;
 		})
 	);
-
-	// Load POIs when caseId is available
-	$effect(() => {
-		if (data.caseId) {
-			loadPOIs();
-		}
-	});
-
-	async function loadPOIs() {
-		loading = true;
-		error = null;
-		try {
-			const response = await poiService.listPOIs(data.caseId);
-			pois = response.pois;
-		} catch (err) {
-			error = err instanceof Error ? err.message : 'Failed to load POIs';
-		} finally {
-			loading = false;
-		}
-	}
 
 	function getStatusColor(status: string): string {
 		const colors: Record<string, string> = {
@@ -51,39 +22,43 @@
 			witness: '#3b82f6',
 			suspect: '#f59e0b',
 			victim: '#8b5cf6',
-			informant: '#10b981'
+			informant: '#10b981',
+			surveillance: '#f59e0b',
+			wanted: '#dc2626',
+			active: '#3b82f6',
+			cleared: '#10b981'
 		};
 		return colors[status] || '#6b7280';
 	}
 
-	function getPriorityColor(priority: string): string {
+	function getThreatColor(level: string): string {
 		const colors: Record<string, string> = {
 			low: '#10b981',
 			medium: '#f59e0b',
 			high: '#ef4444',
-			critical: '#dc2626'
+			critical: '#dc2626',
+			extreme: '#7c2d12'
 		};
-		return colors[priority] || '#6b7280';
+		return colors[level] || '#6b7280';
 	}
 </script>
 
 <div class="poi-list-page">
 	<div class="page-header">
 		<h1>Persons of Interest</h1>
-		<a href="/persons-of-interest/create" class="btn-create">+ New POI</a>
+		<a href="/persons-of-interest/create{data.caseId ? `?caseId=${data.caseId}` : ''}" class="btn-create">+ New POI</a>
 	</div>
 
-	{#if error}
+	{#if data.error}
 		<div class="error-banner">
-			<p>{error}</p>
-			<button onclick={() => loadPOIs()}>Retry</button>
+			<p>{data.error}</p>
 		</div>
 	{/if}
 
 	<div class="filters">
 		<input
 			type="text"
-			placeholder="Search by name or occupation..."
+			placeholder="Search by name or description..."
 			bind:value={searchQuery}
 			class="search-input"
 		/>
@@ -95,10 +70,14 @@
 			<option value="suspect">Suspect</option>
 			<option value="victim">Victim</option>
 			<option value="informant">Informant</option>
+			<option value="surveillance">Surveillance</option>
+			<option value="wanted">Wanted</option>
+			<option value="active">Active</option>
+			<option value="cleared">Cleared</option>
 		</select>
 
-		<select bind:value={selectedPriority} class="filter-select">
-			<option value="">All Priorities</option>
+		<select bind:value={selectedThreatLevel} class="filter-select">
+			<option value="">All Threat Levels</option>
 			<option value="low">Low</option>
 			<option value="medium">Medium</option>
 			<option value="high">High</option>
@@ -106,17 +85,10 @@
 		</select>
 	</div>
 
-	{#if loading}
-		<div class="loading">Loading POIs...</div>
-	{:else if !data.caseId}
-		<div class="empty-state">
-			<p>Please select a case to view Persons of Interest</p>
-			<a href="/cases" class="btn-primary">View Cases</a>
-		</div>
-	{:else if filtered.length === 0}
+	{#if filtered.length === 0}
 		<div class="empty-state">
 			<p>No persons of interest found</p>
-			<a href="/persons-of-interest/create?caseId={data.caseId}" class="btn-primary">Create First POI</a>
+			<a href="/persons-of-interest/create{data.caseId ? `?caseId=${data.caseId}` : ''}" class="btn-primary">Create First POI</a>
 		</div>
 	{:else}
 		<div class="poi-grid">
@@ -128,26 +100,23 @@
 							<span class="badge status" style="background-color: {getStatusColor(poi.status)}">
 								{poi.status.replace(/_/g, ' ')}
 							</span>
-							<span class="badge priority" style="background-color: {getPriorityColor(poi.priority)}">
-								{poi.priority}
+							<span class="badge threat" style="background-color: {getThreatColor(poi.threatLevel)}">
+								{poi.threatLevel}
 							</span>
 						</div>
 					</div>
 
 					<div class="card-body">
-						{#if poi.occupation}
-							<p><strong>Occupation:</strong> {poi.occupation}</p>
+						{#if poi.description}
+							<p class="description">{poi.description}</p>
 						{/if}
-						{#if poi.lastKnownLocation}
-							<p><strong>Last Known:</strong> {poi.lastKnownLocation}</p>
-						{/if}
-						{#if poi.email}
-							<p><strong>Email:</strong> {poi.email}</p>
+						{#if poi.lastLocation}
+							<p><strong>Last Location:</strong> {poi.lastLocation}</p>
 						{/if}
 					</div>
 
 					<div class="card-footer">
-						<span class="threat-level" style="color: {getPriorityColor(poi.threatLevel)}">
+						<span class="threat-level" style="color: {getThreatColor(poi.threatLevel)}">
 							Threat: {poi.threatLevel}
 						</span>
 						<span class="date">
@@ -201,18 +170,6 @@
 		border-radius: 0.375rem;
 		color: #fecaca;
 		margin-bottom: 1.5rem;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.error-banner button {
-		padding: 0.5rem 1rem;
-		background: #dc2626;
-		color: #ffffff;
-		border: none;
-		border-radius: 0.25rem;
-		cursor: pointer;
 	}
 
 	.filters {
@@ -241,12 +198,6 @@
 	.filter-select:focus {
 		outline: none;
 		border-color: #dc2626;
-	}
-
-	.loading {
-		text-align: center;
-		color: #9ca3af;
-		padding: 2rem;
 	}
 
 	.empty-state {
@@ -322,6 +273,13 @@
 		margin: 0.5rem 0;
 		color: #d1d5db;
 		font-size: 0.875rem;
+	}
+
+	.card-body .description {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 	}
 
 	.card-body strong {
