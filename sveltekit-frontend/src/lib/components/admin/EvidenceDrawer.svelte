@@ -113,8 +113,8 @@
 	}
 </script>
 
-<div class="drawer-overlay" class:open={ isOpen } onclick={() => !isSaving && onClose()}>
-	<div class="drawer" class:open={ isOpen } onclick={(e) => e.stopPropagation()}>
+<div class="drawer-overlay" class:open={ isOpen } onclick={() => !isSaving && onClose()} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!isSaving) onClose(); } }} role="button" tabindex="0">
+	<div class="drawer" class:open={ isOpen } onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()} role="presentation">
 		{#if isLoading}
 			<div class="drawer-loading">
 				<div class="spinner"></div>
@@ -134,31 +134,31 @@
 					<h3>File Information</h3>
 					<div class="info-grid">
 						<div class="info-item">
-							<label>File ID</label>
+							<span class="info-label">File ID</span>
 							<code>{data!.id}</code>
 						</div>
 						<div class="info-item">
-							<label>File Type</label>
+							<span class="info-label">File Type</span>
 							<span>{data!.file_type.toUpperCase()}</span>
 						</div>
 						<div class="info-item">
-							<label>File Size</label>
+							<span class="info-label">File Size</span>
 							<span>{formatFileSize(data!.file_size)}</span>
 						</div>
 						<div class="info-item">
-							<label>Chunks</label>
+							<span class="info-label">Chunks</span>
 							<span>{data!.chunk_count}</span>
 						</div>
 						<div class="info-item">
-							<label>Created</label>
+							<span class="info-label">Created</span>
 							<span>{formatDate(data!.created_at)}</span>
 						</div>
 						<div class="info-item">
-							<label>Updated</label>
+							<span class="info-label">Updated</span>
 							<span>{formatDate(data!.updated_at)}</span>
 						</div>
 						<div class="info-item">
-							<label>MinIO Path</label>
+							<span class="info-label">MinIO Path</span>
 							<code class="path">{data!.minio_path}</code>
 						</div>
 					</div>
@@ -272,8 +272,8 @@
 
 			<!-- Delete Confirmation Modal -->
 			{#if showDeleteConfirm}
-				<div class="modal-overlay" onclick={() => (showDeleteConfirm = false)}>
-					<div class="modal" onclick={(e) => e.stopPropagation()}>
+				<div class="modal-overlay" onclick={() => (showDeleteConfirm = false)} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showDeleteConfirm = false; } }} role="button" tabindex="0">
+					<div class="modal" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()} role="presentation">
 						<h3>Delete Evidence?</h3>
 						<p>This action cannot be undone. All chunks and embeddings will be deleted.</p>
 						<div class="modal-buttons">
@@ -444,7 +444,7 @@
 	gap: 0.25rem;
 	}
 
-	.info-item label {
+	.info-item .info-label {
 		font-size: 0.8rem;
 	color: #999;
 		text-transform: uppercase;

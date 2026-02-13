@@ -16,7 +16,7 @@ function getAdminDatabaseUrl(): string {
 // Create merged schema object
 const mergedSchema = { ...schema, canvasAutosaves };
 
-const pool = new Pool({ connectionString: getDatabaseUrl() });
+export const pool = new Pool({ connectionString: getDatabaseUrl() });
 pool.on('error', (err) => {
 	console.error('Database pool error (non-fatal):', err.message);
 });

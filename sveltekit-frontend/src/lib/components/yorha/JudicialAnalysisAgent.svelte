@@ -181,10 +181,10 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  <div class="lg col-span-1 space-y-6">
  <!-- Case Details -->
  <div>
- <label class="block text-sm font-medium text-slate-300 mb-2">
+ <label for="jurisdiction-select" class="block text-sm font-medium text-slate-300 mb-2">
  Jurisdiction
  </label>
- <select
+ <select id="jurisdiction-select"
  bind:value={ jurisdiction }
  class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
  >
@@ -196,9 +196,9 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
 
  <!-- Charges -->
  <div>
- <label class="block text-sm font-medium text-slate-300 mb-2">
+ <span class="block text-sm font-medium text-slate-300 mb-2">
  Charges/Allegations
- </label>
+ </span>
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-3 min-h-32">
  {#if charges.length === 0}
  <p class="text-slate-500 text-center py-8 text-sm">
@@ -218,9 +218,9 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
 
  <!-- Evidence Summary -->
  <div>
- <label class="block text-sm font-medium text-slate-300 mb-2">
+ <span class="block text-sm font-medium text-slate-300 mb-2">
  Evidence ({evidence.length} items)
- </label>
+ </span>
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-3 max-h-40 overflow-y-auto">
  {#if evidence.length === 0}
  <p class="text-slate-500 text-center py-4 text-sm">

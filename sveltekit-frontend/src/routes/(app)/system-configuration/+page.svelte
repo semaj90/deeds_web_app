@@ -382,7 +382,7 @@
   color: #cbd5e1;
  }
 
- select, input[type="text"], input[type="number"] { background: #0f172a;
+ select, input[type="text"] { background: #0f172a;
 		border: 1px solid #475569;
   color: white;
   padding: 0.5rem;

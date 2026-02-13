@@ -96,7 +96,7 @@
 
 {#if isOpen && tag}
   <div class="dialog-overlay" onclick={onClose} role="presentation">
-    <div class="dialog" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+    <div class="dialog" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" tabindex="-1">
       <!-- Header -->
       <header class="dialog-header">
         <div class="header-icon">

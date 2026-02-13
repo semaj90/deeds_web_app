@@ -439,11 +439,6 @@ margin: 0;
  font-weight: bold;
  }
 
- .status-indicator.active { background: #10b981;
-		color: #0d1117;
- box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
- }
-
  .status-indicator.inactive { background: #6b7280;
 		color: #f9fafb;
  }
@@ -469,8 +464,7 @@ cursor: pointer;
  transition: all 0.3s ease;
  }
 
- .scope-btn:hover,
- .scope-btn.active {
+ .scope-btn:hover {
  background: rgba(16, 185, 129, 0.2);
  border-color: #10b981;
  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
@@ -540,10 +534,6 @@ cursor: pointer;
 
  .search-btn:disabled { opacity: 0.6;
 		cursor:not-allowed;
- }
-
- .search-btn.searching {
- background: linear-gradient(90deg, #f59e0b, #fbbf24);
  }
 
  .loading-spinner { display: inline-block;

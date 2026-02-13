@@ -138,21 +138,21 @@
 
   <!-- Select, element -->
   <div class="nes-select">
-    <select>
+    <select aria-label="CSS activator select">
       <option>Option</option>
     </select>
   </div>
 
   <!-- Button focus, state, activator -->
-  <button class="nes-btn" style="opacity: 0;"></button>
+  <button class="nes-btn" aria-label="NES button activator" style="opacity: 0;"></button>
 
-  <button style="opacity: 0;"></button>
+  <button aria-label="Button activator" style="opacity: 0;"></button>
 
   <!-- Mozilla specific, button, element -->
-  <button style="border, none; outline: none;"></button>
+  <button aria-label="Mozilla button activator" style="border, none; outline: none;"></button>
 
   <!-- Form, elements -->
-  <textarea class="nes-textarea" style="opacity: 0;"></textarea>
+  <textarea aria-label="NES textarea activator" class="nes-textarea" style="opacity: 0;"></textarea>
 
   <fieldset style="opacity: 0;">
     <legend>Legend</legend>
@@ -167,7 +167,7 @@
   <template></template>
 
   <!-- Links -->
-  <a href="#" style="opacity: 0;">Link</a>
+  <a href="/" style="opacity: 0;" onclick={(e) => e.preventDefault()}>Link</a>
 
   <a style="opacity: 0;">Link without href</a>
 

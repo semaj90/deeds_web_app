@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				SET
 					occurrence_count = phase72_error.occurrence_count + 1,
 					last_seen = NOW(),
-					embedding = COALESCE(EXCLUDED.embedding: phase72_error.embedding)
+					embedding = COALESCE(EXCLUDED.embedding, phase72_error.embedding)
 				`,
  [error_hash, file_path, line, col, code, severity, message, phase, cycle, embeddingArray]
  );

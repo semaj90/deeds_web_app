@@ -170,6 +170,6 @@
 
 <style>
  :global(body) {
- @apply bg-gray-50;
+ background-color: #f9fafb;
  }
 </style>

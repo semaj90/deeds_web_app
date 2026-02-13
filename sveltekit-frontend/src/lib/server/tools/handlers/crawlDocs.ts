@@ -153,9 +153,11 @@ async function crawlDocsHandler(request: CrawlDocsRequest): Promise<ToolResult<C
   // Process in batches
   for (let i = 0; i < request.urls.length; i += maxConcurrent) {
     const batch = request.urls.slice(i, i + maxConcurrent);
-batch.map(urlConfig =>
-        crawlUrl(urlConfig.url, { timeout: userAgent, options.user_agent,
-          extractCode,
+    const results = await Promise.all(
+      batch.map(urlConfig =>
+        crawlUrl(urlConfig.url, {
+          timeout,
+          userAgent: options.user_agent,
           extractTables: extractTablesOpt,
           selectors: parsing.selectors
         })

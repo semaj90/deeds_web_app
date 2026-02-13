@@ -70,11 +70,11 @@ citations: Array<{ text: string; caseId?: string }>;
 
  <!-- Holding Section -->
  <div class="mb-6">
- <label class="block text-sm font-semibold text-gray-700 mb-2">
+ <label for="holding-textarea" class="block text-sm font-semibold text-gray-700 mb-2">
  Legal Holding
  </label>
  {#if showEditMode}
- <textarea
+ <textarea id="holding-textarea"
  bind:value={editedHolding}
  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  rows="3"
@@ -88,11 +88,11 @@ citations: Array<{ text: string; caseId?: string }>;
 
  <!-- Reasoning Section -->
  <div class="mb-6">
- <label class="block text-sm font-semibold text-gray-700 mb-2">
+ <label for="reasoning-textarea" class="block text-sm font-semibold text-gray-700 mb-2">
  Reasoning
  </label>
  {#if showEditMode}
- <textarea
+ <textarea id="reasoning-textarea"
  bind:value={editedReasoning}
  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  rows="4"
@@ -106,9 +106,9 @@ citations: Array<{ text: string; caseId?: string }>;
 
  <!-- Citations Section -->
  <div class="mb-6">
- <label class="block text-sm font-semibold text-gray-700 mb-2">
+ <span class="block text-sm font-semibold text-gray-700 mb-2">
  Citations
- </label>
+ </span>
  <div class="space-y-2">
  {#each editedCitations as citation, index (index)}
  <div class="flex items-center justify-between bg-blue-50 p-3 rounded border border-blue-200">
@@ -133,9 +133,9 @@ citations: Array<{ text: string; caseId?: string }>;
 
  <!-- Keywords Section -->
  <div class="mb-6">
- <label class="block text-sm font-semibold text-gray-700 mb-2">
+ <span class="block text-sm font-semibold text-gray-700 mb-2">
  Keywords
- </label>
+ </span>
  <div class="flex flex-wrap gap-2">
  {#each editedKeywords as keyword, index (index)}
  <div class="flex items-center gap-2 bg-gray-200 px-3 py-1 rounded-full">

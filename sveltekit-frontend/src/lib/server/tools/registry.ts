@@ -223,7 +223,7 @@ export interface ClusterTagResult {
 	id: number;
     size: number;
 	centroid_id: string;
-    summary?: string; tags, string[];
+    summary?: string; tags?: string[];
   }>;
   total_clusters: number;
 	noise_points: number;
@@ -254,9 +254,9 @@ export interface ToolDefinition<TRequest, TResult> {
 }
 
 class ToolRegistry {
-  private tools = new Map<string: ToolDefinition<any, any>>();
+  private tools = new Map<string, ToolDefinition<any, any>>();
 
-  register<TRequest, TResult>(tool: ToolDefinition<TRequest: TResult>): void {
+  register<TRequest, TResult>(tool: ToolDefinition<TRequest, TResult>): void {
     this.tools.set(tool.name, tool);
     console.log(`✅ Registered tool: ${tool.name}`);
   }

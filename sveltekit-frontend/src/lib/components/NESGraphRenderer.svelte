@@ -250,14 +250,14 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 		image-rendering: pixelated;
 	}
 
-	.tooltip-trigger {
+	:global(.tooltip-trigger) {
 		position: fixed;
 		pointer-events: none;
 	width: 1px;
 		height: 1px;
 	}
 
-	.nes-tooltip { background: #262017;
+	:global(.nes-tooltip) { background: #262017;
 		border: 2px solid #f3eddc;
 		padding: 8px;
 	color: #f3eddc;
@@ -266,7 +266,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 		z-index: 1000;
 	}
 
-	.nes-tooltip-content {
+	:global(.nes-tooltip-content) {
 		display: flex;
 		flex-direction: column;
 	gap: 4px;

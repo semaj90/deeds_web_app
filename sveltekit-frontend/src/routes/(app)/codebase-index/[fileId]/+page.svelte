@@ -211,7 +211,7 @@
 					<div class="rounded-2xl border border-slate-700/50 bg-slate-800/30 p-6 backdrop-blur">
 						<div class="flex items-center justify-between mb-4">
 							<h3 class="font-semibold text-slate-300">Agentic Fixes Log</h3>
-							<a href="#" class="text-sm text-cyan-400 hover:underline">View All Logs</a>
+							<button class="text-sm text-cyan-400 hover:underline bg-transparent border-none cursor-pointer p-0">View All Logs</button>
 						</div>
 						<table class="w-full text-sm">
 							<thead>

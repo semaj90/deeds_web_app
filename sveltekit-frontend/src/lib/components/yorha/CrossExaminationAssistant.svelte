@@ -147,9 +147,9 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <div class="lg col-span-1 space-y-6">
  <!-- Witness Selection -->
  <div>
- <label class="block text-sm font-medium text-slate-300 mb-2">
+ <span class="block text-sm font-medium text-slate-300 mb-2">
  Witness to Examine
- </label>
+ </span>
  {#if witness}
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-4">
  <div class="flex items-center gap-3">
@@ -182,10 +182,10 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
 
  <!-- Case Context -->
  <div>
- <label class="block text-sm font-medium text-slate-300 mb-2">
+ <label for="case-context" class="block text-sm font-medium text-slate-300 mb-2">
  Case Context (Optional)
  </label>
- <textarea
+ <textarea id="case-context"
  bind:value={ caseContext }
  placeholder="Additional context about the case, allegations, or specific areas to focus on..."
  class="w-full h-24 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm"
@@ -195,9 +195,9 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <!-- Evidence Summary -->
  {#if evidence.length > 0}
  <div>
- <label class="block text-sm font-medium text-slate-300 mb-2">
+ <span class="block text-sm font-medium text-slate-300 mb-2">
  Available Evidence ({evidence.length})
- </label>
+ </span>
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-3 max-h-32 overflow-y-auto">
  <div class="space-y-1">
  {#each evidence as item (item.id)}
@@ -263,8 +263,8 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  <h4 class="font-medium text-slate-300 mb-3">Filter Questions</h4>
  <div class="grid grid-cols-2 gap-4">
  <div>
- <label class="block text-xs text-slate-400 mb-1">Type</label>
- <select
+ <label for="question-type-filter" class="block text-xs text-slate-400 mb-1">Type</label>
+ <select id="question-type-filter"
  bind:value={selectedQuestionType}
  class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm"
  >
@@ -276,8 +276,8 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  </select>
  </div>
  <div>
- <label class="block text-xs text-slate-400 mb-1">Priority</label>
- <select
+ <label for="priority-filter" class="block text-xs text-slate-400 mb-1">Priority</label>
+ <select id="priority-filter"
  bind:value={selectedPriority}
  class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm"
  >

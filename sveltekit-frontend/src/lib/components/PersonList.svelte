@@ -34,7 +34,7 @@ import type { FugitiveDexPerson } from './types';
 		<!-- Search Input using Bits-UI -->
 		<input
 			type="text"
-			placeholder="SEARCH PERSONS..."
+			aria-label="Search persons" placeholder="SEARCH PERSONS..."
 			class="nes-input w-full"
 			bind:value={searchQuery}
 		/>
@@ -64,7 +64,7 @@ import type { FugitiveDexPerson } from './types';
 		<div class="filter-section">
 			<h4 class="text-amber-300 text-sm mb-2">FILTERS</h4>
 			<div class="filter-group">
-				<label id="status-filter-label" class="text-xs opacity-70 block mb-1">STATUS</label>
+				<span id="status-filter-label" class="text-xs opacity-70 block mb-1">STATUS</span>
 				<div class="flex gap-1 flex-wrap" role="group" aria-labelledby="status-filter-label">
 					{#each statusOptions as status}
 						<Button.Root
@@ -77,7 +77,7 @@ import type { FugitiveDexPerson } from './types';
 				</div>
 			</div>
 			<div class="filter-group mt-3">
-				<label id="priority-filter-label" class="text-xs opacity-70 block mb-1">PRIORITY</label>
+				<span id="priority-filter-label" class="text-xs opacity-70 block mb-1">PRIORITY</span>
 				<div class="flex gap-1 flex-wrap" role="group" aria-labelledby="priority-filter-label">
 					{#each priorityOptions as priority}
 						<Button.Root

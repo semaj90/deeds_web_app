@@ -262,11 +262,6 @@
  font-weight: bold;
  }
 
- .status-indicator.active { background: #10b981;
-		color: #0d1117;
- box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
- }
-
  .status-indicator.inactive { background: #6b7280;
 		color: #f9fafb;
  }
@@ -375,10 +370,6 @@
 
  .analyze-btn:disabled { opacity: 0.6;
 		cursor:not-allowed;
- }
-
- .analyze-btn.analyzing {
- background: linear-gradient(90deg, #f59e0b, #fbbf24);
  }
 
  .loading-spinner { display: inline-block;

@@ -79,7 +79,7 @@
     <div class="panel-content">
       <!-- File Path -->
       <div class="detail-section">
-        <label class="section-label">File Path</label>
+        <span class="section-label">File Path</span>
         <button class="file-path" onclick={() => onViewFile(node.filePath)}>
           <FileCode class="h-4 w-4" />
           <span>{node.filePath}</span>
@@ -89,7 +89,7 @@
       <!-- Error Count -->
       {#if node.errorCount > 0}
         <div class="detail-section">
-          <label class="section-label">Errors</label>
+          <span class="section-label">Errors</span>
           <button class="error-badge" onclick={() => onViewErrors(node.filePath)}>
             <AlertTriangle class="h-4 w-4" />
             <span>{node.errorCount} error{node.errorCount !== 1 ? 's' : ''}</span>
@@ -101,7 +101,7 @@
       <!-- Cluster -->
       {#if node.cluster}
         <div class="detail-section">
-          <label class="section-label">Cluster</label>
+          <span class="section-label">Cluster</span>
           <div class="cluster-badge">
             <Layers class="h-4 w-4" />
             <span>{node.cluster}</span>
@@ -112,7 +112,7 @@
       <!-- Imports -->
       {#if node.imports && node.imports.length > 0}
         <div class="detail-section">
-          <label class="section-label">Imports ({node.imports.length})</label>
+          <span class="section-label">Imports ({node.imports.length})</span>
           <div class="list-container">
             {#each node.imports.slice(0, 5) as importItem}
               <div class="list-item">{importItem}</div>
@@ -127,7 +127,7 @@
       <!-- Exports -->
       {#if node.exports && node.exports.length > 0}
         <div class="detail-section">
-          <label class="section-label">Exports ({node.exports.length})</label>
+          <span class="section-label">Exports ({node.exports.length})</span>
           <div class="list-container">
             {#each node.exports.slice(0, 5) as exportItem}
               <div class="list-item export">{exportItem}</div>
@@ -142,7 +142,7 @@
       <!-- Functions -->
       {#if node.functions && node.functions.length > 0}
         <div class="detail-section">
-          <label class="section-label">Functions ({node.functions.length})</label>
+          <span class="section-label">Functions ({node.functions.length})</span>
           <div class="list-container">
             {#each node.functions.slice(0, 5) as funcItem}
               <div class="list-item function">{funcItem}()</div>

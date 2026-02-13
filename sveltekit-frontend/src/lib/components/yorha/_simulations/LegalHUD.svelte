@@ -38,14 +38,6 @@
 {/if}
 
 <style>
- @keyframes scan {
- 0% { transform: translateY(-100%); }
- 100% { transform: translateY(100vh); }
- }
-
- .scan-line {
- animation: scan 3s linear infinite;
- }
 </style>
 
 

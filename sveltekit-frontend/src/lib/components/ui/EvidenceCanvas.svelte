@@ -96,7 +96,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 <!-- 🧩 Evidence Grid -->
 <div class="canvas grid grid-cols-auto-fill-minmax gap-4 p-4">
   {#each evidenceItems as item (item.id)}
-    <article
+    <div
       class="card nes-container is-dark hover:shadow-lg cursor-pointer"
       onclick={() => handleItemClick(item)}
       onkeydown={(e) => (['Enter',' '].includes(e.key) && handleItemClick(item))}
@@ -132,7 +132,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
           </div>
         </div>
       {/if}
-    </article>
+    </div>
   {/each}
 
   {#if !evidenceItems.length}

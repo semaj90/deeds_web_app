@@ -114,8 +114,8 @@
 		<!-- Filters -->
 		<div class="filters">
 			<div class="filter-group">
-				<label>Filter by Phase:</label>
-				<select bind:value={filter}>
+				<label for="phase-filter">Filter by Phase:</label>
+				<select id="phase-filter" bind:value={filter}>
 					<option value="all">All</option>
 					<option value="phase72">Phase 72 (Error Brain)</option>
 					<option value="phase82">Phase 82 (Svelte 5 Upgrade)</option>
@@ -123,8 +123,8 @@
 			</div>
 
 			<div class="filter-group">
-				<label>Filter by Priority:</label>
-				<select bind:value={filter}>
+				<label for="priority-filter">Filter by Priority:</label>
+				<select id="priority-filter" bind:value={filter}>
 					<option value="all">All</option>
 					<option value="high">High</option>
 					<option value="medium">Medium</option>
@@ -133,8 +133,8 @@
 			</div>
 
 			<div class="filter-group">
-				<label>Filter by Category:</label>
-				<select bind:value={selectedCategory}>
+				<label for="category-filter">Filter by Category:</label>
+				<select id="category-filter" bind:value={selectedCategory}>
 					<option value={null}>All</option>
 					{#each Object.keys(report.byCategory) as category}
 						<option value={category}>{category}</option>

@@ -8,11 +8,11 @@
   class?: string;
  }>();
 
- const variantClass = variant === 'primary'
+ let variantClass = $derived(variant === 'primary'
   ? 'btn-primary'
   : variant === 'secondary'
   ? 'btn-secondary'
-  : 'btn-danger';
+  : 'btn-danger');
 </script>
 
 <button
