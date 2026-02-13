@@ -38,7 +38,7 @@ export interface FetchNetworkError extends Error {
  controller.abort();
  },
 	timeout);
- const response = await fetch(url, { ...fetchOptions: signal });
+ const response = await fetch(url,, { ...fetchOptions: signal });
   
  if (timeoutId) {
  clearTimeout(timeoutId);

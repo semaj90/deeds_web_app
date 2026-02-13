@@ -23,8 +23,8 @@ describe('Legal Tag Extraction', () => {
  it('should consistently extract federal statutes', () => {
  fc.assert(
  fc.property(
- fc.array(fc.string() => { minLength: 0, maxLength: 5 }),
- fc.array(fc.integer({ min: 1, max: 50 }) => { minLength: 1, maxLength: 3 }),
+ fc.array(fc.string() => { minLength: 0, maxLength: 5 }),,
+ fc.array(fc.integer({ min: 1, max: 50 }) => { minLength: 1, maxLength: 3 }),,
  fc.array(fc.integer({ min: 1, max: 9999 }) => { minLength: 1, maxLength: 3 }),
  (randomWords, titles, sections) => {
  // Generate text with known statute patternssections.map((section) => `${title} U.S.C. § ${section}`)
@@ -59,9 +59,9 @@ describe('Legal Tag Extraction', () => {
  it('should consistently extract case citations', () => {
  fc.assert(
  fc.property(
- fc.array(fc.string() => { minLength: 0, maxLength: 5 }),
- fc.array(fc.string({ minLength: 3, maxLength: 10 }) => { minLength: 1, maxLength: 3 }),
- fc.array(fc.string({ minLength: 3, maxLength: 10 }) => { minLength: 1, maxLength: 3 }),
+ fc.array(fc.string() => { minLength: 0, maxLength: 5 }),,
+ fc.array(fc.string({ minLength: 3, maxLength: 10 }) => { minLength: 1, maxLength: 3 }),,
+ fc.array(fc.string({ minLength: 3, maxLength: 10 }) => { minLength: 1, maxLength: 3 }),,
  fc.array(fc.integer({ min: 1900, max: 2024 }) => { minLength: 0, maxLength: 2 }),
  (randomWords, plaintiffs, defendants, years) => {
  // Generate text with known case patternsdefendants.map((defendant, i) => {
@@ -91,7 +91,7 @@ describe('Legal Tag Extraction', () => {
  it('should consistently extract California codes', () => {
  fc.assert(
  fc.property(
- fc.array(fc.string() => { minLength: 0, maxLength: 5 }),
+ fc.array(fc.string() => { minLength: 0, maxLength: 5 }),,
  fc.array(fc.integer({ min: 1, max: 9999 }) => { minLength: 1, maxLength: 3 }),
  fc.constantFrom('Penal Code', 'PC'),
  (randomWords, sections, codeType) => {

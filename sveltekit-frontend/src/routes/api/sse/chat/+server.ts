@@ -1,92 +1,111 @@
-import { produce } from 'sveltekit-sse';
 import type { RequestHandler } from './$types';
-import { db } from '$lib/server/db';
-import { messages } from '$lib/server/db/schema';
-import { ollamaService } from '$lib/server/ai/ollama-service';
-import { eq } from 'drizzle-orm';
+import { db } from '$lib/server/db/client';
+import { chatMessages } from '$lib/server/db/schema';
+
+// TODO: Wire up sveltekit-sse produce() for cleaner SSE patterns
+// TODO: Integrate Redis cache for chat session optimization
+// TODO: Add RabbitMQ embedding.generation queue for async embedding of chat messages
+// TODO: Add Qdrant vector tagging for semantic chat retrieval
+// TODO: IndexedDB + Loki.js client-side caching for offline chat history
+
+const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 
 export const POST: RequestHandler = async ({ request }) => {
-    const { message, model, conversationId } = await request.json();
+	const { message, model, conversationId } = await request.json();
 
-    if (!conversationId) {
-        return new Response('Missing conversationId', { status: 400 });
-    }
+	if (!conversationId) {
+		return new Response('Missing conversationId', { status: 400 });
+	}
 
-    // 1. Save user message
-    try {
-        await db.insert(messages).values({ conversationId, role: 'user',
-            content: message,
-            model: model ?? 'gemma3-legal-latest'
-        });
-    } catch (e) {
-        console.error('Failed to save user message', e);
-    }
+	// 1. Save user message to chatMessages table
+	// TODO: Add userId from locals.user once auth is wired into this SSE endpoint
+	try {
+		await db.insert(chatMessages).values({
+			chatId: conversationId,
+			role: 'user',
+			content: message,
+		});
+	} catch (e) {
+		console.error('Failed to save user message', e);
+	}
 
-    const stream = new ReadableStream({
-        async start(controller) {
-            const encoder = new TextEncoder();
-            const id = crypto.randomUUID();
+	const stream = new ReadableStream({
+		async start(controller) {
+			const encoder = new TextEncoder();
+			const id = crypto.randomUUID();
 
-            const send = (data: any) => {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-            };
+			const send = (data: unknown) => {
+				controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+			};
 
-            send({ id, role: 'assistant',
-                content: '',
-                status: 'thinking'
-            });
+			send({ id, role: 'assistant', content: '', status: 'thinking' });
 
-            // Accumulate response for DB
-            let fullResponse = '';
+			let fullResponse = '';
 
-            try {
-                // Generate response (simulate streaming if service doesn't support it natively yet)
-                const result = await ollamaService.generate(message, { model });
+			try {
+				// Stream from Ollama using gemma3-legal:latest
+				const ollamaRes = await fetch(`${OLLAMA_URL}/api/generate`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						model: model ?? 'gemma3-legal:latest',
+						prompt: message,
+						stream: true,
+					}),
+				});
 
-                // Mock streaming effect for UI responsiveness if the backend wasn't truly streaming
-                const chunks = result.response.match(/.{1,20}/g) || [result.response];
+				if (!ollamaRes.ok || !ollamaRes.body) {
+					throw new Error(`Ollama error: ${ollamaRes.status}`);
+				}
 
-                for (const chunk of chunks) {
-                    await new Promise(r => setTimeout(r, 50)); // artificial delay for effect
-                    fullResponse += chunk;
-                    send({ id, role: 'assistant',
-                        content: fullResponse,
-                        status: 'streaming'
-                    });
-                }
+				const reader = ollamaRes.body.getReader();
+				const decoder = new TextDecoder();
 
-                // Save assistant message
-                await db.insert(messages).values({ conversationId, role: 'assistant',
-                    content: fullResponse,
-                    model: result.model,
-                    tokensUsed: result?.eval_count ?? 0,
-                    finishReason: result.done ? 'stop' : 'unknown'
-                });
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) break;
 
-                send({ id, role: 'assistant',
-                    content: fullResponse,
-                    status: 'done'
-                });
+					const text = decoder.decode(value, { stream: true });
+					for (const line of text.split('\n').filter(Boolean)) {
+						try {
+							const parsed = JSON.parse(line);
+							if (parsed.response) {
+								fullResponse += parsed.response;
+								send({ id, role: 'assistant', content: fullResponse, status: 'streaming' });
+							}
+						} catch {
+							// skip malformed JSON lines
+						}
+					}
+				}
 
-            } catch (error) {
-                console.error('Generation error:', error);
-                send({ id, role: 'assistant',
-                    content: 'Sorry, I encountered an error generating a response.',
-                    status: 'error'
-                });
-            }
+				// Save assistant message
+				await db.insert(chatMessages).values({
+					chatId: conversationId,
+					role: 'assistant',
+					content: fullResponse,
+				});
 
-            controller.close();
-        }
-    });
+				send({ id, role: 'assistant', content: fullResponse, status: 'done' });
+			} catch (error) {
+				console.error('Generation error:', error);
+				send({
+					id,
+					role: 'assistant',
+					content: 'Sorry, I encountered an error generating a response.',
+					status: 'error',
+				});
+			}
 
-    return new Response(stream, {
-        headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
-        }
-    });
+			controller.close();
+		},
+	});
+
+	return new Response(stream, {
+		headers: {
+			'Content-Type': 'text/event-stream',
+			'Cache-Control': 'no-cache',
+			Connection: 'keep-alive',
+		},
+	});
 };
-
-

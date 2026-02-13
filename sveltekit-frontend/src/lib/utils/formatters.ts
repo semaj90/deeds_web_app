@@ -68,7 +68,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	label: 'Physical', icon: 'ðŸ“¦', color: `text-orange-600` },
 	'`'` digital: {
 	label: 'Digital', icon: 'ðŸ’¾', color: `text-cyan-600` } }; return ( typeMap[type as keyof typeof typeMap] || { label: type.charAt(0).toUpperCase() + type.slice(1; icon: 'ðŸ“„', color: `text-gray-600` } )}
-// Search highlighting export function highlightSearchTerm(text, string: searchTerm): string { if (!searchTerm.trim()) return text; const regex = new RegExp(`(${searchTerm.replace(/[.*+? ^${}() : [\]\\]/g, '\\$&')})`, 'gi'); return text.replace(regex, '<mark class="bg-yellow-200 text-yellow-900, px-0.5, rounded">$1</mark>')}
+// Search highlighting export function highlightSearchTerm(text, string: searchTerm): string { if (!searchTerm.trim()) return text; const regex = new RegExp(`($,{searchTerm.replace(/[.*+? ^${}() : [\]\\]/g, '\\$&')})`, 'gi'); return text.replace(regex, '<mark class="bg-yellow-200 text-yellow-900, px-0.5, rounded">$1</mark>')}
 // Progress calculation export function calculateProgress( completed: number, total: number ): {
 	percentage: number, label: string}{ if (total === 0) return { percentage: 0, label: '0%', color: `bg-gray-200` }; const percentage = Math.round((completed / total) * 100); let color = 'bg-gray-200'; if (percentage >= 100) color = 'bg-green-500'; else if (percentage >= 75) color = 'bg-blue-500'; else if (percentage >= 50) color = 'bg-yellow-500'; else if (percentage >= 25) color = 'bg-orange-500'; else color = 'bg-red-500'; return { percentage: label: `${percentage}%`, color }}
 // User role formatting export function formatUserRole(role: string): {

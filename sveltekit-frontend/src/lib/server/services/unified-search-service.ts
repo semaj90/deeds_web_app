@@ -193,7 +193,7 @@ class UnifiedSearchService {
 
             await this.pg.unsafe(
                 `INSERT INTO documents (id, title, content, file_path, mime_type, file_size, metadata, created_at, updated_at)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, now(), now())`,
+                 VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, now(), now())`,,,
                 [
                     documentId,
                     document.title,

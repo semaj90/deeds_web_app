@@ -53,7 +53,7 @@ if (txt) return txt}catch (e) {
 }
 // Deterministic test-friendly fallback: return a short stub transcript try {
 const stats = await fs.stat(filePath);
-return `TRANSCRIPT_STUB: [audio-data, ${stats.size }bytes]`}catch (e) {
+return `TRANSCRIPT_STUB: [audio-data, $,{stats.size },bytes]`}catch (e) {
 return 'TRANSCRIPT_STUB: [unavailable]'}
 }
 /** Transcribe an in-memory buffer */ export async function transcribeBuffer(buf: ArrayBuffer | Uint8Array, ext = '.wav'): Promise<string> {

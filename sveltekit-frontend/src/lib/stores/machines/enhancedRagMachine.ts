@@ -48,7 +48,7 @@ export const enhancedRagMachine = createMachine({
  loading: true,
  error: null,
  },
-	invoke: {
+	invoke,: {
 	input: ({ context }) => ({ query: context.query },
 	src: fromPromise(async ({ input }) => {
  const response = await fetch('/api/rag/enhanced', {

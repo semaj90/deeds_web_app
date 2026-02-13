@@ -276,7 +276,7 @@ SELECT
                     document_id,
                     CURRENT_TIMESTAMP as timestamp
                 FROM embeddings
-                WHERE (vector <=> ${JSON.stringify(request.embedding)}::vector) < (1 - ${threshold})
+                WHERE (vector <=> $,{JSON.stringify(request.embedding)}::vector) < (1 - ${threshold})
                 ORDER BY vector <=> ${JSON.stringify(request.embedding)}::vector
                 LIMIT ${limit}
             `;
@@ -386,9 +386,9 @@ SELECT
     }): Promise<void> {
         await this.database`
             INSERT INTO embeddings (id, content, vector, metadata, document_id, embedding_type)
-            VALUES (${doc.id},
-	${doc.content},
-	${JSON.stringify(doc.embedding)}::vector, ${JSON.stringify(doc?.metadata|| {})},
+            VALUES ($,{doc.id},
+	$,{doc.content},
+	$,{JSON.stringify(doc.embedding)}::vector, $,{JSON.stringify(doc?.metadata|| {})},
 	${doc?.documentId ?? null},
 	'legal_context')
             ON CONFLICT (id) DO UPDATE SET
@@ -543,7 +543,7 @@ SELECT
             let cursor = '0';
             const keysToDelete: string[] = [];
 
-            do {
+            ,do {
                 const [nextCursor, scanKeys] = await this.redis.scan(cursor, 'MATCH', 'vector:search:*');
                 cursor = nextCursor;
                 if ($1?.$2 > 0) {

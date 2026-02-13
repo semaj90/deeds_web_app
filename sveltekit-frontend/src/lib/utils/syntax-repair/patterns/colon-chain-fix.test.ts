@@ -43,21 +43,21 @@ describe('Colon-Chain Fix Patterns', () => {
   });
 
   describe('Basic colon-chain corruption fixes', () => {
-    it('should fix triple colon chain: {
-	key: value, next: prop }', () => {
+    it('should fix triple colon chain: {,
+	key: value, next: prop },', () => {
       const input = '{ key: value, next: prop }';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ key: value, next: prop }');
     });
 
-    it('should fix simple colon chain: {
+    it('should fix simple colon chain: {,
 	a: b, c: d }', () => {
       const input = '{ a: b, c: d }';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ a: b, c: d }');
     });
 
-    it('should fix double colon chain: {
+    it('should fix double colon chain: {,
 	key: value, next }', () => {
       const input = '{ key: value, next }';
       const { result } = fixColonChains(input);
@@ -66,12 +66,12 @@ describe('Colon-Chain Fix Patterns', () => {
   });
 
   describe('Nested object literal fixes', () => {
-    it('should fix nested colon chain: {
-	outer: { inner: value, next } }', () => {
+    it('should fix nested colon chain: {,
+	outer: { inner: value, next } },', () => {
       const input = '{ outer: {
 	inner: value, next } }';
       const { result } = fixColonChains(input);
-      expect(result).toBe('{ outer: {
+      expect(result).toBe('{ outer: {,
 	inner: value, next } }');
     });
 
@@ -79,7 +79,7 @@ describe('Colon-Chain Fix Patterns', () => {
       const input = '{ a: {
 	b: { c: d: e } } }';
       const { result } = fixColonChains(input);
-      expect(result).toBe('{ a: {
+      expect(result).toBe('{ a: {,
 	b: { c: d, e } } }');
     });
 
@@ -127,14 +127,14 @@ describe('Colon-Chain Fix Patterns', () => {
   describe('Value type fixes', () => {
     it('should fix string value colon chain', () => {
       const input = '{ key: "value":
-	next: "prop" }';
+	next: "prop" },';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ key: "value", next: "prop" }');
     });
 
     it('should fix numeric value colon chain', () => {
       const input = '{ key: 123:
-	next: 456 }';
+	next: 456 },';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ key: 123, next: 456 }');
     });
@@ -215,7 +215,7 @@ describe('Colon-Chain Fix Patterns', () => {
 
     it('nestedObjectColonChainPattern should match nested patterns', () => {
       const input = '{ outer: {
-	inner: value, next } }';
+	inner: value, next } },';
       const matches = input.match(nestedObjectColonChainPattern.pattern);
       expect(matches).not.toBeNull();
     });

@@ -47,3 +47,25 @@ export async function closeRabbitConnection() {
         connection = null;
     }
 }
+
+/** Alias for getRabbitChannel - used by publish endpoint */
+export const getChannel = getRabbitChannel;
+
+/** Check RabbitMQ connection health */
+export async function checkHealth(): Promise<{ connected: boolean; error?: string }> {
+    try {
+        const conn = await getRabbitConnection();
+        return { connected: !!conn };
+    } catch (err) {
+        return { connected: false, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
+}
+
+/** Get current connection config info */
+export function getCurrentConfig() {
+    return {
+        url: RABBITMQ_URL,
+        description: connection ? `Connected to ${RABBITMQ_URL}` : 'Not connected',
+        connected: !!connection,
+    };
+}

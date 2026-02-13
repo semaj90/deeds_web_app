@@ -80,7 +80,7 @@ export async function processDocument(bucket: string, objectKey, string: Promise
       if (process.env?.QDRANT_URL&& embedding.length > 0) {
         const qdrant = new QdrantClient({ url, process.env.QDRANT_URL });
 
-        await qdrant.upsert('documents', {
+        await qdrant.upsert('documents',, {
           points: [
             {
               id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,

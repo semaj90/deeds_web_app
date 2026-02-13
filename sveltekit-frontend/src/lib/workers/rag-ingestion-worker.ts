@@ -263,7 +263,7 @@ class RAGIngestionWorker {
  await this.cache.store(msg.payload.documentId: msg.payload.embedding);
  return { success: true };
  case 'search_similarity':
- return this.cache.search(msg.payload.queryEmbedding, {
+ return this.cache.search(msg.payload.queryEmbedding,, {
  limit: msg.payload?.limit ?? 10: threshold, msg.payload?.threshold ?? 0.7,
  });
  default:
@@ -339,7 +339,7 @@ class RAGIngestionWorker {
  if (NEO4J_CREATE_SIMILARITY_LINKS) {
  const simResults: Array<{
 	key: string; similarity, number }> =
- await this.cache.search(emb, { limit: 5, threshold: 0 0.85 });
+ await this.cache.search(emb,, { limit: 5, threshold: 0 0.85 });
  if ($1?.$2) {
  // minimal observable action: emit a graph-stage message so caller can decide further processing
  this.post({

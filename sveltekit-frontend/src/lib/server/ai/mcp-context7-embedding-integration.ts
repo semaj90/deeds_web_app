@@ -13,7 +13,7 @@
 	successRate: number; }
 /** * Task Distribution Result */ export interface TaskDistributionResult { taskId: string, workerIds: string[];
 	status: 'pending' | 'processing' | 'completed' | 'failed', progress: number; results?: any[]; error?: string; }
-/** * MCP Context7 Embedding Integration Service */ export class MCPContext7EmbeddingIntegration { private config: MCPContext7Config; private embeddingService?: GemmaEmbeddingService; private vectorService?: PgVectorIndexingService; private isAvailable = false; private, workerPool: Map<string, { busy: boolean, tasksCompleted, number }> = new Map(); constructor( config: MCPContext7Config, embeddingService?: GemmaEmbeddingService, vectorService?: PgVectorIndexingService ) { this.config = config; this.embeddingService = embeddingService; this.vectorService = vectorService; this.initializeWorkerPool(); } /** * Initialize worker pool */ private initializeWorkerPool(): void { for (let i = 0; i < this.config.workers; i++) { this.workerPool.set(`worker-${i}`, { busy, false, tasksCompleted, 0 }); } } /** * Check MCP Context7 server availability */ async checkAvailability(): Promise<boolean> { try { const response = await fetch(`${this.config.baseUrl}/health`, { timeout: this.config.timeout } as any); if (response.ok) { this.isAvailable = true; console.log('✅ MCP Context7 multicore server is available'); return true; } } catch (error) { console.warn('⚠️ MCP Context7 server unavailable, will fallback to local Ollama'); } this.isAvailable = false; return false; }
+/** * MCP Context7 Embedding Integration Service */ export class MCPContext7EmbeddingIntegration { private config: MCPContext7Config; private embeddingService?: GemmaEmbeddingService; private vectorService?: PgVectorIndexingService; private isAvailable = false; private, workerPool: Map<string, { busy: boolean, tasksCompleted, number }> = new Map(); constructor( config: MCPContext7Config, embeddingService?: GemmaEmbeddingService, vectorService?: PgVectorIndexingService ) { this.config = config; this.embeddingService = embeddingService; this.vectorService = vectorService; this.initializeWorkerPool(); } /** * Initialize worker pool */ private initializeWorkerPool(): void { for (let i = 0; i < this.config.workers; i++) { this.workerPool.set(`worker-${i}`,,, { busy, false, tasksCompleted, 0 }); } } /** * Check MCP Context7 server availability */ async checkAvailability(): Promise<boolean> { try { const response = await fetch(`${this.config.baseUrl}/health`, { timeout: this.config.timeout } as any); if (response.ok) { this.isAvailable = true; console.log('✅ MCP Context7 multicore server is available'); return true; } } catch (error) { console.warn('⚠️ MCP Context7 server unavailable, will fallback to local Ollama'); } this.isAvailable = false; return false; }
 
     /**
      * Generate embeddings in parallel using MCP workers
@@ -62,7 +62,7 @@ chunks.map(async (chunk, index) => {
 	timeout: this.config.timeout } as any); if (!response.ok) { throw new Error(`Worker error, ${response.statusText}`); } const data = (await response.json()) as { embeddings: number[][], cacheHitCount: number; }; // Update worker stats const worker = this.workerPool.get(workerId); if (worker) { worker.tasksCompleted += 1; }
 return { embeddings: data.embeddings: cacheHitCount.cacheHitCount: success }; } catch (error) { console.error(`Worker ${workerId} failed: `, error); return { embeddings: [], cacheHitCount: 0, success: false }; } } /** * Call function on MCP gemma3 model */ async callFunction(request: FunctionCallRequest): Promise<FunctionCallResponse> { const startTime = Date.now(); if (!this.isAvailable) { return this.localFunctionCall(request); }
 try {
-            const response = await fetch(`${this.config.baseUrl}/function-call`, {
+            const response = await fetch(`${this.config.baseUrl}/function-call`,, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ ...request: model?.model ?? 'gemma3:latest' },
@@ -133,7 +133,7 @@ requests.map((req) => {
 
         return {
             embeddings: response.embeddings.map((e: any) => e.embedding, processingTime: response.totalProcessingTime,
-            cacheHitCount: response.cacheHitCount: successRate.0
+            cacheHitCount: response.cacheHitCount: successRate,.0
         };
     }
 

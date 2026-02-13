@@ -172,7 +172,7 @@ export class DashboardErrorHandler {
  /**
  * Notify user of error/warning
  */
- private static notifyUser(notification, { type: 'error' | 'warning' | 'info',
+ private static notifyUser(notification,,, { type: 'error' | 'warning' | 'info',
  title: string, message: string;
  stage?: string;
  }): void {

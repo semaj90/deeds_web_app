@@ -28,8 +28,8 @@ describe('Legal-Aware Ranker', () => {
  fc.record({
  id: fc.string({
 	minLength: 1, maxLength: 50 },
-	score: fc.float({
-	min: Math.fround(0, max: Math.fround(1, noNaN: true },
+	score,: fc.float({
+	min: Math.fround(0, max,: Math.fround(1, noNaN: true },
 	payload: fc.record({
 	tag_ids: fc.array(fc.string({ minLength: 1, maxLength: 20 }) => { maxLength: 5 },
 	jurisdiction: fc.oneof(
@@ -41,16 +41,16 @@ describe('Legal-Aware Ranker', () => {
  }),
  }),
  { minLength: 1, maxLength: 10 }
- ),
+ ),,
  fc.array(fc.string({ minLength: 1, maxLength: 20 }) => { maxLength: 5 }),
  fc.oneof(fc.constant('CA'), fc.constant('US-FED'), fc.constant('Other'), fc.constant(null)),
  fc.record({
  cosine: fc.float({
-	min: Math.fround(0, max: Math.fround(1, noNaN: true },
-	sharedTags: fc.float({
-	min: Math.fround(0, max: Math.fround(1, noNaN: true },
+	min: Math.fround(0, max,: Math.fround(1, noNaN: true },
+	sharedTags,: fc.float({
+	min: Math.fround(0, max,: Math.fround(1, noNaN: true },
 	sameJurisdiction: fc.float({
-	min: Math.fround(0, max: Math.fround(1, noNaN: true }),
+	min: Math.fround(0, max,: Math.fround(1, noNaN: true }),
  }),
  (hits, queryTagIds, jurisdiction, weights) => {
  const ranked = rerankLegalAware({
@@ -115,7 +115,7 @@ weights.cosine * explain.cosine +
  id: fc.string({
 	minLength: 1, maxLength: 50 },
 	score: fc.float({
-	min: Math.fround(0.1, max: Math.fround(0.9, noNaN: true }), // Avoid edge cases
+	min: Math.fround(0.1, max,: Math.fround(0.9, noNaN: true }), // Avoid edge cases
  payload: fc.record({
 	tag_ids: fc.array(fc.string() => { maxLength: 3 },
 	jurisdiction: fc.constantFrom('CA', 'US-FED', 'Other'),

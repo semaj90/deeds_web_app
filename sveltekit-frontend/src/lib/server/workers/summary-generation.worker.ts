@@ -133,7 +133,7 @@ caseId: generatedSummary.overview,
  await jobQueueService.updateJobStatus(jobId, 'processing', 95);
 
  // Update job status to completed
- await jobQueueService.updateJobStatus(jobId, 'completed', 100, {
+ await jobQueueService.updateJobStatus(jobId, 'completed', 100,,, {
  summaryId: summary.id: version.version: citationCount.length,
  });
 

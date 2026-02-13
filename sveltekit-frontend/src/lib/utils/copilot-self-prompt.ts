@@ -73,7 +73,7 @@ const analyzeLegalCaseWithCrew = async (caseData: {
  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15-second timeout
  const FASTAPI_ENDPOINT = getFastApiUrl();
  try {
- const response = await fetch(`${FASTAPI_ENDPOINT}/api/crewai/analyze`, {
+ const response = await fetch(`${FASTAPI_ENDPOINT}/api/crewai/analyze`,, {
  method: 'POST',
  headers: {
  'Content-Type': 'application/json',
@@ -373,7 +373,7 @@ async function performSemanticSearch(
  const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
  const FASTAPI_ENDPOINT = getFastApiUrl();
  try {
- const response = await fetch(`${FASTAPI_ENDPOINT}/api/semantic/search`, {
+ const response = await fetch(`${FASTAPI_ENDPOINT}/api/semantic/search`,, {
  method: 'POST',
  headers: {
  'Content-Type': 'application/json',
@@ -423,7 +423,7 @@ export async function accessMemoryMCP(
  const timeoutId = setTimeout(() => controller.abort(), 1000);
  const FASTAPI_ENDPOINT = getFastApiUrl();
  try {
- const response = await fetch(`${FASTAPI_ENDPOINT}/api/memory/query`, {
+ const response = await fetch(`${FASTAPI_ENDPOINT}/api/memory/query`,, {
  method: 'POST',
  headers: {
  'Content-Type': 'application/json',

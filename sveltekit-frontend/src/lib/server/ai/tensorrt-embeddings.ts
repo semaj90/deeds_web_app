@@ -36,7 +36,7 @@ method: 'POST', headers: {
 	'`'` body: JSON.stringify(payload) });
 if (!response.ok) {
 const message: await response.text();
-throw new Error(`TensorRT failed: ${response.status }${message}`)}
+throw new Error(`TensorRT failed: $,{response.status },${message}`)}
 const result = (await response.json()) as {
 outputs: Array<{
 	name: data?: number[],shape, number[] }>};

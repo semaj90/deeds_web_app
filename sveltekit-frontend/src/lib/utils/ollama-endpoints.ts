@@ -174,7 +174,7 @@ Provide your analysis in a clear, structured format.`;
 
  // Parse structured response
  return {
- analysis: analysisText, confidence: extractConfidence(analysisText, keyFindings: extractKeyFindings(analysisText, recommendations: extractRecommendations(analysisText),
+ analysis: analysisText, confidence: extractConfidence(analysisText, keyFindings,: extractKeyFindings(analysisText, recommendations: extractRecommendations(analysisText),
  };
  } catch (error) {
  console.error('Legal analysis generation failed:', error);

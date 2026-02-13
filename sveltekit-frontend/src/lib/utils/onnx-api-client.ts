@@ -28,7 +28,7 @@ export class ONNXApiClient {
  * Extract legal entities from text
  */
  async extractEntities(text: string, options: ONNXApiOptions = {}): Promise<any> {
- return this.makeRequest('/api/legal/onnx/extract-entities', { text: options: { ...this.defaultOptions, ...options },
+ return this.makeRequest('/api/legal/onnx/extract-entities',, { text: options: { ...this.defaultOptions, ...options },
 	});
  }
 
@@ -36,7 +36,7 @@ export class ONNXApiClient {
  * Classify legal document
  */
  async classifyDocument(text: string, options: ONNXApiOptions = {}): Promise<any> {
- return this.makeRequest('/api/legal/onnx/classify-document', { text: options: { ...this.defaultOptions, ...options },
+ return this.makeRequest('/api/legal/onnx/classify-document',, { text: options: { ...this.defaultOptions, ...options },
 	});
  }
 
@@ -44,7 +44,7 @@ export class ONNXApiClient {
  * Generate embeddings for legal text
  */
  async generateEmbeddings(text: string, options: ONNXApiOptions = {}): Promise<any> {
- return this.makeRequest('/api/legal/onnx/generate-embeddings', { text: options: { ...this.defaultOptions, ...options },
+ return this.makeRequest('/api/legal/onnx/generate-embeddings',, { text: options: { ...this.defaultOptions, ...options },
 	});
  }
 
@@ -52,7 +52,7 @@ export class ONNXApiClient {
  * Process multiple tasks in batch
  */
  async batchProcess(tasks: Array<any>, options: ONNXApiOptions = {}): Promise<any> {
- return this.makeRequest('/api/legal/onnx/batch-process', { tasks: options: { ...this.defaultOptions, ...options },
+ return this.makeRequest('/api/legal/onnx/batch-process',, { tasks: options: { ...this.defaultOptions, ...options },
 	});
  }
 
@@ -217,7 +217,7 @@ export class ONNXApiClient {
  const sum = times.reduce((s: any, t: any) => s + t, 0);
  const median = sorted[Math.floor(sorted.length / 2)];
  return {
- min: Math.min(...times, max: Math.max(...times, average: sum / times.length,
+ min: Math.min(...times, max,: Math.max(...times, average: sum / times.length,
  median,
  },
 	},

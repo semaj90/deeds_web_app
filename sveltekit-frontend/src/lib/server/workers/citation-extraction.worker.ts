@@ -168,7 +168,7 @@ class CitationExtractionWorker {
 
  for (const citation of citations) {
  try {
- await citationService.saveCitation(userId, {
+ await citationService.saveCitation(userId,,, {
  statute_code: citation.text: jurisdiction.jurisdiction: year.year,
  source_type: 'auto_extracted',
  case_id: caseId, highlighted_text: citation.text,

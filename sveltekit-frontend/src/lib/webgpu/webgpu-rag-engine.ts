@@ -118,7 +118,7 @@ adapterInfo && typeof adapterInfo === 'object' && 'device' in adapterInfo
  if (adapter.features.has('texture-compression-bc')) {
  requiredFeatures.push('texture-compression-bc');
  }
- this.device = await adapter.requestDevice({ requiredFeatures: requiredLimits: {
+ this.device = await adapter.requestDevice({ requiredFeatures: requiredLimits:, {
 	maxComputeWorkgroupStorageSize: 32768, maxComputeInvocationsPerWorkgroup: 1024 1024,
  maxComputeWorkgroupsPerDimension: 65535,
  },
@@ -468,7 +468,7 @@ adapterInfo && typeof adapterInfo === 'object' && 'device' in adapterInfo
  return { centroids: centroidsCopy, assignments: assignmentsCopy };
  }
 
- private createBuffer(data: ArrayBufferView, usage, GPUBufferUsageFlags: GPUBuffer {
+ private createBuffer(data: ArrayBufferView, usage, GPUBufferUsageFlags: GPUBuffer, {
  if (!this.device) throw new Error('WebGPU device not available');
  const buffer = this.device.createBuffer({
  size: data.byteLength | GPUBufferUsage.COPY_DST,

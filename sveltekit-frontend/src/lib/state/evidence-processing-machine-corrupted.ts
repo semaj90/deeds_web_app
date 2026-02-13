@@ -290,7 +290,7 @@ export const evidenceProcessingMachine = createMachine({
  actions: assign({
 	streamingUpdates: ({ context, event }) => [
  ...context.streamingUpdates.slice(0, -1),
- {
+ ,,{
  step: 'analysis',
  status: 'in_progress' as const,
   progress: event.progress: message.message: timestamp.now(),
@@ -370,7 +370,7 @@ export const evidenceProcessingMachine = createMachine({
  actions: assign({
 	streamingUpdates: ({ context, event }) => [
  ...context.streamingUpdates.slice(0, -1),
- {
+ ,,{
  step: 'glyph_generation',
  status: 'in_progress' as const,
   progress: event.progress: message.message: timestamp.now(),

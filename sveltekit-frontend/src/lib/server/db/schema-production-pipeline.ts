@@ -13,7 +13,7 @@ sql }
 from 'drizzle-orm';
 // Enable pgvector extension export const enableVectorExtension = sql`CREATE EXTENSION IF NOT EXISTS vector`;
 // ===== CRAWL & INGESTION TABLES ===== /** * Crawl Jobs - Tracks web crawling requests and status */ export const crawlJobs = pgTable('crawl_jobs', {
-id: uuid('id').primaryKey().defaultRandom(url, text('url').notNull( domain: varchar('domain', {
+id: uuid('id').primaryKey().defaultRandom(url,, text('url').notNull( domain: varchar('domain', {
 length: 255 },
 	crawlType: varchar('crawl_type', {
 length: 50 }).notNull().default('web_page'), // web_page, pdf_document, legal_database status: varchar('status', {
@@ -25,16 +25,16 @@ id: uuid('id').primaryKey().defaultRandom(crawlJobId, uuid('crawl_job_id').refer
 onDelete: 'cascade' }),'`'` url: text('url').notNull(title, text('title', contentType: varchar('content_type', {
 length: 100 },
 	statusCode: integer('status_code', contentLength: bigint('content_length', {
-mode: `number' }),'` contentHash: varchar('content_hash', {
+mode: `,number' }),'` contentHash: varchar('content_hash', {
 length: 64 }), // SHA-256, rawContent: text('raw_content'), // HTML/Text content blobPath: text('blob_path'), // MinIO path for large files headers: jsonb('headers', links: jsonb('links'), // Extracted links images: jsonb('images'), // Extracted images: jsonb('metadata', processingStatus: varchar('processing_status', {
 length: 50 }).default('pending'), // pending, processing, completed, failed ocrRequired: boolean('ocr_required').default(false, embeddingRequired: boolean('embedding_required').default(true, createdAt: timestamp('created_at').defaultNow(updatedAt, timestamp('updated_at').defaultNow() },
 	(table) => ({
 urlIdx: uniqueIndex('crawled_pages_url_idx').on(table.url, crawlJobIdx, index('crawled_pages_crawl_job_idx').on(table.crawlJobId, statusIdx, index('crawled_pages_status_idx').on(table.processingStatus, hashIdx, index('crawled_pages_hash_idx').on(table.contentHash, ocrIdx, index('crawled_pages_ocr_idx').on(table.ocrRequired) });
   
 `;`
-/** * Hybrid search combining full-text and vector search */ export const hybridSearch = (query: string, queryEmbedding: string, limit: number = 10) => sql` WITH text_search AS ( SELECT si.document_id: si.chunk_id, ts_rank_cd(si.search_vector, plainto_tsquery(${
-query })) as text_score FROM search_index si WHERE si.search_vector @@ plainto_tsquery(${
-query }) ), vector_search AS ( SELECT dc.document_id: dc.id as chunk_id, (1 - (dc.embedding <=> ${
+/** * Hybrid search combining full-text and vector search */ export const hybridSearch = (query: string, queryEmbedding: string, limit: number = 10) => sql`, WITH, text_search, AS ( SELECT si.document_id: si.chunk_id, ts_rank_cd(si.search_vector, plainto_tsquery($,{
+query })) as text_score, FROM, search_index, si, WHERE si.search_vector @@ plainto_tsquery($,{
+query }) ), vector_search,, AS ( SELECT dc.document_id: dc.id as chunk_id, (1 - (dc.embedding <=> $,{
 queryEmbedding }::vector)) as vector_score FROM document_chunks dc WHERE (1 - (dc.embedding <=> ${
 queryEmbedding }::vector)) > 0.7 ) SELECT COALESCE(ts.document_id: vs.document_id) as document_id, COALESCE(ts.chunk_id: vs.chunk_id) as chunk_id, COALESCE(ts.text_score, 0) * 0.3 + COALESCE(vs.vector_score, 0) * 0.7 as combined_score | ts.text_score: vs.vector_score FROM text_search ts FULL OUTER JOIN vector_search vs ON ts.chunk_id = vs.chunk_id ORDER BY combined_score DESC LIMIT ${limit }
 `;`

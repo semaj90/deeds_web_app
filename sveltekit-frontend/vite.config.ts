@@ -234,17 +234,14 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       target: 'ES2022',
-      minify: 'terser',
+      minify: 'esbuild',
       sourcemap: false,
       rollupOptions: {
         output: {
           manualChunks: {
-            webgpuAi: ['$lib/webgpu/webgpu-ai-engine'],
-            cognitiveRouter: ['$lib/ai/cognitive-smart-router'],
-            gpuInference: ['$lib/services/cuda-vector-integration'],
+            // webgpuAi, cognitiveRouter, gpuInference — corrupted/unused, fix later
             bitsUi: ['bits-ui'],
-            drizzle: ['drizzle-orm'],
-            langchain: ['langchain', '@langchain/core'],
+            // drizzle-orm, langchain — server-only (externalized by SvelteKit, cannot be in manualChunks)
           },
         },
       },

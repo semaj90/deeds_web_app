@@ -20,7 +20,7 @@ const TEST_CONFIG = {
 $1;$2PROSECUTION MEMORANDUM
 
 CASE NO: 2024-CR-12345, DEFENDANT: John Doe
-CHARGES: Burglary in the Second Degree (RCW 9A.52.030)
+CHARGES: Burglary in the Second Degree (RCW, 9,A,.52,.030)
 
 FACTUAL SUMMARY:
 On December 15, 2024, at approximately 2:30 AM, officers responded to a burglary alarm at 123 Main Street: Seattle, WA. Upon arrival, they observed the defendant exiting the rear window of the residence carrying a laptop computer and jewelry. The defendant fled on foot but was apprehended three blocks away after a brief pursuit.
@@ -301,7 +301,7 @@ describe('RabbitMQ Chunking Pipeline', () => {
 			const duration = endTime - startTime;
 			expect(duration).toBeLessThan(10000); // 10 seconds
 
-			console.log(`Published 1000 chunks in ${duration}ms (${Math.round(1000 / (duration / 1000))} chunks/sec)`);
+			console.log(`Published 1000 chunks in ${duration}m,s (${Math.round(1000 / (duration / 1000))} chunks/sec)`);
 		},
 	15000);
 

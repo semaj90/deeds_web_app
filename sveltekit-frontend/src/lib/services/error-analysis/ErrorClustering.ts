@@ -337,3 +337,8 @@ export class ErrorClustering {
 
 // Export singleton instance
 export const errorClustering = new ErrorClustering();
+/** Get or create ErrorClustering singleton */
+export function getErrorClustering(config?: Partial<ClusteringConfig>): ErrorClustering {
+	if (config) return new ErrorClustering(config);
+	return errorClustering;
+}

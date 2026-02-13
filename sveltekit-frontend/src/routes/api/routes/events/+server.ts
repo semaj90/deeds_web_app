@@ -145,3 +145,8 @@ export function _getConnectionCount(): number {
 
 
 
+
+// Public aliases (used by sibling routes)
+export const broadcastHealthChange = _broadcastHealthChange;
+export const broadcastErrorCountChange = _broadcastErrorCountChange;
+export const getConnectionCount = _getConnectionCount;

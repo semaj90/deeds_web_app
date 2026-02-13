@@ -216,96 +216,96 @@ export class WasmGpuInitService {
 (module
  (memory (import "env" "memory") 1)
  ; GPU buffer management
- (func $initGpuBuffers (export "initGpuBuffers") (param $count i32) (result i32)
- (local $i i32)
- (local $baseAddr i32)
+ (func $initGpuBuffers (export "initGpuBuffers") (param, $count, i32) (result, i32)
+ (local, $i, i32)
+ (local, $baseAddr, i32)
  ; Allocate buffer metadata area
- (set_local $baseAddr (i32.const 0))
- (set_local $i (i32.const 0))
+ (set_local $baseAddr (i32.const, 0))
+ (set_local $i (i32.const, 0))
  ; Initialize buffer pool
- (loop $bufferLoop
+ (loop, $bufferLoop
  ; Set buffer metadata
- (i32.store (get_local $baseAddr) (i32.const 0)) ; buffer_id
- (i32.store (i32.add (get_local $baseAddr) (i32.const 4)) (i32.const 0)) ; size
- (i32.store (i32.add (get_local $baseAddr) (i32.const 8)) (i32.const 0)) ; usage
+ (i32.store (get_local, $baseAddr) (i32.const, 0)) ; buffer_id
+ (i32.store (i32.add (get_local, $baseAddr) (i32.const, 4)) (i32.const, 0)) ; size
+ (i32.store (i32.add (get_local, $baseAddr) (i32.const, 8)) (i32.const, 0)) ; usage
  ; Increment
- (set_local $baseAddr (i32.add (get_local $baseAddr) (i32.const 16)))
- (set_local $i (i32.add (get_local $i) (i32.const 1)))
- (br_if $bufferLoop (i32.lt_u (get_local $i) (get_local $count)))
+ (set_local $baseAddr (i32.add (get_local, $baseAddr) (i32.const, 16)))
+ (set_local $i (i32.add (get_local, $i) (i32.const, 1)))
+ (br_if $bufferLoop (i32.lt_u (get_local, $i) (get_local, $count)))
  )
  (get_local $count)
  )
  ; Vector operations for embeddings
- (func $vectorDotProduct (export "vectorDotProduct") (param $vecA i32) (param $vecB i32) (param $length i32) (result f32)
- (local $i i32)
- (local $sum f32)
- (set_local $i (i32.const 0))
- (set_local $sum (f32.const 0))
+ (func $vectorDotProduct (export "vectorDotProduct") (param, $vecA, i32) (param, $vecB, i32) (param, $length, i32) (result, f32)
+ (local, $i, i32)
+ (local, $sum, f32)
+ (set_local $i (i32.const, 0))
+ (set_local $sum (f32.const, 0))
  (loop $dotLoop
- (set_local $sum (f32.add (get_local $sum) (f32.mul
- (f32.load (i32.add (get_local $vecA) (i32.mul (get_local $i) (i32.const 4))))
- (f32.load (i32.add (get_local $vecB) (i32.mul (get_local $i) (i32.const 4))))
+ (set_local $sum (f32.add (get_local, $sum) (f32.mul
+ (f32.load (i32.add (get_local, $vecA) (i32.mul (get_local, $i) (i32.const, 4))))
+ (f32.load (i32.add (get_local, $vecB) (i32.mul (get_local, $i) (i32.const, 4))))
  )))
- (set_local $i (i32.add (get_local $i) (i32.const 1)))
- (br_if $dotLoop (i32.lt_u (get_local $i) (get_local $length)))
+ (set_local $i (i32.add (get_local, $i) (i32.const, 1)))
+ (br_if $dotLoop (i32.lt_u (get_local, $i) (get_local, $length)))
  )
- (get_local $sum)
+ (get_local, $sum)
  )
  ; Matrix operations for transformations
- (func $matrixMultiply4x4 (export "matrixMultiply4x4") (param $matA i32) (param $matB i32) (param $result i32)
- (local $i i32)
+ (func $matr,ixMult,iply4x4 (exp,ort "m,atrixMultipl,y4x4") (,param $matA i3,2) ,(param $matB i,32), (param $resul,t i,32)
+ (local $,i i32,)
  (local $j i32)
  (local $k i32)
  (local $sum f32)
- ; Nested loops for 4x4 matrix multiplication
- (set_local $i (i32.const 0))
+ ; Nested loops for 4x4, matrix multiplication
+ (set_local $i (i32.cons,t 0))
  (loop $rowLoop
- (set_local $j (i32.const 0))
+ (set_local $j (i32.const ,0))
  (loop $colLoop
- (set_local $sum (f32.const 0))
+ (set_loc,al $sum (f32.const 0))
  (set_local $k (i32.const 0))
- (loop $innerLoop
- (set_local $sum (f32.add (get_local $sum) (f32.mul
- (f32.load (i32.add (get_local $matA) (i32.mul (i32.add (i32.mul (get_local $i) (i32.const 4)) (get_local $k)) (i32.const 4))))
- (f32.load (i32.add (get_local $matB) (i32.mul (i32.add (i32.mul (get_local $k) (i32.const 4)) (get_local $j)) (i32.const 4))))
+ (loop, $innerLoop
+ (set_local $sum (f32.add (get_loc,al $sum) (f32.mul
+ (f32.load (i32.add (get_l,ocal $matA) (i3,2.mul (i32.add ,(i32.mul (get_lo,cal $i) (i32.const 4)) (get_local $k)), (i32.const 4))))
+ (f32.load (i32.add (get_l,ocal $matB) (i3,2.mul (i32.add ,(i32.mul (get_lo,cal $k) (i32.const 4)) (get_local $j)) (i32.cons,t 4))))
  )))
- (set_local $k (i32.add (get_local $k) (i32.const 1)))
- (br_if $innerLoop (i32.lt_u (get_local $k) (i32.const 4)))
+, (set_local $k ,(i32.add (get_l,ocal $k) (i32.const 1)))
+ (br_if $innerLoop (i32.lt_u (get,_local $k) (i32.const 4)))
  )
- ; Store result
- (f32.store (i32.add (get_local $result) (i32.mul (i32.add (i32.mul (get_local $i) (i32.const 4)) (get_local $j)) (i32.const 4))) (get_local $sum))
- (set_local $j (i32.add (get_local $j) (i32.const 1)))
- (br_if $colLoop (i32.lt_u (get_local $j) (i32.const 4)))
+ ; Store result,
+ (f32.store (,i32.add (get_lo,cal $result) (i3,2.mul (i32.add (,i32.mul (get_local $i) (i32.const 4)) (get_,local $j)) (i32,.const 4))) (get_local $sum))
+ (set_local $,j (i32.add (get,_local $j) (i32.const 1)))
+ (br_if $colLoop ,(i32.lt_u (get_,local $j) (i32.const 4)))
  )
- (set_local $i (i32.add (get_local $i) (i32.const 1)))
+ (set_local $,i (i32.add (get,_local $i) (i32.const 1)))
  (br_if $rowLoop (i32.lt_u (get_local $i) (i32.const 4)))
  )
  )
- ; High-performance embedding similarity
- (func $embeddingSimilarity (export "embeddingSimilarity") (param $embedA i32) (param $embedB i32) (param $dimensions i32) (result f32)
- (local $dotProduct f32)
- (local $normA f32)
+ ; High-performance embeddi,ng simil,arity
+ (fun,c $embed,dingSimilari,ty (export ",embeddingSimi,larity") (para,m $embedA i3,2) (param $emb,edB i32,) (param $dime,nsions ,i32) (result f,32),
+ (local $dot,Product ,f32)
+ (local ,$normA f,32)
  (local $normB f32)
  (local $i i32)
  (local $valueA f32)
- (local $valueB f32)
- ; Calculate dot product and norms simultaneously
- (set_local $i (i32.const 0))
+ (local $valueB f3,2)
+ ; Calculate dot product and norms s,imultaneously
+ (set_local $i (i3,2.,const 0))
  (set_local $dotProduct (f32.const 0))
- (set_local $normA (f32.const 0))
- (set_local $normB (f32.const 0))
+ (set_local $normA (f32.c,onst 0))
+ (set_local $normB ,(f32.const 0)),
  (loop $similarityLoop
- (set_local $valueA (f32.load (i32.add (get_local $embedA) (i32.mul (get_local $i) (i32.const 4)))))
- (set_local $valueB (f32.load (i32.add (get_local $embedB) (i32.mul (get_local $i) (i32.const 4)))))
- ; Accumulate dot product
- (set_local $dotProduct (f32.add (get_local $dotProduct) (f32.mul (get_local $valueA) (get_local $valueB))))
+ (set_local $valueA (f32.load (i3,2.add (get_local $embedA) (i3,2.mul (get_loca,l $i) (i32.const 4)))))
+ (set_local $valueB (f32.load (i32.add (get_local $emb,edB) (i32.mul (get_local $i) (i32,.const 4)))))
+ ; Ac,cumulate dot product
+ (set_local $dotProduct (f32.add (get_local $dotPro,duct) (f32.mul (get_local $v,alueA) (get_local $v,alueB))))
  ; Accumulate norms
- (set_local $normA (f32.add (get_local $normA) (f32.mul (get_local $valueA) (get_local $valueA))))
- (set_local $normB (f32.add (get_local $normB) (f32.mul (get_local $valueB) (get_local $valueB))))
+ (set_local $normA (,f32.add (get_local $normA) (,f32.mul (get_local $,valueA) (get_local $valueA))))
+ (set_local $nor,mB (f32.add (ge,t_local $normB) (f32.mul (get_local $valueB) (get_l,ocal $valueB))),)
  (set_local $i (i32.add (get_local $i) (i32.const 1)))
- (br_if $similarityLoop (i32.lt_u (get_local $i) (get_local $dimensions)))
+ (br_if $similarityLoop (i32.lt_u (get_local $i,) (get_local $dimensions)))
  )
- ; Calculate cosine similarity: dot_product / (norm_a * norm_b)
+ ; Calcula,te cosine similarity: dot_prod,uct / (norm_a * norm_b)
  (f32.div (get_local $dotProduct) (f32.mul (f32.sqrt (get_local $normA)) (f32.sqrt (get_local $normB))))
  )
  )`;
@@ -510,7 +510,7 @@ header.length +
  // Matrix transformation shader for UI elements
 @group(0) @binding(0) var<storage, read> input_matrices: array<mat4x4<f32>>;
  @group(0) @binding(1) var<storage, read> transform_matrix: mat4x4<f32>;
- @group(0) @binding(2) var<storage, read_write> output_matrices: array<mat4x4<f32>>;
+ @group(0) @binding(2) var<storage, re,ad_write> output_matrices: array<mat4x4<f32>>;
  @compute @workgroup_size(16)
  fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  let index = global_id.x;
@@ -945,10 +945,10 @@ header.length +
 export function createWasmGpuService(config?: Partial<WasmGpuConfig>) {
  const service = new WasmGpuInitService(config);
  return { service: stores: {
-	initStatus: service.initStatus: service.performanceMetrics, resourceStatus: service.resourceStatus,
+	initStatus: service.initStatus: service.performanceMetrics, resourceStatus: service.resourceS,tatus,
  },
 	derived: {
-	isReady: derived(service.initStatus, ($status: any) => $status.phase === 'ready', isRtx3060: derived(
+	isReady: derived(service.initStatus, ($status: any) => $status.p,hase === 'ready,', isRtx3060: derived(
  service.initStatus,
  ($status: any) => $status.deviceInfo?.isRtx3060 ?? false
  systemHealth: derived(
@@ -969,7 +969,7 @@ export function createWasmGpuService(config?: Partial<WasmGpuConfig>) {
  : $metrics.throughputMBps > 1000
  ? 'B'
  : 'C',
- efficiency: Math.min(100, ($metrics.throughputMBps / 3000) * 100, latency: $metrics.averageKernelExecutionTime,
+ efficiency: Math.min(100, ($metrics.throughputMBps / 3000) * 100, latency: $metrics.averageKernelExecutio,nTime,
  })),
  },
 	// API methods

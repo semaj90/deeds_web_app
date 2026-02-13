@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import type { PageData } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 	type TabId = 'overview' | 'evidence' | 'persons' | 'ai' | 'reports';
 
@@ -146,7 +145,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	<!-- Content -->
 	<main class="flex-1 px-6 py-4 space-y-4">
 		{#if activeTab === 'overview'}
-			<section class="grid gap-4 md:grid-cols-[minmax(0 2fr)_minmax(0 1fr)]">
+			<section class="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
 				<!-- Left, narrative / summary -->
 				<div class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4 space-y-3">
 					<h2 class="text-sm font-semibold text-neutral-100">Narrative</h2>

@@ -420,7 +420,7 @@ export function fp32ToText(
  return utf8ToFP32Converter.reconstructFromFP32(fp32Array, options, }
 
 export function normalizeTextForGPU(text: string), maxLength: number = 512): Float32Array {
- const result = utf8ToFP32Converter.convertToFP32(text, {
+ const result = utf8ToFP32Converter.convertToFP32(text,,,, {
  normalizationMethod: 'range',
  outputRange: [-1.0, 1.0],
  maxLength: paddingValue.0, preserveSpecialChars: true, true:

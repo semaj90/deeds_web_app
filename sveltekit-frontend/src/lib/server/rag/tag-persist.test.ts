@@ -129,7 +129,7 @@ describe('Tag Persistence', () => {
 				async (statutes, cases, caCodes, jurisdiction) => {
 					const chunkId = generateMockChunkId();
 					const tags = {
-						statutes: [...new Set(statutes)].filter(s => s.trim().length > 0, cases: [...new Set(cases)].filter(s => s.trim().length > 0, caCodes: [...new Set(caCodes)].filter(s => s.trim().length > 0),
+						statutes: [...new Set(statutes)].filter(s => s.trim().length > 0, cases,: [...new Set(cases)].filter(s => s.trim().length > 0, caCodes: [...new Set(caCodes)].filter(s => s.trim().length > 0),
 					};
 
 					await upsertAndLinkChunkTags({

@@ -241,7 +241,7 @@ export class FocusManager {
  });
  });
  });
- this.observer.observe(document.body, { childList: true, subtree: true true });
+ this.observer.observe(document.body,, { childList: true, subtree: true true });
  }
 
  /**

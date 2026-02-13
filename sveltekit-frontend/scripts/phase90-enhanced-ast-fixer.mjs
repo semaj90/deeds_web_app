@@ -297,7 +297,7 @@ function findNodeAtPosition(sourceFile, position) {
 function isPrecededBySeparator(sourceFile, position) {
     const text = sourceFile.text;
     let pos = position - 1;
-    
+
     while (pos >= 0) {
         const char = text[pos];
         if (/\s/.test(char)) {
@@ -312,17 +312,17 @@ function isPrecededBySeparator(sourceFile, position) {
         if (char === '/' && pos > 0 && text[pos-1] === '*') {
             // End of block comment */
             // Skip back to start /*
-            // This is complex without full lexer. 
+            // This is complex without full lexer.
             // Simplified: just stop if we hit non-separator char.
             // If we are inside a comment, this logic fails.
             // But we rely on node.pos which usually skips leading trivia?
             // node.pos INCLUDES leading trivia.
-            // So we are scanning BACKWARDS through the previous node's trailing trivia 
+            // So we are scanning BACKWARDS through the previous node's trailing trivia
             // OR the current node's leading trivia.
-            
+
             // If node.pos is used, we are looking at text BEFORE the node specific start.
         }
-        
+
         return false; // Found non-separator token
     }
     return false;
@@ -711,6 +711,23 @@ async function processFile(filePath) {
         console.log(`   🔍 Dry run: ${fixes.length} corrections validated`);
     }
 
+    console.log('   📝 Modifications:');
+    for (const fix of fixes) {
+         let line = -1, character = -1;
+         try {
+             // Ensure position is within bounds (fixes at EOF can exceed slightly?)
+             const pos = Math.min(fix.position, sourceFile.end);
+             const lc = sourceFile.getLineAndCharacterOfPosition(pos);
+             line = lc.line;
+             character = lc.character;
+         } catch (e) {
+             console.warn(`      (Warning: Fix position ${fix.position} out of bounds)`);
+         }
+         if (line !== -1) {
+             console.log(`      Line ${line + 1}:${character + 1} [${fix.type}] "${fix.text.replace(/\n/g, '\\n')}"`);
+         }
+    }
+
     return {
         filePath,
         errorsBefore,
@@ -740,7 +757,11 @@ async function processBatch(files) {
 // MAIN
 // ============================================================================
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Normalize paths for Windows comparison
+const currentPath = fileURLToPath(import.meta.url).replace(/\\/g, '/').toLowerCase();
+const scriptPath = process.argv[1].replace(/\\/g, '/').toLowerCase();
+
+if (currentPath.endsWith(path.basename(scriptPath))) {
     const args = process.argv.slice(2);
 
     if (args.includes('--help') || args.includes('-h')) {
@@ -787,12 +808,24 @@ Examples:
         process.exit(result.success ? 0 : 1);
     }
 
+    const limitIdx = args.indexOf('--limit');
+    let limit = 10;
+    if (limitIdx !== -1) limit = parseInt(args[limitIdx + 1]);
+    if (args.includes('--all')) limit = 0;
+
+    const offsetIdx = args.indexOf('--offset');
+    let offset = 0;
+    if (offsetIdx !== -1) offset = parseInt(args[offsetIdx + 1]);
+
     const batchIdx = args.indexOf('--batch');
     if (batchIdx !== -1) {
         const batchPath = args[batchIdx + 1];
         const errorFilesData = JSON.parse(fs.readFileSync(batchPath, 'utf-8'));
         const errorFiles = errorFilesData.track1Files || [];
-        const batch = errorFiles.slice(0, 10).map((f) => ({ path: f.file, ...f }));
+
+        console.log(`📂 Loaded batch: ${errorFiles.length} files (offset: ${offset}, limit: ${limit})`);
+        const sliceEnd = limit > 0 ? offset + limit : undefined;
+        const batch = errorFiles.slice(offset, sliceEnd).map((f) => ({ path: f.file, ...f }));
 
         const results = await processBatch(batch);
 

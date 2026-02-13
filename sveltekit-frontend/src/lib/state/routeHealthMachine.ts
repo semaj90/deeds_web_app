@@ -120,13 +120,13 @@ createMachine(
  event.type === 'ERROR_OBSERVED' ? event.clusterId  : undefined; lastErrorMessageShort: (_, event) =>
  event.type === 'ERROR_OBSERVED' ? event.message.substring(0, 100)  | undefined,
  },
-	resetErrors: assign({
+	resetErrors,: assign({
 	recentErrorCount: () => 0,
  lastErrorAt: () => undefined,
  lastErrorClusterId: () => undefined,
  lastErrorMessageShort: () => undefined,
  },
-	partialReset: assign({
+	partialReset,: assign({
 	recentErrorCount: ({ context }) => Math.max(0, context.recentErrorCount - 2),
  },
 	decayErrors: assign({

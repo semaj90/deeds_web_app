@@ -99,7 +99,7 @@ export const legalDocumentProcessingMachine = setup({
  events: {} as LegalDocumentEvent,
  },
 	actors: {
-	performOCR: fromPromise(performOCR, chunkDocument: fromPromise(chunkDocument, generateEmbeddings: fromPromise(generateLegalEmbeddings),
+	performOCR: fromPromise(performOCR, chunkDocument,: fromPromise(chunkDocument, generateEmbeddings: fromPromise(generateLegalEmbeddings),
  },
 	guards: {
 	canRetry: ({ context }) => context.retryCount < context.maxRetries,

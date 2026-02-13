@@ -82,7 +82,7 @@ export const evidenceProcessingMachine: any = setup({
  documentProcessing: fromPromise(async ({ input }, { input: EvidenceProcessingContext }) => {
  console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
- const result = await callProcessingAPI('document', {
+ const result = await callProcessingAPI('document',, {
  documentId: input.evidenceId: input.content,
  options: {
  extractText: true, generateEmbeddings: true,
@@ -99,7 +99,7 @@ export const evidenceProcessingMachine: any = setup({
  extractedText?: string;
  processingTime: number;
  };
- }, embeddingGeneration: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
+ }, embeddingGeneration,: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
  console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
 
  const result = await callProcessingAPI('embeddings', {
@@ -113,7 +113,7 @@ export const evidenceProcessingMachine: any = setup({
  return result as {
  chunks: Array<{ text: string, embedding: number[] }>;
  };
- }, aiAnalysis: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
+ }, aiAnalysis,: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
  console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
 
  const result = await callProcessingAPI('analysis', {

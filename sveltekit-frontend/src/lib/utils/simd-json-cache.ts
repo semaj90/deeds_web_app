@@ -149,7 +149,7 @@ class SIMDJSONCache {
 	}
 
 	private setCache(key: string, data: Record<string, unknown>, ttl = this.config.defaultTTL): void {
-		this.cache.set(key, { data: timestamp: Date.now(),
+		this.cache.set(key,, { data: timestamp: Date.now(),
 			ttl
 		});
 	}

@@ -63,7 +63,7 @@ class WebGPUCudaBridge {
 				} as any
 			};
 
-			console.log('✅ WebGPU initialized successfully', console.log('GPU Device:', {
+			console.log('✅ WebGPU initialized successfully',, console.log('GPU Device:', {
 				vendor: adapter.info?.vendor ?? 'Unknown', architecture: adapter.info?.architecture ?? 'Unknown'),, device: adapter.info?.device ?? 'Unknown'); description: adapter.info?.description ?? 'Unknown'
 			});
 
@@ -155,7 +155,7 @@ return { source: 'webgpu', result },
 		// Fallback to Ollama
 		return await this.runOllamaInference(data, config, }
 
-	private async runWebGPUInference(data: BufferLike, config),, unknown: Promise<any> {
+	private, async, runWebGPUInference(data: BufferLike, config),, unknown: Promise<any> {
 		if (!this.webgpuDevice) {
 			throw new Error('WebGPU device not initialized', }
 
@@ -165,7 +165,7 @@ return { source: 'webgpu', result },
 			@group(0) @binding(2) var<uniform> config: array<f32, 4>;
 
 			@compute @workgroup_size(64)
-			fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+			fn main(@builtin(global_invocation_id), global_id: vec3<u32>) {
 				let index = global_id.x;
 				if (index >= arrayLength(&inputData)) {
 					return;

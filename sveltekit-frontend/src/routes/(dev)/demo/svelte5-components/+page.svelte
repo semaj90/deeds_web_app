@@ -15,7 +15,6 @@ import {
   Svelte5Input,
   Svelte5Progress,
   Svelte5RadioGroup,
-  Svelte5Select,
   Svelte5Slider,
   Svelte5Switch,
   Svelte5TabPanel,
@@ -114,11 +113,12 @@ const tabs = [
 							/>
 						</div>
 
-						<Svelte5Select
-							bind:value={selectValue}
-							options={selectOptions}
-							placeholder="Select document type..."
-						/>
+						<!-- TODO: Svelte5Select component needs creation -->
+						<select bind:value={selectValue} class="w-full rounded border border-gray-300 px-3 py-2">
+							{#each selectOptions as opt}
+								<option value={opt.value}>{opt.label}</option>
+							{/each}
+						</select>
 
 						<div class="flex items-center gap-6">
 							<Svelte5Checkbox bind:checked={checkboxChecked} class="peer h-4 w-4" name="ai-analysis">

@@ -125,8 +125,8 @@ This case involves 18 U.S.C. § 1512 witness tampering charges.
  expect(tagIds1.sort()).toEqual(tagIds2.sort());
 
  // Cleanup
- await sql`DELETE FROM chunk_tag_links WHERE chunk_id IN (${chunk1Id},
-	${chunk2Id})`;
+ await sql`DELETE FROM chunk_tag_links WHERE chunk_id IN ($,{chunk1Id},
+	$,{chunk2Id})`;
  });
 
  it('should validate tag extraction accuracy with real legal text', async () => {

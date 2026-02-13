@@ -18,8 +18,8 @@ export const loadAIComponents = {
   },
 
   async qloraMonitoring() {
-    const { default: QLoRAMonitoringDashboard } = await import('$lib/components/ai/QLoRAMonitoringDashboard.svelte');
-    return QLoRAMonitoringDashboard;
+    // TODO: Create QLoRAMonitoringDashboard component
+    return null;
   },
 
   async fabricCanvas() {
@@ -47,43 +47,78 @@ export const loadAIComponents = {
   },
 
   // WebGPU components
+  // TODO: Enhance with C++ Dawn matrix integration for WebGPU compute shaders
+  // TODO: Add IndexedDB + Loki.js + Fuse.js caching layer for front-end optimizations
   async webgpu() {
-    const [WebGPULoader, TextureStreaming] = await Promise.all([
-      import('$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte'),
-      import('$lib/components/examples/NESTextureStreamingExample.svelte')
-    ]);
-    return {
-      WebGPULoader: WebGPULoader.default,
-      TextureStreaming: TextureStreaming.default
-    };
+    try {
+      const [WebGPULoader, TextureStreaming] = await Promise.all([
+        import('$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte'),
+        import('$lib/components/examples/NESTextureStreamingExample.svelte')
+      ]);
+      return {
+        WebGPULoader: WebGPULoader.default,
+        TextureStreaming: TextureStreaming.default
+      };
+    } catch {
+      console.warn('[dynamic-imports] WebGPU components not yet available');
+      return { WebGPULoader: null, TextureStreaming: null };
+    }
   }
 };
 
 // Service workers for heavy AI processing
+// TODO: Redis optimization tensor analysis → Docker containers → Qdrant tagged → pgvector mirrored for RTX CUDA
+// TODO: RabbitMQ graph DB backend integration (separate service)
+// TODO: Front-end optimizations: IndexedDB + Loki.js + Fuse.js for concurrent parallelism, user analytics recommendations
 export const loadAIServices = {
   async embeddingWorker() {
-    const { enhancedEmbeddingWorker } = await import('$lib/workers/embedding-worker-enhanced.js');
-    return enhancedEmbeddingWorker;
+    try {
+      const { enhancedEmbeddingWorker } = await import('$lib/workers/embedding-worker-enhanced.js');
+      return enhancedEmbeddingWorker;
+    } catch {
+      console.warn('[dynamic-imports] Embedding worker not yet available');
+      return null;
+    }
   },
 
   async gpuSomEmbeddings() {
-    const mod = await import('$lib/services/gpu-som-embeddings');
-    return (mod as any).GPUSOMEmbeddings;
+    try {
+      const mod = await import('$lib/services/gpu-som-embeddings');
+      return (mod as any).GPUSOMEmbeddings;
+    } catch {
+      console.warn('[dynamic-imports] GPU SOM embeddings not yet available');
+      return null;
+    }
   },
 
   async contextualIntelligence() {
-    const service = await import('$lib/services/contextual-intelligence-service');
-    return service;
+    try {
+      const service = await import('$lib/services/contextual-intelligence-service');
+      return service;
+    } catch {
+      console.warn('[dynamic-imports] Contextual intelligence service not yet available');
+      return null;
+    }
   },
 
   async quantumCache() {
-    const cache = await import('$lib/quantum/rag-cache');
-    return cache;
+    try {
+      const cache = await import('$lib/quantum/rag-cache');
+      return cache;
+    } catch {
+      console.warn('[dynamic-imports] RAG cache not yet available');
+      return null;
+    }
   },
 
   async simdGpuTiling() {
-    const { simdGPUTilingEngine } = await import('$lib/evidence/simd-gpu-tiling-engine');
-    return simdGPUTilingEngine;
+    try {
+      const { simdGPUTilingEngine } = await import('$lib/evidence/simd-gpu-tiling-engine');
+      return simdGPUTilingEngine;
+    } catch {
+      console.warn('[dynamic-imports] SIMD GPU tiling engine not yet available');
+      return null;
+    }
   }
 };
 

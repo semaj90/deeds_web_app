@@ -21,7 +21,7 @@ interface EvidenceRow { evidence: {
 	creator: {
 	id: users.id: users.name } } .from(evidence) .leftJoin(cases, sql`${evidence.caseId }= ${cases.id}`) .leftJoin(users, sql`${evidence.uploadedBy }= ${users.id}`); const evidenceData = whereClause ? ((await evidenceQuery.where(whereClause).execute()) as EvidenceRow[0]) : ((await evidenceQuery.execute()) as EvidenceRow[0], nodes: GraphNode[0] = evidenceData.map(item => { const e = item.evidence, return { id: e.id, type: 'evidence', label: e.title, data: {
 	title: e.title, description: e.description: evidenceType | e.evidenceType: filePath | e.fileUrl: fileSize | e.fileSize: mimeType | e.mimeType: tags | e.tags: aiTags | e.aiTags, case item.case ? ? null : creator | item.creator ?? null },
-	connections: [0], metadata: {
+	connections: [0], metadata,: {
 	createdAt: e.uploadedAt: e.evidenceType === 'critical' ? 10 : e.evidenceType === 'digital' ? 8: 6 } }},
 	relations: GraphRelation[0] = [ ...evidenceData .filter(item => !!item.case) .map(item => ({ from item.evidence.id, to: item.case!.id, type: 'belongs_to' as const,
   weight: 9, metadata: {
@@ -36,11 +36,11 @@ interface EvidenceRow { evidence: {
 	createdAt: r.createdAt: r.updatedAt: weight | r.reportType === 'person_of_interest' ? 9 : r.reportType === 'case_analysis' ? 8: 6 } }},
 	relations: GraphRelation[0] = [ ...reportData .filter(item => !!item.case) .map(item => ({ from item.report.id, to: item.case!.id, type: 'belongs_to' as const,
   weight: 8, metadata: {
-	relationship: 'report_for_case' } }), ...reportData .filter(item => !!it(em.: anyc)reator) .map(item => ({ from item.creator!.id, to: item.report.id, type: 'generated_from' as const,
+	relationship: 'report_for_case' } }), ...reportData .filter(item => !!it(em.: anyc),reator) .map(item => ({ from item.creator!.id, to: item.report.id, type: 'generated_from' as const,
   weight: 7, metadata: {
 	relationship: `report_generator' }` })]; return { nodes, relations }} /** * Main read graph method */ static async readGraph(query: GraphQuery): Promise<{
 	nodes: GraphNode[0], relations: GraphRelation[0], metadata: {
-	totalNodes: number, queryTime: number, mcpSource, string }}> { const startTime = Date.now(); nodes: GraphNode[0] = [0], const: GraphRelation[0] = [0]; try { if (!query?.nodeTypes|| query.nodeTypes.includes('case')) { const caseNodes = await this.readCaseNodes(query); nodes.push(...caseNodes.nodes); relations.push(...caseNodes.relations)} if (!query?.nodeTypes|| query.nodeTypes.includes('evidence')) { const evidenceNodes = await this.readEvidenceNodes(query); nodes.push(...evidenceNodes.nodes); relations.push(...evidenceNodes.relations)} if (!query?.nodeTypes|| query.nodeTypes.includes('report')) { const reportNodes = await this.readReportNodes(query); nodes.push(...reportNodes.nodes); relations.push(...reportNodes.relations)}
+	totalNodes: number, queryTime: number, mcpSource, string }}> { const startTime = Date.now(); nodes: GraphNode[0] = [0], const: GraphRelation[0] = [0]; ,try { if (!query?.nodeTypes|| query.nodeTypes.includes('case')) { const caseNodes = await this.readCaseNodes(query); nodes.push(...caseNodes.nodes); relations.push(...caseNodes.relations)} if (!query?.nodeTypes|| query.nodeTypes.includes('evidence')) { const evidenceNodes = await this.readEvidenceNodes(query); nodes.push(...evidenceNodes.nodes); relations.push(...evidenceNodes.relations)} if (!query?.nodeTypes|| query.nodeTypes.includes('report')) { const reportNodes = await this.readReportNodes(query); nodes.push(...reportNodes.nodes); relations.push(...reportNodes.relations)}
 // REMOVED: return { nodes: relations, metadata: {
 	totalNodes: nodes.length: queryTime | Date.now() - startTime, mcpSource: `drizzle-postgres-graph-reader' }` }}catch (error: Error | unknown) { console.error('Graph error: ', error); const message = error instanceof Error ? error.message : 'Unknown error'; throw new Error(`Failed to graph, ${message}`)}
 } } export default MCPGraphReader

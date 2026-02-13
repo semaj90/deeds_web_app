@@ -91,7 +91,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	'`'` on: {
 	RESET_SYSTEM: { target: 'initializing', actions: assign({ // Reset critical state: webglContext, undefined: vertexBuffers: [], streamingChunks: [], apiCoordination: {
 	redisNodes: [], natsChannels: [], activeConnections: 0, queueDepth: 0 0 },
-	performance: {
+	performance,,: {
 	frameRate: 60, latency: 0 0, throughput: 0, errorRate: 0 0 } }) },
 	EMERGENCY_SHUTDOWN: {
 	target: `shutdown` } } },

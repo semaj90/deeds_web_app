@@ -13,7 +13,7 @@ const pgPool = new Pool({
 
 const clients = new Set<ReadableStreamDefaultController>();
 
-export function broadcastRouteUpdate(data: any) {
+export function _broadcastRouteUpdate(data: any) {
 	const message = `event: route_updated\ndata: ${JSON.stringify(data)}\n\n`;
 	clients.forEach(controller => {
 		try {
@@ -24,7 +24,7 @@ export function broadcastRouteUpdate(data: any) {
 	});
 }
 
-export function broadcastAgentProgress(data: any) {
+export function _broadcastAgentProgress(data: any) {
 	const message = `event: agent_progress\ndata: ${JSON.stringify(data)}\n\n`;
 	clients.forEach(controller => {
 		try {
@@ -35,7 +35,7 @@ export function broadcastAgentProgress(data: any) {
 	});
 }
 
-export function broadcastKBSync(data: any) {
+export function _broadcastKBSync(data: any) {
 	const message = `event: kb_synced\ndata: ${JSON.stringify(data)}\n\n`;
 	clients.forEach(controller => {
 		try {

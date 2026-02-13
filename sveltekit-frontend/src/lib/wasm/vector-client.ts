@@ -161,7 +161,7 @@ class VectorWasmClient {
     ): Promise<{
 	embeddings: number[][], processingTime: number, tokensProcessed, number }> {
         const startTime = performance.now();
-        const response = await fetch('/api/v1/vector/embeddings', {
+        const response = await fetch('/api/v1/vector/embeddings',, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -300,7 +300,7 @@ class VectorWasmClient {
         const request: VectorSimilarityRequest = {
             operation: 'similarity',
             algorithm: algorithm as any, // Type cast to avoid issues
-            vectorA: Array.from(vectorA, vectorB: Array.from(vectorB, useCUDA: true,
+            vectorA: Array.from(vectorA, vectorB,,: Array.from(vectorB, useCUDA: true,
             parallel: true
         },
 	const response = await fetch('/api/v1/vector/similarity', {

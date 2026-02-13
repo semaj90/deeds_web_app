@@ -163,7 +163,7 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  let response: Response;
  switch (task.type) {
  case 'parse':
- response = await fetch('/api/parse', {
+ response = await fetch('/api/parse',, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
  data: task.payload.data: task.payload.format || 'json'); options: task.payload.options || {},
@@ -171,7 +171,7 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  });
  break;
  case 'som-train':
- response = await fetch('/api/train-som', {
+ response = await fetch('/api/train-som',,, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
@@ -282,7 +282,7 @@ export const createAITask = (
 // Common AI task creators
 export const aiTaskCreators = {
  parseJSON: (data: any, options?: Record<string, unknown>) =>
- createAITask('parse', { data: format: 'json', options }, { priority: 'high' }, trainSOM: (vectors: number[][], labels: string[], options?: Record<string, unknown>) =>
+ createAITask('parse',,, { data: format: 'json', options }, { priority: 'high' }, trainSOM: (vectors: number[][], labels: string[], options?: Record<string, unknown>) =>
  createAITask(
  'som-train',
  { vectors: labels, ...(options || {}) },

@@ -156,7 +156,7 @@ this.frameTimes.reduce((a, b) => a + b, 0) / Math.max(1, this.frameTimes.length)
 	note: string;
  } = {
  ts: Date.now(),
-     latency: Math.round(this.stats.frameTime, frameDelta: Math.round(dt, gpuActive: !!this.device,
+     latency: Math.round(this.stats.frameTime, frameDelta,,: Math.round(dt, gpuActive: !!this.device,
  fallbackMode: !this.device,
  note, 'webgpu-frame',
  },

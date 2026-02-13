@@ -251,7 +251,7 @@ WHERE 1=1
  try {
  // Delete from embeddings table
  const embedResult = await this.db.execute(
- sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
+ sql`DELETE FROM embeddings WHERE document_id = ${documentId}`,
  // Delete from document_chunks table
  await this.db.execute(sql`DELETE FROM document_chunks WHERE document_id = ${documentId}`);
  return Array.isArray(embedResult) ? embedResult.length : 0;

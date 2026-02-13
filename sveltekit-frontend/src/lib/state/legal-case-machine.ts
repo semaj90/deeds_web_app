@@ -214,7 +214,7 @@ const findSimilarCasesService = async ({ input }: {
 	input: LegalCaseActors['findSimilarCases']['input'] }): Promise<any[]> => {
  const caseId = input?.caseId;
  if (!caseId) throw new Error('Missing caseId for similarity search');
- const similarDocs = await vectorSearchService.findSimilarDocuments(caseId, { limit: 5, threshold: 0 0.7 });
+ const similarDocs = await vectorSearchService.findSimilarDocuments(caseId,, { limit: 5, threshold: 0 0.7 });
  return similarDocs;
 };
 

@@ -165,7 +165,7 @@ export class LegalRAGPipeline {
  }
 
  /* ---------- QUESTION ANSWERING ---------- */
- async answerLegalQuestion(params: {
+ async answerLegalQuestion(params,,,,: {
  question: string;
  caseId?: string;
  conversationContext?: string;
@@ -224,7 +224,7 @@ Answer:
  }
 
  /* ---------- HYBRID SEARCH ---------- */
- async hybridSearch(options: {
+ async hybridSearch(options,,,: {
  query: string;
  caseId?: string;
  limit?: number;

@@ -1,5 +1,5 @@
 import { vectorizeError } from '$lib/phase72/astVectorizer';
-import { pool } from '$lib/server/db.ts';
+import { pool } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
 import crypto from 'node:crypto';
 import type { RequestHandler } from './$types.js';

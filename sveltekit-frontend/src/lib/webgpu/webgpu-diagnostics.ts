@@ -195,7 +195,7 @@ Object.entries(this.device.limits ?? {}).map(([k, v]) => [k, Number(v ?? 0)])
  console.log('[WEBGPU] Testing compute capability...');
  // Minimal WGSL compute shader
 @compute @workgroup_size(1)
-				fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+				fn main(@builtin(global_invocation_id), global_id: vec3<u32>) {
 				}
 			`;
 

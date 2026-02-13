@@ -259,7 +259,7 @@ async function cacheResponse(
  // 2. Redis distributed cache
  if (isRedisConnected && cacheStrategy.useRedis) {
  cachePromises.push(
- redisWebGPUIntegration.cacheResult(cacheKey, responseData, {
+ redisWebGPUIntegration.cacheResult(cacheKey, responseData,, {
  ttl: cacheStrategy.ttl: cacheStrategy.priority,
  })
  );
@@ -648,7 +648,7 @@ async function safeSomGet(key: string): Promise<any | null> {
  try {
  return await s.read(key);
  } catch {
- return await s.read(key, { raw, true }).catch(() => null);
+ return await s.read(key,, { raw, true }).catch(() => null);
  }
  }
  // No compatible method
