@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	return {
 		user: locals.user,
 		caseId,
-		case: {
+		caseData: {
 			id: caseRow.id,
 			title: caseRow.title,
 			status: caseRow.status,

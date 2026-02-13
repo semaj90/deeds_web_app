@@ -45,7 +45,7 @@ export async function setCache(key: string, value: string, ttl?: number): Promis
     try {
         if (!redis) return;
         if (typeof ttl === 'number') {
-            await redis.set(key, value, 'EX', ttl);
+            await (redis as any).set(key, value, 'EX', ttl);
         } else {
             await redis.set(key, value);
         }
@@ -87,10 +87,10 @@ export async function setCacheIfNotExists(key: string, value: string, ttl?: numb
     try {
         if (!redis) return false;
         if (typeof ttl === 'number') {
-            const result = await redis.set(key, value, 'EX', ttl, 'NX');
+            const result = await (redis as any).set(key, value, 'EX', ttl, 'NX');
             return result === 'OK';
         }
-        const result = await redis.set(key, value, 'NX');
+        const result = await (redis as any).set(key, value, 'NX');
         return result === 'OK';
     } catch (error) {
         console.error('Redis error:', error);

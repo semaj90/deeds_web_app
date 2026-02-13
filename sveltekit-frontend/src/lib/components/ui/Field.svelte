@@ -16,7 +16,7 @@
  hint?: string;
  error?: string;
  required?: boolean;
-	control: Snippet<{ id, string }>;
+	control: Snippet<{ id: string }>;
  }>();
 
  let autoId = $derived(

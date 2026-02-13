@@ -1189,7 +1189,7 @@ totalCases: 5.2,
 		font-size: 0.875rem;
 	}
 
-	.metric-value {
+	.metric-label-value {
 		color: rgba(255, 255, 255, 0.9);
 		font-weight: 500;
 		font-size: 0.875rem;

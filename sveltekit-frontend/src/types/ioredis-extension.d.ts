@@ -1,3 +1,32 @@
-// This file augments the: 'ioredis' module to include missing type definitions // for methods, like: 'on', 'off', 'once', 'call', 'info', and: 'quit' // which are part of the ioredis Redis client but might not be fully // inferred by TypeScript in certain environments or versions. declare module, 'ioredis' { import type { EventEmitter } from 'events'; // Augment the Redis class to include EventEmitter methods and specific ioredis commands interface Redis extends EventEmitter { // EventEmitter methods (explicitly listed for clarity if needed, as Redis extends EventEmitter) on(event, string | symbol, listener: (...args, any[]) => void): this; off(event, string | symbol, listener: (...args: unknown[]) => void): this; once(event, string | symbol, listener: (...args: unknown[]) => void): this; // ioredis specific command methods // 'call' for custom commands or Redis Stack commands like JSON call(command, string, ...args: (string | number | Buffer)[]): Promise<any>; // 'info' to retrieve information and statistics about the Redis server info(section?: string): Promise<string>; // 'quit' to close the connection quit(): Promise<string>} }
+import type { EventEmitter } from 'events';
 
+declare module 'ioredis' {
+	interface Redis extends EventEmitter {
+		status: string;
+		ping(): Promise<string>;
+		get(key: string): Promise<string | null>;
+		set(key: string, value: string): Promise<string>;
+		setex(key: string, seconds: number, value: string): Promise<string>;
+		del(...keys: string[]): Promise<number>;
+		flushdb(): Promise<string>;
+		info(section?: string): Promise<string>;
+		dbsize(): Promise<number>;
+		quit(): Promise<string>;
+		call(command: string, ...args: (string | number | Buffer)[]): Promise<any>;
+	}
 
+	export interface RedisOptions {
+		host?: string;
+		port?: number;
+		password?: string;
+		db?: number;
+		lazyConnect?: boolean;
+		maxRetriesPerRequest?: number;
+		enableReadyCheck?: boolean;
+		connectTimeout?: number;
+		commandTimeout?: number;
+		retryStrategy?: (times: number) => number | null;
+		reconnectOnError?: (err: Error) => boolean;
+		[key: string]: any;
+	}
+}

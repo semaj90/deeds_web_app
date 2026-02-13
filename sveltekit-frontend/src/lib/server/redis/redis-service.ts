@@ -11,7 +11,7 @@ export class RedisService {
     async setCache(key: string, value: unknown, ttlSeconds = 300): Promise<void> {
         try {
             const serialized = JSON.stringify(value);
-            await redis.set(key, serialized, 'EX', ttlSeconds);
+            await (redis as any).set(key, serialized, 'EX', ttlSeconds);
         } catch (error) {
             console.error(`[RedisService] Cache set error for key: "${key}":`, error);
         }

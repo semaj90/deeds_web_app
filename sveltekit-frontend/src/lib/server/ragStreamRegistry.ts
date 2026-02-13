@@ -101,7 +101,7 @@ export async function cachedSummary(text: string, maxSentences = 3): Promise<str
 
     if (summary && redis) {
         try {
-            await redis.set(key, summary, 'EX', 3600);
+            await (redis as any).set(key, summary, 'EX', 3600);
         } catch (error) { }
     }
 

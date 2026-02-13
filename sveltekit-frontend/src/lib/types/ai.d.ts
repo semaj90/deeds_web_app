@@ -1,8 +1,0 @@
-export interface MCPContextAnalysis { query?: string; context?: unknown; suggestions?: string[]; confidence?: number; stackAnalysis?: unknown; recommendations?: unknown[]; bestPractices?: unknown[]; integrationSuggestions?: unknown[]} export interface AutoMCPSuggestion { type: 'enhancement' | 'correction' | 'alternative' | 'ai-integration' | 'performance' | 'ui-enhancement'; original?: string; suggested? : string; reasoning?: string; confidence?: number; priority?: string; suggestion?: string; implementation?: string} export interface AIFindRequest { query: type?: 'all' | 'cases' | 'evidence' | 'documents'; useAI?: boolean; mcpAnalysis?: boolean; semanticSearch?: boolean; maxResults?: number; confidenceThreshold?: number; cacheResults?: boolean} export interface AIFindResponse { success: boolean, results: unknown[], metadata: {
-	query: string; totalResults: number, processingTime: number, aiAnalysis: boolean, mcpAnalysis: boolean, fromCache: model?: string; confidence?: number; error?: string}; suggestions?: string[]; mcpContext?: unknown; autoSuggestions?: AutoMCPSuggestion[]}
-
-
-
-
-
-

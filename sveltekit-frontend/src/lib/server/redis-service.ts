@@ -187,7 +187,7 @@ class RedisService {
       await client.del('test:json');
       console.log('✅ [RedisService] JSON module available');
       // Test basic operations
-      await client.set('test:basic', 'redis-stack-ready', 'EX', 60);
+      await (client as any).set('test:basic', 'redis-stack-ready', 'EX', 60);
       const testValue = await client.get('test:basic');
       await client.del('test:basic');
       if (testValue === 'redis-stack-ready') {
@@ -295,7 +295,7 @@ class RedisService {
         }
       }
       if (smartTtl) {
-        await client.set(key, serialized, 'EX', smartTtl);
+        await (client as any).set(key, serialized, 'EX', smartTtl);
       } else {
         await client.set(key, serialized);
       }

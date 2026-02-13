@@ -74,10 +74,10 @@
 			</div>
 			<div>
 				<h1 class="text-xl font-semibold leading-tight">
-					Case #{data.case?.id ?? data.caseId}
+					Case #{data.caseData?.id ?? data.caseId}
 				</h1>
 				<p class="text-xs text-neutral-400 line-clamp-1">
-					{data.case?.title ?? 'Untitled case'} • {data.case?.status ?? 'Draft'}
+					{data.caseData?.title ?? 'Untitled case'} • {data.caseData?.status ?? 'Draft'}
 				</p>
 			</div>
 		</div>
@@ -150,33 +150,33 @@
 				<div class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4 space-y-3">
 					<h2 class="text-sm font-semibold text-neutral-100">Narrative</h2>
 					<p class="text-sm text-neutral-300 whitespace-pre-line">
-						{data.case?.narrative ?? 'No narrative captured yet.'}
+						{data.caseData?.narrative ?? 'No narrative captured yet.'}
 					</p>
 
 					<div class="grid gap-2 text-xs text-neutral-300 md:grid-cols-3">
 						<div>
 							<p class="text-neutral-500">WHO</p>
-							<p>{data.case?.who ?? '—'}</p>
+							<p>{data.caseData?.who ?? '—'}</p>
 						</div>
 						<div>
 							<p class="text-neutral-500">WHAT</p>
-							<p>{data.case?.what ?? '—'}</p>
+							<p>{data.caseData?.what ?? '—'}</p>
 						</div>
 						<div>
 							<p class="text-neutral-500">WHEN</p>
-							<p>{data.case?.when ?? '—'}</p>
+							<p>{data.caseData?.when ?? '—'}</p>
 						</div>
 						<div>
 							<p class="text-neutral-500">WHERE</p>
-							<p>{data.case?.where ?? '—'}</p>
+							<p>{data.caseData?.where ?? '—'}</p>
 						</div>
 						<div>
 							<p class="text-neutral-500">WHY</p>
-							<p>{data.case?.why ?? '—'}</p>
+							<p>{data.caseData?.why ?? '—'}</p>
 						</div>
 						<div>
 							<p class="text-neutral-500">HOW</p>
-							<p>{data.case?.how ?? '—'}</p>
+							<p>{data.caseData?.how ?? '—'}</p>
 						</div>
 					</div>
 				</div>

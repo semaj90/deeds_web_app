@@ -36,6 +36,7 @@
     ".svelte-check-tmp/**",
     "../.rag-metrics/**",
     "src/lib/_archive/**",
+    "src/archived/**",
     "**/_archive/**",
     "src/tests/**",
     "src/stories/**",

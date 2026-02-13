@@ -212,7 +212,7 @@ export class CHRROMPatternCache {
 			const serializedPattern = this.serializePattern(pattern);
 			if (this.redis) {
 				// ioredis typings prefer 'set' with EX option instead of 'setex'
-				await this.redis.set(redisKey, serializedPattern, 'EX', 3600); // 1 hour TTL
+				await (this.redis as any).set(redisKey, serializedPattern, 'EX', 3600); // 1 hour TTL
 			}
 
 			// Store in L1 cache

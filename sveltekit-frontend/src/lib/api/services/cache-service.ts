@@ -1,4 +1,4 @@
-import { Redis } from 'ioredis';
+import Redis from 'ioredis';
 import { gunzipSync, gzipSync } from 'zlib';
 
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour in ms
