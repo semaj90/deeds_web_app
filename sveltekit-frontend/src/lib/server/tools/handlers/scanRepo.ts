@@ -11,6 +11,7 @@ import {
   toolRegistry,
   ScanRepoRequestSchema,
   type ScanRepoRequest,
+  type ScanRepoResult,
   type ToolResult
 } from '../registry.js';
 
@@ -112,7 +113,7 @@ async function scanRepoHandler(request: ScanRepoRequest): Promise<ToolResult<Sca
   };
 
   for (const patternDef of request.patterns) {
-    const matches = await searchWithPattern(patternDef.pattern, request.paths,
+    const matches = await runRipgrep(patternDef.pattern, request.paths,
       {
         ...options,
         isRegex: patternDef.type === 'regex'

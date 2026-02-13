@@ -9,9 +9,11 @@ import {
   toolRegistry,
   LangExtractBatchRequestSchema,
   type LangExtractBatchRequest,
+  type LangExtractResult,
   type ToolResult
 } from '../registry.js';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+const LANGEXTRACT_URL = process.env?.LANGEXTRACT_URL ?? 'http://localhost:8095';
 
 interface ExtractedEntity {
   type: string;
@@ -74,7 +76,8 @@ JSON:`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: prompt,
+	model,
+        prompt,
         stream: false,
         options: {
 	temperature: 0.1 }
@@ -82,7 +85,7 @@ JSON:`;
     });
 
     if (response.ok) {
-      const data = await response.json() as { response, string };
+      const data = await response.json() as { response: string };
       try {
         const parsed = JSON.parse(data.response);
         return {
@@ -114,9 +117,8 @@ async function fetchDocumentContent(url: string, textRef: string): Promise<strin
 }
 
 async function langextractBatchHandler(request: LangExtractBatchRequest): Promise<ToolResult<LangExtractResult>> {
-  const options = request?.options|| {};
-  const model = options?.model ?? 'gemma3-legal:latest';
-  const timeout = options?.timeout_ms ?? 30000;
+  const model = request.options?.model ?? 'gemma3-legal:latest';
+  const timeout = request.options?.timeout_ms ?? 30000;
 
   const extractions: Array<{
 	doc_url: string;
@@ -160,7 +162,8 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
     run_id: request.run_id,
     tool: 'langextract_batch',
     data: {
-	extractions: total_entities, totalEntities,
+	extractions,
+      total_entities: totalEntities,
       total_relations: totalRelations
     },
 	duration_ms: 0,

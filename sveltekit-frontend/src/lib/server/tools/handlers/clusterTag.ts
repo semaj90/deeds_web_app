@@ -9,9 +9,11 @@ import {
   toolRegistry,
   ClusterTagRequestSchema,
   type ClusterTagRequest,
+  type ClusterTagResult,
   type ToolResult
 } from '../registry.js';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const PHASE72_PYTHON = process.env?.PHASE72_PYTHON ?? 'python';
 
 async function fetchVectors(collection: string, limit: number): Promise<Array<{
@@ -49,7 +51,7 @@ async function generateClusterSummary(clusterPoints: string[], model: string): P
     });
 
     if (response.ok) {
-      const data = await response.json() as { response, string };
+      const data = await response.json() as { response: string };
       return data.response;
     }
   } catch {
@@ -83,7 +85,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
 	id: number;
     size: number;
 	centroid_id: string;
-    summary?: string; tags?: string[];
+    summary?: string | undefined; tags?: string[] | undefined;
   }> = [];
 
   const clusterSize = Math.max(5, Math.floor(points.length / 10));
@@ -115,7 +117,8 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     run_id: request.run_id,
     tool: 'cluster_tag',
     data: {
-	total_clusters: clusters.length,
+	clusters,
+      total_clusters: clusters.length,
       noise_points: points.length % clusterSize
     },
 	duration_ms: 0,

@@ -88,10 +88,10 @@ function extractTextContent(html: string): string {
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
-    .replace(/&nbsp,/g, ' ')
-    .replace(/&lt,/g, '<')
-    .replace(/&gt,/g, '>')
-    .replace(/&amp,/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
     .trim();
 }
 
@@ -138,13 +138,10 @@ async function crawlUrl(
 }
 
 async function crawlDocsHandler(request: CrawlDocsRequest): Promise<ToolResult<CrawlDocsResult>> {
-  const options = request?.options|| {};
-  const parsing = request?.parsing|| {};
-
-  const timeout = options?.timeout_ms ?? 10000;
-  const maxConcurrent = options?.max_concurrent ?? 5;
-  const extractCode = parsing.extract_code !== false;
-  const extractTablesOpt = parsing.extract_tables !== false;
+  const timeout = request.options?.timeout_ms ?? 10000;
+  const maxConcurrent = request.options?.max_concurrent ?? 5;
+  const extractCode = request.parsing?.extract_code !== false;
+  const extractTablesOpt = request.parsing?.extract_tables !== false;
 
   const crawledPages: CrawledPage[] = [];
   const failedUrls: string[] = [];
@@ -157,9 +154,10 @@ async function crawlDocsHandler(request: CrawlDocsRequest): Promise<ToolResult<C
       batch.map(urlConfig =>
         crawlUrl(urlConfig.url, {
           timeout,
-          userAgent: options.user_agent,
+          userAgent: request.options?.user_agent,
+          extractCode,
           extractTables: extractTablesOpt,
-          selectors: parsing.selectors
+          selectors: request.parsing?.selectors
         })
       )
     );

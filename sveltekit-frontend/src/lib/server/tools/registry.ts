@@ -113,7 +113,7 @@ export type KBSearchRequest = z.infer<typeof KBSearchRequestSchema>;
 export const ChunkEmbedDocSchema = z.object({
   id: z.string().min(1),
   content: z.string().min(1),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
   source: z.string().optional()
 });
 
@@ -209,10 +209,10 @@ export interface LangExtractResult {
   extractions: Array<{
 	doc_url: string;
     entities: Array<{
-	type: string, name: string; confidence, number }>;
+	type: string; name: string; confidence: number }>;
     relations: Array<{
-	type: string, source: string;
-	target: string; confidence, number }>;
+	type: string; source: string;
+	target: string; confidence: number }>;
   }>;
   total_entities: number;
 	total_relations: number;
@@ -294,7 +294,7 @@ class ToolRegistry {
         success: false,
         run_id: (rawArgs as any)?.run_id ?? '',
         tool: name,
-        error: `Validation, failed: ${parseResult.error.message}`,
+        error: `Validation failed: ${parseResult.error.message}`,
         duration_ms: Date.now() - startTime,
         timestamp: new Date().toISOString()
       };

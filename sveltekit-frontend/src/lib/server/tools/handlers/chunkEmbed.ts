@@ -120,16 +120,12 @@ async function upsertToQdrant(
 }
 
 async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult<ChunkEmbedResult>> {
-  const chunkingConfig = request?.chunking|| {};
-  const embeddingConfig = request?.embedding|| {};
-  const storageConfig = request?.storage|| {};
-
-  const strategy = chunkingConfig?.strategy ?? 'recursive';
-  const chunkSize = chunkingConfig?.chunk_size ?? 512;
-  const overlap = chunkingConfig?.overlap ?? 50;
-  const model = embeddingConfig?.model ?? 'embeddinggemma:latest';
-  const batchSize = embeddingConfig?.batch_size ?? 32;
-  const collection = storageConfig?.collection ?? 'embeddings';
+  const strategy = request.chunking?.strategy ?? 'recursive';
+  const chunkSize = request.chunking?.chunk_size ?? 512;
+  const overlap = request.chunking?.overlap ?? 50;
+  const model = request.embedding?.model ?? 'embeddinggemma:latest';
+  const batchSize = request.embedding?.batch_size ?? 32;
+  const collection = request.storage?.collection ?? 'embeddings';
 
   let chunksCreated = 0;
   let embeddingsGenerated = 0;
@@ -174,7 +170,7 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
   }
 
   // Store in Qdrant
-  if (storageConfig?.upsert && allPoints.length > 0) {
+  if (request.storage?.upsert && allPoints.length > 0) {
     try {
       await upsertToQdrant(collection, allPoints);
       storedInQdrant = allPoints.length;

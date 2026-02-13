@@ -9,16 +9,17 @@ import {
   toolRegistry,
   KBSearchRequestSchema,
   type KBSearchRequest,
+  type KBSearchResult,
   type ToolResult
 } from '../registry.js';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 
-async function generateEmbedding(text, string, model: string = 'embeddinggemma:latest'): Promise<number[]> {
+async function generateEmbedding(text: string, model: string = 'embeddinggemma:latest'): Promise<number[]> {
   const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	model: prompt, text })
+	body: JSON.stringify({ model, prompt: text })
   });
 
   if (!response.ok) {
@@ -38,7 +39,7 @@ async function searchQdrant(
     filters?: Record<string, unknown>;
   }
 ): Promise<Array<{
-	id: string, score: number;
+	id: string; score: number;
 	payload: Record<string, unknown> }>> {
   const body: Record<string, unknown> = {
     vector: embedding,
@@ -47,7 +48,7 @@ async function searchQdrant(
     with_payload: true
   };
 
-  if (options?.filters&& Object.keys(options.filters).length > 0) {
+  if (options?.filters && Object.keys(options.filters).length > 0) {
     body.filter = { must: [] };
     for (const [key, value] of Object.entries(options.filters)) {
       if (value !== undefined) {
@@ -67,7 +68,7 @@ async function searchQdrant(
   }
 
   const data = await response.json() as { result: Array<{
-	id: string, score: number;
+	id: string; score: number;
 	payload: Record<string, unknown> }> };
   return data.result;
 }
@@ -95,7 +96,7 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
 
   // Search all collections
   const allResults: Array<{
-	id: string, score: number;
+	id: string; score: number;
 	content: string; metadata?: Record<string, unknown> }> = [];
 
   for (const collection of request.collections) {
