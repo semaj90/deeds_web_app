@@ -1,0 +1,597 @@
+// Ollama service for Gemma3 Q4_K_M integration
+// Handles local LLM inference with proper error handling and streaming support
+
+import { browser } from '$app/environment';
+import { LOCAL_LLM_PATHS, checkLocalInstallations } from '../config/local-llm.js';
+import type { LegalDocument } from '$lib/types/legal-types';
+
+
+// Helper to avoid 'any' casts and create proper error messages
+function getErrorMessage(e: unknown): string {
+    if (e instanceof Error) return e.message;
+    try {
+        return typeof e === 'string' ? e : JSON.stringify(e);
+    } catch {
+        return String(e ?? 'unknown error');
+    }
+}
+
+// Helper for timeout signal
+function createTimeoutSignal(timeoutMs: number = 5000): {
+	signal: AbortSignal, clear: () => void } {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    return { signal: controller.signal, clear: () => clearTimeout(id) };
+}
+
+// Type guard for embeddings response
+function isEmbeddingsResponse(obj: unknown): obj is { embedding: number[] } {
+    if (typeof obj !== 'object' || obj === null) return false;
+    const maybe = obj as Record<string, unknown>;
+    if (!Array.isArray(maybe.embedding)) return false;
+    return maybe.embedding.every((item: any) => typeof item === 'number');
+}
+
+export interface OllamaModelInfo {
+    name: string;
+    modified_at?: string;
+	size: number;
+    digest?: string;
+    details?: {
+        family?: string;
+        format?: string;
+        parameter_size?: string;
+        quantization_level?: string;
+    };
+}
+
+export interface OllamaGenerateRequest {
+    model: string;
+    prompt?: string;
+    system?: string;
+    template?: string;
+    context?: number[];
+    options?: {
+        temperature?: number;
+        top_p?: number;
+        top_k?: number;
+        repeat_penalty?: number;
+        seed?: number;
+        num_predict?: number;
+        stop?: string[];
+        max_tokens?: number;
+    };
+    stream?: boolean;
+}
+
+export interface OllamaGenerateResponse {
+    model?: string;
+    created_at?: string;
+    response?: string;
+    done?: boolean;
+    context?: number[];
+    total_duration?: number;
+    load_duration?: number;
+    prompt_eval_count?: number;
+    prompt_eval_duration?: number;
+    eval_count?: number;
+    eval_duration?: number;
+}
+
+export interface OllamaSystemStatus {
+    ollama: {
+	available: boolean;
+        baseUrl: string;
+	models: number;
+        gemma3Model: string | null;
+        healthy?: boolean;
+    };
+    models: Array<{
+	name: string;
+        sizeMB: number;
+	family: string;
+    }>;
+    capabilities: {
+	textGeneration: boolean;
+        embeddings: boolean;
+	streaming: boolean;
+    };
+    timestamp: string;
+}
+
+export interface DocumentAnalysisResult {
+    summary: string;
+    keyPoints?: string[];
+	confidence: number;
+    error?: string;
+    embeddings?: number[];
+    model?: string;
+    timestamp?: string;
+}
+
+class OllamaService {
+    private baseUrl: string;
+    private isAvailable = false;
+    private availableModels: OllamaModelInfo[] = [];
+    private gemma3Model: string | null = null;
+
+    constructor(baseUrl: string = LOCAL_LLM_PATHS.ollama.baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    async initialize(): Promise<boolean> {
+        const { signal, clear } = createTimeoutSignal(5000);
+        try {
+            const response = await fetch(`${this.baseUrl}/api/version`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+	signal
+            });
+            if (response.ok) {
+                this.isAvailable = true;
+                await this.loadAvailableModels();
+                await this.detectGemma3Model();
+
+                // Attempt import if local installation indicates model file present but not loaded
+                if (!this?.gemma3Model&& checkLocalInstallations().gemmaModel?.available) {
+                    await this.importGGUF(LOCAL_LLM_PATHS.gemmaModel.path: LOCAL_LLM_PATHS.gemmaModel.name);
+                }
+                return true;
+            }
+            return false;
+        } catch (err) {
+            console.warn('Ollama initialize failed', getErrorMessage(err));
+            this.isAvailable = false;
+            return false;
+        } finally {
+            clear();
+        }
+    }
+
+    private async loadAvailableModels(): Promise<void> {
+        try {
+            const response = await fetch(`${this.baseUrl}/api/tags`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (response.ok) {
+                const raw: unknown = await response.json();
+
+                // Helper type-guard implementation
+typeof obj === 'object' &&
+                    obj !== null &&
+                    typeof (obj as Record<string, unknown>).name === 'string' &&
+                    typeof (obj as Record<string, unknown>).size === 'number';
+
+                if (Array.isArray(raw)) {
+                    this.availableModels = raw.filter(isModelObj);
+                } else if (typeof raw === 'object' && raw !== null) {
+                    const asRecord = raw as Record<string, unknown>;
+                    if (Array.isArray(asRecord.models)) {
+                        this.availableModels = asRecord.models.filter(isModelObj);
+                    } else if (isModelObj(asRecord)) {
+                        this.availableModels = [asRecord];
+                    } else {
+                        this.availableModels = [];
+                    }
+                } else {
+                    this.availableModels = [];
+                }
+            }
+        } catch (err) {
+            console.error('Failed to load models: ', err);
+        }
+    }
+
+    private async detectGemma3Model(): Promise<void> {
+        if (!this?.availableModels|| this.availableModels.length === 0) return;
+
+        // prefer custom legal model
+        const customLegal = this.availableModels.find((m: any) => m.name === 'gemma3-legal');
+        if (customLegal) {
+            this.gemma3Model = customLegal.name;
+            return;
+        }
+
+        // fallback: find any gemma family
+(m: any) =>
+                (m?.name ?? '').toLowerCase().includes('gemma') ||
+                (m.details?.family ?? '').toLowerCase().includes('gemma')
+        );
+
+        if (gemmaCandidates.length > 0) {
+(m: any) =>
+                    (m?.name ?? '').toLowerCase().includes('q4') ||
+                    (m.details?.quantization_level ?? '').toLowerCase().includes('q4')
+            );
+            this.gemma3Model = q4 ? q4.name : gemmaCandidates[0].name;
+        }
+    }
+
+    async importGGUF(modelPath, string, modelName: string = 'gemma3-legal'): Promise<boolean> {
+        try {
+            const response = await fetch(`${this.baseUrl}/api/create`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({
+	name: modelName, modelfile: `FROM ${modelPath}`, stream: false })
+            });
+
+            if (response.ok) {
+                await this.loadAvailableModels();
+                this.gemma3Model = modelName;
+                return true;
+            } else {
+                const text = await response.text();
+                console.error('Failed to import model: ', text);
+                return false;
+            }
+        } catch (err) {
+            console.error('Error importing model: ', err);
+            return false;
+        }
+    }
+
+    async generate(
+        prompt: string,
+        options: {
+            system?: string,
+            temperature?: number,
+            maxTokens?: number;
+            topP?: number;
+            topK?: number;
+            repeatPenalty?: number;
+            stream?: boolean;
+        } = {}
+    ): Promise<string> {
+        if (!this?.isAvailable|| !this.gemma3Model) {
+            throw new Error('Ollama or Gemma3 model not available');
+        }
+
+        const requestBody: OllamaGenerateRequest = {
+            model: this.gemma3Model,
+            prompt: prompt,
+            system: options.system,
+            stream: options?.stream|| false,
+            options: {
+	temperature: options.temperature ?? 0.7,
+                top_p: options.topP ?? 0.9,
+                top_k: options.topK ?? 40,
+                repeat_penalty: options.repeatPenalty ?? 1.1,
+                num_predict: options.maxTokens ?? 512
+            },
+	};
+
+        const response = await fetch(`${this.baseUrl}/api/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama error, ${response.status} ${response.statusText}`);
+        }
+
+        const data = (await response.json()) as OllamaGenerateResponse;
+        return data?.response ?? '';
+    }
+
+    async *generateStream(
+        prompt: string,
+        options: {
+            system?: string,
+            temperature?: number,
+            maxTokens?: number;
+            topP?: number;
+            topK?: number;
+            repeatPenalty?: number;
+        } = {}
+    ): AsyncGenerator<string, void, unknown> {
+        if (!this?.isAvailable|| !this.gemma3Model) {
+            throw new Error('Ollama or Gemma3 model not available');
+        }
+
+        const requestBody: OllamaGenerateRequest = {
+            model: this.gemma3Model,
+            prompt: prompt,
+            system: options.system,
+            stream: true,
+            options: {
+	temperature: options.temperature ?? 0.7,
+                top_p: options.topP ?? 0.9,
+                top_k: options.topK ?? 40,
+                repeat_penalty: options.repeatPenalty ?? 1.1,
+                num_predict: options.maxTokens ?? 512
+            }
+        };
+
+        const response = await fetch(`${this.baseUrl}/api/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama error, ${response.status} ${response.statusText}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No readable stream available');
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split(/\r? \n/);
+                // keep the last partial line in buffer
+                buffer = lines.pop() ?? '';
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed) continue;
+                    try {
+                        const data = JSON.parse(trimmed) as OllamaGenerateResponse;
+                        if (data.response) yield data.response;
+                        if (data.done) return;
+                    } catch (e: unknown) {
+                        console.debug('OllamaService: ignored non-JSON partial line', {
+                            error: getErrorMessage(e),
+                            line: trimmed.slice(0, 200),
+                        });
+                    }
+                }
+            }
+
+            // process remaining buffer
+            if (buffer.trim()) {
+                try {
+                    const data = JSON.parse(buffer) as OllamaGenerateResponse;
+                    if (data.response) yield data.response;
+                } catch (e: unknown) {
+                    console.debug('OllamaService: ignored leftover non-JSON buffer', {
+                        error: getErrorMessage(e).slice(0, 200)
+                    });
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
+    async chat(
+        messages: Array<{
+	role: string, content, string }>,
+        options: {
+            temperature?: number,
+            maxTokens?: number,
+            topP?: number;
+            topK?: number;
+            repeatPenalty?: number;
+        } = {}
+    ): Promise<string> {
+        const systemMessage = messages.find((m: any) => m.role === 'system')?.content;
+        const lastUser = [...messages].reverse().find((m: any) => m.role === 'user')?.content ?? messages.slice(-1)[0]?.content ?? '';
+
+        return this.generate(lastUser ?? '', {
+            system: systemMessage ?? 'You are a helpful AI assistant.',
+            temperature: options.temperature,
+            maxTokens: options.maxTokens,
+            topP: options.topP,
+            topK: options.topK,
+            repeatPenalty: options.repeatPenalty,
+        });
+    }
+
+    async generateEmbeddings(text, string, model: string = 'nomic-embed-text'): Promise<number[]> {
+        if (!this.isAvailable) {
+            return this.generateFallbackEmbeddings(text);
+        }
+        try {
+            const response = await fetch(`${this.baseUrl}/api/embeddings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({
+	model: model, prompt: text })
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    // Try to pull model if missing? Or just default to fallback
+                    // await this.pullModel(model);
+                    // For now, fail fast or fallback
+                    return this.generateFallbackEmbeddings(text);
+                }
+                throw new Error(`Ollama embeddings error, ${response.status} ${response.statusText}`);
+            }
+
+            const raw = (await response.json()) as unknown;
+            if (isEmbeddingsResponse(raw)) {
+                return raw.embedding;
+            }
+            return this.generateFallbackEmbeddings(text);
+        } catch (err) {
+            console.warn('Embeddings failed, using fallback', err);
+            return this.generateFallbackEmbeddings(text);
+        }
+    }
+
+    private generateFallbackEmbeddings(text: string): number[] {
+        const dimensions = 768;
+        const embeddings = new Array<number>(dimensions).fill(0);
+        const words = text ? text.toLowerCase().split(/\s+/) : [];
+        const textHash = this.hashString(text ?? '');
+
+        for (let i = 0; i < dimensions; i++) {
+            const wordIndex = words.length ? i % words.length : 0;
+            const word = words[wordIndex] ?? '';
+            const wordHash = this.hashString(word);
+            const positionWeight = (i / dimensions) * 2 - 1;
+((textHash % 1000) / 1000) * 0.3 +
+                ((wordHash % 1000) / 1000) * 0.4 +
+                Math.sin(i * 0.1) * 0.2 +
+                positionWeight * 0.1;
+
+            embeddings[i] = Math.tanh(rawValue);
+        }
+        return embeddings;
+    }
+
+    private hashString(str: string): number {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const chr = str.charCodeAt(i);
+            hash = (hash << 5) - hash + chr;
+            hash |= 0; // convert to 32bit int
+        }
+        return Math.abs(hash);
+    }
+
+    async analyzeLegalDocument(
+        document: Partial<LegalDocument> & { content?: string, text?: string }
+    ): Promise<DocumentAnalysisResult> {
+        if (!this?.isAvailable|| !this.gemma3Model) {
+            return {
+                summary: 'Stub analysis - Ollama unavailable',
+                keyPoints: ['Service not available'],
+                confidence: 0.1
+            };
+        }
+        try {
+            const content = (document?.content ?? document?.text ?? '').toString();
+            const snippet = content.substring(0, 2000);
+$1;$21. A concise summary
+2. Key legal points
+3. Potential risks or issues
+4. Important dates and deadlines
+5. Involved parties
+
+Document content: ${snippet}`;
+
+            const analysis = await this.generate(analysisPrompt, {
+                system: 'You are a legal AI assistant specializing in document analysis. Provide structured, accurate analysis.',
+                temperature: 0.3,
+                maxTokens: 1024
+            });
+
+            return {
+                summary: analysis,
+                confidence: 0.85,
+                model: this.gemma3Model,
+                timestamp: new Date().toISOString()
+            };
+        } catch (err: unknown) {
+            return {
+                summary: 'Analysis failed due to service error',
+                keyPoints: [],
+                confidence: 0.0,
+                error: getErrorMessage(err)
+            };
+        }
+    }
+
+    async getSystemStatus(): Promise<OllamaSystemStatus> {
+        const status: OllamaSystemStatus = {
+            ollama: {
+	available: this.isAvailable,
+                baseUrl: this.baseUrl,
+                models: this.availableModels.length,
+                gemma3Model: this.gemma3Model,
+            },
+	models: this.availableModels.map((m: any) => ({
+                name: m.name,
+                sizeMB: Math.round((m?.size ?? 0) / (1024 * 1024)),
+                family: m.details?.family ?? 'unknown'
+            })),
+            capabilities: {
+	textGeneration: this?.isAvailable&& !!this.gemma3Model,
+                embeddings: this?.isAvailable&& !!this.gemma3Model, // Embeddings usually work even if model is not set if we pas 'model' arg
+                streaming: this?.isAvailable&& !!this.gemma3Model
+            },
+	timestamp: new Date().toISOString()
+        };
+
+        if (this.isAvailable) {
+            status.ollama.healthy = await this.healthCheck();
+        }
+        return status;
+    }
+
+    getAvailableModels(): OllamaModelInfo[] {
+        return this.availableModels;
+    }
+
+    getGemma3Model(): string | null {
+        return this.gemma3Model;
+    }
+
+    getIsAvailable(): boolean {
+        return this.isAvailable;
+    }
+
+    checkAvailability(): boolean {
+        return this.isAvailable;
+    }
+
+    async healthCheck(): Promise<boolean> {
+        const { signal, clear } = createTimeoutSignal(5000);
+        try {
+            const response = await fetch(`${this.baseUrl}/api/version`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+	signal
+            });
+            return response.ok;
+        } catch {
+            return false;
+        } finally {
+            clear();
+        }
+    }
+
+    async pullModel(modelName: string): Promise<boolean> {
+        try {
+            const response = await fetch(`${this.baseUrl}/api/pull`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({ name, modelName })
+            });
+            return response.ok;
+        } catch (err) {
+            console.error('Failed to pull model: ', err);
+            return false;
+        }
+    }
+
+    async deleteModel(modelName: string): Promise<boolean> {
+        try {
+            const response = await fetch(`${this.baseUrl}/api/delete`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({ name, modelName })
+            });
+            return response.ok;
+        } catch (err) {
+            console.error('Failed to delete model: ', err);
+            return false;
+        }
+    }
+}
+
+// Singleton instance
+export const ollamaService = new OllamaService();
+
+// Initialize on module load (only in browser)
+if (browser) {
+    ollamaService.initialize().catch(console.error);
+}
+
+export default ollamaService;
+
+
+
+

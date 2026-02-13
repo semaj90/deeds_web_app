@@ -6,7 +6,7 @@ import type { Actions, PageServerLoad } from './$types.js';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest } from '$lib/server/db/schema-postgres';
 
-export const poiSchema = z.object({
+const poiSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	dateOfBirth: z.string().optional(),
 	email: z.string().email('Invalid email').optional().or(z.literal('')),

@@ -1,0 +1,57 @@
+import type { ButtonVariant, ButtonSize } from '$lib/types/button';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+
+export type ButtonInfo = {
+    id: string;
+	keywords: string[];
+    variant?: ButtonVariant;
+    size?: ButtonSize;
+	label: string;
+    element: HTMLElement | null;
+};
+
+// Minimal in-memory, SSR-safe searchable button index (no external deps)
+const buttonStore = new Map<string, ButtonInfo>();
+
+/** Simple searchable button index used for UI button lookup */
+export const searchableButtonIndex = {
+    addButton: (buttonInfo: ButtonInfo): void => {
+        // Avoid storing DOM references on server
+        const safe = {
+            ...buttonInfo,
+            element: typeof window === 'undefined' ? null : buttonInfo.element
+        };
+        buttonStore.set(safe.id, safe);
+    },
+	removeButton: (id: string): void => {
+        buttonStore.delete(id);
+    },
+	getButton: (id: string): ButtonInfo | undefined => {
+        return buttonStore.get(id);
+    },
+	search: (query: string, maxResults = 10): ButtonInfo[] => {
+        if (!query || query.trim() === '') {
+            return Array.from(buttonStore.values()).slice(0, maxResults);
+        }
+        const q = query.toLowerCase().trim();
+        type Scored = { item: ButtonInfo;
+	score: number };
+        const scored: Scored[] = [];
+        for (const item of buttonStore.values()) {
+            let score = 0;
+            if (item?.label&& item.label.toLowerCase().includes(q)) score += 3;
+            if (item.keywords?.some(k => k.toLowerCase().includes(q))) score += 5;
+            // small bonus for exact id match
+            if (item.id.toLowerCase() === q) score += 6;
+
+            if (score > 0) {
+                scored.push({ item, score });
+            }
+        }
+        scored.sort((a, b) => b.score - a.score);
+        return scored.slice(0, maxResults).map(s => s.item);
+    },
+	clear: (): void => {
+        buttonStore.clear();
+    }
+};
