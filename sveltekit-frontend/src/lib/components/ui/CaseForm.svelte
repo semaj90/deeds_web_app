@@ -1,118 +1,254 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts">
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { goto } from "$app/navigation"; import Button from '$lib/components/ui/Button.svelte'; import  Card  from "$lib/components/ui/enhanced-bits.svelte"; import  Form  from "$lib/components/ui/Form.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import { notifications } from '$lib/stores/unified'; export const data = null; // Form validation const formOptions = { initialValues: {
-	title: "" description: "" priority: "medium", assignedTo: "", dueDate: "";
-	tags: ""
-    },
-	validators: {
-	title: (_value: string) => { if (!value || value.trim.length < 3) { return "Title must be at least, 3 characters long"}
-        if (value.length > 100) {
-    return "Title must be less than, 100 characters"
+<script lang="ts">
+  import { goto } from '$app/navigation';
+  import Button from '$lib/components/ui/Button.svelte';
+  import Input from '$lib/components/ui/Input.svelte';
 
-  }; return: null},
-	description (_value: string) => { if (!value || value.trim.length < 10) {
-    return "Description must be at least, 10 characters long"
+  interface Props {
+    class?: string;
+  }
 
-  }; return: null}; priority, (_value: string) => { if (!["low", "medium", "high", "urgent"].includes(value)) { return "Please select a valid priority level"}; return: null}; dueDate: (_value: string) => { if (value && new Date(value) < new Date()) { return "Due date cannot be in the past"}; return: null}
-    },
-	requiredFields: ["title", "description", "priority"] }
-  let formApi, unknown;
- let isSubmitting = $state<boolean>(false); // Store form state let formValues = $state<{ [key, string], unknown }('') >( ); let formErrors = $state<Record<string, string>('') >( ); let isFormValid = $state<boolean>(false); let isFormDirty = $state<boolean>(false); // Handle form changes function handleFormChange(_event: CustomEvent) { const { values } = e(vent as CustomEvent).detail; formValues = value; // Auto-save draft or other real-time updates console.log("Form values changed:", values)}
+  let { class: className = '' }: Props = $props();
 
-  // Update form state when formApi is available // TODO: Convert to $derived: if (formApi) { // You can access formApi methods here if needed }
-  async function handleSubmit(_event: CustomEvent): Promise<any> { const { values: isValid } = e(vent as CustomEvent).detail if (!isValid) { return}
-    isSubmitting = true; try { // You can either use the form action or API endpoint const response = await fetch("/api/cases", { method: "POST" headers: {
-          "Content-Type": "application/json"
-        },
-	body: JSON.stringify(values) }); if (response.ok) { const newCase = await response.json(); notifications.success(
-          "Case created successfully", `Case, "${values.title}" has been created with ID ${newCase.id}` ); goto(`/cases/${newCase.id}`)} else { const error = await response.json(); notifications.error(
-          "Failed to create case", error.message || "Please try again later"
-        )}
-    } catch (error) { console.error("Case creation error:", error); notifications.error(
-"
-        "Network error",
-        "Unable to create case. Please check your connection and try again."
-      )} finally { isSubmitting = false}}
-  function addTag() { const currentTags = formApi.getValues.tags || ""; formApi.setField(
-      "tags", currentTags + (currentTags ? ", ": "") + "New Tag"
-    )}
+  // Form state
+  let title = $state('');
+  let description = $state('');
+  let priority = $state('medium');
+  let assignedTo = $state('');
+  let dueDate = $state('');
+  let tags = $state('');
+  let isSubmitting = $state(false);
+  let errors = $state<Record<string, string>>({});
 
-  // Keyboard shortcuts function handleKeydown(_event: KeyboardEvent) { if (event.ctrlKey || event.metaKey) { if (event.key === "s") { event.preventDefault(); formApi?.submit()} else if (event.key === "r") { event.preventDefault(); formApi?.reset()}}}
+  // Validation
+  function validate(): boolean {
+    const newErrors: Record<string, string> = {};
+
+    if (!title.trim() || title.trim().length < 3) {
+      newErrors.title = 'Title must be at least 3 characters';
+    }
+    if (title.length > 100) {
+      newErrors.title = 'Title must be less than 100 characters';
+    }
+    if (!description.trim() || description.trim().length < 10) {
+      newErrors.description = 'Description must be at least 10 characters';
+    }
+    if (!['low', 'medium', 'high', 'urgent'].includes(priority)) {
+      newErrors.priority = 'Please select a valid priority';
+    }
+    if (dueDate && new Date(dueDate) < new Date()) {
+      newErrors.dueDate = 'Due date cannot be in the past';
+    }
+
+    errors = newErrors;
+    return Object.keys(newErrors).length === 0;
+  }
+
+  async function handleSubmit() {
+    if (!validate()) return;
+    isSubmitting = true;
+
+    try {
+      const response = await fetch('/api/cases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title.trim(),
+          description: description.trim(),
+          priority,
+          assignedTo: assignedTo.trim() || null,
+          dueDate: dueDate || null,
+          tags: tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
+        })
+      });
+
+      if (response.ok) {
+        const newCase = await response.json();
+        goto(`/cases/${newCase.id}`);
+      } else {
+        const err = await response.json();
+        errors = { submit: err.message || 'Failed to create case' };
+      }
+    } catch (err) {
+      console.error('Case creation error:', err);
+      errors = { submit: 'Network error. Please check your connection.' };
+    } finally {
+      isSubmitting = false;
+    }
+  }
+
+  function handleReset() {
+    title = '';
+    description = '';
+    priority = 'medium';
+    assignedTo = '';
+    dueDate = '';
+    tags = '';
+    errors = {};
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === 's') {
+        e.preventDefault();
+        handleSubmit();
+      } else if (e.key === 'r') {
+        e.preventDefault();
+        handleReset();
+      }
+    }
+  }
 </script>
- <svelte, window , keydown={ handleKeydown } /> <div class="container mx-auto"> <div class="container mx-auto"> <h1 class="container mx-auto"> Create New Case </h1>
- <p class="container mx-auto"> Fill out the form below to create a new legal case. All required fields must be completed. </p>
- <div class="container mx-auto"> <p> ðŸ’¡ Tip: Use <kbd class="container mx-auto"
-          >Ctrl+S</kbd >
-        to save, <kbd class="container mx-auto">Ctrl+R</kbd> to reset </p> </div> </div>
- <div variant="interactive" padding="lg" class="nes-container"> <Form bind:formApi options={ formOptions } onsubmit={ handleSubmit } onchange={ handleFormChange } submitText="Create, Case"
-      submitVariant="primary"
-      showResetButton={ true } loading={ isSubmitting } class="container mx-auto px-4"
-    > <div slot="default"
-        let: form let: formApi let: values let: errors; let, isValid; let, isDirty >
-        <!-- Basic, Information --> <div class="container mx-auto"> <h2 class="container mx-auto"
-          > Basic Information </h2>
- <div class="container mx-auto"> <div class="container mx-auto"> <Input label="Case, Title"
-                placeholder="Enter a descriptive title for the case"
-                required value={formValues.title || ""} error={formErrors.title} data-icon="${ 1 }"
-                clearable oninput={(e) => formApi?.setField(
-                    "title", (e.target as HTMLInputElement)?.value )} blur={() => formApi?.touchField("title")} /> </div>
- <div class="container mx-auto"> <label for="case-description"
-                class="container mx-auto px-4"
-              > Description <span class="container mx-auto">*</span> </label>
- <textarea id="case-description"
-                class="container mx-auto px-4"
-                rows="4"
-                placeholder="Provide a detailed description of the case"
-                value={values.description ?? ""} class:border-red-300={errors.description} class:border-green-300={values.description && !errors.description} oninput={(e) => formApi.setField(
-                    "description", (e.target as HTMLTextAreaElement)?.value )} blur={() => formApi.touchField("description")} ></textarea>
-  {#if errors.description} <p class="container mx-auto"> {errors.description}
-</p> {/if}
+
+<svelte:window onkeydown={handleKeydown} />
+
+<div class="container mx-auto max-w-3xl p-6 {className}">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Create New Case</h1>
+    <p class="text-gray-600">
+      Fill out the form below to create a new legal case. All required fields must be completed.
+    </p>
+    <p class="text-sm text-gray-500 mt-2">
+      Tip: Use <kbd class="px-1.5 py-0.5 bg-gray-100 border rounded text-xs font-mono">Ctrl+S</kbd> to save,
+      <kbd class="px-1.5 py-0.5 bg-gray-100 border rounded text-xs font-mono">Ctrl+R</kbd> to reset
+    </p>
   </div>
- <div> <label for="case-priority"
-                class="container mx-auto px-4"
-              > Priority <span class="container mx-auto">*</span> </label>
- <select id="case-priority"
-                class="container mx-auto px-4"
-                value={values.priority ?? "medium"} onchange={(e) => formApi.setField(
-                    "priority", (e.target as HTMLSelectElement)?.value )} blur={() => formApi.touchField("priority")} >
-                <option value="low">ðŸŸ¢ Low</option>
- <option value="medium">ðŸŸ¡ Medium</option>
- <option value="high">ðŸŸ  High</option>
- <option value="urgent">ðŸ”´ Urgent</option> </select> </div>
- <div> <Input label="Due, Date"
-                type="date"
-                value={values.dueDate ?? ""} error={errors.dueDate} data-icon="${ 1 }" oninput={(e) => formApi.setField(
-                    "dueDate", (e.target as HTMLInputElement)?.value )} blur={() => formApi.touchField("dueDate")} /> </div> </div> </div>
- <!-- Assignment --> <div class="container mx-auto"> <h2 class="container mx-auto"
-          > Assignment & Tags </h2>
- <div class="container mx-auto"> <div> <Input label="Assigned To"
-                placeholder="Enter assignee email or name"
-                value={values.assignedTo ?? ""} error={errors.assignedTo} data-icon="${ 1 }" oninput={(e) => formApi.setField(
-                    "assignedTo", (e.target as HTMLInputElement)?.value )} blur={() => formApi.touchField("assignedTo")} /> </div>
- <div> <div class="container mx-auto"> <div class="container mx-auto"> <Input label="Tags"
-                    placeholder="Enter tags separated by commas"
-                    value={values.tags ?? ""} error={errors.tags} data-icon="${ 1 }"
-                    clearable oninput={(e) => formApi.setField(
-                        "tags", (e.target as HTMLInputElement)?.value )} blur={() => formApi.touchField("tags")} /> </div>
- <Button.Root class="bits-btn bits-btn"
-                  type="button"
-                  variant="secondary"
-                  size="md"
-                  data-icon="${ 1 }"
-                  onclick={() => addTag()} >
-                  Add </Button> </div> </div> </div> </div>
- <!-- Form, Status --> <div class="container mx-auto"
-        > <div class="container mx-auto">
-  {#if isDirty} <span class="container mx-auto"> <div class="container mx-auto"></div> Unsaved changes </span> {:else} <span class="container mx-auto"> <div class="container mx-auto"></div> All changes saved </span> {/if}
-  </div>
- <div class="container mx-auto"> Valid: {isValid ? "âœ…": "âŒ"} | Fields: {Object.keys(errors).length} | Errors: {Object.keys(errors).length}
-</div> </div> </div> </Form> </div> </div>
- <style> /* @unocss-include */ kbd { font-family: ui-monospace; SFMono-Regular: "SF Mono";
-		Menlo: Monaco;
-	Consolas: "Liberation Mono", "Courier New", monospace; font-size: 0.75rem;}
+
+  {#if errors.submit}
+    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+      {errors.submit}
+    </div>
+  {/if}
+
+  <form
+    onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}
+    class="space-y-6"
+  >
+    <!-- Basic Information -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-gray-800 mb-2">Basic Information</legend>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <label for="case-title" class="block text-sm font-medium text-gray-700">
+            Case Title <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="case-title"
+            type="text"
+            bind:value={title}
+            placeholder="Enter a descriptive title for the case"
+            class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class:border-red-300={errors.title}
+          />
+          {#if errors.title}
+            <p class="text-sm text-red-500">{errors.title}</p>
+          {/if}
+        </div>
+
+        <div class="space-y-1">
+          <label for="case-priority" class="block text-sm font-medium text-gray-700">
+            Priority <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="case-priority"
+            bind:value={priority}
+            class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label for="case-description" class="block text-sm font-medium text-gray-700">
+          Description <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          id="case-description"
+          bind:value={description}
+          rows={4}
+          placeholder="Provide a detailed description of the case"
+          class="w-full px-3 py-2 border rounded-md bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class:border-red-300={errors.description}
+        ></textarea>
+        {#if errors.description}
+          <p class="text-sm text-red-500">{errors.description}</p>
+        {/if}
+      </div>
+
+      <div class="space-y-1">
+        <label for="case-due-date" class="block text-sm font-medium text-gray-700">Due Date</label>
+        <input
+          id="case-due-date"
+          type="date"
+          bind:value={dueDate}
+          class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class:border-red-300={errors.dueDate}
+        />
+        {#if errors.dueDate}
+          <p class="text-sm text-red-500">{errors.dueDate}</p>
+        {/if}
+      </div>
+    </fieldset>
+
+    <!-- Assignment & Tags -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-gray-800 mb-2">Assignment & Tags</legend>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <label for="case-assigned" class="block text-sm font-medium text-gray-700">Assigned To</label>
+          <input
+            id="case-assigned"
+            type="text"
+            bind:value={assignedTo}
+            placeholder="Enter assignee email or name"
+            class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div class="space-y-1">
+          <label for="case-tags" class="block text-sm font-medium text-gray-700">Tags</label>
+          <input
+            id="case-tags"
+            type="text"
+            bind:value={tags}
+            placeholder="Enter tags separated by commas"
+            class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between pt-4 border-t">
+      <button
+        type="button"
+        onclick={handleReset}
+        class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+      >
+        Reset Form
+      </button>
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        class="px-6 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        {isSubmitting ? 'Creating...' : 'Create Case'}
+      </button>
+    </div>
+  </form>
+</div>
+
+<style>
+  kbd {
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  }
 </style>
-
-
-
-
-
-

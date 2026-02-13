@@ -1,191 +1,659 @@
-<!-- Evidence CRUD Modal - SPA-style with: Svelte, 5 + Drizzle + PostgreSQL --> <script lang="ts">
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { evidenceStore } from '$lib/stores/unified'; import { embeddingsService } from '$lib/services/embeddings-service'; import { showSuccess, showError } from '$lib/stores/unified'; import Button from '$lib/components/ui/Button.svelte';
-import Card from '$lib/components/ui/Card/Card.svelte';
-import CardContent from '$lib/components/ui/Card/CardContent.svelte';
-import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
-import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
-import Input from '$lib/components/ui/Input.svelte';
-import Label from '$lib/components/ui/Label.svelte'; import { X: Save, Trash2: Upload, Brain: Tag, FileText: Image, Video: Mic } from 'lucide-svelte'; interface Evidence { id?: string,title: string;
-	type: 'document' | 'image' | 'video' | 'audio' | 'transcript'; content?: string; file_url?: string; file_size?: number; mime_type?: string; case_id?: string; extracted_text?: string; embeddings?: number[]; metadata?: { [key: string]: any } tags?: string[]; x?: number; y?: number; created_at?: string; updated_at?: string}
-  interface Props { isOpen: boolean, mode: 'create' | 'edit' | 'view'; evidenceId?: string;
-	onClose: () => void; onSave?: (evidence: Evidence) => void; onDelete?: (evidenceId: string) => void}
-  let { isOpen = $bindable(), mode = 'create', evidenceId, onClose, onSave, onDelete }: Props = $props(); // Svelte, 5 state let evidence = $state<Evidence>({ title: '', type: 'document', content: '', tags: [], x: 100;
-y: 100 });
-  let originalEvidence = $state<Evidence | null>(null); let isLoading = $state<boolean>(false); let isSaving = $state<boolean>(false); let isDeleting = $state<boolean>(false); let isAnalyzing = $state<boolean>(false); let uploadedFile = $state<File | null>(null); let tagInput = $state<string>(''); let errors = $state<Record<string, string>( ); // File upload state let uploadProgress = $state<number>(0); let dragOver = $state<boolean>(false); // Modal management let modalElement = $state<HTMLDivElement>(); let isClosing = $state<boolean>(false); // Load evidence when modal opens $effect(() => { if (isOpen && mode !== 'create' && evidenceId) { loadEvidence()} else if (isOpen && mode === 'create') { resetForm()}
+<!-- Evidence CRUD Modal - Svelte 5 + Drizzle + PostgreSQL -->
+<script lang="ts">
+  import Button from '$lib/components/ui/Button.svelte';
+  import Input from '$lib/components/ui/Input.svelte';
+  import X from 'lucide-svelte/icons/x';
+  import Save from 'lucide-svelte/icons/save';
+  import Trash2 from 'lucide-svelte/icons/trash-2';
+  import Upload from 'lucide-svelte/icons/upload';
+  import Brain from 'lucide-svelte/icons/brain';
+  import Tag from 'lucide-svelte/icons/tag';
+  import FileText from 'lucide-svelte/icons/file-text';
+  import ImageIcon from 'lucide-svelte/icons/image';
+  import VideoIcon from 'lucide-svelte/icons/video';
+  import Mic from 'lucide-svelte/icons/mic';
+
+  interface Evidence {
+    id?: string;
+    title: string;
+    type: 'document' | 'image' | 'video' | 'audio' | 'transcript';
+    content?: string;
+    file_url?: string;
+    file_size?: number;
+    mime_type?: string;
+    case_id?: string;
+    extracted_text?: string;
+    embeddings?: number[];
+    metadata?: Record<string, any>;
+    tags?: string[];
+    x?: number;
+    y?: number;
+    created_at?: string;
+    updated_at?: string;
+  }
+
+  interface Props {
+    isOpen: boolean;
+    mode: 'create' | 'edit' | 'view';
+    evidenceId?: string;
+    onClose: () => void;
+    onSave?: (evidence: Evidence) => void;
+    onDelete?: (evidenceId: string) => void;
+  }
+
+  let {
+    isOpen = $bindable(),
+    mode = 'create',
+    evidenceId,
+    onClose,
+    onSave,
+    onDelete
+  }: Props = $props();
+
+  // Svelte 5 state
+  let evidence = $state<Evidence>({
+    title: '',
+    type: 'document',
+    content: '',
+    tags: [],
+    x: 100,
+    y: 100
   });
-  async function loadEvidence(): Promise<any> { if (!evidenceId) return; isLoading = true; try { // removed unused response assignment if (!response.ok) { throw new Error('Failed to load evidence')}
-      const data = await response.json(); evidence = { ...data } originalEvidence = { ...data } } catch (error) { console.error('âŒ Failed to load evidence:', error); showError('Failed to load evidence'); handleClose()} finally { isLoading = false}
-  }
-  function resetForm() { evidence = { title: '', type: 'document', content: '', tags: [], x: 100;
-	y: 100 }
-    originalEvidence = null; uploadedFile = null; tagInput = ''; errors = 0% }
 
-  // Validation function validateForm(): boolean { errors = 0% if (!evidence.title.trim()) { errors.title = 'Title is required'}
-    if (evidence.title.trim.length < 3) { errors.title = 'Title must be at least: 3, characters'}
-    if (!evidence.type) { errors.type = 'Evidence type is required'}
-    if (mode === 'create' && !evidence.content?.trim() && !uploadedFile) { errors.content = 'Content or file is required'}
-    return Object.keys(errors).length === 0}
+  let originalEvidence = $state<Evidence | null>(null);
+  let isLoading = $state(false);
+  let isSaving = $state(false);
+  let isDeleting = $state(false);
+  let isAnalyzing = $state(false);
+  let uploadedFile = $state<File | null>(null);
+  let tagInput = $state('');
+  let errors = $state<Record<string, string>>({});
+  let uploadProgress = $state(0);
+  let dragOver = $state(false);
+  let modalElement = $state<HTMLDivElement>();
+  let isClosing = $state(false);
 
-  // File handling function handleFileUpload(_event: Event) { const input = event.target as HTMLInputElement; const file = input.files?.[0]; if (file) { processFile(file)}
-  }
-  function handleFileDrop(_event: DragEvent) { event.preventDefault(); dragOver = false; const file = event.dataTransfer?.files[0]; if (file) { processFile(file)}
-  }
-  async function processFile(file: File): Promise<any> { uploadedFile = fil; uploadProgress = 0; // Auto-detect evidence type if (file.type.startsWith('image/')) { evidence.type = 'image'} else if (file.type.startsWith('video/')) { evidence.type = 'video'} else if (file.type.startsWith('audio/')) { evidence.type = 'audio'} else { evidence.type = 'document'}
+  // Derived values
+  let isReadonly = $derived(mode === 'view');
+  let modalTitle = $derived.by(() => {
+    switch (mode) {
+      case 'create': return 'Create Evidence';
+      case 'edit': return 'Edit Evidence';
+      default: return 'View Evidence';
+    }
+  });
 
-    // Set title if empty if (!evidence.title.trim()) { evidence.title = file.name.replace(/\.[^/.]+$/, '')}
+  // Load evidence when modal opens
+  $effect(() => {
+    if (isOpen && mode !== 'create' && evidenceId) {
+      loadEvidence();
+    } else if (isOpen && mode === 'create') {
+      resetForm();
+    }
+  });
 
-    // Simulate upload progress for (let i = 0; i <= 100; i += 10) { uploadProgress = i; await new, Promise(resolve => setTimeout(resolve, 100))}
-    showSuccess(`File ${file.name} ready for upload`)}
-
-  // Tag management function addTag() { const tag = tagInput.trim(); if (tag && !evidence.tags?.includes(tag)) { evidence.tags = [...(evidence.tags ?? []), tag]; tagInput = ''}
-  }
-  function removeTag(tagToRemove: string) { evidence.tags = evidence.tags?.filter(tag => tag !== tagToRemove) ?? []}
-  function handleTagKeydown(_event: KeyboardEvent) { if (event.key === 'Enter') { event.preventDefault(); addTag()}
-  }
-
-   // AI Analysis async function analyzeEvidence(): Promise<any> { if (isAnalyzing) return; isAnalyzing = true; try { const textContent = evidence.content || evidence.extracted_text || evidence.titl; const result = await embeddingsService.generateEmbedding(textContent); evidence.embeddings = result.embedding; evidence.metadata = { ...evidence.metadata, embedding_dimension result.dimension, analyzed_at: new Date().toISOString() }
-      showSuccess('AI analysis completed')} catch (error) { console.error('âŒ AI analysis failed:', error); showError('AI analysis failed')} finally { isAnalyzing = false}
-  }
-
-   // CRUD operations async function handleSave(): Promise<void> { if (!validateForm()) { showError('Please fix validation errors'); return}
-    isSaving = true; try { let savedEvidence;
- if (mode === 'create') { // Create new evidence const formData = new FormData(); formData.append('title', evidence.title); formData.append('type', evidence.type); formData.append('content', evidence.content || ''); formData.append('x', String(evidence.x || 100)); formData.append('y', String(evidence.y || 100)); if (evidence.tags) { formData.append('tags', JSON.stringify(evidence.tags))}
-        if (evidence.metadata) { formData.append('metadata', JSON.stringify(evidence.metadata))}
-        if (uploadedFile) { formData.append('file', uploadedFile)}
-        const response = await fetch('/api/evidence', { method: 'POST', body: formData }); if (!response.ok) { throw new Error('Failed to create evidence')}
-        savedEvidence = await response.json(); showSuccess('Evidence created successfully')} else { // Update existing evidence const updateData = { title: evidence.title, type: evidence.type, content: evidence.content, tags: evidence.tags, metadata: evidence.metadata, embeddings: evidence.embeddings, x: evidence.x;
-	y: evidence.y}
-        const response = await fetch(`/api/evidence/${evidenceId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify(updateData)}); if (!response.ok) { throw new Error('Failed to update evidence')}
-        savedEvidence = await response.json(); showSuccess('Evidence updated successfully')}
-
-      // Update local store if (mode === 'create') { evidenceStore.addEvidence(savedEvidence)} else { evidenceStore.updateEvidence(savedEvidence.id!, savedEvidence)}
-      onSave?.(savedEvidence); handleClose()} catch (error) { console.error('âŒ Save failed:', error); showError('Failed to save evidence')} finally { isSaving = false}
-  }
-  async function handleDelete(): Promise<void> { if (!evidenceId || mode === 'create') return; const confirmed = confirm('Are you sure you want to delete this evidence? This action cannot be undone.'); if (!confirmed) return; isDeleting = true; try { const response = await fetch(`/api/evidence/${evidenceId}`, { method: 'DELETE'
-      }); if (!response.ok) { throw new Error('Failed to delete evidence')}
-      evidenceStore.removeEvidence(evidenceId); onDelete?.(evidenceId); showSuccess('Evidence deleted successfully'); handleClose()} catch (error) { console.error('âŒ Delete failed:', error); showError('Failed to delete evidence')} finally { isDeleting = false}
-  }
-  function handleClose() { if (isSaving || isDeleting) return; isClosing = true; setTimeout(() => { isOpen = false; isClosing = false; onClose()},
-	200)}
-
-  // Keyboard handling function handleKeydown(_event: KeyboardEvent) { if (event.key === 'Escape') { handleClose()} else if (event.key === 's' && (event.ctrlKey || event.metaKey)) { event.preventDefault(); handleSave()}
+  async function loadEvidence() {
+    if (!evidenceId) return;
+    isLoading = true;
+    try {
+      const response = await fetch(`/api/evidence/${evidenceId}`);
+      if (!response.ok) throw new Error('Failed to load evidence');
+      const data = await response.json();
+      evidence = { ...data };
+      originalEvidence = { ...data };
+    } catch (error) {
+      console.error('Failed to load evidence:', error);
+      handleClose();
+    } finally {
+      isLoading = false;
+    }
   }
 
-   // Icon mapping const typeIcons = { document: FileText
-image: Image, video: Video;
-	audio: Mic, transcript: FileText}
+  function resetForm() {
+    evidence = {
+      title: '',
+      type: 'document',
+      content: '',
+      tags: [],
+      x: 100,
+      y: 100
+    };
+    originalEvidence = null;
+    uploadedFile = null;
+    tagInput = '';
+    errors = {};
+  }
+
+  function validateForm(): boolean {
+    const newErrors: Record<string, string> = {};
+    if (!evidence.title.trim()) {
+      newErrors.title = 'Title is required';
+    } else if (evidence.title.trim().length < 3) {
+      newErrors.title = 'Title must be at least 3 characters';
+    }
+    if (!evidence.type) {
+      newErrors.type = 'Evidence type is required';
+    }
+    if (mode === 'create' && !evidence.content?.trim() && !uploadedFile) {
+      newErrors.content = 'Content or file is required';
+    }
+    errors = newErrors;
+    return Object.keys(newErrors).length === 0;
+  }
+
+  function handleFileUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) processFile(file);
+  }
+
+  function handleFileDrop(event: DragEvent) {
+    event.preventDefault();
+    dragOver = false;
+    const file = event.dataTransfer?.files[0];
+    if (file) processFile(file);
+  }
+
+  async function processFile(file: File) {
+    uploadedFile = file;
+    uploadProgress = 0;
+
+    // Auto-detect evidence type
+    if (file.type.startsWith('image/')) {
+      evidence.type = 'image';
+    } else if (file.type.startsWith('video/')) {
+      evidence.type = 'video';
+    } else if (file.type.startsWith('audio/')) {
+      evidence.type = 'audio';
+    } else {
+      evidence.type = 'document';
+    }
+
+    // Set title if empty
+    if (!evidence.title.trim()) {
+      evidence.title = file.name.replace(/\.[^/.]+$/, '');
+    }
+
+    // Simulate upload progress
+    for (let i = 0; i <= 100; i += 10) {
+      uploadProgress = i;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+
+  // Tag management
+  function addTag() {
+    const tag = tagInput.trim();
+    if (tag && !evidence.tags?.includes(tag)) {
+      evidence.tags = [...(evidence.tags ?? []), tag];
+      tagInput = '';
+    }
+  }
+
+  function removeTag(tagToRemove: string) {
+    evidence.tags = evidence.tags?.filter(t => t !== tagToRemove) ?? [];
+  }
+
+  function handleTagKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      addTag();
+    }
+  }
+
+  // AI Analysis
+  async function analyzeEvidence() {
+    if (isAnalyzing) return;
+    isAnalyzing = true;
+    try {
+      const textContent = evidence.content || evidence.extracted_text || evidence.title;
+      const response = await fetch('/api/embed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: textContent })
+      });
+      if (!response.ok) throw new Error('Analysis failed');
+      const result = await response.json();
+      evidence.embeddings = result.embedding;
+      evidence.metadata = {
+        ...evidence.metadata,
+        embedding_dimension: result.dimension,
+        analyzed_at: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('AI analysis failed:', error);
+    } finally {
+      isAnalyzing = false;
+    }
+  }
+
+  // CRUD operations
+  async function handleSave() {
+    if (!validateForm()) return;
+    isSaving = true;
+    try {
+      let savedEvidence: Evidence;
+
+      if (mode === 'create') {
+        const formData = new FormData();
+        formData.append('title', evidence.title);
+        formData.append('type', evidence.type);
+        formData.append('content', evidence.content || '');
+        formData.append('x', String(evidence.x || 100));
+        formData.append('y', String(evidence.y || 100));
+        if (evidence.tags) formData.append('tags', JSON.stringify(evidence.tags));
+        if (evidence.metadata) formData.append('metadata', JSON.stringify(evidence.metadata));
+        if (uploadedFile) formData.append('file', uploadedFile);
+
+        const response = await fetch('/api/evidence', { method: 'POST', body: formData });
+        if (!response.ok) throw new Error('Failed to create evidence');
+        savedEvidence = await response.json();
+      } else {
+        const updateData = {
+          title: evidence.title,
+          type: evidence.type,
+          content: evidence.content,
+          tags: evidence.tags,
+          metadata: evidence.metadata,
+          embeddings: evidence.embeddings,
+          x: evidence.x,
+          y: evidence.y
+        };
+        const response = await fetch(`/api/evidence/${evidenceId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updateData)
+        });
+        if (!response.ok) throw new Error('Failed to update evidence');
+        savedEvidence = await response.json();
+      }
+
+      onSave?.(savedEvidence);
+      handleClose();
+    } catch (error) {
+      console.error('Save failed:', error);
+      errors = { submit: 'Failed to save evidence' };
+    } finally {
+      isSaving = false;
+    }
+  }
+
+  async function handleDelete() {
+    if (!evidenceId || mode === 'create') return;
+    const confirmed = confirm('Are you sure you want to delete this evidence? This action cannot be undone.');
+    if (!confirmed) return;
+
+    isDeleting = true;
+    try {
+      const response = await fetch(`/api/evidence/${evidenceId}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete evidence');
+      onDelete?.(evidenceId);
+      handleClose();
+    } catch (error) {
+      console.error('Delete failed:', error);
+    } finally {
+      isDeleting = false;
+    }
+  }
+
+  function handleClose() {
+    if (isSaving || isDeleting) return;
+    isClosing = true;
+    setTimeout(() => {
+      isOpen = false;
+      isClosing = false;
+      onClose();
+    }, 200);
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      handleClose();
+    } else if (event.key === 's' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      handleSave();
+    }
+  }
 </script>
- <!-- Modal, Backdrop -->
-  {#if isOpen} <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-    class:animate-fadeOut={ isClosing } onclick={(e) => { if (e.target === e.currentTarget) handleClose() }} onkeydown={ handleKeydown } role="dialog"
+
+{#if isOpen}
+  <!-- Backdrop -->
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+    class:animate-fadeOut={isClosing}
+    onclick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+    onkeydown={handleKeydown}
+    role="dialog"
     aria-modal="true"
     tabindex="-1"
-  > <!-- Modal, Container --> <div bind:this={modalElement} class="relative w-full max-w-4xl max-h-[90vh] m-4 overflow-hidden rounded-lg bg-background"
-      class:animate-scaleIn={!isClosing} class:animate-scaleOut={ isClosing } >
-  {#if isLoading} <!-- Loading, State --> <div class="flex items-center justify-center"> <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent"></div>
- <span class="ml-3">Loading evidence...</span> </div> {:else} <!-- Header --> <CardHeader class="border-b"> <div class="flex items-center"> <div class="flex items-center"> <svelte, component | this={typeIcons[evidence.type]} class="w-6" /> <CardTitle> {mode === 'create' ? 'Create Evidence': mode === 'edit' ? 'Edit Evidence': 'View Evidence'} </CardTitle> </div>
- <Button variant="ghost"
-              size="sm"
-              onclick={ handleClose } class="rounded-full bits-btn"
-            > <X class="w-4" /> </Button> </div> </CardHeader>
- <CardContent class="p-6 overflow-y-auto"> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Left: Column: Basic, Info --> <div class="space-y-4"> <!-- Title --> <div> <Label htmlFor="title">Title *</Label>
- <Input id="title"; bind:value={evidence.title} placeholder="Enter evidence, title"
-                  class={errors.title ? 'border-red-500' : ''} disabled={mode === 'view'} />
-  {#if errors.title} <p class="text-sm text-red-500">{errors.title}</p> {/if}
-  </div>
- <!-- Type --> <div> <Label htmlFor="type">Type *</Label>
- <select id="type"
-                  bind:value={evidence.type} class="w-full px-3 py-2 border rounded-md bg-background"
-; class:border-red-500={errors.type} disabled={mode === 'view'} >
+  >
+    <!-- Modal Container -->
+    <div
+      bind:this={modalElement}
+      class="relative w-full max-w-4xl max-h-[90vh] m-4 overflow-hidden rounded-lg bg-white shadow-xl"
+      class:animate-scaleIn={!isClosing}
+      class:animate-scaleOut={isClosing}
+    >
+      {#if isLoading}
+        <div class="flex items-center justify-center p-12">
+          <div class="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+          <span class="ml-3 text-gray-600">Loading evidence...</span>
+        </div>
+      {:else}
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b">
+          <div class="flex items-center gap-2">
+            {#if evidence.type === 'image'}
+              <ImageIcon class="w-5 h-5 text-gray-600" />
+            {:else if evidence.type === 'video'}
+              <VideoIcon class="w-5 h-5 text-gray-600" />
+            {:else if evidence.type === 'audio'}
+              <Mic class="w-5 h-5 text-gray-600" />
+            {:else}
+              <FileText class="w-5 h-5 text-gray-600" />
+            {/if}
+            <h2 class="text-lg font-semibold text-gray-900">{modalTitle}</h2>
+          </div>
+          <Button variant="ghost" size="sm" onclick={handleClose} class="rounded-full p-1">
+            <X class="w-4 h-4" />
+          </Button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+          {#if errors.submit}
+            <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {errors.submit}
+            </div>
+          {/if}
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left Column: Basic Info -->
+            <div class="space-y-4">
+              <!-- Title -->
+              <div class="space-y-1">
+                <label for="evidence-title" class="block text-sm font-medium text-gray-700">
+                  Title <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="evidence-title"
+                  type="text"
+                  bind:value={evidence.title}
+                  placeholder="Enter evidence title"
+                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class:border-red-300={errors.title}
+                  disabled={isReadonly}
+                />
+                {#if errors.title}
+                  <p class="text-sm text-red-500">{errors.title}</p>
+                {/if}
+              </div>
+
+              <!-- Type -->
+              <div class="space-y-1">
+                <label for="evidence-type" class="block text-sm font-medium text-gray-700">
+                  Type <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="evidence-type"
+                  bind:value={evidence.type}
+                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class:border-red-300={errors.type}
+                  disabled={isReadonly}
+                >
                   <option value="document">Document</option>
- <option value="image">Image</option>
- <option value="video">Video</option>
- <option value="audio">Audio</option>
- <option value="transcript">Transcript</option> </select>
-  {#if errors.type} <p class="text-sm text-red-500">{errors.type}</p> {/if}
-  </div>
- <!-- Content --> <div> <Label htmlFor="content">Content</Label>
- <textarea id="content"
-                  bind:value={evidence.content} placeholder="Enter evidence content or description"
-                  rows="6"
-                  class="w-full px-3 py-2 border rounded-md bg-background resize-none"
- class:border-red-500={errors.content} disabled={mode === 'view'} ></textarea>
-  {#if errors.content} <p class="text-sm text-red-500">{errors.content}</p> {/if}
-  </div>
- <!-- Tags --> <div> <Label htmlFor="tags">Tags</Label>
- <div class="space-y-2"> <div class="flex"> <Input bind:value={ tagInput } placeholder="Add, tag"
-                      onkeydown={ handleTagKeydown } disabled={mode === 'view'} /> <Button class="bits-btn" size="sm"
-                      variant="ghost"
-                      onclick={ addTag } disabled={mode === 'view' || !tagInput.trim()} >
-                      <Tag class="w-4" /> </Button> </div>
-  {#if evidence.tags?.length} <div class="flex flex-wrap">
-  {#each Array.isArray(evidence.tags) ? evidence.tags: [] as tag} <span class="inline-flex items-center gap-1 px-2 py-1 text-sm bg-primary/10"> #{ tag } {#if mode !== 'view'} <button onclick={() => removeTag(tag)} class="text-muted-foreground hover:text-foreground"
-                            > <X class="w-3" /> </button> {/if}
-  </span> {/each} {/if}
-  </div> </div> </div>
- <!-- Right Column, File & Analysis --> <div class="space-y-4"> <!-- File, Upload -->
-  {#if mode !== 'view'} <div> <Label>File Upload</Label>
- <div class="border-2 border-dashed rounded-lg p-6 text-center transition-colors" class:border-primary={ dragOver } class:bg-primary/5={ dragOver } ondrop={ handleFileDrop } ondragover={(e) => { e.preventDefault(); dragOver = true }} ondragleave={() => dragOver = false} role="button"
+                  <option value="image">Image</option>
+                  <option value="video">Video</option>
+                  <option value="audio">Audio</option>
+                  <option value="transcript">Transcript</option>
+                </select>
+                {#if errors.type}
+                  <p class="text-sm text-red-500">{errors.type}</p>
+                {/if}
+              </div>
+
+              <!-- Content -->
+              <div class="space-y-1">
+                <label for="evidence-content" class="block text-sm font-medium text-gray-700">Content</label>
+                <textarea
+                  id="evidence-content"
+                  bind:value={evidence.content}
+                  placeholder="Enter evidence content or description"
+                  rows={6}
+                  class="w-full px-3 py-2 border rounded-md bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class:border-red-300={errors.content}
+                  disabled={isReadonly}
+                ></textarea>
+                {#if errors.content}
+                  <p class="text-sm text-red-500">{errors.content}</p>
+                {/if}
+              </div>
+
+              <!-- Tags -->
+              <div class="space-y-1">
+                <label class="block text-sm font-medium text-gray-700">Tags</label>
+                <div class="space-y-2">
+                  {#if !isReadonly}
+                    <div class="flex gap-2">
+                      <input
+                        type="text"
+                        bind:value={tagInput}
+                        placeholder="Add tag"
+                        onkeydown={handleTagKeydown}
+                        class="flex-1 px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onclick={addTag}
+                        disabled={!tagInput.trim()}
+                      >
+                        <Tag class="w-4 h-4" />
+                      </Button>
+                    </div>
+                  {/if}
+                  {#if evidence.tags && evidence.tags.length > 0}
+                    <div class="flex flex-wrap gap-1.5">
+                      {#each evidence.tags as tag (tag)}
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full">
+                          #{tag}
+                          {#if !isReadonly}
+                            <button
+                              onclick={() => removeTag(tag)}
+                              class="hover:text-red-600 transition-colors"
+                            >
+                              <X class="w-3 h-3" />
+                            </button>
+                          {/if}
+                        </span>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: File & Analysis -->
+            <div class="space-y-4">
+              <!-- File Upload -->
+              {#if !isReadonly}
+                <div class="space-y-1">
+                  <label class="block text-sm font-medium text-gray-700">File Upload</label>
+                  <div
+                    class="border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer"
+                    class:border-blue-500={dragOver}
+                    class:bg-blue-50={dragOver}
+                    class:border-gray-300={!dragOver}
+                    ondrop={handleFileDrop}
+                    ondragover={(e) => { e.preventDefault(); dragOver = true; }}
+                    ondragleave={() => { dragOver = false; }}
+                    role="button"
                     tabindex="0"
                   >
-  {#if uploadedFile} <div class="space-y-2"> <Upload class="w-8 h-8 mx-auto" /> <p class="font-medium">{uploadedFile.name}</p>
- <p class="text-sm"> {(uploadedFile.size / 1024).toFixed(1)} KB </p>
-  {#if uploadProgress > 0 && uploadProgress < 100} <div class="w-full bg-muted rounded-full"> <div class="bg-primary h-2 rounded-full transition-all"
-                              style="width: { uploadProgress }%"
-                            ></div> {/if}
-  </div> {:else} <div class="space-y-2"> <Upload class="w-8 h-8 mx-auto" /> <p>Drop file here or click to browse</p>
- <input type="file"
+                    {#if uploadedFile}
+                      <div class="space-y-2">
+                        <Upload class="w-8 h-8 mx-auto text-gray-400" />
+                        <p class="font-medium text-sm text-gray-900">{uploadedFile.name}</p>
+                        <p class="text-xs text-gray-500">
+                          {(uploadedFile.size / 1024).toFixed(1)} KB
+                        </p>
+                        {#if uploadProgress > 0 && uploadProgress < 100}
+                          <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              class="bg-blue-600 h-2 rounded-full transition-all"
+                              style="width: {uploadProgress}%"
+                            ></div>
+                          </div>
+                        {/if}
+                      </div>
+                    {:else}
+                      <div class="space-y-2">
+                        <Upload class="w-8 h-8 mx-auto text-gray-400" />
+                        <p class="text-sm text-gray-600">Drop file here or click to browse</p>
+                        <input
+                          type="file"
                           class="hidden"
-                          onchange={ handleFileUpload } accept="*/*"
-                        /> {/if}
-  </div> {/if}
-  <!-- AI, Analysis --> <div> <div class="flex items-center justify-between"> <Label>AI Analysis</Label>
-  {#if mode !== 'view'} <Button class="bits-btn" size="sm"
+                          onchange={handleFileUpload}
+                          accept="*/*"
+                        />
+                      </div>
+                    {/if}
+                  </div>
+                </div>
+              {/if}
+
+              <!-- AI Analysis -->
+              <div class="space-y-1">
+                <div class="flex items-center justify-between">
+                  <label class="block text-sm font-medium text-gray-700">AI Analysis</label>
+                  {#if !isReadonly}
+                    <Button
                       variant="ghost"
-                      onclick={ analyzeEvidence } disabled={ isAnalyzing } >
-  {#if isAnalyzing} <div class="animate-spin w-4 h-4 mr-1 border border-current border-t-transparent"></div> {:else} <Brain class="w-4 h-4" /> {/if} Analyze </Button> {/if}
-  </div>
-  {#if evidence.embeddings?.length} <div class="p-3 bg-muted/50"> <p class="text-sm text-green-600">âœ“ Embeddings generated</p>
- <p class="text-xs"> Dimension {evidence.embeddings.length} </p> </div> {:else} <div class="p-3 bg-muted/50"> <p class="text-sm"> No AI analysis available </p> {/if}
-  </div>
- <!-- Position --> <div class="grid grid-cols-2"> <div> <Label htmlFor="x">X Position</Label>
- <Input id="x"
+                      size="sm"
+                      onclick={analyzeEvidence}
+                      disabled={isAnalyzing}
+                    >
+                      {#if isAnalyzing}
+                        <div class="animate-spin w-4 h-4 mr-1 border-2 border-current border-t-transparent rounded-full"></div>
+                      {:else}
+                        <Brain class="w-4 h-4 mr-1" />
+                      {/if}
+                      Analyze
+                    </Button>
+                  {/if}
+                </div>
+                {#if evidence.embeddings && evidence.embeddings.length > 0}
+                  <div class="p-3 bg-green-50 rounded-md border border-green-200">
+                    <p class="text-sm text-green-700 font-medium">Embeddings generated</p>
+                    <p class="text-xs text-green-600 mt-0.5">
+                      Dimension: {evidence.embeddings.length}
+                    </p>
+                  </div>
+                {:else}
+                  <div class="p-3 bg-gray-50 rounded-md border border-gray-200">
+                    <p class="text-sm text-gray-500">No AI analysis available</p>
+                  </div>
+                {/if}
+              </div>
+
+              <!-- Position -->
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                  <label for="evidence-x" class="block text-sm font-medium text-gray-700">X Position</label>
+                  <input
+                    id="evidence-x"
                     type="number"
-                    bind:value={evidence.x} disabled={mode === 'view'} /> </div>
- <div> <Label htmlFor="y">Y Position</Label>
- <Input id="y"
-                    type="number"; bind:value={evidence.y} disabled={mode === 'view'} /> </div> </div>
- <!-- Metadata -->
-  {#if evidence.metadata} <div> <Label>Metadata</Label>
- <div class="p-3 bg-muted/50 rounded"> <pre>{JSON.stringify(evidence.metadata, null, 2)}</pre> </div> {/if}
-  </div> </div> </CardContent>
- <!-- Footer --> <div class="border-t p-6 flex items-center justify-between"> <div class="flex items-center">
-  {#if mode !== 'view' && mode !== 'create'} <Button class="bits-btn" variant="error"
+                    bind:value={evidence.x}
+                    class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isReadonly}
+                  />
+                </div>
+                <div class="space-y-1">
+                  <label for="evidence-y" class="block text-sm font-medium text-gray-700">Y Position</label>
+                  <input
+                    id="evidence-y"
+                    type="number"
+                    bind:value={evidence.y}
+                    class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isReadonly}
+                  />
+                </div>
+              </div>
+
+              <!-- Metadata -->
+              {#if evidence.metadata && Object.keys(evidence.metadata).length > 0}
+                <div class="space-y-1">
+                  <label class="block text-sm font-medium text-gray-700">Metadata</label>
+                  <div class="p-3 bg-gray-50 rounded-md border border-gray-200 overflow-auto max-h-40">
+                    <pre class="text-xs text-gray-700 whitespace-pre-wrap">{JSON.stringify(evidence.metadata, null, 2)}</pre>
+                  </div>
+                </div>
+              {/if}
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="border-t px-6 py-4 flex items-center justify-between">
+          <div>
+            {#if mode === 'edit' && evidenceId}
+              <Button
+                variant="ghost"
                 size="sm"
-                onclick={ handleDelete } disabled={ isDeleting } >
-  {#if isDeleting} <div class="animate-spin w-4 h-4 mr-1 border border-current border-t-transparent"></div> {:else} <Trash2 class="w-4 h-4" /> {/if} Delete </Button> {/if}
+                onclick={handleDelete}
+                disabled={isDeleting}
+                class="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                {#if isDeleting}
+                  <div class="animate-spin w-4 h-4 mr-1 border-2 border-current border-t-transparent rounded-full"></div>
+                {:else}
+                  <Trash2 class="w-4 h-4 mr-1" />
+                {/if}
+                Delete
+              </Button>
+            {/if}
+          </div>
+          <div class="flex items-center gap-2">
+            <Button variant="ghost" onclick={handleClose}>
+              Cancel
+            </Button>
+            {#if !isReadonly}
+              <Button onclick={handleSave} disabled={isSaving}>
+                {#if isSaving}
+                  <div class="animate-spin w-4 h-4 mr-1 border-2 border-white border-t-transparent rounded-full"></div>
+                {:else}
+                  <Save class="w-4 h-4 mr-1" />
+                {/if}
+                {mode === 'create' ? 'Create' : 'Save'}
+              </Button>
+            {/if}
+          </div>
+        </div>
+      {/if}
+    </div>
   </div>
- <div class="flex items-center"> <Button class="bits-btn" variant="ghost" onclick={ handleClose }> Cancel </Button>
-  {#if mode !== 'view'} <Button class="bits-btn" onclick={ handleSave } disabled={ isSaving } >
-  {#if isSaving} <div class="animate-spin w-4 h-4 mr-1 border border-current border-t-transparent"></div> {:else} <Save class="w-4 h-4" /> {/if} {mode === 'create' ? 'Create': 'Save'} </Button> {/if}
-  </div> {/if}
-  </div> {/if}
-  <style> @keyframes fadeOut { from { opacity: 1;} to { opacity: 0;} }
-  @keyframes scaleIn { from { opacity: 0;
-		transform: scale(0.95)}
-    to { opacity: 1;
-		transform: scale(1)}
-  } @keyframes scaleOut { from { opacity: 1;
-		transform: scale(1)}
-    to { opacity: 0;
-		transform: scale(0.95)}
-  } .animate-fadeOut { animation: fadeOut 200ms ease-out forward;}
-  .animate-scaleIn { animation: scaleIn 200ms ease-out forward;}
-  .animate-scaleOut { animation: scaleOut 200ms ease-out forward;}
+{/if}
+
+<style>
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes scaleOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.95); }
+  }
+  .animate-fadeOut {
+    animation: fadeOut 200ms ease-out forwards;
+  }
+  .animate-scaleIn {
+    animation: scaleIn 200ms ease-out forwards;
+  }
+  .animate-scaleOut {
+    animation: scaleOut 200ms ease-out forwards;
+  }
 </style>
-
-
-
-
-
