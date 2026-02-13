@@ -116,9 +116,9 @@ model: 'embeddinggemma:latest', input: searchQuery })
 			searchResults = (searchData.result || []).map((r: any) => ({
 				id: r.id,
 				score: r.score,
-				text: r.payload?.raw_text ?? r.payload?.text || '',
+				text: r.payload?.raw_text ?? (r.payload?.text || ''),
 				source: r.payload?.source ?? '',
-				tags: r.payload?.tags ?? r.payload?.auto_tags || [],
+				tags: r.payload?.tags ?? (r.payload?.auto_tags || []),
 				cluster_id: r.payload?.cluster_id
 			}));
 		} catch (e) {
@@ -266,8 +266,8 @@ cluster_id: cluster.cluster_id,
 });
 
 	// TODO: Add as cleanup in $effect: return () => {
-		eventSource?.close();
-	}
+	//	eventSource?.close();
+	// }
 </script>
 
 <svelte:head>

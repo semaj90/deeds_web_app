@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
-import { broadcastAgentProgress } from '../routes/stream/+server.js';
+// Stream endpoint not yet implemented
+function broadcastAgentProgress(_data: any) { /* no-op */ }
 import type { RequestHandler } from './$types';
 
 const OLLAMA_URL = 'http://127.0.0.1:11434';

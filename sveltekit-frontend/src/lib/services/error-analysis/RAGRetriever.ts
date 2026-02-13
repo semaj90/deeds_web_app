@@ -114,6 +114,7 @@ export class RAGRetriever {
 		if (this.qdrantAvailable) {
 			try {
 				const results = await this.queryQdrant(embedding, k);
+
 				if (results.length > 0) {
 					this.stats.qdrantSuccesses++;
 					return this.transformToSimilarErrors(results);
@@ -140,17 +141,17 @@ export class RAGRetriever {
 	/**
 	 * Query Qdrant vector database
 	 */
-	private async queryQdrant(embedding: number[]): Promise<VectorSearchResult[]> {
+	private async queryQdrant(embedding: number[], topK?: number): Promise<VectorSearchResult[]> {
 		const response = await fetch(`${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	vector: embedding,
-				limit: topK,
+			body: JSON.stringify({
+				vector: embedding,
+				limit: topK || this.config.topK,
 				with_payload: true,
 				score_threshold: this.config.similarityThreshold
 			}),
-	signal: AbortSignal.timeout(10000)
+			signal: AbortSignal.timeout(10000)
 		});
 
 		if (!response.ok) {
@@ -170,7 +171,7 @@ export class RAGRetriever {
 	 * Property 7: For any vector search, the system SHALL query Qdrant first,
 	 * then fall back to pgvector if Qdrant fails.
 	 */
-	private async queryPgVector(embedding: number[]): Promise<VectorSearchResult[]> {
+	private async queryPgVector(embedding: number[], _topK?: number): Promise<VectorSearchResult[]> {
 		// This would use a PostgreSQL client with pgvector
 		// For now;
  // return empty as pgvector requires database connection
@@ -183,13 +184,14 @@ export class RAGRetriever {
 	 */
 	private transformToSimilarErrors(results: VectorSearchResult[]): SimilarError[] {
 		return results.map((r: any) => ({
-			id: String(r.id, embedding: [], // Not returned from search
+			id: String(r.id),
+			embedding: [], // Not returned from search
 			similarity: r.score,
 			fixStrategies: [], // Will be populated from cache
 			successRate: (r.payload.success_rate as number) ?? 0,
 			timestamp: Date.now(),
-     errorReport: {
-	file: (r.payload.file as string) ?? '',
+			errorReport: {
+				file: (r.payload.file as string) ?? '',
 				line: (r.payload.line as number) ?? 0,
 				column: (r.payload.column as number) ?? 0,
 				code: (r.payload.error_code as string) ?? '',
@@ -237,7 +239,7 @@ export class RAGRetriever {
 
 		try {
 			const cacheKey = `fix-strategies:${ errorId }`;
-			await this.redisClient.set(cacheKey: JSON.stringify(strategies), { EX, ttl });
+			await this.redisClient.set(cacheKey, JSON.stringify(strategies), { EX: ttl });
 		} catch (error) {
 			console.warn(`⚠️  Failed to cache fix strategies: ${error instanceof Error ? error.message : String(error)}`);
 		}
@@ -266,7 +268,7 @@ export class RAGRetriever {
 
 				return { ...error, similarity: combinedScore };
 			})
-			.sort((a: any, b, any) => b.similarity - a.similarity);
+			.sort((a: any, b: any) => b.similarity - a.similarity);
 	}
 
 	/**
@@ -280,7 +282,8 @@ export class RAGRetriever {
 		const ranked = this.rankKnowledge(similar);
 
 		// Fetch fix strategies for each
-ranked.map(async (error: any) => {
+		const withStrategies = await Promise.all(
+			ranked.map(async (error: any) => {
 				const strategies = await this.getFixStrategies(error.id);
 				return { ...error, fixStrategies: strategies };
 			})

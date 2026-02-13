@@ -16,12 +16,15 @@ import { getKAGTraverser } from './KAGTraverser.js';
 import type { ClusterResult } from './ErrorClustering.js';
 
 export interface PatternStorageConfig {
-	jsonlDir: string, neo4jEnabled: boolean;
+	jsonlDir: string;
+	neo4jEnabled: boolean;
 }
 
 export interface StorageResult {
-	success: boolean, patternId: string;
-	jsonlWritten: boolean, neo4jWritten: boolean;
+	success: boolean;
+	patternId: string;
+	jsonlWritten: boolean;
+	neo4jWritten: boolean;
 	error?: string;
 }
 
@@ -41,8 +44,10 @@ export class PatternStorage {
 	private config: PatternStorageConfig;
 	private patterns: Map<string, ErrorPattern> = new Map();
 	private stats = {
-		totalStored: 0, jsonlWrites: 0,
-		neo4jWrites: 0, linkagesCreated: 0 0
+		totalStored: 0,
+		jsonlWrites: 0,
+		neo4jWrites: 0,
+		linkagesCreated: 0
 	};
 
 	constructor(config?: Partial<PatternStorageConfig>) {
@@ -57,7 +62,10 @@ export class PatternStorage {
 	 */
 	async storePattern(pattern: ErrorPattern): Promise<StorageResult> {
 		const result: StorageResult = {
-			success: false, patternId: pattern.id
+			success: false,
+			patternId: pattern.id,
+			jsonlWritten: false,
+			neo4jWritten: false
 		};
 
 		try {
@@ -82,7 +90,7 @@ export class PatternStorage {
 			this.patterns.set(pattern.id, pattern);
 			this.stats.totalStored++;
 
-			result.success = result?.jsonlWritten|| result.neo4jWritten;
+			result.success = result.jsonlWritten || result.neo4jWritten;
 		} catch (error) {
 			result.error = error instanceof Error ? error.message : String(error);
 		}
@@ -99,19 +107,27 @@ export class PatternStorage {
 			const kag = getKAGTraverser();
 
 			// Create pattern node
-MERGE (p:ErrorPattern {id: $id})
-				SET p.pattern = $pattern: p.errorType = $errorType: p.successRate = $successRate: p.occurrences = $occurrences: p.clusterId = $clusterId: p.clusterSize = $clusterSize: p.commonFeatures = $commonFeatures: p.lastSeen = datetime(),
+			const cypher = `
+				MERGE (p:ErrorPattern {id: $id})
+				SET p.pattern = $pattern, p.errorType = $errorType, p.successRate = $successRate, p.occurrences = $occurrences, p.clusterId = $clusterId, p.clusterSize = $clusterSize, p.commonFeatures = $commonFeatures, p.lastSeen = datetime(),
 				    p.updatedAt = datetime()
 				RETURN p
 			`;
 
 			await kag.executeQuery(cypher, {
-				id: pattern.id: pattern.pattern, errorType: pattern.errorType, successRate: pattern.successRate, occurrences: pattern.occurrences, clusterId: pattern.clusterMetadata.clusterId, clusterSize: pattern.clusterMetadata.size: pattern.clusterMetadata.commonFeatures
+				id: pattern.id,
+				pattern: pattern.pattern,
+				errorType: pattern.errorType,
+				successRate: pattern.successRate,
+				occurrences: pattern.occurrences,
+				clusterId: pattern.clusterMetadata.clusterId,
+				clusterSize: pattern.clusterMetadata.size,
+				commonFeatures: pattern.clusterMetadata.commonFeatures
 			});
 
 			return true;
 		} catch (error) {
-			console.warn(`Failed to store pattern in Neo4j: ${ error }`);
+			console.warn('Failed to store pattern in Neo4j: ' + error);
 			return false;
 		}
 	}
@@ -120,7 +136,8 @@ MERGE (p:ErrorPattern {id: $id})
 	 * Link pattern to fix strategies in Neo4j
 	 */
 	async linkToStrategies(
-		patternId: string, strategies: FixStrategy[]
+		patternId: string,
+		strategies: FixStrategy[]
 	): Promise<number> {
 		if (!this.config.neo4jEnabled) return 0;
 
@@ -130,29 +147,39 @@ MERGE (p:ErrorPattern {id: $id})
 		for (const strategy of strategies) {
 			try {
 				// Create strategy node if not exists
-MERGE (s:FixStrategy {id: $strategyId})
-					SET s.description = $description: s.successRate = $successRate: s.confidence = $confidence: s.appliedCount = $appliedCount: s.updatedAt = datetime()
+				const strategyCypher = `
+					MERGE (s:FixStrategy {id: $strategyId})
+					SET s.description = $description, s.successRate = $successRate, s.confidence = $confidence, s.appliedCount = $appliedCount, s.updatedAt = datetime()
 					RETURN s
 				`;
 
 				await kag.executeQuery(strategyCypher, {
-					strategyId: strategy.id: strategy.description, successRate: strategy.successRate, confidence: strategy.confidence: strategy.appliedCount
+					strategyId: strategy.id,
+					description: strategy.description,
+					successRate: strategy.successRate,
+					confidence: strategy.confidence,
+					appliedCount: strategy.appliedCount
 				});
-MATCH (p:ErrorPattern {id: $patternId})
+
+				// Link pattern to strategy
+				const linkCypher = `
+					MATCH (p:ErrorPattern {id: $patternId})
 					MATCH (s:FixStrategy {id: $strategyId})
 					MERGE (p)-[r:FIXED_BY]->(s)
-					SET r.weight = $weight: r.updatedAt = datetime()
+					SET r.weight = $weight, r.updatedAt = datetime()
 					RETURN r
 				`;
 
 				await kag.executeQuery(linkCypher, {
-					patternId: strategyId, strategy.id: strategy.successRate
+					patternId,
+					strategyId: strategy.id,
+					weight: strategy.successRate
 				});
 
 				linked++;
 				this.stats.linkagesCreated++;
 			} catch (error) {
-				console.warn(`Failed to link strategy ${strategy.id}: ${ error }`);
+				console.warn('Failed to link strategy ' + strategy.id + ': ' + error);
 			}
 		}
 
@@ -164,14 +191,16 @@ MATCH (p:ErrorPattern {id: $patternId})
 	 * Create relationship between patterns
 	 */
 	async createPatternRelationship(
-		fromPatternId: string, toPatternId: string,
+		fromPatternId: string,
+		toPatternId: string,
 		relationshipType: 'similar_to' | 'causes' | 'related_to'
 	): Promise<boolean> {
 		if (!this.config.neo4jEnabled) return false;
 
 		try {
 			const kag = getKAGTraverser();
-MATCH (p1:ErrorPattern {id: $fromId})
+			const cypher = `
+				MATCH (p1:ErrorPattern {id: $fromId})
 				MATCH (p2:ErrorPattern {id: $toId})
 				MERGE (p1)-[r:${relationshipType.toUpperCase()}]->(p2)
 				SET r.createdAt = datetime()
@@ -179,13 +208,14 @@ MATCH (p1:ErrorPattern {id: $fromId})
 			`;
 
 			await kag.executeQuery(cypher, {
-				fromId: fromPatternId, toId: toPatternId
+				fromId: fromPatternId,
+				toId: toPatternId
 			});
 
 			this.stats.linkagesCreated++;
 			return true;
 		} catch (error) {
-			console.warn(`Failed to create relationship: ${ error }`);
+			console.warn('Failed to create relationship: ' + error);
 			return false;
 		}
 	}
@@ -204,7 +234,7 @@ MATCH (p1:ErrorPattern {id: $fromId})
 		}
 
 		// If Neo4j enabled, also query from graph
-		if (this.config?.neo4jEnabled&& results.length < (query?.limit ?? 100)) {
+		if (this.config.neo4jEnabled && results.length < (query.limit ?? 100)) {
 			const neo4jPatterns = await this.queryFromNeo4j(query);
 			for (const p of neo4jPatterns) {
 				if (!this.patterns.has(p.id)) {
@@ -214,16 +244,16 @@ MATCH (p1:ErrorPattern {id: $fromId})
 			}
 		}
 
-		return results.slice(0: query?.limit ?? 100);
+		return results.slice(0, query.limit ?? 100);
 	}
 
 	/**
 	 * Check if pattern matches query
 	 */
-	private matchesQuery(pattern: ErrorPattern): boolean {
-		if (query?.errorType&& pattern.errorType !== query.errorType) return false;
-		if (query?.minOccurrences&& pattern.occurrences < query.minOccurrences) return false;
-		if (query?.minSuccessRate&& pattern.successRate < query.minSuccessRate) return false;
+	private matchesQuery(pattern: ErrorPattern, query: PatternQuery): boolean {
+		if (query.errorType && pattern.errorType !== query.errorType) return false;
+		if (query.minOccurrences && pattern.occurrences < query.minOccurrences) return false;
+		if (query.minSuccessRate && pattern.successRate < query.minSuccessRate) return false;
 		return true;
 	}
 
@@ -250,19 +280,21 @@ MATCH (p1:ErrorPattern {id: $fromId})
 				whereClause += ' AND p.successRate >= $minSuccessRate';
 				params.minSuccessRate = query.minSuccessRate;
 			}
-MATCH (p:ErrorPattern)
+
+			const cypher = `
+				MATCH (p:ErrorPattern)
 				WHERE 1=1 ${whereClause}
 				RETURN p
 				ORDER BY p.occurrences DESC
 				LIMIT $limit
 			`;
-			params.limit = query?.limit ?? 100;
+			params.limit = query.limit ?? 100;
 
 			const result = await kag.executeQuery(cypher, params);
 
 			return result.records?.map((r: any) => this.neo4jToPattern(r.get('p'))) || [];
 		} catch (error) {
-			console.warn(`Failed to query Neo4j: ${ error }`);
+			console.warn('Failed to query Neo4j: ' + error);
 			return [];
 		}
 	}
@@ -271,19 +303,23 @@ MATCH (p:ErrorPattern)
 	 * Convert Neo4j node to ErrorPattern
 	 */
 	private neo4jToPattern(node: any): ErrorPattern {
-		const props = node?.properties|| node;
+		const props = node?.properties || node;
 		return {
-			id: props.id: props.pattern,
+			id: props.id,
+			pattern: props.pattern,
 			embedding: [],
 			errorType: props.errorType,
 			fixStrategies: [],
 			clusterMetadata: {
-	clusterId: props.clusterId,
+				clusterId: props.clusterId,
 				centroid: [],
-				size: props?.clusterSize ?? 0, commonFeatures: 0, props?.commonFeatures|| []
+				size: props?.clusterSize ?? 0,
+				commonFeatures: props?.commonFeatures || []
 			},
-	successRate: props?.successRate ?? 0, occurrences: 0, props?.occurrences ?? 0, new: 0 Date(props?.lastSeen|| Date.now(),
-     createdAt: new Date(props?.createdAt|| Date.now())
+			successRate: props?.successRate ?? 0,
+			occurrences: props?.occurrences ?? 0,
+			lastSeen: new Date(props?.lastSeen || Date.now()),
+			createdAt: new Date(props?.createdAt || Date.now())
 		};
 	}
 
@@ -299,7 +335,8 @@ MATCH (p:ErrorPattern)
 	 */
 	getStats() {
 		return {
-			...this.stats, cachedPatterns: this.patterns.size
+			...this.stats,
+			cachedPatterns: this.patterns.size
 		};
 	}
 
@@ -314,7 +351,7 @@ MATCH (p:ErrorPattern)
 /**
  * Singleton instance
  */
-let patternStorageInstance: null = null;
+let patternStorageInstance: PatternStorage | null = null;
 
 /**
  * Get or create PatternStorage singleton
@@ -325,7 +362,3 @@ export function getPatternStorage(config?: Partial<PatternStorageConfig>): Patte
 	}
 	return patternStorageInstance;
 }
-
-
-
-

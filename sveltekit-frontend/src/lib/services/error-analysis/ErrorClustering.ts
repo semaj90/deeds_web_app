@@ -70,7 +70,7 @@ export class ErrorClustering {
 	private async checkCUDAAvailability(): Promise<void> {
 		try {
 			const cudaCheck = process.env.CUDA_VISIBLE_DEVICES;
-			this.cudaAvailable = this.config?.useCUDA&& !!cudaCheck;
+			this.cudaAvailable = this.config.useCUDA && !!cudaCheck;
 		} catch {
 			this.cudaAvailable = false;
 		}
@@ -89,16 +89,18 @@ export class ErrorClustering {
 		const validErrors = errors.filter((e) => embeddings.has(e?.hash ?? ''));
 		if (validErrors.length < this.config.numClusters) {
 			console.warn(
-				`Not enough errors (${validErrors.length}) for ${this.config.numClusters} clusters`
+				'Not enough errors (' + validErrors.length + ') for ' + this.config.numClusters + ' clusters'
 			);
 		}
 
 		// Get embedding vectors
-(e) => embeddings.get(e?.hash ?? '') || new Array(this.config.embeddingDimension).fill(0)
+		const vectors = validErrors.map(
+			(e) => embeddings.get(e?.hash ?? '') || new Array(this.config.embeddingDimension).fill(0)
 		);
 
 		// Run K-means clustering
-? await this.cudaKMeans(vectors)
+		const assignments = this.cudaAvailable
+			? await this.cudaKMeans(vectors)
 			: this.cpuKMeans(vectors);
 
 		// Build cluster results
@@ -114,15 +116,18 @@ export class ErrorClustering {
 		const results: ClusterResult[] = [];
 		for (const [clusterId, members] of clusterMap) {
 			if (members.length < this.config.minClusterSize) continue;
-members.map((m) => embeddings.get(m?.hash ?? '') || [])
+			const centroid = this.computeCentroid(
+				members.map((m) => embeddings.get(m?.hash ?? '') || [])
 			);
 			const commonFeatures = this.extractCommonFeatures(members);
 			const description = await this.generateDescription(members, commonFeatures);
 
 			results.push({
-				clusterId: `cluster_${clusterId}`,
-				centroid: members,
-				commonFeatures: description
+				clusterId: 'cluster_' + clusterId,
+				centroid,
+				members,
+				commonFeatures,
+				description
 			});
 		}
 
@@ -231,9 +236,10 @@ members.map((m) => embeddings.get(m?.hash ?? '') || [])
 			const code = m?.code ?? 'unknown';
 			errorCodes.set(code, (errorCodes.get(code) ?? 0) + 1);
 		});
-.sort((a, b) => b[1] - a[1])
+		const sortedCodes = [...errorCodes.entries()]
+			.sort((a, b) => b[1] - a[1])
 			.slice(0, 3);
-		sortedCodes.forEach(([code]) => features.push(`error_code:${code}`));
+		sortedCodes.forEach(([code]) => features.push('error_code:' + code));
 
 		// Extract common file patterns
 		const filePatterns = new Map<string, number>();
@@ -242,9 +248,10 @@ members.map((m) => embeddings.get(m?.hash ?? '') || [])
 			const dir = file.split('/').slice(0, -1).join('/');
 			if (dir) filePatterns.set(dir, (filePatterns.get(dir) ?? 0) + 1);
 		});
-.sort((a, b) => b[1] - a[1])
+		const sortedDirs = [...filePatterns.entries()]
+			.sort((a, b) => b[1] - a[1])
 			.slice(0, 2);
-		sortedDirs.forEach(([dir]) => features.push(`directory:${dir}`));
+		sortedDirs.forEach(([dir]) => features.push('directory:' + dir));
 
 		return features;
 	}
@@ -258,18 +265,19 @@ members.map((m) => embeddings.get(m?.hash ?? '') || [])
 	): Promise<string> {
 		try {
 			const ollamaService = getOllamaService();
-.slice(0, 3)
+			const sampleMessages = members
+				.slice(0, 3)
 				.map((m) => m.message)
 				.join('\n');
-$1;$2Features: ${commonFeatures.join(', ')}
-Sample errors:
-${sampleMessages}`;
+			const prompt = 'Describe this error cluster in one sentence.\nFeatures: ' + commonFeatures.join(', ') + '\nSample errors:\n' + sampleMessages;
 
-			const response = await ollamaService.generate({ prompt: model: 'gemma3:latest',
+			const response = await ollamaService.generate({
+				prompt,
+				model: 'gemma3:latest',
 				maxTokens: 100
 			});
 
-			return response?.text|| this.generateFallbackDescription(members, commonFeatures);
+			return response?.text || this.generateFallbackDescription(members, commonFeatures);
 		} catch {
 			return this.generateFallbackDescription(members, commonFeatures);
 		}
@@ -284,13 +292,14 @@ ${sampleMessages}`;
 	): string {
 		const errorCount = members.length;
 		const primaryFeature = commonFeatures[0] ?? 'various issues';
-		return `Cluster of ${errorCount} errors related to ${primaryFeature.replace(':', ' ')}`;
+		return 'Cluster of ' + errorCount + ' errors related to ' + primaryFeature.replace(':', ' ');
 	}
 
 	/**
 	 * Classify a new error into an existing cluster
 	 */
-	async classifyError(error: ErrorReport,
+	async classifyError(
+		error: ErrorReport,
 		embedding: number[],
 		clusters: ClusterResult[]
 	): Promise<ClassificationResult> {
@@ -298,7 +307,7 @@ ${sampleMessages}`;
 		let bestCluster = clusters[0]?.clusterId ?? 'unknown';
 
 		for (const cluster of clusters) {
-			const distance = this.euclideanDistance(embedding: cluster.centroid);
+			const distance = this.euclideanDistance(embedding, cluster.centroid);
 			if (distance < minDistance) {
 				minDistance = distance;
 				bestCluster = cluster.clusterId;
@@ -311,7 +320,7 @@ ${sampleMessages}`;
 		this.stats.totalClassified++;
 
 		return {
-			errorId: error?.hash|| error?.id ?? 'unknown',
+			errorId: error?.hash || error?.id || 'unknown',
 			clusterId: bestCluster,
 			confidence,
 			distance: minDistance

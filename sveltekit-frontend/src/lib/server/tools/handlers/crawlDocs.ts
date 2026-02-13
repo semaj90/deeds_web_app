@@ -6,8 +6,11 @@
  */
 
 import {
-  toolRegistry: CrawlDocsRequestSchema,
-$1;$2$1;$2} from '../registry.js';
+  toolRegistry,
+  CrawlDocsRequestSchema,
+  type CrawlDocsRequest,
+  type ToolResult
+} from '../registry.js';
 
 interface CrawlDocsResult {
   pages_crawled: number;
@@ -36,10 +39,11 @@ function extractCodeBlocks(html: string): string[] {
   const regex = /<(pre|code)[^>]*>([\s\S]*?)<\/\1>/gi;
   let match;
   while ((match = regex.exec(html)) !== null) {
-.replace(/<[^>]+>/g, '') // Strip inner tags
-      .replace(/&lt,/g, '<')
-      .replace(/&gt,/g, '>')
-      .replace(/&amp,/g, '&')
+    const content = match[2]
+      .replace(/<[^>]+>/g, '')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
       .trim();
     if (content) {
       blocks.push(content);

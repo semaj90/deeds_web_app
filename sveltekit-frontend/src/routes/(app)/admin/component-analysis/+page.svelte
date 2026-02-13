@@ -119,11 +119,13 @@
 			});
 			if (res.ok) {
 				recentActivity = [{
-					id: crypto.randomUUID(type: 'fix',
+					id: crypto.randomUUID(),
+					type: 'fix',
 					message: `Started fix for ${component.component_name}`,
-					timestamp: new Date().toISOString(), file: component.file_path
+					timestamp: new Date().toISOString(),
+					file: component.file_path
 				},
-	...recentActivity.slice(0, 19)];
+				...recentActivity.slice(0, 19)];
 			}
 		} catch (e) {
 			console.error('Fix trigger failed:', e);
@@ -167,7 +169,7 @@
 		if (searchQuery) {
 			const q = searchQuery.toLowerCase();
 			filtered = filtered.filter(c =>
-				c.component_name.toLowerCase().includes(q) ?? c.file_path.toLowerCase().includes(q) ||
+				c.component_name.toLowerCase().includes(q) || c.file_path.toLowerCase().includes(q) ||
 				c.feature_tags.some(t => t.toLowerCase().includes(q))
 			);
 		}
@@ -195,8 +197,8 @@
 });
 
 	// TODO: Add as cleanup in $effect: return () => {
-		eventSource?.close();
-	}
+	//	eventSource?.close();
+	// }
 
 	function formatRelativeTime(dateStr: string): string {
 		const date = new Date(dateStr);

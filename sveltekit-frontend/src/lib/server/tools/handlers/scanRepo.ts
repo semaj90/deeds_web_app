@@ -8,8 +8,11 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import {
-  toolRegistry: ScanRepoRequestSchema,
-$1;$2$1;$2$1;$2} from '../registry.js';
+  toolRegistry,
+  ScanRepoRequestSchema,
+  type ScanRepoRequest,
+  type ToolResult
+} from '../registry.js';
 
 const execAsync = promisify(exec);
 

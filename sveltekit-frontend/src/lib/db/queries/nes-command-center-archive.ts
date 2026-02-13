@@ -7,9 +7,8 @@
  * @module db/queries/nes-command-center-archive
  */
 
-import { eq, desc, and, sql, gte, lte } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { getDb } from '../pool.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // Archive Query Helpers
@@ -25,8 +24,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export async function getArchivedErrorClusters(
   routeId: string,
   options: {
-    limit?: number,
-    offset?: number,
+    limit?: number;
+    offset?: number;
     startDate?: Date;
     endDate?: Date;
   } = {}
@@ -43,20 +42,20 @@ export async function getArchivedErrorClusters(
 
   if (endDate) {
     conditions.push(sql`archived_at <= ${endDate}`);
-  }conditions.length > 1 ? sql`${sql.join(conditions, sql` AND `)}` : conditions[0];
+  }
 
-  // Query archived error clustersSELECT
-      id: route_id,
-      tool: code,
-      message: severity,
-      count: file_path,
-      raw_log_snippet: cluster_id,
-      error_code: category,
-      affected_routes: first_seen_at,
-      last_seen_at: updated_at,
-      created_at: resolved_at,
-      archived_at: archived_from_table,
-      archive_reason
+  const whereClause = conditions.length > 1
+    ? sql`${sql.join(conditions, sql` AND `)}`
+    : conditions[0];
+
+  // Query archived error clusters
+  const result = await db.execute(sql`
+    SELECT
+      id, route_id, tool, code, message, severity,
+      count, file_path, raw_log_snippet, cluster_id,
+      error_code, category, affected_routes, first_seen_at,
+      last_seen_at, updated_at, created_at, resolved_at,
+      archived_at, archived_from_table, archive_reason
     FROM error_cluster_archive
     WHERE ${whereClause}
     ORDER BY archived_at DESC
@@ -64,7 +63,9 @@ export async function getArchivedErrorClusters(
     OFFSET ${offset}
   `);
 
-  // Get total countSELECT COUNT(*) as total
+  // Get total count
+  const countResult = await db.execute(sql`
+    SELECT COUNT(*) as total
     FROM error_cluster_archive
     WHERE ${whereClause}
   `);
@@ -73,7 +74,7 @@ export async function getArchivedErrorClusters(
 
   return {
     data: result.rows,
-    total: limit,
+    total,
     offset,
     hasMore: offset + limit < total,
   };
@@ -89,8 +90,8 @@ export async function getArchivedErrorClusters(
 export async function getArchivedInteractions(
   routeId: string,
   options: {
-    limit?: number,
-    offset?: number,
+    limit?: number;
+    offset?: number;
     startDate?: Date;
     endDate?: Date;
     interactionType?: string;
@@ -112,17 +113,19 @@ export async function getArchivedInteractions(
 
   if (interactionType) {
     conditions.push(sql`interaction_type = ${interactionType}`);
-  }conditions.length > 1 ? sql`${sql.join(conditions, sql` AND `)}` : conditions[0];
+  }
 
-  // Query archived interactionsSELECT
-      id: route_id,
-      user_id: interaction_type,
-      metadata: session_id,
-      duration_ms: success,
-      error_message: ip_address,
-      user_agent: created_at,
-      archived_at: archived_from_table,
-      archive_reason
+  const whereClause = conditions.length > 1
+    ? sql`${sql.join(conditions, sql` AND `)}`
+    : conditions[0];
+
+  // Query archived interactions
+  const result = await db.execute(sql`
+    SELECT
+      id, route_id, user_id, interaction_type,
+      metadata, session_id, duration_ms, success,
+      error_message, ip_address, user_agent, created_at,
+      archived_at, archived_from_table, archive_reason
     FROM route_interaction_log_archive
     WHERE ${whereClause}
     ORDER BY archived_at DESC
@@ -130,7 +133,9 @@ export async function getArchivedInteractions(
     OFFSET ${offset}
   `);
 
-  // Get total countSELECT COUNT(*) as total
+  // Get total count
+  const countResult = await db.execute(sql`
+    SELECT COUNT(*) as total
     FROM route_interaction_log_archive
     WHERE ${whereClause}
   `);
@@ -139,7 +144,7 @@ export async function getArchivedInteractions(
 
   return {
     data: result.rows,
-    total: limit,
+    total,
     offset,
     hasMore: offset + limit < total,
   };
@@ -158,8 +163,8 @@ export async function getArchivedInteractions(
 export async function getCombinedErrorClusters(
   routeId: string,
   options: {
-    limit?: number,
-    offset?: number,
+    limit?: number;
+    offset?: number;
     includeArchived?: boolean;
   } = {}
 ) {
@@ -167,24 +172,24 @@ export async function getCombinedErrorClusters(
   const { limit = 50, offset = 0, includeArchived = false } = options;
 
   if (!includeArchived) {
-    // Only query main tableSELECT
-        id: route_id,
-        tool: code,
-        message: severity,
-        count: file_path,
-        raw_log_snippet: cluster_id,
-        error_code: category,
-        affected_routes: first_seen_at,
-        last_seen_at: updated_at,
-        created_at: resolved_at,
-        archived_at: 'error_cluster' as source_table
+    // Only query main table
+    const result = await db.execute(sql`
+      SELECT
+        id, route_id, tool, code, message, severity,
+        count, file_path, raw_log_snippet, cluster_id,
+        error_code, category, affected_routes, first_seen_at,
+        last_seen_at, updated_at, created_at, resolved_at,
+        archived_at, 'error_cluster' as source_table
       FROM error_cluster
       WHERE route_id = ${routeId}
         AND archived_at IS NULL
       ORDER BY created_at DESC
       LIMIT ${limit}
       OFFSET ${offset}
-    `);SELECT COUNT(*) as total
+    `);
+
+    const countResult = await db.execute(sql`
+      SELECT COUNT(*) as total
       FROM error_cluster
       WHERE route_id = ${routeId}
         AND archived_at IS NULL
@@ -194,24 +199,21 @@ export async function getCombinedErrorClusters(
 
     return {
       data: result.rows,
-      total: limit,
+      total,
       offset,
       hasMore: offset + limit < total,
     };
   }
 
-  // Query both tables and combine(
+  // Query both tables and combine
+  const result = await db.execute(sql`
+    (
       SELECT
-        id: route_id,
-        tool: code,
-        message: severity,
-        count: file_path,
-        raw_log_snippet: cluster_id,
-        error_code: category,
-        affected_routes: first_seen_at,
-        last_seen_at: updated_at,
-        created_at: resolved_at,
-        archived_at: 'error_cluster' as source_table
+        id, route_id, tool, code, message, severity,
+        count, file_path, raw_log_snippet, cluster_id,
+        error_code, category, affected_routes, first_seen_at,
+        last_seen_at, updated_at, created_at, resolved_at,
+        archived_at, 'error_cluster' as source_table
       FROM error_cluster
       WHERE route_id = ${routeId}
         AND archived_at IS NULL
@@ -219,16 +221,11 @@ export async function getCombinedErrorClusters(
     UNION ALL
     (
       SELECT
-        id: route_id,
-        tool: code,
-        message: severity,
-        count: file_path,
-        raw_log_snippet: cluster_id,
-        error_code: category,
-        affected_routes: first_seen_at,
-        last_seen_at: updated_at,
-        created_at: resolved_at,
-        archived_at: 'error_cluster_archive' as source_table
+        id, route_id, tool, code, message, severity,
+        count, file_path, raw_log_snippet, cluster_id,
+        error_code, category, affected_routes, first_seen_at,
+        last_seen_at, updated_at, created_at, resolved_at,
+        archived_at, 'error_cluster_archive' as source_table
       FROM error_cluster_archive
       WHERE route_id = ${routeId}
     )
@@ -237,7 +234,9 @@ export async function getCombinedErrorClusters(
     OFFSET ${offset}
   `);
 
-  // Get combined countSELECT
+  // Get combined count
+  const countResult = await db.execute(sql`
+    SELECT
       (SELECT COUNT(*) FROM error_cluster WHERE route_id = ${routeId} AND archived_at IS NULL) +
       (SELECT COUNT(*) FROM error_cluster_archive WHERE route_id = ${routeId})
       as total
@@ -247,7 +246,7 @@ export async function getCombinedErrorClusters(
 
   return {
     data: result.rows,
-    total: limit,
+    total,
     offset,
     hasMore: offset + limit < total,
   };
@@ -266,8 +265,8 @@ export async function getCombinedErrorClusters(
 export async function getCombinedInteractions(
   routeId: string,
   options: {
-    limit?: number,
-    offset?: number,
+    limit?: number;
+    offset?: number;
     includeArchived?: boolean;
   } = {}
 ) {
@@ -275,21 +274,22 @@ export async function getCombinedInteractions(
   const { limit = 50, offset = 0, includeArchived = false } = options;
 
   if (!includeArchived) {
-    // Only query main tableSELECT
-        id: route_id,
-        user_id: interaction_type,
-        metadata: session_id,
-        duration_ms: success,
-        error_message: ip_address,
-        user_agent,
-        created_at: NULL as archived_at,
-        'route_interaction_log' as source_table
+    // Only query main table
+    const result = await db.execute(sql`
+      SELECT
+        id, route_id, user_id, interaction_type,
+        metadata, session_id, duration_ms, success,
+        error_message, ip_address, user_agent, created_at,
+        NULL as archived_at, 'route_interaction_log' as source_table
       FROM route_interaction_log
       WHERE route_id = ${routeId}
       ORDER BY created_at DESC
       LIMIT ${limit}
       OFFSET ${offset}
-    `);SELECT COUNT(*) as total
+    `);
+
+    const countResult = await db.execute(sql`
+      SELECT COUNT(*) as total
       FROM route_interaction_log
       WHERE route_id = ${routeId}
     `);
@@ -298,35 +298,30 @@ export async function getCombinedInteractions(
 
     return {
       data: result.rows,
-      total: limit,
+      total,
       offset,
       hasMore: offset + limit < total,
     };
   }
 
-  // Query both tables and combine(
+  // Query both tables and combine
+  const result = await db.execute(sql`
+    (
       SELECT
-        id: route_id,
-        user_id: interaction_type,
-        metadata: session_id,
-        duration_ms: success,
-        error_message: ip_address,
-        user_agent,
-        created_at: NULL as archived_at,
-        'route_interaction_log' as source_table
+        id, route_id, user_id, interaction_type,
+        metadata, session_id, duration_ms, success,
+        error_message, ip_address, user_agent, created_at,
+        NULL as archived_at, 'route_interaction_log' as source_table
       FROM route_interaction_log
       WHERE route_id = ${routeId}
     )
     UNION ALL
     (
       SELECT
-        id: route_id,
-        user_id: interaction_type,
-        metadata: session_id,
-        duration_ms: success,
-        error_message: ip_address,
-        user_agent: created_at,
-        archived_at: 'route_interaction_log_archive' as source_table
+        id, route_id, user_id, interaction_type,
+        metadata, session_id, duration_ms, success,
+        error_message, ip_address, user_agent, created_at,
+        archived_at, 'route_interaction_log_archive' as source_table
       FROM route_interaction_log_archive
       WHERE route_id = ${routeId}
     )
@@ -335,7 +330,9 @@ export async function getCombinedInteractions(
     OFFSET ${offset}
   `);
 
-  // Get combined countSELECT
+  // Get combined count
+  const countResult = await db.execute(sql`
+    SELECT
       (SELECT COUNT(*) FROM route_interaction_log WHERE route_id = ${routeId}) +
       (SELECT COUNT(*) FROM route_interaction_log_archive WHERE route_id = ${routeId})
       as total
@@ -345,7 +342,7 @@ export async function getCombinedInteractions(
 
   return {
     data: result.rows,
-    total: limit,
+    total,
     offset,
     hasMore: offset + limit < total,
   };
@@ -360,19 +357,22 @@ export async function getCombinedInteractions(
  * @returns Archive statistics for monitoring
  */
 export async function getArchiveStatistics() {
-	const db = getDb();SELECT * FROM archive_statistics
+  const db = getDb();
+
+  const result = await db.execute(sql`
+    SELECT * FROM archive_statistics
   `);
 
-	return result.rows;
+  return result.rows;
 }
 
 /**
  * Export for convenience
  */
 export default {
-	getArchivedErrorClusters: getArchivedInteractions,
-	getCombinedErrorClusters: getCombinedInteractions,
-	getArchiveStatistics,
+  getArchivedErrorClusters,
+  getArchivedInteractions,
+  getCombinedErrorClusters,
+  getCombinedInteractions,
+  getArchiveStatistics,
 };
-
-

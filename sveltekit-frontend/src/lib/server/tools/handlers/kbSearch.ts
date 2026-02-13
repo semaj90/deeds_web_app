@@ -6,11 +6,11 @@
  */
 
 import {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-  toolRegistry: KBSearchRequestSchema,
-$1;$2$1;$2$1;$2} from '../registry.js';
-
-const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
+  toolRegistry,
+  KBSearchRequestSchema,
+  type KBSearchRequest,
+  type ToolResult
+} from '../registry.js';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 
 async function generateEmbedding(text, string, model: string = 'embeddinggemma:latest'): Promise<number[]> {
@@ -51,7 +51,7 @@ async function searchQdrant(
     body.filter = { must: [] };
     for (const [key, value] of Object.entries(options.filters)) {
       if (value !== undefined) {
-        (body.filter as any).must.push({ key: match: { value }
+        (body.filter as any).must.push({ key, match: { value } }
         });
       }
     }

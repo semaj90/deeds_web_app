@@ -6,16 +6,16 @@
  */
 
 import {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-  toolRegistry: ClusterTagRequestSchema,
-$1;$2$1;$2$1;$2} from '../registry.js';
-
-const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
+  toolRegistry,
+  ClusterTagRequestSchema,
+  type ClusterTagRequest,
+  type ToolResult
+} from '../registry.js';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 const PHASE72_PYTHON = process.env?.PHASE72_PYTHON ?? 'python';
 
 async function fetchVectors(collection: string, limit: number): Promise<Array<{
-	id: string; vector, number[] }>> {
+	id: string; vector: number[] }>> {
   const response = await fetch(`${QDRANT_URL}/collections/${ collection }/points/scroll`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

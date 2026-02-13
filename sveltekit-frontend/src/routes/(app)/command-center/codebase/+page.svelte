@@ -7,7 +7,7 @@
 	 * Route: /command-center/codebase
 	 * Purpose: Main codebase intelligence view with error overview and clusters
 	 */
-	import { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui';
+	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Activity from 'lucide-svelte/icons/activity';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
@@ -35,17 +35,17 @@
 		indexedFiles: 0,
 		totalErrors: 0,
 		errorClusters: 0,
-		topErrorCodes: [] as Array<{ code: string; count, number }>,
+		topErrorCodes: [] as Array<{ code: string; count: number }>,
 		surfaceBreakdown: {} as Record<string, number>,
 		techBreakdown: {} as Record<string, number>
 	});
 
-	let recentClusters = $state<Array<{ id: string, name: string;
-		dominant_code: string;
-	member_count: number;
-		fix_suggestion: string;
+	let recentClusters = $state<Array<{ id: string, name: string,
+		dominant_code: string,
+	member_count: number,
+		fix_suggestion: string,
 	surface: string[];
-		tech, string[];
+		tech: string[];
 	}>>([]);
 
 	$effect(() => {
@@ -239,7 +239,7 @@
 								<div class="error-bar-container">
 									<div
 										class="error-bar"
-										style="width, {Math.min(100: (count / (metrics.topErrorCodes[0]?.count ?? 1)) * 100)}%"
+										style="width: {Math.min(100, (count / (metrics.topErrorCodes[0]?.count ?? 1)) * 100)}%"
 									></div>
 								</div>
 								<span class="error-count">{count}</span>

@@ -8,8 +8,8 @@
 	 * Purpose: Interactive dependency graph visualization
 	 */
 	import { goto } from '$app/navigation';
-	import { NodeDetailPanel: RouteGraph } from '$lib/components/codebase';
-	import { Card: CardContent } from '$lib/components/ui';
+	import { NodeDetailPanel, RouteGraph } from '$lib/components/codebase';
+	import { Card, CardContent } from '$lib/components/ui';
 	import Button from '$lib/components/ui/Button.svelte';
 	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
 	import Filter from 'lucide-svelte/icons/filter';

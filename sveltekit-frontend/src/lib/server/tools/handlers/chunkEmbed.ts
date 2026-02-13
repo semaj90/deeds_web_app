@@ -6,9 +6,11 @@
  */
 
 import {
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-  toolRegistry: ChunkEmbedRequestSchema,
-$1;$2$1;$2} from '../registry.js';
+  toolRegistry,
+  ChunkEmbedRequestSchema,
+  type ChunkEmbedRequest,
+  type ToolResult
+} from '../registry.js';
 
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
@@ -45,7 +47,8 @@ function chunkText(
       if (currentChunk.length + sentence.length > chunkSize && currentChunk) {
         chunks.push({
           id: `chunk_${chunks.length}`,
-          content: currentChunk.trim(metadata: {},
+          content: currentChunk.trim(),
+          metadata: {},
 	start_idx: startIdx,
           end_idx: startIdx + currentChunk.length
         });
@@ -59,7 +62,8 @@ function chunkText(
     if (currentChunk.trim()) {
       chunks.push({
         id: `chunk_${chunks.length}`,
-        content: currentChunk.trim(metadata: {},
+        content: currentChunk.trim(),
+          metadata: {},
 	start_idx: startIdx,
         end_idx: content.length
       });
@@ -88,7 +92,7 @@ async function generateEmbedding(text: string, model: string): Promise<number[]>
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: prompt, text })
+	model, prompt: text })
   });
 
   if (!response.ok) {
@@ -170,7 +174,7 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
   }
 
   // Store in Qdrant
-  if (storageConfig?.upsert&& allPoints.length > 0) {
+  if (storageConfig?.upsert && allPoints.length > 0) {
     try {
       await upsertToQdrant(collection, allPoints);
       storedInQdrant = allPoints.length;

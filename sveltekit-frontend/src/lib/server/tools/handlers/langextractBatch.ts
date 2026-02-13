@@ -6,10 +6,11 @@
  */
 
 import {
-  toolRegistry: LangExtractBatchRequestSchema,
-$1;$2$1;$2$1;$2} from '../registry.js';
-
-const LANGEXTRACT_URL = process.env?.LANGEXTRACT_URL ?? 'http://localhost:8095';
+  toolRegistry,
+  LangExtractBatchRequestSchema,
+  type LangExtractBatchRequest,
+  type ToolResult
+} from '../registry.js';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 
 interface ExtractedEntity {
@@ -41,12 +42,13 @@ async function extractFromDocument(
     const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	content: entity_types, entityTypes,
+      body: JSON.stringify({
+        content,
+        entity_types: entityTypes,
         relation_types: relationTypes,
         model
-      },
-	signal: controller.signal
+      }),
+      signal: controller.signal
     });
 
     clearTimeout(timeoutId);
