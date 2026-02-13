@@ -141,7 +141,7 @@ export class WebGPUBufferUtils {
      * Prepare data for WebGPU buffer upload
      */
     static prepareForUpload(data: BufferLike): {
-	buffer: ArrayBuffer, byteLength: number;
+	buffer: ArrayBuffer; byteLength: number;
 	elementCount: number } {
         const buffer = toArrayBuffer(data);
         const byteLength = buffer.byteLength;
@@ -186,7 +186,7 @@ export const BufferDebugUtils = {
      * Get detailed info about a buffer
      */
     inspectBuffer(data: BufferLike): {
-	type: string, byteLength: number; elementCount?: number;
+	type: string; byteLength: number; elementCount?: number | undefined;
 	alignment: number } {
         const type = data.constructor.name;
         let byteLength: number;

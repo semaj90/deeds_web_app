@@ -43,7 +43,7 @@ export class RouteOperationLogger {
  category: string,
  priority: 'high' | 'medium' | 'low',
  error: {
-	code: string, message: string;
+	code: string; message: string;
 	count: number },
 	suggestion?: string
  ) {

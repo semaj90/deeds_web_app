@@ -763,7 +763,7 @@ export function fixBitsUiMigrationMultiPass(
   content: string,
   maxPasses: number = 3
 ): {
-	result: string, fixCount: number;
+	result: string; fixCount: number;
 	passes: number } {
   let result = content;
   let totalFixes = 0;
