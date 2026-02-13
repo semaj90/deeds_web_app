@@ -1,6 +1,5 @@
 import pg from 'pg';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const { Pool } = pg;
 
@@ -70,7 +69,8 @@ export const GET: RequestHandler = async () => {
 			const monitor = setInterval(async () => {
 				try {
 					// Check for recent file changes
-SELECT
+					const result = await pgPool.query(`
+						SELECT
 							file_path,
 							COUNT(*) as error_count,
 							MAX(created_at) as last_updated
@@ -84,7 +84,8 @@ SELECT
 						for (const row of result.rows) {
 							controller.enqueue(
 								new TextEncoder().encode(
-									`event: route_updated\ndata: ${JSON.stringify({ id: row.file_path,
+									`event: route_updated\ndata: ${JSON.stringify({
+										id: row.file_path,
 										path: row.file_path,
 										errors: parseInt(row.error_count),
 										timestamp: row.last_updated
@@ -115,6 +116,3 @@ SELECT
 		}
 	});
 };
-
-
-

@@ -75,7 +75,8 @@ export async function POST({ request }: RequestEvent) {
 };
 
 async function searchTagOccurrences(tag: string, collection: string) {
-? await getCollections()
+	const collections = collection === 'all'
+		? await getCollections()
 		: [collection];
 
 	const results: any[] = [];
@@ -90,7 +91,7 @@ async function searchTagOccurrences(tag: string, collection: string) {
 				filter: { must: [
 						{
 						key: 'tags',
-							match: { value, tag }
+							match: { value: tag }
 						}
 					]
 				}
@@ -117,7 +118,8 @@ async function analyzeTagWithLLM(tag: string, occurrences: any[]) {
 		source: o.payload?.source ?? o.payload?.file_path ?? '',
 		collection: o.collection
 	}));
-Tag: ${ tag }
+
+	const prompt = `Tag: ${tag}
 Occurrences: ${occurrences.length}
 
 Sample Data:

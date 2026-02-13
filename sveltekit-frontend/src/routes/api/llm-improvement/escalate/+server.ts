@@ -7,17 +7,22 @@
  */
 
 import { getEscalationService } from '$lib/services/error-analysis/EscalationService';
-import type { DiagnosticResult, ErrorContext,
-    ErrorReport, FixStrategy } from '$lib/services/error-analysis/types';
+import type {
+	DiagnosticResult, ErrorContext,
+	ErrorReport, FixStrategy
+} from '$lib/services/error-analysis/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
 		const { error, attemptedStrategies, confidence, toolResults, context } = body as {
-			error: ErrorReport, attemptedStrategies: FixStrategy[], confidence: number, toolResults: DiagnosticResult[], context: ErrorContext;
+			error: ErrorReport;
+			attemptedStrategies: FixStrategy[];
+			confidence: number;
+			toolResults: DiagnosticResult[];
+			context: ErrorContext;
 		};
 
 		if (!error) {
@@ -25,7 +30,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		const escalation = getEscalationService();
-error,
+		const result = await escalation.escalate(
+			error,
 			attemptedStrategies || [],
 			confidence ?? 0,
 			toolResults || [],
@@ -66,9 +72,10 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		return json({
 			success: true,
-			tickets: tickets.map(t => ({
+			tickets: tickets.map((t: any) => ({
 				id: t.id,
-				error: { code: t.errorReport.code,
+				error: {
+					code: t.errorReport.code,
 					message: t.errorReport.message,
 					file: t.errorReport.file
 				},
@@ -96,7 +103,8 @@ export const PUT: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
 		const { ticketId, action, fix, resolution, assignee } = body as {
-			ticketId: string, action: 'resolve' | 'assign' | 'close';
+			ticketId: string;
+			action: 'resolve' | 'assign' | 'close';
 			fix?: FixStrategy;
 			resolution?: string;
 			assignee?: string;
@@ -109,7 +117,7 @@ export const PUT: RequestHandler = async ({ request }) => {
 		const escalation = getEscalationService();
 
 		switch (action) {
-			case 'resolve':
+			case 'resolve': {
 				if (!fix || !resolution) {
 					return json({ error: 'Missing fix or resolution' }, { status: 400 });
 				}
@@ -120,19 +128,23 @@ export const PUT: RequestHandler = async ({ request }) => {
 					policyUpdated: resolveResult.policyUpdated,
 					error: resolveResult.error
 				});
+			}
 
-			case 'assign':
+			case 'assign': {
 				if (!assignee) {
 					return json({ error: 'Missing assignee' }, { status: 400 });
 				}
 				const assigned = escalation.assignTicket(ticketId, assignee);
-				return json({ success, assigned });
+				return json({ success: true, assigned });
+			}
 
-			case 'close':
+			case 'close': {
 				const closed = escalation.closeTicket(ticketId, resolution ?? 'Closed without resolution');
-				return json({ success, closed });
+				return json({ success: true, closed });
+			}
 
-			default:return json({ error: 'Invalid action' }, { status: 400 });
+			default:
+				return json({ error: 'Invalid action' }, { status: 400 });
 		}
 	} catch (err) {
 		return json(
@@ -141,6 +153,3 @@ export const PUT: RequestHandler = async ({ request }) => {
 		);
 	}
 };
-
-
-

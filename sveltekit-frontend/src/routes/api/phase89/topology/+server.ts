@@ -5,7 +5,6 @@
 
 import { json, type RequestHandler } from '@sveltejs/kit';
 import pg from 'pg';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const { Pool } = pg;
 
@@ -15,7 +14,8 @@ const pool = new Pool({ connectionString: DATABASE_URL });
 export const GET: RequestHandler = async () => {
   try {
     // Get errors grouped by file
-SELECT
+    const errorsResult = await pool.query(`
+      SELECT
         COALESCE(
           SUBSTRING(raw_text FROM '^([^:(]+)'),
           'unknown'
@@ -30,21 +30,22 @@ SELECT
     `);
 
     // Build topology nodes
-    const nodes = errorsResult.rows.map((row, i) => ({
-      id: row?.file_path|| `unknown_${i}`,
+    const nodes = errorsResult.rows.map((row: any, i: number) => ({
+      id: row?.file_path || `unknown_${i}`,
       label: (row?.file_path ?? 'unknown').split('/').pop() ?? 'unknown',
       type: 'file' as const,
       errorCount: parseInt(row.error_count),
       embeddedCount: parseInt(row.embedded_count),
       source: row.source,
       status: parseInt(row.embedded_count) === parseInt(row.error_count)
-        ? 'clean' as const | parseInt(row.error_count) > 10
+        ? 'clean' as const
+        : parseInt(row.error_count) > 10
           ? 'error' as const
           : 'warning' as const
     }));
 
     // Build edges based on file paths (same directory = connected)
-    const edges: Array<{ from: string, to: string; type, string }> = [];
+    const edges: Array<{ from: string; to: string; type: string }> = [];
     const dirGroups = new Map<string, string[]>();
 
     for (const node of nodes) {
@@ -56,7 +57,7 @@ SELECT
     }
 
     // Create edges within directories
-    for (const [dir, files] of dirGroups.entries()) {
+    for (const [_dir, files] of dirGroups.entries()) {
       if (files.length > 1 && files.length < 20) {
         for (let i = 0; i < files.length - 1; i++) {
           edges.push({
@@ -68,8 +69,12 @@ SELECT
       }
     }
 
-    return json({ topology: { nodes: edges,
-        summary: { totalFiles: nodes.length,
+    return json({
+      topology: {
+        nodes,
+        edges,
+        summary: {
+          totalFiles: nodes.length,
           totalErrors: nodes.reduce((sum, n) => sum + n.errorCount, 0),
           totalEmbedded: nodes.reduce((sum, n) => sum + n.embeddedCount, 0)
         }
@@ -77,7 +82,9 @@ SELECT
     });
   } catch (error: any) {
     console.error('Topology error:', error);
-    return json({ topology: { nodes: [],
+    return json({
+      topology: {
+        nodes: [],
         edges: [],
         summary: { totalFiles: 0, totalErrors: 0, totalEmbedded: 0 }
       },
@@ -85,7 +92,3 @@ SELECT
     });
   }
 };
-
-
-
-

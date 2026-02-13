@@ -27,7 +27,7 @@ interface GraphEdge { source: string, target:string;
 export const GET: RequestHandler = async ({ url, fetch }) => {
   try {
     // Try to fetch from FastAPI backend (Task 16.2 integration)
-    const backendUrl = env?.FASTAPI_URL|| env?.CODEBASE_INDEXER_URL ?? 'http://localhost:8090';
+    const backendUrl = (env?.FASTAPI_URL || env?.CODEBASE_INDEXER_URL) ?? 'http://localhost:8090';
 
     try {
       // Try FastAPI admin routes first (Task 16.2)
@@ -48,7 +48,8 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     }
 
     // Return mock data for development/demo
-// Routes
+    const mockNodes: GraphNode[] = [
+      // Routes
       {
         id: 'route-home',
         label: '+page.svelte',
@@ -220,7 +221,8 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
         functions: ['formatDate', 'formatCurrency', 'truncate']
       }
     ];
-// Route imports
+    const mockEdges: GraphEdge[] = [
+      // Route imports
       { source: 'route-home', target: 'comp-button', type: 'import' },
       { source: 'route-home', target: 'store-user', type: 'import' },
       { source: 'route-dashboard', target: 'comp-evidence-board', type: 'import' },
@@ -252,7 +254,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     return json({
       nodes: mockNodes,
       edges: mockEdges,
-      metadata: {, totalNodes: mockNodes.length,
+      metadata: { totalNodes: mockNodes.length,
         totalEdges: mockEdges.length,
         nodesWithErrors: mockNodes.filter(n => n.errorCount > 0).length,
         generatedAt: new Date().toISOString()

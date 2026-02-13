@@ -69,8 +69,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 			});
 		}
 
-		// If FastAPI is not available;
- return a mock success
+		// If FastAPI is not available, return a mock success
 		console.warn('FastAPI not available, returning mock response');
 		return json({
 			success: true,

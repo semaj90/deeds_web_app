@@ -17,9 +17,15 @@ function getAdminDatabaseUrl(): string {
 const mergedSchema = { ...schema, canvasAutosaves };
 
 const pool = new Pool({ connectionString: getDatabaseUrl() });
+pool.on('error', (err) => {
+	console.error('Database pool error (non-fatal):', err.message);
+});
 export const db = drizzle(pool, { schema: mergedSchema });
 
 const adminPool = new Pool({ connectionString: getAdminDatabaseUrl() });
+adminPool.on('error', (err) => {
+	console.error('Admin database pool error (non-fatal):', err.message);
+});
 export const adminDb = drizzle(adminPool, { schema: mergedSchema });
 
 export async function closeConnections(): Promise<void> {

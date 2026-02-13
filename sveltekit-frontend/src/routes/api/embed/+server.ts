@@ -2,8 +2,8 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import type { OPENAI_API_KEY, NOMIC_API_KEY } from '$env /static/private';
-import type { redisOptimized } from '$lib/middleware/redis-orchestrator-middleware';
+import { OPENAI_API_KEY, NOMIC_API_KEY } from '$env/static/private';
+import { redisOptimized } from '$lib/middleware/redis-orchestrator-middleware';
 
 // Define a type for redisOptimized middleware to include all known methods
 interface RedisOptimizedMiddleware {
@@ -49,7 +49,7 @@ model: 'text-embedding-3-small',
  throw new Error(`OpenAI error: ${error.error?.message || response.statusText}`);
  }
  const data = await response.json();
- return { embedding: data.data[0].embedding: tokens.usage.total_tokens };
+ return { embedding: data.data[0].embedding, tokens: data.usage.total_tokens };
 }
 
 // Nomic embedding function

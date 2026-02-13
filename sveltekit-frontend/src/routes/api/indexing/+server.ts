@@ -14,14 +14,16 @@ import { glob } from 'glob';
 import { Client as MinIOClient } from 'minio';
 import path from 'path';
 import postgres from 'postgres';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Configuration
-const CONFIG = { qdrant: { url: process.env?.QDRANT_URL ?? 'http://localhost:6333',
+const CONFIG = {
+  qdrant: {
+    url: process.env?.QDRANT_URL ?? 'http://localhost:6333',
     collectionCode: 'phase79_codebase',
     collectionErrors: 'phase79_error_analysis'
   },
-  minio: { endpoint: process.env?.MINIO_ENDPOINT ?? 'localhost',
+  minio: {
+    endpoint: process.env?.MINIO_ENDPOINT ?? 'localhost',
     port: parseInt(process.env?.MINIO_PORT ?? '9000'),
     accessKey: process.env?.MINIO_ACCESS_KEY ?? 'minioadmin',
     secretKey: process.env?.MINIO_SECRET_KEY ?? 'minioadmin',
@@ -29,16 +31,16 @@ const CONFIG = { qdrant: { url: process.env?.QDRANT_URL ?? 'http://localhost:633
     bucketCode: 'codebase-index',
     bucketErrors: 'error-analysis'
   },
-  ollama: { url: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
+  ollama: {
+    url: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
     embeddingModel: 'embeddinggemma:latest'
   },
-  postgres: { url: process.env?.DATABASE_URL ?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
+  postgres: {
+    url: process.env?.DATABASE_URL ?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
   }
 };
 
-// ============================================================================
 // Helpers
-// ============================================================================
 
 function getMinIOClient(): MinIOClient {
   return new MinIOClient({
@@ -55,13 +57,14 @@ async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${CONFIG.ollama.url}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: CONFIG.ollama.embeddingModel,
+      body: JSON.stringify({
+        model: CONFIG.ollama.embeddingModel,
         prompt: text.substring(0, 8000)
       })
     });
 
     const data = await response.json();
-    return data?.embedding|| [];
+    return data?.embedding || [];
   } catch (err) {
     console.error('Embedding error:', err);
     return [];
@@ -70,7 +73,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 
 async function ensureQdrantCollection(collectionName: string): Promise<void> {
   try {
-    const response = await fetch(`${CONFIG.qdrant.url}/collections/${ collectionName }`);
+    const response = await fetch(`${CONFIG.qdrant.url}/collections/${collectionName}`);
     if (response.status === 404) {
       throw new Error('Collection not found');
     }
@@ -81,7 +84,9 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
     const createResponse = await fetch(`${CONFIG.qdrant.url}/collections/${collectionName}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vectors: { size: 768,
+      body: JSON.stringify({
+        vectors: {
+          size: 768,
           distance: 'Cosine'
         }
       })
@@ -112,31 +117,21 @@ function extractFileMetadata(content: string, filePath: string): any {
       ? 'typescript'
       : 'javascript';
 
-  return {
-    language,
-    imports,
-    exports,
-    typeCount,
-    functionCount
-  };
+  return { language, imports, exports, typeCount, functionCount };
 }
 
 function chunkFileContent(content: string, chunkSize: number = 500, overlap: number = 100): string[] {
   const chunks: string[] = [];
-
   for (let i = 0; i < content.length; i += chunkSize - overlap) {
     const chunk = content.slice(i, i + chunkSize);
     if (chunk.trim().length > 0) {
       chunks.push(chunk);
     }
   }
-
   return chunks;
 }
 
-// ============================================================================
-// POST /api/indexing/codebase
-// ============================================================================
+// POST /api/indexing
 
 export const POST: RequestHandler = async ({ request, url }) => {
   const pathname = url.pathname;
@@ -179,16 +174,12 @@ export const POST: RequestHandler = async ({ request, url }) => {
       const results: any[] = [];
 
       for (const filePath of files.slice(0, 50)) {
-        // Limit to 50 files for API
         try {
           const content = await fs.readFile(filePath, 'utf-8');
           const relativePath = path.relative(rootPath, filePath);
           const fileHash = crypto.createHash('md5').update(filePath).digest('hex');
 
-          // Extract metadata
           const metadata = extractFileMetadata(content, relativePath);
-
-          // Chunk file content
           const chunks = chunkFileContent(content, 500, 100);
 
           // Upload to MinIO
@@ -206,34 +197,39 @@ export const POST: RequestHandler = async ({ request, url }) => {
             const embedding = await generateEmbedding(chunk);
 
             if (!embedding || embedding.length === 0) continue;
-parseInt(
-                crypto.createHash('md5').update(`${filePath}_${idx}`).digest('hex').slice(0, 8),
-                16
-              ) %
-              (10 ** 8);
 
-            const upsertResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ points: [
-                  {
-                   id: pointId,
-                    vector: Array.from(embedding),
-                    payload: { file_path: relativePath,
-                      file_hash: fileHash,
-                      chunk_index: idx,
-                      chunk_count: chunks.length,
-                      language: metadata.language,
-                      imports: metadata.imports.slice(0, 5),
-                      exports: metadata.exports.slice(0, 5),
-                      type_count: metadata.typeCount,
-                      function_count: metadata.functionCount,
-                      indexed_at: new Date().toISOString()
+            const pointId = parseInt(
+              crypto.createHash('md5').update(`${filePath}_${idx}`).digest('hex').slice(0, 8),
+              16
+            ) % (10 ** 8);
+
+            const upsertResponse = await fetch(
+              `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points`,
+              {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  points: [
+                    {
+                      id: pointId,
+                      vector: Array.from(embedding),
+                      payload: {
+                        file_path: relativePath,
+                        file_hash: fileHash,
+                        chunk_index: idx,
+                        chunk_count: chunks.length,
+                        language: metadata.language,
+                        imports: metadata.imports.slice(0, 5),
+                        exports: metadata.exports.slice(0, 5),
+                        type_count: metadata.typeCount,
+                        function_count: metadata.functionCount,
+                        indexed_at: new Date().toISOString()
+                      }
                     }
-                  }
-                ]
-              })
-            });
+                  ]
+                })
+              }
+            );
             if (!upsertResponse.ok) {
               throw new Error(`Qdrant upsert failed: ${upsertResponse.statusText}`);
             }
@@ -259,10 +255,7 @@ parseInt(
         message: `Indexed ${indexed} of ${Math.min(50, files.length)} files`
       });
     } catch (err: any) {
-      return json(
-        { success: false, error: err.message },
-        { status: 500 }
-      );
+      return json({ success: false, error: err.message }, { status: 500 });
     }
   }
 
@@ -270,7 +263,6 @@ parseInt(
   if (pathname === '/api/indexing/errors' || action === 'errors') {
     try {
       const sql = postgres(CONFIG.postgres.url);
-
       const minio = getMinIOClient();
 
       // Ensure bucket exists
@@ -283,8 +275,9 @@ parseInt(
       }
 
       // Fetch error clusters
-SELECT DISTINCT
-          file_path: error_code,
+      const errorClusters = await sql`
+        SELECT DISTINCT
+          file_path, error_code,
           message,
           COUNT(*) as error_count
         FROM error_cluster
@@ -304,35 +297,44 @@ SELECT DISTINCT
       for (const cluster of errorClusters) {
         try {
           const { file_path, error_code, message, error_count } = cluster;
-$1;$2Error Code: ${ error_code }
-File: ${ file_path }
-Message: ${ message }
-Occurrences: ${ error_count }
-Phase: Phase 66-79 Error Analysis
-          `.trim();
+          const errorContext = `Error Code: ${error_code}
+File: ${file_path}
+Message: ${message}
+Occurrences: ${error_count}
+Phase: Phase 66-79 Error Analysis`.trim();
 
           const embedding = await generateEmbedding(errorContext);
 
           if (!embedding || embedding.length === 0) continue;
-parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8), 16) %
-            (10 ** 8);
 
-          const upsertResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ points: [
-                {
-                 id: pointId,
-                  vector: Array.from(embedding),
-                  payload: { error_code: file_path,
-                    message: error_count,
-                    phase: 'phase66-79',
-                    indexed_at: new Date().toISOString()
+          const pointId = parseInt(
+            crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8),
+            16
+          ) % (10 ** 8);
+
+          const upsertResponse = await fetch(
+            `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points`,
+            {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                points: [
+                  {
+                    id: pointId,
+                    vector: Array.from(embedding),
+                    payload: {
+                      error_code,
+                      file_path,
+                      message,
+                      error_count,
+                      phase: 'phase66-79',
+                      indexed_at: new Date().toISOString()
+                    }
                   }
-                }
-              ]
-            })
-          });
+                ]
+              })
+            }
+          );
           if (!upsertResponse.ok) {
             throw new Error(`Qdrant upsert failed: ${upsertResponse.statusText}`);
           }
@@ -352,7 +354,7 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
 
           indexed++;
         } catch (err) {
-          console.error(`Error indexing cluster:`, err);
+          console.error('Error indexing cluster:', err);
         }
       }
 
@@ -364,10 +366,7 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
         message: `Indexed ${indexed} error clusters`
       });
     } catch (err: any) {
-      return json(
-        { success: false, error: err.message },
-        { status: 500 }
-      );
+      return json({ success: false, error: err.message }, { status: 500 });
     }
   }
 
@@ -380,27 +379,28 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
       const embedding = await generateEmbedding(query);
 
       if (!embedding || embedding.length === 0) {
-        return json(
-          { success: false, error: 'Failed to generate embedding' },
-          { status: 400 }
-        );
+        return json({ success: false, error: 'Failed to generate embedding' }, { status: 400 });
       }
 
-      const searchResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vector: Array.from(embedding),
-          limit,
-          with_payload: true
-        })
-      });
+      const searchResponse = await fetch(
+        `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points/search`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            vector: Array.from(embedding),
+            limit,
+            with_payload: true
+          })
+        }
+      );
 
       if (!searchResponse.ok) {
         throw new Error(`Qdrant search failed: ${searchResponse.statusText}`);
       }
 
       const searchData = await searchResponse.json();
-      const results = searchData?.result|| [];
+      const results = searchData?.result || [];
 
       return json({
         success: true,
@@ -413,10 +413,7 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
         }))
       });
     } catch (err: any) {
-      return json(
-        { success: false, error: err.message },
-        { status: 500 }
-      );
+      return json({ success: false, error: err.message }, { status: 500 });
     }
   }
 
@@ -429,27 +426,28 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
       const embedding = await generateEmbedding(query);
 
       if (!embedding || embedding.length === 0) {
-        return json(
-          { success: false, error: 'Failed to generate embedding' },
-          { status: 400 }
-        );
+        return json({ success: false, error: 'Failed to generate embedding' }, { status: 400 });
       }
 
-      const searchResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vector: Array.from(embedding),
-          limit,
-          with_payload: true
-        })
-      });
+      const searchResponse = await fetch(
+        `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points/search`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            vector: Array.from(embedding),
+            limit,
+            with_payload: true
+          })
+        }
+      );
 
       if (!searchResponse.ok) {
         throw new Error(`Qdrant search failed: ${searchResponse.statusText}`);
       }
 
       const searchData = await searchResponse.json();
-      const results = searchData?.result|| [];
+      const results = searchData?.result || [];
 
       return json({
         success: true,
@@ -462,26 +460,17 @@ parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8)
         }))
       });
     } catch (err: any) {
-      return json(
-        { success: false, error: err.message },
-        { status: 500 }
-      );
+      return json({ success: false, error: err.message }, { status: 500 });
     }
   }
 
-  return json(
-    { success: false, error: 'Not found' },
-    { status: 404 }
-  );
+  return json({ success: false, error: 'Not found' }, { status: 404 });
 };
 
-// ============================================================================
 // GET /api/indexing/status
-// ============================================================================
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async () => {
   try {
-    // Get collection stats via REST API
     const codebaseResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}`);
     const errorsResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}`);
 
@@ -493,10 +482,13 @@ export const GET: RequestHandler = async ({ url }) => {
 
     return json({
       success: true,
-      collections: { codebase: { points_count: codebaseCollection?.points_count ?? 0,
+      collections: {
+        codebase: {
+          points_count: codebaseCollection?.points_count ?? 0,
           vectors_size: codebaseCollection?.config?.params?.vectors?.size ?? 768
         },
-        errors: { points_count: errorsCollection?.points_count ?? 0,
+        errors: {
+          points_count: errorsCollection?.points_count ?? 0,
           vectors_size: errorsCollection?.config?.params?.vectors?.size ?? 768
         }
       },
@@ -505,8 +497,10 @@ export const GET: RequestHandler = async ({ url }) => {
   } catch (err: any) {
     return json(
       {
-        success: false, error: err.message,
-        collections: { codebase: { points_count: 0 },
+        success: false,
+        error: err.message,
+        collections: {
+          codebase: { points_count: 0 },
           errors: { points_count: 0 }
         }
       },
@@ -514,6 +508,3 @@ export const GET: RequestHandler = async ({ url }) => {
     );
   }
 };
-
-
-

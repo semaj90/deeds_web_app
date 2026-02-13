@@ -14,7 +14,6 @@ import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
 import { createClient } from 'redis';
 import { promisify } from 'util';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const execAsync = promisify(exec);
 const redis = createClient({ url: 'redis://127.0.0.1:6379' });
@@ -48,7 +47,8 @@ export async function POST() {
 		return json({
 			success: true,
 			summaries,
-			stats: { totalClusters: summaries.length,
+			stats: {
+				totalClusters: summaries.length,
 				cudaAccelerated: clusterAnalysis.cudaAccelerated,
 				redisCached: true,
 				neo4jSynced: true,
@@ -61,10 +61,10 @@ export async function POST() {
 	} finally {
 		await redis.disconnect().catch(() => {});
 	}
-};
+}
 
 async function runCUDAClustering() {
-	console.log('🔬 Running CUDA clustering...');
+	console.log('Running CUDA clustering...');
 
 	try {
 		const { stdout } = await execAsync(
@@ -85,7 +85,8 @@ async function runCUDAClustering() {
 
 		return {
 			cudaAccelerated: stdout.includes('CUDA: Available'),
-			coordinates: clusters
+			coordinates,
+			clusters
 		};
 	} catch (err: any) {
 		console.warn('CUDA clustering failed, using fallback:', err.message);
@@ -104,7 +105,8 @@ async function generateClusterSummaries(clusters: any) {
 		if (!Array.isArray(errorIds) || errorIds.length === 0) continue;
 
 		// Get error samples from PostgreSQL
-SELECT message, source, code, timestamp
+		const errors = await db.execute(sql`
+			SELECT message, source, code, timestamp
 			FROM raw_error_embeddings
 			WHERE id = ANY(${errorIds.slice(0, 10)})
 			LIMIT 10
@@ -133,7 +135,7 @@ SELECT message, source, code, timestamp
 }
 
 async function analyzeClusterWithLLM(clusterId: number, errors: any[]) {
-Cluster ID: ${ clusterId }
+	const prompt = `Cluster ID: ${clusterId}
 Error Count: ${errors.length}
 
 Sample Errors:
@@ -149,7 +151,8 @@ Be concise and actionable.`;
 	const response = await fetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: 'gemma3-legal:latest',
+		body: JSON.stringify({
+			model: 'gemma3-legal:latest',
 			messages: [
 				{
 					role: 'system',
@@ -191,7 +194,9 @@ async function getClusterTags(errorIds: any[]): Promise<string[]> {
 
 	for (const collection of collections) {
 		try {
-			const scrollResult = await scrollPoints({ collection: limit: 50,
+			const scrollResult = await scrollPoints({
+				collection,
+				limit: 50,
 				withPayload: true,
 				withVector: false
 			});
@@ -215,7 +220,8 @@ async function updateQdrantTags(summaries: any[]) {
 		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'embeddinggemma:latest',
+			body: JSON.stringify({
+				model: 'embeddinggemma:latest',
 				prompt: summary.summary
 			})
 		});
@@ -230,7 +236,8 @@ async function updateQdrantTags(summaries: any[]) {
 				{
 					id: `cluster_${summary.id}_${Date.now()}`,
 					vector: embedding,
-					payload: { cluster_id: summary.id,
+					payload: {
+						cluster_id: summary.id,
 						summary: summary.summary,
 						tags: summary.tags,
 						error_count: summary.errorCount,
@@ -247,24 +254,24 @@ async function cacheClusterCoordinates(coordinates: any[]) {
 	for (const coord of coordinates) {
 		await redis.set(
 			`phase89:cluster:${coord.id}:coords`,
-			JSON.stringify(coord) => { EX: 86400 } // 24 hour expiry
+			JSON.stringify(coord),
+			{ EX: 86400 } // 24 hour expiry
 		);
 	}
 }
 
 async function updateNeo4jGraph(summaries: any[]) {
 	// TODO: Implement Neo4j Cypher queries
-	// For now, just log
-	console.log('📊 Neo4j graph update:', summaries.length, 'clusters');
+	console.log('Neo4j graph update:', summaries.length, 'clusters');
 }
 
 async function syncToPostgreSQL(summaries: any[]) {
 	for (const summary of summaries) {
 		await db.execute(sql`
 			INSERT INTO phase89_cluster_summaries (
-				cluster_id: summary,
-				tags: error_count,
-				recommendations: metadata,
+				cluster_id, summary,
+				tags, error_count,
+				recommendations, metadata,
 				created_at
 			) VALUES (
 				${summary.id},
@@ -288,8 +295,5 @@ async function syncToPostgreSQL(summaries: any[]) {
 
 async function syncToCouchDB(summaries: any[]) {
 	// TODO: Implement CouchDB sync
-	console.log('🛋️ CouchDB sync:', summaries.length, 'documents');
+	console.log('CouchDB sync:', summaries.length, 'documents');
 }
-
-
-

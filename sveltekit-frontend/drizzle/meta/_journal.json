@@ -57,6 +57,13 @@
       "when": 1770832437508,
       "tag": "0007_magical_donald_blake",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1770940340724,
+      "tag": "0008_black_tigra",
+      "breakpoints": true
     }
   ]
 }

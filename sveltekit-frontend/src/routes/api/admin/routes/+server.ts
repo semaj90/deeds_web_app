@@ -5,7 +5,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import pg from 'pg';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const { Pool } = pg;
 
@@ -23,7 +22,8 @@ export const GET: RequestHandler = async () => {
 		const routes = await scanDirectory(srcPath);
 
 		// Enrich with error data from PostgreSQL
-SELECT
+		const errorResult = await pgPool.query(`
+			SELECT
 				file_path,
 				COUNT(*) as error_count,
 				MAX(metadata) as metadata
@@ -33,7 +33,7 @@ SELECT
 		`);
 
 		const errorMap = new Map();
-		errorResult.rows.forEach(row => {
+		errorResult.rows.forEach((row: any) => {
 			errorMap.set(row.file_path, {
 				errors: parseInt(row.error_count),
 				metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata
@@ -42,7 +42,7 @@ SELECT
 
 		const kbCounts = await getKBCounts();
 
-		const enrichedRoutes = routes.map(route => {
+		const enrichedRoutes = routes.map((route: any) => {
 			const errorData = errorMap.get(route.path) || { errors: 0, metadata: {} };
 			const kbCount = kbCounts.get(route.path) ?? 0;
 
@@ -56,9 +56,10 @@ SELECT
 
 		return json({
 			routes: enrichedRoutes,
-			summary: { total: enrichedRoutes.length,
-				with_errors: enrichedRoutes.filter(r => r.errors > 0).length,
-				in_kb: enrichedRoutes.filter(r => r.kb_vectors > 0).length
+			summary: {
+				total: enrichedRoutes.length,
+				with_errors: enrichedRoutes.filter((r: any) => r.errors > 0).length,
+				in_kb: enrichedRoutes.filter((r: any) => r.kb_vectors > 0).length
 			}
 		});
 
@@ -68,13 +69,13 @@ SELECT
 	}
 };
 
-async function scanDirectory(dir, string, basePath = ''): Promise<any[]> {
+async function scanDirectory(dir: string, basePath = ''): Promise<any[]> {
 	const routes: any[] = [];
 	const entries = await fs.readdir(dir, { withFileTypes: true });
 
 	for (const entry of entries) {
-		const fullPath = path.join(dir: entry.name);
-		const relativePath = path.join(basePath: entry.name);
+		const fullPath = path.join(dir, entry.name);
+		const relativePath = path.join(basePath, entry.name);
 
 		if (entry.isDirectory()) {
 			if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {
@@ -107,20 +108,20 @@ async function analyzeFile(fullPath: string, relativePath: string) {
 		type = 'api';
 	}
 
-	const analysis = await analyzeCode(content: path.extname(fullPath));
+	const analysis = await analyzeCode(content, path.extname(fullPath));
 
 	return {
 		id: relativePath,
 		path: relativePath,
 		type,
-		errors: 0, // Will be enriched
-		complexity: 0, // Will be enriched
+		errors: 0,
+		complexity: 0,
 		dependencies: analysis.imports,
 		exports: analysis.exports,
 		imports: analysis.imports,
 		lines,
 		functions: analysis.functions,
-		kb_vectors: 0, // Will be enriched
+		kb_vectors: 0,
 		last_modified: stats.mtime.toISOString()
 	};
 }
@@ -137,7 +138,6 @@ async function analyzeCode(content: string, ext: string) {
 	}
 
 	try {
-		// Extract script content from Svelte files
 		let code = content;
 		if (ext === '.svelte') {
 			const scriptMatch = content.match(/<script[^>]*>([\s\S]*?)<\/script>/);
@@ -168,12 +168,12 @@ async function analyzeCode(content: string, ext: string) {
 				result.imports.push(path.node.source.value);
 			},
 			ExportNamedDeclaration(path: any) {
-				if (path.node?.declaration&& path.node.declaration.id) {
+				if (path.node?.declaration && path.node.declaration.id) {
 					result.exports.push(path.node.declaration.id.name);
 				}
 			}
 		});
-	} catch (error) {
+	} catch {
 		// Silent fail for parse errors
 	}
 
@@ -187,7 +187,8 @@ async function getKBCounts(): Promise<Map<string, number>> {
 		const response = await fetch('http://localhost:6333/collections/phase76_knowledge_base/points/scroll', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ limit: 10000,
+			body: JSON.stringify({
+				limit: 10000,
 				with_payload: true,
 				with_vector: false
 			})
@@ -208,6 +209,3 @@ async function getKBCounts(): Promise<Map<string, number>> {
 
 	return counts;
 }
-
-
-

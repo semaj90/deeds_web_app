@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://user:pass@127.0.0.1:5434/legal';
 const pool = new pg.Pool({ connectionString: DATABASE_URL });
@@ -14,11 +13,13 @@ export const GET: RequestHandler = async ({ url }) => {
 	const limit = parseInt(url.searchParams.get('limit') ?? '20');
 
 	try {
-		// Get top error filesSELECT DISTINCT
-				n.id:
-				n.uri: n.label,
+		// Get top error files
+		const filesResult = await pool.query(`
+			SELECT DISTINCT
+				n.id,
+				n.uri, n.label,
 				n.kind,
-				(n.meta->>'error_count')::int as error_count | n.meta->>'module_kind' as module_kind
+				(n.meta->>'error_count')::int as error_count, n.meta->>'module_kind' as module_kind
 			FROM kg_nodes n
 			WHERE n.kind = 'file'
 			  AND (n.meta->>'error_count')::int > 0
@@ -26,7 +27,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			LIMIT $1
 		`, [limit]);
 
-		const nodes: any[] = filesResult.rows.map(row => ({
+		const nodes: any[] = filesResult.rows.map((row: any) => ({
 			uri: row.uri,
 			label: row.label,
 			kind: row.kind,
@@ -35,10 +36,12 @@ export const GET: RequestHandler = async ({ url }) => {
 		}));
 
 		// Get errors for these files
-		const fileUris = nodes.map(n => n.uri);SELECT DISTINCT
-				n.id:
-				n.uri: n.label,
-				n.kind: n.meta->>'code' as code | n.meta->>'message' as message | n.meta->>'path' as path,
+		const fileUris = nodes.map(n => n.uri);
+		const errorsResult = await pool.query(`
+			SELECT DISTINCT
+				n.id,
+				n.uri, n.label,
+				n.kind, n.meta->>'code' as code, n.meta->>'message' as message, n.meta->>'path' as path,
 				(n.meta->>'line')::int as line,
 				(n.meta->>'column')::int as column
 			FROM kg_nodes n
@@ -50,7 +53,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			LIMIT 100
 		`, [fileUris]);
 
-		nodes.push(...errorsResult.rows.map(row => ({
+		nodes.push(...errorsResult.rows.map((row: any) => ({
 			uri: row.uri,
 			label: row.label,
 			kind: row.kind,
@@ -61,10 +64,12 @@ export const GET: RequestHandler = async ({ url }) => {
 			column: row.column
 		})));
 
-		// Get edges between files and errorsSELECT
-				e.from_id: e.to_id,
-				e.type:
-				e.weight: n1.uri as source_uri | n2.uri as target_uri
+		// Get edges between files and errors
+		const linksResult = await pool.query(`
+			SELECT
+				e.from_id, e.to_id,
+				e.type,
+				e.weight, n1.uri as source_uri, n2.uri as target_uri
 			FROM kg_edges e
 			JOIN kg_nodes n1 ON n1.id = e.from_id
 			JOIN kg_nodes n2 ON n2.id = e.to_id
@@ -72,9 +77,9 @@ export const GET: RequestHandler = async ({ url }) => {
 			  AND e.type IN ('ERROR_IN_FILE', 'FILE_IMPORTS_FILE')
 		`, [fileUris]);
 
-		const links = linksResult.rows.map(row => ({
+		const links = linksResult.rows.map((row: any) => ({
 			source: row.source_uri,
-			target:row.target_uri,
+			target: row.target_uri,
 			type: row.type,
 			weight: row.weight
 		}));
@@ -85,5 +90,3 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json({ error: error.message }, { status: 500 });
 	}
 };
-
-

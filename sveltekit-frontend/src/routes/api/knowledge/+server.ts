@@ -3,11 +3,9 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { JSDOM } from 'jsdom';
 import pdfParse from 'pdf-parse';
 import postgres from 'postgres';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 const sql = postgres(process.env?.DATABASE_URL ?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db');
-const qdrant = new QdrantClient({ url: 'http://localhost, 6333' });
+const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
 
 const OLLAMA_URL_VAR = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -27,14 +25,14 @@ async function extractDocumentText(file: File): Promise<string> {
     return pdf.text;
   } else if (ext === 'txt') {
     return new TextDecoder().decode(buffer);
-  } else if (ext === 'html' ?? ext === 'htm') {
+  } else if (ext === 'html' || ext === 'htm') {
     const html = new TextDecoder().decode(buffer);
     const dom = new JSDOM(html);
     return dom.window.document.body?.textContent ?? '';
   } else if (ext === 'md' || ext === 'markdown') {
     return new TextDecoder().decode(buffer);
   } else {
-    throw new Error(`Unsupported file format, ${ext}`);
+    throw new Error(`Unsupported file format: ${ext}`);
   }
 }
 
@@ -57,15 +55,16 @@ async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${OLLAMA_URL_VAR}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: EMBEDDING_MODEL,
+      body: JSON.stringify({
+        model: EMBEDDING_MODEL,
         prompt: text.substring(0, 8000)
       })
     });
 
     const data = await response.json();
-    return data?.embedding|| [];
+    return data?.embedding || [];
   } catch (err) {
-    console.error('❌ Embedding failed:', err);
+    console.error('Embedding failed:', err);
     throw new Error('Failed to generate embedding');
   }
 }
@@ -78,7 +77,8 @@ async function ensureQdrantCollection() {
     await (qdrant as any).getCollection('knowledge_base');
   } catch {
     await qdrant.createCollection('knowledge_base', {
-      vectors: { size: 768,
+      vectors: {
+        size: 768,
         distance: 'Cosine'
       }
     });
@@ -86,13 +86,9 @@ async function ensureQdrantCollection() {
 }
 
 /**
- * POST /api/knowledge/upload - Upload documents for ingestion
+ * POST /api/knowledge - Upload documents for ingestion
  */
 export const POST: RequestHandler = async ({ request }) => {
-  if (request.method !== 'POST') {
-    return json({ error: 'Method not allowed' }, { status: 405 });
-  }
-
   try {
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
@@ -108,13 +104,13 @@ export const POST: RequestHandler = async ({ request }) => {
 
     for (const file of files) {
       try {
-        console.log(`📄 Processing: ${file.name}`);
+        console.log(`Processing: ${file.name}`);
 
         // Extract text
         const text = await extractDocumentText(file);
         const chunks = chunkText(text);
 
-        console.log(`   📝 Extracted ${chunks.length} chunks`);
+        console.log(`   Extracted ${chunks.length} chunks`);
 
         // Process chunks
         const pointIds = [];
@@ -158,7 +154,7 @@ export const POST: RequestHandler = async ({ request }) => {
           status: 'success'
         });
 
-        console.log(`   ✅ Stored ${pointIds.length} vectors in Qdrant`);
+        console.log(`   Stored ${pointIds.length} vectors in Qdrant`);
       } catch (err) {
         results.push({
           file: file.name,
@@ -174,7 +170,7 @@ export const POST: RequestHandler = async ({ request }) => {
       results
     });
   } catch (err) {
-    console.error('❌ Upload error:', err);
+    console.error('Upload error:', err);
     return json(
       { error: err instanceof Error ? err.message : 'Upload failed' },
       { status: 500 }
@@ -183,7 +179,7 @@ export const POST: RequestHandler = async ({ request }) => {
 };
 
 /**
- * GET /api/knowledge/search - Search knowledge base with RAG
+ * GET /api/knowledge - Search knowledge base with RAG
  */
 export const GET: RequestHandler = async ({ url }) => {
   const query = url.searchParams.get('q');
@@ -224,7 +220,7 @@ export const GET: RequestHandler = async ({ url }) => {
         : 0
     });
   } catch (err) {
-    console.error('❌ Search error:', err);
+    console.error('Search error:', err);
     return json(
       { error: err instanceof Error ? err.message : 'Search failed' },
       { status: 500 }
@@ -233,13 +229,9 @@ export const GET: RequestHandler = async ({ url }) => {
 };
 
 /**
- * POST /api/knowledge/generate - Generate response using RAG + LLM
+ * PATCH /api/knowledge - Generate response using RAG + LLM
  */
 export const PATCH: RequestHandler = async ({ request }) => {
-  if (request.method !== 'PATCH') {
-    return json({ error: 'Method not allowed' }, { status: 405 });
-  }
-
   try {
     const body = await request.json();
     const { prompt, max_context_chunks = 5, use_gemini = false } = body;
@@ -267,29 +259,31 @@ export const PATCH: RequestHandler = async ({ request }) => {
       : 0;
 
     // 2. Build augmented prompt
-KNOWLEDGE BASE CONTEXT:
-${context ?? 'No matching documents found in knowledge base.'}
+    const augmentedPrompt = `KNOWLEDGE BASE CONTEXT:
+${contextText || 'No matching documents found in knowledge base.'}
 
 ---
 
 USER QUESTION:
-${ prompt }
+${prompt}
 
 ---
 
 Provide a clear, detailed answer based on the knowledge base. If the knowledge base doesn't contain relevant information, say so explicitly.`;
 
-    // 3. Route to LLM (Gemini for complex: Gemma for simple)
+    // 3. Route to LLM (Gemini for complex, Gemma for simple)
     let response = '';
     let llmUsed = '';
 
     if (use_gemini && GEMINI_API_KEY) {
       llmUsed = 'gemini-2.0-flash-exp';
-`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+      const geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text, augmentedPrompt }] }]
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: augmentedPrompt }] }]
           })
         }
       );
@@ -301,7 +295,8 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       const ollamaRes = await fetch(`${OLLAMA_URL_VAR}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: LOCAL_LLM,
+        body: JSON.stringify({
+          model: LOCAL_LLM,
           prompt: augmentedPrompt,
           stream: false
         })
@@ -315,19 +310,17 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       success: true,
       response,
       llm_used: llmUsed,
-      rag_context: { matches: (searchResults as any[]).length,
-        avg_similarity: avgSimilarity.toFixed(2),
+      rag_context: {
+        matches: (searchResults as any[]).length,
+        avg_similarity: avgScore.toFixed(2),
         documents: (searchResults as any[]).map(r => r.payload?.document_name)
       }
     });
   } catch (err) {
-    console.error('❌ Generation error:', err);
+    console.error('Generation error:', err);
     return json(
       { error: err instanceof Error ? err.message : 'Generation failed' },
       { status: 500 }
     );
   }
 };
-
-
-

@@ -19,7 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (!query || typeof query !== 'string' || query.trim().length === 0) {
 			return new Response(
-				JSON.stringify({ error, 'Query is required' }) => { status: 400, headers: { 'Content-Type': 'application/json' } }
+				JSON.stringify({ error: 'Query is required' }), { status: 400, headers: { 'Content-Type': 'application/json' } }
 			);
 		}
 

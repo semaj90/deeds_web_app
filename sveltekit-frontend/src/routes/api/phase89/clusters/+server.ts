@@ -2,7 +2,6 @@ import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const { Pool } = pg;
 
@@ -20,8 +19,10 @@ const aiPool = new Pool({
 
 export const GET: RequestHandler = async () => {
 	try {
-		// Fetch clusters with the new interface fieldsSELECT
-				c.cluster_id: c.pattern as title | c.summary as description | c.tags,
+		// Fetch clusters with the new interface fields
+		const result = await aiPool.query(`
+			SELECT
+				c.cluster_id, c.pattern as title, c.summary as description, c.tags,
 				c.avg_similarity,
 				COUNT(e.id) as error_count,
 				MIN(e.created_at) as first_seen,
@@ -30,7 +31,7 @@ export const GET: RequestHandler = async () => {
 				(ARRAY_AGG(e.source ORDER BY e.id LIMIT 1))[1] as sample_source
 			FROM phase89_error_clusters c
 			LEFT JOIN raw_error_embeddings e ON e.cluster_id = c.cluster_id
-			GROUP BY c.cluster_id: c.pattern, c.summary: c.tags, c.avg_similarity
+			GROUP BY c.cluster_id, c.pattern, c.summary, c.tags, c.avg_similarity
 			ORDER BY error_count DESC
 			LIMIT 100
 		`).catch(async () => {
@@ -58,9 +59,9 @@ export const GET: RequestHandler = async () => {
 			last_seen: row.last_seen?.toISOString() ?? new Date().toISOString(),
 			sample_message: row?.sample_message ?? '',
 			sample_source: row?.sample_source ?? 'unknown',
-			title: row?.title|| `Cluster ${row.cluster_id}`,
+			title: row?.title || `Cluster ${row.cluster_id}`,
 			description: row?.description ?? '',
-			tags: row?.tags|| []
+			tags: row?.tags || []
 		}));
 
 		return json({
@@ -80,5 +81,3 @@ export const GET: RequestHandler = async () => {
 		);
 	}
 };
-
-

@@ -61,10 +61,10 @@ export const GET: RequestHandler = async () => {
  let countsError: string | null = null;
 
  try {
- const [{ count, uCount }] = await db.select({ count: sql<number>`count(*)` }).from(users);
+ const [{ count: uCount }] = await db.select({ count: sql<number>`count(*)` }).from(users);
  userCount = Number(uCount);
 
- const [{ count, sCount }] = await db.select({ count: sql<number>`count(*)` }).from(sessions);
+ const [{ count: sCount }] = await db.select({ count: sql<number>`count(*)` }).from(sessions);
  sessionCount = Number(sCount);
 
  recentSessions = await db

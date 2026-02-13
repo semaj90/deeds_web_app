@@ -1,7 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import pg from 'pg';
 import { createClient } from 'redis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const { Pool } = pg;
 
@@ -18,7 +17,9 @@ const REDIS_URL = 'redis://localhost:6379/0';
 
 export const GET: RequestHandler = async () => {
 	try {
-		// PostgreSQL StatspgPool.query(`
+		// PostgreSQL Stats
+		const [errorStats, embeddingsCount, fixAttempts, kbCards] = await Promise.all([
+			pgPool.query(`
 				SELECT
 					COUNT(*) FILTER (WHERE status = 'open') as open,
 					COUNT(*) FILTER (WHERE status = 'stale') as stale,
@@ -30,7 +31,7 @@ export const GET: RequestHandler = async () => {
 			pgPool.query('SELECT COUNT(*) as count FROM phase89_kb_cards')
 		]);
 
-		const postgres = {
+		const postgresStats = {
 			error_instances_open: parseInt(errorStats.rows[0]?.open ?? '0'),
 			error_instances_stale: parseInt(errorStats.rows[0]?.stale ?? '0'),
 			error_instances_resolved: parseInt(errorStats.rows[0]?.resolved ?? '0'),
@@ -41,7 +42,10 @@ export const GET: RequestHandler = async () => {
 
 		// Redis Stats
 		const redisClient = createClient({ url: REDIS_URL });
-		await redisClient.connect();redisClient.dbsize(),
+		await redisClient.connect();
+
+		const [totalKeys, phase89Keys, embKeys, topkKeys, kbKeys] = await Promise.all([
+			redisClient.dbSize(),
 			redisClient.keys('phase89:*').then(k => k.length),
 			redisClient.keys('emb:*').then(k => k.length),
 			redisClient.keys('topk:*').then(k => k.length),
@@ -50,7 +54,7 @@ export const GET: RequestHandler = async () => {
 
 		await redisClient.quit();
 
-		const redis = {
+		const redisStats = {
 			total_keys: totalKeys,
 			phase89_keys: phase89Keys,
 			emb_keys: embKeys,
@@ -58,7 +62,9 @@ export const GET: RequestHandler = async () => {
 			kb_keys: kbKeys
 		};
 
-		// Qdrant Stats'phase89_error_chunks',
+		// Qdrant Stats
+		const qdrantCollections = [
+			'phase89_error_chunks',
 			'phase89_ast_embeddings',
 			'phase89_error_clusters',
 			'phase89_rag_patterns',
@@ -82,8 +88,10 @@ export const GET: RequestHandler = async () => {
 			}
 		}
 
-		// Cluster StatsSELECT
-				cluster_id: cluster_pattern,
+		// Cluster Stats
+		const clusterResult = await pgPool.query(`
+			SELECT
+				cluster_id, cluster_pattern,
 				COUNT(*) as count,
 				AVG(confidence) as avg_confidence
 			FROM phase89_error_clusters
@@ -94,23 +102,25 @@ export const GET: RequestHandler = async () => {
 
 		const clusters = {
 			total: clusterResult?.rowCount ?? 0,
-			top_patterns: clusterResult.rows.map(row => ({
+			top_patterns: clusterResult.rows.map((row: any) => ({
 				pattern: row?.cluster_pattern ?? 'Unknown',
 				count: parseInt(row.count),
 				confidence: parseFloat(row?.avg_confidence ?? '0')
 			}))
 		};
 
-		// Timeline (recent events)SELECT
-				timestamp: event_type,
-				file_path: success,
+		// Timeline (recent events)
+		const timelineResult = await pgPool.query(`
+			SELECT
+				timestamp, event_type,
+				file_path, success,
 				details
 			FROM phase89_timeline
 			ORDER BY timestamp DESC
 			LIMIT 20
 		`);
 
-		const timeline = timelineResult.rows.map(row => ({
+		const timeline = timelineResult.rows.map((row: any) => ({
 			timestamp: row.timestamp,
 			event_type: row.event_type,
 			file_path: row.file_path,
@@ -118,8 +128,10 @@ export const GET: RequestHandler = async () => {
 			details: row.details
 		}));
 
-		// Cosine Rankings (top matches)SELECT
-				query_text: top_match,
+		// Cosine Rankings (top matches)
+		const rankingsResult = await pgPool.query(`
+			SELECT
+				query_text, top_match,
 				similarity_score,
 				confidence_boost
 			FROM phase89_cosine_rankings
@@ -127,7 +139,8 @@ export const GET: RequestHandler = async () => {
 			ORDER BY similarity_score DESC
 			LIMIT 10
 		`);
-		const cosine_rankings = rankingsResult.rows.map(row => ({
+
+		const cosine_rankings = rankingsResult.rows.map((row: any) => ({
 			query: row.query_text,
 			top_match: row.top_match,
 			similarity: parseFloat(row.similarity_score),
@@ -135,9 +148,11 @@ export const GET: RequestHandler = async () => {
 		}));
 
 		return json({
-			postgres: redis,
+			postgres: postgresStats,
+			redis: redisStats,
 			qdrant: qdrantStats,
-			clusters: timeline,
+			clusters,
+			timeline,
 			cosine_rankings
 		});
 	} catch (error) {
@@ -151,5 +166,3 @@ export const GET: RequestHandler = async () => {
 		);
 	}
 };
-
-

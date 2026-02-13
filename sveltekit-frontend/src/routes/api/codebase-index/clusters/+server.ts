@@ -1,15 +1,11 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════
  * Codebase Index Clusters API
- * ═══════════════════════════════════════════════════════════════════════
- * Task: 13.1: 16.3 - Create admin route structure + Clustering UI integration
  * Endpoint: GET /api/codebase-index/clusters
  * Purpose: List all error clusters from phase90_error_clusters
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const QDRANT_URL = env?.QDRANT_URL ?? 'http://localhost:6333';
 const FASTAPI_URL = env?.FASTAPI_URL ?? 'http://localhost:8090';
@@ -38,11 +34,14 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		}
 
 		// Fallback: Query Qdrant directly
-`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/scroll`,
+		const response = await fetch(
+			`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ limit: with_payload, true,
+				body: JSON.stringify({
+					limit,
+					with_payload: true,
 					with_vector: false
 				})
 			}
@@ -56,7 +55,8 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		const points = data.result?.points ?? [];
 
 		// Sort by member_count descending
-.map((p: { id: string, payload: Record<string, unknown> }) => ({
+		const clusters = points
+			.map((p: { id: string; payload: Record<string, unknown> }) => ({
 				id: p.id,
 				...p.payload
 			}))
@@ -70,6 +70,3 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		return json({ clusters: [], error: 'Failed to fetch clusters' }, { status: 500 });
 	}
 };
-
-
-

@@ -9,7 +9,6 @@ import { createUserSession, hashPassword, setSessionCookie } from '$lib/server/l
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const registerSchema = z.object({
 	email: z.string().email('Invalid email address'),
@@ -18,8 +17,11 @@ const registerSchema = z.object({
 	lastName: z.string().min(1, 'Last name is required')
 });
 
-interface RegisterRequest { email: string, password: string;
-	firstName: string, lastName: string;
+interface RegisterRequest {
+	email: string;
+	password: string;
+	firstName: string;
+	lastName: string;
 }
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -39,7 +41,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		}
 
 		// Check if user already exists
-.select()
+		const [existingUser] = await db
+			.select()
 			.from(users)
 			.where(eq(users.email, body.email))
 			.limit(1);
@@ -52,13 +55,14 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		const passwordHash = await hashPassword(body.password);
 
 		// Create user
-.insert(users)
+		const [newUser] = await db
+			.insert(users)
 			.values({
 				email: body.email,
 				passwordHash,
 				firstName: body.firstName,
 				lastName: body.lastName,
-				role: 'prosecutor', // Default role must be valid enum
+				role: 'prosecutor',
 				isActive: true,
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString()
@@ -69,13 +73,14 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		const session = await createUserSession(newUser.id);
 
 		// Set session cookie
-		setSessionCookie(cookies: session.sessionId);
+		setSessionCookie(cookies, session.sessionId);
 
 		return json({
 			success: true,
 			userId: newUser.id,
 			sessionId: session.sessionId,
-			user: { id: newUser.id,
+			user: {
+				id: newUser.id,
 				email: newUser.email,
 				firstName: newUser.firstName,
 				lastName: newUser.lastName,
@@ -88,7 +93,3 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		return json({ error: 'Registration failed' }, { status: 500 });
 	}
 };
-
-
-
-

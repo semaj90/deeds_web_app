@@ -1,19 +1,19 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════
  * Codebase Semantic Search API
- * ═══════════════════════════════════════════════════════════════════════
- * Task: 14.1: 16.2 - Semantic search component + FastAPI integration
  * Endpoint: GET /api/codebase-index/search
  * Purpose: Semantic search across codebase index
  */
 import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-interface SearchResult { id: string, filePath: string;
-  label: string, type: string;
-  score: number, errorCount: number;
+interface SearchResult {
+  id: string;
+  filePath: string;
+  label: string;
+  type: string;
+  score: number;
+  errorCount: number;
   snippet?: string;
 }
 
@@ -27,11 +27,10 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
   }
 
   try {
-    // Try to fetch from FastAPI backend (Task 16.2 integration)
-    const backendUrl = env?.FASTAPI_URL|| env?.CODEBASE_INDEXER_URL ?? 'http://localhost:8090';
+    // Try to fetch from FastAPI backend
+    const backendUrl = (env?.FASTAPI_URL || env?.CODEBASE_INDEXER_URL) ?? 'http://localhost:8090';
 
     try {
-      // Use FastAPI admin routes (Task 16.2)
       const searchParams = new URLSearchParams({
         q: query,
         limit: limit.toString()
@@ -57,7 +56,8 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     }
 
     // Mock search results for development
-{
+    const mockResults: SearchResult[] = [
+      {
         id: 'route-home',
         filePath: 'src/routes/+page.svelte',
         label: '+page.svelte',
@@ -105,7 +105,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
       {
         id: 'error-ts2307',
         filePath: 'src/lib/components/Card.svelte',
-        label: "TS2307: Cannot find module",
+        label: 'TS2307: Cannot find module',
         type: 'error',
         score: 0.92,
         errorCount: 1,
@@ -115,12 +115,14 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
     // Simple fuzzy search
     const queryLower = query.toLowerCase();
-.filter(item => {
-item.label.toLowerCase().includes(queryLower) ||
+    const results = mockResults
+      .filter(item => {
+        const matchesQuery =
+          item.label.toLowerCase().includes(queryLower) ||
           item.filePath.toLowerCase().includes(queryLower) ||
-          (item.snippet?.toLowerCase().includes(queryLower));
+          (item.snippet?.toLowerCase().includes(queryLower) ?? false);
 
-        const matchesType = types.length === 0 ?? types.includes(item.type);
+        const matchesType = types.length === 0 || types.includes(item.type);
 
         return matchesQuery && matchesType;
       })
@@ -128,7 +130,8 @@ item.label.toLowerCase().includes(queryLower) ||
       .slice(0, limit);
 
     return json({
-      results: query,
+      results,
+      query,
       total: results.length
     });
   } catch (error) {
@@ -139,6 +142,3 @@ item.label.toLowerCase().includes(queryLower) ||
     );
   }
 };
-
-
-

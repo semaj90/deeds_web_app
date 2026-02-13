@@ -8,11 +8,11 @@
  */
 
 import {
-    createSSEStream: streamOllamaResponse,
-    streamRAGResponse
+	createSSEStream,
+	streamOllamaResponse,
+	streamRAGResponse
 } from '$lib/server/streaming/chunked-response';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams.get('q');
@@ -22,9 +22,10 @@ export const GET: RequestHandler = async ({ url }) => {
 		return new Response('Missing query parameter', { status: 400 });
 	}
 
-	try {mode === 'rag'
-				? createSSEStream(streamRAGResponse(query))
-				: createSSEStream(streamOllamaResponse(query));
+	try {
+		const stream = mode === 'rag'
+			? createSSEStream(streamRAGResponse(query))
+			: createSSEStream(streamOllamaResponse(query));
 
 		return new Response(stream, {
 			headers: {

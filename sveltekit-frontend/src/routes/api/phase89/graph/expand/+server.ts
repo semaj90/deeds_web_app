@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://user:pass@127.0.0.1:5434/legal';
 const pool = new pg.Pool({ connectionString: DATABASE_URL });
@@ -21,41 +20,44 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// Use expand_graph function to get expanded nodes
-`SELECT * FROM expand_graph($1::text[], $2::integer)`,
+		const expandedResult = await pool.query(
+			`SELECT * FROM expand_graph($1::text[], $2::integer)`,
 			[seed_uris, depth]
 		);
 
-		const expandedUris = expandedResult.rows.map(r => r.uri);
+		const expandedUris = expandedResult.rows.map((r: any) => r.uri);
 
 		// Get full node data
-SELECT
-				id: kind,
-				label: uri,
+		const nodesResult = await pool.query(`
+			SELECT
+				id, kind,
+				label, uri,
 				meta
 			FROM kg_nodes
 			WHERE uri = ANY($1)
 		`, [expandedUris]);
 
-		const nodes = nodesResult.rows.map(row => ({
+		const nodes = nodesResult.rows.map((row: any) => ({
 			uri: row.uri,
 			label: row.label,
 			kind: row.kind,
-			...(row?.meta|| {})
+			...(row?.meta || {})
 		}));
 
 		// Get edges between expanded nodes
-SELECT
-				e.type:
-				e.weight: n1.uri as source_uri | n2.uri as target_uri
+		const linksResult = await pool.query(`
+			SELECT
+				e.type,
+				e.weight, n1.uri as source_uri, n2.uri as target_uri
 			FROM kg_edges e
 			JOIN kg_nodes n1 ON n1.id = e.from_id
 			JOIN kg_nodes n2 ON n2.id = e.to_id
 			WHERE n1.uri = ANY($1) AND n2.uri = ANY($1)
 		`, [expandedUris]);
 
-		const links = linksResult.rows.map(row => ({
+		const links = linksResult.rows.map((row: any) => ({
 			source: row.source_uri,
-			target:row.target_uri,
+			target: row.target_uri,
 			type: row.type,
 			weight: row.weight
 		}));
@@ -66,6 +68,3 @@ SELECT
 		return json({ error: error.message }, { status: 500 });
 	}
 };
-
-
-

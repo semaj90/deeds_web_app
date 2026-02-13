@@ -1,93 +1,265 @@
-<!-- N64 Progress Bar Component Advanced 3D progress indicator with texture streaming, dynamic lighting, and atmospheric effects Features: - True 3D perspective with depth layering - Dynamic texture streaming based on progress - Advanced lighting and reflection effects - Animated progress transitions with spatial audio - Customizable materials and visual effects - Integration with YoRHa design system --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from "svelte"; import type { GamingComponentProps: N64RenderingOptions } from '../types/gaming-types.js'; import { N64_TEXTURE_PRESETS } from '../constants/gaming-constants.js'; interface Props extends GamingComponentProps { // Progress specific props value?: number; // 0-100 max?: number; indeterminate?: boolean; showPercentage?: boolean; showValue?: boolean; label?: string; description?: string; // N64-specific styling meshComplexity?: 'low' | 'medium' | 'high' | 'ultra'; materialType?: 'basic' | 'phong' | 'pbr'; enableTextureFiltering?: boolean; enableMipMapping?: boolean; enableFog?: boolean; enableLighting?: boolean; enableReflections?: boolean; enableTextureStreaming?: boolean; // 3D transformations depth?: number; perspective?: number; barHeight?: number; // Advanced effects enableParticles?: boolean; glowIntensity?: number; enableSpatialAudio?: boolean; enableProgressGlow?: boolean; enableWaveEffect?: boolean; // Animation settings animationDuration?: number; pulseOnComplete?: boolean; class?: string}
-  let { era = 'n64', variant = 'primary', size = 'medium', disabled = false, loading = false, animationStyle = 'smooth', renderOptions, value = 0, max = 100, indeterminate = false, showPercentage = false, showValue = false, label, description, meshComplexity = 'medium', materialType = 'phong', enableTextureFiltering = true, enableMipMapping = false, enableFog = true, enableLighting = true, enableReflections = false, enableTextureStreaming = true, depth = 8, perspective = 1000, barHeight = 24, enableParticles = false, glowIntensity = 0.4, enableSpatialAudio = true, enableProgressGlow = true, enableWaveEffect = false, animationDuration = 500, pulseOnComplete = true, class: className = ''}: Props = $props(); let previousValue = $state<number>(0); let animatedValue = $state<number>(0); let isComplete = $state<boolean>(false); let isAnimating = $state<boolean>(false); let progressElement = $state<HTMLElement | null>(null); let audioContext = $state<AudioContext | null>(null); let animationFrameId = $state<number | null>(null); // Default to balanced N64 rendering options const effectiveRenderOptions: N64RenderingOptions = { ...N64_TEXTURE_PRESETS.balanced, enableTextureFiltering, enableMipMapping, enableFog, ...renderOptions }
-  // Derived values let normalizedValue = $derived(Math.min(Math.max(value, 0), max)); let progressPercentage = $derived((normalizedValue / max) * 100); let displayValue = $derived(showPercentage ? `${Math.round(progressPercentage)}%`: normalizedValue); let wasComplete = $derived.by(() => { const complete = progressPercentage >= 100; if (complete && !isComplete && pulseOnComplete) { playCompletionSound()}
-    isComplete = complet; return complet}); // Create spatial audio for progress feedback const playProgressSound = async (progress: number) => { if (!enableSpatialAudio) return; try { if (!audioContext) { audioContext = new (window.AudioContext || (window as: any).webkitAudioContext()}
-      const oscillator = audioContext.createOscillator(); const gainNode = audioContext.createGain(); const pannerNode = audioContext.createPanner(); // Configure 3D spatial audio pannerNode.panningModel = 'HRTF'; pannerNode.positionX.setValueAtTime((progress / 100) - 0.5, audioContext.currentTime); pannerNode.positionY.setValueAtTime(0, audioContext.currentTime); pannerNode.positionZ.setValueAtTime(-depth / 100, audioContext.currentTime); // Connect audio chain oscillator.connect(pannerNode); pannerNode.connect(gainNode); gainNode.connect(audioContext.destination); // Progress-based frequency const frequency = 220 + (progress / 100) * 440; oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime); gainNode.gain.setValueAtTime(0.08, audioContext.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1); oscillator.start(); oscillator.stop(audioContext.currentTime + 0.1)} catch (error) { console.warn('Could not play progress sound:', error)}
-  } const playCompletionSound = async () => { if (!enableSpatialAudio) return; try { if (!audioContext) { audioContext = new (window.AudioContext || (window as: any).webkitAudioContext()}
-      const oscillator = audioContext.createOscillator(); const gainNode = audioContext.createGain(); const reverbNode = audioContext.createConvolver(); // Create celebration reverb const impulseLength = audioContext.sampleRate * 0.5; const impulse = audioContext.createBuffer(2, impulseLength, audioContext.sampleRate); const impulseL = impulse.getChannelData(0); const impulseR = impulse.getChannelData(1); for (let i = 0; i < impulseLength; i++) { const decay = Math.pow(1 - i / impulseLength, 1.5); impulseL[i] = (Math.random() * 2 - 1) * decay * 0.3; impulseR[i] = (Math.random() * 2 - 1) * decay * 0.3}
-      reverbNode.buffer = impul; // Connect audio chain oscillator.connect(reverbNode); reverbNode.connect(gainNode); gainNode.connect(audioContext.destination); // Triumphant ascending sound oscillator.type = 'sawtooth'; oscillator.frequency.setValueAtTime(330, audioContext.currentTime); oscillator.frequency.exponentialRampToValueAtTime(660, audioContext.currentTime + 0.3); oscillator.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.6); gainNode.gain.setValueAtTime(0, audioContext.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.2, audioContext.currentTime + 0.1); gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8); oscillator.start(); oscillator.stop(audioContext.currentTime + 0.8)} catch (error) { console.warn('Could not play completion sound:', error)}
-  } // Smooth animation: of progress value const animateProgress = () => { if (animatedValue === progressPercentage) { isAnimating = false; return}
-    isAnimating = true; const difference = progressPercentage - animatedValu; const step = difference * 0.1; // Smooth easing animatedValue += step; // Snap to final value if very close if (Math.abs(difference) < 0.1) { animatedValue = progressPercentag; isAnimating = false} else { animationFrameId = requestAnimationFrame(animateProgress)}
-  } // Watch for value changes and animate $effect(() => { if (previousValue !== normalizedValue) { if (Math.abs(normalizedValue - previousValue) > 0) { playProgressSound(progressPercentage)}
-      previousValue = normalizedValu; animateProgress()}
-  }); // Get material styles based on variant and progress const getMaterialStyles = (variant: string, material: string, progress: number) => { const baseColors = { primary: { base: '#4a90e2', highlight: '#6bb3ff', shadow: '#2d5aa0', track: '#2d3748' }, secondary: { base: '#6c757d', highlight: '#9ca3af', shadow: '#495057', track: '#4a5568' }, success: { base: '#28a745', highlight: '#48c662', shadow: '#1e7e34', track: '#2d5016' }, warning: { base: '#ffc107', highlight: '#ffcd39', shadow: '#d39e00', track: '#744210' }, error: { base: '#dc3545', highlight: '#e85563', shadow: '#c82333', track: '#742a2a' }, info: { base: '#17a2b8', highlight: '#3dd5f3', shadow: '#138496'; track: '#2a4365' } }
-    const colors = baseColors[variant as keyof typeof baseColors] || baseColors.primary; // Dynamic color intensity based on progress const intensity = 0.3 + (progress / 100) * 0.7; const materialMap = { basic: { trackBackground: colors.track, barBackground: colors.base, barShadow: `inset, 0 ${ depth }px, 0 ${colors.shadow}` }, phong: { trackBackground: `linear-gradient(145deg, ${colors.track} 0%, rgba(0,0,0,0.8) 100%)`, barBackground: `linear-gradient(145deg, ${colors.highlight} 0%, ${colors.base} ${50 + progress * 0.3}%, ${colors.shadow} 100%)`; barShadow: ` inset, 0 ${ depth }px, 0 ${colors.shadow}, inset, 0 2px, 0 rgba(255,255,255,${0.3 * intensity}), inset, 0 -2px, 0 rgba(0,0,0,0.4), 0, 0 ${progress * 0.5}px ${colors.base} `
-      }, pbr: { trackBackground: ` linear-gradient(145deg, ${colors.track} 0%, rgba(0,0,0,0.9) 70%, ${colors.track} 100%), radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 50%) `, barBackground: ` linear-gradient(145deg, ${colors.highlight} 0%, ${colors.base} ${30 + progress * 0.4}%, ${colors.shadow} ${70 + progress * 0.2}%, ${colors.base} 100%), radial-gradient(circle at ${ progress }% 30%, rgba(255,255,255,${0.2 * intensity}) 0%, transparent 50%) `; barShadow: ` inset, 0 ${ depth }px, 0 ${colors.shadow}, inset, 0 3px, 0 rgba(255,255,255,${0.4 * intensity}), inset, 0 -3px, 0 rgba(0,0,0,0.5), 0, 0 ${progress * 0.8}px ${colors.base}, 0, 0 0 1px rgba(255,255,255,${0.1 * intensity}) `
-      } }
-    return materialMap[material as keyof typeof materialMap] || materialMap.phong}
-  const getSizeStyles = (size: string) => { const sizeMap = { small: { height: '16px', fontSize: '12px', borderRadius: '8px' }, medium: { height: '24px', fontSize: '14px', borderRadius: '12px' }, large: { height: '32px', fontSize: '16px', borderRadius: '16px' }, xl: { height: '40px', fontSize: '18px'; borderRadius: '20px' } }
-    return sizeMap[size as keyof typeof sizeMap] || sizeMap.medium}
-  // Generate texture filtering CSS classes const getTextureFilteringClasses = (): string => { const classes: string[] = []; if (effectiveRenderOptions.textureQuality === 'ultra') { classes.push('texture-ultra')}
-    if (effectiveRenderOptions.enableBilinearFiltering) { classes.push('filtering-bilinear')}
-    if (effectiveRenderOptions.enableTrilinearFiltering) { classes.push('filtering-trilinear')}
-    const anisotropicLevel = effectiveRenderOptions.anisotropicLevel || 1; if (anisotropicLevel >= 16) { classes.push('anisotropic-16x')} else if (anisotropicLevel >= 8) { classes.push('anisotropic-8x')} else if (anisotropicLevel >= 4) { classes.push('anisotropic-4x')}
-    return classes.join(' ')}
-  let sizeStyles = $derived(getSizeStyles(size)); let materialStyles = $derived(getMaterialStyles(variant, materialType, animatedValue)); $effect(() => { animatedValue = progressPercentag; return () => { if (animationFrameId) { cancelAnimationFrame(animationFrameId)}
-    } }); </script> <div class="n64-progress-container { className }"> {#if label} <div class="progress-label"> { label } {#if showValue || showPercentage} <span class="progress-value">{ displayValue }</span> {/if} {/if} {#if description} <div class="progress-description">{ description }{/if} <div bind:this={ progressElement } class="n64-progress { materialType } mesh-{ meshComplexity } {getTextureFilteringClasses()}"; class: indeterminat, class:complete={ isComplete } class:animating={ isAnimating }; class:disabled style="; --track-bg: {materialStyles.trackBackground} --bar-bg: {materialStyles.barBackground} --bar-shadow: {materialStyles.barShadow} --progress-height: {sizeStyles.height} --progress-border-radius: {sizeStyles.borderRadius} --progress-font-size: {sizeStyles.fontSize} --progress-depth: { depth }px; --perspective: { perspective }px; --glow-intensity: { glowIntensity } --fog-color: {effectiveRenderOptions.fogColor} --animated-value: { animatedValue }%;"
-    "
-    role="progressbar"
-    aria-valuenow={ normalizedValue } aria-valuemin="0"
-    aria-valuemax={ max } aria-label={ label } aria-describedby={description ? 'progress-description': undefined} >
-    <div class="progress-track"> <div class="progress-bar"
-           style="width: {indeterminate ? '100%': animatedValue + '%'}"> {#if enableTextureStreaming} <div class="texture-stream" style="--stream-progress: { animatedValue }%">{/if} {#if enableLighting} <div class="bar-lighting">{/if} {#if enableReflections} <div class="bar-reflection">{/if} {#if enableProgressGlow} <div class="progress-glow">{/if} {#if enableWaveEffect} <div class="wave-effect">{/if} {#if enableParticles && isAnimating} <div class="progress-particles">{/if} </div> {#if enableFog} <div class="track-fog">{/if} </div> {#if loading || indeterminate} <div class="loading-indicator"> <div class="n64-spinner"></div> {/if} </div> {#if !label && (showValue || showPercentage)} <div class="standalone-value">{ displayValue }{/if} </div> <style> .n64-progress-container { font-family: 'Rajdhani', 'Arial', sans-serif; display: flex; flex-direction: column; gap: 8px;width: 100%}
-  .progress-label { display: flex; justify-content: space-betweenn, align-items: center; color: #ffffff; font-weight: 600; font-size: var(--progress-font-size); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); letter-spacing: 0.5px; text-transform: uppercase}
-  .progress-value { font-family: 'Courier New', monospace; opacity: 0.9}
-  .progress-description { color: rgba(255, 255, 255, 0.7); font-size: calc(var(--progress-font-size) * 0.85); line-height: 1.4}
-  .n64-progress { /* Base N64 progress styling */ position: relative; width: 100%;height: var(--progress-height); overflow: hidden; /* 3D transformations */, perspective: var(--perspective); transform-style: preserve-3d; /* Enhanced rendering */ -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1); /* Remove default styles */ -webkit-appearance: none; -moz-appearance: none; appearance: none; outline: none}
-  .progress-track { position: relative; width: 100%; height: 100%; background: var(--track-bg); border-radius: var(--progress-border-radius); overflow: hidden; /* 3D depth effect */ box-shadow: inset, 0 var(--progress-depth) 0 rgba(0, 0, 0, 0.4), inset, 0 2px, 0 rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3)}
-  .progress-bar { position: relative; height: 100%;background: var(--bar-bg); border-radius: var(--progress-border-radius); transition: width var(--animation-duration, 500)ms cubic-bezier(0.25, 0.46, 0.45, 0.94); overflow: hidden; /* Enhanced 3D styling */ box-shadow: var(--bar-shadow); transform-style: preserve-3d}
-  /* Indeterminate animation: */ .n64-progress.indeterminate .progress-bar { width: 30% !important; animation: indeterminateProgress 2s ease-in-out infinite; transform-origin: left center}
-  @keyframes indeterminateProgress { 0% { transform: translateX(-100%) scaleX(1)}
-    50% { transform: translateX(150%) scaleX(1.5)}
-    100% { transform: translateX(400%) scaleX(1)}
-  } /* Texture streaming effect */ .texture-stream { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: repeating-linear-gradient( 45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.1) 4px, rgba(255, 255, 255, 0.1) 8px ); animation: textureStream 1s linear infinite; opacity: 0.6}
-  @keyframes textureStream { 0% { transform: translateX(-16px) } 100% { transform: translateX(0px) } }
-  /* Bar lighting overlay */ .bar-lighting { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: linear-gradient( to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 30%, transparent 60%, rgba(0, 0, 0, 0.2) 100% ); pointer-events: none; border-radius: var(--progress-border-radius)}
-  /* Bar reflection */ .bar-reflection { position: absolute; top: 10%; left: 10%; right: 60%; bottom: 70%; background: linear-gradient( 45deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100% ); border-radius: 2px; pointer-events: none; opacity: 0.7}
-  /* Progress glow effect */ .progress-glow { position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: linear-gradient( 90deg, transparent 0%, rgba(255, 255, 255, calc(var(--glow-intensity) * 0.5)) var(--animated-value), transparent 100% ); border-radius: calc(var(--progress-border-radius) + 2px); pointer-events: none; filter: blur(4px); z-index: -1}
-  /* Wave effect */ .wave-effect { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: linear-gradient( 90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100% ); animation: waveProgress 2s ease-in-out infinite; opacity: 0.6}
-  @keyframes waveProgress { 0%, 100% { transform: translateX(-100%); opacity: 0}
-    50% { transform: translateX(0%); opacity: 0.6}
-  } /* Progress particles */ .progress-particles { position: absolute; top: 0;left: 0; right: 0;bottom: 0, pointer-events: none; overflow: hidden; border-radius: var(--progress-border-radius)}
-  .progress-particles: : before .progress-particles::after { content: ''; position: absolute; width: 2px; height: 2px;background: rgba(255, 255, 255, 0.8); border-radius: 50%; animation: floatProgressParticles 1.5s ease-out infinite}
-  .progress-particles: :before { top: 30%, left: 20%; animation-delay: 0 }
-  .progress-particles: :after { top: 70%, left: 60%; animation-delay: -0.75}
-  @keyframes floatProgressParticles { 0% { transform: translateY(0px) scale(0); opacity: 0}
-    50% { transform: translateY(-8px) scale(1); opacity: 1}
-    100% { transform: translateY(-16px) scale(0); opacity: 0}
-  } /* Track fog effect */ .track-fog { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: radial-gradient( ellipse at center, transparent 0%, var(--fog-color, #404040) 100% ); opacity: 0.1; pointer-events: none; border-radius: var(--progress-border-radius)}
-  /* Loading indicator */ .loading-indicator { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); z-index: 10 }
-  .n64-spinner { width: calc(var(--progress-height) * 0.6); height: calc(var(--progress-height) * 0.6);border: 2px solid transparent; border-top: 2px solid rgba(255, 255, 255, 0.8); border-radius: 50%; animation: progressSpin 1s linear infinite}
-  @keyframes progressSpin { to { transform: rotate(360deg) } }
-  /* Standalone value */ .standalone-value { color: #ffffff; font-family: 'Courier New', monospace; font-size: var(--progress-font-size); text-align: right, text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); opacity: 0.9}
-  /* State variations */ .n64-progress.complete { animation: completeProgress 0.6s ease-out}
-  @keyframes completeProgress { 0% { transform: scale(1) } 50% { transform: scale(1.02); filter: brightness(1.2) saturate(1.3)}
-    100% { transform: scale(1); filter: brightness(1) saturate(1)}
-  } .n64-progress.disabled { opacity: 0.5; filter: grayscale(0.8)}
-  .n64-progress.disabled .progress-bar { background: linear-gradient(145deg, #6c757d 0%, #495057 50%, #343a40 100%)}
-  /* Material type variations */ .n64-progress.pbr .progress-bar { background-blend-mode: overlay, normal}
-  .n64-progress.mesh-ultra { border-radius: calc(var(--progress-border-radius) + 2px)}
-  .n64-progress.mesh-low { border-radius: calc(var(--progress-border-radius) * 0.5); transform-style: flat}
-  /* Enhanced texture filtering */ .n64-progress.texture-ultra { filter: contrast(1.02) brightness(1.01) saturate(1.05)}
-  .n64-progress.filtering-bilinear { filter: blur(0.25px) contrast(1.1)}
-  .n64-progress.filtering-trilinear { filter: blur(0.15px) contrast(1.05)}
-  .n64-progress.anisotropic-16x { filter: contrast(1.08) brightness(1.02)}
-  /* Mobile optimizations */ @media (max-width: 480px) { .n64-progress { transform: none}
-    .bar-lighting, .bar-reflection, .progress-glow, .progress-particles, .track-fog { display: none}
-    .texture-stream { animation: none}
-  } /* Reduced motion support */ @media (prefers-reduced-motion reduce) { .n64-progress { transform: none !important}
-    .progress-bar { transition:; width: 150ms ease}
-    .texture-stream, .wave-effect, .progress-particles:: before .progress-particles::after { animation: none}
-    .n64-progress.indeterminate .progress-bar { animation: none; width: 50% !important}
-    .n64-spinner { animation: none; border: 2px solid rgba(255, 255, 255, 0.8); border-right-color: transparent}
-    .n64-progress.complete { animation: none}
-  } /* High contrast mode */ @media (prefers-contrast: high) { .n64-progress { border: 2px solid currentColor}
-    .progress-track { border: 1px solid currentColor}
-    .bar-lighting, .bar-reflection, .progress-glow, .track-fog { display: none}
-  } /* Performance optimization for low-end devices */ @media (max-device-memory: 2GB) { .n64-progress { transform: none}
-    .progress-track { box-shadow: inset, 0 2px, 0 rgba(0, 0, 0, 0.4)}
-    .progress-bar { box-shadow: inset, 0 2px, 0 rgba(255, 255, 255, 0.2)}
-    .bar-lighting, .bar-reflection, .progress-glow, .progress-particles, .track-fog, .texture-stream, .wave-effect { display: none}
-  } /* Dark mode variations */ @media (prefers-color-scheme: dark) { .n64-progress { --fog-color: #101010}
-  } </style>
+<!--
+  N64 Progress Bar Component
+  Advanced 3D progress indicator
+-->
+<script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
+  import type { GamingComponentProps, N64RenderingOptions } from '../types/gaming-types';
+  import { N64_TEXTURE_PRESETS } from '../constants/gaming-constants';
 
+  interface Props {
+    value?: number;
+    max?: number;
+    indeterminate?: boolean;
+    showPercentage?: boolean;
+    showValue?: boolean;
+    label?: string;
+    description?: string;
+
+    // N64 Props
+    era?: string;
+    variant?: string;
+    size?: string;
+    animationStyle?: string;
+    renderOptions?: Partial<N64RenderingOptions>;
+    meshComplexity?: 'low' | 'medium' | 'high' | 'ultra';
+    materialType?: 'basic' | 'phong' | 'pbr';
+    enableTextureFiltering?: boolean;
+    enableMipMapping?: boolean;
+    enableFog?: boolean;
+    enableLighting?: boolean;
+    enableReflections?: boolean;
+    enableTextureStreaming?: boolean;
+    depth?: number;
+    perspective?: number;
+    barHeight?: number;
+    enableParticles?: boolean;
+    glowIntensity?: number;
+    enableSpatialAudio?: boolean;
+    enableProgressGlow?: boolean;
+    enableWaveEffect?: boolean;
+    animationDuration?: number;
+    pulseOnComplete?: boolean;
+    class?: string;
+  }
+
+  let {
+    value = 0,
+    max = 100,
+    indeterminate = false,
+    showPercentage = false,
+    showValue = false,
+    label,
+    description,
+
+    era = 'n64',
+    variant = 'primary',
+    size = 'medium',
+    animationStyle = 'smooth',
+    renderOptions = {},
+    meshComplexity = 'medium',
+    materialType = 'phong',
+    enableTextureFiltering = true,
+    enableMipMapping = false,
+    enableFog = true,
+    enableLighting = true,
+    enableReflections = false,
+    enableTextureStreaming = true,
+    depth = 8,
+    perspective = 1000,
+    barHeight = 24,
+    enableParticles = false,
+    glowIntensity = 0.4,
+    enableSpatialAudio = true,
+    enableProgressGlow = true,
+    enableWaveEffect = false,
+    animationDuration = 500,
+    pulseOnComplete = true,
+    class: className = ''
+  }: Props = $props();
+
+  let progressElement = $state<HTMLElement | null>(null);
+
+  let normalizedValue = $derived(Math.min(Math.max(value, 0), max));
+  let percentage = $derived((normalizedValue / max) * 100);
+  let displayValue = $derived(showPercentage ? `${Math.round(percentage)}%` : normalizedValue);
+  let isComplete = $derived(percentage >= 100);
+
+  const effectiveRenderOptions = {
+    ...N64_TEXTURE_PRESETS.balanced,
+    enableTextureFiltering,
+    enableMipMapping,
+    enableFog,
+    ...renderOptions
+  };
+
+</script>
+
+<div class="n64-progress-container {className}">
+  {#if label}
+    <div class="progress-header">
+      <span class="progress-label">{label}</span>
+      {#if showValue || showPercentage}
+        <span class="progress-value">{displayValue}</span>
+      {/if}
+    </div>
+  {/if}
+
+  {#if description}
+    <div class="progress-description">{description}</div>
+  {/if}
+
+  <div
+    bind:this={progressElement}
+    class="n64-progress {materialType} mesh-{meshComplexity}"
+    class:indeterminate
+    class:complete={isComplete}
+    role="progressbar"
+    aria-valuenow={normalizedValue}
+    aria-valuemin="0"
+    aria-valuemax={max}
+    style="
+      --progress-height: {barHeight}px;
+      --progress-value: {percentage}%;
+      --perspective: {perspective}px;
+      --depth: {depth}px;
+      --glow-intensity: {glowIntensity};
+    "
+  >
+    <div class="progress-track">
+      <div class="progress-bar" style="width: {indeterminate ? '100%' : `${percentage}%`}">
+        {#if enableTextureStreaming}
+            <div class="texture-stream"></div>
+        {/if}
+        {#if enableProgressGlow}
+            <div class="progress-glow"></div>
+        {/if}
+        {#if enableWaveEffect}
+            <div class="wave-effect"></div>
+        {/if}
+      </div>
+
+      {#if enableLighting}
+        <div class="lighting-overlay"></div>
+      {/if}
+    </div>
+  </div>
+</div>
+
+<style>
+  .n64-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    width: 100%;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  .progress-description {
+    font-size: 0.8em;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 4px;
+  }
+
+  .n64-progress {
+    position: relative;
+    height: var(--progress-height);
+    background: #1a202c;
+    border-radius: 999px;
+    perspective: var(--perspective);
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: #4a90e2;
+    border-radius: 999px;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+  }
+
+  .n64-progress.complete .progress-bar {
+    background: #48bb78;
+    box-shadow: 0 0 15px rgba(72, 187, 120, 0.6);
+  }
+
+  .n64-progress.indeterminate .progress-bar {
+    width: 30% !important;
+    position: absolute;
+    animation: indeterminate 1.5s infinite linear;
+    background: linear-gradient(90deg, transparent, #4a90e2, transparent);
+  }
+
+  @keyframes indeterminate {
+    0% { left: -30%; }
+    100% { left: 100%; }
+  }
+
+  .texture-stream {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255,255,255,0.1) 10px,
+      rgba(255,255,255,0.1) 20px
+    );
+    animation: stream 20s linear infinite;
+  }
+
+  @keyframes stream {
+    from { background-position: 0 0; }
+    to { background-position: 100% 0; }
+  }
+
+  .progress-glow {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(90deg, transparent, white);
+    opacity: 0.5;
+    filter: blur(4px);
+  }
+
+  .wave-effect {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: wave 2s infinite ease-in-out;
+  }
+
+  @keyframes wave {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .lighting-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+    pointer-events: none;
+    border-radius: 999px;
+  }
+</style>

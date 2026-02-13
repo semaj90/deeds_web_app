@@ -199,11 +199,11 @@ export default defineConfig(({ mode }) => {
             rewrite: (path) => path.replace(/^\/api\/playwright-auditor/, ''),
         },
         // POI API proxy (Phase 8)
-        '/api/persons-of-interest': {
-          target: 'http://localhost:8000',
-          changeOrigin: true,
-          secure: false,
-        },
+        // '/api/persons-of-interest': {
+        //   target: 'http://localhost:8000',
+        //   changeOrigin: true,
+        //   secure: false,
+        // },
         // WebSocket proxy for legal AI services
         '/ws/rag': {
           target: `ws://localhost:${wsPort}`, // enhanced-rag Go service

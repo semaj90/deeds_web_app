@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const { Pool } = pg;
 
@@ -29,7 +28,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// Fetch cluster errors from PostgreSQL
-`SELECT id, source, raw_text, line_number, tags
+		const errorsResult = await pool.query(
+			`SELECT id, source, raw_text, line_number, tags
 			 FROM raw_error_embeddings
 			 WHERE cluster_id = $1
 			 ORDER BY id
@@ -42,10 +42,11 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// Build ACE contextual prompt
-`- ${e.source}:${e.line_number}: ${e.raw_text.slice(0, 150)}`
+		const sampleErrors = errorsResult.rows.map((e: any) =>
+			`- ${e.source}:${e.line_number}: ${e.raw_text.slice(0, 150)}`
 		).join('\n');
 
-		const sources = [...new Set(errorsResult.rows.map((e, any) => e.source))];
+		const sources = [...new Set(errorsResult.rows.map((e: any) => e.source))];
 
 		const prompt = `Analyze this cluster of ${errorsResult.rows.length} TypeScript/Svelte errors and provide actionable fix recommendations.
 
@@ -87,7 +88,9 @@ Provide your analysis in this JSON structure:
 		const ollamaRes = await fetch('http://localhost:11434/api/chat', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: messages: [
+			body: JSON.stringify({
+				model,
+				messages: [
 					{
 						role: 'system',
 						content: 'You are an expert TypeScript and Svelte 5 developer. Always respond with valid JSON.'
@@ -100,7 +103,7 @@ Provide your analysis in this JSON structure:
 		});
 
 		if (!ollamaRes.ok) {
-			throw new Error(`Ollama request failed, ${ollamaRes.status}`);
+			throw new Error(`Ollama request failed: ${ollamaRes.status}`);
 		}
 
 		const ollamaData = await ollamaRes.json();
@@ -117,7 +120,7 @@ Provide your analysis in this JSON structure:
 		} catch (e) {
 			// Fallback: return raw content
 			analysis = {
-				pattern_name: `cluster_${ cluster_id }_analysis`,
+				pattern_name: `cluster_${cluster_id}_analysis`,
 				root_cause: content.slice(0, 500),
 				fix_strategy: ['Review the analysis above'],
 				estimated_effort: 'moderate',
@@ -135,14 +138,17 @@ Provide your analysis in this JSON structure:
 			   tags = EXCLUDED.tags,
 			   updated_at = NOW()`,
 			[
-				cluster_id: analysis.pattern_name,
-				analysis.root_cause: analysis?.fix_strategy|| []
+				cluster_id,
+				analysis.pattern_name,
+				analysis.root_cause,
+				analysis?.fix_strategy || []
 			]
 		).catch(console.error);
 
 		return json({
 			success: true,
-			cluster_id: analysis,
+			cluster_id,
+			analysis,
 			model,
 			error_count: errorsResult.rows.length
 		});
@@ -154,6 +160,3 @@ Provide your analysis in this JSON structure:
 		}, { status: 500 });
 	}
 };
-
-
-

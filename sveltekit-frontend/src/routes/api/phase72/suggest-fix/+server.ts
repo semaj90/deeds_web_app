@@ -21,8 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const payload: SuggestFixRequest = await request.json();
 
- // If no backend is configured;
- return placeholder suggestions
+ // If no backend is configured, return placeholder suggestions
  if (!PHASE72_BACKEND_URL || PHASE72_BACKEND_URL === 'http://127.0.0.1:8000') {
  console.warn('Phase72 backend not configured, returning placeholder suggestions');
  return json({

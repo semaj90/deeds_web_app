@@ -1,21 +1,144 @@
-import type { User } from '$lib/types';
-import type { db, pool } from './drizzle.js'; import type { users, cases, evidence } from './schema.ts'; import bcrypt from 'bcryptjs'; import { eq } from 'drizzle-orm'; // Sample embeddings (normally produced by an AI model) const sampleEmbeddings = { financial: Array.from({
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-	length: 768 },
-	() => Math.random() * 0.1 + 0.1, legal: Array.from({
-	length: 768 },
-	() => Math.random() * 0.1 + 0.2, criminal: Array.from({
-	length: 768 },
-	() => Math.random() * 0.1 + 0.3) }; async function seed(): Promise<any> { console.log('[seed] Starting database seed...'); try { console.log('[seed] Creating or refreshing demo users...'); const passwordHash = await bcrypt.hash('password123', 12); const demoPasswordHash = await bcrypt.hash('demo123', 12); const seedUsers = [ { email: 'demo@legal-ai.local', name: 'Demo User', firstName: 'Demo', lastName: 'User', role: 'admin', hashedPassword: demoPasswordHash | isActive, true },
-	{ email: 'prosecutor@legal.ai', name: 'John Prosecutor', firstName: 'John', lastName: 'Prosecutor', role: 'prosecutor', hashedPassword: passwordHash | isActive, true },
-	{ email: 'detective@legal.ai', name: 'Jane Detective', firstName: 'Jane', lastName: 'Detective', role: 'detective', hashedPassword: passwordHash | isActive, true },
-	{ email: 'admin@legal.ai', name: 'Admin User', firstName: 'Admin', lastName: 'User', role: 'admin', hashedPassword: passwordHash | isActive, true }]; const insertedUsers: typeof seedUsers = []; for (const user of seedUsers) { try { const existing = await db.select().from(users).where(eq(users.email, user.email)).limit(1); if (existing.length === 0) { const [created] = await db.insert(users).values(user).returning(); insertedUsers.push(created); console.log(` [seed] created user ${user.email}`)}else { const [updated] = await db .update(users) .set({ hashedPassword: user.hashedPassword, firstName: user.firstName ? ? existing[0].firstName : lastName | user.lastName ?? existing[0].lastName: name | user.name ? ? existing[0].name : role | user.role ?? existing[0].role: isActive | user.isActive ? ? existing[0].isActive : updatedAt | new Date().toISOString() }) .where(eq(users.id: existing[0].id)) .returning(); insertedUsers.push(updated); console.log(` [seed] refreshed user ${user.email}`)}catch (err) { console.error(` [seed] failed to upsert ${user.email}:`, err)} console.log(`[seed] Users ready: ${insertedUsers.length}`); console.log('\n[seed] Database seed completed successfully.'); console.log( [ 'Summary: ','`'` ` users: ${insertedUsers.length}`, '', 'Login Credentials: ', ' Demo demo@legal-ai.local / demo123', ' Prosecutor prosecutor@legal.ai / password123', ' Detective detective@legal.ai / password123', ' Admin admin@legal.ai / password123'].join('\n') ); // Skip case/evidence bootstrap for now (schema still in flux) return; // ----------------------------------------------------------------------- // Future bootstrap data (kept for reference) // ----------------------------------------------------------------------- console.log('[seed] Creating sample cases...'); const insertedCases = await db .insert(cases) .values([ { title: 'Financial Fraud Investigation', description: 'Complex financial fraud case involving multiple entities and cryptocurrency transactions.', priority: 'high', status: 'open', category: 'financial_fraud', dangerScore, 75, createdBy, insertedUsers[0].id, aiSummary: 'High-priority financial fraud case with strong evidence of laundering via shell companies.', aiTags: ['money_laundering', 'cryptocurrency', 'international', 'high_value'] }]) .returning(); console.log('[seed] Creating sample evidence...'); await db.insert(evidence).values([ { caseId, insertedCases[0].id, title: 'Bank Transaction Records', description: 'Suspicious transaction patterns showing structured deposits.', evidenceType: 'financial_document', tags: ['transactions', 'banking', 'offshore'], uploadedBy: insertedUsers[0].id, aiSummary: 'Strong indicators of layering and placement activity.', aiAnalysis: {
-	confidence: 0.92, patterns: ['structuring', 'threshold_avoidance'] },
-	embedding: sampleEmbeddings.financial }])}catch (error) { console.error('[seed] fatal error: ', error); throw error}finally { await pool.end(); console.log('[seed] Connection pool closed.')} }
-seed() .then(() => { console.log('[seed] completed'); process.exit(0)}) .catch(error => { console.error('[seed] failed: ', error); process.exit(1)}); export { seed };
+/**
+ * Database Seed Script - Drizzle ORM 0.44
+ * Seeds legal_ai_db with demo users + sessions table.
+ *
+ * Usage: npx tsx src/lib/server/db/seed.ts
+ * Or:    npm run db:seed
+ */
 
+import bcrypt from 'bcryptjs';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import pg from 'pg';
+import * as schema from './schema-postgres';
 
+const { Pool } = pg;
 
+const DATABASE_URL =
+	process.env.DATABASE_URL ||
+	'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 
+const pool = new Pool({ connectionString: DATABASE_URL });
+const db = drizzle(pool, { schema });
 
+const { users } = schema;
 
+async function seed(): Promise<void> {
+	console.log('[seed] Starting database seed...');
+	console.log('[seed] Database:', DATABASE_URL.replace(/:[^@]+@/, ':****@'));
+
+	try {
+		// Ensure sessions table exists (Lucia v3 requirement)
+		await pool.query(`
+			CREATE TABLE IF NOT EXISTS sessions (
+				id TEXT PRIMARY KEY NOT NULL,
+				user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+				expires_at TIMESTAMPTZ NOT NULL
+			);
+			CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
+		`);
+		console.log('[seed] Sessions table ready.');
+
+		// Hash passwords
+		const demoHash = await bcrypt.hash('demo123', 12);
+		const defaultHash = await bcrypt.hash('password123', 12);
+
+		const seedUsers = [
+			{
+				email: 'demo@legal-ai.local',
+				name: 'Demo User',
+				firstName: 'Demo',
+				lastName: 'User',
+				role: 'admin' as const,
+				passwordHash: demoHash,
+				isActive: true
+			},
+			{
+				email: 'prosecutor@legal.ai',
+				name: 'John Prosecutor',
+				firstName: 'John',
+				lastName: 'Prosecutor',
+				role: 'prosecutor' as const,
+				passwordHash: defaultHash,
+				isActive: true
+			},
+			{
+				email: 'detective@legal.ai',
+				name: 'Jane Detective',
+				firstName: 'Jane',
+				lastName: 'Detective',
+				role: 'detective' as const,
+				passwordHash: defaultHash,
+				isActive: true
+			},
+			{
+				email: 'admin@legal.ai',
+				name: 'Admin User',
+				firstName: 'Admin',
+				lastName: 'User',
+				role: 'admin' as const,
+				passwordHash: defaultHash,
+				isActive: true
+			}
+		];
+
+		console.log('[seed] Upserting demo users...');
+		let count = 0;
+
+		for (const user of seedUsers) {
+			const existing = await db
+				.select()
+				.from(users)
+				.where(eq(users.email, user.email))
+				.limit(1);
+
+			if (existing.length === 0) {
+				await db.insert(users).values({
+					email: user.email,
+					passwordHash: user.passwordHash,
+					name: user.name,
+					firstName: user.firstName,
+					lastName: user.lastName,
+					role: user.role,
+					isActive: user.isActive
+				});
+				console.log(`  + Created: ${user.email}`);
+			} else {
+				await db
+					.update(users)
+					.set({
+						passwordHash: user.passwordHash,
+						firstName: user.firstName,
+						lastName: user.lastName,
+						name: user.name,
+						role: user.role,
+						isActive: user.isActive,
+						updatedAt: new Date().toISOString()
+					})
+					.where(eq(users.email, user.email));
+				console.log(`  ~ Refreshed: ${user.email}`);
+			}
+			count++;
+		}
+
+		console.log(`\n[seed] Done. ${count} users ready.`);
+		console.log('');
+		console.log('Login Credentials:');
+		console.log('  demo@legal-ai.local  / demo123');
+		console.log('  prosecutor@legal.ai  / password123');
+		console.log('  detective@legal.ai   / password123');
+		console.log('  admin@legal.ai       / password123');
+	} catch (error) {
+		console.error('[seed] Fatal error:', error);
+		throw error;
+	} finally {
+		await pool.end();
+		console.log('[seed] Pool closed.');
+	}
+}
+
+seed()
+	.then(() => process.exit(0))
+	.catch(() => process.exit(1));
+
+export { seed };
