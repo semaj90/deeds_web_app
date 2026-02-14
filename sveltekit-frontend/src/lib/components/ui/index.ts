@@ -81,7 +81,6 @@ export { default as EvidenceCanvas } from './EvidenceCanvas.svelte';
 // Performance
 export { default as AdaptiveRenderingEngine } from './AdaptiveRenderingEngine.svelte';
 export { default as PerformanceMonitor } from './PerformanceMonitor.svelte';
-export { default as ZeroLatencyInteraction } from './ZeroLatencyInteraction.svelte';
 
 // Accessibility
 export { default as AccessibilitySettings } from './AccessibilitySettings.svelte';
