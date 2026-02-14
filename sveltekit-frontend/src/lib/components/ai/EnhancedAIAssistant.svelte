@@ -297,7 +297,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 		cursor: pointer; font-size: 0.875rem;
 	transition:background-color 0.2;}
   .btn-close:hover { background: #e5e7eb;}
-  /* Color utilities */ .text-sand/60 { color: #6b7280;} .text-accent { color: #10b981;} .text-warning { color: #f59e0b;} .text-danger { color: #ef4444;} /* Responsive adjustments */ @media (max-width: 768px) { .enhanced-ai-assistant { border-radius: 0;}
+  /* Color utilities */ .text-sand-60 { color: #6b7280;} .text-accent { color: #10b981;} .text-warning { color: #f59e0b;} .text-danger { color: #ef4444;} /* Responsive adjustments */ @media (max-width: 768px) { .enhanced-ai-assistant { border-radius: 0;}
     .backend-grid { grid-template-columns: repeat(2, 1fr)}
     .message { max-width: 95%}
     .capabilities { grid-template-columns: 1fr;}

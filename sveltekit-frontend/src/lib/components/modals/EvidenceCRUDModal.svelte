@@ -380,8 +380,7 @@
                   type="text"
                   bind:value={evidence.title}
                   placeholder="Enter evidence title"
-                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info"
-                  class:border-danger/30={errors.title}
+                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info {errors.title ? 'border-danger/30' : ''}"
                   disabled={isReadonly}
                 />
                 {#if errors.title}
@@ -397,8 +396,7 @@
                 <select
                   id="evidence-type"
                   bind:value={evidence.type}
-                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info"
-                  class:border-danger/30={errors.type}
+                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info {errors.type ? 'border-danger/30' : ''}"
                   disabled={isReadonly}
                 >
                   <option value="document">Document</option>
@@ -420,8 +418,7 @@
                   bind:value={evidence.content}
                   placeholder="Enter evidence content or description"
                   rows={6}
-                  class="w-full px-3 py-2 border rounded-md bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-info"
-                  class:border-danger/30={errors.content}
+                  class="w-full px-3 py-2 border rounded-md bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-info {errors.content ? 'border-danger/30' : ''}"
                   disabled={isReadonly}
                 ></textarea>
                 {#if errors.content}
@@ -480,10 +477,8 @@
                 <div class="space-y-1">
                   <label class="block text-sm font-medium text-sand/80">File Upload</label>
                   <div
-                    class="border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer"
+                    class="border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer {dragOver ? 'bg-info/5' : ''} {!dragOver ? 'border-sand/20' : ''}"
                     class:border-info={dragOver}
-                    class:bg-info/5={dragOver}
-                    class:border-sand/20={!dragOver}
                     ondrop={handleFileDrop}
                     ondragover={(e) => { e.preventDefault(); dragOver = true; }}
                     ondragleave={() => { dragOver = false; }}

@@ -140,8 +140,7 @@
             type="text"
             bind:value={title}
             placeholder="Enter a descriptive title for the case"
-            class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info"
-            class:border-danger/30={errors.title}
+            class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info {errors.title ? 'border-danger/30' : ''}"
           />
           {#if errors.title}
             <p class="text-sm text-danger">{errors.title}</p>
@@ -174,8 +173,7 @@
           bind:value={description}
           rows={4}
           placeholder="Provide a detailed description of the case"
-          class="w-full px-3 py-2 border rounded-md bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-info"
-          class:border-danger/30={errors.description}
+          class="w-full px-3 py-2 border rounded-md bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-info {errors.description ? 'border-danger/30' : ''}"
         ></textarea>
         {#if errors.description}
           <p class="text-sm text-danger">{errors.description}</p>
@@ -188,8 +186,7 @@
           id="case-due-date"
           type="date"
           bind:value={dueDate}
-          class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info"
-          class:border-danger/30={errors.dueDate}
+          class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info {errors.dueDate ? 'border-danger/30' : ''}"
         />
         {#if errors.dueDate}
           <p class="text-sm text-danger">{errors.dueDate}</p>

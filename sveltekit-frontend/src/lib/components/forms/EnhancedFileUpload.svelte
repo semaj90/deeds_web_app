@@ -291,9 +291,8 @@
     <div class="p-4 space-y-6">
       <!-- Drop Zone -->
       <div
-        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer border-sand/20 hover:border-info/80"
+        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer border-sand/20 hover:border-info/80 {isDragOver ? 'bg-info/5' : ''}"
         class:border-info={isDragOver}
-        class:bg-info/5={isDragOver}
         class:opacity-50={disabled}
         class:cursor-not-allowed={disabled}
         ondragover={handleDragOver}

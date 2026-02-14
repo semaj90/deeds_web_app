@@ -184,12 +184,9 @@
 							{title}
 							{#if legalContext?.aiAnalysis}
 								<span
-									class="px-2 py-1 text-xs rounded-full"
-									class:bg-accent/10={legalContext.aiAnalysis.riskLevel === 'low'}
+									class="px-2 py-1 text-xs rounded-full {legalContext.aiAnalysis.riskLevel === 'low' ? 'bg-accent/10' : ''} {legalContext.aiAnalysis.riskLevel === 'medium' ? 'bg-warning/10' : ''} {legalContext.aiAnalysis.riskLevel === 'high' ? 'bg-danger/10' : ''}"
 									class:text-accent={legalContext.aiAnalysis.riskLevel === 'low'}
-									class:bg-warning/10={legalContext.aiAnalysis.riskLevel === 'medium'}
 									class:text-warning={legalContext.aiAnalysis.riskLevel === 'medium'}
-									class:bg-danger/10={legalContext.aiAnalysis.riskLevel === 'high'}
 									class:text-danger={legalContext.aiAnalysis.riskLevel === 'high'}
 								>
 									AI: {Math.round((legalContext.aiAnalysis.confidence ?? 0) * 100)}%

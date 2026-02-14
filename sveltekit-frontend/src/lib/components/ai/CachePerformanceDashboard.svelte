@@ -861,7 +861,7 @@
   .text-warning { color: #eab308; }
   .text-warning { color: #f97316; }
   .text-danger { color: #ef4444; }
-  .text-sand/60 { color: #6b7280; }
+  .text-sand-60 { color: #6b7280; }
   .animate-spin {
     animation: spin 1s linear infinite;
   }

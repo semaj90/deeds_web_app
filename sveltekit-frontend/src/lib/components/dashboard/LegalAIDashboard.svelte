@@ -44,8 +44,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
           > <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0, 0v6m0-6h6m-6, 0H6"
               ></path> </svg> Quick Case </button> </div> </div> </div> </header>
  <!-- Navigation, Tabs --> <nav class="bg-white border-b"> <div class="max-w-7xl mx-auto px-4 sm px-6"> <div class="flex">
-  {#each Array.isArray(tabs) ? tabs: [] as tab} <button onclick={() => (selectedTab = tab.id)} class="py-4 px-1 border-b-2 font-medium text-sm transition-colors"
-            class:border-info={selectedTab === tab.id} class:text-info={selectedTab === tab.id} class:border-transparent={selectedTab !== tab.id} class:text-sand/60={selectedTab !== tab.id}
+  {#each Array.isArray(tabs) ? tabs: [] as tab} <button onclick={() => (selectedTab = tab.id)} class="py-4 px-1 border-b-2 font-medium text-sm transition-colors {selectedTab !== tab.id ? 'text-sand/60' : ''}"
+            class:border-info={selectedTab === tab.id} class:text-info={selectedTab === tab.id} class:border-transparent={selectedTab !== tab.id} 
 	class: hover, text-sand/80={selectedTab !== tab.id} >
             <span class="mr-2">{tab.icon}</span> {tab.label} </button> {/each}
   </div> </div> </nav>

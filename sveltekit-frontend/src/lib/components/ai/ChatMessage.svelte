@@ -113,10 +113,9 @@
 
   <div class="message-content-wrapper flex flex-col max-w-[80%]">
     <div
-      class="message-bubble rounded-lg px-4 py-2.5"
+      class="message-bubble rounded-lg px-4 py-2.5 {!isUser ? 'bg-sand/10' : ''}"
       class:bg-info={isUser}
       class:text-white={isUser}
-      class:bg-sand/10={!isUser}
     >
       {#if isProactive}
         <div class="flex items-center gap-1 text-xs opacity-70 mb-1">

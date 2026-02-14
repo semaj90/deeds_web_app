@@ -311,14 +311,9 @@ import Button from '$lib/components/ui/Button.svelte';
 					<div
 						role="button"
 						tabindex="0"
-						class="relative border-2 border-dashed rounded-lg p-8 transition-all cursor-pointer"
+						class="relative border-2 border-dashed rounded-lg p-8 transition-all cursor-pointer {dragOver ? 'bg-info/5 dark:bg-info/10' : ''} {!dragOver && !$file ? 'border-sand/20' : ''} {$file ? 'bg-accent/5 dark:bg-accent/10' : ''}"
 						class:border-info={dragOver}
-						class:bg-info/5={dragOver}
-						class:dark:bg-info/10={dragOver}
-						class:border-sand/20={!dragOver && !$file}
 						class:border-accent={$file}
-						class:bg-accent/5={$file}
-						class:dark:bg-accent/10={$file}
 						ondrop={onDrop}
 						ondragover={onDragOver}
 						ondragleave={onDragLeave}

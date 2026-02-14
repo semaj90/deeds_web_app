@@ -119,11 +119,9 @@
       onclick={() => isExpanded = !isExpanded}
       onmouseenter={() => isHovered = true}
       onmouseleave={() => isHovered = false}
-      class="relative group p-4 bg-gradient-to-br from-panel via-panelSoft to-panel border-2 border-sand/30/50 rounded-full shadow-2xl hover:border-sand/30/70 hover:shadow-info/20 transition-all duration-300 transform hover:scale-105 active:scale-95"
+      class="relative group p-4 bg-gradient-to-br from-panel via-panelSoft to-panel border-2 border-sand/30/50 rounded-full shadow-2xl hover:border-sand/30/70 hover:shadow-info/20 transition-all duration-300 transform hover:scale-105 active:scale-95 {aiMode === 'active' ? 'shadow-accent/30 border-accent/60/70' : ''}"
       class:animate-pulse={aiMode === 'idle' && pulseAnimation}
       class:animate-bounce={aiMode === 'thinking'}
-      class:shadow-accent/30={aiMode === 'active'}
-      class:border-accent/60/70={aiMode === 'active'}
       aria-label={isExpanded ? 'Close AI Menu' : 'Open AI Assistant'}
       aria-expanded={isExpanded}
     >

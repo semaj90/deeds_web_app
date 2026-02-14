@@ -121,8 +121,8 @@ stream: false }); if (!result?.success) {
               class:bg-primary={message.role === 'user'} class:bg-muted={message.role === 'assistant' || message.role === 'system'} class:text-primary-foreground={message.role === 'user'} >
   {#if message.role === 'user'} ðŸ‘¤ {:else if message.role === 'system'} âš™ï¸ {:else} ðŸ¤– {/if}
   </div>
- <div class="max-w-[70%] p-3"
-              class:bg-primary={message.role === 'user'} class:text-primary-foreground={message.role === 'user'} class:bg-muted={message.role === 'assistant' || message.role === 'system'} class:border-danger/20={message.isError} class:bg-danger/5={message.isError} >
+ <div class="max-w-[70%] p-3 {message.isError ? 'border-danger/20 bg-danger/5' : ''}"
+              class:bg-primary={message.role === 'user'} class:text-primary-foreground={message.role === 'user'} class:bg-muted={message.role === 'assistant' || message.role === 'system'}  >
               <div class="prose prose-sm"> {message.content}
 </div>
  <div class="flex items-center justify-between mt-2 pt-2 border-t"> <div class="text-xs"> {new Date(message.timestamp).toLocaleTimeString()}

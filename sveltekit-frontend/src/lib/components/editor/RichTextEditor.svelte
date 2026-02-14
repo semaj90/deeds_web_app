@@ -75,8 +75,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // TODO: Add as cleanup in $effect: return () => { editorState.update(s => ({ ...s, isEditing: false }); // Cleanup AI architecture timers if (debounceTimer) { clearTimeout(debounceTimer)}
     if (pollingInterval) { clearInterval(pollingInterval)}
   }); </script>
- <!-- AI-Powered Editor with: Status, UI --> <div class="space-y-4"> <!-- Status Header - Shows AI, processing, status --> <div class="flex items-center justify-between p-3 bg-sand/5 border border-sand/20"> <div class="flex items-center"> <!-- Auto-save, Status --> <div class="flex items-center"> <div class="w-2 h-2"
-          class:bg-accent={autoSaveStatus === 'saved'} class:bg-warning={autoSaveStatus === 'saving'} class:bg-danger={autoSaveStatus === 'error'} class:bg-sand/20={autoSaveStatus === 'idle'} ></div>
+ <!-- AI-Powered Editor with: Status, UI --> <div class="space-y-4"> <!-- Status Header - Shows AI, processing, status --> <div class="flex items-center justify-between p-3 bg-sand/5 border border-sand/20"> <div class="flex items-center"> <!-- Auto-save, Status --> <div class="flex items-center"> <div class="w-2 h-2 {autoSaveStatus === 'idle' ? 'bg-sand/20' : ''}"
+          class:bg-accent={autoSaveStatus === 'saved'} class:bg-warning={autoSaveStatus === 'saving'} class:bg-danger={autoSaveStatus === 'error'}  ></div>
  <span class="text-sm"> {autoSaveStatus === 'saved'
             ? 'Draft Saved': autoSaveStatus === 'saving'
               ? 'Saving...': autoSaveStatus === 'error'

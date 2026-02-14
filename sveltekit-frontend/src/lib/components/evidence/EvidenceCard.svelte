@@ -121,23 +121,13 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between px-3 py-3 bg-sand/5 border-b">
 		<div
-			class="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border capitalize"
+			class="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border capitalize {evidenceType === 'document' ? 'bg-info/5 border-info/20' : ''} {evidenceType === 'image' ? 'bg-accent/5 border-accent/20' : ''} {evidenceType === 'video' ? 'bg-info/5 border-info/20' : ''} {evidenceType === 'audio' ? 'bg-warning/5 border-warning/20' : ''} {evidenceType === 'link' ? 'bg-info/5 border-info/20' : ''}"
 			data-type={evidenceType}
-			class:bg-info/5={evidenceType === 'document'}
 			class:text-info={evidenceType === 'document'}
-			class:border-info/20={evidenceType === 'document'}
-			class:bg-accent/5={evidenceType === 'image'}
 			class:text-accent={evidenceType === 'image'}
-			class:border-accent/20={evidenceType === 'image'}
-			class:bg-info/5={evidenceType === 'video'}
 			class:text-info={evidenceType === 'video'}
-			class:border-info/20={evidenceType === 'video'}
-			class:bg-warning/5={evidenceType === 'audio'}
 			class:text-warning={evidenceType === 'audio'}
-			class:border-warning/20={evidenceType === 'audio'}
-			class:bg-info/5={evidenceType === 'link'}
 			class:text-info={evidenceType === 'link'}
-			class:border-info/20={evidenceType === 'link'}
 		>
 			<IconComponent size={16} />
 			<span>{evidenceType}</span>

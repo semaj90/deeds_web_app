@@ -98,9 +98,9 @@ name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
   {#if !selectedFile && !isProcessing && !isCompleted} <div role="button"
         tabindex="0"
         aria-label="Drop files here to upload or click to select files"
-        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors border-sand/20"
+        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors border-sand/20 {dragOver ? 'bg-info/5' : ''}"
         class:border-info={ dragOver }
-	class:bg-info/5={ dragOver } ondrop={ handleFileDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
+	 ondrop={ handleFileDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
         <div class="space-y-4"> <div class="text-4xl">ðŸ“„</div>
  <div> <h3 class="text-lg">Upload Legal Evidence</h3>
  <p class="text-sm text-sand/60">Drag and drop a file here, or click to select</p> </div>
