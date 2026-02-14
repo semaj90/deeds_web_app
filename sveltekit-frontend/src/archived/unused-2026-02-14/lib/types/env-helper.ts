@@ -1,0 +1,51 @@
+import { env as privateEnv } from '$env/dynamic/private';
+import type { EnhancedEnv } from './env-enhanced.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
+const nodeEnv = typeof process !== 'undefined' ? (process.env as Record<string, string | undefined>)  : undefined;
+
+export const envHelper = {
+get: (key: string, defaultValue?: string): string | undefined => {
+return (nodeEnv && nodeEnv[key]) ?? (privateEnv && (privateEnv as Record<string, string | undefined>)[key]) ?? defaultValue;
+},
+	getBool: (key: string, defaultValue: boolean = false): boolean => {
+const value = envHelper.get(key);
+if (value === undefined) return defaultValue;
+return value.toLowerCase() === 'true' || value === '1';
+},
+	getNumber: (key: string, defaultValue: number = 0): number => {
+const value = envHelper.get(key);
+if (!value) return defaultValue;
+const parsed = parseInt(value, 10);
+return Number.isNaN(parsed) ? defaultValue : parsed;
+},
+	getRequired: (key: string): string => {
+const value = envHelper.get(key);
+if (!value) {
+throw new Error(`Required environment variable ${key} is not set`);
+}
+return value;
+},
+	getDatabaseUrl: (): string => {
+return (
+envHelper.get('DATABASE_URL') ||
+envHelper.get('POSTGRES_URL') ||
+`postgresql://legal_admin:123456@postgres:5432/legal_ai_db`
+);
+},
+	getRedisUrl: (): string => {
+return (
+envHelper.get('REDIS_URL') ||
+`redis://redis@redis:6379/0`
+);
+},
+	getOllamaUrl: (): string => {
+return (
+envHelper.get('OLLAMA_URL') ||
+envHelper.get('PUBLIC_OLLAMA_URL') ||
+'http://ollama:11434'
+);
+}
+};
+
+export type { EnhancedEnv };

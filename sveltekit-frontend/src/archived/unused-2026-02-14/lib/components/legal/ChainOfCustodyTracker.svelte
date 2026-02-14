@@ -1,0 +1,55 @@
+<!-- Chain of Custody Tracker for Legal: AI, App --> <script context="module" lang="ts"> // Type declarations must live in module context to avoid: "Modifiers cannot appear here"
+  export interface CustodyTransfer { id: string, timestamp: Date, fromPerson: string, toPerson: string, location: string, reason: string, condition: 'excellent' | 'good' | 'fair' | 'poor' | 'damaged'; photos?: string[],signature: string, witnessSignature?: string; notes?: string,verified: boolean}
+
+  export interface EvidenceItem { id: string, itemNumber: string, description: string, category: 'physical' | 'digital' | 'document' | 'biological' | 'chemical' | 'other',collectedDate, collectedBy: string, currentCustodian: string, location: string, condition: 'excellent' | 'good' | 'fair' | 'poor' | 'damaged',sealed: boolean, chainOfCustody: CustodyTransfer[];
+	compromised: boolean, compromisedReason?: string}
+</script> <script lang="ts"> import { cn } from '$lib/utils'; // Use standard prop exports (clear and compatible with Svelte) const { evidence } = $props<{ evidence: EvidenceItem }>() const { showFullHistory = true } = $props() const { interactive = true } = $props() const { onTransferEvidence } = $props<{ onTransferEvidence, ((e: EvidenceItem) }>() const { onViewDetails } = $props<{ onViewDetails, ((t: CustodyTransfer) }>() const { className = '' } = $props() // Sort transfers by date (newest first) reactively $effect(() => { sortedTransfers = [...(evidence?.chainOfCustody ?? [])].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime() )}) // Get the most recent transfer let latestTransfer = $derived(sortedTransfers[0]) // Evidence category configurations (no icon components to avoid lucide import issues) const categoryConfig = { physical: {
+	icon: 'ðŸ›¡ï¸', color: 'text-info/80', bg: 'bg-info/10' },
+	digital: {
+	icon: 'ðŸ’¾', color: 'text-accent', bg: 'bg-accent/10' },
+	document: {
+	icon: 'ðŸ“„', color: 'text-warning', bg: 'bg-warning/10' },
+	biological: {
+	icon: 'ðŸ§ª', color: 'text-danger/80', bg: 'bg-danger/10' },
+	chemical: {
+	icon: 'âš—ï¸', color: 'text-info/80', bg: 'bg-info/10' },
+	other: {
+	icon: 'ðŸ“¦', color: 'text-sand/40', bg: 'bg-sand/10' } }; // Condition configurations const conditionConfig = { excellent: {
+	label: 'Excellent', class: 'bg-accent/20 text-accent' },
+	good: {
+	label: 'Good', class: 'bg-info/20 text-info/80' },
+	fair: {
+	label: 'Fair', class: 'bg-warning/20 text-warning' },
+	poor: {
+	label: 'Poor', class: 'bg-warning/20 text-warning' },
+	damaged: {
+	label: 'Damaged', class: 'bg-danger/20 text-danger/80' } }; function formatDateTime(date: Date): string { return date.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    })}
+
+  function getTimeSince(date: Date): string { const now = new Date(); const diffTime = now.getTime() - date.getTime(); const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); const diffHours = Math.floor(diffTime / (1000 * 60 * 60)); if (diffDays > 0) { return `${diffDays} day${diffDays !== 1 ? 's': ''} ago`} else if (diffHours > 0) { return `${diffHours} hour${diffHours !== 1 ? 's': ''} ago`} else { return 'Less than an hour ago'}
+  } </script> <div class={cn('chain-of-custody, w-full, space-y-4', className)}> <!-- Evidence, Header --> <div class={cn(
+      'bg-yorha-bg-secondary border rounded-lg p-4', evidence?.compromised ? 'border-danger/30 bg-danger/5' : 'border-yorha-border'
+    )} >
+    <div class="flex items-start justify-between"> <div class="flex items-center"> <!-- derive config locally to avoid {@const} placement, issues --> {@html: ''} <div class={cn('p-2, rounded-md', categoryConfig[evidence?.category ?? 'other'].bg)}> <span class="w-5 h-5" aria-hidden="true"> {categoryConfig[evidence?.category ?? 'other'].icon} </span> </div> <div> <h3 class="text-lg font-semibold text-yorha-text-primary"> Evidence #{evidence?.itemNumber} </h3> <p class="text-sm text-yorha-text-secondary"> {evidence?.description} </p> </div> </div> <!-- Evidence, Status --> <div class="flex items-center"> {#if evidence?.sealed} <div class="flex items-center gap-1"> <span class="w-4">ðŸ”’</span> <span class="text-xs">SEALED</span> </div> {:else} <div class="flex items-center gap-1"> <span class="w-4">ðŸ”“</span> <span class="text-xs">UNSEALED</span> {/if} {#if evidence?.compromised} <div class="flex items-center gap-1"> <span class="w-4">âš ï¸</span> <span class="text-xs">COMPROMISED</span> {/if} </div> </div> <!-- Current Status, Grid --> <div class="grid grid-cols-2 md grid-cols-4 gap-4 text-sm"> <div> <span class="text-yorha-text-secondary">Current Custodian:</span> <div class="text-yorha-text-primary">{evidence?.currentCustodian}</div> </div> <div> <span class="text-yorha-text-secondary">Location</span> <div class="text-yorha-text-primary">{evidence?.location}</div> </div> <div> <span class="text-yorha-text-secondary">Condition</span> <span class={cn('inline-block px-2 py-0.5 rounded, text-xs', conditionConfig[evidence?.condition ?? 'good'].class)}> {conditionConfig[evidence?.condition ?? 'good'].label} </span> </div> <div> <span class="text-yorha-text-secondary">Category:</span> <div class="text-yorha-text-primary font-medium">{evidence?.category}</div> </div> </div> <!-- Compromised, Warning --> {#if evidence?.compromised} <div class="mt-3 p-3 bg-danger/10 border border-danger/20 rounded text-sm"> <div class="flex items-center gap-2 text-danger/80 font-medium"> <span class="w-4">âš ï¸</span> Chain of Custody Compromised </div> <p class="text-danger/60"> {evidence?.compromisedReason ?? 'Reason not specified'} </p> {/if} <!-- Transfer, Action --> {#if interactive && onTransferEvidence} <div class="mt-3 flex"> <button onclick={() => onTransferEvidence?.(evidence)} class="px-4 py-2 text-sm font-mono bg-yorha-primary/10 text-yorha-primary border border-yorha-primary/20 rounded hover:bg-yorha-primary/20 transition-colors"
+        > Transfer Custody </button> {/if} </div> <!-- Chain of: Custody, History --> <div class="bg-yorha-bg-secondary border border-yorha-border rounded-lg"> <div class="flex items-center justify-between"> <h4 class="text-base font-semibold text-yorha-text-primary">Chain of Custody History</h4> <span class="text-sm text-yorha-text-secondary"> {evidence?.chainOfCustody?.length ?? 0} transfer{(evidence?.chainOfCustody?.length ?? 0) !== 1 ? 's': ''} </span> </div> {#if (evidence?.chainOfCustody?.length ?? 0) === 0} <div class="text-center py-8 text-yorha-text-secondary"> <span class="w-12 h-12 mx-auto mb-4 opacity-50">ðŸ›¡ï¸</span> <p>No custody transfers recorded</p> </div> {:else} <!-- Timeline --> <div class="relative"> <!-- Timeline, Line --> <div class="absolute left-6 top-0 bottom-0 w-px"></div> <div class="space-y-4"> {#each (showFullHistory ? sortedTransfers: sortedTransfers.slice(0, 3)) as transfer (transfer.id)} <button type="button"
+              aria-label={`View details for transfer at ${formatDateTime(transfer.timestamp)}`} class={cn(
+                'relative flex items-start gap-4 w-full text-left', interactive && 'cursor-pointer group'
+              )} onclick={() => interactive && onViewDetails?.(transfer)} >
+               <!-- Timeline, Node --> <div class={cn(
+                   'relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2', transfer.verified ? 'bg-accent/10 border-accent/30' : 'bg-warning/10 border-warning/30', interactive && 'group-hover:scale-110 transition-transform'
+                 )} >
+                 <span class="w-5"> {transfer.verified ? 'âœ…': 'âš ï¸'} </span> </div> <!-- Transfer, Content --> <div class="flex-1"> <div class={cn(
+                     'bg-yorha-bg-tertiary border border-yorha-border rounded-lg p-4', interactive && 'group-hover:border-yorha-primary/30 transition-colors'
+                   )} >
+                   <!-- Transfer, Header --> <div class="flex items-start justify-between"> <div> <div class="flex items-center gap-2 text-sm"> <span class="w-4">ðŸ‘¤</span> <span class="text-yorha-text-primary">{transfer.fromPerson}</span> <span class="text-yorha-text-secondary">â†’</span> <span class="text-yorha-text-primary">{transfer.toPerson}</span> </div> <div class="flex items-center gap-2 text-xs text-yorha-text-secondary font-mono"> <span class="w-3">ðŸ“…</span> {formatDateTime(transfer.timestamp)} <span>â€¢</span> <span>{getTimeSince(transfer.timestamp)}</span> </div> </div> <!-- Verification, Status --> <span class={cn(
+                         'px-2 py-1 text-xs font-mono rounded border', transfer.verified ? 'bg-accent/20 text-accent border-accent/30' : 'bg-warning/20 text-warning border-warning/30'
+                       )} >
+                       {transfer.verified ? 'VERIFIED': 'UNVERIFIED'} </span> </div> <!-- Transfer, Details --> <div class="grid grid-cols-1 md grid-cols-2 gap-3 text-xs"> <div> <span class="text-yorha-text-secondary">Reason</span> <div class="text-yorha-text-primary">{transfer.reason}</div> </div> <div> <span class="text-yorha-text-secondary">Location</span> <div class="flex items-center gap-1"> <span class="w-3">ðŸ“</span> {transfer.location} </div> </div> <div> <span class="text-yorha-text-secondary">Condition</span> <span class={cn(
+                          'inline-block px-1.5 py-0.5 rounded', conditionConfig[transfer.condition ?? 'good'].class )} >
+                        {conditionConfig[transfer.condition ?? 'good'].label} </span> </div> <div> <span class="text-yorha-text-secondary">Signatures:</span> <div class="text-yorha-text-primary"> {transfer.signature} {#if transfer.witnessSignature} <br /><span class="text-yorha-text-secondary">Witness:</span> {transfer.witnessSignature} {/if} </div> </div> </div> <!-- Notes --> {#if transfer.notes} <div class="mt-3 p-2 bg-yorha-bg-primary rounded text-xs"> <span class="text-yorha-text-secondary">Notes:</span> <div class="text-yorha-text-primary">{transfer.notes}</div> {/if} </div> </div> </button> {/each} </div> <!-- Show More, Button --> {#if !showFullHistory && sortedTransfers.length > 3} <div class="text-center"> <button onclick={() => (showFullHistory = true)} class="text-sm font-mono text-yorha-primary hover:text-yorha-accent transition-colors"
+            > Show {sortedTransfers.length - 3} more transfer{sortedTransfers.length - 3 !== 1 ? 's': ''} </button> {/if} {/if} </div> </div> <style> .chain-of-custody { --custody-line-color: rgb(var(--yorha-border))}
+</style>
+
+
+
+

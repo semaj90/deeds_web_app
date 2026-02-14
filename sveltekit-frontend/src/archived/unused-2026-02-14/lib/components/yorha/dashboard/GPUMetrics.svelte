@@ -1,0 +1,221 @@
+<script lang="ts">
+  import { appStore } from '$lib/stores/app-store';
+  import { webgpu } from '$lib/webgpu/webgpu-init';
+  // Migrated to $effect
+
+  let gpuMetrics = $state({
+    utilization: 0,
+    memoryUsed: 0,
+    memoryTotal: 8, // GB
+    temperature: 65,
+    powerDraw: 150,
+    fanSpeed: 45
+  });
+
+  let performanceHistory = $state(Array.from({ length: 20 },
+	() => ({
+    time: 0,
+    utilization: 0,
+    memory: 0
+  })));
+
+  let loading = $state(true);
+  let error: string | null = $state(null);
+
+  async function loadGPUMetrics() {
+    try {
+      loading = true;
+      error = null;
+
+      // Load GPU metrics from API
+      // await appStore.loadSystemMetrics(); // Assuming this updates the store
+
+      const metrics = ($appStore as any).systemMetrics?.gpu;
+
+      if (metrics) {
+        gpuMetrics = {
+          utilization: metrics.utilization ?? 0,
+          memoryUsed: metrics.memoryUsed || 0,
+          memoryTotal: metrics.memoryTotal || 8,
+          temperature: metrics.temperature || 65,
+          powerDraw: metrics.powerDraw || 150,
+          fanSpeed: metrics.fanSpeed || 45
+        };
+
+        // Update performance history
+        performanceHistory = [
+          ...performanceHistory.slice(1),
+          {
+            time: Date.now(),
+            utilization: gpuMetrics.utilization,
+            memory: (gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100
+          }
+        ];
+      } else {
+        // Fallback or just skip if no metrics found yet
+        simulateMetrics();
+      }
+
+    } catch (err) {
+      console.error('Failed to load GPU metrics:', err);
+      error = 'Failed to load GPU metrics';
+      simulateMetrics();
+    } finally {
+      loading = false;
+    }
+  }
+
+  function simulateMetrics() {
+    gpuMetrics = {
+      utilization: Math.floor(Math.random() * 40) + 30,
+      memoryUsed: Math.random() * 2 + 4,
+      memoryTotal: 8,
+      temperature: Math.floor(Math.random() * 10) + 60,
+      powerDraw: Math.floor(Math.random() * 50) + 120,
+      fanSpeed: Math.floor(Math.random() * 20) + 40
+    };
+
+    performanceHistory = [
+      ...performanceHistory.slice(1),
+      {
+        time: Date.now(),
+        utilization: gpuMetrics.utilization,
+        memory: (gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100
+      }
+    ];
+  }
+
+
+  $effect(() => {
+    let interval: NodeJS.Timeout;
+
+    const init = async () => {
+      try {
+        const capabilities = await webgpu.initialize();
+      } catch (error) {
+        console.warn('WebGPU initialization failed:', error);
+      }
+
+      await loadGPUMetrics();
+
+      // Update metrics periodically
+      interval = setInterval(async () => {
+        await loadGPUMetrics();
+      }, 5000); // Update every 5 seconds
+    };
+
+    init();
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  });
+
+  function getMetricColor(value: number, thresholds: {
+low: number, high: number }): string {
+    if (value >= thresholds.high) return 'text-danger/80';
+    if (value >= thresholds.low) return 'text-warning';
+    return 'text-accent';
+  }
+</script>
+
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
+ <div class="flex items-center justify-between mb-4">
+ <h2 class="text-xl font-semibold text-info">GPU Metrics</h2>
+ {#if loading}
+ <div class="w-4 h-4 border-2 border-info/80 border-t-transparent rounded-full animate-spin"></div>
+ {/if}
+ </div>
+
+ {#if error}
+ <div class="text-center py-4 mb-4">
+ <div class="text-danger/80 text-sm">⚠️ {error}</div>
+ </div>
+ {/if}
+
+ <div class="space-y-4">
+ <!-- GPU Utilization -->
+ <div>
+ <div class="flex justify-between text-sm mb-1">
+ <span class="text-sand/40">GPU Utilization</span>
+ <span class="{getMetricColor(gpuMetrics.utilization, {low: 60, high: 85})}">{gpuMetrics.utilization}%</span>
+ </div>
+ <div class="w-full bg-panelSoft rounded-full h-2">
+ <div
+ class="h-2 rounded-full bg-info/80 transition-all duration-300"
+ style="width: {gpuMetrics.utilization}%"
+ ></div>
+ </div>
+ </div>
+
+ <!-- Memory Usage -->
+ <div>
+ <div class="flex justify-between text-sm mb-1">
+ <span class="text-sand/40">VRAM Usage</span>
+ <span class="{getMetricColor((gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100, {low: 70, high: 90})}">
+ {gpuMetrics.memoryUsed.toFixed(1)} / {gpuMetrics.memoryTotal} GB
+ </span>
+ </div>
+ <div class="w-full bg-panelSoft rounded-full h-2">
+ <div
+ class="h-2 rounded-full bg-accent/80 transition-all duration-300"
+ style="width: {(gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100}%"
+ ></div>
+ </div>
+ </div>
+
+ <!-- Temperature -->
+ <div class="grid grid-cols-3 gap-4 text-center">
+ <div class="bg-panelSoft/30 rounded-lg p-3">
+ <div class="text-lg font-bold {getMetricColor(gpuMetrics.temperature {low: 70 high: 85})}">
+ {gpuMetrics.temperature}°C
+ </div>
+ <div class="text-xs text-sand/40">Temperature</div>
+ </div>
+
+ <div class="bg-panelSoft/30 rounded-lg p-3">
+ <div class="text-lg font-bold text-info/80">{gpuMetrics.powerDraw}W</div>
+ <div class="text-xs text-sand/40">Power Draw</div>
+ </div>
+
+ <div class="bg-panelSoft/30 rounded-lg p-3">
+ <div class="text-lg font-bold text-info/80">{gpuMetrics.fanSpeed}%</div>
+ <div class="text-xs text-sand/40">Fan Speed</div>
+ </div>
+ </div>
+
+ <!-- Performance History (Mini Chart) -->
+ <div class="pt-4 border-t border-sand/50">
+ <h3 class="text-sm font-medium text-sand/40 mb-3">Performance History</h3>
+ <div class="h-16 bg-panelSoft/30 rounded flex items-end space-x-1 p-2">
+ {#each performanceHistory as point}
+ <div
+ class="bg-info/60 rounded-sm flex-1 transition-all duration-200"
+ style="height: {point.utilization}%"
+ ></div>
+ {/each}
+ </div>
+ <div class="flex justify-between text-xs text-sand/40 mt-1">
+ <span>Utilization %</span>
+ <span>Last 100s</span>
+ </div>
+ </div>
+
+ <!-- GPU Capabilities -->
+ <div class="pt-4 border-t border-sand/50">
+ <h3 class="text-sm font-medium text-sand/40 mb-2">Active Capabilities</h3>
+ <div class="flex flex-wrap gap-1">
+ <span class="px-2 py-1 bg-info/20 text-info text-xs rounded">WebGPU</span>
+ <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Compute Shaders</span>
+ <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">Tensor Ops</span>
+ <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">Vector Search</span>
+ {#if appStore.systemMetrics?.gpu?.model}
+ <span class="px-2 py-1 bg-warning/20 text-warning text-xs rounded">{appStore.systemMetrics.gpu.model}</span>
+ {/if}
+ </div>
+ </div>
+ </div>
+</div>
+
+
+

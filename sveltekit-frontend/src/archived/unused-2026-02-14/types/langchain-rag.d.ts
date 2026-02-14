@@ -1,0 +1,17 @@
+declare module '$lib/ai/langchain-rag' {
+ // Optional factory functions
+ export const getVectorStore: (() => Promise<unknown> | unknown) | undefined;
+ export const createVectorStore: (() => Promise<unknown> | unknown) | undefined;
+
+ // Default export
+ const _default: unknown;
+ export default _default;
+
+ // Named export const vectorStore: unknown;
+
+ // Allow additional exports
+ export const __esModule: boolean;
+ export const extras: { [key: string]: unknown };
+}
+
+

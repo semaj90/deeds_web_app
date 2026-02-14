@@ -1,0 +1,552 @@
+/**
+ * SvelteKit GPU Cache Integration - SSR + Client Cache Orchestration
+ * Provides seamless integration between server-side GPU caching and client-side caching
+ * Integrates: IndexedDB, LokiJS: User History, Predictive Prefetch
+ */
+
+import { browser } from '$app/environment';
+import { page } from '$app/stores';
+import { writable, derived } from 'svelte/store';
+import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
+// === Client Cache Configuration ===
+export interface ClientCacheConfig {
+	indexedDB: { dbName: string;
+		version: number; maxSizeMB: number;
+		autoCleanup: boolean;
+	};
+	lokiJS: { enableMemoryCache: boolean;
+		maxMemoryMB: number; persistInterval: number;
+	};
+	prefetch: { enabled: boolean;
+		maxConcurrentRequests: number; predictiveThreshold: number;
+	};
+	userHistory: { trackingEnabled: boolean;
+		maxEntriesPerUser: number; syncInterval: number;
+	};
+	ssr: { hydrateFromCache: boolean;
+		preloadCriticalData: boolean; serverCacheTimeout: number;
+	};
+}
+
+// === Cache Entry Types ===
+export interface ClientCacheEntry {
+	id: string; data: Record<string, unknown>;
+	metadata: { timestamp: number;
+		source: 'server' | 'client' | 'prefetch';
+		hitCount: number; lastAccessed: number;
+		size: number; compressed: boolean;
+		priority: number;
+	};
+	tags: string[];
+	embedding?: Float32Array;
+	userContext?: { userId: string;
+		sessionId: string; preferences: unknown;
+	};
+}
+
+// === Svelte Stores for Cache State ===
+export const cacheState = writable({
+	isInitialized: false,
+	serverConnected: false,
+	clientCacheSize: 0,
+	indexedDBSize: 0,
+	lokiJSSize: 0,
+	totalHits: 0,
+	totalMisses: 0,
+	hitRatio: 0,
+	lastSync: 0,
+	prefetchQueue: 0,
+	userHistorySize: 0
+});
+
+export const cacheMetrics = writable({
+	performance: { serverLatency: 0,
+		clientLatency: 0,
+		indexedDBLatency: 0,
+		compressionRatio: 0
+	},
+	storage: { indexedDBUsageMB: 0,
+		lokiJSUsageMB: 0,
+		compressionSavingsMB: 0
+	},
+	predictions: { prefetchAccuracy: 0,
+		rlOptimizationGain: 0,
+		userBehaviorPrediction: 0
+	}
+});
+
+// RPC client type
+interface GPUCacheRPCClient {
+	connect?: () => Promise<void>;
+	disconnect?: () => Promise<void>;
+	retrieve?: (key: string, opts?: unknown) => Promise<unknown>;
+	store?: (key: string, data: unknown, opts?: unknown) => Promise<void>;
+	updateUserHistory?: (userId: string, action: string, history: unknown[]) => Promise<void>;
+}
+
+// === SvelteKit GPU Cache Integration ===
+export class SvelteKitGPUCacheIntegration {
+	private config: ClientCacheConfig;
+	private rpcClient: GPUCacheRPCClient = {};
+	private indexedDB: IDBDatabase | null = null;
+	private lokiJS: unknown = null;
+	private prefetchWorker: Worker | null = null;
+	private isInitialized = false;
+	private serverConnected = false;
+	private memoryCache = new Map<string, ClientCacheEntry>();
+	private userHistory = new Map<string, unknown[]>();
+	private prefetchQueue = new Set<string>();
+	private metrics = {
+		hits: { server: 0, client: 0, indexeddb: 0, memory: 0 },
+		misses: 0,
+		prefetchHits: 0,
+		latencies: [] as number[],
+		startTime: Date.now()
+	};
+
+	constructor(config: ClientCacheConfig) {
+		this.config = config;
+	}
+
+	async initialize(): Promise<void> {
+		if (this.isInitialized) return;
+
+		try {
+			if (browser) {
+				await this.initializeIndexedDB();
+			}
+			this.isInitialized = true;
+			this.updateCacheState();
+			console.log('✅ SvelteKit GPU Cache initialized');
+		} catch (error) {
+			console.error('Failed to initialize cache:', error);
+		}
+	}
+
+	// === Client-Side Cache Operations ===
+	async get(
+		key: string,
+		options: {
+			userId?: string;
+			useGPUCache?: boolean;
+			enablePrefetch?: boolean;
+			priority?: 'high' | 'normal' | 'low';
+		} = {}
+	): Promise<unknown> {
+		const startTime = performance.now();
+
+		try {
+			// Memory cache
+			const memoryEntry = this.memoryCache.get(key);
+			if (memoryEntry) {
+				memoryEntry.metadata.hitCount++;
+				memoryEntry.metadata.lastAccessed = Date.now();
+				this.metrics.hits.memory++;
+				const latency = performance.now() - startTime;
+				this.updateLatencyMetrics('client', latency);
+				console.log(`💾 Memory hit: ${key} (${latency.toFixed(2)}ms)`);
+				return memoryEntry.data;
+			}
+
+			// IndexedDB
+			if (browser) {
+				const indexedDBEntry = await this.getFromIndexedDB(key);
+				if (indexedDBEntry) {
+					this.memoryCache.set(key, indexedDBEntry);
+					this.metrics.hits.indexeddb++;
+					const latency = performance.now() - startTime;
+					this.updateLatencyMetrics('client', latency);
+					console.log(`🗃️ IndexedDB hit: ${key} (${latency.toFixed(2)}ms)`);
+					return indexedDBEntry.data;
+				}
+			}
+
+			// Service call simulation if RPC is connected
+			if (options.useGPUCache !== false && this.serverConnected) {
+				const serverEntry = await this.safeRpcRetrieve(key, { userId: options.userId });
+
+				if (serverEntry) {
+					this.metrics.hits.server++;
+					const clientEntry: ClientCacheEntry = {
+						id: key,
+						data: serverEntry as Record<string, unknown>,
+						metadata: { timestamp: Date.now(),
+							source: 'server',
+							hitCount: 1,
+							lastAccessed: Date.now(),
+							size: JSON.stringify(serverEntry).length,
+							compressed: false,
+							priority: options.priority === 'high' ? 1 : 0.5
+						},
+						tags: [],
+						userContext: options.userId
+							? {
+									userId: options.userId,
+									sessionId: this.generateSessionId(),
+									preferences: {}
+							  }
+							: undefined
+					};
+
+					this.memoryCache.set(key, clientEntry);
+					if (browser) {
+						await this.storeInIndexedDB(key, clientEntry);
+					}
+
+					const latency = performance.now() - startTime;
+					this.updateLatencyMetrics('server', latency);
+					console.log(`📡 Server hit: ${key} (${latency.toFixed(2)}ms)`);
+					return serverEntry;
+				}
+			}
+
+			// Miss
+			this.metrics.misses++;
+			if (options?.enablePrefetch && browser) {
+				this.schedulePrefetch(key, options.userId).catch(() => {
+					/* no-op */
+				});
+			}
+
+			const latency = performance.now() - startTime;
+			console.log(`❌ Cache miss: ${key} (${latency.toFixed(2)}ms)`);
+			return null;
+		} catch (error) {
+			console.error(`Cache get error for ${key}:`, error);
+			return null;
+		} finally {
+			this.updateCacheState();
+		}
+	}
+
+	async set(
+		key: string,
+		data: Record<string, unknown>,
+		options: {
+			userId?: string;
+			tags?: string[];
+			storeOnServer?: boolean;
+			compression?: boolean;
+			ttl?: number;
+			priority?: 'high' | 'normal' | 'low';
+		} = {}
+	): Promise<void> {
+		try {
+			const size = JSON.stringify(data).length;
+
+			const clientEntry: ClientCacheEntry = {
+				id: key,
+				data: options.compression ? await this.compressData(data) : data,
+				metadata: { timestamp: Date.now(),
+					source: 'client',
+					hitCount: 0,
+					lastAccessed: Date.now(),
+					size,
+					compressed: Boolean(options.compression),
+					priority: options.priority === 'high' ? 1 : options.priority === 'low' ? 0.2 : 0.5
+				},
+				tags: options?.tags || [],
+				userContext: options.userId
+					? {
+							userId: options.userId,
+							sessionId: this.generateSessionId(),
+							preferences: {}
+					  }
+					: undefined
+			};
+
+			this.memoryCache.set(key, clientEntry);
+
+			if (browser) {
+				await this.storeInIndexedDB(key, clientEntry);
+			}
+
+			if (options.storeOnServer) {
+				await this.safeRpcStore(key, data, {
+					tags: options.tags,
+					userId: options.userId,
+					compressionLevel: options.compression ? 6 : undefined
+				});
+			}
+
+			if (options.userId) {
+				this.updateUserHistory(options.userId, 'set', {
+					key,
+					size,
+					tags: options?.tags || []
+				});
+			}
+
+			console.log(`💾 Stored cache: ${key} (${size} bytes)`);
+		} catch (error) {
+			console.error(`Cache set error for ${key}:`, error);
+			throw error;
+		} finally {
+			this.updateCacheState();
+		}
+	}
+
+	// === Predictive Prefetch ===
+	private async schedulePrefetch(relatedKey: string, userId?: string): Promise<void> {
+		if (!this.config.prefetch?.enabled || this.prefetchQueue.has(relatedKey)) return;
+
+		try {
+			this.prefetchQueue.add(relatedKey);
+			setTimeout(async () => {
+				await this.executePrefetch(relatedKey, userId);
+			}, 100);
+		} catch (error) {
+			console.error('Prefetch schedule error:', error);
+		}
+	}
+
+	private async executePrefetch(key: string, userId?: string): Promise<void> {
+		try {
+			console.log(`🔮 Executing prefetch for: ${key}`);
+			const serverEntry = await this.safeRpcRetrieve(key, { userId });
+
+			if (serverEntry) {
+				const clientEntry: ClientCacheEntry = {
+					id: key,
+					data: serverEntry as Record<string, unknown>,
+					metadata: { timestamp: Date.now(),
+						source: 'prefetch',
+						hitCount: 0,
+						lastAccessed: Date.now(),
+						size: JSON.stringify(serverEntry).length,
+						compressed: false,
+						priority: 0.3
+					},
+					tags: ['prefetch']
+				};
+
+				this.memoryCache.set(key, clientEntry);
+				if (browser) {
+					await this.storeInIndexedDB(key, clientEntry);
+				}
+
+				this.metrics.prefetchHits++;
+				console.log(`✅ Prefetch successful: ${key}`);
+			}
+		} catch (error) {
+			console.warn(`⚠️ Prefetch failed for ${key}:`, error);
+		} finally {
+			this.prefetchQueue.delete(key);
+		}
+	}
+
+	// === User History ===
+	private updateUserHistory(userId: string, action: string, data: unknown): void {
+		if (!this.config.userHistory.trackingEnabled) return;
+
+		if (!this.userHistory.has(userId)) {
+			this.userHistory.set(userId, []);
+		}
+
+		const history = this.userHistory.get(userId)!;
+		history.push({
+			action,
+			data,
+			timestamp: Date.now(),
+			sessionId: this.generateSessionId()
+		});
+
+		if (history.length > this.config.userHistory.maxEntriesPerUser) {
+			history.splice(0, history.length - this.config.userHistory.maxEntriesPerUser);
+		}
+
+		if (history.length % 10 === 0) {
+			this.syncUserHistoryWithServer(userId).catch(() => {
+				/* no-op */
+			});
+		}
+	}
+
+	private async syncUserHistoryWithServer(userId: string): Promise<void> {
+		try {
+			const history = this.userHistory.get(userId);
+			if (!history || history.length === 0) return;
+
+			if (this.rpcClient && typeof this.rpcClient.updateUserHistory === 'function') {
+				await this.rpcClient.updateUserHistory(userId, 'bulk_sync', history);
+			}
+
+			console.log(`📊 Synced user history for ${userId}: ${history.length} entries`);
+		} catch (error) {
+			console.error('User history sync error:', error);
+		}
+	}
+
+	// === IndexedDB Operations ===
+	private async initializeIndexedDB(): Promise<void> {
+		if (!browser) return;
+
+		return new Promise((resolve, reject) => {
+			const request = indexedDB.open(this.config.indexedDB.dbName, this.config.indexedDB.version);
+
+			request.onerror = () => reject(request.error);
+
+			request.onsuccess = (event: Event) => {
+				this.indexedDB = (event.target as IDBOpenDBRequest).result;
+				console.log('✅ IndexedDB initialized');
+				resolve();
+			};
+
+			request.onupgradeneeded = (event: Event) => {
+				const db = (event.target as IDBOpenDBRequest).result;
+
+				if (!db.objectStoreNames.contains('cache_entries')) {
+					const cacheStore = db.createObjectStore('cache_entries', { keyPath: 'key' });
+					cacheStore.createIndex('timestamp', 'timestamp');
+					cacheStore.createIndex('tags', 'tags', { multiEntry: true });
+					cacheStore.createIndex('userId', 'userId');
+				}
+
+				if (!db.objectStoreNames.contains('user_history')) {
+					const historyStore = db.createObjectStore('user_history', { keyPath: 'id' });
+					historyStore.createIndex('userId', 'userId');
+					historyStore.createIndex('lastSync', 'lastSync');
+				}
+			};
+		});
+	}
+
+	private async getFromIndexedDB(key: string): Promise<ClientCacheEntry | null> {
+		if (!this.indexedDB) return null;
+
+		return new Promise((resolve) => {
+			const tx = this.indexedDB!.transaction('cache_entries', 'readonly');
+			const store = tx.objectStore('cache_entries');
+			const request = store.get(key);
+
+			request.onsuccess = () => resolve(request.result || null);
+			request.onerror = () => resolve(null);
+		});
+	}
+
+	private async storeInIndexedDB(key: string, entry: ClientCacheEntry): Promise<void> {
+		if (!this.indexedDB) return;
+
+		return new Promise((resolve) => {
+			const tx = this.indexedDB!.transaction('cache_entries', 'readwrite');
+			const store = tx.objectStore('cache_entries');
+			const request = store.put({ ...entry, key });
+
+			request.onsuccess = () => resolve();
+			request.onerror = () => resolve();
+		});
+	}
+
+	// === Helpers ===
+	private generateSessionId(): string {
+		return Math.random().toString(36).substring(2, 15);
+	}
+
+	private async compressData(data: Record<string, unknown>): Promise<Record<string, unknown>> {
+		return data; // Placeholder for compression logic
+	}
+
+	private async safeRpcRetrieve(key: string, _opts?: unknown): Promise<unknown> {
+		if (!this.rpcClient.retrieve) return null;
+		try {
+			return await this.rpcClient.retrieve(key);
+		} catch {
+			return null;
+		}
+	}
+
+	private async safeRpcStore(key: string, data: unknown, opts?: unknown): Promise<void> {
+		if (!this.rpcClient.store) return;
+		try {
+			await this.rpcClient.store(key, data, opts);
+		} catch {
+			// ignore
+		}
+	}
+
+	private updateLatencyMetrics(type: string, latency: number): void {
+		// Update stores logic here
+	}
+
+	private updateCacheState(): void {
+		// Update Svelte stores with current state
+		cacheState.update(s => ({
+			...s,
+			clientCacheSize: this.memoryCache.size,
+			isInitialized: this.isInitialized
+		}));
+	}
+
+	async preloadCriticalData(routes: string[]): Promise<void> {
+		if (!browser) return;
+		// Implementation for preloading
+	}
+}
+
+export function createDefaultClientCacheConfig(): ClientCacheConfig {
+	return {
+		indexedDB: { dbName: 'SvelteKitGPUCache',
+			version: 1,
+			maxSizeMB: 50,
+			autoCleanup: true
+		},
+		lokiJS: { enableMemoryCache: true,
+			maxMemoryMB: 100,
+			persistInterval: 30000
+		},
+		prefetch: { enabled: true,
+			maxConcurrentRequests: 3,
+			predictiveThreshold: 0.7
+		},
+		userHistory: { trackingEnabled: true,
+			maxEntriesPerUser: 1000,
+			syncInterval: 60000
+		},
+		ssr: { hydrateFromCache: true,
+			preloadCriticalData: true,
+			serverCacheTimeout: 300000
+		}
+	};
+}
+
+// === Singleton Instance ===
+export const svelteKitGPUCache = new SvelteKitGPUCacheIntegration(createDefaultClientCacheConfig());
+
+// === Svelte Actions and Utilities ===
+export function cacheAction(_node: HTMLElement): { destroy: () => void } {
+	return {
+		destroy() {
+			// Cleanup if needed
+		}
+	};
+}
+
+export const cacheLoader = derived([page], ([$page]) => {
+	return {
+		async loadData(key: string, fetcher: () => Promise<unknown>) {
+			const userId = ($page.data?.user as { id?: string })?.id;
+
+			const cached = await svelteKitGPUCache.get(key, {
+				userId,
+				enablePrefetch: true
+			});
+
+			if (cached) return cached;
+
+			const data = await fetcher();
+			await svelteKitGPUCache.set(key, data as Record<string, unknown>, {
+				userId,
+				compression: true
+			});
+
+			return data;
+		}
+	};
+});
+
+// === Auto-initialization ===
+if (browser) {
+	svelteKitGPUCache.initialize().catch(console.error);
+}

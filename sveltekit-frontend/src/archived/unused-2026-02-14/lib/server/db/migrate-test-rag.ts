@@ -1,0 +1,128 @@
+/**
+ * Test RAG Migration Script
+ * Creates test_rag_documents, test_rag_embeddings, test_rag_search_sessions tables
+ * Run: npx tsx src/lib/server/db/migrate-test-rag.ts
+ */
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { sql } from 'drizzle-orm';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
+const connectionString = process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const migrationClient = postgres(connectionString, { max: 1 });
+const db = drizzle(migrationClient);
+
+async function migrate(): Promise<void> {
+	console.log('🚀 Starting Test RAG migration...\n');
+	try {
+		// Enable pgvector extension if not already enabled
+		console.log('📦 Enabling pgvector extension...');
+		await db.execute(sql`CREATE EXTENSION IF NOT EXISTS vector;`);
+		console.log('✅ pgvector extension enabled\n');
+
+		// Create test_rag_documents table
+		console.log('📄 Creating test_rag_documents table...');
+		await db.execute(sql`
+			CREATE TABLE IF NOT EXISTS test_rag_documents (
+				id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+				filename TEXT NOT NULL,
+				content TEXT NOT NULL,
+				original_content TEXT,
+				metadata JSONB,
+				confidence REAL,
+				legal_analysis JSONB,
+				created_at TIMESTAMP DEFAULT NOW(),
+				updated_at TIMESTAMP DEFAULT NOW()
+			);
+		`);
+		console.log('✅ test_rag_documents table created\n');
+
+		// Create test_rag_embeddings table with pgvector
+		console.log('🔢 Creating test_rag_embeddings table with pgvector(768)...');
+		await db.execute(sql`
+			CREATE TABLE IF NOT EXISTS test_rag_embeddings (
+				id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+				document_id UUID REFERENCES test_rag_documents(id) ON DELETE CASCADE,
+				content TEXT NOT NULL,
+				embedding vector(768),
+				metadata JSONB,
+				created_at TIMESTAMP DEFAULT NOW()
+			);
+		`);
+		console.log('✅ test_rag_embeddings table created\n');
+
+		// Create test_rag_search_sessions table
+		console.log('🔍 Creating test_rag_search_sessions table...');
+		await db.execute(sql`
+			CREATE TABLE IF NOT EXISTS test_rag_search_sessions (
+				id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+				query TEXT NOT NULL,
+				query_embedding vector(768),
+				results JSONB,
+				search_type TEXT NOT NULL,
+				result_count INTEGER NOT NULL,
+				metadata JSONB,
+				created_at TIMESTAMP DEFAULT NOW()
+			);
+		`);
+		console.log('✅ test_rag_search_sessions table created\n');
+
+		// Create indexes for performance
+		console.log('⚡ Creating indexes...');
+
+		// HNSW index for vector similarity search (fast but approximate)
+		await db.execute(sql`
+			CREATE INDEX IF NOT EXISTS test_rag_embeddings_vector_idx ON test_rag_embeddings USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
+		`);
+		console.log('✅ Created HNSW index on embeddings (vector similarity)');
+
+		// B-tree indexes for common queries
+		await db.execute(sql`
+			CREATE INDEX IF NOT EXISTS test_rag_embeddings_document_id_idx ON test_rag_embeddings(document_id);
+		`);
+		console.log('✅ Created index on document_id');
+
+		await db.execute(sql`
+			CREATE INDEX IF NOT EXISTS test_rag_documents_created_at_idx ON test_rag_documents(created_at DESC);
+		`);
+		console.log('✅ Created index on created_at');
+
+		// GIN index for JSONB metadata searches
+		await db.execute(sql`
+			CREATE INDEX IF NOT EXISTS test_rag_documents_metadata_idx ON test_rag_documents USING gin(metadata jsonb_path_ops);
+		`);
+		console.log('✅ Created GIN index on metadata (JSONB)');
+
+		await db.execute(sql`
+			CREATE INDEX IF NOT EXISTS test_rag_documents_legal_analysis_idx ON test_rag_documents USING gin(legal_analysis jsonb_path_ops);
+		`);
+		console.log('✅ Created GIN index on legal_analysis (JSONB)\n');
+
+		// Verify tables exist
+		console.log('🔍 Verifying tables...');
+		const tables = await db.execute(sql`
+			SELECT table_name
+			FROM information_schema.tables
+			WHERE table_schema = 'public'
+			AND table_name LIKE 'test_rag%'
+			ORDER BY table_name;
+		`);
+
+		console.log('\n📊 Created tables: ');
+		tables.forEach((row: any) => {
+			console.log(` ✅ ${row.table_name}`);
+		});
+
+        await migrationClient.end();
+
+	} catch (err: unknown) {
+        await migrationClient.end();
+        throw err;
+    }
+}
+
+migrate().catch((err) => {
+	console.error('Fatal error: ', err);
+	process.exit(1);
+});
+

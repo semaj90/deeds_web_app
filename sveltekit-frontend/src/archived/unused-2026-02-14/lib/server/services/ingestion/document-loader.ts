@@ -1,0 +1,135 @@
+/**
+ * Document Loader
+ * Loads documents from local filesystem or MinIO bucket
+ */
+
+import { PDFFileLoader, type RawDocument } from './pdf-file-loader.js';
+import { processDocument, type ProcessedDocument } from './document-processor.js';
+import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
+export type { RawDocument };
+
+export class DocumentLoader {
+    private pdfLoader: PDFFileLoader;
+    private source: 'local' | 'minio' | 'both';
+
+    constructor(
+        localBasePath: string = './lawpdfs',
+        source: 'local' | 'minio' | 'both' = 'local',
+        minioClient?: any,
+        minioBucket?: string
+    ) {
+        this.pdfLoader = new PDFFileLoader(localBasePath, minioClient, minioBucket);
+        this.source = source;
+    }
+
+    /**
+     * Get document count from specified source
+     */
+    getDocumentCount(): number {
+        const stats = this.pdfLoader.getStats();
+        return stats.localPDFCount;
+    }
+
+    /**
+     * Get documents from local filesystem
+     */
+    async getLocalDocuments(limit: number = 100, offset: number = 0): Promise<RawDocument[]> {
+        return this.pdfLoader.loadLocalBatch(limit, offset);
+    }
+
+    /**
+     * Get documents from MinIO bucket
+     */
+    async getMinioDocuments(prefix: string = '', limit: number = 100): Promise<RawDocument[]> {
+        return this.pdfLoader.loadMinioBatch(prefix, limit);
+    }
+
+    /**
+     * Get documents based on configured source
+     */
+    async getDocuments(limit: number = 100, offset: number = 0): Promise<RawDocument[]> {
+        if (this.source === 'local') {
+            return this.getLocalDocuments(limit, offset);
+        } else if (this.source === 'minio') {
+            return this.getMinioDocuments('', limit);
+        } else {
+            // Try local first, then MinIO
+            const localDocs = await this.getLocalDocuments(limit, offset);
+            if (localDocs.length > 0) {
+                return localDocs;
+            }
+            return this.getMinioDocuments('', limit);
+        }
+    }
+
+    /**
+     * Get document by ID
+     */
+    async getDocumentById(_id: string): Promise<RawDocument | null> {
+        // For file-based sources, we'd need to track documents
+        // This is a placeholder for future implementation
+        console.warn('getDocumentById not implemented for file-based sources');
+        return null;
+    }
+
+    /**
+     * Process batch of documents
+     */
+    async processBatch(limit: number = 100, offset: number = 0): Promise<ProcessedDocument[]> {
+        const documents = await this.getDocuments(limit, offset);
+        const processed: ProcessedDocument[] = [];
+
+        for (const doc of documents) {
+            try {
+                if (!doc?.text || doc.text.trim().length === 0) {
+                    console.warn(`No text available for ${doc.id}`);
+                    continue;
+                }
+
+                const result = await processDocument(doc.id, doc.title, doc.text, doc.source);
+
+                processed.push(result);
+            } catch (error) {
+                console.error(`Error processing document ${doc.id}:`, error);
+            }
+        }
+
+        return processed;
+    }
+
+    /**
+     * Get processing statistics
+     */
+    getStats(): {
+	totalDocuments: number;
+        source: string;
+	minioConfigured: boolean;
+    } {
+        const stats = this.pdfLoader.getStats();
+        return {
+            totalDocuments: stats.localPDFCount,
+            source: this.source,
+            minioConfigured: stats.minioConfigured,
+        };
+    }
+
+    /**
+     * Close any open connections
+     */
+    close(): void {
+        // No persistent connections to close for file-based sources
+    }
+}
+
+/**
+ * Create document loader instance
+ */
+export async function createDocumentLoader(
+    localBasePath?: string,
+    source?: 'local' | 'minio' | 'both',
+    minioClient?: any,
+    minioBucket?: string
+): Promise<DocumentLoader> {
+    return new DocumentLoader(localBasePath, source, minioClient, minioBucket);
+}

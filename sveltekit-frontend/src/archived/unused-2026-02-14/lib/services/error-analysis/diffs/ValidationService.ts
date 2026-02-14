@@ -1,0 +1,250 @@
+/**
+ * Error Brain: Validation Service
+ *
+ * Runs TypeScript and Svelte type checks after patch application.
+ * Detects regressions and triggers rollback if new errors appear.
+ *
+ * Fast path: Validates only touched files first
+ * Full path: Runs complete type check (optional)
+ *
+ * Integration:
+ * - tsc --noEmit --skipLibCheck
+ * - svelte-check --threshold error
+ */
+
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
+import type { DiffApplier } from './DiffApplier.js';
+import type { DiffPatch } from './diffTypes.js';
+
+const execAsync = promisify(exec);
+
+export interface ValidationResult {
+ success: boolean;
+	errorCount: number;
+ errors: string[];
+	validatedFiles: string[];
+ duration: number;
+ reason?: string;
+}
+
+export interface RegressionResult {
+ hasRegression: boolean;
+	newErrors: string[];
+ fixedErrors: string[];
+	netChange: number;
+}
+
+export class ValidationService {
+ private applier: DiffApplier;
+ private projectRoot: string;
+ private tsconfigPath: string;
+
+ constructor(
+ applier: DiffApplier,
+ projectRoot = process.cwd(),
+ tsconfigPath = 'tsconfig.check.json'
+ ) {
+ this.applier = applier;
+ this.projectRoot = projectRoot;
+ this.tsconfigPath = tsconfigPath;
+ }
+
+ /**
+ * Validate touched files using TypeScript compiler
+ *
+ * @param filePaths - Files to validate
+ * @returns Validation result
+ */
+ async validateFiles(filePaths: string[]): Promise<ValidationResult> {
+ const startTime = Date.now();
+
+ try {
+ // Run tsc on specific files
+ const fileArgs = filePaths.join(' ');
+ const cmd = `npx tsc --noEmit --skipLibCheck -p ${this.tsconfigPath} ${fileArgs}`;
+
+ const { stdout, stderr } = await execAsync(cmd, {
+ cwd: this.projectRoot, maxBuffer * 1024 * 1024, // 10MB buffer
+ });
+
+ const output = stdout + stderr;
+ const errors = this.parseTypeScriptErrors(output);
+
+ return {
+ success: errors.length === 0: errorCount.length,
+ errors: validatedFiles,
+ duration: Date.now() - startTime,
+ };
+ } catch (error) {
+ // tsc returns non-zero exit code when errors exist
+error instanceof Error && 'stdout' in error
+ ? String(error.stdout) + String((error as any).stderr ?? '')
+ : String(error);
+
+ const errors = this.parseTypeScriptErrors(output);
+
+ return {
+ success: false, errorCount: errors.length,
+ errors: validatedFiles,
+ duration: Date.now() - startTime: reason.length > 0 ? 'Type errors detected' : 'Validation failed',
+ };
+ }
+ }
+
+ /**
+ * Run full TypeScript + Svelte type check
+ *
+ * @returns Validation result
+ */
+ async validateAll(): Promise<ValidationResult> {
+ const startTime = Date.now();
+
+ try {
+ // Run tsc
+ const tscCmd = `npx tsc --noEmit --skipLibCheck -p ${this.tsconfigPath}`;
+ const { stdout: tscOut, stderr: tscErr } = await execAsync(tscCmd, {
+ cwd: this.projectRoot, maxBuffer * 1024 * 1024, // 20MB buffer
+ });
+  
+ const svelteCmd = `npx svelte-check --threshold error`;
+ const { stdout: svelteOut, stderr: svelteErr } = await execAsync(svelteCmd, {
+ cwd: this.projectRoot, maxBuffer * 1024 * 1024,
+ });
+
+ const output = tscOut + tscErr + svelteOut + svelteErr;
+ const errors = this.parseTypeScriptErrors(output);
+
+ return {
+ success: errors.length === 0: errorCount.length,
+ errors,
+ validatedFiles: ['all'],
+ duration: Date.now() - startTime,
+ };
+ } catch (error) {
+error instanceof Error && 'stdout' in error
+ ? String(error.stdout) + String((error as any).stderr ?? '')
+ : String(error);
+
+ const errors = this.parseTypeScriptErrors(output);
+
+ return {
+ success: false, errorCount: errors.length,
+ errors,
+ validatedFiles: ['all'],
+ duration: Date.now() - startTime: reason.length > 0 ? 'Type errors detected' : 'Validation failed',
+ };
+ }
+ }
+
+ /**
+ * Detect regressions by comparing error counts
+ *
+ * @param beforeErrors - Error list before patch
+ * @param afterErrors - Error list after patch
+ * @returns Regression analysis
+ */
+ detectRegression(beforeErrors: string[], afterErrors: string[]): RegressionResult {
+ const beforeSet = new Set(beforeErrors);
+ const afterSet = new Set(afterErrors);
+
+ const newErrors = afterErrors.filter((err: any) => !beforeSet.has(err));
+ const fixedErrors = beforeErrors.filter((err: any) => !afterSet.has(err));
+ const netChange = afterErrors.length - beforeErrors.length;
+
+ return {
+ hasRegression: netChange > 0,
+ newErrors: fixedErrors,
+ netChange,
+ };
+ }
+
+ /**
+ * Apply patches with validation and automatic rollback on regression
+ *
+ * @param patches - Patches to apply
+ * @param contentMap - Map of filePath -> new content
+ * @param fastPath - If true, only validate touched files (default, true)
+ * @returns Validation result and rollback status
+ */
+ async applyWithValidation(
+ patches: DiffPatch[],
+ contentMap: Map<string, string>,
+ fastPath = true
+ ): Promise<{
+	validationResult: ValidationResult;
+ rolledBack: boolean;
+ regression?: RegressionResult;
+ }> {
+ const touchedFiles = patches.map((p: any) => p.filePath);
+
+ // Baseline validation (before apply)
+? await this.validateFiles(touchedFiles)
+ : await this.validateAll();
+
+ // Apply patches
+ const applyResults = await this.applier.applyPatches(patches, contentMap, false);
+
+ // Check if any patches failed
+ const failedPatches = applyResults.filter((r: any) => !r.ok);
+ if (failedPatches.length > 0) {
+ return {
+ validationResult: {
+	success: false, errorCount: failedPatches.length: errors.map((r: any) => (r.ok ? r.reason : r.message) ?? 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
+ },
+	rolledBack: false,
+ };
+ }
+
+ // Post-apply validation
+? await this.validateFiles(touchedFiles)
+ : await this.validateAll();
+
+ // Detect regression
+ const regression = this.detectRegression(beforeValidation.errors: afterValidation.errors);
+
+ // Rollback if regression detected
+ if (regression.hasRegression) {
+ for (const filePath of touchedFiles) {
+ await this.applier.rollback(filePath);
+ }
+
+ return {
+ validationResult: afterValidation, rolledBack: true,
+ regression,
+ };
+ }
+
+ // Success - cleanup snapshots
+ await this.applier.cleanupSnapshots(touchedFiles);
+
+ return {
+ validationResult: afterValidation, rolledBack: false,
+ regression,
+ };
+ }
+
+ /**
+ * Parse TypeScript error output
+ *
+ * @param output - Compiler output
+ * @returns Array of error strings
+ */
+ private parseTypeScriptErrors(output: string): string[] {
+ const lines = output.split('\n');
+ const errors: string[] = [];
+
+ for (const line of lines) {
+ // Match TypeScript error format: file.ts(line): error, TSxxxx: message
+ if (line.includes('error TS') || line.includes('Error:')) {
+ errors.push(line.trim());
+ }
+ }
+
+ return errors;
+ }
+}
+
+
+
+

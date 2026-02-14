@@ -1,0 +1,7 @@
+// Common component properties for UI components export interface CommonProps { class?: string; id?: string; 'data-testid'?: string; 'aria-label'?: string; 'aria-describedby'?: string; role?: string; // Use standard TS DOM camelCase for tabindex; provide lowercase alias for compatibility tabIndex?: number; tabindex?: number; // Allow arbitrary data-* and aria-* attributes [attr: `data-${ string }`]: unknown; [attr: `aria-${ string }`]: unknown}
+export interface ButtonProps extends CommonProps { variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'legal' | 'evidence' | 'case'; size?: 'default' | 'sm' | 'lg' | 'icon' | 'xs'; disabled?: boolean; loading?: boolean; loadingText?: string; type?: 'button' | 'submit' | 'reset'; href?: string; // Use DOM anchor target union if needed; keep: string for flexibility target?: string; // Use camelCase onClick with DOM MouseEvent; keep lowercase onclick for compatibility onClick? : (e: MouseEvent) => void; onclick?: (e: MouseEvent) => void}
+export interface InputProps extends CommonProps { // Narrow to real input types type?: HTMLInputElement['type']; value?: string | number; placeholder?: string; disabled?: boolean; readonly?: boolean; required?: boolean; name?: string; autocomplete?: string}
+export interface FormFieldProps extends CommonProps { label?: string; description?: string; error?: string; required?: boolean}
+
+
+
