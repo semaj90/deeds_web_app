@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Legal AI Chat Testing', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the AI chat page
-    await page.goto('http://localhost:5173/ai-chat');
+    await page.goto('/chat');
 
     // Wait for the page to load
     await page.waitForLoadState('networkidle');

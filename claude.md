@@ -17,6 +17,41 @@
 
 ---
 
+## 🚨 Phase 99 @migration-task Corruption (February 13, 2026)
+
+**Problem**: Phase 99 Svelte 5 auto-migration tool (`0a2bd98929`) corrupted **83 active `.svelte` component files** in `src/lib/components/`. The tool left `@migration-task Error` comments and mangled code (compressed to single lines, `0%` corruption, broken syntax).
+
+**Scope**:
+- **83 active `.svelte` files** with `@migration-task` corruption (plus 282 backup files)
+- **54 have clean originals** at commit `fa8498dc4a` (pre-Phase 99)
+- **29 were created after** `fa8498dc4a` (no clean version to restore)
+- **Only ~5 are imported by active routes** (94% are dead code / unused components)
+
+**Clean version commit**: `fa8498dc4a` ("fix(typescript): resolve compilation errors")
+- Files at this commit were already Svelte 5-compatible (no `export let`, no `on:click`, no `$:`)
+- Properly formatted, readable code with correct imports
+
+**Corruption commit**: `0a2bd98929` ("Phase 99: Svelte 5 Auto-Migration - 80% error reduction")
+- Tool compressed code to single lines
+- Injected `@migration-task Error` comments at top of files
+- Replaced `{}` with `0%` throughout
+- Broke import patterns with unsafe runtime fallbacks
+
+**Route-Imported Components** (fix these first):
+- `SuggestionsList` → `phase78/routes/[routePath]/+page.svelte`
+- Other 78 components are NOT imported by any route
+
+**Restoration Strategy**:
+1. Restore 54 files from `fa8498dc4a` using `git show fa8498dc4a:sveltekit-frontend/<path>`
+2. Convert restored files to Svelte 5 runes (`$props`, `$state`, `$derived`, `$effect`)
+3. Update imports (bits-ui v2 namespace, Button default import)
+4. For 29 files without clean originals: rewrite from scratch or archive as dead code
+5. Focus on route-imported components first, archive the rest
+
+**DO NOT**: Run the Phase 99 migration tool again. Manual conversion is safer.
+
+---
+
 ## 🚀 February 8, 2026 – Production-Ready Legal AI Platform Guide
 
 ### 📚 Architecture Overview

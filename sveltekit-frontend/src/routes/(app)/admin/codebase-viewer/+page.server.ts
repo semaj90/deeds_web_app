@@ -1,20 +1,23 @@
-import { QdrantClient } from '@qdrant/js-client-rest';
-import { Pool } from 'pg';
 import type { PageServerLoad } from './$types';
 
-const db = new Pool({
-	user: 'legal_admin',
-	password: '123456',
-	host: 'localhost',
-	port: 5434,
-	database: 'legal_ai_db'
-});
-
-const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
+const EMPTY_DATA = {
+	qdrant: { collections: [], totalPoints: 0 },
+	postgres: { embeddings: [], timeline: [], stats: { total_files: 0, total_errors: 0, embedding_coverage: 0, unique_error_codes: 0 } },
+	error: null as string | null,
+};
 
 export const load: PageServerLoad = async () => {
+	let qdrantData = { collections: [] as any[], totalPoints: 0 };
+	let pgEmbeddings: any[] = [];
+	let pgTimeline: any[] = [];
+	let pgStats: any = { total_files: 0, total_errors: 0, embedding_coverage: 0 };
+	const errors: string[] = [];
+
+	// Try Qdrant (may not be running)
 	try {
-		// Get Qdrant collections
+		const { QdrantClient } = await import('@qdrant/js-client-rest');
+		const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
+
 		const collections = await qdrant.getCollections();
 		const collectionStats = await Promise.all(
 			collections.collections.map(async (col) => {
@@ -28,60 +31,72 @@ export const load: PageServerLoad = async () => {
 			})
 		);
 
-		// Get PostgreSQL embedded files
-		const pgEmbeddings = await db.query(`
-			SELECT
-				source,
-				COUNT(*) as error_count,
-				MAX(indexed_at) as last_indexed,
-				ARRAY_AGG(DISTINCT error_code) as error_codes
-			FROM raw_error_embeddings
-			WHERE source LIKE 'src/%'
-			GROUP BY source
-			ORDER BY error_count DESC
-			LIMIT 100
-		`);
-
-		// Get file timeline from PostgreSQL
-		const timeline = await db.query(`
-			SELECT
-				file_path, indexed_at,
-				tagged_at, edited_at,
-				analyzed_at,
-				metadata
-			FROM phase89_file_timeline
-			ORDER BY analyzed_at DESC NULLS LAST
-			LIMIT 50
-		`).catch(() => ({ rows: [] }));
-
-		// Get embedding statistics
-		const embeddingStats = await db.query(`
-			SELECT
-				COUNT(DISTINCT source) as total_files,
-				COUNT(*) as total_errors,
-				COUNT(DISTINCT error_code) as unique_error_codes,
-				AVG(CASE WHEN embedding IS NOT NULL THEN 1 ELSE 0 END) * 100 as embedding_coverage
-			FROM raw_error_embeddings
-			WHERE source LIKE 'src/%'
-		`);
-
-		return {
-			qdrant: {
-				collections: collectionStats,
-				totalPoints: collectionStats.reduce((sum: number, col: any) => sum + col.pointsCount, 0)
-			},
-			postgres: {
-				embeddings: pgEmbeddings.rows,
-				timeline: timeline.rows,
-				stats: embeddingStats.rows[0]
-			}
+		qdrantData = {
+			collections: collectionStats,
+			totalPoints: collectionStats.reduce((sum: number, col: any) => sum + col.pointsCount, 0)
 		};
-	} catch (error) {
-		console.error('Error loading codebase data:', error);
-		return {
-			qdrant: { collections: [], totalPoints: 0 },
-			postgres: { embeddings: [], timeline: [], stats: {} },
-			error: String(error)
-		};
+	} catch (e) {
+		errors.push(`Qdrant: ${e instanceof Error ? e.message : String(e)}`);
 	}
+
+	// Try PostgreSQL (may not be running)
+	try {
+		const { Pool } = await import('pg');
+		const db = new Pool({
+			user: 'legal_admin',
+			password: '123456',
+			host: 'localhost',
+			port: 5434,
+			database: 'legal_ai_db',
+			connectionTimeoutMillis: 3000,
+		});
+
+		const [embedResult, timelineResult, statsResult] = await Promise.all([
+			db.query(`
+				SELECT source, COUNT(*) as error_count,
+					MAX(indexed_at) as last_indexed,
+					ARRAY_AGG(DISTINCT error_code) as error_codes
+				FROM raw_error_embeddings
+				WHERE source LIKE 'src/%'
+				GROUP BY source
+				ORDER BY error_count DESC
+				LIMIT 100
+			`).catch(() => ({ rows: [] })),
+
+			db.query(`
+				SELECT file_path, indexed_at, tagged_at, edited_at, analyzed_at, metadata
+				FROM phase89_file_timeline
+				ORDER BY analyzed_at DESC NULLS LAST
+				LIMIT 50
+			`).catch(() => ({ rows: [] })),
+
+			db.query(`
+				SELECT
+					COUNT(DISTINCT source) as total_files,
+					COUNT(*) as total_errors,
+					COUNT(DISTINCT error_code) as unique_error_codes,
+					AVG(CASE WHEN embedding IS NOT NULL THEN 1 ELSE 0 END) * 100 as embedding_coverage
+				FROM raw_error_embeddings
+				WHERE source LIKE 'src/%'
+			`).catch(() => ({ rows: [{ total_files: 0, total_errors: 0, embedding_coverage: 0 }] })),
+		]);
+
+		pgEmbeddings = embedResult.rows;
+		pgTimeline = timelineResult.rows;
+		pgStats = statsResult.rows[0] ?? { total_files: 0, total_errors: 0, embedding_coverage: 0 };
+
+		await db.end();
+	} catch (e) {
+		errors.push(`PostgreSQL: ${e instanceof Error ? e.message : String(e)}`);
+	}
+
+	return {
+		qdrant: qdrantData,
+		postgres: {
+			embeddings: pgEmbeddings,
+			timeline: pgTimeline,
+			stats: pgStats,
+		},
+		error: errors.length > 0 ? errors.join('; ') : null,
+	};
 };

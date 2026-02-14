@@ -1,545 +1,238 @@
 <script lang="ts">
+	import { Tabs } from 'bits-ui';
+
 	let { data } = $props();
 
 	let selectedCollection = $state<string | null>(null);
 	let searchQuery = $state('');
-	let selectedView = $state<'qdrant' | 'postgres' | 'timeline'>('qdrant');
 
 	// Filter embeddings based on search
 	const filteredEmbeddings = $derived(
-		data.postgres.embeddings.filter(e =>
-			!searchQuery || e.source.toLowerCase().includes(searchQuery.toLowerCase())
+		(data.postgres?.embeddings ?? []).filter((e: any) =>
+			!searchQuery || e.source?.toLowerCase().includes(searchQuery.toLowerCase())
 		)
 	);
+
+	const qdrantCollections = $derived(data.qdrant?.collections ?? []);
+	const timelineItems = $derived(data.postgres?.timeline ?? []);
+	const stats = $derived(data.postgres?.stats ?? {});
+	const totalPoints = $derived(data.qdrant?.totalPoints ?? 0);
 </script>
 
-<div class="codebase-viewer">
-	<header class="viewer-header">
-		<h1>🗄️ Codebase Viewer</h1>
-		<p class="subtitle">
-			Indexed embeddings • Tagged files • Vector database explorer
+<div class="mx-auto max-w-[1400px] p-6">
+	<!-- Header -->
+	<header class="mb-6">
+		<h1 class="text-2xl font-bold text-sand">Codebase Viewer</h1>
+		<p class="mt-1 text-sm text-sand/60">
+			Indexed embeddings &bull; Tagged files &bull; Vector database explorer
 		</p>
 	</header>
 
-	<!-- Stats Overview -->
-	<div class="stats-grid">
-		<div class="stat-card qdrant">
-			<div class="stat-icon">🔢</div>
-			<div class="stat-content">
-				<div class="stat-value">{data.qdrant.totalPoints.toLocaleString()}</div>
-				<div class="stat-label">Qdrant Vectors</div>
+	<!-- Stats Grid -->
+	<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-blue-500/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+			<span class="text-3xl">🔢</span>
+			<div>
+				<div class="text-xl font-bold text-sand">{totalPoints.toLocaleString()}</div>
+				<div class="text-xs uppercase tracking-wide text-sand/60">Qdrant Vectors</div>
 			</div>
 		</div>
 
-		<div class="stat-card postgres">
-			<div class="stat-icon">📁</div>
-			<div class="stat-content">
-				<div class="stat-value">{data.postgres.stats.total_files || 0}</div>
-				<div class="stat-label">Indexed Files</div>
+		<div class="flex items-center gap-3 rounded-lg border-2 border-emerald-500/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+			<span class="text-3xl">📁</span>
+			<div>
+				<div class="text-xl font-bold text-sand">{stats.total_files || 0}</div>
+				<div class="text-xs uppercase tracking-wide text-sand/60">Indexed Files</div>
 			</div>
 		</div>
 
-		<div class="stat-card embeddings">
-			<div class="stat-icon">🧬</div>
-			<div class="stat-content">
-				<div class="stat-value">{data.postgres.stats.total_errors || 0}</div>
-				<div class="stat-label">Total Errors</div>
+		<div class="flex items-center gap-3 rounded-lg border-2 border-amber-500/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+			<span class="text-3xl">🧬</span>
+			<div>
+				<div class="text-xl font-bold text-sand">{stats.total_errors || 0}</div>
+				<div class="text-xs uppercase tracking-wide text-sand/60">Total Errors</div>
 			</div>
 		</div>
 
-		<div class="stat-card coverage">
-			<div class="stat-icon">📊</div>
-			<div class="stat-content">
-				<div class="stat-value">
-					{(data.postgres.stats.embedding_coverage || 0).toFixed(1)}%
+		<div class="flex items-center gap-3 rounded-lg border-2 border-violet-500/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+			<span class="text-3xl">📊</span>
+			<div>
+				<div class="text-xl font-bold text-sand">
+					{(stats.embedding_coverage || 0).toFixed(1)}%
 				</div>
-				<div class="stat-label">Embedding Coverage</div>
+				<div class="text-xs uppercase tracking-wide text-sand/60">Embedding Coverage</div>
 			</div>
 		</div>
 	</div>
 
-	<!-- View Tabs -->
-	<div class="view-tabs">
-		<button
-			class:active={selectedView === 'qdrant'}
-			onclick={() => selectedView = 'qdrant'}
-		>
-			🔢 Qdrant Collections
-		</button>
-		<button
-			class:active={selectedView === 'postgres'}
-			onclick={() => selectedView = 'postgres'}
-		>
-			🗃️ PostgreSQL Embeddings
-		</button>
-		<button
-			class:active={selectedView === 'timeline'}
-			onclick={() => selectedView = 'timeline'}
-		>
-			📅 File Timeline
-		</button>
-	</div>
+	<!-- Tabbed View (bits-ui Tabs) -->
+	<Tabs.Root value="qdrant" class="w-full">
+		<Tabs.List class="mb-4 flex gap-1 border-b-2 border-sand/20">
+			<Tabs.Trigger
+				value="qdrant"
+				class="rounded-t-md px-4 py-2 text-sm font-mono uppercase tracking-wider text-sand/60 transition data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent hover:text-sand"
+			>
+				🔢 Qdrant Collections
+			</Tabs.Trigger>
+			<Tabs.Trigger
+				value="postgres"
+				class="rounded-t-md px-4 py-2 text-sm font-mono uppercase tracking-wider text-sand/60 transition data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent hover:text-sand"
+			>
+				🗃️ PostgreSQL Embeddings
+			</Tabs.Trigger>
+			<Tabs.Trigger
+				value="timeline"
+				class="rounded-t-md px-4 py-2 text-sm font-mono uppercase tracking-wider text-sand/60 transition data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent hover:text-sand"
+			>
+				📅 File Timeline
+			</Tabs.Trigger>
+		</Tabs.List>
 
-	<!-- Search Bar -->
-	{#if selectedView === 'postgres'}
-		<div class="search-bar">
-			<input
-				type="text"
-				bind:value={searchQuery}
-				placeholder="Search files..."
-				class="search-input"
-			/>
-		</div>
-	{/if}
-
-	<!-- Qdrant Collections View -->
-	{#if selectedView === 'qdrant'}
-		<div class="collections-grid">
-			{#each data.qdrant.collections as collection}
-				<div
-					class="collection-card"
-					class:selected={selectedCollection === collection.name}
-					onclick={() => selectedCollection = collection.name}
-				>
-					<div class="collection-header">
-						<h3>{collection.name}</h3>
-						<span class="status-badge {collection.status}">{collection.status}</span>
-					</div>
-
-					<div class="collection-stats">
-						<div class="stat-row">
-							<span class="label">Points:</span>
-							<span class="value">{collection.pointsCount.toLocaleString()}</span>
+		<!-- Qdrant Collections Tab -->
+		<Tabs.Content value="qdrant">
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+				{#each qdrantCollections as collection}
+					<button
+						type="button"
+						class="w-full rounded-lg border-2 bg-panel p-4 text-left transition hover:border-blue-500/60 hover:shadow-md {selectedCollection === collection.name ? 'border-blue-500 bg-blue-500/10' : 'border-sand/20'}"
+						onclick={() => selectedCollection = collection.name}
+					>
+						<div class="mb-3 flex items-center justify-between">
+							<h3 class="font-semibold text-sand">{collection.name}</h3>
+							<span class="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+								{collection.status}
+							</span>
 						</div>
-						<div class="stat-row">
-							<span class="label">Vector Size:</span>
-							<span class="value">{collection.vectorSize}d</span>
-						</div>
-					</div>
-				</div>
-			{/each}
-		</div>
-	{/if}
 
-	<!-- PostgreSQL Embeddings View -->
-	{#if selectedView === 'postgres'}
-		<div class="embeddings-table">
-			<table>
-				<thead>
-					<tr>
-						<th>File Path</th>
-						<th>Error Count</th>
-						<th>Error Codes</th>
-						<th>Last Indexed</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each filteredEmbeddings as embedding}
-						<tr>
-							<td class="file-path">
-								<code>{embedding.source}</code>
-							</td>
-							<td class="error-count">
-								<span class="badge">{embedding.error_count}</span>
-							</td>
-							<td class="error-codes">
-								{#each (embedding.error_codes || []) as code}
-									<span class="error-badge">{code}</span>
-								{/each}
-							</td>
-							<td class="timestamp">
-								{embedding.last_indexed
-									? new Date(embedding.last_indexed).toLocaleString()
-									: 'Never'}
-							</td>
+						<div class="space-y-1 text-sm">
+							<div class="flex justify-between">
+								<span class="text-sand/60">Points:</span>
+								<span class="font-semibold text-sand">{collection.pointsCount.toLocaleString()}</span>
+							</div>
+							<div class="flex justify-between">
+								<span class="text-sand/60">Vector Size:</span>
+								<span class="font-semibold text-sand">{collection.vectorSize}d</span>
+							</div>
+						</div>
+					</button>
+				{/each}
+
+				{#if qdrantCollections.length === 0}
+					<div class="col-span-full rounded-lg border-2 border-dashed border-sand/20 p-8 text-center text-sand/40">
+						No Qdrant collections found. Is Qdrant running on port 6333?
+					</div>
+				{/if}
+			</div>
+		</Tabs.Content>
+
+		<!-- PostgreSQL Embeddings Tab -->
+		<Tabs.Content value="postgres">
+			<!-- Search Bar -->
+			<div class="mb-4">
+				<input
+					type="text"
+					bind:value={searchQuery}
+					placeholder="Search files..."
+					class="w-full rounded-lg border-2 border-sand/20 bg-panel px-4 py-2 text-sand placeholder-sand/40 transition focus:border-accent focus:outline-none"
+				/>
+			</div>
+
+			<div class="overflow-hidden rounded-lg border-2 border-sand/20 bg-panel">
+				<table class="w-full border-collapse">
+					<thead>
+						<tr class="border-b-2 border-sand/20 bg-panelSoft">
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">File Path</th>
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Error Count</th>
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Error Codes</th>
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Last Indexed</th>
 						</tr>
-					{/each}
-				</tbody>
-			</table>
-		</div>
-	{/if}
+					</thead>
+					<tbody>
+						{#each filteredEmbeddings as embedding}
+							<tr class="border-b border-sand/10 transition hover:bg-sand/5">
+								<td class="p-3">
+									<code class="rounded bg-sand/10 px-2 py-0.5 text-xs text-sand">{embedding.source}</code>
+								</td>
+								<td class="p-3">
+									<span class="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-400">
+										{embedding.error_count}
+									</span>
+								</td>
+								<td class="p-3">
+									{#each (embedding.error_codes || []) as code}
+										<span class="mr-1 mb-1 inline-block rounded bg-danger/20 px-2 py-0.5 text-[10px] font-bold text-danger">
+											{code}
+										</span>
+									{/each}
+								</td>
+								<td class="p-3 text-xs text-sand/60">
+									{embedding.last_indexed
+										? new Date(embedding.last_indexed).toLocaleString()
+										: 'Never'}
+								</td>
+							</tr>
+						{/each}
 
-	<!-- Timeline View -->
-	{#if selectedView === 'timeline'}
-		<div class="timeline-view">
-			{#each data.postgres.timeline as item}
-				<div class="timeline-item">
-					<div class="timeline-marker"></div>
-					<div class="timeline-content">
-						<h4>{item.file_path}</h4>
-						<div class="timeline-events">
-							{#if item.indexed_at}
-								<span class="event indexed">
-									📥 Indexed: {new Date(item.indexed_at).toLocaleString()}
-								</span>
-							{/if}
-							{#if item.tagged_at}
-								<span class="event tagged">
-									🏷️ Tagged: {new Date(item.tagged_at).toLocaleString()}
-								</span>
-							{/if}
-							{#if item.edited_at}
-								<span class="event edited">
-									✏️ Edited: {new Date(item.edited_at).toLocaleString()}
-								</span>
-							{/if}
-							{#if item.analyzed_at}
-								<span class="event analyzed">
-									🔍 Analyzed: {new Date(item.analyzed_at).toLocaleString()}
-								</span>
-							{/if}
+						{#if filteredEmbeddings.length === 0}
+							<tr>
+								<td colspan="4" class="p-8 text-center text-sand/40">
+									{searchQuery ? `No files matching "${searchQuery}"` : 'No embeddings found. Is PostgreSQL running?'}
+								</td>
+							</tr>
+						{/if}
+					</tbody>
+				</table>
+			</div>
+		</Tabs.Content>
+
+		<!-- Timeline Tab -->
+		<Tabs.Content value="timeline">
+			<div class="relative pl-8">
+				{#each timelineItems as item, i}
+					<div class="relative mb-6 pl-6">
+						<!-- Marker -->
+						<div class="absolute left-0 top-2 h-3 w-3 rounded-full border-2 border-panel bg-accent shadow-[0_0_0_2px] shadow-accent/40"></div>
+
+						<!-- Line -->
+						{#if i < timelineItems.length - 1}
+							<div class="absolute left-[5px] top-5 bottom--4 w-0.5 bg-sand/20"></div>
+						{/if}
+
+						<!-- Content -->
+						<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+							<h4 class="mb-2 font-semibold text-sand">{item.file_path}</h4>
+							<div class="flex flex-wrap gap-2">
+								{#if item.indexed_at}
+									<span class="rounded-md bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-400">
+										📥 Indexed: {new Date(item.indexed_at).toLocaleString()}
+									</span>
+								{/if}
+								{#if item.tagged_at}
+									<span class="rounded-md bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-400">
+										🏷️ Tagged: {new Date(item.tagged_at).toLocaleString()}
+									</span>
+								{/if}
+								{#if item.edited_at}
+									<span class="rounded-md bg-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-400">
+										✏️ Edited: {new Date(item.edited_at).toLocaleString()}
+									</span>
+								{/if}
+								{#if item.analyzed_at}
+									<span class="rounded-md bg-violet-500/20 px-3 py-1 text-xs font-medium text-violet-400">
+										🔍 Analyzed: {new Date(item.analyzed_at).toLocaleString()}
+									</span>
+								{/if}
+							</div>
 						</div>
 					</div>
-				</div>
-			{/each}
-		</div>
-	{/if}
+				{/each}
+
+				{#if timelineItems.length === 0}
+					<div class="rounded-lg border-2 border-dashed border-sand/20 p-8 text-center text-sand/40">
+						No timeline data available.
+					</div>
+				{/if}
+			</div>
+		</Tabs.Content>
+	</Tabs.Root>
 </div>
-
-<style>
-	.codebase-viewer {
-		padding: 2rem;
-		max-width: 1400px;
-	margin: 0 auto;
-	}
-
-	.viewer-header {
-		margin-bottom: 2rem;
-	}
-
-	.viewer-header h1 {
-		font-size: 2rem;
-	margin: 0;
-		color: #1a1a1a;
-	}
-
-	.subtitle {
-		color: #666;
-	margin: 0.5rem 0 0;
-	}
-
-	/* Stats Grid */
-	.stats-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-		gap: 1rem;
-		margin-bottom: 2rem;
-	}
-
-	.stat-card {
-		display: flex;
-		align-items: center;
-	gap: 1rem;
-		padding: 1.5rem;
-		border-radius: 12px;
-	background: white;
-		border: 2px solid #e5e7eb;
-		transition: all 0.2s;
-	}
-
-	.stat-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	}
-
-	.stat-card.qdrant {
-		border-color: #3b82f6;
-	}
-
-	.stat-card.postgres {
-		border-color: #10b981;
-	}
-
-	.stat-card.embeddings {
-		border-color: #f59e0b;
-	}
-
-	.stat-card.coverage {
-		border-color: #8b5cf6;
-	}
-
-	.stat-icon {
-		font-size: 2.5rem;
-	}
-
-	.stat-value {
-		font-size: 1.75rem;
-		font-weight: 700;
-	color: #1a1a1a;
-	}
-
-	.stat-label {
-		font-size: 0.875rem;
-	color: #666;
-		margin-top: 0.25rem;
-	}
-
-	/* View Tabs */
-	.view-tabs {
-		display: flex;
-	gap: 0.5rem;
-		margin-bottom: 1.5rem;
-		border-bottom: 2px solid #e5e7eb;
-	}
-
-	.view-tabs button {
-		padding: 0.75rem 1.5rem;
-		border: none;
-	background: none;
-		cursor: pointer;
-		font-size: 1rem;
-	color: #666;
-		border-bottom: 3px solid transparent;
-		transition: all 0.2s;
-	}
-
-	.view-tabs button:hover {
-		color: #1a1a1a;
-	background: #f9fafb;
-	}
-
-	.view-tabs button.active {
-		color: #3b82f6;
-		border-bottom-color: #3b82f6;
-	}
-
-	/* Search Bar */
-	.search-bar {
-		margin-bottom: 1.5rem;
-	}
-
-	.search-input {
-		width: 100%;
-	padding: 0.75rem 1rem;
-		border: 2px solid #e5e7eb;
-		border-radius: 8px;
-		font-size: 1rem;
-	transition: border-color 0.2s;
-	}
-
-	.search-input:focus {
-		outline: none;
-		border-color: #3b82f6;
-	}
-
-	/* Collections Grid */
-	.collections-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 1rem;
-	}
-
-	.collection-card {
-		padding: 1.5rem;
-	border: 2px solid #e5e7eb;
-		border-radius: 12px;
-	background: white;
-		cursor: pointer;
-	transition: all 0.2s;
-	}
-
-	.collection-card:hover {
-		border-color: #3b82f6;
-		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-	}
-
-	.collection-card.selected {
-		border-color: #3b82f6;
-	background: #eff6ff;
-	}
-
-	.collection-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1rem;
-	}
-
-	.collection-header h3 {
-		margin: 0;
-		font-size: 1.125rem;
-	color: #1a1a1a;
-	}
-
-	.status-badge {
-		padding: 0.25rem 0.75rem;
-		border-radius: 9999px;
-		font-size: 0.75rem;
-		font-weight: 600;
-		text-transform: uppercase;
-	}
-
-	.status-badge.green {
-		background: #d1fae5;
-	color: #065f46;
-	}
-
-	.collection-stats .stat-row {
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 0.5rem;
-	}
-
-	.collection-stats .label {
-		color: #666;
-		font-size: 0.875rem;
-	}
-
-	.collection-stats .value {
-		font-weight: 600;
-	color: #1a1a1a;
-	}
-
-	/* Embeddings Table */
-	.embeddings-table {
-		background: white;
-		border-radius: 12px;
-	border: 2px solid #e5e7eb;
-		overflow: hidden;
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-	}
-
-	thead {
-		background: #f9fafb;
-	}
-
-	th {
-		padding: 1rem;
-		text-align: left;
-		font-weight: 600;
-	color: #1a1a1a;
-		border-bottom: 2px solid #e5e7eb;
-	}
-
-	td {
-		padding: 1rem;
-		border-bottom: 1px solid #f3f4f6;
-	}
-
-	tr:hover {
-		background: #f9fafb;
-	}
-
-	.file-path code {
-		background: #f3f4f6;
-	padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		font-size: 0.875rem;
-	}
-
-	.error-count .badge {
-		background: #fef3c7;
-	color: #92400e;
-		padding: 0.25rem 0.75rem;
-		border-radius: 9999px;
-		font-weight: 600;
-		font-size: 0.875rem;
-	}
-
-	.error-badge {
-		display: inline-block;
-	background: #fee2e2;
-		color: #991b1b;
-	padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		font-size: 0.75rem;
-		font-weight: 600;
-		margin-right: 0.25rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.timestamp {
-		color: #666;
-		font-size: 0.875rem;
-	}
-
-	/* Timeline View */
-	.timeline-view {
-		position: relative;
-		padding-left: 2rem;
-	}
-
-	.timeline-item {
-		position: relative;
-		margin-bottom: 2rem;
-		padding-left: 2rem;
-	}
-
-	.timeline-marker {
-		position: absolute;
-	left: 0;
-		top: 0.5rem;
-	width: 12px;
-		height: 12px;
-		border-radius: 50%;
-	background: #3b82f6;
-		border: 3px solid white;
-		box-shadow: 0 0 0 2px #3b82f6;
-	}
-
-	.timeline-item::before {
-		content: '';
-	position: absolute;
-		left: 5px;
-	top: 1.5rem;
-		bottom: -1.5rem;
-	width: 2px;
-		background: #e5e7eb;
-	}
-
-	.timeline-item:last-child::before {
-		display: none;
-	}
-
-	.timeline-content {
-		background: white;
-	padding: 1.5rem;
-		border-radius: 12px;
-	border: 2px solid #e5e7eb;
-	}
-
-	.timeline-content h4 {
-		margin: 0 0 1rem;
-		color: #1a1a1a;
-	}
-
-	.timeline-events {
-		display: flex;
-		flex-wrap: wrap;
-	gap: 0.5rem;
-	}
-
-	.event {
-		padding: 0.5rem 1rem;
-		border-radius: 8px;
-		font-size: 0.875rem;
-		font-weight: 500;
-	}
-
-	.event.indexed {
-		background: #dbeafe;
-	color: #1e40af;
-	}
-
-	.event.tagged {
-		background: #fef3c7;
-	color: #92400e;
-	}
-
-	.event.edited {
-		background: #d1fae5;
-	color: #065f46;
-	}
-
-	.event.analyzed {
-		background: #f3e8ff;
-	color: #6b21a8;
-	}
-</style>
-
-
-
