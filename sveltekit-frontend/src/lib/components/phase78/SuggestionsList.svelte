@@ -156,11 +156,9 @@
 								{/if}
 							</div>
 
-							{#if suggestion.appliedAt}
+							{#if suggestion.applied}
 								<div class="text-xs text-sand/40">
-									Applied by {suggestion.appliedByUserId || 'unknown'} on {new Date(
-										suggestion.appliedAt
-									).toLocaleString()}
+									Applied
 								</div>
 							{/if}
 						</div>
