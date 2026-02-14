@@ -154,7 +154,7 @@ https, //svelte.dev/e/js_parse_error -->
  <div class="flex items-center gap-2 mt-2">
  <span class="px-2 py-1 rounded text-xs font-medium
  {currentCase.status === 'active' ? 'bg-accent/10 text-accent' :
- currentCase.status === 'pending' ? 'bg-warning/20/20 text-warning' : 'bg-panelSoft text-sand/40'}">
+ currentCase.status === 'pending' ? 'bg-warning/20 text-warning' : 'bg-panelSoft text-sand/40'}">
  {currentCase.status.toUpperCase()}
  </span>
  </div>

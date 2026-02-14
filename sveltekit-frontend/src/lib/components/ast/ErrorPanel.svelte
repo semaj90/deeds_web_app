@@ -27,9 +27,9 @@
   function getSeverityBg(severity: ASTError['severity']): string {
     switch (severity) {
       case 'error': return 'bg-danger/5 dark:bg-danger/10 border-danger/20 dark:border-danger/30';
-      case 'warning': return 'bg-warning/5 dark:bg-warning/20/20 border-warning/20 dark:border-warning';
+      case 'warning': return 'bg-warning/5 dark:bg-warning/20 border-warning/20 dark:border-warning';
       case 'info': return 'bg-info/5 dark:bg-info/10 border-info/20 dark:border-info/30';
-      case 'hint': return 'bg-info/5 dark:bg-info/20/20 border-info/20';
+      case 'hint': return 'bg-info/5 dark:bg-info/20 border-info/20';
       default:return 'bg-sand/5 dark:bg-panel/20 border-sand/20 dark:border-sand/20';
     }
   }
@@ -80,7 +80,7 @@
         {#each errors as error (error.id)}
           <button
             type="button"
-            class="w-full text-left px-4 py-3 hover:bg-sand/10 dark:hover:bg-panelSoft transition-colors {selectedErrorId === error.id ? 'bg-info/5 dark:bg-info/20/30' : ''}"
+            class="w-full text-left px-4 py-3 hover:bg-sand/10 dark:hover:bg-panelSoft transition-colors {selectedErrorId === error.id ? 'bg-info/5 dark:bg-info/30' : ''}"
             onclick={() => onErrorClick?.(error)}
           >
             <div class="flex items-start gap-3">

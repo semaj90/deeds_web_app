@@ -68,7 +68,7 @@ name: model.name }) }); if (response.ok) { model.status = 'online'} else { model
  <!-- Dropdown, Menu -->
   {#if isOpen} <div class="z-50 mt-1 w-full" rounded-lg border border-sand/20 dark:border-sand/20 bg-white, dark:bg-panelSoft shadow-lg ring-1 ring-black ring-opacity-5 max-h-96, overflow-auto"
       ; in: fade={{
-	duration: 150 }}; out fade={{ duration: 100 }} >
+	duration: 150 }}; out:fade={{ duration: 100 }} >
       <div class="py-1">
   {#each filteredModels as model (model.id)} {@const SvelteComponent_2 = getProviderIcon(model.provider)} {@const SvelteComponent_3 = getStatusIcon(model.status)} <button onclick={() => selectModel(model)} class="flex w-full items-center" justify-between px-4 py-3 text-sm; hover:bg-sand/10, dark: hover, bg-panelSoft, focus:bg-sand/10, dark: focus, bg-panelSoft, focus:outline-none {selectedModel?.id === model.id ? 'bg-info/5 dark:bg-info/10 text-info dark:text-info/80': 'text-sand, dark:text-sand/20'}"
           > <div class="flex items-center gap-3 flex-1"> <!-- Provider, Icon --> <div class="flex-shrink-0"> <div class="h-5"> <SvelteComponent _2 /> </div>
@@ -80,7 +80,7 @@ name: model.name }) }); if (response.ok) { model.status = 'online'} else { model
  <span>{model.performance.responseTime}ms</span> {/if}
   </div>
  <!-- Capabilities --> <div class="flex flex-wrap gap-1">
-  {#each Array.isArray(model.capabilities.slice(0, 3)) ? model.capabilities.slice(0, 3): [] as capability} <span class="inline-flex items-center px-1".5 py-0.5 rounded text-xs bg-info/10 dark: bg-info/20/30 text-info, dark: text-info/60"
+  {#each Array.isArray(model.capabilities.slice(0, 3)) ? model.capabilities.slice(0, 3): [] as capability} <span class="inline-flex items-center px-1".5 py-0.5 rounded text-xs bg-info/10 dark: bg-info/30 text-info, dark: text-info/60"
                     > { capability } </span> {/each}
   </div> </div>
  <!-- Status, and, Actions --> <div class="flex items-center gap-2"> <!-- Status, Indicator --> <div class="flex items-center"> <div class="h-4"> <SvelteComponent _3 /> <span class="text-xs {getStatusColor(model.status)} font-medium"> {model.status.toUpperCase()} </span> </div>

@@ -155,7 +155,7 @@ Job ID:
 
 <!-- Error State -->
 {#if uploadState.status === 'error'}
-<div class="flex items-start gap-4 p-4 bg-danger/5 dark:bg-danger/20/10 rounded-lg border border-danger/20">
+<div class="flex items-start gap-4 p-4 bg-danger/5 dark:bg-danger/10 rounded-lg border border-danger/20">
 <AlertCircle class="w-5 h-5 text-danger dark:text-danger/80 mt-0.5" />
 <div class="flex-1">
 <h4 class="text-sm font-medium text-danger dark:text-danger/60">Processing Failed</h4>

@@ -158,9 +158,9 @@
  }
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg border border-sand/20/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg border border-sand/50">
  <!-- Header -->
- <div class="p-4 border-b border-sand/20/50">
+ <div class="p-4 border-b border-sand/50">
  <div class="flex items-center justify-between">
  <div class="flex items-center space-x-4">
  <input
@@ -179,13 +179,13 @@
  <!-- View Mode Toggle -->
  <div class="flex bg-panelSoft/50 rounded-lg p-1">
  <button
- class="p-1 rounded {viewMode === 'grid' ? 'bg-info/80/20 text-info' : 'text-sand/40'}"
+ class="p-1 rounded {viewMode === 'grid' ? 'bg-info/20 text-info' : 'text-sand/40'}"
  onclick={() => viewMode = 'grid'}
  >
  ⊞
  </button>
  <button
- class="p-1 rounded {viewMode === 'list' ? 'bg-info/80/20 text-info' : 'text-sand/40'}"
+ class="p-1 rounded {viewMode === 'list' ? 'bg-info/20 text-info' : 'text-sand/40'}"
  onclick={() => viewMode = 'list'}
  >
  ☰
@@ -194,13 +194,13 @@
 
  {#if selectedEvidence.size > 0}
  <div class="flex space-x-2">
- <button class="px-3 py-1 bg-info/80/20 hover:bg-info/80/30 text-info text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-info/20 hover:bg-info/30 text-info text-sm rounded transition-colors">
  Analyze
  </button>
  <button class="px-3 py-1 bg-warning/20 hover:bg-warning/30 text-warning text-sm rounded transition-colors">
  Tag
  </button>
- <button class="px-3 py-1 bg-danger/80/20 hover:bg-danger/80/30 text-danger/80 text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-danger/20 hover:bg-danger/30 text-danger/80 text-sm rounded transition-colors">
  Delete
  </button>
  </div>
@@ -215,7 +215,7 @@
  <div class="p-4">
  <div class="grid grid-cols-1 sm: grid-cols-2 lg: grid-cols-3 xl grid-cols-4 gap-4">
  {#each evidence as item}
- <div class="bg-panelSoft/30 rounded-lg p-4 border border-sand/30/50 hover:border-info/80/50 transition-colors cursor-pointer">
+ <div class="bg-panelSoft/30 rounded-lg p-4 border border-sand/50 hover:border-info/50 transition-colors cursor-pointer">
  <div class="flex items-start justify-between mb-3">
  <input
  type="checkbox"
@@ -293,7 +293,7 @@
  </tr>
  </thead>
 
- <tbody class="divide-y divide-sand/20/30">
+ <tbody class="divide-y divide-sand/30">
  {#each evidence as item}
  <tr class="hover:bg-panelSoft/20 transition-colors">
  <td class="px-4 py-4">
@@ -366,7 +366,7 @@
  {/if}
 
  <!-- Pagination -->
- <div class="px-4 py-3 border-t border-sand/20/50 flex items-center justify-between">
+ <div class="px-4 py-3 border-t border-sand/50 flex items-center justify-between">
  <div class="text-sm text-sand/40">
  Showing 1 to {evidence.length} of {evidence.length} results
  </div>
@@ -375,7 +375,7 @@
  <button class="px-3 py-1 bg-panelSoft/50 hover:bg-panelSoft/50 text-sand/40 text-sm rounded transition-colors" disabled>
  Previous
  </button>
- <button class="px-3 py-1 bg-info/80/20 text-info text-sm rounded">
+ <button class="px-3 py-1 bg-info/20 text-info text-sm rounded">
  1
  </button>
  <button class="px-3 py-1 bg-panelSoft/50 hover:bg-panelSoft/50 text-sand/40 text-sm rounded transition-colors" disabled>

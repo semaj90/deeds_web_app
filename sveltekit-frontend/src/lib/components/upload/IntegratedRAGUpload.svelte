@@ -192,7 +192,7 @@ function handleClick() {
 
   <!-- Results Section -->
   {#if result}
-    <div class="result-section bg-accent/5 dark:bg-accent/10/20 border border-accent/20 dark:border-accent/30 rounded-lg p-4 space-y-3">
+    <div class="result-section bg-accent/5 dark:bg-accent/20 border border-accent/20 dark:border-accent/30 rounded-lg p-4 space-y-3">
       <div class="flex items-center gap-2 text-accent dark:text-accent">
         <CheckCircle class="h-5 w-5" />
         <h4 class="font-medium">Upload Successful</h4>
@@ -220,13 +220,13 @@ function handleClick() {
       </div>
 
       {#if result.recommendations && result.recommendations.length > 0}
-        <div class="border-t border-accent/20 dark:border-accent/30/50 pt-3 mt-3">
+        <div class="border-t border-accent/20 dark:border-accent/50 pt-3 mt-3">
           <h5 class="text-xs font-semibold text-accent dark:text-accent mb-2 flex items-center gap-2">
             <Search class="h-3 w-3" /> Similar Documents Found
           </h5>
           <div class="space-y-2">
             {#each result.recommendations as rec}
-              <div class="text-xs bg-background/50 p-2 rounded border border-green-100 dark:border-accent/30/30">
+              <div class="text-xs bg-background/50 p-2 rounded border border-green-100 dark:border-accent/30">
                 <div class="flex items-center justify-between mb-1">
                   <span class="font-medium text-accent dark:text-accent/80">
                     {Math.round(rec.similarity * 100)}% Match
@@ -286,7 +286,7 @@ function handleClick() {
         {#each searchResults as result}
           <div class="search-result-item p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors">
             <div class="flex items-center justify-between mb-2">
-              <Badge variant="secondary" class={result.similarity > 0.8 ? 'bg-accent/10 text-accent dark:bg-accent/20/30 dark:text-accent/80' : ''}>
+              <Badge variant="secondary" class={result.similarity > 0.8 ? 'bg-accent/10 text-accent dark:bg-accent/30 dark:text-accent/80' : ''}>
                 {Math.round(result.similarity * 100)}% Relevance
               </Badge>
               {#if result.source}

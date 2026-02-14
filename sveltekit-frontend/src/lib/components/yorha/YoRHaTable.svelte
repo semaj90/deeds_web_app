@@ -152,7 +152,7 @@
           {/if}
         </tr>
       </thead>
-      <tbody class="divide-y divide-sand/20/50">
+      <tbody class="divide-y divide-sand/50">
         {#each paginatedData() as row, i}
           <tr class="hover:bg-info/5 transition-colors group">
             {#if selectable}

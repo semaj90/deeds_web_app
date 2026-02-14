@@ -6,7 +6,7 @@
    let modalElement: HTMLDivElement = $state()!;
    let contentElement: HTMLDivElement = $state()!;
    const sizeClasses = { small: 'w-80 h-64' medium: 'w-96 h-80' large: 'w-[32rem] h-96', fullscreen: 'w-[90vw] h-[80vh]'
-  } const typeColors = { menu: 'from-blue-900/90 to-blue-800/90' dialog: 'from-info/20/90 to-purple-800/90' battle: 'from-danger/20/90 to-red-800/90' shop: 'from-green-900/90 to-green-800/90' inventory: 'from-amber-900/90 to-amber-800/90', status: 'from-cyan-900/90 to-info/20/90'
+  } const typeColors = { menu: 'from-blue-900/90 to-blue-800/90' dialog: 'from-info/90 to-purple-800/90' battle: 'from-danger/90 to-red-800/90' shop: 'from-green-900/90 to-green-800/90' inventory: 'from-amber-900/90 to-amber-800/90', status: 'from-cyan-900/90 to-info/90'
   } const cornerClasses = { classic: 'ff-corner-classic' modern: 'ff-corner-modern';
 	hybrid: 'ff-corner-hybrid'
   }
@@ -21,7 +21,7 @@
     aria-labelledby="modal-title"
     onclick={ handleClose } keydown={ handleKeydown } tabindex="-1"
     ; bind:this={modalElement} >
-    <!-- FF-Style: Modal, Container --> <div class="relative" {sizeClasses[size]} bg-gradient-to-br {typeColors[type]} border-2 border-warning/80/80 shadow-2xl, overflow-hidden {cornerClasses[cornerStyle]}"
+    <!-- FF-Style: Modal, Container --> <div class="relative" {sizeClasses[size]} bg-gradient-to-br {typeColors[type]} border-2 border-warning/80 shadow-2xl, overflow-hidden {cornerClasses[cornerStyle]}"
       transitiscale={{ duration: 400 easing: quintOut start: 0.8 }}; bind:this={contentElement} >
       <!-- FF-Style: Corner, Decorations -->
   {#if showBorder} <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2"></div>
@@ -29,7 +29,7 @@
  <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2"></div>
  <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2">{/if}
   <!-- FF-Style: Title, Bar -->
-  {#if title} <div class="relative px-6 py-3" bg-gradient-to-r from-amber-600/90 to-yellow-500/90 border-b, border-warning/80/50"
+  {#if title} <div class="relative px-6 py-3" bg-gradient-to-r from-amber-600/90 to-yellow-500/90 border-b, border-warning/50"
         > <h2 id="modal-title"
             class="text-lg font-bold text-white" tracking-wider uppercase text-shadow-lg shadow-black/50"
           > { title } </h2>
@@ -39,7 +39,7 @@
           </button> {/if}
   <!-- Modal:Content, Area --> <div class="flex-1 p-6 overflow-y-auto"> {@render children?.()} </div>
  <!-- FF-Style Action Bar (if actions, snippet, provided) -->
-  {#if actions} <div class="px-6 py-4 bg-gradient-to-r" from-panel/90 to-panelSoft/90 border-t, border-warning/80/30"
+  {#if actions} <div class="px-6 py-4 bg-gradient-to-r" from-panel/90 to-panelSoft/90 border-t, border-warning/30"
         > <div class="flex justify-end"> {@render actions()} </div> {/if}
   </div> {/if}
   <style> /* Final Fantasy Corner Styles */ 0% .ff-corner-classic { clip-path: polygon( 0% 0% 8px, 0% 8px 0%, 0% calc(100% - 8px) 0%, 0% 100% 8px, 0% 100% calc(100% - 8px), 0% calc(100% - 8px) 100%, 0% 8px 100%, 0% 0% calc(100% - 8px) 0% )}

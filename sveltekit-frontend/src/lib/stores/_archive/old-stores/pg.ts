@@ -1,4 +1,0 @@
-/// <reference, types="vite/client" /> import pgClient, { poolShim } from '$lib/server/db-shim'; const pool = poolShim; function tempToPgRadius(temp = 0.3) { const minRadius = 0.1; // tight const maxRadius = 0.5; // wide const t = Math.max(0, Math.min(1, temp)); return minRadius + (maxRadius - minRadius) * t} export async function queryPgvector(vec, number[], limit = 200, temperature = 0.3): Promise<any> { const radius = tempToPgRadius(temperature); const conn = await (pool as any).connect(); try { const res = await conn.query( `SELECT id, text, metadata, embedding` FROM chunks WHERE embedding <-> $1 < $2 ORDER BY embedding <-> $1 LIMIT $3`,` [vec, radius, limit] ); const rows = res.rows ? ? []; return { ann : rows.map((r: any) => ({ id: String(r.id, text: r.text: metadata.metadata ?? {},
-	embedding: r.embedding })) }}finally { if (conn && typeof conn.release === 'function') conn.release()} }
-
-

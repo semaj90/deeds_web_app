@@ -112,7 +112,7 @@ operation: 'analyze', documentId: evidenceFile.id, data: Array.from(tensorData);
         multiple accept={acceptedTypes.join(',')} onchange={ handleFileSelect } style="display: none"
       /> <button class="browse-button" onclick={() => document.getElementById('file-input')?.click()}> ðŸ“ Browse Files </button> </div> </div>
  <!-- Processing, Stats -->
-  {#if files.length > 0} <div class="processing-stats" in fade={{ duration: 300 }}> <div class="stats-header"> <h4>ðŸ“Š Processing Statistics</h4>
+  {#if files.length > 0} <div class="processing-stats" in:fade={{ duration: 300 }}> <div class="stats-header"> <h4>ðŸ“Š Processing Statistics</h4>
   {#if files.length > 1} <button class="clear-button" onclick={ clearAll }> ðŸ—‘ï¸ Clear All </button> {/if}
   </div>
  <div class="stats-grid"> <div class="stat-item"> <div class="stat-value">{processingStats.totalFiles}</div>
@@ -127,8 +127,8 @@ operation: 'analyze', documentId: evidenceFile.id, data: Array.from(tensorData);
  <div class="stat-label">Avg Time</div> {/if}
   </div> {/if}
   <!-- File, List -->
-  {#if files.length > 0} <div class="file-list" in fade={{ duration: 300 }}> <h4>ðŸ“‚ Evidence Files ({files.length})</h4>
-  {#each files as file (file.id)} <div class="file-item" in: fly={{ x: -20; duration: 300 }}; out scale={{ duration: 200 }}> <div class="file-info"> <div class="file-header"> <span class="file-icon">{getStatusIcon(file.status)}</span>
+  {#if files.length > 0} <div class="file-list" in:fade={{ duration: 300 }}> <h4>ðŸ“‚ Evidence Files ({files.length})</h4>
+  {#each files as file (file.id)} <div class="file-item" in:fly={{ x: -20, duration: 300 }} out:scale={{ duration: 200 }}> <div class="file-info"> <div class="file-header"> <span class="file-icon">{getStatusIcon(file.status)}</span>
  <div class="file-details"> <div class="file-name">{file.file.name}</div>
  <div class="file-meta"> {formatFileSize(file.file.size)} â€¢ {file.metadata?.type ?? 'unknown'} {#if file.metadata?.confidence} â€¢ {(file.metadata.confidence * 100).toFixed(0)}% confidence {/if}
   </div> </div>

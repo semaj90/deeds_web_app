@@ -156,7 +156,7 @@
  <article class="border border-beige/30 p-3 rounded">
  <div class="flex justify-between items-start mb-2">
  <span class="text-sm font-medium">Document {result.index + 1}</span>
- <span class="text-xs bg-info/20/50 px-2 py-1 rounded">
+ <span class="text-xs bg-info/50 px-2 py-1 rounded">
  {(result.score * 100).toFixed(1)}% similarity
  </span>
  </div>

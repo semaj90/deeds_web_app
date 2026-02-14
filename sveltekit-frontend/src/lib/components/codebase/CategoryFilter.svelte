@@ -97,13 +97,13 @@
 		store: 'bg-accent/20 text-accent/80 border-accent/30',
 		service: 'bg-warning/20 text-warning/80 border-warning/30',
 		api: 'bg-info/20 text-info/80 border-info/30',
-		util: 'bg-sand/20/20 text-sand/40 border-sand/30/30',
+		util: 'bg-sand/20 text-sand/40 border-sand/30',
 		error: 'bg-danger/20 text-danger/60 border-danger/30',
 		warning: 'bg-warning/20 text-warning/80 border-warning/30'
 	};
 
 	function getOptionColor(option: FilterOption): string {
-		return option.color || defaultColors[option.value] || 'bg-sand/20/20 text-sand/40 border-sand/30/30';
+		return option.color || defaultColors[option.value] || 'bg-sand/20 text-sand/40 border-sand/30';
 	}
 </script>
 

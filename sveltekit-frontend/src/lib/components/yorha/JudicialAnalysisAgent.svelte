@@ -87,7 +87,7 @@ caseId: evidence,
  switch (ruling) {
  case 'admissible': return 'text-accent bg-accent/10';
  case 'inadmissible': return 'text-danger/80 bg-danger/10';
- case 'conditional': return 'text-warning bg-warning/20/20';
+ case 'conditional': return 'text-warning bg-warning/20';
  default:return 'text-sand/40 bg-panel/20';
  }
  }

@@ -10,10 +10,10 @@
 
  <!-- Corner Indicators -->
  <div class="fixed top-4 left-4 flex gap-2 z-40">
- <div class="bg-info/20 border border-info/80/50 px-3 py-1 rounded text-xs text-info font-mono">
+ <div class="bg-info/20 border border-info/50 px-3 py-1 rounded text-xs text-info font-mono">
  PHOENIX AI
  </div>
- <div class="bg-accent/20 border border-accent/60/50 px-3 py-1 rounded text-xs text-accent font-mono">
+ <div class="bg-accent/20 border border-accent/50 px-3 py-1 rounded text-xs text-accent font-mono">
  LIVE
  </div>
  </div>
@@ -33,7 +33,7 @@
  <!-- Scan Lines Effect -->
  <div class="fixed inset-0 pointer-events-none z-30 opacity-10">
  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-info/20 to-transparent animate-pulse"></div>
- <div class="absolute inset-0 bg-gradient-to-r from-transparent via-warning/80/10 to-transparent animate-pulse" style="animation-delay: 1s;"></div>
+ <div class="absolute inset-0 bg-gradient-to-r from-transparent via-warning/10 to-transparent animate-pulse" style="animation-delay: 1s;"></div>
  </div>
 {/if}
 

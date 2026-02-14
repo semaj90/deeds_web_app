@@ -41,7 +41,7 @@
   }
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50 mb-6">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50 mb-6">
   <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
     <!-- Search -->
     <div class="flex-1 max-w-md">

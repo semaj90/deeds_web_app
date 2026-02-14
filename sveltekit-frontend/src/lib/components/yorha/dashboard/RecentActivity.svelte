@@ -106,14 +106,14 @@
 });
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
   <div class="flex items-center justify-between mb-4">
     <h2 class="text-xl font-semibold text-info">Recent Activity</h2>
     <div class="flex items-center space-x-2">
       {#if loading}
         <div class="w-4 h-4 border-2 border-info/80 border-t-transparent rounded-full animate-spin"></div>
       {/if}
-      <button class="px-3 py-1 bg-info/80/20 hover:bg-info/80/30 text-info text-sm rounded transition-colors">
+      <button class="px-3 py-1 bg-info/20 hover:bg-info/30 text-info text-sm rounded transition-colors">
         View All
       </button>
     </div>
@@ -151,7 +151,7 @@
   </div>
 
   <!-- Activity Summary -->
-  <div class="mt-4 pt-4 border-t border-sand/20/50">
+  <div class="mt-4 pt-4 border-t border-sand/50">
     <div class="grid grid-cols-3 gap-4 text-center">
       <div>
         <div class="text-lg font-bold text-info">{getActivitiesToday()}</div>

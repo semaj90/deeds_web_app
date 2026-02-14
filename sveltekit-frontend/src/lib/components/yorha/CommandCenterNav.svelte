@@ -77,7 +77,7 @@
  <nav class="space-y-2">
  {#each navigation as item}
  <button
- class="w-full text-left p-3 rounded-lg transition-all duration-200 hover:bg-panelSoft/50 hover:border-info/80/30 border border-transparent {currentPath === item.path ? 'bg-info/80/10 border-info/80/50 text-info/80' : 'text-sand/40'}"
+ class="w-full text-left p-3 rounded-lg transition-all duration-200 hover:bg-panelSoft/50 hover:border-info/30 border border-transparent {currentPath === item.path ? 'bg-info/10 border-info/50 text-info/80' : 'text-sand/40'}"
  onclick={() => navigateTo(item.path)}
  >
  <div class="flex items-center space-x-3">
@@ -92,7 +92,7 @@
  </nav>
 
  <!-- System Status Indicator -->
- <div class="mt-8 pt-6 border-t border-sand/20/50">
+ <div class="mt-8 pt-6 border-t border-sand/50">
  <div class="text-xs text-sand/40 mb-2">System Status</div>
  <div class="flex items-center space-x-2">
  <div class="w-2 h-2 bg-accent/80 rounded-full animate-pulse"></div>

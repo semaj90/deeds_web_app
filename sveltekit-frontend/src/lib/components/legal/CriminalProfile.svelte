@@ -65,13 +65,13 @@ import type { Case } from '$lib/types';
     at_large: {
 	label: 'At Large', className: 'bg-danger/20 text-danger/80', icon: 'âš ï¸' },
 	incarcerated: {
-	label: 'Incarcerated', className: 'bg-sand/20/20 text-sand/40', icon: 'ðŸ”’' },
+	label: 'Incarcerated', className: 'bg-sand/20 text-sand/40', icon: 'ðŸ”’' },
 	on_parole: {
 	label: 'On Parole', className: 'bg-warning/20 text-warning', icon: 'ðŸ‘ï¸' },
 	probation: {
 	label: 'Probation', className: 'bg-info/20 text-info/80', icon: 'ðŸ“„' },
 	deceased: {
-	label: 'Deceased', className: 'bg-sand/20/20 text-sand/40', icon: 'âš°ï¸' },
+	label: 'Deceased', className: 'bg-sand/20 text-sand/40', icon: 'âš°ï¸' },
 	cleared: {
 	label: 'Cleared', className: 'bg-accent/20 text-accent', icon: 'âœ…' }
   };
@@ -85,7 +85,7 @@ import type { Case } from '$lib/types';
 	pending: {
 	label: 'Pending', className: 'bg-warning/20 text-warning' },
 	sealed: {
-	label: 'Sealed', className: 'bg-sand/20/20 text-sand/40' }
+	label: 'Sealed', className: 'bg-sand/20 text-sand/40' }
   };
   // helpers
   function toDate(d: string | Date): Date {

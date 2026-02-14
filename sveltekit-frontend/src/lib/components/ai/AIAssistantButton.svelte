@@ -53,7 +53,7 @@
 			idle: 'bg-panelSoft border-sand/20 text-sand/40',
 			processing: 'bg-info/10 border-info text-info/80 animate-pulse',
 			listening: 'bg-danger/10 border-danger text-danger/80 animate-pulse',
-			connected: 'bg-warning/20/20 border-warning text-warning'
+			connected: 'bg-warning/20 border-warning text-warning'
 		};
 
 		let classes = `${base} ${variants[variant]} ${statusColors[aiStatus]}`;

@@ -22,12 +22,12 @@
   }: Props = $props();
 
   const typeColors = {
-    menu: 'from-panel/95 to-slate-900/95 border-info/80/80',
-    info: 'from-blue-800/95 to-blue-900/95 border-info/80/80',
-    stats: 'from-green-800/95 to-green-900/95 border-accent/60/80',
+    menu: 'from-panel/95 to-slate-900/95 border-info/80',
+    info: 'from-blue-800/95 to-blue-900/95 border-info/80',
+    stats: 'from-green-800/95 to-green-900/95 border-accent/80',
     inventory: 'from-amber-800/95 to-amber-900/95 border-warning/80',
-    battle: 'from-danger/40/95 to-danger/20/95 border-danger/60/80',
-    magic: 'from-purple-800/95 to-purple-900/95 border-info/60/80'
+    battle: 'from-danger/95 to-danger/95 border-danger/80',
+    magic: 'from-purple-800/95 to-purple-900/95 border-info/80'
   };
 
   const glowColors = {

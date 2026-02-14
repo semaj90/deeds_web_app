@@ -43,7 +43,7 @@
 		stores: 'bg-accent/20 text-accent/80',
 		services: 'bg-warning/20 text-warning/80',
 		api: 'bg-info/20 text-info/80',
-		utils: 'bg-sand/20/20 text-sand/40'
+		utils: 'bg-sand/20 text-sand/40'
 	};
 
 	// Error code colors
@@ -119,7 +119,7 @@
 				<!-- Surface Tags -->
 				<div class="surface-tags">
 					{#each cluster.surface.slice(0, 4) as surface}
-						<span class={`surface-tag ${surfaceColors[surface] || 'bg-sand/20/20 text-sand/40'}`}>
+						<span class={`surface-tag ${surfaceColors[surface] || 'bg-sand/20 text-sand/40'}`}>
 							{surface}
 						</span>
 					{/each}

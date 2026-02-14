@@ -196,7 +196,7 @@ routePath: suggestionId,
  {:else}
  <ul class="space-y-1 text-xs">
  {#each events as ev}
- <li class="border border-sand/20/60 rounded px-2 py-1">
+ <li class="border border-sand/60 rounded px-2 py-1">
  <div class="flex justify-between">
  <span class="font-mono text-[11px] text-sand/40">
  {ev.kind}/{ev.severity}

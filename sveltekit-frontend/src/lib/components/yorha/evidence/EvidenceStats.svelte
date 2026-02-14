@@ -44,13 +44,13 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
  <!-- Total Documents -->
- <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+ <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <div class="flex items-center justify-between">
  <div>
  <p class="text-sm font-medium text-sand/40">Total Documents</p>
  <p class="text-3xl font-bold text-white">{stats.totalDocuments.toLocaleString()}</p>
  </div>
- <div class="p-3 bg-info/80/20 rounded-lg">
+ <div class="p-3 bg-info/20 rounded-lg">
  <span class="text-2xl">📚</span>
  </div>
  </div>
@@ -62,13 +62,13 @@
  </div>
 
  <!-- Processing Status -->
- <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+ <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <div class="flex items-center justify-between">
  <div>
  <p class="text-sm font-medium text-sand/40">Processing Status</p>
  <p class="text-3xl font-bold text-accent">{stats.documentsProcessed.toLocaleString()}</p>
  </div>
- <div class="p-3 bg-accent/80/20 rounded-lg">
+ <div class="p-3 bg-accent/20 rounded-lg">
  <span class="text-2xl">⚡</span>
  </div>
  </div>
@@ -86,13 +86,13 @@
  </div>
 
  <!-- AI Analysis -->
- <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+ <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <div class="flex items-center justify-between">
  <div>
  <p class="text-sm font-medium text-sand/40">AI Analyzed</p>
  <p class="text-3xl font-bold text-info/80">{stats.aiAnalyzed.toLocaleString()}</p>
  </div>
- <div class="p-3 bg-info/80/20 rounded-lg">
+ <div class="p-3 bg-info/20 rounded-lg">
  <span class="text-2xl">🤖</span>
  </div>
  </div>
@@ -110,7 +110,7 @@
  </div>
 
  <!-- Pending Analysis -->
- <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+ <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <div class="flex items-center justify-between">
  <div>
  <p class="text-sm font-medium text-sand/40">Pending Analysis</p>
@@ -129,7 +129,7 @@
 </div>
 
 <!-- Processing Queue -->
-<div class="mt-6 bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+<div class="mt-6 bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <h3 class="text-lg font-semibold text-info mb-4">Active Processing Queue</h3>
 
  {#if processingQueue.length > 0}
@@ -138,7 +138,7 @@
  <div class="bg-panelSoft/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">
  <div class="flex items-center space-x-3">
- <div class="w-8 h-8 bg-info/80/20 rounded-lg flex items-center justify-center">
+ <div class="w-8 h-8 bg-info/20 rounded-lg flex items-center justify-center">
  <span class="text-sm">📄</span>
  </div>
  <div>

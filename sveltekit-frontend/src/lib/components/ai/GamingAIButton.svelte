@@ -86,7 +86,7 @@
         {#each quickActions as action, index}
           <button
             onclick={() => handleQuickAction(action.id)}
-            class="group relative flex items-center gap-3 px-4 py-3 bg-panel/95 backdrop-blur-md border border-sand/20/50 rounded-2xl hover:border-sand/30/50 transition-all duration-200 {action.color}"
+            class="group relative flex items-center gap-3 px-4 py-3 bg-panel/95 backdrop-blur-md border border-sand/50 rounded-2xl hover:border-sand/50 transition-all duration-200 {action.color}"
             in:scale={{ duration: 200, delay: index * 50, start: 0.8 }}
             aria-label={action.label}
           >
@@ -107,7 +107,7 @@
     {#if isExpanded}
       <button
         onclick={onSettingsClick}
-        class="p-3 bg-panelSoft/90 backdrop-blur-md border border-sand/30/50 rounded-xl hover:bg-panelSoft/90 hover:border-sand/30/50 transition-all duration-200 group"
+        class="p-3 bg-panelSoft/90 backdrop-blur-md border border-sand/50 rounded-xl hover:bg-panelSoft/90 hover:border-sand/50 transition-all duration-200 group"
         in:scale={{ duration: 200, delay: 300 }}
         aria-label="AI Assistant Settings"
       >
@@ -119,7 +119,7 @@
       onclick={() => isExpanded = !isExpanded}
       onmouseenter={() => isHovered = true}
       onmouseleave={() => isHovered = false}
-      class="relative group p-4 bg-gradient-to-br from-panel via-panelSoft to-panel border-2 border-sand/30/50 rounded-full shadow-2xl hover:border-sand/30/70 hover:shadow-info/20 transition-all duration-300 transform hover:scale-105 active:scale-95 {aiMode === 'active' ? 'shadow-accent/30 border-accent/60/70' : ''}"
+      class="relative group p-4 bg-gradient-to-br from-panel via-panelSoft to-panel border-2 border-sand/50 rounded-full shadow-2xl hover:border-sand/70 hover:shadow-info/20 transition-all duration-300 transform hover:scale-105 active:scale-95 {aiMode === 'active' ? 'shadow-accent/30 border-accent/70' : ''}"
       class:animate-pulse={aiMode === 'idle' && pulseAnimation}
       class:animate-bounce={aiMode === 'thinking'}
       aria-label={isExpanded ? 'Close AI Menu' : 'Open AI Assistant'}
@@ -128,9 +128,9 @@
       <div class="absolute inset-0 rounded-full bg-gradient-to-br from-info/20 via-info/20 to-accent/20 opacity-0 group-hover:opacity-50 transition-opacity duration-500 blur-xl"></div>
 
       {#if isConnected}
-        <div class="absolute inset-0 rounded-full border-2 border-accent/60/30 {pulseClasses[aiMode]}"></div>
+        <div class="absolute inset-0 rounded-full border-2 border-accent/30 {pulseClasses[aiMode]}"></div>
       {:else}
-        <div class="absolute inset-0 rounded-full border-2 border-danger/60/50 animate-pulse"></div>
+        <div class="absolute inset-0 rounded-full border-2 border-danger/50 animate-pulse"></div>
       {/if}
 
       <div class="relative flex items-center justify-center w-12 h-12">
@@ -153,7 +153,7 @@
 
       {#if isHovered && !isExpanded}
         <div
-          class="absolute right-full mr-4 top-1/2 -translate-y-1/2 px-3 py-2 bg-panel/95 backdrop-blur-md border border-sand/30/50 rounded-lg text-sm text-sand/40 whitespace-nowrap"
+          class="absolute right-full mr-4 top-1/2 -translate-y-1/2 px-3 py-2 bg-panel/95 backdrop-blur-md border border-sand/50 rounded-lg text-sm text-sand/40 whitespace-nowrap"
           in:fade={{ duration: 200 }}
           role="tooltip"
         >

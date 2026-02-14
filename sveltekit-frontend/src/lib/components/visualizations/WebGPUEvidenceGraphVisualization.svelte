@@ -396,7 +396,7 @@
     @apply bg-sand/10 dark:bg-panelSoft px-2 py-1 rounded text-x;
   }
   .fallback-message {
-    @apply bg-warning/5 dark:bg-warning/20/20 border border-warning/30 dark:border-warning/60 rounded-lg p-4 text-center;
+    @apply bg-warning/5 dark:bg-warning/20 border border-warning/30 dark:border-warning/60 rounded-lg p-4 text-center;
   }
   .graph-legend {
     @apply mt-4 p-3 bg-sand/5 dark:bg-panelSoft rounded-lg;

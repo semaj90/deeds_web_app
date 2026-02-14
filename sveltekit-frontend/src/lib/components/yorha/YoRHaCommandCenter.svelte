@@ -88,7 +88,7 @@
 
 <div class="p-6 space-y-6 bg-panel min-h-screen text-sand/40 font-mono">
   <!-- Header -->
-  <div class="flex items-center justify-between border-b border-info/20/50 pb-4">
+  <div class="flex items-center justify-between border-b border-info/50 pb-4">
     <div>
       <h1 class="text-2xl font-bold text-white tracking-[0.2em] uppercase">COMMAND CENTER</h1>
       <p class="text-info/60 text-xs mt-1">YoRHa Unit Monitoring & Neural Network Relay [v1.0.4]</p>
@@ -97,7 +97,7 @@
       <button
         onclick={loadData}
         disabled={isLoading}
-        class="px-4 py-2 bg-panel hover:bg-info/10 border border-info/30/50 text-info text-[10px] uppercase transition-all disabled:opacity-50"
+        class="px-4 py-2 bg-panel hover:bg-info/10 border border-info/50 text-info text-[10px] uppercase transition-all disabled:opacity-50"
       >
         {isLoading ? 'SYNCING...' : 'FORCE SYNC'}
       </button>
@@ -118,7 +118,7 @@
       {@const t = clusterHealth.thresholds}
 
       <!-- CPU -->
-      <div class="bg-panel/50 border border-sand/20 p-6 rounded relative overflow-hidden group hover:border-info/30/50 transition-colors">
+      <div class="bg-panel/50 border border-sand/20 p-6 rounded relative overflow-hidden group hover:border-info/50 transition-colors">
         <div class="absolute top-0 left-0 w-1 h-full bg-info"></div>
         <div class="flex justify-between items-start mb-4">
           <span class="text-[10px] text-sand/60 uppercase tracking-wider">Processor Load</span>
@@ -135,7 +135,7 @@
       </div>
 
       <!-- Memory -->
-      <div class="bg-panel/50 border border-sand/20 p-6 rounded relative overflow-hidden group hover:border-info/30/50 transition-colors">
+      <div class="bg-panel/50 border border-sand/20 p-6 rounded relative overflow-hidden group hover:border-info/50 transition-colors">
         <div class="absolute top-0 left-0 w-1 h-full bg-info"></div>
         <div class="flex justify-between items-start mb-4">
           <span class="text-[10px] text-sand/60 uppercase tracking-wider">Memory Allocation</span>
@@ -168,7 +168,7 @@
         </div>
       </div>
     {:else if isLoading}
-      <div class="col-span-3 h-24 flex items-center justify-center text-info/40 text-[10px] uppercase animate-pulse border border-sand/20/50 rounded">
+      <div class="col-span-3 h-24 flex items-center justify-center text-info/40 text-[10px] uppercase animate-pulse border border-sand/50 rounded">
         CALIBRATING SYSTEM LINK...
       </div>
     {/if}
@@ -184,7 +184,7 @@
       </div>
       <div class="p-4 space-y-3 flex-1">
         {#each cases as c}
-          <div class="flex items-center justify-between p-3 bg-panel/80 border border-sand/20 hover:border-info/20/50 transition-all cursor-pointer group rounded-sm">
+          <div class="flex items-center justify-between p-3 bg-panel/80 border border-sand/20 hover:border-info/50 transition-all cursor-pointer group rounded-sm">
             <div class="flex items-center gap-3">
               <div class="w-1.5 h-1.5 {c.status === 'active' ? 'bg-info' : 'bg-panelSoft'} rounded-full"></div>
               <div>

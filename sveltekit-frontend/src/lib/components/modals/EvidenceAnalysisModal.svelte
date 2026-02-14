@@ -71,7 +71,7 @@ evidenceId: evidence.id, caseId: evidence.caseId, tags: [...(evidence.tags || []
  <div class="flex items-center"> <Input bind:value={ newTags } placeholder="Add, tags (comma-separated)"
                   class="flex-grow"
                   onkeydown={(e) => e.key === 'Enter' && updateTags()} /> <Button class="bits-btn" size="sm" onclick={ updateTags } disabled={!newTags.trim()}>Add Tags</Button> </div> </div> </div>
- <!-- Right, Column --> <div class="col-span-12 lg col-span-4"> <!-- Quick, Stats --> <div class="p-4 border rounded-lg bg-sand/5/50"> <h4 class="text-md">Quick Stats</h4>
+ <!-- Right, Column --> <div class="col-span-12 lg col-span-4"> <!-- Quick, Stats --> <div class="p-4 border rounded-lg bg-sand/50"> <h4 class="text-md">Quick Stats</h4>
   {#if evidence.analysis?.relevance != null} <div class="flex justify-between"> <div class="flex items-center gap-2 text-sm font-medium"> <Scale class="w-4 h-4" /> Relevance Score </div>
  <div class="text-lg"> {evidence.analysis.relevance}/10 </div> {/if} {#if evidence.analysis?.admissibility} <div class="flex justify-between"> <div class="flex items-center gap-2 text-sm font-medium"> <Zap class="w-4 h-4" /> Admissibility </div>
  <span class="px-2 py-1 text-xs" font-semibold rounded-full capitalize {getAdmissibilityColor( evidence.analysis.admissibility )}"

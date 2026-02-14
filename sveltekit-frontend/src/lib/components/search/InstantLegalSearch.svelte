@@ -67,7 +67,7 @@ import { fly } from "svelte/transition";
                 value={result.title}
                 class="flex items-center gap-3 p-3 rounded-lg hover:bg-sand/10 dark:hover:bg-panelSoft cursor-pointer transition-colors"
             >
-                <div class="p-2 bg-info/5 dark:bg-info/20/30 rounded-full text-info">
+                <div class="p-2 bg-info/5 dark:bg-info/30 rounded-full text-info">
                 {#if result.type === 'case'}
                   <Scale size={18} />
                 {:else}

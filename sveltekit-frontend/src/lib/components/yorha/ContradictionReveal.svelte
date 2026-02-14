@@ -41,7 +41,7 @@
 
 {#if show}
  <!-- Backdrop -->
- <div class="fixed inset-0 bg-danger/20/80 flex items-center justify-center z-50 animate-fade-in">
+ <div class="fixed inset-0 bg-danger/80 flex items-center justify-center z-50 animate-fade-in">
  <!-- Phoenix Wright Style Alert -->
  <div class="bg-gradient-to-br from-danger/40 to-danger/20 border-4 border-warning rounded-lg p-8 text-center shadow-2xl animate-bounce-in">
  <!-- Dramatic Icon -->

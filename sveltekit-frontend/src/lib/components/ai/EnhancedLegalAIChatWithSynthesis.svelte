@@ -1284,7 +1284,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
                   <details class="text-xs">
                     <summary class="cursor-pointer text-info hover:text-info"
                       >📚 Document Analysis</summary>
-                    <div class="mt-1 p-2 bg-info/5 dark:bg-info/20/20 rounded">
+                    <div class="mt-1 p-2 bg-info/5 dark:bg-info/20 rounded">
                       <div>
                         <strong>Documents Processed:</strong>
                         {message.ragResults.metadata?.documentsProcessed || 0}

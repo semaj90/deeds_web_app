@@ -165,7 +165,7 @@ files = files.filter(f => f.id !== id);
 
 <div class="space-y-4">
 {#if enableCudaAcceleration && performanceStats.totalFiles > 0}
-<div class="flex items-center justify-between p-3 bg-info/5/50 dark:bg-info/20/10 border border-info/20 dark:border-info/30 rounded-lg text-sm">
+<div class="flex items-center justify-between p-3 bg-info/50 dark:bg-info/10 border border-info/20 dark:border-info/30 rounded-lg text-sm">
 <div class="flex items-center gap-2">
 <Zap class="h-4 w-4 text-info" />
 <span class="font-medium text-info dark:text-info/60">CUDA Acceleration Active</span>

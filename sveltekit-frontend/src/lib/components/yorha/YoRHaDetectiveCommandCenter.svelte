@@ -164,12 +164,12 @@
   function getCasePriorityColor(priority: string): string {
     switch (priority) {
       case 'high':
-        return 'border-danger/60 bg-danger/80/10 text-danger/60';
+        return 'border-danger/60 bg-danger/10 text-danger/60';
       case 'medium':
         return 'border-warning bg-warning/10 text-warning/80';
       case 'low':
-        return 'border-accent/60 bg-accent/80/10 text-accent/80';
-      default:return 'border-sand/30 bg-sand/20/10 text-sand/40';
+        return 'border-accent/60 bg-accent/10 text-accent/80';
+      default:return 'border-sand/30 bg-sand/10 text-sand/40';
     }
   }
 

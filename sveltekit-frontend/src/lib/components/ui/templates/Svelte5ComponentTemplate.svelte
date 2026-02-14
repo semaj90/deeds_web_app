@@ -85,7 +85,7 @@ let sizeClasses = $derived({
 
 let stateClasses = $derived([
 	disabled && 'opacity-50 cursor-not-allowed',
-	isHovered && !disabled && 'ring-2 ring-info/80/50',
+	isHovered && !disabled && 'ring-2 ring-info/50',
 	isFocused && !disabled && 'ring-2 ring-info'
 ].filter(Boolean).join(' '));
 

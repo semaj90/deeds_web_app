@@ -91,7 +91,7 @@
  }
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <div class="flex items-center justify-between mb-4">
  <h2 class="text-xl font-semibold text-info">System Overview</h2>
  {#if loading}
@@ -168,34 +168,34 @@
  </div>
 
  <!-- System Capabilities -->
- <div class="mt-6 pt-4 border-t border-sand/20/50">
+ <div class="mt-6 pt-4 border-t border-sand/50">
  <h3 class="text-sm font-medium text-sand/40 mb-3">Active Capabilities</h3>
  <div class="flex flex-wrap gap-2">
  {#if webgpuCapabilities?.hasWebGPU}
- <span class="px-2 py-1 bg-info/80/20 text-info text-xs rounded">WebGPU Compute</span>
+ <span class="px-2 py-1 bg-info/20 text-info text-xs rounded">WebGPU Compute</span>
  {/if}
  {#if cpuCapabilities?.hasWebGL}
- <span class="px-2 py-1 bg-accent/80/20 text-accent text-xs rounded">WebGL Fallback</span>
+ <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">WebGL Fallback</span>
  {/if}
  {#if systemMetrics?.services?.redis}
- <span class="px-2 py-1 bg-danger/80/20 text-danger/80 text-xs rounded">Redis Cache</span>
+ <span class="px-2 py-1 bg-danger/20 text-danger/80 text-xs rounded">Redis Cache</span>
  {/if}
  {#if systemMetrics?.services?.qdrant}
- <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">Vector Search</span>
+ <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">Vector Search</span>
  {/if}
  {#if systemMetrics?.services?.ollama}
- <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">AI Models</span>
+ <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">AI Models</span>
  {/if}
  {#if systemMetrics?.services?.database}
- <span class="px-2 py-1 bg-accent/80/20 text-accent text-xs rounded">Database</span>
+ <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Database</span>
  {/if}
- <span class="px-2 py-1 bg-warning/80/20 text-warning text-xs rounded">Document Processing</span>
+ <span class="px-2 py-1 bg-warning/20 text-warning text-xs rounded">Document Processing</span>
  </div>
  </div>
 
  <!-- Service Status -->
  {#if systemMetrics?.services}
- <div class="mt-4 pt-4 border-t border-sand/20/50">
+ <div class="mt-4 pt-4 border-t border-sand/50">
  <h3 class="text-sm font-medium text-sand/40 mb-3">Service Status</h3>
  <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
  {#each Object.entries(systemMetrics.services) as [service, status]}

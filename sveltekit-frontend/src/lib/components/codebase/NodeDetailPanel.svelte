@@ -46,7 +46,7 @@
     store: 'bg-accent/20 text-accent/80 border-accent/30',
     service: 'bg-warning/20 text-warning/80 border-warning/30',
     api: 'bg-info/20 text-info/80 border-info/30',
-    util: 'bg-sand/20/20 text-sand/40 border-sand/30/30'
+    util: 'bg-sand/20 text-sand/40 border-sand/30'
   };
 
   function getTypeIcon(type: string) {

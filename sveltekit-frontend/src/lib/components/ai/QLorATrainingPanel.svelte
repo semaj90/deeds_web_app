@@ -84,7 +84,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import  Ba
  <div class="bg-panelSoft/50 p-3 rounded border"> <p class="text-sand/40">GPU Util</p>
  <p class="text-white">{(currentJob.metrics.gpuUtilization * 100).toFixed(0)}%</p> </div> </div>
  <!-- Reinforcement Learning, Stats -->
-  {#if config?.useReinforcementLearning && currentJob.reinforcementLearning.episodes > 0} <div class="bg-info/20/20 border border-info/30 rounded-lg"> <h5 class="text-info/60 font-semibold">ðŸŽ¯ Reinforcement Learning</h5>
+  {#if config?.useReinforcementLearning && currentJob.reinforcementLearning.episodes > 0} <div class="bg-info/20 border border-info/30 rounded-lg"> <h5 class="text-info/60 font-semibold">ðŸŽ¯ Reinforcement Learning</h5>
  <div class="grid grid-cols-3"> <div> <p class="text-sand/40">Episodes</p>
  <p class="text-info/60">{currentJob.reinforcementLearning.episodes}
 </p> </div>

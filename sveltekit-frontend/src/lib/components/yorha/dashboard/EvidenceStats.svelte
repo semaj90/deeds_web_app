@@ -79,7 +79,7 @@
 });
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <div class="flex items-center justify-between mb-4">
  <h2 class="text-xl font-semibold text-info">Evidence Statistics</h2>
  {#if loading}
@@ -137,7 +137,7 @@
  </div>
 
  <!-- Document Types -->
- <div class="pt-4 border-t border-sand/20/50">
+ <div class="pt-4 border-t border-sand/50">
  <h3 class="text-sm font-medium text-sand/40 mb-3">Document Types</h3>
  <div class="space-y-2">
  <div class="flex items-center justify-between text-sm">

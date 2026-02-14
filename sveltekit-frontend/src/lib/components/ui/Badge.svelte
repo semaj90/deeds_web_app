@@ -20,9 +20,9 @@
  }: Props = $props();
 
  const variantStyles = {
- default: 'bg-sand/20/50 text-sand/40 b b-gray-500/30',
+ default: 'bg-sand/50 text-sand/40 b b-gray-500/30',
  primary: 'bg-info/50 text-info/40 b b-blue-500/30',
- secondary: 'bg-info/60/50 text-info/40 b b-purple-500/30',
+ secondary: 'bg-info/50 text-info/40 b b-purple-500/30',
  success: 'bg-accent/50 text-accent/40 b b-green-500/30',
  warning: 'bg-warning/50 text-warning/60 b b-yellow-500/30',
  destructive: 'bg-danger/50 text-danger/40 b b-red-500/30',

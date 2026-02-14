@@ -119,7 +119,7 @@ low: number, high: number }): string {
   }
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <div class="flex items-center justify-between mb-4">
  <h2 class="text-xl font-semibold text-info">GPU Metrics</h2>
  {#if loading}
@@ -185,12 +185,12 @@ low: number, high: number }): string {
  </div>
 
  <!-- Performance History (Mini Chart) -->
- <div class="pt-4 border-t border-sand/20/50">
+ <div class="pt-4 border-t border-sand/50">
  <h3 class="text-sm font-medium text-sand/40 mb-3">Performance History</h3>
  <div class="h-16 bg-panelSoft/30 rounded flex items-end space-x-1 p-2">
  {#each performanceHistory as point}
  <div
- class="bg-info/80/60 rounded-sm flex-1 transition-all duration-200"
+ class="bg-info/60 rounded-sm flex-1 transition-all duration-200"
  style="height: {point.utilization}%"
  ></div>
  {/each}
@@ -202,13 +202,13 @@ low: number, high: number }): string {
  </div>
 
  <!-- GPU Capabilities -->
- <div class="pt-4 border-t border-sand/20/50">
+ <div class="pt-4 border-t border-sand/50">
  <h3 class="text-sm font-medium text-sand/40 mb-2">Active Capabilities</h3>
  <div class="flex flex-wrap gap-1">
- <span class="px-2 py-1 bg-info/80/20 text-info text-xs rounded">WebGPU</span>
- <span class="px-2 py-1 bg-accent/80/20 text-accent text-xs rounded">Compute Shaders</span>
- <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">Tensor Ops</span>
- <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">Vector Search</span>
+ <span class="px-2 py-1 bg-info/20 text-info text-xs rounded">WebGPU</span>
+ <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Compute Shaders</span>
+ <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">Tensor Ops</span>
+ <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">Vector Search</span>
  {#if appStore.systemMetrics?.gpu?.model}
  <span class="px-2 py-1 bg-warning/20 text-warning text-xs rounded">{appStore.systemMetrics.gpu.model}</span>
  {/if}

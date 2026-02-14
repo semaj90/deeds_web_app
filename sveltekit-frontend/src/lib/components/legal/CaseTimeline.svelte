@@ -70,7 +70,7 @@
 	overdue: {
 	label: 'Overdue', className: 'bg-danger/20 text-danger/80 border-danger/30' },
 	cancelled: {
-	label: 'Cancelled', className: 'bg-sand/20/20 text-sand/40 border-sand/30/30' }
+	label: 'Cancelled', className: 'bg-sand/20 text-sand/40 border-sand/30' }
   } as const;
 
   function formatDate(date: Date): string {
@@ -203,7 +203,7 @@
                             'px-2 py-0.5 text-xs font-mono rounded',
                             event.priority === 'critical' && 'bg-danger/20 text-danger/80 border border-danger/30',
                             event.priority === 'high' && 'bg-warning/20 text-warning border border-warning/30',
-                            event.priority === 'low' && 'bg-sand/20/20 text-sand/40 border border-sand/30/30'
+                            event.priority === 'low' && 'bg-sand/20 text-sand/40 border border-sand/30'
                           )}
                         >
                           {event.priority.toUpperCase()}

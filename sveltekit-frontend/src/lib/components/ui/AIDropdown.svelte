@@ -150,7 +150,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     />
     {#if isGenerating}
       <div
-        class="absolute inset-0 rounded-md bg-info/20/50 animate-pulse"
+        class="absolute inset-0 rounded-md bg-info/50 animate-pulse"
         aria-hidden="true"
       ></div>
     {/if}

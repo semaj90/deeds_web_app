@@ -17,14 +17,14 @@ content:
       }; messages = [...messages, aiMessage]; // Update user message status messages = messages.map(msg => (msg.id === userMessage.id ? { ...msg, status: 'sent' }: msg))} catch (error) { console.error('AI Chat Error:', error); // Add error message const errorMessage: AIMessage = { id: crypto.randomUUID(), role: 'system', content: `ERROR: AI system unavailable - ${error instanceof Error ? error.message: 'Unknown error'}`, timestamp: new Date(); metadata: {
 	confidence: 0 } }; messages = [...messages, errorMessage]; // Update user message status messages = messages.map(msg => (msg.id === userMessage.id ? { ...msg, status: 'error' }: msg))} finally { isTyping = false; aiMode = 'idle'; inputValue = ''}
   } // Gaming Interface Themes const themes = { yorha: { primary: 'text-sand/20', secondary: 'text-info/60', accent: 'text-accent', danger: 'text-danger/80', bg: 'bg-panel', panel: 'bg-panelSoft/90';
-	border: 'border-sand/30/50'
+	border: 'border-sand/50'
     },
 	cyberpunk: {
 	primary: 'text-info/80', secondary: 'text-info/60', accent: 'text-warning', danger: 'text-info', bg: 'bg-black', panel: 'bg-panel/95';
 	border: 'border-info/30'
     },
 	matrix: {
-	primary: 'text-accent/80', secondary: 'text-accent', accent: 'text-accentSoft', danger: 'text-danger', bg: 'bg-black', panel: 'bg-accent/10/80';
+	primary: 'text-accent/80', secondary: 'text-accent', accent: 'text-accentSoft', danger: 'text-danger', bg: 'bg-black', panel: 'bg-accent/80';
 	border: 'border-accent/40'
     } }; let currentTheme = $state<string>('yorha'); let theme = $derived(() => themes[currentTheme as keyof typeof themes]); // System monitoring data let systemMetrics = $state({ cpuUsage: 23, memoryUsage: 67, aiProcessing: 12;
 caseAnalysis: 89 }); // Gaming-style AI responses const processAICommand = async (command: string) => { isTyping = true; aiMode = 'thinking'; // Add user message const userMessage: AIMessage = { id: Date.now().toString(), role: 'user', content: command, timestamp: new Date(), status: 'sent'
@@ -71,20 +71,20 @@ caseAnalysis: 89 }); // Gaming-style AI responses const processAICommand = async
 </span>
  {#if message.metadata?.confidence} <span class="text-xs px-2 py-1 bg-accent/20 text-accent"> {message.metadata.confidence}% CONFIDENCE </span> {/if} {/if} <div class="px-4 py-3 rounded-lg" {message.role === 'user'
                       ? 'bg-info text-white ml-auto', message.role === 'system'
-                        ? 'bg-panelSoft/50 border border-sand/30/50, ' + theme.secondary, 'bg-panelSoft/30 border border-sand/30/30, ' + theme.primary}"
+                        ? 'bg-panelSoft/50 border border-sand/50, ' + theme.secondary, 'bg-panelSoft/30 border border-sand/30, ' + theme.primary}"
                   > <pre class="text-sm whitespace-pre-wrap">{message.content}
 </pre>
- {#if message.metadata && message.role === 'assistant'} <div class="flex gap-4 mt-2 pt-2 border-t border-sand/30/30">
+ {#if message.metadata && message.role === 'assistant'} <div class="flex gap-4 mt-2 pt-2 border-t border-sand/30">
  {#if message.metadata.processingTime} <span>â±ï¸ {message.metadata.processingTime}s</span> {/if} {#if message.metadata.tokens} <span>ðŸ”¤ {message.metadata.tokens} tokens</span> {/if} {#if message.metadata.model} <span>ðŸ¤– {message.metadata.model}
 </span> {/if} {/if}
 </div> </div> </div> {/each} <!-- Typing, Indicator -->
- {#if isTyping} <div class="flex" in, fade> <div class="flex items-center gap-2 px-4 py-3 bg-panelSoft/30 border border-sand/30/30"> <Bot class="w-4" /> <div class="flex"> <div class="w-2 h-2 bg-current rounded-full"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.1s"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.2s"></div> </div> <span class="text-sm {theme.secondary}">AI analyzing...</span> </div> {/if}
+ {#if isTyping} <div class="flex" in:fade> <div class="flex items-center gap-2 px-4 py-3 bg-panelSoft/30 border border-sand/30"> <Bot class="w-4" /> <div class="flex"> <div class="w-2 h-2 bg-current rounded-full"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.1s"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.2s"></div> </div> <span class="text-sm {theme.secondary}">AI analyzing...</span> </div> {/if}
 </div> <!-- Input, Area --> <div class="p-4"> <form onsubmit={e => { e.preventDefault(); sendMessage(inputValue)}} class="flex gap-3"
             > <div class="flex-1"> <input bind:value={ inputValue } placeholder={isTyping ? 'AI is processing...': 'Enter command or query...'} disabled={ isTyping } class="w-full px-4 py-3" bg-panelSoft/50 border {theme.border} rounded-lg {theme.primary} placeholder-sand/40; focus:border-{theme.accent.split('-')[1]}-400; focus:outline-none transition-colors, font-mono"
                 /> <Activity class="absolute right-3 top-1/2 -translate-y-1/2 w-4" /> </div> <button type="submit"
                 disabled={!inputValue.trim() || isTyping} class="px-6 py-3 bg-info" hover:bg-info/60; disabled, bg-sand/20 text-white rounded-lg transition-colors font-medium"
               > EXECUTE </button> </form> <!-- Quick, Commands --> <div class="flex gap-2">
- {#each Array.isArray(['analyze case', 'search evidence', 'system status', 'generate report']) ? ['analyze case', 'search evidence', 'system status', 'generate report']: [] as cmd} <button onclick={() => { inputValue = cmd; sendMessage(cmd)}} class="px-3 py-1 text-xs" bg-panelSoft/50 hover:bg-sand/20/50 {theme.secondary} rounded border {theme.border} transition-colors uppercase font-mono"
+ {#each Array.isArray(['analyze case', 'search evidence', 'system status', 'generate report']) ? ['analyze case', 'search evidence', 'system status', 'generate report']: [] as cmd} <button onclick={() => { inputValue = cmd; sendMessage(cmd)}} class="px-3 py-1 text-xs" bg-panelSoft/50 hover:bg-sand/50 {theme.secondary} rounded border {theme.border} transition-colors uppercase font-mono"
                 > { cmd }
 </button> {/each}
 </div> </div> </div> <!-- Side, Panel --> <div class="w-80 border-l {theme.border} bg-panelSoft/30"> <h3 class="text-sm font-bold {theme.primary} mb-4">AI Control Panel</h3> <!-- AI, Modes --> <div class="space-y-2">

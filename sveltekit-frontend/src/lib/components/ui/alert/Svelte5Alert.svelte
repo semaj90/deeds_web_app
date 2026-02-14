@@ -30,9 +30,9 @@ let {
 let isVisible = $state(true);
 
 let variantClasses = $derived({
-	info: 'bg-info/20/50 border-info text-info/40',
-	success: 'bg-accent/20/50 border-accent text-accent/40',
-	warning: 'bg-warning/20/50 border-warning text-warning/60',
+	info: 'bg-info/50 border-info text-info/40',
+	success: 'bg-accent/50 border-accent text-accent/40',
+	warning: 'bg-warning/50 border-warning text-warning/60',
 	error: 'bg-danger/20 border-danger text-danger/40'
 }[variant]);
 

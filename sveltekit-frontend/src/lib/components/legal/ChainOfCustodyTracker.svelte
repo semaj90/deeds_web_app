@@ -14,7 +14,7 @@
 	chemical: {
 	icon: 'âš—ï¸', color: 'text-info/80', bg: 'bg-info/10' },
 	other: {
-	icon: 'ðŸ“¦', color: 'text-sand/40', bg: 'bg-sand/20/10' } }; // Condition configurations const conditionConfig = { excellent: {
+	icon: 'ðŸ“¦', color: 'text-sand/40', bg: 'bg-sand/10' } }; // Condition configurations const conditionConfig = { excellent: {
 	label: 'Excellent', class: 'bg-accent/20 text-accent' },
 	good: {
 	label: 'Good', class: 'bg-info/20 text-info/80' },

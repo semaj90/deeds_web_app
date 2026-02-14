@@ -49,10 +49,10 @@ function generateRecommendations() {
 
 	function getPriorityColor(priority: string) {
 		switch (priority) {
-			case 'high': return 'text-danger/80 border-danger/60/30';
+			case 'high': return 'text-danger/80 border-danger/30';
 			case 'medium': return 'text-warning border-warning/30';
-			case 'low': return 'text-accent border-accent/60/30';
-			default:return 'text-sand/40 border-sand/30/30';
+			case 'low': return 'text-accent border-accent/30';
+			default:return 'text-sand/40 border-sand/30';
 		}
 	}
 

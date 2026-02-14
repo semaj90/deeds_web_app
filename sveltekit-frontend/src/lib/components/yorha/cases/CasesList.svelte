@@ -80,19 +80,19 @@
 
   function getPriorityClass(priority: string) {
     switch (priority) {
-      case 'high': return 'text-danger/80 bg-danger/80/10 border-danger/60/20';
-      case 'medium': return 'text-warning bg-warning/80/10 border-warning/80/20';
-      case 'low': return 'text-accent bg-accent/80/10 border-accent/20';
-      default:return 'text-sand/40 bg-sand/20/10 border-sand/30/20';
+      case 'high': return 'text-danger/80 bg-danger/10 border-danger/20';
+      case 'medium': return 'text-warning bg-warning/10 border-warning/20';
+      case 'low': return 'text-accent bg-accent/10 border-accent/20';
+      default:return 'text-sand/40 bg-sand/10 border-sand/20';
     }
   }
 </script>
 
 <div class="space-y-4">
-  <div class="overflow-x-auto rounded-lg border border-sand/20/50 bg-panel/50 backdrop-blur">
+  <div class="overflow-x-auto rounded-lg border border-sand/50 bg-panel/50 backdrop-blur">
     <table class="w-full text-left border-collapse">
       <thead>
-        <tr class="border-b border-sand/20/50 bg-panelSoft/30">
+        <tr class="border-b border-sand/50 bg-panelSoft/30">
           <th class="p-4 w-10">
             <input type="checkbox" class="rounded border-sand/30 bg-panelSoft text-info" />
           </th>
@@ -106,7 +106,7 @@
       </thead>
       <tbody>
         {#each filteredCases as item (item.id)}
-          <tr class="border-b border-sand/20/30 hover:bg-panelSoft/20 transition-colors group">
+          <tr class="border-b border-sand/30 hover:bg-panelSoft/20 transition-colors group">
             <td class="p-4">
               <input
                 type="checkbox"

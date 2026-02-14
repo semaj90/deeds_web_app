@@ -165,7 +165,7 @@ $effect(() => {
 						class="w-full px-3 py-2 text-left text-sm flex items-center gap-2
 							   transition-colors duration-100
 							   {item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-							   {item.danger ? 'text-danger/80 hover:bg-danger/20/30' : 'text-white hover:bg-panelSoft'}
+							   {item.danger ? 'text-danger/80 hover:bg-danger/30' : 'text-white hover:bg-panelSoft'}
 							   {focusedIndex === i ? 'bg-panelSoft' : ''}"
 						role="menuitem"
 						tabindex={focusedIndex === i ? 0 : -1}

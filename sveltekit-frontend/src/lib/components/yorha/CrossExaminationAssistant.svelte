@@ -98,7 +98,7 @@ witness: evidence,
  function getPriorityColor(priority: string) {
  switch (priority) {
  case 'high': return 'text-danger/80 bg-danger/10';
- case 'medium': return 'text-warning bg-warning/20/20';
+ case 'medium': return 'text-warning bg-warning/20';
  case 'low': return 'text-accent bg-accent/10';
  default:return 'text-sand/40 bg-panel/20';
  }

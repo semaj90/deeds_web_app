@@ -103,14 +103,14 @@ Compact AI recommendations component for sidebar/dashboard use
 	function getRecommendationColor(type: string) {
 		switch (type) {
 			case 'action':
-				return 'border-l-info bg-info/5/50 dark:bg-info/20/10';
+				return 'border-l-info bg-info/50 dark:bg-info/10';
 			case 'insight':
-				return 'border-l-accent bg-accent/5/50 dark:bg-accent/20/10';
+				return 'border-l-accent bg-accent/50 dark:bg-accent/10';
 			case 'warning':
-				return 'border-l-danger bg-danger/5/50 dark:bg-danger/20/10';
+				return 'border-l-danger bg-danger/50 dark:bg-danger/10';
 			case 'opportunity':
-				return 'border-l-purple-500 bg-info/5/50 dark:bg-info/20/10';
-			default:return 'border-l-sand/50 bg-sand/5/50 dark:bg-panel/10';
+				return 'border-l-purple-500 bg-info/50 dark:bg-info/10';
+			default:return 'border-l-sand/50 bg-sand/50 dark:bg-panel/10';
 		}
 	}
 
@@ -131,13 +131,13 @@ Compact AI recommendations component for sidebar/dashboard use
 	function getPriorityColor(priority: string) {
 		switch (priority) {
 			case 'critical':
-				return 'text-danger bg-danger/10 dark:bg-danger/20/30 dark:text-danger/80';
+				return 'text-danger bg-danger/10 dark:bg-danger/30 dark:text-danger/80';
 			case 'high':
-				return 'text-warning bg-warning/10 dark:bg-warning/20/30 dark:text-warning';
+				return 'text-warning bg-warning/10 dark:bg-warning/30 dark:text-warning';
 			case 'medium':
-				return 'text-warning bg-warning/10 dark:bg-warning/20/30 dark:text-warning';
+				return 'text-warning bg-warning/10 dark:bg-warning/30 dark:text-warning';
 			case 'low':
-				return 'text-accent bg-accent/10 dark:bg-accent/20/30 dark:text-accent';
+				return 'text-accent bg-accent/10 dark:bg-accent/30 dark:text-accent';
 			default:return 'text-sand/60 bg-sand/10 dark:bg-panel/30 dark:text-sand/40';
 		}
 	}

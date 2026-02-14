@@ -452,7 +452,7 @@
         <div class="border-t border-warning/30 max-h-96 overflow-y-auto" data-testid="search-results">
           {#each searchResults as result, index (result.id)}
             <div
-              class="nier-result-item border-b border-sand/20/50 p-4 hover:bg-panelSoft/50 cursor-pointer transition-all duration-200 group"
+              class="nier-result-item border-b border-sand/50 p-4 hover:bg-panelSoft/50 cursor-pointer transition-all duration-200 group"
               onclick={() => selectResult(result)}
               role="button"
               tabindex="0"

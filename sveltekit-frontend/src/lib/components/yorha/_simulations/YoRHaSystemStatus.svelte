@@ -127,7 +127,7 @@
     <div class="flex items-center bg-panelSoft px-3 py-1 border border-sand/20 rounded-sm">
       <span class="text-info font-bold tracking-widest"> {currentTime.toLocaleTimeString('en-GB', { hour12: false })} </span>
     </div>
-    <div class="hidden xl:block bg-info/10 border border-info/30/50 px-2 py-1 rounded-sm">
+    <div class="hidden xl:block bg-info/10 border border-info/50 px-2 py-1 rounded-sm">
       <span class="text-info font-bold">YORHA-ID: AI-NODE-2B</span>
     </div>
   </div>

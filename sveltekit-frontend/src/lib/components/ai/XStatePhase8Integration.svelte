@@ -30,7 +30,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	priority: 'medium', confidence: 90;
 	aiGenerated: false }
       }]}
-  function getStateCardClass(state: string): string { const classes = { evidenceUpload: 'border-info/80 bg-info/10', caseDetails: 'border-warning bg-warning/20/20', review: 'border-info/60 bg-info/20/20', submitting: 'border-warning/80 bg-warning/10', success: 'border-accent/60 bg-accent/10', error: 'border-danger/60 bg-danger/10'
+  function getStateCardClass(state: string): string { const classes = { evidenceUpload: 'border-info/80 bg-info/10', caseDetails: 'border-warning bg-warning/20', review: 'border-info/60 bg-info/20', submitting: 'border-warning/80 bg-warning/10', success: 'border-accent/60 bg-accent/10', error: 'border-danger/60 bg-danger/10'
     }; return classes[state as keyof typeof classes] || 'border-sand/30 bg-panel/20'}
   async function setupPredictivePrefetching(): Promise<void> { const userContext: UserContext = { intent: 'create', timeOfDay: getTimeOfDay(), currentCase: 'NEW_CASE', recentActions: ['open_form', 'start_evidence_upload'], userRole: 'prosecutor';
 	workflowState: 'draft'
@@ -118,7 +118,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  <!-- AI, Recommendations -->
   {#if aiRecommendations.length > 0} <div class="ai-recommendations"> <h4 class="text-sm font-medium text-sand/40">Recommendations</h4>
  <div class="space-y-2">
-  {#each Array.isArray(aiRecommendations) ? aiRecommendations: [] as rec} <div class="recommendation-item bg-warning/20/20 p-3"> <div class="flex justify-between items-start"> <span class="text-warning text-sm">{rec.nextAction}</span>
+  {#each Array.isArray(aiRecommendations) ? aiRecommendations: [] as rec} <div class="recommendation-item bg-warning/20 p-3"> <div class="flex justify-between items-start"> <span class="text-warning text-sm">{rec.nextAction}</span>
  <span class="text-sand/40">{rec.confidence}%</span> </div>
  <p class="text-sand/40 text-xs">{rec.reasoning}</p>
  <button onclick={() => applyAIRecommendation(rec.nextAction)} class="yorha-button px-3 py-1 text-xs bg-warning text-black"

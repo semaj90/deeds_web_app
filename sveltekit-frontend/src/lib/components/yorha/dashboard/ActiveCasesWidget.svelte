@@ -105,14 +105,14 @@
   }
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <div class="flex items-center justify-between mb-4">
  <h2 class="text-xl font-semibold text-info">Active Cases</h2>
  <div class="flex items-center space-x-2">
  {#if loading}
  <div class="w-4 h-4 border-2 border-info/80 border-t-transparent rounded-full animate-spin"></div>
  {/if}
- <button class="px-3 py-1 bg-info/80/20 hover:bg-info/80/30 text-info text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-info/20 hover:bg-info/30 text-info text-sm rounded transition-colors">
  View All
  </button>
  </div>
@@ -155,7 +155,7 @@
  {#if !loading}
  <div class="text-center py-8">
  <div class="text-sand/40 mb-2">No active cases found</div>
- <button class="px-4 py-2 bg-info/80/20 hover:bg-info/80/30 text-info text-sm rounded transition-colors">
+ <button class="px-4 py-2 bg-info/20 hover:bg-info/30 text-info text-sm rounded transition-colors">
  Create New Case
  </button>
  </div>
@@ -163,7 +163,7 @@
  {/each}
  </div>
 
- <div class="mt-4 pt-4 border-t border-sand/20/50">
+ <div class="mt-4 pt-4 border-t border-sand/50">
  <div class="flex items-center justify-between text-sm">
  <span class="text-sand/40">Total Active Cases:</span>
  <span class="text-info font-medium">{activeCases.length}</span>

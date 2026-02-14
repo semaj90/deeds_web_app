@@ -102,10 +102,10 @@ function getFileIcon(type: string): string {
 }
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
  <!-- Upload Zone -->
  <div
- class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-info/80 bg-info/80/10' : 'border-sand/30 hover:border-sand/30'}"
+ class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-info/80 bg-info/10' : 'border-sand/30 hover:border-sand/30'}"
  role="region"
  ondragover={ handleDragOver }
  ondragleave={ handleDragLeave }
@@ -130,7 +130,7 @@ function getFileIcon(type: string): string {
 
  <label
  for="file-input"
- class="inline-flex items-center px-4 py-2 bg-info/80/20 hover:bg-info/80/30 text-info rounded-lg cursor-pointer transition-colors"
+ class="inline-flex items-center px-4 py-2 bg-info/20 hover:bg-info/30 text-info rounded-lg cursor-pointer transition-colors"
  >
  <span class="mr-2">📎</span>
  Choose Files
@@ -147,7 +147,7 @@ function getFileIcon(type: string): string {
  <div class="flex items-center justify-between mb-4">
  <h4 class="text-sm font-medium text-sand/40">Files to Upload ({uploadedFiles.length})</h4>
  <button
- class="px-4 py-2 bg-accent/80/20 hover:bg-accent/80/30 text-accent text-sm rounded-lg transition-colors disabled:opacity-50"
+ class="px-4 py-2 bg-accent/20 hover:bg-accent/30 text-accent text-sm rounded-lg transition-colors disabled:opacity-50"
  disabled={isUploading}
  onclick={ uploadFiles }
  >
@@ -193,7 +193,7 @@ function getFileIcon(type: string): string {
  </div>
  {/if}
 
- <div class="mt-6 pt-4 border-t border-sand/20/50">
+ <div class="mt-6 pt-4 border-t border-sand/50">
  <h4 class="text-sm font-medium text-sand/40 mb-2">Upload Tips</h4>
  <ul class="text-xs text-sand/40 space-y-1">
  <li>Maximum file size: 100MB per file</li>

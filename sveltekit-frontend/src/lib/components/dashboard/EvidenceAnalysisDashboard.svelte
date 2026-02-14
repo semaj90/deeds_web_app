@@ -86,14 +86,14 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .evidence-panel { /* @apply lg:col-span-1; */ }
   .analysis-panel { /* @apply lg:col-span-2; */ }
   .upload-zone { /* @apply border-2 border-dashed border-sand/20 dark:border-sand/30 rounded-lg p-6 mb-4 text-center transition-color; */ }
-  .upload-zone.active { /* @apply border-info bg-info/5 dark:bg-info/20/20; */ }
+  .upload-zone.active { /* @apply border-info bg-info/5 dark:bg-info/20; */ }
   .upload-label { /* @apply cursor-pointer flex flex-col items-center; */ }
   .upload-icon { /* @apply w-12 h-12 text-sand/40 mb-2; */ }
   .upload-text { /* @apply text-sm text-sand/60 dark:text-sand/40; */ }
   .evidence-list { /* @apply space-y-2 max-h-96 overflow-y-auto; */ }
   .evidence-item { /* @apply w-full text-left p-3 rounded-lg border border-sand/20 dark: border-sand/20;
 		hover:bg-sand/5; dark:hover, bg-panelSoft transition-colors flex items-start gap-3; */ }
-  .evidence-item.selected { /* @apply bg-info/5 dark:bg-info/20/30 border-info; */ }
+  .evidence-item.selected { /* @apply bg-info/5 dark:bg-info/30 border-info; */ }
   .evidence-icon { /* @apply text-2xl flex-shrink-0; */ }
   .evidence-info { /* @apply flex-1; */ }
   .evidence-title { /* @apply font-medium text-sand dark:text-sand/20; */ }

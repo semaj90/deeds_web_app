@@ -166,7 +166,7 @@
       </Card.Header>
       <Card.Content>
         <div class="text-2xl font-bold">{performanceMetrics.gpuEfficiency}%</div>
-        <Progress value={performanceMetrics.gpuEfficiency} class="mt-2 h-1 bg-warning/10/20" />
+        <Progress value={performanceMetrics.gpuEfficiency} class="mt-2 h-1 bg-warning/20" />
       </Card.Content>
     </Card.Root>
 

@@ -73,7 +73,7 @@ let searchQuery = $state('');
  }
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
   <div class="flex flex-col lg: flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 gap-4">
     <!-- Search -->
     <div class="flex-1 max-w-md">
@@ -154,14 +154,14 @@ let searchQuery = $state('');
       </button>
 
       <button
-        class="px-4 py-2 bg-info/80/20 hover:bg-info/80/30 text-info text-sm rounded-lg transition-colors"
+        class="px-4 py-2 bg-info/20 hover:bg-info/30 text-info text-sm rounded-lg transition-colors"
         onclick={bulkAnalyze}
       >
         🤖 Bulk Analyze
       </button>
 
       <button
-        class="px-4 py-2 bg-accent/80/20 hover:bg-accent/80/30 text-accent text-sm rounded-lg transition-colors"
+        class="px-4 py-2 bg-accent/20 hover:bg-accent/30 text-accent text-sm rounded-lg transition-colors"
         onclick={bulkTag}
       >
         🏷️ Bulk Tag
@@ -172,30 +172,30 @@ let searchQuery = $state('');
 
  <!-- Active Filters Display -->
  {#if searchQuery || typeFilter !== 'all' || statusFilter !== 'all' || caseFilter !== 'all' || aiAnalyzedFilter !== 'all' || dateRange !== 'all'}
- <div class="mt-4 pt-4 border-t border-sand/20/50">
+ <div class="mt-4 pt-4 border-t border-sand/50">
  <div class="flex flex-wrap items-center gap-2">
  <span class="text-sm text-sand/40">Active filters:</span>
 
  {#if searchQuery}
- <span class="px-2 py-1 bg-info/80/20 text-info text-xs rounded">
+ <span class="px-2 py-1 bg-info/20 text-info text-xs rounded">
  Search: "{searchQuery}"
  </span>
  {/if}
 
  {#if typeFilter !== 'all'}
- <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">
+ <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">
  Type: {typeOptions.find(o => o.value === typeFilter)?.label}
  </span>
  {/if}
 
  {#if statusFilter !== 'all'}
- <span class="px-2 py-1 bg-accent/80/20 text-accent text-xs rounded">
+ <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">
  Status: {statusOptions.find(o => o.value === statusFilter)?.label}
  </span>
  {/if}
 
  {#if caseFilter !== 'all'}
- <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">
+ <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">
  Case: {caseOptions.find(o => o.value === caseFilter)?.label}
  </span>
  {/if}
@@ -207,7 +207,7 @@ let searchQuery = $state('');
  {/if}
 
  {#if dateRange !== 'all'}
- <span class="px-2 py-1 bg-warning/80/20 text-warning text-xs rounded">
+ <span class="px-2 py-1 bg-warning/20 text-warning text-xs rounded">
  Date: {dateRangeOptions.find(o => o.value === dateRange)?.label}
  </span>
  {/if}

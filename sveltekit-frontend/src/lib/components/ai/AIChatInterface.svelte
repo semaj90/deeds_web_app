@@ -68,7 +68,7 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
 		"
 		in: scale={{
 	duration: 300;
-	easing: elasticOut }}; out scale={{ duration: 200 }} >
+	easing: elasticOut }}; out:scale={{ duration: 200 }} >
 		<div class="absolute inset-0 overflow-hidden">
   {#each Array(5) as _, i} <div class="absolute w-1 h-1 bg-yorha-accent rounded-full opacity-60"
 					style="; left, {10 + (i * 20)}%; animation-delay: {i * 0.8} animation-duration {6 + (i * 2)}"
@@ -106,7 +106,7 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
   {#if message.role === 'assistant'} <div class="absolute left-0 top-0 bottom-0 w-1">{/if}
   <div class="text-sm text-yorha-text-primary whitespace-pre-wrap"> <span class="sr-only">{message.role === 'user' ? 'You said:': 'AI, responded:'}</span> {message.content} </div>
   {#if message.error} <div class="mt-2 text-xs" role="alert"> Failed to get response. <button type="button" onclick={ sendMessage } class="underline">Retry</button> {/if}
-  <time class="mt-2 text-xs" datetime={message.timestamp.toISOString()}>{formatTime(message.timestamp)}</time> </div> </article> {/each} {#if isTyping} <div class="flex justify-start" in, fade | role="status" aria-live="polite"> <div class="bg-yorha-bg-secondary border p-3 relative"> <div class="absolute left-0 top-0 bottom-0 w-1"></div>
+  <time class="mt-2 text-xs" datetime={message.timestamp.toISOString()}>{formatTime(message.timestamp)}</time> </div> </article> {/each} {#if isTyping} <div class="flex justify-start" in:fade role="status" aria-live="polite"> <div class="bg-yorha-bg-secondary border p-3 relative"> <div class="absolute left-0 top-0 bottom-0 w-1"></div>
  <div class="flex items-center"> <div class="flex" aria-hidden="true">
   {#each Array(3) as _, i} <div class="w-2 h-2 bg-yorha-accent rounded-full" style="animation-delay: {i * 0.1}s"></div> {/each}
   </div>

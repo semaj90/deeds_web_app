@@ -25,7 +25,7 @@
 			case 'error':
 				return 'border-danger bg-danger/5 text-danger dark:bg-danger/10 dark:text-danger/20';
 			case 'warning':
-				return 'border-warning bg-warning/5 text-warning dark:bg-warning/20/20';
+				return 'border-warning bg-warning/5 text-warning dark:bg-warning/20';
 			case 'info':
 				return 'border-info bg-info/5 text-info dark:bg-info/10 dark:text-info/20';
 			default:

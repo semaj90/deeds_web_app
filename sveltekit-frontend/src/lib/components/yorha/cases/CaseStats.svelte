@@ -47,13 +47,13 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
   <!-- Total Cases -->
-  <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+  <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
     <div class="flex items-center justify-between">
       <div>
         <p class="text-sm font-medium text-sand/40">Total Cases</p>
         <p class="text-3xl font-bold text-white">{stats.totalCases}</p>
       </div>
-      <div class="p-3 bg-info/80/20 rounded-lg">
+      <div class="p-3 bg-info/20 rounded-lg">
         <span class="text-2xl">📋</span>
       </div>
     </div>
@@ -68,13 +68,13 @@
   </div>
 
   <!-- Active Cases -->
-  <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+  <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
     <div class="flex items-center justify-between">
       <div>
         <p class="text-sm font-medium text-sand/40">Active Cases</p>
         <p class="text-3xl font-bold text-accent">{stats.activeCases}</p>
       </div>
-      <div class="p-3 bg-accent/80/20 rounded-lg">
+      <div class="p-3 bg-accent/20 rounded-lg">
         <span class="text-2xl">🔍</span>
       </div>
     </div>
@@ -90,7 +90,7 @@
   </div>
 
   <!-- Under Review -->
-  <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+  <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
     <div class="flex items-center justify-between">
       <div>
         <p class="text-sm font-medium text-sand/40">Under Review</p>
@@ -112,13 +112,13 @@
   </div>
 
   <!-- Success Rate -->
-  <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+  <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
     <div class="flex items-center justify-between">
       <div>
         <p class="text-sm font-medium text-sand/40">Success Rate</p>
         <p class="text-3xl font-bold text-info">{stats.successRate}%</p>
       </div>
-      <div class="p-3 bg-info/80/20 rounded-lg">
+      <div class="p-3 bg-info/20 rounded-lg">
         <span class="text-2xl">✨</span>
       </div>
     </div>
@@ -129,7 +129,7 @@
 </div>
 
 <!-- Priority Breakdown -->
-<div class="mt-6 bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+<div class="mt-6 bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
   <h3 class="text-lg font-semibold text-info mb-4">Priority Breakdown</h3>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
