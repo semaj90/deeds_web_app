@@ -81,7 +81,7 @@ interface PersonOfInterest {
  <Dialog.Root bind:open={aiOpen}>
  <Dialog.Portal>
  <Dialog.Overlay />
- <Dialog.Content class="nes-container bg-gray-900 text-white w-[500px] rounded-xl">
+ <Dialog.Content class="nes-container bg-panel text-white w-[500px] rounded-xl">
  <Dialog.Title class="text-xl mb-4">AI Legal Risk Summary</Dialog.Title>
  <Dialog.Description>
    <p>{aiSummary}</p>

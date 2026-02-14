@@ -73,7 +73,7 @@ let searchQuery = $state('');
  }
 </script>
 
-<div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
   <div class="flex flex-col lg: flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 gap-4">
     <!-- Search -->
     <div class="flex-1 max-w-md">
@@ -81,12 +81,12 @@ let searchQuery = $state('');
         <input
           type="text"
           placeholder="Search evidence..."
-          class="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+          class="w-full pl-10 pr-4 py-2 bg-panelSoft/50 border border-sand/30 rounded-lg text-white placeholder-sand/40 focus:ring-2 focus:ring-info/80 focus:border-transparent"
           bind:value={searchQuery}
           oninput={applyFilters}
         />
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="h-5 w-5 text-sand/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
@@ -96,7 +96,7 @@ let searchQuery = $state('');
     <!-- Filters -->
     <div class="flex flex-wrap items-center gap-4">
       <select
-        class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+        class="bg-panelSoft/50 border border-sand/30 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-info/80 focus:border-transparent"
         bind:value={typeFilter}
         onchange={applyFilters}
       >
@@ -106,7 +106,7 @@ let searchQuery = $state('');
       </select>
 
       <select
-        class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+        class="bg-panelSoft/50 border border-sand/30 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-info/80 focus:border-transparent"
         bind:value={statusFilter}
         onchange={applyFilters}
       >
@@ -116,7 +116,7 @@ let searchQuery = $state('');
       </select>
 
       <select
-        class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+        class="bg-panelSoft/50 border border-sand/30 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-info/80 focus:border-transparent"
         bind:value={caseFilter}
         onchange={applyFilters}
       >
@@ -126,7 +126,7 @@ let searchQuery = $state('');
       </select>
 
       <select
-        class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+        class="bg-panelSoft/50 border border-sand/30 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-info/80 focus:border-transparent"
         bind:value={aiAnalyzedFilter}
         onchange={applyFilters}
       >
@@ -136,7 +136,7 @@ let searchQuery = $state('');
       </select>
 
       <select
-        class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+        class="bg-panelSoft/50 border border-sand/30 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-info/80 focus:border-transparent"
         bind:value={dateRange}
         onchange={applyFilters}
       >
@@ -147,21 +147,21 @@ let searchQuery = $state('');
 
       <!-- Actions -->
       <button
-        class="px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 text-sm rounded-lg transition-colors"
+        class="px-4 py-2 bg-panelSoft/50 hover:bg-panelSoft/50 text-sand/40 text-sm rounded-lg transition-colors"
         onclick={clearFilters}
       >
         Clear Filters
       </button>
 
       <button
-        class="px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded-lg transition-colors"
+        class="px-4 py-2 bg-info/80/20 hover:bg-info/80/30 text-info text-sm rounded-lg transition-colors"
         onclick={bulkAnalyze}
       >
         🤖 Bulk Analyze
       </button>
 
       <button
-        class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors"
+        class="px-4 py-2 bg-accent/80/20 hover:bg-accent/80/30 text-accent text-sm rounded-lg transition-colors"
         onclick={bulkTag}
       >
         🏷️ Bulk Tag
@@ -172,42 +172,42 @@ let searchQuery = $state('');
 
  <!-- Active Filters Display -->
  {#if searchQuery || typeFilter !== 'all' || statusFilter !== 'all' || caseFilter !== 'all' || aiAnalyzedFilter !== 'all' || dateRange !== 'all'}
- <div class="mt-4 pt-4 border-t border-slate-700/50">
+ <div class="mt-4 pt-4 border-t border-sand/20/50">
  <div class="flex flex-wrap items-center gap-2">
- <span class="text-sm text-slate-400">Active filters:</span>
+ <span class="text-sm text-sand/40">Active filters:</span>
 
  {#if searchQuery}
- <span class="px-2 py-1 bg-cyan-400/20 text-cyan-400 text-xs rounded">
+ <span class="px-2 py-1 bg-info/80/20 text-info text-xs rounded">
  Search: "{searchQuery}"
  </span>
  {/if}
 
  {#if typeFilter !== 'all'}
- <span class="px-2 py-1 bg-blue-400/20 text-blue-400 text-xs rounded">
+ <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">
  Type: {typeOptions.find(o => o.value === typeFilter)?.label}
  </span>
  {/if}
 
  {#if statusFilter !== 'all'}
- <span class="px-2 py-1 bg-green-400/20 text-green-400 text-xs rounded">
+ <span class="px-2 py-1 bg-accent/80/20 text-accent text-xs rounded">
  Status: {statusOptions.find(o => o.value === statusFilter)?.label}
  </span>
  {/if}
 
  {#if caseFilter !== 'all'}
- <span class="px-2 py-1 bg-purple-400/20 text-purple-400 text-xs rounded">
+ <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">
  Case: {caseOptions.find(o => o.value === caseFilter)?.label}
  </span>
  {/if}
 
  {#if aiAnalyzedFilter !== 'all'}
- <span class="px-2 py-1 bg-yellow-400/20 text-yellow-400 text-xs rounded">
+ <span class="px-2 py-1 bg-warning/20 text-warning text-xs rounded">
  AI: {aiAnalyzedOptions.find(o => o.value === aiAnalyzedFilter)?.label}
  </span>
  {/if}
 
  {#if dateRange !== 'all'}
- <span class="px-2 py-1 bg-orange-400/20 text-orange-400 text-xs rounded">
+ <span class="px-2 py-1 bg-warning/80/20 text-warning text-xs rounded">
  Date: {dateRangeOptions.find(o => o.value === dateRange)?.label}
  </span>
  {/if}

@@ -30,24 +30,24 @@
   async function loadRecentQueries(): Promise<any> { try { // removed unused response assignment const data = await response.json(); if (data.success) { queries = data.queries.map((q: any) => ({ ...q; timestamp: new Date(q.timestamp)}))}
     } catch (err) { console.error('Failed to load recent queries:', err)}
   } $effect(() => { loadRecentQueries()}); </script>
- <div class="legal-ai-chat max-w-4xl mx-auto"> <div class="header"> <h1 class="text-3xl font-bold text-gray-900">Legal AI Assistant</h1>
- <p class="text-gray-600"> Powered by Gemma3 with TensorRT optimization â€¢ {useVectorSearch ? 'Vector search enabled': 'Vector search disabled'}
+ <div class="legal-ai-chat max-w-4xl mx-auto"> <div class="header"> <h1 class="text-3xl font-bold text-sand">Legal AI Assistant</h1>
+ <p class="text-sand/60"> Powered by Gemma3 with TensorRT optimization â€¢ {useVectorSearch ? 'Vector search enabled': 'Vector search disabled'}
 </p> </div>
  <!-- Query, Form --> <Card.Root class="mb-8"> <CardHeader> <CardTitle>Ask a Legal Question</CardTitle> </CardHeader>
- <CardContent class="space-y-4"> <!-- Prompt, Input --> <div> <label for="prompt" class="block text-sm font-medium text-gray-700"> Legal Query </label>
+ <CardContent class="space-y-4"> <!-- Prompt, Input --> <div> <label for="prompt" class="block text-sm font-medium text-sand/80"> Legal Query </label>
  <textarea id="prompt"
           bind:value={ prompt } placeholder="Enter your legal question or request for analysis..."
-          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          class="w-full p-3 border border-sand/20 rounded-lg focus:ring-2 focus:ring-info"
           rows="3"
           disabled={ isLoading } ></textarea> </div>
- <!-- Context, Input --> <div> <label for="context" class="block text-sm font-medium text-gray-700"> Additional Context (Optional) </label>
+ <!-- Context, Input --> <div> <label for="context" class="block text-sm font-medium text-sand/80"> Additional Context (Optional) </label>
  <textarea id="context"
           bind:value={ context } placeholder="Provide: any additional context, document excerpts, or specific requirements..."
-          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          class="w-full p-3 border border-sand/20 rounded-lg focus:ring-2 focus:ring-info"
           rows="2"
           disabled={ isLoading } ></textarea> </div>
  <!-- Options --> <div class="flex items-center"> <label class="flex"> <input type="checkbox"
-            bind:checked={ useVectorSearch } disabled={ isLoading } class="rounded border-gray-300 text-blue-600"
+            bind:checked={ useVectorSearch } disabled={ isLoading } class="rounded border-sand/20 text-info"
           /> <span class="ml-2 text-sm"> Search similar documents </span> </label>
  <Button onclick={ submitQuery } disabled={!canSubmit} class="px-6 bits-btn">
   {#if isLoading} <span class="flex"> <svg class="animate-spin -ml-1 mr-3 h-4 w-4"
@@ -62,21 +62,21 @@
   </Button> </div> </CardContent> </Card>
  <!-- Sample, Prompts --> <Card.Root class="mb-8"> <CardHeader> <CardTitle>Sample Legal Queries</CardTitle> </CardHeader>
  <CardContent> <div class="grid grid-cols-1 md grid-cols-2">
-  {#each Array.isArray(samplePrompts) ? samplePrompts: [] as sample} <button onclick={() => useSamplePrompt(sample)} class="p-3 text-left border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+  {#each Array.isArray(samplePrompts) ? samplePrompts: [] as sample} <button onclick={() => useSamplePrompt(sample)} class="p-3 text-left border border-sand/20 rounded-lg hover:border-info/40 hover:bg-info/5 transition-colors"
             disabled={ isLoading } >
             <p class="text-sm">{ sample }
 </p> </button> {/each}
   </div> </CardContent> </Card>
  <!-- Error, Display -->
-  {#if error} <div class="mb-6 p-4 bg-red-50 border border-red-200"> <div class="flex"> <svg class="h-5 w-5 text-red-400" viewBox=" 0 0 | 20, 20" fill="currentColor"> <path fill-rule="evenodd"
+  {#if error} <div class="mb-6 p-4 bg-danger/5 border border-danger/20"> <div class="flex"> <svg class="h-5 w-5 text-danger/80" viewBox=" 0 0 | 20, 20" fill="currentColor"> <path fill-rule="evenodd"
             d="M10 18a8, 8 0 100-16, 8 | 8, 0 000 16zM8.707 7.293a1, 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1, 1 0 101.414 1.414L10 11.414l1.293 1.293a1, 1 0 001.414-1.414L11.414 10l1.293-1.293a1, 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
             clip-rule="evenodd"
           /> </svg>
  <div class="ml-3"> <h3 class="text-sm font-medium">Error</h3>
- <p class="text-sm text-red-700">{ error }
+ <p class="text-sm text-danger">{ error }
 </p> </div> </div> {/if}
   <!-- Current, Response -->
-  {#if currentResponse} <Card class="mb-8 border-green-200"> <CardHeader> <CardTitle class="text-green-800">Latest Response</CardTitle>
+  {#if currentResponse} <Card class="mb-8 border-accent/20"> <CardHeader> <CardTitle class="text-accent">Latest Response</CardTitle>
  <div class="flex items-center space-x-4 text-sm"> <span>Model: {currentResponse.model_used}
 </span>
  <span>Tokens: {currentResponse.tokens}
@@ -85,15 +85,15 @@
 </span>
   {#if currentResponse.similar_documents_found && currentResponse.similar_documents_found > 0} <span>ðŸ“š {currentResponse.similar_documents_found} docs found</span> {/if}
   </div> </CardHeader>
- <CardContent> <div class="mb-3"> <h4 class="font-medium text-gray-900">Query:</h4>
- <p class="text-gray-700">"{currentResponse.prompt}"</p> </div>
- <div> <h4 class="font-medium text-gray-900">Response:</h4>
- <div class="prose"> <p class="text-gray-800">{currentResponse.response}
+ <CardContent> <div class="mb-3"> <h4 class="font-medium text-sand">Query:</h4>
+ <p class="text-sand/80">"{currentResponse.prompt}"</p> </div>
+ <div> <h4 class="font-medium text-sand">Response:</h4>
+ <div class="prose"> <p class="text-sand">{currentResponse.response}
 </p> </div> </div> </CardContent> </Card> {/if}
   <!-- Query, History -->
   {#if hasQueries} <Card> <CardHeader> <CardTitle>Recent Legal Queries</CardTitle> </CardHeader>
  <CardContent> <div class="space-y-4">
-  {#each queries.slice(0, 5) as query, index} <div class="border-l-4 border-blue-200 pl-4"> <div class="flex items-center justify-between"> <h4 class="font-medium text-gray-900"> Query #{query.id || index + 1}
+  {#each queries.slice(0, 5) as query, index} <div class="border-l-4 border-info/20 pl-4"> <div class="flex items-center justify-between"> <h4 class="font-medium text-sand"> Query #{query.id || index + 1}
 </h4>
  <div class="flex items-center space-x-2 text-xs"> <span>{query.model_used}
 </span>
@@ -103,8 +103,8 @@
  <span>{query.timestamp.toLocaleTimeString()}
 </span> {/if}
   </div> </div>
- <p class="text-sm text-gray-600">"{query.prompt}"</p>
-  {#if query.response} <p class="text-sm text-gray-800">{query.response}
+ <p class="text-sm text-sand/60">"{query.prompt}"</p>
+  {#if query.response} <p class="text-sm text-sand">{query.response}
 </p> {/if}
   </div> {/each}
   </div> </CardContent> </Card> {/if}

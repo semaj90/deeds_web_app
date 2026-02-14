@@ -62,11 +62,11 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
 
  // Status color mapping
  const statusColors = {
- person_of_interest: 'bg-blue-500',
- witness: 'bg-green-500',
- suspect: 'bg-red-500',
- victim: 'bg-purple-500',
- informant: 'bg-yellow-500'
+ person_of_interest: 'bg-info',
+ witness: 'bg-accent',
+ suspect: 'bg-danger',
+ victim: 'bg-info',
+ informant: 'bg-warning'
  };
 
  const statusLabels = {
@@ -78,17 +78,17 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  };
 
  const priorityColors = {
- low: 'bg-gray-500',
- medium: 'bg-yellow-500',
- high: 'bg-orange-500',
- critical: 'bg-red-500'
+ low: 'bg-sand/20',
+ medium: 'bg-warning',
+ high: 'bg-warning',
+ critical: 'bg-danger'
  };
 
  const threatLevelColors = {
- low: 'bg-green-500',
- medium: 'bg-yellow-500',
- high: 'bg-orange-500',
- extreme: 'bg-red-500'
+ low: 'bg-accent',
+ medium: 'bg-warning',
+ high: 'bg-warning',
+ extreme: 'bg-danger'
  };
 
  const threatLevelLabels = {
@@ -125,13 +125,13 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <DialogContent class="max-w-6xl max-h-[90vh] overflow-hidden p-0">
  {#if poi}
  <!-- Header with Photo and Basic Info -->
- <div class="bg-gradient-to-r from-slate-900 to-slate-800 p-6 border-b border-slate-700">
+ <div class="bg-gradient-to-r from-panel to-panelSoft p-6 border-b border-sand/20">
  <div class="flex items-start gap-6">
  <!-- Photo Section -->
  <div class="flex-shrink-0">
- <Avatar class="w-24 h-24 border-2 border-slate-600">
+ <Avatar class="w-24 h-24 border-2 border-sand/30">
  <AvatarImage src={poi.photo} alt={poi.name} />
- <AvatarFallback class="text-2xl font-bold bg-slate-700 text-slate-300">
+ <AvatarFallback class="text-2xl font-bold bg-panelSoft text-sand/40">
  {poi.name.split(' ').map(n => n[0]).join('').toUpperCase()}
  </AvatarFallback>
  </Avatar>
@@ -143,7 +143,7 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <div>
  <h1 class="text-3xl font-bold text-white mb-2">{poi.name}</h1>
  {#if poi.aliases && poi.aliases.length > 0}
- <p class="text-slate-400 mb-3">
+ <p class="text-sand/40 mb-3">
  <span class="font-medium">Also known as:</span> {poi.aliases.join(', ')}
  </p>
  {/if}
@@ -152,7 +152,7 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  variant="outline"
  size="sm"
  onclick={() => onEdit(poi)}
- class="bg-slate-700 border-slate-600 hover:bg-slate-600"
+ class="bg-panelSoft border-sand/30 hover:bg-panelSoft"
  >
  <Edit class="w-4 h-4 mr-2" />
  Edit Profile
@@ -175,25 +175,25 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <!-- Quick Stats -->
  <div class="grid grid-cols-2 md grid-cols-4 gap-4 text-sm">
  {#if age}
- <div class="flex items-center gap-2 text-slate-300">
+ <div class="flex items-center gap-2 text-sand/40">
  <Calendar class="w-4 h-4" />
  <span>{age} years old</span>
  </div>
  {/if}
  {#if poi.lastKnownLocation}
- <div class="flex items-center gap-2 text-slate-300">
+ <div class="flex items-center gap-2 text-sand/40">
  <MapPin class="w-4 h-4" />
  <span class="truncate">{poi.lastKnownLocation}</span>
  </div>
  {/if}
  {#if poi.phone}
- <div class="flex items-center gap-2 text-slate-300">
+ <div class="flex items-center gap-2 text-sand/40">
  <Phone class="w-4 h-4" />
  <span>{poi.phone}</span>
  </div>
  {/if}
  {#if poi.email}
- <div class="flex items-center gap-2 text-slate-300">
+ <div class="flex items-center gap-2 text-sand/40">
  <Mail class="w-4 h-4" />
  <span class="truncate">{poi.email}</span>
  </div>
@@ -206,20 +206,20 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <!-- Main Content Tabs -->
  <div class="flex-1 overflow-hidden">
  <Tabs defaultValue="overview" class="h-full flex flex-col">
- <TabsList class="grid w-full grid-cols-4 bg-slate-800 border-b border-slate-700">
- <TabsTrigger value="overview" class="data-[state=active] bg-slate-700">
+ <TabsList class="grid w-full grid-cols-4 bg-panelSoft border-b border-sand/20">
+ <TabsTrigger value="overview" class="data-[state=active] bg-panelSoft">
  <Eye class="w-4 h-4 mr-2" />
  Overview
  </TabsTrigger>
- <TabsTrigger value="timeline" class="data-[state=active] bg-slate-700">
+ <TabsTrigger value="timeline" class="data-[state=active] bg-panelSoft">
  <Clock class="w-4 h-4 mr-2" />
  Timeline
  </TabsTrigger>
- <TabsTrigger value="connections" class="data-[state=active] bg-slate-700">
+ <TabsTrigger value="connections" class="data-[state=active] bg-panelSoft">
  <Network class="w-4 h-4 mr-2" />
  Connections
  </TabsTrigger>
- <TabsTrigger value="analysis" class="data-[state=active] bg-slate-700">
+ <TabsTrigger value="analysis" class="data-[state=active] bg-panelSoft">
  <BarChart3 class="w-4 h-4 mr-2" />
  Analysis
  </TabsTrigger>
@@ -228,9 +228,9 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <div class="flex-1 overflow-y-auto p-6">
  <TabsContent value="overview" class="mt-0 space-y-6">
  <!-- Physical Characteristics -->
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200 flex items-center gap-2">
+ <CardTitle class="text-sand/40 flex items-center gap-2">
  <Users class="w-5 h-5" />
  Physical Characteristics
  </CardTitle>
@@ -238,33 +238,33 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <CardContent>
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
  {#if poi.physicalDescription.height}
- <div class="bg-slate-700 p-3 rounded-lg">
- <div class="text-xs text-slate-400 uppercase tracking-wide">Height</div>
+ <div class="bg-panelSoft p-3 rounded-lg">
+ <div class="text-xs text-sand/40 uppercase tracking-wide">Height</div>
  <div class="text-lg font-semibold text-white">{poi.physicalDescription.height}</div>
  </div>
  {/if}
  {#if poi.physicalDescription.weight}
- <div class="bg-slate-700 p-3 rounded-lg">
- <div class="text-xs text-slate-400 uppercase tracking-wide">Weight</div>
+ <div class="bg-panelSoft p-3 rounded-lg">
+ <div class="text-xs text-sand/40 uppercase tracking-wide">Weight</div>
  <div class="text-lg font-semibold text-white">{poi.physicalDescription.weight}</div>
  </div>
  {/if}
  {#if poi.physicalDescription.hair}
- <div class="bg-slate-700 p-3 rounded-lg">
- <div class="text-xs text-slate-400 uppercase tracking-wide">Hair</div>
+ <div class="bg-panelSoft p-3 rounded-lg">
+ <div class="text-xs text-sand/40 uppercase tracking-wide">Hair</div>
  <div class="text-lg font-semibold text-white">{poi.physicalDescription.hair}</div>
  </div>
  {/if}
  {#if poi.physicalDescription.eyes}
- <div class="bg-slate-700 p-3 rounded-lg">
- <div class="text-xs text-slate-400 uppercase tracking-wide">Eyes</div>
+ <div class="bg-panelSoft p-3 rounded-lg">
+ <div class="text-xs text-sand/40 uppercase tracking-wide">Eyes</div>
  <div class="text-lg font-semibold text-white">{poi.physicalDescription.eyes}</div>
  </div>
  {/if}
  {#if poi.physicalDescription.distinguishingMarks}
- <div class="bg-slate-700 p-3 rounded-lg col-span-full">
- <div class="text-xs text-slate-400 uppercase tracking-wide">Distinguishing Marks</div>
- <div class="text-sm text-slate-200 mt-1">{poi.physicalDescription.distinguishingMarks}</div>
+ <div class="bg-panelSoft p-3 rounded-lg col-span-full">
+ <div class="text-xs text-sand/40 uppercase tracking-wide">Distinguishing Marks</div>
+ <div class="text-sm text-sand/40 mt-1">{poi.physicalDescription.distinguishingMarks}</div>
  </div>
  {/if}
  </div>
@@ -273,24 +273,24 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
 
  <!-- Modus Operandi -->
  {#if poi.profileData.modusOperandi}
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200 flex items-center gap-2">
+ <CardTitle class="text-sand/40 flex items-center gap-2">
  <AlertTriangle class="w-5 h-5" />
  Modus Operandi
  </CardTitle>
  </CardHeader>
  <CardContent>
- <div class="text-slate-200 whitespace-pre-line">{poi.profileData.modusOperandi}</div>
+ <div class="text-sand/40 whitespace-pre-line">{poi.profileData.modusOperandi}</div>
  </CardContent>
  </Card>
  {/if}
 
  <!-- Known Habits -->
  {#if poi.profileData.knownHabits && poi.profileData.knownHabits.length > 0}
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200 flex items-center gap-2">
+ <CardTitle class="text-sand/40 flex items-center gap-2">
  <TrendingUp class="w-5 h-5" />
  Known Habits
  </CardTitle>
@@ -298,8 +298,8 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <CardContent>
  <ul class="space-y-2">
  {#each poi.profileData.knownHabits as habit}
- <li class="flex items-start gap-2 text-slate-200">
- <div class="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+ <li class="flex items-start gap-2 text-sand/40">
+ <div class="w-1.5 h-1.5 bg-info/80 rounded-full mt-2 flex-shrink-0"></div>
  <span>{habit}</span>
  </li>
  {/each}
@@ -310,9 +310,9 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
 
  <!-- Known Associates -->
  {#if poi.profileData.associates && poi.profileData.associates.length > 0}
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200 flex items-center gap-2">
+ <CardTitle class="text-sand/40 flex items-center gap-2">
  <Users class="w-5 h-5" />
  Known Associates
  </CardTitle>
@@ -320,8 +320,8 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <CardContent>
  <div class="grid grid-cols-1 md grid-cols-2 gap-3">
  {#each poi.profileData.associates as associate}
- <div class="bg-slate-700 p-3 rounded-lg">
- <div class="text-slate-200 font-medium">{associate}</div>
+ <div class="bg-panelSoft p-3 rounded-lg">
+ <div class="text-sand/40 font-medium">{associate}</div>
  </div>
  {/each}
  </div>
@@ -331,24 +331,24 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
 
  <!-- Investigation Notes -->
  {#if poi.notes}
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200 flex items-center gap-2">
+ <CardTitle class="text-sand/40 flex items-center gap-2">
  <FileText class="w-5 h-5" />
  Investigation Notes
  </CardTitle>
  </CardHeader>
  <CardContent>
- <div class="text-slate-200 whitespace-pre-line">{poi.notes}</div>
+ <div class="text-sand/40 whitespace-pre-line">{poi.notes}</div>
  </CardContent>
  </Card>
  {/if}
 
  <!-- Tags -->
  {#if poi.tags && poi.tags.length > 0}
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200 flex items-center gap-2">
+ <CardTitle class="text-sand/40 flex items-center gap-2">
  <Tag class="w-5 h-5" />
  Tags
  </CardTitle>
@@ -356,7 +356,7 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <CardContent>
  <div class="flex flex-wrap gap-2">
  {#each poi.tags as tag}
- <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{tag}</span>
+ <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10 text-sand/80">{tag}</span>
  {/each}
  </div>
  </CardContent>
@@ -365,12 +365,12 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  </TabsContent>
 
  <TabsContent value="timeline" class="mt-0">
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200">Activity Timeline</CardTitle>
+ <CardTitle class="text-sand/40">Activity Timeline</CardTitle>
  </CardHeader>
  <CardContent>
- <div class="text-center py-8 text-slate-400">
+ <div class="text-center py-8 text-sand/40">
  <Clock class="w-12 h-12 mx-auto mb-4 opacity-50" />
  <p>Timeline feature coming soon</p>
  <p class="text-sm mt-2">Track POI activities, sightings, and case developments</p>
@@ -380,12 +380,12 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  </TabsContent>
 
  <TabsContent value="connections" class="mt-0">
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200">Connection Network</CardTitle>
+ <CardTitle class="text-sand/40">Connection Network</CardTitle>
  </CardHeader>
  <CardContent>
- <div class="text-center py-8 text-slate-400">
+ <div class="text-center py-8 text-sand/40">
  <Network class="w-12 h-12 mx-auto mb-4 opacity-50" />
  <p>Network analysis coming soon</p>
  <p class="text-sm mt-2">Visualize relationships and connections</p>
@@ -396,9 +396,9 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
 
  <TabsContent value="analysis" class="mt-0 space-y-6">
  <!-- Threat Assessment -->
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200 flex items-center gap-2">
+ <CardTitle class="text-sand/40 flex items-center gap-2">
  <AlertTriangle class="w-5 h-5" />
  Threat Assessment
  </CardTitle>
@@ -406,25 +406,25 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  <CardContent>
  <div class="space-y-4">
  <div class="flex items-center justify-between">
- <span class="text-slate-200">Threat Level</span>
+ <span class="text-sand/40">Threat Level</span>
  <Badge class={threatLevelColors[poi.threatLevel]}>
  {threatLevelLabels[poi.threatLevel]}
  </Badge>
  </div>
  <div class="flex items-center justify-between">
- <span class="text-slate-200">Danger Level</span>
+ <span class="text-sand/40">Danger Level</span>
  <div class="flex items-center gap-2">
- <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+ <div class="w-24 h-2 bg-panelSoft rounded-full overflow-hidden">
  <div
- class="h-full bg-gradient-to-r from-green-500 to-red-500"
+ class="h-full bg-gradient-to-r from-accent to-danger"
  style="width: {poi.dangerLevel * 10}%"
  ></div>
  </div>
- <span class="text-slate-200 text-sm">{poi.dangerLevel}/10</span>
+ <span class="text-sand/40 text-sm">{poi.dangerLevel}/10</span>
  </div>
  </div>
  <div class="flex items-center justify-between">
- <span class="text-slate-200">Overall Risk Score</span>
+ <span class="text-sand/40">Overall Risk Score</span>
  <div class="text-2xl font-bold text-white">
  {threatScore.toFixed(1)}
  </div>
@@ -434,15 +434,15 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  </Card>
 
  <!-- Analysis Placeholder -->
- <Card class="bg-slate-800 border-slate-700">
+ <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
- <CardTitle class="text-slate-200 flex items-center gap-2">
+ <CardTitle class="text-sand/40 flex items-center gap-2">
  <BarChart3 class="w-5 h-5" />
  Behavioral Analysis
  </CardTitle>
  </CardHeader>
  <CardContent>
- <div class="text-center py-8 text-slate-400">
+ <div class="text-center py-8 text-sand/40">
  <BarChart3 class="w-12 h-12 mx-auto mb-4 opacity-50" />
  <p>Advanced analysis coming soon</p>
  <p class="text-sm mt-2">AI-powered behavioral patterns and risk assessment</p>

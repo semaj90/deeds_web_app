@@ -54,12 +54,12 @@
 
 	function getPenaltyColor(penalty: string): string {
 		const colors: Record<string, string> = {
-			felony: 'bg-red-900 border-red-700 text-red-100',
-			wobbler: 'bg-orange-900 border-orange-700 text-orange-100',
-			misdemeanor: 'bg-yellow-900 border-yellow-700 text-yellow-100',
-			infraction: 'bg-blue-900 border-blue-700 text-blue-100'
+			felony: 'bg-danger/20 border-danger/60 text-danger/20',
+			wobbler: 'bg-warning/20 border-warning/60 text-warning/20',
+			misdemeanor: 'bg-warning/20 border-warning/60 text-warning',
+			infraction: 'bg-info/20 border-info/60 text-info/20'
 		};
-		return colors[penalty] || 'bg-gray-900 border-gray-700 text-gray-100';
+		return colors[penalty] || 'bg-panel border-sand/20 text-sand/20';
 	}
 
 	function getVictimIcon(victim: string): string {
@@ -76,17 +76,17 @@
 
 {#if isOpen && statute}
 	<div class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-		<div class="bg-gray-900 rounded-lg shadow-2xl max-w-2xl w-full border-4 border-red-900">
+		<div class="bg-panel rounded-lg shadow-2xl max-w-2xl w-full border-4 border-danger/30">
 			<!-- Header -->
-			<div class="bg-gradient-to-r from-red-900 to-gray-900 p-6 border-b-2 border-red-700">
+			<div class="bg-gradient-to-r from-danger/20 to-panel p-6 border-b-2 border-danger/60">
 				<div class="flex justify-between items-start">
 					<div>
 						<h2 class="text-2xl font-bold text-white">{statute.citation}</h2>
-						<p class="text-red-200 text-lg mt-1">{statute.title}</p>
+						<p class="text-danger/40 text-lg mt-1">{statute.title}</p>
 					</div>
 					<button
 						onclick={onClose}
-						class="text-gray-400 hover:text-white text-3xl leading-none"
+						class="text-sand/40 hover:text-white text-3xl leading-none"
 					>
 						✕
 					</button>
@@ -102,7 +102,7 @@
 						</div>
 					{/if}
 					{#if statute.victimClass}
-						<div class="px-4 py-2 rounded-lg font-bold border-2 bg-purple-900 border-purple-700 text-purple-100">
+						<div class="px-4 py-2 rounded-lg font-bold border-2 bg-info/20 border-info/60 text-info/20">
 							{getVictimIcon(statute.victimClass)} {statute.victimClass.toUpperCase()}
 						</div>
 					{/if}
@@ -114,13 +114,13 @@
 				<!-- Description -->
 				<div>
 					<h3 class="text-lg font-semibold text-white mb-2">Definition</h3>
-					<p class="text-gray-300">{statute.description}</p>
+					<p class="text-sand/40">{statute.description}</p>
 				</div>
 
 				<!-- Penalty -->
 				<div>
 					<h3 class="text-lg font-semibold text-white mb-2">Penalty</h3>
-					<p class="text-gray-300">{statute.penalty}</p>
+					<p class="text-sand/40">{statute.penalty}</p>
 				</div>
 
 				<!-- Bundled Charges -->
@@ -129,18 +129,18 @@
 						<h3 class="text-lg font-semibold text-white mb-3">🚔 Suggested Companion Charges</h3>
 						<div class="space-y-3">
 							{#each statute.bundledCharges as bundle}
-								<div class="p-4 bg-red-950 border-2 border-red-700 rounded-lg hover:bg-red-900 transition">
+								<div class="p-4 bg-danger/10 border-2 border-danger/60 rounded-lg hover:bg-danger/20 transition">
 									<div class="flex justify-between items-start">
 										<div class="flex-1">
-											<p class="font-bold text-red-100">{bundle.title}</p>
-											<p class="text-sm text-red-300">{bundle.citation}</p>
-											<p class="text-xs text-red-400 mt-2">{bundle.reason}</p>
+											<p class="font-bold text-danger/20">{bundle.title}</p>
+											<p class="text-sm text-danger/60">{bundle.citation}</p>
+											<p class="text-xs text-danger/80 mt-2">{bundle.reason}</p>
 										</div>
 										<div class="text-right ml-4">
-											<div class="text-lg font-bold text-red-300">
+											<div class="text-lg font-bold text-danger/60">
 												{Math.round(bundle.frequency * 100)}%
 											</div>
-											<div class="text-xs text-red-400">filed together</div>
+											<div class="text-xs text-danger/80">filed together</div>
 										</div>
 									</div>
 								</div>
@@ -155,7 +155,7 @@
 						<h3 class="text-lg font-semibold text-white mb-2">Related Statutes</h3>
 						<div class="flex flex-wrap gap-2">
 							{#each statute.relatedStatutes as code}
-								<span class="px-3 py-1 bg-blue-900 text-blue-200 rounded-full text-sm border border-blue-700">
+								<span class="px-3 py-1 bg-info/20 text-info/40 rounded-full text-sm border border-info/60">
 									{code}
 								</span>
 							{/each}
@@ -165,24 +165,24 @@
 			</div>
 
 			<!-- Footer -->
-			<div class="bg-gray-800 border-t-2 border-red-700 p-4 flex gap-3 justify-end">
+			<div class="bg-panelSoft border-t-2 border-danger/60 p-4 flex gap-3 justify-end">
 				<button
 					onclick={onClose}
-					class="px-4 py-2 text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition border border-gray-600"
+					class="px-4 py-2 text-sand/40 bg-panelSoft hover:bg-sand/20 rounded-lg transition border border-sand/30"
 				>
 					Close
 				</button>
 				<button
 					onclick={handleAttach}
 					disabled={isAttaching}
-					class="px-6 py-2 bg-red-900 hover:bg-red-800 text-white rounded-lg transition font-bold border-2 border-red-700 disabled:opacity-50"
+					class="px-6 py-2 bg-danger/20 hover:bg-danger/60 text-white rounded-lg transition font-bold border-2 border-danger/60 disabled:opacity-50"
 				>
 					{isAttaching ? '⏳ Attaching...' : '📎 Attach to Case'}
 				</button>
 			</div>
 
 			{#if attachError}
-				<div class="bg-red-900 text-red-100 p-3 text-center text-sm border-t border-red-700">
+				<div class="bg-danger/20 text-danger/20 p-3 text-center text-sm border-t border-danger/60">
 					{attachError}
 				</div>
 			{/if}

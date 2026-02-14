@@ -39,15 +39,15 @@
 	function getThreatColor(level: string): string {
 		switch (level) {
 			case 'critical':
-				return 'bg-red-500 text-white';
+				return 'bg-danger text-white';
 			case 'high':
-				return 'bg-orange-500 text-white';
+				return 'bg-warning text-white';
 			case 'medium':
-				return 'bg-yellow-500 text-black';
+				return 'bg-warning text-black';
 			case 'low':
-				return 'bg-green-500 text-white';
+				return 'bg-accent text-white';
 			default:
-				return 'bg-gray-500 text-white';
+				return 'bg-sand/20 text-white';
 		}
 	}
 
@@ -73,7 +73,7 @@
 						</Avatar>
 						{#if poi.photos.length > 1}
 							<div
-								class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+								class="absolute -top-1 -right-1 bg-info text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
 							>
 								<Camera class="w-3 h-3" />
 							</div>
@@ -81,15 +81,15 @@
 					</div>
 				{:else}
 					<Avatar class="w-12 h-12">
-						<AvatarFallback class="bg-gray-200">
-							<User class="w-6 h-6 text-gray-500" />
+						<AvatarFallback class="bg-sand/10">
+							<User class="w-6 h-6 text-sand/60" />
 						</AvatarFallback>
 					</Avatar>
 				{/if}
 				<div>
 					<CardTitle class="text-lg">{poi.name}</CardTitle>
 					{#if poi.alias}
-						<p class="text-sm text-gray-500">"{poi.alias}"</p>
+						<p class="text-sm text-sand/60">"{poi.alias}"</p>
 					{/if}
 				</div>
 			</div>
@@ -104,10 +104,10 @@
 
 	<CardContent class="space-y-3">
 		{#if poi.notes}
-			<p class="text-sm text-gray-700 line-clamp-2">{poi.notes}</p>
+			<p class="text-sm text-sand/80 line-clamp-2">{poi.notes}</p>
 		{/if}
 
-		<div class="flex items-center justify-between text-xs text-gray-500">
+		<div class="flex items-center justify-between text-xs text-sand/60">
 			<span>Created {new Date(poi.createdAt).toLocaleDateString()}</span>
 			{#if poi.photos && poi.photos.length > 0}
 				<span>{poi.photos.length} photo{poi.photos.length !== 1 ? 's' : ''}</span>
@@ -146,7 +146,7 @@
 					e.stopPropagation();
 					onDelete?.(poi);
 				}}
-				class="text-red-600 hover:text-red-700"
+				class="text-danger hover:text-danger"
 			>
 				<Trash2 class="w-4 h-4" />
 			</Button>

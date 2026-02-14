@@ -224,15 +224,15 @@
   function getStatusColor(status: string) {
     switch (status) {
       case 'verified':
-        return 'text-green-600';
+        return 'text-accent';
       case 'compromised':
-        return 'text-red-600';
+        return 'text-danger';
       case 'requires-attention':
-        return 'text-yellow-600';
+        return 'text-warning';
       case 'pending':
-        return 'text-blue-600';
+        return 'text-info';
       default:
-        return 'text-gray-600';
+        return 'text-sand/60';
     }
   }
 
@@ -244,26 +244,26 @@
 <!-- Main Custody Workflow Container -->
 <div class="evidence-custody-flow max-w-7xl mx-auto p-6 space-y-6">
   <!-- Header Section -->
-  <div class="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
+  <div class="flex items-center justify-between bg-gradient-to-r from-info/5 to-info/5 rounded-lg p-6">
     <div>
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Evidence Chain of Custody</h1>
-      <p class="text-gray-600">
-        Evidence ID: <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">{evidenceId}</span>
-        &bull; Case ID: <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">{caseId}</span>
+      <h1 class="text-3xl font-bold text-sand mb-2">Evidence Chain of Custody</h1>
+      <p class="text-sand/60">
+        Evidence ID: <span class="font-mono text-sm bg-sand/10 px-2 py-1 rounded">{evidenceId}</span>
+        &bull; Case ID: <span class="font-mono text-sm bg-sand/10 px-2 py-1 rounded">{caseId}</span>
       </p>
     </div>
 
     <!-- Status Badge -->
     <div class="flex items-center space-x-4">
       {#if integrityStatus}
-        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium {integrityStatus === 'verified' ? 'bg-green-100 text-green-800' : integrityStatus === 'compromised' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium {integrityStatus === 'verified' ? 'bg-accent/10 text-accent' : integrityStatus === 'compromised' ? 'bg-danger/10 text-danger' : 'bg-sand/10 text-sand'}">
           <svelte:component this={getStatusIcon(integrityStatus)} class="w-4 h-4" />
           {integrityStatus.toUpperCase()}
         </span>
       {/if}
 
       {#if activeCollaborators.length > 0}
-        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-sand/10 text-sand border border-sand/20">
           <Users class="w-4 h-4" />
           {activeCollaborators.length} Collaborator{activeCollaborators.length > 1 ? 's' : ''}
         </span>
@@ -282,22 +282,22 @@
 
   <!-- Error Messages -->
   {#if error}
-    <div class="border border-red-300 bg-red-50 rounded-lg p-4 flex items-start gap-3">
-      <AlertTriangle class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+    <div class="border border-danger/30 bg-danger/5 rounded-lg p-4 flex items-start gap-3">
+      <AlertTriangle class="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
       <div>
-        <h4 class="font-medium text-red-800">Workflow Error</h4>
-        <p class="text-red-700 text-sm">{error}</p>
+        <h4 class="font-medium text-danger">Workflow Error</h4>
+        <p class="text-danger text-sm">{error}</p>
       </div>
     </div>
   {/if}
 
   <!-- Warnings -->
   {#if warnings.length > 0}
-    <div class="border border-yellow-300 bg-yellow-50 rounded-lg p-4 flex items-start gap-3">
-      <AlertTriangle class="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+    <div class="border border-warning/30 bg-warning/5 rounded-lg p-4 flex items-start gap-3">
+      <AlertTriangle class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
       <div>
-        <h4 class="font-medium text-yellow-800">Warnings</h4>
-        <ul class="list-disc list-inside mt-2 text-sm text-yellow-700">
+        <h4 class="font-medium text-warning">Warnings</h4>
+        <ul class="list-disc list-inside mt-2 text-sm text-warning">
           {#each warnings as warning}
             <li>{warning}</li>
           {/each}
@@ -313,14 +313,14 @@
       <!-- Workflow Controls -->
       {#if !isWorkflowActive && currentState.value === 'idle'}
         <div class="border rounded-lg overflow-hidden">
-          <div class="px-4 py-3 border-b bg-gray-50">
+          <div class="px-4 py-3 border-b bg-sand/5">
             <h3 class="font-medium flex items-center gap-2">
               <Shield class="w-5 h-5" />
               Start Custody Workflow
             </h3>
           </div>
           <div class="p-4">
-            <p class="text-gray-600 mb-4">
+            <p class="text-sand/60 mb-4">
               Begin the Evidence Chain of Custody workflow to ensure proper handling,
               verification, and documentation of evidence integrity.
             </p>
@@ -334,13 +334,13 @@
       <!-- Integrity Verification -->
       {#if currentState.context.verificationResults || currentState.value === 'integrityVerification'}
         <div class="border rounded-lg overflow-hidden">
-          <div class="px-4 py-3 border-b bg-gray-50 flex items-center justify-between">
+          <div class="px-4 py-3 border-b bg-sand/5 flex items-center justify-between">
             <h3 class="font-medium flex items-center gap-2">
               <FileCheck class="w-5 h-5" />
               Integrity Verification
             </h3>
             <button
-              class="text-sm text-blue-600 hover:underline"
+              class="text-sm text-info hover:underline"
               onclick={() => showIntegrityDetails = !showIntegrityDetails}
             >
               {showIntegrityDetails ? 'Hide' : 'Show'} Details
@@ -362,7 +362,7 @@
       <!-- Custody Timeline -->
       {#if custodyEvents.length > 0}
         <div class="border rounded-lg overflow-hidden">
-          <div class="px-4 py-3 border-b bg-gray-50">
+          <div class="px-4 py-3 border-b bg-sand/5">
             <h3 class="font-medium flex items-center gap-2">
               <Clock class="w-5 h-5" />
               Custody Timeline
@@ -380,16 +380,16 @@
       <!-- Workflow Actions -->
       {#if isWorkflowActive}
         <div class="border rounded-lg overflow-hidden">
-          <div class="px-4 py-3 border-b bg-gray-50">
+          <div class="px-4 py-3 border-b bg-sand/5">
             <h3 class="font-medium">Workflow Actions</h3>
           </div>
           <div class="p-4 space-y-4">
             {#if currentState.value === 'awaitingApproval'}
               <div class="flex space-x-3">
-                <Button onclick={approveWorkflow} class="bg-green-600 text-white hover:bg-green-700">
+                <Button onclick={approveWorkflow} class="bg-accent text-white hover:bg-accent/60">
                   Approve Custody
                 </Button>
-                <Button onclick={rejectWorkflow} class="bg-red-600 text-white hover:bg-red-700">
+                <Button onclick={rejectWorkflow} class="bg-danger text-white hover:bg-danger/80">
                   Reject Custody
                 </Button>
               </div>
@@ -417,7 +417,7 @@
                 <Button onclick={retryWorkflow}>
                   Retry Workflow
                 </Button>
-                <Button onclick={cancelWorkflow} class="bg-red-600 text-white hover:bg-red-700">
+                <Button onclick={cancelWorkflow} class="bg-danger text-white hover:bg-danger/80">
                   Cancel Workflow
                 </Button>
               </div>
@@ -454,7 +454,7 @@
     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-lg max-w-md w-full p-6">
         <h3 class="text-lg font-semibold mb-4">Transfer Custody</h3>
-        <p class="text-gray-600 mb-4">
+        <p class="text-sand/60 mb-4">
           Please provide a reason for transferring custody of this evidence.
         </p>
         <textarea

@@ -92,18 +92,18 @@
 
 	// Default colors for options
 	const defaultColors: Record<string, string> = {
-		route: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-		component: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-		store: 'bg-green-500/20 text-green-300 border-green-500/30',
-		service: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
-		api: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-		util: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
-		error: 'bg-red-500/20 text-red-300 border-red-500/30',
-		warning: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+		route: 'bg-info/20 text-info/60 border-info/30',
+		component: 'bg-info/20 text-info/60 border-info/30',
+		store: 'bg-accent/20 text-accent/80 border-accent/30',
+		service: 'bg-warning/20 text-warning/80 border-warning/30',
+		api: 'bg-info/20 text-info/80 border-info/30',
+		util: 'bg-sand/20/20 text-sand/40 border-sand/30/30',
+		error: 'bg-danger/20 text-danger/60 border-danger/30',
+		warning: 'bg-warning/20 text-warning/80 border-warning/30'
 	};
 
 	function getOptionColor(option: FilterOption): string {
-		return option.color || defaultColors[option.value] || 'bg-gray-500/20 text-gray-300 border-gray-500/30';
+		return option.color || defaultColors[option.value] || 'bg-sand/20/20 text-sand/40 border-sand/30/30';
 	}
 </script>
 

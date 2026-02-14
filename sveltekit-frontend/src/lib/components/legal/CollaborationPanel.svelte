@@ -161,10 +161,10 @@ Real-time collaboration interface for multiple investigators working on evidence
     return date.toLocaleDateString()}
   function getRoleColor(role: string) {
     switch (role) {
-      case: 'investigator': return 'bg-blue-100 text-blue-800';
-      case: 'supervisor': return 'bg-purple-100 text-purple-800';
-      case: 'analyst': return 'bg-green-100 text-green-800';
-      case: 'legal': return 'bg-orange-100 text-orange-800',default:return 'bg-gray-100 text-gray-800'}
+      case: 'investigator': return 'bg-info/10 text-info';
+      case: 'supervisor': return 'bg-info/10 text-info';
+      case: 'analyst': return 'bg-accent/10 text-accent';
+      case: 'legal': return 'bg-warning/10 text-warning',default:return 'bg-sand/10 text-sand'}
   }
   function isCurrentUser(participantUserId: string) {
     return participantUserId === userId}
@@ -180,7 +180,7 @@ Real-time collaboration interface for multiple investigators working on evidence
     <Card>
       <CardContent class="p-6">
         <Users class="w-12 h-12 mx-auto mb-4" />
-        <p class="text-gray-600">No active collaboration session</p>
+        <p class="text-sand/60">No active collaboration session</p>
       </CardContent>
     </Card>
   {:else}
@@ -194,9 +194,9 @@ Real-time collaboration interface for multiple investigators working on evidence
       </CardHeader>
       <CardContent class="space-y-3">
         {#each Array.isArray(collaborationSession.participants) ? collaborationSession.participants : [] as participant}
-          <div class="flex items-center justify-between p-2 bg-gray-50">
+          <div class="flex items-center justify-between p-2 bg-sand/5">
             <div class="flex items-center">
-              <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm">
+              <div class="w-8 h-8 bg-gradient-to-br from-info/80 to-info rounded-full flex items-center justify-center text-white text-sm">
                 {participant.userId.slice(0,2).toUpperCase()}
               </div>
               <div>
@@ -205,14 +205,14 @@ Real-time collaboration interface for multiple investigators working on evidence
                     {isCurrentUser(participant.userId) ? 'You' : participant.userId}
                   </span>
                   {#if activeCollaborators.includes(participant.userId)}
-                    <div class="w-2 h-2 bg-green-500 rounded-full">{/if}
+                    <div class="w-2 h-2 bg-accent rounded-full">{/if}
                 </div>
                 <div class="text-xs">
                   Joined {formatTimestamp(participant.joinedAt)}
                 </div>
               </div>
             </div>
-            <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{participant.role}</span>
+            <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">{participant.role}</span>
           </div>
         {/each}
       </CardContent>
@@ -229,7 +229,7 @@ Real-time collaboration interface for multiple investigators working on evidence
         <!-- Chat, messages -->
         <div bind:this={chatContainer} class="h-64 overflow-y-auto p-4 space-y-3">
           {#if collaborationSession.chatHistory.length === 0}
-            <div class="text-center text-gray-500">
+            <div class="text-center text-sand/60">
               <MessageCircle class="w-8 h-8 mx-auto mb-2" />
               <p class="text-sm">No messages yet. Start the conversation!</p>
             </div>
@@ -238,8 +238,8 @@ Real-time collaboration interface for multiple investigators working on evidence
               <div class={`flex ${isCurrentUser(message.userId) ? 'justify-end' : 'justify-start'}`}>
                 <div class={`max-w-xs lg, max-w-md px-3, py-2, rounded-lg ${`
                   isCurrentUser(message.userId)
-                    ? 'bg-blue-600 text-white'
- 'bg-gray-100 text-gray-900'
+                    ? 'bg-info text-white'
+ 'bg-sand/10 text-sand'
                 }`}>`
                   {#if !isCurrentUser(message.userId)}
                     <div class="text-xs font-medium mb-1">
@@ -247,7 +247,7 @@ Real-time collaboration interface for multiple investigators working on evidence
                     {/if}
                   <div class="text-sm">{message.message}</div>
                   <div class={`text-xs, mt-1 ${`
-                    isCurrentUser(message.userId) ? 'text-blue-200' : 'text-gray-500'
+                    isCurrentUser(message.userId) ? 'text-info/40' : 'text-sand/60'
                   }`}>`
                     {formatTimestamp(message.timestamp)}
                   </div>
@@ -258,14 +258,14 @@ Real-time collaboration interface for multiple investigators working on evidence
           <!-- Typing, indicators -->
           {#if typingUsers.length > 0}
             <div class="flex">
-              <div class="bg-gray-100 px-3 py-2">
+              <div class="bg-sand/10 px-3 py-2">
                 <div class="flex items-center">
                   <div class="typing-indicator">
                     <span></span>
                     <span></span>
                     <span></span>
                   </div>
-                  <span class="text-xs text-gray-500">
+                  <span class="text-xs text-sand/60">
                     {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
                   </span>
                 </div>
@@ -314,7 +314,7 @@ Real-time collaboration interface for multiple investigators working on evidence
       </CardHeader>
       <CardContent class="space-y-3">
         {#if showAnnotationInput}
-          <div class="border border-gray-200 rounded-lg p-3">
+          <div class="border border-sand/20 rounded-lg p-3">
             <Textarea
               bind:value={newAnnotation}
               placeholder="Add an annotation or note..."
@@ -330,17 +330,17 @@ Real-time collaboration interface for multiple investigators working on evidence
             </div>
           {/if}
         {#if collaborationSession.annotations.length === 0}
-          <div class="text-center text-gray-500">
+          <div class="text-center text-sand/60">
             <MapPin class="w-8 h-8 mx-auto mb-2" />
             <p class="text-sm">No annotations yet</p>
           </div>
         {:else}
           <div class="max-h-48 overflow-y-auto">
             {#each Array.isArray(collaborationSession.annotations) ? collaborationSession.annotations : [] as annotation}
-              <div class="p-3 bg-gray-50 rounded">
+              <div class="p-3 bg-sand/5 rounded">
                 <div class="flex items-start justify-between">
                   <div class="flex items-center">
-                    <div class="w-6 h-6 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+                    <div class="w-6 h-6 bg-gradient-to-br from-accent to-info rounded-full flex items-center justify-center text-white text-xs">
                       {annotation.userId.slice(0,2).toUpperCase()}
                     </div>
                     <span class="text-sm">{annotation.userId}</span>

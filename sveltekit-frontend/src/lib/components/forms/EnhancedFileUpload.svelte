@@ -281,7 +281,7 @@
 
 <div class="w-full">
   <div class="border rounded-lg overflow-hidden">
-    <div class="px-4 py-3 border-b bg-gray-50">
+    <div class="px-4 py-3 border-b bg-sand/5">
       <h3 class="font-medium flex items-center gap-2">
         <Upload class="h-5 w-5" />
         {compact ? "Upload Files" : "Evidence Upload"}
@@ -291,9 +291,9 @@
     <div class="p-4 space-y-6">
       <!-- Drop Zone -->
       <div
-        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer border-gray-300 hover:border-blue-400"
-        class:border-blue-500={isDragOver}
-        class:bg-blue-50={isDragOver}
+        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer border-sand/20 hover:border-info/80"
+        class:border-info={isDragOver}
+        class:bg-info/5={isDragOver}
         class:opacity-50={disabled}
         class:cursor-not-allowed={disabled}
         ondragover={handleDragOver}
@@ -307,12 +307,12 @@
       >
         {#if isUploading}
           <div class="flex flex-col items-center gap-4">
-            <Loader2 class="h-8 w-8 animate-spin text-blue-500" />
+            <Loader2 class="h-8 w-8 animate-spin text-info" />
             <div class="space-y-2">
               <p class="text-sm font-medium">Uploading {currentUploadFile}...</p>
               {#if uploadProgress[currentUploadFile] !== undefined}
                 <progress value={uploadProgress[currentUploadFile]} max="100" class="w-64" />
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-sand/60">
                   {Math.round(uploadProgress[currentUploadFile])}% complete
                 </p>
               {/if}
@@ -320,12 +320,12 @@
           </div>
         {:else}
           <div class="space-y-4">
-            <Upload class="h-12 w-12 mx-auto text-gray-400" />
+            <Upload class="h-12 w-12 mx-auto text-sand/40" />
             <div>
               <p class="text-lg font-medium">
                 {selectedFiles.length > 0 ? "Add more files" : "Drop files here or click to browse"}
               </p>
-              <p class="text-sm text-gray-500 mt-1">
+              <p class="text-sm text-sand/60 mt-1">
                 Supports: Images, Videos, Audio, Documents (Max {maxSizeMB}MB each)
               </p>
             </div>
@@ -339,24 +339,24 @@
           <h4 class="font-medium">Selected Files ({selectedFiles.length})</h4>
           <div class="grid gap-3">
             {#each selectedFiles as file (file.name)}
-              <div class="flex items-center gap-3 p-3 border rounded-lg bg-gray-50">
+              <div class="flex items-center gap-3 p-3 border rounded-lg bg-sand/5">
                 <div class="flex-shrink-0">
                   {#if previews[file.name]}
                     <img src={previews[file.name]} alt={file.name} class="h-12 w-12 object-cover rounded" />
                   {:else}
-                    <svelte:component this={getFileIcon(file)} class="h-12 w-12 text-gray-400" />
+                    <svelte:component this={getFileIcon(file)} class="h-12 w-12 text-sand/40" />
                   {/if}
                 </div>
 
                 <div class="flex-1 min-w-0">
                   <p class="font-medium truncate">{file.name}</p>
-                  <p class="text-sm text-gray-500">{formatFileSize(file.size)} &bull; {file.type}</p>
+                  <p class="text-sm text-sand/60">{formatFileSize(file.size)} &bull; {file.type}</p>
                   {#if uploadProgress[file.name] !== undefined}
                     <progress value={uploadProgress[file.name]} max="100" class="mt-2 w-full" />
                   {/if}
                 </div>
 
-                <button onclick={() => removeFile(file.name)} disabled={isUploading} class="flex-shrink-0 p-1 hover:bg-gray-200 rounded">
+                <button onclick={() => removeFile(file.name)} disabled={isUploading} class="flex-shrink-0 p-1 hover:bg-sand/10 rounded">
                   <X class="h-4 w-4" />
                 </button>
               </div>
@@ -371,8 +371,8 @@
             <div class="space-y-2">
               <label for="title" class="block text-sm font-medium">Title *</label>
               <input id="title" bind:value={formState.title} placeholder="Enter evidence title" disabled={isUploading}
-                class="w-full border rounded px-3 py-2 text-sm" class:border-red-500={!!errors.title} />
-              {#if errors.title}<p class="text-sm text-red-500">{errors.title[0]}</p>{/if}
+                class="w-full border rounded px-3 py-2 text-sm" class:border-danger={!!errors.title} />
+              {#if errors.title}<p class="text-sm text-danger">{errors.title[0]}</p>{/if}
             </div>
 
             <div class="space-y-2">
@@ -381,7 +381,7 @@
                 <option value="" disabled>Select evidence type</option>
                 {#each evidenceTypes as type}<option value={type.value}>{type.label}</option>{/each}
               </select>
-              {#if errors.evidenceType}<p class="text-sm text-red-500">{errors.evidenceType[0]}</p>{/if}
+              {#if errors.evidenceType}<p class="text-sm text-danger">{errors.evidenceType[0]}</p>{/if}
             </div>
 
             <div class="space-y-2">
@@ -402,8 +402,8 @@
           <div class="space-y-2">
             <label for="description" class="block text-sm font-medium">Description</label>
             <textarea id="description" bind:value={formState.description} placeholder="Describe the evidence and its relevance to the case"
-              rows={3} disabled={isUploading} class="w-full border rounded p-2 text-sm" class:border-red-500={!!errors.description}></textarea>
-            {#if errors.description}<p class="text-sm text-red-500">{errors.description[0]}</p>{/if}
+              rows={3} disabled={isUploading} class="w-full border rounded p-2 text-sm" class:border-danger={!!errors.description}></textarea>
+            {#if errors.description}<p class="text-sm text-danger">{errors.description[0]}</p>{/if}
           </div>
 
           <div class="space-y-2">
@@ -424,7 +424,7 @@
             {#if formState.tags.length > 0}
               <div class="flex flex-wrap gap-2 mt-2">
                 {#each formState.tags as tag}
-                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-gray-100 text-sm">
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-sand/10 text-sm">
                     <span>{tag}</span>
                     <button type="button" class="ml-1" onclick={() => removeTag(tag)} disabled={isUploading} aria-label="Remove tag">
                       <X class="h-3 w-3" />
@@ -465,7 +465,7 @@
       {/if}
 
       <div class="flex justify-between items-center pt-4 border-t">
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-sand/60">
           {selectedFiles.length} file{selectedFiles.length !== 1 ? "s" : ""} selected
           {#if multiple}(max {maxFiles}){/if}
         </p>
@@ -484,11 +484,11 @@
       </div>
 
       {#if Object.keys(errors).length > 0 && selectedFiles.length > 0}
-        <div class="border border-red-300 bg-red-50 rounded p-3 flex items-start gap-3">
-          <AlertCircle class="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
+        <div class="border border-danger/30 bg-danger/5 rounded p-3 flex items-start gap-3">
+          <AlertCircle class="h-4 w-4 text-danger flex-shrink-0 mt-0.5" />
           <div>
-            <p class="font-medium text-red-800">Please fix the following errors before uploading:</p>
-            <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+            <p class="font-medium text-danger">Please fix the following errors before uploading:</p>
+            <ul class="mt-2 list-disc list-inside text-sm text-danger">
               {#each Object.entries(errors) as [field, messages]}
                 <li>{field}: {messages[0]}</li>
               {/each}

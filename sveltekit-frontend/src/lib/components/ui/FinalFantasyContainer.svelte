@@ -22,21 +22,21 @@
   }: Props = $props();
 
   const typeColors = {
-    menu: 'from-slate-800/95 to-slate-900/95 border-blue-400/80',
-    info: 'from-blue-800/95 to-blue-900/95 border-cyan-400/80',
-    stats: 'from-green-800/95 to-green-900/95 border-green-400/80',
-    inventory: 'from-amber-800/95 to-amber-900/95 border-yellow-400/80',
-    battle: 'from-red-800/95 to-red-900/95 border-red-400/80',
-    magic: 'from-purple-800/95 to-purple-900/95 border-purple-400/80'
+    menu: 'from-panel/95 to-slate-900/95 border-info/80/80',
+    info: 'from-blue-800/95 to-blue-900/95 border-info/80/80',
+    stats: 'from-green-800/95 to-green-900/95 border-accent/60/80',
+    inventory: 'from-amber-800/95 to-amber-900/95 border-warning/80',
+    battle: 'from-danger/40/95 to-danger/20/95 border-danger/60/80',
+    magic: 'from-purple-800/95 to-purple-900/95 border-info/60/80'
   };
 
   const glowColors = {
-    menu: 'shadow-blue-500/30',
-    info: 'shadow-cyan-500/30',
-    stats: 'shadow-green-500/30',
-    inventory: 'shadow-yellow-500/30',
-    battle: 'shadow-red-500/30',
-    magic: 'shadow-purple-500/30'
+    menu: 'shadow-info/30',
+    info: 'shadow-info/30',
+    stats: 'shadow-accent/30',
+    inventory: 'shadow-warning/30',
+    battle: 'shadow-danger/30',
+    magic: 'shadow-info/30'
   };
 </script>
 
@@ -58,7 +58,7 @@
         {title}
       </h3>
       <!-- FF-Style Title Decoration -->
-      <div class="absolute right-2 top-1/2 -translate-y-1/2 w-1 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse"></div>
+      <div class="absolute right-2 top-1/2 -translate-y-1/2 w-1 h-1 bg-gradient-to-r from-warning to-warning rounded-full animate-pulse"></div>
     </div>
   {/if}
 

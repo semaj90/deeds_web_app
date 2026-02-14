@@ -86,9 +86,9 @@
 
   function getStatusColor(status: string) {
     switch (status) {
-      case 'online': return 'text-green-500';
-      case 'offline': return 'text-red-500';
-      case 'degraded': return 'text-yellow-500';
+      case 'online': return 'text-accent';
+      case 'offline': return 'text-danger';
+      case 'degraded': return 'text-warning';
       default:return 'text-muted-foreground';
     }
   }
@@ -162,11 +162,11 @@
     <Card.Root>
       <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
         <Card.Title class="text-sm font-medium text-muted-foreground">GPU Efficiency</Card.Title>
-        <Zap class="h-4 w-4 text-amber-500" />
+        <Zap class="h-4 w-4 text-warning" />
       </Card.Header>
       <Card.Content>
         <div class="text-2xl font-bold">{performanceMetrics.gpuEfficiency}%</div>
-        <Progress value={performanceMetrics.gpuEfficiency} class="mt-2 h-1 bg-amber-100/20" />
+        <Progress value={performanceMetrics.gpuEfficiency} class="mt-2 h-1 bg-warning/10/20" />
       </Card.Content>
     </Card.Root>
 
@@ -194,7 +194,7 @@
           {#each services as service}
             <div class="flex items-center justify-between border-b border-border/40 pb-3 last: border-0 last:pb-0">
               <div class="flex items-center gap-3">
-                <div class="w-2 h-2 rounded-full {service.status === 'online' ? 'bg-green-500 shadow-[0_0_8px_rgba(34 197 94 0.6)]' : 'bg-red-500'}"></div>
+                <div class="w-2 h-2 rounded-full {service.status === 'online' ? 'bg-accent shadow-[0_0_8px_rgba(34 197 94 0.6)]' : 'bg-danger'}"></div>
                 <div>
                   <div class="font-medium">{service.name}</div>
                   <div class="text-[10px] text-muted-foreground uppercase tracking-wider">{service.id}</div>
@@ -228,7 +228,7 @@
       <Card.Content>
         <div class="space-y-3">
           <div class="p-3 bg-muted/50 rounded-lg border border-border/50 flex gap-3">
-            <CircleCheck class="w-5 h-5 text-green-500 mt-0.5" />
+            <CircleCheck class="w-5 h-5 text-accent mt-0.5" />
             <div>
               <div class="text-sm font-semibold">PostgreSQL Mirroring Complete</div>
               <p class="text-xs text-muted-foreground">Database synchronization finished successfully across all nodes.</p>
@@ -236,8 +236,8 @@
             </div>
           </div>
 
-          <div class="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20 flex gap-3">
-            <TriangleAlert class="w-5 h-5 text-yellow-500 mt-0.5" />
+          <div class="p-3 bg-warning/10 rounded-lg border border-warning/20 flex gap-3">
+            <TriangleAlert class="w-5 h-5 text-warning mt-0.5" />
             <div>
               <div class="text-sm font-semibold">Inference Latency Spike</div>
               <p class="text-xs text-muted-foreground">Ollama queue increased by 25%. Automatic scaling triggered.</p>
@@ -245,8 +245,8 @@
             </div>
           </div>
 
-          <div class="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20 flex gap-3">
-            <Cloud class="w-5 h-5 text-blue-500 mt-0.5" />
+          <div class="p-3 bg-info/10 rounded-lg border border-info/20 flex gap-3">
+            <Cloud class="w-5 h-5 text-info mt-0.5" />
             <div>
               <div class="text-sm font-semibold">Cloud Sync Active</div>
               <p class="text-xs text-muted-foreground">Offsite backup is currently uploading current session data.</p>

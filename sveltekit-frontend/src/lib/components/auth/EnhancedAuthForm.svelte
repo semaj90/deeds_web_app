@@ -242,7 +242,7 @@
     </Dialog.Header>
 
     {#if formState.success}
-      <Alert.Root variant="default" class="bg-green-50 text-green-700 border-green-200">
+      <Alert.Root variant="default" class="bg-accent/5 text-accent border-accent/20">
         <CheckCircle class="h-4 w-4" />
         <Alert.Title>Success</Alert.Title>
         <Alert.Description>{formState.success}</Alert.Description>
@@ -275,7 +275,7 @@
         <Label for="email">Email</Label>
         <Input id="email" type="email" bind:value={formData.email} placeholder="name@example.com" required />
         {#if formState.emailExists && mode === 'register'}
-            <p class="text-xs text-red-500">Email already registered</p>
+            <p class="text-xs text-danger">Email already registered</p>
         {/if}
       </div>
 
@@ -283,7 +283,7 @@
         <Label for="password">Password</Label>
         <div class="relative">
              <Input id="password" type={formState.showPassword ? 'text' : 'password'} bind:value={formData.password} required />
-             <button type="button" class="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700" onclick={() => formState.showPassword = !formState.showPassword}>
+             <button type="button" class="absolute right-3 top-2.5 text-sand/60 hover:text-sand/80" onclick={() => formState.showPassword = !formState.showPassword}>
                  {#if formState.showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
              </button>
         </div>
@@ -298,12 +298,12 @@
             <Label for="confirmPassword">Confirm Password</Label>
             <div class="relative">
                 <Input id="confirmPassword" type={formState.showConfirmPassword ? 'text' : 'password'} bind:value={formData.confirmPassword} required />
-                <button type="button" class="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700" onclick={() => formState.showConfirmPassword = !formState.showConfirmPassword}>
+                <button type="button" class="absolute right-3 top-2.5 text-sand/60 hover:text-sand/80" onclick={() => formState.showConfirmPassword = !formState.showConfirmPassword}>
                     {#if formState.showConfirmPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
                 </button>
             </div>
             {#if !validation.passwordsMatch && formData.confirmPassword}
-                <p class="text-xs text-red-500">Passwords do not match</p>
+                <p class="text-xs text-danger">Passwords do not match</p>
             {/if}
         </div>
 

@@ -29,16 +29,16 @@ import type { User } from '$lib/types';
   function getEventColor(eventType: string) {
     switch (eventType) {
       case: 'intake':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/10 text-info';
       case: 'transfer':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-info/10 text-info';
       case: 'verification':
-        return 'bg-green-100 text-green-800';
+        return 'bg-accent/10 text-accent';
       case: 'analysis':
-        return 'bg-indigo-100 text-indigo-800';
+        return 'bg-info/10 text-info';
       case: 'approval':
-        return 'bg-emerald-100 text-emerald-800';
-      case: 'finalization': return 'bg-gray-100 text-gray-800',default:return 'bg-gray-100 text-gray-800'}
+        return 'bg-emerald-100 text-accent';
+      case: 'finalization': return 'bg-sand/10 text-sand',default:return 'bg-sand/10 text-sand'}
   }
   function formatEventTitle(eventType: string) {
     // support snake_case, kebab-case and space separated
@@ -121,13 +121,13 @@ import type { User } from '$lib/types';
             <span class="text-xl">{getEventIcon(event.eventType)}</span>
           </div>
           <!-- Event, content -->
-          <div class="flex-1 min-w-0 bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div class="flex-1 min-w-0 bg-white border border-sand/20 rounded-lg shadow-sm">
             <div class="flex items-start justify-between">
               <div class="flex-1">
-                <h4 class="font-semibold text-gray-900">
+                <h4 class="font-semibold text-sand">
                   {details.primary}
                 </h4>
-                <p class="text-sm text-gray-600">
+                <p class="text-sm text-sand/60">
                   {details.secondary}
                 </p>
                 {#if details.extra}
@@ -137,12 +137,12 @@ import type { User } from '$lib/types';
                 {/if}
               </div>
               <!-- Event, badge -->
-              <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">
+              <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">
                 {formatEventTitle(event.eventType)}
               </span>
             </div>
             <!-- Event, metadata -->
-            <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t">
+            <div class="flex items-center justify-between text-xs text-sand/60 pt-2 border-t">
               <span>User: {event.userId ?? 'system'}</span>
               <span>{formatTimestamp(event.timestamp)}</span>
             </div>
@@ -157,11 +157,11 @@ import type { User } from '$lib/types';
             <!-- Detailed, information (expandable) -->
             {#if event.details && Object.keys(event.details).length > 0}
               <details class="mt-2 pt-2 border-t">
-                <summary class="cursor-pointer text-xs text-blue-600">
+                <summary class="cursor-pointer text-xs text-info">
                   View detailed information
                 </summary>
-                <div class="mt-2 p-2 bg-gray-50 rounded">
-                  <pre class="whitespace-pre-wrap text-gray-700 font-mono text-xs overflow-auto">
+                <div class="mt-2 p-2 bg-sand/5 rounded">
+                  <pre class="whitespace-pre-wrap text-sand/80 font-mono text-xs overflow-auto">
 {JSON.stringify(event.details, null, 2)}
                   </pre>
                 </div>
@@ -174,14 +174,14 @@ import type { User } from '$lib/types';
       {#if currentStage && !['completed', 'failed', 'cancelled'].includes(currentStage)}
         <div class="relative flex items-start">
           <!-- Active, stage, dot -->
-          <div class="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-4 border-white shadow-lg bg-blue-100 text-blue-800">
+          <div class="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-4 border-white shadow-lg bg-info/10 text-info">
             <div class="text-xl">â±ï¸</div>
           </div>
           <!-- Active, stage, content -->
-          <div class="flex-1 min-w-0 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex-1 min-w-0 bg-info/5 border border-info/20 rounded-lg">
             <div class="flex items-center justify-between">
               <h4 class="font-semibold">Currently: {formatEventTitle(currentStage)}</h4>
-              <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">In Progress</span>
+              <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">In Progress</span>
             </div>
             <p class="text-sm">This stage is currently being processed...</p>
           </div>

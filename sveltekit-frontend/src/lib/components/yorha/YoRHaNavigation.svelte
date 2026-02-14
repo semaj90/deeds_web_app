@@ -80,7 +80,7 @@
   }
 </script>
 
-<div class="h-full flex flex-col bg-slate-900 border-r border-slate-800">
+<div class="h-full flex flex-col bg-panel border-r border-sand/20">
   <!-- Search Bar -->
   {#if !collapsed}
     <div class="p-4">
@@ -88,9 +88,9 @@
         <input
           bind:value={searchQuery}
           placeholder="Search menu..."
-          class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all"
+          class="w-full bg-panelSoft border border-sand/20 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:ring-1 focus:ring-info outline-none transition-all"
         />
-        <div class="absolute right-3 top-2.5 text-slate-500">🔍</div>
+        <div class="absolute right-3 top-2.5 text-sand/60">🔍</div>
       </div>
     </div>
   {/if}
@@ -102,7 +102,7 @@
       <div class="space-y-1">
         {#each filteredRoutes as route}
           <button
-            class="w-full flex items-center gap-3 p-2 rounded transition-colors text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:bg-slate-800'}"
+            class="w-full flex items-center gap-3 p-2 rounded transition-colors text-left {isRouteActive(route.route) ? 'bg-info/20 text-info border border-info/30' : 'text-sand/40 hover:bg-panelSoft'}"
             onclick={() => navigateToRoute(route.route)}
           >
             <span class="text-lg">{route.icon}</span>
@@ -118,19 +118,19 @@
         {#each Object.entries(organizedRoutes) as [sectionId, sectionRoutes]}
           <div class="space-y-1">
             <button
-              class="w-full flex items-center justify-between p-2 rounded hover:bg-slate-800 transition-colors group"
+              class="w-full flex items-center justify-between p-2 rounded hover:bg-panelSoft transition-colors group"
               onclick={() => toggleSection(sectionId)}
             >
               <div class="flex items-center gap-2">
                 <span class="text-base">{getSectionIcon(sectionId)}</span>
                 {#if !collapsed}
-                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-slate-300">
+                  <span class="text-[10px] font-bold text-sand/60 uppercase tracking-widest group-hover:text-sand/40">
                     {getSectionTitle(sectionId)}
                   </span>
                 {/if}
               </div>
               {#if !collapsed}
-                <span class="text-[10px] text-slate-600 transition-transform {expandedSections.has(sectionId) ? 'rotate-90' : ''}">
+                <span class="text-[10px] text-sand/60 transition-transform {expandedSections.has(sectionId) ? 'rotate-90' : ''}">
                   ▶
                 </span>
               {/if}
@@ -141,7 +141,7 @@
               <div class="space-y-1 {collapsed ? '' : 'ml-2'}">
                 {#each sectionRoutes as route}
                   <button
-                    class="w-full relative flex items-center gap-3 p-2 rounded transition-all group text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(34 211 238 0.1)]' : 'text-slate-400 hover:bg-slate-800'}"
+                    class="w-full relative flex items-center gap-3 p-2 rounded transition-all group text-left {isRouteActive(route.route) ? 'bg-info/20 text-info border border-info/30 shadow-[0_0_15px_rgba(34 211 238 0.1)]' : 'text-sand/40 hover:bg-panelSoft'}"
                     onclick={() => navigateToRoute(route.route)}
                     onmouseenter={() => (hoveredRoute = route.id)}
                     onmouseleave={() => (hoveredRoute = null)}
@@ -152,7 +152,7 @@
                     {/if}
                     <!-- Active indicator -->
                     {#if isRouteActive(route.route)}
-                      <div class="absolute right-2 w-1 h-3 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34 211 238 0.5)]"></div>
+                      <div class="absolute right-2 w-1 h-3 bg-info/80 rounded-full shadow-[0_0_8px_rgba(34 211 238 0.5)]"></div>
                     {/if}
                   </button>
                 {/each}
@@ -166,15 +166,15 @@
 
   <!-- Footer -->
   {#if !collapsed}
-    <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+    <div class="p-4 border-t border-sand/20 bg-panel/50">
       <div class="space-y-1 text-[10px] font-mono uppercase tracking-tighter">
-        <div class="flex justify-between items-center text-slate-500">
+        <div class="flex justify-between items-center text-sand/60">
           <span>Active Nodes</span>
-          <span class="text-cyan-500">{routes.length}</span>
+          <span class="text-info">{routes.length}</span>
         </div>
-        <div class="flex justify-between items-center text-slate-500">
+        <div class="flex justify-between items-center text-sand/60">
           <span>System Status</span>
-          <span class="text-green-500">Ready</span>
+          <span class="text-accent">Ready</span>
         </div>
       </div>
     </div>

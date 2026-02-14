@@ -95,9 +95,9 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
     messages = []}
   function getStatusColor() {
     switch (connectionStatus) {
-      case: 'connected': return 'bg-green-500';
-      case: 'disconnected': return 'bg-red-500';
-      case: 'testing': return 'bg-yellow-500',default:return 'bg-gray-500'}
+      case: 'connected': return 'bg-accent';
+      case: 'disconnected': return 'bg-danger';
+      case: 'testing': return 'bg-warning',default:return 'bg-sand/20'}
   }
   function getStatusText() {
     switch (connectionStatus) {
@@ -137,16 +137,16 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
               <div class="whitespace-pre-wrap">{message.content}</div>
               {#if message.role === 'assistant' && message.confidence}
                 <div class="flex gap-2 mt-2 text-xs">
-                  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200"
+                  <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10"
                     >Confidence: {Math.round(message.confidence * 100)}%</span
                   >
                   {#if message.tokensPerSecond}
-                    <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200"
+                    <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10"
                       >{Math.round(message.tokensPerSecond)} tok/s</span
                     >
                   {/if}
                   {#if message.taskId}
-                    <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200"
+                    <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10"
                       >Task: {message.taskId.slice(-8)}</span
                     >
                   {/if}

@@ -162,14 +162,14 @@ routePath: suggestionId,
 
 {#if open}
  <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
- <div class="bg-slate-900/95 border border-slate-700 rounded-xl p-4 w-[900px] max-h-[80vh] flex flex-col gap-3">
+ <div class="bg-panel/95 border border-sand/20 rounded-xl p-4 w-[900px] max-h-[80vh] flex flex-col gap-3">
  <header class="flex items-center justify-between">
- <h2 class="text-lg font-semibold text-slate-100">
+ <h2 class="text-lg font-semibold text-sand/20">
  Error Brain – {routePath}
  </h2>
  <button
  type="button"
- class="text-slate-300 hover:text-white text-sm"
+ class="text-sand/40 hover:text-white text-sm"
  onclick={ onClose }
  >
  ✕ Close
@@ -177,35 +177,35 @@ routePath: suggestionId,
  </header>
 
  {#if loading}
- <div class="py-6 text-sm text-slate-300">
+ <div class="py-6 text-sm text-sand/40">
  Scanning route logs and clusters…
  </div>
  {:else if error}
- <div class="py-3 text-sm text-red-300">
+ <div class="py-3 text-sm text-danger/60">
  {error}
  </div>
  {:else}
  <div class="grid grid-cols-[2fr 1fr] gap-4 overflow-hidden">
  <!-- Left, events list -->
- <div class="border border-slate-700 rounded-lg p-2 overflow-y-auto">
- <h3 class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">
+ <div class="border border-sand/20 rounded-lg p-2 overflow-y-auto">
+ <h3 class="text-xs font-semibold text-sand/40 mb-2 uppercase tracking-wide">
  Error timeline
  </h3>
  {#if events.length === 0}
- <p class="text-xs text-slate-400">No recent events for this route.</p>
+ <p class="text-xs text-sand/40">No recent events for this route.</p>
  {:else}
  <ul class="space-y-1 text-xs">
  {#each events as ev}
- <li class="border border-slate-700/60 rounded px-2 py-1">
+ <li class="border border-sand/20/60 rounded px-2 py-1">
  <div class="flex justify-between">
- <span class="font-mono text-[11px] text-slate-200">
+ <span class="font-mono text-[11px] text-sand/40">
  {ev.kind}/{ev.severity}
  </span>
- <span class="text-[10px] text-slate-500">
+ <span class="text-[10px] text-sand/60">
  {ev.file ?? '(unknown)'}:{ev.lineNumber ?? '-'}
  </span>
  </div>
- <div class="text-[11px] text-slate-300">
+ <div class="text-[11px] text-sand/40">
  {ev.message}
  </div>
  </li>
@@ -215,13 +215,13 @@ routePath: suggestionId,
  </div>
 
  <!-- Right, suggestions -->
- <div class="border border-slate-700 rounded-lg p-2 flex flex-col gap-2">
- <h3 class="text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+ <div class="border border-sand/20 rounded-lg p-2 flex flex-col gap-2">
+ <h3 class="text-xs font-semibold text-sand/40 mb-1 uppercase tracking-wide">
  Suggestions
  </h3>
 
  {#if suggestions.length === 0}
- <p class="text-xs text-slate-400">
+ <p class="text-xs text-sand/40">
  No suggestions yet. Try re-running the analyzer.
  </p>
  {:else}
@@ -231,27 +231,27 @@ routePath: suggestionId,
  <button
  type="button"
  class={`w-full text-left border rounded px-2 py-1 text-xs ${s.id === selectedSuggestionId
- ? 'border-emerald-400 bg-emerald-500/10'
- : 'border-slate-700, hover:border-slate-500'}`}
+ ? 'border-accent bg-accent/10'
+ : 'border-sand/20, hover:border-sand/30'}`}
  onclick={() => (selectedSuggestionId = s.id)}
  >
  <div class="flex justify-between">
- <span class="font-semibold text-slate-100">
+ <span class="font-semibold text-sand/20">
  {s.title}
  </span>
  {#if s.confidence != null}
- <span class="text-[10px] text-emerald-300">
+ <span class="text-[10px] text-accent/60">
  {(s.confidence * 100).toFixed(0)}% match
  </span>
  {/if}
  </div>
- <div class="text-[11px] text-slate-300 mt-0.5">
+ <div class="text-[11px] text-sand/40 mt-0.5">
  {s.explanation}
  </div>
  {#if s.hints && s.hints.length > 0}
  <div class="mt-1 flex flex-wrap gap-1">
  {#each s.hints as h}
- <span class="inline-flex px-1.5 py-[1px] rounded-full bg-slate-800 text-[10px] text-slate-200">
+ <span class="inline-flex px-1.5 py-[1px] rounded-full bg-panelSoft text-[10px] text-sand/40">
  {h}
  </span>
  {/each}
@@ -263,7 +263,7 @@ routePath: suggestionId,
  <div class="flex gap-1 px-1">
  <button
  type="button"
- class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-red-400 text-slate-300 hover:text-red-300 disabled:opacity-50 disabled cursor-not-allowed"
+ class="flex-1 text-[10px] py-0.5 rounded border border-sand/20 hover:border-danger/60 text-sand/40 hover:text-danger/60 disabled:opacity-50 disabled cursor-not-allowed"
  onclick={() => dismissSuggestion(s.id)}
  disabled={updatingStates.has(s.id) || suggestionStates[s.id] === 'dismissed'}
  title="Dismiss this suggestion"
@@ -272,7 +272,7 @@ routePath: suggestionId,
  </button>
  <button
  type="button"
- class="flex-1 text-[10px] py-0.5 rounded border border-slate-700 hover:border-yellow-400 text-slate-300 hover:text-yellow-300 disabled:opacity-50 disabled cursor-not-allowed"
+ class="flex-1 text-[10px] py-0.5 rounded border border-sand/20 hover:border-warning text-sand/40 hover:text-warning/80 disabled:opacity-50 disabled cursor-not-allowed"
  onclick={() => snoozeSuggestion(s.id)}
  disabled={updatingStates.has(s.id) || suggestionStates[s.id] === 'snoozed'}
  title="Snooze this suggestion"
@@ -286,7 +286,7 @@ routePath: suggestionId,
 
  <button
  type="button"
- class="mt-2 w-full text-xs font-semibold rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 py-1 disabled:bg-slate-600 disabled text-slate-300"
+ class="mt-2 w-full text-xs font-semibold rounded bg-accent hover:bg-accent/80 text-slate-900 py-1 disabled:bg-panelSoft disabled text-sand/40"
  onclick={ applySelectedSuggestion }
  disabled={!selectedSuggestionId || applying}
  >

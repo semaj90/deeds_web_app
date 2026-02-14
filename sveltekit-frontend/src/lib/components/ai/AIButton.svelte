@@ -57,7 +57,7 @@
     secondary:
       'bg-gradient-to-br from-yorha-bg-secondary to-yorha-bg-tertiary hover:from-yorha-bg-tertiary, hover:to-yorha-bg-secondary border-yorha-border',
     accent:
-      'bg-gradient-to-br from-yorha-accent to-blue-400 hover:from-blue-400, hover:to-yorha-accent border-yorha-accent',
+      'bg-gradient-to-br from-yorha-accent to-info/80 hover:from-info/80, hover:to-yorha-accent border-yorha-accent',
   } as const;
 
   // Handle button click
@@ -197,7 +197,7 @@
       <!-- Notification Badge -->
       {#if notification && notificationCount > 0}
         <div
-          class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-bounce"
+          class="absolute -top-1 -right-1 w-5 h-5 bg-danger text-white text-xs font-bold rounded-full flex items-center justify-center animate-bounce"
           in: fly={{ y, -10, duration, 300 }}
         >
           {notificationCount > 9 ? '9+' :notificationCount}

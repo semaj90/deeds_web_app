@@ -177,14 +177,14 @@ $effect(() => {
 
 	<!-- Form status -->
 	{#if form.submitCount > 0 && Object.keys(form.errors).length > 0}
-		<div class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md">
+		<div class="mt-4 p-4 bg-danger/5 dark:bg-danger/10 border border-danger/20 dark:border-danger/60 rounded-md">
 			<div class="flex items-start">
-				<div class="text-red-600 dark:text-red-400 mr-2">⚠️</div>
+				<div class="text-danger dark:text-danger/80 mr-2">⚠️</div>
 				<div class="flex-1">
-					<h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+					<h3 class="text-sm font-medium text-danger dark:text-danger/40">
 						Please correct the following errors:
 					</h3>
-					<ul class="text-sm text-red-700 dark:text-red-300 ml-4 list-disc">
+					<ul class="text-sm text-danger dark:text-danger/60 ml-4 list-disc">
 						{#each Object.entries(form.errors) as [field, error]}
 							<li>{error}</li>
 						{/each}

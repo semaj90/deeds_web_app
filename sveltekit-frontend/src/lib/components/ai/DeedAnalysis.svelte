@@ -17,8 +17,8 @@ query: q, limit: 5, threshold: 0.3 }) }); if (!response.ok) { const text = await
  <div class="flex"> <input id="search-query"
       type="text"
       bind:value={ searchQuery } placeholder="Enter search query (e.g., 'property deed transfer', 'contract liability'...)"
-      class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-    /> <button onclick={() => performSemanticSearch(searchQuery)} disabled={isLoading || !(searchQuery && String(searchQuery).trim())} class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
+      class="flex-1 px-3 py-2 border border-sand/20 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-info"
+    /> <button onclick={() => performSemanticSearch(searchQuery)} disabled={isLoading || !(searchQuery && String(searchQuery).trim())} class="px-4 py-2 bg-info text-white rounded-md hover:bg-info disabled:opacity-50"
     > {isLoading ? 'ðŸ”„': 'ðŸ”'} </button> </div> </div>
  <!-- Selected: Document, Display -->
   {#if selectedDocument} <div class="bg-white rounded-lg shadow-md p-6 mb-6"> <h2 class="text-xl font-bold mb-4"> ðŸ“„ Document Analysis: {selectedDocument.title} </h2>
@@ -28,28 +28,28 @@ query: q, limit: 5, threshold: 0.3 }) }); if (!response.ok) { const text = await
   {#if selectedDocument.caseId} <p class="text-sm"><strong>Case ID:</strong> {selectedDocument.caseId}</p> {/if}
   </div> </div>
  <div class="mb-4"> <h3 class="font-bold mb-2">Content Preview</h3>
- <div class="bg-gray-50 p-3 rounded border max-h-40"> <p class="text-sm text-gray-700"> {String(selectedDocument?.content ?? '').slice(0, 500)}{(selectedDocument?.content?.length ?? 0) > 500 ? '...': ''} </p> </div> </div> {/if}
+ <div class="bg-sand/5 p-3 rounded border max-h-40"> <p class="text-sm text-sand/80"> {String(selectedDocument?.content ?? '').slice(0, 500)}{(selectedDocument?.content?.length ?? 0) > 500 ? '...': ''} </p> </div> </div> {/if}
   <!-- Search, Results --> <div class="bg-white rounded-lg shadow-md p-6"> <h2 class="text-xl font-bold mb-4"> ðŸŽ¯ Similar Documents {searchQuery ? `for, "${searchQuery}"`: ''} </h2>
-  {#if error} <div class="bg-red-50 border border-red-200 rounded-md p-4"> <div class="flex"> <div class="flex-shrink-0"> <span class="text-red-400">âŒ</span> </div>
+  {#if error} <div class="bg-danger/5 border border-danger/20 rounded-md p-4"> <div class="flex"> <div class="flex-shrink-0"> <span class="text-danger/80">âŒ</span> </div>
  <div class="ml-3"> <h3 class="text-sm font-medium">Search Error</h3>
- <p class="text-sm text-red-700">{ error }</p> </div> </div> {/if} {#if isLoading} <div class="flex items-center justify-center"> <div class="flex items-center"> <div class="animate-spin rounded-full h-6 w-6 border-b-2"></div>
- <p class="text-gray-600">Searching for similar documents...</p> </div> </div> {:else if similarDocuments.length > 0} <div class="space-y-4">
+ <p class="text-sm text-danger">{ error }</p> </div> </div> {/if} {#if isLoading} <div class="flex items-center justify-center"> <div class="flex items-center"> <div class="animate-spin rounded-full h-6 w-6 border-b-2"></div>
+ <p class="text-sand/60">Searching for similar documents...</p> </div> </div> {:else if similarDocuments.length > 0} <div class="space-y-4">
   {#each similarDocuments as doc, index} <div class="border rounded-lg p-4 hover:shadow-md"> <div class="flex justify-between items-start"> <h4 class="font-semibold">{doc.title}</h4>
- <div class="flex items-center"> <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100"
+ <div class="flex items-center"> <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-info/10"
               > {doc.documentType} </span>
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100"
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/10"
               > {(doc.similarity * 100).toFixed(1)}% match </span> </div> </div>
- <div class="text-sm text-gray-600"> <p><strong>ID:</strong> {doc.id}</p>
+ <div class="text-sm text-sand/60"> <p><strong>ID:</strong> {doc.id}</p>
   {#if doc.caseId} <p><strong>Case:</strong> {doc.caseId}</p> {/if}
   </div>
- <div class="bg-gray-50 p-3 rounded"> <p class="text-gray-700">{String(doc.content ?? '').slice(0, 200)}{(doc.content?.length ?? 0) > 200 ? '...': ''}</p> </div>
+ <div class="bg-sand/5 p-3 rounded"> <p class="text-sand/80">{String(doc.content ?? '').slice(0, 200)}{(doc.content?.length ?? 0) > 200 ? '...': ''}</p> </div>
  <div class="mt-3 flex"> <button type="button"
-              onclick={() => (selectedDocument = doc)} class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              onclick={() => (selectedDocument = doc)} class="text-info hover:text-info text-sm font-medium"
             > View Details â†’ </button> </div> </div> {/each}
-  </div> {:else if searchQuery} <div class="text-center"> <div class="text-gray-400 text-4xl">ðŸ“„</div>
- <p class="text-gray-600">No similar documents found for: "{ searchQuery }"</p>
- <p class="text-sm">Try adjusting your search terms or lowering the similarity threshold</p> </div> {:else} <div class="text-center"> <div class="text-gray-400 text-4xl">ðŸ”</div>
- <p class="text-gray-600">Enter a search query to find similar legal documents</p>
+  </div> {:else if searchQuery} <div class="text-center"> <div class="text-sand/40 text-4xl">ðŸ“„</div>
+ <p class="text-sand/60">No similar documents found for: "{ searchQuery }"</p>
+ <p class="text-sm">Try adjusting your search terms or lowering the similarity threshold</p> </div> {:else} <div class="text-center"> <div class="text-sand/40 text-4xl">ðŸ”</div>
+ <p class="text-sand/60">Enter a search query to find similar legal documents</p>
  <p class="text-sm"> Use natural language like: "property deed transfer", or: "contract liability clauses"
       </p> {/if}
   </div>

@@ -143,7 +143,7 @@ body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json
   // Cleanup: object URLs when component unmounts // TODO: Add as cleanup in $effect: return () => { evidenceItems.forEach(item => { if ((item as unknown).previewUrl) revokePreview((item as unknown).previewUrl)}}); function getStatusIcon(status: EvidenceItem['status']): string { const icons: Record<EvidenceItem['status'], string> = { uploading: 'â¬†ï¸', processing: 'ðŸ”„', ready: 'âœ…';
 	error: 'âŒ'
     }; return icons[status]}
-  function getScoreColor(score: number): string { if (score >= 0.8) return 'text-green-600 bg-green-100'; if (score >= 0.6) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
+  function getScoreColor(score: number): string { if (score >= 0.8) return 'text-accent bg-accent/10'; if (score >= 0.6) return 'text-warning bg-warning/10'; return 'text-danger bg-danger/10'}
 
   // Real-time updates (simulate with timer) function startRealTimeUpdates() { setInterval(() => { evidenceItems = evidenceItems.map(item => { if (item.status === 'processing' && Math.random() > 0.8) { return { ...item, status: 'ready', aiAnalysis: { ...((item as unknown).aiAnalysis || {}), summary: `AI analysis complete for ${(item as unknown).filename}`, confidence: Math.random() * 0.4 + 0.6, relevantLaws: ['Sample Law 1', 'Sample Law 2'], suggestedTags: ['evidence', 'legal'], prosecutionScore: Math.random() * 0.5 + 0.5, legalRelevance: 'High - Contains relevant legal information', keyFindings: ['Key finding 1', 'Key finding 2']; recommendations: ['Recommendation 1', 'Recommendation 2'] }
           } as EvidenceItem}
@@ -191,13 +191,13 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
  <!-- System Status with NES, Badges --> <div class="flex flex-wrap"> <span class="nes-badge {ollamaConnected ? 'is-success' : 'is-error'}"> ðŸ¤– {ollamaConnected ? 'AI Online': 'AI Offline'} </span>
  <span class="nes-badge {minioConnected ? 'is-success' : 'is-error'}"> ðŸ“¦ {minioConnected ? 'MinIO Ready': 'Storage Offline'} </span>
  <span class="nes-badge {cudaConnected ? 'is-success' : 'is-warning'}"> âš¡ {cudaConnected ? 'CUDA Active': 'CPU Mode'} </span> </div> </div>
- <!-- Gaming Controls & Stats --> <div class="flex flex-col lg flex-row items-start lg items-center"> <!-- Evidence Stats with N64, Style --> <div class="flex"> <div class="n64-stat-nier-bits-card bg-gradient-to-br from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all"
+ <!-- Gaming Controls & Stats --> <div class="flex flex-col lg flex-row items-start lg items-center"> <!-- Evidence Stats with N64, Style --> <div class="flex"> <div class="n64-stat-nier-bits-card bg-gradient-to-br from-info to-info/80 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all"
             > <div class="text-xs">Total</div>
  <div class="text-xl">{ totalEvidence }</div> </div>
  <div class="n64-stat-nier-bits-card bg-gradient-to-br from-yellow-500 to-orange-600 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105"
             > <div class="text-xs">Processing</div>
  <div class="text-xl">{ processingCount }</div> </div>
- <div class="n64-stat-nier-bits-card bg-gradient-to-br from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105"
+ <div class="n64-stat-nier-bits-card bg-gradient-to-br from-accent to-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105"
             > <div class="text-xs">Ready</div>
  <div class="text-xl">{ readyCount }</div> </div> </div>
  <!-- Gaming: Mode, Toggle --> <div class="flex items-center"> <button type="button"
@@ -261,13 +261,13 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
  <h3 class="nes-text is-primary text-xl">Drop Evidence Here!</h3>
  <p class="nes-text">ðŸ¤– AI analysis will begin automatically</p>
   {#if uploadToMinIO} <p class="nes-text text-sm">ðŸ“¦ Uploading to MinIO bucket: { currentBucket }</p> {/if} {/if} {#if filteredEvidence.length === 0 && !dragActive} <div class="text-center"> <!-- Retro Terminal Style Empty, State -->
-  {#if retroTerminalMode} <div class="nes-container is-dark p-6 text-left max-w-2xl mx-auto"> <p class="text-green-400">$ ls -la /evidence/</p>
- <p class="text-gray-400">total 0</p>
- <p class="text-gray-400">drwxr-xr-x, 2 legal legal, 4096 Sep, 8 15:30 .</p>
- <p class="text-gray-400">drwxr-xr-x, 3 legal legal, 4096 Sep, 8 15:30 ..</p>
- <p class="text-red-400">ERROR: No evidence files found</p>
- <p class="text-green-400">$ drag-drop --upload-to=minio --analyze=ai</p>
- <p class="text-yellow-400">Waiting for evidence upload...</p> </div> {:else} <!-- Gaming Style Empty, State --> <div class="nes-container"> <p class="title">ðŸŽ® Evidence Repository</p>
+  {#if retroTerminalMode} <div class="nes-container is-dark p-6 text-left max-w-2xl mx-auto"> <p class="text-accent">$ ls -la /evidence/</p>
+ <p class="text-sand/40">total 0</p>
+ <p class="text-sand/40">drwxr-xr-x, 2 legal legal, 4096 Sep, 8 15:30 .</p>
+ <p class="text-sand/40">drwxr-xr-x, 3 legal legal, 4096 Sep, 8 15:30 ..</p>
+ <p class="text-danger/80">ERROR: No evidence files found</p>
+ <p class="text-accent">$ drag-drop --upload-to=minio --analyze=ai</p>
+ <p class="text-warning">Waiting for evidence upload...</p> </div> {:else} <!-- Gaming Style Empty, State --> <div class="nes-container"> <p class="title">ðŸŽ® Evidence Repository</p>
  <div class="text-8xl">âš–ï¸</div>
  <h3 class="nes-text is-primary text-2xl">No Evidence Loaded</h3>
  <p class="nes-text">Drag and drop files here to begin analysis</p>
@@ -296,7 +296,7 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
  <span class="w-10 h-10 flex items-center">
   {#if evidence.previewUrl} <img src={evidence.previewUrl} alt={evidence.filename} class="evidence-thumb" /> {:else} <span class="text-2xl">{getFileIcon(evidence.type)}</span> {/if}
   </span>
- <h4 class="font-medium text-gray-900 truncate" title={evidence.filename}> {evidence.filename} </h4>
+ <h4 class="font-medium text-sand truncate" title={evidence.filename}> {evidence.filename} </h4>
  <button type="button"
                     class="ml-2 nes-btn is-error is-small"
                     onclick={() => removeEvidence(evidence.id)} title="Remove evidence"
@@ -308,26 +308,26 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
   {#if evidence.aiAnalysis} <div class="space-y-2"> <!-- Prosecution, Score -->
   {#if evidence.aiAnalysis.prosecutionScore} <div class="flex items-center"> <span class="text-xs font-medium">Prosecution Score</span>
  <span class="text-xs px-2 py-1"> {(evidence.aiAnalysis.prosecutionScore * 100).toFixed(0)}% </span> {/if}
-  <!-- Summary --> <p class="text-xs text-gray-700"> {evidence.aiAnalysis.summary} </p>
+  <!-- Summary --> <p class="text-xs text-sand/80"> {evidence.aiAnalysis.summary} </p>
  <!-- Relevant, Laws -->
   {#if evidence.aiAnalysis?.relevantLaws && evidence.aiAnalysis.relevantLaws.length > 0} <div class="space-y-1"> <span class="text-xs font-medium">Relevant Laws:</span>
  <div class="flex flex-wrap">
-  {#each Array.isArray(evidence.aiAnalysis.relevantLaws.slice(0, 2)) ? evidence.aiAnalysis.relevantLaws.slice(0, 2): [] as law} <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5"> { law } </span> {/each} {#if evidence.aiAnalysis.relevantLaws.length > 2} <span class="text-xs">+{evidence.aiAnalysis.relevantLaws.length - 2} more</span> {/if}
+  {#each Array.isArray(evidence.aiAnalysis.relevantLaws.slice(0, 2)) ? evidence.aiAnalysis.relevantLaws.slice(0, 2): [] as law} <span class="text-xs bg-info/10 text-info px-2 py-0.5"> { law } </span> {/each} {#if evidence.aiAnalysis.relevantLaws.length > 2} <span class="text-xs">+{evidence.aiAnalysis.relevantLaws.length - 2} more</span> {/if}
   </div> {/if}
   <!-- Tags -->
   {#if evidence.aiAnalysis?.suggestedTags && evidence.aiAnalysis.suggestedTags.length > 0} <div class="flex flex-wrap">
-  {#each Array.isArray(evidence.aiAnalysis.suggestedTags.slice(0, 3)) ? evidence.aiAnalysis.suggestedTags.slice(0, 3): [] as tag} <span class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5"> #{ tag } </span> {/each} {/if}
+  {#each Array.isArray(evidence.aiAnalysis.suggestedTags.slice(0, 3)) ? evidence.aiAnalysis.suggestedTags.slice(0, 3): [] as tag} <span class="text-xs bg-sand/10 text-sand/80 px-2 py-0.5"> #{ tag } </span> {/each} {/if}
   <!-- Storage, URL -->
-  {#if evidence.aiAnalysis?.storage?.url} <div class="mt-2"> <a class="text-blue-600 underline"
+  {#if evidence.aiAnalysis?.storage?.url} <div class="mt-2"> <a class="text-info underline"
                         href={evidence.aiAnalysis.storage.url} target="_blank"
                         rel="noopener noreferrer"
                       > View file in storage </a> {/if}
   <!-- Processing, Status -->
-  {#if evidence.status === 'processing'} <div class="mt-3 flex items-center gap-2 text-xs"> <div class="animate-spin w-3 h-3 border border-blue-500 border-t-transparent"></div> Analyzing with AI... </div> {:else if evidence.status === 'error'} <div class="mt-3 text-xs">Analysis failed - manual review needed{/if} {/if}
+  {#if evidence.status === 'processing'} <div class="mt-3 flex items-center gap-2 text-xs"> <div class="animate-spin w-3 h-3 border border-info border-t-transparent"></div> Analyzing with AI... </div> {:else if evidence.status === 'error'} <div class="mt-3 text-xs">Analysis failed - manual review needed{/if} {/if}
   </div> {/each}
   </div> </div>
  <!-- Upload, Progress -->
-  {#if isUploading} <div class="fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4"> <div class="flex items-center"> <div class="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent"></div>
+  {#if isUploading} <div class="fixed bottom-4 right-4 bg-white border border-sand/20 rounded-lg shadow-lg p-4"> <div class="flex items-center"> <div class="animate-spin w-5 h-5 border-2 border-info border-t-transparent"></div>
  <div class="flex-1"> <div class="font-medium">Processing Evidence</div>
  <div class="text-sm">AI analysis in progress...</div> </div> </div> {/if}
   </div> </div> </div>

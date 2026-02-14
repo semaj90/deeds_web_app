@@ -11,9 +11,9 @@
  });
 
  let chartData = $derived([
- { label: 'Documents', value: stats.totalDocuments, color: 'bg-cyan-400' },
-	{ label: 'AI Analyzed', value: stats.aiAnalyzed, color: 'bg-green-400' },
-	{ label: 'Pending', value: stats.pendingReview, color: 'bg-yellow-400' }
+ { label: 'Documents', value: stats.totalDocuments, color: 'bg-info/80' },
+	{ label: 'AI Analyzed', value: stats.aiAnalyzed, color: 'bg-accent/80' },
+	{ label: 'Pending', value: stats.pendingReview, color: 'bg-warning' }
  ]);
 
  let loading = $state(true);
@@ -49,9 +49,9 @@
  };
 
  chartData = [
- { label: 'Documents', value: stats.totalDocuments, color: 'bg-cyan-400' },
-	{ label: 'AI Analyzed', value: stats.aiAnalyzed, color: 'bg-green-400' },
-	{ label: 'Pending', value: stats.pendingReview, color: 'bg-yellow-400' }
+ { label: 'Documents', value: stats.totalDocuments, color: 'bg-info/80' },
+	{ label: 'AI Analyzed', value: stats.aiAnalyzed, color: 'bg-accent/80' },
+	{ label: 'Pending', value: stats.pendingReview, color: 'bg-warning' }
  ];
 
  } catch (err) {
@@ -79,31 +79,31 @@
 });
 </script>
 
-<div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
  <div class="flex items-center justify-between mb-4">
- <h2 class="text-xl font-semibold text-cyan-400">Evidence Statistics</h2>
+ <h2 class="text-xl font-semibold text-info">Evidence Statistics</h2>
  {#if loading}
- <div class="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+ <div class="w-4 h-4 border-2 border-info/80 border-t-transparent rounded-full animate-spin"></div>
  {/if}
  </div>
 
  {#if error}
  <div class="text-center py-4 mb-4">
- <div class="text-red-400 text-sm">⚠️ {error}</div>
+ <div class="text-danger/80 text-sm">⚠️ {error}</div>
  </div>
  {/if}
 
  <div class="space-y-4">
  <!-- Key Metrics -->
  <div class="grid grid-cols-2 gap-4">
- <div class="bg-slate-700/30 rounded-lg p-3">
- <div class="text-2xl font-bold text-cyan-400">{stats.totalDocuments.toLocaleString()}</div>
- <div class="text-xs text-slate-400">Total Documents</div>
+ <div class="bg-panelSoft/30 rounded-lg p-3">
+ <div class="text-2xl font-bold text-info">{stats.totalDocuments.toLocaleString()}</div>
+ <div class="text-xs text-sand/40">Total Documents</div>
  </div>
 
- <div class="bg-slate-700/30 rounded-lg p-3">
- <div class="text-2xl font-bold text-green-400">{stats.processedToday}</div>
- <div class="text-xs text-slate-400">Processed Today</div>
+ <div class="bg-panelSoft/30 rounded-lg p-3">
+ <div class="text-2xl font-bold text-accent">{stats.processedToday}</div>
+ <div class="text-xs text-sand/40">Processed Today</div>
  </div>
  </div>
 
@@ -111,12 +111,12 @@
  <div class="space-y-3">
  <div>
  <div class="flex justify-between text-sm mb-1">
- <span class="text-slate-300">AI Analysis Progress</span>
- <span class="text-cyan-400">{Math.round((stats.aiAnalyzed / Math.max(stats.totalDocuments, 1)) * 100)}%</span>
+ <span class="text-sand/40">AI Analysis Progress</span>
+ <span class="text-info">{Math.round((stats.aiAnalyzed / Math.max(stats.totalDocuments, 1)) * 100)}%</span>
  </div>
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div
- class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
+ class="h-2 rounded-full bg-info/80 transition-all duration-300"
  style="width: {(stats.aiAnalyzed / Math.max(stats.totalDocuments, 1)) * 100}%"
  ></div>
  </div>
@@ -124,12 +124,12 @@
 
  <div>
  <div class="flex justify-between text-sm mb-1">
- <span class="text-slate-300">Evidence Quality Score</span>
- <span class="text-green-400">{stats.evidenceQuality}%</span>
+ <span class="text-sand/40">Evidence Quality Score</span>
+ <span class="text-accent">{stats.evidenceQuality}%</span>
  </div>
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div
- class="h-2 rounded-full bg-green-400 transition-all duration-300"
+ class="h-2 rounded-full bg-accent/80 transition-all duration-300"
  style="width: {stats.evidenceQuality}%"
  ></div>
  </div>
@@ -137,28 +137,28 @@
  </div>
 
  <!-- Document Types -->
- <div class="pt-4 border-t border-slate-700/50">
- <h3 class="text-sm font-medium text-slate-300 mb-3">Document Types</h3>
+ <div class="pt-4 border-t border-sand/20/50">
+ <h3 class="text-sm font-medium text-sand/40 mb-3">Document Types</h3>
  <div class="space-y-2">
  <div class="flex items-center justify-between text-sm">
- <span class="text-slate-400">Contracts</span>
- <span class="text-cyan-400">{Math.floor(stats.totalDocuments * 0.27).toLocaleString()}</span>
+ <span class="text-sand/40">Contracts</span>
+ <span class="text-info">{Math.floor(stats.totalDocuments * 0.27).toLocaleString()}</span>
  </div>
  <div class="flex items-center justify-between text-sm">
- <span class="text-slate-400">Emails</span>
- <span class="text-cyan-400">{Math.floor(stats.totalDocuments * 0.25).toLocaleString()}</span>
+ <span class="text-sand/40">Emails</span>
+ <span class="text-info">{Math.floor(stats.totalDocuments * 0.25).toLocaleString()}</span>
  </div>
  <div class="flex items-center justify-between text-sm">
- <span class="text-slate-400">Financial Records</span>
- <span class="text-cyan-400">{Math.floor(stats.totalDocuments * 0.16).toLocaleString()}</span>
+ <span class="text-sand/40">Financial Records</span>
+ <span class="text-info">{Math.floor(stats.totalDocuments * 0.16).toLocaleString()}</span>
  </div>
  <div class="flex items-center justify-between text-sm">
- <span class="text-slate-400">Legal Documents</span>
- <span class="text-cyan-400">{Math.floor(stats.totalDocuments * 0.13).toLocaleString()}</span>
+ <span class="text-sand/40">Legal Documents</span>
+ <span class="text-info">{Math.floor(stats.totalDocuments * 0.13).toLocaleString()}</span>
  </div>
  <div class="flex items-center justify-between text-sm">
- <span class="text-slate-400">Other</span>
- <span class="text-cyan-400">{Math.floor(stats.totalDocuments * 0.19).toLocaleString()}</span>
+ <span class="text-sand/40">Other</span>
+ <span class="text-info">{Math.floor(stats.totalDocuments * 0.19).toLocaleString()}</span>
  </div>
  </div>
  </div>

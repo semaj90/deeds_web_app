@@ -61,9 +61,9 @@
   {/if}
 
   {#if photos.length === 0}
-    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-      <Camera class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-      <p class="text-gray-500 mb-4">No photos uploaded yet</p>
+    <div class="border-2 border-dashed border-sand/20 rounded-lg p-8 text-center">
+      <Camera class="w-12 h-12 text-sand/40 mx-auto mb-4" />
+      <p class="text-sand/60 mb-4">No photos uploaded yet</p>
       {#if editable}
         <Button class="bits-btn" onclick={handleUpload} variant="outline">
           <Upload class="w-4 h-4 mr-2" />
@@ -76,7 +76,7 @@
       {#each photos as photo, index}
         <div class="relative group">
           <div
-            class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border-2 border-gray-200"
+            class="aspect-square bg-sand/10 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border-2 border-sand/20"
             role="button"
             tabindex="0"
             onclick={() => handlePhotoClick(photo, index)}
@@ -121,7 +121,7 @@
           <!-- AI Analysis Badge -->
           {#if photo.ai && photo.ai.caption}
             <div class="absolute bottom-2 left-2">
-              <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700"
+              <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10 text-sand/80"
                 >AI Analyzed</span
               >
             </div>

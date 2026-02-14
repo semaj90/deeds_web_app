@@ -11,7 +11,7 @@
 		class: className = '',
 	}: Props = $props();
 
-	const defaultClass = 'text-sm text-slate-400';
+	const defaultClass = 'text-sm text-sand/40';
 </script>
 
 <p class="{defaultClass} {className}" data-dialog-description="">

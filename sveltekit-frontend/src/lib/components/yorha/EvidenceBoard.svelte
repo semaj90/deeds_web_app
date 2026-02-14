@@ -88,12 +88,12 @@ import { onMount } from "svelte";
   onMount(loadEvidence);
 </script>
 
-<div class="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden flex flex-col h-[800px]">
+<div class="bg-panel border border-sand/20 rounded-lg overflow-hidden flex flex-col h-[800px]">
   <!-- Header -->
-  <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-    <span class="text-xs font-bold text-slate-400 tracking-[0.2em] uppercase">NEURAL EVIDENCE NETWORK</span>
+  <div class="p-4 bg-panel border-b border-sand/20 flex justify-between items-center">
+    <span class="text-xs font-bold text-sand/40 tracking-[0.2em] uppercase">NEURAL EVIDENCE NETWORK</span>
     {#if selectedNode}
-      <div class="px-3 py-1 bg-cyan-900/30 border border-cyan-500/50 rounded text-cyan-400 text-[10px] font-mono">
+      <div class="px-3 py-1 bg-info/10 border border-info/50 rounded text-info text-[10px] font-mono">
         SELECTED: {selectedNode.title}
       </div>
     {/if}
@@ -101,11 +101,11 @@ import { onMount } from "svelte";
 
   <div class="relative flex-1 bg-[radial-gradient(#1e293b_1px transparent_1px)] bg-[size:40px_40px]">
     {#if isLoading}
-      <div class="absolute inset-0 flex items-center justify-center text-cyan-500 font-mono text-xs animate-pulse">
+      <div class="absolute inset-0 flex items-center justify-center text-info font-mono text-xs animate-pulse">
         CALIBRATING VISUAL ARRAY...
       </div>
     {:else if error}
-      <div class="absolute inset-0 flex items-center justify-center text-red-500 font-mono text-xs">
+      <div class="absolute inset-0 flex items-center justify-center text-danger font-mono text-xs">
         {error}
       </div>
     {:else}
@@ -177,22 +177,22 @@ import { onMount } from "svelte";
   </div>
 
   <!-- Legend -->
-  <div class="p-3 bg-slate-950 border-t border-slate-800 flex gap-4 overflow-x-auto">
+  <div class="p-3 bg-panel border-t border-sand/20 flex gap-4 overflow-x-auto">
     {#each ['document', 'photo', 'video', 'testimony'] as type}
       <div class="flex items-center gap-2 flex-shrink-0">
         <div class="w-2 h-2 rounded-full" style="background: {getNodeColor(type)}"></div>
-        <span class="text-[9px] text-slate-500 font-mono uppercase">{type}</span>
+        <span class="text-[9px] text-sand/60 font-mono uppercase">{type}</span>
       </div>
     {/each}
   </div>
 </div>
 
 <style>
- .bg-slate-900 {
+ .bg-panel {
  background-color: #1e293b;
  }
 
- .border-slate-800 {
+ .border-sand-20 {
  border-color: #334155;
  }
 
@@ -216,7 +216,7 @@ import { onMount } from "svelte";
  padding: 1rem;
  }
 
- .bg-slate-950 {
+ .bg-panel {
  background-color: #0f172a;
  }
 
@@ -288,7 +288,7 @@ import { onMount } from "svelte";
  opacity: 0;
  }
 
- .text-cyan-500 {
+ .text-info {
  color: #22d3ee;
  }
 
@@ -296,7 +296,7 @@ import { onMount } from "svelte";
  font-family: monospace;
  }
 
- .text-red-500 {
+ .text-danger {
  color: #f43f5e;
  }
 
@@ -332,7 +332,7 @@ import { onMount } from "svelte";
  flex-shrink: 0;
  }
 
- .text-slate-500 {
+ .text-sand-60 {
  color: #94a3b8;
  }
 </style>

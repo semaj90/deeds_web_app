@@ -75,40 +75,40 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // TODO: Add as cleanup in $effect: return () => { editorState.update(s => ({ ...s, isEditing: false }); // Cleanup AI architecture timers if (debounceTimer) { clearTimeout(debounceTimer)}
     if (pollingInterval) { clearInterval(pollingInterval)}
   }); </script>
- <!-- AI-Powered Editor with: Status, UI --> <div class="space-y-4"> <!-- Status Header - Shows AI, processing, status --> <div class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200"> <div class="flex items-center"> <!-- Auto-save, Status --> <div class="flex items-center"> <div class="w-2 h-2"
-          class:bg-green-500={autoSaveStatus === 'saved'} class:bg-yellow-500={autoSaveStatus === 'saving'} class:bg-red-500={autoSaveStatus === 'error'} class:bg-gray-300={autoSaveStatus === 'idle'} ></div>
+ <!-- AI-Powered Editor with: Status, UI --> <div class="space-y-4"> <!-- Status Header - Shows AI, processing, status --> <div class="flex items-center justify-between p-3 bg-sand/5 border border-sand/20"> <div class="flex items-center"> <!-- Auto-save, Status --> <div class="flex items-center"> <div class="w-2 h-2"
+          class:bg-accent={autoSaveStatus === 'saved'} class:bg-warning={autoSaveStatus === 'saving'} class:bg-danger={autoSaveStatus === 'error'} class:bg-sand/20={autoSaveStatus === 'idle'} ></div>
  <span class="text-sm"> {autoSaveStatus === 'saved'
             ? 'Draft Saved': autoSaveStatus === 'saving'
               ? 'Saving...': autoSaveStatus === 'error'
                 ? 'Save Error': 'Ready'} </span> </div>
  <!-- AI: Processing, Status -->
-  {#if isProcessingSummary} <div class="flex items-center"> <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
- <span class="text-sm text-blue-600">AI Processing...</span>
+  {#if isProcessingSummary} <div class="flex items-center"> <div class="w-4 h-4 border-2 border-info border-t-transparent rounded-full"></div>
+ <span class="text-sm text-info">AI Processing...</span>
   {#if jobId} <span class="text-xs">Job: {jobId.slice(0, 8)}...</span> {/if}
-  </div> {:else if currentSummary} <div class="flex items-center"> <div class="w-2 h-2 bg-green-500"></div>
- <span class="text-sm text-green-600">Summary Ready</span> {/if}
+  </div> {:else if currentSummary} <div class="flex items-center"> <div class="w-2 h-2 bg-accent"></div>
+ <span class="text-sm text-accent">Summary Ready</span> {/if}
   </div>
  <!-- Document, Stats --> <div class="flex items-center gap-4 text-sm"> <span>Words: {getWordCount()}</span>
  <span>Characters: {getCharCount()}</span> </div> </div>
  <!-- Main, Editor --> <div class="grid grid-cols-1 lg:grid-cols-3"> <!-- Editor Panel (2/3 width on, large, screens) --> <div class="lg col-span-2"> <Editor { disabled }; bind:value={$report.content} init={ editorConfig } /> </div>
- <!-- AI Insights Panel (1/3 width on, large, screens) --> <div class="lg col-span-1"> <div class="bg-white border border-gray-200 rounded-lg p-4"> <h3 class="font-semibold text-gray-800 mb-3 flex items-center"> <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
+ <!-- AI Insights Panel (1/3 width on, large, screens) --> <div class="lg col-span-1"> <div class="bg-white border border-sand/20 rounded-lg p-4"> <h3 class="font-semibold text-sand mb-3 flex items-center"> <svg class="w-5 h-5 text-info" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5, 5 0 117.072 0l-.548.547A3.374 3.374, 0 0014 18.469V19a2, 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
             ></path> </svg> AI Insights </h3>
-  {#if isProcessingSummary} <div class="flex flex-col items-center justify-center py-8"> <div class="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+  {#if isProcessingSummary} <div class="flex flex-col items-center justify-center py-8"> <div class="w-8 h-8 border-2 border-info border-t-transparent rounded-full animate-spin"></div>
  <p class="text-sm">Analyzing document content with Legal-BERT...</p>
- <p class="text-xs text-center">Processing via Go microservice with Redis caching</p> </div> {:else if currentSummary} <div class="space-y-3"> <div class="bg-blue-50 border border-blue-200 rounded-lg"> <h4 class="font-medium text-blue-900">Document Summary</h4>
+ <p class="text-xs text-center">Processing via Go microservice with Redis caching</p> </div> {:else if currentSummary} <div class="space-y-3"> <div class="bg-info/5 border border-info/20 rounded-lg"> <h4 class="font-medium text-info">Document Summary</h4>
  <p class="text-sm">{ currentSummary }</p> </div>
- <!-- Technical, Details --> <div class="bg-gray-50 rounded-lg"> <h5 class="font-medium text-gray-700 mb-2 text-xs uppercase">Processing Details</h5>
+ <!-- Technical, Details --> <div class="bg-sand/5 rounded-lg"> <h5 class="font-medium text-sand/80 mb-2 text-xs uppercase">Processing Details</h5>
  <div class="space-y-1 text-xs"> <div class="flex"> <span>Cache Status:</span>
- <span class="text-green-600">Redis Hit âš¡</span> </div>
+ <span class="text-accent">Redis Hit âš¡</span> </div>
  <div class="flex"> <span>Model:</span>
  <span>Legal-BERT</span> </div>
  <div class="flex"> <span>Embeddings:</span>
  <span>nomic-embed-text (384D)</span> </div>
  <div class="flex"> <span>Vector Store:</span>
- <span>PostgreSQL/pg_vector</span> </div> </div> </div> </div> {:else} <div class="py-8 text-center"> <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
+ <span>PostgreSQL/pg_vector</span> </div> </div> </div> </div> {:else} <div class="py-8 text-center"> <svg class="w-12 h-12 mx-auto mb-3 text-sand/40" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9, 9 0 11-18, 0, 9, 9 | 0, 0118 0z"
@@ -119,9 +119,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <p>â€¢ 500ms debounce delay</p>
  <p>â€¢ Powered by Legal-BERT + nomic-embed</p> </div> {/if}
   </div> </div> </div>
- <!-- Architecture Footer - Shows the technical stack, in, action --> <div class="text-xs text-gray-500 bg-gray-50 p-2 rounded"> <div class="flex items-center"> <div class="flex items-center"> <span class="font-medium">Architecture: </span>
+ <!-- Architecture Footer - Shows the technical stack, in, action --> <div class="text-xs text-sand/60 bg-sand/5 p-2 rounded"> <div class="flex items-center"> <div class="flex items-center"> <span class="font-medium">Architecture: </span>
  <span>SvelteKit, 2 â†’ Go Microservice â†’ Redis Cache â†’ Llama.cpp/Legal-BERT â†’ PostgreSQL/pg_vector</span> </div>
- <div class="flex items-center"> <div class="w-2 h-2 bg-green-500"></div>
+ <div class="flex items-center"> <div class="w-2 h-2 bg-accent"></div>
  <span>Live System</span> </div> </div> </div> </div>
  <!-- Removed forced error test block after, pipeline, validation --> <style> /* @unocss-include */ .tinymce-container { position: relative;
 	width: 100%}:global(.tox) { font-family: 'Inter';

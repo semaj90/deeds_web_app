@@ -153,20 +153,20 @@ async function handleValidate() {
 				type="text"
 				bind:value={searchQuery}
 				placeholder="Enter your question (e.g., How do I use Svelte 5 runes?)"
-				class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+				class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-info"
 				disabled={isSearching}
 			/>
 			<button
 				type="submit"
 				disabled={isSearching || !searchQuery.trim()}
-				class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+				class="px-6 py-2 bg-info text-white rounded-lg hover:bg-info/60 disabled:bg-sand/20"
 			>
 				{isSearching ? 'Searching...' : 'Search'}
 			</button>
 		</form>
 
 		{#if searchError}
-			<div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+			<div class="mt-4 p-4 bg-danger/5 border border-danger/20 rounded-lg text-danger">
 				⚠️ {searchError}
 			</div>
 		{/if}
@@ -178,10 +178,10 @@ async function handleValidate() {
 			<div class="flex justify-between items-center mb-4">
 				<h3 class="text-xl font-semibold">Found {searchResults.length} sources</h3>
 				<div class="flex gap-2">
-					<button onclick={approveAll} class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200">
+					<button onclick={approveAll} class="px-4 py-2 bg-accent/10 text-accent rounded-lg hover:bg-accent/10">
 						✅ Approve High-Confidence
 					</button>
-					<button onclick={clearSelection} class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+					<button onclick={clearSelection} class="px-4 py-2 bg-sand/10 text-sand/80 rounded-lg hover:bg-sand/10">
 						🗑️ Clear
 					</button>
 				</div>
@@ -203,37 +203,37 @@ async function handleValidate() {
 							<div class="flex-1">
 								<div class="flex items-center gap-2 mb-1">
 									<span class="text-xl">{sourceConfig.icon}</span>
-									<span class="text-sm font-semibold text-gray-600">{sourceConfig.label}</span>
+									<span class="text-sm font-semibold text-sand/60">{sourceConfig.label}</span>
 									<span class="px-2 py-1 text-xs rounded-full confidence-{confidenceColor}">
 										{(result.confidence_score * 100).toFixed(0)}%
 									</span>
 								</div>
-								<p class="text-sm text-gray-500">{result.source_file}</p>
+								<p class="text-sm text-sand/60">{result.source_file}</p>
 							</div>
 
 							<div class="flex gap-2">
 								<button
 									onclick={() => toggleChunk(result.chunk_id)}
 									class="px-3 py-1 rounded transition"
-									class:bg-green-600={isSelected}
+									class:bg-accent={isSelected}
 									class:text-white={isSelected}
-									class:bg-green-100={!isSelected}
+									class:bg-accent/10={!isSelected}
 								>
 									{isSelected ? '✅' : 'Approve'}
 								</button>
 								<button
 									onclick={() => rejectChunk(result.chunk_id)}
 									class="px-3 py-1 rounded transition"
-									class:bg-red-600={isRejected}
+									class:bg-danger={isRejected}
 									class:text-white={isRejected}
-									class:bg-red-100={!isRejected}
+									class:bg-danger/10={!isRejected}
 								>
 									{isRejected ? '❌' : 'Reject'}
 								</button>
 							</div>
 						</div>
 
-						<div class="snippet-preview mt-3 p-3 bg-gray-50 rounded text-sm">
+						<div class="snippet-preview mt-3 p-3 bg-sand/5 rounded text-sm">
 							{result.snippet_preview}
 						</div>
 					</div>
@@ -256,13 +256,13 @@ async function handleValidate() {
 				<button
 					onclick={handleValidate}
 					disabled={!canValidate}
-					class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold"
+					class="w-full px-6 py-3 bg-info text-white rounded-lg hover:bg-info/60 disabled:bg-sand/20 font-semibold"
 				>
 					{isValidating ? 'Validating...' : `Validate ${selectedChunks.size} Source${selectedChunks.size === 1 ? '' : 's'}`}
 				</button>
 
 				{#if validationError}
-					<div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+					<div class="mt-4 p-4 bg-danger/5 border border-danger/20 rounded-lg text-danger">
 						⚠️ {validationError}
 					</div>
 				{/if}

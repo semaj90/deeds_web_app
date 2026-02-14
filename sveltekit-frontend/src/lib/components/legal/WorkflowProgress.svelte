@@ -64,29 +64,29 @@ Visual progress indicator for the Evidence Chain of Custody workflow
   function getStageColor(status: 'completed' | 'current' | 'pending'): string {
     switch (status) {
       case 'completed':
-        return 'text-green-600 bg-green-100 border-green-200';
+        return 'text-accent bg-accent/10 border-accent/20';
       case 'current':
-        return 'text-blue-600 bg-blue-100 border-blue-200';
+        return 'text-info bg-info/10 border-info/20';
       case 'pending':
-        return 'text-gray-400 bg-gray-50 border-gray-200';
-      default:return 'text-gray-400 bg-gray-50 border-gray-200';
+        return 'text-sand/40 bg-sand/5 border-sand/20';
+      default:return 'text-sand/40 bg-sand/5 border-sand/20';
     }
   }
   function getConnectorColor(fromStage: string, toStage: string, currentStage: string): string {
     const fromStatus = getStageStatus(fromStage, currentStage, progress);
     const toStatus = getStageStatus(toStage, currentStage, progress);
     if (fromStatus === 'completed' && toStatus === 'completed') {
-      return 'bg-green-400';
+      return 'bg-accent/80';
     } else if (fromStatus === 'completed' && toStatus === 'current') {
-      return 'bg-gradient-to-r from-green-400 to-blue-400';
+      return 'bg-gradient-to-r from-accent/80 to-info/80';
     } else if (fromStatus === 'completed') {
-      return 'bg-green-400';
+      return 'bg-accent/80';
     } else {
-      return 'bg-gray-200';
+      return 'bg-sand/10';
     }
   }
 </script>
-<div class="workflow-progress bg-white border border-gray-200 rounded-lg">
+<div class="workflow-progress bg-white border border-sand/20 rounded-lg">
   <!-- Overall, Progress -->
   <div class="mb-8">
     <div class="flex items-center justify-between">
@@ -109,7 +109,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
         class="absolute top-0 h-3 flex items-center transition-all duration-300 ease-out"
         style="left: {Math.min(Math.max(progress - 5, 0), 90)}%"
       >
-        <div class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full shadow-sm">
+        <div class="bg-info text-white text-xs px-2 py-1 rounded-full shadow-sm">
           {progress}%
         </div>
       </div>
@@ -118,15 +118,15 @@ Visual progress indicator for the Evidence Chain of Custody workflow
 
   <!-- Stage Progress Visualization -->
   <div class="space-y-6">
-    <h4 class="font-medium text-gray-900">Workflow Stages</h4>
+    <h4 class="font-medium text-sand">Workflow Stages</h4>
     <!-- Desktop View Horizontal Timeline -->
     <div class="hidden lg:block">
       <div class="relative">
         <!-- Connecting Lines -->
-        <div class="absolute top-6 left-0 right-0 h-1 bg-gray-200"></div>
+        <div class="absolute top-6 left-0 right-0 h-1 bg-sand/10"></div>
         <!-- Dynamic Progress Line -->
         <div
-          class="absolute top-6 left-0 h-1 bg-blue-400 rounded transition-all duration-500 ease-out"
+          class="absolute top-6 left-0 h-1 bg-info/80 rounded transition-all duration-500 ease-out"
           style="width: {progress}%"
         ></div>
         <!-- Stage Nodes -->
@@ -153,7 +153,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
                 <div
                   class={`
                   text-xs font-medium mb-1
-                  ${status === 'current' ? 'text-blue-600' : status === 'completed' ? 'text-green-600' : 'text-gray-500'}
+                  ${status === 'current' ? 'text-info' : status === 'completed' ? 'text-accent' : 'text-sand/60'}
                 `}
                 >
                   {stageItem.name}
@@ -181,11 +181,11 @@ Visual progress indicator for the Evidence Chain of Custody workflow
         <div class="relative flex items-start mb-6 last:mb-0">
           <!-- Vertical Connector (except for last item) -->
           {#if nextStage}
-            <div class="absolute left-6 top-12 bottom-0 w-0.5 bg-gray-200"></div>
+            <div class="absolute left-6 top-12 bottom-0 w-0.5 bg-sand/10"></div>
             <div
               class={`
                 absolute left-6 top-12 w-0.5 transition-all duration-300
-                ${status === 'completed' ? 'bg-green-400 bottom-0' : status === 'current' ? 'bg-blue-400' : ''}
+                ${status === 'completed' ? 'bg-accent/80 bottom-0' : status === 'current' ? 'bg-info/80' : ''}
               `}
               style={status === 'current' ? `height: ${stageProgress}%` : ''}
             ></div>
@@ -207,22 +207,22 @@ Visual progress indicator for the Evidence Chain of Custody workflow
             <div
               class={`
               font-medium mb-1
-              ${status === 'current' ? 'text-blue-600' : status === 'completed' ? 'text-green-600' : 'text-gray-500'}
+              ${status === 'current' ? 'text-info' : status === 'completed' ? 'text-accent' : 'text-sand/60'}
             `}
             >
               {stageItem.name}
             </div>
-            <p class="text-sm text-gray-600">{stageItem.description}</p>
+            <p class="text-sm text-sand/60">{stageItem.description}</p>
             <!-- Stage Progress Bar -->
             {#if status === 'current'}
               <div class="max-w-xs mt-2">
                 <Progress value={stageProgress} class="h-2" />
-                <div class="text-xs text-gray-500 mt-1">{Math.round(stageProgress)}% complete</div>
+                <div class="text-xs text-sand/60 mt-1">{Math.round(stageProgress)}% complete</div>
               </div>
             {:else if status === 'completed'}
-              <div class="text-xs text-green-600 mt-1">✓ Completed</div>
+              <div class="text-xs text-accent mt-1">✓ Completed</div>
             {:else}
-              <div class="text-xs text-gray-400 mt-1">Pending</div>
+              <div class="text-xs text-sand/40 mt-1">Pending</div>
             {/if}
           </div>
         </div>

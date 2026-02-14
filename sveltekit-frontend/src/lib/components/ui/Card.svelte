@@ -20,10 +20,10 @@
  }: Props = $props();
 
  const variantStyles = {
- default: 'bg-gray-800/50 b b-gray-700',
- elevated: 'bg-gray-800 shadow-lg shadow-black/20 b b-gray-600',
+ default: 'bg-panelSoft/50 b b-gray-700',
+ elevated: 'bg-panelSoft shadow-lg shadow-black/20 b b-gray-600',
  outlined: 'bg-transparent b-2 b-gray-600',
- ghost: 'bg-gray-800/20'
+ ghost: 'bg-panelSoft/20'
  };
 
  const paddingStyles = {

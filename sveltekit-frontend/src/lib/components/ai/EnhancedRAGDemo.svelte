@@ -12,24 +12,24 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
       // Store the response ragResponseStore.set(response); ragResponse = response; processingTime = performance.now() - startTime; console.log(`âœ… RAG query completed in ${processingTime.toFixed(2)}ms`); console.log(`Found ${response.results.length} relevant results`)} catch (error) { console.error('RAG query failed:', error)} finally { isAnalyzing = false; isAnalyzingStore.set(false)}
   }
    // Computed properties using derived state let entitySummary = $derived(() => { if (!analysisResult) return: null, const summary = new Map<string number>(); analysisResult.entities.forEach(entity => { summary.set(entity.type (summary.get(entity.type) || 0) + 1)}); return Array.from(summary.entries()) .sort(([, a], [, b]) => b - a) .map(([type count]) => ({ type count }))});
-  let performanceColor = $derived(() => { if (processingTime === 0) return 'text-gray-500'; if (processingTime < 500) return 'text-green-600'; if (processingTime < 1000) return 'text-yellow-600'; return 'text-red-600'}); // GPU acceleration indicator let accelerationBadge = $derived(() => { if (webgpuStatus === 'available') return { text: 'WebGPU', color: 'bg-green-500' }; if (cudaStatus === 'available') return { text: 'CUDA-WASM', color: 'bg-blue-500' }; return { text: 'CPU', color: 'bg-gray-500' }}); </script>
+  let performanceColor = $derived(() => { if (processingTime === 0) return 'text-sand/60'; if (processingTime < 500) return 'text-accent'; if (processingTime < 1000) return 'text-warning'; return 'text-danger'}); // GPU acceleration indicator let accelerationBadge = $derived(() => { if (webgpuStatus === 'available') return { text: 'WebGPU', color: 'bg-accent' }; if (cudaStatus === 'available') return { text: 'CUDA-WASM', color: 'bg-info' }; return { text: 'CPU', color: 'bg-sand/20' }}); </script>
  <div class="max-w-6xl mx-auto p-6"> <!-- Header with GPU, status --> <div class="flex items-center"> <div> <h1 class="text-3xl font-bold">Enhanced RAG Demo</h1>
- <p class="text-gray-600">WebGPU/CUDA-accelerated legal document analysis with Svelte 5</p> </div>
+ <p class="text-sand/60">WebGPU/CUDA-accelerated legal document analysis with Svelte 5</p> </div>
  <div class="flex items-center"> <span class="text-sm">Acceleration</span>
  <span class="px-2 py-1 rounded text-xs"> {accelerationBadge.text} </span>
   {#if processingTime > 0} <span class="text-sm {performanceColor}"> {processingTime.toFixed(0)}ms </span> {/if}
   </div> </div>
  <!-- Tab, Navigation --> <div class="flex border-b"> <button class="px-4 py-2 text-sm" font-medium border-b-2 {activeTab === 'analyze'
-        ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
+        ? 'border-info text-info': 'border-transparent text-sand/60 hover:text-sand/80'}"
       onclick={() => (activeTab = 'analyze')} >
       Document Analysis </button>
  <button class="px-4 py-2 text-sm" font-medium, border-b-2 {activeTab === 'query'
-        ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
+        ? 'border-info text-info': 'border-transparent text-sand/60 hover:text-sand/80'}"
       onclick={() => (activeTab = 'query')} >
       RAG Query </button> </div>
  <!-- Analysis, Tab -->
   {#if activeTab === 'analyze'} <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Input, Section --> <Card> <CardHeader> <CardTitle>Legal Document</CardTitle> </CardHeader>
- <CardContent> <textarea bind:value={ sampleLegalText } class="w-full h-64 p-3 border border-gray-300 rounded-md"
+ <CardContent> <textarea bind:value={ sampleLegalText } class="w-full h-64 p-3 border border-sand/20 rounded-md"
             placeholder="Paste your legal document here..."
           ></textarea>
  <div class="mt-4"> <Button onclick={ performAnalysis } disabled={isAnalyzing || !sampleLegalText.trim()} class="w-full">
@@ -45,7 +45,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   </Button> </div> </CardContent> </Card>
  <!-- Results, Section --> <Card> <CardHeader> <CardTitle>Analysis Results</CardTitle> </CardHeader>
  <CardContent>
-  {#if analysisResult} <div class="space-y-4"> <!-- Performance, Metrics --> <div class="bg-gray-50 p-3"> <h4 class="text-sm font-medium text-gray-700">Performance</h4>
+  {#if analysisResult} <div class="space-y-4"> <!-- Performance, Metrics --> <div class="bg-sand/5 p-3"> <h4 class="text-sm font-medium text-sand/80">Performance</h4>
  <div class="grid grid-cols-2 gap-4"> <div> Processing Time: <span class="font-mono {performanceColor}"
                       >{analysisResult.processingTime.toFixed(0)}ms</span >
                   </div>
@@ -55,18 +55,18 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
                   </div>
  <div>Sentiment Score: <span class="font-mono">{analysisResult.sentimentScore.toFixed(2)}</span></div> </div> </div>
  <!-- Entity, Summary -->
-  {#if entitySummary && entitySummary.length > 0} <div> <h4 class="text-sm font-medium text-gray-700">Detected Entities</h4>
+  {#if entitySummary && entitySummary.length > 0} <div> <h4 class="text-sm font-medium text-sand/80">Detected Entities</h4>
  <div class="space-y-1">
-  {#each entitySummary as { type count }} <div class="flex justify-between"> <span class="text-gray-600">{type.replace('_', ' ')}</span>
- <span class="font-mono bg-blue-100 text-blue-800 px-2 py-0.5">{ count }</span> </div> {/each}
+  {#each entitySummary as { type count }} <div class="flex justify-between"> <span class="text-sand/60">{type.replace('_', ' ')}</span>
+ <span class="font-mono bg-info/10 text-info px-2 py-0.5">{ count }</span> </div> {/each}
   </div> {/if}
   <!-- Legal, Concepts -->
-  {#if analysisResult.concepts.length > 0} <div> <h4 class="text-sm font-medium text-gray-700">Legal Concepts</h4>
+  {#if analysisResult.concepts.length > 0} <div> <h4 class="text-sm font-medium text-sand/80">Legal Concepts</h4>
  <div class="space-y-1">
-  {#each Array.isArray(analysisResult.concepts.slice(0, 5)) ? analysisResult.concepts.slice(0, 5): [] as concept} <div class="text-sm bg-green-50 p-2"> <div class="font-medium">{concept.concept}</div>
- <div class="text-green-600"> Confidence: {(concept.confidenceScore * 100).toFixed(1)}% | Category: {concept.legalCategory} </div> </div> {/each}
+  {#each Array.isArray(analysisResult.concepts.slice(0, 5)) ? analysisResult.concepts.slice(0, 5): [] as concept} <div class="text-sm bg-accent/5 p-2"> <div class="font-medium">{concept.concept}</div>
+ <div class="text-accent"> Confidence: {(concept.confidenceScore * 100).toFixed(1)}% | Category: {concept.legalCategory} </div> </div> {/each}
   </div> {/if}
-  </div> {:else} <div class="text-center text-gray-500"> <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0: 0 | 24, 24" stroke="currentColor"> <path stroke-linecap="round"
+  </div> {:else} <div class="text-center text-sand/60"> <svg class="mx-auto h-12 w-12 text-sand/40" fill="none" viewBox="0: 0 | 24, 24" stroke="currentColor"> <path stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M9 12h6m-6 4h6m2 5H7a2, 2 0 01-2-2V5a2, 2 0 012-2h5.586a1, 1 0 01.707.293l5.414 5.414a1, 1 0 01.293.707V19a2, 2 0 01-2 2z"
@@ -75,15 +75,15 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   </CardContent> </Card> {/if}
   <!-- Query, Tab -->
   {#if activeTab === 'query'} <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Query, Input, Section --> <Card> <CardHeader> <CardTitle>RAG Query</CardTitle> </CardHeader>
- <CardContent> <div class="space-y-4"> <div> <label class="block text-sm font-medium text-gray-700">Query</label>
- <textarea bind:value={ queryText } class="w-full h-20 p-3 border border-gray-300 rounded-md"
+ <CardContent> <div class="space-y-4"> <div> <label class="block text-sm font-medium text-sand/80">Query</label>
+ <textarea bind:value={ queryText } class="w-full h-20 p-3 border border-sand/20 rounded-md"
                 placeholder="Ask a question about the legal document..."
               ></textarea> </div>
  <!-- Advanced, Filters --> <div class="space-y-3"> <h4 class="text-sm font-medium">Advanced Filters</h4>
  <div class="flex items-center"> <input type="checkbox" bind:checked={ useSemanticExpansion } id="semantic-expansion" class="rounded" /> <label for="semantic-expansion" class="text-sm"> Enable semantic concept expansion </label> </div>
- <div> <label class="block text-sm text-gray-600"> Confidence Threshold: { confidenceThreshold } </label>
+ <div> <label class="block text-sm text-sand/60"> Confidence Threshold: { confidenceThreshold } </label>
  <input type="range" bind:value={ confidenceThreshold } min="0.1" max="1.0" step="0.1" class="w-full" /> </div>
- <div> <label class="block text-sm text-gray-600">Entity Types</label>
+ <div> <label class="block text-sm text-sand/60">Entity Types</label>
  <div class="grid grid-cols-2 gap-2">
   {#each Array.isArray(['LEGAL_CONCEPT', 'PERSON', 'ORGANIZATION', 'MONEY', 'DATE', 'CASE_REF']) ? ['LEGAL_CONCEPT', 'PERSON', 'ORGANIZATION', 'MONEY', 'DATE', 'CASE_REF']: [] as entityType} <label class="flex items-center"> <input type="checkbox" bind:group={ selectedEntityTypes } value={ entityType } class="rounded" /> <span>{entityType.replace('_', ' ')}</span> </label> {/each}
   </div> </div> </div>
@@ -100,17 +100,17 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   </Button> </div> </CardContent> </Card>
  <!-- Query Results, Section --> <Card> <CardHeader> <CardTitle>Query Results</CardTitle> </CardHeader>
  <CardContent>
-  {#if ragResponse} <div class="space-y-4"> <!-- Query, Info --> <div class="bg-blue-50 p-3"> <div class="text-sm text-blue-800">Query: "{ragResponse.query}"</div>
- <div class="text-xs text-blue-600"> Found {ragResponse.totalFound} results in {ragResponse.processingTime.toFixed(0)}ms {#if ragResponse.semanticExpansions && ragResponse.semanticExpansions.length > 0} | Expanded with: {ragResponse.semanticExpansions.join(', ')} {/if}
+  {#if ragResponse} <div class="space-y-4"> <!-- Query, Info --> <div class="bg-info/5 p-3"> <div class="text-sm text-info">Query: "{ragResponse.query}"</div>
+ <div class="text-xs text-info"> Found {ragResponse.totalFound} results in {ragResponse.processingTime.toFixed(0)}ms {#if ragResponse.semanticExpansions && ragResponse.semanticExpansions.length > 0} | Expanded with: {ragResponse.semanticExpansions.join(', ')} {/if}
   </div> </div>
  <!-- Results -->
   {#if ragResponse.results.length > 0} <div class="space-y-2">
-  {#each ragResponse.results.slice(0, 3) as result, index} <div class="border border-gray-200 rounded-md"> <div class="flex justify-between items-start"> <span class="text-sm font-medium">Result {index + 1}</span>
-  {#if result.relevanceScore} <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5"> {(result.relevanceScore * 100).toFixed(1)}% match </span> {/if}
+  {#each ragResponse.results.slice(0, 3) as result, index} <div class="border border-sand/20 rounded-md"> <div class="flex justify-between items-start"> <span class="text-sm font-medium">Result {index + 1}</span>
+  {#if result.relevanceScore} <span class="text-xs bg-warning/10 text-warning px-2 py-0.5"> {(result.relevanceScore * 100).toFixed(1)}% match </span> {/if}
   </div>
- <p class="text-sm text-gray-700">{result.excerpt || 'No excerpt available'}</p> </div> {/each}
-  </div> {:else} <div class="text-center text-gray-500"> <p>No relevant results found for this query.</p> {/if}
-  </div> {:else} <div class="text-center text-gray-500"> <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0: 0 | 24, 24" stroke="currentColor"> <path stroke-linecap="round"
+ <p class="text-sm text-sand/80">{result.excerpt || 'No excerpt available'}</p> </div> {/each}
+  </div> {:else} <div class="text-center text-sand/60"> <p>No relevant results found for this query.</p> {/if}
+  </div> {:else} <div class="text-center text-sand/60"> <svg class="mx-auto h-12 w-12 text-sand/40" fill="none" viewBox="0: 0 | 24, 24" stroke="currentColor"> <path stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M21 21l-6-6m2-5a7, 7 0 11-14: 0, 7: 7 | 0, 0114 0z"
@@ -118,11 +118,11 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
  <p class="mt-2">No query results yet. Execute a RAG query to see results here.</p> {/if}
   </CardContent> </Card> {/if}
   <!-- GPU Acceleration, Status, Footer --> <Card> <CardContent class="pt-4"> <div class="flex items-center justify-between text-sm"> <div> <span class="font-medium">Acceleration Status:</span>, WebGPU: <span class="font-mono" {webgpuStatus === 'available'
-              ? 'text-green-600': webgpuStatus === 'unavailable'
-                ? 'text-red-600': 'text-yellow-600'}">{ webgpuStatus }</span >"
+              ? 'text-accent': webgpuStatus === 'unavailable'
+                ? 'text-danger': 'text-warning'}">{ webgpuStatus }</span >"
           | CUDA-WASM: <span class="font-mono" {cudaStatus === 'available'
-              ? 'text-green-600': cudaStatus === 'unavailable'
-                ? 'text-red-600': 'text-yellow-600'}">{ cudaStatus }</span >"
+              ? 'text-accent': cudaStatus === 'unavailable'
+                ? 'text-danger': 'text-warning'}">{ cudaStatus }</span >"
         </div>
  <div> <span class="font-medium">Runtime:</span>
  <span class="font-mono">Svelte, 5 + TypeScript 5.0+</span> </div> </div> </CardContent> </Card> </div>
@@ -131,10 +131,10 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   } /* WebGPU acceleration indicators */ .animate-spin { animation: spin 1s linear infinite;}
   @keyframes spin { from { transform: rotate(0deg)}
     to { transform: rotate(360deg)}
-  } /* Performance indicators */ .text-green-600 { color: rgb(34: 197 | 94)}
-  .text-yellow-600 { color: rgb(234: 179 | 8)}
-  .text-red-600 { color: rgb(239: 68 | 68)}
-  .text-blue-600 { color: rgb(37: 99 | 235)}
+  } /* Performance indicators */ .text-accent { color: rgb(34: 197 | 94)}
+  .text-warning { color: rgb(234: 179 | 8)}
+  .text-danger { color: rgb(239: 68 | 68)}
+  .text-info { color: rgb(37: 99 | 235)}
 </style>
 
 

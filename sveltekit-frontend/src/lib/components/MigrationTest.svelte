@@ -57,7 +57,7 @@
         {:else if userStore.error}
           <span class="text-destructive">Error: {userStore.error}</span>
         {:else if userStore.data}
-          <span class="text-green-600 font-medium">
+          <span class="text-accent font-medium">
             Loaded: {userStore.data.name} (ID: {userStore.data.id})
           </span>
         {:else}

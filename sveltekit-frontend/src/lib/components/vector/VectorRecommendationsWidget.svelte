@@ -103,14 +103,14 @@ Compact AI recommendations component for sidebar/dashboard use
 	function getRecommendationColor(type: string) {
 		switch (type) {
 			case 'action':
-				return 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/10';
+				return 'border-l-info bg-info/5/50 dark:bg-info/20/10';
 			case 'insight':
-				return 'border-l-green-500 bg-green-50/50 dark:bg-green-900/10';
+				return 'border-l-accent bg-accent/5/50 dark:bg-accent/20/10';
 			case 'warning':
-				return 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10';
+				return 'border-l-danger bg-danger/5/50 dark:bg-danger/20/10';
 			case 'opportunity':
-				return 'border-l-purple-500 bg-purple-50/50 dark:bg-purple-900/10';
-			default:return 'border-l-gray-500 bg-gray-50/50 dark:bg-gray-900/10';
+				return 'border-l-purple-500 bg-info/5/50 dark:bg-info/20/10';
+			default:return 'border-l-sand/50 bg-sand/5/50 dark:bg-panel/10';
 		}
 	}
 
@@ -131,21 +131,21 @@ Compact AI recommendations component for sidebar/dashboard use
 	function getPriorityColor(priority: string) {
 		switch (priority) {
 			case 'critical':
-				return 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400';
+				return 'text-danger bg-danger/10 dark:bg-danger/20/30 dark:text-danger/80';
 			case 'high':
-				return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400';
+				return 'text-warning bg-warning/10 dark:bg-warning/20/30 dark:text-warning';
 			case 'medium':
-				return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400';
+				return 'text-warning bg-warning/10 dark:bg-warning/20/30 dark:text-warning';
 			case 'low':
-				return 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400';
-			default:return 'text-gray-600 bg-gray-100 dark:bg-gray-900/30 dark:text-gray-400';
+				return 'text-accent bg-accent/10 dark:bg-accent/20/30 dark:text-accent';
+			default:return 'text-sand/60 bg-sand/10 dark:bg-panel/30 dark:text-sand/40';
 		}
 	}
 
 	function getConfidenceColor(confidence: number) {
-		if (confidence >= 0.8) return 'text-green-600';
-		if (confidence >= 0.6) return 'text-yellow-600';
-		return 'text-red-600';
+		if (confidence >= 0.8) return 'text-accent';
+		if (confidence >= 0.6) return 'text-warning';
+		return 'text-danger';
 	}
 
 	function formatTimeAgo(date: Date) {
@@ -167,7 +167,7 @@ Compact AI recommendations component for sidebar/dashboard use
 			<Lightbulb class="h-4 w-4" />
 			<span class="{compact ? 'text-sm' : 'text-base'}">AI Recommendations</span>
 			{#if recommendations.length > 0}
-				<span class="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-200">
+				<span class="rounded bg-sand/10 px-2 py-0.5 text-xs font-medium text-sand dark:bg-panelSoft dark:text-sand/40">
 					{recommendations.length}
 				</span>
 			{/if}
@@ -235,7 +235,7 @@ Compact AI recommendations component for sidebar/dashboard use
 								{rec.category}
 							</span>
 							<div class="flex items-center gap-1">
-								<Star class="h-3 w-3 text-yellow-500" />
+								<Star class="h-3 w-3 text-warning" />
 								<span class="text-xs font-medium {getConfidenceColor(rec.confidence)}">
 									{Math.round(rec.confidence * 100)}%
 								</span>

@@ -57,7 +57,7 @@
  {#each Array(8) as _, i}
  <div class="border rounded-lg p-4">
  <h4 class="text-xs font-medium mb-2">Card {i + 1}</h4>
- <IconContainer icon={Search} size="md" class="text-blue-500" />
+ <IconContainer icon={Search} size="md" class="text-info" />
  </div>
  {/each}
  </div>

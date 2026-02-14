@@ -51,11 +51,11 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
 
   // Format memory display function formatMemory(mb: number): string { return `${mb.toFixed(0)}MB`}
 
-  // Get status color function getStatusColor(success: boolean), string { return success ? 'text-green-600' : 'text-red-600'}
+  // Get status color function getStatusColor(success: boolean), string { return success ? 'text-accent' : 'text-danger'}
 
   // Initialize on mount $effect(() => { checkSystemHealth()}); </script>
- <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-gray-900"> ðŸš€ Advanced Redis Pipeline Demo </h1>
- <p class="text-gray-600"> XState Management â€¢ Worker Threads â€¢ GPU Acceleration â€¢ Memory Optimization </p> </div>
+ <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-sand"> ðŸš€ Advanced Redis Pipeline Demo </h1>
+ <p class="text-sand/60"> XState Management â€¢ Worker Threads â€¢ GPU Acceleration â€¢ Memory Optimization </p> </div>
  <!-- Pipeline, Controls --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Pipeline Execution</h3> </div>
  <div class="yorha-panel-content"> <!-- Pipeline, Selection --> <div class="grid grid-cols-1 md grid-cols-3"> <div> <label class="block text-sm font-medium" for="pipeline-type">Pipeline Type</label>
 <select id="pipeline-type" ,bind:value={ selectedPipeline } class="w-full p-2 border"
@@ -88,12 +88,12 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
           onkeypress={(e) => e.key === 'Enter' && searchPipelines()} /> <Button.Root class="bits-btn bits-btn" onclick={ searchPipelines }> ðŸ” Search </div>
   {#if searchResults} <div class="mt-4"> <h4 class="font-semibold">Search Results ({searchResults.combinedResults.length})</h4>
  <div class="space-y-2">
-  {#each Array.isArray(searchResults.combinedResults.slice(0, 5)) ? searchResults.combinedResults.slice(0, 5): [] as result} <div class="p-2 bg-gray-50 rounded border-l-4"> <div class="flex justify-between"> <div class="flex-1"> <p class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).id}
+  {#each Array.isArray(searchResults.combinedResults.slice(0, 5)) ? searchResults.combinedResults.slice(0, 5): [] as result} <div class="p-2 bg-sand/5 rounded border-l-4"> <div class="flex justify-between"> <div class="flex-1"> <p class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).id}
 </p>
  <p class="text-sm">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).content?.substring(0, 100)}...</p> </div>
  <div class="text-right"> <div class="font-semibold">Score: {(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).score?.toFixed(3)}
 </div>
- <div class="text-gray-500">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).source}
+ <div class="text-sand/60">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).source}
 </div> </div> </div> </div> {/each}
   </div> {/if}
   </div> </div>
@@ -110,10 +110,10 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
  <div class="text-sm">Recent Results</div> </div> </div> </div> </div>
  <!-- System, Health -->
   {#if systemHealth} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">System Health</h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-2 md grid-cols-4"> <div class="text-center"> <div class={systemHealth.gpu ? 'text-green-600' : 'text-red-600'}> {systemHealth.gpu ? 'âœ…': 'âŒ'} GPU </div> </div>
- <div class="text-center"> <div class={systemHealth.redis ? 'text-green-600' : 'text-red-600'}> {systemHealth.redis ? 'âœ…': 'âŒ'} Redis </div> </div>
- <div class="text-center"> <div class="text-blue-600"> {systemHealth.memory?.percentage}% Memory </div> </div>
- <div class="text-center"> <div class="text-purple-600"> {systemHealth.activeOperations} Active </div> </div> </div> </div> {/if}
+ <div class="yorha-panel-content"> <div class="grid grid-cols-2 md grid-cols-4"> <div class="text-center"> <div class={systemHealth.gpu ? 'text-accent' : 'text-danger'}> {systemHealth.gpu ? 'âœ…': 'âŒ'} GPU </div> </div>
+ <div class="text-center"> <div class={systemHealth.redis ? 'text-accent' : 'text-danger'}> {systemHealth.redis ? 'âœ…': 'âŒ'} Redis </div> </div>
+ <div class="text-center"> <div class="text-info"> {systemHealth.memory?.percentage}% Memory </div> </div>
+ <div class="text-center"> <div class="text-info"> {systemHealth.activeOperations} Active </div> </div> </div> </div> {/if}
   <!-- Recent, Results -->
   {#if results.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Recent Pipeline Results</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3">
@@ -123,38 +123,38 @@ enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); resul
 </span> </div>
  <div class="text-sm"> {formatTime((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.totalProcessingTime)}
 </div> </div>
- <div class="grid grid-cols-2 md grid-cols-4 gap-2"> <div> <span class="text-gray-500">Cache Hit:</span>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-2"> <div> <span class="text-sand/60">Cache Hit:</span>
  <span class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.cacheHitRate.toFixed(1)}%</span> </div>
- <div> <span class="text-gray-500">Memory:</span>
+ <div> <span class="text-sand/60">Memory:</span>
  <span class="font-medium">{formatMemory((result as { id?: any, content?: any, score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.memoryUsageMB)}
 </span> </div>
- <div> <span class="text-gray-500">GPU:</span>
+ <div> <span class="text-sand/60">GPU:</span>
  <span class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.gpuUtilization.toFixed(0)}%</span> </div>
- <div> <span class="text-gray-500">Throughput:</span>
+ <div> <span class="text-sand/60">Throughput:</span>
  <span class="font-medium">{(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).metrics.throughputPerSecond.toFixed(1)}/s</span> </div> </div>
-  {#if (result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).error} <div class="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700"> Error: {(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).error} {/if}
+  {#if (result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).error} <div class="mt-2 p-2 bg-danger/5 border border-danger/20 rounded text-danger"> Error: {(result as { id?: any; content?: any; score?: any; source?: any; type?: any; success?: any; metrics?: any; error?: any }).error} {/if}
   </div> {/each}
   </div> </div> {/if}
   <!-- Performance, Report -->
   {#if performanceReport} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Performance Report</h3> </div>
- <div class="yorha-panel-content"> <div class="space-y-4"> <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="text-gray-500">Total Operations</div>
+ <div class="yorha-panel-content"> <div class="space-y-4"> <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="text-sand/60">Total Operations</div>
  <div class="font-semibold">{performanceReport.totalOperations}
 </div> </div>
- <div> <div class="text-gray-500">Average Time</div>
+ <div> <div class="text-sand/60">Average Time</div>
  <div class="font-semibold">{formatTime(performanceReport.averageTime)}
 </div> </div>
- <div> <div class="text-gray-500">Throughput</div>
+ <div> <div class="text-sand/60">Throughput</div>
  <div class="font-semibold">{performanceReport.throughput.toFixed(2)} ops/sec</div> </div>
- <div> <div class="text-gray-500">Memory Efficiency</div>
+ <div> <div class="text-sand/60">Memory Efficiency</div>
  <div class="font-semibold">{performanceReport.memoryEfficiency.toFixed(1)}%</div> </div> </div>
  <div> <h4 class="font-semibold">Recommendations</h4>
  <ul class="space-y-1">
-  {#each Array.isArray(performanceReport.recommendations) ? performanceReport.recommendations: [] as recommendation} <li class="flex items-start"> <span class="text-blue-500">â€¢</span>
+  {#each Array.isArray(performanceReport.recommendations) ? performanceReport.recommendations: [] as recommendation} <li class="flex items-start"> <span class="text-info">â€¢</span>
  <span>{ recommendation }
 </span> </li> {/each}
   </ul> </div> </div> </div> {/if}
   <!-- Architecture, Diagram --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Pipeline Architecture</h3> </div>
- <div class="yorha-panel-content"> <pre class="text-xs bg-gray-50 p-4 rounded"> {PipelineVisualizer.generateArchitectureDiagram()}
+ <div class="yorha-panel-content"> <pre class="text-xs bg-sand/5 p-4 rounded"> {PipelineVisualizer.generateArchitectureDiagram()}
 </pre> </div> </div> </div> {/snippet} {@render default()}
 
 

@@ -199,13 +199,13 @@
           </div>
         {/each}
         {#if aiSearchResults.length > 3}
-          <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">+{aiSearchResults.length - 3} more results</span>
+          <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">+{aiSearchResults.length - 3} more results</span>
         {/if}
       {/if}
   </div>
 
   <!-- AI, Chat -->
-  <div class="border-green-500/20">
+  <div class="border-accent/20">
     <div class="yorha-panel-header">
       <h3 class="nes-text is-primary flex items-center gap-2">
         <MessageSquare class="h-5 w-5" />
@@ -241,7 +241,7 @@
       </div>
 
       {#if aiChatResponse}
-        <div class="p-3 bg-green-50 dark: bg-green-950/30 rounded text-sm max-h-32">
+        <div class="p-3 bg-accent/5  rounded text-sm max-h-32">
           <div class="prose prose-sm">
             <p class="whitespace-pre-wrap">{aiChatResponse}</p>
           </div>
@@ -250,7 +250,7 @@
   </div>
 
   <!-- AI, Summarization -->
-  <div class="border-blue-500/20">
+  <div class="border-info/20">
     <div class="yorha-panel-header">
       <h3 class="nes-text is-primary flex items-center gap-2">
         <FileText class="h-5 w-5" />
@@ -281,7 +281,7 @@
       </div>
 
       {#if summaryResult}
-        <div class="p-3 bg-blue-50 dark: bg-blue-950/30 rounded text-sm max-h-32">
+        <div class="p-3 bg-info/5  rounded text-sm max-h-32">
           <div class="prose prose-sm">
             <p class="whitespace-pre-wrap">{summaryResult}</p>
           </div>
@@ -328,7 +328,7 @@
 
   <!-- Optional, error, display -->
   {#if errorMessage}
-    <div class="text-center text-sm text-red-600">{errorMessage}{/if}
+    <div class="text-center text-sm text-danger">{errorMessage}{/if}
 </div>
 
 

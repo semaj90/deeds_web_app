@@ -59,19 +59,19 @@
         bind:value={ prompt } class="w-full p-3 border rounded-lg resize-vertical min-h-[80px]"
         placeholder="Describe the visual style and content you want to generate..."
         disabled={ generating } ></textarea>
- <p class="text-xs text-gray-500"> Describe the visual elements, mood, and style for your legal evidence glyph </p> </div>
+ <p class="text-xs text-sand/60"> Describe the visual elements, mood, and style for your legal evidence glyph </p> </div>
  <!-- Style, Selection --> <div> <label class="block text-sm font-medium">Visual Style</label>
  <div class="grid grid-cols-2 md grid-cols-4">
-  {#each Array.isArray(styles) ? styles: [] as styleOption} <button onclick={() => style = styleOption.value} class="p-3 border rounded-lg text-left transition-colors {style === styleOption.value ? 'border-blue-500 bg-blue-50': 'border-gray-300 hover:border-gray-400'}"
+  {#each Array.isArray(styles) ? styles: [] as styleOption} <button onclick={() => style = styleOption.value} class="p-3 border rounded-lg text-left transition-colors {style === styleOption.value ? 'border-info bg-info/5': 'border-sand/20 hover:border-sand/30'}"
             disabled={ generating } >
             <div class="font-medium">{styleOption.label}</div>
  <div class="text-xs">{styleOption.description}</div> </button> {/each}
   </div> </div>
  <!-- Dimensions --> <div> <label class="block text-sm font-medium">Output Dimensions</label>
  <div class="flex flex-wrap gap-2">
-  {#each Array.isArray(dimensionPresets) ? dimensionPresets: [] as preset} <button onclick={() => setDimensionPreset(preset.value)} class="px-3 py-2 text-sm border rounded-lg transition-colors {dimensions[0] === preset.value[0] && dimensions[1] === preset.value[1] ? 'border-blue-500 bg-blue-50': 'border-gray-300 hover:border-gray-400'}"
+  {#each Array.isArray(dimensionPresets) ? dimensionPresets: [] as preset} <button onclick={() => setDimensionPreset(preset.value)} class="px-3 py-2 text-sm border rounded-lg transition-colors {dimensions[0] === preset.value[0] && dimensions[1] === preset.value[1] ? 'border-info bg-info/5': 'border-sand/20 hover:border-sand/30'}"
             disabled={ generating } >
-            {preset.label} <span class="text-xs text-gray-500">{preset.description}</span> </button> {/each}
+            {preset.label} <span class="text-xs text-sand/60">{preset.description}</span> </button> {/each}
   </div>
  <!-- Custom, dimensions --> <div class="flex gap-2"> <label class="text-sm" for="custom">Custom:</label>
 <input id="custom"
@@ -89,39 +89,39 @@
           disabled={ generating } /> <span class="text-xs"> (64-2048px, powers of, 64 recommended) </span> </div> </div>
  <!-- Conditioning, Tensors (Advanced) --> <div> <label class="block text-sm font-medium"> Conditioning Tensors <span class="text-xs">(Advanced - Optional)</span> </label>
   {#if conditioningTensors.length > 0} <div class="space-y-2">
-  {#each conditioningTensors as tensorId, index} <div class="flex items-center gap-2 p-2 bg-gray-50"> <code class="text-sm">{ tensorId }</code>
- <button onclick={() => removeConditioningTensor(index)} class="text-red-600 hover:text-red-800 text-sm"
+  {#each conditioningTensors as tensorId, index} <div class="flex items-center gap-2 p-2 bg-sand/5"> <code class="text-sm">{ tensorId }</code>
+ <button onclick={() => removeConditioningTensor(index)} class="text-danger hover:text-danger text-sm"
                 disabled={ generating } >
                 Remove </button> </div> {/each} {/if}
   <Button variant="ghost"
         onclick={ addConditioningTensor } disabled={ generating } class="text-sm bits-btn bits-btn bits-btn"
-      > + Add Conditioning Tensor <p class="text-xs text-gray-500"> Reuse cached tensors for consistent styling across generations </p> </div>
- <!-- GRPMO Extended: Thinking, Configuration --> <div class="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-teal-50"> <div class="flex items-center gap-2"> <input type="checkbox"
+      > + Add Conditioning Tensor <p class="text-xs text-sand/60"> Reuse cached tensors for consistent styling across generations </p> </div>
+ <!-- GRPMO Extended: Thinking, Configuration --> <div class="border rounded-lg p-4 bg-gradient-to-r from-green-50 to-info/5"> <div class="flex items-center gap-2"> <input type="checkbox"
           id="enable-extended-thinking"
           bind:checked={ extendedThinkingEnabled } disabled={ generating } class="rounded"
         /> <label for="enable-extended-thinking" class="text-sm"> ðŸ§  Enable GRPMO Extended Thinking </label>
- <span class="text-xs bg-green-100 text-green-800 px-2 py-1"> AI ENHANCED </span> </div>
- <p class="text-xs text-gray-600"> Uses GPU-Reinforced Predictive Memory Orchestration for intelligent caching, reinforcement learning, and contextual glyph generation </p>
+ <span class="text-xs bg-accent/10 text-accent px-2 py-1"> AI ENHANCED </span> </div>
+ <p class="text-xs text-sand/60"> Uses GPU-Reinforced Predictive Memory Orchestration for intelligent caching, reinforcement learning, and contextual glyph generation </p>
   {#if extendedThinkingEnabled && (thinkingStages.length > 0 || currentStage)} <div class="mt-4 ml-6 border-l-2 border-teal-200"> <h4 class="text-sm font-medium mb-2 flex items-center"> ðŸ”„ Thinking Process {#if generating && currentStage} <span class="animate-pulse">({currentStage.name})</span> {/if}
   </h4>
  <div class="space-y-1">
-  {#each Array.isArray(thinkingStages) ? thinkingStages: [] as stage} <div class="flex items-center gap-2"> <div class="w-2 h-2 rounded-full {stage === currentStage ? 'bg-teal-500"></div>
+  {#each Array.isArray(thinkingStages) ? thinkingStages: [] as stage} <div class="flex items-center gap-2"> <div class="w-2 h-2 rounded-full {stage === currentStage ? 'bg-info"></div>
  <span class="flex-1">{stage.name}</span>
- <span class="text-gray-500">{stage.duration}ms</span>
+ <span class="text-sand/60">{stage.duration}ms</span>
  <span class="font-mono">{stage.cacheLayer}</span>
- <span class="text-gray-400">{(stage.confidence * 100).toFixed(0)}%</span> </div> {/each}
+ <span class="text-sand/40">{(stage.confidence * 100).toFixed(0)}%</span> </div> {/each}
   </div>
-  {#if cachePerformance.hot > 0 ?? cachePerformance.warm > 0 || cachePerformance.cold > 0} <div class="mt-2 p-2 bg-teal-50 rounded"> <div class="font-medium">Cache Performance:</div>
+  {#if cachePerformance.hot > 0 ?? cachePerformance.warm > 0 || cachePerformance.cold > 0} <div class="mt-2 p-2 bg-info/5 rounded"> <div class="font-medium">Cache Performance:</div>
  <div class="flex">
-  {#if cachePerformance.hot > 0} <span class="text-green-600">ðŸ”¥ Hot: {cachePerformance.hot}</span> {/if} {#if cachePerformance.warm > 0} <span class="text-yellow-600">ðŸŒ¡ï¸ Warm: {cachePerformance.warm}</span> {/if} {#if cachePerformance.cold > 0} <span class="text-blue-600">â„ï¸ Cold: {cachePerformance.cold}</span> {/if}
+  {#if cachePerformance.hot > 0} <span class="text-accent">ðŸ”¥ Hot: {cachePerformance.hot}</span> {/if} {#if cachePerformance.warm > 0} <span class="text-warning">ðŸŒ¡ï¸ Warm: {cachePerformance.warm}</span> {/if} {#if cachePerformance.cold > 0} <span class="text-info">â„ï¸ Cold: {cachePerformance.cold}</span> {/if}
   </div> {/if} {/if}
   </div>
- <!-- Neural Sprite, Configuration (Advanced) --> <div class="border rounded-lg p-4 bg-gradient-to-r from-purple-50"> <div class="flex items-center gap-2"> <input type="checkbox"
+ <!-- Neural Sprite, Configuration (Advanced) --> <div class="border rounded-lg p-4 bg-gradient-to-r from-info/5"> <div class="flex items-center gap-2"> <input type="checkbox"
           id="enable-neural-sprite"
           bind:checked={ enableNeuralSprite } disabled={ generating } class="rounded"
         /> <label for="enable-neural-sprite" class="text-sm"> ðŸ§¬ Enable Neural Sprite Compression </label>
- <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1"> EXPERIMENTAL </span> </div>
-  {#if enableNeuralSprite} <div class="space-y-4 ml-6 border-l-2 border-purple-200"> <!-- Compression, Settings --> <div> <div class="flex items-center gap-2"> <input type="checkbox"
+ <span class="text-xs bg-info/10 text-info px-2 py-1"> EXPERIMENTAL </span> </div>
+  {#if enableNeuralSprite} <div class="space-y-4 ml-6 border-l-2 border-info/20"> <!-- Compression, Settings --> <div> <div class="flex items-center gap-2"> <input type="checkbox"
                 id="enable-compression"; bind:checked={ enableCompression } disabled={ generating } class="rounded"
               /> <label for="enable-compression" class="text-sm"> Enable tensor compression </label> </div>
   {#if enableCompression} <div class="ml-6 flex items-center"> <label class="text-sm" for="target-ratio">Target ratio: </label>
@@ -140,25 +140,25 @@
  <!-- UI: Layout, Compression --> <div> <div class="flex items-center"> <input type="checkbox"
                 id="enable-ui-compression"; bind:checked={ enableUILayoutCompression } disabled={ generating } class="rounded"
               /> <label for="enable-ui-compression" class="text-sm"> Enable UI layout compression demo </label> </div>
- <p class="text-xs text-gray-500 mt-1"> Demonstrates compression of UI layout states </p> </div> </div>
- <div class="mt-3 p-2 bg-blue-50 rounded text-xs"> ðŸ’¡ Neural Sprite uses AI-powered compression to optimize tensor storage and generate predictive animation: frames. {/if}
+ <p class="text-xs text-sand/60 mt-1"> Demonstrates compression of UI layout states </p> </div> </div>
+ <div class="mt-3 p-2 bg-info/5 rounded text-xs"> ðŸ’¡ Neural Sprite uses AI-powered compression to optimize tensor storage and generate predictive animation: frames. {/if}
   </div>
  <!-- Generate, Button --> <div class="flex"> <Button onclick={ generateGlyph } disabled={generating || !prompt.trim()} class="px-6 py-2 bits-btn bits-btn bits-btn"
       >
   {#if generating} <div class="flex items-center"> <div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent"></div> Generating... </div> {:else} ðŸŽ¨ Generate Glyph {/if}
   </div>
  <!-- Error, Display -->
-  {#if error} <div class="p-3 bg-red-50 border border-red-200"> <div class="flex items-center"> <span class="text-red-600">âš ï¸</span>
- <span class="text-red-800">{ error }</span> </div> {/if}
+  {#if error} <div class="p-3 bg-danger/5 border border-danger/20"> <div class="flex items-center"> <span class="text-danger">âš ï¸</span>
+ <span class="text-danger">{ error }</span> </div> {/if}
   <!-- Result, Display -->
-  {#if result} <div class="p-4 bg-green-50 border border-green-200"> <h3 class="font-medium text-green-800">âœ… Generation Complete!</h3>
+  {#if result} <div class="p-4 bg-accent/5 border border-accent/20"> <h3 class="font-medium text-accent">âœ… Generation Complete!</h3>
  <div class="grid grid-cols-1 md grid-cols-2"> <!-- Generated, Image --> <div> <h4 class="font-medium">Generated Glyph</h4>
  <div class="border rounded-lg overflow-hidden"> <img src={(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).glyph_url} alt="Generated, glyph"
                 class="w-full h-auto"
                 style="max-height, 300px, object-fit: contain;"
               /> </div>
   {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).preview_with_tensors} <div class="mt-2"> <a href={(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?, any }).preview_with_tensors} target="_blank"
-                  class="text-sm text-blue-600 hover:text-blue-800"
+                  class="text-sm text-info hover:text-info"
                 > ðŸ“¦ Download with embedded tensors </a> {/if}
   </div>
  <!-- Generation, Stats --> <div> <h4 class="font-medium">Generation Statistics</h4>
@@ -174,10 +174,10 @@
  <span class="font-mono">{(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).metadata?.dimensions?.join('Ã—')}</span> </div> </div>
   {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).tensor_ids?.length > 0} <div class="mt-3"> <h5 class="font-medium text-sm">Cached Tensors:</h5>
  <div class="space-y-1">
-  {#each (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).tensor_ids as tensorId} <div class="text-xs font-mono bg-gray-100 p-1"> { tensorId } </div> {/each}
+  {#each (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).tensor_ids as tensorId} <div class="text-xs font-mono bg-sand/10 p-1"> { tensorId } </div> {/each}
   </div> {/if}
   <!-- GRPMO Extended Thinking, Results -->
-  {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata} <div class="mt-4 p-3 border rounded-lg"> <h5 class="font-medium text-sm mb-2 flex items-center"> ðŸ§  GRPMO Extended Thinking Results <span class="text-xs bg-green-200 text-green-800 px-2 py-1"> AI ENHANCED </span> </h5>
+  {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata} <div class="mt-4 p-3 border rounded-lg"> <h5 class="font-medium text-sm mb-2 flex items-center"> ðŸ§  GRPMO Extended Thinking Results <span class="text-xs bg-accent/10 text-accent px-2 py-1"> AI ENHANCED </span> </h5>
  <div class="space-y-2"> <div class="flex"> <span>Thinking Stages:</span>
  <span class="font-mono"> {(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata.thinking_stages?.length ?? 0} </span> </div>
  <div class="flex"> <span>Cache Efficiency:</span>
@@ -188,12 +188,12 @@
  <span class="font-mono"> {(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata.glyph_embedding.length}D vector </span> {/if} {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata.thinking_stages?.length > 0} <div class="mt-2 pt-2 border-t"> <h6 class="text-xs font-medium">Processing Timeline:</h6>
  <div class="space-y-1">
   {#each (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata.thinking_stages as stage} <div class="flex items-center justify-between"> <span class="flex items-center"> <div class="w-2 h-2"></div> {stage.name} </span>
- <div class="flex gap-2"> <span class="bg-gray-100 px-2 py-0.5">{stage.cacheLayer}</span>
+ <div class="flex gap-2"> <span class="bg-sand/10 px-2 py-0.5">{stage.cacheLayer}</span>
  <span>{stage.duration}ms</span> </div> </div> {/each}
   </div> {/if}
   </div> {/if}
   <!-- Neural Sprite, Results -->
-  {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results} <div class="mt-4 p-3 border rounded-lg"> <h5 class="font-medium text-sm mb-2 flex items-center"> ðŸ§¬ Neural Sprite Results <span class="text-xs bg-purple-200 text-purple-800 px-2 py-1"> EXPERIMENTAL </span> </h5>
+  {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results} <div class="mt-4 p-3 border rounded-lg"> <h5 class="font-medium text-sm mb-2 flex items-center"> ðŸ§¬ Neural Sprite Results <span class="text-xs bg-info/20 text-info px-2 py-1"> EXPERIMENTAL </span> </h5>
  <div class="space-y-2">
   {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results.compression_ratio} <div class="flex"> <span>Compression Ratio:</span>
  <span class="font-mono"> {(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results.compression_ratio}:1 </span> {/if} {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results.predictive_frames?.length > 0} <div class="flex"> <span>Predictive Frames:</span>
@@ -212,7 +212,7 @@
  <span class="font-mono"> {(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results.ui_layout_metrics.compressionRatio.toFixed(1)}:1 </span> </div>
  <div class="flex"> <span>Accuracy:</span>
  <span class="font-mono"> {((result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results.ui_layout_metrics.accuracy * 100).toFixed(1)}% </span> </div> </div> {/if} {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).neural_sprite_results.compressed_tensor_url} <div class="mt-2 pt-2 border-t"> <a href={(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?, any }).neural_sprite_results.compressed_tensor_url} target="_blank"
-                        class="text-xs text-purple-600 hover:text-purple-800 flex items-center gap-1"
+                        class="text-xs text-info hover:text-info flex items-center gap-1"
                       > ðŸ“¦ Download compressed tensor data </a> {/if}
   </div> {/if}
   </div> </div> {/if}

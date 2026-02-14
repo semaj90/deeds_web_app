@@ -54,7 +54,7 @@ placement: 'bottom', fitViewport: true }
  <div class="text-xs">{provider.endpoint}</div> </div> </div>
  <Badge class={`text-xs ${getStatusColor(provider.status)}`}> {provider.status.toUpperCase()} </Badge> </div>
  <!-- Capabilities --> <div class="flex flex-wrap gap-1">
-  {#each Array.isArray(provider.capabilities) ? provider.capabilities: [] as capability} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{ capability }</span> {/each}
+  {#each Array.isArray(provider.capabilities) ? provider.capabilities: [] as capability} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{ capability }</span> {/each}
   </div>
  <!-- Models (if, available) -->
   {#if provider.models.length > 0} <div class="text-xs"> <div class="font-medium">Available Models:</div>

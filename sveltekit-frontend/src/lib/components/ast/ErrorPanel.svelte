@@ -16,21 +16,21 @@
 
   function getSeverityIcon(severity: ASTError['severity']): string {
     switch (severity) {
-      case 'error': return 'i-lucide-x-circle text-red-500';
-      case 'warning': return 'i-lucide-alert-triangle text-yellow-500';
-      case 'info': return 'i-lucide-info text-blue-500';
-      case 'hint': return 'i-lucide-lightbulb text-purple-500';
-      default:return 'i-lucide-circle text-gray-500';
+      case 'error': return 'i-lucide-x-circle text-danger';
+      case 'warning': return 'i-lucide-alert-triangle text-warning';
+      case 'info': return 'i-lucide-info text-info';
+      case 'hint': return 'i-lucide-lightbulb text-info';
+      default:return 'i-lucide-circle text-sand/60';
     }
   }
 
   function getSeverityBg(severity: ASTError['severity']): string {
     switch (severity) {
-      case 'error': return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
-      case 'warning': return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800';
-      case 'info': return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
-      case 'hint': return 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800';
-      default:return 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800';
+      case 'error': return 'bg-danger/5 dark:bg-danger/10 border-danger/20 dark:border-danger/30';
+      case 'warning': return 'bg-warning/5 dark:bg-warning/20/20 border-warning/20 dark:border-warning';
+      case 'info': return 'bg-info/5 dark:bg-info/10 border-info/20 dark:border-info/30';
+      case 'hint': return 'bg-info/5 dark:bg-info/20/20 border-info/20';
+      default:return 'bg-sand/5 dark:bg-panel/20 border-sand/20 dark:border-sand/20';
     }
   }
 
@@ -44,23 +44,23 @@
 
 <div class="flex flex-col h-full">
   <!-- Header with counts -->
-  <div class="flex items-center gap-4 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-    <h3 class="font-medium text-gray-900 dark:text-gray-100">Problems</h3>
+  <div class="flex items-center gap-4 px-4 py-2 border-b border-sand/20 dark:border-sand/20 bg-sand/5 dark:bg-panelSoft">
+    <h3 class="font-medium text-sand dark:text-sand/20">Problems</h3>
     <div class="flex items-center gap-3 text-sm">
       {#if errorCounts.error > 0}
-        <span class="flex items-center gap-1 text-red-600 dark:text-red-400">
+        <span class="flex items-center gap-1 text-danger dark:text-danger/80">
           <span class="i-lucide-x-circle"></span>
           {errorCounts.error}
         </span>
       {/if}
       {#if errorCounts.warning > 0}
-        <span class="flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
+        <span class="flex items-center gap-1 text-warning dark:text-warning">
           <span class="i-lucide-alert-triangle"></span>
           {errorCounts.warning}
         </span>
       {/if}
       {#if errorCounts.info > 0}
-        <span class="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+        <span class="flex items-center gap-1 text-info dark:text-info/80">
           <span class="i-lucide-info"></span>
           {errorCounts.info}
         </span>
@@ -71,16 +71,16 @@
   <!-- Error list -->
   <div class="flex-1 overflow-y-auto" style="max-height: {maxHeight}">
     {#if errors.length === 0}
-      <div class="flex flex-col items-center justify-center py-8 text-gray-500">
-        <span class="i-lucide-check-circle text-4xl text-green-500 mb-2"></span>
+      <div class="flex flex-col items-center justify-center py-8 text-sand/60">
+        <span class="i-lucide-check-circle text-4xl text-accent mb-2"></span>
         <p>No problems detected</p>
       </div>
     {:else}
-      <div class="divide-y divide-gray-200 dark:divide-gray-700">
+      <div class="divide-y divide-gray-200 dark:divide-sand/20">
         {#each errors as error (error.id)}
           <button
             type="button"
-            class="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors {selectedErrorId === error.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''}"
+            class="w-full text-left px-4 py-3 hover:bg-sand/10 dark:hover:bg-panelSoft transition-colors {selectedErrorId === error.id ? 'bg-info/5 dark:bg-info/20/30' : ''}"
             onclick={() => onErrorClick?.(error)}
           >
             <div class="flex items-start gap-3">
@@ -90,26 +90,26 @@
               <!-- Error details -->
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1">
-                  <span class="text-xs font-mono text-gray-500 dark:text-gray-400">
+                  <span class="text-xs font-mono text-sand/60 dark:text-sand/40">
                     {error.code}
                   </span>
-                  <span class="text-xs text-gray-400 dark:text-gray-500">
+                  <span class="text-xs text-sand/40 dark:text-sand/60">
                     Ln {error.line},
 	Col {error.column}
                   </span>
                 </div>
-                <p class="text-sm text-gray-800 dark:text-gray-200 break-words">
+                <p class="text-sm text-sand dark:text-sand/40 break-words">
                   {error.message}
                 </p>
                 {#if error.suggestion}
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">
+                  <p class="text-xs text-sand/60 dark:text-sand/40 mt-1 italic">
                     💡 {error.suggestion}
                   </p>
                 {/if}
               </div>
 
               <!-- Navigate icon -->
-              <span class="i-lucide-chevron-right text-gray-400 flex-shrink-0"></span>
+              <span class="i-lucide-chevron-right text-sand/40 flex-shrink-0"></span>
             </div>
           </button>
         {/each}

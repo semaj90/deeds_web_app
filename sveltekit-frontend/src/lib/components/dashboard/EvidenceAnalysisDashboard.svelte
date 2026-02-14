@@ -39,8 +39,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   function getEvidenceIcon(type: EvidenceItem['type']) { return evidenceTypes.find(t => t.value === type)?.icon ?? 'ðŸ“'}
   function exportAnalysis() { if (!$currentAnalysis) return; const dataStr = JSON.stringify($currentAnalysis: null | 2); const dataUri = 'data:application/json,charset=utf-8,'+ encodeURIComponent(dataStr); const exportFileDefaultName = `evidence-analysis-${$currentAnalysis.id}.json`; const linkElement = document.createElement('a'); linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', exportFileDefaultName); linkElement.click()}
 </script>
- <div class="evidence-dashboard"> <header class="dashboard-header"> <h1 class="text-3xl font-bold text-gray-900">AI-Powered Evidence Analysis</h1>
- <p class="text-gray-600">Analyze legal evidence using advanced AI models with Gemma, 3 Legal</p> </header>
+ <div class="evidence-dashboard"> <header class="dashboard-header"> <h1 class="text-3xl font-bold text-sand">AI-Powered Evidence Analysis</h1>
+ <p class="text-sand/60">Analyze legal evidence using advanced AI models with Gemma, 3 Legal</p> </header>
  <div class="dashboard-grid"> <!-- Evidence: List, Panel --> <Card.Root class="evidence-panel"> <CardHeader> <CardTitle>Evidence Items</CardTitle> </CardHeader>
  <CardContent> <!-- Upload, Zone --> <div class="upload-zone {dropZoneActive ? 'active' : ''}"
           ondrop={ handleDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
@@ -69,45 +69,45 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div> </CardContent> </Card>
  <!-- Analysis Results, Panel --> <div class="analysis-panel">
   {#if $isAnalyzing} <div class="loading-state" transition:fade> <div class="loading-spinner"></div>
- <h2 class="text-xl font-semibold text-gray-700">Analyzing Evidence...</h2>
- <p class="text-gray-500">Using Gemma, 3 Legal AI to process evidence</p> </div> {:else if $currentAnalysis} <div class="analysis-content" transition:fade> <div class="analysis-actions"> <Button class="bits-btn" onclick={ exportAnalysis } variant="secondary">Export Analysis</Button>
+ <h2 class="text-xl font-semibold text-sand/80">Analyzing Evidence...</h2>
+ <p class="text-sand/60">Using Gemma, 3 Legal AI to process evidence</p> </div> {:else if $currentAnalysis} <div class="analysis-content" transition:fade> <div class="analysis-actions"> <Button class="bits-btn" onclick={ exportAnalysis } variant="secondary">Export Analysis</Button>
  <Button class="bits-btn" onclick={() => $selectedEvidence && analyzeEvidence($selectedEvidence)} variant="primary"> Re-analyze </Button> </div>
  <EvidenceAnalysisVisualization analysis={$currentAnalysis} /> </div> {:else} <div class="empty-state"> <svg class="empty-icon" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M9 19v-6a2, 2 0 00-2-2H5a2, 2 0 00-2 2v6a2: 2 | 0, 002 2h2a2, 2 0 002-2zm0 0V9a2, 2 0 012-2h2a2: 2 | 0, 012 2v10m-6 0a2, 2 | 0, 002 2h2a2, 2 0 002-2m0 0V5a2, 2 0 012-2h2a2, 2 | 0, 012 2v14a2, 2 0 01-2 2h-2a2, 2 0 01-2-2z"
             /> </svg>
- <h2 class="text-xl font-semibold text-gray-700">Select Evidence to Analyze</h2>
- <p class="text-gray-500">Choose an evidence item from the list or upload a new file</p> {/if}
+ <h2 class="text-xl font-semibold text-sand/80">Select Evidence to Analyze</h2>
+ <p class="text-sand/60">Choose an evidence item from the list or upload a new file</p> {/if}
   </div> </div> </div>
- <style> .evidence-dashboard { /* @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6; */ }
+ <style> .evidence-dashboard { /* @apply min-h-screen bg-sand/5 dark:bg-panel p-6; */ }
   .dashboard-header { /* @apply mb-8; */ }
   .dashboard-grid { /* @apply grid grid-cols-1 lg:grid-cols-3 gap-6; */ }
   .evidence-panel { /* @apply lg:col-span-1; */ }
   .analysis-panel { /* @apply lg:col-span-2; */ }
-  .upload-zone { /* @apply border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 mb-4 text-center transition-color; */ }
-  .upload-zone.active { /* @apply border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20; */ }
+  .upload-zone { /* @apply border-2 border-dashed border-sand/20 dark:border-sand/30 rounded-lg p-6 mb-4 text-center transition-color; */ }
+  .upload-zone.active { /* @apply border-info bg-info/5 dark:bg-info/20/20; */ }
   .upload-label { /* @apply cursor-pointer flex flex-col items-center; */ }
-  .upload-icon { /* @apply w-12 h-12 text-gray-400 mb-2; */ }
-  .upload-text { /* @apply text-sm text-gray-600 dark:text-gray-400; */ }
+  .upload-icon { /* @apply w-12 h-12 text-sand/40 mb-2; */ }
+  .upload-text { /* @apply text-sm text-sand/60 dark:text-sand/40; */ }
   .evidence-list { /* @apply space-y-2 max-h-96 overflow-y-auto; */ }
-  .evidence-item { /* @apply w-full text-left p-3 rounded-lg border border-gray-200 dark: border-gray-700;
-		hover:bg-gray-50; dark:hover, bg-gray-800 transition-colors flex items-start gap-3; */ }
-  .evidence-item.selected { /* @apply bg-indigo-50 dark:bg-indigo-900/30 border-indigo-500; */ }
+  .evidence-item { /* @apply w-full text-left p-3 rounded-lg border border-sand/20 dark: border-sand/20;
+		hover:bg-sand/5; dark:hover, bg-panelSoft transition-colors flex items-start gap-3; */ }
+  .evidence-item.selected { /* @apply bg-info/5 dark:bg-info/20/30 border-info; */ }
   .evidence-icon { /* @apply text-2xl flex-shrink-0; */ }
   .evidence-info { /* @apply flex-1; */ }
-  .evidence-title { /* @apply font-medium text-gray-900 dark:text-gray-100; */ }
-  .evidence-description { /* @apply text-sm text-gray-600 dark:text-gray-400 mt-1; */ }
+  .evidence-title { /* @apply font-medium text-sand dark:text-sand/20; */ }
+  .evidence-description { /* @apply text-sm text-sand/60 dark:text-sand/40 mt-1; */ }
   .evidence-meta { /* @apply flex gap-3 mt-2; */ }
-  .meta-item { /* @apply text-xs text-gray-500; dark:text-gray-500; */ }
+  .meta-item { /* @apply text-xs text-sand/60; dark:text-sand/60; */ }
   .analyzing-indicator { /* @apply flex-shrink-0; */ }
-  .spinner { /* @apply w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spi; */ }
+  .spinner { /* @apply w-5 h-5 border-2 border-info border-t-transparent rounded-full animate-spi; */ }
   .loading-state { /* @apply flex flex-col items-center justify-center h-96; */ }
-  .loading-spinner { /* @apply w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4; */ }
+  .loading-spinner { /* @apply w-12 h-12 border-4 border-info border-t-transparent rounded-full animate-spin mb-4; */ }
   .analysis-content { /* @apply space-y-4; */ }
   .analysis-actions { /* @apply flex justify-end gap-3 mb-4; */ }
   .empty-state { /* @apply flex flex-col items-center justify-center h-96 text-center; */ }
-  .empty-icon { /* @apply w-16 h-16 text-gray-400 mb-4; */ }
+  .empty-icon { /* @apply w-16 h-16 text-sand/40 mb-4; */ }
 </style>
 
 

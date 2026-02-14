@@ -300,7 +300,7 @@ x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
 </script>
 
 <!-- YoRHa Command Interface -->
-<div class="yorha-container min-h-screen bg-slate-900 text-cyan-400 p-4 relative overflow-hidden" class:glitch-effect={glitchActive}>
+<div class="yorha-container min-h-screen bg-panel text-info p-4 relative overflow-hidden" class:glitch-effect={glitchActive}>
 
   <!-- Scanline Overlay -->
   <div class="scanlines pointer-events-none absolute inset-0 z-20" style="opacity: {scanlineOpacity}"></div>
@@ -312,7 +312,7 @@ x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
 
   <!-- Animated Data Streams -->
   {#each Array(12) as _, i}
-    <div class="data-stream absolute w-0.5 bg-gradient-to-b from-transparent via-cyan-500 to-transparent h-24 z-10"
+    <div class="data-stream absolute w-0.5 bg-gradient-to-b from-transparent via-info to-transparent h-24 z-10"
          style="left: {5 + i * 8}%; top: -100px;
 	animation: dataFlow 3s linear infinite; animation-delay: {i * 0.3}s"></div>
   {/each}
@@ -321,15 +321,15 @@ x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
   <div class="relative z-30 flex flex-col h-full max-w-7xl mx-auto">
 
     <!-- Header -->
-    <header class="flex justify-between items-center mb-8 border-b border-cyan-500/30 pb-4">
+    <header class="flex justify-between items-center mb-8 border-b border-info/30 pb-4">
       <div>
         <h1 class="hologram-text text-4xl font-bold tracking-widest">YoRHa COMMAND INTERFACE</h1>
-        <p class="text-cyan-400/70 text-sm tracking-wider">BUNKER UNIT 001 • LEGAL AI OPERATIONS CENTER</p>
+        <p class="text-info/70 text-sm tracking-wider">BUNKER UNIT 001 • LEGAL AI OPERATIONS CENTER</p>
       </div>
       <div class="flex items-center gap-6">
         <div class="text-right">
           <div class="hologram-text text-2xl font-mono">{$powerLevel.toFixed(1)}%</div>
-          <div class="text-xs text-cyan-500">POWER LEVEL</div>
+          <div class="text-xs text-info">POWER LEVEL</div>
         </div>
         <div class="flex items-center gap-2">
           <div class="w-3 h-3 rounded-full animate-pulse shadow-[0_0_10px_currentColor]" style="background-color: {getStatusColor($systemStatus)}"></div>
@@ -344,18 +344,18 @@ x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
       <div class="lg:col-span-1 space-y-6">
         <!-- System Modules Grid -->
         <div class="space-y-4">
-            <h3 class="text-sm font-bold border-l-2 border-cyan-500 pl-2">ACTIVE MODULES</h3>
+            <h3 class="text-sm font-bold border-l-2 border-info pl-2">ACTIVE MODULES</h3>
             {#each $activeModules as module}
-            <div class="module-panel p-3 bg-black/40 border border-cyan-500/30 rounded hover:border-cyan-400 transition-all group">
+            <div class="module-panel p-3 bg-black/40 border border-info/30 rounded hover:border-info/80 transition-all group">
                 <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-sm text-cyan-300 group-hover:text-white transition-colors">{module.name}</span>
+                    <span class="font-bold text-sm text-info/80 group-hover:text-white transition-colors">{module.name}</span>
                     <div class="w-2 h-2 rounded-full" style="background-color: {getStatusColor(module.status)}"></div>
                 </div>
                 <div class="flex justify-between items-end text-xs">
-                    <span class="text-cyan-600/70">{module.status}</span>
+                    <span class="text-info/70">{module.status}</span>
                     <span class="font-mono">{module.power.toFixed(1)}%</span>
                 </div>
-                <div class="w-full bg-slate-800 h-0.5 mt-1">
+                <div class="w-full bg-panelSoft h-0.5 mt-1">
                     <div class="h-full transition-all duration-1000" style="width: {module.power}%; background-color: {module.color}"></div>
                 </div>
             </div>
@@ -364,69 +364,65 @@ x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
 
         <!-- System Metrics -->
         <div class="grid grid-cols-2 gap-2">
-            <div class="p-2 border border-cyan-500/20 bg-black/60 text-center">
-                <div class="font-mono text-lg text-cyan-300">{$metrics.cpu_usage.toFixed(1)}%</div>
-                <div class="text-[10px] text-cyan-600">CPU</div>
+            <div class="p-2 border border-info/20 bg-black/60 text-center">
+                <div class="font-mono text-lg text-info/80">{$metrics.cpu_usage.toFixed(1)}%</div>
+                <div class="text-[10px] text-info">CPU</div>
             </div>
-            <div class="p-2 border border-cyan-500/20 bg-black/60 text-center">
-                <div class="font-mono text-lg text-cyan-300">{$metrics.memory_usage.toFixed(1)}%</div>
-                <div class="text-[10px] text-cyan-600">MEM</div>
+            <div class="p-2 border border-info/20 bg-black/60 text-center">
+                <div class="font-mono text-lg text-info/80">{$metrics.memory_usage.toFixed(1)}%</div>
+                <div class="text-[10px] text-info">MEM</div>
             </div>
-            <div class="p-2 border border-cyan-500/20 bg-black/60 text-center">
-                <div class="font-mono text-lg text-cyan-300">{$metrics.security_level}</div>
-                <div class="text-[10px] text-cyan-600">SEC</div>
+            <div class="p-2 border border-info/20 bg-black/60 text-center">
+                <div class="font-mono text-lg text-info/80">{$metrics.security_level}</div>
+                <div class="text-[10px] text-info">SEC</div>
             </div>
-             <div class="p-2 border border-cyan-500/20 bg-black/60 text-center">
-                <div class="font-mono text-lg text-cyan-300">{$metrics.neural_activity.toFixed(0)}</div>
-                <div class="text-[10px] text-cyan-600">NEURAL</div>
+             <div class="p-2 border border-info/20 bg-black/60 text-center">
+                <div class="font-mono text-lg text-info/80">{$metrics.neural_activity.toFixed(0)}</div>
+                <div class="text-[10px] text-info">NEURAL</div>
             </div>
         </div>
       </div>
 
       <!-- Center/Right: Terminal -->
-      <div class="lg:col-span-3 flex flex-col bg-black/80 border border-cyan-500/50 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(6 182 212 0.1)]">
+      <div class="lg:col-span-3 flex flex-col bg-black/80 border border-info/50 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(6 182 212 0.1)]">
         <!-- Terminal Output -->
         <div class="flex-1 p-4 overflow-y-auto font-mono text-sm space-y-2 min-h-[400px]" id="terminal-output">
              {#each $commandHistory as result (result.id)}
-                <div class="border-b border-cyan-900/30 pb-2 mb-2 animate-in fade-in slide-in-from-left-4 duration-300">
+                <div class="border-b border-info/20 pb-2 mb-2 animate-in fade-in slide-in-from-left-4 duration-300">
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="text-cyan-600">$</span>
-                        <span class="text-cyan-200 font-bold">{result.command}</span>
-                        <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded"
-                        class:text-green-400={result.status==='SUCCESS'}
-                        class:bg-green-900_20={result.status==='SUCCESS'}
-                        class:text-red-400={result.status==='ERROR'}
-                          >
-                              class:bg-red-900/20={result.status==='ERROR'}
-                              class:text-yellow-400={result.status==='PROCESSING'}
-                              class:bg-yellow-900/20={result.status==='PROCESSING'}>
+                        <span class="text-info">$</span>
+                        <span class="text-info/60 font-bold">{result.command}</span>
+                        <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded
+                            {result.status === 'SUCCESS' ? 'text-accent bg-accent/20' : ''}
+                            {result.status === 'ERROR' ? 'text-danger bg-danger/10' : ''}
+                            {result.status === 'PROCESSING' ? 'text-warning bg-warning/20' : ''}">
                             {result.status}
                         </span>
                     </div>
-                    <div class="pl-4 text-cyan-100/80 whitespace-pre-wrap">{result.output}</div>
-                    <div class="text-right text-[10px] text-cyan-700 mt-1">[{result.module}]</div>
+                    <div class="pl-4 text-info/80 whitespace-pre-wrap">{result.output}</div>
+                    <div class="text-right text-[10px] text-info mt-1">[{result.module}]</div>
                 </div>
              {/each}
         </div>
 
         <!-- Command Input -->
-        <div class="p-4 bg-cyan-950/20 border-t border-cyan-500/30 flex items-center gap-3">
-             <span class="text-cyan-400 font-bold animate-pulse">></span>
+        <div class="p-4 bg-info/10 border-t border-info/30 flex items-center gap-3">
+             <span class="text-info font-bold animate-pulse">></span>
              <input type="text"
                     bind:value={commandInput}
                     onkeydown={handleKeyPress}
                     disabled={isProcessingCommand}
-                    class="flex-1 bg-transparent border-none outline-none text-cyan-100 font-mono placeholder-cyan-700 disabled:opacity-50"
+                    class="flex-1 bg-transparent border-none outline-none text-info/20 font-mono placeholder-info disabled:opacity-50"
                     placeholder="Enter system command..."
                     autocomplete="off" />
             {#if isProcessingCommand}
-                 <span class="text-xs text-yellow-500 animate-pulse">PROCESSING...</span>
+                 <span class="text-xs text-warning animate-pulse">PROCESSING...</span>
             {/if}
         </div>
       </div>
     </div>
 
-    <footer class="mt-8 text-center text-xs text-cyan-600/50 font-mono">
+    <footer class="mt-8 text-center text-xs text-info/50 font-mono">
         <div>YoRHa Legal AI Interface v2.0 • Bunker Operations • Quantum Security Enabled</div>
     </footer>
   </div>

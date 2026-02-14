@@ -31,10 +31,10 @@ let {
 let isClickable = $derived(!!href || !!onclick || interactive);
 
 let variantClasses = $derived({
-	default: 'bg-slate-800 border border-slate-700',
-	nes: 'bg-slate-900 border-4 border-white shadow-[4px_4px_0_0_#000]',
+	default: 'bg-panelSoft border border-sand/20',
+	nes: 'bg-panel border-4 border-white shadow-[4px_4px_0_0_#000]',
 	glass: 'bg-white/5 backdrop-blur-xl border border-white/10',
-	elevated: 'bg-slate-800 border border-slate-700 shadow-xl'
+	elevated: 'bg-panelSoft border border-sand/20 shadow-xl'
 }[variant]);
 
 let paddingClasses = $derived({
@@ -46,7 +46,7 @@ let paddingClasses = $derived({
 
 let interactiveClasses = $derived(
 	isClickable
-		? 'cursor-pointer transition-all duration-200 hover:border-blue-500 hover:shadow-lg, active:scale-[0.98]'
+		? 'cursor-pointer transition-all duration-200 hover:border-info hover:shadow-lg, active:scale-[0.98]'
 		: ''
 );
 </script>
@@ -58,7 +58,7 @@ let interactiveClasses = $derived(
 		onclick={onclick}
 	>
 		{#if header}
-			<div class="px-4 py-3 border-b border-slate-700">
+			<div class="px-4 py-3 border-b border-sand/20">
 				{@render header()}
 			</div>
 		{/if}
@@ -70,7 +70,7 @@ let interactiveClasses = $derived(
 		</div>
 
 		{#if footer}
-			<div class="px-4 py-3 border-t border-slate-700 bg-slate-900/50">
+			<div class="px-4 py-3 border-t border-sand/20 bg-panel/50">
 				{@render footer()}
 			</div>
 		{/if}
@@ -84,7 +84,7 @@ let interactiveClasses = $derived(
 		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && onclick?.()}
 	>
 		{#if header}
-			<div class="px-4 py-3 border-b border-slate-700">
+			<div class="px-4 py-3 border-b border-sand/20">
 				{@render header()}
 			</div>
 		{/if}
@@ -96,7 +96,7 @@ let interactiveClasses = $derived(
 		</div>
 
 		{#if footer}
-			<div class="px-4 py-3 border-t border-slate-700 bg-slate-900/50">
+			<div class="px-4 py-3 border-t border-sand/20 bg-panel/50">
 				{@render footer()}
 			</div>
 		{/if}

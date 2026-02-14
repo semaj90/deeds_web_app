@@ -247,11 +247,11 @@ import Button from '$lib/components/ui/Button.svelte';
 	<Dialog.Portal>
 		<Dialog.Overlay class="fixed inset-0 bg-black/50 z-40" />
 		<Dialog.Content
-			class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl max-h-[90vh] overflow-y-auto z-50 bg-white dark:bg-gray-900 rounded-lg shadow-xl"
+			class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl max-h-[90vh] overflow-y-auto z-50 bg-white dark:bg-panel rounded-lg shadow-xl"
 		>
-			<div class="sticky top-0 bg-white dark:bg-gray-900 border-b dark:border-gray-700 p-4 flex items-center justify-between">
+			<div class="sticky top-0 bg-white dark:bg-panel border-b dark:border-sand/20 p-4 flex items-center justify-between">
 				<div class="flex items-center gap-3">
-					<FileText class="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<FileText class="h-5 w-5 text-info dark:text-info/80" />
 					<Dialog.Title class="text-lg font-semibold dark:text-white">
 						Legal Document Upload
 					</Dialog.Title>
@@ -259,15 +259,15 @@ import Button from '$lib/components/ui/Button.svelte';
 
 				<div class="flex items-center gap-2">
 					<div class="flex gap-1">
-						<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded text-xs font-medium flex items-center gap-1">
+						<span class="px-2 py-1 bg-info/10 dark:bg-info/20 text-info dark:text-info/60 rounded text-xs font-medium flex items-center gap-1">
 							<Brain class="h-3 w-3" />
 							LegalBERT
 						</span>
-						<span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded text-xs font-medium flex items-center gap-1">
+						<span class="px-2 py-1 bg-accent/10 dark:bg-accent/20 text-accent dark:text-accent/80 rounded text-xs font-medium flex items-center gap-1">
 							<Scan class="h-3 w-3" />
 							OCR
 						</span>
-						<span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-xs font-medium flex items-center gap-1">
+						<span class="px-2 py-1 bg-info/10 dark:bg-info/20 text-info dark:text-info/60 rounded text-xs font-medium flex items-center gap-1">
 							<Target class="h-3 w-3" />
 							RAG
 						</span>
@@ -284,8 +284,8 @@ import Button from '$lib/components/ui/Button.svelte';
 			<form method="POST" action="?/upload" use:enhance enctype="multipart/form-data" class="p-6 space-y-6">
 				<!-- Case ID -->
 				<div class="space-y-2">
-					<label for="caseId" class="block text-sm font-medium dark:text-gray-200">
-						Case ID <span class="text-red-500">*</span>
+					<label for="caseId" class="block text-sm font-medium dark:text-sand/40">
+						Case ID <span class="text-danger">*</span>
 					</label>
 					<input
 						id="caseId"
@@ -294,31 +294,31 @@ import Button from '$lib/components/ui/Button.svelte';
 						bind:value={$form.caseId}
 						placeholder="Enter case ID"
 						required
-						class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-						class:border-red-500={$errors.caseId}
+						class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-info outline-none dark:bg-panelSoft dark:border-sand/30 dark:text-white"
+						class:border-danger={$errors.caseId}
 					/>
 					{#if $errors.caseId}
-						<p class="text-sm text-red-500">{$errors.caseId}</p>
+						<p class="text-sm text-danger">{$errors.caseId}</p>
 					{/if}
 				</div>
 
 				<!-- File Upload Area -->
 				<div class="space-y-2">
-					<label class="block text-sm font-medium dark:text-gray-200">
-						Document Upload <span class="text-red-500">*</span>
+					<label class="block text-sm font-medium dark:text-sand/40">
+						Document Upload <span class="text-danger">*</span>
 					</label>
 
 					<div
 						role="button"
 						tabindex="0"
 						class="relative border-2 border-dashed rounded-lg p-8 transition-all cursor-pointer"
-						class:border-blue-500={dragOver}
-						class:bg-blue-50={dragOver}
-						class:dark:bg-blue-900/20={dragOver}
-						class:border-gray-300={!dragOver && !$file}
-						class:border-green-500={$file}
-						class:bg-green-50={$file}
-						class:dark:bg-green-900/20={$file}
+						class:border-info={dragOver}
+						class:bg-info/5={dragOver}
+						class:dark:bg-info/10={dragOver}
+						class:border-sand/20={!dragOver && !$file}
+						class:border-accent={$file}
+						class:bg-accent/5={$file}
+						class:dark:bg-accent/10={$file}
 						ondrop={onDrop}
 						ondragover={onDragOver}
 						ondragleave={onDragLeave}
@@ -344,17 +344,17 @@ import Button from '$lib/components/ui/Button.svelte';
 									{#if filePreview}
 										<img src={filePreview} alt="Preview" class="w-24 h-24 object-cover rounded border" />
 									{:else}
-										<div class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded border flex items-center justify-center">
-											<FileText class="h-12 w-12 text-gray-400" />
+										<div class="w-24 h-24 bg-sand/10 dark:bg-panelSoft rounded border flex items-center justify-center">
+											<FileText class="h-12 w-12 text-sand/40" />
 										</div>
 									{/if}
 
 									<div class="flex-1 min-w-0">
 										<p class="font-medium text-sm dark:text-white truncate">{$file.name}</p>
-										<p class="text-xs text-gray-500 dark:text-gray-400">{formatFileSize($file.size)}</p>
+										<p class="text-xs text-sand/60 dark:text-sand/40">{formatFileSize($file.size)}</p>
 
 										{#if processingStage}
-											<div class="flex items-center gap-2 mt-2 text-xs text-blue-600 dark:text-blue-400">
+											<div class="flex items-center gap-2 mt-2 text-xs text-info dark:text-info/80">
 												<Loader2 class="h-3 w-3 animate-spin" />
 												{processingStage}
 											</div>
@@ -364,7 +364,7 @@ import Button from '$lib/components/ui/Button.svelte';
 									<button
 										type="button"
 										onclick={removeFile}
-										class="text-red-500 hover:text-red-700 transition-colors"
+										class="text-danger hover:text-danger transition-colors"
 									>
 										<X class="h-5 w-5" />
 									</button>
@@ -372,16 +372,16 @@ import Button from '$lib/components/ui/Button.svelte';
 
 								<!-- Analysis Preview -->
 								{#if ocrResults || legalAnalysis || semanticEmbeddings}
-									<div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2 border border-gray-200 dark:border-gray-700">
+									<div class="bg-sand/5 dark:bg-panelSoft rounded-lg p-4 space-y-2 border border-sand/20 dark:border-sand/20">
 										<h4 class="text-sm font-semibold dark:text-white flex items-center gap-2">
-											<CheckCircle class="h-4 w-4 text-green-500" />
+											<CheckCircle class="h-4 w-4 text-accent" />
 											Preliminary Analysis
 										</h4>
 
 										<div class="grid gap-2 text-xs">
 											{#if ocrResults}
 												<div class="flex justify-between">
-													<span class="text-gray-600 dark:text-gray-400">OCR Results:</span>
+													<span class="text-sand/60 dark:text-sand/40">OCR Results:</span>
 													<span class="font-medium dark:text-white">
 														{ocrResults.pages} pages • {ocrResults.averageConfidence}% confidence
 													</span>
@@ -390,7 +390,7 @@ import Button from '$lib/components/ui/Button.svelte';
 
 											{#if legalAnalysis}
 												<div class="flex justify-between">
-													<span class="text-gray-600 dark:text-gray-400">Legal Analysis:</span>
+													<span class="text-sand/60 dark:text-sand/40">Legal Analysis:</span>
 													<span class="font-medium dark:text-white">
 														{legalAnalysis.concepts?.length || 0} concepts identified
 													</span>
@@ -399,8 +399,8 @@ import Button from '$lib/components/ui/Button.svelte';
 
 											{#if semanticEmbeddings}
 												<div class="flex justify-between">
-													<span class="text-gray-600 dark:text-gray-400">Embeddings:</span>
-													<span class="font-medium dark:text-white text-green-600">Generated ✓</span>
+													<span class="text-sand/60 dark:text-sand/40">Embeddings:</span>
+													<span class="font-medium dark:text-white text-accent">Generated ✓</span>
 												</div>
 											{/if}
 										</div>
@@ -409,13 +409,13 @@ import Button from '$lib/components/ui/Button.svelte';
 							</div>
 						{:else}
 							<div class="text-center space-y-3">
-								<Upload class="h-12 w-12 mx-auto text-gray-400" />
+								<Upload class="h-12 w-12 mx-auto text-sand/40" />
 								<div>
 									<p class="text-sm font-medium dark:text-white">Drop your legal document here or click to browse</p>
-									<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+									<p class="text-xs text-sand/60 dark:text-sand/40 mt-1">
 										PDF, Word, Text, or Image files up to 100MB
 									</p>
-									<p class="text-xs text-blue-600 dark:text-blue-400 mt-1">
+									<p class="text-xs text-info dark:text-info/80 mt-1">
 										⚡ Enhanced with OCR, LegalBERT, and Semantic Analysis
 									</p>
 								</div>
@@ -424,31 +424,31 @@ import Button from '$lib/components/ui/Button.svelte';
 					</div>
 
 					{#if $errors.file}
-						<p class="text-sm text-red-500">{$errors.file}</p>
+						<p class="text-sm text-danger">{$errors.file}</p>
 					{/if}
 				</div>
 
 				<!-- Metadata Grid -->
 				<div class="grid md:grid-cols-2 gap-4">
 					<div class="space-y-2">
-						<label for="title" class="block text-sm font-medium dark:text-gray-200">Title</label>
+						<label for="title" class="block text-sm font-medium dark:text-sand/40">Title</label>
 						<input
 							id="title"
 							name="title"
 							type="text"
 							bind:value={$form.title}
 							placeholder="Document title"
-							class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+							class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-info outline-none dark:bg-panelSoft dark:border-sand/30 dark:text-white"
 						/>
 					</div>
 
 					<div class="space-y-2">
-						<label for="evidenceType" class="block text-sm font-medium dark:text-gray-200">Evidence Type</label>
+						<label for="evidenceType" class="block text-sm font-medium dark:text-sand/40">Evidence Type</label>
 						<select
 							id="evidenceType"
 							name="evidenceType"
 							bind:value={$form.evidenceType}
-							class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+							class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-info outline-none dark:bg-panelSoft dark:border-sand/30 dark:text-white"
 						>
 							{#each evidenceTypes as type}
 								<option value={type.value}>{type.label}</option>
@@ -459,62 +459,62 @@ import Button from '$lib/components/ui/Button.svelte';
 
 				<!-- Description -->
 				<div class="space-y-2">
-					<label for="description" class="block text-sm font-medium dark:text-gray-200">Description</label>
+					<label for="description" class="block text-sm font-medium dark:text-sand/40">Description</label>
 					<textarea
 						id="description"
 						name="description"
 						bind:value={$form.description}
 						placeholder="Optional description"
 						rows="3"
-						class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+						class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-info outline-none resize-none dark:bg-panelSoft dark:border-sand/30 dark:text-white"
 					></textarea>
 				</div>
 
 				<!-- Tags -->
 				<div class="space-y-2">
-					<label for="tags" class="block text-sm font-medium dark:text-gray-200">Tags (comma-separated)</label>
+					<label for="tags" class="block text-sm font-medium dark:text-sand/40">Tags (comma-separated)</label>
 					<input
 						id="tags"
 						name="tags"
 						type="text"
 						bind:value={$form.tags}
 						placeholder="e.g., contract, evidence, confidential"
-						class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+						class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-info outline-none dark:bg-panelSoft dark:border-sand/30 dark:text-white"
 					/>
 				</div>
 
 				<!-- AI Processing Options -->
-				<div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+				<div class="space-y-3 p-4 bg-sand/5 dark:bg-panelSoft rounded-lg border border-sand/20 dark:border-sand/20">
 					<h3 class="text-sm font-semibold dark:text-white">🤖 AI Processing Options</h3>
 
 					<div class="grid md:grid-cols-2 gap-3">
 						<label class="flex items-center gap-2 cursor-pointer">
 							<input type="checkbox" name="enableAiAnalysis" bind:checked={$form.enableAiAnalysis} class="rounded" />
-							<span class="text-sm dark:text-gray-200">🧠 Enable AI Analysis</span>
+							<span class="text-sm dark:text-sand/40">🧠 Enable AI Analysis</span>
 						</label>
 
 						<label class="flex items-center gap-2 cursor-pointer">
 							<input type="checkbox" name="enableOcr" bind:checked={$form.enableOcr} class="rounded" />
-							<span class="text-sm dark:text-gray-200">📄 Enable OCR</span>
+							<span class="text-sm dark:text-sand/40">📄 Enable OCR</span>
 						</label>
 
 						<label class="flex items-center gap-2 cursor-pointer">
 							<input type="checkbox" name="enableEmbeddings" bind:checked={$form.enableEmbeddings} class="rounded" />
-							<span class="text-sm dark:text-gray-200">🎯 Generate Embeddings</span>
+							<span class="text-sm dark:text-sand/40">🎯 Generate Embeddings</span>
 						</label>
 
 						<label class="flex items-center gap-2 cursor-pointer">
 							<input type="checkbox" name="isAdmissible" bind:checked={$form.isAdmissible} class="rounded" />
-							<span class="text-sm dark:text-gray-200">⚖️ Mark as Admissible</span>
+							<span class="text-sm dark:text-sand/40">⚖️ Mark as Admissible</span>
 						</label>
 					</div>
 				</div>
 
 				<!-- Submit Button -->
-				<div class="flex items-center justify-between pt-4 border-t dark:border-gray-700">
-					<div class="text-xs text-gray-500 dark:text-gray-400">
+				<div class="flex items-center justify-between pt-4 border-t dark:border-sand/20">
+					<div class="text-xs text-sand/60 dark:text-sand/40">
 						{#if $message}
-							<span class="text-green-600 dark:text-green-400">✓ {$message}</span>
+							<span class="text-accent dark:text-accent">✓ {$message}</span>
 						{/if}
 					</div>
 

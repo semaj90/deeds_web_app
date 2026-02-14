@@ -70,7 +70,7 @@ let contentRef = $state<HTMLDivElement | null>(null);
 		fixed left-1/2 top-1/2 z-50
 		grid w-full max-w-lg
 		-translate-x-1/2 -translate-y-1/2
-		gap-4 border border-slate-700 bg-slate-900
+		gap-4 border border-sand/20 bg-panel
 		p-6 shadow-lg duration-200
 		sm:rounded-lg md:w-full
 	`.replace(/\s+/g, ' ').trim();

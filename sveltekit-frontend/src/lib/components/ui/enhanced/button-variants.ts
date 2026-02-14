@@ -16,8 +16,8 @@ export const buttonVariants = cva(
                 ghost: 'hover:bg-accent, hover:text-accent-foreground',
                 link: 'text-primary underline-offset-4 hover:underline',
                 nier: 'yorha-button-primary',
-                crimson: 'bg-red-600 text-white hover:bg-red-700, dark:bg-red-700 dark: hover, bg-red-800',
-                gold: 'bg-yellow-600 text-white hover:bg-yellow-700, dark:bg-yellow-700 dark: hover, bg-yellow-800',
+                crimson: 'bg-danger text-white hover:bg-danger/80, dark:bg-danger/80 dark: hover, bg-danger/60',
+                gold: 'bg-warning text-white hover:bg-warning/80, dark:bg-warning/80 dark: hover, bg-warning/20',
             },
 	size: {
 	default: 'h-10 px-4 py-2',

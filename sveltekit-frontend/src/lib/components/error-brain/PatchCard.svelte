@@ -38,7 +38,7 @@ interface Props {
  const confidenceColor = $derived(confidence >= 0.9 ? 'success' : confidence >= 0.7 ? 'warning' : 'destructive');
 </script>
 
-<Card class="mb-4 {applied ? 'border-green-500 dark:border-green-700' : ''}">
+<Card class="mb-4 {applied ? 'border-accent dark:border-accent/60' : ''}">
  <CardHeader>
  <div class="flex items-start justify-between">
  <div class="flex-1">
@@ -50,7 +50,7 @@ interface Props {
  {confidencePercent}% confidence
  </Badge>
  {#if applied}
- <span class="px-2 py-1 rounded text-xs font-medium bg-blue-500 text-white">Applied</span>
+ <span class="px-2 py-1 rounded text-xs font-medium bg-info text-white">Applied</span>
  {/if}
  </div>
  </div>
@@ -58,8 +58,8 @@ interface Props {
 
  <CardContent>
  <!-- Diff Display -->
- <div class="bg-slate-950 dark:bg-slate-900 rounded-md p-4 overflow-x-auto">
- <pre class="text-xs font-mono text-slate-200"><code>{diffText}</code></pre>
+ <div class="bg-panel dark:bg-panel rounded-md p-4 overflow-x-auto">
+ <pre class="text-xs font-mono text-sand/40"><code>{diffText}</code></pre>
  </div>
 
  <!-- Metadata -->

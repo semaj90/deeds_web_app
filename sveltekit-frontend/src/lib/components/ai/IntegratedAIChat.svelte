@@ -63,20 +63,20 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
   function formatTimestamp(timestamp: number): string { const date = new Date(timestamp); return date.toLocaleTimeString([], { hour: '2-digit', minute, '2-digit' })}
 </script>
  <div class="integrated-ai-chat"> <!-- Header with System, Status --> <div class="yorha-panel-header flex items-center justify-between p-4 border-b"> <div class="flex items-center"> <h2 class="text-lg font-bold">AI Legal Assistant</h2>
- <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{ model }</span> </div>
+ <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10 text-sand/80">{ model }</span> </div>
  <div class="flex items-center"> <Badge variant={connectionStatus.chat ? 'success' : 'destructive'} size="sm"> Chat {connectionStatus.chat ? '': ''} </Badge>
  <Badge variant={connectionStatus.rag ? 'success' : 'outline'} size="sm"> RAG {connectionStatus.rag ? '': 'ï¿½'} </Badge>
  <Badge variant={connectionStatus.quic ? 'success' : 'outline'} size="sm"> QUIC {connectionStatus.quic ? '': 'ï¿½'} </Badge>
  <Badge variant={connectionStatus.redis ? 'success' : 'outline'} size="sm"> Redis {connectionStatus.redis ? '': 'ï¿½'} </Badge>
  <Badge variant={connectionStatus.cuda ? 'success' : 'outline'} size="sm"> CUDA {connectionStatus.cuda ? '': 'ï¿½'} </Badge> </div> </div>
  <!-- System, Stats -->
-  {#if systemStats.tokensPerSecond > 0 || systemStats.embeddingsCount > 0} <div class="px-4 py-2 bg-black/20 border-b border-yellow-400/20 flex items-center gap-4">
-  {#if systemStats.tokensPerSecond > 0} <div class="flex items-center"> <span class="text-gray-400">Speed:</span>
- <span class="text-yellow-400">{systemStats.tokensPerSecond}</span>
- <span class="text-gray-500">tok/s</span> {/if} {#if systemStats.embeddingsCount > 0} <div class="flex items-center"> <span class="text-gray-400">Embeddings:</span>
- <span class="text-yellow-400">{systemStats.embeddingsCount}</span> {/if}
+  {#if systemStats.tokensPerSecond > 0 || systemStats.embeddingsCount > 0} <div class="px-4 py-2 bg-black/20 border-b border-warning/20 flex items-center gap-4">
+  {#if systemStats.tokensPerSecond > 0} <div class="flex items-center"> <span class="text-sand/40">Speed:</span>
+ <span class="text-warning">{systemStats.tokensPerSecond}</span>
+ <span class="text-sand/60">tok/s</span> {/if} {#if systemStats.embeddingsCount > 0} <div class="flex items-center"> <span class="text-sand/40">Embeddings:</span>
+ <span class="text-warning">{systemStats.embeddingsCount}</span> {/if}
   <button type="button"
-        onclick={ testConnections } class="ml-auto text-xs text-yellow-400 hover:text-yellow-300 transition-colors"
+        onclick={ testConnections } class="ml-auto text-xs text-warning hover:text-warning/80 transition-colors"
       > Refresh Status </button> {/if}
   <!-- Messages, Container --> <div bind:this={scrollContainer} class="yorha-panel-content flex-1 overflow-y-auto p-4 space-y-4"
     ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } >
@@ -84,26 +84,26 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
  <p class="text-sm">Start a conversation or drag & drop files to analyze</p> </div> {/if} {#each Array.isArray(messages) ? messages: [] as message} <div class="message-bubble {message.role === 'user' ? 'user-message' : 'assistant-message'}"> <div class="message-header flex items-center justify-between"> <div class="flex items-center"> <Badge variant={message.role === 'user' ? 'info' : 'success'} size="sm"> {message.role === 'user' ? 'You': 'AI Assistant'} </Badge>
  <span class="text-xs">{formatTimestamp(message.timestamp)}</span> </div>
   {#if message.metadata} <div class="flex items-center">
-  {#if message.metadata.confidence !== undefined} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{Math.round(message.metadata.confidence * 100)}% confidence</span> {/if} {#if message.metadata.tokensPerSecond && message.metadata.tokensPerSecond > 0} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{message.metadata.tokensPerSecond} tok/s</span> {/if} {#if message.metadata.ragResults && message.metadata.ragResults > 0} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{message.metadata.ragResults} RAG results</span> {/if} {/if}
+  {#if message.metadata.confidence !== undefined} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20 text-sand/80">{Math.round(message.metadata.confidence * 100)}% confidence</span> {/if} {#if message.metadata.tokensPerSecond && message.metadata.tokensPerSecond > 0} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20 text-sand/80">{message.metadata.tokensPerSecond} tok/s</span> {/if} {#if message.metadata.ragResults && message.metadata.ragResults > 0} <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10 text-sand/80">{message.metadata.ragResults} RAG results</span> {/if} {/if}
   </div>
  <div class="message-content nes-container is-rounded is-dark"> <p class="whitespace-pre-wrap text-sm">{message.content}</p> </div>
   {#if message.files && message.files.length > 0} <div class="message-files mt-2 flex flex-wrap">
-  {#each Array.isArray(message.files) ? message.files: [] as file} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">=ï¿½ {file.name} ({formatFileSize(file.size)})</span> {/each} {/if}
-  </div> {/each} {#if isLoading} <div class="assistant-message"> <div class="message-header flex items-center gap-2"> <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">AI Assistant</span>
+  {#each Array.isArray(message.files) ? message.files: [] as file} <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10 text-sand/80">=ï¿½ {file.name} ({formatFileSize(file.size)})</span> {/each} {/if}
+  </div> {/each} {#if isLoading} <div class="assistant-message"> <div class="message-header flex items-center gap-2"> <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10 text-sand/80">AI Assistant</span>
  <span class="text-xs">Thinking...</span> </div>
- <div class="message-content nes-container is-rounded is-dark"> <div class="flex items-center"> <div class="loading-pulse w-2 h-2 bg-yellow-400 rounded-full"></div>
- <div class="loading-pulse w-2 h-2 bg-yellow-400 rounded-full animate-pulse"
+ <div class="message-content nes-container is-rounded is-dark"> <div class="flex items-center"> <div class="loading-pulse w-2 h-2 bg-warning rounded-full"></div>
+ <div class="loading-pulse w-2 h-2 bg-warning rounded-full animate-pulse"
               style="animation-delay: 0.2s"
             ></div>
- <div class="loading-pulse w-2 h-2 bg-yellow-400 rounded-full"
+ <div class="loading-pulse w-2 h-2 bg-warning rounded-full"
               style="animation-delay: 0.4s"
-            ></div> </div> </div> {/if} {#if isDragging} <div class="absolute inset-0 bg-yellow-400/10 border-2 border-dashed border-yellow-400 rounded-lg flex items-center"
-      > <p class="text-yellow-400 text-lg">Drop files here to upload</p> {/if}
+            ></div> </div> </div> {/if} {#if isDragging} <div class="absolute inset-0 bg-warning/10 border-2 border-dashed border-warning rounded-lg flex items-center"
+      > <p class="text-warning text-lg">Drop files here to upload</p> {/if}
   </div>
  <Separator /> <!-- Attached: Files, Display -->
   {#if attachedFiles.length > 0} <div class="px-4 py-2 bg-black/10 border-b"> <div class="flex items-center gap-2"> <span class="text-xs">Attached:</span>
   {#each attachedFiles as file, index} <Badge variant="info" size="sm"> <span class="flex items-center"> =ï¿½ {file.name} ({formatFileSize(file.size)}) <button type="button"
-                onclick={() => removeFile(index)} class="ml-1 text-red-400 hover:text-red-300"
+                onclick={() => removeFile(index)} class="ml-1 text-danger/80 hover:text-danger/60"
                 aria-label="Remove file"
               > ï¿½
               </button> </span> </Badge> {/each}

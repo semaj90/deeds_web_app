@@ -48,15 +48,15 @@
   });
 
   // Event type configurations
-  const eventConfig = { filing: { icon: '📄', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+  const eventConfig = { filing: { icon: '📄', color: 'text-info/80', bg: 'bg-info/10', border: 'border-info/20' },
 	hearing: {
-	icon: '⚖️', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+	icon: '⚖️', color: 'text-info/80', bg: 'bg-info/10', border: 'border-info/20' },
 	evidence: {
-	icon: '📋', color: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/20' },
+	icon: '📋', color: 'text-accent', bg: 'bg-accent/10', border: 'border-accent/20' },
 	meeting: {
-	icon: '👥', color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20' },
+	icon: '👥', color: 'text-warning', bg: 'bg-warning/10', border: 'border-warning/20' },
 	deadline: {
-	icon: '⚠️', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20' },
+	icon: '⚠️', color: 'text-danger/80', bg: 'bg-danger/10', border: 'border-danger/20' },
 	decision: {
 	icon: '✅', color: 'text-yorha-primary', bg: 'bg-yorha-primary/10', border: 'border-yorha-primary/20' },
 	milestone: {
@@ -64,13 +64,13 @@
   } as const;
 
   // Status configurations
-  const statusConfig = { completed: { label: 'Completed', className: 'bg-green-500/20 text-green-400 border-green-500/30' },
+  const statusConfig = { completed: { label: 'Completed', className: 'bg-accent/20 text-accent border-accent/30' },
 	pending: {
-	label: 'Pending', className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+	label: 'Pending', className: 'bg-warning/20 text-warning border-warning/30' },
 	overdue: {
-	label: 'Overdue', className: 'bg-red-500/20 text-red-400 border-red-500/30' },
+	label: 'Overdue', className: 'bg-danger/20 text-danger/80 border-danger/30' },
 	cancelled: {
-	label: 'Cancelled', className: 'bg-gray-500/20 text-gray-400 border-gray-500/30' }
+	label: 'Cancelled', className: 'bg-sand/20/20 text-sand/40 border-sand/30/30' }
   } as const;
 
   function formatDate(date: Date): string {
@@ -201,9 +201,9 @@
                         <span
                           class={cn(
                             'px-2 py-0.5 text-xs font-mono rounded',
-                            event.priority === 'critical' && 'bg-red-500/20 text-red-400 border border-red-500/30',
-                            event.priority === 'high' && 'bg-orange-500/20 text-orange-400 border border-orange-500/30',
-                            event.priority === 'low' && 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                            event.priority === 'critical' && 'bg-danger/20 text-danger/80 border border-danger/30',
+                            event.priority === 'high' && 'bg-warning/20 text-warning border border-warning/30',
+                            event.priority === 'low' && 'bg-sand/20/20 text-sand/40 border border-sand/30/30'
                           )}
                         >
                           {event.priority.toUpperCase()}

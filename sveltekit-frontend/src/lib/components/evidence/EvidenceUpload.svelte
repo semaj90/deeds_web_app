@@ -238,18 +238,18 @@
 
           <!-- Upload Area -->
           <div
-            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors {dragOver ? 'border-blue-500 bg-blue-50' : 'hover:border-gray-400'}"
+            class="border-2 border-dashed border-sand/20 rounded-lg p-8 text-center transition-colors {dragOver ? 'border-info bg-info/5' : 'hover:border-sand/30'}"
             ondragover={handleDragOver}
             ondragleave={handleDragLeave}
             ondrop={handleDrop}
             role="button"
             tabindex="0"
           >
-            <Upload class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p class="text-lg font-medium text-gray-900 mb-2">
+            <Upload class="w-12 h-12 text-sand/40 mx-auto mb-4" />
+            <p class="text-lg font-medium text-sand mb-2">
               Drop files here or click to select
             </p>
-            <p class="text-sm text-gray-500 mb-4">
+            <p class="text-sm text-sand/60 mb-4">
               Supports images, videos, audio, documents (max 50MB each)
             </p>
             <input
@@ -268,7 +268,7 @@
           <!-- Selected Files -->
           {#if selectedFiles.length > 0}
             <div class="mt-6">
-              <h4 class="font-medium text-gray-900 mb-3">
+              <h4 class="font-medium text-sand mb-3">
                 Selected Files ({selectedFiles.length})
               </h4>
               <div class="space-y-3 max-h-96 overflow-y-auto">
@@ -276,44 +276,44 @@
                   <div class="border rounded-lg p-4">
                     <div class="flex items-start gap-3">
                       <div class="flex-shrink-0">
-                        <svelte:component this={getFileIcon(fileData.file)} class="w-8 h-8 text-gray-400" />
+                        <svelte:component this={getFileIcon(fileData.file)} class="w-8 h-8 text-sand/40" />
                       </div>
 
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between mb-2">
-                          <h5 class="font-medium text-gray-900 truncate">
+                          <h5 class="font-medium text-sand truncate">
                             {fileData.title}
                           </h5>
                           <button
                             onclick={() => removeFile(fileData.id)}
-                            class="p-1 hover:bg-gray-100 rounded"
+                            class="p-1 hover:bg-sand/10 rounded"
                           >
                             <X class="w-4 h-4" />
                           </button>
                         </div>
 
-                        <p class="text-sm text-gray-500 mb-3">
+                        <p class="text-sm text-sand/60 mb-3">
                           {formatFileSize(fileData.file.size)} &bull; {fileData.file.type}
                         </p>
 
                         <!-- File Details Form -->
                         <div class="grid grid-cols-2 gap-3">
                           <div>
-                            <label for="title-{fileData.id}" class="block text-sm font-medium text-gray-700">Title</label>
+                            <label for="title-{fileData.id}" class="block text-sm font-medium text-sand/80">Title</label>
                             <input
                               id="title-{fileData.id}"
                               bind:value={fileData.title}
                               placeholder="Evidence title"
-                              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                              class="mt-1 block w-full rounded-md border border-sand/20 px-3 py-2 text-sm"
                             />
                           </div>
 
                           <div>
-                            <label for="type-{fileData.id}" class="block text-sm font-medium text-gray-700">Type</label>
+                            <label for="type-{fileData.id}" class="block text-sm font-medium text-sand/80">Type</label>
                             <select
                               id="type-{fileData.id}"
                               bind:value={fileData.evidenceType}
-                              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                              class="mt-1 block w-full rounded-md border border-sand/20 px-3 py-2 text-sm"
                             >
                               <option value="document">Document</option>
                               <option value="image">Image</option>
@@ -324,22 +324,22 @@
                           </div>
 
                           <div class="col-span-2">
-                            <label for="description-{fileData.id}" class="block text-sm font-medium text-gray-700">Description</label>
+                            <label for="description-{fileData.id}" class="block text-sm font-medium text-sand/80">Description</label>
                             <textarea
                               id="description-{fileData.id}"
                               bind:value={fileData.description}
                               placeholder="Describe this evidence"
-                              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[60px]"
+                              class="mt-1 block w-full rounded-md border border-sand/20 px-3 py-2 text-sm min-h-[60px]"
                             ></textarea>
                           </div>
 
                           <div>
-                            <label for="tags-{fileData.id}" class="block text-sm font-medium text-gray-700">Tags</label>
+                            <label for="tags-{fileData.id}" class="block text-sm font-medium text-sand/80">Tags</label>
                             <input
                               id="tags-{fileData.id}"
                               bind:value={fileData.tags}
                               placeholder="Comma-separated tags"
-                              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                              class="mt-1 block w-full rounded-md border border-sand/20 px-3 py-2 text-sm"
                             />
                           </div>
 
@@ -350,7 +350,7 @@
                               bind:checked={fileData.isAdmissible}
                               class="rounded"
                             />
-                            <label for="admissible-{fileData.id}" class="text-sm font-medium text-gray-700">Admissible</label>
+                            <label for="admissible-{fileData.id}" class="text-sm font-medium text-sand/80">Admissible</label>
                           </div>
                         </div>
                       </div>
@@ -366,7 +366,7 @@
             <div class="mt-6">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-sm font-medium">Uploading files...</span>
-                <span class="text-sm text-gray-500">{Math.round(uploadProgress)}%</span>
+                <span class="text-sm text-sand/60">{Math.round(uploadProgress)}%</span>
               </div>
               <progress value={uploadProgress} max="100" class="w-full h-2"></progress>
             </div>
@@ -375,19 +375,19 @@
           <!-- Upload Results -->
           {#if completedUploads.length > 0 || failedUploads.length > 0}
             <div class="mt-6">
-              <h4 class="font-medium text-gray-900 mb-3">Upload Results</h4>
+              <h4 class="font-medium text-sand mb-3">Upload Results</h4>
 
               {#if completedUploads.length > 0}
                 <div class="mb-4">
                   <div class="flex items-center gap-2 mb-2">
-                    <CheckCircle class="w-4 h-4 text-green-500" />
-                    <span class="text-sm font-medium text-green-700">
+                    <CheckCircle class="w-4 h-4 text-accent" />
+                    <span class="text-sm font-medium text-accent">
                       Successfully uploaded ({completedUploads.length})
                     </span>
                   </div>
                   <div class="space-y-1">
                     {#each completedUploads as upload}
-                      <div class="flex items-center gap-2 text-sm text-green-600">
+                      <div class="flex items-center gap-2 text-sm text-accent">
                         <CheckCircle class="w-3 h-3" />
                         <span>{upload.title}</span>
                       </div>
@@ -399,14 +399,14 @@
               {#if failedUploads.length > 0}
                 <div>
                   <div class="flex items-center gap-2 mb-2">
-                    <AlertCircle class="w-4 h-4 text-red-500" />
-                    <span class="text-sm font-medium text-red-700">
+                    <AlertCircle class="w-4 h-4 text-danger" />
+                    <span class="text-sm font-medium text-danger">
                       Failed uploads ({failedUploads.length})
                     </span>
                   </div>
                   <div class="space-y-1">
                     {#each failedUploads as upload}
-                      <div class="flex items-center gap-2 text-sm text-red-600">
+                      <div class="flex items-center gap-2 text-sm text-danger">
                         <AlertCircle class="w-3 h-3" />
                         <span>{upload.title}: {upload.error}</span>
                       </div>
@@ -421,14 +421,14 @@
           <div class="flex justify-between items-center mt-6">
             <div class="flex gap-2">
               {#if selectedFiles.length > 0}
-                <Button onclick={clearAllFiles} class="text-gray-600">
+                <Button onclick={clearAllFiles} class="text-sand/60">
                   Clear All
                 </Button>
               {/if}
             </div>
 
             <div class="flex gap-2">
-              <Button onclick={() => showUploadDialog = false} class="text-gray-600">
+              <Button onclick={() => showUploadDialog = false} class="text-sand/60">
                 Cancel
               </Button>
               <Button

@@ -46,13 +46,13 @@
 
 	// Type colors
 	const typeColors: Record<string, string> = {
-		route: 'text-purple-400',
-		component: 'text-blue-400',
-		store: 'text-green-400',
-		service: 'text-orange-400',
-		api: 'text-cyan-400',
-		util: 'text-gray-400',
-		error: 'text-red-400'
+		route: 'text-info/80',
+		component: 'text-info/80',
+		store: 'text-accent',
+		service: 'text-warning',
+		api: 'text-info',
+		util: 'text-sand/40',
+		error: 'text-danger/80'
 	};
 
 	async function performSearch(searchQuery: string) {
@@ -178,9 +178,9 @@
 				>
 					<div class="result-icon">
 						{#if result.type === 'error'}
-							<AlertTriangle class="h-4 w-4 text-red-400" />
+							<AlertTriangle class="h-4 w-4 text-danger/80" />
 						{:else}
-							<FileCode class={`h-4 w-4 ${typeColors[result.type] || 'text-gray-400'}`} />
+							<FileCode class={`h-4 w-4 ${typeColors[result.type] || 'text-sand/40'}`} />
 						{/if}
 					</div>
 					<div class="result-content">

@@ -55,16 +55,16 @@ let labelSizeClasses = $derived({
 // Variant classes
 let trackVariants = $derived({
 	default:checked
-		? 'bg-blue-600'
-		: 'bg-slate-600',
+		? 'bg-info'
+		: 'bg-panelSoft',
 	nes: checked
-		? 'bg-green-500 border-4 border-white'
-		: 'bg-red-500 border-4 border-white'
+		? 'bg-accent border-4 border-white'
+		: 'bg-danger border-4 border-white'
 }[variant]);
 
 let thumbVariants = $derived({
 	default: 'bg-white shadow-md',
-	nes: 'bg-white border-2 border-slate-800'
+	nes: 'bg-white border-2 border-sand/20'
 }[variant]);
 
 function handleChange(e: Event) {
@@ -110,7 +110,7 @@ function handleKeydown(e: KeyboardEvent) {
 		class="relative inline-flex shrink-0 {dimensions.track}
 			   rounded-full cursor-pointer
 			   transition-colors duration-200 ease-in-out
-			   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900
+			   focus:outline-none focus:ring-2 focus:ring-info focus:ring-offset-2 focus:ring-offset-panel
 			   disabled:cursor-not-allowed
 			   {trackVariants}"
 		onclick={() => !disabled && (checked = !checked, onchange?.(checked))}

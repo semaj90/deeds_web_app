@@ -131,15 +131,15 @@
   }
 </script>
 
-<div class="legal-rich-text-editor rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
+<div class="legal-rich-text-editor rounded-lg border border-sand/20 dark:border-sand/20 bg-white dark:bg-panelSoft overflow-hidden">
   {#if !readonly}
-    <div class="toolbar flex flex-wrap items-center gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-      <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
+    <div class="toolbar flex flex-wrap items-center gap-1 p-2 border-b border-sand/20 dark:border-sand/20 bg-sand/5 dark:bg-panel">
+      <div class="flex items-center gap-1 pr-2 border-r border-sand/20 dark:border-sand/30">
         <button type="button" onclick={undo} class="toolbar-btn" title="Undo (Ctrl+Z)">↶</button>
         <button type="button" onclick={redo} class="toolbar-btn" title="Redo (Ctrl+Y)">↷</button>
       </div>
 
-      <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
+      <div class="flex items-center gap-1 pr-2 border-r border-sand/20 dark:border-sand/30">
         <select
           class="toolbar-select"
           value={currentHeading}
@@ -153,14 +153,14 @@
         </select>
       </div>
 
-      <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
+      <div class="flex items-center gap-1 pr-2 border-r border-sand/20 dark:border-sand/30">
         <button type="button" onclick={toggleBold} class="toolbar-btn" class:active={isBold} title="Bold">B</button>
         <button type="button" onclick={toggleItalic} class="toolbar-btn" class:active={isItalic} title="Italic">I</button>
         <button type="button" onclick={toggleUnderline} class="toolbar-btn" class:active={isUnderline} title="Underline">U</button>
         <button type="button" onclick={toggleStrike} class="toolbar-btn" class:active={isStrike} title="Strikethrough">S</button>
       </div>
 
-      <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
+      <div class="flex items-center gap-1 pr-2 border-r border-sand/20 dark:border-sand/30">
         <button type="button" onclick={toggleBulletList} class="toolbar-btn" class:active={isBulletList} title="Bullet List">•</button>
         <button type="button" onclick={toggleOrderedList} class="toolbar-btn" class:active={isOrderedList} title="Numbered List">1.</button>
         <button type="button" onclick={toggleBlockquote} class="toolbar-btn" class:active={isBlockquote} title="Quote">"</button>

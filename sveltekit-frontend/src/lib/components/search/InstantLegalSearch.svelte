@@ -38,25 +38,25 @@ import { fly } from "svelte/transition";
 <div class="w-full max-w-xl">
   <Combobox.Root bind:inputValue={searchQuery} bind:open>
     <div class="relative">
-      <div class="absolute left-3 top-3 text-gray-400">
+      <div class="absolute left-3 top-3 text-sand/40">
         <Search size={20} />
       </div>
 
       <Combobox.Input
-        class="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none text-lg"
+        class="w-full pl-10 pr-4 py-3 bg-white dark:bg-panelSoft border rounded-xl shadow-sm focus:ring-2 focus:ring-info outline-none text-lg"
         placeholder="Search cases, statutes, or evidence..."
         aria-label="Search"
       />
 
       {#if isLoading}
-        <div class="absolute right-3 top-3 text-indigo-500 animate-spin">
+        <div class="absolute right-3 top-3 text-info animate-spin">
           <Loader2 size={20} />
         </div>
       {/if}
     </div>
 
     <Combobox.Content
-      class="w-full bg-white dark:bg-gray-800 border rounded-xl shadow-xl mt-2 overflow-hidden z-50"
+      class="w-full bg-white dark:bg-panelSoft border rounded-xl shadow-xl mt-2 overflow-hidden z-50"
       transition={fly}
       params={{ y: -10, duration: 200 }}
     >
@@ -65,9 +65,9 @@ import { fly } from "svelte/transition";
             {#each results as result (result.id)}
             <Combobox.Item
                 value={result.title}
-                class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-sand/10 dark:hover:bg-panelSoft cursor-pointer transition-colors"
             >
-                <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-full text-indigo-600">
+                <div class="p-2 bg-info/5 dark:bg-info/20/30 rounded-full text-info">
                 {#if result.type === 'case'}
                   <Scale size={18} />
                 {:else}
@@ -75,14 +75,14 @@ import { fly } from "svelte/transition";
                 {/if}
                 </div>
                 <div>
-                <div class="font-medium text-gray-900 dark:text-gray-100">{result.title}</div>
-                <div class="text-xs text-gray-500 capitalize">{result.type}</div>
+                <div class="font-medium text-sand dark:text-sand/20">{result.title}</div>
+                <div class="text-xs text-sand/60 capitalize">{result.type}</div>
                 </div>
             </Combobox.Item>
             {/each}
         </div>
       {:else if searchQuery && !isLoading}
-        <div class="p-4 text-center text-gray-500">
+        <div class="p-4 text-center text-sand/60">
           No results found for "{searchQuery}"
         </div>
       {/if}

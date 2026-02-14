@@ -31,35 +31,35 @@
  label: 'Explain',
  icon: '📖',
  description: 'Get plain English explanation',
- color: 'bg-blue-50, hover:bg-blue-100',
+ color: 'bg-info/5, hover:bg-info/10',
  },
 	{
  id: 'LINK_CASES',
  label: 'Related Cases',
  icon: '⚖️',
  description: 'Find relevant case law',
- color: 'bg-purple-50, hover:bg-purple-100',
+ color: 'bg-info/5, hover:bg-info/10',
  },
 	{
  id: 'HIGHLIGHT_CLAUSE',
  label: 'Highlight',
  icon: '🎯',
  description: 'Identify key clauses',
- color: 'bg-amber-50, hover:bg-amber-100',
+ color: 'bg-warning/5, hover:bg-warning/10',
  },
 	{
  id: 'TAXONOMY_EXPLORE',
  label: 'Explore',
  icon: '🗺️',
  description: 'Browse law taxonomy',
- color: 'bg-green-50, hover:bg-green-100',
+ color: 'bg-accent/5, hover:bg-accent/10',
  },
 	{
  id: 'MEMO_BUILDER',
  label: 'Memo',
  icon: '📝',
  description: 'Generate memo outline',
- color: 'bg-red-50, hover:bg-red-100',
+ color: 'bg-danger/5, hover:bg-danger/10',
  }];
 
  async function handleAction(intent: LegalIntent) {

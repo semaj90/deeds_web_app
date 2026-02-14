@@ -281,15 +281,15 @@ import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
         <CardContent>
           <div class="grid grid-cols-3 gap-4">
             <div class="flex items-center">
-              <div class="{wasmSupported ? 'bg-green-500' : 'bg-red-500'} w-3 h-3"></div>
+              <div class="{wasmSupported ? 'bg-accent' : 'bg-danger'} w-3 h-3"></div>
               <span>WebAssembly</span>
             </div>
             <div class="flex items-center">
-              <div class="{webglSupported ? 'bg-green-500' : 'bg-yellow-500'} w-3 h-3"></div>
+              <div class="{webglSupported ? 'bg-accent' : 'bg-warning'} w-3 h-3"></div>
               <span>WebGL</span>
             </div>
             <div class="flex items-center">
-              <div class="{sharedMemorySupported ? 'bg-green-500' : 'bg-yellow-500'} w-3 h-3"></div>
+              <div class="{sharedMemorySupported ? 'bg-accent' : 'bg-warning'} w-3 h-3"></div>
               <span>SharedMemory</span>
             </div>
           </div>
@@ -306,7 +306,7 @@ import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
       {:else}
         <Alert>
           <div class="flex items-center">
-            <div class="bg-green-500 w-6 h-6 rounded-full flex items-center">
+            <div class="bg-accent w-6 h-6 rounded-full flex items-center">
               <svg class="w-4 h-4 text-white" fill="currentColor" viewBox=" 0 0 | 20, 20">
                 <path
                   fill-rule="evenodd"
@@ -327,26 +327,26 @@ import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
           </CardHeader>
           <CardContent>
             <div class="grid grid-cols-2 md grid-cols-4">
-              <div class="metric bg-blue-50 p-3 rounded-lg">
-                <div class="text-sm text-blue-600">Load Time</div>
+              <div class="metric bg-info/5 p-3 rounded-lg">
+                <div class="text-sm text-info">Load Time</div>
                 <div class="text-lg font-semibold">
                   {performanceMetrics.loadTime.toFixed(0)}ms
                 </div>
               </div>
-              <div class="metric bg-green-50 p-3 rounded-lg">
-                <div class="text-sm text-green-600">Inference Time</div>
+              <div class="metric bg-accent/5 p-3 rounded-lg">
+                <div class="text-sm text-accent">Inference Time</div>
                 <div class="text-lg font-semibold">
                   {performanceMetrics.inferenceTime.toFixed(0)}ms
                 </div>
               </div>
-              <div class="metric bg-purple-50 p-3 rounded-lg">
-                <div class="text-sm text-purple-600">Tokens/Sec</div>
+              <div class="metric bg-info/5 p-3 rounded-lg">
+                <div class="text-sm text-info">Tokens/Sec</div>
                 <div class="text-lg font-semibold">
                   {performanceMetrics.tokensPerSecond}
                 </div>
               </div>
-              <div class="metric bg-orange-50 p-3 rounded-lg">
-                <div class="text-sm text-orange-600">Memory</div>
+              <div class="metric bg-warning/5 p-3 rounded-lg">
+                <div class="text-sm text-warning">Memory</div>
                 <div class="text-lg font-semibold">
                   {performanceMetrics.memoryUsage}MB
                 </div>

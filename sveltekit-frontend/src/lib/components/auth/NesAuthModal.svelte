@@ -70,7 +70,7 @@
       </div>
       <div class="mt-4 flex justify-end">
         <button type="button" class="rounded bg-neutral-700 px-3" onclick={close}>Cancel</button>
-        <button type="submit" class="rounded bg-emerald-600 px-3" disabled={submitting}>
+        <button type="submit" class="rounded bg-accent px-3" disabled={submitting}>
           {#if submitting}Signing in...{:else}Sign in{/if}
         </button>
       </div>

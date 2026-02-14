@@ -158,17 +158,17 @@
 
 </script>
 
-<Card class="w-full h-[600px] flex flex-col bg-slate-950 border-slate-800">
+<Card class="w-full h-[600px] flex flex-col bg-panel border-sand/20">
     <CardHeader class="flex flex-row items-center justify-between py-3">
         <div class="flex items-center gap-2">
-            <Network class="w-5 h-5 text-blue-400"/>
+            <Network class="w-5 h-5 text-info/80"/>
             <CardTitle>Case Graph</CardTitle>
             <Badge variant="outline" class="ml-2">{visibleNodes.length} Nodes</Badge>
         </div>
         <div class="flex gap-1">
              {#each Object.entries(lodConfig) as [lvl, cfg]}
                 <button
-                  class="px-2 py-1 text-xs rounded border border-slate-700 {currentLOD === Number(lvl) ? 'bg-slate-800 text-white' : 'text-slate-400'}"
+                  class="px-2 py-1 text-xs rounded border border-sand/20 {currentLOD === Number(lvl) ? 'bg-panelSoft text-white' : 'text-sand/40'}"
                   onclick={() => { currentLOD = Number(lvl); updateLOD(); }}
                 >
                   {cfg.label}
@@ -183,7 +183,7 @@
             height={500}
             class="w-full h-full"
         ></canvas>
-        <div class="absolute bottom-2 right-2 text-xs text-slate-500">
+        <div class="absolute bottom-2 right-2 text-xs text-sand/60">
             WebGPU: {enableWebGPU ? 'Enabled' : 'Disabled'}
         </div>
     </CardContent>

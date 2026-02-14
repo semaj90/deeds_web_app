@@ -182,7 +182,7 @@ $effect(() => {
 
               {#if result.highlights && result.highlights.length > 0}
                 <div class="text-xs mt-1">
-                  <span class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 px-1 rounded">
+                  <span class="bg-warning/10 dark:bg-warning/20/30 text-warning dark:text-warning/60 px-1 rounded">
                     {result.highlights[0]}
                   </span>
                 </div>
@@ -231,26 +231,26 @@ $effect(() => {
   }
 
   :global(.vector-confidence-high) {
-    @apply text-green-600 border-green-200 bg-green-50;
+    @apply text-accent border-accent/20 bg-accent/5;
   }
 
   :global(.dark .vector-confidence-high) {
-    @apply text-green-400 border-green-800 bg-green-950/30;
+    @apply text-accent border-accent/30 bg-accent/10/30;
   }
 
   :global(.vector-confidence-medium) {
-    @apply text-yellow-600 border-yellow-200 bg-yellow-50;
+    @apply text-warning border-warning/20 bg-warning/5;
   }
 
   :global(.dark .vector-confidence-medium) {
-    @apply text-yellow-400 border-yellow-800 bg-yellow-950/30;
+    @apply text-warning border-warning bg-warning/10/30;
   }
 
   :global(.vector-confidence-low) {
-    @apply text-slate-600 border-slate-200 bg-slate-50;
+    @apply text-sand/60 border-sand/20 bg-sand/5;
   }
 
   :global(.dark .vector-confidence-low) {
-    @apply text-slate-400 border-slate-800 bg-slate-950/30;
+    @apply text-sand/40 border-sand/20 bg-panel/30;
   }
 </style>

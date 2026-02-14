@@ -41,8 +41,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
-	class="nes-container is-rounded p-4 flex flex-col items-center justify-center border-dashed border-2 min-h-[150px] transition-colors"
-	class:bg-blue-900={dropzoneActive}
+	class="nes-container is-rounded p-4 flex flex-col items-center justify-center border-dashed border-2 min-h-[150px] transition-colors {dropzoneActive ? 'bg-info/20' : ''}"
 	ondragover={(e) => { e.preventDefault(); dropzoneActive = true }}
 	ondragleave={() => dropzoneActive = false}
 	ondrop={async (e) => {

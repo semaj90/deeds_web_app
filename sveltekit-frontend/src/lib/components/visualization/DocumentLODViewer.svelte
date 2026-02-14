@@ -79,7 +79,7 @@
     </div>
   </div>
 
-  <CardContent class="p-0 min-h-[500px] flex items-center justify-center bg-slate-100 dark:bg-slate-900 overflow-hidden relative">
+  <CardContent class="p-0 min-h-[500px] flex items-center justify-center bg-sand/5 dark:bg-panel overflow-hidden relative">
     {#if isLoading}
       <div class="flex flex-col items-center gap-2">
         <div class="nes-progress is-primary w-48 h-4"></div>

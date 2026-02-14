@@ -155,10 +155,10 @@ import type { Document } from '$lib/types';
   };
   // Get confidence color
   const getConfidenceColor = (confidence?: number) => {
-    if (!confidence) return 'bg-gray-500';
-    if (confidence >= 0.9) return 'bg-green-500';
-    if (confidence >= 0.7) return 'bg-yellow-500';
-    return 'bg-red-500'};
+    if (!confidence) return 'bg-sand/20';
+    if (confidence >= 0.9) return 'bg-accent';
+    if (confidence >= 0.7) return 'bg-warning';
+    return 'bg-danger'};
   // Helper to compute input classes for components (components don't support class: directives)'
   const getInputClasses = (field: FormField) => {
     const errors = get(formErrors);

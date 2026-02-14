@@ -190,7 +190,7 @@
 
   <!-- Error Message -->
   {#if errorMessage}
-    <p class="text-sm text-red-500 mt-1">{errorMessage}</p>
+    <p class="text-sm text-danger mt-1">{errorMessage}</p>
   {/if}
 
   <!-- File List -->
@@ -208,9 +208,9 @@
               <div class="progress-fill" style="width: {file.progress}%"></div>
             </div>
           {:else if file.status === 'completed'}
-            <span class="text-xs text-green-500">Done</span>
+            <span class="text-xs text-accent">Done</span>
           {:else if file.status === 'error'}
-            <span class="text-xs text-red-500">{file.error ?? 'Error'}</span>
+            <span class="text-xs text-danger">{file.error ?? 'Error'}</span>
           {/if}
           <button type="button" class="remove-btn" onclick={() => removeFile(file.id)}>
             <X class="h-3 w-3" />

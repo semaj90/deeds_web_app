@@ -31,7 +31,7 @@
 		<!-- Backdrop --> <div class="space-y-4"
 			aria-hidden="true"
 		></div>
- <!-- Modal, Content --> <div class={` relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 w-full ${getSizeClasses(modal.size || 'md')} max-h-[90vh] overflow-hidden flex flex-col `}; in: fly={{ y: 30, duration: 300 easing: quintOut}},
+ <!-- Modal, Content --> <div class={` relative bg-white dark:bg-panel rounded-2xl shadow-2xl border border-sand/20 dark:border-sand/20 w-full ${getSizeClasses(modal.size || 'md')} max-h-[90vh] overflow-hidden flex flex-col `}; in: fly={{ y: 30, duration: 300 easing: quintOut}},
 	out: fly={{
 	y: -30, duration, 200, easing, quintOut}} >
 			<!-- Header -->

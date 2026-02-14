@@ -151,10 +151,10 @@ function getTrendIcon(direction: string) {
 function getTrendColor(direction: string) {
   switch (direction) {
     case 'up':
-      return 'text-green-600';
+      return 'text-accent';
     case 'down':
-      return 'text-red-600';
-    default:return 'text-gray-600';
+      return 'text-danger';
+    default:return 'text-sand/60';
   }
 }
 
@@ -181,7 +181,7 @@ function getStarRating(rating: number): string {
         <BarChart3 class="w-8 h-8" />
         <div>
           <h1 class="text-3xl font-bold">Feedback Analytics</h1>
-          <p class="text-gray-600">User experience insights and performance metrics</p>
+          <p class="text-sand/60">User experience insights and performance metrics</p>
         </div>
       </div>
 
@@ -303,11 +303,11 @@ function getStarRating(rating: number): string {
             </div>
             <div class="metric-value">
               {#if dashboardData.overview?.averageRating >= 4}
-                <span class="text-green-600">High</span>
+                <span class="text-accent">High</span>
               {:else if dashboardData.overview?.averageRating >= 3}
-                <span class="text-yellow-600">Medium</span>
+                <span class="text-warning">Medium</span>
               {:else}
-                <span class="text-red-600">Low</span>
+                <span class="text-danger">Low</span>
               {/if}
             </div>
             <div class="metric-detail">
@@ -337,12 +337,12 @@ function getStarRating(rating: number): string {
                 <div class="breakdown-change">
                   {#if category.improvement > 0}
                     <ArrowUpRight class="w-4 h-4" />
-                    <span class="text-green-600">+{category.improvement.toFixed(1)}%</span>
+                    <span class="text-accent">+{category.improvement.toFixed(1)}%</span>
                   {:else if category.improvement < 0}
                     <ArrowDownRight class="w-4 h-4" />
-                    <span class="text-red-600">{category.improvement.toFixed(1)}%</span>
+                    <span class="text-danger">{category.improvement.toFixed(1)}%</span>
                   {:else}
-                    <span class="text-gray-600">No change</span>
+                    <span class="text-sand/60">No change</span>
                   {/if}
                 </div>
               </div>
@@ -453,7 +453,7 @@ function getStarRating(rating: number): string {
                         <TrendingDown class="w-4 h-4" />
                         Decreasing
                       {:else}
-                        <span class="text-gray-500">Stable</span>
+                        <span class="text-sand/60">Stable</span>
                       {/if}
                     </span>
                   </div>

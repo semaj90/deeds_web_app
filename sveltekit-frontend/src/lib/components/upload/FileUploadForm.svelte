@@ -151,7 +151,7 @@ function formatFileSize(bytes: number): string {
         supportedFormats={['PDF', 'Word', 'Images', 'Video', 'Audio']}
       />
       {#if $errors.file}
-        <span class="text-sm text-red-500">{$errors.file}</span>
+        <span class="text-sm text-danger">{$errors.file}</span>
       {/if}
     </div>
 
@@ -166,7 +166,7 @@ function formatFileSize(bytes: number): string {
         required
       />
       {#if $errors.title}
-        <span class="text-sm text-red-500">{$errors.title}</span>
+        <span class="text-sm text-danger">{$errors.title}</span>
       {/if}
     </div>
 
@@ -201,7 +201,7 @@ function formatFileSize(bytes: number): string {
         </Select.Content>
       </Select.Root>
       {#if $errors.type}
-        <span class="text-sm text-red-500">{$errors.type}</span>
+        <span class="text-sm text-danger">{$errors.type}</span>
       {/if}
     </div>
 
@@ -217,7 +217,7 @@ function formatFileSize(bytes: number): string {
           required
         />
         {#if $errors.caseId}
-          <span class="text-sm text-red-500">{$errors.caseId}</span>
+          <span class="text-sm text-danger">{$errors.caseId}</span>
         {/if}
       </div>
     {:else}

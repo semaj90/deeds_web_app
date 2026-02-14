@@ -55,31 +55,31 @@ let orientationClasses = $derived(
 );
 
 let variantClasses = $derived({
-	default: 'bg-slate-800 border border-slate-600 rounded-lg p-1',
+	default: 'bg-panelSoft border border-sand/30 rounded-lg p-1',
 	pills: 'gap-2',
-	underline: 'border-b border-slate-600',
-	nes: 'bg-slate-900 border-4 border-white font-["Press_Start_2P",monospace] p-1'
+	underline: 'border-b border-sand/30',
+	nes: 'bg-panel border-4 border-white font-["Press_Start_2P",monospace] p-1'
 }[variant]);
 
 function getTabClasses(tab: TabItem) {
 	const isActive = value === tab.id;
 	const isDisabled = tab.disabled;
 
-	const base = 'px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500';
+	const base = 'px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-info';
 
 	const variants = {
 		default:isActive
-			? 'bg-blue-600 text-white rounded-md'
-			: 'text-slate-400 hover:text-white hover:bg-slate-700 rounded-md',
+			? 'bg-info text-white rounded-md'
+			: 'text-sand/40 hover:text-white hover:bg-panelSoft rounded-md',
 		pills: isActive
-			? 'bg-blue-600 text-white rounded-full'
-			: 'text-slate-400 hover:text-white hover:bg-slate-700 rounded-full',
+			? 'bg-info text-white rounded-full'
+			: 'text-sand/40 hover:text-white hover:bg-panelSoft rounded-full',
 		underline: isActive
-			? 'text-blue-400 border-b-2 border-blue-400 -mb-px'
-			: 'text-slate-400 hover:text-white border-b-2 border-transparent',
+			? 'text-info/80 border-b-2 border-info/80 -mb-px'
+			: 'text-sand/40 hover:text-white border-b-2 border-transparent',
 		nes: isActive
-			? 'bg-blue-600 text-white border-2 border-blue-400'
-			: 'text-slate-400 hover:text-white hover:bg-slate-700 border-2 border-transparent'
+			? 'bg-info text-white border-2 border-info/80'
+			: 'text-sand/40 hover:text-white hover:bg-panelSoft border-2 border-transparent'
 	}[variant];
 
 	const disabled = isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';

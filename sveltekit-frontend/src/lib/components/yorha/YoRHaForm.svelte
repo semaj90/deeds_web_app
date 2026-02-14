@@ -105,16 +105,16 @@
   }
 </script>
 
-<div class="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden shadow-2xl max-w-2xl w-full">
+<div class="bg-panel border border-sand/20 rounded-lg overflow-hidden shadow-2xl max-w-2xl w-full">
   <!-- Header -->
-  <div class="px-6 py-4 bg-slate-950 border-b border-slate-800 flex justify-between items-start">
+  <div class="px-6 py-4 bg-panel border-b border-sand/20 flex justify-between items-start">
     <div>
-      <h2 class="text-sm font-bold text-cyan-500 tracking-[0.2em] uppercase">{title}</h2>
+      <h2 class="text-sm font-bold text-info tracking-[0.2em] uppercase">{title}</h2>
       {#if subtitle}
-        <p class="text-[10px] text-slate-500 font-mono uppercase mt-1">{subtitle}</p>
+        <p class="text-[10px] text-sand/60 font-mono uppercase mt-1">{subtitle}</p>
       {/if}
     </div>
-    <div class="px-2 py-1 border border-cyan-500/30 text-[10px] font-mono {loading ? 'text-yellow-500 animate-pulse' : 'text-cyan-500'}">
+    <div class="px-2 py-1 border border-info/30 text-[10px] font-mono {loading ? 'text-warning animate-pulse' : 'text-info'}">
       {loading ? 'PROCESSING' : 'READY'}
     </div>
   </div>
@@ -123,9 +123,9 @@
   <div class="p-6 space-y-6">
     {#each fields as field}
       <div class="space-y-2">
-        <label for={field.id} class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        <label for={field.id} class="block text-[10px] font-bold text-sand/40 uppercase tracking-widest">
           {field.label}
-          {#if field.required}<span class="text-red-500 ml-1">*</span>{/if}
+          {#if field.required}<span class="text-danger ml-1">*</span>{/if}
         </label>
         <div class="relative">
           {#if field.type === 'textarea'}
@@ -135,14 +135,14 @@
               oninput={(e) => handleInput(field.id, (e.currentTarget as HTMLTextAreaElement).value)}
               disabled={loading || field.disabled}
               placeholder={field.placeholder}
-              class="w-full bg-slate-800 border {errors[field.id] ? 'border-red-500' : 'border-slate-700'} rounded p-3 text-sm text-slate-200 focus:ring-1 focus:ring-cyan-500 outline-none transition-all min-h-[100px]"></textarea>
+              class="w-full bg-panelSoft border {errors[field.id] ? 'border-danger' : 'border-sand/20'} rounded p-3 text-sm text-sand/40 focus:ring-1 focus:ring-info outline-none transition-all min-h-[100px]"></textarea>
           {:else if field.type === 'select'}
             <select
               id={field.id}
               bind:value={formData[field.id]}
               onchange={(e) => handleInput(field.id, (e.currentTarget as HTMLSelectElement).value)}
               disabled={loading || field.disabled}
-              class="w-full bg-slate-800 border {errors[field.id] ? 'border-red-500' : 'border-slate-700'} rounded p-3 text-sm text-slate-200 focus:ring-1 focus:ring-cyan-500 outline-none appearance-none">
+              class="w-full bg-panelSoft border {errors[field.id] ? 'border-danger' : 'border-sand/20'} rounded p-3 text-sm text-sand/40 focus:ring-1 focus:ring-info outline-none appearance-none">
               <option value="">{field.placeholder || 'Select...'}</option>
               {#each field.options || [] as opt}
                 <option value={opt.value}>{opt.label}</option>
@@ -156,8 +156,8 @@
                 bind:checked={formData[field.id]}
                 onchange={(e) => handleInput(field.id, (e.currentTarget as HTMLInputElement).checked)}
                 disabled={loading || field.disabled}
-                class="w-4 h-4 bg-slate-800 border-slate-700 rounded text-cyan-600 focus:ring-cyan-500" />
-              <span class="text-xs text-slate-400 group-hover:text-slate-200 transition-colors uppercase font-mono">
+                class="w-4 h-4 bg-panelSoft border-sand/20 rounded text-info focus:ring-info" />
+              <span class="text-xs text-sand/40 group-hover:text-sand/40 transition-colors uppercase font-mono">
                 {field.placeholder || 'Enable'}
               </span>
             </label>
@@ -169,11 +169,11 @@
               oninput={(e) => handleInput(field.id, (e.currentTarget as HTMLInputElement).value)}
               disabled={loading || field.disabled}
               placeholder={field.placeholder}
-              class="w-full bg-slate-800 border {errors[field.id] ? 'border-red-500' : 'border-slate-700'} rounded p-3 text-sm text-slate-200 focus:ring-1 focus:ring-cyan-500 outline-none transition-all" />
+              class="w-full bg-panelSoft border {errors[field.id] ? 'border-danger' : 'border-sand/20'} rounded p-3 text-sm text-sand/40 focus:ring-1 focus:ring-info outline-none transition-all" />
           {/if}
         </div>
         {#if errors[field.id] && touched[field.id]}
-          <p class="text-[10px] text-red-400 font-mono tracking-tighter uppercase">
+          <p class="text-[10px] text-danger/80 font-mono tracking-tighter uppercase">
             [ERROR]: {errors[field.id]}
           </p>
         {/if}
@@ -182,8 +182,8 @@
   </div>
 
   <!-- Footer -->
-  <div class="px-6 py-4 bg-slate-950 border-t border-slate-800 flex justify-between items-center">
-    <div class="flex gap-4 text-[9px] font-mono text-slate-600 uppercase">
+  <div class="px-6 py-4 bg-panel border-t border-sand/20 flex justify-between items-center">
+    <div class="flex gap-4 text-[9px] font-mono text-sand/60 uppercase">
       <span>Ctrl+Enter Submit</span>
       <span>Esc Abort</span>
     </div>
@@ -192,14 +192,14 @@
         <button
           onclick={oncancel}
           disabled={loading}
-          class="px-4 py-2 border border-slate-700 text-slate-500 hover:text-slate-300 hover:border-slate-500 text-[10px] font-bold tracking-widest uppercase transition-all">
+          class="px-4 py-2 border border-sand/20 text-sand/60 hover:text-sand/40 hover:border-sand/30 text-[10px] font-bold tracking-widest uppercase transition-all">
           {cancelLabel}
         </button>
       {/if}
       <button
         onclick={handleSubmit}
         disabled={loading}
-        class="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-[10px] font-bold tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(8 145 178 0.2)]">
+        class="px-6 py-2 bg-info hover:bg-info text-white text-[10px] font-bold tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(8 145 178 0.2)]">
         {loading ? 'EXECUTING...' : submitLabel}
       </button>
     </div>

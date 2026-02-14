@@ -113,23 +113,23 @@
 
   function getMetricColor(value: number, thresholds: {
 low: number, high: number }): string {
-    if (value >= thresholds.high) return 'text-red-400';
-    if (value >= thresholds.low) return 'text-yellow-400';
-    return 'text-green-400';
+    if (value >= thresholds.high) return 'text-danger/80';
+    if (value >= thresholds.low) return 'text-warning';
+    return 'text-accent';
   }
 </script>
 
-<div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
  <div class="flex items-center justify-between mb-4">
- <h2 class="text-xl font-semibold text-cyan-400">GPU Metrics</h2>
+ <h2 class="text-xl font-semibold text-info">GPU Metrics</h2>
  {#if loading}
- <div class="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+ <div class="w-4 h-4 border-2 border-info/80 border-t-transparent rounded-full animate-spin"></div>
  {/if}
  </div>
 
  {#if error}
  <div class="text-center py-4 mb-4">
- <div class="text-red-400 text-sm">⚠️ {error}</div>
+ <div class="text-danger/80 text-sm">⚠️ {error}</div>
  </div>
  {/if}
 
@@ -137,12 +137,12 @@ low: number, high: number }): string {
  <!-- GPU Utilization -->
  <div>
  <div class="flex justify-between text-sm mb-1">
- <span class="text-slate-300">GPU Utilization</span>
+ <span class="text-sand/40">GPU Utilization</span>
  <span class="{getMetricColor(gpuMetrics.utilization, {low: 60, high: 85})}">{gpuMetrics.utilization}%</span>
  </div>
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div
- class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
+ class="h-2 rounded-full bg-info/80 transition-all duration-300"
  style="width: {gpuMetrics.utilization}%"
  ></div>
  </div>
@@ -151,14 +151,14 @@ low: number, high: number }): string {
  <!-- Memory Usage -->
  <div>
  <div class="flex justify-between text-sm mb-1">
- <span class="text-slate-300">VRAM Usage</span>
+ <span class="text-sand/40">VRAM Usage</span>
  <span class="{getMetricColor((gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100, {low: 70, high: 90})}">
  {gpuMetrics.memoryUsed.toFixed(1)} / {gpuMetrics.memoryTotal} GB
  </span>
  </div>
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div
- class="h-2 rounded-full bg-green-400 transition-all duration-300"
+ class="h-2 rounded-full bg-accent/80 transition-all duration-300"
  style="width: {(gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100}%"
  ></div>
  </div>
@@ -166,51 +166,51 @@ low: number, high: number }): string {
 
  <!-- Temperature -->
  <div class="grid grid-cols-3 gap-4 text-center">
- <div class="bg-slate-700/30 rounded-lg p-3">
+ <div class="bg-panelSoft/30 rounded-lg p-3">
  <div class="text-lg font-bold {getMetricColor(gpuMetrics.temperature {low: 70 high: 85})}">
  {gpuMetrics.temperature}°C
  </div>
- <div class="text-xs text-slate-400">Temperature</div>
+ <div class="text-xs text-sand/40">Temperature</div>
  </div>
 
- <div class="bg-slate-700/30 rounded-lg p-3">
- <div class="text-lg font-bold text-blue-400">{gpuMetrics.powerDraw}W</div>
- <div class="text-xs text-slate-400">Power Draw</div>
+ <div class="bg-panelSoft/30 rounded-lg p-3">
+ <div class="text-lg font-bold text-info/80">{gpuMetrics.powerDraw}W</div>
+ <div class="text-xs text-sand/40">Power Draw</div>
  </div>
 
- <div class="bg-slate-700/30 rounded-lg p-3">
- <div class="text-lg font-bold text-purple-400">{gpuMetrics.fanSpeed}%</div>
- <div class="text-xs text-slate-400">Fan Speed</div>
+ <div class="bg-panelSoft/30 rounded-lg p-3">
+ <div class="text-lg font-bold text-info/80">{gpuMetrics.fanSpeed}%</div>
+ <div class="text-xs text-sand/40">Fan Speed</div>
  </div>
  </div>
 
  <!-- Performance History (Mini Chart) -->
- <div class="pt-4 border-t border-slate-700/50">
- <h3 class="text-sm font-medium text-slate-300 mb-3">Performance History</h3>
- <div class="h-16 bg-slate-700/30 rounded flex items-end space-x-1 p-2">
+ <div class="pt-4 border-t border-sand/20/50">
+ <h3 class="text-sm font-medium text-sand/40 mb-3">Performance History</h3>
+ <div class="h-16 bg-panelSoft/30 rounded flex items-end space-x-1 p-2">
  {#each performanceHistory as point}
  <div
- class="bg-cyan-400/60 rounded-sm flex-1 transition-all duration-200"
+ class="bg-info/80/60 rounded-sm flex-1 transition-all duration-200"
  style="height: {point.utilization}%"
  ></div>
  {/each}
  </div>
- <div class="flex justify-between text-xs text-slate-400 mt-1">
+ <div class="flex justify-between text-xs text-sand/40 mt-1">
  <span>Utilization %</span>
  <span>Last 100s</span>
  </div>
  </div>
 
  <!-- GPU Capabilities -->
- <div class="pt-4 border-t border-slate-700/50">
- <h3 class="text-sm font-medium text-slate-300 mb-2">Active Capabilities</h3>
+ <div class="pt-4 border-t border-sand/20/50">
+ <h3 class="text-sm font-medium text-sand/40 mb-2">Active Capabilities</h3>
  <div class="flex flex-wrap gap-1">
- <span class="px-2 py-1 bg-cyan-400/20 text-cyan-400 text-xs rounded">WebGPU</span>
- <span class="px-2 py-1 bg-green-400/20 text-green-400 text-xs rounded">Compute Shaders</span>
- <span class="px-2 py-1 bg-blue-400/20 text-blue-400 text-xs rounded">Tensor Ops</span>
- <span class="px-2 py-1 bg-purple-400/20 text-purple-400 text-xs rounded">Vector Search</span>
+ <span class="px-2 py-1 bg-info/80/20 text-info text-xs rounded">WebGPU</span>
+ <span class="px-2 py-1 bg-accent/80/20 text-accent text-xs rounded">Compute Shaders</span>
+ <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">Tensor Ops</span>
+ <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">Vector Search</span>
  {#if appStore.systemMetrics?.gpu?.model}
- <span class="px-2 py-1 bg-yellow-400/20 text-yellow-400 text-xs rounded">{appStore.systemMetrics.gpu.model}</span>
+ <span class="px-2 py-1 bg-warning/20 text-warning text-xs rounded">{appStore.systemMetrics.gpu.model}</span>
  {/if}
  </div>
  </div>

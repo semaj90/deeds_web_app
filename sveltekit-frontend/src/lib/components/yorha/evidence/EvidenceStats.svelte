@@ -44,84 +44,84 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
  <!-- Total Documents -->
- <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+ <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
  <div class="flex items-center justify-between">
  <div>
- <p class="text-sm font-medium text-slate-400">Total Documents</p>
+ <p class="text-sm font-medium text-sand/40">Total Documents</p>
  <p class="text-3xl font-bold text-white">{stats.totalDocuments.toLocaleString()}</p>
  </div>
- <div class="p-3 bg-cyan-400/20 rounded-lg">
+ <div class="p-3 bg-info/80/20 rounded-lg">
  <span class="text-2xl">📚</span>
  </div>
  </div>
  <div class="mt-4">
- <div class="text-sm text-slate-400">
+ <div class="text-sm text-sand/40">
  {stats.totalSize} total storage
  </div>
  </div>
  </div>
 
  <!-- Processing Status -->
- <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+ <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
  <div class="flex items-center justify-between">
  <div>
- <p class="text-sm font-medium text-slate-400">Processing Status</p>
- <p class="text-3xl font-bold text-green-400">{stats.documentsProcessed.toLocaleString()}</p>
+ <p class="text-sm font-medium text-sand/40">Processing Status</p>
+ <p class="text-3xl font-bold text-accent">{stats.documentsProcessed.toLocaleString()}</p>
  </div>
- <div class="p-3 bg-green-400/20 rounded-lg">
+ <div class="p-3 bg-accent/80/20 rounded-lg">
  <span class="text-2xl">⚡</span>
  </div>
  </div>
  <div class="mt-4">
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div
- class="h-2 rounded-full bg-green-400 transition-all duration-300"
+ class="h-2 rounded-full bg-accent/80 transition-all duration-300"
  style="width: {(stats.documentsProcessed / stats.totalDocuments) * 100}%"
  ></div>
  </div>
- <p class="text-xs text-slate-400 mt-1">
+ <p class="text-xs text-sand/40 mt-1">
  {Math.round((stats.documentsProcessed / stats.totalDocuments) * 100)}% processed
  </p>
  </div>
  </div>
 
  <!-- AI Analysis -->
- <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+ <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
  <div class="flex items-center justify-between">
  <div>
- <p class="text-sm font-medium text-slate-400">AI Analyzed</p>
- <p class="text-3xl font-bold text-purple-400">{stats.aiAnalyzed.toLocaleString()}</p>
+ <p class="text-sm font-medium text-sand/40">AI Analyzed</p>
+ <p class="text-3xl font-bold text-info/80">{stats.aiAnalyzed.toLocaleString()}</p>
  </div>
- <div class="p-3 bg-purple-400/20 rounded-lg">
+ <div class="p-3 bg-info/80/20 rounded-lg">
  <span class="text-2xl">🤖</span>
  </div>
  </div>
  <div class="mt-4">
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div
- class="h-2 rounded-full bg-purple-400 transition-all duration-300"
+ class="h-2 rounded-full bg-info/80 transition-all duration-300"
  style="width: {(stats.aiAnalyzed / stats.totalDocuments) * 100}%"
  ></div>
  </div>
- <p class="text-xs text-slate-400 mt-1">
+ <p class="text-xs text-sand/40 mt-1">
  {stats.successRate}% accuracy rate
  </p>
  </div>
  </div>
 
  <!-- Pending Analysis -->
- <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+ <div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
  <div class="flex items-center justify-between">
  <div>
- <p class="text-sm font-medium text-slate-400">Pending Analysis</p>
- <p class="text-3xl font-bold text-yellow-400">{stats.pendingAnalysis.toLocaleString()}</p>
+ <p class="text-sm font-medium text-sand/40">Pending Analysis</p>
+ <p class="text-3xl font-bold text-warning">{stats.pendingAnalysis.toLocaleString()}</p>
  </div>
- <div class="p-3 bg-yellow-400/20 rounded-lg">
+ <div class="p-3 bg-warning/20 rounded-lg">
  <span class="text-2xl">⏳</span>
  </div>
  </div>
  <div class="mt-4">
- <div class="text-sm text-slate-400">
+ <div class="text-sm text-sand/40">
  Avg processing: {stats.avgProcessingTime}
  </div>
  </div>
@@ -129,31 +129,31 @@
 </div>
 
 <!-- Processing Queue -->
-<div class="mt-6 bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
- <h3 class="text-lg font-semibold text-cyan-400 mb-4">Active Processing Queue</h3>
+<div class="mt-6 bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
+ <h3 class="text-lg font-semibold text-info mb-4">Active Processing Queue</h3>
 
  {#if processingQueue.length > 0}
  <div class="space-y-3">
  {#each processingQueue as item}
- <div class="bg-slate-700/30 rounded-lg p-4">
+ <div class="bg-panelSoft/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">
  <div class="flex items-center space-x-3">
- <div class="w-8 h-8 bg-cyan-400/20 rounded-lg flex items-center justify-center">
+ <div class="w-8 h-8 bg-info/80/20 rounded-lg flex items-center justify-center">
  <span class="text-sm">📄</span>
  </div>
  <div>
  <div class="font-medium text-white text-sm">{item.name}</div>
- <div class="text-xs text-slate-400">{item.id}</div>
+ <div class="text-xs text-sand/40">{item.id}</div>
  </div>
  </div>
  <div class="text-right">
- <div class="text-sm text-cyan-400">{item.progress}%</div>
- <div class="text-xs text-slate-400">ETA: {item.eta}</div>
+ <div class="text-sm text-info">{item.progress}%</div>
+ <div class="text-xs text-sand/40">ETA: {item.eta}</div>
  </div>
  </div>
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div
- class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
+ class="h-2 rounded-full bg-info/80 transition-all duration-300"
  style="width: {item.progress}%"
  ></div>
  </div>
@@ -163,8 +163,8 @@
  {:else}
  <div class="text-center py-8">
  <div class="text-4xl mb-4">✅</div>
- <p class="text-slate-400">No documents currently processing</p>
- <p class="text-sm text-slate-500 mt-1">All evidence has been analyzed</p>
+ <p class="text-sand/40">No documents currently processing</p>
+ <p class="text-sm text-sand/60 mt-1">All evidence has been analyzed</p>
  </div>
  {/if}
 </div>

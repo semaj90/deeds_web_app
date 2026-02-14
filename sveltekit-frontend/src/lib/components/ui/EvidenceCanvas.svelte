@@ -123,10 +123,10 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
       {#if item.confidence !== undefined}
         <div class="mt-2">
-          <div class="text-xs text-gray-400 mb-1">Confidence</div>
-          <div class="w-full bg-gray-700 rounded-full h-2">
+          <div class="text-xs text-sand/40 mb-1">Confidence</div>
+          <div class="w-full bg-panelSoft rounded-full h-2">
             <div
-              class="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-2 rounded-full"
+              class="bg-gradient-to-r from-danger via-yellow-500 to-accent h-2 rounded-full"
               style="width: {Math.max(5, item.confidence*100)}%"
             ></div>
           </div>
@@ -138,8 +138,8 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   {#if !evidenceItems.length}
     <div class="col-span-full text-center py-12 opacity-70">
       <div class="nes-icon is-large star animate-pulse"></div>
-      <p class="mt-4 text-gray-400">No evidence items yet</p>
-      <p class="text-sm text-gray-500">Upload documents or add evidence to get started</p>
+      <p class="mt-4 text-sand/40">No evidence items yet</p>
+      <p class="text-sm text-sand/60">Upload documents or add evidence to get started</p>
     </div>
   {/if}
 </div>
@@ -148,7 +148,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 <Dialog.Root bind:open={showModal}>
   <Dialog.Portal>
     <Dialog.Overlay class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm px-4" />
-    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border border-gray-700 bg-gray-900 p-6 shadow-lg sm: rounded-lg md w-full">
+    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border border-sand/20 bg-panel p-6 shadow-lg sm: rounded-lg md w-full">
       {#if selectedItem}
         <Dialog.Title class="text-lg font-bold">{selectedItem.title ?? 'Evidence Details'}</Dialog.Title>
 
@@ -159,7 +159,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
           <section>
             <h4 class="font-semibold mb-2">Description</h4>
-            <p class="text-sm text-gray-300">{selectedItem.description ?? 'No description.'}</p>
+            <p class="text-sm text-sand/40">{selectedItem.description ?? 'No description.'}</p>
           </section>
 
           {#if selectedItem.tags?.length}
@@ -179,8 +179,8 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
               <dl class="text-xs space-y-1">
                 {#each Object.entries(selectedItem.metadata) as [key, value]}
                   <div class="flex justify-between">
-                    <dt class="text-gray-400">{key}</dt>
-                    <dd class="text-gray-200">{String(value)}</dd>
+                    <dt class="text-sand/40">{key}</dt>
+                    <dd class="text-sand/40">{String(value)}</dd>
                   </div>
                 {/each}
               </dl>
@@ -191,9 +191,9 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
             <section>
               <h4 class="font-semibold mb-2">AI Confidence</h4>
               <div class="flex items-center gap-2">
-                <div class="flex-1 bg-gray-700 rounded-full h-3">
+                <div class="flex-1 bg-panelSoft rounded-full h-3">
                   <div
-                    class="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-3 rounded-full"
+                    class="bg-gradient-to-r from-danger via-yellow-500 to-accent h-3 rounded-full"
                     style="width: {selectedItem.confidence*100}%"
                   ></div>
                 </div>
@@ -208,18 +208,18 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
               <div class="space-y-3">
                 {#if selectedItem.metadata.analysis.summary}
                   <div>
-                    <h5 class="text-sm font-medium text-gray-300 mb-1">Summary</h5>
-                    <p class="text-sm text-gray-200">{selectedItem.metadata.analysis.summary}</p>
+                    <h5 class="text-sm font-medium text-sand/40 mb-1">Summary</h5>
+                    <p class="text-sm text-sand/40">{selectedItem.metadata.analysis.summary}</p>
                   </div>
                 {/if}
 
                 {#if selectedItem.metadata.analysis.key_points?.length}
                   <div>
-                    <h5 class="text-sm font-medium text-gray-300 mb-1">Key Points</h5>
-                    <ul class="text-sm text-gray-200 space-y-1">
+                    <h5 class="text-sm font-medium text-sand/40 mb-1">Key Points</h5>
+                    <ul class="text-sm text-sand/40 space-y-1">
                       {#each selectedItem.metadata.analysis.key_points as point}
                         <li class="flex items-start gap-2">
-                          <span class="text-blue-400 mt-1">•</span>
+                          <span class="text-info/80 mt-1">•</span>
                           <span>{point}</span>
                         </li>
                       {/each}
@@ -229,11 +229,11 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
                 {#if selectedItem.metadata.analysis.recommendations?.length}
                   <div>
-                    <h5 class="text-sm font-medium text-gray-300 mb-1">Recommendations</h5>
-                    <ul class="text-sm text-gray-200 space-y-1">
+                    <h5 class="text-sm font-medium text-sand/40 mb-1">Recommendations</h5>
+                    <ul class="text-sm text-sand/40 space-y-1">
                       {#each selectedItem.metadata.analysis.recommendations as rec}
                         <li class="flex items-start gap-2">
-                          <span class="text-green-400 mt-1">→</span>
+                          <span class="text-accent mt-1">→</span>
                           <span>{rec}</span>
                         </li>
                       {/each}

@@ -28,7 +28,7 @@
  />
 
  {#if enhanced}
- <div class="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 text-xs font-bold rounded">
+ <div class="absolute top-2 right-2 bg-warning text-black px-2 py-1 text-xs font-bold rounded">
  ENHANCED
  </div>
  {/if}
@@ -37,7 +37,7 @@
  <div class="mt-3 flex gap-3">
  <button
  onclick={toggleEnhance}
- class="px-3 py-1 border border-black bg-yellow-200 hover:bg-yellow-300 transition-colors"
+ class="px-3 py-1 border border-black bg-warning/10 hover:bg-warning/60 transition-colors"
  >
  {enhanced ? 'Remove Enhance' : 'Enhance'}
  </button>

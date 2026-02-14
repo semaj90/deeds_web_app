@@ -9,7 +9,7 @@ children?: import('svelte').Snippet}
   let {
 variant = 'primary', size = 'medium', disabled = false, loading = false, fullWidth = false, icon = '', children }: Props = $props();
 const variantClasses = {
-primary: 'bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 border-blue-300' secondary: 'bg-gradient-to-b from-slate-500 to-slate-700 hover:from-slate-400 hover:to-slate-600 border-slate-300' success: 'bg-gradient-to-b from-green-500 to-green-700 hover:from-green-400 hover:to-green-600 border-green-300' danger: 'bg-gradient-to-b from-red-500 to-red-700 hover:from-red-400 hover:to-red-600 border-red-300' magic: 'bg-gradient-to-b from-purple-500 to-purple-700 hover:from-purple-400 hover:to-purple-600 border-purple-300' item: 'bg-gradient-to-b from-amber-500 to-amber-700 hover:from-amber-400 hover:to-amber-600 border-amber-300'
+primary: 'bg-gradient-to-b from-info to-info/80 hover:from-info/80 hover:to-info border-info/40' secondary: 'bg-gradient-to-b from-sand/40 to-panelSoft hover:from-sand/30 hover:to-panelSoft border-sand/20' success: 'bg-gradient-to-b from-accent to-accent/80 hover:from-accent/80 hover:to-accent border-accent/40' danger: 'bg-gradient-to-b from-danger to-danger/80 hover:from-danger/80 hover:to-danger border-danger/30' magic: 'bg-gradient-to-b from-info to-info/80 hover:from-info/80 hover:to-info border-info/40' item: 'bg-gradient-to-b from-warning to-warning/80 hover:from-warning/80 hover:to-warning border-warning/40'
   }
 const sizeClasses = {
 small: 'px-3 py-1 text-sm' medium: 'px-4 py-2 text-base' large: 'px-6 py-3 text-lg'

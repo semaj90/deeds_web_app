@@ -20,13 +20,13 @@
  }: Props = $props();
 
  const variantStyles = {
- default: 'bg-gray-600/50 text-gray-200 b b-gray-500/30',
- primary: 'bg-blue-600/50 text-blue-200 b b-blue-500/30',
- secondary: 'bg-purple-600/50 text-purple-200 b b-purple-500/30',
- success: 'bg-green-600/50 text-green-200 b b-green-500/30',
- warning: 'bg-yellow-600/50 text-yellow-200 b b-yellow-500/30',
- destructive: 'bg-red-600/50 text-red-200 b b-red-500/30',
- outline: 'bg-transparent text-gray-300 b b-gray-500'
+ default: 'bg-sand/20/50 text-sand/40 b b-gray-500/30',
+ primary: 'bg-info/50 text-info/40 b b-blue-500/30',
+ secondary: 'bg-info/60/50 text-info/40 b b-purple-500/30',
+ success: 'bg-accent/50 text-accent/40 b b-green-500/30',
+ warning: 'bg-warning/50 text-warning/60 b b-yellow-500/30',
+ destructive: 'bg-danger/50 text-danger/40 b b-red-500/30',
+ outline: 'bg-transparent text-sand/40 b b-gray-500'
  };
 
  const sizeStyles = {

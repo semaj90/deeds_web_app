@@ -53,13 +53,13 @@
 
   function getStatusColor(value: number, inverse = false): string {
     if (inverse) {
-        if (value < 50) return 'text-red-400';
-        if (value < 80) return 'text-yellow-400';
-        return 'text-green-400';
+        if (value < 50) return 'text-danger/80';
+        if (value < 80) return 'text-warning';
+        return 'text-accent';
     }
-    if (value >= 80) return 'text-red-400';
-    if (value >= 60) return 'text-yellow-400';
-    return 'text-green-400';
+    if (value >= 80) return 'text-danger/80';
+    if (value >= 60) return 'text-warning';
+    return 'text-accent';
   }
 
   function getStatusIcon(value: number): string {
@@ -69,15 +69,15 @@
   }
 </script>
 
-<div class="system-status p-4 rounded-lg bg-black/40 border border-slate-700 backdrop-blur-sm">
+<div class="system-status p-4 rounded-lg bg-black/40 border border-sand/20 backdrop-blur-sm">
   <div class="grid grid-cols-2 gap-4">
 
     <!-- CPU -->
     <div class="metric-item flex flex-col">
-      <span class="text-xs text-slate-400 uppercase tracking-wider">CPU Load</span>
+      <span class="text-xs text-sand/40 uppercase tracking-wider">CPU Load</span>
       <div class="flex items-baseline gap-2">
         <span class="text-xl font-mono {getStatusColor(systemMetrics.cpu)}">{systemMetrics.cpu}%</span>
-        <div class="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden self-center">
+        <div class="h-1.5 flex-1 bg-panelSoft rounded-full overflow-hidden self-center">
             <div class="h-full bg-current transition-all duration-500" style="width: {systemMetrics.cpu}%"></div>
         </div>
       </div>
@@ -85,10 +85,10 @@
 
     <!-- Memory -->
     <div class="metric-item flex flex-col">
-      <span class="text-xs text-slate-400 uppercase tracking-wider">Memory</span>
+      <span class="text-xs text-sand/40 uppercase tracking-wider">Memory</span>
       <div class="flex items-baseline gap-2">
         <span class="text-xl font-mono {getStatusColor(systemMetrics.memory)}">{systemMetrics.memory}%</span>
-        <div class="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden self-center">
+        <div class="h-1.5 flex-1 bg-panelSoft rounded-full overflow-hidden self-center">
             <div class="h-full bg-current transition-all duration-500" style="width: {systemMetrics.memory}%"></div>
         </div>
       </div>
@@ -96,24 +96,24 @@
 
     <!-- GPU -->
     <div class="metric-item flex flex-col">
-      <span class="text-xs text-slate-400 uppercase tracking-wider">GPU Core</span>
+      <span class="text-xs text-sand/40 uppercase tracking-wider">GPU Core</span>
       <div class="flex items-baseline gap-2">
-        <span class="text-xl font-mono {webgpuReady ? 'text-blue-400' : 'text-orange-400'}">{systemMetrics.gpu}%</span>
-        <div class="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden self-center">
-            <div class="h-full {webgpuReady ? 'bg-blue-400' : 'bg-orange-400'} transition-all duration-500" style="width: {systemMetrics.gpu}%"></div>
+        <span class="text-xl font-mono {webgpuReady ? 'text-info/80' : 'text-warning'}">{systemMetrics.gpu}%</span>
+        <div class="h-1.5 flex-1 bg-panelSoft rounded-full overflow-hidden self-center">
+            <div class="h-full {webgpuReady ? 'bg-info/80' : 'bg-warning/80'} transition-all duration-500" style="width: {systemMetrics.gpu}%"></div>
         </div>
       </div>
-       <span class="text-[0.65rem] {webgpuReady ? 'text-green-400' : 'text-yellow-500'}">
+       <span class="text-[0.65rem] {webgpuReady ? 'text-accent' : 'text-warning'}">
           {webgpuReady ? 'ACCELERATED' : (cpuFallbackReady ? 'SOFTWARE FALLBACK' : 'OFFLINE')}
        </span>
     </div>
 
     <!-- Network -->
     <div class="metric-item flex flex-col">
-      <span class="text-xs text-slate-400 uppercase tracking-wider">Network</span>
+      <span class="text-xs text-sand/40 uppercase tracking-wider">Network</span>
       <div class="flex items-baseline gap-2">
         <span class="text-xl font-mono {getStatusColor(systemMetrics.network, true)}">{systemMetrics.network}%</span>
-        <div class="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden self-center">
+        <div class="h-1.5 flex-1 bg-panelSoft rounded-full overflow-hidden self-center">
             <div class="h-full bg-current transition-all duration-500" style="width: {systemMetrics.network}%"></div>
         </div>
       </div>

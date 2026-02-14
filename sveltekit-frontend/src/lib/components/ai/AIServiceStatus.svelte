@@ -117,9 +117,9 @@
 		<div class="service-list">
 			<div class="service-item">
 				{#if serviceStatus.ollama}
-					<CheckCircle class="w-5 h-5 text-green-500" />
+					<CheckCircle class="w-5 h-5 text-accent" />
 				{:else}
-					<XCircle class="w-5 h-5 text-red-500" />
+					<XCircle class="w-5 h-5 text-danger" />
 				{/if}
 				<div class="service-info">
 					<div class="service-name">Ollama AI</div>
@@ -132,9 +132,9 @@
 
 			<div class="service-item">
 				{#if serviceStatus.embedding}
-					<CheckCircle class="w-5 h-5 text-green-500" />
+					<CheckCircle class="w-5 h-5 text-accent" />
 				{:else}
-					<XCircle class="w-5 h-5 text-red-500" />
+					<XCircle class="w-5 h-5 text-danger" />
 				{/if}
 				<div class="service-info">
 					<div class="service-name">Embedding Service</div>
@@ -147,9 +147,9 @@
 
 			<div class="service-item">
 				{#if serviceStatus.qdrant}
-					<CheckCircle class="w-5 h-5 text-green-500" />
+					<CheckCircle class="w-5 h-5 text-accent" />
 				{:else}
-					<XCircle class="w-5 h-5 text-red-500" />
+					<XCircle class="w-5 h-5 text-danger" />
 				{/if}
 				<div class="service-info">
 					<div class="service-name">Qdrant Vector DB</div>
@@ -162,9 +162,9 @@
 
 			<div class="service-item">
 				{#if serviceStatus.rag}
-					<CheckCircle class="w-5 h-5 text-green-500" />
+					<CheckCircle class="w-5 h-5 text-accent" />
 				{:else}
-					<XCircle class="w-5 h-5 text-red-500" />
+					<XCircle class="w-5 h-5 text-danger" />
 				{/if}
 				<div class="service-info">
 					<div class="service-name">RAG Pipeline</div>

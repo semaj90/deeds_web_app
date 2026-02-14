@@ -280,31 +280,31 @@
     role="dialog"
     aria-modal="true"
   >
-    <div class="nier-container bg-gray-900 border-2 border-yellow-400 shadow-2xl overflow-hidden">
+    <div class="nier-container bg-panel border-2 border-warning shadow-2xl overflow-hidden">
 
-      <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-transparent to-yellow-400 opacity-20 animate-pulse pointer-events-none"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-warning via-transparent to-warning opacity-20 animate-pulse pointer-events-none"></div>
 
       <!-- Header -->
-      <div class="border-b border-yellow-400/30 p-4 relative">
+      <div class="border-b border-warning/30 p-4 relative">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="nier-icon-container">
-              <Sparkles class="w-6 h-6 text-yellow-400 animate-pulse" />
+              <Sparkles class="w-6 h-6 text-warning animate-pulse" />
             </div>
-            <h2 class="text-xl font-mono text-yellow-400 tracking-wider">
+            <h2 class="text-xl font-mono text-warning tracking-wider">
               AI-POWERED SEARCH SYSTEM
             </h2>
           </div>
 
           <div class="flex items-center gap-2">
             {#if useMCPAnalysis}
-              <div class="nier-status-badge bg-green-500/20 border border-green-500/50 text-green-400">
+              <div class="nier-status-badge bg-accent/20 border border-accent/50 text-accent">
                 <Brain class="w-3 h-3" />
                 MCP
               </div>
             {/if}
             {#if useSemanticSearch}
-              <div class="nier-status-badge bg-blue-500/20 border border-blue-500/50 text-blue-400">
+              <div class="nier-status-badge bg-info/20 border border-info/50 text-info/80">
                 <Target class="w-3 h-3" />
                 SEMANTIC
               </div>
@@ -316,32 +316,32 @@
       <!-- Main Search Area -->
       <div class="p-6 space-y-4">
         <div class="relative">
-          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-sand/40 z-10" />
           <input
             bind:value={searchQuery}
             onkeydown={handleKeydown}
             placeholder="Search cases, evidence, documents with AI..."
-            class="nier-input w-full pl-12 pr-16 py-4 bg-black border border-yellow-400/50 text-white font-mono placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:shadow-lg focus:shadow-yellow-400/20 transition-all duration-300"
+            class="nier-input w-full pl-12 pr-16 py-4 bg-black border border-warning/50 text-white font-mono placeholder-sand/40 focus:outline-none focus:border-warning focus:shadow-lg focus:shadow-warning/20 transition-all duration-300"
             disabled={isSearching}
             data-testid="search-input"
           />
 
           <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
             {#if isSearching}
-              <div class="w-5 h-5 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin"></div>
+              <div class="w-5 h-5 border-2 border-warning/30 border-t-warning rounded-full animate-spin"></div>
             {:else if searchResults.length > 0}
-              <div class="text-green-400 text-sm font-mono">{searchResults.length}</div>
+              <div class="text-accent text-sm font-mono">{searchResults.length}</div>
             {/if}
           </div>
 
           {#if suggestions.length > 0 && searchQuery.length >= 3}
             <div
-              class="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-600 max-h-40 overflow-y-auto z-20"
+              class="absolute top-full left-0 right-0 mt-2 bg-panelSoft border border-sand/30 max-h-40 overflow-y-auto z-20"
               transition:fly={{ y: -10, duration: 200 }}
             >
               {#each suggestions as suggestion}
                 <button
-                  class="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 hover:text-white font-mono text-sm transition-colors"
+                  class="w-full px-4 py-2 text-left text-sand/40 hover:bg-panelSoft hover:text-white font-mono text-sm transition-colors"
                   onclick={() => selectSuggestion(suggestion)}
                 >
                   <Search class="w-4 h-4 inline mr-2" />
@@ -381,12 +381,12 @@
         <!-- Advanced Options Panel -->
         {#if showAdvanced}
           <div
-            class="nier-advanced-panel bg-gray-800/50 border border-gray-600 p-4 space-y-3"
+            class="nier-advanced-panel bg-panelSoft/50 border border-sand/30 p-4 space-y-3"
             transition:fly={{ y: -20, duration: 300, easing: elasticOut }}
           >
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div class="space-y-2">
-                <label class="text-yellow-400 font-mono text-sm">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
+                <label class="text-warning font-mono text-sm">AI CONFIDENCE: {Math.round(aiConfidenceThreshold * 100)}%</label>
                 <input
                   type="range"
                   bind:value={aiConfidenceThreshold}
@@ -398,13 +398,13 @@
               </div>
 
               <div class="space-y-2">
-                <label class="text-yellow-400 font-mono text-sm">FEATURES</label>
+                <label class="text-warning font-mono text-sm">FEATURES</label>
                 <div class="space-y-1">
-                  <label class="flex items-center gap-2 text-gray-300 font-mono text-sm cursor-pointer">
+                  <label class="flex items-center gap-2 text-sand/40 font-mono text-sm cursor-pointer">
                     <input type="checkbox" bind:checked={useSemanticSearch} class="nier-checkbox" />
                     Semantic Search
                   </label>
-                  <label class="flex items-center gap-2 text-gray-300 font-mono text-sm cursor-pointer">
+                  <label class="flex items-center gap-2 text-sand/40 font-mono text-sm cursor-pointer">
                     <input type="checkbox" bind:checked={useMCPAnalysis} class="nier-checkbox" />
                     MCP Analysis
                   </label>
@@ -412,11 +412,11 @@
               </div>
 
               <div class="space-y-2">
-                <label class="text-yellow-400 font-mono text-sm">RECENT SEARCHES</label>
+                <label class="text-warning font-mono text-sm">RECENT SEARCHES</label>
                 <div class="space-y-1 max-h-20 overflow-y-auto">
                   {#each searchHistory.slice(0, 3) as query}
                     <button
-                      class="block w-full text-left text-gray-400 hover:text-white font-mono text-xs p-1 rounded hover:bg-gray-700 transition-colors"
+                      class="block w-full text-left text-sand/40 hover:text-white font-mono text-xs p-1 rounded hover:bg-panelSoft transition-colors"
                       onclick={() => selectHistory(query)}
                     >
                       {query}
@@ -432,7 +432,7 @@
         <button
           onclick={performAISearch}
           disabled={isSearching || !searchQuery.trim()}
-          class="nier-search-btn w-full py-4 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-mono font-bold transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+          class="nier-search-btn w-full py-4 bg-warning hover:bg-warning/60 disabled:bg-sand/20 disabled:cursor-not-allowed text-black font-mono font-bold transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
           data-testid="ai-search-btn"
         >
           <div class="flex items-center justify-center gap-3">
@@ -449,10 +449,10 @@
 
       <!-- Search Results -->
       {#if searchResults.length > 0}
-        <div class="border-t border-yellow-400/30 max-h-96 overflow-y-auto" data-testid="search-results">
+        <div class="border-t border-warning/30 max-h-96 overflow-y-auto" data-testid="search-results">
           {#each searchResults as result, index (result.id)}
             <div
-              class="nier-result-item border-b border-gray-700/50 p-4 hover:bg-gray-800/50 cursor-pointer transition-all duration-200 group"
+              class="nier-result-item border-b border-sand/20/50 p-4 hover:bg-panelSoft/50 cursor-pointer transition-all duration-200 group"
               onclick={() => selectResult(result)}
               role="button"
               tabindex="0"
@@ -461,13 +461,13 @@
               data-testid="result-item"
             >
               <div class="flex items-start gap-4">
-                <div class="nier-result-index w-10 h-10 bg-yellow-400/20 border border-yellow-400/50 flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-400/30 transition-colors">
-                  <span class="text-yellow-400 font-mono font-bold text-sm">{String(index + 1).padStart(2, '0')}</span>
+                <div class="nier-result-index w-10 h-10 bg-warning/20 border border-warning/50 flex items-center justify-center flex-shrink-0 group-hover:bg-warning/30 transition-colors">
+                  <span class="text-warning font-mono font-bold text-sm">{String(index + 1).padStart(2, '0')}</span>
                 </div>
 
                 <div class="flex-1 min-w-0">
                   <div class="flex items-start justify-between gap-2 mb-2">
-                    <h3 class="text-white font-mono font-bold text-lg leading-tight group-hover:text-yellow-400 transition-colors">
+                    <h3 class="text-white font-mono font-bold text-lg leading-tight group-hover:text-warning transition-colors">
                       {result.title}
                     </h3>
 
@@ -479,28 +479,28 @@
                     {/if}
                   </div>
 
-                  <p class="text-gray-300 text-sm mb-3 line-clamp-2 leading-relaxed">
+                  <p class="text-sand/40 text-sm mb-3 line-clamp-2 leading-relaxed">
                     {result.excerpt}
                   </p>
 
                   <div class="flex items-center flex-wrap gap-3 text-xs">
-                    <span class="nier-type-badge bg-gray-800 border border-gray-600 px-2 py-1">
+                    <span class="nier-type-badge bg-panelSoft border border-sand/30 px-2 py-1">
                       {result.type?.toUpperCase()}
                     </span>
 
                     {#if result.relevanceScore}
-                      <span class="text-blue-400 flex items-center gap-1">
+                      <span class="text-info/80 flex items-center gap-1">
                         <Target class="w-3 h-3" />
                         {Math.round(result.relevanceScore * 100)}% relevant
                       </span>
                     {/if}
 
-                    <span class="text-gray-500">{result.lastModified}</span>
+                    <span class="text-sand/60">{result.lastModified}</span>
 
                     {#if result.highlights && result.highlights.length > 0}
                       <div class="flex items-center gap-1">
-                        <Sparkles class="w-3 h-3 text-yellow-400" />
-                        <span class="text-yellow-400">{result.highlights.length} highlights</span>
+                        <Sparkles class="w-3 h-3 text-warning" />
+                        <span class="text-warning">{result.highlights.length} highlights</span>
                       </div>
                     {/if}
                   </div>
@@ -511,22 +511,22 @@
         </div>
 
       {:else if searchQuery && !isSearching}
-        <div class="border-t border-yellow-400/30 p-8 text-center">
+        <div class="border-t border-warning/30 p-8 text-center">
           <div
-            class="w-20 h-20 mx-auto mb-4 bg-gray-800 border border-gray-600 flex items-center justify-center"
+            class="w-20 h-20 mx-auto mb-4 bg-panelSoft border border-sand/30 flex items-center justify-center"
             transition:scale={{ duration: 400, easing: elasticOut }}
           >
-            <Search class="w-10 h-10 text-gray-500" />
+            <Search class="w-10 h-10 text-sand/60" />
           </div>
           <h3 class="text-white font-mono text-lg mb-2">NO RESULTS FOUND</h3>
-          <p class="text-gray-400 text-sm mb-4">Try adjusting your search terms, filters, or AI confidence threshold</p>
+          <p class="text-sand/40 text-sm mb-4">Try adjusting your search terms, filters, or AI confidence threshold</p>
 
           {#if mcpContext?.recommendations && mcpContext.recommendations.length > 0}
             <div class="text-left max-w-md mx-auto">
-              <h4 class="text-yellow-400 font-mono text-sm mb-2">AI SUGGESTIONS:</h4>
+              <h4 class="text-warning font-mono text-sm mb-2">AI SUGGESTIONS:</h4>
               <ul class="space-y-1">
                 {#each mcpContext.recommendations.slice(0, 3) as suggestion}
-                  <li class="text-gray-300 text-sm">{suggestion}</li>
+                  <li class="text-sand/40 text-sm">{suggestion}</li>
                 {/each}
               </ul>
             </div>
@@ -534,8 +534,8 @@
         </div>
 
       {:else if !searchQuery}
-        <div class="border-t border-yellow-400/30 p-6">
-          <h3 class="text-yellow-400 font-mono text-lg mb-4 flex items-center gap-2">
+        <div class="border-t border-warning/30 p-6">
+          <h3 class="text-warning font-mono text-lg mb-4 flex items-center gap-2">
             <Sparkles class="w-5 h-5" />
             INTELLIGENT SUGGESTIONS
           </h3>
@@ -543,7 +543,7 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             {#each autoSuggestions as suggestion}
               <div
-                class="nier-suggestion-card bg-gray-800/50 border border-gray-600 p-4 hover:border-yellow-400/50 transition-colors group cursor-pointer"
+                class="nier-suggestion-card bg-panelSoft/50 border border-sand/30 p-4 hover:border-warning/50 transition-colors group cursor-pointer"
                 onclick={() => applyAutoSuggestion(suggestion)}
                 role="button"
                 tabindex="0"
@@ -552,17 +552,17 @@
                 <div class="flex items-start gap-3">
                   <div class="nier-priority-indicator {suggestion.priority} w-3 h-3 rounded-full flex-shrink-0 mt-1"></div>
                   <div class="flex-1">
-                    <h4 class="text-white font-mono font-bold text-sm mb-1 group-hover:text-yellow-400 transition-colors">
+                    <h4 class="text-white font-mono font-bold text-sm mb-1 group-hover:text-warning transition-colors">
                       {suggestion.suggestion}
                     </h4>
-                    <p class="text-gray-400 text-xs mb-2 leading-relaxed">
+                    <p class="text-sand/40 text-xs mb-2 leading-relaxed">
                       {suggestion.implementation}
                     </p>
                     <div class="flex items-center gap-2">
-                      <span class="nier-type-badge bg-gray-900 border border-gray-700 px-2 py-1 text-xs">
+                      <span class="nier-type-badge bg-panel border border-sand/20 px-2 py-1 text-xs">
                         {suggestion.type.replace('-', ' ').toUpperCase()}
                       </span>
-                      <span class="text-xs font-mono {suggestion.priority === 'high' ? 'text-red-400' : suggestion.priority === 'medium' ? 'text-yellow-400' : 'text-green-400'}">
+                      <span class="text-xs font-mono {suggestion.priority === 'high' ? 'text-danger/80' : suggestion.priority === 'medium' ? 'text-warning' : 'text-accent'}">
                         {suggestion.priority.toUpperCase()}
                       </span>
                     </div>
@@ -575,11 +575,11 @@
       {/if}
 
       <!-- Footer -->
-      <div class="border-t border-yellow-400/30 p-4 flex justify-between items-center text-xs text-gray-500 font-mono bg-gray-900/50">
+      <div class="border-t border-warning/30 p-4 flex justify-between items-center text-xs text-sand/60 font-mono bg-panel/50">
         <div class="flex items-center gap-4">
           <span>POWERED BY AI + CONTEXT7 MCP</span>
           {#if mcpContext}
-            <span class="text-green-400">MCP ACTIVE</span>
+            <span class="text-accent">MCP ACTIVE</span>
           {/if}
         </div>
         <div class="flex items-center gap-4">

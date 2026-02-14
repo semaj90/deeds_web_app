@@ -4,8 +4,19 @@
  */
 
 import { dev } from '$app/environment';
+import type { HandleClientError } from '@sveltejs/kit';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+
+/**
+ * SvelteKit client error handler
+ */
+export const handleError: HandleClientError = ({ error, event, status, message }) => {
+  console.error('Client error:', error);
+  return {
+    message: dev ? String(error) : 'An unexpected error occurred'
+  };
+};
 
 /**
  * Initialize client-side features

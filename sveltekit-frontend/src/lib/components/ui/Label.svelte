@@ -8,7 +8,7 @@
   let { children, ...restProps }: Props = $props();
 </script>
 
-<label {...restProps} class="text-sm font-medium text-gray-700">
+<label {...restProps} class="text-sm font-medium text-sand/80">
   {@render children?.()}
 </label>
 

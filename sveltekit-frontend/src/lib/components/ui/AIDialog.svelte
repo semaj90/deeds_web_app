@@ -27,7 +27,7 @@
     transition:fade
   >
     <div
-      class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md relative {className || ''}"
+      class="bg-white dark:bg-panel rounded-lg shadow-lg p-6 w-full max-w-md relative {className || ''}"
       transition:scale
       role="dialog"
       aria-modal="true"
@@ -40,7 +40,7 @@
       {/if}
 
       <button
-        class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        class="absolute top-2 right-2 text-sand/40 hover:text-sand/80 dark:hover:text-sand/40 focus:outline-none focus:ring-2 focus:ring-info focus:ring-offset-2"
         use:accessibleClick={{ handler: onClose, label: 'Close dialog' }}
         aria-label="Close dialog"
       >

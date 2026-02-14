@@ -99,13 +99,13 @@ stream: false }); if (!result?.success) {
  <!-- Unified AI: Assistant, Interface --> <div class="h-full flex flex-col"> <!-- Header --> <div class="mb-4"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex items-center"> <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center"> <Bot class="w-5 h-5" /> </div>
  <div> <h3 class="nes-text is-primary">Legal AI Assistant</h3>
  <p class="text-sm nes-text">Powered by multiple AI backends with GPU acceleration</p> </div> </div>
- <div class="flex items-center"> <!-- Backend Status - Badge not, available, use, spans --> <div class="flex"> <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.vllm.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >vLLM</span >
+ <div class="flex items-center"> <!-- Backend Status - Badge not, available, use, spans --> <div class="flex"> <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.vllm.available ? 'bg-primary text-white' : 'border-sand/20, text-sand/80'}`} >vLLM</span >
 
-            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.ollama.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >Ollama</span >
+            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.ollama.available ? 'bg-primary text-white' : 'border-sand/20, text-sand/80'}`} >Ollama</span >
 
-            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.webgpu.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >WebGPU</span >
+            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.webgpu.available ? 'bg-primary text-white' : 'border-sand/20, text-sand/80'}`} >WebGPU</span >
 
-            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.goMicroservice.available ? 'bg-primary text-white' : 'border-gray-300, text-gray-700'}`} >Go ÂµS</span >
+            <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.goMicroservice.available ? 'bg-primary text-white' : 'border-sand/20, text-sand/80'}`} >Go ÂµS</span >
           </div>
  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ exportConversation }> <Download class="w-4 h-4" /> Export </Button>
  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ clearConversation }> <Square class="w-4 h-4" /> Clear </Button> </div> </div> </div> </div>
@@ -122,12 +122,12 @@ stream: false }); if (!result?.success) {
   {#if message.role === 'user'} ðŸ‘¤ {:else if message.role === 'system'} âš™ï¸ {:else} ðŸ¤– {/if}
   </div>
  <div class="max-w-[70%] p-3"
-              class:bg-primary={message.role === 'user'} class:text-primary-foreground={message.role === 'user'} class:bg-muted={message.role === 'assistant' || message.role === 'system'} class:border-red-200={message.isError} class:bg-red-50={message.isError} >
+              class:bg-primary={message.role === 'user'} class:text-primary-foreground={message.role === 'user'} class:bg-muted={message.role === 'assistant' || message.role === 'system'} class:border-danger/20={message.isError} class:bg-danger/5={message.isError} >
               <div class="prose prose-sm"> {message.content}
 </div>
  <div class="flex items-center justify-between mt-2 pt-2 border-t"> <div class="text-xs"> {new Date(message.timestamp).toLocaleTimeString()}
 </div>
-  {#if message.backend} <div class="flex items-center gap-1"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
+  {#if message.backend} <div class="flex items-center gap-1"> <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20"
                       >{message.backend}
 </span >
   {#if message.processingTime} <span class="opacity-70">{message.processingTime}ms</span> {/if} {#if message.tokensPerSecond > 0} <span class="opacity-70">{message.tokensPerSecond.toFixed(1)} tok/s</span> {/if} {/if}

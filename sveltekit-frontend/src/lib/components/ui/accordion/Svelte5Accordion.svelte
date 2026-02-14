@@ -66,9 +66,9 @@ setContext('accordion', {
 });
 
 let variantClasses = $derived({
-	default: 'border border-slate-600 rounded-lg divide-y divide-slate-600',
-	nes: 'border-4 border-white bg-slate-900 divide-y-4 divide-white',
-	ghost: 'divide-y divide-slate-700'
+	default: 'border border-sand/30 rounded-lg divide-y divide-sand/30',
+	nes: 'border-4 border-white bg-panel divide-y-4 divide-white',
+	ghost: 'divide-y divide-sand/20'
 }[variant]);
 </script>
 
@@ -89,8 +89,8 @@ let variantClasses = $derived({
 			type="button"
 			class="flex w-full items-center justify-between px-4 py-3 text-left
 				   text-white font-medium
-				   hover:bg-slate-700/50 transition-colors duration-150
-				   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset disabled:opacity-50 disabled:cursor-not-allowed
+				   hover:bg-panelSoft/50 transition-colors duration-150
+				   focus:outline-none focus:ring-2 focus:ring-info focus:ring-inset disabled:opacity-50 disabled:cursor-not-allowed
 				   {variant === 'nes' ? 'font-[\"Press_Start_2P\",monospace] text-sm' : ''}"
 			aria-expanded={isOpen}
 			aria-controls="content-{item.id}"
@@ -104,7 +104,7 @@ let variantClasses = $derived({
 				{item.title}
 			</span>
 			<svg
-				class="w-5 h-5 text-slate-400 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}"
+				class="w-5 h-5 text-sand/40 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"
@@ -116,7 +116,7 @@ let variantClasses = $derived({
 		{#if isOpen}
 			<div
 				id="content-{item.id}"
-				class="px-4 py-3 text-slate-300 animate-accordion-down"
+				class="px-4 py-3 text-sand/40 animate-accordion-down"
 				role="region"
 				aria-labelledby="trigger-{item.id}"
 			>

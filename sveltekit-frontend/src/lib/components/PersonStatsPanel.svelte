@@ -14,18 +14,18 @@
 </script>
 
 {#if selectedPerson}
-	<div class="nes-container with-title bg-gray-900 text-white rounded-xl p-4">
-		<p class="title text-amber-300">THREAT ANALYSIS</p>
+	<div class="nes-container with-title bg-panel text-white rounded-xl p-4">
+		<p class="title text-warning/80">THREAT ANALYSIS</p>
 
 		<div class="danger-rating mb-6">
 			<div class="text-center mb-2">
-				<span class="text-3xl font-bold text-red-400">{selectedPerson.dangerLevel.toFixed(1)}</span>
+				<span class="text-3xl font-bold text-danger/80">{selectedPerson.dangerLevel.toFixed(1)}</span>
 			</div>
-			<div class="text-center text-red-400 font-bold text-sm">DANGER LEVEL</div>
+			<div class="text-center text-danger/80 font-bold text-sm">DANGER LEVEL</div>
 		</div>
 
 		<div class="attributes-section mb-6">
-			<h4 class="text-amber-300 text-sm mb-3">ATTRIBUTES</h4>
+			<h4 class="text-warning/80 text-sm mb-3">ATTRIBUTES</h4>
 			<div class="space-y-2">
 				{#each Object.entries(selectedPerson.attributes) as [attr, value]}
 					<div class="attribute-row">
@@ -33,21 +33,21 @@
 						<div class="attr-bar">
 							<div class="attr-fill" style="width: { value }%"></div>
 						</div>
-						<span class="text-xs font-bold text-green-400">{value}</span>
+						<span class="text-xs font-bold text-accent">{value}</span>
 					</div>
 				{/each}
 			</div>
 		</div>
 
 		<div class="location-section mb-6">
-			<h4 class="text-amber-300 text-sm mb-2">LAST KNOWN LOCATION</h4>
-			<div class="nes-container bg-gray-800 p-3 rounded">
+			<h4 class="text-warning/80 text-sm mb-2">LAST KNOWN LOCATION</h4>
+			<div class="nes-container bg-panelSoft p-3 rounded">
 				<p class="text-sm">{selectedPerson.lastSeen}</p>
 			</div>
 		</div>
 
 		<div class="actions-section">
-			<h4 class="text-amber-300 text-sm mb-3">ACTIONS</h4>
+			<h4 class="text-warning/80 text-sm mb-3">ACTIONS</h4>
 			<div class="space-y-2">
 				<ButtonRoot class="nes-btn is-primary w-full text-xs bits-btn">UPDATE INTEL</ButtonRoot>
 				<ButtonRoot class="nes-btn is-warning w-full text-xs bits-btn">VIEW TIMELINE</ButtonRoot>
@@ -56,9 +56,9 @@
 		</div>
 	</div>
 {:else}
-	<div class="nes-container with-title bg-gray-900 text-white rounded-xl p-4">
-		<p class="title text-amber-300">NO SELECTION</p>
-		<p class="text-center text-gray-400 text-sm mt-4">Select a person to view threat analysis.</p>
+	<div class="nes-container with-title bg-panel text-white rounded-xl p-4">
+		<p class="title text-warning/80">NO SELECTION</p>
+		<p class="text-center text-sand/40 text-sm mt-4">Select a person to view threat analysis.</p>
 	</div>
 {/if}
 

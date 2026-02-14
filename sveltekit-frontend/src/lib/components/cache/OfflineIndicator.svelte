@@ -36,7 +36,7 @@
 
 {#if showOfflineBanner}
 	<div
-		class="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-yellow-950 px-4 py-3 shadow-lg"
+		class="fixed top-0 left-0 right-0 z-50 bg-warning text-panel px-4 py-3 shadow-lg"
 		role="alert"
 	>
 		<div class="container mx-auto flex items-center gap-3">
@@ -47,7 +47,7 @@
 			</div>
 			<button
 				onclick={() => (showOfflineBanner = false)}
-				class="text-yellow-950 hover:text-yellow-900"
+				class="text-panel hover:text-warning"
 				aria-label="Dismiss"
 			>
 				✕
@@ -59,7 +59,7 @@
 <!-- Small indicator in corner -->
 {#if !isOnline}
 	<div
-		class="fixed bottom-4 right-4 bg-yellow-500 text-yellow-950 px-3 py-2 rounded-md shadow-lg flex items-center gap-2"
+		class="fixed bottom-4 right-4 bg-warning text-panel px-3 py-2 rounded-md shadow-lg flex items-center gap-2"
 	>
 		<WifiOff class="w-4 h-4" />
 		<span class="text-sm font-medium">Offline</span>

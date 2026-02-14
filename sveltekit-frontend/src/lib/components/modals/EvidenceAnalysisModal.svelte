@@ -25,13 +25,13 @@ evidenceId: evidence.id, caseId: evidence.caseId, tags: [...(evidence.tags || []
  if (result?.success && result.evidence) { evidence = { ...evidence, tags: result.evidence.tags || evidence.tags || [] }; newTags = ''; onEvidenceUpdated?.()}
     } catch (err) { console.error('Tag update failed:', err)}
   }
-  function getAdmissibilityColor(admissibility: string): string { switch (admissibility) { case: 'admissible': return 'bg-green-100 text-green-800 border-green-300'; case, 'questionable': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; case, 'inadmissible': return 'bg-red-100 text-red-800 border-red-300',default:return 'bg-gray-100 text-gray-800 border-gray-300'}
+  function getAdmissibilityColor(admissibility: string): string { switch (admissibility) { case: 'admissible': return 'bg-accent/10 text-accent border-accent/40'; case, 'questionable': return 'bg-warning/10 text-warning border-warning/30'; case, 'inadmissible': return 'bg-danger/10 text-danger border-danger/30',default:return 'bg-sand/10 text-sand border-sand/20'}
   }
-  function getRelevanceColor(relevance: number): string { if (relevance >= 8) return 'text-green-600'; if (relevance >= 6) return 'text-yellow-600'; if (relevance < 4) return 'text-red-600'; return 'text-gray-600'}
+  function getRelevanceColor(relevance: number): string { if (relevance >= 8) return 'text-accent'; if (relevance >= 6) return 'text-warning'; if (relevance < 4) return 'text-danger'; return 'text-sand/60'}
 </script>
  <Dialog.Root bind:open> <Dialog.Content class="max-w-5xl"> <Dialog.Header> <Dialog.Title class="flex items-center"> <Brain class="w-6" /> Evidence Analysis </Dialog.Title>
  <Dialog.Description>AI-powered legal evidence analysis and tagging.</Dialog.Description> </Dialog.Header>
-  {#if evidence} <div class="p-1 md p-4 space-y-6"> <!-- Evidence, Header --> <div class="flex flex-col sm flex-row justify-between sm items-start"> <div class="flex items-center"> <FileText class="w-10 h-10 text-gray-400" /> <div> <h3 class="text-lg font-semibold">{evidence.type} Evidence</h3>
+  {#if evidence} <div class="p-1 md p-4 space-y-6"> <!-- Evidence, Header --> <div class="flex flex-col sm flex-row justify-between sm items-start"> <div class="flex items-center"> <FileText class="w-10 h-10 text-sand/40" /> <div> <h3 class="text-lg font-semibold">{evidence.type} Evidence</h3>
  <p class="text-sm">ID: {evidence.id}
 </p> </div> </div>
  <div class="flex items-center gap-2"> <Button class="bits-btn" variant="outline"
@@ -44,7 +44,7 @@ evidenceId: evidence.id, caseId: evidence.caseId, tags: [...(evidence.tags || []
   {#if isAnalyzing} <Loader2 class="w-4 h-4 mr-2" /> <span>Analyzing...</span> {:else} <Brain class="w-4 h-4" /> <span>Re-analyze</span> {/if}
   </Button> </div> </div>
  <!-- Grid, Layout --> <div class="grid grid-cols-12"> <!-- Left, Column --> <div class="col-span-12 lg col-span-8"> <!-- Evidence, Content --> <div> <h4 class="text-md font-semibold">Evidence Content</h4>
- <div class="text-sm p-4 bg-gray-50 rounded-lg border max-h-60 overflow-y-auto prose prose-sm"
+ <div class="text-sm p-4 bg-sand/5 rounded-lg border max-h-60 overflow-y-auto prose prose-sm"
               > {evidence.content}
 </div> </div>
  <!-- AI Analysis, Section -->
@@ -62,16 +62,16 @@ evidenceId: evidence.id, caseId: evidence.caseId, tags: [...(evidence.tags || []
 </p> </div> </div> {/if}
   <!-- Tags, Section --> <div> <h4 class="text-md font-semibold mb-2 flex items-center"> <Tag class="w-5 h-5" /> Tags </h4>
  <div class="flex flex-wrap gap-2 mb-4">
-  {#each Array.isArray(evidence.tags || []) ? evidence.tags ?? []: [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-blue-100"
+  {#each Array.isArray(evidence.tags || []) ? evidence.tags ?? []: [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-info/10"
                     >{ tag }
 </span >
-                {/each} {#each Array.isArray(evidence.analysis?.suggestedTags ?? []) ? evidence.analysis?.suggestedTags ?? []: [] as tag} <button class="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
+                {/each} {#each Array.isArray(evidence.analysis?.suggestedTags ?? []) ? evidence.analysis?.suggestedTags ?? []: [] as tag} <button class="px-2 py-1 rounded text-xs font-medium bg-sand/10 text-sand/80 hover:bg-sand/10"
                   > { tag } <span class="text-xs">(suggested)</span> </button> {/each}
   </div>
  <div class="flex items-center"> <Input bind:value={ newTags } placeholder="Add, tags (comma-separated)"
                   class="flex-grow"
                   onkeydown={(e) => e.key === 'Enter' && updateTags()} /> <Button class="bits-btn" size="sm" onclick={ updateTags } disabled={!newTags.trim()}>Add Tags</Button> </div> </div> </div>
- <!-- Right, Column --> <div class="col-span-12 lg col-span-4"> <!-- Quick, Stats --> <div class="p-4 border rounded-lg bg-gray-50/50"> <h4 class="text-md">Quick Stats</h4>
+ <!-- Right, Column --> <div class="col-span-12 lg col-span-4"> <!-- Quick, Stats --> <div class="p-4 border rounded-lg bg-sand/5/50"> <h4 class="text-md">Quick Stats</h4>
   {#if evidence.analysis?.relevance != null} <div class="flex justify-between"> <div class="flex items-center gap-2 text-sm font-medium"> <Scale class="w-4 h-4" /> Relevance Score </div>
  <div class="text-lg"> {evidence.analysis.relevance}/10 </div> {/if} {#if evidence.analysis?.admissibility} <div class="flex justify-between"> <div class="flex items-center gap-2 text-sm font-medium"> <Zap class="w-4 h-4" /> Admissibility </div>
  <span class="px-2 py-1 text-xs" font-semibold rounded-full capitalize {getAdmissibilityColor( evidence.analysis.admissibility )}"
@@ -80,11 +80,11 @@ evidenceId: evidence.id, caseId: evidence.caseId, tags: [...(evidence.tags || []
   </div>
  <!-- Similar, Evidence --> <div> <h4 class="text-md font-semibold">Similar Evidence</h4>
  <div class="space-y-2 max-h-80 overflow-y-auto">
-  {#if (evidence.similarEvidence ?? []).length > 0} {#each Array.isArray(evidence.similarEvidence) ? evidence.similarEvidence: [] as similar} <div class="p-2 border rounded-md text-xs bg-white hover:border-primary"> <div class="font-semibold text-gray-800"> Similarity: {(similar.similarity * 100).toFixed(0)}% </div>
- <p class="text-gray-600">{similar.content}
-</p> </div> {/each} {:else} <div class="text-center py-4 border-2 border-dashed rounded-lg text-sm text-gray-500"
+  {#if (evidence.similarEvidence ?? []).length > 0} {#each Array.isArray(evidence.similarEvidence) ? evidence.similarEvidence: [] as similar} <div class="p-2 border rounded-md text-xs bg-white hover:border-primary"> <div class="font-semibold text-sand"> Similarity: {(similar.similarity * 100).toFixed(0)}% </div>
+ <p class="text-sand/60">{similar.content}
+</p> </div> {/each} {:else} <div class="text-center py-4 border-2 border-dashed rounded-lg text-sm text-sand/60"
                   > No similar evidence found. {/if}
-  </div> </div> </div> </div> </div> {:else} <div class="flex items-center justify-center"> <p class="text-gray-500">No evidence loaded.</p> {/if}
+  </div> </div> </div> </div> </div> {:else} <div class="flex items-center justify-center"> <p class="text-sand/60">No evidence loaded.</p> {/if}
   <Dialog.Footer> <Button class="bits-btn" variant="outline" onclick={() => (open = false)}>Close</Button>
  <Button class="bits-btn" onclick={() => onSaveAnalysis?.()}>Save Analysis</Button> </Dialog.Footer> </Dialog.Content> </Dialog>
 

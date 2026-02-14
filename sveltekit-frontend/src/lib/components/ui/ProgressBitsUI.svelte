@@ -11,23 +11,23 @@
   
   let variantClass = $derived(
     variant === 'success'
-      ? 'bg-green-500'
+      ? 'bg-accent'
       : variant === 'error'
-      ? 'bg-red-500'
+      ? 'bg-danger'
       : variant === 'warning'
-      ? 'bg-yellow-500'
+      ? 'bg-warning'
       : variant === 'yorha'
       ? 'bg-black'
       : variant === 'legal'
-      ? 'bg-indigo-600'
-      : 'bg-gray-600'
+      ? 'bg-info'
+      : 'bg-sand/20'
   );
   
   let sizeClasses = $derived('h-2'); // keep simple, allow override via class prop
 </script>
 <!-- accessible, SSR-friendly, progress bar -->
 <div class={['relative w-full', className].filter(Boolean).join(' ')}>
-  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full">
+  <div class="w-full bg-sand/10 dark:bg-panelSoft rounded-full">
     <div
       role="progressbar"
       aria-valuemin="0"
@@ -42,7 +42,7 @@
     </div>
   </div>
   {#if showPercentage}
-    <div class="text-xs font-mono text-gray-600 dark:text-gray-400 mt-1 text-right">
+    <div class="text-xs font-mono text-sand/60 dark:text-sand/40 mt-1 text-right">
       {Math.round(percentage)}%
     </div>
   {/if}

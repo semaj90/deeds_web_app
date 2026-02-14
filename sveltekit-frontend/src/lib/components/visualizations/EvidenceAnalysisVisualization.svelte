@@ -261,7 +261,7 @@ labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.s
 
 <div class="evidence-analysis-visualization">
   <div class="analysis-header">
-    <h2 class="text-2xl font-bold text-gray-900">Evidence Analysis Report</h2>
+    <h2 class="text-2xl font-bold text-sand">Evidence Analysis Report</h2>
     <div class="metadata">
       <span class="badge">Model: {analysis.aiModel}</span>
       <span class="badge">Confidence: {(analysis.confidence * 100).toFixed(1)}%</span>

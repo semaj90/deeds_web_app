@@ -52,7 +52,7 @@
  PINNED CONTEXT ({$chatContext .length})
  </h3>
  <button
- class="text-[10px] text-red-400 hover:text-red-300"
+ class="text-[10px] text-danger/80 hover:text-danger/60"
  onclick={ clearAll }
  >
  CLEAR ALL
@@ -66,7 +66,7 @@
  <div class="font-mono text-[#f5f0e2]">
  {item.type.toUpperCase()}: {item.title}
  </div>
- <div class="text-gray-400 mt-1">
+ <div class="text-sand/40 mt-1">
  {#if item.type === 'topic'}
  {@const topic = item.data as TopicNode}
  {topic.clusterSize} items • {topic.tags.slice(0, 3).join(', ')}
@@ -77,7 +77,7 @@
  </div>
  </div>
  <button
- class="ml-2 text-red-400 hover:text-red-300 text-xs"
+ class="ml-2 text-danger/80 hover:text-danger/60 text-xs"
  onclick={() => removeContext(item.id)}
  >
  ×

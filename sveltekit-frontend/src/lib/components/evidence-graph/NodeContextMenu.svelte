@@ -2,9 +2,9 @@
  let { x, y, node, onAction } = $props();
 </script>
 
-<div class="absolute bg-gray-800 text-white p-3 rounded-lg border border-cyan-300"
+<div class="absolute bg-panelSoft text-white p-3 rounded-lg border border-info/60"
  style="top:{ y }px; left: { x }px;">
- <p class="font-bold text-amber-300 mb-2">{node.label}</p>
+ <p class="font-bold text-warning/80 mb-2">{node.label}</p>
 
  <button class="nes-btn is-primary mb-2 w-full" onclick={()=>onAction('open', node)}>Open Evidence</button>
  <button class="nes-btn mb-2 w-full" onclick={()=>onAction('compare', node)}>Compare…</button>

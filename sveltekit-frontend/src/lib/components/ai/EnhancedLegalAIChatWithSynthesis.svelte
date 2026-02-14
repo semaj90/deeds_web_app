@@ -998,9 +998,9 @@ ${relatedReports.length > 0 ? `**Database Stats:**
   }
 
   function getConfidenceColor(confidence: number): string {
-    if (confidence >= 0.8) return 'text-green-600';
-    if (confidence >= 0.6) return 'text-yellow-600';
-    return 'text-red-600';
+    if (confidence >= 0.8) return 'text-accent';
+    if (confidence >= 0.6) return 'text-warning';
+    return 'text-danger';
   }
 
   function getStatusIcon(status: string) {
@@ -1028,19 +1028,19 @@ ${relatedReports.length > 0 ? `**Database Stats:**
           <Brain class="w-5 h-5" />
           Enhanced Legal AI Assistant
           {#if userRole}
-            <span class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100">{userRole}</span>
+            <span class="px-2 py-0.5 rounded text-xs font-medium bg-sand/10">{userRole}</span>
           {/if}
           {#if caseId}
-            <span class="px-2 py-0.5 rounded text-xs font-medium border border-gray-300">Case: {caseId}</span>
+            <span class="px-2 py-0.5 rounded text-xs font-medium border border-sand/20">Case: {caseId}</span>
           {/if}
           {#if reportId}
-            <span class="px-2 py-0.5 rounded text-xs font-medium border border-blue-200 bg-blue-50 text-blue-700">Report: {reportId.slice(0, 8)}...</span>
+            <span class="px-2 py-0.5 rounded text-xs font-medium border border-info/20 bg-info/5 text-info">Report: {reportId.slice(0, 8)}...</span>
           {/if}
           {#if persistConversation && currentSessionId}
-            <span class="px-2 py-0.5 rounded text-xs font-medium border border-green-200 bg-green-50 text-green-700">DB Connected</span>
+            <span class="px-2 py-0.5 rounded text-xs font-medium border border-accent/20 bg-accent/5 text-accent">DB Connected</span>
           {/if}
           {#if relatedReports.length > 0}
-            <span class="px-2 py-0.5 rounded text-xs font-medium border border-purple-200 bg-purple-50 text-purple-700">{relatedReports.length} Related</span>
+            <span class="px-2 py-0.5 rounded text-xs font-medium border border-info/20 bg-info/5 text-info">{relatedReports.length} Related</span>
           {/if}
         </h3>
 
@@ -1110,35 +1110,35 @@ ${relatedReports.length > 0 ? `**Database Stats:**
             <div class="mt-4 space-y-2">
               <label class="text-sm font-medium">Typewriter Speed</label>
               <div class="flex items-center gap-2">
-                <span class="text-xs text-gray-500">Fast</span>
+                <span class="text-xs text-sand/60">Fast</span>
                 <input
                   type="range"
                   min="10"
                   max="100"
                   bind:value={settings.typewriterSpeed}
-                  class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  class="flex-1 h-2 bg-sand/10 rounded-lg appearance-none cursor-pointer"
                 />
-                <span class="text-xs text-gray-500">Slow</span>
+                <span class="text-xs text-sand/60">Slow</span>
               </div>
-              <div class="text-xs text-gray-600 text-center">
+              <div class="text-xs text-sand/60 text-center">
                 {settings.typewriterSpeed}ms per character
               </div>
             </div>
           {/if}
 
           <!-- Database Status -->
-          <div class="mt-4 p-3 bg-gray-50 rounded-lg text-xs">
+          <div class="mt-4 p-3 bg-sand/5 rounded-lg text-xs">
             <div class="flex items-center justify-between mb-2">
               <span class="font-medium">Database Status</span>
               {#if isSavingToDatabase}
-                <span class="px-2 py-0.5 rounded text-xs font-medium border border-yellow-300 text-yellow-600">Syncing...</span>
+                <span class="px-2 py-0.5 rounded text-xs font-medium border border-warning/30 text-warning">Syncing...</span>
               {:else if lastSyncTime}
-                <span class="px-2 py-0.5 rounded text-xs font-medium border border-green-300 text-green-600">Synced</span>
+                <span class="px-2 py-0.5 rounded text-xs font-medium border border-accent/40 text-accent">Synced</span>
               {:else}
-                <span class="px-2 py-0.5 rounded text-xs font-medium border border-gray-300 text-gray-600">Ready</span>
+                <span class="px-2 py-0.5 rounded text-xs font-medium border border-sand/20 text-sand/60">Ready</span>
               {/if}
             </div>
-            <div class="space-y-1 text-gray-600">
+            <div class="space-y-1 text-sand/60">
               {#if currentSessionId}
                 <div>Session: {currentSessionId.slice(0, 8)}...</div>
               {/if}
@@ -1156,17 +1156,17 @@ ${relatedReports.length > 0 ? `**Database Stats:**
   <!-- Messages Container -->
   <div
     bind:this={chatContainer}
-    class="flex-1 overflow-y-auto space-y-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+    class="flex-1 overflow-y-auto space-y-4 p-4 bg-sand/5 dark:bg-panel rounded-lg border">
     {#each messages as message (message.id)}
       <div class="message-bubble {message.role}">
         <div class="flex items-start gap-3">
           <!-- Message Icon -->
           <div
             class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center {message.role === 'user'
-              ? 'bg-blue-500'
+              ? 'bg-info'
               : message.role === 'assistant'
-                ? 'bg-green-500'
-                : 'bg-gray-500'}">
+                ? 'bg-accent'
+                : 'bg-sand/20'}">
             <svelte:component
               this={message.role === 'user'
                 ? Send
@@ -1180,16 +1180,16 @@ ${relatedReports.length > 0 ? `**Database Stats:**
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1">
               <span class="text-sm font-medium capitalize">{message.role}</span>
-              <span class="text-xs text-gray-500">{formatTimestamp(message.timestamp)}</span>
+              <span class="text-xs text-sand/60">{formatTimestamp(message.timestamp)}</span>
 
               {#if message.confidence && settings.includeConfidenceScores}
-                <span class="px-2 py-0.5 rounded text-xs font-medium border border-gray-300 {getConfidenceColor(message.confidence)}">
+                <span class="px-2 py-0.5 rounded text-xs font-medium border border-sand/20 {getConfidenceColor(message.confidence)}">
                   {Math.round(message.confidence * 100)}% confidence
                 </span>
               {/if}
 
               {#if message.processingTime}
-                <span class="px-2 py-0.5 rounded text-xs font-medium border border-gray-300">
+                <span class="px-2 py-0.5 rounded text-xs font-medium border border-sand/20">
                   {message.processingTime}ms
                 </span>
               {/if}
@@ -1202,8 +1202,8 @@ ${relatedReports.length > 0 ? `**Database Stats:**
             <!-- Main Content -->
             <div
               class="prose prose-sm max-w-none {message.role === 'user'
-                ? 'bg-blue-50 dark:bg-blue-900/20'
-                : 'bg-white dark:bg-gray-800'} p-3 rounded-lg">
+                ? 'bg-info/5 dark:bg-info/10'
+                : 'bg-white dark:bg-panelSoft'} p-3 rounded-lg">
               {#if streamingMessageId === message.id && isStreaming && settings.enableTypewriterEffect}
                 <!-- Advanced TypewriterResponse component for streaming -->
                 <TypewriterResponse
@@ -1236,9 +1236,9 @@ ${relatedReports.length > 0 ? `**Database Stats:**
               <div class="mt-2 space-y-2">
                 {#if message.synthesizedInput}
                   <details class="text-xs">
-                    <summary class="cursor-pointer text-blue-600 hover:text-blue-800"
+                    <summary class="cursor-pointer text-info hover:text-info"
                       >🧠 Input Analysis</summary>
-                    <div class="mt-1 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                    <div class="mt-1 p-2 bg-info/5 dark:bg-info/10 rounded">
                       <div>
                         <strong>Intent:</strong>
                         {message.synthesizedInput.intent?.primary} ({Math.round(
@@ -1259,9 +1259,9 @@ ${relatedReports.length > 0 ? `**Database Stats:**
 
                 {#if message.legalAnalysis}
                   <details class="text-xs">
-                    <summary class="cursor-pointer text-green-600 hover:text-green-800"
+                    <summary class="cursor-pointer text-accent hover:text-accent"
                       >⚖️ Legal Analysis</summary>
-                    <div class="mt-1 p-2 bg-green-50 dark:bg-green-900/20 rounded">
+                    <div class="mt-1 p-2 bg-accent/5 dark:bg-accent/10 rounded">
                       <div>
                         <strong>Entities:</strong>
                         {message.legalAnalysis.entities?.length || 0}
@@ -1282,9 +1282,9 @@ ${relatedReports.length > 0 ? `**Database Stats:**
 
                 {#if message.ragResults}
                   <details class="text-xs">
-                    <summary class="cursor-pointer text-purple-600 hover:text-purple-800"
+                    <summary class="cursor-pointer text-info hover:text-info"
                       >📚 Document Analysis</summary>
-                    <div class="mt-1 p-2 bg-purple-50 dark:bg-purple-900/20 rounded">
+                    <div class="mt-1 p-2 bg-info/5 dark:bg-info/20/20 rounded">
                       <div>
                         <strong>Documents Processed:</strong>
                         {message.ragResults.metadata?.documentsProcessed || 0}
@@ -1309,7 +1309,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
 
     {#if isProcessing}
       <div class="flex items-center justify-center py-4" transition:fade>
-        <div class="flex items-center gap-2 text-gray-600">
+        <div class="flex items-center gap-2 text-sand/60">
           <Loader2 class="w-4 h-4 animate-spin" />
           <span>Processing with advanced AI pipeline...</span>
         </div>
@@ -1325,7 +1325,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
       placeholder="Ask about legal matters, analyze documents, or use commands like /analyze..."
       onkeydown={handleKeyDown}
       disabled={isProcessing}
-      class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+      class="flex-1 rounded-md border border-sand/20 px-3 py-2 text-sm focus:border-info focus:outline-none focus:ring-1 focus:ring-info"
     />
     <Button onclick={sendMessage} disabled={!currentInput.trim() || isProcessing}>
       {#if isProcessing}
@@ -1348,7 +1348,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
         </h3>
       </div>
       <div class="p-4">
-        <pre class="text-xs overflow-auto max-h-60 bg-gray-100 dark:bg-gray-800 p-3 rounded">
+        <pre class="text-xs overflow-auto max-h-60 bg-sand/10 dark:bg-panelSoft p-3 rounded">
 {JSON.stringify(currentAnalysis, null, 2)}
         </pre>
       </div>

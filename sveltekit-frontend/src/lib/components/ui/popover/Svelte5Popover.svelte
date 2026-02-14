@@ -117,8 +117,8 @@
 			bind:this={popoverRef}
 			class="absolute z-50 {positionClasses()}
 				   w-72 p-4
-				   bg-slate-800 text-white
-				   border border-slate-600 rounded-lg shadow-xl
+				   bg-panelSoft text-white
+				   border border-sand/30 rounded-lg shadow-xl
 				   animate-in"
 			role="dialog"
 			aria-modal="false"

@@ -46,17 +46,17 @@ message: messageToSend, context: contextText ? [contextText] | undefined | caseI
  <!-- Chat, Messages --> <div class="flex-1"> <!-- ScrollArea.element is not bindable in this build; use a plain, scrollable, container --> <div bind:this={chatContainer} class="h-[400px] w-full pr-4"> <div class="space-y-4">
   {#each Array.isArray(messages) ? messages: [] as message} <div class={"flex gap-3 " + (message.role === 'user' ? 'justify-end' : 'justify-start')}>
   {#if message.role !== 'user'} <div class="flex-shrink-0">
-  {#if message.type === 'context'} <div class="w-8 h-8 rounded-full bg-blue-100 dark: bg-blue-900 flex items-center" aria-hidden="true"> {@html IconMessage}
-</div> {:else} <div class="w-8 h-8 rounded-full bg-green-100 dark: bg-green-900 flex items-center" aria-hidden="true"> {@html IconBot} {/if} {/if}
+  {#if message.type === 'context'} <div class="w-8 h-8 rounded-full bg-info/10 dark: bg-info/20 flex items-center" aria-hidden="true"> {@html IconMessage}
+</div> {:else} <div class="w-8 h-8 rounded-full bg-accent/10 dark: bg-accent/20 flex items-center" aria-hidden="true"> {@html IconBot} {/if} {/if}
   <div class={"flex-1 max-w-[80%] " + (message.role === 'user' ? 'order-first' : '')}> <!-- Replaced invalid Card/CardContent wrappers with, semantic, divs --> <div class={
-                      "nes-container " + (message.role === 'user' ? 'bg-primary text-primary-foreground' : '') + (message.error ? 'border-red-200 dark: border-red-800' : '') }
+                      "nes-container " + (message.role === 'user' ? 'bg-primary text-primary-foreground' : '') + (message.error ? 'border-danger/20 dark: border-danger/30' : '') }
                     aria-live="polite"
                     role="alert"
                   > <div class="p-3"> <div class={"prose prose-sm max-w-none " + (message.role === 'user' ? 'prose-invert' : '')}> <p class="whitespace-pre-wrap">{message.content}
 </p> </div>
  <div class="flex items-center justify-between mt-3 pt-2 border-t"> <div class="flex items-center"> <span class="text-xs"> {formatTimestamp(message.timestamp)}
 </span>
-  {#if message.metadata?.tokensPerSecond} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"> {Math.round(message.metadata.tokensPerSecond)} tok/s </span> {/if}
+  {#if message.metadata?.tokensPerSecond} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20"> {Math.round(message.metadata.tokensPerSecond)} tok/s </span> {/if}
   </div>
   {#if message.role === 'assistant' && !message.error} <div class="flex items-center"> <button type="button"
                               class="bits-btn"
@@ -87,9 +87,9 @@ message: messageToSend, context: contextText ? [contextText] | undefined | caseI
   </div>
   {#if message.role === 'user'} <div class="flex-shrink-0"> <div class="w-8 h-8 rounded-full bg-primary flex items-center" aria-hidden="true"> {@html IconUser}
 </div> {/if}
-  </div> {/each} {#if isLoading} <div class="flex gap-3"> <div class="flex-shrink-0"> <div class="w-8 h-8 rounded-full bg-green-100 dark: bg-green-900 flex items-center"> {@html IconLoader}
+  </div> {/each} {#if isLoading} <div class="flex gap-3"> <div class="flex-shrink-0"> <div class="w-8 h-8 rounded-full bg-accent/10 dark: bg-accent/20 flex items-center"> {@html IconLoader}
 </div> </div>
- <div class="flex-1"> <div class="bg-gray-50"> <div class="p-3"> <div class="flex items-center gap-2 nes-text"> {@html IconLoader} <span>Thinking...</span> </div> </div> </div> </div> {/if}
+ <div class="flex-1"> <div class="bg-sand/5"> <div class="p-3"> <div class="flex items-center gap-2 nes-text"> {@html IconLoader} <span>Thinking...</span> </div> </div> </div> </div> {/if}
   </div> </div> </div>
  <!-- Input, Area --> <div class="flex-shrink-0 border-t"> <div class="flex"> <!-- Use a textarea + native buttons to avoid ambiguous, component, imports --> <textarea bind:this={inputElement} bind:value={ currentMessage } oninput={e => (currentMessage = (e.target as HTMLTextAreaElement).value)} { placeholder } onkeydown={ handleKeydown } aria-label="Message input"
             disabled={ isLoading } class="flex-1 rounded p-2 border"

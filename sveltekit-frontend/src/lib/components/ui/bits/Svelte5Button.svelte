@@ -32,13 +32,13 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   let isPressed = $state(false);
   let isHovered = $state(false);
 
-  const variantClassMap: Record<string, string> = { primary: 'bg-blue-600, hover:bg-blue-700 text-white border-blue-800',
-    secondary: 'bg-gray-600 hover:bg-gray-700 text-white border-gray-800',
-    success: 'bg-green-600 hover:bg-green-700 text-white border-green-800',
-    warning: 'bg-yellow-500 hover:bg-yellow-600 text-black border-yellow-700',
-    error: 'bg-red-600 hover:bg-red-700 text-white border-red-800',
-    ghost: 'bg-transparent hover:bg-gray-100 text-gray-700 border-transparent',
-    outline: 'bg-transparent hover:bg-gray-50 text-gray-700 border-gray-300 hover:border-gray-400'
+  const variantClassMap: Record<string, string> = { primary: 'bg-info, hover:bg-info/60 text-white border-info/30',
+    secondary: 'bg-sand/20 hover:bg-panelSoft text-white border-sand/20',
+    success: 'bg-accent hover:bg-accent/60 text-white border-accent/30',
+    warning: 'bg-warning hover:bg-warning text-black border-warning/60',
+    error: 'bg-danger hover:bg-danger/80 text-white border-danger/30',
+    ghost: 'bg-transparent hover:bg-sand/10 text-sand/80 border-transparent',
+    outline: 'bg-transparent hover:bg-sand/5 text-sand/80 border-sand/20 hover:border-sand/30'
   };
 
   const sizeClassMap: Record<string, string> = {
@@ -67,7 +67,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
       'font-medium rounded-md',
       'border-2 border-b-4',
       'transition-all duration-150 ease-in-out',
-      'focus:outline-none focus:ring-2 focus:ring-offset-2, focus:ring-blue-500',
+      'focus:outline-none focus:ring-2 focus:ring-offset-2, focus:ring-info',
       variantClasses,
       sizeClasses,
       stateClasses,

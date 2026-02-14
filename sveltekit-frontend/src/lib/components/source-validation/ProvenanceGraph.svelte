@@ -212,15 +212,15 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 <div class="provenance-graph">
 	<div class="graph-header mb-4">
 		<h2 class="text-xl font-bold">🕸️ Knowledge Graph</h2>
-		<p class="text-sm text-gray-600">
+		<p class="text-sm text-sand/60">
 			{entities.length} entities, {relationships.length} relationships
 		</p>
-		<p class="text-xs text-gray-500">Validation: {validationId.slice(0, 16)}...</p>
+		<p class="text-xs text-sand/60">Validation: {validationId.slice(0, 16)}...</p>
 	</div>
 
 	{#if entities.length === 0 || relationships.length === 0}
-		<div class="empty-state p-8 bg-gray-50 rounded-lg text-center">
-			<p class="text-gray-600">
+		<div class="empty-state p-8 bg-sand/5 rounded-lg text-center">
+			<p class="text-sand/60">
 				No knowledge graph data yet. Generate an answer to extract entities and relationships.
 			</p>
 		</div>
@@ -230,7 +230,7 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 		</div>
 
 		<!-- Legend -->
-		<div class="graph-legend mt-4 p-4 bg-gray-50 rounded-lg">
+		<div class="graph-legend mt-4 p-4 bg-sand/5 rounded-lg">
 			<h3 class="text-sm font-semibold mb-2">Relationship Types:</h3>
 			<div class="flex flex-wrap gap-3 text-xs">
 				{#each ['USES', 'DEPENDS_ON', 'REFERENCES', 'EXTENDS', 'IMPLEMENTS', 'HAS_FEATURE'] as type}

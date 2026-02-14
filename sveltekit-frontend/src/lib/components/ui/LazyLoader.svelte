@@ -48,10 +48,10 @@
 {#if isLoading}
   <AILoadingIndicator isLoading={true} title={fallback} operation="processing" size="md" variant="inline" />
 {:else if error}
-  <div class="lazy-load-error p-4 border border-red-200 dark:border-red-800 rounded-lg bg-red-50 dark:bg-red-900/20">
-    <h3 class="text-red-800 dark:text-red-200 font-semibold">Component Error</h3>
-    <p class="text-red-600 dark:text-red-400 text-sm mt-1">{errorFallback}</p>
-    <button onclick={retry} class="mt-2 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+  <div class="lazy-load-error p-4 border border-danger/20 dark:border-danger/30 rounded-lg bg-danger/5 dark:bg-danger/10">
+    <h3 class="text-danger dark:text-danger/40 font-semibold">Component Error</h3>
+    <p class="text-danger dark:text-danger/80 text-sm mt-1">{errorFallback}</p>
+    <button onclick={retry} class="mt-2 px-3 py-1 bg-danger text-white rounded text-sm hover:bg-danger/80">
       Retry
     </button>
   </div>

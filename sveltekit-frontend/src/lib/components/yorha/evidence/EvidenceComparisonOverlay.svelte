@@ -23,25 +23,25 @@
   <div class="fixed inset-0 bg-black bg-opacity-80 flex p-10 gap-8 text-white z-50">
     <div class="w-1/2 nes-container with-title">
       <p class="title">Evidence A</p>
-      <h2 class="text-amber-300 mb-4">{evidenceA.fileName}</h2>
-      <div class="text-xs text-slate-400 mb-2">
+      <h2 class="text-warning/80 mb-4">{evidenceA.fileName}</h2>
+      <div class="text-xs text-sand/40 mb-2">
         Case: {evidenceA.caseId || 'Unknown'} | {evidenceA.timestamp || 'No timestamp'}
       </div>
-      <pre class="text-sm bg-slate-900 p-4 rounded border max-h-96 overflow-y-auto whitespace-pre-wrap">{evidenceA.extractedText}</pre>
+      <pre class="text-sm bg-panel p-4 rounded border max-h-96 overflow-y-auto whitespace-pre-wrap">{evidenceA.extractedText}</pre>
     </div>
 
     <div class="w-1/2 nes-container with-title">
       <p class="title">Evidence B</p>
-      <h2 class="text-amber-300 mb-4">{evidenceB.fileName}</h2>
-      <div class="text-xs text-slate-400 mb-2">
+      <h2 class="text-warning/80 mb-4">{evidenceB.fileName}</h2>
+      <div class="text-xs text-sand/40 mb-2">
         Case: {evidenceB.caseId || 'Unknown'} | {evidenceB.timestamp || 'No timestamp'}
       </div>
-      <pre class="text-sm bg-slate-900 p-4 rounded border max-h-96 overflow-y-auto whitespace-pre-wrap">{evidenceB.extractedText}</pre>
+      <pre class="text-sm bg-panel p-4 rounded border max-h-96 overflow-y-auto whitespace-pre-wrap">{evidenceB.extractedText}</pre>
     </div>
 
     <!-- Close Button -->
     <button
-      class="fixed top-4 right-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+      class="fixed top-4 right-4 bg-danger hover:bg-danger/80 text-white px-4 py-2 rounded-lg transition-colors"
       onclick={close}
     >
       Close Comparison

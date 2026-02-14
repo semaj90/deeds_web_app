@@ -81,11 +81,11 @@
  function getLineClass(line: number): string {
  if (highlightedLines.has(line)) {
  const error = errors.find(e => e.line === line);
- if (error?.severity === 'error') return 'bg-red-500/20 text-red-400';
- if (error?.severity === 'warning') return 'bg-yellow-500/20 text-yellow-400';
- return 'bg-blue-500/20 text-blue-400';
+ if (error?.severity === 'error') return 'bg-danger/20 text-danger/80';
+ if (error?.severity === 'warning') return 'bg-warning/20 text-warning';
+ return 'bg-info/20 text-info/80';
  }
- return 'text-gray-500';
+ return 'text-sand/60';
  }
 
  $effect(() => {
@@ -96,13 +96,13 @@
 });
 </script>
 
-<div class="code-editor flex h-full w-full rounded-lg border border-gray-700 bg-gray-900 overflow-hidden font-mono text-sm">
+<div class="code-editor flex h-full w-full rounded-lg border border-sand/20 bg-panel overflow-hidden font-mono text-sm">
  <!-- Line Numbers -->
- <div class="line-numbers flex-shrink-0 select-none bg-gray-800 border-r border-gray-700 py-3 text-right">
+ <div class="line-numbers flex-shrink-0 select-none bg-panelSoft border-r border-sand/20 py-3 text-right">
  {#each lineNumbers as line}
  <button
  type="button"
- class="block w-12 px-2 leading-6 transition-colors hover:bg-gray-700 {getLineClass(line)}"
+ class="block w-12 px-2 leading-6 transition-colors hover:bg-panelSoft {getLineClass(line)}"
  onclick={() => handleLineClick(line)}
  title={highlightedLines.has(line) ? 'Click to see error' : `Line ${line}`}
  >
@@ -123,7 +123,7 @@
  spellcheck="false"
  autocomplete="off"
  autocapitalize="off"
- class="w-full h-full p-3 bg-transparent text-gray-100 resize-none outline-none leading-6"
+ class="w-full h-full p-3 bg-transparent text-sand/20 resize-none outline-none leading-6"
  style="tab-size: 2;"
  ></textarea>
 
@@ -134,9 +134,9 @@
  <button
  type="button"
  class="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors
- {error.severity === 'error' ? 'bg-red-500/80 hover:bg-red-500' : ''}
- {error.severity === 'warning' ? 'bg-yellow-500/80 hover:bg-yellow-500' : ''}
- {error.severity === 'info' ? 'bg-blue-500/80 hover:bg-blue-500' : ''}
+ {error.severity === 'error' ? 'bg-danger/80 hover:bg-danger' : ''}
+ {error.severity === 'warning' ? 'bg-warning/80 hover:bg-warning' : ''}
+ {error.severity === 'info' ? 'bg-info/80 hover:bg-info' : ''}
  text-white"
  onclick={() => {
  scrollToLine(error.line);
@@ -149,7 +149,7 @@
  </button>
  {/each}
  {#if errors.length > 5}
- <span class="text-xs text-gray-400 px-2">+{errors.length - 5} more</span>
+ <span class="text-xs text-sand/40 px-2">+{errors.length - 5} more</span>
  {/if}
  </div>
  {/if}

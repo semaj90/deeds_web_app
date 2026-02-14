@@ -29,12 +29,12 @@ let {
 }: Props = $props();
 
 let variantClasses = $derived({
-	default: 'bg-blue-600 text-white',
-	secondary: 'bg-slate-600 text-white',
-	success: 'bg-green-600 text-white',
-	warning: 'bg-yellow-500 text-black',
-	error: 'bg-red-600 text-white',
-	outline: 'bg-transparent border border-slate-500 text-slate-300'
+	default: 'bg-info text-white',
+	secondary: 'bg-panelSoft text-white',
+	success: 'bg-accent text-white',
+	warning: 'bg-warning text-black',
+	error: 'bg-danger text-white',
+	outline: 'bg-transparent border border-sand/30 text-sand/40'
 }[variant]);
 
 let sizeClasses = $derived({

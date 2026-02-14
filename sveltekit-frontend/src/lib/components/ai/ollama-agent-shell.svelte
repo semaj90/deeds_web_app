@@ -54,7 +54,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  {#each messages as message, i} <div class="flex items-start gap-3">
  {#if message.role === "assistant"} <div class="p-2 bg-primary bg-opacity-10 rounded-full"> <Bot class="h-4" /> </div> {:else if message.role === "user"} <div class="p-2 bg-muted rounded-full"> <User class="h-4" /> </div> {:else} <div class="p-2 bg-accent rounded-full"> <Terminal class="h-4" /> {/if} <div class="flex-1"> <div class="flex items-center gap-2"> <span class="text-xs nes-text"> {message.timestamp.toLocaleTimeString()}
 </span>
- {#if message.status === "streaming"} <span class="text-xs text-blue-500">â—</span> {:else if message.status === "error"} <span class="text-xs">Error</span> {/if}
+ {#if message.status === "streaming"} <span class="text-xs text-info">â—</span> {:else if message.status === "error"} <span class="text-xs">Error</span> {/if}
 </div> <pre class="whitespace-pre-wrap font-mono">{message.content}
 </pre> </div> <button onclick={() => copyMessage(message.content, i)} class="opacity-0 group-hover:opacity-100 transition-opacity p-1"
             >

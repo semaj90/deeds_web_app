@@ -41,11 +41,11 @@ let sizeClasses = $derived({
 }[size]);
 
 let colorClasses = $derived({
-	blue: 'bg-blue-500',
-	green: 'bg-green-500',
-	yellow: 'bg-yellow-500',
-	red: 'bg-red-500',
-	purple: 'bg-purple-500'
+	blue: 'bg-info',
+	green: 'bg-accent',
+	yellow: 'bg-warning',
+	red: 'bg-danger',
+	purple: 'bg-info'
 }[color]);
 
 let variantClasses = $derived({
@@ -57,7 +57,7 @@ let variantClasses = $derived({
 let barClasses = $derived({
 	default:colorClasses,
 	nes: `${colorClasses} border-r-2 border-white`,
-	gradient: 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500'
+	gradient: 'bg-gradient-to-r from-info via-info to-info'
 }[variant]);
 </script>
 
@@ -65,16 +65,16 @@ let barClasses = $derived({
 	{#if label || showValue}
 		<div class="flex justify-between items-center mb-1.5 text-sm">
 			{#if label}
-				<span class="text-slate-300">{label}</span>
+				<span class="text-sand/40">{label}</span>
 			{/if}
 			{#if showValue && !indeterminate}
-				<span class="text-slate-400">{Math.round(percentage)}%</span>
+				<span class="text-sand/40">{Math.round(percentage)}%</span>
 			{/if}
 		</div>
 	{/if}
 
 	<div
-		class="w-full bg-slate-700 overflow-hidden {sizeClasses} {variantClasses}"
+		class="w-full bg-panelSoft overflow-hidden {sizeClasses} {variantClasses}"
 		role="progressbar"
 		aria-valuenow={indeterminate ? undefined : value}
 		aria-valuemin={ 0 }

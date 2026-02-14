@@ -226,8 +226,8 @@
 	<div bind:this={messagesContainer} class="messages-container">
 		{#if conversation.length === 0}
 			<div class="empty-state">
-				<MessageCircle size={48} class="text-gray-400" />
-				<p class="text-gray-500">Ask a question to get started</p>
+				<MessageCircle size={48} class="text-sand/40" />
+				<p class="text-sand/60">Ask a question to get started</p>
 			</div>
 		{/if}
 

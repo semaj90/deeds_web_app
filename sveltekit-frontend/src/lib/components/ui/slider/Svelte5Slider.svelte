@@ -62,17 +62,17 @@ let thumbSize = $derived({
 
 // Color classes
 let colorClasses = $derived({
-	blue: 'bg-blue-500',
-	green: 'bg-green-500',
-	purple: 'bg-purple-500',
-	red: 'bg-red-500'
+	blue: 'bg-info',
+	green: 'bg-accent',
+	purple: 'bg-info',
+	red: 'bg-danger'
 }[color]);
 
 let thumbColorClasses = $derived({
-	blue: 'bg-blue-500 border-blue-300',
-	green: 'bg-green-500 border-green-300',
-	purple: 'bg-purple-500 border-purple-300',
-	red: 'bg-red-500 border-red-300'
+	blue: 'bg-info border-info/40',
+	green: 'bg-accent border-accent/40',
+	purple: 'bg-info border-info/40',
+	red: 'bg-danger border-danger/30'
 }[color]);
 
 // Generate tick marks
@@ -103,12 +103,12 @@ function handleChange(e: Event) {
 	{#if label || showValue}
 		<div class="flex justify-between items-center mb-2">
 			{#if label}
-				<label for={id} class="text-sm font-medium text-slate-300">
+				<label for={id} class="text-sm font-medium text-sand/40">
 					{label}
 				</label>
 			{/if}
 			{#if showValue}
-				<span class="text-sm text-slate-400 tabular-nums">
+				<span class="text-sm text-sand/40 tabular-nums">
 					{#if valueLabel}
 						{@render valueLabel(value)}
 					{:else}
@@ -122,7 +122,7 @@ function handleChange(e: Event) {
 	<div class="relative">
 		<!-- Track background -->
 		<div class="absolute inset-0 flex items-center">
-			<div class="w-full {trackHeight} bg-slate-700 rounded-full overflow-hidden
+			<div class="w-full {trackHeight} bg-panelSoft rounded-full overflow-hidden
 						{variant === 'nes' ? 'border-2 border-white' : ''}">
 				<!-- Filled portion -->
 				<div
@@ -173,7 +173,7 @@ function handleChange(e: Event) {
 	{#if showTicks && ticks().length > 0}
 		<div class="flex justify-between mt-1 px-1">
 			{#each ticks() as tick}
-				<span class="text-xs text-slate-500">{tick}</span>
+				<span class="text-xs text-sand/60">{tick}</span>
 			{/each}
 		</div>
 	{/if}

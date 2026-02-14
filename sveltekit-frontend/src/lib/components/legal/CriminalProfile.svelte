@@ -53,39 +53,39 @@ import type { Case } from '$lib/types';
   // Configs - consistent property names
   const riskConfig = {
     low: {
-	label: 'Low Risk', className: 'bg-green-500/20 text-green-400 border-green-500/30' },
+	label: 'Low Risk', className: 'bg-accent/20 text-accent border-accent/30' },
 	medium: {
-	label: 'Medium Risk', className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+	label: 'Medium Risk', className: 'bg-warning/20 text-warning border-warning/30' },
 	high: {
-	label: 'High Risk', className: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
+	label: 'High Risk', className: 'bg-warning/20 text-warning border-warning/30' },
 	extreme: {
-	label: 'Extreme Risk', className: 'bg-red-500/20 text-red-400 border-red-500/30' }
+	label: 'Extreme Risk', className: 'bg-danger/20 text-danger/80 border-danger/30' }
   };
   const statusConfig = {
     at_large: {
-	label: 'At Large', className: 'bg-red-500/20 text-red-400', icon: 'âš ï¸' },
+	label: 'At Large', className: 'bg-danger/20 text-danger/80', icon: 'âš ï¸' },
 	incarcerated: {
-	label: 'Incarcerated', className: 'bg-gray-500/20 text-gray-400', icon: 'ðŸ”’' },
+	label: 'Incarcerated', className: 'bg-sand/20/20 text-sand/40', icon: 'ðŸ”’' },
 	on_parole: {
-	label: 'On Parole', className: 'bg-yellow-500/20 text-yellow-400', icon: 'ðŸ‘ï¸' },
+	label: 'On Parole', className: 'bg-warning/20 text-warning', icon: 'ðŸ‘ï¸' },
 	probation: {
-	label: 'Probation', className: 'bg-blue-500/20 text-blue-400', icon: 'ðŸ“„' },
+	label: 'Probation', className: 'bg-info/20 text-info/80', icon: 'ðŸ“„' },
 	deceased: {
-	label: 'Deceased', className: 'bg-gray-500/20 text-gray-400', icon: 'âš°ï¸' },
+	label: 'Deceased', className: 'bg-sand/20/20 text-sand/40', icon: 'âš°ï¸' },
 	cleared: {
-	label: 'Cleared', className: 'bg-green-500/20 text-green-400', icon: 'âœ…' }
+	label: 'Cleared', className: 'bg-accent/20 text-accent', icon: 'âœ…' }
   };
   const dispositionConfig = {
     convicted: {
-	label: 'Convicted', className: 'bg-red-500/20 text-red-400' },
+	label: 'Convicted', className: 'bg-danger/20 text-danger/80' },
 	acquitted: {
-	label: 'Acquitted', className: 'bg-green-500/20 text-green-400' },
+	label: 'Acquitted', className: 'bg-accent/20 text-accent' },
 	dismissed: {
-	label: 'Dismissed', className: 'bg-blue-500/20 text-blue-400' },
+	label: 'Dismissed', className: 'bg-info/20 text-info/80' },
 	pending: {
-	label: 'Pending', className: 'bg-yellow-500/20 text-yellow-400' },
+	label: 'Pending', className: 'bg-warning/20 text-warning' },
 	sealed: {
-	label: 'Sealed', className: 'bg-gray-500/20 text-gray-400' }
+	label: 'Sealed', className: 'bg-sand/20/20 text-sand/40' }
   };
   // helpers
   function toDate(d: string | Date): Date {
@@ -130,12 +130,12 @@ import type { Case } from '$lib/types';
 <div
   class={cn(
     'criminal-profile bg-yorha-bg-secondary border border-yorha-border rounded-lg overflow-hidden',
-    profile?.currentStatus === 'at_large' && 'border-red-500/30',
+    profile?.currentStatus === 'at_large' && 'border-danger/30',
     className
   )}
 >
   <!-- Profile, Header -->
-  <div class={cn('p-4 border-b border-yorha-border', profile?.currentStatus === 'at_large' && 'bg-red-500/5')}>
+  <div class={cn('p-4 border-b border-yorha-border', profile?.currentStatus === 'at_large' && 'bg-danger/5')}>
     <div class="flex items-start">
       <!-- Profile, Photo/Mugshot -->
       <div class="shrink-0">
@@ -188,10 +188,10 @@ import type { Case } from '$lib/types';
             </span>
           </div>
           {#if profile.riskAssessment.flightRisk}
-            <span class="px-2 py-0.5 bg-red-500/20 text-red-400 border border-red-500/30"> FLIGHT RISK </span>
+            <span class="px-2 py-0.5 bg-danger/20 text-danger/80 border border-danger/30"> FLIGHT RISK </span>
           {/if}
           {#if profile.riskAssessment.violentHistory}
-            <span class="px-2 py-0.5 bg-red-500/20 text-red-400 border border-red-500/30">
+            <span class="px-2 py-0.5 bg-danger/20 text-danger/80 border border-danger/30">
               VIOLENT HISTORY
             </span>
           {/if}
@@ -200,14 +200,14 @@ import type { Case } from '$lib/types';
     </div>
     <!-- Active:Warrants, Alert -->
     {#if activeWarrants.length > 0}
-      <div class="mt-3 p-3 bg-red-500/10 border border-red-500/20">
-        <div class="flex items-center gap-2 text-red-400 font-medium text-sm font-mono">
+      <div class="mt-3 p-3 bg-danger/10 border border-danger/20">
+        <div class="flex items-center gap-2 text-danger/80 font-medium text-sm font-mono">
           <!-- alert, emoji, fallback -->
           <span class="text-sm">âš ï¸</span>
           {activeWarrants.length} Active Warrant{activeWarrants.length !== 1 ? 's' : ''}
         </div>
         {#each Array.isArray(activeWarrants) ? activeWarrants : [] as warrant}
-          <div class="text-xs text-red-300">
+          <div class="text-xs text-danger/60">
             {warrant.type} - {warrant.jurisdiction} ({formatDate(warrant.issueDate)})
           </div>
         {/each}

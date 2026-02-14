@@ -85,34 +85,34 @@
   function getStatusColor(status: string): string {
     switch (status) {
       case 'active':
-      case 'in_progress': return 'text-green-400';
+      case 'in_progress': return 'text-accent';
       case 'review':
-      case 'pending': return 'text-yellow-400';
+      case 'pending': return 'text-warning';
       case 'closed':
-      case 'completed': return 'text-slate-400';
-      default:return 'text-slate-400';
+      case 'completed': return 'text-sand/40';
+      default:return 'text-sand/40';
     }
   }
 
   function getPriorityColor(priority: string): string {
     switch (priority) {
       case 'high':
-      case 'critical': return 'border-red-400';
-      case 'medium': return 'border-yellow-400';
-      case 'low': return 'border-green-400';
-      default:return 'border-slate-400';
+      case 'critical': return 'border-danger/60';
+      case 'medium': return 'border-warning';
+      case 'low': return 'border-accent/60';
+      default:return 'border-sand/30';
     }
   }
 </script>
 
-<div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
  <div class="flex items-center justify-between mb-4">
- <h2 class="text-xl font-semibold text-cyan-400">Active Cases</h2>
+ <h2 class="text-xl font-semibold text-info">Active Cases</h2>
  <div class="flex items-center space-x-2">
  {#if loading}
- <div class="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+ <div class="w-4 h-4 border-2 border-info/80 border-t-transparent rounded-full animate-spin"></div>
  {/if}
- <button class="px-3 py-1 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
+ <button class="px-3 py-1 bg-info/80/20 hover:bg-info/80/30 text-info text-sm rounded transition-colors">
  View All
  </button>
  </div>
@@ -120,42 +120,42 @@
 
  {#if error}
  <div class="text-center py-8">
- <div class="text-red-400 mb-2">⚠️ {error}</div>
- <div class="text-sm text-slate-400">Showing cached data</div>
+ <div class="text-danger/80 mb-2">⚠️ {error}</div>
+ <div class="text-sm text-sand/40">Showing cached data</div>
  </div>
  {/if}
 
  <div class="space-y-4">
  {#each activeCases as caseItem}
- <div class="bg-slate-700/30 rounded-lg p-4 border-l-4 {getPriorityColor(caseItem.priority)}">
+ <div class="bg-panelSoft/30 rounded-lg p-4 border-l-4 {getPriorityColor(caseItem.priority)}">
  <div class="flex items-start justify-between mb-2">
  <div>
  <h3 class="font-medium text-white text-sm">{caseItem.title}</h3>
- <p class="text-xs text-slate-400">{caseItem.id}</p>
+ <p class="text-xs text-sand/40">{caseItem.id}</p>
  </div>
- <span class="px-2 py-1 {getStatusColor(caseItem.status)} text-xs bg-slate-600/50 rounded">
+ <span class="px-2 py-1 {getStatusColor(caseItem.status)} text-xs bg-panelSoft/50 rounded">
  {caseItem.status.toUpperCase()}
  </span>
  </div>
 
- <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+ <div class="flex items-center justify-between text-xs text-sand/40 mb-2">
  <span>{caseItem.evidenceCount} evidence items</span>
  <span>{caseItem.lastActivity}</span>
  </div>
 
- <div class="w-full bg-slate-600 rounded-full h-1.5">
+ <div class="w-full bg-panelSoft rounded-full h-1.5">
  <div
- class="h-1.5 rounded-full bg-cyan-400 transition-all duration-300"
+ class="h-1.5 rounded-full bg-info/80 transition-all duration-300"
  style="width: {caseItem.progress}%"
  ></div>
  </div>
- <div class="text-xs text-slate-400 mt-1">{caseItem.progress}% complete</div>
+ <div class="text-xs text-sand/40 mt-1">{caseItem.progress}% complete</div>
  </div>
  {:else}
  {#if !loading}
  <div class="text-center py-8">
- <div class="text-slate-400 mb-2">No active cases found</div>
- <button class="px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded transition-colors">
+ <div class="text-sand/40 mb-2">No active cases found</div>
+ <button class="px-4 py-2 bg-info/80/20 hover:bg-info/80/30 text-info text-sm rounded transition-colors">
  Create New Case
  </button>
  </div>
@@ -163,10 +163,10 @@
  {/each}
  </div>
 
- <div class="mt-4 pt-4 border-t border-slate-700/50">
+ <div class="mt-4 pt-4 border-t border-sand/20/50">
  <div class="flex items-center justify-between text-sm">
- <span class="text-slate-400">Total Active Cases:</span>
- <span class="text-cyan-400 font-medium">{activeCases.length}</span>
+ <span class="text-sand/40">Total Active Cases:</span>
+ <span class="text-info font-medium">{activeCases.length}</span>
  </div>
  </div>
 </div>

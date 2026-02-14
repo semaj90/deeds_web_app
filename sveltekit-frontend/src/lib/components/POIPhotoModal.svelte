@@ -141,7 +141,7 @@
  </div>
 
  <!-- Metadata Panel -->
- <div class="w-96 bg-gray-50 dark:bg-gray-900 border-l overflow-y-auto">
+ <div class="w-96 bg-sand/5 dark:bg-panel border-l overflow-y-auto">
  <div class="p-6">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-lg font-semibold">Photo Analysis</h3>
@@ -168,19 +168,19 @@
  </CardHeader>
  <CardContent class="space-y-2 text-sm">
  <div class="flex justify-between">
- <span class="text-gray-600">Filename:</span>
+ <span class="text-sand/60">Filename:</span>
  <span class="font-mono">{currentPhoto.originalName}</span>
  </div>
  <div class="flex justify-between">
- <span class="text-gray-600">Size:</span>
+ <span class="text-sand/60">Size:</span>
  <span>{formatFileSize(currentPhoto.size)}</span>
  </div>
  <div class="flex justify-between">
- <span class="text-gray-600">Type:</span>
+ <span class="text-sand/60">Type:</span>
  <span>{currentPhoto.mimeType}</span>
  </div>
  <div class="flex justify-between">
- <span class="text-gray-600">Uploaded:</span>
+ <span class="text-sand/60">Uploaded:</span>
  <span>{formatDate(currentPhoto.uploadedAt)}</span>
  </div>
  </CardContent>
@@ -193,12 +193,12 @@
  </CardHeader>
  <CardContent class="text-sm">
  <div class="flex justify-between">
- <span class="text-gray-600">Resolution:</span>
+ <span class="text-sand/60">Resolution:</span>
  <span>{currentPhoto.forensicData.dimensions.width} × {currentPhoto.forensicData.dimensions.height}</span>
  </div>
  {#if currentPhoto.forensicData.imageQuality}
  <div class="flex justify-between">
- <span class="text-gray-600">Quality:</span>
+ <span class="text-sand/60">Quality:</span>
  <Badge variant={currentPhoto.forensicData.imageQuality === 'high' ? 'default' : 'secondary'}>
  {currentPhoto.forensicData.imageQuality}
  </Badge>
@@ -219,7 +219,7 @@
  </CardTitle>
  </CardHeader>
  <CardContent>
- <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+ <p class="text-sm text-sand/80 dark:text-sand/40 leading-relaxed">
  {currentPhoto.aiCaption}
  </p>
  </CardContent>
@@ -234,7 +234,7 @@
  <CardContent>
  <div class="flex flex-wrap gap-2">
  {#each currentPhoto.aiTags as tag}
- <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{tag}</span>
+ <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20 text-sand/80">{tag}</span>
  {/each}
  </div>
  </CardContent>
@@ -249,14 +249,14 @@
  <CardContent class="space-y-2 text-sm">
  {#if currentPhoto.forensicData.perceptualHash}
  <div class="flex justify-between">
- <span class="text-gray-600">Perceptual Hash:</span>
+ <span class="text-sand/60">Perceptual Hash:</span>
  <span class="font-mono text-xs">{currentPhoto.forensicData.perceptualHash}</span>
  </div>
  {/if}
  {#if currentPhoto.forensicData.lightingConditions}
  <div class="flex justify-between">
- <span class="text-gray-600">Lighting:</span>
- <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{currentPhoto.forensicData.lightingConditions}</span>
+ <span class="text-sand/60">Lighting:</span>
+ <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20 text-sand/80">{currentPhoto.forensicData.lightingConditions}</span>
  </div>
  {/if}
  </CardContent>
@@ -276,7 +276,7 @@
  <CardContent class="space-y-2 text-sm">
  {#each Object.entries(currentPhoto.exifData) as [key, value]}
  <div class="flex justify-between">
- <span class="text-gray-600">{key}:</span>
+ <span class="text-sand/60">{key}:</span>
  <span class="font-mono text-xs">{String(value)}</span>
  </div>
  {/each}
@@ -284,7 +284,7 @@
  </Card>
  {:else}
  <Card>
- <CardContent class="text-center py-8 text-gray-500">
+ <CardContent class="text-center py-8 text-sand/60">
  <Camera class="w-8 h-8 mx-auto mb-2 opacity-50" />
  <p>No EXIF data available</p>
  </CardContent>

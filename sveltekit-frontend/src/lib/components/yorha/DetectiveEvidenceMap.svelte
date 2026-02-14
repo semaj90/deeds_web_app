@@ -385,33 +385,33 @@
 </script>
 
 {#if show}
- <div class="detective-map-container bg-slate-900 rounded-lg p-4">
+ <div class="detective-map-container bg-panel rounded-lg p-4">
  <!-- Header -->
  <div class="flex items-center justify-between mb-4">
  <div class="flex items-center gap-4">
- <h2 class="text-xl font-bold text-cyan-400">🕵️♂️ Detective Evidence Map</h2>
+ <h2 class="text-xl font-bold text-info">🕵️♂️ Detective Evidence Map</h2>
  <div class="flex gap-2">
  <button
  onclick={() => filterMode = 'all'}
- class="px-3 py-1 text-xs rounded {filterMode === 'all' ? 'bg-cyan-600 text-white' : 'bg-slate-700 text-slate-300'}"
+ class="px-3 py-1 text-xs rounded {filterMode === 'all' ? 'bg-info text-white' : 'bg-panelSoft text-sand/40'}"
  >
  All
  </button>
  <button
  onclick={() => filterMode = 'evidence'}
- class="px-3 py-1 text-xs rounded {filterMode === 'evidence' ? 'bg-cyan-600 text-white' : 'bg-slate-700 text-slate-300'}"
+ class="px-3 py-1 text-xs rounded {filterMode === 'evidence' ? 'bg-info text-white' : 'bg-panelSoft text-sand/40'}"
  >
  Evidence
  </button>
  <button
  onclick={() => filterMode = 'contradictions'}
- class="px-3 py-1 text-xs rounded {filterMode === 'contradictions' ? 'bg-cyan-600 text-white' : 'bg-slate-700 text-slate-300'}"
+ class="px-3 py-1 text-xs rounded {filterMode === 'contradictions' ? 'bg-info text-white' : 'bg-panelSoft text-sand/40'}"
  >
  Contradictions
  </button>
  <button
  onclick={() => filterMode = 'timeline'}
- class="px-3 py-1 text-xs rounded {filterMode === 'timeline' ? 'bg-cyan-600 text-white' : 'bg-slate-700 text-slate-300'}"
+ class="px-3 py-1 text-xs rounded {filterMode === 'timeline' ? 'bg-info text-white' : 'bg-panelSoft text-sand/40'}"
  >
  Timeline
  </button>
@@ -419,10 +419,10 @@
  </div>
 
  <div class="flex gap-2">
- <button onclick={resetZoom} class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
+ <button onclick={resetZoom} class="px-3 py-1 text-xs bg-panelSoft text-sand/40 rounded hover:bg-panelSoft">
  Reset Zoom
  </button>
- <button onclick={ loadData } class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
+ <button onclick={ loadData } class="px-3 py-1 text-xs bg-panelSoft text-sand/40 rounded hover:bg-panelSoft">
  Refresh
  </button>
  </div>
@@ -431,27 +431,27 @@
  <!-- Legend -->
  <div class="flex gap-6 mb-4 text-xs">
  <div class="flex items-center gap-2">
- <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+ <div class="w-3 h-3 rounded-full bg-info"></div>
  <span>New Evidence</span>
  </div>
  <div class="flex items-center gap-2">
- <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+ <div class="w-3 h-3 rounded-full bg-warning"></div>
  <span>Under Review</span>
  </div>
  <div class="flex items-center gap-2">
- <div class="w-3 h-3 rounded-full bg-green-500"></div>
+ <div class="w-3 h-3 rounded-full bg-accent"></div>
  <span>Approved</span>
  </div>
  <div class="flex items-center gap-2">
- <div class="w-3 h-3 rounded-full bg-red-500"></div>
+ <div class="w-3 h-3 rounded-full bg-danger"></div>
  <span>Rejected/POI</span>
  </div>
  <div class="flex items-center gap-2">
- <span class="text-red-400">━━</span>
+ <span class="text-danger/80">━━</span>
  <span>Contradiction</span>
  </div>
  <div class="flex items-center gap-2">
- <span class="text-blue-400" style="text-decoration: underline;">╌╌</span>
+ <span class="text-info/80" style="text-decoration: underline;">╌╌</span>
  <span>Timeline</span>
  </div>
  </div>
@@ -459,40 +459,40 @@
  <!-- Visualization -->
  <div class="relative">
  {#if isLoading}
- <div class="absolute inset-0 flex items-center justify-center bg-slate-900/80 rounded">
+ <div class="absolute inset-0 flex items-center justify-center bg-panel/80 rounded">
  <div class="text-center">
- <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
- <p class="text-cyan-400">Analyzing evidence relationships...</p>
+ <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-info/80 mx-auto mb-4"></div>
+ <p class="text-info">Analyzing evidence relationships...</p>
  </div>
  </div>
  {/if}
 
- <div bind:this={container} class="w-full h-[600px] bg-slate-950 rounded border border-slate-700"></div>
+ <div bind:this={container} class="w-full h-[600px] bg-panel rounded border border-sand/20"></div>
  </div>
 
  <!-- Selected Node Details -->
  {#if selectedNode}
- <div class="mt-4 p-4 bg-slate-800 rounded border border-slate-600">
- <h3 class="font-bold text-cyan-400 mb-2">{selectedNode.title}</h3>
+ <div class="mt-4 p-4 bg-panelSoft rounded border border-sand/30">
+ <h3 class="font-bold text-info mb-2">{selectedNode.title}</h3>
  <div class="grid grid-cols-2 gap-4 text-sm">
  <div>
- <span class="text-slate-400">Type:</span>
+ <span class="text-sand/40">Type:</span>
  <span class="ml-2 text-white">{selectedNode.type}</span>
  </div>
  <div>
- <span class="text-slate-400">Status:</span>
+ <span class="text-sand/40">Status:</span>
  <span class="ml-2 text-white">{selectedNode.status || 'Unknown'}</span>
  </div>
  {#if selectedNode.timestamp}
  <div>
- <span class="text-slate-400">Timestamp:</span>
+ <span class="text-sand/40">Timestamp:</span>
  <span class="ml-2 text-white">{new Date(selectedNode.timestamp).toLocaleString()}</span>
  </div>
  {/if}
  {#if selectedNode.contradictions}
  <div>
- <span class="text-slate-400">Contradictions:</span>
- <span class="ml-2 text-red-400">{selectedNode.contradictions}</span>
+ <span class="text-sand/40">Contradictions:</span>
+ <span class="ml-2 text-danger/80">{selectedNode.contradictions}</span>
  </div>
  {/if}
  </div>

@@ -135,26 +135,26 @@ https, //svelte.dev/e/js_parse_error -->
  }
 </script>
 
-<div class="detective-mode-dashboard min-h-screen bg-slate-950">
+<div class="detective-mode-dashboard min-h-screen bg-panel">
  <!-- Header -->
- <div class="bg-gradient-to-r from-slate-900 to-slate-800 border-b border-slate-700 p-6">
+ <div class="bg-gradient-to-r from-panel to-panelSoft border-b border-sand/20 p-6">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-4">
  <div class="text-3xl">🕵️</div>
  <div>
- <h1 class="text-2xl font-bold text-blue-400">Phase 4: Detective Mode</h1>
- <p class="text-slate-400">Professional Investigative AI System</p>
+ <h1 class="text-2xl font-bold text-info/80">Phase 4: Detective Mode</h1>
+ <p class="text-sand/40">Professional Investigative AI System</p>
  </div>
  </div>
 
  {#if currentCase}
- <div class="bg-slate-800 rounded-lg p-4">
+ <div class="bg-panelSoft rounded-lg p-4">
  <h2 class="font-medium text-white">{currentCase.title}</h2>
- <p class="text-sm text-slate-400">Case #{currentCase.id}</p>
+ <p class="text-sm text-sand/40">Case #{currentCase.id}</p>
  <div class="flex items-center gap-2 mt-2">
  <span class="px-2 py-1 rounded text-xs font-medium
- {currentCase.status === 'active' ? 'bg-green-900/20 text-green-400' :
- currentCase.status === 'pending' ? 'bg-yellow-900/20 text-yellow-400' : 'bg-slate-700 text-slate-400'}">
+ {currentCase.status === 'active' ? 'bg-accent/10 text-accent' :
+ currentCase.status === 'pending' ? 'bg-warning/20/20 text-warning' : 'bg-panelSoft text-sand/40'}">
  {currentCase.status.toUpperCase()}
  </span>
  </div>
@@ -164,15 +164,15 @@ https, //svelte.dev/e/js_parse_error -->
  </div>
 
  <!-- Module Navigation -->
- <div class="bg-slate-900 border-b border-slate-700 px-6 py-4">
+ <div class="bg-panel border-b border-sand/20 px-6 py-4">
  <div class="flex gap-1 overflow-x-auto">
  {#each (['map', 'police', 'cross-exam', 'judicial', 'timeline'] as const) as module}
  <button
  onclick={() => handleModuleChange(module)}
  class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap
  {activeModule === module
- ? 'bg-blue-600 text-white'
- : 'text-slate-400 hover:text-white hover:bg-slate-800'}"
+ ? 'bg-info text-white'
+ : 'text-sand/40 hover:text-white hover:bg-panelSoft'}"
  >
  <span class="text-lg">{getModuleIcon(module)}</span>
  <span class="font-medium">{getModuleTitle(module)}</span>
@@ -221,19 +221,19 @@ https, //svelte.dev/e/js_parse_error -->
 
  <!-- Witness Selector (for cross-examination) -->
  {#if activeModule === 'cross-exam' && witnesses.length > 0}
- <div class="fixed bottom-6 right-6 bg-slate-800 border border-slate-600 rounded-lg p-4 shadow-lg">
+ <div class="fixed bottom-6 right-6 bg-panelSoft border border-sand/30 rounded-lg p-4 shadow-lg">
  <h3 class="font-medium text-white mb-3">Select Witness</h3>
  <div class="space-y-2 max-h-48 overflow-y-auto">
  {#each witnesses as witness (witness.id)}
  <button
  onclick={() => selectedWitness = witness}
- class="w-full text-left p-2 rounded hover:bg-slate-700 transition-colors
- {selectedWitness?.id === witness.id ? 'bg-blue-600 text-white' : 'text-slate-300'}"
+ class="w-full text-left p-2 rounded hover:bg-panelSoft transition-colors
+ {selectedWitness?.id === witness.id ? 'bg-info text-white' : 'text-sand/40'}"
  >
  <div class="flex items-center justify-between">
  <span class="font-medium">{witness.name}</span>
  {#if witness.credibility}
- <span class="text-xs text-slate-400">{witness.credibility}/10</span>
+ <span class="text-xs text-sand/40">{witness.credibility}/10</span>
  {/if}
  </div>
  </button>
@@ -243,19 +243,19 @@ https, //svelte.dev/e/js_parse_error -->
  {/if}
 
  <!-- Quick Stats -->
- <div class="fixed top-24 right-6 bg-slate-800 border border-slate-600 rounded-lg p-4 shadow-lg">
+ <div class="fixed top-24 right-6 bg-panelSoft border border-sand/30 rounded-lg p-4 shadow-lg">
  <h3 class="font-medium text-white mb-3">Case Overview</h3>
  <div class="space-y-2 text-sm">
  <div class="flex justify-between">
- <span class="text-slate-400">Evidence:</span>
+ <span class="text-sand/40">Evidence:</span>
  <span class="text-white">{caseEvidence.length}</span>
  </div>
  <div class="flex justify-between">
- <span class="text-slate-400">Witnesses:</span>
+ <span class="text-sand/40">Witnesses:</span>
  <span class="text-white">{witnesses.length}</span>
  </div>
  <div class="flex justify-between">
- <span class="text-slate-400">Charges:</span>
+ <span class="text-sand/40">Charges:</span>
  <span class="text-white">{charges.length}</span>
  </div>
  </div>

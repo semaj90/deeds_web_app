@@ -85,7 +85,7 @@
         <div
             role="button"
             tabindex="0"
-            class="drop-zone border-2 border-dashed border-gray-400 p-10 text-center transition-colors mb-4 cursor-pointer"
+            class="drop-zone border-2 border-dashed border-sand/30 p-10 text-center transition-colors mb-4 cursor-pointer"
             class:drag-over={dragOver}
             ondragover={(e: DragEvent) => {
                 e.preventDefault();
@@ -109,11 +109,11 @@
             />
 
             {#if snapshot.matches('validating')}
-                <div class="animate-pulse text-blue-600">
+                <div class="animate-pulse text-info">
                     [VALIDATING_RESOURCES...]
                 </div>
             {:else}
-                <div class="text-gray-500">
+                <div class="text-sand/60">
                     <p class="text-lg">DRAG_AND_DROP_FILES</p>
                     <p class="text-xs mt-2 italic">OR CLICK TO BROWSE_FILESYSTEM</p>
                 </div>
@@ -122,16 +122,16 @@
 
         {#if context.files.length > 0}
             <div class="file-list mb-4 space-y-2" in:slide>
-                <h3 class="text-xs font-bold uppercase text-gray-400 mb-2">Selected_Queue:</h3>
+                <h3 class="text-xs font-bold uppercase text-sand/40 mb-2">Selected_Queue:</h3>
                 {#each context.files as file}
-                    <div class="file-item flex justify-between bg-gray-50 p-2 text-xs border border-gray-200">
+                    <div class="file-item flex justify-between bg-sand/5 p-2 text-xs border border-sand/20">
                         <span class="truncate max-w-[70%]">{file.name}</span>
-                        <span class="text-gray-400">{formatSize(file.size)}</span>
+                        <span class="text-sand/40">{formatSize(file.size)}</span>
                     </div>
                 {/each}
 
                 {#if Object.keys(context.validationErrors).length > 0}
-                    <div class="errors mt-2 p-2 bg-red-50 border border-red-200 text-red-600 text-[10px]" in:fade>
+                    <div class="errors mt-2 p-2 bg-danger/5 border border-danger/20 text-danger text-[10px]" in:fade>
                         {#each Object.entries(context.validationErrors) as [field, msgs]}
                             {#each Array.isArray(msgs) ? msgs : [] as msg}
                                 <div>[VALIDATION_ERROR: {msg}]</div>
@@ -166,7 +166,7 @@
                     {snapshot.matches('uploading') ? 'TRANSMITTING_DATA' : 'NEURAL_PROCESSING'}
                 </div>
 
-                <div class="progress-bar-container w-full h-4 border-2 border-black bg-gray-100 relative overflow-hidden">
+                <div class="progress-bar-container w-full h-4 border-2 border-black bg-sand/10 relative overflow-hidden">
                     <div
                         class="progress-fill h-full bg-black transition-all duration-300"
                         style="width: {snapshot.matches('uploading') ? context.uploadProgress : context.processingProgress}%"
@@ -179,7 +179,7 @@
                 </div>
             </div>
 
-            <div class="terminal-output bg-black text-green-500 p-4 text-left font-mono text-[10px] h-32 overflow-hidden bg-opacity-90">
+            <div class="terminal-output bg-black text-accent p-4 text-left font-mono text-[10px] h-32 overflow-hidden bg-opacity-90">
                 <div>> INITIATING_CONNECTION...</div>
                 {#if snapshot.matches('uploading')}
                     <div>> UPLOADING_DOCUMENT_PACKETS...</div>
@@ -195,14 +195,14 @@
         </div>
 
     {:else if snapshot.matches('completed')}
-        <div class="success-result p-6 border-2 border-green-500 bg-green-50" in:fade>
-            <div class="text-green-700 font-bold text-center mb-4">
+        <div class="success-result p-6 border-2 border-accent bg-accent/5" in:fade>
+            <div class="text-accent font-bold text-center mb-4">
                 [SYSTEM_SUCCESS: ALL_DATA_PROCESSED]
             </div>
 
-            <div class="text-xs space-y-2 text-gray-600 mb-6">
+            <div class="text-xs space-y-2 text-sand/60 mb-6">
                 {#if context.aiResults}
-                    <div class="p-4 bg-white border border-green-200">
+                    <div class="p-4 bg-white border border-accent/20">
                         <p class="font-bold mb-2 text-black border-b border-black pb-1">AI_SUMMARY:</p>
                         <p class="leading-relaxed">{context.aiResults.summary}</p>
                     </div>
@@ -215,11 +215,11 @@
         </div>
 
     {:else if snapshot.matches('error')}
-        <div class="error-result p-6 border-2 border-red-500 bg-red-50" in:fade>
-            <div class="text-red-700 font-bold text-center mb-4 uppercase">
+        <div class="error-result p-6 border-2 border-danger bg-danger/5" in:fade>
+            <div class="text-danger font-bold text-center mb-4 uppercase">
                 [SYSTEM_CRITICAL_FAILURE]
             </div>
-            <div class="text-xs text-red-600 p-4 bg-white border border-red-200 mb-6 font-mono">
+            <div class="text-xs text-danger p-4 bg-white border border-danger/20 mb-6 font-mono">
                 > ERROR_LOG: {context.error}
             </div>
 

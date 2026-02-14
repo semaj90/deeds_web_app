@@ -30,63 +30,63 @@ id: 'idle',
 name: 'Ready to Upload',
 icon: Clock,
 description: 'Waiting for files to be selected',
-color: 'bg-gray-500'
+color: 'bg-sand/20'
 },
 {
 id: 'requesting_presign',
 name: 'Preparing Upload',
 icon: Network,
 description: 'Generating secure upload URLs with MinIO',
-color: 'bg-blue-500'
+color: 'bg-info'
 },
 {
 id: 'uploading',
 name: 'File Upload',
 icon: Zap,
 description: 'Uploading chunks to secure storage',
-color: 'bg-purple-500'
+color: 'bg-info'
 },
 {
 id: 'rabbitmq_queue',
 name: 'Queue Processing',
 icon: Network,
 description: 'Adding to RabbitMQ processing queue',
-color: 'bg-orange-500'
+color: 'bg-warning'
 },
 {
 id: 'ocr_extraction',
 name: 'OCR Analysis',
 icon: Eye,
 description: 'Extracting text from images and PDFs',
-color: 'bg-cyan-500'
+color: 'bg-info'
 },
 {
 id: 'text_extraction',
 name: 'Document Parsing',
 icon: Database,
 description: 'Advanced text extraction and preprocessing',
-color: 'bg-green-500'
+color: 'bg-accent'
 },
 {
 id: 'vector_embedding',
 name: 'Vectorization',
 icon: Brain,
 description: 'Generating vector embeddings for AI search',
-color: 'bg-indigo-500'
+color: 'bg-info'
 },
 {
 id: 'completed',
 name: 'Upload Complete',
 icon: CheckCircle,
 description: 'File processed and indexed successfully',
-color: 'bg-emerald-500'
+color: 'bg-accent'
 },
 {
 id: 'error',
 name: 'Upload Failed',
 icon: AlertCircle,
 description: 'An error occurred during processing',
-color: 'bg-red-500'
+color: 'bg-danger'
 }
 ];
 
@@ -108,7 +108,7 @@ return id ? id.slice(0, 8) : '';
 {#if uploadState.jobId}
 <div class="flex items-center text-xs text-muted-foreground">
 Job ID:
-<span class="ml-2 font-mono text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+<span class="ml-2 font-mono text-xs bg-sand/10 dark:bg-panelSoft px-2 py-1 rounded">
 {formatJobId(uploadState.jobId)}
 </span>
 </div>
@@ -145,7 +145,7 @@ Job ID:
 <Loader2 class="w-4 h-4" />
 </div>
 {:else if i < getActiveStageIndex(uploadState.status) || uploadState.status === 'completed'}
-<div class="text-emerald-500">
+<div class="text-accent">
 <CheckCircle class="w-4 h-4" />
 </div>
 {/if}
@@ -155,14 +155,14 @@ Job ID:
 
 <!-- Error State -->
 {#if uploadState.status === 'error'}
-<div class="flex items-start gap-4 p-4 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-200 dark:border-red-900">
-<AlertCircle class="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
+<div class="flex items-start gap-4 p-4 bg-danger/5 dark:bg-danger/20/10 rounded-lg border border-danger/20">
+<AlertCircle class="w-5 h-5 text-danger dark:text-danger/80 mt-0.5" />
 <div class="flex-1">
-<h4 class="text-sm font-medium text-red-800 dark:text-red-300">Processing Failed</h4>
-<p class="text-sm text-red-600 dark:text-red-400 mt-1">
+<h4 class="text-sm font-medium text-danger dark:text-danger/60">Processing Failed</h4>
+<p class="text-sm text-danger dark:text-danger/80 mt-1">
 {uploadState.error || 'Unknown error occurred'}
 </p>
-<Button variant="outline" size="sm" class="mt-3 border-red-200 hover:bg-red-100 dark:border-red-800 dark:hover:bg-red-900/20" onclick={() => enhancedUploadStore.reset()}>
+<Button variant="outline" size="sm" class="mt-3 border-danger/20 hover:bg-danger/10 dark:border-danger/30 dark:hover:bg-danger/10" onclick={() => enhancedUploadStore.reset()}>
 Try Again
 </Button>
 </div>

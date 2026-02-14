@@ -46,28 +46,28 @@ import type { Case } from '$lib/types';
   let expanded = $state<boolean>(false);
   // Precedent type configurations (use className to avoid JS reserved word)
   const precedentTypeConfig = { binding: { label: 'Binding Precedent',
-      className: 'bg-green-500/20 text-green-400 border-green-500/30',
+      className: 'bg-accent/20 text-accent border-accent/30',
       priority: 1
     },
 	persuasive: {
 	label: 'Persuasive Authority',
-      className: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      className: 'bg-info/20 text-info/80 border-info/30',
       priority: 2
     },
 	distinguishable: {
 	label: 'Distinguishable',
-      className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      className: 'bg-warning/20 text-warning border-warning/30',
       priority: 3
     }
   };
   // Jurisdiction configurations
-  const jurisdictionConfig = { federal: { label: 'Federal', icon: Scale, color: 'text-blue-400' },
+  const jurisdictionConfig = { federal: { label: 'Federal', icon: Scale, color: 'text-info/80' },
 	state: {
-	label: 'State', icon: MapPin, color: 'text-green-400' },
+	label: 'State', icon: MapPin, color: 'text-accent' },
 	local: {
-	label: 'Local', icon: MapPin, color: 'text-yellow-400' },
+	label: 'Local', icon: MapPin, color: 'text-warning' },
 	international: {
-	label: 'International', icon: Scale, color: 'text-purple-400' }
+	label: 'International', icon: Scale, color: 'text-info/80' }
   };
   // Reactive derived values (avoid using {@const} in template)
   const relevanceLevel = $derived((() => {
@@ -154,10 +154,10 @@ import type { Case } from '$lib/types';
               class={cn(
                 'font-medium',
                 similarityLevel === 'high'
-                  ? 'text-green-400'
+                  ? 'text-accent'
                   similarityLevel === 'medium'
-                  ? 'text-yellow-400'
- 'text-red-400'
+                  ? 'text-warning'
+ 'text-danger/80'
               )}
             >
               {precedent.similarityScore}%
@@ -170,10 +170,10 @@ import type { Case } from '$lib/types';
               class={cn(
                 'font-medium',
                 relevanceLevel === 'high'
-                  ? 'text-green-400'
+                  ? 'text-accent'
                   relevanceLevel === 'medium'
-                  ? 'text-yellow-400'
- 'text-red-400'
+                  ? 'text-warning'
+ 'text-danger/80'
               )}
             >
               {precedent.relevanceScore}%
@@ -263,13 +263,13 @@ import type { Case } from '$lib/types';
       {/if}
     <!-- Overruled, Warning -->
     {#if precedent.overruled}
-      <div class="mb-4 p-3 bg-red-500/10 border border-red-500/20">
-        <div class="flex items-center gap-2 text-red-400 text-sm font-mono font-medium">
+      <div class="mb-4 p-3 bg-danger/10 border border-danger/20">
+        <div class="flex items-center gap-2 text-danger/80 text-sm font-mono font-medium">
           <Scale class="w-4" />
           This precedent has been overruled
         </div>
         {#if precedent.overruledBy}
-          <p class="text-xs text-red-300">Overruled by: {precedent.overruledBy}</p>
+          <p class="text-xs text-danger/60">Overruled by: {precedent.overruledBy}</p>
         {/if}
       {/if}
   </div>
@@ -321,7 +321,7 @@ import type { Case } from '$lib/types';
         {#if onAddToCase && interactive && currentCaseId}
           <button
             onclick={() => onAddToCase?.(precedent)}
-            class="px-2 py-1 text-xs font-mono bg-green-500/10 text-green-400 border border-green-500/20 rounded hover:bg-green-500/20 transition-colors"
+            class="px-2 py-1 text-xs font-mono bg-accent/10 text-accent border border-accent/20 rounded hover:bg-accent/20 transition-colors"
           >
             Add to Case
           </button>

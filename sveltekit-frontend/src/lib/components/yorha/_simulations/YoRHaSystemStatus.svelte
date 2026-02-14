@@ -64,71 +64,71 @@
 </script>
 
 <!-- System Status Bar -->
-<div class="bg-slate-900 border-t border-slate-800 px-4 py-2 flex items-center justify-between text-[10px] font-mono whitespace-nowrap overflow-hidden">
+<div class="bg-panel border-t border-sand/20 px-4 py-2 flex items-center justify-between text-[10px] font-mono whitespace-nowrap overflow-hidden">
   <!-- Status Indicators -->
   <div class="flex items-center gap-6">
     <div class="flex items-center gap-2">
       <div class="w-2 h-2 rounded-full animate-pulse"
-          class:bg-emerald-500={systemStatus === 'NORMAL'}
-          class:bg-amber-500={systemStatus === 'WARNING'}
+          class:bg-accent={systemStatus === 'NORMAL'}
+          class:bg-warning={systemStatus === 'WARNING'}
           class:bg-rose-500={systemStatus === 'CRITICAL'}
         ></div>
-      <span class="font-bold text-slate-300">SYS_STATUS: {systemStatus}</span>
+      <span class="font-bold text-sand/40">SYS_STATUS: {systemStatus}</span>
     </div>
 
     <!-- Metrics -->
-    <div class="hidden sm:flex items-center gap-4 text-slate-500">
+    <div class="hidden sm:flex items-center gap-4 text-sand/60">
       <div class="flex items-center gap-2">
         <span>CPU</span>
-        <div class="w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
-          <div class="h-full bg-cyan-500" style:width={`${systemLoad}%`}></div>
+        <div class="w-12 h-1 bg-panelSoft rounded-full overflow-hidden">
+          <div class="h-full bg-info" style:width={`${systemLoad}%`}></div>
         </div>
-        <span class="text-slate-300">{ systemLoad }%</span>
+        <span class="text-sand/40">{ systemLoad }%</span>
       </div>
       <div class="flex items-center gap-2">
         <span>GPU</span>
-        <div class="w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
-          <div class="h-full bg-pink-500" style:width={`${gpuUtilization}%`}></div>
+        <div class="w-12 h-1 bg-panelSoft rounded-full overflow-hidden">
+          <div class="h-full bg-info" style:width={`${gpuUtilization}%`}></div>
         </div>
-        <span class="text-slate-300">{ gpuUtilization }%</span>
+        <span class="text-sand/40">{ gpuUtilization }%</span>
       </div>
       <div class="flex items-center gap-2">
         <span>MEM</span>
-        <div class="w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
-          <div class="h-full bg-purple-500" style:width={`${memoryUsage}%`}></div>
+        <div class="w-12 h-1 bg-panelSoft rounded-full overflow-hidden">
+          <div class="h-full bg-info" style:width={`${memoryUsage}%`}></div>
         </div>
-        <span class="text-slate-300">{ memoryUsage }%</span>
+        <span class="text-sand/40">{ memoryUsage }%</span>
       </div>
       <div class="flex items-center gap-2">
         <span>TEMP</span>
-        <span class={cpuTemp > 80 ? 'text-rose-500' : 'text-slate-300'}>{Math.round(cpuTemp)}°C</span>
+        <span class={cpuTemp > 80 ? 'text-rose-500' : 'text-sand/40'}>{Math.round(cpuTemp)}°C</span>
       </div>
     </div>
   </div>
 
   <!-- Center (Latency) -->
-  <div class="hidden lg:flex items-center gap-4 text-slate-500">
+  <div class="hidden lg:flex items-center gap-4 text-sand/60">
     <div class="flex items-center gap-2">
       <span>LATENCY</span>
-      <span class="text-emerald-500">{ networkLatency }ms</span>
+      <span class="text-accent">{ networkLatency }ms</span>
     </div>
     <div class="flex items-center gap-2">
       <span>DISK</span>
-      <span class="text-slate-300">{ Math.round(diskUsage) }%</span>
+      <span class="text-sand/40">{ Math.round(diskUsage) }%</span>
     </div>
   </div>
 
   <!-- Right (Time/Uptime) -->
   <div class="flex items-center gap-6">
     <div class="flex items-center gap-2">
-      <span class="text-slate-500">UPTIME</span>
-      <span class="text-slate-300">{ formatUptime(uptime) }</span>
+      <span class="text-sand/60">UPTIME</span>
+      <span class="text-sand/40">{ formatUptime(uptime) }</span>
     </div>
-    <div class="flex items-center bg-slate-800 px-3 py-1 border border-slate-700 rounded-sm">
-      <span class="text-cyan-400 font-bold tracking-widest"> {currentTime.toLocaleTimeString('en-GB', { hour12: false })} </span>
+    <div class="flex items-center bg-panelSoft px-3 py-1 border border-sand/20 rounded-sm">
+      <span class="text-info font-bold tracking-widest"> {currentTime.toLocaleTimeString('en-GB', { hour12: false })} </span>
     </div>
-    <div class="hidden xl:block bg-cyan-900/20 border border-cyan-800/50 px-2 py-1 rounded-sm">
-      <span class="text-cyan-500 font-bold">YORHA-ID: AI-NODE-2B</span>
+    <div class="hidden xl:block bg-info/10 border border-info/30/50 px-2 py-1 rounded-sm">
+      <span class="text-info font-bold">YORHA-ID: AI-NODE-2B</span>
     </div>
   </div>
 </div>

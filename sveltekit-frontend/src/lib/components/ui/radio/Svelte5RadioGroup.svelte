@@ -73,8 +73,8 @@ function getOptionClasses(option: RadioOption) {
 			border-2 rounded-lg cursor-pointer
 			transition-all duration-150
 			${isSelected
-				? 'border-blue-500 bg-blue-900/20'
-				: 'border-slate-600 hover:border-slate-500'}
+				? 'border-info bg-info/10'
+				: 'border-sand/30 hover:border-sand/30'}
 			${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
 		`;
 	}
@@ -84,7 +84,7 @@ function getOptionClasses(option: RadioOption) {
 			flex items-center gap-3 p-2
 			border-2 border-white cursor-pointer
 			font-["Press_Start_2P",monospace] text-sm
-			${isSelected ? 'bg-blue-600' : 'bg-slate-900 hover:bg-slate-800'}
+			${isSelected ? 'bg-info' : 'bg-panel hover:bg-panelSoft'}
 			${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
 		`;
 	}
@@ -101,10 +101,10 @@ function getOptionClasses(option: RadioOption) {
 	{ disabled }
 >
 	{#if label}
-		<legend class="text-sm font-medium text-slate-300 mb-3">
+		<legend class="text-sm font-medium text-sand/40 mb-3">
 			{label}
 			{#if required}
-				<span class="text-red-400 ml-1">*</span>
+				<span class="text-danger/80 ml-1">*</span>
 			{/if}
 		</legend>
 	{/if}
@@ -140,8 +140,8 @@ function getOptionClasses(option: RadioOption) {
 							   rounded-full border-2
 							   transition-all duration-150
 							   {isSelected
-								? 'border-blue-500 bg-blue-500'
-								: 'border-slate-500 bg-transparent hover:border-slate-400'}"
+								? 'border-info bg-info'
+								: 'border-sand/30 bg-transparent hover:border-sand/30'}"
 					>
 						{#if isSelected}
 							<span
@@ -162,7 +162,7 @@ function getOptionClasses(option: RadioOption) {
 						{option.label}
 					</span>
 					{#if option.description}
-						<span class="text-sm text-slate-400 mt-0.5">
+						<span class="text-sm text-sand/40 mt-0.5">
 							{option.description}
 						</span>
 					{/if}
@@ -171,7 +171,7 @@ function getOptionClasses(option: RadioOption) {
 				<!-- Card variant checkmark -->
 				{#if variant === 'cards' && isSelected}
 					<span class="ml-auto shrink-0">
-						<svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+						<svg class="w-5 h-5 text-info/80" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
 						</svg>
 					</span>

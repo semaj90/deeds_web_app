@@ -22,7 +22,7 @@
 	const defaultClass = `
 		absolute right-4 top-4
 		rounded-sm opacity-70
-		ring-offset-slate-900
+		ring-offset-panel
 		transition-opacity
 		hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:pointer-events-none
 	`.replace(/\s+/g, ' ').trim();

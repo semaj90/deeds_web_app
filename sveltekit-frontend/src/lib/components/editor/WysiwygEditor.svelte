@@ -92,7 +92,7 @@ relevance: r.similarity }))}
  <div class="ai-response">{ aiResults }</div>
  <button onclick={ insertAIContent } class="btn btn-secondary"> Insert into Document </button></div> {/if}
   </div> </div>
- <button class="absolute right-4 top-4 cursor-pointer border-none bg-transparent text-2xl leading-none text-gray-500" onclick={() => aiOpen.set(false)}>Ã—</button> </div> {/if}
+ <button class="absolute right-4 top-4 cursor-pointer border-none bg-transparent text-2xl leading-none text-sand/60" onclick={() => aiOpen.set(false)}>Ã—</button> </div> {/if}
   <!-- Citation Helper Modal (replaces Dialog.Root, usage) -->
   {#if $citeOpen} <div class="fixed inset-0"> <div class="fixed inset-0" onclick={() => citeOpen.set(false)} /> <div class="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-600px -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white" role="dialog" aria-modal="true" aria-labelledby="cite-title"> <h2 id="cite-title" class="pb-4 text-xl">Citation Helper</h2>
  <div class="pt-4"> <div class="space-y-4"> <label for="cite-query">Search for citations:</label>
@@ -106,7 +106,7 @@ relevance: r.similarity }))}
  <div class="citation-meta"> Relevance: {Math.round(citation.relevance * 100)}% </div>
  <button onclick={() => insertCitation(citation)} class="btn btn-secondary btn-sm"> Insert Citation </button> </div> {/each} {/if}
   </div> </div>
- <button class="absolute right-4 top-4 cursor-pointer border-none bg-transparent text-2xl leading-none text-gray-500" onclick={() => citeOpen.set(false)}>Ã—</button> </div> {/if}
+ <button class="absolute right-4 top-4 cursor-pointer border-none bg-transparent text-2xl leading-none text-sand/60" onclick={() => citeOpen.set(false)}>Ã—</button> </div> {/if}
   <style> /* @unocss-include */ .wysiwyg-container { border: 1px solid #d1d5db; border-radius: 0.5rem;
 	overflow: hidden;
 		background: white;}

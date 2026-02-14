@@ -50,10 +50,10 @@
 			'top-left': 'top-6 left-6'
 		};
 		const statusColors = {
-			idle: 'bg-gray-800 border-gray-700 text-gray-300',
-			processing: 'bg-blue-900/20 border-blue-500 text-blue-400 animate-pulse',
-			listening: 'bg-red-900/20 border-red-500 text-red-400 animate-pulse',
-			connected: 'bg-yellow-900/20 border-yellow-500 text-yellow-500'
+			idle: 'bg-panelSoft border-sand/20 text-sand/40',
+			processing: 'bg-info/10 border-info text-info/80 animate-pulse',
+			listening: 'bg-danger/10 border-danger text-danger/80 animate-pulse',
+			connected: 'bg-warning/20/20 border-warning text-warning'
 		};
 
 		let classes = `${base} ${variants[variant]} ${statusColors[aiStatus]}`;
@@ -85,13 +85,13 @@
 		aiStatus = isListening ? 'listening' : 'connected';
 	}
 
-	const statusConfig = { idle: { color: 'bg-gray-400', pulse: false },
+	const statusConfig = { idle: { color: 'bg-sand/20', pulse: false },
 	processing: {
-	color: 'bg-blue-500', pulse: true },
+	color: 'bg-info', pulse: true },
 	listening: {
-	color: 'bg-red-500', pulse: true },
+	color: 'bg-danger', pulse: true },
 	connected: {
-	color: 'bg-yellow-500', pulse: false }
+	color: 'bg-warning', pulse: false }
 	};
 </script>
 
@@ -107,12 +107,12 @@
 			<Brain class="w-8 h-8" />
 			{#if showStatus}
 				<div
-					class="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-gray-800 {statusConfig[aiStatus].color} {statusConfig[aiStatus].pulse ? 'animate-pulse' : ''}"
+					class="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-sand/20 {statusConfig[aiStatus].color} {statusConfig[aiStatus].pulse ? 'animate-pulse' : ''}"
 					title={aiStatus}
 				></div>
 			{/if}
 			{#if showBadge && unreadCount > 0}
-				<Badge class="absolute -top-4 -right-4 bg-yellow-500 text-black text-[10px] h-5 w-5 flex items-center justify-center p-0 min-w-0">
+				<Badge class="absolute -top-4 -right-4 bg-warning text-black text-[10px] h-5 w-5 flex items-center justify-center p-0 min-w-0">
 					{unreadCount > 9 ? '9+' : unreadCount}
 				</Badge>
 			{/if}
@@ -131,7 +131,7 @@
 				<Brain class="w-6 h-6" />
 				{#if showStatus}
 					<div
-						class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-gray-800 {statusConfig[aiStatus].color} {statusConfig[aiStatus].pulse ? 'animate-pulse' : ''}"
+						class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-sand/20 {statusConfig[aiStatus].color} {statusConfig[aiStatus].pulse ? 'animate-pulse' : ''}"
 						title={aiStatus}
 					></div>
 				{/if}
@@ -163,7 +163,7 @@
 			{/if}
 
 			{#if variant === 'full'}
-				<Sparkles class="w-4 h-4 text-yellow-500 animate-pulse" />
+				<Sparkles class="w-4 h-4 text-warning animate-pulse" />
 			{/if}
 		</div>
 	</button>

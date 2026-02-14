@@ -170,7 +170,7 @@ onclick={() => editor?.chain().focus().toggleOrderedList().run()}
 <div class="flex-1"></div>
 
 <Button variant="outline" size="sm"
-class="gap-2 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/10"
+class="gap-2 text-indigo-400 border-info/30 hover:bg-info/10"
 onclick={() => showAiMenu = !showAiMenu}
 >
 <Wand2 class="w-3.5 h-3.5" />
@@ -195,11 +195,11 @@ Save
 
 <!-- AI Menu -->
 {#if showAiMenu}
-<div class="bg-indigo-950/30 border-b border-indigo-500/20 p-3" transition:slide>
+<div class="bg-indigo-950/30 border-b border-info/20 p-3" transition:slide>
 <div class="flex gap-2">
 <input
 type="text"
-class="flex-1 bg-background border rounded-md px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+class="flex-1 bg-background border rounded-md px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info"
 placeholder="Ask AI to draft a section, summarize, or improved phrasing..."
 bind:value={aiPrompt}
 onkeydown={(e) => e.key === 'Enter' && runAiCommand()}
@@ -225,7 +225,7 @@ Generate
 <div class="flex items-center gap-3">
 <span>{wordCount} words</span>
 {#if lastSaved}
-<span class="flex items-center gap-1 text-emerald-400">
+<span class="flex items-center gap-1 text-accent">
 <Check class="w-3 h-3" />
 Saved {formatTime(lastSaved)}
 </span>

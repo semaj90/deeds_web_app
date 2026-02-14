@@ -79,18 +79,18 @@
 
   function getStatusColor(st: string): string {
     switch (st) {
-      case 'success': return 'text-green-400';
-      case 'error': return 'text-red-400';
-      case 'warning': return 'text-yellow-400';
+      case 'success': return 'text-accent';
+      case 'error': return 'text-danger/80';
+      case 'warning': return 'text-warning';
       case 'loading':
         switch (operation) {
-          case 'ai': return 'text-blue-400';
-          case 'gpu': return 'text-purple-400';
-          case 'cpu': return 'text-orange-400';
-          case 'upload': return 'text-green-400';
-          default:return 'text-blue-400';
+          case 'ai': return 'text-info/80';
+          case 'gpu': return 'text-info/80';
+          case 'cpu': return 'text-warning';
+          case 'upload': return 'text-accent';
+          default:return 'text-info/80';
         }
-      default:return 'text-gray-400';
+      default:return 'text-sand/40';
     }
   }
 
@@ -147,21 +147,21 @@
 
       <!-- Content -->
       <div class="flex-1">
-        <h3 class="font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
+        <h3 class="font-semibold text-sand dark:text-sand/20">{title}</h3>
 
         {#if description}
-          <p class="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+          <p class="text-sm text-sand/60 dark:text-sand/40">{description}</p>
         {/if}
 
         {#if showProgress && status === 'loading'}
           <div class="mt-3">
-            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+            <div class="flex items-center justify-between text-xs text-sand/60 dark:text-sand/40">
               <span>Progress</span>
               <span>{Math.round($progressTween)}%</span>
             </div>
-            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div class="w-full bg-sand/10 dark:bg-panelSoft rounded-full h-2">
               <div
-                class="h-2 rounded-full transition-all duration-300 {operation === 'ai' ? 'bg-blue-500' : operation === 'gpu' ? 'bg-purple-500' : operation === 'cpu' ? 'bg-orange-500' : 'bg-green-500'}"
+                class="h-2 rounded-full transition-all duration-300 {operation === 'ai' ? 'bg-info' : operation === 'gpu' ? 'bg-info' : operation === 'cpu' ? 'bg-warning' : 'bg-accent'}"
                 style="width: {$progressTween}%"
               ></div>
             </div>
@@ -169,7 +169,7 @@
         {/if}
 
         {#if isLoading && (showEstimate || elapsedTime > 0)}
-          <div class="mt-2 flex items-center gap-4 text-xs text-gray-500">
+          <div class="mt-2 flex items-center gap-4 text-xs text-sand/60">
             {#if elapsedTime > 0}
               <span class="flex items-center gap-1">
                 <Clock class="w-3 h-3" />
@@ -184,7 +184,7 @@
 
         {#if operation && status === 'loading'}
           <div class="mt-2">
-            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium {operation === 'ai' ? 'bg-blue-100 text-blue-800 dark: bg-blue-900 dark:text-blue-200' : operation === 'gpu' ? 'bg-purple-100 text-purple-800 dark: bg-purple-900 dark:text-purple-200' : operation === 'cpu' ? 'bg-orange-100 text-orange-800 dark: bg-orange-900 dark:text-orange-200' : 'bg-green-100 text-green-800 dark: bg-green-900 dark:text-green-200'}">
+            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium {operation === 'ai' ? 'bg-info/10 text-info dark: bg-info/20 dark:text-info/40' : operation === 'gpu' ? 'bg-info/10 text-info dark: bg-info/20 dark:text-info/40' : operation === 'cpu' ? 'bg-warning/10 text-warning dark: bg-warning/20 dark:text-warning/40' : 'bg-accent/10 text-accent dark: bg-accent/20 dark:text-accent/40'}">
               {operation.toUpperCase()} Processing
             </span>
           </div>

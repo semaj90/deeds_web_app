@@ -534,20 +534,20 @@
 			{@const b = selectedBounds()}
 			{#if b}
 				<div
-					class="absolute rounded-xl border border-blue-400/50 shadow-[0_0_0_1px_rgba(59 130 246 0.2)]"
+					class="absolute rounded-xl border border-info/80/50 shadow-[0_0_0_1px_rgba(59 130 246 0.2)]"
 					style="left:{b.x}px; top:{b.y}px; width:{b.w}px; height:{b.h}px;"
 				>
 					<div
-						class="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-blue-500 border border-black/50"
+						class="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-info border border-black/50"
 					></div>
 					<div
-						class="absolute -right-1.5 -top-1.5 w-3 h-3 rounded-full bg-blue-500 border border-black/50"
+						class="absolute -right-1.5 -top-1.5 w-3 h-3 rounded-full bg-info border border-black/50"
 					></div>
 					<div
-						class="absolute -left-1.5 -bottom-1.5 w-3 h-3 rounded-full bg-blue-500 border border-black/50"
+						class="absolute -left-1.5 -bottom-1.5 w-3 h-3 rounded-full bg-info border border-black/50"
 					></div>
 					<div
-						class="absolute -right-1.5 -bottom-1.5 w-3 h-3 rounded-full bg-blue-500 border border-black/50"
+						class="absolute -right-1.5 -bottom-1.5 w-3 h-3 rounded-full bg-info border border-black/50"
 					></div>
 				</div>
 			{/if}
@@ -561,7 +561,7 @@
 					style="left:{r.x}px; top:{r.y}px; width:{r.w}px; height:{r.h}px;"
 				>
 					<textarea
-						class="w-full h-full resize-none rounded-xl border border-blue-500/50 bg-black/80 p-3 text-white/90 outline-none text-sm font-sans"
+						class="w-full h-full resize-none rounded-xl border border-info/50 bg-black/80 p-3 text-white/90 outline-none text-sm font-sans"
 						value={editing.value}
 						oninput={(e) =>
 							(editing = { ...editing!, value: (e.currentTarget as HTMLTextAreaElement).value })}

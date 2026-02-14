@@ -336,23 +336,23 @@
     >
       {#if isLoading}
         <div class="flex items-center justify-center p-12">
-          <div class="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full"></div>
-          <span class="ml-3 text-gray-600">Loading evidence...</span>
+          <div class="animate-spin w-8 h-8 border-2 border-info border-t-transparent rounded-full"></div>
+          <span class="ml-3 text-sand/60">Loading evidence...</span>
         </div>
       {:else}
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b">
           <div class="flex items-center gap-2">
             {#if evidence.type === 'image'}
-              <ImageIcon class="w-5 h-5 text-gray-600" />
+              <ImageIcon class="w-5 h-5 text-sand/60" />
             {:else if evidence.type === 'video'}
-              <VideoIcon class="w-5 h-5 text-gray-600" />
+              <VideoIcon class="w-5 h-5 text-sand/60" />
             {:else if evidence.type === 'audio'}
-              <Mic class="w-5 h-5 text-gray-600" />
+              <Mic class="w-5 h-5 text-sand/60" />
             {:else}
-              <FileText class="w-5 h-5 text-gray-600" />
+              <FileText class="w-5 h-5 text-sand/60" />
             {/if}
-            <h2 class="text-lg font-semibold text-gray-900">{modalTitle}</h2>
+            <h2 class="text-lg font-semibold text-sand">{modalTitle}</h2>
           </div>
           <Button variant="ghost" size="sm" onclick={handleClose} class="rounded-full p-1">
             <X class="w-4 h-4" />
@@ -362,7 +362,7 @@
         <!-- Body -->
         <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
           {#if errors.submit}
-            <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <div class="mb-4 p-3 bg-danger/5 border border-danger/20 rounded-lg text-danger text-sm">
               {errors.submit}
             </div>
           {/if}
@@ -372,33 +372,33 @@
             <div class="space-y-4">
               <!-- Title -->
               <div class="space-y-1">
-                <label for="evidence-title" class="block text-sm font-medium text-gray-700">
-                  Title <span class="text-red-500">*</span>
+                <label for="evidence-title" class="block text-sm font-medium text-sand/80">
+                  Title <span class="text-danger">*</span>
                 </label>
                 <input
                   id="evidence-title"
                   type="text"
                   bind:value={evidence.title}
                   placeholder="Enter evidence title"
-                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  class:border-red-300={errors.title}
+                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info"
+                  class:border-danger/30={errors.title}
                   disabled={isReadonly}
                 />
                 {#if errors.title}
-                  <p class="text-sm text-red-500">{errors.title}</p>
+                  <p class="text-sm text-danger">{errors.title}</p>
                 {/if}
               </div>
 
               <!-- Type -->
               <div class="space-y-1">
-                <label for="evidence-type" class="block text-sm font-medium text-gray-700">
-                  Type <span class="text-red-500">*</span>
+                <label for="evidence-type" class="block text-sm font-medium text-sand/80">
+                  Type <span class="text-danger">*</span>
                 </label>
                 <select
                   id="evidence-type"
                   bind:value={evidence.type}
-                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  class:border-red-300={errors.type}
+                  class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info"
+                  class:border-danger/30={errors.type}
                   disabled={isReadonly}
                 >
                   <option value="document">Document</option>
@@ -408,30 +408,30 @@
                   <option value="transcript">Transcript</option>
                 </select>
                 {#if errors.type}
-                  <p class="text-sm text-red-500">{errors.type}</p>
+                  <p class="text-sm text-danger">{errors.type}</p>
                 {/if}
               </div>
 
               <!-- Content -->
               <div class="space-y-1">
-                <label for="evidence-content" class="block text-sm font-medium text-gray-700">Content</label>
+                <label for="evidence-content" class="block text-sm font-medium text-sand/80">Content</label>
                 <textarea
                   id="evidence-content"
                   bind:value={evidence.content}
                   placeholder="Enter evidence content or description"
                   rows={6}
-                  class="w-full px-3 py-2 border rounded-md bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  class:border-red-300={errors.content}
+                  class="w-full px-3 py-2 border rounded-md bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-info"
+                  class:border-danger/30={errors.content}
                   disabled={isReadonly}
                 ></textarea>
                 {#if errors.content}
-                  <p class="text-sm text-red-500">{errors.content}</p>
+                  <p class="text-sm text-danger">{errors.content}</p>
                 {/if}
               </div>
 
               <!-- Tags -->
               <div class="space-y-1">
-                <label class="block text-sm font-medium text-gray-700">Tags</label>
+                <label class="block text-sm font-medium text-sand/80">Tags</label>
                 <div class="space-y-2">
                   {#if !isReadonly}
                     <div class="flex gap-2">
@@ -440,7 +440,7 @@
                         bind:value={tagInput}
                         placeholder="Add tag"
                         onkeydown={handleTagKeydown}
-                        class="flex-1 px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="flex-1 px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info"
                       />
                       <Button
                         variant="ghost"
@@ -455,12 +455,12 @@
                   {#if evidence.tags && evidence.tags.length > 0}
                     <div class="flex flex-wrap gap-1.5">
                       {#each evidence.tags as tag (tag)}
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-info/10 text-info rounded-full">
                           #{tag}
                           {#if !isReadonly}
                             <button
                               onclick={() => removeTag(tag)}
-                              class="hover:text-red-600 transition-colors"
+                              class="hover:text-danger transition-colors"
                             >
                               <X class="w-3 h-3" />
                             </button>
@@ -478,12 +478,12 @@
               <!-- File Upload -->
               {#if !isReadonly}
                 <div class="space-y-1">
-                  <label class="block text-sm font-medium text-gray-700">File Upload</label>
+                  <label class="block text-sm font-medium text-sand/80">File Upload</label>
                   <div
                     class="border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer"
-                    class:border-blue-500={dragOver}
-                    class:bg-blue-50={dragOver}
-                    class:border-gray-300={!dragOver}
+                    class:border-info={dragOver}
+                    class:bg-info/5={dragOver}
+                    class:border-sand/20={!dragOver}
                     ondrop={handleFileDrop}
                     ondragover={(e) => { e.preventDefault(); dragOver = true; }}
                     ondragleave={() => { dragOver = false; }}
@@ -492,15 +492,15 @@
                   >
                     {#if uploadedFile}
                       <div class="space-y-2">
-                        <Upload class="w-8 h-8 mx-auto text-gray-400" />
-                        <p class="font-medium text-sm text-gray-900">{uploadedFile.name}</p>
-                        <p class="text-xs text-gray-500">
+                        <Upload class="w-8 h-8 mx-auto text-sand/40" />
+                        <p class="font-medium text-sm text-sand">{uploadedFile.name}</p>
+                        <p class="text-xs text-sand/60">
                           {(uploadedFile.size / 1024).toFixed(1)} KB
                         </p>
                         {#if uploadProgress > 0 && uploadProgress < 100}
-                          <div class="w-full bg-gray-200 rounded-full h-2">
+                          <div class="w-full bg-sand/10 rounded-full h-2">
                             <div
-                              class="bg-blue-600 h-2 rounded-full transition-all"
+                              class="bg-info h-2 rounded-full transition-all"
                               style="width: {uploadProgress}%"
                             ></div>
                           </div>
@@ -508,8 +508,8 @@
                       </div>
                     {:else}
                       <div class="space-y-2">
-                        <Upload class="w-8 h-8 mx-auto text-gray-400" />
-                        <p class="text-sm text-gray-600">Drop file here or click to browse</p>
+                        <Upload class="w-8 h-8 mx-auto text-sand/40" />
+                        <p class="text-sm text-sand/60">Drop file here or click to browse</p>
                         <input
                           type="file"
                           class="hidden"
@@ -525,7 +525,7 @@
               <!-- AI Analysis -->
               <div class="space-y-1">
                 <div class="flex items-center justify-between">
-                  <label class="block text-sm font-medium text-gray-700">AI Analysis</label>
+                  <label class="block text-sm font-medium text-sand/80">AI Analysis</label>
                   {#if !isReadonly}
                     <Button
                       variant="ghost"
@@ -543,15 +543,15 @@
                   {/if}
                 </div>
                 {#if evidence.embeddings && evidence.embeddings.length > 0}
-                  <div class="p-3 bg-green-50 rounded-md border border-green-200">
-                    <p class="text-sm text-green-700 font-medium">Embeddings generated</p>
-                    <p class="text-xs text-green-600 mt-0.5">
+                  <div class="p-3 bg-accent/5 rounded-md border border-accent/20">
+                    <p class="text-sm text-accent font-medium">Embeddings generated</p>
+                    <p class="text-xs text-accent mt-0.5">
                       Dimension: {evidence.embeddings.length}
                     </p>
                   </div>
                 {:else}
-                  <div class="p-3 bg-gray-50 rounded-md border border-gray-200">
-                    <p class="text-sm text-gray-500">No AI analysis available</p>
+                  <div class="p-3 bg-sand/5 rounded-md border border-sand/20">
+                    <p class="text-sm text-sand/60">No AI analysis available</p>
                   </div>
                 {/if}
               </div>
@@ -559,22 +559,22 @@
               <!-- Position -->
               <div class="grid grid-cols-2 gap-3">
                 <div class="space-y-1">
-                  <label for="evidence-x" class="block text-sm font-medium text-gray-700">X Position</label>
+                  <label for="evidence-x" class="block text-sm font-medium text-sand/80">X Position</label>
                   <input
                     id="evidence-x"
                     type="number"
                     bind:value={evidence.x}
-                    class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info"
                     disabled={isReadonly}
                   />
                 </div>
                 <div class="space-y-1">
-                  <label for="evidence-y" class="block text-sm font-medium text-gray-700">Y Position</label>
+                  <label for="evidence-y" class="block text-sm font-medium text-sand/80">Y Position</label>
                   <input
                     id="evidence-y"
                     type="number"
                     bind:value={evidence.y}
-                    class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="w-full px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-info"
                     disabled={isReadonly}
                   />
                 </div>
@@ -583,9 +583,9 @@
               <!-- Metadata -->
               {#if evidence.metadata && Object.keys(evidence.metadata).length > 0}
                 <div class="space-y-1">
-                  <label class="block text-sm font-medium text-gray-700">Metadata</label>
-                  <div class="p-3 bg-gray-50 rounded-md border border-gray-200 overflow-auto max-h-40">
-                    <pre class="text-xs text-gray-700 whitespace-pre-wrap">{JSON.stringify(evidence.metadata, null, 2)}</pre>
+                  <label class="block text-sm font-medium text-sand/80">Metadata</label>
+                  <div class="p-3 bg-sand/5 rounded-md border border-sand/20 overflow-auto max-h-40">
+                    <pre class="text-xs text-sand/80 whitespace-pre-wrap">{JSON.stringify(evidence.metadata, null, 2)}</pre>
                   </div>
                 </div>
               {/if}
@@ -602,7 +602,7 @@
                 size="sm"
                 onclick={handleDelete}
                 disabled={isDeleting}
-                class="text-red-600 hover:text-red-700 hover:bg-red-50"
+                class="text-danger hover:text-danger hover:bg-danger/5"
               >
                 {#if isDeleting}
                   <div class="animate-spin w-4 h-4 mr-1 border-2 border-current border-t-transparent rounded-full"></div>

@@ -63,7 +63,7 @@ let dragging = false;
       {#if aiEnabled}
         <span class="badge badge-primary mt-2">✨ AI Analysis Ready</span>
       {/if}
-      <p class="text-xs mt-2 text-gray-500">Max size: {(maxSize / 1024 / 1024).toFixed(0)}MB</p>
+      <p class="text-xs mt-2 text-sand/60">Max size: {(maxSize / 1024 / 1024).toFixed(0)}MB</p>
     {/if}
   </label>
 </div>

@@ -210,14 +210,14 @@ message: string }) => void;
           <label for="title" class="block text-sm font-bold text-yorha-light mb-1">CASE TITLE *</label>
           <input id="title" name="title" type="text" bind:value={formData.title} required
                  class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm focus:outline-none transition-colors" />
-          {#if formErrors.title}<p class="text-red-400 text-xs mt-1">{formErrors.title}</p>{/if}
+          {#if formErrors.title}<p class="text-danger/80 text-xs mt-1">{formErrors.title}</p>{/if}
         </div>
 
         <div>
           <label for="description" class="block text-sm font-bold text-yorha-light mb-1">DESCRIPTION *</label>
           <textarea id="description" name="description" rows="4" bind:value={formData.description} required
                     class="w-full p-3 bg-yorha-darker border border-yorha-accent-warm/30 rounded text-yorha-light focus:border-yorha-accent-warm focus:outline-none resize-none"></textarea>
-          {#if formErrors.description}<p class="text-red-400 text-xs mt-1">{formErrors.description}</p>{/if}
+          {#if formErrors.description}<p class="text-danger/80 text-xs mt-1">{formErrors.description}</p>{/if}
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -308,7 +308,7 @@ message: string }) => void;
                 </div>
                 <div>
                      <span class="block text-yorha-muted text-xs">Priority</span>
-                     <span class="uppercase font-bold" class:text-red-400={formData.priority==='critical'}>{formData.priority}</span>
+                     <span class="uppercase font-bold {formData.priority === 'critical' ? 'text-danger/80' : ''}">{formData.priority}</span>
                 </div>
                 <div class="col-span-2">
                     <span class="block text-yorha-muted text-xs">Description</span>
@@ -325,7 +325,7 @@ message: string }) => void;
         </button>
         <div class="flex gap-2">
             <button type="button" onclick={handleClose} disabled={isSubmitting}
-                    class="px-6 py-2 border border-red-500/50 text-red-300 rounded hover:bg-red-900/20 disabled:opacity-50">
+                    class="px-6 py-2 border border-danger/50 text-danger/60 rounded hover:bg-danger/10 disabled:opacity-50">
             Cancel
             </button>
             <button type="submit" disabled={isSubmitting || !isValid}

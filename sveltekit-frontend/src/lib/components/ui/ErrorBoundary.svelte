@@ -95,17 +95,17 @@
 </script>
 
 {#if error}
-  <div class="error-boundary min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark: from-red-950 dark:to-orange-950 flex items-center justify-center">
+  <div class="error-boundary min-h-screen bg-gradient-to-br from-danger/5 to-warning/5 dark: from-danger/10 dark:to-warning/10 flex items-center justify-center">
     <div class="max-w-2xl w-full mx-4">
       <!-- Error Card -->
-      <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-red-200 dark:border-red-800 overflow-hidden">
+      <div class="bg-white dark:bg-panel rounded-xl shadow-2xl border border-danger/20 dark:border-danger/30 overflow-hidden">
         <!-- Header -->
-        <div class="bg-red-500 dark:bg-red-600 text-white p-6">
+        <div class="bg-danger dark:bg-danger text-white p-6">
           <div class="flex items-center gap-4">
             <AlertTriangle class="w-8 h-8" />
             <div>
               <h1 class="text-2xl font-bold">Something went wrong</h1>
-              <p class="text-red-100">We encountered an unexpected error. Don't worry, your data is safe.</p>
+              <p class="text-danger/20">We encountered an unexpected error. Don't worry, your data is safe.</p>
             </div>
           </div>
         </div>
@@ -113,20 +113,20 @@
         <!-- Content -->
         <div class="p-6">
           {#if fallback}
-            <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <p class="text-blue-800 dark:text-blue-200">{fallback}</p>
+            <div class="mb-6 p-4 bg-info/5 dark:bg-info/10 border border-info/20 dark:border-info/30 rounded-lg">
+              <p class="text-info dark:text-info/40">{fallback}</p>
             </div>
           {/if}
 
           <!-- Error Summary -->
           <div class="mb-6">
-            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Error Details</h3>
-            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <p class="font-mono text-sm text-red-600 dark:text-red-400">
+            <h3 class="text-lg font-semibold mb-2 text-sand dark:text-sand/20">Error Details</h3>
+            <div class="bg-sand/5 dark:bg-panelSoft p-4 rounded-lg">
+              <p class="font-mono text-sm text-danger dark:text-danger/80">
                 {error.name}: {error.message}
               </p>
               {#if errorDetails}
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                <p class="text-xs text-sand/60 dark:text-sand/40 mt-2">
                   Occurred at {new Date(errorDetails.timestamp).toLocaleString()}
                 </p>
               {/if}
@@ -152,19 +152,19 @@
           <!-- Technical Details (Collapsible) -->
           {#if showDetails && errorInfo}
             <details class="mt-4">
-              <summary class="cursor-pointer text-sm font-medium text-gray-700 dark: text-gray-300 hover:text-gray-900">
+              <summary class="cursor-pointer text-sm font-medium text-sand/80 dark: text-sand/40 hover:text-sand">
                 Technical Details
               </summary>
-              <div class="mt-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <pre class="text-xs text-gray-600 dark:text-gray-400 whitespace-pre-wrap font-mono overflow-x-auto max-h-60">{errorInfo}</pre>
+              <div class="mt-3 p-4 bg-sand/5 dark:bg-panelSoft rounded-lg">
+                <pre class="text-xs text-sand/60 dark:text-sand/40 whitespace-pre-wrap font-mono overflow-x-auto max-h-60">{errorInfo}</pre>
               </div>
             </details>
           {/if}
 
           <!-- Help Text -->
-          <div class="mt-6 p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <h4 class="font-medium text-yellow-800 dark:text-yellow-200 mb-2">What can you do?</h4>
-            <ul class="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
+          <div class="mt-6 p-4 bg-warning/5 dark:bg-warning/10 border border-warning/20 dark:border-warning rounded-lg">
+            <h4 class="font-medium text-warning dark:text-warning/60 mb-2">What can you do?</h4>
+            <ul class="text-sm text-warning dark:text-warning/80 space-y-1">
               <li>• Try refreshing the page</li>
               <li>• Check your internet connection</li>
               <li>• Clear your browser cache</li>

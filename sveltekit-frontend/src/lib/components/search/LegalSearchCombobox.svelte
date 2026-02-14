@@ -35,18 +35,18 @@ import { fly } from "svelte/transition";
     onOpenChange={(open) => { if(!open && onSelect) onSelect(inputValue) }}
   >
     <div class="relative">
-      <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+      <div class="absolute left-3 top-1/2 -translate-y-1/2 text-sand/40">
         <Search size={16} />
       </div>
       <Combobox.Input
-        class="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border rounded-md shadow-sm focus:ring-1 focus:ring-blue-500 text-sm"
+        class="w-full pl-9 pr-4 py-2 bg-white dark:bg-panel border rounded-md shadow-sm focus:ring-1 focus:ring-info text-sm"
         {placeholder}
         aria-label="Search Legal Database"
       />
     </div>
 
     <Combobox.Content
-      class="w-full bg-white dark:bg-gray-900 border rounded-md shadow-lg mt-1 overflow-hidden z-50 max-h-60 overflow-y-auto"
+      class="w-full bg-white dark:bg-panel border rounded-md shadow-lg mt-1 overflow-hidden z-50 max-h-60 overflow-y-auto"
       transition={fly}
       params={{ y: -5, duration: 150 }}
     >
@@ -54,10 +54,10 @@ import { fly } from "svelte/transition";
         <Combobox.Item
             value={item.value}
             label={item.label}
-            class="flex items-center justify-between px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer data-[highlighted]:bg-gray-100"
+            class="flex items-center justify-between px-3 py-2 text-sm hover:bg-sand/10 dark:hover:bg-panelSoft cursor-pointer data-[highlighted]:bg-sand/10"
         >
             <div class="flex items-center gap-2">
-                <Scale size={14} class="text-blue-500"/>
+                <Scale size={14} class="text-info"/>
                 <span>{item.label}</span>
             </div>
             <Combobox.ItemIndicator>
@@ -67,7 +67,7 @@ import { fly } from "svelte/transition";
         {/each}
 
         {#if filteredItems.length === 0}
-            <div class="px-3 py-2 text-sm text-gray-500">No results found</div>
+            <div class="px-3 py-2 text-sm text-sand/60">No results found</div>
         {/if}
     </Combobox.Content>
   </Combobox.Root>

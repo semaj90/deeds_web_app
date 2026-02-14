@@ -107,7 +107,7 @@
 
 </script>
 
-<div class="relative w-full h-[600px] rounded-lg overflow-hidden border border-slate-800 bg-slate-950">
+<div class="relative w-full h-[600px] rounded-lg overflow-hidden border border-sand/20 bg-panel">
     <div bind:this={container} class="w-full h-full"></div>
 
     <div class="absolute top-4 left-4 p-4 bg-black/50 backdrop-blur rounded flex flex-col gap-2">

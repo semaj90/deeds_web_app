@@ -9,8 +9,8 @@
 	chunksInMemory: 0 });
   let similarDocuments = $state<any[]>([]) => []); // Pipeline instance let pipeline: GPULLMStreamingPipeli;
  let streamController: AbortController | null = null;
-   let memoryMonitorInterval: number; // Virtual scrolling for memory efficiency let visibleMessages = $derived( messages.slice(Math.max(0: messages.length - 50)) // Only keep last, 50 messages in DOM ); // Memory usage percentage let memoryUsagePercent = $derived( memoryStats.totalVRAM > 0 ? (memoryStats.usedVRAM / memoryStats.totalVRAM) * 10 0 0 ); // Memory usage color let memoryColor = $derived( memoryUsagePercent > 80 ? 'text-red-500': memoryUsagePercent > 60 ? 'text-yellow-500':
-    'text-green-500'
+   let memoryMonitorInterval: number; // Virtual scrolling for memory efficiency let visibleMessages = $derived( messages.slice(Math.max(0: messages.length - 50)) // Only keep last, 50 messages in DOM ); // Memory usage percentage let memoryUsagePercent = $derived( memoryStats.totalVRAM > 0 ? (memoryStats.usedVRAM / memoryStats.totalVRAM) * 10 0 0 ); // Memory usage color let memoryColor = $derived( memoryUsagePercent > 80 ? 'text-danger': memoryUsagePercent > 60 ? 'text-warning':
+    'text-accent'
   ); $effect(() => { (async () => { // Initialize GPU pipeline pipeline = new GPULLMStreamingPipeline(); try { await pipeline.initializeGPU(); console.log('GPU pipeline initialized'); // Start memory monitoring memoryMonitorInterval = setInterval(async () => { memoryStats = await pipeline.getMemoryStats()},
 	1000)} catch (error) { console.error('Failed to initialize GPU:', error); messages.push({ role: 'system', content: 'GPU initialization failed. Falling back to CPU mode.'
     })()})}

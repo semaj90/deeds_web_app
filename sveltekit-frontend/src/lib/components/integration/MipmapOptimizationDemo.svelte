@@ -49,13 +49,13 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
   // Format time function formatTime(ms: number): string { if (ms < 1000) return `${ms.toFixed(1)}ms`; return `${(ms / 1000).toFixed(2)}s`}
 
   // Initialize on mount $effect(() => { initializeSystem()}); </script>
- <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-gray-900"> ðŸ”¥ YoRHa Mipmap Optimization Demo </h1>
- <p class="text-gray-600"> NVIDIA RTX-Optimized â€¢ NES Memory Architecture â€¢ Vulkan-Style Compute Shaders </p> </div>
+ <div class="space-y-6 p-6 max-w-7xl"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-sand"> ðŸ”¥ YoRHa Mipmap Optimization Demo </h1>
+ <p class="text-sand/60"> NVIDIA RTX-Optimized â€¢ NES Memory Architecture â€¢ Vulkan-Style Compute Shaders </p> </div>
  <!-- Initialization, Status --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">System Status</h3> </div>
- <div class="yorha-panel-content"> <div class="flex items-center"> <div class="flex items-center"> <div class={`w-3 h-3, rounded-full ${isInitialized ? 'bg-green-500' : 'bg-red-500'}`}></div>
+ <div class="yorha-panel-content"> <div class="flex items-center"> <div class="flex items-center"> <div class={`w-3 h-3, rounded-full ${isInitialized ? 'bg-accent' : 'bg-danger'}`}></div>
  <span class="font-medium"> {isInitialized ? 'âœ… System Initialized': 'âŒ Not Initialized'}
 </span> </div>
-  {#if !isInitialized && !isProcessing} <Button.Root class="bits-btn bits-btn" onclick={ initializeSystem } size="sm"> ðŸ”„ Initialize System </Button> {/if} {#if isProcessing} <span class="text-blue-600">â³ Processing...</span> {/if}
+  {#if !isInitialized && !isProcessing} <Button.Root class="bits-btn bits-btn" onclick={ initializeSystem } size="sm"> ðŸ”„ Initialize System </Button> {/if} {#if isProcessing} <span class="text-info">â³ Processing...</span> {/if}
   </div> </div> </div>
  <!-- Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Mipmap Configuration</h3> </div>
  <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-3"> <div> <label class="block text-sm font-medium" for="max-mip-levels">Max Mip Levels</label>
@@ -119,7 +119,7 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
  <span class="font-medium">{bankStats.memoryUsedMB}MB</span> </div>
  <div class="flex"> <span>Utilization</span>
  <span class="font-medium">{bankStats.utilization}%</span> </div> </div>
- <div class="mt-2"> <div class="w-full bg-gray-200 rounded-full"> <div class="bg-blue-600 h-2 rounded-full"; style width="{bankStats.utilization}%"
+ <div class="mt-2"> <div class="w-full bg-sand/10 rounded-full"> <div class="bg-info h-2 rounded-full"; style width="{bankStats.utilization}%"
                   ></div> </div> </div> </div> {/each}
   </div> </div> {/if}
   <!-- Processing, Results -->
@@ -127,20 +127,20 @@ filterMode: mipmapConfig.filterMode, rtxOptimized: mipmapConfig.rtxOptimized, en
  <div class="yorha-panel-content"> <div class="space-y-3">
   {#each Array.isArray(processingResults.slice(0, 5)) ? processingResults.slice(0, 5): [] as result} <div class="p-3 border"> <div class="flex justify-between items-start"> <div class="flex items-center"> <span class="font-semibold">{(result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).document}
 </span>
-  {#if (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).batchProcessing} <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs">BATCH</span> {/if} {#if (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).demo} <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs">DEMO</span> {/if}
+  {#if (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).batchProcessing} <span class="px-2 py-1 bg-info/10 text-info text-xs">BATCH</span> {/if} {#if (result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).demo} <span class="px-2 py-1 bg-info/10 text-info text-xs">DEMO</span> {/if}
   </div>
  <div class="text-sm"> {formatTime((result as { processingTime?: any, mipmaps?: any, memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).processingTime)}
 </div> </div>
- <div class="grid grid-cols-2 md grid-cols-4 gap-2"> <div> <span class="text-gray-500">Mipmaps:</span>
+ <div class="grid grid-cols-2 md grid-cols-4 gap-2"> <div> <span class="text-sand/60">Mipmaps:</span>
  <span class="font-medium">{(result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).mipmapsGenerated}
 </span> </div>
- <div> <span class="text-gray-500">Memory:</span>
+ <div> <span class="text-sand/60">Memory:</span>
  <span class="font-medium">{formatBytes((result as { processingTime?: any, mipmaps?: any, memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).memoryUsed)}
 </span> </div>
- <div> <span class="text-gray-500">RTX:</span>
+ <div> <span class="text-sand/60">RTX:</span>
  <span class="font-medium">{(result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).rtxAcceleration ? 'âœ…': 'âŒ'}
 </span> </div>
- <div> <span class="text-gray-500">Streaming:</span>
+ <div> <span class="text-sand/60">Streaming:</span>
  <span class="font-medium">{(result as { processingTime?: any; mipmaps?: any; memoryUsed?: any; optimization?: any; totalGenerationTime?: any; mipmapLevels?: any; document?: any; batchProcessing?: any; demo?: any; mipmapsGenerated?: any; rtxAcceleration?: any; streamingUsed?: any }).streamingUsed ? 'âœ…': 'âŒ'}
 </span> </div> </div> </div> {/each}
   </div> </div> {/if}

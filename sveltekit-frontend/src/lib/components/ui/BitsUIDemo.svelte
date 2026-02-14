@@ -204,24 +204,24 @@ showDialog = true}
       âœ… Component Status
     </h2>
     <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-      <div class="bg-green-500/10 border border-green-500/20 rounded">
-        <div class="text-green-400">âœ… BitsDialog</div>
+      <div class="bg-accent/10 border border-accent/20 rounded">
+        <div class="text-accent">âœ… BitsDialog</div>
         <div class="text-yorha-text-secondary">Accessible modal component</div>
       </div>
-      <div class="bg-green-500/10 border border-green-500/20 rounded">
-        <div class="text-green-400">âœ… BitsSelect</div>
+      <div class="bg-accent/10 border border-accent/20 rounded">
+        <div class="text-accent">âœ… BitsSelect</div>
         <div class="text-yorha-text-secondary">Dropdown with search</div>
       </div>
-      <div class="bg-green-500/10 border border-green-500/20 rounded">
-        <div class="text-green-400">âœ… BitsInput</div>
+      <div class="bg-accent/10 border border-accent/20 rounded">
+        <div class="text-accent">âœ… BitsInput</div>
         <div class="text-yorha-text-secondary">Enhanced input fields</div>
       </div>
-      <div class="bg-green-500/10 border border-green-500/20 rounded">
-        <div class="text-green-400">âœ… Button</div>
+      <div class="bg-accent/10 border border-accent/20 rounded">
+        <div class="text-accent">âœ… Button</div>
         <div class="text-yorha-text-secondary">Svelte, 5 compatible</div>
       </div>
-      <div class="bg-blue-500/10 border border-blue-500/20 rounded">
-        <div class="text-blue-400">ðŸ”¨ More Coming</div>
+      <div class="bg-info/10 border border-info/20 rounded">
+        <div class="text-info/80">ðŸ”¨ More Coming</div>
         <div class="text-yorha-text-secondary">Expanding library</div>
       </div>
     </div>

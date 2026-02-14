@@ -50,10 +50,10 @@
   <div class="flex items-center">
     {#if showUserInfo && authStore.user}
       <div class="flex flex-col items-end">
-        <span class="font-medium text-gray-700">
+        <span class="font-medium text-sand/80">
           {authStore.user.name ?? authStore.user.email}
         </span>
-        <span class="text-xs text-gray-500 dark: text-gray-400">
+        <span class="text-xs text-sand/60 dark: text-sand/40">
           {authStore.user.role}
         </span>
       </div>

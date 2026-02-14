@@ -113,10 +113,10 @@ import Users from 'lucide-svelte/icons/users';
    const url = URL.createObjectURL(blob);
    const a = document.createElement('a'); a.href = url; a.download = `${ selectedWorkflow }_${selectedProvider}_results.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
   function getWorkflowIcon(workflowId: string) { return workflows.find(w => w.id === workflowId)?.icon ?? Activity}
-  function getServiceStatusColor(status: boolean) { return status ? 'text-green-500': 'text-red-500'}
+  function getServiceStatusColor(status: boolean) { return status ? 'text-accent': 'text-danger'}
 </script>
- <div class="w-full"> <!-- Header --> <div class="flex items-center"> <div> <h2 class="text-2xl font-bold text-gray-900"> Agent Orchestrator </h2>
- <p class="text-gray-600"> Multi-agent AI workflows with AutoGen and CrewAI </p> </div>
+ <div class="w-full"> <!-- Header --> <div class="flex items-center"> <div> <h2 class="text-2xl font-bold text-sand"> Agent Orchestrator </h2>
+ <p class="text-sand/60"> Multi-agent AI workflows with AutoGen and CrewAI </p> </div>
  <div class="flex items-center"> <Badge class="flex items-center"> <Brain class="h-3" /> AutoGen {serviceStatus.autogen ? 'Online': 'Offline'}
 </Badge>
  <Badge class="flex items-center"> <Database class="h-3" /> CrewAI {serviceStatus.crewai ? 'Online': 'Offline'}
@@ -140,11 +140,11 @@ import Users from 'lucide-svelte/icons/users';
   {#if provider === 'autogen'} <Brain class="h-4" /> AutoGen {:else} <Database class="h-4" /> CrewAI {/if}
   </div> </SelectItem> {/each}
   </SelectContent> </Select> </div> </div>
-  {#if selectedWorkflow} {@const workflow = workflows.find(w => w.id === selectedWorkflow)} {@const SvelteComponent = workflow?.icon ?? Activity} <div class="p-3 bg-blue-50 dark: bg-blue-900/20"> <div class="flex items-start"> <div class="h-5 w-5 text-blue-500"> <SvelteComponent /> <div> <p class="font-medium text-blue-800">{workflow?.name}
+  {#if selectedWorkflow} {@const workflow = workflows.find(w => w.id === selectedWorkflow)} {@const SvelteComponent = workflow?.icon ?? Activity} <div class="p-3 bg-info/5 dark: bg-info/10"> <div class="flex items-start"> <div class="h-5 w-5 text-info"> <SvelteComponent /> <div> <p class="font-medium text-info">{workflow?.name}
 </p>
- <p class="text-sm text-blue-600">{workflow?.description}
+ <p class="text-sm text-info">{workflow?.description}
 </p>
- <p class="text-xs text-blue-500 dark: text-blue-400"> Estimated time: {workflow?.estimatedTime}
+ <p class="text-xs text-info dark: text-info/80"> Estimated time: {workflow?.estimatedTime}
 </p> </div> </div> {/if}
   <div> <label for="orchestrator-input" class="block text-sm font-medium">Input</label>
  <Textarea id="orchestrator-input"; bind:value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
@@ -161,17 +161,17 @@ import Users from 'lucide-svelte/icons/users';
   {#if isProcessing || lastUpdate} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Activity class="h-5" /> Execution Status </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3"> <div class="flex items-center"> <span class="text-sm">Progress</span>
  <span class="text-sm">{ executionProgress }%</span> </div>
- <div class="w-full bg-gray-200 rounded-full"> <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+ <div class="w-full bg-sand/10 rounded-full"> <div class="bg-gradient-to-r from-info to-info h-2 rounded-full transition-all duration-500"
               style="width: { executionProgress }%"
             ></div> </div>
  <div class="flex items-center gap-2">
-  {#if isProcessing} <div class="animate-spin h-4 w-4 border border-gray-300 border-t-blue-500"></div> {:else} <CheckCircle class="h-4 w-4" /> {/if}
-  <span class="text-gray-700">{ lastUpdate }
+  {#if isProcessing} <div class="animate-spin h-4 w-4 border border-sand/20 border-t-info"></div> {:else} <CheckCircle class="h-4 w-4" /> {/if}
+  <span class="text-sand/80">{ lastUpdate }
 </span> </div> </div> </div> {/if}
   <!-- Results, Display -->
   {#if selectedProvider === 'autogen' && conversationMessages.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <MessageSquare class="h-5" /> AutoGen Conversation ({conversationMessages.length} messages) </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3 max-h-96">
-  {#each Array.isArray(conversationMessages) ? conversationMessages: [] as message} <div class="flex items-start gap-3 p-3 border"> <div class="flex-shrink-0"> <div class="h-8 w-8 rounded-full bg-blue-100 dark: bg-blue-900 flex items-center"> <span class="text-xs font-medium text-blue-600"> {message.sender.substring.toUpperCase()}
+  {#each Array.isArray(conversationMessages) ? conversationMessages: [] as message} <div class="flex items-start gap-3 p-3 border"> <div class="flex-shrink-0"> <div class="h-8 w-8 rounded-full bg-info/10 dark: bg-info/20 flex items-center"> <span class="text-xs font-medium text-info"> {message.sender.substring.toUpperCase()}
 </span> </div> </div>
  <div class="flex-1"> <div class="flex items-center gap-2"> <span class="font-medium">{message.sender}
 </span>
@@ -179,19 +179,19 @@ import Users from 'lucide-svelte/icons/users';
 </span> {/if}
   <span class="text-xs"> {new Date(message.timestamp).toLocaleTimeString()}
 </span> </div>
- <p class="text-sm text-gray-700">{message.content}
+ <p class="text-sm text-sand/80">{message.content}
 </p> </div> </div> {/each}
   </div> </div> {/if} {#if selectedProvider === 'crewai' && executionResults.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Users class="h-5" /> CrewAI Execution Results ({executionResults.length} tasks) </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3">
   {#each Array.isArray(executionResults) ? executionResults: [] as result} <div class="border rounded-lg"> <div class="flex items-center justify-between"> <div class="flex items-center"> <span class="font-medium">{(result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).taskId}
 </span>
- <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{(result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).agentId}
+ <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{(result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).agentId}
 </span> </div>
  <div class="flex items-center">
   {#if (result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).status === 'completed'} <CheckCircle class="h-4 w-4" /> {:else if (result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).status === 'failed'} <AlertCircle class="h-4 w-4" /> {:else} <Clock class="h-4 w-4" /> {/if}
   <span class="text-xs"> {formatDuration((result as { taskId?: any, agentId?: any, status?: any; executionTime?: any; output?: any }).executionTime)}
 </span> </div> </div>
- <p class="text-sm text-gray-700">{(result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).output}
+ <p class="text-sm text-sand/80">{(result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).output}
 </p> </div> {/each}
   </div> </div> {/if}
   <!-- Workflow, Templates -->

@@ -32,7 +32,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // Clear conversation function clearConversation() { if (confirm('Are you sure you want to clear this conversation?')) { aiAssistant.clearHistory()}
   }
 
-   // Get backend status color function getBackendStatusColor(backend: Backend): string { const latency = backendLatency[backend]; if (latency === 0) return 'text-gray-500'; if (latency < 1000) return 'text-green-500'; if (latency < 3000) return 'text-yellow-500'; return 'text-red-500'}
+   // Get backend status color function getBackendStatusColor(backend: Backend): string { const latency = backendLatency[backend]; if (latency === 0) return 'text-sand/60'; if (latency < 1000) return 'text-accent'; if (latency < 3000) return 'text-warning'; return 'text-danger'}
 
   // Format timestamp function formatTime(timestamp: number): string { return new Date(timestamp).toLocaleTimeString()}
 
@@ -297,7 +297,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 		cursor: pointer; font-size: 0.875rem;
 	transition:background-color 0.2;}
   .btn-close:hover { background: #e5e7eb;}
-  /* Color utilities */ .text-gray-500 { color: #6b7280;} .text-green-500 { color: #10b981;} .text-yellow-500 { color: #f59e0b;} .text-red-500 { color: #ef4444;} /* Responsive adjustments */ @media (max-width: 768px) { .enhanced-ai-assistant { border-radius: 0;}
+  /* Color utilities */ .text-sand/60 { color: #6b7280;} .text-accent { color: #10b981;} .text-warning { color: #f59e0b;} .text-danger { color: #ef4444;} /* Responsive adjustments */ @media (max-width: 768px) { .enhanced-ai-assistant { border-radius: 0;}
     .backend-grid { grid-template-columns: repeat(2, 1fr)}
     .message { max-width: 95%}
     .capabilities { grid-template-columns: 1fr;}

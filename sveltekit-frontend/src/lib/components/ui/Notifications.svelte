@@ -14,19 +14,19 @@
 
   const colorClasses = {
     success:
-      'bg-green-50 border-green-200 text-green-800 dark: bg-green-900/10 dark:border-green-800 dark:text-green-200',
+      'bg-accent/5 border-accent/20 text-accent dark: bg-accent/20/10 dark:border-accent/30 dark:text-accent/40',
     error:
-      'bg-red-50 border-red-200 text-red-800 dark: bg-red-900/10 dark:border-red-800 dark:text-red-200',
+      'bg-danger/5 border-danger/20 text-danger dark: bg-danger/20/10 dark:border-danger/30 dark:text-danger/40',
     warning:
-      'bg-yellow-50 border-yellow-200 text-yellow-800 dark: bg-yellow-900/10 dark:border-yellow-800 dark:text-yellow-200',
+      'bg-warning/5 border-warning/20 text-warning dark: bg-warning/20/10 dark:border-warning dark:text-warning/60',
     info:
-      'bg-blue-50 border-blue-200 text-blue-800 dark: bg-blue-900/10 dark: border-blue-800 dark:text-blue-200'
+      'bg-info/5 border-info/20 text-info dark: bg-info/20/10 dark: border-info/30 dark:text-info/40'
   };
 
-  const iconColorClasses = { success: 'text-green-400',
-    error: 'text-red-400',
-    warning: 'text-yellow-400',
-    info: 'text-blue-400'
+  const iconColorClasses = { success: 'text-accent',
+    error: 'text-danger/80',
+    warning: 'text-warning',
+    info: 'text-info/80'
   };
 
   function handleClose(notification: Notification) {
@@ -111,9 +111,9 @@
 
       <!-- Progress bar for, timed, notifications -->
       {#if notification.duration && notification.duration > 0}
-        <div class="mt-3 h-1 bg-gray-200 rounded">
+        <div class="mt-3 h-1 bg-sand/10 rounded">
           <div
-            class="h-full bg-indigo-600"
+            class="h-full bg-info"
             style="animation: shrink {notification.duration}ms linear forwards;"
           ></div>
         {/if}

@@ -50,78 +50,78 @@ clusterCount: 8 }); // Sample legal documents for demo const sampleDocuments = [
   }
   function exportSOMData(): void { if (!somRAG) return; const exportData = somRAG.exportRapidJSON(); const blob = new Blob([exportData], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `som-data-${Date.now()}.json`; link.click(); URL.revokeObjectURL(url)}
 </script>
- <div class="som-visualization {className}"> <!-- Header --> <div class="header yorha-panel p-4"> <h2 class="text-xl font-bold text-yellow-400">Self-Organizing Map RAG Visualization</h2>
- <p class="text-gray-300">Dimensionality reduction and clustering for legal document embeddings</p> </div>
- <!-- Controls --> <div class="controls grid grid-cols-1 lg:grid-cols-3 gap-4"> <!-- SOM, Configuration --> <div class="config-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">SOM Configuration</h3>
- <div class="space-y-3"> <div> <label class="block text-sm text-gray-300">Map Size</label>
+ <div class="som-visualization {className}"> <!-- Header --> <div class="header yorha-panel p-4"> <h2 class="text-xl font-bold text-warning">Self-Organizing Map RAG Visualization</h2>
+ <p class="text-sand/40">Dimensionality reduction and clustering for legal document embeddings</p> </div>
+ <!-- Controls --> <div class="controls grid grid-cols-1 lg:grid-cols-3 gap-4"> <!-- SOM, Configuration --> <div class="config-panel yorha-panel"> <h3 class="text-lg font-semibold text-warning">SOM Configuration</h3>
+ <div class="space-y-3"> <div> <label class="block text-sm text-sand/40">Map Size</label>
  <div class="flex"> <input bind:value={somConfig.mapWidth} onchange={ updateSOMConfig } type="number"
               min="5"
               max="50"
-              class="w-20 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
-              disabled={ isTraining } /> <span class="text-gray-400">Ã—</span>
+              class="w-20 px-2 py-1 bg-panelSoft border border-sand/30 rounded text-sm"
+              disabled={ isTraining } /> <span class="text-sand/40">Ã—</span>
  <input bind:value={somConfig.mapHeight} onchange={ updateSOMConfig } type="number"
               min="5"
               max="50"
-              class="w-20 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
+              class="w-20 px-2 py-1 bg-panelSoft border border-sand/30 rounded text-sm"
               disabled={ isTraining } /> </div> </div>
- <div> <label class="block text-sm text-gray-300" for="learning-rate">Learning Rate</label>
+ <div> <label class="block text-sm text-sand/40" for="learning-rate">Learning Rate</label>
 <input id="learning-rate"
             bind:value={somConfig.learningRate} type="number"
             step="0.01"
             min="0.01"
             max="1.0"
-            class="w-full px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
+            class="w-full px-2 py-1 bg-panelSoft border border-sand/30 rounded text-sm"
             disabled={ isTraining } /> </div>
- <div> <label class="block text-sm text-gray-300" for="clusters">Clusters</label>
+ <div> <label class="block text-sm text-sand/40" for="clusters">Clusters</label>
 <input id="clusters"
             bind:value={somConfig.clusterCount} onchange={ updateSOMConfig } type="number"
             min="2"
             max="16"
-            class="w-full px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
+            class="w-full px-2 py-1 bg-panelSoft border border-sand/30 rounded text-sm"
             disabled={ isTraining } /> </div>
- <div> <label class="block text-sm text-gray-300" for="epochs">Epochs</label>
+ <div> <label class="block text-sm text-sand/40" for="epochs">Epochs</label>
 <input id="epochs"
             bind:value={somConfig.maxEpochs} type="number"
             min="100"
             max="2000"
-            class="w-full px-2 py-1 bg-gray-800 border border-gray-600 rounded text-sm"
+            class="w-full px-2 py-1 bg-panelSoft border border-sand/30 rounded text-sm"
             disabled={ isTraining } /> </div> </div> </div>
- <!-- Statistics --> <div class="stats-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">Processing Stats</h3>
- <div class="space-y-2"> <div class="flex"> <span class="text-gray-300">Total Processed:</span>
+ <!-- Statistics --> <div class="stats-panel yorha-panel"> <h3 class="text-lg font-semibold text-warning">Processing Stats</h3>
+ <div class="space-y-2"> <div class="flex"> <span class="text-sand/40">Total Processed:</span>
  <span class="text-white">{stats.total_processed}</span> </div>
- <div class="flex"> <span class="text-gray-300">Successful:</span>
- <span class="text-green-400">{stats.successful}</span> </div>
- <div class="flex"> <span class="text-gray-300">Failed:</span>
- <span class="text-red-400">{stats.failed}</span> </div>
- <div class="flex"> <span class="text-gray-300">Avg Time:</span>
+ <div class="flex"> <span class="text-sand/40">Successful:</span>
+ <span class="text-accent">{stats.successful}</span> </div>
+ <div class="flex"> <span class="text-sand/40">Failed:</span>
+ <span class="text-danger/80">{stats.failed}</span> </div>
+ <div class="flex"> <span class="text-sand/40">Avg Time:</span>
  <span class="text-white">{Math.round(stats.avg_processing_time)}ms</span> </div>
- <div class="flex"> <span class="text-gray-300">Queue Size:</span>
- <span class="text-blue-400">{stats.queue_size}</span> </div>
- <div class="flex"> <span class="text-gray-300">Processing:</span>
+ <div class="flex"> <span class="text-sand/40">Queue Size:</span>
+ <span class="text-info/80">{stats.queue_size}</span> </div>
+ <div class="flex"> <span class="text-sand/40">Processing:</span>
  <span class="text-{stats.is_processing ? 'yellow' : 'gray'}-400"> {stats.is_processing ? 'Yes': 'No'} </span> </div> </div>
-  {#if stats.evidence_type_distribution && Object.keys(stats.evidence_type_distribution).length > 0} <div class="mt-4"> <h4 class="text-sm font-medium text-gray-300">Evidence Types</h4>
-  {#each Object.entries(stats.evidence_type_distribution) as [type count]} <div class="flex justify-between"> <span class="text-gray-400">{ type }:</span>
+  {#if stats.evidence_type_distribution && Object.keys(stats.evidence_type_distribution).length > 0} <div class="mt-4"> <h4 class="text-sm font-medium text-sand/40">Evidence Types</h4>
+  {#each Object.entries(stats.evidence_type_distribution) as [type count]} <div class="flex justify-between"> <span class="text-sand/40">{ type }:</span>
  <span class="text-white">{ count }</span> </div> {/each} {/if}
   </div>
- <!-- Actions --> <div class="actions-panel yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">Actions</h3>
- <div class="space-y-3"> <button onclick={ trainWithSampleData } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-blue-600 text-white disabled opacity-50 disabled cursor-not-allowed"
+ <!-- Actions --> <div class="actions-panel yorha-panel"> <h3 class="text-lg font-semibold text-warning">Actions</h3>
+ <div class="space-y-3"> <button onclick={ trainWithSampleData } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-info text-white disabled opacity-50 disabled cursor-not-allowed"
         > {isTraining ? 'Training...': 'Train with Sample Data'} </button>
- <button onclick={ processTestDocument } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-green-600 text-white disabled opacity-50 disabled cursor-not-allowed"
+ <button onclick={ processTestDocument } disabled={!isInitialized || isTraining} class="w-full yorha-button px-4 py-2 bg-accent text-white disabled opacity-50 disabled cursor-not-allowed"
         > Process Test Document </button>
- <button onclick={ exportSOMData } disabled={!isInitialized} class="w-full yorha-button px-4 py-2 bg-purple-600 text-white disabled opacity-50"
+ <button onclick={ exportSOMData } disabled={!isInitialized} class="w-full yorha-button px-4 py-2 bg-info/60 text-white disabled opacity-50"
         > Export SOM Data </button>
  <div class="system-status"> <div class="flex items-center"> <div class="w-2 h-2 rounded-full"></div>
- <span class="text-gray-300"> System {isInitialized ? 'Online': 'Offline'} </span> </div> </div> </div> </div> </div>
+ <span class="text-sand/40"> System {isInitialized ? 'Online': 'Offline'} </span> </div> </div> </div> </div> </div>
  <!-- Visualization, Canvas --> <div class="visualization-container yorha-panel"> <div class="flex justify-between items-center"> <h3 class="text-lg font-semibold">SOM Cluster Map</h3>
  <div class="text-sm"> {visualizationData.length} nodes â€¢ {somConfig.clusterCount} clusters </div> </div>
- <div class="canvas-wrapper relative bg-black border border-gray-700"> <canvas bind:this={canvas as, any} { width } { height } class="w-full"></canvas>
+ <div class="canvas-wrapper relative bg-black border border-sand/20"> <canvas bind:this={canvas as, any} { width } { height } class="w-full"></canvas>
   {#if !isInitialized} <div class="absolute inset-0 flex items-center justify-center bg-black"> <div class="text-center"> <div class="loading-spinner mx-auto"></div>
- <p class="text-gray-400">Initializing SOM System...</p> </div> {/if} {#if isTraining} <div class="absolute inset-0 flex items-center justify-center bg-black"> <div class="text-center"> <div class="loading-spinner mx-auto"></div>
- <p class="text-yellow-400">Training SOM with legal documents...</p> </div> {/if}
+ <p class="text-sand/40">Initializing SOM System...</p> </div> {/if} {#if isTraining} <div class="absolute inset-0 flex items-center justify-center bg-black"> <div class="text-center"> <div class="loading-spinner mx-auto"></div>
+ <p class="text-warning">Training SOM with legal documents...</p> </div> {/if}
   </div>
  <div class="info-panel mt-4 text-xs"> <p> <strong>Legend:</strong> Colors represent different clusters. Numbers show document count per node. Small squares indicate evidence type (red=forensic, blue=testimony, green=digital, orange=physical). </p> </div> </div> </div>
  <style> /* @unocss-include */ .som-visualization { @apply max-w-6xl mx-auto p-6;}
-  .loading-spinner { @apply w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin;}
+  .loading-spinner { @apply w-6 h-6 border-2 border-warning border-t-transparent rounded-full animate-spin;}
   .canvas-wrapper canvas { display: block; image-rendering: pixelated;}
   .system-status { padding-top: 12px; border-top: 1px solid #374151;}
   input[type='number'] { appearance: textfield;}

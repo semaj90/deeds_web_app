@@ -38,7 +38,7 @@
  {/if}
 
  {#if error}
- <div id={errId} class="text-xs text-red-600">{error}</div>
+ <div id={errId} class="text-xs text-danger">{error}</div>
  {/if}
 </div>
 

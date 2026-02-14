@@ -27,8 +27,8 @@ import type { FugitiveDexPerson } from './types';
 	));
 </script>
 
-<div class="nes-container with-title bg-gray-900 text-white rounded-xl">
-	<p class="title text-amber-300">Persons of Interest</p>
+<div class="nes-container with-title bg-panel text-white rounded-xl">
+	<p class="title text-warning/80">Persons of Interest</p>
 
 	<div class="space-y-4">
 		<!-- Search Input using Bits-UI -->
@@ -48,7 +48,7 @@ import type { FugitiveDexPerson } from './types';
 		<div class="person-entries max-h-96 overflow-y-auto">
 			{#each filteredPersons as person (person.id)}
 				<Button.Root
-					class="person-entry {selectedPerson?.id === person.id ? 'selected' : ''} w-full p-3 bg-gray-800 hover:bg-gray-700 transition rounded flex items-center gap-3 cursor-pointer border border-gray-600"
+					class="person-entry {selectedPerson?.id === person.id ? 'selected' : ''} w-full p-3 bg-panelSoft hover:bg-panelSoft transition rounded flex items-center gap-3 cursor-pointer border border-sand/30"
 					onclick={() => onSelect(person)}
 				>
 					<img src={person.photo || '/placeholder-person.jpg'} alt="" class="w-14 h-14 rounded shadow" />
@@ -62,7 +62,7 @@ import type { FugitiveDexPerson } from './types';
 
 		<!-- Filter Section -->
 		<div class="filter-section">
-			<h4 class="text-amber-300 text-sm mb-2">FILTERS</h4>
+			<h4 class="text-warning/80 text-sm mb-2">FILTERS</h4>
 			<div class="filter-group">
 				<span id="status-filter-label" class="text-xs opacity-70 block mb-1">STATUS</span>
 				<div class="flex gap-1 flex-wrap" role="group" aria-labelledby="status-filter-label">

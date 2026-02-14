@@ -70,10 +70,10 @@ let isFocused = $state(false);
 
 // STEP 4: Computed values with $derived()
 let variantClasses = $derived({
-	default: 'bg-slate-800 border-slate-600 text-white',
-	primary: 'bg-blue-600 border-blue-500 text-white',
-	secondary: 'bg-slate-600 border-slate-500 text-white',
-	nes: 'bg-slate-900 border-4 border-white font-["Press_Start_2P",monospace]',
+	default: 'bg-panelSoft border-sand/30 text-white',
+	primary: 'bg-info border-info text-white',
+	secondary: 'bg-panelSoft border-sand/30 text-white',
+	nes: 'bg-panel border-4 border-white font-["Press_Start_2P",monospace]',
 	glass: 'bg-white/10 backdrop-blur-md border-white/20 text-white'
 }[variant]);
 
@@ -85,8 +85,8 @@ let sizeClasses = $derived({
 
 let stateClasses = $derived([
 	disabled && 'opacity-50 cursor-not-allowed',
-	isHovered && !disabled && 'ring-2 ring-blue-400/50',
-	isFocused && !disabled && 'ring-2 ring-blue-500'
+	isHovered && !disabled && 'ring-2 ring-info/80/50',
+	isFocused && !disabled && 'ring-2 ring-info'
 ].filter(Boolean).join(' '));
 
 // STEP 5: Side effects with $effect()
@@ -157,7 +157,7 @@ function handleKeydown(event: KeyboardEvent) {
 		{#if children}
 			{@render children()}
 		{:else}
-			<span class="placeholder text-slate-400">No content</span>
+			<span class="placeholder text-sand/40">No content</span>
 		{/if}
 	</div>
 

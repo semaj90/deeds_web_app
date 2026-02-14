@@ -571,10 +571,10 @@
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg shadow-2xl w-full max-w-6xl">
       <!-- Header -->
-      <div class="bg-blue-600 text-white px-6 py-4 flex justify-between">
+      <div class="bg-info text-white px-6 py-4 flex justify-between">
         <div>
           <h2 class="text-2xl">Document Analysis</h2>
-          <p class="text-blue-100">
+          <p class="text-info/20">
             {#if $loadingSource === 'cache'}
               ðŸ“¦ Loading from cache... ({formatDuration(cacheHitTime)})
             {:else if $loadingSource === 'server'}
@@ -586,15 +586,15 @@
             {/if}
           </p>
         </div>
-        <button onclick={onClose} class="text-white hover:text-blue-200 text-2xl" aria-label="Close">
+        <button onclick={onClose} class="text-white hover:text-info/40 text-2xl" aria-label="Close">
           Ã—
         </button>
       </div>
       <!-- Loading, State -->
       {#if $isLoading}
         <div class="p-8">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p class="text-gray-600">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-info mx-auto"></div>
+          <p class="text-sand/60">
             {#if $loadingSource === 'cache'}
               Checking cache...
             {:else if $loadingSource === 'server'}
@@ -607,11 +607,11 @@
       <!-- Error, State -->
       {#if $errorMessage}
         <div class="p-8">
-          <div class="text-red-600 text-xl">âŒ Error</div>
-          <p class="text-red-700">{$errorMessage}</p>
+          <div class="text-danger text-xl">âŒ Error</div>
+          <p class="text-danger">{$errorMessage}</p>
           <button
             onclick={() => loadDocumentDetails(documentId, true)}
-            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            class="bg-info text-white px-6 py-2 rounded hover:bg-info/60"
           >
             Retry
           </button>
@@ -620,7 +620,7 @@
       {#if $documentData && !$isLoading}
         <div class="overflow-y-auto">
           <!-- Performance: Metrics, Bar -->
-          <div class="bg-gray-100 px-6 py-3 border-b grid grid-cols-2 md grid-cols-4 gap-4">
+          <div class="bg-sand/10 px-6 py-3 border-b grid grid-cols-2 md grid-cols-4 gap-4">
             <div>
               <span class="font-semibold">Cache Hit:</span>
               {cacheHitTime ? formatDuration(cacheHitTime) : 'No cache'}
@@ -642,22 +642,22 @@
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Document, Content -->
             <div class="lg col-span-2">
-              <div class="bg-white rounded-lg border border-gray-200">
+              <div class="bg-white rounded-lg border border-sand/20">
                 <div class="flex justify-between items-start">
                   <h3 class="text-xl font-semibold">Document Content</h3>
                   <div class="flex">
                     <button
                       onclick={() => loadDocumentDetails(documentId, true)}
-                      class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded"
+                      class="text-sm bg-sand/10 hover:bg-sand/10 px-3 py-1 rounded"
                     >
                       ðŸ”„ Refresh
                     </button>
                     <button
                       onclick={toggleGPUAnalysis}
                       class="text-sm" {showGPUAnalysis
-                        ? 'bg-purple-100 text-purple-700'
-                        'bg-gray-100'},
-	hover:bg-purple-200 px-3 py-1 rounded"
+                        ? 'bg-info/10 text-info'
+                        'bg-sand/10'},
+	hover:bg-info/20 px-3 py-1 rounded"
                     >
                       {showGPUAnalysis ? 'ðŸ§  GPU Active' : 'âš¡ GPU Analysis'}
                     </button>
@@ -666,17 +666,17 @@
                 <div class="space-y-4">
                   <div>
                     <span class="font-medium">Title:</span>
-                    <p class="text-gray-900">{$documentData.title}</p>
+                    <p class="text-sand">{$documentData.title}</p>
                   </div>
                   <div>
                     <span class="font-medium">Type:</span>
-                    <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                    <span class="inline-block bg-info/10 text-info px-2 py-1 rounded text-sm">
                       {$documentData.document_type || 'Unknown'}
                     </span>
                   </div>
                   <div>
                     <span class="font-medium">Content:</span>
-                    <div class="mt-2 p-4 bg-gray-50 rounded-lg max-h-96">
+                    <div class="mt-2 p-4 bg-sand/5 rounded-lg max-h-96">
                       <pre class="whitespace-pre-wrap text-sm">
                         {$documentData.content
                           ? $documentData.content.substring(0, 2000) +
@@ -689,29 +689,29 @@
               </div>
               <!-- GPU: Analysis, Results -->
               {#if $gpuAnalysis}
-                <div class="bg-purple-50 rounded-lg border border-purple-200 p-6">
-                  <h3 class="text-xl font-semibold text-purple-800 mb-4 flex items-center">
+                <div class="bg-info/5 rounded-lg border border-info/20 p-6">
+                  <h3 class="text-xl font-semibold text-info mb-4 flex items-center">
                     ðŸ§  GPU Analysis (FlashAttention2 RTX, 3060 Ti)
                   </h3>
                   <div class="grid grid-cols-2">
                     <div>
                       <span class="font-medium">Confidence:</span>
-                      <div class="w-full bg-purple-200 rounded-full h-2">
+                      <div class="w-full bg-info/20 rounded-full h-2">
                         <div
-                          class="bg-purple-600 h-2 rounded-full"
+                          class="bg-info/60 h-2 rounded-full"
                           style="width: {($gpuAnalysis.confidence * 100).toFixed(1)}%"
                         ></div>
                       </div>
-                      <p class="text-sm text-purple-600">{($gpuAnalysis.confidence * 100).toFixed(1)}%</p>
+                      <p class="text-sm text-info">{($gpuAnalysis.confidence * 100).toFixed(1)}%</p>
                     </div>
                     <div>
                       <span class="font-medium">Processing Time:</span>
-                      <p class="text-purple-800">{formatDuration($gpuAnalysis.processingTime)}</p>
+                      <p class="text-info">{formatDuration($gpuAnalysis.processingTime)}</p>
                     </div>
                   </div>
                   {#if $gpuAnalysis.legalAnalysis}
                     <div class="mt-4">
-                      <h4 class="font-medium text-purple-700">Legal Analysis:</h4>
+                      <h4 class="font-medium text-info">Legal Analysis:</h4>
                       <div class="bg-white rounded p-3">
                         <p>
                           <strong>Relevance:</strong>
@@ -733,19 +733,19 @@
             <div class="space-y-6">
               <!-- Related, Documents -->
               {#if $relatedDocuments.length > 0}
-                <div class="bg-white rounded-lg border border-gray-200">
-                  <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                <div class="bg-white rounded-lg border border-sand/20">
+                  <h3 class="text-lg font-semibold text-sand mb-3 flex items-center">
                     ðŸ”— Related Documents ({$relatedDocuments.length})
                   </h3>
                   <div class="space-y-3 max-h-64">
                     {#each Array.isArray($relatedDocuments) ? $relatedDocuments : [] as doc}
-                      <div class="bg-gray-50 rounded p-3">
+                      <div class="bg-sand/5 rounded p-3">
                         <h4 class="font-medium">{doc.title}</h4>
-                        <p class="text-gray-600 text-xs">
+                        <p class="text-sand/60 text-xs">
                           Similarity: {(doc.similarity * 100).toFixed(1)}% | {doc.documentType || 'Document'}
                         </p>
                         {#if doc.content}
-                          <p class="text-gray-700 text-xs mt-2">
+                          <p class="text-sand/80 text-xs mt-2">
                             {doc.content.substring(0, 100)}...
                           </p>
                         {/if}
@@ -755,42 +755,42 @@
                 {/if}
               <!-- Graph, Connections -->
               {#if $graphConnections.length > 0}
-                <div class="bg-white rounded-lg border border-gray-200">
-                  <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                <div class="bg-white rounded-lg border border-sand/20">
+                  <h3 class="text-lg font-semibold text-sand mb-3 flex items-center">
                     ðŸŒ Knowledge Graph ({$graphConnections.length})
                   </h3>
                   <div class="space-y-3 max-h-64">
                     {#each Array.isArray($graphConnections) ? $graphConnections : [] as conn}
-                      <div class="bg-gray-50 rounded p-3">
+                      <div class="bg-sand/5 rounded p-3">
                         <div class="flex items-center gap-2">
-                          <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                          <span class="bg-info/10 text-info px-2 py-1 rounded text-xs">
                             {conn.type}
                           </span>
-                          <span class="text-gray-500">
+                          <span class="text-sand/60">
                             {(conn.relationship_strength * 100).toFixed(0)}%
                           </span>
                         </div>
                         <h4 class="font-medium">{conn.targetTitle}</h4>
-                        <p class="text-gray-600 text-xs">{conn.connection_type}</p>
+                        <p class="text-sand/60 text-xs">{conn.connection_type}</p>
                       </div>
                     {/each}
                   </div>
                 {/if}
               <!-- Case, Associations -->
               {#if $caseAssociations.length > 0}
-                <div class="bg-white rounded-lg border border-gray-200">
-                  <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                <div class="bg-white rounded-lg border border-sand/20">
+                  <h3 class="text-lg font-semibold text-sand mb-3 flex items-center">
                     âš–ï¸ Associated Cases ({$caseAssociations.length})
                   </h3>
                   <div class="space-y-3 max-h-64">
                     {#each Array.isArray($caseAssociations) ? $caseAssociations : [] as caseItem}
-                      <div class="bg-gray-50 rounded p-3">
+                      <div class="bg-sand/5 rounded p-3">
                         <h4 class="font-medium">{caseItem.title}</h4>
                         <div class="flex items-center gap-2">
-                          <span class="bg-green-100 text-green-800 px-2 py-1 rounded">
+                          <span class="bg-accent/10 text-accent px-2 py-1 rounded">
                             {caseItem.status}
                           </span>
-                          <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                          <span class="bg-warning/10 text-warning px-2 py-1 rounded">
                             {caseItem.priority}
                           </span>
                         </div>
@@ -800,32 +800,32 @@
                 {/if}
               <!-- Processing, Metrics -->
               {#if $processingMetrics}
-                <div class="bg-white rounded-lg border border-gray-200">
-                  <h3 class="text-lg font-semibold text-gray-800">ðŸ“Š Processing Metrics</h3>
+                <div class="bg-white rounded-lg border border-sand/20">
+                  <h3 class="text-lg font-semibold text-sand">ðŸ“Š Processing Metrics</h3>
                   <div class="space-y-2">
                     <div class="flex">
-                      <span class="text-gray-600">Content Length:</span>
+                      <span class="text-sand/60">Content Length:</span>
                       <span class="font-medium">{formatBytes($processingMetrics.content_length || 0)}</span>
                     </div>
                     <div class="flex">
-                      <span class="text-gray-600">Vector Embedding:</span>
+                      <span class="text-sand/60">Vector Embedding:</span>
                       <span
                         class="font-medium" {$processingMetrics.has_vector_embedding
-                          ? 'text-green-600'
- 'text-red-600'}"
+                          ? 'text-accent'
+ 'text-danger'}"
                       >
                         {$processingMetrics.has_vector_embedding ? 'âœ… Available' : 'âŒ Missing'}
                       </span>
                     </div>
                     <div class="flex">
-                      <span class="text-gray-600">Last Accessed:</span>
+                      <span class="text-sand/60">Last Accessed:</span>
                       <span class="font-medium">
                         {new Date($processingMetrics.last_accessed).toLocaleTimeString()}
                       </span>
                     </div>
                     {#if $processingMetrics.server_processing}
                       <div class="mt-3 pt-3 border-t">
-                        <p class="text-xs text-gray-500">Server Performance:</p>
+                        <p class="text-xs text-sand/60">Server Performance:</p>
                         <div class="space-y-1">
                           <div class="flex">
                             <span>Total Time:</span>

@@ -67,7 +67,7 @@
 
 {#if visible}
   <div
-    class="relative overflow-hidden bg-slate-900 border border-slate-700 p-4 min-w-[300px] shadow-2xl"
+    class="relative overflow-hidden bg-panel border border-sand/20 p-4 min-w-[300px] shadow-2xl"
     transition:fly={{
 	x: 100, duration: 400 }}
   >
@@ -77,16 +77,16 @@
         {#if title}
           <div class="font-bold text-xs uppercase tracking-widest mb-1" style="color: {config.color}">{title}</div>
         {/if}
-        <div class="text-xs text-slate-300 font-mono leading-relaxed">{message}</div>
+        <div class="text-xs text-sand/40 font-mono leading-relaxed">{message}</div>
       </div>
       {#if closable}
-        <button onclick={close} class="text-slate-500 hover:text-white transition-colors">✕</button>
+        <button onclick={close} class="text-sand/60 hover:text-white transition-colors">✕</button>
       {/if}
     </div>
 
     <!-- Progress Bar -->
     {#if duration > 0}
-      <div class="absolute bottom-0 left-0 h-0.5 bg-slate-800 w-full">
+      <div class="absolute bottom-0 left-0 h-0.5 bg-panelSoft w-full">
         <div
           class="h-full transition-all duration-100 ease-linear"
           style="width: {progress}%; background-color: {config.color}"

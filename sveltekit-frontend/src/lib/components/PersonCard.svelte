@@ -9,20 +9,20 @@
 
  function getRiskColor(risk: string) {
  switch (risk?.toLowerCase()) {
- case 'low': return 'bg-green-500';
- case 'medium': return 'bg-yellow-500';
- case 'high': return 'bg-orange-500';
- case 'critical': return 'bg-red-500';
- default:return 'bg-gray-500';
+ case 'low': return 'bg-accent';
+ case 'medium': return 'bg-warning';
+ case 'high': return 'bg-warning';
+ case 'critical': return 'bg-danger';
+ default:return 'bg-sand/20';
  }
  }
 
  function getStatusColor(status: string) {
  switch (status?.toLowerCase()) {
- case 'active': return 'bg-blue-500';
- case 'inactive': return 'bg-gray-500';
- case 'archived': return 'bg-purple-500';
- default:return 'bg-gray-500';
+ case 'active': return 'bg-info';
+ case 'inactive': return 'bg-sand/20';
+ case 'archived': return 'bg-info';
+ default:return 'bg-sand/20';
  }
  }
 

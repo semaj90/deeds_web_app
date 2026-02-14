@@ -300,7 +300,7 @@
                     </DropdownMenu.Item>
                     <DropdownMenu.Separator />
                     <DropdownMenu.Item onclick={() => console.log('Delete')}>
-                        <span class="text-red-500 flex items-center"><X class="mr-2 h-4 w-4" /> Delete</span>
+                        <span class="text-danger flex items-center"><X class="mr-2 h-4 w-4" /> Delete</span>
                     </DropdownMenu.Item>
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
@@ -332,14 +332,14 @@
                         </Button>
 
                         <Button variant="ghost" size="sm" title="AI Assistant" onclick={() => aiDialogOpen = true}>
-                            <Brain class="h-5 w-5 text-purple-600" />
+                            <Brain class="h-5 w-5 text-info" />
                         </Button>
 
                         <Dialog.Root bind:open={aiDialogOpen}>
                             <Dialog.Content class="sm:max-w-[500px]">
                                 <div class="flex flex-col space-y-1.5 text-center sm:text-left">
                                     <Dialog.Title class="flex items-center gap-2">
-                                        <Brain class="h-6 w-6 text-purple-600" /> AI Legal Assistant
+                                        <Brain class="h-6 w-6 text-info" /> AI Legal Assistant
                                     </Dialog.Title>
                                     <Dialog.Description>
                                         Ask for help drafting, researching, or refining your document.
@@ -347,7 +347,7 @@
                                 </div>
 
                                 {#if error}
-                                    <div class="bg-red-50 text-red-600 p-3 rounded text-sm flex gap-2 items-center">
+                                    <div class="bg-danger/5 text-danger p-3 rounded text-sm flex gap-2 items-center">
                                         <AlertCircle class="h-4 w-4" /> {error}
                                     </div>
                                 {/if}
@@ -386,7 +386,7 @@
                         </div>
                     {:else if documentLoadError}
                          <div class="absolute inset-0 flex flex-col items-center justify-center bg-background/80 z-10">
-                            <AlertCircle class="h-8 w-8 text-red-500" />
+                            <AlertCircle class="h-8 w-8 text-danger" />
                             <p class="mt-2 text-sm font-medium">Failed to load</p>
                             <Button variant="outline" size="sm" class="mt-2" onclick={loadDocument}>Retry</Button>
                         </div>
@@ -448,12 +448,12 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-muted-foreground">Status</span>
-                        <span class:text-red-600={saveError} class:text-green-600={!hasUnsavedChanges && !saveError} class:text-yellow-600={hasUnsavedChanges && !saveError} class="font-medium">
+                        <span class:text-danger={saveError} class:text-accent={!hasUnsavedChanges && !saveError} class:text-warning={hasUnsavedChanges && !saveError} class="font-medium">
                             {saveStatus}
                         </span>
                     </div>
                     {#if saveError}
-                        <p class="text-xs text-red-500 mt-1">{saveError}</p>
+                        <p class="text-xs text-danger mt-1">{saveError}</p>
                     {/if}
                 </div>
             </div>

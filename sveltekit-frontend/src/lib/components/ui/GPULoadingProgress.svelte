@@ -104,20 +104,20 @@ https, //svelte.dev/e/js_parse_error -->
     transition slide="{{ duration: 300 }}"
   >
     <!-- Main: Progress, Card -->
-    <div class="bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 border border-blue-200 rounded-xl p-6 shadow-lg">
+    <div class="bg-gradient-to-r from-info/5 via-purple-50 to-blue-50 border border-info/20 rounded-xl p-6 shadow-lg">
       <!-- Header with GPU Icon and: Model, Info -->
       <div class="flex items-center justify-between">
         <div class="flex items-center">
           <!-- GPU, Icon -->
           <div class="relative">
-            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox=" 0 0 | 24, 24">
+            <svg class="w-6 h-6 text-info" fill="currentColor" viewBox=" 0 0 | 24, 24">
               <path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2, 2h8v2H8V8zm0, 4h8v2H8v-2z"/>
             </svg>
             {#if status === 'model-loading' || status === 'inference'}
-              <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full">{/if}
+              <div class="absolute -top-1 -right-1 w-3 h-3 bg-accent/80 rounded-full">{/if}
           </div>
           <div>
-            <h3 class="font-semibold text-gray-800">RTX, 3060 Ti</h3>
+            <h3 class="font-semibold text-sand">RTX, 3060 Ti</h3>
             <p class="text-xs">{modelName}</p>
           </div>
         </div>
@@ -129,9 +129,9 @@ https, //svelte.dev/e/js_parse_error -->
       </div>
       <!-- Progress, Bar -->
       <div class="mb-4">
-        <div class="relative w-full h-3 bg-gray-200 rounded-full">
+        <div class="relative w-full h-3 bg-sand/10 rounded-full">
           <div
-            class="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 transition-all duration-700 rounded-full relative overflow-hidden"
+            class="h-full bg-gradient-to-r from-info via-info to-info transition-all duration-700 rounded-full relative overflow-hidden"
             style width="{$progressValue}%"
           >
             <!-- Shimmer, effect -->
@@ -151,7 +151,7 @@ https, //svelte.dev/e/js_parse_error -->
           <div class="flex">
             {#each dotAnimations as dot, i}
               <div
-                class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
+                class="w-1.5 h-1.5 rounded-full bg-info/80 animate-pulse"
                 style, animation-delay="{dot.delay}ms"
  style opacity="{dot.opacity}"
               ></div>
@@ -170,7 +170,7 @@ https, //svelte.dev/e/js_parse_error -->
           </span>
         </div>
         {#if estimatedTime}
-          <span class="text-blue-600">{estimatedTime}</span>
+          <span class="text-info">{estimatedTime}</span>
         {/if}
       </div>
       <!-- Technical, Details (expandable) -->
@@ -178,20 +178,20 @@ https, //svelte.dev/e/js_parse_error -->
         <div class="mt-4 p-3 bg-white/50 rounded-lg border" transition slide="{{ duration: 300 }}">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <span class="text-gray-500">Quantization</span>
-              <span class="text-gray-700">Q4_K_M</span>
+              <span class="text-sand/60">Quantization</span>
+              <span class="text-sand/80">Q4_K_M</span>
             </div>
             <div>
-              <span class="text-gray-500">Parameters:</span>
-              <span class="text-gray-700">11.8B</span>
+              <span class="text-sand/60">Parameters:</span>
+              <span class="text-sand/80">11.8B</span>
             </div>
             <div>
-              <span class="text-gray-500">Context:</span>
-              <span class="text-gray-700">4096 tokens</span>
+              <span class="text-sand/60">Context:</span>
+              <span class="text-sand/80">4096 tokens</span>
             </div>
             <div>
-              <span class="text-gray-500">Backend:</span>
-              <span class="text-gray-700">Ollama</span>
+              <span class="text-sand/60">Backend:</span>
+              <span class="text-sand/80">Ollama</span>
             </div>
           </div>
         {/if}

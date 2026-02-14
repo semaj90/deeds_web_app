@@ -4,5 +4,5 @@
 </script>
 
 <div class="p-4">
-  <p class="text-gray-400">NES Texture Streaming — Coming Soon</p>
+  <p class="text-sand/40">NES Texture Streaming — Coming Soon</p>
 </div>

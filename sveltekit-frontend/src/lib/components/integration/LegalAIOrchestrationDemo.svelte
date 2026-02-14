@@ -134,11 +134,11 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="flex items-center justify-between">
  <div>
  <h1 class="text-3xl font-bold">Legal AI Integration Demo</h1>
- <p class="text-gray-600">End-to-end workflow orchestration with Svelte 5</p>
+ <p class="text-sand/60">End-to-end workflow orchestration with Svelte 5</p>
  </div>
  <div class="flex items-center space-x-2">
  <div class="flex items-center">
- <div class="w-3 h-3 rounded-full {systemHealthy ? 'bg-green-500' : 'bg-red-500'}"></div>
+ <div class="w-3 h-3 rounded-full {systemHealthy ? 'bg-accent' : 'bg-danger'}"></div>
  <span class="text-sm ml-2">{systemHealthy ? 'System Healthy' : 'System Issues'}</span>
  </div>
 				{#if Object.entries(systemHealth).filter(([k, v]) => !v).length > 0}
@@ -159,24 +159,24 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <CardContent>
  <div class="space-y-2">
  <label class="flex items-center">
- <input type="radio" bind:group={selectedWorkflow} value="legal-research" class="w-4 h-4 text-blue-600" />
+ <input type="radio" bind:group={selectedWorkflow} value="legal-research" class="w-4 h-4 text-info" />
  <div class="ml-2">
  <div class="font-medium">Legal Research</div>
- <div class="text-sm text-gray-600">Comprehensive case law and precedent analysis</div>
+ <div class="text-sm text-sand/60">Comprehensive case law and precedent analysis</div>
  </div>
  </label>
  <label class="flex items-center">
- <input type="radio" bind:group={selectedWorkflow} value="document-processing" class="w-4 h-4 text-blue-600" />
+ <input type="radio" bind:group={selectedWorkflow} value="document-processing" class="w-4 h-4 text-info" />
  <div class="ml-2">
  <div class="font-medium">Document Processing</div>
- <div class="text-sm text-gray-600">AI-powered document analysis and extraction</div>
+ <div class="text-sm text-sand/60">AI-powered document analysis and extraction</div>
  </div>
  </label>
  <label class="flex items-center">
- <input type="radio" bind:group={selectedWorkflow} value="case-creation" class="w-4 h-4 text-blue-600" />
+ <input type="radio" bind:group={selectedWorkflow} value="case-creation" class="w-4 h-4 text-info" />
  <div class="ml-2">
  <div class="font-medium">Case Creation</div>
- <div class="text-sm text-gray-600">Automated case setup with AI assistance</div>
+ <div class="text-sm text-sand/60">Automated case setup with AI assistance</div>
  </div>
  </label>
  </div>
@@ -196,7 +196,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {#each Object.entries(systemHealth) as [service, healthy]}
  <div class="flex items-center justify-between">
  <span class="capitalize">{service.replace(/[/_-]/g, ' ')}</span>
- <span class="{healthy ? 'text-green-600' : 'text-red-600'}">
+ <span class="{healthy ? 'text-accent' : 'text-danger'}">
  {healthy ? '✓' : '✗'}
  </span>
  </div>
@@ -216,13 +216,13 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {#if selectedWorkflow === 'legal-research'}
  <div class="space-y-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="research-query">Research Query</label>
- <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+ <label class="block text-sm font-medium text-sand/80" for="research-query">Research Query</label>
+ <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-sand/20 rounded-md focus:ring-2 focus:ring-info" rows="3"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="jurisdiction">Jurisdiction</label>
- <select id="jurisdiction" bind:value={legalResearchForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
+ <label class="block text-sm font-medium text-sand/80" for="jurisdiction">Jurisdiction</label>
+ <select id="jurisdiction" bind:value={legalResearchForm.jurisdiction} class="w-full p-2 border border-sand/20 rounded">
  <option value="federal">Federal</option>
  <option value="state">State</option>
  <option value="local">Local</option>
@@ -230,8 +230,8 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </select>
  </div>
  <div>
- <label class="block text-sm font-medium text-gray-700" for="user-role">User Role</label>
- <select id="user-role" bind:value={legalResearchForm.userRole} class="w-full p-2 border border-gray-300 rounded">
+ <label class="block text-sm font-medium text-sand/80" for="user-role">User Role</label>
+ <select id="user-role" bind:value={legalResearchForm.userRole} class="w-full p-2 border border-sand/20 rounded">
  <option value="attorney">Attorney</option>
  <option value="paralegal">Paralegal</option>
  <option value="judge">Judge</option>
@@ -245,12 +245,12 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {#if selectedWorkflow === 'document-processing'}
  <div class="space-y-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="document-content">Document Content</label>
- <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="6"></textarea>
+ <label class="block text-sm font-medium text-sand/80" for="document-content">Document Content</label>
+ <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-sand/20 rounded-md focus:ring-2 focus:ring-info" rows="6"></textarea>
  </div>
  <div>
- <label class="block text-sm font-medium text-gray-700" for="document-type">Document Type</label>
- <select id="document-type" bind:value={documentProcessingForm.documentType} class="w-full p-2 border border-gray-300 rounded">
+ <label class="block text-sm font-medium text-sand/80" for="document-type">Document Type</label>
+ <select id="document-type" bind:value={documentProcessingForm.documentType} class="w-full p-2 border border-sand/20 rounded">
  <option value="contract">Contract</option>
  <option value="brief">Legal Brief</option>
  <option value="evidence">Evidence</option>
@@ -264,17 +264,17 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {#if selectedWorkflow === 'case-creation'}
  <div class="space-y-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="case-title">Case Title</label>
- <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" />
+ <label class="block text-sm font-medium text-sand/80" for="case-title">Case Title</label>
+ <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-sand/20 rounded-md focus:ring-2 focus:ring-info" />
  </div>
  <div>
- <label class="block text-sm font-medium text-gray-700" for="case-description">Case Description</label>
- <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
+ <label class="block text-sm font-medium text-sand/80" for="case-description">Case Description</label>
+ <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-sand/20 rounded-md focus:ring-2 focus:ring-info" rows="4"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
- <label class="block text-sm font-medium text-gray-700" for="case-type">Case Type</label>
- <select id="case-type" bind:value={caseCreationForm.caseType} class="w-full p-2 border border-gray-300 rounded">
+ <label class="block text-sm font-medium text-sand/80" for="case-type">Case Type</label>
+ <select id="case-type" bind:value={caseCreationForm.caseType} class="w-full p-2 border border-sand/20 rounded">
  <option value="civil">Civil</option>
  <option value="criminal">Criminal</option>
  <option value="corporate">Corporate</option>
@@ -283,8 +283,8 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </select>
  </div>
  <div>
- <label class="block text-sm font-medium text-gray-700" for="jurisdiction">Jurisdiction</label>
- <select id="jurisdiction" bind:value={caseCreationForm.jurisdiction} class="w-full p-2 border border-gray-300 rounded">
+ <label class="block text-sm font-medium text-sand/80" for="jurisdiction">Jurisdiction</label>
+ <select id="jurisdiction" bind:value={caseCreationForm.jurisdiction} class="w-full p-2 border border-sand/20 rounded">
  <option value="federal">Federal</option>
  <option value="state">State</option>
  <option value="local">Local</option>
@@ -323,9 +323,9 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="flex-1">
  <div class="flex items-center mb-2">
  <span class="text-sm font-medium">Status:</span>
- <span class="capitalize text-sm px-2 py-1 rounded-full bg-blue-100 ml-2">{activeWorkflowStatus.status}</span>
+ <span class="capitalize text-sm px-2 py-1 rounded-full bg-info/10 ml-2">{activeWorkflowStatus.status}</span>
  </div>
- <p class="text-sm text-gray-600">{activeWorkflowStatus.message}</p>
+ <p class="text-sm text-sand/60">{activeWorkflowStatus.message}</p>
  </div>
  <div class="text-right">
  <div class="text-sm font-medium">Progress</div>
@@ -333,8 +333,8 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  </div>
  <div class="mt-4">
- <div class="w-full bg-gray-200 rounded-full h-2">
- <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: {activeWorkflowStatus.progress}%"></div>
+ <div class="w-full bg-sand/10 rounded-full h-2">
+ <div class="bg-info h-2 rounded-full transition-all duration-300" style="width: {activeWorkflowStatus.progress}%"></div>
  </div>
  </div>
  </CardContent>
@@ -343,36 +343,36 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 
  <!-- Results -->
  {#if errorMessage}
- <Card class="mt-6 border-red-200 bg-red-50">
+ <Card class="mt-6 border-danger/20 bg-danger/5">
  <CardHeader>
- <CardTitle class="text-red-700">Error</CardTitle>
+ <CardTitle class="text-danger">Error</CardTitle>
  </CardHeader>
  <CardContent>
- <p class="text-red-600">{errorMessage}</p>
+ <p class="text-danger">{errorMessage}</p>
  </CardContent>
  </Card>
  {/if}
 
  {#if workflowResult}
- <Card class="mt-6 border-green-200 bg-green-50">
+ <Card class="mt-6 border-accent/20 bg-accent/5">
  <CardHeader>
- <CardTitle class="text-green-700">Workflow Results - {formatTime(workflowResult.processingTime)}</CardTitle>
+ <CardTitle class="text-accent">Workflow Results - {formatTime(workflowResult.processingTime)}</CardTitle>
  </CardHeader>
  <CardContent>
  <div class="space-y-4">
  {#if selectedWorkflow === 'legal-research'}
  <div>
- <h4 class="font-medium text-green-800">Research Summary</h4>
- <p class="text-sm text-green-700">{workflowResult.aiAnalysis}</p>
+ <h4 class="font-medium text-accent">Research Summary</h4>
+ <p class="text-sm text-accent">{workflowResult.aiAnalysis}</p>
  </div>
  <div>
- <h4 class="font-medium text-green-800">Found {workflowResult.searchResults?.length ?? 0} Legal Documents</h4>
+ <h4 class="font-medium text-accent">Found {workflowResult.searchResults?.length ?? 0} Legal Documents</h4>
  <div class="text-sm">Confidence: {Math.round((workflowResult.confidence || 0) * 100)}%</div>
  </div>
  {#if workflowResult.recommendations?.length > 0}
  <div>
- <h4 class="font-medium text-green-800">Recommendations</h4>
- <ul class="list-disc list-inside text-sm text-green-700">
+ <h4 class="font-medium text-accent">Recommendations</h4>
+ <ul class="list-disc list-inside text-sm text-accent">
  {#each workflowResult.recommendations.slice(0, 3) as rec}
  <li>{rec}</li>
  {/each}
@@ -383,22 +383,22 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 
  {#if selectedWorkflow === 'document-processing'}
  <div>
- <h4 class="font-medium text-green-800">Document Summary</h4>
- <p class="text-sm text-green-700">{workflowResult.summary}</p>
+ <h4 class="font-medium text-accent">Document Summary</h4>
+ <p class="text-sm text-accent">{workflowResult.summary}</p>
  </div>
  {#if workflowResult.keyTerms?.length > 0}
  <div>
- <h4 class="font-medium text-green-800">Key Terms</h4>
+ <h4 class="font-medium text-accent">Key Terms</h4>
  <div class="flex flex-wrap gap-2">
  {#each workflowResult.keyTerms.slice(0, 8) as term}
- <span class="px-2 py-1 bg-green-200 text-green-800 rounded-full text-xs">{term}</span>
+ <span class="px-2 py-1 bg-accent/10 text-accent rounded-full text-xs">{term}</span>
  {/each}
  </div>
  </div>
  {/if}
  {#if workflowResult.entities?.length > 0}
  <div>
- <h4 class="font-medium text-green-800">Extracted Entities</h4>
+ <h4 class="font-medium text-accent">Extracted Entities</h4>
  <div class="text-sm">Found {workflowResult.entities.length} entities</div>
  </div>
  {/if}
@@ -406,13 +406,13 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 
  {#if selectedWorkflow === 'case-creation'}
  <div>
- <h4 class="font-medium text-green-800">Case Created: {workflowResult.caseId}</h4>
- <p class="text-sm text-green-700">{workflowResult.title}</p>
+ <h4 class="font-medium text-accent">Case Created: {workflowResult.caseId}</h4>
+ <p class="text-sm text-accent">{workflowResult.title}</p>
  </div>
  {#if workflowResult.researchSuggestions?.length > 0}
  <div>
- <h4 class="font-medium text-green-800">Research Suggestions</h4>
- <ul class="list-disc list-inside text-sm text-green-700">
+ <h4 class="font-medium text-accent">Research Suggestions</h4>
+ <ul class="list-disc list-inside text-sm text-accent">
  {#each workflowResult.researchSuggestions.slice(0, 4) as suggestion}
  <li>{suggestion}</li>
  {/each}
@@ -421,7 +421,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {/if}
  {#if workflowResult.timeline?.milestones?.length > 0}
  <div>
- <h4 class="font-medium text-green-800">Timeline Created</h4>
+ <h4 class="font-medium text-accent">Timeline Created</h4>
  <div class="text-sm">{workflowResult.timeline.milestones.length} milestones planned</div>
  </div>
  {/if}

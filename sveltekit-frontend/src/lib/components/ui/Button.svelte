@@ -20,12 +20,12 @@
   }: Props = $props();
 
   const variantClasses: Record<string, string> = {
-    default: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-600 text-white hover:bg-gray-700',
-    ghost: 'bg-transparent hover:bg-gray-100',
-    destructive: 'bg-red-600 text-white hover:bg-red-700',
-    outline: 'border border-gray-300 bg-transparent hover:bg-gray-100'
+    default: 'bg-sand/10 text-sand hover:bg-sand/10',
+    primary: 'bg-info text-white hover:bg-info/60',
+    secondary: 'bg-sand/20 text-white hover:bg-panelSoft',
+    ghost: 'bg-transparent hover:bg-sand/10',
+    destructive: 'bg-danger text-white hover:bg-danger/80',
+    outline: 'border border-sand/20 bg-transparent hover:bg-sand/10'
   };
 
   const sizeClasses: Record<string, string> = {

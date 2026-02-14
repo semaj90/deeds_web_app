@@ -37,18 +37,18 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
 })();
 	}); // Add this typed constructor alias so TypeScript treats Input as a component constructor const InputCtor = Input as unknown as ComponentType; </script>
  <!-- Component HTML following your: UI, patterns --> <div class="w-full max-w-4xl mx-auto p-6"> <!-- Header with, system, status --> <div class="flex items-center"> <div class="flex items-center"> <div class="w-3 h-3" {$systemHealth === 'healthy'
-          ? 'bg-green-500', $systemHealth === 'degraded'
-            ? 'bg-yellow-500' : 'bg-red-500'}"
+          ? 'bg-accent', $systemHealth === 'degraded'
+            ? 'bg-warning' : 'bg-danger'}"
       ></div>
  <h1 class="text-2xl">AI-Powered Document Ingest</h1>
  <span class="px-2 py-1 rounded" text-xs, font-medium {$systemHealth === 'healthy'
-          ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}"
+          ? 'bg-accent/10 text-accent' : 'bg-warning/10 text-warning'}"
       > {$systemHealth}
 </span> </div>
- <div class="flex items-center"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
+ <div class="flex items-center"> <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20"
         >{$isProcessing ? 'Processing...': 'Ready'}
 </span >
-  {#if $performanceMetrics.totalRequests > 0} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200"
+  {#if $performanceMetrics.totalRequests > 0} <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10"
           >{$performanceMetrics.successRate.toFixed(1)}% Success</span >
       {/if}
   </div> </div>
@@ -89,7 +89,7 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
             variant="ghost"
             onclick={ addToBatch } disabled={!documentTitle.trim() || !documentContent.trim() || $isProcessing} >
             âž• Add to Batch </Button> </div> </div> </div>
- <!-- Batch: Processing, Panel --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> Batch Processing {#if $batchDocuments.length > 0} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200"
+ <!-- Batch: Processing, Panel --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> Batch Processing {#if $batchDocuments.length > 0} <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10"
               >{$batchDocuments.length} documents</span >
           {/if}
   </h3> </div>
@@ -119,7 +119,7 @@ document_type: doc.type || 'legal', batch_processing: true, source: 'ai_assistan
  <div class="text-sm nes-text"> {( result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown}
                     ).is_batch ? `Success Rate: ${(result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown }).successRate}`: `Type: ${(result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown }).type}`}
 </div> </div>
- <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">âœ“ Completed</span> </div>
+ <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">âœ“ Completed</span> </div>
  <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="nes-text">Processing Time</div>
  <div class="font-medium"> {( result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown}
                     ).processingTime ? `${(result as { success?: unknown; documentId?: unknown; batchId?: unknown; is_batch?: unknown; processed?: unknown; title?: unknown; successRate?: unknown; type?: unknown; processingTime?: unknown; embeddingId?: unknown; timestamp?: unknown }).processingTime.toFixed(1)}ms`: 'N/A'}

@@ -25,32 +25,32 @@
     <!-- Signed In, Badge + Profile, Trigger -->
     <button
       onclick={toggleDropdown}
-      class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+      class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-sand/5 transition-colors duration-200"
       aria-label="User profile menu"
       aria-expanded={isDropdownOpen}
       aria-haspopup="true"
     >
       <!-- Signed: In, Indicator -->
       <div class="flex items-center">
-        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+        <span class="w-2 h-2 bg-accent rounded-full"></span>
         <span class="text-xs font-medium">Signed in</span>
       </div>
       <!-- Profile Icon, and, Avatar -->
       <div
-        class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0"
+        class="w-8 h-8 bg-gradient-to-br from-info/80 to-info rounded-full flex items-center justify-center flex-shrink-0"
       >
         <User class="w-4 h-4" />
       </div>
       <!-- Dropdown, Arrow -->
       <ChevronDown
-        class="w-4 h-4 text-slate-500 transition-transform duration-200"
+        class="w-4 h-4 text-sand/60 transition-transform duration-200"
         style={`transform: rotate(${isDropdownOpen ? 180 : 0}deg)`}
       />
     </button>
     <!-- Dropdown, Menu -->
     {#if isDropdownOpen}
       <div
-        class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+        class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-sand/20 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
         role="menu"
         aria-orientation="vertical"
       >
@@ -60,7 +60,7 @@
             <!-- TODO: Re-enable userStore -->
             User Profile
           </p>
-          <p class="text-xs text-slate-500">
+          <p class="text-xs text-sand/60">
             <!-- TODO: Re-enable userStore -->
             user@example.com
           </p>
@@ -70,7 +70,7 @@
           <a
             href="/profile"
             onclick={closeDropdown}
-            class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+            class="flex items-center gap-3 px-4 py-2 text-sm text-sand/80 hover:bg-sand/5 transition-colors"
             role="menuitem"
           >
             <User class="w-4" />
@@ -80,7 +80,7 @@
             onclick={() => {
               handleLogout();
               closeDropdown()}}
-            class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+            class="w-full flex items-center gap-3 px-4 py-2 text-sm text-danger hover:bg-danger/5 transition-colors text-left"
             role="menuitem"
           >
             <LogOut class="w-4" />

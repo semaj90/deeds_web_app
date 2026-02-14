@@ -36,16 +36,16 @@
 
   const getModeColor = (mode: string) => {
     switch (mode) {
-      case 'thinking': return 'text-amber-400';
-      case 'active': return 'text-green-400';
-      default: return 'text-blue-400';
+      case 'thinking': return 'text-warning';
+      case 'active': return 'text-accent';
+      default: return 'text-info/80';
     }
   };
 
   const quickActions = [
-    { id: 'analyze', label: 'Analyze Case', icon: Brain, color: 'hover:bg-purple-500/20' },
-    { id: 'search', label: 'Search Evidence', icon: MessageCircle, color: 'hover:bg-blue-500/20' },
-    { id: 'assist', label: 'AI Assistant', icon: Sparkles, color: 'hover:bg-green-500/20' }
+    { id: 'analyze', label: 'Analyze Case', icon: Brain, color: 'hover:bg-info/20' },
+    { id: 'search', label: 'Search Evidence', icon: MessageCircle, color: 'hover:bg-info/20' },
+    { id: 'assist', label: 'AI Assistant', icon: Sparkles, color: 'hover:bg-accent/20' }
   ];
 
   const handleQuickAction = (actionId: string) => {
@@ -86,17 +86,17 @@
         {#each quickActions as action, index}
           <button
             onclick={() => handleQuickAction(action.id)}
-            class="group relative flex items-center gap-3 px-4 py-3 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-2xl hover:border-gray-500/50 transition-all duration-200 {action.color}"
+            class="group relative flex items-center gap-3 px-4 py-3 bg-panel/95 backdrop-blur-md border border-sand/20/50 rounded-2xl hover:border-sand/30/50 transition-all duration-200 {action.color}"
             in:scale={{ duration: 200, delay: index * 50, start: 0.8 }}
             aria-label={action.label}
           >
             <div class="relative">
-              <svelte:component this={action.icon} class="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+              <svelte:component this={action.icon} class="w-5 h-5 text-sand/40 group-hover:text-white transition-colors" />
               <div class="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity">
                 <svelte:component this={action.icon} class="w-5 h-5 text-white blur-sm" />
               </div>
             </div>
-            <span class="text-sm font-medium text-gray-300 group-hover:text-white whitespace-nowrap">
+            <span class="text-sm font-medium text-sand/40 group-hover:text-white whitespace-nowrap">
               {action.label}
             </span>
           </button>
@@ -107,11 +107,11 @@
     {#if isExpanded}
       <button
         onclick={onSettingsClick}
-        class="p-3 bg-gray-800/90 backdrop-blur-md border border-gray-600/50 rounded-xl hover:bg-gray-700/90 hover:border-gray-500/50 transition-all duration-200 group"
+        class="p-3 bg-panelSoft/90 backdrop-blur-md border border-sand/30/50 rounded-xl hover:bg-panelSoft/90 hover:border-sand/30/50 transition-all duration-200 group"
         in:scale={{ duration: 200, delay: 300 }}
         aria-label="AI Assistant Settings"
       >
-        <Settings class="w-5 h-5 text-gray-400 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+        <Settings class="w-5 h-5 text-sand/40 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
       </button>
     {/if}
 
@@ -119,20 +119,20 @@
       onclick={() => isExpanded = !isExpanded}
       onmouseenter={() => isHovered = true}
       onmouseleave={() => isHovered = false}
-      class="relative group p-4 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-2 border-gray-600/50 rounded-full shadow-2xl hover:border-gray-400/70 hover:shadow-blue-500/20 transition-all duration-300 transform hover:scale-105 active:scale-95"
+      class="relative group p-4 bg-gradient-to-br from-panel via-panelSoft to-panel border-2 border-sand/30/50 rounded-full shadow-2xl hover:border-sand/30/70 hover:shadow-info/20 transition-all duration-300 transform hover:scale-105 active:scale-95"
       class:animate-pulse={aiMode === 'idle' && pulseAnimation}
       class:animate-bounce={aiMode === 'thinking'}
-      class:shadow-green-500/30={aiMode === 'active'}
-      class:border-green-400/70={aiMode === 'active'}
+      class:shadow-accent/30={aiMode === 'active'}
+      class:border-accent/60/70={aiMode === 'active'}
       aria-label={isExpanded ? 'Close AI Menu' : 'Open AI Assistant'}
       aria-expanded={isExpanded}
     >
-      <div class="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-green-500/20 opacity-0 group-hover:opacity-50 transition-opacity duration-500 blur-xl"></div>
+      <div class="absolute inset-0 rounded-full bg-gradient-to-br from-info/20 via-info/20 to-accent/20 opacity-0 group-hover:opacity-50 transition-opacity duration-500 blur-xl"></div>
 
       {#if isConnected}
-        <div class="absolute inset-0 rounded-full border-2 border-green-400/30 {pulseClasses[aiMode]}"></div>
+        <div class="absolute inset-0 rounded-full border-2 border-accent/60/30 {pulseClasses[aiMode]}"></div>
       {:else}
-        <div class="absolute inset-0 rounded-full border-2 border-red-400/50 animate-pulse"></div>
+        <div class="absolute inset-0 rounded-full border-2 border-danger/60/50 animate-pulse"></div>
       {/if}
 
       <div class="relative flex items-center justify-center w-12 h-12">
@@ -144,7 +144,7 @@
             {#if aiMode === 'thinking' || aiMode === 'active'}
               <div class="absolute -top-1 -right-1 w-3 h-3 bg-current rounded-full {pulseClasses[aiMode]}"></div>
             {/if}
-            <div class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full {isConnected ? 'bg-green-400' : 'bg-red-400'} {isConnected ? 'animate-pulse' : 'animate-ping'}"></div>
+            <div class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full {isConnected ? 'bg-accent/80' : 'bg-danger/80'} {isConnected ? 'animate-pulse' : 'animate-ping'}"></div>
           </div>
         {/if}
       </div>
@@ -155,12 +155,12 @@
 
       {#if isHovered && !isExpanded}
         <div
-          class="absolute right-full mr-4 top-1/2 -translate-y-1/2 px-3 py-2 bg-gray-900/95 backdrop-blur-md border border-gray-600/50 rounded-lg text-sm text-gray-300 whitespace-nowrap"
+          class="absolute right-full mr-4 top-1/2 -translate-y-1/2 px-3 py-2 bg-panel/95 backdrop-blur-md border border-sand/30/50 rounded-lg text-sm text-sand/40 whitespace-nowrap"
           in:fade={{ duration: 200 }}
           role="tooltip"
         >
           {isConnected ? 'AI Assistant Ready' : 'AI Disconnected'}
-          <div class="absolute top-1/2 -translate-y-1/2 left-full w-0 h-0 border-l-4 border-l-gray-900/95 border-y-4 border-y-transparent"></div>
+          <div class="absolute top-1/2 -translate-y-1/2 left-full w-0 h-0 border-l-4 border-l-panel border-y-4 border-y-transparent"></div>
         </div>
       {/if}
     </button>

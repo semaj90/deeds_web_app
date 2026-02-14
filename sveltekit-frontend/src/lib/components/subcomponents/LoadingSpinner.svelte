@@ -23,11 +23,11 @@
   };
 
   const colorClasses: Record<string, string> = {
-    blue: 'text-blue-600',
-    green: 'text-green-600',
-    red: 'text-red-600',
-    yellow: 'text-yellow-600',
-    gray: 'text-gray-600',
+    blue: 'text-info',
+    green: 'text-accent',
+    red: 'text-danger',
+    yellow: 'text-warning',
+    gray: 'text-sand/60',
     white: 'text-white'
   };
 </script>

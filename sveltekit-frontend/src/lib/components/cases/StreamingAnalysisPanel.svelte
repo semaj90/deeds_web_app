@@ -88,7 +88,7 @@
 </script>
 
 <div class="bg-white rounded-lg shadow p-6">
-	<h3 class="font-semibold text-gray-900 mb-3">AI Case Analysis</h3>
+	<h3 class="font-semibold text-sand mb-3">AI Case Analysis</h3>
 
 	<!-- Analysis Type Selector -->
 	<div class="flex flex-wrap gap-2 mb-4">
@@ -98,8 +98,8 @@
 				disabled={isStreaming}
 				class={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
 					selectedType === type.value
-						? 'bg-purple-600 text-white'
-						: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+						? 'bg-info/60 text-white'
+						: 'bg-sand/10 text-sand/60 hover:bg-sand/10'
 				} disabled:opacity-50`}
 			>
 				{type.icon} {type.label}
@@ -112,8 +112,8 @@
 		onclick={startAnalysis}
 		class={`w-full px-4 py-2 rounded-lg text-sm font-medium transition mb-4 ${
 			isStreaming
-				? 'bg-red-500 text-white hover:bg-red-600'
-				: 'bg-purple-600 text-white hover:bg-purple-700'
+				? 'bg-danger text-white hover:bg-danger'
+				: 'bg-info/60 text-white hover:bg-info/40'
 		}`}
 	>
 		{isStreaming ? 'Stop Analysis' : 'Run Analysis'}
@@ -121,17 +121,17 @@
 
 	<!-- Output -->
 	{#if error}
-		<div class="p-3 bg-red-50 border border-red-200 rounded-lg mb-3">
-			<p class="text-red-700 text-sm">{error}</p>
+		<div class="p-3 bg-danger/5 border border-danger/20 rounded-lg mb-3">
+			<p class="text-danger text-sm">{error}</p>
 		</div>
 	{/if}
 
 	{#if analysis}
-		<div class="analysis-output p-4 bg-gray-50 rounded-lg border border-gray-200 max-h-[400px] overflow-y-auto">
-			<div class="prose prose-sm max-w-none text-gray-800 whitespace-pre-wrap">{analysis}</div>
+		<div class="analysis-output p-4 bg-sand/5 rounded-lg border border-sand/20 max-h-[400px] overflow-y-auto">
+			<div class="prose prose-sm max-w-none text-sand whitespace-pre-wrap">{analysis}</div>
 		</div>
 	{:else if !isStreaming && !error}
-		<p class="text-sm text-gray-400 text-center py-4">
+		<p class="text-sm text-sand/40 text-center py-4">
 			Select an analysis type and click "Run Analysis" to get AI insights about this case.
 		</p>
 	{/if}
@@ -139,11 +139,11 @@
 	{#if isStreaming}
 		<div class="flex items-center gap-2 mt-3">
 			<div class="flex gap-1">
-				<span class="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></span>
-				<span class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
-				<span class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+				<span class="w-2 h-2 bg-info rounded-full animate-bounce"></span>
+				<span class="w-2 h-2 bg-info rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+				<span class="w-2 h-2 bg-info rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
 			</div>
-			<span class="text-xs text-gray-500">Analyzing...</span>
+			<span class="text-xs text-sand/60">Analyzing...</span>
 		</div>
 	{/if}
 </div>

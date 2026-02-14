@@ -38,22 +38,22 @@
 
 	// Surface colors
 	const surfaceColors: Record<string, string> = {
-		routes: 'bg-purple-500/20 text-purple-300',
-		components: 'bg-blue-500/20 text-blue-300',
-		stores: 'bg-green-500/20 text-green-300',
-		services: 'bg-orange-500/20 text-orange-300',
-		api: 'bg-cyan-500/20 text-cyan-300',
-		utils: 'bg-gray-500/20 text-gray-300'
+		routes: 'bg-info/20 text-info/60',
+		components: 'bg-info/20 text-info/60',
+		stores: 'bg-accent/20 text-accent/80',
+		services: 'bg-warning/20 text-warning/80',
+		api: 'bg-info/20 text-info/80',
+		utils: 'bg-sand/20/20 text-sand/40'
 	};
 
 	// Error code colors
 	function getCodeColor(code: string): string {
-		if (code.startsWith('TS1')) return 'text-red-400'; // Syntax
-		if (code.startsWith('TS2')) return 'text-orange-400'; // Semantic
-		if (code.startsWith('TS7')) return 'text-yellow-400'; // Warnings
-		if (code.startsWith('SYNTAX')) return 'text-red-400';
-		if (code.startsWith('CANNOT')) return 'text-orange-400';
-		return 'text-blue-400';
+		if (code.startsWith('TS1')) return 'text-danger/80'; // Syntax
+		if (code.startsWith('TS2')) return 'text-warning'; // Semantic
+		if (code.startsWith('TS7')) return 'text-warning'; // Warnings
+		if (code.startsWith('SYNTAX')) return 'text-danger/80';
+		if (code.startsWith('CANNOT')) return 'text-warning';
+		return 'text-info/80';
 	}
 
 	// Calculate cluster size for visualization
@@ -119,7 +119,7 @@
 				<!-- Surface Tags -->
 				<div class="surface-tags">
 					{#each cluster.surface.slice(0, 4) as surface}
-						<span class={`surface-tag ${surfaceColors[surface] || 'bg-gray-500/20 text-gray-300'}`}>
+						<span class={`surface-tag ${surfaceColors[surface] || 'bg-sand/20/20 text-sand/40'}`}>
 							{surface}
 						</span>
 					{/each}

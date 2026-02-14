@@ -200,9 +200,9 @@
   }
 
   function riskDeltaColor(delta: number) {
-    if (delta > 0) return 'text-red-400';
-    if (delta < 0) return 'text-green-400';
-    return 'text-slate-400';
+    if (delta > 0) return 'text-danger/80';
+    if (delta < 0) return 'text-accent';
+    return 'text-sand/40';
   }
 
   async function refreshRecommendations(seed?: string) {
@@ -237,15 +237,15 @@
   }
 </script>
 
-<div class="min-h-screen bg-slate-950 text-white">
+<div class="min-h-screen bg-panel text-white">
   <!-- Prosecutor Mode Header -->
-  <div class="bg-gradient-to-r from-red-900 via-purple-900 to-cyan-900 p-4 border-b border-slate-700">
+  <div class="bg-gradient-to-r from-danger/20 via-info/20 to-cyan-900 p-4 border-b border-sand/20">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <div class="text-2xl font-bold text-yellow-400">🏛️ Phoenix Wright Prosecutor Mode</div>
+        <div class="text-2xl font-bold text-warning">🏛️ Phoenix Wright Prosecutor Mode</div>
         <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
-          <span class="text-sm text-green-400">Investigation Active</span>
+          <div class="w-3 h-3 rounded-full bg-accent/80 animate-pulse"></div>
+          <span class="text-sm text-accent">Investigation Active</span>
         </div>
       </div>
 
@@ -253,16 +253,16 @@
         <!-- Stats -->
         <div class="flex gap-6 text-sm">
           <div class="text-center">
-            <div class="text-lg font-bold text-blue-400">{evidenceCount}</div>
-            <div class="text-slate-400">Evidence</div>
+            <div class="text-lg font-bold text-info/80">{evidenceCount}</div>
+            <div class="text-sand/40">Evidence</div>
           </div>
           <div class="text-center">
-            <div class="text-lg font-bold text-red-400">{contradictionsFound}</div>
-            <div class="text-slate-400">Contradictions</div>
+            <div class="text-lg font-bold text-danger/80">{contradictionsFound}</div>
+            <div class="text-sand/40">Contradictions</div>
           </div>
           <div class="text-center">
-            <div class="text-lg font-bold text-purple-400">{aiSummariesReady}</div>
-            <div class="text-slate-400">AI Summaries</div>
+            <div class="text-lg font-bold text-info/80">{aiSummariesReady}</div>
+            <div class="text-sand/40">AI Summaries</div>
           </div>
         </div>
 
@@ -270,13 +270,13 @@
         <div class="flex gap-2">
           <button
             onclick={toggleProsecutorMode}
-            class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors"
+            class="px-4 py-2 bg-panelSoft hover:bg-panelSoft rounded-lg text-sm font-medium transition-colors"
           >
             {isProsecutorMode ? '🔄 Standard Mode' : '⚖️ Prosecutor Mode'}
           </button>
           <button
             onclick={exportInvestigationReport}
-            class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 rounded-lg text-sm font-medium transition-colors"
+            class="px-4 py-2 bg-gradient-to-r from-info to-info hover:from-info hover:to-info rounded-lg text-sm font-medium transition-colors"
           >
             📋 Export Report
           </button>
@@ -314,7 +314,7 @@
       <div class="risk-insights-header">
         <p>Risk signals</p>
         <button
-          class="text-xs text-slate-300 hover:text-white transition-colors"
+          class="text-xs text-sand/40 hover:text-white transition-colors"
           onclick={() => refreshRecommendations(lastCaseTheory ?? undefined)}
         >
           Refresh intel
@@ -333,7 +333,7 @@
           </li>
         {/each}
         {#if riskInsights.length === 0}
-          <li class="text-slate-500 text-sm">No recent risk movements</li>
+          <li class="text-sand/60 text-sm">No recent risk movements</li>
         {/if}
       </ul>
     </div>
@@ -342,11 +342,11 @@
   <!-- Main Content Area -->
   <div class="flex h-[calc(100vh-80px)]">
     <!-- Evidence Graph Panel -->
-    <div class="w-1/2 border-r border-slate-700 p-4">
-      <div class="bg-slate-900/50 rounded-lg p-4 h-full">
-        <h2 class="text-lg font-bold mb-4 text-cyan-400">🔗 Evidence Relationship Graph</h2>
+    <div class="w-1/2 border-r border-sand/20 p-4">
+      <div class="bg-panel/50 rounded-lg p-4 h-full">
+        <h2 class="text-lg font-bold mb-4 text-info">🔗 Evidence Relationship Graph</h2>
         <div class="h-[calc(100%-3rem)]">
-          <div class="flex items-center justify-center h-full text-slate-500">
+          <div class="flex items-center justify-center h-full text-sand/60">
             <p>Evidence Graph Visualization (WebGPU)</p>
           </div>
         </div>
@@ -356,33 +356,33 @@
     <!-- Investigation Panel -->
     <div class="w-1/2 p-4 space-y-4">
       <!-- Quick Actions -->
-      <div class="bg-slate-900/50 rounded-lg p-4">
-        <h3 class="text-md font-bold mb-3 text-purple-400">⚡ Quick Actions</h3>
+      <div class="bg-panel/50 rounded-lg p-4">
+        <h3 class="text-md font-bold mb-3 text-info/80">⚡ Quick Actions</h3>
         <div class="grid grid-cols-2 gap-3">
-          <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
-            <div class="text-sm font-medium text-cyan-400">🔍 Analyze Evidence</div>
-            <div class="text-xs text-slate-400">Run AI analysis on selected items</div>
+          <button class="p-3 bg-panelSoft hover:bg-panelSoft rounded-lg text-left transition-colors">
+            <div class="text-sm font-medium text-info">🔍 Analyze Evidence</div>
+            <div class="text-xs text-sand/40">Run AI analysis on selected items</div>
           </button>
-          <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
-            <div class="text-sm font-medium text-green-400">📊 Generate Report</div>
-            <div class="text-xs text-slate-400">Create investigation summary</div>
+          <button class="p-3 bg-panelSoft hover:bg-panelSoft rounded-lg text-left transition-colors">
+            <div class="text-sm font-medium text-accent">📊 Generate Report</div>
+            <div class="text-xs text-sand/40">Create investigation summary</div>
           </button>
-          <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
-            <div class="text-sm font-medium text-yellow-400">🔗 Find Similar Cases</div>
-            <div class="text-xs text-slate-400">AI-powered case recommendations</div>
+          <button class="p-3 bg-panelSoft hover:bg-panelSoft rounded-lg text-left transition-colors">
+            <div class="text-sm font-medium text-warning">🔗 Find Similar Cases</div>
+            <div class="text-xs text-sand/40">AI-powered case recommendations</div>
           </button>
-          <button class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left transition-colors">
-            <div class="text-sm font-medium text-red-400">⚠️ Check Contradictions</div>
-            <div class="text-xs text-slate-400">Detect evidence conflicts</div>
+          <button class="p-3 bg-panelSoft hover:bg-panelSoft rounded-lg text-left transition-colors">
+            <div class="text-sm font-medium text-danger/80">⚠️ Check Contradictions</div>
+            <div class="text-xs text-sand/40">Detect evidence conflicts</div>
           </button>
         </div>
       </div>
 
       <!-- Evidence List -->
-      <div class="bg-slate-900/50 rounded-lg p-4 flex-1">
-        <h3 class="text-md font-bold mb-3 text-blue-400">📄 Evidence Library</h3>
+      <div class="bg-panel/50 rounded-lg p-4 flex-1">
+        <h3 class="text-md font-bold mb-3 text-info/80">📄 Evidence Library</h3>
         <div class="space-y-2 max-h-96 overflow-y-auto">
-          <div class="text-center text-slate-500 py-8">
+          <div class="text-center text-sand/60 py-8">
             <div class="text-2xl mb-2">📋</div>
             <div class="text-sm">Upload evidence to begin investigation</div>
           </div>
@@ -390,11 +390,11 @@
       </div>
 
       <!-- Predictive Recommendations -->
-      <div class="bg-slate-900/50 rounded-lg p-4">
+      <div class="bg-panel/50 rounded-lg p-4">
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-md font-bold text-cyan-300">🔮 Predictive Summary</h3>
+          <h3 class="text-md font-bold text-info/80">🔮 Predictive Summary</h3>
           <button
-            class="px-3 py-1 text-xs bg-slate-800 hover:bg-slate-700 rounded transition-colors disabled:opacity-50"
+            class="px-3 py-1 text-xs bg-panelSoft hover:bg-panelSoft rounded transition-colors disabled:opacity-50"
             onclick={() => refreshRecommendations(lastCaseTheory ?? undefined)}
             disabled={isLoadingRecommendations}
           >
@@ -403,19 +403,19 @@
         </div>
 
         {#if isLoadingRecommendations}
-          <div class="text-center text-slate-500 py-6 text-sm">Consulting Phoenix intelligence…</div>
+          <div class="text-center text-sand/60 py-6 text-sm">Consulting Phoenix intelligence…</div>
         {:else}
-          <p class="text-sm text-slate-200 leading-relaxed mb-4">
+          <p class="text-sm text-sand/40 leading-relaxed mb-4">
             {predictiveSummary ||
               'No predictive brief yet. Generate a case theory or provide input to activate recommendations.'}
           </p>
 
           {#if didYouMean.length}
             <div class="mb-3">
-              <p class="text-xs text-slate-400 uppercase mb-1">Did you mean</p>
+              <p class="text-xs text-sand/40 uppercase mb-1">Did you mean</p>
               <div class="flex flex-wrap gap-2">
                 {#each didYouMean as suggestion (suggestion)}
-                  <span class="px-2 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-200">
+                  <span class="px-2 py-1 rounded-full bg-panelSoft border border-sand/20 text-xs text-sand/40">
                     {suggestion}
                   </span>
                 {/each}
@@ -426,12 +426,12 @@
           {#if graphRecommendations.length}
             <div class="space-y-2 mb-3">
               {#each graphRecommendations as rec (rec.title)}
-                <div class="border border-slate-800 rounded-lg p-3 bg-slate-950/40">
-                  <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <div class="border border-sand/20 rounded-lg p-3 bg-panel/40">
+                  <div class="flex items-center justify-between text-xs text-sand/40 mb-1">
                     <span>{rec.confidence?.toUpperCase?.() ?? 'CONFIDENCE'}</span>
-                    <span class="text-cyan-300 font-semibold">{rec.title}</span>
+                    <span class="text-info/80 font-semibold">{rec.title}</span>
                   </div>
-                  <p class="text-sm text-slate-200">{rec.rationale}</p>
+                  <p class="text-sm text-sand/40">{rec.rationale}</p>
                 </div>
               {/each}
             </div>
@@ -439,8 +439,8 @@
 
           {#if predictiveSignals.length}
             <div>
-              <p class="text-xs text-slate-400 uppercase mb-1">Graph Signals</p>
-              <ul class="text-xs text-slate-300 space-y-1">
+              <p class="text-xs text-sand/40 uppercase mb-1">Graph Signals</p>
+              <ul class="text-xs text-sand/40 space-y-1">
                 {#each predictiveSignals as signal (signal)}
                   <li>• {signal}</li>
                 {/each}

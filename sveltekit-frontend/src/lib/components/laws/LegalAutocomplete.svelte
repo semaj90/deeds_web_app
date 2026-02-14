@@ -15,10 +15,10 @@
 	let showSuggestions = $state(false);
 
 	const typeColors: Record<string, string> = {
-		statute: 'bg-blue-50 border-blue-200',
-		crime: 'bg-red-50 border-red-200',
-		state: 'bg-green-50 border-green-200',
-		title: 'bg-purple-50 border-purple-200'
+		statute: 'bg-info/5 border-info/20',
+		crime: 'bg-danger/5 border-danger/20',
+		state: 'bg-accent/5 border-accent/20',
+		title: 'bg-info/5 border-info/20'
 	};
 
 	const typeIcons: Record<string, string> = {
@@ -114,32 +114,32 @@
 			onfocus={handleFocus}
 			onblur={handleBlur}
 			placeholder="Search statutes, crimes, states..."
-			class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+			class="w-full px-4 py-2 border border-sand/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-info"
 		/>
 		{#if isLoading}
 			<div class="absolute right-3 top-2.5">
-				<div class="animate-spin h-5 w-5 text-gray-400">⟳</div>
+				<div class="animate-spin h-5 w-5 text-sand/40">⟳</div>
 			</div>
 		{/if}
 	</div>
 
 	{#if showSuggestions && suggestions.length > 0}
-		<div class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+		<div class="absolute top-full left-0 right-0 mt-1 bg-white border border-sand/20 rounded-lg shadow-lg z-50">
 			<div class="max-h-96 overflow-y-auto">
 				{#each suggestions as suggestion, index (suggestion.value)}
 					<button
 						type="button"
 						onclick={() => selectSuggestion(suggestion)}
-						class={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition ${index === selectedIndex ? 'bg-blue-100' : ''}`}
+						class={`w-full text-left px-4 py-3 border-b border-sand/10 hover:bg-sand/5 transition ${index === selectedIndex ? 'bg-info/10' : ''}`}
 					>
 						<div class="flex items-start gap-3">
 							<span class="text-lg">{typeIcons[suggestion.type]}</span>
 							<div class="flex-1 min-w-0">
-								<div class="font-medium text-gray-900 truncate">{suggestion.label}</div>
+								<div class="font-medium text-sand truncate">{suggestion.label}</div>
 								{#if suggestion.description}
-									<div class="text-sm text-gray-600 truncate">{suggestion.description}</div>
+									<div class="text-sm text-sand/60 truncate">{suggestion.description}</div>
 								{/if}
-								<div class="text-xs text-gray-500 mt-1">
+								<div class="text-xs text-sand/60 mt-1">
 									{suggestion.type} • {Math.round(suggestion.confidence * 100)}% match
 								</div>
 							</div>

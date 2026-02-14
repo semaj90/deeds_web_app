@@ -95,7 +95,7 @@
  <!-- Header -->
  <header class="mb-6">
  <h2 class="text-xl font-bold flex items-center gap-2">
- <Zap class="w-6 h-6 text-cyan-400" />
+ <Zap class="w-6 h-6 text-info" />
  WebGPU Similarity Search
  </h2>
  <p class="text-sm opacity-70 mt-1">
@@ -133,10 +133,10 @@
  <span>Documents: {documentEmbeddings.length}/10</span>
  <span class="flex items-center gap-1">
  {#if webgpuSimilarityService.getStats().webgpuSupported}
- <Zap class="w-3 h-3 text-green-400" />
+ <Zap class="w-3 h-3 text-accent" />
  WebGPU
  {:else}
- <Cpu class="w-3 h-3 text-yellow-400" />
+ <Cpu class="w-3 h-3 text-warning" />
  CPU Fallback
  {/if}
  </span>
@@ -156,7 +156,7 @@
  <article class="border border-beige/30 p-3 rounded">
  <div class="flex justify-between items-start mb-2">
  <span class="text-sm font-medium">Document {result.index + 1}</span>
- <span class="text-xs bg-cyan-900/50 px-2 py-1 rounded">
+ <span class="text-xs bg-info/20/50 px-2 py-1 rounded">
  {(result.score * 100).toFixed(1)}% similarity
  </span>
  </div>
@@ -189,7 +189,7 @@
  {#if documentEmbeddings.length === 0}
  <div class="flex-1 flex items-center justify-center text-center">
  <div>
- <Loader class="animate-spin w-8 h-8 mx-auto mb-4 text-cyan-400" />
+ <Loader class="animate-spin w-8 h-8 mx-auto mb-4 text-info" />
  <p class="text-sm opacity-70">Initializing sample embeddings...</p>
  <p class="text-xs opacity-50 mt-2">This may take a moment for first-time setup</p>
  </div>

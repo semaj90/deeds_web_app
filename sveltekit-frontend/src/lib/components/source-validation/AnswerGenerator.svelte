@@ -108,27 +108,27 @@ $effect(() => {
 	<div class="header mb-4">
 		<div class="flex justify-between items-center">
 			<h2 class="text-2xl font-bold">🤖 AI-Generated Answer</h2>
-			<div class="flex items-center gap-2 text-sm text-gray-600">
-				<span class="px-2 py-1 bg-blue-100 rounded">{llmProvider}</span>
+			<div class="flex items-center gap-2 text-sm text-sand/60">
+				<span class="px-2 py-1 bg-info/10 rounded">{llmProvider}</span>
 				<span>Validation: {validationId.slice(0, 16)}...</span>
 			</div>
 		</div>
-		<p class="text-sm text-gray-600 mt-1">
+		<p class="text-sm text-sand/60 mt-1">
 			<strong>Query:</strong> {query}
 		</p>
 	</div>
 
 	{#if isGenerating}
-		<div class="loading-state p-8 bg-gray-50 rounded-lg text-center">
+		<div class="loading-state p-8 bg-sand/5 rounded-lg text-center">
 			<div class="spinner mb-4"></div>
-			<p class="text-gray-600">Generating answer with validated sources...</p>
+			<p class="text-sand/60">Generating answer with validated sources...</p>
 		</div>
 	{:else if generationError}
-		<div class="error-state p-4 bg-red-50 border border-red-200 rounded-lg">
-			<p class="text-red-700">⚠️ {generationError}</p>
+		<div class="error-state p-4 bg-danger/5 border border-danger/20 rounded-lg">
+			<p class="text-danger">⚠️ {generationError}</p>
 			<button
 				onclick={generateAnswer}
-				class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+				class="mt-3 px-4 py-2 bg-danger text-white rounded hover:bg-danger/80"
 			>
 				Retry
 			</button>
@@ -158,24 +158,24 @@ $effect(() => {
 				<!-- Used Citations -->
 				{#if usedCitations.length > 0}
 					<div class="mb-4">
-						<h4 class="text-sm font-semibold text-green-700 mb-2">✅ Cited in Answer</h4>
+						<h4 class="text-sm font-semibold text-accent mb-2">✅ Cited in Answer</h4>
 						<div class="grid gap-2">
 							{#each usedCitations as citation, index (citation.chunk_id)}
 								<button
 									onclick={() => openCitation(citation)}
-									class="citation-card p-3 border border-green-200 bg-green-50 rounded hover:bg-green-100 text-left"
+									class="citation-card p-3 border border-accent/20 bg-accent/5 rounded hover:bg-accent/10 text-left"
 								>
 									<div class="flex justify-between items-start">
 										<div class="flex-1">
-											<div class="text-xs text-green-700 font-semibold mb-1">
+											<div class="text-xs text-accent font-semibold mb-1">
 												[Source {index + 1}]
 											</div>
-											<div class="text-sm text-gray-700">{citation.source_file}</div>
-											<div class="text-xs text-gray-500 mt-1 line-clamp-2">
+											<div class="text-sm text-sand/80">{citation.source_file}</div>
+											<div class="text-xs text-sand/60 mt-1 line-clamp-2">
 												{citation.snippet}
 											</div>
 										</div>
-										<div class="ml-3 text-xs text-gray-500">
+										<div class="ml-3 text-xs text-sand/60">
 											{(citation.confidence * 100).toFixed(0)}%
 										</div>
 									</div>
@@ -188,21 +188,21 @@ $effect(() => {
 				<!-- Unused Citations -->
 				{#if unusedCitations.length > 0}
 					<div>
-						<h4 class="text-sm font-semibold text-gray-500 mb-2">📖 Available but Not Cited</h4>
+						<h4 class="text-sm font-semibold text-sand/60 mb-2">📖 Available but Not Cited</h4>
 						<div class="grid gap-2">
 							{#each unusedCitations as citation (citation.chunk_id)}
 								<button
 									onclick={() => openCitation(citation)}
-									class="citation-card p-3 border bg-gray-50 rounded hover:bg-gray-100 text-left opacity-60"
+									class="citation-card p-3 border bg-sand/5 rounded hover:bg-sand/10 text-left opacity-60"
 								>
 									<div class="flex justify-between items-start">
 										<div class="flex-1">
-											<div class="text-sm text-gray-700">{citation.source_file}</div>
-											<div class="text-xs text-gray-500 mt-1 line-clamp-2">
+											<div class="text-sm text-sand/80">{citation.source_file}</div>
+											<div class="text-xs text-sand/60 mt-1 line-clamp-2">
 												{citation.snippet}
 											</div>
 										</div>
-										<div class="ml-3 text-xs text-gray-500">
+										<div class="ml-3 text-xs text-sand/60">
 											{(citation.confidence * 100).toFixed(0)}%
 										</div>
 									</div>

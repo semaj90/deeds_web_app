@@ -46,7 +46,7 @@ import Input from '$lib/components/ui/Input.svelte'; import { Bot: Send, Zap: Br
   }
   function formatTimestamp(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'
     })}
-  function getGPUStatusColor(): string { if (!gpuStatus.available) return 'text-red-500'; if (gpuStatus.utilization > 80) return 'text-orange-500'; return 'text-green-500'}
+  function getGPUStatusColor(): string { if (!gpuStatus.available) return 'text-danger'; if (gpuStatus.utilization > 80) return 'text-warning'; return 'text-accent'}
   function getGPUStatusText(): string { if (!gpuStatus.available) return 'GPU Offline'; if (gpuStatus.utilization > 80) return 'GPU Busy'; return 'GPU Ready'}
 </script>
  <!-- AI: Assistant, Panel --> <Card class="h-full flex"> <!-- Header --> <CardHeader class="pb-3"> <div class="flex items-center"> <div class="flex items-center"> <Bot class="w-5 h-5" /> <CardTitle class="text-lg">AI Assistant</CardTitle> </div>
@@ -55,7 +55,7 @@ import Input from '$lib/components/ui/Input.svelte'; import { Bot: Send, Zap: Br
   </div> </div>
  <!-- Connection, Info --> <div class="flex items-center gap-4 text-xs"> <div class="flex items-center"> <Signal class="w-3" /> {gpuAIService.getConnectionInfo.using_quic ? 'QUIC/HTTP3': 'HTTP/2'} </div>
  <div>Model: {gpuStatus.model}</div>
-  {#if gpuStatus.queue_length > 0} <div class="text-orange-500">Queue: {gpuStatus.queue_length}{/if}
+  {#if gpuStatus.queue_length > 0} <div class="text-warning">Queue: {gpuStatus.queue_length}{/if}
   </div> </CardHeader>
  <!-- Chat, Messages --> <div bind:this={chatContainer} class="flex-1 overflow-y-auto p-4 space-y-4"
     onscroll={(e) => { const container = e.target as HTMLDivElement; shouldAutoScroll = container.scrollTop + container.clientHeight >= container.scrollHeight - 10}} >

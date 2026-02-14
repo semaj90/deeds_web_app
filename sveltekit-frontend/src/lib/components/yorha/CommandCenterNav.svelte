@@ -69,22 +69,22 @@
 <div class="p-6">
  <!-- YoRHa Logo -->
  <div class="mb-8 text-center">
- <div class="text-2xl font-bold text-cyan-400 terminal-glow mb-2">YoRHa</div>
- <div class="text-xs text-slate-400">Legal AI Division</div>
+ <div class="text-2xl font-bold text-info terminal-glow mb-2">YoRHa</div>
+ <div class="text-xs text-sand/40">Legal AI Division</div>
  </div>
 
  <!-- Navigation Menu -->
  <nav class="space-y-2">
  {#each navigation as item}
  <button
- class="w-full text-left p-3 rounded-lg transition-all duration-200 hover:bg-slate-700/50 hover:border-cyan-400/30 border border-transparent {currentPath === item.path ? 'bg-cyan-400/10 border-cyan-400/50 text-cyan-300' : 'text-slate-300'}"
+ class="w-full text-left p-3 rounded-lg transition-all duration-200 hover:bg-panelSoft/50 hover:border-info/80/30 border border-transparent {currentPath === item.path ? 'bg-info/80/10 border-info/80/50 text-info/80' : 'text-sand/40'}"
  onclick={() => navigateTo(item.path)}
  >
  <div class="flex items-center space-x-3">
  <span class="text-lg">{item.icon}</span>
  <div class="flex-1">
  <div class="font-medium text-sm">{item.name}</div>
- <div class="text-xs text-slate-400 mt-1">{item.description}</div>
+ <div class="text-xs text-sand/40 mt-1">{item.description}</div>
  </div>
  </div>
  </button>
@@ -92,11 +92,11 @@
  </nav>
 
  <!-- System Status Indicator -->
- <div class="mt-8 pt-6 border-t border-slate-700/50">
- <div class="text-xs text-slate-400 mb-2">System Status</div>
+ <div class="mt-8 pt-6 border-t border-sand/20/50">
+ <div class="text-xs text-sand/40 mb-2">System Status</div>
  <div class="flex items-center space-x-2">
- <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
- <span class="text-xs text-green-400">Online</span>
+ <div class="w-2 h-2 bg-accent/80 rounded-full animate-pulse"></div>
+ <span class="text-xs text-accent">Online</span>
  </div>
  </div>
 </div>

@@ -29,29 +29,29 @@
   }
 </script>
 
-<div class="w-full bg-slate-900 border-2 border-slate-800 font-mono text-xs {className}">
+<div class="w-full bg-panel border-2 border-sand/20 font-mono text-xs {className}">
   {#if loading}
-    <div class="p-8 text-center text-cyan-500 animate-pulse uppercase tracking-widest bg-slate-900/50">
+    <div class="p-8 text-center text-info animate-pulse uppercase tracking-widest bg-panel/50">
       Syncing Neural Network...
     </div>
   {:else}
     <div class="overflow-auto max-h-[600px] custom-scrollbar">
       <table class="w-full border-collapse">
         <thead class="sticky top-0 z-10">
-          <tr class="bg-slate-800 border-b-2 border-slate-700">
+          <tr class="bg-panelSoft border-b-2 border-sand/20">
             {#each columns as col}
-              <th class="p-3 text-slate-400 uppercase text-left font-bold">{col.title}</th>
+              <th class="p-3 text-sand/40 uppercase text-left font-bold">{col.title}</th>
             {/each}
             {#if actionsSnippet}
-              <th class="p-3 text-slate-400 uppercase text-right font-bold">Actions</th>
+              <th class="p-3 text-sand/40 uppercase text-right font-bold">Actions</th>
             {/if}
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-800">
+        <tbody class="divide-y divide-sand/20">
           {#each data as row, i (row?.id ?? i)}
-            <tr class="hover:bg-slate-800/50 transition-colors group">
+            <tr class="hover:bg-panelSoft/50 transition-colors group">
               {#each columns as col}
-                <td class="p-3 text-slate-300 group-hover:text-cyan-400 transition-colors">
+                <td class="p-3 text-sand/40 group-hover:text-info transition-colors">
                   {formatCellValue(row[col.key], col, row)}
                 </td>
               {/each}
@@ -63,7 +63,7 @@
             </tr>
           {:else}
             <tr>
-              <td colspan={columns.length + (actionsSnippet ? 1 : 0)} class="p-12 text-center text-slate-600 italic">
+              <td colspan={columns.length + (actionsSnippet ? 1 : 0)} class="p-12 text-center text-sand/60 italic">
                 NO DATA RECORDS RETRIEVED
               </td>
             </tr>

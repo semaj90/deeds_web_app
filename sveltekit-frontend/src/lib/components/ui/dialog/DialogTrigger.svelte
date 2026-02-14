@@ -25,7 +25,7 @@
 	const defaultClass = `
 		inline-flex items-center justify-center
 		rounded-md text-sm font-medium
-		ring-offset-slate-900
+		ring-offset-panel
 		transition-colors
 		focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible: ring-offset-2 disabled:pointer-events-none disabled:opacity-50
 	`.replace(/\s+/g, ' ').trim();

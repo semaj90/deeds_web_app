@@ -14,10 +14,10 @@
     ...rest
   }: Props = $props();
 
-  const variantClasses = $derived({ default: "bg-gray-50, dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-800",
-    destructive: "bg-red-50 dark:bg-red-950 text-red-900 dark:text-red-100 border-red-200 dark:border-red-800",
-    success: "bg-green-50 dark:bg-green-950 text-green-900 dark:text-green-100 border-green-200 dark:border-green-800",
-    warning: "bg-yellow-50 dark:bg-yellow-950 text-yellow-900 dark:text-yellow-100 border-yellow-200, dark:border-yellow-800"
+  const variantClasses = $derived({ default: "bg-sand/5, dark:bg-panel text-sand dark:text-sand/20 border-sand/20 dark:border-sand/20",
+    destructive: "bg-danger/5 dark:bg-danger/10 text-danger dark:text-danger/20 border-danger/20 dark:border-danger/30",
+    success: "bg-accent/5 dark:bg-accent/10 text-accent dark:text-accent/20 border-accent/20 dark:border-accent/30",
+    warning: "bg-warning/5 dark:bg-warning/10 text-warning border-warning/20, dark:border-warning"
   }[variant]);
 </script>
 

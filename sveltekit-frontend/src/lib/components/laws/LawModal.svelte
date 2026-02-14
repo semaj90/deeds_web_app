@@ -33,12 +33,12 @@
 
 	function getSeverityColor(severity: string): string {
 		const colors: Record<string, string> = {
-			felony: 'bg-red-100 text-red-800 border-red-300',
-			wobbler: 'bg-orange-100 text-orange-800 border-orange-300',
-			misdemeanor: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-			infraction: 'bg-blue-100 text-blue-800 border-blue-300'
+			felony: 'bg-danger/10 text-danger border-danger/30',
+			wobbler: 'bg-warning/10 text-warning border-warning/30',
+			misdemeanor: 'bg-warning/10 text-warning border-warning/30',
+			infraction: 'bg-info/10 text-info border-info/40'
 		};
-		return colors[severity] || 'bg-gray-100 text-gray-800 border-gray-300';
+		return colors[severity] || 'bg-sand/10 text-sand border-sand/20';
 	}
 
 	function getVictimIcon(victimClass: string | null): string {
@@ -77,15 +77,15 @@
 	<div class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
 		<div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-96 overflow-y-auto">
 			<!-- Header -->
-			<div class="sticky top-0 bg-gradient-to-r from-gray-900 to-gray-800 text-white p-6 border-b border-gray-700">
+			<div class="sticky top-0 bg-gradient-to-r from-panel to-gray-800 text-white p-6 border-b border-sand/20">
 				<div class="flex justify-between items-start">
 					<div>
 						<h2 class="text-2xl font-bold">{statute.title}</h2>
-						<p class="text-gray-300 text-sm mt-1">{statute.citation}</p>
+						<p class="text-sand/40 text-sm mt-1">{statute.citation}</p>
 					</div>
 					<button
 						onclick={handleClose}
-						class="text-gray-400 hover:text-white text-2xl leading-none"
+						class="text-sand/40 hover:text-white text-2xl leading-none"
 					>
 						✕
 					</button>
@@ -97,7 +97,7 @@
 						{statute.severity.toUpperCase()}
 					</div>
 					{#if statute.victimClass}
-						<div class="px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800 border border-purple-300">
+						<div class="px-3 py-1 rounded-full text-sm font-semibold bg-info/10 text-info border border-info/40">
 							{getVictimIcon(statute.victimClass)} {getVictimLabel(statute.victimClass)}
 						</div>
 					{/if}
@@ -108,23 +108,23 @@
 			<div class="p-6 space-y-6">
 				<!-- Description -->
 				<div>
-					<h3 class="text-lg font-semibold text-gray-900 mb-2">Definition</h3>
-					<p class="text-gray-700">{statute.description}</p>
+					<h3 class="text-lg font-semibold text-sand mb-2">Definition</h3>
+					<p class="text-sand/80">{statute.description}</p>
 				</div>
 
 				<!-- Penalty -->
 				<div>
-					<h3 class="text-lg font-semibold text-gray-900 mb-2">Penalty</h3>
-					<p class="text-gray-700">{statute.penalty}</p>
+					<h3 class="text-lg font-semibold text-sand mb-2">Penalty</h3>
+					<p class="text-sand/80">{statute.penalty}</p>
 				</div>
 
 				<!-- Related Statutes -->
 				{#if relatedStatutes.length > 0}
 					<div>
-						<h3 class="text-lg font-semibold text-gray-900 mb-2">Related Statutes</h3>
+						<h3 class="text-lg font-semibold text-sand mb-2">Related Statutes</h3>
 						<div class="flex flex-wrap gap-2">
 							{#each relatedStatutes as code}
-								<span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm border border-blue-200">
+								<span class="px-3 py-1 bg-info/5 text-info rounded-full text-sm border border-info/20">
 									{code}
 								</span>
 							{/each}
@@ -135,21 +135,21 @@
 				<!-- Bundled Charges -->
 				{#if bundledCharges.length > 0}
 					<div>
-						<h3 class="text-lg font-semibold text-gray-900 mb-3">⚖️ Suggested Companion Charges</h3>
+						<h3 class="text-lg font-semibold text-sand mb-3">⚖️ Suggested Companion Charges</h3>
 						<div class="space-y-2">
 							{#each bundledCharges as charge}
-								<div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+								<div class="p-3 bg-danger/5 border border-danger/20 rounded-lg">
 									<div class="flex justify-between items-start">
 										<div>
-											<p class="font-semibold text-gray-900">{charge.title}</p>
-											<p class="text-sm text-gray-600">{charge.citation}</p>
-											<p class="text-xs text-gray-500 mt-1">{charge.reason}</p>
+											<p class="font-semibold text-sand">{charge.title}</p>
+											<p class="text-sm text-sand/60">{charge.citation}</p>
+											<p class="text-xs text-sand/60 mt-1">{charge.reason}</p>
 										</div>
 										<div class="text-right">
-											<div class="text-sm font-semibold text-red-700">
+											<div class="text-sm font-semibold text-danger">
 												{Math.round(charge.frequency * 100)}%
 											</div>
-											<div class="text-xs text-gray-500">filed together</div>
+											<div class="text-xs text-sand/60">filed together</div>
 										</div>
 									</div>
 								</div>
@@ -161,21 +161,21 @@
 				<!-- Precedents -->
 				{#if precedents.length > 0}
 					<div>
-						<h3 class="text-lg font-semibold text-gray-900 mb-3">📋 Key Precedents</h3>
+						<h3 class="text-lg font-semibold text-sand mb-3">📋 Key Precedents</h3>
 						<div class="space-y-2">
 							{#each precedents as precedent}
-								<div class="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+								<div class="p-3 bg-sand/5 border border-sand/20 rounded-lg">
 									<div class="flex justify-between items-start">
 										<div>
-											<p class="font-semibold text-gray-900">{precedent.caseId}</p>
-											<p class="text-sm text-gray-600">{precedent.title}</p>
-											<p class="text-xs text-gray-500">{precedent.court} ({precedent.year})</p>
+											<p class="font-semibold text-sand">{precedent.caseId}</p>
+											<p class="text-sm text-sand/60">{precedent.title}</p>
+											<p class="text-xs text-sand/60">{precedent.court} ({precedent.year})</p>
 										</div>
 										<div class="text-right">
-											<div class="text-sm font-semibold text-blue-700">
+											<div class="text-sm font-semibold text-info">
 												{Math.round(precedent.relevance * 100)}%
 											</div>
-											<div class="text-xs text-gray-500">relevant</div>
+											<div class="text-xs text-sand/60">relevant</div>
 										</div>
 									</div>
 								</div>
@@ -186,16 +186,16 @@
 			</div>
 
 			<!-- Footer -->
-			<div class="sticky bottom-0 bg-gray-50 border-t border-gray-200 p-4 flex gap-3 justify-end">
+			<div class="sticky bottom-0 bg-sand/5 border-t border-sand/20 p-4 flex gap-3 justify-end">
 				<button
 					onclick={handleClose}
-					class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+					class="px-4 py-2 text-sand/80 bg-white border border-sand/20 rounded-lg hover:bg-sand/5 transition"
 				>
 					Close
 				</button>
 				<button
 					onclick={ handleAttach }
-					class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+					class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/60 transition font-semibold"
 				>
 					📎 Attach to Case
 				</button>

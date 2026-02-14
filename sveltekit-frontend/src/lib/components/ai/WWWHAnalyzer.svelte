@@ -24,7 +24,7 @@ error = String(e)}
 finally {
 loading = false}
   }
-</script> <div class="wwwh-analyzer uno-max-w-2xl uno-mx-auto uno-my-8 uno-p-4 uno-bg-white uno-border uno-border-gray-200"
+</script> <div class="wwwh-analyzer uno-max-w-2xl uno-mx-auto uno-my-8 uno-p-4 uno-bg-white uno-border uno-border-sand/20"
 > <h3 class="uno-font-bold uno-text-lg">WWWH (Who: What, When: How) Analyzer</h3> <textarea bind:value={
 inputText }
 rows={
@@ -43,10 +43,10 @@ aria-label="Analyze text"
 Analyzing... {:else}
 Analyze {/if}
 </button> {#if error}
-<div class="uno-text-red-600" role="alert">{
+<div class="uno-text-danger" role="alert">{
 error }{/if}
 {#if result}
-<div class="uno-mt-4 uno-p-3 uno-bg-gray-50 uno-border"> <pre>{
+<div class="uno-mt-4 uno-p-3 uno-bg-sand/5 uno-border"> <pre>{
 result }</pre> {/if}
 </div> <style> /* @unocss-include */ /* UnoCSS utility classes used above, no custom CSS needed. */ </style>
 

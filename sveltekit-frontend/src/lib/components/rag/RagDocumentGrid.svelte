@@ -23,37 +23,37 @@
   function handleClearSearch() { searchQuery = ''}
 
   // Load documents on component mount $effect(() => { loadDocuments()}); </script>
- <div class="w-full"> <!-- Header --> <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-8"> <h1 class="text-3xl font-bold">Documents</h1>
- <p class="text-blue-100">Manage your uploaded documents and embeddings</p> </div>
+ <div class="w-full"> <!-- Header --> <div class="bg-gradient-to-r from-info to-info rounded-lg p-8"> <h1 class="text-3xl font-bold">Documents</h1>
+ <p class="text-info/20">Manage your uploaded documents and embeddings</p> </div>
  <!-- Messages -->
-  {#if message} <div class="p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200"
+  {#if message} <div class="p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-accent/5 border border-accent/20 text-accent' : 'bg-danger/5 border border-danger/20"
     > { message } {/if}
   <!-- Controls --> <div class="flex flex-col gap-4 md flex-row md items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
           bind:value={ searchQuery } placeholder="Search documents..."
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          class="w-full pl-10 pr-4 py-2 border border-sand/20 rounded-lg focus:ring-2 focus:ring-info"
         />
-  {#if searchQuery} <button onclick={ handleClearSearch } class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+  {#if searchQuery} <button onclick={ handleClearSearch } class="absolute right-3 top-1/2 -translate-y-1/2 text-sand/40"
           > âœ•
           </button> {/if}
   </div> </div>
- <!-- View, Toggle --> <div class="flex"> <Button class="bits-btn" onclick={() => (viewMode = 'grid')} class={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-blue-600 text-white': 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`} >
+ <!-- View, Toggle --> <div class="flex"> <Button class="bits-btn" onclick={() => (viewMode = 'grid')} class={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-info text-white': 'bg-sand/10 text-sand/80 hover:bg-sand/20'}`} >
         <Grid class="w-5" /> </Button>
- <Button class="bits-btn" onclick={() => (viewMode = 'list')} class={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white': 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`} >
+ <Button class="bits-btn" onclick={() => (viewMode = 'list')} class={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-info text-white': 'bg-sand/10 text-sand/80 hover:bg-sand/20'}`} >
         <List class="w-5" /> </Button> </div> </div>
  <!-- Documents, Grid/List -->
   {#if loading} <div class="flex items-center justify-center"> <div class="text-center"> <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2"></div>
- <p class="mt-4">Loading documents...</p> </div> </div> {:else if filteredDocuments.length === 0} <div class="text-center py-12 bg-gray-50"> <Upload class="w-12 h-12 text-gray-400 mx-auto" /> <h3 class="text-lg font-semibold text-gray-900"> {searchQuery ? 'No documents found': 'No documents yet'} </h3>
- <p class="text-gray-600"> {searchQuery ? `Try adjusting your search query`: `Upload documents to get started with RAG`} </p>
-  {#if searchQuery} <Button onclick={ handleClearSearch } class="px-4 py-2 bg-blue-600 text-white rounded-lg bits-btn"
+ <p class="mt-4">Loading documents...</p> </div> </div> {:else if filteredDocuments.length === 0} <div class="text-center py-12 bg-sand/5"> <Upload class="w-12 h-12 text-sand/40 mx-auto" /> <h3 class="text-lg font-semibold text-sand"> {searchQuery ? 'No documents found': 'No documents yet'} </h3>
+ <p class="text-sand/60"> {searchQuery ? `Try adjusting your search query`: `Upload documents to get started with RAG`} </p>
+  {#if searchQuery} <Button onclick={ handleClearSearch } class="px-4 py-2 bg-info text-white rounded-lg bits-btn"
         > Clear search </Button> {/if}
   </div> {:else if viewMode === 'grid'} <!-- 3-Column: Grid, View --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3">
   {#each filteredDocuments as document (document.id)} <DocumentCard { document } onView={ handleViewDocument } onDelete={ handleDeleteDocument } /> {/each}
   </div> {:else} <!-- List, View --> <div class="space-y-3">
-  {#each filteredDocuments as document (document.id)} <div class="flex items-center justify-between gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md"> <div class="flex-1"> <h3 class="font-semibold text-gray-900">{document.filename}</h3>
- <p class="text-sm text-gray-600">{document.summary}</p> </div>
- <div class="flex gap-2"> <Button class="bits-btn" onclick={() => handleViewDocument(document)} class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+  {#each filteredDocuments as document (document.id)} <div class="flex items-center justify-between gap-4 p-4 bg-white rounded-lg border border-sand/20 hover:shadow-md"> <div class="flex-1"> <h3 class="font-semibold text-sand">{document.filename}</h3>
+ <p class="text-sm text-sand/60">{document.summary}</p> </div>
+ <div class="flex gap-2"> <Button class="bits-btn" onclick={() => handleViewDocument(document)} class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/60"
             > View </Button>
- <Button class="bits-btn" onclick={() => handleDeleteDocument(document.id)} class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+ <Button class="bits-btn" onclick={() => handleDeleteDocument(document.id)} class="px-4 py-2 bg-danger text-white rounded-lg hover:bg-danger/80"
             > Delete </Button> </div> </div> {/each} {/if}
   <!-- Document, Count -->
   {#if filteredDocuments.length > 0} <div class="text-center text-sm"> Showing {filteredDocuments.length} of {documents.length} documents {/if}

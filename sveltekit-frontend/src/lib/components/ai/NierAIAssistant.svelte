@@ -9,7 +9,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
 	1000); currentMessage = ''}
 </script>
 
-<div class="nier-ai-assistant p-6 bg-black text-green-400 font-mono">
+<div class="nier-ai-assistant p-6 bg-black text-accent font-mono">
   <div class="mb-4">
     <h3 class="text-xl">NieR AI Assistant</h3>
 
@@ -21,7 +21,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
 
   <div class="messages space-y-3 max-h-60 overflow-y-auto">
   {#each Array.isArray(messages) ? messages : [] as message}
-      <div class="message" class:text-yellow-400={message.sender === 'ai'}>
+      <div class="message" class:text-warning={message.sender === 'ai'}>
         <span class="font-bold">[{message.sender.toUpperCase()}]</span>
         {message.text}
       </div>
@@ -33,9 +33,9 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
       bind:value={currentMessage}
       onkeydown={e => e.key === 'Enter' && sendMessage()}
       placeholder="Enter command..."
-      class="flex-1 bg-gray-900 border border-green-400 text-green-400 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+      class="flex-1 bg-panel border border-accent/60 text-accent px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-accent/80"
     />
-    <button onclick={sendMessage} class="bg-green-400 text-black px-4 py-2 rounded hover:bg-green-300"> SEND </button>
+    <button onclick={sendMessage} class="bg-accent/80 text-black px-4 py-2 rounded hover:bg-accent/60"> SEND </button>
   </div>
 </div>
 

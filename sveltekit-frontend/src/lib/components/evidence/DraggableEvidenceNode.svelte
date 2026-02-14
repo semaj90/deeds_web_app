@@ -80,9 +80,9 @@
 
   let confidenceColor = $derived.by(() => {
     const confidence = evidence.metadata?.confidence ?? 0;
-    if (confidence > 0.8) return 'text-green-600';
-    if (confidence > 0.6) return 'text-yellow-600';
-    return 'text-red-600';
+    if (confidence > 0.8) return 'text-accent';
+    if (confidence > 0.6) return 'text-warning';
+    return 'text-danger';
   });
 
   function handlePositionUpdate(x: number, y: number) {
@@ -242,7 +242,7 @@ evidenceId: evidence.id,
 >
   <div class="w-64 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all border">
     <!-- Header with drag handle -->
-    <div class="flex items-center justify-between p-3 border-b bg-gray-50">
+    <div class="flex items-center justify-between p-3 border-b bg-sand/5">
       <div class="flex items-center gap-2 drag-handle cursor-grab">
         <IconComponent class="w-4 h-4" />
         <span class="text-sm font-medium truncate">{evidence.title}</span>
@@ -256,7 +256,7 @@ evidenceId: evidence.id,
           ></div>
         {/if}
         <button
-          class="p-1 h-6 w-6 rounded hover:bg-gray-200 flex items-center justify-center"
+          class="p-1 h-6 w-6 rounded hover:bg-sand/10 flex items-center justify-center"
           onclick={(e) => {
             e.stopPropagation();
             analyzeEvidence();
@@ -265,7 +265,7 @@ evidenceId: evidence.id,
           aria-label="Analyze evidence"
         >
           {#if isAnalyzing}
-            <div class="animate-spin w-3 h-3 border border-blue-500 border-t-transparent rounded-full"></div>
+            <div class="animate-spin w-3 h-3 border border-info border-t-transparent rounded-full"></div>
           {:else}
             <Bot class="w-3 h-3" />
           {/if}
@@ -276,11 +276,11 @@ evidenceId: evidence.id,
     <div class="p-3 space-y-2">
       <!-- Type badge -->
       <div class="flex items-center justify-between">
-        <span class="px-2 py-1 text-xs bg-gray-100 rounded">
+        <span class="px-2 py-1 text-xs bg-sand/10 rounded">
           {evidence.type}
         </span>
         {#if evidence.metadata?.fileSize}
-          <span class="text-xs text-gray-500">
+          <span class="text-xs text-sand/60">
             {(evidence.metadata.fileSize / 1024).toFixed(1)}KB
           </span>
         {/if}
@@ -288,7 +288,7 @@ evidenceId: evidence.id,
 
       <!-- Content preview -->
       {#if evidence.content}
-        <p class="text-xs text-gray-600 line-clamp-2">
+        <p class="text-xs text-sand/60 line-clamp-2">
           {evidence.content.substring(0, 100)}...
         </p>
       {/if}
@@ -296,26 +296,26 @@ evidenceId: evidence.id,
       <!-- Analysis progress -->
       {#if isAnalyzing}
         <div class="space-y-1">
-          <div class="w-full bg-gray-200 rounded-full h-1">
+          <div class="w-full bg-sand/10 rounded-full h-1">
             <div
-              class="bg-blue-500 h-1 rounded-full transition-all duration-300"
+              class="bg-info h-1 rounded-full transition-all duration-300"
               style="width: {analysisProgress}%"
             ></div>
           </div>
-          <p class="text-xs text-gray-500">Analyzing... {analysisProgress}%</p>
+          <p class="text-xs text-sand/60">Analyzing... {analysisProgress}%</p>
         </div>
       {/if}
 
       <!-- Analysis results -->
       {#if evidence.analysis}
-        <div class="p-2 bg-gray-50 rounded text-xs space-y-1">
+        <div class="p-2 bg-sand/5 rounded text-xs space-y-1">
           {#if evidence.analysis.summary}
-            <p class="text-gray-700">{evidence.analysis.summary}</p>
+            <p class="text-sand/80">{evidence.analysis.summary}</p>
           {/if}
           {#if evidence.analysis.keyTerms?.length}
             <div class="flex flex-wrap gap-1">
               {#each evidence.analysis.keyTerms.slice(0, 3) as term}
-                <span class="px-1 py-0.5 bg-blue-100 text-blue-700 rounded">{term}</span>
+                <span class="px-1 py-0.5 bg-info/10 text-info rounded">{term}</span>
               {/each}
             </div>
           {/if}
@@ -324,7 +324,7 @@ evidenceId: evidence.id,
 
       <!-- Connections indicator -->
       {#if evidence.connections?.length}
-        <div class="flex items-center gap-1 text-xs text-gray-500">
+        <div class="flex items-center gap-1 text-xs text-sand/60">
           <Zap class="w-3 h-3" />
           <span>{evidence.connections.length} connections</span>
         </div>
@@ -334,10 +334,10 @@ evidenceId: evidence.id,
       {#if evidence.tags?.length}
         <div class="flex flex-wrap gap-1">
           {#each evidence.tags.slice(0, 2) as tag}
-            <span class="px-1 py-0.5 text-xs bg-gray-200 rounded">#{tag}</span>
+            <span class="px-1 py-0.5 text-xs bg-sand/10 rounded">#{tag}</span>
           {/each}
           {#if evidence.tags.length > 2}
-            <span class="text-xs text-gray-500">+{evidence.tags.length - 2} more</span>
+            <span class="text-xs text-sand/60">+{evidence.tags.length - 2} more</span>
           {/if}
         </div>
       {/if}

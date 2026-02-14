@@ -56,10 +56,10 @@ let shapeClasses = $derived({
 
 // Status indicator classes
 let statusClasses = $derived({
-	online: 'bg-green-500',
-	offline: 'bg-gray-500',
-	busy: 'bg-red-500',
-	away: 'bg-yellow-500'
+	online: 'bg-accent',
+	offline: 'bg-sand/20',
+	busy: 'bg-danger',
+	away: 'bg-warning'
 }[status ?? 'offline']);
 
 let statusSizeClasses = $derived({
@@ -86,9 +86,9 @@ let displayInitials = $derived(() => {
 
 let bgColor = $derived(() => {
 	const colors = [
-		'bg-blue-600', 'bg-green-600', 'bg-purple-600',
-		'bg-pink-600', 'bg-indigo-600', 'bg-teal-600',
-		'bg-orange-600', 'bg-cyan-600'
+		'bg-info', 'bg-accent', 'bg-info/60',
+		'bg-pink-600', 'bg-info', 'bg-info',
+		'bg-orange-600', 'bg-info'
 	];
 	const hash = displayInitials().charCodeAt(0) + (displayInitials().charCodeAt(1) ?? 0);
 	return colors[hash % colors.length];
@@ -115,7 +115,7 @@ function handleError() {
 		class="w-full h-full flex items-center justify-center overflow-hidden
 			   {shapeClasses}
 			   {bordered ? 'ring-2 ring-white' : ''}
-			   {(!src || hasError) ? bgColor() : 'bg-slate-700'}"
+			   {(!src || hasError) ? bgColor() : 'bg-panelSoft'}"
 	>
 		{#if src && !hasError}
 			<img
@@ -138,8 +138,8 @@ function handleError() {
 		{/if}
 
 		{#if isLoading && src && !hasError}
-			<div class="absolute inset-0 flex items-center justify-center bg-slate-700 animate-pulse">
-				<svg class="w-1/2 h-1/2 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
+			<div class="absolute inset-0 flex items-center justify-center bg-panelSoft animate-pulse">
+				<svg class="w-1/2 h-1/2 text-sand/60" fill="currentColor" viewBox="0 0 24 24">
 					<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
 				</svg>
 			</div>
@@ -150,7 +150,7 @@ function handleError() {
 	{#if status}
 		<span
 			class="absolute bottom-0 right-0 block {statusSizeClasses} {statusClasses} {shape === 'circle' ? 'rounded-full' : 'rounded-sm'}
-				   ring-2 ring-slate-900"
+				   ring-2 ring-panel"
 			aria-label="Status, {status}"
 		></span>
 	{/if}

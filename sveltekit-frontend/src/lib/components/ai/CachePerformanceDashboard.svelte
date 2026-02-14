@@ -73,18 +73,18 @@
   });
 
   let performanceGrade = $derived.by(() => {
-    if (totalHitRate >= 80) return { grade: 'A', color: 'text-green-500' };
-    if (totalHitRate >= 60) return { grade: 'B', color: 'text-yellow-500' };
-    if (totalHitRate >= 40) return { grade: 'C', color: 'text-orange-500' };
-    return { grade: 'D', color: 'text-red-500' };
+    if (totalHitRate >= 80) return { grade: 'A', color: 'text-accent' };
+    if (totalHitRate >= 60) return { grade: 'B', color: 'text-warning' };
+    if (totalHitRate >= 40) return { grade: 'C', color: 'text-warning' };
+    return { grade: 'D', color: 'text-danger' };
   });
 
   let healthColor = $derived.by(() => {
     switch (systemHealth) {
-      case 'healthy': return 'text-green-500';
-      case 'warning': return 'text-yellow-500';
-      case 'critical': return 'text-red-500';
-      default: return 'text-gray-500';
+      case 'healthy': return 'text-accent';
+      case 'warning': return 'text-warning';
+      case 'critical': return 'text-danger';
+      default: return 'text-sand/60';
     }
   });
 
@@ -505,7 +505,7 @@
           </div>
           <div class="perf-item">
             <span>Error Rate:</span>
-            <span class="value {cacheMetrics.performance.errorRate > 2 ? 'text-red-500' : 'text-green-500'}">
+            <span class="value {cacheMetrics.performance.errorRate > 2 ? 'text-danger' : 'text-accent'}">
               {cacheMetrics.performance.errorRate.toFixed(2)}%
             </span>
           </div>
@@ -857,11 +857,11 @@
   .perf-item .value {
     font-weight: bold;
   }
-  .text-green-500 { color: #22c55e; }
-  .text-yellow-500 { color: #eab308; }
-  .text-orange-500 { color: #f97316; }
-  .text-red-500 { color: #ef4444; }
-  .text-gray-500 { color: #6b7280; }
+  .text-accent { color: #22c55e; }
+  .text-warning { color: #eab308; }
+  .text-warning { color: #f97316; }
+  .text-danger { color: #ef4444; }
+  .text-sand/60 { color: #6b7280; }
   .animate-spin {
     animation: spin 1s linear infinite;
   }

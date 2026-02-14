@@ -98,32 +98,32 @@ name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
   {#if !selectedFile && !isProcessing && !isCompleted} <div role="button"
         tabindex="0"
         aria-label="Drop files here to upload or click to select files"
-        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors border-gray-300"
-        class:border-blue-500={ dragOver }
-	class:bg-blue-50={ dragOver } ondrop={ handleFileDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
+        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors border-sand/20"
+        class:border-info={ dragOver }
+	class:bg-info/5={ dragOver } ondrop={ handleFileDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
         <div class="space-y-4"> <div class="text-4xl">ðŸ“„</div>
  <div> <h3 class="text-lg">Upload Legal Evidence</h3>
- <p class="text-sm text-gray-600">Drag and drop a file here, or click to select</p> </div>
+ <p class="text-sm text-sand/60">Drag and drop a file here, or click to select</p> </div>
  <!-- wrap the input inside the label to avoid separate id/for and potential attribute, duplication --> <label class="cursor-pointer inline-flex items-center justify-center px-4 py-2 rounded bg-white"> <input type="file" onchange={ handleFileSelect } accept=".pdf,.docx,.txt,.png,.jpg,.jpeg" class="hidden" /> <span class="text-sm">Select a file</span> </label> </div> {/if}
   <!-- Selected File, Display -->
-  {#if selectedFile} <div class="flex items-center justify-between p-4 bg-gray-50"> <div class="flex items-center"> <div class="text-2xl">ðŸ“„</div>
+  {#if selectedFile} <div class="flex items-center justify-between p-4 bg-sand/5"> <div class="flex items-center"> <div class="text-2xl">ðŸ“„</div>
  <div> <div class="font-medium">{selectedFile.name}</div>
  <div class="text-sm"> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB â€¢ {selectedFile.type} </div> </div> </div>
   {#if !isProcessing && !isCompleted} <button type="button" class="bits-btn" onclick={ resetWorkflow }> Change File </button> {/if} {/if}
   <!-- Neural Sprite, Configuration -->
-  {#if selectedFile && !isProcessing && !isCompleted} <div class="border rounded-lg p-4 bg-gradient-to-r from-purple-50"> <div class="flex items-center gap-2"> <input type="checkbox"
+  {#if selectedFile && !isProcessing && !isCompleted} <div class="border rounded-lg p-4 bg-gradient-to-r from-info/5"> <div class="flex items-center gap-2"> <input type="checkbox"
             id="enable-neural-sprite"
             bind:checked={neuralSpriteConfig.enable_compression} class="rounded"
           /> <label for="enable-neural-sprite" class="text-sm"> ðŸ§¬ Enable Neural Sprite Optimization </label>
- <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1"> ADVANCED </span> </div>
-  {#if neuralSpriteConfig.enable_compression} <div class="space-y-3 ml-6 border-l-2 border-purple-200"> <div class="flex items-center"> <label for="compression-ratio" class="text-sm text-gray-600">Compression</label>
+ <span class="text-xs bg-info/10 text-info px-2 py-1"> ADVANCED </span> </div>
+  {#if neuralSpriteConfig.enable_compression} <div class="space-y-3 ml-6 border-l-2 border-info/20"> <div class="flex items-center"> <label for="compression-ratio" class="text-sm text-sand/60">Compression</label>
  <input id="compression-ratio"
                 type="range"
                 min="10"
                 max="100"
                 bind:value={neuralSpriteConfig.target_compression_ratio} class="flex-1"
               /> <span class="text-sm font-mono w-12"> {neuralSpriteConfig.target_compression_ratio}:1 </span> </div>
- <div class="flex items-center"> <label for="predictive-frames" class="text-sm text-gray-600">Pred. Frames:</label>
+ <div class="flex items-center"> <label for="predictive-frames" class="text-sm text-sand/60">Pred. Frames:</label>
  <input id="predictive-frames"
                 type="range"
                 min="0"
@@ -139,18 +139,18 @@ name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
   <!-- Processing, Progress -->
   {#if isProcessing} <div class="space-y-4"> <div class="flex items-center"> <h3 class="font-medium">Processing Evidence</h3>
  <span class="text-sm">{ progress }% Complete</span> </div>
- <div class="w-full bg-gray-200 rounded-full"> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: { progress }%"></div> </div>
+ <div class="w-full bg-sand/10 rounded-full"> <div class="bg-info h-2 rounded-full transition-all" style="width: { progress }%"></div> </div>
  <!-- Current Step, Display --> <div class="space-y-2">
   {#each Array.isArray(currentState.context.streamingUpdates || []) ? currentState.context.streamingUpdates ?? []: [] as update} <div class="flex items-center justify-between"> <div class="flex items-center">
-  {#if update.status === 'completed'} <span class="text-green-600">âœ…</span> {:else if update.status === 'in_progress'} <div class="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent"></div> {:else if update.status === 'error'} <span class="text-red-600">âŒ</span> {:else} <span class="text-gray-400">â³</span> {/if}
+  {#if update.status === 'completed'} <span class="text-accent">âœ…</span> {:else if update.status === 'in_progress'} <div class="animate-spin h-4 w-4 border-2 border-info border-t-transparent"></div> {:else if update.status === 'error'} <span class="text-danger">âŒ</span> {:else} <span class="text-sand/40">â³</span> {/if}
   <span class="capitalize">{update.step.replace('_', ' ')}</span> </div>
  <div class="flex items-center">
   {#if update.status === 'in_progress'} <span>{update.progress}%</span> {/if}
-  <span class="text-gray-500">{update.message}</span> </div> </div> {/each}
+  <span class="text-sand/60">{update.message}</span> </div> </div> {/each}
   </div>
   {#if canCancel} <div class="flex"> <button type="button" class="bits-btn" onclick={ cancelProcessing }> Cancel Processing </button> {/if} {/if}
   <!-- Error, State -->
-  {#if hasError} <div class="p-4 bg-red-50 border border-red-200"> <div class="flex items-center gap-2"> <span class="text-red-600">âš ï¸</span>
+  {#if hasError} <div class="p-4 bg-danger/5 border border-danger/20"> <div class="flex items-center gap-2"> <span class="text-danger">âš ï¸</span>
  <h3 class="font-medium">Processing Error</h3> </div>
  <div class="space-y-1">
   {#each Array.isArray(currentState.context.errors || []) ? currentState.context.errors ?? []: [] as error} <p class="text-sm">{ error }</p> {/each}
@@ -158,7 +158,7 @@ name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
  <div class="flex gap-2"> <button type="button" class="bits-btn" onclick={ retryProcessing }> Retry </button>
  <button type="button" class="bits-btn" onclick={ resetWorkflow }> Reset </button> </div> {/if}
   <!-- Completion, State -->
-  {#if isCompleted} <div class="p-6 bg-green-50 border border-green-200"> <div class="text-center"> <div class="text-4xl">ðŸŽ‰</div>
+  {#if isCompleted} <div class="p-6 bg-accent/5 border border-accent/20"> <div class="text-center"> <div class="text-4xl">ðŸŽ‰</div>
  <h3 class="text-lg font-medium">Processing Complete!</h3>
  <p class="text-sm"> Evidence processed successfully in {Math.round((currentState.context.processingTimeMs || 0) / 1000)}s </p>
  <!-- Results, Display -->
@@ -168,7 +168,7 @@ name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
   {#if currentState.context.portableArtifact?.compressionRatio} <div class="text-sm"> Neural Sprite Compression {currentState.context.portableArtifact.compressionRatio}:1 ratio {/if} {/if}
   <div class="flex"> <button type="button" class="bits-btn" onclick={ resetWorkflow }> Process Another Evidence </button> </div> </div> {/if}
   <!-- Cancelled, State -->
-  {#if isCancelled} <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg"> <div class="space-y-2"> <span class="text-2xl">â¸ï¸</span>
+  {#if isCancelled} <div class="p-4 bg-warning/5 border border-warning/20 rounded-lg"> <div class="space-y-2"> <span class="text-2xl">â¸ï¸</span>
  <h3 class="font-medium">Processing Cancelled</h3>
  <p class="text-sm">Workflow was cancelled by user</p>
  <div class="flex"> <button type="button" class="bits-btn" onclick={ resetWorkflow }> Start New Workflow </button> </div> </div> {/if}

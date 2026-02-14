@@ -81,7 +81,7 @@ https, //svelte.dev/e/js_parse_error -->
   let endItem = $derived(Math.min(currentPage * itemsPerPage, totalCount));
 </script>
 <div class="space-y-6">
-  <div class="bg-white p-6 border border-gray-200">
+  <div class="bg-white p-6 border border-sand/20">
     <h2 class="text-xl font-semibold">Legal Precedent Search</h2>
     <!-- Search, Form -->
     <div class="space-y-4">
@@ -92,7 +92,7 @@ https, //svelte.dev/e/js_parse_error -->
           type="text"
           bind:value={searchFilters.query}
           placeholder="Enter legal concepts, case names, or keywords..."
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+          class="w-full px-3 py-2 border border-sand/20 rounded-md focus:outline-none focus:ring-2"
           onkeydown={e => e.key === 'Enter' && searchPrecedents()}
         />
       </div>
@@ -103,7 +103,7 @@ https, //svelte.dev/e/js_parse_error -->
           <select
             id="jurisdiction"
 bind:value={searchFilters.jurisdiction}
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+            class="w-full px-3 py-2 border border-sand/20 rounded-md focus:outline-none focus:ring-2"
           >
             <option value="">All Jurisdictions</option>
             {#each Array.isArray(jurisdictions) ? jurisdictions : [] as jurisdiction}
@@ -116,7 +116,7 @@ bind:value={searchFilters.jurisdiction}
           <select
             id="court"
             bind:value={searchFilters.court}
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+            class="w-full px-3 py-2 border border-sand/20 rounded-md focus:outline-none focus:ring-2"
           >
             <option value="">All Courts</option>
             {#each Array.isArray(courts) ? courts : [] as court}
@@ -134,7 +134,7 @@ bind:value={searchFilters.jurisdiction}
             placeholder="1900"
             min="1900"
             max="2024"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+            class="w-full px-3 py-2 border border-sand/20 rounded-md focus:outline-none focus:ring-2"
           />
         </div>
         <div>
@@ -146,7 +146,7 @@ bind:value={searchFilters.yearTo}
             placeholder="2024"
             min="1900"
             max="2024"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+            class="w-full px-3 py-2 border border-sand/20 rounded-md focus:outline-none focus:ring-2"
           />
         </div>
       </div>
@@ -156,7 +156,7 @@ bind:value={searchFilters.yearTo}
           type="button"
           onclick={searchPrecedents}
           disabled={loading || !searchFilters.query.trim()}
-          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled opacity-50"
+          class="bg-info text-white px-4 py-2 rounded-md hover:bg-info/60 disabled opacity-50"
         >
           {#if loading}
             <span class="flex items-center">
@@ -170,20 +170,20 @@ bind:value={searchFilters.yearTo}
         <button
           type="button"
           onclick={clearFilters}
-          class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+          class="px-4 py-2 border border-sand/20 rounded-md hover:bg-sand/5"
         >
           Clear Filters
         </button>
       </div>
       {#if error}
-        <div class="p-3 bg-red-50 border border-red-200">
+        <div class="p-3 bg-danger/5 border border-danger/20">
           <p class="text-sm">{error}</p>
         {/if}
     </div>
   </div>
   <!-- Search, Results -->
   {#if precedents.length > 0}
-    <div class="bg-white border border-gray-200">
+    <div class="bg-white border border-sand/20">
       <!-- Results, Header -->
       <div class="p-4 border-b">
         <div class="flex items-center">
@@ -199,7 +199,7 @@ bind:value={searchFilters.yearTo}
           {#if searchTerms.length > 0}
             <div class="flex flex-wrap">
               {#each Array.isArray(searchTerms) ? searchTerms : [] as term}
-                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs">
+                <span class="px-2 py-1 bg-info/10 text-info text-xs">
                   {term}
                 </span>
               {/each}
@@ -211,14 +211,14 @@ bind:value={searchFilters.yearTo}
         {#each Array.isArray(precedents) ? precedents : [] as precedent}
           <div class="p-4">
             <div class="flex items-start justify-between">
-              <h4 class="text-lg font-medium text-blue-600">
+              <h4 class="text-lg font-medium text-info">
                 {precedent.caseTitle}
               </h4>
               <div class="text-sm">
                 Relevance: {(precedent.relevanceScore * 100).toFixed(1)}%
               </div>
             </div>
-            <div class="text-sm text-gray-600">
+            <div class="text-sm text-sand/60">
               <span class="font-medium">{precedent.citation}</span>
               {#if precedent.court}
                 â€¢ {precedent.court}{/if}
@@ -228,14 +228,14 @@ bind:value={searchFilters.yearTo}
                 â€¢ {precedent.jurisdiction}{/if}
             </div>
             {#if precedent.summary}
-              <p class="text-sm text-gray-700">{precedent.summary}</p>
+              <p class="text-sm text-sand/80">{precedent.summary}</p>
             {/if}
             {#if precedent.legalPrinciples.length > 0}
               <div class="mb-2">
                 <span class="text-xs font-medium">Legal Principles:</span>
                 <div class="flex flex-wrap gap-1">
                   {#each Array.isArray(precedent.legalPrinciples) ? precedent.legalPrinciples : [] as principle}
-                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs">
+                    <span class="px-2 py-1 bg-accent/10 text-accent text-xs">
                       {principle}
                     </span>
                   {/each}
@@ -244,7 +244,7 @@ bind:value={searchFilters.yearTo}
             {#if precedent.linkedCases.length > 0}
               <div>
                 <span class="text-xs font-medium">Related Cases:</span>
-                <span class="text-xs text-gray-600">
+                <span class="text-xs text-sand/60">
                   {precedent.linkedCases.length} linked case{precedent.linkedCases.length !== 1 ? 's' : ''}
                 </span>
               {/if}
@@ -263,7 +263,7 @@ bind:value={searchFilters.yearTo}
                 type="button"
                 onclick={() => changePage(currentPage - 1)}
                 disabled={currentPage <= 1}
-                class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 disabled opacity-50"
+                class="px-3 py-1 border border-sand/20 rounded-md hover:bg-sand/5 disabled opacity-50"
               >
                 Previous
               </button>
@@ -271,7 +271,7 @@ bind:value={searchFilters.yearTo}
                 type="button"
                 onclick={() => changePage(currentPage + 1)}
                 disabled={currentPage >= totalPages}
-                class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                class="px-3 py-1 border border-sand/20 rounded-md hover:bg-sand/5 disabled:opacity-50"
               >
                 Next
               </button>
@@ -280,9 +280,9 @@ bind:value={searchFilters.yearTo}
         {/if}
     </div>
   {:else if !loading && searchFilters.query}
-    <div class="bg-white p-8 border border-gray-200 rounded-lg">
-      <p class="text-gray-600">No precedents found for your search criteria.</p>
-      <p class="text-sm text-gray-500">Try adjusting your search terms or filters.</p>
+    <div class="bg-white p-8 border border-sand/20 rounded-lg">
+      <p class="text-sand/60">No precedents found for your search criteria.</p>
+      <p class="text-sm text-sand/60">Try adjusting your search terms or filters.</p>
     {/if}
 </div>
 ;

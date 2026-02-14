@@ -38,7 +38,7 @@ showEstimate={operation.estimatedTime !== undefined}
 estimatedTime={operation.estimatedTime}
 /> </div> {/each}
 {#if operations.length > maxVisible}
-<div class="text-xs text-gray-500 dark: text-gray-400 text-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded px-2"
+<div class="text-xs text-sand/60 dark: text-sand/40 text-center bg-white/80 dark:bg-panelSoft/80 backdrop-blur-sm rounded px-2"
 in fade={{ duration: 200 }}
 >
         +{operations.length - maxVisible}

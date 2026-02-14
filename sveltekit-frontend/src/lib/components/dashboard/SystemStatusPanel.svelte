@@ -21,7 +21,7 @@
  return 'text-[#00AA00]';
  case 'offline':
  return 'text-[#CC0000]';
- default:return 'text-gray-500';
+ default:return 'text-sand/60';
  }
  };
 
@@ -31,7 +31,7 @@
  return 'bg-[#00AA00]';
  case 'offline':
  return 'bg-[#CC0000]';
- default:return 'bg-gray-400';
+ default:return 'bg-sand/20';
  }
  };
 
@@ -42,15 +42,15 @@
  };
 </script>
 
-<div class="bg-white border-2 border-gray-300 p-6 rounded">
- <h2 class="text-xl font-bold text-gray-900 mb-4 font-mono">SYSTEM STATUS</h2>
+<div class="bg-white border-2 border-sand/20 p-6 rounded">
+ <h2 class="text-xl font-bold text-sand mb-4 font-mono">SYSTEM STATUS</h2>
 
  <div class="space-y-4">
  <!-- Database Status -->
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-3">
  <div class="w-3 h-3 rounded-full {getStatusDot(status.database)}" ></div>
- <span class="font-mono text-sm text-gray-700">Database</span>
+ <span class="font-mono text-sm text-sand/80">Database</span>
  </div>
  <span class="font-mono text-sm {getStatusColor(status.database)} uppercase">
  {status.database}
@@ -61,7 +61,7 @@
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-3">
  <div class="w-3 h-3 rounded-full {getStatusDot(status.elasticsearch)}" ></div>
- <span class="font-mono text-sm text-gray-700">Elasticsearch</span>
+ <span class="font-mono text-sm text-sand/80">Elasticsearch</span>
  </div>
  <span class="font-mono text-sm {getStatusColor(status.elasticsearch)} uppercase">
  {status.elasticsearch}
@@ -72,7 +72,7 @@
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-3">
  <div class="w-3 h-3 rounded-full {getStatusDot(status.gemma)}" ></div>
- <span class="font-mono text-sm text-gray-700">Gemma Service</span>
+ <span class="font-mono text-sm text-sand/80">Gemma Service</span>
  </div>
  <span class="font-mono text-sm {getStatusColor(status.gemma)} uppercase">
  {status.gemma}
@@ -80,12 +80,12 @@
  </div>
 
  <!-- Storage Capacity -->
- <div class="pt-2 border-t border-gray-300">
+ <div class="pt-2 border-t border-sand/20">
  <div class="flex items-center justify-between mb-2">
- <span class="font-mono text-sm text-gray-700">Storage Capacity</span>
- <span class="font-mono text-sm text-gray-600">{status.storageCapacity}%</span>
+ <span class="font-mono text-sm text-sand/80">Storage Capacity</span>
+ <span class="font-mono text-sm text-sand/60">{status.storageCapacity}%</span>
  </div>
- <div class="w-full bg-gray-200 rounded h-2">
+ <div class="w-full bg-sand/10 rounded h-2">
  <div
  class="h-2 rounded {getStorageColor(status.storageCapacity)}"
  style="width: {status.storageCapacity}%"

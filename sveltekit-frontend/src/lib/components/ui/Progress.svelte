@@ -25,18 +25,18 @@
   // Enhanced theming with NES.css compatibility
   let variantClasses = $derived(
     variant === 'success'
-      ? 'bg-green-500 nes-progress is-success'
+      ? 'bg-accent nes-progress is-success'
       : variant === 'error'
-        ? 'bg-red-500 nes-progress is-error'
+        ? 'bg-danger nes-progress is-error'
         : variant === 'warning'
-          ? 'bg-yellow-500 nes-progress is-warning'
+          ? 'bg-warning nes-progress is-warning'
           : variant === 'info'
-            ? 'bg-blue-500 nes-progress is-primary'
+            ? 'bg-info nes-progress is-primary'
             : variant === 'yorha'
               ? 'bg-black nes-progress is-dark'
               : variant === 'legal'
-                ? 'bg-indigo-600 nes-progress is-pattern'
-                : 'bg-gray-600 nes-progress'
+                ? 'bg-info nes-progress is-pattern'
+                : 'bg-sand/20 nes-progress'
   );
 
   let sizeClasses = $derived(
@@ -53,7 +53,7 @@
 </script>
 
 <div class="relative {className}">
-  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full">
+  <div class="w-full bg-sand/10 dark:bg-panelSoft rounded-full">
     <div
       class="h-full transition-all duration-300 {variantClasses} {sizeClasses}"
       style="width: {percentage}%"
@@ -69,7 +69,7 @@
     </div>
   </div>
   {#if showPercentage}
-    <div class="text-xs font-mono text-gray-600 dark:text-gray-400 mt-1 text-right">
+    <div class="text-xs font-mono text-sand/60 dark:text-sand/40 mt-1 text-right">
       {Math.round(percentage)}%
     </div>
   {/if}

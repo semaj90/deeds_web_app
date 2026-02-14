@@ -233,10 +233,10 @@ caseId: searchResult,
  }
 </script>
 
-<div class="phoenix-wright-search bg-[#1a1a1a] p-4 rounded-lg border border-gray-700">
+<div class="phoenix-wright-search bg-[#1a1a1a] p-4 rounded-lg border border-sand/20">
  <div class="flex justify-between items-center mb-4">
  <h3 class="text-lg font-bold text-white flex items-center">
- <span class="text-blue-400 mr-2">⚖️</span>
+ <span class="text-info/80 mr-2">⚖️</span>
  Phoenix Wright AI Legal Search
  </h3>
 
@@ -244,13 +244,13 @@ caseId: searchResult,
  <div class="flex gap-2">
  <button
  onclick={() => showHistory = !showHistory}
- class="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-panelSoft hover:bg-sand/20 text-white text-sm rounded transition-colors"
  >
  📚 History ({searchHistory.length})
  </button>
  <button
  onclick={() => showFavorites = !showFavorites}
- class="px-3 py-1 bg-yellow-700 hover:bg-yellow-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-warning/80 hover:bg-warning text-white text-sm rounded transition-colors"
  >
  ⭐ Favorites ({favorites.length})
  </button>
@@ -259,28 +259,28 @@ caseId: searchResult,
 
  <!-- History Panel -->
  {#if showHistory}
- <div class="mb-4 p-3 bg-[#2a2a2a] rounded border border-gray-600">
+ <div class="mb-4 p-3 bg-[#2a2a2a] rounded border border-sand/30">
  <div class="flex justify-between items-center mb-2">
  <h4 class="text-sm font-semibold text-white">Search History</h4>
- <button onclick={clearHistory} class="text-xs text-red-400 hover:text-red-300">Clear All</button>
+ <button onclick={clearHistory} class="text-xs text-danger/80 hover:text-danger/60">Clear All</button>
  </div>
  <div class="space-y-2 max-h-40 overflow-y-auto">
  {#each searchHistory as result}
  <div class="flex justify-between items-center p-2 bg-[#1a1a1a] rounded text-sm">
  <div class="flex-1">
  <p class="text-white truncate">{result.query || 'Untitled Search'}</p>
- <p class="text-gray-400 text-xs">{result.precedents.length} precedents • {(result.confidence * 100).toFixed(0)}% confidence</p>
+ <p class="text-sand/40 text-xs">{result.precedents.length} precedents • {(result.confidence * 100).toFixed(0)}% confidence</p>
  </div>
  <button
  onclick={() => loadFromHistory(result)}
- class="ml-2 px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
+ class="ml-2 px-2 py-1 bg-info hover:bg-info/60 text-white text-xs rounded"
  >
  Load
  </button>
  </div>
  {/each}
  {#if searchHistory.length === 0}
- <p class="text-gray-500 text-sm text-center py-4">No search history yet</p>
+ <p class="text-sand/60 text-sm text-center py-4">No search history yet</p>
  {/if}
  </div>
  </div>
@@ -288,28 +288,28 @@ caseId: searchResult,
 
  <!-- Favorites Panel -->
  {#if showFavorites}
- <div class="mb-4 p-3 bg-[#2a2a2a] rounded border border-gray-600">
+ <div class="mb-4 p-3 bg-[#2a2a2a] rounded border border-sand/30">
  <div class="flex justify-between items-center mb-2">
  <h4 class="text-sm font-semibold text-white">Favorite Searches</h4>
- <button onclick={clearFavorites} class="text-xs text-red-400 hover:text-red-300">Clear All</button>
+ <button onclick={clearFavorites} class="text-xs text-danger/80 hover:text-danger/60">Clear All</button>
  </div>
  <div class="space-y-2 max-h-40 overflow-y-auto">
  {#each favorites as result}
  <div class="flex justify-between items-center p-2 bg-[#1a1a1a] rounded text-sm">
  <div class="flex-1">
  <p class="text-white truncate">{result.query || 'Untitled Search'}</p>
- <p class="text-gray-400 text-xs">{result.precedents.length} precedents • {(result.confidence * 100).toFixed(0)}% confidence</p>
+ <p class="text-sand/40 text-xs">{result.precedents.length} precedents • {(result.confidence * 100).toFixed(0)}% confidence</p>
  </div>
  <div class="flex gap-1">
  <button
  onclick={() => loadFromHistory(result)}
- class="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
+ class="px-2 py-1 bg-info hover:bg-info/60 text-white text-xs rounded"
  >
  Load
  </button>
  <button
  onclick={() => removeFromFavorites(result.id)}
- class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded"
+ class="px-2 py-1 bg-danger hover:bg-danger/80 text-white text-xs rounded"
  >
  ✕
  </button>
@@ -317,7 +317,7 @@ caseId: searchResult,
  </div>
  {/each}
  {#if favorites.length === 0}
- <p class="text-gray-500 text-sm text-center py-4">No favorites yet</p>
+ <p class="text-sand/60 text-sm text-center py-4">No favorites yet</p>
  {/if}
  </div>
  </div>
@@ -326,27 +326,27 @@ caseId: searchResult,
  <!-- Search Form -->
  <div class="space-y-4 mb-6">
  <div>
- <label for="pw-legal-query" class="block text-sm font-medium text-gray-300 mb-2">
+ <label for="pw-legal-query" class="block text-sm font-medium text-sand/40 mb-2">
  Legal Query
  </label>
  <textarea
  id="pw-legal-query"
  bind:value={searchQuery}
  placeholder="Describe the legal case, evidence, or question..."
- class="w-full h-24 p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none resize-none"
+ class="w-full h-24 p-3 bg-[#2a2a2a] border border-sand/30 rounded text-white placeholder-sand/40 focus:border-info/80 focus:outline-none resize-none"
  disabled={isSearching}
  ></textarea>
  </div>
 
  <div>
- <label for="pw-jurisdiction" class="block text-sm font-medium text-gray-300 mb-2">
+ <label for="pw-jurisdiction" class="block text-sm font-medium text-sand/40 mb-2">
  Jurisdiction (Optional)
  </label>
  <input
  id="pw-jurisdiction"
  bind:value={jurisdiction}
  placeholder="e.g., California: Federal, etc."
- class="w-full p-3 bg-[#2a2a2a] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+ class="w-full p-3 bg-[#2a2a2a] border border-sand/30 rounded text-white placeholder-sand/40 focus:border-info/80 focus:outline-none"
  disabled={isSearching}
  />
  </div>
@@ -355,7 +355,7 @@ caseId: searchResult,
  <button
  onclick={performPhoenixWrightSearch}
  disabled={isSearching || !searchQuery.trim()}
- class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled bg-gray-600 text-white rounded font-medium transition-colors"
+ class="flex-1 px-4 py-2 bg-info hover:bg-info/60 disabled bg-sand/20 text-white rounded font-medium transition-colors"
  >
  {#if isSearching}
  <span class="flex items-center justify-center">
@@ -369,7 +369,7 @@ caseId: searchResult,
 
  <button
  onclick={ resetSearch }
- class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-medium transition-colors"
+ class="px-4 py-2 bg-sand/20 hover:bg-panelSoft text-white rounded font-medium transition-colors"
  >
  Reset
  </button>
@@ -378,7 +378,7 @@ caseId: searchResult,
 
  <!-- Error Display -->
  {#if error}
- <div class="mb-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200">
+ <div class="mb-4 p-3 bg-danger/20 border border-danger/60 rounded text-danger/40">
  <strong>Error:</strong> {error}
  </div>
  {/if}
@@ -393,7 +393,7 @@ caseId: searchResult,
  <button
  onclick={() => exportResults('json')}
  disabled={isExporting}
- class="px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-accent hover:bg-accent/60 disabled:bg-sand/20 text-white text-sm rounded transition-colors"
  >
  {#if isExporting}
  <div class="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
@@ -405,7 +405,7 @@ caseId: searchResult,
  <button
  onclick={() => exportResults('pdf')}
  disabled={isExporting}
- class="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-danger hover:bg-danger/80 disabled:bg-sand/20 text-white text-sm rounded transition-colors"
  >
  {#if isExporting}
  <div class="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
@@ -417,56 +417,56 @@ caseId: searchResult,
  <button
  onclick={() => addToFavorites(searchResult)}
  disabled={favorites.some(fav => fav.id === searchResult.id)}
- class="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+ class="px-3 py-1 bg-warning hover:bg-warning/80 disabled:bg-sand/20 text-white text-sm rounded transition-colors"
  >
  ⭐ Favorite
  </button>
  </div>
  </div>
  <!-- Summary -->
- <div class="bg-[#2a2a2a] p-4 rounded border border-gray-600">
+ <div class="bg-[#2a2a2a] p-4 rounded border border-sand/30">
  <h4 class="text-md font-semibold text-white mb-2">Search Summary</h4>
  <div class="grid grid-cols-2 gap-4 text-sm">
  <div>
- <span class="text-gray-400">Precedents Found:</span>
+ <span class="text-sand/40">Precedents Found:</span>
  <span class="text-white ml-2">{searchResult.precedents.length}</span>
  </div>
  <div>
- <span class="text-gray-400">Contradictions:</span>
+ <span class="text-sand/40">Contradictions:</span>
  <span class="text-white ml-2">{searchResult.contradictions.length}</span>
  </div>
  <div>
- <span class="text-gray-400">Evidence Matches:</span>
+ <span class="text-sand/40">Evidence Matches:</span>
  <span class="text-white ml-2">{searchResult.evidenceMatches.length}</span>
  </div>
  <div>
- <span class="text-gray-400">Confidence:</span>
+ <span class="text-sand/40">Confidence:</span>
  <span class="text-white ml-2">{(searchResult.confidence * 100).toFixed(1)}%</span>
  </div>
  </div>
  </div>
 
  <!-- Ranking Explanation -->
- <div class="bg-[#2a2a2a] p-4 rounded border border-gray-600">
+ <div class="bg-[#2a2a2a] p-4 rounded border border-sand/30">
  <h4 class="text-md font-semibold text-white mb-2">AI Analysis</h4>
- <p class="text-gray-300 text-sm leading-relaxed">{searchResult.rankingExplanation}</p>
+ <p class="text-sand/40 text-sm leading-relaxed">{searchResult.rankingExplanation}</p>
  </div>
 
  <!-- Precedents -->
  {#if searchResult.precedents.length > 0}
- <div class="bg-[#2a2a2a] p-4 rounded border border-gray-600">
+ <div class="bg-[#2a2a2a] p-4 rounded border border-sand/30">
  <h4 class="text-md font-semibold text-white mb-3">Relevant Legal Precedents</h4>
  <div class="space-y-3">
  {#each searchResult.precedents as precedent}
- <div class="border border-gray-700 rounded p-3">
+ <div class="border border-sand/20 rounded p-3">
  <div class="flex justify-between items-start mb-2">
  <h5 class="font-medium text-white">{precedent.title}</h5>
- <span class="text-xs bg-blue-900 text-blue-200 px-2 py-1 rounded">
+ <span class="text-xs bg-info/20 text-info/40 px-2 py-1 rounded">
  {(precedent.relevanceScore * 100).toFixed(0)}% relevant
  </span>
  </div>
- <p class="text-sm text-gray-400 mb-1">{precedent.citation} • {precedent.court} • {precedent.date}</p>
- <p class="text-sm text-gray-300">{precedent.outcome}</p>
+ <p class="text-sm text-sand/40 mb-1">{precedent.citation} • {precedent.court} • {precedent.date}</p>
+ <p class="text-sm text-sand/40">{precedent.outcome}</p>
  </div>
  {/each}
  </div>
@@ -475,21 +475,21 @@ caseId: searchResult,
 
  <!-- Contradictions -->
  {#if searchResult.contradictions.length > 0}
- <div class="bg-[#2a2a2a] p-4 rounded border border-gray-600">
+ <div class="bg-[#2a2a2a] p-4 rounded border border-sand/30">
  <h4 class="text-md font-semibold text-white mb-3">Detected Contradictions</h4>
  <div class="space-y-3">
  {#each searchResult.contradictions as contradiction}
- <div class="border border-red-700 rounded p-3">
+ <div class="border border-danger/60 rounded p-3">
  <div class="flex justify-between items-start mb-2">
- <h5 class="font-medium text-red-300">{contradiction.type.toUpperCase()} Contradiction</h5>
- <span class="text-xs bg-red-900 text-red-200 px-2 py-1 rounded capitalize">
+ <h5 class="font-medium text-danger/60">{contradiction.type.toUpperCase()} Contradiction</h5>
+ <span class="text-xs bg-danger/20 text-danger/40 px-2 py-1 rounded capitalize">
  {contradiction.severity}
  </span>
  </div>
- <p class="text-sm text-gray-300 mb-2">{contradiction.description}</p>
- <p class="text-xs text-gray-400">Location: {contradiction.location}</p>
+ <p class="text-sm text-sand/40 mb-2">{contradiction.description}</p>
+ <p class="text-xs text-sand/40">Location: {contradiction.location}</p>
  {#if contradiction.parties.length > 0}
- <p class="text-xs text-gray-400">Parties: {contradiction.parties.join(', ')}</p>
+ <p class="text-xs text-sand/40">Parties: {contradiction.parties.join(', ')}</p>
  {/if}
  </div>
  {/each}
@@ -499,19 +499,19 @@ caseId: searchResult,
 
  <!-- Evidence Matches -->
  {#if searchResult.evidenceMatches.length > 0}
- <div class="bg-[#2a2a2a] p-4 rounded border border-gray-600">
+ <div class="bg-[#2a2a2a] p-4 rounded border border-sand/30">
  <h4 class="text-md font-semibold text-white mb-3">Evidence Analysis</h4>
  <div class="space-y-3">
  {#each searchResult.evidenceMatches as evidence}
- <div class="border border-green-700 rounded p-3">
+ <div class="border border-accent/60 rounded p-3">
  <div class="flex justify-between items-start mb-2">
- <h5 class="font-medium text-green-300">{evidence.type.toUpperCase()}</h5>
- <span class="text-xs bg-green-900 text-green-200 px-2 py-1 rounded capitalize">
+ <h5 class="font-medium text-accent/80">{evidence.type.toUpperCase()}</h5>
+ <span class="text-xs bg-accent/20 text-accent/40 px-2 py-1 rounded capitalize">
  {evidence.strength}
  </span>
  </div>
- <p class="text-sm text-gray-300 mb-2">{evidence.description}</p>
- <div class="text-xs text-gray-400">
+ <p class="text-sm text-sand/40 mb-2">{evidence.description}</p>
+ <div class="text-xs text-sand/40">
  <p>Relevance: {(evidence.relevanceScore * 100).toFixed(0)}%</p>
  <p>Legal Weight: {(evidence.legalWeight * 100).toFixed(0)}%</p>
  </div>

@@ -211,7 +211,7 @@
 		// Escape regex special characters in query to prevent errors
 		const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 		const regex = new RegExp(`(${escapedQuery})`, 'gi');
-		return text.replace(regex, '<mark class="bg-yellow-300">$1</mark>');
+		return text.replace(regex, '<mark class="bg-warning/60">$1</mark>');
 	}
 
 	const searchSuggestions = [
@@ -236,7 +236,7 @@
 
 		{#if systemStatus}
 			<div class="flex items-center gap-2">
-				<div class="w-3 h-3 rounded-full {systemStatus.healthScore > 80 ? 'bg-green-500' : systemStatus.healthScore > 60 ? 'bg-yellow-500' : 'bg-red-500'}"></div>
+				<div class="w-3 h-3 rounded-full {systemStatus.healthScore > 80 ? 'bg-accent' : systemStatus.healthScore > 60 ? 'bg-warning' : 'bg-danger'}"></div>
 				<span class="font-mono">Health: {systemStatus.healthScore}%</span>
 				<span class="text-nier-text-muted">
 					({(systemStatus.services || []).length} services)
@@ -270,7 +270,7 @@
 						<Search class="w-4 h-4 mr-2" /> Search
 					{/if}
 				</Button>
-				<Button onclick={ingestDocument} variant="outline" size="lg" class="border-blue-500">
+				<Button onclick={ingestDocument} variant="outline" size="lg" class="border-info">
 					📄 Ingest Doc
 				</Button>
 			</div>
@@ -325,8 +325,8 @@
 	</CardRoot>
 
 	{#if errorMessage}
-		<div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
-			<div class="text-red-400 font-mono">❌ {errorMessage}</div>
+		<div class="bg-danger/10 border border-danger/30 rounded-lg p-4">
+			<div class="text-danger/80 font-mono">❌ {errorMessage}</div>
 		</div>
 	{/if}
 
@@ -355,11 +355,11 @@
 					<CardRoot class="bg-nier-bg-primary border border-nier-border-muted legal-search-result p-4">
 						<div class="flex justify-between items-start mb-2">
 							<div class="flex items-center gap-2">
-								<span class="font-mono text-sm bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
+								<span class="font-mono text-sm bg-info/20 text-info/80 px-2 py-1 rounded">
 									Similarity: {((result.similarity || 0) * 100).toFixed(1)}%
 								</span>
 								{#if result.entityInfo}
-									<span class="font-mono text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+									<span class="font-mono text-xs bg-accent/20 text-accent px-2 py-1 rounded">
 										{result.entityInfo.type}: {result.entityInfo.name || result.entityInfo.id}
 									</span>
 								{/if}
@@ -402,7 +402,7 @@
 							<div class="flex gap-2 text-xs text-nier-text-muted items-center">
 								<span>{historyItem.resultCount} results</span>
 								{#if historyItem.hasRAGResponse}
-									<span class="text-green-400 bg-green-500/10 px-1 rounded">+AI</span>
+									<span class="text-accent bg-accent/10 px-1 rounded">+AI</span>
 								{/if}
 								<span>{formatTimestamp(historyItem.timestamp)}</span>
 							</div>

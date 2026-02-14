@@ -76,11 +76,11 @@
 
   function getPriorityColor(priority: string): string {
     const colors: Record<string, string> = {
-      HIGH: 'bg-red-100 text-red-900 border-red-300',
-      MEDIUM: 'bg-yellow-100 text-yellow-900 border-yellow-300',
-      LOW: 'bg-blue-100 text-blue-900 border-blue-300'
+      HIGH: 'bg-danger/10 text-danger border-danger/30',
+      MEDIUM: 'bg-warning/10 text-warning border-warning/30',
+      LOW: 'bg-info/10 text-info border-info/40'
     };
-    return colors[priority] || 'bg-gray-100';
+    return colors[priority] || 'bg-sand/10';
   }
 
   function getSeverityBar(severity: number): number {

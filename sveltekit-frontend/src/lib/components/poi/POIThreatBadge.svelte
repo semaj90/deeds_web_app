@@ -15,30 +15,30 @@
  switch (level) {
  case 'critical':
  return {
- color: 'bg-red-500 text-white border-red-600',
+ color: 'bg-danger text-white border-danger',
  icon: AlertTriangle,
  label: 'CRITICAL'
  };
  case 'high':
  return {
- color: 'bg-orange-500 text-white border-orange-600',
+ color: 'bg-warning text-white border-warning/60',
  icon: AlertCircle,
  label: 'HIGH'
  };
  case 'medium':
  return {
- color: 'bg-yellow-500 text-black border-yellow-600',
+ color: 'bg-warning text-black border-warning/60',
  icon: Shield,
  label: 'MEDIUM'
  };
  case 'low':
  return {
- color: 'bg-green-500 text-white border-green-600',
+ color: 'bg-accent text-white border-accent',
  icon: CheckCircle,
  label: 'LOW'
  };
  default:return {
- color: 'bg-gray-500 text-white border-gray-600',
+ color: 'bg-sand/20 text-white border-sand/30',
  icon: Shield,
  label: 'UNKNOWN'
  };

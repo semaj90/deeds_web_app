@@ -84,8 +84,8 @@ extractEntities: true, riskAssessment, true, generateRecommendations, false }
  <!-- Form, Fields --> <form use, enhance | method="post" class="space-y-6"> <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Basic, Information --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary">Document Information</h3> </div>
  <div class="yorha-panel-content"> <div> <label for="title" class="block text-sm font-medium"> Title * </label>
  <Input id="title" bind:value={$formData.title} placeholder="Enter document, title"
-              class={$errors.title ? "border-red-500" : ""} disabled={$isSubmitting} />
-  {#if $errors.title} <p class="text-sm text-red-600">{$errors.title[0]}
+              class={$errors.title ? "border-danger" : ""} disabled={$isSubmitting} />
+  {#if $errors.title} <p class="text-sm text-danger">{$errors.title[0]}
 </p> {/if}
   </div>
  <div> <label for="description" class="block text-sm font-medium"> Description </label>
@@ -152,10 +152,10 @@ Reset Form </Button>
                 ? "Processing...": "Please wait..."} {:else} <Upload class="mr-2" size={ 16 } /> Upload & Process {/if}
   </Button> </div> </div> </form> </div>
  <style> .enhanced-document-upload-form { /* @apply max-w-4xl mx-auto; */ }
-  .file-upload-card { /* @apply border-2 border-dashed border-gray-300 border-opacity-25 transition-color; */ }
-  .file-upload-card:hover { /* @apply border-blue-500 border-opacity-50; */ }
+  .file-upload-card { /* @apply border-2 border-dashed border-sand/20 border-opacity-25 transition-color; */ }
+  .file-upload-card:hover { /* @apply border-info border-opacity-50; */ }
   .drop-zone { /* @apply min-h-32 rounded-lg flex items-center justify-center cursor-pointer transition-color; */ }
-  .drop-zone.drag-active { /* @apply bg-blue-500 bg-opacity-5 border-blue-500; */ }
+  .drop-zone.drag-active { /* @apply bg-info bg-opacity-5 border-info; */ }
   .drop-zone-content { /* @apply text-center space-y-3; */ }
   .drop-zone-title { /* @apply text-lg font-semibold; */ }
   .drop-zone-description { /* @apply text-sm text-muted-foreground; */ }

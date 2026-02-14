@@ -259,7 +259,7 @@ onclick={(e) => { e.stopPropagation(); openContextMenuId = openContextMenuId ===
 {/each}
 </div>
 {:else}
-	<div class="nes-container is-rounded h-full p-0 relative overflow-hidden bg-slate-900/10"
+	<div class="nes-container is-rounded h-full p-0 relative overflow-hidden bg-panel/10"
 		role="region"
 		aria-label="Evidence Board Canvas"
 		bind:this={canvasContainer}

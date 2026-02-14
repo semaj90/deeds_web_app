@@ -205,13 +205,13 @@ message: trimmed, history: messages })
   <!-- Header -->
   <div class="p-3 border-b border-[#3a3a3a] flex items-center justify-between bg-[#222]">
     <div class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center flex-shrink-0">
-        <BotIcon class="w-5 h-5 text-cyan-500" />
+      <div class="w-8 h-8 rounded-full bg-panelSoft border border-sand/20 flex items-center justify-center flex-shrink-0">
+        <BotIcon class="w-5 h-5 text-info" />
       </div>
       <span class="font-bold tracking-tighter uppercase">YoRHa AI Interface</span>
     </div>
     <div class="flex items-center gap-2 text-[10px]">
-      <div class="w-2 h-2 rounded-full {isConnected ? 'bg-emerald-500' : 'bg-rose-500'}"></div>
+      <div class="w-2 h-2 rounded-full {isConnected ? 'bg-accent' : 'bg-rose-500'}"></div>
       <span>{isConnected ? 'SYSTEM_ONLINE' : 'SYSTEM_OFFLINE'}</span>
     </div>
   </div>
@@ -221,18 +221,18 @@ message: trimmed, history: messages })
     {#each messages as msg (msg.id)}
       <div class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}">
         <div class="max-w-[85%] space-y-1">
-          <div class="flex items-center gap-2 text-[10px] text-zinc-500 {msg.role === 'user' ? 'flex-row-reverse' : ''}">
+          <div class="flex items-center gap-2 text-[10px] text-sand/60 {msg.role === 'user' ? 'flex-row-reverse' : ''}">
             <span class="font-bold uppercase">{msg.role}</span>
             <span>{new Date(msg.timestamp).toLocaleTimeString()}</span>
           </div>
-          <div class="p-3 rounded border {msg.role === 'user' ? 'bg-cyan-950/20 border-cyan-800' : 'bg-zinc-900 border-zinc-800'}">
+          <div class="p-3 rounded border {msg.role === 'user' ? 'bg-info/10 border-info/30' : 'bg-panel border-sand/20'}">
             <p class="text-sm whitespace-pre-wrap">{msg.content}</p>
           </div>
         </div>
       </div>
     {/each}
     {#if isTyping}
-      <div class="flex gap-2 items-center text-xs text-zinc-500 animate-pulse">
+      <div class="flex gap-2 items-center text-xs text-sand/60 animate-pulse">
         <Activity class="w-4 h-4" /> <span>YoRHa processing...</span>
       </div>
     {/if}
@@ -245,14 +245,14 @@ message: trimmed, history: messages })
         bind:value={messageInput}
         onkeydown={handleKeydown}
         placeholder="ENTER_COMMAND_OR_QUERY..."
-        class="flex-1 bg-black border border-zinc-800 p-3 text-sm focus:outline-none focus:border-cyan-500 resize-none"
+        class="flex-1 bg-black border border-sand/20 p-3 text-sm focus:outline-none focus:border-info resize-none"
         rows="2"
       ></textarea>
-      <Button variant="outline" class="h-auto px-6 border-zinc-800 bg-black hover:bg-zinc-900" onclick={sendMessage}>
+      <Button variant="outline" class="h-auto px-6 border-sand/20 bg-black hover:bg-panel" onclick={sendMessage}>
         <SendIcon class="w-5 h-5" />
       </Button>
     </div>
-    <div class="mt-2 flex justify-between text-[9px] text-zinc-600">
+    <div class="mt-2 flex justify-between text-[9px] text-sand/60">
       <span>CMD: /HELP, /STATUS, /CLEAR</span>
       <span>READY_FOR_INPUT</span>
     </div>

@@ -14,11 +14,11 @@
 
  // Generate heatmap colors based on similarity score
  function getHeatmapColor(score: number): string {
- if (score > 0.8) return 'bg-red-500'; // High similarity - red
- if (score > 0.6) return 'bg-orange-500'; // Medium-high - orange
- if (score > 0.4) return 'bg-yellow-500'; // Medium - yellow
- if (score > 0.2) return 'bg-green-500'; // Low-medium - green
- return 'bg-blue-500'; // Low similarity - blue
+ if (score > 0.8) return 'bg-danger'; // High similarity - red
+ if (score > 0.6) return 'bg-warning'; // Medium-high - orange
+ if (score > 0.4) return 'bg-warning'; // Medium - yellow
+ if (score > 0.2) return 'bg-accent'; // Low-medium - green
+ return 'bg-info'; // Low similarity - blue
  }
 
  function getIntensity(score: number): string {
@@ -66,11 +66,11 @@
  <span>0% - 100%</span>
  </div>
  <div class="flex h-2 rounded overflow-hidden">
- <div class="flex-1 bg-blue-500"></div>
- <div class="flex-1 bg-green-500"></div>
- <div class="flex-1 bg-yellow-500"></div>
- <div class="flex-1 bg-orange-500"></div>
- <div class="flex-1 bg-red-500"></div>
+ <div class="flex-1 bg-info"></div>
+ <div class="flex-1 bg-accent"></div>
+ <div class="flex-1 bg-warning"></div>
+ <div class="flex-1 bg-warning"></div>
+ <div class="flex-1 bg-danger"></div>
  </div>
  <div class="flex justify-between text-xs mt-1">
  <span>Low</span>

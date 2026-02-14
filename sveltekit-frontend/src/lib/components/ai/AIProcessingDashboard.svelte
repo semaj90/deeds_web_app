@@ -206,11 +206,11 @@ userId: 'demo-user',
   // Utility functions
   const getTaskTypeColor = (type: string) => {
     switch (type) {
-      case 'embedding': return 'bg-blue-500';
-      case 'generation': return 'bg-green-500';
-      case 'analysis': return 'bg-purple-500';
-      case 'vector-search': return 'bg-orange-500';
-      default:return 'bg-gray-500';
+      case 'embedding': return 'bg-info';
+      case 'generation': return 'bg-accent';
+      case 'analysis': return 'bg-info';
+      case 'vector-search': return 'bg-warning';
+      default:return 'bg-sand/20';
     }
   };
   const formatDuration = (ms: number) => (ms < 1000 ? `${Math.round(ms)}ms` : `${(ms / 1000).toFixed(1)}s`);

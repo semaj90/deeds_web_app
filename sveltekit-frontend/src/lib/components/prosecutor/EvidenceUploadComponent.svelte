@@ -27,7 +27,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   type UploadResult = { fileName?: string; file?: string | null; aiAnalysis?: AIAnalysis | null; embedding?: string | null; qdrantId?: string | null; jobId?: string; status?: string; message?: string; // optional storage info (added so uploadResults may include these fields) s3Key?: string | null; s3Bucket?: string | null}; // Safe caller for onUploadComplete prop (handles cases where prop is not a function) function safeCallOnUploadComplete(results: UploadResult[] | any[]) { try { if (typeof onUploadComplete === 'function') { // explicit cast so TypeScript knows it's callable (onUploadComplete as (r: UploadResult[]) => void)(results)} else { // no-op if prop isn't a function (defensive) // optionally: console.warn('onUploadComplete is not callable', onUploadComplete)}
     } catch (err) { console.warn('safeCallOnUploadComplete error', err)}
   } </script>
- <div class="w-full max-w-4xl mx-auto"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Upload class="w-5" /> Evidence Upload - Prosecutor Workflow {#if enableWebGPU} <!-- Replaced Badge component with inline span to avoid Svelte, typing, error --> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"> <Zap class="w-3 h-3" /> GPU Accelerated </span> {/if}
+ <div class="w-full max-w-4xl mx-auto"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Upload class="w-5" /> Evidence Upload - Prosecutor Workflow {#if enableWebGPU} <!-- Replaced Badge component with inline span to avoid Svelte, typing, error --> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sand/10 text-sand"> <Zap class="w-3 h-3" /> GPU Accelerated </span> {/if}
   </h3> </div>
  <div class="yorha-panel-content"> <!-- Evidence: Metadata, Form --> <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-2"> <label for="evidence-title" class="block text-sm font-medium">Evidence Title *</label>
  <Input id="evidence-title"
@@ -54,32 +54,32 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
       class:drag-active={ dragActive } ondragover={handleDragOver as any} ondragleave={handleDragLeave as any} role="region"
       aria-label="Drop zone"
       ondrop={handleDrop as any} >
-  {#if selectedFiles.length === 0} <Upload class="mx-auto w-12 h-12 text-gray-400" /> <h3 class="text-lg font-medium text-gray-900">Drop evidence files here or click to browse</h3>
- <p class="text-sm text-gray-500"> Supports PDFs, images, videos, documents ({ maxFiles } files max) </p>
+  {#if selectedFiles.length === 0} <Upload class="mx-auto w-12 h-12 text-sand/40" /> <h3 class="text-lg font-medium text-sand">Drop evidence files here or click to browse</h3>
+ <p class="text-sm text-sand/60"> Supports PDFs, images, videos, documents ({ maxFiles } files max) </p>
  <input type="file" multiple accept={ acceptAttr } onchange={ handleFileSelect } class="hidden" id="file-input" /> <button type="button"
-          class="bits-btn px-4 py-2 rounded bg-gray-100 text-gray-800"
+          class="bits-btn px-4 py-2 rounded bg-sand/10 text-sand"
           onclick={() => clickFileInput('file-input')} >
           Select Files </button> {:else} <div class="space-y-3"> <h3 class="text-lg">Selected Files ({selectedFiles.length}/{ maxFiles })</h3>
-  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-gray-50"> <div class="flex items-center"> <!-- explicit icon branches to avoid deprecated/invalid dynamic, tags -->
+  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-sand/5"> <div class="flex items-center"> <!-- explicit icon branches to avoid deprecated/invalid dynamic, tags -->
   {#if file?.type?.startsWith?.('image/')} <Image class="w-5 h-5" /> {:else if file?.type?.startsWith?.('video/')} <Film class="w-5 h-5" /> {:else if file?.type?.startsWith?.('audio/')} <Mic class="w-5 h-5" /> {:else if file?.type?.includes?.('pdf') ?? file?.type?.startsWith?.('text/')} <FileText class="w-5 h-5" /> {:else if file?.type?.includes?.('zip') ?? file?.type?.includes?.('rar')} <Archive class="w-5 h-5" /> {:else} <FileText class="w-5 h-5" /> {/if}
   <div> <p class="font-medium">{file?.name}</p>
  <p class="text-xs"> {(file?.size ?? 0) / 1024 / 1024 ? ((file?.size ?? 0) / 1024 / 1024).toFixed(2) + ' MB': 'Unknown size'} â€¢ {file?.type ?? 'unknown'} </p> </div> </div>
  <div class="flex items-center">
-  {#if enableAI} <!-- Replaced Badge with inline span to avoid Svelte typing, error --> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+  {#if enableAI} <!-- Replaced Badge with inline span to avoid Svelte typing, error --> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sand/10 text-sand"
                   > <Brain class="w-3 h-3" /> AI Analysis </span> {/if}
   <button type="button"
-                  class="bits-btn px-2 py-1 text-sm rounded bg-gray-100 text-gray-800"
+                  class="bits-btn px-2 py-1 text-sm rounded bg-sand/10 text-sand"
                   onclick={() => removeFile(index)} aria-label="Remove file"
                 > <X class="w-4" /> </button> </div> </div> {/each}
   <div class="flex justify-center space-x-3"> <input type="file"
               multiple accept={ acceptAttr } onchange={ handleFileSelect } class="hidden"
               id="add-more-files"
             /> <button type="button"
-              class="bits-btn px-4 py-2 rounded bg-gray-100 text-gray-800"
+              class="bits-btn px-4 py-2 rounded bg-sand/10 text-sand"
               onclick={() => clickFileInput('add-more-files')} disabled={selectedFiles.length >= (maxFiles ?? 10)} >
               Add More Files </button>
  <button type="button"
-              class="bits-btn px-4 py-2 rounded bg-blue-600 text-white"
+              class="bits-btn px-4 py-2 rounded bg-info text-white"
               onclick={ uploadEvidence } disabled={uploading || !evidenceTitle.trim()} >
   {#if uploading} Processing... {:else} Upload & Analyze Evidence {/if}
   </button> </div> {/if}
@@ -90,39 +90,39 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <Progress value={ uploadProgress } class="w-full" /> {/if}
   <!-- Queued Jobs, Tracking -->
   {#if queuedJobs.length > 0} <div class="space-y-3"> <h3 class="text-lg font-medium flex items-center"> <CheckCircle class="w-5 h-5" /> Processing Jobs - Queued for AI Analysis </h3>
- <div class="bg-blue-50 border border-blue-200 rounded-lg"> <div class="flex items-start gap-3"> <Brain class="w-5 h-5 text-blue-600" /> <div class="flex-1"> <p class="text-sm font-medium"> {queuedJobs.length} file{queuedJobs.length > 1 ? 's': ''} queued for background processing </p>
+ <div class="bg-info/5 border border-info/20 rounded-lg"> <div class="flex items-start gap-3"> <Brain class="w-5 h-5 text-info" /> <div class="flex-1"> <p class="text-sm font-medium"> {queuedJobs.length} file{queuedJobs.length > 1 ? 's': ''} queued for background processing </p>
  <p class="text-xs"> RabbitMQ workers will process: OCR â†’ Embeddings â†’ Summarization â†’ Legal Analysis </p> </div> </div>
  <div class="space-y-2">
-  {#each Array.isArray(queuedJobs) ? queuedJobs: [] as job} <div class="p-3 bg-white border border-blue-200"> <div class="flex justify-between"> <div class="flex-1"> <div class="flex items-center"> <FileText class="w-4 h-4" /> <p class="font-medium">{job.fileName}</p> </div>
- <p class="text-xs text-gray-600 mt-1"> Job ID: {job.jobId.substring(0, 8)}... </p>
- <div class="flex items-center gap-2"> <!-- Replaced Badge with inline span to avoid Svelte typing, error --> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
+  {#each Array.isArray(queuedJobs) ? queuedJobs: [] as job} <div class="p-3 bg-white border border-info/20"> <div class="flex justify-between"> <div class="flex-1"> <div class="flex items-center"> <FileText class="w-4 h-4" /> <p class="font-medium">{job.fileName}</p> </div>
+ <p class="text-xs text-sand/60 mt-1"> Job ID: {job.jobId.substring(0, 8)}... </p>
+ <div class="flex items-center gap-2"> <!-- Replaced Badge with inline span to avoid Svelte typing, error --> <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-info/10 text-info"
                       > {job.status} </span>
  <span class="text-xs"> Est. {job.estimatedTime} </span> </div> </div>
  <button type="button"
-                    class="bits-btn px-2 py-1 text-sm rounded bg-gray-100 text-gray-800"
+                    class="bits-btn px-2 py-1 text-sm rounded bg-sand/10 text-sand"
                     title="View job details"
                   > <Eye class="w-4" /> </button> </div> </div> {/each}
   </div>
- <div class="mt-4 p-3 bg-blue-100 border border-blue-300"> <p class="text-xs"> <strong>ðŸ’¡ Real-time Updates:</strong> You'll receive WebSocket notifications when processing completes. Check the Evidence Timeline for real-time progress. </p> </div> </div> {/if}
+ <div class="mt-4 p-3 bg-info/10 border border-info/40"> <p class="text-xs"> <strong>ðŸ’¡ Real-time Updates:</strong> You'll receive WebSocket notifications when processing completes. Check the Evidence Timeline for real-time progress. </p> </div> </div> {/if}
   <!-- Upload Results (Legacy - kept for, compatibility) -->
   {#if uploadResults.length > 0 && !queuedJobs.length} <div class="space-y-3"> <h3 class="text-lg font-medium flex items-center"> <CheckCircle class="w-5 h-5" /> Upload Complete - Evidence Processed </h3>
-  {#each Array.isArray(uploadResults) ? uploadResults: [] as result} <div class="p-4 bg-green-50 border border-green-200"> <div class="flex justify-between"> <div> <h4 class="font-medium"> {result.fileName || result.file} </h4>
+  {#each Array.isArray(uploadResults) ? uploadResults: [] as result} <div class="p-4 bg-accent/5 border border-accent/20"> <div class="flex justify-between"> <div> <h4 class="font-medium"> {result.fileName || result.file} </h4>
  <p class="text-sm">Stored in MinIO â€¢ Embedded in Qdrant â€¢ AI Analyzed</p>
   {#if result.aiAnalysis} <div class="mt-2"> <p class="text-xs"> <strong>AI Summary:</strong> {result.aiAnalysis.summary ? result.aiAnalysis.summary.substring(0, 100) + '...': 'No summary'} </p>
   {#if result.aiAnalysis.prosecutionRelevance} <!-- Use a simple span instead of Badge to avoid Svelte component constructor typing, issues --> <span class={'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium, ' + (result.aiAnalysis.prosecutionRelevance === 'high'
-                            ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')} >
+                            ? 'bg-danger/10 text-danger' : 'bg-sand/10 text-sand')} >
                         {result.aiAnalysis.prosecutionRelevance} relevance </span> {/if} {/if}
   </div>
- <div class="flex flex-col items-end"> <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200"> {result.embedding ?? 'Vector stored'} </span>
-  {#if result.qdrantId} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"> Searchable </span> {/if}
+ <div class="flex flex-col items-end"> <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10"> {result.embedding ?? 'Vector stored'} </span>
+  {#if result.qdrantId} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20"> Searchable </span> {/if}
   </div> </div> </div> {/each}
   <div class="flex justify-center"> <button type="button"
-            class="bits-btn px-4 py-2 rounded bg-gray-100 text-gray-800"
+            class="bits-btn px-4 py-2 rounded bg-sand/10 text-sand"
             onclick={() => { uploadResults = []; selectedFiles = []}} >
             Upload More Evidence </button> </div> {/if}
   <!-- AI: Features, Info -->
-  {#if enableAI} <div class="p-4 bg-blue-50 border border-blue-200"> <div class="flex items-start"> <Brain class="w-5 h-5 text-blue-500" /> <div> <h4 class="font-medium">AI-Powered Evidence Processing</h4>
- <ul class="text-sm text-blue-700 mt-1"> <li>â€¢ Automatic text extraction and OCR</li>
+  {#if enableAI} <div class="p-4 bg-info/5 border border-info/20"> <div class="flex items-start"> <Brain class="w-5 h-5 text-info" /> <div> <h4 class="font-medium">AI-Powered Evidence Processing</h4>
+ <ul class="text-sm text-info mt-1"> <li>â€¢ Automatic text extraction and OCR</li>
  <li>â€¢ Legal relevance analysis with Gemma3Legal</li>
  <li>â€¢ Vector embeddings for semantic search</li>
  <li>â€¢ YOLO: object detection for images/videos</li>
@@ -130,8 +130,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if enableWebGPU} <li>â€¢ WebGPU acceleration for vector operations</li> {/if}
   </ul> </div> </div> {/if}
   </div> </div>
- <div class="flex items-start"> <Brain class="w-5 h-5 text-blue-500" /> <div> <h4 class="font-medium">AI-Powered Evidence Processing</h4>
- <ul class="text-sm text-blue-700 mt-1"> <li>â€¢ Automatic text extraction and OCR</li>
+ <div class="flex items-start"> <Brain class="w-5 h-5 text-info" /> <div> <h4 class="font-medium">AI-Powered Evidence Processing</h4>
+ <ul class="text-sm text-info mt-1"> <li>â€¢ Automatic text extraction and OCR</li>
  <li>â€¢ Legal relevance analysis with Gemma3Legal</li>
  <li>â€¢ Vector embeddings for semantic search</li>
  <li>â€¢ YOLO: object detection for images/videos</li>

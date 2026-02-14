@@ -41,14 +41,14 @@
 
 {#if show}
  <!-- Backdrop -->
- <div class="fixed inset-0 bg-red-900/80 flex items-center justify-center z-50 animate-fade-in">
+ <div class="fixed inset-0 bg-danger/20/80 flex items-center justify-center z-50 animate-fade-in">
  <!-- Phoenix Wright Style Alert -->
- <div class="bg-gradient-to-br from-red-800 to-red-900 border-4 border-yellow-400 rounded-lg p-8 text-center shadow-2xl animate-bounce-in">
+ <div class="bg-gradient-to-br from-danger/40 to-danger/20 border-4 border-warning rounded-lg p-8 text-center shadow-2xl animate-bounce-in">
  <!-- Dramatic Icon -->
  <div class="text-8xl mb-6 animate-pulse">⚠️</div>
 
  <!-- Main Message -->
- <h1 class="text-4xl font-bold text-yellow-400 mb-4 animate-pulse">
+ <h1 class="text-4xl font-bold text-warning mb-4 animate-pulse">
  {message}
  </h1>
 
@@ -59,17 +59,17 @@
 
  <!-- Evidence Indicator -->
  <div class="bg-black/50 rounded-lg p-4 mb-6">
- <div class="text-red-300 text-sm">
+ <div class="text-danger/60 text-sm">
  🔍 Contradictory evidence detected in case analysis
  </div>
- <div class="text-yellow-300 text-xs mt-2">
+ <div class="text-warning/80 text-xs mt-2">
  Immediate prosecutor review recommended
  </div>
  </div>
 
  <!-- Action Button -->
  <button
- class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-8 rounded-lg transition-colors animate-pulse"
+ class="bg-warning hover:bg-warning text-black font-bold py-3 px-8 rounded-lg transition-colors animate-pulse"
  onclick={ dismiss }
  >
  REVIEW EVIDENCE

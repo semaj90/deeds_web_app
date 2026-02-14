@@ -111,21 +111,21 @@ content: documentType,
 
 <div class="pattern-recognition bg-white rounded-lg shadow-sm border p-6">
 	<div class="mb-6">
-		<h3 class="text-lg font-semibold text-gray-900 mb-2">AI Pattern Recognition</h3>
-		<p class="text-sm text-gray-600">
+		<h3 class="text-lg font-semibold text-sand mb-2">AI Pattern Recognition</h3>
+		<p class="text-sm text-sand/60">
 			Analyze legal documents for patterns, clauses, and risk indicators using advanced AI
 		</p>
 	</div>
 
 	<!-- Document Type Selection -->
 	<div class="mb-4">
-		<label for="documentType" class="block text-sm font-medium text-gray-700 mb-2">
+		<label for="documentType" class="block text-sm font-medium text-sand/80 mb-2">
 			Document Type
 		</label>
 		<select
 			id="documentType"
 			bind:value={ documentType }
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+			class="w-full px-3 py-2 border border-sand/20 rounded-md focus:outline-none focus:ring-2 focus:ring-info"
 		>
 			<option value="contract">Contract</option>
 			<option value="agreement">Agreement</option>
@@ -140,7 +140,7 @@ content: documentType,
 
 	<!-- Custom Patterns -->
 	<div class="mb-4">
-		<label for="customPatternInput" class="block text-sm font-medium text-gray-700 mb-2">
+		<label for="customPatternInput" class="block text-sm font-medium text-sand/80 mb-2">
 			Custom Patterns to Look For
 		</label>
 		<div class="flex gap-2 mb-2">
@@ -148,7 +148,7 @@ content: documentType,
 				id="customPatternInput"
 				type="text"
 				placeholder="Add specific pattern (e.g., indemnification, force majeure)"
-				class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+				class="flex-1 px-3 py-2 border border-sand/20 rounded-md focus:outline-none focus:ring-2 focus:ring-info"
 				onkeydown={(e) => { // Changed back to onkeydown
 					if (e.key === 'Enter') {
 						e.preventDefault();
@@ -166,7 +166,7 @@ content: documentType,
 						input.value = '';
 					}
 				}}
-				class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+				class="px-4 py-2 bg-info text-white rounded-md hover:bg-info/60 focus:outline-none focus:ring-2 focus:ring-info"
 			>
 				Add
 			</button>
@@ -175,12 +175,12 @@ content: documentType,
 		{#if patterns.length > 0}
 			<div class="flex flex-wrap gap-2">
 				{#each patterns as pattern, index}
-					<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+					<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-info/10 text-info">
 						{pattern}
 						<button
 							type="button"
 							onclick={() => removePattern(index)} // Changed back to onclick
-							class="ml-1 text-blue-600 hover:text-blue-800"
+							class="ml-1 text-info hover:text-info"
 						>
 							×
 						</button>
@@ -192,7 +192,7 @@ content: documentType,
 
 	<!-- Content Input -->
 	<div class="mb-4">
-		<label for="content" class="block text-sm font-medium text-gray-700 mb-2">
+		<label for="content" class="block text-sm font-medium text-sand/80 mb-2">
 			Document Content
 		</label>
 		<textarea
@@ -200,7 +200,7 @@ content: documentType,
 			bind:value={content}
 			placeholder="Paste or type the legal document content here..."
 			rows="8"
-			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
+			class="w-full px-3 py-2 border border-sand/20 rounded-md focus:outline-none focus:ring-2 focus:ring-info resize-vertical"
 		></textarea>
 	</div>
 
@@ -210,7 +210,7 @@ content: documentType,
 			type="button"
 			onclick={analyzePatterns} // Changed back to onclick
 			disabled={isAnalyzing || !content.trim()}
-			class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled cursor-not-allowed"
+			class="flex-1 px-4 py-2 bg-info text-white rounded-md hover:bg-info/60 focus:outline-none focus:ring-2 focus:ring-info disabled:opacity-50 disabled cursor-not-allowed"
 		>
 			{#if isAnalyzing}
 				<span class="flex items-center justify-center">
@@ -229,7 +229,7 @@ content: documentType,
 			<button
 				type="button"
 				onclick={ clearAnalysis } // Changed back to onclick
-				class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+				class="px-4 py-2 bg-sand/20 text-white rounded-md hover:bg-panelSoft focus:outline-none focus:ring-2 focus:ring-sand/40"
 			>
 				Clear
 			</button>
@@ -238,16 +238,16 @@ content: documentType,
 
 	<!-- Error Display -->
 	{#if error}
-		<div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+		<div class="mb-4 p-4 bg-danger/5 border border-danger/20 rounded-md">
 			<div class="flex">
 				<div class="flex-shrink-0">
-					<svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+					<svg class="h-5 w-5 text-danger/80" viewBox="0 0 20 20" fill="currentColor">
 						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" ></path>
 					</svg>
 				</div>
 				<div class="ml-3">
-					<h3 class="text-sm font-medium text-red-800">Analysis Error</h3>
-					<div class="mt-2 text-sm text-red-700">{error}</div>
+					<h3 class="text-sm font-medium text-danger">Analysis Error</h3>
+					<div class="mt-2 text-sm text-danger">{error}</div>
 				</div>
 			</div>
 		</div>
@@ -258,23 +258,23 @@ content: documentType,
 		<div class="space-y-6">
 			<!-- Risk Assessment -->
 			{#if analysis.risk_assessment}
-				<div class="bg-gray-50 rounded-lg p-4">
-					<h4 class="text-md font-semibold text-gray-900 mb-3">Risk Assessment</h4>
+				<div class="bg-sand/5 rounded-lg p-4">
+					<h4 class="text-md font-semibold text-sand mb-3">Risk Assessment</h4>
 					<div class="grid grid-cols-1 md grid-cols-3 gap-4">
 						<div class="text-center">
-							<div class="text-2xl font-bold {analysis.risk_assessment.overall_risk === 'high' ? 'text-red-600' : analysis.risk_assessment.overall_risk === 'medium' ? 'text-yellow-600' : 'text-green-600'}">
+							<div class="text-2xl font-bold {analysis.risk_assessment.overall_risk === 'high' ? 'text-danger' : analysis.risk_assessment.overall_risk === 'medium' ? 'text-warning' : 'text-accent'}">
 								{analysis.risk_assessment.overall_risk.toUpperCase()}
 							</div>
-							<div class="text-sm text-gray-600">Overall Risk</div>
+							<div class="text-sm text-sand/60">Overall Risk</div>
 						</div>
 						<div class="md col-span-2">
 							{#if analysis.risk_assessment.key_concerns?.length > 0}
 								<div class="mb-3">
-									<h5 class="text-sm font-medium text-gray-700 mb-2">Key Concerns</h5>
-									<ul class="text-sm text-gray-600 space-y-1">
+									<h5 class="text-sm font-medium text-sand/80 mb-2">Key Concerns</h5>
+									<ul class="text-sm text-sand/60 space-y-1">
 										{#each analysis.risk_assessment.key_concerns as concern}
 											<li class="flex items-start">
-												<span class="text-red-500 mr-2">•</span>
+												<span class="text-danger mr-2">•</span>
 												{concern}
 											</li>
 										{/each}
@@ -283,11 +283,11 @@ content: documentType,
 							{/if}
 							{#if analysis.risk_assessment.recommendations?.length > 0}
 								<div>
-									<h5 class="text-sm font-medium text-gray-700 mb-2">Recommendations</h5>
-									<ul class="text-sm text-gray-600 space-y-1">
+									<h5 class="text-sm font-medium text-sand/80 mb-2">Recommendations</h5>
+									<ul class="text-sm text-sand/60 space-y-1">
 										{#each analysis.risk_assessment.recommendations as recommendation}
 											<li class="flex items-start">
-												<span class="text-green-500 mr-2">•</span>
+												<span class="text-accent mr-2">•</span>
 												{recommendation}
 											</li>
 										{/each}
@@ -302,18 +302,18 @@ content: documentType,
 			<!-- Identified Patterns -->
 			{#if analysis.patterns?.length > 0}
 				<div class="bg-white border rounded-lg p-4">
-					<h4 class="text-md font-semibold text-gray-900 mb-3">Identified Patterns</h4>
+					<h4 class="text-md font-semibold text-sand mb-3">Identified Patterns</h4>
 					<div class="space-y-3">
 						{#each analysis.patterns as pattern}
-							<div class="border-l-4 border-blue-500 pl-4 py-2">
+							<div class="border-l-4 border-info pl-4 py-2">
 								<div class="flex items-center justify-between mb-1">
-									<span class="font-medium text-gray-900">{pattern.type}</span>
-									<span class="text-sm text-gray-500">{Math.round(pattern.confidence * 100)}% confidence</span>
+									<span class="font-medium text-sand">{pattern.type}</span>
+									<span class="text-sm text-sand/60">{Math.round(pattern.confidence * 100)}% confidence</span>
 								</div>
-								<div class="text-sm text-gray-700 mb-1">{pattern.text}</div>
-								<div class="text-xs text-gray-500">Category: {pattern.category}</div>
+								<div class="text-sm text-sand/80 mb-1">{pattern.text}</div>
+								<div class="text-xs text-sand/60">Category: {pattern.category}</div>
 								{#if pattern.implications}
-									<div class="text-sm text-gray-600 mt-1">
+									<div class="text-sm text-sand/60 mt-1">
 										<strong>Implications:</strong> {pattern.implications}
 									</div>
 								{/if}
@@ -326,18 +326,18 @@ content: documentType,
 			<!-- Key Clauses -->
 			{#if analysis.clauses?.length > 0}
 				<div class="bg-white border rounded-lg p-4">
-					<h4 class="text-md font-semibold text-gray-900 mb-3">Key Clauses</h4>
+					<h4 class="text-md font-semibold text-sand mb-3">Key Clauses</h4>
 					<div class="space-y-3">
 						{#each analysis.clauses.filter(c => c) as clause}
 							<div class="border rounded-lg p-3">
 								<div class="flex items-center justify-between mb-2">
-									<h5 class="font-medium text-gray-900">{clause.name}</h5>
-									<span class="px-2 py-1 text-xs rounded-full {clause.risk_level === 'high' ? 'bg-red-100 text-red-800' : clause.risk_level === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
+									<h5 class="font-medium text-sand">{clause.name}</h5>
+									<span class="px-2 py-1 text-xs rounded-full {clause.risk_level === 'high' ? 'bg-danger/10 text-danger' : clause.risk_level === 'medium' ? 'bg-warning/10 text-warning' : 'bg-accent/10 text-accent'}">
 										{clause.risk_level} risk
 									</span>
 								</div>
-								<div class="text-sm text-gray-700 mb-2">{clause.text}</div>
-								<div class="text-sm text-gray-600">
+								<div class="text-sm text-sand/80 mb-2">{clause.text}</div>
+								<div class="text-sm text-sand/60">
 									<strong>Analysis:</strong> {clause.analysis}
 								</div>
 							</div>
@@ -348,7 +348,7 @@ content: documentType,
 
 			<!-- Metadata -->
 			{#if analysis.metadata}
-				<div class="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
+				<div class="text-xs text-sand/60 bg-sand/5 rounded-lg p-3">
 					<div class="grid grid-cols-2 gap-4">
 						<div>
 							<strong>Document Type:</strong> {analysis.metadata.document_type}

@@ -25,36 +25,36 @@ import type { Document } from '$lib/types'; import Button from "$lib/components/
   // Debounce / input handling let searchTimeout: ReturnType<typeof setTimeout>; function handleQueryChange() { clearTimeout(searchTimeout); if (query.trim()) { searchTimeout = setTimeout(performSearch, 500)}
   }
    // Reactive effect for query changes (Svelte, 5 runes $effect assumed) $effect(() => { if (query) handleQueryChange()}); // Utility fixes function formatMetric(value: number, unit: string): string { return `${value.toFixed(unit === '%' ? 1 : 0)}${unit}`}
-  function getSearchTypeColor(type: string): string { switch (type) { case 'semantic': return 'bg-blue-100 text-blue-800'; case 'keyword': return 'bg-green-100 text-green-800'; case 'hybrid': return 'bg-purple-100 text-purple-800'; default: return 'bg-gray-100 text-gray-800'; }
+  function getSearchTypeColor(type: string): string { switch (type) { case 'semantic': return 'bg-info/10 text-info'; case 'keyword': return 'bg-accent/10 text-accent'; case 'hybrid': return 'bg-info/10 text-info'; default: return 'bg-sand/10 text-sand'; }
   }
-  function getDocumentTypeColor(type: string): string { switch (type) { case 'contract': return 'bg-orange-100 text-orange-800'; case 'agreement': return 'bg-blue-100 text-blue-800'; case 'lease': return 'bg-green-100 text-green-800'; case 'deed': return 'bg-purple-100 text-purple-800'; default: return 'bg-gray-100 text-gray-800'; }
+  function getDocumentTypeColor(type: string): string { switch (type) { case 'contract': return 'bg-warning/10 text-warning'; case 'agreement': return 'bg-info/10 text-info'; case 'lease': return 'bg-accent/10 text-accent'; case 'deed': return 'bg-info/10 text-info'; default: return 'bg-sand/10 text-sand'; }
   }
 </script>
  <div class="cuda-search-container"> <!-- Search, Header --> <Card.Root class="mb-4"> <CardHeader> <CardTitle class="flex items-center"> <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          ></path> </svg> CUDA-Accelerated Legal Search {#if cudaCapabilities} <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm"> {cudaCapabilities.gpu_model}
+          ></path> </svg> CUDA-Accelerated Legal Search {#if cudaCapabilities} <span class="bg-accent/10 text-accent px-2 py-1 rounded text-sm"> {cudaCapabilities.gpu_model}
 </span> {/if}
   </CardTitle> </CardHeader>
  <CardContent> <!-- Search, Form --> <form onsubmit={ handleSubmit } class="space-y-4"> <div class="relative"> <input type="text"
-            bind:value={ query } { placeholder } disabled={ isSearching } class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            bind:value={ query } { placeholder } disabled={ isSearching } class="w-full px-4 py-3 border border-sand/20 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent"
           /> <div class="absolute right-3">
-  {#if isSearching} <div class="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent"></div> {:else} <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round"
+  {#if isSearching} <div class="animate-spin w-5 h-5 border-2 border-info border-t-transparent"></div> {:else} <svg class="w-5 h-5 text-sand/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 ></path> </svg> {/if}
   </div> </div>
  <!-- Search, Options --> <div class="flex flex-wrap"> <span class={getSearchTypeColor(searchType) + ' px-2 py-1 rounded text-sm font-medium'}> {searchType.charAt(0).toUpperCase() + searchType.slice(1)} Search </span>
-  {#if enableGpuAcceleration} <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm"> ðŸš€ GPU Accelerated </span> {/if} {#if enableSIMD && cudaCapabilities?.simd_enabled} <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">âš¡ {cudaCapabilities.instruction_set} SIMD</span> {/if}
+  {#if enableGpuAcceleration} <span class="bg-accent/10 text-accent px-2 py-1 rounded text-sm"> ðŸš€ GPU Accelerated </span> {/if} {#if enableSIMD && cudaCapabilities?.simd_enabled} <span class="bg-info/10 text-info px-2 py-1 rounded text-sm">âš¡ {cudaCapabilities.instruction_set} SIMD</span> {/if}
   <span class="bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm">Domain: { legalDomain }
 </span> </div>
  <Button type="submit" disabled={isSearching || !query.trim()} class="w-full">
   {#if isSearching}ðŸ”„ Searching...{:else}ðŸš€ Search Legal Documents{/if}
   </Button> </form>
  <!-- Error, Message -->
-  {#if errorMessage} <div class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700"> { errorMessage } {/if}
+  {#if errorMessage} <div class="mt-4 p-3 bg-danger/10 border border-danger/60 text-danger"> { errorMessage } {/if}
   </CardContent> </Card.Root>
  <!-- Performance, Metrics -->
   {#if searchTime > 0 || cudaCapabilities} <Card.Root class="mb-4"> <CardHeader> <CardTitle class="text-lg">Performance Metrics</CardTitle> </CardHeader>
@@ -74,7 +74,7 @@ import type { Document } from '$lib/types'; import Button from "$lib/components/
   {#if searchTime > 0} <span class="bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm"> {formatMetric(searchTime, 'ms')} total </span> {/if}
   </CardTitle> </CardHeader>
  <CardContent> <div class="space-y-4">
-  {#each results as result (result.id)} <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md"> <!-- Result, Header --> <div class="flex items-start justify-between"> <div class="flex-1"> <h3 class="font-semibold text-lg text-gray-900"> {result.title}
+  {#each results as result (result.id)} <div class="border border-sand/20 rounded-lg p-4 hover:shadow-md"> <!-- Result, Header --> <div class="flex items-start justify-between"> <div class="flex-1"> <h3 class="font-semibold text-lg text-sand"> {result.title}
 </h3>
  <div class="flex flex-wrap gap-2"> <span class={getDocumentTypeColor(result.metadata.document_type) + ' px-2 py-1 rounded text-sm font-medium'}> {result.metadata.document_type}
 </span>
@@ -83,12 +83,12 @@ import type { Document } from '$lib/types'; import Button from "$lib/components/
  <span class="bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm"> {result.metadata.date}
 </span> </div> </div>
  <div class="text-right"> <div class="text-sm font-medium"> Score: {(result.score * 100).toFixed(1)}% </div>
-  {#if result.performance.gpu_accelerated} <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs"> ðŸš€ GPU </span> {:else} <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs"> ðŸ’» CPU </span> {/if}
+  {#if result.performance.gpu_accelerated} <span class="bg-accent/10 text-accent px-2 py-1 rounded text-xs"> ðŸš€ GPU </span> {:else} <span class="bg-sand/10 text-sand px-2 py-1 rounded text-xs"> ðŸ’» CPU </span> {/if}
   </div> </div>
- <!-- Result, Content --> <p class="text-gray-700 mb-3"> {result.content}
+ <!-- Result, Content --> <p class="text-sand/80 mb-3"> {result.content}
 </p>
  <!-- Performance, Info -->
-  {#if result.performance.search_time_ms > 0} <div class="text-xs text-gray-500 flex"> <span>Search: {result.performance.search_time_ms}ms</span>
+  {#if result.performance.search_time_ms > 0} <div class="text-xs text-sand/60 flex"> <span>Search: {result.performance.search_time_ms}ms</span>
   {#if result.performance.gpu_utilization > 0} <span>GPU: {result.performance.gpu_utilization.toFixed(1)}%</span> {/if} {/if}
   </div> {/each}
   </div> </CardContent> </Card.Root> {:else if query && !isSearching} <Card.Root> <CardContent class="text-center py-8"> No results found for: "{ query }"

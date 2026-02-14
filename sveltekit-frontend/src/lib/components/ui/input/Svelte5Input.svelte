@@ -72,26 +72,26 @@ let sizeClasses = $derived({
 // Variant classes
 let variantClasses = $derived({
 	default: `
-		bg-slate-800 text-white
-		border-2 border-slate-600
-		hover:border-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400
+		bg-panelSoft text-white
+		border-2 border-sand/30
+		hover:border-sand/30 focus:border-info focus:ring-2 focus:ring-info/20 placeholder:text-sand/40
 	`,
 	nes: `
-		bg-slate-900 text-white
+		bg-panel text-white
 		border-4 border-white
 		font-["Press_Start_2P",monospace]
-		placeholder:text-slate-500
+		placeholder:text-sand/60
 	`,
 	ghost: `
 		bg-transparent text-white
-		border-b-2 border-slate-600
-		hover:border-slate-500 focus:border-blue-500, placeholder:text-slate-400
+		border-b-2 border-sand/30
+		hover:border-sand/30 focus:border-info, placeholder:text-sand/40
 		rounded-none
 	`
 }[variant].replace(/\s+/g, ' ').trim());
 
 let errorClasses = $derived(
-	error ? 'border-red-500 focus:border-red-500, focus:ring-red-500/20' : ''
+	error ? 'border-danger focus:border-danger, focus:ring-danger/20' : ''
 );
 
 function handleInput(e: Event) {
@@ -119,17 +119,17 @@ function handleBlur() {
 
 <div class="w-full {className}">
 	{#if label}
-		<label for={id} class="block text-sm font-medium text-slate-300 mb-1.5">
+		<label for={id} class="block text-sm font-medium text-sand/40 mb-1.5">
 			{label}
 			{#if required}
-				<span class="text-red-400 ml-1">*</span>
+				<span class="text-danger/80 ml-1">*</span>
 			{/if}
 		</label>
 	{/if}
 
 	<div class="relative flex items-center">
 		{#if prefix}
-			<div class="absolute left-3 text-slate-400">
+			<div class="absolute left-3 text-sand/40">
 				{@render prefix()}
 			</div>
 		{/if}
@@ -164,14 +164,14 @@ function handleBlur() {
 		/>
 
 		{#if suffix}
-			<div class="absolute right-3 text-slate-400">
+			<div class="absolute right-3 text-sand/40">
 				{@render suffix()}
 			</div>
 		{/if}
 	</div>
 
 	{#if error}
-		<p id="{id}-error" class="mt-1.5 text-sm text-red-400">
+		<p id="{id}-error" class="mt-1.5 text-sm text-danger/80">
 			{error}
 		</p>
 	{/if}

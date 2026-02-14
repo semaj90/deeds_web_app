@@ -54,17 +54,17 @@
   let toneColor = $derived.by(() => {
     switch (emotionalTone) {
       case 'encouraging':
-        return 'text-green-600';
+        return 'text-accent';
       case 'supportive':
-        return 'text-blue-600';
+        return 'text-info';
       case 'enthusiastic':
-        return 'text-purple-600';
+        return 'text-info';
       case 'thoughtful':
-        return 'text-indigo-600';
+        return 'text-info';
       case 'professional':
-        return 'text-gray-600';
+        return 'text-sand/60';
       default:
-        return 'text-gray-500';
+        return 'text-sand/60';
     }
   });
 
@@ -106,17 +106,17 @@
   role="listitem"
 >
   {#if !isUser}
-    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-      <Bot class="w-5 h-5 text-gray-600" />
+    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-sand/10 flex items-center justify-center">
+      <Bot class="w-5 h-5 text-sand/60" />
     </div>
   {/if}
 
   <div class="message-content-wrapper flex flex-col max-w-[80%]">
     <div
       class="message-bubble rounded-lg px-4 py-2.5"
-      class:bg-blue-600={isUser}
+      class:bg-info={isUser}
       class:text-white={isUser}
-      class:bg-gray-100={!isUser}
+      class:bg-sand/10={!isUser}
     >
       {#if isProactive}
         <div class="flex items-center gap-1 text-xs opacity-70 mb-1">
@@ -145,7 +145,7 @@
 
     <!-- Timestamp & Actions -->
     <div class="flex items-center gap-2 mt-1 text-xs" class:justify-end={isUser} class:justify-start={!isUser}>
-      <span class="text-gray-400">{formattedTime}</span>
+      <span class="text-sand/40">{formattedTime}</span>
 
       {#if showActions}
         <div class="actions flex gap-0.5">
@@ -167,7 +167,7 @@
             title={message.saved ? 'Remove from saved' : 'Save message'}
           >
             {#if message.saved}
-              <Star class="w-3.5 h-3.5 text-yellow-500" />
+              <Star class="w-3.5 h-3.5 text-warning" />
             {:else}
               <StarOff class="w-3.5 h-3.5" />
             {/if}
@@ -182,7 +182,7 @@
 
     <!-- AI Metadata -->
     {#if hasMetadata}
-      <div class="text-xs text-gray-400 mt-0.5" class:text-right={isUser} class:text-left={!isUser}>
+      <div class="text-xs text-sand/40 mt-0.5" class:text-right={isUser} class:text-left={!isUser}>
         {#if message.metadata?.model}
           <span>Model: {message.metadata.model}</span>
         {/if}
@@ -197,8 +197,8 @@
   </div>
 
   {#if isUser}
-    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-      <Users class="w-5 h-5 text-blue-600" />
+    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-info/10 flex items-center justify-center">
+      <Users class="w-5 h-5 text-info" />
     </div>
   {/if}
 </div>

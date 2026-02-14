@@ -64,31 +64,31 @@
 
   // Reactive updates $effect(() => { if (canvas && autoRender) { stopRendering(); startRendering()}
   }); </script>
- <div class="simd-glyph-renderer"> <div class="relative"> <canvas bind:this={canvas as any} { width } { height } class="border border-gray-600 rounded-lg"
-    /> <!-- Render Mode, Indicator --> <div class="absolute top-2 left-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1"> {renderMode.toUpperCase()} {#if glyphResult.simd_shader_data} <span class="text-yellow-400">SIMD</span> {/if}
+ <div class="simd-glyph-renderer"> <div class="relative"> <canvas bind:this={canvas as any} { width } { height } class="border border-sand/30 rounded-lg"
+    /> <!-- Render Mode, Indicator --> <div class="absolute top-2 left-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1"> {renderMode.toUpperCase()} {#if glyphResult.simd_shader_data} <span class="text-warning">SIMD</span> {/if}
   </div>
  <!-- Loading, Overlay -->
   {#if isRendering && renderMode !== 'canvas2d'} <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"> <div class="text-white">Rendering...</div> {/if}
   <!-- Error, Overlay -->
-  {#if renderError} <div class="absolute inset-0 bg-red-900 bg-opacity-75 flex items-center justify-center"> <div class="text-red-200 text-sm text-center"> <div class="font-semibold">Render Error</div>
+  {#if renderError} <div class="absolute inset-0 bg-danger/20 bg-opacity-75 flex items-center justify-center"> <div class="text-danger/40 text-sm text-center"> <div class="font-semibold">Render Error</div>
  <div>{ renderError }</div> </div> {/if}
   </div>
  <!-- Stats, Panel -->
-  {#if showStats} <div class="mt-4 bg-gray-800 rounded-lg"> <h4 class="text-sm font-medium text-gray-300">Render Stats</h4>
- <div class="grid grid-cols-2 gap-4"> <div> <span class="text-gray-400">Render Time:</span>
+  {#if showStats} <div class="mt-4 bg-panelSoft rounded-lg"> <h4 class="text-sm font-medium text-sand/40">Render Stats</h4>
+ <div class="grid grid-cols-2 gap-4"> <div> <span class="text-sand/40">Render Time:</span>
  <span class="ml-2">{renderStats.renderTime.toFixed(2)}ms</span> </div>
- <div> <span class="text-gray-400">Frame Rate:</span>
+ <div> <span class="text-sand/40">Frame Rate:</span>
  <span class="ml-2">{renderStats.frameRate.toFixed(1)} FPS</span> </div>
-  {#if glyphResult.simd_shader_data} <div> <span class="text-gray-400">Compression</span>
+  {#if glyphResult.simd_shader_data} <div> <span class="text-sand/40">Compression</span>
  <span class="ml-2">{glyphResult.simd_shader_data.compression_ratio.toFixed(1)}:1</span> </div>
- <div> <span class="text-gray-400">Tiles:</span>
+ <div> <span class="text-sand/40">Tiles:</span>
  <span class="ml-2">{glyphResult.simd_shader_data.tile_map.length}</span> {/if}
   </div> {/if}
-  <!-- Controls --> <div class="mt-4 flex"> <button onclick={ startRendering } disabled={ isRendering } class="px-3 py-1 bg-green-600 hover:bg-green-700 disabled bg-gray-600 text-white text-sm rounded transition-colors"
+  <!-- Controls --> <div class="mt-4 flex"> <button onclick={ startRendering } disabled={ isRendering } class="px-3 py-1 bg-accent hover:bg-accent/60 disabled bg-sand/20 text-white text-sm rounded transition-colors"
     > Start </button>
- <button onclick={ stopRendering } disabled={!isRendering} class="px-3 py-1 bg-red-600 hover:bg-red-700 disabled bg-gray-600 text-white text-sm rounded"
+ <button onclick={ stopRendering } disabled={!isRendering} class="px-3 py-1 bg-danger hover:bg-danger/80 disabled bg-sand/20 text-white text-sm rounded"
     > Stop </button>
- <select ,bind:value={ renderMode } class="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white"
+ <select ,bind:value={ renderMode } class="px-2 py-1 bg-panelSoft border border-sand/30 rounded text-white"
     > <option value="webgpu">WebGPU</option>
  <option value="webgl">WebGL</option>
  <option value="canvas2d">Canvas 2D</option> </select> </div> </div>

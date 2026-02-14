@@ -150,26 +150,26 @@
 	function getStatusColor(value: number, type: 'fps' | 'memory' | 'cpu' | 'gpu'): string {
 		switch (type) {
 			case 'fps':
-				if (value >= 55) return 'text-green-400';
-				if (value >= 30) return 'text-yellow-400';
-				return 'text-red-400';
+				if (value >= 55) return 'text-accent';
+				if (value >= 30) return 'text-warning';
+				return 'text-danger/80';
 			case 'memory':
-				if (value <= 50) return 'text-green-400';
-				if (value <= 80) return 'text-yellow-400';
-				return 'text-red-400';
+				if (value <= 50) return 'text-accent';
+				if (value <= 80) return 'text-warning';
+				return 'text-danger/80';
 			case 'cpu':
 			case 'gpu':
-				if (value <= 30) return 'text-green-400';
-				if (value <= 70) return 'text-yellow-400';
-				return 'text-red-400';
-			default:return 'text-gray-400';
+				if (value <= 30) return 'text-accent';
+				if (value <= 70) return 'text-warning';
+				return 'text-danger/80';
+			default:return 'text-sand/40';
 		}
 	}
 </script>
 
 {#if isVisible}
 	<div class="performance-monitor fixed top-4 right-4 z-[9999] font-mono">
-		<div class="bg-black/80 backdrop-blur-sm text-white rounded-lg p-3 shadow-2xl border border-gray-700">
+		<div class="bg-black/80 backdrop-blur-sm text-white rounded-lg p-3 shadow-2xl border border-sand/20">
 			<!-- Header -->
 			<div class="flex items-center justify-between mb-2 pb-1 border-b">
 				<div class="flex items-center">
@@ -178,7 +178,7 @@
 				</div>
 				<button
 					onclick={toggleVisibility}
-					class="text-gray-400 hover:text-white transition-colors"
+					class="text-sand/40 hover:text-white transition-colors"
 					aria-label="Close performance monitor"
 				>
 					×
@@ -224,7 +224,7 @@
 
 					<div class="flex items-center justify-between gap-4">
 						<span>AI Ops:</span>
-						<span class="text-blue-400">
+						<span class="text-info/80">
 							{metrics.activeOperations}
 						</span>
 					</div>
@@ -233,20 +233,20 @@
 						<span class="flex items-center gap-1">
 							<Clock class="w-3" /> Response:
 						</span>
-						<span class="text-purple-400">
+						<span class="text-info/80">
 							{metrics.responseTime}ms
 						</span>
 					</div>
 
 					<div class="flex items-center justify-between pt-1 border-t mt-1">
 						<span>WebGPU:</span>
-						<span class={(metrics.webGPUActive ? 'text-green-400' : 'text-red-400') + ' font-semibold'}>
+						<span class={(metrics.webGPUActive ? 'text-accent' : 'text-danger/80') + ' font-semibold'}>
 							{metrics.webGPUActive ? 'Active' : 'Inactive'}
 						</span>
 					</div>
 				</div>
 			{/if}
-			<div class="mt-2 pt-1 border-t border-gray-600 text-xs text-gray-400">Press Ctrl+Shift+P to toggle</div>
+			<div class="mt-2 pt-1 border-t border-sand/30 text-xs text-sand/40">Press Ctrl+Shift+P to toggle</div>
 		</div>
 	</div>
 {/if}

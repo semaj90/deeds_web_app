@@ -41,7 +41,7 @@
 	}
 </script>
 
-<div class="flex flex-col h-full nes-container is-rounded bg-slate-900/50 p-2" class:hidden={!isVisible}>
+<div class="flex flex-col h-full nes-container is-rounded bg-panel/50 p-2" class:hidden={!isVisible}>
 	<div class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-4">
 		{#each messages as msg}
 			<div class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}">

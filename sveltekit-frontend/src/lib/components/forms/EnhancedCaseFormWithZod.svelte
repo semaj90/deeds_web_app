@@ -37,9 +37,9 @@ data: CaseForm }) => void}
 	300)} else { if (progressInterval) { clearInterval(progressInterval); progressInterval = null}
       if (progress > 0) { if (progressTimeout) clearTimeout(progressTimeout); progressTimeout = setTimeout(() => { progress = 0},
 	600)}
-    } }); // TODO: Add as cleanup in $effect: return () => { if (progressInterval) clearInterval(progressInterval); if (progressTimeout) clearTimeout(progressTimeout)} // Priority levels with colors const priorityLevels = [ { value: 'low', label: 'Low Priority', color: 'text-green-600' },
-	{ value: 'medium', label: 'Medium Priority', color: 'text-yellow-600' },
-	{ value: 'high', label: 'High Priority', color: 'text-red-600' }]; // Status options (fixed: added, missing: ':' for description) const statusOptions = [ { value: 'draft', label: 'Draft', description: 'Case is being prepared' },
+    } }); // TODO: Add as cleanup in $effect: return () => { if (progressInterval) clearInterval(progressInterval); if (progressTimeout) clearTimeout(progressTimeout)} // Priority levels with colors const priorityLevels = [ { value: 'low', label: 'Low Priority', color: 'text-accent' },
+	{ value: 'medium', label: 'Medium Priority', color: 'text-warning' },
+	{ value: 'high', label: 'High Priority', color: 'text-danger' }]; // Status options (fixed: added, missing: ':' for description) const statusOptions = [ { value: 'draft', label: 'Draft', description: 'Case is being prepared' },
 	{ value: 'active', label: 'Active', description: 'Case is under investigation' },
 	{ value: 'pending', label: 'Pending', description: 'Awaiting review or action' },
 	{ value: 'closed', label: 'Closed', description: 'Case is completed' }]; // Enhanced file upload handler function handleFileUpload(event: Event) { const target = event.target as HTMLInputElement | null; if (target?.files) { uploadedFiles = [...uploadedFiles, ...Array.from(target.files)]}
@@ -75,7 +75,7 @@ data: CaseForm }) => void}
   {#if !componentError} <!-- Replaced Card* components with semantic wrappers to avoid typing, mismatch --> <div class="w-full max-w-4xl mx-auto bg-white rounded-lg"> <header class="px-6 py-4"> <div class="flex items-center"> <div class="flex items-center"> <Scale class="h-6 w-6" /> <div> <h3 class="text-xl"> {editMode ? 'Edit Case': 'Create New Case'} </h3>
  <p class="text-sm"> {editMode ? 'Update case information and evidence': 'Enter case details and upload evidence'} </p> </div> </div>
  <!-- Progress, indicator -->
-  {#if progress > 0} <div class="flex items-center"> <div class="w-20 bg-gray-200 rounded-full"> <div class="bg-primary h-2 rounded-full transition-all" style="width: { progress }%"></div> </div>
+  {#if progress > 0} <div class="flex items-center"> <div class="w-20 bg-sand/10 rounded-full"> <div class="bg-primary h-2 rounded-full transition-all" style="width: { progress }%"></div> </div>
  <span class="text-sm nes-text">{Math.round(progress)}%</span></div> {/if}
   </div> </header>
  <section class="px-6"> <!-- Auto-save, status -->
@@ -183,11 +183,11 @@ data: CaseForm }) => void}
  <div class="flex items-center"> <button type="button" class="inline-flex items-center px-3 py-2 rounded-md text-sm bg-transparent">Cancel</button>
  <!-- moved conditional outside the Button to avoid invalid, block, continuation -->
   {#if isSubmitting} <button type="submit" disabled={ true } class="min-w-[120px] inline-flex items-center justify-center px-4 py-2 rounded-md text-sm bg-primary/90" aria-busy="true"> <span class="flex"> <Loader2 class="mr-2 h-4 w-4" /> {editMode ? 'Updating...': 'Creating...'} </span> </button> {:else} <button type="submit" disabled={!isValid} class="min-w-[120px] inline-flex items-center justify-center px-4 py-2 rounded-md text-sm bg-primary text-white"> {editMode ? 'Update Case': 'Create Case'} </button> {/if}
-  </div> </div> </form> </section> {/if} {#if componentError} <div class="error-boundary bg-red-50 border border-red-200 rounded-lg p-6"> <h2 class="text-lg font-semibold text-red-800">Form Error</h2>
- <p class="text-red-700">The case form encountered an error:</p>
- <p class="text-red-600 font-mono text-sm mb-4 bg-red-100 p-2">{componentError.message}</p>
+  </div> </div> </form> </section> {/if} {#if componentError} <div class="error-boundary bg-danger/5 border border-danger/20 rounded-lg p-6"> <h2 class="text-lg font-semibold text-danger">Form Error</h2>
+ <p class="text-danger">The case form encountered an error:</p>
+ <p class="text-danger font-mono text-sm mb-4 bg-danger/10 p-2">{componentError.message}</p>
  <button type="button"
-      onclick={() => { componentError = null}} class="border-red-300 text-red-700 hover:bg-red-50 inline-flex items-center px-3 py-2 rounded-md"
+      onclick={() => { componentError = null}} class="border-danger/30 text-danger hover:bg-danger/5 inline-flex items-center px-3 py-2 rounded-md"
     > Dismiss Error </button> {/if}
   <style> /*$__STYLE_CONTENT__$*/ </style>
 

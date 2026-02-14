@@ -6,8 +6,8 @@
   let { filters, onUpdate }: Props = $props();
 </script>
 
-<div class="flex flex-wrap gap-3 p-3 nes-container with-title bg-gray-900 text-white rounded-lg">
- <p class="title text-amber-400">Evidence Filters</p>
+<div class="flex flex-wrap gap-3 p-3 nes-container with-title bg-panel text-white rounded-lg">
+ <p class="title text-warning">Evidence Filters</p>
 
  <select class="nes-select" onchange={(e) => onUpdate('caseId', (e.target as HTMLSelectElement).value)}>
  <option value="">All Cases</option>

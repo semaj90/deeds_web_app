@@ -166,9 +166,9 @@ await checkServiceHealth()})()});
     return `${(ms / 1000).toFixed(1)}s`}
   // Get quality color based on score
   function getQualityColor(score: number), string {
-    if (score >= 0.8) return 'text-green-600';
-    if (score >= 0.6) return 'text-yellow-600';
-    return 'text-red-600'}
+    if (score >= 0.8) return 'text-accent';
+    if (score >= 0.6) return 'text-warning';
+    return 'text-danger'}
   // Copy summary to clipboard
   async function copySummary(): Promise<void> {
     if (!currentSummary) return
@@ -393,19 +393,19 @@ await checkServiceHealth()})()});
           </Card>
           <!-- Compression, Stats -->
           <div class="grid grid-cols-3 gap-4">
-            <div class="bg-blue-50 p-3 rounded-lg">
+            <div class="bg-info/5 p-3 rounded-lg">
               <div class="text-lg font-semibold">
                 {currentSummary.original_length_words.toLocaleString()}
               </div>
               <div class="text-xs">Original Words</div>
             </div>
-            <div class="bg-green-50 p-3 rounded-lg">
+            <div class="bg-accent/5 p-3 rounded-lg">
               <div class="text-lg font-semibold">
                 {currentSummary.summary_length_words.toLocaleString()}
               </div>
               <div class="text-xs">Summary Words</div>
             </div>
-            <div class="bg-purple-50 p-3 rounded-lg">
+            <div class="bg-info/5 p-3 rounded-lg">
               <div class="text-lg font-semibold">
                 {(currentSummary.compression_ratio * 100).toFixed(1)}%
               </div>
@@ -442,7 +442,7 @@ await checkServiceHealth()})()});
               <ul class="space-y-2">
                 {#each Array.isArray(currentSummary.summary.legal_implications) ? currentSummary.summary.legal_implications : [] as implication}
                   <li class="flex items-start space-x-2">
-                    <span class="text-yellow-600">âš ï¸</span>
+                    <span class="text-warning">âš ï¸</span>
                     <span>{implication}</span>
                   </li>
                 {/each}

@@ -10,11 +10,11 @@
 	let { selectedPerson, onOpenAIModal }: Props = $props();
 </script>
 
-<div class="nes-container with-title bg-gray-100 rounded-xl p-6">
+<div class="nes-container with-title bg-sand/10 rounded-xl p-6">
 	<p class="title">Profile</p>
 
 	{#if !selectedPerson}
-		<p class="italic text-gray-500 text-center mt-12">Select a person to view details</p>
+		<p class="italic text-sand/60 text-center mt-12">Select a person to view details</p>
 	{:else}
 		<!-- Top Section -->
 		<div class="flex gap-6 mb-6">
@@ -57,7 +57,7 @@
 
 		<!-- Modus Operandi -->
 		<h2 class="text-2xl mb-2">Modus Operandi</h2>
-		<p class="nes-container bg-gray-200 rounded p-4 mb-6">{selectedPerson.modusOperandi}</p>
+		<p class="nes-container bg-sand/10 rounded p-4 mb-6">{selectedPerson.modusOperandi}</p>
 
 		<!-- Known Associates -->
 		<h2 class="text-2xl mb-2">Known Associates</h2>

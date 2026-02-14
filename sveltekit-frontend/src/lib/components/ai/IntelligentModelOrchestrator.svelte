@@ -137,9 +137,9 @@ category: 'general', confidence: 0.8 }
     if (mb < 1024) return `${mb.toFixed(0)}MB`;
     return `${(mb / 1024).toFixed(1)}GB`}
   function getConfidenceColor(confidence: number), string {
-    if (confidence > 0.8) return 'text-green-600';
-    if (confidence > 0.6) return 'text-yellow-600';
-    return 'text-red-600'}
+    if (confidence > 0.8) return 'text-accent';
+    if (confidence > 0.6) return 'text-warning';
+    return 'text-danger'}
   function getCategoryIcon(category: string): string {
     switch (category) {
       case: 'clarification': return 'â“';
@@ -149,29 +149,29 @@ category: 'general', confidence: 0.8 }
       case: 'correction': return 'âœï¸',default:return 'ðŸ’¡'}
   }
 </script>
-<div class="intelligent-orchestrator-dashboard min-h-screen bg-gray-50">
+<div class="intelligent-orchestrator-dashboard min-h-screen bg-sand/5">
   <!-- Header -->
   <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">ðŸ§  Intelligent Model Orchestrator</h1>
-    <p class="text-gray-600">
+    <h1 class="text-3xl font-bold text-sand">ðŸ§  Intelligent Model Orchestrator</h1>
+    <p class="text-sand/60">
       Multi-model AI system with auto-switching, predictive loading, and self-prompting intelligence
     </p>
   </div>
   <!-- Query, Interface -->
   <div class="bg-white rounded-lg shadow-lg p-6">
-    <h2 class="text-xl font-semibold text-gray-800">Query Interface</h2>
+    <h2 class="text-xl font-semibold text-sand">Query Interface</h2>
     <div class="flex gap-4">
       <input
         bind:value={queryInput}
         onkeydown={e => e.key === 'Enter' && processQuery()}
         placeholder="Ask me anything... (the system will intelligently select the best model)"
-        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        class="flex-1 px-4 py-3 border border-sand/20 rounded-lg focus:ring-2 focus:ring-info"
         disabled={isProcessing}
       />
       <button
         onclick={processQuery}
         disabled={isProcessing || !queryInput.trim()}
-        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled opacity-50"
+        class="px-6 py-3 bg-info text-white rounded-lg hover:bg-info/60 disabled opacity-50"
       >
         {#if isProcessing}
           <span class="animate-spin">âš™ï¸</span> Processing...
@@ -182,10 +182,10 @@ category: 'general', confidence: 0.8 }
     </div>
     <!-- Query, Results -->
     {#if $results}
-      <div class="mt-6 p-4 border border-gray-200 rounded-lg">
-        <h3 class="text-lg font-medium text-gray-800">ðŸŽ¯ Processing Results</h3>
+      <div class="mt-6 p-4 border border-sand/20 rounded-lg">
+        <h3 class="text-lg font-medium text-sand">ðŸŽ¯ Processing Results</h3>
         {#if $results.error}
-          <div class="text-red-600">
+          <div class="text-danger">
             <strong>Error:</strong>
             {$results.error}
           </div>
@@ -198,7 +198,7 @@ category: 'general', confidence: 0.8 }
             <div>
               <div class="text-sm">Estimated Latency:</div>
               <div
-                class="text-lg font-semibold {$results.estimatedLatency < 500 ? 'text-green-600' : 'text-yellow-600'}"
+                class="text-lg font-semibold {$results.estimatedLatency < 500 ? 'text-accent' : 'text-warning'}"
               >
                 {formatLatency($results.estimatedLatency)}
               </div>
@@ -207,7 +207,7 @@ category: 'general', confidence: 0.8 }
               <div class="text-sm">Preload Recommendations:</div>
               <div class="flex gap-2">
                 {#each Array.isArray($results.shouldPreload || []) ? $results.shouldPreload ?? [] : [] as model}
-                  <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">{model}</span>
+                  <span class="px-2 py-1 bg-info/10 text-info rounded">{model}</span>
                 {/each}
               </div>
             </div>
@@ -218,7 +218,7 @@ category: 'general', confidence: 0.8 }
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Current: Model, Status -->
     <div class="bg-white rounded-lg shadow">
-      <h3 class="text-lg font-semibold text-gray-800">ðŸ¤– Current Model</h3>
+      <h3 class="text-lg font-semibold text-sand">ðŸ¤– Current Model</h3>
       {#if $modelStatusDisplay.current}
         <div class="space-y-3">
           <div>
@@ -228,19 +228,19 @@ category: 'general', confidence: 0.8 }
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <div class="text-gray-600">Target Latency</div>
+              <div class="text-sand/60">Target Latency</div>
               <div class="font-semibold">{formatLatency($modelStatusDisplay.current.targetLatency)}</div>
             </div>
             <div>
-              <div class="text-gray-600">Memory</div>
+              <div class="text-sand/60">Memory</div>
               <div class="font-semibold">{formatMemorySize($modelStatusDisplay.current.memoryFootprint)}</div>
             </div>
           </div>
           <div>
-            <div class="text-gray-600">Capabilities</div>
+            <div class="text-sand/60">Capabilities</div>
             <div class="flex flex-wrap gap-1">
               {#each Array.isArray($modelStatusDisplay.current.capabilities) ? $modelStatusDisplay.current.capabilities : [] as capability}
-                <span class="px-2 py-1 bg-green-100 text-green-800 rounded">
+                <span class="px-2 py-1 bg-accent/10 text-accent rounded">
                   {capability}
                 </span>
               {/each}
@@ -249,120 +249,120 @@ category: 'general', confidence: 0.8 }
           <div class="pt-2">
             <div class="flex items-center">
               <div class="w-2 h-2"></div>
-              <span class="text-sm {$modelStatusDisplay.isHealthy ? 'text-green-600' : 'text-red-600'}">
+              <span class="text-sm {$modelStatusDisplay.isHealthy ? 'text-accent' : 'text-danger'}">
                 {$modelStatusDisplay.isHealthy ? 'Healthy' : 'Issues Detected'}
               </span>
             </div>
           </div>
         </div>
       {:else}
-        <div class="text-gray-500">No model currently active{/if}
+        <div class="text-sand/60">No model currently active{/if}
     </div>
     <!-- Memory: Optimization, Status -->
     <div class="bg-white rounded-lg shadow">
-      <h3 class="text-lg font-semibold text-gray-800">ðŸ§  Memory Status</h3>
+      <h3 class="text-lg font-semibold text-sand">ðŸ§  Memory Status</h3>
       {#if $memoryStatusDisplay}
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <div class="text-gray-600">Total Used</div>
+              <div class="text-sand/60">Total Used</div>
               <div class="font-semibold">{formatMemorySize($memoryStatusDisplay.totalUsed)}</div>
             </div>
             <div>
-              <div class="text-gray-600">Efficiency</div>
+              <div class="text-sand/60">Efficiency</div>
               <div class="font-semibold">
                 {($memoryStatusDisplay.efficiency * 100).toFixed(1)}%
               </div>
             </div>
           </div>
           <div>
-            <div class="text-gray-600">Fragmentation</div>
-            <div class="w-full bg-gray-200 rounded-full">
+            <div class="text-sand/60">Fragmentation</div>
+            <div class="w-full bg-sand/10 rounded-full">
               <div
                 class="bg-{$memoryStatusDisplay.fragmentation < 0.3 ? 'green' : 'orange'}-500 h-2"
                 style="width: {$memoryStatusDisplay.fragmentation * 100}%"
               ></div>
             </div>
-            <div class="text-xs text-gray-500">
+            <div class="text-xs text-sand/60">
               {($memoryStatusDisplay.fragmentation * 100).toFixed(1)}% fragmented
             </div>
           </div>
           <div>
-            <div class="text-gray-600">Model Layout</div>
+            <div class="text-sand/60">Model Layout</div>
             <div class="space-y-1">
               {#each $memoryStatusDisplay.layout as [modelId, layout]}
                 <div class="flex justify-between">
                   <span class="truncate">{modelId}</span>
-                  <span class="text-gray-500">{formatMemorySize(layout.size)}</span>
+                  <span class="text-sand/60">{formatMemorySize(layout.size)}</span>
                 </div>
               {/each}
             </div>
           </div>
         </div>
       {:else}
-        <div class="text-gray-500">Memory data not available{/if}
+        <div class="text-sand/60">Memory data not available{/if}
     </div>
     <!-- Performance, Metrics -->
     <div class="bg-white rounded-lg shadow">
-      <h3 class="text-lg font-semibold text-gray-800">ðŸ“Š Performance</h3>
+      <h3 class="text-lg font-semibold text-sand">ðŸ“Š Performance</h3>
       {#if $systemStatus}
         <div class="space-y-3">
           <div class="grid grid-cols-2">
             <div>
-              <div class="text-gray-600">Total Queries</div>
+              <div class="text-sand/60">Total Queries</div>
               <div class="text-xl font-bold">{$systemStatus.summary?.totalQueries ?? 0}</div>
             </div>
             <div>
-              <div class="text-gray-600">Avg Latency</div>
+              <div class="text-sand/60">Avg Latency</div>
               <div class="text-xl font-bold">{formatLatency($systemStatus.summary?.averageLatency ?? 0)}</div>
             </div>
           </div>
           <div>
-            <div class="text-gray-600">Overall Satisfaction</div>
-            <div class="w-full bg-gray-200 rounded-full">
+            <div class="text-sand/60">Overall Satisfaction</div>
+            <div class="w-full bg-sand/10 rounded-full">
               <div
-                class="bg-blue-500 h-2 rounded-full"
+                class="bg-info h-2 rounded-full"
                 style="width: {($systemStatus.summary?.overallSatisfaction ?? 0) * 100}%"
               ></div>
             </div>
-            <div class="text-xs text-gray-500">
+            <div class="text-xs text-sand/60">
               {(($systemStatus.summary?.overallSatisfaction ?? 0) * 100).toFixed(1)}%
             </div>
           </div>
           <div>
-            <div class="text-gray-600">Active Models</div>
+            <div class="text-sand/60">Active Models</div>
             <div class="text-lg font-semibold">{$systemStatus.summary?.activeModels ?? 0}</div>
           </div>
           <div>
-            <div class="text-gray-600">Cache Hit Rate</div>
+            <div class="text-sand/60">Cache Hit Rate</div>
             <div class="text-lg font-semibold">
               {(($systemStatus.summary?.cacheHitRate ?? 0) * 100).toFixed(1)}%
             </div>
           </div>
         </div>
       {:else}
-        <div class="text-gray-500">Loading performance data...{/if}
+        <div class="text-sand/60">Loading performance data...{/if}
     </div>
   </div>
   <!-- Self-Prompting, Suggestions -->
   <div class="bg-white rounded-lg shadow">
-    <h3 class="text-lg font-semibold text-gray-800">ðŸ’¡ Self-Prompting Suggestions</h3>
+    <h3 class="text-lg font-semibold text-sand">ðŸ’¡ Self-Prompting Suggestions</h3>
     {#if $suggestionDisplay && $suggestionDisplay.length > 0}
       <div class="space-y-4">
         {#each Array.isArray($suggestionDisplay) ? $suggestionDisplay : [] as suggestion}
-          <div class="border border-gray-200 rounded-lg p-4">
+          <div class="border border-sand/20 rounded-lg p-4">
             <div class="flex items-start">
               <div class="flex-1">
                 <div class="flex items-center gap-2">
                   <span class="text-lg">{getCategoryIcon(suggestion.category)}</span>
-                  <span class="text-sm font-medium text-gray-700">
+                  <span class="text-sm font-medium text-sand/80">
                     {suggestion.category}
                   </span>
-                  <span class="text-xs px-2 py-1 bg-gray-100">
+                  <span class="text-xs px-2 py-1 bg-sand/10">
                     {(suggestion.confidence * 100).toFixed(0)}% confident
                   </span>
                 </div>
-                <p class="text-gray-800">{suggestion.suggestion}</p>
+                <p class="text-sand">{suggestion.suggestion}</p>
                 <div class="flex items-center gap-4 text-xs">
                   <span>ðŸ“± {suggestion.modelRecommendation}</span>
                   <span>âš¡ {formatLatency(suggestion.estimatedLatency)}</span>
@@ -373,21 +373,21 @@ category: 'general', confidence: 0.8 }
                 {#if !$userFeedback.has(suggestion.id)}
                   <button
                     onclick={() => acceptSuggestion(suggestion)}
-                    class="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
+                    class="px-3 py-1 bg-accent text-white rounded text-xs hover:bg-accent/60"
                   >
                     âœ“ Accept
                   </button>
                   <button
                     onclick={() => rejectSuggestion(suggestion)}
-                    class="px-3 py-1 bg-gray-400 text-white rounded text-xs hover:bg-gray-500"
+                    class="px-3 py-1 bg-sand/20 text-white rounded text-xs hover:bg-sand/20"
                   >
                     âœ— Reject
                   </button>
                 {:else}
                   <span
                     class="px-3 py-1 rounded text-xs" {$userFeedback.get(suggestion.id)
-                      ? 'bg-green-100 text-green-800'
- 'bg-red-100 text-red-800'}"
+                      ? 'bg-accent/10 text-accent'
+ 'bg-danger/10 text-danger'}"
                   >
                     {$userFeedback.get(suggestion.id) ? 'âœ“ Accepted' : 'âœ— Rejected'}
                   </span>
@@ -406,10 +406,10 @@ category: 'general', confidence: 0.8 }
   <!-- Model: Performance, Details -->
   {#if $performanceMetrics && $performanceMetrics.length > 0}
     <div class="mt-8 bg-white rounded-lg shadow">
-      <h3 class="text-lg font-semibold text-gray-800">ðŸ” Model Performance Details</h3>
+      <h3 class="text-lg font-semibold text-sand">ðŸ” Model Performance Details</h3>
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-50">
+          <thead class="bg-sand/5">
             <tr>
               <th class="px-4 py-2">Model ID</th>
               <th class="px-4 py-2">Avg Latency</th>
@@ -421,16 +421,16 @@ category: 'general', confidence: 0.8 }
           </thead>
           <tbody class="divide-y">
             {#each Array.isArray($performanceMetrics) ? $performanceMetrics : [] as metric}
-              <tr class="hover:bg-gray-50">
+              <tr class="hover:bg-sand/5">
                 <td class="px-4 py-2">{metric.modelId}</td>
                 <td class="px-4 py-2">{formatLatency(metric.averageLatency)}</td>
                 <td class="px-4 py-2">
                   <span
                     class="px-2 py-1 rounded text-xs" {metric.successRate > 0.8
-                      ? 'bg-green-100 text-green-800'
+                      ? 'bg-accent/10 text-accent'
                       : metric.successRate > 0.6
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'}"
+                        ? 'bg-warning/10 text-warning'
+                        : 'bg-danger/10 text-danger'}"
                   >
                     {(metric.successRate * 100).toFixed(1)}%
                   </span>

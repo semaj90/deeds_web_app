@@ -80,48 +80,48 @@
 
   function getPriorityClass(priority: string) {
     switch (priority) {
-      case 'high': return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'medium': return 'text-amber-400 bg-amber-400/10 border-amber-400/20';
-      case 'low': return 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20';
-      default:return 'text-slate-400 bg-slate-400/10 border-slate-400/20';
+      case 'high': return 'text-danger/80 bg-danger/80/10 border-danger/60/20';
+      case 'medium': return 'text-warning bg-warning/80/10 border-warning/80/20';
+      case 'low': return 'text-accent bg-accent/80/10 border-accent/20';
+      default:return 'text-sand/40 bg-sand/20/10 border-sand/30/20';
     }
   }
 </script>
 
 <div class="space-y-4">
-  <div class="overflow-x-auto rounded-lg border border-slate-700/50 bg-slate-900/50 backdrop-blur">
+  <div class="overflow-x-auto rounded-lg border border-sand/20/50 bg-panel/50 backdrop-blur">
     <table class="w-full text-left border-collapse">
       <thead>
-        <tr class="border-b border-slate-700/50 bg-slate-800/30">
+        <tr class="border-b border-sand/20/50 bg-panelSoft/30">
           <th class="p-4 w-10">
-            <input type="checkbox" class="rounded border-slate-600 bg-slate-700 text-cyan-500" />
+            <input type="checkbox" class="rounded border-sand/30 bg-panelSoft text-info" />
           </th>
-          <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-400">ID</th>
-          <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-400">Title</th>
-          <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-400">Status</th>
-          <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-400">Priority</th>
-          <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-400">Progress</th>
-          <th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-400">Updated</th>
+          <th class="p-4 text-xs font-bold uppercase tracking-wider text-sand/40">ID</th>
+          <th class="p-4 text-xs font-bold uppercase tracking-wider text-sand/40">Title</th>
+          <th class="p-4 text-xs font-bold uppercase tracking-wider text-sand/40">Status</th>
+          <th class="p-4 text-xs font-bold uppercase tracking-wider text-sand/40">Priority</th>
+          <th class="p-4 text-xs font-bold uppercase tracking-wider text-sand/40">Progress</th>
+          <th class="p-4 text-xs font-bold uppercase tracking-wider text-sand/40">Updated</th>
         </tr>
       </thead>
       <tbody>
         {#each filteredCases as item (item.id)}
-          <tr class="border-b border-slate-700/30 hover:bg-slate-800/20 transition-colors group">
+          <tr class="border-b border-sand/20/30 hover:bg-panelSoft/20 transition-colors group">
             <td class="p-4">
               <input
                 type="checkbox"
                 checked={selectedCases.has(item.id)}
                 onclick={() => toggleSelect(item.id)}
-                class="rounded border-slate-600 bg-slate-700 text-cyan-500"
+                class="rounded border-sand/30 bg-panelSoft text-info"
               />
             </td>
-            <td class="p-4 font-mono text-xs text-cyan-400">{item.id}</td>
+            <td class="p-4 font-mono text-xs text-info">{item.id}</td>
             <td class="p-4">
-              <div class="font-medium text-slate-200">{item.title}</div>
-              <div class="text-xs text-slate-500 mt-1">{item.description}</div>
+              <div class="font-medium text-sand/40">{item.title}</div>
+              <div class="text-xs text-sand/60 mt-1">{item.description}</div>
             </td>
             <td class="p-4">
-              <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-slate-700 text-slate-300 border border-slate-600">
+              <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-panelSoft text-sand/40 border border-sand/30">
                 {item.status}
               </span>
             </td>
@@ -131,12 +131,12 @@
               </span>
             </td>
             <td class="p-4">
-              <div class="w-24 bg-slate-700 rounded-full h-1.5 overflow-hidden">
-                <div class="bg-cyan-500 h-full transition-all duration-500" style="width: {item.progress}%"></div>
+              <div class="w-24 bg-panelSoft rounded-full h-1.5 overflow-hidden">
+                <div class="bg-info h-full transition-all duration-500" style="width: {item.progress}%"></div>
               </div>
-              <span class="text-[10px] text-slate-500 mt-1">{item.progress}%</span>
+              <span class="text-[10px] text-sand/60 mt-1">{item.progress}%</span>
             </td>
-            <td class="p-4 text-xs text-slate-400">
+            <td class="p-4 text-xs text-sand/40">
               {item.updated.toLocaleDateString()}
             </td>
           </tr>

@@ -151,9 +151,9 @@
 </script>
 
 <!-- YoRHa-themed UI -->
-<div class="unified-vector-interface bg-black text-green-400 font-mono min-h-screen p-6">
+<div class="unified-vector-interface bg-black text-accent font-mono min-h-screen p-6">
 	<!-- Header -->
-	<div class="border border-green-400 p-4 mb-6">
+	<div class="border border-accent/60 p-4 mb-6">
 		<h1 class="text-2xl mb-2">UNIFIED VECTOR ORCHESTRATOR</h1>
 		<div class="text-sm text-center">
 			WebGPU SOM • WebAssembly RAG • PageRank • Glyph Diffusion • Neo4j • Vector Search
@@ -163,13 +163,13 @@
 	<!-- System Status Grid -->
 	<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 		<!-- Health Status -->
-		<div class="border border-green-400 p-4">
+		<div class="border border-accent/60 p-4">
 			<h2 class="text-lg mb-3">SYSTEM STATUS</h2>
 			<div class="space-y-2">
 				{#each Object.entries($health) as [system, status]}
 					<div class="flex justify-between">
 						<span class="capitalize">{system.replace(/([A-Z])/g, ' $1')}</span>
-						<span class={status ? 'text-green-400' : 'text-red-400'}>
+						<span class={status ? 'text-accent' : 'text-danger/80'}>
 							{status ? '●' : '○'}
 						</span>
 					</div>
@@ -178,7 +178,7 @@
 		</div>
 
 		<!-- Performance Analytics -->
-		<div class="border border-green-400 p-4">
+		<div class="border border-accent/60 p-4">
 			<h2 class="text-lg mb-3">PERFORMANCE</h2>
 			<div class="space-y-2">
 				{#each Object.entries($analytics) as [operation, stats]}
@@ -193,11 +193,11 @@
 		</div>
 
 		<!-- Activity Log -->
-		<div class="border border-green-400 p-4">
+		<div class="border border-accent/60 p-4">
 			<h2 class="text-lg mb-3">ACTIVITY LOG</h2>
 			<div class="h-32 overflow-y-auto text-xs">
 				{#each $logs as log}
-					<div class="text-green-300">{log}</div>
+					<div class="text-accent/80">{log}</div>
 				{/each}
 			</div>
 		</div>
@@ -206,7 +206,7 @@
 	<!-- Main Interface -->
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 		<!-- Control Panel -->
-		<div class="border border-green-400 p-4">
+		<div class="border border-accent/60 p-4">
 			<h2 class="text-lg mb-4">CONTROL PANEL</h2>
 
 			<!-- Operation Select -->
@@ -215,7 +215,7 @@
 				<select
 					id="operation"
 					bind:value={selectedOperation}
-					class="w-full bg-black border border-green-400 text-green-400 p-2 text-sm"
+					class="w-full bg-black border border-accent/60 text-accent p-2 text-sm"
 				>
 					<option value="analyze">Analyze - Complete AI analysis pipeline</option>
 					<option value="search">Search - Hybrid vector + semantic search</option>
@@ -233,7 +233,7 @@
 						id="input-text"
 						bind:value={inputText}
 						placeholder="Enter your legal text for analysis..."
-						class="w-full bg-black border border-green-400 text-green-400 p-2 text-sm h-24 resize-none"
+						class="w-full bg-black border border-accent/60 text-accent p-2 text-sm h-24 resize-none"
 					></textarea>
 				</div>
 			{/if}
@@ -245,7 +245,7 @@
 					<input
 						id="user-id"
 						bind:value={userId}
-						class="w-full bg-black border border-green-400 text-green-400 p-1 text-xs"
+						class="w-full bg-black border border-accent/60 text-accent p-1 text-xs"
 					/>
 				</div>
 				<div>
@@ -253,7 +253,7 @@
 					<input
 						id="session-id"
 						bind:value={sessionId}
-						class="w-full bg-black border border-green-400 text-green-400 p-1 text-xs"
+						class="w-full bg-black border border-accent/60 text-accent p-1 text-xs"
 					/>
 				</div>
 			</div>
@@ -294,19 +294,19 @@
 				<button
 					onclick={processRequest}
 					disabled={$isProcessing}
-					class="bg-green-900 border border-green-400 text-green-400 p-2 text-sm hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
+					class="bg-accent/20 border border-accent/60 text-accent p-2 text-sm hover:bg-accent/20 disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					{$isProcessing ? 'PROCESSING...' : 'EXECUTE'}
 				</button>
 				<button
 					onclick={checkHealth}
-					class="bg-blue-900 border border-blue-400 text-blue-400 p-2 text-sm hover:bg-blue-800"
+					class="bg-info/20 border border-info/80 text-info/80 p-2 text-sm hover:bg-info/20"
 				>
 					HEALTH CHECK
 				</button>
 				<button
 					onclick={loadAnalytics}
-					class="bg-purple-900 border border-purple-400 text-purple-400 p-2 text-sm hover:bg-purple-800"
+					class="bg-info/20 border border-info/60 text-info/80 p-2 text-sm hover:bg-info/20"
 				>
 					ANALYTICS
 				</button>
@@ -314,18 +314,18 @@
 		</div>
 
 		<!-- Results Panel -->
-		<div class="border border-green-400 p-4">
+		<div class="border border-accent/60 p-4">
 			<h2 class="text-lg mb-4">RESULTS</h2>
 
 			{#if $results}
 				<div class="space-y-4">
 					<!-- Operation Summary -->
-					<div class="border border-green-600 p-3">
-						<div class="text-green-200 mb-2">OPERATION: {$results.type.toUpperCase()}</div>
+					<div class="border border-accent p-3">
+						<div class="text-accent/40 mb-2">OPERATION: {$results.type.toUpperCase()}</div>
 						<div class="grid grid-cols-2 gap-2 text-sm">
 							<div>
 								Status:
-								<span class={$results.success ? 'text-green-400' : 'text-red-400'}>
+								<span class={$results.success ? 'text-accent' : 'text-danger/80'}>
 									{$results.success ? 'SUCCESS' : 'FAILED'}
 								</span>
 							</div>
@@ -336,11 +336,11 @@
 					</div>
 
 					<!-- Components Used -->
-					<div class="border border-green-600 p-3">
-						<div class="text-green-200 mb-2">COMPONENTS USED</div>
+					<div class="border border-accent p-3">
+						<div class="text-accent/40 mb-2">COMPONENTS USED</div>
 						<div class="flex flex-wrap gap-2">
 							{#each $results.metadata.componentsUsed as component}
-								<span class="bg-green-900 px-2 py-1 text-xs border border-green-600">
+								<span class="bg-accent/20 px-2 py-1 text-xs border border-accent">
 									{component}
 								</span>
 							{/each}
@@ -349,8 +349,8 @@
 
 					<!-- Performance Breakdown -->
 					{#if $results.metadata.performance && Object.keys($results.metadata.performance).length > 0}
-						<div class="border border-green-600 p-3">
-							<div class="text-green-200 mb-2">PERFORMANCE</div>
+						<div class="border border-accent p-3">
+							<div class="text-accent/40 mb-2">PERFORMANCE</div>
 							{#each Object.entries($results.metadata.performance) as [component, time]}
 								<div class="flex justify-between text-sm">
 									<span>{component}</span>
@@ -362,17 +362,17 @@
 
 					<!-- Vector Results -->
 					{#if $results.results.vectorResults}
-						<div class="border border-green-600 p-3">
-							<div class="text-green-200 mb-2">
+						<div class="border border-accent p-3">
+							<div class="text-accent/40 mb-2">
 								VECTOR RESULTS ({$results.results.vectorResults.length})
 							</div>
 							<div class="space-y-1 text-xs max-h-32 overflow-y-auto">
 								{#each $results.results.vectorResults.slice(0, 5) as result}
-									<div class="border-l-2 border-green-700 pl-2">
-										<div class="text-green-300">
+									<div class="border-l-2 border-accent/60 pl-2">
+										<div class="text-accent/80">
 											{result.metadata?.title ?? result.id}
 										</div>
-										<div class="text-green-500">
+										<div class="text-accent">
 											Score: {(result.score * 100).toFixed(1)}%
 										</div>
 									</div>
@@ -383,15 +383,15 @@
 
 					<!-- Recommendations -->
 					{#if $results.results.recommendations}
-						<div class="border border-green-600 p-3">
-							<div class="text-green-200 mb-2">
+						<div class="border border-accent p-3">
+							<div class="text-accent/40 mb-2">
 								RECOMMENDATIONS ({$results.results.recommendations.length})
 							</div>
 							<div class="space-y-1 text-xs max-h-32 overflow-y-auto">
 								{#each $results.results.recommendations.slice(0, 3) as rec}
-									<div class="border-l-2 border-green-700 pl-2">
-										<div class="text-green-300">{rec.title || rec.id}</div>
-										<div class="text-green-500">
+									<div class="border-l-2 border-accent/60 pl-2">
+										<div class="text-accent/80">{rec.title || rec.id}</div>
+										<div class="text-accent">
 											Confidence: {(rec.confidence * 100).toFixed(1)}%
 										</div>
 									</div>
@@ -402,18 +402,18 @@
 
 					<!-- Errors -->
 					{#if $results.metadata.errors && $results.metadata.errors.length > 0}
-						<div class="border border-red-600 p-3">
-							<div class="text-red-200 mb-2">ERRORS</div>
+						<div class="border border-danger p-3">
+							<div class="text-danger/40 mb-2">ERRORS</div>
 							<div class="space-y-1">
 								{#each $results.metadata.errors as error}
-									<div class="text-red-400">{error}</div>
+									<div class="text-danger/80">{error}</div>
 								{/each}
 							</div>
 						</div>
 					{/if}
 				</div>
 			{:else}
-				<div class="text-green-600 text-center p-8">
+				<div class="text-accent text-center p-8">
 					No results yet. Execute an operation to see results.
 				</div>
 			{/if}

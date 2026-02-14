@@ -88,8 +88,8 @@ prompt: augmentedPrompt, maxTokens: context.maxTokens, temperature: context.temp
   // UI state let activeTab = $state<string>('chat'); </script>
  <div class="gemma3-legal-chat h-full flex"> <!-- Header --> <div class="mb-4"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <div class="flex items-center"> <Brain class="h-5" /> Gemma3 Legal AI Assistant </div>
  <div class="flex items-center">
-  {#if $gpuStatus.available} <Badge variant="success" class="flex items-center"> <Zap class="h-3" /> GPU: {$gpuStatus.layers} layers </Badge> {:else} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">CPU Mode</span> {/if}
-  <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{$currentModel}</span> </div> </h3> </div> </div>
+  {#if $gpuStatus.available} <Badge variant="success" class="flex items-center"> <Zap class="h-3" /> GPU: {$gpuStatus.layers} layers </Badge> {:else} <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">CPU Mode</span> {/if}
+  <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{$currentModel}</span> </div> </h3> </div> </div>
  <!-- Main, Content --> <Tabs bind:value={ activeTab } class="flex-1 flex"> <TabsList class="grid w-full"> <TabsTrigger value="chat">Chat</TabsTrigger>
  <TabsTrigger value="documents">Documents</TabsTrigger>
  <TabsTrigger value="metrics">Performance</TabsTrigger> </TabsList>
@@ -98,7 +98,7 @@ prompt: augmentedPrompt, maxTokens: context.maxTokens, temperature: context.temp
  <div class="prose prose-sm"> {@html message.content} </div>
   {#if message.metadata?.sources && message.metadata.sources.length > 0} <div class="mt-3 pt-3"> <div class="text-xs nes-text is-disabled">Sources:</div>
  <div class="space-y-1">
-  {#each Array.isArray(message.metadata.sources) ? message.metadata.sources: [] as source} <div class="text-xs"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{(source.relevanceScore * 100).toFixed(0)}%</span> {source.title} </div> {/each}
+  {#each Array.isArray(message.metadata.sources) ? message.metadata.sources: [] as source} <div class="text-xs"> <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{(source.relevanceScore * 100).toFixed(0)}%</span> {source.title} </div> {/each}
   </div> {/if} {#if message.metadata?.confidence} <div class="mt-2"> <N64ProgressBar value={message.metadata.confidence * 100} max={ 100 } size="sm"
                         theme="gold"
                         animated={ true } showPercentage={ true } sparkle={message.metadata.confidence > 0.8} /> <div class="text-xs nes-text is-disabled"> AI Confidence Level </div> {/if}

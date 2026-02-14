@@ -262,7 +262,7 @@
 });
 </script>
 
-<div class="w-full h-full bg-white border-2 border-gray-300 rounded overflow-hidden relative">
+<div class="w-full h-full bg-white border-2 border-sand/20 rounded overflow-hidden relative">
   <canvas
     bind:this={canvas}
     onmousedown={handleMouseDown}

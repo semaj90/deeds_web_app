@@ -66,10 +66,10 @@ https, //svelte.dev/e/css_empty_declaration -->
 
 	function getActionColor(actionType: string): string {
 		const colors: Record<string, string> = {
-			charge_added: 'border-red-700 bg-red-950',
-			charge_suggested: 'border-orange-700 bg-orange-950',
-			bundle_viewed: 'border-blue-700 bg-blue-950',
-			default: 'border-gray-700 bg-gray-900'
+			charge_added: 'border-danger/60 bg-danger/10',
+			charge_suggested: 'border-warning/60 bg-warning/10',
+			bundle_viewed: 'border-info/60 bg-info/10',
+			default: 'border-sand/20 bg-panel'
 		};
 		return colors[actionType] || colors.default;
 	}
@@ -81,20 +81,20 @@ https, //svelte.dev/e/css_empty_declaration -->
 		<button
 			onclick={loadTimeline}
 			disabled={isLoading}
-			class="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 text-gray-200 rounded transition disabled:opacity-50"
+			class="px-3 py-1 text-sm bg-panelSoft hover:bg-sand/20 text-sand/40 rounded transition disabled:opacity-50"
 		>
 			{isLoading ? '⟳ Refreshing...' : '🔄 Refresh'}
 		</button>
 	</div>
 
 	{#if error}
-		<div class="bg-red-900 text-red-100 p-3 rounded border border-red-700">
+		<div class="bg-danger/20 text-danger/20 p-3 rounded border border-danger/60">
 			{error}
 		</div>
 	{/if}
 
 	{#if events.length === 0}
-		<div class="bg-gray-800 text-gray-400 p-6 rounded border border-gray-700 text-center">
+		<div class="bg-panelSoft text-sand/40 p-6 rounded border border-sand/20 text-center">
 			No timeline events yet. Start adding charges!
 		</div>
 	{:else}
@@ -104,8 +104,8 @@ https, //svelte.dev/e/css_empty_declaration -->
 					<div class="flex items-start gap-3">
 						<span class="text-2xl">{getActionIcon(event.actionType)}</span>
 						<div class="flex-1 min-w-0">
-							<p class="text-gray-100 font-semibold">{event.description}</p>
-							<p class="text-xs text-gray-400 mt-1">{event.time}</p>
+							<p class="text-sand/20 font-semibold">{event.description}</p>
+							<p class="text-xs text-sand/40 mt-1">{event.time}</p>
 						</div>
 					</div>
 				</div>

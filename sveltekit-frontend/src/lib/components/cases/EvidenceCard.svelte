@@ -44,14 +44,14 @@
 
 	function getTypeColor(type: string) {
 		switch (type) {
-			case 'document': return 'bg-blue-100 text-blue-800';
-			case 'photo': return 'bg-purple-100 text-purple-800';
-			case 'video': return 'bg-red-100 text-red-800';
-			case 'audio': return 'bg-green-100 text-green-800';
-			case 'physical': return 'bg-yellow-100 text-yellow-800';
-			case 'digital': return 'bg-indigo-100 text-indigo-800';
-			case 'testimony': return 'bg-orange-100 text-orange-800';
-			default: return 'bg-gray-100 text-gray-800';
+			case 'document': return 'bg-info/10 text-info';
+			case 'photo': return 'bg-info/10 text-info';
+			case 'video': return 'bg-danger/10 text-danger';
+			case 'audio': return 'bg-accent/10 text-accent';
+			case 'physical': return 'bg-warning/10 text-warning';
+			case 'digital': return 'bg-info/10 text-info';
+			case 'testimony': return 'bg-warning/10 text-warning';
+			default: return 'bg-sand/10 text-sand';
 		}
 	}
 
@@ -91,7 +91,7 @@
 		</div>
 
 		<div class="flex-1">
-			<h4 class="text-sm font-medium text-gray-900">{evidence.title}</h4>
+			<h4 class="text-sm font-medium text-sand">{evidence.title}</h4>
 
 			<div class="mt-1">
 				<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {getTypeColor(evidence.evidenceType || evidence.type)}">
@@ -100,7 +100,7 @@
 			</div>
 
 			{#if evidence.description}
-				<p class="mt-2 text-sm text-gray-600">{evidence.description}</p>
+				<p class="mt-2 text-sm text-sand/60">{evidence.description}</p>
 			{/if}
 
 			<div class="mt-2 flex items-center text-xs">
@@ -113,7 +113,7 @@
 		<div class="flex-shrink-0 flex items-center">
 			<button
 				onclick={() => handleView()}
-				class="p-1 text-gray-400 hover:text-gray-600 rounded"
+				class="p-1 text-sand/40 hover:text-sand/60 rounded"
 				title="View evidence"
 				{disabled}
 			>
@@ -122,7 +122,7 @@
 
 			<button
 				onclick={() => handleEdit()}
-				class="p-1 text-gray-400 hover:text-gray-600 rounded"
+				class="p-1 text-sand/40 hover:text-sand/60 rounded"
 				title="Edit evidence"
 				{disabled}
 			>
@@ -131,7 +131,7 @@
 
 			<button
 				onclick={() => handleDownload()}
-				class="p-1 text-gray-400 hover:text-gray-600 rounded"
+				class="p-1 text-sand/40 hover:text-sand/60 rounded"
 				title="Download evidence"
 				{disabled}
 			>
@@ -140,7 +140,7 @@
 
 			<button
 				onclick={() => handleDelete()}
-				class="p-1 text-red-400 hover:text-red-600 rounded"
+				class="p-1 text-danger/80 hover:text-danger rounded"
 				title="Delete evidence"
 				{disabled}
 			>

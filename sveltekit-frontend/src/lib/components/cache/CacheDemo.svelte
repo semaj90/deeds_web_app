@@ -307,14 +307,14 @@ ttl: 60000 } })
 
 <div class="cache-demo space-y-6 max-w-7xl mx-auto p-4">
   <!-- Header -->
-  <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-    <h3 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+  <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-info/80 flex items-center gap-2">
       <Database size={24} /> Multi-Layer Cache System Demo
-      <span class="text-xs font-medium bg-gray-700 text-gray-300 px-2 py-1 rounded"
+      <span class="text-xs font-medium bg-panelSoft text-sand/40 px-2 py-1 rounded"
         >Loki.js + Redis + PostgreSQL</span
       >
     </h3>
-    <p class="text-gray-400 mt-2">
+    <p class="text-sand/40 mt-2">
       Interactive demonstration of the comprehensive caching architecture with real-time statistics
       and performance testing.
     </p>
@@ -322,28 +322,28 @@ ttl: 60000 } })
 
   <!-- Main Content Tabs -->
   <Tabs.Root value="operations" class="w-full">
-    <Tabs.List class="flex gap-4 border-b border-gray-700 mb-6">
+    <Tabs.List class="flex gap-4 border-b border-sand/20 mb-6">
       <Tabs.Trigger
         value="operations"
-        class="px-4 py-2 hover:text-blue-400 border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-500 transition-all"
+        class="px-4 py-2 hover:text-info/80 border-b-2 border-transparent data-[state=active]:border-info data-[state=active]:text-info transition-all"
       >
         Operations
       </Tabs.Trigger>
       <Tabs.Trigger
         value="statistics"
-        class="px-4 py-2 hover:text-blue-400 border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-500 transition-all"
+        class="px-4 py-2 hover:text-info/80 border-b-2 border-transparent data-[state=active]:border-info data-[state=active]:text-info transition-all"
       >
         Statistics
       </Tabs.Trigger>
       <Tabs.Trigger
         value="health"
-        class="px-4 py-2 hover:text-blue-400 border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-500 transition-all"
+        class="px-4 py-2 hover:text-info/80 border-b-2 border-transparent data-[state=active]:border-info data-[state=active]:text-info transition-all"
       >
         Health
       </Tabs.Trigger>
       <Tabs.Trigger
         value="testing"
-        class="px-4 py-2 hover:text-blue-400 border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-500 transition-all"
+        class="px-4 py-2 hover:text-info/80 border-b-2 border-transparent data-[state=active]:border-info data-[state=active]:text-info transition-all"
       >
         Tests
       </Tabs.Trigger>
@@ -352,7 +352,7 @@ ttl: 60000 } })
     <Tabs.Content value="operations" class="space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Cache Operations Form -->
-        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+        <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
           <h3 class="text-lg font-bold mb-4">Cache Operations</h3>
           <div class="space-y-4">
             <div>
@@ -361,7 +361,7 @@ ttl: 60000 } })
                 id="cache-key"
                 bind:value={cacheKey}
                 placeholder="Enter cache key"
-                class="bg-gray-700 border-gray-600 w-full"
+                class="bg-panelSoft border-sand/30 w-full"
               />
             </div>
             <div>
@@ -370,7 +370,7 @@ ttl: 60000 } })
                 id="cache-value"
                 bind:value={cacheValue}
                 placeholder="Enter cache value"
-                class="bg-gray-700 border-gray-600 w-full"
+                class="bg-panelSoft border-sand/30 w-full"
               />
             </div>
             <div class="grid grid-cols-2 gap-4">
@@ -379,7 +379,7 @@ ttl: 60000 } })
                 <select
                   id="cache-ttl"
                   bind:value={selectedTTL}
-                  class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
+                  class="w-full bg-panelSoft border border-sand/30 rounded p-2 text-white"
                 >
                   {#each ttlOptions as option}
                     <option value={option.value}>{option.label}</option>
@@ -391,7 +391,7 @@ ttl: 60000 } })
                 <select
                   id="priority-select"
                   bind:value={selectedPriority}
-                  class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
+                  class="w-full bg-panelSoft border border-sand/30 rounded p-2 text-white"
                 >
                   {#each priorityOptions as option}
                     <option value={option.value}>{option.label}</option>
@@ -403,7 +403,7 @@ ttl: 60000 } })
               <Button
                 onclick={setCacheValue}
                 disabled={isLoading}
-                class="bg-blue-600 hover:bg-blue-700 flex-1"
+                class="bg-info hover:bg-info/60 flex-1"
               >
                 <Database class="mr-2" size={16} /> Set
               </Button>
@@ -426,7 +426,7 @@ ttl: 60000 } })
         </div>
 
         <!-- Test Results -->
-        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+        <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold">Execution Log</h3>
             <Button size="sm" variant="ghost" onclick={() => (testResults = [])}>Clear</Button>
@@ -434,21 +434,21 @@ ttl: 60000 } })
           <div class="space-y-2 max-h-80 overflow-y-auto pr-2">
             {#each testResults as result}
               <div
-                class="flex items-start gap-4 p-3 rounded bg-gray-900 border-l-4 {result.type ===
+                class="flex items-start gap-4 p-3 rounded bg-panel border-l-4 {result.type ===
                 'success'
-                  ? 'border-green-500'
+                  ? 'border-accent'
                   : result.type === 'error'
-                    ? 'border-red-500'
+                    ? 'border-danger'
                     : result.type === 'warning'
-                      ? 'border-yellow-500'
-                      : 'border-blue-500'}"
+                      ? 'border-warning'
+                      : 'border-info'}"
               >
-                <div class="text-xs text-gray-500 whitespace-nowrap">{result.timestamp}</div>
-                <div class="text-sm text-gray-200">{result.message}</div>
+                <div class="text-xs text-sand/60 whitespace-nowrap">{result.timestamp}</div>
+                <div class="text-sm text-sand/40">{result.message}</div>
               </div>
             {/each}
             {#if testResults.length === 0}
-              <div class="text-center text-gray-500 py-12">No operations yet.</div>
+              <div class="text-center text-sand/60 py-12">No operations yet.</div>
             {/if}
           </div>
         </div>
@@ -458,8 +458,8 @@ ttl: 60000 } })
     <Tabs.Content value="statistics">
       {#if cacheStats}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-            <h4 class="text-sm text-gray-400 mb-2">Service Stats</h4>
+          <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
+            <h4 class="text-sm text-sand/40 mb-2">Service Stats</h4>
             <div class="space-y-1">
               <div class="flex justify-between">
                 <span>Requests:</span>
@@ -477,8 +477,8 @@ ttl: 60000 } })
 
           {#if cacheStats.layers?.layers}
             {#each cacheStats.layers.layers as layer}
-              <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-                <h4 class="text-sm text-blue-400 mb-2 capitalize">{layer.layer} Layer</h4>
+              <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
+                <h4 class="text-sm text-info/80 mb-2 capitalize">{layer.layer} Layer</h4>
                 <div class="space-y-1">
                   <div class="flex justify-between">
                     <span>Items:</span>
@@ -492,8 +492,8 @@ ttl: 60000 } })
                     <span>Memory:</span>
                     <span class="font-mono">{formatBytes(layer.memoryUsage ?? 0)}</span>
                   </div>
-                  <Progress.Root value={(layer.hitRate ?? 0) * 100} class="h-1 mt-2 bg-gray-700">
-                    <Progress.Indicator class="h-full bg-blue-500 transition-all" />
+                  <Progress.Root value={(layer.hitRate ?? 0) * 100} class="h-1 mt-2 bg-panelSoft">
+                    <Progress.Indicator class="h-full bg-info transition-all" />
                   </Progress.Root>
                 </div>
               </div>
@@ -501,7 +501,7 @@ ttl: 60000 } })
           {/if}
         </div>
       {:else}
-        <div class="text-center py-20 text-gray-500">
+        <div class="text-center py-20 text-sand/60">
           <Activity class="mx-auto mb-4 animate-pulse" size={48} />
           Loading statistics...
         </div>
@@ -511,12 +511,12 @@ ttl: 60000 } })
     <Tabs.Content value="health">
       {#if healthStatus}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+          <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
               {#if healthStatus.healthy}
-                <CheckCircle class="text-green-500" /> System Healthy
+                <CheckCircle class="text-accent" /> System Healthy
               {:else}
-                <XCircle class="text-red-500" /> Issues Detected
+                <XCircle class="text-danger" /> Issues Detected
               {/if}
             </h3>
             <div class="space-y-3">
@@ -539,18 +539,18 @@ ttl: 60000 } })
             </div>
           </div>
 
-          <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+          <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
             <h3 class="text-lg font-bold mb-4">Issues & Alerts</h3>
             {#if healthStatus.layers?.issues && healthStatus.layers.issues.length > 0}
               <div class="space-y-2">
                 {#each healthStatus.layers.issues as issue}
-                  <div class="p-3 bg-red-900/20 border border-red-900 text-red-400 rounded text-sm">
+                  <div class="p-3 bg-danger/10 border border-danger/30 text-danger/80 rounded text-sm">
                     ⚠️ {issue}
                   </div>
                 {/each}
               </div>
             {:else}
-              <div class="text-center py-8 text-green-500">
+              <div class="text-center py-8 text-accent">
                 <CheckCircle class="mx-auto mb-2" size={32} />
                 All systems operational
               </div>
@@ -558,7 +558,7 @@ ttl: 60000 } })
           </div>
         </div>
       {:else}
-        <div class="text-center py-20 text-gray-500">
+        <div class="text-center py-20 text-sand/60">
           <HardDrive class="mx-auto mb-4 animate-pulse" size={48} />
           Checking system health...
         </div>
@@ -567,7 +567,7 @@ ttl: 60000 } })
 
     <Tabs.Content value="testing" class="space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+        <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
           <h3 class="text-lg font-bold mb-4">Toolbox</h3>
           <div class="space-y-3">
             <Button onclick={runPerformanceTest} disabled={isLoading} class="w-full justify-start">
@@ -592,12 +592,12 @@ ttl: 60000 } })
           </div>
         </div>
 
-        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+        <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
           <h3 class="text-lg font-bold mb-4">Architecture</h3>
           <div class="space-y-4">
-            <div class="bg-blue-900/20 p-4 rounded border border-blue-900">
-              <h4 class="text-sm font-bold text-blue-400 mb-2">Hierarchical Layers</h4>
-              <ul class="text-xs space-y-1 text-blue-200">
+            <div class="bg-info/10 p-4 rounded border border-info/30">
+              <h4 class="text-sm font-bold text-info/80 mb-2">Hierarchical Layers</h4>
+              <ul class="text-xs space-y-1 text-info/40">
                 <li><strong>L1 (Memory):</strong> Ultra-fast ephemeral LRU cache</li>
                 <li><strong>L2 (Loki.js):</strong> Local persistent document store</li>
                 <li><strong>L3 (Redis):</strong> Shared high-concurrency layer</li>

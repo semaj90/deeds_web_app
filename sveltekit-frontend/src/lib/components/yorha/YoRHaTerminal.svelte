@@ -132,22 +132,22 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
-  class="bg-slate-950 border-2 border-slate-800 rounded-sm flex flex-col h-[600px] font-mono shadow-2xl overflow-hidden"
+  class="bg-panel border-2 border-sand/20 rounded-sm flex flex-col h-[600px] font-mono shadow-2xl overflow-hidden"
   onclick={() => inputRef?.focus()}
 >
   <!-- Header -->
-  <div class="bg-slate-900 px-4 py-2 border-b border-slate-800 flex justify-between items-center select-none">
+  <div class="bg-panel px-4 py-2 border-b border-sand/20 flex justify-between items-center select-none">
     <div class="flex items-center gap-4">
       <div class="flex gap-1.5">
-        <div class="w-2.5 h-2.5 bg-slate-800 border border-slate-700"></div>
-        <div class="w-2.5 h-2.5 bg-slate-800 border border-slate-700"></div>
-        <div class="w-2.5 h-2.5 bg-slate-800 border border-slate-700"></div>
+        <div class="w-2.5 h-2.5 bg-panelSoft border border-sand/20"></div>
+        <div class="w-2.5 h-2.5 bg-panelSoft border border-sand/20"></div>
+        <div class="w-2.5 h-2.5 bg-panelSoft border border-sand/20"></div>
       </div>
-      <span class="text-[10px] font-bold text-slate-500 tracking-widest uppercase">{title}</span>
+      <span class="text-[10px] font-bold text-sand/60 tracking-widest uppercase">{title}</span>
     </div>
     <div class="flex items-center gap-2">
-      <div class="h-1.5 w-1.5 rounded-full {isActive ? 'bg-cyan-500 animate-pulse' : 'bg-slate-600'}"></div>
-      <span class="text-[9px] text-slate-500">{isActive ? 'RELAY_ACTIVE' : 'RELAY_OFFLINE'}</span>
+      <div class="h-1.5 w-1.5 rounded-full {isActive ? 'bg-info animate-pulse' : 'bg-panelSoft'}"></div>
+      <span class="text-[9px] text-sand/60">{isActive ? 'RELAY_ACTIVE' : 'RELAY_OFFLINE'}</span>
     </div>
   </div>
 
@@ -157,7 +157,7 @@
     class="flex-1 p-4 overflow-y-auto space-y-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent"
   >
     {#each terminalHistory as line}
-      <div class="text-xs {line.startsWith(prompt) ? 'text-white font-bold' : 'text-slate-400'} whitespace-pre-wrap leading-relaxed">
+      <div class="text-xs {line.startsWith(prompt) ? 'text-white font-bold' : 'text-sand/40'} whitespace-pre-wrap leading-relaxed">
         {line}
       </div>
     {/each}
@@ -165,7 +165,7 @@
     <!-- Input Line -->
     <div class="flex items-center gap-2 text-xs">
       {#if isProcessing}
-        <span class="text-cyan-500 animate-pulse">PROCESSING...</span>
+        <span class="text-info animate-pulse">PROCESSING...</span>
       {:else}
         <span class="text-white font-bold whitespace-nowrap">{prompt}</span>
         <input
@@ -183,7 +183,7 @@
   </div>
 
   <!-- Footer -->
-  <div class="bg-slate-900/50 px-4 py-1 border-t border-slate-900 flex justify-between items-center text-[9px] text-slate-600">
+  <div class="bg-panel/50 px-4 py-1 border-t border-panel flex justify-between items-center text-[9px] text-sand/60">
     <span>SECURE CONNECTION</span>
     <span>ENCRYPTION: AES-256-YORHA</span>
   </div>
@@ -191,12 +191,12 @@
 
 <style>
   /* Base Styles */
-  .bg-slate-950 { background-color: #0a0a0a; }
-  .bg-slate-900 { background-color: #1a1a1a; }
-  .bg-slate-800 { background-color: #2a2a2a; }
-  .bg-slate-600 { background-color: #4a4a4a; }
-  .text-slate-500 { color: #b0b0b0; }
-  .text-slate-400 { color: #d0d0d0; }
+  .bg-panel { background-color: #0a0a0a; }
+  .bg-panel { background-color: #1a1a1a; }
+  .bg-panelSoft { background-color: #2a2a2a; }
+  .bg-panelSoft { background-color: #4a4a4a; }
+  .text-sand-60 { color: #b0b0b0; }
+  .text-sand-40 { color: #d0d0d0; }
   .text-white { color: #ffffff; }
   .rounded-sm { border-radius: 0.125rem; }
   .shadow-2xl { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.7); }

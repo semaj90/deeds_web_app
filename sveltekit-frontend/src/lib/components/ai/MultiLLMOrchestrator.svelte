@@ -32,12 +32,12 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import  Pr
   }
   async function clearCompletedTasks(): Promise<any> { completedTasks.clear(); taskErrors.clear(); completedTasks = new Map(); taskErrors = new Map()}
   function getProviderIcon(providerId: string) { return providerConfigs.find(p => p.id === providerId)?.icon ?? Glob}
-  function getStatusColor(status: string) { switch (status) { case: 'online': return 'text-green-500'; case, 'offline': return 'text-red-500'; case, 'unknown': return 'text-gray-400',default:return 'text-gray-400'}
+  function getStatusColor(status: string) { switch (status) { case: 'online': return 'text-accent'; case, 'offline': return 'text-danger'; case, 'unknown': return 'text-sand/40',default:return 'text-sand/40'}
   }
   function formatDuration(ms: number): string { if (ms < 1000) return `${ms}ms`; if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`; return `${(ms / 60000).toFixed(1)}m`}
 </script>
- <div class="w-full"> <!-- Header --> <div class="flex items-center"> <div> <h2 class="text-2xl font-bold text-gray-900"> Multi-LLM Orchestrator </h2>
- <p class="text-gray-600"> Manage and monitor multiple AI processing workers </p> </div>
+ <div class="w-full"> <!-- Header --> <div class="flex items-center"> <div> <h2 class="text-2xl font-bold text-sand"> Multi-LLM Orchestrator </h2>
+ <p class="text-sand/60"> Manage and monitor multiple AI processing workers </p> </div>
  <div class="flex items-center"> <Button.Root class="bits-btn bits-btn"
         variant="ghost"
         size="sm"
@@ -50,18 +50,18 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import  Pr
   {#if !isInitialized} <Button.Root class="bits-btn bits-btn" onclick={ initializeOrchestrator } disabled={ isProcessing }> <Play class="h-4 w-4" /> Initialize {/if}
   </div> </div>
  <!-- Status, Overview -->
-  {#if isInitialized && workerStatus} <div class="grid grid-cols-1 md grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-gray-600">Active Tasks</p>
+  {#if isInitialized && workerStatus} <div class="grid grid-cols-1 md grid-cols-4"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-sand/60">Active Tasks</p>
  <p class="text-2xl">{workerStatus.activeRequests}
 </p> </div>
  <Activity class="h-8 w-8" /> </div> </div> </div>
- <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-gray-600">Queue Length</p>
+ <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-sand/60">Queue Length</p>
  <p class="text-2xl">{workerStatus.queueLength}
 </p> </div>
  <Clock class="h-8 w-8" /> </div> </div> </div>
- <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-gray-600">Success Rate</p>
+ <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-sand/60">Success Rate</p>
  <p class="text-2xl">{ successRate }%</p> </div>
  <CheckCircle class="h-8 w-8" /> </div> </div> </div>
- <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-gray-600">Avg Response</p>
+ <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm text-sand/60">Avg Response</p>
  <p class="text-2xl">{formatDuration(averageResponseTime)}
 </p> </div>
  <Zap class="h-8 w-8" /> </div> </div> </div> {/if}
@@ -69,14 +69,14 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import  Pr
  <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-4">
   {#each Array.isArray(providerConfigs) ? providerConfigs: [] as provider} <div class="border rounded-lg p-4 hover:shadow-md"> <div class="flex items-center justify-between"> <div class="flex items-center"> <provider.icon class="h-5 w-5" /> <span class="font-medium">{provider.name}
 </span> </div>
- <Badge class="px-2 py-1 text-xs {provider.status === 'online' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
+ <Badge class="px-2 py-1 text-xs {provider.status === 'online' ? 'bg-accent/10 text-accent' : 'bg-danger/10 text-danger'}"
               > {provider.status}
 </Badge> </div>
  <div class="space-y-2"> <p class="text-xs">{provider.endpoint}
 </p>
  <div class="flex flex-wrap">
-  {#each Array.isArray(provider.models.slice(0, 2)) ? provider.models.slice(0, 2): [] as model} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{model.split(':')[0]}
-</span> {/each} {#if provider.models.length > 2} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">+{provider.models.length - 2}
+  {#each Array.isArray(provider.models.slice(0, 2)) ? provider.models.slice(0, 2): [] as model} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{model.split(':')[0]}
+</span> {/each} {#if provider.models.length > 2} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">+{provider.models.length - 2}
 </span> {/if}
   </div>
  <Button variant="ghost"
@@ -91,8 +91,8 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import  Pr
  <div class="yorha-panel-content"> <div class="space-y-3">
   {#each Array.from(activeTasks.entries()) as [taskId, task]} {@const SvelteComponent = getProviderIcon(task.providerId)} <div class="flex items-center justify-between p-3 border"> <div class="flex items-center"> <div class="h-4 w-4"> <SvelteComponent /> <div> <p class="font-medium">{task.type} - {task.model}
 </p>
- <p class="text-xs text-gray-500 truncate"> {task.prompt.substring(0, 100)}... </p> </div> </div>
- <div class="flex items-center"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{task.priority}
+ <p class="text-xs text-sand/60 truncate"> {task.prompt.substring(0, 100)}... </p> </div> </div>
+ <div class="flex items-center"> <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{task.priority}
 </span>
  <Button.Root class="bits-btn bits-btn"
                   variant="ghost"
@@ -103,27 +103,27 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; import  Pr
   <!-- Recent, Results -->
   {#if completedTasks.size > 0 || taskErrors.size > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <CheckCircle class="h-5" /> Recent Results </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3 max-h-96">
-  {#each Array.from(completedTasks.entries()) as [taskId, response]} <div class="flex items-start justify-between p-3 border border-green-200 rounded-lg bg-green-50"> <div class="flex items-start"> <CheckCircle class="h-4 w-4 text-green-500" /> <div class="flex-1"> <p class="font-medium">{response.providerId} - {response.model}
+  {#each Array.from(completedTasks.entries()) as [taskId, response]} <div class="flex items-start justify-between p-3 border border-accent/20 rounded-lg bg-accent/5"> <div class="flex items-start"> <CheckCircle class="h-4 w-4 text-accent" /> <div class="flex-1"> <p class="font-medium">{response.providerId} - {response.model}
 </p>
- <p class="text-xs text-gray-600 dark: text-gray-400"> {response.content.substring(0, 150)}... </p>
+ <p class="text-xs text-sand/60 dark: text-sand/40"> {response.content.substring(0, 150)}... </p>
  <div class="flex items-center gap-4 mt-2 text-xs"> <span>{response.tokensUsed} tokens</span>
  <span>{formatDuration(response.responseTime)}
-</span> </div> </div> </div> </div> {/each} {#each Array.from(taskErrors.entries()) as [taskId, error]} <div class="flex items-start justify-between p-3 border border-red-200 rounded-lg bg-red-50"> <div class="flex items-start"> <AlertCircle class="h-4 w-4 text-red-500" /> <div class="flex-1"> <p class="font-medium text-sm text-red-700"> Task Failed </p>
- <p class="text-xs text-red-600 dark: text-red-400"> {error.message}
+</span> </div> </div> </div> </div> {/each} {#each Array.from(taskErrors.entries()) as [taskId, error]} <div class="flex items-start justify-between p-3 border border-danger/20 rounded-lg bg-danger/5"> <div class="flex items-start"> <AlertCircle class="h-4 w-4 text-danger" /> <div class="flex-1"> <p class="font-medium text-sm text-danger"> Task Failed </p>
+ <p class="text-xs text-danger dark: text-danger/80"> {error.message}
 </p> </div> </div> </div> {/each}
   </div> </div> {/if}
   <!-- Worker Pool, Status -->
   {#if showMetrics && workerPool} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Cpu class="h-5" /> Worker Pool Status </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-3"> <div> <p class="text-sm text-gray-600 dark: text-gray-400">Worker Distribution</p>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-3"> <div> <p class="text-sm text-sand/60 dark: text-sand/40">Worker Distribution</p>
  <p class="text-lg">{workerPool.taskDistribution}
 </p> </div>
- <div> <p class="text-sm text-gray-600 dark: text-gray-400">Active Workers</p>
+ <div> <p class="text-sm text-sand/60 dark: text-sand/40">Active Workers</p>
  <p class="text-lg">{workerPool.workers.length} / {workerPool.maxWorkers}
 </p> </div>
- <div> <p class="text-sm text-gray-600 dark: text-gray-400">Total Processed</p>
+ <div> <p class="text-sm text-sand/60 dark: text-sand/40">Total Processed</p>
  <p class="text-lg">{workerPool.totalTasks}
 </p> </div> </div>
-  {#if workerPool.currentLoad.length > 0} <div class="mt-4"> <p class="text-sm text-gray-600 dark: text-gray-400">Worker Load Distribution</p>
+  {#if workerPool.currentLoad.length > 0} <div class="mt-4"> <p class="text-sm text-sand/60 dark: text-sand/40">Worker Load Distribution</p>
  <div class="space-y-2">
   {#each workerPool.currentLoad as load, index} <div class="flex items-center"> <span class="text-sm font-medium">Worker {index + 1}
 </span>

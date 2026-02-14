@@ -21,19 +21,16 @@
  };
 
  const colorMap: Record<string, string> = {
- 'bg-red-500': 'bg-red-500, hover:bg-red-600',
- 'bg-blue-500': 'bg-blue-500, hover:bg-blue-600',
- 'bg-purple-500': 'bg-purple-500, hover:bg-purple-600',
- 'bg-orange-500': 'bg-orange-500, hover:bg-orange-600',
- 'bg-orange-600': 'bg-orange-600, hover:bg-orange-700',
- 'bg-green-500': 'bg-green-500, hover:bg-green-600',
- 'bg-yellow-500': 'bg-yellow-500, hover:bg-yellow-600',
+ 'bg-danger': 'bg-danger hover:bg-danger',
+ 'bg-info': 'bg-info hover:bg-info/60',
+ 'bg-warning': 'bg-warning hover:bg-warning/80',
+ 'bg-accent': 'bg-accent hover:bg-accent',
  };
 </script>
 
 <button
  type="button"
- class="inline-flex items-center gap-1 rounded-full font-medium text-white transition-colors {sizeClasses[size]} {colorMap[cluster.color] ?? 'bg-gray-500 hover:bg-gray-600'}"
+ class="inline-flex items-center gap-1 rounded-full font-medium text-white transition-colors {sizeClasses[size]} {colorMap[cluster.color] ?? 'bg-sand/20 hover:bg-sand/20'}"
  title="Cluster, {cluster.label}"
  onclick={ onclick }
 >

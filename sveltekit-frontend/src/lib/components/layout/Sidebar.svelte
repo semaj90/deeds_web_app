@@ -169,7 +169,7 @@
 					<p class="text-xs text-muted-foreground">{user.role || 'Legal Professional'}</p>
 				</div>
 				{#if isAdmin}
-					<div class="text-xs bg-red-500 text-white px-2 py-1 rounded">ADMIN</div>
+					<div class="text-xs bg-danger text-white px-2 py-1 rounded">ADMIN</div>
 				{/if}
 			</div>
 		{/if}
@@ -270,15 +270,15 @@
 								class={cn(
 									'group flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200',
 									item.current
-										? 'bg-red-500 text-white'
-										: 'text-muted-foreground, hover:text-foreground, hover:bg-nier-surface-light border border-red-500/20'
+										? 'bg-danger text-white'
+										: 'text-muted-foreground, hover:text-foreground, hover:bg-nier-surface-light border border-danger/20'
 								)}
 								onclick={closeSidebar}
 							>
 								<IconComponent
 									class={cn(
 										'h-5 w-5 flex-shrink-0',
-										item.current ? 'text-white' : 'text-red-500 group-hover:text-foreground'
+										item.current ? 'text-white' : 'text-danger group-hover:text-foreground'
 									)}
 								/>
 								<span class="flex-1 min-w-0">{item.name}</span>
@@ -286,7 +286,7 @@
 									<span
 										class={cn(
 											'inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium',
-											item.current ? 'bg-white/20 text-white' : 'bg-red-500 text-white'
+											item.current ? 'bg-white/20 text-white' : 'bg-danger text-white'
 										)}
 									>
 										{item.badge}
@@ -309,7 +309,7 @@
 							class={cn(
 								'group flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200',
 								item.current
-									? 'bg-green-600 text-white'
+									? 'bg-accent text-white'
 									: 'text-muted-foreground, hover:text-foreground, hover:bg-nier-surface-light'
 							)}
 							onclick={closeSidebar}
@@ -330,12 +330,12 @@
 		<!-- Status indicator -->
 		<div class="p-4 border-t border-nier-gray">
 			<div class="flex items-center gap-3 p-3 bg-nier-surface-light rounded-md">
-				<div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+				<div class="w-3 h-3 bg-accent rounded-full animate-pulse"></div>
 				<div class="flex-1">
 					<p class="text-sm font-medium">🎮 Console Status</p>
 					<p class="text-xs text-muted-foreground">{theme?.toUpperCase()} mode - All systems online</p>
 				</div>
-				<div class="text-xs bg-green-500 text-white px-2 py-1 rounded">PWR</div>
+				<div class="text-xs bg-accent text-white px-2 py-1 rounded">PWR</div>
 			</div>
 		</div>
 	</div>

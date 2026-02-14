@@ -64,14 +64,14 @@
   function getThreatColor(level: string) {
     switch (level) {
       case 'critical':
-        return 'bg-red-500 text-white';
+        return 'bg-danger text-white';
       case 'high':
-        return 'bg-orange-500 text-white';
+        return 'bg-warning text-white';
       case 'medium':
-        return 'bg-yellow-500 text-black';
+        return 'bg-warning text-black';
       case 'low':
-        return 'bg-green-500 text-white';
-      default:return 'bg-gray-500 text-white';
+        return 'bg-accent text-white';
+      default:return 'bg-sand/20 text-white';
     }
   }
 </script>
@@ -116,7 +116,7 @@
         <span class="{getThreatColor(formData.threatLevel)} px-2 py-1 rounded text-xs font-semibold">
           {formData.threatLevel.toUpperCase()}
         </span>
-        <span class="text-sm text-gray-600">
+        <span class="text-sm text-sand/60">
           {formData.threatLevel === 'low'
             ? 'Low Risk'
             : formData.threatLevel === 'medium'
@@ -128,7 +128,7 @@
       </div>
       <select
         bind:value={formData.threatLevel}
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="w-full px-3 py-2 border border-sand/20 rounded-md focus:outline-none focus:ring-2 focus:ring-info"
       >
         <option value="low">Low Risk</option>
         <option value="medium">Medium Risk</option>

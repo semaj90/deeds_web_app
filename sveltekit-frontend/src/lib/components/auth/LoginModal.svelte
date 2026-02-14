@@ -51,7 +51,7 @@
     </Dialog.Header>
 
     {#if $message}
-      <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+      <div class="mb-4 p-3 bg-danger/5 border border-danger/20 rounded text-danger text-sm">
         {$message}
       </div>
     {/if}
@@ -64,11 +64,11 @@
           name="email"
           type="email"
           bind:value={$form.email}
-          class={$errors.email ? 'border-red-500' : ''}
+          class={$errors.email ? 'border-danger' : ''}
           placeholder="name@example.com"
         />
         {#if $errors.email}
-          <p class="text-xs text-red-500">{$errors.email}</p>
+          <p class="text-xs text-danger">{$errors.email}</p>
         {/if}
       </div>
 
@@ -79,10 +79,10 @@
           name="password"
           type="password"
           bind:value={$form.password}
-          class={$errors.password ? 'border-red-500' : ''}
+          class={$errors.password ? 'border-danger' : ''}
         />
         {#if $errors.password}
-          <p class="text-xs text-red-500">{$errors.password}</p>
+          <p class="text-xs text-danger">{$errors.password}</p>
         {/if}
       </div>
 

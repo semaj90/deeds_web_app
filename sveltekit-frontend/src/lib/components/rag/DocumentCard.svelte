@@ -49,17 +49,17 @@ import type { Document } from '$lib/types';
       onView(document)}
   }
 </script>
-<div class="group relative bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all">
+<div class="group relative bg-white rounded-lg border border-sand/20 overflow-hidden hover:shadow-lg hover:border-info/40 transition-all">
   <!-- Card Header, with, Icon -->
-  <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 border-b">
+  <div class="bg-gradient-to-r from-info/5 to-info/5 p-4 border-b">
     <div class="flex items-start justify-between">
       <div class="flex items-start gap-3 flex-1">
-        <div class="p-2 bg-blue-100 rounded-lg">
+        <div class="p-2 bg-info/10 rounded-lg">
           <FileText class="w-5 h-5" />
         </div>
         <div class="min-w-0">
-          <h3 class="font-semibold text-gray-900 truncate">{document.filename}</h3>
-          <p class="text-xs text-gray-500">{formatFileSize(document.fileSize)}</p>
+          <h3 class="font-semibold text-sand truncate">{document.filename}</h3>
+          <p class="text-xs text-sand/60">{formatFileSize(document.fileSize)}</p>
         </div>
       </div>
     </div>
@@ -67,22 +67,22 @@ import type { Document } from '$lib/types';
   <!-- Card, Content -->
   <div class="p-4">
     <!-- Embedding, Info -->
-    <div class="flex items-center gap-2 px-3 py-2 bg-yellow-50">
+    <div class="flex items-center gap-2 px-3 py-2 bg-warning/5">
       <span class="text-xs font-semibold">âš¡ {document.embeddingModel}</span>
     </div>
     <!-- Summary -->
     <div>
-      <p class="text-xs text-gray-600 line-clamp-3">{document.summary || 'No summary available'}</p>
+      <p class="text-xs text-sand/60 line-clamp-3">{document.summary || 'No summary available'}</p>
     </div>
     <!-- Metadata -->
     <div class="flex flex-wrap gap-2">
       {#if document.metadata?.pageCount}
-        <span class="px-2 py-1 bg-gray-100 text-gray-700">{document.metadata.pageCount} pages</span>
+        <span class="px-2 py-1 bg-sand/10 text-sand/80">{document.metadata.pageCount} pages</span>
       {/if}
       {#if document.metadata?.language}
-        <span class="px-2 py-1 bg-gray-100 text-gray-700">{document.metadata.language}</span>
+        <span class="px-2 py-1 bg-sand/10 text-sand/80">{document.metadata.language}</span>
       {/if}
-      <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded flex items-center">
+      <span class="px-2 py-1 bg-sand/10 text-sand/80 rounded flex items-center">
         <Clock class="w-3" />
         {formatDate(document.uploadedAt)}
       </span>
@@ -94,19 +94,19 @@ import type { Document } from '$lib/types';
           <span class="text-xs font-medium">Confidence</span>
           <span class="text-xs font-semibold">{Math.round(document.metadata.confidence * 100)}%</span>
         </div>
-        <div class="w-full h-2 bg-gray-200 rounded-full">
+        <div class="w-full h-2 bg-sand/10 rounded-full">
           <div
-            class="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all"
+            class="h-full bg-gradient-to-r from-accent to-accent rounded-full transition-all"
             style="width: {document.metadata.confidence * 100}%"
           />
         </div>
       {/if}
   </div>
   <!-- Card, Footer / Actions -->
-  <div class="flex gap-2 p-3 bg-gray-50 border-t">
+  <div class="flex gap-2 p-3 bg-sand/5 border-t">
     <Button
       onclick={handleView}
-      class="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors bits-btn"
+      class="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm bg-info text-white rounded hover:bg-info/60 transition-colors bits-btn"
     >
       <Eye class="w-4" />
       View
@@ -114,14 +114,14 @@ import type { Document } from '$lib/types';
     <Button
       onclick={handleDelete}
       disabled={deleting}
-      class="flex items-center justify-center px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 bits-btn"
+      class="flex items-center justify-center px-3 py-2 text-sm bg-danger text-white rounded hover:bg-danger/80 bits-btn"
     >
       <Trash2 class="w-4" />
     </Button>
   </div>
   <!-- Hover:Overlay, Badge -->
   <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100">
-    <span class="px-2 py-1 bg-blue-600 text-white text-xs font-semibold">Click to view</span>
+    <span class="px-2 py-1 bg-info text-white text-xs font-semibold">Click to view</span>
   </div>
 </div>
 

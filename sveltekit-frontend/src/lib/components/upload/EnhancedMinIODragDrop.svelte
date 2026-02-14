@@ -165,10 +165,10 @@ files = files.filter(f => f.id !== id);
 
 <div class="space-y-4">
 {#if enableCudaAcceleration && performanceStats.totalFiles > 0}
-<div class="flex items-center justify-between p-3 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg text-sm">
+<div class="flex items-center justify-between p-3 bg-info/5/50 dark:bg-info/20/10 border border-info/20 dark:border-info/30 rounded-lg text-sm">
 <div class="flex items-center gap-2">
-<Zap class="h-4 w-4 text-blue-500" />
-<span class="font-medium text-blue-700 dark:text-blue-300">CUDA Acceleration Active</span>
+<Zap class="h-4 w-4 text-info" />
+<span class="font-medium text-info dark:text-info/60">CUDA Acceleration Active</span>
 </div>
 <div class="text-xs text-muted-foreground">
 {performanceStats.cudaAccelerated}/{performanceStats.totalFiles} Optimized
@@ -226,18 +226,18 @@ Max file size: {Math.round(maxFileSize / 1024 / 1024)}MB
 {#if file.status === 'uploading'}
 <span class="text-xs text-muted-foreground">{file.progress}%</span>
 {:else if file.status === 'completed'}
-<Check class="h-4 w-4 text-green-500" />
+<Check class="h-4 w-4 text-accent" />
 {:else if file.status === 'error'}
-<AlertCircle class="h-4 w-4 text-red-500" />
+<AlertCircle class="h-4 w-4 text-danger" />
 {/if}
 </div>
 
 {#if file.status === 'uploading'}
 <Progress value={file.progress} class="h-1" />
 {:else if file.status === 'error'}
-<span class="text-xs text-red-500">{file.errorMessage}</span>
+<span class="text-xs text-danger">{file.errorMessage}</span>
 {:else if file.status === 'completed' && file.cudaProcessed}
-<div class="flex items-center gap-1 text-[10px] text-blue-500">
+<div class="flex items-center gap-1 text-[10px] text-info">
 <Zap class="h-3 w-3" /> CUDA Optimized
 </div>
 {/if}

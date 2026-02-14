@@ -6,8 +6,8 @@
   let { filters, onFilterChange }: Props = $props();
 </script>
 
-<div class="nes-container with-title bg-gray-900 text-white p-4 rounded-lg">
- <p class="title text-cyan-300">Advanced Filters</p>
+<div class="nes-container with-title bg-panel text-white p-4 rounded-lg">
+ <p class="title text-info/80">Advanced Filters</p>
 
  <div class="grid grid-cols-2 gap-4">
  <div>

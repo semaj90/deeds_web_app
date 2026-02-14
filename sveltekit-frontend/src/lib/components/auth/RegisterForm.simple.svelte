@@ -87,7 +87,7 @@
 		feedback: string;
 		color: string;
 	} {
-		if (!password) return { score: 0, feedback: 'Enter a password', color: 'text-gray-400' };
+		if (!password) return { score: 0, feedback: 'Enter a password', color: 'text-sand/40' };
 
 		let score = 0;
 		if (password.length >= 8) score += 2;
@@ -97,37 +97,37 @@
 		if (/\d/.test(password)) score += 1;
 		if (/[@$!%*?&]/.test(password)) score += 1;
 
-		if (score < 3) return { score, feedback: 'Weak', color: 'text-red-500' };
-		if (score < 5) return { score, feedback: 'Fair', color: 'text-yellow-500' };
-		if (score < 7) return { score, feedback: 'Good', color: 'text-blue-500' };
-		return { score, feedback: 'Excellent', color: 'text-green-500' };
+		if (score < 3) return { score, feedback: 'Weak', color: 'text-danger' };
+		if (score < 5) return { score, feedback: 'Fair', color: 'text-warning' };
+		if (score < 7) return { score, feedback: 'Good', color: 'text-info' };
+		return { score, feedback: 'Excellent', color: 'text-accent' };
 	}
 
 	let passwordStrength = $derived(calculatePasswordStrength($form.password || ''));
 </script>
 
 <div class="w-full max-w-2xl mx-auto">
-	<div class="bg-white dark:bg-gray-900 p-8 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg">
+	<div class="bg-white dark:bg-panel p-8 rounded-lg border border-sand/20 dark:border-sand/20 shadow-lg">
 		<!-- Header -->
 		<div class="text-center mb-8">
 			<div class="flex items-center justify-center gap-3 mb-2">
-				<Shield class="h-8 w-8 text-blue-600 dark:text-blue-400" />
+				<Shield class="h-8 w-8 text-info dark:text-info/80" />
 				<h1 class="text-2xl font-bold dark:text-white">Legal AI Platform</h1>
 			</div>
 
 			<div class="flex items-center justify-center gap-2 mb-2">
-				<UserPlus class="h-5 w-5 text-gray-600 dark:text-gray-400" />
+				<UserPlus class="h-5 w-5 text-sand/60 dark:text-sand/40" />
 				<h2 class="text-xl font-semibold dark:text-white">Create Account</h2>
 			</div>
 
-			<p class="text-sm text-gray-600 dark:text-gray-400">
+			<p class="text-sm text-sand/60 dark:text-sand/40">
 				Register as a legal professional to access the AI-powered legal system
 			</p>
 		</div>
 
 		<!-- Error Message -->
 		{#if errorMessage || $message}
-			<div class="bg-red-50 dark:bg-red-900/20 border border-red-500 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-4 flex items-center gap-2">
+			<div class="bg-danger/5 dark:bg-danger/10 border border-danger text-danger dark:text-danger/80 px-4 py-3 rounded mb-4 flex items-center gap-2">
 				<AlertCircle class="h-4 w-4 flex-shrink-0" />
 				<span class="text-sm">{errorMessage || $message}</span>
 			</div>
@@ -135,7 +135,7 @@
 
 		<!-- Success Message -->
 		{#if successMessage}
-			<div class="bg-green-50 dark:bg-green-900/20 border border-green-500 text-green-700 dark:text-green-400 px-4 py-3 rounded mb-4 flex items-center gap-2">
+			<div class="bg-accent/5 dark:bg-accent/10 border border-accent text-accent dark:text-accent px-4 py-3 rounded mb-4 flex items-center gap-2">
 				<Shield class="h-4 w-4 flex-shrink-0" />
 				<span class="text-sm">{successMessage}</span>
 			</div>
@@ -147,7 +147,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<!-- First Name -->
 				<div class="space-y-2">
-					<Label for="firstName">First Name <span class="text-red-500">*</span></Label>
+					<Label for="firstName">First Name <span class="text-danger">*</span></Label>
 					<Input
 						id="firstName"
 						name="firstName"
@@ -156,16 +156,16 @@
 						bind:value={$form.firstName}
 						disabled={$delayed}
 						required
-						class={$errors.firstName ? 'border-red-500' : ''}
+						class={$errors.firstName ? 'border-danger' : ''}
 					/>
 					{#if $errors.firstName}
-						<p class="text-sm text-red-500">{$errors.firstName}</p>
+						<p class="text-sm text-danger">{$errors.firstName}</p>
 					{/if}
 				</div>
 
 				<!-- Last Name -->
 				<div class="space-y-2">
-					<Label for="lastName">Last Name <span class="text-red-500">*</span></Label>
+					<Label for="lastName">Last Name <span class="text-danger">*</span></Label>
 					<Input
 						id="lastName"
 						name="lastName"
@@ -174,17 +174,17 @@
 						bind:value={$form.lastName}
 						disabled={$delayed}
 						required
-						class:border-red-500={$errors.lastName}
+						class:border-danger={$errors.lastName}
 					/>
 					{#if $errors.lastName}
-						<p class="text-sm text-red-500">{$errors.lastName}</p>
+						<p class="text-sm text-danger">{$errors.lastName}</p>
 					{/if}
 				</div>
 			</div>
 
 			<!-- Email -->
 			<div class="space-y-2">
-				<Label for="email">Official Email Address <span class="text-red-500">*</span></Label>
+				<Label for="email">Official Email Address <span class="text-danger">*</span></Label>
 				<Input
 					id="email"
 					name="email"
@@ -193,10 +193,10 @@
 					bind:value={$form.email}
 					disabled={$delayed}
 					required
-					class:border-red-500={$errors.email}
+					class:border-danger={$errors.email}
 				/>
 				{#if $errors.email}
-					<p class="text-sm text-red-500">{$errors.email}</p>
+					<p class="text-sm text-danger">{$errors.email}</p>
 				{/if}
 			</div>
 
@@ -204,22 +204,22 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<!-- Role -->
 				<div class="space-y-2">
-					<Label for="role">Professional Role <span class="text-red-500">*</span></Label>
+					<Label for="role">Professional Role <span class="text-danger">*</span></Label>
 					<select
 						id="role"
 						name="role"
 						bind:value={$form.role}
 						disabled={$delayed}
 						required
-						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-						class:border-red-500={$errors.role}
+						class="w-full px-3 py-2 border border-sand/20 dark:border-sand/30 bg-white dark:bg-panelSoft text-sand dark:text-white rounded-lg focus:ring-2 focus:ring-info outline-none"
+						class:border-danger={$errors.role}
 					>
 						{#each roleOptions as option}
 							<option value={option.value}>{option.label}</option>
 						{/each}
 					</select>
 					{#if $errors.role}
-						<p class="text-sm text-red-500">{$errors.role}</p>
+						<p class="text-sm text-danger">{$errors.role}</p>
 					{/if}
 				</div>
 
@@ -240,7 +240,7 @@
 			<!-- Department & Jurisdiction -->
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<div class="space-y-2">
-					<Label for="department">Department/Agency <span class="text-red-500">*</span></Label>
+					<Label for="department">Department/Agency <span class="text-danger">*</span></Label>
 					<Input
 						id="department"
 						name="department"
@@ -249,15 +249,15 @@
 						bind:value={$form.department}
 						disabled={$delayed}
 						required
-						class:border-red-500={$errors.department}
+						class:border-danger={$errors.department}
 					/>
 					{#if $errors.department}
-						<p class="text-sm text-red-500">{$errors.department}</p>
+						<p class="text-sm text-danger">{$errors.department}</p>
 					{/if}
 				</div>
 
 				<div class="space-y-2">
-					<Label for="jurisdiction">Jurisdiction <span class="text-red-500">*</span></Label>
+					<Label for="jurisdiction">Jurisdiction <span class="text-danger">*</span></Label>
 					<Input
 						id="jurisdiction"
 						name="jurisdiction"
@@ -266,10 +266,10 @@
 						bind:value={$form.jurisdiction}
 						disabled={$delayed}
 						required
-						class:border-red-500={$errors.jurisdiction}
+						class:border-danger={$errors.jurisdiction}
 					/>
 					{#if $errors.jurisdiction}
-						<p class="text-sm text-red-500">{$errors.jurisdiction}</p>
+						<p class="text-sm text-danger">{$errors.jurisdiction}</p>
 					{/if}
 				</div>
 			</div>
@@ -278,7 +278,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<!-- Password -->
 				<div class="space-y-2">
-					<Label for="password">Password <span class="text-red-500">*</span></Label>
+					<Label for="password">Password <span class="text-danger">*</span></Label>
 					<div class="relative">
 						<Input
 							id="password"
@@ -289,11 +289,11 @@
 							disabled={$delayed}
 							required
 							class="pr-10"
-							class:border-red-500={$errors.password}
+							class:border-danger={$errors.password}
 						/>
 						<button
 							type="button"
-							class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+							class="absolute inset-y-0 right-0 pr-3 flex items-center text-sand/60 hover:text-sand/80 dark:text-sand/40 dark:hover:text-sand/40"
 							onclick={() => (showPassword = !showPassword)}
 							disabled={$delayed}
 						>
@@ -307,13 +307,13 @@
 
 					{#if $form.password}
 						<div class="flex items-center gap-2">
-							<div class="h-2 flex-1 bg-gray-200 dark:bg-gray-700 rounded">
+							<div class="h-2 flex-1 bg-sand/10 dark:bg-panelSoft rounded">
 								<div
 									class="h-full rounded transition-all"
-									class:bg-red-500={passwordStrength.score < 3}
-									class:bg-yellow-500={passwordStrength.score >= 3 && passwordStrength.score < 5}
-									class:bg-blue-500={passwordStrength.score >= 5 && passwordStrength.score < 7}
-									class:bg-green-500={passwordStrength.score >= 7}
+									class:bg-danger={passwordStrength.score < 3}
+									class:bg-warning={passwordStrength.score >= 3 && passwordStrength.score < 5}
+									class:bg-info={passwordStrength.score >= 5 && passwordStrength.score < 7}
+									class:bg-accent={passwordStrength.score >= 7}
 									style="width: {Math.min(100, (passwordStrength.score / 8) * 100)}%"
 								></div>
 							</div>
@@ -322,13 +322,13 @@
 					{/if}
 
 					{#if $errors.password}
-						<p class="text-sm text-red-500">{$errors.password}</p>
+						<p class="text-sm text-danger">{$errors.password}</p>
 					{/if}
 				</div>
 
 				<!-- Confirm Password -->
 				<div class="space-y-2">
-					<Label for="confirmPassword">Confirm Password <span class="text-red-500">*</span></Label>
+					<Label for="confirmPassword">Confirm Password <span class="text-danger">*</span></Label>
 					<div class="relative">
 						<Input
 							id="confirmPassword"
@@ -339,11 +339,11 @@
 							disabled={$delayed}
 							required
 							class="pr-10"
-							class:border-red-500={$errors.confirmPassword}
+							class:border-danger={$errors.confirmPassword}
 						/>
 						<button
 							type="button"
-							class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+							class="absolute inset-y-0 right-0 pr-3 flex items-center text-sand/60 hover:text-sand/80 dark:text-sand/40 dark:hover:text-sand/40"
 							onclick={() => (showConfirmPassword = !showConfirmPassword)}
 							disabled={$delayed}
 						>
@@ -356,13 +356,13 @@
 					</div>
 
 					{#if $errors.confirmPassword}
-						<p class="text-sm text-red-500">{$errors.confirmPassword}</p>
+						<p class="text-sm text-danger">{$errors.confirmPassword}</p>
 					{/if}
 				</div>
 			</div>
 
 			<!-- Security Options -->
-			<div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+			<div class="space-y-3 p-4 bg-sand/5 dark:bg-panelSoft rounded-lg border border-sand/20 dark:border-sand/20">
 				<h3 class="text-sm font-semibold dark:text-white">Security Options</h3>
 
 				<label class="flex items-center gap-2 cursor-pointer">
@@ -372,16 +372,16 @@
 						name="enableTwoFactor"
 						bind:checked={$form.enableTwoFactor}
 						disabled={$delayed}
-						class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+						class="rounded border-sand/20 dark:border-sand/30 text-info focus:ring-info"
 					/>
-					<span class="text-sm dark:text-gray-200">
+					<span class="text-sm dark:text-sand/40">
 						Enable two-factor authentication (recommended for legal professionals)
 					</span>
 				</label>
 			</div>
 
 			<!-- Terms and Privacy -->
-			<div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+			<div class="space-y-3 p-4 bg-sand/5 dark:bg-panelSoft rounded-lg border border-sand/20 dark:border-sand/20">
 				<label class="flex items-start gap-2 cursor-pointer">
 					<input
 						type="checkbox"
@@ -390,15 +390,15 @@
 						bind:checked={$form.agreeToTerms}
 						disabled={$delayed}
 						required
-						class="mt-0.5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-						class:border-red-500={$errors.agreeToTerms}
+						class="mt-0.5 rounded border-sand/20 dark:border-sand/30 text-info focus:ring-info"
+						class:border-danger={$errors.agreeToTerms}
 					/>
-					<span class="text-sm dark:text-gray-200">
-						I agree to the <a href="/legal/terms" class="text-blue-600 dark:text-blue-400 hover:underline">Terms of Service</a>
+					<span class="text-sm dark:text-sand/40">
+						I agree to the <a href="/legal/terms" class="text-info dark:text-info/80 hover:underline">Terms of Service</a>
 					</span>
 				</label>
 				{#if $errors.agreeToTerms}
-					<p class="text-sm text-red-500">{$errors.agreeToTerms}</p>
+					<p class="text-sm text-danger">{$errors.agreeToTerms}</p>
 				{/if}
 
 				<label class="flex items-start gap-2 cursor-pointer">
@@ -409,15 +409,15 @@
 						bind:checked={$form.agreeToPrivacy}
 						disabled={$delayed}
 						required
-						class="mt-0.5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-						class:border-red-500={$errors.agreeToPrivacy}
+						class="mt-0.5 rounded border-sand/20 dark:border-sand/30 text-info focus:ring-info"
+						class:border-danger={$errors.agreeToPrivacy}
 					/>
-					<span class="text-sm dark:text-gray-200">
-						I agree to the <a href="/legal/privacy" class="text-blue-600 dark:text-blue-400 hover:underline">Privacy Policy</a>
+					<span class="text-sm dark:text-sand/40">
+						I agree to the <a href="/legal/privacy" class="text-info dark:text-info/80 hover:underline">Privacy Policy</a>
 					</span>
 				</label>
 				{#if $errors.agreeToPrivacy}
-					<p class="text-sm text-red-500">{$errors.agreeToPrivacy}</p>
+					<p class="text-sm text-danger">{$errors.agreeToPrivacy}</p>
 				{/if}
 			</div>
 
@@ -436,11 +436,11 @@
 		<!-- Login Link -->
 		{#if showLogin}
 			<div class="mt-6 text-center">
-				<p class="text-sm text-gray-600 dark:text-gray-400">
+				<p class="text-sm text-sand/60 dark:text-sand/40">
 					Already have an account?
 					<a
 						href="/auth/login"
-						class="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+						class="text-info dark:text-info/80 hover:underline font-medium"
 						tabindex={$delayed ? -1 : 0}
 					>
 						Sign in here

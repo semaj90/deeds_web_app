@@ -309,7 +309,7 @@
 
 <div class="webgpu-graph-container">
   <div class="graph-header">
-    <h3 class="text-lg font-semibold text-gray-800">Evidence Relationship Graph (WebGPU Accelerated)</h3>
+    <h3 class="text-lg font-semibold text-sand">Evidence Relationship Graph (WebGPU Accelerated)</h3>
     <div class="graph-controls">
       <select bind:value={layoutType} onchange={handleLayoutChange} class="layout-select">
         <option value="force">Force-Directed</option>
@@ -362,7 +362,7 @@
 
 <style>
   .webgpu-graph-container {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4;
+    @apply bg-white dark:bg-panelSoft rounded-lg shadow-lg p-4;
   }
   .graph-header {
     @apply flex justify-between items-center mb-4;
@@ -371,38 +371,38 @@
     @apply flex gap-2;
   }
   .layout-select {
-    @apply px-3 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm;
+    @apply px-3 py-1 rounded border border-sand/20 dark:border-sand/30 bg-white dark:bg-panelSoft text-sm;
   }
   .canvas-container {
-    @apply relative bg-gray-900 rounded-lg overflow-hidden;
+    @apply relative bg-panel rounded-lg overflow-hidden;
     min-height: 600px;
   }
   .graph-canv.loading-overlay {
-    @apply absolute inset-0 flex flex-col items-center justify-center bg-gray-900/90;
+    @apply absolute inset-0 flex flex-col items-center justify-center bg-panel/90;
   }
   .loading-spinner {
-    @apply w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4;
+    @apply w-12 h-12 border-4 border-info border-t-transparent rounded-full animate-spin mb-4;
   }
   .error-message {
-    @apply bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg p-4 text-center;
+    @apply bg-danger/5 dark:bg-danger/10 border border-danger/30 dark:border-danger/60 rounded-lg p-4 text-center;
   }
   .error-icon {
-    @apply w-12 h-12 text-red-500 mx-auto mb-2;
+    @apply w-12 h-12 text-danger mx-auto mb-2;
   }
   .error-hint {
-    @apply text-sm text-gray-600 dark:text-gray-400 mt-2;
+    @apply text-sm text-sand/60 dark:text-sand/40 mt-2;
   }
   .error-hint code {
-    @apply bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-x;
+    @apply bg-sand/10 dark:bg-panelSoft px-2 py-1 rounded text-x;
   }
   .fallback-message {
-    @apply bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-4 text-center;
+    @apply bg-warning/5 dark:bg-warning/20/20 border border-warning/30 dark:border-warning/60 rounded-lg p-4 text-center;
   }
   .graph-legend {
-    @apply mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg;
+    @apply mt-4 p-3 bg-sand/5 dark:bg-panelSoft rounded-lg;
   }
   .legend-title {
-    @apply text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
+    @apply text-sm font-semibold text-sand/80 dark:text-sand/40 mb-2;
   }
   .legend-items {
     @apply grid grid-cols-2; md:grid-cols-4 gap-2;

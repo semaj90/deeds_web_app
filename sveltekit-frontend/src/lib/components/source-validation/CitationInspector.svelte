@@ -52,7 +52,7 @@ function handleBackdropClick(event: MouseEvent) {
 					<h2 id="citation-title" class="text-xl font-bold mb-2">
 						📄 Source Citation
 					</h2>
-					<p class="text-sm text-gray-600">{citation.source_file}</p>
+					<p class="text-sm text-sand/60">{citation.source_file}</p>
 				</div>
 				<button
 					onclick={onClose}
@@ -74,9 +74,9 @@ function handleBackdropClick(event: MouseEvent) {
 						<span class="label">Confidence:</span>
 						<span
 							class="value font-semibold"
-							class:text-green-600={citation.confidence >= 0.9}
-							class:text-yellow-600={citation.confidence >= 0.7 && citation.confidence < 0.9}
-							class:text-red-600={citation.confidence < 0.7}
+							class:text-accent={citation.confidence >= 0.9}
+							class:text-warning={citation.confidence >= 0.7 && citation.confidence < 0.9}
+							class:text-danger={citation.confidence < 0.7}
 						>
 							{(citation.confidence * 100).toFixed(1)}%
 						</span>
@@ -85,9 +85,9 @@ function handleBackdropClick(event: MouseEvent) {
 						<span class="label">Used in Answer:</span>
 						<span class="value">
 							{#if citation.used_in_answer}
-								<span class="text-green-600 font-semibold">✅ Yes</span>
+								<span class="text-accent font-semibold">✅ Yes</span>
 							{:else}
-								<span class="text-gray-500">❌ No</span>
+								<span class="text-sand/60">❌ No</span>
 							{/if}
 						</span>
 					</div>
@@ -106,7 +106,7 @@ function handleBackdropClick(event: MouseEvent) {
 			<div class="modal-footer">
 				<button
 					onclick={onClose}
-					class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+					class="px-6 py-2 bg-info text-white rounded-lg hover:bg-info/60"
 				>
 					Close
 				</button>

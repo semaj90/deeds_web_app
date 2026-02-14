@@ -23,7 +23,7 @@
 </script>
 
 <button
-  class="flex items-center w-full px-3 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none disabled:opacity-50 {className}"
+  class="flex items-center w-full px-3 py-2 text-sm text-left hover:bg-sand/10 dark:hover:bg-panelSoft focus:bg-sand/10 dark:focus:bg-panelSoft focus:outline-none disabled:opacity-50 {className}"
   {disabled}
   onclick={handleSelect}
 >

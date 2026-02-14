@@ -79,53 +79,53 @@
 });
 
  function getHealthColor(score: number): string {
- if (score >= 90) return 'text-green-400';
- if (score >= 70) return 'text-yellow-400';
- return 'text-red-400';
+ if (score >= 90) return 'text-accent';
+ if (score >= 70) return 'text-warning';
+ return 'text-danger/80';
  }
 
  function getHealthBg(score: number): string {
- if (score >= 90) return 'bg-green-400';
- if (score >= 70) return 'bg-yellow-400';
- return 'bg-red-400';
+ if (score >= 90) return 'bg-accent/80';
+ if (score >= 70) return 'bg-warning';
+ return 'bg-danger/80';
  }
 </script>
 
-<div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
  <div class="flex items-center justify-between mb-4">
- <h2 class="text-xl font-semibold text-cyan-400">System Overview</h2>
+ <h2 class="text-xl font-semibold text-info">System Overview</h2>
  {#if loading}
  <div class="flex items-center space-x-2">
- <div class="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
- <span class="text-sm text-slate-400">Loading...</span>
+ <div class="w-4 h-4 border-2 border-info/80 border-t-transparent rounded-full animate-spin"></div>
+ <span class="text-sm text-sand/40">Loading...</span>
  </div>
  {:else if error}
- <div class="text-sm text-red-400">{error}</div>
+ <div class="text-sm text-danger/80">{error}</div>
  {/if}
  </div>
 
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
  <!-- Overall Health -->
- <div class="bg-slate-700/30 rounded-lg p-4">
+ <div class="bg-panelSoft/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">
- <span class="text-sm text-slate-400">Overall Health</span>
+ <span class="text-sm text-sand/40">Overall Health</span>
  <span class="text-lg {getHealthColor(systemHealth.overall)}">{systemHealth.overall}%</span>
  </div>
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div class="h-2 rounded-full {getHealthBg(systemHealth.overall)} transition-all duration-300" style="width: {systemHealth.overall}%"></div>
  </div>
  </div>
 
  <!-- WebGPU Status -->
- <div class="bg-slate-700/30 rounded-lg p-4">
+ <div class="bg-panelSoft/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">
- <span class="text-sm text-slate-400">WebGPU</span>
+ <span class="text-sm text-sand/40">WebGPU</span>
  <div class="flex items-center space-x-2">
- <div class="w-2 h-2 {webgpuCapabilities?.hasWebGPU ? 'bg-green-400' : 'bg-red-400'} rounded-full"></div>
+ <div class="w-2 h-2 {webgpuCapabilities?.hasWebGPU ? 'bg-accent/80' : 'bg-danger/80'} rounded-full"></div>
  <span class="text-sm {getHealthColor(systemHealth.webgpu)}">{systemHealth.webgpu}%</span>
  </div>
  </div>
- <div class="text-xs text-slate-500">
+ <div class="text-xs text-sand/60">
  {webgpuCapabilities?.hasWebGPU ? 'GPU Accelerated' : 'CPU Fallback'}
  {#if systemMetrics?.gpu?.model}
  <br />{systemMetrics.gpu.model}
@@ -134,15 +134,15 @@
  </div>
 
  <!-- CPU/WebGL Status -->
- <div class="bg-slate-700/30 rounded-lg p-4">
+ <div class="bg-panelSoft/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">
- <span class="text-sm text-slate-400">CPU/WebGL</span>
+ <span class="text-sm text-sand/40">CPU/WebGL</span>
  <div class="flex items-center space-x-2">
- <div class="w-2 h-2 {cpuCapabilities?.hasWebGL ? 'bg-green-400' : 'bg-yellow-400'} rounded-full"></div>
+ <div class="w-2 h-2 {cpuCapabilities?.hasWebGL ? 'bg-accent/80' : 'bg-warning'} rounded-full"></div>
  <span class="text-sm {getHealthColor(systemHealth.cpu)}">{systemHealth.cpu}%</span>
  </div>
  </div>
- <div class="text-xs text-slate-500">
+ <div class="text-xs text-sand/60">
  {cpuCapabilities?.maxThreads ?? 4} threads available
  {#if systemMetrics?.cpu?.cores}
  <br />{systemMetrics.cpu.cores} cores
@@ -151,16 +151,16 @@
  </div>
 
  <!-- Memory Usage -->
- <div class="bg-slate-700/30 rounded-lg p-4">
+ <div class="bg-panelSoft/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">
- <span class="text-sm text-slate-400">Memory</span>
+ <span class="text-sm text-sand/40">Memory</span>
  <span class="text-sm {getHealthColor(systemHealth.memory)}">{systemHealth.memory}%</span>
  </div>
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div class="h-2 rounded-full {getHealthBg(systemHealth.memory)} transition-all duration-300" style="width: {systemHealth.memory}%"></div>
  </div>
  {#if systemMetrics?.memory}
- <div class="text-xs text-slate-500 mt-1">
+ <div class="text-xs text-sand/60 mt-1">
  {Math.round(systemMetrics.memory.used / 1024 / 1024)}MB / {Math.round(systemMetrics.memory.total / 1024 / 1024)}MB
  </div>
  {/if}
@@ -168,40 +168,40 @@
  </div>
 
  <!-- System Capabilities -->
- <div class="mt-6 pt-4 border-t border-slate-700/50">
- <h3 class="text-sm font-medium text-slate-300 mb-3">Active Capabilities</h3>
+ <div class="mt-6 pt-4 border-t border-sand/20/50">
+ <h3 class="text-sm font-medium text-sand/40 mb-3">Active Capabilities</h3>
  <div class="flex flex-wrap gap-2">
  {#if webgpuCapabilities?.hasWebGPU}
- <span class="px-2 py-1 bg-cyan-400/20 text-cyan-400 text-xs rounded">WebGPU Compute</span>
+ <span class="px-2 py-1 bg-info/80/20 text-info text-xs rounded">WebGPU Compute</span>
  {/if}
  {#if cpuCapabilities?.hasWebGL}
- <span class="px-2 py-1 bg-green-400/20 text-green-400 text-xs rounded">WebGL Fallback</span>
+ <span class="px-2 py-1 bg-accent/80/20 text-accent text-xs rounded">WebGL Fallback</span>
  {/if}
  {#if systemMetrics?.services?.redis}
- <span class="px-2 py-1 bg-red-400/20 text-red-400 text-xs rounded">Redis Cache</span>
+ <span class="px-2 py-1 bg-danger/80/20 text-danger/80 text-xs rounded">Redis Cache</span>
  {/if}
  {#if systemMetrics?.services?.qdrant}
- <span class="px-2 py-1 bg-purple-400/20 text-purple-400 text-xs rounded">Vector Search</span>
+ <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">Vector Search</span>
  {/if}
  {#if systemMetrics?.services?.ollama}
- <span class="px-2 py-1 bg-blue-400/20 text-blue-400 text-xs rounded">AI Models</span>
+ <span class="px-2 py-1 bg-info/80/20 text-info/80 text-xs rounded">AI Models</span>
  {/if}
  {#if systemMetrics?.services?.database}
- <span class="px-2 py-1 bg-green-400/20 text-green-400 text-xs rounded">Database</span>
+ <span class="px-2 py-1 bg-accent/80/20 text-accent text-xs rounded">Database</span>
  {/if}
- <span class="px-2 py-1 bg-orange-400/20 text-orange-400 text-xs rounded">Document Processing</span>
+ <span class="px-2 py-1 bg-warning/80/20 text-warning text-xs rounded">Document Processing</span>
  </div>
  </div>
 
  <!-- Service Status -->
  {#if systemMetrics?.services}
- <div class="mt-4 pt-4 border-t border-slate-700/50">
- <h3 class="text-sm font-medium text-slate-300 mb-3">Service Status</h3>
+ <div class="mt-4 pt-4 border-t border-sand/20/50">
+ <h3 class="text-sm font-medium text-sand/40 mb-3">Service Status</h3>
  <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
  {#each Object.entries(systemMetrics.services) as [service, status]}
  <div class="flex items-center space-x-2">
- <div class="w-2 h-2 {status === 'online' ? 'bg-green-400' : 'bg-red-400'} rounded-full"></div>
- <span class="text-xs text-slate-400 capitalize">{ service }</span>
+ <div class="w-2 h-2 {status === 'online' ? 'bg-accent/80' : 'bg-danger/80'} rounded-full"></div>
+ <span class="text-xs text-sand/40 capitalize">{ service }</span>
  </div>
  {/each}
  </div>

@@ -64,7 +64,7 @@
         {@render children?.()}
       </div>
   {#if footer}
-        <div class="modal-footer mt-4 pt-4 border-t-2 border-gray-300 px-4">
+        <div class="modal-footer mt-4 pt-4 border-t-2 border-sand/20 px-4">
           {@render footer?.()}
         {/if}
   </div>

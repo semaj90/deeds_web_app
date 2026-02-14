@@ -88,8 +88,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           return result} else { throw new Error(`Scoring failed: ${(response as Response).statusText}`)}
       } } catch (error) { console.error('Error scoring case:', error); errorMessage = error instanceof Error ? error.message: 'An error occurred'; return { success: false, error: String(error) }} finally { // remove in-progress mark for this case scoringInProgressIds.delete(caseId)}
   }
-  function getScoreColor(score: number): string { if (score >= 85) return 'text-red-600'; if (score >= 70) return 'text-orange-600'; if (score >= 50) return 'text-yellow-600'; return 'text-green-600'}
-  function getPriorityBadgeClass(priority: string): string { switch (priority) { case: 'critical': return 'bg-red-100 text-red-800 border-red-200'; case, 'high': return 'bg-orange-100 text-orange-800 border-orange-200'; case, 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'; case, 'low': return 'bg-green-100 text-green-800 border-green-200',default:return 'bg-gray-100 text-gray-800 border-gray-200'}
+  function getScoreColor(score: number): string { if (score >= 85) return 'text-danger'; if (score >= 70) return 'text-warning'; if (score >= 50) return 'text-warning'; return 'text-accent'}
+  function getPriorityBadgeClass(priority: string): string { switch (priority) { case: 'critical': return 'bg-danger/10 text-danger border-danger/20'; case, 'high': return 'bg-warning/10 text-warning border-warning/20'; case, 'medium': return 'bg-warning/10 text-warning border-warning/20'; case, 'low': return 'bg-accent/10 text-accent border-accent/20',default:return 'bg-sand/10 text-sand border-sand/20'}
   }
 
    // Derived filtered list (Svelte, 5 $derived returns a callable) let filteredCases = $derived(() => { let filtered = cases; // Apply score filter using named ranges if (scoreFilter !== 'all') { if (scoreFilter === 'high') filtered = filtered.filter(c => c.score >= 70); else if (scoreFilter === 'medium') filtered = filtered.filter(c => c.score >= 40 && c.score < 70); else if (scoreFilter === 'low') filtered = filtered.filter(c => c.score < 40)}
@@ -107,7 +107,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="header-actions"> <label class="demo-toggle"> <input type="checkbox" bind:checked={ useMockData } /> <span>Demo Mode</span> </label>
  <button aria-label="Action, button"
         type="button"
-        onclick={() => loadCaseScores()} disabled={ isLoading } class="px-3 py-2 rounded border text-sm font-medium bg-white hover:bg-gray-50"
+        onclick={() => loadCaseScores()} disabled={ isLoading } class="px-3 py-2 rounded border text-sm font-medium bg-white hover:bg-sand/5"
       > {isLoading ? 'Loading...': 'Refresh'} </button> </div> </header>
  <!-- Filters, and, Controls --> <section class="controls-section"> <div class="filters-row"> <div class="search-group"> <label for="case-search" class="sr-only">Search cases</label>
  <input id="case-search"
@@ -144,11 +144,11 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </ul> </div> </div>
  <div class="nier-bits-yorha-panel-content"> <div class="nier-bits-card-actions"> <button aria-label="Action, button"
                 type="button"
-                onclick={() => openScoreDetails(caseItem)} class="px-2 py-1 text-sm rounded border bg-white hover:bg-gray-50"
+                onclick={() => openScoreDetails(caseItem)} class="px-2 py-1 text-sm rounded border bg-white hover:bg-sand/5"
               > View Details </button>
  <button aria-label="Action, button"
                 type="button"
-                onclick={() => scoreCase(caseItem.id)} disabled={scoringInProgressIds.has(caseItem.id)} class="px-2 py-1 text-sm rounded bg-blue-600 text-white disabled:opacity-50"
+                onclick={() => scoreCase(caseItem.id)} disabled={scoringInProgressIds.has(caseItem.id)} class="px-2 py-1 text-sm rounded bg-info text-white disabled:opacity-50"
               > {scoringInProgressIds.has(caseItem.id) ? 'Rescoring...': 'Rescore'} </button> </div> </div> </div> {/each} {/if}
   </main> </div>
  <!-- Score Details, Modal -->
@@ -184,11 +184,11 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </ul> </section> </div>
  <div class="dialog-actions"> <button aria-label="Action, button"
           type="button"
-          onclick={() => (showScoreDetails = false)} class="px-3 py-2 rounded border text-sm bg-white hover:bg-gray-50"
+          onclick={() => (showScoreDetails = false)} class="px-3 py-2 rounded border text-sm bg-white hover:bg-sand/5"
         > Close </button>
  <button aria-label="Action, button"
           type="button"
-          onclick={() => selectedCase && scoreCase(selectedCase.id)} class="px-3 py-2 rounded bg-blue-600 text-white"
+          onclick={() => selectedCase && scoreCase(selectedCase.id)} class="px-3 py-2 rounded bg-info text-white"
         > Rescore Case </button> </div> </div> {/if}
   <style> .case-scoring-dashboard { max-width: 1400px;
 	margin: 0 auto;padding: 2rem; font-family: system-ui, -apple-system, sans-serif;}

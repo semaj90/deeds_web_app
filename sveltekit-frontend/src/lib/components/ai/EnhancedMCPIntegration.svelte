@@ -42,7 +42,7 @@ toolId: args }) }); const data = await resp.json(); if (resp.ok) { queryResults.
 	...r].slice(0, 20) )} finally { isProcessing = false; mcpTools.update(tools => tools.map(t => (t.id === toolId ? { ...t, status: 'available' }: t)))}
   } </script>
  <div class="nes-container is-dark"> <p class="title">Enhanced MCP Integration</p>
- <div class="flex items-center justify-between mb-4 border-b border-gray-700"> <div class="flex items-center"> <strong class="nes-text">Enhanced MCP</strong>
+ <div class="flex items-center justify-between mb-4 border-b border-sand/20"> <div class="flex items-center"> <strong class="nes-text">Enhanced MCP</strong>
  <span class="nes-text">{$mcpStatus}</span> </div>
  <div class="flex items-center">
   {#if $mcpStatus === 'connecting'} <i class="nes-icon coin is-small"></i>

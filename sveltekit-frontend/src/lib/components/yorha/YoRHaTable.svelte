@@ -108,18 +108,18 @@
   }
 </script>
 
-<div class="w-full bg-slate-900 border border-slate-800 rounded overflow-hidden {className}">
+<div class="w-full bg-panel border border-sand/20 rounded overflow-hidden {className}">
   <!-- Table Search -->
-  <div class="p-3 border-b border-slate-800 flex items-center gap-4 bg-slate-900/50">
+  <div class="p-3 border-b border-sand/20 flex items-center gap-4 bg-panel/50">
     <div class="relative flex-1 max-w-sm">
       <input
         bind:value={searchQuery}
         placeholder="Filter records..."
-        class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+        class="w-full bg-panelSoft border border-sand/20 rounded px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-info outline-none"
       />
     </div>
     {#if loading}
-      <div class="text-[10px] text-cyan-500 font-mono animate-pulse uppercase">Syncing...</div>
+      <div class="text-[10px] text-info font-mono animate-pulse uppercase">Syncing...</div>
     {/if}
   </div>
 
@@ -127,48 +127,48 @@
   <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse">
       <thead>
-        <tr class="border-b border-slate-800 bg-slate-950/50">
+        <tr class="border-b border-sand/20 bg-panel/50">
           {#if selectable}
             <th class="p-3 w-10">
-              <input type="checkbox" onchange={() => {}} class="rounded bg-slate-800 border-slate-700" />
+              <input type="checkbox" onchange={() => {}} class="rounded bg-panelSoft border-sand/20" />
             </th>
           {/if}
           {#each columns as col}
             <th
-              class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-300"
+              class="p-3 text-[10px] font-bold text-sand/60 uppercase tracking-widest cursor-pointer hover:text-sand/40"
               style:width={col.width}
               onclick={() => handleSort(col)}
             >
               <div class="flex items-center gap-1">
                 {col.title}
                 {#if sortColumn === col.key}
-                  <span class="text-cyan-500">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                  <span class="text-info">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                 {/if}
               </div>
             </th>
           {/each}
           {#if actionsSnippet}
-            <th class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
+            <th class="p-3 text-[10px] font-bold text-sand/60 uppercase tracking-widest text-right">Actions</th>
           {/if}
         </tr>
       </thead>
-      <tbody class="divide-y divide-slate-800/50">
+      <tbody class="divide-y divide-sand/20/50">
         {#each paginatedData() as row, i}
-          <tr class="hover:bg-cyan-500/5 transition-colors group">
+          <tr class="hover:bg-info/5 transition-colors group">
             {#if selectable}
               <td class="p-3">
                 <input
                   type="checkbox"
                   checked={selectedRows.has(row.id)}
                   onchange={() => toggleRowSelection(row.id)}
-                  class="rounded bg-slate-800 border-slate-700"
+                  class="rounded bg-panelSoft border-sand/20"
                 />
               </td>
             {/if}
             {#each columns as col}
-              <td class="p-3 text-sm text-slate-300 group-hover:text-white transition-colors" style:text-align={col.align}>
+              <td class="p-3 text-sm text-sand/40 group-hover:text-white transition-colors" style:text-align={col.align}>
                 {#if col.type === 'status'}
-                  <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-slate-800 border border-slate-700">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-panelSoft border border-sand/20">
                     {row[col.key]}
                   </span>
                 {:else}
@@ -184,7 +184,7 @@
           </tr>
         {:else}
           <tr>
-            <td colspan={columns.length + (selectable ? 1 : 0) + (actionsSnippet ? 1 : 0)} class="p-8 text-center text-slate-600 font-mono text-xs italic">
+            <td colspan={columns.length + (selectable ? 1 : 0) + (actionsSnippet ? 1 : 0)} class="p-8 text-center text-sand/60 font-mono text-xs italic">
               NO RECORDS LOADED
             </td>
           </tr>
@@ -195,22 +195,22 @@
 
   <!-- Pagination -->
   {#if pagination && totalPages() > 1}
-    <div class="p-3 border-t border-slate-800 flex justify-between items-center bg-slate-950/50">
-      <span class="text-[10px] font-mono text-slate-500 uppercase">
+    <div class="p-3 border-t border-sand/20 flex justify-between items-center bg-panel/50">
+      <span class="text-[10px] font-mono text-sand/60 uppercase">
         Page {currentPage} of {totalPages()}
       </span>
       <div class="flex gap-1">
         <button
           disabled={currentPage === 1}
           onclick={() => currentPage--}
-          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled:hover bg-slate-700 disabled:opacity-30 transition-all font-mono"
+          class="px-2 py-1 bg-panelSoft border border-sand/20 text-[10px] font-bold enabled:hover bg-panelSoft disabled:opacity-30 transition-all font-mono"
         >
           PREV
         </button>
         <button
           disabled={currentPage === totalPages()}
           onclick={() => currentPage++}
-          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled:hover bg-slate-700 disabled:opacity-30 transition-all font-mono"
+          class="px-2 py-1 bg-panelSoft border border-sand/20 text-[10px] font-bold enabled:hover bg-panelSoft disabled:opacity-30 transition-all font-mono"
         >
           NEXT
         </button>

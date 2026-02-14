@@ -51,28 +51,28 @@
   function getStatusColor(status: string): string {
     switch (status) {
       case "open":
-        return "bg-green-100 text-green-800";
+        return "bg-accent/10 text-accent";
       case "in_progress":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-warning/10 text-warning";
       case "closed":
-        return "bg-blue-100 text-blue-800";
+        return "bg-info/10 text-info";
       case "archived":
-        return "bg-gray-100 text-gray-800";
-      default:return "bg-gray-100 text-gray-800";
+        return "bg-sand/10 text-sand";
+      default:return "bg-sand/10 text-sand";
     }
   }
 
   function getPriorityColor(priority: string): string {
     switch (priority) {
       case "low":
-        return "bg-green-100 text-green-800";
+        return "bg-accent/10 text-accent";
       case "medium":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-warning/10 text-warning";
       case "high":
-        return "bg-orange-100 text-orange-800";
+        return "bg-warning/10 text-warning";
       case "urgent":
-        return "bg-red-100 text-red-800";
-      default:return "bg-gray-100 text-gray-800";
+        return "bg-danger/10 text-danger";
+      default:return "bg-sand/10 text-sand";
     }
   }
 
@@ -97,8 +97,7 @@
 </script>
 
 <div
-  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md" class:bg-blue-50={isActive}
-  class:border-blue-300={isActive}
+  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md {isActive ? 'bg-info/5 border-info/40' : ''}"
   class:opacity-50={disabled}
   class:cursor-not-allowed={disabled}
   onclick={handleClick}
@@ -109,14 +108,14 @@
   <div class="space-y-3">
     <!-- Case Title and Number -->
     <div class="flex items-center gap-2">
-      <StatusIcon class="w-5 h-5 text-gray-500" />
+      <StatusIcon class="w-5 h-5 text-sand/60" />
       <h3 class="font-semibold text-lg truncate">
         {caseData.title}
       </h3>
     </div>
 
     <!-- Case Number -->
-    <p class="text-sm text-gray-500">
+    <p class="text-sm text-sand/60">
       Case #{caseData.caseNumber}
     </p>
 
@@ -135,7 +134,7 @@
     </div>
 
     <!-- Metadata -->
-    <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+    <div class="flex flex-wrap gap-4 text-sm text-sand/60">
       <div class="flex items-center gap-1">
         <Calendar class="w-4 h-4" />
         <span>{formattedDate}</span>
@@ -156,7 +155,7 @@
 
     <!-- Court Date if available -->
     {#if caseData.courtDate}
-      <div class="flex items-center gap-1 text-sm text-gray-600">
+      <div class="flex items-center gap-1 text-sm text-sand/60">
         <Calendar class="w-4 h-4" />
         <span>Court: {new Date(caseData.courtDate).toLocaleDateString()}</span>
       </div>

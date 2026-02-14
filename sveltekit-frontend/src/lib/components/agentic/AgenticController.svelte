@@ -115,42 +115,42 @@
 });
 </script>
 
-<div class="agentic-controller p-4 bg-gray-900 rounded-lg">
+<div class="agentic-controller p-4 bg-panel rounded-lg">
   <h2 class="text-xl font-bold text-white mb-4">🤖 Agentic Controller</h2>
 
   {#if loading}
     <div class="text-center py-4">
-      <div class="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
-      <p class="text-gray-400 mt-2">Loading...</p>
+      <div class="animate-spin w-8 h-8 border-2 border-info border-t-transparent rounded-full mx-auto"></div>
+      <p class="text-sand/40 mt-2">Loading...</p>
     </div>
   {/if}
 
   {#if error}
-    <div class="bg-red-900/50 border border-red-500 rounded p-3 mb-4">
-      <p class="text-red-300">{error}</p>
+    <div class="bg-danger/20 border border-danger rounded p-3 mb-4">
+      <p class="text-danger/60">{error}</p>
     </div>
   {/if}
 
   {#if status}
     <div class="grid grid-cols-2 gap-4 mb-6">
-      <div class="bg-gray-800 rounded p-3">
-        <h3 class="text-sm text-gray-400 mb-1">Status</h3>
-        <p class="text-lg font-semibold {status.status === 'active' ? 'text-green-400' : 'text-yellow-400'}">
+      <div class="bg-panelSoft rounded p-3">
+        <h3 class="text-sm text-sand/40 mb-1">Status</h3>
+        <p class="text-lg font-semibold {status.status === 'active' ? 'text-accent' : 'text-warning'}">
           {status.status}
         </p>
       </div>
-      <div class="bg-gray-800 rounded p-3">
-        <h3 class="text-sm text-gray-400 mb-1">Redis</h3>
-        <p class="text-lg font-semibold {status.system.redisConnected ? 'text-green-400' : 'text-red-400'}">
+      <div class="bg-panelSoft rounded p-3">
+        <h3 class="text-sm text-sand/40 mb-1">Redis</h3>
+        <p class="text-lg font-semibold {status.system.redisConnected ? 'text-accent' : 'text-danger/80'}">
           {status.system.redisConnected ? 'Connected' : 'Disconnected'}
         </p>
       </div>
-      <div class="bg-gray-800 rounded p-3">
-        <h3 class="text-sm text-gray-400 mb-1">Pending Errors</h3>
+      <div class="bg-panelSoft rounded p-3">
+        <h3 class="text-sm text-sand/40 mb-1">Pending Errors</h3>
         <p class="text-lg font-semibold text-white">{status.activity.pendingErrors}</p>
       </div>
-      <div class="bg-gray-800 rounded p-3">
-        <h3 class="text-sm text-gray-400 mb-1">Last Activity</h3>
+      <div class="bg-panelSoft rounded p-3">
+        <h3 class="text-sm text-sand/40 mb-1">Last Activity</h3>
         <p class="text-sm text-white">{status.activity.lastActivity}</p>
       </div>
     </div>
@@ -163,12 +163,12 @@
         type="text"
         bind:value={errorQuery}
         placeholder="Describe the error..."
-        class="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+        class="flex-1 bg-panelSoft border border-sand/20 rounded px-3 py-2 text-white"
       />
       <button
         onclick={queryFixSuggestions}
         disabled={loading || !errorQuery.trim()}
-        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-white"
+        class="px-4 py-2 bg-info hover:bg-info/60 disabled:opacity-50 rounded text-white"
       >
         Search
       </button>
@@ -180,9 +180,9 @@
       <h3 class="text-lg font-semibold text-white mb-2">Suggestions</h3>
       <div class="space-y-2">
         {#each fixSuggestions as suggestion}
-          <div class="bg-gray-800 rounded p-3">
+          <div class="bg-panelSoft rounded p-3">
             <p class="text-white">{suggestion.suggestion}</p>
-            <div class="flex gap-4 mt-2 text-sm text-gray-400">
+            <div class="flex gap-4 mt-2 text-sm text-sand/40">
               <span>Success Rate: {(suggestion.successRate * 100).toFixed(0)}%</span>
               <span>Relevance: {(suggestion.relevance * 100).toFixed(0)}%</span>
             </div>
@@ -197,9 +197,9 @@
       <h3 class="text-lg font-semibold text-white mb-2">Recent Errors</h3>
       <div class="space-y-2 max-h-64 overflow-y-auto">
         {#each recentErrors as err}
-          <div class="bg-gray-800 rounded p-3 {err.resolved ? 'opacity-50' : ''}">
+          <div class="bg-panelSoft rounded p-3 {err.resolved ? 'opacity-50' : ''}">
             <p class="text-white text-sm">{err.text}</p>
-            <div class="flex gap-4 mt-2 text-xs text-gray-400">
+            <div class="flex gap-4 mt-2 text-xs text-sand/40">
               <span>Confidence: {(err.confidence * 100).toFixed(0)}%</span>
               <span>{err.resolved ? '✓ Resolved' : '⏳ Pending'}</span>
             </div>

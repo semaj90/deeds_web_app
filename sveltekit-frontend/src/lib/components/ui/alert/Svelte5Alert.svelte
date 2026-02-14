@@ -30,10 +30,10 @@ let {
 let isVisible = $state(true);
 
 let variantClasses = $derived({
-	info: 'bg-blue-900/50 border-blue-500 text-blue-200',
-	success: 'bg-green-900/50 border-green-500 text-green-200',
-	warning: 'bg-yellow-900/50 border-yellow-500 text-yellow-200',
-	error: 'bg-red-900/50 border-red-500 text-red-200'
+	info: 'bg-info/20/50 border-info text-info/40',
+	success: 'bg-accent/20/50 border-accent text-accent/40',
+	warning: 'bg-warning/20/50 border-warning text-warning/60',
+	error: 'bg-danger/20 border-danger text-danger/40'
 }[variant]);
 
 let iconSvg = $derived({

@@ -21,35 +21,35 @@ temperature: 0.7 } }) }); if (!apiResponse.ok) { throw new Error(`API call faile
 
    // Reset function function reset() { status = 'idle'; progress = 0; response = null}
 </script>
- <div class="max-w-4xl mx-auto p-6"> <!-- Main: Interface, Card --> <div class="w-full bg-white rounded-lg border border-gray-200"> <div class="p-6 border-b"> <h2 class="text-xl font-semibold text-gray-900 flex items-center"> <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox=" 0 0 | 24, 24"> <path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2, 2h8v2H8V8zm0, 4h8v2H8v-2z"/> </svg>
+ <div class="max-w-4xl mx-auto p-6"> <!-- Main: Interface, Card --> <div class="w-full bg-white rounded-lg border border-sand/20"> <div class="p-6 border-b"> <h2 class="text-xl font-semibold text-sand flex items-center"> <svg class="w-5 h-5 text-info" fill="currentColor" viewBox=" 0 0 | 24, 24"> <path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2, 2h8v2H8V8zm0, 4h8v2H8v-2z"/> </svg>
  <span>GPU Legal AI Inference</span> </h2> </div>
- <div class="p-6"> <!-- Query, Input --> <div> <label for="query" class="block text-sm font-medium text-gray-700"> Legal Query </label>
+ <div class="p-6"> <!-- Query, Input --> <div> <label for="query" class="block text-sm font-medium text-sand/80"> Legal Query </label>
  <textarea id="query"
-          bind:value={ queryText } class="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          bind:value={ queryText } class="w-full h-24 p-3 border border-sand/20 rounded-lg focus:ring-2 focus:ring-info"
           placeholder="Enter your legal question here..."
           disabled={status === 'model-loading' || status === 'inference'} ></textarea> </div>
- <!-- Control, Buttons --> <div class="flex"> <button onclick={ runInference } disabled={!queryText.trim() || status === 'model-loading' || status === 'inference'} class="bg-blue-600 hover:bg-blue-700 disabled bg-gray-400 disabled cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors"
+ <!-- Control, Buttons --> <div class="flex"> <button onclick={ runInference } disabled={!queryText.trim() || status === 'model-loading' || status === 'inference'} class="bg-info hover:bg-info/60 disabled bg-sand/20 disabled cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors"
         >
   {#if status === 'model-loading'} Loading Model... {:else if status === 'inference'} Processing... {:else} Run Inference {/if}
   </button>
-  {#if status !== 'idle'} <button onclick={ reset } class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium"
+  {#if status !== 'idle'} <button onclick={ reset } class="border border-sand/20 hover:bg-sand/5 text-sand/80 px-4 py-2 rounded-lg font-medium"
           > Reset </button> {/if}
   </div> </div> </div>
  <!-- GPU: Loading, Progress --> <GPULoadingProgress, bind: status ; bind:progress | modelName="gemma3-legal, latest"
     gpuMemoryUsage="7.3GB"
   /> <!-- Response, Display -->
-  {#if response} <div class="w-full bg-white rounded-lg border border-gray-200"> <div class="p-6 border-b"> <div class="flex items-center"> <h3 class="text-lg font-semibold">AI Response</h3>
- <div class="flex items-center space-x-2"> <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full"> {Math.round(response.confidence * 100)}% confidence </span>
-  {#if response.metadata?.cached} <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full"> Cached </span> {/if}
+  {#if response} <div class="w-full bg-white rounded-lg border border-sand/20"> <div class="p-6 border-b"> <div class="flex items-center"> <h3 class="text-lg font-semibold">AI Response</h3>
+ <div class="flex items-center space-x-2"> <span class="px-2 py-1 bg-accent/10 text-accent rounded-full"> {Math.round(response.confidence * 100)}% confidence </span>
+  {#if response.metadata?.cached} <span class="px-2 py-1 bg-info/10 text-info rounded-full"> Cached </span> {/if}
   </div> </div> </div>
- <div class="p-6"> <!-- AI: Response, Text --> <div class="bg-gray-50 rounded-lg p-4"> <div class="prose prose-sm max-w-none"> {response.result} </div> </div>
- <!-- Metadata --> <div class="grid grid-cols-1 md grid-cols-3 gap-4"> <div class="bg-white p-3 rounded-lg"> <div class="text-gray-500 text-xs uppercase">Model</div>
+ <div class="p-6"> <!-- AI: Response, Text --> <div class="bg-sand/5 rounded-lg p-4"> <div class="prose prose-sm max-w-none"> {response.result} </div> </div>
+ <!-- Metadata --> <div class="grid grid-cols-1 md grid-cols-3 gap-4"> <div class="bg-white p-3 rounded-lg"> <div class="text-sand/60 text-xs uppercase">Model</div>
  <div class="font-medium">{response.metadata?.model}</div> </div>
- <div class="bg-white p-3 rounded-lg"> <div class="text-gray-500 text-xs uppercase">Processing Time</div>
+ <div class="bg-white p-3 rounded-lg"> <div class="text-sand/60 text-xs uppercase">Processing Time</div>
  <div class="font-medium">{response.metadata?.processing_time}</div> </div>
- <div class="bg-white p-3 rounded-lg"> <div class="text-gray-500 text-xs uppercase">Confidence</div>
+ <div class="bg-white p-3 rounded-lg"> <div class="text-sand/60 text-xs uppercase">Confidence</div>
  <div class="font-medium">{Math.round(response.confidence * 100)}%</div> </div> </div> </div> {/if}
-  <!-- Performance, Info --> <div class="bg-amber-50 border border-amber-200 rounded-lg"> <h4 class="font-medium text-amber-800">Performance Expectations</h4>
+  <!-- Performance, Info --> <div class="bg-warning/5 border border-amber-200 rounded-lg"> <h4 class="font-medium text-warning">Performance Expectations</h4>
  <div class="grid grid-cols-1 md grid-cols-3 gap-4 text-sm"> <div> <strong>Model Loading:</strong>
 <br> First call loads 7.3GB model into VRAM (~60-90s) </div>
  <div> <strong>Inference Speed:</strong>

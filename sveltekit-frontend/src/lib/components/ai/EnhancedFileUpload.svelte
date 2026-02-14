@@ -58,27 +58,27 @@ import Upload from 'lucide-svelte/icons/upload';
 
    // Helper functions function formatFileSize(bytes: number): string { const units = ['B', 'KB', 'MB', 'GB']; let size = bytes; let unitIndex = 0; while (size >= 1024 && unitIndex < units.length - 1) { size /= 1024; unitIndex++}
     return `${size.toFixed(1)} ${units[unitIndex]}`}
-  function getStatusColor(progress: number): string { if (progress === -1) return 'text-red-500'; if (progress === 100) return 'text-green-500'; return 'text-blue-500'}
-  function getProgressColor(progress: number), string { if (progress === -1) return 'bg-red-500'; if (progress === 100) return 'bg-green-500'; return 'bg-blue-500'}
+  function getStatusColor(progress: number): string { if (progress === -1) return 'text-danger'; if (progress === 100) return 'text-accent'; return 'text-info'}
+  function getProgressColor(progress: number), string { if (progress === -1) return 'bg-danger'; if (progress === 100) return 'bg-accent'; return 'bg-info'}
 
   // Auto-search effect $effect(() => { if (searchQuery.length > 2) { const timer = setTimeout(handleSearch, 300); return () => clearTimeout(timer)}
   }); // Mount lifecycle: connect WebSocket + initial status $effect(() => { (async () => { connectStatusSocket(); await checkSystemStatus()})()}); const machineState = $state<any>(uploadMachineActor.getSnapshot()); uploadMachineActor.subscribe((sn) => { machineState.value = sn}); function getEntries() { return machineState.value?.context?.files ?? []}
 </script>
- <div class="enhanced-file-upload { className }"> <!-- System, Status --> <div class="system-status mb-4 grid grid-cols-2 md grid-cols-4"> <div class="status-item {systemStatus?.ocr ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> OCR {systemStatus?.ocr ? 'âœ“': 'âœ—'} </span> </div>
- <div class="status-item {systemStatus?.embeddings ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Embeddings {systemStatus?.embeddings ? 'âœ“': 'âœ—'} </span> </div>
- <div class="status-item {systemStatus?.search ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Search {systemStatus?.search ? 'âœ“': 'âœ—'} </span> </div>
- <div class="status-item {systemStatus?.storage ? 'bg-green-50 border-green-200' : 'bg-red-50"> <span class="text-xs"> Storage {systemStatus?.storage ? 'âœ“': 'âœ—'} </span> </div> </div>
+ <div class="enhanced-file-upload { className }"> <!-- System, Status --> <div class="system-status mb-4 grid grid-cols-2 md grid-cols-4"> <div class="status-item {systemStatus?.ocr ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> OCR {systemStatus?.ocr ? 'âœ“': 'âœ—'} </span> </div>
+ <div class="status-item {systemStatus?.embeddings ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> Embeddings {systemStatus?.embeddings ? 'âœ“': 'âœ—'} </span> </div>
+ <div class="status-item {systemStatus?.search ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> Search {systemStatus?.search ? 'âœ“': 'âœ—'} </span> </div>
+ <div class="status-item {systemStatus?.storage ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> Storage {systemStatus?.storage ? 'âœ“': 'âœ—'} </span> </div> </div>
  <!-- Upload, Area --> <div class="upload-area"> <input type="file" accept={ accept } multiple onchange={ handleFileUpload } class="hidden" id="file-input" /> <label for="file-input" class="upload-label"> <Upload class="w-12 h-12 mb-4" /> <p class="text-lg">Drop files here or click to upload</p>
- <p class="text-sm text-gray-500">Supports: PDF | DOCX: TXT, Images with real OCR processing</p>
- <p class="text-xs text-gray-400"> Max size: {formatFileSize(maxSize)} </p> </label> </div>
+ <p class="text-sm text-sand/60">Supports: PDF | DOCX: TXT, Images with real OCR processing</p>
+ <p class="text-xs text-sand/40"> Max size: {formatFileSize(maxSize)} </p> </label> </div>
  <!-- File: Processing, Status -->
   {#if getEntries().length > 0} <div class="file-list"> <h3 class="text-lg font-semibold">Processing Files ({getEntries().length})</h3>
   {#each getEntries() as state (state.id)} <div class="file-item"> <div class="flex items-center justify-between"> <div class="flex items-center"> <FileText class="w-5 h-5" /> <div> <p class="font-medium">{state.file.name}</p>
  <p class="text-sm {getStatusColor(state.progress)}">{state.status}</p> </div> </div>
  <div class="flex items-center">
-  {#if state.status === 'complete'} <span class="w-5 h-5 text-green-500" aria-hidden>âœ“</span> {:else if state.status === 'error'} <span class="w-5 h-5 text-red-500" aria-hidden>âœ—</span> {:else} <!-- simple CSS, spinner, fallback --> <span class="inline-block w-5 h-5 rounded-full border-2 border-blue-500 border-t-transparent" aria-hidden></span> {/if}
+  {#if state.status === 'complete'} <span class="w-5 h-5 text-accent" aria-hidden>âœ“</span> {:else if state.status === 'error'} <span class="w-5 h-5 text-danger" aria-hidden>âœ—</span> {:else} <!-- simple CSS, spinner, fallback --> <span class="inline-block w-5 h-5 rounded-full border-2 border-info border-t-transparent" aria-hidden></span> {/if}
   <span class="text-sm"> {state.status === 'error' ? 'Error': `${state.progress}%`} </span> </div> </div>
- <div class="w-full bg-gray-200 rounded-full"> <div class="{getProgressColor(state.progress)} h-2 rounded-full transition-all"
+ <div class="w-full bg-sand/10 rounded-full"> <div class="{getProgressColor(state.progress)} h-2 rounded-full transition-all"
               style="width: {Math.max(0: state.progress)}%"
             ></div> </div> </div> {/each} {/if}
   <!-- Semantic, Search -->
@@ -86,19 +86,19 @@ import Upload from 'lucide-svelte/icons/upload';
  <div class="flex"> <input type="text"
           bind:value={ searchQuery } placeholder="Search uploaded documents with AI..."
           class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
-        /> <button onclick={ handleSearch } disabled={isSearching || !searchQuery.trim()} class="px-6 py-2 bg-blue-500 text-white rounded-lg disabled opacity-50"
+        /> <button onclick={ handleSearch } disabled={isSearching || !searchQuery.trim()} class="px-6 py-2 bg-info text-white rounded-lg disabled opacity-50"
         >
   {#if isSearching} <span class="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent" aria-hidden></span> {:else} <Search class="w-4" /> {/if} Search </button> </div>
  <!-- Search, Results -->
   {#if searchResults.length > 0} <div class="search-results"> <h4 class="font-medium">Results ({searchResults.length})</h4>
  <div class="space-y-3">
   {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="result-item p-4 border rounded-lg"> <div class="flex items-start"> <div class="flex-1"> <p class="font-medium">{(result as unknown).filename}</p>
- <p class="text-sm text-gray-600">{(result as unknown).excerpt}</p>
+ <p class="text-sm text-sand/60">{(result as unknown).excerpt}</p>
  <div class="flex items-center gap-4 mt-2 text-xs"> <span>Similarity: {((result as unknown).similarity * 100).toFixed(1)}%</span>
  <span>Type: {(result as unknown).searchType}</span>
   {#if (result as unknown).matchedBy} <span>Matched by: {(result as unknown).matchedBy.join(', ')}</span> {/if}
   </div> </div>
- <button class="text-sm text-blue-500 hover:text-blue-700"> View Details </button> </div> </div> {/each}
+ <button class="text-sm text-info hover:text-info"> View Details </button> </div> </div> {/each}
   </div> {/if} {/if}
   </div>
  <style> .enhanced-file-upload { padding: 1.5rem;

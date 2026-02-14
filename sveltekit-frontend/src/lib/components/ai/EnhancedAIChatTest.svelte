@@ -325,13 +325,13 @@ What would you like to explore today?`,
 	function getStatusColor() {
 		switch (connectionStatus) {
 			case 'checking':
-				return 'text-yellow-500';
+				return 'text-warning';
 			case 'connected':
-				return 'text-green-500';
+				return 'text-accent';
 			case 'error':
-				return 'text-red-500';
+				return 'text-danger';
 			default:
-				return 'text-gray-500';
+				return 'text-sand/60';
 		}
 	}
 </script>
@@ -347,17 +347,17 @@ What would you like to explore today?`,
 	<Dialog.Portal>
 		<Dialog.Overlay class="fixed inset-0 bg-black/50" />
 		<Dialog.Content
-			class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[80vh] z-50 flex flex-col bg-white dark:bg-gray-900 rounded-lg shadow-xl"
+			class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[80vh] z-50 flex flex-col bg-white dark:bg-panel rounded-lg shadow-xl"
 		>
 			<!-- Header -->
-			<div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
+			<div class="flex items-center justify-between p-4 border-b dark:border-sand/20">
 				<div class="flex items-center gap-3">
-					<Bot class="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<Bot class="h-5 w-5 text-info dark:text-info/80" />
 					<Dialog.Title class="text-lg font-semibold dark:text-white">
 						{title}
 					</Dialog.Title>
 					{#if caseId}
-						<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded text-xs font-medium">
+						<span class="px-2 py-1 bg-info/10 dark:bg-info/20 text-info dark:text-info/60 rounded text-xs font-medium">
 							Case {caseId}
 						</span>
 					{/if}
@@ -365,7 +365,7 @@ What would you like to explore today?`,
 
 				<div class="flex items-center gap-2">
 					<!-- Status Indicator -->
-					<div class="flex items-center gap-2 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md">
+					<div class="flex items-center gap-2 px-2 py-1 bg-sand/10 dark:bg-panelSoft rounded-md">
 						{#snippet statusIndicator()}
 							{@const StatusIcon = getStatusIcon()}
 							<StatusIcon class="h-4 w-4 {getStatusColor()}" />
@@ -406,17 +406,17 @@ What would you like to explore today?`,
 					{#each messages as message (message.id)}
 						<div class="flex gap-3 {message.role === 'user' ? 'flex-row-reverse' : ''}">
 							{#if message.role === 'assistant'}
-								<div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-									<Bot class="h-4 w-4 text-blue-600 dark:text-blue-400" />
+								<div class="flex-shrink-0 w-8 h-8 rounded-full bg-info/10 dark:bg-info/20 flex items-center justify-center">
+									<Bot class="h-4 w-4 text-info dark:text-info/80" />
 								</div>
 							{/if}
 
 							<div
 								class="max-w-[80%] rounded-lg p-3 {message.role === 'user'
-									? 'bg-blue-600 text-white'
+									? 'bg-info text-white'
 									: message.error
-										? 'bg-red-100 dark:bg-red-900 text-red-900 dark:text-red-100'
-										: 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'}"
+										? 'bg-danger/10 dark:bg-danger/20 text-danger dark:text-danger/20'
+										: 'bg-sand/10 dark:bg-panelSoft text-sand dark:text-sand/20'}"
 							>
 								<div class="text-sm whitespace-pre-wrap">
 									{message.content}
@@ -446,7 +446,7 @@ What would you like to explore today?`,
 							</div>
 
 							{#if message.role === 'user'}
-								<div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+								<div class="flex-shrink-0 w-8 h-8 rounded-full bg-info flex items-center justify-center">
 									<UserIcon class="h-4 w-4 text-white" />
 								</div>
 							{/if}
@@ -456,7 +456,7 @@ What would you like to explore today?`,
 			</ScrollArea>
 
 			<!-- Input -->
-			<div class="p-4 border-t dark:border-gray-700">
+			<div class="p-4 border-t dark:border-sand/20">
 				<div class="flex gap-2">
 					<input
 						type="text"
@@ -464,7 +464,7 @@ What would you like to explore today?`,
 						bind:value={currentMessage}
 						placeholder={isConnected ? 'Ask your legal question...' : 'Connecting to AI service...'}
 						disabled={!isConnected || isLoading}
-						class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:opacity-50 dark:text-white"
+						class="flex-1 px-4 py-2 bg-sand/10 dark:bg-panelSoft border border-sand/20 dark:border-sand/30 rounded-lg focus:ring-2 focus:ring-info focus:border-transparent outline-none disabled:opacity-50 dark:text-white"
 						onkeydown={handleKeydown}
 					/>
 
@@ -482,14 +482,14 @@ What would you like to explore today?`,
 				</div>
 
 				<div class="flex items-center justify-between mt-2">
-					<div class="text-xs text-gray-600 dark:text-gray-400">
+					<div class="text-xs text-sand/60 dark:text-sand/40">
 						{#if isConnected}
 							🟢 Ready • Gemma3 Legal Enhanced • RTX 3060 Ti GPU
 						{:else}
 							🔴 Checking connection to Ollama service...
 						{/if}
 					</div>
-					<div class="text-xs text-gray-500">Enter to send • Shift+Enter for new line</div>
+					<div class="text-xs text-sand/60">Enter to send • Shift+Enter for new line</div>
 				</div>
 			</div>
 		</Dialog.Content>

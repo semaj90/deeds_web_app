@@ -253,19 +253,19 @@
   }
 </script>
 
-<Card class="w-full h-full bg-slate-950 border-slate-800 flex flex-col">
-  <CardHeader class="pb-2 border-b border-slate-900">
+<Card class="w-full h-full bg-panel border-sand/20 flex flex-col">
+  <CardHeader class="pb-2 border-b border-panel">
     <div class="flex justify-between items-center">
       <div>
-        <CardTitle class="text-lg font-bold text-slate-100">Timeline Analysis</CardTitle>
+        <CardTitle class="text-lg font-bold text-sand/20">Timeline Analysis</CardTitle>
         <CardDescription>Temporal evidence distribution</CardDescription>
       </div>
       <div class="flex items-center gap-2">
          <Badge variant="outline">{visibleEvents.length} Events</Badge>
-         <div class="flex rounded-md bg-slate-900 p-1">
+         <div class="flex rounded-md bg-panel p-1">
             {#each Object.entries(lodConfig) as [level, config]}
                 <button
-                    class="px-2 py-1 text-xs rounded transition-colors {currentLOD === Number(level) ? 'bg-slate-700 text-white' : 'text-slate-500 hover:text-slate-300'}"
+                    class="px-2 py-1 text-xs rounded transition-colors {currentLOD === Number(level) ? 'bg-panelSoft text-white' : 'text-sand/60 hover:text-sand/40'}"
                     onclick={() => { currentLOD = Number(level); updateVisibleEvents(); }}
                 >
                     {config.label}
@@ -277,7 +277,7 @@
   </CardHeader>
 
   <CardContent class="flex-1 p-0 relative min-h-[400px]">
-    <div class="absolute top-4 left-4 z-10 bg-black/50 backdrop-blur rounded px-2 py-1 text-xs text-slate-300">
+    <div class="absolute top-4 left-4 z-10 bg-black/50 backdrop-blur rounded px-2 py-1 text-xs text-sand/40">
         {formatDate(timeRange.start)} - {formatDate(timeRange.end)}
     </div>
 
@@ -295,20 +295,20 @@
     ></canvas>
 
     {#if selectedEvent}
-      <div class="absolute bottom-4 left-4 right-4 bg-slate-900/90 backdrop-blur border border-slate-700 p-4 rounded-lg shadow-xl animate-in fade-in slide-in-from-bottom-4">
+      <div class="absolute bottom-4 left-4 right-4 bg-panel/90 backdrop-blur border border-sand/20 p-4 rounded-lg shadow-xl animate-in fade-in slide-in-from-bottom-4">
         <div class="flex justify-between items-start">
             <div>
                 <div class="flex items-center gap-2 mb-1">
                     <Badge variant="default" class="capitalize">{selectedEvent.type}</Badge>
-                    <span class="text-xs text-slate-400">{selectedEvent.timestamp.toLocaleString()}</span>
+                    <span class="text-xs text-sand/40">{selectedEvent.timestamp.toLocaleString()}</span>
                 </div>
                 <h4 class="text-lg font-semibold text-white">{selectedEvent.title}</h4>
-                <p class="text-slate-400 text-sm mt-1">{selectedEvent.description}</p>
+                <p class="text-sand/40 text-sm mt-1">{selectedEvent.description}</p>
 
                 {#if selectedEvent.participants.length}
                     <div class="flex gap-2 mt-3">
                         {#each selectedEvent.participants as p}
-                           <div class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs" title={p}>
+                           <div class="w-6 h-6 rounded-full bg-panelSoft flex items-center justify-center text-xs" title={p}>
                              {p[0]}
                            </div>
                         {/each}

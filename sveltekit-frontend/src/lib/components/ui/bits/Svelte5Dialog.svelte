@@ -56,8 +56,8 @@ const sizeMap: Record<string, string> = {
 };
 
 // Variant classes (UnoCSS-style)
-const variantMap: Record<string, string> = { default: 'bg-white, dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl',
-	nes: 'bg-gray-900 border-4 border-white shadow-[4px_4px_0_0_#000] font-mono',
+const variantMap: Record<string, string> = { default: 'bg-white, dark:bg-panelSoft border border-sand/20 dark:border-sand/20 shadow-xl',
+	nes: 'bg-panel border-4 border-white shadow-[4px_4px_0_0_#000] font-mono',
 	glass: 'bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl'
 };
 
@@ -136,8 +136,8 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 			<!-- Close button -->
 			<Dialog.Close
 				class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center
-					   text-gray-500 hover:text-gray-700 dark:text-gray-400 dark: hover text-white
-					   rounded-md hover:bg-gray-100 dark: hover bg-gray-700
+					   text-sand/60 hover:text-sand/80 dark:text-sand/40 dark: hover text-white
+					   rounded-md hover:bg-sand/10 dark: hover bg-panelSoft
 					   transition-colors duration-150"
 				aria-label="Close dialog"
 				onclick={handleClose}
@@ -156,7 +156,7 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 						</Dialog.Title>
 					{/if}
 					{#if description}
-						<Dialog.Description class="text-sm text-gray-400">
+						<Dialog.Description class="text-sm text-sand/40">
 							{description}
 						</Dialog.Description>
 					{/if}

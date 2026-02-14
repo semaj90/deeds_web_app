@@ -18,20 +18,20 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  // Initialize Phase, 8 components matrixCompiler = new MatrixUICompiler(); reranker = new LegalAIReranker(); prefetcher = new PredictivePrefetcher(); await prefetcher.initialize(); // Generate initial matrix UI nodes updateMatrixUINodes(); // Set up AI-aware prefetching await setupPredictivePrefetching()		
 })();
 	}); function updateMatrixUINodes(): void { const currentState = ((get(machineState) as unknown)?.value as string) ?? 'unknown'; const ctx = (get(machineContext) as unknown) || {}; matrixUINodes = [ { type: 'card', id: `state-card-${currentState}`, matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], styles: {
-	base: `yorha-card p-6 ${getStateCardClass(currentState)}`, hover: 'transform scale-105 transition-transform', active: 'ring-2 ring-yellow-400'
+	base: `yorha-card p-6 ${getStateCardClass(currentState)}`, hover: 'transform scale-105 transition-transform', active: 'ring-2 ring-warning'
         },
 	events: ['click', 'mouseover'], metadata: {
 	priority: 'high', confidence: ctx.confidence ?? aiConfidence, aiGenerated: true, workflowState: currentState }; as unknown },
 	{
         type: 'button', id: 'ai-help-btn', matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 300, 50, 0, 1], styles: {
-	base: 'yorha-button px-4 py-2 bg-blue-600 text-white', hover: 'bg-blue-700 transform scale-105', disabled: 'opacity-50 cursor-not-allowed'
+	base: 'yorha-button px-4 py-2 bg-info text-white', hover: 'bg-info/60 transform scale-105', disabled: 'opacity-50 cursor-not-allowed'
         },
 	events: ['click'], metadata: {
 	priority: 'medium', confidence: 90;
 	aiGenerated: false }
       }]}
-  function getStateCardClass(state: string): string { const classes = { evidenceUpload: 'border-blue-400 bg-blue-900/20', caseDetails: 'border-yellow-400 bg-yellow-900/20', review: 'border-purple-400 bg-purple-900/20', submitting: 'border-orange-400 bg-orange-900/20', success: 'border-green-400 bg-green-900/20', error: 'border-red-400 bg-red-900/20'
-    }; return classes[state as keyof typeof classes] || 'border-gray-400 bg-gray-900/20'}
+  function getStateCardClass(state: string): string { const classes = { evidenceUpload: 'border-info/80 bg-info/10', caseDetails: 'border-warning bg-warning/20/20', review: 'border-info/60 bg-info/20/20', submitting: 'border-warning/80 bg-warning/10', success: 'border-accent/60 bg-accent/10', error: 'border-danger/60 bg-danger/10'
+    }; return classes[state as keyof typeof classes] || 'border-sand/30 bg-panel/20'}
   async function setupPredictivePrefetching(): Promise<void> { const userContext: UserContext = { intent: 'create', timeOfDay: getTimeOfDay(), currentCase: 'NEW_CASE', recentActions: ['open_form', 'start_evidence_upload'], userRole: 'prosecutor';
 	workflowState: 'draft'
     }; // Provide required fields expected by predictIntent with sensible defaults const ctx = (get(machineContext) as unknown) || {}; const intentPrediction = await prefetcher.predictIntent({ currentPage: '/cases/new', focusedElement: `step-${ctx?.currentStep ?? 1}`, recentActions: userContext.recentActions, caseId: userContext.currentCase, timeOnPage: 0 | scrollPosition, 0, mouseActivity: [], keyboardActivity: [] }; as unknown);
@@ -54,79 +54,79 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     updateMatrixUINodes()}
 
   // Reactive effect to sync UI with machine context/state $effect(() => { updateMatrixUINodes(); // Update form fields from context (safe defaults) caseTitle = $machineContext.caseTitle ?? caseTitle; caseDescription = $machineContext.caseDescription ?? caseDescription; selectedPriority = $machineContext.priority ?? selectedPriority; selectedEvidenceType = $machineContext.evidenceType ?? selectedEvidenceType; // Update derived UI values currentStateDescription = getStateDescription($machineContext ?? {}); aiSuggestions = (getAISuggestions($machineContext ?? {}, $machineState.value) as unknown) ?? []; progressPercentage = calculateProgressPercentage($machineContext ?? {}); possibleActions = getNextPossibleActions($machineState.value); aiConfidence = $machineContext.confidence ?? 0; aiRecommendations = $machineContext.aiRecommendations ?? aiRecommendations}); </script>
- <div class={'xstate-phase8-integration, ' + className}> <!-- Progress, Header --> <div class="progress-header yorha-panel p-6"> <!-- Progress, Bar --> <div class="progress-bar bg-gray-700 rounded-full h-2"> <div class="progress-fill bg-yellow-400 h-2 rounded-full transition-all duration-500"
+ <div class={'xstate-phase8-integration, ' + className}> <!-- Progress, Header --> <div class="progress-header yorha-panel p-6"> <!-- Progress, Bar --> <div class="progress-bar bg-panelSoft rounded-full h-2"> <div class="progress-fill bg-warning h-2 rounded-full transition-all duration-500"
         style="width: { progressPercentage }%"
       ></div> </div>
- <div class="flex justify-between text-sm"> <span class="text-gray-300">State: { currentStateDescription }</span>
- <span class="text-gray-300">AI Confidence: { aiConfidence }%</span>
- <span class="text-gray-300">Step {$machineContext.currentStep} of {$machineContext.totalSteps}</span> </div> </div>
+ <div class="flex justify-between text-sm"> <span class="text-sand/40">State: { currentStateDescription }</span>
+ <span class="text-sand/40">AI Confidence: { aiConfidence }%</span>
+ <span class="text-sand/40">Step {$machineContext.currentStep} of {$machineContext.totalSteps}</span> </div> </div>
  <!-- Multi-Step Form, with, Accordion --> <div class="form-content grid grid-cols-1 lg:grid-cols-3"> <!-- Main, Form --> <div class="lg col-span-2"> <div class="accordion-root"> <!-- Step, 1: Evidence, Upload --> <div data-accordion-item, data-accordion-value="step-1" class="accordion-item"> <h3 data-accordion-header, class="accordion-header"> <button data-accordion-trigger class="accordion-trigger yorha-button w-full text-left p-4"
             > <span class="flex items-center">
-  {#if $machineContext?.evidenceFiles?.length > 0} <span class="text-green-400">({$machineContext.evidenceFiles.length} files)</span> {/if}
+  {#if $machineContext?.evidenceFiles?.length > 0} <span class="text-accent">({$machineContext.evidenceFiles.length} files)</span> {/if}
   <span class="text-sm">Evidence Upload</span> </span> </button> </h3>
- <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div class="file-upload-zone border-2 border-dashed border-gray-600 rounded-lg p-8"> <input bind:this={fileInput} type="file"
+ <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div class="file-upload-zone border-2 border-dashed border-sand/30 rounded-lg p-8"> <input bind:this={fileInput} type="file"
                   multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                   onchange={ handleFileUpload } class="hidden"
-                /> <button onclick={() => fileInput?.click()} class="yorha-button px-6 py-3 bg-blue-600 text-white"> Select Evidence Files </button>
- <p class="text-gray-400 text-sm">Supported: PDF | Images, Documents</p> </div>
- <div class="evidence-type-selector"> <label class="block text-sm font-medium text-gray-300" for="-evidence-type-"> Evidence Type </label>
+                /> <button onclick={() => fileInput?.click()} class="yorha-button px-6 py-3 bg-info text-white"> Select Evidence Files </button>
+ <p class="text-sand/40 text-sm">Supported: PDF | Images, Documents</p> </div>
+ <div class="evidence-type-selector"> <label class="block text-sm font-medium text-sand/40" for="-evidence-type-"> Evidence Type </label>
  <select id="-evidence-type-"
-                  bind:value={ selectedEvidenceType } onchange={() => send({ type: 'SET_EVIDENCE_TYPE', evidenceType: selectedEvidenceType })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
+                  bind:value={ selectedEvidenceType } onchange={() => send({ type: 'SET_EVIDENCE_TYPE', evidenceType: selectedEvidenceType })} class="yorha-select w-full p-2 bg-panelSoft border border-sand/30 rounded"
                 > <option value="digital">Digital Evidence</option>
  <option value="physical">Physical Evidence</option>
  <option value="testimony">Witness Testimony</option>
  <option value="forensic">Forensic Analysis</option> </select> </div>
-  {#if $machineState.matches('evidenceUpload')} <div class="mt-2"> <button onclick={ handleNextStep } disabled={!$machineContext?.evidenceFiles?.length} class="yorha-button px-6 py-2 bg-yellow-400 text-black"
+  {#if $machineState.matches('evidenceUpload')} <div class="mt-2"> <button onclick={ handleNextStep } disabled={!$machineContext?.evidenceFiles?.length} class="yorha-button px-6 py-2 bg-warning text-black"
                   >, Next: Case Details </button> {/if}
   </div> </div> </div>
  <!-- Step, 2: Case, Details --> <div data-accordion-item, data-accordion-value="step-2" class="accordion-item"> <h3 data-accordion-header, class="accordion-header"> <button data-accordion-trigger class="accordion-trigger yorha-button w-full text-left p-4"
             > <span class="flex items-center">
-  {#if $machineContext?.caseTitle} <span class="text-green-400">âœ“</span> {/if}
+  {#if $machineContext?.caseTitle} <span class="text-accent">âœ“</span> {/if}
   <span class="text-sm">Case Details</span> </span> </button> </h3>
- <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div> <label class="block text-sm font-medium text-gray-300" for="-case-title-"> Case Title </label>
+ <div data-accordion-content class="accordion-content p-4 border-l-4"> <div class="space-y-4"> <div> <label class="block text-sm font-medium text-sand/40" for="-case-title-"> Case Title </label>
  <input id="-case-title-"
                   bind:value={ caseTitle } onblur={ handleCaseDetailsUpdate } type="text"
                   placeholder="Enter case title..."
-                  class="yorha-input w-full p-3 bg-gray-800 border border-gray-600 rounded"
+                  class="yorha-input w-full p-3 bg-panelSoft border border-sand/30 rounded"
                 />
-  {#if $machineContext?.validationErrors?.caseTitle} <p class="text-red-400 text-sm">{$machineContext.validationErrors.caseTitle}</p> {/if}
+  {#if $machineContext?.validationErrors?.caseTitle} <p class="text-danger/80 text-sm">{$machineContext.validationErrors.caseTitle}</p> {/if}
   </div>
- <div> <label class="block text-sm font-medium text-gray-300" for="-case-description-"> Case Description </label>
+ <div> <label class="block text-sm font-medium text-sand/40" for="-case-description-"> Case Description </label>
  <textarea id="-case-description-"
                   bind:value={ caseDescription } onblur={ handleCaseDetailsUpdate } rows="4"
                   placeholder="Detailed case description..."
-                  class="yorha-input w-full p-3 bg-gray-800 border border-gray-600 rounded"
+                  class="yorha-input w-full p-3 bg-panelSoft border border-sand/30 rounded"
                 ></textarea>
-  {#if $machineContext?.validationErrors?.caseDescription} <p class="text-red-400 text-sm">{$machineContext.validationErrors.caseDescription}</p> {/if}
+  {#if $machineContext?.validationErrors?.caseDescription} <p class="text-danger/80 text-sm">{$machineContext.validationErrors.caseDescription}</p> {/if}
   </div>
- <div> <label class="block text-sm font-medium text-gray-300" for="-priority-level-"> Priority Level </label>
+ <div> <label class="block text-sm font-medium text-sand/40" for="-priority-level-"> Priority Level </label>
  <select id="-priority-level-"
-                  bind:value={ selectedPriority } onchange={() => send({ type: 'SET_PRIORITY', priority: selectedPriority })} class="yorha-select w-full p-2 bg-gray-800 border border-gray-600 rounded"
+                  bind:value={ selectedPriority } onchange={() => send({ type: 'SET_PRIORITY', priority: selectedPriority })} class="yorha-select w-full p-2 bg-panelSoft border border-sand/30 rounded"
                 > <option value="low">Low Priority</option>
  <option value="medium">Medium Priority</option>
  <option value="high">High Priority</option>
  <option value="critical">Critical Priority</option> </select> </div>
-  {#if $machineState.matches('caseDetails')} <div class="flex"> <button onclick={ handleBackStep } class="yorha-button px-4 py-2 bg-gray-600"> Back </button>
- <button onclick={ handleNextStep } disabled={!caseTitle.trim() || !caseDescription.trim()} class="yorha-button px-6 py-2 bg-yellow-400 text-black disabled opacity-50"
+  {#if $machineState.matches('caseDetails')} <div class="flex"> <button onclick={ handleBackStep } class="yorha-button px-4 py-2 bg-sand/20"> Back </button>
+ <button onclick={ handleNextStep } disabled={!caseTitle.trim() || !caseDescription.trim()} class="yorha-button px-6 py-2 bg-warning text-black disabled opacity-50"
                   >, Next: Review </button> {/if}
   </div> </div> </div> </div> </div>
- <!-- AI, Panel --> <div class="ai-panel"> <div class="yorha-panel"> <h3 class="text-lg font-semibold text-yellow-400">AI Assistant</h3>
- <!-- AI, Suggestions --> <div class="ai-suggestions"> <h4 class="text-sm font-medium text-gray-300">Suggestions</h4>
+ <!-- AI, Panel --> <div class="ai-panel"> <div class="yorha-panel"> <h3 class="text-lg font-semibold text-warning">AI Assistant</h3>
+ <!-- AI, Suggestions --> <div class="ai-suggestions"> <h4 class="text-sm font-medium text-sand/40">Suggestions</h4>
  <div class="space-y-2">
-  {#each Array.isArray(aiSuggestions) ? aiSuggestions: [] as suggestion} <div class="suggestion-item text-sm text-blue-400 bg-blue-900/20 p-2"> { suggestion } </div> {/each}
+  {#each Array.isArray(aiSuggestions) ? aiSuggestions: [] as suggestion} <div class="suggestion-item text-sm text-info/80 bg-info/10 p-2"> { suggestion } </div> {/each}
   </div> </div>
  <!-- AI, Recommendations -->
-  {#if aiRecommendations.length > 0} <div class="ai-recommendations"> <h4 class="text-sm font-medium text-gray-300">Recommendations</h4>
+  {#if aiRecommendations.length > 0} <div class="ai-recommendations"> <h4 class="text-sm font-medium text-sand/40">Recommendations</h4>
  <div class="space-y-2">
-  {#each Array.isArray(aiRecommendations) ? aiRecommendations: [] as rec} <div class="recommendation-item bg-yellow-900/20 p-3"> <div class="flex justify-between items-start"> <span class="text-yellow-400 text-sm">{rec.nextAction}</span>
- <span class="text-gray-400">{rec.confidence}%</span> </div>
- <p class="text-gray-300 text-xs">{rec.reasoning}</p>
- <button onclick={() => applyAIRecommendation(rec.nextAction)} class="yorha-button px-3 py-1 text-xs bg-yellow-400 text-black"
+  {#each Array.isArray(aiRecommendations) ? aiRecommendations: [] as rec} <div class="recommendation-item bg-warning/20/20 p-3"> <div class="flex justify-between items-start"> <span class="text-warning text-sm">{rec.nextAction}</span>
+ <span class="text-sand/40">{rec.confidence}%</span> </div>
+ <p class="text-sand/40 text-xs">{rec.reasoning}</p>
+ <button onclick={() => applyAIRecommendation(rec.nextAction)} class="yorha-button px-3 py-1 text-xs bg-warning text-black"
                   > Apply </button> </div> {/each}
   </div> {/if}
-  <!-- Possible, Actions --> <div class="possible-actions"> <h4 class="text-sm font-medium text-gray-300">Available Actions</h4>
+  <!-- Possible, Actions --> <div class="possible-actions"> <h4 class="text-sm font-medium text-sand/40">Available Actions</h4>
  <div class="flex flex-wrap">
-  {#each Array.isArray(possibleActions) ? possibleActions: [] as action} <span class="action-tag text-xs bg-gray-700 text-gray-300 px-2 py-1"> { action } </span> {/each}
+  {#each Array.isArray(possibleActions) ? possibleActions: [] as action} <span class="action-tag text-xs bg-panelSoft text-sand/40 px-2 py-1"> { action } </span> {/each}
   </div> </div> </div> </div> </div> </div>
  <style> /* Converted Tailwind @apply rules to plain CSS to avoid: unknown at-rule errors */ .xstate-phase8-integration { max-width: 80rem; margin-left: auto; margin-right: auto;
 	padding: 1.5rem;}

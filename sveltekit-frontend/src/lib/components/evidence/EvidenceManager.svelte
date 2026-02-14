@@ -297,12 +297,12 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
             multiple class="hidden"
             onchange={(e: Event) => { const target = e.target as HTMLInputElement; if (target?.files) handleFileUpload(target.files); }} /> <div class="text-center"> <div class="text-4xl">ðŸ“Ž</div>
  <p class="text-lg">Drop files here or click to browse</p>
- <p class="text-sm text-gray-600">Supports PDFs, images, documents, and more</p>
+ <p class="text-sm text-sand/60">Supports PDFs, images, documents, and more</p>
  <Button 
               onclick={() => fileInput?.click()} disabled={loading.upload} >
               {loading.upload ? 'Uploading...': 'Select Files'}
 </Button> </div> </div>
-  {#if uploadProgress} <div class="mt-4 p-3 bg-blue-50 rounded border"> <p class="text-blue-700">{ uploadProgress }
+  {#if uploadProgress} <div class="mt-4 p-3 bg-info/5 rounded border"> <p class="text-info">{ uploadProgress }
 </p> {/if}
   </div> {/if}
   <!-- Search, Section -->
@@ -318,10 +318,10 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
  <Button  onclick={() => { showSearchResults = false; searchResults = []}} variant="ghost"
                 class="text-sm"
               > Clear Results </Button> </div>
-  {#if searchResults.length === 0} <p class="text-gray-600">No similar evidence found.</p> {:else} <div class="space-y-3">
-  {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="search-result-item p-4 border rounded-lg bg-gray-50 hover:bg-gray-100"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{result.title}
+  {#if searchResults.length === 0} <p class="text-sand/60">No similar evidence found.</p> {:else} <div class="space-y-3">
+  {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="search-result-item p-4 border rounded-lg bg-sand/5 hover:bg-sand/10"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{result.title}
 </h5>
-  {#if result.description} <p class="text-sm text-gray-600">{result.description}
+  {#if result.description} <p class="text-sm text-sand/60">{result.description}
 </p> {/if}
   <div class="flex gap-4 mt-2 text-xs"> <span>ðŸ“ {result.evidence_type}
 </span>
@@ -340,14 +340,14 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
         > {loading.files ? 'Loading...': 'ðŸ”„ Refresh'}
 </Button> </div> </div>
  <div class="yorha-panel-content">
-  {#if loading.files} <div class="text-center"> <div class="animate-spin h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
- <p class="text-gray-600">Loading evidence files...</p> </div> {:else if evidenceFiles.length === 0} <div class="text-center"> <div class="text-4xl">ðŸ“‚</div>
- <p class="text-gray-600">No evidence files uploaded yet.</p>
-  {#if showUpload} <p class="text-sm text-gray-500">Use the upload section above to add files.</p> {/if}
+  {#if loading.files} <div class="text-center"> <div class="animate-spin h-8 w-8 border-2 border-info border-t-transparent rounded-full mx-auto"></div>
+ <p class="text-sand/60">Loading evidence files...</p> </div> {:else if evidenceFiles.length === 0} <div class="text-center"> <div class="text-4xl">ðŸ“‚</div>
+ <p class="text-sand/60">No evidence files uploaded yet.</p>
+  {#if showUpload} <p class="text-sm text-sand/60">Use the upload section above to add files.</p> {/if}
   </div> {:else} <div class="space-y-3">
-  {#each Array.isArray(evidenceFiles) ? evidenceFiles: [] as file} <div class="evidence-file-item p-4 border rounded-lg hover:bg-gray-50"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{file.title}
+  {#each Array.isArray(evidenceFiles) ? evidenceFiles: [] as file} <div class="evidence-file-item p-4 border rounded-lg hover:bg-sand/5"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{file.title}
 </h5>
-  {#if file.description} <p class="text-sm text-gray-600">{file.description}
+  {#if file.description} <p class="text-sm text-sand/60">{file.description}
 </p> {/if}
   <div class="flex gap-4 mt-2 text-xs"> <span>ðŸ“ {file.evidence_type}
 </span>
@@ -360,7 +360,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
   {#if file.case_id} <span>ðŸ—‚ï¸ case {file.case_id.substring(0, 8)}...</span> {/if}
   </div> </div>
  <div class="text-right"> <div class="embedding-status">
-  {#if file.hasEmbedding} <span class="text-green-600">âœ… Embedded</span> {:else} <span class="text-orange-600">â³ Pending</span> {/if}
+  {#if file.hasEmbedding} <span class="text-accent">âœ… Embedded</span> {:else} <span class="text-warning">â³ Pending</span> {/if}
   </div> </div> </div> </div> {/each} {/if}
   </div> </div>
  <!-- Error, Display -->

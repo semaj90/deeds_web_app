@@ -49,20 +49,20 @@ function generateRecommendations() {
 
 	function getPriorityColor(priority: string) {
 		switch (priority) {
-			case 'high': return 'text-red-400 border-red-400/30';
-			case 'medium': return 'text-yellow-400 border-yellow-400/30';
-			case 'low': return 'text-green-400 border-green-400/30';
-			default:return 'text-gray-400 border-gray-400/30';
+			case 'high': return 'text-danger/80 border-danger/60/30';
+			case 'medium': return 'text-warning border-warning/30';
+			case 'low': return 'text-accent border-accent/60/30';
+			default:return 'text-sand/40 border-sand/30/30';
 		}
 	}
 
 	function getTypeColor(type: string) {
 		switch (type) {
-			case 'strategy': return 'text-blue-400';
-			case 'admissibility': return 'text-green-400';
-			case 'discovery': return 'text-purple-400';
-			case 'precedent': return 'text-orange-400';
-			default:return 'text-gray-400';
+			case 'strategy': return 'text-info/80';
+			case 'admissibility': return 'text-accent';
+			case 'discovery': return 'text-info/80';
+			case 'precedent': return 'text-warning';
+			default:return 'text-sand/40';
 		}
 	}
 </script>

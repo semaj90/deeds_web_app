@@ -23,7 +23,7 @@
 
 	const variantClasses: Record<Variant, string> = {
 		default: 'bg-harvard-crimson text-white hover:bg-harvard-crimson/90',
-		destructive: 'bg-red-500 text-white hover:bg-red-500/90',
+		destructive: 'bg-danger text-white hover:bg-danger/90',
 		outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
 		secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 		ghost: 'hover:bg-accent hover:text-accent-foreground',

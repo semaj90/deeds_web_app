@@ -148,7 +148,7 @@ email: formData.get('email') as string,
 
   function calculatePasswordStrength(password: string): { score: number, feedback: string;
 	color: string } {
-    if (!password) return { score: 0, feedback: 'Enter a password', color: 'text-gray-400' };
+    if (!password) return { score: 0, feedback: 'Enter a password', color: 'text-sand/40' };
 
     let score = 0;
     if (password.length >= 12) score += 2;
@@ -159,10 +159,10 @@ email: formData.get('email') as string,
     if (/[@$!%*?&]/.test(password)) score += 1;
     if (password.length >= 20) score += 1;
 
-    if (score < 3) return { score, feedback: 'Weak', color: 'text-red-500' };
-    if (score < 5) return { score, feedback: 'Fair', color: 'text-yellow-500' };
-    if (score < 7) return { score, feedback: 'Good', color: 'text-blue-500' };
-    return { score, feedback: 'Excellent', color: 'text-green-500' };
+    if (score < 3) return { score, feedback: 'Weak', color: 'text-danger' };
+    if (score < 5) return { score, feedback: 'Fair', color: 'text-warning' };
+    if (score < 7) return { score, feedback: 'Good', color: 'text-info' };
+    return { score, feedback: 'Excellent', color: 'text-accent' };
   }
 </script>
 
@@ -176,12 +176,12 @@ email: formData.get('email') as string,
       <UserPlus class="h-5 w-5" />
       Create Account
     </h2>
-    <p class="text-gray-600 mt-2">Register as a legal professional to access the AI-powered legal system</p>
+    <p class="text-sand/60 mt-2">Register as a legal professional to access the AI-powered legal system</p>
   </header>
 
   <section class="bg-white rounded-lg shadow-md p-6">
     {#if enableGPUValidation && gpuValidationStatus !== 'idle'}
-      <div class="mb-4 p-3 rounded bg-blue-50 border border-blue-200" role="status" aria-live="polite">
+      <div class="mb-4 p-3 rounded bg-info/5 border border-info/20" role="status" aria-live="polite">
         <div class="flex items-center gap-2 font-mono text-sm">
           <Zap class="h-4 w-4" />
           <strong>AI-Enhanced Validation</strong>
@@ -201,22 +201,22 @@ email: formData.get('email') as string,
     {/if}
 
     {#if errorMessage}
-      <div class="mb-4 p-3 rounded bg-red-50 border border-red-200" role="alert">
-        <div class="flex items-center gap-2 text-red-700">
+      <div class="mb-4 p-3 rounded bg-danger/5 border border-danger/20" role="alert">
+        <div class="flex items-center gap-2 text-danger">
           <AlertCircle class="h-4 w-4" />
           <strong>Error</strong>
         </div>
-        <p class="mt-1 text-sm text-red-600">{errorMessage}</p>
+        <p class="mt-1 text-sm text-danger">{errorMessage}</p>
       </div>
     {/if}
 
     {#if successMessage}
-      <div class="mb-4 p-3 rounded bg-green-50 border border-green-200" role="status" aria-live="polite">
-        <div class="flex items-center gap-2 text-green-700">
+      <div class="mb-4 p-3 rounded bg-accent/5 border border-accent/20" role="status" aria-live="polite">
+        <div class="flex items-center gap-2 text-accent">
           <Shield class="h-4 w-4" />
           <strong>Success</strong>
         </div>
-        <p class="mt-1 text-sm text-green-600">{successMessage}</p>
+        <p class="mt-1 text-sm text-accent">{successMessage}</p>
       </div>
     {/if}
 
@@ -234,9 +234,9 @@ email: formData.get('email') as string,
             placeholder="John"
             bind:value={$form.firstName}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-info"
           />
-          {#if getErr('firstName')}<p class="text-red-500 text-xs mt-1">{getErr('firstName')}</p>{/if}
+          {#if getErr('firstName')}<p class="text-danger text-xs mt-1">{getErr('firstName')}</p>{/if}
         </div>
 
         <div class="field">
@@ -248,9 +248,9 @@ email: formData.get('email') as string,
             placeholder="Smith"
             bind:value={$form.lastName}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-info"
           />
-          {#if getErr('lastName')}<p class="text-red-500 text-xs mt-1">{getErr('lastName')}</p>{/if}
+          {#if getErr('lastName')}<p class="text-danger text-xs mt-1">{getErr('lastName')}</p>{/if}
         </div>
       </div>
 
@@ -264,9 +264,9 @@ email: formData.get('email') as string,
           placeholder="john.smith@prosecutor.gov"
           bind:value={$form.email}
           disabled={isLoading}
-          class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-info"
         />
-        {#if getErr('email')}<p class="text-red-500 text-xs mt-1">{getErr('email')}</p>{/if}
+        {#if getErr('email')}<p class="text-danger text-xs mt-1">{getErr('email')}</p>{/if}
       </div>
 
       <!-- Professional Information -->
@@ -278,14 +278,14 @@ email: formData.get('email') as string,
             name="role"
             bind:value={$form.role}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-info"
           >
             <option value="" disabled selected>Select role</option>
             {#each roleOptions as option}
               <option value={option.value}>{option.label}</option>
             {/each}
           </select>
-          {#if getErr('role')}<p class="text-red-500 text-xs mt-1">{getErr('role')}</p>{/if}
+          {#if getErr('role')}<p class="text-danger text-xs mt-1">{getErr('role')}</p>{/if}
         </div>
 
         <div class="field">
@@ -297,7 +297,7 @@ email: formData.get('email') as string,
             placeholder="12345"
             bind:value={$form.badgeNumber}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-info"
           />
         </div>
       </div>
@@ -313,9 +313,9 @@ email: formData.get('email') as string,
             placeholder="District Attorney's Office"
             bind:value={$form.department}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-info"
           />
-          {#if getErr('department')}<p class="text-red-500 text-xs mt-1">{getErr('department')}</p>{/if}
+          {#if getErr('department')}<p class="text-danger text-xs mt-1">{getErr('department')}</p>{/if}
         </div>
 
         <div class="field">
@@ -327,9 +327,9 @@ email: formData.get('email') as string,
             placeholder="Los Angeles County"
             bind:value={$form.jurisdiction}
             disabled={isLoading}
-            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-info"
           />
-          {#if getErr('jurisdiction')}<p class="text-red-500 text-xs mt-1">{getErr('jurisdiction')}</p>{/if}
+          {#if getErr('jurisdiction')}<p class="text-danger text-xs mt-1">{getErr('jurisdiction')}</p>{/if}
         </div>
       </div>
 
@@ -345,11 +345,11 @@ email: formData.get('email') as string,
               placeholder="Enter secure password"
               bind:value={$form.password}
               disabled={isLoading}
-              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-info"
             />
             <button
               type="button"
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+              class="absolute right-2 top-1/2 -translate-y-1/2 text-sand/60"
               onclick={togglePasswordVisibility}
               disabled={isLoading}
               aria-label="Toggle password visibility"
@@ -363,7 +363,7 @@ email: formData.get('email') as string,
           </div>
           {#if $form.password}
             <div class="mt-2 flex items-center gap-2">
-              <div class="h-2 flex-1 bg-gray-200 rounded">
+              <div class="h-2 flex-1 bg-sand/10 rounded">
                 <div
                   class="h-full rounded transition-all duration-300 {passwordStrength.color.replace('text-', 'bg-')}"
                   style="width: {Math.min(100, (passwordStrength.score / 8) * 100)}%"
@@ -372,7 +372,7 @@ email: formData.get('email') as string,
               <span class="text-sm {passwordStrength.color}">{passwordStrength.feedback}</span>
             </div>
           {/if}
-          {#if getErr('password')}<p class="text-red-500 text-xs mt-1">{getErr('password')}</p>{/if}
+          {#if getErr('password')}<p class="text-danger text-xs mt-1">{getErr('password')}</p>{/if}
         </div>
 
         <div class="field">
@@ -385,11 +385,11 @@ email: formData.get('email') as string,
               placeholder="Confirm your password"
               bind:value={$form.confirmPassword}
               disabled={isLoading}
-              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-info"
             />
             <button
               type="button"
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+              class="absolute right-2 top-1/2 -translate-y-1/2 text-sand/60"
               onclick={toggleConfirmPasswordVisibility}
               disabled={isLoading}
               aria-label="Toggle confirm password visibility"
@@ -401,7 +401,7 @@ email: formData.get('email') as string,
               {/if}
             </button>
           </div>
-          {#if getErr('confirmPassword')}<p class="text-red-500 text-xs mt-1">{getErr('confirmPassword')}</p>{/if}
+          {#if getErr('confirmPassword')}<p class="text-danger text-xs mt-1">{getErr('confirmPassword')}</p>{/if}
         </div>
       </div>
 
@@ -417,19 +417,19 @@ email: formData.get('email') as string,
       <div class="space-y-3">
         <label class="flex items-center space-x-2">
           <Checkbox id="agreeToTerms" name="agreeToTerms" bind:checked={$form.agreeToTerms} disabled={isLoading} class="" />
-          <span class="text-sm">I agree to the <a href="/legal/terms" class="text-blue-600 hover:underline">Terms of Service</a></span>
+          <span class="text-sm">I agree to the <a href="/legal/terms" class="text-info hover:underline">Terms of Service</a></span>
         </label>
 
         <label class="flex items-center space-x-2">
           <Checkbox id="agreeToPrivacy" name="agreeToPrivacy" bind:checked={$form.agreeToPrivacy} disabled={isLoading} class="" />
-          <span class="text-sm">I agree to the <a href="/legal/privacy" class="text-blue-600 hover:underline">Privacy Policy</a></span>
+          <span class="text-sm">I agree to the <a href="/legal/privacy" class="text-info hover:underline">Privacy Policy</a></span>
         </label>
       </div>
 
       <!-- Submit Button -->
       <button
         type="submit"
-        class="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        class="w-full py-3 px-4 bg-info text-white font-medium rounded-md hover:bg-info/60 disabled:bg-sand/20 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         disabled={isLoading || $submitting}
       >
         {#if isLoading || $submitting}
@@ -444,9 +444,9 @@ email: formData.get('email') as string,
 
     {#if showLogin}
       <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-sand/60">
           Already have an account?
-          <a href="/auth/login" class="text-blue-600 hover:underline">Sign in here</a>
+          <a href="/auth/login" class="text-info hover:underline">Sign in here</a>
         </p>
       </div>
     {/if}

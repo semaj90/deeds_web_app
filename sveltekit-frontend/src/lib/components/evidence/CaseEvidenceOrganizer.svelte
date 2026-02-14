@@ -217,7 +217,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   {#each Array.isArray(evidence.chain_of_custody || []) ? evidence.chain_of_custody ?? []: [] as entry} <div class="custody-entry"> <span class="custody-action">{entry.action}</span>
  <span class="custody-time"> {new Date(entry.timestamp).toLocaleString()} </span> </div> {/each}
   </div> </button> {/each}
-  </div> </div> {/each} {/if} {#if !organizationStructure && !isLoading} <div class="text-center text-gray-500">No organization structure available. Select a mode to begin.{/if}
+  </div> </div> {/each} {/if} {#if !organizationStructure && !isLoading} <div class="text-center text-sand/60">No organization structure available. Select a mode to begin.{/if}
   </main> </div>
  <style> /* @unocss-include */ .case-evidence-organizer { display: flex; flex-direction: column;
 	height: 100vh;background: #f8fafc; font-family: system-ui, -apple-system, sans-serif;}

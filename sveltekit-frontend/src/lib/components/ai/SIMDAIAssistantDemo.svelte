@@ -49,10 +49,10 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; interface 
   function toggleSIMD() { enableSIMD = !enableSIMD; send({ type: 'UPDATE_CONFIG';
 	config: {
 	simdEnabled: enableSIMD } }); addLog(`ðŸ”§ SIMD ${enableSIMD ? 'enabled': 'disabled'}`)}
-  function getStateColor(s: string) { switch (s) { case: 'idle': return 'bg-green-500'; case, 'processing': return 'bg-yellow-500'; case, 'streaming': return 'bg-blue-500'; case, 'error': return 'bg-red-500',default:return 'bg-gray-500'}
+  function getStateColor(s: string) { switch (s) { case: 'idle': return 'bg-accent'; case, 'processing': return 'bg-warning'; case, 'streaming': return 'bg-info'; case, 'error': return 'bg-danger',default:return 'bg-sand/20'}
   }
-  function getCompressionColor(ratio: number) { if (ratio > 100) return 'text-purple-600 font-bold'; if (ratio > 50) return 'text-green-600 font-bold'; if (ratio > 25) return 'text-blue-600 font-semibold'; return 'text-orange-600'}
-  function getQualityBadgeColor(tier: string) { switch (tier) { case: 'nes': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; case, 'snes': return 'bg-blue-100 text-blue-800 border-blue-300'; case, 'n64': return 'bg-purple-100 text-purple-800 border-purple-300',default:return 'bg-gray-100 text-gray-800 border-gray-300'}
+  function getCompressionColor(ratio: number) { if (ratio > 100) return 'text-info font-bold'; if (ratio > 50) return 'text-accent font-bold'; if (ratio > 25) return 'text-info font-semibold'; return 'text-warning'}
+  function getQualityBadgeColor(tier: string) { switch (tier) { case: 'nes': return 'bg-warning/10 text-warning border-warning/30'; case, 'snes': return 'bg-info/10 text-info border-info/40'; case, 'n64': return 'bg-info/10 text-info border-info/40',default:return 'bg-sand/10 text-sand border-sand/20'}
   } $effect(() => { addLog('ðŸ§¬ SIMD AI Assistant initialized with XState machine'); addLog(`ðŸ’¡ SIMD: ${enableSIMD ? 'enabled': 'disabled'},
 	WebWorker: ${useWorker ? 'enabled': 'disabled'}`)}); </script>
  <div class="simd-ai-assistant max-w-6xl mx-auto p-6"> <!-- Enhanced Status Header with: SIMD, Info --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> ðŸ§¬ SIMD AI Assistant <span class="text-sm font-normal">XState + Ollama + 7-bit Compression</span> </span>
@@ -63,42 +63,42 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; interface 
 </span>
  <div class="text-sm"> Session <span class="font-mono">{context?.sessionId?.slice?.(-8)}
 </span> </div> </div> </h3> </div>
- <div class="yorha-panel-content"> <!-- System: Status, Grid --> <div class="grid grid-cols-1 md grid-cols-4 gap-4"> <div class="bg-gray-50 p-3"> <div class="font-semibold">Ollama Status</div>
+ <div class="yorha-panel-content"> <!-- System: Status, Grid --> <div class="grid grid-cols-1 md grid-cols-4 gap-4"> <div class="bg-sand/5 p-3"> <div class="font-semibold">Ollama Status</div>
  <div class="flex items-center"> <div class="w-2 h-2 rounded-full"></div>
  <span>Connected</span> </div>
- <div class="text-gray-600">Model: {context?.model?.slice?.(0, 15)}...</div> </div>
- <div class="bg-gray-50 p-3"> <div class="font-semibold">SIMD Compression</div>
- <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${enableSIMD ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+ <div class="text-sand/60">Model: {context?.model?.slice?.(0, 15)}...</div> </div>
+ <div class="bg-sand/5 p-3"> <div class="font-semibold">SIMD Compression</div>
+ <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${enableSIMD ? 'bg-accent' : 'bg-sand/20'}`}></div>
  <span>{enableSIMD ? 'Enabled': 'Disabled'}
 </span> </div>
- <div class="text-gray-600">Target: { compressionTarget }:1</div> </div>
- <div class="bg-gray-50 p-3"> <div class="font-semibold">Web Worker</div>
- <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${useWorker ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+ <div class="text-sand/60">Target: { compressionTarget }:1</div> </div>
+ <div class="bg-sand/5 p-3"> <div class="font-semibold">Web Worker</div>
+ <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${useWorker ? 'bg-accent' : 'bg-sand/20'}`}></div>
  <span>{useWorker ? 'Enabled': 'Disabled'}
 </span> </div>
- <div class="text-gray-600">Non-blocking processing</div> </div>
- <div class="bg-gray-50 p-3"> <div class="font-semibold">UI Components</div>
- <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${liveComponents.length > 0 ? 'bg-green-500': 'bg-gray-400'}`}></div>
+ <div class="text-sand/60">Non-blocking processing</div> </div>
+ <div class="bg-sand/5 p-3"> <div class="font-semibold">UI Components</div>
+ <div class="flex items-center"> <div class={`w-2, h-2, rounded-full ${liveComponents.length > 0 ? 'bg-accent': 'bg-sand/20'}`}></div>
  <span>{liveComponents.length} Active</span> </div>
- <div class="text-gray-600">Instant rendering</div> </div> </div> </div> </div>
+ <div class="text-sand/60">Instant rendering</div> </div> </div> </div> </div>
  <!-- Query, Interface --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">Legal AI Query Interface</h3> </div>
- <div class="yorha-panel-content"> <!-- Configuration, Controls --> <div class="grid grid-cols-1 md grid-cols-4 gap-4 p-4 bg-gray-50"> <div> <label class="block text-sm font-medium text-gray-700" for="compression-target">Compression Target</label>
+ <div class="yorha-panel-content"> <!-- Configuration, Controls --> <div class="grid grid-cols-1 md grid-cols-4 gap-4 p-4 bg-sand/5"> <div> <label class="block text-sm font-medium text-sand/80" for="compression-target">Compression Target</label>
  <select id="compression-target" bind:value={ compressionTarget } class="w-full p-2 border rounded-md"> <option value={ 7 }>7:1 (Ultra Quality)</option>
  <option value={ 25 }>25:1 (High Quality)</option>
  <option value={ 50 }>50:1 (Balanced)</option>
  <option value={ 109 }>109:1 (7-bit NES)</option>
  <option value={ 200 }>200:1 (Maximum)</option> </select> </div>
- <div> <label class="block text-sm font-medium text-gray-700" for="quality-tier">Quality Tier</label>
+ <div> <label class="block text-sm font-medium text-sand/80" for="quality-tier">Quality Tier</label>
  <select id="quality-tier" bind:value={ qualityTier } class="w-full p-2 border rounded-md"> <option value="nes">NES (8-bit)</option>
  <option value="snes">SNES (16-bit)</option>
  <option value="n64">N64 (64-bit)</option> </select> </div>
- <div class="flex"> <label class="block text-sm font-medium text-gray-700">Options</label>
+ <div class="flex"> <label class="block text-sm font-medium text-sand/80">Options</label>
  <div class="space-y-2"> <label class="flex"> <input type="checkbox" bind:checked={ useWorker } class="rounded" /> <span class="text-sm">Web Worker</span> </label> </div> </div>
  <div class="flex"> <Button onclick={ toggleSIMD } variant="ghost" class="w-full text-sm bits-btn bits-btn"> {enableSIMD ? 'ðŸ”§ Disable SIMD': 'âš¡ Enable SIMD'}
 </Button> </div> </div>
  <!-- Query, Input --> <div class="space-y-2"> <div class="flex"> <input type="text"
             bind:value={ queryInput } placeholder="Enter your legal AI query..."
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            class="flex-1 px-4 py-2 border border-sand/20 rounded-md focus:ring-2 focus:ring-info"
             disabled={ isProcessing } onkeydown={(e) => e.key === 'Enter' && submitQuery()} /> <Button onclick={ submitQuery } disabled={isProcessing || !queryInput.trim()} class={isProcessing ? 'processing' : ''} >
             {isProcessing ? 'Processing...': 'Submit'}
 </Button> </div>
@@ -123,18 +123,18 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; interface 
  <!-- Compressed Tiles, Visualization -->
   {#if (simdResults.compressed_tiles?.length ?? 0) > 0} <div class="space-y-2"> <h4 class="font-medium">Compressed Tiles (7-bit encoding):</h4>
  <div class="grid grid-cols-2 md grid-cols-4 lg:grid-cols-6">
-  {#each (simdResults.compressed_tiles ?? []).slice(0, 12) as tile, index} <div class="bg-gray-800 text-white p-2 rounded"> <div class="flex justify-between items-center"> <span>#{index + 1}
+  {#each (simdResults.compressed_tiles ?? []).slice(0, 12) as tile, index} <div class="bg-panelSoft text-white p-2 rounded"> <div class="flex justify-between items-center"> <span>#{index + 1}
 </span>
- <span class="text-green-400">{(tile.compression_ratio ?? 0).toFixed(0)}:1</span> </div>
- <div class="text-gray-300"> {tile.compressed_bytes}B </div>
- <div class="text-gray-500"> {((tile.semantic_preservation ?? 0) * 100).toFixed(0)}% semantic </div> </div> {/each}
+ <span class="text-accent">{(tile.compression_ratio ?? 0).toFixed(0)}:1</span> </div>
+ <div class="text-sand/40"> {tile.compressed_bytes}B </div>
+ <div class="text-sand/60"> {((tile.semantic_preservation ?? 0) * 100).toFixed(0)}% semantic </div> </div> {/each}
   </div> {/if}
   </div> {/if}
   <!-- Live Rendered, Components -->
   {#if liveComponents.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸŽ® Live SIMD Components</h3> </div>
- <div class="yorha-panel-content"> <div class="bg-gray-900 p-4 rounded-lg"> <div class="text-sm text-gray-300"> Instant UI components generated from compressed tiles ({qualityTier.toUpperCase()} quality): </div>
+ <div class="yorha-panel-content"> <div class="bg-panel p-4 rounded-lg"> <div class="text-sm text-sand/40"> Instant UI components generated from compressed tiles ({qualityTier.toUpperCase()} quality): </div>
  <div class="space-y-2">
-  {#each liveComponents.slice(0, 8) as component (component.id)} <div class="live-component p-2 rounded border"> <div class="text-xs text-gray-400"> {component.type} â€¢ Render: {component.render_time}ms </div>
+  {#each liveComponents.slice(0, 8) as component (component.id)} <div class="live-component p-2 rounded border"> <div class="text-xs text-sand/40"> {component.type} â€¢ Render: {component.render_time}ms </div>
  <div class="rendered-content"> {@html component.dom_structure}
 </div> </div> {/each}
   </div> </div> </div> {/if}
@@ -143,7 +143,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; interface 
   </h3> </div>
  <div class="yorha-panel-content"> <div class="prose"> <div class="whitespace-pre-wrap bg-white p-4 rounded"> {context.response}
 </div> </div>
-  {#if context.metadata} <div class="mt-4 text-sm text-gray-600"> <div><strong>Model:</strong> {context.metadata.model}
+  {#if context.metadata} <div class="mt-4 text-sm text-sand/60"> <div><strong>Model:</strong> {context.metadata.model}
 </div>
  <div><strong>Speed:</strong> {Number(context.metadata.tokensPerSecond ?? 0).toFixed(1)} tokens/sec</div>
  <div><strong>Duration:</strong> {Number((context.metadata.totalDuration ?? 0) / 1000000).toFixed(0)}ms</div>
@@ -152,17 +152,17 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte'; interface 
   <!-- Conversation, History -->
   {#if context.conversationHistory && context.conversationHistory.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ“œ Conversation History</h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3 max-h-96">
-  {#each Array.isArray(context.conversationHistory) ? context.conversationHistory: [] as entry} <div class={`flex gap-3 p-3, rounded-lg ${entry.type === 'user' ? 'bg-blue-50' : 'bg-green-50'}`}> <div class={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${entry.type === 'user' ? 'bg-blue-600 text-white' : 'bg-green-600, text-white'}`}> {entry.type === 'user' ? 'U': 'AI'}
+  {#each Array.isArray(context.conversationHistory) ? context.conversationHistory: [] as entry} <div class={`flex gap-3 p-3, rounded-lg ${entry.type === 'user' ? 'bg-info/5' : 'bg-accent/5'}`}> <div class={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${entry.type === 'user' ? 'bg-info text-white' : 'bg-accent, text-white'}`}> {entry.type === 'user' ? 'U': 'AI'}
 </div>
- <div class="flex-1"> <div class="text-sm text-gray-500"> {new Date(entry.timestamp).toLocaleTimeString()} {#if entry.metadata?.simd_enabled} <span class="ml-2 px-1 py-0 bg-purple-100 text-purple-800 rounded"> SIMD {entry.metadata.compression_ratio?.toFixed(1)}:1 </span> {/if}
+ <div class="flex-1"> <div class="text-sm text-sand/60"> {new Date(entry.timestamp).toLocaleTimeString()} {#if entry.metadata?.simd_enabled} <span class="ml-2 px-1 py-0 bg-info/10 text-info rounded"> SIMD {entry.metadata.compression_ratio?.toFixed(1)}:1 </span> {/if}
   </div>
- <div class="text-gray-900">{entry.content}
+ <div class="text-sand">{entry.content}
 </div> </div> </div> {/each}
   </div> </div> {/if}
   <!-- Processing, Logs -->
   {#if processingLogs.length > 0} <div class="nes-container"> <div class="yorha-panel-header flex justify-between"> <h3 class="nes-text">ðŸ“ System Logs</h3>
  <Button.Root class="bits-btn bits-btn" onclick={() => (processingLogs = [])} variant="ghost" size="sm">Clear Logs</Button> </div>
- <div class="yorha-panel-content"> <div class="bg-black text-green-400 p-4 rounded-lg font-mono text-xs max-h-48">
+ <div class="yorha-panel-content"> <div class="bg-black text-accent p-4 rounded-lg font-mono text-xs max-h-48">
   {#each Array.isArray(processingLogs) ? processingLogs: [] as log} <div class="mb-1">{ log }
 </div> {/each}
   </div> </div> {/if}

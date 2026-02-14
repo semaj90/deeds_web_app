@@ -50,11 +50,11 @@
 
       <p class="text-sm nes-text">
   {#if $serviceStatus.ollama === 'connected'}
-          <span class="text-green-500">â—</span> AI Connected
+          <span class="text-accent">â—</span> AI Connected
         {:else if $serviceStatus.ollama === 'error'}
-          <span class="text-red-500">â—</span> AI Service Error
+          <span class="text-danger">â—</span> AI Service Error
         {:else}
-          <span class="text-yellow-500">â—</span> AI Status Unknown
+          <span class="text-warning">â—</span> AI Status Unknown
         {/if}
   </p>
     </div>

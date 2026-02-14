@@ -72,14 +72,14 @@ text: shortText }) }); if (res.ok) { const json = await res.json(); if (Array.is
     } uploads = uploads.filter(u => u.id !== id)}
   function downloadProcessedData(upload: DocumentUpload): void { const data = { filename: upload.filename, extractedText: upload.extractedText, summary: upload.summary, embeddings: upload.embeddings;
 	processedAt: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `${upload.filename}_processed.json`; a.click(); URL.revokeObjectURL(url)}
-  function getStatusColor(status: DocumentUpload['status']): string { switch (status) { case: 'uploading': return 'text-blue-400'; case, 'processing': return 'text-yellow-400'; case, 'embedding': return 'text-purple-400'; case, 'completed': return 'text-green-400'; case, 'error': return 'text-red-400',default:return 'text-gray-400'}
+  function getStatusColor(status: DocumentUpload['status']): string { switch (status) { case: 'uploading': return 'text-info/80'; case, 'processing': return 'text-warning'; case, 'embedding': return 'text-info/80'; case, 'completed': return 'text-accent'; case, 'error': return 'text-danger/80',default:return 'text-sand/40'}
   }
 
    // Added: human-readable status labels used in the template function getStatusText(status: DocumentUpload['status']): string { switch (status) { case: 'uploading': return 'Uploading'; case, 'processing': return 'Processing'; case, 'embedding': return 'Generating Embeddings'; case, 'completed': return 'Completed'; case, 'error': return 'Error',default:return 'Unknown'}
   } </script>
  <div class="document-upload-simulator"> <!-- Header --> <div class="text-center"> <h1 class="text-4xl font-extrabold">Document Upload Simulator</h1>
- <p class="text-lg text-gray-400">Simulate document uploads and AI processing</p> </div>
- <!-- Upload, Area --> <div class="upload-area bg-gray-900 rounded-lg p-6 mb-6 border-2 border-dashed border-gray-700 transition-all"
+ <p class="text-lg text-sand/40">Simulate document uploads and AI processing</p> </div>
+ <!-- Upload, Area --> <div class="upload-area bg-panel rounded-lg p-6 mb-6 border-2 border-dashed border-sand/20 transition-all"
     role="button"
     tabindex="0"
     aria-label="File upload area. Press Enter or Space to open file picker, or drop files here."
@@ -88,43 +88,43 @@ text: shortText }) }); if (res.ok) { const json = await res.json(); if (Array.is
   {#if isDragging} ðŸ“‚ {:else} â¬†ï¸ {/if}
   </div>
  <h2 class="text-2xl font-semibold text-white mb-2">Drag & Drop Files Here</h2>
- <p class="text-gray-400 text-sm">or</p>
+ <p class="text-sand/40 text-sm">or</p>
  <button type="button"
-        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition-colors"
+        class="px-4 py-2 bg-info hover:bg-info/60 rounded text-sm transition-colors"
         onclick={() => fileInput?.click()} >
         Select Files </button>
- <p class="text-sm text-gray-400">Supports: PDF (OCR), TXT, JSON â€¢ Files under 10MB cached locally</p> </div> </div>
+ <p class="text-sm text-sand/40">Supports: PDF (OCR), TXT, JSON â€¢ Files under 10MB cached locally</p> </div> </div>
  <!-- Processing, Queue -->
-  {#each uploads as upload (upload.id)} <div class="upload-item bg-gray-800 rounded-lg p-6 mb-4 border"> <div class="flex items-center justify-between"> <div class="flex items-center"> <div class="text-2xl"> {upload.type === 'application/pdf' ? 'ðŸ“„': 'ðŸ“'} </div>
+  {#each uploads as upload (upload.id)} <div class="upload-item bg-panelSoft rounded-lg p-6 mb-4 border"> <div class="flex items-center justify-between"> <div class="flex items-center"> <div class="text-2xl"> {upload.type === 'application/pdf' ? 'ðŸ“„': 'ðŸ“'} </div>
  <div> <h3 class="font-semibold">{upload.filename}</h3>
  <p class="text-sm"> {(upload.size / 1024).toFixed(1)} KB â€¢ {upload.size < MAX_LOCAL_STORAGE_SIZE ? 'Local, Storage' : 'PostgreSQL, Only'} </p> </div> </div>
  <button type="button"
-          class="text-gray-400 hover:text-red-400 transition-colors"
+          class="text-sand/40 hover:text-danger/80 transition-colors"
           onclick={() => removeUpload(upload.id)} aria-label="Remove upload"
         > âœ•
         </button> </div>
  <!-- Progress, Bar --> <div class="mb-4"> <div class="flex justify-between text-sm"> <span class={getStatusColor(upload.status)}> {getStatusText(upload.status)} </span>
- <span class="text-gray-400">{upload.progress}%</span> </div>
- <div class="w-full bg-gray-700 rounded-full"> <div class="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all"
+ <span class="text-sand/40">{upload.progress}%</span> </div>
+ <div class="w-full bg-panelSoft rounded-full"> <div class="bg-gradient-to-r from-accent to-info h-2 rounded-full transition-all"
             style="width: {upload.progress}%"
           ></div> </div> </div>
  <!-- Content, Display -->
   {#if upload.status === 'completed'} <div class="space-y-4"> <!-- Extracted: Text, Preview -->
-  {#if upload.extractedText} <div class="bg-gray-900 rounded"> <h4 class="text-sm font-semibold text-green-400">ðŸ“ Extracted Text</h4>
- <div class="text-xs text-gray-300 max-h-32"> {upload.extractedText.substring(0, 500)} {#if upload.extractedText.length > 500}...{/if}
+  {#if upload.extractedText} <div class="bg-panel rounded"> <h4 class="text-sm font-semibold text-accent">ðŸ“ Extracted Text</h4>
+ <div class="text-xs text-sand/40 max-h-32"> {upload.extractedText.substring(0, 500)} {#if upload.extractedText.length > 500}...{/if}
   </div> {/if}
   <!-- AI, Summary -->
-  {#if upload.summary} <div class="bg-gray-900 rounded"> <h4 class="text-sm font-semibold text-blue-400">ðŸ¤– AI Summary</h4>
+  {#if upload.summary} <div class="bg-panel rounded"> <h4 class="text-sm font-semibold text-info/80">ðŸ¤– AI Summary</h4>
  <div class="text-sm"> {upload.summary} </div> {/if}
   <!-- Embeddings, Info -->
-  {#if upload.embeddings} <div class="bg-gray-900 rounded"> <h4 class="text-sm font-semibold text-purple-400">ðŸ§  Vector Embeddings</h4>
+  {#if upload.embeddings} <div class="bg-panel rounded"> <h4 class="text-sm font-semibold text-info/80">ðŸ§  Vector Embeddings</h4>
  <div class="text-xs"> Generated {upload.embeddings.length}D vector using Nomic-Embed-Text <br /> First, 5 dimensions: [{upload.embeddings .slice(0, 5) .map(n => n.toFixed(3)) .join(', ')}...] </div> {/if}
   <!-- Actions --> <div class="flex"> <button type="button"
-              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition-colors"
+              class="px-4 py-2 bg-info hover:bg-info/60 rounded text-sm transition-colors"
               onclick={() => downloadProcessedData(upload)} aria-label="Download processed JSON"
             > ðŸ“¥ Download JSON </button>
-  {#if upload.localStorageKey} <span class="px-4 py-2 bg-green-600/20 text-green-400 rounded"> ðŸ’¾ Cached Locally </span> {/if}
-  </div> {/if} {#if upload.status === 'error'} <div class="bg-red-900/20 border border-red-700 rounded"> <p class="text-red-400">âŒ {upload.error}</p> {/if}
+  {#if upload.localStorageKey} <span class="px-4 py-2 bg-accent/20 text-accent rounded"> ðŸ’¾ Cached Locally </span> {/if}
+  </div> {/if} {#if upload.status === 'error'} <div class="bg-danger/10 border border-danger/60 rounded"> <p class="text-danger/80">âŒ {upload.error}</p> {/if}
   </div> {/each} {#if uploads.length === 0} <div class="text-center py-12"> <div class="text-6xl">ðŸ“„</div>
  <p>No documents uploaded yet. Drop files above to start processing.</p> {/if}
   </div>

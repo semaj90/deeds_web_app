@@ -51,15 +51,15 @@ let labelSizeClasses = $derived({
 // Variant classes
 let variantClasses = $derived({
 	default: `
-		border-2 border-slate-500 rounded
-		bg-slate-800
-		checked:bg-blue-600 checked:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900
+		border-2 border-sand/30 rounded
+		bg-panelSoft
+		checked:bg-info checked:border-info focus:ring-2 focus:ring-info focus:ring-offset-2 focus:ring-offset-panel
 		transition-colors duration-150
 	`,
 	nes: `
 		border-4 border-white
-		bg-slate-900
-	checked:bg-blue-600
+		bg-panel
+	checked:bg-info
 		font-["Press_Start_2P",monospace]
 	`
 }[variant].replace(/\s+/g, ' ').trim());

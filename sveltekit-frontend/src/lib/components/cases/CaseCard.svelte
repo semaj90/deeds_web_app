@@ -45,22 +45,22 @@
 
   let open = $state(false);
 
-  const statusConfig = { active: { label: 'Active', class: 'bg-green-100 text-green-800', icon: CheckCircle },
+  const statusConfig = { active: { label: 'Active', class: 'bg-accent/10 text-accent', icon: CheckCircle },
 	pending: {
-	label: 'Pending', class: 'bg-yellow-100 text-yellow-800', icon: Clock },
+	label: 'Pending', class: 'bg-warning/10 text-warning', icon: Clock },
 	closed: {
-	label: 'Closed', class: 'bg-blue-100 text-blue-800', icon: Archive },
+	label: 'Closed', class: 'bg-info/10 text-info', icon: Archive },
 	archived: {
-	label: 'Archived', class: 'bg-gray-100 text-gray-800', icon: Archive }
+	label: 'Archived', class: 'bg-sand/10 text-sand', icon: Archive }
   };
 
-  const priorityConfig = { critical: { icon: '🔴', color: 'text-red-500' },
+  const priorityConfig = { critical: { icon: '🔴', color: 'text-danger' },
 	high: {
-	icon: '🟠', color: 'text-orange-500' },
+	icon: '🟠', color: 'text-warning' },
 	medium: {
-	icon: '🟡', color: 'text-yellow-500' },
+	icon: '🟡', color: 'text-warning' },
 	low: {
-	icon: '🟢', color: 'text-green-500' }
+	icon: '🟢', color: 'text-accent' }
   };
 
   let currentStatus = $derived(statusConfig[caseData.status] || statusConfig.active);
@@ -178,7 +178,7 @@
     {#if caseData.tags && caseData.tags.length > 0}
       <div class="flex flex-wrap gap-2 mb-4">
         {#each caseData.tags as tag}
-          <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">#{tag}</span>
+          <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10 text-sand/80">#{tag}</span>
         {/each}
       </div>
     {/if}
@@ -269,7 +269,7 @@
     <Button
       onclick={() => { onArchive(caseData.id); open = false }}
       variant="ghost"
-      class="w-full justify-start text-amber-600 hover:bg-amber-50"
+      class="w-full justify-start text-warning hover:bg-warning/5"
       size="sm"
     >
       <Archive class="w-4 h-4 mr-2" />
@@ -278,7 +278,7 @@
     <Button
       onclick={() => { onDelete(caseData.id); open = false }}
       variant="ghost"
-      class="w-full justify-start text-red-600 hover:bg-red-50"
+      class="w-full justify-start text-danger hover:bg-danger/5"
       size="sm"
     >
       <Trash2 class="w-4 h-4 mr-2" />

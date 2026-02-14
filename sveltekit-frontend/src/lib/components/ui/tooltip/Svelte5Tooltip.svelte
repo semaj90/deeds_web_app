@@ -37,10 +37,10 @@ let positionClasses = $derived({
 
 // Arrow classes
 let arrowClasses = $derived({
-	top: 'top-full left-1/2 -translate-x-1/2 border-t-slate-700 border-x-transparent border-b-transparent',
-	bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-slate-700 border-x-transparent border-t-transparent',
-	left: 'left-full top-1/2 -translate-y-1/2 border-l-slate-700 border-y-transparent border-r-transparent',
-	right: 'right-full top-1/2 -translate-y-1/2 border-r-slate-700 border-y-transparent border-l-transparent'
+	top: 'top-full left-1/2 -translate-x-1/2 border-t-panel border-x-transparent border-b-transparent',
+	bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-panel border-x-transparent border-t-transparent',
+	left: 'left-full top-1/2 -translate-y-1/2 border-l-panel border-y-transparent border-r-transparent',
+	right: 'right-full top-1/2 -translate-y-1/2 border-r-panel border-y-transparent border-l-transparent'
 }[position]);
 
 function show() {
@@ -75,7 +75,7 @@ function hide() {
 		<div
 			class="absolute z-50 {positionClasses}
 				   px-3 py-2 text-sm text-white
-				   bg-slate-700 rounded-lg shadow-lg
+				   bg-panelSoft rounded-lg shadow-lg
 				   pointer-events-none
 				   whitespace-nowrap
 				   animate-in fade-in-0 zoom-in-95 duration-150"

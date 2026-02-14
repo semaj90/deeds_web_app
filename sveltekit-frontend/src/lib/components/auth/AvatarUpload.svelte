@@ -87,15 +87,15 @@ const file = input.files?.[0];
   {#if message}
     <div
       class="p-3 rounded text-sm {messageType === 'success'
-        ? 'bg-green-50 border border-green-200 text-green-700'
-        : 'bg-red-50 border border-red-200 text-red-700'}"
+        ? 'bg-accent/5 border border-accent/20 text-accent'
+        : 'bg-danger/5 border border-danger/20 text-danger'}"
     >
       {message}
     </div>
   {/if}
   <div class="flex items-center">
     <div class="relative">
-      <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full flex items-center justify-center">
+      <div class="w-24 h-24 bg-gradient-to-br from-info/80 to-info rounded-full flex items-center justify-center">
         {#if preview}
           <img src={preview} alt="Avatar preview" class="w-full h-full" />
         {:else}
@@ -105,20 +105,20 @@ const file = input.files?.[0];
       <button
         onclick={triggerUpload}
         disabled={uploading}
-        class="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50"
+        class="absolute bottom-0 right-0 p-2 bg-info text-white rounded-full hover:bg-info/60 disabled:opacity-50"
         title="Change avatar"
       >
         <Camera class="w-4" />
       </button>
     </div>
     <div class="flex-1">
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-sand/60">
         Upload a profile picture (JPEG or PNG, max 2MB)
       </p>
       <Button
         onclick={triggerUpload}
         disabled={uploading}
-        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 bits-btn"
+        class="flex items-center gap-2 px-4 py-2 bg-info text-white rounded hover:bg-info/60 bits-btn"
       >
         <Upload class="w-4" />
         {uploading ? 'Uploading...' : 'Choose Image'}

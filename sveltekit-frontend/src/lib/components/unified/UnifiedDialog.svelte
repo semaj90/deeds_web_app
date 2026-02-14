@@ -71,9 +71,9 @@
 	let contentClasses = $derived.by(() => {
 		return [
 			'relative rounded-lg shadow-xl max-h-[90vh] overflow-hidden',
-			variant === 'legal' ? 'border-l-4 border-green-500' :
-			variant === 'evidence' ? 'border-l-4 border-amber-500' :
-			variant === 'case' ? 'border-l-4 border-indigo-500' : '',
+			variant === 'legal' ? 'border-l-4 border-accent' :
+			variant === 'evidence' ? 'border-l-4 border-warning' :
+			variant === 'case' ? 'border-l-4 border-info' : '',
 			glassmorphism ? 'backdrop-blur-md bg-white/80' : 'bg-white',
 			pixelated ? 'image-rendering-pixelated' : '',
 			variant === 'nes' ? 'border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : ''
@@ -174,23 +174,23 @@
 
 				<!-- Legal AI Risk Indicator -->
 				{#if legalContext?.aiAnalysis?.riskLevel === 'high'}
-					<div class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full animate-pulse border-2 border-white"></div>
+					<div class="absolute -top-2 -right-2 w-4 h-4 bg-danger rounded-full animate-pulse border-2 border-white"></div>
 				{/if}
 
 				<!-- Header -->
 				{#if title}
 					<div class="px-6 py-4 border-b">
-						<h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+						<h2 class="text-lg font-semibold text-sand flex items-center gap-2">
 							{title}
 							{#if legalContext?.aiAnalysis}
 								<span
 									class="px-2 py-1 text-xs rounded-full"
-									class:bg-green-100={legalContext.aiAnalysis.riskLevel === 'low'}
-									class:text-green-800={legalContext.aiAnalysis.riskLevel === 'low'}
-									class:bg-yellow-100={legalContext.aiAnalysis.riskLevel === 'medium'}
-									class:text-yellow-800={legalContext.aiAnalysis.riskLevel === 'medium'}
-									class:bg-red-100={legalContext.aiAnalysis.riskLevel === 'high'}
-									class:text-red-800={legalContext.aiAnalysis.riskLevel === 'high'}
+									class:bg-accent/10={legalContext.aiAnalysis.riskLevel === 'low'}
+									class:text-accent={legalContext.aiAnalysis.riskLevel === 'low'}
+									class:bg-warning/10={legalContext.aiAnalysis.riskLevel === 'medium'}
+									class:text-warning={legalContext.aiAnalysis.riskLevel === 'medium'}
+									class:bg-danger/10={legalContext.aiAnalysis.riskLevel === 'high'}
+									class:text-danger={legalContext.aiAnalysis.riskLevel === 'high'}
 								>
 									AI: {Math.round((legalContext.aiAnalysis.confidence ?? 0) * 100)}%
 								</span>
@@ -206,9 +206,9 @@
 					{/if}
 
 					{#if legalContext?.aiAnalysis?.suggestions && legalContext.aiAnalysis.suggestions.length > 0}
-						<div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-							<h4 class="text-sm font-medium text-blue-900 mb-1">AI Suggestions:</h4>
-							<ul class="text-sm text-blue-800 list-disc list-inside">
+						<div class="mt-4 p-3 bg-info/5 rounded-lg border border-info/20">
+							<h4 class="text-sm font-medium text-info mb-1">AI Suggestions:</h4>
+							<ul class="text-sm text-info list-disc list-inside">
 								{#each legalContext.aiAnalysis.suggestions as suggestion}
 									<li>{suggestion}</li>
 								{/each}
@@ -219,13 +219,13 @@
 
 				<!-- Footer -->
 				{#if footer}
-					<div class="px-6 py-4 border-t border-gray-200">
+					<div class="px-6 py-4 border-t border-sand/20">
 						{@render footer()}
 					</div>
 				{:else}
-					<div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+					<div class="px-6 py-4 border-t border-sand/20 bg-sand/5 flex justify-end">
 						<button
-							class="px-3 py-1 text-sm rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 shadow-sm"
+							class="px-3 py-1 text-sm rounded-md border border-sand/20 bg-white text-sand/80 hover:bg-sand/5 shadow-sm"
 							type="button"
 							onclick={closeDialog}
 						>
@@ -236,7 +236,7 @@
 
 				<!-- Close button -->
 				<button
-					class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+					class="absolute top-4 right-4 text-sand/40 hover:text-sand/60 transition-colors"
 					onclick={closeDialog}
 					aria-label="Close"
 				>

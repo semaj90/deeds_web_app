@@ -130,7 +130,7 @@
   <div class="canvas-container bg-black rounded overflow-hidden relative" style="height: 600px;">
     {#if isWebGPUActive}
       <div class="absolute top-2 right-2 z-10">
-        <Badge variant="default" class="bg-green-600">WebGPU Active</Badge>
+        <Badge variant="default" class="bg-accent">WebGPU Active</Badge>
       </div>
     {/if}
     <canvas bind:this={canvasElement} width="800" height="600" class="w-full h-full block"></canvas>

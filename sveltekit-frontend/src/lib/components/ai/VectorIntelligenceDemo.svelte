@@ -17,7 +17,7 @@ query: query.trim() }) }); if (!response.ok) { const errText = await response.te
 
    // Format similarity score as percentage function formatSimilarity(score: number): string { return `${Math.round(score * 100)}%`}
 
-  // Get document type icon and color function getDocumentTypeStyle(type: SearchResult['documentType']) { switch (type) { case: 'deed': return { icon FileText, color: 'bg-blue-100 text-blue-800' }; case, 'contract': return { icon FileText, color: 'bg-green-100 text-green-800' }; case, 'evidence': return { icon Database, color: 'bg-orange-100 text-orange-800' }; case, 'case_law': return { icon Brain, color: 'bg-purple-100 text-purple-800' }; default:return { icon FileText, color: 'bg-gray-100 text-gray-800' }}
+  // Get document type icon and color function getDocumentTypeStyle(type: SearchResult['documentType']) { switch (type) { case: 'deed': return { icon FileText, color: 'bg-info/10 text-info' }; case, 'contract': return { icon FileText, color: 'bg-accent/10 text-accent' }; case, 'evidence': return { icon Database, color: 'bg-warning/10 text-warning' }; case, 'case_law': return { icon Brain, color: 'bg-info/10 text-info' }; default:return { icon FileText, color: 'bg-sand/10 text-sand' }}
   }
 
    // Demo placeholder results for development const demoResults: SearchResult[] = [ { id: 'demo-1', title: 'Property Deed - 123 Main Street', content:
@@ -42,7 +42,7 @@ query: query.trim() }) }); if (!response.ok) { const errText = await response.te
 </Button> {/each}
   </div> </div> </div>
  <!-- Error, Display -->
-  {#if error} <div class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center"> <AlertCircle class="h-4 w-4" /> <div class="text-red-800">{ error }
+  {#if error} <div class="bg-danger/5 border border-danger/20 rounded-lg p-4 flex items-center"> <AlertCircle class="h-4 w-4" /> <div class="text-danger">{ error }
 </div> {/if}
   <!-- Search, Metrics -->
   {#if showMetrics} <div class="nes-container"> <div class="yorha-panel-content"> <div class="grid grid-cols-2 md grid-cols-4 gap-4"> <div> <div class="text-2xl">{metrics.totalDocuments}
@@ -56,7 +56,7 @@ query: query.trim() }) }); if (!response.ok) { const errText = await response.te
  <div class="text-sm nes-text">Threshold</div> </div> </div> </div> {/if}
   <!-- Search, Results -->
   {#if hasResults} <div class="space-y-4"> <div class="flex items-center"> <h3 class="text-lg">Search Results</h3>
- <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{results.length} found</span> </div>
+ <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">{results.length} found</span> </div>
  <div class="grid">
   {#each results as result (result.id)} {@const typeStyle = getDocumentTypeStyle(result.documentType)} <button type="button"
             class="w-full text-left hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-purple-500 nes-container"
@@ -78,7 +78,7 @@ query: query.trim() }) }); if (!response.ok) { const errText = await response.te
 </span> {/if}
   </div>
   {#if result.metadata.tags} <div class="flex flex-wrap">
-  {#each Array.isArray(result.metadata.tags) ? result.metadata.tags: [] as tag} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
+  {#each Array.isArray(result.metadata.tags) ? result.metadata.tags: [] as tag} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20"
                           >{ tag }
 </span >
                       {/each} {/if} {/if}
@@ -100,7 +100,7 @@ query: query.trim() }) }); if (!response.ok) { const errText = await response.te
 </p>
  <div class="flex items-center"> <Badge>Similarity: {formatSimilarity(selectedResult.similarity)}
 </Badge>
- <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
+ <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20"
             >{selectedResult.documentType}
 </span >
         </div> </div> </div> {/if}

@@ -102,10 +102,10 @@ function getFileIcon(type: string): string {
 }
 </script>
 
-<div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">
+<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/20/50">
  <!-- Upload Zone -->
  <div
- class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-cyan-400 bg-cyan-400/10' : 'border-slate-600 hover:border-slate-500'}"
+ class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-info/80 bg-info/80/10' : 'border-sand/30 hover:border-sand/30'}"
  role="region"
  ondragover={ handleDragOver }
  ondragleave={ handleDragLeave }
@@ -114,7 +114,7 @@ function getFileIcon(type: string): string {
  <div class="mb-4">
  <div class="text-4xl mb-4">📁</div>
  <h3 class="text-lg font-medium text-white mb-2">Upload Evidence Files</h3>
- <p class="text-slate-400 text-sm">
+ <p class="text-sand/40 text-sm">
  Drag and drop files here, or click to browse
  </p>
  </div>
@@ -130,13 +130,13 @@ function getFileIcon(type: string): string {
 
  <label
  for="file-input"
- class="inline-flex items-center px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 rounded-lg cursor-pointer transition-colors"
+ class="inline-flex items-center px-4 py-2 bg-info/80/20 hover:bg-info/80/30 text-info rounded-lg cursor-pointer transition-colors"
  >
  <span class="mr-2">📎</span>
  Choose Files
  </label>
 
- <div class="mt-4 text-xs text-slate-500">
+ <div class="mt-4 text-xs text-sand/60">
  Supported: PDF, Word, Excel, Email, Video, Images
  </div>
  </div>
@@ -145,9 +145,9 @@ function getFileIcon(type: string): string {
  {#if uploadedFiles.length > 0}
  <div class="mt-6">
  <div class="flex items-center justify-between mb-4">
- <h4 class="text-sm font-medium text-slate-300">Files to Upload ({uploadedFiles.length})</h4>
+ <h4 class="text-sm font-medium text-sand/40">Files to Upload ({uploadedFiles.length})</h4>
  <button
- class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors disabled:opacity-50"
+ class="px-4 py-2 bg-accent/80/20 hover:bg-accent/80/30 text-accent text-sm rounded-lg transition-colors disabled:opacity-50"
  disabled={isUploading}
  onclick={ uploadFiles }
  >
@@ -158,12 +158,12 @@ function getFileIcon(type: string): string {
  {#if isUploading}
  <div class="mb-4">
  <div class="flex justify-between text-sm mb-1">
- <span class="text-slate-300">Uploading files...</span>
- <span class="text-cyan-400">{uploadProgress}%</span>
+ <span class="text-sand/40">Uploading files...</span>
+ <span class="text-info">{uploadProgress}%</span>
  </div>
- <div class="w-full bg-slate-600 rounded-full h-2">
+ <div class="w-full bg-panelSoft rounded-full h-2">
  <div
- class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
+ class="h-2 rounded-full bg-info/80 transition-all duration-300"
  style="width: {uploadProgress}%"
  ></div>
  </div>
@@ -172,16 +172,16 @@ function getFileIcon(type: string): string {
 
  <div class="space-y-2 max-h-64 overflow-y-auto">
  {#each uploadedFiles as file, index}
- <div class="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
+ <div class="flex items-center justify-between bg-panelSoft/30 rounded-lg p-3">
  <div class="flex items-center space-x-3 flex-1 min-w-0">
  <span class="text-lg">{getFileIcon(file.type)}</span>
  <div class="flex-1 min-w-0">
  <div class="font-medium text-white text-sm truncate">{file.name}</div>
- <div class="text-xs text-slate-400">{formatFileSize(file.size)}</div>
+ <div class="text-xs text-sand/40">{formatFileSize(file.size)}</div>
  </div>
  </div>
  <button
- class="p-1 text-slate-400 hover:text-red-400 transition-colors"
+ class="p-1 text-sand/40 hover:text-danger/80 transition-colors"
  onclick={() => removeFile(index)}
  disabled={isUploading}
  >
@@ -193,9 +193,9 @@ function getFileIcon(type: string): string {
  </div>
  {/if}
 
- <div class="mt-6 pt-4 border-t border-slate-700/50">
- <h4 class="text-sm font-medium text-slate-300 mb-2">Upload Tips</h4>
- <ul class="text-xs text-slate-400 space-y-1">
+ <div class="mt-6 pt-4 border-t border-sand/20/50">
+ <h4 class="text-sm font-medium text-sand/40 mb-2">Upload Tips</h4>
+ <ul class="text-xs text-sand/40 space-y-1">
  <li>Maximum file size: 100MB per file</li>
  <li>Files are automatically scanned for viruses</li>
  <li>AI analysis begins immediately after upload</li>

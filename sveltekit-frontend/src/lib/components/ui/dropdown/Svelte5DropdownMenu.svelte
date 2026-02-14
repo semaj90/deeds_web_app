@@ -137,7 +137,7 @@ $effect(() => {
 		{:else if children}
 			{@render children()}
 		{:else}
-			<span class="px-3 py-2 bg-slate-700 rounded-lg text-white hover:bg-slate-600">
+			<span class="px-3 py-2 bg-panelSoft rounded-lg text-white hover:bg-panelSoft">
 				Menu
 				<svg class="w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -151,22 +151,22 @@ $effect(() => {
 			bind:this={menuRef}
 			class="absolute z-50 {alignClasses} {sideClasses}
 				   min-w-[180px] py-1
-				   bg-slate-800 border border-slate-600 rounded-lg shadow-xl
+				   bg-panelSoft border border-sand/30 rounded-lg shadow-xl
 				   animate-in fade-in-0 zoom-in-95 duration-100"
 			role="menu"
 			aria-orientation="vertical"
 		>
 			{#each items as item, i}
 				{#if item.separator}
-					<div class="my-1 h-px bg-slate-700" role="separator"></div>
+					<div class="my-1 h-px bg-panelSoft" role="separator"></div>
 				{:else}
 					<button
 						type="button"
 						class="w-full px-3 py-2 text-left text-sm flex items-center gap-2
 							   transition-colors duration-100
 							   {item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-							   {item.danger ? 'text-red-400 hover:bg-red-900/30' : 'text-white hover:bg-slate-700'}
-							   {focusedIndex === i ? 'bg-slate-700' : ''}"
+							   {item.danger ? 'text-danger/80 hover:bg-danger/20/30' : 'text-white hover:bg-panelSoft'}
+							   {focusedIndex === i ? 'bg-panelSoft' : ''}"
 						role="menuitem"
 						tabindex={focusedIndex === i ? 0 : -1}
 						disabled={item.disabled}
@@ -178,7 +178,7 @@ $effect(() => {
 						{/if}
 						<span class="flex-1">{item.label}</span>
 						{#if item.shortcut}
-							<span class="text-xs text-slate-500">{item.shortcut}</span>
+							<span class="text-xs text-sand/60">{item.shortcut}</span>
 						{/if}
 					</button>
 				{/if}

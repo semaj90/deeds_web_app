@@ -129,15 +129,15 @@ import Trash2 from 'lucide-svelte/icons/trash-2';
   {#each Array.isArray(citationCategories) ? citationCategories: [] as category} <button class="w-full flex justify-between items-center p-2 rounded text-sm hover:bg-muted" class:bg-primary={selectedCategory === category.id}
 	class:text-primary-foreground={selectedCategory === category.id} onclick={() => selectCategory(category.id)} >
 						<span>{category.label}</span>
- <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{category.count}</span> </button> {/each}
+ <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">{category.count}</span> </button> {/each}
   </div> </div>
  <!-- Citations, List --> <div class="col-span-3">
   {#if isLoading} <div class="nes-container"> <div class="yorha-panel-content py-8"> <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
  <p class="text-sm nes-text">Loading citations...</p> </div> </div> {:else if filteredCitations.length === 0} <div class="nes-container"> <div class="yorha-panel-content py-8"> <BookOpen class="w-12 h-12 nes-text is-disabled mx-auto" /> <p class="text-sm nes-text is-disabled">No citations found</p>
   {#if searchQuery} <p class="text-xs nes-text">Try adjusting your search terms</p> {/if}
   </div> </div> {:else} {#each Array.isArray(filteredCitations) ? filteredCitations: [] as citation} <div class="hover:shadow-md transition-shadow"> <div class="yorha-panel-content"> <div class="flex justify-between"> <div class="flex-1"> <div class="flex items-center gap-2"> <h3 class="font-semibold">{citation.title}</h3>
- <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{citation.category}</span>
-  {#if citation.relevanceScore > 80} <span class="px-2 py-1 rounded text-xs font-medium bg-blue-500">High Relevance</span> {/if}
+ <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{citation.category}</span>
+  {#if citation.relevanceScore > 80} <span class="px-2 py-1 rounded text-xs font-medium bg-info">High Relevance</span> {/if}
   </div>
  <div class="text-sm nes-text is-disabled"> <div class="flex items-center gap-4"> <span class="flex items-center"> <User class="w-3" /> {citation.authors} </span>
  <span class="flex items-center"> <Calendar class="w-3" /> {citation.year} </span>
@@ -226,9 +226,9 @@ import Trash2 from 'lucide-svelte/icons/trash-2';
   {#if selectedCitation.notes} <div> <strong>Notes:</strong>
  <p class="mt-1">{selectedCitation.notes}</p> {/if} {#if selectedCitation.tags.length > 0} <div> <strong>Tags:</strong>
  <div class="flex flex-wrap gap-1">
-  {#each Array.isArray(selectedCitation.tags) ? selectedCitation.tags: [] as tag} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{ tag }</span> {/each}
+  {#each Array.isArray(selectedCitation.tags) ? selectedCitation.tags: [] as tag} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{ tag }</span> {/each}
   </div> {/if}
-  <div class="flex justify-between items-center"> <div> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">Relevance: {selectedCitation.relevanceScore}%</span> </div>
+  <div class="flex justify-between items-center"> <div> <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">Relevance: {selectedCitation.relevanceScore}%</span> </div>
  <div class="flex">
   {#if selectedCitation.url} <Button class="enhanced-bits-btn nes-dialog-control n64-enhanced lod-optimized retro-external-btn bits-btn"
 								variant="ghost"

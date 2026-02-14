@@ -13,16 +13,16 @@ import { browser } from '$app/environment';
     { variants: { variant: {
           default: 'btn-nes-primary',
           destructive: 'btn-nes-danger',
-          outline: 'border-2 border-gray-400 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800',
+          outline: 'border-2 border-sand/30 bg-transparent hover:bg-sand/10 dark:hover:bg-panelSoft',
           secondary: 'btn-nes-secondary',
-          ghost: 'hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none',
-          link: 'text-blue-500 underline-offset-4 hover:underline hover:text-blue-600',
+          ghost: 'hover:bg-sand/10 dark:hover:bg-panelSoft rounded-none',
+          link: 'text-info underline-offset-4 hover:underline hover:text-info',
           legal: 'nes-legal-priority-medium yorha-3d-button',
           evidence: 'nes-legal-priority-critical yorha-3d-button',
           caseItem: 'nes-legal-priority-high yorha-3d-button',
           success: 'btn-nes-success',
-          yorha: 'yorha-3d-button bg-black/80 text-yellow-400 border-2 border-yellow-400',
-          neural: 'neural-sprite-active bg-gradient-to-r from-purple-600 to-blue-600 text-white border-2 border-purple-400'
+          yorha: 'yorha-3d-button bg-black/80 text-warning border-2 border-warning',
+          neural: 'neural-sprite-active bg-gradient-to-r from-info to-info text-white border-2 border-info/60'
         },
 	size: {
 	default: 'h-10 px-4 py-2',

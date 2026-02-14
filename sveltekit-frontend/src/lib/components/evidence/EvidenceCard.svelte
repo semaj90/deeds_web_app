@@ -107,7 +107,7 @@
 
 <div
 	role="article"
-	class="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-200 shadow relative"
+	class="bg-white border border-sand/20 rounded-xl overflow-hidden transition-all duration-200 shadow relative"
 	class:text-sm={compact}
 	class:cursor-grab={draggable}
 	class:scale-105={isHovered}
@@ -119,25 +119,25 @@
 	duration: 200, easing: quintOut }}
 >
 	<!-- Header -->
-	<div class="flex items-center justify-between px-3 py-3 bg-gray-50 border-b">
+	<div class="flex items-center justify-between px-3 py-3 bg-sand/5 border-b">
 		<div
 			class="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border capitalize"
 			data-type={evidenceType}
-			class:bg-blue-50={evidenceType === 'document'}
-			class:text-blue-700={evidenceType === 'document'}
-			class:border-blue-200={evidenceType === 'document'}
-			class:bg-green-50={evidenceType === 'image'}
-			class:text-green-700={evidenceType === 'image'}
-			class:border-green-200={evidenceType === 'image'}
-			class:bg-purple-50={evidenceType === 'video'}
-			class:text-purple-700={evidenceType === 'video'}
-			class:border-purple-200={evidenceType === 'video'}
-			class:bg-orange-50={evidenceType === 'audio'}
-			class:text-orange-700={evidenceType === 'audio'}
-			class:border-orange-200={evidenceType === 'audio'}
-			class:bg-indigo-50={evidenceType === 'link'}
-			class:text-indigo-700={evidenceType === 'link'}
-			class:border-indigo-200={evidenceType === 'link'}
+			class:bg-info/5={evidenceType === 'document'}
+			class:text-info={evidenceType === 'document'}
+			class:border-info/20={evidenceType === 'document'}
+			class:bg-accent/5={evidenceType === 'image'}
+			class:text-accent={evidenceType === 'image'}
+			class:border-accent/20={evidenceType === 'image'}
+			class:bg-info/5={evidenceType === 'video'}
+			class:text-info={evidenceType === 'video'}
+			class:border-info/20={evidenceType === 'video'}
+			class:bg-warning/5={evidenceType === 'audio'}
+			class:text-warning={evidenceType === 'audio'}
+			class:border-warning/20={evidenceType === 'audio'}
+			class:bg-info/5={evidenceType === 'link'}
+			class:text-info={evidenceType === 'link'}
+			class:border-info/20={evidenceType === 'link'}
 		>
 			<IconComponent size={16} />
 			<span>{evidenceType}</span>
@@ -145,7 +145,7 @@
 		<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
 			{#if showCompare}
 				<button
-					class="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:bg-gray-100"
+					class="flex items-center justify-center w-7 h-7 rounded text-sand/60 hover:bg-sand/10"
 					onclick={handleCompareClick}
 					title={comparing ? 'Analyzing...' : 'Analyze & compare'}
 					aria-busy={comparing}
@@ -183,11 +183,11 @@
 
 		<!-- Title and Description -->
 		<div class="flex flex-col gap-1">
-			<h3 class="font-semibold text-base text-gray-900 leading-tight">
+			<h3 class="font-semibold text-base text-sand leading-tight">
 				{evidence?.title}
 			</h3>
 			{#if evidence?.description && !compact}
-				<p class="text-sm text-gray-500 leading-snug">
+				<p class="text-sm text-sand/60 leading-snug">
 					{evidence.description}
 				</p>
 			{/if}
@@ -195,17 +195,17 @@
 			<!-- Metadata -->
 			<div class="flex flex-wrap gap-2 mt-2">
 				{#if evidence?.metadata?.createdAt || evidence?.createdAt}
-					<span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+					<span class="text-xs text-sand/40 bg-sand/10 px-2 py-0.5 rounded">
 						{new Date(String(evidence?.metadata?.createdAt ?? evidence?.createdAt ?? '')).toLocaleDateString()}
 					</span>
 				{/if}
 				{#if fileSize > 0}
-					<span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+					<span class="text-xs text-sand/40 bg-sand/10 px-2 py-0.5 rounded">
 						{formatFileSize(fileSize)}
 					</span>
 				{/if}
 				{#if evidence?.metadata?.format}
-					<span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+					<span class="text-xs text-sand/40 bg-sand/10 px-2 py-0.5 rounded">
 						{String(evidence.metadata.format).toUpperCase()}
 					</span>
 				{/if}
@@ -215,13 +215,13 @@
 			{#if evidence?.tags && evidence.tags.length > 0}
 				<div class="flex flex-wrap gap-1 mt-2">
 					{#each (Array.isArray(evidence.tags) ? evidence.tags.slice(0, 3) : []) as tag}
-						<span class="flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded border border-blue-200">
+						<span class="flex items-center gap-1 text-xs bg-info/10 text-info px-2 py-0.5 rounded border border-info/20">
 							<TagIcon size={10} />
 							{tag}
 						</span>
 					{/each}
 					{#if evidence.tags.length > 3}
-						<span class="text-xs text-gray-500">+{evidence.tags.length - 3}</span>
+						<span class="text-xs text-sand/60">+{evidence.tags.length - 3}</span>
 					{/if}
 				</div>
 			{/if}
@@ -230,12 +230,12 @@
 
 	<!-- Footer link -->
 	{#if evidence?.url && evidenceType === 'link'}
-		<div class="px-3 py-3 border-t border-gray-200">
+		<div class="px-3 py-3 border-t border-sand/20">
 			<a
 				href={evidence.url}
 				target="_blank"
 				rel="noopener noreferrer"
-				class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+				class="flex items-center gap-1 text-info hover:text-info text-sm font-medium"
 			>
 				<LinkIcon size={14} />
 				Open Link

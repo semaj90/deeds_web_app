@@ -164,24 +164,24 @@
   function getCasePriorityColor(priority: string): string {
     switch (priority) {
       case 'high':
-        return 'border-red-400 bg-red-400/10 text-red-300';
+        return 'border-danger/60 bg-danger/80/10 text-danger/60';
       case 'medium':
-        return 'border-yellow-400 bg-yellow-400/10 text-yellow-300';
+        return 'border-warning bg-warning/10 text-warning/80';
       case 'low':
-        return 'border-green-400 bg-green-400/10 text-green-300';
-      default:return 'border-gray-400 bg-gray-400/10 text-gray-300';
+        return 'border-accent/60 bg-accent/80/10 text-accent/80';
+      default:return 'border-sand/30 bg-sand/20/10 text-sand/40';
     }
   }
 
   function getCaseStatusColor(status: string): string {
     switch (status) {
       case 'active':
-        return 'text-green-400';
+        return 'text-accent';
       case 'pending':
-        return 'text-yellow-400';
+        return 'text-warning';
       case 'closed':
-        return 'text-gray-400';
-      default:return 'text-gray-400';
+        return 'text-sand/40';
+      default:return 'text-sand/40';
     }
   }
 

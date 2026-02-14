@@ -59,17 +59,17 @@
 
  function getConfidenceColor(confidence: string): string {
  switch (confidence) {
- case 'high': return 'bg-green-500 text-white';
- case 'medium': return 'bg-yellow-500 text-black';
- case 'low': return 'bg-red-500 text-white';
- default:return 'bg-gray-500 text-white';
+ case 'high': return 'bg-accent text-white';
+ case 'medium': return 'bg-warning text-black';
+ case 'low': return 'bg-danger text-white';
+ default:return 'bg-sand/20 text-white';
  }
  }
 
  function getSimilarityColor(similarity: number): string {
- if (similarity >= 0.9) return 'text-green-600';
- if (similarity >= 0.7) return 'text-yellow-600';
- return 'text-red-600';
+ if (similarity >= 0.9) return 'text-accent';
+ if (similarity >= 0.7) return 'text-warning';
+ return 'text-danger';
  }
 
  function getInitials(name: string): string {
@@ -97,8 +97,8 @@
  <div class="space-y-4">
  {#if matches.length === 0}
  <div class="text-center py-8">
- <Users class="w-12 h-12 text-gray-400 mx-auto mb-4" />
- <p class="text-gray-500">No face matches found</p>
+ <Users class="w-12 h-12 text-sand/40 mx-auto mb-4" />
+ <p class="text-sand/60">No face matches found</p>
  </div>
  {:else}
  <div class="grid gap-4">
@@ -115,8 +115,8 @@
  </Avatar>
  {:else}
  <Avatar class="w-16 h-16">
- <AvatarFallback class="bg-gray-200">
- <Users class="w-8 h-8 text-gray-500" />
+ <AvatarFallback class="bg-sand/10">
+ <Users class="w-8 h-8 text-sand/60" />
  </AvatarFallback>
  </Avatar>
  {/if}
@@ -127,7 +127,7 @@
  <div class="flex items-center gap-2 mb-1">
  <h3 class="font-semibold text-lg">{match.poi.name}</h3>
  {#if match.poi.alias}
- <span class="text-gray-500">"{match.poi.alias}"</span>
+ <span class="text-sand/60">"{match.poi.alias}"</span>
  {/if}
  </div>
 
@@ -135,7 +135,7 @@
  <Badge class={getConfidenceColor(match.confidence)}>
  {match.confidence.toUpperCase()} CONFIDENCE
  </Badge>
- <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">Threat: {match.poi.threatLevel.toUpperCase()}</span>
+ <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20 text-sand/80">Threat: {match.poi.threatLevel.toUpperCase()}</span>
  </div>
 
  <div class="flex items-center gap-1 text-sm">

@@ -21,13 +21,13 @@
 	const variantClass = $derived.by(() => {
 		switch (variant) {
 			case 'success':
-				return 'border-green-500 bg-green-50 text-green-900 dark:bg-green-900/20 dark:text-green-100';
+				return 'border-accent bg-accent/5 text-accent dark:bg-accent/10 dark:text-accent/20';
 			case 'error':
-				return 'border-red-500 bg-red-50 text-red-900 dark:bg-red-900/20 dark:text-red-100';
+				return 'border-danger bg-danger/5 text-danger dark:bg-danger/10 dark:text-danger/20';
 			case 'warning':
-				return 'border-yellow-500 bg-yellow-50 text-yellow-900 dark:bg-yellow-900/20 dark:text-yellow-100';
+				return 'border-warning bg-warning/5 text-warning dark:bg-warning/20/20';
 			case 'info':
-				return 'border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-100';
+				return 'border-info bg-info/5 text-info dark:bg-info/10 dark:text-info/20';
 			default:
 				return 'border-border bg-background text-foreground';
 		}

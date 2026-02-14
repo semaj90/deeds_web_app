@@ -5,10 +5,10 @@
 	import { fly } from 'svelte/transition';
 
 	const alertClasses: Record<Toast['type'], string> = {
-		info: 'bg-blue-100 border-blue-500 text-blue-700',
-		success: 'bg-green-100 border-green-500 text-green-700',
-		warning: 'bg-yellow-100 border-yellow-500 text-yellow-700',
-		error: 'bg-red-100 border-red-500 text-red-700'
+		info: 'bg-info/10 border-info text-info',
+		success: 'bg-accent/10 border-accent text-accent',
+		warning: 'bg-warning/10 border-warning text-warning',
+		error: 'bg-danger/10 border-danger text-danger'
 	};
 
 	// Toasts auto-dismiss via the store's built-in duration handling
@@ -27,10 +27,10 @@
 					// Toasts are managed by the store, just for manual dismiss if needed
 				}}
 				class="ml-4 p-1 rounded-full hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-offset-2"
-				class:text-blue-800={toast.type === 'info'}
-				class:text-green-800={toast.type === 'success'}
-				class:text-yellow-800={toast.type === 'warning'}
-				class:text-red-800={toast.type === 'error'}
+				class:text-info={toast.type === 'info'}
+				class:text-accent={toast.type === 'success'}
+				class:text-warning={toast.type === 'warning'}
+				class:text-danger={toast.type === 'error'}
 				aria-label="Dismiss alert"
 			>
 				<X class="h-5 w-5" />

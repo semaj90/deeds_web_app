@@ -147,16 +147,16 @@ https://svelte.dev/e/js_parse_error -->
 	}
 	function getTypeBadgeColor(noteType: string): string {
 		const colors: Record<string, string> = {
-			legal_analysis: 'bg-blue-500',
-			case_note: 'bg-green-500',
-			evidence_note: 'bg-purple-500',
-			research: 'bg-orange-500',
-			ai_generated: 'bg-pink-500',
-			ocr_extracted: 'bg-cyan-500',
-			todo: 'bg-yellow-500',
-			general: 'bg-gray-500'
+			legal_analysis: 'bg-info',
+			case_note: 'bg-accent',
+			evidence_note: 'bg-info',
+			research: 'bg-warning',
+			ai_generated: 'bg-info',
+			ocr_extracted: 'bg-info',
+			todo: 'bg-warning',
+			general: 'bg-sand/20'
 		};
-		return colors[noteType] || 'bg-gray-500';
+		return colors[noteType] || 'bg-sand/20';
 	}
 	function addTag(tag: string) {
 		if (tag.trim() && !newNote.tags.includes(tag.trim())) {
@@ -170,8 +170,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @ts-ignore -->
  <div class="space-y-6"> <!-- Header --> <div class="flex justify-between"> <div> <h1 class="text-3xl font-bold flex items-center"> <FileText class="h-8 w-8" /> Legal Notes Manager </h1>
  <p class="text-muted-foreground">AI-Enhanced Legal Documentation with OCR, Embeddings & Graph Relations</p> </div>
- <div class="flex"> <!-- Use native buttons for accessibility; visually mimic Button inner, content --> <button type="button" class="inline-block" onclick={() => (showCreateNote = !showCreateNote)}> <span class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"> <Plus class="h-4 w-4" /> New Note </span> </button>
- <button type="button" class="inline-block" onclick={() => (showFilters = !showFilters)}> <span class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"> <Filter class="h-4 w-4" /> Filters </span> </button> </div> </div>
+ <div class="flex"> <!-- Use native buttons for accessibility; visually mimic Button inner, content --> <button type="button" class="inline-block" onclick={() => (showCreateNote = !showCreateNote)}> <span class="inline-flex items-center px-3 py-1 rounded-md bg-sand/5 hover:bg-sand/10"> <Plus class="h-4 w-4" /> New Note </span> </button>
+ <button type="button" class="inline-block" onclick={() => (showFilters = !showFilters)}> <span class="inline-flex items-center px-3 py-1 rounded-md bg-sand/5 hover:bg-sand/10"> <Filter class="h-4 w-4" /> Filters </span> </button> </div> </div>
  <div class="grid grid-cols-1 md:grid-cols-4"> <Card> <CardHeader class="pb-2"> <CardTitle class="text-sm flex items-center"> <FileText class="h-4" /> Total Notes </CardTitle> </CardHeader>
  <CardContent> <div class="text-2xl font-bold">{stats.total || 0}</div>
  <div class="text-xs"> {stats.recentlyUpdated || 0} updated this week </div> </CardContent> </Card>
@@ -189,15 +189,15 @@ https://svelte.dev/e/js_parse_error -->
  placeholder="Search notes, content, citations..."
  bind:value={ searchQuery } onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && applyFilters()} /> </div>
  <!-- native buttons replace problematic Button component, usages --> <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-white border hover:bg-slate-50 text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-white border hover:bg-sand/5 text-sm"
  onclick={ applyFilters } >
  <Search class="h-4 w-4" /> Search </button>
  <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm"
  onclick={ performSemSearch } >
  <Brain class="h-4 w-4" /> Semantic </button>
  <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm"
  onclick={ clearAllFilters } >
  Clear </button> </div>
  {#if showFilters} <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4"> <div> <!-- associate label with native select via id/for, for, accessibility --> <label for="filter-note-type" class="block text-sm font-medium">Note Type</label>
@@ -217,15 +217,15 @@ https://svelte.dev/e/js_parse_error -->
  <option value="high">High</option>
  <option value="critical">Critical</option> </select> </div>
  <div class="flex items-end"> <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm"
  onclick={() => exportNotes('json')} >
  <Download class="h-4 w-4" /> JSON </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm"
  onclick={() => exportNotes('markdown')} >
  <Download class="h-4 w-4" /> Markdown </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm"
  onclick={() => exportNotes('legal_brief')} >
  <Gavel class="h-4 w-4" /> Brief </button> </div> {/if}
  </CardContent> </Card>
@@ -259,16 +259,16 @@ https://svelte.dev/e/js_parse_error -->
  onkeydown={(e: KeyboardEvent & { currentTarget: HTMLInputElement }) => { if (e.key === 'Enter') { addTag(e.currentTarget.value); e.currentTarget.value = ''}
  }} /> </div>
  <div class="flex"> <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-blue-600 text-white text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-info text-white text-sm"
  onclick={ createNote } >
  <Save class="h-4 w-4" /> Save Note </button>
  <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm"
  onclick={() => (showCreateNote = false)} >
  Cancel </button> </div> </CardContent> </Card> {/if}
  <!-- Semantic Search, Results -->
  {#if showSemanticSearch && semanticResults.length > 0} <Card> <CardHeader> <CardTitle class="flex items-center"> <Brain class="h-5" /> Semantic Search Results <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm ml-2"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm ml-2"
  onclick={() => (showSemanticSearch = false)} >
  <X class="h-4" /> </button> </CardTitle> </CardHeader>
  <CardContent> <div class="space-y-4">
@@ -276,23 +276,23 @@ https://svelte.dev/e/js_parse_error -->
  <div class="inline-flex items-center px-2 py-1 rounded-md border"> {((note.metadata as any).semanticSimilarity * 100).toFixed(1)}% match </div> </div>
  <p class="text-sm text-muted-foreground"> {note.content.substring(0, 200)}... </p>
  <div class="flex"> <div class="inline-flex items-center px-2 py-1 rounded-md text-white {getTypeBadgeColor(note.noteType)}"> {note.noteType.replace(/_/g, ' ')} </div>
- {#if (note.metadata as any).riskLevel} <div class="inline-flex items-center px-2 py-1 rounded-md {(note.metadata as any).riskLevel === 'destructive' ? 'bg-red-500 text-white' : 'border'}"> {(note.metadata as any).riskLevel} </div> {/if}
+ {#if (note.metadata as any).riskLevel} <div class="inline-flex items-center px-2 py-1 rounded-md {(note.metadata as any).riskLevel === 'destructive' ? 'bg-danger text-white' : 'border'}"> {(note.metadata as any).riskLevel} </div> {/if}
  </div> </div> {/each}
  </div> </CardContent> </Card> {/if}
  <!-- Notes, List --> <div class="space-y-4">
  {#each notes as note (note.id)} <Card> <CardContent class="p-4">
  {#if editingNote?.id === note.id} <!-- Edit, Mode --> <div class="space-y-4"> <Input type="text" bind:value={editingNote.title} class="font-semibold" /> <textarea bind:value={editingNote.content} rows={ 6 } ></textarea> <div class="flex"> <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-blue-600 text-white text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-info text-white text-sm"
  onclick={ saveEditedNote } >
  <Save class="h-4 w-4" /> Save </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm"
  onclick={ cancelEdit }>Cancel</button >
  </div> </div> {:else} <!-- Display, Mode --> <div class="space-y-3"> <div class="flex justify-between"> <div class="flex-1"> <div class="flex items-center gap-2"> <h3 class="font-semibold">{note.title}</h3>
- {#if note.metadata.starred} <Star class="h-4 w-4 fill-yellow-400" /> {/if}
+ {#if note.metadata.starred} <Star class="h-4 w-4 fill-warning" /> {/if}
  </div>
  <div class="flex flex-wrap gap-2"> <Badge class={getTypeBadgeColor(note.noteType) + ' text-white'}> {note.noteType.replace(/_/g, ' ')} </Badge>
- {#if (note.metadata as any).riskLevel} <Badge variant={getRiskBadgeVariant((note.metadata as any).riskLevel)}> <AlertTriangle class="h-3 w-3" /> {(note.metadata as any).riskLevel} </Badge> {/if} {#if note.metadata.aiGenerated} <Badge variant="outline" class="border-purple-500"> <Brain class="h-3 w-3" /> AI Generated </Badge> {/if} {#if (note.metadata as any).ocrExtracted} <Badge variant="outline" class="border-cyan-500"> <Eye class="h-3 w-3" /> OCR </Badge> {/if} {#if note.metadata.confidence} <Badge variant="outline"> {(note.metadata.confidence * 100).toFixed(1)}% confidence </Badge> {/if}
+ {#if (note.metadata as any).riskLevel} <Badge variant={getRiskBadgeVariant((note.metadata as any).riskLevel)}> <AlertTriangle class="h-3 w-3" /> {(note.metadata as any).riskLevel} </Badge> {/if} {#if note.metadata.aiGenerated} <Badge variant="outline" class="border-info"> <Brain class="h-3 w-3" /> AI Generated </Badge> {/if} {#if (note.metadata as any).ocrExtracted} <Badge variant="outline" class="border-info"> <Eye class="h-3 w-3" /> OCR </Badge> {/if} {#if note.metadata.confidence} <Badge variant="outline"> {(note.metadata.confidence * 100).toFixed(1)}% confidence </Badge> {/if}
  </div>
  <p class="text-sm text-muted-foreground"> {note.content.length > 300 ? note.content.substring(0, 300) + '...': note.content} </p>
  <div class="flex flex-wrap gap-1">
@@ -302,16 +302,16 @@ https://svelte.dev/e/js_parse_error -->
  {#if note.caseId} <span class="flex items-center"> <Gavel class="h-3" /> {note.caseId} </span> {/if} {#if (note.metadata as any).neo4jNodeId} <span class="flex items-center"> <Database class="h-3" /> Linked </span> {/if}
  </div> </div>
  <div class="flex"> <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm"
  onclick={() => toggleStar(note)} >
- {#if note.metadata.starred} <Star class="h-4 w-4 fill-yellow-400" /> {:else} <StarOff class="h-4" /> {/if}
+ {#if note.metadata.starred} <Star class="h-4 w-4 fill-warning" /> {:else} <StarOff class="h-4" /> {/if}
  </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm"
  onclick={() => startEditNote(note)} >
  <Edit3 class="h-4" /> </button>
  <button type="button"
- class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm text-red-600"
+ class="inline-flex items-center px-2 py-1 rounded-md bg-sand/5 hover:bg-sand/10 text-sm text-danger"
  onclick={() => deleteNote(note.id)} >
  <Trash2 class="h-4" /> </button> </div> </div>
  <!-- Legal, Citations -->
@@ -322,7 +322,7 @@ https://svelte.dev/e/js_parse_error -->
  </CardContent> </Card> {/each} {#if notes.length === 0} <Card> <CardContent class="p-8"> <FileText class="h-12 w-12 mx-auto text-muted-foreground" /> <h3 class="font-semibold">No notes found</h3>
  <p class="text-muted-foreground"> {currentFilters.search || currentFilters.noteType || currentFilters.riskLevel ? 'Try adjusting your filters or search query.': 'Create your first note to get started.'} </p>
  {#if !showCreateNote} <button type="button"
- class="inline-flex items-center px-3 py-1 rounded-md bg-blue-600 text-white text-sm"
+ class="inline-flex items-center px-3 py-1 rounded-md bg-info text-white text-sm"
  onclick={() => (showCreateNote = true)} >
  <Plus class="h-4 w-4" /> Create Note </button> {/if}
  </CardContent> </Card> {/if}

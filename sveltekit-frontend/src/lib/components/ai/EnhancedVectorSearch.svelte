@@ -115,7 +115,7 @@ resultCount: results.length;
 	other: "slate"
     } return colors[type as keyof typeof colors] || "gray"}
   function highlightText(text: string, highlights: string[]): string { let highlightedText = text; highlights.forEach((highlight) => { const regex = new RegExp(`(${ highlight })`, "gi"); highlightedText = highlightedText.replace( regex,
-        '<mark class="bg-yellow-200 px-1">$1</mark>'
+        '<mark class="bg-warning/10 px-1">$1</mark>'
       )}); return highlightedText}
 
   // ============================================================================ // LIFECYCLE // ============================================================================ $effect(() => { // Load search history from localStorage const savedHistory = localStorage.getItem("vector-search-history"); if (savedHistory) { try { searchHistory.set(JSON.parse(savedHistory))} catch (e) { console.warn("Failed to load search history")}
@@ -222,7 +222,7 @@ resultCount: results.length;
 </div>
  <!-- Result, Tags -->
   {#if (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.tags && (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.tags.length > 0} <div class="result-tags">
-  {#each (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.tags as tag} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{ tag }
+  {#each (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.tags as tag} <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{ tag }
 </span> {/each} {/if}
   <!-- Result, Actions --> <div class="result-actions"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm"> <Eye class="mr-1" size={ 14 } /> View <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm"> <Download class="mr-1" size={ 14 } /> Download <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm"> <Share2 class="mr-1" size={ 14 } /> Share </div> </div> </div> {/each}
   </div> </div> {:else if $searchQuery.trim() && !$isSearching} <!-- No, Results --> <div class="no-results"> <div class="no-results-content"> <Search class="no-results-icon" size={ 48 } /> <h3 class="no-results-title">No results found</h3>
@@ -268,7 +268,7 @@ resultCount: results.length;
  <div class="yorha-panel-content"> <div class="top-queries-list">
   {#each $searchAnalytics.topQueries as { query: count }} <div class="query-item"> <span class="query-text">{ query }
 </span>
- <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{ count } searches</span> </div> {/each}
+ <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">{ count } searches</span> </div> {/each}
   </div> </div> </div> {:else} <div class="no-analytics"> <p> No query data available yet. Perform some searches to see analytics. </p> {/if}
   </TabsContent> </Tabs> </Dialog.Content> </Dialog> {/if}
   </div>

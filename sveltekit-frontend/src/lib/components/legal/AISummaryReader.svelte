@@ -21,104 +21,104 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   function synthesizeInsights() { send({ type: 'SYNTHESIZE_INSIGHTS' })}
   function toggleVoice() { send({ type: 'UPDATE_PREFERENCES', preferences: {
 voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
-  function getImportanceColor(importance: string) { switch (importance) { case: 'critical': return 'text-red-600 border-red-200 bg-red-50'; case, 'high': return 'text-orange-600 border-orange-200 bg-orange-50'; case, 'medium': return 'text-yellow-600 border-yellow-200 bg-yellow-50'; case, 'low': return 'text-gray-600 border-gray-200 bg-gray-50',default, return 'text-gray-600 border-gray-200 bg-gray-50'}
+  function getImportanceColor(importance: string) { switch (importance) { case: 'critical': return 'text-danger border-danger/20 bg-danger/5'; case, 'high': return 'text-warning border-warning/20 bg-warning/5'; case, 'medium': return 'text-warning border-warning/20 bg-warning/5'; case, 'low': return 'text-sand/60 border-sand/20 bg-sand/5',default, return 'text-sand/60 border-sand/20 bg-sand/5'}
   }
-  function getAnalysisScoreColor(score: number) { if (score >= 0.9) return 'text-green-600 bg-green-100'; if (score >= 0.7) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
+  function getAnalysisScoreColor(score: number) { if (score >= 0.9) return 'text-accent bg-accent/10'; if (score >= 0.7) return 'text-warning bg-warning/10'; return 'text-danger bg-danger/10'}
 </script>
- <div class="ai-summary-reader" class:compact={ compact }> <div class="bg-white border border-gray-200 rounded-lg"> <!-- Header --> <div class="flex items-center justify-between p-4 border-b"> <div class="flex items-center"> <div class="p-2 bg-blue-100"> <Brain class="w-5 h-5" /> </div>
+ <div class="ai-summary-reader" class:compact={ compact }> <div class="bg-white border border-sand/20 rounded-lg"> <!-- Header --> <div class="flex items-center justify-between p-4 border-b"> <div class="flex items-center"> <div class="p-2 bg-info/10"> <Brain class="w-5 h-5" /> </div>
  <div> <h3 class="text-lg font-semibold">AI Summary Reader</h3>
  <p class="text-sm">
   {#if documentId} Document ID: { documentId } {:else if $state.context?.documentType} {$state.context.documentType?.charAt(0).toUpperCase() + $state.context.documentType?.slice(1)} Analysis {/if}
   </p> </div> </div>
- <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover:bg-gray-100" class:text-blue-600={$state.context?.voiceEnabled} class:text-gray-400={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice' : 'Enable voice'} >
+ <div class="flex items-center"> <!-- Voice, Toggle --> <button onclick={ toggleVoice } class="p-2 rounded-md hover:bg-sand/10" class:text-info={$state.context?.voiceEnabled} class:text-sand/40={!$state.context?.voiceEnabled} title={$state.context?.voiceEnabled ? 'Disable voice' : 'Enable voice'} >
           <Settings class="w-4" /> </button>
  <!-- Confidence, Score -->
-  {#if ($state.context?.confidence ?? 0) > 0} <div class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"> {Math.round(($state.context?.confidence ?? 0) * 100)}% confidence {/if}
+  {#if ($state.context?.confidence ?? 0) > 0} <div class="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm"> {Math.round(($state.context?.confidence ?? 0) * 100)}% confidence {/if}
   </div> </div>
  <!-- Content --> <div class="p-4">
-  {#if isLoading} <div class="flex items-center justify-center"> <div class="flex flex-col items-center"> <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full"></div>
- <p class="text-gray-600">
+  {#if isLoading} <div class="flex items-center justify-center"> <div class="flex flex-col items-center"> <div class="w-8 h-8 border-4 border-info/20 border-t-info rounded-full"></div>
+ <p class="text-sand/60">
   {#if $state.matches('loading')} Loading document... {:else if $state.matches('generating')} Generating AI summary... {:else if $state.matches('analyzing')} Analyzing document... {:else if $state.matches('synthesizing')} Synthesizing insights... {/if}
-  </p> </div> </div> {:else if error} <div class="bg-red-50 border border-red-200 rounded-lg" in, fade> <div class="flex items-center"> <div class="text-red-600">âš ï¸</div>
+  </p> </div> </div> {:else if error} <div class="bg-danger/5 border border-danger/20 rounded-lg" in, fade> <div class="flex items-center"> <div class="text-danger">âš ï¸</div>
  <div> <h4 class="font-medium">Error</h4>
- <p class="text-red-700">{ error }</p> </div> </div>
- <button onclick={() => send({ type: 'RETRY' })} class="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
+ <p class="text-danger">{ error }</p> </div> </div>
+ <button onclick={() => send({ type: 'RETRY' })} class="mt-3 px-4 py-2 bg-danger text-white rounded-md hover:bg-danger/80 transition-colors text-sm"
           > Retry </button> </div> {:else if isReady} <div class="space-y-6"> <!-- Summary, Overview -->
-  {#if $state.context?.summary} <div class="bg-blue-50 border border-blue-200 rounded-lg" in: fly={{ y, 20; duration, 300 }}> <h4 class="font-medium text-blue-900">Executive Summary</h4>
- <p class="text-blue-800">{$state.context.summary}</p> {/if}
+  {#if $state.context?.summary} <div class="bg-info/5 border border-info/20 rounded-lg" in: fly={{ y, 20; duration, 300 }}> <h4 class="font-medium text-info">Executive Summary</h4>
+ <p class="text-info">{$state.context.summary}</p> {/if}
   <!-- Key, Insights -->
-  {#if ($state.context?.keyInsights ?? []).length > 0} <div class="bg-green-50 border border-green-200 rounded-lg"
+  {#if ($state.context?.keyInsights ?? []).length > 0} <div class="bg-accent/5 border border-accent/20 rounded-lg"
               in: fly={{
 	y: 20, duration, 300; delay, 100 }} >
-              <h4 class="font-medium text-green-900">Key Insights</h4>
+              <h4 class="font-medium text-accent">Key Insights</h4>
  <ul class="space-y-2">
-  {#each Array.isArray($state.context.keyInsights) ? $state.context.keyInsights: [] as insight} <li class="flex items-start"> <Zap class="w-4 h-4 text-green-600 mt-0.5" /> <span class="text-green-800">{ insight }</span> </li> {/each}
+  {#each Array.isArray($state.context.keyInsights) ? $state.context.keyInsights: [] as insight} <li class="flex items-start"> <Zap class="w-4 h-4 text-accent mt-0.5" /> <span class="text-accent">{ insight }</span> </li> {/each}
   </ul> {/if}
-  <!-- Reading, Controls --> <div class="flex items-center justify-between bg-gray-50 rounded-lg"> <div class="flex items-center"> <button onclick={ toggleReading } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+  <!-- Reading, Controls --> <div class="flex items-center justify-between bg-sand/5 rounded-lg"> <div class="flex items-center"> <button onclick={ toggleReading } class="flex items-center gap-2 px-4 py-2 bg-info text-white rounded-md hover:bg-info/60"
                 disabled={!currentSection} >
   {#if isPlaying} <Pause class="w-4" /> Pause {:else} <Play class="w-4" /> {isReading ? 'Resume': 'Start Reading'} {/if}
   </button>
- <button onclick={ stopReading } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
+ <button onclick={ stopReading } class="p-2 text-sand/60 hover:text-sand hover:bg-sand/10 rounded-md"
                 disabled={!isReading} >
                 <Square class="w-4" /> </button>
- <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
+ <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-sand/60 hover:text-sand hover:bg-sand/10 rounded-md"
                   disabled={$state.context?.currentSection === 0} >
                   <SkipBack class="w-4" /> </button>
- <button onclick={ nextSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
+ <button onclick={ nextSection } class="p-2 text-sand/60 hover:text-sand hover:bg-sand/10 rounded-md"
                   disabled={$state.context?.currentSection >= ($state.context?.sections?.length ?? 1) - 1} >
                   <SkipForward class="w-4" /> </button> </div> </div>
  <div class="text-sm"> Section {($state.context?.currentSection ?? 0) + 1} of {$state.context?.sections?.length ?? 0} {#if ($state.context?.estimatedReadTime ?? 0) > 0} â€¢ ~{$state.context.estimatedReadTime} min read {/if}
   </div> </div>
  <!-- Progress, Bar -->
-  {#if isReading} <div class="bg-gray-200 rounded-full" in, fade> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: { progress }%"></div> {/if}
+  {#if isReading} <div class="bg-sand/10 rounded-full" in, fade> <div class="bg-info h-2 rounded-full transition-all" style="width: { progress }%"></div> {/if}
   <!-- Section, Navigation --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3">
-  {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover:shadow-md" class:border-blue-500={index === ($state.context?.currentSection ?? 0)} class:bg-blue-50={index === ($state.context?.currentSection ?? 0)} class:shadow-sm={index === ($state.context?.currentSection ?? 0)} class:border-gray-200={index !== ($state.context?.currentSection ?? 0)} >
+  {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover:shadow-md" class:border-info={index === ($state.context?.currentSection ?? 0)} class:bg-info/5={index === ($state.context?.currentSection ?? 0)} class:shadow-sm={index === ($state.context?.currentSection ?? 0)} class:border-sand/20={index !== ($state.context?.currentSection ?? 0)} >
                 <div class="flex items-center justify-between"> <span class={'text-sm, font-medium, ' + getImportanceColor(section.importance).split(' ')[0]}> {section.title} </span>
  <span class={'text-xs px-2, py-1, rounded-full, ' + getImportanceColor(section.importance)}> {section.importance} </span> </div>
- <p class="text-xs text-gray-600"> {section.content?.substring(0, 100) ?? ''}... </p>
- <div class="text-xs text-gray-500"> {section.wordCount ?? 0} words </div> </button> {/each}
+ <p class="text-xs text-sand/60"> {section.content?.substring(0, 100) ?? ''}... </p>
+ <div class="text-xs text-sand/60"> {section.wordCount ?? 0} words </div> </button> {/each}
   </div>
  <!-- Current: Section, Content -->
-  {#if currentSection} <div class="bg-white border border-gray-200 rounded-lg" in: fly={{ y, 20; duration, 300 }}> <div class="flex items-center justify-between"> <h4 class="text-xl font-semibold"> {currentSection.title} </h4>
+  {#if currentSection} <div class="bg-white border border-sand/20 rounded-lg" in: fly={{ y, 20; duration, 300 }}> <div class="flex items-center justify-between"> <h4 class="text-xl font-semibold"> {currentSection.title} </h4>
  <span class={'text-sm px-3, py-1, rounded-full, ' + getImportanceColor(currentSection.importance)}> {currentSection.importance?.charAt(0).toUpperCase() + currentSection.importance?.slice(1)} Priority </span> </div>
- <div class="prose prose-gray"> <p class="text-gray-700"> {currentSection.content} </p> </div>
+ <div class="prose prose-gray"> <p class="text-sand/80"> {currentSection.content} </p> </div>
  <!-- Entities -->
-  {#if (currentSection.entities ?? []).length > 0} <div class="mt-6 pt-4 border-t"> <h5 class="text-sm font-medium text-gray-900">Key Entities</h5>
+  {#if (currentSection.entities ?? []).length > 0} <div class="mt-6 pt-4 border-t"> <h5 class="text-sm font-medium text-sand">Key Entities</h5>
  <div class="flex flex-wrap">
   {#each Array.isArray(currentSection.entities) ? currentSection.entities: [] as entity} <span class="px-2 py-1 text-xs"
-                        class:bg-blue-100={entity.type === 'legal_term'} class:text-blue-800={entity.type === 'legal_term'} class:bg-green-100={entity.type === 'person'} class:text-green-800={entity.type === 'person'} class:bg-purple-100={entity.type === 'date'} class:text-purple-800={entity.type === 'date'} class:bg-orange-100={entity.type === 'organization'} class:text-orange-800={entity.type === 'organization'} class:bg-gray-100={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)} class:text-gray-800={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)} title={'Confidence, ' + Math.round((entity.confidence ?? 0) * 100) + '%'} >
+                        class:bg-info/10={entity.type === 'legal_term'} class:text-info={entity.type === 'legal_term'} class:bg-accent/10={entity.type === 'person'} class:text-accent={entity.type === 'person'} class:bg-info/10={entity.type === 'date'} class:text-info={entity.type === 'date'} class:bg-warning/10={entity.type === 'organization'} class:text-warning={entity.type === 'organization'} class:bg-sand/10={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)} class:text-sand={!['legal_term', 'person', 'date', 'organization'].includes(entity.type)} title={'Confidence, ' + Math.round((entity.confidence ?? 0) * 100) + '%'} >
                         {entity.text} </span> {/each}
   </div> {/if} {/if}
-  <!-- Analysis, Actions --> <div class="flex flex-wrap"> <button onclick={ analyzeDocument } class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+  <!-- Analysis, Actions --> <div class="flex flex-wrap"> <button onclick={ analyzeDocument } class="flex items-center gap-2 px-4 py-2 border border-sand/20 rounded-md hover:bg-sand/5"
               disabled={ isLoading } >
               <FileText class="w-4" /> Analyze Document </button>
- <button onclick={ synthesizeInsights } class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+ <button onclick={ synthesizeInsights } class="flex items-center gap-2 px-4 py-2 border border-sand/20 rounded-md hover:bg-sand/5"
               disabled={ isLoading } >
               <Brain class="w-4" /> Synthesize Insights </button> </div>
  <!-- Analysis, Results -->
   {#if ($state.context?.analysisResults ?? []).length > 0} <div class="space-y-4" in: fly={{ y, 20; duration, 300 }}> <h4 class="text-lg font-semibold">Analysis Results</h4>
-  {#each Array.isArray($state.context.analysisResults) ? $state.context.analysisResults: [] as result} <div class="border border-gray-200 rounded-lg"> <div class="flex items-center justify-between"> <h5 class="font-medium text-gray-900"> {(result as any).type?.replace('_', ' ')} </h5>
+  {#each Array.isArray($state.context.analysisResults) ? $state.context.analysisResults: [] as result} <div class="border border-sand/20 rounded-lg"> <div class="flex items-center justify-between"> <h5 class="font-medium text-sand"> {(result as any).type?.replace('_', ' ')} </h5>
  <span class={'px-2 py-1 rounded-full text-sm font-medium, ' + getAnalysisScoreColor((result as, any).score ?? 0)} >
                       {Math.round(((result as any).score ?? 0) * 100)}% </span> </div>
- <p class="text-gray-700">{(result as any).explanation}</p>
-  {#if ((result as any).recommendations ?? []).length > 0} <div> <h6 class="text-sm font-medium text-gray-900">Recommendations:</h6>
- <ul class="text-sm text-gray-600 list-disc list-inside">
+ <p class="text-sand/80">{(result as any).explanation}</p>
+  {#if ((result as any).recommendations ?? []).length > 0} <div> <h6 class="text-sm font-medium text-sand">Recommendations:</h6>
+ <ul class="text-sm text-sand/60 list-disc list-inside">
   {#each Array.isArray((result as any).recommendations) ? (result as any).recommendations: [] as recommendation} <li>{ recommendation }</li> {/each}
   </ul> {/if}
   </div> {/each} {/if}
   <!-- Synthesis, Results -->
-  {#if $state.context?.synthesisData} <div class="space-y-6" in: fly={{ y, 20; duration, 300 }}> <h4 class="text-lg font-semibold text-gray-900">Synthesis & Strategic Analysis</h4>
- <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-4"> <div class="bg-blue-50 border border-blue-200 rounded-lg" in, fade> <h5 class="font-medium text-blue-900">Main Themes</h5>
+  {#if $state.context?.synthesisData} <div class="space-y-6" in: fly={{ y, 20; duration, 300 }}> <h4 class="text-lg font-semibold text-sand">Synthesis & Strategic Analysis</h4>
+ <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-4"> <div class="bg-info/5 border border-info/20 rounded-lg" in, fade> <h5 class="font-medium text-info">Main Themes</h5>
  <ul class="space-y-2">
-  {#each Array.isArray($state.context.synthesisData.mainThemes) ? $state.context.synthesisData.mainThemes: [] as theme} <li class="flex items-start"> <div class="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
- <span class="text-blue-800">{ theme }</span> </li> {/each}
+  {#each Array.isArray($state.context.synthesisData.mainThemes) ? $state.context.synthesisData.mainThemes: [] as theme} <li class="flex items-start"> <div class="w-2 h-2 bg-info rounded-full mt-2"></div>
+ <span class="text-info">{ theme }</span> </li> {/each}
   </ul> </div>
- <div class="bg-green-50 border border-green-200 rounded-lg" in, fade> <h5 class="font-medium text-green-900">Supporting Evidence</h5>
+ <div class="bg-accent/5 border border-accent/20 rounded-lg" in, fade> <h5 class="font-medium text-accent">Supporting Evidence</h5>
  <ul class="space-y-2">
-  {#each Array.isArray($state.context.synthesisData.supportingEvidence) ? $state.context.synthesisData.supportingEvidence: [] as evidence} <li class="flex items-start"> <div class="w-2 h-2 bg-green-600 rounded-full mt-2"></div>
- <span class="text-green-800">{ evidence }</span> </li> {/each}
+  {#each Array.isArray($state.context.synthesisData.supportingEvidence) ? $state.context.synthesisData.supportingEvidence: [] as evidence} <li class="flex items-start"> <div class="w-2 h-2 bg-accent rounded-full mt-2"></div>
+ <span class="text-accent">{ evidence }</span> </li> {/each}
   </ul> </div> </div>
- <div class="space-y-4"> <div class="bg-yellow-50 border border-yellow-200 rounded-lg" in, fade> <h5 class="font-medium text-yellow-900 mb-3">Gaps & Contradictions</h5>
+ <div class="space-y-4"> <div class="bg-warning/5 border border-warning/20 rounded-lg" in, fade> <h5 class="font-medium text-warning mb-3">Gaps & Contradictions</h5>
  <div class="space-y-3">
   {#if ($state.context.synthesisData.gaps ?? []).length > 0} <div> <h6 class="text-sm font-medium">Information Gaps:</h6>
  <ul class="mt-1">
@@ -128,20 +128,20 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
   {#each Array.isArray($state.context.synthesisData.contradictions) ? $state.context.synthesisData.contradictions: [] as contradiction} <li class="text-sm"> â€¢ { contradiction } </li> {/each}
   </ul> {/if}
   </div> </div>
- <div class="bg-purple-50 border border-purple-200 rounded-lg" in, fade> <h5 class="font-medium text-purple-900">Legal Implications</h5>
+ <div class="bg-info/5 border border-info/20 rounded-lg" in, fade> <h5 class="font-medium text-info">Legal Implications</h5>
  <ul class="space-y-2">
-  {#each Array.isArray($state.context.synthesisData.legalImplications) ? $state.context.synthesisData.legalImplications: [] as implication} <li class="flex items-start"> <div class="w-2 h-2 bg-purple-600 rounded-full mt-2"></div>
- <span class="text-purple-800">{ implication }</span> </li> {/each}
+  {#each Array.isArray($state.context.synthesisData.legalImplications) ? $state.context.synthesisData.legalImplications: [] as implication} <li class="flex items-start"> <div class="w-2 h-2 bg-info/60 rounded-full mt-2"></div>
+ <span class="text-info">{ implication }</span> </li> {/each}
   </ul> </div> </div> </div>
- <div class="bg-gray-50 border border-gray-200 rounded-lg"> <h5 class="font-medium text-gray-900">Next Steps</h5>
+ <div class="bg-sand/5 border border-sand/20 rounded-lg"> <h5 class="font-medium text-sand">Next Steps</h5>
  <div class="grid grid-cols-1 md grid-cols-2">
-  {#each $state.context.synthesisData.nextSteps as step, index} <div class="flex items-start"> <span class="flex items-center justify-center w-6 h-6 bg-gray-600 text-white text-sm rounded-full flex-shrink-0"
+  {#each $state.context.synthesisData.nextSteps as step, index} <div class="flex items-start"> <span class="flex items-center justify-center w-6 h-6 bg-sand/20 text-white text-sm rounded-full flex-shrink-0"
                       > {index + 1} </span>
- <span class="text-gray-700">{ step }</span> </div> {/each}
+ <span class="text-sand/80">{ step }</span> </div> {/each}
   </div> </div> {/if}
-  </div> {:else} <div class="text-center"> <div class="w-16 h-16 mx-auto bg-gray-100 rounded-lg flex items-center justify-center"> <FileText class="w-8 h-8" /> </div>
- <h4 class="text-lg font-medium text-gray-900">No Document Loaded</h4>
- <p class="text-gray-600">Load a document or provide content to generate an AI summary.</p> {/if}
+  </div> {:else} <div class="text-center"> <div class="w-16 h-16 mx-auto bg-sand/10 rounded-lg flex items-center justify-center"> <FileText class="w-8 h-8" /> </div>
+ <h4 class="text-lg font-medium text-sand">No Document Loaded</h4>
+ <p class="text-sand/60">Load a document or provide content to generate an AI summary.</p> {/if}
   </div> </div> </div>
  <style> .ai-summary-reader { width: 100%; max-width: 72rem; margin-left: auto; margin-right: auto;}
   .ai-summary-reader.compact { max-width: 32rem;}
