@@ -47,7 +47,7 @@
     "src/lib/components/gpu/**",
     "src/lib/engines/**",
     "src/lib/gpu/**",
-    "src/routes__parked/**",
+    // "src/routes__parked/**", // Session 27: deleted
     "**/*.test.ts",
     "**/*.spec.ts",
     "**/*.stories.ts",
@@ -102,7 +102,7 @@
     "src/lib/services/gpu-typescript-error-processor.ts",
     "src/lib/graph/sora-graph-traversal.ts",
     "src/lib/api/vector-search-client.ts",
-    "src/routes_parked/**",
+    // Session 27: routes_parked deleted, archived to github.com/semaj90/deeds_lab
     // Exclude backup/fixed folders - these inflate error count massively
     "src_fixed/**",
     "src.backup/**",
@@ -468,6 +468,8 @@
     "src/lib/forms/superforms-xstate-integration.ts",
     "src/routes/(app)/persons-of-interest/+page.svelte",
     // Session 21: Corrupted knowledge-search service files
-    "src/lib/services/knowledge-search/**"
+    "src/lib/services/knowledge-search/**",
+    // Session 27: Orphan components importing from deleted _archive
+    "src/lib/components/SlideTabs.svelte"
   ]
 }

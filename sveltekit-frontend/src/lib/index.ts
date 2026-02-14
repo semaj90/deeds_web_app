@@ -100,8 +100,7 @@ export const DEV_TOOLS = {
 // export { createTypeSafeQuery, drizzleCompatibilityLayer, enhanceResultWithTypes, ensureConnection, entityEnhancers, handleQueryResult, safePropertyAccess, vectorOperations } from './database/drizzle-compatibility-fix.js';
 
 // ===== ENHANCED SERVICES & STORES =====
-// Global User Store with Svelte 5 Runes
-export { default as globalUserStore } from './stores/_archive/old-stores/global-user-store.svelte';
+// Session 27: globalUserStore archived to deeds_lab — use userStore from '$lib/stores/user.svelte'
 
 // Hybrid Vector Operations
 // export { getVectorSystemHealth, syncVectorData } from './services/hybrid-vector-operations.js';
