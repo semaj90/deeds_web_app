@@ -21,9 +21,9 @@
     formData: any;
   }
 
-  let { formData }: Props = $props();
+  let props: Props = $props();
 
-  const { form, errors, enhance, submitting, message } = superForm(formData, {
+  const { form, errors, enhance, submitting, message } = superForm(props.formData, {
     validators: zodClient(poiSchema),
     resetForm: false
   });

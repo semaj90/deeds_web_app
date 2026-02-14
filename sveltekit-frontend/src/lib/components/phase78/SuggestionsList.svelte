@@ -27,8 +27,8 @@
 
 	const getRiskColor = (risk: string) => {
 		const colors: Record<string, string> = {
-			low: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400',
-			medium: 'border-amber-500/40 bg-amber-500/10 text-amber-400',
+			low: 'border-accent/40 bg-accent/10 text-accent',
+			medium: 'border-warning/40 bg-warning/10 text-warning',
 			high: 'border-danger/40 bg-danger/10 text-danger'
 		};
 		return colors[risk] || 'border-sand/20 bg-panel text-sand';
@@ -95,13 +95,13 @@
 
 		<div class="space-y-3">
 			{#each filtered as suggestion (suggestion.id)}
-				<button
-					type="button"
+				<div role="button" tabindex="0"
 					class="w-full cursor-pointer rounded-lg border-2 p-4 text-left transition hover:shadow-md {getRiskColor(
 						suggestion.riskLevel
 					)}"
 					onclick={() =>
 						(selectedId = selectedId === suggestion.id ? null : suggestion.id)}
+					onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedId = selectedId === suggestion.id ? null : suggestion.id; } }}
 				>
 					<div class="flex items-start justify-between gap-3">
 						<div class="flex-1">
@@ -163,7 +163,7 @@
 							{/if}
 						</div>
 					{/if}
-				</button>
+				</div>
 			{/each}
 		</div>
 	{/if}
