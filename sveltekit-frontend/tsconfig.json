@@ -470,6 +470,8 @@
     // Session 21: Corrupted knowledge-search service files
     "src/lib/services/knowledge-search/**",
     // Session 27: Orphan components importing from deleted _archive
-    "src/lib/components/SlideTabs.svelte"
+    "src/lib/components/SlideTabs.svelte",
+    // Session 28: Dead layout file referencing non-existent Navigation component
+    "src/routes/layout.complex.svelte"
   ]
 }
