@@ -146,20 +146,20 @@ async function handleValidate() {
 <div class="source-validator">
 	<!-- Search Section -->
 	<div class="search-section">
-		<h2 class="text-2xl font-bold mb-4">🔍 Search Knowledge Base</h2>
+		<h2 class="text-2xl font-bold mb-4 text-sand">Search Knowledge Base</h2>
 
 		<form onsubmit={(e) => { e.preventDefault(); handleSearch(); }} class="flex gap-2">
 			<input
 				type="text"
 				bind:value={searchQuery}
 				placeholder="Enter your question (e.g., How do I use Svelte 5 runes?)"
-				class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-info"
+				class="flex-1 px-4 py-2 border border-sand/30 rounded-lg bg-panelSoft text-sand placeholder-sand/40 focus:ring-2 focus:ring-info focus:outline-none"
 				disabled={isSearching}
 			/>
 			<button
 				type="submit"
 				disabled={isSearching || !searchQuery.trim()}
-				class="px-6 py-2 bg-info text-white rounded-lg hover:bg-info/60 disabled:bg-sand/20"
+				class="px-6 py-2 bg-info text-white rounded-lg hover:bg-info/60 disabled:bg-sand/20 disabled:text-sand/40"
 			>
 				{isSearching ? 'Searching...' : 'Search'}
 			</button>
@@ -167,7 +167,7 @@ async function handleValidate() {
 
 		{#if searchError}
 			<div class="mt-4 p-4 bg-danger/5 border border-danger/20 rounded-lg text-danger">
-				⚠️ {searchError}
+				{searchError}
 			</div>
 		{/if}
 	</div>
@@ -176,13 +176,13 @@ async function handleValidate() {
 	{#if searchResults.length > 0}
 		<div class="results-section mt-8">
 			<div class="flex justify-between items-center mb-4">
-				<h3 class="text-xl font-semibold">Found {searchResults.length} sources</h3>
+				<h3 class="text-xl font-semibold text-sand">Found {searchResults.length} sources</h3>
 				<div class="flex gap-2">
-					<button onclick={approveAll} class="px-4 py-2 bg-accent/10 text-accent rounded-lg hover:bg-accent/10">
-						✅ Approve High-Confidence
+					<button onclick={approveAll} class="px-4 py-2 bg-accent/10 text-accent rounded-lg hover:bg-accent/20">
+						Approve High-Confidence
 					</button>
-					<button onclick={clearSelection} class="px-4 py-2 bg-sand/10 text-sand/80 rounded-lg hover:bg-sand/10">
-						🗑️ Clear
+					<button onclick={clearSelection} class="px-4 py-2 bg-sand/10 text-sand/80 rounded-lg hover:bg-sand/20">
+						Clear
 					</button>
 				</div>
 			</div>
@@ -195,16 +195,14 @@ async function handleValidate() {
 					{@const confidenceColor = getConfidenceColor(result.confidence_score)}
 
 					<div
-						class="source-card p-4 border rounded-lg hover:shadow-md transition"
-						class:selected={isSelected}
-						class:rejected={isRejected}
+						class="p-4 border rounded-lg hover:shadow-md transition {isSelected ? 'border-accent bg-accent/5' : isRejected ? 'border-danger bg-danger/5 opacity-60' : 'border-sand/20 bg-panelSoft'}"
 					>
 						<div class="flex justify-between items-start mb-2">
 							<div class="flex-1">
 								<div class="flex items-center gap-2 mb-1">
 									<span class="text-xl">{sourceConfig.icon}</span>
 									<span class="text-sm font-semibold text-sand/60">{sourceConfig.label}</span>
-									<span class="px-2 py-1 text-xs rounded-full confidence-{confidenceColor}">
+									<span class="px-2 py-1 text-xs rounded-full {confidenceColor === 'green' ? 'bg-accent/20 text-accent' : confidenceColor === 'yellow' ? 'bg-warning/20 text-warning' : 'bg-danger/20 text-danger'}">
 										{(result.confidence_score * 100).toFixed(0)}%
 									</span>
 								</div>
@@ -214,26 +212,20 @@ async function handleValidate() {
 							<div class="flex gap-2">
 								<button
 									onclick={() => toggleChunk(result.chunk_id)}
-									class="px-3 py-1 rounded transition"
-									class:bg-accent={isSelected}
-									class:text-white={isSelected}
-									class:bg-accent/10={!isSelected}
+									class="px-3 py-1 rounded transition {isSelected ? 'bg-accent text-white' : 'bg-accent/10 text-accent'}"
 								>
-									{isSelected ? '✅' : 'Approve'}
+									{isSelected ? 'Approved' : 'Approve'}
 								</button>
 								<button
 									onclick={() => rejectChunk(result.chunk_id)}
-									class="px-3 py-1 rounded transition"
-									class:bg-danger={isRejected}
-									class:text-white={isRejected}
-									class:bg-danger/10={!isRejected}
+									class="px-3 py-1 rounded transition {isRejected ? 'bg-danger text-white' : 'bg-danger/10 text-danger'}"
 								>
-									{isRejected ? '❌' : 'Reject'}
+									{isRejected ? 'Rejected' : 'Reject'}
 								</button>
 							</div>
 						</div>
 
-						<div class="snippet-preview mt-3 p-3 bg-sand/5 rounded text-sm">
+						<div class="mt-3 p-3 bg-sand/5 rounded text-sm text-sand/80">
 							{result.snippet_preview}
 						</div>
 					</div>
@@ -241,29 +233,29 @@ async function handleValidate() {
 			</div>
 
 			<!-- Validation Section -->
-			<div class="validation-section mt-6 p-4 border-t">
-				<h3 class="text-lg font-semibold mb-3">
-					✅ Validate ({selectedChunks.size} approved, {rejectedChunks.size} rejected)
+			<div class="mt-6 p-4 border-t border-sand/20">
+				<h3 class="text-lg font-semibold mb-3 text-sand">
+					Validate ({selectedChunks.size} approved, {rejectedChunks.size} rejected)
 				</h3>
 
 				<textarea
 					bind:value={validationNotes}
 					placeholder="Optional notes..."
-					class="w-full px-4 py-2 border rounded-lg mb-4"
+					class="w-full px-4 py-2 border border-sand/30 rounded-lg bg-panelSoft text-sand placeholder-sand/40 mb-4 focus:ring-2 focus:ring-info focus:outline-none"
 					rows="3"
 				></textarea>
 
 				<button
 					onclick={handleValidate}
 					disabled={!canValidate}
-					class="w-full px-6 py-3 bg-info text-white rounded-lg hover:bg-info/60 disabled:bg-sand/20 font-semibold"
+					class="w-full px-6 py-3 bg-info text-white rounded-lg hover:bg-info/60 disabled:bg-sand/20 disabled:text-sand/40 font-semibold"
 				>
 					{isValidating ? 'Validating...' : `Validate ${selectedChunks.size} Source${selectedChunks.size === 1 ? '' : 's'}`}
 				</button>
 
 				{#if validationError}
 					<div class="mt-4 p-4 bg-danger/5 border border-danger/20 rounded-lg text-danger">
-						⚠️ {validationError}
+						{validationError}
 					</div>
 				{/if}
 			</div>
@@ -276,31 +268,5 @@ async function handleValidate() {
 		max-width: 1200px;
 		margin: 0 auto;
 		padding: 2rem;
-	}
-
-	.source-card.selected {
-		border-color: #10b981;
-		background-color: #f0fdf4;
-	}
-
-	.source-card.rejected {
-		border-color: #ef4444;
-		background-color: #fef2f2;
-		opacity: 0.6;
-	}
-
-	.confidence-green {
-		background-color: #d1fae5;
-		color: #065f46;
-	}
-
-	.confidence-yellow {
-		background-color: #fef3c7;
-		color: #92400e;
-	}
-
-	.confidence-red {
-		background-color: #fee2e2;
-		color: #991b1b;
 	}
 </style>

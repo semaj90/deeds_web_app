@@ -30,7 +30,7 @@
 
 	<!-- Stats Grid -->
 	<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-		<div class="flex items-center gap-3 rounded-lg border-2 border-blue-500/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-info/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 			<span class="text-3xl">🔢</span>
 			<div>
 				<div class="text-xl font-bold text-sand">{totalPoints.toLocaleString()}</div>
@@ -38,7 +38,7 @@
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-emerald-500/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-accent/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 			<span class="text-3xl">📁</span>
 			<div>
 				<div class="text-xl font-bold text-sand">{stats.total_files || 0}</div>
@@ -46,7 +46,7 @@
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-amber-500/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-warning/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 			<span class="text-3xl">🧬</span>
 			<div>
 				<div class="text-xl font-bold text-sand">{stats.total_errors || 0}</div>
@@ -54,7 +54,7 @@
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-violet-500/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-info/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 			<span class="text-3xl">📊</span>
 			<div>
 				<div class="text-xl font-bold text-sand">
@@ -94,12 +94,12 @@
 				{#each qdrantCollections as collection}
 					<button
 						type="button"
-						class="w-full rounded-lg border-2 bg-panel p-4 text-left transition hover:border-blue-500/60 hover:shadow-md {selectedCollection === collection.name ? 'border-blue-500 bg-blue-500/10' : 'border-sand/20'}"
+						class="w-full rounded-lg border-2 bg-panel p-4 text-left transition hover:border-info/60 hover:shadow-md {selectedCollection === collection.name ? 'border-info bg-info/10' : 'border-sand/20'}"
 						onclick={() => selectedCollection = collection.name}
 					>
 						<div class="mb-3 flex items-center justify-between">
 							<h3 class="font-semibold text-sand">{collection.name}</h3>
-							<span class="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+							<span class="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
 								{collection.status}
 							</span>
 						</div>
@@ -154,7 +154,7 @@
 									<code class="rounded bg-sand/10 px-2 py-0.5 text-xs text-sand">{embedding.source}</code>
 								</td>
 								<td class="p-3">
-									<span class="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-400">
+									<span class="rounded-full bg-warning/20 px-2 py-0.5 text-xs font-bold text-warning">
 										{embedding.error_count}
 									</span>
 								</td>
@@ -203,22 +203,22 @@
 							<h4 class="mb-2 font-semibold text-sand">{item.file_path}</h4>
 							<div class="flex flex-wrap gap-2">
 								{#if item.indexed_at}
-									<span class="rounded-md bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-400">
+									<span class="rounded-md bg-info/20 px-3 py-1 text-xs font-medium text-info">
 										📥 Indexed: {new Date(item.indexed_at).toLocaleString()}
 									</span>
 								{/if}
 								{#if item.tagged_at}
-									<span class="rounded-md bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-400">
+									<span class="rounded-md bg-warning/20 px-3 py-1 text-xs font-medium text-warning">
 										🏷️ Tagged: {new Date(item.tagged_at).toLocaleString()}
 									</span>
 								{/if}
 								{#if item.edited_at}
-									<span class="rounded-md bg-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-400">
+									<span class="rounded-md bg-accent/20 px-3 py-1 text-xs font-medium text-accent">
 										✏️ Edited: {new Date(item.edited_at).toLocaleString()}
 									</span>
 								{/if}
 								{#if item.analyzed_at}
-									<span class="rounded-md bg-violet-500/20 px-3 py-1 text-xs font-medium text-violet-400">
+									<span class="rounded-md bg-info/20 px-3 py-1 text-xs font-medium text-info">
 										🔍 Analyzed: {new Date(item.analyzed_at).toLocaleString()}
 									</span>
 								{/if}

@@ -195,8 +195,6 @@
   .bg-panel { background-color: #1a1a1a; }
   .bg-panelSoft { background-color: #2a2a2a; }
   .bg-panelSoft { background-color: #4a4a4a; }
-  .text-sand-60 { color: #b0b0b0; }
-  .text-sand-40 { color: #d0d0d0; }
   .text-white { color: #ffffff; }
   .rounded-sm { border-radius: 0.125rem; }
   .shadow-2xl { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.7); }

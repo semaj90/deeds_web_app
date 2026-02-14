@@ -192,10 +192,6 @@ import { onMount } from "svelte";
  background-color: #1e293b;
  }
 
- .border-sand-20 {
- border-color: #334155;
- }
-
  .rounded-lg {
  border-radius: 0.5rem;
  }
@@ -332,9 +328,6 @@ import { onMount } from "svelte";
  flex-shrink: 0;
  }
 
- .text-sand-60 {
- color: #94a3b8;
- }
 </style>
 
 
