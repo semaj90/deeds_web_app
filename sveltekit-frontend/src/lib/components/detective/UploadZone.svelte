@@ -28,7 +28,7 @@
 			for (const file of files) {
 				// Artificial delay / local upload logic
 				await new Promise((resolve) => setTimeout(resolve, 500));
-				const result = await evidenceStore.uploadEvidence(file, caseId);
+				const result = await evidenceStore.uploadEvidence(file, { caseId, type: 'document' });
 				onUploadComplete(result);
 			}
 		} catch (error) {

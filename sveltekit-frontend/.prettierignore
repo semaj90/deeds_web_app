@@ -1,6 +1,8 @@
 node_modules/**
 build/**
 .svelte-kit/**
+tsconfig.json
+tsconfig.*.json
 dist/**
 archived-components/**
 src/tests/**

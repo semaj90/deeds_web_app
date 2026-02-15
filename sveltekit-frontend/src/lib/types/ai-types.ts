@@ -2,7 +2,7 @@ import type { Document } from '$lib/types';
 
 // Enhanced AI Types for Legal Document Processing
 // SvelteKit 2 + Svelte 5 Compatible Types
-| 'contract_law'
+export type PracticeArea = 'contract_law'
  | 'tort_law'
  | 'criminal_law'
  | 'corporate_law'
@@ -16,7 +16,7 @@ import type { Document } from '$lib/types';
  | 'environmental_law'
  | 'securities_law'
  | 'healthcare_law';
-| 'US'
+export type Jurisdiction = 'US'
  | 'federal'
  | 'state'
  | 'local'

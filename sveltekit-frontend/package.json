@@ -790,7 +790,6 @@
     "@types/dom-webcodecs": "^0.1.16",
     "@types/fabric": "^5.3.10",
     "@types/fluent-ffmpeg": "^2.1.24",
-    "@types/ioredis": "^4.28.10",
     "@types/lokijs": "1.5.14",
     "@types/mdx": "^2.0.13",
     "@types/minio": "^7.1.0",

@@ -16,10 +16,10 @@ export const caseFormSchema = z.object({
     .max(1000, 'Description too long')
     .optional(),
   priority: z.enum(['low', 'medium', 'high'], {
-    errorMap: () => ({ message: 'Please select a priority level' })
+    message: 'Please select a priority level'
   }),
   status: z.enum(['draft', 'active', 'pending', 'closed'], {
-    errorMap: () => ({ message: 'Please select a status' })
+    message: 'Please select a status'
   }).default('draft'),
   assignedTo: z.string().uuid('Please select a valid user').optional(),
   dueDate: z.string()

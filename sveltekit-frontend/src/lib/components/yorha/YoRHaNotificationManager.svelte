@@ -5,15 +5,8 @@
   import { flip } from 'svelte/animate';
   import YoRHaNotification from "./YoRHaNotification.svelte";
 
-  let notifications = $state<any[]>([]);
-
-  // Subscribe to the store (simple subscribe for compatibility with the writable store)
-  $effect(() => {
-    const unsubscribe = notificationStore.subscribe(value => {
-      notifications = value;
-    });
-    return unsubscribe;
-  });
+  // Direct reactive access — no subscribe needed with Svelte 5 runes
+  let notifications = $derived(notificationStore.notifications);
 
   function handleClose(id?: string) {
     if (id) notificationStore.remove(id);

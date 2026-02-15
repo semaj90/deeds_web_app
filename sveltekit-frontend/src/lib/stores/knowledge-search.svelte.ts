@@ -1,5 +1,3 @@
-import { get } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 /**
  * Knowledge Search Store - Svelte 5 Barrel Export
  *
@@ -261,7 +259,7 @@ export class KnowledgeSearchStore {
     /**
      * Handle SSE stream events
      */
-    private handleStreamEvent(event: string, data) {
+    private handleStreamEvent(event: string, data: any) {
         switch (event) {
             case 'search_results':
                 this.results = data.results.map((r: any) => ({

@@ -1,15 +1,42 @@
 <script lang="ts">
- import type { CanvasState, CitationPoint } from '$lib/data/types';
- import type { Evidence } from '$lib/types/api';
+ interface CanvasElement {
+   id: string;
+   x: number;
+   y: number;
+   type: string;
+   text: string;
+ }
 
- let { canvasState, reportId, evidence, citationPoints, save } = $props<{
- canvasState: CanvasState, null, reportId: string;
-	evidence: Evidence[], citationPoints: CitationPoint[];
-	save: (canvasState: CanvasState) => Promise<void>;
+ interface CanvasState {
+   id: string;
+   caseId: string;
+   userId: string;
+   stateData: unknown;
+   createdAt: Date;
+   updatedAt: Date;
+ }
+
+ interface CitationPoint {
+   id: string;
+   source: string;
+ }
+
+ interface EvidenceItem {
+   id: string;
+   title: string;
+   evidenceType: string;
+ }
+
+ let { canvasState, reportId, evidence = [], citationPoints = [], save } = $props<{
+   canvasState: CanvasState | null;
+   reportId: string;
+   evidence: EvidenceItem[];
+   citationPoints: CitationPoint[];
+   save: (canvasState: CanvasState) => Promise<void>;
  }>();
 
  // Reactive derived value from props
- let currentCanvasElements = $derived(canvasState?.elements ?? []);
+ let currentCanvasElements = $derived(((canvasState?.stateData ?? []) as CanvasElement[]));
 
  function handleSave() {
 		const updatedCanvasState: CanvasState = {

@@ -19,7 +19,7 @@ export const boardNodeSchema = z.object({
     body: z.string().optional(),
     evidenceId: z.string().optional(),
     locked: z.boolean().optional(),
-    meta: z.record(z.unknown()).optional(),
+    meta: z.record(z.string(), z.unknown()).optional(),
     color: z.string().optional()
 });
 

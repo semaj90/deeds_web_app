@@ -1,5 +1,5 @@
-/** * AI Assistant Types - Complete type definitions for multi-backend AI system */
-| 'tensorRT-llm'
+/** AI Assistant Types - Complete type definitions for multi-backend AI system */
+export type Backend = 'tensorRT-llm'
  | 'ollama'
  | 'webasm'
  | 'go-micro'
@@ -408,7 +408,7 @@ export interface WebGPUAIConfig extends WebGPUConfig {
 // === Re-exports for compatibility ===
 export type { ChatMessage as AIMessage };
 export type { ChatSession as AISession };
-export type { BackendResponse as AIResponse };
+export type { BackendResponse as AIBackendResponse };
 export type { LegalContext as AILegalContext };
 
 

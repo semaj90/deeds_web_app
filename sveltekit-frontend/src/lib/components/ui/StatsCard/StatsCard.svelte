@@ -1,5 +1,7 @@
 <script lang="ts">
+ import type { Snippet } from 'svelte';
  let { children, title = '', value = undefined, subtitle = undefined } = $props<{
+ children?: Snippet;
  title?: string;
  value?: string | number;
  subtitle?: string;

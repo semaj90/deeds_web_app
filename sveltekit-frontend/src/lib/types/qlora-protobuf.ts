@@ -96,7 +96,7 @@ export class QLoRABinaryCodec {
 
         // Parse JSON and restore TypedArrays
         return JSON.parse(jsonString, (key: any, value: any) => {
-            if ($1?.$2 === 'Float32Array') {
+            if (value && value.__type === 'Float32Array') {
                 return new Float32Array(value.data);
             }
             return value;
@@ -117,7 +117,8 @@ export class QLoRABinaryCodec {
 
         return {
             compressionRatio: compressedSize / Math.max(1, originalSize),
-            originalSize: compressedSize
+            originalSize,
+            compressedSize
         };
     }
 }

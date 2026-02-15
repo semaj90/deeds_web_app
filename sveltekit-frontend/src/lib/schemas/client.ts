@@ -10,7 +10,7 @@ export const evidenceSchema = z.object({
   tags: z.array(z.string()).optional(),
   caseId: cuidSchema.optional(),
   fileUrl: z.string().url().optional(),
-  metadata: z.record(z.unknown()).optional()
+  metadata: z.record(z.string(), z.unknown()).optional()
 });
 
 export type EvidenceFormData = z.infer<typeof evidenceSchema>;
