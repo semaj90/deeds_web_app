@@ -84,7 +84,7 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
 			if (evidenceRows.length > 0) {
 				context += `\n## Evidence (${evidenceRows.length} items)\n`;
 				for (const e of evidenceRows) {
-					context += `- ${e.title ?? e.type ?? 'Untitled'}: ${e.description ?? ''}\n`;
+					context += `- ${e.title ?? e.fileType ?? 'Untitled'}: ${e.description ?? ''}\n`;
 				}
 			}
 		} catch {

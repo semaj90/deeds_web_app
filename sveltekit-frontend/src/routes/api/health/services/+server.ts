@@ -40,7 +40,7 @@ export const GET: RequestHandler = async () => {
       },
       urls: serviceUrls,
       responseTimeMs: Date.now() - startTime,
-      environment: services.env.nodeEnv,
+      environment: process.env.NODE_ENV ?? 'development',
     };
 
     // Overall health status

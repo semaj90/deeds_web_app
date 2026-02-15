@@ -1,7 +1,9 @@
 import { auth as lucia } from '$lib/server/auth/lucia';
-import { db, users } from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
+import { users } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import type { RequestHandler } from './$types';
 
 /**
  * POST /api/auth/demo-login
@@ -14,10 +16,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
  // Check if demo login is enabled
  const devBypassAuth = process.env.DEV_BYPASS_AUTH === 'true';
  if (!devBypassAuth) {
- return error(403, {
- message: 'Demo login is disabled in production',
- code: 'DEMO_LOGIN_DISABLED',
- });
+ throw error(403, 'Demo login is disabled in production');
  }
 
 	const body = await request.json();
@@ -54,7 +53,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			.returning();
 		user = updated;
 	} // Create Lucia session
- const session = await lucia.createSession(user.id, {});
+ const session = await lucia.createSession(user.id);
  const sessionCookie = lucia.createSessionCookie(session.id);
  cookies.set(sessionCookie.name, sessionCookie.value, {
  path: '/',
@@ -76,10 +75,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
  });
  } catch (err) {
  console.error('[Demo Login] Error: ', err);
- return error(500, {
- message: err instanceof Error ? err.message : 'Failed to create demo session',
- code: 'DEMO_LOGIN_ERROR',
- });
+ throw error(500, err instanceof Error ? err.message : 'Failed to create demo session');
  }
 };
 

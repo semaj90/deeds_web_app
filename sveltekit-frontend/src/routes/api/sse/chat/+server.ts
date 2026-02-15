@@ -21,6 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	// TODO: Add userId from locals.user once auth is wired into this SSE endpoint
 	try {
 		await db.insert(chatMessages).values({
+			id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
 			chatId: conversationId,
 			role: 'user',
 			content: message,
@@ -81,6 +82,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 				// Save assistant message
 				await db.insert(chatMessages).values({
+					id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
 					chatId: conversationId,
 					role: 'assistant',
 					content: fullResponse,

@@ -134,8 +134,7 @@ const updated = await db
 			.where(
 				and(
 					eq(cases.assignedAttorney, locals.user.id),
-					// @ts-expect-error - Drizzle inArray typing issue
-					inArray(cases.id, body.ids)
+		inArray(cases.id, body.ids)
 				)
 			)
 			.returning();
@@ -179,8 +178,7 @@ const archived = await db
 			.where(
 				and(
 					eq(cases.assignedAttorney, locals.user.id),
-					// @ts-expect-error - Drizzle inArray typing issue
-					inArray(cases.id, body.ids)
+		inArray(cases.id, body.ids)
 				)
 			)
 			.returning();

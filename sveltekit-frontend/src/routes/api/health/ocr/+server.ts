@@ -287,7 +287,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const httpStatus = overallStatus === 'healthy' ? 200 : overallStatus === 'degraded' ? 206 : 503;
 
- return json(response, { status, httpStatus });
+ return json(response, { status: httpStatus });
  } catch (err: unknown) {
  return json(
  {

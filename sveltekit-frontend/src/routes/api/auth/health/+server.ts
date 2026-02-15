@@ -1,5 +1,5 @@
 import { auth as lucia } from '$lib/server/auth/lucia';
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { sessions, users } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async () => {
  // Directly access globalThis properties for HMR checks
  const usersSameRef = globalThis.__users_ref ? globalThis.__users_ref === users : true;
  const sessionsSameRef = globalThis.__sessions_ref ? globalThis.__sessions_ref === sessions : true;
-!!globalThis?.__lucia_instance&& globalThis.__lucia_instance === lucia;
+const luciaInstanceReused = !!globalThis?.__lucia_instance && globalThis.__lucia_instance === lucia;
 
  if (!usersSameRef || !sessionsSameRef) {
  status = 'degraded';

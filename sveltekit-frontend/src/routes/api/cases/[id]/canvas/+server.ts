@@ -37,15 +37,14 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         if (existing) {
             await db.update(canvasStates)
                 .set({
-                    canvasData: state,
-                    updatedAt: new Date().toISOString(),
+                    stateData: state,
+                    updatedAt: new Date(),
                 })
                 .where(eq(canvasStates.caseId, id));
         } else {
             await db.insert(canvasStates).values({
                 caseId: id,
-                canvasData: state,
-                name: 'Main Board',
+                stateData: state,
                 // createdBy: locals.user?.id
             });
         }
@@ -68,7 +67,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
         if (!stateEntry) return json(null);
 
-        return json(stateEntry.canvasData);
+        return json(stateEntry.stateData);
     } catch (e: unknown) {
         console.error('Error loading canvas:', e);
 

@@ -1,7 +1,8 @@
-import { cases, db } from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
+import { cases } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import type { RequestHandler } from './$types';
 
 /**
  * GET /api/cases/[id]

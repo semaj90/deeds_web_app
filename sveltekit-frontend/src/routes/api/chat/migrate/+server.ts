@@ -59,6 +59,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					await tx
 						.insert(chatMessages)
 						.values({
+						id: msg.id || `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
 							chatId,
 							userId: locals.user!.id,
 							role: msg.role,
