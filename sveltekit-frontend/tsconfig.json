@@ -474,13 +474,13 @@
     "src/lib/components/SlideTabs.svelte",
     // Session 28: Dead layout file referencing non-existent Navigation component
     "src/routes/layout.complex.svelte",
-    // Session 29: Zod 4/3 version mismatch — superforms expects Zod 3, drizzle-zod ships Zod 4
-    "src/lib/components/auth/LoginModal.svelte",
-    "src/lib/components/auth/RegisterForm.svelte",
-    "src/lib/components/auth/RegisterModal.svelte",
-    "src/lib/components/auth/RegisterModal/**",
-    "src/lib/components/poi/POIForm.svelte",
-    "src/routes/(app)/persons-of-interest/create/**",
+    // Session 29: Zod 4 fixed — using zod4/zod4Client adapters
+    // "src/lib/components/auth/LoginModal.svelte",   // FIXED: zod4 adapter
+    // "src/lib/components/auth/RegisterForm.svelte",  // FIXED: zod4Client adapter
+    // "src/lib/components/auth/RegisterModal.svelte",  // FIXED: zod4Client adapter
+    // "src/lib/components/auth/RegisterModal/**",
+    // "src/lib/components/poi/POIForm.svelte",         // FIXED: zod4Client adapter
+    // "src/routes/(app)/persons-of-interest/create/**", // FIXED: zod4 adapter
     "src/routes/upload-test/**"
   ]
 }

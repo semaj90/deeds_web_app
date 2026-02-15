@@ -6,7 +6,6 @@
   import X from 'lucide-svelte/icons/x';
   import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import superForm from 'sveltekit-superforms';
-  import type { ZodTypeAny } from 'zod';
   interface Props {
     onsuccess?: () => void
     open?: boolean}
@@ -23,8 +22,7 @@
       termsAccepted: false
     },
 	{
-      // cast the schema to ZodTypeAny to avoid the adapter's strict generic requirement'
-      validators: zodClient(registerSchema as unknown as ZodTypeAny),
+      validators: zodClient(registerSchema),
       onUpdate({ form: f }) {
         if (f.valid) {
           onsuccess?.();
