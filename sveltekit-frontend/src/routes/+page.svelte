@@ -116,6 +116,15 @@
  <a href="/global-search" class="nav-item">
  <span class="nav-icon">🔍</span> GLOBAL SEARCH
  </a>
+ <a href="/citations" class="nav-item">
+ <span class="nav-icon">📜</span> CITATIONS
+ </a>
+ <a href="/dashboard" class="nav-item">
+ <span class="nav-icon">📈</span> DASHBOARD
+ </a>
+ <a href="/ai-dashboard" class="nav-item">
+ <span class="nav-icon">🧠</span> AI DASHBOARD
+ </a>
  <a href="/chat" class="nav-item">
  <span class="nav-icon">🤖</span> AI ASSISTANT
  </a>

@@ -1,6 +1,5 @@
 <script lang="ts">
-	import type { Toast } from '$lib/stores/unified/notification-store';
-	import { toasts } from '$lib/stores/unified/notification-store';
+	import { notificationStore, type Toast } from '$lib/stores/unified/notification-store.svelte';
 	import X from 'lucide-svelte/icons/x';
 	import { fly } from 'svelte/transition';
 
@@ -16,7 +15,7 @@
 </script>
 
 <div class="fixed bottom-4 right-4 z-50 w-80 space-y-3">
-	{#each $toasts as toast (toast.id)}
+	{#each notificationStore.toasts as toast (toast.id)}
 		<div
 			class={`p-4 border-l-4 rounded shadow-lg flex items-center justify-between ${alertClasses[toast.type]}`}
 			transition:fly={{ y: 20, duration: 300 }}

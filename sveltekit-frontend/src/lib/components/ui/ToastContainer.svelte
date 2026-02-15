@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { toastStore, type Toast } from '$lib/stores/unified';
+  import { toastStore, type Toast } from '$lib/stores/unified/toast-store.svelte';
 
   // helper: build class: string safely to avoid inline expression parsing issues
   function toastClass(t: Toast) {
@@ -20,7 +20,7 @@
 </script>
 
 <div class="toast-container" role="region" aria-label="Notifications">
-  {#each $toastStore as t (t.id)}
+  {#each toastStore.toasts as t (t.id)}
     <div class={toastClass(t)} role="status" aria-live={ariaLiveFor(t)}>
       <p class="nes-text">{t.message}</p>
     </div>

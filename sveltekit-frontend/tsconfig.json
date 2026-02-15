@@ -31,6 +31,7 @@
     "build",
     ".svelte-kit",
     "dist",
+    "archives/**",
     "archived/**",
     "archived-components/**",
     ".svelte-check-tmp/**",

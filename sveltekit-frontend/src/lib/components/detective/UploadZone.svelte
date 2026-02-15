@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { evidenceStore } from '$lib/stores/unified/evidence-store';
+	import { evidenceStore } from '$lib/stores/unified/evidence-store.svelte';
 	import FileUp from 'lucide-svelte/icons/file-up';
 	import Loader2 from 'lucide-svelte/icons/loader-2';
 
