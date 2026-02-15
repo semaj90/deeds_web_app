@@ -1,6 +1,5 @@
 <script lang="ts">
- import { appStore } from '$lib/stores/app-store';
- // Migrated to $effect
+ import { appStore } from '$lib/stores/app-store.svelte';
 
  let stats = $state({
  totalDocuments: 15432,
@@ -25,9 +24,9 @@
  error = null;
 
  // Load evidence from API
- await (appStore as any).loadEvidence();
+ await appStore.loadEvidence();
 
- const evidence = (appStore as any).evidence || [];
+ const evidence = appStore.evidence || [];
 
  // Calculate stats from real data
  const totalDocuments = evidence.length;

@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { appStore } from '$lib/stores/app-store';
+  import { appStore } from '$lib/stores/app-store.svelte';
   import { webgpu } from '$lib/webgpu/webgpu-init';
-  // Migrated to $effect
 
   let gpuMetrics = $state({
     utilization: 0,
@@ -30,7 +29,7 @@
       // Load GPU metrics from API
       // await appStore.loadSystemMetrics(); // Assuming this updates the store
 
-      const metrics = ($appStore as any).systemMetrics?.gpu;
+      const metrics = (appStore as any).systemMetrics?.gpu;
 
       if (metrics) {
         gpuMetrics = {

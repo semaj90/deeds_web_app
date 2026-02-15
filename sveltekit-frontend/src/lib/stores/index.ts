@@ -12,6 +12,8 @@ export { notificationStore } from './notifications.svelte.js';
 export { chatStore } from './chat-store.svelte.js';
 export { gpuSummaryStore } from './gpu-summary-store.svelte.js';
 export { KnowledgeSearchStore } from './knowledge-search.svelte.js';
+export { searchStore } from './search.svelte.js';
+export { appStore } from './app-store.svelte.js';
 
 /**
  * Initialization function for barrel stores

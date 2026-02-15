@@ -1,23 +1,10 @@
 <script lang="ts">
-	import type { PageStatus } from '$lib/stores/dashboard/DocumentProgressStore';
-	import { pageStatusesArray } from '$lib/stores/dashboard/DocumentProgressStore';
+	import { documentProgressStore, type PageStatus } from '$lib/stores/dashboard/DocumentProgressStore.svelte';
 	import { getPageStatusIcon } from '$lib/stores/dashboard/GrpcStatusAdapter';
-	// Migrated to $effect
 
-	let pages: PageStatus[] = $state([]);
 	let selectedPage: number | null = $state(null);
 	let showErrorModal = $state(false);
 	let selectedPageError: PageStatus | null = $state(null);
-
-	$effect(() => {
-
-		const unsubscribe = pageStatusesArray.subscribe((value) => {
-			pages = value;
-		
-});
-
-		return unsubscribe;
-	});
 
 	function handlePageClick(page: PageStatus) {
 		if (page.status === 'error') {
@@ -42,7 +29,7 @@
 <div class="thumbnail-tray">
 	<div class="thumbnail-tray-label">Pages</div>
 
-	{#each pages as page (page.pageNumber)}
+	{#each documentProgressStore.pageStatusesArray as page (page.pageNumber)}
 		<button
 			class="page-thumbnail {page.status}"
 			class:selected={selectedPage === page.pageNumber}

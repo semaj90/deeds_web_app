@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { appActions, appStore } from '$lib/stores/app-store';
-	import { onMount } from "svelte";
- // Migrated to $effect
+	import { onMount } from 'svelte';
+	import { appStore } from '$lib/stores/app-store.svelte';
 
  let selectedSection = $state('command-center');
  let showNewCaseModal = $state(false);
@@ -25,25 +24,16 @@
  let evidenceInsights = $state([]);
  let recentCases = $state([]);
 
- // Subscribe to store
- let appState: { cases?: any[]; evidence?: any[] } = $state({});
- $effect(() => {
- const unsubscribe = appStore.subscribe(state => {
- appState = state;
- });
- return unsubscribe;
- });
-
  async function loadCases() {
  try {
  loading = true;
  error = null;
 
  // Load cases from API
- await appActions.loadCases();
+ await appStore.loadCases();
 
  // Get cases from store and filter for recent ones
- const allCases = appState?.cases ?? [];
+ const allCases = appStore.cases ?? [];
  recentCases = allCases
  .sort((a: any, b: any) => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
  .slice(0, 10)
@@ -93,9 +83,9 @@
  async function loadEvidenceInsights() {
  try {
  // Load evidence from API
- await appActions.loadEvidence();
+ await appStore.loadEvidence();
 
- const evidence = appState?.evidence ?? [];
+ const evidence = appStore.evidence ?? [];
 
  // Generate insights from evidence data
  evidenceInsights = evidence

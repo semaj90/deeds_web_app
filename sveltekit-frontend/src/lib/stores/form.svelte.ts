@@ -1,275 +1,213 @@
-import { writable, derived, get } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+/**
+ * Form Store - Svelte 5 Runes (Session 30)
+ *
+ * Generic form state management using $state/$derived.
+ * Replaces writable/derived/get pattern with class-based reactive form.
+ */
 
 export interface FormField<TValue = unknown> {
- name: string;
+	name: string;
 	value: TValue;
- error?: string | null;
- touched: boolean;
- required?: boolean;
- validator?: (value: TValue) => string | null;
-}
-
-export interface FormState<T extends Record<string, unknown>> {
- fields: Partial<{ [K in keyof T]: FormField<T[K]> }>;
- values: Partial<T>;
-	errors: Record<string, string>;
- isSubmitting: boolean;
-	isValid: boolean;
- isDirty: boolean;
-	submitCount: number;
+	error?: string | null;
+	touched: boolean;
+	required?: boolean;
+	validator?: (value: TValue) => string | null;
 }
 
 export interface FormOptions<T extends Record<string, unknown>> {
- initialValues?: T;
- validators?: { [K in keyof T]?: (value: T[K]) => string | null };
- requiredFields?: (keyof T)[];
- onSubmit?: (values: T) => Promise<void> | void;
+	initialValues?: T;
+	validators?: { [K in keyof T]?: (value: T[K]) => string | null };
+	requiredFields?: (keyof T)[];
+	onSubmit?: (values: T) => Promise<void> | void;
 }
 
-function createFormStore<T extends Record<string, unknown>>(options: FormOptions<T> = {}) {
- const {
- initialValues = {} as T,
- validators = {} as FormOptions<T>['validators'],
- requiredFields = [],
- onSubmit,
- } = options;
+class FormStore<T extends Record<string, unknown>> {
+	fields = $state<Partial<{ [K in keyof T]: FormField<T[K]> }>>({});
+	isSubmitting = $state(false);
+	isDirty = $state(false);
+	submitCount = $state(0);
 
- const validateField = <K extends keyof T>(field: FormField<T[K]>): string | null => {
- // Check required
- if (
- field?.required&&
- (field.value === undefined || field.value === null || field.value === '')
- ) {
- return `${field.name} is required`;
- }
- // Run custom validator
- if (field.validator) {
- return field.validator(field.value);
- }
- return null;
- };
+	private validators: FormOptions<T>['validators'];
+	private requiredFields: (keyof T)[];
+	private onSubmit?: (values: T) => Promise<void> | void;
+	private initialFields: Partial<{ [K in keyof T]: FormField<T[K]> }>;
 
- // Refactored validateForm to return updated fields and validity
- const validateForm = (
-	fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
- ): {
-	updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }>; isValid: boolean } => {
- let isValid = true;
- const updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }> = { ...fields };
- (Object.keys(updatedFields) as Array<keyof T>).forEach((name) => {
- const field = updatedFields[name];
- if (!field) return;
- const error = validateField(field);
- updatedFields[name] = { ...field, error };
- if (error) isValid = false;
- });
- return { updatedFields, isValid };
- };
+	// Derived: current form values
+	values = $derived.by(() => {
+		const vals = {} as Partial<T>;
+		for (const field of Object.values(this.fields) as FormField<unknown>[]) {
+			if (field) {
+				(vals as any)[field.name] = field.value;
+			}
+		}
+		return vals;
+	});
 
- // Initialize fields
- const initialFields: Partial<{ [K in keyof T]: FormField<T[K]> }> = {} as Partial<{
- [K in keyof T]: FormField<T[K]>;
- }>;
- (Object.keys(initialValues) as Array<keyof T>).forEach((name) => {
- initialFields[name] = {
- name: name as string,
- value: initialValues[name],
- touched: false,
- required: requiredFields.includes(name as string),
- validator: validators[name as string],
- };
- });
+	// Derived: current form errors
+	errors = $derived.by(() => {
+		const errs: Record<string, string> = {};
+		for (const field of Object.values(this.fields) as FormField<unknown>[]) {
+			if (field?.error) {
+				errs[field.name] = field.error;
+			}
+		}
+		return errs;
+	});
 
- const { updatedFields: validatedInitialFields, isValid: initialIsValid } =
- validateForm(initialFields);
+	// Derived: is form valid
+	isValid = $derived.by(() => {
+		for (const field of Object.values(this.fields) as FormField<unknown>[]) {
+			if (field?.error) return false;
+		}
+		return true;
+	});
 
- // Calculate initial values and errors from validatedInitialFields
- const initialFormValues: Partial<T> = {} as Partial<T>;
- const initialFormErrors: Record<string, string> = {};
- (Object.values(validatedInitialFields) as FormField<unknown>[]).forEach((field) => {
- if (field) {
- initialFormValues[field.name as keyof T] = field.value as T[keyof T];
- if (field.error) {
- initialFormErrors[field.name] = field.error;
- }
- }
- });
+	constructor(options: FormOptions<T> = {}) {
+		const {
+			initialValues = {} as T,
+			validators = {} as FormOptions<T>['validators'],
+			requiredFields = [],
+			onSubmit,
+		} = options;
 
- const initialState: FormState<T> = {
- fields: validatedInitialFields, // Use validated fields
- values: initialFormValues, errors: initialFormErrors,
- isSubmitting: false, isValid: initialIsValid, // Set initial validity
- isDirty: false, submitCount: 0,
- };
+		this.validators = validators;
+		this.requiredFields = requiredFields;
+		this.onSubmit = onSubmit;
 
- const { subscribe, set, update } = writable<FormState<T>>(initialState);
+		// Initialize fields
+		const fields: Partial<{ [K in keyof T]: FormField<T[K]> }> = {};
+		for (const name of Object.keys(initialValues) as Array<keyof T>) {
+			fields[name] = {
+				name: name as string,
+				value: initialValues[name],
+				touched: false,
+				required: requiredFields.includes(name),
+				validator: validators?.[name],
+				error: null,
+			};
+		}
 
- // Derived store for form values
- const values = derived({ subscribe },
-	(state) => {
- const vals: Partial<T> = {} as Partial<T>;
- (Object.values(state.fields) as FormField<unknown>[]).forEach((field) => {
- if (field) {
- // Ensure field is not undefined if fields is Partial
- vals[field.name as keyof T] = field.value as T[keyof T];
- }
- });
- return vals;
- });
+		// Validate initial fields
+		for (const name of Object.keys(fields) as Array<keyof T>) {
+			const field = fields[name];
+			if (field) {
+				field.error = this.validateField(field);
+			}
+		}
 
- const errors = derived({ subscribe },
-	(state) => {
- const errs: Record<string, string> = {};
- (Object.values(state.fields) as FormField<unknown>[]).forEach((field) => {
- if (field?.error) {
- // Use optional chaining for safety
- errs[field.name] = field.error;
- }
- });
- return errs;
- });
+		this.fields = fields;
+		this.initialFields = structuredClone(fields);
+	}
 
- return {
- subscribe: values,
- errors,
- // Set field value
- setField: <K extends keyof T>(name: K, value: T[K]) => {
- update((state) => {
- const field = state.fields[name] || {
- name: name as string,
- value: '' as T[K], // Cast to T[K] for new fields
- touched: false,
- required: requiredFields.includes(name as string),
- validator: validators?.[name] as FormField<T[K]>['validator'],
- };
- const updatedField: FormField<T[K]> = { ...field, value };
- // Validate field
- const error = validateField(updatedField);
- updatedField.error = error;
- const newFields = { ...state.fields, [name]: updatedField };
- // Recalculate form validity and update field errors using the refactored validateForm
- const { updatedFields: validatedFields, isValid } = validateForm(newFields);
- // Update values and errors based on the newly validated fields
- const newValues: Partial<T> = {} as Partial<T>;
- const newErrors: Record<string, string> = {};
- (Object.values(validatedFields) as FormField<unknown>[]).forEach((f) => {
- if (f) {
- newValues[f.name as keyof T] = f.value as T[keyof T];
- if (f.error) {
- newErrors[f.name] = f.error;
- }
- }
- });
- return {
- ...state, fields: validatedFields,
- values: newValues, errors: newErrors,
- isDirty: true,
- isValid,
- };
- });
- },
-	// Touch field (mark as interacted with)
- touchField: <K extends keyof T>(name: K) => {
- update((state) => ({
- ...state,
- fields: { ...state.fields, [name]: { ...state.fields[name], touched: true } },
-	}));
- },
-	// Validate all fields
- validate: () => {
- let isValid = false; // Initialize to false, will be set by update
- update((state) => {
- const { updatedFields, isValid: formIsValid } = validateForm(state.fields);
- isValid = formIsValid; // Capture for return value
- // Re-calculate errors based on validatedFields
- const newErrors = (Object.values(updatedFields) as FormField<any>[]).reduce(
- (acc, field) => {
- if (field?.error) acc[field.name] = field.error;
- return acc;
- },
-	{} as Record<string, string>
- );
- return { ...state, fields: updatedFields as any, errors: newErrors, isValid: formIsValid };
- });
- return isValid;
- },
-	// Submit form
- submit: async () => {
- let canSubmit = false;
- update((state) => {
- const newState = { ...state, isSubmitting: true, submitCount: state.submitCount + 1 };
- // Touch all fields
- const touchedFields: Partial<{ [K in keyof T]: FormField<T[K]> }> = {};
- (Object.keys(newState.fields) as Array<keyof T>).forEach((name) => {
- const field = newState.fields[name];
- if (field) {
- touchedFields[name] = { ...field, touched: true };
- }
- });
+	private validateField<K extends keyof T>(field: FormField<T[K]>): string | null {
+		if (
+			field?.required &&
+			(field.value === undefined || field.value === null || field.value === '')
+		) {
+			return `${field.name} is required`;
+		}
+		if (field.validator) {
+			return field.validator(field.value);
+		}
+		return null;
+	}
 
- const { updatedFields: validatedFields, isValid: formIsValid } =
- validateForm(touchedFields);
- canSubmit = formIsValid;
- // Re-calculate errors based on validatedFields
- const newErrors = (Object.values(validatedFields) as FormField<any>[]).reduce(
- (acc, field) => {
- if (field?.error) acc[field.name] = field.error;
- return acc;
- },
-	{} as Record<string, string>
- );
- return { ...newState, fields: validatedFields as any, errors: newErrors, isValid: formIsValid };
- });
- if (canSubmit && onSubmit) {
- try {
- await onSubmit(get(values) as T);
- } catch (error: any) {
- console.error('Form submission error: ', error);
- }
- }
- update((state) => ({ ...state, isSubmitting: false }));
- return canSubmit;
- },
-	// Reset form
- reset: () => {
- set(initialState);
- },
-	// Add new field dynamically
- addField: <K extends keyof T>(name: K, initialValue: T[K], isRequired: boolean = false) => {
- update((state) => {
- const newFields = {
- ...state.fields,
- [name]: {
-	name: name as string, value: initialValue, touched: false, required: isRequired,
- validator: validators[name],
- },
-	};
- // Re-validate the form after adding a field
- const { updatedFields: validatedFields, isValid } = validateForm(newFields);
- // Re-calculate values and errors based on validatedFields
- const newValues: Partial<T> = {} as Partial<T>;
- const newErrors: Record<string, string> = {};
- (Object.values(validatedFields) as FormField<unknown>[]).forEach((field) => {
- if (field) {
- newValues[field.name as keyof T] = field.value as T[keyof T];
- if (field.error) {
- newErrors[field.name] = field.error;
- }
- }
- });
- return {
- ...state, fields: validatedFields,
- values: newValues, errors: newErrors,
- isValid, isDirty: true,
- }; // Adding a field makes the form dirty
- });
- },
-	};
+	setField<K extends keyof T>(name: K, value: T[K]) {
+		const existing = this.fields[name] || {
+			name: name as string,
+			value: '' as T[K],
+			touched: false,
+			required: this.requiredFields.includes(name),
+			validator: this.validators?.[name] as FormField<T[K]>['validator'],
+		};
+
+		const updatedField: FormField<T[K]> = { ...existing, value };
+		updatedField.error = this.validateField(updatedField);
+
+		this.fields = { ...this.fields, [name]: updatedField };
+		this.isDirty = true;
+	}
+
+	touchField<K extends keyof T>(name: K) {
+		const field = this.fields[name];
+		if (field) {
+			this.fields = { ...this.fields, [name]: { ...field, touched: true } };
+		}
+	}
+
+	validate(): boolean {
+		const updatedFields = { ...this.fields };
+		let valid = true;
+
+		for (const name of Object.keys(updatedFields) as Array<keyof T>) {
+			const field = updatedFields[name];
+			if (field) {
+				const error = this.validateField(field);
+				updatedFields[name] = { ...field, error };
+				if (error) valid = false;
+			}
+		}
+
+		this.fields = updatedFields;
+		return valid;
+	}
+
+	async submit(): Promise<boolean> {
+		this.submitCount++;
+
+		// Touch all fields
+		const touchedFields = { ...this.fields };
+		for (const name of Object.keys(touchedFields) as Array<keyof T>) {
+			const field = touchedFields[name];
+			if (field) {
+				touchedFields[name] = { ...field, touched: true };
+			}
+		}
+		this.fields = touchedFields;
+
+		// Validate
+		const canSubmit = this.validate();
+
+		if (canSubmit && this.onSubmit) {
+			this.isSubmitting = true;
+			try {
+				await this.onSubmit(this.values as T);
+			} catch (error: any) {
+				console.error('Form submission error:', error);
+			} finally {
+				this.isSubmitting = false;
+			}
+		}
+
+		return canSubmit;
+	}
+
+	reset() {
+		this.fields = structuredClone(this.initialFields);
+		this.isDirty = false;
+		this.isSubmitting = false;
+		this.submitCount = 0;
+	}
+
+	addField<K extends keyof T>(name: K, initialValue: T[K], isRequired = false) {
+		const field: FormField<T[K]> = {
+			name: name as string,
+			value: initialValue,
+			touched: false,
+			required: isRequired,
+			validator: this.validators?.[name] as FormField<T[K]>['validator'],
+			error: null,
+		};
+		field.error = this.validateField(field);
+		this.fields = { ...this.fields, [name]: field };
+		this.isDirty = true;
+	}
 }
 
-export default createFormStore;
+export default function createFormStore<T extends Record<string, unknown>>(
+	options: FormOptions<T> = {},
+) {
+	return new FormStore<T>(options);
+}
 
-
-
-
+export { FormStore };

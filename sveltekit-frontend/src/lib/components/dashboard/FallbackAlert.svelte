@@ -1,28 +1,13 @@
 <script lang="ts">
- import { fallbackActive, fallbackConfidence } from '$lib/stores/dashboard/DocumentProgressStore';
- // Migrated to $effect
+	import { documentProgressStore } from '$lib/stores/dashboard/DocumentProgressStore.svelte';
 
- let isActive = $state(false);
- let confidence = $state(0);
- let showAlert = $state(false);
+	let showAlert = $state(false);
 
- $effect(() => {
-
- const unsubscribeFallback = fallbackActive.subscribe((value) => {
- isActive = value;
- showAlert = value;
- 
-});
-
- const unsubscribeConfidence = fallbackConfidence.subscribe((value) => {
- confidence = value;
- });
-
- return () => {
- unsubscribeFallback();
- unsubscribeConfidence();
- };
- });
+	$effect(() => {
+		if (documentProgressStore.fallbackActive) {
+			showAlert = true;
+		}
+	});
 
  function dismissAlert() {
  showAlert = false;
@@ -39,7 +24,7 @@
  }
 </script>
 
-{#if showAlert && isActive}
+{#if showAlert && documentProgressStore.fallbackActive}
  <div class="fallback-alert" role="alert" aria-live="polite">
  <div class="fallback-alert-icon">⚠️</div>
 
@@ -52,7 +37,7 @@
  </div>
 
  <div class="fallback-alert-confidence">
- <span class="courthouse-metadata">Confidence Level: {formatConfidence(confidence)}</span>
+ <span class="courthouse-metadata">Confidence Level: {formatConfidence(documentProgressStore.fallbackConfidence)}</span>
  </div>
 
  <div class="fallback-alert-actions">

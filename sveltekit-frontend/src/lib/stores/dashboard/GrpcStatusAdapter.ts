@@ -1,4 +1,4 @@
-import type { ProcessingEvent } from './SSEStatusStore.js';
+import type { ProcessingEvent } from './SSEStatusStore.svelte.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**

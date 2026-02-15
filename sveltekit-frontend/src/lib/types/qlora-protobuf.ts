@@ -92,7 +92,7 @@ export class QLoRABinaryCodec {
      */
     static decode(binaryData: Uint8Array): QLoRAProtobufTopologyResponse {
         // Decompress
-        const jsonString = pako.ungzip(binaryData, { to: 'string' });
+        const jsonString = pako.ungzip(binaryData, { to: 'string' }) as string;
 
         // Parse JSON and restore TypedArrays
         return JSON.parse(jsonString, (key: any, value: any) => {

@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { appStore } from '$lib/stores/app-store';
-  // Migrated to $effect
+  import { appStore } from '$lib/stores/app-store.svelte';
 
   let activeCases: any[] = $state([]);
   let loading = $state(true);
@@ -14,7 +13,7 @@
       // Filter for active cases and take first 5
       // Accessing store reactively or directly depending on implementation
       // Assuming naive access for now as the original code tried
-      const currentCases = ($appStore as any).cases || [];
+      const currentCases = appStore.cases || [];
 
       activeCases = currentCases
         .filter((caseItem: any) => caseItem.status === 'active' || caseItem.status === 'in_progress')

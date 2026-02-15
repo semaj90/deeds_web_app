@@ -1,11 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
-	import { appActions, appStore } from '$lib/stores/app-store';
-	import { onMount } from "svelte";
- // Migrated to $effect
-
- // YoRHaModalComponent is being replaced by bits-ui Dialog
+	import { appStore } from '$lib/stores/app-store.svelte';
 
  let selectedSection = $state('command-center');
  let showNewCaseModal = $state(false);
@@ -29,31 +26,16 @@
  let evidenceInsights = $state<any[]>([]);
  let recentCases = $state<any[]>([]);
 
- type AppState = { cases?: any[]; evidence?: any[] };
- const actions = appActions as unknown as {
- 	loadCases?: () => Promise<void>;
- 	loadEvidence?: () => Promise<void>;
- };
-
- // Subscribe to store
- let appState = $state<AppState>({});
- $effect(() => {
- const unsubscribe = appStore.subscribe((state) => {
- appState = state;
- });
- return unsubscribe;
- });
-
  async function loadCases() {
  try {
  loading = true;
  error = null;
 
  // Load cases from API
- await actions.loadCases?.();
+ await appStore.loadCases();
 
  // Get cases from store and filter for recent ones
- const allCases = appState?.cases ?? [];
+ const allCases = appStore.cases ?? [];
  recentCases = allCases
  .sort((a: any, b: any) => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
  .slice(0, 10)
@@ -101,9 +83,9 @@
  async function loadEvidenceInsights() {
  try {
  // Load evidence from API
- await actions.loadEvidence?.();
+ await appStore.loadEvidence();
 
- const evidence = appState?.evidence ?? [];
+ const evidence = appStore.evidence ?? [];
 
  // Generate insights from evidence data
  evidenceInsights = evidence

@@ -1,6 +1,5 @@
 <script lang="ts">
- import { appActions, appStore } from '$lib/stores/app-store';
- // Migrated to $effect
+ import { appStore } from '$lib/stores/app-store.svelte';
 
  interface SystemProps {
  	webgpuCapabilities?: { hasWebGPU: boolean } | null;
@@ -26,25 +25,16 @@
  let loading = $state(true);
  let error = $state<string | null>(null);
 
- // Subscribe to store
- let appState = $state<any>();
- $effect(() => {
- const unsubscribe = appStore.subscribe(state => {
- appState = state;
- });
- return unsubscribe;
- });
-
  async function loadSystemMetrics() {
  try {
  loading = true;
  error = null;
 
  // Load system metrics from API
- await appActions.loadSystemMetrics();
+ await appStore.loadSystemMetrics();
 
  // Get metrics from store
- systemMetrics = appState?.systemMetrics;
+ systemMetrics = appStore.systemMetrics;
 
  // Update health scores based on real data
  if (systemMetrics) {

@@ -242,23 +242,23 @@
     // "src/lib/server/redis.ts",
     // "src/lib/server/redis-client.ts",
     // "src/lib/server/redis-service.ts",
-    "src/lib/server/redis-streams.ts",
-    "src/lib/server/redis/**",
-    "src/lib/server/neo4j-driver.ts",
-    "src/lib/server/lokiHybridStore.ts",
-    "src/lib/server/adapter-ranking.ts",
-    "src/lib/server/indexers/**",
-    "src/lib/server/vector/**",
+    // "src/lib/server/redis-streams.ts",  // Session 29: RE-INCLUDED
+    // "src/lib/server/redis/**",  // Session 29: RE-INCLUDED
+    // "src/lib/server/neo4j-driver.ts",  // Session 29: RE-INCLUDED
+    // "src/lib/server/lokiHybridStore.ts",  // Session 29: RE-INCLUDED
+    // "src/lib/server/adapter-ranking.ts",  // Session 29: RE-INCLUDED
+    // "src/lib/server/indexers/**",  // Session 29: RE-INCLUDED
+    // "src/lib/server/vector/**",  // Session 29: RE-INCLUDED
     // Broken store barrels (re-export missing files)
     "src/lib/stores/machines/**",
     "src/lib/stores/phase76-barrel.ts",
-    // Other non-route files with type issues
-    "src/lib/types/qlora-protobuf.ts",
-    "src/lib/api/services/cache-service.ts",
-    "src/lib/cache/chr-rom-pattern-cache.ts",
-    "src/lib/logic/**",
-    "src/lib/workers/embedding-worker-enhanced.ts",
-    "src/qdrant-client.ts",
+    // Other non-route files — RE-INCLUDED after ioredis shim cleanup
+    // "src/lib/types/qlora-protobuf.ts",  // Session 29: RE-INCLUDED
+    // "src/lib/api/services/cache-service.ts",  // Session 29: RE-INCLUDED
+    // "src/lib/cache/chr-rom-pattern-cache.ts",  // Session 29: RE-INCLUDED
+    // "src/lib/logic/**",  // Session 29: RE-INCLUDED
+    // "src/lib/workers/embedding-worker-enhanced.ts",  // Session 29: RE-INCLUDED
+    // "src/qdrant-client.ts",  // Session 29: RE-INCLUDED
     "src/lib/config/**",
     "src/lib/forms/**",
     "src/lib/data/**",
