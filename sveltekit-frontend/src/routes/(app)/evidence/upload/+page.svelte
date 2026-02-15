@@ -1,15 +1,15 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import type { PageData } from './$types';
 
-	let { data }: {
-	data: PageData } = $props();
+	let { data }: { data: PageData } = $props();
 	let user = $derived(data.user);
 
 	interface UploadStatus {
 		status: 'idle' | 'uploading' | 'processing' | 'complete' | 'error';
 		docId?: string;
 		fileName?: string;
-	progress: number;
+		progress: number;
 		message: string;
 		error?: string;
 	}
@@ -17,11 +17,19 @@
 	let uploadStatus: UploadStatus = $state({
 		status: 'idle',
 		progress: 0,
-		message: 'Ready to upload'
+		message: 'Ready to upload',
 	});
 
 	let dragActive = $state(false);
 	let fileInput: HTMLInputElement | undefined = $state();
+	let eventSource: EventSource | null = null;
+
+	onDestroy(() => {
+		if (eventSource) {
+			eventSource.close();
+			eventSource = null;
+		}
+	});
 
 	async function uploadFile(file: File) {
 		if (!file) return;
@@ -30,7 +38,7 @@
 			status: 'uploading',
 			fileName: file.name,
 			progress: 0,
-			message: 'Uploading file...'
+			message: 'Uploading file...',
 		};
 
 		if (!user) {
@@ -44,126 +52,145 @@
 
 			const response = await fetch('/api/evidence/upload', {
 				method: 'POST',
-				body: formData
+				body: formData,
 			});
 
 			if (!response.ok) {
-				throw new Error(`Upload failed: ${response.statusText}`);
+				const err = await response.json().catch(() => ({}));
+				throw new Error(err.error || `Upload failed: ${response.statusText}`);
 			}
 
 			const result = await response.json();
 
 			uploadStatus = {
 				status: 'processing',
-				docId: result.doc_id,
-				fileName: result.filename,
-				progress: 50,
-				message: `Queued for processing: ${result.doc_id}`
+				docId: result.id,
+				fileName: result.fileName,
+				progress: 60,
+				message: 'Uploaded to MinIO. Generating embeddings...',
 			};
 
-			// Poll for processing status
-			await pollProcessingStatus(result.doc_id);
-
+			// Connect to SSE for real-time progress
+			connectSSE(result.jobId);
 		} catch (error) {
 			uploadStatus = {
 				status: 'error',
 				progress: 0,
 				message: 'Upload failed',
-				error: error instanceof Error ? error.message : 'Unknown error'
+				error: error instanceof Error ? error.message : 'Unknown error',
 			};
+		}
+	}
+
+	function connectSSE(jobId: string) {
+		if (eventSource) {
+			eventSource.close();
+		}
+
+		eventSource = new EventSource(`/api/evidence/realtime?jobId=${jobId}`);
+
+		eventSource.onmessage = (event) => {
+			try {
+				const data = JSON.parse(event.data);
+
+				if (data.type === 'progress') {
+					uploadStatus = {
+						status: 'processing',
+						docId: data.evidenceId || uploadStatus.docId,
+						fileName: uploadStatus.fileName,
+						progress: data.progress ?? uploadStatus.progress,
+						message: data.message ?? 'Processing...',
+					};
+				}
+
+				if (data.type === 'complete') {
+					uploadStatus = {
+						status: 'complete',
+						docId: data.evidenceId || uploadStatus.docId,
+						fileName: uploadStatus.fileName,
+						progress: 100,
+						message: data.message ?? 'Upload and embedding complete',
+					};
+					eventSource?.close();
+					eventSource = null;
+				}
+
+				if (data.type === 'error') {
+					uploadStatus = {
+						status: 'error',
+						docId: uploadStatus.docId,
+						fileName: uploadStatus.fileName,
+						progress: uploadStatus.progress,
+						message: data.message ?? 'Processing error',
+						error: data.error,
+					};
+					eventSource?.close();
+					eventSource = null;
+				}
+			} catch {
+				// Ignore parse errors (keep-alive comments etc.)
+			}
+		};
+
+		eventSource.onerror = () => {
+			// SSE connection lost — fall back to polling status endpoint
+			eventSource?.close();
+			eventSource = null;
+			if (uploadStatus.status === 'processing' && uploadStatus.docId) {
+				pollFallback(uploadStatus.docId);
+			}
+		};
+	}
+
+	async function pollFallback(docId: string) {
+		// Simple fallback: poll status endpoint once after SSE drops
+		try {
+			const response = await fetch(`/api/evidence/${docId}/status`);
+			if (response.ok) {
+				const status = await response.json();
+				uploadStatus = {
+					status: status.status === 'complete' ? 'complete' : status.status === 'error' ? 'error' : 'processing',
+					docId,
+					fileName: uploadStatus.fileName,
+					progress: status.progress ?? uploadStatus.progress,
+					message: status.message ?? 'Processing...',
+					error: status.error,
+				};
+			}
+		} catch {
+			// Status check failed silently
 		}
 	}
 
 	async function saveToLocalStorage(file: File) {
 		try {
-			// Store metadata
 			const pendingUpload = {
 				id: crypto.randomUUID(),
 				fileName: file.name,
 				fileSize: file.size,
 				fileType: file.type,
 				timestamp: Date.now(),
-				status: 'pending'
+				status: 'pending',
 			};
 
 			const uploads = JSON.parse(localStorage.getItem('pending_uploads') || '[]');
 			uploads.push(pendingUpload);
 			localStorage.setItem('pending_uploads', JSON.stringify(uploads));
 
-			// Simulate processing delay
-			await new Promise(resolve => setTimeout(resolve, 1000));
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 
 			uploadStatus = {
 				status: 'complete',
 				fileName: file.name,
 				progress: 100,
-				message: 'Saved locally (Offline Mode). Will upload when online.'
+				message: 'Saved locally (Offline Mode). Will upload when online.',
 			};
 		} catch (e) {
 			uploadStatus = {
 				status: 'error',
 				progress: 0,
 				message: 'Local save failed',
-				error: e instanceof Error ? e.message : 'Unknown error'
-			};
-		}
-	}
-
-	async function pollProcessingStatus(docId: string) {
-		const maxAttempts = 60; // 5 minutes with 5s intervals
-		let attempts = 0;
-
-		while (attempts < maxAttempts) {
-			try {
-				const response = await fetch(`/api/evidence/${docId}/status`);
-
-				if (!response.ok) {
-					throw new Error('Status check failed');
-				}
-
-				const status = await response.json();
-
-				uploadStatus = {
-					status: status.status === 'complete' ? 'complete' : 'processing',
-					docId: docId,
-					fileName: uploadStatus.fileName,
-					progress: status.progress || 50,
-					message: status.message || 'Processing...'
-				};
-
-				if (status.status === 'complete') {
-					uploadStatus.progress = 100;
-					uploadStatus.message = `✅ Processing complete, ${status.chunk_count} chunks created`;
-					break;
-				}
-
-				if (status.status === 'error') {
-					uploadStatus.status = 'error';
-					uploadStatus.error = status.error;
-					break;
-				}
-
-				// Wait 5 seconds before next poll
-				await new Promise(resolve => setTimeout(resolve, 5000));
-				attempts++;
-
-			} catch (error) {
-				uploadStatus = {
-					status: 'error',
-					progress: 0,
-					message: 'Status check failed',
-					error: error instanceof Error ? error.message : 'Unknown error'
-				};
-				break;
-			}
-		}
-
-		if (attempts >= maxAttempts) {
-			uploadStatus = {
-				status: 'error',
-				progress: 0,
-				message: 'Processing timeout',
-				error: 'Document processing took too long'
+				error: e instanceof Error ? e.message : 'Unknown error',
 			};
 		}
 	}
@@ -199,10 +226,14 @@
 	}
 
 	function resetUpload() {
+		if (eventSource) {
+			eventSource.close();
+			eventSource = null;
+		}
 		uploadStatus = {
 			status: 'idle',
 			progress: 0,
-			message: 'Ready to upload'
+			message: 'Ready to upload',
 		};
 		if (fileInput) {
 			fileInput.value = '';

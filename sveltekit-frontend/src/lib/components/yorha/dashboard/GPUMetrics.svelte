@@ -1,6 +1,5 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app-store.svelte';
-  import { webgpu } from '$lib/webgpu/webgpu-init';
 
   let gpuMetrics = $state({
     utilization: 0,
@@ -11,8 +10,7 @@
     fanSpeed: 45
   });
 
-  let performanceHistory = $state(Array.from({ length: 20 },
-	() => ({
+  let performanceHistory = $state(Array.from({ length: 20 }, () => ({
     time: 0,
     utilization: 0,
     memory: 0
@@ -26,22 +24,18 @@
       loading = true;
       error = null;
 
-      // Load GPU metrics from API
-      // await appStore.loadSystemMetrics(); // Assuming this updates the store
-
-      const metrics = (appStore as any).systemMetrics?.gpu;
+      const metrics = appStore.systemMetrics?.gpu;
 
       if (metrics) {
         gpuMetrics = {
-          utilization: metrics.utilization ?? 0,
+          utilization: metrics.usage ?? 0,
           memoryUsed: metrics.memoryUsed || 0,
           memoryTotal: metrics.memoryTotal || 8,
           temperature: metrics.temperature || 65,
-          powerDraw: metrics.powerDraw || 150,
-          fanSpeed: metrics.fanSpeed || 45
+          powerDraw: (metrics as any).powerDraw || 150,
+          fanSpeed: (metrics as any).fanSpeed || 45
         };
 
-        // Update performance history
         performanceHistory = [
           ...performanceHistory.slice(1),
           {
@@ -51,7 +45,6 @@
           }
         ];
       } else {
-        // Fallback or just skip if no metrics found yet
         simulateMetrics();
       }
 
@@ -84,34 +77,17 @@
     ];
   }
 
-
   $effect(() => {
-    let interval: NodeJS.Timeout;
+    loadGPUMetrics();
 
-    const init = async () => {
-      try {
-        const capabilities = await webgpu.initialize();
-      } catch (error) {
-        console.warn('WebGPU initialization failed:', error);
-      }
-
+    const interval = setInterval(async () => {
       await loadGPUMetrics();
+    }, 5000);
 
-      // Update metrics periodically
-      interval = setInterval(async () => {
-        await loadGPUMetrics();
-      }, 5000); // Update every 5 seconds
-    };
-
-    init();
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   });
 
-  function getMetricColor(value: number, thresholds: {
-low: number, high: number }): string {
+  function getMetricColor(value: number, thresholds: { low: number; high: number }): string {
     if (value >= thresholds.high) return 'text-danger/80';
     if (value >= thresholds.low) return 'text-warning';
     return 'text-accent';
@@ -166,7 +142,7 @@ low: number, high: number }): string {
  <!-- Temperature -->
  <div class="grid grid-cols-3 gap-4 text-center">
  <div class="bg-panelSoft/30 rounded-lg p-3">
- <div class="text-lg font-bold {getMetricColor(gpuMetrics.temperature {low: 70 high: 85})}">
+ <div class="text-lg font-bold {getMetricColor(gpuMetrics.temperature, {low: 70, high: 85})}">
  {gpuMetrics.temperature}°C
  </div>
  <div class="text-xs text-sand/40">Temperature</div>
@@ -208,8 +184,8 @@ low: number, high: number }): string {
  <span class="px-2 py-1 bg-accent/20 text-accent text-xs rounded">Compute Shaders</span>
  <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">Tensor Ops</span>
  <span class="px-2 py-1 bg-info/20 text-info/80 text-xs rounded">Vector Search</span>
- {#if appStore.systemMetrics?.gpu?.model}
- <span class="px-2 py-1 bg-warning/20 text-warning text-xs rounded">{appStore.systemMetrics.gpu.model}</span>
+ {#if (appStore.systemMetrics?.gpu as any)?.model}
+ <span class="px-2 py-1 bg-warning/20 text-warning text-xs rounded">{(appStore.systemMetrics?.gpu as any).model}</span>
  {/if}
  </div>
  </div>

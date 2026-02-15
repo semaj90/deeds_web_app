@@ -92,8 +92,7 @@ name: newCollectionName,
 		selectedCollection = collection;
 	}
 
-	function handleCollectionDeleted(event: CustomEvent) {
-		const collectionId = event.detail;
+	function handleCollectionDeleted(collectionId: string) {
 		collections = collections.filter((c) => c.id !== collectionId);
 		if (selectedCollection?.id === collectionId) {
 			selectedCollection = null;
@@ -173,8 +172,8 @@ name: newCollectionName,
 				{:else}
 					<CitationCollections
 						{collections}
-						onselect={(e: CustomEvent) => selectCollection(e.detail)}
-						ondeleted={handleCollectionDeleted}
+						onselect={(collection) => selectCollection(collection)}
+						ondeleted={(id) => handleCollectionDeleted(id)}
 					/>
 				{/if}
 			</div>

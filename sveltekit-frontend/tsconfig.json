@@ -445,9 +445,9 @@
     "src/lib/components/ui/SimpleDragDrop.svelte",
     "src/lib/components/ui/SmartTextarea.svelte",
     // Session 16: Other corrupted component files
-    "src/lib/components/chat/SSRQLorAChatInterface.svelte",
-    "src/lib/components/legal-ai/CitationCollections.svelte",
-    "src/lib/components/yorha/dashboard/GPUMetrics.svelte",
+    // "src/lib/components/chat/SSRQLorAChatInterface.svelte", // Session 30: REMOVED — file doesn't exist
+    // "src/lib/components/legal-ai/CitationCollections.svelte", // Session 30: RE-INCLUDED — added missing <script> tag
+    // "src/lib/components/yorha/dashboard/GPUMetrics.svelte", // Session 30: RE-INCLUDED — fixed syntax + removed webgpu dep
     // Session 16b: Non-critical component directories
     "src/lib/components/visual-memory/**",
     "src/lib/components/templates/**",
@@ -461,11 +461,11 @@
     "src/lib/components/ui/EvidenceCard/**",
     "src/routes/(dev)/**",
     // Session 16b: More corrupted UI files
-    "src/lib/components/ui/ZeroLatencyInteraction.svelte",
+    // "src/lib/components/ui/ZeroLatencyInteraction.svelte", // Session 30: REMOVED — file doesn't exist
     "src/lib/components/ui/AIAccessibilityWrapper.svelte",
     "src/lib/components/ui/BitsUIAccessibilityWrapper.svelte",
     "src/lib/components/ui/NESElementsShowcase.svelte",
-    "src/lib/components/ui/CardFooter.svelte",
+    // "src/lib/components/ui/CardFooter.svelte", // Session 30: RE-INCLUDED — already clean Svelte 5
     "src/lib/components/ui/CaseItem.svelte",
     "src/lib/components/ui/CommandPalette.svelte",
     "src/lib/components/ui/ContextMenuTrigger.svelte",
@@ -477,7 +477,7 @@
     "src/lib/components/ui/enhanced-bits.ts",
     "src/lib/components/ui/svelte5-index.ts",
     "src/lib/components/ui/tooltip.ts",
-    "src/lib/components/ui/Dialog.svelte",
+    // "src/lib/components/ui/Dialog.svelte", // Session 30: RE-INCLUDED — fixed dark: pseudo-selector spacing
 
     // Session 17: Missing module imports + placeholder files
     "src/lib/components/detective/DetectiveBoard.svelte",

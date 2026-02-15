@@ -1,101 +1,86 @@
 import type { RequestHandler } from './$types';
+import { subscribe, getJob } from '$lib/server/evidence-progress';
 
 /**
- * SSE Endpoint for Real-time Evidence Updates
- * Subscribes to Redis/Postgres events for evidence processing status
+ * GET /api/evidence/realtime?jobId=xxx
+ * SSE endpoint for real-time evidence processing progress.
+ * Subscribes to the in-memory progress store and streams updates.
  */
 export const GET: RequestHandler = async ({ url, locals }) => {
-    // 1. Auth Guard
-    if (!locals.user) {
-        return new Response('Unauthorized', { status: 401 });
-    }
+	if (!locals.user) {
+		return new Response('Unauthorized', { status: 401 });
+	}
 
-    const userId = locals.user.id;
-    const encoder = new TextEncoder();
+	const jobId = url.searchParams.get('jobId');
+	if (!jobId) {
+		return new Response('Missing jobId parameter', { status: 400 });
+	}
 
-    // Track intervals for cleanup
-    let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
-    let simulateInterval: ReturnType<typeof setInterval> | null = null;
-    let isClosed = false;
+	const encoder = new TextEncoder();
+	let isClosed = false;
+	let unsubscribe: (() => void) | null = null;
+	let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
 
-    // 2. Create ReadableStream
-    const stream = new ReadableStream({
-        start(controller) {
-            // Helper to safely enqueue data
-            const safeEnqueue = (data: string) => {
-                if (!isClosed) {
-                    try {
-                        controller.enqueue(encoder.encode(data));
-                    } catch {
-                        // Controller already closed, ignore
-                        isClosed = true;
-                        cleanup();
-                    }
-                }
-            };
+	const stream = new ReadableStream({
+		start(controller) {
+			const safeEnqueue = (data: string) => {
+				if (isClosed) return;
+				try {
+					controller.enqueue(encoder.encode(data));
+				} catch {
+					isClosed = true;
+					cleanup();
+				}
+			};
 
-            // Cleanup function
-            const cleanup = () => {
-                if (keepAliveInterval) {
-                    clearInterval(keepAliveInterval);
-                    keepAliveInterval = null;
-                }
-                if (simulateInterval) {
-                    clearInterval(simulateInterval);
-                    simulateInterval = null;
-                }
-            };
+			const cleanup = () => {
+				if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+				if (keepAliveInterval) { clearInterval(keepAliveInterval); keepAliveInterval = null; }
+			};
 
-            // Send initial connection message
-            safeEnqueue(`data: ${JSON.stringify({ type: 'connected', userId })}\n\n`);
+			// Send initial connection event
+			safeEnqueue(`data: ${JSON.stringify({ type: 'connected', jobId })}\n\n`);
 
-            // Setup keep-alive interval (every 30s)
-            keepAliveInterval = setInterval(() => {
-                safeEnqueue(': keep-alive\n\n');
-            }, 30000);
+			// Subscribe to progress updates from the in-memory store
+			unsubscribe = subscribe(jobId, (progress) => {
+				safeEnqueue(`data: ${JSON.stringify({ type: 'progress', ...progress })}\n\n`);
 
-            // TODO: Hook into actual event bus (Redis PubSub or Postgres Notify)
-            // For now, we simulate processing updates if a 'simulate' param is present
-            if (url.searchParams.has('simulate')) {
-                let progress = 0;
-                simulateInterval = setInterval(() => {
-                    progress += 10;
-                    if (progress > 100) {
-                        if (simulateInterval) {
-                            clearInterval(simulateInterval);
-                            simulateInterval = null;
-                        }
-                        safeEnqueue(`data: ${JSON.stringify({ type: 'complete', docId: '123' })}\n\n`);
-                    } else {
-                        safeEnqueue(`data: ${JSON.stringify({ type: 'progress', progress, status: 'processing' })}\n\n`);
-                    }
-                }, 1000);
-            }
+				// Close stream when job completes or errors
+				if (progress.step === 'complete' || progress.step === 'error') {
+					const eventType = progress.step === 'complete' ? 'complete' : 'error';
+					safeEnqueue(`data: ${JSON.stringify({ type: eventType, ...progress })}\n\n`);
+					isClosed = true;
+					cleanup();
+					try { controller.close(); } catch { /* already closed */ }
+				}
+			});
 
-            // Return cleanup function
-            return cleanup;
-        },
-        cancel() {
-            // Client disconnected
-            isClosed = true;
-            if (keepAliveInterval) {
-                clearInterval(keepAliveInterval);
-                keepAliveInterval = null;
-            }
-            if (simulateInterval) {
-                clearInterval(simulateInterval);
-                simulateInterval = null;
-            }
-        }
-    });
+			// Keep-alive every 30 seconds
+			keepAliveInterval = setInterval(() => {
+				safeEnqueue(': keep-alive\n\n');
+			}, 30_000);
 
-    // 3. Return SSE Response
-    return new Response(stream, {
-        headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'X-Accel-Buffering': 'no' // Important for Nginx proxy
-        }
-    });
+			// If job doesn't exist (expired or invalid), close immediately
+			if (!getJob(jobId)) {
+				safeEnqueue(`data: ${JSON.stringify({ type: 'error', message: 'Job not found or expired' })}\n\n`);
+				isClosed = true;
+				cleanup();
+				try { controller.close(); } catch { /* already closed */ }
+			}
+		},
+		cancel() {
+			isClosed = true;
+			if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+			if (keepAliveInterval) { clearInterval(keepAliveInterval); keepAliveInterval = null; }
+		},
+	});
+
+	return new Response(stream, {
+		headers: {
+			'Content-Type': 'text/event-stream',
+			'Cache-Control': 'no-cache',
+			'Connection': 'keep-alive',
+			'X-Accel-Buffering': 'no',
+		},
+	});
 };
