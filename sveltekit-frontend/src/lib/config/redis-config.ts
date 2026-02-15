@@ -26,7 +26,7 @@ export const REDIS_BASE_CONFIG: RedisOptions = {
     maxRetriesPerRequest: 1,
     enableReadyCheck: true,
     // Connection pooling for high concurrency
-    maxLoadingTimeout: 5000
+    // maxLoadingTimeout: 5000  // Not a valid ioredis option
 };
 
 // Development-specific optimizations

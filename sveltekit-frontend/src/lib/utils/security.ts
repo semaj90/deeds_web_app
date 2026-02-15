@@ -459,7 +459,6 @@ export function addChainOfCustodyEvent(evidenceId: string, event: Omit<ChainOfCu
     logSecurityEvent({
         type: "evidence_access",
         userId: event.userId,
-        timestamp: fullEvent.timestamp,
         details: {
 	action: "chain_of_custody",
             evidenceId,
@@ -475,7 +474,6 @@ export function secureDataExport(data: unknown, userId: string, legalContext?: R
     logSecurityEvent({
         type: "data_export",
         userId,
-        timestamp: Date.now(),
         details: {
 	dataType: typeof data,
             recordCount: Array.isArray(data) ? data.length : 1,
@@ -516,7 +514,6 @@ export function checkAttorneyClientPrivilege(userId: string, documentId: string,
         logSecurityEvent({
             type: "access_denied",
             userId,
-            timestamp: Date.now(),
             details: {
 	reason: "non_legal_professional_access", documentId, action },
 	severity: "high"
@@ -536,7 +533,6 @@ export function validateLegalAccess(requiredPermission: string, caseId?: string)
         logSecurityEvent({
             type: "access_denied",
             userId: session.userId,
-            timestamp: Date.now(),
             details: { requiredPermission, userPermissions: session.permissions },
 	severity: "medium",
             legalContext: { caseId }
@@ -552,7 +548,6 @@ export function trackPrivilegedAccess(documentId: string, action: "view" | "edit
         logSecurityEvent({
             type: "privileged_access",
             userId: session.userId,
-            timestamp: Date.now(),
             details: {
 	documentId: action,
                 isLegalProfessional: session.isLegalProfessional,

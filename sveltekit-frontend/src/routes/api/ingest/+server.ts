@@ -19,13 +19,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       indexing: formData.get('indexing') === 'true'
     };
 
-    console.log(`[INGEST] Received ${files.length} files from ${locals.user.username}`);
-    console.log(`[INGEST] Options:`, options);
-
     const results = [];
 
     for (const file of files) {
-      console.log(`[INGEST] Processing ${file.name} (${file.size} bytes)...`);
 
       // 1. Upload to Docling Gateway (Mock)
       // const doclingRes = await fetch('http://localhost:8000/process', { method: 'POST', body: file });

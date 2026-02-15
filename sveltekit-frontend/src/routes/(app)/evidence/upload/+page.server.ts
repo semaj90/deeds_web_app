@@ -155,8 +155,8 @@ export const actions: Actions = {
 	errors: { file: ['No file provided'] } } });
       }
 
-      // Ensure the provided entry supports arrayBuffer (basic duck-typing)
-      if (typeof (rawFile as any).arrayBuffer !== 'function') {
+      // Ensure the provided entry is a File (not a string field)
+      if (!(rawFile instanceof File)) {
         return fail(400, {
           form: {
 	errors: { file: ['Uploaded file is not readable on server'] } },
@@ -164,10 +164,10 @@ export const actions: Actions = {
       }
 
       // Normalize file fields safely for server-side processing
-      const fileName = (rawFile as any).name ?? 'upload.bin';
-      const fileType = (rawFile as any).type ?? 'application/octet-stream';
-      const fileSize = Number((rawFile as any).size ?? 0);
-      const arrayBuffer = await (rawFile as any).arrayBuffer();
+      const fileName = rawFile.name ?? 'upload.bin';
+      const fileType = rawFile.type ?? 'application/octet-stream';
+      const fileSize = Number(rawFile.size ?? 0);
+      const arrayBuffer = await rawFile.arrayBuffer();
       const fileBuffer = Buffer.from(arrayBuffer);
 
       const caseId = (formData.get('case_id') ?? '')?.toString() ?? null;

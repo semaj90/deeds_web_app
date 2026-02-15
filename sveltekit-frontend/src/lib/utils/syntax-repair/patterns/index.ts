@@ -14,7 +14,6 @@ export * from './nullish-coalescing-fix';
 
 // New pattern exports for Svelte 5 remediation
 export * from './bits-ui-migration-fix';
-export * from './colon-chain-fix';
 export * from './a11y-label-fix';
 
 // Pattern getter imports
@@ -24,7 +23,6 @@ import { getFunctionCallPatterns } from './function-call-fix';
 import { getObjectLiteralPatterns } from './object-literal-fix';
 import { getNullishCoalescingPatterns } from './nullish-coalescing-fix';
 import { getBitsUiMigrationPatterns } from './bits-ui-migration-fix';
-import { getColonChainPatterns } from './colon-chain-fix';
 import { getA11yLabelPatterns } from './a11y-label-fix';
 
 import type { PatternMatcher } from '../pattern-matcher';
@@ -39,7 +37,6 @@ export type PatternCategory =
   | 'object-literal'
   | 'nullish-coalescing'
   | 'bits-ui-migration'
-  | 'colon-chain'
   | 'a11y-label';
 
 /**
@@ -48,9 +45,7 @@ export type PatternCategory =
  */
 export function getAllPatterns(): PatternMatcher[] {
   return [
-    // Colon-chain fixes first (highest priority, fixes cascading issues)
-    ...getColonChainPatterns(),
-    // Import fixes next
+    // Import fixes first
     ...getImportTypePatterns(),
     // Bits-UI migration patterns
     ...getBitsUiMigrationPatterns(),
@@ -72,7 +67,6 @@ export function getAllPatterns(): PatternMatcher[] {
 export function getPatternsByCategory(): Map<PatternCategory, PatternMatcher[]> {
   const categories = new Map<PatternCategory, PatternMatcher[]>();
 
-  categories.set('colon-chain', getColonChainPatterns());
   categories.set('import-type', getImportTypePatterns());
   categories.set('bits-ui-migration', getBitsUiMigrationPatterns());
   categories.set('function-param', getFunctionParamPatterns());
@@ -97,7 +91,6 @@ export function getPatternsForCategory(category: PatternCategory): PatternMatche
  */
 export function getTypeScriptPatterns(): PatternMatcher[] {
   return [
-    ...getColonChainPatterns(),
     ...getImportTypePatterns(),
     ...getFunctionParamPatterns(),
     ...getFunctionCallPatterns(),

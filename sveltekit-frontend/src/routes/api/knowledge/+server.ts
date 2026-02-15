@@ -104,13 +104,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
     for (const file of files) {
       try {
-        console.log(`Processing: ${file.name}`);
-
         // Extract text
         const text = await extractDocumentText(file);
         const chunks = chunkText(text);
-
-        console.log(`   Extracted ${chunks.length} chunks`);
 
         // Process chunks
         const pointIds = [];
@@ -154,7 +150,6 @@ export const POST: RequestHandler = async ({ request }) => {
           status: 'success'
         });
 
-        console.log(`   Stored ${pointIds.length} vectors in Qdrant`);
       } catch (err) {
         results.push({
           file: file.name,

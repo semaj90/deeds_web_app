@@ -147,6 +147,13 @@ export class KAGTraverser {
 	}
 
 	/**
+	 * Execute a Cypher query (public API for services like PatternStorage)
+	 */
+	async executeQuery(query: string, params: Record<string, unknown> = {}): Promise<any> {
+		return this.executeCypher(query, params);
+	}
+
+	/**
 	 * Execute Cypher query via Neo4j HTTP API
 	 */
 	private async executeCypher(query: string, params: Record<string, unknown> = {}): Promise<any[]> {

@@ -107,7 +107,6 @@ async function loadRouteMetadataFromDatabase(): Promise<Map<string, Record<strin
 			metadataMap.set(route.routeId, route as Record<string, unknown>);
 		}
 
-		console.log(`[Phase 6.1] Loaded ${metadataMap.size} route metadata records from database`);
 		return metadataMap;
 	} catch (error) {
 		console.error('[Phase 6.1] Database query error:', error);
@@ -159,12 +158,8 @@ function mergeRoutesWithDatabase(
  * Main enrichment orchestrator
  */
 async function enrichRoutesWithDatabase(routes: RouteNode[]): Promise<RouteNode[]> {
-	console.log('[Phase 6] Starting database enrichment...');
-
 	const dbMetadata = await loadRouteMetadataFromDatabase();
 	const enriched = mergeRoutesWithDatabase(routes, dbMetadata);
-
-	console.log('[Phase 6] Database enrichment complete');
 	return enriched;
 }
 
@@ -237,7 +232,6 @@ export const load = async () => {
 			);
 		}
 
-		console.log(`[Phase 78] Loaded ${routes.length} routes from Phase 72 AST`);
 	} catch (error) {
 		console.error('[Phase 78] Route AST load error:', error);
 	}
@@ -249,9 +243,8 @@ export const load = async () => {
 			routes = fallbackGraph.nodes.map((node) =>
 				astNodeToRouteNode(node as Record<string, unknown>)
 			);
-			console.log(`[Phase 78] Loaded ${routes.length} routes from static Phase 72 graph`);
 		} else {
-			console.warn('[Phase 78] Phase 72 static graph not found');
+			// Static graph not found — routes will be empty
 		}
 	}
 
@@ -271,7 +264,6 @@ export const load = async () => {
 
 	try {
 		errorClusters = buildErrorClusters(routes, astGraph);
-		console.log(`[Phase 78] Built ${errorClusters.length} error clusters`);
 	} catch (error) {
 		console.error('[Phase 78] Error cluster build error:', error);
 	}
@@ -302,14 +294,7 @@ export const load = async () => {
 	// ─────────────────────────────────────────────────────────
 
 	shieldData = await readJsonFile(PHASE90_SHIELD_PATH);
-	if (!shieldData) {
-		console.warn('[Phase 90] Shield data not found');
-	}
-
 	errorSummary = await readJsonFile(ERROR_SUMMARY_PATH);
-	if (!errorSummary) {
-		console.warn('[Phase 90] Error summary not found');
-	}
 
 	// ─────────────────────────────────────────────────────────
 	// Step 6: Return shaped data for UI

@@ -70,10 +70,10 @@ export async function getArchivedErrorClusters(
     WHERE ${whereClause}
   `);
 
-  const total = Number(countResult.rows[0]?.total ?? 0);
+  const total = Number(countResult[0]?.total ?? 0);
 
   return {
-    data: result.rows,
+    data: result,
     total,
     offset,
     hasMore: offset + limit < total,
@@ -140,10 +140,10 @@ export async function getArchivedInteractions(
     WHERE ${whereClause}
   `);
 
-  const total = Number(countResult.rows[0]?.total ?? 0);
+  const total = Number(countResult[0]?.total ?? 0);
 
   return {
-    data: result.rows,
+    data: result,
     total,
     offset,
     hasMore: offset + limit < total,
@@ -195,10 +195,10 @@ export async function getCombinedErrorClusters(
         AND archived_at IS NULL
     `);
 
-    const total = Number(countResult.rows[0]?.total ?? 0);
+    const total = Number(countResult[0]?.total ?? 0);
 
     return {
-      data: result.rows,
+      data: result,
       total,
       offset,
       hasMore: offset + limit < total,
@@ -242,10 +242,10 @@ export async function getCombinedErrorClusters(
       as total
   `);
 
-  const total = Number(countResult.rows[0]?.total ?? 0);
+  const total = Number(countResult[0]?.total ?? 0);
 
   return {
-    data: result.rows,
+    data: result,
     total,
     offset,
     hasMore: offset + limit < total,
@@ -294,10 +294,10 @@ export async function getCombinedInteractions(
       WHERE route_id = ${routeId}
     `);
 
-    const total = Number(countResult.rows[0]?.total ?? 0);
+    const total = Number(countResult[0]?.total ?? 0);
 
     return {
-      data: result.rows,
+      data: result,
       total,
       offset,
       hasMore: offset + limit < total,
@@ -338,10 +338,10 @@ export async function getCombinedInteractions(
       as total
   `);
 
-  const total = Number(countResult.rows[0]?.total ?? 0);
+  const total = Number(countResult[0]?.total ?? 0);
 
   return {
-    data: result.rows,
+    data: result,
     total,
     offset,
     hasMore: offset + limit < total,
@@ -363,7 +363,7 @@ export async function getArchiveStatistics() {
     SELECT * FROM archive_statistics
   `);
 
-  return result.rows;
+  return result;
 }
 
 /**

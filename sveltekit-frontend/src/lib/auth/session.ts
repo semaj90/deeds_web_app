@@ -1,5 +1,3 @@
-// Deprecated duplicate Lucia session definition. Re-export canonical lucia instance. import type { lucia } from '../server/auth.js';
-export { lucia };
-export type Auth = typeof lucia;
-
-
+// Deprecated duplicate Lucia session definition.
+// Nothing imports from this file. Kept as a stub for backward compatibility.
+export type Auth = Record<string, unknown>;

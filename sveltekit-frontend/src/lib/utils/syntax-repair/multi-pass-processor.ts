@@ -253,7 +253,6 @@ export async function runSinglePass(
     | 'object-literal'
     | 'nullish-coalescing'
     | 'bits-ui-migration'
-    | 'colon-chain'
     | 'a11y-label',
   config: Partial<FileProcessorConfig> = {}
 ): Promise<DirectoryProcessResult> {
@@ -280,7 +279,6 @@ export async function runCategoryRemediation(
     | 'object-literal'
     | 'nullish-coalescing'
     | 'bits-ui-migration'
-    | 'colon-chain'
     | 'a11y-label'
   >,
   config: Partial<MultiPassConfig> = {}

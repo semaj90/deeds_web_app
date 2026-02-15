@@ -21,7 +21,7 @@
 	// Merge summaries into clusters
 	$effect(() => {
 		if (data.summaries && clusters.length > 0) {
-			const summaryMap = new Map(data.summaries.map((s: any) => {
+			const summaryMap = new Map<string, { title?: string; description?: string; tags?: string[] }>(data.summaries.map((s: any) => {
 				const meta = typeof s.metadata === 'string' ? JSON.parse(s.metadata) : s.metadata;
 				// Handle both string and number cluster_id
 				return [String(meta.cluster_id), s];
@@ -575,7 +575,7 @@ cluster_id: cluster.cluster_id,
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
 	padding: 1rem;
-		border-left: 3px solid hsl(calc(var(--score: 0.5) * 120), 70%, 50%);
+		border-left: 3px solid hsl(calc(var(--score, 0.5) * 120) 70% 50%);
 	}
 
 	.result-header {

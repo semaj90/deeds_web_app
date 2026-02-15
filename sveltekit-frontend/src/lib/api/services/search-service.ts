@@ -1,12 +1,17 @@
-import { apiFetch } from '../clients/api-client.js';
+import { getOllamaBaseUrlFromConfig } from '$lib/config/ollama-config';
+
 export interface SemanticQuery {
   query: string;
   limit?: number;
 }
-export async function semanticSearch(q: SemanticQuery): Promise<any> {
-    // TODO: ACE: Async function without await (check if async is needed)
-  return apiFetch('http://localhost:8080/api/v1/search/semantic', 'POST', {
-    body: q,
-  });
-}
 
+export async function semanticSearch(q: SemanticQuery): Promise<unknown> {
+  const baseUrl = getOllamaBaseUrlFromConfig();
+  const res = await fetch(`${baseUrl}/api/embeddings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: q.query, model: 'embeddinggemma:latest' })
+  });
+  if (!res.ok) throw new Error(`Semantic search failed: ${res.status}`);
+  return res.json();
+}

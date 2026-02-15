@@ -25,17 +25,15 @@ interface RegisterRequest {
 }
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	console.log('[Auth] Register POST received');
 	try {
 		const rawBody = await request.text();
-		console.log('[Auth] Register body:', rawBody);
 		const body = JSON.parse(rawBody) as RegisterRequest;
 
 		// Validate input
 		const validation = registerSchema.safeParse(body);
 		if (!validation.success) {
 			return json(
-				{ error: validation.error.errors[0].message },
+				{ error: validation.error.issues[0].message },
 				{ status: 400 }
 			);
 		}

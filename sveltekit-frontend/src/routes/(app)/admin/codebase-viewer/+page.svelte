@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { Tabs } from 'bits-ui';
+	import { Tabs as _Tabs } from 'bits-ui';
+	// Workaround: svelte-check can't resolve bits-ui namespace re-export chain
+	const Tabs = _Tabs as Record<string, any>;
 
 	let { data } = $props();
 

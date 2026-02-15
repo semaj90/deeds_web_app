@@ -5,6 +5,7 @@
 
 import type { ASTError } from './svelte-check-analyzer.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { getOllamaBaseUrlFromConfig } from '$lib/config/ollama-config';
 
 export interface Suggestion {
 	id: string;
@@ -361,7 +362,7 @@ export class SuggestionEngine {
 
 		try {
 			// Call Ollama/Gemma for AI suggestions
-			const response = await fetch('http://localhost:11434/api/generate', {
+			const response = await fetch(`${getOllamaBaseUrlFromConfig()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

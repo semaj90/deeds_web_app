@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	return {
 		form,
 		caseId,
-		userId: (locals as any).user?.id ?? null
+		userId: locals.user?.id ?? null
 	};
 };
 

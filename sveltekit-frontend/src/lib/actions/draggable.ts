@@ -24,7 +24,7 @@ export function draggable(
       onDragStart(event);
     }
   });
-  element.addEventListener('dragmove', (event) => {
+  element.addEventListener('drag', (event) => {
     if (isDragging) {
       event.preventDefault();
       const x = event.clientX - offsetX;

@@ -89,10 +89,10 @@ async function processJob(job) {
             console.log('⏭️ Skipping already-processed job', job.id);
             try {
                 await globalLoki.updateJob(job.id, { state: 'skipped', reason: `dedupe` });
-            } catch (error) { }
+            } catch (error) { console.warn('[worker] Failed to update loki job state (dedupe):', job.id, error); }
             return;
         }
-    } catch (error) { }
+    } catch (error) { console.warn('[worker] Redis dedupe check failed:', job.id, error); }
 
     // Acquire in-flight dedupe lock (24h) using NX
     try {
@@ -103,14 +103,14 @@ async function processJob(job) {
             // older ioredis style
             try {
                 locked = await redis.set(`job, processed, ${job.id}`, '1', 'NX', 'EX', 24 * 60 * 60);
-            } catch (error) { }
+            } catch (error) { console.warn('[worker] Redis NX lock fallback failed:', job.id, error); }
         }
 
         if (!locked) {
             console.log('⏭️ Skipping job due to NX lock (already being processed):', job.id);
             try {
                 await globalLoki.updateJob(job.id, { state: 'skipped', reason: 'dedupe-nx' });
-            } catch (error) { }
+            } catch (error) { console.warn('[worker] Failed to update loki job state (dedupe-nx):', job.id, error); }
             return;
         }
     } catch (e) {
@@ -121,7 +121,7 @@ async function processJob(job) {
 
     try {
         await globalLoki.startJob(job.id, { model: job?.model ?? 'unknown', text: job.text });
-    } catch (error) { }
+    } catch (error) { console.warn('[worker] Failed to start loki job tracking:', job.id, error); }
 
     const started = await safeJobMachine.startJob(job.id);
     if (!started) {
@@ -164,7 +164,7 @@ async function processJob(job) {
 
         try {
             await globalLoki.completeJob(job.id, { embeddingSize: Array.isArray(emb) ? emb.length : 0 });
-        } catch (error) { }
+        } catch (error) { console.warn('[worker] Failed to complete loki job:', job.id, error); }
 
         // Notify clients to invalidate embedding caches
         try {
@@ -176,7 +176,7 @@ async function processJob(job) {
                 ts: Date.now(),
                 inserted
             });
-        } catch (error) { }
+        } catch (error) { console.warn('[worker] Failed to emit cache event:', job.id, error); }
 
         try {
             // ioredis and node-redis expose slightly different APIs
@@ -185,7 +185,7 @@ async function processJob(job) {
             } else {
                 await redis.set(`jobs, done, ${job.id}`, '1', 'EX', 7 * 24 * 3600);
             }
-        } catch (error) { }
+        } catch (error) { console.warn('[worker] Failed to mark job done in Redis:', job.id, error); }
 
         console.log('✅ Stored embedding for', job.id);
 
@@ -194,12 +194,12 @@ async function processJob(job) {
         await safeJobMachine.failJob(job.id, err, false);
         try {
             await globalLoki.failJob(job.id, err?.message ?? String(err));
-        } catch (error) { }
+        } catch (error) { console.warn('[worker] Failed to record loki job failure:', job.id, error); }
 
         // Allow retry by clearing in-flight lock
         try {
             await redis.del(`job:processed:${job.id}`);
-        } catch (error) { }
+        } catch (error) { console.warn('[worker] Failed to clear in-flight lock:', job.id, error); }
 
         throw err;
     }
@@ -266,10 +266,10 @@ process.on('SIGINT', async () => {
         if (typeof pgClient.end === 'function') {
             await pgClient.end();
         }
-    } catch (error) { }
+    } catch (error) { console.warn('[shutdown] pgClient close error:', error); }
     try {
         await closeRabbitMQ();
-    } catch (error) { }
+    } catch (error) { console.warn('[shutdown] RabbitMQ close error:', error); }
     process.exit(0);
 });
 
@@ -280,10 +280,10 @@ process.on('SIGTERM', async () => {
         if (typeof pgClient.end === 'function') {
             await pgClient.end();
         }
-    } catch (error) { }
+    } catch (error) { console.warn('[shutdown] pgClient close error:', error); }
     try {
         await closeRabbitMQ();
-    } catch (error) { }
+    } catch (error) { console.warn('[shutdown] RabbitMQ close error:', error); }
     process.exit(0);
 });
 

@@ -494,7 +494,7 @@ function parseCSV(csvText: string): Record<string, unknown>[] {
 }
 
 function validateImportData(
-  data: Record<string, unknown> | Case[] | EvidenceItem[],
+  data: unknown,
   type: 'cases' | 'evidence'
 ): { success: boolean; errors: string[]; warnings: string[] } {
   const errors: string[] = [];

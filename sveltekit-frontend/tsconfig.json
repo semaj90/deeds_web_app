@@ -190,7 +190,32 @@
     // Phase 99b: Additional corrupted files/dirs
     "src/client-server-sync.ts",
     "src/routes/phase89/**",
-    "src/routes/api/**",
+    // "src/routes/api/**", // Session 31: RE-INCLUDED — 124 endpoints, 95%+ clean
+    // Session 31: API routes with pre-existing type errors (transitive imports from excluded services)
+    "src/routes/api/phase78/**",
+    "src/routes/api/phase89/**",
+    "src/routes/api/knowledge/**",
+    "src/routes/api/admin/knowledge/**",
+    "src/routes/api/llm-improvement/**",
+    "src/routes/api/routes/**",
+    "src/routes/api/system/phase78/**",
+    // Session 31: API routes with pre-existing schema/auth/service type errors
+    "src/routes/api/auth/**",
+    "src/routes/api/reports/**",
+    "src/routes/api/kb/**",
+    "src/routes/api/ace/**",
+    "src/routes/api/acp/**",
+    "src/routes/api/codebase/**",
+    "src/routes/api/health/services/**",
+    "src/routes/api/health/ocr/**",
+    "src/routes/api/health/redis/**",
+    "src/routes/api/cases/**",
+    "src/routes/api/sse/**",
+    "src/routes/api/chat/**",
+    "src/routes/api/ollama/**",
+    "src/routes/api/pipeline/**",
+    "src/routes/api/phase72/**",
+    "src/routes/api/phase90/**",
     "src/lib/api/**",
     "src/lib/server/ai/**",
     "src/lib/server/orchestrator/**",
@@ -259,16 +284,21 @@
     // "src/lib/logic/**",  // Session 29: RE-INCLUDED
     // "src/lib/workers/embedding-worker-enhanced.ts",  // Session 29: RE-INCLUDED
     // "src/qdrant-client.ts",  // Session 29: RE-INCLUDED
-    "src/lib/config/**",
-    "src/lib/forms/**",
-    "src/lib/data/**",
+    // "src/lib/config/**",  // Session 31: RE-INCLUDED (8 files, all clean)
+    // "src/lib/config/ollama-config.ts",  // Session 31: Fixed by linter rewrite
+    "src/lib/config/enhanced-ai-config.ts",  // Session 31: Compressed/corrupted syntax
+    "src/lib/config/database.ts",  // Session 31: Imports non-existent exports from env.ts
+    // "src/lib/forms/**",  // Session 31: RE-INCLUDED (1 file, clean)
+    // "src/lib/data/**",  // Session 31: RE-INCLUDED (2 files, clean)
     "src/lib/db/**",
-    "src/lib/auth/**",
-    "src/lib/actions/**",
+    // "src/lib/auth/**",  // Session 31: RE-INCLUDED (4 clean + 1 excluded below)
+    "src/lib/auth/session-manager.ts",  // Session 31: Heavily corrupted, needs rewrite
+    // "src/lib/actions/**",  // Session 31: RE-INCLUDED (2 files, clean)
     "src/lib/actors/**",
     "src/lib/adapters/**",
     // "src/lib/schemas/**", // Session 29: RE-INCLUDED for production
-    "src/lib/utils/**",
+    // "src/lib/utils/**",  // Session 31: RE-INCLUDED (36 files, 98% clean)
+    "src/lib/utils/simd-markdown-parser.ts",  // Session 31: Corrupted function signature
     "src/lib/shims/**",
     // Corrupted components (keep only core UI)
     "src/lib/components/canvas/**",
@@ -281,7 +311,10 @@
     // Keep only core app routes
     "src/routes/(app)/command-center/**",
     "src/routes/(app)/settings/**",
-    "src/routes/(app)/admin/**",
+    // "src/routes/(app)/admin/**", // Session 31: RE-INCLUDED — dev-tools hub + existing admin pages
+    // Session 31: Pre-existing admin pages with bits-ui Tabs namespace issue
+    "src/routes/(app)/admin/phase89/**",
+    "src/routes/(app)/admin/knowledge-search/**",
     "src/routes/(app)/analytics/**",
     "src/routes/knowledge/**",
     "src/routes/indexing/**",
@@ -329,8 +362,8 @@
     "src/lib/sdk/**",
     "src/lib/json/**",
     "src/lib/demos/**",
-    "src/lib/models/**",
-    "src/lib/constants/**",
+    // "src/lib/models/**",  // Session 31: RE-INCLUDED (1 file, clean Svelte 5 runes)
+    // "src/lib/constants/**",  // Session 31: RE-INCLUDED (1 file, clean)
     "src/lib/server/clients/**",
     "src/lib/server/context/**",
     "src/lib/server/contradictionEngine/**",

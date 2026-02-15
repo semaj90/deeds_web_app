@@ -1,15 +1,32 @@
-import { connect, type Connection, type Channel } from 'amqplib';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+// amqplib types don't resolve with bundler moduleResolution — use local interfaces
+interface AmqpConnection {
+    on(event: string, cb: (...args: any[]) => void): void;
+    createChannel(): Promise<AmqpChannel>;
+    close(): Promise<void>;
+}
+
+interface AmqpChannel {
+    close(): Promise<void>;
+    assertQueue(queue: string, opts?: Record<string, unknown>): Promise<any>;
+    sendToQueue(queue: string, content: Buffer, opts?: Record<string, unknown>): boolean;
+    consume(queue: string, cb: (msg: any) => void, opts?: Record<string, unknown>): Promise<any>;
+    ack(msg: any): void;
+    nack(msg: any, allUpTo?: boolean, requeue?: boolean): void;
+    prefetch(count: number): void;
+    on(event: string, cb: (...args: any[]) => void): void;
+    once(event: string, cb: (...args: any[]) => void): void;
+}
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
 
-let connection: Connection | null = null;
-let channel: Channel | null = null;
+let connection: AmqpConnection | null = null;
+let channel: AmqpChannel | null = null;
 
-export async function getRabbitConnection(): Promise<Connection> {
+export async function getRabbitConnection(): Promise<AmqpConnection> {
     if (connection) return connection;
     try {
-        connection = await connect(RABBITMQ_URL);
+        const amqplib = await import('amqplib');
+        connection = await (amqplib as any).connect(RABBITMQ_URL) as AmqpConnection;
 
         connection.on('error', (err) => {
             console.error('RabbitMQ connection error', err);
@@ -30,7 +47,7 @@ export async function getRabbitConnection(): Promise<Connection> {
     }
 }
 
-export async function getRabbitChannel(): Promise<Channel> {
+export async function getRabbitChannel(): Promise<AmqpChannel> {
     if (channel) return channel;
     const conn = await getRabbitConnection();
     channel = await conn.createChannel();

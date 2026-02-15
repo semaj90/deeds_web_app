@@ -21,7 +21,7 @@ class UserStore {
   // Derived: Get user display name
   userDisplayName = $derived.by(() => {
     if (!this.user) return null;
-    return this.user.user?.firstName&& this.user.user.lastName
+    return this.user.user?.firstName && this.user.user.lastName
       ? `${this.user.user.firstName} ${this.user.user.lastName}`
       : this.user.user.email;
   });

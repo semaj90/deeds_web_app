@@ -20,7 +20,7 @@ export function createFuseIndex<T extends Record<string, unknown>>(
 	const fuse = new Fuse<T>(items, {
 		includeScore: true,
 		threshold: 0.35,
-		keys: normalizedKeys as Fuse.FuseOptionKey<T>[]
+		keys: normalizedKeys as Fuse.FuseOptions<T>['keys']
 	});
 
 	return fuse;

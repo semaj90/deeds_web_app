@@ -168,9 +168,11 @@ export interface ErrorPattern {
   id: string; // UUID
   pattern: string; // Natural language description
   embedding: number[]; // 384-dim or 768-dim vector
-  errorType: string; // 'type' | 'syntax' | 'runtime' | 'svelte', fixStrategies: FixStrategy[]; // Ranked list of fixes
+  errorType: string; // 'type' | 'syntax' | 'runtime' | 'svelte'
+  fixStrategies: FixStrategy[]; // Ranked list of fixes
   clusterMetadata: ClusterMetadata;
-	successRate: number; // 0-1, occurrences: number; // How many times seen
+	successRate: number; // 0-1
+	occurrences: number; // How many times seen
   lastSeen: Date;
 	createdAt: Date;
 }

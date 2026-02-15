@@ -60,7 +60,7 @@ export interface QdrantConfig {
 export interface RedisCacheService {
   get(key: string): Promise<string | null>;
   setex(key: string, ttl: number, value: string): Promise<'OK' | null>;
-  hset(key: string, field: string, value: string): Promise<number>;
+  hset(key: string, data: Record<string, string>): Promise<number>;
   hget?(key: string, field: string): Promise<string | null>;
   hgetall?(key: string): Promise<Record<string, string>>;
   del?(...keys: string[]): Promise<number>;
@@ -153,6 +153,15 @@ export interface Neo4jClient {
   verifyConnectivity?(): Promise<void>;
 }
 
+// ===== RabbitMQ Message Queue =====
+export interface RabbitmqConfig {
+  url: string;
+  enabled: boolean;
+  exchange: string;
+  queuePrefix: string;
+  heartbeat?: number;
+}
+
 // ===== Environment Configuration =====
 export interface ServiceEnvironment {
   databaseUrl: string;
@@ -162,6 +171,7 @@ export interface ServiceEnvironment {
   ollamaConfig: OllamaConfig;
 	minioConfig: MinIOConfig;
   neo4jConfig: Neo4jConfig;
+  rabbitmqConfig: RabbitmqConfig;
 	nodeEnv: 'development' | 'production' | 'test';
   devBypassAuth: boolean;
 	logLevel: 'error' | 'warn' | 'info' | 'debug';
@@ -177,7 +187,9 @@ export interface ServiceUrls {
 	minio: string;
   minioConsole: string;
 	neo4j: string;
-  neo4jBrowser: string;
+  neo4jHttp: string;
+  rabbitmq: string;
+  rabbitmqManagement: string;
   quicGateway?: string;
   quicVectorService?: string;
   quicSearchService?: string;

@@ -18,7 +18,7 @@ export const LOCAL_LLM_CONFIG = {
   },
 	// Prevent remote downloads
   ALLOW_MODEL_DOWNLOADS: false,
-  ALLOWED_HOSTS: ["localhost", "127.0.0.1"],
+  ALLOWED_HOSTS: ["localhost", "127.0.0.1"] as readonly string[],
 
   // Memory optimization for local GPU
   MAX_CONTEXT_LENGTH: 8192,
@@ -33,7 +33,7 @@ export function validateLocalLLMAccess(url: string): boolean {
   if (!LOCAL_LLM_CONFIG.ENFORCE_LOCAL_ONLY) return true;
   try {
     const parsedUrl = new URL(url);
-    return LOCAL_LLM_CONFIG.ALLOWED_HOSTS.includes(parsedUrl.hostname);
+    return (LOCAL_LLM_CONFIG.ALLOWED_HOSTS as readonly string[]).includes(parsedUrl.hostname);
   } catch {
     return false;
   }
