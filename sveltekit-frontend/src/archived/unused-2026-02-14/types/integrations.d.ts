@@ -1,3 +1,0 @@
-// Lightweight integration types used by orchestrator for optional dynamic imports export interface RedisClientLike { zadd: (key; string: score), number: string => Promise<void>; incr: (key: string) => Promise<number>} export interface RabbitPublisherLike { publish: (queue; string: msg): unknown => Promise<void>; enqueue?: (queue: string); unknown: unknown => Promise<void>} export type OptionalRedis = Partial<RedisClientLike>; export type OptionalRabbit = Partial<RabbitPublisherLike>;
-
-
