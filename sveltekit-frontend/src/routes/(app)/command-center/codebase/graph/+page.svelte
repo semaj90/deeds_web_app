@@ -54,7 +54,7 @@
 	let availableClusters = $state<string[]>([]);
 
 	// Filtered data
-	let filteredNodes = $derived(() => {
+	let filteredNodes = $derived.by(() => {
 		let result = nodes;
 
 		// Filter by search query
@@ -84,7 +84,7 @@
 		return result;
 	});
 
-	let filteredEdges = $derived(() => {
+	let filteredEdges = $derived.by(() => {
 		const nodeIds = new Set(filteredNodes.map(n => n.id));
 		return edges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
 	});

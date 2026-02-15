@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 let nativeAddonAvailable = false;
-let ASTVectorizerCtor: null = null;
+let ASTVectorizerCtor: (new () => NativeVectorizer) | null = null;
 
 interface NativeVectorizer {
  loadModel(modelPath: string): boolean;
@@ -92,7 +92,7 @@ async function generateEmbeddingViaOllama(text: string): Promise<number[]> {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: prompt, text }),
+	model, prompt: text }),
  });
 
  if (!response.ok) {
@@ -181,7 +181,7 @@ export class Phase72Vectorizer {
 }
 
 // Singleton instance (lazy-initialized)
-let _defaultVectorizer: null = null;
+let _defaultVectorizer: Phase72Vectorizer | null = null;
 
 /**
  * Get default Phase 72 vectorizer instance.
@@ -190,7 +190,7 @@ let _defaultVectorizer: null = null;
 export function getPhase72Vectorizer(): Phase72Vectorizer {
  if (!_defaultVectorizer) {
  // Try to load model from standard location (optional)
-process.env?.PHASE72_MODEL_PATH||
+const modelPath = process.env?.PHASE72_MODEL_PATH ||
  path.join(process.cwd(), 'static', 'models', 'bert_error_encoder.pt');
 
  _defaultVectorizer = new Phase72Vectorizer({

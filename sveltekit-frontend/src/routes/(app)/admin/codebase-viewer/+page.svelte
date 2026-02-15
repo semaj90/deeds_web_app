@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { Tabs as _Tabs } from 'bits-ui';
-	// Workaround: svelte-check can't resolve bits-ui namespace re-export chain
-	const Tabs = _Tabs as Record<string, any>;
-
 	let { data } = $props();
 
+	// Native $state-based tabs (avoids bits-ui Tabs namespace SSR bug)
+	let activeTab = $state<'qdrant' | 'postgres' | 'timeline'>('qdrant');
 	let selectedCollection = $state<string | null>(null);
 	let searchQuery = $state('');
 
@@ -19,6 +17,12 @@
 	const timelineItems = $derived(data.postgres?.timeline ?? []);
 	const stats = $derived(data.postgres?.stats ?? {});
 	const totalPoints = $derived(data.qdrant?.totalPoints ?? 0);
+
+	const tabs = [
+		{ id: 'qdrant' as const, label: 'Qdrant Collections', icon: '' },
+		{ id: 'postgres' as const, label: 'PostgreSQL Embeddings', icon: '' },
+		{ id: 'timeline' as const, label: 'File Timeline', icon: '' },
+	];
 </script>
 
 <div class="mx-auto max-w-[1400px] p-6">
@@ -67,31 +71,25 @@
 		</div>
 	</div>
 
-	<!-- Tabbed View (bits-ui Tabs) -->
-	<Tabs.Root value="qdrant" class="w-full">
-		<Tabs.List class="mb-4 flex gap-1 border-b-2 border-sand/20">
-			<Tabs.Trigger
-				value="qdrant"
-				class="rounded-t-md px-4 py-2 text-sm font-mono uppercase tracking-wider text-sand/60 transition data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent hover:text-sand"
-			>
-				🔢 Qdrant Collections
-			</Tabs.Trigger>
-			<Tabs.Trigger
-				value="postgres"
-				class="rounded-t-md px-4 py-2 text-sm font-mono uppercase tracking-wider text-sand/60 transition data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent hover:text-sand"
-			>
-				🗃️ PostgreSQL Embeddings
-			</Tabs.Trigger>
-			<Tabs.Trigger
-				value="timeline"
-				class="rounded-t-md px-4 py-2 text-sm font-mono uppercase tracking-wider text-sand/60 transition data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent hover:text-sand"
-			>
-				📅 File Timeline
-			</Tabs.Trigger>
-		</Tabs.List>
+	<!-- Tabbed View (native $state tabs) -->
+	<div class="w-full">
+		<div class="mb-4 flex gap-1 border-b-2 border-sand/20" role="tablist">
+			{#each tabs as tab}
+				<button
+					role="tab"
+					aria-selected={activeTab === tab.id}
+					class="rounded-t-md px-4 py-2 text-sm font-mono uppercase tracking-wider transition {activeTab === tab.id
+						? 'border-b-2 border-accent text-accent'
+						: 'text-sand/60 hover:text-sand'}"
+					onclick={() => activeTab = tab.id}
+				>
+					{tab.icon} {tab.label}
+				</button>
+			{/each}
+		</div>
 
 		<!-- Qdrant Collections Tab -->
-		<Tabs.Content value="qdrant">
+		{#if activeTab === 'qdrant'}
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 				{#each qdrantCollections as collection}
 					<button
@@ -125,10 +123,10 @@
 					</div>
 				{/if}
 			</div>
-		</Tabs.Content>
+		{/if}
 
 		<!-- PostgreSQL Embeddings Tab -->
-		<Tabs.Content value="postgres">
+		{#if activeTab === 'postgres'}
 			<!-- Search Bar -->
 			<div class="mb-4">
 				<input
@@ -185,10 +183,10 @@
 					</tbody>
 				</table>
 			</div>
-		</Tabs.Content>
+		{/if}
 
 		<!-- Timeline Tab -->
-		<Tabs.Content value="timeline">
+		{#if activeTab === 'timeline'}
 			<div class="relative pl-8">
 				{#each timelineItems as item, i}
 					<div class="relative mb-6 pl-6">
@@ -206,22 +204,22 @@
 							<div class="flex flex-wrap gap-2">
 								{#if item.indexed_at}
 									<span class="rounded-md bg-info/20 px-3 py-1 text-xs font-medium text-info">
-										📥 Indexed: {new Date(item.indexed_at).toLocaleString()}
+										Indexed: {new Date(item.indexed_at).toLocaleString()}
 									</span>
 								{/if}
 								{#if item.tagged_at}
 									<span class="rounded-md bg-warning/20 px-3 py-1 text-xs font-medium text-warning">
-										🏷️ Tagged: {new Date(item.tagged_at).toLocaleString()}
+										Tagged: {new Date(item.tagged_at).toLocaleString()}
 									</span>
 								{/if}
 								{#if item.edited_at}
 									<span class="rounded-md bg-accent/20 px-3 py-1 text-xs font-medium text-accent">
-										✏️ Edited: {new Date(item.edited_at).toLocaleString()}
+										Edited: {new Date(item.edited_at).toLocaleString()}
 									</span>
 								{/if}
 								{#if item.analyzed_at}
 									<span class="rounded-md bg-info/20 px-3 py-1 text-xs font-medium text-info">
-										🔍 Analyzed: {new Date(item.analyzed_at).toLocaleString()}
+										Analyzed: {new Date(item.analyzed_at).toLocaleString()}
 									</span>
 								{/if}
 							</div>
@@ -235,6 +233,6 @@
 					</div>
 				{/if}
 			</div>
-		</Tabs.Content>
-	</Tabs.Root>
+		{/if}
+	</div>
 </div>

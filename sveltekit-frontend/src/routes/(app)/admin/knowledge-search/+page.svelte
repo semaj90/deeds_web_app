@@ -5,7 +5,7 @@
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: {
-	data: PageData, form: ActionData } = $props();
+	data: PageData & { collections?: string[] }, form: ActionData & { results?: Array<{ score: number; collection?: string; payload?: Record<string, any> }> } } = $props();
 
 	// Search State
 	let searchQuery = $state('');

@@ -192,13 +192,13 @@
     "src/routes/phase89/**",
     // "src/routes/api/**", // Session 31: RE-INCLUDED — 124 endpoints, 95%+ clean
     // Session 31: API routes with pre-existing type errors (transitive imports from excluded services)
-    "src/routes/api/phase78/**",
-    "src/routes/api/phase89/**",
+    // "src/routes/api/phase78/**", // Session 32c: RE-INCLUDED (route monitoring)
+    // "src/routes/api/phase89/**", // Session 32c: RE-INCLUDED (error analysis pipeline)
     // "src/routes/api/knowledge/**", // Session 32b: RE-INCLUDED (core RAG search)
     // "src/routes/api/admin/knowledge/**", // Session 32b: RE-INCLUDED
-    "src/routes/api/llm-improvement/**",
-    "src/routes/api/routes/**",
-    "src/routes/api/system/phase78/**",
+    // "src/routes/api/llm-improvement/**", // Session 32c: RE-INCLUDED (metrics/learning)
+    // "src/routes/api/routes/**", // Session 32c: RE-INCLUDED (route health SSE)
+    // "src/routes/api/system/phase78/**", // Session 32c: RE-INCLUDED
     // Session 31: API routes with pre-existing schema/auth/service type errors
     // Session 32: RE-INCLUDED production-critical routes (auth, cases, chat, sse, health)
     // "src/routes/api/auth/**",
@@ -210,13 +210,13 @@
     // "src/routes/api/health/redis/**",
     // "src/routes/api/reports/**", // Session 32b: RE-INCLUDED (case reports)
     // "src/routes/api/kb/**", // Session 32b: RE-INCLUDED (KB validation)
-    "src/routes/api/ace/**",
-    "src/routes/api/acp/**",
-    "src/routes/api/codebase/**",
-    "src/routes/api/ollama/**",
+    // "src/routes/api/ace/**", // Session 32c: RE-INCLUDED (context retrieval)
+    // "src/routes/api/acp/**", // Session 32c: RE-INCLUDED (agent tool execution)
+    // "src/routes/api/codebase/**", // Session 32c: RE-INCLUDED (patch application)
+    // "src/routes/api/ollama/**", // Session 32c: RE-INCLUDED (model management)
     // "src/routes/api/pipeline/**", // Session 32b: RE-INCLUDED (document processing)
-    "src/routes/api/phase72/**",
-    "src/routes/api/phase90/**",
+    // "src/routes/api/phase72/**", // Session 32c: RE-INCLUDED (AST error reduction)
+    // "src/routes/api/phase90/**", // Session 32c: RE-INCLUDED (RAG+KAG+DAG tools)
     "src/lib/api/**",
     "src/lib/server/ai/**",
     "src/lib/server/orchestrator/**",
@@ -310,12 +310,12 @@
     "src/lib/components/graph/**",
     "src/lib/components/timeline/**",
     // Keep only core app routes
-    "src/routes/(app)/command-center/**",
+    // "src/routes/(app)/command-center/**", // Session 32c: RE-INCLUDED (error dashboard)
     "src/routes/(app)/settings/**",
     // "src/routes/(app)/admin/**", // Session 31: RE-INCLUDED — dev-tools hub + existing admin pages
     // Session 31: Pre-existing admin pages with bits-ui Tabs namespace issue
     "src/routes/(app)/admin/phase89/**",
-    "src/routes/(app)/admin/knowledge-search/**",
+    // "src/routes/(app)/admin/knowledge-search/**", // Session 32c: RE-INCLUDED (RAG search)
     "src/routes/(app)/analytics/**",
     "src/routes/knowledge/**",
     "src/routes/indexing/**",
@@ -523,8 +523,7 @@
     "src/lib/server/index.ts",
     "src/lib/forms/superforms-xstate-integration.ts",
     "src/routes/(app)/persons-of-interest/+page.svelte",
-    // Session 21: Corrupted knowledge-search service files
-    "src/lib/services/knowledge-search/**",
+    // "src/lib/services/knowledge-search/**", // Session 32c: RE-INCLUDED — 10/11 files clean, ACPToolRegistry has format issues only
     // Session 27: Orphan components importing from deleted _archive
     "src/lib/components/SlideTabs.svelte",
     // Session 28: Dead layout file referencing non-existent Navigation component

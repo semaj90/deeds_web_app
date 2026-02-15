@@ -71,8 +71,8 @@ function findSharedImports(payload1: any, payload2: any): string[] {
 	if (!payload1 || !payload2) return [];
 
 	// Extract import sources from signature text or uses
-	const uses1 = new Set(payload1?.uses|| []);
-	const uses2 = new Set(payload2?.uses|| []);
+	const uses1 = new Set<string>(payload1?.uses|| []);
+	const uses2 = new Set<string>(payload2?.uses|| []);
 
 	const shared: string[] = [];
 	for (const use of uses1) {

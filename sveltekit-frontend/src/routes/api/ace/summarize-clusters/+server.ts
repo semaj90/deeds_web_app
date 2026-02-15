@@ -52,13 +52,11 @@ async function generateSummary(name: string, samples: Array<any>): Promise<strin
      const context = samples.map(s => JSON.stringify(s?.payload|| {})).join('\n---\n');
      const prompt = `Analyze these code snippets from the vector cluster "${name}". Identify the common pattern, purpose, or functionality they represent.\n\nCode Samples:\n${context.substring(0, 8000)}`;
 
-     const result = await ollamaService.generateResponse({
+     const result = await ollamaService.generate(prompt, {
         model: 'gemma3-legal:latest',
-        prompt,
-        system: "You are a senior software architect analyzing code clusters."
      });
 
-     return result ?? 'Analysis failed';
+     return result?.response ?? 'Analysis failed';
   } catch (err) {
     return 'Summary generation failed';
   }
@@ -101,13 +99,15 @@ export const POST: RequestHandler = async ({ request }) => {
 
       // Store in CouchDB
       try {
-        await aceLLM.storeSummary({
+        await couchdb.post('llm_summaries', {
+          type: 'llm_summary',
           source_type: 'cluster',
           source_id: collectionName,
           model: 'gemma3-legal:latest',
           summary_text: summary,
           tags,
-          confidence: 0.8
+          confidence: 0.8,
+          created_at: new Date().toISOString()
         });
       } catch {
         // Continue
@@ -130,10 +130,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
 export const GET: RequestHandler = async () => {
   try {
-    // Get existing summaries from CouchDB
-    const { docs } = await couchdb.find<{ source_id: string, summary_text: string;
-      tags: string[], created_at: string;
-    }>('llm_summaries', { type: 'llm_summary', source_type: 'cluster' }, { limit: 100 });
+    // Get existing summaries from CouchDB (allDocs + client-side filter)
+    const allResult = await couchdb.allDocs('llm_summaries', { include_docs: true });
+    const docs = (allResult.rows || [])
+      .map((r: any) => r.doc)
+      .filter((d: any) => d?.type === 'llm_summary' && d?.source_type === 'cluster')
+      .slice(0, 100);
 
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
     const listData = await listResponse.json() as { result: { collections: Array<{ name: string }> } };
@@ -141,7 +143,7 @@ export const GET: RequestHandler = async () => {
     return json({
       collections: listData.result.collections.length,
       summaries: docs.length,
-      data: docs.map(d => ({
+      data: docs.map((d: any) => ({
        collection: d.source_id,
         summary: d.summary_text,
         tags: d.tags,

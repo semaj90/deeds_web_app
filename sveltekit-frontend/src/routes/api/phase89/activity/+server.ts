@@ -43,7 +43,7 @@ export const GET: RequestHandler = async () => {
 
     for (const key of fixKeys.slice(0, 20)) {
       try {
-        const data = await client.get(key);
+        const data = await client.get(key) as string | null;
         if (data) {
           const parsed = JSON.parse(data);
           activity.push({

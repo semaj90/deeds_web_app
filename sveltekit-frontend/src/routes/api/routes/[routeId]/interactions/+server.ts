@@ -11,8 +11,14 @@
 import {
     getInteractions, getRouteMetadata,
     logInteraction,
-    type NewRouteInteractionLog
 } from '$lib/db/queries/nes-command-center';
+
+type NewRouteInteractionLog = {
+    routeId: string;
+    interactionType: string;
+    userId: string | null;
+    metadata: Record<string, unknown> | null;
+};
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 

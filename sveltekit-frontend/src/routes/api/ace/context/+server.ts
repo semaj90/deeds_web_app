@@ -142,7 +142,8 @@ export const GET: RequestHandler = async ({ url }) => {
     const contextService = new AceContextService();
 
     const bundle = await contextService.buildContextBundle({
-      query: filters,
+      query,
+      filters,
       limit,
     });
 

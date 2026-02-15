@@ -16,7 +16,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // Redis client type
 type RedisClient = ReturnType<typeof createClient>;
 
-// Extended Qdrant client interface
+// Extended Qdrant client interface (use intersection to avoid incompatible override)
 interface QdrantClientExt extends QdrantClient {
 	scroll(
 		collection_name: string,
@@ -27,7 +27,6 @@ interface QdrantClientExt extends QdrantClient {
 		}
 	): Promise<{
 	points: Array<{ id: string | number; payload?: Record<string, unknown> }> }>;
-	getCollection(collection_name: string): Promise<{ points_count?: number }>;
 }
 
 // Extended Redis client type

@@ -45,7 +45,7 @@ export const GET: RequestHandler = async () => {
 		await redisClient.connect();
 
 		const [totalKeys, phase89Keys, embKeys, topkKeys, kbKeys] = await Promise.all([
-			redisClient.dbSize(),
+			redisClient.dbsize(),
 			redisClient.keys('phase89:*').then(k => k.length),
 			redisClient.keys('emb:*').then(k => k.length),
 			redisClient.keys('topk:*').then(k => k.length),

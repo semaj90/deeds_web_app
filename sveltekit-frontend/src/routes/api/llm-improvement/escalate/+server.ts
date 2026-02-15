@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		const escalation = getEscalationService();
-		const result = await escalation.escalate(
+		const result = await escalation.createEscalation(
 			error,
 			attemptedStrategies || [],
 			confidence ?? 0,

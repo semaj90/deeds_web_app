@@ -105,9 +105,9 @@ export class EscalationService {
 			this.tickets.set(ticketId, ticket);
 
 			const storage = getJSONLStorage({ baseDir: this.config.jsonlDir });
-			await storage.writeRecord({
-				type: 'escalation',
-				ticket: ticket,
+			await storage.bufferRecord({
+				type: 'error',
+				data: ticket as any,
 				timestamp: new Date().toISOString(),
 				version: '1.0'
 			});

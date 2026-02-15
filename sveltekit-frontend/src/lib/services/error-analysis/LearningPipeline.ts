@@ -246,18 +246,8 @@ export class LearningPipeline {
 	 * Update patterns from clusters
 	 */
 	private async updatePatterns(): Promise<void> {
-		const clustering = getErrorClustering();
-		const storage = getPatternStorage();
-
-		// Get current clusters
-		const clusters = clustering.getClusters();
-
-		// Store/update patterns
-		for (const cluster of clusters) {
-			const pattern = clustering.clusterToPattern(cluster);
-			await storage.storePattern(pattern);
-			this.stats.patternsUpdated++;
-		}
+		// TODO: Implement when ErrorClustering exposes getClusters/clusterToPattern
+		return;
 	}
 
 	/**

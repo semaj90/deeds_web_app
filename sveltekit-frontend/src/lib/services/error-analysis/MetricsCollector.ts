@@ -83,7 +83,7 @@ export class MetricsCollector {
 		}
 	}
 
-	private collectMetrics(): void {
+	private async collectMetrics(): Promise<void> {
 		const now = Date.now();
 		this.lastCollection = new Date();
 
@@ -93,7 +93,7 @@ export class MetricsCollector {
 		const experienceStats = getExperienceRecorder().getStats();
 
 		const errorDetectionRate = experienceStats.totalExperiences > 0 ? 1 : 0;
-		const cacheHitRate = this.getCacheHitRate();
+		const cacheHitRate = await this.getCacheHitRate();
 		const fixSuccessRate = decisionStats.successRate;
 		const escalationRate = decisionStats.escalationRate;
 
@@ -120,10 +120,10 @@ export class MetricsCollector {
 		}
 	}
 
-	private getCacheHitRate(): number {
+	private async getCacheHitRate(): Promise<number> {
 		try {
 			const cache = getCacheService();
-			const stats = cache.getStats();
+			const stats = await cache.getStats();
 			const total = stats.hits + stats.misses;
 			return total > 0 ? stats.hits / total : 0;
 		} catch {
@@ -142,7 +142,7 @@ export class MetricsCollector {
 
 		try {
 			const cache = getCacheService();
-			health.redis = await cache.isConnected();
+			health.redis = await cache.isAvailable();
 		} catch { health.redis = false; }
 
 		try {

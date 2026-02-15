@@ -224,7 +224,7 @@ export class DecisionEngine {
 		const toolInvoker = getToolInvoker();
 		const _policy = getGRPOPolicy();
 
-		const toolResults = await toolInvoker.invoke('diagnostics', { file: error.file });
+		const toolResults = await toolInvoker.runDiagnostics(error.file);
 		toolsInvoked.push('diagnostics');
 
 		const updatedConfidence = Math.min(strategy.confidence + 0.1, 1.0);

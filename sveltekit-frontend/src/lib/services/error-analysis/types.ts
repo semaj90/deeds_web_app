@@ -141,7 +141,8 @@ export interface Experience {
   errorId: string; // Reference to error pattern
   strategyId: string; // Reference to fix strategy
   outcome: 'success' | 'failure';
-  confidence: number; // 0-1, context: ErrorContext;
+  confidence: number;
+  context: ErrorContext;
 	toolsInvoked: string[]; // List of tools used
   humanIntervention: boolean;
   feedback?: string; // Human feedback if escalated
@@ -229,7 +230,9 @@ export interface SystemMetrics {
 	errorDetectionRate: number;
 	cacheHitRate: number;
 	confidenceDistribution: {
-	high: number; // >0.85, medium: number; // 0.7-0.85, low: number; // <0.7
+	high: number;
+		medium: number;
+		low: number;
 	};
 	fixSuccessRate: number;
 	escalationRate: number;

@@ -271,13 +271,9 @@ export class ErrorClustering {
 				.join('\n');
 			const prompt = 'Describe this error cluster in one sentence.\nFeatures: ' + commonFeatures.join(', ') + '\nSample errors:\n' + sampleMessages;
 
-			const response = await ollamaService.generate({
-				prompt,
-				model: 'gemma3:latest',
-				maxTokens: 100
-			});
+			const response = await ollamaService.generate(prompt);
 
-			return response?.text || this.generateFallbackDescription(members, commonFeatures);
+			return response || this.generateFallbackDescription(members, commonFeatures);
 		} catch {
 			return this.generateFallbackDescription(members, commonFeatures);
 		}
@@ -320,7 +316,7 @@ export class ErrorClustering {
 		this.stats.totalClassified++;
 
 		return {
-			errorId: error?.hash || error?.id || 'unknown',
+			errorId: error?.hash || 'unknown',
 			clusterId: bestCluster,
 			confidence,
 			distance: minDistance

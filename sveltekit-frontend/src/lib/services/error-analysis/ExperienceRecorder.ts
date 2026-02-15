@@ -387,10 +387,10 @@ export class ExperienceRecorder {
 		const storage = getJSONLStorage({ baseDir: this.config.jsonlDir });
 		let loaded = 0;
 
-		const records = await storage.readRecords();
+		const records: Array<any> = []; for await (const rec of storage.readAll()) { records.push(rec); }
 		for (const record of records) {
-			if (record.type === 'experience' && record.experience) {
-				const experience = record.experience as Experience;
+			if (record.type === 'experience' && record.data) {
+				const experience = record.data as Experience;
 				this.experiences.set(experience.id, experience);
 				this.updateStrategyStats(
 					experience.strategyId, experience.outcome,

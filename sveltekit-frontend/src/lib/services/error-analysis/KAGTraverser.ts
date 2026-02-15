@@ -272,7 +272,7 @@ export class KAGTraverser {
 				createdAt: new Date()
 			})),
 			successRate: 0,
-			timestamp: new Date(),
+			timestamp: Date.now(),
 			errorReport: {
 				file: row[1] || '',
 				line: row[2] || 0,
@@ -283,7 +283,7 @@ export class KAGTraverser {
 				source: 'svelte-check' as const,
 				category: 'misc-error',
 				hash: row[0],
-				timestamp: new Date()
+				timestamp: new Date().toISOString()
 			}
 		}));
 	}

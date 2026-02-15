@@ -5,7 +5,7 @@
  */
 
 import { aceSources } from '$lib/db/schema/ace-web.js';
-import { adminDb as db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/index.js';
 import { json } from '@sveltejs/kit';
 import * as amqp from 'amqplib';
 import * as crypto from 'crypto';
@@ -233,7 +233,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const statusCode = jobIds.length > 0 ? 200 : 400; // Partial success is 200
 
-    return json(response, { status, statusCode });
+    return json(response, { status: statusCode });
   } catch (error) {
     console.error('[ACE Ingest] Endpoint error:', error);
     return json(

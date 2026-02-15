@@ -1,7 +1,7 @@
 
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { db } from './index.ts';
-import * as schema from './schema.ts';
+import { db } from './index.js';
+import * as schema from './schema.js';
 import { eq, sql } from 'drizzle-orm';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
@@ -44,7 +44,8 @@ export class QdrantPostgreSQLService {
     async search(collectionName: string, vector: number[], limit: number = 10) {
         try {
             return await this.qdrant.search(collectionName, {
-                vector: limit,
+                vector,
+                limit,
                 with_payload: true
             });
         } catch (error) {

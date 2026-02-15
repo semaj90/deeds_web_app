@@ -91,6 +91,36 @@ class LLMLogger {
   clear(): void {
     this.logs = [];
   }
+
+  /**
+   * Export logs as instruction tuning samples (Alpaca/JSONL format).
+   * Filters by minimum score and applies limit.
+   * Schema: llm-log.schema.json
+   */
+  exportForInstructionTuning(minScore = 0.8, limit = 1000): Array<{ instruction: string; input: string; output: string }> {
+    return this.logs
+      .filter(e => (e.rating ?? 1) >= minScore)
+      .slice(0, limit)
+      .map(e => ({
+        instruction: e.prompt,
+        input: '',
+        output: e.response,
+      }));
+  }
+
+  /**
+   * Add human feedback rating to a log entry by ID.
+   * Maps positive/negative to numeric rating for filtering.
+   */
+  addFeedback(logId: string, feedback: 'positive' | 'negative', notes?: string): void {
+    const entry = this.logs.find(e => e.id === logId);
+    if (entry) {
+      entry.rating = feedback === 'positive' ? 5 : 1;
+      if (notes) {
+        entry.metadata = { ...entry.metadata, feedbackNotes: notes };
+      }
+    }
+  }
 }
 
 export const llmLogger = new LLMLogger();
