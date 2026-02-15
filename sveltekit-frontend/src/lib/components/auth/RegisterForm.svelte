@@ -12,7 +12,7 @@
   import Shield from 'lucide-svelte/icons/shield';
   import UserPlus from 'lucide-svelte/icons/user-plus';
   import Zap from 'lucide-svelte/icons/zap';
-  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import superForm from 'sveltekit-superforms';
   import { createActor } from 'xstate';
   import { z } from 'zod';

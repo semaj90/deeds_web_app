@@ -11,7 +11,7 @@ import crypto from 'crypto';
 import { eq, type InferInsertModel } from 'drizzle-orm';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types.js';
 

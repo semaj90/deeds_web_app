@@ -2,7 +2,7 @@
 <script lang="ts">
 	import superForm from 'sveltekit-superforms';
 	import { fileProxy } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod';
 	import { Dialog } from "bits-ui";
 import Button from '$lib/components/ui/Button.svelte';

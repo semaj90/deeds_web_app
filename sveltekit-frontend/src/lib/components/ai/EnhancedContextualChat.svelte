@@ -11,7 +11,7 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
   import superForm from 'sveltekit-superforms';
-  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import { chatMessageSchema } from '$lib/forms/contextual-chat-schema';
   import { Dialog } from "bits-ui";
 // Corrected import

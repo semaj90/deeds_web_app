@@ -1,7 +1,7 @@
 <!-- Simplified Registration Form - Svelte 5 + Superforms v2 -->
 <script lang="ts">
 	import superForm from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod';
 	import { goto } from '$app/navigation';
 	import Input from '$lib/components/ui/input/Input.svelte';

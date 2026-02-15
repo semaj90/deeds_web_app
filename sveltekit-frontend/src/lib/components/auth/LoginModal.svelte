@@ -7,7 +7,7 @@
   import X from 'lucide-svelte/icons/x';
   import { goto } from '$app/navigation';
   import { superForm } from 'sveltekit-superforms/client';
-  import { zod } from 'sveltekit-superforms/adapters';
+  import { zod4 as zod } from 'sveltekit-superforms/adapters';
   import { loginSchema } from '$lib/schemas/auth';
 
   interface Props {

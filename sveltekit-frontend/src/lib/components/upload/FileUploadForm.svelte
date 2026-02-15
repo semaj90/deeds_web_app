@@ -19,7 +19,7 @@ import HardDrive from 'lucide-svelte/icons/hard-drive';
 import Image from 'lucide-svelte/icons/image';
 import Music from 'lucide-svelte/icons/music';
 import Upload from 'lucide-svelte/icons/upload';
-import { zodClient } from 'sveltekit-superforms/adapters';
+import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
 import superForm from 'sveltekit-superforms';
 
 interface Props { data: { form: any };

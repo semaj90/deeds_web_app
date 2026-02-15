@@ -4,7 +4,7 @@
   import { caseFormSchema } from '$lib/schemas/forms';
   import { z } from 'zod';
   import superForm from 'sveltekit-superforms';
-  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
 
   // Infer form type from schema
   type CaseFormType = z.infer<typeof caseFormSchema>;

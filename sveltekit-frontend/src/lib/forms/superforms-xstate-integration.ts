@@ -3,7 +3,7 @@
 import { derived, writable, type Readable, type Writable } from 'svelte/store';
 import { superValidate, type SuperValidated } from 'sveltekit-superforms/server';
 import { superForm } from 'sveltekit-superforms/client';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { createActor, type AnyActorRef } from 'xstate';
 import { z } from 'zod';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
