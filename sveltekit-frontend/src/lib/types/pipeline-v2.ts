@@ -99,3 +99,9 @@ export interface PipelineHealth {
     device_name?: string;
   };
 }
+
+export interface ProcessingStatus {
+  stage: 'chunking' | 'embedding' | 'upserting' | 'complete' | 'error';
+  progress: number;
+  message: string;
+}

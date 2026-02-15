@@ -87,7 +87,7 @@ export class TagExtractor {
     const tags = new Set<string>();
 
     // 1. Extract from entities (primary source)
-    if ($1?.$2 > 0) {
+    if (entities?.length > 0) {
       for (const entity of entities) {
         const normalized = this.normalizeTag(entity);
         if (normalized && this.isValidTag(normalized)) {

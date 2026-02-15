@@ -26,7 +26,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			body: JSON.stringify({ filter: { must: [
 						{
 						key: 'file_path',
-							match: { value, filePath }
+							match: { value: filePath }
 						}
 					]
 				},
@@ -60,7 +60,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			body: JSON.stringify({ filter: { must: [
 						{
 						key: 'file_path',
-							match: { value, filePath }
+							match: { value: filePath }
 						}
 					]
 				},

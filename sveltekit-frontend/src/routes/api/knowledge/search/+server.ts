@@ -12,8 +12,6 @@ import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 import type { SearchRequest } from '$lib/services/knowledge-search/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const body = (await request.json()) as SearchRequest;
@@ -56,7 +54,7 @@ export const POST: RequestHandler = async ({ request }) => {
       const validProviders = ['ollama', 'gemini', 'claude'];
       if (!validProviders.includes(body.llmProvider)) {
         return json(
-          { error: `llmProvider must be one, of: ${validProviders.join(', ')}` },
+          { error: `llmProvider must be one of: ${validProviders.join(', ')}` },
           { status: 400 }
         );
       }
@@ -82,7 +80,9 @@ export const POST: RequestHandler = async ({ request }) => {
       success: true,
       query: body.query,
       results,
-      metadata: { queryTime: totalResults, totalResults: results.length,
+      metadata: {
+        queryTime,
+        totalResults: results.length,
         synthesized: body?.synthesize || false,
         llmProvider: body?.llmProvider ?? 'ollama'
       }

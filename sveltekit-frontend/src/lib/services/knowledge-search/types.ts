@@ -92,6 +92,44 @@ export interface ToolResult {
 	duration: number;
 }
 
+// ============================================================================
+// Full Document Types
+// ============================================================================
 
+export interface FullDocument {
+  id: string;
+  title: string;
+  url: string;
+  content: string;
+  summary: string;
+  entities: string[];
+  tags: string[];
+  scrapedAt: Date;
+  minioKey: string;
+}
 
+export interface CollectionStats {
+  totalDocuments: number;
+  indexedVectors: number;
+  collections: {
+    qdrant: { points: number; status: string };
+    postgres: { rows: number };
+    minio: { objects: number; size: string };
+  };
+  lastIndexed: string;
+}
 
+export interface SearchRequest {
+  query: string;
+  topK?: number;
+  filters?: SearchFilters;
+  includeContent?: boolean;
+  synthesize?: boolean;
+  llmProvider?: 'ollama' | 'gemini' | 'claude';
+}
+
+export interface ReindexStats {
+  totalProcessed: number;
+  successful: number;
+  duration: number;
+}

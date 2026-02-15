@@ -194,8 +194,8 @@
     // Session 31: API routes with pre-existing type errors (transitive imports from excluded services)
     "src/routes/api/phase78/**",
     "src/routes/api/phase89/**",
-    "src/routes/api/knowledge/**",
-    "src/routes/api/admin/knowledge/**",
+    // "src/routes/api/knowledge/**", // Session 32b: RE-INCLUDED (core RAG search)
+    // "src/routes/api/admin/knowledge/**", // Session 32b: RE-INCLUDED
     "src/routes/api/llm-improvement/**",
     "src/routes/api/routes/**",
     "src/routes/api/system/phase78/**",
@@ -208,13 +208,13 @@
     // "src/routes/api/health/services/**",
     // "src/routes/api/health/ocr/**",
     // "src/routes/api/health/redis/**",
-    "src/routes/api/reports/**",
-    "src/routes/api/kb/**",
+    // "src/routes/api/reports/**", // Session 32b: RE-INCLUDED (case reports)
+    // "src/routes/api/kb/**", // Session 32b: RE-INCLUDED (KB validation)
     "src/routes/api/ace/**",
     "src/routes/api/acp/**",
     "src/routes/api/codebase/**",
     "src/routes/api/ollama/**",
-    "src/routes/api/pipeline/**",
+    // "src/routes/api/pipeline/**", // Session 32b: RE-INCLUDED (document processing)
     "src/routes/api/phase72/**",
     "src/routes/api/phase90/**",
     "src/lib/api/**",

@@ -10,7 +10,7 @@
  */
 
 import type { CrawledDocument, IndexResult,
-  ReindexStats, SearchResult } from './types.js';
+  ReindexStats } from './types.js';
 
 export interface KnowledgeIndexerConfig {
   qdrantUrl: string;
@@ -110,10 +110,14 @@ export class KnowledgeIndexer {
     console.log(`✅ Indexed document: ${doc.title} (${Date.now() - startTime}ms)`);
 
     return {
-      id: qdrantId.toString(),
-      pgId: minioKey,
-      summary: entities,
-      tags: embedding,
+      id,
+      qdrantId,
+      pgId: 0,
+      minioKey,
+      summary,
+      entities,
+      tags,
+      embedding,
       tfIdfVector
     };
   }

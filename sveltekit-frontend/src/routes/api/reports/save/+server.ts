@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
@@ -17,8 +17,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			.update(reports)
 			.set({
 				title: title || 'Untitled Report',
-				contentHtml,
-				contentJson,
+				content: contentHtml,
+				metadata: contentJson ? { contentJson } : undefined,
 				updatedAt: new Date()
 			})
 			.where(eq(reports.id, reportId))

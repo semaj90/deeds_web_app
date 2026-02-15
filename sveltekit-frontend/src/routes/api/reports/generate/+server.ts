@@ -1,6 +1,7 @@
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { cases, evidence, personsOfInterest, reports } from '$lib/server/db/schema';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -34,12 +35,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			.values({
 				caseId,
 				title: `${type === 'charging_memo' ? 'Charging Memo' : 'Report'} - ${caseData.title}`,
-				type,
-				contentHtml: generatedContent.html,
-				contentJson: generatedContent.json,
-				rawModelOutput: generatedContent.raw,
-				createdAt: new Date(),
-				updatedAt: new Date()
+				content: generatedContent.html,
+				metadata: { type, contentJson: generatedContent.json, rawModelOutput: generatedContent.raw },
 			})
 			.returning();
 

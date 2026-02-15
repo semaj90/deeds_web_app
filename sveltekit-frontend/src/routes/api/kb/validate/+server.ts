@@ -8,7 +8,6 @@
 import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 
@@ -75,8 +74,7 @@ export const POST: RequestHandler = async ({ request }) => {
     };
 
     try {
-      await couchdb.createDatabase('ace_validations');
-      await couchdb.put('ace_validations', validationRecord);
+      await couchdb.post('ace_validations', validationRecord);
     } catch (error) {
       console.warn('CouchDB validation storage failed:', error);
     }
@@ -97,7 +95,7 @@ export const POST: RequestHandler = async ({ request }) => {
           pinned_at: new Date().toISOString()
         };
 
-        await couchdb.put('ace_validations', canvasUpdate);
+        await couchdb.post('ace_validations', canvasUpdate);
       } catch (error) {
         console.warn('Canvas pin failed:', error);
       }
@@ -132,13 +130,15 @@ export const GET: RequestHandler = async ({ url }) => {
   }
 
   try {
-    const selector: Record<string, unknown> = { type: 'source_validation' };
-    if (queryId) selector.query_id = queryId;
-    if (caseId) selector.case_id = caseId;
-
-    const { docs } = await couchdb.find<Record<string, unknown>>('ace_validations', selector, {
-      limit: 50
-    });
+    const result = await couchdb.allDocs('ace_validations', { include_docs: true, limit: 50 });
+    const docs = result.rows
+      .map(r => r.doc)
+      .filter((doc): doc is Record<string, unknown> => {
+        if (!doc || doc.type !== 'source_validation') return false;
+        if (queryId && doc.query_id !== queryId) return false;
+        if (caseId && doc.case_id !== caseId) return false;
+        return true;
+      });
 
     return json({
       validations: docs,
