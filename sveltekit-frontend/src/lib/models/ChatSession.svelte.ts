@@ -257,6 +257,7 @@ export class ChatSession {
 	 * Server SSE inference via /api/sse/chat (Ollama gemma3-legal:latest + RAG).
 	 */
 	private async _handleServerInference(message: string, decision: RouterDecision) {
+		const t0 = performance.now();
 		this.status = 'thinking';
 		this.error = null;
 
@@ -349,6 +350,7 @@ export class ChatSession {
 			if (this.status === 'streaming') {
 				this.status = 'idle';
 			}
+			this.debugInfo = { ...this.debugInfo, cacheHit: 'none', latencyMs: Math.round(performance.now() - t0), provider: 'server-ollama' };
 		} catch (err: any) {
 			if (err.name === 'AbortError') return;
 			console.error('ChatSession.sendMessage error:', err);

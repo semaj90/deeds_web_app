@@ -1,19 +1,17 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
     import { page } from '$app/stores';
     import { ChatSession } from '$lib/models/ChatSession.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     let { data } = $props(); // Load initial history from server load function
 
-    // Initialize our Reactive Rune Class
-    // page.params.id ensures we connect to the right channel
-    const chat = $derived(new ChatSession($page.params.id, data?.history ?? []));
+    // Initialize once — do NOT use $derived (re-creates ChatSession on every data change)
+    const chat = new ChatSession($page.params.id, data?.history ?? []);
 
     // ?local=1 forces local ONNX, ?server=1 forces server SSE (dev verification)
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const forceLocal = urlParams?.get('local') === '1';
     const forceServer = urlParams?.get('server') === '1';
+    const showDebug = urlParams?.get('debug') === '1';
 
     $effect(() => {
         return () => chat.destroy(); // Cleanup on unmount
@@ -77,31 +75,22 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <!-- Input form with test selectors -->
-<form
-    method="POST"
-    action="?/send"
-    use:enhance={() => {
-        // Before submitting:
-        const input = document.querySelector('input[name="message"]') as HTMLInputElement;
-        const text = input.value;
-        if (text) {
-            chat.addMessage('user', text); // Optimistic UI update
-            chat.sendMessage(undefined, { forceLocal, forceServer }); // Set status to thinking
-            input.value = ''; // Clear input
-        }
-
-        return async ({ update }) => {
-            await update({ reset: false });
-        };
-    }}
->
+<form onsubmit={(e) => {
+    e.preventDefault();
+    const input = document.querySelector('input[name="message"]') as HTMLInputElement;
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    input.focus();
+    chat.sendMessage(text, { forceLocal, forceServer });
+}}>
     <input
         type="text"
         name="message"
-        required
         placeholder="Ask about the contract..."
         data-testid="chat-input"
         data-role="chat-input"
+        autocomplete="off"
     />
     <button
         type="submit"
@@ -109,9 +98,22 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         data-testid="chat-send"
         data-role="chat-send"
     >
-        Send
+        {chat.status === 'thinking' ? 'Thinking...' : 'Send'}
     </button>
 </form>
+
+{#if showDebug}
+<div class="debug-overlay" data-testid="debug-overlay">
+    <strong>Dev Metrics</strong>
+    <div>Source: {chat.lastSource}</div>
+    <div>Provider: {chat.debugInfo.provider}</div>
+    <div>Latency: {chat.debugInfo.latencyMs}ms</div>
+    <div>Cache: {chat.debugInfo.cacheHit}</div>
+    <div>Router: {chat.debugInfo.reason || '—'}</div>
+    <div>Confidence: {(chat.lastConfidence * 100).toFixed(0)}%</div>
+    <div>Status: {chat.status}</div>
+</div>
+{/if}
 
 <style>
     .chat-window {
@@ -215,5 +217,25 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         background: #e3f2fd;
         color: #1565c0;
         border: 1px solid #90caf9;
+    }
+    .debug-overlay {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.88);
+        color: #0f0;
+        font-family: monospace;
+        font-size: 11px;
+        padding: 8px 12px;
+        border-radius: 4px;
+        z-index: 9999;
+        line-height: 1.6;
+    }
+    .debug-overlay strong {
+        color: #fff;
+        display: block;
+        margin-bottom: 4px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 2px;
     }
 </style>

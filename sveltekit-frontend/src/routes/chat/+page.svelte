@@ -92,9 +92,9 @@
     const input = document.querySelector('input[name="message"]') as HTMLInputElement;
     const text = input.value.trim();
     if (!text) return;
-    room.addOptimistic(text);
     input.value = '';
-    room.sendMessage(undefined, { forceLocal, forceServer });
+    input.focus();
+    room.sendMessage(text, { forceLocal, forceServer });
 }}>
     <input
         type="text"
@@ -102,7 +102,7 @@
         placeholder="Ask about the liability clause..."
         data-testid="chat-input"
         data-role="chat-input"
-        disabled={room.status === 'thinking' || room.status === 'streaming'}
+        autocomplete="off"
     />
     <button
         type="submit"
@@ -113,6 +113,19 @@
         {room.status === 'thinking' ? 'Thinking...' : room.status === 'streaming' ? 'Streaming...' : 'Send'}
     </button>
 </form>
+
+{#if showDebug}
+<div class="debug-overlay" data-testid="debug-overlay">
+    <strong>Dev Metrics</strong>
+    <div>Source: {room.lastSource}</div>
+    <div>Provider: {room.debugInfo.provider}</div>
+    <div>Latency: {room.debugInfo.latencyMs}ms</div>
+    <div>Cache: {room.debugInfo.cacheHit}</div>
+    <div>Router: {room.debugInfo.reason || '—'}</div>
+    <div>Confidence: {(room.lastConfidence * 100).toFixed(0)}%</div>
+    <div>Status: {room.status}</div>
+</div>
+{/if}
 
 <style>
     .chat-window {
@@ -186,5 +199,25 @@
         background: #e3f2fd;
         color: #1565c0;
         border: 1px solid #90caf9;
+    }
+    .debug-overlay {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.88);
+        color: #0f0;
+        font-family: monospace;
+        font-size: 11px;
+        padding: 8px 12px;
+        border-radius: 4px;
+        z-index: 9999;
+        line-height: 1.6;
+    }
+    .debug-overlay strong {
+        color: #fff;
+        display: block;
+        margin-bottom: 4px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 2px;
     }
 </style>
