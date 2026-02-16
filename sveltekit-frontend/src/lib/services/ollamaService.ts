@@ -49,7 +49,7 @@ const envFallback =
 
 export class OllamaService {
     baseUrl: string;
-    private embedModel = 'nomic-embed-text';
+    private embedModel = 'embeddinggemma';
     private llmModel = 'gemma3-legal:latest';
 
     constructor(baseUrl?: string) {

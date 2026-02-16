@@ -22,10 +22,10 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			? await query.where(eq(citations.caseId, caseId))
 			: await query;
 
-		return json({ success: true, data: results });
+		return json({ success: true, citations: results });
 	} catch (err) {
 		console.error('Error fetching citations:', err);
-		throw error(500, 'Failed to fetch citations');
+		return json({ success: false, citations: [], error: 'Database unavailable' }, { status: 200 });
 	}
 };
 

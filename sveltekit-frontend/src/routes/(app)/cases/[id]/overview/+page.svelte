@@ -127,17 +127,21 @@
 	</header>
 
 	<!-- Tabs -->
-	<nav class="px-6 pt-4 border-b border-neutral-800 flex gap-2 text-xs uppercase tracking-wide">
-		{#each ['overview', 'evidence', 'persons', 'ai', 'reports'] as tabId}
-			{@const t = tabId as TabId}
+	<nav class="case-tab-bar">
+		{#each [
+			{ id: 'overview', label: 'Overview' },
+			{ id: 'evidence', label: 'Evidence' },
+			{ id: 'persons', label: 'Persons' },
+			{ id: 'ai', label: 'AI' },
+			{ id: 'reports', label: 'Reports' }
+		] as tab}
+			{@const t = tab.id as TabId}
 			<button
-				class="px-3 py-2 rounded-t-lg border-b-2 -mb-px
-					{activeTab === t
-						? 'border-emerald-400 text-emerald-300 bg-neutral-900'
-						: 'border-transparent text-neutral-400 hover:text-neutral-100 hover:bg-neutral-900/60'}"
+				class="case-tab"
+				class:active={activeTab === t}
 				onclick={() => setTab(t)}
 			>
-				{t}
+				{tab.label}
 			</button>
 		{/each}
 	</nav>
@@ -256,3 +260,34 @@
 		{/if}
 	</main>
 </div>
+
+<style>
+	.case-tab-bar {
+		display: flex;
+		gap: 4px;
+		padding: 1rem 1.5rem 0;
+		border-bottom: 1px solid #262626;
+		font-size: 0.75rem;
+		text-transform: uppercase;
+	}
+	.case-tab {
+		padding: 0.5rem 1rem;
+		border-radius: 0.5rem 0.5rem 0 0;
+		border-bottom: 2px solid transparent;
+		margin-bottom: -1px;
+		font-weight: 500;
+		color: #a3a3a3;
+		background: rgba(38, 38, 38, 0.4);
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+	.case-tab:hover {
+		color: #f5f5f5;
+		background: #262626;
+	}
+	.case-tab.active {
+		border-bottom-color: #34d399;
+		color: #6ee7b7;
+		background: #171717;
+	}
+</style>

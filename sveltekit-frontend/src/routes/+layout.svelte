@@ -2,9 +2,18 @@
     import { appState, cleanupStores, initializeStores, tokenTracker, userPrefs } from '$lib/stores';
     import type { Snippet } from 'svelte';
     import { onMount } from 'svelte';
-    // Migrated to $effect
+    import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
 
     let { children }: { children: Snippet } = $props();
+    let showDocumentWriter = $state(false);
+    let mounted = $state(false);
+
+    function handleGlobalKeydown(e: KeyboardEvent) {
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
+            e.preventDefault();
+            showDocumentWriter = !showDocumentWriter;
+        }
+    }
 
     // Import webgpu modules dynamically to avoid SSR issues
     let webgpu: any = null;
@@ -13,7 +22,6 @@
     let cpuFallbackReady = $state(false);
 
     $effect(() => {
-
         // Initialize Phase 76 Barrel Stores
         initializeStores();
 
@@ -39,11 +47,14 @@
     });
 
     onMount(() => {
+        mounted = true;
         return () => {
             cleanupStores();
         };
     });
 </script>
+
+<svelte:window onkeydown={handleGlobalKeydown} />
 
 <div class="app-shell" class:dark={userPrefs.theme === 'dark'}>
     <aside class:closed={!appState.isSidebarOpen}>
@@ -74,6 +85,10 @@
         </div>
     </main>
 </div>
+
+{#if mounted}
+    <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
+{/if}
 
 <style>
     .app-shell { display: flex;
@@ -108,7 +123,3 @@
     .home-link { text-decoration: none;
 		color: inherit; font-weight: bold; }
 </style>
-
-
-
-

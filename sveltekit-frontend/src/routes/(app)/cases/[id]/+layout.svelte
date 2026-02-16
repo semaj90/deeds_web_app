@@ -34,23 +34,18 @@
 	</header>
 
 	<!-- Tabs -->
-	<nav class="border-b border-slate-800 px-4 flex gap-2 overflow-x-auto">
+	<nav class="cl-tab-bar">
 		{#each tabs as tab}
+			{@const isActive = page.url.pathname.endsWith(`/${tab.slug}`)}
 			<a
 				href={`/cases/${caseData?.id ?? ''}/${tab.slug}`}
-				class="relative px-3 py-2 text-xs uppercase tracking-[0.2em]
- hover:text-amber-300
- data-[active=true]:text-amber-300
- data-[active=true] font-semibold"
-				data-active={page.url.pathname.endsWith(`/${tab.slug}`)}
+				class="cl-tab"
+				class:active={isActive}
 			>
 				{tab.label}
-				<span
-					class="pointer-events-none absolute left-0 bottom-0 h-[2px] w-full
- origin-left scale-x-0 data-[active=true] scale-x-100
- bg-amber-400 transition-transform"
-					data-active={page.url.pathname.endsWith(`/${tab.slug}`)}
-				></span>
+				{#if isActive}
+					<span class="cl-tab-underline"></span>
+				{/if}
 			</a>
 		{/each}
 	</nav>
@@ -60,3 +55,35 @@
 		{@render children?.()}
 	</main>
 </div>
+
+<style>
+	.cl-tab-bar {
+		display: flex;
+		gap: 4px;
+		padding: 0 1rem;
+		border-bottom: 1px solid #1e293b;
+		overflow-x: auto;
+	}
+	.cl-tab {
+		position: relative;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.2em;
+		color: #94a3b8;
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+	.cl-tab:hover, .cl-tab.active {
+		color: #fcd34d;
+		font-weight: 600;
+	}
+	.cl-tab-underline {
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		height: 2px;
+		width: 100%;
+		background: #fbbf24;
+	}
+</style>

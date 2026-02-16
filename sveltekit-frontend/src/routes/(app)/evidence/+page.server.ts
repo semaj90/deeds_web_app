@@ -8,47 +8,49 @@ import { randomUUID } from 'node:crypto';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
+	const caseId = url.searchParams.get('caseId');
+
 	// Phase 96: SSR Authentication Guard
 	if (!locals.user?.id) {
-		// Allow demo data for development/testing
-		console.log('No user authenticated, returning demo data');
 		return {
 			evidence: [],
-			caseId: url.searchParams.get('caseId'),
-			user: null
-		};
-	}
-
-	try {
-		const caseId = url.searchParams.get('caseId');
-		let evidenceData;
-
-		if (caseId) {
-			// Get evidence for specific case
-			evidenceData = await db
-				.select()
-				.from(evidence)
-				.where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)))
-				.limit(100);
-		} else {
-			// Get all user's evidence
-			evidenceData = await db
-				.select()
-				.from(evidence)
-				.where(eq(evidence.userId, locals.user.id))
-				.limit(50);
-		}
-
-		return {
-			evidence: evidenceData,
 			caseId,
-			user: locals.user
+			user: null,
+			loadError: null
 		};
-	} catch (err: unknown) {
-		const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-		console.error('Failed to load evidence:', errorMessage);
-		throw error(500, 'Failed to load evidence data');
 	}
+
+	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
+
+	let evidenceData;
+	let loadError: string | null = null;
+
+	if (caseId) {
+		evidenceData = await safe(
+			db.select().from(evidence)
+				.where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)))
+				.limit(100),
+			[]
+		);
+	} else {
+		evidenceData = await safe(
+			db.select().from(evidence)
+				.where(eq(evidence.userId, locals.user.id))
+				.limit(50),
+			[]
+		);
+	}
+
+	if (evidenceData.length === 0) {
+		loadError = 'No evidence found or database unavailable';
+	}
+
+	return {
+		evidence: evidenceData,
+		caseId,
+		user: locals.user,
+		loadError
+	};
 };
 
 // Phase 96: Form Actions for mutations (replaces API endpoints)

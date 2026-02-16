@@ -19,10 +19,10 @@ import Button from '$lib/components/ui/Button.svelte';
  if (res.ok) {
  status = await res.json();
  } else {
- error = `Status check failed: ${res.status}`;
+ status = { enabled: false, totalErrors: 0, fixedErrors: 0, pendingErrors: 0 };
  }
- } catch (err) {
- error = `Failed to fetch status: ${err}`;
+ } catch {
+ status = { enabled: false, totalErrors: 0, fixedErrors: 0, pendingErrors: 0 };
  }
  }
 
@@ -92,7 +92,7 @@ import Button from '$lib/components/ui/Button.svelte';
  </CardContent>
  </Card>
  {:else if status}
- <div class="grid gap-4 md grid-cols-3">
+ <div class="grid gap-4 md:grid-cols-3">
  <Card>
  <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
  <CardTitle class="text-sm font-medium">System Status</CardTitle>

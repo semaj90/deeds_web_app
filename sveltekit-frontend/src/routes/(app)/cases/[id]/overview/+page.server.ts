@@ -1,4 +1,4 @@
-import { redirect, error } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema';
@@ -10,22 +10,30 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	}
 
 	const caseId = params.id;
+	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
 
-	const [caseRow] = await db
-		.select()
-		.from(cases)
-		.where(eq(cases.id, caseId))
-		.limit(1);
+	const caseRows = await safe(
+		db.select().from(cases).where(eq(cases.id, caseId)).limit(1),
+		[]
+	);
+
+	const caseRow = caseRows[0];
 
 	if (!caseRow) {
-		throw error(404, 'Case not found');
+		return {
+			user: locals.user,
+			caseId,
+			caseData: null,
+			evidence: [],
+			persons: [] as Array<{ name: string; role: string; riskScore: string }>,
+			loadError: 'Case not found or database unavailable'
+		};
 	}
 
-	const evidenceRows = await db
-		.select()
-		.from(evidence)
-		.where(eq(evidence.caseId, caseId))
-		.limit(50);
+	const evidenceRows = await safe(
+		db.select().from(evidence).where(eq(evidence.caseId, caseId)).limit(50),
+		[]
+	);
 
 	return {
 		user: locals.user,
@@ -51,6 +59,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			mimeType: e.fileType ?? 'unknown',
 			status: 'indexed'
 		})),
-		persons: [] as Array<{ name: string; role: string; riskScore: string }>
+		persons: [] as Array<{ name: string; role: string; riskScore: string }>,
+		loadError: null
 	};
 };

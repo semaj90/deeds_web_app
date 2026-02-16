@@ -4,6 +4,11 @@
 
     const room = new ChatSession('case-101');
 
+    // ?local=1 forces local ONNX, ?server=1 forces server SSE (dev verification)
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const forceLocal = urlParams?.get('local') === '1';
+    const forceServer = urlParams?.get('server') === '1';
+
     let citations = $state<Array<{ text: string; startIndex: number; endIndex: number; summary?: string; confidence?: number }>>([]);
 
     function handleSaveCitation(citation: { text: string; startIndex: number; endIndex: number; summary?: string }) {
@@ -29,6 +34,15 @@
             data-author={msg.role}
         >
             <strong>{msg.role}:</strong>
+            {#if msg.source}
+                <span
+                    class="source-badge {msg.source === 'local-onnx' ? 'source-local' : 'source-server'}"
+                    data-testid="answer-source"
+                    data-source={msg.source}
+                >
+                    {msg.source === 'local-onnx' ? 'LOCAL' : 'SERVER'}
+                </span>
+            {/if}
 
             {#if msg.role === 'assistant'}
                 <CitationHighlighter
@@ -79,7 +93,7 @@
     if (!text) return;
     room.addOptimistic(text);
     input.value = '';
-    room.sendMessage();
+    room.sendMessage(undefined, { forceLocal, forceServer });
 }}>
     <input
         type="text"
@@ -151,5 +165,25 @@
         border: 1px solid #ffc107;
         border-radius: 4px;
         color: #856404;
+    }
+    .source-badge {
+        display: inline-block;
+        font-size: 0.65em;
+        padding: 1px 6px;
+        border-radius: 3px;
+        font-weight: bold;
+        letter-spacing: 0.05em;
+        vertical-align: middle;
+        margin-left: 6px;
+    }
+    .source-local {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #a5d6a7;
+    }
+    .source-server {
+        background: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #90caf9;
     }
 </style>

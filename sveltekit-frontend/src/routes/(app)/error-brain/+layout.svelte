@@ -13,15 +13,14 @@
 <div class="min-h-screen bg-background">
 	<header class="border-b">
 		<div class="container mx-auto px-6 py-4">
-			<nav class="flex items-center gap-6">
-				<a href="/error-brain" class="text-lg font-semibold">Error-Brain</a>
-				<div class="flex gap-4">
+			<nav class="eb-nav">
+				<a href="/error-brain" class="eb-title">Error-Brain</a>
+				<div class="eb-links">
 					{#each navItems as item}
 						<a
 							href={item.href}
-							class:text-primary={page.url.pathname === item.href}
-							class:text-muted-foreground={page.url.pathname !== item.href}
-							class="text-sm font-medium hover:text-primary transition-colors"
+							class="eb-link"
+							class:active={page.url.pathname === item.href}
 						>
 							{item.label}
 						</a>
@@ -36,4 +35,27 @@
 	</main>
 </div>
 
-
+<style>
+	.eb-nav {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+	}
+	.eb-title {
+		font-size: 1.125rem;
+		font-weight: 600;
+	}
+	.eb-links {
+		display: flex;
+		gap: 1rem;
+	}
+	.eb-link {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: rgba(212, 199, 163, 0.6);
+		transition: color 0.15s;
+	}
+	.eb-link:hover, .eb-link.active {
+		color: #4ade80;
+	}
+</style>

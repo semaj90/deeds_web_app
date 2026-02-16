@@ -1,5 +1,4 @@
 import { browser } from '$app/environment';
-import { error } from '@sveltejs/kit';
 import type { LayoutLoad } from './$types.js';
 
 // Dynamically import cache service (browser only)
@@ -17,20 +16,27 @@ export const load: LayoutLoad = async ({ fetch, params }) => {
  if (browser && cacheService) {
  const cached = await cacheService.get(cacheKey);
  if (cached) {
- console.log('✅ Cache hit: case-detail-' + params.id);
- return { caseData: cached, fromCache: true };
+ return { caseData: cached, fromCache: true, loadError: null };
  }
  }
 
- // Cache miss - fetch from API
- console.log('📡 Fetching case from API: ' + params.id);
- const res = await fetch(`/api/cases/${params.id}`);
+ let res: Response;
+ try {
+ res = await fetch(`/api/cases/${params.id}`);
+ } catch {
+ return { caseData: null, fromCache: false, loadError: 'Network error loading case' };
+ }
 
  if (!res.ok) {
- throw error(res.status, `Failed to load case ${params.id}`);
+ return { caseData: null, fromCache: false, loadError: `Failed to load case (${res.status})` };
  }
 
- const caseData = await res.json();
+ let caseData: any;
+ try {
+ caseData = await res.json();
+ } catch {
+ return { caseData: null, fromCache: false, loadError: 'Invalid response from server' };
+ }
 
  // Save to cache (5 minute TTL)
  if (browser && cacheService) {
@@ -39,10 +45,11 @@ export const load: LayoutLoad = async ({ fetch, params }) => {
  persistent: true,
  ttl: 300000 // 5 minutes
  });
- console.log('💾 Cached: case-detail-' + params.id);
  }
 
  return {
  caseData,
+ fromCache: false,
+ loadError: null
  };
 };

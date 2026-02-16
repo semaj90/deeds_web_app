@@ -1,11 +1,13 @@
 <script lang="ts">
-  // Migrated to $effect
+  // Client-side ONNX inference via onnxruntime-web + WebGPU (Dawn)
+  import {
+    CLIENT_LLM_ONNX_PATH,
+    CLIENT_LLM_TOKENIZER_PATH,
+    ONNX_EXECUTION_PROVIDERS
+  } from '$lib/ai/model-ids.js';
 
   interface Props {
-    evidenceItem?: { title: string, excerpt: string;
-	type: string;
-      relevance: number;
-    };
+    evidenceItem?: { title: string; excerpt: string; type: string; relevance: number };
   }
 
   let { evidenceItem }: Props = $props();
@@ -28,40 +30,33 @@
 
   async function loadModel() {
     try {
-      // Import ONNX Runtime Web
+      // Import ONNX Runtime Web (uses Dawn WebGPU backend)
       const { InferenceSession } = await import('onnxruntime-web');
       const { AutoTokenizer } = await import('@huggingface/transformers');
 
-      // Load tokenizer with all required files
-      tokenizer = await AutoTokenizer.from_pretrained('/models/', {
+      // Load tokenizer from static/ served path
+      tokenizer = await AutoTokenizer.from_pretrained('/gemma3_270m_onnx/', {
         local_files_only: true
       });
 
-      const modelPath = '/models/gemma3_270m_w8a16.onnx';
-      const response = await fetch(modelPath);
+      // Fetch ONNX model from static/ (served by SvelteKit)
+      const response = await fetch(CLIENT_LLM_ONNX_PATH);
       const modelBuffer = await response.arrayBuffer();
 
-      // Try execution providers in order: WebGPU -> WebNN -> CPU
-      let executionProviders: string[] = [];
+      // Try execution providers in priority order: WebGPU (Dawn) -> WASM -> CPU
+      const availableProviders: string[] = [];
+      if ('gpu' in navigator) availableProviders.push('webgpu');
+      availableProviders.push('wasm', 'cpu');
 
-      // Check WebGPU support
-      if ('gpu' in navigator) {
-        executionProviders.push('webgpu');
-      }
+      model = await InferenceSession.create(modelBuffer, {
+        executionProviders: availableProviders
+      });
 
-      // Check WebNN support (Chrome/Edge)
-      if ('ml' in navigator) {
-        executionProviders.push('webnn');
-      }
-
-      // Always include CPU as fallback
-      executionProviders.push('cpu');
-
-      model = await InferenceSession.create(modelBuffer, { executionProviders });
-
-      const selectedProvider = model.getExecutionProviders()[0];
-      currentProvider = selectedProvider === 'WebGPUExecutionProvider' ? 'WebGPU' :
-        selectedProvider === 'WebNNExecutionProvider' ? 'WebNN' : 'CPU';
+      // Detect which EP was actually selected
+      const eps = model.getExecutionProviders?.() ?? availableProviders;
+      const selectedProvider = eps[0] ?? 'cpu';
+      currentProvider = selectedProvider.includes('webgpu') ? 'WebGPU (Dawn)' :
+        selectedProvider.includes('wasm') ? 'WASM' : 'CPU';
 
       modelLoaded = true;
       isLoading = false;

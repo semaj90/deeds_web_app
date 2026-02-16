@@ -10,6 +10,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     // page.params.id ensures we connect to the right channel
     const chat = $derived(new ChatSession($page.params.id, data?.history ?? []));
 
+    // ?local=1 forces local ONNX, ?server=1 forces server SSE (dev verification)
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const forceLocal = urlParams?.get('local') === '1';
+    const forceServer = urlParams?.get('server') === '1';
+
     $effect(() => {
         return () => chat.destroy(); // Cleanup on unmount
     });
@@ -29,6 +34,15 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
             data-author={msg.role}
         >
             <strong>{msg.role === 'user' ? 'You' : 'Legal AI'}:</strong>
+            {#if msg.source}
+                <span
+                    class="source-badge {msg.source === 'local-onnx' ? 'source-local' : 'source-server'}"
+                    data-testid="answer-source"
+                    data-source={msg.source}
+                >
+                    {msg.source === 'local-onnx' ? 'LOCAL' : 'SERVER'}
+                </span>
+            {/if}
             <p>{msg.content}</p>
 
             {#if msg.metadata?.confidence !== undefined}
@@ -72,7 +86,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
         const text = input.value;
         if (text) {
             chat.addMessage('user', text); // Optimistic UI update
-            chat.sendMessage(); // Set status to thinking
+            chat.sendMessage(undefined, { forceLocal, forceServer }); // Set status to thinking
             input.value = ''; // Clear input
         }
 
@@ -181,5 +195,25 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
     }
     button:disabled {
         background-color: #ccc;
+    }
+    .source-badge {
+        display: inline-block;
+        font-size: 0.65em;
+        padding: 1px 6px;
+        border-radius: 3px;
+        font-weight: bold;
+        letter-spacing: 0.05em;
+        vertical-align: middle;
+        margin-left: 6px;
+    }
+    .source-local {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #a5d6a7;
+    }
+    .source-server {
+        background: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #90caf9;
     }
 </style>

@@ -177,32 +177,35 @@
 		</div>
 
 		<!-- Filters -->
-		<div class="flex flex-wrap items-center gap-4 mb-6">
+		<div class="ev-toolbar">
 			<input
 				type="text"
 				bind:value={searchQuery}
 				placeholder="Search evidence..."
 				class="flex-1 min-w-[200px] px-3 py-2 border border-sand/30 bg-panelSoft rounded-lg text-sm text-sand focus:outline-none focus:border-info"
 			/>
-			<div class="flex gap-2">
+			<div class="ev-filter-bar">
 				{#each [{ value: 'all', label: 'All' }, { value: 'pdf', label: 'PDF' }, { value: 'image', label: 'Images' }, { value: 'document', label: 'Docs' }] as ft (ft.value)}
 					<button
 						onclick={() => (typeFilter = ft.value)}
-						class={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${typeFilter === ft.value ? 'bg-info text-white' : 'bg-panelSoft text-sand/80 hover:bg-sand/10'}`}
+						class="ev-filter-btn"
+						class:active={typeFilter === ft.value}
 					>
 						{ft.label}
 					</button>
 				{/each}
 			</div>
-			<div class="flex gap-1 border border-sand/20 rounded-lg overflow-hidden">
+			<div class="ev-view-toggle">
 				<button
 					onclick={() => (viewMode = 'grid')}
-					class={`px-2 py-1.5 text-xs ${viewMode === 'grid' ? 'bg-sand/20 text-sand' : 'bg-panelSoft text-sand/60 hover:bg-sand/10'}`}
+					class="ev-view-btn"
+					class:active={viewMode === 'grid'}
 					title="Grid view"
 				>Grid</button>
 				<button
 					onclick={() => (viewMode = 'list')}
-					class={`px-2 py-1.5 text-xs ${viewMode === 'list' ? 'bg-sand/20 text-sand' : 'bg-panelSoft text-sand/60 hover:bg-sand/10'}`}
+					class="ev-view-btn"
+					class:active={viewMode === 'list'}
 					title="List view"
 				>List</button>
 			</div>
@@ -288,3 +291,60 @@
 		{/if}
 	</div>
 </div>
+
+<style>
+	.ev-toolbar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+	}
+	.ev-toolbar input {
+		flex: 1;
+		min-width: 200px;
+	}
+	.ev-filter-bar {
+		display: flex;
+		gap: 6px;
+	}
+	.ev-filter-btn {
+		padding: 0.375rem 0.75rem;
+		border-radius: 0.5rem;
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: rgba(212, 199, 163, 0.8);
+		background: #2f2a22;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+	.ev-filter-btn:hover {
+		background: rgba(212, 199, 163, 0.1);
+	}
+	.ev-filter-btn.active {
+		background: #38bdf8;
+		color: white;
+	}
+	.ev-view-toggle {
+		display: flex;
+		gap: 1px;
+		border: 1px solid rgba(212, 199, 163, 0.2);
+		border-radius: 0.5rem;
+		overflow: hidden;
+	}
+	.ev-view-btn {
+		padding: 0.375rem 0.5rem;
+		font-size: 0.75rem;
+		color: rgba(212, 199, 163, 0.6);
+		background: #2f2a22;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+	.ev-view-btn:hover {
+		background: rgba(212, 199, 163, 0.1);
+	}
+	.ev-view-btn.active {
+		background: rgba(212, 199, 163, 0.2);
+		color: #d4c7a3;
+	}
+</style>

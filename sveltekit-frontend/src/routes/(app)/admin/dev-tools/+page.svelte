@@ -163,10 +163,11 @@
 	</div>
 
 	<!-- Tab Bar -->
-	<div class="mb-4 flex flex-wrap gap-1 border-b-2 border-sand/20">
+	<div class="dt-tab-bar">
 		{#each tabs as tab}
 			<button
-				class="rounded-t-md px-4 py-2 text-sm font-mono uppercase tracking-wider transition {activeTab === tab.value ? 'border-b-2 border-accent text-accent' : 'text-sand/60 hover:text-sand'}"
+				class="dt-tab"
+				class:active={activeTab === tab.value}
 				onclick={() => { activeTab = tab.value; }}
 			>
 				{tab.label}
@@ -397,3 +398,32 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.dt-tab-bar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+		margin-bottom: 1rem;
+		border-bottom: 2px solid rgba(212, 199, 163, 0.2);
+	}
+	.dt-tab {
+		padding: 0.5rem 1rem;
+		border-radius: 0.375rem 0.375rem 0 0;
+		font-size: 0.875rem;
+		text-transform: uppercase;
+		color: rgba(212, 199, 163, 0.6);
+		background: rgba(36, 33, 27, 0.4);
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+	.dt-tab:hover {
+		color: #d4c7a3;
+		background: rgba(36, 33, 27, 0.6);
+	}
+	.dt-tab.active {
+		border-bottom: 2px solid #4ade80;
+		color: #4ade80;
+		background: rgba(36, 33, 27, 0.7);
+	}
+</style>

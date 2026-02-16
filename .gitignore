@@ -950,3 +950,9 @@ documents/large-files/
 *.backup
 *.bak
 
+########################################
+# Exceptions: ONNX Runtime WASM for browser inference
+########################################
+!sveltekit-frontend/static/ort/*.wasm
+!sveltekit-frontend/static/ort/*.mjs
+
