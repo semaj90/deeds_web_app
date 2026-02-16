@@ -1,11 +1,12 @@
 <script lang="ts">
+    import { untrack } from 'svelte';
     import { page } from '$app/stores';
     import { ChatSession } from '$lib/models/ChatSession.svelte';
 
     let { data } = $props(); // Load initial history from server load function
 
-    // Initialize once — do NOT use $derived (re-creates ChatSession on every data change)
-    const chat = new ChatSession($page.params.id, data?.history ?? []);
+    // Initialize once — intentionally capture initial data only (not reactive)
+    const chat = untrack(() => new ChatSession($page.params.id, data?.history ?? []));
 
     // ?local=1 forces local ONNX, ?server=1 forces server SSE (dev verification)
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
