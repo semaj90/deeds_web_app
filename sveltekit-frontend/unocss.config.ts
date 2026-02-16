@@ -61,6 +61,22 @@ export default defineConfig({
     'scroll-panel': 'panel-soft overflow-auto custom-scrollbar',
   },
   safelist: [
+    // Layout utilities — safelisted because UnoCSS extraction misses them
+    // inside dynamic Svelte class expressions (template literals, ternaries)
+    'flex', 'inline-flex', 'flex-col', 'flex-wrap', 'flex-1',
+    'items-center', 'items-start', 'items-end',
+    'justify-between', 'justify-center', 'justify-start',
+    'gap-1', 'gap-2', 'gap-3', 'gap-4', 'gap-6',
+    'px-2', 'px-3', 'px-4', 'px-6',
+    'py-1', 'py-2', 'py-3', 'py-4',
+    'p-2', 'p-3', 'p-4',
+    'rounded', 'rounded-md', 'rounded-lg', 'rounded-xl',
+    'overflow-auto', 'overflow-hidden', 'overflow-x-auto',
+    'min-h-screen', 'min-w-0',
+    'space-y-2', 'space-y-3', 'space-y-4',
+    'grid', 'grid-cols-2', 'grid-cols-3',
+    'md:grid-cols-2', 'md:grid-cols-3',
+    // Heroicons
     'i-heroicons-magnifying-glass-20-solid',
     'i-heroicons-plus-20-solid',
     'i-heroicons-exclamation-triangle',

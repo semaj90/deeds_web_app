@@ -50,6 +50,7 @@ export class ChatSession {
 	lastConfidence = $state<number>(1.0);
 	lastSource = $state<InferenceSource>('server-ollama');
 	connectionStatus = $state<'connected' | 'disconnected'>('disconnected');
+	debugInfo = $state({ reason: '', latencyMs: 0, cacheHit: 'none', provider: 'unknown' });
 
 	private abortController: AbortController | null = null;
 	private _chatId: string;
@@ -111,6 +112,7 @@ export class ChatSession {
 		);
 
 		this.lastSource = decision.source;
+		this.debugInfo = { ...this.debugInfo, reason: decision.reason };
 
 		if (decision.source === 'local-onnx') {
 			await this._handleLocalInference(lastUserMsg.content, decision);
@@ -130,6 +132,7 @@ export class ChatSession {
 	 *   5. If ONNX fails → auto-escalate to server
 	 */
 	private async _handleLocalInference(message: string, decision: RouterDecision) {
+		const t0 = performance.now();
 		this.status = 'thinking';
 		this.error = null;
 
@@ -146,6 +149,7 @@ export class ChatSession {
 			});
 			this.status = 'idle';
 			this.lastSource = 'local-onnx';
+			this.debugInfo = { ...this.debugInfo, cacheHit: 'idb', latencyMs: Math.round(performance.now() - t0), provider: 'cache' };
 			return;
 		}
 
@@ -232,6 +236,7 @@ export class ChatSession {
 			this.status = 'idle';
 			this.lastSource = 'local-onnx';
 			this.lastConfidence = decision.confidence;
+			this.debugInfo = { ...this.debugInfo, cacheHit: 'none', latencyMs: Math.round(performance.now() - t0), provider };
 			console.info(`[ChatRouter] Local ONNX response via ${provider}`, {
 				tokens: generatedTokens.length,
 				reason: decision.reason

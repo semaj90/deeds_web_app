@@ -8,6 +8,7 @@
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const forceLocal = urlParams?.get('local') === '1';
     const forceServer = urlParams?.get('server') === '1';
+    const showDebug = urlParams?.get('debug') === '1';
 
     let citations = $state<Array<{ text: string; startIndex: number; endIndex: number; summary?: string; confidence?: number }>>([]);
 

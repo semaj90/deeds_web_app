@@ -274,6 +274,56 @@ Outputs timestamped screenshots + JSON report to `scripts/tests/screenshots/`. L
 
 ---
 
+## ORT WASM: Git vs Local Differences
+
+The ONNX Runtime browser inference needs 3 `.wasm` binaries + 3 `.mjs` loaders in `sveltekit-frontend/static/ort/`:
+
+| File | Size | In Git | In Local |
+|------|------|--------|----------|
+| `ort-wasm-simd-threaded.asyncify.mjs` | ~4KB | Yes | Yes |
+| `ort-wasm-simd-threaded.jsep.mjs` | ~4KB | Yes | Yes |
+| `ort-wasm-simd-threaded.mjs` | ~2KB | Yes | Yes |
+| `ort-wasm-simd-threaded.asyncify.wasm` | 24.3MB | **No** (pre-commit hook rejects >10MB) | Yes |
+| `ort-wasm-simd-threaded.jsep.wasm` | 22.7MB | **No** | Yes |
+| `ort-wasm-simd-threaded.wasm` | 11.4MB | **No** | Yes |
+
+**After cloning, copy WASM binaries from node_modules:**
+```bash
+cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded*.wasm sveltekit-frontend/static/ort/
+```
+
+**Verify serving:** Hit `/ort/ort-wasm-simd-threaded.wasm` in browser — should return 200.
+
+**Cross-origin isolation:** If using threaded runtime, app needs COOP/COEP headers or threaded WASM degrades silently.
+
+---
+
+## UnoCSS Extraction Limitations (Session 38)
+
+UnoCSS generates CSS only for utilities it can **extract at build time**. Dynamic Svelte class expressions prevent extraction:
+
+```svelte
+<!-- FAILS — UnoCSS can't extract "flex", "gap-3", etc. from dynamic expressions -->
+<div class={`flex gap-3 ${isActive ? 'bg-accent' : 'bg-panel'}`}>
+<div class="flex gap-3 {someVar}">
+
+<!-- WORKS — static class strings are extractable -->
+<div class="flex gap-3 bg-accent">
+```
+
+**Current fix:** Scoped `<style>` blocks for layout-critical components (tabs, filters, toolbars). Most deterministic approach — bypasses UnoCSS entirely.
+
+**Alternative:** Safelist critical layout utilities in `uno.config.ts` to force generation regardless of extraction:
+```typescript
+safelist: [
+  'flex', 'inline-flex', 'items-center', 'justify-between',
+  'gap-1', 'gap-2', 'gap-3', 'gap-4',
+  'px-2', 'px-3', 'px-4', 'py-1', 'py-2',
+]
+```
+
+---
+
 ## Key Lessons (Proven Patterns)
 
 - **$derived vs $derived.by**: `$derived(() => {...})` returns a function. Use `$derived.by(() => {...})` for complex computations
