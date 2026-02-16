@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 	import { onDestroy } from 'svelte';
 
@@ -26,8 +27,8 @@
 	}
 
 	// Create a ChatSession keyed by caseId (or a generic session)
-	// eslint-disable-next-line -- intentionally captures initial caseId for session init
-	let session = $state<ChatSession>(createSession(caseId));
+	// $effect below handles re-creation when caseId changes
+	let session = $state<ChatSession>(untrack(() => createSession(caseId)));
 
 	// Recreate session if caseId changes
 	$effect(() => {

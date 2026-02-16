@@ -1,16 +1,17 @@
 <script lang="ts">
+    import { untrack } from 'svelte';
     import type { PageData } from './$types';
 
     let { data }: {
 	data: PageData } = $props();
 
-    const initFilters = data?.filters;
+    const initFilters = untrack(() => data?.filters);
     let selectedErrorCode = $state(initFilters?.errorCode ?? '');
     let selectedSurface = $state(initFilters?.surface ?? '');
     let selectedTech = $state(initFilters?.tech ?? '');
     let searchQuery = $state('');
 
-    const filteredErrors = $derived(() => {
+    const filteredErrors = $derived.by(() => {
         if (!searchQuery) return data.errors;
         const q = searchQuery.toLowerCase();
         return data.errors.filter(err =>
@@ -158,16 +159,16 @@
     <!-- Error Cards Grid -->
     {#if data.error}
         <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
-            <p class="text-red-400">⚠️ {data.error}</p>
+            <p class="text-red-400">{data.error}</p>
             <p class="text-slate-400 text-sm mt-2">Make sure Qdrant is running and the phase90 pipeline has completed.</p>
         </div>
-    {:else if filteredErrors().length === 0}
+    {:else if filteredErrors.length === 0}
         <div class="bg-slate-800/40 rounded-xl p-12 text-center">
             <p class="text-slate-400 text-lg">No errors found matching your filters.</p>
         </div>
     {:else}
         <div class="space-y-3">
-            {#each filteredErrors() as error}
+            {#each filteredErrors as error}
                 <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50 hover:border-blue-500/30 transition-colors">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex-1 min-w-0">
@@ -191,7 +192,7 @@
 
                             <!-- File Path -->
                             <div class="font-mono text-sm text-slate-300 truncate mb-1">
-                                📄 {error.filePath}:{error.line}:{error.col}
+                                {error.filePath}:{error.line}:{error.col}
                             </div>
 
                             <!-- Message -->
@@ -237,8 +238,3 @@
         overflow: hidden;
     }
 </style>
-
-
-
-
-
