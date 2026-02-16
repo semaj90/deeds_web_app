@@ -223,8 +223,8 @@
 		<Card class="filter-panel">
 			<CardContent class="filter-content">
 				<div class="filter-section">
-					<label class="filter-label">Node Types</label>
-					<div class="filter-chips">
+					<span class="filter-label">Node Types</span>
+					<div class="filter-chips" role="group" aria-label="Node type filters">
 						{#each availableTypes as type}
 							<button
 								class={`filter-chip ${filters.types.includes(type) ? 'active' : ''} ${getTypeColor(type)}`}
@@ -237,7 +237,7 @@
 				</div>
 
 				<div class="filter-section">
-					<label class="filter-label">Error Status</label>
+					<span class="filter-label">Error Status</span>
 					<label class="checkbox-label">
 						<input type="checkbox" bind:checked={filters.hasErrors} />
 						<span>Only show nodes with errors</span>
@@ -246,8 +246,8 @@
 
 				{#if availableClusters.length > 0}
 					<div class="filter-section">
-						<label class="filter-label">Cluster</label>
-						<select bind:value={filters.cluster} class="filter-select">
+						<label for="graph-cluster-filter" class="filter-label">Cluster</label>
+						<select id="graph-cluster-filter" bind:value={filters.cluster} class="filter-select">
 							<option value="">All clusters</option>
 							{#each availableClusters as cluster}
 								<option value={cluster}>{cluster}</option>

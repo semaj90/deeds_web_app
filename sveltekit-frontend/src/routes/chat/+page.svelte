@@ -1,7 +1,18 @@
 <script lang="ts">
     import { ChatSession } from '$lib/models/ChatSession.svelte.js';
+    import CitationHighlighter from '$lib/components/legal-ai/CitationHighlighter.svelte';
 
     const room = new ChatSession('case-101');
+
+    let citations = $state<Array<{ text: string; startIndex: number; endIndex: number; summary?: string; confidence?: number }>>([]);
+
+    function handleSaveCitation(citation: { text: string; startIndex: number; endIndex: number; summary?: string }) {
+        citations = [...citations, citation];
+    }
+
+    function handleRemoveCitation(citation: { text: string; startIndex: number; endIndex: number }) {
+        citations = citations.filter((c) => c.startIndex !== citation.startIndex || c.endIndex !== citation.endIndex);
+    }
 </script>
 
 <svelte:head>
@@ -17,7 +28,18 @@
             data-role={msg.role}
             data-author={msg.role}
         >
-            <strong>{msg.role}:</strong> {msg.content}
+            <strong>{msg.role}:</strong>
+
+            {#if msg.role === 'assistant'}
+                <CitationHighlighter
+                    content={msg.content}
+                    {citations}
+                    onsave={handleSaveCitation}
+                    onremove={handleRemoveCitation}
+                />
+            {:else}
+                {msg.content}
+            {/if}
 
             {#if msg.metadata?.confidence !== undefined}
                 <span class="confidence" data-testid="confidence">
@@ -36,7 +58,7 @@
 
             {#if msg.metadata?.warnings?.length}
                 <div class="warning" data-testid="warning">
-                    ⚠️ {msg.metadata.warnings.join(', ')}
+                    {msg.metadata.warnings.join(', ')}
                 </div>
             {/if}
         </div>

@@ -1,0 +1,69 @@
+import { db } from '$lib/server/db/client';
+import { caseNotes, cases } from '$lib/server/db/schema';
+import { json } from '@sveltejs/kit';
+import { eq, desc, sql } from 'drizzle-orm';
+import type { RequestHandler } from './$types';
+
+/**
+ * GET /api/cases/[id]/notes
+ * List all notes for a case (pinned first, then most recent)
+ */
+export const GET: RequestHandler = async ({ params }) => {
+	const caseId = params.id;
+
+	try {
+		const notes = await db
+			.select()
+			.from(caseNotes)
+			.where(eq(caseNotes.caseId, caseId))
+			.orderBy(desc(caseNotes.isPinned), desc(caseNotes.updatedAt));
+
+		return json({ success: true, notes });
+	} catch (err) {
+		console.error('[notes] GET error:', err);
+		return json({ error: 'Failed to load notes' }, { status: 500 });
+	}
+};
+
+/**
+ * POST /api/cases/[id]/notes
+ * Create a new note
+ * Body: { title?, content, isAI? }
+ */
+export const POST: RequestHandler = async ({ params, request }) => {
+	const caseId = params.id;
+
+	try {
+		const body = await request.json();
+
+		if (!body?.content?.trim()) {
+			return json({ error: 'Content is required' }, { status: 400 });
+		}
+
+		// Verify case exists
+		const [targetCase] = await db
+			.select({ id: cases.id })
+			.from(cases)
+			.where(eq(cases.id, caseId))
+			.limit(1);
+
+		if (!targetCase) {
+			return json({ error: 'Case not found' }, { status: 404 });
+		}
+
+		const [note] = await db
+			.insert(caseNotes)
+			.values({
+				caseId,
+				title: body.title?.trim() || null,
+				content: body.content.trim(),
+				isAI: body.isAI ?? false
+			})
+			.returning();
+
+		return json({ success: true, note }, { status: 201 });
+	} catch (err) {
+		console.error('[notes] POST error:', err);
+		return json({ error: 'Failed to create note' }, { status: 500 });
+	}
+};

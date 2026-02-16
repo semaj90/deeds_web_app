@@ -8,9 +8,8 @@
 
 	let { caseId }: Props = $props();
 
-	// Create a ChatSession keyed by caseId (or a generic session)
-	let session = $state<ChatSession>(
-		new ChatSession(caseId ? `case-${caseId}` : `chat-${Date.now()}`, [
+	function createSession(id?: string) {
+		return new ChatSession(id ? `case-${id}` : `chat-${Date.now()}`, [
 			{
 				role: 'system',
 				content:
@@ -23,8 +22,12 @@
 					'Hello. I am your Legal AI Assistant. How can I help you with this case?',
 				timestamp: new Date().toISOString()
 			}
-		])
-	);
+		]);
+	}
+
+	// Create a ChatSession keyed by caseId (or a generic session)
+	// eslint-disable-next-line -- intentionally captures initial caseId for session init
+	let session = $state<ChatSession>(createSession(caseId));
 
 	// Recreate session if caseId changes
 	$effect(() => {

@@ -4,9 +4,10 @@
     let { data }: {
 	data: PageData } = $props();
 
-    let selectedErrorCode = $state(data.filters.errorCode);
-    let selectedSurface = $state(data.filters.surface);
-    let selectedTech = $state(data.filters.tech);
+    const initFilters = data?.filters;
+    let selectedErrorCode = $state(initFilters?.errorCode ?? '');
+    let selectedSurface = $state(initFilters?.surface ?? '');
+    let selectedTech = $state(initFilters?.tech ?? '');
     let searchQuery = $state('');
 
     const filteredErrors = $derived(() => {
@@ -83,8 +84,9 @@
         <div class="flex flex-wrap gap-4 items-end">
             <!-- Search -->
             <div class="flex-1 min-w-[200px]">
-                <label class="block text-sm text-slate-400 mb-2">Search</label>
+                <label for="err-search" class="block text-sm text-slate-400 mb-2">Search</label>
                 <input
+                    id="err-search"
                     type="text"
                     bind:value={searchQuery}
                     placeholder="Search by file, message, or code..."
@@ -94,8 +96,9 @@
 
             <!-- Error Code Filter -->
             <div class="min-w-[150px]">
-                <label class="block text-sm text-slate-400 mb-2">Error Code</label>
+                <label for="err-code" class="block text-sm text-slate-400 mb-2">Error Code</label>
                 <select
+                    id="err-code"
                     bind:value={selectedErrorCode}
                     class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
@@ -108,8 +111,9 @@
 
             <!-- Surface Filter -->
             <div class="min-w-[150px]">
-                <label class="block text-sm text-slate-400 mb-2">Surface</label>
+                <label for="err-surface" class="block text-sm text-slate-400 mb-2">Surface</label>
                 <select
+                    id="err-surface"
                     bind:value={selectedSurface}
                     class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
@@ -122,8 +126,9 @@
 
             <!-- Tech Filter -->
             <div class="min-w-[150px]">
-                <label class="block text-sm text-slate-400 mb-2">Tech</label>
+                <label for="err-tech" class="block text-sm text-slate-400 mb-2">Tech</label>
                 <select
+                    id="err-tech"
                     bind:value={selectedTech}
                     class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
@@ -227,8 +232,9 @@
     .line-clamp-2 {
         display: -webkit-box;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
-	overflow: hidden;
+        overflow: hidden;
     }
 </style>
 

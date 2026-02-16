@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import type { LayoutData } from './$types';
+	import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
 
 	interface Props {
 		data: LayoutData;
@@ -9,6 +10,14 @@
 
 	let { data, children }: Props = $props();
 	let sidebarOpen = $state(true);
+	let showDocumentWriter = $state(false);
+
+	function handleGlobalKeydown(e: KeyboardEvent) {
+		if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
+			e.preventDefault();
+			showDocumentWriter = !showDocumentWriter;
+		}
+	}
 
 	const navItems = [
 		{ href: '/dashboard', icon: '📊', label: 'DASHBOARD' },
@@ -36,6 +45,8 @@
 		return path.startsWith(href);
 	}
 </script>
+
+<svelte:window onkeydown={handleGlobalKeydown} />
 
 {#if data.devBypass}
 	<div class="bg-warning text-black px-4 py-1.5 text-center text-xs font-mono tracking-wider">
@@ -107,6 +118,8 @@
 		{@render children?.()}
 	</main>
 </div>
+
+<CaseDocumentWriter bind:isOpen={showDocumentWriter} />
 
 <style>
 	.app-shell {
