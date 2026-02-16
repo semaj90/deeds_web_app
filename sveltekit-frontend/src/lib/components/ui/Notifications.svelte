@@ -14,13 +14,13 @@
 
   const colorClasses = {
     success:
-      'bg-accent/5 border-accent/20 text-accent dark: bg-accent/10 dark:border-accent/30 dark:text-accent/40',
+      'bg-accent/5 border-accent/20 text-accent dark:bg-accent/10 dark:border-accent/30 dark:text-accent/40',
     error:
-      'bg-danger/5 border-danger/20 text-danger dark: bg-danger/10 dark:border-danger/30 dark:text-danger/40',
+      'bg-danger/5 border-danger/20 text-danger dark:bg-danger/10 dark:border-danger/30 dark:text-danger/40',
     warning:
-      'bg-warning/5 border-warning/20 text-warning dark: bg-warning/10 dark:border-warning dark:text-warning/60',
+      'bg-warning/5 border-warning/20 text-warning dark:bg-warning/10 dark:border-warning dark:text-warning/60',
     info:
-      'bg-info/5 border-info/20 text-info dark: bg-info/10 dark: border-info/30 dark:text-info/40'
+      'bg-info/5 border-info/20 text-info dark:bg-info/10 dark: border-info/30 dark:text-info/40'
   };
 
   const iconColorClasses = { success: 'text-accent',

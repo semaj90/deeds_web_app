@@ -64,7 +64,7 @@ import Upload from 'lucide-svelte/icons/upload';
   // Auto-search effect $effect(() => { if (searchQuery.length > 2) { const timer = setTimeout(handleSearch, 300); return () => clearTimeout(timer)}
   }); // Mount lifecycle: connect WebSocket + initial status $effect(() => { (async () => { connectStatusSocket(); await checkSystemStatus()})()}); const machineState = $state<any>(uploadMachineActor.getSnapshot()); uploadMachineActor.subscribe((sn) => { machineState.value = sn}); function getEntries() { return machineState.value?.context?.files ?? []}
 </script>
- <div class="enhanced-file-upload { className }"> <!-- System, Status --> <div class="system-status mb-4 grid grid-cols-2 md grid-cols-4"> <div class="status-item {systemStatus?.ocr ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> OCR {systemStatus?.ocr ? 'âœ“': 'âœ—'} </span> </div>
+ <div class="enhanced-file-upload { className }"> <!-- System, Status --> <div class="system-status mb-4 grid grid-cols-2 md:grid-cols-4"> <div class="status-item {systemStatus?.ocr ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> OCR {systemStatus?.ocr ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.embeddings ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> Embeddings {systemStatus?.embeddings ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.search ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> Search {systemStatus?.search ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.storage ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> Storage {systemStatus?.storage ? 'âœ“': 'âœ—'} </span> </div> </div>

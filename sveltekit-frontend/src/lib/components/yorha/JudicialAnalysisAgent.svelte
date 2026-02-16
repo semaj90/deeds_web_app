@@ -178,7 +178,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
 
  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
  <!-- Input Section -->
- <div class="lg col-span-1 space-y-6">
+ <div class="lg:col-span-1 space-y-6">
  <!-- Case Details -->
  <div>
  <label for="jurisdiction-select" class="block text-sm font-medium text-sand/40 mb-2">
@@ -252,7 +252,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  </div>
 
  <!-- Analysis Section -->
- <div class="lg col-span-3">
+ <div class="lg:col-span-3">
  {#if analysis}
  <!-- Tab Navigation -->
  <div class="bg-panelSoft border border-sand/30 rounded-lg p-1 mb-6 flex">
@@ -302,7 +302,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  </div>
 
  <!-- Key Metrics -->
- <div class="grid grid-cols-1 md grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
  <div class="bg-panelSoft border border-sand/30 rounded-lg p-4 text-center">
  <div class="text-2xl mb-2">📊</div>
  <p class="text-sm text-sand/40 mb-1">Overall Strength</p>
@@ -373,7 +373,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  {:else if activeTab === 'case-strength'}
  <div class="space-y-6">
  <!-- Strength Scores -->
- <div class="grid grid-cols-1 md grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
  <div class="bg-panelSoft border border-sand/30 rounded-lg p-4 text-center">
  <p class="text-sm text-sand/40 mb-1">Overall</p>
  <p class="text-3xl font-bold {getCaseStrengthColor(analysis.caseStrength.overall)}">

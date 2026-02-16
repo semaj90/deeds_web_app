@@ -56,7 +56,7 @@
 
 	{#if data.analysis}
 		<!-- Summary Cards -->
-		<div class="grid grid-cols-1 md grid-cols-4 gap-4">
+		<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 			<div class="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
 				<div class="text-sm text-gray-400">Collections</div>
 				<div class="text-2xl font-bold text-white mt-1">
@@ -96,7 +96,7 @@
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
 								<h3 class="text-lg font-semibold text-purple-400">{collection.name}</h3>
-								<div class="grid grid-cols-2 md grid-cols-4 gap-3 mt-3 text-sm">
+								<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 text-sm">
 									<div>
 										<span class="text-gray-400">Points:</span>
 										<span class="text-white ml-2 font-medium">{collection.points.toLocaleString()}</span>

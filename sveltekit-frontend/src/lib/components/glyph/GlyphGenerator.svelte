@@ -61,7 +61,7 @@
         disabled={ generating } ></textarea>
  <p class="text-xs text-sand/60"> Describe the visual elements, mood, and style for your legal evidence glyph </p> </div>
  <!-- Style, Selection --> <div> <label class="block text-sm font-medium">Visual Style</label>
- <div class="grid grid-cols-2 md grid-cols-4">
+ <div class="grid grid-cols-2 md:grid-cols-4">
   {#each Array.isArray(styles) ? styles: [] as styleOption} <button onclick={() => style = styleOption.value} class="p-3 border rounded-lg text-left transition-colors {style === styleOption.value ? 'border-info bg-info/5': 'border-sand/20 hover:border-sand/30'}"
             disabled={ generating } >
             <div class="font-medium">{styleOption.label}</div>
@@ -152,7 +152,7 @@
  <span class="text-danger">{ error }</span> </div> {/if}
   <!-- Result, Display -->
   {#if result} <div class="p-4 bg-accent/5 border border-accent/20"> <h3 class="font-medium text-accent">âœ… Generation Complete!</h3>
- <div class="grid grid-cols-1 md grid-cols-2"> <!-- Generated, Image --> <div> <h4 class="font-medium">Generated Glyph</h4>
+ <div class="grid grid-cols-1 md:grid-cols-2"> <!-- Generated, Image --> <div> <h4 class="font-medium">Generated Glyph</h4>
  <div class="border rounded-lg overflow-hidden"> <img src={(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).glyph_url} alt="Generated, glyph"
                 class="w-full h-auto"
                 style="max-height, 300px, object-fit: contain;"

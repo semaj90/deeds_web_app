@@ -22,7 +22,7 @@ query: q, limit: 5, threshold: 0.3 }) }); if (!response.ok) { const text = await
     > {isLoading ? 'ðŸ”„': 'ðŸ”'} </button> </div> </div>
  <!-- Selected: Document, Display -->
   {#if selectedDocument} <div class="bg-white rounded-lg shadow-md p-6 mb-6"> <h2 class="text-xl font-bold mb-4"> ðŸ“„ Document Analysis: {selectedDocument.title} </h2>
- <div class="grid grid-cols-1 md grid-cols-2 gap-4"> <div> <p class="text-sm"><strong>ID:</strong> {selectedDocument.id}</p>
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <p class="text-sm"><strong>ID:</strong> {selectedDocument.id}</p>
  <p class="text-sm"><strong>Type:</strong> {selectedDocument.documentType}</p> </div>
  <div>
   {#if selectedDocument.caseId} <p class="text-sm"><strong>Case ID:</strong> {selectedDocument.caseId}</p> {/if}

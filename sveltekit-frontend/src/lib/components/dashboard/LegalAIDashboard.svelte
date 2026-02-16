@@ -65,7 +65,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             /> </svg>
  <div class="ml-3"> <h3 class="text-sm font-medium">Error Loading Dashboard</h3>
  <p class="mt-1 text-sm">{ error }</p> </div> </div> </div> {:else} <!-- Overview, Tab -->
-  {#if selectedTab === 'overview'} <div class="space-y-6"> <!-- Statistics, Cards --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-4"> <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-info/10 rounded-md flex items-center"> <span class="text-info">âš–ï¸</span> </div> </div>
+  {#if selectedTab === 'overview'} <div class="space-y-6"> <!-- Statistics, Cards --> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4"> <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-info/10 rounded-md flex items-center"> <span class="text-info">âš–ï¸</span> </div> </div>
  <div class="ml-5 w-0"> <dl> <dt class="text-sm font-medium text-sand/60">Total Cases</dt>
  <dd class="text-lg font-medium">{stats.totalCases}</dd> </dl> </div> </div> </div> </div>
  <div class="bg-white overflow-hidden shadow"> <div class="p-5"> <div class="flex"> <div class="flex-shrink-0"> <div class="w-8 h-8 bg-accent/10 rounded-md flex items-center"> <span class="text-accent">ðŸ”</span> </div> </div>
@@ -129,7 +129,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <td class="px-6 py-4 whitespace-nowrap text-sm"> <button class="text-info">View</button> </td> </tr> {/each}
   </tbody> </table> </div> </div> </div>
  <!-- Evidence, Tab --> {:else if selectedTab === 'evidence'} <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium text-sand">Evidence Items</h3>
- <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3">
+ <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
   {#each Array.isArray(evidence) ? evidence: [] as item} <div class="border border-sand/20 rounded-lg p-4 hover:shadow-md"> <div class="flex items-start"> <div class="flex-shrink-0"> <div class="w-10 h-10 bg-sand/10 rounded-lg flex items-center"> <span class="text-lg"> {item?.evidenceType === 'photo'
                             ? 'ðŸ“·': item?.evidenceType === 'document'
                               ? 'ðŸ“„': item?.evidenceType === 'video'
@@ -144,7 +144,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div> </div> </div> {/each}
   </div> </div> </div>
  <!-- Processing, Tab --> {:else if selectedTab === 'processing'} <div class="space-y-6"> <!-- System, Status --> <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium text-sand">System Status</h3>
- <div class="grid grid-cols-1 md grid-cols-4"> <div class="text-center"> <div class="text-2xl {getHealthColor(systemHealth.api)} mb-2"> {systemHealth.api === 'healthy' ? 'âœ…': systemHealth.api === 'error' ? 'âŒ': 'âš ï¸'} </div>
+ <div class="grid grid-cols-1 md:grid-cols-4"> <div class="text-center"> <div class="text-2xl {getHealthColor(systemHealth.api)} mb-2"> {systemHealth.api === 'healthy' ? 'âœ…': systemHealth.api === 'error' ? 'âŒ': 'âš ï¸'} </div>
  <p class="text-sm font-medium">API Gateway</p>
  <p class="text-xs text-sand/60">{systemHealth.api}</p> </div>
  <div class="text-center"> <div class="text-2xl {getHealthColor(systemHealth.database)} mb-2"> {systemHealth.database === 'healthy' ? 'âœ…': systemHealth.database === 'error' ? 'âŒ': 'âš ï¸'} </div>

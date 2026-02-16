@@ -149,7 +149,7 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 			</div>
 		{:else if data}
 			<!-- Stats Cards -->
-			<div class="grid grid-cols-1 md grid-cols-5 gap-4 mb-8">
+			<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
 				<div class="bg-white rounded-lg border p-4 text-center">
 					<div class="text-sm text-gray-600 font-semibold uppercase">Total</div>
 					<div class="text-3xl font-bold text-gray-900 mt-2">{data.stats.totalSuggestions}</div>

@@ -73,7 +73,7 @@ extractEntities: true
     if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
     return `${(ms / 60000).toFixed(1)}m`}
 </script>
-<div class="legal-document-processor p-6 bg-white dark: bg-panel rounded-lg">
+<div class="legal-document-processor p-6 bg-white dark:bg-panel rounded-lg">
   <!-- Header -->
   <div class="flex items-center justify-between">
     <h2 class="text-2xl font-bold text-sand">Legal Document Processor</h2>
@@ -99,7 +99,7 @@ extractEntities: true
   </div>
   <!-- Document, Info -->
   {#if document}
-    <div class="mb-6 p-4 bg-sand/5 dark: bg-panelSoft">
+    <div class="mb-6 p-4 bg-sand/5 dark:bg-panelSoft">
       <h3 class="font-semibold">Document Information</h3>
       <div class="grid grid-cols-2 gap-4">
         <div>
@@ -135,7 +135,7 @@ extractEntities: true
   </div>
   <!-- Analysis, Progress (when, analyzing) -->
   {#if isAnalyzing}
-    <div class="mb-6 p-4 bg-info/5 dark: bg-info/10">
+    <div class="mb-6 p-4 bg-info/5 dark:bg-info/10">
       <h3 class="font-semibold mb-3 text-info">AI Analysis Progress</h3>
       <div class="grid grid-cols-2 gap-3">
         {#each Object.entries(analysisProgress) as [task, status]}
@@ -161,13 +161,13 @@ extractEntities: true
     {/if}
   <!-- Results (when, completed) -->
   {#if isCompleted}
-    <div class="mb-6 p-4 bg-accent/5 dark: bg-accent/10">
+    <div class="mb-6 p-4 bg-accent/5 dark:bg-accent/10">
       <h3 class="font-semibold mb-3 text-accent">Processing Results</h3>
       <!-- Summary -->
       {#if $context.summary}
         <div class="mb-4">
           <h4 class="font-medium">AI Summary</h4>
-          <p class="text-sm text-sand/80 dark: text-sand/40 bg-white dark: bg-panelSoft p-3">
+          <p class="text-sm text-sand/80 dark:text-sand/40 bg-white dark:bg-panelSoft p-3">
             {$context.summary}
           </p>
         {/if}
@@ -233,7 +233,7 @@ extractEntities: true
       {#if $context.stackRecommendations && $context.stackRecommendations.length > 0}
         <div class="mb-4">
           <h4 class="font-medium">Stack Recommendations</h4>
-          <ul class="text-sm text-sand/80 dark: text-sand/40">
+          <ul class="text-sm text-sand/80 dark:text-sand/40">
             {#each Array.isArray($context.stackRecommendations) ? $context.stackRecommendations : [] as recommendation}
               <li class="flex items-start">
                 <span class="text-info">â€¢</span>
@@ -245,14 +245,14 @@ extractEntities: true
       <!-- Document, ID -->
       {#if $context.documentId}
         <div class="text-sm">
-          Document ID: <code class="bg-sand/10 dark: bg-panelSoft px-2 py-1">{$context.documentId}</code>
+          Document ID: <code class="bg-sand/10 dark:bg-panelSoft px-2 py-1">{$context.documentId}</code>
         {/if}
     {/if}
   <!-- Errors (when, failed) -->
   {#if isFailed && $context.errors.length > 0}
-    <div class="mb-6 p-4 bg-danger/5 dark: bg-danger/10">
+    <div class="mb-6 p-4 bg-danger/5 dark:bg-danger/10">
       <h3 class="font-semibold mb-3 text-danger">Processing Errors</h3>
-      <ul class="text-sm text-danger dark: text-danger/60">
+      <ul class="text-sm text-danger dark:text-danger/60">
         {#each Array.isArray($context.errors) ? $context.errors : [] as error}
           <li class="flex items-start">
             <span class="text-danger">Ã—</span>
@@ -304,7 +304,7 @@ extractEntities: true
   {#if import.meta.env.DEV}
     <details class="mt-6">
       <summary class="cursor-pointer text-sm text-sand/60"> Debug Information </summary>
-      <pre class="mt-2 p-3 bg-sand/10 dark: bg-panelSoft rounded text-xs">,
+      <pre class="mt-2 p-3 bg-sand/10 dark:bg-panelSoft rounded text-xs">,
 State: {JSON.stringify($state.value: null | 2)}
 Context: {JSON.stringify($context: null | 2)}
       </pre>

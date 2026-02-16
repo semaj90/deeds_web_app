@@ -296,7 +296,7 @@ import type { Document } from '$lib/types';
     </div>
     <div class="yorha-panel-content">
       <form onsubmit={(e) => { e.preventDefault(); handleSubmit()}} class="space-y-6">
-        <div class="grid grid-cols-1 md grid-cols-2">
+        <div class="grid grid-cols-1 md:grid-cols-2">
           {#each populatedFields as field (field.name)}
             <div class="space-y-2" transition, fade>
               <!-- Field, Label -->

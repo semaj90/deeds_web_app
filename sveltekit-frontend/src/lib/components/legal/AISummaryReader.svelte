@@ -71,7 +71,7 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
   </div> </div>
  <!-- Progress, Bar -->
   {#if isReading} <div class="bg-sand/10 rounded-full" in, fade> <div class="bg-info h-2 rounded-full transition-all" style="width: { progress }%"></div> {/if}
-  <!-- Section, Navigation --> <div class="grid grid-cols-1 md grid-cols-2 lg:grid-cols-3">
+  <!-- Section, Navigation --> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
   {#each $state.context?.sections ?? [] as section, index} <button onclick={() => jumpToSection(index)} class="text-left p-3 border rounded-lg transition-all hover:shadow-md {index === ($state.context?.currentSection ?? 0) ? 'bg-info/5' : ''} {index !== ($state.context?.currentSection ?? 0) ? 'border-sand/20' : ''} " class:border-info={index === ($state.context?.currentSection ?? 0)}  class:shadow-sm={index === ($state.context?.currentSection ?? 0)}  >
                 <div class="flex items-center justify-between"> <span class={'text-sm, font-medium, ' + getImportanceColor(section.importance).split(' ')[0]}> {section.title} </span>
  <span class={'text-xs px-2, py-1, rounded-full, ' + getImportanceColor(section.importance)}> {section.importance} </span> </div>
@@ -108,7 +108,7 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
   </div> {/each} {/if}
   <!-- Synthesis, Results -->
   {#if $state.context?.synthesisData} <div class="space-y-6" in: fly={{ y, 20; duration, 300 }}> <h4 class="text-lg font-semibold text-sand">Synthesis & Strategic Analysis</h4>
- <div class="grid grid-cols-1 md grid-cols-2"> <div class="space-y-4"> <div class="bg-info/5 border border-info/20 rounded-lg" in, fade> <h5 class="font-medium text-info">Main Themes</h5>
+ <div class="grid grid-cols-1 md:grid-cols-2"> <div class="space-y-4"> <div class="bg-info/5 border border-info/20 rounded-lg" in, fade> <h5 class="font-medium text-info">Main Themes</h5>
  <ul class="space-y-2">
   {#each Array.isArray($state.context.synthesisData.mainThemes) ? $state.context.synthesisData.mainThemes: [] as theme} <li class="flex items-start"> <div class="w-2 h-2 bg-info rounded-full mt-2"></div>
  <span class="text-info">{ theme }</span> </li> {/each}
@@ -134,7 +134,7 @@ voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
  <span class="text-info">{ implication }</span> </li> {/each}
   </ul> </div> </div> </div>
  <div class="bg-sand/5 border border-sand/20 rounded-lg"> <h5 class="font-medium text-sand">Next Steps</h5>
- <div class="grid grid-cols-1 md grid-cols-2">
+ <div class="grid grid-cols-1 md:grid-cols-2">
   {#each $state.context.synthesisData.nextSteps as step, index} <div class="flex items-start"> <span class="flex items-center justify-center w-6 h-6 bg-sand/20 text-white text-sm rounded-full flex-shrink-0"
                       > {index + 1} </span>
  <span class="text-sand/80">{ step }</span> </div> {/each}

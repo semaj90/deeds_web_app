@@ -51,7 +51,7 @@
 						No evidence yet. Use the panel below to add your first piece.
 					</p>
 				{:else}
-					<div class="grid grid-cols-1 md:grid-cols-2 xl grid-cols-3 gap-2">
+					<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
 						{#each evidenceRows as ev}
 							<div
 								class="group flex flex-col gap-1 p-2 rounded border border-[#f5f5f5] bg-[#101018] hover:bg-[#202030] cursor-pointer"

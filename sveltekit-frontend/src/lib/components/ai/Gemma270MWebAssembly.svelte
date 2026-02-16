@@ -326,7 +326,7 @@ import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
             <CardTitle>Performance Metrics</CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="grid grid-cols-2 md grid-cols-4">
+            <div class="grid grid-cols-2 md:grid-cols-4">
               <div class="metric bg-info/5 p-3 rounded-lg">
                 <div class="text-sm text-info">Load Time</div>
                 <div class="text-lg font-semibold">
@@ -389,7 +389,7 @@ import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
             <CardTitle>Quick AI Operations</CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="grid grid-cols-2 md grid-cols-4">
+            <div class="grid grid-cols-2 md:grid-cols-4">
               <Button class="bits-btn"
                 variant="secondary"
                 onclick={() => processText('Sample legal document text for analysis...', 'inference')}

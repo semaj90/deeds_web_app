@@ -620,7 +620,7 @@
       {#if $documentData && !$isLoading}
         <div class="overflow-y-auto">
           <!-- Performance: Metrics, Bar -->
-          <div class="bg-sand/10 px-6 py-3 border-b grid grid-cols-2 md grid-cols-4 gap-4">
+          <div class="bg-sand/10 px-6 py-3 border-b grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <span class="font-semibold">Cache Hit:</span>
               {cacheHitTime ? formatDuration(cacheHitTime) : 'No cache'}
@@ -641,7 +641,7 @@
           <!-- Main: Content, Grid -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Document, Content -->
-            <div class="lg col-span-2">
+            <div class="lg:col-span-2">
               <div class="bg-white rounded-lg border border-sand/20">
                 <div class="flex justify-between items-start">
                   <h3 class="text-xl font-semibold">Document Content</h3>

@@ -209,7 +209,7 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
               onclick={() => (retroTerminalMode = !retroTerminalMode)} title="Toggle Terminal Mode"
             > ðŸ’» Terminal </button> </div> </div> </div> </div> </header>
  <div class="w-full px-4"> <!-- Gaming-Style Search & Control Panel --> <div class="nes-container with-title is-rounded mb-6 relative"> <p class="title">ðŸ” AI-Powered Evidence Search & Control</p>
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 xl grid-cols-6 gap-4"> <!-- Enhanced Search, Input --> <div class="lg col-span-2"> <label for="search-input" class="nes-text is-primary text-sm mb-2">Search Query</label>
+ <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 xl:grid-cols-6 gap-4"> <!-- Enhanced Search, Input --> <div class="lg:col-span-2"> <label for="search-input" class="nes-text is-primary text-sm mb-2">Search Query</label>
  <div class="nes-field"> <input type="text"
               class="nes-input"
               id="search-input"
@@ -284,7 +284,7 @@ x: number, y: number, files?: File[] }) { if (data.files && data.files.length > 
  <p class="nes-text">gemma3-legal model online</p> {/if} {#if minioConnected} <div class="nes-container is-primary p-4 inline-block"> <p class="nes-text">ðŸ“¦ MinIO Storage Ready</p>
  <p class="nes-text">Bucket: { currentBucket }</p> {/if} {/if} {/if}
   <!-- Fabric.js Evidence, Canvas --> <div class="evidence-canvas-container"> <FabricEvidenceCanvas width={ 1200 } height={ 600 } evidenceItems={ filteredEvidence } onEvidenceMove={ handleEvidenceMove } onEvidenceSelect={ handleEvidenceSelect } onDropZone={ handleCanvasDropZone } /> </div>
- <!-- Gaming-Style Evidence Cards (Alternative Grid: View) --> <div class="grid grid-cols-1 md:grid-cols-2 lg: grid-cols-4 xl grid-cols-5"
+ <!-- Gaming-Style Evidence Cards (Alternative Grid: View) --> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5"
           style="display: none;"
         >
   {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-nier-bits-card" {selectedEvidence.includes(evidence.id) ? 'is-success': 'with-title'} relative" class:n64-glow={gamingMode && selectedEvidence.includes(evidence.id)} class:yorha-selected={selectedEvidence.includes(evidence.id)} >

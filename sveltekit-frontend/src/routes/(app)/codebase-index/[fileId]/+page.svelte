@@ -80,7 +80,7 @@
 		{#if file}
 			<div class="grid gap-6 lg:grid-cols-3">
 				<!-- Left Column - Component Card -->
-				<div class="lg col-span-1">
+				<div class="lg:col-span-1">
 					<div class="rounded-2xl border border-slate-700/50 bg-slate-800/30 p-6 backdrop-blur">
 						<!-- Component Icon -->
 						<div class="mb-4 flex justify-center">
@@ -158,7 +158,7 @@
 				</div>
 
 				<!-- Right Column - Details -->
-				<div class="lg col-span-2 space-y-6">
+				<div class="lg:col-span-2 space-y-6">
 					<!-- Summary Card -->
 					<div class="rounded-2xl border border-slate-700/50 bg-slate-800/30 p-6 backdrop-blur">
 						<div class="flex items-start gap-3">

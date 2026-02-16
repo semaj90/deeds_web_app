@@ -56,7 +56,7 @@
  <div class="flex items-start justify-between gap-2 mb-2">
  <div class="flex items-center gap-2">
  <ClusterBadge cluster={suggestion.cluster} size="sm" />
- <h4 class="font-medium text-sand dark: text-sand/20">
+ <h4 class="font-medium text-sand dark:text-sand/20">
  {suggestion.title}
  </h4>
  </div>
@@ -67,14 +67,14 @@
  </div>
 
  <!-- Description -->
- <p class="text-sm text-sand/60 dark: text-sand/40 mb-3">
+ <p class="text-sm text-sand/60 dark:text-sand/40 mb-3">
  {suggestion.description}
  </p>
 
  <!-- Code Preview -->
  {#if suggestion.code}
- <div class="mb-3 rounded bg-sand/10 dark: bg-panel p-3 font-mono text-sm overflow-x-auto">
- <pre class="text-sand dark: text-sand/40">{suggestion.code}</pre>
+ <div class="mb-3 rounded bg-sand/10 dark:bg-panel p-3 font-mono text-sm overflow-x-auto">
+ <pre class="text-sand dark:text-sand/40">{suggestion.code}</pre>
  </div>
  {/if}
 
@@ -82,7 +82,7 @@
  <div class="flex items-center gap-2 mb-3 flex-wrap">
  <span class="text-xs text-sand/60">Sources:</span>
  {#each suggestion.sources as source}
- <span class="inline-flex items-center gap-1 text-xs text-sand/60 dark:text-sand/40 bg-sand/10 dark: bg-panelSoft px-2 py-0.5 rounded">
+ <span class="inline-flex items-center gap-1 text-xs text-sand/60 dark:text-sand/40 bg-sand/10 dark:bg-panelSoft px-2 py-0.5 rounded">
  <span class={getSourceIcon(source.type)}></span>
  {source.name}
  {#if source.url}
@@ -107,7 +107,7 @@
  {#if onDismiss}
  <button
  type="button"
- class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-sand/60 dark: text-sand/40 hover:text-sand dark: hover text-sand/40 border border-sand/20 dark: border-sand/30 rounded transition-colors"
+ class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-sand/60 dark:text-sand/40 hover:text-sand dark: hover text-sand/40 border border-sand/20 dark: border-sand/30 rounded transition-colors"
  onclick={() => onDismiss(suggestion)}
  >
  <span class="i-lucide-x"></span>

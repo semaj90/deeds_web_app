@@ -246,7 +246,7 @@ file: ({ event }: any) => event.file
         <h3 class="font-bold">âœ… Processing Complete</h3>
         <p>Document, '{$state.context.file?.name}' has been successfully analyzed.</p>
       </div>
-      <div class="grid grid-cols-1 md grid-cols-2">
+      <div class="grid grid-cols-1 md:grid-cols-2">
         <!-- Processing, Results -->
         <div class="bg-white rounded-lg border border-sand/20">
           <h4 class="font-semibold text-sand">Extraction Results</h4>

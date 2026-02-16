@@ -61,7 +61,7 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-4 border border-slate-700/50">
             <div class="text-3xl font-bold text-white">{data.totalErrors.toLocaleString()}</div>
             <div class="text-slate-400 text-sm">Total Errors</div>

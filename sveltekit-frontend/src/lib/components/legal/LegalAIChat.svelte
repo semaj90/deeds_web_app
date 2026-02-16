@@ -61,7 +61,7 @@
                 ></path> </svg> Processing... </span> {:else} Analyze {/if}
   </Button> </div> </CardContent> </Card>
  <!-- Sample, Prompts --> <Card.Root class="mb-8"> <CardHeader> <CardTitle>Sample Legal Queries</CardTitle> </CardHeader>
- <CardContent> <div class="grid grid-cols-1 md grid-cols-2">
+ <CardContent> <div class="grid grid-cols-1 md:grid-cols-2">
   {#each Array.isArray(samplePrompts) ? samplePrompts: [] as sample} <button onclick={() => useSamplePrompt(sample)} class="p-3 text-left border border-sand/20 rounded-lg hover:border-info/40 hover:bg-info/5 transition-colors"
             disabled={ isLoading } >
             <p class="text-sm">{ sample }

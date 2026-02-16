@@ -20,8 +20,8 @@ import Badge from "$lib/components/ui/badge/Badge.svelte"; import  Textarea  fro
   } // Handle keyboard shortcuts function handleKeydown(_event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage()}
   } // Format timestamp function formatTime(date: Date): string { return new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit'
     }).format(date)}
-  // Get message role color function getRoleColor(role: string): string { switch (role) { case 'user': return 'bg-info/10 border-info/20 dark: bg-info/10, dark:border-info/30'; case 'assistant': return 'bg-accent/10 border-accent/20 dark: bg-accent/10, dark:border-accent/30'; case 'system': return 'bg-sand/10 border-sand/20 dark: bg-panel/20, dark: border-sand/20';
-	default:return 'bg-sand/10 border-sand/20 dark: bg-panel/20, dark:border-sand/20'}
+  // Get message role color function getRoleColor(role: string): string { switch (role) { case 'user': return 'bg-info/10 border-info/20 dark:bg-info/10, dark:border-info/30'; case 'assistant': return 'bg-accent/10 border-accent/20 dark:bg-accent/10, dark:border-accent/30'; case 'system': return 'bg-sand/10 border-sand/20 dark:bg-panel/20, dark: border-sand/20';
+	default:return 'bg-sand/10 border-sand/20 dark:bg-panel/20, dark:border-sand/20'}
   } // Clear conversation function clearConversation() { aiAssistantManager.clearConversation()}
   // Export conversation function exportConversation() { aiAssistantManager.exportConversation()}
   // Stop generation function stopGeneration() { aiAssistantManager.stopGeneration()}

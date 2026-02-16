@@ -213,7 +213,7 @@
  {#if viewMode === 'grid'}
  <!-- Grid View -->
  <div class="p-4">
- <div class="grid grid-cols-1 sm: grid-cols-2 lg: grid-cols-3 xl grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
  {#each evidence as item}
  <div class="bg-panelSoft/30 rounded-lg p-4 border border-sand/50 hover:border-info/50 transition-colors cursor-pointer">
  <div class="flex items-start justify-between mb-3">

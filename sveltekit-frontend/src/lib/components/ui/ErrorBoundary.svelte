@@ -152,7 +152,7 @@
           <!-- Technical Details (Collapsible) -->
           {#if showDetails && errorInfo}
             <details class="mt-4">
-              <summary class="cursor-pointer text-sm font-medium text-sand/80 dark: text-sand/40 hover:text-sand">
+              <summary class="cursor-pointer text-sm font-medium text-sand/80 dark:text-sand/40 hover:text-sand">
                 Technical Details
               </summary>
               <div class="mt-3 p-4 bg-sand/5 dark:bg-panelSoft rounded-lg">

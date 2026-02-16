@@ -174,7 +174,7 @@ caseId: citation, statute: statute.citation, title: statute.title
 				</div>
 
 				<!-- Info Cards -->
-				<div class="grid grid-cols-1 md grid-cols-3 gap-4">
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 					<div class="bg-panelSoft rounded-lg p-4 border border-sand/20">
 						<div class="text-2xl mb-2">🧠</div>
 						<h3 class="font-semibold text-white">AI-Powered</h3>

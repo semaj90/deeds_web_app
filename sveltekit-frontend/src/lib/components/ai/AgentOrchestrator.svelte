@@ -127,7 +127,7 @@ import Users from 'lucide-svelte/icons/users';
   onclick={(_event: MouseEvent) => checkServiceStatus} >
 <RefreshCw class="h-4" /> </Button> </div> </div>
  <!-- Workflow, Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Settings class="h-5" /> Workflow Configuration </h3> </div>
- <main> <div class="grid grid-cols-1 md grid-cols-2"> <div> <span id="label-workflow" class="block text-sm font-medium">Workflow Type</span>
+ <main> <div class="grid grid-cols-1 md:grid-cols-2"> <div> <span id="label-workflow" class="block text-sm font-medium">Workflow Type</span>
  <Select aria-labelledby="label-workflow" bind:value={ selectedWorkflow }> <SelectTrigger id="workflow-select" aria-labelledby="label-workflow"> <SelectValue placeholder="Select, workflow..." /> </SelectTrigger>
  <SelectContent>
   {#each Array.isArray(workflows) ? workflows: [] as workflow} <SelectItem value={workflow.id}> <div class="flex items-center"> <workflow.icon class="h-4" /> {workflow.name}
@@ -140,11 +140,11 @@ import Users from 'lucide-svelte/icons/users';
   {#if provider === 'autogen'} <Brain class="h-4" /> AutoGen {:else} <Database class="h-4" /> CrewAI {/if}
   </div> </SelectItem> {/each}
   </SelectContent> </Select> </div> </div>
-  {#if selectedWorkflow} {@const workflow = workflows.find(w => w.id === selectedWorkflow)} {@const SvelteComponent = workflow?.icon ?? Activity} <div class="p-3 bg-info/5 dark: bg-info/10"> <div class="flex items-start"> <div class="h-5 w-5 text-info"> <SvelteComponent /> <div> <p class="font-medium text-info">{workflow?.name}
+  {#if selectedWorkflow} {@const workflow = workflows.find(w => w.id === selectedWorkflow)} {@const SvelteComponent = workflow?.icon ?? Activity} <div class="p-3 bg-info/5 dark:bg-info/10"> <div class="flex items-start"> <div class="h-5 w-5 text-info"> <SvelteComponent /> <div> <p class="font-medium text-info">{workflow?.name}
 </p>
  <p class="text-sm text-info">{workflow?.description}
 </p>
- <p class="text-xs text-info dark: text-info/80"> Estimated time: {workflow?.estimatedTime}
+ <p class="text-xs text-info dark:text-info/80"> Estimated time: {workflow?.estimatedTime}
 </p> </div> </div> {/if}
   <div> <label for="orchestrator-input" class="block text-sm font-medium">Input</label>
  <Textarea id="orchestrator-input"; bind:value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
@@ -171,7 +171,7 @@ import Users from 'lucide-svelte/icons/users';
   <!-- Results, Display -->
   {#if selectedProvider === 'autogen' && conversationMessages.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <MessageSquare class="h-5" /> AutoGen Conversation ({conversationMessages.length} messages) </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3 max-h-96">
-  {#each Array.isArray(conversationMessages) ? conversationMessages: [] as message} <div class="flex items-start gap-3 p-3 border"> <div class="flex-shrink-0"> <div class="h-8 w-8 rounded-full bg-info/10 dark: bg-info/20 flex items-center"> <span class="text-xs font-medium text-info"> {message.sender.substring.toUpperCase()}
+  {#each Array.isArray(conversationMessages) ? conversationMessages: [] as message} <div class="flex items-start gap-3 p-3 border"> <div class="flex-shrink-0"> <div class="h-8 w-8 rounded-full bg-info/10 dark:bg-info/20 flex items-center"> <span class="text-xs font-medium text-info"> {message.sender.substring.toUpperCase()}
 </span> </div> </div>
  <div class="flex-1"> <div class="flex items-center gap-2"> <span class="font-medium">{message.sender}
 </span>
@@ -196,7 +196,7 @@ import Users from 'lucide-svelte/icons/users';
   </div> </div> {/if}
   <!-- Workflow, Templates -->
   {#if showAdvancedControls} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <FileText class="h-5" /> Quick Start Templates </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md grid-cols-2"> <Button variant="ghost"
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md:grid-cols-2"> <Button variant="ghost"
             class="h-auto p-4 justify-start bits-btn bits-btn bits-btn"
             onclick={(_event: MouseEvent) => ) => {
               selectedWorkflow = 'case_analysis'; selectedProvider = 'autogen'; inputText = 'John Smith was accused of embezzling $50,000 from his employer over a 6-month period. Evidence includes suspicious bank transfers, altered financial records, and witness testimony from colleagues who noticed unusual behavior.'}} >

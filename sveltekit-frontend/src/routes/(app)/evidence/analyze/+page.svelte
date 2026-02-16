@@ -216,7 +216,7 @@ evidenceId: crypto.randomUUID(),
 			<CardDescription>Upload or paste evidence content for AI-powered legal analysis.</CardDescription>
 		</CardHeader>
 		<CardContent>
-			<div class="grid grid-cols-1 md grid-cols-2 gap-4 mb-4">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 				<div>
 					<Label htmlFor="caseId">Case ID</Label>
 					<Input id="caseId" bind:value={caseId} placeholder="Enter case ID" />
@@ -264,7 +264,7 @@ evidenceId: crypto.randomUUID(),
 			</CardHeader>
 			<CardContent>
 				<Progress value={progress} class="mb-4" />
-				<div class="grid grid-cols-1 md grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					{#each steps as step, index}
 						<div class="step flex items-center gap-2 {currentStep === index ? 'animate-pulse-glow' : ''}">
 							<span class="text-lg">{step.icon}</span>
@@ -290,7 +290,7 @@ evidenceId: crypto.randomUUID(),
 					<h3 class="text-lg font-semibold">Summary</h3>
 					<p>{results.analysisResults.summary || 'No summary available'}</p>
 				</div>
-				<div class="grid grid-cols-1 md grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<h4 class="font-semibold">Key Metrics</h4>
 						<ul class="list-disc list-inside">

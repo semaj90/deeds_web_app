@@ -184,7 +184,7 @@
 
         {#if operation && status === 'loading'}
           <div class="mt-2">
-            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium {operation === 'ai' ? 'bg-info/10 text-info dark: bg-info/20 dark:text-info/40' : operation === 'gpu' ? 'bg-info/10 text-info dark: bg-info/20 dark:text-info/40' : operation === 'cpu' ? 'bg-warning/10 text-warning dark: bg-warning/20 dark:text-warning/40' : 'bg-accent/10 text-accent dark: bg-accent/20 dark:text-accent/40'}">
+            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium {operation === 'ai' ? 'bg-info/10 text-info dark:bg-info/20 dark:text-info/40' : operation === 'gpu' ? 'bg-info/10 text-info dark:bg-info/20 dark:text-info/40' : operation === 'cpu' ? 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning/40' : 'bg-accent/10 text-accent dark:bg-accent/20 dark:text-accent/40'}">
               {operation.toUpperCase()} Processing
             </span>
           </div>

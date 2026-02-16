@@ -144,7 +144,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
 
  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
  <!-- Input Section -->
- <div class="lg col-span-1 space-y-6">
+ <div class="lg:col-span-1 space-y-6">
  <!-- Witness Selection -->
  <div>
  <span class="block text-sm font-medium text-sand/40 mb-2">
@@ -224,7 +224,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  </div>
 
  <!-- Questions Section -->
- <div class="lg col-span-2 space-y-4">
+ <div class="lg:col-span-2 space-y-4">
  {#if session}
  <!-- Session Header -->
  <div class="bg-panelSoft border border-sand/30 rounded-lg p-4">

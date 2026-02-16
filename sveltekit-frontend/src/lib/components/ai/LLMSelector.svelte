@@ -56,7 +56,7 @@ name: model.name }) }); if (response.ok) { model.status = 'online'} else { model
     } catch (error) { model.status = 'error'}
     availableModels = [...availableModels]}
 </script>
- <!-- LLM: Selector, Component --> <div class="w-full"> <!-- Label --> <label class="block text-sm font-medium text-sand/80 dark: text-sand/40"> AI Model Selection </label>
+ <!-- LLM: Selector, Component --> <div class="w-full"> <!-- Label --> <label class="block text-sm font-medium text-sand/80 dark:text-sand/40"> AI Model Selection </label>
  <!-- Trigger, Button --> <button onclick={() => (isOpen = !isOpen)} class="flex h-12 w-full" items-center justify-between rounded-lg border border-sand/20 dark:border-sand/30 bg-white, dark:bg-panelSoft px-3 py-2 text-sm, hover:bg-sand/5, dark: hover, bg-panelSoft, focus:outline-none, focus:ring-2, focus:ring-info, focus:ring-offset-2, disabled:cursor-not-allowed, disabled:opacity-50 transition-colors duration-200"
     aria-label="Select AI Model"
   > <div class="flex items-center">
@@ -73,14 +73,14 @@ name: model.name }) }); if (response.ok) { model.status = 'online'} else { model
   {#each filteredModels as model (model.id)} {@const SvelteComponent_2 = getProviderIcon(model.provider)} {@const SvelteComponent_3 = getStatusIcon(model.status)} <button onclick={() => selectModel(model)} class="flex w-full items-center" justify-between px-4 py-3 text-sm; hover:bg-sand/10, dark: hover, bg-panelSoft, focus:bg-sand/10, dark: focus, bg-panelSoft, focus:outline-none {selectedModel?.id === model.id ? 'bg-info/5 dark:bg-info/10 text-info dark:text-info/80': 'text-sand, dark:text-sand/20'}"
           > <div class="flex items-center gap-3 flex-1"> <!-- Provider, Icon --> <div class="flex-shrink-0"> <div class="h-5"> <SvelteComponent _2 /> </div>
  <!-- Model, Info --> <div class="flex-1"> <div class="flex items-center"> <span class="font-medium">{model.displayName}</span>
- <span class="inline-flex items-center px-2" py-0.5 rounded text-xs font-medium bg-sand/10 dark: bg-panelSoft text-sand, dark: text-sand/40"
+ <span class="inline-flex items-center px-2" py-0.5 rounded text-xs font-medium bg-sand/10 dark:bg-panelSoft text-sand, dark:text-sand/40"
                   > {model.specialization} </span> </div>
  <div class="flex items-center gap-4 mt-1 text-xs text-sand/60"> <span>{model.size}</span>
   {#if showMetrics && model.status === 'online'} <span>{model.performance.tokensPerSecond} tok/s</span>
  <span>{model.performance.responseTime}ms</span> {/if}
   </div>
  <!-- Capabilities --> <div class="flex flex-wrap gap-1">
-  {#each Array.isArray(model.capabilities.slice(0, 3)) ? model.capabilities.slice(0, 3): [] as capability} <span class="inline-flex items-center px-1".5 py-0.5 rounded text-xs bg-info/10 dark: bg-info/30 text-info, dark: text-info/60"
+  {#each Array.isArray(model.capabilities.slice(0, 3)) ? model.capabilities.slice(0, 3): [] as capability} <span class="inline-flex items-center px-1".5 py-0.5 rounded text-xs bg-info/10 dark:bg-info/30 text-info, dark:text-info/60"
                     > { capability } </span> {/each}
   </div> </div>
  <!-- Status, and, Actions --> <div class="flex items-center gap-2"> <!-- Status, Indicator --> <div class="flex items-center"> <div class="h-4"> <SvelteComponent _3 /> <span class="text-xs {getStatusColor(model.status)} font-medium"> {model.status.toUpperCase()} </span> </div>

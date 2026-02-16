@@ -173,7 +173,7 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  </div>
 
  <!-- Quick Stats -->
- <div class="grid grid-cols-2 md grid-cols-4 gap-4 text-sm">
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
  {#if age}
  <div class="flex items-center gap-2 text-sand/40">
  <Calendar class="w-4 h-4" />
@@ -262,7 +262,7 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  </div>
  {/if}
  {#if poi.physicalDescription.distinguishingMarks}
- <div class="bg-panelSoft p-3 rounded-lg col-span-full">
+ <div class="bg-panelSoft p-3 rounded-lg:col-span-full">
  <div class="text-xs text-sand/40 uppercase tracking-wide">Distinguishing Marks</div>
  <div class="text-sm text-sand/40 mt-1">{poi.physicalDescription.distinguishingMarks}</div>
  </div>
@@ -318,7 +318,7 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  </CardTitle>
  </CardHeader>
  <CardContent>
- <div class="grid grid-cols-1 md grid-cols-2 gap-3">
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
  {#each poi.profileData.associates as associate}
  <div class="bg-panelSoft p-3 rounded-lg">
  <div class="text-sand/40 font-medium">{associate}</div>

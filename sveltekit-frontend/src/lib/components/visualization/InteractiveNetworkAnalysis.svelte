@@ -44,7 +44,7 @@
   }
 </script>
 
-<div class="network-analysis-container w-full h-[600px] border relative bg-sand/5 dark: bg-panel" bind:this={containerElement}>
+<div class="network-analysis-container w-full h-[600px] border relative bg-sand/5 dark:bg-panel" bind:this={containerElement}>
   {#if isLoading}
     <div class="absolute inset-0 flex items-center justify-center z-20 bg-background/50">
       <span class="nes-text is-primary">Initializing Physics Engine...</span>
