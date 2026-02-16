@@ -1,297 +1,325 @@
 import { env } from '$lib/env';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-const LANGEXTRACT_API_URL = env?.LANGEXTRACT_API_URL ?? 'http://localhost:8000';
+type SectionType =
+	| 'facts'
+	| 'issues'
+	| 'reasoning'
+	| 'holding'
+	| 'citations'
+	| 'parties'
+	| 'motions'
+	| 'bibliography'
+	| 'procedural_history'
+	| 'sentencing'
+	| 'judgment';
 
-/**
- * Section types for legal documents
- */
-| 'facts'
-  | 'issues'
-  | 'reasoning'
-  | 'holding'
-  | 'citations'
-  | 'parties'
-  | 'motions'
-  | 'bibliography'
-  | 'procedural_history'
-  | 'sentencing'
-  | 'judgment';
-
-/**
- * LangExtract section output
- */
 export interface LangExtractSection {
-  section_type: SectionType;
-  section_subtype?: string;
+	section_type: SectionType;
+	section_subtype?: string;
 	text: string;
-  start_offset: number;
+	start_offset: number;
 	end_offset: number;
-  confidence?: number;
+	confidence?: number;
 }
 
-/**
- * Crime metadata extracted from document
- */
 export interface CrimeMetadata {
-  crime_code?: string;
-  crime_category?: string;
-  crime_classification?: 'felony' | 'misdemeanor' | 'infraction' | 'wobbler';
-  attempted?: boolean;
-  sentencing_year?: number;
-  sentence_length_months?: number;
-  enhancements?: string[];
+	crime_code?: string;
+	crime_category?: string;
+	crime_classification?: 'felony' | 'misdemeanor' | 'infraction' | 'wobbler';
+	attempted?: boolean;
+	sentencing_year?: number;
+	sentence_length_months?: number;
+	enhancements?: string[];
+}
+
+export interface LangExtractOutput {
+	doc_id: string;
+	sections: LangExtractSection[];
+	metadata: CrimeMetadata;
+	language?: string;
+	language_confidence?: number;
+	extraction_confidence?: number;
 }
 
 /**
- * LangExtract API response
+ * Prefer LANGEXTRACT_URL (new), but support LANGEXTRACT_API_URL (legacy).
+ * If neither set, try python:8095 then go:8090.
  */
-export interface LangExtractOutput {
-  doc_id: string;
-	sections: LangExtractSection[];
-  metadata: CrimeMetadata;
-  language?: string;
-  language_confidence?: number;
-  extraction_confidence?: number;
+const CANDIDATE_BASE_URLS = [
+	env?.LANGEXTRACT_URL,
+	env?.LANGEXTRACT_API_URL,
+	'http://localhost:8095', // python (phase66)
+	'http://localhost:8090' // go (langextract-go)
+].filter(Boolean) as string[];
+
+let cachedBaseUrl: string | null = null;
+
+async function resolveLangExtractBaseUrl(): Promise<string> {
+	if (cachedBaseUrl) return cachedBaseUrl;
+
+	for (const base of CANDIDATE_BASE_URLS) {
+		try {
+			const res = await fetch(`${base}/health`, { method: 'GET' });
+			if (res.ok) {
+				cachedBaseUrl = base;
+				return base;
+			}
+		} catch {
+			// keep trying
+		}
+	}
+
+	// If no /health exists, still allow explicit env override to work.
+	const explicit = (env?.LANGEXTRACT_URL ?? env?.LANGEXTRACT_API_URL)?.trim();
+	if (explicit) {
+		cachedBaseUrl = explicit;
+		return explicit;
+	}
+
+	throw new Error(
+		`LangExtract unavailable. Tried: ${CANDIDATE_BASE_URLS.join(', ')} (no /health responded)`
+	);
+}
+
+function normalizeOutput(raw: unknown, documentId: string): LangExtractOutput {
+	const obj = (raw ?? {}) as Partial<LangExtractOutput>;
+
+	const sections = Array.isArray(obj.sections) ? obj.sections : [];
+	const safeSections: LangExtractSection[] = sections
+		.map((s: any) => ({
+			section_type: s?.section_type,
+			section_subtype: s?.section_subtype,
+			text: String(s?.text ?? ''),
+			start_offset: Number.isFinite(s?.start_offset) ? s.start_offset : 0,
+			end_offset: Number.isFinite(s?.end_offset) ? s.end_offset : 0,
+			confidence: Number.isFinite(s?.confidence) ? s.confidence : undefined
+		}))
+		// Drop invalid section types (prevents corrupt downstream)
+		.filter((s) => isValidSectionType(String(s.section_type)));
+
+	return {
+		doc_id: obj.doc_id ?? documentId,
+		sections: safeSections,
+		metadata: (obj.metadata ?? {}) as CrimeMetadata,
+		language: obj.language,
+		language_confidence: obj.language_confidence,
+		extraction_confidence: obj.extraction_confidence
+	};
 }
 
 /**
  * Call LangExtract API to extract sections from document text
  */
 export async function extractSectionsFromText(
-  documentText: string,
-  documentId: string,
-  documentType: 'statute' | 'case' = 'case'
+	documentText: string,
+	documentId: string,
+	documentType: 'statute' | 'case' = 'case'
 ): Promise<LangExtractOutput> {
-  try {
-    console.log(`[LangExtract] Extracting sections from document: ${documentId}`);
-documentType === 'case' ? getCaseExtractionPrompt() : getStatuteExtractionPrompt();
+	const baseUrl = await resolveLangExtractBaseUrl();
+	const prompt =
+		documentType === 'case' ? getCaseExtractionPrompt() : getStatuteExtractionPrompt();
 
-    const response = await fetch(`${LANGEXTRACT_API_URL}/extract`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-	body: JSON.stringify({
-	text: documentText,
-        doc_id: documentId,
-        prompt,
-        extract_metadata: true,
-        extract_crimes: documentType === 'case',
-      }),
-    });
+	const response = await fetch(`${baseUrl}/extract`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			text: documentText,
+			doc_id: documentId,
+			prompt,
+			extract_metadata: true,
+			extract_crimes: documentType === 'case'
+		})
+	});
 
-    if (!response.ok) {
-      throw new Error(`LangExtract API error: ${response.status} ${response.statusText}`);
-    }
+	if (!response.ok) {
+		const body = await safeReadText(response);
+		throw new Error(
+			`LangExtract API error: ${response.status} ${response.statusText}${body ? ` — ${body}` : ''}`
+		);
+	}
 
-    const result = (await response.json()) as LangExtractOutput;
-    console.log(`[LangExtract] Successfully extracted ${result.sections.length} sections`);
+	const raw = (await response.json()) as unknown;
+	const result = normalizeOutput(raw, documentId);
 
-    return result;
-  } catch (error) {
-    console.error('[LangExtract] Error extracting sections:', error);
-    throw error;
-  }
+	// If the model returned 0 valid sections, fall back rather than returning empty
+	if (!result.sections.length) {
+		return detectSectionsHeuristic(documentText, documentId);
+	}
+
+	return result;
+}
+
+async function safeReadText(res: Response): Promise<string> {
+	try {
+		return await res.text();
+	} catch {
+		return '';
+	}
 }
 
 /**
  * Fallback heuristic section detection if LangExtract fails
  */
 export function detectSectionsHeuristic(
-  documentText: string,
-  documentId: string
+	documentText: string,
+	documentId: string
 ): LangExtractOutput {
-  console.log(`[LangExtract] Using heuristic section detection for document: ${documentId}`);
+	const sections: LangExtractSection[] = [];
+	const lines = documentText.split('\n');
 
-  const sections: LangExtractSection[] = [];
-  const lines = documentText.split('\n');
+	const sectionPatterns: Record<SectionType, RegExp> = {
+		facts: /^(facts|background|procedural background|statement of facts)\b/i,
+		issues: /^(issues?|questions presented|legal issues)\b/i,
+		reasoning: /^(reasoning|analysis|discussion|court'?s analysis)\b/i,
+		holding: /^(holding|conclusion|decision|judgment)\b/i,
+		citations: /^(citations|authorities|cases cited|statutes cited)\b/i,
+		parties: /^(parties|plaintiff|defendant|appellant|respondent)\b/i,
+		motions: /^(motions?|motion to|request for)\b/i,
+		bibliography: /^(bibliography|references|sources|cited authorities)\b/i,
+		procedural_history: /^(procedural history|procedural background)\b/i,
+		sentencing: /^(sentencing|sentence|punishment)\b/i,
+		judgment: /^(judgment|verdict|order|decree)\b/i
+	};
 
-  // Define section patterns
-  const sectionPatterns: Record<SectionType, RegExp> = {
-    facts: /^(facts|background|procedural background|statement of facts)/i,
-    issues: /^(issues? |questions presented : legal issues)/i,
-    reasoning: /^(reasoning|analysis|discussion|court's analysis)/i,
-    holding: /^(holding|conclusion|decision|judgment)/i,
-    citations: /^(citations|authorities|cases cited|statutes cited)/i,
-    parties: /^(parties|plaintiff|defendant|appellant|respondent)/i,
-    motions: /^(motions? |motion to : request for)/i,
-    bibliography: /^(bibliography|references|sources|cited authorities)/i,
-    procedural_history: /^(procedural history|procedural background)/i,
-    sentencing: /^(sentencing|sentence|punishment)/i,
-    judgment: /^(judgment|verdict|order|decree)/i,
-  };
+	let currentSection: SectionType = 'facts';
+	let currentText = '';
+	let startOffset = 0;
 
-  let currentSection: SectionType = 'facts';
-  let currentText = '';
-  let startOffset = 0;
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+		let foundSection = false;
+		for (const [sectionType, pattern] of Object.entries(sectionPatterns)) {
+			if (pattern.test(line)) {
+				if (currentText.trim().length > 0) {
+					sections.push({
+						section_type: currentSection,
+						text: currentText.trim(),
+						start_offset: startOffset,
+						end_offset: startOffset + currentText.length,
+						confidence: 0.6
+					});
+				}
 
-    // Check if line matches a section header
-    let foundSection = false;
-    for (const [sectionType, pattern] of Object.entries(sectionPatterns)) {
-      if (pattern.test(line)) {
-        // Save previous section if it has content
-        if (currentText.trim().length > 0) {
-          sections.push({
-            section_type: currentSection,
-            text: currentText.trim(),
-            start_offset: startOffset,
-            end_offset: startOffset + currentText.length,
-            confidence: 0.6 // Lower confidence for heuristic detection
-          });
-        }
+				currentSection = sectionType as SectionType;
+				currentText = '';
+				startOffset = Math.max(0, documentText.indexOf(line));
+				foundSection = true;
+				break;
+			}
+		}
 
-        currentSection = sectionType as SectionType;
-        currentText = '';
-        startOffset = documentText.indexOf(line);
-        foundSection = true;
-        break;
-      }
-    }
+		if (!foundSection) currentText += line + '\n';
+	}
 
-    if (!foundSection) {
-      currentText += line + '\n';
-    }
-  }
+	if (currentText.trim().length > 0) {
+		sections.push({
+			section_type: currentSection,
+			text: currentText.trim(),
+			start_offset: startOffset,
+			end_offset: startOffset + currentText.length,
+			confidence: 0.6
+		});
+	}
 
-  // Save final section
-  if (currentText.trim().length > 0) {
-    sections.push({
-      section_type: currentSection,
-      text: currentText.trim(),
-      start_offset: startOffset,
-      end_offset: startOffset + currentText.length,
-      confidence: 0.6
-    });
-  }
-
-  return {
-    doc_id: documentId,
-    sections,
-    metadata: {},
-	extraction_confidence: 0.6,
-  };
+	return { doc_id: documentId, sections, metadata: {}, extraction_confidence: 0.6 };
 }
 
-/**
- * Validate section types
- */
 export function isValidSectionType(value: string): value is SectionType {
-'facts',
-    'issues',
-    'reasoning',
-    'holding',
-    'citations',
-    'parties',
-    'motions',
-    'bibliography',
-    'procedural_history',
-    'sentencing',
-    'judgment'
-  ];
-  return validTypes.includes(value as SectionType);
+	return (
+		value === 'facts' ||
+		value === 'issues' ||
+		value === 'reasoning' ||
+		value === 'holding' ||
+		value === 'citations' ||
+		value === 'parties' ||
+		value === 'motions' ||
+		value === 'bibliography' ||
+		value === 'procedural_history' ||
+		value === 'sentencing' ||
+		value === 'judgment'
+	);
 }
 
-/**
- * Get LangExtract prompt for case document extraction
- */
 function getCaseExtractionPrompt(): string {
-  return `You are a legal document analyzer. Extract and label the following sections from the provided legal case document:
+	return `You are a legal document analyzer. Extract and label the following sections from the provided legal case document:
 
-1. facts - The factual background of the case
-2. issues - The legal issues or questions presented
-3. reasoning - The court's analysis and reasoning
-4. holding - The court's decision or holding
-5. citations - References to other cases, statutes, or authorities
-6. parties - Information about the parties involved
-7. motions - Any motions filed (e.g., motion to suppress, motion to dismiss)
-8. bibliography - References and cited authorities
-9. procedural_history - The procedural history of the case
-10. sentencing - Sentencing information (if applicable)
-11. judgment - The final judgment or verdict
+- facts
+- issues
+- reasoning
+- holding
+- citations
+- parties
+- motions
+- bibliography
+- procedural_history
+- sentencing
+- judgment
 
-For each section, provide: -, section_type: one of the above types
-- section_subtype: optional subtype (e.g., "motion_to_suppress" for motions)
-- text: the extracted text
-- start_offset: character offset where section starts
-- end_offset: character offset where section ends
-- confidence: confidence score (0-1)
+For each section, return:
+- section_type (one of the above)
+- section_subtype (optional)
+- text
+- start_offset
+- end_offset
+- confidence (0-1)
 
-Also extract crime metadata: -, crime_code: statute reference (e.g., "PC 211")
-- crime_category: category (e.g., "robbery", "drug", "homicide")
-- crime_classification: "felony", "misdemeanor", "infraction", or "wobbler"
-- attempted: whether the crime was attempted
-- sentencing_year: year of sentencing
-- sentence_length_months: length of sentence in months
-- enhancements: array of enhancements (e.g., ["deadly weapon", "prior conviction"])
+Also extract crime metadata:
+- crime_code
+- crime_category
+- crime_classification ("felony" | "misdemeanor" | "infraction" | "wobbler")
+- attempted
+- sentencing_year
+- sentence_length_months
+- enhancements (array)
 
-Return the result as a JSON object with sections array and metadata object.`;
+Return JSON: { "sections": [...], "metadata": {...} }`;
 }
 
 /**
- * Get LangExtract prompt for statute extraction
+ * Statute extraction prompt: maps statute content into existing SectionType union.
+ * Does NOT invent new section types (heading, definitions, penalties, etc.)
  */
 function getStatuteExtractionPrompt(): string {
-  return `You are a legal document analyzer. Extract and label the following sections from the provided statute or legal code:
+	return `You are a legal document analyzer. Extract sections from a statute/legal code and map them into ONLY these section types:
 
-1. heading - The statute heading or title
-2. text - The main text of the statute
-3. definitions - Definitions of terms used in the statute
-4. penalties - Penalties or punishments specified
-5. exceptions - Exceptions or exemptions
-6. citations - References to other statutes or authorities
+- facts (use for "heading/title/summary/purpose")
+- issues (use for "definitions/scope/applicability")
+- reasoning (use for "requirements/prohibitions/conditions")
+- holding (use for "penalties/enforcement/shall/must outcomes")
+- citations (use for cross-references)
+- parties (use for agencies/actors referenced)
+- sentencing (use for penalty duration/terms)
 
-For each section, provide: -, section_type: one of the above types
-- text: the extracted text
-- start_offset: character offset where section starts
-- end_offset: character offset where section ends
-- confidence: confidence score (0-1)
-
-Return the result as a JSON object with sections array.`;
+Do NOT use section types outside this list.
+Return JSON with sections array using ONLY allowed section_type values.`;
 }
 
-/**
- * Batch extract sections from multiple documents
- */
 export async function extractSectionsBatch(
-  documents: Array<{
-	id: string, text: string; type?: 'statute' | 'case' }>,
-  concurrency: number = 3
+	documents: Array<{ id: string; text: string; type?: 'statute' | 'case' }>,
+	concurrency = 3
 ): Promise<LangExtractOutput[]> {
-  console.log(`[LangExtract] Batch extracting sections from ${documents.length} documents`);
+	const results: LangExtractOutput[] = [];
+	const errors: Array<{ docId: string; error: string }> = [];
 
-  const results: LangExtractOutput[] = [];
-  const errors: Array<{
-	docId: string, error: string }> = [];
+	for (let i = 0; i < documents.length; i += concurrency) {
+		const batch = documents.slice(i, i + concurrency);
+		await Promise.all(
+			batch.map(async (doc) => {
+				try {
+					const r = await extractSectionsFromText(doc.text, doc.id, doc.type ?? 'case');
+					results.push(r);
+				} catch (e) {
+					results.push(detectSectionsHeuristic(doc.text, doc.id));
+					errors.push({ docId: doc.id, error: String(e) });
+				}
+			})
+		);
+	}
 
-  // Process documents with concurrency limit
-  for (let i = 0; i < documents.length; i += concurrency) {
-    const batch = documents.slice(i, i + concurrency);
-extractSectionsFromText(doc.text, doc.id, doc?.type ?? 'case')
-        .then((result) => {
-          results.push(result);
-        })
-        .catch((error) => {
-          console.warn(
-            `[LangExtract] Error extracting document ${doc.id},
-	using heuristic fallback`
-          );
-          // Fallback to heuristic detection
-          results.push(detectSectionsHeuristic(doc.text, doc.id));
-          errors.push({ docId: doc.id, error: String(error) });
-        })
-    );
+	if (errors.length) {
+		console.warn(`[LangExtract] ${errors.length} documents failed; used heuristic fallback`);
+	}
 
-    await Promise.all(batchPromises);
-  }
-
-  if (errors.length > 0) {
-    console.warn(`[LangExtract] ${errors.length} documents failed, used heuristic fallback`);
-  }
-
-  return results;
+	return results;
 }
-

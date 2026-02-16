@@ -24,6 +24,7 @@ export interface FixSynthesizerConfig {
 	maxRetries: number;
 	validationTimeout: number;
 	backupDir: string;
+	maxBackups: number;
 }
 
 export interface FixResult {
@@ -53,7 +54,8 @@ export class FixSynthesizer {
 		this.config = {
 			maxRetries: config?.maxRetries ?? 3,
 			validationTimeout: config?.validationTimeout ?? 30000,
-			backupDir: config?.backupDir ?? '.fix-backups'
+			backupDir: config?.backupDir ?? '.fix-backups',
+			maxBackups: config?.maxBackups ?? 100
 		};
 	}
 
@@ -317,6 +319,13 @@ export class FixSynthesizer {
 
 		const backupKey = filePath + '_' + Date.now();
 		this.backups.set(backupKey, '');
+
+		// Prune oldest backups if over limit
+		if (this.backups.size > this.config.maxBackups) {
+			const excess = this.backups.size - this.config.maxBackups;
+			const keys = [...this.backups.keys()].slice(0, excess);
+			for (const k of keys) this.backups.delete(k);
+		}
 
 		return backupKey;
 	}

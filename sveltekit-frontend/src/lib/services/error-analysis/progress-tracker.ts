@@ -109,7 +109,7 @@ export class ProgressTracker extends BaseService {
  }
 
  // Update average confidence
-this.metrics.averageConfidence * (this.metrics.errorsAnalyzed - 1) + confidence;
+  const totalConfidence = this.metrics.averageConfidence * (this.metrics.errorsAnalyzed - 1) + confidence;
  this.metrics.averageConfidence = totalConfidence / this.metrics.errorsAnalyzed;
 
  // Update error reduction
@@ -182,7 +182,8 @@ this.metrics.averageConfidence * (this.metrics.errorsAnalyzed - 1) + confidence;
  sessionId: this.sessionId,
  metrics: { ...this.metrics },
 	status: this.status,
- elapsedTime: completionPercentage,
+ elapsedTime,
+ completionPercentage,
  };
  }
 

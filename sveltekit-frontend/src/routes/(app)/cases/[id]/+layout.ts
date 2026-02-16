@@ -24,7 +24,7 @@ export const load: LayoutLoad = async ({ fetch, params }) => {
 
  // Cache miss - fetch from API
  console.log('📡 Fetching case from API: ' + params.id);
- const res = await fetch(`/api/v1/cases/${params.id}`);
+ const res = await fetch(`/api/cases/${params.id}`);
 
  if (!res.ok) {
  throw error(res.status, `Failed to load case ${params.id}`);

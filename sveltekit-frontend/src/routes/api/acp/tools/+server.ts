@@ -1,19 +1,12 @@
 /**
  * ACP Tools API Endpoint
- * GET /api/acp/tools - List available tools
- * POST /api/acp/execute - Execute a tool
- *
- * Exposes the ACP Tool Registry as REST API for external integration.
+ * GET /api/acp/tools - List available tools with schemas and capabilities
  */
 
-import { getACPToolRegistry } from '$lib/services/knowledge-search/ACPToolRegistry';
+import { getACPToolRegistry, toolSupportsDryRun } from '$lib/services/knowledge-search/ACPToolRegistry';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
-/**
- * GET /api/acp/tools
- * List all available ACP tools with their schemas
- */
 export const GET: RequestHandler = async ({ url }) => {
 	const category = url.searchParams.get('category');
 
@@ -30,11 +23,11 @@ export const GET: RequestHandler = async ({ url }) => {
 			name: t.name,
 			description: t.description,
 			category: t.category,
+			supportsDryRun: toolSupportsDryRun(t.name),
 			inputSchema: t.inputSchema,
-			outputSchema: t.outputSchema
+			outputSchema: t.outputSchema,
+			examples: t.examples
 		})),
 		count: tools.length
 	});
 };
-
-

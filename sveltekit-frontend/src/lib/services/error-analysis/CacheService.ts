@@ -27,17 +27,25 @@ interface RedisClient {
 	get(key: string): Promise<string | null>;
 	set(key: string, value: string, options?: { EX: number }): Promise<string | null>;
 	exists(key: string): Promise<number>;
-	del(key: string): Promise<number>;
+	del(key: string | string[]): Promise<number>;
 	ping(): Promise<string>;
+	keys(pattern: string): Promise<string[]>;
 }
 
 export class CacheService {
 	private redis: RedisClient | null = null;
 	private redisAvailable: boolean = false;
+	private initPromise: Promise<void>;
 	private readonly DEFAULT_TTL = 7 * 24 * 60 * 60; // 7 days in seconds
+	private hits = 0;
+	private misses = 0;
 
 	constructor(redisUrl: string = 'redis://localhost:6379') {
-		this.initializeRedis(redisUrl);
+		this.initPromise = this.initializeRedis(redisUrl);
+	}
+
+	async waitForInit(): Promise<void> {
+		await this.initPromise;
 	}
 
 	/**
@@ -123,6 +131,7 @@ export class CacheService {
 			const cached = await this.redis.get(key);
 
 			if (!cached) {
+				this.misses++;
 				return null;
 			}
 
@@ -132,9 +141,11 @@ export class CacheService {
 			if (result.fileHash !== hash) {
 				console.warn('Cache integrity check failed for ' + filePath);
 				await this.redis.del(key);
+				this.misses++;
 				return null;
 			}
 
+			this.hits++;
 			return result;
 		} catch (error) {
 			console.error('Cache check failed for ' + filePath + ':', error);
@@ -215,13 +226,12 @@ export class CacheService {
 		misses: number;
 		hitRate: number;
 	}> {
-		// This would require tracking hits/misses in Redis
-		// For now, return basic availability
+		const total = this.hits + this.misses;
 		return {
 			available: this.redisAvailable,
-			hits: 0,
-			misses: 0,
-			hitRate: 0
+			hits: this.hits,
+			misses: this.misses,
+			hitRate: total > 0 ? this.hits / total : 0
 		};
 	}
 
@@ -236,9 +246,12 @@ export class CacheService {
 		}
 
 		try {
-			// This would require scanning for keys matching pattern
-			// For now, just log
-			console.log('Clearing cache for ' + filePath);
+			const normalizedPath = filePath.replace(/\\/g, '/');
+			const pattern = 'svelte-check:' + normalizedPath + ':*';
+			const keys = await this.redis.keys(pattern);
+			if (keys.length > 0) {
+				await this.redis.del(keys);
+			}
 		} catch (error) {
 			console.error('Cache clear failed for ' + filePath + ':', error);
 		}

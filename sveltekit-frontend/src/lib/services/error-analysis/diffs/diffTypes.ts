@@ -2,7 +2,8 @@ export type PatchCandidate = {
  runId: string;
 	filePath: string; // repo-relative, posix preferred
  reason: string;
-	confidence: number; // 0..1, beforeSha256: string;
+	confidence: number; // 0..1
+	beforeSha256: string;
 	afterSha256: string;
  afterText: string; // Added for deterministic apply
  diffText: string; // unified diff

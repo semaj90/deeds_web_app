@@ -8,7 +8,7 @@
 
 <LegalAILayout title="Case Analysis" subtitle="Chat with AI Legal Assistant about this case">
  <div class="case-chat-container">
- <CaseChatPanel />
+ <CaseChatPanel {caseId} />
  </div>
 </LegalAILayout>
 

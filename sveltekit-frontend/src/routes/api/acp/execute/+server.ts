@@ -1,5 +1,11 @@
 /**
  * ACP Execute API Endpoint
+ *
+ * POST /api/acp/execute
+ * Body: { tool: string, args: object, dryRun?: boolean }
+ *
+ * When dryRun is true, tools return { kind: "plan", steps: [...] }
+ * instead of executing side effects.
  */
 
 import { executeACPTool, getACPToolSchema } from '$lib/services/knowledge-search/ACPToolRegistry';
@@ -11,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	try {
 		const body = await request.json();
-		const { tool, args } = body;
+		const { tool, args, dryRun } = body;
 
 		if (!tool || typeof tool !== 'string') {
 			return json({ error: 'Tool name is required' }, { status: 400 });
@@ -19,16 +25,21 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const schema = getACPToolSchema(tool);
 		if (!schema) {
-			return json({ error: `Unknown, tool: ${tool}` }, { status: 404 });
+			return json({ error: `Unknown tool: ${tool}` }, { status: 404 });
 		}
 
-		const result = await executeACPTool(tool, args || {});
+		const result = await executeACPTool(tool, args || {}, {
+			dryRun: dryRun === true
+		});
 
 		return json({
 			success: result.success,
+			kind: result.kind ?? 'result',
 			result: result.data,
 			error: result.error,
-			metadata: { duration: result.duration,
+			metadata: {
+				dryRun: dryRun === true,
+				duration: result.duration,
 				totalTime: Date.now() - startTime,
 				timestamp: new Date().toISOString()
 			}
@@ -45,6 +56,3 @@ export const POST: RequestHandler = async ({ request }) => {
 		);
 	}
 };
-
-
-

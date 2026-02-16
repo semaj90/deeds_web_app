@@ -64,7 +64,7 @@ export class EmbeddingService extends BaseService implements IEmbeddingService {
  throw new Error('Invalid input: text must be a non-empty string');
  }
 
- let lastError: null = null;
+ let lastError: Error | null = null;
 
  for (let attempt = 0; attempt < this.config.maxRetries; attempt++) {
  try {
@@ -83,7 +83,7 @@ export class EmbeddingService extends BaseService implements IEmbeddingService {
 
  const data = await response.json();
 
- if (!data?.embeddings|| !Array.isArray(data.embeddings) || data.embeddings.length === 0) {
+ if (!data?.embeddings || !Array.isArray(data.embeddings) || data.embeddings.length === 0) {
  throw new Error('Invalid embedding response: no embeddings returned');
  }
 

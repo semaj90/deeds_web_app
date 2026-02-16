@@ -331,10 +331,13 @@ export class ErrorClustering {
 	}
 }
 
-// Export singleton instance
-export const errorClustering = new ErrorClustering();
+/** Singleton instance */
+let errorClusteringInstance: ErrorClustering | null = null;
+
 /** Get or create ErrorClustering singleton */
 export function getErrorClustering(config?: Partial<ClusteringConfig>): ErrorClustering {
-	if (config) return new ErrorClustering(config);
-	return errorClustering;
+	if (!errorClusteringInstance) {
+		errorClusteringInstance = new ErrorClustering(config);
+	}
+	return errorClusteringInstance;
 }

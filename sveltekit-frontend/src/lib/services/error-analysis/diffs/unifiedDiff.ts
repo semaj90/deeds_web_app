@@ -34,7 +34,7 @@ export function unifiedDiffFromTexts(opts: {
  // Simple diff: find first/last mismatch windows, emit single hunk.
  // (For Task 15 this is sufficient; Task 16 applies based on text/AST, not hunks.)
  let i = 0;
- while (i < before?.length&& i < after?.length&& before[i] === after[i]) i++;
+ while (i < before?.length && i < after?.length && before[i] === after[i]) i++;
 
  let jBefore = before.length - 1;
  let jAfter = after.length - 1;
@@ -57,9 +57,7 @@ export function unifiedDiffFromTexts(opts: {
  const oldLines = oldEnd - oldStart + 1;
  const newLines = newEnd - newStart + 1;
 
- diffLines.push(`@@ -${oldStart},
-	${oldLines} +${newStart},
-	${newLines} @@`);
+ diffLines.push(`@@ -${oldStart},${oldLines} +${newStart},${newLines} @@`);
 
  // context prefix
  for (let k = oldStart - 1; k < i; k++) diffLines.push(` ${before[k] ?? ''}`);

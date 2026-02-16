@@ -8,7 +8,7 @@ import type { ServiceConfig } from './types.js';
 
 export interface IFeatureFlags {
  isEnabled(flagName: string): boolean;
- setFlag(flagName: string, boolean: void,
+ setFlag(flagName: string, enabled: boolean): void;
  getAllFlags(): Record<string, boolean>;
  resetFlags(): void;
 }
@@ -29,7 +29,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  private readonly defaultFlags: FeatureFlagConfig = {
  'error-brain': true,
  'diff-generation': true,
- 'diff-application': true, validation,
+ 'diff-application': true, validation: true,
  'knowledge-base-learning': true,
  'audit-trail': true,
  'progress-tracking': true,
@@ -64,7 +64,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  * Set a feature flag
  * Property 7: Feature Flag Enforcement - flags can be updated dynamically
  */
- setFlag(flagName: string): void {
+ setFlag(flagName: string, enabled: boolean): void {
  this.validateInput(flagName, 'flagName');
 
  const oldValue = this.flags[flagName as keyof FeatureFlagConfig];
@@ -187,7 +187,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  }
  });
 
- return { enabled: disabled, total.length + disabled.length,
+ return { enabled, disabled, total: enabled.length + disabled.length,
  };
  }
 }

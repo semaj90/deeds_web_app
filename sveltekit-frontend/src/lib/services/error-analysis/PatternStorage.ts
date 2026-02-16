@@ -18,6 +18,7 @@ import type { ClusterResult } from './ErrorClustering.js';
 export interface PatternStorageConfig {
 	jsonlDir: string;
 	neo4jEnabled: boolean;
+	maxCachedPatterns: number;
 }
 
 export interface StorageResult {
@@ -53,7 +54,8 @@ export class PatternStorage {
 	constructor(config?: Partial<PatternStorageConfig>) {
 		this.config = {
 			jsonlDir: config?.jsonlDir ?? './data/patterns',
-			neo4jEnabled: config?.neo4jEnabled ?? true
+			neo4jEnabled: config?.neo4jEnabled ?? true,
+			maxCachedPatterns: config?.maxCachedPatterns ?? 5000
 		};
 	}
 
@@ -86,8 +88,13 @@ export class PatternStorage {
 				}
 			}
 
-			// Cache locally
+			// Cache locally (prune oldest if over limit)
 			this.patterns.set(pattern.id, pattern);
+			if (this.patterns.size > this.config.maxCachedPatterns) {
+				const excess = this.patterns.size - this.config.maxCachedPatterns;
+				const keys = [...this.patterns.keys()].slice(0, excess);
+				for (const k of keys) this.patterns.delete(k);
+			}
 			this.stats.totalStored++;
 
 			result.success = result.jsonlWritten || result.neo4jWritten;
@@ -241,6 +248,12 @@ export class PatternStorage {
 					results.push(p);
 					this.patterns.set(p.id, p);
 				}
+			}
+			// Prune cache if over limit after Neo4j load
+			if (this.patterns.size > this.config.maxCachedPatterns) {
+				const excess = this.patterns.size - this.config.maxCachedPatterns;
+				const keys = [...this.patterns.keys()].slice(0, excess);
+				for (const k of keys) this.patterns.delete(k);
 			}
 		}
 

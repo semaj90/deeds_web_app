@@ -72,11 +72,11 @@ export interface SearchResult {
 export interface ACPTool {
   name: string;
 	description: string;
-  category: 'search' | 'database' | 'storage' | 'llm' | 'external' | 'code' | 'fix';
+  category: 'search' | 'database' | 'storage' | 'llm' | 'external' | 'code' | 'fix' | 'error-analysis';
   inputSchema: any;
 	outputSchema: any;
   examples: ToolExample[];
-	handler: (args: any) => Promise<ToolResult>;
+	handler: (args: any, options?: { dryRun?: boolean }) => Promise<ToolResult>;
 }
 
 export interface ToolExample {
@@ -87,9 +87,16 @@ export interface ToolExample {
 
 export interface ToolResult {
   success: boolean;
+  kind?: 'result' | 'plan';
   data?: any;
   error?: string;
 	duration: number;
+}
+
+export interface ToolPlanStep {
+  action: string;
+  target: string;
+  detail?: string;
 }
 
 // ============================================================================

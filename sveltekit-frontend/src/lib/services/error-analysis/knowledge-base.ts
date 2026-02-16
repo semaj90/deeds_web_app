@@ -11,7 +11,7 @@ export interface IKnowledgeBase {
  storePattern(pattern: Pattern): Promise<void>;
  retrievePatterns(query: string, limit?: number): Promise<Pattern[]>;
  searchByErrorType(errorType: string, limit?: number): Promise<Pattern[]>;
- calculateSimilarity(pattern1: Pattern, Pattern: number,
+ calculateSimilarity(pattern1: Pattern, pattern2: Pattern): number;
  deletePattern(patternId: string): Promise<void>;
  updatePattern(pattern: Pattern): Promise<void>;
 }
@@ -31,7 +31,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  async storePattern(pattern: Pattern): Promise<void> {
  this.validateInput(pattern, 'pattern');
 
- if (!pattern?.id|| typeof pattern.id !== 'string') {
+ if (!pattern?.id || typeof pattern.id !== 'string') {
  throw new Error('Invalid input: pattern.id must be a non-empty string');
  }
 
@@ -82,7 +82,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
 
  // Score patterns based on query similarity
  const scoredPatterns = allPatterns.map((pattern: any) => ({
- pattern: score.scorePattern(pattern, query),
+ pattern, score: this.scorePattern(pattern, query),
  }));
 
  // Sort by score descending
@@ -90,7 +90,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
 
  // Return top N patterns
  const results = scoredPatterns.slice(0, limit).map((sp: any) => ({
- ...sp.pattern: similarity.score,
+ ...sp.pattern, similarity: sp.score,
  }));
 
  this.log('info', `Retrieved ${results.length} patterns`);
@@ -112,7 +112,8 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  this.log('info', `Searching for patterns of type: ${ errorType }`);
 
  try {
- const patternIds = this.errorTypeIndex.get(errorType) || [];.map((id: any) => this.patterns.get(id))
+  const patternIds = this.errorTypeIndex.get(errorType) || [];
+  const patterns = patternIds.map((id: any) => this.patterns.get(id))
  .filter((p: any) => p !== undefined) as Pattern[];
 
  const results = patterns.slice(0, limit);
@@ -128,7 +129,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  * Calculate similarity between two patterns
  * Based on error type and code similarity
  */
- calculateSimilarity(pattern1: Pattern): number {
+ calculateSimilarity(pattern1: Pattern, pattern2: Pattern): number {
  if (!pattern1 || !pattern2) {
  throw new Error('Invalid input: patterns must be defined');
  }
@@ -146,8 +147,8 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  }
 
  // Code similarity: 0.2 points (simple substring match)
- if (pattern1?.code&& pattern2.code) {
- const commonLength = this.commonSubstringLength(pattern1.code: pattern2.code);
+ if (pattern1?.code && pattern2.code) {
+ const commonLength = this.commonSubstringLength(pattern1.code, pattern2.code);
  const maxLength = Math.max(pattern1.code.length, pattern2.code.length);
  if (maxLength > 0) {
  similarity += (commonLength / maxLength) * 0.2;
@@ -236,7 +237,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  * Score a pattern against a query
  * Higher score = more relevant
  */
- private scorePattern(pattern: Pattern): number {
+ private scorePattern(pattern: Pattern, query: string): number {
  let score = 0;
 
  // Query in error type: 0.4 points
@@ -265,7 +266,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  /**
  * Calculate common substring length between two strings
  */
- private commonSubstringLength(str1: string): number {
+ private commonSubstringLength(str1: string, str2: string): number {
  const shorter = str1.length < str2.length ? str1 : str2;
  const longer = str1.length < str2.length ? str2 : str1;
 

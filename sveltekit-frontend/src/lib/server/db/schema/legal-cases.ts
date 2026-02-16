@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
     boolean,
     integer,
@@ -7,26 +7,38 @@ import {
     text,
     timestamp,
     uuid,
+    varchar,
     vector,
 } from 'drizzle-orm/pg-core';
 
 /**
- * Cases table: stores criminal case metadata
- * Linked to crimes table for crime-specific information
+ * Cases table — matches actual PostgreSQL `cases` table (legal_ai_db).
+ * Columns verified against `information_schema.columns` on 2026-02-15.
  */
 export const cases = pgTable('cases', {
-    id: uuid('id').primaryKey().defaultRandom(),
-    externalId: text('external_id').unique(), // e.g., docket or reporter cite
-    caseName: text('case_name').notNull(), // e.g., "People v. Smith"
-    jurisdiction: text('jurisdiction').notNull(), // 'CA', 'US', 'NY', etc.
-    courtName: text('court_name'), // e.g., "Cal. Ct. App., 2nd Dist."
-    decisionDate: timestamp('decision_date', { withTimezone: true }),
-    rawDocMinioKey: text('raw_doc_minio_key'), // path to original PDF in MinIO
-    langextractJsonMinioKey: text('langextract_json_minio_key'), // path to LangExtract JSON
-    langextractHtmlMinioKey: text('langextract_html_minio_key'), // path to LangExtract HTML
-    langextractSummary: jsonb('langextract_summary'), // extracted metadata
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+    id: uuid('id').defaultRandom().primaryKey(),
+    title: varchar('title').notNull(),
+    description: text('description'),
+    caseNumber: varchar('case_number'),
+    status: varchar('status').default('active').notNull(),
+    priority: varchar('priority').default('medium').notNull(),
+    practiceArea: varchar('practice_area'),
+    jurisdiction: varchar('jurisdiction'),
+    court: varchar('court'),
+    clientName: varchar('client_name'),
+    opposingParty: varchar('opposing_party'),
+    assignedAttorney: uuid('assigned_attorney'),
+    filingDate: timestamp('filing_date', { withTimezone: true }),
+    dueDate: timestamp('due_date', { withTimezone: true }),
+    closedDate: timestamp('closed_date', { withTimezone: true }),
+    caseEmbedding: vector('case_embedding', { dimensions: 384 }),
+    qdrantId: uuid('qdrant_id'),
+    qdrantCollection: varchar('qdrant_collection').default('cases'),
+    metadata: jsonb('metadata').default({}),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    caseEmbedding384: vector('case_embedding_384', { dimensions: 384 }),
+    userId: uuid('user_id'),
 });
 
 /**

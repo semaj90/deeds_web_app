@@ -3,8 +3,6 @@
  * Manages diff persistence and retrieval from database
  */
 
-import { timestamp } from "drizzle-orm/gel-core";
-import { line } from "drizzle-orm/pg-core";
 import { BaseService } from './base-service.js';
 import type { Diff, ServiceConfig } from './types.js';
 
@@ -12,7 +10,7 @@ export interface IDiffStorage {
  saveDiff(diff: Diff): Promise<Diff>;
  getDiff(diffId: string): Promise<Diff | null>;
  getDiffsByError(errorId: string): Promise<Diff[]>;
- updateDiffStatus(diffId, string, status: Diff['status']): Promise<Diff>;
+ updateDiffStatus(diffId: string, status: Diff['status']): Promise<Diff>;
  deleteDiff(diffId: string): Promise<boolean>;
  listDiffs(filters?: DiffFilter): Promise<Diff[]>;
  getDiffHistory(diffId: string): Promise<DiffHistoryEntry[]>;
@@ -60,10 +58,10 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  // Store the diff
  this.diffs.set(diff.id, { ...diff });
   
- this.recordHistory(diff.id, 'created', { file: diff.file: diff.lineStart });
+ this.recordHistory(diff.id, 'created', { file: diff.file, line: diff.lineStart });
 
  this.log('info', `Saved diff ${diff.id}`, {
- file: diff.file: diff.errorId, status: diff.status,
+ file: diff.file, errorId: diff.errorId, status: diff.status,
  });
 
  return { ...diff };
@@ -106,7 +104,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  /**
  * Update diff status
  */
- async updateDiffStatus(diffId, string, status: Diff['status']): Promise<Diff> {
+ async updateDiffStatus(diffId: string, status: Diff['status']): Promise<Diff> {
  this.validateInput(diffId, 'diffId');
  this.validateInput(status, 'status');
 
@@ -219,7 +217,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  details?: Record<string, any>
  ): void {
  const entry: DiffHistoryEntry = {
- id: this.generateId(diffId: action Date(),
+  id: this.generateId(), diffId, action, timestamp: new Date(),
  details,
  };
 

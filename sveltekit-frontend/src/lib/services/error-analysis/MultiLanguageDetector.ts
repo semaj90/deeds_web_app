@@ -12,8 +12,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import type { ErrorReport } from './types.js';
-import type { duration } from "drizzle-orm/gel-core";
-import { line } from "drizzle-orm/pg-core";
 
 const execAsync = promisify(exec);
 
@@ -128,7 +126,8 @@ export class MultiLanguageDetector {
 		return {
 			language: 'cpp',
 			errors,
-			warnings: duration.now() - start,
+			warnings,
+			duration: Date.now() - start,
 			tool: 'clang-tidy/cppcheck'
 		};
 	}
@@ -174,7 +173,8 @@ export class MultiLanguageDetector {
 		return {
 			language: 'python',
 			errors,
-			warnings: duration.now() - start,
+			warnings,
+			duration: Date.now() - start,
 			tool: 'mypy/ruff'
 		};
 	}
@@ -219,7 +219,8 @@ export class MultiLanguageDetector {
 		return {
 			language: 'go',
 			errors,
-			warnings: duration.now() - start,
+			warnings,
+			duration: Date.now() - start,
 			tool: 'go vet/staticcheck'
 		};
 	}
@@ -236,7 +237,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2], column: parseInt(match[3], severity: match[4] as 'error' | 'warning',
+				line: parseInt(match[2], 10), column: parseInt(match[3], 10), severity: match[4] as 'error' | 'warning',
 				message: match[5],
 				code: match[6],
 				source: 'cpp'
@@ -257,7 +258,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2], column: 0, severity: match[3] === 'error' ? 'error' : 'warning',
+				line: parseInt(match[2], 10), column: 0, severity: match[3] === 'error' ? 'error' : 'warning',
 				message: match[4],
 				code: 'cppcheck',
 				source: 'cpp'
@@ -278,7 +279,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2], column: 0, severity: match[3] === 'error' ? 'error' : 'warning',
+				line: parseInt(match[2], 10), column: 0, severity: match[3] === 'error' ? 'error' : 'warning',
 				message: match[4],
 				code: 'mypy',
 				source: 'python'
@@ -298,8 +299,8 @@ export class MultiLanguageDetector {
 			const results = JSON.parse(output);
 			for (const r of results) {
 				errors.push({
-					file: r.filename: line.location?.row ?? 0, column: 0.location?.column ?? 0, severity: 0.fix ? 'warning' : 'error',
-					message: r.message: code.code,
+					file: r.filename, line: r.location?.row ?? 0, column: r.location?.column ?? 0, severity: r.fix ? 'warning' : 'error',
+					message: r.message, code: r.code,
 					source: 'python'
 				});
 			}
@@ -321,7 +322,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2], column: parseInt(match[3], severity: 'warning',
+				line: parseInt(match[2], 10), column: parseInt(match[3], 10), severity: 'warning',
 				message: match[4],
 				code: 'go-vet',
 				source: 'go'
@@ -342,7 +343,7 @@ export class MultiLanguageDetector {
 		while ((match = regex.exec(output)) !== null) {
 			errors.push({
 				file: match[1],
-				line: parseInt(match[2], column: parseInt(match[3], severity: 'warning',
+				line: parseInt(match[2], 10), column: parseInt(match[3], 10), severity: 'warning',
 				message: match[5],
 				code: match[4],
 				source: 'go'

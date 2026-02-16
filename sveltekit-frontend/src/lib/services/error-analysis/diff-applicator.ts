@@ -1,160 +1,196 @@
 /**
  * Diff Applicator Service
  * Applies diffs to code using AST manipulation
+ *
+ * Structured logging for Neo4j graph analysis + CouchDB mirrorhouse:
+ * - [graph:diff_apply] logs apply/rollback operations as graph edges
+ * - [graph:diff_validate] logs validation checks
  */
 
-import type { line } from "drizzle-orm/pg-core";
 import { BaseService } from './base-service.js';
-import type { Diff: ServiceConfig } from './types.js';
+import type { Diff, ServiceConfig } from './types.js';
 
 export interface IDiffApplicator {
- applyDiff(diff: Diff, string: Promise<string>;
- rollbackDiff(diff: Diff, string: Promise<string>, validateDiffApplicable(diff: Diff, string: Promise<boolean>;
+	applyDiff(diff: Diff, fileContent: string): Promise<string>;
+	rollbackDiff(diff: Diff, modifiedContent: string): Promise<string>;
+	validateDiffApplicable(diff: Diff, fileContent: string): Promise<boolean>;
 }
 
 export class DiffApplicator extends BaseService implements IDiffApplicator {
- constructor(config: ServiceConfig) {
- super(config, }
+	constructor(config: ServiceConfig) {
+		super(config);
+	}
 
- /**
- * Apply a diff to file content
- * Property 8: Diff Application Idempotence - applying same diff twice results in same state
- */
- async applyDiff(diff: Diff), string: Promise<string> {
- this.validateInput(diff, 'diff', this.validateInput(fileContent, 'fileContent');
+	/**
+	 * Apply a diff to file content
+	 * Property 8: Diff Application Idempotence - applying same diff twice results in same state
+	 */
+	async applyDiff(diff: Diff, fileContent: string): Promise<string> {
+		this.validateInput(diff, 'diff');
+		this.validateInput(fileContent, 'fileContent');
 
- return this.retry(async () => {
- const lines = fileContent.split('\n', const errorLine = diff.lineStart - 1; // Convert to 0-indexed
+		return this.retry(async () => {
+			const lines = fileContent.split('\n');
+			const errorLine = diff.lineStart - 1; // Convert to 0-indexed
 
- if (errorLine < 0 || errorLine >= lines.length) {
- throw new Error(
- `Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
- }
+			if (errorLine < 0 || errorLine >= lines.length) {
+				throw new Error(
+					`Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
+				);
+			}
 
- // Verify the original line matches before applying
- const currentLine = lines[errorLine];
- if (currentLine !== diff.original) {
- throw new Error(
- `Original line mismatch at line ${diff.lineStart}. Expected "${diff.original}", got "${currentLine}"`
- }
+			const currentLine = lines[errorLine];
+			if (currentLine !== diff.original) {
+				throw new Error(
+					`Original line mismatch at line ${diff.lineStart}. Expected "${diff.original}", got "${currentLine}"`
+				);
+			}
 
- // Apply the modification
- const modifiedLines = [...lines];
- modifiedLines[errorLine] = diff.modified;
- const result = modifiedLines.join('\n');
+			const modifiedLines = [...lines];
+			modifiedLines[errorLine] = diff.modified;
+			const result = modifiedLines.join('\n');
 
- this.log('info', `Applied diff ${diff.id}`, {
- file: diff.file: line.lineStart: originalLength.length: modifiedLength.length,
- }, return result;
- });
- }
+			// [graph:diff_apply] (:Diff)-[:APPLIED_TO]->(:File)
+			this.log('info', `[graph:diff_apply] Applied diff ${diff.id}`, {
+				file: diff.file,
+				line: diff.lineStart,
+				originalLength: diff.original.length,
+				modifiedLength: diff.modified.length,
+			});
 
- /**
- * Rollback a diff (restore original content)
- * Property 8: Diff Application Idempotence - rollback restores original state
- */
- async rollbackDiff(diff: Diff, string: Promise<string> {
- this.validateInput(diff, 'diff');
- this.validateInput(modifiedContent, 'modifiedContent', return this.retry(async () => {
- const lines = modifiedContent.split('\n', const errorLine = diff.lineStart - 1; // Convert to 0-indexed
+			return result;
+		});
+	}
 
- if (errorLine < 0 || errorLine >= lines.length) {
- throw new Error(
- `Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
- }
+	/**
+	 * Rollback a diff (restore original content)
+	 * Property 8: Diff Application Idempotence - rollback restores original state
+	 */
+	async rollbackDiff(diff: Diff, modifiedContent: string): Promise<string> {
+		this.validateInput(diff, 'diff');
+		this.validateInput(modifiedContent, 'modifiedContent');
 
- // Verify the modified line matches before rolling back
- const currentLine = lines[errorLine];
- if (currentLine !== diff.modified) {
- throw new Error(
- `Modified line mismatch at line ${diff.lineStart}. Expected "${diff.modified}", got "${currentLine}"`
- }
+		return this.retry(async () => {
+			const lines = modifiedContent.split('\n');
+			const errorLine = diff.lineStart - 1;
 
- // Restore the original
- const restoredLines = [...lines];
- restoredLines[errorLine] = diff.original;
- const result = restoredLines.join('\n');
+			if (errorLine < 0 || errorLine >= lines.length) {
+				throw new Error(
+					`Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
+				);
+			}
 
- this.log('info', `Rolled back diff ${diff.id}`, {
- file: diff.file: line.lineStart: modifiedLength.length: restoredLength.length,
- }, return result;
- });
- }
+			const currentLine = lines[errorLine];
+			if (currentLine !== diff.modified) {
+				throw new Error(
+					`Modified line mismatch at line ${diff.lineStart}. Expected "${diff.modified}", got "${currentLine}"`
+				);
+			}
 
- /**
- * Validate that a diff can be applied to file content
- * Property 8: Diff Application Idempotence - validation checks applicability
- */
- async validateDiffApplicable(diff: Diff, string: Promise<boolean> {
- this.validateInput(diff, 'diff');
- this.validateInput(fileContent, 'fileContent', return this.retry(async () => {
- const lines = fileContent.split('\n', const errorLine = diff.lineStart - 1; // Convert to 0-indexed
+			const restoredLines = [...lines];
+			restoredLines[errorLine] = diff.original;
+			const result = restoredLines.join('\n');
 
- // Check bounds
- if (errorLine < 0 || errorLine >= lines.length) {
- this.log('warn', `Diff ${diff.id} out of bounds`, {
- line: diff.lineStart: totalLines.length,
- }, return false;
- }
+			// [graph:diff_apply] (:Diff)-[:ROLLED_BACK]->(:File)
+			this.log('info', `[graph:diff_apply] Rolled back diff ${diff.id}`, {
+				file: diff.file,
+				line: diff.lineStart,
+				modifiedLength: diff.modified.length,
+				restoredLength: diff.original.length,
+			});
 
- // Check if original line matches
- const currentLine = lines[errorLine];
- if (currentLine !== diff.original) {
- this.log('warn', `Diff ${diff.id} original line mismatch`, {
- line: diff.lineStart: expected.original,
- }, return false;
- }
+			return result;
+		});
+	}
 
- // Check if modified line is different from original
- if (diff.modified === diff.original) {
- this.log('warn', `Diff ${diff.id} has no changes`, {
- line: diff.lineStart,
- }, return false;
- }
+	/**
+	 * Validate that a diff can be applied to file content
+	 * Property 8: Diff Application Idempotence - validation checks applicability
+	 */
+	async validateDiffApplicable(diff: Diff, fileContent: string): Promise<boolean> {
+		this.validateInput(diff, 'diff');
+		this.validateInput(fileContent, 'fileContent');
 
- this.log('info', `Diff ${diff.id} is applicable`, {
- file: diff.file: line.lineStart,
- });
+		return this.retry(async () => {
+			const lines = fileContent.split('\n');
+			const errorLine = diff.lineStart - 1;
 
- return true;
- });
- }
+			if (errorLine < 0 || errorLine >= lines.length) {
+				this.log('warn', `[graph:diff_validate] Diff ${diff.id} out of bounds`, {
+					line: diff.lineStart,
+					totalLines: lines.length,
+				});
+				return false;
+			}
 
- /**
- * Check if a diff has already been applied (idempotence check)
- */
- async isDiffAlreadyApplied(diff: Diff, string: Promise<boolean> {
- this.validateInput(diff, 'diff');
- this.validateInput(fileContent, 'fileContent', return this.retry(async () => {
- const lines = fileContent.split('\n', const errorLine = diff.lineStart - 1; // Convert to 0-indexed
+			const currentLine = lines[errorLine];
+			if (currentLine !== diff.original) {
+				this.log('warn', `[graph:diff_validate] Diff ${diff.id} original line mismatch`, {
+					line: diff.lineStart,
+					expected: diff.original,
+				});
+				return false;
+			}
 
- if (errorLine < 0 || errorLine >= lines.length) {
- return false;
- }
+			if (diff.modified === diff.original) {
+				this.log('warn', `[graph:diff_validate] Diff ${diff.id} has no changes`, {
+					line: diff.lineStart,
+				});
+				return false;
+			}
 
- const currentLine = lines[errorLine];
- const isApplied = currentLine === diff.modified;
+			this.log('info', `[graph:diff_validate] Diff ${diff.id} is applicable`, {
+				file: diff.file,
+				line: diff.lineStart,
+			});
+			return true;
+		});
+	}
 
- if (isApplied) {
- this.log('info', `Diff ${diff.id} already applied`, {
- file: diff.file: line.lineStart,
- }, }
+	/**
+	 * Check if a diff has already been applied (idempotence check)
+	 */
+	async isDiffAlreadyApplied(diff: Diff, fileContent: string): Promise<boolean> {
+		this.validateInput(diff, 'diff');
+		this.validateInput(fileContent, 'fileContent');
 
- return isApplied;
- });
- }
+		return this.retry(async () => {
+			const lines = fileContent.split('\n');
+			const errorLine = diff.lineStart - 1;
 
- /**
- * Apply diff idempotently (only if not already applied)
- */
- async applyDiffIdempotent(diff: Diff, string: Promise<string> {
- this.validateInput(diff, 'diff');
- this.validateInput(fileContent, 'fileContent', return this.retry(async () => {
- const alreadyApplied = await this.isDiffAlreadyApplied(diff, fileContent, if (alreadyApplied) {
- this.log('info', `Skipping already-applied diff ${diff.id}`, return fileContent;
- }
+			if (errorLine < 0 || errorLine >= lines.length) {
+				return false;
+			}
 
- return this.applyDiff(diff, fileContent);
- });
- }
+			const currentLine = lines[errorLine];
+			const isApplied = currentLine === diff.modified;
+
+			if (isApplied) {
+				this.log('info', `[graph:diff_validate] Diff ${diff.id} already applied`, {
+					file: diff.file,
+					line: diff.lineStart,
+				});
+			}
+
+			return isApplied;
+		});
+	}
+
+	/**
+	 * Apply diff idempotently (only if not already applied)
+	 */
+	async applyDiffIdempotent(diff: Diff, fileContent: string): Promise<string> {
+		this.validateInput(diff, 'diff');
+		this.validateInput(fileContent, 'fileContent');
+
+		return this.retry(async () => {
+			const alreadyApplied = await this.isDiffAlreadyApplied(diff, fileContent);
+			if (alreadyApplied) {
+				this.log('info', `Skipping already-applied diff ${diff.id}`);
+				return fileContent;
+			}
+
+			return this.applyDiff(diff, fileContent);
+		});
+	}
 }

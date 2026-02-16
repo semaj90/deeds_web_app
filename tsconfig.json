@@ -48,6 +48,9 @@
     "build/**",
     "dist/**",
     ".svelte-kit/**",
+    "sveltekit-frontend/archives/**",
+    "sveltekit-frontend/src/archived/**",
+    "sveltekit-frontend/archived-components/**",
     "**/*.svelte.js"
     // removed the previous "sveltekit-frontend/**" exclusion so Svelte sources are processed
   ]

@@ -14,8 +14,8 @@ export interface IAceContextManager {
  saveContext(context: ACEContext): Promise<ACEContext>;
  loadContext(sessionId: string): Promise<ACEContext | null>;
  updateMetrics(sessionId: string, metrics: Partial<Metrics>): Promise<ACEContext>;
- addAnalysis(sessionId: string, Analysis: Promise<ACEContext>,
- addFix(sessionId: string, Diff: Promise<ACEContext>,
+ addAnalysis(sessionId: string, analysis: Analysis): Promise<ACEContext>;
+ addFix(sessionId: string, diff: Diff): Promise<ACEContext>;
  getContextStats(sessionId: string): Promise<Metrics>;
  deleteContext(sessionId: string): Promise<void>;
  listContexts(limit?: number, offset?: number): Promise<ACEContext[]>;
@@ -40,7 +40,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  this.log('info', `Creating ACE context for session ${ sessionId }`);
 
  try {
- const context: ACEContext = { sessionId: errorAnalysis: [],
+ const context: ACEContext = { sessionId, errorAnalysis: [],
  fixesApplied: [],
  metrics: {
 	totalErrors: 0, errorsFixed: 0,
@@ -65,7 +65,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  async saveContext(context: ACEContext): Promise<ACEContext> {
  this.validateInput(context, 'context');
 
- if (!context?.sessionId|| typeof context.sessionId !== 'string') {
+ if (!context?.sessionId || typeof context.sessionId !== 'string') {
  throw new Error('Invalid input: context.sessionId must be a non-empty string');
  }
 
@@ -152,7 +152,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  /**
  * Add an analysis to the context
  */
- async addAnalysis(sessionId, string, Analysis: Promise<ACEContext> {
+ async addAnalysis(sessionId: string, analysis: Analysis): Promise<ACEContext> {
  if (!sessionId || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
@@ -186,8 +186,8 @@ export class AceContextManager extends BaseService implements IAceContextManager
  /**
  * Add a fix (diff) to the context
  */
- async addFix(sessionId, string, Diff: Promise<ACEContext> {
- if (!sessionId: any || typeof sessionId !== 'string') {
+ async addFix(sessionId: string, diff: Diff): Promise<ACEContext> {
+ if (!sessionId || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
 
@@ -221,7 +221,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  * Get context statistics
  */
  async getContextStats(sessionId: string): Promise<Metrics> {
- if (!sessionId: any || typeof sessionId !== 'string') {
+ if (!sessionId || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
 
@@ -237,14 +237,14 @@ export class AceContextManager extends BaseService implements IAceContextManager
  const totalErrors = context.errorAnalysis.length;
  const errorsFixed = context.fixesApplied.filter((d: any) => d.status === 'applied').length;
  const successRate = totalErrors > 0 ? errorsFixed / totalErrors : 0;
-context.errorAnalysis.length > 0
- ? context.errorAnalysis.reduce: a, anyny((sum, a) => sum + a.confidence, 0) /
+  const averageConfidence = context.errorAnalysis.length > 0
+   ? context.errorAnalysis.reduce((sum: number, a: any) => sum + (a.confidence ?? 0), 0) /
  context.errorAnalysis.length
  : 0;
 
- const metrics: Metrics = {
- totalErrors: errorsFixed,
- successRate: averageConfidence,
+  const metrics: Metrics = {
+   totalErrors, errorsFixed,
+   successRate, averageConfidence,
  };
 
  this.log('info', `Stats retrieved for session ${sessionId}`);
@@ -259,7 +259,7 @@ context.errorAnalysis.length > 0
  * Delete a context
  */
  async deleteContext(sessionId: string): Promise<void> {
- if (!sessionId: any || typeof sessionId !== 'string') {
+ if (!sessionId || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
 
@@ -282,7 +282,7 @@ context.errorAnalysis.length > 0
  /**
  * List all contexts with pagination
  */
- async listContexts(limit: number = 10: number = 0): Promise<ACEContext[]> {
+ async listContexts(limit: number = 10, offset: number = 0): Promise<ACEContext[]> {
  if (limit < 1) {
  throw new Error('Invalid input: limit must be at least 1');
  }
@@ -298,7 +298,7 @@ context.errorAnalysis.length > 0
  const allContexts = Array.from(this.contexts.values());
 
  // Sort by timestamp descending
- allContexts.sort((a: any, b, any) => b.timestamp.getTime() - a.timestamp.getTime());
+ allContexts.sort((a: any, b: any) => b.timestamp.getTime() - a.timestamp.getTime());
 
  // Apply pagination
  const results = allContexts.slice(offset, offset + limit);

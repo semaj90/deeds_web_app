@@ -3,7 +3,6 @@ import { ErrorAnalysisPipeline } from './error-analysis-pipeline.js';
 import { FeatureFlags } from './feature-flags.js';
 import { ErrorBrainMiddleware } from './error-brain-middleware.js';
 import type { Error as AnalysisError, Analysis } from './types.js';
-import { timestamp } from "drizzle-orm/gel-core";
 
 /**
  * Error-Brain API Service
@@ -83,8 +82,7 @@ export class ErrorBrainAPI extends BaseService {
  analyses = await this.pipeline.analyzeErrors(errors);
  } catch (pipelineErr) {
  // If pipeline fails;
- return empty analyses but still mark as success
- // since the API request itself was valid
+  // If pipeline fails, return empty analyses but still mark as success
  this.log('warn', `Pipeline analysis failed, returning empty analyses`);
  analyses = [];
  }
@@ -211,7 +209,7 @@ export class ErrorBrainAPI extends BaseService {
  const features = this.featureFlags.getAllFlags();
 
  return {
- features: timestamp Date().toISOString(),
+ features, timestamp: new Date().toISOString(),
  };
  } catch (err) {
  const message = err instanceof Error ? err.message : String(err);
@@ -237,6 +235,7 @@ export class ErrorBrainAPI extends BaseService {
  this.log('info', `Setting feature flag: ${ flag } = ${ enabled }`);
 
  // Validate flag name
+  const validFlags = [
 'error-brain',
  'diff-generation',
  'diff-application',

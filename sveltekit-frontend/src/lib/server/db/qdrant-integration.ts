@@ -58,8 +58,9 @@ export class QdrantPostgreSQLService {
         try {
             await this.qdrant.upsert('legal_knowledge', {
                 points: [{
-	id: docId,
-                    vector: payload
+                    id: docId,
+                    vector,
+                    payload
                 }]
             });
         } catch (error) {

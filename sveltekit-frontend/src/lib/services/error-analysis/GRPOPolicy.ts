@@ -26,6 +26,7 @@ export interface GRPOConfig {
 	minExperiencesForUpdate: number;
 	validationSplit: number;
 	rollbackThreshold: number;
+	maxErrorGroups: number;
 }
 
 export class GRPOPolicy {
@@ -42,7 +43,8 @@ export class GRPOPolicy {
 			experienceBufferSize: config?.experienceBufferSize ?? 10000,
 			minExperiencesForUpdate: config?.minExperiencesForUpdate ?? 100,
 			validationSplit: config?.validationSplit ?? 0.2,
-			rollbackThreshold: config?.rollbackThreshold ?? 0.05
+			rollbackThreshold: config?.rollbackThreshold ?? 0.05,
+			maxErrorGroups: config?.maxErrorGroups ?? 1000
 		};
 
 		this.state = {
@@ -234,7 +236,7 @@ export class GRPOPolicy {
 	 * Update error groups with new experience
 	 */
 	private updateErrorGroups(experience: Experience): void {
-		const embedding = (experience as any).context?.embedding;
+		const embedding = experience.context?.embedding;
 		if (!embedding || embedding.length === 0) return;
 
 		const existingGroupId = this.findErrorGroup(embedding);
@@ -247,6 +249,12 @@ export class GRPOPolicy {
 				members: [experience.errorId],
 				commonPattern: ''
 			});
+			// Prune oldest groups if over limit
+			if (this.errorGroups.size > this.config.maxErrorGroups) {
+				const excess = this.errorGroups.size - this.config.maxErrorGroups;
+				const keys = [...this.errorGroups.keys()].slice(0, excess);
+				for (const k of keys) this.errorGroups.delete(k);
+			}
 		} else {
 			const group = this.errorGroups.get(existingGroupId)!;
 			group.members.push(experience.errorId);
@@ -320,7 +328,7 @@ export class GRPOPolicy {
 		const groupedExperiences = new Map<string, Experience[]>();
 
 		for (const exp of experiences) {
-			const embedding = (exp as any).context?.embedding || [];
+			const embedding = exp.context?.embedding || [];
 			const groupId = this.findErrorGroup(embedding) ?? 'ungrouped';
 			if (!groupedExperiences.has(groupId)) {
 				groupedExperiences.set(groupId, []);
@@ -337,7 +345,7 @@ export class GRPOPolicy {
 
 			for (let i = 0; i < groupExps.length; i++) {
 				const exp = groupExps[i];
-				const embedding = (exp as any).context?.embedding;
+				const embedding = exp.context?.embedding;
 				if (!embedding || embedding.length !== gradients.length) continue;
 
 				const advantage = rewards[i] - baseline;
@@ -368,7 +376,7 @@ export class GRPOPolicy {
 		let correct = 0;
 
 		for (const exp of experiences) {
-			const embedding = (exp as any).context?.embedding;
+			const embedding = exp.context?.embedding;
 			if (!embedding) continue;
 
 			const policyScore = this.applyPolicyWeights(embedding);
@@ -419,7 +427,7 @@ export class GRPOPolicy {
 		this.recordExperience(experience);
 
 		if (weightMultiplier > 1.0) {
-			const embedding = (experience as any).context?.embedding;
+			const embedding = experience.context?.embedding;
 			if (!embedding || embedding.length !== this.state.weights.length) {
 				return false;
 			}

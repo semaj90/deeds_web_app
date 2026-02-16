@@ -45,14 +45,19 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  this.log('info', `Using k=${k} clusters for ${errors.length} errors`);
 
  // Run K-means clustering
-embeddings.map((e: any) => e.vector),
+ const clusterAssignments = await this.kMeansClustering(
+ embeddings.map((e: any) => e.vector),
  k
  );
+
+
+
+
 
  // Group errors by cluster assignment
  const clusters: Cluster[] = [];
  for (let i = 0; i < k; i++) {
- const clusterErrors = errors.filter((_: any, idx, any) => clusterAssignments[idx] === i);
+ const clusterErrors = errors.filter((_: any, idx: number) => clusterAssignments[idx] === i);
 
  if (clusterErrors.length > 0) {
  const cluster: Cluster = {
@@ -64,14 +69,14 @@ embeddings.map((e: any) => e.vector),
  rootCause: '',
  impact: 0,
  createdAt: new Date(),
- },
+ }),
 	impact: await this.calculateImpact({
  id: '',
  errors: clusterErrors,
  rootCause: '',
  impact: 0,
  createdAt: new Date(),
- },
+ }),
 	createdAt: new Date(),
  };
  clusters.push(cluster);
@@ -137,7 +142,7 @@ embeddings.map((e: any) => e.vector),
  // Update centroids
  const newCentroids: number[][] = [];
  for (let i = 0; i < k; i++) {
- const clusterPoints = embeddings.filter((_: any, idx, any) => assignments[idx] === i);
+ const clusterPoints = embeddings.filter((_: any, idx: number) => assignments[idx] === i);
 
  if (clusterPoints.length > 0) {
  const centroid = new Array(dimension).fill(0);

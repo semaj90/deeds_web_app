@@ -3,8 +3,6 @@
  * Generates contextual diffs with surrounding code
  */
 
-import { line } from "drizzle-orm/pg-core";
-import type { context } from "fast-check";
 import { BaseService } from './base-service.js';
 import type { Diff, Error, ServiceConfig } from './types.js';
 

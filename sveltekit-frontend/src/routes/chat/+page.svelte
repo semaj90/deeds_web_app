@@ -1,9 +1,6 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
-    import { ChatSession } from '$lib/models/ChatSession.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+    import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 
-    // Reactive Chat State Logic using the Barrel Store Pattern
     const room = new ChatSession('case-101');
 </script>
 
@@ -53,30 +50,30 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 </div>
 
 <!-- Input form with test selectors -->
-<form method="POST" action="?/send" use:enhance={() => {
-    // Optimistic Update before server response
+<form onsubmit={(e) => {
+    e.preventDefault();
     const input = document.querySelector('input[name="message"]') as HTMLInputElement;
-    if (input.value) {
-        room.addOptimistic(input.value);
-        input.value = '';
-    }
-
-    return async ({ update }) => { await update({ reset: false }); };
+    const text = input.value.trim();
+    if (!text) return;
+    room.addOptimistic(text);
+    input.value = '';
+    room.sendMessage();
 }}>
-    <input type="hidden" name="chatId" value={room.chatId} />
     <input
         type="text"
         name="message"
         placeholder="Ask about the liability clause..."
         data-testid="chat-input"
         data-role="chat-input"
+        disabled={room.status === 'thinking' || room.status === 'streaming'}
     />
     <button
         type="submit"
         data-testid="chat-send"
         data-role="chat-send"
+        disabled={room.status === 'thinking' || room.status === 'streaming'}
     >
-        Send
+        {room.status === 'thinking' ? 'Thinking...' : room.status === 'streaming' ? 'Streaming...' : 'Send'}
     </button>
 </form>
 

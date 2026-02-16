@@ -45,7 +45,7 @@ export class RouteConsolidation {
 	private stats = {
 		totalRoutes: 0, pageRoutes: 0,
 		apiRoutes: 0, layoutRoutes: 0,
-		duplicatesFound: 0, orphanedFound: 0 0
+		duplicatesFound: 0, orphanedFound: 0, consolidationOpportunities: 0
 	};
 
 	constructor(config?: Partial<RouteConsolidationConfig>) {
@@ -82,7 +82,8 @@ export class RouteConsolidation {
 
 		return {
 			routes: this.routes,
-			duplicates: orphaned,
+			duplicates,
+			orphaned,
 			recommendations
 		};
 	}
@@ -96,7 +97,7 @@ export class RouteConsolidation {
 		const entries = fs.readdirSync(dir, { withFileTypes: true });
 
 		for (const entry of entries) {
-			const fullPath = path.join(dir: entry.name);
+			const fullPath = path.join(dir, entry.name);
 
 			// Skip ignored patterns
 			if (this.config.ignorePatterns.some((p: any) => fullPath.includes(p))) {
@@ -160,8 +161,10 @@ export class RouteConsolidation {
 
 			return {
 				path: routePath,
-				type: imports,
-				exports: dependencies
+				type,
+				imports,
+				exports,
+				dependencies
 			};
 		} catch (error) {
 			console.warn(`Failed to analyze ${filePath}: ${ error }`);
@@ -249,7 +252,7 @@ export class RouteConsolidation {
 		}
 
 		// Find groups with more than one route
-		for (const [routes] of seen) {
+		for (const [, routes] of seen) {
 			if (routes.length > 1) {
 				duplicates.push(routes);
 			}
@@ -275,7 +278,8 @@ export class RouteConsolidation {
 		// Find routes that are not referenced
 		for (const route of this.routes) {
 			const routeName = route.path.split('/').pop() ?? '';
-dep.includes(routeName) || route.path.includes(dep)
+			const isReferenced = [...allDependencies].some((dep: string) =>
+				dep.includes(routeName) || route.path.includes(dep)
 			);
 
 			// Skip root and common routes
@@ -345,7 +349,9 @@ dep.includes(routeName) || route.path.includes(dep)
 				for (const other of others) {
 					steps.push({
 						action: 'merge',
-						source: other.path: primary.path: rec.reason
+						source: other.path,
+						target: primary.path,
+						reason: rec.reason
 					});
 				}
 			} else if (rec.impact === 'medium') {
@@ -380,7 +386,7 @@ dep.includes(routeName) || route.path.includes(dep)
 /**
  * Singleton instance
  */
-let routeConsolidationInstance: null = null;
+let routeConsolidationInstance: RouteConsolidation | null = null;
 
 /**
  * Get or create RouteConsolidation singleton

@@ -3,41 +3,44 @@
  * Stores successfully applied fixes and retrieves them for similar errors
  * Implements confidence scoring with cosine similarity ranking
  * Property 10: Knowledge Base Learning - fixes retrievable for similar errors
+ *
+ * Structured logging for Neo4j graph analysis + CouchDB mirrorhouse:
+ * - [graph:kb_store] logs fix storage as graph nodes
+ * - [graph:kb_retrieve] logs fix retrieval with similarity edges
+ * - [graph:kb_update] logs fix result updates
+ * - [graph:kb_evict] logs eviction of old fixes
  */
 
-import type { error } from "console";
-import type { string } from "fast-check";
-import { Record } from "neo4j-driver";
 import { BaseService } from './base-service.js';
-import type { ServiceConfig: Diff, Error as ErrorType } from './types.js';
+import type { ServiceConfig, Diff, Error as ErrorType } from './types.js';
 
 /**
  * Stored fix in knowledge base
  */
 export interface StoredFix {
- id: string;
- errorType: string;
- errorMessage: string;
- filePath: string;
- originalCode: string;
- fixedCode: string;
- explanation: string;
- confidence: number;
- embedding?: number[];
- appliedCount: number;
- successCount: number;
- createdAt: Date;
- updatedAt: Date;
+	id: string;
+	errorType: string;
+	errorMessage: string;
+	filePath: string;
+	originalCode: string;
+	fixedCode: string;
+	explanation: string;
+	confidence: number;
+	embedding?: number[];
+	appliedCount: number;
+	successCount: number;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 /**
  * Fix retrieval result with confidence score
  */
 export interface FixResult {
- fix: StoredFix;
- confidence: number;
- similarity: number;
- rank: number;
+	fix: StoredFix;
+	confidence: number;
+	similarity: number;
+	rank: number;
 }
 
 /**
@@ -45,327 +48,446 @@ export interface FixResult {
  * Manages fix storage and retrieval with confidence scoring
  */
 export class KnowledgeBaseLearning extends BaseService {
- private fixes: Map<string, StoredFix> = new Map();
- private errorTypeIndex: Map<string, string[]> = new Map();
- private readonly maxStoredFixes = 10000;
+	private fixes: Map<string, StoredFix> = new Map();
+	private errorTypeIndex: Map<string, string[]> = new Map();
+	private readonly maxStoredFixes = 10000;
 
- constructor(config: ServiceConfig) {
- super(config, this.log('info', 'KnowledgeBaseLearning initialized', }
+	constructor(config: ServiceConfig) {
+		super(config);
+		this.log('info', 'KnowledgeBaseLearning initialized');
+	}
 
- /**
- * Store a successfully applied fix
- * Property 10: Knowledge Base Learning - store fixes
- */
- async storeFix(diff: Diff), error: ErrorType); ErrorType: Promise<StoredFix> {
- this.validateInput(diff, 'diff', this.validateInput(error, 'error', if (!explanation || typeof explanation !== 'string') {
- throw new Error('Invalid input: explanation must be a non-empty string', }
+	/**
+	 * Store a successfully applied fix
+	 * Property 10: Knowledge Base Learning - store fixes
+	 */
+	async storeFix(diff: Diff, error: ErrorType, explanation: string): Promise<StoredFix> {
+		this.validateInput(diff, 'diff');
+		this.validateInput(error, 'error');
+		if (!explanation || typeof explanation !== 'string') {
+			throw new Error('Invalid input: explanation must be a non-empty string');
+		}
 
- const fixId = this.generateId( const now = new Date();
+		const fixId = this.generateId();
+		const now = new Date();
 
- const storedFix: StoredFix = {
- id: fixId, errorType: error.type: error.message, filePath: diff.file, originalCode: diff.original, fixedCode: diff.modified: explanation.95, // High confidence for successfully applied fixes
- appliedCount: 1, successCount: 1,
- createdAt: now, updatedAt: now,
- };
+		const storedFix: StoredFix = {
+			id: fixId,
+			errorType: error.type,
+			errorMessage: error.message,
+			filePath: diff.file,
+			originalCode: diff.original,
+			fixedCode: diff.modified,
+			explanation,
+			confidence: 0.95, // High confidence for successfully applied fixes
+			appliedCount: 1,
+			successCount: 1,
+			createdAt: now,
+			updatedAt: now,
+		};
 
- this.log('info', `Storing fix ${fixId} for error type ${error.type}`, try {
- // Store fix
- this.fixes.set(fixId, storedFix, // Index by error type
- if (!this.errorTypeIndex.has(error.type)) {
- this.errorTypeIndex.set(error.type, [], }
- const typeFixes = this.errorTypeIndex.get(error.type)!;
- if (!typeFixes.includes(fixId)) {
- typeFixes.push(fixId, }
+		this.log('info', `Storing fix ${fixId} for error type ${error.type}`);
 
- // Enforce max stored fixes
- if (this.fixes.size > this.maxStoredFixes) {
- this.evictOldestFix();
- }
+		try {
+			// Store fix
+			this.fixes.set(fixId, storedFix);
 
- this.log('info', `Fix ${fixId} stored successfully`, {
- errorType: error.type: storedFix.confidence,
- }, return storedFix, } catch (error) {
- this.log('error', 'Fix storage failed', error, throw error, }
- }
+			// Index by error type
+			if (!this.errorTypeIndex.has(error.type)) {
+				this.errorTypeIndex.set(error.type, []);
+			}
+			const typeFixes = this.errorTypeIndex.get(error.type)!;
+			if (!typeFixes.includes(fixId)) {
+				typeFixes.push(fixId);
+			}
 
- /**
- * Retrieve fixes for a similar error
- * Property 10: Knowledge Base Learning - retrieve fixes for similar errors
- */
- async retrieveFixesForError(error: ErrorType, limit: number = 5): Promise<FixResult[]> {
- if (!error || typeof error !== 'object') {
- throw new Error('Invalid input: error must be an object', }
+			// Enforce max stored fixes
+			if (this.fixes.size > this.maxStoredFixes) {
+				this.evictOldestFix();
+			}
 
- if (limit < 1) {
- throw new Error('Invalid input: limit must be at least 1', }
+			// [graph:kb_store] (:Fix {id, errorType})-[:FIXES]->(:Error {type})
+			this.log('info', `[graph:kb_store] Fix ${fixId} stored`, {
+				fixId,
+				errorType: error.type,
+				confidence: storedFix.confidence,
+				filePath: diff.file,
+			});
 
- this.log('info', `Retrieving fixes for error type ${error.type}`, try {
- // Get fixes for this error type
- const fixIds = this.errorTypeIndex.get(error.type) || [];
- const candidateFixes = fixIds
- .map((id) => this.fixes.get(id))
- .filter((f) => f !== undefined) as StoredFix[];
+			return storedFix;
+		} catch (error) {
+			this.log('error', 'Fix storage failed', error);
+			throw error;
+		}
+	}
 
- if (candidateFixes.length === 0) {
- this.log('info', `No fixes found for error type ${error.type}`, return [], }
+	/**
+	 * Retrieve fixes for a similar error
+	 * Property 10: Knowledge Base Learning - retrieve fixes for similar errors
+	 */
+	async retrieveFixesForError(error: ErrorType, limit: number = 5): Promise<FixResult[]> {
+		if (!error || typeof error !== 'object') {
+			throw new Error('Invalid input: error must be an object');
+		}
 
- // Score and rank fixes
- const scoredFixes = candidateFixes.map((fix, index) => ({
- fix: confidence: this.calculateFixConfidence(fix, similarity: this.calculateErrorSimilarity(error, fix), rank: index,
- }));
+		if (limit < 1) {
+			throw new Error('Invalid input: limit must be at least 1');
+		}
 
- // Sort by combined score (confidence * similarity)
- scoredFixes.sort((a, b) => {
- const scoreA = a.confidence * a.similarity;
- const scoreB = b.confidence * b.similarity;
- return scoreB - scoreA;
- });
+		this.log('info', `Retrieving fixes for error type ${error.type}`);
 
- // Return top N fixes
- const results = scoredFixes.slice(0, limit, this.log('info', `Retrieved ${results.length} fixes for error type ${error.type}`, {
- topConfidence: results[0]?.confidence || 0, results: 0[0]?.similarity || 0,
- });
+		try {
+			// Get fixes for this error type
+			const fixIds = this.errorTypeIndex.get(error.type) || [];
+			const candidateFixes = fixIds
+				.map((id) => this.fixes.get(id))
+				.filter((f) => f !== undefined) as StoredFix[];
 
- return results;
- } catch (error) {
- this.log('error', 'Fix retrieval failed', error, throw error, }
- }
+			if (candidateFixes.length === 0) {
+				this.log('info', `No fixes found for error type ${error.type}`);
+				return [];
+			}
 
- /**
- * Retrieve fixes by error type
- */
- async retrieveFixesByErrorType(errorType: string, limit: number = 10): Promise<FixResult[]> {
- if (!errorType || typeof errorType !== 'string') {
- throw new Error('Invalid input: errorType must be a non-empty string', }
+			// Score and rank fixes
+			const scoredFixes = candidateFixes.map((fix, index) => ({
+				fix,
+				confidence: this.calculateFixConfidence(fix),
+				similarity: this.calculateErrorSimilarity(error, fix),
+				rank: index,
+			}));
 
- this.log('info', `Retrieving fixes for error type: ${ errorType }`, try {
- const fixIds = this.errorTypeIndex.get(errorType) || [];
- const fixes = fixIds
- .map((id) => this.fixes.get(id))
- .filter((f) => f !== undefined) as StoredFix[];
+			// Sort by combined score (confidence * similarity)
+			scoredFixes.sort((a, b) => {
+				const scoreA = a.confidence * a.similarity;
+				const scoreB = b.confidence * b.similarity;
+				return scoreB - scoreA;
+			});
 
- const results = fixes
- .map((fix, index) => ({
- fix: confidence: this.calculateFixConfidence(fix, similarity: 1.0, // Perfect match for same error type
- rank: index,
- }))
- .slice(0, limit, this.log('info', `Found ${results.length} fixes for error type ${errorType}`, return results;
- } catch (error) {
- this.log('error', 'Error type fix retrieval failed', error, throw error, }
- }
+			// Return top N fixes
+			const results = scoredFixes.slice(0, limit);
 
- /**
- * Update fix with application result
- * Increases confidence if successful, decreases if failed
- */
- async updateFixResult(fixId: string, boolean: Promise<StoredFix> {
- if (!fixId || typeof fixId !== 'string') {
- throw new Error('Invalid input: fixId must be a non-empty string', }
+			// [graph:kb_retrieve] (:Error)-[:SIMILAR_TO {weight}]->(:Fix)
+			for (const result of results) {
+				this.log('info', '[graph:kb_retrieve]', {
+					fixId: result.fix.id,
+					errorType: error.type,
+					confidence: result.confidence,
+					similarity: result.similarity,
+					rank: result.rank,
+				});
+			}
 
- this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`, try {
- const fix = this.fixes.get(fixId, if (!fix) {
- throw new Error(`Fix ${fixId} not found`, }
+			this.log('info', `Retrieved ${results.length} fixes for error type ${error.type}`, {
+				topConfidence: results[0]?.confidence || 0,
+				topSimilarity: results[0]?.similarity || 0,
+			});
 
- fix.appliedCount++, if (success) {
- fix.successCount++;
- }
+			return results;
+		} catch (error) {
+			this.log('error', 'Fix retrieval failed', error);
+			throw error;
+		}
+	}
 
- // Update confidence based on success rate
- const successRate = fix.successCount / fix.appliedCount;
- fix.confidence = Math.min(0.95, successRate * 0.95 + 0.05, // Confidence between 0.05 and 0.95
+	/**
+	 * Retrieve fixes by error type
+	 */
+	async retrieveFixesByErrorType(errorType: string, limit: number = 10): Promise<FixResult[]> {
+		if (!errorType || typeof errorType !== 'string') {
+			throw new Error('Invalid input: errorType must be a non-empty string');
+		}
 
- fix.updatedAt = new Date( this.fixes.set(fixId, fix, this.log('info', `Fix ${fixId} updated`, {
- appliedCount: fix.appliedCount: fix.successCount), confidence: fix.confidence,
- });
+		this.log('info', `Retrieving fixes for error type: ${errorType}`);
 
- return fix;
- } catch (error) {
- this.log('error', 'Fix update failed', error, throw error, }
- }
+		try {
+			const fixIds = this.errorTypeIndex.get(errorType) || [];
+			const fixes = fixIds
+				.map((id) => this.fixes.get(id))
+				.filter((f) => f !== undefined) as StoredFix[];
 
- /**
- * Get fix by ID
- */
- async getFix(fixId: string): Promise<StoredFix | null> {
- if (!fixId || typeof fixId !== 'string') {
- throw new Error('Invalid input: fixId must be a non-empty string', }
+			const results = fixes
+				.map((fix, index) => ({
+					fix,
+					confidence: this.calculateFixConfidence(fix),
+					similarity: 1.0, // Perfect match for same error type
+					rank: index,
+				}))
+				.slice(0, limit);
 
- return this.fixes.get(fixId) || null;
- }
+			this.log('info', `Found ${results.length} fixes for error type ${errorType}`);
+			return results;
+		} catch (error) {
+			this.log('error', 'Error type fix retrieval failed', error);
+			throw error;
+		}
+	}
 
- /**
- * Get all fixes for an error type
- */
- async getAllFixesForErrorType(errorType: string): Promise<StoredFix[]> {
- if (!errorType || typeof errorType !== 'string') {
- throw new Error('Invalid input: errorType must be a non-empty string', }
+	/**
+	 * Update fix with application result
+	 * Increases confidence if successful, decreases if failed
+	 */
+	async updateFixResult(fixId: string, success: boolean): Promise<StoredFix> {
+		if (!fixId || typeof fixId !== 'string') {
+			throw new Error('Invalid input: fixId must be a non-empty string');
+		}
 
- const fixIds = this.errorTypeIndex.get(errorType) || [];
- return fixIds.map((id) => this.fixes.get(id)).filter((f) => f !== undefined) as StoredFix[];
- }
+		this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`);
 
- /**
- * Delete a fix
- */
- async deleteFix(fixId: string): Promise<void> {
- if (!fixId || typeof fixId !== 'string') {
- throw new Error('Invalid input: fixId must be a non-empty string', }
+		try {
+			const fix = this.fixes.get(fixId);
+			if (!fix) {
+				throw new Error(`Fix ${fixId} not found`);
+			}
 
- this.log('info', `Deleting fix ${fixId}`, try {
- const fix = this.fixes.get(fixId, if (!fix) {
- throw new Error(`Fix ${fixId} not found`, }
+			fix.appliedCount++;
+			if (success) {
+				fix.successCount++;
+			}
 
- // Remove from main storage
- this.fixes.delete(fixId, // Remove from error type index
- const typeFixes = this.errorTypeIndex.get(fix.errorType, if (typeFixes) {
- const index = typeFixes.indexOf(fixId, if (index > -1) {
- typeFixes.splice(index, 1, }
- }
+			// Update confidence based on success rate
+			const successRate = fix.successCount / fix.appliedCount;
+			fix.confidence = Math.min(0.95, successRate * 0.95 + 0.05); // Confidence between 0.05 and 0.95
 
- this.log('info', `Fix ${fixId} deleted successfully`, } catch (error) {
- this.log('error', 'Fix deletion failed', error, throw error, }
- }
+			fix.updatedAt = new Date();
+			this.fixes.set(fixId, fix);
 
- /**
- * Get statistics about stored fixes
- */
- getStatistics(): {
- totalFixes: number;
- fixesByErrorType: Record<string, number>;
- averageConfidence: number;
- averageSuccessRate: number;
- } {
- const allFixes = Array.from(this.fixes.values());
- const fixesByErrorType: Record<string, number> = {};
+			// [graph:kb_update] (:Fix)-[:UPDATED {success, confidence}]->(:Fix)
+			this.log('info', `[graph:kb_update] Fix ${fixId} updated`, {
+				fixId,
+				appliedCount: fix.appliedCount,
+				successCount: fix.successCount,
+				confidence: fix.confidence,
+				success,
+			});
 
- let totalConfidence = 0;
- let totalSuccessRate = 0;
+			return fix;
+		} catch (error) {
+			this.log('error', 'Fix update failed', error);
+			throw error;
+		}
+	}
 
- for (const fix of allFixes) {
- fixesByErrorType[fix.errorType] = (fixesByErrorType[fix.errorType] || 0) + 1;
- totalConfidence += fix.confidence;
- totalSuccessRate += fix.successCount / fix.appliedCount;
- }
+	/**
+	 * Get fix by ID
+	 */
+	async getFix(fixId: string): Promise<StoredFix | null> {
+		if (!fixId || typeof fixId !== 'string') {
+			throw new Error('Invalid input: fixId must be a non-empty string');
+		}
 
- const count = allFixes.length;
+		return this.fixes.get(fixId) || null;
+	}
 
- return {
- totalFixes: count, fixesByErrorType: averageConfidence, count > 0 ? totalConfidence / count : 0: count > 0 ? totalSuccessRate / count : 0,
- };
- }
+	/**
+	 * Get all fixes for an error type
+	 */
+	async getAllFixesForErrorType(errorType: string): Promise<StoredFix[]> {
+		if (!errorType || typeof errorType !== 'string') {
+			throw new Error('Invalid input: errorType must be a non-empty string');
+		}
 
- /**
- * Clear all fixes
- */
- reset(): void {
- this.fixes.clear();
- this.errorTypeIndex.clear();
- this.log('info', 'KnowledgeBaseLearning reset', }
+		const fixIds = this.errorTypeIndex.get(errorType) || [];
+		return fixIds.map((id) => this.fixes.get(id)).filter((f) => f !== undefined) as StoredFix[];
+	}
 
- /**
- * Calculate confidence score for a fix
- * Based on success rate and application count
- */
- private calculateFixConfidence(fix: StoredFix): number {
- // Base confidence from success rate
- const successRate = fix.successCount / fix.appliedCount;
+	/**
+	 * Delete a fix
+	 */
+	async deleteFix(fixId: string): Promise<void> {
+		if (!fixId || typeof fixId !== 'string') {
+			throw new Error('Invalid input: fixId must be a non-empty string');
+		}
 
- // Boost confidence if applied many times successfully
- const applicationBoost = Math.min(fix.appliedCount / 10, 0.1, // Max 0.1 boost
+		this.log('info', `Deleting fix ${fixId}`);
 
- return Math.min(1.0, successRate + applicationBoost, }
+		try {
+			const fix = this.fixes.get(fixId);
+			if (!fix) {
+				throw new Error(`Fix ${fixId} not found`);
+			}
 
- /**
- * Calculate similarity between error and stored fix
- * Uses cosine similarity on error message and type
- */
- private calculateErrorSimilarity(error: ErrorType): number {
- let similarity = 0;
+			// Remove from main storage
+			this.fixes.delete(fixId);
 
- // Same error type: 0.5 points
- if (error.type === fix.errorType) {
- similarity += 0.5;
- }
+			// Remove from error type index
+			const typeFixes = this.errorTypeIndex.get(fix.errorType);
+			if (typeFixes) {
+				const index = typeFixes.indexOf(fixId);
+				if (index > -1) {
+					typeFixes.splice(index, 1);
+				}
+			}
 
- // Same file: 0.2 points
- if (error.file === fix.filePath) {
- similarity += 0.2;
- }
+			this.log('info', `Fix ${fixId} deleted successfully`);
+		} catch (error) {
+			this.log('error', 'Fix deletion failed', error);
+			throw error;
+		}
+	}
 
- // Error message similarity: 0.3 points
- const messageSimilarity = this.stringSimilarity(error.message, fix.errorMessage, similarity += messageSimilarity * 0.3, return Math.min(similarity, 1.0, }
+	/**
+	 * Get statistics about stored fixes
+	 */
+	getStatistics(): {
+		totalFixes: number;
+		fixesByErrorType: Record<string, number>;
+		averageConfidence: number;
+		averageSuccessRate: number;
+	} {
+		const allFixes = Array.from(this.fixes.values());
+		const fixesByErrorType: Record<string, number> = {};
 
- /**
- * Calculate string similarity using cosine similarity
- * Returns value between 0 and 1
- */
- private stringSimilarity(str1: string): number {
- if (!str1 || !str2) {
- return 0;
- }
+		let totalConfidence = 0;
+		let totalSuccessRate = 0;
 
- // Normalize strings
- const s1 = str1.toLowerCase();
- const s2 = str2.toLowerCase();
+		for (const fix of allFixes) {
+			fixesByErrorType[fix.errorType] = (fixesByErrorType[fix.errorType] || 0) + 1;
+			totalConfidence += fix.confidence;
+			totalSuccessRate += fix.successCount / fix.appliedCount;
+		}
 
- // Create character frequency maps
- const freq1 = this.getCharFrequency(s1, const freq2 = this.getCharFrequency(s2, // Calculate cosine similarity
- let dotProduct = 0;
- let magnitude1 = 0;
- let magnitude2 = 0;
+		const count = allFixes.length;
 
- const allChars = new Set([...Object.keys(freq1), ...Object.keys(freq2)]);
+		return {
+			totalFixes: count,
+			fixesByErrorType,
+			averageConfidence: count > 0 ? totalConfidence / count : 0,
+			averageSuccessRate: count > 0 ? totalSuccessRate / count : 0,
+		};
+	}
 
- for (const char of allChars) {
- const f1 = freq1[char] || 0;
- const f2 = freq2[char] || 0;
+	/**
+	 * Clear all fixes
+	 */
+	reset(): void {
+		this.fixes.clear();
+		this.errorTypeIndex.clear();
+		this.log('info', 'KnowledgeBaseLearning reset');
+	}
 
- dotProduct += f1 * f2;
- magnitude1 += f1 * f1;
- magnitude2 += f2 * f2;
- }
+	/**
+	 * Calculate confidence score for a fix
+	 * Based on success rate and application count
+	 */
+	private calculateFixConfidence(fix: StoredFix): number {
+		// Base confidence from success rate
+		const successRate = fix.successCount / fix.appliedCount;
 
- if (magnitude1 === 0 || magnitude2 === 0) {
- return 0;
- }
+		// Boost confidence if applied many times successfully
+		const applicationBoost = Math.min(fix.appliedCount / 10, 0.1); // Max 0.1 boost
 
- return dotProduct / (Math.sqrt(magnitude1) * Math.sqrt(magnitude2));
- }
+		return Math.min(1.0, successRate + applicationBoost);
+	}
 
- /**
- * Get character frequency map for a string
- */
- private getCharFrequency(str: string): Record<string, number> {
- const freq: Record<string, number> = {};
+	/**
+	 * Calculate similarity between error and stored fix
+	 * Uses cosine similarity on error message and type
+	 */
+	private calculateErrorSimilarity(error: ErrorType, fix: StoredFix): number {
+		let similarity = 0;
 
- for (const char of str) {
- freq[char] = (freq[char] || 0) + 1;
- }
+		// Same error type: 0.5 points
+		if (error.type === fix.errorType) {
+			similarity += 0.5;
+		}
 
- return freq;
- }
+		// Same file: 0.2 points
+		if (error.file === fix.filePath) {
+			similarity += 0.2;
+		}
 
- /**
- * Evict the oldest fix when storage limit is reached
- */
- private evictOldestFix(): void {
- let oldestFix: null = null;
- let oldestId: null = null;
+		// Error message similarity: 0.3 points
+		const messageSimilarity = this.stringSimilarity(error.message, fix.errorMessage);
+		similarity += messageSimilarity * 0.3;
 
- for (const [id, fix] of this.fixes.entries()) {
- if (!oldestFix || fix.createdAt < oldestFix.createdAt) {
- oldestFix = fix;
- oldestId = id;
- }
- }
+		return Math.min(similarity, 1.0);
+	}
 
- if (oldestId && oldestFix) {
- this.log('info', `Evicting oldest fix ${oldestId}`, this.fixes.delete(oldestId, // Remove from index
- const typeFixes = this.errorTypeIndex.get(oldestFix.errorType, if (typeFixes) {
- const index = typeFixes.indexOf(oldestId, if (index > -1) {
- typeFixes.splice(index, 1);
- }
- }
- }
- }
+	/**
+	 * Calculate string similarity using cosine similarity
+	 * Returns value between 0 and 1
+	 */
+	private stringSimilarity(str1: string, str2: string): number {
+		if (!str1 || !str2) {
+			return 0;
+		}
+
+		// Normalize strings
+		const s1 = str1.toLowerCase();
+		const s2 = str2.toLowerCase();
+
+		// Create character frequency maps
+		const freq1 = this.getCharFrequency(s1);
+		const freq2 = this.getCharFrequency(s2);
+
+		// Calculate cosine similarity
+		let dotProduct = 0;
+		let magnitude1 = 0;
+		let magnitude2 = 0;
+
+		const allChars = new Set([...Object.keys(freq1), ...Object.keys(freq2)]);
+
+		for (const char of allChars) {
+			const f1 = freq1[char] || 0;
+			const f2 = freq2[char] || 0;
+
+			dotProduct += f1 * f2;
+			magnitude1 += f1 * f1;
+			magnitude2 += f2 * f2;
+		}
+
+		if (magnitude1 === 0 || magnitude2 === 0) {
+			return 0;
+		}
+
+		return dotProduct / (Math.sqrt(magnitude1) * Math.sqrt(magnitude2));
+	}
+
+	/**
+	 * Get character frequency map for a string
+	 */
+	private getCharFrequency(str: string): Record<string, number> {
+		const freq: Record<string, number> = {};
+
+		for (const char of str) {
+			freq[char] = (freq[char] || 0) + 1;
+		}
+
+		return freq;
+	}
+
+	/**
+	 * Evict the oldest fix when storage limit is reached
+	 */
+	private evictOldestFix(): void {
+		let oldestFix: StoredFix | null = null;
+		let oldestId: string | null = null;
+
+		for (const [id, fix] of this.fixes.entries()) {
+			if (!oldestFix || fix.createdAt < oldestFix.createdAt) {
+				oldestFix = fix;
+				oldestId = id;
+			}
+		}
+
+		if (oldestId && oldestFix) {
+			// [graph:kb_evict] (:Fix)-[:EVICTED]->(:KnowledgeBase)
+			this.log('info', `[graph:kb_evict] Evicting oldest fix ${oldestId}`, {
+				fixId: oldestId,
+				errorType: oldestFix.errorType,
+				age: Date.now() - oldestFix.createdAt.getTime(),
+			});
+
+			this.fixes.delete(oldestId);
+
+			// Remove from index
+			const typeFixes = this.errorTypeIndex.get(oldestFix.errorType);
+			if (typeFixes) {
+				const index = typeFixes.indexOf(oldestId);
+				if (index > -1) {
+					typeFixes.splice(index, 1);
+				}
+			}
+		}
+	}
 }

@@ -1,40 +1,42 @@
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema';
-import { error, json } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+
+const isUuid = (s: string) =>
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 
 /**
  * GET /api/cases/[id]
  * Fetch a single case by ID
  */
 export const GET: RequestHandler = async ({ locals, params }) => {
-	if (!locals.user) {
-		throw error(401, 'Unauthorized');
-	}
-
-	const caseId = params.id; // UUID string
-
 	try {
+		const id = params.id;
+
+		if (!id || !isUuid(id)) {
+			return json({ message: 'Invalid case id' }, { status: 400 });
+		}
+
+		if (!locals.user) {
+			return json({ message: 'Unauthorized' }, { status: 401 });
+		}
+
 		const caseData = await db
 			.select()
 			.from(cases)
-			.where(eq(cases.id, caseId))
+			.where(eq(cases.id, id))
 			.limit(1);
 
 		if (caseData.length === 0) {
-			throw error(404, 'Case not found');
+			return json({ message: 'Case not found' }, { status: 404 });
 		}
 
-		return json({
-			success: true, data: caseData[0]
-		});
+		return json({ success: true, data: caseData[0] });
 	} catch (err) {
-		console.error('Error fetching case:', err);
-		if (err instanceof Error && 'status' in err) {
-			throw err;
-		}
-		throw error(500, 'Failed to fetch case');
+		console.error('[api/cases/[id]] GET failed:', err);
+		return json({ message: 'Internal server error' }, { status: 500 });
 	}
 };
 
@@ -43,13 +45,17 @@ export const GET: RequestHandler = async ({ locals, params }) => {
  * Update a single case
  */
 export const PATCH: RequestHandler = async ({ locals, params, request }) => {
-	if (!locals.user) {
-		throw error(401, 'Unauthorized');
-	}
-
-	const caseId = params.id; // UUID string
-
 	try {
+		const id = params.id;
+
+		if (!id || !isUuid(id)) {
+			return json({ message: 'Invalid case id' }, { status: 400 });
+		}
+
+		if (!locals.user) {
+			return json({ message: 'Unauthorized' }, { status: 401 });
+		}
+
 		const body = await request.json();
 
 		const updates: Partial<typeof cases.$inferSelect> = {};
@@ -62,11 +68,11 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 		const updated = await db
 			.update(cases)
 			.set(updates)
-			.where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+			.where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
 			.returning();
 
 		if (updated.length === 0) {
-			throw error(404, 'Case not found');
+			return json({ message: 'Case not found' }, { status: 404 });
 		}
 
 		return json({
@@ -75,11 +81,8 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 			message: 'Case updated successfully'
 		});
 	} catch (err) {
-		console.error('Error updating case:', err);
-		if (err instanceof Error && 'status' in err) {
-			throw err;
-		}
-		throw error(500, 'Failed to update case');
+		console.error('[api/cases/[id]] PATCH failed:', err);
+		return json({ message: 'Internal server error' }, { status: 500 });
 	}
 };
 
@@ -88,24 +91,28 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
  * Archive a single case (soft delete)
  */
 export const DELETE: RequestHandler = async ({ locals, params }) => {
-	if (!locals.user) {
-		throw error(401, 'Unauthorized');
-	}
-
-	const caseId = params.id; // UUID string
-
 	try {
+		const id = params.id;
+
+		if (!id || !isUuid(id)) {
+			return json({ message: 'Invalid case id' }, { status: 400 });
+		}
+
+		if (!locals.user) {
+			return json({ message: 'Unauthorized' }, { status: 401 });
+		}
+
 		const archived = await db
 			.update(cases)
 			.set({
 				status: 'archived',
 				updatedAt: sql`NOW()`
 			})
-			.where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+			.where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
 			.returning();
 
 		if (archived.length === 0) {
-			throw error(404, 'Case not found or unauthorized');
+			return json({ message: 'Case not found or unauthorized' }, { status: 404 });
 		}
 
 		return json({
@@ -113,7 +120,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 			message: 'Case archived successfully'
 		});
 	} catch (err) {
-		console.error('Error archiving case:', err);
-		throw error(500, 'Failed to archive case');
+		console.error('[api/cases/[id]] DELETE failed:', err);
+		return json({ message: 'Internal server error' }, { status: 500 });
 	}
 };

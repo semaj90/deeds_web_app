@@ -20,6 +20,7 @@ export interface EscalationServiceConfig {
 	jsonlDir: string;
 	humanFixWeightMultiplier: number;
 	maxOpenTickets: number;
+	maxTotalTickets: number;
 	autoCloseAfterDays: number;
 }
 
@@ -63,6 +64,7 @@ export class EscalationService {
 			jsonlDir: config?.jsonlDir ?? './data/escalations',
 			humanFixWeightMultiplier: config?.humanFixWeightMultiplier ?? 2.0,
 			maxOpenTickets: config?.maxOpenTickets ?? 1000,
+			maxTotalTickets: config?.maxTotalTickets ?? 5000,
 			autoCloseAfterDays: config?.autoCloseAfterDays ?? 30
 		};
 	}
@@ -103,6 +105,20 @@ export class EscalationService {
 
 		try {
 			this.tickets.set(ticketId, ticket);
+
+			// Prune resolved/closed tickets when total exceeds limit
+			if (this.tickets.size > this.config.maxTotalTickets) {
+				const closedKeys: string[] = [];
+				for (const [id, t] of this.tickets) {
+					if (t.status === 'resolved' || t.status === 'closed') {
+						closedKeys.push(id);
+					}
+				}
+				const excess = this.tickets.size - this.config.maxTotalTickets;
+				for (const k of closedKeys.slice(0, excess)) {
+					this.tickets.delete(k);
+				}
+			}
 
 			const storage = getJSONLStorage({ baseDir: this.config.jsonlDir });
 			await storage.bufferRecord({

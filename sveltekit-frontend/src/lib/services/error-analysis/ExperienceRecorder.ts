@@ -18,6 +18,9 @@ export interface ExperienceRecorderConfig {
 	similarityThreshold: number;
 	maxGroupSize: number;
 	embeddingDimension: number;
+	maxExperiences: number;
+	maxGroups: number;
+	maxStrategyStats: number;
 }
 
 export interface RecordResult {
@@ -55,7 +58,10 @@ export class ExperienceRecorder {
 			jsonlDir: config?.jsonlDir ?? './data/experiences',
 			similarityThreshold: config?.similarityThreshold ?? 0.85,
 			maxGroupSize: config?.maxGroupSize ?? 100,
-			embeddingDimension: config?.embeddingDimension ?? 384
+			embeddingDimension: config?.embeddingDimension ?? 384,
+			maxExperiences: config?.maxExperiences ?? 10000,
+			maxGroups: config?.maxGroups ?? 1000,
+			maxStrategyStats: config?.maxStrategyStats ?? 500
 		};
 	}
 
@@ -86,8 +92,13 @@ export class ExperienceRecorder {
 		};
 
 		try {
-			// Store in memory
+			// Store in memory (prune oldest if over limit)
 			this.experiences.set(experienceId, experience);
+			if (this.experiences.size > this.config.maxExperiences) {
+				const excess = this.experiences.size - this.config.maxExperiences;
+				const keys = [...this.experiences.keys()].slice(0, excess);
+				for (const k of keys) this.experiences.delete(k);
+			}
 
 			// Update strategy stats
 			this.updateStrategyStats(strategy.id, outcome, strategy.confidence);
@@ -142,6 +153,11 @@ export class ExperienceRecorder {
 		stats.totalConfidence += confidence;
 
 		this.strategyStats.set(strategyId, stats);
+		if (this.strategyStats.size > this.config.maxStrategyStats) {
+			const excess = this.strategyStats.size - this.config.maxStrategyStats;
+			const keys = [...this.strategyStats.keys()].slice(0, excess);
+			for (const k of keys) this.strategyStats.delete(k);
+		}
 	}
 
 	/**
@@ -173,7 +189,7 @@ export class ExperienceRecorder {
 			this.updateGroupCentroid(bestGroup, embedding);
 			return bestGroup;
 		} else {
-			// Create new group
+			// Create new group (prune oldest if over limit)
 			const newGroupId = `group_${uuidv4().slice(0, 8)}`;
 			this.groups.set(newGroupId, {
 				id: newGroupId,
@@ -181,6 +197,11 @@ export class ExperienceRecorder {
 				members: [experience.id],
 				commonPattern: ''
 			});
+			if (this.groups.size > this.config.maxGroups) {
+				const excess = this.groups.size - this.config.maxGroups;
+				const keys = [...this.groups.keys()].slice(0, excess);
+				for (const k of keys) this.groups.delete(k);
+			}
 			this.stats.groupsCreated++;
 			return newGroupId;
 		}
