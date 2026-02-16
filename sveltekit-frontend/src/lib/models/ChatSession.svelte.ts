@@ -367,6 +367,11 @@ export class ChatSession {
 			}
 		} finally {
 			this.abortController = null;
+			// Ensure status returns to idle after stream completes
+			// (guards against SSE payloads missing a 'done' status chunk)
+			if (this.status === 'thinking' || this.status === 'streaming') {
+				this.status = 'idle';
+			}
 		}
 	}
 

@@ -22,24 +22,28 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
   test.beforeEach(async ({ page }) => {
     // Mock ALL chat-related API endpoints to avoid OOM from real Ollama calls
     await page.route('**/api/sse/**', async (route) => {
-      // Return a mock SSE response for the chat session
-      const mockResponse = `data: {"type":"AI_REPLY","content":"This is a mock AI response for testing purposes. The key elements of a valid contract include offer, acceptance, consideration, and mutual assent.","confidence":0.85,"citations":["Cal. Civ. Code § 1550"],"timestamp":"${new Date().toISOString()}"}\n\n`;
+      // Return SSEChunk format that ChatSession._handleServerInference expects
+      const mockContent = 'This is a mock AI response for testing purposes. The key elements of a valid contract include offer, acceptance, consideration, and mutual assent.';
+      const streamChunk = `data: {"id":"mock-1","role":"assistant","content":"${mockContent}","status":"streaming","confidence":0.85}\n\n`;
+      const doneChunk = `data: {"id":"mock-1","role":"assistant","content":"${mockContent}","status":"done","confidence":0.85,"contextUsed":["Cal. Civ. Code § 1550"]}\n\n`;
 
       await route.fulfill({
         status: 200,
         contentType: 'text/event-stream',
-        body: mockResponse,
+        body: streamChunk + doneChunk,
       });
     });
 
     await page.route('**/api/chat/stream**', async (route) => {
-      // Return a mock SSE response
-      const mockResponse = `data: {"type":"chunk","content":"This is a mock AI response for testing purposes. "}\n\ndata: {"type":"chunk","content":"The key elements of a valid contract include offer, acceptance, consideration, and mutual assent."}\n\ndata: {"type":"done","confidence":0.85,"citations":["Cal. Civ. Code § 1550"]}\n\n`;
+      // Return SSEChunk format that ChatSession._handleServerInference expects
+      const mockContent = 'This is a mock AI response for testing purposes. The key elements of a valid contract include offer, acceptance, consideration, and mutual assent.';
+      const streamChunk = `data: {"id":"mock-1","role":"assistant","content":"${mockContent}","status":"streaming","confidence":0.85}\n\n`;
+      const doneChunk = `data: {"id":"mock-1","role":"assistant","content":"${mockContent}","status":"done","confidence":0.85,"contextUsed":["Cal. Civ. Code § 1550"]}\n\n`;
 
       await route.fulfill({
         status: 200,
         contentType: 'text/event-stream',
-        body: mockResponse,
+        body: streamChunk + doneChunk,
       });
     });
 
