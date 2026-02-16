@@ -64,6 +64,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	response.headers.set('X-Request-ID', requestId);
 	response.headers.set('X-Response-Time', `${duration}ms`);
 
+	// Cross-origin isolation headers — required for SharedArrayBuffer / threaded WASM (ORT)
+	response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+	response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
+
 	// Enable streaming for AI endpoints
 	if (event.url.pathname.startsWith('/api/ai/')) {
 		response.headers.set('Content-Type', 'application/x-ndjson');
