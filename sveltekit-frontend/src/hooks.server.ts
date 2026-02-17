@@ -3,6 +3,7 @@
  * Handles request/response processing and middleware
  */
 
+import { dev } from '$app/environment';
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
@@ -17,8 +18,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// Add timing information
 	const startTime = Date.now();
 
-	// === DEV BYPASS AUTH ===
-	if (process.env.DEV_BYPASS_AUTH === 'true' || process.env.ENABLE_GPU === 'true') {
+	// === DEV BYPASS AUTH (only in development mode) ===
+	if (dev && process.env.DEV_BYPASS_AUTH === 'true') {
 		// Use a valid UUID for database compatibility
 		const devUserId = '00000000-0000-0000-0000-000000000001';
 		event.locals.user = {

@@ -1,4 +1,4 @@
-# Production Dockerfile for SvelteKit Frontend
+# Production Dockerfile for SvelteKit Frontend (adapter-node)
 FROM node:20-alpine AS builder
 
 # Set working directory
@@ -19,15 +19,15 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine AS production
 
-# Install serve for static files
-RUN npm install -g serve
-
-# Set working directory
 WORKDIR /app
 
-# Copy built application from builder stage
-COPY --from=builder /app/build ./build
+# Copy package files and install production-only deps
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
+RUN npm ci --omit=dev
+
+# Copy built application from builder
+COPY --from=builder /app/build ./build
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
@@ -37,6 +37,10 @@ RUN adduser -S sveltekit -u 1001
 RUN chown -R sveltekit:nodejs /app
 USER sveltekit
 
+# adapter-node reads HOST and PORT from env
+ENV HOST=0.0.0.0
+ENV PORT=3000
+
 # Expose port
 EXPOSE 3000
 
@@ -44,5 +48,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD node -e "require('http').get('http://localhost:3000', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
-# Start the application
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Start the SvelteKit server (adapter-node output)
+CMD ["node", "build/index.js"]

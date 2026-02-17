@@ -76,11 +76,11 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
     await expect(page).toHaveTitle(/Chat|Legal AI/i);
 
     // Verify chat window exists
-    const chatWindow = page.locator('.chat-window, [data-testid="chat-window"]');
+    const chatWindow = page.locator('[data-testid="chat-window"]');
     await expect(chatWindow).toBeVisible();
 
     // Verify message input exists
-    const messageInput = page.locator('input[name="message"], textarea[name="message"]');
+    const messageInput = page.locator('[data-testid="chat-input"]');
     await expect(messageInput).toBeVisible();
 
     // Take screenshot
@@ -94,8 +94,8 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
 
   test('should send message and receive AI response', async ({ page }) => {
     // Find message input
-    const messageInput = page.locator('input[name="message"], textarea[name="message"]').first();
-    const sendButton = page.locator('button[type="submit"]').first();
+    const messageInput = page.locator('[data-testid="chat-input"]');
+    const sendButton = page.locator('[data-testid="chat-send"]');
 
     // Type legal question
     const testMessage = 'What are the key elements of a valid contract under California law?';
@@ -152,9 +152,9 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
 
   test('should display confidence score if available', async ({ page }) => {
     // Send message
-    const messageInput = page.locator('input[name="message"], textarea[name="message"]').first();
+    const messageInput = page.locator('[data-testid="chat-input"]');
     await messageInput.fill('Explain the statute of limitations for personal injury in California');
-    await page.locator('button[type="submit"]').first().click();
+    await page.locator('[data-testid="chat-send"]').click();
 
     // Wait for AI response
     await page.waitForTimeout(10000); // Wait for mocked response
@@ -180,9 +180,9 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
 
   test('should display citations if available', async ({ page }) => {
     // Send message
-    const messageInput = page.locator('input[name="message"], textarea[name="message"]').first();
+    const messageInput = page.locator('[data-testid="chat-input"]');
     await messageInput.fill('What does 18 U.S.C. § 1001 cover?');
-    await page.locator('button[type="submit"]').first().click();
+    await page.locator('[data-testid="chat-send"]').click();
 
     // Wait for AI response
     await page.waitForTimeout(10000); // Wait for mocked response
@@ -207,6 +207,8 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
   });
 
   test('should show loading state while AI is thinking', async ({ page }) => {
+    // Unroute first to avoid overlapping route handlers
+    await page.unroute('**/api/chat/stream**');
     // Override the mock with a delayed response so loading state is visible
     await page.route('**/api/chat/stream**', async (route) => {
       await new Promise(resolve => setTimeout(resolve, 3000)); // 3s delay
@@ -219,9 +221,9 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
     });
 
     // Send message
-    const messageInput = page.locator('input[name="message"], textarea[name="message"]').first();
+    const messageInput = page.locator('[data-testid="chat-input"]');
     await messageInput.fill('Test loading state');
-    await page.locator('button[type="submit"]').first().click();
+    await page.locator('[data-testid="chat-send"]').click();
 
     // Check for loading indicator (may be .loading, .thinking, or data-testid)
     const loadingIndicator = page.locator('.loading, .thinking, [data-testid="loading"], [data-role="chat-streaming"]');
@@ -251,9 +253,9 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
     ];
 
     for (let i = 0; i < messages.length; i++) {
-      const messageInput = page.locator('input[name="message"], textarea[name="message"]').first();
+      const messageInput = page.locator('[data-testid="chat-input"]');
       await messageInput.fill(messages[i]);
-      await page.locator('button[type="submit"]').first().click();
+      await page.locator('[data-testid="chat-send"]').click();
 
       // Wait for form processing and optimistic update
       await page.waitForTimeout(1500);
@@ -311,9 +313,9 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
 
   test('should display low confidence warning', async ({ page }) => {
     // Send message
-    const messageInput = page.locator('input[name="message"], textarea[name="message"]').first();
+    const messageInput = page.locator('[data-testid="chat-input"]');
     await messageInput.fill('What is the exact statute number for littering in Nome, Alaska?');
-    await page.locator('button[type="submit"]').first().click();
+    await page.locator('[data-testid="chat-send"]').click();
 
     // Wait for response
     await page.waitForTimeout(10000);
