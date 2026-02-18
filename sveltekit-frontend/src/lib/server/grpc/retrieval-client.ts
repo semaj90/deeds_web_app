@@ -39,9 +39,30 @@ export interface SearchResult {
 	rerank?: {
 		cosine: number;
 		sharedCitations: number;
+		jurisdictionMatch: number;
 		sectionProximity: number;
 		finalScore: number;
 	};
+}
+
+export interface GraphNeighbor {
+	nodeId: string;
+	title: string;
+	evidenceType: string;
+	connectionType: string;
+	strength: number;
+	confidence: number;
+	aiReasoning?: string;
+}
+
+export interface DocumentContext {
+	evidenceId: string;
+	fileName: string;
+	fileType: string;
+	description: string;
+	aiSummary?: string;
+	aiTagsJson?: string;
+	keyEntitiesJson?: string;
 }
 
 export interface ContextBundle {
@@ -50,6 +71,8 @@ export interface ContextBundle {
 	sectionPath: string[];
 	heading: string;
 	citations: string[];
+	graphNeighbors: GraphNeighbor[];
+	documentContext?: DocumentContext;
 }
 
 export interface SearchTiming {
@@ -57,6 +80,8 @@ export interface SearchTiming {
 	searchMs: number;
 	rerankMs: number;
 	hopMs: number;
+	kagMs: number;
+	dagMs: number;
 	totalMs: number;
 }
 
@@ -176,10 +201,36 @@ function mapProtoResult(r: any): SearchResult {
 			? {
 					cosine: r.rerank.cosine ?? 0,
 					sharedCitations: r.rerank.sharedCitations ?? 0,
+					jurisdictionMatch: r.rerank.jurisdictionMatch ?? 0,
 					sectionProximity: r.rerank.sectionProximity ?? 0,
 					finalScore: r.rerank.finalScore ?? 0
 				}
 			: undefined
+	};
+}
+
+function mapProtoNeighbor(n: any): GraphNeighbor {
+	return {
+		nodeId: n.nodeId ?? '',
+		title: n.title ?? '',
+		evidenceType: n.evidenceType ?? '',
+		connectionType: n.connectionType ?? '',
+		strength: n.strength ?? 0,
+		confidence: n.confidence ?? 0,
+		aiReasoning: n.aiReasoning || undefined,
+	};
+}
+
+function mapProtoDocContext(d: any): DocumentContext | undefined {
+	if (!d) return undefined;
+	return {
+		evidenceId: d.evidenceId ?? '',
+		fileName: d.fileName ?? '',
+		fileType: d.fileType ?? '',
+		description: d.description ?? '',
+		aiSummary: d.aiSummary || undefined,
+		aiTagsJson: d.aiTagsJson || undefined,
+		keyEntitiesJson: d.keyEntitiesJson || undefined,
 	};
 }
 
@@ -191,14 +242,18 @@ function mapProtoResponse(response: any): EvidenceSearchResponse {
 			siblings: (b.siblings ?? []).map(mapProtoResult),
 			sectionPath: b.sectionPath ?? [],
 			heading: b.heading ?? '',
-			citations: b.citations ?? []
+			citations: b.citations ?? [],
+			graphNeighbors: (b.graphNeighbors ?? []).map(mapProtoNeighbor),
+			documentContext: mapProtoDocContext(b.documentContext),
 		})),
 		timing: {
 			embedMs: Math.round(response.timing?.embedMs ?? 0),
 			searchMs: Math.round(response.timing?.searchMs ?? 0),
 			rerankMs: Math.round(response.timing?.rerankMs ?? 0),
 			hopMs: Math.round(response.timing?.hopMs ?? 0),
-			totalMs: Math.round(response.timing?.totalMs ?? 0)
+			kagMs: Math.round(response.timing?.kagMs ?? 0),
+			dagMs: Math.round(response.timing?.dagMs ?? 0),
+			totalMs: Math.round(response.timing?.totalMs ?? 0),
 		},
 		cacheSource: response.cacheSource || undefined
 	};

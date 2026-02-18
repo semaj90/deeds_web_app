@@ -201,10 +201,15 @@ export async function getEmbeddingCache(
 
 	const memEntry = embeddingCache.get(key);
 	if (memEntry && now - memEntry.ts < memEntry.ttlMs) {
-		memEntry.lastAccess = now;
-		embeddingCache.delete(key);
-		embeddingCache.set(key, memEntry);
-		return { entry: memEntry, source: 'memory' };
+		if (!isValidEmbedding(memEntry.embedding)) {
+			console.warn(`[EmbeddingCache] Evicting invalid memory entry (dim=${memEntry.embedding?.length ?? 0})`);
+			embeddingCache.delete(key);
+		} else {
+			memEntry.lastAccess = now;
+			embeddingCache.delete(key);
+			embeddingCache.set(key, memEntry);
+			return { entry: memEntry, source: 'memory' };
+		}
 	}
 
 	const redis = getRedisClient();
@@ -214,10 +219,15 @@ export async function getEmbeddingCache(
 			const cached = await redis.get(redisKey);
 			if (cached) {
 				const entry: EmbeddingCacheEntry = JSON.parse(cached);
-				entry.lastAccess = now;
-				embeddingCache.set(key, entry);
-				evictEmbeddingCache();
-				return { entry, source: 'redis' };
+				if (!isValidEmbedding(entry.embedding)) {
+					console.warn(`[EmbeddingCache] Evicting invalid Redis entry (dim=${entry.embedding?.length ?? 0})`);
+					await redis.del(redisKey);
+				} else {
+					entry.lastAccess = now;
+					embeddingCache.set(key, entry);
+					evictEmbeddingCache();
+					return { entry, source: 'redis' };
+				}
 			}
 		} catch (error) {
 			console.warn('[EmbeddingCache] Redis get failed:', error);
@@ -228,13 +238,32 @@ export async function getEmbeddingCache(
 }
 
 /**
- * Cache embedding result
+ * Validate embedding vector before caching.
+ * Rejects wrong dimensions, NaN, Infinity, and zero-vectors.
+ */
+function isValidEmbedding(embedding: number[], expectedDim = 768): boolean {
+	if (!Array.isArray(embedding) || embedding.length !== expectedDim) return false;
+	let allZero = true;
+	for (let i = 0; i < embedding.length; i++) {
+		if (!Number.isFinite(embedding[i])) return false;
+		if (embedding[i] !== 0) allZero = false;
+	}
+	return !allZero;
+}
+
+/**
+ * Cache embedding result.
+ * Validates dimension (768) and finite values before writing.
  */
 export async function setEmbeddingCache(
 	text: string,
 	embedding: number[],
 	model: string = 'default'
 ): Promise<void> {
+	if (!isValidEmbedding(embedding)) {
+		console.warn(`[EmbeddingCache] Rejected invalid embedding (dim=${embedding?.length ?? 0})`);
+		return;
+	}
 	const key = generateEmbeddingKey(text, model);
 	const now = Date.now();
 

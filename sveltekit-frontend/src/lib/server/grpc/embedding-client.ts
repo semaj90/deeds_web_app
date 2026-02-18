@@ -37,7 +37,7 @@ async function getGrpcClient(): Promise<any> {
 		const protoLoader = await import('@grpc/proto-loader');
 		const { resolve } = await import('path');
 
-		const PROTO_PATH = resolve(process.cwd(), 'proto/embedding.proto');
+		const PROTO_PATH = resolve(process.cwd(), 'proto/active/embedding.proto');
 
 		const packageDefinition = await protoLoader.load(PROTO_PATH, {
 			keepCase: false,

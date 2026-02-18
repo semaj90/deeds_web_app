@@ -74,12 +74,12 @@ proto/
 import { generateEmbeddings, generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 ```
 
-### 2. Retrieval Client (planned: `src/lib/server/grpc/retrieval-client.ts`)
+### 2. Retrieval Client (`src/lib/server/grpc/retrieval-client.ts`)
 ```typescript
-// Will wrap the existing evidence search pipeline
+// Lazy-loads @grpc/grpc-js + @grpc/proto-loader
 // Connects to RETRIEVAL_GRPC_URL (default: 127.0.0.1:50053)
 // Falls back to inline TypeScript pipeline if gRPC unavailable
-import { searchEvidence, searchCodebase } from '$lib/server/grpc/retrieval-client.js';
+import { searchEvidenceViaGrpc, checkRetrievalHealth } from '$lib/server/grpc/retrieval-client.js';
 ```
 
 ---
@@ -125,12 +125,16 @@ The RetrievalService wraps the existing SvelteKit `POST /api/evidence/search` pi
 3. If gRPC unavailable, falls back to inline pipeline (same as today)
 4. Add Redis caching at the retrieval-service layer (sha256 of query+filters)
 
-### Proto Messages
+### Proto Messages (v2 — promoted from deeds_labs/proto/retrieval-v2.proto)
 See `proto/active/retrieval.proto` for full message definitions. Key types:
-- `EvidenceSearchRequest` → maps 1:1 to current POST body
-- `ContextBundle` → hit + siblings + sectionPath + citations
-- `SearchTiming` → embed_ms, search_ms, rerank_ms, hop_ms, total_ms
-- `CodebaseSearchRequest` → dual-vector codebase search
+- `EvidenceSearchRequest` → maps 1:1 to current POST body + policy messages
+- `ContextBundle` → hit + siblings + sectionPath + citations + GraphNeighbor[] + DocumentContext
+- `GraphNeighbor` → KAG: 1-hop from yorha_evidence_connections (strength, confidence, ai_reasoning)
+- `DocumentContext` → DAG: evidence + yorha_evidence_nodes (ai_summary, ai_tags, key_entities)
+- `SearchTiming` → embed_ms, search_ms, rerank_ms, hop_ms, kag_ms, dag_ms, total_ms
+- `RankPolicy` / `GraphHopPolicy` / `PrefilterPolicy` → client-tunable weights
+- `CodebaseSearchRequest` → dual-vector codebase search + path_prefixes filter
+- Streaming RPCs: `StreamEvidence`, `StreamCodebase` → progressive delivery for SSE
 
 ---
 
