@@ -5,7 +5,7 @@ import { createHash, randomBytes } from 'crypto';
 
 // Conditional imports to avoid circular dependencies
 // In a real app, this should be handled by dependency injection
-const redisServicePromise = import('$lib/server/redis').then((m) => m.redisService).catch(() => null);
+const redisServicePromise = import('$lib/server/redis').then((m) => m.redis).catch(() => null);
 
 // SearchResult interface
 export interface SearchResult {
@@ -632,11 +632,20 @@ export class LokiRedisCache extends EventEmitter {
                 }
                 const documents = collection.find(lokiQuery);
                 for (const doc of documents) {
+                    const legalDoc = doc as LegalDocument;
                     results.push({
                         id: doc.id,
-                        document: doc as LegalDocument,
+                        title: legalDoc.title ?? '',
+                        content: legalDoc.content ?? '',
+                        document: {
+                            ...legalDoc,
+                            cacheTimestamp: Date.now(),
+                            accessCount: 0,
+                            cacheLocation: 'loki',
+                            compressed: false,
+                            syncStatus: 'synced'
+                        },
                         score: this.calculateRelevanceScore(doc),
-                        matchType: 'fuzzy',
                     });
                 }
             }

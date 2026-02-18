@@ -68,7 +68,29 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 	}
 
 	const scope = url.searchParams.get('scope') ?? 'all';
+	const async_ = url.searchParams.get('async') === 'true';
 	const dirs = SCOPE_GLOBS[scope] ?? SCOPE_GLOBS.all;
+
+	// For large jobs (scope=all or async=true), enqueue via RabbitMQ if available
+	if (async_ || scope === 'all') {
+		try {
+			const { rabbitmq } = await import('$lib/server/queue/rabbitmq-manager-fixed.js');
+			const enqueued = await rabbitmq.publishCodebaseIndex({
+				scope,
+				requestedBy: locals.user.id
+			});
+			if (enqueued) {
+				return json({
+					success: true,
+					async: true,
+					scope,
+					message: `Indexing job enqueued for scope="${scope}". Check GET /api/codebase/index for progress.`
+				});
+			}
+		} catch {
+			// RabbitMQ not available — fall through to inline indexing
+		}
+	}
 
 	const start = performance.now();
 
@@ -92,6 +114,7 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 
 	return json({
 		success: true,
+		async: false,
 		scope,
 		filesScanned: allFiles.length,
 		chunksExtracted: chunks.length,

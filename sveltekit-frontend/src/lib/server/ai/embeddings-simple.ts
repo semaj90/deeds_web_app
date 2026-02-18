@@ -18,10 +18,10 @@ const cache: CacheInterface = {
 const getCachedEmbedding = cache.getCachedEmbedding;
 const cacheEmbedding = cache.cacheEmbedding;
 
-// Target embedding dimension (defaults to 384)
+// Target embedding dimension (768 = embeddinggemma native output)
 const TARGET_DIM: number = (() => {
-    const v = Number.parseInt(process.env?.EMBEDDING_DIMENSIONS ?? '384', 10);
-    return Number.isFinite(v) && v > 0 ? v : 384;
+    const v = Number.parseInt(process.env?.EMBEDDING_DIMENSIONS ?? '768', 10);
+    return Number.isFinite(v) && v > 0 ? v : 768;
 })();
 
 function ensureDim(vec: number[] | Float32Array | null | undefined, target: number = TARGET_DIM): number[] {

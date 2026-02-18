@@ -22,7 +22,7 @@ export class QdrantManager {
             {
                 name: this.collections.documents,
                 vectors: {
-	content: { size: 1536, distance: 'Cosine' },
+	content: { size: 768, distance: 'Cosine' },
 	summary: {
 	size: 768, distance: 'Cosine' }
                 }
@@ -30,13 +30,13 @@ export class QdrantManager {
 	{
                 name: this.collections.cases,
                 vectors: {
-	description: { size: 1536, distance: 'Cosine' }
+	description: { size: 768, distance: 'Cosine' }
                 }
             },
 	{
                 name: this.collections.evidence,
                 vectors: {
-	content: { size: 1536, distance: 'Cosine' }
+	content: { size: 768, distance: 'Cosine' }
                 }
             },
 	{
@@ -48,7 +48,7 @@ export class QdrantManager {
 	{
                 name: this.collections.embeddings_cache,
                 vectors: {
-	embedding: { size: 1536, distance: 'Cosine' }
+	embedding: { size: 768, distance: 'Cosine' }
                 }
             }
         ];
@@ -225,7 +225,7 @@ export class QdrantManager {
         try {
             const results = await this.client.search(this.collections.embeddings_cache, {
                 vector: {
-	name: 'embedding', vector: new Array(1536).fill(0) },
+	name: 'embedding', vector: new Array(768).fill(0) },
 	limit: 1,
                 filter: {
 	must: [

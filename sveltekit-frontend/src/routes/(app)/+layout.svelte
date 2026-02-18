@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import type { LayoutData } from './$types';
 	import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
+	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
 
 	interface Props {
 		data: LayoutData;
@@ -120,6 +121,7 @@
 </div>
 
 <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
+<CodebaseSearch />
 
 <style>
 	.app-shell {

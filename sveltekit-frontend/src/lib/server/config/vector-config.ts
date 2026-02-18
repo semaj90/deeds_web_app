@@ -1,5 +1,5 @@
 /**
- * Vector Configuration - Standardized to 384 dimensions
+ * Vector Configuration - Standardized to 768 dimensions
  *
  * Purpose: Centralize vector dimension configuration for:
  * - Drizzle ORM schemas
@@ -7,14 +7,14 @@
  * - PostgreSQL pgvector
  * - API endpoints
  *
- * Model: latest (384 dimensions)
- * Date: 2025-10-17
+ * Model: embeddinggemma:latest (768 dimensions native)
+ * Date: 2026-02-18
  */
 export const VECTOR_CONFIG = {
 	// Primary model:
 	MODEL: 'embeddinggemma:latest',
-	// Standard dimension
-	DIMENSIONS: 384,
+	// Standard dimension (768 = embeddinggemma native output)
+	DIMENSIONS: 768,
 	// Distance
 	DISTANCE_METRIC: {
 	POSTGRES: 'vector_cosine_ops',
@@ -37,12 +37,12 @@ export const VECTOR_CONFIG = {
 	},
 	// Collection
 	COLLECTIONS: {
-	LEGAL_DOCUMENTS: 'legal_documents_384',
-		CASE_EMBEDDINGS: 'case_embeddings_384',
-		EVIDENCE: 'evidence_384',
-		RAG_DOCUMENTS: 'rag_documents_384',
-		CHAT_MESSAGES: 'chat_messages_384',
-		KNOWLEDGE_BASE: 'knowledge_base_384',
+	LEGAL_DOCUMENTS: 'legal_documents_768',
+		CASE_EMBEDDINGS: 'case_embeddings_768',
+		EVIDENCE: 'evidence_768',
+		RAG_DOCUMENTS: 'rag_documents_768',
+		CHAT_MESSAGES: 'chat_messages_768',
+		KNOWLEDGE_BASE: 'knowledge_base_768',
 	},
 	// Docker Desktop URLs (production-ready) — read from ENV for production portability
 	DOCKER_SERVICES: {

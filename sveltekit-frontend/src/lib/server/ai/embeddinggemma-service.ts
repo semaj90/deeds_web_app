@@ -11,7 +11,7 @@ import { generateEmbedding as requestEmbedding } from './ollama-client.js';
 import { cognitiveCache as cacheService } from './cache.js';
 
 const DEFAULT_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
-const DEFAULT_DIMENSIONS = Number(process.env.OLLAMA_EMBED_DIM ?? 384);
+const DEFAULT_DIMENSIONS = Number(process.env.OLLAMA_EMBED_DIM ?? 768);
 const DEFAULT_CACHE_TTL_SECONDS = Number(process.env.EMBEDDING_CACHE_TTL ?? 60 * 60 * 24 * 7); // 7 days
 
 export interface EmbeddingOptions {
