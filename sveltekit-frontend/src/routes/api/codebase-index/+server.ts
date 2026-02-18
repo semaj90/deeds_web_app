@@ -1,7 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
+import { getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
+const QDRANT_URL = getQdrantUrl();
+const OLLAMA_URL = getOllamaUrl();
 const COLLECTION_NAME = 'fastmcp_file_profiles';
 
 interface FileProfile {
@@ -141,7 +143,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// Get embedding from Ollama
-		const embedResponse = await fetch('http://localhost:11434/api/embeddings', {
+		const embedResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

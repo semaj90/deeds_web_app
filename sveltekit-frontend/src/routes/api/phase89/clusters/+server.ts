@@ -1,20 +1,17 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
+import { getQdrantUrl, getDatabaseUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
 const { Pool } = pg;
 
 const qdrant = new QdrantClient({
-	url: process.env?.QDRANT_URL ?? 'http://127.0.0.1:6333'
+	url: getQdrantUrl()
 });
 
 const aiPool = new Pool({
-	host: '127.0.0.1',
-	port: 5434,
-	database: 'legal_ai_db',
-	user: 'legal_admin',
-	password: '123456'
+	connectionString: getDatabaseUrl()
 });
 
 export const GET: RequestHandler = async () => {

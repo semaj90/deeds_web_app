@@ -1,15 +1,10 @@
 import pg from 'pg';
 import type { RequestHandler } from './$types';
 
+import { getDatabaseUrl } from '$lib/config/env.server.js';
 const { Pool } = pg;
 
-const pgPool = new Pool({
-	host: '127.0.0.1',
-	port: 5434,
-	database: 'legal',
-	user: 'user',
-	password: 'pass'
-});
+const pgPool = new Pool({ connectionString: getDatabaseUrl() });
 
 const clients = new Set<ReadableStreamDefaultController>();
 

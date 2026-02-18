@@ -5,6 +5,7 @@
 
 import { json } from '@sveltejs/kit';
 import { createClient } from 'redis';
+import { getRedisUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
@@ -13,7 +14,7 @@ let redis: ReturnType<typeof createClient> | null = null;
 async function getRedis() {
   if (!redis) {
     redis = createClient({
-      url: process.env?.REDIS_URL ?? 'redis://127.0.0.1:6379'
+      url: getRedisUrl()
     });
     await redis.connect().catch(() => null);
   }

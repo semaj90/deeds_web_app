@@ -1,4 +1,5 @@
 import type { PageServerLoad } from './$types';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 
 interface ErrorCard {
     id: string;
@@ -54,7 +55,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 
         const filter = must.length > 0 ? { must } : undefined;
 
-        const response = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
+        const response = await fetch(`${getQdrantUrl()}/collections/phase90_error_cards/points/scroll`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -72,7 +73,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
         const errors = data.result.points.map(p => p.payload);
 
         // Get collection stats
-        const statsResponse = await fetch('http://localhost:6333/collections/phase90_error_cards');
+        const statsResponse = await fetch(`${getQdrantUrl()}/collections/phase90_error_cards`);
         const stats = await statsResponse.json();
 
         // Aggregate stats from returned errors

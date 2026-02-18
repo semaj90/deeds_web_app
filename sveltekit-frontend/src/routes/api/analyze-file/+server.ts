@@ -13,8 +13,9 @@ import { sql } from 'drizzle-orm';
 import { readFile } from 'fs/promises';
 import { promisify } from 'util';
 
+import { getOllamaUrl } from '$lib/config/env.server.js';
 const execAsync = promisify(exec);
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
+const OLLAMA_URL = getOllamaUrl();
 
 export async function POST({ request }: RequestEvent) {
 	try {

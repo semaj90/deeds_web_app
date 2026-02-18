@@ -5,16 +5,12 @@ import fs from 'fs/promises';
 import path from 'path';
 import pg from 'pg';
 import type { RequestHandler } from './$types';
+import { getDatabaseUrl, getQdrantUrl } from '$lib/config/env.server.js';
 
+const QDRANT_URL = getQdrantUrl();
 const { Pool } = pg;
 
-const pgPool = new Pool({
-	host: '127.0.0.1',
-	port: 5434,
-	database: 'legal',
-	user: 'user',
-	password: 'pass'
-});
+const pgPool = new Pool({ connectionString: getDatabaseUrl() });
 
 export const GET: RequestHandler = async () => {
 	try {
@@ -184,7 +180,7 @@ async function getKBCounts(): Promise<Map<string, number>> {
 	const counts = new Map();
 
 	try {
-		const response = await fetch('http://localhost:6333/collections/phase76_knowledge_base/points/scroll', {
+		const response = await fetch(`${QDRANT_URL}/collections/phase76_knowledge_base/points/scroll`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

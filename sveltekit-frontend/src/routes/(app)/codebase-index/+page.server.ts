@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 	const search = url.searchParams.get('search') ?? '';
 
 	// Construct API URL with params
-	const apiUrl = new URL('/api/codebase-index', 'http://localhost:5173'); // Internal fetch or absolute if needed
+	const apiUrl = new URL('/api/codebase-index', url.origin); // Internal fetch or absolute if needed
 	apiUrl.searchParams.set('limit', limit);
 	if (role && role !== 'all') apiUrl.searchParams.set('role', role);
 	if (risk && risk !== 'all') apiUrl.searchParams.set('risk', risk);

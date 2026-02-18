@@ -8,6 +8,7 @@
  */
 
 import { db } from '$lib/server/db/client';
+import { getOllamaUrl, getRedisUrl } from '$lib/config/env.server.js';
 import { scrollPoints, upsertPoints } from '$lib/server/qdrant-http';
 import { json } from '@sveltejs/kit';
 import { exec } from 'child_process';
@@ -16,8 +17,8 @@ import { createClient } from 'redis';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
-const redis = createClient({ url: 'redis://127.0.0.1:6379' });
-const OLLAMA_URL = 'http://127.0.0.1:11434';
+const redis = createClient({ url: getRedisUrl() });
+const OLLAMA_URL = getOllamaUrl();
 const PYTHON_PATH = 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe';
 
 export async function POST() {

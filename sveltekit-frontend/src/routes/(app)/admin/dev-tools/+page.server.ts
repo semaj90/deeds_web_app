@@ -1,4 +1,5 @@
 import type { PageServerLoad } from './$types';
+import { getMinioConfig, getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 
 interface ServiceHealth {
 	name: string;
@@ -57,14 +58,14 @@ async function getQdrantCollections(): Promise<{
 	totalPoints: number;
 }> {
 	try {
-		const res = await fetch('http://localhost:6333/collections');
+		const res = await fetch(`${getQdrantUrl()}/collections`);
 		if (!res.ok) return { collections: [], totalPoints: 0 };
 		const data = await res.json();
 
 		const collections = await Promise.all(
 			(data.result?.collections ?? []).map(async (col: { name: string }) => {
 				try {
-					const info = await fetch(`http://localhost:6333/collections/${col.name}`);
+					const info = await fetch(`${getQdrantUrl()}/collections/${col.name}`);
 					const infoData = await info.json();
 					const result = infoData.result ?? {};
 					return {
@@ -91,7 +92,7 @@ async function getQdrantCollections(): Promise<{
 async function getIndexingStatus(): Promise<IndexingStatus> {
 	const result: IndexingStatus = { codebase: null, errors: null };
 	try {
-		const codeRes = await fetch('http://localhost:6333/collections/phase79_codebase');
+		const codeRes = await fetch(`${getQdrantUrl()}/collections/phase79_codebase`);
 		if (codeRes.ok) {
 			const data = await codeRes.json();
 			const r = data.result ?? {};
@@ -104,7 +105,7 @@ async function getIndexingStatus(): Promise<IndexingStatus> {
 		/* Qdrant not running */
 	}
 	try {
-		const errRes = await fetch('http://localhost:6333/collections/phase79_error_analysis');
+		const errRes = await fetch(`${getQdrantUrl()}/collections/phase79_error_analysis`);
 		if (errRes.ok) {
 			const data = await errRes.json();
 			const r = data.result ?? {};
@@ -123,7 +124,9 @@ async function getDockerContainers(): Promise<
 	Array<{ name: string; status: string; image: string; ports: string }>
 > {
 	try {
-		const res = await fetch('http://localhost:2375/containers/json?all=true');
+		const { env } = await import('$env/dynamic/private');
+		const dockerApiUrl = env?.DOCKER_API_URL ?? 'http://localhost:2375';
+		const res = await fetch(`${dockerApiUrl}/containers/json?all=true`);
 		if (!res.ok) return [];
 		const containers = await res.json();
 		return containers.map((c: Record<string, unknown>) => ({
@@ -140,15 +143,15 @@ async function getDockerContainers(): Promise<
 	}
 }
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
 	const [services, qdrant, indexing, docker] = await Promise.all([
 		Promise.all([
-			checkServiceHealth('PostgreSQL', 'http://localhost:5173/api/health/database'),
-			checkServiceHealth('Redis', 'http://localhost:5173/api/health/redis'),
-			checkServiceHealth('Ollama', 'http://localhost:8086/api/tags'),
-			checkServiceHealth('Qdrant', 'http://localhost:6333/healthz'),
-			checkServiceHealth('Neo4j', 'http://localhost:5173/api/health/neo4j'),
-			checkServiceHealth('MinIO', 'http://localhost:9000/minio/health/live')
+			checkServiceHealth('PostgreSQL', `${url.origin}/api/health/database`),
+			checkServiceHealth('Redis', `${url.origin}/api/health/redis`),
+			checkServiceHealth('Ollama', `${getOllamaUrl()}/api/tags`),
+			checkServiceHealth('Qdrant', `${getQdrantUrl()}/healthz`),
+			checkServiceHealth('Neo4j', `${url.origin}/api/health/neo4j`),
+			checkServiceHealth('MinIO', `http://${getMinioConfig().endpoint}/minio/health/live`)
 		]),
 		getQdrantCollections(),
 		getIndexingStatus(),

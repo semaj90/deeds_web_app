@@ -5,24 +5,18 @@
  */
 
 import { QdrantClient } from '@qdrant/js-client-rest';
+import { getDatabaseUrl, getQdrantUrl } from '$lib/config/env.server.js';
 import pg from 'pg';
 import type { PageServerLoad } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const { Pool } = pg;
 
-const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://127.0.0.1:6333';
 
 export const load: PageServerLoad = async () => {
-	const qdrant = new QdrantClient({ url: QDRANT_URL });
+	const qdrant = new QdrantClient({ url: getQdrantUrl() });
 
-	const aiPool = new Pool({
-		host: '127.0.0.1',
-		port: 5434,
-		database: 'legal_ai_db',
-		user: 'legal_admin',
-		password: '123456'
-	});
+	const aiPool = new Pool({ connectionString: getDatabaseUrl() });
 
 	try {
 		// Fetch error clusters with embeddings

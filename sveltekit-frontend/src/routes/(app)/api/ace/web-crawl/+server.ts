@@ -11,7 +11,6 @@
  * - Analytics: User interaction tracking
  */
 
-// import { getOllamaEndpoint } from '$lib/config/ollama-config'; // TODO: Implement
 import { webCrawlMachine } from '$lib/features/workflows/web-crawl-machine';
 // import { embedWithGemma } from '$lib/server/ai/embedding-service'; // TODO: Implement
 import { db } from '$lib/server/db/client';
@@ -23,6 +22,10 @@ import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { createActor } from 'xstate';
 import type { RequestHandler } from './$types';
+import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
+
+const QDRANT_URL = getQdrantUrl();
+const OLLAMA_URL = getOllamaUrl();
 
 /**
  * Web Crawl State Machine Context
@@ -246,7 +249,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				status: `/api/ace/web-crawl/status/${job.id}`,
 				chat: `/api/ai/chat/${chatSession.id}`,
 				vectors: {
-					qdrant: `http://localhost:6333/collections/ace_web_crawl/points`,
+					qdrant: `${QDRANT_URL}/collections/ace_web_crawl/points`,
 					faiss: `GPU-accelerated local index`,
 					pgvector: `PostgreSQL web_crawl_vectors table`
 				}
@@ -342,7 +345,7 @@ async function processRAG(jobId: string, vector: number[], text: string) {
 		vector,
 		text,
 		model: 'gemma3-legal:latest',
-		endpoint: process.env.OLLAMA_URL || 'http://localhost:11434' //, STUB: TODO - use getOllamaEndpoint()
+		endpoint: OLLAMA_URL
 	});
 }
 

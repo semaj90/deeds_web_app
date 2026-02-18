@@ -1,9 +1,9 @@
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
+import { getDatabaseUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://user:pass@127.0.0.1:5434/legal';
-const pool = new pg.Pool({ connectionString: DATABASE_URL });
+const pool = new pg.Pool({ connectionString: getDatabaseUrl() });
 
 /**
  * POST /api/phase89/graph/expand

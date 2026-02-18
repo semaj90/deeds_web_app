@@ -14,8 +14,9 @@ import { sql } from 'drizzle-orm';
 import { promisify } from 'util';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
+import { getOllamaUrl } from '$lib/config/env.server.js';
 const execAsync = promisify(exec);
-const OLLAMA_URL = 'http://127.0.0.1:11434';
+const OLLAMA_URL = getOllamaUrl();
 
 export async function POST({ request }: RequestEvent) {
 	const { tag, collection } = await request.json();

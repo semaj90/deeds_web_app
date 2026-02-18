@@ -1,4 +1,9 @@
+import { getQdrantUrl, getRedisHost, getRedisPort } from '$lib/config/env.server.js';
+import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
+
+const FASTAPI_OCR_URL = env?.FASTAPI_OCR_URL ?? 'http://localhost:8091';
+const TRTLLM_URL = env?.TRTLLM_URL ?? 'http://localhost:5100';
 
 export const GET = async () => {
  const checks: Record<string, boolean> = {};
@@ -13,17 +18,17 @@ export const GET = async () => {
  };
 
  // Python OCR/Embedding FastAPI
- await tryFetch('fastapi', 'http://localhost:8091/health');
+ await tryFetch('fastapi', `${FASTAPI_OCR_URL}/health`);
 
  // TensorRT-LLM server
- await tryFetch('trtllm', 'http://localhost:5100/health');
+ await tryFetch('trtllm', `${TRTLLM_URL}/health`);
 
  // Qdrant
- await tryFetch('qdrant', 'http://localhost:6333/health');
+ await tryFetch('qdrant', getQdrantUrl() + '/health');
 
  // Redis (simple TCP check via HTTP proxy if available, else assume)
  try {
- const redisRes = await fetch('http://localhost:6379', { method: 'HEAD' });
+ const redisRes = await fetch('http://' + getRedisHost() + ':' + getRedisPort(), { method: 'HEAD' });
  checks['redis'] = redisRes.ok;
  } catch {
  checks['redis'] = false;

@@ -1,4 +1,5 @@
 import { db } from '$lib/server/db/client';
+import { getOllamaUrl, getQdrantUrl, getRedisUrl, getDatabaseUrl, getMinioConfig } from '$lib/config/env.server.js';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
@@ -12,7 +13,7 @@ export async function GET() {
   const services: Record<string, any> = {};
 
   // Redis health
-  if (process.env.REDIS_URL) {
+  {
     try {
       // Attempt to parse REDIS_URL to construct a health check URL
       // Note: This assumes there is an HTTP endpoint at the Redis port or similar, which is unusual for standard Redis.
@@ -21,7 +22,7 @@ export async function GET() {
       let port = '6379';
 
       try {
-        const url = new URL(process.env.REDIS_URL.startsWith('redis://') ? process.env.REDIS_URL : `redis://${process.env.REDIS_URL}`);
+        const url = new URL(getRedisUrl().startsWith('redis://') ? getRedisUrl() : `redis://${getRedisUrl()}`);
         hostname = url.hostname;
         port = url?.port ?? '6379';
       } catch (e) {
@@ -39,13 +40,13 @@ export async function GET() {
       clearTimeout(timeoutId);
 
       services.redis = {
-        url: process.env.REDIS_URL.substring(0, 30) + '...',
+        url: getRedisUrl().substring(0, 30) + '...',
         reachable: resp?.ok ?? false,
         purpose: 'Error cache, session storage, fix memory',
       };
     } catch (e: any) {
       services.redis = {
-        url: process.env.REDIS_URL?.substring(0, 30) + '...',
+        url: getRedisUrl().substring(0, 30) + '...',
         reachable: false,
         error: e.message,
       };
@@ -53,17 +54,17 @@ export async function GET() {
   }
 
   // Qdrant vector DB
-  if (process.env.QDRANT_URL) {
+  {
     try {
-      const resp = await fetch(`${process.env.QDRANT_URL}/health`);
+      const resp = await fetch(`${getQdrantUrl()}/health`);
       services.qdrant = {
-        url: process.env.QDRANT_URL,
+        url: getQdrantUrl(),
         reachable: resp.ok,
         purpose: 'Vector embeddings for semantic search',
       };
     } catch (e: any) {
       services.qdrant = {
-        url: process.env.QDRANT_URL,
+        url: getQdrantUrl(),
         reachable: false,
         error: e.message,
       };
@@ -71,19 +72,19 @@ export async function GET() {
   }
 
   // Ollama LLM
-  if (process.env.OLLAMA_URL) {
+  {
     try {
-      const resp = await fetch(`${process.env.OLLAMA_URL}/api/tags`);
+      const resp = await fetch(`${getOllamaUrl()}/api/tags`);
       const data = await resp.json();
       services.ollama = {
-        url: process.env.OLLAMA_URL,
+        url: getOllamaUrl(),
         reachable: resp.ok,
         models: data.models?.map((m: any) => m.name) || [],
         purpose: 'Local LLM inference (Gemma3-legal, embeddings)',
       };
     } catch (e: any) {
       services.ollama = {
-        url: process.env.OLLAMA_URL,
+        url: getOllamaUrl(),
         reachable: false,
         error: e.message,
       };
@@ -91,11 +92,11 @@ export async function GET() {
   }
 
   // PostgreSQL
-  if (process.env.DATABASE_URL) {
+  {
     try {
       const result = await db.execute(sql`SELECT 1`);
       services.postgres = {
-        url: process.env.DATABASE_URL?.substring(0, 40) + '...',
+        url: getDatabaseUrl().substring(0, 40) + '...',
         reachable: result.rows.length > 0,
         database: 'legal_ai_db',
         extensions: ['pgvector', 'pg_trgm'],
@@ -103,7 +104,7 @@ export async function GET() {
       };
     } catch (e: any) {
       services.postgres = {
-        url: process.env.DATABASE_URL?.substring(0, 40) + '...',
+        url: getDatabaseUrl().substring(0, 40) + '...',
         reachable: false,
         error: e.message,
       };
@@ -111,9 +112,9 @@ export async function GET() {
   }
 
   // MinIO
-  if (process.env.MINIO_ENDPOINT) {
+  {
     services.minio = {
-      endpoint: process.env.MINIO_ENDPOINT,
+      endpoint: getMinioConfig().endpoint,
       bucket: process.env?.MINIO_BUCKET ?? 'legal-evidence',
       purpose: 'Evidence staging, raw artifacts',
     };

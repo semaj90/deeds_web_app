@@ -1,6 +1,9 @@
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+
+const QDRANT_URL = getQdrantUrl();
 
 interface ApplyPatchRequest {
     clusterId: string;
@@ -25,7 +28,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         }
 
         // Fetch cluster details from Qdrant
-        const clusterResponse = await fetch('http://localhost:6333/collections/phase90_error_clusters/points/scroll', {
+        const clusterResponse = await fetch(`${QDRANT_URL}/collections/phase90_error_clusters/points/scroll`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ limit: 1,
@@ -47,7 +50,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         }
 
         // Fetch member errors
-        const membersResponse = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
+        const membersResponse = await fetch(`${QDRANT_URL}/collections/phase90_error_cards/points/scroll`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ limit: 100,

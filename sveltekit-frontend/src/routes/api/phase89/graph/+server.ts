@@ -7,10 +7,11 @@ import { json } from '@sveltejs/kit';
 import fs from 'fs/promises';
 import path from 'path';
 import postgres from 'postgres';
+import { getDatabaseUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-const sql = postgres(process.env?.DATABASE_URL ?? 'postgresql://user:pass@127.0.0.1:5434/legal');
+const sql = postgres(getDatabaseUrl());
 
 export const GET: RequestHandler = async ({ url }) => {
   try {

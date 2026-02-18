@@ -5,11 +5,12 @@
  * POST /api/kb/validate
  */
 
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = getQdrantUrl();
 
 interface ValidateSourcesRequest {
   query_id: string;

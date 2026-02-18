@@ -6,9 +6,10 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import pg from 'pg';
 
+import { getDatabaseUrl } from '$lib/config/env.server.js';
 const { Pool } = pg;
 
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = getDatabaseUrl();
 const pool = new Pool({ connectionString: DATABASE_URL });
 
 export const GET: RequestHandler = async () => {

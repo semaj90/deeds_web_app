@@ -1,10 +1,13 @@
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+
+const QDRANT_URL = getQdrantUrl();
 
 export const GET: RequestHandler = async ({ fetch }) => {
     try {
         // Test Qdrant connection
-        const response = await fetch('http://localhost:6333/collections/fastmcp_file_profiles');
+        const response = await fetch(QDRANT_URL + '/collections/fastmcp_file_profiles');
 
         if (!response.ok) {
             return json({
@@ -19,7 +22,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
         // Get error cards count
         let errorCardsCount = 0;
         try {
-            const errorsResponse = await fetch('http://localhost:6333/collections/phase90_error_cards');
+            const errorsResponse = await fetch(QDRANT_URL + '/collections/phase90_error_cards');
             if (errorsResponse.ok) {
                 const errData = await errorsResponse.json();
                 errorCardsCount = errData.result?.points_count ?? 0;
@@ -29,7 +32,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
         // Get clusters count
         let clustersCount = 0;
         try {
-            const clustersResponse = await fetch('http://localhost:6333/collections/phase90_error_clusters');
+            const clustersResponse = await fetch(QDRANT_URL + '/collections/phase90_error_clusters');
             if (clustersResponse.ok) {
                 const clData = await clustersResponse.json();
                 clustersCount = clData.result?.points_count ?? 0;

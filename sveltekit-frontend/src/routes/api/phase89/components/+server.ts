@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
 // Phase 89: Components API Endpoint
@@ -16,8 +17,10 @@ interface ComponentUnit { unit_id: string, file_path: string;
 
 export const GET: RequestHandler = async ({ fetch }) => {
 	try {
+		const qdrantBaseUrl = getQdrantUrl();
+
 		// Fetch from Qdrant phase89_code_units collection
-		const qdrantResponse = await fetch('http://localhost:6333/collections/phase89_code_units/points/scroll', {
+		const qdrantResponse = await fetch(`${qdrantBaseUrl}/collections/phase89_code_units/points/scroll`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ limit: 500,
@@ -60,8 +63,9 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
 		// Get CUDA status
 		let cudaEnabled = false;
+		const CUDA_SERVICE_URL = (await import('$env/dynamic/private')).env?.CUDA_SERVICE_URL ?? 'http://localhost:8765';
 		try {
-			const gpuCheck = await fetch('http://localhost:8765/health').catch(() => null);
+			const gpuCheck = await fetch(`${CUDA_SERVICE_URL}/health`).catch(() => null);
 			if (gpuCheck?.ok) {
 				const health = await gpuCheck.json();
 				cudaEnabled = health.cuda_enabled ?? false;

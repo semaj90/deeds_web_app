@@ -1,4 +1,5 @@
 import type { Actions, PageServerLoad } from './$types.js';
+import { getOllamaUrl } from '$lib/config/env.server.js';
 
 // Server-side only: no secrets leak to browser
 export const load: PageServerLoad = async () => {
@@ -22,7 +23,7 @@ export const actions: Actions = {
 
  	try {
  		// Call Ollama via API endpoint (not directly from browser)
- 		const response = await fetch('http://127.0.0.1:11434/api/generate', {
+ 		const response = await fetch(`${getOllamaUrl()}/api/generate`, {
  			method: 'POST',
  			headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

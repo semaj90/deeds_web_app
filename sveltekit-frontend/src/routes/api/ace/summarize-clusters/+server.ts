@@ -10,8 +10,8 @@ import { aceLLM, couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
-const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+import { getQdrantUrl } from '$lib/config/env.server.js';
+const QDRANT_URL = getQdrantUrl();
 
 interface CollectionSummary {
   collection: string;

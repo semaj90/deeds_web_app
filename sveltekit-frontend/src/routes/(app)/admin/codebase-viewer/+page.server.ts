@@ -1,5 +1,6 @@
 import type { PageServerLoad } from './$types';
 
+import { getQdrantUrl, getDatabaseUrl } from '$lib/config/env.server.js';
 const EMPTY_DATA = {
 	qdrant: { collections: [], totalPoints: 0 },
 	postgres: { embeddings: [], timeline: [], stats: { total_files: 0, total_errors: 0, embedding_coverage: 0, unique_error_codes: 0 } },
@@ -16,7 +17,7 @@ export const load: PageServerLoad = async () => {
 	// Try Qdrant (may not be running)
 	try {
 		const { QdrantClient } = await import('@qdrant/js-client-rest');
-		const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
+		const qdrant = new QdrantClient({ url: getQdrantUrl() });
 
 		const collections = await qdrant.getCollections();
 		const collectionStats = await Promise.all(
@@ -43,11 +44,7 @@ export const load: PageServerLoad = async () => {
 	try {
 		const { Pool } = await import('pg');
 		const db = new Pool({
-			user: 'legal_admin',
-			password: '123456',
-			host: 'localhost',
-			port: 5434,
-			database: 'legal_ai_db',
+			connectionString: getDatabaseUrl(),
 			connectionTimeoutMillis: 3000,
 		});
 

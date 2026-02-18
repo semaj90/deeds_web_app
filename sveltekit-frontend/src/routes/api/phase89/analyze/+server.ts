@@ -1,15 +1,12 @@
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
+import { getDatabaseUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
 const { Pool } = pg;
 
 const pool = new Pool({
-	host: '127.0.0.1',
-	port: 5434,
-	database: 'legal_ai_db',
-	user: 'legal_admin',
-	password: '123456'
+	connectionString: getDatabaseUrl()
 });
 
 interface AnalyzeRequest {
@@ -85,7 +82,8 @@ Provide your analysis in this JSON structure:
 }`;
 
 		// Call Ollama for analysis
-		const ollamaRes = await fetch('http://localhost:11434/api/chat', {
+		const ollamaBaseUrl = getOllamaUrl();
+		const ollamaRes = await fetch(`${ollamaBaseUrl}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

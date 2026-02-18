@@ -1,4 +1,5 @@
 
+import { getRedisHost, getRedisPort } from '$lib/config/env.server.js';
 import { createRedisConnection } from '$lib/server/redis';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
@@ -40,8 +41,8 @@ export const GET: RequestHandler = async () => {
  return json({
  status: 'healthy',
  service: 'redis',
- port: 6379, // Consider getting from env
- host: 'localhost', // Consider getting from env
+ port: getRedisPort(),
+ host: getRedisHost(),
  timestamp,
  });
  } catch (error: unknown) {

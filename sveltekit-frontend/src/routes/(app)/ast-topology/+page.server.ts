@@ -8,6 +8,7 @@
  */
 
 import type { PageServerLoad } from './$types';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 
 export const load: PageServerLoad = async ({ fetch }) => {
   // Fetch error stats from our API
@@ -59,7 +60,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
     topologyData,
     recentActivity,
     config: {
-	qdrantUrl: process.env?.QDRANT_URL ?? 'http://localhost:6333',
+	qdrantUrl: getQdrantUrl(),
       ollamaModels: ['embeddinggemma:latest', 'gemma3-legal:latest']
     }
   };

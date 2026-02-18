@@ -4,18 +4,13 @@
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
 import type { RequestHandler } from './$types';
+import { getDatabaseUrl } from '$lib/config/env.server.js';
 
 const { Pool } = pg;
 
 export const GET: RequestHandler = async () => {
 	try {
-		const pool = new Pool({
-			user: 'legal_admin',
-			password: '123456',
-			host: 'localhost',
-			port: 5434,
-			database: 'legal_ai_db'
-		});
+		const pool = new Pool({ connectionString: getDatabaseUrl() });
 		const result = await pool.query(`
 			SELECT source, line_number, raw_text, tags
 			FROM raw_error_embeddings

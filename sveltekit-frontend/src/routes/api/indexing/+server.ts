@@ -14,29 +14,30 @@ import { glob } from 'glob';
 import { Client as MinIOClient } from 'minio';
 import path from 'path';
 import postgres from 'postgres';
-
+import { getQdrantUrl, getOllamaUrl, getMinioConfig, getDatabaseUrl } from '$lib/config/env.server.js';
 // Configuration
+const _minioEnv = getMinioConfig();
 const CONFIG = {
   qdrant: {
-    url: process.env?.QDRANT_URL ?? 'http://localhost:6333',
+    url: getQdrantUrl(),
     collectionCode: 'phase79_codebase',
     collectionErrors: 'phase79_error_analysis'
   },
   minio: {
-    endpoint: process.env?.MINIO_ENDPOINT ?? 'localhost',
-    port: parseInt(process.env?.MINIO_PORT ?? '9000'),
-    accessKey: process.env?.MINIO_ACCESS_KEY ?? 'minioadmin',
-    secretKey: process.env?.MINIO_SECRET_KEY ?? 'minioadmin',
-    useSSL: process.env.MINIO_USE_SSL === 'true',
+    endpoint: _minioEnv.endpoint.split(':')[0],
+    port: parseInt(_minioEnv.endpoint.split(':')[1] ?? '9000'),
+    accessKey: _minioEnv.accessKey,
+    secretKey: _minioEnv.secretKey,
+    useSSL: _minioEnv.useSSL,
     bucketCode: 'codebase-index',
     bucketErrors: 'error-analysis'
   },
   ollama: {
-    url: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
+    url: getOllamaUrl(),
     embeddingModel: 'embeddinggemma:latest'
   },
   postgres: {
-    url: process.env?.DATABASE_URL ?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
+    url: getDatabaseUrl()
   }
 };
 

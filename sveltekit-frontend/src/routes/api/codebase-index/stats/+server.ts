@@ -6,8 +6,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 
-const QDRANT_URL = env?.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = getQdrantUrl();
 const FASTAPI_URL = env?.FASTAPI_URL ?? 'http://localhost:8090';
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 const CLUSTER_COLLECTION = 'phase90_error_clusters';

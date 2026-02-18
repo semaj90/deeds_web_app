@@ -1,4 +1,5 @@
 import type { PageServerLoad } from './$types';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface ClusterCard { id: string, name: string;
@@ -30,7 +31,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
     try {
         // Fetch cluster details
-        const clusterResponse = await fetch('http://localhost:6333/collections/phase90_error_clusters/points/scroll', {
+        const clusterResponse = await fetch(`${getQdrantUrl()}/collections/phase90_error_clusters/points/scroll`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({limit: 200,
@@ -50,7 +51,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
         const cluster = clusterData.result.points[0]?.payload ?? null;
 
         // Fetch member errors
-        const membersResponse = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
+        const membersResponse = await fetch(`${getQdrantUrl()}/collections/phase90_error_cards/points/scroll`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({limit: 100,

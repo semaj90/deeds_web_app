@@ -6,6 +6,7 @@
 import { json } from '@sveltejs/kit';
 import { spawn } from 'child_process';
 import { createClient } from 'redis';
+import { getRedisUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -19,7 +20,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // Store fix request in Redis for tracking
     const redis = createClient({
-      url: process.env?.REDIS_URL ?? 'redis://127.0.0.1:6379'
+      url: getRedisUrl()
     });
     await redis.connect().catch(() => null);
 

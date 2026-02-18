@@ -1,4 +1,5 @@
 import type { PageServerLoad } from './$types';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface FileProfile { file_path: string, role: string;
@@ -24,14 +25,14 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
     try {
         // Fetch file profile by ID
-        const response = await fetch(`http://localhost:6333/collections/fastmcp_file_profiles/points/${fileId}`, {
+        const response = await fetch(`${getQdrantUrl()}/collections/fastmcp_file_profiles/points/${fileId}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
 
         if (!response.ok) {
             // Try scroll with filter as fallback
-            const scrollResponse = await fetch('http://localhost:6333/collections/fastmcp_file_profiles/points/scroll', {
+            const scrollResponse = await fetch(`${getQdrantUrl()}/collections/fastmcp_file_profiles/points/scroll`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({limit: 1,
@@ -59,7 +60,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
         let relatedErrors: Array<Record<string, unknown>> = [];
         if (profile?.file_path) {
             try {
-                const errorsResponse = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
+                const errorsResponse = await fetch(`${getQdrantUrl()}/collections/phase90_error_cards/points/scroll`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({limit: 20,

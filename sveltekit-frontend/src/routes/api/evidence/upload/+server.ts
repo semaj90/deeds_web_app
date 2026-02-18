@@ -5,8 +5,9 @@ import db from '$lib/server/db';
 import { evidence, evidenceVectors } from '$lib/server/db/schema';
 import { createJob, updateJob } from '$lib/server/evidence-progress';
 
+import { getOllamaUrl } from '$lib/config/env.server.js';
 const BUCKET = process.env.MINIO_EVIDENCE_BUCKET ?? 'legal-evidence';
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const OLLAMA_URL = getOllamaUrl();
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
 /**

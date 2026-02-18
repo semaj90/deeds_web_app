@@ -139,7 +139,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-  upload: async ({ request, locals }) => {
+  upload: async ({ request, locals, url }) => {
     try {
       if (!locals.user) {
         return fail(401, { form: {
@@ -216,7 +216,7 @@ export const actions: Actions = {
           const ocrBase =
             (metaEnv as any).OCR_BASE_URL ??
             (metaEnv as any).BASE_URL ??
-            (dev ? 'http://localhost:5173' : 'http://localhost:5173');
+            url.origin;
           const ocrUrl = new URL('/api/ocr/extract', ocrBase).toString();
           const ocrForm = new FormData();
           ocrForm.append('file', new Blob([fileBuffer], { type: fileType }), fileName);

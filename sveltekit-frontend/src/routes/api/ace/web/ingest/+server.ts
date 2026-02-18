@@ -13,6 +13,7 @@ import { inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { getRabbitMQUrl } from '$lib/config/env.server.js';
 
 // --- Singleton RabbitMQ Connection ---
 let amqpConnection: any = null;
@@ -22,7 +23,7 @@ async function getAmqpChannel() {
   if (amqpChannel) return amqpChannel;
 
   try {
-    const rabbitmqUrl = process.env?.RABBITMQ_URL ?? 'amqp://localhost:5672';
+    const rabbitmqUrl = getRabbitMQUrl();
     if (!amqpConnection) {
       amqpConnection = await (amqp as any).connect(rabbitmqUrl);
 

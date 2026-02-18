@@ -1,8 +1,9 @@
 import { json } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types.js';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-const PHASE72_BACKEND_URL = process.env.PHASE72_BACKEND_URL ?? 'http://127.0.0.1:8000';
+const PHASE72_BACKEND_URL = env?.PHASE72_BACKEND_URL ?? 'http://127.0.0.1:8000';
 
 interface SuggestFixRequest {
  route?: string;

@@ -2,11 +2,12 @@ import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
+import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 const qdrant = new QdrantClient({
-	url: process.env?.QDRANT_URL ?? 'http://127.0.0.1:6333'
+	url: getQdrantUrl()
 });
 
-const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+const OLLAMA_URL = getOllamaUrl();
 
 async function generateEmbedding(text: string): Promise<number[]> {
 	try {

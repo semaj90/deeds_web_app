@@ -6,9 +6,10 @@
 import type { RequestHandler } from './$types';
 import { createClient } from 'redis';
 
+import { getRedisUrl } from '$lib/config/env.server.js';
 export const GET: RequestHandler = async ({ request }) => {
   const redis = createClient({
-    url: process.env?.REDIS_URL ?? 'redis://127.0.0.1:6379'
+    url: getRedisUrl()
   });
 
   let isConnected = false;

@@ -1,10 +1,11 @@
 import { json } from '@sveltejs/kit';
+import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 // Stream endpoint not yet implemented
 function broadcastAgentProgress(_data: any) { /* no-op */ }
 import type { RequestHandler } from './$types';
 
-const OLLAMA_URL = 'http://127.0.0.1:11434';
-const QDRANT_URL = 'http://127.0.0.1:6333';
+const OLLAMA_URL = getOllamaUrl();
+const QDRANT_URL = getQdrantUrl();
 
 interface FixRequest {
 	file_path: string;

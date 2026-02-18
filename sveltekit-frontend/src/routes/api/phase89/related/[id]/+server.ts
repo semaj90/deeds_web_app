@@ -1,8 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
+import { getQdrantUrl } from '$lib/config/env.server.js';
 // Phase 89: Related Files API
 // Uses cosine similarity from Qdrant to find related components
+
+const QDRANT_URL = getQdrantUrl();
 
 export const GET: RequestHandler = async ({ params, fetch }) => {
 	const componentId = params.id;
@@ -13,7 +16,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 
 	try {
 		// First, get the vector for this component
-		const pointResponse = await fetch(`http://localhost:6333/collections/phase89_code_units/points/${componentId}`, {
+		const pointResponse = await fetch(`${QDRANT_URL}/collections/phase89_code_units/points/${componentId}`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' }
 		});
@@ -30,7 +33,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		}
 
 		// Search for similar components
-		const searchResponse = await fetch('http://localhost:6333/collections/phase89_code_units/points/search', {
+		const searchResponse = await fetch(`${QDRANT_URL}/collections/phase89_code_units/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ vector, limit: 10,
@@ -72,6 +75,8 @@ function findSharedImports(payload1: any, payload2: any): string[] {
 
 	// Extract import sources from signature text or uses
 	const uses1 = new Set<string>(payload1?.uses|| []);
+
+const QDRANT_URL = getQdrantUrl();
 	const uses2 = new Set<string>(payload2?.uses|| []);
 
 	const shared: string[] = [];
