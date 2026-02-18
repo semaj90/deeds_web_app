@@ -1,232 +1,169 @@
-# Protocol Buffers Integration Guide
-## Phase 5-7: gRPC Microservices Architecture
+# Protocol Buffers & gRPC — Implementation Guide
 
-### Overview
-This legal AI platform implements a sophisticated gRPC-based microservices architecture with Protocol Buffers for high-performance communication between 37 Go services and the SvelteKit frontend.
+## Last Updated: February 2026 (Session 53)
 
-## Architecture Components
+---
 
-### 1. Protocol Buffer Definitions
-- **legal_ai.proto**: Core AI services (inference, embeddings, search)
-- **auth.proto**: Authentication and authorization
-- **case_scoring.proto**: Legal case evaluation and scoring
-- **tensor_cache.proto**: GPU tensor caching and management
-- **tasks.proto**: Job queue and task management
-- **quic_streaming.proto**: Ultra-low latency streaming
-- **metrics.proto**: Performance monitoring and metrics
+## Architecture Overview
 
-### 2. Service Registry (37 Microservices)
+This platform uses gRPC for **internal binary-protocol communication** between the SvelteKit gateway and backend services. The browser communicates with SvelteKit via HTTP/SSE/WebSocket; SvelteKit communicates with backend services via gRPC (HTTP/2).
 
-#### Core AI Services (Ports 8080-8099)
-- `legal-gateway` (8080): Main gateway with load balancing
-- `enhanced-rag` (8094): RAG pipeline with vector search
-- `gpu-orchestrator` (8095): GPU allocation and management
-- `cognitive-microservice` (8096): AI inference and analysis
-- `cuda-service-worker` (8097): CUDA kernel execution
-
-#### Legal Analysis Services (Ports 8100-8109)
-- `legal-ai-inference` (8100): Legal LLM inference
-- `case-scoring` (8101): Case evaluation and risk assessment
-- `precedent-search` (8102): Legal precedent matching
-- `document-classifier` (8103): Document type classification
-- `entity-extractor` (8104): Legal entity recognition
-
-#### Vector & Embedding Services (Ports 8110-8119)
-- `vector-search` (8110): Semantic similarity search
-- `embedding-generator` (8111): Text/document embeddings
-- `similarity-engine` (8112): Advanced similarity algorithms
-- `semantic-analyzer` (8113): Semantic analysis and NLP
-
-#### Storage & Cache Services (Ports 8120-8129)
-- `tensor-cache` (8120): GPU tensor caching
-- `redis-orchestrator` (8121): Redis cluster management
-- `minio-gateway` (8122): Object storage gateway
-- `qdrant-proxy` (8123): Vector database proxy
-
-#### Streaming & Real-time Services (Ports 8130-8139)
-- `quic-streaming` (8130): QUIC protocol streaming
-- `websocket-gateway` (8131): WebSocket connections
-- `rabbitmq-coordinator` (8132): Message queue coordination
-- `nats-streaming` (8133): NATS streaming service
-
-#### Monitoring & Health Services (Ports 8140-8149)
-- `health-monitor` (8140): Service health checking
-- `metrics-collector` (8141): Performance metrics
-- `performance-analyzer` (8142): Performance analysis
-- `resource-manager` (8143): Resource allocation
-
-#### Authentication & Security (Ports 8150-8159)
-- `auth-service` (8150): Authentication service
-- `session-manager` (8151): Session management
-- `security-gateway` (8152): Security policies
-
-#### Job Processing & Queue Services (Ports 8160-8169)
-- `job-scheduler` (8160): Job scheduling
-- `task-coordinator` (8161): Task coordination
-- `worker-pool` (8162): Worker pool management
-- `queue-manager` (8163): Queue management
-
-#### Specialized AI Services (Ports 8170-8179)
-- `ocr-processor` (8170): OCR processing
-- `nlp-analyzer` (8171): NLP analysis
-- `sentiment-analyzer` (8172): Sentiment analysis
-- `recommendation-engine` (8173): AI recommendations
-
-#### Additional Infrastructure Services (Ports 8180-8189)
-- `config-manager` (8180): Configuration management
-- `log-aggregator` (8181): Log aggregation
-
-## Implementation Steps
-
-### Phase 5: Protocol Buffer Generation
-```bash
-# Generate Go code from .proto files
-scripts/generate-protobuf.bat
-
-# This creates:
-# - pkg/proto/*.pb.go (Protocol Buffer messages)
-# - pkg/grpc/*_grpc.pb.go (gRPC service definitions)
-# - sveltekit-frontend/src/lib/proto/generated/*.d.ts (TypeScript definitions)
+```
+Browser ──SSE/HTTP──→ SvelteKit Gateway ──gRPC──→ EmbeddingService (port 50051)
+                                          ──gRPC──→ Chr97Agent (port 50052)
+                                          ──gRPC──→ RetrievalService (port 50053)
 ```
 
-### Phase 6: gRPC Service Implementation
-1. **Service Registry**: Central coordinator for all 37 services
-2. **Health Checking**: Automatic health monitoring with fallback
-3. **Load Balancing**: Intelligent request routing
-4. **Circuit Breaker**: Resilience patterns for service failures
+**Edge transport** (HTTP/3 / QUIC / WebTransport) is a future gateway capability — it does NOT mean internal services speak QUIC.
 
-### Phase 7: Frontend Integration
-1. **gRPC Client**: TypeScript client with HTTP fallback
-2. **XState Integration**: gRPC events in state machines
-3. **Redis Caching**: Response caching for performance
-4. **WebAssembly Bridge**: Browser-side gRPC processing
+---
 
-## Key Features
+## Currently Implemented Services
 
-### 1. High Performance
-- **Binary Protocol**: Protocol Buffers for efficient serialization
-- **HTTP/2**: Multiplexed connections with header compression
-- **QUIC Streaming**: Ultra-low latency for real-time features
-- **GPU Acceleration**: Direct GPU communication via gRPC
+| Service | Proto | Port | Language | Status |
+|---------|-------|------|----------|--------|
+| **EmbeddingService** | `proto/active/embedding.proto` | 50051 | Python (backend/) | **REAL** — batch 768d embeddings via gRPC, Ollama HTTP fallback |
+| **Chr97Agent** | `proto/active/chr97_agent.proto` | 50052 | Python (chr97-runtime/) | **REAL** — binary cartridge streaming, tag queries, timelines |
+| **RetrievalService** | `proto/active/retrieval.proto` | 50053 | TypeScript (planned) | **NEW** — RAG+KAG+DAG evidence retrieval, wraps existing pipeline |
+| **CyberElephantService** | `proto/active/vectors.proto` | — | Go (cyber-elephant/) | **SILOED** — document vector processing, can be folded later |
 
-### 2. Reliability
-- **Health Checking**: Automatic service health monitoring
-- **Circuit Breaker**: Failure isolation and recovery
-- **Fallback Mechanisms**: HTTP fallback when gRPC unavailable
-- **Retry Logic**: Intelligent retry with exponential backoff
+### SvelteKit Gateway (HTTP/SSE today)
+- All frontend-facing endpoints are SvelteKit `+server.ts` routes
+- Currently handles RAG/evidence/embedding inline (TypeScript)
+- RetrievalService will externalize the retrieval pipeline
 
-### 3. Observability
-- **Metrics Collection**: Comprehensive performance metrics
-- **Distributed Tracing**: Request tracing across services
-- **Logging**: Centralized logging with correlation IDs
-- **Health Dashboards**: Real-time service monitoring
+---
 
-### 4. Security
-- **mTLS**: Mutual TLS for service-to-service communication
-- **JWT Integration**: Token-based authentication
-- **Rate Limiting**: Protection against abuse
-- **Audit Logging**: Security event tracking
+## Proto Directory Structure
 
-## Usage Examples
+```
+proto/
+├── active/                        ← ONLY these are production-wired
+│   ├── embedding.proto            ← EmbeddingService (batch 768d, RTX 3060 Ti)
+│   ├── chr97_agent.proto          ← Chr97Agent (binary cartridges + KAG graph)
+│   ├── retrieval.proto            ← RetrievalService (RAG+KAG+DAG evidence search)
+│   └── vectors.proto              ← CyberElephantService (document vectors)
+├── archived/                      ← 32 protos — aspirational, not production-wired
+│   ├── legal_ai.proto             ← Core AI services (aspirational)
+│   ├── case_scoring.proto         ← Case evaluation (aspirational)
+│   ├── tensor_cache.proto         ← GPU tensor caching (aspirational)
+│   ├── gateway_streaming.proto    ← Edge streaming (renamed from quic_streaming)
+│   └── ... (28 more)
+├── embed/                         ← Generated Go stubs (embed_grpc.pb.go)
+├── gpu/                           ← Generated Go stubs (gpu_service*.pb.go)
+├── ingest/                        ← Generated Go stubs (ingest_grpc.pb.go)
+└── tensor/                        ← Generated Go stubs (tensor_grpc.pb.go)
+```
 
-### 1. Legal Document Analysis
+### Other Proto Locations (Not Canonical)
+- `backend/proto/embedding.proto` — Python server's copy (canonical is `proto/active/`)
+- `sveltekit-frontend/proto/embedding.proto` — TS client's copy (should import from `proto/active/`)
+- `go-microservice/proto/` — 18 protos (10 empty stubs), generated Go code, buf config
+- `sveltekit-frontend/src/lib/proto/` — ai-suggestions.proto, vector-search.proto
+- `sveltekit-frontend/protos/` — legal_bert.proto, rag_kag.proto
+
+---
+
+## Currently Wired TS Clients
+
+### 1. Embedding Client (`src/lib/server/grpc/embedding-client.ts`)
 ```typescript
-// Frontend request to analyze legal document
-const result = await grpcClient.makeRequest('legal-ai-inference', 'AnalyzeDocument', {
-  document_data: documentBytes,
-  document_type: 'contract',
-  extract_entities: true,
-  analyze_sentiment: true
-});
+// Lazy-loads @grpc/grpc-js + @grpc/proto-loader
+// Connects to EMBEDDING_GRPC_URL (default: 127.0.0.1:50051)
+// Falls back to HTTP/Ollama if gRPC disabled or unavailable
+import { generateEmbeddings, generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 ```
 
-### 2. Vector Similarity Search
+### 2. Retrieval Client (planned: `src/lib/server/grpc/retrieval-client.ts`)
 ```typescript
-// Search for similar legal cases
-const searchResult = await grpcClient.makeRequest('vector-search', 'SearchSimilar', {
-  query_embedding: embeddings,
-  limit: 10,
-  threshold: 0.8,
-  legal_domain: 'contract_law'
-});
+// Will wrap the existing evidence search pipeline
+// Connects to RETRIEVAL_GRPC_URL (default: 127.0.0.1:50053)
+// Falls back to inline TypeScript pipeline if gRPC unavailable
+import { searchEvidence, searchCodebase } from '$lib/server/grpc/retrieval-client.js';
 ```
 
-### 3. Real-time Streaming
-```typescript
-// Stream AI recommendations
-const stream = await grpcClient.makeRequest('recommendation-engine', 'StreamRecommendations', {
-  case_id: 'case_123',
-  max_recommendations: 5,
-  include_precedents: true
-});
-```
+---
 
-## Performance Benchmarks
+## Target Service Registry (Aspirational)
 
-### gRPC vs HTTP/JSON
-- **Throughput**: 5-10x improvement
-- **Latency**: 40-60% reduction
-- **Bandwidth**: 30-50% reduction
-- **CPU Usage**: 20-30% reduction
+The following 37 services were planned in the original architecture but **none are production-wired**. They live in `proto/archived/` and `go-microservice/proto/`. Do not claim these are running.
 
-### Legal AI Specific Optimizations
-- **Document Processing**: 3x faster with protobuf serialization
-- **Vector Operations**: 2x faster with binary encoding
-- **Streaming Inference**: 70% latency reduction with QUIC
-- **Cache Hit Rate**: 95% with intelligent caching
+### Core AI Services (Ports 8080-8099)
+- `legal-gateway` (8080), `enhanced-rag` (8094), `gpu-orchestrator` (8095)
 
-## Integration with Existing Architecture
+### Legal Analysis Services (Ports 8100-8109)
+- `legal-ai-inference` (8100), `case-scoring` (8101), `precedent-search` (8102)
 
-### XState Machines
-- gRPC events trigger state transitions
-- Service status reflected in machine context
-- Error handling through state machine error states
+### Vector & Embedding Services (Ports 8110-8119)
+- `vector-search` (8110), `embedding-generator` (8111)
 
-### Redis Integration
-- gRPC response caching
-- Service discovery cache
-- Circuit breaker state storage
+### Storage & Cache Services (Ports 8120-8129)
+- `tensor-cache` (8120), `redis-orchestrator` (8121), `minio-gateway` (8122)
 
-### WebAssembly
-- Browser-side protobuf encoding/decoding
-- Local inference with gRPC streaming
-- GPU compute via WebGPU + gRPC
+### Streaming Services (Ports 8130-8139)
+- `edge-streaming-gateway` (8130) — formerly "quic-streaming", handles HTTP/3 at the edge
 
-## Monitoring and Debugging
+### Monitoring (Ports 8140-8149)
+- `health-monitor` (8140), `metrics-collector` (8141)
 
-### Service Health
+*(Full list in archived proto files)*
+
+---
+
+## RetrievalService Design
+
+### What It Wraps
+The RetrievalService wraps the existing SvelteKit `POST /api/evidence/search` pipeline:
+
+1. **RAG**: Embed query → pgvector cosine + Qdrant ANN → legal-aware rerank (75% cosine + 15% citations + 10% section proximity)
+2. **KAG**: Traverse `yorha_evidence_connections` graph → score neighbors by connection strength
+3. **DAG**: Resolve citation cross-references across documents
+
+### Implementation Path
+1. Start as thin gRPC wrapper around existing TypeScript logic (same machine)
+2. SvelteKit `/api/evidence/search` calls `RetrievalService.SearchEvidence()` via gRPC
+3. If gRPC unavailable, falls back to inline pipeline (same as today)
+4. Add Redis caching at the retrieval-service layer (sha256 of query+filters)
+
+### Proto Messages
+See `proto/active/retrieval.proto` for full message definitions. Key types:
+- `EvidenceSearchRequest` → maps 1:1 to current POST body
+- `ContextBundle` → hit + siblings + sectionPath + citations
+- `SearchTiming` → embed_ms, search_ms, rerank_ms, hop_ms, total_ms
+- `CodebaseSearchRequest` → dual-vector codebase search
+
+---
+
+## Edge Transport Strategy
+
+| Layer | Protocol | Today | Future |
+|-------|----------|-------|--------|
+| Browser → Gateway | HTTP/1.1, SSE | Working | HTTP/3, WebTransport |
+| Gateway → Services | gRPC (HTTP/2) | Working (embedding) | All services |
+| Service → Service | gRPC (HTTP/2) | N/A | If needed |
+
+**QUIC/HTTP/3** is an edge transport capability via Caddy reverse proxy. Internal services remain gRPC over HTTP/2. The `gateway_streaming.proto` (formerly `quic_streaming.proto`) defines the edge streaming interface — it is NOT a requirement for internal services.
+
+---
+
+## Usage
+
+### Generate stubs (when proto changes)
 ```bash
-# Check all services
-curl http://localhost:5173/api/grpc/services
+# Go stubs
+protoc --go_out=. --go-grpc_out=. proto/active/retrieval.proto
 
-# Check specific service
-curl http://localhost:8100/health
+# Python stubs
+python -m grpc_tools.protoc -Iproto/active --python_out=. --grpc_python_out=. proto/active/retrieval.proto
+
+# TypeScript uses @grpc/proto-loader at runtime (no codegen needed)
 ```
 
-### gRPC Debugging
+### Test gRPC services
 ```bash
-# Use grpcurl for debugging
-grpcurl -plaintext localhost:8100 legal_ai.LegalAIService/AnalyzeDocument
+# Check embedding service health
+grpcurl -plaintext localhost:50051 embedding.EmbeddingService/Health
+
+# Check retrieval service health
+grpcurl -plaintext localhost:50053 yorha.retrieval.RetrievalService/Health
 ```
-
-### Performance Monitoring
-- Prometheus metrics collection
-- Grafana dashboards
-- OpenTelemetry tracing
-- Custom performance analytics
-
-## Future Enhancements
-
-### Phase 8: Advanced Features
-- **Service Mesh**: Istio integration for advanced traffic management
-- **Auto-scaling**: Kubernetes HPA based on gRPC metrics
-- **Federation**: Multi-cluster gRPC service federation
-- **Edge Computing**: gRPC services at edge locations
-
-### Phase 9: AI-Specific Optimizations
-- **Model Serving**: TensorFlow Serving integration
-- **Batch Processing**: Optimized batch inference
-- **Pipeline Parallelism**: Multi-GPU pipeline processing
-- **Federated Learning**: Distributed model training
-
-This comprehensive gRPC implementation provides the foundation for ultra-high-performance legal AI services with enterprise-grade reliability and observability.

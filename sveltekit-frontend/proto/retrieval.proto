@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+package yorha.retrieval;
+
+option go_package = "github.com/deeds-web-app/proto/retrieval";
+
+/**
+ * RetrievalService — RAG + KAG + DAG evidence retrieval.
+ *
+ * RAG: embed query → pgvector cosine + Qdrant ANN → legal-aware rerank
+ * KAG: traverse yorha_evidence_connections graph for related nodes
+ * DAG: resolve citation cross-references across documents
+ *
+ * This is the single retrieval backend. SvelteKit gateway calls this
+ * instead of inline pgvector/Qdrant logic.
+ */
+
+service RetrievalService {
+  // Full RAG+KAG+DAG search returning context bundles
+  rpc SearchEvidence(EvidenceSearchRequest) returns (EvidenceSearchResponse);
+
+  // Codebase chunk search (dual-vector: content + signature)
+  rpc SearchCodebase(CodebaseSearchRequest) returns (CodebaseSearchResponse);
+
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+// ── Evidence Search (RAG + KAG + DAG) ──────────────────────────────────
+
+/**
+ * Evidence search request.
+ * Maps 1:1 to POST /api/evidence/search body.
+ */
+message EvidenceSearchRequest {
+  string query = 1;                    // Natural language query
+  string case_id = 2;                  // Optional: scope to case
+  int32 limit = 3;                     // Max results (default 10)
+  bool expand_sections = 4;            // Graph-hop to section siblings
+  string jurisdiction = 5;             // Optional: jurisdiction filter
+}
+
+/**
+ * Evidence search response with context bundles.
+ */
+message EvidenceSearchResponse {
+  repeated SearchResult results = 1;   // Flat ranked results
+  repeated ContextBundle bundles = 2;  // Section-grouped bundles
+  SearchTiming timing = 3;            // Pipeline timing breakdown
+  string cache_source = 4;            // "memory", "redis", or empty (miss)
+}
+
+/**
+ * A single search hit from pgvector or Qdrant.
+ */
+message SearchResult {
+  string evidence_id = 1;
+  int32 chunk_index = 2;
+  string content = 3;
+  float score = 4;
+  ChunkMetadata metadata = 5;
+  RerankExplain rerank = 6;            // Present after legal-aware reranking
+}
+
+/**
+ * Chunk metadata from the evidence_vectors table.
+ */
+message ChunkMetadata {
+  repeated string section_path = 1;    // Hierarchical section path
+  string heading = 2;                  // Section heading
+  repeated string citations = 3;      // Legal citations found in chunk
+  string file_name = 4;               // Source file name
+  int32 token_count = 5;              // Token count
+  string extraction_method = 6;       // "pdf-parse", "ocr-tesseract", "ocr-tesseractjs"
+}
+
+/**
+ * Rerank explanation (75% cosine + 15% shared citations + 10% section proximity).
+ */
+message RerankExplain {
+  float cosine = 1;
+  float shared_citations = 2;
+  float section_proximity = 3;
+  float final_score = 4;
+}
+
+/**
+ * A context bundle: primary hit + section siblings + citations.
+ * This is the unit of context passed to the LLM.
+ */
+message ContextBundle {
+  SearchResult hit = 1;                // Primary search hit
+  repeated SearchResult siblings = 2;  // Sibling chunks from same section
+  repeated string section_path = 3;    // Section hierarchy
+  string heading = 4;                  // Section heading
+  repeated string citations = 5;      // All citations in this bundle
+}
+
+/**
+ * Pipeline timing breakdown.
+ */
+message SearchTiming {
+  float embed_ms = 1;                 // Query embedding time
+  float search_ms = 2;               // Dual search (pgvector + Qdrant)
+  float rerank_ms = 3;               // Legal-aware reranking
+  float hop_ms = 4;                  // Graph-hop expansion
+  float total_ms = 5;                // End-to-end latency
+}
+
+// ── Codebase Search (dual-vector) ──────────────────────────────────────
+
+/**
+ * Codebase chunk search request.
+ * Uses dual named vectors: content (raw code) + signature (AST metadata).
+ */
+message CodebaseSearchRequest {
+  string query = 1;                    // Natural language or code query
+  int32 limit = 2;                     // Max results (default 10)
+  float content_weight = 3;           // Weight for content vector (default 0.6)
+  float signature_weight = 4;         // Weight for signature vector (default 0.4)
+  repeated string kinds = 5;          // Filter by kind: "route", "component", "server", "lib"
+  string http_method = 6;             // Filter by HTTP method
+}
+
+/**
+ * Codebase search response.
+ */
+message CodebaseSearchResponse {
+  repeated CodebaseChunk chunks = 1;
+  float total_ms = 2;
+}
+
+/**
+ * A codebase chunk result.
+ */
+message CodebaseChunk {
+  string chunk_id = 1;
+  string file_path = 2;
+  string kind = 3;                     // "route", "component", "server", "lib"
+  string http_method = 4;             // GET, POST, etc.
+  string route_id = 5;                // SvelteKit route ID
+  repeated string tags = 6;           // AST-extracted tags
+  string content_preview = 7;         // First N chars of content
+  float score = 8;                    // Combined score
+}
+
+// ── Shared messages ────────────────────────────────────────────────────
+
+/**
+ * Health check request.
+ */
+message HealthRequest {
+  string service = 1;
+}
+
+/**
+ * Health check response.
+ */
+message HealthResponse {
+  string status = 1;                   // "healthy" or "unhealthy"
+  bool pgvector_connected = 2;
+  bool qdrant_connected = 3;
+  bool redis_connected = 4;
+  bool embedding_service_up = 5;
+  int64 timestamp = 6;
+}

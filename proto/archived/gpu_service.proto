@@ -1,0 +1,210 @@
+syntax = "proto3";
+
+package gpu_rag_system;
+
+option go_package = "github.com/yourorg/deeds-web-app/proto/gpu;gpu";
+
+// Core data types for embeddings and chunks
+message EmbeddingVector {
+  repeated float values = 1;          // 384-dim nomic-embed or custom dimensions
+  string model_name = 2;              // "nomic-embed-text-v1.5", etc
+  int32 dimensions = 3;               // vector dimensions
+}
+
+message TextChunk {
+  string content = 1;                 // UTF-8 text content
+  int32 chunk_index = 2;              // position in document
+  string document_id = 3;             // source document ID
+  string case_id = 4;                 // optional case grouping
+  map<string, string> metadata = 5;  // additional context
+}
+
+// GPU processing data containers
+message DataChunk {
+  oneof data {
+    bytes utf8_bytes = 1;             // Raw UTF-8 encoded text
+    EmbeddingVector embedding = 2;     // Float vector embedding
+    string json_data = 3;              // JSON string for SIMD parsing
+  }
+  int32 sequence_id = 4;              // Order in stream
+  bool is_final = 5;                  // Last chunk indicator
+  string operation_type = 6;          // "embed", "cluster", "search", "rank"
+}
+
+// Semantic processing requests
+message SemanticRequest {
+  string session_id = 1;              // Client session identifier
+  string operation = 2;               // "embed_text", "cluster_vectors", "semantic_search", "rank_results"
+  repeated TextChunk text_chunks = 3;
+  repeated EmbeddingVector embeddings = 4;
+  ProcessingOptions options = 5;
+}
+
+message ProcessingOptions {
+  bool use_gpu_acceleration = 1;      // Enable WebGPU/CUDA
+  bool enable_caching = 2;            // Use shader/result caching
+  int32 max_concurrency = 3;          // Parallel processing limit
+  string clustering_algorithm = 4;    // "kmeans", "som", "dbscan"
+  float similarity_threshold = 5;     // For clustering/search
+  bool enable_reinforcement_learning = 6; // Learning system
+}
+
+// GPU processing results
+message ProcessingResult {
+  string session_id = 1;
+  string operation = 2;
+  ProcessingStatus status = 3;
+  repeated EmbeddingVector result_embeddings = 4;
+  repeated ClusterInfo clusters = 5;
+  repeated SearchResult search_results = 6;
+  PerformanceMetrics performance = 7;
+  string error_message = 8;
+}
+
+message ClusterInfo {
+  int32 cluster_id = 1;
+  EmbeddingVector centroid = 2;
+  repeated int32 member_indices = 3;
+  float inertia = 4;                  // Clustering quality metric
+}
+
+message SearchResult {
+  string document_id = 1;
+  float similarity_score = 2;
+  EmbeddingVector embedding = 3;
+  string snippet = 4;                 // Text preview
+  map<string, string> metadata = 5;
+}
+
+message PerformanceMetrics {
+  int64 processing_time_ms = 1;
+  int64 gpu_compute_time_ms = 2;
+  int32 cache_hits = 3;
+  int32 cache_misses = 4;
+  float gpu_utilization = 5;          // 0.0 to 1.0
+  int64 memory_used_bytes = 6;
+}
+
+enum ProcessingStatus {
+  QUEUED = 0;
+  PROCESSING = 1;
+  COMPLETED = 2;
+  FAILED = 3;
+  CANCELLED = 4;
+}
+
+// Enhanced RAG pipeline requests
+message RAGRequest {
+  string query = 1;                   // User query text
+  string case_id = 2;                 // Optional case context
+  string user_id = 3;                 // For personalization
+  RAGOptions options = 4;
+}
+
+message RAGOptions {
+  int32 top_k = 1;                    // Number of results
+  bool enable_hybrid_search = 2;      // Vector + text search
+  bool enable_reranking = 3;          // Advanced result ranking
+  bool enable_compression = 4;        // Context compression
+  float diversity_threshold = 5;      // Result diversity
+  repeated string filters = 6;        // Metadata filters
+}
+
+message RAGResponse {
+  string query = 1;
+  string answer = 2;                  // Generated response
+  repeated SearchResult sources = 3;  // Source documents
+  string context = 4;                 // Used context
+  PerformanceMetrics performance = 5;
+  map<string, string> metadata = 6;
+}
+
+// Recommendation system
+message RecommendationRequest {
+  string user_id = 1;
+  map<string, string> context = 2;   // Current context/preferences
+  int32 max_recommendations = 3;
+  RecommendationType type = 4;
+}
+
+message RecommendationResponse {
+  repeated RecommendationItem recommendations = 1;
+  float confidence_score = 2;
+  string algorithm_used = 3;          // "collaborative", "content", "hybrid"
+}
+
+message RecommendationItem {
+  string item_id = 1;
+  string title = 2;
+  string description = 3;
+  float relevance_score = 4;
+  string category = 5;
+  map<string, string> metadata = 6;
+}
+
+enum RecommendationType {
+  DOCUMENTS = 0;
+  CASES = 1;
+  LEGAL_CONCEPTS = 2;
+  SIMILAR_QUERIES = 3;
+}
+
+// Service definitions
+service GPUProcessingService {
+  // Bidirectional streaming for real-time processing
+  rpc ProcessStream(stream DataChunk) returns (stream ProcessingResult);
+  
+  // Semantic operations
+  rpc ProcessSemantic(SemanticRequest) returns (ProcessingResult);
+  
+  // Enhanced RAG pipeline
+  rpc QueryRAG(RAGRequest) returns (RAGResponse);
+  rpc StreamRAG(RAGRequest) returns (stream RAGResponse);
+  
+  // Recommendation system
+  rpc GetRecommendations(RecommendationRequest) returns (RecommendationResponse);
+  
+  // System health and metrics
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc GetMetrics(MetricsRequest) returns (MetricsResponse);
+}
+
+message HealthCheckRequest {
+  string service_name = 1;
+}
+
+message HealthCheckResponse {
+  bool is_healthy = 1;
+  string status_message = 2;
+  map<string, string> service_status = 3; // PostgreSQL, Redis, Neo4j, etc.
+  SystemResources resources = 4;
+}
+
+message SystemResources {
+  float cpu_usage = 1;                // 0.0 to 1.0
+  float memory_usage = 2;             // 0.0 to 1.0
+  float gpu_usage = 3;                // 0.0 to 1.0
+  int64 disk_free_bytes = 4;
+}
+
+message MetricsRequest {
+  int64 start_time = 1;               // Unix timestamp
+  int64 end_time = 2;
+  repeated string metric_names = 3;   // Specific metrics to fetch
+}
+
+message MetricsResponse {
+  repeated Metric metrics = 1;
+}
+
+message Metric {
+  string name = 1;
+  string type = 2;                    // "counter", "gauge", "histogram"
+  repeated DataPoint data_points = 3;
+}
+
+message DataPoint {
+  int64 timestamp = 1;
+  double value = 2;
+  map<string, string> labels = 3;
+}

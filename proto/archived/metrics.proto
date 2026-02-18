@@ -1,0 +1,271 @@
+syntax = "proto3";
+
+package legal_ai.metrics.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/legal-ai/platform/proto/metrics";
+
+// MetricsService provides standardized metrics collection across all Legal AI services
+service MetricsService {
+  // Report performance metrics from any service
+  rpc ReportMetrics(ReportMetricsRequest) returns (ReportMetricsResponse);
+  
+  // Stream real-time metrics for monitoring dashboards
+  rpc StreamMetrics(StreamMetricsRequest) returns (stream MetricUpdate);
+  
+  // Get aggregated metrics for specific time ranges
+  rpc GetAggregatedMetrics(GetAggregatedMetricsRequest) returns (GetAggregatedMetricsResponse);
+  
+  // Report custom business metrics
+  rpc ReportBusinessMetrics(ReportBusinessMetricsRequest) returns (ReportBusinessMetricsResponse);
+}
+
+// Core metric types following Prometheus conventions
+message Metric {
+  string name = 1;
+  MetricType type = 2;
+  map<string, string> labels = 3;
+  MetricValue value = 4;
+  google.protobuf.Timestamp timestamp = 5;
+  string help = 6; // Description of what this metric measures
+}
+
+enum MetricType {
+  METRIC_TYPE_UNSPECIFIED = 0;
+  METRIC_TYPE_COUNTER = 1;      // Monotonically increasing
+  METRIC_TYPE_GAUGE = 2;        // Can go up or down
+  METRIC_TYPE_HISTOGRAM = 3;    // Distribution of measurements
+  METRIC_TYPE_SUMMARY = 4;      // Similar to histogram with quantiles
+}
+
+message MetricValue {
+  oneof value {
+    double gauge_value = 1;
+    uint64 counter_value = 2;
+    Histogram histogram_value = 3;
+    Summary summary_value = 4;
+  }
+}
+
+message Histogram {
+  uint64 sample_count = 1;
+  double sample_sum = 2;
+  repeated HistogramBucket buckets = 3;
+}
+
+message HistogramBucket {
+  double upper_bound = 1; // le (less than or equal)
+  uint64 cumulative_count = 2;
+}
+
+message Summary {
+  uint64 sample_count = 1;
+  double sample_sum = 2;
+  repeated SummaryQuantile quantiles = 3;
+}
+
+message SummaryQuantile {
+  double quantile = 1; // 0.5, 0.95, 0.99, etc.
+  double value = 2;
+}
+
+// Request/Response messages
+message ReportMetricsRequest {
+  string service_name = 1;
+  string service_version = 2;
+  string instance_id = 3;
+  repeated Metric metrics = 4;
+  map<string, string> global_labels = 5; // Applied to all metrics
+}
+
+message ReportMetricsResponse {
+  bool success = 1;
+  string message = 2;
+  int32 metrics_processed = 3;
+  repeated string errors = 4; // Per-metric errors if any
+}
+
+message StreamMetricsRequest {
+  repeated string metric_names = 1;
+  map<string, string> label_filters = 2;
+  google.protobuf.Duration update_interval = 3;
+  repeated string service_filters = 4;
+}
+
+message MetricUpdate {
+  string service_name = 1;
+  Metric metric = 2;
+  google.protobuf.Timestamp server_timestamp = 3;
+}
+
+message GetAggregatedMetricsRequest {
+  repeated string metric_names = 1;
+  map<string, string> label_filters = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  AggregationType aggregation = 5;
+  google.protobuf.Duration step = 6; // Time step for range queries
+}
+
+message GetAggregatedMetricsResponse {
+  repeated AggregatedMetric metrics = 1;
+  google.protobuf.Timestamp query_timestamp = 2;
+}
+
+message AggregatedMetric {
+  string name = 1;
+  map<string, string> labels = 2;
+  repeated TimeSeriesPoint values = 3;
+  AggregationType aggregation_used = 4;
+}
+
+message TimeSeriesPoint {
+  google.protobuf.Timestamp timestamp = 1;
+  double value = 2;
+}
+
+enum AggregationType {
+  AGGREGATION_TYPE_UNSPECIFIED = 0;
+  AGGREGATION_TYPE_AVG = 1;
+  AGGREGATION_TYPE_SUM = 2;
+  AGGREGATION_TYPE_MIN = 3;
+  AGGREGATION_TYPE_MAX = 4;
+  AGGREGATION_TYPE_P50 = 5;
+  AGGREGATION_TYPE_P95 = 6;
+  AGGREGATION_TYPE_P99 = 7;
+  AGGREGATION_TYPE_RATE = 8; // Per-second rate
+}
+
+// Business metrics specific to Legal AI platform
+message ReportBusinessMetricsRequest {
+  string service_name = 1;
+  repeated LegalAIMetric legal_metrics = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+message ReportBusinessMetricsResponse {
+  bool success = 1;
+  string message = 2;
+  int32 business_metrics_processed = 3;
+}
+
+message LegalAIMetric {
+  oneof metric {
+    DocumentProcessingMetric document_processing = 1;
+    CaseAnalysisMetric case_analysis = 2;
+    EmbeddingGenerationMetric embedding_generation = 3;
+    SearchQueryMetric search_query = 4;
+    GPUUtilizationMetric gpu_utilization = 5;
+    ComplianceMetric compliance = 6;
+  }
+}
+
+message DocumentProcessingMetric {
+  string document_id = 1;
+  string document_type = 2; // contract, evidence, brief, etc.
+  int64 file_size_bytes = 3;
+  google.protobuf.Duration processing_duration = 4;
+  ProcessingStatus status = 5;
+  repeated string processing_stages = 6; // OCR, analysis, embedding, etc.
+  double confidence_score = 7;
+  string error_message = 8;
+}
+
+enum ProcessingStatus {
+  PROCESSING_STATUS_UNSPECIFIED = 0;
+  PROCESSING_STATUS_STARTED = 1;
+  PROCESSING_STATUS_COMPLETED = 2;
+  PROCESSING_STATUS_FAILED = 3;
+  PROCESSING_STATUS_TIMEOUT = 4;
+}
+
+message CaseAnalysisMetric {
+  string case_id = 1;
+  string analysis_type = 2; // similarity, precedent, risk_assessment
+  google.protobuf.Duration analysis_duration = 3;
+  double accuracy_score = 4;
+  int32 documents_analyzed = 5;
+  AnalysisStatus status = 6;
+  string model_used = 7;
+}
+
+enum AnalysisStatus {
+  ANALYSIS_STATUS_UNSPECIFIED = 0;
+  ANALYSIS_STATUS_COMPLETED = 1;
+  ANALYSIS_STATUS_PARTIAL = 2;
+  ANALYSIS_STATUS_FAILED = 3;
+}
+
+message EmbeddingGenerationMetric {
+  string model_name = 1; // embeddinggemma, nomic-embed-text
+  int32 input_tokens = 2;
+  int32 embedding_dimensions = 3;
+  google.protobuf.Duration generation_duration = 4;
+  EmbeddingStatus status = 5;
+  bool gpu_accelerated = 6;
+  double gpu_memory_used_mb = 7;
+}
+
+enum EmbeddingStatus {
+  EMBEDDING_STATUS_UNSPECIFIED = 0;
+  EMBEDDING_STATUS_GENERATED = 1;
+  EMBEDDING_STATUS_CACHED = 2;
+  EMBEDDING_STATUS_FAILED = 3;
+}
+
+message SearchQueryMetric {
+  string query_id = 1;
+  string query_text = 2;
+  SearchType search_type = 3;
+  google.protobuf.Duration search_duration = 4;
+  int32 results_returned = 5;
+  double relevance_score = 6; // Average relevance of results
+  bool used_vector_search = 7;
+  bool used_full_text_search = 8;
+}
+
+enum SearchType {
+  SEARCH_TYPE_UNSPECIFIED = 0;
+  SEARCH_TYPE_SEMANTIC = 1;
+  SEARCH_TYPE_KEYWORD = 2;
+  SEARCH_TYPE_HYBRID = 3;
+  SEARCH_TYPE_CASE_LAW = 4;
+}
+
+message GPUUtilizationMetric {
+  string gpu_uuid = 1;
+  string gpu_name = 2;
+  double utilization_percent = 3;
+  double memory_used_percent = 4;
+  double temperature_celsius = 5;
+  int32 active_contexts = 6;
+  string workload_type = 7; // inference, embedding, training
+}
+
+message ComplianceMetric {
+  string audit_event_id = 1;
+  ComplianceEventType event_type = 2;
+  string user_id = 3;
+  string resource_accessed = 4;
+  google.protobuf.Timestamp access_time = 5;
+  ComplianceStatus compliance_status = 6;
+  string jurisdiction = 7;
+}
+
+enum ComplianceEventType {
+  COMPLIANCE_EVENT_TYPE_UNSPECIFIED = 0;
+  COMPLIANCE_EVENT_TYPE_DATA_ACCESS = 1;
+  COMPLIANCE_EVENT_TYPE_DATA_EXPORT = 2;
+  COMPLIANCE_EVENT_TYPE_USER_LOGIN = 3;
+  COMPLIANCE_EVENT_TYPE_PRIVILEGE_ESCALATION = 4;
+  COMPLIANCE_EVENT_TYPE_DATA_RETENTION = 5;
+}
+
+enum ComplianceStatus {
+  COMPLIANCE_STATUS_UNSPECIFIED = 0;
+  COMPLIANCE_STATUS_COMPLIANT = 1;
+  COMPLIANCE_STATUS_VIOLATION = 2;
+  COMPLIANCE_STATUS_REQUIRES_REVIEW = 3;
+}

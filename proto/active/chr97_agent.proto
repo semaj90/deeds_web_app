@@ -1,0 +1,79 @@
+// chr97_agent.proto - gRPC service for CHR97 binary cartridges
+syntax = "proto3";
+
+package chr97;
+
+// Basic identity
+message CaseRef {
+  string case_id = 1;
+}
+
+// One rune as raw bytes of Chr97Rune + optional meta
+message RuneBinary {
+  bytes header = 1;      // 128 bytes, Chr97Rune
+  bytes tag = 2;         // optional UTF-8 tag
+  bytes label = 3;       // optional UTF-8 label
+  bytes image_meta = 4;  // optional UTF-8 JSON
+}
+
+// Graph edge for agentic AST / KAG overlay
+message GraphEdge {
+  uint32 from_id = 1;     // rune id
+  uint32 to_id = 2;       // rune id
+  string relation = 3;    // "cites", "contradicts", "explains"
+}
+
+// Request full cartridge for a case
+message GetCartridgeRequest {
+  string case_id = 1;
+}
+
+// Stream of runes + edges
+message GetCartridgeResponse {
+  repeated RuneBinary runes = 1;
+  repeated GraphEdge edges = 2;
+}
+
+// Query mirrored tags + citations
+message TagQueryRequest {
+  string query = 1;
+  uint32 limit = 2;
+}
+
+message TagHit {
+  uint32 rune_id = 1;
+  string case_id = 2;
+  uint32 chunk_index = 3;
+  string tag = 4;
+  string label = 5;
+  repeated string saved_citations = 6;
+  repeated string search_citations = 7;
+}
+
+message TagQueryResponse {
+  repeated TagHit hits = 1;
+}
+
+// Agentic timeline + summary
+message TimelineRequest {
+  string case_id = 1;
+  string user_id = 2;
+}
+
+message TimelineEvent {
+  string id = 1;
+  string ts = 2;          // ISO8601
+  string kind = 3;        // "ingest", "search", "edit", "note"
+  string description = 4;
+}
+
+message TimelineResponse {
+  repeated TimelineEvent events = 1;
+  string ai_summary = 2;  // Granite/Gemma summary of where we are
+}
+
+service Chr97Agent {
+  rpc GetCartridge(GetCartridgeRequest) returns (GetCartridgeResponse);
+  rpc QueryTags(TagQueryRequest) returns (TagQueryResponse);
+  rpc GetTimeline(TimelineRequest) returns (TimelineResponse);
+}

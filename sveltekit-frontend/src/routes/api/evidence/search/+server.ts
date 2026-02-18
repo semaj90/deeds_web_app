@@ -20,6 +20,7 @@
  *   Cache final ContextBundle[] in Redis (30min TTL)
  *   Return coherent context bundles (not isolated snippets)
  */
+import { createHash } from 'node:crypto';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
@@ -27,8 +28,35 @@ import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { ENV } from '$lib/server/env.server.js';
+import { searchEvidenceViaGrpc } from '$lib/server/grpc/retrieval-client.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+
+/** SHA-256 hex digest (truncated to 16 chars for cache key brevity). */
+function sha256(input: string): string {
+	return createHash('sha256').update(input).digest('hex').slice(0, 16);
+}
+
+/**
+ * Build a session-scoped cache key that prevents cross-user leakage
+ * and distinguishes different filter combinations.
+ */
+function buildEvidenceSearchCacheKey(args: {
+	userId: string | null;
+	query: string;
+	filters: Record<string, unknown>;
+	limit: number;
+	version?: string;
+}): string {
+	const payload = JSON.stringify({
+		v: args.version ?? 'v1',
+		u: args.userId ?? 'anon',
+		q: args.query,
+		f: args.filters,
+		n: args.limit,
+	});
+	return `evidence:search:${sha256(payload)}`;
+}
 
 interface SearchResult {
 	evidenceId: string;
@@ -75,7 +103,7 @@ interface ContextBundle {
 	documentContext?: DocumentContext;
 }
 
-export async function POST({ request }: RequestEvent) {
+export async function POST({ request, locals }: RequestEvent) {
 	try {
 		const body = await request.json();
 		const { query, caseId, limit = 10, expandSections = true, jurisdiction } = body as {
@@ -91,12 +119,25 @@ export async function POST({ request }: RequestEvent) {
 		}
 
 		const start = performance.now();
+		const userId = (locals as any).user?.id ?? null;
 
-		// ── Cache check: Memory Map → Redis (30min TTL) ──────────────────
-		// Include caseId in the query key so different cases don't collide
-		const cacheQuery = caseId ? `${query}|case:${caseId}` : query;
+		// ── gRPC fast-path: delegate to RetrievalService if available ────
+		const grpcResult = await searchEvidenceViaGrpc({ query, caseId, limit, expandSections, jurisdiction });
+		if (grpcResult) {
+			console.log(`[Evidence Search] gRPC hit for "${query.slice(0, 40)}..." (${grpcResult.timing.totalMs}ms)`);
+			return json(grpcResult);
+		}
+		// gRPC unavailable or disabled — fall through to inline pipeline
+
+		// ── Cache check: session-scoped key (user + filters + query) ─────
+		const cacheKey = buildEvidenceSearchCacheKey({
+			userId,
+			query,
+			filters: { caseId, jurisdiction, expandSections },
+			limit,
+		});
 		const cacheOpts = { limit, metric: 'cosine' };
-		const { entry: cached, source: cacheSource } = await getVectorCache(cacheQuery, cacheOpts);
+		const { entry: cached, source: cacheSource } = await getVectorCache(cacheKey, cacheOpts);
 
 		if (cached) {
 			const totalMs = Math.round(performance.now() - start);
@@ -175,7 +216,7 @@ export async function POST({ request }: RequestEvent) {
 
 		// Cache the full response — fire-and-forget
 		setVectorCache(
-			cacheQuery,
+			cacheKey,
 			[response],
 			{ searchTime: timing.totalMs, totalResults: hits.length, model: 'embeddinggemma:latest', distanceMetric: 'cosine' },
 			cacheOpts

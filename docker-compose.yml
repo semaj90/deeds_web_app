@@ -48,16 +48,22 @@ services:
     environment:
       - NODE_ENV=development
       - PUBLIC_API_URL=http://localhost:8080
+      # ── Core data stores ──
       - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
       - REDIS_URL=redis://redis:6379
-      - OLLAMA_URL=http://host.docker.internal:11434
-      # Use localhost so URLs embedded in the browser client resolve correctly outside Docker
-      - MINIO_ENDPOINT=http://localhost:9000
+      - QDRANT_URL=http://qdrant:6333
+      - RABBITMQ_URL=amqp://legal_admin:secret123@rabbitmq:5672
+      # ── AI / Embedding ──
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - EMBEDDING_GRPC_URL=embedding-service:50051
+      - EMBEDDING_GRPC_ENABLED=true
+      # ── MinIO (server-side uses Docker DNS, browser uses host port) ──
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
       - MINIO_ACCESS_KEY=minio
       - MINIO_SECRET_KEY=minio123
       - MINIO_USE_SSL=false
-      - MINIO_BUCKET_NAME=legal-documents
-      - RABBITMQ_URL=amqp://legal_admin:secret123@rabbitmq:5672
+      - MINIO_EVIDENCE_BUCKET=legal-evidence
     volumes:
       - ./src:/app/src
       - ./static:/app/static
@@ -66,6 +72,9 @@ services:
     depends_on:
       - postgres
       - redis
+      - qdrant
+      - minio
+      - rabbitmq
     networks:
       - legal-ai-network
 

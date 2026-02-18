@@ -8,6 +8,7 @@ import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
+import { getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 
 import { ENV } from '$lib/server/env.server.js';
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -317,6 +318,15 @@ async function createGraphNodes(
 	const DEV_USER = '00000000-0000-0000-0000-000000000001';
 	const nodeIds: Map<string, string> = new Map();
 
+	// Ensure yorha_cases record exists (FK constraint: yorha_evidence_nodes.case_id → yorha_cases.id)
+	await db.execute(sql`
+		INSERT INTO yorha_cases (id, case_number, title, description, status, priority, created_by)
+		SELECT id, COALESCE(case_number, 'AUTO-' || LEFT(id::text, 8)), title,
+			COALESCE(description, ''), COALESCE(status, 'open'), COALESCE(priority, 'medium'), ${DEV_USER}
+		FROM cases WHERE id = ${caseId}
+		ON CONFLICT (id) DO NOTHING
+	`);
+
 	// Create a node for each section
 	for (const [sectionKey, section] of sections) {
 		const nodeId = crypto.randomUUID();
@@ -367,43 +377,62 @@ async function createGraphNodes(
 }
 
 /**
- * Generate a 768-dim embedding. Tries gRPC first, then HTTP/Ollama, then nomic fallback.
+ * Generate a 768-dim embedding. Checks Redis/memory cache first, then
+ * tries gRPC → embeddinggemma → nomic-embed-text. Caches result (60min TTL).
  */
 async function embedText(text: string): Promise<number[] | null> {
+	const model = 'embeddinggemma:latest';
+
+	// Check embedding cache (Memory Map → Redis) — skip re-embedding duplicate text
+	try {
+		const { entry: cached } = await getEmbeddingCache(text, model);
+		if (cached) return cached.embedding;
+	} catch { /* cache miss or unavailable */ }
+
 	// Try gRPC embedding service first (fastest path when available)
+	let embedding: number[] | null = null;
 	try {
 		const vec = await generateSingleEmbedding(text);
-		if (vec && vec.length > 0) return vec;
+		if (vec && vec.length > 0) embedding = vec;
 	} catch {
 		// gRPC unavailable — fall through to direct Ollama
 	}
 
-	try {
-		const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text }),
-			signal: AbortSignal.timeout(30_000),
-		});
-
-		if (!res.ok) {
-			// Fallback to nomic-embed-text
-			const fallback = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+	if (!embedding) {
+		try {
+			const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: 'nomic-embed-text:latest', prompt: text }),
+				body: JSON.stringify({ model, prompt: text }),
 				signal: AbortSignal.timeout(30_000),
 			});
-			if (!fallback.ok) return null;
-			const data = await fallback.json();
-			return data.embedding;
-		}
 
-		const data = await res.json();
-		return data.embedding;
-	} catch {
-		return null;
+			if (!res.ok) {
+				// Fallback to nomic-embed-text
+				const fallback = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ model: 'nomic-embed-text:latest', prompt: text }),
+					signal: AbortSignal.timeout(30_000),
+				});
+				if (!fallback.ok) return null;
+				const data = await fallback.json();
+				embedding = data.embedding;
+			} else {
+				const data = await res.json();
+				embedding = data.embedding;
+			}
+		} catch {
+			return null;
+		}
 	}
+
+	// Cache the fresh embedding — fire-and-forget (60min TTL in vector-cache.ts)
+	if (embedding) {
+		setEmbeddingCache(text, embedding, model).catch(() => {});
+	}
+
+	return embedding;
 }
 
 /**

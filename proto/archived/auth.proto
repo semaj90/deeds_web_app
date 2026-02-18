@@ -1,0 +1,239 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/legal-ai/proto/auth";
+
+// Authentication Service for QUIC Server
+service AuthService {
+    // User registration
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+
+    // User login
+    rpc Login(LoginRequest) returns (LoginResponse);
+
+    // Session validation
+    rpc ValidateSession(ValidateSessionRequest) returns (ValidateSessionResponse);
+
+    // Session refresh
+    rpc RefreshSession(RefreshSessionRequest) returns (RefreshSessionResponse);
+
+    // Logout
+    rpc Logout(LogoutRequest) returns (LogoutResponse);
+
+    // User profile operations
+    rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
+    rpc UpdateUserProfile(UpdateUserProfileRequest) returns (UpdateUserProfileResponse);
+
+    // Session management
+    rpc InvalidateAllSessions(InvalidateAllSessionsRequest) returns (InvalidateAllSessionsResponse);
+
+    // Token validation for API access
+    rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+}
+
+// Request Messages
+message RegisterRequest {
+    string email = 1;
+    string password = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string organization = 5;
+    string role = 6; // "user", "admin", "legal_professional"
+    map<string, string> metadata = 7;
+}
+
+message LoginRequest {
+    string email = 1;
+    string password = 2;
+    string ip_address = 3;
+    string user_agent = 4;
+    int32 session_duration_days = 5; // Default 30 days
+    map<string, string> device_info = 6;
+}
+
+message ValidateSessionRequest {
+    string session_id = 1;
+    string ip_address = 2;
+    string user_agent = 3;
+}
+
+message RefreshSessionRequest {
+    string session_id = 1;
+    int32 extend_days = 2; // Additional days to extend session
+}
+
+message LogoutRequest {
+    string session_id = 1;
+    bool invalidate_all_sessions = 2;
+}
+
+message GetUserProfileRequest {
+    string user_id = 1;
+    string session_id = 2;
+}
+
+message UpdateUserProfileRequest {
+    string user_id = 1;
+    string session_id = 2;
+    UserProfile profile = 3;
+}
+
+message InvalidateAllSessionsRequest {
+    string user_id = 1;
+    string admin_session_id = 2; // Admin session for authorization
+}
+
+message ValidateTokenRequest {
+    string token = 1;
+    string scope = 2; // "api", "quic", "grpc"
+}
+
+// Response Messages
+message RegisterResponse {
+    bool success = 1;
+    string user_id = 2;
+    string message = 3;
+    string error = 4;
+    UserProfile profile = 5;
+}
+
+message LoginResponse {
+    bool success = 1;
+    string session_id = 2;
+    string user_id = 3;
+    int64 expires_at = 4; // Unix timestamp
+    UserProfile profile = 5;
+    string access_token = 6; // JWT for API access
+    string refresh_token = 7;
+    string error = 8;
+}
+
+message ValidateSessionResponse {
+    bool valid = 1;
+    string user_id = 2;
+    UserProfile profile = 3;
+    int64 expires_at = 4;
+    SessionMetadata metadata = 5;
+    string error = 6;
+}
+
+message RefreshSessionResponse {
+    bool success = 1;
+    int64 new_expires_at = 2;
+    string new_session_id = 3; // Optional: rotate session ID
+    string error = 4;
+}
+
+message LogoutResponse {
+    bool success = 1;
+    string message = 2;
+    int32 sessions_invalidated = 3;
+}
+
+message GetUserProfileResponse {
+    bool success = 1;
+    UserProfile profile = 2;
+    string error = 3;
+}
+
+message UpdateUserProfileResponse {
+    bool success = 1;
+    UserProfile updated_profile = 2;
+    string error = 3;
+}
+
+message InvalidateAllSessionsResponse {
+    bool success = 1;
+    int32 sessions_invalidated = 2;
+    string error = 3;
+}
+
+message ValidateTokenResponse {
+    bool valid = 1;
+    string user_id = 2;
+    repeated string scopes = 3;
+    int64 expires_at = 4;
+    TokenMetadata metadata = 5;
+    string error = 6;
+}
+
+// Data Structures
+message UserProfile {
+    string user_id = 1;
+    string email = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string organization = 5;
+    string role = 6;
+    int64 created_at = 7;
+    int64 updated_at = 8;
+    UserPreferences preferences = 9;
+    UserPermissions permissions = 10;
+    map<string, string> metadata = 11;
+}
+
+message UserPreferences {
+    string theme = 1; // "light", "dark", "auto"
+    string language = 2; // "en", "es", etc.
+    bool email_notifications = 3;
+    bool push_notifications = 4;
+    string timezone = 5;
+    map<string, string> custom_settings = 6;
+}
+
+message UserPermissions {
+    repeated string allowed_actions = 1;
+    repeated string allowed_resources = 2;
+    map<string, bool> feature_flags = 3;
+    int32 api_rate_limit = 4;
+    int32 storage_quota_mb = 5;
+    bool can_access_quic = 6;
+    bool can_access_gpu = 7;
+}
+
+message SessionMetadata {
+    string session_id = 1;
+    string user_id = 2;
+    string ip_address = 3;
+    string user_agent = 4;
+    int64 created_at = 5;
+    int64 last_accessed = 6;
+    int64 expires_at = 7;
+    map<string, string> session_context = 8;
+}
+
+message TokenMetadata {
+    string token_type = 1; // "bearer", "api_key"
+    string issued_to = 2;
+    int64 issued_at = 3;
+    int64 last_used = 4;
+    int32 usage_count = 5;
+    repeated string allowed_origins = 6;
+}
+
+// Session Cookie Message for client storage
+message SessionCookie {
+    string session_id = 1;
+    int64 expires_at = 2;
+    bool secure = 3;
+    bool http_only = 4;
+    string same_site = 5; // "strict", "lax", "none"
+}
+
+// Authentication Error Codes
+enum AuthErrorCode {
+    AUTH_ERROR_NONE = 0;
+    AUTH_ERROR_INVALID_CREDENTIALS = 1;
+    AUTH_ERROR_USER_NOT_FOUND = 2;
+    AUTH_ERROR_SESSION_EXPIRED = 3;
+    AUTH_ERROR_SESSION_INVALID = 4;
+    AUTH_ERROR_TOKEN_INVALID = 5;
+    AUTH_ERROR_TOKEN_EXPIRED = 6;
+    AUTH_ERROR_PERMISSION_DENIED = 7;
+    AUTH_ERROR_RATE_LIMITED = 8;
+    AUTH_ERROR_USER_DISABLED = 9;
+    AUTH_ERROR_EMAIL_EXISTS = 10;
+    AUTH_ERROR_WEAK_PASSWORD = 11;
+    AUTH_ERROR_INTERNAL = 12;
+}

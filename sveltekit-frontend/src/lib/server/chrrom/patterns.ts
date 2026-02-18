@@ -47,7 +47,7 @@ export interface PrecomputeContext {
 // Configuration
 const ENHANCED_RAG_BASE = process.env.ENHANCED_RAG_URL || 'http://localhost:8094';
 const FRONTEND_BASE = process.env.FRONTEND_BASE_URL || 'http://localhost:5174';
-const REDIS_TTL_SECONDS = 120;
+const PATTERN_CACHE_TTL_SECONDS = 120;
 
 // Helpers
 async function withTimeout<T>(p: Promise<T>, ms = 8000): Promise<T> {
@@ -88,7 +88,7 @@ const patternCache = new Map<string, { pattern: CHRPattern;
 async function readThrough(
 	key: string,
 	compute: () => Promise<CHRPattern | null>,
-	ttl = REDIS_TTL_SECONDS
+	ttl = PATTERN_CACHE_TTL_SECONDS
 ): Promise<CHRPattern | null> {
 	const cached = patternCache.get(key);
 	if (cached && cached.expires > Date.now()) {
