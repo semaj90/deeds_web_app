@@ -2,9 +2,10 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const OLLAMA_URL = getOllamaUrl();
+const QDRANT_URL = getQdrantUrl();
 
 // Embedding model used for both indexing and retrieval — must match
 const EMBEDDING_MODEL = 'embeddinggemma:latest';

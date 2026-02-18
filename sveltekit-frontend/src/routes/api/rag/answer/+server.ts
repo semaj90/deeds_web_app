@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import type {
 	AnswerRequest,
@@ -7,7 +8,7 @@ import type {
 	ActionItem
 } from '$lib/types/rag-source-validation';
 
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const OLLAMA_URL = getOllamaUrl();
 
 /**
  * POST /api/rag/answer

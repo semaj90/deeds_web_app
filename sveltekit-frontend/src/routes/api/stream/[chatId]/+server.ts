@@ -1,8 +1,9 @@
 
 import { createClient } from 'redis';
+import { getRedisUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
-const REDIS_URL = process.env?.REDIS_URL ?? 'redis://localhost:6379';
+const REDIS_URL = getRedisUrl();
 
 export const GET: RequestHandler = async ({ params }) => {
     const subscriber = createClient({ url: REDIS_URL });

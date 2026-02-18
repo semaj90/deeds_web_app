@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import type {
 	ValidateSourcesRequest,
@@ -6,7 +7,7 @@ import type {
 	RetrievedChunk
 } from '$lib/types/rag-source-validation';
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = getQdrantUrl();
 
 /**
  * POST /api/rag/validate

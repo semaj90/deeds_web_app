@@ -1,7 +1,8 @@
 import { json } from '@sveltejs/kit';
+import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types.js';
 
-const OLLAMA_BASE = 'http://localhost:11434';
+const OLLAMA_BASE = getOllamaUrl();
 
 export const GET: RequestHandler = async () => {
  return json({

@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import type {
 	RetrieveCandidatesRequest,
@@ -7,8 +8,8 @@ import type {
 	ConfidenceLevel
 } from '$lib/types/rag-source-validation';
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const QDRANT_URL = getQdrantUrl();
+const OLLAMA_URL = getOllamaUrl();
 
 function toConfidence(score: number): ConfidenceLevel {
 	if (score >= 0.85) return 'high';

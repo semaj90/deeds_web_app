@@ -1,8 +1,9 @@
 import { json } from '@sveltejs/kit';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-const QDRANT_URL = 'http://127.0.0.1:6333';
+const QDRANT_URL = getQdrantUrl();
 
 interface KBEntry { id: string, score: number;
 	content: string, tags: string[];

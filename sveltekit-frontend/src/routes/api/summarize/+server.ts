@@ -1,7 +1,8 @@
 import { json } from '@sveltejs/kit';
+import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const OLLAMA_URL = getOllamaUrl();
 
 /**
  * POST /api/summarize

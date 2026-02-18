@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { getOllamaUrl, getQdrantUrl, getRedisUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
 interface QdrantSearchResult {
@@ -13,9 +14,9 @@ interface SearchRequest {
     filter?: Record<string, unknown>;
 }
 
-const QDRANT_URL = 'http://localhost:6333';
-const OLLAMA_URL = 'http://127.0.0.1:11434';
-const REDIS_URL = 'redis://localhost:6379';
+const QDRANT_URL = getQdrantUrl();
+const OLLAMA_URL = getOllamaUrl();
+const REDIS_URL = getRedisUrl();
 
 // GET: Health check and stats
 export const GET: RequestHandler = async ({ fetch }) => {

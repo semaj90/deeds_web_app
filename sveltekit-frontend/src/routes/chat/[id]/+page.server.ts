@@ -5,10 +5,11 @@
 
 import { fail } from '@sveltejs/kit';
 import { redis } from '$lib/server/redis';
+import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { Actions, PageServerLoad } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-const OLLAMA_URL = process.env?.OLLAMA_URL ?? process.env?.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
+const OLLAMA_URL = getOllamaUrl();
 const OLLAMA_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
 export const load: PageServerLoad = async ({ params, locals }) => {

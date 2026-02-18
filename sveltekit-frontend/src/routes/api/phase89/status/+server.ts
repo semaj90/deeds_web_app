@@ -1,19 +1,16 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import pg from 'pg';
 import { createClient } from 'redis';
+import { getDatabaseUrl, getQdrantUrl, getRedisUrl } from '$lib/config/env.server.js';
 
 const { Pool } = pg;
 
 const pgPool = new Pool({
-	host: '127.0.0.1',
-	port: 5434,
-	database: 'legal',
-	user: 'user',
-	password: 'pass'
+	connectionString: getDatabaseUrl()
 });
 
-const QDRANT_URL = 'http://127.0.0.1:6333';
-const REDIS_URL = 'redis://localhost:6379/0';
+const QDRANT_URL = getQdrantUrl();
+const REDIS_URL = getRedisUrl();
 
 export const GET: RequestHandler = async () => {
 	try {

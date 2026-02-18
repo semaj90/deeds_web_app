@@ -7,6 +7,7 @@
  */
 
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
+import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types.js';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -112,7 +113,7 @@ async function streamOllamaResponse(
 	_encoder: TextEncoder,
 	sendEvent: (event: string, data: any) => void
 ): Promise<void> {
-	const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+	const OLLAMA_URL = getOllamaUrl();
 	const MODEL = process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
 	const response = await fetch(`${OLLAMA_URL}/api/generate`, {

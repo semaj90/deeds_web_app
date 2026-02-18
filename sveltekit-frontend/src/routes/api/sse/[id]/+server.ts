@@ -6,10 +6,11 @@
  */
 
 import IORedis from 'ioredis';
+import { getRedisUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
-const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
+const REDIS_URL = getRedisUrl();
 
 function sseFormat(event: string, data: unknown): string {
 	return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;

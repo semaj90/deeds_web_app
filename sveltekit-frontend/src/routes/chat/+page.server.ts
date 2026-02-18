@@ -1,4 +1,5 @@
 import * as amqp from 'amqplib';
+import { getRabbitMQUrl } from '$lib/config/env.server.js';
 import type { Actions, PageServerLoad } from './$types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
@@ -34,7 +35,7 @@ export const actions: Actions = {
 
         // Push to RabbitMQ (works for both anonymous and authenticated users)
         try {
-            const conn = await (amqp as any).connect('amqp://localhost');
+            const conn = await (amqp as any).connect(getRabbitMQUrl());
             const ch = await conn.createChannel();
             await ch.assertQueue('ai_jobs');
 
