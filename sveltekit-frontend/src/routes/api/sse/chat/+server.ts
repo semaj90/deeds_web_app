@@ -2,10 +2,11 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
+import { ENV } from '$lib/server/env.server.js';
+import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
 
-const OLLAMA_URL = getOllamaUrl();
-const QDRANT_URL = getQdrantUrl();
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const QDRANT_URL = ENV.QDRANT_URL;
 
 // Embedding model used for both indexing and retrieval — must match
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -34,6 +35,7 @@ interface ConfidenceFactors {
 	ragHits: number;
 	topScore: number | null;
 	embeddingModel: string;
+	codebaseHits: number;
 }
 
 /**
@@ -266,8 +268,15 @@ export const POST: RequestHandler = async ({ request }) => {
 				caseContext = await loadCaseContext(caseMatch[1]);
 			}
 
-			// RAG: retrieve context documents before generating
-			const contextDocs = await retrieveContext(message);
+			// Code-intent gate: only run codebase retrieval for code-related queries
+			const CODE_HINT = /(svelte|sveltekit|drizzle|ts-morph|playwright|hooks\.server|schema-postgres|route|endpoint|api\/|\.ts\b|\.svelte\b|stack trace|error|typescrip|build|vite|qdrant|rabbitmq|proto|grpc|function|handler|component|database|query|schema|migration|server)/i;
+			const wantsCode = CODE_HINT.test(message) || message.includes('in this repo') || message.includes('codebase');
+
+			// RAG + Codebase: retrieve both context sources in parallel
+			const [contextDocs, codebaseResult] = await Promise.all([
+				retrieveContext(message),
+				wantsCode ? loadCodebaseContext(message).catch(() => null) : Promise.resolve(null)
+			]);
 			const contextUsed = contextDocs.map((d) => d.documentId);
 
 			let systemPrompt =
@@ -289,6 +298,11 @@ export const POST: RequestHandler = async ({ request }) => {
 					)
 					.join('\n\n');
 				systemPrompt += `\n\nRelevant evidence from the knowledge base:\n${contextText}\n\nUse this context to inform your response. Cite source numbers when referencing specific evidence.`;
+			}
+
+			// Inject codebase context (recall→rerank pipeline)
+			if (codebaseResult) {
+				systemPrompt += `\n\n${codebaseResult.context}`;
 			}
 
 			let fullResponse = '';
@@ -346,7 +360,8 @@ export const POST: RequestHandler = async ({ request }) => {
 					caseContext: caseContext !== null,
 					ragHits: contextDocs.length,
 					topScore,
-					embeddingModel: EMBEDDING_MODEL
+					embeddingModel: EMBEDDING_MODEL,
+					codebaseHits: codebaseResult?.chunks.length ?? 0
 				};
 
 				// Confidence: base 0.4, +0.15 for case context, +0.05 per RAG hit, +0.15 for high-quality top hit
@@ -357,6 +372,9 @@ export const POST: RequestHandler = async ({ request }) => {
 				}
 				if (topScore !== null && topScore > 0.6) {
 					confidence += 0.15;
+				}
+				if (codebaseResult && codebaseResult.chunks.length > 0) {
+					confidence += Math.min(codebaseResult.chunks.length * 0.03, 0.1);
 				}
 				confidence = Math.min(confidence, 0.95);
 
@@ -369,7 +387,12 @@ export const POST: RequestHandler = async ({ request }) => {
 						ragScores: contextDocs.map((d) => ({
 							id: d.documentId,
 							score: d.similarity
-						}))
+						})),
+						codebaseChunks: codebaseResult?.chunks.map((c) => ({
+							path: c.relativePath,
+							symbol: c.symbol,
+							score: c.score
+						})) ?? []
 					},
 					model: model ?? 'gemma3-legal:latest'
 				});

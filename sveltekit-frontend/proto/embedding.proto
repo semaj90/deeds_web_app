@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package embedding;
+
+option go_package = "github.com/deeds-web-app/backend/proto/embedding";
+option java_multiple_files = true;
+option java_package = "com.deeds.embedding";
+
+/**
+ * EmbeddingGemma gRPC Service
+ * Batch inference for 768d embeddings
+ * Optimized for RTX 3060 Ti (8GB, batch_size=4)
+ */
+
+service EmbeddingService {
+  // Batch embedding generation
+  rpc GenerateEmbeddings(EmbeddingRequest) returns (EmbeddingResponse);
+
+  // Stream embeddings (SSE-like for real-time UI)
+  rpc StreamEmbeddings(stream EmbeddingChunk) returns (stream EmbeddingResult);
+
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+
+  // Get service stats
+  rpc GetStats(StatsRequest) returns (StatsResponse);
+}
+
+/**
+ * Single embedding request
+ */
+message EmbeddingChunk {
+  string chunk_id = 1;
+  string text = 2;
+  string file_path = 3;
+  string language = 4;
+  map<string, string> metadata = 5;
+}
+
+/**
+ * Batch embedding request
+ */
+message EmbeddingRequest {
+  repeated EmbeddingChunk chunks = 1;
+  int32 batch_size = 2;
+  bool normalize = 3;
+  int32 max_length = 4;
+}
+
+/**
+ * Single embedding result
+ */
+message Embedding {
+  string chunk_id = 1;
+  repeated float vector = 2 [packed = true];
+  float processing_time_ms = 3;
+  int32 token_count = 4;
+  string status = 5;
+}
+
+/**
+ * Batch embedding response
+ */
+message EmbeddingResponse {
+  repeated Embedding embeddings = 1;
+  float total_time_ms = 2;
+  string model_name = 3;
+  int32 embedding_dimension = 4;
+  string status = 5;
+}
+
+/**
+ * Streaming embedding result (for SSE)
+ */
+message EmbeddingResult {
+  string chunk_id = 1;
+  repeated float vector = 2 [packed = true];
+  float processing_time_ms = 3;
+  int32 token_count = 4;
+  string status = 5;
+  int32 sequence_number = 6;
+}
+
+/**
+ * Health check request
+ */
+message HealthRequest {
+  string service = 1;
+}
+
+/**
+ * Health check response
+ */
+message HealthResponse {
+  string status = 1;
+  string model_loaded = 2;
+  float gpu_memory_used_gb = 3;
+  float gpu_memory_total_gb = 4;
+  string device = 5;
+  int64 timestamp = 6;
+}
+
+/**
+ * Stats request
+ */
+message StatsRequest {
+  bool include_memory = 1;
+}
+
+/**
+ * Stats response
+ */
+message StatsResponse {
+  string model_name = 1;
+  string device = 2;
+  bool is_loaded = 3;
+  int32 embedding_dimension = 4;
+  int32 batch_size = 5;
+  int32 max_length = 6;
+  int64 total_requests = 7;
+  float total_processing_time_s = 8;
+  float avg_processing_time_ms = 9;
+  bool gpu_available = 10;
+  float gpu_memory_allocated_gb = 11;
+  float gpu_memory_reserved_gb = 12;
+  int32 uptime_seconds = 13;
+}
