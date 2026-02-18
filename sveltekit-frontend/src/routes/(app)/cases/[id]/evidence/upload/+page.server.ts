@@ -3,7 +3,6 @@ import { cases } from '$lib/server/db/schema-postgres';
 import { error, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!locals.user) {
@@ -62,14 +61,28 @@ export const actions: Actions = {
  }
 
  try {
- // TODO: Upload to MinIO
- // TODO: Create rag_documents record
- // TODO: Publish RabbitMQ message
+	// Forward to the working upload API with caseId attached
+	formData.set('caseId', caseId);
+	formData.set('title', file.name);
+	formData.set('evidenceType', 'document');
+
+	const origin = new URL(request.url).origin;
+	const res = await fetch(`${origin}/api/evidence/upload`, {
+		method: 'POST',
+		body: formData,
+	});
+
+	const result = await res.json();
+
+	if (!res.ok) {
+		return { success: false, error: result.error ?? 'Upload failed' };
+	}
 
 	return {
 		success: true,
-		message: 'File uploaded successfully',
-		documentId: 'placeholder-id'
+		message: `File uploaded and queued for embedding (${result.fileName})`,
+		documentId: result.id,
+		jobId: result.jobId,
 	};
  } catch (err) {
  console.error('Upload error:', err);

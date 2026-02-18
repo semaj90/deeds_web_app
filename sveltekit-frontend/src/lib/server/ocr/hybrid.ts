@@ -1,22 +1,16 @@
-import { extractTextFromImage } from '$lib/server/ocr/extractText';
+import {
+    isTesseractAvailable,
+    extractTextFromImage as extractTextFromImageNative
+} from '$lib/server/ocr/tesseract.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { createWorker } from 'tesseract.js';
 import os from 'os';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface OcrResult {
     text: string;
-	method: 'native' | 'tesseractjs' | 'fallback';
+    method: 'native' | 'tesseractjs' | 'fallback';
     error?: string;
-}
-
-// Stub for native check
-async function isTesseractAvailable(): Promise<boolean> {
-    return false; // Stub
-}
-async function extractTextFromImageNative(buf: Buffer, filename: string): Promise<any> {
-    throw new Error('Not implemented');
 }
 
 /**

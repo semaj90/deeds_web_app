@@ -277,11 +277,11 @@ test.describe('User Flow Tests', () => {
         return;
       }
 
-      // Fill the form
-      await titleInput.fill(testCaseData.title);
+      // Fill the form — use .first() to avoid strict mode violation from CaseDocumentWriter inputs
+      await titleInput.first().fill(testCaseData.title);
 
       if ((await descriptionInput.count()) > 0) {
-        await descriptionInput.fill(testCaseData.description);
+        await descriptionInput.first().fill(testCaseData.description);
       }
 
       // Capture filled form
