@@ -93,11 +93,15 @@ for (const route of routes) {
     result.status = response?.status() ?? 0;
     result.ok = result.status >= 200 && result.status < 400;
 
-    // Check page content for SvelteKit error indicators
-    const bodyText = await tab.textContent('body').catch(() => '');
-    if (bodyText.includes('Internal Error') || bodyText.includes('500')) {
+    // Check page for SvelteKit error page (.error-page class from +error.svelte)
+    // or Vite error overlay (custom element injected on module load failure).
+    // Avoids false positives from CSS values like "font-weight: 500" or port
+    // numbers that appear inside <script>/<style> tags in textContent('body').
+    const errorPageCount = await tab.locator('.error-page').count().catch(() => 0);
+    const viteErrorCount = await tab.locator('vite-error-overlay').count().catch(() => 0);
+    if (errorPageCount > 0 || viteErrorCount > 0) {
       result.ok = false;
-      result.error = 'Page contains error text';
+      result.error = errorPageCount > 0 ? 'SvelteKit error page rendered' : 'Vite error overlay detected';
     }
 
     const filename = `${route.name}.png`;
