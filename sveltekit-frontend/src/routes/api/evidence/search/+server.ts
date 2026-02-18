@@ -507,38 +507,63 @@ async function enrichWithGraphNeighbors(
 	try {
 		const idList = evidenceIds.map(id => `'${id}'`).join(',');
 
-		// Find yorha evidence nodes matching our hit evidence IDs
-		const nodeResult = await db.execute(sql`
-			SELECT n.id AS node_id, n.title, n.node_type, n.file_path
-			FROM yorha_evidence_nodes n
-			WHERE n.case_id = ${caseId}
-			AND n.status = 'active'
-			AND (n.file_path IN ${sql.raw(`(${idList})`)}
-				OR n.id::text IN ${sql.raw(`(${idList})`)})
-		`);
-		const nodeRows = (nodeResult as any).rows ?? nodeResult;
+		// Split OR into two queries for sargability — avoids BitmapOr / Seq Scan.
+		// id::text cast prevents PK index usage, so we query file_path and id separately.
+		const [byPath, byId] = await Promise.all([
+			db.execute(sql`
+				SELECT n.id AS node_id, n.title, n.evidence_type, n.file_path
+				FROM yorha_evidence_nodes n
+				WHERE n.case_id = ${caseId}
+				AND n.status = 'active'
+				AND n.file_path IN ${sql.raw(`(${idList})`)}
+			`),
+			db.execute(sql`
+				SELECT n.id AS node_id, n.title, n.evidence_type, n.file_path
+				FROM yorha_evidence_nodes n
+				WHERE n.case_id = ${caseId}
+				AND n.status = 'active'
+				AND n.id IN ${sql.raw(`(${idList})`)}
+			`),
+		]);
+
+		const pathRows = (byPath as any).rows ?? byPath;
+		const idRows = (byId as any).rows ?? byId;
+		// Deduplicate by node_id
+		const nodeMap = new Map<string, any>();
+		for (const row of [...pathRows, ...idRows]) {
+			nodeMap.set(row.node_id, row);
+		}
+		const nodeRows = [...nodeMap.values()];
 		if (nodeRows.length === 0) return;
 
 		const nodeIds = nodeRows.map((r: any) => r.node_id);
 		const nodeIdStr = nodeIds.map((id: string) => `'${id}'`).join(',');
 
-		// 1-hop graph traversal
+		// 1-hop graph traversal — UNION ALL pattern for sargable index joins.
+		// Each branch hits its composite index directly instead of CASE expression.
 		const connResult = await db.execute(sql`
-			SELECT
-				c.source_node_id, c.target_node_id, c.connection_type,
-				c.strength, c.confidence_score, c.ai_reasoning,
-				tn.id AS neighbor_id, tn.title AS neighbor_title,
-				tn.node_type AS neighbor_type
-			FROM yorha_evidence_connections c
-			JOIN yorha_evidence_nodes tn
-				ON tn.id = CASE
-					WHEN c.source_node_id IN ${sql.raw(`(${nodeIdStr})`)} THEN c.target_node_id
-					ELSE c.source_node_id
-				END
-			WHERE c.case_id = ${caseId}
-			AND (c.source_node_id IN ${sql.raw(`(${nodeIdStr})`)}
-				OR c.target_node_id IN ${sql.raw(`(${nodeIdStr})`)})
-			ORDER BY c.strength DESC, c.confidence_score DESC
+			(
+				SELECT c.source_node_id, c.target_node_id, c.connection_type,
+					c.strength, c.confidence_score, c.ai_reasoning,
+					tn.id AS neighbor_id, tn.title AS neighbor_title,
+					tn.evidence_type AS neighbor_type
+				FROM yorha_evidence_connections c
+				JOIN yorha_evidence_nodes tn ON tn.id = c.target_node_id
+				WHERE c.case_id = ${caseId}
+				AND c.source_node_id IN ${sql.raw(`(${nodeIdStr})`)}
+			)
+			UNION ALL
+			(
+				SELECT c.source_node_id, c.target_node_id, c.connection_type,
+					c.strength, c.confidence_score, c.ai_reasoning,
+					tn.id AS neighbor_id, tn.title AS neighbor_title,
+					tn.evidence_type AS neighbor_type
+				FROM yorha_evidence_connections c
+				JOIN yorha_evidence_nodes tn ON tn.id = c.source_node_id
+				WHERE c.case_id = ${caseId}
+				AND c.target_node_id IN ${sql.raw(`(${nodeIdStr})`)}
+			)
+			ORDER BY strength DESC, confidence_score DESC
 			LIMIT 20
 		`);
 		const connRows = (connResult as any).rows ?? connResult;
@@ -583,7 +608,7 @@ async function enrichWithDocumentContext(bundles: ContextBundle[]): Promise<void
 	try {
 		const idList = evidenceIds.map(id => `'${id}'`).join(',');
 		const result = await db.execute(sql`
-			SELECT id, title, type, summary, description
+			SELECT id, title, kind, ai_summary, description
 			FROM evidence
 			WHERE id IN ${sql.raw(`(${idList})`)}
 		`);
@@ -594,8 +619,8 @@ async function enrichWithDocumentContext(bundles: ContextBundle[]): Promise<void
 			docMap.set(row.id, {
 				evidenceId: row.id,
 				fileName: row.title ?? '',
-				fileType: row.type ?? '',
-				description: row.description ?? row.summary ?? '',
+				fileType: row.kind ?? '',
+				description: row.description ?? row.ai_summary ?? '',
 			});
 		}
 
