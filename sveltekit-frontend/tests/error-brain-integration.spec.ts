@@ -25,14 +25,62 @@ test.describe('ErrorBrainModal Integration Tests', () => {
 	});
 
 	test('should load analysis history from API', async ({ page }) => {
+		// Mock the analyses API — return sample history
+		await page.route('**/api/routes/*/error-brain-analyses**', async (route) => {
+			await route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({
+					data: [
+						{
+							id: 'test-analysis-1',
+							phase: 'svelte-check',
+							status: 'completed',
+							created_at: new Date().toISOString(),
+							patches: [{ id: 'p1' }]
+						}
+					],
+					total: 1,
+					limit: 5,
+					offset: 0
+				})
+			});
+		});
+
 		const firstRoute = page.locator('.route-row').first();
 		if ((await firstRoute.count()) === 0) return; // no routes (AST graph unavailable)
 
 		await firstRoute.click();
-		const modalContent = page.locator('[role="dialog"]');
-		await expect(modalContent).toBeVisible();
-		// Modal content shows route details section
-		await expect(modalContent.locator('.modal-title')).toContainText('ROUTE DETAILS');
+		await expect(page.locator('[role="dialog"]')).toBeVisible();
+
+		// Click ANALYZE button
+		await page.locator('[data-testid="analyze-btn"]').click();
+
+		// Analyze panel should appear with history
+		await expect(page.locator('[data-testid="analyze-panel"]')).toBeVisible();
+		// Should show the mocked analysis entry
+		await expect(page.locator('.analysis-entry')).toBeVisible();
+		await expect(page.locator('.analysis-phase')).toContainText('svelte-check');
+	});
+
+	test('should show empty state when no analyses exist', async ({ page }) => {
+		// Mock the analyses API — return empty
+		await page.route('**/api/routes/*/error-brain-analyses**', async (route) => {
+			await route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ data: [], total: 0, limit: 5, offset: 0 })
+			});
+		});
+
+		const firstRoute = page.locator('.route-row').first();
+		if ((await firstRoute.count()) === 0) return;
+
+		await firstRoute.click();
+		await page.locator('[data-testid="analyze-btn"]').click();
+
+		await expect(page.locator('[data-testid="analyze-panel"]')).toBeVisible();
+		await expect(page.locator('.analyze-empty')).toContainText('NO ANALYSES YET');
 	});
 
 	test('should close modal', async ({ page }) => {
@@ -44,6 +92,29 @@ test.describe('ErrorBrainModal Integration Tests', () => {
 		// Escape key closes the modal (svelte:window onkeydown handler)
 		await page.keyboard.press('Escape');
 		await expect(page.locator('[role="dialog"]')).not.toBeVisible();
+	});
+
+	test('should go back from analyze mode', async ({ page }) => {
+		await page.route('**/api/routes/*/error-brain-analyses**', async (route) => {
+			await route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ data: [], total: 0, limit: 5, offset: 0 })
+			});
+		});
+
+		const firstRoute = page.locator('.route-row').first();
+		if ((await firstRoute.count()) === 0) return;
+
+		await firstRoute.click();
+		// Enter analyze mode
+		await page.locator('[data-testid="analyze-btn"]').click();
+		await expect(page.locator('[data-testid="analyze-panel"]')).toBeVisible();
+		// BACK button replaces ANALYZE — go back
+		await page.getByRole('button', { name: 'BACK' }).click();
+		await expect(page.locator('[data-testid="analyze-panel"]')).not.toBeVisible();
+		// ANALYZE button is visible again
+		await expect(page.locator('[data-testid="analyze-btn"]')).toBeVisible();
 	});
 
 	test('should handle route navigation', async ({ page }) => {

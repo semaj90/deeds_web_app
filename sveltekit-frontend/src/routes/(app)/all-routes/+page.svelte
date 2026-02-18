@@ -10,6 +10,9 @@
 	let filterKind = $state<'all' | 'page' | 'layout' | 'server' | 'endpoint'>('all');
 	let selectedRoute = $state<any | null>(null);
 	let modalOpen = $state(false);
+	let analyzeMode = $state(false);
+	let analyses = $state<any[]>([]);
+	let analyzeLoading = $state(false);
 
 	$effect(() => {
 		routes = Array.isArray(data.routes) ? data.routes : [];
@@ -146,6 +149,8 @@
 	function closeModal() {
 		modalOpen = false;
 		selectedRoute = null;
+		analyzeMode = false;
+		analyses = [];
 	}
 
 	function handleNavigate(route: any) {
@@ -153,8 +158,24 @@
 		window.location.href = route.path;
 	}
 
-	function handleAnalyze(route: any) {
+	async function handleAnalyze(route: any) {
 		logInteraction(route.id, 'analyze');
+		analyzeMode = true;
+		analyzeLoading = true;
+		analyses = [];
+		try {
+			const res = await fetch(
+				`/api/routes/${encodeURIComponent(route.id)}/error-brain-analyses?limit=5`
+			);
+			if (res.ok) {
+				const data = await res.json();
+				analyses = Array.isArray(data.data) ? data.data : [];
+			}
+		} catch {
+			// silently fail — modal still usable
+		} finally {
+			analyzeLoading = false;
+		}
 	}
 
 	function handleOverlayClick(e: MouseEvent) {
@@ -402,14 +423,41 @@
 				{/if}
 			</div>
 
+			<!-- Analyze Mode: Error-Brain Analysis History -->
+			{#if analyzeMode}
+				<div class="detail-section analyze-section" data-testid="analyze-panel">
+					<div class="detail-label">ERROR-BRAIN ANALYSES</div>
+					{#if analyzeLoading}
+						<div class="detail-value analyze-loading">LOADING...</div>
+					{:else if analyses.length === 0}
+						<div class="detail-value analyze-empty">NO ANALYSES YET</div>
+					{:else}
+						{#each analyses as analysis}
+							<div class="analysis-entry">
+								<span class="analysis-phase">[{analysis.phase ?? 'unknown'}]</span>
+								<span class="analysis-status">{analysis.status ?? 'pending'}</span>
+								<span class="analysis-patches">{analysis.patches?.length ?? 0}P</span>
+								<span class="analysis-date">{new Date(analysis.created_at).toLocaleDateString()}</span>
+							</div>
+						{/each}
+					{/if}
+				</div>
+			{/if}
+
 			<!-- Modal Actions -->
 			<div class="modal-actions">
 				<button class="nes-btn primary" onclick={() => handleNavigate(selectedRoute)}>
 					VISIT PAGE
 				</button>
-				<button class="nes-btn" onclick={() => handleAnalyze(selectedRoute)}>
-					ANALYZE
-				</button>
+				{#if analyzeMode}
+					<button class="nes-btn" onclick={() => { analyzeMode = false; analyses = []; }}>
+						BACK
+					</button>
+				{:else}
+					<button class="nes-btn" data-testid="analyze-btn" onclick={() => handleAnalyze(selectedRoute)}>
+						ANALYZE
+					</button>
+				{/if}
 				<button class="nes-btn" onclick={closeModal}>
 					CLOSE
 				</button>
@@ -851,6 +899,32 @@
 	}
 
 	/* ── Modal Actions ── */
+	.analyze-section {
+		border-top: 1px dashed #1a5a1a;
+		margin-top: 0.5rem;
+		padding-top: 0.5rem;
+	}
+
+	.analysis-entry {
+		display: flex;
+		gap: 0.75rem;
+		font-size: 0.7rem;
+		padding: 0.2rem 0;
+		border-bottom: 1px solid #0a2a0a;
+		color: #aaffaa;
+	}
+
+	.analysis-phase { color: #55ff55; }
+	.analysis-status { color: #aaaaaa; }
+	.analysis-patches { color: #ffaa33; }
+	.analysis-date { color: #666; margin-left: auto; }
+
+	.analyze-loading, .analyze-empty {
+		font-size: 0.7rem;
+		color: #666;
+		padding: 0.25rem 0;
+	}
+
 	.modal-actions {
 		display: flex;
 		gap: 0.5rem;
