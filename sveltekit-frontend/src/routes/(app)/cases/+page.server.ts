@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   }
 
   // Parse query parameters for filtering
-  const limit = Number(url.searchParams.get('limit')) ?? 50;
+  const limit = Number(url.searchParams.get('limit')) || 50;
   const offset = Number(url.searchParams.get('offset')) ?? 0;
   const status = url.searchParams.get('status');
   const priority = url.searchParams.get('priority');

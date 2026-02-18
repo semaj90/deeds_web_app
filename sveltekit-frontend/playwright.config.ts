@@ -109,4 +109,8 @@ export default defineConfig({
 
   // Preserve output on failure for debugging
   preserveOutput: 'failures-only',
+
+  // Global setup/teardown: seed test case data before suite, clean up after
+  globalSetup: './tests/global-setup.ts',
+  globalTeardown: './tests/global-teardown.ts',
 });
