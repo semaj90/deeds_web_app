@@ -149,7 +149,7 @@ export const load: PageServerLoad = async ({ url }) => {
 			checkServiceHealth('PostgreSQL', `${url.origin}/api/health/database`),
 			checkServiceHealth('Redis', `${url.origin}/api/health/redis`),
 			checkServiceHealth('Ollama', `${getOllamaUrl()}/api/tags`),
-			checkServiceHealth('Qdrant', `${getQdrantUrl()}/healthz`),
+			checkServiceHealth('Qdrant', getQdrantUrl()),
 			checkServiceHealth('Neo4j', `${url.origin}/api/health/neo4j`),
 			checkServiceHealth('MinIO', `http://${getMinioConfig().endpoint}/minio/health/live`)
 		]),

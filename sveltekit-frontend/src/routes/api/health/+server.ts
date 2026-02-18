@@ -23,8 +23,8 @@ export const GET = async () => {
  // TensorRT-LLM server
  await tryFetch('trtllm', `${TRTLLM_URL}/health`);
 
- // Qdrant
- await tryFetch('qdrant', getQdrantUrl() + '/health');
+ // Qdrant (root path returns version JSON with 200)
+ await tryFetch('qdrant', getQdrantUrl());
 
  // Redis (simple TCP check via HTTP proxy if available, else assume)
  try {
