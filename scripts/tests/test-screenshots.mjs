@@ -42,7 +42,7 @@ const ALL_ROUTES = [
   { name: 'admin-codebase-viewer', path: '/admin/codebase-viewer' },
   { name: 'system-configuration', path: '/system-configuration' },
   { name: 'terminal', path: '/terminal' },
-  { name: 'phase78', path: '/phase78' },
+  { name: 'phase78', path: '/phase78/monitor' },
 ];
 
 // SSE / long-poll pages that never reach networkidle
