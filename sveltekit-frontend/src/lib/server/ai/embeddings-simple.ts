@@ -2,6 +2,7 @@
 import { createHash } from 'crypto';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface CacheInterface {
     getCachedEmbedding: (key: string) => Promise<number[] | null>;
@@ -130,7 +131,7 @@ async function generateOpenAIEmbedding(text: string): Promise<number[]> {
 
 // Ollama single embedding
 async function generateOllamaEmbedding(text: string, model: string): Promise<number[]> {
-    const url = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+    const url = ENV.OLLAMA_BASE_URL;
 
     const res = await fetch(`${url}/api/embeddings`, {
         method: 'POST',

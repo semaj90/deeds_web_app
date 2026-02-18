@@ -7,10 +7,11 @@
 import { db } from '$lib/server/db/client';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { sql } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
 
 // Initialize Qdrant client
 const qdrant = new QdrantClient({
-	url: process.env.QDRANT_URL || 'http://localhost:6333'
+	url: ENV.QDRANT_URL
 });
 
 /**

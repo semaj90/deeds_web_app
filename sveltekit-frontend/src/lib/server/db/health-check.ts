@@ -33,8 +33,7 @@ export async function validateDatabaseOnStartup(): Promise<boolean> {
 		return true;
 	} catch (error: any) {
 		console.error('❌ Database health check failed: ', error.message);
-		console.error('🔌 Please ensure PostgreSQL is running on localhost:5432');
-		console.error('🔗 Connection string: postgresql://legal_admin:123456@localhost:5432/legal_ai_db');
+		console.error('🔌 Please ensure PostgreSQL is running and DATABASE_URL is configured');
 		return false;
 	} finally {
 		// Always release the client back to the pool

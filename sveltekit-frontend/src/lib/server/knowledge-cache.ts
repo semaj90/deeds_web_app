@@ -5,10 +5,11 @@ import type { QdrantSearchResult } from '$lib/types/qdrant';
 import crypto from 'crypto';
 import Redis from 'ioredis';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
 // Redis connection
 // Use ioredis for this file as it was using it originally, separate from integrations/redis.ts which uses node-redis
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+const redis = new Redis(ENV.REDIS_URL, {
     retryStrategy(times) {
         return Math.min(times * 50, 2000);
     },

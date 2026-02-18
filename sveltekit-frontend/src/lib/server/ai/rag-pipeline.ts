@@ -7,22 +7,17 @@ import type { Ollama } from '@langchain/ollama';
 import type { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { PromptTemplate } from '@langchain/core/prompts';
 import type { Document as LangChainDocument } from '@langchain/core/documents';
+import { ENV } from '$lib/server/env.server.js';
 
 /* -------------------- CONFIG -------------------- */
 
-function getOllamaEndpoint(): string {
- return (process.env.OLLAMA_URL || 'http://localhost:11434').replace(/\/$/, '');
-}
-
 const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL || 'embeddinggemma:latest';
 const LLM_MODEL = process.env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest';
-const OLLAMA_BASE_URL = getOllamaEndpoint();
-const process.env.DATABASE_URL =
- process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
 
-const sql = postgres(process.env.DATABASE_URL, { max: 20, idle_timeout: 10, prepare: true });
+const sql = postgres(ENV.DATABASE_URL, { max: 20, idle_timeout: 10, prepare: true });
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://:redis@localhost:6379/0', {
+const redis = new Redis(ENV.REDIS_URL, {
  maxRetriesPerRequest: 3, enableReadyCheck: true,
  lazyConnect: false,
  retryStrategy: (times: number) => Math.min(times * 50, 2000),

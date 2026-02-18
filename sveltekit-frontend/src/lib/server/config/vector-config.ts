@@ -44,11 +44,10 @@ export const VECTOR_CONFIG = {
 		CHAT_MESSAGES: 'chat_messages_384',
 		KNOWLEDGE_BASE: 'knowledge_base_384',
 	},
-	// Docker Desktop URLs (production-ready)
+	// Docker Desktop URLs (production-ready) — read from ENV for production portability
 	DOCKER_SERVICES: {
 	QDRANT_URL: process.env?.QDRANT_URL ?? 'http://localhost:6333',
-		POSTGRES_URL:
-			process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
+		POSTGRES_URL: process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
 		OLLAMA_URL: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
 		REDIS_URL: process.env?.REDIS_URL ?? 'redis://:redis@localhost:6379/0',
 	},

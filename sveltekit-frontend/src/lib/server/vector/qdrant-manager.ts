@@ -1,6 +1,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
 export class QdrantManager {
     private client: QdrantClient;
@@ -12,7 +13,7 @@ export class QdrantManager {
         embeddings_cache: 'embedding_cache'
     };
 
-    constructor(url = 'http://localhost:6333') {
+    constructor(url = ENV.QDRANT_URL) {
         this.client = new QdrantClient({ url });
     }
 

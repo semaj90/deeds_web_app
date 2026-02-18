@@ -1,7 +1,7 @@
 import postgres from 'postgres';
+import { ENV } from '$lib/server/env.server.js';
 
-// Use process.env to avoid requiring SvelteKit-specific env imports in utility module
-const connectionString = process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const connectionString = ENV.DATABASE_URL;
 
 const sql = postgres(connectionString, {
     max: 5,

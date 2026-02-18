@@ -13,6 +13,7 @@
  * All configurations are loaded from environment variables.
  */
 import { dev } from '$app/environment';
+import { ENV } from '$lib/server/env.server.js';
 import type {
 	MinIOClient,
 	MinIOConfig,
@@ -38,8 +39,7 @@ import type {
  * Compatible with both Docker and native Windows services
  */
 export function loadServiceEnvironment(): ServiceEnvironment {
-	const databaseUrl =
-		process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+	const databaseUrl = ENV.DATABASE_URL;
 	const dbUrl = new URL(databaseUrl.replace('postgres://', 'postgresql://'));
 
 	return {
@@ -57,7 +57,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
 		},
 		// Redis
 		redisConfig: {
-			url: process.env.REDIS_URL || 'redis://localhost:6379/0',
+			url: ENV.REDIS_URL,
 			password: process.env.REDIS_PASSWORD || undefined,
 			host: process.env.REDIS_HOST || 'localhost',
 			port: parseInt(process.env.REDIS_PORT || '6379', 10),
@@ -74,7 +74,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
 		},
 		// Ollama
 		ollamaConfig: {
-			baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
+			baseUrl: ENV.OLLAMA_BASE_URL,
 			embeddingModel: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
 			chatModel: process.env.CHAT_MODEL || 'gemma3-legal:latest',
 			gpuLayers: parseInt(process.env.OLLAMA_GPU_LAYERS || '30', 10),

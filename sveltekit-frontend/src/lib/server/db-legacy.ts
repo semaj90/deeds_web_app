@@ -5,14 +5,9 @@
 
 import postgres from 'postgres';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
-// Create a single connection instance
-const databaseUrl = process.env.DATABASE_URL ||
-                   process.env.PG_CONN_STRING ||
-                   'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
-
-console.log(`📡 Initializing database connection to: ${databaseUrl.replace(/:[^:]*@/, ':***@')}`);
-console.log(`📡 process.env.DATABASE_URL env var: ${process.env.DATABASE_URL ? 'SET' : 'NOT SET'}`);
+const databaseUrl = ENV.DATABASE_URL;
 
 export const sql = postgres(databaseUrl, {
  max: 20,

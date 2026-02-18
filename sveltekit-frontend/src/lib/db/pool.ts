@@ -8,13 +8,12 @@
  * @module db/pool
  */
 
-import { env } from '$env/dynamic/private';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
-// Fallback for development if env is not loaded
-const connectionString = env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+const connectionString = ENV.DATABASE_URL;
 
 /**
  * PostgreSQL client with connection pooling

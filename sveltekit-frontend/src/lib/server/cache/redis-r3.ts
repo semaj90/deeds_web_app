@@ -1,13 +1,14 @@
 import type { EmbeddingResult, QuantizedEmbedding } from '$lib/shared/embedding-types';
 import { createClient } from 'redis';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
 class RedisR3Cache {
 	private client: any;
 
 	constructor() {
 		this.client = createClient({
-			url: process.env?.REDIS_URL ?? 'redis://localhost:6379',
+			url: ENV.REDIS_URL,
 		});
 
 		this.client.on('error', (err: any) => {

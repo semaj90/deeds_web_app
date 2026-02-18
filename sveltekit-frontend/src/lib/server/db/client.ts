@@ -2,15 +2,14 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { canvasAutosaves } from './schema-canvas-autosaves.js';
 import * as schema from './schema.js'; // Changed from schema-postgres to schema
-
-const DEFAULT_DATABASE_URL = 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+import { ENV } from '$lib/server/env.server.js';
 
 function getDatabaseUrl(): string {
- return process.env?.DATABASE_URL|| DEFAULT_DATABASE_URL;
+ return ENV.DATABASE_URL;
 }
 
 function getAdminDatabaseUrl(): string {
- return process.env?.ADMIN_DATABASE_URL|| getDatabaseUrl();
+ return process.env?.ADMIN_DATABASE_URL || getDatabaseUrl();
 }
 
 // Create merged schema object

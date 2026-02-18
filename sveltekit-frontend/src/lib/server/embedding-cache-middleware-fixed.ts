@@ -5,6 +5,7 @@
  */
 import crypto from 'crypto';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
 // Stub imports - these may not exist or have different signatures
 // The actual implementations should be imported if available
@@ -58,7 +59,7 @@ export class EmbeddingCacheMiddleware {
 
 	constructor(config: EmbeddingCacheConfig = {}) {
 		this.config = {
-			redisUrl: config?.redisUrl ?? 'redis://localhost:6379',
+			redisUrl: config?.redisUrl ?? ENV.REDIS_URL,
 			pythonWorkerUrl: config?.pythonWorkerUrl ?? 'http://localhost:8000',
 			cacheTTL: config?.cacheTTL ?? 86400, // 24 hours
 			batchSize: config?.batchSize ?? 128, // RTX 3060 Ti optimal

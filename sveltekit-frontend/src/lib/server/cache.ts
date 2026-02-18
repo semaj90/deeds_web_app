@@ -1,10 +1,11 @@
 import { createClient } from 'redis';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
 type RedisClientOptions = Parameters<typeof createClient>[0];
 type RedisClient = ReturnType<typeof createClient>;
 
-const DEFAULT_REDIS_URL = process.env.REDIS_URL ?? process.env.VITE_REDIS_URL ?? 'redis://localhost:6379';
+const DEFAULT_REDIS_URL = ENV.REDIS_URL;
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? '';
 
 const SHOULD_USE_REDIS = process.env.CACHE_BACKEND === 'redis' || process.env.USE_REDIS === 'true' || Boolean(process.env.REDIS_URL);

@@ -7,6 +7,7 @@
 import { createClient, type RedisClientType } from 'redis';
 import type { IRedisCacheService, CacheSetOptions } from '$lib/types/external-services';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
 interface RedisConfig {
   url?: string;
@@ -23,7 +24,7 @@ export class RedisCacheService implements IRedisCacheService {
 
   constructor(config: Partial<RedisConfig> = {}) {
     this.config = {
-      url: config?.url || process.env?.REDIS_URL || 'redis://localhost:6379',
+      url: config?.url || ENV.REDIS_URL,
       password: config?.password || process.env?.REDIS_PASSWORD || '',
       maxRetries: config?.maxRetries ?? 3,
       retryDelay: config?.retryDelay ?? 1000,

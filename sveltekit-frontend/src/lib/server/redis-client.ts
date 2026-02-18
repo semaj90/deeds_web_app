@@ -2,9 +2,9 @@
  * Shared Redis Client (ioredis)
  * Centralizes configuration, error handling, and connection management.
  */
-import { env } from '$env/dynamic/private';
 import type { RedisOptions } from 'ioredis';
 import Redis from 'ioredis';
+import { ENV } from '$lib/server/env.server.js';
 
 
 export type RedisClientOptions = RedisOptions & {
@@ -33,9 +33,9 @@ function injectPassword(url: string, password?: string): string {
 }
 
 export function resolveRedisConfig(overrides?: RedisClientOptions): RedisResolvedConfig {
-	const envUrl = env.REDIS_URL || process.env.REDIS_URL;
-	const envPassword = env.REDIS_PASSWORD || process.env.REDIS_PASSWORD;
-	const url = overrides?.url ?? envUrl ?? 'redis://localhost:6379';
+	const envUrl = ENV.REDIS_URL;
+	const envPassword = process.env.REDIS_PASSWORD;
+	const url = overrides?.url ?? envUrl;
 	const password = overrides?.password ?? envPassword ?? undefined;
 	const finalPassword = password && password !== 'redis' ? password : undefined;
 

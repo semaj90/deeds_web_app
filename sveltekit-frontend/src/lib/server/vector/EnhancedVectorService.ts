@@ -3,6 +3,7 @@ import { db, sql } from '../db/index.js';
 import { cases } from '../db/schema.js';
 import type { QdrantApiWrapper } from './qdrant-api-wrapper.js';
 import { createQdrantWrapper } from './qdrant-api-wrapper.js';
+import { ENV } from '$lib/server/env.server.js';
 
 interface DocumentMetadata {
 	[key: string]: any;
@@ -48,11 +49,10 @@ export class EnhancedVectorService {
 
 	constructor() {
 		this.qdrant = createQdrantWrapper({
-			url: import.meta.env?.QDRANT_URL ?? 'http://localhost:6333'
+			url: ENV.QDRANT_URL
 		});
 
-		const redisUrl = (import.meta.env.REDIS_URL as string) ?? 'redis://localhost:6379/0';
-		this.redis = new Redis(redisUrl);
+		this.redis = new Redis(ENV.REDIS_URL);
 	}
 
 	async initializeCollection() {

@@ -62,7 +62,7 @@ export const FALLBACK_CHAIN = {
 };
 
 export const OLLAMA_CONFIG: OllamaConfig = {
-	baseUrl: import.meta.env?.OLLAMA_BASE_URL ?? 'http://localhost:11434',
+	baseUrl: process.env?.OLLAMA_BASE_URL ?? process.env?.OLLAMA_URL ?? 'http://localhost:11434',
 	defaultModel: 'gemma3-legal:latest',
 	embeddingModel: 'embeddinggemma',
 	fallbackModel: 'gemma3-legal:latest',

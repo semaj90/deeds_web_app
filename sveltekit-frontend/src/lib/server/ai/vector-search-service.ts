@@ -1,6 +1,7 @@
 import Redis from 'ioredis';
 import type { Sql } from 'postgres';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
 // Type for postgres client
 type PostgresClient = Sql<Record<string, unknown>>;
@@ -121,8 +122,8 @@ export class VectorSearchService {
         cacheTtl?: number;
         primaryProvider?: 'pgvector' | 'qdrant';
     }) {
-        this.pgvectorUrl = config?.pgvectorUrl ?? 'http://localhost:5432';
-        this.qdrantUrl = config?.qdrantUrl ?? 'http://localhost:6333';
+        this.pgvectorUrl = config?.pgvectorUrl ?? ENV.DATABASE_URL;
+        this.qdrantUrl = config?.qdrantUrl ?? ENV.QDRANT_URL;
         this.qdrantApiKey = config?.qdrantApiKey ?? 'admin';
         this.redis = config.redis;
         this.database = config.database;

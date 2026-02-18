@@ -1,6 +1,7 @@
 import Redis from 'ioredis';
+import { ENV } from '$lib/server/env.server.js';
 
-const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
+const REDIS_URL = ENV.REDIS_URL;
 
 // Single shared client for SSR (auto-connects)
 export const redis = new Redis(REDIS_URL, {

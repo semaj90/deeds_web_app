@@ -3,6 +3,8 @@ import pkg from 'pg';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 const { Pool } = pkg;
 
+import { ENV } from '$lib/server/env.server.js';
+
 // Environment configuration
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -10,13 +12,13 @@ const isDevelopment = process.env.NODE_ENV === 'development';
  * 🔒 Runtime App Connection (legal_admin - limited privileges)
  * Use this for all normal app operations: queries, inserts, updates
  */
-const appConnectionString = process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+const appConnectionString = ENV.DATABASE_URL;
 
 /**
  * 👑 Admin Connection (postgres - superuser)
  * Use this only for migrations, extensions, and administrative tasks
  */
-const adminConnectionString = process.env?.ADMIN_DATABASE_URL || (process.env?.MIGRATION_DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db');
+const adminConnectionString = process.env?.ADMIN_DATABASE_URL || (process.env?.MIGRATION_DATABASE_URL ?? ENV.DATABASE_URL);
 
 // App connection pool (for normal operations)
 export const appPool = isDevelopment

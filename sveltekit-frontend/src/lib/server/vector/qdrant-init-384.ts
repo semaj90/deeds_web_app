@@ -1,6 +1,7 @@
 import type { QdrantClient } from '@qdrant/js-client-rest';
 import { QdrantClient as QdrantClientImpl } from '@qdrant/js-client-rest';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
 // Correct dimensions for modern embeddings
 const VECTOR_CONFIG = {
@@ -21,7 +22,7 @@ const VECTOR_CONFIG = {
         KNOWLEDGE_BASE: 'knowledge_base'
     },
 	DOCKER_SERVICES: {
-	QDRANT_URL: 'http://localhost:6333'
+	QDRANT_URL: ENV.QDRANT_URL
     }
 };
 
