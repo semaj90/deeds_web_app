@@ -47,7 +47,7 @@ const vectorCache: Map<string, VectorCacheEntry> = new Map();
 const embeddingCache: Map<string, EmbeddingCacheEntry> = new Map();
 
 function getRedisClient(): any | null {
-	return redisService.getClient() || (globalThis as any).__REDIS ?? null;
+	return (redisService.getClient() || (globalThis as any).__REDIS) ?? null;
 }
 
 /**

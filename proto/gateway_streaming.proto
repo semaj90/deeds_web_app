@@ -4,7 +4,17 @@ package legal_ai.streaming;
 
 option go_package = "github.com/legal-ai/proto/streaming";
 
-// QUIC-optimized Legal AI Streaming Service
+// WebTransport/HTTP3 Streaming Gateway Interface
+//
+// This is a GATEWAY service — Caddy/nginx reverse proxy terminates
+// HTTP/2, HTTP/3 (QUIC), and WebTransport connections from browsers,
+// then forwards to internal gRPC services over plain HTTP/2.
+//
+// Frontend consumers: SSE/WebSocket over HTTP/2 or HTTP/3 via reverse proxy
+// Backend producers: gRPC (embedding, analysis, recommendations)
+//
+// The QUIC transport is handled by the reverse proxy (Caddy), NOT by
+// individual microservices. Internal services speak gRPC or REST.
 service LegalAIStreamingService {
     // High-performance document processing stream
     rpc ProcessDocumentStream(stream DocumentStreamRequest) returns (stream DocumentStreamResponse);

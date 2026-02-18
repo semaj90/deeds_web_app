@@ -1,20 +1,31 @@
 /**
  * POST /api/evidence/search
  *
- * Graph-hop semantic evidence retrieval:
- *   1. Embed query → pgvector cosine search on evidence_vectors
- *   2. Take top chunk hits → look up their section (via metadata.sectionPath)
- *   3. Graph hop: pull sibling chunks from same section
- *   4. Resolve citation cross-references
- *   5. Return coherent context bundles (not isolated snippets)
+ * RAG + KAG + DAG pipeline — graph-hop semantic evidence retrieval:
  *
- * Also queries Qdrant evidence_items if available (fast ANN pre-filter).
+ *   RAG (Retrieval-Augmented Generation):
+ *     1. Check Redis/memory cache by query hash
+ *     2. On miss: embed query (gRPC → Ollama fallback) → dual search (pgvector + Qdrant ANN)
+ *     3. Legal-aware rerank: cosine 75% + shared citations 15% + jurisdiction/section 10%
+ *     4. Section graph-hop: pull sibling chunks from same section
+ *
+ *   KAG (Knowledge-Augmented Generation):
+ *     5. Traverse yorha_evidence_connections graph to find related evidence nodes
+ *     6. Score graph neighbors by connection strength + AI confidence
+ *
+ *   DAG (Document-Augmented Generation):
+ *     7. For top hits, retrieve full document context from MinIO/evidence table
+ *     8. Resolve citation cross-references across documents
+ *
+ *   Cache final ContextBundle[] in Redis (30min TTL)
+ *   Return coherent context bundles (not isolated snippets)
  */
 import { json, type RequestEvent } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -25,29 +36,54 @@ interface SearchResult {
 	content: string;
 	score: number;
 	metadata: Record<string, unknown>;
+	rerank?: {
+		cosine: number;
+		sharedCitations: number;
+		jurisdictionMatch: number;
+		sectionProximity: number;
+		finalScore: number;
+	};
+}
+
+interface GraphNeighbor {
+	nodeId: string;
+	title: string;
+	evidenceType: string;
+	connectionType: string;
+	strength: number;
+	confidence: number;
+	aiReasoning?: string;
+}
+
+interface DocumentContext {
+	evidenceId: string;
+	fileName: string;
+	fileType: string;
+	description: string;
+	aiSummary?: string;
+	aiTags?: unknown;
+	keyEntities?: unknown;
 }
 
 interface ContextBundle {
-	/** The primary hit chunk */
 	hit: SearchResult;
-	/** Sibling chunks from the same section (graph hop) */
 	siblings: SearchResult[];
-	/** Section path hierarchy */
 	sectionPath: string[];
-	/** Heading of the section */
 	heading: string;
-	/** Citations found across this bundle */
 	citations: string[];
+	graphNeighbors: GraphNeighbor[];
+	documentContext?: DocumentContext;
 }
 
 export async function POST({ request }: RequestEvent) {
 	try {
 		const body = await request.json();
-		const { query, caseId, limit = 10, expandSections = true } = body as {
+		const { query, caseId, limit = 10, expandSections = true, jurisdiction } = body as {
 			query: string;
 			caseId?: string;
 			limit?: number;
 			expandSections?: boolean;
+			jurisdiction?: string;
 		};
 
 		if (!query || typeof query !== 'string') {
@@ -56,6 +92,23 @@ export async function POST({ request }: RequestEvent) {
 
 		const start = performance.now();
 
+		// ── Cache check: Memory Map → Redis (30min TTL) ──────────────────
+		// Include caseId in the query key so different cases don't collide
+		const cacheQuery = caseId ? `${query}|case:${caseId}` : query;
+		const cacheOpts = { limit, metric: 'cosine' };
+		const { entry: cached, source: cacheSource } = await getVectorCache(cacheQuery, cacheOpts);
+
+		if (cached) {
+			const totalMs = Math.round(performance.now() - start);
+			console.log(`[Evidence Search] Cache ${cacheSource} hit for "${query.slice(0, 40)}..." (${totalMs}ms)`);
+			return json({
+				...(cached.results[0] as Record<string, unknown>),
+				timing: { ...(cached.metadata as Record<string, unknown>), totalMs, cacheSource },
+			});
+		}
+
+		// ── Cache miss: full pipeline ────────────────────────────────────
+
 		// 1. Embed the query
 		const queryEmbedding = await embedQuery(query);
 		if (!queryEmbedding) {
@@ -63,12 +116,13 @@ export async function POST({ request }: RequestEvent) {
 		}
 		const embedMs = performance.now() - start;
 
-		// 2. Search pgvector for top chunks
+		// 2. Dual search: Qdrant ANN (fast) + pgvector (authoritative), merge + deduplicate
 		const searchStart = performance.now();
-		const hits = await searchPgvector(queryEmbedding, caseId, limit);
+		const fetchLimit = Math.min(limit * 3, 50); // over-fetch for rerank headroom
+		const rawHits = await dualSearch(queryEmbedding, caseId, fetchLimit);
 		const searchMs = performance.now() - searchStart;
 
-		if (hits.length === 0) {
+		if (rawHits.length === 0) {
 			return json({
 				results: [],
 				bundles: [],
@@ -76,43 +130,141 @@ export async function POST({ request }: RequestEvent) {
 			});
 		}
 
-		// 3. Graph-hop: expand each hit to its section siblings
+		// 3. Legal-aware rerank: cosine 75% + citations 15% + jurisdiction/section 10%
+		const rerankStart = performance.now();
+		const reranked = rerankEvidence(rawHits, query, jurisdiction);
+		const hits = reranked.slice(0, limit);
+		const rerankMs = performance.now() - rerankStart;
+
+		// 4. Graph-hop: expand each hit to its section siblings
 		let bundles: ContextBundle[] = [];
+		let hopMs = 0;
 		if (expandSections) {
 			const hopStart = performance.now();
 			bundles = await expandToSections(hits, caseId);
-			const hopMs = performance.now() - hopStart;
-
-			return json({
-				results: hits,
-				bundles,
-				timing: {
-					embedMs: Math.round(embedMs),
-					searchMs: Math.round(searchMs),
-					hopMs: Math.round(hopMs),
-					totalMs: Math.round(performance.now() - start),
-				},
-			});
+			hopMs = performance.now() - hopStart;
 		}
 
-		return json({
-			results: hits,
-			bundles: [],
-			timing: {
-				embedMs: Math.round(embedMs),
-				searchMs: Math.round(searchMs),
-				totalMs: Math.round(performance.now() - start),
-			},
-		});
+		// 5. KAG: traverse evidence graph for related nodes
+		let kagMs = 0;
+		if (bundles.length > 0 && caseId) {
+			const kagStart = performance.now();
+			await enrichWithGraphNeighbors(bundles, caseId);
+			kagMs = performance.now() - kagStart;
+		}
+
+		// 6. DAG: attach parent document context
+		let dagMs = 0;
+		if (bundles.length > 0) {
+			const dagStart = performance.now();
+			await enrichWithDocumentContext(bundles);
+			dagMs = performance.now() - dagStart;
+		}
+
+		const timing = {
+			embedMs: Math.round(embedMs),
+			searchMs: Math.round(searchMs),
+			rerankMs: Math.round(rerankMs),
+			hopMs: Math.round(hopMs),
+			kagMs: Math.round(kagMs),
+			dagMs: Math.round(dagMs),
+			totalMs: Math.round(performance.now() - start),
+		};
+
+		const response = { results: hits, bundles, timing };
+
+		// Cache the full response — fire-and-forget
+		setVectorCache(
+			cacheQuery,
+			[response],
+			{ searchTime: timing.totalMs, totalResults: hits.length, model: 'embeddinggemma:latest', distanceMetric: 'cosine' },
+			cacheOpts
+		).catch(() => { /* non-critical */ });
+
+		return json(response);
 	} catch (err) {
 		console.error('[Evidence Search] Error:', err);
 		return json({ error: 'Search failed' }, { status: 500 });
 	}
 }
 
+// ── Legal-aware reranking ────────────────────────────────────────────────
+
 /**
- * Embed query text. Tries gRPC → Ollama.
+ * Rerank evidence search results with legal-domain signals.
+ * Weights: 75% cosine + 15% shared citations + 10% jurisdiction/section.
+ * When jurisdiction is provided, the 10% slot favors jurisdiction matches.
+ * When absent, it favors deeper section paths (more specific chunks).
  */
+function rerankEvidence(
+	hits: SearchResult[],
+	query: string,
+	jurisdiction?: string
+): SearchResult[] {
+	const queryCitations = extractQueryCitations(query);
+	const jLower = jurisdiction?.toLowerCase();
+
+	return hits
+		.map((hit) => {
+			const cosine = hit.score;
+
+			// Citation overlap: how many of the hit's citations match query-mentioned refs
+			const hitCitations: string[] = (hit.metadata?.citations as string[]) ?? [];
+			let sharedCitations = 0;
+			if (queryCitations.length > 0 && hitCitations.length > 0) {
+				for (const hc of hitCitations) {
+					const hcLower = hc.toLowerCase();
+					for (const qc of queryCitations) {
+						if (hcLower.includes(qc)) { sharedCitations++; break; }
+					}
+				}
+			}
+
+			// Section proximity: deeper sections (more specific) get a small boost
+			const sectionPath: string[] = (hit.metadata?.sectionPath as string[]) ?? [];
+			const sectionProximity = Math.min(sectionPath.length / 5, 1);
+
+			// Jurisdiction match: if provided, boost chunks from same jurisdiction
+			let jurisdictionMatch = 0;
+			if (jLower) {
+				const hitJurisdiction = String(hit.metadata?.jurisdiction ?? '').toLowerCase();
+				const hitContent = hit.content.toLowerCase();
+				if (hitJurisdiction && hitJurisdiction.includes(jLower)) {
+					jurisdictionMatch = 1;
+				} else if (hitContent.includes(jLower)) {
+					jurisdictionMatch = 0.5; // partial: jurisdiction mentioned in text
+				}
+			}
+
+			// 10% slot: jurisdiction match when available, else section proximity
+			const contextSignal = jLower ? jurisdictionMatch : sectionProximity;
+			const finalScore = 0.75 * cosine + 0.15 * Math.min(sharedCitations, 3) / 3 + 0.10 * contextSignal;
+
+			return {
+				...hit,
+				score: finalScore,
+				rerank: { cosine, sharedCitations, jurisdictionMatch, sectionProximity, finalScore },
+			};
+		})
+		.sort((a, b) => b.score - a.score);
+}
+
+/**
+ * Extract citation-like fragments from the query string for overlap scoring.
+ */
+function extractQueryCitations(query: string): string[] {
+	const citations: string[] = [];
+	const sectionRefs = query.match(/§\s*\d+[\w.-]*/g);
+	if (sectionRefs) citations.push(...sectionRefs.map(s => s.toLowerCase()));
+	const uscRefs = query.match(/\d+\s+U\.?S\.?C\.?\s*§?\s*\d+/gi);
+	if (uscRefs) citations.push(...uscRefs.map(s => s.toLowerCase()));
+	const artSecRefs = query.match(/(?:article|section|art\.?|sec\.?)\s+[IVXLCDM\d]+/gi);
+	if (artSecRefs) citations.push(...artSecRefs.map(s => s.toLowerCase()));
+	return citations;
+}
+
+// ── Embedding ────────────────────────────────────────────────────────────
+
 async function embedQuery(text: string): Promise<number[] | null> {
 	try {
 		const vec = await generateSingleEmbedding(text);
@@ -134,9 +286,62 @@ async function embedQuery(text: string): Promise<number[] | null> {
 	}
 }
 
-/**
- * pgvector cosine similarity search on evidence_vectors.
- */
+// ── Dual search: Qdrant ANN + pgvector ───────────────────────────────────
+
+async function dualSearch(
+	embedding: number[],
+	caseId: string | undefined,
+	limit: number
+): Promise<SearchResult[]> {
+	const [pgResults, qdrantResults] = await Promise.all([
+		searchPgvector(embedding, caseId, limit),
+		searchQdrant(embedding, caseId, limit).catch((err) => {
+			console.warn('[Evidence Search] Qdrant unavailable, using pgvector only:', err instanceof Error ? err.message : err);
+			return [] as SearchResult[];
+		}),
+	]);
+
+	if (qdrantResults.length === 0) return pgResults;
+
+	const seen = new Set(pgResults.map(r => `${r.evidenceId}:${r.chunkIndex}`));
+	const extras = qdrantResults.filter(r => !seen.has(`${r.evidenceId}:${r.chunkIndex}`));
+
+	return [...pgResults, ...extras].sort((a, b) => b.score - a.score).slice(0, limit);
+}
+
+async function searchQdrant(
+	embedding: number[],
+	caseId: string | undefined,
+	limit: number
+): Promise<SearchResult[]> {
+	const { results } = await qdrant.hybridSearch({
+		query: '',
+		queryEmbedding: embedding,
+		collection: 'evidence',
+		filters: caseId ? { case_id: caseId } : undefined,
+		limit,
+		scoreThreshold: 0.3,
+	});
+
+	return results.map((r: any) => ({
+		evidenceId: r.payload?.evidence_id ?? '',
+		chunkIndex: r.payload?.chunk_index ?? 0,
+		content: r.payload?.content_preview ?? '',
+		score: r.score ?? 0,
+		metadata: {
+			sectionPath: r.payload?.section_path ?? [],
+			heading: r.payload?.heading ?? '',
+			citations: r.payload?.citations ?? [],
+			fileName: r.payload?.file_name ?? '',
+			tokenCount: r.payload?.token_count ?? 0,
+			extractionMethod: r.payload?.extraction_method ?? '',
+			jurisdiction: r.payload?.jurisdiction ?? '',
+		},
+	}));
+}
+
+// ── pgvector search ──────────────────────────────────────────────────────
+
 async function searchPgvector(
 	embedding: number[],
 	caseId: string | undefined,
@@ -174,10 +379,8 @@ async function searchPgvector(
 	}));
 }
 
-/**
- * Graph hop: for each hit, find sibling chunks in the same section.
- * Uses metadata.sectionPath to group chunks.
- */
+// ── Graph hop expansion ──────────────────────────────────────────────────
+
 async function expandToSections(
 	hits: SearchResult[],
 	caseId: string | undefined
@@ -190,25 +393,37 @@ async function expandToSections(
 		const heading: string = (hit.metadata?.heading as string) ?? '';
 		const sectionKey = sectionPath.join(' > ') || `chunk-${hit.chunkIndex}`;
 
-		// Skip duplicate sections
 		if (seenSections.has(sectionKey)) continue;
 		seenSections.add(sectionKey);
 
 		let siblings: SearchResult[] = [];
 
 		if (sectionPath.length > 0) {
-			// Find sibling chunks that share the same sectionPath
 			const sectionPathJson = JSON.stringify(sectionPath);
-			const siblingResult = await db.execute(sql`
-				SELECT evidence_id, chunk_index, content, metadata
-				FROM evidence_vectors
-				WHERE evidence_id = ${hit.evidenceId}
-				AND metadata->>'sectionPath' IS NOT NULL
-				AND metadata @> ${sql.raw(`'{"sectionPath":${sectionPathJson}}'::jsonb`)}
-				AND chunk_index != ${hit.chunkIndex}
-				ORDER BY chunk_index
-				LIMIT 10
-			`);
+			const siblingQuery = caseId
+				? sql`
+					SELECT ev.evidence_id, ev.chunk_index, ev.content, ev.metadata
+					FROM evidence_vectors ev
+					JOIN evidence e ON e.id = ev.evidence_id
+					WHERE ev.evidence_id = ${hit.evidenceId}
+					AND e.case_id = ${caseId}
+					AND ev.metadata->>'sectionPath' IS NOT NULL
+					AND ev.metadata @> ${sql.raw(`'{"sectionPath":${sectionPathJson}}'::jsonb`)}
+					AND ev.chunk_index != ${hit.chunkIndex}
+					ORDER BY ev.chunk_index
+					LIMIT 10
+				`
+				: sql`
+					SELECT evidence_id, chunk_index, content, metadata
+					FROM evidence_vectors
+					WHERE evidence_id = ${hit.evidenceId}
+					AND metadata->>'sectionPath' IS NOT NULL
+					AND metadata @> ${sql.raw(`'{"sectionPath":${sectionPathJson}}'::jsonb`)}
+					AND chunk_index != ${hit.chunkIndex}
+					ORDER BY chunk_index
+					LIMIT 10
+				`;
+			const siblingResult = await db.execute(siblingQuery);
 
 			const sibRows = (siblingResult as any).rows ?? siblingResult;
 			siblings = sibRows.map((row: any) => ({
@@ -220,7 +435,6 @@ async function expandToSections(
 			}));
 		}
 
-		// Collect all citations from hit + siblings
 		const allCitations = [
 			...((hit.metadata?.citations as string[]) ?? []),
 			...siblings.flatMap(s => (s.metadata?.citations as string[]) ?? []),
@@ -233,8 +447,140 @@ async function expandToSections(
 			sectionPath,
 			heading,
 			citations: uniqueCitations,
+			graphNeighbors: [],
 		});
 	}
 
 	return bundles;
+}
+
+// ── KAG: Knowledge Graph traversal ───────────────────────────────────────
+
+async function enrichWithGraphNeighbors(
+	bundles: ContextBundle[],
+	caseId: string
+): Promise<void> {
+	const evidenceIds = [...new Set(bundles.map(b => b.hit.evidenceId))];
+	if (evidenceIds.length === 0) return;
+
+	try {
+		const idList = evidenceIds.map(id => `'${id}'`).join(',');
+
+		// Find yorha evidence nodes matching our hit evidence IDs
+		const nodeResult = await db.execute(sql`
+			SELECT n.id AS node_id, n.title, n.node_type, n.file_path
+			FROM yorha_evidence_nodes n
+			WHERE n.case_id = ${caseId}
+			AND n.status = 'active'
+			AND (n.file_path IN ${sql.raw(`(${idList})`)}
+				OR n.id::text IN ${sql.raw(`(${idList})`)})
+		`);
+		const nodeRows = (nodeResult as any).rows ?? nodeResult;
+		if (nodeRows.length === 0) return;
+
+		const nodeIds = nodeRows.map((r: any) => r.node_id);
+		const nodeIdStr = nodeIds.map((id: string) => `'${id}'`).join(',');
+
+		// 1-hop graph traversal
+		const connResult = await db.execute(sql`
+			SELECT
+				c.source_node_id, c.target_node_id, c.connection_type,
+				c.strength, c.confidence_score, c.ai_reasoning,
+				tn.id AS neighbor_id, tn.title AS neighbor_title,
+				tn.node_type AS neighbor_type
+			FROM yorha_evidence_connections c
+			JOIN yorha_evidence_nodes tn
+				ON tn.id = CASE
+					WHEN c.source_node_id IN ${sql.raw(`(${nodeIdStr})`)} THEN c.target_node_id
+					ELSE c.source_node_id
+				END
+			WHERE c.case_id = ${caseId}
+			AND (c.source_node_id IN ${sql.raw(`(${nodeIdStr})`)}
+				OR c.target_node_id IN ${sql.raw(`(${nodeIdStr})`)})
+			ORDER BY c.strength DESC, c.confidence_score DESC
+			LIMIT 20
+		`);
+		const connRows = (connResult as any).rows ?? connResult;
+
+		const neighborMap = new Map<string, GraphNeighbor[]>();
+		for (const row of connRows) {
+			const sourceIsOurs = nodeIds.includes(row.source_node_id);
+			const ourNodeId = sourceIsOurs ? row.source_node_id : row.target_node_id;
+
+			const neighbors = neighborMap.get(ourNodeId) ?? [];
+			neighbors.push({
+				nodeId: row.neighbor_id,
+				title: row.neighbor_title ?? '',
+				evidenceType: row.neighbor_type ?? '',
+				connectionType: row.connection_type,
+				strength: row.strength ?? 50,
+				confidence: row.confidence_score ?? 0,
+				aiReasoning: row.ai_reasoning ?? undefined,
+			});
+			neighborMap.set(ourNodeId, neighbors);
+		}
+
+		for (const bundle of bundles) {
+			const matchingNode = nodeRows.find((n: any) =>
+				n.file_path === bundle.hit.evidenceId || n.node_id === bundle.hit.evidenceId
+			);
+			if (matchingNode) {
+				bundle.graphNeighbors = neighborMap.get(matchingNode.node_id) ?? [];
+			}
+		}
+	} catch (err) {
+		console.warn('[Evidence Search] KAG graph traversal failed (non-fatal):', err);
+	}
+}
+
+// ── DAG: Document-level context ──────────────────────────────────────────
+
+async function enrichWithDocumentContext(bundles: ContextBundle[]): Promise<void> {
+	const evidenceIds = [...new Set(bundles.map(b => b.hit.evidenceId))];
+	if (evidenceIds.length === 0) return;
+
+	try {
+		const idList = evidenceIds.map(id => `'${id}'`).join(',');
+		const result = await db.execute(sql`
+			SELECT id, title, type, summary, description
+			FROM evidence
+			WHERE id IN ${sql.raw(`(${idList})`)}
+		`);
+		const rows = (result as any).rows ?? result;
+
+		const docMap = new Map<string, DocumentContext>();
+		for (const row of rows) {
+			docMap.set(row.id, {
+				evidenceId: row.id,
+				fileName: row.title ?? '',
+				fileType: row.type ?? '',
+				description: row.description ?? row.summary ?? '',
+			});
+		}
+
+		// Enrich with yorha node data (has ai_summary, ai_tags, key_entities)
+		const yorhaResult = await db.execute(sql`
+			SELECT n.file_path, n.ai_summary, n.ai_tags, n.key_entities, n.file_type
+			FROM yorha_evidence_nodes n
+			WHERE n.file_path IN ${sql.raw(`(${idList})`)}
+			OR n.id::text IN ${sql.raw(`(${idList})`)}
+		`);
+		const yorhaRows = (yorhaResult as any).rows ?? yorhaResult;
+		for (const row of yorhaRows) {
+			const evId = row.file_path ?? row.id;
+			const existing = docMap.get(evId);
+			if (existing) {
+				existing.aiSummary = row.ai_summary ?? undefined;
+				existing.aiTags = row.ai_tags ?? undefined;
+				existing.keyEntities = row.key_entities ?? undefined;
+				if (!existing.fileType && row.file_type) existing.fileType = row.file_type;
+			}
+		}
+
+		for (const bundle of bundles) {
+			bundle.documentContext = docMap.get(bundle.hit.evidenceId);
+		}
+	} catch (err) {
+		console.warn('[Evidence Search] DAG document context failed (non-fatal):', err);
+	}
 }
