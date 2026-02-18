@@ -46,7 +46,7 @@ const ALL_ROUTES = [
 ];
 
 // SSE / long-poll pages that never reach networkidle
-const SSE_PAGES = new Set(['all-routes', 'cases-overview', 'dashboard', 'command-center', 'error-brain']);
+const SSE_PAGES = new Set(['all-routes', 'cases-overview', 'dashboard', 'command-center', 'error-brain', 'phase78']);
 
 // ── CLI args ───────────────────────────────────────────────────────
 const args = process.argv.slice(2);
