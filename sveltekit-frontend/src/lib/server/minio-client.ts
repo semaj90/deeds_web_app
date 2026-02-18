@@ -1,24 +1,19 @@
-import { env } from '$lib/env';
+import { ENV } from '$lib/server/env.server.js';
 import { Client } from 'minio';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Centralized MinIO client initialization
 let minioClient: Client | null = null;
 
 function getMinioClient(): Client {
  if (!minioClient) {
- const endPoint = env?.MINIO_ENDPOINT ?? 'localhost';
- const port = parseInt(env?.MINIO_PORT ?? '9000', 10);
- const accessKey = env?.MINIO_ACCESS_KEY ?? 'minioadmin';
- const secretKey = env?.MINIO_SECRET_KEY ?? 'minioadmin';
- const useSSL = env.MINIO_USE_SSL === 'true'; // Default to false for local dev
-
- if (!endPoint || !accessKey || !secretKey) {
- console.error('MinIO environment variables not fully configured. Using defaults.');
- }
+ const endPoint = ENV.MINIO_ENDPOINT;
+ const port = parseInt(ENV.MINIO_PORT, 10);
+ const accessKey = ENV.MINIO_ACCESS_KEY;
+ const secretKey = ENV.MINIO_SECRET_KEY;
+ const useSSL = ENV.MINIO_USE_SSL === 'true';
 
  minioClient = new Client({
-   endPoint: endPoint.split(':')[0], // Handle 'minio:9000' format
+   endPoint: endPoint.split(':')[0],
    port: endPoint.includes(':') ? parseInt(endPoint.split(':')[1], 10) : port,
    useSSL,
    accessKey,
@@ -55,7 +50,7 @@ export async function uploadFile(
  return objectName;
 }
 
-const BUCKET = process.env.MINIO_EVIDENCE_BUCKET ?? 'legal-evidence';
+const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
 const AI_CHAT_IMAGES_BUCKET = process.env.MINIO_AI_CHAT_IMAGES_BUCKET ?? 'ai-chat-images';
 
 /**

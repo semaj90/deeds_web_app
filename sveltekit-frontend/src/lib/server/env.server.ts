@@ -9,6 +9,12 @@ const DEV = {
 	RABBITMQ_URL: 'amqp://guest:guest@localhost:5672',
 	OLLAMA_URL: 'http://localhost:11434',
 	PUBLIC_API_URL: 'http://localhost:5173',
+	MINIO_ENDPOINT: 'localhost',
+	MINIO_PORT: '9000',
+	MINIO_ACCESS_KEY: 'admin',
+	MINIO_SECRET_KEY: 'password',
+	MINIO_USE_SSL: 'false',
+	MINIO_EVIDENCE_BUCKET: 'legal-evidence',
 };
 
 function qdrantUrlFromParts(): string | undefined {
@@ -25,4 +31,10 @@ export const ENV = {
 	RABBITMQ_URL: privateEnv.RABBITMQ_URL ?? DEV.RABBITMQ_URL,
 	OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
 	PUBLIC_API_URL: publicEnv.PUBLIC_API_URL ?? DEV.PUBLIC_API_URL,
+	MINIO_ENDPOINT: privateEnv.MINIO_ENDPOINT ?? DEV.MINIO_ENDPOINT,
+	MINIO_PORT: privateEnv.MINIO_PORT ?? DEV.MINIO_PORT,
+	MINIO_ACCESS_KEY: privateEnv.MINIO_ACCESS_KEY ?? DEV.MINIO_ACCESS_KEY,
+	MINIO_SECRET_KEY: privateEnv.MINIO_SECRET_KEY ?? DEV.MINIO_SECRET_KEY,
+	MINIO_USE_SSL: privateEnv.MINIO_USE_SSL ?? DEV.MINIO_USE_SSL,
+	MINIO_EVIDENCE_BUCKET: privateEnv.MINIO_EVIDENCE_BUCKET ?? DEV.MINIO_EVIDENCE_BUCKET,
 };

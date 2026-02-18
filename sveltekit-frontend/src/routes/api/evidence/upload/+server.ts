@@ -2,12 +2,13 @@ import { json, type RequestEvent } from '@sveltejs/kit';
 import crypto from 'crypto';
 import { uploadFile } from '$lib/server/minio-client';
 import db from '$lib/server/db';
-import { evidence, evidenceVectors } from '$lib/server/db/schema';
+import { evidenceVectors } from '$lib/server/db/schema';
+import { sql } from 'drizzle-orm';
 import { createJob, updateJob } from '$lib/server/evidence-progress';
 
-import { getOllamaUrl } from '$lib/config/env.server.js';
-const BUCKET = process.env.MINIO_EVIDENCE_BUCKET ?? 'legal-evidence';
-const OLLAMA_URL = getOllamaUrl();
+import { ENV } from '$lib/server/env.server.js';
+const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
 /**
@@ -58,35 +59,31 @@ export async function POST({ request }: RequestEvent) {
 
 		const minioUrl = `minio://${BUCKET}/${objectKey}`;
 
-		// 4. Insert into PostgreSQL
+		// 4. Insert into PostgreSQL (raw SQL — Drizzle schema out of sync with actual DB columns)
 		updateJob(jobId, { step: 'db-insert', progress: 50, message: 'Saving to database...' });
 
-		const [inserted] = await db
-			.insert(evidence)
-			.values({
-				caseId: caseId,
-				title: title || file.name,
-				description: description,
-				filePath: minioUrl,
-				fileType: file.type,
-				fileSize: file.size,
-				hash: `sha256:${fileHash}`,
-				source: 'upload',
-				dateObtained: new Date(),
-				metadata: {
-					kind: evidenceType,
-					uploadedAt: new Date().toISOString(),
-					fileSize: file.size,
-					minioKey: objectKey,
-					minioBucket: BUCKET,
-				},
-				evidenceType: evidenceType as any,
-				fileUrl: minioUrl,
-				fileName: file.name,
-				uploadedAt: new Date().toISOString(),
-				canvasPosition: {},
-			})
-			.returning();
+		const evidenceNumber = `EV-${Date.now().toString(36).toUpperCase()}`;
+		const insertResult = await db.execute(sql`
+			INSERT INTO evidence (case_id, evidence_number, title, type, summary, description,
+				evidence_type, file_type, file_url, file_name, file_size, hash, uploaded_at)
+			VALUES (
+				${caseId ?? '00000000-0000-0000-0000-000000000000'},
+				${evidenceNumber},
+				${title || file.name},
+				'document',
+				${description || `Uploaded file: ${file.name}`},
+				${description},
+				${evidenceType.toLowerCase()},
+				${file.type},
+				${minioUrl},
+				${file.name},
+				${file.size},
+				${'sha256:' + fileHash},
+				NOW()
+			)
+			RETURNING id
+		`);
+		const inserted = { id: (insertResult as any).rows?.[0]?.id ?? (insertResult as any)[0]?.id };
 
 		const evidenceId = inserted.id;
 		updateJob(jobId, { evidenceId, step: 'db-insert', progress: 60, message: 'Database record created' });
