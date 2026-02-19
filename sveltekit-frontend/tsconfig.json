@@ -135,7 +135,7 @@
     "src/lib/integrations/**",
     "src/lib/error-brain/**",
     "src/lib/agents/**",
-    "src/lib/phase72/**",
+    // "src/lib/phase72/**", // Session 55: RE-INCLUDED (3 files, imported by all-routes + phase72 API)
     "src/lib/phase78/**",
     "src/lib/phase14/**",
     // Corrupted component subdirectories (syntax corruption in svelte templates)
@@ -218,10 +218,10 @@
     // "src/routes/api/phase72/**", // Session 32c: RE-INCLUDED (AST error reduction)
     // "src/routes/api/phase90/**", // Session 32c: RE-INCLUDED (RAG+KAG+DAG tools)
     "src/lib/api/**",
-    "src/lib/server/ai/**",
+    "src/lib/server/ai/**", // Session 55: RE-EXCLUDED — only ollama-service.ts needed (transitively checked); 334 errors in 10+ broken files
     "src/lib/server/orchestrator/**",
     "src/lib/server/monitoring/**",
-    "src/lib/server/tools/**",
+    // "src/lib/server/tools/**", // Session 55: RE-INCLUDED (8 files, imported by api/tools/execute)
     "src/lib/routing/**",
     "src/lib/middleware/**",
     "src/lib/llm/**",
@@ -336,7 +336,7 @@
     "src/lib/server/db/qdrant-sync.ts",
     "src/lib/server/cases/**",
     "src/lib/server/database-pool-service.ts",
-    "src/lib/server/queue/**",
+    // "src/lib/server/queue/**", // Session 55: RE-INCLUDED (8 files, imported by ace/web-crawl)
     "src/lib/server/search/**",
     "src/lib/server/messaging/**",
     "src/lib/server/connections/**",
@@ -346,7 +346,7 @@
     "src/lib/rabbitmq/**",
     "src/lib/testing/**",
     "src/lib/server/ingest/**",
-    "src/lib/server/auth/**",
+    // "src/lib/server/auth/**", // Session 55: RE-INCLUDED (6 files, imported by auth/health)
     "src/lib/server/db/schema-phase90-hardened.ts",
     "src/lib/server/db/utils.ts",
     "src/lib/server/db/query-utils.ts",
@@ -369,7 +369,7 @@
     "src/lib/server/context/**",
     "src/lib/server/contradictionEngine/**",
     "src/lib/server/error-brain/**",
-    "src/lib/server/grpc/**",
+    // "src/lib/server/grpc/**", // Session 55: RE-INCLUDED (3 files, imported by evidence/upload+search)
     "src/lib/server/helpers/**",
     "src/lib/server/pdf/**",
     "src/lib/server/rabbitmq/**",
@@ -379,11 +379,11 @@
     "src/lib/server/ollama.ts",
     "src/lib/server/rabbitmq.ts",
     // "src/lib/server/redis-service.ts", // Session 29: un-excluded (ioredis types fixed)
-    "src/lib/server/cache/**",
+    // "src/lib/server/cache/**", // Session 55: RE-INCLUDED (8 files, imported by system/phase13)
     "src/lib/server/chat/**",
     "src/lib/server/concurrency/**",
-    "src/lib/server/acp/**",
-    "src/lib/server/adapters/**",
+    // "src/lib/server/acp/**", // Session 55: RE-INCLUDED (2 files, imported by api/phase90)
+    // "src/lib/server/adapters/**", // Session 55: RE-INCLUDED (3 files, imported by health/services)
     "src/lib/server/agents/**",
     "src/lib/server/auth.ts",
     "src/lib/server/auth-utils.ts",
@@ -425,7 +425,7 @@
     "src/lib/server/utils/**",
     "src/lib/server/wsBroker.ts",
     "src/lib/server/ws-evidence-server.ts",
-    "src/lib/server/vector/**",
+    // "src/lib/server/vector/**", // Session 55: RE-INCLUDED (11 files, imported by evidence upload/search)
     "src/lib/server/rate-limit.ts",
     "src/lib/server/document-processor.ts",
     "src/lib/server/embeddings.ts",
@@ -436,7 +436,7 @@
     "src/lib/server/minio-client.ts",
     "src/lib/server/minio-service.ts",
     "src/lib/server/ocr.ts",
-    "src/lib/server/ocr/**",
+    // "src/lib/server/ocr/**", // Session 55: RE-INCLUDED (3 files, imported by evidence/upload)
     "src/lib/server/ollama-utils.ts",
     "src/lib/server/phase72/**",
     "src/lib/server/rag-query.ts",

@@ -34,7 +34,7 @@ export async function extractTextFromImage(
     const text = result.data.text ?? '';
     const markdown = text.replace(/\n\n+/g, '\n\n');
 
-    const bbox: OcrBoundingBox[] = (result.data.words ?? []).map((word) => ({
+    const bbox: OcrBoundingBox[] = ((result.data as any).words ?? []).map((word: any) => ({
         text: word.text ?? '',
         x: word.bbox?.x0 ?? 0,
         y: word.bbox?.y0 ?? 0,

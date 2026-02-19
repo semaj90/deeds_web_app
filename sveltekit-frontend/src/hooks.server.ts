@@ -5,7 +5,11 @@
 
 import { dev } from '$app/environment';
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
+import { startWorker } from '$lib/server/analysis/worker.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
+
+// Start the analysis worker on server boot (idempotent)
+startWorker();
 
 /**
  * Main request handler with Lucia v3 session validation
