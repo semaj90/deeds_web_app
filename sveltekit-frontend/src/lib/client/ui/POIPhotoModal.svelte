@@ -1,16 +1,16 @@
 <script lang="ts">
 
-	import Brain from 'lucide-svelte/icons/brain';
-	import Calendar from 'lucide-svelte/icons/calendar';
-	import Camera from 'lucide-svelte/icons/camera';
-	import Download from 'lucide-svelte/icons/download';
-	import Eye from 'lucide-svelte/icons/eye';
-	import MapPin from 'lucide-svelte/icons/map-pin';
-	import RotateCcw from 'lucide-svelte/icons/rotate-ccw';
-	import Tag from 'lucide-svelte/icons/tag';
-	import X from 'lucide-svelte/icons/x';
-	import ZoomIn from 'lucide-svelte/icons/zoom-in';
-	import ZoomOut from 'lucide-svelte/icons/zoom-out';
+	import Brain from '@lucide/svelte/icons/brain';
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import Camera from '@lucide/svelte/icons/camera';
+	import Download from '@lucide/svelte/icons/download';
+	import Eye from '@lucide/svelte/icons/eye';
+	import MapPin from '@lucide/svelte/icons/map-pin';
+	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import Tag from '@lucide/svelte/icons/tag';
+	import X from '@lucide/svelte/icons/x';
+	import ZoomIn from '@lucide/svelte/icons/zoom-in';
+	import ZoomOut from '@lucide/svelte/icons/zoom-out';
 
  let {
  open,

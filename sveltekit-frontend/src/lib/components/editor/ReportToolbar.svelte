@@ -1,19 +1,19 @@
 <script lang="ts">
   import { slide } from 'svelte/transition';
 // Lucide icons - individual imports
-  import Download from 'lucide-svelte/icons/download';
-  import Eye from 'lucide-svelte/icons/eye';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import Layout from 'lucide-svelte/icons/layout';
-  import Maximize from 'lucide-svelte/icons/maximize';
-  import Minimize from 'lucide-svelte/icons/minimize';
-  import PanelLeft from 'lucide-svelte/icons/panel-left';
-  import Redo from 'lucide-svelte/icons/redo';
-  import Replace from 'lucide-svelte/icons/replace';
-  import Save from 'lucide-svelte/icons/save';
-  import Search from 'lucide-svelte/icons/search';
-  import Undo from 'lucide-svelte/icons/undo';
-  import Upload from 'lucide-svelte/icons/upload';
+  import Download from '@lucide/svelte/icons/download';
+  import Eye from '@lucide/svelte/icons/eye';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import Layout from '@lucide/svelte/icons/layout';
+  import Maximize from '@lucide/svelte/icons/maximize';
+  import Minimize from '@lucide/svelte/icons/minimize';
+  import PanelLeft from '@lucide/svelte/icons/panel-left';
+  import Redo from '@lucide/svelte/icons/redo';
+  import Replace from '@lucide/svelte/icons/replace';
+  import Save from '@lucide/svelte/icons/save';
+  import Search from '@lucide/svelte/icons/search';
+  import Undo from '@lucide/svelte/icons/undo';
+  import Upload from '@lucide/svelte/icons/upload';
 
   // State
   let hasUnsavedChanges = $state(false);

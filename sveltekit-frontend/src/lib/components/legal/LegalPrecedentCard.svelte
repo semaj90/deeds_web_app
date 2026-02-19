@@ -2,14 +2,14 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
 
-  import  Scale  from "lucide-svelte/icons/scale.svelte";
-  import  Calendar  from "lucide-svelte/icons/calendar.svelte";
-  import  MapPin  from "lucide-svelte/icons/map-pin.svelte";
-  import  ExternalLink  from "lucide-svelte/icons/external-link.svelte";
-  import  BookOpen  from "lucide-svelte/icons/book-open.svelte";
-  import  Star  from "lucide-svelte/icons/star.svelte";
-  import  TrendingUp  from "lucide-svelte/icons/trending-up.svelte";
-  import  Users  from "lucide-svelte/icons/users.svelte";
+  import  Scale  from "@lucide/svelte/icons/scale.svelte";
+  import  Calendar  from "@lucide/svelte/icons/calendar.svelte";
+  import  MapPin  from "@lucide/svelte/icons/map-pin.svelte";
+  import  ExternalLink  from "@lucide/svelte/icons/external-link.svelte";
+  import  BookOpen  from "@lucide/svelte/icons/book-open.svelte";
+  import  Star  from "@lucide/svelte/icons/star.svelte";
+  import  TrendingUp  from "@lucide/svelte/icons/trending-up.svelte";
+  import  Users  from "@lucide/svelte/icons/users.svelte";
   import { cn } from '$lib/utils';
   export interface LegalPrecedent {
     id: string, caseNumber: string, caseName: string, court: string, jurisdiction: 'federal' | 'state' | 'local' | 'international',date: Date, judge: string, summary: string, keyIssues: string[],

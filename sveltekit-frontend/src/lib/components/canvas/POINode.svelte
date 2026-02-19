@@ -3,12 +3,12 @@
 import { draggable } from '$lib/actions/draggable';
 	import { aiService } from '$lib/services/aiService';
 	import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
-	import Edit from 'lucide-svelte/icons/edit';
-	import Save from 'lucide-svelte/icons/save';
-	import Sparkles from 'lucide-svelte/icons/sparkles';
-	import Tag from 'lucide-svelte/icons/tag';
-	import UserIcon from 'lucide-svelte/icons/user';
-	import X from 'lucide-svelte/icons/x';
+	import Edit from '@lucide/svelte/icons/edit';
+	import Save from '@lucide/svelte/icons/save';
+	import Sparkles from '@lucide/svelte/icons/sparkles';
+	import Tag from '@lucide/svelte/icons/tag';
+	import UserIcon from '@lucide/svelte/icons/user';
+	import X from '@lucide/svelte/icons/x';
 
 	// Simple POI interface for the component
 	export interface POIData { id: string; name: string;

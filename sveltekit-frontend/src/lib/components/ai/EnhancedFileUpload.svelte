@@ -1,7 +1,7 @@
 <!-- Enhanced File Upload with Real OCR: Embeddings, and: Database, Integration --> <script lang="ts">
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { createUploadMachine } from '$lib/machines/uploadMachine'; import type { ProcessingPipeline } from '$lib/types/upload'; import { toast } from '$lib/utils/toast'; // import only stable icons; replace problematic icons with inline fallbacks below import FileText from 'lucide-svelte/icons/file-text';
-import Search from 'lucide-svelte/icons/search';
-import Upload from 'lucide-svelte/icons/upload';
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { createUploadMachine } from '$lib/machines/uploadMachine'; import type { ProcessingPipeline } from '$lib/types/upload'; import { toast } from '$lib/utils/toast'; // import only stable icons; replace problematic icons with inline fallbacks below import FileText from '@lucide/svelte/icons/file-text';
+import Search from '@lucide/svelte/icons/search';
+import Upload from '@lucide/svelte/icons/upload';
 // Migrated to $effect import { createActor } from 'xstate'; // Props interface interface Props { onUploadComplete?: (doc: unknown) => void; accept?: string; maxSize?: number; enableOCR?: boolean; enableEmbedding?: boolean; enableRAG?: boolean; class?: string}
 
   let {

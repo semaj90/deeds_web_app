@@ -7,12 +7,12 @@
 	import Input from '$lib/components/ui/input/Input.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Label from '$lib/components/ui/label/Label.svelte';
-	import Shield from 'lucide-svelte/icons/shield';
-	import UserPlus from 'lucide-svelte/icons/user-plus';
-	import AlertCircle from 'lucide-svelte/icons/alert-circle';
-	import Eye from 'lucide-svelte/icons/eye';
-	import EyeOff from 'lucide-svelte/icons/eye-off';
-	import Loader2 from 'lucide-svelte/icons/loader-2';
+	import Shield from '@lucide/svelte/icons/shield';
+	import UserPlus from '@lucide/svelte/icons/user-plus';
+	import AlertCircle from '@lucide/svelte/icons/alert-circle';
+	import Eye from '@lucide/svelte/icons/eye';
+	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 
 	// Props
 	interface Props {

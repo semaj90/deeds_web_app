@@ -6,7 +6,7 @@ import type { Case } from '$lib/types';
   import  BitsSelect  from "./select/BitsSelect.svelte";
   import  BitsInput  from "./input/BitsInput.svelte";
   import  Button  from "./button/Button.svelte";
-  import { Search, FileText, Users, Scale, Plus, Edit, Eye } from 'lucide-svelte';
+  import { Search, FileText, Users, Scale, Plus, Edit, Eye } from '@lucide/svelte';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
   // Demo state
   let showDialog = $state<boolean>(false);

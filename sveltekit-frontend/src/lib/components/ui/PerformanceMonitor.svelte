@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import Activity from 'lucide-svelte/icons/activity';
-	import Clock from 'lucide-svelte/icons/clock';
-	import Cpu from 'lucide-svelte/icons/cpu';
-	import TrendingUp from 'lucide-svelte/icons/trending-up';
-	import Zap from 'lucide-svelte/icons/zap';
+	import Activity from '@lucide/svelte/icons/activity';
+	import Clock from '@lucide/svelte/icons/clock';
+	import Cpu from '@lucide/svelte/icons/cpu';
+	import TrendingUp from '@lucide/svelte/icons/trending-up';
+	import Zap from '@lucide/svelte/icons/zap';
 
 	interface Props {
 		showOverlay?: boolean;

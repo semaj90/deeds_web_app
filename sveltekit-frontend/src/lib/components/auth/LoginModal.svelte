@@ -4,7 +4,7 @@
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import { Checkbox } from "$lib/components/ui/checkbox";
-  import X from 'lucide-svelte/icons/x';
+  import X from '@lucide/svelte/icons/x';
   import { goto } from '$app/navigation';
   import { superForm } from 'sveltekit-superforms/client';
   import { zod4 as zod } from 'sveltekit-superforms/adapters';

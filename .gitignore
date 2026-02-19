@@ -864,6 +864,14 @@ quic-nats-bridge-test
 ubuntu-tensorrt/*.deb
 *.deb
 
+# Native binaries / shared libraries
+*.dll
+*.so
+*.dylib
+*.lib
+*.node
+*.exp
+
 ########################################
 # Additional Large Files
 ########################################
@@ -889,15 +897,8 @@ svelte-check.json
 svelte-check-output.json
 sveltekit-frontend/$null
 svelte-errors-full.txt
-.gitignore
-.gitignore
-.gitignore
 sveltekit-frontend/phase22-svelte-check-raw.txt
-.gitignore
-.gitignore
-.gitignore
 svelte-errors-analysis.txt
-.gitignore
 svelte-check-latest.txt
 sveltekit-frontend/svelte-check-errors-latest.txt
 sveltekit-frontend/svelte-check-output.txt
@@ -920,8 +921,6 @@ sveltekit-frontend/svelte-check-errors.txt
 !CONTRIBUTING*.txt
 !python-services/phase46_adapter/requirements.txt
 libtorch/
-sveltekit-frontend/svelte-check-errors.json
-sveltekit-frontend/svelte-check-errors.json
 sveltekit-frontend/svelte-check-errors.json
 sveltekit-frontend/build-debug/Debug/WardenNet.lib
 sveltekit-frontend/build-debug/CMakeFiles/4.0.0/CompilerIdCUDA/CompilerIdCUDA.lib

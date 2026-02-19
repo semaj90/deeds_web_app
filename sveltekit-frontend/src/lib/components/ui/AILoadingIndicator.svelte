@@ -1,11 +1,11 @@
 <script lang="ts">
-  import AlertCircle from 'lucide-svelte/icons/alert-circle';
-  import Brain from 'lucide-svelte/icons/brain';
-  import CheckCircle from 'lucide-svelte/icons/check-circle';
-  import Clock from 'lucide-svelte/icons/clock';
-  import Cpu from 'lucide-svelte/icons/cpu';
-  import XCircle from 'lucide-svelte/icons/x-circle';
-  import Zap from 'lucide-svelte/icons/zap';
+  import AlertCircle from '@lucide/svelte/icons/alert-circle';
+  import Brain from '@lucide/svelte/icons/brain';
+  import CheckCircle from '@lucide/svelte/icons/check-circle';
+  import Clock from '@lucide/svelte/icons/clock';
+  import Cpu from '@lucide/svelte/icons/cpu';
+  import XCircle from '@lucide/svelte/icons/x-circle';
+  import Zap from '@lucide/svelte/icons/zap';
   import { cubicOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
 

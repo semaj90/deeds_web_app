@@ -17,7 +17,7 @@
 	 *   Delete
 	 * </Svelte5Button>
 	 */
-	import Loader2 from 'lucide-svelte/icons/loader-2';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import type { Snippet } from 'svelte';
 
 	type ButtonVariant = 'default' | 'primary' | 'secondary' | 'danger' | 'success' | 'ghost' | 'link';

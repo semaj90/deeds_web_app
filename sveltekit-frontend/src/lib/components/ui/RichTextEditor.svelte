@@ -3,12 +3,12 @@
 	import Image from '@tiptap/extension-image';
 	import Placeholder from '@tiptap/extension-placeholder';
 	import StarterKit from '@tiptap/starter-kit';
-	import Bold from 'lucide-svelte/icons/bold';
-	import ImageIcon from 'lucide-svelte/icons/image';
-	import Italic from 'lucide-svelte/icons/italic';
-	import List from 'lucide-svelte/icons/list';
-	import ListOrdered from 'lucide-svelte/icons/list-ordered';
-	import Save from 'lucide-svelte/icons/save';
+	import Bold from '@lucide/svelte/icons/bold';
+	import ImageIcon from '@lucide/svelte/icons/image';
+	import Italic from '@lucide/svelte/icons/italic';
+	import List from '@lucide/svelte/icons/list';
+	import ListOrdered from '@lucide/svelte/icons/list-ordered';
+	import Save from '@lucide/svelte/icons/save';
 
 	interface Props {
 		content?: string;

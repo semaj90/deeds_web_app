@@ -7,9 +7,9 @@
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
-  import Grid from 'lucide-svelte/icons/grid';
-  import List from 'lucide-svelte/icons/list';
-  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
+  import Grid from '@lucide/svelte/icons/grid';
+  import List from '@lucide/svelte/icons/list';
+  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 
   // Types
   interface GraphVisualizationResult { id: string, url: string;

@@ -6,10 +6,10 @@
 	 * Task: 15.3 - Create cluster visualization
 	 * Purpose: Display clusters as groups, show summaries, navigate between clusters
 	 */
-	import Brain from 'lucide-svelte/icons/brain';
-	import ChevronRight from 'lucide-svelte/icons/chevron-right';
-	import Layers from 'lucide-svelte/icons/layers';
-	import Users from 'lucide-svelte/icons/users';
+	import Brain from '@lucide/svelte/icons/brain';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import Layers from '@lucide/svelte/icons/layers';
+	import Users from '@lucide/svelte/icons/users';
 
 	interface Cluster {
 		id: string;

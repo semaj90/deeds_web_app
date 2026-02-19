@@ -6,14 +6,14 @@
 	import { z } from 'zod';
 	import { Dialog } from "bits-ui";
 import Button from '$lib/components/ui/Button.svelte';
-	import Upload from 'lucide-svelte/icons/upload';
-	import FileText from 'lucide-svelte/icons/file-text';
-	import Brain from 'lucide-svelte/icons/brain';
-	import Scan from 'lucide-svelte/icons/scan';
-	import Target from 'lucide-svelte/icons/target';
-	import Loader2 from 'lucide-svelte/icons/loader-2';
-	import X from 'lucide-svelte/icons/x';
-	import CheckCircle from 'lucide-svelte/icons/check-circle';
+	import Upload from '@lucide/svelte/icons/upload';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Brain from '@lucide/svelte/icons/brain';
+	import Scan from '@lucide/svelte/icons/scan';
+	import Target from '@lucide/svelte/icons/target';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import X from '@lucide/svelte/icons/x';
+	import CheckCircle from '@lucide/svelte/icons/check-circle';
 
 	// Props
 	interface Props {

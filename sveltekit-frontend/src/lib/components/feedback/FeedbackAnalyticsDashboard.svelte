@@ -3,21 +3,21 @@ Provides comprehensive insights into user feedback and system performance -->
 <script lang="ts">
 // Svelte 5 runes are auto-imported
 import { fade, fly } from 'svelte/transition';
-import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
-import TrendingUp from 'lucide-svelte/icons/trending-up';
-import TrendingDown from 'lucide-svelte/icons/trending-down';
-import Users from 'lucide-svelte/icons/users';
-import Star from 'lucide-svelte/icons/star';
-import AlertCircle from 'lucide-svelte/icons/alert-circle';
-import RefreshCw from 'lucide-svelte/icons/refresh-cw';
-import Download from 'lucide-svelte/icons/download';
-import Filter from 'lucide-svelte/icons/filter';
-import Calendar from 'lucide-svelte/icons/calendar';
-import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right';
-import ArrowDownRight from 'lucide-svelte/icons/arrow-down-right';
-import Zap from 'lucide-svelte/icons/zap';
-import ThumbsUp from 'lucide-svelte/icons/thumbs-up';
-import ThumbsDown from 'lucide-svelte/icons/thumbs-down';
+import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+import TrendingUp from '@lucide/svelte/icons/trending-up';
+import TrendingDown from '@lucide/svelte/icons/trending-down';
+import Users from '@lucide/svelte/icons/users';
+import Star from '@lucide/svelte/icons/star';
+import AlertCircle from '@lucide/svelte/icons/alert-circle';
+import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+import Download from '@lucide/svelte/icons/download';
+import Filter from '@lucide/svelte/icons/filter';
+import Calendar from '@lucide/svelte/icons/calendar';
+import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
+import ArrowDownRight from '@lucide/svelte/icons/arrow-down-right';
+import Zap from '@lucide/svelte/icons/zap';
+import ThumbsUp from '@lucide/svelte/icons/thumbs-up';
+import ThumbsDown from '@lucide/svelte/icons/thumbs-down';
 
 // Component state
 let isLoading = $state<boolean>(true);

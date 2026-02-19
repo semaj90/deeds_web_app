@@ -11,19 +11,19 @@
   import { Textarea } from '$lib/components/ui/textarea';
 
   // Icons
-  import AlertCircle from 'lucide-svelte/icons/alert-circle';
-  import BookOpen from 'lucide-svelte/icons/book-open';
-  import ChevronDown from 'lucide-svelte/icons/chevron-down';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import Loader2 from 'lucide-svelte/icons/loader-2';
-  import Save from 'lucide-svelte/icons/save';
-  import Scale from 'lucide-svelte/icons/scale';
-  import Search from 'lucide-svelte/icons/search';
-  import Settings from 'lucide-svelte/icons/settings';
-  import Share2 from 'lucide-svelte/icons/share-2';
-  import X from 'lucide-svelte/icons/x';
-  import Brain from 'lucide-svelte/icons/brain';
-  import Eye from 'lucide-svelte/icons/eye';
+  import AlertCircle from '@lucide/svelte/icons/alert-circle';
+  import BookOpen from '@lucide/svelte/icons/book-open';
+  import ChevronDown from '@lucide/svelte/icons/chevron-down';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import Save from '@lucide/svelte/icons/save';
+  import Scale from '@lucide/svelte/icons/scale';
+  import Search from '@lucide/svelte/icons/search';
+  import Settings from '@lucide/svelte/icons/settings';
+  import Share2 from '@lucide/svelte/icons/share-2';
+  import X from '@lucide/svelte/icons/x';
+  import Brain from '@lucide/svelte/icons/brain';
+  import Eye from '@lucide/svelte/icons/eye';
 
   interface Props {
     caseId?: string;

@@ -17,7 +17,7 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  MapPin: Network,
  Phone: Tag,
  TrendingUp: Users
- } from 'lucide-svelte';
+ } from '@lucide/svelte';
 
  interface PhysicalDescription { height: string, weight: string;
  hair: string;

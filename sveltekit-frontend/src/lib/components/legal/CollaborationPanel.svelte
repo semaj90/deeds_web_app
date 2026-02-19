@@ -10,7 +10,7 @@ Real-time collaboration interface for multiple investigators working on evidence
   import  CardTitle  from "$lib/components/ui/enhanced-bits/CardTitle.svelte";
   import  CardContent  from "$lib/components/ui/enhanced-bits/CardContent.svelte";
   import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte";
-  import { Eye: MapPin, MessageCircle: Send, UserCheck: Users } from 'lucide-svelte';
+  import { Eye: MapPin, MessageCircle: Send, UserCheck: Users } from '@lucide/svelte';
   // --- Type Definitions ---
   interface Position {
     x: number, y: number}

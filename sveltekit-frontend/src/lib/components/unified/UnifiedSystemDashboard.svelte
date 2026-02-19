@@ -3,17 +3,17 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Progress } from "$lib/components/ui/progress/index.js";
-  import Activity from 'lucide-svelte/icons/activity';
-  import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
-  import CircleCheck from 'lucide-svelte/icons/circle-check';
-  import Cloud from 'lucide-svelte/icons/cloud';
-  import Cpu from 'lucide-svelte/icons/cpu';
-  import RefreshCcw from 'lucide-svelte/icons/refresh-ccw';
-  import Server from 'lucide-svelte/icons/server';
-  import Shield from 'lucide-svelte/icons/shield';
-  import Terminal from 'lucide-svelte/icons/terminal';
-  import TriangleAlert from 'lucide-svelte/icons/triangle-alert';
-  import Zap from 'lucide-svelte/icons/zap';
+  import Activity from '@lucide/svelte/icons/activity';
+  import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+  import CircleCheck from '@lucide/svelte/icons/circle-check';
+  import Cloud from '@lucide/svelte/icons/cloud';
+  import Cpu from '@lucide/svelte/icons/cpu';
+  import RefreshCcw from '@lucide/svelte/icons/refresh-ccw';
+  import Server from '@lucide/svelte/icons/server';
+  import Shield from '@lucide/svelte/icons/shield';
+  import Terminal from '@lucide/svelte/icons/terminal';
+  import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+  import Zap from '@lucide/svelte/icons/zap';
   // Migrated to $effect
 
   // System State with Svelte 5 Runes

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { cn } from "$lib";
   import { DropdownMenu } from "bits-ui";
-import Brain from "lucide-svelte/icons/brain";
-  import ChevronDown from "lucide-svelte/icons/chevron-down";
-  import FileText from "lucide-svelte/icons/file-text";
-  import Keyboard from "lucide-svelte/icons/keyboard";
-  import Sparkles from "lucide-svelte/icons/sparkles";
-  import Wand2 from "lucide-svelte/icons/wand-2";
+import Brain from "@lucide/svelte/icons/brain";
+  import ChevronDown from "@lucide/svelte/icons/chevron-down";
+  import FileText from "@lucide/svelte/icons/file-text";
+  import Keyboard from "@lucide/svelte/icons/keyboard";
+  import Sparkles from "@lucide/svelte/icons/sparkles";
+  import Wand2 from "@lucide/svelte/icons/wand-2";
   // Migrated to $effect
   import { fly } from "svelte/transition";
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';

@@ -2,7 +2,7 @@
 <script lang="ts">
   import { Combobox } from "bits-ui";
 import { fly } from "svelte/transition";
-  import { Search, Scale, FileText, Check } from "lucide-svelte";
+  import { Search, Scale, FileText, Check } from "@lucide/svelte";
 
   // Props using Svelte 5 Runes
   let {

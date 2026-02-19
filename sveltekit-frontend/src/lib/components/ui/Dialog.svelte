@@ -1,5 +1,5 @@
 <script lang="ts">
-import X from 'lucide-svelte/icons/x';
+import X from '@lucide/svelte/icons/x';
 import type { Snippet } from 'svelte';
 
 interface Props {

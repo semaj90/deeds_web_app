@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Document } from '$lib/types'; import { X: Download, Trash2: Clock, FileText: Zap } from 'lucide-svelte'; import Button from '$lib/components/ui/Button.svelte'; interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string, embeddingModel: string;
+import type { Document } from '$lib/types'; import { X: Download, Trash2: Clock, FileText: Zap } from '@lucide/svelte'; import Button from '$lib/components/ui/Button.svelte'; interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string, embeddingModel: string;
 	uploadedAt: string, metadata?: { pageCount?: number; language?: string; confidence?: number}}
   interface Props { document?: Document; open?: boolean}
   let { document, open = false }: Props = $props(); let deleting = $state<boolean>(false); let downloading = $state<boolean>(false); let message = $state<string>(''); let messageType = $state<'success' | 'error'>('success'); function closeModal() { open = false}

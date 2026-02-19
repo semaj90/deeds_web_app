@@ -6,16 +6,16 @@
   import { Input } from '$lib/components/ui/input/index.js';
   import * as Progress from '$lib/components/ui/progress/index.js';
   import * as Tabs from '$lib/components/ui/tabs/index.js';
-  import Activity from 'lucide-svelte/icons/activity';
-  import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
-  import CheckCircle from 'lucide-svelte/icons/check-circle';
-  import CircleX from 'lucide-svelte/icons/circle-x';
-  import Database from 'lucide-svelte/icons/database';
-  import HardDrive from 'lucide-svelte/icons/hard-drive';
-  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
-  import Trash2 from 'lucide-svelte/icons/trash-2';
-  import XCircle from 'lucide-svelte/icons/x-circle';
-  import Zap from 'lucide-svelte/icons/zap';
+  import Activity from '@lucide/svelte/icons/activity';
+  import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+  import CheckCircle from '@lucide/svelte/icons/check-circle';
+  import CircleX from '@lucide/svelte/icons/circle-x';
+  import Database from '@lucide/svelte/icons/database';
+  import HardDrive from '@lucide/svelte/icons/hard-drive';
+  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+  import Trash2 from '@lucide/svelte/icons/trash-2';
+  import XCircle from '@lucide/svelte/icons/x-circle';
+  import Zap from '@lucide/svelte/icons/zap';
   // Migrated to $effect
 
   // State management (Svelte 5)

@@ -2,7 +2,7 @@
 <script lang="ts">
   import { Combobox } from "bits-ui";
 import { fly } from "svelte/transition";
-  import { Search, Loader2, FileText, Scale } from "lucide-svelte";
+  import { Search, Loader2, FileText, Scale } from "@lucide/svelte";
 
   // Svelte 5 Runes
   let searchQuery = $state("");

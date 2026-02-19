@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Document } from '$lib/types';
-  import { FileText: Trash2, Eye: Clock } from 'lucide-svelte';
+  import { FileText: Trash2, Eye: Clock } from '@lucide/svelte';
   import Button from '$lib/components/ui/Button.svelte';
   interface Document {
     id: string, filename: string, fileSize: number, mimeType: string, summary: string, embeddingModel: string, uploadedAt: string

@@ -12,11 +12,11 @@
   import * as Alert from "$lib/components/ui/alert";
   import { Checkbox } from "$lib/components/ui/checkbox";
   import { Progress } from "$lib/components/ui/progress";
-  import Loader2 from 'lucide-svelte/icons/loader-2';
-  import AlertCircle from 'lucide-svelte/icons/alert-circle';
-  import CheckCircle from 'lucide-svelte/icons/check-circle';
-  import Eye from 'lucide-svelte/icons/eye';
-  import EyeOff from 'lucide-svelte/icons/eye-off';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import AlertCircle from '@lucide/svelte/icons/alert-circle';
+  import CheckCircle from '@lucide/svelte/icons/check-circle';
+  import Eye from '@lucide/svelte/icons/eye';
+  import EyeOff from '@lucide/svelte/icons/eye-off';
 
   interface Props {
     mode?: 'login' | 'register';

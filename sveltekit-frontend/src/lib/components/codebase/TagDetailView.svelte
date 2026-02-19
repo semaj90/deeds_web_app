@@ -7,15 +7,15 @@
 	 * Task: 15.1 - Create tag detail view
 	 * Purpose: Display all tag metadata, embedding visualization, cluster assignment
 	 */
-	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
-	import Brain from 'lucide-svelte/icons/brain';
-	import Calendar from 'lucide-svelte/icons/calendar';
-	import Code from 'lucide-svelte/icons/code';
-	import FileCode from 'lucide-svelte/icons/file-code';
-	import Hash from 'lucide-svelte/icons/hash';
-	import Layers from 'lucide-svelte/icons/layers';
-	import Tag from 'lucide-svelte/icons/tag';
-	import X from 'lucide-svelte/icons/x';
+	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+	import Brain from '@lucide/svelte/icons/brain';
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import Code from '@lucide/svelte/icons/code';
+	import FileCode from '@lucide/svelte/icons/file-code';
+	import Hash from '@lucide/svelte/icons/hash';
+	import Layers from '@lucide/svelte/icons/layers';
+	import Tag from '@lucide/svelte/icons/tag';
+	import X from '@lucide/svelte/icons/x';
 
 	interface EnhancedTag { id: string, name: string;
 		filePath: string;

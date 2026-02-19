@@ -1,9 +1,9 @@
 <script lang="ts">
   // TODO: Fix user store exports
   // import { userStore, clearUserSession } from '$lib/stores/user';
-  import ChevronDown from 'lucide-svelte/icons/chevron-down';
-  import LogOut from 'lucide-svelte/icons/log-out';
-  import User from 'lucide-svelte/icons/user';
+  import ChevronDown from '@lucide/svelte/icons/chevron-down';
+  import LogOut from '@lucide/svelte/icons/log-out';
+  import User from '@lucide/svelte/icons/user';
   let isDropdownOpen = $state<boolean>(false);
   async function handleLogout(): Promise<any> {
     try {

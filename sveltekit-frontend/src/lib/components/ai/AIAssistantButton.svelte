@@ -2,10 +2,10 @@
 	import { goto } from '$app/navigation';
 	import Badge from '$lib/components/ui/badge/Badge.svelte';
 	import { cn } from '$lib/utils';
-	import Brain from 'lucide-svelte/icons/brain';
-	import Mic from 'lucide-svelte/icons/mic';
-	import MicOff from 'lucide-svelte/icons/mic-off';
-	import Sparkles from 'lucide-svelte/icons/sparkles';
+	import Brain from '@lucide/svelte/icons/brain';
+	import Mic from '@lucide/svelte/icons/mic';
+	import MicOff from '@lucide/svelte/icons/mic-off';
+	import Sparkles from '@lucide/svelte/icons/sparkles';
 
 	interface Props {
 		variant?: 'floating' | 'inline' | 'compact' | 'full';

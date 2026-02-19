@@ -6,11 +6,11 @@
    * Task: 15.2 - Create tag rename dialog
    * Purpose: Input validation, confirmation, progress indicator
    */
-  import AlertCircle from 'lucide-svelte/icons/alert-circle';
-  import Check from 'lucide-svelte/icons/check';
-  import Loader2 from 'lucide-svelte/icons/loader-2';
-  import Tag from 'lucide-svelte/icons/tag';
-  import X from 'lucide-svelte/icons/x';
+  import AlertCircle from '@lucide/svelte/icons/alert-circle';
+  import Check from '@lucide/svelte/icons/check';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import Tag from '@lucide/svelte/icons/tag';
+  import X from '@lucide/svelte/icons/x';
 
   interface TagInfo {
     id: string;

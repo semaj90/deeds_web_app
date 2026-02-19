@@ -8,14 +8,14 @@ interface VectorSearchResult extends BaseSearchResult {
   highlights?: string[];
   relevanceScore?: number;
 }
-import Calendar from 'lucide-svelte/icons/calendar';
-import FileText from 'lucide-svelte/icons/file-text';
-import Loader2 from 'lucide-svelte/icons/loader-2';
-import MapPin from 'lucide-svelte/icons/map-pin';
-import Scale from 'lucide-svelte/icons/scale';
-import Search from 'lucide-svelte/icons/search';
-import Users from 'lucide-svelte/icons/users';
-import X from 'lucide-svelte/icons/x';
+import Calendar from '@lucide/svelte/icons/calendar';
+import FileText from '@lucide/svelte/icons/file-text';
+import Loader2 from '@lucide/svelte/icons/loader-2';
+import MapPin from '@lucide/svelte/icons/map-pin';
+import Scale from '@lucide/svelte/icons/scale';
+import Search from '@lucide/svelte/icons/search';
+import Users from '@lucide/svelte/icons/users';
+import X from '@lucide/svelte/icons/x';
 
 interface Props {
   placeholder?: string;

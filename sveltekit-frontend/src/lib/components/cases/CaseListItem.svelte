@@ -1,12 +1,12 @@
 <script lang="ts">
   import Badge from "$lib/components/ui/Badge.svelte";
   import { formatDistanceToNow } from "date-fns";
-  import Archive from "lucide-svelte/icons/archive";
-  import Calendar from "lucide-svelte/icons/calendar";
-  import CheckCircle from "lucide-svelte/icons/check-circle";
-  import Clock from "lucide-svelte/icons/clock";
-  import FileText from "lucide-svelte/icons/file-text";
-  import User from "lucide-svelte/icons/user";
+  import Archive from "@lucide/svelte/icons/archive";
+  import Calendar from "@lucide/svelte/icons/calendar";
+  import CheckCircle from "@lucide/svelte/icons/check-circle";
+  import Clock from "@lucide/svelte/icons/clock";
+  import FileText from "@lucide/svelte/icons/file-text";
+  import User from "@lucide/svelte/icons/user";
 
   interface CaseData {
     id: string;

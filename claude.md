@@ -1,7 +1,7 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: February 16, 2026 (Session 35)
-## Status: svelte-check 0 errors, 2 warnings (down from 19,666+)
+## Last Updated: February 18, 2026 (Session 54)
+## Status: svelte-check 0 errors, 0 warnings (down from 19,666+)
 
 ---
 
@@ -28,9 +28,104 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Database**: PostgreSQL 16 + Drizzle ORM 0.44 + pgvector
 - **Vector DB**: Qdrant (GPU-accelerated)
 - **AI Models**: Ollama (`embeddinggemma:latest` + `gemma3-legal:latest`)
+- **Client AI**: ONNX Runtime (WebGPU → WASM SIMD → CPU) + gemma 270M quantized
 - **Real-Time**: Server-Sent Events (SSE)
-- **State Machines**: XState v5
-- **Message Queue**: RabbitMQ
+- **State Machines**: XState v5 (client orchestration) + RabbitMQ (server async)
+- **Message Queue**: RabbitMQ (7 queues, 5 exchanges)
+- **MCP**: FastMCP agentic tool calling (9 tools)
+
+---
+
+## Client-Backend Multi-Tier Architecture
+
+### Inference Fallback Chain
+```
+User Query
+  ↓
+Client Router (src/lib/ai/client-router.ts)
+  ├─ Simple query → LOCAL ONNX (gemma270m via WebGPU/WASM)
+  │   ├─ WebGPU (Dawn) → WASM SIMD → CPU fallback
+  │   ├─ Model: static/gemma3_270m_onnx/ (418MB, local-only)
+  │   ├─ Embeddings: static/embeddinggemma_300m_onnx/ (768-dim)
+  │   └─ Auto-escalate on failure → SERVER
+  │
+  └─ Legal/complex query → SERVER Ollama
+      ├─ LLM: gemma3-legal:latest
+      ├─ Embeddings: embeddinggemma:latest (768-dim)
+      └─ SSE stream via /api/sse/chat
+```
+
+### Cache Hierarchy (Client → Server)
+```
+L0: LokiJS (in-memory, 5-10min TTL, session-scoped)
+  ↓ miss
+L1: IndexedDB (persistent, 7-day TTL, survives refresh)
+  ↓ miss
+L2: Memory Cache (server, 5min TTL, in-process Map)
+  ↓ miss
+L3: Redis (server, configurable TTL, cross-request)
+  ↓ miss
+L4: Service Logic (DB query, Qdrant search, Ollama inference)
+  ↓
+Write back to L0-L3
+```
+
+### Retrieval Pipeline (RAG + KAG + DAG)
+- **RAG** (Retrieval-Augmented Generation): Qdrant vector search → confidence scoring → LLM generation
+- **KAG** (Knowledge-Augmented Generation): Schema validation, W3C spec checks, package.json verification
+- **DAG** (Directed Acyclic Graph): Cluster dependency ordering, fix priority scheduling
+- **2-stage codebase retrieval**: Fuse.js fuzzy recall → Qdrant dual-vector rerank (0.6 content + 0.4 signature)
+
+### Qdrant Collections (768-dim)
+| Collection | Purpose | Status |
+|------------|---------|--------|
+| `evidence_items` | Evidence chunks + metadata | Active |
+| `legal_documents` | Legal document embeddings | Active |
+| `legal_cases` | Case description embeddings | Active |
+| `codebase_chunks_768` | Dual-vector code search | Active |
+| `chat_messages` | Chat context search | Active |
+| `embedding_cache` | Embedding lookup cache | Active |
+
+### RabbitMQ Queues
+`cache.invalidate`, `document.embed`, `evidence.process`, `vector.index`, `chat.context`, `analytics.track`, `codebase.index`
+
+### FastMCP Agentic Tools (9)
+`unified_ast_query`, `cross_language_similarity`, `cuda_fix_priority`, `glyph_metadata`, `neo4j_dependency_graph`, `agentic_recommendation`, `batch_error_analysis`, `redis_cache_stats`, `system_health_check`
+
+### Evidence Pipeline (8 stages)
+1. MinIO upload + SHA-256 hash + PostgreSQL record
+2. Text extraction: pdf-parse → OCR fallback (Tesseract CLI → tesseract.js)
+3. Structure-aware chunking via legal-chunker.ts (ARTICLE/SECTION/§)
+4. Embedding: gRPC → embeddinggemma → nomic-embed-text fallback
+5. Dual storage: pgvector `evidence_vectors` + Qdrant `evidence_items`
+6. Entity extraction (EMAIL, PHONE, DATE, CITATION, STATUTE, MONEY)
+7. Forensic pattern detection (SSN, CC, contact density, legal keywords)
+8. Summarization via Ollama gemma3-legal (non-fatal)
+
+### Key Client-Side Files
+| File | Purpose |
+|------|---------|
+| `src/lib/ai/client-router.ts` | Routes local vs server inference |
+| `src/lib/ai/client-cache.ts` | LokiJS + IndexedDB dual-tier cache |
+| `src/lib/ai/client-embed.ts` | 768-dim ONNX embeddings (mean-pool + L2-norm) |
+| `src/lib/ai/onnx/session.ts` | WebGPU → WASM → CPU session factory |
+| `src/lib/ai/model-ids.ts` | Centralized model constants |
+| `src/lib/models/ChatSession.svelte.ts` | Central routing hub (local ↔ server) |
+| `src/lib/machines/retrieval-machine.ts` | XState v5 2-stage retrieval orchestration |
+
+### Key Server-Side Files
+| File | Purpose |
+|------|---------|
+| `src/lib/server/redis.ts` | Primary ioredis singleton + factory |
+| `src/lib/server/cache.ts` | Dual-tier memory + Redis cache |
+| `src/lib/server/vector/qdrant-manager.ts` | Qdrant client + hybrid search |
+| `src/lib/server/queue/rabbitmq-manager-fixed.ts` | RabbitMQ 7-queue manager |
+| `src/lib/server/grpc/embedding-client.ts` | gRPC embedding with HTTP/Ollama fallback |
+| `src/lib/server/rag-pipeline.ts` | End-to-end RAG for legal Q&A |
+| `src/lib/server/indexer/legal-chunker.ts` | Structure-aware legal document chunker |
+| `src/lib/server/analysis/entity-extraction.ts` | LLM + regex entity extraction |
+| `src/lib/server/analysis/forensics.ts` | PII/legal pattern detection |
+| `src/mcp/server.ts` | MCP server (stdio transport, tool handlers) |
 
 ---
 

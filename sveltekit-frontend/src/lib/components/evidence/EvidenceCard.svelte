@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { Evidence } from '$lib/types/evidence';
-	import FileText from 'lucide-svelte/icons/file-text';
-	import Headphones from 'lucide-svelte/icons/headphones';
-	import ImageIcon from 'lucide-svelte/icons/image';
-	import LinkIcon from 'lucide-svelte/icons/link';
-	import SearchIcon from 'lucide-svelte/icons/search';
-	import TagIcon from 'lucide-svelte/icons/tag';
-	import Video from 'lucide-svelte/icons/video';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Headphones from '@lucide/svelte/icons/headphones';
+	import ImageIcon from '@lucide/svelte/icons/image';
+	import LinkIcon from '@lucide/svelte/icons/link';
+	import SearchIcon from '@lucide/svelte/icons/search';
+	import TagIcon from '@lucide/svelte/icons/tag';
+	import Video from '@lucide/svelte/icons/video';
 	import type { ComponentType } from 'svelte';
 	import { quintOut } from 'svelte/easing';
 	import { scale } from 'svelte/transition';

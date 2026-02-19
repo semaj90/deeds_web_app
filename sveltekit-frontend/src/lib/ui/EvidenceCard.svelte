@@ -8,15 +8,15 @@ https, //svelte.dev/e/tag_invalid_name -->
 https, //svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
  import type { Evidence } from '$lib/types/evidence';
- import Archive from "lucide-svelte/icons/archive";
- import Download from "lucide-svelte/icons/download";
- import Eye from "lucide-svelte/icons/eye";
- import FileText from "lucide-svelte/icons/file-text";
- import Image from "lucide-svelte/icons/image";
- import Music from "lucide-svelte/icons/music";
- import Trash2 from "lucide-svelte/icons/trash-2";
- import Video from "lucide-svelte/icons/video";
- import Zap from "lucide-svelte/icons/zap";
+ import Archive from "@lucide/svelte/icons/archive";
+ import Download from "@lucide/svelte/icons/download";
+ import Eye from "@lucide/svelte/icons/eye";
+ import FileText from "@lucide/svelte/icons/file-text";
+ import Image from "@lucide/svelte/icons/image";
+ import Music from "@lucide/svelte/icons/music";
+ import Trash2 from "@lucide/svelte/icons/trash-2";
+ import Video from "@lucide/svelte/icons/video";
+ import Zap from "@lucide/svelte/icons/zap";
  import Tooltip from './Tooltip.svelte';
 import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';

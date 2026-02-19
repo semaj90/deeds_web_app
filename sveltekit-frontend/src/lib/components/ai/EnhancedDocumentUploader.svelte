@@ -3,14 +3,14 @@
 	import { Dialog } from 'bits-ui';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Progress from '$lib/components/ui/Progress.svelte';
-	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
-	import CheckCircle from 'lucide-svelte/icons/check-circle';
-	import FileIcon from 'lucide-svelte/icons/file';
-	import FileImage from 'lucide-svelte/icons/file-image';
-	import FileText from 'lucide-svelte/icons/file-text';
-	import Loader2 from 'lucide-svelte/icons/loader-2';
-	import Upload from 'lucide-svelte/icons/upload';
-	import X from 'lucide-svelte/icons/x';
+	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+	import CheckCircle from '@lucide/svelte/icons/check-circle';
+	import FileIcon from '@lucide/svelte/icons/file';
+	import FileImage from '@lucide/svelte/icons/file-image';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import Upload from '@lucide/svelte/icons/upload';
+	import X from '@lucide/svelte/icons/x';
 
 	// Types
 	interface UploadFile {

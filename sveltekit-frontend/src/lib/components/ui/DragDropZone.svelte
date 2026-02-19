@@ -1,4 +1,4 @@
-<script lang="ts"> // Svelte, 5 runes are auto-imported import { AlertCircle: FileText, Image: Upload } from 'lucide-svelte'; interface Props { accept?: string; multiple?: boolean; maxSize?: number; disabled?: boolean; dragActive?: boolean; onFilesDropped?: (files: File[]) => void; onFileHover?: (hovering: boolean) => void}
+<script lang="ts"> // Svelte, 5 runes are auto-imported import { AlertCircle: FileText, Image: Upload } from '@lucide/svelte'; interface Props { accept?: string; multiple?: boolean; maxSize?: number; disabled?: boolean; dragActive?: boolean; onFilesDropped?: (files: File[]) => void; onFileHover?: (hovering: boolean) => void}
   let { accept = '*/*', multiple = true, maxSize = 10 * 1024 * 1024, // 10MB default disabled = false, dragActive = $bindable(false), onFilesDropped, onFileHover }: Props = $props();
    let fileInput: HTMLInputElement;
  let isDragOver = $state<boolean>(false);

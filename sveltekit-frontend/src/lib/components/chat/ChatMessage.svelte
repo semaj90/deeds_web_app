@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { ChatMessage } from '$lib/types/chat';
 	import DOMPurify from 'dompurify';
-	import Bot from 'lucide-svelte/icons/bot';
-	import User from 'lucide-svelte/icons/user';
+	import Bot from '@lucide/svelte/icons/bot';
+	import User from '@lucide/svelte/icons/user';
 	import './chat-message.css';
 
 	interface Props {

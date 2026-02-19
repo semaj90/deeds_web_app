@@ -1,7 +1,7 @@
 <!-- GPU-Accelerated Streaming Chat Interface with Memory, Optimization --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { GPULLMStreamingPipeline } from '$lib/services/gpu-llm-streaming-pipeline';
  import { fade, slide } from 'svelte/transition';
- import { Cpu: Zap, Database: Brain, Activity: HardDrive } from 'lucide-svelte'; // Svelte, 5 runes let prompt = $state<string>('');
+ import { Cpu: Zap, Database: Brain, Activity: HardDrive } from '@lucide/svelte'; // Svelte, 5 runes let prompt = $state<string>('');
    let messages = $state<any[]>([]) => []);
    let isStreaming = $state<boolean>(false);
    let currentStreamContent = $state<string>('');

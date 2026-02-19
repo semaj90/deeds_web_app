@@ -60,8 +60,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 				avatarUrl: user.avatarUrl
 			}
 		});
-	} catch (error) {
-		console.error('[Auth] Login error:', error);
-		return json({ error: 'Login failed' }, { status: 500 });
+	} catch (err) {
+		const msg = err instanceof Error ? err.message : String(err);
+		console.error('[Auth] Login error:', msg);
+		return json({ error: `Login failed: ${msg}` }, { status: 500 });
 	}
 };

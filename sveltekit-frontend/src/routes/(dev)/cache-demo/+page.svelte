@@ -3,12 +3,12 @@
 	import CacheMonitor from '$lib/components/cache/CacheMonitor.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index';
-	import Activity from 'lucide-svelte/icons/activity';
-	import Database from 'lucide-svelte/icons/database';
-	import Download from 'lucide-svelte/icons/download';
-	import Trash2 from 'lucide-svelte/icons/trash-2';
-	import Upload from 'lucide-svelte/icons/upload';
-	import Zap from 'lucide-svelte/icons/zap';
+	import Activity from '@lucide/svelte/icons/activity';
+	import Database from '@lucide/svelte/icons/database';
+	import Download from '@lucide/svelte/icons/download';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Upload from '@lucide/svelte/icons/upload';
+	import Zap from '@lucide/svelte/icons/zap';
 
 	const cache = useCache();
 

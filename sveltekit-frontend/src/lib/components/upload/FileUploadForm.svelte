@@ -11,14 +11,14 @@ import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
 import { uploadSchema } from '$lib/schemas/upload';
 
 interface UploadFile { id: string; file: File; name: string; type: string; size: number; status: string; progress: number; error?: string; }
-import Binary from 'lucide-svelte/icons/binary';
-import CheckCircle from 'lucide-svelte/icons/check-circle';
-import FileText from 'lucide-svelte/icons/file-text';
-import Film from 'lucide-svelte/icons/film';
-import HardDrive from 'lucide-svelte/icons/hard-drive';
-import Image from 'lucide-svelte/icons/image';
-import Music from 'lucide-svelte/icons/music';
-import Upload from 'lucide-svelte/icons/upload';
+import Binary from '@lucide/svelte/icons/binary';
+import CheckCircle from '@lucide/svelte/icons/check-circle';
+import FileText from '@lucide/svelte/icons/file-text';
+import Film from '@lucide/svelte/icons/film';
+import HardDrive from '@lucide/svelte/icons/hard-drive';
+import Image from '@lucide/svelte/icons/image';
+import Music from '@lucide/svelte/icons/music';
+import Upload from '@lucide/svelte/icons/upload';
 import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
 import superForm from 'sveltekit-superforms';
 

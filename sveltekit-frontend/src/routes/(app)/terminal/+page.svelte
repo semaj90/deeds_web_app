@@ -1,10 +1,10 @@
 <script lang="ts">
  import Button from '$lib/components/ui/Button.svelte';
  import Textarea from '$lib/components/ui/textarea/Textarea.svelte';
- import Bot from 'lucide-svelte/icons/bot';
- import Loader2 from 'lucide-svelte/icons/loader-2';
- import Send from 'lucide-svelte/icons/send';
- import Users from 'lucide-svelte/icons/users';
+ import Bot from '@lucide/svelte/icons/bot';
+ import Loader2 from '@lucide/svelte/icons/loader-2';
+ import Send from '@lucide/svelte/icons/send';
+ import Users from '@lucide/svelte/icons/users';
  import { tick } from 'svelte';
  type ChatMessage = { id: string, role: 'user' | 'assistant';
   content: string;

@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { Case } from '$lib/types';
-  import Search from 'lucide-svelte/icons/search';
-  import File from 'lucide-svelte/icons/file';
-  import Briefcase from 'lucide-svelte/icons/briefcase';
-  import UserIcon from 'lucide-svelte/icons/user';
-  import Settings from 'lucide-svelte/icons/settings';
-  import Command from 'lucide-svelte/icons/command';
+  import Search from '@lucide/svelte/icons/search';
+  import File from '@lucide/svelte/icons/file';
+  import Briefcase from '@lucide/svelte/icons/briefcase';
+  import UserIcon from '@lucide/svelte/icons/user';
+  import Settings from '@lucide/svelte/icons/settings';
+  import Command from '@lucide/svelte/icons/command';
   import { cn } from '$lib/utils';
 
   interface Props {

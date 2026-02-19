@@ -5,10 +5,10 @@
 		checkAIServices,
 		type ServiceStatus
 	} from '$lib/services/ai-pipeline-client';
-	import CheckCircle from 'lucide-svelte/icons/check-circle';
-	import XCircle from 'lucide-svelte/icons/x-circle';
-	import AlertCircle from 'lucide-svelte/icons/alert-circle';
-	import RefreshCw from 'lucide-svelte/icons/refresh-cw';
+	import CheckCircle from '@lucide/svelte/icons/check-circle';
+	import XCircle from '@lucide/svelte/icons/x-circle';
+	import AlertCircle from '@lucide/svelte/icons/alert-circle';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 
 	let serviceStatus = $state<ServiceStatus | null>(null);
 	let isChecking = $state(false);

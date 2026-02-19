@@ -349,7 +349,7 @@ export function analyzeBundleSize(): BundleAnalysis {
             {
                 name: 'Button',
                 size: 12000,
-                dependencies: ['bits-ui', 'lucide-svelte'],
+                dependencies: ['bits-ui', '@lucide/svelte'],
                 critical: true,
             },
 	{
@@ -361,7 +361,7 @@ export function analyzeBundleSize(): BundleAnalysis {
 	{
                 name: 'Select',
                 size: 15000,
-                dependencies: ['bits-ui', 'lucide-svelte'],
+                dependencies: ['bits-ui', '@lucide/svelte'],
                 critical: false,
             },
 	{
@@ -373,14 +373,14 @@ export function analyzeBundleSize(): BundleAnalysis {
 	],
         duplicates: [
             {
-                module: 'lucide-svelte',
+                module: '@lucide/svelte',
                 count: 3,
                 size: 8000,
             },
 	],
         recommendations: [
             'Consider lazy loading VectorIntelligenceDemo component',
-            'Optimize lucide-svelte imports to reduce duplication',
+            'Optimize @lucide/svelte imports to reduce duplication',
             'Use dynamic imports for non-critical components',
         ],
     };

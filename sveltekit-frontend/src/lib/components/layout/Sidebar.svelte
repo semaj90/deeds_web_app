@@ -2,18 +2,18 @@
 	import { page } from '$app/stores';
 	import Button from '$lib/components/ui/bits/Button.svelte';
 	import { cn } from '$lib/utils';
-	import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
-	import Bot from 'lucide-svelte/icons/bot';
-	import Briefcase from 'lucide-svelte/icons/briefcase';
-	import ChevronRight from 'lucide-svelte/icons/chevron-right';
-	import FileBarChart from 'lucide-svelte/icons/file-bar-chart';
-	import FileText from 'lucide-svelte/icons/file-text';
-	import Home from 'lucide-svelte/icons/home';
-	import Layers from 'lucide-svelte/icons/layers';
-	import Plus from 'lucide-svelte/icons/plus';
-	import Scale from 'lucide-svelte/icons/scale';
-	import Search from 'lucide-svelte/icons/search';
-	import Settings from 'lucide-svelte/icons/settings';
+	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+	import Bot from '@lucide/svelte/icons/bot';
+	import Briefcase from '@lucide/svelte/icons/briefcase';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import FileBarChart from '@lucide/svelte/icons/file-bar-chart';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Home from '@lucide/svelte/icons/home';
+	import Layers from '@lucide/svelte/icons/layers';
+	import Plus from '@lucide/svelte/icons/plus';
+	import Scale from '@lucide/svelte/icons/scale';
+	import Search from '@lucide/svelte/icons/search';
+	import Settings from '@lucide/svelte/icons/settings';
 	import type { ComponentType } from 'svelte';
 
 	interface User {

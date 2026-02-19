@@ -6,7 +6,7 @@
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
-  import Network from 'lucide-svelte/icons/network';
+  import Network from '@lucide/svelte/icons/network';
   // Explicitly typing $props to avoid interface merge issues on single lines
   interface GraphNode { id: string, label: string;
     type: string;

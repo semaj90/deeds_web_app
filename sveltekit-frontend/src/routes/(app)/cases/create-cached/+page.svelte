@@ -2,9 +2,9 @@
 	import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index';
-	import AlertCircle from 'lucide-svelte/icons/alert-circle';
-	import Save from 'lucide-svelte/icons/save';
-	import Trash2 from 'lucide-svelte/icons/trash-2';
+	import AlertCircle from '@lucide/svelte/icons/alert-circle';
+	import Save from '@lucide/svelte/icons/save';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { onMount } from 'svelte';
 	// Migrated to $effect
 

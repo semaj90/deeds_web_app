@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Upload from 'lucide-svelte/icons/upload';
-  import X from 'lucide-svelte/icons/x';
-  import FileText from 'lucide-svelte/icons/file-text';
+  import Upload from '@lucide/svelte/icons/upload';
+  import X from '@lucide/svelte/icons/x';
+  import FileText from '@lucide/svelte/icons/file-text';
 
   interface UploadFile {
     id: string;

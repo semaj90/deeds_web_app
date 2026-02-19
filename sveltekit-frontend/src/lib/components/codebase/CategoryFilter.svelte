@@ -6,9 +6,9 @@
 	 * Task: 14.2 - Create category filter component
 	 * Purpose: Filter by tag category, cluster, file type
 	 */
-	import ChevronDown from 'lucide-svelte/icons/chevron-down';
-	import Filter from 'lucide-svelte/icons/filter';
-	import X from 'lucide-svelte/icons/x';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Filter from '@lucide/svelte/icons/filter';
+	import X from '@lucide/svelte/icons/x';
 
 	interface FilterOption {
 		value: string;

@@ -2,16 +2,16 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
   import Input from '$lib/components/ui/Input.svelte';
-  import X from 'lucide-svelte/icons/x';
-  import Save from 'lucide-svelte/icons/save';
-  import Trash2 from 'lucide-svelte/icons/trash-2';
-  import Upload from 'lucide-svelte/icons/upload';
-  import Brain from 'lucide-svelte/icons/brain';
-  import Tag from 'lucide-svelte/icons/tag';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import ImageIcon from 'lucide-svelte/icons/image';
-  import VideoIcon from 'lucide-svelte/icons/video';
-  import Mic from 'lucide-svelte/icons/mic';
+  import X from '@lucide/svelte/icons/x';
+  import Save from '@lucide/svelte/icons/save';
+  import Trash2 from '@lucide/svelte/icons/trash-2';
+  import Upload from '@lucide/svelte/icons/upload';
+  import Brain from '@lucide/svelte/icons/brain';
+  import Tag from '@lucide/svelte/icons/tag';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import ImageIcon from '@lucide/svelte/icons/image';
+  import VideoIcon from '@lucide/svelte/icons/video';
+  import Mic from '@lucide/svelte/icons/mic';
 
   interface Evidence {
     id?: string;

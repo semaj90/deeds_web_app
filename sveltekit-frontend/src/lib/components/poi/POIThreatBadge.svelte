@@ -1,9 +1,9 @@
 <script lang="ts">
  import { Badge } from '$lib/components/ui/badge';
- import AlertCircle from 'lucide-svelte/icons/alert-circle';
- import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
- import CheckCircle from 'lucide-svelte/icons/check-circle';
- import Shield from 'lucide-svelte/icons/shield';
+ import AlertCircle from '@lucide/svelte/icons/alert-circle';
+ import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+ import CheckCircle from '@lucide/svelte/icons/check-circle';
+ import Shield from '@lucide/svelte/icons/shield';
 
  let { threatLevel, size = 'md', showIcon = true } = $props<{
   threatLevel: string;

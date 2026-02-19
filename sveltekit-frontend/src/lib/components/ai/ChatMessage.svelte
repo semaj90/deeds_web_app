@@ -1,14 +1,14 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
-  import Bot from 'lucide-svelte/icons/bot';
-  import Clock from 'lucide-svelte/icons/clock';
-  import Copy from 'lucide-svelte/icons/copy';
-  import Heart from 'lucide-svelte/icons/heart';
-  import MoreVertical from 'lucide-svelte/icons/more-vertical';
-  import Star from 'lucide-svelte/icons/star';
-  import StarOff from 'lucide-svelte/icons/star-off';
-  import ThumbsUp from 'lucide-svelte/icons/thumbs-up';
-  import Users from 'lucide-svelte/icons/users';
+  import Bot from '@lucide/svelte/icons/bot';
+  import Clock from '@lucide/svelte/icons/clock';
+  import Copy from '@lucide/svelte/icons/copy';
+  import Heart from '@lucide/svelte/icons/heart';
+  import MoreVertical from '@lucide/svelte/icons/more-vertical';
+  import Star from '@lucide/svelte/icons/star';
+  import StarOff from '@lucide/svelte/icons/star-off';
+  import ThumbsUp from '@lucide/svelte/icons/thumbs-up';
+  import Users from '@lucide/svelte/icons/users';
 
   interface MessageData {
     id?: string;

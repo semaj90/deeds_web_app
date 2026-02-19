@@ -6,11 +6,11 @@
 	 * Task: 14.3 - Create graph export component
 	 * Purpose: Export graph data to JSON, PNG/SVG, CSV
 	 */
-	import Check from 'lucide-svelte/icons/check';
-	import Download from 'lucide-svelte/icons/download';
-	import FileJson from 'lucide-svelte/icons/file-json';
-	import FileSpreadsheet from 'lucide-svelte/icons/file-spreadsheet';
-	import Image from 'lucide-svelte/icons/image';
+	import Check from '@lucide/svelte/icons/check';
+	import Download from '@lucide/svelte/icons/download';
+	import FileJson from '@lucide/svelte/icons/file-json';
+	import FileSpreadsheet from '@lucide/svelte/icons/file-spreadsheet';
+	import Image from '@lucide/svelte/icons/image';
 
 	interface GraphNode {
 		id: string;

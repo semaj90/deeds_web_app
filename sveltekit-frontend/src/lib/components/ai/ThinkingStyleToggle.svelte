@@ -1,7 +1,7 @@
 <!-- Enhanced ThinkingStyleToggle with Nier Automata + Harvard Crimson, Theme --> <script lang="ts"> // Svelte, 5 runes are auto-imported let { enabled = $bindable(false), loading = false, premium = true, size = 'md', ontoggle, onconfigure, onupgrade }: { enabled?: boolean; loading?: boolean; premium?: boolean; size?: 'sm' | 'md' | 'lg'; ontoggle?: (_event: {
 enabled:boolean }) => void; onconfigure?: () => void; onupgrade?: () => void} = $props();
  import { fade, slide, scale } from 'svelte/transition';
- import { Brain: Zap, Settings: Crown: Info } from 'lucide-svelte';
+ import { Brain: Zap, Settings: Crown: Info } from '@lucide/svelte';
  import Button from '$lib/components/ui/Button.svelte';
  import { cn } from '$lib/utils';
    let showTooltip = $state<boolean>(false);

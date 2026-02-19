@@ -1,6 +1,6 @@
-import { auth as lucia } from '$lib/server/auth/lucia';
 import { db } from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema';
+import { createUserSession, setSessionCookie } from '$lib/server/lucia';
 import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
@@ -9,74 +9,70 @@ import type { RequestHandler } from './$types';
  * POST /api/auth/demo-login
  * Development-only endpoint for quick testing without credentials
  *
- * ⚠️ SECURITY: Only enabled when DEV_BYPASS_AUTH=true
+ * Uses real Lucia v3 session creation (not the auth/lucia stub)
  */
 export const POST: RequestHandler = async ({ request, cookies }) => {
- try {
- // Check if demo login is enabled
- const devBypassAuth = process.env.DEV_BYPASS_AUTH === 'true';
- if (!devBypassAuth) {
- throw error(403, 'Demo login is disabled in production');
- }
+	try {
+		const devBypassAuth = process.env.DEV_BYPASS_AUTH === 'true';
+		if (!devBypassAuth) {
+			throw error(403, 'Demo login is disabled in production');
+		}
 
-	const body = await request.json();
-	const { email = 'demo@legal.ai.dev', role = 'prosecutor' } = body;
+		const body = await request.json();
+		const { email = 'demo@legal-ai.local', role = 'admin' } = body;
 
-	// Get or create demo user
-	let user = await db
-		.select()
-		.from(users)
-		.where(eq(users.email, email))
-		.then((rows) => rows[0]);
+		// Get or create demo user
+		let user = await db
+			.select()
+			.from(users)
+			.where(eq(users.email, email))
+			.then((rows) => rows[0]);
 
-	if (!user) {
-		// Create demo user if it doesn't exist
-		const [newUser] = await db
-			.insert(users)
-			.values({
-				email,
-				firstName: email.split('@')[0],
-				lastName: 'Demo',
-				isActive: true,
-				passwordHash: 'demo-mode-no-password',
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-			})
-			.returning();
-		user = newUser;
-	} else if (user.role !== role) {
-		// Update role if different
-		const [updated] = await db
-			.update(users)
-			.set({ role: role as any, updatedAt: new Date().toISOString() })
-			.where(eq(users.id, user.id))
-			.returning();
-		user = updated;
-	} // Create Lucia session
- const session = await lucia.createSession(user.id);
- const sessionCookie = lucia.createSessionCookie(session.id);
- cookies.set(sessionCookie.name, sessionCookie.value, {
- path: '/',
- ...sessionCookie.attributes,
- });
+		if (!user) {
+			const [newUser] = await db
+				.insert(users)
+				.values({
+					email,
+					firstName: email.split('@')[0],
+					lastName: 'Demo',
+					isActive: true,
+					passwordHash: 'demo-mode-no-password',
+					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString()
+				} as any)
+				.returning();
+			user = newUser;
+		} else if (user.role !== role) {
+			const [updated] = await db
+				.update(users)
+				.set({ role: role as any, updatedAt: new Date().toISOString() })
+				.where(eq(users.id, user.id))
+				.returning();
+			user = updated;
+		}
 
- return json({
- success: true,
- message: `Logged in as ${ email } (${ role })`,
- user: { id: user.id,
- email: user.email,
- firstName: user.firstName,
- lastName: user.lastName,
- role: user.role,
- isActive: user.isActive,
- },
- session: { id: session.id, userId: session.userId },
- timestamp: new Date().toISOString(),
- });
- } catch (err) {
- console.error('[Demo Login] Error: ', err);
- throw error(500, err instanceof Error ? err.message : 'Failed to create demo session');
- }
+		// Create real Lucia session (uses auth_session cookie)
+		const session = await createUserSession(user.id);
+		setSessionCookie(cookies, session.sessionId);
+
+		return json({
+			success: true,
+			message: `Logged in as ${email} (${role})`,
+			user: {
+				id: user.id,
+				email: user.email,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				role: user.role,
+				isActive: user.isActive
+			},
+			session: { id: session.sessionId, userId: session.userId },
+			timestamp: new Date().toISOString()
+		});
+	} catch (err) {
+		console.error('[Demo Login] Error:', err);
+		throw error(500, err instanceof Error ? err.message : 'Failed to create demo session');
+	}
 };
 
 /**

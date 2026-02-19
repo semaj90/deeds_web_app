@@ -1,10 +1,6 @@
 // Minimal module shims - VALID TypeScript
 // Keep this file clean to avoid poisoning the global type system
 
-declare module 'lucide-svelte' {
-  const mod: any;
-  export default mod;
-}
 
 declare module 'svelte-sonner' {
   export const toast: any;

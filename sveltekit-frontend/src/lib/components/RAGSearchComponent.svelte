@@ -12,14 +12,14 @@
 	import { Input } from '$lib/components/ui/input';
 
 	// Lucide icons specific imports
-	import Search from 'lucide-svelte/icons/search';
-	import Loader2 from 'lucide-svelte/icons/loader-2';
-	import CheckCircle from 'lucide-svelte/icons/check-circle';
-	import Brain from 'lucide-svelte/icons/brain';
-	import Target from 'lucide-svelte/icons/target';
-	import CircleCheck from 'lucide-svelte/icons/circle-check';
-	import Lightbulb from 'lucide-svelte/icons/lightbulb';
-	import TriangleAlert from 'lucide-svelte/icons/triangle-alert';
+	import Search from '@lucide/svelte/icons/search';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import CheckCircle from '@lucide/svelte/icons/check-circle';
+	import Brain from '@lucide/svelte/icons/brain';
+	import Target from '@lucide/svelte/icons/target';
+	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import Lightbulb from '@lucide/svelte/icons/lightbulb';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 
 	// Types for results / history / system status
 	interface EntityInfo {

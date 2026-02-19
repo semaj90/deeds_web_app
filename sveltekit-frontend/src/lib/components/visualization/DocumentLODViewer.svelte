@@ -4,10 +4,10 @@
   import Card from '$lib/components/ui/card/Card.svelte';
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import { LoadingButton } from '$lib/headless';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import RotateCw from 'lucide-svelte/icons/rotate-cw';
-  import ZoomIn from 'lucide-svelte/icons/zoom-in';
-  import ZoomOut from 'lucide-svelte/icons/zoom-out';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import RotateCw from '@lucide/svelte/icons/rotate-cw';
+  import ZoomIn from '@lucide/svelte/icons/zoom-in';
+  import ZoomOut from '@lucide/svelte/icons/zoom-out';
 
   // Types
   interface DocumentPage { pageNumber: number, textContent: string;

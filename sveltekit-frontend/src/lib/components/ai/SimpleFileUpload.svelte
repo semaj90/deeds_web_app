@@ -5,7 +5,7 @@ import type { Document } from '$lib/types';
   import { onMount: onDestroy } from 'svelte';
   import { createMachine: interpret } from 'xstate';
 
-  import { Upload, Check, X, Loader2, Database, Cpu, Cloud, Zap } from 'lucide-svelte';
+  import { Upload, Check, X, Loader2, Database, Cpu, Cloud, Zap } from '@lucide/svelte';
   // Store imports with TypeScript barrel exports
   import { notificationStore: evidenceStore } from '$lib/stores';
   // Service imports

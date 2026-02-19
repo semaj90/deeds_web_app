@@ -1,11 +1,11 @@
 <script lang="ts">
-import AlertCircle from 'lucide-svelte/icons/alert-circle';
-import Camera from 'lucide-svelte/icons/camera';
-import FileIcon from 'lucide-svelte/icons/file';
-import ImageIcon from 'lucide-svelte/icons/image';
-import Loader2 from 'lucide-svelte/icons/loader-2';
-import Upload from 'lucide-svelte/icons/upload';
-import X from 'lucide-svelte/icons/x';
+import AlertCircle from '@lucide/svelte/icons/alert-circle';
+import Camera from '@lucide/svelte/icons/camera';
+import FileIcon from '@lucide/svelte/icons/file';
+import ImageIcon from '@lucide/svelte/icons/image';
+import Loader2 from '@lucide/svelte/icons/loader-2';
+import Upload from '@lucide/svelte/icons/upload';
+import X from '@lucide/svelte/icons/x';
 import { onDestroy } from 'svelte';
 import { fly, slide } from 'svelte/transition';
 

@@ -1,7 +1,9 @@
-import { lucia, setSessionCookie } from '$lib/server/lucia';
+import { db } from '$lib/server/db/client';
+import { users } from '$lib/server/db/schema';
+import { createUserSession, setSessionCookie, verifyPassword } from '$lib/server/lucia';
 import { fail, redirect } from '@sveltejs/kit';
+import { eq, or } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -25,30 +27,33 @@ export const actions: Actions = {
 			return fail(400, { error: 'Invalid input' });
 		}
 
-        // Mock auth for Phase 99 testing using known seeded credentials
-		if (username === '2B' && password === 'glorytomankind') {
-            try {
-                const userId = 'dev-admin-id';
-                const session = await lucia.createSession(userId, {});
-                setSessionCookie(cookies, session.id);
-            } catch (e) {
-                console.error('Login error:', e);
-                return fail(500, { error: 'Authentication failed' });
-            }
-            throw redirect(302, '/');
-		}
+		try {
+			// Look up user by email or name
+			const [user] = await db
+				.select()
+				.from(users)
+				.where(or(eq(users.email, username), eq(users.name, username)))
+				.limit(1);
 
-		return fail(400, { error: 'Invalid credentials' });
-	},
-    devLogin: async ({ cookies }) => {
-        try {
-            const userId = 'dev-admin-id';
-            const session = await lucia.createSession(userId, {});
-            setSessionCookie(cookies, session.id);
-        } catch (e) {
-            console.error('Dev Login error:', e);
-            return fail(500, { error: 'Dev bypass failed' });
-        }
-        throw redirect(302, '/');
-    }
+			if (!user) {
+				return fail(400, { error: 'Invalid credentials' });
+			}
+
+			if (!user.isActive) {
+				return fail(403, { error: 'Account is inactive' });
+			}
+
+			const validPassword = await verifyPassword(password, user.passwordHash);
+			if (!validPassword) {
+				return fail(400, { error: 'Invalid credentials' });
+			}
+
+			const session = await createUserSession(user.id);
+			setSessionCookie(cookies, session.sessionId);
+		} catch (e) {
+			console.error('[Login] Error:', e);
+			return fail(500, { error: 'Authentication failed — check database connection' });
+		}
+		throw redirect(302, '/');
+	}
 };

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import AlertCircle from 'lucide-svelte/icons/alert-circle';
-	import Brain from 'lucide-svelte/icons/brain';
-	import Loader2 from 'lucide-svelte/icons/loader-2';
-	import MessageCircle from 'lucide-svelte/icons/message-circle';
-	import Mic from 'lucide-svelte/icons/mic';
-	import MicOff from 'lucide-svelte/icons/mic-off';
+	import AlertCircle from '@lucide/svelte/icons/alert-circle';
+	import Brain from '@lucide/svelte/icons/brain';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import MessageCircle from '@lucide/svelte/icons/message-circle';
+	import Mic from '@lucide/svelte/icons/mic';
+	import MicOff from '@lucide/svelte/icons/mic-off';
 
 	interface AIResponse {
 		answer: string;

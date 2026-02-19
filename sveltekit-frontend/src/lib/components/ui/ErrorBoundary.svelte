@@ -5,10 +5,10 @@
    */
   // Migrated to $effect
   import Button from '$lib/components/ui/Button.svelte';
-  import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
-  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
-  import Home from 'lucide-svelte/icons/home';
-  import Bug from 'lucide-svelte/icons/bug';
+  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+  import Home from '@lucide/svelte/icons/home';
+  import Bug from '@lucide/svelte/icons/bug';
   import type { Snippet } from 'svelte';
 
   interface Props {

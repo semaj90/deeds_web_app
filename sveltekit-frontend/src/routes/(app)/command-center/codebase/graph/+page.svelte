@@ -11,12 +11,12 @@
 	import { NodeDetailPanel, RouteGraph } from '$lib/components/codebase';
 	import { Card, CardContent } from '$lib/components/ui';
 	import Button from '$lib/components/ui/Button.svelte';
-	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
-	import Filter from 'lucide-svelte/icons/filter';
-	import GitBranch from 'lucide-svelte/icons/git-branch';
-	import RefreshCw from 'lucide-svelte/icons/refresh-cw';
-	import Search from 'lucide-svelte/icons/search';
-	import X from 'lucide-svelte/icons/x';
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import Filter from '@lucide/svelte/icons/filter';
+	import GitBranch from '@lucide/svelte/icons/git-branch';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import Search from '@lucide/svelte/icons/search';
+	import X from '@lucide/svelte/icons/x';
 	// Migrated to $effect
 
 	// Types

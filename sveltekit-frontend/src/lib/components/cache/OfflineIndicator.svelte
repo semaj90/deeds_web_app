@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import WifiOff from 'lucide-svelte/icons/wifi-off';
+	import WifiOff from '@lucide/svelte/icons/wifi-off';
 
 	let isOnline = $state(browser && navigator.onLine);
 	let showOfflineBanner = $state(false);

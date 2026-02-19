@@ -9,6 +9,11 @@ import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
 import { getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
+import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
+import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
+import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
+import { createAnalysisJob, updateAnalysisJob, completeAnalysisJob, failAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
+import { embedGate, entityGate, forensicsGate, summarizeGate, gated } from '$lib/server/analysis/concurrency-gate.js';
 
 import { ENV } from '$lib/server/env.server.js';
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -210,7 +215,7 @@ async function processAndEmbed(
 
 	for (const chunk of legalChunks) {
 		try {
-			const embedding = await embedText(chunk.text.slice(0, 8000));
+			const embedding = await gated(embedGate, () => embedText(chunk.text.slice(0, 8000)));
 			if (embedding) {
 				const chunkUUID = crypto.randomUUID();
 
@@ -299,10 +304,101 @@ async function processAndEmbed(
 	// Collect all unique citations for cross-referencing
 	const allCitations = [...new Set(legalChunks.flatMap(c => c.citations))];
 
+	// Create pipeline job in analysis_jobs table (Drizzle ORM)
+	let pipelineJobId: string | null = null;
+	try {
+		pipelineJobId = await createAnalysisJob({ evidenceId, caseId, jobType: 'upload_pipeline' });
+		await updateAnalysisJob(pipelineJobId, { progress: '75' });
+	} catch (err) {
+		console.warn('[Upload] Pipeline job creation failed (non-fatal):', err);
+	}
+
+	// 6. Entity extraction: LLM structured (primary) + regex (fallback) + dedup
+	updateJob(jobId, { step: 'embedding', progress: 93, message: 'Extracting entities...' });
+	let entityJobId: string | null = null;
+	try {
+		entityJobId = await createAnalysisJob({ evidenceId, caseId, jobType: 'entity_extraction' });
+	} catch { /* non-fatal */ }
+
+	const [entities, forensicFlags] = await Promise.all([
+		gated(entityGate, () => extractEntities(fullText.slice(0, 50_000))),
+		gated(forensicsGate, () => Promise.resolve(detectForensicPatterns(fullText.slice(0, 50_000)))),
+	]);
+	console.log(`[Upload] ${entities.length} entities, ${forensicFlags.length} forensic flags for ${fileName}`);
+
+	if (entityJobId) {
+		try {
+			await completeAnalysisJob(entityJobId, {
+				entityCount: entities.length,
+				types: [...new Set(entities.map(e => e.label))],
+			});
+		} catch { /* non-fatal */ }
+	}
+
+	// Record forensics job
+	try {
+		const forensicsJobId = await createAnalysisJob({ evidenceId, caseId, jobType: 'forensics' });
+		await completeAnalysisJob(forensicsJobId, {
+			flagCount: forensicFlags.length,
+			types: forensicFlags.map(f => f.type),
+		});
+	} catch { /* non-fatal */ }
+
+	// 7. Summarization via Ollama (non-fatal — skipped if Ollama unavailable)
+	let summary = '';
+	updateJob(jobId, { step: 'embedding', progress: 95, message: 'Generating summary...' });
+	let summaryJobId: string | null = null;
+	try {
+		summaryJobId = await createAnalysisJob({ evidenceId, caseId, jobType: 'summarization' });
+	} catch { /* non-fatal */ }
+
+	try {
+		summary = await gated(summarizeGate, () => summarizeDocument(fullText));
+		if (summaryJobId) {
+			await completeAnalysisJob(summaryJobId, { summaryLength: summary.length });
+		}
+	} catch (err) {
+		console.warn('[Upload] Summarization skipped:', err);
+		if (summaryJobId) {
+			await failAnalysisJob(summaryJobId, String(err)).catch(() => {});
+		}
+	}
+
+	// 8. Persist analysis results to evidence.metadata
+	try {
+		await db.execute(sql`
+			UPDATE evidence SET metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
+				entities: entities.slice(0, 200),
+				forensicFlags,
+				summary: summary.slice(0, 5000),
+				entityCount: entities.length,
+				analysisTimestamp: new Date().toISOString(),
+			})}::jsonb
+			WHERE id = ${evidenceId}
+		`);
+	} catch (err) {
+		console.warn('[Upload] Analysis persistence failed (vectors are safe):', err);
+	}
+
+	// Complete pipeline job
+	if (pipelineJobId) {
+		try {
+			await completeAnalysisJob(pipelineJobId, {
+				chunks: stored,
+				entities: entities.length,
+				flags: forensicFlags.length,
+				sections: sectionsSeen.size,
+				citations: allCitations.length,
+			});
+		} catch { /* non-fatal */ }
+	}
+
+	const highSeverity = forensicFlags.filter(f => f.severity === 'high');
+
 	updateJob(jobId, {
 		step: 'complete',
 		progress: 100,
-		message: `Upload complete: ${stored}/${legalChunks.length} chunks, ${sectionsSeen.size} sections, ${allCitations.length} citations (${extractionMethod})`,
+		message: `Complete: ${stored} chunks, ${entities.length} entities, ${forensicFlags.length} flags${highSeverity.length ? ` (${highSeverity.length} HIGH)` : ''}, ${sectionsSeen.size} sections, ${allCitations.length} citations (${extractionMethod})`,
 	});
 }
 

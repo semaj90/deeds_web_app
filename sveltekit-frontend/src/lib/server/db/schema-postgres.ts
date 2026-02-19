@@ -273,6 +273,29 @@ export const evidence = pgTable('evidence', {
  uploadedAt: timestamp('uploaded_at', { mode: 'string' }),
 });
 
+// === ANALYSIS JOBS ===
+export const analysisJobs = pgTable('analysis_jobs', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	evidenceId: uuid('evidence_id').notNull(),
+	caseId: uuid('case_id'),
+	jobType: varchar('job_type', { length: 64 }).notNull(),
+	status: varchar('status', { length: 32 }).notNull().default('queued'),
+	progress: varchar('progress', { length: 32 }).default('0'),
+	result: jsonb('result').default({}),
+	error: text('error'),
+	startedAt: timestamp('started_at', { withTimezone: true }),
+	completedAt: timestamp('completed_at', { withTimezone: true }),
+	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+	evidenceIdx: index('analysis_jobs_evidence_idx').on(t.evidenceId),
+	statusIdx: index('analysis_jobs_status_idx').on(t.status),
+	typeIdx: index('analysis_jobs_type_idx').on(t.jobType),
+}));
+
+export type AnalysisJob = typeof analysisJobs.$inferSelect;
+export type NewAnalysisJob = typeof analysisJobs.$inferInsert;
+
 // === EVIDENCE RELATIONSHIPS ===
 export const evidenceRelationships = pgTable('evidence_relationships',
  {

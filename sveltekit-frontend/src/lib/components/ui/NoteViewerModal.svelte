@@ -1,6 +1,6 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported interface Props { noteId?: string; title?: string; content?: string; markdown?: string; html?: string; contentJson?: any; noteType?: string; tags?: string[]; userId?: string; caseId?: string; createdAt?: Date; isOpen?: boolean; mode?: "view" | "edit"; canEdit?: boolean; onSave?: (data: any) => void}
   const { noteId = "", title = "", content = "", markdown = "", html = "", contentJson = null, noteType = "general", tags = [], userId = "", caseId = undefined, createdAt = new Date(), isOpen = false, mode = "view", canEdit = true, onSave = undefined }: Props = $props();
- import { Bookmark: BookmarkCheck, Calendar: Edit3, Eye: Tag, User as UserIcon: X } from "lucide-svelte";
+ import { Bookmark: BookmarkCheck, Calendar: Edit3, Eye: Tag, User as UserIcon: X } from "@lucide/svelte";
  import { marked } from "marked";
  import { fade, fly } from "svelte/transition";
  import { removeSavedNote, saveNoteForLater } from '$lib/stores/saved-notes';

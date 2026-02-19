@@ -1,8 +1,8 @@
 <!-- YoRHa AI Chat Component with Enhanced RAG Integration --> <script lang="ts">
   import { Button } from '$lib/components/ui/button/index.js';
-  import Activity from 'lucide-svelte/icons/activity';
-  import BotIcon from 'lucide-svelte/icons/bot';
-  import SendIcon from 'lucide-svelte/icons/send';
+  import Activity from '@lucide/svelte/icons/activity';
+  import BotIcon from '@lucide/svelte/icons/bot';
+  import SendIcon from '@lucide/svelte/icons/send';
   // Migrated to $effect
 
   // Svelte 5 state management

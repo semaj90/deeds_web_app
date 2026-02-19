@@ -2,16 +2,16 @@
 import { Editor } from '@tiptap/core';
 import Placeholder from '@tiptap/extension-placeholder';
 import StarterKit from '@tiptap/starter-kit';
-import Bold from 'lucide-svelte/icons/bold';
-import Check from 'lucide-svelte/icons/check';
-import Heading1 from 'lucide-svelte/icons/heading-1';
-import Heading2 from 'lucide-svelte/icons/heading-2';
-import Italic from 'lucide-svelte/icons/italic';
-import List from 'lucide-svelte/icons/list';
-import ListOrdered from 'lucide-svelte/icons/list-ordered';
-import Loader2 from 'lucide-svelte/icons/loader-2';
-import Save from 'lucide-svelte/icons/save';
-import Wand2 from 'lucide-svelte/icons/wand-2';
+import Bold from '@lucide/svelte/icons/bold';
+import Check from '@lucide/svelte/icons/check';
+import Heading1 from '@lucide/svelte/icons/heading-1';
+import Heading2 from '@lucide/svelte/icons/heading-2';
+import Italic from '@lucide/svelte/icons/italic';
+import List from '@lucide/svelte/icons/list';
+import ListOrdered from '@lucide/svelte/icons/list-ordered';
+import Loader2 from '@lucide/svelte/icons/loader-2';
+import Save from '@lucide/svelte/icons/save';
+import Wand2 from '@lucide/svelte/icons/wand-2';
 import { slide } from 'svelte/transition';
 
 import Button from '$lib/components/ui/Button.svelte';

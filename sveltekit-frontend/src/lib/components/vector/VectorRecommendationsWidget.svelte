@@ -20,16 +20,16 @@ Compact AI recommendations component for sidebar/dashboard use
       successProbability: number;
     };
   }
-  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import Clock from 'lucide-svelte/icons/clock';
-  import Lightbulb from 'lucide-svelte/icons/lightbulb';
-  import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
-  import Zap from 'lucide-svelte/icons/zap';
-  import Target from 'lucide-svelte/icons/target';
-  import TrendingUp from 'lucide-svelte/icons/trending-up';
-  import ChevronRight from 'lucide-svelte/icons/chevron-right';
-  import Star from 'lucide-svelte/icons/star';
+  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import Clock from '@lucide/svelte/icons/clock';
+  import Lightbulb from '@lucide/svelte/icons/lightbulb';
+  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import Zap from '@lucide/svelte/icons/zap';
+  import Target from '@lucide/svelte/icons/target';
+  import TrendingUp from '@lucide/svelte/icons/trending-up';
+  import ChevronRight from '@lucide/svelte/icons/chevron-right';
+  import Star from '@lucide/svelte/icons/star';
   interface Props {
     context?: string
     userRole?: 'prosecutor' | 'detective' | 'admin' | 'user';

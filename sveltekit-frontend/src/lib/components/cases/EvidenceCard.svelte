@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { formatDistanceToNow } from 'date-fns';
-	import Archive from 'lucide-svelte/icons/archive';
-	import Calendar from 'lucide-svelte/icons/calendar';
-	import Download from 'lucide-svelte/icons/download';
-	import Edit from 'lucide-svelte/icons/edit';
-	import Eye from 'lucide-svelte/icons/eye';
-	import FileText from 'lucide-svelte/icons/file-text';
-	import Headphones from 'lucide-svelte/icons/headphones';
-	import Image from 'lucide-svelte/icons/image';
-	import Trash2 from 'lucide-svelte/icons/trash-2';
-	import Video from 'lucide-svelte/icons/video';
+	import Archive from '@lucide/svelte/icons/archive';
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import Download from '@lucide/svelte/icons/download';
+	import Edit from '@lucide/svelte/icons/edit';
+	import Eye from '@lucide/svelte/icons/eye';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Headphones from '@lucide/svelte/icons/headphones';
+	import Image from '@lucide/svelte/icons/image';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Video from '@lucide/svelte/icons/video';
 
 	interface Props {
 		evidence: any;

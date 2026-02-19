@@ -3,7 +3,7 @@
   // cast helper type to satisfy sveltekit-superforms zod adapter typing
   import Button from '$lib/components/ui/Button.svelte';
   import { registerSchema } from '$lib/schemas/auth';
-  import X from 'lucide-svelte/icons/x';
+  import X from '@lucide/svelte/icons/x';
   import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import superForm from 'sveltekit-superforms';
   interface Props {

@@ -2,7 +2,7 @@
 <script lang="ts">
   import { Slider } from "bits-ui";
 import { Switch } from "bits-ui";
-import { Search, SlidersHorizontal, Zap } from "lucide-svelte";
+import { Search, SlidersHorizontal, Zap } from "@lucide/svelte";
 
   // Props
   let {

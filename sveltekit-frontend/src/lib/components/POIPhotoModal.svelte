@@ -4,14 +4,14 @@
 	import { Dialog, DialogContent } from '$lib/components/ui/dialog';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
-	import Camera from 'lucide-svelte/icons/camera';
-	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
-	import ChevronRight from 'lucide-svelte/icons/chevron-right';
-	import Download from 'lucide-svelte/icons/download';
-	import Eye from 'lucide-svelte/icons/eye';
-	import X from 'lucide-svelte/icons/x';
-	import ZoomIn from 'lucide-svelte/icons/zoom-in';
-	import ZoomOut from 'lucide-svelte/icons/zoom-out';
+	import Camera from '@lucide/svelte/icons/camera';
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import Download from '@lucide/svelte/icons/download';
+	import Eye from '@lucide/svelte/icons/eye';
+	import X from '@lucide/svelte/icons/x';
+	import ZoomIn from '@lucide/svelte/icons/zoom-in';
+	import ZoomOut from '@lucide/svelte/icons/zoom-out';
  // Migrated from createEventDispatcher to callback props;
 
  let { photos = [], currentIndex = $bindable(0), open = $bindable(false), onclose } = $props<{

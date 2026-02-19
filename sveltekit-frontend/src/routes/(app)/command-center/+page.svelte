@@ -4,25 +4,25 @@
 	import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 	import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import Activity from 'lucide-svelte/icons/activity';
-	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
-	import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
-	import Bell from 'lucide-svelte/icons/bell';
-	import Brain from 'lucide-svelte/icons/brain';
-	import ChevronDown from 'lucide-svelte/icons/chevron-down';
-	import Database from 'lucide-svelte/icons/database';
-	import FileText from 'lucide-svelte/icons/file-text';
-	import Gavel from 'lucide-svelte/icons/gavel';
-	import Moon from 'lucide-svelte/icons/moon';
-	import RefreshCw from 'lucide-svelte/icons/refresh-cw';
-	import Search from 'lucide-svelte/icons/search';
-	import Settings from 'lucide-svelte/icons/settings';
-	import Sun from 'lucide-svelte/icons/sun';
-	import TrendingDown from 'lucide-svelte/icons/trending-down';
-	import TrendingUp from 'lucide-svelte/icons/trending-up';
-	import Users from 'lucide-svelte/icons/users';
-	import X from 'lucide-svelte/icons/x';
-	import Zap from 'lucide-svelte/icons/zap';
+	import Activity from '@lucide/svelte/icons/activity';
+	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+	import Bell from '@lucide/svelte/icons/bell';
+	import Brain from '@lucide/svelte/icons/brain';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Database from '@lucide/svelte/icons/database';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Gavel from '@lucide/svelte/icons/gavel';
+	import Moon from '@lucide/svelte/icons/moon';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import Search from '@lucide/svelte/icons/search';
+	import Settings from '@lucide/svelte/icons/settings';
+	import Sun from '@lucide/svelte/icons/sun';
+	import TrendingDown from '@lucide/svelte/icons/trending-down';
+	import TrendingUp from '@lucide/svelte/icons/trending-up';
+	import Users from '@lucide/svelte/icons/users';
+	import X from '@lucide/svelte/icons/x';
+	import Zap from '@lucide/svelte/icons/zap';
 	// Migrated to $effect
 
 	// Svelte 5 runes state

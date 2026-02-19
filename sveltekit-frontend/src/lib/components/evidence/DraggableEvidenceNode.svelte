@@ -1,12 +1,12 @@
 <script lang="ts">
   import { evidenceStore } from '$lib/stores/unified';
   import { toastStore } from '$lib/stores/unified/toast-store';
-  import Bot from 'lucide-svelte/icons/bot';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import ImageIcon from 'lucide-svelte/icons/image';
-  import Mic from 'lucide-svelte/icons/mic';
-  import Video from 'lucide-svelte/icons/video';
-  import Zap from 'lucide-svelte/icons/zap';
+  import Bot from '@lucide/svelte/icons/bot';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import ImageIcon from '@lucide/svelte/icons/image';
+  import Mic from '@lucide/svelte/icons/mic';
+  import Video from '@lucide/svelte/icons/video';
+  import Zap from '@lucide/svelte/icons/zap';
   import type { ComponentType } from 'svelte';
 
   // Stub: embeddingsService module is corrupted, use inline fallback

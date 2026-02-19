@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Brain from 'lucide-svelte/icons/brain';
-  import Cpu from 'lucide-svelte/icons/cpu';
-  import Zap from 'lucide-svelte/icons/zap';
+  import Brain from '@lucide/svelte/icons/brain';
+  import Cpu from '@lucide/svelte/icons/cpu';
+  import Zap from '@lucide/svelte/icons/zap';
   import { webAssemblyAIAdapter } from '../../adapters/webasm-ai-adapter';
   import Badge from "../ui/badge/Badge.svelte";
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
-	import Camera from 'lucide-svelte/icons/camera';
-	import Upload from 'lucide-svelte/icons/upload';
+	import Camera from '@lucide/svelte/icons/camera';
+	import Upload from '@lucide/svelte/icons/upload';
 
  let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean;
 	onUpload: (data: any) => void, onError: (error: any) => void }>();

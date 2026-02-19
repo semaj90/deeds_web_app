@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { notificationStore, type Toast } from '$lib/stores/unified/notification-store.svelte';
-	import X from 'lucide-svelte/icons/x';
+	import X from '@lucide/svelte/icons/x';
 	import { fly } from 'svelte/transition';
 
 	const alertClasses: Record<Toast['type'], string> = {

@@ -3,11 +3,11 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index.js';
-	import Camera from 'lucide-svelte/icons/camera';
-	import Edit from 'lucide-svelte/icons/edit';
-	import Eye from 'lucide-svelte/icons/eye';
-	import Trash2 from 'lucide-svelte/icons/trash-2';
-	import User from 'lucide-svelte/icons/user';
+	import Camera from '@lucide/svelte/icons/camera';
+	import Edit from '@lucide/svelte/icons/edit';
+	import Eye from '@lucide/svelte/icons/eye';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import User from '@lucide/svelte/icons/user';
 
 	interface POI {
 		id: string;

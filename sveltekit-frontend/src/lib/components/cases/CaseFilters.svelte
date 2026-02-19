@@ -3,10 +3,10 @@
   import { Input } from "$lib/components/ui/input";
   import { Select } from "bits-ui";
 import Button from '$lib/components/ui/Button.svelte';
-  import Search from 'lucide-svelte/icons/search';
-  import Filter from 'lucide-svelte/icons/filter';
-  import SortAsc from 'lucide-svelte/icons/sort-asc';
-  import SortDesc from 'lucide-svelte/icons/sort-desc';
+  import Search from '@lucide/svelte/icons/search';
+  import Filter from '@lucide/svelte/icons/filter';
+  import SortAsc from '@lucide/svelte/icons/sort-asc';
+  import SortDesc from '@lucide/svelte/icons/sort-desc';
 
   interface Props {
     cases?: Case[];

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	// Migrated to $effect
+	import { invalidateAll } from '$app/navigation';
 	import type { PageData } from './$types';
 	import { buttonVariants } from '$lib/components/ui/button-variants';
 
@@ -22,6 +22,107 @@
 		ollama: 'online',
 		assistant: 'online'
 	});
+
+	// Auth dialog state
+	let authDialogRef: HTMLDialogElement | undefined = $state();
+	let authTab = $state<'login' | 'register'>('login');
+	let authError = $state('');
+	let authLoading = $state(false);
+	let loginEmail = $state('');
+	let loginPassword = $state('');
+	let regEmail = $state('');
+	let regFirstName = $state('');
+	let regLastName = $state('');
+	let regPassword = $state('');
+
+	function openAuthDialog(tab: 'login' | 'register') {
+		authTab = tab;
+		authError = '';
+		authDialogRef?.showModal();
+	}
+
+	function closeAuthDialog() {
+		authDialogRef?.close();
+		authError = '';
+	}
+
+	async function handleLogin() {
+		authError = '';
+		authLoading = true;
+		try {
+			const res = await fetch('/api/auth/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email: loginEmail, password: loginPassword })
+			});
+			const json = await res.json();
+			if (!res.ok) {
+				authError = json.error || 'Login failed';
+				return;
+			}
+			closeAuthDialog();
+			await invalidateAll();
+		} catch {
+			authError = 'Network error';
+		} finally {
+			authLoading = false;
+		}
+	}
+
+	async function handleRegister() {
+		authError = '';
+		authLoading = true;
+		try {
+			const res = await fetch('/api/auth/register', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					email: regEmail,
+					firstName: regFirstName,
+					lastName: regLastName,
+					password: regPassword
+				})
+			});
+			const json = await res.json();
+			if (!res.ok) {
+				authError = json.error || 'Registration failed';
+				return;
+			}
+			closeAuthDialog();
+			await invalidateAll();
+		} catch {
+			authError = 'Network error';
+		} finally {
+			authLoading = false;
+		}
+	}
+
+	async function handleDemoLogin() {
+		authError = '';
+		authLoading = true;
+		try {
+			const res = await fetch('/api/auth/demo-login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email: 'demo@legal-ai.local', role: 'admin' })
+			});
+			if (!res.ok) {
+				authError = 'Demo login failed';
+				return;
+			}
+			closeAuthDialog();
+			await invalidateAll();
+		} catch {
+			authError = 'Network error';
+		} finally {
+			authLoading = false;
+		}
+	}
+
+	function fillDemoCredentials() {
+		loginEmail = 'demo@legal-ai.local';
+		loginPassword = 'demo123';
+	}
 
 	function cycleAIMode() {
 		const modes = ['9S', 'A2', '2B'];
@@ -47,12 +148,10 @@
 	}
 
 	$effect(() => {
-
 		if (browser) {
 			// Health check logic can be added here later
 		}
-	
-});
+	});
 </script>
 
 {#snippet caseCard(caseItem: any)}
@@ -155,15 +254,24 @@
 			<div class="header-subtitle">YoRHa <span class="dimmed">Detective Interface / 8/13.10</span></div>
 		</div>
  <div class="header-right">
- <button class="{buttonVariants({variant: 'outline', size: 'sm'})} header-btn">
- <span class="icon">🔔</span> HELP <span class="badge">0</span>
- </button>
- <button class="{buttonVariants({variant: 'outline', size: 'sm'})} header-btn">
- <span class="icon">⚙️</span> OPTIONS
- </button>
- <a href="/cases/new" class="{buttonVariants({variant: 'default', size: 'sm'})} header-btn new-case-btn">
- <span class="icon">➕</span> NEW CASE
- </a>
+		{#if !user}
+			<button onclick={() => openAuthDialog('login')} class="{buttonVariants({variant: 'outline', size: 'sm'})} header-btn">
+				SIGN IN
+			</button>
+			<button onclick={() => openAuthDialog('register')} class="{buttonVariants({variant: 'default', size: 'sm'})} header-btn new-case-btn">
+				REGISTER
+			</button>
+		{:else}
+			<button class="{buttonVariants({variant: 'outline', size: 'sm'})} header-btn">
+				<span class="icon">🔔</span> HELP <span class="badge">0</span>
+			</button>
+			<button class="{buttonVariants({variant: 'outline', size: 'sm'})} header-btn">
+				<span class="icon">⚙️</span> OPTIONS
+			</button>
+			<a href="/cases/new" class="{buttonVariants({variant: 'default', size: 'sm'})} header-btn new-case-btn">
+				<span class="icon">➕</span> NEW CASE
+			</a>
+		{/if}
  </div>
  </header>
 
@@ -258,7 +366,7 @@
  <div class="system-status-panel">
  <h3>SYSTEM STATUS</h3>
  <div class="status-buttons">
- <a href="/evidence-board" class="status-btn">
+ <a href="/evidence" class="status-btn">
  <span class="icon">📊</span> EVIDENCE BOARD
  </a>
  <a href="/timeline-analysis" class="status-btn">
@@ -296,6 +404,97 @@
  </footer>
  </div>
 </main>
+
+<!-- Auth Dialog -->
+<dialog bind:this={authDialogRef} class="auth-dialog" onclick={(e) => { if (e.target === authDialogRef) closeAuthDialog(); }}>
+	<div class="dialog-inner">
+		<div class="dialog-header">
+			<h2>YORHA // {authTab === 'login' ? 'SIGN IN' : 'REGISTER'}</h2>
+			<button class="dialog-close" onclick={closeAuthDialog}>X</button>
+		</div>
+
+		<div class="dialog-tabs">
+			<button class="dialog-tab" class:active={authTab === 'login'} onclick={() => { authTab = 'login'; authError = ''; }}>
+				SIGN IN
+			</button>
+			<button class="dialog-tab" class:active={authTab === 'register'} onclick={() => { authTab = 'register'; authError = ''; }}>
+				REGISTER
+			</button>
+		</div>
+
+		{#if authError}
+			<div class="dialog-error">{authError}</div>
+		{/if}
+
+		{#if authTab === 'login'}
+			<form class="dialog-form" onsubmit={(e) => { e.preventDefault(); handleLogin(); }}>
+				<label class="dialog-label">
+					EMAIL
+					<input type="email" bind:value={loginEmail} required class="dialog-input" placeholder="demo@legal-ai.local" />
+				</label>
+				<label class="dialog-label">
+					PASSWORD
+					<input type="password" bind:value={loginPassword} required class="dialog-input" placeholder="demo123" />
+				</label>
+				<button type="submit" class="dialog-btn-primary" disabled={authLoading}>
+					{authLoading ? 'AUTHENTICATING...' : 'SIGN IN'}
+				</button>
+			</form>
+
+			<div class="dialog-divider">
+				<span>DEMO ACCOUNTS</span>
+			</div>
+
+			<div class="demo-credentials">
+				<div class="demo-row">
+					<span class="demo-label">Admin:</span>
+					<code>demo@legal-ai.local</code> / <code>demo123</code>
+					<button class="demo-fill-btn" onclick={fillDemoCredentials}>FILL</button>
+				</div>
+				<div class="demo-row">
+					<span class="demo-label">Prosecutor:</span>
+					<code>prosecutor@legal.ai</code> / <code>password123</code>
+				</div>
+				<div class="demo-row">
+					<span class="demo-label">Detective:</span>
+					<code>detective@legal.ai</code> / <code>password123</code>
+				</div>
+			</div>
+
+			<button class="dialog-btn-demo" onclick={handleDemoLogin} disabled={authLoading}>
+				QUICK DEMO LOGIN (admin)
+			</button>
+
+			<div class="dialog-hint">
+				Run <code>npm run db:seed</code> to create demo accounts
+			</div>
+		{:else}
+			<form class="dialog-form" onsubmit={(e) => { e.preventDefault(); handleRegister(); }}>
+				<div class="dialog-row">
+					<label class="dialog-label">
+						FIRST NAME
+						<input type="text" bind:value={regFirstName} required class="dialog-input" placeholder="Jane" />
+					</label>
+					<label class="dialog-label">
+						LAST NAME
+						<input type="text" bind:value={regLastName} required class="dialog-input" placeholder="Prosecutor" />
+					</label>
+				</div>
+				<label class="dialog-label">
+					EMAIL
+					<input type="email" bind:value={regEmail} required class="dialog-input" placeholder="you@legal.ai" />
+				</label>
+				<label class="dialog-label">
+					PASSWORD
+					<input type="password" bind:value={regPassword} required minlength="8" class="dialog-input" placeholder="Min 8 characters" />
+				</label>
+				<button type="submit" class="dialog-btn-primary" disabled={authLoading}>
+					{authLoading ? 'CREATING ACCOUNT...' : 'REGISTER'}
+				</button>
+			</form>
+		{/if}
+	</div>
+</dialog>
 
 <style>
  /* YoRHa Detective Command Center Styles */
@@ -829,6 +1028,253 @@
  .health-time {
  margin-left: auto;
 		opacity: 0.6;
+ }
+
+ /* Auth Dialog */
+ .auth-dialog {
+	border: none;
+	padding: 0;
+	background: transparent;
+	max-width: 480px;
+	width: 90vw;
+ }
+
+ .auth-dialog::backdrop {
+	background: rgba(15, 15, 15, 0.7);
+	backdrop-filter: blur(4px);
+ }
+
+ .dialog-inner {
+	background: #2a2016;
+	color: #f8f0d9;
+	border: 4px solid #0f0f0f;
+	padding: 2rem;
+ }
+
+ .dialog-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.5rem;
+	padding-bottom: 1rem;
+	border-bottom: 2px solid #0f0f0f;
+ }
+
+ .dialog-header h2 {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 900;
+	letter-spacing: 2px;
+ }
+
+ .dialog-close {
+	background: transparent;
+	border: 2px solid #f8f0d9;
+	color: #f8f0d9;
+	width: 32px;
+	height: 32px;
+	font-weight: 900;
+	cursor: pointer;
+	font-size: 0.85rem;
+ }
+
+ .dialog-close:hover {
+	background: #f8f0d9;
+	color: #2a2016;
+ }
+
+ .dialog-tabs {
+	display: flex;
+	gap: 0;
+	margin-bottom: 1.5rem;
+ }
+
+ .dialog-tab {
+	flex: 1;
+	padding: 0.75rem;
+	background: #1a160f;
+	color: #8a7a5a;
+	border: 2px solid #0f0f0f;
+	font-weight: 700;
+	font-size: 0.8rem;
+	letter-spacing: 1px;
+	cursor: pointer;
+ }
+
+ .dialog-tab.active {
+	background: #0f0f0f;
+	color: #fdf3d4;
+	border-bottom-color: #fdf3d4;
+ }
+
+ .dialog-error {
+	background: #4a1010;
+	border: 2px solid #d32f2f;
+	padding: 0.75rem 1rem;
+	margin-bottom: 1rem;
+	font-size: 0.8rem;
+	color: #ff8a80;
+ }
+
+ .dialog-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+ }
+
+ .dialog-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+ }
+
+ .dialog-label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 1px;
+	color: #b4a080;
+ }
+
+ .dialog-input {
+	padding: 0.625rem 0.75rem;
+	background: #12100c;
+	border: 2px solid #0f0f0f;
+	color: #f8f0d9;
+	font-family: inherit;
+	font-size: 0.85rem;
+ }
+
+ .dialog-input:focus {
+	outline: none;
+	border-color: #fdf3d4;
+ }
+
+ .dialog-input::placeholder {
+	color: #5a4a3a;
+ }
+
+ .dialog-btn-primary {
+	padding: 0.875rem;
+	background: #f8f0d9;
+	color: #0f0f0f;
+	border: 3px solid #0f0f0f;
+	font-weight: 900;
+	font-size: 0.85rem;
+	letter-spacing: 1px;
+	cursor: pointer;
+	margin-top: 0.5rem;
+ }
+
+ .dialog-btn-primary:hover:not(:disabled) {
+	background: #fdf3d4;
+ }
+
+ .dialog-btn-primary:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+ }
+
+ .dialog-divider {
+	display: flex;
+	align-items: center;
+	margin: 1.5rem 0 1rem;
+	gap: 1rem;
+ }
+
+ .dialog-divider::before,
+ .dialog-divider::after {
+	content: '';
+	flex: 1;
+	height: 1px;
+	background: #0f0f0f;
+ }
+
+ .dialog-divider span {
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 1px;
+	color: #8a7a5a;
+ }
+
+ .demo-credentials {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+ }
+
+ .demo-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.75rem;
+	padding: 0.375rem 0.625rem;
+	background: #12100c;
+	border: 1px solid #1a160f;
+ }
+
+ .demo-label {
+	font-weight: 700;
+	color: #b4a080;
+	min-width: 80px;
+ }
+
+ .demo-row code {
+	color: #fdf3d4;
+	font-size: 0.7rem;
+ }
+
+ .demo-fill-btn {
+	margin-left: auto;
+	padding: 0.25rem 0.5rem;
+	background: #0f0f0f;
+	color: #fdf3d4;
+	border: 1px solid #fdf3d4;
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	cursor: pointer;
+ }
+
+ .demo-fill-btn:hover {
+	background: #fdf3d4;
+	color: #0f0f0f;
+ }
+
+ .dialog-btn-demo {
+	width: 100%;
+	padding: 0.75rem;
+	background: #1a3a1a;
+	color: #4ade80;
+	border: 2px solid #4ade80;
+	font-weight: 700;
+	font-size: 0.8rem;
+	letter-spacing: 1px;
+	cursor: pointer;
+	margin-bottom: 1rem;
+ }
+
+ .dialog-btn-demo:hover:not(:disabled) {
+	background: #2a4a2a;
+ }
+
+ .dialog-btn-demo:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+ }
+
+ .dialog-hint {
+	text-align: center;
+	font-size: 0.7rem;
+	color: #8a7a5a;
+ }
+
+ .dialog-hint code {
+	color: #b4a080;
+	font-size: 0.7rem;
  }
 
  /* Responsive */

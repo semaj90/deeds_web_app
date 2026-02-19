@@ -1,17 +1,17 @@
 <script lang="ts">
   import Badge from "$lib/components/ui/Badge.svelte";
   import Button from '$lib/components/ui/Button.svelte';
-  import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
-  import Archive from 'lucide-svelte/icons/archive';
-  import Calendar from 'lucide-svelte/icons/calendar';
-  import CheckCircle from 'lucide-svelte/icons/check-circle';
-  import Clock from 'lucide-svelte/icons/clock';
-  import Edit from 'lucide-svelte/icons/edit';
-  import Eye from 'lucide-svelte/icons/eye';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import MoreVertical from 'lucide-svelte/icons/more-vertical';
-  import Trash2 from 'lucide-svelte/icons/trash-2';
-  import Users from 'lucide-svelte/icons/users';
+  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import Archive from '@lucide/svelte/icons/archive';
+  import Calendar from '@lucide/svelte/icons/calendar';
+  import CheckCircle from '@lucide/svelte/icons/check-circle';
+  import Clock from '@lucide/svelte/icons/clock';
+  import Edit from '@lucide/svelte/icons/edit';
+  import Eye from '@lucide/svelte/icons/eye';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import MoreVertical from '@lucide/svelte/icons/more-vertical';
+  import Trash2 from '@lucide/svelte/icons/trash-2';
+  import Users from '@lucide/svelte/icons/users';
   import { scale } from 'svelte/transition';
 
   interface CaseData { id: string, title: string;

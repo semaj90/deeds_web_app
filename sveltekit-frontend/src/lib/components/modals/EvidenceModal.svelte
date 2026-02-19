@@ -2,10 +2,10 @@
 <script lang="ts">
   import { Dialog } from "bits-ui";
 import Button from '$lib/components/ui/Button.svelte';
-  import X from 'lucide-svelte/icons/x';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import Edit from 'lucide-svelte/icons/edit';
-  import Save from 'lucide-svelte/icons/save';
+  import X from '@lucide/svelte/icons/x';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import Edit from '@lucide/svelte/icons/edit';
+  import Save from '@lucide/svelte/icons/save';
 
   // Props interface
   interface EvidenceItem {

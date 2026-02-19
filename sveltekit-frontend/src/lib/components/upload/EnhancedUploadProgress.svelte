@@ -6,15 +6,15 @@ import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 import Progress from '$lib/components/ui/progress/Progress.svelte';
 import { enhancedUploadStore, type EnhancedUploadState } from '$lib/stores/unified';
-import AlertCircle from 'lucide-svelte/icons/alert-circle';
-import Brain from 'lucide-svelte/icons/brain';
-import CheckCircle from 'lucide-svelte/icons/check-circle';
-import Clock from 'lucide-svelte/icons/clock';
-import Database from 'lucide-svelte/icons/database';
-import Eye from 'lucide-svelte/icons/eye';
-import Loader2 from 'lucide-svelte/icons/loader-2';
-import Network from 'lucide-svelte/icons/network';
-import Zap from 'lucide-svelte/icons/zap';
+import AlertCircle from '@lucide/svelte/icons/alert-circle';
+import Brain from '@lucide/svelte/icons/brain';
+import CheckCircle from '@lucide/svelte/icons/check-circle';
+import Clock from '@lucide/svelte/icons/clock';
+import Database from '@lucide/svelte/icons/database';
+import Eye from '@lucide/svelte/icons/eye';
+import Loader2 from '@lucide/svelte/icons/loader-2';
+import Network from '@lucide/svelte/icons/network';
+import Zap from '@lucide/svelte/icons/zap';
 // Reactive state from enhanced upload machine
 let uploadState = $state<EnhancedUploadState>();
 

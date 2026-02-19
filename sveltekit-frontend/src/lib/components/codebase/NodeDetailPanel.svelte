@@ -6,12 +6,12 @@
    * Task: 13.3 - Add node interaction handlers
    * Purpose: Display detailed metadata for selected graph nodes
    */
-  import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
-  import Code from 'lucide-svelte/icons/code';
-  import FileCode from 'lucide-svelte/icons/file-code';
-  import GitBranch from 'lucide-svelte/icons/git-branch';
-  import Layers from 'lucide-svelte/icons/layers';
-  import X from 'lucide-svelte/icons/x';
+  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import Code from '@lucide/svelte/icons/code';
+  import FileCode from '@lucide/svelte/icons/file-code';
+  import GitBranch from '@lucide/svelte/icons/git-branch';
+  import Layers from '@lucide/svelte/icons/layers';
+  import X from '@lucide/svelte/icons/x';
 
   interface GraphNode {
     id: string;

@@ -3,13 +3,13 @@
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
   import  Input  from "$lib/components/ui/input/Input.svelte";
-  import Loader2 from 'lucide-svelte/icons/loader-2';
-  import Bot from 'lucide-svelte/icons/bot';
-  import MessageSquare from 'lucide-svelte/icons/message-square';
-  import FileText from 'lucide-svelte/icons/file-text';
-  import Search from 'lucide-svelte/icons/search';
-  import Sparkles from 'lucide-svelte/icons/sparkles';
-  import Zap from 'lucide-svelte/icons/zap';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import Bot from '@lucide/svelte/icons/bot';
+  import MessageSquare from '@lucide/svelte/icons/message-square';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import Search from '@lucide/svelte/icons/search';
+  import Sparkles from '@lucide/svelte/icons/sparkles';
+  import Zap from '@lucide/svelte/icons/zap';
 
   // Exported props (use standard exports to avoid svelte-preprocess type errors)
   const { onAISearch } = $props<{ onAISearch, ((res: any) }>()

@@ -6,11 +6,11 @@
 	 * Task: 14.1 - Create semantic search component
 	 * Purpose: Search input with autocomplete and real-time results
 	 */
-	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
-	import FileCode from 'lucide-svelte/icons/file-code';
-	import Loader2 from 'lucide-svelte/icons/loader-2';
-	import Search from 'lucide-svelte/icons/search';
-	import X from 'lucide-svelte/icons/x';
+	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+	import FileCode from '@lucide/svelte/icons/file-code';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import Search from '@lucide/svelte/icons/search';
+	import X from '@lucide/svelte/icons/x';
 	// Migrated to $effect
 
 	interface SearchResult { id: string, filePath: string;

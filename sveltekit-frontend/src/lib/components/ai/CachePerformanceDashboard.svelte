@@ -1,17 +1,17 @@
 <!-- Cache Performance Dashboard for Legal AI System -->
 <script lang="ts">
-  import Database from 'lucide-svelte/icons/database';
-  import Zap from 'lucide-svelte/icons/zap';
-  import TrendingUp from 'lucide-svelte/icons/trending-up';
-  import DollarSign from 'lucide-svelte/icons/dollar-sign';
-  import Clock from 'lucide-svelte/icons/clock';
-  import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
-  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
-  import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
-  import CheckCircle from 'lucide-svelte/icons/check-circle';
-  import Target from 'lucide-svelte/icons/target';
-  import Cpu from 'lucide-svelte/icons/cpu';
-  import HardDrive from 'lucide-svelte/icons/hard-drive';
+  import Database from '@lucide/svelte/icons/database';
+  import Zap from '@lucide/svelte/icons/zap';
+  import TrendingUp from '@lucide/svelte/icons/trending-up';
+  import DollarSign from '@lucide/svelte/icons/dollar-sign';
+  import Clock from '@lucide/svelte/icons/clock';
+  import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import CheckCircle from '@lucide/svelte/icons/check-circle';
+  import Target from '@lucide/svelte/icons/target';
+  import Cpu from '@lucide/svelte/icons/cpu';
+  import HardDrive from '@lucide/svelte/icons/hard-drive';
 
   // Cache metrics state
   let cacheMetrics = $state({
