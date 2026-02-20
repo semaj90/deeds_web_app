@@ -29,6 +29,8 @@ import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 import { searchEvidenceViaGrpc } from '$lib/server/grpc/retrieval-client.js';
+import type { VectorSearchResult, VectorSearchOptions } from '$lib/server/db/pgvector-utils.js';
+import { productionLogger } from '$lib/server/production-logger.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 

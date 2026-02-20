@@ -3,6 +3,7 @@
 	import type { LayoutData } from './$types';
 	import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
+	import { notificationStore } from '$lib/stores/unified/notification-store.svelte.js';
 
 	interface Props {
 		data: LayoutData;
@@ -123,7 +124,65 @@
 <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
 <CodebaseSearch />
 
+<!-- Toast Notifications Overlay -->
+{#if notificationStore.toasts.length > 0}
+	<div class="toast-container">
+		{#each notificationStore.toasts as toast (toast.id)}
+			<div class="toast toast-{toast.type}" role="alert">
+				<span class="toast-msg">{toast.message}</span>
+				<button class="toast-dismiss" onclick={() => notificationStore.dismissToast(toast.id)} aria-label="Dismiss">&times;</button>
+			</div>
+		{/each}
+	</div>
+{/if}
+
 <style>
+	.toast-container {
+		position: fixed;
+		bottom: 1.5rem;
+		right: 1.5rem;
+		z-index: 9999;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		max-width: 360px;
+	}
+
+	.toast {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		border-radius: 0.375rem;
+		font-size: 0.8125rem;
+		font-family: 'JetBrains Mono', monospace;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+		animation: toast-in 0.2s ease-out;
+	}
+
+	@keyframes toast-in {
+		from { opacity: 0; transform: translateX(1rem); }
+		to { opacity: 1; transform: translateX(0); }
+	}
+
+	.toast-info { background: #1a2332; color: #63b3ed; border: 1px solid #63b3ed40; }
+	.toast-success { background: #1a2e1a; color: #48bb78; border: 1px solid #48bb7840; }
+	.toast-warning { background: #2e2a1a; color: #ecc94b; border: 1px solid #ecc94b40; }
+	.toast-error { background: #2e1a1a; color: #f56565; border: 1px solid #f5656540; }
+
+	.toast-msg { flex: 1; }
+
+	.toast-dismiss {
+		background: none;
+		border: none;
+		color: inherit;
+		opacity: 0.6;
+		cursor: pointer;
+		font-size: 1.25rem;
+		padding: 0;
+		line-height: 1;
+	}
+	.toast-dismiss:hover { opacity: 1; }
 	.app-shell {
 		display: flex;
 		min-height: 100vh;

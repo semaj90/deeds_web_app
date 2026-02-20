@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
 	import { getConfidenceLevel, formatProcessingTime } from '$lib/utils';
+	import type { RetrievalContext, RankedChunk } from '$lib/machines/retrieval-machine.js';
 	import Search from '@lucide/svelte/icons/search';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import FileText from '@lucide/svelte/icons/file-text';
@@ -262,21 +263,20 @@
 			</div>
 
 			<div class="mode-toggle">
-				<button
-					class="mode-btn"
-					class:active={searchMode === 'evidence'}
-					onclick={() => searchMode = 'evidence'}
-				>
-					<Network size={14} />
-					Evidence (RAG+KAG+DAG)
+				<button class="mode-btn" class:active={searchMode === 'evidence'} onclick={() => searchMode = 'evidence'}>
+					<Network size={14} /> Evidence
 				</button>
-				<button
-					class="mode-btn"
-					class:active={searchMode === 'rag'}
-					onclick={() => searchMode = 'rag'}
-				>
-					<Search size={14} />
-					Knowledge Base (RAG)
+				<button class="mode-btn" class:active={searchMode === 'rag'} onclick={() => searchMode = 'rag'}>
+					<Search size={14} /> Knowledge Base
+				</button>
+				<button class="mode-btn" class:active={searchMode === 'statutes'} onclick={() => searchMode = 'statutes'}>
+					<Scale size={14} /> Statutes
+				</button>
+				<button class="mode-btn" class:active={searchMode === 'precedents'} onclick={() => searchMode = 'precedents'}>
+					<Briefcase size={14} /> Precedents
+				</button>
+				<button class="mode-btn" class:active={searchMode === 'glossary'} onclick={() => searchMode = 'glossary'}>
+					<FileText size={14} /> Glossary
 				</button>
 			</div>
 		</div>
@@ -345,6 +345,19 @@
 			</div>
 
 			<!-- Timing Breakdown -->
+			{#if (searchMode === 'statutes' || searchMode === 'precedents' || searchMode === 'glossary') && auxTiming.total_ms}
+				<div class="timing-panel">
+					<h3><Clock size={14} /> TIMING</h3>
+					<div class="timing-grid">
+						{#each Object.entries(auxTiming) as [key, ms]}
+							<div class="timing-row">
+								<span>{key.replace(/_/g, ' ')}</span>
+								<span class="timing-value">{ms}ms</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
 			{#if (searchMode === 'evidence' && evidenceTiming) || (searchMode === 'rag' && ragTiming)}
 				{@const timing = searchMode === 'evidence' ? evidenceTiming : ragTiming}
 				<div class="timing-panel">
@@ -503,6 +516,78 @@
 						</div>
 					</button>
 				{/each}
+			{:else if searchMode === 'statutes' && statuteResults.length > 0}
+				{#each statuteResults as result, i}
+					<div class="result-card">
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<div class="bundle-title">{result.statuteTitle}</div>
+							<div class="confidence-badge" style="background: rgba(72,187,120,0.15); color: #48bb78;">
+								{Math.round((result.similarity ?? 0) * 100)}%
+							</div>
+						</div>
+						<p class="bundle-preview">{result.content?.slice(0, 300)}</p>
+						<div class="bundle-meta">
+							{#if result.section}
+								<span class="meta-tag section">{result.section}</span>
+							{/if}
+							{#if result.jurisdiction}
+								<span class="meta-tag source">{result.jurisdiction}</span>
+							{/if}
+							{#if result.category}
+								<span class="meta-tag entity">{result.category}</span>
+							{/if}
+						</div>
+					</div>
+				{/each}
+			{:else if searchMode === 'precedents' && precedentResults.length > 0}
+				{#each precedentResults as result, i}
+					<div class="result-card">
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<div class="bundle-title">{result.title}</div>
+							<div class="confidence-badge" style="background: rgba(99,179,237,0.15); color: #63b3ed;">
+								{Math.round((result.similarity ?? 0) * 100)}%
+							</div>
+						</div>
+						<p class="bundle-preview">{result.summary?.slice(0, 300)}</p>
+						<div class="bundle-meta">
+							{#if result.citation}
+								<span class="meta-tag section">{result.citation}</span>
+							{/if}
+							{#if result.court}
+								<span class="meta-tag source">{result.court}</span>
+							{/if}
+							{#if result.source}
+								<span class="meta-tag entity">{result.source}</span>
+							{/if}
+						</div>
+					</div>
+				{/each}
+			{:else if searchMode === 'glossary' && glossaryResults.length > 0}
+				{#each glossaryResults as result, i}
+					<div class="result-card">
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<div class="bundle-title">{result.term}</div>
+							<div class="confidence-badge" style="background: rgba(236,201,75,0.15); color: #ecc94b;">
+								{result.matchType}
+							</div>
+						</div>
+						<p class="bundle-preview">{result.definition}</p>
+						<div class="bundle-meta">
+							{#if result.category}
+								<span class="meta-tag source">{result.category}</span>
+							{/if}
+							{#if result.jurisdiction}
+								<span class="meta-tag section">{result.jurisdiction}</span>
+							{/if}
+							{#if result.relatedTerms?.length > 0}
+								<span class="meta-tag entity">{result.relatedTerms.length} related</span>
+							{/if}
+						</div>
+					</div>
+				{/each}
 			{:else if !isSearching && searchQuery}
 				<div class="empty-state">
 					<Search size={48} />
@@ -513,7 +598,7 @@
 				<div class="empty-state">
 					<Search size={48} />
 					<p>Enter a query to search</p>
-					<p class="empty-hint">Search across evidence, cases, legal documents, and knowledge base.</p>
+					<p class="empty-hint">Search across evidence, cases, statutes, precedents, and glossary.</p>
 				</div>
 			{/if}
 		</main>

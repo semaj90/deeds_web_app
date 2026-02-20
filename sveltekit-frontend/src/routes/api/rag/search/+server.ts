@@ -7,6 +7,8 @@ import type {
 	RetrievedChunk,
 	ConfidenceLevel
 } from '$lib/types/rag-source-validation';
+import type { RAGConfig } from '$lib/sdk/rag/index.js';
+import { productionLogger } from '$lib/server/production-logger.js';
 
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();

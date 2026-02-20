@@ -6,6 +6,7 @@
 import { dev } from '$app/environment';
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
 import { startWorker } from '$lib/server/analysis/worker.js';
+import { productionLogger } from '$lib/server/production-logger.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 // Start the analysis worker on server boot (idempotent)
@@ -64,10 +65,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// Resolve the request
 	const response = await resolve(event);
 
-	// Add timing headers
+	// Add timing headers + structured request logging
 	const duration = Date.now() - startTime;
 	response.headers.set('X-Request-ID', requestId);
 	response.headers.set('X-Response-Time', `${duration}ms`);
+
+	productionLogger.apiRequest(
+		event.request.method,
+		event.url.pathname,
+		response.status,
+		duration,
+		{ requestId, userId: event.locals.user?.id }
+	);
 
 	// Cross-origin isolation headers — required for SharedArrayBuffer / threaded WASM (ORT)
 	response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
@@ -89,7 +98,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 export const handleError: HandleServerError = ({ error, event }) => {
 	const errorId = crypto.randomUUID();
 
-	console.error(`[${errorId}] Error in ${event.url.pathname}:`, error);
+	productionLogger.error(
+		`[${errorId}] Unhandled error in ${event.url.pathname}`,
+		error instanceof Error ? error : new Error(String(error)),
+		{ requestId: event.locals.requestId, endpoint: event.url.pathname }
+	);
 
 	return {
 		message: 'An unexpected error occurred',

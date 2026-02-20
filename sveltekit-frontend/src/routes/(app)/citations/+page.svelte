@@ -4,6 +4,9 @@
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+  import CitationManager from '$lib/components/legal/CitationManager.svelte';
+
+  let viewMode = $state<'list' | 'manager'>('list');
 
   interface Citation {
     id: string;
@@ -71,7 +74,15 @@
   <header class="mb-8 text-center">
     <h1 class="text-3xl font-bold text-sand mb-2">Citation Library</h1>
     <p class="text-sand/60 text-sm">Browse and search legal citations across all cases</p>
+    <div class="flex justify-center gap-2 mt-4">
+      <Button onclick={() => viewMode = 'list'}>List View</Button>
+      <Button onclick={() => viewMode = 'manager'}>Citation Manager</Button>
+    </div>
   </header>
+
+  {#if viewMode === 'manager'}
+    <CitationManager />
+  {:else}
 
   <Card class="mb-6 bg-panel border-black/40">
     <CardContent class="p-4">
@@ -154,5 +165,6 @@
         </Card>
       {/each}
     </div>
+  {/if}
   {/if}
 </div>
