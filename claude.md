@@ -428,6 +428,10 @@ safelist: [
 - **Qdrant filter**: `match: { value: someVar }` not `match: { value, someVar }` — shorthand fails when var name != `value`
 - **ioredis v5 types**: DO NOT add `declare module 'ioredis'` augmentations — they shadow bundled types
 - **amqplib**: Named/namespace imports fail with `moduleResolution: "bundler"`. Use local interfaces + dynamic `await import('amqplib')`
+- **@lucide/svelte SSR bug**: v0.564.0 throws `Cannot access 'props' before initialization` during SSR. Fix: add `export const ssr = false` in `+page.ts` for routes using lucide icons
+- **Svelte 5 `{@const}` placement**: Must be direct child of `{#if}`/`{:else if}`/`{#each}` blocks — NOT inside `<div>` or other HTML elements
+- **Dev server startup**: Must use `npm run dev` (sets `DEV_BYPASS_AUTH=true` + env vars via `cross-env`), NOT `npx vite dev`
+- **SvelteKit handleError**: Hides real errors behind generic message. Temporarily expose `error.message + error.stack` in return value to diagnose SSR 500s
 - **Corrupted files <50 lines**: Need complete rewrites, not incremental fixes
 - **IDE linter reverts**: Use Write tool (not Edit) for reliable file modifications
 
